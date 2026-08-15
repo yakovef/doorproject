@@ -41,10 +41,10 @@ export function render(state) {
 
   const paint = colour.hex;
   const edge  = silhouette(paint);
-  // The frame must read as its own plane, or the door looks like a flat
-  // sticker. Light doors need a darker frame; dark doors a lighter one,
-  // since darkening near-black achieves nothing.
-  const frameFill = isLight(paint) ? darken(paint, 0.16) : lighten(paint, 0.14);
+  // On a real door the frame is painted the SAME colour as the leaf — they are
+  // separated by shadow, not by tone. Tinting the frame produced a visible
+  // band down the hinge side, which is exactly what a real door doesn't have.
+  const frameFill = paint;
 
   // Hinges on `handing.hinge`; the handle always sits on the opposite side.
   const hingeLeft = handing.hinge === 'left';
@@ -59,10 +59,11 @@ export function render(state) {
      data-light="${isLight(paint)}"
      aria-label="${describe(state)}" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <!-- Barely a gradient. Oven-baked matte paint has almost no falloff, and
+         overdoing it is what makes a drawn door read as plastic. -->
     <linearGradient id="leafGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"    stop-color="${lighten(paint, 0.07)}"/>
-      <stop offset="0.45" stop-color="${paint}"/>
-      <stop offset="1"    stop-color="${darken(paint, 0.06)}"/>
+      <stop offset="0" stop-color="${lighten(paint, 0.03)}"/>
+      <stop offset="1" stop-color="${darken(paint, 0.03)}"/>
     </linearGradient>
 
     <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
@@ -72,9 +73,25 @@ export function render(state) {
     </linearGradient>
 
     <linearGradient id="revealShade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"   stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="0.3" stop-color="#000" stop-opacity="0.10"/>
-      <stop offset="1"   stop-color="#000" stop-opacity="0.04"/>
+      <stop offset="0"   stop-color="#000" stop-opacity="0.42"/>
+      <stop offset="0.25" stop-color="#000" stop-opacity="0.18"/>
+      <stop offset="1"   stop-color="#000" stop-opacity="0.08"/>
+    </linearGradient>
+
+    <!-- Light falls from above, so the frame casts a shadow onto the top of
+         the leaf and a thinner one down the hinge side. This is the only
+         shading on the leaf: the paint itself stays one colour. -->
+    <linearGradient id="topShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sideShadeL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sideShadeR" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
 
     <filter id="softShadow" x="-30%" y="-60%" width="160%" height="260%">
@@ -125,9 +142,11 @@ export function render(state) {
     <rect x="${x0}" y="${y0}" width="${leafW}" height="${leafH}"
           fill="url(#leafGrad)" stroke="${edge}" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
-    <!-- raking light down the hinge stile: matte paint, so barely there -->
-    <rect x="${hingeLeft ? x0 : x1 - 90}" y="${y0}" width="90" height="${leafH}"
-          fill="#fff" opacity="0.05"/>
+    <!-- The leaf is one flat colour edge to edge. Depth comes from the
+         shadow the frame casts onto it, never from tinting the paint. -->
+    <rect x="${x0}" y="${y0}" width="${leafW}" height="46" fill="url(#topShade)"/>
+    <rect x="${hingeLeft ? x0 : x1 - 34}" y="${y0}" width="34" height="${leafH}"
+          fill="url(#${hingeLeft ? 'sideShadeL' : 'sideShadeR'})"/>
   </g>
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
