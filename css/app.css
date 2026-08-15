@@ -1,0 +1,312 @@
+/* ═══════════════════════════════════════════════════════════════
+   דלתות מגן — configurator
+   Mobile first: nearly every visitor arrives on a phone, from a
+   WhatsApp link or the button on the main site (PLAN.md §7).
+   Logical properties throughout, so Hebrew RTL and English LTR
+   share one stylesheet.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --paper:      #EFEDE8;
+  --paper-up:   #F5F3EF;
+  /* The wall matches the stage exactly, so the drawing has no visible edge —
+     otherwise the SVG reads as a floating rectangle pasted onto the page. */
+  --wall:       #F5F3EF;
+  --floor:      #E6E2DA;
+  --ink:        #171715;
+  --ink-2:      #6B6862;
+  --rule:       #D6D3CB;
+  --accent:     #B08D57;
+  --wa:         #1EA95A;
+  --warn:       #A4442E;
+
+  --sp: 4px;
+  --radius: 2px;
+
+  --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+  --sans: "Segoe UI", "Arial Hebrew", Arial, system-ui, sans-serif;
+
+  --ease: cubic-bezier(.33, 1, .68, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;   /* every numeral, always */
+}
+
+.sr-only {
+  position: absolute; inline-size: 1px; block-size: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ── header ───────────────────────────────────────────────── */
+
+.bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-block-end: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.brand { text-decoration: none; color: inherit; display: grid; }
+.brand__name { font-weight: 700; font-size: 1.05rem; letter-spacing: .01em; }
+.brand__sub {
+  font-size: .7rem; letter-spacing: .14em; color: var(--ink-2);
+}
+.bar__phone {
+  font-family: var(--mono); font-size: .9rem;
+  color: var(--ink); text-decoration: none;
+  border-block-end: 1px solid var(--accent);
+  padding-block-end: 1px;
+  direction: ltr;
+}
+
+/* ── strips ───────────────────────────────────────────────── */
+
+.strip {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: .82rem;
+  color: var(--ink-2);
+  background: var(--paper-up);
+  border-block-end: 1px solid var(--rule);
+}
+.strip strong { color: var(--ink); }
+.strip--warn { color: var(--warn); }
+
+/* ── layout ───────────────────────────────────────────────── */
+
+.layout {
+  display: grid;
+  gap: 0;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr minmax(340px, 400px);
+    align-items: start;
+    min-block-size: calc(100vh - 60px);
+  }
+}
+
+/* ── stage ────────────────────────────────────────────────── */
+
+.stage-wrap {
+  padding: 8px 16px 0;
+  background: var(--paper-up);
+  border-block-end: 1px solid var(--rule);
+}
+
+@media (min-width: 900px) {
+  .stage-wrap {
+    position: sticky; inset-block-start: 0;
+    border-block-end: 0;
+    border-inline-start: 1px solid var(--rule);
+    padding: 24px 24px 8px;
+    block-size: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+}
+
+.stage {
+  /* The door is never allowed off-screen — seeing it is the product. */
+  block-size: 46vh;
+  display: grid; place-items: center;
+  transition: background-color .3s var(--ease);
+}
+@media (min-width: 900px) { .stage { block-size: auto; max-block-size: 76vh; } }
+
+/* Light doors would vanish on a light ground, so the stage sinks a shade. */
+.stage[data-light="true"] { --wall: #E4E0D7; --floor: #D6D2C8; }
+
+.door-svg {
+  max-block-size: 46vh; max-inline-size: 100%; block-size: auto;
+  display: block;
+  /* The drawing NEVER mirrors with the interface. A right-hinged door is a
+     physical fact; flipping it would mean ordering the wrong door.
+     PLAN.md §6.1 */
+  direction: ltr;
+}
+@media (min-width: 900px) { .door-svg { max-block-size: 74vh; } }
+
+.door-svg rect, .door-svg path, .door-svg circle {
+  transition: fill .22s var(--ease), stroke .22s var(--ease);
+}
+
+.stage__note {
+  margin: 6px 0 10px;
+  text-align: center;
+  font-size: .72rem; color: var(--ink-2);
+}
+
+/* ── panel ────────────────────────────────────────────────── */
+
+.panel { padding: 20px 16px 40px; display: grid; gap: 28px; }
+@media (min-width: 900px) { .panel { padding: 28px 24px 48px; } }
+
+.field__title {
+  margin: 0 0 10px;
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-2); font-weight: 600;
+}
+.field__hint { margin: 8px 0 0; font-size: .78rem; color: var(--ink-2); }
+
+/* ── swatches ─────────────────────────────────────────────── */
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+
+.swatch {
+  appearance: none; -webkit-appearance: none;
+  background: none; border: 0; padding: 0;
+  font: inherit; color: inherit; text-align: start;
+  cursor: pointer;
+  display: grid; gap: 5px;
+  min-block-size: 44px;
+}
+
+.swatch__chip {
+  --ring: transparent;
+  display: block; block-size: 46px;
+  background: var(--chip);
+  border: 1px solid rgb(0 0 0 / .22);
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ring);
+  transition: box-shadow .12s var(--ease);
+}
+.swatch.is-selected .swatch__chip { --ring: var(--ink); }
+.swatch:hover .swatch__chip { --ring: var(--rule); }
+.swatch.is-selected:hover .swatch__chip { --ring: var(--ink); }
+
+.swatch__name { font-size: .82rem; line-height: 1.25; }
+.swatch__meta {
+  font-family: var(--mono); font-size: .66rem; color: var(--ink-2);
+}
+
+/* ── pills ────────────────────────────────────────────────── */
+
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.pill {
+  appearance: none; -webkit-appearance: none;
+  font: inherit; cursor: pointer;
+  padding: 10px 16px; min-block-size: 44px;
+  background: var(--paper-up);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  transition: border-color .12s var(--ease), background-color .12s var(--ease);
+}
+.pill:hover { border-color: var(--ink-2); }
+.pill.is-selected { border-color: var(--ink); background: var(--paper); box-shadow: inset 0 0 0 1px var(--ink); }
+
+/* ── the send block ───────────────────────────────────────── */
+
+.send {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  background: var(--paper-up);
+  display: grid; gap: 12px;
+}
+
+.send__price { display: grid; gap: 2px; }
+.send__label {
+  font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.send__figure {
+  font-size: 1.9rem; font-weight: 600; line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.send__incl { font-size: .78rem; color: var(--ink-2); }
+
+.send__spec {
+  margin: 0; padding-block: 8px;
+  border-block: 1px solid var(--rule);
+  font-size: .82rem; color: var(--ink-2);
+}
+
+.send__lead { margin: 0; font-size: .92rem; }
+
+.btn {
+  appearance: none; -webkit-appearance: none;
+  font: inherit; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-block-size: 52px; padding: 12px 18px;
+  border-radius: var(--radius); border: 1px solid transparent;
+  text-decoration: none; cursor: pointer;
+  transition: filter .12s var(--ease);
+}
+.btn:active { filter: brightness(.94); }
+
+.btn--wa { background: var(--wa); color: #fff; }
+.btn--wa:hover { filter: brightness(1.05); }
+
+.btn--ghost {
+  background: none; color: var(--ink);
+  border-color: var(--rule);
+  min-block-size: 44px; font-weight: 400; font-size: .88rem;
+}
+.btn--ghost:hover { border-color: var(--ink-2); }
+
+.send__alt {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.send__code { font-size: .78rem; color: var(--ink-2); }
+.send__code b { font-family: var(--mono); color: var(--ink); direction: ltr; display: inline-block; }
+
+.send__fine { margin: 0; font-size: .72rem; color: var(--ink-2); }
+.send__fine a { color: inherit; }
+
+/* ── proof ────────────────────────────────────────────────── */
+
+.proof { margin: 0; font-size: .85rem; color: var(--ink-2); }
+.proof a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: .25em; }
+
+/* ── toast ────────────────────────────────────────────────── */
+
+.toast {
+  position: fixed; inset-block-end: 16px;
+  inset-inline: 16px;
+  margin-inline: auto; max-inline-size: 26rem;
+  background: var(--ink); color: var(--paper);
+  padding: 12px 16px; border-radius: var(--radius);
+  font-size: .86rem; text-align: center;
+  z-index: 50;
+}
+
+/* ── reduced motion ───────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+/* ── forced colours: this UI is hairlines, so guard it ────── */
+
+@media (forced-colors: active) {
+  .swatch__chip { forced-color-adjust: none; }
+  .pill.is-selected, .swatch.is-selected .swatch__chip { outline: 2px solid CanvasText; }
+}

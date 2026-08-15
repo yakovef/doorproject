@@ -1,0 +1,17 @@
+{
+  "name": "dlatot-magen-configurator",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Door configurator for Dlatot Magen",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "dev": "node tools/build.mjs --watch",
+    "test": "node test/units.mjs",
+    "shot": "node tools/screenshot.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "playwright": "^1.49.0"
+  },
+  "type": "module"
+}

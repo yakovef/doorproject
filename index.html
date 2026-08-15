@@ -2,63 +2,92 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>דלתות מגן — בונים דלת</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>בונים דלת — דלתות מגן</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="בחירת דלת כניסה — בפיתוח.">
-<style>
-  :root{
-    --paper:#EFEDE8; --ink:#171715; --ink-2:#6B6862;
-    --rule:#D6D3CB; --accent:#B08D57;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; background:var(--paper); color:var(--ink);
-    font-family:"Segoe UI","Arial Hebrew",Arial,system-ui,sans-serif;
-    line-height:1.6;
-    display:grid; place-items:center; padding:24px;
-  }
-  main{max-width:36rem; width:100%}
-  .tag{
-    font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--ink-2); margin:0 0 1.5rem;
-    font-variant-numeric:tabular-nums;
-  }
-  h1{
-    font-size:clamp(1.9rem,7vw,3rem); line-height:1.15;
-    letter-spacing:-.02em; font-weight:600; margin:0 0 1rem;
-  }
-  p{margin:0 0 1rem; color:var(--ink-2); max-width:34ch}
-  hr{border:0; border-top:1px solid var(--rule); margin:2rem 0}
-  .meta{font-size:.85rem; color:var(--ink-2); font-variant-numeric:tabular-nums}
-  a{color:var(--ink); text-decoration-color:var(--accent); text-underline-offset:.25em}
-  a:hover{color:var(--accent)}
-  .dot{
-    display:inline-block; inline-size:.5rem; block-size:.5rem;
-    border-radius:50%; background:var(--accent); margin-inline-end:.5rem;
-    vertical-align:middle;
-  }
-</style>
+<meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
+<meta name="theme-color" content="#EFEDE8">
+<link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<main>
-  <p class="tag"><span class="dot"></span>בפיתוח</p>
 
-  <h1>בונים כאן משהו.</h1>
+<header class="bar">
+  <a class="brand" href="https://dlatotmagen.co.il">
+    <span class="brand__name">דלתות מגן</span>
+    <span class="brand__sub">בונים דלת</span>
+  </a>
+  <a class="bar__phone" id="phone-link" href="tel:972532197466">053-219-7466</a>
+</header>
 
-  <p>
-    כלי לבחירת דלת כניסה — צבע, חלון ומידה, עם מחיר מלא
-    שכולל התקנה ומע״מ, ושליחה ישירה אלינו בוואטסאפ.
-  </p>
+<p class="strip" id="placeholder-note" hidden>
+  <strong>גרסת פיתוח.</strong> הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.
+</p>
+<p class="strip strip--warn" id="notice" hidden></p>
 
-  <hr>
+<main class="layout">
 
-  <p class="meta">
-    בינתיים אפשר לראות דלתות שהתקנו באתר הראשי —<br>
-    <a href="https://dlatotmagen.co.il/works">dlatotmagen.co.il</a>
-    · <a href="tel:0532197466">053-219-7466</a>
-  </p>
+  <!-- ── the door ─────────────────────────────────────────── -->
+  <section class="stage-wrap" aria-labelledby="stage-h">
+    <h1 class="sr-only" id="stage-h">בחירת דלת כניסה</h1>
+    <div class="stage" id="stage"></div>
+    <p class="stage__note">הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם.</p>
+  </section>
+
+  <!-- ── choices ──────────────────────────────────────────── -->
+  <section class="panel">
+
+    <div class="field">
+      <h2 class="field__title">צבע</h2>
+      <div class="swatches" id="colours"></div>
+    </div>
+
+    <div class="field">
+      <h2 class="field__title">כיוון פתיחה</h2>
+      <div class="pills" id="handings"></div>
+      <p class="field__hint">לא בטוחים? נבדוק יחד במדידה.</p>
+    </div>
+
+    <!-- ── the handoff: the whole point of the site ────────── -->
+    <div class="send">
+      <div class="send__price">
+        <span class="send__label">מחיר משוער</span>
+        <strong class="send__figure" id="price">—</strong>
+        <span class="send__incl">כולל דלת, התקנה מלאה ומע״מ</span>
+      </div>
+
+      <p class="send__spec" id="summary"></p>
+
+      <p class="send__lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
+
+      <a class="btn btn--wa" id="wa-btn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
+          <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
+        </svg>
+        שלחו את הדלת בוואטסאפ
+      </a>
+
+      <div class="send__alt">
+        <button class="btn btn--ghost" id="copy-btn" type="button">העתקת הפרטים</button>
+        <span class="send__code">קוד: <b id="code">—</b></span>
+      </div>
+
+      <p class="send__fine">
+        מחיר משוער. המחיר הסופי נקבע לאחר מדידה.
+        אפשר גם להתקשר — <a href="tel:972532197466">053-219-7466</a>.
+      </p>
+    </div>
+
+    <p class="proof">
+      רוצים לראות דלתות אמיתיות שהתקנו?
+      <a href="https://dlatotmagen.co.il/works">העבודות שלנו →</a>
+    </p>
+
+  </section>
 </main>
+
+<div class="toast" id="toast" hidden></div>
+<div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
+
+<script src="assets/bundle.js"></script>
 </body>
 </html>
