@@ -2,9 +2,9 @@
  * Wiring. Small on purpose — the state is three keys.
  */
 
-import { byId, COLOURS, HANDINGS, PLACEHOLDER, SIZES } from './catalog.js';
+import { byId, COLOURS, GRILLES, HANDINGS, PLACEHOLDER, SIZES, VIEWS, WINDOWS } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
-import { describe, render } from './renderer.js';
+import { describe, grilleGlyph, render, sizeGlyph, windowGlyph } from './renderer.js';
 import { copyMessage, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 
@@ -20,7 +20,14 @@ function init() {
   state = parsed;
 
   buildColours();
+  buildTiles('#windows', WINDOWS, 'סוג חלון', w => windowGlyph(w), w => w.he, w => w.delta,
+             id => set({ window: id }));
+  buildTiles('#grilles', GRILLES, 'סורג', g => grilleGlyph(g), g => g.he, g => g.delta,
+             chooseGrille);
+  buildTiles('#sizes', Object.values(SIZES), 'מידה', z => sizeGlyph(z), z => z.he,
+             z => z.base - SIZES.standard.base, id => set({ size: id }));
   buildHandings();
+  buildViews();
   if (PLACEHOLDER) $('#placeholder-note').hidden = false;
   if (notice) showNotice(notice);
 
@@ -71,6 +78,59 @@ function buildHandings() {
   });
 
   keyboardGrid(wrap, id => set({ handing: id }));
+}
+
+/** Tile groups: window, grille, size. Art comes from the renderer, so a tile
+ *  is always a true miniature of what the stage will show. */
+function buildTiles(sel, list, label, glyph, name, delta, choose) {
+  const wrap = $(sel);
+  wrap.setAttribute('role', 'radiogroup');
+  wrap.setAttribute('aria-label', label);
+
+  list.forEach(o => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tile';
+    b.dataset.id = o.id;
+    b.setAttribute('role', 'radio');
+    b.innerHTML = `
+      <span class="tile__art">${glyph(o)}</span>
+      <span class="tile__name">${name(o)}</span>
+      <span class="tile__meta">${deltaLabel(Math.max(0, delta(o)))}</span>
+      <span class="tile__why" hidden></span>`;
+    b.addEventListener('click', () => choose(o.id));
+    wrap.appendChild(b);
+  });
+
+  keyboardGrid(wrap, choose);
+}
+
+/** Picking a grille with no window fixes both at once rather than refusing. */
+function chooseGrille(id) {
+  const win = byId(WINDOWS, state.window);
+  if (id !== 'none' && !win.rects.length) {
+    set({ grille: id, window: 'rect' });
+    toast('הוספנו חלון מלבני — סורג דורש חלון');
+    return;
+  }
+  set({ grille: id });
+}
+
+function buildViews() {
+  const wrap = $('#views');
+  wrap.setAttribute('role', 'radiogroup');
+  wrap.setAttribute('aria-label', 'צד הדלת');
+  VIEWS.forEach(v => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pill pill--view';
+    b.dataset.id = v.id;
+    b.setAttribute('role', 'radio');
+    b.textContent = v.he;
+    b.addEventListener('click', () => set({ view: v.id }));
+    wrap.appendChild(b);
+  });
+  keyboardGrid(wrap, id => set({ view: id }));
 }
 
 /** Arrow-key navigation with roving tabindex, per PLAN.md §14. */
@@ -128,20 +188,50 @@ function paint() {
   const size = SIZES[state.size] || SIZES.standard;
 
   $('#stage').innerHTML = render(state);
-  $('#stage').dataset.light = String($('#stage').querySelector('svg').dataset.light === 'true');
+  $('.stage-wrap').dataset.light =
+    String($('#stage').querySelector('svg').dataset.light === 'true');
 
   $('#price').textContent = formatAgorot(priceAgorot(state));
   $('#code').textContent = encodeCode(state);
 
-  $('#summary').textContent =
-    `${colour.he} · RAL ${colour.ral} · ${size.he} · ${handing.he}`;
+  const win = byId(WINDOWS, state.window);
+  const grille = byId(GRILLES, state.grille);
+  $('#summary').textContent = [
+    colour.he, `RAL ${colour.ral}`, win.he,
+    ...(win.rects.length && grille.id !== 'none' ? [grille.he] : []),
+    size.he, handing.he,
+  ].join(' · ');
 
   markSelected('#colours', state.colour);
+  markSelected('#windows', state.window);
+  markSelected('#grilles', state.grille);
+  markSelected('#sizes', state.size);
   markSelected('#handings', state.handing);
+  markSelected('#views', state.view);
+
+  gateGrilles(byId(WINDOWS, state.window));
 
   $('#wa-btn').href = whatsappUrl(state);
 
   announce(describe(state));
+}
+
+/**
+ * A grille needs glazing to sit in. Rather than `disabled` — which is
+ * unreachable by keyboard and invisible to touch — the options stay focusable
+ * and clickable, and say why (PLAN.md §10.5: never a dead end, never a
+ * tooltip carrying load-bearing information).
+ */
+function gateGrilles(win) {
+  const solid = win.rects.length === 0;
+  document.querySelectorAll('#grilles [role="radio"]').forEach(el => {
+    const blocked = solid && el.dataset.id !== 'none';
+    el.setAttribute('aria-disabled', String(blocked));
+    el.classList.toggle('is-blocked', blocked);
+    const why = el.querySelector('.tile__why');
+    why.hidden = !blocked;
+    why.textContent = blocked ? 'דורש חלון' : '';
+  });
 }
 
 function markSelected(sel, id) {

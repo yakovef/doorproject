@@ -5,7 +5,7 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { byId, COLOURS, HANDINGS, SIZES } from './catalog.js';
+import { byId, COLOURS, GRILLES, HANDINGS, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { encodeCode, toQuery } from './url-state.js';
 
@@ -22,11 +22,15 @@ export function message(state) {
   const c = byId(COLOURS, state.colour);
   const h = byId(HANDINGS, state.handing);
   const s = SIZES[state.size] || SIZES.standard;
+  const w = byId(WINDOWS, state.window);
+  const g = byId(GRILLES, state.grille);
 
   return [
     'שלום, בחרתי דלת באתר:',
     '',
     `צבע: ${c.he} (RAL ${c.ral})`,
+    `חלון: ${w.he}`,
+    ...(w.rects.length && g.id !== 'none' ? [`סורג: ${g.he}`] : []),
     `מידה: ${s.he}`,
     `פתיחה: ${h.he}`,
     `מחיר באתר: ${formatAgorot(priceAgorot(state))} — כולל התקנה ומע״מ`,

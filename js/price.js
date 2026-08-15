@@ -7,14 +7,18 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, SIZES } from './catalog.js';
+import { byId, COLOURS, GRILLES, SIZES, WINDOWS } from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
 export function priceAgorot(state) {
   const size   = SIZES[state.size] || SIZES.standard;
   const colour = byId(COLOURS, state.colour);
+  const win    = byId(WINDOWS, state.window);
+  const grille = byId(GRILLES, state.grille);
 
-  let total = size.base + colour.delta;
+  let total = size.base + colour.delta + win.delta;
+  // A grille needs glazing to sit in, so it cannot be charged on a solid door.
+  if (win.rects.length) total += grille.delta;
 
   // Round up to the nearest ₪5 so quoted figures stay tidy.
   return Math.ceil(total / 500) * 500;

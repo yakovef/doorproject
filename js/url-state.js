@@ -3,19 +3,22 @@
  *
  * PLAN.md §8.2. Two representations of the same thing:
  *   - a readable query string, for links
- *   - a 4-character code (DM-7K4M), for customers who telephone instead of
+ *   - a 5-character code (DM-8EH48), for customers who telephone instead of
  *     messaging. It is an ENCODING, not a hash — a hash cannot be decoded
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, HANDINGS, SIZES } from './catalog.js';
+import { COLOURS, GRILLES, HANDINGS, SIZES, WINDOWS } from './catalog.js';
 
-export const VERSION = 1;
+export const VERSION = 2;
 
 export const DEFAULTS = {
   colour:  'ral-7016',
+  window:  'rect',
+  grille:  'none',
   size:    'standard',
   handing: 'right-in',
+  view:    'out',        // camera, not a product choice
 };
 
 // ── Query string ──────────────────────────────────────────────────
@@ -25,8 +28,11 @@ export function toQuery(state) {
   const p = new URLSearchParams();
   p.set('v', String(VERSION));
   p.set('c', state.colour);
+  p.set('w', state.window);
+  p.set('g', state.grille);
   p.set('s', state.size);
   p.set('h', state.handing);
+  if (state.view === 'in') p.set('f', 'in');   // only when not the default
   return '?' + p.toString();
 }
 
@@ -56,7 +62,10 @@ export function fromQuery(search) {
   };
 
   take('colour', 'c', COLOURS);
+  take('window', 'w', WINDOWS);
+  take('grille', 'g', GRILLES);
   take('handing', 'h', HANDINGS);
+  if (p.get('f') === 'in') state.view = 'in';
 
   const rawSize = p.get('s');
   if (rawSize != null) {
@@ -68,15 +77,15 @@ export function fromQuery(search) {
 }
 
 // ── Short code ────────────────────────────────────────────────────
-// 20 bits, laid out with room to grow:
-//   version 3 | colour 5 | size 3 | handing 2 | window 5 (reserved) | spare 2
-// -> 4 Crockford base32 characters. Adding window types later does not
-//    change the code length.
+// 25 bits, laid out with room to grow:
+//   version 3 | colour 6 | size 4 | handing 2 | window 5 | grille 3 | spare 2
+// -> 5 Crockford base32 characters. Adding options later fits inside the
+//    existing widths, so the code length stays stable.
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
-const BITS = { version: 3, colour: 5, size: 3, handing: 2, window: 5, spare: 2 };
-const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 20
+const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 3, spare: 2 };
+const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 25 -> 5 chars
 
 export function encodeCode(state) {
   const sizeKeys = Object.keys(SIZES);
@@ -85,15 +94,16 @@ export function encodeCode(state) {
     [Math.max(0, COLOURS.findIndex(c => c.id === state.colour)), BITS.colour],
     [Math.max(0, sizeKeys.indexOf(state.size)), BITS.size],
     [Math.max(0, HANDINGS.findIndex(h => h.id === state.handing)), BITS.handing],
-    [0, BITS.window],
+    [Math.max(0, WINDOWS.findIndex(w => w.id === state.window)), BITS.window],
+    [Math.max(0, GRILLES.findIndex(g => g.id === state.grille)), BITS.grille],
     [0, BITS.spare],
   ];
 
   let bits = 0;
-  for (const [value, width] of parts) bits = (bits << width) | (value & ((1 << width) - 1));
+  for (const [value, width] of parts) bits = ((bits << width) >>> 0) | (value & ((1 << width) - 1));
 
   let out = '';
-  for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[(bits >> i) & 31];
+  for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[(bits >>> i) & 31];
   return 'DM-' + out;
 }
 
@@ -107,12 +117,12 @@ export function decodeCode(code) {
   for (const ch of clean) {
     const v = ALPHABET.indexOf(ch);
     if (v < 0) return null;
-    bits = (bits << 5) | v;
+    bits = ((bits << 5) >>> 0) | v;
   }
 
   const read = width => {
     const shift = TOTAL_BITS - width - consumed;
-    const v = (bits >> shift) & ((1 << width) - 1);
+    const v = (bits >>> shift) & ((1 << width) - 1);
     consumed += width;
     return v;
   };
@@ -124,7 +134,12 @@ export function decodeCode(code) {
   const colour  = COLOURS[read(BITS.colour)];
   const size    = Object.keys(SIZES)[read(BITS.size)];
   const handing = HANDINGS[read(BITS.handing)];
-  if (!colour || !size || !handing) return null;
+  const window  = WINDOWS[read(BITS.window)];
+  const grille  = GRILLES[read(BITS.grille)];
+  if (!colour || !size || !handing || !window || !grille) return null;
 
-  return { colour: colour.id, size, handing: handing.id };
+  return {
+    colour: colour.id, size, handing: handing.id,
+    window: window.id, grille: grille.id, view: 'out',
+  };
 }
