@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { COLOURS, GRILLES, HANDINGS, HANDLES, SIZES, VIEWS, WINDOWS } from '../js/catalog.js';
+import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, VIEWS, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import { render } from '../js/renderer.js';
@@ -14,6 +14,7 @@ const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
 const base = { colour: 'ral-7016', window: 'none', grille: 'none', handle: 'bar-long',
+               detail: 'plain', finish: 'steel',
                size: 'standard', handing: 'right-in', view: 'out' };
 
 /** Every reachable design, for the exhaustive sweeps below. */
@@ -21,7 +22,14 @@ function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
     for (const w of WINDOWS) for (const g of GRILLES) for (const n of HANDLES)
       yield { colour: c.id, size: s, handing: h.id, window: w.id,
-              grille: g.id, handle: n.id, view: 'out' };
+              grille: g.id, handle: n.id, detail: 'plain', finish: 'steel', view: 'out' };
+}
+
+/** Every detail x finish x window combination, at one colour and size. */
+function* everyDetail() {
+  for (const d of DETAILS) for (const f of FINISHES) for (const w of WINDOWS)
+    for (const n of HANDLES)
+      yield { ...base, detail: d.id, finish: f.id, window: w.id, handle: n.id };
 }
 
 // ── 1. Short code ─────────────────────────────────────────────────
@@ -32,9 +40,9 @@ group('short code round-trip');
   for (const st of everyState()) {
     const code = encodeCode(st);
     const back = decodeCode(code);
-    ok(back && ['colour', 'size', 'handing', 'window', 'grille', 'handle'].every(k => back[k] === st[k]),
+    ok(back && ['colour', 'size', 'handing', 'window', 'grille', 'handle', 'detail', 'finish'].every(k => back[k] === st[k]),
        `${code} did not round-trip for ${Object.values(st).join('/')}`);
-    ok(/^DM-[0-9A-HJKMNP-TV-Z]{5}$/.test(code), `malformed code: ${code}`);
+    ok(/^DM-[0-9A-HJKMNP-TV-Z]{6}$/.test(code), `malformed code: ${code}`);
     ok(!seen.has(code), `code collision: ${code}`);
     seen.set(code, 1);
     n++;
@@ -55,16 +63,19 @@ group('url round-trip');
 for (const st of everyState()) {
   const { state: back, notice } = fromQuery(toQuery(st));
   ok(!notice, `unexpected notice for ${toQuery(st)}`);
-  for (const k of ['colour', 'size', 'handing', 'window', 'grille', 'handle']) {
+  for (const k of ['colour', 'size', 'handing', 'window', 'grille', 'handle', 'detail', 'finish']) {
     ok(back[k] === st[k], `url lost ${k} (${st[k]} -> ${back[k]})`);
   }
 }
 {
-  const bad = fromQuery('?v=2&c=ral-nope&w=rect&g=none&n=bar-long&s=standard&h=right-in');
+  const bad = fromQuery('?v=3&c=ral-nope&w=rect&g=none&n=bar-long&d=plain&f=steel&s=standard&h=right-in');
   ok(bad.notice === 'option-unknown', 'unknown option must notify, never silently default');
   ok(bad.state.colour === 'ral-7016', 'unknown option should fall back to default');
-  ok(fromQuery('?v=2&f=in').state.view === 'in', 'inside view lost from url');
-  ok(!toQuery({ ...base }).includes('f=in'), 'default view should not clutter the url');
+  ok(fromQuery('?v=3&i=1').state.view === 'in', 'inside view lost from url');
+  ok(!toQuery({ ...base }).includes('i=1'), 'default view should not clutter the url');
+  // 'f' now means finish, so it must not be mistaken for the inside-view flag.
+  ok(fromQuery('?v=3&f=brass').state.finish === 'brass', 'finish lost from url');
+  ok(fromQuery('?v=3&f=brass').state.view === 'out', 'finish must not flip the view');
 }
 
 // ── 3. Price ──────────────────────────────────────────────────────
@@ -76,6 +87,8 @@ group('price');
   ok(P({ size: 'wide' }) === 3495, 'wide band');
   ok(P({ window: 'rect' }) === 3815, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
   ok(P({ window: 'rect', grille: 'scroll' }) === 4275, 'scrollwork grille adds ₪460');
+  ok(P({ detail: 'panel' }) === 3575, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
+  ok(P({ finish: 'brass' }) === 3415, `brass should add ₪220, got ${P({ finish: 'brass' })}`);
   ok(P({ handle: 'lever' }) === 3115, `a lever is ₪80 less than a pull bar, got ${P({ handle: 'lever' })}`);
 
   // A grille cannot be charged when there is no glazing to put it in.
@@ -126,6 +139,43 @@ group('renderer invariants');
     }
   }
   console.log(`  (${n} renders)`);
+}
+
+// ── 5b. Detail and finish ─────────────────────────────────────────
+group('detail and finish');
+{
+  let n = 0;
+  for (const st of everyDetail()) {
+    const svg = render(st);
+    const label = `${st.detail}/${st.finish}/${st.window}/${st.handle}`;
+    ok(!/NaN|undefined|Infinity/.test(svg), `numeric hole: ${label}`);
+    const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+    ok(new Set(ids).size === ids.length, `duplicate id in ${label}`);
+    const d = DETAILS.find(x => x.id === st.detail);
+    ok(svg.includes('data-detail="panel"') === d.panel, `panel mismatch: ${label}`);
+    ok(svg.includes('data-detail="groove"') === d.groove, `groove mismatch: ${label}`);
+    // Every finish must actually change the metal, or the axis is decorative.
+    ok(svg.includes('--hw-mid:'), `finish tone not applied: ${label}`);
+
+    /* Moulded detail must never cross the glazing — a panel drawn under a
+       tall window puts mouldings over the glass, which is not a door. */
+    const w = WINDOWS.find(x => x.id === st.window);
+    if (w.rects.length && svg.includes('data-detail="panel"')) {
+      const panelTop = Number(/data-detail="panel">\s*\n\s*<path d="M [\d.]+ ([\d.]+)/.exec(svg)[1]);
+      const glassLow = Math.max(...w.rects.map(r => r.top + r.h));
+      ok(panelTop > glassLow, `panel overlaps glazing: ${label}`);
+    }
+    n++;
+  }
+  console.log(`  (${n} renders)`);
+}
+{
+  // A bevel is only a bevel if its lit and shadowed edges differ.
+  const svg = render({ ...base, detail: 'panel' });
+  const block = svg.slice(svg.indexOf('data-detail="panel"'));
+  const fills = [...block.slice(0, 900).matchAll(/fill="(#[0-9a-fA-F]{6})"/g)].map(m => m[1]);
+  ok(fills.length >= 2, 'panel bevel should paint at least two edge colours');
+  ok(fills[0] !== fills[1], 'panel bevel must have distinct lit and shadowed edges');
 }
 
 // ── 6. The inside face mirrors the door ───────────────────────────

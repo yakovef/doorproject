@@ -284,8 +284,31 @@ Sized life-size at 66 mm across a 950 mm leaf.
 point as its root, collapsing the path to nothing, and the brushing rings were
 strong enough to read as a bullseye.*
 
-Still open: **R3 bevels** (panel, groove — the window surround is done),
-**R5 glass**, the hardware finish axis, and the baked-photo finisher.
+**R3 bevels — done.** One primitive: light edges top and left, dark edges
+bottom and right, mitred, and flipped for a recess because a hole is lit the
+other way up. It now draws the **raised lower panel**, the **vertical inlay
+groove** and the **window surround**, so all three agree with one another.
+
+**R5 glass — done.** Darker than the wall because you are looking into an
+unlit interior, a cool sky reflection across the upper third, stronger frost,
+one hard diagonal streak, and grille bars drawn as objects with a lit top
+edge, a dark underside and their own shadow on the glass behind.
+
+**Hardware finish axis — done.** Brushed nickel / matte black / brass, each a
+six-stop cross-section rather than a flat ramp. Every metal part reads from
+the same tone, passed to the top-level hardware helpers through a `--hw-mid`
+custom property on the SVG root.
+
+*One more collision bug, the same class as the leaf-and-a-half hinges: a raised
+panel drawn under a tall window put mouldings across the glass. The panel now
+computes its top from the glazing envelope and returns nothing when there is no
+room, the groove slides to whichever side of the glazing has space, and an
+invariant asserts the two never overlap.*
+
+**Still open:** only the baked-photo finisher, which needs a photograph.
+
+The design code grew to six characters (`DM-CJ058W`) to carry the two new
+axes — still short enough to read down a phone.
 
 *Lesson for the test suite: probes tied to `r="27"` or `width="30"` broke on
 every visual change. Hardware now carries `data-hw` hooks, so the tests assert

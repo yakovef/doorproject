@@ -95,6 +95,25 @@ export const HANDINGS = [
   { id: 'left-in',  he: 'שמאל, פנימה', en: 'Left, inward',  hinge: 'right' },
 ];
 
+/**
+ * Raised and recessed detail on the leaf. This is where the reference
+ * photographs actually win — a door with a moulded panel reads as a
+ * manufactured product; a bare rectangle reads as a drawing.
+ */
+export const DETAILS = [
+  { id: 'plain',  he: 'חלק',            en: 'Plain',          delta: 0,     panel: false, groove: false },
+  { id: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    delta: 38000, panel: true,  groove: false },
+  { id: 'groove', he: 'חריץ אנכי',      en: 'Vertical groove',delta: 24000, panel: false, groove: true  },
+  { id: 'both',   he: 'פאנל וחריץ',     en: 'Panel + groove', delta: 54000, panel: true,  groove: true  },
+];
+
+/** Ironmongery finish. One variable, and it changes every metal part. */
+export const FINISHES = [
+  { id: 'steel', he: 'ניקל מוברש', en: 'Brushed nickel', delta: 0 },
+  { id: 'black', he: 'שחור מט',    en: 'Matte black',    delta: 12000 },
+  { id: 'brass', he: 'פליז',       en: 'Brass',          delta: 22000 },
+];
+
 /** Which face of the door is being shown. Not a product choice — a camera. */
 export const VIEWS = [
   { id: 'out', he: 'חוץ',  en: 'Outside' },

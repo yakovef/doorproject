@@ -7,7 +7,7 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, GRILLES, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDLES, SIZES, WINDOWS } from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
 export function priceAgorot(state) {
@@ -16,7 +16,10 @@ export function priceAgorot(state) {
   const win    = byId(WINDOWS, state.window);
   const grille = byId(GRILLES, state.grille);
 
-  let total = size.base + colour.delta + win.delta + byId(HANDLES, state.handle).delta;
+  let total = size.base + colour.delta + win.delta
+            + byId(HANDLES, state.handle).delta
+            + byId(DETAILS, state.detail).delta
+            + byId(FINISHES, state.finish).delta;
   // A grille needs glazing to sit in, so it cannot be charged on a solid door.
   if (win.rects.length) total += grille.delta;
 

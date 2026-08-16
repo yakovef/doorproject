@@ -16,8 +16,17 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 import { darken, isLight, lighten, silhouette } from './colour.js';
+
+/* Ironmongery tones. Six stops each, because a metal's cross-section is
+   light → mid → dark → a weaker second return near the far edge. That double
+   highlight is what separates metal from grey plastic. */
+const FINISH_TONES = {
+  steel: ['#E4E7E9', '#C6CBCF', '#9FA5AA', '#80868B', '#99A0A5', '#6A7075'],
+  black: ['#5E6165', '#3D4043', '#26282B', '#171819', '#313437', '#0F1011'],
+  brass: ['#F3E4BE', '#E0C88C', '#C4A660', '#A08444', '#CBB273', '#7C6334'],
+};
 
 /* ── The light. Everything shades from this. ────────────────────────
    Key is high and ~30° left of camera. The camera itself sits a little
@@ -53,6 +62,9 @@ export function render(state) {
   const win     = byId(WINDOWS, state.window);
   const grille  = byId(GRILLES, state.grille);
   const handle  = byId(HANDLES, state.handle);
+  const detail  = byId(DETAILS, state.detail);
+  const finish  = byId(FINISHES, state.finish);
+  const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
   const inside  = state.view === 'in';
 
   const leafW = size.w, leafH = size.h;
@@ -82,6 +94,14 @@ export function render(state) {
   const leverDir = hingeOnLeft ? -1 : 1;
   const centreX = mainX + leafW / 2;
 
+  /* The glazing envelope, so moulded detail can be kept clear of it. */
+  const winBottom = win.rects.length
+    ? y0 + Math.max(...win.rects.map(r => r.top + r.h)) : y0;
+  const winSpan = win.rects.length ? {
+    x:  centreX + Math.min(...win.rects.map(r => (r.dx || 0) - r.w / 2)),
+    x1: centreX + Math.max(...win.rects.map(r => (r.dx || 0) + r.w / 2)),
+  } : null;
+
   const paint = inside ? lighten(colour.hex, isLight(colour.hex) ? 0.05 : 0.28) : colour.hex;
   const edge  = silhouette(paint);
   const deep  = darken(paint, 0.55);
@@ -104,6 +124,7 @@ export function render(state) {
 
   return `
 <svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
+     style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint)}"
      aria-label="${describe(state)}" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -169,17 +190,17 @@ export function render(state) {
          and there is a second, weaker return near the far edge — that double
          highlight is what separates metal from grey plastic. -->
     <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"    stop-color="#E4E7E9"/>
-      <stop offset="0.16" stop-color="#C6CBCF"/>
-      <stop offset="0.38" stop-color="#9FA5AA"/>
-      <stop offset="0.60" stop-color="#80868B"/>
-      <stop offset="0.80" stop-color="#99A0A5"/>
-      <stop offset="1"    stop-color="#6A7075"/>
+      <stop offset="0"    stop-color="${tone[0]}"/>
+      <stop offset="0.16" stop-color="${tone[1]}"/>
+      <stop offset="0.38" stop-color="${tone[2]}"/>
+      <stop offset="0.60" stop-color="${tone[3]}"/>
+      <stop offset="0.80" stop-color="${tone[4]}"/>
+      <stop offset="1"    stop-color="${tone[5]}"/>
     </linearGradient>
     <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"   stop-color="#D9DDE0"/>
-      <stop offset="0.5" stop-color="#A5ABB0"/>
-      <stop offset="1"   stop-color="#82888D"/>
+      <stop offset="0"   stop-color="${tone[1]}"/>
+      <stop offset="0.5" stop-color="${tone[3]}"/>
+      <stop offset="1"   stop-color="${tone[5]}"/>
     </linearGradient>
 
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
@@ -196,9 +217,14 @@ export function render(state) {
       <stop offset="1"    stop-color="#101113"/>
     </linearGradient>
 
-    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4E5A62"/>
-      <stop offset="1" stop-color="#71808A"/>
+    <!-- Glazing is darker than the wall: you are looking into an unlit
+         interior. The top carries a cool sky reflection, the base warms
+         slightly from the floor. -->
+    <linearGradient id="glass" x1="0.1" y1="0" x2="0.6" y2="1">
+      <stop offset="0"    stop-color="#8FA3B0"/>
+      <stop offset="0.18" stop-color="#5E6C76"/>
+      <stop offset="0.62" stop-color="#3D474E"/>
+      <stop offset="1"    stop-color="#4C545A"/>
     </linearGradient>
 
     <!-- One hard diagonal streak. A straight edge reads as glass; a soft
@@ -210,6 +236,11 @@ export function render(state) {
       <stop offset="0.52"  stop-color="#fff" stop-opacity="0.20"/>
       <stop offset="0.521" stop-color="#fff" stop-opacity="0.03"/>
       <stop offset="1"     stop-color="#fff" stop-opacity="0.03"/>
+    </linearGradient>
+
+    <linearGradient id="skyRefl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CFE0EA" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#CFE0EA" stop-opacity="0"/>
     </linearGradient>
 
     <radialGradient id="vignette" cx="0.5" cy="0.44" r="0.78">
@@ -352,6 +383,12 @@ export function render(state) {
   <!-- ── main leaf ────────────────────────────────────────────── -->
   <g id="leaf">${leaf(mainX, leafW)}</g>
 
+  <!-- ── moulded detail, kept clear of the glazing ────────────── -->
+  <g id="detail">
+    ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint, winBottom) : ''}
+    ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
+  </g>
+
   <!-- ── glazing ──────────────────────────────────────────────── -->
   <g id="glazing">
     ${win.rects.map((r, i) => aperture({
@@ -372,30 +409,89 @@ export function render(state) {
 </svg>`.trim();
 }
 
+/**
+ * A bevel. Light edges top and left, dark edges bottom and right, mitred at
+ * the corners — flipped for a recess, because a hole is lit the other way up.
+ * One primitive, used by the panel, the groove and the window surround.
+ */
+function bevel(x, y, w, h, d, paint, raised = true) {
+  const lit  = raised ? lighten(paint, 0.30) : darken(paint, 0.46);
+  const dark = raised ? darken(paint, 0.46)  : lighten(paint, 0.24);
+  return `
+      <path d="M ${x} ${y + h} L ${x} ${y} L ${x + w} ${y}
+               L ${x + w - d} ${y + d} L ${x + d} ${y + d} L ${x + d} ${y + h - d} Z"
+            fill="${lit}"/>
+      <path d="M ${x + w} ${y} L ${x + w} ${y + h} L ${x} ${y + h}
+               L ${x + d} ${y + h - d} L ${x + w - d} ${y + h - d} L ${x + w - d} ${y + d} Z"
+            fill="${dark}"/>`;
+}
+
+/**
+ * A raised moulded panel, as on the red and grey reference doors.
+ * It has to sit clear of the glazing: a panel drawn under a tall window
+ * produces mouldings crossing the glass, which is not a door.
+ * Returns '' when there is no room, so the two can never collide.
+ */
+function raisedPanel(lx, ly, lw, lh, paint, winBottom) {
+  const inset = 105;
+  const top = Math.max(ly + lh * 0.60, winBottom + 70);
+  const bottom = ly + lh - 120;
+  const h = bottom - top;
+  if (h < 300) return '';                       // no room below the glazing
+  const x = lx + inset, w = lw - inset * 2;
+  return `
+    <g data-detail="panel">
+      ${bevel(x, top, w, h, 26, paint, true)}
+      <rect x="${x + 26}" y="${top + 26}" width="${w - 52}" height="${h - 52}"
+            fill="${lighten(paint, 0.05)}"/>
+      ${bevel(x + 26, top + 26, w - 52, h - 52, 9, paint, false)}
+      <rect x="${x + 35}" y="${top + 35}" width="${w - 70}" height="${h - 70}"
+            fill="url(#keyLight)" opacity="0.5"/>
+      <!-- the panel sits proud, so it casts down onto the field below -->
+      <rect x="${x}" y="${top + h}" width="${w}" height="16"
+            fill="#000" opacity="0.22" filter="url(#contact)"/>
+    </g>`;
+}
+
+/**
+ * A single fine vertical recess — the cheapest detail with a real payoff.
+ * Kept clear of the glazing for the same reason as the panel.
+ */
+function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
+  const w = 18;
+  let x = hingeOnLeft ? lx + lw * 0.30 : lx + lw * 0.70 - w;
+  if (winSpan && x + w > winSpan.x - 40 && x < winSpan.x1 + 40) {
+    // Slide it to whichever side of the glazing has room.
+    const left = winSpan.x - 40 - w, right = winSpan.x1 + 40;
+    x = (left - lx > lx + lw - right) ? Math.max(lx + 90, left) : Math.min(lx + lw - 90 - w, right);
+  }
+  const top = ly + 190, h = lh - 380;
+  return `
+    <g data-detail="groove">
+      ${bevel(x, top, w, h, 6, paint, false)}
+      <rect x="${x + 6}" y="${top + 6}" width="${w - 12}" height="${h - 12}"
+            fill="${darken(paint, 0.34)}"/>
+    </g>`;
+}
+
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 function aperture({ x, y, w, h, paint, edge, grille, key }) {
   const M = 30;                       // moulding width
   const id = `cl-${key}`;
-  const lightEdge = lighten(paint, 0.26);
-  const darkEdge  = darken(paint, 0.40);
   return `
     <g>
       <!-- raised surround: light on the lit edges, dark on the others -->
       <rect x="${x - M}" y="${y - M}" width="${w + M * 2}" height="${h + M * 2}"
             fill="${paint}"/>
-      <path d="M ${x - M} ${y + h + M} L ${x - M} ${y - M} L ${x + w + M} ${y - M} L ${x + w + M - 8} ${y - M + 8} L ${x - M + 8} ${y - M + 8} L ${x - M + 8} ${y + h + M - 8} Z"
-            fill="${lightEdge}"/>
-      <path d="M ${x + w + M} ${y - M} L ${x + w + M} ${y + h + M} L ${x - M} ${y + h + M} L ${x - M + 8} ${y + h + M - 8} L ${x + w + M - 8} ${y + h + M - 8} L ${x + w + M - 8} ${y - M + 8} Z"
-            fill="${darkEdge}"/>
-      <!-- inner rebate, reversed: this is a hole, so the bevel flips -->
-      <path d="M ${x} ${y + h} L ${x} ${y} L ${x + w} ${y} L ${x + w - 7} ${y + 7} L ${x + 7} ${y + 7} L ${x + 7} ${y + h - 7} Z"
-            fill="${darken(paint, 0.55)}"/>
-      <path d="M ${x + w} ${y} L ${x + w} ${y + h} L ${x} ${y + h} L ${x + 7} ${y + h - 7} L ${x + w - 7} ${y + h - 7} L ${x + w - 7} ${y + 7} Z"
-            fill="${lighten(paint, 0.14)}"/>
+      ${bevel(x - M, y - M, w + M * 2, h + M * 2, 10, paint, true)}
+      <!-- inner rebate: a hole, so the bevel flips -->
+      ${bevel(x, y, w, h, 8, paint, false)}
 
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
       <rect x="${x}" y="${y}" width="${w}" height="${h}"
-            filter="url(#frost)" opacity="0.22" style="mix-blend-mode:screen"/>
+            filter="url(#frost)" opacity="0.30" style="mix-blend-mode:screen"/>
+      <!-- reflected sky across the upper third -->
+      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
       <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
@@ -499,9 +595,9 @@ function pullBar(cx, cy, len, leafH, paint) {
       <rect x="${cx - w / 2 + 10}" y="${cy - half + 12}" width="${w}" height="${half * 2}"
             rx="${w / 2}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
       ${[cy - half + 95, cy + half - 95].map(sy => `
-      <rect x="${cx - 10}" y="${sy - 10}" width="20" height="20" rx="5" fill="#63676B"/>`).join('')}
+      <rect x="${cx - 10}" y="${sy - 10}" width="20" height="20" rx="5" fill="var(--hw-mid)"/>`).join('')}
       <rect x="${cx - w / 2}" y="${cy - half}" width="${w}" height="${half * 2}" rx="${w / 2}"
-            fill="url(#metal)"/>
+            fill="url(#nickel)"/>
       <rect x="${cx - w / 2 + 4}" y="${cy - half + 10}" width="5" height="${half * 2 - 20}" rx="2.5"
             fill="#fff" opacity="0.55"/>
     </g>`;
@@ -702,11 +798,14 @@ export function describe(state, lang = 'he') {
   const w = byId(WINDOWS, state.window);
   const g = byId(GRILLES, state.grille);
   const hd = byId(HANDLES, state.handle);
+  const dt = byId(DETAILS, state.detail);
+  const fn = byId(FINISHES, state.finish);
   const s = SIZES[state.size] || SIZES.standard;
   const face = state.view === 'in' ? 'מבט מבפנים' : 'מבט מבחוץ';
   if (lang === 'he') {
     const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}, ${hd.he}, ${s.he}, פתיחה ${h.he}. ${face}`;
+    const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
+    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he} ${fn.he}, ${s.he}, פתיחה ${h.he}. ${face}`;
   }
   return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
 }
@@ -766,5 +865,38 @@ export function handleGlyph(handle) {
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor"
           stroke-width="44" opacity="0.5"/>
     ${art}
+  </svg>`;
+}
+
+/** Detail glyph: where the panel and groove sit on the leaf. */
+export function detailGlyph(detail) {
+  const W = 950, H = 2100, pad = 40;
+  return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
+    ${detail.panel ? `<rect x="105" y="${H * 0.60}" width="${W - 210}" height="${H * 0.30}"
+          fill="none" stroke="currentColor" stroke-width="36"/>` : ''}
+    ${detail.groove ? `<rect x="${W * 0.70 - 18}" y="190" width="18" height="${H - 380}"
+          fill="currentColor"/>` : ''}
+  </svg>`;
+}
+
+/** Finish glyph: the actual metal, as a turned disc. */
+export function finishGlyph(finish) {
+  const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
+  const S = 300, c = S / 2;
+  return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
+    <defs>
+      <linearGradient id="fg-${finish.id}" x1="0.1" y1="0" x2="0.9" y2="1">
+        <stop offset="0" stop-color="${tone[0]}"/><stop offset="0.38" stop-color="${tone[2]}"/>
+        <stop offset="0.6" stop-color="${tone[3]}"/><stop offset="1" stop-color="${tone[5]}"/>
+      </linearGradient>
+    </defs>
+    <circle cx="${c}" cy="${c}" r="${c - 16}" fill="url(#fg-${finish.id})"/>
+    <path d="${arcPath(c, c, c - 22, 135, 315)}" fill="none" stroke="#fff"
+          stroke-opacity="0.45" stroke-width="9"/>
+    <path d="${arcPath(c, c, c - 22, 315, 135)}" fill="none" stroke="#000"
+          stroke-opacity="0.3" stroke-width="9"/>
+    <circle cx="${c}" cy="${c}" r="${c - 16}" fill="none" stroke="currentColor"
+            stroke-opacity="0.35" stroke-width="8"/>
   </svg>`;
 }

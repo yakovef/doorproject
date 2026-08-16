@@ -45,6 +45,17 @@
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "left" },
     { id: "left-in", he: "שמאל, פנימה", en: "Left, inward", hinge: "right" }
   ];
+  var DETAILS = [
+    { id: "plain", he: "חלק", en: "Plain", delta: 0, panel: false, groove: false },
+    { id: "panel", he: "פאנל תחתון", en: "Lower panel", delta: 38e3, panel: true, groove: false },
+    { id: "groove", he: "חריץ אנכי", en: "Vertical groove", delta: 24e3, panel: false, groove: true },
+    { id: "both", he: "פאנל וחריץ", en: "Panel + groove", delta: 54e3, panel: true, groove: true }
+  ];
+  var FINISHES = [
+    { id: "steel", he: "ניקל מוברש", en: "Brushed nickel", delta: 0 },
+    { id: "black", he: "שחור מט", en: "Matte black", delta: 12e3 },
+    { id: "brass", he: "פליז", en: "Brass", delta: 22e3 }
+  ];
   var VIEWS = [
     { id: "out", he: "חוץ", en: "Outside" },
     { id: "in", he: "פנים", en: "Inside" }
@@ -57,7 +68,7 @@
     const colour = byId(COLOURS, state2.colour);
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
-    let total = size.base + colour.delta + win.delta + byId(HANDLES, state2.handle).delta;
+    let total = size.base + colour.delta + win.delta + byId(HANDLES, state2.handle).delta + byId(DETAILS, state2.detail).delta + byId(FINISHES, state2.finish).delta;
     if (win.rects.length) total += grille.delta;
     return Math.ceil(total / 500) * 500;
   }
@@ -118,6 +129,11 @@
   var isLight = (hex) => luminance(hex) > 0.45;
 
   // js/renderer.js
+  var FINISH_TONES = {
+    steel: ["#E4E7E9", "#C6CBCF", "#9FA5AA", "#80868B", "#99A0A5", "#6A7075"],
+    black: ["#5E6165", "#3D4043", "#26282B", "#171819", "#313437", "#0F1011"],
+    brass: ["#F3E4BE", "#E0C88C", "#C4A660", "#A08444", "#CBB273", "#7C6334"]
+  };
   var LIGHT = {
     key: 0.24,
     // face wash amplitude
@@ -146,6 +162,9 @@
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
     const handle = byId(HANDLES, state2.handle);
+    const detail = byId(DETAILS, state2.detail);
+    const finish = byId(FINISHES, state2.finish);
+    const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const inside = state2.view === "in";
     const leafW = size.w, leafH = size.h;
     const sideW = size.side || 0;
@@ -167,6 +186,11 @@
     const hingeX = hingeOnLeft ? mainX : mainX1;
     const leverDir = hingeOnLeft ? -1 : 1;
     const centreX = mainX + leafW / 2;
+    const winBottom = win.rects.length ? y0 + Math.max(...win.rects.map((r) => r.top + r.h)) : y0;
+    const winSpan = win.rects.length ? {
+      x: centreX + Math.min(...win.rects.map((r) => (r.dx || 0) - r.w / 2)),
+      x1: centreX + Math.max(...win.rects.map((r) => (r.dx || 0) + r.w / 2))
+    } : null;
     const paint2 = inside ? lighten(colour.hex, isLight(colour.hex) ? 0.05 : 0.28) : colour.hex;
     const edge = silhouette(paint2);
     const deep = darken(paint2, 0.55);
@@ -187,6 +211,7 @@
     <rect x="${lx}" y="${floorY - 40}" width="${lw}" height="40" fill="url(#aoBottom)"/>`;
     return `
 <svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
+     style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint2)}"
      aria-label="${describe(state2)}" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -252,17 +277,17 @@
          and there is a second, weaker return near the far edge — that double
          highlight is what separates metal from grey plastic. -->
     <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"    stop-color="#E4E7E9"/>
-      <stop offset="0.16" stop-color="#C6CBCF"/>
-      <stop offset="0.38" stop-color="#9FA5AA"/>
-      <stop offset="0.60" stop-color="#80868B"/>
-      <stop offset="0.80" stop-color="#99A0A5"/>
-      <stop offset="1"    stop-color="#6A7075"/>
+      <stop offset="0"    stop-color="${tone[0]}"/>
+      <stop offset="0.16" stop-color="${tone[1]}"/>
+      <stop offset="0.38" stop-color="${tone[2]}"/>
+      <stop offset="0.60" stop-color="${tone[3]}"/>
+      <stop offset="0.80" stop-color="${tone[4]}"/>
+      <stop offset="1"    stop-color="${tone[5]}"/>
     </linearGradient>
     <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"   stop-color="#D9DDE0"/>
-      <stop offset="0.5" stop-color="#A5ABB0"/>
-      <stop offset="1"   stop-color="#82888D"/>
+      <stop offset="0"   stop-color="${tone[1]}"/>
+      <stop offset="0.5" stop-color="${tone[3]}"/>
+      <stop offset="1"   stop-color="${tone[5]}"/>
     </linearGradient>
 
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
@@ -279,9 +304,14 @@
       <stop offset="1"    stop-color="#101113"/>
     </linearGradient>
 
-    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4E5A62"/>
-      <stop offset="1" stop-color="#71808A"/>
+    <!-- Glazing is darker than the wall: you are looking into an unlit
+         interior. The top carries a cool sky reflection, the base warms
+         slightly from the floor. -->
+    <linearGradient id="glass" x1="0.1" y1="0" x2="0.6" y2="1">
+      <stop offset="0"    stop-color="#8FA3B0"/>
+      <stop offset="0.18" stop-color="#5E6C76"/>
+      <stop offset="0.62" stop-color="#3D474E"/>
+      <stop offset="1"    stop-color="#4C545A"/>
     </linearGradient>
 
     <!-- One hard diagonal streak. A straight edge reads as glass; a soft
@@ -293,6 +323,11 @@
       <stop offset="0.52"  stop-color="#fff" stop-opacity="0.20"/>
       <stop offset="0.521" stop-color="#fff" stop-opacity="0.03"/>
       <stop offset="1"     stop-color="#fff" stop-opacity="0.03"/>
+    </linearGradient>
+
+    <linearGradient id="skyRefl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CFE0EA" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#CFE0EA" stop-opacity="0"/>
     </linearGradient>
 
     <radialGradient id="vignette" cx="0.5" cy="0.44" r="0.78">
@@ -438,6 +473,12 @@
   <!-- ── main leaf ────────────────────────────────────────────── -->
   <g id="leaf">${leaf(mainX, leafW)}</g>
 
+  <!-- ── moulded detail, kept clear of the glazing ────────────── -->
+  <g id="detail">
+    ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint2, winBottom) : ""}
+    ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
+  </g>
+
   <!-- ── glazing ──────────────────────────────────────────────── -->
   <g id="glazing">
     ${win.rects.map((r, i) => aperture({
@@ -463,29 +504,69 @@
   <rect x="0" y="0" width="${view.w}" height="${view.h}" fill="url(#vignette)"/>
 </svg>`.trim();
   }
+  function bevel(x, y, w, h, d, paint2, raised = true) {
+    const lit = raised ? lighten(paint2, 0.3) : darken(paint2, 0.46);
+    const dark = raised ? darken(paint2, 0.46) : lighten(paint2, 0.24);
+    return `
+      <path d="M ${x} ${y + h} L ${x} ${y} L ${x + w} ${y}
+               L ${x + w - d} ${y + d} L ${x + d} ${y + d} L ${x + d} ${y + h - d} Z"
+            fill="${lit}"/>
+      <path d="M ${x + w} ${y} L ${x + w} ${y + h} L ${x} ${y + h}
+               L ${x + d} ${y + h - d} L ${x + w - d} ${y + h - d} L ${x + w - d} ${y + d} Z"
+            fill="${dark}"/>`;
+  }
+  function raisedPanel(lx, ly, lw, lh, paint2, winBottom) {
+    const inset = 105;
+    const top = Math.max(ly + lh * 0.6, winBottom + 70);
+    const bottom = ly + lh - 120;
+    const h = bottom - top;
+    if (h < 300) return "";
+    const x = lx + inset, w = lw - inset * 2;
+    return `
+    <g data-detail="panel">
+      ${bevel(x, top, w, h, 26, paint2, true)}
+      <rect x="${x + 26}" y="${top + 26}" width="${w - 52}" height="${h - 52}"
+            fill="${lighten(paint2, 0.05)}"/>
+      ${bevel(x + 26, top + 26, w - 52, h - 52, 9, paint2, false)}
+      <rect x="${x + 35}" y="${top + 35}" width="${w - 70}" height="${h - 70}"
+            fill="url(#keyLight)" opacity="0.5"/>
+      <!-- the panel sits proud, so it casts down onto the field below -->
+      <rect x="${x}" y="${top + h}" width="${w}" height="16"
+            fill="#000" opacity="0.22" filter="url(#contact)"/>
+    </g>`;
+  }
+  function inlayGroove(lx, ly, lw, lh, paint2, hingeOnLeft, winSpan) {
+    const w = 18;
+    let x = hingeOnLeft ? lx + lw * 0.3 : lx + lw * 0.7 - w;
+    if (winSpan && x + w > winSpan.x - 40 && x < winSpan.x1 + 40) {
+      const left = winSpan.x - 40 - w, right = winSpan.x1 + 40;
+      x = left - lx > lx + lw - right ? Math.max(lx + 90, left) : Math.min(lx + lw - 90 - w, right);
+    }
+    const top = ly + 190, h = lh - 380;
+    return `
+    <g data-detail="groove">
+      ${bevel(x, top, w, h, 6, paint2, false)}
+      <rect x="${x + 6}" y="${top + 6}" width="${w - 12}" height="${h - 12}"
+            fill="${darken(paint2, 0.34)}"/>
+    </g>`;
+  }
   function aperture({ x, y, w, h, paint: paint2, edge, grille, key }) {
     const M = 30;
     const id = `cl-${key}`;
-    const lightEdge = lighten(paint2, 0.26);
-    const darkEdge = darken(paint2, 0.4);
     return `
     <g>
       <!-- raised surround: light on the lit edges, dark on the others -->
       <rect x="${x - M}" y="${y - M}" width="${w + M * 2}" height="${h + M * 2}"
             fill="${paint2}"/>
-      <path d="M ${x - M} ${y + h + M} L ${x - M} ${y - M} L ${x + w + M} ${y - M} L ${x + w + M - 8} ${y - M + 8} L ${x - M + 8} ${y - M + 8} L ${x - M + 8} ${y + h + M - 8} Z"
-            fill="${lightEdge}"/>
-      <path d="M ${x + w + M} ${y - M} L ${x + w + M} ${y + h + M} L ${x - M} ${y + h + M} L ${x - M + 8} ${y + h + M - 8} L ${x + w + M - 8} ${y + h + M - 8} L ${x + w + M - 8} ${y - M + 8} Z"
-            fill="${darkEdge}"/>
-      <!-- inner rebate, reversed: this is a hole, so the bevel flips -->
-      <path d="M ${x} ${y + h} L ${x} ${y} L ${x + w} ${y} L ${x + w - 7} ${y + 7} L ${x + 7} ${y + 7} L ${x + 7} ${y + h - 7} Z"
-            fill="${darken(paint2, 0.55)}"/>
-      <path d="M ${x + w} ${y} L ${x + w} ${y + h} L ${x} ${y + h} L ${x + 7} ${y + h - 7} L ${x + w - 7} ${y + h - 7} L ${x + w - 7} ${y + 7} Z"
-            fill="${lighten(paint2, 0.14)}"/>
+      ${bevel(x - M, y - M, w + M * 2, h + M * 2, 10, paint2, true)}
+      <!-- inner rebate: a hole, so the bevel flips -->
+      ${bevel(x, y, w, h, 8, paint2, false)}
 
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
       <rect x="${x}" y="${y}" width="${w}" height="${h}"
-            filter="url(#frost)" opacity="0.22" style="mix-blend-mode:screen"/>
+            filter="url(#frost)" opacity="0.30" style="mix-blend-mode:screen"/>
+      <!-- reflected sky across the upper third -->
+      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
       <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
@@ -572,9 +653,9 @@
       <rect x="${cx - w / 2 + 10}" y="${cy - half + 12}" width="${w}" height="${half * 2}"
             rx="${w / 2}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
       ${[cy - half + 95, cy + half - 95].map((sy) => `
-      <rect x="${cx - 10}" y="${sy - 10}" width="20" height="20" rx="5" fill="#63676B"/>`).join("")}
+      <rect x="${cx - 10}" y="${sy - 10}" width="20" height="20" rx="5" fill="var(--hw-mid)"/>`).join("")}
       <rect x="${cx - w / 2}" y="${cy - half}" width="${w}" height="${half * 2}" rx="${w / 2}"
-            fill="url(#metal)"/>
+            fill="url(#nickel)"/>
       <rect x="${cx - w / 2 + 4}" y="${cy - half + 10}" width="5" height="${half * 2 - 20}" rx="2.5"
             fill="#fff" opacity="0.55"/>
     </g>`;
@@ -733,11 +814,14 @@
     const w = byId(WINDOWS, state2.window);
     const g = byId(GRILLES, state2.grille);
     const hd = byId(HANDLES, state2.handle);
+    const dt = byId(DETAILS, state2.detail);
+    const fn = byId(FINISHES, state2.finish);
     const s = SIZES[state2.size] || SIZES.standard;
     const face = state2.view === "in" ? "מבט מבפנים" : "מבט מבחוץ";
     if (lang === "he") {
       const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
-      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}, ${hd.he}, ${s.he}, פתיחה ${h.he}. ${face}`;
+      const det = dt.id === "plain" ? "" : `, ${dt.he}`;
+      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he} ${fn.he}, ${s.he}, פתיחה ${h.he}. ${face}`;
     }
     return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
   }
@@ -793,14 +877,45 @@
     ${art}
   </svg>`;
   }
+  function detailGlyph(detail) {
+    const W = 950, H = 2100, pad = 40;
+    return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
+    ${detail.panel ? `<rect x="105" y="${H * 0.6}" width="${W - 210}" height="${H * 0.3}"
+          fill="none" stroke="currentColor" stroke-width="36"/>` : ""}
+    ${detail.groove ? `<rect x="${W * 0.7 - 18}" y="190" width="18" height="${H - 380}"
+          fill="currentColor"/>` : ""}
+  </svg>`;
+  }
+  function finishGlyph(finish) {
+    const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
+    const S = 300, c = S / 2;
+    return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
+    <defs>
+      <linearGradient id="fg-${finish.id}" x1="0.1" y1="0" x2="0.9" y2="1">
+        <stop offset="0" stop-color="${tone[0]}"/><stop offset="0.38" stop-color="${tone[2]}"/>
+        <stop offset="0.6" stop-color="${tone[3]}"/><stop offset="1" stop-color="${tone[5]}"/>
+      </linearGradient>
+    </defs>
+    <circle cx="${c}" cy="${c}" r="${c - 16}" fill="url(#fg-${finish.id})"/>
+    <path d="${arcPath(c, c, c - 22, 135, 315)}" fill="none" stroke="#fff"
+          stroke-opacity="0.45" stroke-width="9"/>
+    <path d="${arcPath(c, c, c - 22, 315, 135)}" fill="none" stroke="#000"
+          stroke-opacity="0.3" stroke-width="9"/>
+    <circle cx="${c}" cy="${c}" r="${c - 16}" fill="none" stroke="currentColor"
+            stroke-opacity="0.35" stroke-width="8"/>
+  </svg>`;
+  }
 
   // js/url-state.js
-  var VERSION = 2;
+  var VERSION = 3;
   var DEFAULTS = {
     colour: "ral-7016",
     window: "rect",
     grille: "none",
     handle: "bar-long",
+    detail: "plain",
+    finish: "steel",
     size: "standard",
     handing: "right-in",
     view: "out"
@@ -813,16 +928,18 @@
     p.set("w", state2.window);
     p.set("g", state2.grille);
     p.set("n", state2.handle);
+    p.set("d", state2.detail);
+    p.set("f", state2.finish);
     p.set("s", state2.size);
     p.set("h", state2.handing);
-    if (state2.view === "in") p.set("f", "in");
+    if (state2.view === "in") p.set("i", "1");
     return "?" + p.toString();
   }
   function fromQuery(search) {
     const p = new URLSearchParams(search);
     const state2 = { ...DEFAULTS };
     let notice = null;
-    const code = p.get("d");
+    const code = p.get("code");
     if (code) {
       const decoded = decodeCode(code);
       if (decoded) return { state: decoded, notice: null };
@@ -839,8 +956,10 @@
     take("window", "w", WINDOWS);
     take("grille", "g", GRILLES);
     take("handle", "n", HANDLES);
+    take("detail", "d", DETAILS);
+    take("finish", "f", FINISHES);
     take("handing", "h", HANDINGS);
-    if (p.get("f") === "in") state2.view = "in";
+    if (p.get("i") === "1") state2.view = "in";
     const rawSize = p.get("s");
     if (rawSize != null) {
       if (SIZES[rawSize]) state2.size = rawSize;
@@ -849,7 +968,18 @@
     return { state: state2, notice };
   }
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
-  var BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 2, handle: 3 };
+  var BITS = {
+    version: 3,
+    colour: 6,
+    size: 4,
+    handing: 2,
+    window: 5,
+    grille: 2,
+    handle: 3,
+    detail: 2,
+    finish: 2,
+    spare: 1
+  };
   var TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   function encodeCode(state2) {
     const sizeKeys = Object.keys(SIZES);
@@ -860,7 +990,10 @@
       [Math.max(0, HANDINGS.findIndex((h) => h.id === state2.handing)), BITS.handing],
       [Math.max(0, WINDOWS.findIndex((w) => w.id === state2.window)), BITS.window],
       [Math.max(0, GRILLES.findIndex((g) => g.id === state2.grille)), BITS.grille],
-      [Math.max(0, HANDLES.findIndex((n) => n.id === state2.handle)), BITS.handle]
+      [Math.max(0, HANDLES.findIndex((n) => n.id === state2.handle)), BITS.handle],
+      [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail],
+      [Math.max(0, FINISHES.findIndex((f) => f.id === state2.finish)), BITS.finish],
+      [0, BITS.spare]
     ];
     let bits = 0;
     for (const [value, width] of parts) bits = bits << width >>> 0 | value & (1 << width) - 1;
@@ -892,7 +1025,9 @@
     const window2 = WINDOWS[read(BITS.window)];
     const grille = GRILLES[read(BITS.grille)];
     const handle = HANDLES[read(BITS.handle)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle) return null;
+    const detail = DETAILS[read(BITS.detail)];
+    const finish = FINISHES[read(BITS.finish)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !detail || !finish) return null;
     return {
       colour: colour.id,
       size,
@@ -900,6 +1035,8 @@
       window: window2.id,
       grille: grille.id,
       handle: handle.id,
+      detail: detail.id,
+      finish: finish.id,
       view: "out"
     };
   }
@@ -923,7 +1060,8 @@
       `צבע: ${c.he} (RAL ${c.ral})`,
       `חלון: ${w.he}`,
       ...w.rects.length && g.id !== "none" ? [`סורג: ${g.he}`] : [],
-      `ידית: ${byId(HANDLES, state2.handle).he}`,
+      `ידית: ${byId(HANDLES, state2.handle).he} · ${byId(FINISHES, state2.finish).he}`,
+      ...state2.detail !== "plain" ? [`עיצוב: ${byId(DETAILS, state2.detail).he}`] : [],
       `מידה: ${s.he}`,
       `פתיחה: ${h.he}`,
       `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — כולל התקנה ומע״מ`,
@@ -987,6 +1125,24 @@
       (n) => n.he,
       (n) => n.delta,
       (id) => set({ handle: id })
+    );
+    buildTiles(
+      "#details",
+      DETAILS,
+      "עיצוב",
+      (d) => detailGlyph(d),
+      (d) => d.he,
+      (d) => d.delta,
+      (id) => set({ detail: id })
+    );
+    buildTiles(
+      "#finishes",
+      FINISHES,
+      "גימור ידיות",
+      (f) => finishGlyph(f),
+      (f) => f.he,
+      (f) => f.delta,
+      (id) => set({ finish: id })
     );
     buildTiles(
       "#sizes",
@@ -1137,7 +1293,8 @@
       `RAL ${colour.ral}`,
       win.he,
       ...win.rects.length && grille.id !== "none" ? [grille.he] : [],
-      byId(HANDLES, state.handle).he,
+      `${byId(HANDLES, state.handle).he} ${byId(FINISHES, state.finish).he}`,
+      ...state.detail !== "plain" ? [byId(DETAILS, state.detail).he] : [],
       size.he,
       handing.he
     ].join(" · ");
@@ -1145,6 +1302,8 @@
     markSelected("#windows", state.window);
     markSelected("#grilles", state.grille);
     markSelected("#handles", state.handle);
+    markSelected("#details", state.detail);
+    markSelected("#finishes", state.finish);
     markSelected("#sizes", state.size);
     markSelected("#handings", state.handing);
     markSelected("#views", state.view);

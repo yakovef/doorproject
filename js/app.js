@@ -2,9 +2,9 @@
  * Wiring. Small on purpose — the state is three keys.
  */
 
-import { byId, COLOURS, GRILLES, HANDINGS, HANDLES, PLACEHOLDER, SIZES, VIEWS, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, PLACEHOLDER, SIZES, VIEWS, WINDOWS } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
-import { describe, grilleGlyph, handleGlyph, render, sizeGlyph, windowGlyph } from './renderer.js';
+import { describe, detailGlyph, finishGlyph, grilleGlyph, handleGlyph, render, sizeGlyph, windowGlyph } from './renderer.js';
 import { copyMessage, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 
@@ -26,6 +26,10 @@ function init() {
              chooseGrille);
   buildTiles('#handles', HANDLES, 'ידית', n => handleGlyph(n), n => n.he, n => n.delta,
              id => set({ handle: id }));
+  buildTiles('#details', DETAILS, 'עיצוב', d => detailGlyph(d), d => d.he, d => d.delta,
+             id => set({ detail: id }));
+  buildTiles('#finishes', FINISHES, 'גימור ידיות', f => finishGlyph(f), f => f.he, f => f.delta,
+             id => set({ finish: id }));
   buildTiles('#sizes', Object.values(SIZES), 'מידה', z => sizeGlyph(z), z => z.he,
              z => z.base - SIZES.standard.base, id => set({ size: id }));
   buildHandings();
@@ -201,13 +205,17 @@ function paint() {
   $('#summary').textContent = [
     colour.he, `RAL ${colour.ral}`, win.he,
     ...(win.rects.length && grille.id !== 'none' ? [grille.he] : []),
-    byId(HANDLES, state.handle).he, size.he, handing.he,
+    `${byId(HANDLES, state.handle).he} ${byId(FINISHES, state.finish).he}`,
+    ...(state.detail !== 'plain' ? [byId(DETAILS, state.detail).he] : []),
+    size.he, handing.he,
   ].join(' · ');
 
   markSelected('#colours', state.colour);
   markSelected('#windows', state.window);
   markSelected('#grilles', state.grille);
   markSelected('#handles', state.handle);
+  markSelected('#details', state.detail);
+  markSelected('#finishes', state.finish);
   markSelected('#sizes', state.size);
   markSelected('#handings', state.handing);
   markSelected('#views', state.view);

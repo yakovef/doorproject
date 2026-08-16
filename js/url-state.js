@@ -3,20 +3,22 @@
  *
  * PLAN.md §8.2. Two representations of the same thing:
  *   - a readable query string, for links
- *   - a 5-character code (DM-8EH48), for customers who telephone instead of
+ *   - a 6-character code (DM-8EH48X), for customers who telephone instead of
  *     messaging. It is an ENCODING, not a hash — a hash cannot be decoded
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 
-export const VERSION = 2;
+export const VERSION = 3;
 
 export const DEFAULTS = {
   colour:  'ral-7016',
   window:  'rect',
   grille:  'none',
   handle:  'bar-long',
+  detail:  'plain',
+  finish:  'steel',
   size:    'standard',
   handing: 'right-in',
   view:    'out',        // camera, not a product choice
@@ -32,9 +34,11 @@ export function toQuery(state) {
   p.set('w', state.window);
   p.set('g', state.grille);
   p.set('n', state.handle);
+  p.set('d', state.detail);
+  p.set('f', state.finish);
   p.set('s', state.size);
   p.set('h', state.handing);
-  if (state.view === 'in') p.set('f', 'in');   // only when not the default
+  if (state.view === 'in') p.set('i', '1');    // only when not the default
   return '?' + p.toString();
 }
 
@@ -48,7 +52,7 @@ export function fromQuery(search) {
   const state = { ...DEFAULTS };
   let notice = null;
 
-  const code = p.get('d');
+  const code = p.get('code');
   if (code) {
     const decoded = decodeCode(code);
     if (decoded) return { state: decoded, notice: null };
@@ -67,8 +71,10 @@ export function fromQuery(search) {
   take('window', 'w', WINDOWS);
   take('grille', 'g', GRILLES);
   take('handle', 'n', HANDLES);
+  take('detail', 'd', DETAILS);
+  take('finish', 'f', FINISHES);
   take('handing', 'h', HANDINGS);
-  if (p.get('f') === 'in') state.view = 'in';
+  if (p.get('i') === '1') state.view = 'in';
 
   const rawSize = p.get('s');
   if (rawSize != null) {
@@ -80,14 +86,15 @@ export function fromQuery(search) {
 }
 
 // ── Short code ────────────────────────────────────────────────────
-// 25 bits, laid out with room to grow:
-//   version 3 | colour 6 | size 4 | handing 2 | window 5 | grille 2 | handle 3
-// -> 5 Crockford base32 characters. Adding options later fits inside the
-//    existing widths, so the code length stays stable.
+// 30 bits, laid out with room to grow:
+//   version 3 | colour 6 | size 4 | handing 2 | window 5
+//   | grille 2 | handle 3 | detail 2 | finish 2 | spare 1
+// -> 6 Crockford base32 characters, still short enough to read aloud.
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
-const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 2, handle: 3 };
+const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5,
+               grille: 2, handle: 3, detail: 2, finish: 2, spare: 1 };
 const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 25 -> 5 chars
 
 export function encodeCode(state) {
@@ -100,6 +107,9 @@ export function encodeCode(state) {
     [Math.max(0, WINDOWS.findIndex(w => w.id === state.window)), BITS.window],
     [Math.max(0, GRILLES.findIndex(g => g.id === state.grille)), BITS.grille],
     [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
+    [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
+    [Math.max(0, FINISHES.findIndex(f => f.id === state.finish)), BITS.finish],
+    [0, BITS.spare],
   ];
 
   let bits = 0;
@@ -140,10 +150,13 @@ export function decodeCode(code) {
   const window  = WINDOWS[read(BITS.window)];
   const grille  = GRILLES[read(BITS.grille)];
   const handle  = HANDLES[read(BITS.handle)];
-  if (!colour || !size || !handing || !window || !grille || !handle) return null;
+  const detail  = DETAILS[read(BITS.detail)];
+  const finish  = FINISHES[read(BITS.finish)];
+  if (!colour || !size || !handing || !window || !grille || !handle || !detail || !finish) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
-    grille: grille.id, handle: handle.id, view: 'out',
+    grille: grille.id, handle: handle.id, detail: detail.id,
+    finish: finish.id, view: 'out',
   };
 }

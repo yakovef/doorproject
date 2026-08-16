@@ -7,7 +7,7 @@ import { writeFileSync } from 'node:fs';
 
 const cases = [
   { name: 'black', ref: 'research/doors/ref-00.png',
-    q: '?v=2&c=ral-7016&w=none&g=none&n=channel&s=standard&h=right-in' },
+    q: '?v=3&c=ral-7016&w=none&g=none&n=channel&d=plain&f=steel&s=standard&h=right-in' },
 ];
 
 const html = cases.map(c => `
