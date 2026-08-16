@@ -92,13 +92,17 @@ export function fromQuery(search) {
 // ── Short code ────────────────────────────────────────────────────
 // 30 bits, laid out with room to grow:
 //   version 3 | colour 6 | size 4 | handing 2 | window 5
-//   | grille 2 | handle 3 | detail 2 | finish 2 | spare 1
+//   | grille 2 | handle 4 | detail 2 | finish 2
 // -> 6 Crockford base32 characters, still short enough to read aloud.
+//
+// The handle field took the spare bit when the range grew to the real Rav
+// Bariach products. Four bits is sixteen slots against fourteen used, so the
+// code length is unchanged and there is still room for two more.
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
 const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5,
-               grille: 2, handle: 3, detail: 2, finish: 2, spare: 1 };
+               grille: 2, handle: 4, detail: 2, finish: 2 };
 const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 25 -> 5 chars
 
 export function encodeCode(state) {
@@ -113,7 +117,6 @@ export function encodeCode(state) {
     [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
     [Math.max(0, FINISHES.findIndex(f => f.id === state.finish)), BITS.finish],
-    [0, BITS.spare],
   ];
 
   let bits = 0;

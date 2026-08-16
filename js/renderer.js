@@ -890,17 +890,20 @@ function plateHandle(cx, cy, dir, inside) {
     C ${cx - rb} ${yB - kB} ${cx - wh} ${mid + kB * 0.6} ${cx - wh} ${mid}
     C ${cx - wh} ${mid - kA * 0.6} ${cx - r} ${yA + kA} ${cx - r} ${yA} Z`;
 
-  return `
-    <g>
-      <path d="${outline}" transform="translate(${dir * 13} 16)"
-            fill="#000" opacity="0.40" filter="url(#hwShadow)"/>
-
-      <!-- lever first, so the plate's rim overlaps its root -->
+  /* The lever sits ON the plate — that is how it is mounted, and drawing the
+     plate over it hid the lever's root so only the outer half showed. Order
+     here is therefore: plate, then its fixings, then the lever's shadow onto
+     the plate, then the lever and its collar on top of everything. */
+  const lever = `
       <path d="M ${at(6)} ${cy - bar + 3} L ${at(reach - 14)} ${cy - bar + 6}
                Q ${at(reach)} ${cy - bar + 6} ${at(reach)} ${cy + 2}
                Q ${at(reach)} ${cy + bar + 4} ${at(reach - 14)} ${cy + bar + 4}
                L ${at(6)} ${cy + bar + 6} Z"
             fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
+      <!-- the collar first: the lever swells out of it -->
+      <ellipse cx="${at(1)}" cy="${cy}" rx="16" ry="${bar * 1.25}" fill="url(#nickel)"/>
+      <path d="${arcPath(at(1), cy, bar * 1.1, 150, 320)}" fill="none"
+            stroke="#fff" stroke-opacity="0.5" stroke-width="2"/>
       <path d="M ${at(0)} ${cy - bar} L ${at(reach - 18)} ${cy - bar * 0.62}
                Q ${at(reach)} ${cy - bar * 0.62} ${at(reach)} ${cy + bar * 0.1}
                Q ${at(reach)} ${cy + bar * 0.8} ${at(reach - 18)} ${cy + bar * 0.8}
@@ -911,9 +914,12 @@ function plateHandle(cx, cy, dir, inside) {
             fill="#fff" opacity="0.95"/>
       <path d="M ${at(3)} ${cy + bar - 7} L ${at(reach - 16)} ${cy + bar * 0.8 - 5}
                L ${at(reach - 16)} ${cy + bar * 0.8} L ${at(3)} ${cy + bar} Z"
-            fill="#000" opacity="0.46"/>
-      <!-- the collar where the lever leaves the plate -->
-      <ellipse cx="${at(-2)}" cy="${cy}" rx="13" ry="${bar * 1.12}" fill="url(#nickel)"/>
+            fill="#000" opacity="0.46"/>`;
+
+  return `
+    <g>
+      <path d="${outline}" transform="translate(${dir * 13} 16)"
+            fill="#000" opacity="0.40" filter="url(#hwShadow)"/>
 
       <!-- the plate: mid-dark face, bright rim, one lit band off centre -->
       <path d="${outline}" fill="url(#plateFace)"/>
@@ -945,6 +951,8 @@ function plateHandle(cx, cy, dir, inside) {
                stroke="#fff" stroke-opacity="0.42" stroke-width="1.6"/>
       <ellipse cx="${cx}" cy="${keyY}" rx="11" ry="18" fill="#000" opacity="0.20"/>
       ${keyway(cx, keyY - 1, 0.85)}`}
+
+      ${lever}
     </g>`;
 }
 
