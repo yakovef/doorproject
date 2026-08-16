@@ -60,11 +60,30 @@ const FALLOFF = {
   light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.02, drift: 0.14 },
 };
 
-// ── Geometry, in mm ────────────────────────────────────────────────
+/* ── Geometry, in mm ──────────────────────────────────────────────
+   The returns were roughly three times too wide, and thirty measured
+   photographs plus a look at two of them settled it: a real door of this kind
+   is shot near square-on, so the camera sees a NARROW strip beside the leaf,
+   not the three-quarter view we were drawing. Whole reveal, leaf edge to frame
+   face, as a fraction of leaf width:
+
+              ours (was)   photographs        now
+     near       0.131      0.045 dark / 0.067 light    0.063
+     far        0.113      0.031 / 0.038               0.040
+     head       0.059      0.093 (both)                0.093
+
+   The head is the exception and goes the other way: the soffit is the ONE
+   surface a standing viewer looks up into, so it reads deeper than the jambs
+   in every tier. We had it as the shallowest of the three.
+
+   Keeping near/far at about 1.5 keeps the door off-axis enough to sit in the
+   wall — depth is still the thing that stops it being a picture of a door
+   (REALISM.md §1) — but the far return is now nearly nothing, which is what
+   an almost-square-on view actually shows. */
 const CASING   = 46;   // flat frame face against the wall
-const RET_NEAR = 92;   // visible return, camera side (wide)
-const RET_FAR  = 64;   // visible return, far side (narrow)
-const RET_HEAD = 56;   // visible return under the head
+const RET_NEAR = 32;   // visible return, camera side (wide)
+const RET_FAR  = 10;   // visible return, far side — nearly edge-on
+const RET_HEAD = 60;   // visible return under the head — the deepest of the three
 const MULLION  = 46;
 
 /* The reveal profile, read outward from the leaf. Every works photograph has
@@ -72,10 +91,13 @@ const MULLION  = 46;
    leaf to return face. The BEAD is the important one — a 2px line at up to
    1.3x the leaf's own value, mitred at both top corners. Both analyses of the
    photographs called it the strongest edge cue in the image and the one most
-   often dropped. */
-const GAP   = 12;      // leaf-to-frame shadow gap, 0.013 W
-const BEAD  = 9;       // the lit arris, 0.010 W
-const QUIRK = 22;      // the dark groove behind it, 0.023 W
+   often dropped.
+
+   Scaled down with the returns. On d003 the entire visible reveal is a line
+   0.025 of the leaf wide — 23 mm — and this profile alone used to be 43. */
+const GAP   = 10;      // leaf-to-frame shadow gap, 0.011 W
+const BEAD  = 6;       // the lit arris, 0.006 W
+const QUIRK = 12;      // the dark groove behind it, 0.013 W
 
 /* Hardware dimensions, measured off the works photographs (see REALISM.md
    §7). These are absolute millimetres, not fractions of the leaf, because a
@@ -272,17 +294,26 @@ export function render(state) {
     <!-- On the anthracite doors the gap runs 0.22-0.66x the leaf; on the cream
          ones it reaches 0.97-1.36x, i.e. there is no dark line there at all.
          A hard-coded dark stroke is wrong on half the catalogue. -->
+    <!-- Retuned against the thirty. The reveal on a dark leaf was running at
+         0.55 of the leaf's own value at the head where the photographs measure
+         0.79 — a black gash down each side of a door that in life has a
+         shadowed but plainly lit surface there. Light leaves were close
+         already. Targets, head -> floor:
+             dark   0.79 -> 0.45        light  0.85 -> 0.78 -->
     <linearGradient id="gapTone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.14 : 0.46}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.26 : 0.72}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.09 : 0.13}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.18 : 0.56}"/>
     </linearGradient>
     <linearGradient id="beadTone" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${LIGHT.warm}" stop-opacity="0.11"/>
       <stop offset="1" stop-color="${LIGHT.warm}" stop-opacity="0.02"/>
     </linearGradient>
+    <!-- The quirk was one fixed pair of opacities for every colour, which is
+         the same mistake the gap had: a groove that reads as a groove on white
+         reads as a hole on anthracite. -->
     <linearGradient id="quirkTone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.26"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.44"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.09 : 0.12}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.21 : 0.44}"/>
     </linearGradient>
 
     <!-- There was a warm floor bounce here: peach at 0.19 over the bottom
@@ -294,12 +325,21 @@ export function render(state) {
          The foot is now the shadow ramp arriving, and nothing else. -->
 
     <!-- Ambient occlusion. Tight, dark, and at every junction. -->
+    <!-- Under the lintel. The photographs put a dark leaf's top strip at 0.44
+         of its own midpoint and a pale one's at 0.71; we were at 0.87 for both,
+         so the head of the door barely knew it was in a rebate at all. -->
     <linearGradient id="aoTop" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${LIGHT.ao}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.34 : 0.40}"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
+    <!-- Contact shadow at the floor. The photographs put a WHITE door's foot
+         at 0.42 of its own midpoint and a dark one's at 0.51 — the light door
+         has the deeper relative drop, because the shadow arriving is roughly a
+         fixed amount of darkness and a pale leaf has further to fall. We had
+         it the other way round (0.62 light, 0.42 dark) from a single fixed
+         opacity, which is the same colour-blind mistake as the returns. -->
     <linearGradient id="aoBottom" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.34"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.55 : 0.26}"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoLeft" x1="0" y1="0" x2="1" y2="0">
@@ -314,13 +354,37 @@ export function render(state) {
     <!-- Frame return faces. Each turns away from the camera, and each goes
          darkest where it meets the leaf — that corner is the deepest
          occlusion in the whole image, and it is what creates depth. -->
+    <!-- Both returns were one fixed ramp for every colour, bottoming out at
+         0.60 black — which on white paint is a grey stripe down a door that
+         the photographs show as almost the leaf's own value (near_tone 0.89).
+         Measured targets for the return face, against the leaf midpoint:
+                        near    far
+              light     0.89   0.86     nearly equal
+              dark      0.52   0.74     the far return is the BRIGHTER one
+         That reversal is the tell. The far return faces back toward the key
+         light; the near one turns away from it. Averaging them, as a single
+         shared ramp does, loses the only thing that says which way the door
+         is facing. -->
     <linearGradient id="retNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.24"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.60"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.06 : 0.30}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.15 : 0.55}"/>
     </linearGradient>
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.52"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.04 : 0.02}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.12 : 0.14}"/>
+    </linearGradient>
+
+    <!-- Both returns had a horizontal ramp and no vertical one at all, so a
+         reveal was equally bright at the head and at the floor. The
+         photographs are emphatic that it is not: a dark leaf's reveal runs
+         0.79 at the head to 0.45 at the foot, a pale one 0.85 to 0.78. That
+         is what made the two demands here look contradictory — the near
+         reveal needed to be brighter at the top AND darker at mid-height, and
+         no purely horizontal gradient can do both. -->
+    <linearGradient id="revealFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="${pale ? 0.02 : 0.14}"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="${pale ? 0.05 : 0.44}"/>
     </linearGradient>
     <linearGradient id="retHead" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
@@ -610,11 +674,15 @@ export function render(state) {
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint}"/>
     <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retNear)"/>
+    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
+          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#revealFall)"/>
 
     <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint}"/>
     <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retFar)"/>
+    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
+          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#revealFall)"/>
 
     <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
           width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint}"/>
