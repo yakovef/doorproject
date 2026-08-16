@@ -64,13 +64,24 @@ export const WINDOWS = [
 /**
  * Handles. The long vertical pull bar dominates modern Israeli entrance
  * doors — the brand catalogues are full of them — so it is the default.
+ *
+ * `lock: true` means the handle carries the cylinder on its own backplate and
+ * no separate escutcheon is drawn beside it. Three of the four doors we could
+ * measure on the works page are built that way: it is the standard fitting on
+ * the doors Chava actually installs, and the renderer had no way to draw it.
+ *
+ * New styles append to the END. The short code packs the handle as an index,
+ * so inserting one in the middle would silently repoint every code already
+ * written down or read out over the phone.
  */
 export const HANDLES = [
   { id: 'bar-long',  he: 'ידית משיכה ארוכה', en: 'Long pull bar',  delta: 0,     len: 1150, style: 'bar' },
   { id: 'bar-short', he: 'ידית משיכה קצרה',  en: 'Short pull bar', delta: 0,     len: 600,  style: 'bar' },
   { id: 'channel',   he: 'ידית שקועה',       en: 'Recessed channel', delta: 32000, len: 1250, style: 'channel' },
   { id: 'dee',       he: 'ידית חצי-סהר',     en: 'Half-moon',      delta: 18000, len: 0,    style: 'dee' },
-  { id: 'lever',     he: 'ידית רגילה',        en: 'Lever',          delta: -8000, len: 0,    style: 'lever' },
+  { id: 'lever',     he: 'ידית על רוזטה',    en: 'Lever on rose',  delta: -8000, len: 0,    style: 'lever' },
+  { id: 'plate',     he: 'ידית עם פלטה',     en: 'Lever on backplate',
+    delta: -8000, len: 0, style: 'plate', lock: true },
 ];
 
 /** Decorative iron grille over the glazing. Only meaningful with a window. */

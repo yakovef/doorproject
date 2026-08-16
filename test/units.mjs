@@ -222,38 +222,49 @@ group('handle clears the lock');
     const svg = render({ ...base, handle: hn.id, size: sz, handing: hd.id, view: v.id });
     const label = `${hn.id}/${sz}/${hd.id}/${v.id}`;
 
-    const lock = {
-      x: num(svg, /data-hw="lock"[^>]*data-cx="([-\d.]+)"/),
-      y: num(svg, /data-hw="lock"[^>]*data-cy="([-\d.]+)"/),
-      r: num(svg, /data-hw="lock"[^>]*data-r="([-\d.]+)"/),
-    };
     const grip = {
       x:  num(svg, /data-hw="handle"[^>]*data-cx="([-\d.]+)"/s),
-      y:  num(svg, /data-hw="handle"[^>]*data-cy="([-\d.]+)"/s),
       hx: num(svg, /data-hw="handle"[^>]*data-hx="([-\d.]+)"/s),
       vy: num(svg, /data-hw="handle"[^>]*data-vy="([-\d.]+)"/s),
+      y:  num(svg, /data-hw="handle"[^>]*data-cy="([-\d.]+)"/s),
     };
-
-    // Gap along each axis; positive on either axis means the boxes miss.
-    const gapX = Math.abs(grip.x - lock.x) - (grip.hx + lock.r);
-    const gapY = Math.abs(grip.y - lock.y) - (grip.vy + lock.r);
-    ok(Math.max(gapX, gapY) > 0, `handle overlaps the lock (${label}): gapX ${gapX}, gapY ${gapY}`);
-    tightest = Math.min(tightest, Math.max(gapX, gapY));
-
     const leaf = { x: num(svg, /id="leaf" data-x="([-\d.]+)"/), w: num(svg, /id="leaf"[^>]*data-w="([\d.]+)"/) };
+    const carries = /data-carries-lock="true"/.test(svg);
 
-    /* The handle may only stand off towards the leaf centre — never out past
-       the lock towards the closing edge, where there is no door left to hold.
-       The lock sits on the closing edge, so "towards the centre" is the hinge
-       side whichever way the door is hung and whichever face we are on. */
-    const toHinge = Math.sign(leaf.x + leaf.w / 2 - lock.x);
-    const toGrip = Math.sign(grip.x - lock.x);
-    ok(toGrip === 0 || toGrip === toHinge,
-       `handle stands off the wrong way, past the closing edge (${label})`);
+    /* Whatever the style, the door gets exactly one way to unlock it: either
+       the handle carries the cylinder on its own backplate, or a separate
+       escutcheon sits beside it. Never both, and never neither. */
+    const escutcheons = [...svg.matchAll(/data-hw="lock"/g)].length;
+    ok(carries === !!hn.lock, `data-carries-lock disagrees with the catalogue (${label})`);
+    ok(escutcheons === (carries ? 0 : 1),
+       `expected ${carries ? 0 : 1} separate escutcheon, found ${escutcheons} (${label})`);
+    ok([...svg.matchAll(/data-hw="keyway"/g)].length === (v.id === 'in' ? 0 : 1),
+       `the street face needs exactly one keyway and the inside face none (${label})`);
 
-    // And both must land on the active leaf, clear of its edges.
-    ok(lock.x - lock.r > leaf.x && lock.x + lock.r < leaf.x + leaf.w,
-       `lock hangs off the leaf (${label})`);
+    if (!carries) {
+      const lock = {
+        x: num(svg, /data-hw="lock"[^>]*data-cx="([-\d.]+)"/),
+        y: num(svg, /data-hw="lock"[^>]*data-cy="([-\d.]+)"/),
+        r: num(svg, /data-hw="lock"[^>]*data-r="([-\d.]+)"/),
+      };
+      // Gap along each axis; positive on either axis means the boxes miss.
+      const gapX = Math.abs(grip.x - lock.x) - (grip.hx + lock.r);
+      const gapY = Math.abs(grip.y - lock.y) - (grip.vy + lock.r);
+      ok(Math.max(gapX, gapY) > 0, `handle overlaps the lock (${label}): gapX ${gapX}, gapY ${gapY}`);
+      tightest = Math.min(tightest, Math.max(gapX, gapY));
+
+      /* The handle may only stand off towards the leaf centre — never out past
+         the lock towards the closing edge, where there is no door left to
+         hold. The lock sits on the closing edge, so "towards the centre" is
+         the hinge side whichever way the door is hung and whichever face. */
+      const toHinge = Math.sign(leaf.x + leaf.w / 2 - lock.x);
+      const toGrip = Math.sign(grip.x - lock.x);
+      ok(toGrip === 0 || toGrip === toHinge,
+         `handle stands off the wrong way, past the closing edge (${label})`);
+      ok(lock.x - lock.r > leaf.x && lock.x + lock.r < leaf.x + leaf.w,
+         `lock hangs off the leaf (${label})`);
+    }
+
     ok(grip.x - grip.hx > leaf.x && grip.x + grip.hx < leaf.x + leaf.w,
        `handle hangs off the leaf (${label})`);
     n++;

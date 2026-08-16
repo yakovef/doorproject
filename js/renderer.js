@@ -25,7 +25,7 @@ import { darken, isLight, lighten, silhouette } from './colour.js';
 const FINISH_TONES = {
   steel: ['#E4E7E9', '#C6CBCF', '#9FA5AA', '#80868B', '#99A0A5', '#6A7075'],
   black: ['#5E6165', '#3D4043', '#26282B', '#171819', '#313437', '#0F1011'],
-  brass: ['#F3E4BE', '#E0C88C', '#C4A660', '#A08444', '#CBB273', '#7C6334'],
+  brass: ['#EFE5CE', '#D9CBA6', '#BCAD86', '#9C8F6C', '#C7BA9B', '#7C7154'],
 };
 
 /* ── The light. Everything shades from this. ────────────────────────
@@ -90,6 +90,19 @@ const LEVER_REACH  = 124;   // 0.13 W, and exactly horizontal in all four photos
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
 const BAR_STANDOFF = 0.14;  // of leaf width: where ref-00 puts its channel
 const THRESHOLD    = 26;
+
+/* The backplate that carries lever and cylinder together — the fitting on
+   three of the four doors we could measure. Waisted, not a plain stadium:
+   the ends flare and the middle pulls in to about four fifths. */
+const PLATE = {
+  w: 90,          // 0.095 W
+  h: 240,         // 0.114 H, aspect 2.67
+  waist: 0.91,    // of the end width — a pinch, not an hourglass
+  lever: 0.30,    // spindle, as a fraction down the plate
+  key: 0.74,      // cylinder, same
+  reach: 1.32,    // lever tip from the spindle, in plate widths
+  bar: 0.36,      // lever thickness at the root, in plate widths
+};
 
 const PAD = { x: 70, top: 95, bottom: 150 };
 
@@ -308,6 +321,20 @@ export function render(state) {
       <stop offset="1"   stop-color="${tone[5]}"/>
     </linearGradient>
 
+    <!-- Chrome mirrors an unlit room: bright rim, banded face, and a middle
+         that is DARKER than the door behind it. Filling a backplate with
+         light grey is the classic rendered-hardware tell. -->
+    <linearGradient id="plateFace" x1="0" y1="0" x2="1" y2="0.22">
+      <stop offset="0"    stop-color="${tone[2]}"/>
+      <stop offset="0.16" stop-color="${tone[4]}"/>
+      <stop offset="0.36" stop-color="${tone[5]}"/>
+      <stop offset="0.50" stop-color="${tone[3]}"/>
+      <stop offset="0.64" stop-color="${tone[1]}"/>
+      <stop offset="0.78" stop-color="${tone[2]}"/>
+      <stop offset="0.92" stop-color="${tone[4]}"/>
+      <stop offset="1"    stop-color="${tone[5]}"/>
+    </linearGradient>
+
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"    stop-color="#6E7276"/>
       <stop offset="0.18" stop-color="#EDEFF0"/>
@@ -517,8 +544,9 @@ export function render(state) {
     ${inside ? HINGES_AFF.filter(a => a < leafH - 120)
                  .map(a => hinge(hingeX, y(a), inward)).join('') : ''}
     ${win.rects.length ? '' : peephole(centreX, y(PEEPHOLE_AFF))}
-    ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint)}
-    ${inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
+    ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint, inside)}
+    ${handle.lock ? ''
+      : inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   <rect x="0" y="0" width="${view.w}" height="${view.h}" fill="url(#vignette)"/>
@@ -668,6 +696,7 @@ function handleFootprint(handle, leafH) {
     case 'channel': return { hx: 21, vy: channelHalf(handle.len, leafH) };
     case 'dee':     return { hx: DEE_R, vy: DEE_R };
     case 'lever':   return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
+    case 'plate':   return { hx: PLATE.w / 2, vy: PLATE.h / 2 };
     default:        return { hx: 15, vy: barHalf(handle.len, leafH) };
   }
 }
@@ -679,6 +708,7 @@ function handleFootprint(handle, leafH) {
  * real door, and moving it would be wrong.
  */
 export function handleStandoff(handle, leafW, leafH) {
+  if (handle.lock) return 0;                         // it IS the lock
   const foot = handleFootprint(handle, leafH);
   const dy = Math.abs(HANDLE_AFF - CYLINDER_AFF);
   if (dy >= foot.vy + LOCK_R) return 0;              // vertical bands miss
@@ -687,15 +717,17 @@ export function handleStandoff(handle, leafW, leafH) {
   return Math.round(Math.max(foot.hx + LOCK_R + LOCK_CLEAR, leafW * BAR_STANDOFF));
 }
 
-function handleArt(handle, cx, cy, leafH, dir, paint) {
+function handleArt(handle, cx, cy, leafH, dir, paint, inside) {
   const art =
     handle.style === 'channel' ? channelHandle(cx, cy, handle.len, leafH, paint) :
     handle.style === 'dee'     ? deeHandle(cx, cy, paint, dir) :
+    handle.style === 'plate'   ? plateHandle(cx, cy, dir, inside) :
     handle.len                 ? pullBar(cx, cy, handle.len, leafH, paint) :
                                  lever(cx, cy, dir);
   const foot = handleFootprint(handle, leafH);
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}">${art}</g>`;
+             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
+             data-carries-lock="${!!handle.lock}">${art}</g>`;
 }
 
 const DEE_R = 78;
@@ -751,6 +783,108 @@ function pullBar(cx, cy, len, leafH, paint) {
             fill="url(#nickel)"/>
       <rect x="${cx - w / 2 + 4}" y="${cy - half + 10}" width="5" height="${half * 2 - 20}" rx="2.5"
             fill="#fff" opacity="0.55"/>
+    </g>`;
+}
+
+/**
+ * Lever on a waisted backplate — the fitting on most of Chava's doors.
+ *
+ * Three things the photographs insist on and a naive drawing gets wrong:
+ *
+ *   1. The plate is WAISTED. Flared ends, a middle that pulls in to about
+ *      four fifths. A plain stadium reads as a generic escutcheon.
+ *   2. Chrome MIRRORS. The rim is the brightest thing on the door and the
+ *      face is *darker* than the paint around it, because it is reflecting an
+ *      unlit room. Filling the plate with light grey is the classic tell.
+ *   3. The whole assembly stands ~15mm proud, so it throws a soft shadow down
+ *      and towards the hinge — the plate reads as bolted on without it.
+ *
+ * `cy` is the lever spindle, which sits 0.30 down the plate rather than at
+ * its middle, so the plate hangs lower than it looks like it should.
+ */
+function plateHandle(cx, cy, dir, inside) {
+  const w = PLATE.w, h = PLATE.h, r = w / 2;
+  const top = cy - h * PLATE.lever, bot = top + h;
+  const wh = (w * PLATE.waist) / 2;
+  const keyY = top + h * PLATE.key;
+  const at = t => cx + dir * t;
+  const reach = w * PLATE.reach, bar = (w * PLATE.bar) / 2;
+
+  /* Ends are shallow domes, not semicircles, and the waist is a gentle pinch
+     near mid-height rather than a curve running the whole length — the sides
+     stay near-straight for most of the plate. Getting this wrong turns the
+     plate into a peanut, which is what a semicircular end plus an even waist
+     produces. The bottom is fuller than the top, as the photographs show. */
+  const rT = w * 0.30, rB = w * 0.40;
+  const rb = r * 0.90;                      // the foot is a shade narrower
+  const yA = top + rT, yB = bot - rB, mid = (yA + yB) / 2;
+  const kA = (mid - yA) * 0.62, kB = (yB - mid) * 0.62;
+
+  const outline = `M ${cx - r} ${yA}
+    C ${cx - r} ${top + rT * 0.45} ${cx - r * 0.55} ${top} ${cx} ${top}
+    C ${cx + r * 0.55} ${top} ${cx + r} ${top + rT * 0.45} ${cx + r} ${yA}
+    C ${cx + r} ${yA + kA} ${cx + wh} ${mid - kA * 0.6} ${cx + wh} ${mid}
+    C ${cx + wh} ${mid + kB * 0.6} ${cx + rb} ${yB - kB} ${cx + rb} ${yB}
+    C ${cx + rb} ${bot - rB * 0.35} ${cx + rb * 0.62} ${bot} ${cx} ${bot}
+    C ${cx - rb * 0.62} ${bot} ${cx - rb} ${bot - rB * 0.35} ${cx - rb} ${yB}
+    C ${cx - rb} ${yB - kB} ${cx - wh} ${mid + kB * 0.6} ${cx - wh} ${mid}
+    C ${cx - wh} ${mid - kA * 0.6} ${cx - r} ${yA + kA} ${cx - r} ${yA} Z`;
+
+  return `
+    <g>
+      <path d="${outline}" transform="translate(${dir * 13} 16)"
+            fill="#000" opacity="0.40" filter="url(#hwShadow)"/>
+
+      <!-- lever first, so the plate's rim overlaps its root -->
+      <path d="M ${at(6)} ${cy - bar + 3} L ${at(reach - 14)} ${cy - bar + 6}
+               Q ${at(reach)} ${cy - bar + 6} ${at(reach)} ${cy + 2}
+               Q ${at(reach)} ${cy + bar + 4} ${at(reach - 14)} ${cy + bar + 4}
+               L ${at(6)} ${cy + bar + 6} Z"
+            fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
+      <path d="M ${at(0)} ${cy - bar} L ${at(reach - 18)} ${cy - bar * 0.62}
+               Q ${at(reach)} ${cy - bar * 0.62} ${at(reach)} ${cy + bar * 0.1}
+               Q ${at(reach)} ${cy + bar * 0.8} ${at(reach - 18)} ${cy + bar * 0.8}
+               L ${at(0)} ${cy + bar} Z"
+            fill="url(#nickel)"/>
+      <path d="M ${at(3)} ${cy - bar + 2} L ${at(reach - 14)} ${cy - bar * 0.62 + 2}
+               L ${at(reach - 14)} ${cy - bar * 0.62 + 5} L ${at(3)} ${cy - bar + 6} Z"
+            fill="#fff" opacity="0.95"/>
+      <path d="M ${at(3)} ${cy + bar - 7} L ${at(reach - 16)} ${cy + bar * 0.8 - 5}
+               L ${at(reach - 16)} ${cy + bar * 0.8} L ${at(3)} ${cy + bar} Z"
+            fill="#000" opacity="0.46"/>
+      <!-- the collar where the lever leaves the plate -->
+      <ellipse cx="${at(-2)}" cy="${cy}" rx="13" ry="${bar * 1.12}" fill="url(#nickel)"/>
+
+      <!-- the plate: mid-dark face, bright rim, one lit band off centre -->
+      <path d="${outline}" fill="url(#plateFace)"/>
+      <path d="${outline}" fill="none" stroke="#fff" stroke-opacity="0.62" stroke-width="3.4"
+            transform="translate(${dir * 1.2} -1.6)"/>
+      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.46" stroke-width="2.4"
+            transform="translate(${dir * -1.8} 2.4)"/>
+      <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.30" stroke-width="1"/>
+
+      ${inside ? `
+      <!-- the inside plate is screwed through: two pairs, top and bottom -->
+      ${[yA - 4, yB + 4].flatMap(sy => [-1, 1].map(sx => `
+      <circle cx="${cx + sx * w * 0.19}" cy="${sy}" r="6.5" fill="#000" opacity="0.34"/>
+      <circle cx="${cx + sx * w * 0.19}" cy="${sy}" r="5.2" fill="url(#nickelSoft)"/>
+      <path d="${arcPath(cx + sx * w * 0.19, sy, 3.6, 150, 320)}" fill="none"
+            stroke="#fff" stroke-opacity="0.6" stroke-width="1.5"/>`)).join('')}
+      <!-- thumb-turn: a stubby bar, not a pin -->
+      <rect x="${cx - 8}" y="${keyY - 22}" width="16" height="44" rx="8"
+            fill="#000" opacity="0.28" transform="translate(${dir * -3} 4)"/>
+      <rect x="${cx - 8}" y="${keyY - 22}" width="16" height="44" rx="8" fill="url(#nickel)"/>
+      <rect x="${cx - 5}" y="${keyY - 18}" width="4.5" height="36" rx="2.2"
+            fill="#fff" opacity="0.7"/>
+      <rect x="${cx + 3}" y="${keyY - 18}" width="3" height="36" rx="1.5"
+            fill="#000" opacity="0.26"/>`
+      : `
+      <!-- raised oval boss carrying the euro keyway -->
+      <ellipse cx="${cx}" cy="${keyY}" rx="17" ry="25" fill="url(#nickelSoft)"/>
+      <ellipse cx="${cx - 1}" cy="${keyY - 1}" rx="15" ry="23" fill="none"
+               stroke="#fff" stroke-opacity="0.42" stroke-width="1.6"/>
+      <ellipse cx="${cx}" cy="${keyY}" rx="11" ry="18" fill="#000" opacity="0.20"/>
+      ${keyway(cx, keyY - 1, 0.85)}`}
     </g>`;
 }
 
@@ -916,6 +1050,19 @@ const peephole = (cx, cy) => {
     <circle cx="${cx}" cy="${cy}" r="${R * 0.16}" fill="#1A1D20"/>`;
 };
 
+/** Bow over blade, with the warding visible inside. Shared by the round
+ *  escutcheon and the backplate, so the two can never drift apart. */
+const keyway = (kx, ky, s = 1) => `
+      <g data-hw="keyway" transform="translate(${kx} ${ky}) scale(${s})">
+        <path d="M -5.4 -17 a 5.4 5.4 0 1 1 10.8 0 l 1.5 15
+                 a 1.8 1.8 0 0 1 -1.8 2 h -10.2 a 1.8 1.8 0 0 1 -1.8 -2 Z"
+              fill="#121417"/>
+        <path d="M -3.4 -17 a 3.4 3.4 0 1 1 6.8 0 l 0.9 12 h -8.6 Z"
+              fill="#2E3235" opacity="0.85"/>
+        <rect x="-2" y="-8" width="4" height="1.6" fill="#6B7075" opacity="0.8"/>
+        <rect x="-2" y="-4" width="3" height="1.4" fill="#6B7075" opacity="0.7"/>
+      </g>`;
+
 /**
  * The lock: a turned brushed-nickel escutcheon with a euro cylinder.
  * Modelled on the supplied hardware photograph — stepped concentric rings,
@@ -948,16 +1095,7 @@ const cylinder = (cx, cy) => {
       <path d="${arcPath(kx, ky - 15, 10, 315, 135)}" fill="none" stroke="#000"
             stroke-opacity="0.3" stroke-width="1.8"/>
 
-      <!-- keyway: bow over blade, with the warding visible inside -->
-      <path d="M ${kx - 5.4} ${ky - 17}
-               a 5.4 5.4 0 1 1 10.8 0
-               l 1.5 15 a 1.8 1.8 0 0 1 -1.8 2 h -10.2
-               a 1.8 1.8 0 0 1 -1.8 -2 Z"
-            fill="#121417"/>
-      <path d="M ${kx - 3.4} ${ky - 17} a 3.4 3.4 0 1 1 6.8 0 l 0.9 12 h -8.6 Z"
-            fill="#2E3235" opacity="0.85"/>
-      <rect x="${kx - 2}" y="${ky - 8}" width="4" height="1.6" fill="#6B7075" opacity="0.8"/>
-      <rect x="${kx - 2}" y="${ky - 4}" width="3" height="1.4" fill="#6B7075" opacity="0.7"/>
+      ${keyway(kx, ky)}
 
       <!-- two crisp speculars: the tell of polished metal -->
       <ellipse cx="${cx - R * 0.42}" cy="${cy - R * 0.5}" rx="7" ry="4"
@@ -1045,6 +1183,13 @@ export function handleGlyph(handle) {
                  rx="8" fill="none" stroke="currentColor" stroke-width="34"/>`;
   } else if (handle.style === 'dee') {
     art = `<path d="M ${cx} ${H / 2 - 150} A 150 150 0 0 0 ${cx} ${H / 2 + 150} Z" fill="currentColor"/>`;
+  } else if (handle.style === 'plate') {
+    const pw = 150, ph = 380, t = H / 2 - ph * PLATE.lever;
+    art = `<rect x="${cx - pw / 2}" y="${t}" width="${pw}" height="${ph}" rx="${pw / 2}"
+                 fill="currentColor"/>
+           <rect x="${cx - 300}" y="${H / 2 - 32}" width="300" height="64" rx="32"
+                 fill="currentColor"/>
+           <circle cx="${cx}" cy="${t + ph * PLATE.key}" r="26" fill="#fff" opacity="0.7"/>`;
   } else if (handle.len) {
     art = `<rect x="${cx - 26}" y="${H / 2 - handle.len / 2}" width="52" height="${handle.len}"
                  rx="26" fill="currentColor"/>`;
