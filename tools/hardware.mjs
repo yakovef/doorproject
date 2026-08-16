@@ -19,7 +19,8 @@ const CASES = [
   // the inside face flips the handle to the other side, so hang the door the
   // other way round for these two and the crop still lands on the furniture
   ['lock-plate-in', 'n=plate&f=steel&i=1&h=left-in'],
-  ['lock-dee',     'n=dee&f=black'],
+  ['lock-grab',    'n=grab&f=steel'],
+  ['lock-flat',    'n=bar-flat&f=steel'],
   ['lock-inside',  'n=lever&f=steel&i=1&h=left-in'],
 ];
 

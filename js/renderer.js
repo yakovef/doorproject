@@ -88,7 +88,18 @@ const LOCK_R       = 40;    // 0.083 W across — the escutcheon is the bigger d
 const LEVER_ROSETTE = 37;   // ratio to the escutcheon is 1.08, not 1.2
 const LEVER_REACH  = 124;   // 0.13 W, and exactly horizontal in all four photos
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
-const BAR_STANDOFF = 0.14;  // of leaf width: where ref-00 puts its channel
+/* Where a pull bar sits, as a fraction of leaf width from the closing edge.
+   Measured across every installation square-on enough to trust: 0.052, 0.128,
+   0.156, 0.167, 0.21, 0.275, 0.28, 0.31 — median 0.19. Real bars are markedly
+   inboard, usually lining up with a glazing or inlay feature, with the lock
+   furniture outboard of them. Only one of eight hugged the stile. */
+const BAR_INSET = 0.19;
+
+/* The horizontal grab bar. All 18 instances are centred on the leaf width at
+   a mid rail, 0.30 of leaf width long at about 1:15, on ball collars — and
+   every single one is on a door that already has a lever. It is an accessory,
+   never a door's main grip, which is why it ships as "lever + grab bar". */
+const GRAB = { fromTop: 0.585, len: 0.30, ratio: 1 / 15, boss: 17 };
 const THRESHOLD    = 26;
 
 /* The backplate that carries lever and cylinder together — the fitting on
@@ -544,7 +555,8 @@ export function render(state) {
     ${inside ? HINGES_AFF.filter(a => a < leafH - 120)
                  .map(a => hinge(hingeX, y(a), inward)).join('') : ''}
     ${win.rects.length ? '' : peephole(centreX, y(PEEPHOLE_AFF))}
-    ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint, inside)}
+    ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint, inside,
+                centreX, leafW, y0)}
     ${handle.lock ? ''
       : inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
@@ -694,10 +706,10 @@ function grillePaths(kind, x, y, w, h) {
 function handleFootprint(handle, leafH) {
   switch (handle.style) {
     case 'channel': return { hx: 21, vy: channelHalf(handle.len, leafH) };
-    case 'dee':     return { hx: DEE_R, vy: DEE_R };
+    case 'grab':    return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
     case 'lever':   return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
     case 'plate':   return { hx: PLATE.w / 2, vy: PLATE.h / 2 };
-    default:        return { hx: 15, vy: barHalf(handle.len, leafH) };
+    default:        return { hx: (handle.w || 30) / 2, vy: barHalf(handle.len, leafH) };
   }
 }
 
@@ -711,18 +723,20 @@ export function handleStandoff(handle, leafW, leafH) {
   if (handle.lock) return 0;                         // it IS the lock
   const foot = handleFootprint(handle, leafH);
   const dy = Math.abs(HANDLE_AFF - CYLINDER_AFF);
-  if (dy >= foot.vy + LOCK_R) return 0;              // vertical bands miss
-  // Clearing the escutcheon is the floor, not the target: ref-00 stands its
-  // channel 0.227 W off the closing edge, and 0.085 + 0.14 lands on that.
-  return Math.round(Math.max(foot.hx + LOCK_R + LOCK_CLEAR, leafW * BAR_STANDOFF));
+  const clear = dy >= foot.vy + LOCK_R                // do the vertical bands meet?
+    ? 0 : foot.hx + LOCK_R + LOCK_CLEAR;
+  // Clearing the escutcheon is the floor; the measured inset is the target.
+  const want = handle.inset ? leafW * handle.inset - LOCK_BACKSET
+             : foot.vy > 200 ? leafW * BAR_INSET - LOCK_BACKSET : 0;
+  return Math.round(Math.max(clear, want, 0));
 }
 
-function handleArt(handle, cx, cy, leafH, dir, paint, inside) {
+function handleArt(handle, cx, cy, leafH, dir, paint, inside, centreX, leafW, y0) {
   const art =
     handle.style === 'channel' ? channelHandle(cx, cy, handle.len, leafH, paint) :
-    handle.style === 'dee'     ? deeHandle(cx, cy, paint, dir) :
+    handle.style === 'grab'    ? grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) :
     handle.style === 'plate'   ? plateHandle(cx, cy, dir, inside) :
-    handle.len                 ? pullBar(cx, cy, handle.len, leafH, paint) :
+    handle.len                 ? pullBar(cx, cy, handle, leafH) :
                                  lever(cx, cy, dir);
   const foot = handleFootprint(handle, leafH);
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
@@ -730,7 +744,6 @@ function handleArt(handle, cx, cy, leafH, dir, paint, inside) {
              data-carries-lock="${!!handle.lock}">${art}</g>`;
 }
 
-const DEE_R = 78;
 const channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
 const barHalf     = (len, leafH) => Math.min(len, leafH - 320) / 2;
 
@@ -754,35 +767,82 @@ function channelHandle(cx, cy, len, leafH, paint) {
     </g>`;
 }
 
-/** Matte-black half-moon D-handle. The bow turns away from the lock, so the
- *  two never crowd each other whichever way the door is hung. */
-function deeHandle(cx, cy, paint, dir) {
-  const r = DEE_R;
-  const sweep = dir < 0 ? 0 : 1;      // 0 bulges left, 1 bulges right
+/**
+ * Lever, plus the horizontal grab bar that so often accompanies it.
+ *
+ * This replaces a "half-moon D-handle" that was wrong twice over: it was
+ * drawn as a filled half-disc, which corresponds to no real object, and it
+ * was offered as a door's main grip. Across 128 installations the bow appears
+ * 18 times and every single one is horizontal, centred on the leaf width at a
+ * mid rail, and secondary to a lever that is already there.
+ *
+ * Seen square-on a bow is a swelled bar between two ball collars — the swell
+ * and the collars are the only things separating it from a plain pull.
+ */
+function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
+  const half = (leafW * GRAB.len) / 2;
+  const w = leafW * GRAB.len * GRAB.ratio;
+  const by = y0 + leafH * GRAB.fromTop;   // below the lever, on the mid rail
+  const boss = GRAB.boss, swell = w * 1.5;
+  const bar = (dx, dy, fill, op = 1) => `
+      <path d="M ${centreX - half + boss + dx} ${by - w / 2 + dy}
+               C ${centreX - half * 0.45 + dx} ${by - swell / 2 + dy}
+                 ${centreX + half * 0.45 + dx} ${by - swell / 2 + dy}
+                 ${centreX + half - boss + dx} ${by - w / 2 + dy}
+               L ${centreX + half - boss + dx} ${by + w / 2 + dy}
+               C ${centreX + half * 0.45 + dx} ${by + swell / 2 + dy}
+                 ${centreX - half * 0.45 + dx} ${by + swell / 2 + dy}
+                 ${centreX - half + boss + dx} ${by + w / 2 + dy} Z"
+            fill="${fill}" opacity="${op}"/>`;
+  const ends = [centreX - half + boss, centreX + half - boss];
   return `
     <g>
-      <path d="M ${cx + 6} ${cy - r + 6} A ${r} ${r} 0 0 ${sweep} ${cx + 6} ${cy + r + 6} Z"
-            fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
-      <path d="M ${cx} ${cy - r} A ${r} ${r} 0 0 ${sweep} ${cx} ${cy + r} Z" fill="url(#blackMetal)"/>
-      <path d="M ${cx - dir * 6} ${cy - r + 12} A ${r - 14} ${r - 14} 0 0 ${sweep}
-               ${cx - dir * 6} ${cy + r - 12}"
-            fill="none" stroke="#fff" stroke-opacity="0.13" stroke-width="5"/>
+      ${lever(cx, cy, dir)}
+      <g data-hw="grab">
+        ${bar(6, 9, '#000', 0.30)}
+        ${ends.map(ex => `
+        <circle cx="${ex + 5}" cy="${by + 8}" r="${boss}" fill="#000" opacity="0.28"
+                filter="url(#hwShadow)"/>`).join('')}
+        ${bar(0, 0, 'url(#nickel)')}
+        <!-- turned collars where the bar meets each ball -->
+        ${ends.map(ex => `
+        <rect x="${ex - 5}" y="${by - w * 0.75}" width="10" height="${w * 1.5}" rx="3"
+              fill="url(#nickelSoft)"/>`).join('')}
+        ${ends.map(ex => `
+        <circle cx="${ex}" cy="${by}" r="${boss}" fill="url(#nickel)"/>
+        <path d="${arcPath(ex, by, boss - 3, 140, 315)}" fill="none" stroke="#fff"
+              stroke-opacity="0.42" stroke-width="3"/>`).join('')}
+        <!-- one specular along the top of the swell -->
+        <path d="M ${centreX - half + boss + 4} ${by - w / 2 + 3}
+                 C ${centreX - half * 0.45} ${by - swell / 2 + 4}
+                   ${centreX + half * 0.45} ${by - swell / 2 + 4}
+                   ${centreX + half - boss - 4} ${by - w / 2 + 3}
+                 L ${centreX + half - boss - 4} ${by - w / 2 + 8}
+                 C ${centreX + half * 0.45} ${by - swell / 2 + 10}
+                   ${centreX - half * 0.45} ${by - swell / 2 + 10}
+                   ${centreX - half + boss + 4} ${by - w / 2 + 8} Z"
+              fill="#fff" opacity="0.5"/>
+      </g>
     </g>`;
 }
 
-function pullBar(cx, cy, len, leafH, paint) {
-  const half = barHalf(len, leafH);
-  const w = 30;
+function pullBar(cx, cy, handle, leafH) {
+  const half = barHalf(handle.len, leafH);
+  const w = handle.w || 30;
+  // A slender rod is capped round; a flat bar is a section with soft corners.
+  const rx = handle.section === 'flat' ? 9 : w / 2;
   return `
     <g>
       <rect x="${cx - w / 2 + 10}" y="${cy - half + 12}" width="${w}" height="${half * 2}"
-            rx="${w / 2}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+            rx="${rx}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
       ${[cy - half + 95, cy + half - 95].map(sy => `
       <rect x="${cx - 10}" y="${sy - 10}" width="20" height="20" rx="5" fill="var(--hw-mid)"/>`).join('')}
-      <rect x="${cx - w / 2}" y="${cy - half}" width="${w}" height="${half * 2}" rx="${w / 2}"
+      <rect x="${cx - w / 2}" y="${cy - half}" width="${w}" height="${half * 2}" rx="${rx}"
             fill="url(#nickel)"/>
-      <rect x="${cx - w / 2 + 4}" y="${cy - half + 10}" width="5" height="${half * 2 - 20}" rx="2.5"
-            fill="#fff" opacity="0.55"/>
+      <rect x="${cx - w / 2 + 4}" y="${cy - half + 10}" width="${w > 40 ? 8 : 5}"
+            height="${half * 2 - 20}" rx="2.5" fill="#fff" opacity="0.55"/>
+      ${w > 40 ? `<rect x="${cx + w / 2 - 8}" y="${cy - half + 10}" width="5"
+            height="${half * 2 - 20}" rx="2.5" fill="#000" opacity="0.22"/>` : ''}
     </g>`;
 }
 
@@ -1181,8 +1241,12 @@ export function handleGlyph(handle) {
   if (handle.style === 'channel') {
     art = `<rect x="${cx - 40}" y="${H / 2 - handle.len / 2}" width="80" height="${handle.len}"
                  rx="8" fill="none" stroke="currentColor" stroke-width="34"/>`;
-  } else if (handle.style === 'dee') {
-    art = `<path d="M ${cx} ${H / 2 - 150} A 150 150 0 0 0 ${cx} ${H / 2 + 150} Z" fill="currentColor"/>`;
+  } else if (handle.style === 'grab') {
+    const gy = H * GRAB.fromTop, gh = W * GRAB.len / 2;
+    art = `<circle cx="${cx}" cy="${H / 2}" r="46" fill="currentColor"/>
+           <rect x="${cx - 190}" y="${H / 2 - 22}" width="190" height="44" rx="22" fill="currentColor"/>
+           <rect x="${W / 2 - gh}" y="${gy - 26}" width="${gh * 2}" height="52" rx="26"
+                 fill="currentColor"/>`;
   } else if (handle.style === 'plate') {
     const pw = 150, ph = 380, t = H / 2 - ph * PLATE.lever;
     art = `<rect x="${cx - pw / 2}" y="${t}" width="${pw}" height="${ph}" rx="${pw / 2}"

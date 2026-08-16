@@ -10,7 +10,11 @@
 
 import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 
-export const VERSION = 3;
+/* 4: the handle at index 3 changed meaning (the fictional half-moon D-handle
+   became "lever + horizontal grab bar", which is what the installations
+   actually show). Bumping rather than reusing means an older code is refused
+   with a notice instead of quietly decoding into a different door. */
+export const VERSION = 4;
 
 export const DEFAULTS = {
   colour:  'ral-7016',

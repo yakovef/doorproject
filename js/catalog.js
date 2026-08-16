@@ -62,26 +62,40 @@ export const WINDOWS = [
 ];
 
 /**
- * Handles. The long vertical pull bar dominates modern Israeli entrance
- * doors — the brand catalogues are full of them — so it is the default.
+ * Handles, ranked by what 128 real installations on the works pages actually
+ * carry: lever on a rose (55), vertical pull bar (37), lever on a backplate
+ * (24), horizontal grab bar (18), recessed channel (3), short bar (3).
  *
  * `lock: true` means the handle carries the cylinder on its own backplate and
  * no separate escutcheon is drawn beside it. Three of the four doors we could
- * measure on the works page are built that way: it is the standard fitting on
- * the doors Chava actually installs, and the renderer had no way to draw it.
+ * measure closely are built that way: it is the standard fitting on the doors
+ * Chava installs, and the renderer had no way to draw it.
+ *
+ * `inset` is where the grip sits, as a fraction of leaf width from the closing
+ * edge. Left unset it takes the measured median for pull bars. Real bars sit
+ * markedly inboard — the median across every measurable installation is 0.19,
+ * not hard against the stile as you might assume.
  *
  * New styles append to the END. The short code packs the handle as an index,
  * so inserting one in the middle would silently repoint every code already
- * written down or read out over the phone.
+ * written down or read out over the phone. `grab` replaces the old `dee` at
+ * index 3, and the code VERSION is bumped so an older code is rejected with a
+ * notice rather than decoded into the wrong door.
  */
 export const HANDLES = [
-  { id: 'bar-long',  he: 'ידית משיכה ארוכה', en: 'Long pull bar',  delta: 0,     len: 1150, style: 'bar' },
-  { id: 'bar-short', he: 'ידית משיכה קצרה',  en: 'Short pull bar', delta: 0,     len: 600,  style: 'bar' },
-  { id: 'channel',   he: 'ידית שקועה',       en: 'Recessed channel', delta: 32000, len: 1250, style: 'channel' },
-  { id: 'dee',       he: 'ידית חצי-סהר',     en: 'Half-moon',      delta: 18000, len: 0,    style: 'dee' },
-  { id: 'lever',     he: 'ידית על רוזטה',    en: 'Lever on rose',  delta: -8000, len: 0,    style: 'lever' },
+  { id: 'bar-long',  he: 'ידית משיכה ארוכה', en: 'Long pull bar',
+    delta: 0, len: 1150, w: 30, style: 'bar' },
+  { id: 'bar-short', he: 'ידית משיכה קצרה',  en: 'Short pull bar',
+    delta: 0, len: 800, w: 30, style: 'bar' },
+  { id: 'channel',   he: 'ידית שקועה',       en: 'Recessed channel',
+    delta: 32000, len: 1554, inset: 0.30, style: 'channel' },
+  { id: 'grab',      he: 'ידית עם מאחז אופקי', en: 'Lever with grab bar',
+    delta: 18000, len: 0, style: 'grab' },
+  { id: 'lever',     he: 'ידית על רוזטה',    en: 'Lever on rose',  delta: -8000, len: 0, style: 'lever' },
   { id: 'plate',     he: 'ידית עם פלטה',     en: 'Lever on backplate',
     delta: -8000, len: 0, style: 'plate', lock: true },
+  { id: 'bar-flat',  he: 'ידית משיכה שטוחה', en: 'Flat pull bar',
+    delta: 12000, len: 880, w: 66, style: 'bar', section: 'flat' },
 ];
 
 /** Decorative iron grille over the glazing. Only meaningful with a window. */
