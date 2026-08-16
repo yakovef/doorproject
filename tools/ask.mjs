@@ -1,5 +1,5 @@
 /**
- * The two pictures ASK-CHAVA.md question 1 depends on, plus the handle sheet
+ * The two pictures ASK-PERETZ.md question 1 depends on, plus the handle sheet
  * for question 2. A picture gets these answered; a definition does not.
  *
  * Run: npm run ask

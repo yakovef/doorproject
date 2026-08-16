@@ -3,7 +3,7 @@
  *
  * Its one job today: bundle the ES modules into a single CLASSIC script, so
  * index.html can be opened by double-clicking it. Browsers block
- * `type="module"` over file://, and Chava needs to be able to open the folder
+ * `type="module"` over file://, and Peretz needs to be able to open the folder
  * on his own laptop with nothing installed (PLAN.md §3, §8.1).
  */
 import { build, context } from 'esbuild';

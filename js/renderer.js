@@ -1062,7 +1062,7 @@ function pullBar(cx, cy, handle, leafH) {
 }
 
 /**
- * Lever on a waisted backplate — the fitting on most of Chava's doors.
+ * Lever on a waisted backplate — the fitting on most of Peretz's doors.
  *
  * Three things the photographs insist on and a naive drawing gets wrong:
  *

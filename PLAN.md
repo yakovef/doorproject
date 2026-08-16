@@ -2,7 +2,7 @@
 
 > A configurator for **דלתות מגן**, Rishon LeZion. A customer designs an armored
 > steel entrance door — colour, window, size — sees the **full installed price**,
-> and sends it to Chava in one tap.
+> and sends it to Peretz in one tap.
 >
 > Revision C rewrites Revisions A and B around the real business. Those were
 > written for an imagined European joinery brand; almost every product
@@ -12,13 +12,13 @@
 
 ## 0. THE ONE JOB
 
-**A customer must be able to hand Chava an unambiguous order.**
+**A customer must be able to hand Peretz an unambiguous order.**
 
 That is the product. Everything else — the drawing, the price, the languages —
 exists to serve it. A wrong door ordered costs real money, and today the handoff
 is a customer describing a door badly over the phone.
 
-Success = Chava receives a message he can act on without a single clarifying
+Success = Peretz receives a message he can act on without a single clarifying
 question.
 
 Everything in this plan is judged against that sentence.
@@ -46,7 +46,7 @@ Yakov:
 - **Every listed price already includes full installation** — the site says
   *"המחיר כולל התקנה מלאה. אין עלויות נסתרות"*.
 - **The existing brand promise is "תמונות אמיתיות · מחירים אמיתיים."**
-- Contact: **053-219-7466**, WhatsApp, chavakras73@gmail.com.
+- Contact: **053-219-7466**, WhatsApp, peretzkras73@gmail.com.
 
 ### 1.1 What the doors actually look like
 
@@ -67,7 +67,7 @@ imagined. The renderer got easier, not harder.
 
 ## 2. WHAT THE CUSTOMER CHOOSES
 
-**Three axes in v1.** More later, once Chava confirms what the brands offer.
+**Three axes in v1.** More later, once Peretz confirms what the brands offer.
 
 | # | Axis | Hebrew | Notes |
 |---|---|---|---|
@@ -75,7 +75,7 @@ imagined. The renderer got easier, not harder.
 | 02 | **Window** | חלון | None / shapes / with or without grille. The second-biggest visual variable. |
 | 03 | **Size** | מידה | **A price category, not a measurement — see §2.1.** |
 
-Deferred to v2, pending Chava: handle style, lock upgrade, peephole type,
+Deferred to v2, pending Peretz: handle style, lock upgrade, peephole type,
 threshold, opening direction as a priced option, two-leaf doors, wood-look
 finishes.
 
@@ -84,7 +84,7 @@ never a code change.** This is the single most likely thing to change.
 
 ### 2.1 Size — handle this carefully
 
-Chava or his workers measure on site. **The customer must never type a
+Peretz or his workers measure on site. **The customer must never type a
 manufacturing dimension**, because a typo becomes a wrong door and a real loss.
 
 So size on the site is a **price band**, not a spec:
@@ -99,7 +99,7 @@ Under it, always: **"נמדוד אצלכם במדויק — בחינם."**
 
 The preview changes proportion with the band so the customer sees the
 difference, but no number the customer typed is ever treated as an order
-dimension. Chava's measurement is the only real one.
+dimension. Peretz's measurement is the only real one.
 
 ---
 
@@ -117,7 +117,7 @@ find the chat → paste. Replace it with one link:
 https://wa.me/972532197466?text=<url-encoded message>
 ```
 
-One tap on a phone, message pre-written, addressed to Chava. **Perhaps five
+One tap on a phone, message pre-written, addressed to Peretz. **Perhaps five
 lines of code for the highest-value feature on the site.**
 
 - **Primary action:** `שלחו את הדלת בוואטסאפ`
@@ -141,7 +141,7 @@ lines of code for the highest-value feature on the site.**
 
 Three things make this work:
 
-1. **The link back.** Chava taps it and sees exactly what the customer saw. He
+1. **The link back.** Peretz taps it and sees exactly what the customer saw. He
    decodes nothing.
 2. **The short code.** For customers who phone instead of message — four
    characters read aloud, typed into the site, same door on screen.
@@ -163,7 +163,7 @@ send this. Not a subtle button.
 - A full-width primary action, WhatsApp green, with the icon.
 - One line above it in plain Hebrew: **"בחרתם דלת? שלחו לנו אותה ונחזור אליכם
   עם הצעה מדויקת."**
-- After sending, a confirmation state: *"נשלח. חוה יחזור אליכם."*
+- After sending, a confirmation state: *"נשלח. פרץ יחזור אליכם."*
 
 ---
 
@@ -264,13 +264,13 @@ Grilles are decorative wrought-iron patterns drawn as repeatable SVG paths.
 
 ### 5.1 What it must show
 
-Chava's existing promise is all-in pricing with no hidden costs. **The
+Peretz's existing promise is all-in pricing with no hidden costs. **The
 configurator must not break that promise.** So:
 
 > **₪4,700 · כולל דלת, התקנה מלאה ומע"מ**
 
 The brands quote door-only. Showing the true installed total is exactly why a
-customer should come to Chava instead of going direct — it is the whole
+customer should come to Peretz instead of going direct — it is the whole
 argument, and it costs nothing to display.
 
 ### 5.2 The model
@@ -305,7 +305,7 @@ Yakov says installation cost varies with distance from Rishon LeZion. The
 existing site says *"אין עלויות נסתרות."* **Both cannot be true outside the
 centre.**
 
-Two options, and **Chava must choose**:
+Two options, and **Peretz must choose**:
 
 - **(a) One price everywhere in his service area.** Simplest, strongest, matches
   the existing promise. No city dropdown at all.
@@ -337,7 +337,7 @@ commercially in this market.
 **When the interface mirrors, the door must NOT mirror.**
 
 A right-hinged door is a physical fact about a real object. If the drawing flips
-with the layout, the site will show one hinge side and Chava will order the
+with the layout, the site will show one hinge side and Peretz will order the
 other. That is a wrong-door delivery caused by a stylesheet.
 
 **Rule: the stage SVG is always `dir="ltr"` and never inherits the mirror.**
@@ -412,7 +412,7 @@ const state = {
 - **Versioned** (`v=1`) with a migration switch.
 - **Option ids are a permanent public wire format** — banner comment at the top
   of `catalog.js`: *never rename; keep old ids as aliases forever.* Every shared
-  WhatsApp message contains them, and Chava may open one months later.
+  WhatsApp message contains them, and Peretz may open one months later.
 - **Unknown param → default + a visible notice**, never a silent fallback.
   Silent data loss on a shared link is the worst failure this site can have.
 - **`replaceState` debounced 300 ms** — WebKit throws above 100 history writes
@@ -427,16 +427,16 @@ const state = {
 `catalog.js`. Costs nothing, nothing to break. **Find out whether customers use
 it at all before building infrastructure for them.**
 
-**Stage 2 (once it is being used): an admin screen for Chava.**
+**Stage 2 (once it is being used): an admin screen for Peretz.**
 
-This is the real backend requirement, and it is not accounts — it is: **Chava
+This is the real backend requirement, and it is not accounts — it is: **Peretz
 must be able to change prices without phoning Yakov.** Steel prices move,
 brands change, and a configurator quoting stale prices is worse than no
 configurator. This is the failure that kills small-business sites.
 
 Recommended: **Supabase** — Postgres, an API and auth without writing a server.
 Products, options and prices move out of `catalog.js` into tables; the site
-reads JSON; Chava edits through a simple protected page. ~30–40 h.
+reads JSON; Peretz edits through a simple protected page. ~30–40 h.
 
 **Stage 3 (only if volume demands it):** saved designs across devices, customer
 accounts, and a request pipeline (new → measured → quoted → sold). This is the
@@ -453,7 +453,7 @@ Small on purpose.
 | **`/` configurator** | The whole product. Opens straight into it — no splash, no marketing preamble. |
 | **`/works`** | The 131 real installed doors with real prices. The trust layer. Filterable by price and by tier. |
 | **`/about`** | Two short paragraphs, the address, the phone. Family business since 2010. |
-| **`?d=CODE`** | Any shared design opens here. Chava's view and the customer's are identical. |
+| **`?d=CODE`** | Any shared design opens here. Peretz's view and the customer's are identical. |
 
 Everything else — blog, FAQ, materials — lives on the main site. **This site
 does one thing.**
@@ -470,11 +470,11 @@ history, and still deploys independently.
 |---|---|---|
 | **0 — Foundation** | Deploy a blank page to the live subdomain **first**. Build script. Rubik subset. Tokens, RTL logical properties, mobile-first grid. | **12** |
 | **0.5 — Data & copy** | `catalog.js`: colours, window types, size bands, prices in agorot, VAT constant. `copy.json` in he/en/ru. Price assertion table. | **14** |
-| **1 — VERTICAL SLICE** ⟵ *gate* | **Colour only, end to end, with the WhatsApp handoff working.** Renderer with the layer stack and stroked silhouette. Live price. URL state + short code. Summary card. **Send it to Chava on WhatsApp from a phone.** | **14** |
-| | **GATE.** Show three people. Does the door look real enough? Does the message reach Chava in a form he can act on? Fix here, before building more. | — |
+| **1 — VERTICAL SLICE** ⟵ *gate* | **Colour only, end to end, with the WhatsApp handoff working.** Renderer with the layer stack and stroked silhouette. Live price. URL state + short code. Summary card. **Send it to Peretz on WhatsApp from a phone.** | **14** |
+| | **GATE.** Show three people. Does the door look real enough? Does the message reach Peretz in a form he can act on? Fix here, before building more. | — |
 | **2 — Renderer** | All window types + grilles. Size bands. Handing mirror. Hardware. Contrast invariant across every colour. | **16** |
-| **3 — Full flow** | All three axes wired. Mobile sheet. Keyboard and screen-reader pass. Print sheet for Chava. Edge states. | **16** |
-| **4 — Price & zones** | Final price model. Distance zones **if** Chava chooses (b). "What's included" panel. Lead time. | **8** |
+| **3 — Full flow** | All three axes wired. Mobile sheet. Keyboard and screen-reader pass. Print sheet for Peretz. Edge states. | **16** |
+| **4 — Price & zones** | Final price model. Distance zones **if** Peretz chooses (b). "What's included" panel. Lead time. | **8** |
 | **5 — Works gallery + about** | 131 photos, filters, deep links into the configurator. About page. | **12** |
 | **6 — Languages** | English and Russian throughout. RTL/LTR switching. **The hinge-mirror test.** | **10** |
 | **7 — QA & ship** | Real phones, not just DevTools. Lighthouse. **Five real people, one sentence: "תבחרו דלת ותשלחו אותה אלינו."** Ship when 4 of 5 manage it unaided. | **8** |
@@ -495,7 +495,7 @@ Not "it looks finished."
 
 1. **Five people** who did not build it are given one sentence — *"תבחרו דלת
    ותשלחו אותה אלינו"* — and **4 of 5 complete it unaided on a phone.**
-2. **Chava receives five of those messages and can order every one without
+2. **Peretz receives five of those messages and can order every one without
    asking a clarifying question.** This is the real test; he is the one who
    knows if the handoff works.
 3. Every price on screen matches the assertion table.
@@ -504,7 +504,7 @@ Not "it looks finished."
 
 ---
 
-## 12. OPEN ITEMS — for Chava
+## 12. OPEN ITEMS — for Peretz
 
 Blocking, in order:
 
@@ -536,7 +536,7 @@ build script · price shown as a readout, not a bill · "included" never "₪0" 
 a real ship gate involving people who did not build it.
 
 **Discarded, with reasons:** six invented door styles (he sells brand doors) ·
-euro pricing (₪) · the customer entering measurements (Chava measures) · the
+euro pricing (₪) · the customer entering measurements (Peretz measures) · the
 architect's-sheet identity (too cold for this business) · dusk mode, revision
 clouds, ink-in animation (solutions to a different product) · the €3,900
 positioning (real range is ₪3,195–₪17,700) · a "my doors" account system (people

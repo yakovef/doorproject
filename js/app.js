@@ -266,7 +266,7 @@ function announce(text) {
 
 async function onCopy() {
   const ok = await copyMessage(state);
-  toast(ok ? 'הפרטים הועתקו — הדביקו בהודעה לחוה' : 'ההעתקה נכשלה, נסו לשלוח בוואטסאפ');
+  toast(ok ? 'הפרטים הועתקו — הדביקו בהודעה לפרץ' : 'ההעתקה נכשלה, נסו לשלוח בוואטסאפ');
 }
 
 let toastTimer = null;

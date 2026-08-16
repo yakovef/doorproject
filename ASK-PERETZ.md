@@ -1,4 +1,4 @@
-# שאלות לחוה — לפני שהאתר עולה
+# שאלות לפרץ — לפני שהאתר עולה
 
 > **Why this file exists.** `PLAN.md` §12 lists what is blocking, but it lists
 > it as *topics*. Topics do not get answered. This is the same list turned into
@@ -15,7 +15,7 @@
 
 ## 1. ימין או שמאל? ⚠ הכי חשוב
 
-שלח לחוה את שתי התמונות: `screenshots/handing-a.png` ו-`handing-b.png`.
+שלח לפרץ את שתי התמונות: `screenshots/handing-a.png` ו-`handing-b.png`.
 
 > **"על איזו דלת מהשתיים היית אומר ללקוח 'זאת דלת ימין'?"**
 

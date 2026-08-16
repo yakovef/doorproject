@@ -1,12 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════
 //  IDS ARE A PUBLIC WIRE FORMAT.
 //  Every id below travels inside shared links and WhatsApp messages that
-//  customers send to Chava. He may open one months later.
+//  customers send to Peretz. He may open one months later.
 //  NEVER rename an id. To change a name, keep the old id in `aliases`.
 // ═══════════════════════════════════════════════════════════════════
 //
 //  ⚠ PLACEHOLDER DATA — every colour, window, grille and price here is a
-//  stand-in until Chava supplies the real lists (see PLAN.md §12).
+//  stand-in until Peretz supplies the real lists (see PLAN.md §12).
 //  Prices are anchored to the observed real range on dlatotmagen.co.il/works
 //  (₪3,195 – ₪17,700) so the numbers are plausible, not correct.
 //
@@ -17,7 +17,7 @@ export const PLACEHOLDER = true;
 export const VAT_RATE = 0.18; // Israel, 2025. CONFIRM before launch.
 
 /**
- * Size bands. NOT a measurement the customer types — Chava measures on site.
+ * Size bands. NOT a measurement the customer types — Peretz measures on site.
  * This is a price category that also changes the drawing's proportions
  * (PLAN.md §2.1).
  *
@@ -69,14 +69,14 @@ export const WINDOWS = [
  * `lock: true` means the handle carries the cylinder on its own backplate and
  * no separate escutcheon is drawn beside it. Three of the four doors we could
  * measure closely are built that way: it is the standard fitting on the doors
- * Chava installs, and the renderer had no way to draw it.
+ * Peretz installs, and the renderer had no way to draw it.
  *
  * `inset` is where the grip sits, as a fraction of leaf width from the closing
  * edge. Left unset it takes the measured median for pull bars. Real bars sit
  * markedly inboard — the median across every measurable installation is 0.19,
  * not hard against the stile as you might assume.
  *
- * The range is now the manufacturer's own named products, because Chava
+ * The range is now the manufacturer's own named products, because Peretz
  * orders by name — "Idan" is a thing he can put on a purchase order in a way
  * that "long pull bar" is not.
  *
@@ -131,7 +131,7 @@ export const GRILLES = [
  * ⚠ CONVENTION UNCONFIRMED. Israeli trade usage of ימין / שמאל varies by
  * whether it names the hinge side or the handle side, and whether it is read
  * from outside or inside. Getting this wrong means ordering a mirrored door.
- * Confirm with Chava before launch — see PLAN.md §12.
+ * Confirm with Peretz before launch — see PLAN.md §12.
  * `hinge` here is the side the hinges sit on AS SEEN FROM OUTSIDE.
  */
 export const HANDINGS = [

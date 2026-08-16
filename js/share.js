@@ -1,7 +1,7 @@
 /**
  * The handoff. PLAN.md §3 — this is the product.
  *
- * A customer must be able to hand Chava an order he can act on without a
+ * A customer must be able to hand Peretz an order he can act on without a
  * single clarifying question. Everything else on the site exists to get here.
  */
 
@@ -17,7 +17,7 @@ export function shareUrl(state) {
   return `${origin}${pathname}${toQuery(state)}`;
 }
 
-/** The message Chava receives. */
+/** The message Peretz receives. */
 export function message(state) {
   const c = byId(COLOURS, state.colour);
   const h = byId(HANDINGS, state.handing);
@@ -38,13 +38,13 @@ export function message(state) {
     `מחיר באתר: ${formatAgorot(priceAgorot(state))} — כולל התקנה ומע״מ`,
     `קוד: ${encodeCode(state)}`,
     '',
-    // The link matters more than anything above it: Chava taps it and sees
+    // The link matters more than anything above it: Peretz taps it and sees
     // exactly what the customer saw. He decodes nothing.
     `לצפייה: ${shareUrl(state)}`,
   ].join('\n');
 }
 
-/** One tap: opens WhatsApp with the message already written, addressed to Chava. */
+/** One tap: opens WhatsApp with the message already written, addressed to Peretz. */
 export const whatsappUrl = state =>
   `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state))}`;
 

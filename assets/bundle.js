@@ -1792,7 +1792,7 @@
       `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — כולל התקנה ומע״מ`,
       `קוד: ${encodeCode(state2)}`,
       "",
-      // The link matters more than anything above it: Chava taps it and sees
+      // The link matters more than anything above it: Peretz taps it and sees
       // exactly what the customer saw. He decodes nothing.
       `לצפייה: ${shareUrl(state2)}`
     ].join("\n");
@@ -2064,7 +2064,7 @@
   }
   async function onCopy() {
     const ok = await copyMessage(state);
-    toast(ok ? "הפרטים הועתקו — הדביקו בהודעה לחוה" : "ההעתקה נכשלה, נסו לשלוח בוואטסאפ");
+    toast(ok ? "הפרטים הועתקו — הדביקו בהודעה לפרץ" : "ההעתקה נכשלה, נסו לשלוח בוואטסאפ");
   }
   var toastTimer = null;
   function toast(text) {

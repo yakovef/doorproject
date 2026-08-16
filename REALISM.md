@@ -320,7 +320,7 @@ behaviour instead of styling.*
 
 Round one compared against `ref-00.png`, which is a **catalogue render**, not a
 photograph. The twelve installation photos now in `research/works/img/` are the
-real thing — Chava's own doors, shot on phones in stairwells and doorways — and
+real thing — Peretz's own doors, shot on phones in stairwells and doorways — and
 they contradicted the renderer in ways a catalogue image never would.
 
 Four independent readings of the set were taken: three visual, one metrological
@@ -390,7 +390,7 @@ ours        (white)      contrast 1.24   profile 0.83 1 0.95 0.96 0.93 0.90 0.87
   lever and cylinder on one stadium-shaped plate (0.10 W × 0.112 H, aspect
   2.5), not two separate discs. We draw the two-disc arrangement, which is
   what 3300 shows and is correct — but the plate is the more common of the two
-  and belongs in the catalogue as its own option. **Ask Chava which he fits.**
+  and belongs in the catalogue as its own option. **Ask Peretz which he fits.**
 - Gap width should follow the view angle rather than a fixed fraction: the
   near-frontal photographs show a genuine 2–4 px hairline, the oblique ones
   9–29 px, and that is parallax rather than a property of the door.
