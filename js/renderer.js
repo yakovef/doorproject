@@ -34,7 +34,6 @@ const FINISH_TONES = {
    depth looks like a diagram. */
 export const LIGHT = {
   key: 0.24,       // face wash amplitude
-  bounce: 0.19,    // warm floor bounce, lowest ~250mm
   ao: 0.26,        // occlusion at a tight junction
   vignette: 0.07,
   /* Lit is warm, shadow is cool. Measured on four of the works doors and
@@ -51,9 +50,14 @@ export const LIGHT = {
    stairwells, and a configurator that renders the bottom third of an
    anthracite door near-black misrepresents the colour someone is buying.
    ~1.9:1 and ~1.45:1 keep the modelling strong and the colour legible. */
+/* `foot` sits just above `low` on purpose. It used to overshoot it by half
+   again, in a warm near-black rather than the cool the rest of the ramp uses,
+   and the mismatch showed up as a discrete patch at the bottom of the leaf
+   instead of the end of a fall. Whatever happens down there must read as the
+   shadow continuing, never as an event. */
 const FALLOFF = {
-  dark:  { peak: 0.16, mid: 0.08, low: 0.30, foot: 0.44, head: 0.03, grain: 0.13, drift: 0.26 },
-  light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.26, head: 0.02, grain: 0.02, drift: 0.14 },
+  dark:  { peak: 0.16, mid: 0.08, low: 0.30, foot: 0.35, head: 0.03, grain: 0.13, drift: 0.26 },
+  light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.02, drift: 0.14 },
 };
 
 // ── Geometry, in mm ────────────────────────────────────────────────
@@ -191,7 +195,6 @@ export function render(state) {
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#leafFill)"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#keyWash)"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#bloom)"/>
-    <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#floorBounce)"/>
     <!-- Surface: broad cloud at 0.2-0.4 W, and only a whisper of fine grain.
          Three of the four doors measured have no resolvable speckle at all —
          what they have is slow mottling, so that is what carries the weight. -->
@@ -240,6 +243,14 @@ export function render(state) {
       <stop offset="0.48" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
       <stop offset="0.64" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
       <stop offset="0.82" stop-color="${LIGHT.cool}" stop-opacity="${fall.low}"/>
+      <!-- Warm-black, and it has to be: the ramp above is blue all the way
+           down, so a cool or even neutral last stop tints the foot rather
+           than darkening it (R-B -15 and -11, tried both). This lands at
+           -10, still cooler than the photograph's +5 — the peach bounce
+           that used to close that gap was doing it by painting a brown
+           patch on the door, which is a bad trade. A ten-point R-B drift
+           continuing a ramp that is cool anyway does not read as a colour;
+           a warm patch with an edge did. -->
       <stop offset="1"    stop-color="#100D0B" stop-opacity="${fall.foot}"/>
     </linearGradient>
 
@@ -273,10 +284,13 @@ export function render(state) {
       <stop offset="1" stop-color="#000" stop-opacity="0.44"/>
     </linearGradient>
 
-    <linearGradient id="floorBounce" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0"    stop-color="#FFD9A0" stop-opacity="${LIGHT.bounce}"/>
-      <stop offset="0.12" stop-color="#FFD9A0" stop-opacity="0"/>
-    </linearGradient>
+    <!-- There was a warm floor bounce here: peach at 0.19 over the bottom
+         eighth of the leaf. On a dark door it did not read as light at all,
+         it read as a brown patch of some other paint, and the profile agreed
+         — our anthracite rose 0.49 to 0.52 in the last row where the
+         photograph rises 0.37 to 0.38. A floor does bounce, but a whisper of
+         it is the honest amount, and a whisper is invisible, so nothing here.
+         The foot is now the shadow ramp arriving, and nothing else. -->
 
     <!-- Ambient occlusion. Tight, dark, and at every junction. -->
     <linearGradient id="aoTop" x1="0" y1="0" x2="0" y2="1">

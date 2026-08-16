@@ -42,9 +42,19 @@ why nothing agrees with anything else. Fix it by declaring it:
 ```
 KEY LIGHT:    high, front, ~30° to the LEFT of camera
 FILL:         weak, from the right, cool
-BOUNCE:       from the floor, warm, only the lowest ~350 mm
+BOUNCE:       none — see below
 AMBIENT OCC:  every junction, every crevice, no exceptions
 ```
+
+The floor bounce was in this list, warm, over the lowest ~350 mm, and it was
+cut. Not because floors do not bounce light but because at any strength you
+can see it is wrong: over dark paint a warm overlay reads as a brown patch of
+different paint rather than as light, and the photographs back that up — the
+anthracite door's profile ends 0.41 0.37 0.38, dead flat, while ours ended
+0.54 0.49 0.52, rising into the last row. The price is a foot that measures
+R-B -10 where the photograph is +5. That is the accepted side of the trade:
+a slight cool drift continuing a ramp that is cool anyway is invisible, and
+the warm patch it replaced was the first thing anyone noticed.
 
 **Every** shading decision derives from these. A surface facing up is
 brightest; facing left, bright; facing right, dark; facing down, darkest.
