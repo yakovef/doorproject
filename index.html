@@ -115,6 +115,12 @@
 <div class="toast" id="toast" hidden></div>
 <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
 
+<script>
+  // ?bare=1 renders the stage alone, for the realism comparison harness.
+  if (new URLSearchParams(location.search).has('bare')) {
+    document.documentElement.classList.add('is-bare');
+  }
+</script>
 <script src="assets/bundle.js"></script>
 </body>
 </html>

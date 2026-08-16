@@ -252,6 +252,35 @@ repaints within one frame. Filters are the risk — measure, do not assume.
 
 ---
 
+## 4b. Status — round one
+
+Done, verified against `research/doors/ref-00.png` via `npm run compare`:
+
+- **R1 frame box** — casing, three return faces, the deep corner where each
+  return meets the leaf. The single biggest change; the opening now reads as
+  a hole rather than an outline.
+- **R2 texture** — fine grain plus slow tonal drift. **The bug worth
+  remembering: `feTurbulence` outputs mid-grey, and mid-grey through `overlay`
+  is a no-op**, so the noise was invisible at any opacity until an
+  `feComponentTransfer` stretched its contrast.
+- **R4 hardware, partly** — hinges reduced to discreet tinted barrels (the
+  reference shows none at all), cylinder cut to a small ring, recessed
+  **channel handle** and **half-moon D-handle** added, every item now casting
+  a shadow onto the face.
+- **R6 finish** — vignette, threshold, wall grain, hard contact shadow.
+- **R7 stronger light** — radial key at 0.24, which cannot band.
+- **Gate harness** — `tools/compare.mjs` renders beside the photograph and
+  again at 12 px blur. Run it after every change to the drawing.
+
+Still open: **R3 bevels** (panel, groove — the window surround is done),
+**R5 glass**, the hardware finish axis, and the baked-photo finisher.
+
+*Lesson for the test suite: probes tied to `r="27"` or `width="30"` broke on
+every visual change. Hardware now carries `data-hw` hooks, so the tests assert
+behaviour instead of styling.*
+
+---
+
 ## 5. Order of work
 
 | Step | Content | Est. | Why here |

@@ -133,32 +133,31 @@ group('inside view');
 for (const h of HANDINGS) {
   const out = render({ ...base, handing: h.id, view: 'out' });
   const inn = render({ ...base, handing: h.id, view: 'in' });
-  // Probe the lock cylinder / thumb-turn: it sits at the handle position
-  // regardless of which handle style is fitted.
-  const handleX = svg => Number(/<circle cx="([\d.]+)" cy="[\d.]+" r="27"/.exec(svg)[1]);
+  // The lock sits at the handle position whatever handle is fitted, and it
+  // carries a stable hook so this probe survives restyling.
+  const handleX = svg => Number(/data-hw="lock"[^>]*data-cx="([\d.]+)"/.exec(svg)[1]);
   const midX = svg => Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]) / 2;
   ok((handleX(out) > midX(out)) !== (handleX(inn) > midX(inn)),
      `handle must swap sides when viewed from inside (${h.id})`);
-  ok(inn.includes('rx="6" fill="#6E7378"'), `inside face should show a thumb-turn (${h.id})`);
-  ok(!out.includes('rx="6" fill="#6E7378"'), `outside face should show a cylinder (${h.id})`);
+  ok(/data-kind="thumb"/.test(inn), `inside face should show a thumb-turn (${h.id})`);
+  ok(/data-kind="cylinder"/.test(out), `outside face should show a cylinder (${h.id})`);
 }
 
 // ── 6b. Handles ───────────────────────────────────────────────────
 group('handles');
 for (const n of HANDLES) {
   const svg = render({ ...base, handle: n.id });
+  const drawn = svg => Number(/data-hw="handle"[^>]*data-len="([\d.]+)"/.exec(svg)[1]);
+  ok(new RegExp(`data-style="${n.style}"`).test(svg), `${n.style} not drawn for ${n.id}`);
   if (n.len) {
-    const m = /<rect x="[\d.]+" y="[\d.]+" width="30" height="([\d.]+)" rx="15"/.exec(svg);
-    ok(m, `pull bar not drawn for ${n.id}`);
-    // The bar must fit the leaf with room to spare, whatever the size band.
+    // Whatever the size band, the handle must fit the leaf with room to spare.
     for (const sz of sizeKeys) {
-      const s2 = render({ ...base, handle: n.id, size: sz });
-      const len = Number(/<rect x="[\d.]+" y="[\d.]+" width="30" height="([\d.]+)" rx="15"/.exec(s2)[1]);
-      ok(len > 100 && len < SIZES[sz].h - 200, `bar length ${len} wrong on ${sz}`);
+      const len = drawn(render({ ...base, handle: n.id, size: sz }));
+      ok(len > 100 && len < SIZES[sz].h - 200, `${n.id} length ${len} wrong on ${sz}`);
     }
-  } else {
-    ok(/r="34"/.test(svg), `lever rosette not drawn for ${n.id}`);
   }
+  // Every piece of hardware casts a shadow onto the face (REALISM.md G3).
+  ok(svg.includes('filter="url(#hwShadow)"'), `no hardware shadow for ${n.id}`);
 }
 
 // ── 7. Leaf-and-a-half hinges against the frame, not the fixed panel ──
@@ -166,8 +165,7 @@ group('leaf and a half');
 for (const h of HANDINGS) {
   const svg = render({ ...base, size: 'half', handing: h.id });
   const total = Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]);
-  const hingeXs = [...svg.matchAll(/<rect x="([\d.]+)" y="[\d.]+" width="26" height="116"/g)]
-    .map(m => Number(m[1]) + 13);
+  const hingeXs = [...svg.matchAll(/data-hw="hinge" data-cx="([\d.]+)"/g)].map(m => Number(m[1]));
   ok(hingeXs.length >= 2, `no hinges found for ${h.id}`);
   // Hinges belong on an outer edge of the opening, never at the mullion.
   const nearEdge = hingeXs.every(x => x < total * 0.30 || x > total * 0.70);

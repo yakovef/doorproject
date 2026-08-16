@@ -384,3 +384,11 @@ body {
   .swatch__chip { forced-color-adjust: none; }
   .pill.is-selected, .swatch.is-selected .swatch__chip { outline: 2px solid CanvasText; }
 }
+
+
+/* ── bare mode: the stage only, for tools/compare.mjs ─────── */
+.is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar { display: none; }
+.is-bare .layout { display: block; block-size: 100dvh; }
+.is-bare .stage-wrap { block-size: 100dvh; padding: 0; border: 0; }
+.is-bare .stage { block-size: 100dvh; }
+.is-bare .door-svg { max-block-size: 100dvh; }

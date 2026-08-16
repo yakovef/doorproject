@@ -66,9 +66,11 @@ export const WINDOWS = [
  * doors — the brand catalogues are full of them — so it is the default.
  */
 export const HANDLES = [
-  { id: 'bar-long',  he: 'ידית משיכה ארוכה', en: 'Long pull bar',  delta: 0,     len: 1150 },
-  { id: 'bar-short', he: 'ידית משיכה קצרה',  en: 'Short pull bar', delta: 0,     len: 600 },
-  { id: 'lever',     he: 'ידית רגילה',        en: 'Lever',          delta: -8000, len: 0 },
+  { id: 'bar-long',  he: 'ידית משיכה ארוכה', en: 'Long pull bar',  delta: 0,     len: 1150, style: 'bar' },
+  { id: 'bar-short', he: 'ידית משיכה קצרה',  en: 'Short pull bar', delta: 0,     len: 600,  style: 'bar' },
+  { id: 'channel',   he: 'ידית שקועה',       en: 'Recessed channel', delta: 32000, len: 1250, style: 'channel' },
+  { id: 'dee',       he: 'ידית חצי-סהר',     en: 'Half-moon',      delta: 18000, len: 0,    style: 'dee' },
+  { id: 'lever',     he: 'ידית רגילה',        en: 'Lever',          delta: -8000, len: 0,    style: 'lever' },
 ];
 
 /** Decorative iron grille over the glazing. Only meaningful with a window. */

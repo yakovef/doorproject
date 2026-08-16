@@ -81,13 +81,13 @@ export function fromQuery(search) {
 
 // ── Short code ────────────────────────────────────────────────────
 // 25 bits, laid out with room to grow:
-//   version 3 | colour 6 | size 4 | handing 2 | window 5 | grille 3 | handle 2
+//   version 3 | colour 6 | size 4 | handing 2 | window 5 | grille 2 | handle 3
 // -> 5 Crockford base32 characters. Adding options later fits inside the
 //    existing widths, so the code length stays stable.
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
-const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 3, handle: 2 };
+const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 2, handle: 3 };
 const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 25 -> 5 chars
 
 export function encodeCode(state) {
