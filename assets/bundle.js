@@ -29,24 +29,72 @@
     { id: "tallwin", he: "חלון גבוה", en: "Tall light", delta: 88e3, rects: [{ w: 340, h: 1180, top: 400 }] }
   ];
   var HANDLES = [
+    /* Levers and locksets */
     {
-      id: "bar-long",
-      he: "ידית משיכה ארוכה",
-      en: "Long pull bar",
+      id: "coral",
+      he: "קורל",
+      en: "Coral",
+      delta: -8e3,
+      len: 0,
+      style: "lever",
+      aliases: ["lever"]
+    },
+    { id: "plate", he: "רותם", en: "Rotem", delta: -8e3, len: 0, style: "plate", lock: true },
+    {
+      id: "grab",
+      he: "קורל + מאחז",
+      en: "Coral + grab bar",
+      delta: 18e3,
+      len: 0,
+      style: "grab",
+      aliases: ["dee"]
+    },
+    { id: "almog", he: "אלמוג", en: "Almog", delta: 16e3, len: 0, style: "almog" },
+    { id: "sapir", he: "ספיר", en: "Sapir", delta: 6e3, len: 0, style: "sapir" },
+    { id: "cadoor", he: "כדור", en: "Cadoor", delta: -4e3, len: 0, style: "cadoor" },
+    /* Pull bars, in the manufacturer's own range. `bar` selects the section,
+       fixings and tone profile; see BARS in the renderer. Lengths sit inside the
+       0.38-0.55 of leaf height that the installed doors measure, and the
+       section thicknesses keep the products' relative slenderness: ella is the
+       stockiest at L/W 15, ron the slimmest at L/W 27. */
+    {
+      id: "idan",
+      he: "עידן",
+      en: "Idan",
       delta: 0,
+      len: 1050,
+      w: 32,
+      style: "bar",
+      bar: "idan",
+      aliases: ["bar-long"]
+    },
+    { id: "ella", he: "אלה", en: "Ella", delta: 26e3, len: 900, w: 34, style: "bar", bar: "ella" },
+    {
+      id: "nitzan",
+      he: "ניצן",
+      en: "Nitzan",
+      delta: 8e3,
+      len: 800,
+      w: 26,
+      style: "bar",
+      bar: "nitzan",
+      aliases: ["bar-short"]
+    },
+    {
+      id: "shahar",
+      he: "שחר",
+      en: "Shahar",
+      delta: 14e3,
       len: 1150,
       w: 30,
-      style: "bar"
+      style: "bar",
+      bar: "shahar",
+      aliases: ["bar-flat"]
     },
-    {
-      id: "bar-short",
-      he: "ידית משיכה קצרה",
-      en: "Short pull bar",
-      delta: 0,
-      len: 800,
-      w: 30,
-      style: "bar"
-    },
+    { id: "ron", he: "רון", en: "Ron", delta: 4e3, len: 900, w: 16, style: "bar", bar: "ron" },
+    /* Recessed, and the statement pieces */
+    { id: "luna", he: "לונה", en: "Luna", delta: 18e3, len: 0, style: "luna" },
+    { id: "shiran", he: "שירן", en: "Shiran", delta: 42e3, len: 0, style: "shiran" },
     {
       id: "channel",
       he: "ידית שקועה",
@@ -55,34 +103,6 @@
       len: 1554,
       inset: 0.3,
       style: "channel"
-    },
-    {
-      id: "grab",
-      he: "ידית עם מאחז אופקי",
-      en: "Lever with grab bar",
-      delta: 18e3,
-      len: 0,
-      style: "grab"
-    },
-    { id: "lever", he: "ידית על רוזטה", en: "Lever on rose", delta: -8e3, len: 0, style: "lever" },
-    {
-      id: "plate",
-      he: "ידית עם פלטה",
-      en: "Lever on backplate",
-      delta: -8e3,
-      len: 0,
-      style: "plate",
-      lock: true
-    },
-    {
-      id: "bar-flat",
-      he: "ידית משיכה שטוחה",
-      en: "Flat pull bar",
-      delta: 12e3,
-      len: 880,
-      w: 66,
-      style: "bar",
-      section: "flat"
     }
   ];
   var GRILLES = [
@@ -110,7 +130,7 @@
     { id: "out", he: "חוץ", en: "Outside" },
     { id: "in", he: "פנים", en: "Inside" }
   ];
-  var byId = (list, id) => list.find((o) => o.id === id) || list[0];
+  var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
 
   // js/price.js
   function priceAgorot(state2) {
@@ -451,6 +471,100 @@
       <stop offset="0.4" stop-color="#B9BFC4"/>
       <stop offset="1"   stop-color="#7C8288"/>
     </linearGradient>
+
+    <!-- Pull-bar cross-sections, each measured off its own product photograph.
+         A round tube carries two narrow blown highlights with a dark separator
+         between them; a prism holds one or two broad flat plateaux. Using one
+         gradient for both is what makes rendered bars look like tubes of
+         toothpaste. -->
+    <linearGradient id="barRound" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#4A4440"/>
+      <stop offset="0.10" stop-color="#FFFFFF"/>
+      <stop offset="0.167" stop-color="#FFFFFF"/>
+      <stop offset="0.283" stop-color="#4E4846"/>
+      <stop offset="0.40" stop-color="#FCFBF6"/>
+      <stop offset="0.467" stop-color="#F2F0EA"/>
+      <stop offset="0.633" stop-color="#302E2A"/>
+      <stop offset="0.815" stop-color="#766B65"/>
+      <stop offset="1"    stop-color="#564E47"/>
+    </linearGradient>
+    <linearGradient id="barBrass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#7D7467"/>
+      <stop offset="0.19" stop-color="#DCBF8C"/>
+      <stop offset="0.40" stop-color="#624E2C"/>
+      <stop offset="0.53" stop-color="#5A4727"/>
+      <stop offset="0.72" stop-color="#B99B69"/>
+      <stop offset="0.78" stop-color="#FFF8E0"/>
+      <stop offset="0.86" stop-color="#C0A87E"/>
+      <stop offset="1"    stop-color="#817F82"/>
+    </linearGradient>
+    <linearGradient id="barMatte" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#5C5D5A"/>
+      <stop offset="0.32" stop-color="#6D6D69"/>
+      <stop offset="0.74" stop-color="#666462"/>
+      <stop offset="1"    stop-color="#5A5955"/>
+    </linearGradient>
+    <linearGradient id="barPolish" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#D1CCBF"/>
+      <stop offset="0.037" stop-color="#F5F4F2"/>
+      <stop offset="0.444" stop-color="#F7F6F4"/>
+      <stop offset="0.519" stop-color="#FFFFFF"/>
+      <stop offset="0.560" stop-color="#A9ACA9"/>
+      <stop offset="0.778" stop-color="#96938D"/>
+      <stop offset="1"    stop-color="#999591"/>
+    </linearGradient>
+    <linearGradient id="barDark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#55565C"/>
+      <stop offset="0.14" stop-color="#525255"/>
+      <stop offset="0.50" stop-color="#515054"/>
+      <stop offset="0.92" stop-color="#4E4E50"/>
+      <stop offset="1"    stop-color="#6D6B6C"/>
+    </linearGradient>
+
+    <!-- Almog's blade: bright top, dark belly, bounce along the bottom, and
+         crucially it never reaches white — the compressed range is the matte. -->
+    <linearGradient id="bronzeBlade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#A9A3A1"/>
+      <stop offset="0.3" stop-color="#72655D"/>
+      <stop offset="0.55" stop-color="#65564D"/>
+      <stop offset="0.78" stop-color="#5A4B40"/>
+      <stop offset="1"   stop-color="#8C8179"/>
+    </linearGradient>
+    <!-- Cadoor's dome: a hard terminator, not a smooth falloff. -->
+    <radialGradient id="domeKnob" cx="0.34" cy="0.26" r="0.86">
+      <stop offset="0"    stop-color="#F2EEEA"/>
+      <stop offset="0.28" stop-color="#E3DFDB"/>
+      <stop offset="0.42" stop-color="#5D5249"/>
+      <stop offset="0.72" stop-color="#988E86"/>
+      <stop offset="1"    stop-color="#6B625B"/>
+    </radialGradient>
+    <!-- Sapir: mirror chrome is bright at both edges with a dark reflected
+         core — the opposite of the satin gradient everything else uses. -->
+    <linearGradient id="mirrorKnob" x1="0" y1="0" x2="1" y2="0.18">
+      <stop offset="0"    stop-color="#ACACAB"/>
+      <stop offset="0.10" stop-color="#E6E6E5"/>
+      <stop offset="0.30" stop-color="#595959"/>
+      <stop offset="0.50" stop-color="#4B4A49"/>
+      <stop offset="0.72" stop-color="#676767"/>
+      <stop offset="0.92" stop-color="#DADAD9"/>
+      <stop offset="1"    stop-color="#A6A6A5"/>
+    </linearGradient>
+
+    <!-- Luna. Matt black still has structure: dark along the chord, a broad
+         plateau over the outer 42%, and a 21-level total range. -->
+    <linearGradient id="lunaFace" x1="0" y1="0" x2="1" y2="0.12">
+      <stop offset="0"    stop-color="#121014"/>
+      <stop offset="0.235" stop-color="#221C21"/>
+      <stop offset="0.55" stop-color="#292327"/>
+      <stop offset="1"    stop-color="#2B2529"/>
+    </linearGradient>
+    <radialGradient id="brassDisc" cx="0.36" cy="0.30" r="0.82">
+      <stop offset="0"    stop-color="#C4AC80"/>
+      <stop offset="0.62" stop-color="#8A7355"/>
+      <stop offset="0.88" stop-color="#6A5539"/>
+      <stop offset="0.95" stop-color="#D9C094"/>
+      <stop offset="1"    stop-color="#8A7355"/>
+    </radialGradient>
 
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"    stop-color="#6E7276"/>
@@ -804,6 +918,16 @@
         return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
       case "plate":
         return { hx: PLATE.w / 2, vy: PLATE.h / 2 };
+      case "almog":
+        return { hx: 39, vy: 39 };
+      case "cadoor":
+        return { hx: 34, vy: 40 };
+      case "sapir":
+        return { hx: 36, vy: 36 };
+      case "luna":
+        return { hx: 115, vy: 230 };
+      case "shiran":
+        return { hx: 44, vy: 240 };
       default:
         return { hx: (handle.w || 30) / 2, vy: barHalf(handle.len, leafH) };
     }
@@ -821,7 +945,12 @@
     grab: (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
     plate: (h, g) => plateHandle(g.cx, g.cy, g.dir, g.inside),
     bar: (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
-    lever: (h, g) => lever(g.cx, g.cy, g.dir)
+    lever: (h, g) => lever(g.cx, g.cy, g.dir),
+    almog: (h, g) => almogLever(g.cx, g.cy, g.dir),
+    cadoor: (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
+    sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir, g.inside),
+    luna: (h, g) => lunaPull(g.cx, g.cy, g.dir),
+    shiran: (h, g) => shiranPull(g.cx, g.cy, g.leafH)
   };
   function handleArt(handle, cx, cy, leafH, dir, paint2, inside, centreX, leafW, y0) {
     const draw = HANDLE_ART[handle.style] || HANDLE_ART.lever;
@@ -897,22 +1026,106 @@
       </g>
     </g>`;
   }
+  var BARS = {
+    // Round tube. TWO blown highlights with a dark separator — the tube's tell.
+    idan: {
+      tone: "barRound",
+      cap: "bullnose",
+      rx: 0.5,
+      fix: { kind: "cylinder", t: [0.138, 0.879], proj: 1.71, size: 0.87 }
+    },
+    // Round rod, dark-cored and twin-rimmed, warm. The collars are the event:
+    // fat turned bosses with near-black undercut grooves, and the rod steps
+    // down to 0.91 W beyond them.
+    ella: {
+      tone: "barBrass",
+      cap: "dome",
+      rx: 0.5,
+      stub: 0.91,
+      fix: { kind: "collar", t: [0.184, 0.805], proj: 0.59, size: 1.72, tall: 1.3 }
+    },
+    // Square, one face on: almost a flat fill, 20 levels of contrast across it.
+    // The clamp blocks INTERRUPT the bar, over a wider back-plate with screws.
+    nitzan: {
+      tone: "barMatte",
+      cap: "flat",
+      rx: 0.05,
+      stub: 0.8,
+      fix: { kind: "clamp", t: [0.169, 0.826], proj: 0.9, size: 1.23, tall: 1.2 }
+    },
+    // Square at yaw: two flat faces across a hard step, brightest of the range.
+    // No standoffs at all — both ends mitre into legs that run back to the door.
+    shahar: {
+      tone: "barPolish",
+      cap: "none",
+      rx: 0.06,
+      fix: { kind: "leg", t: [0.019, 0.975], proj: 1.24, size: 0.6 }
+    },
+    // Matte anthracite, the only cool one, and the only two-tone handle: bright
+    // brushed shoes cap both extremities and there is nothing in between.
+    ron: {
+      tone: "barDark",
+      cap: "shoe",
+      rx: 0.08,
+      fix: { kind: "shoe", t: [0.035, 0.965], proj: 0.33, size: 1.57, tall: 1.86 }
+    }
+  };
   function pullBar(cx, cy, handle, leafH) {
+    const spec = BARS[handle.bar] || BARS.idan;
     const half = barHalf(handle.len, leafH);
-    const w = handle.w || 30;
-    const rx = handle.section === "flat" ? 9 : w / 2;
+    const w = handle.w || 30, r = w * spec.rx;
+    const top = cy - half, bot = cy + half, L = half * 2;
+    const at = (t) => top + L * t;
+    const stub = w * (spec.stub || 1);
+    const px = cx + w / 2;
+    const fx = spec.fix;
+    const fixArt = (behind) => fx.t.map((t) => {
+      const y = at(t), proj = w * fx.proj, sz = w * (fx.size || 1);
+      if (fx.kind === "cylinder" && behind) return `
+      <rect x="${px - 4}" y="${y - sz / 2}" width="${proj}" height="${sz}" rx="${sz / 2}"
+            fill="url(#nickelSoft)"/>
+      <ellipse cx="${px + proj - sz * 0.18}" cy="${y}" rx="${sz * 0.3}" ry="${sz / 2}"
+               fill="url(#nickel)"/>`;
+      if (fx.kind === "collar" && !behind) return `
+      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
+            rx="${w * 0.18}" fill="url(#nickel)"/>
+      ${[-0.3, 0.02].map((o) => `
+      <rect x="${cx - sz / 2}" y="${y + w * fx.tall * o}" width="${sz}" height="${w * 0.2}"
+            fill="#000" opacity="0.72"/>`).join("")}
+      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz * 0.16}"
+            height="${w * fx.tall}" fill="#fff" opacity="0.34"/>`;
+      if (fx.kind === "clamp" && !behind) return `
+      <rect x="${cx - w * 1.13}" y="${y - w * fx.tall / 2 - 2}" width="${w * 2.26}"
+            height="${w * fx.tall + 4}" rx="3" fill="url(#nickelSoft)" opacity="0.55"/>
+      <rect x="${cx - w * 1.13}" y="${y - w * fx.tall / 2 - 2}" width="${w * 2.26}"
+            height="${w * fx.tall + 4}" rx="3" fill="#000" opacity="0.42"/>
+      <circle cx="${cx + w * 0.83}" cy="${y}" r="${w * 0.14}" fill="#000" opacity="0.5"/>
+      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
+            rx="2" fill="url(#nickel)"/>`;
+      if (fx.kind === "leg" && behind) return `
+      <rect x="${cx - w / 2}" y="${y - w / 2}" width="${w * fx.proj + w / 2}" height="${w * 0.6}"
+            rx="2" fill="url(#nickelSoft)"/>`;
+      if (fx.kind === "shoe" && !behind) return `
+      <rect x="${cx - w * fx.size / 2}" y="${y - w * fx.tall / 2}" width="${w * fx.size}"
+            height="${w * fx.tall}" rx="${w * 0.22}" fill="url(#nickel)"/>
+      <rect x="${cx - w * fx.size / 2 + 2}" y="${y - w * fx.tall / 2 + 2}" width="${w * 0.22}"
+            height="${w * fx.tall - 4}" rx="2" fill="#fff" opacity="0.5"/>`;
+      return "";
+    }).join("");
+    const capR = spec.cap === "dome" ? w * 0.15 : spec.cap === "bullnose" ? w * 0.148 : r;
+    const shaftTop = spec.cap === "shoe" ? top + w * 0.9 : top;
+    const shaftBot = spec.cap === "shoe" ? bot - w * 0.9 : bot;
     return `
     <g>
-      <rect x="${cx - w / 2 + 10}" y="${cy - half + 12}" width="${w}" height="${half * 2}"
-            rx="${rx}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      ${[cy - half + 95, cy + half - 95].map((sy) => `
-      <rect x="${cx - 10}" y="${sy - 10}" width="20" height="20" rx="5" fill="var(--hw-mid)"/>`).join("")}
-      <rect x="${cx - w / 2}" y="${cy - half}" width="${w}" height="${half * 2}" rx="${rx}"
-            fill="url(#nickel)"/>
-      <rect x="${cx - w / 2 + 4}" y="${cy - half + 10}" width="${w > 40 ? 8 : 5}"
-            height="${half * 2 - 20}" rx="2.5" fill="#fff" opacity="0.55"/>
-      ${w > 40 ? `<rect x="${cx + w / 2 - 8}" y="${cy - half + 10}" width="5"
-            height="${half * 2 - 20}" rx="2.5" fill="#000" opacity="0.22"/>` : ""}
+      <rect x="${cx - w / 2 + 11}" y="${shaftTop + 13}" width="${w}" height="${shaftBot - shaftTop}"
+            rx="${capR}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+      ${fixArt(true)}
+      <!-- the stubs beyond the fixings step down on two of the products -->
+      <rect x="${cx - stub / 2}" y="${shaftTop}" width="${stub}" height="${shaftBot - shaftTop}"
+            rx="${capR}" fill="url(#${spec.tone})"/>
+      ${stub !== w ? `<rect x="${cx - w / 2}" y="${at(fx.t[0])}" width="${w}"
+            height="${at(fx.t[1]) - at(fx.t[0])}" fill="url(#${spec.tone})"/>` : ""}
+      ${fixArt(false)}
     </g>`;
   }
   function plateHandle(cx, cy, dir, inside) {
@@ -992,6 +1205,135 @@
       ${keyway(cx, keyY - 1, 0.85)}`}
 
       ${lever2}
+    </g>`;
+  }
+  function almogLever(cx, cy, dir) {
+    const R = 39, D = R * 2;
+    const L = D * 2.8;
+    const rake = Math.tan(14.8 * Math.PI / 180);
+    const at = (t) => cx + dir * t;
+    const mid = (t) => cy + D * 0.269 - rake * t;
+    const halfT = (t) => D * (0.211 + 0.057 * (t / L)) / 2;
+    const pt = (t, s) => `${at(t)} ${mid(t) + s * halfT(t)}`;
+    return `
+    <g>
+      <path d="M ${pt(6, -1)} L ${pt(L - 22, -1)} Q ${pt(L, -0.4)} ${pt(L - 16, 1)}
+               L ${pt(6, 1)} Z"
+            transform="translate(${dir * 7} 11)" fill="#000" opacity="0.30"
+            filter="url(#hwShadow)"/>
+      ${disc(cx, cy, R)}
+      <!-- the neck leaves the rose tangentially at the lower quarter: on this
+           handle the collar and the blade are one swept surface -->
+      <path d="M ${pt(0, -1.15)} L ${pt(L - 24, -1)}
+               Q ${pt(L + 2, -0.35)} ${pt(L + 2, 0.35)}
+               Q ${pt(L + 2, 1)} ${pt(L - 24, 1)}
+               L ${pt(0, 1.15)} Z"
+            fill="url(#bronzeBlade)"/>
+      <path d="M ${pt(10, -0.78)} L ${pt(L - 30, -0.7)} L ${pt(L - 30, -0.34)}
+               L ${pt(10, -0.42)} Z"
+            fill="#fff" opacity="0.34"/>
+      <path d="M ${pt(10, 0.52)} L ${pt(L - 26, 0.6)} L ${pt(L - 26, 0.95)}
+               L ${pt(10, 0.95)} Z"
+            fill="#000" opacity="0.34"/>
+    </g>`;
+  }
+  function cadoorKnob(cx, cy, dir) {
+    const rx = 34, ry = 40;
+    const tilt = -11.8 * dir;
+    return `
+    <g>
+      <ellipse cx="${cx + dir * 5}" cy="${cy + 9}" rx="${rx}" ry="${ry}"
+               fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+      <!-- the shank, seen almost edge-on and mostly hidden by the ball -->
+      <rect x="${cx - dir * rx * 1.1}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
+            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"/>
+      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
+               transform="rotate(${tilt} ${cx} ${cy})"/>
+      <!-- the terminator: a hard bright band over a dark one, not a gradient -->
+      <ellipse cx="${cx - dir * rx * 0.22}" cy="${cy - ry * 0.3}"
+               rx="${rx * 0.46}" ry="${ry * 0.2}" fill="#fff" opacity="0.72"
+               transform="rotate(${tilt - 18 * dir} ${cx} ${cy})"/>
+      <ellipse cx="${cx + dir * rx * 0.1}" cy="${cy + ry * 0.34}"
+               rx="${rx * 0.72}" ry="${ry * 0.3}" fill="#000" opacity="0.26"
+               transform="rotate(${tilt} ${cx} ${cy})"/>
+    </g>`;
+  }
+  function sapirKnob(cx, cy, dir, inside) {
+    const side = 72, r = side * 0.04;
+    const half = side / 2;
+    const kx = cx + dir * side * 0.47, ky = cy + side * 0.11;
+    const ks = side * 0.98, kr = ks * 0.13;
+    return `
+    <g>
+      <rect x="${cx - half + dir * 6}" y="${cy - half + 8}" width="${side}" height="${side}"
+            rx="${r}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+      <rect x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
+            fill="url(#plateFace)"/>
+      <rect x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
+            fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="2"/>
+      <circle cx="${cx}" cy="${cy}" r="${side * 0.325}" fill="url(#nickelSoft)"/>
+      <circle cx="${cx}" cy="${cy}" r="${side * 0.195}" fill="none" stroke="#000"
+              stroke-opacity="0.22" stroke-width="2"/>
+      <rect x="${kx - ks / 2 + dir * 5}" y="${ky - ks / 2 + 7}" width="${ks}" height="${ks}"
+            rx="${kr}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
+      <rect x="${kx - ks / 2}" y="${ky - ks / 2}" width="${ks}" height="${ks}" rx="${kr}"
+            fill="url(#mirrorKnob)"/>
+      <rect x="${kx - ks / 2 + 3}" y="${ky - ks / 2 + 3}" width="${ks - 6}" height="${ks * 0.16}"
+            rx="${kr * 0.5}" fill="#fff" opacity="0.5"/>
+    </g>`;
+  }
+  function lunaPull(cx, cy, dir) {
+    const H = 460, R = H / 2, W = R * 0.99;
+    const x0 = cx - dir * W * 0.5;
+    const top = cy - H / 2, bot = cy + H / 2;
+    const seg = `M ${x0} ${top} A ${R} ${R} 0 0 ${dir > 0 ? 1 : 0} ${x0} ${bot} Z`;
+    return `
+    <g>
+      <path d="${seg}" transform="translate(${dir * 9} 13)" fill="#000" opacity="0.38"
+            filter="url(#hwShadow)"/>
+      <path d="${seg}" fill="url(#lunaFace)"/>
+      <!-- the one specular, at 0.93 of the width and a third of the way down -->
+      <ellipse cx="${x0 + dir * W * 0.93}" cy="${top + H * 0.335}"
+               rx="${W * 0.05}" ry="${H * 0.035}" fill="#6B6470" opacity="0.55"/>
+      <path d="${seg}" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="1.5"/>
+    </g>`;
+  }
+  function shiranPull(cx, cy, leafH) {
+    const H = Math.min(480, leafH - 320), W = H / 5.49;
+    const top = cy - H / 2;
+    const at = (t) => top + H * t;
+    const wAt = (f) => W * f;
+    const disc2 = (t, f) => `
+      <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) / 2}" fill="url(#brassDisc)"/>
+      <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) / 2 - 1.5}" fill="none"
+              stroke="#FFF3D4" stroke-opacity="0.55" stroke-width="2"/>
+      <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) * 0.31}" fill="#000" opacity="0.45"/>`;
+    const bulge = (t, f) => `
+      <path d="M ${cx - wAt(f) / 2} ${at(t)}
+               Q ${cx - wAt(f) * 0.16} ${at(t) - H * 0.03} ${cx} ${at(t) - H * 0.03}
+               Q ${cx + wAt(f) * 0.16} ${at(t) - H * 0.03} ${cx + wAt(f) / 2} ${at(t)}
+               Q ${cx + wAt(f) * 0.16} ${at(t) + H * 0.03} ${cx} ${at(t) + H * 0.03}
+               Q ${cx - wAt(f) * 0.16} ${at(t) + H * 0.03} ${cx - wAt(f) / 2} ${at(t)} Z"
+            fill="url(#barBrass)"/>`;
+    return `
+    <g>
+      <rect x="${cx - W * 0.3}" y="${at(0.04) + 12}" width="${W * 0.55}" height="${H * 0.92}"
+            rx="${W * 0.2}" fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
+      <!-- terminal spigots -->
+      ${[0, 0.966].map((t) => `
+      <rect x="${cx - wAt(0.15) / 2}" y="${at(t)}" width="${wAt(0.15)}" height="${H * 0.034}"
+            rx="${wAt(0.06)}" fill="url(#barBrass)"/>`).join("")}
+      <!-- the shaft, and the discs it lands on -->
+      <rect x="${cx - wAt(0.48) / 2}" y="${at(0.269)}" width="${wAt(0.48)}" height="${H * 0.465}"
+            fill="url(#barBrass)"/>
+      ${disc2(0.188, 0.964)}
+      ${disc2(0.813, 0.989)}
+      ${bulge(0.055, 0.554)}
+      ${bulge(0.938, 0.577)}
+      <!-- the turned bulbs standing proud of each disc -->
+      ${[0.188, 0.813].map((t) => `
+      <ellipse cx="${cx}" cy="${at(t)}" rx="${wAt(0.61) / 2}" ry="${H * 0.042}"
+               fill="url(#barBrass)"/>`).join("")}
     </g>`;
   }
   var polar = (cx, cy, r, deg) => {
@@ -1116,6 +1458,16 @@
           stroke-opacity="0.22" stroke-width="1.8"/>
     <circle cx="${cx}" cy="${cy}" r="${R * 0.16}" fill="#1A1D20"/>`;
   };
+  var keySlot = (kx, ky, r = 13) => `
+      <g data-hw="keyway">
+        <circle cx="${kx}" cy="${ky}" r="${r}" fill="url(#euroSteel)"/>
+        <path d="${arcPath(kx, ky, r - 1, 145, 320)}" fill="none" stroke="#fff"
+              stroke-opacity="0.5" stroke-width="1.6"/>
+        <rect x="${kx - r * 0.92}" y="${ky - r * 0.23}" width="${r * 1.84}" height="${r * 0.46}"
+              rx="${r * 0.12}" fill="#121417"/>
+        <rect x="${kx - r * 0.92}" y="${ky - r * 0.23}" width="${r * 0.6}" height="${r * 0.46}"
+              rx="${r * 0.12}" fill="#5B6065" opacity="0.7"/>
+      </g>`;
   var keyway = (kx, ky, s = 1) => `
       <g data-hw="keyway" transform="translate(${kx} ${ky}) scale(${s})">
         <path d="M -5.4 -17 a 5.4 5.4 0 1 1 10.8 0 l 1.5 15
@@ -1150,7 +1502,7 @@
       <path d="${arcPath(kx, ky - 15, 10, 315, 135)}" fill="none" stroke="#000"
             stroke-opacity="0.3" stroke-width="1.8"/>
 
-      ${keyway(kx, ky)}
+      ${keySlot(kx, ky, R * 0.33)}
 
       <!-- two crisp speculars: the tell of polished metal -->
       <ellipse cx="${cx - R * 0.42}" cy="${cy - R * 0.5}" rx="7" ry="4"
@@ -1288,7 +1640,7 @@
     colour: "ral-7016",
     window: "rect",
     grille: "none",
-    handle: "bar-long",
+    handle: "idan",
     detail: "plain",
     finish: "steel",
     size: "standard",

@@ -13,7 +13,7 @@ const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' +
 const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
-const base = { colour: 'ral-7016', window: 'none', grille: 'none', handle: 'bar-long',
+const base = { colour: 'ral-7016', window: 'none', grille: 'none', handle: 'idan',
                detail: 'plain', finish: 'steel',
                size: 'standard', handing: 'right-in', view: 'out' };
 
@@ -89,7 +89,10 @@ group('price');
   ok(P({ window: 'rect', grille: 'scroll' }) === 4275, 'scrollwork grille adds ₪460');
   ok(P({ detail: 'panel' }) === 3575, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
   ok(P({ finish: 'brass' }) === 3415, `brass should add ₪220, got ${P({ finish: 'brass' })}`);
-  ok(P({ handle: 'lever' }) === 3115, `a lever is ₪80 less than a pull bar, got ${P({ handle: 'lever' })}`);
+  ok(P({ handle: 'coral' }) === 3115, `a lever is ₪80 less than a pull bar, got ${P({ handle: 'coral' })}`);
+  // A retired id must land on its replacement, not on the first entry.
+  ok(P({ handle: 'bar-long' }) === P({ handle: 'idan' }), 'alias bar-long should price as idan');
+  ok(P({ handle: 'bar-flat' }) === P({ handle: 'shahar' }), 'alias bar-flat should price as shahar');
 
   // A grille cannot be charged when there is no glazing to put it in.
   for (const g of GRILLES) {

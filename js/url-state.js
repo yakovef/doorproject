@@ -20,7 +20,7 @@ export const DEFAULTS = {
   colour:  'ral-7016',
   window:  'rect',
   grille:  'none',
-  handle:  'bar-long',
+  handle:  'idan',
   detail:  'plain',
   finish:  'steel',
   size:    'standard',

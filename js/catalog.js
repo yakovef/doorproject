@@ -76,26 +76,45 @@ export const WINDOWS = [
  * markedly inboard — the median across every measurable installation is 0.19,
  * not hard against the stile as you might assume.
  *
- * New styles append to the END. The short code packs the handle as an index,
- * so inserting one in the middle would silently repoint every code already
- * written down or read out over the phone. `grab` replaces the old `dee` at
- * index 3, and the code VERSION is bumped so an older code is rejected with a
- * notice rather than decoded into the wrong door.
+ * The range is now the manufacturer's own named products, because Chava
+ * orders by name — "Idan" is a thing he can put on a purchase order in a way
+ * that "long pull bar" is not.
+ *
+ * Renaming ids would break shared links, so every superseded id survives in
+ * `aliases` and still resolves. The short code packs the handle as an INDEX
+ * though, which aliases cannot rescue, so the code VERSION is bumped: an older
+ * code is refused with a notice rather than decoded into the wrong door.
  */
 export const HANDLES = [
-  { id: 'bar-long',  he: 'ידית משיכה ארוכה', en: 'Long pull bar',
-    delta: 0, len: 1150, w: 30, style: 'bar' },
-  { id: 'bar-short', he: 'ידית משיכה קצרה',  en: 'Short pull bar',
-    delta: 0, len: 800, w: 30, style: 'bar' },
-  { id: 'channel',   he: 'ידית שקועה',       en: 'Recessed channel',
+  /* Levers and locksets */
+  { id: 'coral',   he: 'קורל',  en: 'Coral',  delta: -8000, len: 0, style: 'lever',
+    aliases: ['lever'] },
+  { id: 'plate',   he: 'רותם',  en: 'Rotem',  delta: -8000, len: 0, style: 'plate', lock: true },
+  { id: 'grab',    he: 'קורל + מאחז', en: 'Coral + grab bar', delta: 18000, len: 0, style: 'grab',
+    aliases: ['dee'] },
+  { id: 'almog',   he: 'אלמוג',  en: 'Almog',  delta: 16000, len: 0, style: 'almog' },
+  { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  delta: 6000,  len: 0, style: 'sapir' },
+  { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', delta: -4000, len: 0, style: 'cadoor' },
+
+  /* Pull bars, in the manufacturer's own range. `bar` selects the section,
+     fixings and tone profile; see BARS in the renderer. Lengths sit inside the
+     0.38-0.55 of leaf height that the installed doors measure, and the
+     section thicknesses keep the products' relative slenderness: ella is the
+     stockiest at L/W 15, ron the slimmest at L/W 27. */
+  { id: 'idan',    he: 'עידן',  en: 'Idan',   delta: 0,     len: 1050, w: 32, style: 'bar', bar: 'idan',
+    aliases: ['bar-long'] },
+  { id: 'ella',    he: 'אלה',   en: 'Ella',   delta: 26000, len: 900,  w: 34, style: 'bar', bar: 'ella' },
+  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', delta: 8000,  len: 800,  w: 26, style: 'bar', bar: 'nitzan',
+    aliases: ['bar-short'] },
+  { id: 'shahar',  he: 'שחר',   en: 'Shahar', delta: 14000, len: 1150, w: 30, style: 'bar', bar: 'shahar',
+    aliases: ['bar-flat'] },
+  { id: 'ron',     he: 'רון',   en: 'Ron',    delta: 4000,  len: 900,  w: 16, style: 'bar', bar: 'ron' },
+
+  /* Recessed, and the statement pieces */
+  { id: 'luna',    he: 'לונה',   en: 'Luna',   delta: 18000, len: 0, style: 'luna' },
+  { id: 'shiran',  he: 'שירן',   en: 'Shiran', delta: 42000, len: 0, style: 'shiran' },
+  { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
     delta: 32000, len: 1554, inset: 0.30, style: 'channel' },
-  { id: 'grab',      he: 'ידית עם מאחז אופקי', en: 'Lever with grab bar',
-    delta: 18000, len: 0, style: 'grab' },
-  { id: 'lever',     he: 'ידית על רוזטה',    en: 'Lever on rose',  delta: -8000, len: 0, style: 'lever' },
-  { id: 'plate',     he: 'ידית עם פלטה',     en: 'Lever on backplate',
-    delta: -8000, len: 0, style: 'plate', lock: true },
-  { id: 'bar-flat',  he: 'ידית משיכה שטוחה', en: 'Flat pull bar',
-    delta: 12000, len: 880, w: 66, style: 'bar', section: 'flat' },
 ];
 
 /** Decorative iron grille over the glazing. Only meaningful with a window. */
@@ -145,4 +164,10 @@ export const VIEWS = [
   { id: 'in',  he: 'פנים', en: 'Inside'  },
 ];
 
-export const byId = (list, id) => list.find(o => o.id === id) || list[0];
+/* Aliases count: a superseded id must resolve to its replacement rather than
+   silently falling through to the first entry, which is how a stale link
+   quietly becomes a different door at a different price. */
+export const byId = (list, id) =>
+  list.find(o => o.id === id) ||
+  list.find(o => (o.aliases || []).includes(id)) ||
+  list[0];
