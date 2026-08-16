@@ -28,6 +28,11 @@
     { id: "duo", he: "שני חלונות", en: "Two lights", delta: 74e3, rects: [{ w: 200, h: 220, top: 520, dx: -150 }, { w: 200, h: 220, top: 520, dx: 150 }] },
     { id: "tallwin", he: "חלון גבוה", en: "Tall light", delta: 88e3, rects: [{ w: 340, h: 1180, top: 400 }] }
   ];
+  var HANDLES = [
+    { id: "bar-long", he: "ידית משיכה ארוכה", en: "Long pull bar", delta: 0, len: 1150 },
+    { id: "bar-short", he: "ידית משיכה קצרה", en: "Short pull bar", delta: 0, len: 600 },
+    { id: "lever", he: "ידית רגילה", en: "Lever", delta: -8e3, len: 0 }
+  ];
   var GRILLES = [
     { id: "none", he: "ללא סורג", en: "No grille", delta: 0 },
     { id: "bars", he: "סורג ישר", en: "Straight", delta: 22e3 },
@@ -50,7 +55,7 @@
     const colour = byId(COLOURS, state2.colour);
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
-    let total = size.base + colour.delta + win.delta;
+    let total = size.base + colour.delta + win.delta + byId(HANDLES, state2.handle).delta;
     if (win.rects.length) total += grille.delta;
     return Math.ceil(total / 500) * 500;
   }
@@ -126,6 +131,7 @@
     const handing = byId(HANDINGS, state2.handing);
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
+    const handle = byId(HANDLES, state2.handle);
     const inside = state2.view === "in";
     const leafW = size.w, leafH = size.h;
     const sideW = size.side || 0;
@@ -174,9 +180,36 @@
       <stop offset="1"    stop-color="#000" stop-opacity="0.08"/>
     </linearGradient>
 
-    <!-- Light falls from above, so the frame casts a shadow onto the top of
-         the leaf and a thinner one down the hinge side. This is the ONLY
-         shading on the leaf: the paint itself stays one colour edge to edge. -->
+    <!-- ── the light ──────────────────────────────────────────────
+         One key light, high and to the left, as in every product photo in
+         the brand catalogues. The face carries a broad, smooth wash — never
+         a band, which reads as a seam rather than as light. Amplitude stays
+         low because oven-baked paint is matte. -->
+    <linearGradient id="faceLight" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="#fff" stop-opacity="0.11"/>
+      <stop offset="0.32" stop-color="#fff" stop-opacity="0.04"/>
+      <stop offset="0.62" stop-color="#000" stop-opacity="0.02"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.09"/>
+    </linearGradient>
+
+    <!-- Bounce off the floor: weak, warm, only near the bottom. -->
+    <linearGradient id="bounce" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0"    stop-color="#FFE9C8" stop-opacity="0.10"/>
+      <stop offset="0.22" stop-color="#FFE9C8" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Frame members face different directions, so each takes its own tone.
+         This is what makes the opening read as a box rather than an outline. -->
+    <linearGradient id="jambLight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="jambDark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.20"/>
+    </linearGradient>
+
+    <!-- Frame casts a shadow onto the top of the leaf and down one side. -->
     <linearGradient id="topShade" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#000" stop-opacity="0.20"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
@@ -222,17 +255,28 @@
           fill="#000" opacity="0.30" filter="url(#contactShadow)"/>
   </g>
 
-  <!-- ── frame ────────────────────────────────────────────────── -->
-  <path d="M ${openingX - FRAME} ${floorY}
-           L ${openingX - FRAME} ${y0 - FRAME}
-           L ${openingX + totalW + FRAME} ${y0 - FRAME}
-           L ${openingX + totalW + FRAME} ${floorY}
-           L ${openingX + totalW} ${floorY}
-           L ${openingX + totalW} ${y0}
-           L ${openingX} ${y0}
-           L ${openingX} ${floorY} Z"
-        fill="${paint2}" stroke="${edge}" stroke-width="1.25"
-        vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+  <!-- ── frame: three members, each lit for the way it faces ──── -->
+  <g id="frame">
+    <path d="M ${openingX - FRAME} ${floorY}
+             L ${openingX - FRAME} ${y0 - FRAME}
+             L ${openingX + totalW + FRAME} ${y0 - FRAME}
+             L ${openingX + totalW + FRAME} ${floorY}
+             L ${openingX + totalW} ${floorY}
+             L ${openingX + totalW} ${y0}
+             L ${openingX} ${y0}
+             L ${openingX} ${floorY} Z"
+          fill="${paint2}" stroke="${edge}" stroke-width="1.25"
+          vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+
+    <!-- head: faces up, catches the most light -->
+    <rect x="${openingX - FRAME}" y="${y0 - FRAME}" width="${totalW + FRAME * 2}" height="${FRAME}"
+          fill="#fff" opacity="0.14"/>
+    <!-- jambs: the left one faces the light, the right turns away -->
+    <rect x="${openingX - FRAME}" y="${y0}" width="${FRAME}" height="${leafH}"
+          fill="url(#jambLight)"/>
+    <rect x="${openingX + totalW}" y="${y0}" width="${FRAME}" height="${leafH}"
+          fill="url(#jambDark)"/>
+  </g>
 
   <!-- ── reveal: the shadowed rebate the leaf sits in ─────────── -->
   <rect x="${openingX - REVEAL}" y="${y0 - REVEAL}"
@@ -256,6 +300,10 @@
     <rect x="${mainX}" y="${y0}" width="${leafW}" height="${leafH}"
           fill="url(#leafGrad)" stroke="${edge}" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
+    <!-- One smooth wash across the whole face. The paint underneath stays a
+         single colour edge to edge; this is light, not a second colour. -->
+    <rect x="${mainX}" y="${y0}" width="${leafW}" height="${leafH}" fill="url(#faceLight)"/>
+    <rect x="${mainX}" y="${y0}" width="${leafW}" height="${leafH}" fill="url(#bounce)"/>
     <rect x="${mainX}" y="${y0}" width="${leafW}" height="46" fill="url(#topShade)"/>
     <rect x="${hingeOnLeft ? mainX : mainX1 - 34}" y="${y0}" width="34" height="${leafH}"
           fill="url(#${hingeOnLeft ? "sideShadeL" : "sideShadeR"})"/>
@@ -287,14 +335,7 @@
 
     ${peephole(centreX, y(PEEPHOLE_AFF), win)}
 
-    <!-- lever handle on a round rosette -->
-    <circle cx="${handleX}" cy="${y(HANDLE_AFF)}" r="34" fill="url(#metal)"
-            stroke="${darken(paint2, 0.3)}" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-    <rect x="${leverDir < 0 ? handleX - 150 : handleX}" y="${y(HANDLE_AFF) - 11}"
-          width="150" height="22" rx="11" fill="url(#metal)"
-          stroke="${darken(paint2, 0.3)}" stroke-width="1"
-          vector-effect="non-scaling-stroke"/>
+    ${handle.len ? pullBar(handleX, y(HANDLE_AFF), handle.len, leafH, paint2) : lever(handleX, y(HANDLE_AFF), leverDir, paint2)}
 
     ${inside ? thumbTurn(handleX, y(CYLINDER_AFF), paint2) : cylinder(handleX, y(CYLINDER_AFF), paint2)}
   </g>
@@ -354,6 +395,8 @@
     <rect x="${x}" y="${y}" width="${w}" height="${h}"
           fill="url(#leafGrad)" stroke="${edge}" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#faceLight)"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#bounce)"/>
     <rect x="${x}" y="${y}" width="${w}" height="46" fill="url(#topShade)"/>
     <rect x="${shadeLeft ? x : x + w - 34}" y="${y}" width="34" height="${h}"
           fill="url(#${shade})"/>
@@ -366,6 +409,29 @@
     <circle cx="${cx}" cy="${cy}" r="11" fill="url(#metal)"/>
     <circle cx="${cx}" cy="${cy}" r="5.5" fill="#1B1D1F"/>`;
   }
+  function pullBar(cx, cy, len, leafH, paint2) {
+    const half = Math.min(len, leafH - 300) / 2;
+    const top = cy - half, bot = cy + half;
+    const w = 30;
+    return `
+    <g>
+      <rect x="${cx - w / 2 + 7}" y="${top + 10}" width="${w}" height="${half * 2}" rx="${w / 2}"
+            fill="#000" opacity="0.22"/>
+      ${[top + 90, bot - 90].map((sy) => `
+      <rect x="${cx - 9}" y="${sy - 9}" width="18" height="18" rx="4" fill="#7E8388"/>`).join("")}
+      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${half * 2}" rx="${w / 2}"
+            fill="url(#metal)" stroke="${darken(paint2, 0.32)}" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+      <rect x="${cx - w / 2 + 5}" y="${top + 8}" width="6" height="${half * 2 - 16}" rx="3"
+            fill="#fff" opacity="0.5"/>
+    </g>`;
+  }
+  var lever = (cx, cy, dir, paint2) => `
+    <circle cx="${cx}" cy="${cy}" r="34" fill="url(#metal)"
+            stroke="${darken(paint2, 0.3)}" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <rect x="${dir < 0 ? cx - 150 : cx}" y="${cy - 11}" width="150" height="22" rx="11"
+          fill="url(#metal)" stroke="${darken(paint2, 0.3)}" stroke-width="1"
+          vector-effect="non-scaling-stroke"/>`;
   var cylinder = (cx, cy, paint2) => `
     <circle cx="${cx}" cy="${cy}" r="27" fill="url(#metal)"
             stroke="${darken(paint2, 0.3)}" stroke-width="1" vector-effect="non-scaling-stroke"/>
@@ -379,11 +445,12 @@
     const h = byId(HANDINGS, state2.handing);
     const w = byId(WINDOWS, state2.window);
     const g = byId(GRILLES, state2.grille);
+    const hd = byId(HANDLES, state2.handle);
     const s = SIZES[state2.size] || SIZES.standard;
     const face = state2.view === "in" ? "מבט מבפנים" : "מבט מבחוץ";
     if (lang === "he") {
       const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
-      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}, ${s.he}, פתיחה ${h.he}. ${face}`;
+      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}, ${hd.he}, ${s.he}, פתיחה ${h.he}. ${face}`;
     }
     return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
   }
@@ -422,6 +489,17 @@
           fill="none" stroke="currentColor" stroke-width="44"/>
   </svg>`;
   }
+  function handleGlyph(handle) {
+    const W = 950, H = 2100, pad = 40, cx = W - 120;
+    const art = handle.len ? `<rect x="${cx - 26}" y="${H / 2 - handle.len / 2}" width="52" height="${handle.len}"
+             rx="26" fill="currentColor"/>` : `<circle cx="${cx}" cy="${H / 2}" r="46" fill="currentColor"/>
+       <rect x="${cx - 190}" y="${H / 2 - 22}" width="190" height="44" rx="22" fill="currentColor"/>`;
+    return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="none"
+          stroke="currentColor" stroke-width="44" opacity="0.5"/>
+    ${art}
+  </svg>`;
+  }
 
   // js/url-state.js
   var VERSION = 2;
@@ -429,6 +507,7 @@
     colour: "ral-7016",
     window: "rect",
     grille: "none",
+    handle: "bar-long",
     size: "standard",
     handing: "right-in",
     view: "out"
@@ -440,6 +519,7 @@
     p.set("c", state2.colour);
     p.set("w", state2.window);
     p.set("g", state2.grille);
+    p.set("n", state2.handle);
     p.set("s", state2.size);
     p.set("h", state2.handing);
     if (state2.view === "in") p.set("f", "in");
@@ -465,6 +545,7 @@
     take("colour", "c", COLOURS);
     take("window", "w", WINDOWS);
     take("grille", "g", GRILLES);
+    take("handle", "n", HANDLES);
     take("handing", "h", HANDINGS);
     if (p.get("f") === "in") state2.view = "in";
     const rawSize = p.get("s");
@@ -475,7 +556,7 @@
     return { state: state2, notice };
   }
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
-  var BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 3, spare: 2 };
+  var BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 3, handle: 2 };
   var TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   function encodeCode(state2) {
     const sizeKeys = Object.keys(SIZES);
@@ -486,7 +567,7 @@
       [Math.max(0, HANDINGS.findIndex((h) => h.id === state2.handing)), BITS.handing],
       [Math.max(0, WINDOWS.findIndex((w) => w.id === state2.window)), BITS.window],
       [Math.max(0, GRILLES.findIndex((g) => g.id === state2.grille)), BITS.grille],
-      [0, BITS.spare]
+      [Math.max(0, HANDLES.findIndex((n) => n.id === state2.handle)), BITS.handle]
     ];
     let bits = 0;
     for (const [value, width] of parts) bits = bits << width >>> 0 | value & (1 << width) - 1;
@@ -517,13 +598,15 @@
     const handing = HANDINGS[read(BITS.handing)];
     const window2 = WINDOWS[read(BITS.window)];
     const grille = GRILLES[read(BITS.grille)];
-    if (!colour || !size || !handing || !window2 || !grille) return null;
+    const handle = HANDLES[read(BITS.handle)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle) return null;
     return {
       colour: colour.id,
       size,
       handing: handing.id,
       window: window2.id,
       grille: grille.id,
+      handle: handle.id,
       view: "out"
     };
   }
@@ -547,6 +630,7 @@
       `צבע: ${c.he} (RAL ${c.ral})`,
       `חלון: ${w.he}`,
       ...w.rects.length && g.id !== "none" ? [`סורג: ${g.he}`] : [],
+      `ידית: ${byId(HANDLES, state2.handle).he}`,
       `מידה: ${s.he}`,
       `פתיחה: ${h.he}`,
       `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — כולל התקנה ומע״מ`,
@@ -601,6 +685,15 @@
       (g) => g.he,
       (g) => g.delta,
       chooseGrille
+    );
+    buildTiles(
+      "#handles",
+      HANDLES,
+      "ידית",
+      (n) => handleGlyph(n),
+      (n) => n.he,
+      (n) => n.delta,
+      (id) => set({ handle: id })
     );
     buildTiles(
       "#sizes",
@@ -751,12 +844,14 @@
       `RAL ${colour.ral}`,
       win.he,
       ...win.rects.length && grille.id !== "none" ? [grille.he] : [],
+      byId(HANDLES, state.handle).he,
       size.he,
       handing.he
     ].join(" · ");
     markSelected("#colours", state.colour);
     markSelected("#windows", state.window);
     markSelected("#grilles", state.grille);
+    markSelected("#handles", state.handle);
     markSelected("#sizes", state.size);
     markSelected("#handings", state.handing);
     markSelected("#views", state.view);

@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { COLOURS, GRILLES, HANDINGS, SIZES, VIEWS, WINDOWS } from '../js/catalog.js';
+import { COLOURS, GRILLES, HANDINGS, HANDLES, SIZES, VIEWS, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import { render } from '../js/renderer.js';
@@ -13,14 +13,15 @@ const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' +
 const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
-const base = { colour: 'ral-7016', window: 'none', grille: 'none',
+const base = { colour: 'ral-7016', window: 'none', grille: 'none', handle: 'bar-long',
                size: 'standard', handing: 'right-in', view: 'out' };
 
 /** Every reachable design, for the exhaustive sweeps below. */
 function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
-    for (const w of WINDOWS) for (const g of GRILLES)
-      yield { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id, view: 'out' };
+    for (const w of WINDOWS) for (const g of GRILLES) for (const n of HANDLES)
+      yield { colour: c.id, size: s, handing: h.id, window: w.id,
+              grille: g.id, handle: n.id, view: 'out' };
 }
 
 // ── 1. Short code ─────────────────────────────────────────────────
@@ -31,7 +32,7 @@ group('short code round-trip');
   for (const st of everyState()) {
     const code = encodeCode(st);
     const back = decodeCode(code);
-    ok(back && ['colour', 'size', 'handing', 'window', 'grille'].every(k => back[k] === st[k]),
+    ok(back && ['colour', 'size', 'handing', 'window', 'grille', 'handle'].every(k => back[k] === st[k]),
        `${code} did not round-trip for ${Object.values(st).join('/')}`);
     ok(/^DM-[0-9A-HJKMNP-TV-Z]{5}$/.test(code), `malformed code: ${code}`);
     ok(!seen.has(code), `code collision: ${code}`);
@@ -54,12 +55,12 @@ group('url round-trip');
 for (const st of everyState()) {
   const { state: back, notice } = fromQuery(toQuery(st));
   ok(!notice, `unexpected notice for ${toQuery(st)}`);
-  for (const k of ['colour', 'size', 'handing', 'window', 'grille']) {
+  for (const k of ['colour', 'size', 'handing', 'window', 'grille', 'handle']) {
     ok(back[k] === st[k], `url lost ${k} (${st[k]} -> ${back[k]})`);
   }
 }
 {
-  const bad = fromQuery('?v=2&c=ral-nope&w=rect&g=none&s=standard&h=right-in');
+  const bad = fromQuery('?v=2&c=ral-nope&w=rect&g=none&n=bar-long&s=standard&h=right-in');
   ok(bad.notice === 'option-unknown', 'unknown option must notify, never silently default');
   ok(bad.state.colour === 'ral-7016', 'unknown option should fall back to default');
   ok(fromQuery('?v=2&f=in').state.view === 'in', 'inside view lost from url');
@@ -75,6 +76,7 @@ group('price');
   ok(P({ size: 'wide' }) === 3495, 'wide band');
   ok(P({ window: 'rect' }) === 3815, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
   ok(P({ window: 'rect', grille: 'scroll' }) === 4275, 'scrollwork grille adds ₪460');
+  ok(P({ handle: 'lever' }) === 3115, `a lever is ₪80 less than a pull bar, got ${P({ handle: 'lever' })}`);
 
   // A grille cannot be charged when there is no glazing to put it in.
   for (const g of GRILLES) {
@@ -131,12 +133,32 @@ group('inside view');
 for (const h of HANDINGS) {
   const out = render({ ...base, handing: h.id, view: 'out' });
   const inn = render({ ...base, handing: h.id, view: 'in' });
-  const handleX = svg => Number(/<circle cx="([\d.]+)"[^>]*r="34"/.exec(svg)[1]);
+  // Probe the lock cylinder / thumb-turn: it sits at the handle position
+  // regardless of which handle style is fitted.
+  const handleX = svg => Number(/<circle cx="([\d.]+)" cy="[\d.]+" r="27"/.exec(svg)[1]);
   const midX = svg => Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]) / 2;
   ok((handleX(out) > midX(out)) !== (handleX(inn) > midX(inn)),
      `handle must swap sides when viewed from inside (${h.id})`);
-  ok(inn.includes('rx="6"'), `inside face should show a thumb-turn, not a keyway (${h.id})`);
-  ok(!out.includes('rx="6"'), `outside face should show a cylinder, not a thumb-turn (${h.id})`);
+  ok(inn.includes('rx="6" fill="#6E7378"'), `inside face should show a thumb-turn (${h.id})`);
+  ok(!out.includes('rx="6" fill="#6E7378"'), `outside face should show a cylinder (${h.id})`);
+}
+
+// ── 6b. Handles ───────────────────────────────────────────────────
+group('handles');
+for (const n of HANDLES) {
+  const svg = render({ ...base, handle: n.id });
+  if (n.len) {
+    const m = /<rect x="[\d.]+" y="[\d.]+" width="30" height="([\d.]+)" rx="15"/.exec(svg);
+    ok(m, `pull bar not drawn for ${n.id}`);
+    // The bar must fit the leaf with room to spare, whatever the size band.
+    for (const sz of sizeKeys) {
+      const s2 = render({ ...base, handle: n.id, size: sz });
+      const len = Number(/<rect x="[\d.]+" y="[\d.]+" width="30" height="([\d.]+)" rx="15"/.exec(s2)[1]);
+      ok(len > 100 && len < SIZES[sz].h - 200, `bar length ${len} wrong on ${sz}`);
+    }
+  } else {
+    ok(/r="34"/.test(svg), `lever rosette not drawn for ${n.id}`);
+  }
 }
 
 // ── 7. Leaf-and-a-half hinges against the frame, not the fixed panel ──

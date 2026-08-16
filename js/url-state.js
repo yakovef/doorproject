@@ -8,7 +8,7 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, GRILLES, HANDINGS, SIZES, WINDOWS } from './catalog.js';
+import { COLOURS, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 
 export const VERSION = 2;
 
@@ -16,6 +16,7 @@ export const DEFAULTS = {
   colour:  'ral-7016',
   window:  'rect',
   grille:  'none',
+  handle:  'bar-long',
   size:    'standard',
   handing: 'right-in',
   view:    'out',        // camera, not a product choice
@@ -30,6 +31,7 @@ export function toQuery(state) {
   p.set('c', state.colour);
   p.set('w', state.window);
   p.set('g', state.grille);
+  p.set('n', state.handle);
   p.set('s', state.size);
   p.set('h', state.handing);
   if (state.view === 'in') p.set('f', 'in');   // only when not the default
@@ -64,6 +66,7 @@ export function fromQuery(search) {
   take('colour', 'c', COLOURS);
   take('window', 'w', WINDOWS);
   take('grille', 'g', GRILLES);
+  take('handle', 'n', HANDLES);
   take('handing', 'h', HANDINGS);
   if (p.get('f') === 'in') state.view = 'in';
 
@@ -78,13 +81,13 @@ export function fromQuery(search) {
 
 // ── Short code ────────────────────────────────────────────────────
 // 25 bits, laid out with room to grow:
-//   version 3 | colour 6 | size 4 | handing 2 | window 5 | grille 3 | spare 2
+//   version 3 | colour 6 | size 4 | handing 2 | window 5 | grille 3 | handle 2
 // -> 5 Crockford base32 characters. Adding options later fits inside the
 //    existing widths, so the code length stays stable.
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
-const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 3, spare: 2 };
+const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5, grille: 3, handle: 2 };
 const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 25 -> 5 chars
 
 export function encodeCode(state) {
@@ -96,7 +99,7 @@ export function encodeCode(state) {
     [Math.max(0, HANDINGS.findIndex(h => h.id === state.handing)), BITS.handing],
     [Math.max(0, WINDOWS.findIndex(w => w.id === state.window)), BITS.window],
     [Math.max(0, GRILLES.findIndex(g => g.id === state.grille)), BITS.grille],
-    [0, BITS.spare],
+    [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
   ];
 
   let bits = 0;
@@ -136,10 +139,11 @@ export function decodeCode(code) {
   const handing = HANDINGS[read(BITS.handing)];
   const window  = WINDOWS[read(BITS.window)];
   const grille  = GRILLES[read(BITS.grille)];
-  if (!colour || !size || !handing || !window || !grille) return null;
+  const handle  = HANDLES[read(BITS.handle)];
+  if (!colour || !size || !handing || !window || !grille || !handle) return null;
 
   return {
-    colour: colour.id, size, handing: handing.id,
-    window: window.id, grille: grille.id, view: 'out',
+    colour: colour.id, size, handing: handing.id, window: window.id,
+    grille: grille.id, handle: handle.id, view: 'out',
   };
 }

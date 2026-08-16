@@ -5,7 +5,7 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { byId, COLOURS, GRILLES, HANDINGS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { encodeCode, toQuery } from './url-state.js';
 
@@ -31,6 +31,7 @@ export function message(state) {
     `צבע: ${c.he} (RAL ${c.ral})`,
     `חלון: ${w.he}`,
     ...(w.rects.length && g.id !== 'none' ? [`סורג: ${g.he}`] : []),
+    `ידית: ${byId(HANDLES, state.handle).he}`,
     `מידה: ${s.he}`,
     `פתיחה: ${h.he}`,
     `מחיר באתר: ${formatAgorot(priceAgorot(state))} — כולל התקנה ומע״מ`,

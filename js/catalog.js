@@ -61,6 +61,16 @@ export const WINDOWS = [
   { id: 'tallwin',he: 'חלון גבוה',      en: 'Tall light',       delta: 88000,  rects: [{ w: 340, h: 1180, top: 400 }] },
 ];
 
+/**
+ * Handles. The long vertical pull bar dominates modern Israeli entrance
+ * doors — the brand catalogues are full of them — so it is the default.
+ */
+export const HANDLES = [
+  { id: 'bar-long',  he: 'ידית משיכה ארוכה', en: 'Long pull bar',  delta: 0,     len: 1150 },
+  { id: 'bar-short', he: 'ידית משיכה קצרה',  en: 'Short pull bar', delta: 0,     len: 600 },
+  { id: 'lever',     he: 'ידית רגילה',        en: 'Lever',          delta: -8000, len: 0 },
+];
+
 /** Decorative iron grille over the glazing. Only meaningful with a window. */
 export const GRILLES = [
   { id: 'none',    he: 'ללא סורג',   en: 'No grille',  delta: 0 },

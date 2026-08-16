@@ -8,7 +8,7 @@
  * build script, so there is only ever one implementation of the geometry.
  */
 
-import { byId, COLOURS, GRILLES, HANDINGS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 import { darken, isLight, lighten, silhouette } from './colour.js';
 
 // ── Geometry, in mm ────────────────────────────────────────────────
@@ -31,6 +31,7 @@ export function render(state) {
   const handing = byId(HANDINGS, state.handing);
   const win     = byId(WINDOWS, state.window);
   const grille  = byId(GRILLES, state.grille);
+  const handle  = byId(HANDLES, state.handle);
 
   const inside  = state.view === 'in';
 
@@ -98,9 +99,36 @@ export function render(state) {
       <stop offset="1"    stop-color="#000" stop-opacity="0.08"/>
     </linearGradient>
 
-    <!-- Light falls from above, so the frame casts a shadow onto the top of
-         the leaf and a thinner one down the hinge side. This is the ONLY
-         shading on the leaf: the paint itself stays one colour edge to edge. -->
+    <!-- ── the light ──────────────────────────────────────────────
+         One key light, high and to the left, as in every product photo in
+         the brand catalogues. The face carries a broad, smooth wash — never
+         a band, which reads as a seam rather than as light. Amplitude stays
+         low because oven-baked paint is matte. -->
+    <linearGradient id="faceLight" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="#fff" stop-opacity="0.11"/>
+      <stop offset="0.32" stop-color="#fff" stop-opacity="0.04"/>
+      <stop offset="0.62" stop-color="#000" stop-opacity="0.02"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.09"/>
+    </linearGradient>
+
+    <!-- Bounce off the floor: weak, warm, only near the bottom. -->
+    <linearGradient id="bounce" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0"    stop-color="#FFE9C8" stop-opacity="0.10"/>
+      <stop offset="0.22" stop-color="#FFE9C8" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Frame members face different directions, so each takes its own tone.
+         This is what makes the opening read as a box rather than an outline. -->
+    <linearGradient id="jambLight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="jambDark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.20"/>
+    </linearGradient>
+
+    <!-- Frame casts a shadow onto the top of the leaf and down one side. -->
     <linearGradient id="topShade" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#000" stop-opacity="0.20"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
@@ -146,17 +174,28 @@ export function render(state) {
           fill="#000" opacity="0.30" filter="url(#contactShadow)"/>
   </g>
 
-  <!-- ── frame ────────────────────────────────────────────────── -->
-  <path d="M ${openingX - FRAME} ${floorY}
-           L ${openingX - FRAME} ${y0 - FRAME}
-           L ${openingX + totalW + FRAME} ${y0 - FRAME}
-           L ${openingX + totalW + FRAME} ${floorY}
-           L ${openingX + totalW} ${floorY}
-           L ${openingX + totalW} ${y0}
-           L ${openingX} ${y0}
-           L ${openingX} ${floorY} Z"
-        fill="${paint}" stroke="${edge}" stroke-width="1.25"
-        vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+  <!-- ── frame: three members, each lit for the way it faces ──── -->
+  <g id="frame">
+    <path d="M ${openingX - FRAME} ${floorY}
+             L ${openingX - FRAME} ${y0 - FRAME}
+             L ${openingX + totalW + FRAME} ${y0 - FRAME}
+             L ${openingX + totalW + FRAME} ${floorY}
+             L ${openingX + totalW} ${floorY}
+             L ${openingX + totalW} ${y0}
+             L ${openingX} ${y0}
+             L ${openingX} ${floorY} Z"
+          fill="${paint}" stroke="${edge}" stroke-width="1.25"
+          vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+
+    <!-- head: faces up, catches the most light -->
+    <rect x="${openingX - FRAME}" y="${y0 - FRAME}" width="${totalW + FRAME * 2}" height="${FRAME}"
+          fill="#fff" opacity="0.14"/>
+    <!-- jambs: the left one faces the light, the right turns away -->
+    <rect x="${openingX - FRAME}" y="${y0}" width="${FRAME}" height="${leafH}"
+          fill="url(#jambLight)"/>
+    <rect x="${openingX + totalW}" y="${y0}" width="${FRAME}" height="${leafH}"
+          fill="url(#jambDark)"/>
+  </g>
 
   <!-- ── reveal: the shadowed rebate the leaf sits in ─────────── -->
   <rect x="${openingX - REVEAL}" y="${y0 - REVEAL}"
@@ -171,6 +210,10 @@ export function render(state) {
     <rect x="${mainX}" y="${y0}" width="${leafW}" height="${leafH}"
           fill="url(#leafGrad)" stroke="${edge}" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
+    <!-- One smooth wash across the whole face. The paint underneath stays a
+         single colour edge to edge; this is light, not a second colour. -->
+    <rect x="${mainX}" y="${y0}" width="${leafW}" height="${leafH}" fill="url(#faceLight)"/>
+    <rect x="${mainX}" y="${y0}" width="${leafW}" height="${leafH}" fill="url(#bounce)"/>
     <rect x="${mainX}" y="${y0}" width="${leafW}" height="46" fill="url(#topShade)"/>
     <rect x="${hingeOnLeft ? mainX : mainX1 - 34}" y="${y0}" width="34" height="${leafH}"
           fill="url(#${hingeOnLeft ? 'sideShadeL' : 'sideShadeR'})"/>
@@ -197,14 +240,9 @@ export function render(state) {
 
     ${peephole(centreX, y(PEEPHOLE_AFF), win)}
 
-    <!-- lever handle on a round rosette -->
-    <circle cx="${handleX}" cy="${y(HANDLE_AFF)}" r="34" fill="url(#metal)"
-            stroke="${darken(paint, 0.3)}" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-    <rect x="${leverDir < 0 ? handleX - 150 : handleX}" y="${y(HANDLE_AFF) - 11}"
-          width="150" height="22" rx="11" fill="url(#metal)"
-          stroke="${darken(paint, 0.3)}" stroke-width="1"
-          vector-effect="non-scaling-stroke"/>
+    ${handle.len
+        ? pullBar(handleX, y(HANDLE_AFF), handle.len, leafH, paint)
+        : lever(handleX, y(HANDLE_AFF), leverDir, paint)}
 
     ${inside ? thumbTurn(handleX, y(CYLINDER_AFF), paint) : cylinder(handleX, y(CYLINDER_AFF), paint)}
   </g>
@@ -278,6 +316,8 @@ function sideLeaf({ x, y, w, h, paint, edge, win, grille, shadeLeft }) {
     <rect x="${x}" y="${y}" width="${w}" height="${h}"
           fill="url(#leafGrad)" stroke="${edge}" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#faceLight)"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#bounce)"/>
     <rect x="${x}" y="${y}" width="${w}" height="46" fill="url(#topShade)"/>
     <rect x="${shadeLeft ? x : x + w - 34}" y="${y}" width="34" height="${h}"
           fill="url(#${shade})"/>
@@ -292,6 +332,34 @@ function peephole(cx, cy, win) {
     <circle cx="${cx}" cy="${cy}" r="11" fill="url(#metal)"/>
     <circle cx="${cx}" cy="${cy}" r="5.5" fill="#1B1D1F"/>`;
 }
+
+/** The long vertical pull bar: the dominant handle on modern Israeli
+ *  entrance doors. Standoffs at each end lift it off the face, and it takes
+ *  a highlight down the side facing the light. */
+function pullBar(cx, cy, len, leafH, paint) {
+  const half = Math.min(len, leafH - 300) / 2;
+  const top = cy - half, bot = cy + half;
+  const w = 30;
+  return `
+    <g>
+      <rect x="${cx - w / 2 + 7}" y="${top + 10}" width="${w}" height="${half * 2}" rx="${w / 2}"
+            fill="#000" opacity="0.22"/>
+      ${[top + 90, bot - 90].map(sy => `
+      <rect x="${cx - 9}" y="${sy - 9}" width="18" height="18" rx="4" fill="#7E8388"/>`).join('')}
+      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${half * 2}" rx="${w / 2}"
+            fill="url(#metal)" stroke="${darken(paint, 0.32)}" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+      <rect x="${cx - w / 2 + 5}" y="${top + 8}" width="6" height="${half * 2 - 16}" rx="3"
+            fill="#fff" opacity="0.5"/>
+    </g>`;
+}
+
+const lever = (cx, cy, dir, paint) => `
+    <circle cx="${cx}" cy="${cy}" r="34" fill="url(#metal)"
+            stroke="${darken(paint, 0.3)}" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <rect x="${dir < 0 ? cx - 150 : cx}" y="${cy - 11}" width="150" height="22" rx="11"
+          fill="url(#metal)" stroke="${darken(paint, 0.3)}" stroke-width="1"
+          vector-effect="non-scaling-stroke"/>`;
 
 const cylinder = (cx, cy, paint) => `
     <circle cx="${cx}" cy="${cy}" r="27" fill="url(#metal)"
@@ -310,12 +378,13 @@ export function describe(state, lang = 'he') {
   const h = byId(HANDINGS, state.handing);
   const w = byId(WINDOWS, state.window);
   const g = byId(GRILLES, state.grille);
+  const hd = byId(HANDLES, state.handle);
   const s = SIZES[state.size] || SIZES.standard;
   const face = state.view === 'in' ? 'מבט מבפנים' : 'מבט מבחוץ';
 
   if (lang === 'he') {
     const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}, ${s.he}, פתיחה ${h.he}. ${face}`;
+    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}, ${hd.he}, ${s.he}, פתיחה ${h.he}. ${face}`;
   }
   return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
 }
@@ -365,5 +434,20 @@ export function sizeGlyph(size) {
           fill="none" stroke="currentColor" stroke-width="44" opacity="0.45"/>` : ''}
     <rect x="${size.side ? size.side + 46 : 0}" y="0" width="${size.w}" height="${size.h}"
           fill="none" stroke="currentColor" stroke-width="44"/>
+  </svg>`;
+}
+
+/** Handle glyph: the bar's real proportion relative to the leaf. */
+export function handleGlyph(handle) {
+  const W = 950, H = 2100, pad = 40, cx = W - 120;
+  const art = handle.len
+    ? `<rect x="${cx - 26}" y="${H / 2 - handle.len / 2}" width="52" height="${handle.len}"
+             rx="26" fill="currentColor"/>`
+    : `<circle cx="${cx}" cy="${H / 2}" r="46" fill="currentColor"/>
+       <rect x="${cx - 190}" y="${H / 2 - 22}" width="190" height="44" rx="22" fill="currentColor"/>`;
+  return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="none"
+          stroke="currentColor" stroke-width="44" opacity="0.5"/>
+    ${art}
   </svg>`;
 }
