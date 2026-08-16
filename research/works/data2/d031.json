@@ -1,0 +1,156 @@
+{
+  "id": "d031",
+  "cat": "basic",
+  "price": 4050,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.95,
+  "leaf": {
+    "x": 170,
+    "y": 102,
+    "w": 522,
+    "h": 1402
+  },
+  "colour": {
+    "hex": "#554C47",
+    "ral_guess": "7022",
+    "family": "anthracite",
+    "lum": 77.6,
+    "rb": 14,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.75,
+    "profile": [
+      1.0,
+      0.97,
+      0.98,
+      0.87,
+      0.81,
+      0.72,
+      0.67,
+      0.62,
+      0.57
+    ]
+  },
+  "warmth": {
+    "top": 15,
+    "foot": 4
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#48423F",
+    "face_vs_leaf": 0.86,
+    "reveal": {
+      "near_w": 0.01,
+      "near_tone": 0.493,
+      "far_w": null,
+      "far_w_why": "not installed - on the lock side the leaf's edge meets bare plaster with no frame member in the photograph, so there is no reveal to measure",
+      "far_tone": null,
+      "far_tone_why": "not installed - on the lock side the leaf's edge meets bare plaster with no frame member in the photograph, so there is no reveal to measure",
+      "head_w": null,
+      "head_w_why": "not installed - above the leaf's top edge there is only wall and the closer arm; no head member appears",
+      "head_tone": null,
+      "head_tone_why": "not installed - above the leaf's top edge there is only wall and the closer arm; no head member appears",
+      "tone_top": 0.858,
+      "tone_bottom": 0.394
+    },
+    "bead": {
+      "present": true,
+      "w": 0.015,
+      "tone": 1.614,
+      "side": "near"
+    },
+    "cast": {
+      "present": true,
+      "side": "right",
+      "w": 0.034,
+      "tone": 0.918
+    },
+    "head_shadow": {
+      "depth_h": null,
+      "tone": null,
+      "depth_h_why": "no lintel - this is a door set standing against a wall, nothing overhangs the leaf",
+      "tone_why": "no lintel - this is a door set standing against a wall, nothing overhangs the leaf"
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "kind_why": "not installed; the leaf stands directly on brick paving on small timber packers, no sill member exists yet",
+      "h_h_why": "not installed; the leaf stands directly on brick paving on small timber packers, no sill member exists yet",
+      "tone_why": "not installed; the leaf stands directly on brick paving on small timber packers, no sill member exists yet"
+    },
+    "floor_contact": {
+      "tone": 0.977,
+      "height_h": 0.005
+    }
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "shape": null,
+    "rects": [],
+    "shape_why": "no glazing on this leaf, so there is no shape"
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "pattern_why": "no grille on this leaf, so there is no pattern"
+  },
+  "handle": {
+    "type": "knob",
+    "orientation": "horizontal",
+    "finish": "brass",
+    "x": 0.177,
+    "y": 0.504,
+    "len_h": 0,
+    "w_w": 0.123
+  },
+  "lock": {
+    "present": true,
+    "kind": "keyhole-in-plate",
+    "x": 0.182,
+    "y": 0.551
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "x_why": "no peephole on this leaf, so it has no position or diameter",
+    "y_why": "no peephole on this leaf, so it has no position or diameter",
+    "dia_w_why": "no peephole on this leaf, so it has no position or diameter"
+  },
+  "hinges": {
+    "visible": true,
+    "count": 3,
+    "side": "right",
+    "y": [
+      0.15,
+      0.489,
+      0.827
+    ]
+  },
+  "detail": {
+    "panel": false,
+    "groove": true,
+    "grooves": [
+      {
+        "orientation": "perimeter",
+        "inset": 0.021,
+        "count": 1
+      }
+    ],
+    "texture": "smooth"
+  },
+  "extras": [
+    "door set not installed - leaning on brick paving against a plaster wall",
+    "surface-mounted overhead closer on the leaf",
+    "three barrel hinges",
+    "timber packers under the leaf",
+    "blue-tagged key in the lock"
+  ],
+  "notes": "Not installed, so the whole far-jamb, head and threshold vocabulary is genuinely absent rather than unmeasured - the only frame member in shot is the hinge jamb. Its rounded arris throws a specular flare that peaks near 1.5x the leaf midpoint over roughly y 768-800 and has gone by y 1100, which is the one good example in this set of a bead being a moving highlight rather than a painted line. The three barrel hinges at 0.15 / 0.49 / 0.83 of leaf height are the only visible hinges anywhere in the tier."
+}

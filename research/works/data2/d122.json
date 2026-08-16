@@ -1,0 +1,147 @@
+{
+  "id": "d122",
+  "cat": "luxury",
+  "price": 13900,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.85,
+  "leaf": {
+    "x": 308,
+    "y": 309,
+    "w": 447,
+    "h": 969
+  },
+  "colour": {
+    "hex": "#989A8E",
+    "ral_guess": "7032",
+    "family": "grey",
+    "lum": 152.7,
+    "rb": 10,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.19,
+    "profile": [
+      0.99,
+      0.99,
+      1.0,
+      0.96,
+      0.92,
+      0.89,
+      0.87,
+      0.86,
+      0.84
+    ]
+  },
+  "warmth": {
+    "top": 8,
+    "foot": 10
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#95988D",
+    "face_vs_leaf": 0.99,
+    "reveal": {
+      "near_side": "right",
+      "near_w": 0.098,
+      "far_w": 0.063,
+      "head_w": 0.181,
+      "near_tone": 0.44,
+      "far_tone": 0.57,
+      "head_tone": 0.37,
+      "tone_top": 0.47,
+      "tone_bottom": 0.35
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "bead_why": "both jambs step straight from a dark reveal (0.44 near / 0.57 far) up to a frame face at 0.97-0.99 with no overshoot; no highlight line at either arris at 6x"
+    },
+    "cast": {
+      "present": false,
+      "side": null,
+      "w": null,
+      "tone": null,
+      "cast_why": "the frame's outer face sits proud of nothing - stucco reads 217 immediately beyond it on the right and 212 on the left, with no darkened band"
+    },
+    "head_shadow": {
+      "depth_h": 0.01,
+      "tone": 0.37
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "threshold_why": "no threshold section - the leaf stops on a black bituminous membrane and loose gravel, the job is unfinished at the foot"
+    },
+    "floor_contact": {
+      "tone": 0.54,
+      "height_h": 0.008
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "tall rectangle, upper half, moulded surround",
+    "rects": [
+      {
+        "x": 0.295,
+        "y": 0.059,
+        "w": 0.434,
+        "h": 0.454
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "lattice"
+  },
+  "handle": {
+    "type": "pull-bar",
+    "orientation": "vertical",
+    "finish": "black",
+    "x": 0.16,
+    "y": 0.5,
+    "len_h": 0.515,
+    "w_w": 0.04
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.06,
+    "y": 0.514
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "the only round boss on the leaf is the keyed escutcheon at 0.06/0.51 (keyway visible at 8x); a second small disc at 0.21/0.73 is a bar through-bolt, not a lens"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "bar and lock are on the left of the leaf so hinges are on the right, inside a 44 px reveal that reads at tone 0.44; no knuckles break the silhouette"
+  },
+  "detail": {
+    "panel": true,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "fixed narrow sidelight to the left with a matching slim glazed slot",
+    "reeded / heavily textured privacy glass",
+    "black pull bar with an integrated multipoint lock body and two cast bosses",
+    "moulded raised lower panel",
+    "moulded architrave around the glazing",
+    "black bituminous membrane and gravel at the foot, no threshold",
+    "photographer's shadow across the lower left of the leaf"
+  ],
+  "notes": "Leaf is the right-hand element of a door + sidelight set; the left jamb reveal borders the sidelight, not the measured leaf. This is the darkest reveal pair in the tier - near 0.44, far 0.57, head 0.37 - because the leaf sits in a genuine recessed box under bright sun. Geometric midpoint falls on glass, colour taken on the right stile at the same height (700,793). The photographer's shadow crosses the lower left of the leaf; the tone profile was sampled on the right stile only so it is unaffected."
+}

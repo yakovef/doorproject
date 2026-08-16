@@ -1,0 +1,147 @@
+{
+  "id": "d097",
+  "cat": "luxury",
+  "price": 7500,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.87,
+  "leaf": {
+    "x": 169,
+    "y": 181,
+    "w": 537,
+    "h": 1215
+  },
+  "colour": {
+    "hex": "#BBBAB5",
+    "ral_guess": "9016",
+    "family": "white",
+    "lum": 185.9,
+    "rb": 6,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.08,
+    "profile": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.99,
+      0.98,
+      0.97,
+      0.95,
+      0.92
+    ]
+  },
+  "warmth": {
+    "top": 7,
+    "foot": 4
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#D6D8D4",
+    "face_vs_leaf": 1.16,
+    "reveal": {
+      "near_side": "left",
+      "near_w": 0.078,
+      "far_w": 0.006,
+      "head_w": 0.169,
+      "near_tone": 0.76,
+      "far_tone": 1.02,
+      "head_tone": 0.92,
+      "tone_top": 0.85,
+      "tone_bottom": 0.72
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "bead_why": "the near jamb steps monotonically from lining 0.76 up to frame face 1.16 with no overshoot; the far jamb has no recess at all, so there is no arris to catch light"
+    },
+    "cast": {
+      "present": true,
+      "side": "right",
+      "w": 0.015,
+      "tone": 0.31,
+      "cast_note": "dark line where the frame box meets the hacked-out wall on the camera-near side"
+    },
+    "head_shadow": {
+      "depth_h": 0.006,
+      "tone": 0.97,
+      "head_shadow_note": "barely present - the soffit is lit almost as brightly as the leaf (head_tone 0.92) and the junction only drops to 0.97"
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "threshold_why": "no threshold fitted: broken concrete and rubble come up to the leaf, the site is unfinished"
+    },
+    "floor_contact": {
+      "tone": 0.32,
+      "height_h": 0.006
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "tall rectangle, upper three-fifths, moulded surround",
+    "rects": [
+      {
+        "x": 0.285,
+        "y": 0.077,
+        "w": 0.441,
+        "h": 0.605
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "lattice"
+  },
+  "handle": {
+    "type": "lever-rose",
+    "orientation": "horizontal",
+    "finish": "chrome",
+    "x": 0.946,
+    "y": 0.517,
+    "len_h": 0.0,
+    "w_w": 0.06
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.939,
+    "y": 0.567
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "leaf is 60 percent glazed; swept the painted field at 5x and found only the lever rose, escutcheon and panel mouldings"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "handle at x 0.95 puts the hinges on the left stile, which is buried in the 42 px lining; no knuckles project"
+  },
+  "detail": {
+    "panel": true,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "white lattice muntins with scroll motifs top and bottom of the glazing",
+    "moulded raised lower panel",
+    "moulded architrave around the glazing",
+    "deep white reveal box: 42 px lining on the near jamb, 91 px soffit at the head",
+    "hacked-out wall opening with exposed conduit and loose wiring beside the frame",
+    "broken concrete step, no threshold"
+  ],
+  "notes": "Camera sits right of the door axis, so only the left jamb shows a lining (42 px at tone 0.76) while the right jamb shows a 3 px joint straight onto the frame face - near_w/far_w is 11:1 here, the most asymmetric of the ten. Geometric midpoint falls on glass; colour taken on the left stile at the same height (250,788). Very flat tone profile (contrast 1.08) - overcast light, no gradient down the leaf."
+}

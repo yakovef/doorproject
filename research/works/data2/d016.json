@@ -1,0 +1,141 @@
+{
+  "id": "d016",
+  "cat": "basic",
+  "price": 3545,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.92,
+  "leaf": {
+    "x": 215,
+    "y": 152,
+    "w": 455,
+    "h": 1285
+  },
+  "colour": {
+    "hex": "#969AA3",
+    "ral_guess": "7004",
+    "family": "grey",
+    "lum": 153.8,
+    "rb": -13,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.24,
+    "profile": [
+      0.8,
+      0.98,
+      1.0,
+      0.98,
+      0.96,
+      0.93,
+      0.9,
+      0.87,
+      0.84
+    ]
+  },
+  "warmth": {
+    "top": 7,
+    "foot": -29
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#C9C5C5",
+    "face_vs_leaf": 1.29,
+    "reveal": {
+      "near_w": 0.057,
+      "near_tone": 1.285,
+      "far_w": 0.044,
+      "far_tone": 0.954,
+      "head_w": 0.037,
+      "head_tone": 0.698,
+      "tone_top": 1.595,
+      "tone_bottom": 0.906
+    },
+    "bead": {
+      "present": true,
+      "w": 0.024,
+      "tone": 1.484,
+      "side": "near"
+    },
+    "cast": {
+      "present": true,
+      "side": "right",
+      "w": 0.024,
+      "tone": 0.573
+    },
+    "head_shadow": {
+      "depth_h": 0.036,
+      "tone": 0.707
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "kind_why": "leaf drops straight onto a poured terrazzo step; no sill member, weatherbar or cill plate visible in the foot crop",
+      "h_h_why": "leaf drops straight onto a poured terrazzo step; no sill member, weatherbar or cill plate visible in the foot crop",
+      "tone_why": "leaf drops straight onto a poured terrazzo step; no sill member, weatherbar or cill plate visible in the foot crop"
+    },
+    "floor_contact": {
+      "tone": 0.426,
+      "height_h": 0.008
+    }
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "shape": null,
+    "rects": [],
+    "shape_why": "no glazing on this leaf, so there is no shape"
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "pattern_why": "no grille on this leaf, so there is no pattern"
+  },
+  "handle": {
+    "type": "lever-rose",
+    "orientation": "horizontal",
+    "finish": "steel",
+    "x": 0.121,
+    "y": 0.53,
+    "len_h": 0,
+    "w_w": 0.081
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.13,
+    "y": 0.58
+  },
+  "peephole": {
+    "present": true,
+    "x": 0.547,
+    "y": 0.24,
+    "dia_w": 0.037
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "side_why": "no hinge is visible from this face, so no side can be assigned"
+  },
+  "detail": {
+    "panel": false,
+    "groove": true,
+    "grooves": [
+      {
+        "orientation": "horizontal",
+        "y": 0.977,
+        "count": 1
+      }
+    ],
+    "texture": "smooth"
+  },
+  "extras": [
+    "rough stone opening surround",
+    "terrazzo step"
+  ],
+  "notes": "Deep stone reveal, sun raking from upper left: the near (left) frame band runs 1.59x the leaf midpoint at the top and 0.90x at the foot, so any flat frame fill will look wrong. Leaf paint is a light grey that reads near-white against the shaded stone; measured midpoint is darker than the paint chip because the recess is in shade."
+}

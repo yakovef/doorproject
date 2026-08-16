@@ -1,0 +1,133 @@
+{
+  "id": "d029",
+  "cat": "basic",
+  "price": 3800,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.9,
+  "leaf": {
+    "x": 360,
+    "y": 300,
+    "w": 465,
+    "h": 1102
+  },
+  "colour": {
+    "hex": "#583C28",
+    "ral_guess": "8011",
+    "family": "brown",
+    "lum": 64.5,
+    "rb": 48,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.39,
+    "profile": [
+      0.96,
+      1.0,
+      0.95,
+      0.87,
+      0.83,
+      0.78,
+      0.76,
+      0.73,
+      0.72
+    ]
+  },
+  "warmth": {
+    "top": 41,
+    "foot": 47
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#755642",
+    "face_vs_leaf": 1.41,
+    "reveal": {
+      "near_w": 0.12,
+      "near_tone": 0.413,
+      "far_w": 0.009,
+      "far_tone": 0.792,
+      "head_w": 0.26,
+      "head_tone": 0.367,
+      "tone_top": 0.368,
+      "tone_bottom": 0.432
+    },
+    "bead": {
+      "present": true,
+      "w": 0.009,
+      "tone": 1.133,
+      "side": "far"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.019,
+      "tone": 0.964
+    },
+    "head_shadow": {
+      "depth_h": 0.053,
+      "tone": 1.133
+    },
+    "threshold": {
+      "present": true,
+      "kind": "stone sill",
+      "h_h": 0.007,
+      "tone": 2.131
+    },
+    "floor_contact": {
+      "tone": 0.812,
+      "height_h": 0.005
+    }
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "shape": null,
+    "rects": [],
+    "shape_why": "no glazing on this leaf, so there is no shape"
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "pattern_why": "no grille on this leaf, so there is no pattern"
+  },
+  "handle": {
+    "type": "lever-plate",
+    "orientation": "horizontal",
+    "finish": "steel",
+    "x": 0.848,
+    "y": 0.529,
+    "len_h": 0,
+    "w_w": 0.118
+  },
+  "lock": {
+    "present": true,
+    "kind": "keyhole-in-plate",
+    "x": 0.849,
+    "y": 0.558
+  },
+  "peephole": {
+    "present": true,
+    "x": 0.428,
+    "y": 0.21,
+    "dia_w": 0.034
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "side_why": "no hinge is visible from this face, so no side can be assigned"
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "deep brown box lining wrapping the full wall thickness",
+    "tiled lobby dado",
+    "large-format floor tile"
+  ],
+  "notes": "A deep box lining, not a flat frame: the head soffit alone is 0.26 of leaf width and the far (right) reveal collapses to 0.009 while the near (left) opens to 0.120 - a 13:1 split from a camera only slightly off centre. Both reveals are near-flat top to bottom (0.38 to 0.43), so the lining's darkness is geometry, not a falloff gradient."
+}

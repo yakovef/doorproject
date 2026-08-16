@@ -1,0 +1,147 @@
+{
+  "id": "d106",
+  "cat": "luxury",
+  "price": 8500,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.82,
+  "leaf": {
+    "x": 275,
+    "y": 148,
+    "w": 428,
+    "h": 1184
+  },
+  "colour": {
+    "hex": "#A6ADB5",
+    "ral_guess": "7001",
+    "family": "grey",
+    "lum": 172.1,
+    "rb": -15,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.26,
+    "profile": [
+      0.79,
+      0.94,
+      0.97,
+      0.99,
+      0.98,
+      0.98,
+      1.0,
+      1.0,
+      0.97
+    ]
+  },
+  "warmth": {
+    "top": -16,
+    "foot": -25
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#ACB3B6",
+    "face_vs_leaf": 1.03,
+    "reveal": {
+      "near_side": "right",
+      "near_w": 0.026,
+      "far_w": 0.007,
+      "head_w": 0.007,
+      "near_tone": 0.89,
+      "far_tone": 0.86,
+      "head_tone": 0.67,
+      "tone_top": 0.81,
+      "tone_bottom": 1.02
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "bead_why": "scanned both jambs at 5x: the leaf/frame joint is a plain 3-11 px shadow step straight onto a flat frame face - no narrow highlight peak anywhere along either arris"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.028,
+      "tone": 0.6,
+      "cast_note": "this is the unfilled construction gap between frame and blockwork rather than a true cast shadow; it reads as a black wedge 6 px wide at the head widening to 24 px at the foot"
+    },
+    "head_shadow": {
+      "depth_h": 0.003,
+      "tone": 0.67
+    },
+    "threshold": {
+      "present": true,
+      "kind": "aluminium",
+      "h_h": 0.019,
+      "tone": 0.58
+    },
+    "floor_contact": {
+      "tone": 0.37,
+      "height_h": 0.006
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "tall rectangle, upper two-thirds, moulded surround",
+    "rects": [
+      {
+        "x": 0.255,
+        "y": 0.079,
+        "w": 0.509,
+        "h": 0.518
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "other"
+  },
+  "handle": {
+    "type": "lever-plate",
+    "orientation": "horizontal",
+    "finish": "bronze",
+    "x": 0.911,
+    "y": 0.477,
+    "len_h": 0.108,
+    "w_w": 0.126
+  },
+  "lock": {
+    "present": true,
+    "kind": "cylinder in the same backplate",
+    "x": 0.92,
+    "y": 0.529
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "swept the full painted field at 5x - the only interruptions are the glazing, the backplate and the panel mouldings; no lens"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "handle at x 0.91 puts the hinges on the left stile, and that side shows only a 3 px joint - no knuckles project"
+  },
+  "detail": {
+    "panel": true,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "interlocking-circles ornamental grille in cream metal over the glazing",
+    "dark bronze lever on a long shaped backplate",
+    "moulded raised lower panel",
+    "moulded architrave around the glazing",
+    "steel fixing lugs still projecting from the frame into the blockwork",
+    "unfilled construction gap round the frame",
+    "dark anodised aluminium threshold profile",
+    "gravel and unfinished screed at the foot"
+  ],
+  "notes": "Newly installed, still on a building site. The leaf is sheared in the frame in the image: both stiles shift about 14 px left from head to foot and the bottom edge drops 27 px from left to right, so skew is 0.82 and the pixel bbox is the mid-height box. Geometric midpoint falls on glass; colour taken on the left stile at the same height (330,736). The frame is a flat band in the leaf colour (face_vs_leaf 1.03) with almost no recess - the reveal is only a 3 px joint on the far jamb and an 11 px chamfer on the near one."
+}

@@ -1,0 +1,136 @@
+{
+ "id": "d048",
+ "cat": "designed",
+ "price": 4800,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.84,
+ "leaf": {
+  "x": 358,
+  "y": 286,
+  "w": 438,
+  "h": 1126
+ },
+ "colour": {
+  "hex": "#232C3B",
+  "ral_guess": "5011",
+  "family": "blue",
+  "lum": 43.2,
+  "rb": -24,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 10.64,
+  "profile": [
+   1.0,
+   0.85,
+   0.66,
+   0.51,
+   0.4,
+   0.34,
+   0.31,
+   0.27,
+   0.09
+  ]
+ },
+ "warmth": {
+  "top": -24,
+  "foot": -12
+ },
+ "frame": {
+  "same_colour_as_leaf": true,
+  "hex": "#202734",
+  "face_vs_leaf": 0.89,
+  "reveal": {
+   "near_w": 0.053,
+   "far_w": 0.053,
+   "head_w": 0.068,
+   "near_tone": 0.32,
+   "far_tone": 0.27,
+   "head_tone": 0.53,
+   "tone_top": 0.92,
+   "tone_bottom": 0.13
+  },
+  "bead": {
+   "present": true,
+   "w": 0.014,
+   "tone": 0.76,
+   "side": "near"
+  },
+  "cast": {
+   "present": false,
+   "side": null,
+   "side_why": "no cast shadow - the wall is brightest right at the frame (lum 201 left / 191 right) and falls off away from it, so the frame throws nothing onto the plaster",
+   "w": null,
+   "w_why": "no cast shadow to measure",
+   "tone": null,
+   "tone_why": "no cast shadow to measure"
+  },
+  "head_shadow": {
+   "depth_h": 0.027,
+   "tone": 0.53
+  },
+  "threshold": {
+   "present": true,
+   "kind": "aluminium",
+   "h_h": 0.012,
+   "tone": 3.47
+  },
+  "floor_contact": {
+   "tone": 0.19,
+   "height_h": 0.037
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "solid panelled leaf, no glazing",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille"
+ },
+ "handle": {
+  "type": "lever-rose",
+  "orientation": "horizontal",
+  "finish": "steel",
+  "x": 0.066,
+  "y": 0.536,
+  "len_h": 0.0,
+  "w_w": 0.036
+ },
+ "lock": {
+  "present": true,
+  "kind": "round-escutcheon",
+  "x": 0.065,
+  "y": 0.59
+ },
+ "peephole": {
+  "present": true,
+  "x": 0.5,
+  "y": 0.267,
+  "dia_w": 0.027
+ },
+ "hinges": {
+  "visible": false,
+  "count": 0,
+  "side": null,
+  "side_why": "lever and cylinder are on the left so the hinges are on the right, but the right jamb shows no knuckles at 5x - fully concealed",
+  "y": []
+ },
+ "detail": {
+  "panel": true,
+  "groove": false,
+  "grooves": [],
+  "texture": "smooth"
+ },
+ "extras": [
+  "ring knocker on a diamond backplate with the peephole set inside the ring",
+  "coir WELCOME mat",
+  "framed painting on the adjacent corridor wall"
+ ],
+ "notes": "Strong keystone: the opening measures 602 px wide at y=320 and 504 px at y=1390, so leaf edges converge downward and all x fractions were taken against the LOCAL leaf width at each feature's height, not against the recorded bbox. Frame is the same navy as the leaf, so the whole assembly reads as one dark mass against white plaster. Steepest vertical falloff in the set - a corridor light directly above gives contrast 10.6, top of the leaf #616879 and the foot #0B0A17, and the near reveal follows it down from tone 0.92 at the top to 0.13 at the floor. Two raised moulded panels: upper y 0.09-0.61, lower y 0.71-0.91, both about x 0.24-0.77."
+}

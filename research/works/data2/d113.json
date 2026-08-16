@@ -1,0 +1,146 @@
+{
+  "id": "d113",
+  "cat": "luxury",
+  "price": 9500,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.9,
+  "leaf": {
+    "x": 336,
+    "y": 196,
+    "w": 556,
+    "h": 1213
+  },
+  "colour": {
+    "hex": "#C1BDB4",
+    "ral_guess": "1013",
+    "family": "cream",
+    "lum": 189.2,
+    "rb": 13,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.6,
+    "profile": [
+      0.63,
+      0.83,
+      0.94,
+      0.98,
+      0.99,
+      1.0,
+      1.0,
+      0.99,
+      0.98
+    ]
+  },
+  "warmth": {
+    "top": 39,
+    "foot": 12
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#D7D4CD",
+    "face_vs_leaf": 1.12,
+    "reveal": {
+      "near_side": "right",
+      "near_w": 0.095,
+      "far_w": 0.092,
+      "head_w": 0.209,
+      "near_tone": 0.94,
+      "far_tone": 1.11,
+      "head_tone": 0.76,
+      "tone_top": 0.78,
+      "tone_bottom": 0.97
+    },
+    "bead": {
+      "present": true,
+      "w": 0.009,
+      "tone": 1.18,
+      "side": "near"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.011,
+      "tone": 0.95,
+      "cast_note": "soft corner darkening where the rendered reveal box meets the grey stucco wall, not a hard cast edge"
+    },
+    "head_shadow": {
+      "depth_h": 0.004,
+      "tone": 0.65
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "threshold_why": "finished job but no threshold profile - the leaf closes onto a 4 px dark line and then straight onto the stone floor tiles"
+    },
+    "floor_contact": {
+      "tone": 0.37,
+      "height_h": 0.004
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "tall narrow rectangle, full height of the upper leaf, moulded surround",
+    "rects": [
+      {
+        "x": 0.334,
+        "y": 0.079,
+        "w": 0.331,
+        "h": 0.62
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "straight"
+  },
+  "handle": {
+    "type": "pull-bar",
+    "orientation": "vertical",
+    "finish": "black",
+    "x": 0.209,
+    "y": 0.463,
+    "len_h": 0.537,
+    "w_w": 0.027
+  },
+  "lock": {
+    "present": true,
+    "kind": "black smart-lock body with recessed thumb-pull and key cylinder",
+    "x": 0.055,
+    "y": 0.541
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "full-height glazed slot serves the same purpose; swept the painted field at 4x, only the bar and the lock body break it"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "pull bar and lock are both on the left, so hinges are on the right stile inside a 53 px lining; no knuckles visible"
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "long black tubular pull bar, 0.54 of leaf height",
+    "black electronic smart lock with key override",
+    "decorative mezuzah case fixed to the right lining",
+    "white straight muntins dividing the glazed slot",
+    "deep rendered reveal box: 116 px of soffit, 51-53 px linings both sides",
+    "grey textured stucco wall",
+    "stone floor tiles, no threshold"
+  ],
+  "notes": "Unusually symmetric reveal (near 0.095, far 0.092) because the camera is almost on the door axis; what differs is tone, not width - the left lining is lit to 1.11 and the right sits at 0.94. A clean bead runs down the inner arris of the frame face at tone 1.18. Geometric midpoint falls on glass, colour taken on the right stile at the same height (820,802). The face is a warm ivory (rb +13) and the head shadow drives the top row of the tone profile down to 0.63."
+}

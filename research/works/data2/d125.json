@@ -1,0 +1,146 @@
+{
+  "id": "d125",
+  "cat": "luxury",
+  "price": 14900,
+  "usable": true,
+  "view": "inside",
+  "skew": 0.89,
+  "leaf": {
+    "x": 88,
+    "y": 156,
+    "w": 434,
+    "h": 938
+  },
+  "colour": {
+    "hex": "#DDD6C6",
+    "ral_guess": "1015",
+    "family": "cream",
+    "lum": 214.3,
+    "rb": 23,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.12,
+    "profile": [
+      0.91,
+      0.95,
+      0.97,
+      0.97,
+      0.99,
+      1.0,
+      0.96,
+      0.93,
+      0.89
+    ]
+  },
+  "warmth": {
+    "top": 44,
+    "foot": 10
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#CCCABF",
+    "face_vs_leaf": 0.94,
+    "reveal": {
+      "near_side": "left",
+      "near_w": 0.025,
+      "far_w": 0.035,
+      "head_w": 0.06,
+      "near_tone": 0.77,
+      "far_tone": 0.51,
+      "head_tone": 0.59,
+      "tone_top": 0.77,
+      "tone_bottom": 0.4
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "bead_why": "the frame's whole visible face is a 5 px lit sliver, already recorded as frame.hex / face_vs_leaf; there is no separate highlight line inside the reveal"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.071,
+      "tone": 0.57,
+      "cast_note": "raw concrete of the hacked opening running in shadow beside the frame, 30 px at mid height narrowing to 8 px near the head"
+    },
+    "head_shadow": {
+      "depth_h": 0.005,
+      "tone": 0.63
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "threshold_why": "no threshold section: the leaves stop 5 px above brown paving with only a dark line between"
+    },
+    "floor_contact": {
+      "tone": 0.42,
+      "height_h": 0.005
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "very tall narrow rectangle, moulded surround, 0.76 of leaf height",
+    "rects": [
+      {
+        "x": 0.339,
+        "y": 0.124,
+        "w": 0.304,
+        "h": 0.76
+      }
+    ]
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "grille_why": "plain clear glazing - the street reads straight through it, no bars or muntins anywhere in the opening"
+  },
+  "handle": {
+    "type": "pull-bar",
+    "orientation": "vertical",
+    "finish": "steel",
+    "x": 0.841,
+    "y": 0.512,
+    "len_h": 0.409,
+    "w_w": 0.028
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.931,
+    "y": 0.608
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "a glazed lobby door with clear glass full height - swept both leaves at 7x, only the bar and the escutcheon interrupt the paint"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "checked the three dark marks on the right stile at 6x - they are the far leaf's glazing bead corners, not hinges; nothing projects past either leaf edge"
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "equal double leaves, both with brushed-steel vertical pull bars",
+    "moulded architrave around each glazed slot",
+    "clear unobscured glazing",
+    "hacked concrete opening, frame fixing straps still exposed",
+    "brown paver floor, no threshold"
+  ],
+  "notes": "Equal-leaf pair; the left leaf carries the lock escutcheon so it was measured as the leaf, its bounds ending at the meeting stile (x 522). far_w is therefore the opposite jamb of the same opening, which borders the other leaf. View is read as inside: a dark ceiling sits above the head and the street reads through the glazing; if that is wrong the record is still valid for colour and frame. Geometric midpoint falls on glass so colour was taken on paint at the same height (160,625). Warm ivory (rb +23) with a very flat tone profile."
+}

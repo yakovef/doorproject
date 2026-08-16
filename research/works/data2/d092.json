@@ -1,0 +1,145 @@
+{
+  "id": "d092",
+  "cat": "luxury",
+  "price": 6950,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.92,
+  "leaf": {
+    "x": 376,
+    "y": 742,
+    "w": 215,
+    "h": 533
+  },
+  "colour": {
+    "hex": "#678184",
+    "ral_guess": "7031",
+    "family": "green",
+    "lum": 123.7,
+    "rb": -29,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.18,
+    "profile": [
+      0.85,
+      0.96,
+      0.98,
+      0.98,
+      1.0,
+      1.0,
+      0.96,
+      0.94,
+      0.93
+    ]
+  },
+  "warmth": {
+    "top": -10,
+    "foot": -28
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#6C7267",
+    "face_vs_leaf": 0.9,
+    "reveal": {
+      "near_side": "right",
+      "near_w": 0.065,
+      "far_w": 0.037,
+      "head_w": 0.093,
+      "near_tone": 0.89,
+      "far_tone": 1.17,
+      "head_tone": 0.72,
+      "tone_top": 0.91,
+      "tone_bottom": 0.82
+    },
+    "bead": {
+      "present": true,
+      "w": 0.028,
+      "tone": 1.21,
+      "side": "far"
+    },
+    "cast": {
+      "present": false,
+      "side": null,
+      "w": null,
+      "tone": null,
+      "cast_why": "leaf sits inside a rough stone opening flush with the wall face; the frame projects nothing that could cast onto the stone"
+    },
+    "head_shadow": {
+      "depth_h": 0.019,
+      "tone": 0.36
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "threshold_why": "building still under construction - no threshold laid, leaf stops on bare rubble"
+    },
+    "floor_contact": {
+      "tone": 0.87,
+      "height_h": 0.008
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "tall rectangle, upper half",
+    "rects": [
+      {
+        "x": 0.237,
+        "y": 0.075,
+        "w": 0.493,
+        "h": 0.471
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "scroll"
+  },
+  "handle": {
+    "type": "knob",
+    "orientation": "none",
+    "finish": "bronze",
+    "x": 0.933,
+    "y": 0.478,
+    "len_h": 0.0,
+    "w_w": 0.067
+  },
+  "lock": {
+    "present": true,
+    "kind": "keyhole in long bronze backplate",
+    "x": 0.935,
+    "y": 0.527
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "glazed upper half makes one unnecessary; none visible anywhere on the leaf at 9x zoom"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "hinge stile is the left one and is buried in the stone reveal; no knuckles break the silhouette"
+  },
+  "detail": {
+    "panel": true,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "rough limestone block surround",
+    "ornamental wrought-iron scrollwork over the glazing",
+    "bronze knob-and-keyhole backplate",
+    "moulded raised lower panel",
+    "moulded architrave around the glazing",
+    "no threshold - bare construction rubble at the foot"
+  ],
+  "notes": "Leaf midpoint falls on glass, so colour was sampled on the paint of the rail between glazing and lower panel (480,1058). The frame is almost entirely swallowed by the stone opening: on the left only a 6 px lit sliver of frame shows (recorded as the bead, tone 1.21), on the right a 14 px shadowed return. near_side records which jamb the wide reveal is on."
+}

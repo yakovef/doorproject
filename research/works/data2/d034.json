@@ -1,0 +1,139 @@
+{
+ "id": "d034",
+ "cat": "designed",
+ "price": 4300,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.97,
+ "leaf": {
+  "x": 198,
+  "y": 167,
+  "w": 526,
+  "h": 1240
+ },
+ "colour": {
+  "hex": "#837F7C",
+  "ral_guess": "7037",
+  "family": "grey",
+  "lum": 127.6,
+  "rb": 7,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 1.87,
+  "profile": [
+   0.53,
+   0.73,
+   0.9,
+   0.98,
+   1.0,
+   0.98,
+   0.87,
+   0.7,
+   0.59
+  ]
+ },
+ "warmth": {
+  "top": 7,
+  "foot": -7
+ },
+ "frame": {
+  "same_colour_as_leaf": true,
+  "hex": "#7F7B76",
+  "face_vs_leaf": 0.97,
+  "reveal": {
+   "near_w": 0.04,
+   "far_w": 0.042,
+   "head_w": 0.099,
+   "near_tone": 0.45,
+   "far_tone": 0.38,
+   "head_tone": 0.2,
+   "tone_top": 0.46,
+   "tone_bottom": 0.32
+  },
+  "bead": {
+   "present": true,
+   "w": 0.004,
+   "tone": 1.07,
+   "side": "near"
+  },
+  "cast": {
+   "present": true,
+   "side": "right",
+   "w": 0.029,
+   "tone": 0.71
+  },
+  "head_shadow": {
+   "depth_h": 0.042,
+   "tone": 0.2
+  },
+  "threshold": {
+   "present": true,
+   "kind": "concrete",
+   "h_h": 0.038,
+   "tone": 1.13
+  },
+  "floor_contact": {
+   "tone": 0.49,
+   "height_h": 0.016
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "solid leaf, no glazing",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille"
+ },
+ "handle": {
+  "type": "pull-bar",
+  "orientation": "vertical",
+  "finish": "steel",
+  "x": 0.24,
+  "y": 0.504,
+  "len_h": 0.544,
+  "w_w": 0.051
+ },
+ "lock": {
+  "present": true,
+  "kind": "round-escutcheon",
+  "x": 0.055,
+  "y": 0.568
+ },
+ "peephole": {
+  "present": true,
+  "x": 0.5,
+  "y": 0.214,
+  "dia_w": 0.034
+ },
+ "hinges": {
+  "visible": false,
+  "count": 0,
+  "side": null,
+  "side_why": "pull bar and cylinder are on the left so the hinges are on the right, but at 1.7x the right jamb shows only the frame face and a galvanised wall strap - no knuckles",
+  "y": []
+ },
+ "detail": {
+  "panel": false,
+  "groove": true,
+  "grooves": [
+   {
+    "orientation": "vertical",
+    "x": 0.677,
+    "count": 1
+   }
+  ],
+  "texture": "smooth"
+ },
+ "extras": [
+  "galvanised installation straps still bolted to both jambs",
+  "loose aluminium threshold angle lying at the base",
+  "unfinished opening - raw concrete sill and unpointed stone reveal"
+ ],
+ "notes": "Most symmetric frame in the set after d072: 21 px near reveal against 22 px far, 45 px and 35 px of frame face, and the frame paint is within 4 lum of the leaf (0.97) so the whole opening reads as one grey. Light bows rather than falls: the tone profile peaks at mid height (1.00) and drops to 0.53 at the head and 0.59 at the foot. One fine vertical groove at x 0.68 running y 0.06 to 0.89, and a flat pale pull bar at x 0.24 whose highlight clips to #FFFAF5, so its finish is inferred as brushed steel rather than measured. The 15 px dark band on the right is the unfilled construction joint between frame and stone, not a thrown shadow."
+}

@@ -1,0 +1,146 @@
+{
+  "id": "d099",
+  "cat": "luxury",
+  "price": 7500,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.95,
+  "leaf": {
+    "x": 110,
+    "y": 490,
+    "w": 319,
+    "h": 774
+  },
+  "colour": {
+    "hex": "#6B6362",
+    "ral_guess": "8019",
+    "family": "brown",
+    "lum": 100.6,
+    "rb": 9,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.53,
+    "profile": [
+      0.88,
+      1.0,
+      1.0,
+      0.98,
+      0.86,
+      0.84,
+      0.76,
+      0.69,
+      0.66
+    ]
+  },
+  "warmth": {
+    "top": 8,
+    "foot": 6
+  },
+  "frame": {
+    "same_colour_as_leaf": false,
+    "hex": "#A0675B",
+    "face_vs_leaf": 1.14,
+    "reveal": {
+      "near_side": "left",
+      "near_w": 0.1,
+      "far_w": 0.034,
+      "head_w": 0.063,
+      "near_tone": 0.67,
+      "far_tone": 0.52,
+      "head_tone": 0.26,
+      "tone_top": 0.82,
+      "tone_bottom": 0.56
+    },
+    "bead": {
+      "present": true,
+      "w": 0.013,
+      "tone": 0.91,
+      "side": "near",
+      "bead_note": "a 4 px lit arris inside the near reveal, not brighter than the leaf face"
+    },
+    "cast": {
+      "present": false,
+      "side": null,
+      "w": null,
+      "tone": null,
+      "cast_why": "stucco wall runs at luminance 242 right up to the last pixel of the timber casing - no measurable darkening, the assembly is flush and the light is diffuse"
+    },
+    "head_shadow": {
+      "depth_h": 0.026,
+      "tone": 0.25
+    },
+    "threshold": {
+      "present": true,
+      "kind": "aluminium",
+      "h_h": 0.006,
+      "tone": 1.35
+    },
+    "floor_contact": {
+      "tone": 0.57,
+      "height_h": 0.005
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "tall rectangle, upper two-thirds, moulded surround",
+    "rects": [
+      {
+        "x": 0.307,
+        "y": 0.103,
+        "w": 0.429,
+        "h": 0.454
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "lattice"
+  },
+  "handle": {
+    "type": "lever-rose",
+    "orientation": "horizontal",
+    "finish": "black",
+    "x": 0.053,
+    "y": 0.483,
+    "len_h": 0.0,
+    "w_w": 0.066,
+    "w_w_note": "w_w is the hardware footprint across the leaf - here the rose diameter"
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.053,
+    "y": 0.528
+  },
+  "peephole": {
+    "present": true,
+    "x": 0.193,
+    "y": 0.256,
+    "dia_w": 0.03
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "hinges are on the right stile, hidden in the 11 px far reveal; nothing breaks the silhouette at 6x"
+  },
+  "detail": {
+    "panel": true,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "full-height glazed sidelight with wrought-iron scrollwork (right of leaf)",
+    "four-panel glazed transom with scrollwork over the whole opening",
+    "mahogany-stained timber casing, different colour from the leaf",
+    "cast-iron decorative horizontal pull bar (x 0.31-0.71, y 0.59)",
+    "wrought-iron scroll motif set into the lower third of the leaf glazing",
+    "moulded raised lower panel",
+    "aluminium threshold strip"
+  ],
+  "notes": "The leaf is only the left element of a door+sidelight+transom set; leaf bounds exclude the sidelight. The geometric leaf midpoint falls on glass, so colour was taken on paint at the same height (175,877). The leaf carries two handles: an operating black lever-rose at 0.48 height and a separate decorative horizontal pull bar lower down, recorded in extras. Timber casing is mahogany (#A0675B) against a taupe leaf, so same_colour_as_leaf is false."
+}

@@ -1,0 +1,172 @@
+{
+  "cat": "basic",
+  "n": 10,
+  "price_range": [
+    3195,
+    4050
+  ],
+  "colours": {
+    "grey": 3,
+    "brown": 3,
+    "white": 2,
+    "anthracite": 2
+  },
+  "ral_guesses": {
+    "7022": 2,
+    "7004": 1,
+    "7040": 1,
+    "7047": 1,
+    "7037": 1,
+    "7009": 1,
+    "3005": 1,
+    "7038": 1,
+    "8011": 1
+  },
+  "frame_same_colour_as_leaf": 10,
+  "frame_face_vs_leaf": {
+    "median": 1.02,
+    "min": 0.82,
+    "max": 1.41
+  },
+  "near_far_convention": "near = the jamb whose reveal the camera looks into, i.e. the wider of the two; far = the opposite jamb. Assigned per door from the measured band widths, cross-checked against the vanishing point of the head and threshold lines.",
+  "reveal_near_w": {
+    "median": 0.051,
+    "min": 0.01,
+    "max": 0.12
+  },
+  "reveal_near_tone": {
+    "median": 0.68,
+    "min": 0.413,
+    "max": 1.285
+  },
+  "reveal_far_w": {
+    "median": 0.031,
+    "min": 0.009,
+    "max": 0.044
+  },
+  "reveal_far_tone": {
+    "median": 0.792,
+    "min": 0.163,
+    "max": 1.003
+  },
+  "reveal_head_w": {
+    "median": 0.074,
+    "min": 0.037,
+    "max": 0.26
+  },
+  "reveal_head_tone": {
+    "median": 0.696,
+    "min": 0.299,
+    "max": 0.966
+  },
+  "reveal_asymmetry": 1.42,
+  "reveal_asymmetry_range": [
+    1.12,
+    13.33
+  ],
+  "reveal_tone_top": {
+    "median": 1.0,
+    "min": 0.28,
+    "max": 1.59
+  },
+  "reveal_tone_bottom": {
+    "median": 0.53,
+    "min": 0.32,
+    "max": 0.91
+  },
+  "bead_present": 7,
+  "cast_present": 10,
+  "cast_tone": {
+    "median": 0.79,
+    "min": 0.37,
+    "max": 0.96
+  },
+  "head_shadow_tone": {
+    "median": 1.13,
+    "min": 0.47,
+    "max": 2.97
+  },
+  "head_returns_light": 5,
+  "threshold_kinds": {
+    "aluminium": 5,
+    "none (leaf lands on step or paving)": 3,
+    "brass strip": 1,
+    "stone sill": 1
+  },
+  "floor_contact_tone": {
+    "median": 0.51,
+    "min": 0.27,
+    "max": 1.08
+  },
+  "leaf_contrast": {
+    "median": 1.75,
+    "min": 1.24,
+    "max": 6.66
+  },
+  "skew": {
+    "median": 0.92,
+    "min": 0.82,
+    "max": 0.97
+  },
+  "handles": {
+    "lever-plate": 5,
+    "lever-rose": 3,
+    "knob": 2
+  },
+  "handle_finishes": {
+    "steel": 5,
+    "brass": 4,
+    "chrome": 1
+  },
+  "handle_y": {
+    "median": 0.53,
+    "min": 0.504,
+    "max": 0.601
+  },
+  "handle_side": {
+    "lock-left": 6,
+    "lock-right": 4
+  },
+  "locks": {
+    "keyhole-in-plate": 5,
+    "round-escutcheon": 4,
+    "cylinder-in-plate": 1
+  },
+  "windows": 0,
+  "grilles": 0,
+  "panels": 0,
+  "grooves": 4,
+  "peepholes": 9,
+  "peephole_x": {
+    "median": 0.499,
+    "min": 0.428,
+    "max": 0.547
+  },
+  "peephole_y": {
+    "median": 0.233,
+    "min": 0.202,
+    "max": 0.271
+  },
+  "hinges_visible": 1,
+  "vocabulary": [
+    "peephole",
+    "mezuzah case",
+    "engraved brass nameplate",
+    "house number on the wall",
+    "ribbed aluminium sill",
+    "brass threshold strip",
+    "stone or terrazzo step",
+    "galvanised frame fixing lugs still exposed",
+    "key left in the cylinder",
+    "surface-mounted overhead closer",
+    "barrel hinges",
+    "coir doormat",
+    "intercom and meter plates",
+    "tiled or marble stairwell dado",
+    "stepped moulded architrave",
+    "deep box lining",
+    "potted plant",
+    "unfinished rubble sill trench"
+  ],
+  "characteristic": "A basic door is one flat sheet with nothing applied to it: across all ten there is not a single window, grille, raised panel, inlay or piece of ironwork, and the only marks on the leaf are a peephole sitting at x 0.50 +/- 0.04, y 0.23 +/- 0.03 and one handle set at y 0.53 with its lock directly beneath - four of the ten add nothing more than a shallow perimeter or foot groove. What the tier does have is a frame painted the same colour as the leaf in ten cases out of ten and reading within 2% of its luminance, so the opening is legible only through geometry and shading: a near reveal of 0.051 of leaf width against a far reveal of 0.031, that near reveal falling from 1.00 at the head to 0.53 at the foot, and a floor contact line at 0.51 that is usually the darkest value on the door. Money in this tier buys hardware and installation, not shape - the cheapest two doors carry the same plain leaf as the dearest, and what changes with price is a lever-on-rose becoming a lever-on-plate, a raw concrete step becoming an aluminium or brass sill, and fixing lugs disappearing behind finished plaster."
+}

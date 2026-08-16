@@ -1,0 +1,172 @@
+{
+ "id": "d064",
+ "cat": "designed",
+ "price": 5200,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.96,
+ "leaf": {
+  "x": 242,
+  "y": 259,
+  "w": 456,
+  "h": 1156
+ },
+ "colour": {
+  "hex": "#524E4D",
+  "ral_guess": "7022",
+  "family": "anthracite",
+  "lum": 78.8,
+  "rb": 5,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 2.98,
+  "profile": [
+   0.98,
+   1.0,
+   0.92,
+   0.81,
+   0.72,
+   0.61,
+   0.52,
+   0.38,
+   0.34
+  ]
+ },
+ "warmth": {
+  "top": -13,
+  "foot": 2
+ },
+ "frame": {
+  "same_colour_as_leaf": true,
+  "hex": "#48494B",
+  "face_vs_leaf": 0.93,
+  "reveal": {
+   "near_w": 0.031,
+   "far_w": 0.024,
+   "head_w": 0.07,
+   "near_tone": 0.46,
+   "far_tone": 0.38,
+   "head_tone": 0.36,
+   "tone_top": 0.92,
+   "tone_bottom": 0.32
+  },
+  "bead": {
+   "present": false,
+   "w": null,
+   "w_why": "no bead - at 1 px resolution the wall drops from lum 185 straight to the frame face at 68 on the left and 71 to 122 on the right; the frame has no lit arris",
+   "tone": null,
+   "tone_why": "no bead present",
+   "side": null,
+   "side_why": "no bead present"
+  },
+  "cast": {
+   "present": true,
+   "side": "right",
+   "w": 0.024,
+   "tone": 2.01
+  },
+  "head_shadow": {
+   "depth_h": 0.028,
+   "tone": 0.36
+  },
+  "threshold": {
+   "present": true,
+   "kind": "stone",
+   "h_h": 0.05,
+   "tone": 1.9
+  },
+  "floor_contact": {
+   "tone": 0.64,
+   "height_h": 0.016
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "solid leaf, no glazing",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille"
+ },
+ "handle": {
+  "type": "lever-rose",
+  "orientation": "horizontal",
+  "finish": "steel",
+  "x": 0.934,
+  "y": 0.512,
+  "len_h": 0.0,
+  "w_w": 0.035
+ },
+ "lock": {
+  "present": true,
+  "kind": "round-escutcheon",
+  "x": 0.919,
+  "y": 0.565
+ },
+ "peephole": {
+  "present": true,
+  "x": 0.478,
+  "y": 0.219,
+  "dia_w": 0.037
+ },
+ "hinges": {
+  "visible": false,
+  "count": 0,
+  "side": null,
+  "side_why": "lever and cylinder are on the right so the hinges are on the left, but the left reveal is a flat 14 px shadow with no knuckles at 2.2x",
+  "y": []
+ },
+ "detail": {
+  "panel": false,
+  "groove": true,
+  "grooves": [
+   {
+    "orientation": "horizontal",
+    "y": 0.084,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.27,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.322,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.501,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.671,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.72,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.893,
+    "count": 1
+   }
+  ],
+  "texture": "smooth"
+ },
+ "extras": [
+  "dark mezuzah case with gilt lettering on the lock stile at y 0.19",
+  "coir mat",
+  "patterned ceramic dado tiles beside the opening"
+ ],
+ "notes": "The seven horizontal lines are applied brushed-steel inlay strips, not milled grooves - about 8 px tall and 2x the luminance of the face. They are deliberately STAGGERED: all seven start flush at the leaf's left edge, the top one (y 0.08) and bottom one (y 0.89) run nearly the full width, and the five between them stop at roughly x 0.51 to 0.74 in a ragged pattern. Frame is a plain flat casing the same anthracite as the leaf with no bead at all; the reveals are shallow (14 px near / 11 px far) but the head soffit is 32 px at tone 0.36. The only bright thing on the wall side is an 11 px occlusion gradient to the right of the frame."
+}

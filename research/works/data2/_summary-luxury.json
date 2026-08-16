@@ -1,0 +1,168 @@
+{
+  "cat": "luxury",
+  "n": 10,
+  "price_range": [
+    6950,
+    15500
+  ],
+  "colours": {
+    "white": 3,
+    "grey": 2,
+    "cream": 2,
+    "green": 1,
+    "brown": 1,
+    "blue": 1
+  },
+  "colour_lum": {
+    "median": 174.8,
+    "min": 100.6,
+    "max": 214.3
+  },
+  "colour_rb": {
+    "median": 7.5,
+    "min": -30,
+    "max": 23
+  },
+  "frame_same_colour_as_leaf": 9,
+  "frame_face_vs_leaf": {
+    "median": 1.035,
+    "min": 0.8,
+    "max": 1.16
+  },
+  "reveal_near_w": {
+    "median": 0.082,
+    "min": 0.025,
+    "max": 0.106
+  },
+  "reveal_far_w": {
+    "median": 0.043,
+    "min": 0.006,
+    "max": 0.092
+  },
+  "reveal_near_tone": {
+    "median": 0.83,
+    "min": 0.44,
+    "max": 0.99
+  },
+  "reveal_far_tone": {
+    "median": 0.92,
+    "min": 0.51,
+    "max": 1.17
+  },
+  "reveal_head_w": {
+    "median": 0.131,
+    "min": 0.007,
+    "max": 0.209
+  },
+  "reveal_head_tone": {
+    "median": 0.67,
+    "min": 0.26,
+    "max": 0.92
+  },
+  "reveal_asymmetry": 1.62,
+  "reveal_tone_top_vs_bottom": {
+    "tone_top": {
+      "median": 0.815,
+      "min": 0.47,
+      "max": 1.05
+    },
+    "tone_bottom": {
+      "median": 0.77,
+      "min": 0.35,
+      "max": 1.02
+    }
+  },
+  "bead_present": 3,
+  "cast_present": 6,
+  "head_shadow_tone": {
+    "median": 0.525,
+    "min": 0.25,
+    "max": 0.97
+  },
+  "threshold_present": 2,
+  "floor_contact_tone": {
+    "median": 0.395,
+    "min": 0.09,
+    "max": 0.87
+  },
+  "tone_contrast": {
+    "median": 1.29,
+    "min": 1.08,
+    "max": 1.87
+  },
+  "handles": {
+    "pull-bar": 4,
+    "lever-rose": 3,
+    "lever-plate": 2,
+    "knob": 1
+  },
+  "handle_finishes": {
+    "bronze": 3,
+    "black": 3,
+    "chrome": 2,
+    "steel": 2
+  },
+  "windows": 10,
+  "grilles": 9,
+  "grille_patterns": {
+    "lattice": 4,
+    "scroll": 3,
+    "other": 1,
+    "straight": 1
+  },
+  "peepholes": 1,
+  "hinges_visible": 0,
+  "panelled": 7,
+  "multi_leaf_sets": 5,
+  "vocabulary_counts": {
+    "moulded raised panel": 6,
+    "moulded architrave around the glazing": 6,
+    "ornamental ironwork / scroll motifs in the glazing": 6,
+    "unfinished site around the door (rubble, screed, void, exposed lugs or conduit)": 6,
+    "deep rendered reveal box or porch lining": 5,
+    "sidelight, fixed narrow second leaf, or equal double leaves": 5,
+    "bronze or copper hardware on a long shaped backplate": 3,
+    "second decorative pull bar in addition to the operating handle": 2,
+    "obscured / reeded privacy glass": 2,
+    "glazed transom over the whole opening": 1,
+    "rough limestone block surround": 1,
+    "mahogany timber casing in a different colour from the leaf": 1,
+    "applied classical mouldings (dentil cornice, console brackets, plinth block)": 1,
+    "interlocking-circles metal grille": 1,
+    "electronic smart lock": 1,
+    "mezuzah case on the lining": 1,
+    "perforated metal pergola overhead": 1,
+    "photographer's shadow falling across the leaf": 1
+  },
+  "vocabulary": [
+    "moulded raised panel",
+    "moulded architrave around glazing",
+    "wrought-iron scrollwork in the glazing",
+    "sidelight / fixed second leaf / double leaves",
+    "deep rendered reveal box",
+    "glazed transom",
+    "stone block surround",
+    "mahogany timber casing",
+    "applied classical mouldings (cornice, consoles, plinth)",
+    "interlocking-circles metal grille",
+    "reeded privacy glass",
+    "second decorative pull bar",
+    "bronze backplate handle",
+    "electronic smart lock",
+    "mezuzah case",
+    "metal pergola",
+    "exposed frame fixing lugs",
+    "unfilled construction gap",
+    "aluminium threshold strip"
+  ],
+  "conventions": {
+    "reveal": "near_* / far_* name the two jambs of the opening; reveal.near_side records which physical side (left|right) near_* refers to. near is the jamb the camera sees into - the one showing a visible lining or return - except on multi-leaf sets, where near is the jamb that actually borders the MEASURED leaf and far is the opening's other jamb (which borders the sidelight or second leaf). d116, d125, d128 and d122 are the multi-leaf cases; d125 is the one door where far_w exceeds near_w.",
+    "reveal_width": "the reveal is the recessed band between the leaf face and the outer frame face - a lining, return or joint. The frame's own flat face is NOT counted in it; that is frame.hex / frame.face_vs_leaf.",
+    "handle_w_w": "w_w is the hardware's footprint across the leaf: rose diameter for a lever-rose, backplate width for a lever-plate, bar thickness for a pull-bar, knob diameter for a knob.",
+    "handle_len_h": "0 for rose and knob types; for lever-plate it is the backplate's vertical extent; for pull-bar it is the bar length.",
+    "colour_sampling": "all ten leaves are glazed and on nine of them the geometric midpoint falls on glass or on an applied moulding, so colour.hex was taken from a 40x40 median on plain paint at the same height. Each record's notes give the exact pixel used.",
+    "tone_reference": "every *_tone is luminance divided by the luminance of that colour sample."
+  },
+  "characteristic": "Every luxury door in this ten is glazed - ten windows, nine of them filled with ornamental metalwork (wrought-iron scrolls, quatrefoils, interlocking circles) rather than plain bars - and half of them are not a single leaf at all but a set: a sidelight, a fixed narrow second leaf, an equal pair, or a transom. Colour is the opposite of dramatic: eight of the ten are white, cream, or a near-neutral grey (median lum 175, median rb +7.5), so the money goes into relief and hardware - six leaves carry moulded raised panels, six a moulded architrave around the glazing, three a bronze or copper backplate, and two a second purely decorative pull bar beside the working handle. The frame is the real tell: instead of the flat casing of the cheaper tiers these sit in deep rendered reveal boxes (median head soffit 0.13 of leaf width, up to 0.21) with a lining on the near jamb of median 0.082 leaf-widths against 0.043 on the far - an asymmetry of 1.6 - and the frame is painted the leaf colour on nine of ten (median face 1.04x the leaf), so all the frame modelling comes from tone, not hue.",
+  "notes": "Six of the ten were photographed on live building sites: eight have no threshold at all (only d099 and d106 have a profile), and the foot of the leaf usually meets rubble, screed, membrane or an open void, so floor_contact tone ranges 0.09-0.87. Hinges are visible on none of the ten. Only one peephole in the tier (d099) - a full-height glazed panel replaces it. Features named but deliberately not measured are listed per record in extras."
+}

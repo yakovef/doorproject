@@ -1,0 +1,135 @@
+{
+  "id": "d003",
+  "cat": "basic",
+  "price": 3195,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.92,
+  "leaf": {
+    "x": 326,
+    "y": 140,
+    "w": 489,
+    "h": 1265
+  },
+  "colour": {
+    "hex": "#59564F",
+    "ral_guess": "7009",
+    "family": "anthracite",
+    "lum": 86.1,
+    "rb": 10,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.77,
+    "profile": [
+      0.57,
+      0.69,
+      0.77,
+      0.8,
+      0.82,
+      0.85,
+      0.93,
+      1.0,
+      0.94
+    ]
+  },
+  "warmth": {
+    "top": 1,
+    "foot": -19
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#575654",
+    "face_vs_leaf": 1.0,
+    "reveal": {
+      "near_w": 0.022,
+      "near_tone": 0.472,
+      "far_w": 0.018,
+      "far_tone": 0.742,
+      "head_w": 0.047,
+      "head_tone": 0.299,
+      "tone_top": 0.284,
+      "tone_bottom": 0.547
+    },
+    "bead": {
+      "present": true,
+      "w": 0.012,
+      "tone": 0.853,
+      "side": "near"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.037,
+      "tone": 0.823
+    },
+    "head_shadow": {
+      "depth_h": 0.042,
+      "tone": 0.465
+    },
+    "threshold": {
+      "present": true,
+      "kind": "aluminium",
+      "h_h": 0.006,
+      "tone": 2.093
+    },
+    "floor_contact": {
+      "tone": 1.077,
+      "height_h": 0.005
+    }
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "shape": null,
+    "rects": [],
+    "shape_why": "no glazing on this leaf, so there is no shape"
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "pattern_why": "no grille on this leaf, so there is no pattern"
+  },
+  "handle": {
+    "type": "lever-plate",
+    "orientation": "horizontal",
+    "finish": "brass",
+    "x": 0.927,
+    "y": 0.543,
+    "len_h": 0,
+    "w_w": 0.112
+  },
+  "lock": {
+    "present": true,
+    "kind": "keyhole-in-plate",
+    "x": 0.935,
+    "y": 0.568
+  },
+  "peephole": {
+    "present": true,
+    "x": 0.509,
+    "y": 0.243,
+    "dia_w": 0.033
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "side_why": "no hinge is visible from this face, so no side can be assigned"
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "white plastered reveal around a dark frame",
+    "potted plant crowding the far jamb",
+    "intercom and meter plates flanking the opening",
+    "house number 5 on the left wall",
+    "terrazzo paving"
+  ],
+  "notes": "The near (right) reveal brightens toward the floor - 0.28 at the top, 0.55 at the foot - because the pale terrazzo bounces light back up into the recess, the reverse of the usual darkening. The bead on that jamb reads 0.85 of the leaf midpoint and is bright only relative to the shaded leaf edge beside it (0.34x), so it has to be drawn as a local step, not an absolute highlight."
+}

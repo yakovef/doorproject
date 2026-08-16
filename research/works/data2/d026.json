@@ -1,0 +1,137 @@
+{
+  "id": "d026",
+  "cat": "basic",
+  "price": 3750,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.97,
+  "leaf": {
+    "x": 344,
+    "y": 180,
+    "w": 483,
+    "h": 1212
+  },
+  "colour": {
+    "hex": "#A2A7AD",
+    "ral_guess": "7040",
+    "family": "grey",
+    "lum": 166.4,
+    "rb": -11,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.33,
+    "profile": [
+      0.97,
+      1.0,
+      0.98,
+      0.96,
+      0.94,
+      0.91,
+      0.87,
+      0.83,
+      0.75
+    ]
+  },
+  "warmth": {
+    "top": -12,
+    "foot": -21
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#A8ADB1",
+    "face_vs_leaf": 1.04,
+    "reveal": {
+      "near_w": 0.037,
+      "near_tone": 0.573,
+      "far_w": 0.033,
+      "far_tone": 0.766,
+      "head_w": 0.124,
+      "head_tone": 0.551,
+      "tone_top": 0.57,
+      "tone_bottom": 0.529
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "w_why": "no lit arris anywhere on either jamb; frame face, reveal and leaf all read as three flat greys with a hard step between them, no highlight line at any of the three edges",
+      "tone_why": "no lit arris anywhere on either jamb; frame face, reveal and leaf all read as three flat greys with a hard step between them, no highlight line at any of the three edges",
+      "side_why": "no lit arris anywhere on either jamb; frame face, reveal and leaf all read as three flat greys with a hard step between them, no highlight line at any of the three edges"
+    },
+    "cast": {
+      "present": true,
+      "side": "right",
+      "w": 0.019,
+      "tone": 0.37
+    },
+    "head_shadow": {
+      "depth_h": 0.04,
+      "tone": 0.909
+    },
+    "threshold": {
+      "present": true,
+      "kind": "aluminium",
+      "h_h": 0.036,
+      "tone": 0.594
+    },
+    "floor_contact": {
+      "tone": 0.508,
+      "height_h": 0.007
+    }
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "shape": null,
+    "rects": [],
+    "shape_why": "no glazing on this leaf, so there is no shape"
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "pattern_why": "no grille on this leaf, so there is no pattern"
+  },
+  "handle": {
+    "type": "lever-rose",
+    "orientation": "horizontal",
+    "finish": "brass",
+    "x": 0.077,
+    "y": 0.524,
+    "len_h": 0,
+    "w_w": 0.079
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.07,
+    "y": 0.578
+  },
+  "peephole": {
+    "present": true,
+    "x": 0.509,
+    "y": 0.226,
+    "dia_w": 0.037
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "side_why": "no hinge is visible from this face, so no side can be assigned"
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "galvanised frame fixing lugs still exposed",
+    "ribbed aluminium sill",
+    "small metal stud near top of leaf",
+    "raw concrete step"
+  ],
+  "notes": "Nearly square-on, so the two jamb reveals are almost equal (0.039 vs 0.035); the asymmetry that matters here is vertical - the head soffit reads 0.135 of leaf width because the camera is far below the lintel, three to four times either jamb. The ribbed sill medians dark (0.6) but its rib crowns spike above 1.4, so it must be drawn striped, not as a flat bright bar."
+}

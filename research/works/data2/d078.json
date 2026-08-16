@@ -1,0 +1,191 @@
+{
+ "id": "d078",
+ "cat": "designed",
+ "price": 5900,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.96,
+ "leaf": {
+  "x": 325,
+  "y": 157,
+  "w": 561,
+  "h": 1371
+ },
+ "colour": {
+  "hex": "#666A6D",
+  "ral_guess": "7012",
+  "family": "grey",
+  "lum": 105.4,
+  "rb": -7,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 3.43,
+  "profile": [
+   1.0,
+   0.91,
+   0.76,
+   0.65,
+   0.54,
+   0.44,
+   0.38,
+   0.33,
+   0.29
+  ]
+ },
+ "warmth": {
+  "top": -18,
+  "foot": 10
+ },
+ "frame": {
+  "same_colour_as_leaf": true,
+  "hex": "#616264",
+  "face_vs_leaf": 0.93,
+  "reveal": {
+   "near_w": 0.046,
+   "far_w": 0.005,
+   "head_w": 0.118,
+   "near_tone": 0.75,
+   "far_tone": 0.74,
+   "head_tone": 0.73,
+   "tone_top": 1.14,
+   "tone_bottom": 0.46
+  },
+  "bead": {
+   "present": true,
+   "w": 0.011,
+   "tone": 0.86,
+   "side": "near"
+  },
+  "cast": {
+   "present": true,
+   "side": "left",
+   "w": 0.071,
+   "tone": 1.23
+  },
+  "head_shadow": {
+   "depth_h": 0.048,
+   "tone": 0.73
+  },
+  "threshold": {
+   "present": false,
+   "kind": null,
+   "kind_why": "no sill strip - at 4x the leaf runs into a 17 px shadow gap and then straight onto poured terrazzo",
+   "h_h": null,
+   "h_h_why": "no threshold present",
+   "tone": null,
+   "tone_why": "no threshold present"
+  },
+  "floor_contact": {
+   "tone": 0.2,
+   "height_h": 0.012
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "solid leaf, no glazing",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille"
+ },
+ "handle": {
+  "type": "pull-bar",
+  "orientation": "vertical",
+  "finish": "steel",
+  "x": 0.239,
+  "y": 0.484,
+  "len_h": 0.322,
+  "w_w": 0.039
+ },
+ "lock": {
+  "present": true,
+  "kind": "round-escutcheon",
+  "x": 0.07,
+  "y": 0.555
+ },
+ "peephole": {
+  "present": true,
+  "x": 0.492,
+  "y": 0.217,
+  "dia_w": 0.036
+ },
+ "hinges": {
+  "visible": false,
+  "count": 0,
+  "side": null,
+  "side_why": "knob and cylinder sit on the left so the hinges are on the right; the right jamb was cropped at 4x and shows no knuckles",
+  "y": []
+ },
+ "detail": {
+  "panel": false,
+  "groove": true,
+  "grooves": [
+   {
+    "orientation": "horizontal",
+    "y": 0.021,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.076,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.156,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.235,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.342,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.485,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.626,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.73,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.81,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.889,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.944,
+    "count": 1
+   }
+  ],
+  "texture": "smooth"
+ },
+ "extras": [
+  "fixed satin ball knob at x 0.08, y 0.50",
+  "stone-faced opening, left jamb returns in shade"
+ ],
+ "notes": "The eleven horizontal lines are APPLIED polished-stainless inlay strips, not milled grooves - they read brighter than the face around them (1.1x at the lit top, 1.4x at the shaded foot), the opposite of a groove, and each is about 8 px tall. Their spacing is deliberately graduated and symmetric about mid height: gaps of 0.055, 0.080, 0.079, 0.107, 0.143, 0.141, 0.104, 0.080, 0.079, 0.055 of leaf height. Near jamb is the LEFT one - the camera sits right of the axis so the left reveal opens to 26 px while the right is a 3 px line. The handle is a bowed tube: its ends sit at x 0.17 and its belly reaches x 0.31."
+}

@@ -1,0 +1,133 @@
+{
+  "id": "d015",
+  "cat": "basic",
+  "price": 3500,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.93,
+  "leaf": {
+    "x": 332,
+    "y": 209,
+    "w": 523,
+    "h": 1258
+  },
+  "colour": {
+    "hex": "#42170D",
+    "ral_guess": "3005",
+    "family": "brown",
+    "lum": 31.4,
+    "rb": 53,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 6.66,
+    "profile": [
+      1.0,
+      0.92,
+      0.64,
+      0.43,
+      0.29,
+      0.22,
+      0.18,
+      0.15,
+      0.15
+    ]
+  },
+  "warmth": {
+    "top": 62,
+    "foot": 22
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#35130C",
+    "face_vs_leaf": 0.82,
+    "reveal": {
+      "near_w": 0.027,
+      "near_tone": 0.585,
+      "far_w": 0.019,
+      "far_tone": 0.918,
+      "head_w": 0.069,
+      "head_tone": 0.724,
+      "tone_top": 1.312,
+      "tone_bottom": 0.317
+    },
+    "bead": {
+      "present": true,
+      "w": 0.01,
+      "tone": 1.227,
+      "side": "far"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.038,
+      "tone": 0.846
+    },
+    "head_shadow": {
+      "depth_h": 0.04,
+      "tone": 2.971
+    },
+    "threshold": {
+      "present": true,
+      "kind": "brass strip",
+      "h_h": 0.006,
+      "tone": 2.498
+    },
+    "floor_contact": {
+      "tone": 0.622,
+      "height_h": 0.006
+    }
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "shape": null,
+    "rects": [],
+    "shape_why": "no glazing on this leaf, so there is no shape"
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "pattern_why": "no grille on this leaf, so there is no pattern"
+  },
+  "handle": {
+    "type": "lever-rose",
+    "orientation": "horizontal",
+    "finish": "steel",
+    "x": 0.085,
+    "y": 0.523,
+    "len_h": 0,
+    "w_w": 0.063
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.09,
+    "y": 0.572
+  },
+  "peephole": {
+    "present": true,
+    "x": 0.499,
+    "y": 0.231,
+    "dia_w": 0.034
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "side_why": "no hinge is visible from this face, so no side can be assigned"
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "engraved brass family nameplate",
+    "marble-clad stairwell dado",
+    "brass threshold strip"
+  ],
+  "notes": "Dim tungsten stairwell, lit only from above: the leaf's top row measures 2.97x its midpoint and the near reveal falls from 1.31 at the top to 0.32 at the foot, the widest vertical swing in the set. The warm illuminant inflates R-B (+53 on the leaf, +101 on the plaster), so the paint is a dark brown reading as maroon, not a red door; geometry is approximate because the leaf-to-frame step is only a few luminance counts down at the foot."
+}

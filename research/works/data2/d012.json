@@ -1,0 +1,136 @@
+{
+  "id": "d012",
+  "cat": "basic",
+  "price": 3450,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.89,
+  "leaf": {
+    "x": 291,
+    "y": 248,
+    "w": 595,
+    "h": 1106
+  },
+  "colour": {
+    "hex": "#B2BAC8",
+    "ral_guess": "7047",
+    "family": "white",
+    "lum": 185.3,
+    "rb": -22,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.75,
+    "profile": [
+      0.98,
+      1.0,
+      0.96,
+      0.87,
+      0.8,
+      0.75,
+      0.72,
+      0.65,
+      0.57
+    ]
+  },
+  "warmth": {
+    "top": 9,
+    "foot": -47
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#B6C5DE",
+    "face_vs_leaf": 1.06,
+    "reveal": {
+      "near_w": 0.061,
+      "near_tone": 0.865,
+      "far_w": 0.02,
+      "far_tone": 0.163,
+      "head_w": 0.074,
+      "head_tone": 0.966,
+      "tone_top": 1.074,
+      "tone_bottom": 0.702
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "w_why": "the frame face is blown out to 245 against a 185 leaf, so the arris between face and reveal is a tone step, not a separate lit line; no bead resolvable at 4x on either jamb",
+      "tone_why": "the frame face is blown out to 245 against a 185 leaf, so the arris between face and reveal is a tone step, not a separate lit line; no bead resolvable at 4x on either jamb",
+      "side_why": "the frame face is blown out to 245 against a 185 leaf, so the arris between face and reveal is a tone step, not a separate lit line; no bead resolvable at 4x on either jamb"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.012,
+      "tone": 0.486
+    },
+    "head_shadow": {
+      "depth_h": 0.047,
+      "tone": 1.139
+    },
+    "threshold": {
+      "present": true,
+      "kind": "aluminium",
+      "h_h": 0.014,
+      "tone": 0.233
+    },
+    "floor_contact": {
+      "tone": 0.439,
+      "height_h": 0.011
+    }
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "shape": null,
+    "rects": [],
+    "shape_why": "no glazing on this leaf, so there is no shape"
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "pattern_why": "no grille on this leaf, so there is no pattern"
+  },
+  "handle": {
+    "type": "lever-plate",
+    "orientation": "horizontal",
+    "finish": "chrome",
+    "x": 0.856,
+    "y": 0.561,
+    "len_h": 0,
+    "w_w": 0.087
+  },
+  "lock": {
+    "present": true,
+    "kind": "cylinder-in-plate",
+    "x": 0.854,
+    "y": 0.589
+  },
+  "peephole": {
+    "present": true,
+    "x": 0.457,
+    "y": 0.263,
+    "dia_w": 0.034
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "side_why": "no hinge is visible from this face, so no side can be assigned"
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "galvanised frame fixing lugs left proud of the blockwork",
+    "unfinished rubble sill trench",
+    "key left in the cylinder"
+  ],
+  "notes": "The lintel here returns light instead of casting shadow: the leaf's top 5% measures 1.14x the midpoint and is the brightest row on the door, so head_shadow.tone is above 1 by measurement, not by error. Strongest reveal asymmetry in the set - near (left) reveal 0.061 at tone 0.87 against a far reveal of 0.020 at tone 0.16, effectively a black slot. Paint is white; the measured #B2BAC8 is open-sky shade, so the nearest-RAL figure runs far too grey."
+}

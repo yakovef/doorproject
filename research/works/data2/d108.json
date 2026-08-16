@@ -1,0 +1,147 @@
+{
+  "id": "d108",
+  "cat": "luxury",
+  "price": 8800,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.86,
+  "leaf": {
+    "x": 230,
+    "y": 240,
+    "w": 491,
+    "h": 1120
+  },
+  "colour": {
+    "hex": "#CAC9C7",
+    "ral_guess": "9010",
+    "family": "white",
+    "lum": 201.1,
+    "rb": 3,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.87,
+    "profile": [
+      0.53,
+      0.92,
+      0.98,
+      1.0,
+      0.96,
+      0.99,
+      0.98,
+      0.96,
+      0.93
+    ]
+  },
+  "warmth": {
+    "top": 18,
+    "foot": -1
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#CCD1D5",
+    "face_vs_leaf": 1.04,
+    "reveal": {
+      "near_side": "right",
+      "near_w": 0.106,
+      "far_w": 0.063,
+      "head_w": 0.196,
+      "near_tone": 0.93,
+      "far_tone": 0.93,
+      "head_tone": 0.58,
+      "tone_top": 0.88,
+      "tone_bottom": 0.91
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "bead_why": "the jamb is three flat planes - leaf, lining at 0.93, outer frame plane at 1.04 - and the arris between lining and outer plane is a clean step with no narrow highlight (checked at 5x on both jambs)"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.01,
+      "tone": 0.26,
+      "cast_note": "a 5 px black line where the frame meets raw blockwork; on the right the blockwork is itself in shadow so no separate line reads"
+    },
+    "head_shadow": {
+      "depth_h": 0.004,
+      "tone": 0.26
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "threshold_why": "no floor yet - under the leaf is an open black void about 25 px deep, then galvanised channel and rubble on the ground"
+    },
+    "floor_contact": {
+      "tone": 0.09,
+      "height_h": 0.022
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "tall rectangle, upper half, moulded surround with a cornice over it",
+    "rects": [
+      {
+        "x": 0.301,
+        "y": 0.131,
+        "w": 0.401,
+        "h": 0.363
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "scroll"
+  },
+  "handle": {
+    "type": "lever-plate",
+    "orientation": "horizontal",
+    "finish": "bronze",
+    "x": 0.061,
+    "y": 0.483,
+    "len_h": 0.105,
+    "w_w": 0.106
+  },
+  "lock": {
+    "present": true,
+    "kind": "keyhole in the same backplate",
+    "x": 0.055,
+    "y": 0.532
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "swept the whole painted field at 3.5x and 5x: mouldings, glazing, handle and pull bar only - no lens or drilled boss"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "handle at x 0.06 puts the hinges on the right stile; that jamb shows 52 px of plain lining and no knuckle breaks its edge"
+  },
+  "detail": {
+    "panel": true,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "applied classical mouldings: dentil cornice over the glazing, console brackets, plinth block at the foot",
+    "wrought-iron scrollwork grille behind the glazing",
+    "copper/bronze horizontal pull bar on the mid rail (x 0.35-0.63, y 0.59)",
+    "copper/bronze lever on a shaped backplate",
+    "deep white-lined reveal box around the opening (96 px of soffit visible at the head)",
+    "raw blockwork wall, frame fixing straps still exposed",
+    "no floor or threshold - open void under the leaf"
+  ],
+  "notes": "Deep rendered reveal: leaf, then a 52 px (near) / 31 px (far) lining, then a brighter outer frame plane at 1.04. Camera is low and left of the door axis, so the head soffit is 96 px deep (head_w 0.196) and the leaf bottom rises 10 px from left to right; skew 0.86. Geometric midpoint falls on the applied cornice, so colour was taken on plain paint at the same height on the right stile (670,802). Leaf reads ivory beside the frame lining, but is numerically neutral (rb +3) - the frame reads cooler (rb -9) because it faces the sky."
+}

@@ -1,0 +1,137 @@
+{
+ "id": "d087",
+ "cat": "designed",
+ "price": 8000,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.96,
+ "leaf": {
+  "x": 218,
+  "y": 281,
+  "w": 452,
+  "h": 1171
+ },
+ "colour": {
+  "hex": "#66686D",
+  "ral_guess": "9005",
+  "family": "black",
+  "lum": 103.9,
+  "rb": -7,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 6.08,
+  "profile": [
+   0.87,
+   1.0,
+   0.98,
+   0.94,
+   0.63,
+   0.51,
+   0.37,
+   0.29,
+   0.16
+  ]
+ },
+ "warmth": {
+  "top": 2,
+  "foot": -8
+ },
+ "frame": {
+  "same_colour_as_leaf": true,
+  "hex": "#4B4C4E",
+  "face_vs_leaf": 0.73,
+  "reveal": {
+   "near_w": 0.071,
+   "far_w": 0.062,
+   "head_w": 0.139,
+   "near_tone": 0.24,
+   "far_tone": 0.32,
+   "head_tone": 0.19,
+   "tone_top": 0.52,
+   "tone_bottom": 0.19
+  },
+  "bead": {
+   "present": true,
+   "w": 0.004,
+   "tone": 0.91,
+   "side": "near"
+  },
+  "cast": {
+   "present": false,
+   "side": null,
+   "side_why": "no cast shadow - the render wall holds 199-207 flat right up to the frame on the left and 170-179 on the right, dropping to the frame face in 2 px with no shadow band",
+   "w": null,
+   "w_why": "no cast shadow to measure",
+   "tone": null,
+   "tone_why": "no cast shadow to measure"
+  },
+  "head_shadow": {
+   "depth_h": 0.054,
+   "tone": 0.19
+  },
+  "threshold": {
+   "present": true,
+   "kind": "aluminium",
+   "h_h": 0.015,
+   "tone": 1.49
+  },
+  "floor_contact": {
+   "tone": 0.25,
+   "height_h": 0.021
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "solid panelled leaf, no glazing",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille"
+ },
+ "handle": {
+  "type": "pull-bar",
+  "orientation": "vertical",
+  "finish": "black",
+  "x": 0.142,
+  "y": 0.512,
+  "len_h": 0.726,
+  "w_w": 0.044
+ },
+ "lock": {
+  "present": true,
+  "kind": "keypad",
+  "x": 0.046,
+  "y": 0.557
+ },
+ "peephole": {
+  "present": true,
+  "x": 0.496,
+  "y": 0.314,
+  "dia_w": 0.029
+ },
+ "hinges": {
+  "visible": false,
+  "count": 0,
+  "side": null,
+  "side_why": "pull bar and keypad are on the left so the hinges are on the right, and the right reveal is a flat 28 px shadow with no knuckles at 3x",
+  "y": []
+ },
+ "detail": {
+  "panel": true,
+  "groove": false,
+  "grooves": [],
+  "texture": "smooth"
+ },
+ "extras": [
+  "ornate black bow pull between the panels at y 0.56",
+  "stainless hammered mezuzah case on the right reveal",
+  "potted shrub crowding the right jamb",
+  "shoes on the mat"
+ ],
+ "notes": "Black paint read through a bright sky: the leaf's midpoint samples #66686D (lum 104) but the foot is #181D20 (lum 28) and contrast is 6.08, so the RAL guess is taken from the paint (9005) rather than from the midpoint hex, which is a sheen not a colour. Deep frame: 32 px near reveal, 28 px far, and a 63 px head soffit at tone 0.19 - the darkest head in this set. Two raised moulded panels, upper x 0.23-0.79 / y 0.12-0.50, lower x 0.23-0.78 / y 0.64-0.85. Three separate pieces of hardware on the lock stile: a 0.73-height round pull bar at x 0.14, a keypad smart lock at x 0.05, and a decorative bow pull across the middle rail."
+}

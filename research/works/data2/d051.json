@@ -1,0 +1,142 @@
+{
+ "id": "d051",
+ "cat": "designed",
+ "price": 4800,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.95,
+ "leaf": {
+  "x": 178,
+  "y": 100,
+  "w": 597,
+  "h": 1467
+ },
+ "colour": {
+  "hex": "#9A8776",
+  "ral_guess": "1035",
+  "family": "brown",
+  "lum": 137.8,
+  "rb": 36,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 1.2,
+  "profile": [
+   1.0,
+   0.97,
+   0.94,
+   0.91,
+   0.88,
+   0.88,
+   0.84,
+   0.85,
+   0.83
+  ]
+ },
+ "warmth": {
+  "top": 35,
+  "foot": 32
+ },
+ "frame": {
+  "same_colour_as_leaf": true,
+  "hex": "#A39082",
+  "face_vs_leaf": 1.07,
+  "reveal": {
+   "near_w": 0.02,
+   "far_w": 0.003,
+   "head_w": 0.0,
+   "near_tone": 0.54,
+   "far_tone": 1.07,
+   "head_tone": null,
+   "head_tone_why": "no head recess to measure - the leaf is proud of the frame at the head and its top arris reads as a highlight (lum 173, 1.26x leaf), not a shadow",
+   "tone_top": 0.68,
+   "tone_bottom": 0.48
+  },
+  "bead": {
+   "present": true,
+   "w": 0.003,
+   "tone": 1.22,
+   "side": "far"
+  },
+  "cast": {
+   "present": true,
+   "side": "right",
+   "w": 0.141,
+   "tone": 0.7
+  },
+  "head_shadow": {
+   "depth_h": 0.0,
+   "tone": null,
+   "tone_why": "nothing to measure - no lintel soffit is visible above the leaf, the rough opening runs straight into the leaf's lit top arris"
+  },
+  "threshold": {
+   "present": false,
+   "kind": null,
+   "kind_why": "no threshold fitted - unfinished install, the leaf stands on packing blocks over bare rubble",
+   "h_h": null,
+   "h_h_why": "no threshold present",
+   "tone": null,
+   "tone_why": "no threshold present"
+  },
+  "floor_contact": {
+   "tone": 0.11,
+   "height_h": 0.018
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "solid leaf, no glazing",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille"
+ },
+ "handle": {
+  "type": "lever-rose",
+  "orientation": "horizontal",
+  "finish": "chrome",
+  "x": 0.923,
+  "y": 0.515,
+  "len_h": 0.0,
+  "w_w": 0.03
+ },
+ "lock": {
+  "present": true,
+  "kind": "round-escutcheon",
+  "x": 0.921,
+  "y": 0.556
+ },
+ "peephole": {
+  "present": true,
+  "x": 0.489,
+  "y": 0.249,
+  "dia_w": 0.04
+ },
+ "hinges": {
+  "visible": true,
+  "count": 3,
+  "side": "left",
+  "y": [
+   0.138,
+   0.495,
+   0.843
+  ]
+ },
+ "detail": {
+  "panel": true,
+  "groove": false,
+  "grooves": [],
+  "texture": "smooth"
+ },
+ "extras": [
+  "chrome bow pull handle across mid-face",
+  "keys left hanging in the cylinder",
+  "galvanised installation straps still bolted to the frame",
+  "hard diagonal cast shadow from an off-frame object across the whole face"
+ ],
+ "notes": "Near jamb is the RIGHT one: the camera sits left of the axis, so the right side shows a 12 px shadowed edge return (tone 0.54) while the hinge side is flush - a 2 px hairline that reads LIGHT (1.07), not dark. Two bolection-moulded raised panels, upper spanning y 0.08-0.57 and lower y 0.66-0.92, both x about 0.20-0.79. Three chrome barrel hinges are exposed on the left stile. A hard diagonal shadow from something off-frame crosses the whole face; the nine-row tone profile was taken clear of it, so it looks flatter (contrast 1.20) than the photo feels."
+}

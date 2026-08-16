@@ -1,0 +1,146 @@
+{
+  "id": "d128",
+  "cat": "luxury",
+  "price": 15500,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.9,
+  "leaf": {
+    "x": 123,
+    "y": 373,
+    "w": 363,
+    "h": 828
+  },
+  "colour": {
+    "hex": "#5F6D7D",
+    "ral_guess": "5014",
+    "family": "blue",
+    "lum": 107.2,
+    "rb": -30,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.41,
+    "profile": [
+      0.71,
+      0.83,
+      0.89,
+      0.91,
+      0.93,
+      0.97,
+      0.98,
+      1.0,
+      0.91
+    ]
+  },
+  "warmth": {
+    "top": -25,
+    "foot": -37
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#4F575E",
+    "face_vs_leaf": 0.8,
+    "reveal": {
+      "near_side": "left",
+      "near_w": 0.085,
+      "far_w": 0.066,
+      "head_w": 0.168,
+      "near_tone": 0.72,
+      "far_tone": 0.92,
+      "head_tone": 0.67,
+      "tone_top": 0.66,
+      "tone_bottom": 0.51
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "bead_why": "both jambs step monotonically leaf -> reveal -> frame face with no overshoot; the right frame face is bright (1.30) but it is a 21 px plane, not a line"
+    },
+    "cast": {
+      "present": false,
+      "side": null,
+      "w": null,
+      "tone": null,
+      "cast_why": "render wall runs at 165-197 straight into the frame face on both sides with no darkening in the last pixels; the porch is open and the light diffuse"
+    },
+    "head_shadow": {
+      "depth_h": 0.006,
+      "tone": 0.42
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "threshold_why": "no threshold section - the leaf meets a poured concrete apron with only a 3 px dark line between"
+    },
+    "floor_contact": {
+      "tone": 0.33,
+      "height_h": 0.006
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "very tall narrow rectangle, moulded surround, 0.78 of leaf height",
+    "rects": [
+      {
+        "x": 0.3,
+        "y": 0.092,
+        "w": 0.402,
+        "h": 0.781
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "scroll"
+  },
+  "handle": {
+    "type": "pull-bar",
+    "orientation": "vertical",
+    "finish": "steel",
+    "x": 0.821,
+    "y": 0.464,
+    "len_h": 0.519,
+    "w_w": 0.036
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.937,
+    "y": 0.543
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "the round chrome boss at 0.94/0.54 is a keyed cylinder escutcheon (keyway clearly visible at 9x), not a lens; no other boss on the leaf"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "bar and lock are on the right of the leaf so hinges are on the left, inside a 31 px reveal; no knuckles break the edge at 6x"
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "fixed narrow second leaf to the right with a matching glazed slot",
+    "dense wrought-iron scrollwork filling both glazed slots",
+    "brushed-steel vertical pull bar, 0.52 of leaf height",
+    "moulded architrave around the glazed slot",
+    "recessed porch: 61 px of soffit and 21 px frame faces on both jambs",
+    "poured concrete apron, no threshold"
+  ],
+  "notes": "Main leaf measured; the narrow fixed leaf to its right is excluded, so far_w is the opening's right jamb (which borders that fixed leaf). Strong side lighting: the right frame face reads 1.30 and the left only 0.80, while widths are nearly equal - on this door the jambs differ in tone, not size. Geometric midpoint falls on glass; colour taken on lit paint at the same height (450,787), the shaded left stile at the same height is #44505E, a full 0.73 of it. Steel blue, rb -30."
+}

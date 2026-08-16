@@ -1,0 +1,143 @@
+{
+  "id": "d030",
+  "cat": "basic",
+  "price": 3850,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.94,
+  "leaf": {
+    "x": 195,
+    "y": 397,
+    "w": 518,
+    "h": 1270
+  },
+  "colour": {
+    "hex": "#82756C",
+    "ral_guess": "7037",
+    "family": "grey",
+    "lum": 119.1,
+    "rb": 22,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 3.76,
+    "profile": [
+      1.0,
+      0.95,
+      0.88,
+      0.8,
+      0.71,
+      0.62,
+      0.55,
+      0.46,
+      0.27
+    ]
+  },
+  "warmth": {
+    "top": 19,
+    "foot": 9
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#796F65",
+    "face_vs_leaf": 0.94,
+    "reveal": {
+      "near_w": 0.044,
+      "near_tone": 0.775,
+      "far_w": 0.031,
+      "far_tone": 0.812,
+      "head_w": 0.097,
+      "head_tone": 0.674,
+      "tone_top": 1.043,
+      "tone_bottom": 0.534
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "w_why": "row profiles at 3px steps across both jambs show a monotonic step from leaf to reveal to face with no local maximum; nothing on this frame catches a highlight in the flat stairwell light",
+      "tone_why": "row profiles at 3px steps across both jambs show a monotonic step from leaf to reveal to face with no local maximum; nothing on this frame catches a highlight in the flat stairwell light",
+      "side_why": "row profiles at 3px steps across both jambs show a monotonic step from leaf to reveal to face with no local maximum; nothing on this frame catches a highlight in the flat stairwell light"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.017,
+      "tone": 0.535
+    },
+    "head_shadow": {
+      "depth_h": 0.049,
+      "tone": 1.387
+    },
+    "threshold": {
+      "present": true,
+      "kind": "aluminium",
+      "h_h": 0.016,
+      "tone": 0.354
+    },
+    "floor_contact": {
+      "tone": 0.271,
+      "height_h": 0.006
+    }
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "shape": null,
+    "rects": [],
+    "shape_why": "no glazing on this leaf, so there is no shape"
+  },
+  "grille": {
+    "present": false,
+    "pattern": null,
+    "pattern_why": "no grille on this leaf, so there is no pattern"
+  },
+  "handle": {
+    "type": "knob",
+    "orientation": "horizontal",
+    "finish": "steel",
+    "x": 0.929,
+    "y": 0.511,
+    "len_h": 0,
+    "w_w": 0.085
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.929,
+    "y": 0.562
+  },
+  "peephole": {
+    "present": true,
+    "x": 0.502,
+    "y": 0.202,
+    "dia_w": 0.039
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "side_why": "no hinge is visible from this face, so no side can be assigned"
+  },
+  "detail": {
+    "panel": false,
+    "groove": true,
+    "grooves": [
+      {
+        "orientation": "horizontal",
+        "y": 0.976,
+        "count": 1
+      }
+    ],
+    "texture": "smooth"
+  },
+  "extras": [
+    "mezuzah case on the near doorpost",
+    "black coir doormat",
+    "phone screenshot chrome above and below the photograph",
+    "yellow tiled stairwell dado"
+  ],
+  "notes": "Frame and leaf are the same warm grey within 6%, so the whole opening reads by geometry alone - reveal 0.044 near against 0.031 far, and a floor contact line at 0.27 that is the darkest thing in the frame. Source is a phone screenshot; the photograph occupies y 251-1767 and a UI button clips the bottom-left corner of the threshold, which is why the sill was measured between x 250 and 650 only."
+}

@@ -1,0 +1,145 @@
+{
+ "id": "d072",
+ "cat": "designed",
+ "price": 5500,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.97,
+ "leaf": {
+  "x": 315,
+  "y": 272,
+  "w": 605,
+  "h": 1183
+ },
+ "colour": {
+  "hex": "#7C7771",
+  "ral_guess": "7048",
+  "family": "grey",
+  "lum": 119.6,
+  "rb": 11,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 2.74,
+  "profile": [
+   0.51,
+   1.0,
+   0.93,
+   0.84,
+   0.8,
+   0.75,
+   0.69,
+   0.58,
+   0.36
+  ]
+ },
+ "warmth": {
+  "top": 16,
+  "foot": 3
+ },
+ "frame": {
+  "same_colour_as_leaf": true,
+  "hex": "#64615C",
+  "face_vs_leaf": 0.81,
+  "reveal": {
+   "near_w": 0.073,
+   "far_w": 0.076,
+   "head_w": 0.099,
+   "near_tone": 0.31,
+   "far_tone": 0.29,
+   "head_tone": 0.23,
+   "tone_top": 0.4,
+   "tone_bottom": 0.26
+  },
+  "bead": {
+   "present": true,
+   "w": 0.003,
+   "tone": 1.17,
+   "side": "near"
+  },
+  "cast": {
+   "present": false,
+   "side": null,
+   "side_why": "no cast shadow - the render wall runs 210-248 right up to the frame and is brightest in the last 10 px before it",
+   "w": null,
+   "w_why": "no cast shadow to measure",
+   "tone": null,
+   "tone_why": "no cast shadow to measure"
+  },
+  "head_shadow": {
+   "depth_h": 0.051,
+   "tone": 0.23
+  },
+  "threshold": {
+   "present": true,
+   "kind": "stone",
+   "h_h": 0.027,
+   "tone": 1.46
+  },
+  "floor_contact": {
+   "tone": 0.39,
+   "height_h": 0.021
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "solid leaf, no glazing",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille"
+ },
+ "handle": {
+  "type": "pull-bar",
+  "orientation": "vertical",
+  "finish": "black",
+  "x": 0.813,
+  "y": 0.509,
+  "len_h": 0.861,
+  "w_w": 0.063
+ },
+ "lock": {
+  "present": true,
+  "kind": "round-escutcheon",
+  "x": 0.947,
+  "y": 0.548
+ },
+ "peephole": {
+  "present": false,
+  "x": null,
+  "x_why": "no peephole - the whole face was read at 1.1x crop and the only fittings are the pull bar and the black cylinder rose",
+  "y": null,
+  "y_why": "no peephole present",
+  "dia_w": null,
+  "dia_w_why": "no peephole present"
+ },
+ "hinges": {
+  "visible": false,
+  "count": 0,
+  "side": null,
+  "side_why": "bar and cylinder are on the right so the hinges are on the left, but the left reveal is a flat 44 px shadow with no knuckles at 1.6x",
+  "y": []
+ },
+ "detail": {
+  "panel": false,
+  "groove": true,
+  "grooves": [
+   {
+    "orientation": "vertical",
+    "x": 0.332,
+    "count": 1
+   }
+  ],
+  "texture": "smooth"
+ },
+ "extras": [
+  "brass inlay strip running the middle two thirds of the black pull bar",
+  "recessed porch: frame face is a 90 px flat casing on both sides",
+  "bristle mat in a steel tray on the sill"
+ ],
+ "notes": "Deepest and most symmetric frame in the set: a box lining with a 90 px flat face and a 44-46 px return on BOTH jambs, plus a 60 px head soffit at tone 0.23. The shot is square-on, so near and far reveal differ by 2 px and the near/far split is nominal - do not read asymmetry into it. Handle is unusual: a flat matte-black bar 0.86 of the leaf height with a brass strip inlaid down its centre, set at x 0.81, inboard of the cylinder rose at x 0.95. Leaf aspect is 1.96, so this is a wide (about 105 cm) leaf, not a standard 90."
+}

@@ -1,0 +1,147 @@
+{
+  "id": "d116",
+  "cat": "luxury",
+  "price": 13900,
+  "usable": true,
+  "view": "outside",
+  "skew": 0.93,
+  "leaf": {
+    "x": 457,
+    "y": 408,
+    "w": 432,
+    "h": 996
+  },
+  "colour": {
+    "hex": "#B7B1A6",
+    "ral_guess": "9010",
+    "family": "white",
+    "lum": 177.5,
+    "rb": 17,
+    "uniform": true
+  },
+  "tone": {
+    "contrast": 1.32,
+    "profile": [
+      0.76,
+      0.88,
+      0.91,
+      0.92,
+      0.94,
+      0.98,
+      0.99,
+      1.0,
+      1.0
+    ]
+  },
+  "warmth": {
+    "top": 30,
+    "foot": 10
+  },
+  "frame": {
+    "same_colour_as_leaf": true,
+    "hex": "#C7C5BC",
+    "face_vs_leaf": 1.11,
+    "reveal": {
+      "near_side": "left",
+      "near_w": 0.067,
+      "far_w": 0.049,
+      "head_w": 0.093,
+      "near_tone": 0.99,
+      "far_tone": 0.92,
+      "head_tone": 0.75,
+      "tone_top": 1.05,
+      "tone_bottom": 1.0
+    },
+    "bead": {
+      "present": false,
+      "w": null,
+      "tone": null,
+      "side": null,
+      "bead_why": "the jamb reads as two flat planes - a beige return at tone 0.92 and a lit frame face at 1.11 - meeting in a hard step; no narrow highlight line at the arris at 5x zoom"
+    },
+    "cast": {
+      "present": true,
+      "side": "left",
+      "w": 0.012,
+      "tone": 0.93
+    },
+    "head_shadow": {
+      "depth_h": 0.01,
+      "tone": 0.72
+    },
+    "threshold": {
+      "present": false,
+      "kind": null,
+      "h_h": null,
+      "tone": null,
+      "threshold_why": "no threshold profile fitted - under the leaf there is a 2 px black gap, then a raw grey screed strip, then wood-look floor tile"
+    },
+    "floor_contact": {
+      "tone": 0.64,
+      "height_h": 0.004
+    }
+  },
+  "window": {
+    "present": true,
+    "count": 1,
+    "shape": "tall rectangle, upper half, moulded surround",
+    "rects": [
+      {
+        "x": 0.31,
+        "y": 0.073,
+        "w": 0.405,
+        "h": 0.487
+      }
+    ]
+  },
+  "grille": {
+    "present": true,
+    "pattern": "lattice"
+  },
+  "handle": {
+    "type": "lever-rose",
+    "orientation": "horizontal",
+    "finish": "chrome",
+    "x": 0.069,
+    "y": 0.502,
+    "len_h": 0.0,
+    "w_w": 0.053,
+    "w_w_note": "w_w is the hardware footprint across the leaf - here the rose diameter"
+  },
+  "lock": {
+    "present": true,
+    "kind": "round-escutcheon",
+    "x": 0.069,
+    "y": 0.54
+  },
+  "peephole": {
+    "present": false,
+    "x": null,
+    "y": null,
+    "dia_w": null,
+    "peephole_why": "leaf is half glazed; swept the whole painted field at 6x and there is no lens, ring or drilled boss anywhere on it"
+  },
+  "hinges": {
+    "visible": false,
+    "count": 0,
+    "side": null,
+    "y": [],
+    "hinges_why": "handle sits at x 0.07 so the leaf is hinged on the right, in the 21 px far reveal; no knuckles project past the leaf edge"
+  },
+  "detail": {
+    "panel": true,
+    "groove": false,
+    "grooves": [],
+    "texture": "smooth"
+  },
+  "extras": [
+    "fixed narrow second leaf to the left, matching, with its own slim glazed panel",
+    "black lattice muntins with two cast quatrefoil scroll motifs in the glazing",
+    "obscured/textured privacy glass",
+    "rendered plaster surround forming a shallow porch box around the opening",
+    "perforated leaf-pattern metal pergola overhead (top of frame)",
+    "moulded raised lower panel",
+    "raw screed strip in place of a threshold"
+  ],
+  "notes": "Leaf measured is the right-hand active leaf of an unequal pair (handle at x 0.07, hinged right). The left jamb reveal borders the fixed narrow leaf, not the measured leaf, but is recorded as far/near of the same opening. Geometric midpoint falls on glass so colour was taken on paint at the same height (510,906); that spot sits in the head shadow, and the well-lit lower panel reads #C7C7C1 - the paint is a near-neutral white, the warm cast is the light. Unusually the leaf gets brighter toward the floor (profile 0.76 -> 1.00) because a deep porch soffit shades the head."
+}

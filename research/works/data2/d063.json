@@ -1,0 +1,156 @@
+{
+ "id": "d063",
+ "cat": "designed",
+ "price": 5200,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.97,
+ "leaf": {
+  "x": 352,
+  "y": 194,
+  "w": 532,
+  "h": 1294
+ },
+ "colour": {
+  "hex": "#817373",
+  "ral_guess": "7036",
+  "family": "brown",
+  "lum": 118.0,
+  "rb": 14,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 3.29,
+  "profile": [
+   0.3,
+   0.56,
+   0.71,
+   0.93,
+   1.0,
+   0.95,
+   0.87,
+   0.86,
+   0.82
+  ]
+ },
+ "warmth": {
+  "top": 15,
+  "foot": 6
+ },
+ "frame": {
+  "same_colour_as_leaf": true,
+  "hex": "#897F7F",
+  "face_vs_leaf": 1.09,
+  "reveal": {
+   "near_w": 0.038,
+   "far_w": 0.004,
+   "head_w": 0.09,
+   "near_tone": 0.23,
+   "far_tone": 0.52,
+   "head_tone": 0.17,
+   "tone_top": 0.11,
+   "tone_bottom": 0.21
+  },
+  "bead": {
+   "present": true,
+   "w": 0.006,
+   "tone": 1.12,
+   "side": "near"
+  },
+  "cast": {
+   "present": true,
+   "side": "right",
+   "w": 0.013,
+   "tone": 0.49
+  },
+  "head_shadow": {
+   "depth_h": 0.037,
+   "tone": 0.17
+  },
+  "threshold": {
+   "present": true,
+   "kind": "aluminium",
+   "h_h": 0.035,
+   "tone": 1.36
+  },
+  "floor_contact": {
+   "tone": 0.62,
+   "height_h": 0.014
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "no glazing anywhere on the leaf",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille - leaf is solid steel"
+ },
+ "handle": {
+  "type": "pull-bar",
+  "orientation": "vertical",
+  "finish": "chrome",
+  "x": 0.222,
+  "y": 0.43,
+  "len_h": 0.383,
+  "w_w": 0.041
+ },
+ "lock": {
+  "present": true,
+  "kind": "round-escutcheon",
+  "x": 0.079,
+  "y": 0.573
+ },
+ "peephole": {
+  "present": false,
+  "x": null,
+  "x_why": "no peephole on this leaf",
+  "y": null,
+  "y_why": "no peephole on this leaf",
+  "dia_w": null,
+  "dia_w_why": "no peephole on this leaf"
+ },
+ "hinges": {
+  "visible": false,
+  "count": 0,
+  "side": null,
+  "side_why": "hardware is on the left so hinges are on the right, but the right jamb shows no knuckles at 4x - concealed or hidden behind the frame return",
+  "y": []
+ },
+ "detail": {
+  "panel": false,
+  "groove": true,
+  "grooves": [
+   {
+    "orientation": "horizontal",
+    "y": 0.199,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.402,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.611,
+    "count": 1
+   },
+   {
+    "orientation": "horizontal",
+    "y": 0.808,
+    "count": 1
+   }
+  ],
+  "texture": "smooth"
+ },
+ "extras": [
+  "shield maker's badge top-left",
+  "galvanised installation straps still bolted to frame"
+ ],
+ "notes": "Near jamb here is the LEFT one: the camera sits right of the door axis so only the left reveal return is visible (20 px deep), while the right side shows a 2 px gap line. The vertical light gradient is inverted for the tier - the head sits in deep porch shade (0.30 of peak) and the brightest band is at mid height, so the midpoint hex #817373 is lighter than the paint reads at the top."
+}

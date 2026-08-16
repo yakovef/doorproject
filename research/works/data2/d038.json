@@ -1,0 +1,171 @@
+{
+ "id": "d038",
+ "cat": "designed",
+ "price": 4500,
+ "usable": true,
+ "view": "angled",
+ "skew": 0.78,
+ "leaf": {
+  "x": 250,
+  "y": 137,
+  "w": 719,
+  "h": 1806
+ },
+ "colour": {
+  "hex": "#6D6A62",
+  "ral_guess": "7039",
+  "family": "grey",
+  "lum": 106.1,
+  "rb": 11,
+  "uniform": true
+ },
+ "tone": {
+  "contrast": 1.62,
+  "profile": [
+   0.96,
+   1.0,
+   0.95,
+   0.82,
+   0.72,
+   0.66,
+   0.66,
+   0.63,
+   0.62
+  ]
+ },
+ "warmth": {
+  "top": 0,
+  "foot": 13
+ },
+ "frame": {
+  "same_colour_as_leaf": null,
+  "same_colour_as_leaf_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+  "hex": null,
+  "hex_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+  "face_vs_leaf": null,
+  "face_vs_leaf_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+  "reveal": {
+   "near_w": null,
+   "near_w_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "far_w": null,
+   "far_w_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "head_w": null,
+   "head_w_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "near_tone": null,
+   "near_tone_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "far_tone": null,
+   "far_tone_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "head_tone": null,
+   "head_tone_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "tone_top": null,
+   "tone_top_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "tone_bottom": null,
+   "tone_bottom_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed"
+  },
+  "bead": {
+   "present": false,
+   "w": null,
+   "w_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "tone": null,
+   "tone_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "side": null,
+   "side_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed"
+  },
+  "cast": {
+   "present": false,
+   "side": null,
+   "side_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed; the leaf itself does throw a soft 64 px shadow onto the wall on its left, tone 1.77 of the leaf, but that is the leaf's own contact shadow and not a frame's",
+   "w": null,
+   "w_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "tone": null,
+   "tone_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed"
+  },
+  "head_shadow": {
+   "depth_h": null,
+   "depth_h_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed",
+   "tone": null,
+   "tone_why": "no frame anywhere in the shot - the leaf is standing loose against a showroom wall, not installed"
+  },
+  "threshold": {
+   "present": false,
+   "kind": null,
+   "kind_why": "no threshold - the leaf stands directly on a showroom floor on a blue plastic shim",
+   "h_h": null,
+   "h_h_why": "no threshold present",
+   "tone": null,
+   "tone_why": "no threshold present"
+  },
+  "floor_contact": {
+   "tone": 0.72,
+   "height_h": 0.008
+  }
+ },
+ "window": {
+  "present": false,
+  "count": 0,
+  "shape": null,
+  "shape_why": "solid leaf, no glazing",
+  "rects": []
+ },
+ "grille": {
+  "present": false,
+  "pattern": null,
+  "pattern_why": "no grille"
+ },
+ "handle": {
+  "type": "lever-rose",
+  "orientation": "horizontal",
+  "finish": "black",
+  "x": 0.097,
+  "y": 0.567,
+  "len_h": 0.0,
+  "w_w": 0.031
+ },
+ "lock": {
+  "present": true,
+  "kind": "round-escutcheon",
+  "x": 0.099,
+  "y": 0.617
+ },
+ "peephole": {
+  "present": true,
+  "x": 0.533,
+  "y": 0.254,
+  "dia_w": 0.037
+ },
+ "hinges": {
+  "visible": false,
+  "count": 0,
+  "side": null,
+  "side_why": "lever and cylinder are on the left so the hinge side is the right, but the leaf is out of its frame: the only thing on the right edge at 3.25x is one small metal lug at y 0.55, not a hinge knuckle",
+  "y": []
+ },
+ "detail": {
+  "panel": false,
+  "groove": true,
+  "grooves": [
+   {
+    "orientation": "vertical",
+    "x": 0.771,
+    "count": 1
+   },
+   {
+    "orientation": "vertical",
+    "x": 0.846,
+    "count": 1
+   },
+   {
+    "orientation": "vertical",
+    "x": 0.917,
+    "count": 1
+   }
+  ],
+  "texture": "smooth"
+ },
+ "extras": [
+  "black security latch bar bolted across the lock stile at y 0.25",
+  "white shield maker's badge top-left",
+  "blue plastic shim under the foot"
+ ],
+ "notes": "NOT AN INSTALLED DOOR: a bare leaf leaning against a showroom wall, so every frame field is null with a reason. Skew 0.78, just above the usable limit - the leaf projects as a trapezoid 794 px wide at the top and 686 px at the foot, with the left edge 1896 px long against the right's 1702, so x fractions were taken against the LOCAL width at each feature's height. The three vertical lines ARE true milled grooves here (unlike d078 and d043): they read 0.3-0.4x the surrounding face, about 8 px wide, and run y 0.07 to 0.91. Flattest lighting in the set, contrast 1.62 - diffuse showroom light, which is exactly why it is the least useful record for how light falls."
+}
