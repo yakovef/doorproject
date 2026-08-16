@@ -219,7 +219,7 @@
   var LOCK_BACKSET = 72;
   var LOCK_R = 40;
   var LEVER_ROSETTE = 37;
-  var LEVER_REACH = 124;
+  var LEVER_REACH = 145;
   var LOCK_CLEAR = 15;
   var BAR_INSET = 0.19;
   var GRAB = { fromTop: 0.585, len: 0.3, ratio: 1 / 15, boss: 17 };
@@ -440,6 +440,16 @@
       <stop offset="0.78" stop-color="${tone[2]}"/>
       <stop offset="0.92" stop-color="${tone[4]}"/>
       <stop offset="1"    stop-color="${tone[5]}"/>
+    </linearGradient>
+
+    <!-- The euro cylinder is a separate chromed part pressed into the
+         escutcheon. On a brass rosette it reads markedly cooler and brighter
+         than the plate around it, which is the giveaway that it is a
+         different component rather than a moulded feature. -->
+    <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="#E8ECEE"/>
+      <stop offset="0.4" stop-color="#B9BFC4"/>
+      <stop offset="1"   stop-color="#7C8288"/>
     </linearGradient>
 
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
@@ -806,8 +816,16 @@
     const want = handle.inset ? leafW * handle.inset - LOCK_BACKSET : foot.vy > 200 ? leafW * BAR_INSET - LOCK_BACKSET : 0;
     return Math.round(Math.max(clear, want, 0));
   }
+  var HANDLE_ART = {
+    channel: (h, g) => channelHandle(g.cx, g.cy, h.len, g.leafH, g.paint),
+    grab: (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
+    plate: (h, g) => plateHandle(g.cx, g.cy, g.dir, g.inside),
+    bar: (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
+    lever: (h, g) => lever(g.cx, g.cy, g.dir)
+  };
   function handleArt(handle, cx, cy, leafH, dir, paint2, inside, centreX, leafW, y0) {
-    const art = handle.style === "channel" ? channelHandle(cx, cy, handle.len, leafH, paint2) : handle.style === "grab" ? grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) : handle.style === "plate" ? plateHandle(cx, cy, dir, inside) : handle.len ? pullBar(cx, cy, handle, leafH) : lever(cx, cy, dir);
+    const draw = HANDLE_ART[handle.style] || HANDLE_ART.lever;
+    const art = draw(handle, { cx, cy, dir, paint: paint2, inside, centreX, leafW, leafH, y0 });
     const foot = handleFootprint(handle, leafH);
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
@@ -1126,7 +1144,7 @@
                a 10 10 0 1 1 20 0
                l 3 25 a 3.4 3.4 0 0 1 -3.4 3.7
                h -19.2 a 3.4 3.4 0 0 1 -3.4 -3.7 Z"
-            fill="url(#nickelSoft)"/>
+            fill="url(#euroSteel)"/>
       <path d="${arcPath(kx, ky - 15, 10, 135, 315)}" fill="none" stroke="#fff"
             stroke-opacity="0.5" stroke-width="1.8"/>
       <path d="${arcPath(kx, ky - 15, 10, 315, 135)}" fill="none" stroke="#000"

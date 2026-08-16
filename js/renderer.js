@@ -86,7 +86,9 @@ const HINGES_AFF   = [303, 1057, 1799];   // 0.144 / 0.504 / 0.857 H
 const LOCK_BACKSET = 72;    // 0.076 W from the closing edge
 const LOCK_R       = 40;    // 0.083 W across — the escutcheon is the bigger disc
 const LEVER_ROSETTE = 37;   // ratio to the escutcheon is 1.08, not 1.2
-const LEVER_REACH  = 124;   // 0.13 W, and exactly horizontal in all four photos
+const LEVER_REACH  = 145;   // 4.0 rosette radii, and exactly horizontal
+                            // (0.151 W on the door metrology; the product
+                            //  photographs agree at 4.0-4.7 radii)
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
 /* Where a pull bar sits, as a fraction of leaf width from the closing edge.
    Measured across every installation square-on enough to trust: 0.052, 0.128,
@@ -344,6 +346,16 @@ export function render(state) {
       <stop offset="0.78" stop-color="${tone[2]}"/>
       <stop offset="0.92" stop-color="${tone[4]}"/>
       <stop offset="1"    stop-color="${tone[5]}"/>
+    </linearGradient>
+
+    <!-- The euro cylinder is a separate chromed part pressed into the
+         escutcheon. On a brass rosette it reads markedly cooler and brighter
+         than the plate around it, which is the giveaway that it is a
+         different component rather than a moulded feature. -->
+    <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="#E8ECEE"/>
+      <stop offset="0.4" stop-color="#B9BFC4"/>
+      <stop offset="1"   stop-color="#7C8288"/>
     </linearGradient>
 
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
@@ -731,13 +743,21 @@ export function handleStandoff(handle, leafW, leafH) {
   return Math.round(Math.max(clear, want, 0));
 }
 
+/**
+ * One entry per style. Each takes the catalogue entry and a context object, so
+ * a new handle is a row here plus a draw function — nothing else changes.
+ */
+const HANDLE_ART = {
+  channel: (h, g) => channelHandle(g.cx, g.cy, h.len, g.leafH, g.paint),
+  grab:    (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
+  plate:   (h, g) => plateHandle(g.cx, g.cy, g.dir, g.inside),
+  bar:     (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
+  lever:   (h, g) => lever(g.cx, g.cy, g.dir),
+};
+
 function handleArt(handle, cx, cy, leafH, dir, paint, inside, centreX, leafW, y0) {
-  const art =
-    handle.style === 'channel' ? channelHandle(cx, cy, handle.len, leafH, paint) :
-    handle.style === 'grab'    ? grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) :
-    handle.style === 'plate'   ? plateHandle(cx, cy, dir, inside) :
-    handle.len                 ? pullBar(cx, cy, handle, leafH) :
-                                 lever(cx, cy, dir);
+  const draw = HANDLE_ART[handle.style] || HANDLE_ART.lever;
+  const art = draw(handle, { cx, cy, dir, paint, inside, centreX, leafW, leafH, y0 });
   const foot = handleFootprint(handle, leafH);
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
@@ -1157,7 +1177,7 @@ const cylinder = (cx, cy) => {
                a 10 10 0 1 1 20 0
                l 3 25 a 3.4 3.4 0 0 1 -3.4 3.7
                h -19.2 a 3.4 3.4 0 0 1 -3.4 -3.7 Z"
-            fill="url(#nickelSoft)"/>
+            fill="url(#euroSteel)"/>
       <path d="${arcPath(kx, ky - 15, 10, 135, 315)}" fill="none" stroke="#fff"
             stroke-opacity="0.5" stroke-width="1.8"/>
       <path d="${arcPath(kx, ky - 15, 10, 315, 135)}" fill="none" stroke="#000"
