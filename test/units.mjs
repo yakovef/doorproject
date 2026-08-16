@@ -240,16 +240,18 @@ group('handle clears the lock');
     ok(Math.max(gapX, gapY) > 0, `handle overlaps the lock (${label}): gapX ${gapX}, gapY ${gapY}`);
     tightest = Math.min(tightest, Math.max(gapX, gapY));
 
-    /* The handle may only stand off towards the hinge — never out past the
-       lock towards the closing edge, where there is no door left to hold. */
-    const hinges = [...svg.matchAll(/data-hw="hinge" data-cx="([-\d.]+)"/g)].map(m => Number(m[1]));
-    const toHinge = Math.sign(hinges[0] - lock.x);
+    const leaf = { x: num(svg, /id="leaf" data-x="([-\d.]+)"/), w: num(svg, /id="leaf"[^>]*data-w="([\d.]+)"/) };
+
+    /* The handle may only stand off towards the leaf centre — never out past
+       the lock towards the closing edge, where there is no door left to hold.
+       The lock sits on the closing edge, so "towards the centre" is the hinge
+       side whichever way the door is hung and whichever face we are on. */
+    const toHinge = Math.sign(leaf.x + leaf.w / 2 - lock.x);
     const toGrip = Math.sign(grip.x - lock.x);
     ok(toGrip === 0 || toGrip === toHinge,
        `handle stands off the wrong way, past the closing edge (${label})`);
 
     // And both must land on the active leaf, clear of its edges.
-    const leaf = { x: num(svg, /id="leaf" data-x="([-\d.]+)"/), w: num(svg, /id="leaf"[^>]*data-w="([\d.]+)"/) };
     ok(lock.x - lock.r > leaf.x && lock.x + lock.r < leaf.x + leaf.w,
        `lock hangs off the leaf (${label})`);
     ok(grip.x - grip.hx > leaf.x && grip.x + grip.hx < leaf.x + leaf.w,
@@ -259,10 +261,33 @@ group('handle clears the lock');
   console.log(`  (${n} renders, tightest clearance ${tightest}mm)`);
 }
 
+// ── 6c. What the works photographs actually show ──────────────────
+group('hinges and peephole match the photographs');
+for (const hd of HANDINGS) for (const sz of sizeKeys) {
+  const st = { ...base, handing: hd.id, size: sz };
+  const out = render({ ...st, view: 'out' });
+  const inn = render({ ...st, view: 'in' });
+  const label = `${hd.id}/${sz}`;
+
+  /* These doors open inwards. From the street the hinges are inside the
+     rebate, and not one outside photograph on the works page shows one. */
+  ok(!/data-hw="hinge"/.test(out), `hinges drawn on the street face (${label})`);
+  ok([...inn.matchAll(/data-hw="hinge"/g)].length >= 3, `inside face is missing hinges (${label})`);
+
+  // The peephole is on the leaf's centre line in every photograph.
+  for (const svg of [out, inn]) {
+    const leafX = Number(/id="leaf" data-x="([-\d.]+)"/.exec(svg)[1]);
+    const leafW = Number(/id="leaf"[^>]*data-w="([\d.]+)"/.exec(svg)[1]);
+    const eye = Number(/<circle cx="([-\d.]+)"[^>]*fill="url\(#metal\)"/.exec(svg)[1]);
+    ok(Math.abs(eye - (leafX + leafW / 2)) < 1, `peephole off the centre line (${label})`);
+  }
+}
+
 // ── 7. Leaf-and-a-half hinges against the frame, not the fixed panel ──
 group('leaf and a half');
 for (const h of HANDINGS) {
-  const svg = render({ ...base, size: 'half', handing: h.id });
+  // Hinges are drawn on the inside face only, as the works photographs show.
+  const svg = render({ ...base, size: 'half', handing: h.id, view: 'in' });
   const total = Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]);
   const hingeXs = [...svg.matchAll(/data-hw="hinge" data-cx="([\d.]+)"/g)].map(m => Number(m[1]));
   ok(hingeXs.length >= 2, `no hinges found for ${h.id}`);

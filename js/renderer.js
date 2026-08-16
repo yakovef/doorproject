@@ -409,8 +409,9 @@ export function render(state) {
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
-    ${HINGES_AFF.filter(a => a < leafH - 120).map(a => hinge(hingeX, y(a), paint, hingeOnLeft)).join('')}
-    ${win.rects.length ? '' : peephole(hingeOnLeft ? mainX + 130 : mainX1 - 130, y(PEEPHOLE_AFF))}
+    ${inside ? HINGES_AFF.filter(a => a < leafH - 120)
+                 .map(a => hinge(hingeX, y(a), inward)).join('') : ''}
+    ${win.rects.length ? '' : peephole(centreX, y(PEEPHOLE_AFF))}
     ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint)}
     ${inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
@@ -750,19 +751,41 @@ function lever(cx, cy, dir) {
     </g>`;
 }
 
-/* The reference photograph shows no hinges at all — modern armoured doors
-   conceal them. Draw a discreet barrel tinted to the door rather than bright
-   steel: visible on inspection, never jewellery. */
-const hinge = (cx, cy, paint, onLeft) => `
+/**
+ * Hinges, drawn only on the inside face.
+ *
+ * These doors open inwards, so from the street the hinges are hidden inside
+ * the rebate — every outside photograph on the works page shows a leaf with no
+ * hinges on it at all, and drawing them there was inventing hardware. From the
+ * inside they are unmissable: three bright chromed barrels standing proud of
+ * the leaf edge, brighter than any paint colour behind them.
+ *
+ * `out` is the direction the knuckle projects — away from the leaf centre.
+ */
+const hinge = (cx, cy, inward) => {
+  const out = -inward;
+  const h = 96, w = 26;
+  const x = cx + out * (w * 0.15);       // most of the barrel clears the edge
+  return `
     <g data-hw="hinge" data-cx="${cx}">
-      <rect x="${cx - 9}" y="${cy - 46}" width="18" height="92" rx="6"
-            fill="${darken(paint, 0.42)}"/>
-      <rect x="${cx - 9}" y="${cy - 46}" width="5" height="92" rx="2.5"
-            fill="#fff" opacity="0.13"/>
-      <rect x="${cx + 3}" y="${cy - 46}" width="6" height="92" rx="3"
-            fill="#000" opacity="0.22"/>
+      <rect x="${x - w / 2 + out * 4}" y="${cy - h / 2 + 5}" width="${w}" height="${h}" rx="${w / 2}"
+            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+      <rect x="${x - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" rx="${w / 2}"
+            fill="url(#nickel)"/>
+      <!-- knuckle caps: the barrel is three sleeves, not one tube -->
+      ${[-h / 2 + 30, h / 2 - 30].map(dy => `
+      <rect x="${x - w / 2}" y="${cy + dy - 1}" width="${w}" height="2"
+            fill="#000" opacity="0.28"/>`).join('')}
+      <rect x="${x - w / 2 + 4}" y="${cy - h / 2 + 6}" width="4.5" height="${h - 12}" rx="2.2"
+            fill="#fff" opacity="0.5"/>
+      <rect x="${x + w / 2 - 6}" y="${cy - h / 2 + 6}" width="4" height="${h - 12}" rx="2"
+            fill="#000" opacity="0.20"/>
     </g>`;
+};
 
+/* Centred on the leaf, always. Every photograph on the works page puts it on
+   the leaf's centre line — offsetting it towards the hinge, as this did, is
+   the kind of small wrongness that registers before anyone can name it. */
 const peephole = (cx, cy) => `
     <circle cx="${cx + 2}" cy="${cy + 3}" r="15" fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
     <circle cx="${cx}" cy="${cy}" r="14" fill="url(#metal)"/>

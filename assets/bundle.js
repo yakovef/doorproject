@@ -500,8 +500,8 @@
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
-    ${HINGES_AFF.filter((a) => a < leafH - 120).map((a) => hinge(hingeX, y(a), paint2, hingeOnLeft)).join("")}
-    ${win.rects.length ? "" : peephole(hingeOnLeft ? mainX + 130 : mainX1 - 130, y(PEEPHOLE_AFF))}
+    ${inside ? HINGES_AFF.filter((a) => a < leafH - 120).map((a) => hinge(hingeX, y(a), inward)).join("") : ""}
+    ${win.rects.length ? "" : peephole(centreX, y(PEEPHOLE_AFF))}
     ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint2)}
     ${inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
@@ -769,15 +769,26 @@
             fill="#fff" opacity="0.42"/>
     </g>`;
   }
-  var hinge = (cx, cy, paint2, onLeft) => `
+  var hinge = (cx, cy, inward) => {
+    const out = -inward;
+    const h = 96, w = 26;
+    const x = cx + out * (w * 0.15);
+    return `
     <g data-hw="hinge" data-cx="${cx}">
-      <rect x="${cx - 9}" y="${cy - 46}" width="18" height="92" rx="6"
-            fill="${darken(paint2, 0.42)}"/>
-      <rect x="${cx - 9}" y="${cy - 46}" width="5" height="92" rx="2.5"
-            fill="#fff" opacity="0.13"/>
-      <rect x="${cx + 3}" y="${cy - 46}" width="6" height="92" rx="3"
-            fill="#000" opacity="0.22"/>
+      <rect x="${x - w / 2 + out * 4}" y="${cy - h / 2 + 5}" width="${w}" height="${h}" rx="${w / 2}"
+            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
+      <rect x="${x - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" rx="${w / 2}"
+            fill="url(#nickel)"/>
+      <!-- knuckle caps: the barrel is three sleeves, not one tube -->
+      ${[-h / 2 + 30, h / 2 - 30].map((dy) => `
+      <rect x="${x - w / 2}" y="${cy + dy - 1}" width="${w}" height="2"
+            fill="#000" opacity="0.28"/>`).join("")}
+      <rect x="${x - w / 2 + 4}" y="${cy - h / 2 + 6}" width="4.5" height="${h - 12}" rx="2.2"
+            fill="#fff" opacity="0.5"/>
+      <rect x="${x + w / 2 - 6}" y="${cy - h / 2 + 6}" width="4" height="${h - 12}" rx="2"
+            fill="#000" opacity="0.20"/>
     </g>`;
+  };
   var peephole = (cx, cy) => `
     <circle cx="${cx + 2}" cy="${cy + 3}" r="15" fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
     <circle cx="${cx}" cy="${cy}" r="14" fill="url(#metal)"/>
