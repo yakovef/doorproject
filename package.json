@@ -10,7 +10,8 @@
     "shot": "node tools/screenshot.mjs",
     "compare": "node tools/compare.mjs",
     "hardware": "node tools/hardware.mjs",
-    "measure": "node tools/measure.mjs"
+    "measure": "node tools/measure.mjs",
+    "ask": "node tools/ask.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
