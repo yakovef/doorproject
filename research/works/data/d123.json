@@ -1,0 +1,30 @@
+{
+  "id": "d123",
+  "usable": true,
+  "view": "outside",
+  "squareness": 0.91,
+  "leaf": { "x": 501, "y": 227, "w": 435, "h": 1213, "aspect": 2.79 },
+
+  "colour": { "hex": "#4F5467", "name": "cool blue-grey (as shot)", "ral_guess": null,
+              "lum": 84, "rb": -21.4 },
+  "tone":   { "contrast": 1.37,
+              "profile": [0.86, 1.0, 1.0, 0.95, 0.93, 0.88, 0.83, 0.78, 0.73] },
+
+  "window": { "present": true, "count": 1, "kind": "single-tall",
+              "rects": [ { "x": 0.275, "y": 0.075, "w": 0.464, "h": 0.561 } ] },
+  "grille": "lattice",
+
+  "handle": { "type": "lever-plate", "finish": "black plate, satin lever",
+              "inset_w": 0.07, "height_h": 0.42, "len_h": null },
+  "lock":   { "present": true, "kind": "cylinder", "inset_w": 0.07, "height_h": 0.38 },
+  "peephole": { "present": false, "u": null, "height_h": null, "dia_w": null },
+  "hinges": { "visible": 0, "heights": [] },
+
+  "frame":  { "same_colour": true, "casing_w": 0.12, "gap_w": 0.014,
+              "gap_ratio": 0.92, "planes": 3 },
+  "detail": { "panel": false, "groove": false, "inlay": false,
+              "notes": "Leaf face is plain apart from a raised architrave around the glazing (u 0.23-0.80, h 0.345-0.94). Grille is a Deco / Mackintosh pattern: paired slim vertical bars inboard of each glass edge running the full height, closing into a woven square lattice across the bottom fifth of the glass. Nothing at all below the window." },
+  "extras": [],
+  "threshold": { "present": false, "hex": null },
+  "notes": "Leaf is the wide right-hand leaf of a 1.5-leaf set; the narrow left leaf (about 0.52 of leaf width, matching narrow glazed slot and grille) is not in the leaf bounds. Hinges right, hardware on the left closing edge. Unusually tall: aspect 2.79, so a roughly 2.5-2.8 m leaf. COLOUR IS NOT TRUSTWORTHY - the door is plainly white or near-white, but the shot is underexposed and heavily blue-cast (rb -21.4, measured lum only 84) because the camera exposed for bright daylight beyond the glass partitions either side; the hex given is what is in the pixels, not the paint. Geometry is good though (tilt 0.44 deg, keystone 1.76 deg). Leaf/frame gap is a faint shadow line only, hence gap_ratio near 1. Unfinished construction floor, no threshold."
+}

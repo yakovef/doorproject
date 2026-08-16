@@ -1,0 +1,29 @@
+{
+  "id": "d062",
+  "usable": false,
+  "view": "outside",
+  "squareness": 0.87,
+  "leaf": { "x": 207, "y": 63, "w": 673, "h": null, "aspect": null },
+
+  "colour": { "hex": "#3B4859", "name": "blue-grey", "ral_guess": "5014",
+              "lum": 70, "rb": -26 },
+  "tone":   { "contrast": 2.84,
+              "profile": [0.97, 1.0, 0.89, 0.77, 0.62, 0.51, 0.45, 0.41, 0.35] },
+
+  "window": { "present": false, "count": 0, "kind": "none", "rects": [] },
+  "grille": "none",
+
+  "handle": { "type": "lever-rose", "finish": "brass",
+              "inset_w": 0.06, "height_h": null, "len_h": null },
+  "lock":   { "present": true, "kind": "cylinder", "inset_w": 0.06, "height_h": null },
+  "peephole": { "present": true, "u": 0.49, "height_h": null, "dia_w": 0.04 },
+  "hinges": { "visible": 0, "heights": [] },
+
+  "frame":  { "same_colour": true, "casing_w": 0.1, "gap_w": 0.08,
+              "gap_ratio": 0.47, "planes": 2 },
+  "detail": { "panel": true, "groove": false, "inlay": false,
+              "notes": "two raised panels with deep multi-step moulded surrounds; large upper panel, shorter lower panel; wide flat stiles" },
+  "extras": ["pull-bar"],
+  "threshold": { "present": null, "hex": null },
+  "notes": "UNUSABLE for full-leaf geometry: the bottom of the leaf is below the frame of the photograph (image ends at y=1596 with plain door surface, no bottom rail, no floor). Leaf height, aspect and every height_h fraction are therefore unmeasurable and left null. Width IS reliable: left edge x=207 at the top drifting to x=224 at the image bottom, right edge x=880 to x=852; mid-height leaf width about 650 px. Roughly 3-5 percent of the leaf height is missing, so the 9-cell tone profile (measured over the visible span, top of leaf to y=1590) is very nearly the full profile but the last cell is a touch high. Squareness 0.87 is from the three visible edges only (L +0.64 deg, R -1.05 deg, T 0.0 deg); the bottom edge could not be included. HINGE SIDE IS ON THE RIGHT - the lever and cylinder sit near the LEFT edge, so inset_w is measured from the left (closing) edge. Extras: a horizontal turned brass pull rail across the middle of the leaf spanning u 0.33-0.72 with bosses at u 0.38 and u 0.62, at the same height as the cylinder. All hardware is brass, not the usual satin nickel. Strong top-to-bottom light falloff (contrast 2.84): the leaf reads #848E9E at the top and #2D3743 at the bottom, so the median #3B4859 is darker than the actual paint - the mid-height sample #5F6A7C is the better guide to the paint colour, hence the RAL 5014 pigeon-blue guess. A small blown-out white shield-shaped fitting sits on the leaf at about (255,105), unidentified. A beige bell push is on the wall to the right of the frame, not on the leaf. Leaf, gap and frame are all the same dark colour, so gap_w 0.08 is the whole shadowed reveal and cannot be separated from the frame face."
+}

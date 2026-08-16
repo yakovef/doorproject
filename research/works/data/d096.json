@@ -1,0 +1,83 @@
+{
+  "id": "d096",
+  "usable": true,
+  "view": "outside",
+  "squareness": 0.94,
+  "leaf": {
+    "x": 209,
+    "y": 407,
+    "w": 677,
+    "h": 1188,
+    "aspect": 1.76
+  },
+  "colour": {
+    "hex": "#8D9092",
+    "name": null,
+    "ral_guess": null,
+    "lum": 143.5,
+    "rb": -1.1
+  },
+  "tone": {
+    "contrast": 1.2,
+    "profile": [
+      0.894,
+      0.885,
+      0.859,
+      0.863,
+      0.83,
+      0.907,
+      0.887,
+      0.894,
+      1.0
+    ]
+  },
+  "window": {
+    "present": false,
+    "count": 0,
+    "kind": "none",
+    "rects": []
+  },
+  "grille": "none",
+  "handle": {
+    "type": null,
+    "finish": null,
+    "inset_w": null,
+    "height_h": null,
+    "len_h": null
+  },
+  "lock": {
+    "present": false,
+    "kind": null,
+    "inset_w": null,
+    "height_h": null
+  },
+  "peephole": {
+    "present": false,
+    "u": null,
+    "height_h": null,
+    "dia_w": null
+  },
+  "hinges": {
+    "visible": 0,
+    "heights": []
+  },
+  "frame": {
+    "same_colour": false,
+    "casing_w": 0.057,
+    "gap_w": 0.0118,
+    "gap_ratio": 0.986,
+    "planes": 1
+  },
+  "detail": {
+    "panel": false,
+    "groove": false,
+    "inlay": false,
+    "notes": ""
+  },
+  "extras": [],
+  "threshold": {
+    "present": false,
+    "hex": null
+  },
+  "notes": ""
+}

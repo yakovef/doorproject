@@ -1,0 +1,29 @@
+{
+  "id": "d063",
+  "usable": true,
+  "view": "outside",
+  "squareness": 0.93,
+  "leaf": { "x": 344, "y": 192, "w": 520, "h": 1301, "aspect": 2.5 },
+
+  "colour": { "hex": "#6B6061", "name": "taupe-brown", "ral_guess": "8019",
+              "lum": 98, "rb": 11 },
+  "tone":   { "contrast": 3.18,
+              "profile": [0.31, 0.56, 0.73, 0.95, 1.0, 0.95, 0.87, 0.85, 0.79] },
+
+  "window": { "present": false, "count": 0, "kind": "none", "rects": [] },
+  "grille": "none",
+
+  "handle": { "type": "pull-bar", "finish": "polished chrome",
+              "inset_w": 0.23, "height_h": 0.59, "len_h": 0.37 },
+  "lock":   { "present": true, "kind": "cylinder", "inset_w": 0.07, "height_h": 0.44 },
+  "peephole": { "present": false, "u": null, "height_h": null, "dia_w": null },
+  "hinges": { "visible": 0, "heights": [] },
+
+  "frame":  { "same_colour": true, "casing_w": 0.11, "gap_w": 0.04,
+              "gap_ratio": 0.26, "planes": 3 },
+  "detail": { "panel": false, "groove": true, "inlay": false,
+              "notes": "four fine horizontal shadow grooves across the full leaf width at height_h 0.81, 0.61, 0.41 and 0.20, dividing the face into five near-equal bands; face otherwise flat" },
+  "extras": [],
+  "threshold": { "present": true, "hex": "#829AAB" },
+  "notes": "Exterior house entrance, near square-on (squareness 0.93) and the whole leaf is visible, so bounds are solid. HINGE SIDE IS ON THE RIGHT - lock cylinder and pull bar are both near the LEFT edge, so inset_w is measured from the left (closing) edge. No lever on this face: a long vertical polished tube pull bar is the only handle, running height_h 0.40-0.77 on two round bosses. Round chrome cylinder escutcheon with a rotating keyhole shutter at height_h 0.44. No peephole anywhere on the leaf. A small shield-shaped maker's badge sits at u 0.10, height_h 0.96. Careful: the leaf is inset behind a shadowed rebate about 19 px wide on each side and 47 px at the head - a naive edge-finder locks onto the frame line, not the leaf. Leaf edges here are the inner boundary of that rebate. Very strong vertical light gradient (contrast 3.18) and it is INVERTED relative to most doors: the head is in deep porch shade (0.31 of peak) and the brightest band is at mid height, falling off again to 0.79 at the foot. The measured median #6B6061 is therefore darker than the paint; the well-lit mid band reads #706666. Threshold is a brushed aluminium sill; the sampled #829AAB is blue because it mirrors the sky. Frame is the same brown as the leaf. Galvanised installation straps are still bolted around the frame and a protective bag is on the floor - this is a fresh, not-yet-finished install."
+}

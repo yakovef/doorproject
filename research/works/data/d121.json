@@ -1,0 +1,30 @@
+{
+  "id": "d121",
+  "usable": true,
+  "view": "outside",
+  "squareness": 0.17,
+  "leaf": { "x": 204, "y": 216, "w": 413, "h": 920, "aspect": 2.23 },
+
+  "colour": { "hex": "#525253", "name": "anthracite", "ral_guess": "7016",
+              "lum": 82, "rb": -1.2 },
+  "tone":   { "contrast": 1.18,
+              "profile": [0.92, 0.92, 0.92, 0.94, 0.97, 1.0, 0.92, 0.88, 0.84] },
+
+  "window": { "present": true, "count": 1, "kind": "single-tall",
+              "rects": [ { "x": 0.24, "y": 0.16, "w": 0.455, "h": 0.49 } ] },
+  "grille": "lattice",
+
+  "handle": { "type": "lever-rose", "finish": "chrome",
+              "inset_w": 0.10, "height_h": 0.44, "len_h": null },
+  "lock":   { "present": true, "kind": "cylinder", "inset_w": 0.105, "height_h": 0.39 },
+  "peephole": { "present": false, "u": null, "height_h": null, "dia_w": null },
+  "hinges": { "visible": 0, "heights": [] },
+
+  "frame":  { "same_colour": true, "casing_w": 0.17, "gap_w": 0.005,
+              "gap_ratio": 0.73, "planes": 3 },
+  "detail": { "panel": true, "groove": false, "inlay": false,
+              "notes": "Raised panel moulding around the glazing (u 0.19-0.76, h 0.31-0.87) and a second raised panel low down (u 0.19-0.75, h 0.03-0.22). Small chrome maker's emblem at u 0.87, height_h 0.955 - too high to be a peephole." },
+  "extras": [],
+  "threshold": { "present": false, "hex": null },
+  "notes": "Leaf is the left half of a door + fixed sidelight set; the sidelight (about 0.55 of leaf width, same colour, matching narrow glazed slot with the same arch grille) is to the right and is NOT included in the leaf bounds. Shot is strongly oblique - camera low and to the right, left jamb reveal visible; left stile measures 877 px tall against 960 px on the right, hence the low squareness (tilt 4.4 deg, keystone 16.2 deg). Measurements taken on a perspective-rectified leaf. Frame reads lighter (#656669) than the leaf only because it is a differently lit plane; same paint. Row of small dark studs along the hinge-side frame seam are anchor plugs, not hinges."
+}

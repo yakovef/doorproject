@@ -1,0 +1,29 @@
+{
+  "id": "d061",
+  "usable": true,
+  "view": "outside",
+  "squareness": 0.23,
+  "leaf": { "x": 196, "y": 496, "w": 302, "h": 635, "aspect": 2.1 },
+
+  "colour": { "hex": "#B9BABC", "name": "white", "ral_guess": "9016",
+              "lum": 186, "rb": -3 },
+  "tone":   { "contrast": 1.27,
+              "profile": [1.0, 1.0, 0.98, 0.96, 0.92, 0.9, 0.86, 0.83, 0.79] },
+
+  "window": { "present": false, "count": 0, "kind": "none", "rects": [] },
+  "grille": "none",
+
+  "handle": { "type": "lever-rose", "finish": "satin",
+              "inset_w": 0.07, "height_h": 0.53, "len_h": null },
+  "lock":   { "present": true, "kind": "cylinder", "inset_w": 0.07, "height_h": 0.48 },
+  "peephole": { "present": true, "u": 0.5, "height_h": 0.82, "dia_w": 0.08 },
+  "hinges": { "visible": 0, "heights": [] },
+
+  "frame":  { "same_colour": true, "casing_w": 0.12, "gap_w": 0.03,
+              "gap_ratio": 0.87, "planes": 3 },
+  "detail": { "panel": true, "groove": false, "inlay": false,
+              "notes": "two raised panels with mitred moulded surrounds; tall upper panel (about v 0.09-0.47), shorter lower panel (about v 0.60-0.92); flat stiles and rails" },
+  "extras": [],
+  "threshold": { "present": true, "hex": "#9D9D9D" },
+  "notes": "Oblique three-quarter view from the lobby; whole leaf visible so bounds are reliable, but the leaf is a strong trapezoid (top edge +3.7 deg, bottom -9.6 deg), hence low squareness. Perspective-corrected leaf aspect is 2.22 against a bbox aspect of 2.10; use 2.22 for proportion. Door is set in a deep reveal, so the band outside the closing edge is the jamb return (0.11 of leaf width) rather than a shadow gap. Peephole reads oversized for a plain viewer (about 0.08 of leaf width) - probably a wide-angle/digital viewer. Paint reads neutral-to-slightly-cool white; the measured median is darkened by the shaded recess, the door is a plain white in reality."
+}

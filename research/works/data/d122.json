@@ -1,0 +1,30 @@
+{
+  "id": "d122",
+  "usable": true,
+  "view": "outside",
+  "squareness": 0.82,
+  "leaf": { "x": 299, "y": 306, "w": 450, "h": 968, "aspect": 2.15 },
+
+  "colour": { "hex": "#93968B", "name": "sage grey", "ral_guess": "7032",
+              "lum": 149, "rb": 7.8 },
+  "tone":   { "contrast": 1.09,
+              "profile": [0.99, 0.97, 0.93, 1.0, 0.99, 0.97, 0.95, 0.93, 0.92] },
+
+  "window": { "present": true, "count": 1, "kind": "single-tall",
+              "rects": [ { "x": 0.294, "y": 0.055, "w": 0.442, "h": 0.45 } ] },
+  "grille": "lattice",
+
+  "handle": { "type": "pull-bar", "finish": "matt black",
+              "inset_w": 0.176, "height_h": 0.50, "len_h": 0.514 },
+  "lock":   { "present": true, "kind": "cylinder", "inset_w": 0.065, "height_h": 0.485 },
+  "peephole": { "present": false, "u": null, "height_h": null, "dia_w": null },
+  "hinges": { "visible": 0, "heights": [] },
+
+  "frame":  { "same_colour": true, "casing_w": 0.051, "gap_w": 0.018,
+              "gap_ratio": 0.19, "planes": 3 },
+  "detail": { "panel": true, "groove": false, "inlay": false,
+              "notes": "Two raised panels: a moulded surround to the glazing (u 0.24-0.79, h 0.45-0.97) and a large lower panel (u 0.24-0.77, h 0.10-0.375). Glazing is dark textured/reeded glass divided 3 wide x 4 high by slim dark muntins matching the black bar. Small round fixing (bar through-bolt) at u 0.21, height_h 0.73." },
+  "extras": [],
+  "threshold": { "present": true, "hex": "#474648" },
+  "notes": "Leaf is the right-hand element of a door + narrow fixed sidelight set; the sidelight (about 0.42 of leaf width, same colour, one narrow glazed slot divided into three) sits to the LEFT and is not in the leaf bounds. Hinges on the right, closing edge and all hardware on the left. Door sits in a deep reveal: leaf, then an 8 px shadow gap, then about 40 px of shadowed jamb return, then the light frame casing face - hence planes 3. Photographer's shadow falls across the bottom-left of the leaf; the paint-cluster mask rejects those pixels so the tone profile is still clean, but rows 8-9 are the least reliable. Unfinished construction floor below the door. Colour is a pale warm sage grey (rb +7.8); RAL guess is loose."
+}

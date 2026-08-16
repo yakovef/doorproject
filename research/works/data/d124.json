@@ -1,0 +1,30 @@
+{
+  "id": "d124",
+  "usable": true,
+  "view": "outside",
+  "squareness": 0.98,
+  "leaf": { "x": 560, "y": 183, "w": 352, "h": 817, "aspect": 2.32 },
+
+  "colour": { "hex": "#A6ABAD", "name": "off-white, cool in shade", "ral_guess": "9001",
+              "lum": 170, "rb": -7.8 },
+  "tone":   { "contrast": 1.15,
+              "profile": [0.92, 0.98, 1.0, 0.98, 0.97, 0.97, 0.95, 0.89, 0.87] },
+
+  "window": { "present": true, "count": 1, "kind": "single-tall",
+              "rects": [ { "x": 0.268, "y": 0.10, "w": 0.461, "h": 0.484 } ] },
+  "grille": "scroll",
+
+  "handle": { "type": "pull-bar", "finish": "polished stainless",
+              "inset_w": 0.176, "height_h": 0.55, "len_h": 0.349 },
+  "lock":   { "present": true, "kind": "cylinder", "inset_w": 0.063, "height_h": 0.477 },
+  "peephole": { "present": false, "u": null, "height_h": null, "dia_w": null },
+  "hinges": { "visible": 0, "heights": [] },
+
+  "frame":  { "same_colour": true, "casing_w": 0.135, "gap_w": 0.011,
+              "gap_ratio": 0.80, "planes": 3 },
+  "detail": { "panel": true, "groove": false, "inlay": false,
+              "notes": "Raised architrave around the glazing (u 0.21-0.81, h 0.385-0.92) and a large lower raised panel with an inner bead (u 0.21-0.79, h 0.026-0.26). Grille is white-painted wrought scrollwork in two blocks (h 0.75-0.87 and h 0.45-0.56) set inside a plain rectilinear bar grid across the whole light. A second round chrome escutcheon (thumbturn/emergency bolt) sits above the key cylinder at inset_w 0.063, height_h 0.526." },
+  "extras": [],
+  "threshold": { "present": true, "hex": "#616D6E" },
+  "notes": "One leaf of a symmetric pair of equal double doors; this is the right-hand (active, locking) leaf. The matching left leaf is the mirror image. Closing edge and all hardware are on the LEFT (meeting stile); hinges on the right jamb. Almost dead square-on - all four edges within about 0.2 deg of axis over 800 px, the squarest shot in the batch. Leaf is in open shade while the frame is in direct sun and blown out (lum 250+), so the leaf colour reads cool (rb -7.8); the paint is very likely a warm off-white/cream. Glass is dark (unlit interior) so the bright-blob detector found no glazing - the window rect was read by eye. A cordless drill left on the sill occludes the bottom-right corner of the leaf (about u 0.85-1.0, h 0-0.06). Building site: sill and surrounding render unfinished."
+}
