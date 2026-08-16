@@ -243,15 +243,16 @@ export function render(state) {
       <stop offset="0.48" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
       <stop offset="0.64" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
       <stop offset="0.82" stop-color="${LIGHT.cool}" stop-opacity="${fall.low}"/>
-      <!-- Warm-black, and it has to be: the ramp above is blue all the way
-           down, so a cool or even neutral last stop tints the foot rather
-           than darkening it (R-B -15 and -11, tried both). This lands at
-           -10, still cooler than the photograph's +5 — the peach bounce
-           that used to close that gap was doing it by painting a brown
-           patch on the door, which is a bad trade. A ten-point R-B drift
-           continuing a ramp that is cool anyway does not read as a colour;
-           a warm patch with an edge did. -->
-      <stop offset="1"    stop-color="#100D0B" stop-opacity="${fall.foot}"/>
+      <!-- Pure black, and it must stay pure black. Compositing black at
+           alpha a multiplies every channel by (1-a), so hue and saturation
+           come through untouched and only the value falls. Any TINTED dark
+           does the opposite: the warm near-black that used to sit here
+           pulled 35% of its own hue into the paint, which on a near-neutral
+           anthracite is invisible and on saturated paint is not — navy,
+           fir green and wine all went brown at the foot, because losing
+           blue at low luminance IS brown. Do not tune this stop against a
+           grey door. -->
+      <stop offset="1"    stop-color="#000" stop-opacity="${fall.foot}"/>
     </linearGradient>
 
     <!-- A soft elliptical bloom in the upper third. On the white doors this is

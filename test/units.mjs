@@ -4,6 +4,7 @@
  */
 import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, VIEWS, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
+import { LIGHT } from '../js/renderer.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import { render } from '../js/renderer.js';
 import { decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
@@ -294,6 +295,41 @@ for (const hd of HANDINGS) for (const sz of sizeKeys) {
     const leafW = Number(/id="leaf"[^>]*data-w="([\d.]+)"/.exec(svg)[1]);
     const eye = Number(/<circle cx="([-\d.]+)"[^>]*fill="url\(#metal\)"/.exec(svg)[1]);
     ok(Math.abs(eye - (leafX + leafW / 2)) < 1, `peephole off the centre line (${label})`);
+  }
+}
+
+// ── 6b. Nothing may pour its own hue into the paint ────────────────
+/* Shipped twice, reported twice. A darkening overlay has to be pure black,
+   because black at alpha a multiplies every channel by (1-a) and so takes the
+   value down while leaving hue and saturation alone. A TINTED dark mixes its
+   own colour in instead, at a strength nobody reads off the hex.
+   The stop that did it was a warm near-black at the foot, picked by measuring
+   R-B on anthracite — a paint so close to neutral that a warm tint cannot be
+   seen. On navy, fir green and wine it very much could: they went brown,
+   because a dark colour losing its blue is what brown is.
+   So the face wash may only ever speak in the two declared light colours and
+   in black, and its foot — the strongest stop, over the darkest paint — must
+   be black exactly. */
+group('the face wash does not tint the paint');
+{
+  const allowed = new Set(['#000', LIGHT.warm.toLowerCase(), LIGHT.cool.toLowerCase()]);
+  for (const c of COLOURS) {
+    const svg = render({ ...base, colour: c.id });
+    const wash = /<linearGradient id="keyWash"[\s\S]*?<\/linearGradient>/.exec(svg);
+    ok(wash, `no keyWash gradient for ${c.id}`);
+    const stops = [...wash[0].matchAll(/<stop offset="([\d.]+)"\s+stop-color="([^"]+)"/g)]
+      .map(m => ({ at: Number(m[1]), col: m[2].toLowerCase() }));
+    ok(stops.length >= 2, `keyWash has no stops for ${c.id}`);
+
+    for (const s of stops) {
+      ok(allowed.has(s.col),
+        `keyWash stop at ${s.at} on ${c.id} is ${s.col}: only black and the ` +
+        `two declared light colours may touch the paint`);
+    }
+    const foot = stops.reduce((a, b) => (b.at >= a.at ? b : a));
+    ok(foot.at === 1 && foot.col === '#000',
+      `keyWash foot stop on ${c.id} is ${foot.col} at ${foot.at}, not #000 at 1: ` +
+      `a tinted foot turns saturated doors brown`);
   }
 }
 

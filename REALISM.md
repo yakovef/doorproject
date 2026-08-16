@@ -52,9 +52,25 @@ can see it is wrong: over dark paint a warm overlay reads as a brown patch of
 different paint rather than as light, and the photographs back that up — the
 anthracite door's profile ends 0.41 0.37 0.38, dead flat, while ours ended
 0.54 0.49 0.52, rising into the last row. The price is a foot that measures
-R-B -10 where the photograph is +5. That is the accepted side of the trade:
-a slight cool drift continuing a ramp that is cool anyway is invisible, and
-the warm patch it replaced was the first thing anyone noticed.
+R-B -11 where the photograph is +5. Accepted: RAL 7016 is itself R-B -10, so
+the foot is simply the paint's own colour with the key light taken off it.
+
+### The tint rule, learned the hard way
+
+**A darkening overlay must be pure black.** Black at alpha *a* multiplies every
+channel by (1-a), so hue and saturation survive and only value falls. Anything
+tinted pours its own hue into the paint in proportion to its opacity.
+
+Cutting the bounce did not fix the patch, because the stop underneath it was a
+warm near-black at 0.35 and that was the other half of the fault. It was
+chosen by measuring R-B on anthracite, where a warm tint is invisible because
+the paint is nearly neutral. On saturated paint it was not invisible at all:
+the navy leaf ran R-B -28 through the body and -13 at the foot, and a dark
+colour losing its blue **is** brown. Navy, fir green and wine all grew the same
+brown patch, from a stop that measured fine on grey.
+
+So: never calibrate a tint against a neutral door. Anything that darkens gets
+checked on RAL 5011, 6009 and 3005 before it is believed.
 
 **Every** shading decision derives from these. A surface facing up is
 brightest; facing left, bright; facing right, dark; facing down, darkest.
