@@ -316,6 +316,87 @@ behaviour instead of styling.*
 
 ---
 
+## 4c. Status — round two, against the works photographs
+
+Round one compared against `ref-00.png`, which is a **catalogue render**, not a
+photograph. The twelve installation photos now in `research/works/img/` are the
+real thing — Chava's own doors, shot on phones in stairwells and doorways — and
+they contradicted the renderer in ways a catalogue image never would.
+
+Four independent readings of the set were taken: three visual, one metrological
+(`jpeg-js` decode, slope-fitted leaf edges, Kåsa circle fits on the hardware,
+9×13 tone grids, detrended high-pass for texture). Where they disagreed, the
+metrology won.
+
+### What the photographs proved wrong
+
+| # | The renderer did | The photographs show |
+|---|---|---|
+| 1 | Handle and lock on one axis, so pull bars ran through the keyhole | Lock on the stile; a vertical handle stands off towards the centre |
+| 2 | Lock backset 0.158 W | **0.067–0.087 W**, mean 0.076 |
+| 3 | Escutcheon *smaller* than the lever rosette (0.83×) | **1.08×** — the escutcheon is the bigger disc |
+| 4 | Peephole offset 130 mm towards the hinge | **Centred**, 0.496–0.514 of leaf width, in all twelve |
+| 5 | Peephole a dark disc in a bright bezel | A small **bright boss** inside a dark ring — inside out |
+| 6 | Hinges on the street face | These doors open inward: **no outside photograph has one**. Inside, three chromed barrels standing clear of the leaf edge |
+| 7 | Leaf straight into the return face | A **gap → bead → quirk** profile, mitred at both top corners |
+| 8 | Falloff 1.35 : 1, everywhere | **2.4–3.4 : 1 on dark doors, 1.5–1.7 : 1 on cream** — one gradient cannot serve both |
+| 9 | A hard dark gap line on every door | 0.22–0.66× the leaf on anthracite, but **0.97–1.36× on cream** — no dark line there at all |
+| 10 | Neutral shading | Lit is warm, shadow is cool. A white leaf swings R−B from **+40 at the head to −52 at the foot** |
+
+Two of these — 1 and 4 — were the customer-visible ones. The rest are the
+difference between "a drawing of a door" and "a door".
+
+### What they confirmed
+
+Handle height is the steadiest quantity in the whole set: **0.486 H ± 0.012**
+across four doors. The lever is horizontal to within 0.44°, points at the
+hinge, and reaches **0.13 W**. Lever and keyhole sit on **one vertical axis** —
+the horizontal offset measures 1.7 px on a 522 px leaf. Frame and leaf are
+**the same paint**; every difference is plane orientation. And the texture on
+the one door whose phone did not denoise it is **multiplicative** — amplitude
+≈ 0.034 × local luminance — which is what an `overlay` blend already does, so
+the existing grain model was right in kind and only wrong in amount.
+
+### Where we deliberately depart
+
+- **Contrast.** The anthracite photographs run 2.4–3.4 : 1 because they were
+  shot in dim stairwells. Tuning to that number matched the metric and made
+  the bottom third of the door near-black — a configurator that hides the
+  colour someone is buying has failed at its actual job. Held at **1.94 : 1**,
+  with the profile shape matched row for row.
+- **Keystoning.** Every real leaf is a trapezoid, 3–4% narrower at the foot,
+  and nothing in any photograph is axis-aligned. Skipped on purpose: this is a
+  product elevation, not a snapshot, and a leaning door would read as a
+  mistake rather than as realism.
+
+### The instrument
+
+`npm run measure` prints contrast, the normalised vertical profile, R−B at head
+and foot, and high-pass sigma — for three photographs and for our own render,
+side by side. Tuning is now a matter of closing numbers:
+
+```
+3300.jpeg (anthracite)   contrast 2.66   profile 0.68 0.96 1 0.92 0.68 0.52 0.41 0.37 0.38
+ours      (anthracite)   contrast 1.94   profile 0.61 0.99 1 0.86 0.69 0.60 0.54 0.49 0.52
+3195_3.jpeg (white)      contrast 1.30   profile 0.77 1 0.98 0.97 0.94 0.90 0.86 0.81 0.77
+ours        (white)      contrast 1.24   profile 0.83 1 0.95 0.96 0.93 0.90 0.87 0.83 0.81
+```
+
+### Still open
+
+- The baked-photo shading finisher, which still needs one photograph of a
+  plain door in daylight.
+- **The single elongated backplate.** Three of the four measured doors carry
+  lever and cylinder on one stadium-shaped plate (0.10 W × 0.112 H, aspect
+  2.5), not two separate discs. We draw the two-disc arrangement, which is
+  what 3300 shows and is correct — but the plate is the more common of the two
+  and belongs in the catalogue as its own option. **Ask Chava which he fits.**
+- Gap width should follow the view angle rather than a fixed fraction: the
+  near-frontal photographs show a genuine 2–4 px hairline, the oblique ones
+  9–29 px, and that is parallax rather than a property of the door.
+
+---
+
 ## 5. Order of work
 
 | Step | Content | Est. | Why here |

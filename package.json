@@ -9,11 +9,14 @@
     "test": "node test/units.mjs",
     "shot": "node tools/screenshot.mjs",
     "compare": "node tools/compare.mjs",
-    "hardware": "node tools/hardware.mjs"
+    "hardware": "node tools/hardware.mjs",
+    "measure": "node tools/measure.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
-    "playwright": "^1.49.0"
+    "jpeg-js": "^0.4.4",
+    "playwright": "^1.49.0",
+    "pngjs": "^7.0.0"
   },
   "type": "module"
 }

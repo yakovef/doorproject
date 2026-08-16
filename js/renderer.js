@@ -34,25 +34,61 @@ const FINISH_TONES = {
    depth looks like a diagram. */
 export const LIGHT = {
   key: 0.24,       // face wash amplitude
-  bounce: 0.11,    // warm floor bounce, lowest ~350mm
-  ao: 0.58,        // occlusion at a tight junction
+  bounce: 0.19,    // warm floor bounce, lowest ~250mm
+  ao: 0.26,        // occlusion at a tight junction
   vignette: 0.07,
+  /* Lit is warm, shadow is cool. Measured on four of the works doors and
+     named by all three analyses as the first thing whose absence reads as
+     plastic: a white leaf runs R-B +40 at the lit top to -52 at the foot,
+     a dark one +11 to -6. A single grey with a luminance ramp cannot do it. */
+  warm: '#FFF4E2',
+  cool: '#0C1622',
+};
+
+/* How far the face falls from its brightest point to its darkest.
+   The photographs run 1.45-2.9 stops on a dark leaf and 0.6-1.0 on a white
+   one. We deliberately stop short of the dark end: these were shot in dim
+   stairwells, and a configurator that renders the bottom third of an
+   anthracite door near-black misrepresents the colour someone is buying.
+   ~1.9:1 and ~1.45:1 keep the modelling strong and the colour legible. */
+const FALLOFF = {
+  dark:  { peak: 0.16, mid: 0.08, low: 0.30, foot: 0.44, head: 0.03, grain: 0.13, drift: 0.26 },
+  light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.26, head: 0.02, grain: 0.02, drift: 0.14 },
 };
 
 // ── Geometry, in mm ────────────────────────────────────────────────
 const CASING   = 46;   // flat frame face against the wall
 const RET_NEAR = 92;   // visible return, camera side (wide)
-const RET_FAR  = 34;   // visible return, far side (narrow)
+const RET_FAR  = 64;   // visible return, far side (narrow)
 const RET_HEAD = 56;   // visible return under the head
 const MULLION  = 46;
 
-const HANDLE_AFF   = 1050;
-const CYLINDER_AFF = 950;
-const PEEPHOLE_AFF = 1520;
-const HINGES_AFF   = [250, 1050, 1850];
-const LOCK_BACKSET = 150;   // lock centre from the leaf's closing edge
-const LOCK_R       = 33;    // escutcheon radius; see cylinder()
+/* The reveal profile, read outward from the leaf. Every works photograph has
+   these three bands and the renderer had none of them: it went straight from
+   leaf to return face. The BEAD is the important one — a 2px line at up to
+   1.3x the leaf's own value, mitred at both top corners. Both analyses of the
+   photographs called it the strongest edge cue in the image and the one most
+   often dropped. */
+const GAP   = 12;      // leaf-to-frame shadow gap, 0.013 W
+const BEAD  = 9;       // the lit arris, 0.010 W
+const QUIRK = 22;      // the dark groove behind it, 0.023 W
+
+/* Hardware dimensions, measured off the works photographs (see REALISM.md
+   §7). These are absolute millimetres, not fractions of the leaf, because a
+   euro cylinder is 66 mm across and a handle sits at waist height whether the
+   door is 800 or 1100 wide. The fractions the photographs give are converted
+   here against the standard 950 x 2100 leaf they were measured on. */
+const HANDLE_AFF   = 1020;  // 0.486 H — the steadiest number in the whole set
+const CYLINDER_AFF = 904;   // 0.1225 W below the lever, on the same axis
+const PEEPHOLE_AFF = 1600;  // 0.762 H
+const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
+const HINGES_AFF   = [303, 1057, 1799];   // 0.144 / 0.504 / 0.857 H
+const LOCK_BACKSET = 72;    // 0.076 W from the closing edge
+const LOCK_R       = 40;    // 0.083 W across — the escutcheon is the bigger disc
+const LEVER_ROSETTE = 37;   // ratio to the escutcheon is 1.08, not 1.2
+const LEVER_REACH  = 124;   // 0.13 W, and exactly horizontal in all four photos
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
+const BAR_STANDOFF = 0.14;  // of leaf width: where ref-00 puts its channel
 const THRESHOLD    = 26;
 
 const PAD = { x: 70, top: 95, bottom: 150 };
@@ -98,7 +134,7 @@ export function render(state) {
      it is not what ref-00 or any of the works photographs show. */
   const lockX   = hingeOnLeft ? mainX1 - LOCK_BACKSET : mainX + LOCK_BACKSET;
   const inward  = hingeOnLeft ? -1 : 1;
-  const standoff = handleStandoff(handle, leafH);
+  const standoff = handleStandoff(handle, leafW, leafH);
   const handleX = lockX + inward * standoff;
   const hingeX  = hingeOnLeft ? mainX : mainX1;
   const leverDir = hingeOnLeft ? -1 : 1;
@@ -115,22 +151,46 @@ export function render(state) {
   const paint = inside ? lighten(colour.hex, isLight(colour.hex) ? 0.05 : 0.28) : colour.hex;
   const edge  = silhouette(paint);
   const deep  = darken(paint, 0.55);
+  const fall  = isLight(paint) ? FALLOFF.light : FALLOFF.dark;
+
+  const pale = isLight(paint);
+
+  /* The leaf's own perimeter ramps, distinct from the frame's shadow gap and
+     easy to omit: the face itself darkens towards its edges over 0.04-0.06 W,
+     and over 0.065 H at the foot. Measured on the anthracite stairwell door. */
+  const AO_SIDE = Math.round(leafW * 0.05);
+  const AO_FOOT = Math.round(leafH * 0.065);
 
   const leaf = (lx, lw) => `
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#leafFill)"/>
-    <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#keyLight)"/>
+    <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#keyWash)"/>
+    <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#bloom)"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#floorBounce)"/>
+    <!-- Surface: broad cloud at 0.2-0.4 W, and only a whisper of fine grain.
+         Three of the four doors measured have no resolvable speckle at all —
+         what they have is slow mottling, so that is what carries the weight. -->
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
-          filter="url(#grain)" opacity="0.16" style="mix-blend-mode:overlay"/>
+          filter="url(#drift)" opacity="${fall.drift}" style="mix-blend-mode:overlay"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
-          filter="url(#drift)" opacity="0.22" style="mix-blend-mode:overlay"/>
+          filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
     <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.10"/>
     <!-- occlusion where the leaf meets the frame on every side -->
     <rect x="${lx}" y="${y0}" width="${lw}" height="64" fill="url(#aoTop)"/>
-    <rect x="${lx}" y="${y0}" width="46" height="${leafH}" fill="url(#aoLeft)"/>
-    <rect x="${lx + lw - 46}" y="${y0}" width="46" height="${leafH}" fill="url(#aoRight)"/>
-    <rect x="${lx}" y="${floorY - 40}" width="${lw}" height="40" fill="url(#aoBottom)"/>`;
+    <rect x="${lx}" y="${y0}" width="${AO_SIDE}" height="${leafH}" fill="url(#aoLeft)"/>
+    <rect x="${lx + lw - AO_SIDE}" y="${y0}" width="${AO_SIDE}" height="${leafH}" fill="url(#aoRight)"/>
+    <rect x="${lx}" y="${floorY - AO_FOOT}" width="${lw}" height="${AO_FOOT}" fill="url(#aoBottom)"/>`;
+
+  /* The reveal: three mitred bands running up one jamb, across the head and
+     down the other. Stroking one path per band gets the 45-degree corner
+     mitres for free, and those mitres are named in the photographs as the
+     frame's most distinctive detail. */
+  const band = (inset, w, fill) => {
+    const d = inset + w / 2;
+    return `<path d="M ${x0 - d} ${floorY + THRESHOLD} L ${x0 - d} ${y0 - d}
+                     L ${x1 + d} ${y0 - d} L ${x1 + d} ${floorY + THRESHOLD}"
+                  fill="none" stroke="${fill}" stroke-width="${w}" stroke-linejoin="miter"/>`;
+  };
 
   return `
 <svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
@@ -143,18 +203,53 @@ export function render(state) {
       <stop offset="1" stop-color="${darken(paint, 0.05)}"/>
     </linearGradient>
 
-    <!-- Key light: a large off-centre radial. Radial falloff has no straight
-         edges, so it cannot band the way a linear wash did. -->
-    <radialGradient id="keyLight" cx="0.22" cy="0.12" r="1.15">
-      <stop offset="0"   stop-color="#fff" stop-opacity="${LIGHT.key}"/>
-      <stop offset="0.42" stop-color="#fff" stop-opacity="${(LIGHT.key * 0.32).toFixed(3)}"/>
-      <stop offset="0.72" stop-color="#000" stop-opacity="0.09"/>
-      <stop offset="1"   stop-color="#000" stop-opacity="0.24"/>
+    <!-- The key wash. Vertical, because that is what the photographs measure:
+         a dip at the very head, a peak around 0.15-0.30 down, then a long
+         fall to roughly half at the foot. Warm where it is lit, cool where it
+         is not — the hue swing is doing as much work here as the value. -->
+    <linearGradient id="keyWash" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="${LIGHT.cool}" stop-opacity="${fall.head}"/>
+      <stop offset="0.15" stop-color="${LIGHT.warm}" stop-opacity="${fall.peak}"/>
+      <stop offset="0.32" stop-color="${LIGHT.warm}" stop-opacity="${fall.mid}"/>
+      <stop offset="0.48" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
+      <stop offset="0.64" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
+      <stop offset="0.82" stop-color="${LIGHT.cool}" stop-opacity="${fall.low}"/>
+      <stop offset="1"    stop-color="#100D0B" stop-opacity="${fall.foot}"/>
+    </linearGradient>
+
+    <!-- A soft elliptical bloom in the upper third. On the white doors this is
+         a measured object — the pendant bulb's reflection, half-max spanning
+         0.50 W by 0.28 H. On dark paint it barely registers, which is also
+         what the photographs show. -->
+    <radialGradient id="bloom" cx="0.42" cy="0.22" r="0.62"
+                    gradientTransform="translate(0 0.22) scale(1 0.66) translate(0 -0.22)">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.75).toFixed(3)}"/>
+      <stop offset="0.55" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.22).toFixed(3)}"/>
+      <stop offset="1"    stop-color="${LIGHT.warm}" stop-opacity="0"/>
     </radialGradient>
 
+    <!-- The reveal bands. The gap tracks ambient rather than going black —
+         measured at 0.30-0.70x the adjacent surface, never zero — and gets
+         darker towards the floor. The bead is the one bright plane. -->
+    <!-- On the anthracite doors the gap runs 0.22-0.66x the leaf; on the cream
+         ones it reaches 0.97-1.36x, i.e. there is no dark line there at all.
+         A hard-coded dark stroke is wrong on half the catalogue. -->
+    <linearGradient id="gapTone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.14 : 0.46}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.26 : 0.72}"/>
+    </linearGradient>
+    <linearGradient id="beadTone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${LIGHT.warm}" stop-opacity="0.11"/>
+      <stop offset="1" stop-color="${LIGHT.warm}" stop-opacity="0.02"/>
+    </linearGradient>
+    <linearGradient id="quirkTone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.44"/>
+    </linearGradient>
+
     <linearGradient id="floorBounce" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0"    stop-color="#FFE7C2" stop-opacity="${LIGHT.bounce}"/>
-      <stop offset="0.18" stop-color="#FFE7C2" stop-opacity="0"/>
+      <stop offset="0"    stop-color="#FFD9A0" stop-opacity="${LIGHT.bounce}"/>
+      <stop offset="0.12" stop-color="#FFD9A0" stop-opacity="0"/>
     </linearGradient>
 
     <!-- Ambient occlusion. Tight, dark, and at every junction. -->
@@ -372,6 +467,16 @@ export function render(state) {
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
     <line x1="${x1 + RET_FAR}" y1="${y0 - RET_HEAD}" x2="${x1 + RET_FAR}" y2="${floorY + THRESHOLD}"
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+
+    <!-- ── the reveal: quirk, bead, gap, mitred at both top corners ── -->
+    <g id="reveal">
+      ${band(GAP + BEAD, QUIRK, 'url(#quirkTone)')}
+      ${band(GAP, BEAD, 'url(#beadTone)')}
+      ${band(0, GAP, 'url(#gapTone)')}
+      <!-- the head gap is the widest and the darkest opening in the frame -->
+      <rect x="${x0 - GAP}" y="${y0 - GAP}" width="${totalW + GAP * 2}" height="${GAP * 2.4}"
+            fill="#000" opacity="${pale ? 0.12 : 0.30}"/>
+    </g>
   </g>
 
   <!-- ── threshold ────────────────────────────────────────────── -->
@@ -573,11 +678,13 @@ function handleFootprint(handle, leafH) {
  * a lever's rosette stops 27 mm above the escutcheon, exactly as it does on a
  * real door, and moving it would be wrong.
  */
-export function handleStandoff(handle, leafH) {
+export function handleStandoff(handle, leafW, leafH) {
   const foot = handleFootprint(handle, leafH);
   const dy = Math.abs(HANDLE_AFF - CYLINDER_AFF);
   if (dy >= foot.vy + LOCK_R) return 0;              // vertical bands miss
-  return Math.round(foot.hx + LOCK_R + LOCK_CLEAR);
+  // Clearing the escutcheon is the floor, not the target: ref-00 stands its
+  // channel 0.227 W off the closing edge, and 0.085 + 0.14 lands on that.
+  return Math.round(Math.max(foot.hx + LOCK_R + LOCK_CLEAR, leafW * BAR_STANDOFF));
 }
 
 function handleArt(handle, cx, cy, leafH, dir, paint) {
@@ -592,7 +699,6 @@ function handleArt(handle, cx, cy, leafH, dir, paint) {
 }
 
 const DEE_R = 78;
-const LEVER_ROSETTE = 40;
 const channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
 const barHalf     = (len, leafH) => Math.min(len, leafH - 320) / 2;
 
@@ -706,7 +812,7 @@ const disc = (cx, cy, r) => `
  * thing is built from the rosette outward so it cannot degenerate.
  */
 function lever(cx, cy, dir) {
-  const L = 185;
+  const L = LEVER_REACH;
   const at = t => cx + dir * t;               // distance along the lever
   return `
     <g>
@@ -725,21 +831,30 @@ function lever(cx, cy, dir) {
                L ${at(0)} ${cy + 20} Z"
             fill="url(#nickel)"/>
 
-      <!-- One long, soft specular along the top face — the strongest metal
-           cue there is, but a hard white slab reads as plastic. -->
-      <path d="M ${at(18)} ${cy - 14} L ${at(L - 24)} ${cy - 9}
-               Q ${at(L - 8)} ${cy - 9} ${at(L - 8)} ${cy - 4.5}
-               L ${at(18)} ${cy - 7} Z"
-            fill="#fff" opacity="0.5"/>
-      <path d="M ${at(18)} ${cy - 6} L ${at(L - 10)} ${cy - 4} L ${at(L - 10)} ${cy}
-               L ${at(18)} ${cy - 1} Z"
-            fill="#fff" opacity="0.16"/>
-      <!-- rolled underside, turned away from the key -->
-      <path d="M ${at(18)} ${cy + 6} L ${at(L - 16)} ${cy + 5}
-               L ${at(L - 16)} ${cy + 11} L ${at(18)} ${cy + 15} Z"
-            fill="#000" opacity="0.26"/>
+      <!-- Metal is BANDED, not shaded: the photographs show a hard clipped
+           arris along the top (the only blown highlight anywhere in the
+           frame), a mid band under it, and a body that goes nearly as dark as
+           the paint underneath. A smooth gradient down the whole section is
+           what makes rendered hardware look like grey plastic. -->
+      <path d="M ${at(14)} ${cy - 17} L ${at(L - 20)} ${cy - 12}
+               Q ${at(L - 6)} ${cy - 12} ${at(L - 6)} ${cy - 9}
+               L ${at(14)} ${cy - 13} Z"
+            fill="#fff" opacity="0.92"/>
+      <path d="M ${at(16)} ${cy - 12} L ${at(L - 14)} ${cy - 8}
+               L ${at(L - 14)} ${cy - 3} L ${at(16)} ${cy - 6} Z"
+            fill="#fff" opacity="0.26"/>
+      <!-- rolled underside, turned away from the key and nearly in shadow -->
+      <path d="M ${at(16)} ${cy + 3} L ${at(L - 16)} ${cy + 2}
+               L ${at(L - 16)} ${cy + 11} L ${at(16)} ${cy + 16} Z"
+            fill="#000" opacity="0.44"/>
+      <!-- the tip turns out of the key and picks up the darker surround -->
+      <path d="M ${at(L - 26)} ${cy - 11} L ${at(L - 4)} ${cy - 10}
+               Q ${at(L)} ${cy - 9} ${at(L)} ${cy - 1}
+               Q ${at(L)} ${cy + 9} ${at(L - 14)} ${cy + 9}
+               L ${at(L - 26)} ${cy + 8} Z"
+            fill="#000" opacity="0.16"/>
 
-      ${disc(cx, cy, 40)}
+      ${disc(cx, cy, LEVER_ROSETTE)}
 
       <!-- the neck swelling out of the rosette, drawn over it -->
       <path d="M ${at(2)} ${cy - 19} Q ${at(28)} ${cy - 18} ${at(33)} ${cy - 15}
@@ -764,8 +879,8 @@ function lever(cx, cy, dir) {
  */
 const hinge = (cx, cy, inward) => {
   const out = -inward;
-  const h = 96, w = 26;
-  const x = cx + out * (w * 0.15);       // most of the barrel clears the edge
+  const h = 80, w = 32;                  // 0.038 H x 0.034 W
+  const x = cx + out * 22;               // centre 0.023 W outside the leaf edge
   return `
     <g data-hw="hinge" data-cx="${cx}">
       <rect x="${x - w / 2 + out * 4}" y="${cy - h / 2 + 5}" width="${w}" height="${h}" rx="${w / 2}"
@@ -786,11 +901,20 @@ const hinge = (cx, cy, inward) => {
 /* Centred on the leaf, always. Every photograph on the works page puts it on
    the leaf's centre line — offsetting it towards the hinge, as this did, is
    the kind of small wrongness that registers before anyone can name it. */
-const peephole = (cx, cy) => `
-    <circle cx="${cx + 2}" cy="${cy + 3}" r="15" fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
-    <circle cx="${cx}" cy="${cy}" r="14" fill="url(#metal)"/>
-    <circle cx="${cx}" cy="${cy}" r="7" fill="#141618"/>
-    <circle cx="${cx - 3}" cy="${cy - 3}" r="2.4" fill="#fff" opacity="0.5"/>`;
+const peephole = (cx, cy) => {
+  const R = PEEPHOLE_R;
+  return `
+    <!-- Radially: a soft halo, a dark ring, then a small bright boss at the
+         centre. Measured off 3300 — the middle is BRIGHTER than the leaf, so
+         drawing a dark disc with a shiny bezel had it inside out. -->
+    <circle cx="${cx + 2}" cy="${cy + 3}" r="${R * 0.75}" fill="#000" opacity="0.18" filter="url(#hwShadow)"/>
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="#000" opacity="0.07"/>
+    <circle cx="${cx}" cy="${cy}" r="${R * 0.62}" fill="#000" opacity="0.30"/>
+    <circle cx="${cx}" cy="${cy}" r="${R * 0.38}" fill="url(#metal)"/>
+    <path d="${arcPath(cx, cy, R * 0.5, 140, 310)}" fill="none" stroke="#fff"
+          stroke-opacity="0.22" stroke-width="1.8"/>
+    <circle cx="${cx}" cy="${cy}" r="${R * 0.16}" fill="#1A1D20"/>`;
+};
 
 /**
  * The lock: a turned brushed-nickel escutcheon with a euro cylinder.
