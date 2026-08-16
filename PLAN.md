@@ -200,7 +200,12 @@ Why SVG wins here:
 
 The two do different jobs and neither pretends to be the other.
 
-### 4.1 Renderer specification
+#**Realism is tracked separately.** The drawing not being believable is the
+single biggest risk to the whole site — a customer who does not trust the
+preview does not send anything. See **`REALISM.md`** for the diagnosis, the
+lighting model, the prioritised work list and the falsifiable gates.
+
+## 4.1 Renderer specification
 
 `viewBox` in **real millimetres**, so every number in the source is a true
 dimension and a wrong proportion is impossible.
