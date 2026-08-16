@@ -8,7 +8,8 @@
     "dev": "node tools/build.mjs --watch",
     "test": "node test/units.mjs",
     "shot": "node tools/screenshot.mjs",
-    "compare": "node tools/compare.mjs"
+    "compare": "node tools/compare.mjs",
+    "hardware": "node tools/hardware.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

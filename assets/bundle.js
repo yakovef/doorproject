@@ -152,7 +152,9 @@
   var CYLINDER_AFF = 950;
   var PEEPHOLE_AFF = 1520;
   var HINGES_AFF = [250, 1050, 1850];
-  var HANDLE_INSET = 150;
+  var LOCK_BACKSET = 150;
+  var LOCK_R = 33;
+  var LOCK_CLEAR = 15;
   var THRESHOLD = 26;
   var PAD = { x: 70, top: 95, bottom: 150 };
   function render(state2) {
@@ -182,7 +184,10 @@
     const mainX = sideW && !hingeOnLeft ? x0 + sideW + MULLION : x0;
     const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
     const mainX1 = mainX + leafW;
-    const handleX = hingeOnLeft ? mainX1 - HANDLE_INSET : mainX + HANDLE_INSET;
+    const lockX = hingeOnLeft ? mainX1 - LOCK_BACKSET : mainX + LOCK_BACKSET;
+    const inward = hingeOnLeft ? -1 : 1;
+    const standoff = handleStandoff(handle, leafH);
+    const handleX = lockX + inward * standoff;
     const hingeX = hingeOnLeft ? mainX : mainX1;
     const leverDir = hingeOnLeft ? -1 : 1;
     const centreX = mainX + leafW / 2;
@@ -471,7 +476,7 @@
     }) : ""}</g>` : ""}
 
   <!-- ── main leaf ────────────────────────────────────────────── -->
-  <g id="leaf">${leaf(mainX, leafW)}</g>
+  <g id="leaf" data-x="${mainX}" data-w="${leafW}">${leaf(mainX, leafW)}</g>
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
@@ -498,7 +503,7 @@
     ${HINGES_AFF.filter((a) => a < leafH - 120).map((a) => hinge(hingeX, y(a), paint2, hingeOnLeft)).join("")}
     ${win.rects.length ? "" : peephole(hingeOnLeft ? mainX + 130 : mainX1 - 130, y(PEEPHOLE_AFF))}
     ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint2)}
-    ${inside ? thumbTurn(handleX, y(CYLINDER_AFF)) : cylinder(handleX, y(CYLINDER_AFF))}
+    ${inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   <rect x="0" y="0" width="${view.w}" height="${view.h}" fill="url(#vignette)"/>
@@ -611,13 +616,36 @@
     }
     return "";
   }
-  function handleArt(handle, cx, cy, leafH, dir, paint2) {
-    const art = handle.style === "channel" ? channelHandle(cx, cy, handle.len, leafH, paint2) : handle.style === "dee" ? deeHandle(cx, cy, paint2) : handle.len ? pullBar(cx, cy, handle.len, leafH, paint2) : lever(cx, cy, dir);
-    const drawn = handle.style === "channel" ? Math.min(handle.len, leafH - 420) : handle.len ? Math.min(handle.len, leafH - 320) : 0;
-    return `<g data-hw="handle" data-style="${handle.style}" data-len="${drawn}">${art}</g>`;
+  function handleFootprint(handle, leafH) {
+    switch (handle.style) {
+      case "channel":
+        return { hx: 21, vy: channelHalf(handle.len, leafH) };
+      case "dee":
+        return { hx: DEE_R, vy: DEE_R };
+      case "lever":
+        return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
+      default:
+        return { hx: 15, vy: barHalf(handle.len, leafH) };
+    }
   }
+  function handleStandoff(handle, leafH) {
+    const foot = handleFootprint(handle, leafH);
+    const dy = Math.abs(HANDLE_AFF - CYLINDER_AFF);
+    if (dy >= foot.vy + LOCK_R) return 0;
+    return Math.round(foot.hx + LOCK_R + LOCK_CLEAR);
+  }
+  function handleArt(handle, cx, cy, leafH, dir, paint2) {
+    const art = handle.style === "channel" ? channelHandle(cx, cy, handle.len, leafH, paint2) : handle.style === "dee" ? deeHandle(cx, cy, paint2, dir) : handle.len ? pullBar(cx, cy, handle.len, leafH, paint2) : lever(cx, cy, dir);
+    const foot = handleFootprint(handle, leafH);
+    return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
+             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}">${art}</g>`;
+  }
+  var DEE_R = 78;
+  var LEVER_ROSETTE = 40;
+  var channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
+  var barHalf = (len, leafH) => Math.min(len, leafH - 320) / 2;
   function channelHandle(cx, cy, len, leafH, paint2) {
-    const half = Math.min(len, leafH - 420) / 2;
+    const half = channelHalf(len, leafH);
     const w = 42;
     return `
     <g>
@@ -634,19 +662,21 @@
             rx="4" fill="${darken(paint2, 0.5)}"/>
     </g>`;
   }
-  function deeHandle(cx, cy, paint2) {
-    const r = 78;
+  function deeHandle(cx, cy, paint2, dir) {
+    const r = DEE_R;
+    const sweep = dir < 0 ? 0 : 1;
     return `
     <g>
-      <path d="M ${cx + 6} ${cy - r + 6} A ${r} ${r} 0 0 0 ${cx + 6} ${cy + r + 6} Z"
+      <path d="M ${cx + 6} ${cy - r + 6} A ${r} ${r} 0 0 ${sweep} ${cx + 6} ${cy + r + 6} Z"
             fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
-      <path d="M ${cx} ${cy - r} A ${r} ${r} 0 0 0 ${cx} ${cy + r} Z" fill="url(#blackMetal)"/>
-      <path d="M ${cx - 6} ${cy - r + 12} A ${r - 14} ${r - 14} 0 0 0 ${cx - 6} ${cy + r - 12}"
+      <path d="M ${cx} ${cy - r} A ${r} ${r} 0 0 ${sweep} ${cx} ${cy + r} Z" fill="url(#blackMetal)"/>
+      <path d="M ${cx - dir * 6} ${cy - r + 12} A ${r - 14} ${r - 14} 0 0 ${sweep}
+               ${cx - dir * 6} ${cy + r - 12}"
             fill="none" stroke="#fff" stroke-opacity="0.13" stroke-width="5"/>
     </g>`;
   }
   function pullBar(cx, cy, len, leafH, paint2) {
-    const half = Math.min(len, leafH - 320) / 2;
+    const half = barHalf(len, leafH);
     const w = 30;
     return `
     <g>
@@ -754,10 +784,10 @@
     <circle cx="${cx}" cy="${cy}" r="7" fill="#141618"/>
     <circle cx="${cx - 3}" cy="${cy - 3}" r="2.4" fill="#fff" opacity="0.5"/>`;
   var cylinder = (cx, cy) => {
-    const R = 33;
+    const R = LOCK_R;
     const kx = cx, ky = cy + 2;
     return `
-    <g data-hw="lock" data-kind="cylinder" data-cx="${cx}">
+    <g data-hw="lock" data-kind="cylinder" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       ${disc(cx, cy, R)}
 
       <!-- the euro cylinder is recessed into the escutcheon, so its opening
@@ -795,9 +825,9 @@
     </g>`;
   };
   var thumbTurn = (cx, cy) => {
-    const R = 33;
+    const R = LOCK_R;
     return `
-    <g data-hw="lock" data-kind="thumb" data-cx="${cx}">
+    <g data-hw="lock" data-kind="thumb" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       ${disc(cx, cy, R)}
       <rect x="${cx + 3}" y="${cy - 16}" width="14" height="36" rx="7"
             fill="#000" opacity="0.3" filter="url(#hwShadow)"/>

@@ -50,7 +50,9 @@ const HANDLE_AFF   = 1050;
 const CYLINDER_AFF = 950;
 const PEEPHOLE_AFF = 1520;
 const HINGES_AFF   = [250, 1050, 1850];
-const HANDLE_INSET = 150;
+const LOCK_BACKSET = 150;   // lock centre from the leaf's closing edge
+const LOCK_R       = 33;    // escutcheon radius; see cylinder()
+const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
 const THRESHOLD    = 26;
 
 const PAD = { x: 70, top: 95, bottom: 150 };
@@ -89,7 +91,15 @@ export function render(state) {
   const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
   const mainX1 = mainX + leafW;
 
-  const handleX = hingeOnLeft ? mainX1 - HANDLE_INSET : mainX + HANDLE_INSET;
+  /* The lock owns the stile: its backset is what defines where the lock side
+     of the door is, so it never moves. A handle whose art runs down past the
+     escutcheon stands off towards the leaf centre instead — a pull bar drawn
+     through the keyhole is the single loudest "this is a drawing" tell, and
+     it is not what ref-00 or any of the works photographs show. */
+  const lockX   = hingeOnLeft ? mainX1 - LOCK_BACKSET : mainX + LOCK_BACKSET;
+  const inward  = hingeOnLeft ? -1 : 1;
+  const standoff = handleStandoff(handle, leafH);
+  const handleX = lockX + inward * standoff;
   const hingeX  = hingeOnLeft ? mainX : mainX1;
   const leverDir = hingeOnLeft ? -1 : 1;
   const centreX = mainX + leafW / 2;
@@ -381,7 +391,7 @@ export function render(state) {
         : ''}</g>` : ''}
 
   <!-- ── main leaf ────────────────────────────────────────────── -->
-  <g id="leaf">${leaf(mainX, leafW)}</g>
+  <g id="leaf" data-x="${mainX}" data-w="${leafW}">${leaf(mainX, leafW)}</g>
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
@@ -402,7 +412,7 @@ export function render(state) {
     ${HINGES_AFF.filter(a => a < leafH - 120).map(a => hinge(hingeX, y(a), paint, hingeOnLeft)).join('')}
     ${win.rects.length ? '' : peephole(hingeOnLeft ? mainX + 130 : mainX1 - 130, y(PEEPHOLE_AFF))}
     ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint)}
-    ${inside ? thumbTurn(handleX, y(CYLINDER_AFF)) : cylinder(handleX, y(CYLINDER_AFF))}
+    ${inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   <rect x="0" y="0" width="${view.w}" height="${view.h}" fill="url(#vignette)"/>
@@ -542,21 +552,52 @@ function grillePaths(kind, x, y, w, h) {
 
 /* ── hardware ───────────────────────────────────────────────────── */
 
+/**
+ * The handle art's footprint about its own centre, in mm: `hx` either side,
+ * `vy` above and below. Declared once so the placement maths and the tests
+ * read the same numbers the drawing does.
+ */
+function handleFootprint(handle, leafH) {
+  switch (handle.style) {
+    case 'channel': return { hx: 21, vy: channelHalf(handle.len, leafH) };
+    case 'dee':     return { hx: DEE_R, vy: DEE_R };
+    case 'lever':   return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
+    default:        return { hx: 15, vy: barHalf(handle.len, leafH) };
+  }
+}
+
+/**
+ * How far towards the leaf centre this handle has to sit so that it clears the
+ * lock escutcheon. Zero when the two never meet — which is the common case:
+ * a lever's rosette stops 27 mm above the escutcheon, exactly as it does on a
+ * real door, and moving it would be wrong.
+ */
+export function handleStandoff(handle, leafH) {
+  const foot = handleFootprint(handle, leafH);
+  const dy = Math.abs(HANDLE_AFF - CYLINDER_AFF);
+  if (dy >= foot.vy + LOCK_R) return 0;              // vertical bands miss
+  return Math.round(foot.hx + LOCK_R + LOCK_CLEAR);
+}
+
 function handleArt(handle, cx, cy, leafH, dir, paint) {
   const art =
     handle.style === 'channel' ? channelHandle(cx, cy, handle.len, leafH, paint) :
-    handle.style === 'dee'     ? deeHandle(cx, cy, paint) :
+    handle.style === 'dee'     ? deeHandle(cx, cy, paint, dir) :
     handle.len                 ? pullBar(cx, cy, handle.len, leafH, paint) :
                                  lever(cx, cy, dir);
-  const drawn =
-    handle.style === 'channel' ? Math.min(handle.len, leafH - 420) :
-    handle.len                 ? Math.min(handle.len, leafH - 320) : 0;
-  return `<g data-hw="handle" data-style="${handle.style}" data-len="${drawn}">${art}</g>`;
+  const foot = handleFootprint(handle, leafH);
+  return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
+             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}">${art}</g>`;
 }
+
+const DEE_R = 78;
+const LEVER_ROSETTE = 40;
+const channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
+const barHalf     = (len, leafH) => Math.min(len, leafH - 320) / 2;
 
 /** Recessed vertical channel with the grip inside — the style in ref-00. */
 function channelHandle(cx, cy, len, leafH, paint) {
-  const half = Math.min(len, leafH - 420) / 2;
+  const half = channelHalf(len, leafH);
   const w = 42;
   return `
     <g>
@@ -574,21 +615,24 @@ function channelHandle(cx, cy, len, leafH, paint) {
     </g>`;
 }
 
-/** Matte-black half-moon D-handle. */
-function deeHandle(cx, cy, paint) {
-  const r = 78;
+/** Matte-black half-moon D-handle. The bow turns away from the lock, so the
+ *  two never crowd each other whichever way the door is hung. */
+function deeHandle(cx, cy, paint, dir) {
+  const r = DEE_R;
+  const sweep = dir < 0 ? 0 : 1;      // 0 bulges left, 1 bulges right
   return `
     <g>
-      <path d="M ${cx + 6} ${cy - r + 6} A ${r} ${r} 0 0 0 ${cx + 6} ${cy + r + 6} Z"
+      <path d="M ${cx + 6} ${cy - r + 6} A ${r} ${r} 0 0 ${sweep} ${cx + 6} ${cy + r + 6} Z"
             fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
-      <path d="M ${cx} ${cy - r} A ${r} ${r} 0 0 0 ${cx} ${cy + r} Z" fill="url(#blackMetal)"/>
-      <path d="M ${cx - 6} ${cy - r + 12} A ${r - 14} ${r - 14} 0 0 0 ${cx - 6} ${cy + r - 12}"
+      <path d="M ${cx} ${cy - r} A ${r} ${r} 0 0 ${sweep} ${cx} ${cy + r} Z" fill="url(#blackMetal)"/>
+      <path d="M ${cx - dir * 6} ${cy - r + 12} A ${r - 14} ${r - 14} 0 0 ${sweep}
+               ${cx - dir * 6} ${cy + r - 12}"
             fill="none" stroke="#fff" stroke-opacity="0.13" stroke-width="5"/>
     </g>`;
 }
 
 function pullBar(cx, cy, len, leafH, paint) {
-  const half = Math.min(len, leafH - 320) / 2;
+  const half = barHalf(len, leafH);
   const w = 30;
   return `
     <g>
@@ -734,10 +778,10 @@ const peephole = (cx, cy) => `
  * 66 mm across, which is life-size against a 950 mm leaf.
  */
 const cylinder = (cx, cy) => {
-  const R = 33;
+  const R = LOCK_R;
   const kx = cx, ky = cy + 2;          // cylinder sits marginally low, as it does in life
   return `
-    <g data-hw="lock" data-kind="cylinder" data-cx="${cx}">
+    <g data-hw="lock" data-kind="cylinder" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       ${disc(cx, cy, R)}
 
       <!-- the euro cylinder is recessed into the escutcheon, so its opening
@@ -777,9 +821,9 @@ const cylinder = (cx, cy) => {
 
 /** Inside face: same escutcheon, thumb-turn instead of a keyway. */
 const thumbTurn = (cx, cy) => {
-  const R = 33;
+  const R = LOCK_R;
   return `
-    <g data-hw="lock" data-kind="thumb" data-cx="${cx}">
+    <g data-hw="lock" data-kind="thumb" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       ${disc(cx, cy, R)}
       <rect x="${cx + 3}" y="${cy - 16}" width="14" height="36" rx="7"
             fill="#000" opacity="0.3" filter="url(#hwShadow)"/>

@@ -210,6 +210,55 @@ for (const n of HANDLES) {
   ok(svg.includes('filter="url(#hwShadow)"'), `no hardware shadow for ${n.id}`);
 }
 
+/* A handle drawn through the keyhole is the loudest "this is a drawing" tell
+   there is, and it is the third collision-class bug this renderer has had
+   (panel over glazing, hinges at the mullion, handle over lock). Assert the
+   footprints stay apart over every design, not just the one that was fixed. */
+group('handle clears the lock');
+{
+  const num = (svg, re) => Number(re.exec(svg)[1]);
+  let n = 0, tightest = Infinity;
+  for (const hn of HANDLES) for (const sz of sizeKeys) for (const hd of HANDINGS) for (const v of VIEWS) {
+    const svg = render({ ...base, handle: hn.id, size: sz, handing: hd.id, view: v.id });
+    const label = `${hn.id}/${sz}/${hd.id}/${v.id}`;
+
+    const lock = {
+      x: num(svg, /data-hw="lock"[^>]*data-cx="([-\d.]+)"/),
+      y: num(svg, /data-hw="lock"[^>]*data-cy="([-\d.]+)"/),
+      r: num(svg, /data-hw="lock"[^>]*data-r="([-\d.]+)"/),
+    };
+    const grip = {
+      x:  num(svg, /data-hw="handle"[^>]*data-cx="([-\d.]+)"/s),
+      y:  num(svg, /data-hw="handle"[^>]*data-cy="([-\d.]+)"/s),
+      hx: num(svg, /data-hw="handle"[^>]*data-hx="([-\d.]+)"/s),
+      vy: num(svg, /data-hw="handle"[^>]*data-vy="([-\d.]+)"/s),
+    };
+
+    // Gap along each axis; positive on either axis means the boxes miss.
+    const gapX = Math.abs(grip.x - lock.x) - (grip.hx + lock.r);
+    const gapY = Math.abs(grip.y - lock.y) - (grip.vy + lock.r);
+    ok(Math.max(gapX, gapY) > 0, `handle overlaps the lock (${label}): gapX ${gapX}, gapY ${gapY}`);
+    tightest = Math.min(tightest, Math.max(gapX, gapY));
+
+    /* The handle may only stand off towards the hinge — never out past the
+       lock towards the closing edge, where there is no door left to hold. */
+    const hinges = [...svg.matchAll(/data-hw="hinge" data-cx="([-\d.]+)"/g)].map(m => Number(m[1]));
+    const toHinge = Math.sign(hinges[0] - lock.x);
+    const toGrip = Math.sign(grip.x - lock.x);
+    ok(toGrip === 0 || toGrip === toHinge,
+       `handle stands off the wrong way, past the closing edge (${label})`);
+
+    // And both must land on the active leaf, clear of its edges.
+    const leaf = { x: num(svg, /id="leaf" data-x="([-\d.]+)"/), w: num(svg, /id="leaf"[^>]*data-w="([\d.]+)"/) };
+    ok(lock.x - lock.r > leaf.x && lock.x + lock.r < leaf.x + leaf.w,
+       `lock hangs off the leaf (${label})`);
+    ok(grip.x - grip.hx > leaf.x && grip.x + grip.hx < leaf.x + leaf.w,
+       `handle hangs off the leaf (${label})`);
+    n++;
+  }
+  console.log(`  (${n} renders, tightest clearance ${tightest}mm)`);
+}
+
 // ── 7. Leaf-and-a-half hinges against the frame, not the fixed panel ──
 group('leaf and a half');
 for (const h of HANDINGS) {
