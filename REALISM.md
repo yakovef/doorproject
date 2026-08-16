@@ -272,6 +272,18 @@ Done, verified against `research/doors/ref-00.png` via `npm run compare`:
 - **Gate harness** — `tools/compare.mjs` renders beside the photograph and
   again at 12 px blur. Run it after every change to the drawing.
 
+**R4 lock and lever, from the hardware photograph.** Escutcheon and rosette
+are now *turned* discs: concentric machined steps with a lit arc facing the key
+light and a shadowed arc opposite, fine circular brushing, and a real euro
+cylinder — round bow over a tapered blade slot, with warding visible inside —
+rather than a dot. The lever has a broad top face carrying one long specular, a
+rolled shadowed underside, and a rounded cap; a pointed tip reads as a blade.
+Sized life-size at 66 mm across a 950 mm leaf.
+
+*Two bugs found while drawing it: the lever's `tip` was computed as the same
+point as its root, collapsing the path to nothing, and the brushing rings were
+strong enough to read as a bullseye.*
+
 Still open: **R3 bevels** (panel, groove — the window surround is done),
 **R5 glass**, the hardware finish axis, and the baked-photo finisher.
 

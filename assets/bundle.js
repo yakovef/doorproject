@@ -248,6 +248,23 @@
       <stop offset="1" stop-color="#000" stop-opacity="0.06"/>
     </linearGradient>
 
+    <!-- Brushed nickel, lit from upper-left. The bright band sits off-centre
+         and there is a second, weaker return near the far edge — that double
+         highlight is what separates metal from grey plastic. -->
+    <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="#E4E7E9"/>
+      <stop offset="0.16" stop-color="#C6CBCF"/>
+      <stop offset="0.38" stop-color="#9FA5AA"/>
+      <stop offset="0.60" stop-color="#80868B"/>
+      <stop offset="0.80" stop-color="#99A0A5"/>
+      <stop offset="1"    stop-color="#6A7075"/>
+    </linearGradient>
+    <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="#D9DDE0"/>
+      <stop offset="0.5" stop-color="#A5ABB0"/>
+      <stop offset="1"   stop-color="#82888D"/>
+    </linearGradient>
+
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"    stop-color="#6E7276"/>
       <stop offset="0.18" stop-color="#EDEFF0"/>
@@ -493,8 +510,8 @@
       return Array.from({ length: n - 1 }, (_, i) => bar(x + w * (i + 1) / n, y, x + w * (i + 1) / n, y + h)).join("");
     }
     if (kind === "lattice") {
-      const step = 110, out = [];
-      for (let o = -h; o < w + h; o += step) {
+      const step2 = 110, out = [];
+      for (let o = -h; o < w + h; o += step2) {
         out.push(bar(x + o, y, x + o + h, y + h, 9));
         out.push(bar(x + o, y + h, x + o + h, y, 9));
       }
@@ -562,20 +579,83 @@
             fill="#fff" opacity="0.55"/>
     </g>`;
   }
+  var polar = (cx, cy, r, deg) => {
+    const a = deg * Math.PI / 180;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  };
+  function arcPath(cx, cy, r, a1, a2) {
+    const [x1, y1] = polar(cx, cy, r, a1);
+    const [x2, y2] = polar(cx, cy, r, a2);
+    const large = (a2 - a1 + 360) % 360 > 180 ? 1 : 0;
+    return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+  }
+  var step = (cx, cy, r, w, lit = 0.55, dark = 0.3) => `
+      <path d="${arcPath(cx, cy, r, 135, 315)}" fill="none" stroke="#fff"
+            stroke-opacity="${lit}" stroke-width="${w}" stroke-linecap="round"/>
+      <path d="${arcPath(cx, cy, r, 315, 135)}" fill="none" stroke="#000"
+            stroke-opacity="${dark}" stroke-width="${w}" stroke-linecap="round"/>`;
+  function brushing(cx, cy, rFrom, rTo, n = 14) {
+    let out = "";
+    for (let i = 0; i < n; i++) {
+      const r = rFrom + (rTo - rFrom) * i / (n - 1);
+      const light = i % 2 === 0;
+      out += `<circle cx="${cx}" cy="${cy}" r="${r.toFixed(2)}" fill="none"
+             stroke="${light ? "#fff" : "#000"}" stroke-opacity="${light ? 0.035 : 0.03}"
+             stroke-width="0.8"/>`;
+    }
+    return out;
+  }
+  var disc = (cx, cy, r) => `
+      <circle cx="${cx + 3}" cy="${cy + 5}" r="${r}" fill="#000" opacity="0.36"
+              filter="url(#hwShadow)"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#nickel)"/>
+      ${step(cx, cy, r - 1.5, 3, 0.5, 0.34)}
+      ${step(cx, cy, r * 0.82, 2.4, 0.34, 0.26)}
+      ${step(cx, cy, r * 0.7, 2, 0.26, 0.2)}
+      ${brushing(cx, cy, r * 0.16, r * 0.62)}`;
   function lever(cx, cy, dir) {
-    const x = dir < 0 ? cx - 165 : cx;
+    const L = 185;
+    const at = (t) => cx + dir * t;
     return `
     <g>
-      <ellipse cx="${cx + 5}" cy="${cy + 7}" rx="40" ry="40" fill="#000" opacity="0.3"
-               filter="url(#hwShadow)"/>
-      <circle cx="${cx}" cy="${cy}" r="38" fill="url(#metal)"/>
-      <circle cx="${cx}" cy="${cy}" r="30" fill="none" stroke="#fff" stroke-opacity="0.28" stroke-width="2"/>
-      <circle cx="${cx}" cy="${cy}" r="23" fill="none" stroke="#000" stroke-opacity="0.20" stroke-width="2"/>
-      <rect x="${x + 4}" y="${cy - 9}" width="165" height="26" rx="13" fill="#000"
-            opacity="0.28" filter="url(#hwShadow)"/>
-      <rect x="${x}" y="${cy - 13}" width="165" height="26" rx="13" fill="url(#metal)"/>
-      <rect x="${x + 8}" y="${cy - 10}" width="149" height="5" rx="2.5" fill="#fff" opacity="0.55"/>
-      <rect x="${x + 8}" y="${cy + 6}" width="149" height="4" rx="2" fill="#000" opacity="0.22"/>
+      <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
+               Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
+               Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}
+               L ${at(12)} ${cy + 24} Z"
+            fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
+
+      <!-- Body: broad at the neck, tapering slightly, rounded at the tip.
+           A pointed tip reads as a blade; real levers are capped. -->
+      <path d="M ${at(0)} ${cy - 20}
+               L ${at(L - 20)} ${cy - 14}
+               Q ${at(L)} ${cy - 14} ${at(L)} ${cy - 1}
+               Q ${at(L)} ${cy + 12} ${at(L - 20)} ${cy + 12}
+               L ${at(0)} ${cy + 20} Z"
+            fill="url(#nickel)"/>
+
+      <!-- One long, soft specular along the top face — the strongest metal
+           cue there is, but a hard white slab reads as plastic. -->
+      <path d="M ${at(18)} ${cy - 14} L ${at(L - 24)} ${cy - 9}
+               Q ${at(L - 8)} ${cy - 9} ${at(L - 8)} ${cy - 4.5}
+               L ${at(18)} ${cy - 7} Z"
+            fill="#fff" opacity="0.5"/>
+      <path d="M ${at(18)} ${cy - 6} L ${at(L - 10)} ${cy - 4} L ${at(L - 10)} ${cy}
+               L ${at(18)} ${cy - 1} Z"
+            fill="#fff" opacity="0.16"/>
+      <!-- rolled underside, turned away from the key -->
+      <path d="M ${at(18)} ${cy + 6} L ${at(L - 16)} ${cy + 5}
+               L ${at(L - 16)} ${cy + 11} L ${at(18)} ${cy + 15} Z"
+            fill="#000" opacity="0.26"/>
+
+      ${disc(cx, cy, 40)}
+
+      <!-- the neck swelling out of the rosette, drawn over it -->
+      <path d="M ${at(2)} ${cy - 19} Q ${at(28)} ${cy - 18} ${at(33)} ${cy - 15}
+               L ${at(33)} ${cy + 13} Q ${at(28)} ${cy + 18} ${at(2)} ${cy + 19} Z"
+            fill="url(#nickel)"/>
+      <path d="M ${at(9)} ${cy - 14} Q ${at(26)} ${cy - 13} ${at(30)} ${cy - 11}
+               L ${at(30)} ${cy - 6} L ${at(9)} ${cy - 7} Z"
+            fill="#fff" opacity="0.42"/>
     </g>`;
   }
   var hinge = (cx, cy, paint2, onLeft) => `
@@ -592,17 +672,61 @@
     <circle cx="${cx}" cy="${cy}" r="14" fill="url(#metal)"/>
     <circle cx="${cx}" cy="${cy}" r="7" fill="#141618"/>
     <circle cx="${cx - 3}" cy="${cy - 3}" r="2.4" fill="#fff" opacity="0.5"/>`;
-  var cylinder = (cx, cy) => `
-    <g data-hw="lock" data-kind="cylinder" data-cx="${cx}">    <circle cx="${cx + 2}" cy="${cy + 3}" r="19" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-    <circle cx="${cx}" cy="${cy}" r="18" fill="url(#metal)"/>
-    <circle cx="${cx}" cy="${cy}" r="12" fill="none" stroke="#000" stroke-opacity="0.22" stroke-width="1.5"/>
-    <circle cx="${cx}" cy="${cy}" r="7.5" fill="#232629"/>
-    <rect x="${cx - 2}" y="${cy - 5.5}" width="4" height="11" rx="2" fill="#0C0D0F"/></g>`;
-  var thumbTurn = (cx, cy) => `
-    <g data-hw="lock" data-kind="thumb" data-cx="${cx}">    <circle cx="${cx + 2}" cy="${cy + 3}" r="21" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-    <circle cx="${cx}" cy="${cy}" r="20" fill="url(#metal)"/>
-    <rect x="${cx - 5}" y="${cy - 15}" width="10" height="30" rx="5" fill="#6E7378"/>
-    <rect x="${cx - 3}" y="${cy - 13}" width="3" height="26" rx="1.5" fill="#fff" opacity="0.4"/></g>`;
+  var cylinder = (cx, cy) => {
+    const R = 33;
+    const kx = cx, ky = cy + 2;
+    return `
+    <g data-hw="lock" data-kind="cylinder" data-cx="${cx}">
+      ${disc(cx, cy, R)}
+
+      <!-- the euro cylinder is recessed into the escutcheon, so its opening
+           is occluded at the top and catches a little bounce at the bottom -->
+      <path d="M ${kx - 11} ${ky - 15}
+               a 11 11 0 1 1 22 0
+               l 3.2 26 a 4 4 0 0 1 -4 4.4
+               h -20.4 a 4 4 0 0 1 -4 -4.4 Z"
+            fill="#8E9398"/>
+      <path d="M ${kx - 10} ${ky - 15}
+               a 10 10 0 1 1 20 0
+               l 3 25 a 3.4 3.4 0 0 1 -3.4 3.7
+               h -19.2 a 3.4 3.4 0 0 1 -3.4 -3.7 Z"
+            fill="url(#nickelSoft)"/>
+      <path d="${arcPath(kx, ky - 15, 10, 135, 315)}" fill="none" stroke="#fff"
+            stroke-opacity="0.5" stroke-width="1.8"/>
+      <path d="${arcPath(kx, ky - 15, 10, 315, 135)}" fill="none" stroke="#000"
+            stroke-opacity="0.3" stroke-width="1.8"/>
+
+      <!-- keyway: bow over blade, with the warding visible inside -->
+      <path d="M ${kx - 5.4} ${ky - 17}
+               a 5.4 5.4 0 1 1 10.8 0
+               l 1.5 15 a 1.8 1.8 0 0 1 -1.8 2 h -10.2
+               a 1.8 1.8 0 0 1 -1.8 -2 Z"
+            fill="#121417"/>
+      <path d="M ${kx - 3.4} ${ky - 17} a 3.4 3.4 0 1 1 6.8 0 l 0.9 12 h -8.6 Z"
+            fill="#2E3235" opacity="0.85"/>
+      <rect x="${kx - 2}" y="${ky - 8}" width="4" height="1.6" fill="#6B7075" opacity="0.8"/>
+      <rect x="${kx - 2}" y="${ky - 4}" width="3" height="1.4" fill="#6B7075" opacity="0.7"/>
+
+      <!-- two crisp speculars: the tell of polished metal -->
+      <ellipse cx="${cx - R * 0.42}" cy="${cy - R * 0.5}" rx="7" ry="4"
+               fill="#fff" opacity="0.4" transform="rotate(-38 ${cx - R * 0.42} ${cy - R * 0.5})"/>
+      <circle cx="${cx + R * 0.5}" cy="${cy + R * 0.46}" r="2.4" fill="#fff" opacity="0.18"/>
+    </g>`;
+  };
+  var thumbTurn = (cx, cy) => {
+    const R = 33;
+    return `
+    <g data-hw="lock" data-kind="thumb" data-cx="${cx}">
+      ${disc(cx, cy, R)}
+      <rect x="${cx + 3}" y="${cy - 16}" width="14" height="36" rx="7"
+            fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
+      <rect x="${cx - 7}" y="${cy - 19}" width="14" height="38" rx="7" fill="url(#nickel)"/>
+      <rect x="${cx - 4.5}" y="${cy - 16}" width="4" height="32" rx="2"
+            fill="#fff" opacity="0.5"/>
+      <rect x="${cx + 2}" y="${cy - 16}" width="3" height="32" rx="1.5"
+            fill="#000" opacity="0.22"/>
+    </g>`;
+  };
   function describe(state2, lang = "he") {
     const c = byId(COLOURS, state2.colour);
     const h = byId(HANDINGS, state2.handing);
