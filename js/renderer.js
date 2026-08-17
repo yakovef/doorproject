@@ -829,23 +829,30 @@ function raisedPanel(lx, ly, lw, lh, paint, winBottom) {
  * because a thing standing proud of a surface has to cast something.
  */
 function metalStrips(lx, ly, lw, lh, count, tone) {
-  const top = ly + lh * 0.10, bot = ly + lh * 0.90;
-  const wStrip = Math.max(14, Math.round(lw * 0.022));
-  const span = lw * 0.52;                       // the band they occupy
-  const x0s = lx + (lw - span) / 2;
-  const gap = count > 1 ? span / (count - 1) : 0;
+  /* HORIZONTAL. I drew them vertical first, from the tier summary's phrase
+     "ruled line work", and d078 settles it at a glance: eleven bands running
+     across the leaf, not up it. They also run nearly the full width — inset
+     about a tenth each side — rather than sitting in a central band.
+     Spacing is even here. The real one is graduated, tighter at the head and
+     foot than in the middle, which is a refinement worth having only once the
+     orientation is right. */
+  const x0s = lx + lw * 0.09, x1s = lx + lw * 0.91;
+  const wide = x1s - x0s;
+  const t = Math.max(8, Math.round(lh * 0.008));    // strip thickness
+  const top = ly + lh * 0.09, bot = ly + lh * 0.91;
+  const gap = count > 1 ? (bot - top) / (count - 1) : 0;
   const out = [];
   for (let i = 0; i < count; i++) {
-    const cx = count > 1 ? x0s + gap * i : lx + lw / 2;
-    const x = Math.round(cx - wStrip / 2);
+    const cy = count > 1 ? top + gap * i : ly + lh / 2;
+    const y = Math.round(cy - t / 2);
     out.push(`
-      <rect x="${x + 3}" y="${top + 3}" width="${wStrip}" height="${bot - top}"
+      <rect x="${x0s + 3}" y="${y + 3}" width="${wide}" height="${t}"
             fill="#000" opacity="0.22"/>
-      <rect x="${x}" y="${top}" width="${wStrip}" height="${bot - top}" fill="${tone[2]}"/>
-      <rect x="${x}" y="${top}" width="${Math.max(2, wStrip * 0.30)}" height="${bot - top}"
+      <rect x="${x0s}" y="${y}" width="${wide}" height="${t}" fill="${tone[2]}"/>
+      <rect x="${x0s}" y="${y}" width="${wide}" height="${Math.max(2, t * 0.34)}"
             fill="${tone[0]}"/>
-      <rect x="${x + wStrip - Math.max(2, wStrip * 0.22)}" y="${top}"
-            width="${Math.max(2, wStrip * 0.22)}" height="${bot - top}" fill="${tone[4]}"/>`);
+      <rect x="${x0s}" y="${y + t - Math.max(2, t * 0.24)}" width="${wide}"
+            height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`);
   }
   return `<g data-detail="strips" data-count="${count}">${out.join('')}</g>`;
 }
@@ -869,14 +876,29 @@ function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 function aperture({ x, y, w, h, paint, edge, grille, key }) {
-  const M = 30;                       // moulding width
+  /* The architrave. It was a 30 mm band with a single 10 mm bevel, and that
+     thinness is most of why a glazed door of ours read as CAD next to a
+     photograph: on the measured doors the surround is a MOULDING, wide and
+     stepped, standing clearly proud of the face and casting onto it. Eight of
+     the ten glazed doors in the corpus carry one.
+     Two steps rather than one, because a single bevel of any width still reads
+     as a chamfered hole; it is the second plane that says "applied timber". */
+  const M = 62;                       // moulding width
+  const S = 22;                       // the outer step, proud of the leaf
   const id = `cl-${key}`;
   return `
     <g>
-      <!-- raised surround: light on the lit edges, dark on the others -->
+      <!-- the moulding casts onto the leaf below and to the right of it -->
+      <rect x="${x - M + 5}" y="${y - M + 5}" width="${w + M * 2}" height="${h + M * 2}"
+            fill="#000" opacity="0.13"/>
+      <!-- outer step -->
       <rect x="${x - M}" y="${y - M}" width="${w + M * 2}" height="${h + M * 2}"
             fill="${paint}"/>
-      ${bevel(x - M, y - M, w + M * 2, h + M * 2, 10, paint, true)}
+      ${bevel(x - M, y - M, w + M * 2, h + M * 2, 11, paint, true)}
+      <!-- inner step, set back, so the profile has two planes not one -->
+      <rect x="${x - M + S}" y="${y - M + S}" width="${w + (M - S) * 2}" height="${h + (M - S) * 2}"
+            fill="${lighten(paint, 0.03)}"/>
+      ${bevel(x - M + S, y - M + S, w + (M - S) * 2, h + (M - S) * 2, 9, paint, true)}
       <!-- inner rebate: a hole, so the bevel flips -->
       ${bevel(x, y, w, h, 8, paint, false)}
 

@@ -177,7 +177,7 @@ export const DETAILS = [
      brass — reading 1.1 to 2x BRIGHTER than the paint, not darker. Drawing
      those as a recessed shadow is the single easiest way to render this tier
      wrong. Counts observed: 3, 7 and 11 strips. */
-  { id: 'strips', he: 'פסי מתכת',       en: 'Metal strips',   delta: 44000, panel: false, groove: false, strips: 7 },
+  { id: 'strips', he: 'פסי מתכת',       en: 'Metal strips',   delta: 44000, panel: false, groove: false, strips: 11 },
   { id: 'strips3',he: 'שלושה פסים',     en: 'Three strips',   delta: 32000, panel: false, groove: false, strips: 3 },
 ];
 

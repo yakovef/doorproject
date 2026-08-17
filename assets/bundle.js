@@ -141,7 +141,7 @@
        brass — reading 1.1 to 2x BRIGHTER than the paint, not darker. Drawing
        those as a recessed shadow is the single easiest way to render this tier
        wrong. Counts observed: 3, 7 and 11 strips. */
-    { id: "strips", he: "פסי מתכת", en: "Metal strips", delta: 44e3, panel: false, groove: false, strips: 7 },
+    { id: "strips", he: "פסי מתכת", en: "Metal strips", delta: 44e3, panel: false, groove: false, strips: 11 },
     { id: "strips3", he: "שלושה פסים", en: "Three strips", delta: 32e3, panel: false, groove: false, strips: 3 }
   ];
   var FINISHES = [
@@ -913,23 +913,23 @@
     </g>`;
   }
   function metalStrips(lx, ly, lw, lh, count, tone) {
-    const top = ly + lh * 0.1, bot = ly + lh * 0.9;
-    const wStrip = Math.max(14, Math.round(lw * 0.022));
-    const span = lw * 0.52;
-    const x0s = lx + (lw - span) / 2;
-    const gap = count > 1 ? span / (count - 1) : 0;
+    const x0s = lx + lw * 0.09, x1s = lx + lw * 0.91;
+    const wide = x1s - x0s;
+    const t = Math.max(8, Math.round(lh * 8e-3));
+    const top = ly + lh * 0.09, bot = ly + lh * 0.91;
+    const gap = count > 1 ? (bot - top) / (count - 1) : 0;
     const out = [];
     for (let i = 0; i < count; i++) {
-      const cx = count > 1 ? x0s + gap * i : lx + lw / 2;
-      const x = Math.round(cx - wStrip / 2);
+      const cy = count > 1 ? top + gap * i : ly + lh / 2;
+      const y = Math.round(cy - t / 2);
       out.push(`
-      <rect x="${x + 3}" y="${top + 3}" width="${wStrip}" height="${bot - top}"
+      <rect x="${x0s + 3}" y="${y + 3}" width="${wide}" height="${t}"
             fill="#000" opacity="0.22"/>
-      <rect x="${x}" y="${top}" width="${wStrip}" height="${bot - top}" fill="${tone[2]}"/>
-      <rect x="${x}" y="${top}" width="${Math.max(2, wStrip * 0.3)}" height="${bot - top}"
+      <rect x="${x0s}" y="${y}" width="${wide}" height="${t}" fill="${tone[2]}"/>
+      <rect x="${x0s}" y="${y}" width="${wide}" height="${Math.max(2, t * 0.34)}"
             fill="${tone[0]}"/>
-      <rect x="${x + wStrip - Math.max(2, wStrip * 0.22)}" y="${top}"
-            width="${Math.max(2, wStrip * 0.22)}" height="${bot - top}" fill="${tone[4]}"/>`);
+      <rect x="${x0s}" y="${y + t - Math.max(2, t * 0.24)}" width="${wide}"
+            height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`);
     }
     return `<g data-detail="strips" data-count="${count}">${out.join("")}</g>`;
   }
@@ -949,14 +949,22 @@
     </g>`;
   }
   function aperture({ x, y, w, h, paint: paint2, edge, grille, key }) {
-    const M = 30;
+    const M = 62;
+    const S = 22;
     const id = `cl-${key}`;
     return `
     <g>
-      <!-- raised surround: light on the lit edges, dark on the others -->
+      <!-- the moulding casts onto the leaf below and to the right of it -->
+      <rect x="${x - M + 5}" y="${y - M + 5}" width="${w + M * 2}" height="${h + M * 2}"
+            fill="#000" opacity="0.13"/>
+      <!-- outer step -->
       <rect x="${x - M}" y="${y - M}" width="${w + M * 2}" height="${h + M * 2}"
             fill="${paint2}"/>
-      ${bevel(x - M, y - M, w + M * 2, h + M * 2, 10, paint2, true)}
+      ${bevel(x - M, y - M, w + M * 2, h + M * 2, 11, paint2, true)}
+      <!-- inner step, set back, so the profile has two planes not one -->
+      <rect x="${x - M + S}" y="${y - M + S}" width="${w + (M - S) * 2}" height="${h + (M - S) * 2}"
+            fill="${lighten(paint2, 0.03)}"/>
+      ${bevel(x - M + S, y - M + S, w + (M - S) * 2, h + (M - S) * 2, 9, paint2, true)}
       <!-- inner rebate: a hole, so the bevel flips -->
       ${bevel(x, y, w, h, 8, paint2, false)}
 

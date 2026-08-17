@@ -15,15 +15,15 @@ import jpeg from 'jpeg-js';
 /* Each recreation is the closest the CURRENT catalogue can get. Where nothing
    is close the gap is the finding, and it is named here rather than hidden. */
 const CASES = [
-  { id: 'd003', label: 'basic ₪3,195',
-    q: 'c=ral-7024&w=none&g=none&n=plate&d=plain&f=brass&s=standard&h=right-in',
-    gap: 'leaf #59564F is a warm mid grey; nearest we own is RAL 7024 #474A51, darker and cooler' },
-  { id: 'd063', label: 'designed ₪5,200',
-    q: 'c=ral-7024&w=none&g=none&n=idan&d=groove&f=steel&s=standard&h=right-in',
-    gap: 'leaf #817373 is a warm taupe; the catalogue has nothing between #474A51 and #C5C7C4' },
-  { id: 'd116', label: 'luxury ₪13,900',
-    q: 'c=ral-7035&w=tallwin&g=lattice&n=coral&d=panel&f=steel&s=half&h=left-in',
-    gap: 'leaf #B7B1A6 is warm off-white; RAL 7035 #C5C7C4 is cooler and lighter' },
+  { id: 'd016', label: 'basic ₪3,545',
+    q: 'c=ral-7035&w=none&g=none&n=coral&d=groove&f=steel&s=standard&h=right-in',
+    gap: 'leaf #969AA3 is a mid cool grey; RAL 7035 #C5C7C4 is the nearest and is lighter' },
+  { id: 'd078', label: 'designed ₪5,900',
+    q: 'c=ral-8019&w=none&g=none&n=idan&d=strips&f=steel&s=standard&h=right-in',
+    gap: 'photo has 11 polished strips, our option draws 7' },
+  { id: 'd125', label: 'luxury ₪14,900',
+    q: 'c=ral-1013&w=tallwin&g=none&n=idan&d=plain&f=steel&s=half&h=right-in',
+    gap: 'photo is equal double leaves; our leaf-and-a-half has one narrow side leaf' },
 ];
 
 const load = f => f.endsWith('.png')
