@@ -5,7 +5,7 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { encodeCode, toQuery } from './url-state.js';
 
@@ -28,6 +28,7 @@ export function message(state) {
   const s = SIZES[state.size] || SIZES.standard;
   const w = byId(WINDOWS, state.window);
   const g = byId(GRILLES, state.grille);
+  const fin = effectiveFinish(state);
 
   return [
     'שלום, בחרתי דלת באתר:',
@@ -35,7 +36,7 @@ export function message(state) {
     `צבע: ${c.he} (RAL ${c.ral})`,
     `חלון: ${w.he}`,
     ...(w.rects.length && g.id !== 'none' ? [`סורג: ${g.he}`] : []),
-    `ידית: ${byId(HANDLES, state.handle).he} · ${byId(FINISHES, state.finish).he}`,
+    `ידית: ${byId(HANDLES, state.handle).he}${fin ? ` · ${fin.he}` : ''}`,
     ...(state.detail !== 'plain' ? [`עיצוב: ${byId(DETAILS, state.detail).he}`] : []),
     `מידה: ${s.he}`,
     `פתיחה: ${h.he}`,

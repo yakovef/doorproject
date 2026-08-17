@@ -40,9 +40,28 @@ gets this answered in thirty seconds; a definition does not.*
 קורל · רותם · אלמוג · ספיר · כדור · עידן · אלה · ניצן · שחר · רון · לונה · שירן,
 ועוד מאחז אופקי וידית שקועה.
 
-*Fourteen is too many to put in front of a cold visitor. Rather than guess
+*Fifteen is too many to put in front of a cold visitor. Rather than guess
 which to cut, cut the ones he does not stock. That is a better filter than
 taste, and it makes every remaining option orderable by name.*
+
+---
+
+## 2b. איזו ידית מגיעה באיזה גימור?
+
+> **"אילו ידיות אפשר להזמין בכל שלושת הגימורים — ניקל מוברש, שחור מט, פליז?
+> ואילו מגיעות בגימור אחד בלבד?"**
+
+מה שהנחנו כרגע, לפי תמונות המוצר:
+**לונה — שחור מט בלבד** · **שירן — פליז בלבד** ·
+**ידית שקועה — אין בה חלקי מתכת בכלל** (שקע בדלת עצמה) ·
+כל השאר — שלושת הגימורים.
+
+*Until this was noticed the finish tiles were live for all fifteen handles and
+priced at up to ₪220. On Luna, Shiran and the recessed channel the drawing did
+not change at all, and the message going to Peretz read "Shiran, matte black" —
+a door that does not exist. Those three are now fixed in the catalogue and the
+tiles say why. If any is wrong it is one line each: `HANDLES[].finish` in
+`js/catalog.js`.*
 
 ---
 

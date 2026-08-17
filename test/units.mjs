@@ -410,6 +410,44 @@ group('every option tile draws its own picture');
   for (const s of Object.values(SIZES)) check('size', s.id, sizeGlyph(s));
 }
 
+// ── 6c. Nothing may be charged for that does not change the door ───
+/* Found by looking at a black-finish Shiran and seeing a brass handle. Four
+   of the fifteen handles reference only fixed-tone gradients, so the finish
+   tiles — priced at ₪120 and ₪220 — changed nothing in the drawing for them,
+   and the message still went out saying "Shiran, matte black", which is a
+   door Peretz cannot build.
+
+   The rule that holds in both directions: money and pixels move together. If
+   two designs draw identically they must cost the same, and if they cost
+   differently they must look different. */
+group('a priced option changes the door, and a free one does not');
+for (const n of HANDLES) {
+  for (const f of FINISHES.slice(1)) {
+    const a = { ...base, handle: n.id, finish: FINISHES[0].id };
+    const b = { ...base, handle: n.id, finish: f.id };
+    const draws = render(a) !== render(b);
+    const costs = priceAgorot(a) !== priceAgorot(b);
+    ok(draws === costs, costs
+      ? `handle ${n.id}: the ${f.id} finish costs ₪${shekels(f.delta)} and changes nothing`
+      : `handle ${n.id}: the ${f.id} finish changes the drawing but is not charged for`);
+  }
+}
+for (const [key, list, ctx] of [
+  ['window', WINDOWS, {}],
+  ['grille', GRILLES, { window: 'tallwin' }],
+  ['detail', DETAILS, {}],
+  ['handle', HANDLES, {}],
+]) {
+  const free = list.find(o => !o.delta) || list[0];
+  for (const o of list) {
+    if (o.id === free.id || !o.delta) continue;
+    const a = render({ ...base, ...ctx, [key]: free.id });
+    const b = render({ ...base, ...ctx, [key]: o.id });
+    ok(a !== b, `${key} "${o.id}" costs ₪${shekels(o.delta)} more than "${free.id}" ` +
+                `and draws exactly the same door`);
+  }
+}
+
 // ── 7. Leaf-and-a-half hinges against the frame, not the fixed panel ──
 group('leaf and a half');
 for (const h of HANDINGS) {

@@ -115,8 +115,24 @@
     },
     { id: "ron", he: "רון", en: "Ron", delta: 4e3, len: 900, w: 16, style: "bar", bar: "ron" },
     /* Recessed, and the statement pieces */
-    { id: "luna", he: "לונה", en: "Luna", delta: 18e3, len: 0, style: "luna" },
-    { id: "shiran", he: "שירן", en: "Shiran", delta: 42e3, len: 0, style: "shiran" },
+    {
+      id: "luna",
+      he: "לונה",
+      en: "Luna",
+      delta: 18e3,
+      len: 0,
+      style: "luna",
+      finish: "black"
+    },
+    {
+      id: "shiran",
+      he: "שירן",
+      en: "Shiran",
+      delta: 42e3,
+      len: 0,
+      style: "shiran",
+      finish: "brass"
+    },
     {
       id: "channel",
       he: "ידית שקועה",
@@ -124,7 +140,8 @@
       delta: 32e3,
       len: 1554,
       inset: 0.3,
-      style: "channel"
+      style: "channel",
+      finish: "none"
     }
   ];
   var GRILLES = [
@@ -171,6 +188,11 @@
     { id: "black", he: "שחור מט", en: "Matte black", delta: 12e3 },
     { id: "brass", he: "פליז", en: "Brass", delta: 22e3 }
   ];
+  function effectiveFinish(state2) {
+    const h = byId(HANDLES, state2.handle);
+    if (h.finish === "none") return null;
+    return byId(FINISHES, h.finish || state2.finish);
+  }
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
 
   // js/price.js
@@ -179,7 +201,9 @@
     const colour = byId(COLOURS, state2.colour);
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
-    let total = size.base + colour.delta + win.delta + byId(HANDLES, state2.handle).delta + byId(DETAILS, state2.detail).delta + byId(FINISHES, state2.finish).delta;
+    const handle = byId(HANDLES, state2.handle);
+    const finish = effectiveFinish(state2);
+    let total = size.base + colour.delta + win.delta + handle.delta + byId(DETAILS, state2.detail).delta + (finish && !handle.finish ? finish.delta : 0);
     if (win.rects.length) total += grille.delta;
     return Math.ceil(total / 500) * 500;
   }
@@ -350,8 +374,8 @@
     const grille = byId(GRILLES, state2.grille);
     const handle = byId(HANDLES, state2.handle);
     const detail = byId(DETAILS, state2.detail);
-    const finish = byId(FINISHES, state2.finish);
-    const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
+    const finish = effectiveFinish(state2);
+    const tone = FINISH_TONES[finish ? finish.id : "steel"] || FINISH_TONES.steel;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
@@ -1561,12 +1585,12 @@ ${body}
     <g data-hw="handle" data-style="knobplate">
       <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
             filter="url(#hwShadow)"/>
-      <path d="${d}" fill="url(#metal)"/>
+      <path d="${d}" fill="url(#nickel)"/>
       <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2"
             vector-effect="non-scaling-stroke"/>
       <!-- the knob, standing off the plate -->
       <ellipse cx="${cx}" cy="${cy + 6}" rx="30" ry="27" fill="#000" opacity="0.30"/>
-      <circle cx="${cx}" cy="${cy}" r="29" fill="url(#metal)"/>
+      <circle cx="${cx}" cy="${cy}" r="29" fill="url(#nickelSoft)"/>
       <circle cx="${cx - 8}" cy="${cy - 9}" r="11" fill="#fff" opacity="0.30"/>
       <circle cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#000"
               stroke-opacity="0.28" stroke-width="2" vector-effect="non-scaling-stroke"/>
@@ -1850,12 +1874,12 @@ ${body}
     const g = byId(GRILLES, state2.grille);
     const hd = byId(HANDLES, state2.handle);
     const dt = byId(DETAILS, state2.detail);
-    const fn = byId(FINISHES, state2.finish);
+    const fn = effectiveFinish(state2);
     const s = SIZES[state2.size] || SIZES.standard;
     if (lang === "he") {
       const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
       const det = dt.id === "plain" ? "" : `, ${dt.he}`;
-      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he} ${fn.he}, ${s.he}, פתיחה ${h.he}.`;
+      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he}${fn ? " " + fn.he : ""}, ${s.he}, פתיחה ${h.he}.`;
     }
     return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
   }
@@ -2165,13 +2189,14 @@ ${body}
     const s = SIZES[state2.size] || SIZES.standard;
     const w = byId(WINDOWS, state2.window);
     const g = byId(GRILLES, state2.grille);
+    const fin = effectiveFinish(state2);
     return [
       "שלום, בחרתי דלת באתר:",
       "",
       `צבע: ${c.he} (RAL ${c.ral})`,
       `חלון: ${w.he}`,
       ...w.rects.length && g.id !== "none" ? [`סורג: ${g.he}`] : [],
-      `ידית: ${byId(HANDLES, state2.handle).he} · ${byId(FINISHES, state2.finish).he}`,
+      `ידית: ${byId(HANDLES, state2.handle).he}${fin ? ` · ${fin.he}` : ""}`,
       ...state2.detail !== "plain" ? [`עיצוב: ${byId(DETAILS, state2.detail).he}`] : [],
       `מידה: ${s.he}`,
       `פתיחה: ${h.he}`,
@@ -2388,12 +2413,13 @@ ${body}
     $("#code").textContent = encodeCode(state);
     const win = byId(WINDOWS, state.window);
     const grille = byId(GRILLES, state.grille);
+    const finish = effectiveFinish(state);
     $("#summary").textContent = [
       colour.he,
       `RAL ${colour.ral}`,
       win.he,
       ...win.rects.length && grille.id !== "none" ? [grille.he] : [],
-      `${byId(HANDLES, state.handle).he} ${byId(FINISHES, state.finish).he}`,
+      `${byId(HANDLES, state.handle).he}${finish ? ` ${finish.he}` : ""}`,
       ...state.detail !== "plain" ? [byId(DETAILS, state.detail).he] : [],
       size.he,
       handing.he
@@ -2403,10 +2429,11 @@ ${body}
     markSelected("#grilles", state.grille);
     markSelected("#handles", state.handle);
     markSelected("#details", state.detail);
-    markSelected("#finishes", state.finish);
+    markSelected("#finishes", finish ? finish.id : null);
     markSelected("#sizes", state.size);
     markSelected("#handings", state.handing);
     gateGrilles(byId(WINDOWS, state.window));
+    gateFinishes(byId(HANDLES, state.handle), finish);
     $("#wa-btn").href = whatsappUrl(state);
     announce(describe(state));
   }
@@ -2435,6 +2462,23 @@ ${body}
       why.hidden = !blocked;
       why.textContent = blocked ? "דורש חלון" : "";
     });
+  }
+  function gateFinishes(handle, finish) {
+    const fixed = !!handle.finish;
+    document.querySelectorAll('#finishes [role="radio"]').forEach((el) => {
+      const blocked = fixed && el.dataset.id !== (finish && finish.id);
+      el.setAttribute("aria-disabled", String(blocked));
+      el.classList.toggle("is-blocked", blocked);
+      const why = el.querySelector(".tile__why");
+      why.hidden = !blocked;
+      why.textContent = blocked ? finish ? `${handle.he} — ${finish.he} בלבד` : "אין חלקי מתכת" : "";
+      const meta = el.querySelector(".tile__meta");
+      const own = byId(FINISHES, el.dataset.id);
+      meta.textContent = deltaLabel(fixed ? 0 : Math.max(0, own.delta));
+    });
+    const note = $("#finish-note");
+    note.hidden = !fixed;
+    note.textContent = !fixed ? "" : finish ? `ידית ${handle.he} מגיעה בגימור ${finish.he} בלבד.` : `ידית שקועה היא שקע בדלת עצמה — אין בה חלקי מתכת לגמור.`;
   }
   function markSelected(sel, id) {
     document.querySelectorAll(`${sel} [role="radio"]`).forEach((el) => {

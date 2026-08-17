@@ -16,7 +16,7 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 import { darken, isLight, lighten, silhouette } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
@@ -305,8 +305,12 @@ export function render(state) {
   const grille  = byId(GRILLES, state.grille);
   const handle  = byId(HANDLES, state.handle);
   const detail  = byId(DETAILS, state.detail);
-  const finish  = byId(FINISHES, state.finish);
-  const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
+  /* The handle's own finish wins over the chosen one — Luna is matte black and
+     Shiran is antique brass whatever the tiles say, and the recessed channel
+     has no metal on it at all. Anything with a finish still needs a tone for
+     the fixings, so a handle with none falls back to brushed nickel. */
+  const finish  = effectiveFinish(state);
+  const tone    = FINISH_TONES[finish ? finish.id : 'steel'] || FINISH_TONES.steel;
 
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
@@ -1755,12 +1759,12 @@ function knobPlate(cx, cy, dir) {
     <g data-hw="handle" data-style="knobplate">
       <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
             filter="url(#hwShadow)"/>
-      <path d="${d}" fill="url(#metal)"/>
+      <path d="${d}" fill="url(#nickel)"/>
       <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2"
             vector-effect="non-scaling-stroke"/>
       <!-- the knob, standing off the plate -->
       <ellipse cx="${cx}" cy="${cy + 6}" rx="30" ry="27" fill="#000" opacity="0.30"/>
-      <circle cx="${cx}" cy="${cy}" r="29" fill="url(#metal)"/>
+      <circle cx="${cx}" cy="${cy}" r="29" fill="url(#nickelSoft)"/>
       <circle cx="${cx - 8}" cy="${cy - 9}" r="11" fill="#fff" opacity="0.30"/>
       <circle cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#000"
               stroke-opacity="0.28" stroke-width="2" vector-effect="non-scaling-stroke"/>
@@ -2128,12 +2132,12 @@ export function describe(state, lang = 'he') {
   const g = byId(GRILLES, state.grille);
   const hd = byId(HANDLES, state.handle);
   const dt = byId(DETAILS, state.detail);
-  const fn = byId(FINISHES, state.finish);
+  const fn = effectiveFinish(state);
   const s = SIZES[state.size] || SIZES.standard;
   if (lang === 'he') {
     const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
     const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he} ${fn.he}, ${s.he}, פתיחה ${h.he}.`;
+    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he}${fn ? ' ' + fn.he : ''}, ${s.he}, פתיחה ${h.he}.`;
   }
   return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
 }

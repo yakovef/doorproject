@@ -163,10 +163,12 @@ export const HANDLES = [
   { id: 'ron',     he: 'רון',   en: 'Ron',    delta: 4000,  len: 900,  w: 16, style: 'bar', bar: 'ron' },
 
   /* Recessed, and the statement pieces */
-  { id: 'luna',    he: 'לונה',   en: 'Luna',   delta: 18000, len: 0, style: 'luna' },
-  { id: 'shiran',  he: 'שירן',   en: 'Shiran', delta: 42000, len: 0, style: 'shiran' },
+  { id: 'luna',    he: 'לונה',   en: 'Luna',   delta: 18000, len: 0, style: 'luna',
+    finish: 'black' },
+  { id: 'shiran',  he: 'שירן',   en: 'Shiran', delta: 42000, len: 0, style: 'shiran',
+    finish: 'brass' },
   { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
-    delta: 32000, len: 1554, inset: 0.30, style: 'channel' },
+    delta: 32000, len: 1554, inset: 0.30, style: 'channel', finish: 'none' },
 ];
 
 /** Decorative iron grille over the glazing. Only meaningful with a window. */
@@ -226,13 +228,40 @@ export const DETAILS = [
   { id: 'panel2', he: 'שני פאנלים',     en: 'Two panels',     delta: 52000, panel: true,  groove: false, panels: 2 },
 ];
 
-/** Ironmongery finish. One variable, and it changes every metal part. */
+/**
+ * Ironmongery finish.
+ *
+ * Not every handle takes one. Luna is a matte black casting and Shiran an
+ * antique brass one — the renderer has drawn them that way since they were
+ * measured off the product shots — and the recessed channel has no metal on
+ * it at all, being a void in the leaf. For those three the finish tiles were
+ * live, priced at up to ₪220, and changed nothing whatsoever in the drawing.
+ * Worse than a picture that does not update: the WhatsApp message went out
+ * saying "Shiran, matte black", which is a door Peretz cannot build.
+ *
+ * A handle's own `finish` now wins over the choice, everywhere at once — in
+ * the drawing, in the price, in the summary and in the message — and the
+ * tiles say so instead of pretending. Which handles really come in which
+ * finishes is a question for Peretz; see ASK-PERETZ.md.
+ */
 export const FINISHES = [
   { id: 'steel', he: 'ניקל מוברש', en: 'Brushed nickel', delta: 0 },
   { id: 'black', he: 'שחור מט',    en: 'Matte black',    delta: 12000 },
   { id: 'brass', he: 'פליז',       en: 'Brass',          delta: 22000 },
 ];
 
+
+/**
+ * The finish this door is actually built in — null when the handle has no
+ * metal to finish. Everything that shows a finish to anyone goes through
+ * here, so the drawing, the price, the spec line and the message can never
+ * disagree about it.
+ */
+export function effectiveFinish(state) {
+  const h = byId(HANDLES, state.handle);
+  if (h.finish === 'none') return null;
+  return byId(FINISHES, h.finish || state.finish);
+}
 
 /* Aliases count: a superseded id must resolve to its replacement rather than
    silently falling through to the first entry, which is how a stale link

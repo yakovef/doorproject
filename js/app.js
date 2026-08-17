@@ -2,7 +2,7 @@
  * Wiring. Small on purpose — the state is three keys.
  */
 
-import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, PLACEHOLDER, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, PLACEHOLDER, SIZES, WINDOWS } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import { describe, detailGlyph, finishGlyph, grilleGlyph, handleGlyph, render, sizeGlyph, windowGlyph } from './renderer.js';
 import { copyMessage, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
@@ -195,10 +195,11 @@ function paint() {
 
   const win = byId(WINDOWS, state.window);
   const grille = byId(GRILLES, state.grille);
+  const finish = effectiveFinish(state);
   $('#summary').textContent = [
     colour.he, `RAL ${colour.ral}`, win.he,
     ...(win.rects.length && grille.id !== 'none' ? [grille.he] : []),
-    `${byId(HANDLES, state.handle).he} ${byId(FINISHES, state.finish).he}`,
+    `${byId(HANDLES, state.handle).he}${finish ? ` ${finish.he}` : ''}`,
     ...(state.detail !== 'plain' ? [byId(DETAILS, state.detail).he] : []),
     size.he, handing.he,
   ].join(' · ');
@@ -208,11 +209,14 @@ function paint() {
   markSelected('#grilles', state.grille);
   markSelected('#handles', state.handle);
   markSelected('#details', state.detail);
-  markSelected('#finishes', state.finish);
+  // The tile that is ticked is the finish the door is BUILT in, which is not
+  // always the one that was clicked (see gateFinishes).
+  markSelected('#finishes', finish ? finish.id : null);
   markSelected('#sizes', state.size);
   markSelected('#handings', state.handing);
 
   gateGrilles(byId(WINDOWS, state.window));
+  gateFinishes(byId(HANDLES, state.handle), finish);
 
   $('#wa-btn').href = whatsappUrl(state);
 
@@ -267,6 +271,39 @@ function gateGrilles(win) {
     why.hidden = !blocked;
     why.textContent = blocked ? 'דורש חלון' : '';
   });
+}
+
+/**
+ * Some handles decide their own finish, and one has no metal to finish at all.
+ *
+ * The tiles used to stay live for all of them: you could pick matte black with
+ * a Shiran and the drawing stayed antique brass, the price still took ₪120,
+ * and the WhatsApp message went out reading "Shiran, matte black" — a door
+ * Peretz cannot build. Same rule as the grilles: never a dead end, never
+ * silence, always say why.
+ */
+function gateFinishes(handle, finish) {
+  const fixed = !!handle.finish;
+  document.querySelectorAll('#finishes [role="radio"]').forEach(el => {
+    const blocked = fixed && el.dataset.id !== (finish && finish.id);
+    el.setAttribute('aria-disabled', String(blocked));
+    el.classList.toggle('is-blocked', blocked);
+    const why = el.querySelector('.tile__why');
+    why.hidden = !blocked;
+    why.textContent = blocked
+      ? (finish ? `${handle.he} — ${finish.he} בלבד` : 'אין חלקי מתכת')
+      : '';
+    // A finish that comes with the handle is inside the handle's price, so
+    // the tile must not go on advertising a surcharge nobody can decline.
+    const meta = el.querySelector('.tile__meta');
+    const own = byId(FINISHES, el.dataset.id);
+    meta.textContent = deltaLabel(fixed ? 0 : Math.max(0, own.delta));
+  });
+  const note = $('#finish-note');
+  note.hidden = !fixed;
+  note.textContent = !fixed ? ''
+    : finish ? `ידית ${handle.he} מגיעה בגימור ${finish.he} בלבד.`
+             : `ידית שקועה היא שקע בדלת עצמה — אין בה חלקי מתכת לגמור.`;
 }
 
 function markSelected(sel, id) {

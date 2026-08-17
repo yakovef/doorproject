@@ -62,7 +62,12 @@ for (const v of VIEWS) {
     if (!ids.length) { fault(v.name, `${g} rendered no options`); continue; }
 
     for (const id of ids) {
-      await p.click(`${g} [data-id="${id}"]`);
+      /* el.click(), not page.click(): options that the current design blocks
+         carry aria-disabled, and Playwright's actionability check refuses to
+         click those. A person still can — they are buttons, not `disabled`
+         buttons, exactly so that keyboard and touch users are never walled
+         off — so this drives them the way Enter on a focused button does. */
+      await p.$eval(`${g} [data-id="${id}"]`, el => el.click());
       await p.waitForTimeout(30);
 
       const s = await p.evaluate(() => {

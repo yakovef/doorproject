@@ -7,7 +7,7 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDLES, SIZES, WINDOWS } from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
 export function priceAgorot(state) {
@@ -16,10 +16,19 @@ export function priceAgorot(state) {
   const win    = byId(WINDOWS, state.window);
   const grille = byId(GRILLES, state.grille);
 
+  /* The finish is charged only when it is a choice. The recessed channel is a
+     void in the leaf with no metal on it, and Luna and Shiran each come in one
+     finish — all three used to take up to ₪220 for a decision the customer
+     could not make and the drawing did not show. Where the handle carries its
+     own finish, that finish is part of the handle's price: "Shiran costs ₪420
+     and comes in brass" is a sentence a customer can act on; "₪420 plus a ₪220
+     brass surcharge you cannot decline" is not. */
+  const handle = byId(HANDLES, state.handle);
+  const finish = effectiveFinish(state);
   let total = size.base + colour.delta + win.delta
-            + byId(HANDLES, state.handle).delta
+            + handle.delta
             + byId(DETAILS, state.detail).delta
-            + byId(FINISHES, state.finish).delta;
+            + (finish && !handle.finish ? finish.delta : 0);
   // A grille needs glazing to sit in, so it cannot be charged on a solid door.
   if (win.rects.length) total += grille.delta;
 
