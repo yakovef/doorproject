@@ -64,6 +64,10 @@ export const COLOURS = [
      could be honest about its paint. */
   { id: 'ral-7033', ral: '7033', hex: '#678184', he: 'ירוק מרווה',  en: 'Sage green',      delta: 25000 },
   { id: 'ral-7046', ral: '7046', hex: '#7E858C', he: 'אפור פלדה',   en: 'Slate grey',      delta: 0 },
+  /* d026's leaf, and I missed it by adding 7046 alone: that door is #A2A7AD
+     at luminance 166 and slate lands at 132, a whole step below. The light
+     cool greys need two entries, not one. */
+  { id: 'ral-7040', ral: '7040', hex: '#A2A7AD', he: 'אפור חלון',   en: 'Window grey',     delta: 0 },
 ];
 
 /**

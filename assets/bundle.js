@@ -36,7 +36,11 @@
        between RAL 7024 and 7035, a gap wide enough that neither recreation
        could be honest about its paint. */
     { id: "ral-7033", ral: "7033", hex: "#678184", he: "ירוק מרווה", en: "Sage green", delta: 25e3 },
-    { id: "ral-7046", ral: "7046", hex: "#7E858C", he: "אפור פלדה", en: "Slate grey", delta: 0 }
+    { id: "ral-7046", ral: "7046", hex: "#7E858C", he: "אפור פלדה", en: "Slate grey", delta: 0 },
+    /* d026's leaf, and I missed it by adding 7046 alone: that door is #A2A7AD
+       at luminance 166 and slate lands at 132, a whole step below. The light
+       cool greys need two entries, not one. */
+    { id: "ral-7040", ral: "7040", hex: "#A2A7AD", he: "אפור חלון", en: "Window grey", delta: 0 }
   ];
   var WINDOWS = [
     { id: "none", he: "ללא חלון", en: "Solid", delta: 0, rects: [] },
@@ -271,8 +275,8 @@
     cool: "#0C1622"
   };
   var FALLOFF = {
-    dark: { peak: 0.16, mid: 0.08, low: 0.3, foot: 0.35, head: 0.03, grain: 0.11, drift: 0.13 },
-    light: { peak: 0.1, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.05, drift: 0.09 }
+    dark: { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.16, drift: 0.13 },
+    light: { peak: 0.1, mid: 0.05, low: 0.09, foot: 0.1, head: 0.02, grain: 0.09, drift: 0.09 }
   };
   var CASING = 46;
   var RET_NEAR = 25;
@@ -295,7 +299,7 @@
   var LOCK_CLEAR = 15;
   var BAR_INSET = 0.19;
   var GRAB = { fromTop: 0.585, len: 0.3, ratio: 1 / 15, boss: 17 };
-  var THRESHOLD = 26;
+  var THRESHOLD = 42;
   var PLATE = {
     w: 90,
     // 0.095 W
@@ -371,11 +375,18 @@
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
           filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
-    <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.10"/>
+    <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.16"/>
     <!-- occlusion where the leaf meets the frame on every side -->
     <rect x="${lx}" y="${y0}" width="${lw}" height="64" fill="url(#aoTop)"/>
     <rect x="${lx}" y="${y0}" width="${AO_SIDE}" height="${leafH}" fill="url(#aoLeft)"/>
     <rect x="${lx + lw - AO_SIDE}" y="${y0}" width="${AO_SIDE}" height="${leafH}" fill="url(#aoRight)"/>
+    <!-- The leaf's own edge is a rolled arris facing the light, so it carries
+         a bright line, not a dark one. We were drawing the shadow that falls
+         BESIDE the edge over the edge itself. -->
+    <rect x="${lx + 2}" y="${y0 + 20}" width="3" height="${leafH - 40}"
+          fill="#fff" opacity="0.16"/>
+    <rect x="${lx + lw - 5}" y="${y0 + 20}" width="3" height="${leafH - 40}"
+          fill="#fff" opacity="0.13"/>
     <rect x="${lx}" y="${floorY - AO_FOOT}" width="${lw}" height="${AO_FOOT}" fill="url(#aoBottom)"/>`;
     const band = (inset, w, fill) => {
       const d = inset + w / 2;
@@ -399,8 +410,15 @@
          fall to roughly half at the foot. Warm where it is lit, cool where it
          is not — the hue swing is doing as much work here as the value. -->
     <linearGradient id="keyWash" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"    stop-color="${LIGHT.cool}" stop-opacity="${fall.head}"/>
-      <stop offset="0.15" stop-color="${LIGHT.warm}" stop-opacity="${fall.peak}"/>
+      <!-- The peak is at the HEAD, not a third of the way down. Ours dipped at
+           offset 0 and peaked at 0.15, which put the brightest row three rows
+           in; the thirty doors run 0.96 0.96 0.90 0.84 ... — brightest at the
+           very top and falling from there, every one of them. A door lit from
+           above and in front has no reason to be dimmer at its own head, and
+           the dip was left over from tuning against a stairwell shot where
+           the lamp was below the lintel. -->
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${fall.peak}"/>
+      <stop offset="0.15" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.86).toFixed(3)}"/>
       <stop offset="0.32" stop-color="${LIGHT.warm}" stop-opacity="${fall.mid}"/>
       <stop offset="0.48" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
       <stop offset="0.64" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
@@ -465,11 +483,13 @@
          The foot is now the shadow ramp arriving, and nothing else. -->
 
     <!-- Ambient occlusion. Tight, dark, and at every junction. -->
-    <!-- Under the lintel. The photographs put a dark leaf's top strip at 0.44
-         of its own midpoint and a pale one's at 0.71; we were at 0.87 for both,
-         so the head of the door barely knew it was in a rebate at all. -->
+    <!-- Under the lintel. This chased one number off one stairwell photograph
+         and blew past the truth: across all thirty doors the leaf's TOP row
+         is 0.96 of its brightest on a dark door and 0.91 on a pale one — the
+         head is barely shadowed at all, because the lintel above it is
+         bouncing as much light down as it blocks. Ours had it at 0.57. -->
     <linearGradient id="aoTop" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.34 : 0.4}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.05 : 0.06}"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <!-- Contact shadow at the floor. The photographs put a WHITE door's foot

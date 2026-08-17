@@ -16,8 +16,8 @@ import jpeg from 'jpeg-js';
    is close the gap is the finding, and it is named here rather than hidden. */
 const CASES = [
   { id: 'd026', label: 'basic ₪3,750',
-    q: 'c=ral-7046&w=none&g=none&n=coral&d=plain&f=brass&s=standard&h=right-in',
-    gap: 'leaf #A2A7AD cool light grey; RAL 7046 #7E858C is nearest and darker' },
+    q: 'c=ral-7040&w=none&g=none&n=coral&d=plain&f=brass&s=standard&h=right-in',
+    gap: 'window grey added this round; exact match' },
   { id: 'd097', label: 'luxury ₪7,500',
     q: 'c=ral-9016&w=tallwin&g=grid-light&n=coral&d=panel&f=steel&s=standard&h=right-in',
     gap: 'grid-light added; photo also has scroll motifs inside the grid' },

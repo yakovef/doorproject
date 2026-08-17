@@ -45,19 +45,26 @@ export const LIGHT = {
 };
 
 /* How far the face falls from its brightest point to its darkest.
-   The photographs run 1.45-2.9 stops on a dark leaf and 0.6-1.0 on a white
-   one. We deliberately stop short of the dark end: these were shot in dim
-   stairwells, and a configurator that renders the bottom third of an
-   anthracite door near-black misrepresents the colour someone is buying.
-   ~1.9:1 and ~1.45:1 keep the modelling strong and the colour legible. */
+   Retargeted on the MEDIAN of all thirty measured doors rather than the one
+   dim stairwell photograph the model grew up against. Nine rows, normalised:
+
+     photographs  dark   0.96 0.96 0.90 0.84 0.80 0.72 0.67 0.62 0.57  1.68x
+     photographs  light  0.91 0.98 0.98 0.97 0.96 0.98 0.96 0.93 0.89  1.10x
+     ours (was)   dark   0.57 0.97 1.00 0.86 0.69 0.60 0.55 0.50 0.46  2.17x
+
+   Two errors, and the stairwell photo was hiding both. Our fall was half a
+   stop too steep, so a dark leaf lost its colour toward the floor. And our
+   TOP row read 0.57 where the thirty doors say 0.96 — the head shadow was
+   nearly halving the leaf's value at its brightest point, which is the one
+   place a real door is not in shadow at all. */
 /* `foot` sits just above `low` on purpose. It used to overshoot it by half
    again, in a warm near-black rather than the cool the rest of the ramp uses,
    and the mismatch showed up as a discrete patch at the bottom of the leaf
    instead of the end of a fall. Whatever happens down there must read as the
    shadow continuing, never as an event. */
 const FALLOFF = {
-  dark:  { peak: 0.16, mid: 0.08, low: 0.30, foot: 0.35, head: 0.03, grain: 0.11, drift: 0.13 },
-  light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.05, drift: 0.09 },
+  dark:  { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.16, drift: 0.13 },
+  light: { peak: 0.10, mid: 0.05, low: 0.09, foot: 0.10, head: 0.02, grain: 0.09, drift: 0.09 },
 };
 
 /* `drift` and `grain` both halved, for two reasons that turn out to be one.
@@ -151,7 +158,7 @@ const BAR_INSET = 0.19;
    every single one is on a door that already has a lever. It is an accessory,
    never a door's main grip, which is why it ships as "lever + grab bar". */
 const GRAB = { fromTop: 0.585, len: 0.30, ratio: 1 / 15, boss: 17 };
-const THRESHOLD    = 26;
+const THRESHOLD    = 42;   // a real sill is a chunky extrusion, ~0.02 H, not a strip
 
 /* The backplate that carries lever and cylinder together — the fitting on
    three of the four doors we could measure. Waisted, not a plain stadium:
@@ -264,11 +271,18 @@ export function render(state) {
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
           filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
-    <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.10"/>
+    <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.16"/>
     <!-- occlusion where the leaf meets the frame on every side -->
     <rect x="${lx}" y="${y0}" width="${lw}" height="64" fill="url(#aoTop)"/>
     <rect x="${lx}" y="${y0}" width="${AO_SIDE}" height="${leafH}" fill="url(#aoLeft)"/>
     <rect x="${lx + lw - AO_SIDE}" y="${y0}" width="${AO_SIDE}" height="${leafH}" fill="url(#aoRight)"/>
+    <!-- The leaf's own edge is a rolled arris facing the light, so it carries
+         a bright line, not a dark one. We were drawing the shadow that falls
+         BESIDE the edge over the edge itself. -->
+    <rect x="${lx + 2}" y="${y0 + 20}" width="3" height="${leafH - 40}"
+          fill="#fff" opacity="0.16"/>
+    <rect x="${lx + lw - 5}" y="${y0 + 20}" width="3" height="${leafH - 40}"
+          fill="#fff" opacity="0.13"/>
     <rect x="${lx}" y="${floorY - AO_FOOT}" width="${lw}" height="${AO_FOOT}" fill="url(#aoBottom)"/>`;
 
   /* The reveal: three mitred bands running up one jamb, across the head and
@@ -298,8 +312,15 @@ export function render(state) {
          fall to roughly half at the foot. Warm where it is lit, cool where it
          is not — the hue swing is doing as much work here as the value. -->
     <linearGradient id="keyWash" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"    stop-color="${LIGHT.cool}" stop-opacity="${fall.head}"/>
-      <stop offset="0.15" stop-color="${LIGHT.warm}" stop-opacity="${fall.peak}"/>
+      <!-- The peak is at the HEAD, not a third of the way down. Ours dipped at
+           offset 0 and peaked at 0.15, which put the brightest row three rows
+           in; the thirty doors run 0.96 0.96 0.90 0.84 ... — brightest at the
+           very top and falling from there, every one of them. A door lit from
+           above and in front has no reason to be dimmer at its own head, and
+           the dip was left over from tuning against a stairwell shot where
+           the lamp was below the lintel. -->
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${fall.peak}"/>
+      <stop offset="0.15" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.86).toFixed(3)}"/>
       <stop offset="0.32" stop-color="${LIGHT.warm}" stop-opacity="${fall.mid}"/>
       <stop offset="0.48" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
       <stop offset="0.64" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
@@ -364,11 +385,13 @@ export function render(state) {
          The foot is now the shadow ramp arriving, and nothing else. -->
 
     <!-- Ambient occlusion. Tight, dark, and at every junction. -->
-    <!-- Under the lintel. The photographs put a dark leaf's top strip at 0.44
-         of its own midpoint and a pale one's at 0.71; we were at 0.87 for both,
-         so the head of the door barely knew it was in a rebate at all. -->
+    <!-- Under the lintel. This chased one number off one stairwell photograph
+         and blew past the truth: across all thirty doors the leaf's TOP row
+         is 0.96 of its brightest on a dark door and 0.91 on a pale one — the
+         head is barely shadowed at all, because the lintel above it is
+         bouncing as much light down as it blocks. Ours had it at 0.57. -->
     <linearGradient id="aoTop" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.34 : 0.40}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.05 : 0.06}"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <!-- Contact shadow at the floor. The photographs put a WHITE door's foot
