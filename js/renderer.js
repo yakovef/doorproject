@@ -101,11 +101,29 @@ const FALLOFF = {
    Keeping near/far at about 1.5 keeps the door off-axis enough to sit in the
    wall — depth is still the thing that stops it being a picture of a door
    (REALISM.md §1) — but the far return is now nearly nothing, which is what
-   an almost-square-on view actually shows. */
+   an almost-square-on view actually shows.
+
+   ── CORRECTED, from five close photographs of one installation ──
+   The narrowing above was wrong, and wrong for a specific reason: the corpus
+   field called `reveal` is the dark SHADOW GAP beside the leaf, not the
+   frame's returns, and I cut the returns to fit a shadow gap's width. Five
+   shots of one green door from four angles settle it — the opening is a deep
+   BOX, three planes turning back from the wall to the leaf, and the soffit
+   alone runs to something like a sixth of the leaf's width.
+
+                  ours (was)    the green door      now
+     near jamb      0.062        ~0.16              0.125
+     far jamb       0.040        ~0.28 (sunlit)     0.087
+     soffit         0.093        ~0.31              0.162
+
+   Set below what that door measures, deliberately: it is a phone shot from
+   close range so its perspective is exaggerated, and the corpus does contain
+   genuinely shallow installations in thin walls (d003, d106). These land
+   between the two rather than at either end. */
 const CASING   = 46;   // flat frame face against the wall
-const RET_NEAR = 25;   // visible return, camera side (wide)
-const RET_FAR  = 6;   // visible return, far side — nearly edge-on
-const RET_HEAD = 51;   // visible return under the head — the deepest of the three
+const RET_NEAR = 78;   // visible return, shadowed side
+const RET_FAR  = 46;   // visible return, sunlit side
+const RET_HEAD = 110;  // the soffit — the deepest of the three, and by a lot
 /* Between two leaves the real joint is a line, not a post: on d125's equal
    pair the leaves almost touch. 46 mm drew a wide lit band that read as a
    structural mullion the door does not have. */
@@ -428,12 +446,19 @@ export function render(state) {
          shared ramp does, loses the only thing that says which way the door
          is facing. -->
     <linearGradient id="retNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.06 : 0.30}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.15 : 0.55}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.20 : 0.42}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.34 : 0.64}"/>
     </linearGradient>
+    <!-- The far return is LIT, not less-shadowed. In the photographs the two
+         jambs are not two shades of one shadow: the near one falls away into
+         the dark and the far one takes the sun square-on and comes out
+         BRIGHTER than the leaf itself. We drew both as black at slightly
+         different strengths, which is why the opening read flat — a box needs
+         one plane in light and one in shade before it is a box. -->
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.04 : 0.02}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.12 : 0.14}"/>
+      <stop offset="0"   stop-color="#fff" stop-opacity="${pale ? 0.30 : 0.62}"/>
+      <stop offset="0.6" stop-color="#fff" stop-opacity="${pale ? 0.18 : 0.38}"/>
+      <stop offset="1"   stop-color="#000" stop-opacity="0.10"/>
     </linearGradient>
 
     <!-- Both returns had a horizontal ramp and no vertical one at all, so a
@@ -753,9 +778,12 @@ export function render(state) {
     <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint}"/>
     <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retFar)"/>
-    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#revealFall)"/>
+    <!-- The sunlit jamb's highlight goes on LAST. Painted before the vertical
+         fall, the fall simply covered it and the plane came out as dark as its
+         opposite number, which is the whole reason the opening read flat. -->
+    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
+          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retFar)"/>
 
     <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
           width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint}"/>
@@ -767,6 +795,16 @@ export function render(state) {
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
     <line x1="${x1 + RET_FAR}" y1="${y0 - RET_HEAD}" x2="${x1 + RET_FAR}" y2="${floorY + THRESHOLD}"
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+
+    <!-- The mitre. Where soffit meets jamb the photographs show a hard 45
+         degree seam, not a blend — two planes at different angles to the light
+         meeting on a line. Without it the box corners look moulded. -->
+    <path d="M ${x0 - RET_NEAR} ${y0 - RET_HEAD} L ${x0} ${y0}" fill="none"
+          stroke="#000" stroke-opacity="0.34" stroke-width="1.5"
+          vector-effect="non-scaling-stroke"/>
+    <path d="M ${x1 + RET_FAR} ${y0 - RET_HEAD} L ${x1} ${y0}" fill="none"
+          stroke="#fff" stroke-opacity="0.22" stroke-width="1.5"
+          vector-effect="non-scaling-stroke"/>
 
     <!-- ── the reveal: quirk, bead, gap, mitred at both top corners ── -->
     <g id="reveal">

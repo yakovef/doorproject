@@ -279,9 +279,9 @@
     light: { peak: 0.1, mid: 0.05, low: 0.09, foot: 0.1, head: 0.02, grain: 0.09, drift: 0.09 }
   };
   var CASING = 46;
-  var RET_NEAR = 25;
-  var RET_FAR = 6;
-  var RET_HEAD = 51;
+  var RET_NEAR = 78;
+  var RET_FAR = 46;
+  var RET_HEAD = 110;
   var MULLION = 22;
   var REBATE = 50;
   var GAP = 10;
@@ -526,12 +526,19 @@
          shared ramp does, loses the only thing that says which way the door
          is facing. -->
     <linearGradient id="retNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.06 : 0.3}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.15 : 0.55}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.2 : 0.42}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.34 : 0.64}"/>
     </linearGradient>
+    <!-- The far return is LIT, not less-shadowed. In the photographs the two
+         jambs are not two shades of one shadow: the near one falls away into
+         the dark and the far one takes the sun square-on and comes out
+         BRIGHTER than the leaf itself. We drew both as black at slightly
+         different strengths, which is why the opening read flat — a box needs
+         one plane in light and one in shade before it is a box. -->
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.04 : 0.02}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.12 : 0.14}"/>
+      <stop offset="0"   stop-color="#fff" stop-opacity="${pale ? 0.3 : 0.62}"/>
+      <stop offset="0.6" stop-color="#fff" stop-opacity="${pale ? 0.18 : 0.38}"/>
+      <stop offset="1"   stop-color="#000" stop-opacity="0.10"/>
     </linearGradient>
 
     <!-- Both returns had a horizontal ramp and no vertical one at all, so a
@@ -851,9 +858,12 @@
     <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint2}"/>
     <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retFar)"/>
-    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#revealFall)"/>
+    <!-- The sunlit jamb's highlight goes on LAST. Painted before the vertical
+         fall, the fall simply covered it and the plane came out as dark as its
+         opposite number, which is the whole reason the opening read flat. -->
+    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
+          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retFar)"/>
 
     <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
           width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint2}"/>
@@ -865,6 +875,16 @@
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
     <line x1="${x1 + RET_FAR}" y1="${y0 - RET_HEAD}" x2="${x1 + RET_FAR}" y2="${floorY + THRESHOLD}"
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+
+    <!-- The mitre. Where soffit meets jamb the photographs show a hard 45
+         degree seam, not a blend — two planes at different angles to the light
+         meeting on a line. Without it the box corners look moulded. -->
+    <path d="M ${x0 - RET_NEAR} ${y0 - RET_HEAD} L ${x0} ${y0}" fill="none"
+          stroke="#000" stroke-opacity="0.34" stroke-width="1.5"
+          vector-effect="non-scaling-stroke"/>
+    <path d="M ${x1 + RET_FAR} ${y0 - RET_HEAD} L ${x1} ${y0}" fill="none"
+          stroke="#fff" stroke-opacity="0.22" stroke-width="1.5"
+          vector-effect="non-scaling-stroke"/>
 
     <!-- ── the reveal: quirk, bead, gap, mitred at both top corners ── -->
     <g id="reveal">
