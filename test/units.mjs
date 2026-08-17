@@ -289,6 +289,23 @@ for (const hd of HANDINGS) for (const sz of sizeKeys) {
   }
 }
 
+// ── 5c. Every url(#id) must resolve to something we defined ────────
+/* Missed and shipped: a refactor deleted the `edgeShade` gradient while the
+   rect referencing it stayed. SVG paints nothing for a dangling url(), so the
+   whole leaf-to-frame junction silently stopped rendering — no error, no
+   visual crash, just a measured feature quietly absent. Tests were green.
+   Same family as the grille that drew nothing and the panel that dropped
+   itself: things that vanish rather than break. */
+group('no dangling gradient or filter references');
+for (const c of [COLOURS[0], COLOURS[8], COLOURS[16]]) {
+  const svg = render({ ...base, colour: c.id, window: 'tallwin', grille: 'grid', detail: 'panel' });
+  const defined = new Set([...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
+  const used = [...svg.matchAll(/url\(#([^)]+)\)/g)].map(m => m[1]);
+  for (const u of new Set(used)) {
+    ok(defined.has(u), `url(#${u}) is referenced but never defined (${c.id})`);
+  }
+}
+
 // ── 6a. A grille the customer pays for must actually appear ────────
 /* Missed once and shipped: adding `grid-light` gave it an id that matched no
    branch in grillePaths, so it returned an empty string. The option was

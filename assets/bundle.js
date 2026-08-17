@@ -519,25 +519,32 @@
       <stop offset="0" stop-color="${darken(paint2, pale ? 0.13 : 0.22)}"/>
       <stop offset="1" stop-color="${darken(paint2, pale ? 0.23 : 0.38)}"/>
     </linearGradient>
+    <!-- The junction ramp, referenced by the reveal band. Darkest against the
+         leaf and recovering outward, per the twenty-door measurement — and in
+         the paint's own colour, like every other plane in the frame. -->
+    <!-- The light falling across a raised panel's inner face. This was
+         referenced by raisedPanel and never defined, so every panelled door we
+         have ever drawn had a flat field where the light should cross it. The
+         new dangling-reference test found it immediately. -->
+    <linearGradient id="keyLight" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.16"/>
+      <stop offset="0.6" stop-color="${LIGHT.warm}" stop-opacity="0.04"/>
+      <stop offset="1"   stop-color="${LIGHT.cool}" stop-opacity="0.06"/>
+    </linearGradient>
+
+    <linearGradient id="edgeShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${darken(paint2, pale ? 0.14 : 0.22)}"/>
+      <stop offset="1" stop-color="${darken(paint2, pale ? 0.24 : 0.38)}"/>
+    </linearGradient>
+
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"   stop-color="${lighten(paint2, 0.06)}"/>
       <stop offset="0.3" stop-color="${darken(paint2, pale ? 0.12 : 0.2)}"/>
       <stop offset="1"   stop-color="${darken(paint2, pale ? 0.3 : 0.48)}"/>
     </linearGradient>
-
-    <linearGradient id="revealFall" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"    stop-color="#000" stop-opacity="0"/>
-      <stop offset="0.45" stop-color="#000" stop-opacity="${pale ? 0.02 : 0.14}"/>
-      <stop offset="1"    stop-color="#000" stop-opacity="${pale ? 0.05 : 0.44}"/>
-    </linearGradient>
-    <linearGradient id="retHead" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.66"/>
-    </linearGradient>
-
     <linearGradient id="casingFace" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#fff" stop-opacity="0.10"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.06"/>
+      <stop offset="0" stop-color="${lighten(paint2, 0.1)}"/>
+      <stop offset="1" stop-color="${darken(paint2, 0.06)}"/>
     </linearGradient>
 
     <!-- Brushed nickel, lit from upper-left. The bright band sits off-centre
@@ -813,11 +820,12 @@
           fill="${paint2}"/>
     <rect x="${x0 - RET_NEAR - CASING}" y="${y0 - RET_HEAD - CASING}"
           width="${totalW + RET_NEAR + RET_FAR + CASING * 2}" height="${CASING}"
-          fill="#fff" opacity="0.07"/>
+          fill="${lighten(paint2, 0.07)}"/>
     <rect x="${x0 - RET_NEAR - CASING}" y="${y0 - RET_HEAD}" width="${CASING}"
           height="${floorY + THRESHOLD - y0 + RET_HEAD}" fill="url(#casingFace)"/>
     <rect x="${x1 + RET_FAR}" y="${y0 - RET_HEAD}" width="${CASING}"
-          height="${floorY + THRESHOLD - y0 + RET_HEAD}" fill="#000" opacity="0.13"/>
+          height="${floorY + THRESHOLD - y0 + RET_HEAD}"
+          fill="${darken(paint2, pale ? 0.09 : 0.14)}"/>
     <!-- light catch where the casing meets the wall -->
     <line x1="${x0 - RET_NEAR - CASING}" y1="${y0 - RET_HEAD - CASING}"
           x2="${x1 + RET_FAR + CASING}" y2="${y0 - RET_HEAD - CASING}"
@@ -847,7 +855,7 @@
     <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
           width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint2}"/>
     <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="url(#retHead)"/>
+          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="url(#soffit)"/>
 
     <!-- hard arris where casing turns into return -->
     <line x1="${x0 - RET_NEAR}" y1="${y0 - RET_HEAD}" x2="${x0 - RET_NEAR}" y2="${floorY + THRESHOLD}"
