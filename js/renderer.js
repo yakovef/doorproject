@@ -114,7 +114,7 @@ const FALLOFF = {
                   ours (was)    the green door      now
      near jamb      0.062        ~0.16              0.125
      far jamb       0.040        ~0.28 (sunlit)     0.087
-     soffit         0.093        ~0.31              0.162
+     soffit         0.093        ~0.31              0.205
 
    Set below what that door measures, deliberately: it is a phone shot from
    close range so its perspective is exaggerated, and the corpus does contain
@@ -123,7 +123,7 @@ const FALLOFF = {
 const CASING   = 46;   // flat frame face against the wall
 const RET_NEAR = 78;   // visible return, shadowed side
 const RET_FAR  = 46;   // visible return, sunlit side
-const RET_HEAD = 110;  // the soffit — the deepest of the three, and by a lot
+const RET_HEAD = 148;  // the soffit — the deepest of the three, and by a lot
 /* Between two leaves the real joint is a line, not a post: on d125's equal
    pair the leaves almost touch. 46 mm drew a wide lit band that read as a
    structural mullion the door does not have. */
@@ -288,6 +288,13 @@ export function render(state) {
           filter="url(#drift)" opacity="${fall.drift}" style="mix-blend-mode:overlay"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
           filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
+    <!-- The gasket. Every one of the green door's photographs shows a crisp
+         BLACK line following the leaf all the way round, right at its edge —
+         the compression seal it shuts against. It is the last thing dividing
+         leaf from frame, and we drew nothing there, so our leaf appeared to
+         float in the opening rather than close into it. -->
+    <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="none"
+          stroke="#0B0C0D" stroke-opacity="0.72" stroke-width="4"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
     <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.16"/>
     <!-- occlusion where the leaf meets the frame on every side -->
@@ -1032,8 +1039,12 @@ function aperture({ x, y, w, h, paint, edge, grille, key }) {
      under the pull bar, which is a collision the renderer has no business
      creating. Wide enough to read as a moulding, narrow enough to stay out of
      the hardware's way. */
-  const M = 46;                       // moulding width
-  const S = 17;                       // the outer step, proud of the leaf
+  /* 32, down from 46. Against the green door's photographs ours was a heavy
+     architrave where his is slim — a few fine steps close together rather
+     than one broad band. Narrowing it puts the emphasis back on the glazing
+     instead of on the frame around it. */
+  const M = 32;                       // moulding width
+  const S = 11;                       // the outer step, proud of the leaf
   const id = `cl-${key}`;
   return `
     <g>

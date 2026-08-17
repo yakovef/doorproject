@@ -281,7 +281,7 @@
   var CASING = 46;
   var RET_NEAR = 78;
   var RET_FAR = 46;
-  var RET_HEAD = 110;
+  var RET_HEAD = 148;
   var MULLION = 22;
   var REBATE = 50;
   var GAP = 10;
@@ -374,6 +374,13 @@
           filter="url(#drift)" opacity="${fall.drift}" style="mix-blend-mode:overlay"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
           filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
+    <!-- The gasket. Every one of the green door's photographs shows a crisp
+         BLACK line following the leaf all the way round, right at its edge —
+         the compression seal it shuts against. It is the last thing dividing
+         leaf from frame, and we drew nothing there, so our leaf appeared to
+         float in the opening rather than close into it. -->
+    <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="none"
+          stroke="#0B0C0D" stroke-opacity="0.72" stroke-width="4"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
     <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.16"/>
     <!-- occlusion where the leaf meets the frame on every side -->
@@ -1051,8 +1058,8 @@
     </g>`;
   }
   function aperture({ x, y, w, h, paint: paint2, edge, grille, key }) {
-    const M = 46;
-    const S = 17;
+    const M = 32;
+    const S = 11;
     const id = `cl-${key}`;
     return `
     <g>
