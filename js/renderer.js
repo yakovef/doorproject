@@ -463,9 +463,10 @@ export function render(state) {
          different strengths, which is why the opening read flat — a box needs
          one plane in light and one in shade before it is a box. -->
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0"   stop-color="#fff" stop-opacity="${pale ? 0.30 : 0.62}"/>
-      <stop offset="0.6" stop-color="#fff" stop-opacity="${pale ? 0.18 : 0.38}"/>
-      <stop offset="1"   stop-color="#000" stop-opacity="0.10"/>
+      <stop offset="0"    stop-color="#fff" stop-opacity="${pale ? 0.36 : 0.72}"/>
+      <stop offset="0.45" stop-color="#fff" stop-opacity="${pale ? 0.17 : 0.34}"/>
+      <stop offset="0.8"  stop-color="#000" stop-opacity="0.08"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="${pale ? 0.20 : 0.34}"/>
     </linearGradient>
 
     <!-- Both returns had a horizontal ramp and no vertical one at all, so a
@@ -475,6 +476,18 @@ export function render(state) {
          is what made the two demands here look contradictory — the near
          reveal needed to be brighter at the top AND darker at mid-height, and
          no purely horizontal gradient can do both. -->
+    <!-- The soffit. There was no plane here at all — the area above the leaf
+         was flat paint between the two jamb rects, which is why the top of
+         the opening had tone but no shape. Seen from below it recedes: the
+         outer edge, next to the wall, still catches sky, and it deepens the
+         whole way back to the leaf. That fall is what tells you it is a
+         horizontal surface overhead rather than more wall. -->
+    <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#fff" stop-opacity="${pale ? 0.10 : 0.16}"/>
+      <stop offset="0.3" stop-color="#000" stop-opacity="${pale ? 0.10 : 0.20}"/>
+      <stop offset="1"   stop-color="#000" stop-opacity="${pale ? 0.30 : 0.56}"/>
+    </linearGradient>
+
     <linearGradient id="revealFall" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"    stop-color="#000" stop-opacity="0"/>
       <stop offset="0.45" stop-color="#000" stop-opacity="${pale ? 0.02 : 0.14}"/>
@@ -773,6 +786,12 @@ export function render(state) {
           x2="${x1 + RET_FAR + CASING}" y2="${y0 - RET_HEAD - CASING}"
           stroke="#fff" stroke-opacity="0.16" stroke-width="2"
           vector-effect="non-scaling-stroke"/>
+
+    <!-- the soffit, drawn first so the jamb returns and their mitres lie over it -->
+    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
+          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint}"/>
+    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
+          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="url(#soffit)"/>
 
     <!-- the returns: three surfaces turning away from the camera -->
     <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
