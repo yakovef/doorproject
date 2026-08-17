@@ -17,7 +17,7 @@
  */
 
 import { byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
-import { darken, isLight, lighten, silhouette } from './colour.js';
+import { darken, isLight, lighten, scaleTone, silhouette } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
    light → mid → dark → a weaker second return near the far edge. That double
@@ -613,6 +613,8 @@ export function render(state) {
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
 
+    ${mouldGradients(paint, pale)}
+
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"   stop-color="${lighten(paint, 0.06)}"/>
       <stop offset="0.3" stop-color="${darken(paint, pale ? 0.12 : 0.20)}"/>
@@ -1012,7 +1014,7 @@ export function render(state) {
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint, winBottom, detail.panels === 2) : ''}
+    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom, detail.panels === 2) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone) : ''}
   </g>
@@ -1072,53 +1074,158 @@ function bevel(x, y, w, h, d, paint, raised = true) {
             fill="${dark}"/>`;
 }
 
-/**
- * A raised moulded panel, as on the red and grey reference doors.
- * It has to sit clear of the glazing: a panel drawn under a tall window
- * produces mouldings crossing the glass, which is not a door.
- * Returns '' when there is no room, so the two can never collide.
+/* ── The applied moulding ─────────────────────────────────────────────
+ *
+ * A "panel" on these doors is not a panel. It is a strip of moulding 60 to
+ * 90 mm wide, laid on the face in a rectangle — and the face INSIDE the
+ * rectangle is the same plane, the same paint and the same texture as the
+ * face outside it. We were drawing a raised block with a lightened field,
+ * which is a different object altogether: a picture-frame bulge stuck to the
+ * middle of the door.
+ *
+ * Measured across three doors by scanning a line through the band and reading
+ * every sample against the flat field beside it:
+ *
+ *                band / leaf W   bead peak   quirk floor   field in vs out
+ *   d076 cream       0.096          1.02         0.78          +3%
+ *   d062 navy        0.090          1.12         0.38          −1%
+ *   d048 navy        0.083          1.16         0.27          +4%
+ *
+ * The last column is the whole finding. The few per cent between the field
+ * inside the rectangle and the field outside it is the light falling across
+ * the door, not a step: on all three, sampled at the same height, they are
+ * one surface.
+ *
+ * The band is a bolection — three or four bead-and-quirk pairs, never one
+ * chamfer — and what carries it is the QUIRKS. The beads run 1.02 to 1.16 of
+ * the field, which is almost nothing; the quirks drop to 0.27. A moulding on
+ * a painted steel door is legible very nearly by its shadows alone.
+ *
+ * Light paint compresses the whole profile: cream d076 spans 0.78–1.02 where
+ * navy d048 spans 0.27–1.16. A near-white paint has no headroom left for a
+ * highlight and its shadows are filled by bounce from everything around it.
  */
-function raisedPanel(lx, ly, lw, lh, paint, winBottom, upper) {
-  /* The panel was starting at 0.60 of the leaf and running to 0.94 — a third
-     of the whole door. On d092 and d116 the real panel sits in the bottom
-     quarter, about 0.72 to 0.96, and is the smaller partner to the glazing
-     rather than its equal. A panel that big reads as a flush-panel interior
-     door, not an entrance door with a light over a panel. */
-  const inset = 105;
-  const top = Math.max(ly + lh * 0.70, winBottom + 70);
-  const bottom = ly + lh - 85;
-  const h = bottom - top;
-  if (h < 300) return '';                       // no room below the glazing
+
+/* The cross-section, read straight off d048: a line scanned through the band
+   at 1 px steps, every sample divided by the flat field beside it, smoothed and
+   resampled to sixteen stops. `at` runs from the band's OUTER edge to its
+   inner one; `tone` is how much light that point returns compared with the
+   field.
+   Carried as a gradient rather than as a set of drawn lines, because the two
+   failures either side of this are both easy to reach. Fine lines alone leave
+   the band flat, and the moulding reads as an outline etched into the door.
+   Fat lines turn it into a black picture frame painted on. What the photograph
+   actually shows is a sculpted ramp WITH fine quirks cut into it — mass and
+   detail, and the mass is the half that was missing. */
+const MOULD = [
+  [0.00, 1.00], [0.07, 0.72], [0.10, 0.44], [0.15, 1.14],
+  [0.19, 0.34], [0.25, 1.02], [0.30, 0.52], [0.38, 1.05],
+  [0.46, 0.86], [0.52, 1.12], [0.60, 0.62], [0.70, 1.10],
+  [0.79, 0.36], [0.87, 0.70], [0.94, 0.96], [1.00, 1.00],
+];
+
+/* One gain per side. Key is high and left, so every run of the rectangle sits
+   at a different angle to it: measured on d062, the top run's deepest quirk
+   bottoms out at 0.55 and the bottom run's at 0.27, with the two verticals
+   between them. Without this the rectangle reads as an engraved line rather
+   than as something standing off the door. */
+const MOULD_SIDE = { top: 1.10, left: 0.98, right: 0.93, bottom: 0.87 };
+
+/**
+ * A rectangle of applied moulding. No field, no fill, nothing inside it — the
+ * door's own paint and its own texture show straight through, which is the
+ * point.
+ */
+function moulding(x, y, w, h, band, paint, pale) {
+  if (w <= band * 2.2 || h <= band * 2.2) return '';
+
+  /* Four mitred trapezoids, each filled with the measured cross-section as a
+     gradient running perpendicular to its own run. That is the whole moulding:
+     mass and quirks in one fill, four paths for the rectangle instead of the
+     hundred and seventy-six a stop-per-stroke version would have taken. */
+  const side = (d, o) => `<path d="${d}" fill="url(#mould-${o})"/>`;
+  const b = band;
+  return side(`M ${x} ${y} H ${x + w} L ${x + w - b} ${y + b} H ${x + b} Z`, 't')
+       + side(`M ${x} ${y + h} H ${x + w} L ${x + w - b} ${y + h - b} H ${x + b} Z`, 'b')
+       + side(`M ${x} ${y} L ${x + b} ${y + b} V ${y + h - b} L ${x} ${y + h} Z`, 'l')
+       + side(`M ${x + w} ${y} L ${x + w - b} ${y + b} V ${y + h - b} L ${x + w} ${y + h} Z`, 'r')
+  /* The mitre joint itself: four lengths of moulding cut at 45° and butted, not
+     a moulded frame. A close crop of d076 shows it as a hairline and nothing
+     more — at any weight you can actually notice, it stops reading as a joint
+     and starts reading as a diagonal drawn across the corner. */
+       + [[x, y, x + b, y + b], [x + w, y, x + w - b, y + b],
+          [x, y + h, x + b, y + h - b], [x + w, y + h, x + w - b, y + h - b]]
+         .map(([a, c, e, f]) => `<path d="M ${a} ${c} L ${e} ${f}" fill="none" stroke="#000"
+              stroke-opacity="${pale ? 0.05 : 0.09}" stroke-width="0.9"
+              vector-effect="non-scaling-stroke"/>`).join('');
+}
+
+/**
+ * The four gradients a moulding is made of — one per side, because each run of
+ * the rectangle sits at a different angle to the key and takes a different
+ * amount of it. Emitted into the defs, and dropped again by usedDefs on any
+ * door that has no moulding on it.
+ */
+function mouldGradients(paint, pale) {
+  /* Compressed on light paint, per the cream door: d076 spans 0.78 to 1.02
+     where navy d048 spans 0.27 to 1.16. A near-white paint has no headroom
+     left for a highlight and its shadows are filled by bounce off everything
+     around it. One factor rather than two, because a single door of each is
+     not enough to justify separate numbers for the beads and the quirks. */
+  const relief = pale ? 0.34 : 1;
+  const stops = lift => MOULD.map(([at, tone]) =>
+    `<stop offset="${at}" stop-color="${scaleTone(paint, (1 + (tone - 1) * relief) * lift)}"/>`).join('');
+  /* Outer edge first in every case, so one measured profile serves all four:
+     the top run reads downward, the bottom run upward, and the two verticals
+     inward from their own side of the rectangle. */
+  const g = (id, x1, y1, x2, y2, lift) =>
+    `<linearGradient id="mould-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(lift)}</linearGradient>`;
+  return g('t', 0, 0, 0, 1, MOULD_SIDE.top)
+       + g('b', 0, 1, 0, 0, MOULD_SIDE.bottom)
+       + g('l', 0, 0, 1, 0, MOULD_SIDE.left)
+       + g('r', 1, 0, 0, 0, MOULD_SIDE.right);
+}
+
+/**
+ * The moulded rectangles that make up the "designed" face.
+ *
+ * Geometry measured on the same three doors, as fractions of the leaf:
+ *   inset each side   0.17  0.21  0.23      -> 0.18 (the two wider readings
+ *                                              are off-axis doors, where the
+ *                                              far stile foreshortens)
+ *   upper rect  top   0.047 0.072 0.113     -> 0.07
+ *               foot  0.536 0.569 0.631     -> 0.57
+ *   lower rect  top   0.650 0.674 0.695     -> 0.67
+ *               foot  0.879 0.922 0.909     -> 0.91
+ *
+ * Kept clear of the glazing: mouldings crossing a pane is not a door. Returns
+ * '' when there is no room, and the caller must survive that — the last time
+ * this dropped itself silently it did so on 84 window-and-panel combinations.
+ */
+function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper) {
+  const band = lw * 0.09;
+  const inset = lw * 0.18;
   const x = lx + inset, w = lw - inset * 2;
+  const rect = (t, b) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale);
 
-  /* One panel body, so the two-panel case cannot drift from the one-panel
-     case. The field is barely lightened — 0.02, not 0.05. On d048 the real
-     mouldings are the SAME navy as the door and are legible only by their
-     shadow; ours lifted the field far enough to read as a second, paler
-     colour panelled into the leaf, which is a thing the photographs never
-     show. A moulding is a shape, not a tint. */
-  const one = (py, ph) => `
-      ${bevel(x, py, w, ph, 26, paint, true)}
-      <rect x="${x + 26}" y="${py + 26}" width="${w - 52}" height="${ph - 52}"
-            fill="${lighten(paint, 0.02)}"/>
-      ${bevel(x + 26, py + 26, w - 52, ph - 52, 9, paint, false)}
-      <rect x="${x + 35}" y="${py + 35}" width="${w - 70}" height="${ph - 70}"
-            fill="url(#keyLight)" opacity="0.30"/>
-      <!-- it sits proud, so it casts down onto the field below -->
-      <rect x="${x}" y="${py + ph}" width="${w}" height="16"
-            fill="#000" opacity="0.22" filter="url(#contact)"/>`;
-
-  /* The classic two-panel face: a tall upper and a short lower, which is what
-     d048 carries and what our single bottom-quarter panel could not say. Only
-     drawn on a solid leaf — with glazing above, there is nowhere for it. */
-  if (upper) {
-    const uTop = ly + lh * 0.15, uBot = ly + lh * 0.56;
-    if (winBottom <= ly + 1 && uBot - uTop >= 300) {
-      return `<g data-detail="panel" data-panels="2">
-        ${one(uTop, uBot - uTop)}${one(ly + lh * 0.63, lh * 0.29)}</g>`;
-    }
+  /* The classic two-rectangle face, which is what nearly every designed door
+     in the gallery carries. Only on a solid leaf: with glazing above there is
+     nowhere for the upper one. */
+  if (upper && winBottom <= ly + 1) {
+    return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
+               data-band="${band.toFixed(1)}">${rect(0.07, 0.57)}${rect(0.67, 0.91)}</g>`;
   }
-  return `<g data-detail="panel">${one(top, h)}</g>`;
+
+  const top = Math.max(ly + lh * 0.67, winBottom + lw * 0.08);
+  const bottom = ly + lh * 0.91;
+  const art = moulding(x, top, w, bottom - top, band, paint, pale);
+  /* `data-top` so a test can ask where the moulding starts instead of parsing
+     the first path out of the markup. It did that until this rewrite, and the
+     assertion it was protecting — that mouldings never cross the glazing —
+     broke the moment the drawing changed shape, which is the wrong thing to be
+     fragile about. */
+  return art ? `<g data-detail="panel" data-top="${top.toFixed(1)}"
+                   data-band="${band.toFixed(1)}">${art}</g>` : '';
 }
 
 /**
@@ -1205,23 +1312,20 @@ function aperture({ x, y, w, h, paint, edge, grille, key }) {
      architrave where his is slim — a few fine steps close together rather
      than one broad band. Narrowing it puts the emphasis back on the glazing
      instead of on the frame around it. */
-  const M = 32;                       // moulding width
-  const S = 11;                       // the outer step, proud of the leaf
+  /* And it is the SAME OBJECT as the rectangles on a panelled door, so it is
+     the same primitive and the same measured cross-section. It was three
+     stacked bevels around a step lightened by 0.03 — which lifted the surround
+     into a second, paler colour, precisely the mistake the panel had. A
+     surround is not a lighter thing applied to the door; it is the door's own
+     paint, shaped. Widened to 40 at the same time, because the measured
+     profile needs room to be a profile. */
+  const M = 40;                       // moulding width
   const id = `cl-${key}`;
   return `
     <g>
-      <!-- the moulding casts onto the leaf below and to the right of it -->
-      <rect x="${x - M + 5}" y="${y - M + 5}" width="${w + M * 2}" height="${h + M * 2}"
-            fill="#000" opacity="0.13"/>
-      <!-- outer step -->
-      <rect x="${x - M}" y="${y - M}" width="${w + M * 2}" height="${h + M * 2}"
-            fill="${paint}"/>
-      ${bevel(x - M, y - M, w + M * 2, h + M * 2, 11, paint, true)}
-      <!-- inner step, set back, so the profile has two planes not one -->
-      <rect x="${x - M + S}" y="${y - M + S}" width="${w + (M - S) * 2}" height="${h + (M - S) * 2}"
-            fill="${lighten(paint, 0.03)}"/>
-      ${bevel(x - M + S, y - M + S, w + (M - S) * 2, h + (M - S) * 2, 9, paint, true)}
-      <!-- inner rebate: a hole, so the bevel flips -->
+      ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint, isLight(paint))}
+      <!-- inner rebate: the glass is set back behind the moulding, so the last
+           edge before the pane turns the other way -->
       ${bevel(x, y, w, h, 8, paint, false)}
 
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
@@ -2321,10 +2425,11 @@ export function detailGlyph(detail) {
         width="${W - inset * 2}" height="${H * (bot - top)}"
         fill="none" stroke="currentColor" stroke-width="36"/>`;
 
-  // raisedPanel: one panel in the bottom quarter, or the classic tall-over-short pair
+  // appliedFrame: the measured rectangles — a tall upper over a short lower,
+  // or the lower one alone when a window takes the top of the leaf
   const panels = !detail.panel ? ''
-    : detail.panels === 2 ? panelAt(0.15, 0.56) + panelAt(0.63, 0.92)
-    : panelAt(0.70, 0.96);
+    : detail.panels === 2 ? panelAt(0.07, 0.57) + panelAt(0.67, 0.91)
+    : panelAt(0.67, 0.91);
 
   // metalStrips: horizontal, inset a tenth each side, evenly spaced 0.09–0.91
   const n = detail.strips || 0;

@@ -172,21 +172,43 @@ group('detail and finish');
        tall window puts mouldings over the glass, which is not a door. */
     const w = WINDOWS.find(x => x.id === st.window);
     if (w.rects.length && svg.includes('data-detail="panel"')) {
-      const panelTop = Number(/data-detail="panel">\s*\n\s*<path d="M [\d.]+ ([\d.]+)/.exec(svg)[1]);
+      const m = /data-detail="panel"[^>]*data-top="([\d.]+)"/.exec(svg);
+      ok(m, `the panel group no longer reports data-top, so this check is dead: ${label}`);
       const glassLow = Math.max(...w.rects.map(r => r.top + r.h));
-      ok(panelTop > glassLow, `panel overlaps glazing: ${label}`);
+      if (m) ok(Number(m[1]) > glassLow, `panel overlaps glazing: ${label}`);
     }
     n++;
   }
   console.log(`  (${n} renders)`);
 }
 {
-  // A bevel is only a bevel if its lit and shadowed edges differ.
-  const svg = render({ ...base, detail: 'panel' });
-  const block = svg.slice(svg.indexOf('data-detail="panel"'));
-  const fills = [...block.slice(0, 900).matchAll(/fill="(#[0-9a-fA-F]{6})"/g)].map(m => m[1]);
-  ok(fills.length >= 2, 'panel bevel should paint at least two edge colours');
-  ok(fills[0] !== fills[1], 'panel bevel must have distinct lit and shadowed edges');
+  /* An applied moulding is only a moulding if its four runs take different
+     amounts of light — otherwise the rectangle reads as a line engraved into
+     the door rather than as something standing off it. And the field inside it
+     must stay the door's own paint: the whole finding behind this rewrite is
+     that the face inside the rectangle and the face outside it are one
+     surface, so anything that FILLS the interior is the old bug returning. */
+  for (const c of [COLOURS[0], COLOURS[10], COLOURS[16]]) {
+    const svg = render({ ...base, colour: c.id, detail: 'panel2' });
+    /* The panel group only. Sliced to the end of the document it swallowed the
+       hardware drawn after it, and the first thing it found was the nickel on
+       a lever — a false alarm that would have hidden a real one. */
+    const from = svg.indexOf('data-detail="panel"');
+    const block = svg.slice(from, svg.indexOf('</g>', from));
+    const sides = [...block.matchAll(/fill="url\(#mould-([tblr])\)"/g)].map(m => m[1]);
+    ok(new Set(sides).size === 4, `moulding on ${c.id} draws ${new Set(sides).size} of its 4 sides`);
+
+    const grads = [...svg.matchAll(/<linearGradient id="mould-[tblr]"[\s\S]*?<\/linearGradient>/g)];
+    ok(grads.length === 4, `expected 4 moulding gradients on ${c.id}, got ${grads.length}`);
+    const first = grads.map(g => /stop-color="(#[0-9a-fA-F]{6})"/.exec(g[0])[1]);
+    ok(new Set(first).size > 1, `every side of the moulding on ${c.id} takes the same light`);
+
+    const filled = [...block.matchAll(/<(?:rect|path)[^>]*fill="(?!url\(#mould|none)([^"]+)"/g)]
+      .map(m => m[1]).filter(v => v !== '#000');
+    ok(filled.length === 0,
+      `the moulding on ${c.id} fills its interior with ${filled[0]} — the face inside ` +
+      `the rectangle is the same plane and the same paint as the face outside it`);
+  }
 }
 
 // ── 6. The inside face mirrors the door ───────────────────────────

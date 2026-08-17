@@ -242,6 +242,10 @@
   }
   var darken = (hex, amt) => mix(hex, "#000000", amt);
   var lighten = (hex, amt) => mix(hex, "#ffffff", amt);
+  var scaleTone = (hex, m) => {
+    const { r, g, b } = toRgb(hex);
+    return toHex({ r: r * m, g: g * m, b: b * m });
+  };
   function luminance(hex) {
     const { r, g, b } = toRgb(hex);
     const f = (c) => {
@@ -629,6 +633,8 @@
       <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
+
+    ${mouldGradients(paint2, pale)}
 
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"   stop-color="${lighten(paint2, 0.06)}"/>
@@ -1031,7 +1037,7 @@
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint2, winBottom, detail.panels === 2) : ""}
+    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint2, pale, winBottom, detail.panels === 2) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone) : ""}
   </g>
@@ -1093,31 +1099,58 @@ ${body}
                L ${x + d} ${y + h - d} L ${x + w - d} ${y + h - d} L ${x + w - d} ${y + d} Z"
             fill="${dark}"/>`;
   }
-  function raisedPanel(lx, ly, lw, lh, paint2, winBottom, upper) {
-    const inset = 105;
-    const top = Math.max(ly + lh * 0.7, winBottom + 70);
-    const bottom = ly + lh - 85;
-    const h = bottom - top;
-    if (h < 300) return "";
+  var MOULD = [
+    [0, 1],
+    [0.07, 0.72],
+    [0.1, 0.44],
+    [0.15, 1.14],
+    [0.19, 0.34],
+    [0.25, 1.02],
+    [0.3, 0.52],
+    [0.38, 1.05],
+    [0.46, 0.86],
+    [0.52, 1.12],
+    [0.6, 0.62],
+    [0.7, 1.1],
+    [0.79, 0.36],
+    [0.87, 0.7],
+    [0.94, 0.96],
+    [1, 1]
+  ];
+  var MOULD_SIDE = { top: 1.1, left: 0.98, right: 0.93, bottom: 0.87 };
+  function moulding(x, y, w, h, band, paint2, pale) {
+    if (w <= band * 2.2 || h <= band * 2.2) return "";
+    const side = (d, o) => `<path d="${d}" fill="url(#mould-${o})"/>`;
+    const b = band;
+    return side(`M ${x} ${y} H ${x + w} L ${x + w - b} ${y + b} H ${x + b} Z`, "t") + side(`M ${x} ${y + h} H ${x + w} L ${x + w - b} ${y + h - b} H ${x + b} Z`, "b") + side(`M ${x} ${y} L ${x + b} ${y + b} V ${y + h - b} L ${x} ${y + h} Z`, "l") + side(`M ${x + w} ${y} L ${x + w - b} ${y + b} V ${y + h - b} L ${x + w} ${y + h} Z`, "r") + [
+      [x, y, x + b, y + b],
+      [x + w, y, x + w - b, y + b],
+      [x, y + h, x + b, y + h - b],
+      [x + w, y + h, x + w - b, y + h - b]
+    ].map(([a, c, e, f]) => `<path d="M ${a} ${c} L ${e} ${f}" fill="none" stroke="#000"
+              stroke-opacity="${pale ? 0.05 : 0.09}" stroke-width="0.9"
+              vector-effect="non-scaling-stroke"/>`).join("");
+  }
+  function mouldGradients(paint2, pale) {
+    const relief = pale ? 0.34 : 1;
+    const stops = (lift) => MOULD.map(([at, tone]) => `<stop offset="${at}" stop-color="${scaleTone(paint2, (1 + (tone - 1) * relief) * lift)}"/>`).join("");
+    const g = (id, x1, y1, x2, y2, lift) => `<linearGradient id="mould-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(lift)}</linearGradient>`;
+    return g("t", 0, 0, 0, 1, MOULD_SIDE.top) + g("b", 0, 1, 0, 0, MOULD_SIDE.bottom) + g("l", 0, 0, 1, 0, MOULD_SIDE.left) + g("r", 1, 0, 0, 0, MOULD_SIDE.right);
+  }
+  function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper) {
+    const band = lw * 0.09;
+    const inset = lw * 0.18;
     const x = lx + inset, w = lw - inset * 2;
-    const one = (py, ph) => `
-      ${bevel(x, py, w, ph, 26, paint2, true)}
-      <rect x="${x + 26}" y="${py + 26}" width="${w - 52}" height="${ph - 52}"
-            fill="${lighten(paint2, 0.02)}"/>
-      ${bevel(x + 26, py + 26, w - 52, ph - 52, 9, paint2, false)}
-      <rect x="${x + 35}" y="${py + 35}" width="${w - 70}" height="${ph - 70}"
-            fill="url(#keyLight)" opacity="0.30"/>
-      <!-- it sits proud, so it casts down onto the field below -->
-      <rect x="${x}" y="${py + ph}" width="${w}" height="16"
-            fill="#000" opacity="0.22" filter="url(#contact)"/>`;
-    if (upper) {
-      const uTop = ly + lh * 0.15, uBot = ly + lh * 0.56;
-      if (winBottom <= ly + 1 && uBot - uTop >= 300) {
-        return `<g data-detail="panel" data-panels="2">
-        ${one(uTop, uBot - uTop)}${one(ly + lh * 0.63, lh * 0.29)}</g>`;
-      }
+    const rect = (t, b) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale);
+    if (upper && winBottom <= ly + 1) {
+      return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
+               data-band="${band.toFixed(1)}">${rect(0.07, 0.57)}${rect(0.67, 0.91)}</g>`;
     }
-    return `<g data-detail="panel">${one(top, h)}</g>`;
+    const top = Math.max(ly + lh * 0.67, winBottom + lw * 0.08);
+    const bottom = ly + lh * 0.91;
+    const art = moulding(x, top, w, bottom - top, band, paint2, pale);
+    return art ? `<g data-detail="panel" data-top="${top.toFixed(1)}"
+                   data-band="${band.toFixed(1)}">${art}</g>` : "";
   }
   function metalStrips(lx, ly, lw, lh, count, tone) {
     const x0s = lx + lw * 0.09, x1s = lx + lw * 0.91;
@@ -1156,23 +1189,13 @@ ${body}
     </g>`;
   }
   function aperture({ x, y, w, h, paint: paint2, edge, grille, key }) {
-    const M = 32;
-    const S = 11;
+    const M = 40;
     const id = `cl-${key}`;
     return `
     <g>
-      <!-- the moulding casts onto the leaf below and to the right of it -->
-      <rect x="${x - M + 5}" y="${y - M + 5}" width="${w + M * 2}" height="${h + M * 2}"
-            fill="#000" opacity="0.13"/>
-      <!-- outer step -->
-      <rect x="${x - M}" y="${y - M}" width="${w + M * 2}" height="${h + M * 2}"
-            fill="${paint2}"/>
-      ${bevel(x - M, y - M, w + M * 2, h + M * 2, 11, paint2, true)}
-      <!-- inner step, set back, so the profile has two planes not one -->
-      <rect x="${x - M + S}" y="${y - M + S}" width="${w + (M - S) * 2}" height="${h + (M - S) * 2}"
-            fill="${lighten(paint2, 0.03)}"/>
-      ${bevel(x - M + S, y - M + S, w + (M - S) * 2, h + (M - S) * 2, 9, paint2, true)}
-      <!-- inner rebate: a hole, so the bevel flips -->
+      ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint2, isLight(paint2))}
+      <!-- inner rebate: the glass is set back behind the moulding, so the last
+           edge before the pane turns the other way -->
       ${bevel(x, y, w, h, 8, paint2, false)}
 
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
@@ -2013,7 +2036,7 @@ ${body}
     const panelAt = (top, bot) => `<rect x="${inset}" y="${H * top}"
         width="${W - inset * 2}" height="${H * (bot - top)}"
         fill="none" stroke="currentColor" stroke-width="36"/>`;
-    const panels = !detail.panel ? "" : detail.panels === 2 ? panelAt(0.15, 0.56) + panelAt(0.63, 0.92) : panelAt(0.7, 0.96);
+    const panels = !detail.panel ? "" : detail.panels === 2 ? panelAt(0.07, 0.57) + panelAt(0.67, 0.91) : panelAt(0.67, 0.91);
     const n = detail.strips || 0;
     const strips = Array.from({ length: n }, (_, i) => {
       const y = H * (0.09 + (n > 1 ? i * 0.82 / (n - 1) : 0.41));

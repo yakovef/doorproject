@@ -21,6 +21,9 @@ const CASES = [
   { id: 'd097', label: 'luxury ₪7,500',
     q: 'c=rb-9016d&w=tallwin&g=grid-light&n=coral&d=panel&f=steel&s=standard&h=right-in',
     gap: 'grid-light added; photo also has scroll motifs inside the grid' },
+  { id: 'd062', label: 'designed ₪5,000',
+    q: 'c=rb-5103d&w=none&g=none&n=grab&d=panel2&f=steel&s=standard&h=right-in',
+    gap: 'the applied-moulding rewrite was measured on this door and d048/d076' },
 ];
 
 const load = f => f.endsWith('.png')

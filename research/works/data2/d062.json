@@ -1,0 +1,20 @@
+{
+ "id": "d062",
+ "cat": "designed",
+ "price": 5000,
+ "usable": true,
+ "view": "outside",
+ "skew": 0.9,
+ "leaf": {
+  "x": 210,
+  "y": 52,
+  "w": 592,
+  "h": 1519
+ },
+ "handle": {
+  "type": "lever-rose",
+  "x": 0.06,
+  "y": 0.52
+ },
+ "notes": "leaf box measured by hand for the applied-moulding study; the moulding profile in js/renderer.js MOULD is scanned from this door, d048 and d076"
+}

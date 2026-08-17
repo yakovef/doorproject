@@ -28,6 +28,25 @@ export function mix(hex, target, amount) {
 export const darken  = (hex, amt) => mix(hex, '#000000', amt);
 export const lighten = (hex, amt) => mix(hex, '#ffffff', amt);
 
+/**
+ * The same paint reflecting `m` times as much light.
+ *
+ * This is the shape a measurement actually comes in. Scanning across a
+ * moulding and reading every sample against the flat field beside it gives a
+ * multiplier — 0.27 in the quirk, 1.16 on the bead — and multiplying every
+ * channel by it is exactly that statement, with the hue left alone.
+ *
+ * `lighten` cannot stand in for it above 1.0: mixing toward white by 0.13
+ * raises a mid grey 16% and a dark navy 46%, so a single measured number would
+ * mean something different on every colour in the catalogue. Below 1.0 the two
+ * agree — darkening by (1−m) IS multiplying by m — which is why the shadows in
+ * this renderer were already right and the highlights were not.
+ */
+export const scaleTone = (hex, m) => {
+  const { r, g, b } = toRgb(hex);
+  return toHex({ r: r * m, g: g * m, b: b * m });
+};
+
 /** WCAG relative luminance, 0 (black) – 1 (white). */
 export function luminance(hex) {
   const { r, g, b } = toRgb(hex);

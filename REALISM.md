@@ -600,6 +600,74 @@ Extend the existing instrument rather than judging by eye:
   and "every tile draws its own picture" tests, which is how the last three
   invisible failures were caught.
 
+### 7.4b Done since: the "panel" was never a panel
+
+Raised first, before the glass, because a hundred doors of the gallery say so
+at a glance once you know to look.
+
+**What was wrong.** Every designed door we drew had a raised block in the
+middle of it: a rectangle with its own lightened field, a bevel all round and
+a shadow cast onto the leaf below. On the real doors there is no block. There
+is a strip of moulding 60 to 90 mm wide laid on the face in a rectangle, and
+the face inside that rectangle is the same plane, the same paint and the same
+texture as the face outside it.
+
+**Measured**, by scanning a line through the band on three doors and dividing
+every sample by the flat field beside it:
+
+```
+              band / leaf W   bead peak   quirk floor   field in vs out
+d076 cream        0.096          1.02         0.78          +3%
+d062 navy         0.090          1.12         0.38          −1%
+d048 navy         0.083          1.16         0.27          +4%
+```
+
+The last column is the finding. Those few per cent are the light falling
+across the door, not a step: sampled at the same height, inside and outside
+are one surface.
+
+Two things fell out of the measurement that guessing would not have given:
+
+- **The quirks carry it, not the beads.** The beads run 1.02 to 1.16 of the
+  field — almost nothing. The quirks drop to 0.27. A moulding on a painted
+  steel door is legible very nearly by its shadows alone.
+- **Light paint compresses the whole profile.** Cream spans 0.78–1.02 where
+  navy spans 0.27–1.16. A near-white paint has no headroom for a highlight and
+  its shadows are filled by bounce.
+
+**What it is now.** The full cross-section, resampled to sixteen stops off
+d048, carried as a gradient across four mitred trapezoids — one per side,
+because each run of the rectangle sits at a different angle to the key (d062's
+top run bottoms out at 0.55, its bottom run at 0.27). Four paths and four
+hairline mitre joints per rectangle. Nothing fills the interior.
+
+Both failure modes either side of this are easy to reach and were both reached
+on the way: fine lines alone leave the band flat and the rectangle reads as an
+outline etched into the door; fat lines turn it into a black picture frame
+painted on. The photograph shows a sculpted ramp *with* quirks cut into it,
+and the mass was the half that was missing.
+
+The window surround uses the same primitive now, for the same reason: it is
+the same object. It had been three stacked bevels around a step lightened by
+0.03, which lifted it into a second, paler colour — the panel's mistake,
+committed twice.
+
+Geometry, from the same three doors as fractions of the leaf: rectangles inset
+0.18 each side, upper 0.07 to 0.57, lower 0.67 to 0.91.
+
+**One check that stopped a wrong fix.** Beside the photograph our leaf looked
+blotchy, and the obvious move was to turn the drift down. Measured instead —
+coarse-grid variance with each row's own mean divided out — the photographs
+run 0.089 and 0.155 and ours runs 0.032. We have less than half the tonal
+unevenness of a real door, not more. `tools/_mottle` is the kind of thing that
+should exist before an adjustment, not after.
+
+Still open on the designs, in the same photographs: the strips detail appears
+both horizontally and vertically in the gallery (d043 is vertical, d078
+horizontal) and we only draw one; d067 carries three rectangles, not two; and
+d080 is a full classical composition with a cornice and a plinth that we have
+no vocabulary for at all.
+
 ### 7.5 The failure mode to keep watching
 
 Three separate features have shipped that rendered as *nothing*: a grille with
