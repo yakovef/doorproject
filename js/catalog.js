@@ -153,6 +153,13 @@ export const GRILLES = [
      Appended rather than repurposing `lattice`, because both patterns are
      real and a shared link must keep meaning what it meant. */
   { id: 'grid',    he: 'סורג רשת',   en: 'Square grid', delta: 30000 },
+  /* Muntins in the door's OWN colour, not black. d097 is the clearest case:
+     white bars on a white door, legible only by their shadow, and drawing
+     them dark inverts the single most visible thing about that pane. Roughly
+     as common as ironwork across the glazed doors, so it is an axis rather
+     than a variant — `light` tells the renderer to take the leaf colour. */
+  { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', delta: 30000, light: true },
+  { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Scrollwork, door colour',  delta: 46000, light: true },
 ];
 
 /**

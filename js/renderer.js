@@ -56,8 +56,8 @@ export const LIGHT = {
    instead of the end of a fall. Whatever happens down there must read as the
    shadow continuing, never as an event. */
 const FALLOFF = {
-  dark:  { peak: 0.16, mid: 0.08, low: 0.30, foot: 0.35, head: 0.03, grain: 0.07, drift: 0.13 },
-  light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.015, drift: 0.09 },
+  dark:  { peak: 0.16, mid: 0.08, low: 0.30, foot: 0.35, head: 0.03, grain: 0.11, drift: 0.13 },
+  light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.05, drift: 0.09 },
 };
 
 /* `drift` and `grain` both halved, for two reasons that turn out to be one.
@@ -66,7 +66,14 @@ const FALLOFF = {
    lighting model. And the same overlay is the texture: all thirty measured
    doors record `smooth`, with high-pass sigma of 0.16-1.26 on the reference
    photographs against our 1.1-2.8. A painted steel door has slow mottling
-   and almost no speckle, and we had too much of both. */
+   and almost no speckle, and we had too much of both.
+
+   Then `grain` went too far the other way and d026's orange peel called it:
+   plain deviation on a flat patch of real paint is 3.5 on a light leaf and
+   4.4 on a dark one, and at 0.015 ours was effectively bare. Halving the
+   DRIFT was right — that was a lopsided cloud pretending to be light. Halving
+   the GRAIN was not; the speckle is real, it is just fine. Back up to 0.11
+   and 0.05, which is still well under where this started. */
 
 /* ── Geometry, in mm ──────────────────────────────────────────────
    The returns were roughly three times too wide, and thirty measured
@@ -581,15 +588,17 @@ export function render(state) {
          interior. The top carries a cool sky reflection, the base warms
          slightly from the floor. -->
     <!-- Darkened after d125. Beside the photograph our pane read as a pale
-         blue-grey card; the real one is nearly black in its lower two thirds
-         with the street showing through it. Glass on an entrance door is a
-         hole, and a hole is dark — the only bright part is what the sky puts
-         back in the top. -->
+         blue-grey card, so I darkened it — and overshot to about 0.17 of the
+         leaf's own value. Measured properly across the ten glazed doors, a
+         pane runs 0.62 of the leaf (range 0.21 to 1.58, so this varies more
+         than anything else in the frame). Dark enough to read as a hole,
+         light enough that you can see the street through it, which is what
+         the photographs show and neither of my first two guesses did. -->
     <linearGradient id="glass" x1="0.1" y1="0" x2="0.6" y2="1">
-      <stop offset="0"    stop-color="#6E8290"/>
-      <stop offset="0.18" stop-color="#3E4A53"/>
-      <stop offset="0.62" stop-color="#232A2F"/>
-      <stop offset="1"    stop-color="#2C3238"/>
+      <stop offset="0"    stop-color="#9DB0BC"/>
+      <stop offset="0.18" stop-color="#72828E"/>
+      <stop offset="0.62" stop-color="#515D67"/>
+      <stop offset="1"    stop-color="#5C6772"/>
     </linearGradient>
 
     <!-- One hard diagonal streak. A straight edge reads as glass; a soft
@@ -972,7 +981,7 @@ function aperture({ x, y, w, h, paint, edge, grille, key }) {
       <!-- reflected sky across the upper third -->
       <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
-      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h)}</g>
+      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint, 0.10) : null)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
       <rect x="${x}" y="${y}" width="${w}" height="34" fill="url(#aoTop)"/>
@@ -983,14 +992,25 @@ function aperture({ x, y, w, h, paint, edge, grille, key }) {
 }
 
 /** Ironwork. Bars are objects: lit top edge, dark underside, own shadow. */
-function grillePaths(kind, x, y, w, h) {
+function grillePaths(kind, x, y, w, h, tint) {
+  /* `tint` is the bar's own colour. Ironwork is near-black, but muntins in the
+     door's own paint are just as common — d097 is white bars on a white door,
+     legible only by their shadow — and drawing those dark inverts the most
+     visible thing about the pane. */
+  /* The `-light` variants share their base pattern and differ only in colour,
+     so strip the suffix before dispatching. Without this they matched no
+     branch at all and drew an empty pane — a grille the customer paid for,
+     silently missing. */
+  kind = String(kind).replace(/-light$/, '');
+  const body = tint || '#232527';
+  const gleam = tint ? '#fff' : '#8A8F94';
   const bar = (x1, y1, x2, y2, sw = 13) => `
     <line x1="${x1 + 3}" y1="${y1 + 3}" x2="${x2 + 3}" y2="${y2 + 3}"
           stroke="#000" stroke-opacity="0.35" stroke-width="${sw}" stroke-linecap="round"/>
     <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="#232527" stroke-width="${sw}" stroke-linecap="round"/>
+          stroke="${body}" stroke-width="${sw}" stroke-linecap="round"/>
     <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="#8A8F94" stroke-opacity="0.5" stroke-width="${sw * 0.28}" stroke-linecap="round"
+          stroke="${gleam}" stroke-opacity="0.5" stroke-width="${sw * 0.28}" stroke-linecap="round"
           transform="translate(-${sw * 0.22} -${sw * 0.22})"/>`;
 
   if (kind === 'bars') {
@@ -1034,8 +1054,8 @@ function grillePaths(kind, x, y, w, h) {
                  a ${rr * 0.5} ${rr * 0.5} 0 1 0 ${rr} 0`;
       return `<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.3"
                     stroke-width="8" transform="translate(3 3)"/>
-              <path d="${d}" fill="none" stroke="#232527" stroke-width="8"/>
-              <path d="${d}" fill="none" stroke="#8A8F94" stroke-opacity="0.35"
+              <path d="${d}" fill="none" stroke="${body}" stroke-width="8"/>
+              <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.35"
                     stroke-width="2.5" transform="translate(-1.5 -1.5)"/>`;
     };
     const rr = Math.min(w / (n * 1.6), h * 0.055);
@@ -1884,7 +1904,7 @@ export function grilleGlyph(grille) {
   const S = 300;
   return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
-    <g>${grillePaths(grille.id, 0, 0, S, S)}</g>
+    <g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
 }

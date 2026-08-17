@@ -132,7 +132,14 @@
        ORTHOGONAL grid of squares, sometimes with a scroll motif set into it.
        Appended rather than repurposing `lattice`, because both patterns are
        real and a shared link must keep meaning what it meant. */
-    { id: "grid", he: "סורג רשת", en: "Square grid", delta: 3e4 }
+    { id: "grid", he: "סורג רשת", en: "Square grid", delta: 3e4 },
+    /* Muntins in the door's OWN colour, not black. d097 is the clearest case:
+       white bars on a white door, legible only by their shadow, and drawing
+       them dark inverts the single most visible thing about that pane. Roughly
+       as common as ironwork across the glazed doors, so it is an axis rather
+       than a variant — `light` tells the renderer to take the leaf colour. */
+    { id: "grid-light", he: "סורג רשת בהיר", en: "Square grid, door colour", delta: 3e4, light: true },
+    { id: "scroll-light", he: "סורג מעוצב בהיר", en: "Scrollwork, door colour", delta: 46e3, light: true }
   ];
   var HANDINGS = [
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "left" },
@@ -252,8 +259,8 @@
     cool: "#0C1622"
   };
   var FALLOFF = {
-    dark: { peak: 0.16, mid: 0.08, low: 0.3, foot: 0.35, head: 0.03, grain: 0.07, drift: 0.13 },
-    light: { peak: 0.1, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.015, drift: 0.09 }
+    dark: { peak: 0.16, mid: 0.08, low: 0.3, foot: 0.35, head: 0.03, grain: 0.11, drift: 0.13 },
+    light: { peak: 0.1, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.05, drift: 0.09 }
   };
   var CASING = 46;
   var RET_NEAR = 25;
@@ -670,15 +677,17 @@
          interior. The top carries a cool sky reflection, the base warms
          slightly from the floor. -->
     <!-- Darkened after d125. Beside the photograph our pane read as a pale
-         blue-grey card; the real one is nearly black in its lower two thirds
-         with the street showing through it. Glass on an entrance door is a
-         hole, and a hole is dark — the only bright part is what the sky puts
-         back in the top. -->
+         blue-grey card, so I darkened it — and overshot to about 0.17 of the
+         leaf's own value. Measured properly across the ten glazed doors, a
+         pane runs 0.62 of the leaf (range 0.21 to 1.58, so this varies more
+         than anything else in the frame). Dark enough to read as a hole,
+         light enough that you can see the street through it, which is what
+         the photographs show and neither of my first two guesses did. -->
     <linearGradient id="glass" x1="0.1" y1="0" x2="0.6" y2="1">
-      <stop offset="0"    stop-color="#6E8290"/>
-      <stop offset="0.18" stop-color="#3E4A53"/>
-      <stop offset="0.62" stop-color="#232A2F"/>
-      <stop offset="1"    stop-color="#2C3238"/>
+      <stop offset="0"    stop-color="#9DB0BC"/>
+      <stop offset="0.18" stop-color="#72828E"/>
+      <stop offset="0.62" stop-color="#515D67"/>
+      <stop offset="1"    stop-color="#5C6772"/>
     </linearGradient>
 
     <!-- One hard diagonal streak. A straight edge reads as glass; a soft
@@ -1005,7 +1014,7 @@
       <!-- reflected sky across the upper third -->
       <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
-      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h)}</g>
+      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint2, 0.1) : null)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
       <rect x="${x}" y="${y}" width="${w}" height="34" fill="url(#aoTop)"/>
@@ -1014,14 +1023,17 @@
             vector-effect="non-scaling-stroke"/>
     </g>`;
   }
-  function grillePaths(kind, x, y, w, h) {
+  function grillePaths(kind, x, y, w, h, tint) {
+    kind = String(kind).replace(/-light$/, "");
+    const body = tint || "#232527";
+    const gleam = tint ? "#fff" : "#8A8F94";
     const bar = (x1, y1, x2, y2, sw = 13) => `
     <line x1="${x1 + 3}" y1="${y1 + 3}" x2="${x2 + 3}" y2="${y2 + 3}"
           stroke="#000" stroke-opacity="0.35" stroke-width="${sw}" stroke-linecap="round"/>
     <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="#232527" stroke-width="${sw}" stroke-linecap="round"/>
+          stroke="${body}" stroke-width="${sw}" stroke-linecap="round"/>
     <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="#8A8F94" stroke-opacity="0.5" stroke-width="${sw * 0.28}" stroke-linecap="round"
+          stroke="${gleam}" stroke-opacity="0.5" stroke-width="${sw * 0.28}" stroke-linecap="round"
           transform="translate(-${sw * 0.22} -${sw * 0.22})"/>`;
     if (kind === "bars") {
       const n = Math.max(2, Math.round(w / 90));
@@ -1051,8 +1063,8 @@
                  a ${rr2 * 0.5} ${rr2 * 0.5} 0 1 0 ${rr2} 0`;
         return `<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.3"
                     stroke-width="8" transform="translate(3 3)"/>
-              <path d="${d}" fill="none" stroke="#232527" stroke-width="8"/>
-              <path d="${d}" fill="none" stroke="#8A8F94" stroke-opacity="0.35"
+              <path d="${d}" fill="none" stroke="${body}" stroke-width="8"/>
+              <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.35"
                     stroke-width="2.5" transform="translate(-1.5 -1.5)"/>`;
       };
       const rr = Math.min(w / (n * 1.6), h * 0.055);
@@ -1715,7 +1727,7 @@
     const S = 300;
     return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
-    <g>${grillePaths(grille.id, 0, 0, S, S)}</g>
+    <g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
   }

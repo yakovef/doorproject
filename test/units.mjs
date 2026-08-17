@@ -299,6 +299,26 @@ for (const hd of HANDINGS) for (const sz of sizeKeys) {
   }
 }
 
+// ── 6a. A grille the customer pays for must actually appear ────────
+/* Missed once and shipped: adding `grid-light` gave it an id that matched no
+   branch in grillePaths, so it returned an empty string. The option was
+   selectable, priced at ₪300, and drew nothing at all — the same class of
+   silent-wrong-door failure as the short code overflow. Every grille that is
+   not 'none' must put strokes inside the glazing. */
+group('every grille draws something');
+for (const g of GRILLES) {
+  const svg = render({ ...base, window: 'tallwin', grille: g.id });
+  const marks = (svg.match(/<line |<path /g) || []).length;
+  if (g.id === 'none') {
+    ok(true, 'none needs no bars');
+  } else {
+    const bare = render({ ...base, window: 'tallwin', grille: 'none' });
+    const bareMarks = (bare.match(/<line |<path /g) || []).length;
+    ok(marks > bareMarks + 4,
+      `grille ${g.id} drew ${marks - bareMarks} extra marks: a priced option that renders nothing`);
+  }
+}
+
 // ── 6b. Nothing may pour its own hue into the paint ────────────────
 /* Shipped twice, reported twice. A darkening overlay has to be pure black,
    because black at alpha a multiplies every channel by (1-a) and so takes the

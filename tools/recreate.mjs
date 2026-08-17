@@ -15,15 +15,12 @@ import jpeg from 'jpeg-js';
 /* Each recreation is the closest the CURRENT catalogue can get. Where nothing
    is close the gap is the finding, and it is named here rather than hidden. */
 const CASES = [
-  { id: 'd030', label: 'basic ₪3,850',
-    q: 'c=ral-8019&w=none&g=none&n=cadoor&d=groove&f=steel&s=standard&h=left-in',
-    gap: 'leaf #82756C warm mid taupe; RAL 8019 #6B6362 is the nearest, a shade darker' },
-  { id: 'd048', label: 'designed ₪4,800',
-    q: 'c=ral-5011&w=none&g=none&n=coral&d=panel2&f=steel&s=standard&h=right-in',
-    gap: 'photo contrast is 10.6:1 — a very dark leaf in hard light' },
-  { id: 'd092', label: 'luxury ₪6,950',
-    q: 'c=ral-7033&w=tallwin&g=scroll&n=cadoor&d=panel&f=brass&s=standard&h=left-in',
-    gap: 'sage green added this round; exact match' },
+  { id: 'd026', label: 'basic ₪3,750',
+    q: 'c=ral-7046&w=none&g=none&n=coral&d=plain&f=brass&s=standard&h=right-in',
+    gap: 'leaf #A2A7AD cool light grey; RAL 7046 #7E858C is nearest and darker' },
+  { id: 'd097', label: 'luxury ₪7,500',
+    q: 'c=ral-9016&w=tallwin&g=grid-light&n=coral&d=panel&f=steel&s=standard&h=left-in',
+    gap: 'grid-light added; photo also has scroll motifs inside the grid' },
 ];
 
 const load = f => f.endsWith('.png')
@@ -47,8 +44,16 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 for (const c of CASES) {
   const rec = JSON.parse(readFileSync(`research/works/data2/${c.id}.json`, 'utf8'));
 
+  /* Handing comes from the measurement, not from me. I typed it by hand on
+     eight recreations and got it wrong on four, which means half those
+     comparisons were testing a mirrored door. handle.x is the grip's position
+     as a fraction of leaf width from the LEFT: grip left => hinges right. */
+  const hand = rec.handle && rec.handle.x != null
+    ? (rec.handle.x < 0.5 ? 'left-in' : 'right-in') : null;
+  const q = hand ? c.q.replace(/h=[a-z-]+/, `h=${hand}`) : c.q;
+
   const p = await b.newPage({ viewport: { width: 620, height: 1000 }, deviceScaleFactor: 2 });
-  await p.goto(`file://${process.cwd()}/index.html?bare=1&v=4&${c.q}`);
+  await p.goto(`file://${process.cwd()}/index.html?bare=1&v=5&${q}`);
   await p.waitForTimeout(500);
   const box = await p.evaluate(() => {
     const s = document.querySelector('.door-svg').getBoundingClientRect();
