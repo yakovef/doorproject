@@ -14,7 +14,8 @@
     "ask": "node tools/ask.mjs",
     "frame": "node tools/frame.mjs",
     "recreate": "node tools/recreate.mjs",
-    "audit": "node tools/audit.mjs"
+    "audit": "node tools/audit.mjs",
+    "glass": "node tools/glass.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

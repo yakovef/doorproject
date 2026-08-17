@@ -445,3 +445,170 @@ ours        (white)      contrast 1.24   profile 0.83 1 0.95 0.96 0.93 0.90 0.87
 here was tuned by eye against nothing, which is exactly why it kept landing at
 "slightly better." The comparison page from step 0 is not a nicety — it is the
 instrument, and without it this work will drift the same way.
+
+---
+
+## 7. Round four — what is left, and how to copy it
+
+Rounds one to three were driven by measurements of the *leaf* and the *frame*,
+and those two are now close. This round starts from a measurement nobody had
+taken, of the one surface that turned out to be furthest off.
+
+### 7.1 The finding: glass is the last flat thing we draw
+
+`tools/_glass.mjs` sampled every glazed door in `research/works/data2` in five
+horizontal bands across the pane, and recorded two numbers per band: the mean
+tone against the leaf's own midpoint, and — the number that matters — the
+**spread** between the brightest and darkest pixel inside that one band.
+
+```
+              top ──────────────────────────► bottom
+photographs   tone    0.92  0.65  0.79  0.68  0.54
+              spread  1.13  1.02  1.08  1.35  1.28
+
+ours          tone    0.67  0.58  0.49  0.46  0.46
+              spread  0.61  0.17  0.13  0.10  0.06
+```
+
+Our overall tone is defensible. Our **spread is six times too small across
+the middle of the pane and twenty times too small at its foot**. In a real
+pane the light and dark inside a single strip differ by
+*more than the entire leaf's value* — because a window is not a surface, it is
+an aperture with a street behind it: sky, foliage, a parked car, a person, the
+dark of an unlit hall. We draw a smooth vertical gradient with a soft sheen,
+which is a photograph of grey plastic.
+
+This is the same mistake as the flat casing and the flat reveal, made once
+more on the last surface still holding it: **we keep drawing the average of a
+thing instead of the thing.**
+
+The per-door numbers also split cleanly into two populations:
+
+```
+d128  spread 2.58 1.62 2.38 1.76 2.20     clear glass, street visible
+d099  spread 2.17 2.14 1.70 1.93 1.45     clear
+d108  spread 0.80 0.83 0.20 0.17 0.29     obscured / textured
+d113  spread 1.02 0.77 0.85 0.98 0.90     obscured with some transmission
+```
+
+That is not noise, it is **a product option we do not offer**: clear glazing
+versus obscured. Peretz sells both — you can see both on the works page — and
+a customer choosing a front door absolutely cares which one they get. It is
+also the single cheapest way to make the drawing honest, because obscured
+glass is the one case our current flat pane is nearly right for.
+
+### 7.2 The work, ordered by measured gap
+
+**G1 — Build the pane as a scene, not a fill.** *(largest gap by far)*
+
+Four layers, drawn inside the aperture and clipped to it:
+
+1. *Ground and sky.* A horizon at roughly 0.55 of the pane, sky above (cool,
+   above the leaf's value), ground below (warm, well under it). The measured
+   medians say bright-ish top, darkest at the foot.
+2. *Content with edges.* The spread number is the whole point: a real pane
+   contains **hard boundaries**, not gradients. Two or three soft-edged
+   verticals (a doorway opposite, a post, a fence), one horizontal ground
+   line, a couple of blurred organic blobs for planting. Blurred heavily —
+   depth of field and dirty glass both do that — but each one an actual edge.
+3. *Reflection.* One hard diagonal band of sky reflected off the pane, which
+   is what tells a viewer the surface is glass rather than a hole. We have
+   this (`sheen`); it is far too weak to survive layer 2.
+4. *The bars in front.* Grille and glazing bars are lit from the street, so
+   they sit brighter than most of what is behind them.
+
+The whole scene must be built from a small neutral palette and blurred enough
+that no one reads it as a picture of a specific place — it has to work behind
+seventeen door colours in a configurator, not illustrate one address.
+
+**G2 — Two glass types in the catalogue.** `clear` and `obscured`, priced,
+with the pane structure above for clear and something close to today's flat
+pane, plus a fine texture, for obscured. This wants Peretz's confirmation of
+what he stocks (add to ASK-PERETZ.md when the answer arrives).
+
+**G3 — The glazing surround is a moulding, not a bead.** Beside d097 the
+difference is immediate: the photograph has a wide moulded surround **in the
+door's own colour**, stepping down to the glass over 50–60 mm. Ours is a thin
+grey bead that reads as an aluminium sub-frame clipped into a hole. Reuse the
+existing recursive `bevel()`, in paint rather than in metal.
+
+**G4 — Paint texture must cross everything made of paint.** The raised
+panel's field, the applied strips' backing, the moulded surround — each is
+drawn as a flat fill *over* the leaf, which wipes out the grain and drift
+underneath. On a real door all of it is the same sprayed steel. Fix by
+drawing the texture layers **last**, over the whole leaf including its
+mouldings, instead of underneath them. Cheap, and it removes a "these are
+separate objects stuck on" quality that shows at every zoom level.
+
+**G5 — Panel proportion and moulding weight.** In d097 the lower panel is
+about 0.11 of leaf height with a fine double-line moulding; ours is 0.26 with
+a heavy chamfer that reads as a second, paler colour. Measure the panel
+rectangle and moulding width across the panelled doors in the corpus the way
+the reveal was measured, then set both from the median rather than by eye.
+
+**G6 — Grille motifs are rosettes, not S-curves.** The photograph's scroll is
+a symmetric medallion sitting inside the grid: four scrolls meeting at a
+centre. Ours is a lone S, which is a different ornament. Same for `lattice`
+and `scroll` — worth tracing from a flat-on photograph of each pattern rather
+than inventing.
+
+**G7 — Put the door somewhere.** The room is now infinite but it is a studio:
+flat plaster, flat floor, one horizon line. Real doorways sit against tile,
+stone cladding, render, with a skirting or a step, and the frame casts onto
+all of it. Low cost, high return, and it is the last thing between the
+drawing and a photograph. Deliberately kept generic: it must never look like
+someone else's house.
+
+### 7.3 What images would help, and exactly what each unlocks
+
+This is the part worth spending your effort on. Photographs are the only
+thing that has ever moved this work forward; everything tuned by eye against
+nothing has landed on "slightly better" and stayed there.
+
+In rough order of value:
+
+| # | What to shoot | How many | What it unlocks |
+|---|---|---|---|
+| 1 | **Glazed doors, square on, from the street, in daylight** — close enough that the pane fills most of the frame | 6–10 | G1. This is the biggest single gap in the drawing. Different times of day is a feature, not a problem: it tells us how much the pane changes and therefore how much we must not over-commit. |
+| 2 | **The same door with clear glass and with obscured glass**, if he installs both | 2–4 | G2. Settles whether it is one option or two, and what obscured actually looks like. |
+| 3 | **Close-ups of the moulding around the glass**, taken at a raking angle so the shadow shows the profile | 3–4 | G3. A profile can be read off a shadow; it cannot be read off a flat-on shot. |
+| 4 | **Close-ups of a lower panel's corner**, same raking light | 3–4 | G5. Same reason. |
+| 5 | **Each grille pattern flat on**, ideally against a bright interior so the ironwork reads as a silhouette | one per pattern | G6. Lets us trace the real motif instead of approximating it. |
+| 6 | **Each handle he actually stocks, at arm's length, on a door**, in each finish he sells it in | one per handle/finish | Finishes the hardware, and answers ASK-PERETZ 2b at the same time. |
+| 7 | **The frame where it meets the wall and the floor** — including the bottom corner where frame, threshold and floor all meet | 3–4 | G7, and the last unmeasured piece of the frame study. |
+| 8 | **One door photographed morning, midday and late afternoon** | 3 of one door | Would let us stop guessing the light and instead *choose* one defensible condition, knowing what we gave up. |
+
+Two things that make any photograph much more useful:
+
+- **Square on.** Every record carries a `skew` field and the off-axis ones are
+  the ones we cannot measure. Standing directly in front of the door, phone
+  held level at about chest height, is worth more than good lighting.
+- **One un-edited shot per subject if the phone allows it.** Phone HDR lifts
+  shadows hard, which is exactly the information the frame study needs.
+
+### 7.4 How this gets verified
+
+Extend the existing instrument rather than judging by eye:
+
+- `tools/_glass.mjs` becomes `npm run glass` and reports ours beside the
+  corpus, band by band, the same way `npm run frame` does for the reveal.
+- A new gate: **the spread inside every band of our pane must land inside the
+  corpus range for its glass type.** Tone alone is not enough — tone is what
+  we already match while looking wrong.
+- `npm run recreate` gains a case per glass type.
+- Every new option gets swept by the existing "priced options change the door"
+  and "every tile draws its own picture" tests, which is how the last three
+  invisible failures were caught.
+
+### 7.5 The failure mode to keep watching
+
+Three separate features have shipped that rendered as *nothing*: a grille with
+no matching branch, a panel that dropped itself when the leaf slimmed, a
+gradient deleted by a refactor while its reference stayed. Two more shipped
+that rendered as *the wrong thing quietly*: nine handles sharing one picture,
+and a finish option that charged money and changed no pixel.
+
+None of them threw. All of them looked like a working page. Tests catch wrong
+output easily and absent output almost never, unless someone goes looking on
+purpose — so every item above ships with an assertion about what must be
+**present and distinct**, not only about what must be correct.
