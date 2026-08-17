@@ -14,7 +14,12 @@
 
 export const PLACEHOLDER = true;
 
-export const VAT_RATE = 0.18; // Israel, 2025. CONFIRM before launch.
+/* Every figure below is VAT-INCLUSIVE, which is what the page says and what a
+   customer expects from a tradesman's quote. There was a `VAT_RATE = 0.18`
+   exported here that nothing ever multiplied by, and an unused tax rate
+   sitting beside prices that already contain the tax is a trap: the first
+   person to reach for it adds 18% to a number that already has it. The rate
+   belongs with the prices Peretz confirms — see ASK-PERETZ.md. */
 
 /**
  * Size bands. NOT a measurement the customer types — Peretz measures on site.

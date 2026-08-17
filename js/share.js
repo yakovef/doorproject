@@ -13,8 +13,12 @@ export const PHONE_DISPLAY = '053-219-7466';
 export const PHONE_E164    = '972532197466';   // for wa.me and tel:
 
 export function shareUrl(state) {
-  const { origin, pathname } = window.location;
-  return `${origin}${pathname}${toQuery(state)}`;
+  /* Built from the page's own URL rather than from origin + pathname. On
+     file:// — which PLAN.md §8.1 requires to work, because Peretz opens the
+     folder on his own laptop — some browsers report `location.origin` as the
+     literal string "null", and the one line of this message that matters most
+     would arrive as "null/index.html?…". */
+  return window.location.href.split(/[?#]/)[0] + toQuery(state);
 }
 
 /** The message Peretz receives. */

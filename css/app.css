@@ -81,9 +81,16 @@ body {
 }
 .bar__phone {
   font-family: var(--mono); font-size: .9rem;
-  color: var(--ink); text-decoration: none;
-  border-block-end: 1px solid var(--accent);
-  padding-block-end: 1px;
+  color: var(--ink);
+  /* The underline is drawn on the TEXT, so the box around it can grow to a
+     44px thumb without the rule sliding away from the number. It was a 104x24
+     target — on one of the two actions the whole site exists to produce. */
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  display: inline-flex; align-items: center;
+  min-block-size: 44px; padding-inline: 6px;
   direction: ltr;
 }
 
@@ -151,8 +158,14 @@ body {
 }
 
 .stage {
-  /* The door is never allowed off-screen — seeing it is the product. */
-  block-size: 52vh;
+  /* The door is never allowed off-screen — seeing it is the product.
+     Height rather than width decides how big the door comes out, because the
+     drawing is far taller than it is wide. A flat 52vh therefore gave a phone
+     a door filling half the screen and a tablet — same fraction of a much
+     shorter, much wider screen — a small door adrift in a large room. Tracking
+     the width instead keeps the door at about half the stage on both, and the
+     bounds stop a landscape phone from handing the whole viewport to it. */
+  block-size: clamp(54vh, 118vw, 74vh);
   transition: background-color .3s var(--ease);
 }
 @media (min-width: 1100px) {
@@ -175,9 +188,12 @@ body {
   direction: ltr;
 }
 
-.door-svg rect, .door-svg path, .door-svg circle {
-  transition: fill .22s var(--ease), stroke .22s var(--ease);
-}
+/* There was a `transition: fill .22s` on every rect, path and circle in the
+   drawing here. It never ran once: paint() replaces the stage's innerHTML, so
+   every element is brand new and has no previous fill to animate from. What it
+   did do was ask the style engine to track transitions on a few hundred nodes
+   on every colour change. The stage background still fades, because that
+   element survives the swap.  */
 
 .stage__bar {
   flex: 0 0 auto;

@@ -272,7 +272,6 @@
   var CYLINDER_AFF = 904;
   var PEEPHOLE_AFF = 1600;
   var PEEPHOLE_R = 30;
-  var HINGES_AFF = [303, 1057, 1799];
   var LOCK_BACKSET = 72;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
@@ -299,6 +298,50 @@
   };
   var PAD = { x: 70, top: 110, bottom: 300 };
   var SCENE = 4200;
+  function usedDefs(defs, body) {
+    const blocks = topLevelElements(defs);
+    const byId2 = /* @__PURE__ */ new Map();
+    for (const b of blocks) {
+      const m = /\sid="([^"]+)"/.exec(b);
+      if (m) byId2.set(m[1], b);
+    }
+    const want = /* @__PURE__ */ new Set();
+    const walk = (text) => {
+      for (const m of text.matchAll(/(?:url\(#|href="#)([^)"]+)/g)) {
+        if (!want.has(m[1]) && byId2.has(m[1])) {
+          want.add(m[1]);
+          walk(byId2.get(m[1]));
+        }
+      }
+    };
+    walk(body);
+    return blocks.filter((b) => {
+      const m = /\sid="([^"]+)"/.exec(b);
+      return m && want.has(m[1]);
+    }).join("\n");
+  }
+  function topLevelElements(markup) {
+    const re = /<!--[\s\S]*?-->|<\/([A-Za-z][\w:.-]*)\s*>|<([A-Za-z][\w:.-]*)\b[^>]*?(\/?)>/g;
+    const out = [];
+    let depth = 0, start = -1, m;
+    while (m = re.exec(markup)) {
+      if (m[0].startsWith("<!--")) continue;
+      if (m[1]) {
+        if (--depth === 0) {
+          out.push(markup.slice(start, m.index + m[0].length));
+          start = -1;
+        }
+      } else {
+        if (depth === 0) start = m.index;
+        if (!m[3]) depth++;
+        else if (depth === 0) {
+          out.push(m[0]);
+          start = -1;
+        }
+      }
+    }
+    return out;
+  }
   function render(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const colour = byId(COLOURS, state2.colour);
@@ -309,7 +352,6 @@
     const detail = byId(DETAILS, state2.detail);
     const finish = byId(FINISHES, state2.finish);
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
-    const inside = false;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
@@ -330,7 +372,7 @@
     const casY0 = revY0 - CASING;
     const baseY = floorY + THRESHOLD;
     const openW = totalW + RETURN * 2;
-    const hingeOnLeft = inside ? handing.hinge === "right" : handing.hinge === "left";
+    const hingeOnLeft = handing.hinge === "left";
     const mainX = sideW && !hingeOnLeft ? x0 + sideW + MULLION : x0;
     const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
     const mainX1 = mainX + leafW;
@@ -346,7 +388,7 @@
       x: centreX + Math.min(...win.rects.map((r) => (r.dx || 0) - r.w / 2)),
       x1: centreX + Math.max(...win.rects.map((r) => (r.dx || 0) + r.w / 2))
     } : null;
-    const paint2 = inside ? lighten(colour.hex, isLight(colour.hex) ? 0.05 : 0.28) : colour.hex;
+    const paint2 = colour.hex;
     const edge = silhouette(paint2);
     const deep = darken(paint2, 0.55);
     const fall = isLight(paint2) ? FALLOFF.light : FALLOFF.dark;
@@ -363,7 +405,7 @@
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
           filter="url(#drift)" opacity="${fall.drift}" style="mix-blend-mode:overlay"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
-          filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
+          fill="url(#grainTex)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
     <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.16"/>
     <!-- occlusion where the leaf meets the frame on every side -->
@@ -385,13 +427,7 @@
             fill="url(#edgeLeft)"/>
       <rect x="${x1}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
             fill="url(#edgeRight)"/>`;
-    return `
-<svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
-     style="--hw-mid:${tone[3]}"
-     data-light="${isLight(paint2)}"
-     data-fit-w="${view.w}" data-fit-h="${view.h}"
-     aria-label="${describe(state2)}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
+    const defs = `
     <linearGradient id="leafFill" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${lighten(paint2, 0.04)}"/>
       <stop offset="1" stop-color="${darken(paint2, 0.05)}"/>
@@ -786,9 +822,16 @@
     </radialGradient>
 
     <!-- Surface. Fine grain for paint texture, slow drift for the tonal
-         unevenness that any large painted panel actually has. -->
+         unevenness that any large painted panel actually has.
+         The grain is a stitched tile: at baseFrequency 0.55 its period is
+         under two millimetres, so it repeats every 180 without anything to see
+         — and running turbulence over the whole leaf twice per render (once
+         here, once for drift) was the single most expensive thing on the page.
+         Drift stays a filter, because its period is about half a leaf and
+         tiling it would be plainly visible. -->
     <filter id="grain" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="4" seed="7"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="4" seed="7"
+                    stitchTiles="stitch"/>
       <feColorMatrix type="saturate" values="0"/>
       <feComponentTransfer>
         <feFuncR type="linear" slope="1.9" intercept="-0.45"/>
@@ -796,6 +839,9 @@
         <feFuncB type="linear" slope="1.9" intercept="-0.45"/>
       </feComponentTransfer>
     </filter>
+    <pattern id="grainTex" width="180" height="180" patternUnits="userSpaceOnUse">
+      <rect width="180" height="180" filter="url(#grain)"/>
+    </pattern>
     <!-- Slow tonal drift: the cloudiness any large painted panel actually has,
          and the thing that most separates a photograph from a fill. -->
     <filter id="drift" x="0" y="0" width="100%" height="100%">
@@ -843,7 +889,8 @@
     <filter id="frameShadow" x="-15%" y="-15%" width="130%" height="130%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
-  </defs>
+`;
+    const body = `
 
   <!-- ── wall and floor ───────────────────────────────────────────
        Painted far past the drawing's own bounds (see SCENE): the page widens
@@ -981,7 +1028,6 @@
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
-    ${inside ? HINGES_AFF.filter((a) => a < leafH - 120).map((a) => hinge(hingeX, y(a), inward)).join("") : ""}
     ${win.rects.length ? "" : peephole(centreX, y(PEEPHOLE_AFF))}
     ${handleArt(
       handle,
@@ -990,16 +1036,24 @@
       leafH,
       leverDir,
       paint2,
-      inside,
       centreX,
       leafW,
       y0
     )}
-    ${handle.lock ? "" : inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
+    ${handle.lock ? "" : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
         height="${view.h + SCENE * 2}" fill="url(#vignette)"/>
+`;
+    return `
+<svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
+     style="--hw-mid:${tone[3]}"
+     data-light="${isLight(paint2)}"
+     data-fit-w="${view.w}" data-fit-h="${view.h}"
+     aria-label="${describe(state2)}" xmlns="http://www.w3.org/2000/svg">
+  <defs>${usedDefs(defs, body)}</defs>
+${body}
 </svg>`.trim();
   }
   function bevel(x, y, w, h, d, paint2, raised = true) {
@@ -1217,19 +1271,19 @@
   var HANDLE_ART = {
     channel: (h, g) => channelHandle(g.cx, g.cy, h.len, g.leafH, g.paint),
     grab: (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
-    plate: (h, g) => plateHandle(g.cx, g.cy, g.dir, g.inside),
+    plate: (h, g) => plateHandle(g.cx, g.cy, g.dir),
     bar: (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
     lever: (h, g) => lever(g.cx, g.cy, g.dir),
     almog: (h, g) => almogLever(g.cx, g.cy, g.dir),
     cadoor: (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
-    knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir, g.inside),
-    sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir, g.inside),
+    knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
+    sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir),
     luna: (h, g) => lunaPull(g.cx, g.cy, g.dir),
     shiran: (h, g) => shiranPull(g.cx, g.cy, g.leafH)
   };
-  function handleArt(handle, cx, cy, leafH, dir, paint2, inside, centreX, leafW, y0) {
+  function handleArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0) {
     const draw = HANDLE_ART[handle.style] || HANDLE_ART.lever;
-    const art = draw(handle, { cx, cy, dir, paint: paint2, inside, centreX, leafW, leafH, y0 });
+    const art = draw(handle, { cx, cy, dir, paint: paint2, centreX, leafW, leafH, y0 });
     const foot = handleFootprint(handle, leafH);
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
@@ -1403,7 +1457,7 @@
       ${fixArt(false)}
     </g>`;
   }
-  function plateHandle(cx, cy, dir, inside) {
+  function plateHandle(cx, cy, dir) {
     const w = PLATE.w, h = PLATE.h, r = w / 2;
     const top = cy - h * PLATE.lever, bot = top + h;
     const wh = w * PLATE.waist / 2;
@@ -1457,27 +1511,12 @@
             transform="translate(${dir * -1.8} 2.4)"/>
       <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.30" stroke-width="1"/>
 
-      ${inside ? `
-      <!-- the inside plate is screwed through: two pairs, top and bottom -->
-      ${[yA - 4, yB + 4].flatMap((sy) => [-1, 1].map((sx) => `
-      <circle cx="${cx + sx * w * 0.19}" cy="${sy}" r="6.5" fill="#000" opacity="0.34"/>
-      <circle cx="${cx + sx * w * 0.19}" cy="${sy}" r="5.2" fill="url(#nickelSoft)"/>
-      <path d="${arcPath(cx + sx * w * 0.19, sy, 3.6, 150, 320)}" fill="none"
-            stroke="#fff" stroke-opacity="0.6" stroke-width="1.5"/>`)).join("")}
-      <!-- thumb-turn: a stubby bar, not a pin -->
-      <rect x="${cx - 8}" y="${keyY - 22}" width="16" height="44" rx="8"
-            fill="#000" opacity="0.28" transform="translate(${dir * -3} 4)"/>
-      <rect x="${cx - 8}" y="${keyY - 22}" width="16" height="44" rx="8" fill="url(#nickel)"/>
-      <rect x="${cx - 5}" y="${keyY - 18}" width="4.5" height="36" rx="2.2"
-            fill="#fff" opacity="0.7"/>
-      <rect x="${cx + 3}" y="${keyY - 18}" width="3" height="36" rx="1.5"
-            fill="#000" opacity="0.26"/>` : `
       <!-- raised oval boss carrying the euro keyway -->
       <ellipse cx="${cx}" cy="${keyY}" rx="17" ry="25" fill="url(#nickelSoft)"/>
       <ellipse cx="${cx - 1}" cy="${keyY - 1}" rx="15" ry="23" fill="none"
                stroke="#fff" stroke-opacity="0.42" stroke-width="1.6"/>
       <ellipse cx="${cx}" cy="${keyY}" rx="11" ry="18" fill="#000" opacity="0.20"/>
-      ${keyway(cx, keyY - 1, 0.85)}`}
+      ${keyway(cx, keyY - 1, 0.85)}
 
       ${lever2}
     </g>`;
@@ -1512,7 +1551,7 @@
             fill="#000" opacity="0.34"/>
     </g>`;
   }
-  function knobPlate(cx, cy, dir, inside) {
+  function knobPlate(cx, cy, dir) {
     const W = 96, H = 300, r = 30;
     const x = cx - W / 2, y = cy - H * 0.34;
     const d = `M ${x} ${y + r} Q ${x} ${y} ${x + W / 2} ${y} Q ${x + W} ${y} ${x + W} ${y + r}
@@ -1535,7 +1574,7 @@
            Street face only: from indoors this fitting shows a thumbturn, and
            drawing a keyhole there would say the door locks with a key from
            the inside, which it does not. -->
-      ${inside ? "" : keyway(cx, y + H * 0.78)}
+      ${keyway(cx, y + H * 0.78)}
     </g>`;
   }
   function cadoorKnob(cx, cy, dir) {
@@ -1559,7 +1598,7 @@
                transform="rotate(${tilt} ${cx} ${cy})"/>
     </g>`;
   }
-  function sapirKnob(cx, cy, dir, inside) {
+  function sapirKnob(cx, cy, dir) {
     const side = 72, r = side * 0.04;
     const half = side / 2;
     const kx = cx + dir * side * 0.47, ky = cy + side * 0.11;
@@ -1725,26 +1764,6 @@
             fill="#fff" opacity="0.42"/>
     </g>`;
   }
-  var hinge = (cx, cy, inward) => {
-    const out = -inward;
-    const h = 80, w = 32;
-    const x = cx + out * 22;
-    return `
-    <g data-hw="hinge" data-cx="${cx}">
-      <rect x="${x - w / 2 + out * 4}" y="${cy - h / 2 + 5}" width="${w}" height="${h}" rx="${w / 2}"
-            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      <rect x="${x - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" rx="${w / 2}"
-            fill="url(#nickel)"/>
-      <!-- knuckle caps: the barrel is three sleeves, not one tube -->
-      ${[-h / 2 + 30, h / 2 - 30].map((dy) => `
-      <rect x="${x - w / 2}" y="${cy + dy - 1}" width="${w}" height="2"
-            fill="#000" opacity="0.28"/>`).join("")}
-      <rect x="${x - w / 2 + 4}" y="${cy - h / 2 + 6}" width="4.5" height="${h - 12}" rx="2.2"
-            fill="#fff" opacity="0.5"/>
-      <rect x="${x + w / 2 - 6}" y="${cy - h / 2 + 6}" width="4" height="${h - 12}" rx="2"
-            fill="#000" opacity="0.20"/>
-    </g>`;
-  };
   var peephole = (cx, cy) => {
     const R = PEEPHOLE_R;
     return `
@@ -1824,20 +1843,6 @@
       <circle cx="${cx + R * 0.5}" cy="${cy + R * 0.46}" r="2.4" fill="#fff" opacity="0.18"/>
     </g>`;
   };
-  var thumbTurn = (cx, cy) => {
-    const R = LOCK_R;
-    return `
-    <g data-hw="lock" data-kind="thumb" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      ${disc(cx, cy, R)}
-      <rect x="${cx + 3}" y="${cy - 16}" width="14" height="36" rx="7"
-            fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
-      <rect x="${cx - 7}" y="${cy - 19}" width="14" height="38" rx="7" fill="url(#nickel)"/>
-      <rect x="${cx - 4.5}" y="${cy - 16}" width="4" height="32" rx="2"
-            fill="#fff" opacity="0.5"/>
-      <rect x="${cx + 2}" y="${cy - 16}" width="3" height="32" rx="1.5"
-            fill="#000" opacity="0.22"/>
-    </g>`;
-  };
   function describe(state2, lang = "he") {
     const c = byId(COLOURS, state2.colour);
     const h = byId(HANDINGS, state2.handing);
@@ -1847,11 +1852,10 @@
     const dt = byId(DETAILS, state2.detail);
     const fn = byId(FINISHES, state2.finish);
     const s = SIZES[state2.size] || SIZES.standard;
-    const face = state2.view === "in" ? "מבט מבפנים" : "מבט מבחוץ";
     if (lang === "he") {
       const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
       const det = dt.id === "plain" ? "" : `, ${dt.he}`;
-      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he} ${fn.he}, ${s.he}, פתיחה ${h.he}. ${face}`;
+      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he} ${fn.he}, ${s.he}, פתיחה ${h.he}.`;
     }
     return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
   }
@@ -2153,8 +2157,7 @@
   var PHONE_DISPLAY = "053-219-7466";
   var PHONE_E164 = "972532197466";
   function shareUrl(state2) {
-    const { origin, pathname } = window.location;
-    return `${origin}${pathname}${toQuery(state2)}`;
+    return window.location.href.split(/[?#]/)[0] + toQuery(state2);
   }
   function message(state2) {
     const c = byId(COLOURS, state2.colour);

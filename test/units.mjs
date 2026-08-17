@@ -296,15 +296,34 @@ for (const hd of HANDINGS) for (const sz of sizeKeys) {
    whole leaf-to-frame junction silently stopped rendering — no error, no
    visual crash, just a measured feature quietly absent. Tests were green.
    Same family as the grille that drew nothing and the panel that dropped
-   itself: things that vanish rather than break. */
+   itself: things that vanish rather than break.
+
+   Swept exhaustively now, because render() no longer emits every definition —
+   it keeps the ones the drawing points at and drops the rest, which is what
+   took the SVG from 333 nodes to under 200. That pruning is derived from the
+   markup and so cannot go stale on its own, but it is the one place where a
+   mistake would produce exactly this failure and produce it invisibly. Every
+   handle against every finish, every grille, every detail. */
 group('no dangling gradient or filter references');
-for (const c of [COLOURS[0], COLOURS[8], COLOURS[16]]) {
-  const svg = render({ ...base, colour: c.id, window: 'tallwin', grille: 'grid', detail: 'panel' });
-  const defined = new Set([...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
-  const used = [...svg.matchAll(/url\(#([^)]+)\)/g)].map(m => m[1]);
-  for (const u of new Set(used)) {
-    ok(defined.has(u), `url(#${u}) is referenced but never defined (${c.id})`);
+{
+  let checked = 0;
+  const sweep = (label, state) => {
+    const svg = render(state);
+    const defined = new Set([...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
+    for (const u of new Set([...svg.matchAll(/url\(#([^)]+)\)/g)].map(m => m[1]))) {
+      ok(defined.has(u), `url(#${u}) is referenced but never defined (${label})`);
+    }
+    checked++;
+  };
+  for (const n of HANDLES) for (const f of FINISHES) {
+    sweep(`${n.id}/${f.id}`, { ...base, handle: n.id, finish: f.id, window: 'tallwin', detail: 'panel' });
   }
+  for (const g of GRILLES) sweep(`grille ${g.id}`, { ...base, window: 'tallwin', grille: g.id });
+  for (const d of DETAILS) sweep(`detail ${d.id}`, { ...base, detail: d.id });
+  for (const c of [COLOURS[0], COLOURS[8], COLOURS[16]]) {
+    for (const s of sizeKeys) sweep(`${c.id}/${s}`, { ...base, colour: c.id, size: s });
+  }
+  console.log(`  (${checked} renders swept)`);
 }
 
 // ── 6a. A grille the customer pays for must actually appear ────────

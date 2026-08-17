@@ -13,7 +13,8 @@
     "measure": "node tools/measure.mjs",
     "ask": "node tools/ask.mjs",
     "frame": "node tools/frame.mjs",
-    "recreate": "node tools/recreate.mjs"
+    "recreate": "node tools/recreate.mjs",
+    "audit": "node tools/audit.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

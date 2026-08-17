@@ -178,7 +178,11 @@ const HANDLE_AFF   = 1020;  // 0.486 H — the steadiest number in the whole set
 const CYLINDER_AFF = 904;   // 0.1225 W below the lever, on the same axis
 const PEEPHOLE_AFF = 1600;  // 0.762 H
 const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
-const HINGES_AFF   = [303, 1057, 1799];   // 0.144 / 0.504 / 0.857 H
+/* Hinge heights, 0.144 / 0.504 / 0.857 H, kept as a note rather than as code.
+   These doors open inwards, so from the street the hinges are hidden in the
+   rebate: every outside photograph on the works page shows a leaf with none on
+   it, and the inside face they were drawn on no longer exists. The hinge and
+   thumb-turn art went with it — a hundred lines that could not be reached. */
 const LOCK_BACKSET = 72;    // 0.076 W from the closing edge
 /* Both discs came down about a fifth after d016: side by side with the
    photograph our rose and escutcheon were plainly oversized, reading as
@@ -233,6 +237,66 @@ const PAD = { x: 70, top: 110, bottom: 300 };
    see the overspill. */
 const SCENE = 4200;
 
+/**
+ * Keep only the definitions this door actually points at.
+ *
+ * The defs block carries every gradient and filter that ANY door might need —
+ * Luna's matte black face, Shiran's turned brass discs, the bronze blade of
+ * the Almog swan-neck — and any one door uses a handful of them. All of them
+ * were emitted every time: 214 of the SVG's 333 nodes were definitions, most
+ * for hardware not on this door, and the browser rebuilt every one of them on
+ * every colour change.
+ *
+ * Resolution is transitive, because a def can point at another def, and it is
+ * read off the markup rather than from a hand-kept list of which handle needs
+ * which gradient. A list like that goes stale in silence and the symptom is a
+ * dangling url() — a feature that renders as nothing, which is the exact
+ * failure this codebase keeps turning up. The test sweeps every handle against
+ * every finish for that reason.
+ *
+ * The scan is deliberately naive about attribute values containing '>'. It
+ * only ever reads the defs block in render(), which is ours and has none.
+ */
+function usedDefs(defs, body) {
+  const blocks = topLevelElements(defs);
+  const byId = new Map();
+  for (const b of blocks) {
+    const m = /\sid="([^"]+)"/.exec(b);
+    if (m) byId.set(m[1], b);
+  }
+
+  const want = new Set();
+  const walk = text => {
+    for (const m of text.matchAll(/(?:url\(#|href="#)([^)"]+)/g)) {
+      if (!want.has(m[1]) && byId.has(m[1])) { want.add(m[1]); walk(byId.get(m[1])); }
+    }
+  };
+  walk(body);
+
+  return blocks.filter(b => {
+    const m = /\sid="([^"]+)"/.exec(b);
+    return m && want.has(m[1]);
+  }).join('\n');
+}
+
+/** Split markup into its top-level elements, ignoring comments and text. */
+function topLevelElements(markup) {
+  const re = /<!--[\s\S]*?-->|<\/([A-Za-z][\w:.-]*)\s*>|<([A-Za-z][\w:.-]*)\b[^>]*?(\/?)>/g;
+  const out = [];
+  let depth = 0, start = -1, m;
+  while ((m = re.exec(markup))) {
+    if (m[0].startsWith('<!--')) continue;
+    if (m[1]) {                                   // a closing tag
+      if (--depth === 0) { out.push(markup.slice(start, m.index + m[0].length)); start = -1; }
+    } else {                                      // opening, or self-closing
+      if (depth === 0) start = m.index;
+      if (!m[3]) depth++;
+      else if (depth === 0) { out.push(m[0]); start = -1; }
+    }
+  }
+  return out;
+}
+
 export function render(state) {
   const size    = SIZES[state.size] || SIZES.standard;
   const colour  = byId(COLOURS, state.colour);
@@ -243,7 +307,6 @@ export function render(state) {
   const detail  = byId(DETAILS, state.detail);
   const finish  = byId(FINISHES, state.finish);
   const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
-  const inside  = false;   // the inside view was removed; see PLAN.md
 
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
@@ -281,7 +344,7 @@ export function render(state) {
   const baseY = floorY + THRESHOLD;     // where every vertical meets the floor
   const openW = totalW + RETURN * 2;    // the opening, wall face to wall face
 
-  const hingeOnLeft = inside ? handing.hinge === 'right' : handing.hinge === 'left';
+  const hingeOnLeft = handing.hinge === 'left';
 
   const mainX = (sideW && !hingeOnLeft) ? x0 + sideW + MULLION : x0;
   const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
@@ -308,7 +371,7 @@ export function render(state) {
     x1: centreX + Math.max(...win.rects.map(r => (r.dx || 0) + r.w / 2)),
   } : null;
 
-  const paint = inside ? lighten(colour.hex, isLight(colour.hex) ? 0.05 : 0.28) : colour.hex;
+  const paint = colour.hex;
   const edge  = silhouette(paint);
   const deep  = darken(paint, 0.55);
   const fall  = isLight(paint) ? FALLOFF.light : FALLOFF.dark;
@@ -339,7 +402,7 @@ export function render(state) {
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
           filter="url(#drift)" opacity="${fall.drift}" style="mix-blend-mode:overlay"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
-          filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
+          fill="url(#grainTex)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
     <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.16"/>
     <!-- occlusion where the leaf meets the frame on every side -->
@@ -367,13 +430,7 @@ export function render(state) {
       <rect x="${x1}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
             fill="url(#edgeRight)"/>`;
 
-  return `
-<svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
-     style="--hw-mid:${tone[3]}"
-     data-light="${isLight(paint)}"
-     data-fit-w="${view.w}" data-fit-h="${view.h}"
-     aria-label="${describe(state)}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
+  const defs = `
     <linearGradient id="leafFill" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${lighten(paint, 0.04)}"/>
       <stop offset="1" stop-color="${darken(paint, 0.05)}"/>
@@ -768,9 +825,16 @@ export function render(state) {
     </radialGradient>
 
     <!-- Surface. Fine grain for paint texture, slow drift for the tonal
-         unevenness that any large painted panel actually has. -->
+         unevenness that any large painted panel actually has.
+         The grain is a stitched tile: at baseFrequency 0.55 its period is
+         under two millimetres, so it repeats every 180 without anything to see
+         — and running turbulence over the whole leaf twice per render (once
+         here, once for drift) was the single most expensive thing on the page.
+         Drift stays a filter, because its period is about half a leaf and
+         tiling it would be plainly visible. -->
     <filter id="grain" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="4" seed="7"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="4" seed="7"
+                    stitchTiles="stitch"/>
       <feColorMatrix type="saturate" values="0"/>
       <feComponentTransfer>
         <feFuncR type="linear" slope="1.9" intercept="-0.45"/>
@@ -778,6 +842,9 @@ export function render(state) {
         <feFuncB type="linear" slope="1.9" intercept="-0.45"/>
       </feComponentTransfer>
     </filter>
+    <pattern id="grainTex" width="180" height="180" patternUnits="userSpaceOnUse">
+      <rect width="180" height="180" filter="url(#grain)"/>
+    </pattern>
     <!-- Slow tonal drift: the cloudiness any large painted panel actually has,
          and the thing that most separates a photograph from a fill. -->
     <filter id="drift" x="0" y="0" width="100%" height="100%">
@@ -825,7 +892,9 @@ export function render(state) {
     <filter id="frameShadow" x="-15%" y="-15%" width="130%" height="130%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
-  </defs>
+`;
+
+  const body = `
 
   <!-- ── wall and floor ───────────────────────────────────────────
        Painted far past the drawing's own bounds (see SCENE): the page widens
@@ -954,17 +1023,24 @@ export function render(state) {
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
-    ${inside ? HINGES_AFF.filter(a => a < leafH - 120)
-                 .map(a => hinge(hingeX, y(a), inward)).join('') : ''}
     ${win.rects.length ? '' : peephole(centreX, y(PEEPHOLE_AFF))}
-    ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint, inside,
+    ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint,
                 centreX, leafW, y0)}
-    ${handle.lock ? ''
-      : inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
+    ${handle.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
         height="${view.h + SCENE * 2}" fill="url(#vignette)"/>
+`;
+
+  return `
+<svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
+     style="--hw-mid:${tone[3]}"
+     data-light="${isLight(paint)}"
+     data-fit-w="${view.w}" data-fit-h="${view.h}"
+     aria-label="${describe(state)}" xmlns="http://www.w3.org/2000/svg">
+  <defs>${usedDefs(defs, body)}</defs>
+${body}
 </svg>`.trim();
 }
 
@@ -1304,20 +1380,20 @@ export function handleStandoff(handle, leafW, leafH) {
 const HANDLE_ART = {
   channel: (h, g) => channelHandle(g.cx, g.cy, h.len, g.leafH, g.paint),
   grab:    (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
-  plate:   (h, g) => plateHandle(g.cx, g.cy, g.dir, g.inside),
+  plate:   (h, g) => plateHandle(g.cx, g.cy, g.dir),
   bar:     (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
   lever:   (h, g) => lever(g.cx, g.cy, g.dir),
   almog:   (h, g) => almogLever(g.cx, g.cy, g.dir),
   cadoor:  (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
-  knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir, g.inside),
-  sapir:   (h, g) => sapirKnob(g.cx, g.cy, g.dir, g.inside),
+  knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
+  sapir:   (h, g) => sapirKnob(g.cx, g.cy, g.dir),
   luna:    (h, g) => lunaPull(g.cx, g.cy, g.dir),
   shiran:  (h, g) => shiranPull(g.cx, g.cy, g.leafH),
 };
 
-function handleArt(handle, cx, cy, leafH, dir, paint, inside, centreX, leafW, y0) {
+function handleArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0) {
   const draw = HANDLE_ART[handle.style] || HANDLE_ART.lever;
-  const art = draw(handle, { cx, cy, dir, paint, inside, centreX, leafW, leafH, y0 });
+  const art = draw(handle, { cx, cy, dir, paint, centreX, leafW, leafH, y0 });
   const foot = handleFootprint(handle, leafH);
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
@@ -1533,7 +1609,7 @@ function pullBar(cx, cy, handle, leafH) {
  * `cy` is the lever spindle, which sits 0.30 down the plate rather than at
  * its middle, so the plate hangs lower than it looks like it should.
  */
-function plateHandle(cx, cy, dir, inside) {
+function plateHandle(cx, cy, dir) {
   const w = PLATE.w, h = PLATE.h, r = w / 2;
   const top = cy - h * PLATE.lever, bot = top + h;
   const wh = (w * PLATE.waist) / 2;
@@ -1600,28 +1676,12 @@ function plateHandle(cx, cy, dir, inside) {
             transform="translate(${dir * -1.8} 2.4)"/>
       <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.30" stroke-width="1"/>
 
-      ${inside ? `
-      <!-- the inside plate is screwed through: two pairs, top and bottom -->
-      ${[yA - 4, yB + 4].flatMap(sy => [-1, 1].map(sx => `
-      <circle cx="${cx + sx * w * 0.19}" cy="${sy}" r="6.5" fill="#000" opacity="0.34"/>
-      <circle cx="${cx + sx * w * 0.19}" cy="${sy}" r="5.2" fill="url(#nickelSoft)"/>
-      <path d="${arcPath(cx + sx * w * 0.19, sy, 3.6, 150, 320)}" fill="none"
-            stroke="#fff" stroke-opacity="0.6" stroke-width="1.5"/>`)).join('')}
-      <!-- thumb-turn: a stubby bar, not a pin -->
-      <rect x="${cx - 8}" y="${keyY - 22}" width="16" height="44" rx="8"
-            fill="#000" opacity="0.28" transform="translate(${dir * -3} 4)"/>
-      <rect x="${cx - 8}" y="${keyY - 22}" width="16" height="44" rx="8" fill="url(#nickel)"/>
-      <rect x="${cx - 5}" y="${keyY - 18}" width="4.5" height="36" rx="2.2"
-            fill="#fff" opacity="0.7"/>
-      <rect x="${cx + 3}" y="${keyY - 18}" width="3" height="36" rx="1.5"
-            fill="#000" opacity="0.26"/>`
-      : `
       <!-- raised oval boss carrying the euro keyway -->
       <ellipse cx="${cx}" cy="${keyY}" rx="17" ry="25" fill="url(#nickelSoft)"/>
       <ellipse cx="${cx - 1}" cy="${keyY - 1}" rx="15" ry="23" fill="none"
                stroke="#fff" stroke-opacity="0.42" stroke-width="1.6"/>
       <ellipse cx="${cx}" cy="${keyY}" rx="11" ry="18" fill="#000" opacity="0.20"/>
-      ${keyway(cx, keyY - 1, 0.85)}`}
+      ${keyway(cx, keyY - 1, 0.85)}
 
       ${lever}
     </g>`;
@@ -1685,7 +1745,7 @@ function almogLever(cx, cy, dir) {
  * knob and the keyway, and it stands proud enough to cast down the leaf. We
  * were substituting a bare round knob, which loses the whole fitting.
  */
-function knobPlate(cx, cy, dir, inside) {
+function knobPlate(cx, cy, dir) {
   const W = 96, H = 300, r = 30;
   const x = cx - W / 2, y = cy - H * 0.34;
   const d = `M ${x} ${y + r} Q ${x} ${y} ${x + W / 2} ${y} Q ${x + W} ${y} ${x + W} ${y + r}
@@ -1708,7 +1768,7 @@ function knobPlate(cx, cy, dir, inside) {
            Street face only: from indoors this fitting shows a thumbturn, and
            drawing a keyhole there would say the door locks with a key from
            the inside, which it does not. -->
-      ${inside ? '' : keyway(cx, y + H * 0.78)}
+      ${keyway(cx, y + H * 0.78)}
     </g>`;
 }
 
@@ -1741,7 +1801,7 @@ function cadoorKnob(cx, cy, dir) {
  * runs bright at BOTH edges with a dark reflected core, which is what a mirror
  * finish does when it is looking at an unlit room.
  */
-function sapirKnob(cx, cy, dir, inside) {
+function sapirKnob(cx, cy, dir) {
   const side = 72, r = side * 0.04;        // corner radius 0.04 of the side
   const half = side / 2;
   const kx = cx + dir * side * 0.47, ky = cy + side * 0.11;   // knob projects
@@ -1961,38 +2021,6 @@ function lever(cx, cy, dir) {
     </g>`;
 }
 
-/**
- * Hinges, drawn only on the inside face.
- *
- * These doors open inwards, so from the street the hinges are hidden inside
- * the rebate — every outside photograph on the works page shows a leaf with no
- * hinges on it at all, and drawing them there was inventing hardware. From the
- * inside they are unmissable: three bright chromed barrels standing proud of
- * the leaf edge, brighter than any paint colour behind them.
- *
- * `out` is the direction the knuckle projects — away from the leaf centre.
- */
-const hinge = (cx, cy, inward) => {
-  const out = -inward;
-  const h = 80, w = 32;                  // 0.038 H x 0.034 W
-  const x = cx + out * 22;               // centre 0.023 W outside the leaf edge
-  return `
-    <g data-hw="hinge" data-cx="${cx}">
-      <rect x="${x - w / 2 + out * 4}" y="${cy - h / 2 + 5}" width="${w}" height="${h}" rx="${w / 2}"
-            fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      <rect x="${x - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" rx="${w / 2}"
-            fill="url(#nickel)"/>
-      <!-- knuckle caps: the barrel is three sleeves, not one tube -->
-      ${[-h / 2 + 30, h / 2 - 30].map(dy => `
-      <rect x="${x - w / 2}" y="${cy + dy - 1}" width="${w}" height="2"
-            fill="#000" opacity="0.28"/>`).join('')}
-      <rect x="${x - w / 2 + 4}" y="${cy - h / 2 + 6}" width="4.5" height="${h - 12}" rx="2.2"
-            fill="#fff" opacity="0.5"/>
-      <rect x="${x + w / 2 - 6}" y="${cy - h / 2 + 6}" width="4" height="${h - 12}" rx="2"
-            fill="#000" opacity="0.20"/>
-    </g>`;
-};
-
 /* Centred on the leaf, always. Every photograph on the works page puts it on
    the leaf's centre line — offsetting it towards the hinge, as this did, is
    the kind of small wrongness that registers before anyone can name it. */
@@ -2092,22 +2120,6 @@ const cylinder = (cx, cy) => {
     </g>`;
 };
 
-/** Inside face: same escutcheon, thumb-turn instead of a keyway. */
-const thumbTurn = (cx, cy) => {
-  const R = LOCK_R;
-  return `
-    <g data-hw="lock" data-kind="thumb" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      ${disc(cx, cy, R)}
-      <rect x="${cx + 3}" y="${cy - 16}" width="14" height="36" rx="7"
-            fill="#000" opacity="0.3" filter="url(#hwShadow)"/>
-      <rect x="${cx - 7}" y="${cy - 19}" width="14" height="38" rx="7" fill="url(#nickel)"/>
-      <rect x="${cx - 4.5}" y="${cy - 16}" width="4" height="32" rx="2"
-            fill="#fff" opacity="0.5"/>
-      <rect x="${cx + 2}" y="${cy - 16}" width="3" height="32" rx="1.5"
-            fill="#000" opacity="0.22"/>
-    </g>`;
-};
-
 /** Plain-language description, used as the SVG's accessible name. */
 export function describe(state, lang = 'he') {
   const c = byId(COLOURS, state.colour);
@@ -2118,11 +2130,10 @@ export function describe(state, lang = 'he') {
   const dt = byId(DETAILS, state.detail);
   const fn = byId(FINISHES, state.finish);
   const s = SIZES[state.size] || SIZES.standard;
-  const face = state.view === 'in' ? 'מבט מבפנים' : 'מבט מבחוץ';
   if (lang === 'he') {
     const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
     const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he} ${fn.he}, ${s.he}, פתיחה ${h.he}. ${face}`;
+    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he} ${fn.he}, ${s.he}, פתיחה ${h.he}.`;
   }
   return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
 }
