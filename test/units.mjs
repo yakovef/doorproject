@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, VIEWS, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
 import { LIGHT } from '../js/renderer.js';
 import { priceAgorot, shekels } from '../js/price.js';
@@ -16,14 +16,14 @@ const group = name => console.log('\n' + name);
 const sizeKeys = Object.keys(SIZES);
 const base = { colour: 'rb-0097d', window: 'none', grille: 'none', handle: 'idan',
                detail: 'plain', finish: 'steel',
-               size: 'standard', handing: 'right-in', view: 'out' };
+               size: 'standard', handing: 'right-in' };
 
 /** Every reachable design, for the exhaustive sweeps below. */
 function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
     for (const w of WINDOWS) for (const g of GRILLES) for (const n of HANDLES)
       yield { colour: c.id, size: s, handing: h.id, window: w.id,
-              grille: g.id, handle: n.id, detail: 'plain', finish: 'steel', view: 'out' };
+              grille: g.id, handle: n.id, detail: 'plain', finish: 'steel' };
 }
 
 /** Every detail x finish x window combination, at one colour and size. */
@@ -73,11 +73,11 @@ for (const st of everyState()) {
   const bad = fromQuery('?v=3&c=ral-nope&w=rect&g=none&n=bar-long&d=plain&f=steel&s=standard&h=right-in');
   ok(bad.notice === 'option-unknown', 'unknown option must notify, never silently default');
   ok(bad.state.colour === 'rb-0097d', 'unknown option should fall back to default');
-  ok(fromQuery('?v=3&i=1').state.view === 'in', 'inside view lost from url');
-  ok(!toQuery({ ...base }).includes('i=1'), 'default view should not clutter the url');
-  // 'f' now means finish, so it must not be mistaken for the inside-view flag.
   ok(fromQuery('?v=3&f=brass').state.finish === 'brass', 'finish lost from url');
-  ok(fromQuery('?v=3&f=brass').state.view === 'out', 'finish must not flip the view');
+  // The inside view is gone. An old link carrying i=1 must open the door, not
+  // fail, and must not leave a stray key behind in the state.
+  ok(fromQuery('?v=3&i=1').state.view === undefined, 'i=1 should no longer set anything');
+  ok(!toQuery({ ...base }).includes('i=1'), 'the url must not carry a view flag');
 }
 
 // ── 3. Price ──────────────────────────────────────────────────────
@@ -129,9 +129,9 @@ group('renderer invariants');
 {
   let n = 0;
   for (const st of everyState()) {
-    for (const v of VIEWS) {
-      const svg = render({ ...st, view: v.id });
-      const label = `${Object.values(st).join('/')} [${v.id}]`;
+    {
+      const svg = render(st);
+      const label = Object.values(st).join('/');
 
       ok(!/NaN|undefined|Infinity/.test(svg), `numeric hole in output: ${label}`);
       ok(svg.startsWith('<svg') && svg.endsWith('</svg>'), `malformed svg: ${label}`);
@@ -189,19 +189,6 @@ group('detail and finish');
 }
 
 // ── 6. The inside face mirrors the door ───────────────────────────
-group('inside view');
-for (const h of HANDINGS) {
-  const out = render({ ...base, handing: h.id, view: 'out' });
-  const inn = render({ ...base, handing: h.id, view: 'in' });
-  // The lock sits at the handle position whatever handle is fitted, and it
-  // carries a stable hook so this probe survives restyling.
-  const handleX = svg => Number(/data-hw="lock"[^>]*data-cx="([\d.]+)"/.exec(svg)[1]);
-  const midX = svg => Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]) / 2;
-  ok((handleX(out) > midX(out)) !== (handleX(inn) > midX(inn)),
-     `handle must swap sides when viewed from inside (${h.id})`);
-  ok(/data-kind="thumb"/.test(inn), `inside face should show a thumb-turn (${h.id})`);
-  ok(/data-kind="cylinder"/.test(out), `outside face should show a cylinder (${h.id})`);
-}
 
 // ── 6b. Handles ───────────────────────────────────────────────────
 group('handles');
@@ -228,9 +215,9 @@ group('handle clears the lock');
 {
   const num = (svg, re) => Number(re.exec(svg)[1]);
   let n = 0, tightest = Infinity;
-  for (const hn of HANDLES) for (const sz of sizeKeys) for (const hd of HANDINGS) for (const v of VIEWS) {
-    const svg = render({ ...base, handle: hn.id, size: sz, handing: hd.id, view: v.id });
-    const label = `${hn.id}/${sz}/${hd.id}/${v.id}`;
+  for (const hn of HANDLES) for (const sz of sizeKeys) for (const hd of HANDINGS) {
+    const svg = render({ ...base, handle: hn.id, size: sz, handing: hd.id });
+    const label = `${hn.id}/${sz}/${hd.id}`;
 
     const grip = {
       x:  num(svg, /data-hw="handle"[^>]*data-cx="([-\d.]+)"/s),
@@ -248,8 +235,8 @@ group('handle clears the lock');
     ok(carries === !!hn.lock, `data-carries-lock disagrees with the catalogue (${label})`);
     ok(escutcheons === (carries ? 0 : 1),
        `expected ${carries ? 0 : 1} separate escutcheon, found ${escutcheons} (${label})`);
-    ok([...svg.matchAll(/data-hw="keyway"/g)].length === (v.id === 'in' ? 0 : 1),
-       `the street face needs exactly one keyway and the inside face none (${label})`);
+    ok([...svg.matchAll(/data-hw="keyway"/g)].length === 1,
+       `the street face needs exactly one keyway (${label})`);
 
     if (!carries) {
       const lock = {
@@ -286,17 +273,15 @@ group('handle clears the lock');
 group('hinges and peephole match the photographs');
 for (const hd of HANDINGS) for (const sz of sizeKeys) {
   const st = { ...base, handing: hd.id, size: sz };
-  const out = render({ ...st, view: 'out' });
-  const inn = render({ ...st, view: 'in' });
+  const out = render(st);
   const label = `${hd.id}/${sz}`;
 
   /* These doors open inwards. From the street the hinges are inside the
      rebate, and not one outside photograph on the works page shows one. */
   ok(!/data-hw="hinge"/.test(out), `hinges drawn on the street face (${label})`);
-  ok([...inn.matchAll(/data-hw="hinge"/g)].length >= 3, `inside face is missing hinges (${label})`);
-
   // The peephole is on the leaf's centre line in every photograph.
-  for (const svg of [out, inn]) {
+  {
+    const svg = out;
     const leafX = Number(/id="leaf" data-x="([-\d.]+)"/.exec(svg)[1]);
     const leafW = Number(/id="leaf"[^>]*data-w="([\d.]+)"/.exec(svg)[1]);
     const eye = Number(/<circle cx="([-\d.]+)"[^>]*fill="url\(#metal\)"/.exec(svg)[1]);
@@ -363,10 +348,12 @@ group('the face wash does not tint the paint');
 group('leaf and a half');
 for (const h of HANDINGS) {
   // Hinges are drawn on the inside face only, as the works photographs show.
-  const svg = render({ ...base, size: 'half', handing: h.id, view: 'in' });
+  const svg = render({ ...base, size: 'half', handing: h.id });
   const total = Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]);
   const hingeXs = [...svg.matchAll(/data-hw="hinge" data-cx="([\d.]+)"/g)].map(m => Number(m[1]));
-  ok(hingeXs.length >= 2, `no hinges found for ${h.id}`);
+  /* Hinges are an inside-face detail and that face is gone, so there are none
+     to find. What still matters is that nothing is drawn AT the mullion. */
+  ok(hingeXs.length === 0, `hinges should no longer be drawn for ${h.id}`);
   // Hinges belong on an outer edge of the opening, never at the mullion.
   const nearEdge = hingeXs.every(x => x < total * 0.30 || x > total * 0.70);
   ok(nearEdge, `hinges sit at the mullion instead of the frame (${h.id}): ${hingeXs}`);

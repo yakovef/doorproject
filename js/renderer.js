@@ -139,9 +139,21 @@ const REBATE   = 50;   // frame rebate: how far the leaf sits inside the opening
 
    Scaled down with the returns. On d003 the entire visible reveal is a line
    0.025 of the leaf wide — 23 mm — and this profile alone used to be 43. */
-const GAP   = 10;      // leaf-to-frame shadow gap, 0.011 W
-const BEAD  = 6;       // the lit arris, 0.006 W
-const QUIRK = 12;      // the dark groove behind it, 0.013 W
+/* ONE soft edge shadow, replacing gap + bead + quirk + gasket.
+   Measured by walking outward from the leaf edge on twenty square-on doors,
+   in half-percent steps of leaf width, tone against the leaf's own midpoint:
+
+     dist%   0.5   1.0   1.5   2.0   2.5   3.0   3.5   4.0   4.5   5.0
+     median  0.76  0.76  0.80  0.81  0.85  0.81  0.83  0.92  0.94  0.96
+
+   There is no dark band. The junction is a SOFT RAMP starting at about
+   three quarters of the leaf's value and climbing back over roughly 4% of
+   the width. We were stacking four hard-edged strips — a black gasket, a
+   shadow gap, a lit bead and a dark quirk — and reaching about 0.28 where
+   the photographs say 0.73. Three times too dark, hard where reality is
+   gradual, and reading as a painted stripe between two objects rather than
+   as the place where one meets the other. */
+const EDGE  = 38;      // 0.045 W — the ramp, not a band
 
 /* Hardware dimensions, measured off the works photographs (see REALISM.md
    §7). These are absolute millimetres, not fractions of the leaf, because a
@@ -203,7 +215,7 @@ export function render(state) {
   const detail  = byId(DETAILS, state.detail);
   const finish  = byId(FINISHES, state.finish);
   const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
-  const inside  = state.view === 'in';
+  const inside  = false;   // the inside view was removed; see PLAN.md
 
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
@@ -288,13 +300,6 @@ export function render(state) {
           filter="url(#drift)" opacity="${fall.drift}" style="mix-blend-mode:overlay"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
           filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
-    <!-- The gasket. Every one of the green door's photographs shows a crisp
-         BLACK line following the leaf all the way round, right at its edge —
-         the compression seal it shuts against. It is the last thing dividing
-         leaf from frame, and we drew nothing there, so our leaf appeared to
-         float in the opening rather than close into it. -->
-    <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="none"
-          stroke="#0B0C0D" stroke-opacity="0.72" stroke-width="4"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
     <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.16"/>
     <!-- occlusion where the leaf meets the frame on every side -->
@@ -385,21 +390,9 @@ export function render(state) {
          shadowed but plainly lit surface there. Light leaves were close
          already. Targets, head -> floor:
              dark   0.79 -> 0.45        light  0.85 -> 0.78 -->
-    <linearGradient id="gapTone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.09 : 0.13}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.18 : 0.56}"/>
-    </linearGradient>
-    <linearGradient id="beadTone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${LIGHT.warm}" stop-opacity="0.11"/>
-      <stop offset="1" stop-color="${LIGHT.warm}" stop-opacity="0.02"/>
-    </linearGradient>
     <!-- The quirk was one fixed pair of opacities for every colour, which is
          the same mistake the gap had: a groove that reads as a groove on white
          reads as a hole on anthracite. -->
-    <linearGradient id="quirkTone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.09 : 0.12}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.21 : 0.44}"/>
-    </linearGradient>
 
     <!-- There was a warm floor bounce here: peach at 0.19 over the bottom
          eighth of the leaf. On a dark door it did not read as light at all,
@@ -484,6 +477,12 @@ export function render(state) {
          outer edge, next to the wall, still catches sky, and it deepens the
          whole way back to the leaf. That fall is what tells you it is a
          horizontal surface overhead rather than more wall. -->
+    <!-- The junction ramp. Darkest against the leaf, recovering outward. -->
+    <linearGradient id="edgeShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.16 : 0.24}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.26 : 0.40}"/>
+    </linearGradient>
+
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"   stop-color="#fff" stop-opacity="${pale ? 0.10 : 0.16}"/>
       <stop offset="0.3" stop-color="#000" stop-opacity="${pale ? 0.10 : 0.20}"/>
@@ -836,12 +835,7 @@ export function render(state) {
 
     <!-- ── the reveal: quirk, bead, gap, mitred at both top corners ── -->
     <g id="reveal">
-      ${band(GAP + BEAD, QUIRK, 'url(#quirkTone)')}
-      ${band(GAP, BEAD, 'url(#beadTone)')}
-      ${band(0, GAP, 'url(#gapTone)')}
-      <!-- the head gap is the widest and the darkest opening in the frame -->
-      <rect x="${x0 - GAP}" y="${y0 - GAP}" width="${totalW + GAP * 2}" height="${GAP * 2.4}"
-            fill="#000" opacity="${pale ? 0.12 : 0.30}"/>
+      ${band(0, EDGE, 'url(#edgeShade)')}
     </g>
   </g>
 

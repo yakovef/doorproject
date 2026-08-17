@@ -32,7 +32,6 @@ export const DEFAULTS = {
   finish:  'steel',
   size:    'standard',
   handing: 'right-in',
-  view:    'out',        // camera, not a product choice
 };
 
 // ── Query string ──────────────────────────────────────────────────
@@ -49,7 +48,6 @@ export function toQuery(state) {
   p.set('f', state.finish);
   p.set('s', state.size);
   p.set('h', state.handing);
-  if (state.view === 'in') p.set('i', '1');    // only when not the default
   return '?' + p.toString();
 }
 
@@ -85,7 +83,6 @@ export function fromQuery(search) {
   take('detail', 'd', DETAILS);
   take('finish', 'f', FINISHES);
   take('handing', 'h', HANDINGS);
-  if (p.get('i') === '1') state.view = 'in';
 
   const rawSize = p.get('s');
   if (rawSize != null) {
@@ -187,6 +184,6 @@ export function decodeCode(code) {
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, detail: detail.id,
-    finish: finish.id, view: 'out',
+    finish: finish.id,
   };
 }

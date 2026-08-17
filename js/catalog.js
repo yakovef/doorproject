@@ -228,11 +228,6 @@ export const FINISHES = [
   { id: 'brass', he: 'פליז',       en: 'Brass',          delta: 22000 },
 ];
 
-/** Which face of the door is being shown. Not a product choice — a camera. */
-export const VIEWS = [
-  { id: 'out', he: 'חוץ',  en: 'Outside' },
-  { id: 'in',  he: 'פנים', en: 'Inside'  },
-];
 
 /* Aliases count: a superseded id must resolve to its replacement rather than
    silently falling through to the first entry, which is how a stale link

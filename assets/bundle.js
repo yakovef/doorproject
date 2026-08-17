@@ -171,10 +171,6 @@
     { id: "black", he: "שחור מט", en: "Matte black", delta: 12e3 },
     { id: "brass", he: "פליז", en: "Brass", delta: 22e3 }
   ];
-  var VIEWS = [
-    { id: "out", he: "חוץ", en: "Outside" },
-    { id: "in", he: "פנים", en: "Inside" }
-  ];
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
 
   // js/price.js
@@ -272,9 +268,7 @@
   var RET_HEAD = 148;
   var MULLION = 22;
   var REBATE = 50;
-  var GAP = 10;
-  var BEAD = 6;
-  var QUIRK = 12;
+  var EDGE = 38;
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
   var PEEPHOLE_AFF = 1600;
@@ -315,7 +309,7 @@
     const detail = byId(DETAILS, state2.detail);
     const finish = byId(FINISHES, state2.finish);
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
-    const inside = state2.view === "in";
+    const inside = false;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
@@ -362,13 +356,6 @@
           filter="url(#drift)" opacity="${fall.drift}" style="mix-blend-mode:overlay"/>
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}"
           filter="url(#grain)" opacity="${fall.grain}" style="mix-blend-mode:overlay"/>
-    <!-- The gasket. Every one of the green door's photographs shows a crisp
-         BLACK line following the leaf all the way round, right at its edge —
-         the compression seal it shuts against. It is the last thing dividing
-         leaf from frame, and we drew nothing there, so our leaf appeared to
-         float in the opening rather than close into it. -->
-    <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="none"
-          stroke="#0B0C0D" stroke-opacity="0.72" stroke-width="4"/>
     <!-- the leaf's own top edge catching light, as in the reference -->
     <rect x="${lx + 6}" y="${y0 + 3}" width="${lw - 12}" height="6" fill="#fff" opacity="0.16"/>
     <!-- occlusion where the leaf meets the frame on every side -->
@@ -453,21 +440,9 @@
          shadowed but plainly lit surface there. Light leaves were close
          already. Targets, head -> floor:
              dark   0.79 -> 0.45        light  0.85 -> 0.78 -->
-    <linearGradient id="gapTone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.09 : 0.13}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.18 : 0.56}"/>
-    </linearGradient>
-    <linearGradient id="beadTone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${LIGHT.warm}" stop-opacity="0.11"/>
-      <stop offset="1" stop-color="${LIGHT.warm}" stop-opacity="0.02"/>
-    </linearGradient>
     <!-- The quirk was one fixed pair of opacities for every colour, which is
          the same mistake the gap had: a groove that reads as a groove on white
          reads as a hole on anthracite. -->
-    <linearGradient id="quirkTone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.09 : 0.12}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.21 : 0.44}"/>
-    </linearGradient>
 
     <!-- There was a warm floor bounce here: peach at 0.19 over the bottom
          eighth of the leaf. On a dark door it did not read as light at all,
@@ -552,6 +527,12 @@
          outer edge, next to the wall, still catches sky, and it deepens the
          whole way back to the leaf. That fall is what tells you it is a
          horizontal surface overhead rather than more wall. -->
+    <!-- The junction ramp. Darkest against the leaf, recovering outward. -->
+    <linearGradient id="edgeShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.16 : 0.24}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.26 : 0.4}"/>
+    </linearGradient>
+
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"   stop-color="#fff" stop-opacity="${pale ? 0.1 : 0.16}"/>
       <stop offset="0.3" stop-color="#000" stop-opacity="${pale ? 0.1 : 0.2}"/>
@@ -904,12 +885,7 @@
 
     <!-- ── the reveal: quirk, bead, gap, mitred at both top corners ── -->
     <g id="reveal">
-      ${band(GAP + BEAD, QUIRK, "url(#quirkTone)")}
-      ${band(GAP, BEAD, "url(#beadTone)")}
-      ${band(0, GAP, "url(#gapTone)")}
-      <!-- the head gap is the widest and the darkest opening in the frame -->
-      <rect x="${x0 - GAP}" y="${y0 - GAP}" width="${totalW + GAP * 2}" height="${GAP * 2.4}"
-            fill="#000" opacity="${pale ? 0.12 : 0.3}"/>
+      ${band(0, EDGE, "url(#edgeShade)")}
     </g>
   </g>
 
@@ -1947,9 +1923,7 @@
     detail: "plain",
     finish: "steel",
     size: "standard",
-    handing: "right-in",
-    view: "out"
-    // camera, not a product choice
+    handing: "right-in"
   };
   function toQuery(state2) {
     const p = new URLSearchParams();
@@ -1962,7 +1936,6 @@
     p.set("f", state2.finish);
     p.set("s", state2.size);
     p.set("h", state2.handing);
-    if (state2.view === "in") p.set("i", "1");
     return "?" + p.toString();
   }
   function fromQuery(search) {
@@ -1989,7 +1962,6 @@
     take("detail", "d", DETAILS);
     take("finish", "f", FINISHES);
     take("handing", "h", HANDINGS);
-    if (p.get("i") === "1") state2.view = "in";
     const rawSize = p.get("s");
     if (rawSize != null) {
       if (SIZES[rawSize]) state2.size = rawSize;
@@ -2067,8 +2039,7 @@
       grille: grille.id,
       handle: handle.id,
       detail: detail.id,
-      finish: finish.id,
-      view: "out"
+      finish: finish.id
     };
   }
 
@@ -2185,7 +2156,6 @@
       (id) => set({ size: id })
     );
     buildHandings();
-    buildViews();
     if (PLACEHOLDER) $("#placeholder-note").hidden = false;
     if (notice) showNotice(notice);
     $("#copy-btn").addEventListener("click", onCopy);
@@ -2256,22 +2226,6 @@
     }
     set({ grille: id });
   }
-  function buildViews() {
-    const wrap = $("#views");
-    wrap.setAttribute("role", "radiogroup");
-    wrap.setAttribute("aria-label", "צד הדלת");
-    VIEWS.forEach((v) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "pill pill--view";
-      b.dataset.id = v.id;
-      b.setAttribute("role", "radio");
-      b.textContent = v.he;
-      b.addEventListener("click", () => set({ view: v.id }));
-      wrap.appendChild(b);
-    });
-    keyboardGrid(wrap, (id) => set({ view: id }));
-  }
   function keyboardGrid(wrap, choose) {
     wrap.addEventListener("keydown", (e) => {
       const items = [...wrap.querySelectorAll('[role="radio"]')];
@@ -2337,7 +2291,6 @@
     markSelected("#finishes", state.finish);
     markSelected("#sizes", state.size);
     markSelected("#handings", state.handing);
-    markSelected("#views", state.view);
     gateGrilles(byId(WINDOWS, state.window));
     $("#wa-btn").href = whatsappUrl(state);
     announce(describe(state));

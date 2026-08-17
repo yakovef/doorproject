@@ -2,7 +2,7 @@
  * Wiring. Small on purpose — the state is three keys.
  */
 
-import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, PLACEHOLDER, SIZES, VIEWS, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, PLACEHOLDER, SIZES, WINDOWS } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import { describe, detailGlyph, finishGlyph, grilleGlyph, handleGlyph, render, sizeGlyph, windowGlyph } from './renderer.js';
 import { copyMessage, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
@@ -33,7 +33,6 @@ function init() {
   buildTiles('#sizes', Object.values(SIZES), 'מידה', z => sizeGlyph(z), z => z.he,
              z => z.base - SIZES.standard.base, id => set({ size: id }));
   buildHandings();
-  buildViews();
   if (PLACEHOLDER) $('#placeholder-note').hidden = false;
   if (notice) showNotice(notice);
 
@@ -122,22 +121,6 @@ function chooseGrille(id) {
   set({ grille: id });
 }
 
-function buildViews() {
-  const wrap = $('#views');
-  wrap.setAttribute('role', 'radiogroup');
-  wrap.setAttribute('aria-label', 'צד הדלת');
-  VIEWS.forEach(v => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'pill pill--view';
-    b.dataset.id = v.id;
-    b.setAttribute('role', 'radio');
-    b.textContent = v.he;
-    b.addEventListener('click', () => set({ view: v.id }));
-    wrap.appendChild(b);
-  });
-  keyboardGrid(wrap, id => set({ view: id }));
-}
 
 /** Arrow-key navigation with roving tabindex, per PLAN.md §14. */
 function keyboardGrid(wrap, choose) {
@@ -218,7 +201,6 @@ function paint() {
   markSelected('#finishes', state.finish);
   markSelected('#sizes', state.size);
   markSelected('#handings', state.handing);
-  markSelected('#views', state.view);
 
   gateGrilles(byId(WINDOWS, state.window));
 
