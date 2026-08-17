@@ -28,7 +28,15 @@
     { id: "ral-7022", ral: "7022", hex: "#4C4A43", he: "אפור אומברה", en: "Umbra grey", delta: 0 },
     { id: "ral-8019", ral: "8019", hex: "#6B6362", he: "חום אפרפר", en: "Grey brown", delta: 25e3 },
     { id: "ral-7036", ral: "7036", hex: "#817373", he: "אפור פלטינה", en: "Platinum grey", delta: 0 },
-    { id: "ral-1035", ral: "1035", hex: "#9A8776", he: "בז' פנינה", en: "Pearl beige", delta: 25e3 }
+    { id: "ral-1035", ral: "1035", hex: "#9A8776", he: "בז' פנינה", en: "Pearl beige", delta: 25e3 },
+    /* Two more the recreations demanded. d092's leaf is a muted sage-teal
+       #678184 and nothing we owned was within reach of it — the nearest was a
+       mauve-brown, which is not the same colour family, let alone the same
+       colour. d016 and d078 both sit in a cool mid grey (#969AA3, #666A6D)
+       between RAL 7024 and 7035, a gap wide enough that neither recreation
+       could be honest about its paint. */
+    { id: "ral-7033", ral: "7033", hex: "#678184", he: "ירוק מרווה", en: "Sage green", delta: 25e3 },
+    { id: "ral-7046", ral: "7046", hex: "#7E858C", he: "אפור פלדה", en: "Slate grey", delta: 0 }
   ];
   var WINDOWS = [
     { id: "none", he: "ללא חלון", en: "Solid", delta: 0, rects: [] },
@@ -903,8 +911,8 @@
   }
   function raisedPanel(lx, ly, lw, lh, paint2, winBottom) {
     const inset = 105;
-    const top = Math.max(ly + lh * 0.6, winBottom + 70);
-    const bottom = ly + lh - 120;
+    const top = Math.max(ly + lh * 0.7, winBottom + 70);
+    const bottom = ly + lh - 85;
     const h = bottom - top;
     if (h < 300) return "";
     const x = lx + inset, w = lw - inset * 2;
@@ -1026,15 +1034,25 @@
       return out.join("");
     }
     if (kind === "scroll") {
-      const cx = x + w / 2, cy = y + h / 2, r = Math.min(w, h) * 0.3;
-      return [
-        bar(cx, y, cx, y + h, 10),
-        bar(x, cy, x + w, cy, 10),
-        `<circle cx="${cx + 3}" cy="${cy + 3}" r="${r}" fill="none" stroke="#000"
-               stroke-opacity="0.35" stroke-width="10"/>`,
-        `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#232527" stroke-width="10"/>`,
-        `<circle cx="${cx}" cy="${cy}" r="${r * 0.45}" fill="none" stroke="#232527" stroke-width="8"/>`
-      ].join("");
+      const out = [];
+      const n = Math.max(3, Math.round(w / 95));
+      for (let i = 1; i < n; i++) out.push(bar(x + w * i / n, y, x + w * i / n, y + h, 9));
+      const scroll = (cx, cy, rr2) => {
+        const d = `M ${cx - rr2} ${cy} a ${rr2 * 0.5} ${rr2 * 0.5} 0 1 1 ${rr2} 0
+                 a ${rr2 * 0.5} ${rr2 * 0.5} 0 1 0 ${rr2} 0`;
+        return `<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.3"
+                    stroke-width="8" transform="translate(3 3)"/>
+              <path d="${d}" fill="none" stroke="#232527" stroke-width="8"/>
+              <path d="${d}" fill="none" stroke="#8A8F94" stroke-opacity="0.35"
+                    stroke-width="2.5" transform="translate(-1.5 -1.5)"/>`;
+      };
+      const rr = Math.min(w / (n * 1.6), h * 0.055);
+      for (const t of [0.22, 0.5, 0.78]) {
+        const cy = y + h * t;
+        out.push(bar(x, cy, x + w, cy, 8));
+        for (let i = 0; i < n; i++) out.push(scroll(x + w * (i + 0.5) / n, cy, rr));
+      }
+      return out.join("");
     }
     return "";
   }

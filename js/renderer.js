@@ -804,9 +804,14 @@ function bevel(x, y, w, h, d, paint, raised = true) {
  * Returns '' when there is no room, so the two can never collide.
  */
 function raisedPanel(lx, ly, lw, lh, paint, winBottom) {
+  /* The panel was starting at 0.60 of the leaf and running to 0.94 — a third
+     of the whole door. On d092 and d116 the real panel sits in the bottom
+     quarter, about 0.72 to 0.96, and is the smaller partner to the glazing
+     rather than its equal. A panel that big reads as a flush-panel interior
+     door, not an entrance door with a light over a panel. */
   const inset = 105;
-  const top = Math.max(ly + lh * 0.60, winBottom + 70);
-  const bottom = ly + lh - 120;
+  const top = Math.max(ly + lh * 0.70, winBottom + 70);
+  const bottom = ly + lh - 85;
   const h = bottom - top;
   if (h < 300) return '';                       // no room below the glazing
   const x = lx + inset, w = lw - inset * 2;
@@ -979,15 +984,34 @@ function grillePaths(kind, x, y, w, h) {
     for (let gy = y + step; gy < y + h - 1; gy += step) out.push(bar(x, gy, x + w, gy, 9));
     return out.join('');
   }
+  /* Scrollwork. It used to be one circle and a cross, which beside d092 is not
+     ornamental ironwork — it is a gunsight. The real thing is DENSE: a comb of
+     vertical bars running the height of the pane, with S-scrolls and C-scrolls
+     worked between them in bands. What reads as "wrought iron" at a glance is
+     the density and the curvature, not any one motif, so this draws a full
+     comb and three bands of scrolls rather than one big emblem. */
   if (kind === 'scroll') {
-    const cx = x + w / 2, cy = y + h / 2, r = Math.min(w, h) * 0.3;
-    return [
-      bar(cx, y, cx, y + h, 10), bar(x, cy, x + w, cy, 10),
-      `<circle cx="${cx + 3}" cy="${cy + 3}" r="${r}" fill="none" stroke="#000"
-               stroke-opacity="0.35" stroke-width="10"/>`,
-      `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#232527" stroke-width="10"/>`,
-      `<circle cx="${cx}" cy="${cy}" r="${r * 0.45}" fill="none" stroke="#232527" stroke-width="8"/>`,
-    ].join('');
+    const out = [];
+    const n = Math.max(3, Math.round(w / 95));           // the comb
+    for (let i = 1; i < n; i++) out.push(bar(x + (w * i) / n, y, x + (w * i) / n, y + h, 9));
+
+    // an S-scroll drawn as two opposed arcs, with its own drop shadow
+    const scroll = (cx, cy, rr) => {
+      const d = `M ${cx - rr} ${cy} a ${rr * 0.5} ${rr * 0.5} 0 1 1 ${rr} 0
+                 a ${rr * 0.5} ${rr * 0.5} 0 1 0 ${rr} 0`;
+      return `<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.3"
+                    stroke-width="8" transform="translate(3 3)"/>
+              <path d="${d}" fill="none" stroke="#232527" stroke-width="8"/>
+              <path d="${d}" fill="none" stroke="#8A8F94" stroke-opacity="0.35"
+                    stroke-width="2.5" transform="translate(-1.5 -1.5)"/>`;
+    };
+    const rr = Math.min(w / (n * 1.6), h * 0.055);
+    for (const t of [0.22, 0.5, 0.78]) {
+      const cy = y + h * t;
+      out.push(bar(x, cy, x + w, cy, 8));
+      for (let i = 0; i < n; i++) out.push(scroll(x + (w * (i + 0.5)) / n, cy, rr));
+    }
+    return out.join('');
   }
   return '';
 }

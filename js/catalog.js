@@ -56,6 +56,14 @@ export const COLOURS = [
   { id: 'ral-8019', ral: '8019', hex: '#6B6362', he: 'חום אפרפר',    en: 'Grey brown',      delta: 25000 },
   { id: 'ral-7036', ral: '7036', hex: '#817373', he: 'אפור פלטינה',  en: 'Platinum grey',   delta: 0 },
   { id: 'ral-1035', ral: '1035', hex: '#9A8776', he: 'בז' + "'" + ' פנינה',   en: 'Pearl beige',     delta: 25000 },
+  /* Two more the recreations demanded. d092's leaf is a muted sage-teal
+     #678184 and nothing we owned was within reach of it — the nearest was a
+     mauve-brown, which is not the same colour family, let alone the same
+     colour. d016 and d078 both sit in a cool mid grey (#969AA3, #666A6D)
+     between RAL 7024 and 7035, a gap wide enough that neither recreation
+     could be honest about its paint. */
+  { id: 'ral-7033', ral: '7033', hex: '#678184', he: 'ירוק מרווה',  en: 'Sage green',      delta: 25000 },
+  { id: 'ral-7046', ral: '7046', hex: '#7E858C', he: 'אפור פלדה',   en: 'Slate grey',      delta: 0 },
 ];
 
 /**
