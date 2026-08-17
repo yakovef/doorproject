@@ -22,11 +22,11 @@
   ];
   var WINDOWS = [
     { id: "none", he: "ללא חלון", en: "Solid", delta: 0, rects: [] },
-    { id: "square", he: "חלון מרובע", en: "Square", delta: 45e3, rects: [{ w: 260, h: 260, top: 520 }] },
-    { id: "rect", he: "חלון מלבני", en: "Rectangular", delta: 62e3, rects: [{ w: 420, h: 560, top: 470 }] },
-    { id: "strip", he: "צוהר אנכי", en: "Vertical slot", delta: 58e3, rects: [{ w: 190, h: 1e3, top: 430 }] },
-    { id: "duo", he: "שני חלונות", en: "Two lights", delta: 74e3, rects: [{ w: 200, h: 220, top: 520, dx: -150 }, { w: 200, h: 220, top: 520, dx: 150 }] },
-    { id: "tallwin", he: "חלון גבוה", en: "Tall light", delta: 88e3, rects: [{ w: 340, h: 1180, top: 400 }] }
+    { id: "square", he: "חלון מרובע", en: "Square", delta: 45e3, rects: [{ w: 270, h: 270, top: 300 }] },
+    { id: "rect", he: "חלון מלבני", en: "Rectangular", delta: 62e3, rects: [{ w: 360, h: 740, top: 265 }] },
+    { id: "strip", he: "צוהר אנכי", en: "Vertical slot", delta: 58e3, rects: [{ w: 190, h: 900, top: 220 }] },
+    { id: "duo", he: "שני חלונות", en: "Two lights", delta: 74e3, rects: [{ w: 200, h: 230, top: 300, dx: -150 }, { w: 200, h: 230, top: 300, dx: 150 }] },
+    { id: "tallwin", he: "חלון גבוה", en: "Tall light", delta: 88e3, rects: [{ w: 357, h: 1025, top: 175 }] }
   ];
   var HANDLES = [
     /* Levers and locksets */
@@ -222,10 +222,11 @@
     light: { peak: 0.1, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.02, drift: 0.14 }
   };
   var CASING = 46;
-  var RET_NEAR = 32;
-  var RET_FAR = 10;
-  var RET_HEAD = 60;
+  var RET_NEAR = 25;
+  var RET_FAR = 6;
+  var RET_HEAD = 51;
   var MULLION = 46;
+  var REBATE = 50;
   var GAP = 10;
   var BEAD = 6;
   var QUIRK = 12;
@@ -270,8 +271,8 @@
     const finish = byId(FINISHES, state2.finish);
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const inside = state2.view === "in";
-    const leafW = size.w, leafH = size.h;
-    const sideW = size.side || 0;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
     const x0 = PAD.x + CASING + RET_NEAR;
     const x1 = x0 + totalW;

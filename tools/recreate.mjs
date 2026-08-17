@@ -16,13 +16,13 @@ import jpeg from 'jpeg-js';
    is close the gap is the finding, and it is named here rather than hidden. */
 const CASES = [
   { id: 'd003', label: 'basic ₪3,195',
-    q: 'c=ral-7024&w=none&g=none&n=plate&d=plain&f=brass&s=standard&h=left-in',
+    q: 'c=ral-7024&w=none&g=none&n=plate&d=plain&f=brass&s=standard&h=right-in',
     gap: 'leaf #59564F is a warm mid grey; nearest we own is RAL 7024 #474A51, darker and cooler' },
   { id: 'd063', label: 'designed ₪5,200',
-    q: 'c=ral-7024&w=none&g=none&n=idan&d=groove&f=steel&s=standard&h=left-in',
+    q: 'c=ral-7024&w=none&g=none&n=idan&d=groove&f=steel&s=standard&h=right-in',
     gap: 'leaf #817373 is a warm taupe; the catalogue has nothing between #474A51 and #C5C7C4' },
   { id: 'd116', label: 'luxury ₪13,900',
-    q: 'c=ral-7035&w=tallwin&g=lattice&n=coral&d=panel&f=steel&s=standard&h=left-in',
+    q: 'c=ral-7035&w=tallwin&g=lattice&n=coral&d=panel&f=steel&s=half&h=left-in',
     gap: 'leaf #B7B1A6 is warm off-white; RAL 7035 #C5C7C4 is cooler and lighter' },
 ];
 

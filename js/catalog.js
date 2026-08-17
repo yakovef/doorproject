@@ -51,14 +51,21 @@ export const COLOURS = [
 /**
  * Window openings. `rects` are in mm, centred on the leaf unless `dx` shifts
  * them, measured from the top of the leaf. An empty list means a solid door.
+ *
+ * Retuned against the ten glazed doors in research/works/data2. Every one puts
+ * the glass markedly higher than we did — median top 0.085 of leaf height
+ * against our 0.20-0.23 — and the median opening is 0.42 of leaf width by 0.50
+ * of its height. `tallwin` was 0.58 tall, which on the corrected (slimmer)
+ * leaf also left the lower panel 20 mm short of the room it needs, so the
+ * renderer silently dropped the panel on every tallwin + panel combination.
  */
 export const WINDOWS = [
   { id: 'none',   he: 'ללא חלון',       en: 'Solid',            delta: 0,      rects: [] },
-  { id: 'square', he: 'חלון מרובע',     en: 'Square',           delta: 45000,  rects: [{ w: 260, h: 260, top: 520 }] },
-  { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular',      delta: 62000,  rects: [{ w: 420, h: 560, top: 470 }] },
-  { id: 'strip',  he: 'צוהר אנכי',      en: 'Vertical slot',    delta: 58000,  rects: [{ w: 190, h: 1000, top: 430 }] },
-  { id: 'duo',    he: 'שני חלונות',     en: 'Two lights',       delta: 74000,  rects: [{ w: 200, h: 220, top: 520, dx: -150 }, { w: 200, h: 220, top: 520, dx: 150 }] },
-  { id: 'tallwin',he: 'חלון גבוה',      en: 'Tall light',       delta: 88000,  rects: [{ w: 340, h: 1180, top: 400 }] },
+  { id: 'square', he: 'חלון מרובע',     en: 'Square',           delta: 45000,  rects: [{ w: 270, h: 270, top: 300 }] },
+  { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular',      delta: 62000,  rects: [{ w: 360, h: 740, top: 265 }] },
+  { id: 'strip',  he: 'צוהר אנכי',      en: 'Vertical slot',    delta: 58000,  rects: [{ w: 190, h: 900, top: 220 }] },
+  { id: 'duo',    he: 'שני חלונות',     en: 'Two lights',       delta: 74000,  rects: [{ w: 200, h: 230, top: 300, dx: -150 }, { w: 200, h: 230, top: 300, dx: 150 }] },
+  { id: 'tallwin',he: 'חלון גבוה',      en: 'Tall light',       delta: 88000,  rects: [{ w: 357, h: 1025, top: 175 }] },
 ];
 
 /**

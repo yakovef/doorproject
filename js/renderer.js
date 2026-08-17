@@ -81,10 +81,11 @@ const FALLOFF = {
    (REALISM.md §1) — but the far return is now nearly nothing, which is what
    an almost-square-on view actually shows. */
 const CASING   = 46;   // flat frame face against the wall
-const RET_NEAR = 32;   // visible return, camera side (wide)
-const RET_FAR  = 10;   // visible return, far side — nearly edge-on
-const RET_HEAD = 60;   // visible return under the head — the deepest of the three
+const RET_NEAR = 25;   // visible return, camera side (wide)
+const RET_FAR  = 6;   // visible return, far side — nearly edge-on
+const RET_HEAD = 51;   // visible return under the head — the deepest of the three
 const MULLION  = 46;
+const REBATE   = 50;   // frame rebate: how far the leaf sits inside the opening
 
 /* The reveal profile, read outward from the leaf. Every works photograph has
    these three bands and the renderer had none of them: it went straight from
@@ -157,8 +158,16 @@ export function render(state) {
   const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
   const inside  = state.view === 'in';
 
-  const leafW = size.w, leafH = size.h;
-  const sideW = size.side || 0;
+  /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
+     as the same thing, which made every door too squat: measured across the 20
+     works photographs square-on enough to trust, a real leaf runs h/w 2.44
+     (1.96 to 2.82), and ours was 2.21 — more slender than us in 18 of 20.
+     A steel frame rebates the leaf inside the opening on both jambs and at the
+     head, and stops at the floor. 950 x 2100 opening less that rebate is
+     850 x 2050, which is 2.41. The band names and prices are untouched: no
+     millimetre in SIZES is ever shown to a customer, only 'סטנדרטית'. */
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const sideW = size.side ? size.side - REBATE : 0;
   const totalW = leafW + (sideW ? sideW + MULLION : 0);
 
   // Left edge of the leaf opening; returns and casing sit outside it.

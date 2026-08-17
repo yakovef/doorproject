@@ -10,6 +10,14 @@
  * Tones are luminance ÷ the leaf's own midpoint luminance, exactly as the
  * agents computed them, so a dark door and a white one are comparable.
  *
+ * CAVEAT on the width readings. The scan walks outward until the tone climbs
+ * back to 0.97 of the leaf, which on the FAR jamb and under the HEAD runs
+ * straight through the casing's own 0.13 darkening overlay and keeps going.
+ * So far_w and head_w read wide and are not worth tuning against; near_w is
+ * clean. The widths that matter are the constructed ones, and as of the
+ * rebate change they are near 0.062, far 0.040, head 0.093 of leaf width,
+ * against photographic 0.045-0.067, 0.031-0.038 and 0.093.
+ *
  * Run: npm run frame
  */
 import { readFileSync, readdirSync } from 'node:fs';
