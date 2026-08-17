@@ -495,9 +495,15 @@
          light; the near one turns away from it. Averaging them, as a single
          shared ramp does, loses the only thing that says which way the door
          is facing. -->
+    <!-- These three were black at 0.30-0.64 laid over the paint, and at
+         drawing scale that is exactly what they looked like: half-transparent
+         black rectangles sitting on top of a door, not surfaces turning away
+         from the light. A shaded plane is the SAME PAINT with less light on
+         it, so each stop is now a darkened version of the leaf colour at full
+         opacity. Same tones, no film. -->
     <linearGradient id="retNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.2 : 0.42}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.34 : 0.64}"/>
+      <stop offset="0" stop-color="${darken(paint2, pale ? 0.2 : 0.34)}"/>
+      <stop offset="1" stop-color="${darken(paint2, pale ? 0.34 : 0.52)}"/>
     </linearGradient>
     /* I had this jamb sunlit — brighter than the leaf — because the green
        door's photographs show it that way, caught square-on by the afternoon
@@ -510,33 +516,13 @@
        back toward the light. Same family as the near jamb, two thirds the
        depth. */
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.13 : 0.28}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.23 : 0.44}"/>
+      <stop offset="0" stop-color="${darken(paint2, pale ? 0.13 : 0.22)}"/>
+      <stop offset="1" stop-color="${darken(paint2, pale ? 0.23 : 0.38)}"/>
     </linearGradient>
-
-    <!-- Both returns had a horizontal ramp and no vertical one at all, so a
-         reveal was equally bright at the head and at the floor. The
-         photographs are emphatic that it is not: a dark leaf's reveal runs
-         0.79 at the head to 0.45 at the foot, a pale one 0.85 to 0.78. That
-         is what made the two demands here look contradictory — the near
-         reveal needed to be brighter at the top AND darker at mid-height, and
-         no purely horizontal gradient can do both. -->
-    <!-- The soffit. There was no plane here at all — the area above the leaf
-         was flat paint between the two jamb rects, which is why the top of
-         the opening had tone but no shape. Seen from below it recedes: the
-         outer edge, next to the wall, still catches sky, and it deepens the
-         whole way back to the leaf. That fall is what tells you it is a
-         horizontal surface overhead rather than more wall. -->
-    <!-- The junction ramp. Darkest against the leaf, recovering outward. -->
-    <linearGradient id="edgeShade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.16 : 0.24}"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.26 : 0.4}"/>
-    </linearGradient>
-
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"   stop-color="#fff" stop-opacity="${pale ? 0.1 : 0.16}"/>
-      <stop offset="0.3" stop-color="#000" stop-opacity="${pale ? 0.1 : 0.2}"/>
-      <stop offset="1"   stop-color="#000" stop-opacity="${pale ? 0.3 : 0.56}"/>
+      <stop offset="0"   stop-color="${lighten(paint2, 0.06)}"/>
+      <stop offset="0.3" stop-color="${darken(paint2, pale ? 0.12 : 0.2)}"/>
+      <stop offset="1"   stop-color="${darken(paint2, pale ? 0.3 : 0.48)}"/>
     </linearGradient>
 
     <linearGradient id="revealFall" x1="0" y1="0" x2="0" y2="1">
@@ -849,13 +835,9 @@
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint2}"/>
     <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retNear)"/>
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#revealFall)"/>
 
     <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
           height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint2}"/>
-    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#revealFall)"/>
     <!-- The sunlit jamb's highlight goes on LAST. Painted before the vertical
          fall, the fall simply covered it and the plane came out as dark as its
          opposite number, which is the whole reason the opening read flat. -->
