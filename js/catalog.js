@@ -120,6 +120,11 @@ export const HANDLES = [
   { id: 'almog',   he: 'אלמוג',  en: 'Almog',  delta: 16000, len: 0, style: 'almog' },
   { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  delta: 6000,  len: 0, style: 'sapir' },
   { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', delta: -4000, len: 0, style: 'cadoor' },
+  /* Knob on a long backplate — the bronze fitting on d092, named three times
+     across the luxury tier. A different object from a knob on a rose: the
+     plate carries the keyway too, so it locks like the Rotem backplate. */
+  { id: 'knobplate', he: 'כדור על אורך', en: 'Knob on backplate', delta: 22000, len: 0,
+    style: 'knobplate', lock: true },
 
   /* Pull bars, in the manufacturer's own range. `bar` selects the section,
      fixings and tone profile; see BARS in the renderer. Lengths sit inside the

@@ -70,6 +70,18 @@
     { id: "almog", he: "אלמוג", en: "Almog", delta: 16e3, len: 0, style: "almog" },
     { id: "sapir", he: "ספיר", en: "Sapir", delta: 6e3, len: 0, style: "sapir" },
     { id: "cadoor", he: "כדור", en: "Cadoor", delta: -4e3, len: 0, style: "cadoor" },
+    /* Knob on a long backplate — the bronze fitting on d092, named three times
+       across the luxury tier. A different object from a knob on a rose: the
+       plate carries the keyway too, so it locks like the Rotem backplate. */
+    {
+      id: "knobplate",
+      he: "כדור על אורך",
+      en: "Knob on backplate",
+      delta: 22e3,
+      len: 0,
+      style: "knobplate",
+      lock: true
+    },
     /* Pull bars, in the manufacturer's own range. `bar` selects the section,
        fixings and tone profile; see BARS in the renderer. Lengths sit inside the
        0.38-0.55 of leaf height that the installed doors measure, and the
@@ -851,6 +863,19 @@
           height="${THRESHOLD}" fill="${darken(paint2, 0.3)}"/>
     <rect x="${x0 - RET_NEAR}" y="${floorY}" width="${totalW + RET_NEAR + RET_FAR}"
           height="4" fill="#fff" opacity="0.18"/>
+    <!-- Ribbed, because every sill in the photographs is: an extruded
+         aluminium threshold with four or five flutes running its length,
+         each catching a line of light. One flat bar reads as a painted
+         step. -->
+    ${Array.from({ length: 4 }, (_, i) => {
+      const ry = floorY + 7 + i * ((THRESHOLD - 9) / 4);
+      return `<rect x="${x0 - RET_NEAR + 4}" y="${ry}"
+                    width="${totalW + RET_NEAR + RET_FAR - 8}" height="2"
+                    fill="#000" opacity="0.30"/>
+              <rect x="${x0 - RET_NEAR + 4}" y="${ry + 2}"
+                    width="${totalW + RET_NEAR + RET_FAR - 8}" height="1.4"
+                    fill="#fff" opacity="0.22"/>`;
+    }).join("")}
   </g>
 
   ${sideW ? `<g id="side-leaf">${leaf(sideX, sideW)}${win.rects[0] && sideW > 320 ? aperture({
@@ -913,7 +938,9 @@
   function bevel(x, y, w, h, d, paint2, raised = true) {
     const lit = raised ? lighten(paint2, 0.3) : darken(paint2, 0.46);
     const dark = raised ? darken(paint2, 0.46) : lighten(paint2, 0.24);
-    return `
+    const d2 = Math.max(2, Math.round(d * 0.34));
+    const inner = d > 12 ? bevel(x + d, y + d, w - d * 2, h - d * 2, d2, paint2, !raised) : "";
+    return inner + `
       <path d="M ${x} ${y + h} L ${x} ${y} L ${x + w} ${y}
                L ${x + w - d} ${y + d} L ${x + d} ${y + d} L ${x + d} ${y + h - d} Z"
             fill="${lit}"/>
@@ -1052,6 +1079,17 @@
       const out = [];
       for (let gx = x + step2; gx < x + w - 1; gx += step2) out.push(bar(gx, y, gx, y + h, 9));
       for (let gy = y + step2; gy < y + h - 1; gy += step2) out.push(bar(x, gy, x + w, gy, 9));
+      const rr = Math.min(w * 0.3, h * 0.075);
+      for (const t of [0.2, 0.8]) {
+        const cy2 = y + h * t, cx2 = x + w / 2;
+        const d = `M ${cx2 - rr * 2} ${cy2} a ${rr} ${rr} 0 1 1 ${rr * 2} 0
+                 a ${rr} ${rr} 0 1 0 ${rr * 2} 0`;
+        out.push(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28"
+                      stroke-width="9" transform="translate(3 3)"/>
+                <path d="${d}" fill="none" stroke="${body}" stroke-width="9"/>
+                <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.4"
+                      stroke-width="3" transform="translate(-1.5 -1.5)"/>`);
+      }
       return out.join("");
     }
     if (kind === "scroll") {
@@ -1117,6 +1155,7 @@
     lever: (h, g) => lever(g.cx, g.cy, g.dir),
     almog: (h, g) => almogLever(g.cx, g.cy, g.dir),
     cadoor: (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
+    knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir, g.inside),
     sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir, g.inside),
     luna: (h, g) => lunaPull(g.cx, g.cy, g.dir),
     shiran: (h, g) => shiranPull(g.cx, g.cy, g.leafH)
@@ -1406,6 +1445,32 @@
             fill="#000" opacity="0.34"/>
     </g>`;
   }
+  function knobPlate(cx, cy, dir, inside) {
+    const W = 96, H = 300, r = 30;
+    const x = cx - W / 2, y = cy - H * 0.34;
+    const d = `M ${x} ${y + r} Q ${x} ${y} ${x + W / 2} ${y} Q ${x + W} ${y} ${x + W} ${y + r}
+             L ${x + W} ${y + H - r} Q ${x + W} ${y + H} ${x + W / 2} ${y + H}
+             Q ${x} ${y + H} ${x} ${y + H - r} Z`;
+    return `
+    <g data-hw="handle" data-style="knobplate">
+      <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
+            filter="url(#hwShadow)"/>
+      <path d="${d}" fill="url(#metal)"/>
+      <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2"
+            vector-effect="non-scaling-stroke"/>
+      <!-- the knob, standing off the plate -->
+      <ellipse cx="${cx}" cy="${cy + 6}" rx="30" ry="27" fill="#000" opacity="0.30"/>
+      <circle cx="${cx}" cy="${cy}" r="29" fill="url(#metal)"/>
+      <circle cx="${cx - 8}" cy="${cy - 9}" r="11" fill="#fff" opacity="0.30"/>
+      <circle cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#000"
+              stroke-opacity="0.28" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      <!-- and the keyway low on the same plate, which is the point of it.
+           Street face only: from indoors this fitting shows a thumbturn, and
+           drawing a keyhole there would say the door locks with a key from
+           the inside, which it does not. -->
+      ${inside ? "" : keyway(cx, y + H * 0.78)}
+    </g>`;
+  }
   function cadoorKnob(cx, cy, dir) {
     const rx = 34, ry = 40;
     const tilt = -11.8 * dir;
@@ -1543,7 +1608,7 @@
     const L = LEVER_REACH;
     const at = (t) => cx + dir * t;
     return `
-    <g>
+    <g transform="rotate(${dir * 12} ${cx} ${cy})">
       <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
                Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
                Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}
@@ -1653,6 +1718,19 @@
     return `
     <g data-hw="lock" data-kind="cylinder" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       ${disc(cx, cy, R)}
+      <!-- The escutcheon is DOMED, not a flat plate. On d026 and d030 it is
+           plainly a little hemisphere standing off the door with a highlight
+           up its top-left and a crescent of shade under it; drawn flat it
+           reads as a sticker. -->
+      <ellipse cx="${cx}" cy="${cy + R * 0.16}" rx="${R * 0.92}" ry="${R * 0.86}"
+               fill="#000" opacity="0.16"/>
+      <radialGradient id="dome-${Math.round(cx)}-${Math.round(cy)}" cx="0.36" cy="0.30" r="0.78">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.42"/>
+        <stop offset="0.55" stop-color="#fff" stop-opacity="0.05"/>
+        <stop offset="1"    stop-color="#000" stop-opacity="0.22"/>
+      </radialGradient>
+      <circle cx="${cx}" cy="${cy}" r="${R * 0.9}"
+              fill="url(#dome-${Math.round(cx)}-${Math.round(cy)})"/>
 
       <!-- the euro cylinder is recessed into the escutcheon, so its opening
            is occluded at the top and catches a little bounce at the bottom -->

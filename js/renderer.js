@@ -762,6 +762,19 @@ export function render(state) {
           height="${THRESHOLD}" fill="${darken(paint, 0.30)}"/>
     <rect x="${x0 - RET_NEAR}" y="${floorY}" width="${totalW + RET_NEAR + RET_FAR}"
           height="4" fill="#fff" opacity="0.18"/>
+    <!-- Ribbed, because every sill in the photographs is: an extruded
+         aluminium threshold with four or five flutes running its length,
+         each catching a line of light. One flat bar reads as a painted
+         step. -->
+    ${Array.from({ length: 4 }, (_, i) => {
+      const ry = floorY + 7 + i * ((THRESHOLD - 9) / 4);
+      return `<rect x="${x0 - RET_NEAR + 4}" y="${ry}"
+                    width="${totalW + RET_NEAR + RET_FAR - 8}" height="2"
+                    fill="#000" opacity="0.30"/>
+              <rect x="${x0 - RET_NEAR + 4}" y="${ry + 2}"
+                    width="${totalW + RET_NEAR + RET_FAR - 8}" height="1.4"
+                    fill="#fff" opacity="0.22"/>`;
+    }).join('')}
   </g>
 
   ${sideW ? `<g id="side-leaf">${leaf(sideX, sideW)}${
@@ -811,9 +824,16 @@ export function render(state) {
  * One primitive, used by the panel, the groove and the window surround.
  */
 function bevel(x, y, w, h, d, paint, raised = true) {
+  /* A moulding is two planes, not one. A single chamfer of any width reads as
+     a bevelled hole; the references all show a bolection — an outer quirk
+     turning one way and an inner ovolo turning the other, which is what puts
+     the double line in the photographs. The inner plane runs at a third the
+     depth and inverts, so the shadow reverses across it. */
   const lit  = raised ? lighten(paint, 0.30) : darken(paint, 0.46);
   const dark = raised ? darken(paint, 0.46)  : lighten(paint, 0.24);
-  return `
+  const d2 = Math.max(2, Math.round(d * 0.34));
+  const inner = d > 12 ? bevel(x + d, y + d, w - d * 2, h - d * 2, d2, paint, !raised) : '';
+  return inner + `
       <path d="M ${x} ${y + h} L ${x} ${y} L ${x + w} ${y}
                L ${x + w - d} ${y + d} L ${x + d} ${y + d} L ${x + d} ${y + h - d} Z"
             fill="${lit}"/>
@@ -1035,6 +1055,20 @@ function grillePaths(kind, x, y, w, h, tint) {
     const out = [];
     for (let gx = x + step; gx < x + w - 1; gx += step) out.push(bar(gx, y, gx, y + h, 9));
     for (let gy = y + step; gy < y + h - 1; gy += step) out.push(bar(x, gy, x + w, gy, 9));
+    /* d097 sets an ornament into the grid at top and bottom — the mesh is the
+       field and the scroll is the event. A plain grid alone is a security
+       bar; the motif is what makes it a door someone chose. */
+    const rr = Math.min(w * 0.30, h * 0.075);
+    for (const t of [0.20, 0.80]) {
+      const cy2 = y + h * t, cx2 = x + w / 2;
+      const d = `M ${cx2 - rr * 2} ${cy2} a ${rr} ${rr} 0 1 1 ${rr * 2} 0
+                 a ${rr} ${rr} 0 1 0 ${rr * 2} 0`;
+      out.push(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28"
+                      stroke-width="9" transform="translate(3 3)"/>
+                <path d="${d}" fill="none" stroke="${body}" stroke-width="9"/>
+                <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.4"
+                      stroke-width="3" transform="translate(-1.5 -1.5)"/>`);
+    }
     return out.join('');
   }
   /* Scrollwork. It used to be one circle and a cross, which beside d092 is not
@@ -1121,6 +1155,7 @@ const HANDLE_ART = {
   lever:   (h, g) => lever(g.cx, g.cy, g.dir),
   almog:   (h, g) => almogLever(g.cx, g.cy, g.dir),
   cadoor:  (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
+  knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir, g.inside),
   sapir:   (h, g) => sapirKnob(g.cx, g.cy, g.dir, g.inside),
   luna:    (h, g) => lunaPull(g.cx, g.cy, g.dir),
   shiran:  (h, g) => shiranPull(g.cx, g.cy, g.leafH),
@@ -1487,6 +1522,42 @@ function almogLever(cx, cy, dir) {
  * diagonal terminator — a narrow specular a quarter of the way down falling
  * to near-black within a fifth of the height.
  */
+/**
+ * A knob on a long shaped backplate — the bronze fitting on d092, and named
+ * three times in the luxury tier's inventory.
+ *
+ * It is a different object from a knob on a rose, not a variant of one: the
+ * plate is tall and narrow with a shaped head and foot, it carries BOTH the
+ * knob and the keyway, and it stands proud enough to cast down the leaf. We
+ * were substituting a bare round knob, which loses the whole fitting.
+ */
+function knobPlate(cx, cy, dir, inside) {
+  const W = 96, H = 300, r = 30;
+  const x = cx - W / 2, y = cy - H * 0.34;
+  const d = `M ${x} ${y + r} Q ${x} ${y} ${x + W / 2} ${y} Q ${x + W} ${y} ${x + W} ${y + r}
+             L ${x + W} ${y + H - r} Q ${x + W} ${y + H} ${x + W / 2} ${y + H}
+             Q ${x} ${y + H} ${x} ${y + H - r} Z`;
+  return `
+    <g data-hw="handle" data-style="knobplate">
+      <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
+            filter="url(#hwShadow)"/>
+      <path d="${d}" fill="url(#metal)"/>
+      <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2"
+            vector-effect="non-scaling-stroke"/>
+      <!-- the knob, standing off the plate -->
+      <ellipse cx="${cx}" cy="${cy + 6}" rx="30" ry="27" fill="#000" opacity="0.30"/>
+      <circle cx="${cx}" cy="${cy}" r="29" fill="url(#metal)"/>
+      <circle cx="${cx - 8}" cy="${cy - 9}" r="11" fill="#fff" opacity="0.30"/>
+      <circle cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#000"
+              stroke-opacity="0.28" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      <!-- and the keyway low on the same plate, which is the point of it.
+           Street face only: from indoors this fitting shows a thumbturn, and
+           drawing a keyhole there would say the door locks with a key from
+           the inside, which it does not. -->
+      ${inside ? '' : keyway(cx, y + H * 0.78)}
+    </g>`;
+}
+
 function cadoorKnob(cx, cy, dir) {
   const rx = 34, ry = 40;                  // 68 x 80 mm, aspect 0.85
   const tilt = -11.8 * dir;
@@ -1677,10 +1748,15 @@ const disc = (cx, cy, r) => `
  * thing is built from the rosette outward so it cannot degenerate.
  */
 function lever(cx, cy, dir) {
+  /* Levers hang. Every one in the photographs sits nose-down by 10-15 degrees
+     — it is sprung to horizontal but the handle's own weight and the latch's
+     slack take it below, and a lever drawn dead level is the single clearest
+     tell that a door was drawn rather than photographed. Rotated about the
+     spindle so the rose stays put. */
   const L = LEVER_REACH;
   const at = t => cx + dir * t;               // distance along the lever
   return `
-    <g>
+    <g transform="rotate(${dir * 12} ${cx} ${cy})">
       <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
                Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
                Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}
@@ -1822,6 +1898,19 @@ const cylinder = (cx, cy) => {
   return `
     <g data-hw="lock" data-kind="cylinder" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       ${disc(cx, cy, R)}
+      <!-- The escutcheon is DOMED, not a flat plate. On d026 and d030 it is
+           plainly a little hemisphere standing off the door with a highlight
+           up its top-left and a crescent of shade under it; drawn flat it
+           reads as a sticker. -->
+      <ellipse cx="${cx}" cy="${cy + R * 0.16}" rx="${R * 0.92}" ry="${R * 0.86}"
+               fill="#000" opacity="0.16"/>
+      <radialGradient id="dome-${Math.round(cx)}-${Math.round(cy)}" cx="0.36" cy="0.30" r="0.78">
+        <stop offset="0"    stop-color="#fff" stop-opacity="0.42"/>
+        <stop offset="0.55" stop-color="#fff" stop-opacity="0.05"/>
+        <stop offset="1"    stop-color="#000" stop-opacity="0.22"/>
+      </radialGradient>
+      <circle cx="${cx}" cy="${cy}" r="${R * 0.9}"
+              fill="url(#dome-${Math.round(cx)}-${Math.round(cy)})"/>
 
       <!-- the euro cylinder is recessed into the escutcheon, so its opening
            is occluded at the top and catches a little bounce at the bottom -->
