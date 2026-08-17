@@ -536,17 +536,19 @@
       <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.2 : 0.42}"/>
       <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.34 : 0.64}"/>
     </linearGradient>
-    <!-- The far return is LIT, not less-shadowed. In the photographs the two
-         jambs are not two shades of one shadow: the near one falls away into
-         the dark and the far one takes the sun square-on and comes out
-         BRIGHTER than the leaf itself. We drew both as black at slightly
-         different strengths, which is why the opening read flat — a box needs
-         one plane in light and one in shade before it is a box. -->
+    /* I had this jamb sunlit — brighter than the leaf — because the green
+       door's photographs show it that way, caught square-on by the afternoon
+       sun. Reverted: a strongly lit plane on one side only reads as a light
+       source rather than a surface, and beside two shadowed planes it looks
+       like a mistake rather than like weather. The photograph is honest about
+       that one door at that one hour; a configurator has to hold for every
+       door at every hour, and the reading that survives both is three planes
+       all turning away into shade, the far one least deeply because it faces
+       back toward the light. Same family as the near jamb, two thirds the
+       depth. */
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0"    stop-color="#fff" stop-opacity="${pale ? 0.36 : 0.72}"/>
-      <stop offset="0.45" stop-color="#fff" stop-opacity="${pale ? 0.17 : 0.34}"/>
-      <stop offset="0.8"  stop-color="#000" stop-opacity="0.08"/>
-      <stop offset="1"    stop-color="#000" stop-opacity="${pale ? 0.2 : 0.34}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.13 : 0.28}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${pale ? 0.23 : 0.44}"/>
     </linearGradient>
 
     <!-- Both returns had a horizontal ramp and no vertical one at all, so a
@@ -909,7 +911,7 @@
           stroke="#000" stroke-opacity="0.34" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
     <path d="M ${x1 + RET_FAR} ${y0 - RET_HEAD} L ${x1} ${y0}" fill="none"
-          stroke="#fff" stroke-opacity="0.22" stroke-width="1.5"
+          stroke="#000" stroke-opacity="0.26" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
 
     <!-- ── the reveal: quirk, bead, gap, mitred at both top corners ── -->
