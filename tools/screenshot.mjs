@@ -16,23 +16,23 @@ import { chromium } from 'playwright';
 
 const SHOTS = [
   { name: 'phone',    w: 390,  h: 844, full: true,
-    q: '?c=rb-9016d&w=rect&g=lattice&n=idan&d=panel&f=steel&s=standard&h=right-in' },
+    q: '?c=rb-9016d&w=rect&g=lattice&n=idan&k=coral&d=panel&f=steel&s=standard&h=right-in' },
   { name: 'laptop',   w: 1280, h: 720,
-    q: '?c=rb-9005d&w=none&g=none&n=channel&d=groove&f=black&s=standard&h=right-in' },
+    q: '?c=rb-9005d&w=none&g=none&n=channel&k=plate&d=groove&f=black&s=standard&h=right-in' },
   { name: 'desktop',  w: 1680, h: 950,
-    q: '?c=rb-6459d&w=tallwin&g=grid&n=idan&d=panel&f=steel&s=standard&h=right-in' },
+    q: '?c=rb-6459d&w=tallwin&g=grid&n=idan&k=coral&d=panel&f=steel&s=standard&h=right-in' },
   { name: 'panel',    w: 1280, h: 720,
-    q: '?c=rb-rb09d&w=tallwin&g=bars&n=ella&d=both&f=brass&s=standard&h=right-in' },
+    q: '?c=rb-rb09d&w=tallwin&g=bars&n=ella&k=almog&d=both&f=brass&s=standard&h=right-in' },
   { name: 'grey',     w: 1280, h: 720,
-    q: '?c=rb-7110d&w=rect&g=lattice&n=coral&d=panel&f=steel&s=standard&h=right-in' },
+    q: '?c=rb-7110d&w=rect&g=lattice&n=none&k=coral&d=panel&f=steel&s=standard&h=right-in' },
   { name: 'plate',    w: 1280, h: 720,
-    q: '?c=rb-9016d&w=none&g=none&n=plate&d=plain&f=brass&s=standard&h=right-in' },
+    q: '?c=rb-9016d&w=none&g=none&n=none&k=plate&d=plain&f=brass&s=standard&h=right-in' },
   { name: 'strips',   w: 1280, h: 720,
-    q: '?c=rb-0097d&w=none&g=none&n=shiran&d=strips&f=black&s=standard&h=right-in' },
+    q: '?c=rb-0097d&w=none&g=none&n=shiran&k=cadoor&d=strips&f=black&s=standard&h=right-in' },
   { name: 'halfleaf', w: 1280, h: 720,
-    q: '?c=rb-9001d&w=duo&g=bars&n=nitzan&d=groove&f=steel&s=half&h=left-in' },
+    q: '?c=rb-9001d&w=duo&g=bars&n=nitzan&k=sapir&d=groove&f=steel&s=half&h=left-in' },
   { name: 'tablet',   w: 834,  h: 1112, full: true,
-    q: '?c=rb-2030d&w=strip&g=scroll&n=luna&d=panel2&f=brass&s=tall&h=left-in' },
+    q: '?c=rb-2030d&w=strip&g=scroll&n=none&k=knobplate&d=panel2&f=brass&s=tall&h=left-in' },
 ];
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });

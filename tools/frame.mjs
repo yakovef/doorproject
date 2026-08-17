@@ -73,7 +73,7 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 async function measure(colourId) {
   const p = await b.newPage({ viewport: { width: 700, height: 1000 }, deviceScaleFactor: 2 });
   await p.goto(`file://${process.cwd()}/index.html?bare=1&c=${colourId}`
-             + `&w=none&g=none&n=idan&d=plain&f=steel&s=standard&h=right-in`);
+             + `&w=none&g=none&n=idan&k=coral&d=plain&f=steel&s=standard&h=right-in`);
   await p.waitForTimeout(500);
 
   /* Ask the page where things are, rather than guessing from the viewBox: the

@@ -7,7 +7,7 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
 export function priceAgorot(state) {
@@ -27,6 +27,7 @@ export function priceAgorot(state) {
   const finish = effectiveFinish(state);
   let total = size.base + colour.delta + win.delta
             + handle.delta
+            + byId(LOCKSETS, state.lockset).delta
             + byId(DETAILS, state.detail).delta
             + (finish && !handle.finish ? finish.delta : 0);
   // A grille needs glazing to sit in, so it cannot be charged on a solid door.

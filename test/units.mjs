@@ -2,11 +2,12 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import {
-  detailGlyph, finishGlyph, grilleGlyph, handleGlyph, LIGHT, render, sizeGlyph, windowGlyph,
+  detailGlyph, finishGlyph, grilleGlyph, handleGlyph, LIGHT, locksetGlyph, render,
+  sizeGlyph, windowGlyph,
 } from '../js/renderer.js';
 import { decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 
@@ -16,22 +17,39 @@ const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
 const base = { colour: 'rb-0097d', window: 'none', grille: 'none', handle: 'idan',
-               detail: 'plain', finish: 'steel',
+               lockset: 'coral', detail: 'plain', finish: 'steel',
                size: 'standard', handing: 'right-in' };
 
-/** Every reachable design, for the exhaustive sweeps below. */
+/** The keys a design is made of, in one place, so a new one cannot be forgotten
+ *  by half the round-trip checks below. */
+const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle', 'lockset',
+              'detail', 'finish'];
+
+/**
+ * Every reachable design.
+ *
+ * ADDITIVE across the two hardware groups, not multiplicative: every grip
+ * against one lockset, then every lockset against one grip. The full
+ * cross-product is 642,600 designs and turns a suite that runs in seconds into
+ * one that runs in minutes, and it buys nothing for the checks below — none of
+ * them couples a grip to a lockset. The one thing that does couple them is the
+ * clearance between them, and that has its own exhaustive sweep further down.
+ */
 function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
-    for (const w of WINDOWS) for (const g of GRILLES) for (const n of HANDLES)
-      yield { colour: c.id, size: s, handing: h.id, window: w.id,
-              grille: g.id, handle: n.id, detail: 'plain', finish: 'steel' };
+    for (const w of WINDOWS) for (const g of GRILLES) {
+      const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
+                     detail: 'plain', finish: 'steel' };
+      for (const n of HANDLES) yield { ...stem, handle: n.id, lockset: 'coral' };
+      for (const k of LOCKSETS.slice(1)) yield { ...stem, handle: 'idan', lockset: k.id };
+    }
 }
 
 /** Every detail x finish x window combination, at one colour and size. */
 function* everyDetail() {
   for (const d of DETAILS) for (const f of FINISHES) for (const w of WINDOWS)
-    for (const n of HANDLES)
-      yield { ...base, detail: d.id, finish: f.id, window: w.id, handle: n.id };
+    for (const n of HANDLES) for (const k of LOCKSETS)
+      yield { ...base, detail: d.id, finish: f.id, window: w.id, handle: n.id, lockset: k.id };
 }
 
 // ── 1. Short code ─────────────────────────────────────────────────
@@ -42,10 +60,10 @@ group('short code round-trip');
   for (const st of everyState()) {
     const code = encodeCode(st);
     const back = decodeCode(code);
-    ok(back && ['colour', 'size', 'handing', 'window', 'grille', 'handle', 'detail', 'finish'].every(k => back[k] === st[k]),
+    ok(back && KEYS.every(k => back[k] === st[k]),
        `${code} did not round-trip for ${Object.values(st).join('/')}`);
-    // 7 characters since the fields were widened at VERSION 5 (35 bits).
-    ok(/^DM-[0-9A-HJKMNP-TV-Z]{7}$/.test(code), `malformed code: ${code}`);
+    // 8 characters since the grip and the lockset became separate fields (40 bits).
+    ok(/^DM-[0-9A-HJKMNP-TV-Z]{8}$/.test(code), `malformed code: ${code}`);
     ok(!seen.has(code), `code collision: ${code}`);
     seen.set(code, 1);
     n++;
@@ -66,7 +84,7 @@ group('url round-trip');
 for (const st of everyState()) {
   const { state: back, notice } = fromQuery(toQuery(st));
   ok(!notice, `unexpected notice for ${toQuery(st)}`);
-  for (const k of ['colour', 'size', 'handing', 'window', 'grille', 'handle', 'detail', 'finish']) {
+  for (const k of KEYS) {
     ok(back[k] === st[k], `url lost ${k} (${st[k]} -> ${back[k]})`);
   }
 }
@@ -85,26 +103,36 @@ for (const st of everyState()) {
 group('price');
 {
   const P = st => shekels(priceAgorot({ ...base, ...st }));
-  ok(P({}) === 3195, `standard anthracite solid should be ₪3,195, got ${P({})}`);
+  /* The baseline door carries an Idan bar AND a Coral lockset now, because a
+     grip and a lock are two things. ₪3,195 is the bare door with a lever and
+     no pull. */
+  ok(P({ handle: 'none' }) === 3195,
+     `a solid anthracite door with a lever and no pull should be ₪3,195, got ${P({ handle: 'none' })}`);
+  ok(P({}) === 3455, `adding the Idan bar should reach ₪3,455, got ${P({})}`);
   /* Every colour is delta 0 now: the manufacturer's chart gives codes, not
      prices, and the old per-colour premiums were our invention. */
   for (const c of COLOURS) ok(P({ colour: c.id }) === P({}), `colour ${c.id} must not change the price yet`);
   // A link shared before the chart replaced the list must still open a door.
   ok(P({ colour: 'ral-9005' }) === P({}), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
-  ok(P({ size: 'wide' }) === 3495, 'wide band');
-  ok(P({ window: 'rect' }) === 3815, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
-  ok(P({ window: 'rect', grille: 'scroll' }) === 4275, 'scrollwork grille adds ₪460');
-  ok(P({ detail: 'panel' }) === 3575, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
-  ok(P({ finish: 'brass' }) === 3415, `brass should add ₪220, got ${P({ finish: 'brass' })}`);
-  ok(P({ handle: 'coral' }) === 3115, `a lever is ₪80 less than a pull bar, got ${P({ handle: 'coral' })}`);
+  ok(P({ size: 'wide' }) === 3755, 'wide band');
+  ok(P({ window: 'rect' }) === 4075, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
+  ok(P({ window: 'rect', grille: 'scroll' }) === 4535, 'scrollwork grille adds ₪460');
+  ok(P({ detail: 'panel' }) === 3835, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
+  ok(P({ finish: 'brass' }) === 3675, `brass should add ₪220, got ${P({ finish: 'brass' })}`);
+  /* The whole point of the split: a pull bar and a backplate on one door. */
+  ok(P({ handle: 'idan', lockset: 'plate' }) === 3515,
+     `Idan with a Rotem backplate should be ₪3,515, got ${P({ handle: 'idan', lockset: 'plate' })}`);
+  ok(P({ handle: 'none', lockset: 'plate' }) === 3255, 'Rotem alone adds ₪60 to the bare door');
   // A retired id must land on its replacement, not on the first entry.
   ok(P({ handle: 'bar-long' }) === P({ handle: 'idan' }), 'alias bar-long should price as idan');
   ok(P({ handle: 'bar-flat' }) === P({ handle: 'shahar' }), 'alias bar-flat should price as shahar');
+  // Luna is gone from the catalogue; its id must still land somewhere real.
+  ok(P({ handle: 'luna' }) === P({ handle: 'idan' }), 'retired luna should price as idan');
 
   // A grille cannot be charged when there is no glazing to put it in.
   for (const g of GRILLES) {
-    ok(P({ window: 'none', grille: g.id }) === 3195,
+    ok(P({ window: 'none', grille: g.id }) === P({ window: 'none', grille: 'none' }),
        `grille ${g.id} must not add cost to a solid door`);
   }
 
@@ -218,6 +246,12 @@ group('handles');
 for (const n of HANDLES) {
   const svg = render({ ...base, handle: n.id });
   const drawn = svg => Number(/data-hw="handle"[^>]*data-len="([\d.]+)"/.exec(svg)[1]);
+  if (n.style === 'none') {
+    // "No pull" must draw no pull, and must not take the lockset with it.
+    ok(!/data-hw="handle"/.test(svg), 'the "no pull" grip still drew something');
+    ok(/data-hw="lockset"/.test(svg), 'choosing no pull removed the lockset as well');
+    continue;
+  }
   ok(new RegExp(`data-style="${n.style}"`).test(svg), `${n.style} not drawn for ${n.id}`);
   if (n.len) {
     // Whatever the size band, the handle must fit the leaf with room to spare.
@@ -234,62 +268,80 @@ for (const n of HANDLES) {
    there is, and it is the third collision-class bug this renderer has had
    (panel over glazing, hinges at the mullion, handle over lock). Assert the
    footprints stay apart over every design, not just the one that was fixed. */
-group('handle clears the lock');
+group('the grip clears the lockset');
 {
   const num = (svg, re) => Number(re.exec(svg)[1]);
   let n = 0, tightest = Infinity;
-  for (const hn of HANDLES) for (const sz of sizeKeys) for (const hd of HANDINGS) {
-    const svg = render({ ...base, handle: hn.id, size: sz, handing: hd.id });
-    const label = `${hn.id}/${sz}/${hd.id}`;
+  /* EXHAUSTIVE here, because this is the one place a grip and a lockset
+     interact: every grip against every lockset, on every size band and both
+     handings. A pull bar drawn through a lever is the loudest "this is a
+     drawing" tell there is, and on a narrow leaf the two have barely 60 mm
+     between them. */
+  for (const hn of HANDLES) for (const kn of LOCKSETS) for (const sz of sizeKeys)
+    for (const hd of HANDINGS) {
+      const svg = render({ ...base, handle: hn.id, lockset: kn.id, size: sz, handing: hd.id });
+      const label = `${hn.id}+${kn.id}/${sz}/${hd.id}`;
+      const leaf = { x: num(svg, /id="leaf" data-x="([-\d.]+)"/),
+                     w: num(svg, /id="leaf"[^>]*data-w="([\d.]+)"/) };
 
-    const grip = {
-      x:  num(svg, /data-hw="handle"[^>]*data-cx="([-\d.]+)"/s),
-      hx: num(svg, /data-hw="handle"[^>]*data-hx="([-\d.]+)"/s),
-      vy: num(svg, /data-hw="handle"[^>]*data-vy="([-\d.]+)"/s),
-      y:  num(svg, /data-hw="handle"[^>]*data-cy="([-\d.]+)"/s),
-    };
-    const leaf = { x: num(svg, /id="leaf" data-x="([-\d.]+)"/), w: num(svg, /id="leaf"[^>]*data-w="([\d.]+)"/) };
-    const carries = /data-carries-lock="true"/.test(svg);
+      /* Whatever the pairing, the door gets exactly one way to unlock it:
+         either the lockset carries the cylinder on its own backplate, or a
+         separate escutcheon sits beside it. Never both, never neither. */
+      const carries = /data-carries-lock="true"/.test(svg);
+      const escutcheons = [...svg.matchAll(/data-hw="lock"/g)].length;
+      ok(carries === !!kn.lock, `data-carries-lock disagrees with the catalogue (${label})`);
+      ok(escutcheons === (carries ? 0 : 1),
+         `expected ${carries ? 0 : 1} separate escutcheon, found ${escutcheons} (${label})`);
+      ok([...svg.matchAll(/data-hw="keyway"/g)].length === 1,
+         `the street face needs exactly one keyway (${label})`);
 
-    /* Whatever the style, the door gets exactly one way to unlock it: either
-       the handle carries the cylinder on its own backplate, or a separate
-       escutcheon sits beside it. Never both, and never neither. */
-    const escutcheons = [...svg.matchAll(/data-hw="lock"/g)].length;
-    ok(carries === !!hn.lock, `data-carries-lock disagrees with the catalogue (${label})`);
-    ok(escutcheons === (carries ? 0 : 1),
-       `expected ${carries ? 0 : 1} separate escutcheon, found ${escutcheons} (${label})`);
-    ok([...svg.matchAll(/data-hw="keyway"/g)].length === 1,
-       `the street face needs exactly one keyway (${label})`);
-
-    if (!carries) {
+      // The lockset is always drawn, and always on the leaf.
       const lock = {
-        x: num(svg, /data-hw="lock"[^>]*data-cx="([-\d.]+)"/),
-        y: num(svg, /data-hw="lock"[^>]*data-cy="([-\d.]+)"/),
-        r: num(svg, /data-hw="lock"[^>]*data-r="([-\d.]+)"/),
+        x:  num(svg, /data-hw="lockset"[^>]*data-cx="([-\d.]+)"/s),
+        y:  num(svg, /data-hw="lockset"[^>]*data-cy="([-\d.]+)"/s),
+        hx: num(svg, /data-hw="lockset"[^>]*data-hx="([-\d.]+)"/s),
+        vy: num(svg, /data-hw="lockset"[^>]*data-vy="([-\d.]+)"/s),
+        reach: num(svg, /data-hw="lockset"[^>]*data-reach="([-\d.]+)"/s),
       };
-      // Gap along each axis; positive on either axis means the boxes miss.
-      const gapX = Math.abs(grip.x - lock.x) - (grip.hx + lock.r);
-      const gapY = Math.abs(grip.y - lock.y) - (grip.vy + lock.r);
-      ok(Math.max(gapX, gapY) > 0, `handle overlaps the lock (${label}): gapX ${gapX}, gapY ${gapY}`);
-      tightest = Math.min(tightest, Math.max(gapX, gapY));
+      /* The body is symmetric about its centre; the lever's blade reaches
+         inboard only. Both ends have to land on the leaf. */
+      const inward = Math.sign(leaf.x + leaf.w / 2 - lock.x);
+      ok(lock.x - lock.hx > leaf.x && lock.x + lock.hx < leaf.x + leaf.w,
+         `the lockset hangs off the leaf (${label})`);
+      const tip = lock.x + inward * (lock.hx + lock.reach);
+      ok(tip > leaf.x && tip < leaf.x + leaf.w,
+         `the lever reaches off the leaf (${label})`);
 
-      /* The handle may only stand off towards the leaf centre — never out past
-         the lock towards the closing edge, where there is no door left to
-         hold. The lock sits on the closing edge, so "towards the centre" is
-         the hinge side whichever way the door is hung and whichever face. */
-      const toHinge = Math.sign(leaf.x + leaf.w / 2 - lock.x);
-      const toGrip = Math.sign(grip.x - lock.x);
-      ok(toGrip === 0 || toGrip === toHinge,
-         `handle stands off the wrong way, past the closing edge (${label})`);
-      ok(lock.x - lock.r > leaf.x && lock.x + lock.r < leaf.x + leaf.w,
-         `lock hangs off the leaf (${label})`);
+      if (hn.style !== 'none' && hn.style !== 'grab') {
+        const grip = {
+          x:  num(svg, /data-hw="handle"[^>]*data-cx="([-\d.]+)"/s),
+          y:  num(svg, /data-hw="handle"[^>]*data-cy="([-\d.]+)"/s),
+          hx: num(svg, /data-hw="handle"[^>]*data-hx="([-\d.]+)"/s),
+          vy: num(svg, /data-hw="handle"[^>]*data-vy="([-\d.]+)"/s),
+        };
+        // Gap along each axis; positive on either axis means the boxes miss.
+        /* Bodies, not reaches. The lever's blade passes behind the bar on a
+           real door; what may never overlap is the fitting the key goes into
+           and the thing your hand wraps round. */
+        const gapX = Math.abs(grip.x - lock.x) - (grip.hx + lock.hx);
+        const gapY = Math.abs(grip.y - lock.y) - (grip.vy + lock.vy);
+        ok(Math.max(gapX, gapY) > 0,
+           `the grip overlaps the lockset (${label}): gapX ${gapX.toFixed(0)}, gapY ${gapY.toFixed(0)}`);
+        tightest = Math.min(tightest, Math.max(gapX, gapY));
+
+        /* The grip may only stand off towards the leaf centre — never out past
+           the lockset towards the closing edge, where there is no door left to
+           hold on to. */
+        const toHinge = Math.sign(leaf.x + leaf.w / 2 - lock.x);
+        const toGrip = Math.sign(grip.x - lock.x);
+        ok(toGrip === 0 || toGrip === toHinge,
+           `the grip stands off the wrong way, past the closing edge (${label})`);
+        ok(grip.x - grip.hx > leaf.x && grip.x + grip.hx < leaf.x + leaf.w,
+           `the grip hangs off the leaf (${label})`);
+      }
+      n++;
     }
-
-    ok(grip.x - grip.hx > leaf.x && grip.x + grip.hx < leaf.x + leaf.w,
-       `handle hangs off the leaf (${label})`);
-    n++;
-  }
-  console.log(`  (${n} renders, tightest clearance ${tightest}mm)`);
+  console.log(`  (${n} renders, tightest clearance ${Math.round(tightest)}mm)`);
 }
 
 // ── 6c. What the works photographs actually show ──────────────────
@@ -425,6 +477,7 @@ group('every option tile draws its own picture');
     seen.set(key, id);
   };
   for (const h of HANDLES) check('handle', h.id, handleGlyph(h));
+  for (const k of LOCKSETS) check('lockset', k.id, locksetGlyph(k));
   for (const w of WINDOWS) check('window', w.id, windowGlyph(w));
   for (const g of GRILLES) check('grille', g.id, grilleGlyph(g));
   for (const d of DETAILS) check('detail', d.id, detailGlyph(d));
@@ -459,6 +512,7 @@ for (const [key, list, ctx] of [
   ['grille', GRILLES, { window: 'tallwin' }],
   ['detail', DETAILS, {}],
   ['handle', HANDLES, {}],
+  ['lockset', LOCKSETS, {}],
 ]) {
   const free = list.find(o => !o.delta) || list[0];
   for (const o of list) {

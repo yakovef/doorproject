@@ -31,18 +31,25 @@ gets this answered in thirty seconds; a definition does not.*
 
 ## 2. אילו ידיות אתה באמת מזמין?
 
-שלח את `screenshots/handles.png` — כל ארבע-עשרה הידיות, עם השמות.
+שלח את הקבצים `screenshots/grip-*.png` ו-`screenshots/lock-*.png`.
 
 > **"על אילו מאלה אתה עובד בפועל? מה למחוק?"**
-> **"כמה תוספת על כל אחת מעל הידית הבסיסית?"**
+> **"כמה תוספת על כל אחת?"**
 
-הידיות שציירנו, בשמות של רב בריח:
-קורל · רותם · אלמוג · ספיר · כדור · עידן · אלה · ניצן · שחר · רון · לונה · שירן,
-ועוד מאחז אופקי וידית שקועה.
+**ידיות משיכה (אנכיות):** עידן · אלה · ניצן · שחר · רון · שירן ·
+מאחז אופקי · ידית שקועה — ואפשר גם בלי.
 
-*Fifteen is too many to put in front of a cold visitor. Rather than guess
-which to cut, cut the ones he does not stock. That is a better filter than
-taste, and it makes every remaining option orderable by name.*
+**מנעול וידית:** קורל · רותם · כדור · ספיר · אלמוג · כדור על אורך.
+
+*Two lists now, not one. A grip and a lockset are separate objects bought
+separately and fitted to the same door — the gallery is full of doors carrying
+both — and the configurator could not express that until they were separated.
+Fifteen in one list was also too many to put in front of a cold visitor; nine
+plus six, each answering a different question, is a different shape of choice.
+Rather than guess which to cut, cut the ones he does not stock.*
+
+*`luna`, the black half-disc, is gone. It was offered as a door's main grip and
+it is not one.*
 
 ---
 
@@ -52,16 +59,15 @@ taste, and it makes every remaining option orderable by name.*
 > ואילו מגיעות בגימור אחד בלבד?"**
 
 מה שהנחנו כרגע, לפי תמונות המוצר:
-**לונה — שחור מט בלבד** · **שירן — פליז בלבד** ·
-**ידית שקועה — אין בה חלקי מתכת בכלל** (שקע בדלת עצמה) ·
-כל השאר — שלושת הגימורים.
+**שירן — פליז בלבד** · כל השאר — שלושת הגימורים.
 
-*Until this was noticed the finish tiles were live for all fifteen handles and
-priced at up to ₪220. On Luna, Shiran and the recessed channel the drawing did
-not change at all, and the message going to Peretz read "Shiran, matte black" —
-a door that does not exist. Those three are now fixed in the catalogue and the
-tiles say why. If any is wrong it is one line each: `HANDLES[].finish` in
-`js/catalog.js`.*
+*Until this was noticed the finish tiles were live for every handle and priced
+at up to ₪220, while the drawing did not change at all for some of them — the
+message going to Peretz read "Shiran, matte black", a door that does not exist.
+Shiran is now fixed in the catalogue and the tiles say why. The recessed
+channel used to be listed here too; since the split it is a grip with a lever
+beside it, so the door does have metal on it and the finish means something
+again. If any of this is wrong it is one line: `HANDLES[].finish`.*
 
 ---
 
@@ -118,7 +124,7 @@ buying direct from the brand. His call, not ours.*
 | | Question | Blocks |
 |---|---|---|
 | 1 | ימין/שמאל | correctness of every order |
-| 2 | which handles | the handle list |
+| 2 | which grips, which locksets | both hardware lists |
 | 3 | colours + prices | the colour list |
 | 4 | windows + prices | the window list |
 | 5 | prices per size | every price shown |

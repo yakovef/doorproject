@@ -39,63 +39,29 @@
     { id: "tallwin", he: "חלון גבוה", en: "Tall light", delta: 88e3, rects: [{ w: 357, h: 1025, top: 175 }] }
   ];
   var HANDLES = [
-    /* Levers and locksets */
-    {
-      id: "coral",
-      he: "קורל",
-      en: "Coral",
-      delta: -8e3,
-      len: 0,
-      style: "lever",
-      aliases: ["lever"]
-    },
-    { id: "plate", he: "רותם", en: "Rotem", delta: -8e3, len: 0, style: "plate", lock: true },
-    {
-      id: "grab",
-      he: "קורל + מאחז",
-      en: "Coral + grab bar",
-      delta: 18e3,
-      len: 0,
-      style: "grab",
-      aliases: ["dee"]
-    },
-    { id: "almog", he: "אלמוג", en: "Almog", delta: 16e3, len: 0, style: "almog" },
-    { id: "sapir", he: "ספיר", en: "Sapir", delta: 6e3, len: 0, style: "sapir" },
-    { id: "cadoor", he: "כדור", en: "Cadoor", delta: -4e3, len: 0, style: "cadoor" },
-    /* Knob on a long backplate — the bronze fitting on d092, named three times
-       across the luxury tier. A different object from a knob on a rose: the
-       plate carries the keyway too, so it locks like the Rotem backplate. */
-    {
-      id: "knobplate",
-      he: "כדור על אורך",
-      en: "Knob on backplate",
-      delta: 22e3,
-      len: 0,
-      style: "knobplate",
-      lock: true
-    },
-    /* Pull bars, in the manufacturer's own range. `bar` selects the section,
-       fixings and tone profile; see BARS in the renderer. Lengths sit inside the
-       0.38-0.55 of leaf height that the installed doors measure, and the
-       section thicknesses keep the products' relative slenderness: ella is the
-       stockiest at L/W 15, ron the slimmest at L/W 27. */
+    { id: "none", he: "ללא ידית משיכה", en: "No pull", delta: 0, len: 0, style: "none" },
+    /* Pull bars. `bar` selects the section, fixings and tone profile; see BARS in
+       the renderer. Lengths sit inside the 0.38-0.55 of leaf height that the
+       installed doors measure, and the section thicknesses keep the products'
+       relative slenderness: ella is the stockiest at L/W 15, ron the slimmest
+       at L/W 27. */
     {
       id: "idan",
       he: "עידן",
       en: "Idan",
-      delta: 0,
+      delta: 26e3,
       len: 1050,
       w: 32,
       style: "bar",
       bar: "idan",
-      aliases: ["bar-long"]
+      aliases: ["bar-long", "luna"]
     },
-    { id: "ella", he: "אלה", en: "Ella", delta: 26e3, len: 900, w: 34, style: "bar", bar: "ella" },
+    { id: "ella", he: "אלה", en: "Ella", delta: 38e3, len: 900, w: 34, style: "bar", bar: "ella" },
     {
       id: "nitzan",
       he: "ניצן",
       en: "Nitzan",
-      delta: 8e3,
+      delta: 3e4,
       len: 800,
       w: 26,
       style: "bar",
@@ -106,42 +72,59 @@
       id: "shahar",
       he: "שחר",
       en: "Shahar",
-      delta: 14e3,
+      delta: 34e3,
       len: 1150,
       w: 30,
       style: "bar",
       bar: "shahar",
       aliases: ["bar-flat"]
     },
-    { id: "ron", he: "רון", en: "Ron", delta: 4e3, len: 900, w: 16, style: "bar", bar: "ron" },
-    /* Recessed, and the statement pieces */
-    {
-      id: "luna",
-      he: "לונה",
-      en: "Luna",
-      delta: 18e3,
-      len: 0,
-      style: "luna",
-      finish: "black"
-    },
+    { id: "ron", he: "רון", en: "Ron", delta: 28e3, len: 900, w: 16, style: "bar", bar: "ron" },
+    /* The ornate pull, the horizontal bow, and the recess. */
     {
       id: "shiran",
       he: "שירן",
       en: "Shiran",
-      delta: 42e3,
+      delta: 52e3,
       len: 0,
       style: "shiran",
       finish: "brass"
     },
     {
+      id: "grab",
+      he: "מאחז אופקי",
+      en: "Grab bar",
+      delta: 18e3,
+      len: 0,
+      style: "grab",
+      aliases: ["dee"]
+    },
+    {
       id: "channel",
       he: "ידית שקועה",
       en: "Recessed channel",
-      delta: 32e3,
+      delta: 4e4,
       len: 1554,
       inset: 0.3,
-      style: "channel",
-      finish: "none"
+      style: "channel"
+    }
+  ];
+  var LOCKSETS = [
+    { id: "coral", he: "קורל", en: "Coral", delta: 0, style: "lever", aliases: ["lever"] },
+    { id: "plate", he: "רותם", en: "Rotem", delta: 6e3, style: "plate", lock: true },
+    { id: "cadoor", he: "כדור", en: "Cadoor", delta: 4e3, style: "cadoor" },
+    { id: "sapir", he: "ספיר", en: "Sapir", delta: 1e4, style: "sapir" },
+    { id: "almog", he: "אלמוג", en: "Almog", delta: 16e3, style: "almog" },
+    /* Knob on a long backplate — the bronze fitting on d092, named three times
+       across the luxury tier. A different object from a knob on a rose: the
+       plate carries the keyway too, so it locks like the Rotem backplate. */
+    {
+      id: "knobplate",
+      he: "כדור על אורך",
+      en: "Knob on backplate",
+      delta: 22e3,
+      style: "knobplate",
+      lock: true
     }
   ];
   var GRILLES = [
@@ -190,7 +173,6 @@
   ];
   function effectiveFinish(state2) {
     const h = byId(HANDLES, state2.handle);
-    if (h.finish === "none") return null;
     return byId(FINISHES, h.finish || state2.finish);
   }
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
@@ -203,7 +185,7 @@
     const grille = byId(GRILLES, state2.grille);
     const handle = byId(HANDLES, state2.handle);
     const finish = effectiveFinish(state2);
-    let total = size.base + colour.delta + win.delta + handle.delta + byId(DETAILS, state2.detail).delta + (finish && !handle.finish ? finish.delta : 0);
+    let total = size.base + colour.delta + win.delta + handle.delta + byId(LOCKSETS, state2.lockset).delta + byId(DETAILS, state2.detail).delta + (finish && !handle.finish ? finish.delta : 0);
     if (win.rects.length) total += grille.delta;
     return Math.ceil(total / 500) * 500;
   }
@@ -377,6 +359,7 @@
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
     const handle = byId(HANDLES, state2.handle);
+    const lockset = byId(LOCKSETS, state2.lockset);
     const detail = byId(DETAILS, state2.detail);
     const finish = effectiveFinish(state2);
     const tone = FINISH_TONES[finish ? finish.id : "steel"] || FINISH_TONES.steel;
@@ -406,8 +389,6 @@
     const mainX1 = mainX + leafW;
     const lockX = hingeOnLeft ? mainX1 - LOCK_BACKSET : mainX + LOCK_BACKSET;
     const inward = hingeOnLeft ? -1 : 1;
-    const standoff = handleStandoff(handle, leafW, leafH);
-    const handleX = lockX + inward * standoff;
     const hingeX = hingeOnLeft ? mainX : mainX1;
     const leverDir = hingeOnLeft ? -1 : 1;
     const centreX = mainX + leafW / 2;
@@ -416,6 +397,9 @@
       x: centreX + Math.min(...win.rects.map((r) => (r.dx || 0) - r.w / 2)),
       x1: centreX + Math.max(...win.rects.map((r) => (r.dx || 0) + r.w / 2))
     } : null;
+    const glassEdge = winSpan ? Math.abs((hingeOnLeft ? winSpan.x1 : winSpan.x) - lockX) : Infinity;
+    const standoff = gripStandoff(handle, lockset, leafW, leafH, glassEdge);
+    const handleX = lockX + inward * standoff;
     const paint2 = colour.hex;
     const edge = silhouette(paint2);
     const deep = darken(paint2, 0.55);
@@ -1059,7 +1043,7 @@
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
     ${win.rects.length ? "" : peephole(centreX, y(PEEPHOLE_AFF))}
-    ${handleArt(
+    ${gripArt(
       handle,
       handleX,
       y(HANDLE_AFF),
@@ -1070,7 +1054,8 @@
       leafW,
       y0
     )}
-    ${handle.lock ? "" : cylinder(lockX, y(CYLINDER_AFF))}
+    ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
+    ${lockset.lock ? "" : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
@@ -1285,56 +1270,70 @@ ${body}
   }
   function handleFootprint(handle, leafH) {
     switch (handle.style) {
+      case "none":
+        return { hx: 0, vy: 0 };
       case "channel":
         return { hx: 21, vy: channelHalf(handle.len, leafH) };
       case "grab":
         return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
       case "lever":
-        return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
+        return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE, reach: LEVER_REACH };
       case "plate":
-        return { hx: PLATE.w / 2, vy: PLATE.h / 2 };
+        return { hx: PLATE.w / 2, vy: PLATE.h / 2, reach: PLATE.w * PLATE.reach };
       case "almog":
-        return { hx: 39, vy: 39 };
+        return { hx: 39, vy: 39, reach: 39 * 2 * 2.8 };
       case "cadoor":
         return { hx: 34, vy: 40 };
       case "sapir":
         return { hx: 36, vy: 36 };
-      case "luna":
-        return { hx: 115, vy: 230 };
+      case "knobplate":
+        return { hx: 48, vy: 150 };
       case "shiran":
         return { hx: 44, vy: 240 };
       default:
         return { hx: (handle.w || 30) / 2, vy: barHalf(handle.len, leafH) };
     }
   }
-  function handleStandoff(handle, leafW, leafH) {
-    if (handle.lock) return 0;
-    const foot = handleFootprint(handle, leafH);
-    const dy = Math.abs(HANDLE_AFF - CYLINDER_AFF);
-    const clear = dy >= foot.vy + LOCK_R ? 0 : foot.hx + LOCK_R + LOCK_CLEAR;
-    const want = handle.inset ? leafW * handle.inset - LOCK_BACKSET : foot.vy > 200 ? leafW * BAR_INSET - LOCK_BACKSET : 0;
-    return Math.round(Math.max(clear, want, 0));
+  function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) {
+    const grip = handleFootprint(handle, leafH);
+    if (!grip.vy && !grip.hx) return 0;
+    const lock = handleFootprint(lockset, leafH);
+    const clear = lock.hx + grip.hx + LOCK_CLEAR;
+    const want = handle.inset ? leafW * handle.inset - LOCK_BACKSET : grip.vy > 200 ? leafW * BAR_INSET - LOCK_BACKSET : 0;
+    const room = toGlass - grip.hx - LOCK_CLEAR;
+    return Math.round(Math.max(clear, Math.min(want, room), 0));
   }
-  var HANDLE_ART = {
+  var GRIP_ART = {
+    none: () => "",
     channel: (h, g) => channelHandle(g.cx, g.cy, h.len, g.leafH, g.paint),
     grab: (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
-    plate: (h, g) => plateHandle(g.cx, g.cy, g.dir),
     bar: (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
+    shiran: (h, g) => shiranPull(g.cx, g.cy, g.leafH)
+  };
+  var LOCK_ART = {
     lever: (h, g) => lever(g.cx, g.cy, g.dir),
+    plate: (h, g) => plateHandle(g.cx, g.cy, g.dir),
     almog: (h, g) => almogLever(g.cx, g.cy, g.dir),
     cadoor: (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
     knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
-    sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir),
-    luna: (h, g) => lunaPull(g.cx, g.cy, g.dir),
-    shiran: (h, g) => shiranPull(g.cx, g.cy, g.leafH)
+    sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir)
   };
-  function handleArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0) {
-    const draw = HANDLE_ART[handle.style] || HANDLE_ART.lever;
+  function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0) {
+    const draw = GRIP_ART[handle.style];
+    if (!draw) return "";
     const art = draw(handle, { cx, cy, dir, paint: paint2, centreX, leafW, leafH, y0 });
+    if (!art) return "";
     const foot = handleFootprint(handle, leafH);
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
+             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}">${art}</g>`;
+  }
+  function locksetArt(lockset, cx, cy, dir) {
+    const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
+    const foot = handleFootprint(lockset, 0);
+    return `<g data-hw="lockset" data-style="${lockset.style}"
              data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
-             data-carries-lock="${!!handle.lock}">${art}</g>`;
+             data-reach="${Math.round(foot.reach || 0)}"
+             data-carries-lock="${!!lockset.lock}">${draw(lockset, { cx, cy, dir })}</g>`;
   }
   var channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
   var barHalf = (len, leafH) => Math.min(len, leafH - 320) / 2;
@@ -1453,15 +1452,12 @@ ${body}
     const top = cy - half, bot = cy + half, L = half * 2;
     const at = (t) => top + L * t;
     const stub = w * (spec.stub || 1);
-    const px = cx + w / 2;
     const fx = spec.fix;
     const fixArt = (behind) => fx.t.map((t) => {
-      const y = at(t), proj = w * fx.proj, sz = w * (fx.size || 1);
-      if (fx.kind === "cylinder" && behind) return `
-      <rect x="${px - 4}" y="${y - sz / 2}" width="${proj}" height="${sz}" rx="${sz / 2}"
-            fill="url(#nickelSoft)"/>
-      <ellipse cx="${px + proj - sz * 0.18}" cy="${y}" rx="${sz * 0.3}" ry="${sz / 2}"
-               fill="url(#nickel)"/>`;
+      const y = at(t), sz = w * (fx.size || 1);
+      if ((fx.kind === "cylinder" || fx.kind === "leg") && behind) return `
+      <ellipse cx="${cx + 11}" cy="${y + 13}" rx="${w * 0.78}" ry="${sz * 0.62}"
+               fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`;
       if (fx.kind === "collar" && !behind) return `
       <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
             rx="${w * 0.18}" fill="url(#nickel)"/>
@@ -1478,9 +1474,6 @@ ${body}
       <circle cx="${cx + w * 0.83}" cy="${y}" r="${w * 0.14}" fill="#000" opacity="0.5"/>
       <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
             rx="2" fill="url(#nickel)"/>`;
-      if (fx.kind === "leg" && behind) return `
-      <rect x="${cx - w / 2}" y="${y - w / 2}" width="${w * fx.proj + w / 2}" height="${w * 0.6}"
-            rx="2" fill="url(#nickelSoft)"/>`;
       if (fx.kind === "shoe" && !behind) return `
       <rect x="${cx - w * fx.size / 2}" y="${y - w * fx.tall / 2}" width="${w * fx.size}"
             height="${w * fx.tall}" rx="${w * 0.22}" fill="url(#nickel)"/>
@@ -1667,22 +1660,6 @@ ${body}
             fill="url(#mirrorKnob)"/>
       <rect x="${kx - ks / 2 + 3}" y="${ky - ks / 2 + 3}" width="${ks - 6}" height="${ks * 0.16}"
             rx="${kr * 0.5}" fill="#fff" opacity="0.5"/>
-    </g>`;
-  }
-  function lunaPull(cx, cy, dir) {
-    const H = 460, R = H / 2, W = R * 0.99;
-    const x0 = cx - dir * W * 0.5;
-    const top = cy - H / 2, bot = cy + H / 2;
-    const seg = `M ${x0} ${top} A ${R} ${R} 0 0 ${dir > 0 ? 1 : 0} ${x0} ${bot} Z`;
-    return `
-    <g>
-      <path d="${seg}" transform="translate(${dir * 9} 13)" fill="#000" opacity="0.38"
-            filter="url(#hwShadow)"/>
-      <path d="${seg}" fill="url(#lunaFace)"/>
-      <!-- the one specular, at 0.93 of the width and a third of the way down -->
-      <ellipse cx="${x0 + dir * W * 0.93}" cy="${top + H * 0.335}"
-               rx="${W * 0.05}" ry="${H * 0.035}" fill="#6B6470" opacity="0.55"/>
-      <path d="${seg}" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="1.5"/>
     </g>`;
   }
   function shiranPull(cx, cy, leafH) {
@@ -1896,13 +1873,15 @@ ${body}
     const w = byId(WINDOWS, state2.window);
     const g = byId(GRILLES, state2.grille);
     const hd = byId(HANDLES, state2.handle);
+    const lk = byId(LOCKSETS, state2.lockset);
     const dt = byId(DETAILS, state2.detail);
     const fn = effectiveFinish(state2);
     const s = SIZES[state2.size] || SIZES.standard;
     if (lang === "he") {
       const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
       const det = dt.id === "plain" ? "" : `, ${dt.he}`;
-      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he}${fn ? " " + fn.he : ""}, ${s.he}, פתיחה ${h.he}.`;
+      const grip = hd.style === "none" ? "" : `${hd.he}, `;
+      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${grip}${lk.he}${fn ? " " + fn.he : ""}, ${s.he}, פתיחה ${h.he}.`;
     }
     return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
   }
@@ -1937,7 +1916,10 @@ ${body}
           fill="none" stroke="currentColor" stroke-width="44"/>
   </svg>`;
   }
-  var HANDLE_GLYPH = {
+  var FITTING_GLYPH = {
+    none: () => ({ box: [-60, -80, 60, 80], art: `
+    <path d="M -34 -46 L 34 46 M 34 -46 L -34 46" fill="none" stroke="currentColor"
+          stroke-width="7" stroke-linecap="round" opacity="0.45"/>` }),
     // Coral: plain lever on a round rose, reaching toward the hinge.
     lever: () => ({ box: [-172, -48, 52, 48], art: `
     <circle cx="0" cy="0" r="39"/>
@@ -1966,9 +1948,6 @@ ${body}
     <rect x="-36" y="-36" width="72" height="72" rx="3"/>
     <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper)"/>
     <rect x="-65" y="-23" width="62" height="62" rx="7"/>` }),
-    // Luna: a half-disc, chord against the stile.
-    luna: () => ({ box: [-118, -238, 122, 238], art: `
-    <path d="M 114 -230 A 230 230 0 0 0 114 230 Z"/>` }),
     // Shiran: the ornate pull — spigot, bulge, disc, parallel shaft, mirrored.
     shiran: () => ({ box: [-48, -252, 48, 252], art: `
     <rect x="-7" y="-240" width="14" height="17"/>
@@ -2011,7 +1990,7 @@ ${body}
     }
   };
   function handleGlyph(handle) {
-    const make = HANDLE_GLYPH[handle.style] || HANDLE_GLYPH.lever;
+    const make = FITTING_GLYPH[handle.style] || FITTING_GLYPH.lever;
     const { box, art } = make(handle);
     const A = 3 / 4;
     let [x0, y0, x1, y1] = box;
@@ -2030,6 +2009,7 @@ ${body}
     <g fill="currentColor">${art}</g>
   </svg>`;
   }
+  var locksetGlyph = handleGlyph;
   function detailGlyph(detail) {
     const W = 950, H = 2100, pad = 40;
     const inset = 105;
@@ -2071,12 +2051,13 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 6;
+  var VERSION = 7;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "rect",
     grille: "none",
     handle: "idan",
+    lockset: "coral",
     detail: "plain",
     finish: "steel",
     size: "standard",
@@ -2089,6 +2070,7 @@ ${body}
     p.set("w", state2.window);
     p.set("g", state2.grille);
     p.set("n", state2.handle);
+    p.set("k", state2.lockset);
     p.set("d", state2.detail);
     p.set("f", state2.finish);
     p.set("s", state2.size);
@@ -2116,6 +2098,16 @@ ${body}
     take("window", "w", WINDOWS);
     take("grille", "g", GRILLES);
     take("handle", "n", HANDLES);
+    take("lockset", "k", LOCKSETS);
+    const rawN = p.get("n");
+    if (rawN && !p.get("k")) {
+      const hit = LOCKSETS.find((o) => o.id === rawN || (o.aliases || []).includes(rawN));
+      if (hit) {
+        state2.lockset = hit.id;
+        state2.handle = "none";
+        notice = null;
+      }
+    }
     take("detail", "d", DETAILS);
     take("finish", "f", FINISHES);
     take("handing", "h", HANDINGS);
@@ -2135,8 +2127,9 @@ ${body}
     window: 5,
     grille: 3,
     handle: 5,
+    lockset: 4,
     detail: 3,
-    finish: 3
+    finish: 4
   };
   var TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   function encodeCode(state2) {
@@ -2149,6 +2142,7 @@ ${body}
       [Math.max(0, WINDOWS.findIndex((w) => w.id === state2.window)), BITS.window],
       [Math.max(0, GRILLES.findIndex((g) => g.id === state2.grille)), BITS.grille],
       [Math.max(0, HANDLES.findIndex((n) => n.id === state2.handle)), BITS.handle],
+      [Math.max(0, LOCKSETS.findIndex((k) => k.id === state2.lockset)), BITS.lockset],
       [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail],
       [Math.max(0, FINISHES.findIndex((f) => f.id === state2.finish)), BITS.finish]
     ];
@@ -2185,9 +2179,10 @@ ${body}
     const window2 = WINDOWS[read(BITS.window)];
     const grille = GRILLES[read(BITS.grille)];
     const handle = HANDLES[read(BITS.handle)];
+    const lockset = LOCKSETS[read(BITS.lockset)];
     const detail = DETAILS[read(BITS.detail)];
     const finish = FINISHES[read(BITS.finish)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !detail || !finish) return null;
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !finish) return null;
     return {
       colour: colour.id,
       size,
@@ -2195,6 +2190,7 @@ ${body}
       window: window2.id,
       grille: grille.id,
       handle: handle.id,
+      lockset: lockset.id,
       detail: detail.id,
       finish: finish.id
     };
@@ -2219,7 +2215,8 @@ ${body}
       `צבע: ${c.he} (RAL ${c.ral})`,
       `חלון: ${w.he}`,
       ...w.rects.length && g.id !== "none" ? [`סורג: ${g.he}`] : [],
-      `ידית: ${byId(HANDLES, state2.handle).he}${fin ? ` · ${fin.he}` : ""}`,
+      ...byId(HANDLES, state2.handle).style === "none" ? [] : [`ידית משיכה: ${byId(HANDLES, state2.handle).he}`],
+      `מנעול וידית: ${byId(LOCKSETS, state2.lockset).he}${fin ? ` · ${fin.he}` : ""}`,
       ...state2.detail !== "plain" ? [`עיצוב: ${byId(DETAILS, state2.detail).he}`] : [],
       `מידה: ${s.he}`,
       `פתיחה: ${h.he}`,
@@ -2279,11 +2276,20 @@ ${body}
     buildTiles(
       "#handles",
       HANDLES,
-      "ידית",
+      "ידית משיכה",
       (n) => handleGlyph(n),
       (n) => n.he,
       (n) => n.delta,
       (id) => set({ handle: id })
+    );
+    buildTiles(
+      "#locksets",
+      LOCKSETS,
+      "מנעול וידית",
+      (k) => locksetGlyph(k),
+      (k) => k.he,
+      (k) => k.delta,
+      (id) => set({ lockset: id })
     );
     buildTiles(
       "#details",
@@ -2442,7 +2448,8 @@ ${body}
       `RAL ${colour.ral}`,
       win.he,
       ...win.rects.length && grille.id !== "none" ? [grille.he] : [],
-      `${byId(HANDLES, state.handle).he}${finish ? ` ${finish.he}` : ""}`,
+      ...byId(HANDLES, state.handle).style === "none" ? [] : [byId(HANDLES, state.handle).he],
+      `${byId(LOCKSETS, state.lockset).he}${finish ? ` ${finish.he}` : ""}`,
       ...state.detail !== "plain" ? [byId(DETAILS, state.detail).he] : [],
       size.he,
       handing.he
@@ -2451,6 +2458,7 @@ ${body}
     markSelected("#windows", state.window);
     markSelected("#grilles", state.grille);
     markSelected("#handles", state.handle);
+    markSelected("#locksets", state.lockset);
     markSelected("#details", state.detail);
     markSelected("#finishes", finish ? finish.id : null);
     markSelected("#sizes", state.size);

@@ -109,66 +109,92 @@ export const WINDOWS = [
 ];
 
 /**
- * Handles, ranked by what 128 real installations on the works pages actually
- * carry: lever on a rose (55), vertical pull bar (37), lever on a backplate
- * (24), horizontal grab bar (18), recessed channel (3), short bar (3).
+ * ── TWO GROUPS, NOT ONE ──────────────────────────────────────────────
  *
- * `lock: true` means the handle carries the cylinder on its own backplate and
- * no separate escutcheon is drawn beside it. Three of the four doors we could
- * measure closely are built that way: it is the standard fitting on the doors
- * Peretz installs, and the renderer had no way to draw it.
+ * A grip and a lockset are different objects bought separately and fitted to
+ * the same door, and the gallery is full of doors carrying both: a vertical
+ * pull bar inboard, a lever and a cylinder out at the stile. We had them in
+ * one list, so choosing the Idan bar made a Rotem backplate unreachable — a
+ * combination Peretz installs constantly and the configurator could not
+ * express.
+ *
+ * HANDLES is now the GRIP: the thing you pull. LOCKSETS is the lock furniture:
+ * the thing you turn, and the keyway. Every door has a lockset; the grip is
+ * optional, because a door with only a lever is the commonest door there is.
+ *
+ * Ids are a public wire format, so every id below keeps the meaning it had.
+ * A link written before the split carries the lockset under `n=`; fromQuery
+ * moves it to `k=` and leaves the grip empty. The short code packs both as
+ * INDICES, which no alias can rescue, so its VERSION is bumped and an older
+ * code is refused with a notice rather than decoded into a different door.
+ */
+
+/**
+ * Grips, ranked by what the 128 installations carry: vertical pull bar (37),
+ * horizontal grab bar (18), recessed channel (3).
  *
  * `inset` is where the grip sits, as a fraction of leaf width from the closing
- * edge. Left unset it takes the measured median for pull bars. Real bars sit
- * markedly inboard — the median across every measurable installation is 0.19,
- * not hard against the stile as you might assume.
+ * edge. Left unset it takes the measured median for pull bars: real bars sit
+ * markedly inboard — 0.19 across every measurable installation, not hard
+ * against the stile as you might assume — which is also what leaves room for
+ * the lockset outboard of them.
  *
- * The range is now the manufacturer's own named products, because Peretz
- * orders by name — "Idan" is a thing he can put on a purchase order in a way
- * that "long pull bar" is not.
- *
- * Renaming ids would break shared links, so every superseded id survives in
- * `aliases` and still resolves. The short code packs the handle as an INDEX
- * though, which aliases cannot rescue, so the code VERSION is bumped: an older
- * code is refused with a notice rather than decoded into the wrong door.
+ * The range is the manufacturer's own named products, because Peretz orders by
+ * name: "Idan" is a thing he can put on a purchase order in a way that "long
+ * pull bar" is not.
  */
 export const HANDLES = [
-  /* Levers and locksets */
-  { id: 'coral',   he: 'קורל',  en: 'Coral',  delta: -8000, len: 0, style: 'lever',
-    aliases: ['lever'] },
-  { id: 'plate',   he: 'רותם',  en: 'Rotem',  delta: -8000, len: 0, style: 'plate', lock: true },
-  { id: 'grab',    he: 'קורל + מאחז', en: 'Coral + grab bar', delta: 18000, len: 0, style: 'grab',
+  { id: 'none',    he: 'ללא ידית משיכה', en: 'No pull', delta: 0, len: 0, style: 'none' },
+
+  /* Pull bars. `bar` selects the section, fixings and tone profile; see BARS in
+     the renderer. Lengths sit inside the 0.38-0.55 of leaf height that the
+     installed doors measure, and the section thicknesses keep the products'
+     relative slenderness: ella is the stockiest at L/W 15, ron the slimmest
+     at L/W 27. */
+  { id: 'idan',    he: 'עידן',  en: 'Idan',   delta: 26000, len: 1050, w: 32, style: 'bar', bar: 'idan',
+    aliases: ['bar-long', 'luna'] },
+  { id: 'ella',    he: 'אלה',   en: 'Ella',   delta: 38000, len: 900,  w: 34, style: 'bar', bar: 'ella' },
+  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', delta: 30000, len: 800,  w: 26, style: 'bar', bar: 'nitzan',
+    aliases: ['bar-short'] },
+  { id: 'shahar',  he: 'שחר',   en: 'Shahar', delta: 34000, len: 1150, w: 30, style: 'bar', bar: 'shahar',
+    aliases: ['bar-flat'] },
+  { id: 'ron',     he: 'רון',   en: 'Ron',    delta: 28000, len: 900,  w: 16, style: 'bar', bar: 'ron' },
+
+  /* The ornate pull, the horizontal bow, and the recess. */
+  { id: 'shiran',  he: 'שירן',   en: 'Shiran', delta: 52000, len: 0, style: 'shiran',
+    finish: 'brass' },
+  { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', delta: 18000, len: 0, style: 'grab',
     aliases: ['dee'] },
-  { id: 'almog',   he: 'אלמוג',  en: 'Almog',  delta: 16000, len: 0, style: 'almog' },
-  { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  delta: 6000,  len: 0, style: 'sapir' },
-  { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', delta: -4000, len: 0, style: 'cadoor' },
+  { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
+    delta: 40000, len: 1554, inset: 0.30, style: 'channel' },
+];
+
+/**
+ * Lock furniture: lever or knob, and the keyway.
+ *
+ * `lock: true` means the fitting carries the cylinder on its own backplate and
+ * no separate escutcheon is drawn beside it. Three of the four doors we could
+ * measure closely are built that way — it is the standard fitting on the doors
+ * Peretz installs.
+ *
+ * Ranked by what the installations carry: lever on a rose (55), lever on a
+ * backplate (24).
+ *
+ * `luna`, the black half-disc, is gone from the catalogue entirely. It was
+ * offered as a door's main grip and it is not one; its id resolves to Idan so
+ * a link written when it existed still opens a door.
+ */
+export const LOCKSETS = [
+  { id: 'coral',   he: 'קורל',  en: 'Coral',  delta: 0,     style: 'lever', aliases: ['lever'] },
+  { id: 'plate',   he: 'רותם',  en: 'Rotem',  delta: 6000,  style: 'plate', lock: true },
+  { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', delta: 4000,  style: 'cadoor' },
+  { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  delta: 10000, style: 'sapir' },
+  { id: 'almog',   he: 'אלמוג',  en: 'Almog',  delta: 16000, style: 'almog' },
   /* Knob on a long backplate — the bronze fitting on d092, named three times
      across the luxury tier. A different object from a knob on a rose: the
      plate carries the keyway too, so it locks like the Rotem backplate. */
-  { id: 'knobplate', he: 'כדור על אורך', en: 'Knob on backplate', delta: 22000, len: 0,
+  { id: 'knobplate', he: 'כדור על אורך', en: 'Knob on backplate', delta: 22000,
     style: 'knobplate', lock: true },
-
-  /* Pull bars, in the manufacturer's own range. `bar` selects the section,
-     fixings and tone profile; see BARS in the renderer. Lengths sit inside the
-     0.38-0.55 of leaf height that the installed doors measure, and the
-     section thicknesses keep the products' relative slenderness: ella is the
-     stockiest at L/W 15, ron the slimmest at L/W 27. */
-  { id: 'idan',    he: 'עידן',  en: 'Idan',   delta: 0,     len: 1050, w: 32, style: 'bar', bar: 'idan',
-    aliases: ['bar-long'] },
-  { id: 'ella',    he: 'אלה',   en: 'Ella',   delta: 26000, len: 900,  w: 34, style: 'bar', bar: 'ella' },
-  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', delta: 8000,  len: 800,  w: 26, style: 'bar', bar: 'nitzan',
-    aliases: ['bar-short'] },
-  { id: 'shahar',  he: 'שחר',   en: 'Shahar', delta: 14000, len: 1150, w: 30, style: 'bar', bar: 'shahar',
-    aliases: ['bar-flat'] },
-  { id: 'ron',     he: 'רון',   en: 'Ron',    delta: 4000,  len: 900,  w: 16, style: 'bar', bar: 'ron' },
-
-  /* Recessed, and the statement pieces */
-  { id: 'luna',    he: 'לונה',   en: 'Luna',   delta: 18000, len: 0, style: 'luna',
-    finish: 'black' },
-  { id: 'shiran',  he: 'שירן',   en: 'Shiran', delta: 42000, len: 0, style: 'shiran',
-    finish: 'brass' },
-  { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
-    delta: 32000, len: 1554, inset: 0.30, style: 'channel', finish: 'none' },
 ];
 
 /** Decorative iron grille over the glazing. Only meaningful with a window. */
@@ -258,8 +284,12 @@ export const FINISHES = [
  * disagree about it.
  */
 export function effectiveFinish(state) {
+  /* Every door now carries a lockset, so there is always metal on it and the
+     finish always means something — the "no metal parts" case went away with
+     the split, because the recessed channel is a grip and the lever beside it
+     is still a lever. What survives is a grip supplied in one finish only:
+     Shiran is antique brass, and hardware on a door matches. */
   const h = byId(HANDLES, state.handle);
-  if (h.finish === 'none') return null;
   return byId(FINISHES, h.finish || state.finish);
 }
 

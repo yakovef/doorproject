@@ -17,7 +17,7 @@ const shot = async (name, q, clip) => {
 };
 
 // Question 1: the same door hung both ways, nothing else different.
-const base = 'c=rb-0097d&w=none&g=none&d=plain&s=standard&f=steel&n=plate';
+const base = 'c=rb-0097d&w=none&g=none&d=plain&s=standard&f=steel&n=none&k=plate';
 await shot('handing-a', `${base}&h=right-in`);
 await shot('handing-b', `${base}&h=left-in`);
 console.log('handing-a / handing-b');

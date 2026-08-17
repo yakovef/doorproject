@@ -2,9 +2,9 @@
  * Wiring. Small on purpose — the state is three keys.
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, PLACEHOLDER, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
-import { describe, detailGlyph, finishGlyph, grilleGlyph, handleGlyph, render, sizeGlyph, windowGlyph } from './renderer.js';
+import { describe, detailGlyph, finishGlyph, grilleGlyph, handleGlyph, locksetGlyph, render, sizeGlyph, windowGlyph } from './renderer.js';
 import { copyMessage, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 
@@ -24,8 +24,10 @@ function init() {
              id => set({ window: id }));
   buildTiles('#grilles', GRILLES, 'סורג', g => grilleGlyph(g), g => g.he, g => g.delta,
              chooseGrille);
-  buildTiles('#handles', HANDLES, 'ידית', n => handleGlyph(n), n => n.he, n => n.delta,
+  buildTiles('#handles', HANDLES, 'ידית משיכה', n => handleGlyph(n), n => n.he, n => n.delta,
              id => set({ handle: id }));
+  buildTiles('#locksets', LOCKSETS, 'מנעול וידית', k => locksetGlyph(k), k => k.he, k => k.delta,
+             id => set({ lockset: id }));
   buildTiles('#details', DETAILS, 'עיצוב', d => detailGlyph(d), d => d.he, d => d.delta,
              id => set({ detail: id }));
   buildTiles('#finishes', FINISHES, 'גימור ידיות', f => finishGlyph(f), f => f.he, f => f.delta,
@@ -199,7 +201,8 @@ function paint() {
   $('#summary').textContent = [
     colour.he, `RAL ${colour.ral}`, win.he,
     ...(win.rects.length && grille.id !== 'none' ? [grille.he] : []),
-    `${byId(HANDLES, state.handle).he}${finish ? ` ${finish.he}` : ''}`,
+    ...(byId(HANDLES, state.handle).style === 'none' ? [] : [byId(HANDLES, state.handle).he]),
+    `${byId(LOCKSETS, state.lockset).he}${finish ? ` ${finish.he}` : ''}`,
     ...(state.detail !== 'plain' ? [byId(DETAILS, state.detail).he] : []),
     size.he, handing.he,
   ].join(' · ');
@@ -208,6 +211,7 @@ function paint() {
   markSelected('#windows', state.window);
   markSelected('#grilles', state.grille);
   markSelected('#handles', state.handle);
+  markSelected('#locksets', state.lockset);
   markSelected('#details', state.detail);
   // The tile that is ticked is the finish the door is BUILT in, which is not
   // always the one that was clicked (see gateFinishes).

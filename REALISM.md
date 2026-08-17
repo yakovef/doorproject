@@ -662,6 +662,18 @@ run 0.089 and 0.155 and ours runs 0.032. We have less than half the tonal
 unevenness of a real door, not more. `tools/_mottle` is the kind of thing that
 should exist before an adjustment, not after.
 
+One more thing the same twenty photographs settled, on the hardware rather
+than the designs: **a grip and a lockset are two objects.** Most of the doors
+carry both — a vertical pull bar inboard, a lever and a cylinder out at the
+stile — and the catalogue had them in one list, so choosing the Idan bar made
+a Rotem backplate unreachable. They are two option groups now. The pull bars
+also lost their standoffs: those projected sideways because every product
+photograph is yawed just enough to show them, and this drawing is not — leaf,
+frame, threshold and mouldings are all dead square-on, so a bracket sticking
+out to one side was the only thing on the door announcing a viewpoint nothing
+else shared. Square-on, a standoff is behind its own bar; what is left of it
+is the shadow it drops on the leaf.
+
 Still open on the designs, in the same photographs: the strips detail appears
 both horizontally and vertically in the gallery (d043 is vertical, d078
 horizontal) and we only draw one; d067 carries three rectangles, not two; and

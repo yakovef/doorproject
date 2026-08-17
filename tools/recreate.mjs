@@ -16,13 +16,13 @@ import jpeg from 'jpeg-js';
    is close the gap is the finding, and it is named here rather than hidden. */
 const CASES = [
   { id: 'd026', label: 'basic ₪3,750',
-    q: 'c=rb-7080d&w=none&g=none&n=coral&d=plain&f=brass&s=standard&h=right-in',
+    q: 'c=rb-7080d&w=none&g=none&n=none&k=coral&d=plain&f=brass&s=standard&h=right-in',
     gap: 'window grey added this round; exact match' },
   { id: 'd097', label: 'luxury ₪7,500',
-    q: 'c=rb-9016d&w=tallwin&g=grid-light&n=coral&d=panel&f=steel&s=standard&h=right-in',
+    q: 'c=rb-9016d&w=tallwin&g=grid-light&n=none&k=coral&d=panel&f=steel&s=standard&h=right-in',
     gap: 'grid-light added; photo also has scroll motifs inside the grid' },
   { id: 'd062', label: 'designed ₪5,000',
-    q: 'c=rb-5103d&w=none&g=none&n=grab&d=panel2&f=steel&s=standard&h=right-in',
+    q: 'c=rb-5103d&w=none&g=none&n=grab&k=coral&d=panel2&f=steel&s=standard&h=right-in',
     gap: 'the applied-moulding rewrite was measured on this door and d048/d076' },
 ];
 

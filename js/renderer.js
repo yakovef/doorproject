@@ -16,7 +16,7 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { darken, isLight, lighten, scaleTone, silhouette } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
@@ -304,6 +304,7 @@ export function render(state) {
   const win     = byId(WINDOWS, state.window);
   const grille  = byId(GRILLES, state.grille);
   const handle  = byId(HANDLES, state.handle);
+  const lockset = byId(LOCKSETS, state.lockset);
   const detail  = byId(DETAILS, state.detail);
   /* The handle's own finish wins over the chosen one — Luna is matte black and
      Shiran is antique brass whatever the tiles say, and the recessed channel
@@ -361,19 +362,23 @@ export function render(state) {
      it is not what ref-00 or any of the works photographs show. */
   const lockX   = hingeOnLeft ? mainX1 - LOCK_BACKSET : mainX + LOCK_BACKSET;
   const inward  = hingeOnLeft ? -1 : 1;
-  const standoff = handleStandoff(handle, leafW, leafH);
-  const handleX = lockX + inward * standoff;
   const hingeX  = hingeOnLeft ? mainX : mainX1;
   const leverDir = hingeOnLeft ? -1 : 1;
   const centreX = mainX + leafW / 2;
 
-  /* The glazing envelope, so moulded detail can be kept clear of it. */
+  /* The glazing envelope, so moulded detail and the grip can be kept clear of
+     it. Declared before the grip is placed, because the grip now reads it. */
   const winBottom = win.rects.length
     ? y0 + Math.max(...win.rects.map(r => r.top + r.h)) : y0;
   const winSpan = win.rects.length ? {
     x:  centreX + Math.min(...win.rects.map(r => (r.dx || 0) - r.w / 2)),
     x1: centreX + Math.max(...win.rects.map(r => (r.dx || 0) + r.w / 2)),
   } : null;
+
+  const glassEdge = winSpan
+    ? Math.abs((hingeOnLeft ? winSpan.x1 : winSpan.x) - lockX) : Infinity;
+  const standoff = gripStandoff(handle, lockset, leafW, leafH, glassEdge);
+  const handleX = lockX + inward * standoff;
 
   const paint = colour.hex;
   const edge  = silhouette(paint);
@@ -1030,9 +1035,10 @@ export function render(state) {
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
     ${win.rects.length ? '' : peephole(centreX, y(PEEPHOLE_AFF))}
-    ${handleArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint,
-                centreX, leafW, y0)}
-    ${handle.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
+    ${gripArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint,
+              centreX, leafW, y0)}
+    ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
+    ${lockset.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
@@ -1444,68 +1450,109 @@ function grillePaths(kind, x, y, w, h, tint) {
 /* ── hardware ───────────────────────────────────────────────────── */
 
 /**
- * The handle art's footprint about its own centre, in mm: `hx` either side,
- * `vy` above and below. Declared once so the placement maths and the tests
- * read the same numbers the drawing does.
+ * The art's footprint about its own centre, in mm: `hx` either side, `vy` above
+ * and below, and `reach` for the part that only extends INBOARD.
+ *
+ * A lever's blade is the reason `reach` exists. It swings towards the leaf
+ * centre and nowhere else, so folding it into `hx` made the fitting look 145 mm
+ * wide on the closing-edge side too, which put it off the edge of the leaf.
+ * The body is symmetric; the blade is not.
+ *
+ * Declared once so the placement maths and the tests read the same numbers the
+ * drawing does.
  */
 function handleFootprint(handle, leafH) {
   switch (handle.style) {
+    case 'none':    return { hx: 0, vy: 0 };
     case 'channel': return { hx: 21, vy: channelHalf(handle.len, leafH) };
     case 'grab':    return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
-    case 'lever':   return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
-    case 'plate':   return { hx: PLATE.w / 2, vy: PLATE.h / 2 };
-    case 'almog':   return { hx: 39, vy: 39 };
+    case 'lever':   return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE, reach: LEVER_REACH };
+    case 'plate':   return { hx: PLATE.w / 2, vy: PLATE.h / 2, reach: PLATE.w * PLATE.reach };
+    case 'almog':   return { hx: 39, vy: 39, reach: 39 * 2 * 2.80 };
     case 'cadoor':  return { hx: 34, vy: 40 };
     case 'sapir':   return { hx: 36, vy: 36 };
-    case 'luna':    return { hx: 115, vy: 230 };
+    case 'knobplate': return { hx: 48, vy: 150 };
     case 'shiran':  return { hx: 44, vy: 240 };
     default:        return { hx: (handle.w || 30) / 2, vy: barHalf(handle.len, leafH) };
   }
 }
 
 /**
- * How far towards the leaf centre this handle has to sit so that it clears the
- * lock escutcheon. Zero when the two never meet — which is the common case:
- * a lever's rosette stops 27 mm above the escutcheon, exactly as it does on a
- * real door, and moving it would be wrong.
+ * How far towards the leaf centre the GRIP has to sit so that it clears the
+ * lock furniture beside it.
+ *
+ * Simpler than it was, because the grip no longer has to double as the lock:
+ * the two are always both on the door now, always at the same height, so the
+ * clearance always applies rather than being conditional on whether their
+ * vertical bands happen to meet. The measured inset is the target and the
+ * clearance is the floor — on a narrow leaf the floor is what binds.
  */
-export function handleStandoff(handle, leafW, leafH) {
-  if (handle.lock) return 0;                         // it IS the lock
-  const foot = handleFootprint(handle, leafH);
-  const dy = Math.abs(HANDLE_AFF - CYLINDER_AFF);
-  const clear = dy >= foot.vy + LOCK_R                // do the vertical bands meet?
-    ? 0 : foot.hx + LOCK_R + LOCK_CLEAR;
-  // Clearing the escutcheon is the floor; the measured inset is the target.
+export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) {
+  const grip = handleFootprint(handle, leafH);
+  if (!grip.vy && !grip.hx) return 0;                // nothing to place
+  const lock = handleFootprint(lockset, leafH);
+  /* The lockset's BODY is what the grip has to clear, not the lever's reach. A
+     lever sits about 30 mm proud of the door and a pull bar about 50 on its
+     standoffs, so the blade sweeps behind the bar — which is exactly what a
+     real door with both fittings looks like, and why the bar is drawn over the
+     lever rather than beside it.
+     Counting the reach as solid pushed the bar 195 mm inboard, past the near
+     edge of a centred window, so a door with a Rotem backplate and an Idan bar
+     had the bar lying across the glass. The keyway is the thing that must stay
+     clear, and it is inside the body. */
+  const clear = lock.hx + grip.hx + LOCK_CLEAR;
   const want = handle.inset ? leafW * handle.inset - LOCK_BACKSET
-             : foot.vy > 200 ? leafW * BAR_INSET - LOCK_BACKSET : 0;
-  return Math.round(Math.max(clear, want, 0));
+             : grip.vy > 200 ? leafW * BAR_INSET - LOCK_BACKSET : 0;
+  /* And it must not run across the glass. `toGlass` is the distance from the
+     lock's axis to the near edge of the glazing; the bar has to stop short of
+     it. Where a wide window leaves no room, clearing the lockset still wins —
+     a bar over a pane is wrong, a bar drawn through a lever is worse. */
+  const room = toGlass - grip.hx - LOCK_CLEAR;
+  return Math.round(Math.max(clear, Math.min(want, room), 0));
 }
 
 /**
  * One entry per style. Each takes the catalogue entry and a context object, so
- * a new handle is a row here plus a draw function — nothing else changes.
+ * a new fitting is a row here plus a draw function — nothing else changes.
+ *
+ * Two tables, because a grip and a lockset are two objects on the same door.
+ * Every door draws one of each (the grip may be `none`), which is what made a
+ * pull bar with a Rotem backplate possible.
  */
-const HANDLE_ART = {
+const GRIP_ART = {
+  none:    () => '',
   channel: (h, g) => channelHandle(g.cx, g.cy, h.len, g.leafH, g.paint),
   grab:    (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
-  plate:   (h, g) => plateHandle(g.cx, g.cy, g.dir),
   bar:     (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
+  shiran:  (h, g) => shiranPull(g.cx, g.cy, g.leafH),
+};
+
+const LOCK_ART = {
   lever:   (h, g) => lever(g.cx, g.cy, g.dir),
+  plate:   (h, g) => plateHandle(g.cx, g.cy, g.dir),
   almog:   (h, g) => almogLever(g.cx, g.cy, g.dir),
   cadoor:  (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
   knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
   sapir:   (h, g) => sapirKnob(g.cx, g.cy, g.dir),
-  luna:    (h, g) => lunaPull(g.cx, g.cy, g.dir),
-  shiran:  (h, g) => shiranPull(g.cx, g.cy, g.leafH),
 };
 
-function handleArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0) {
-  const draw = HANDLE_ART[handle.style] || HANDLE_ART.lever;
+function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0) {
+  const draw = GRIP_ART[handle.style];
+  if (!draw) return '';
   const art = draw(handle, { cx, cy, dir, paint, centreX, leafW, leafH, y0 });
+  if (!art) return '';
   const foot = handleFootprint(handle, leafH);
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
+             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}">${art}</g>`;
+}
+
+function locksetArt(lockset, cx, cy, dir) {
+  const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
+  const foot = handleFootprint(lockset, 0);
+  return `<g data-hw="lockset" data-style="${lockset.style}"
              data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
-             data-carries-lock="${!!handle.lock}">${art}</g>`;
+             data-reach="${Math.round(foot.reach || 0)}"
+             data-carries-lock="${!!lockset.lock}">${draw(lockset, { cx, cy, dir })}</g>`;
 }
 
 const channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
@@ -1643,18 +1690,22 @@ function pullBar(cx, cy, handle, leafH) {
   const at = t => top + L * t;
   const stub = w * (spec.stub || 1);
 
-  /* Fixings project to one side: a truly square-on photograph would hide them
-     behind the bar, and every product shot is yawed just enough to show them.
-     They go under the bar unless the measurement says they interrupt it. */
-  const px = cx + w / 2;
+  /* The standoffs used to project sideways from the bar, because every product
+     photograph is yawed just enough to show them. This drawing is not: the
+     leaf, the frame, the threshold and the mouldings are all dead square-on,
+     and a bracket sticking out to one side is the one thing on the door
+     announcing a viewpoint nothing else shares. Seen square-on a standoff is
+     behind its own bar and invisible, so what is left of it is the shadow it
+     drops on the leaf — a local thickening of the bar's own shadow where it is
+     actually held off the door.
+     Collars, clamps and end shoes stay: those are ON the bar, wrapping or
+     interrupting it, and they are visible from any angle at all. */
   const fx = spec.fix;
   const fixArt = (behind) => fx.t.map(t => {
-    const y = at(t), proj = w * fx.proj, sz = w * (fx.size || 1);
-    if (fx.kind === 'cylinder' && behind) return `
-      <rect x="${px - 4}" y="${y - sz / 2}" width="${proj}" height="${sz}" rx="${sz / 2}"
-            fill="url(#nickelSoft)"/>
-      <ellipse cx="${px + proj - sz * 0.18}" cy="${y}" rx="${sz * 0.3}" ry="${sz / 2}"
-               fill="url(#nickel)"/>`;
+    const y = at(t), sz = w * (fx.size || 1);
+    if ((fx.kind === 'cylinder' || fx.kind === 'leg') && behind) return `
+      <ellipse cx="${cx + 11}" cy="${y + 13}" rx="${w * 0.78}" ry="${sz * 0.62}"
+               fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`;
     if (fx.kind === 'collar' && !behind) return `
       <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
             rx="${w * 0.18}" fill="url(#nickel)"/>
@@ -1671,9 +1722,6 @@ function pullBar(cx, cy, handle, leafH) {
       <circle cx="${cx + w * 0.83}" cy="${y}" r="${w * 0.14}" fill="#000" opacity="0.5"/>
       <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
             rx="2" fill="url(#nickel)"/>`;
-    if (fx.kind === 'leg' && behind) return `
-      <rect x="${cx - w / 2}" y="${y - w / 2}" width="${w * fx.proj + w / 2}" height="${w * 0.6}"
-            rx="2" fill="url(#nickelSoft)"/>`;
     if (fx.kind === 'shoe' && !behind) return `
       <rect x="${cx - w * fx.size / 2}" y="${y - w * fx.tall / 2}" width="${w * fx.size}"
             height="${w * fx.tall}" rx="${w * 0.22}" fill="url(#nickel)"/>
@@ -2235,13 +2283,15 @@ export function describe(state, lang = 'he') {
   const w = byId(WINDOWS, state.window);
   const g = byId(GRILLES, state.grille);
   const hd = byId(HANDLES, state.handle);
+  const lk = byId(LOCKSETS, state.lockset);
   const dt = byId(DETAILS, state.detail);
   const fn = effectiveFinish(state);
   const s = SIZES[state.size] || SIZES.standard;
   if (lang === 'he') {
     const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
     const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${hd.he}${fn ? ' ' + fn.he : ''}, ${s.he}, פתיחה ${h.he}.`;
+    const grip = hd.style === 'none' ? '' : `${hd.he}, `;
+    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${grip}${lk.he}${fn ? ' ' + fn.he : ''}, ${s.he}, פתיחה ${h.he}.`;
   }
   return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
 }
@@ -2302,7 +2352,11 @@ export function sizeGlyph(size) {
  * Every silhouette below traces the art the door itself draws; the numbers are
  * the same measured millimetres, so a tile cannot drift from its door.
  */
-const HANDLE_GLYPH = {
+const FITTING_GLYPH = {
+  none: () => ({ box: [-60, -80, 60, 80], art: `
+    <path d="M -34 -46 L 34 46 M 34 -46 L -34 46" fill="none" stroke="currentColor"
+          stroke-width="7" stroke-linecap="round" opacity="0.45"/>` }),
+
   // Coral: plain lever on a round rose, reaching toward the hinge.
   lever: () => ({ box: [-172, -48, 52, 48], art: `
     <circle cx="0" cy="0" r="39"/>
@@ -2336,10 +2390,6 @@ const HANDLE_GLYPH = {
     <rect x="-36" y="-36" width="72" height="72" rx="3"/>
     <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper)"/>
     <rect x="-65" y="-23" width="62" height="62" rx="7"/>` }),
-
-  // Luna: a half-disc, chord against the stile.
-  luna: () => ({ box: [-118, -238, 122, 238], art: `
-    <path d="M 114 -230 A 230 230 0 0 0 114 230 Z"/>` }),
 
   // Shiran: the ornate pull — spigot, bulge, disc, parallel shaft, mirrored.
   shiran: () => ({ box: [-48, -252, 48, 252], art: `
@@ -2389,7 +2439,7 @@ const HANDLE_GLYPH = {
 };
 
 export function handleGlyph(handle) {
-  const make = HANDLE_GLYPH[handle.style] || HANDLE_GLYPH.lever;
+  const make = FITTING_GLYPH[handle.style] || FITTING_GLYPH.lever;
   const { box, art } = make(handle);
 
   /* Fit the art into a fixed 3:4 window, so a rose and a 1150 mm pull bar
@@ -2406,6 +2456,9 @@ export function handleGlyph(handle) {
     <g fill="currentColor">${art}</g>
   </svg>`;
 }
+
+/** Lock furniture shares the drawing; only the list it is chosen from differs. */
+export const locksetGlyph = handleGlyph;
 
 /**
  * Detail glyph: where the panel, groove and applied strips sit on the leaf.

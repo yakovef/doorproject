@@ -16,6 +16,12 @@
  * Run: npm run audit
  */
 import { chromium } from 'playwright';
+import { DEFAULTS, encodeCode } from '../js/url-state.js';
+
+/* Derived, not spelled out: the code grew from seven characters to eight when
+   the grip and the lockset became separate fields, and a hard-coded length
+   here turned that into 280 audit failures that were all the same fact. */
+const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
 
 const VIEWS = [
   { name: 'phone',   w: 390,  h: 844 },
@@ -25,8 +31,8 @@ const VIEWS = [
   { name: 'wide',    w: 1680, h: 950 },
 ];
 
-const GROUPS = ['#colours', '#windows', '#grilles', '#handles', '#details',
-                '#finishes', '#sizes', '#handings'];
+const GROUPS = ['#colours', '#windows', '#grilles', '#handles', '#locksets',
+                '#details', '#finishes', '#sizes', '#handings'];
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 let faults = 0;
@@ -100,7 +106,7 @@ for (const v of VIEWS) {
         if (clip > 1) fault(v.name, `${g}=${id}: the leaf is cut off by ${Math.round(clip)}px`);
       }
       if (!/\d/.test(s.price)) fault(v.name, `${g}=${id}: price reads "${s.price}"`);
-      if (!/^DM-[0-9A-Z]{7}$/.test(s.code)) fault(v.name, `${g}=${id}: code reads "${s.code}"`);
+      if (!CODE.test(s.code)) fault(v.name, `${g}=${id}: code reads "${s.code}"`);
       if (!s.wa || !s.wa.startsWith('https://')) fault(v.name, `${g}=${id}: WhatsApp link is "${s.wa}"`);
       if (!s.summary.trim()) fault(v.name, `${g}=${id}: the spec line is empty`);
 

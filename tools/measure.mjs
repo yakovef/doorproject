@@ -99,7 +99,7 @@ for (const [name, q] of [
   ['ours  (white, RAL 9016D)', 'c=rb-9016d'],
 ]) {
   const p = await b.newPage({ viewport: { width: 900, height: 1200 }, deviceScaleFactor: 1 });
-  await p.goto(`file://${process.cwd()}/index.html?bare=1&${q}&w=none&g=none&n=channel&d=plain&f=steel&s=standard&h=right-in`);
+  await p.goto(`file://${process.cwd()}/index.html?bare=1&${q}&w=none&g=none&n=channel&k=coral&d=plain&f=steel&s=standard&h=right-in`);
   await p.waitForTimeout(500);
   /* The browser already knows where the leaf landed. Reconstructing it from
      the viewBox and a scale factor meant re-deriving, by hand, a mapping that

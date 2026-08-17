@@ -15,13 +15,18 @@
  * Run: npm run hardware
  */
 import { chromium } from 'playwright';
-import { FINISHES, HANDLES } from '../js/catalog.js';
+import { FINISHES, HANDLES, LOCKSETS } from '../js/catalog.js';
 
+/* Both groups, and one pairing of the two — the combination the split exists
+   for is a pull bar with a lever-and-cylinder backplate beside it, and that is
+   the crop most worth being able to look at. */
 const CASES = [
-  ...HANDLES.map(h => [`lock-${h.id}`, `n=${h.id}&f=steel`]),
-  // one alternative finish, and one door hung the other way round
-  ['lock-plate-brass', 'n=plate&f=brass'],
-  ['lock-plate-left',  'n=plate&f=steel&h=left-in'],
+  ...HANDLES.filter(h => h.style !== 'none').map(h => [`grip-${h.id}`, `n=${h.id}&k=coral&f=steel`]),
+  ...LOCKSETS.map(k => [`lock-${k.id}`, `n=none&k=${k.id}&f=steel`]),
+  ['pair-idan-plate',  'n=idan&k=plate&f=steel'],
+  ['pair-shahar-almog', 'n=shahar&k=almog&f=brass'],
+  ['lock-plate-brass', 'n=none&k=plate&f=brass'],
+  ['lock-plate-left',  'n=none&k=plate&f=steel&h=left-in'],
 ];
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
@@ -49,5 +54,6 @@ for (const [name, opts] of CASES) {
   console.log(name, 'ok');
   await p.close();
 }
-console.log(`${CASES.length} crops, ${HANDLES.length} handles, ${FINISHES.length} finishes`);
+console.log(`${CASES.length} crops, ${HANDLES.length} grips, ${LOCKSETS.length} locksets, ` +
+            `${FINISHES.length} finishes`);
 await b.close();

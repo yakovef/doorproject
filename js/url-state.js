@@ -8,9 +8,15 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
+import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 
-/* 6: the whole colour list was replaced by the manufacturer's own chart, so
+/* 7: the handle list split in two. A grip and a lockset are separate objects
+   fitted to the same door, so they are separate fields — `n` is the grip and
+   the new `k` is the lock furniture. Every id keeps its meaning and a link
+   written before the split still opens the right door (fromQuery moves a
+   lockset found under `n` across to `k`), but the code stores INDICES and the
+   field layout itself changed, so an older code is refused with a notice.
+   6: the whole colour list was replaced by the manufacturer's own chart, so
    every colour index moved. Aliases keep shared LINKS working; they cannot
    help a code, which stores a number.
    5: the code's fields were widened (see BITS) and the catalogue grew, so
@@ -21,13 +27,14 @@ import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS 
    became "lever + horizontal grab bar", which is what the installations
    actually show). Bumping rather than reusing means an older code is refused
    with a notice instead of quietly decoding into a different door. */
-export const VERSION = 6;
+export const VERSION = 7;
 
 export const DEFAULTS = {
   colour:  'rb-0097d',
   window:  'rect',
   grille:  'none',
   handle:  'idan',
+  lockset: 'coral',
   detail:  'plain',
   finish:  'steel',
   size:    'standard',
@@ -44,6 +51,7 @@ export function toQuery(state) {
   p.set('w', state.window);
   p.set('g', state.grille);
   p.set('n', state.handle);
+  p.set('k', state.lockset);
   p.set('d', state.detail);
   p.set('f', state.finish);
   p.set('s', state.size);
@@ -80,6 +88,16 @@ export function fromQuery(search) {
   take('window', 'w', WINDOWS);
   take('grille', 'g', GRILLES);
   take('handle', 'n', HANDLES);
+  take('lockset', 'k', LOCKSETS);
+
+  /* A link written before the grip and the lockset were separate fields names
+     the lockset under `n`. Move it across rather than refusing it: those links
+     are in people's WhatsApp history and Peretz opens them months later. */
+  const rawN = p.get('n');
+  if (rawN && !p.get('k')) {
+    const hit = LOCKSETS.find(o => o.id === rawN || (o.aliases || []).includes(rawN));
+    if (hit) { state.lockset = hit.id; state.handle = 'none'; notice = null; }
+  }
   take('detail', 'd', DETAILS);
   take('finish', 'f', FINISHES);
   take('handing', 'h', HANDINGS);
@@ -94,10 +112,15 @@ export function fromQuery(search) {
 }
 
 // ── Short code ────────────────────────────────────────────────────
-// 35 bits, laid out with room to grow:
+// 40 bits, laid out with room to grow:
 //   version 3 | colour 7 | size 4 | handing 2 | window 5
-//   | grille 3 | handle 5 | detail 3 | finish 3
-// -> 7 Crockford base32 characters, still short enough to read aloud.
+//   | grille 3 | handle 5 | lockset 4 | detail 3 | finish 4
+// -> 8 Crockford base32 characters, still short enough to read aloud.
+//
+// 40 bits, up from 35, because the handle field became two: a grip and a
+// lockset are separate objects on the same door. The eighth character is the
+// price of saying so, and it also means every pre-split code fails the length
+// check and is refused outright rather than decoded into a different door.
 //
 // The handle field took the spare bit when the range grew to the real Rav
 // Bariach products. Four bits is sixteen slots against fourteen used, so the
@@ -112,11 +135,11 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    phone, and Peretz builds a door with no grille at all. Not an error, not a
    refusal, just a different door. PLAN.md §8.2 names that as the worst thing
    this site can do.
-   35 bits is 7 characters instead of 6. Capacities now: 128 colours, 16 sizes,
-   4 handings, 32 windows, 8 grilles, 32 handles, 8 details, 8 finishes. */
+   Capacities now: 128 colours, 16 sizes, 4 handings, 32 windows, 8 grilles,
+   32 grips, 16 locksets, 8 details, 16 finishes. */
 const BITS = { version: 3, colour: 7, size: 4, handing: 2, window: 5,
-               grille: 3, handle: 5, detail: 3, finish: 3 };
-const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 35 -> 7 chars
+               grille: 3, handle: 5, lockset: 4, detail: 3, finish: 4 };
+const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 40 -> 8 chars
 
 export function encodeCode(state) {
   const sizeKeys = Object.keys(SIZES);
@@ -128,6 +151,7 @@ export function encodeCode(state) {
     [Math.max(0, WINDOWS.findIndex(w => w.id === state.window)), BITS.window],
     [Math.max(0, GRILLES.findIndex(g => g.id === state.grille)), BITS.grille],
     [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
+    [Math.max(0, LOCKSETS.findIndex(k => k.id === state.lockset)), BITS.lockset],
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
     [Math.max(0, FINISHES.findIndex(f => f.id === state.finish)), BITS.finish],
   ];
@@ -177,13 +201,15 @@ export function decodeCode(code) {
   const window  = WINDOWS[read(BITS.window)];
   const grille  = GRILLES[read(BITS.grille)];
   const handle  = HANDLES[read(BITS.handle)];
+  const lockset = LOCKSETS[read(BITS.lockset)];
   const detail  = DETAILS[read(BITS.detail)];
   const finish  = FINISHES[read(BITS.finish)];
-  if (!colour || !size || !handing || !window || !grille || !handle || !detail || !finish) return null;
+  if (!colour || !size || !handing || !window || !grille || !handle || !lockset
+      || !detail || !finish) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
-    grille: grille.id, handle: handle.id, detail: detail.id,
+    grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
     finish: finish.id,
   };
 }
