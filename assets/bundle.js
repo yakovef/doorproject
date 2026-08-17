@@ -150,7 +150,10 @@
        those as a recessed shadow is the single easiest way to render this tier
        wrong. Counts observed: 3, 7 and 11 strips. */
     { id: "strips", he: "פסי מתכת", en: "Metal strips", delta: 44e3, panel: false, groove: false, strips: 11 },
-    { id: "strips3", he: "שלושה פסים", en: "Three strips", delta: 32e3, panel: false, groove: false, strips: 3 }
+    { id: "strips3", he: "שלושה פסים", en: "Three strips", delta: 32e3, panel: false, groove: false, strips: 3 },
+    /* The classic two-panel face — tall upper, short lower — which d048 carries
+       and a single bottom-quarter panel cannot describe. Solid leaves only. */
+    { id: "panel2", he: "שני פאנלים", en: "Two panels", delta: 52e3, panel: true, groove: false, panels: 2 }
   ];
   var FINISHES = [
     { id: "steel", he: "ניקל מוברש", en: "Brushed nickel", delta: 0 },
@@ -249,8 +252,8 @@
     cool: "#0C1622"
   };
   var FALLOFF = {
-    dark: { peak: 0.16, mid: 0.08, low: 0.3, foot: 0.35, head: 0.03, grain: 0.13, drift: 0.26 },
-    light: { peak: 0.1, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.02, drift: 0.14 }
+    dark: { peak: 0.16, mid: 0.08, low: 0.3, foot: 0.35, head: 0.03, grain: 0.07, drift: 0.13 },
+    light: { peak: 0.1, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.015, drift: 0.09 }
   };
   var CASING = 46;
   var RET_NEAR = 25;
@@ -335,7 +338,7 @@
     const deep = darken(paint2, 0.55);
     const fall = isLight(paint2) ? FALLOFF.light : FALLOFF.dark;
     const pale = isLight(paint2);
-    const AO_SIDE = Math.round(leafW * 0.05);
+    const AO_SIDE = Math.round(leafW * 0.14);
     const AO_FOOT = Math.round(leafH * 0.065);
     const leaf = (lx, lw) => `
     <rect x="${lx}" y="${y0}" width="${lw}" height="${leafH}" fill="url(#leafFill)"/>
@@ -461,11 +464,11 @@
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoLeft" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.40"/>
+      <stop offset="0" stop-color="#000" stop-opacity="0.24"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoRight" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.40"/>
+      <stop offset="0" stop-color="#000" stop-opacity="0.24"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
 
@@ -857,7 +860,7 @@
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint2, winBottom) : ""}
+    ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint2, winBottom, detail.panels === 2) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone) : ""}
   </g>
@@ -909,25 +912,31 @@
                L ${x + d} ${y + h - d} L ${x + w - d} ${y + h - d} L ${x + w - d} ${y + d} Z"
             fill="${dark}"/>`;
   }
-  function raisedPanel(lx, ly, lw, lh, paint2, winBottom) {
+  function raisedPanel(lx, ly, lw, lh, paint2, winBottom, upper) {
     const inset = 105;
     const top = Math.max(ly + lh * 0.7, winBottom + 70);
     const bottom = ly + lh - 85;
     const h = bottom - top;
     if (h < 300) return "";
     const x = lx + inset, w = lw - inset * 2;
-    return `
-    <g data-detail="panel">
-      ${bevel(x, top, w, h, 26, paint2, true)}
-      <rect x="${x + 26}" y="${top + 26}" width="${w - 52}" height="${h - 52}"
-            fill="${lighten(paint2, 0.05)}"/>
-      ${bevel(x + 26, top + 26, w - 52, h - 52, 9, paint2, false)}
-      <rect x="${x + 35}" y="${top + 35}" width="${w - 70}" height="${h - 70}"
-            fill="url(#keyLight)" opacity="0.5"/>
-      <!-- the panel sits proud, so it casts down onto the field below -->
-      <rect x="${x}" y="${top + h}" width="${w}" height="16"
-            fill="#000" opacity="0.22" filter="url(#contact)"/>
-    </g>`;
+    const one = (py, ph) => `
+      ${bevel(x, py, w, ph, 26, paint2, true)}
+      <rect x="${x + 26}" y="${py + 26}" width="${w - 52}" height="${ph - 52}"
+            fill="${lighten(paint2, 0.02)}"/>
+      ${bevel(x + 26, py + 26, w - 52, ph - 52, 9, paint2, false)}
+      <rect x="${x + 35}" y="${py + 35}" width="${w - 70}" height="${ph - 70}"
+            fill="url(#keyLight)" opacity="0.30"/>
+      <!-- it sits proud, so it casts down onto the field below -->
+      <rect x="${x}" y="${py + ph}" width="${w}" height="16"
+            fill="#000" opacity="0.22" filter="url(#contact)"/>`;
+    if (upper) {
+      const uTop = ly + lh * 0.15, uBot = ly + lh * 0.56;
+      if (winBottom <= ly + 1 && uBot - uTop >= 300) {
+        return `<g data-detail="panel" data-panels="2">
+        ${one(uTop, uBot - uTop)}${one(ly + lh * 0.63, lh * 0.29)}</g>`;
+      }
+    }
+    return `<g data-detail="panel">${one(top, h)}</g>`;
   }
   function metalStrips(lx, ly, lw, lh, count, tone) {
     const x0s = lx + lw * 0.09, x1s = lx + lw * 0.91;

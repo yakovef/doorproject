@@ -187,6 +187,9 @@ export const DETAILS = [
      wrong. Counts observed: 3, 7 and 11 strips. */
   { id: 'strips', he: 'פסי מתכת',       en: 'Metal strips',   delta: 44000, panel: false, groove: false, strips: 11 },
   { id: 'strips3',he: 'שלושה פסים',     en: 'Three strips',   delta: 32000, panel: false, groove: false, strips: 3 },
+  /* The classic two-panel face — tall upper, short lower — which d048 carries
+     and a single bottom-quarter panel cannot describe. Solid leaves only. */
+  { id: 'panel2', he: 'שני פאנלים',     en: 'Two panels',     delta: 52000, panel: true,  groove: false, panels: 2 },
 ];
 
 /** Ironmongery finish. One variable, and it changes every metal part. */

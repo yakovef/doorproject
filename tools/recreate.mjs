@@ -19,7 +19,7 @@ const CASES = [
     q: 'c=ral-8019&w=none&g=none&n=cadoor&d=groove&f=steel&s=standard&h=left-in',
     gap: 'leaf #82756C warm mid taupe; RAL 8019 #6B6362 is the nearest, a shade darker' },
   { id: 'd048', label: 'designed ₪4,800',
-    q: 'c=ral-5011&w=none&g=none&n=coral&d=panel&f=steel&s=standard&h=right-in',
+    q: 'c=ral-5011&w=none&g=none&n=coral&d=panel2&f=steel&s=standard&h=right-in',
     gap: 'photo contrast is 10.6:1 — a very dark leaf in hard light' },
   { id: 'd092', label: 'luxury ₪6,950',
     q: 'c=ral-7033&w=tallwin&g=scroll&n=cadoor&d=panel&f=brass&s=standard&h=left-in',

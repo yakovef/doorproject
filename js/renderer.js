@@ -56,9 +56,17 @@ export const LIGHT = {
    instead of the end of a fall. Whatever happens down there must read as the
    shadow continuing, never as an event. */
 const FALLOFF = {
-  dark:  { peak: 0.16, mid: 0.08, low: 0.30, foot: 0.35, head: 0.03, grain: 0.13, drift: 0.26 },
-  light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.02, drift: 0.14 },
+  dark:  { peak: 0.16, mid: 0.08, low: 0.30, foot: 0.35, head: 0.03, grain: 0.07, drift: 0.13 },
+  light: { peak: 0.10, mid: 0.05, low: 0.14, foot: 0.17, head: 0.02, grain: 0.015, drift: 0.09 },
 };
+
+/* `drift` and `grain` both halved, for two reasons that turn out to be one.
+   Sampling seven columns across the leaf, a dark door of ours fell 12% from
+   left to right where the photographs RISE 3% — a lopsided cloud, not a
+   lighting model. And the same overlay is the texture: all thirty measured
+   doors record `smooth`, with high-pass sigma of 0.16-1.26 on the reference
+   photographs against our 1.1-2.8. A painted steel door has slow mottling
+   and almost no speckle, and we had too much of both. */
 
 /* ── Geometry, in mm ──────────────────────────────────────────────
    The returns were roughly three times too wide, and thirty measured
@@ -226,7 +234,15 @@ export function render(state) {
   /* The leaf's own perimeter ramps, distinct from the frame's shadow gap and
      easy to omit: the face itself darkens towards its edges over 0.04-0.06 W,
      and over 0.065 H at the foot. Measured on the anthracite stairwell door. */
-  const AO_SIDE = Math.round(leafW * 0.05);
+  /* 0.14, not 0.05. Sampling seven columns across twenty square-on
+     photographs gives 0.862 0.907 0.894 0.928 0.937 0.939 0.882 — a shallow
+     dome, both edges down about 7% on the middle, and the falloff still
+     running at 0.12 of the width in. Ours darkened over 0.05 and was
+     therefore INVISIBLE at the first sample column, so our leaf read
+     brightest exactly where a real one is dimmest. Individual doors lean
+     left or right depending on where the light was, but the dome is in all
+     of them, so the dome is what the model should carry. */
+  const AO_SIDE = Math.round(leafW * 0.14);
   const AO_FOOT = Math.round(leafH * 0.065);
 
   const leaf = (lx, lw) => `
@@ -359,11 +375,11 @@ export function render(state) {
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoLeft" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.40"/>
+      <stop offset="0" stop-color="#000" stop-opacity="0.24"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoRight" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.40"/>
+      <stop offset="0" stop-color="#000" stop-opacity="0.24"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
 
@@ -752,7 +768,7 @@ export function render(state) {
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint, winBottom) : ''}
+    ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint, winBottom, detail.panels === 2) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone) : ''}
   </g>
@@ -803,7 +819,7 @@ function bevel(x, y, w, h, d, paint, raised = true) {
  * produces mouldings crossing the glass, which is not a door.
  * Returns '' when there is no room, so the two can never collide.
  */
-function raisedPanel(lx, ly, lw, lh, paint, winBottom) {
+function raisedPanel(lx, ly, lw, lh, paint, winBottom, upper) {
   /* The panel was starting at 0.60 of the leaf and running to 0.94 — a third
      of the whole door. On d092 and d116 the real panel sits in the bottom
      quarter, about 0.72 to 0.96, and is the smaller partner to the glazing
@@ -815,18 +831,35 @@ function raisedPanel(lx, ly, lw, lh, paint, winBottom) {
   const h = bottom - top;
   if (h < 300) return '';                       // no room below the glazing
   const x = lx + inset, w = lw - inset * 2;
-  return `
-    <g data-detail="panel">
-      ${bevel(x, top, w, h, 26, paint, true)}
-      <rect x="${x + 26}" y="${top + 26}" width="${w - 52}" height="${h - 52}"
-            fill="${lighten(paint, 0.05)}"/>
-      ${bevel(x + 26, top + 26, w - 52, h - 52, 9, paint, false)}
-      <rect x="${x + 35}" y="${top + 35}" width="${w - 70}" height="${h - 70}"
-            fill="url(#keyLight)" opacity="0.5"/>
-      <!-- the panel sits proud, so it casts down onto the field below -->
-      <rect x="${x}" y="${top + h}" width="${w}" height="16"
-            fill="#000" opacity="0.22" filter="url(#contact)"/>
-    </g>`;
+
+  /* One panel body, so the two-panel case cannot drift from the one-panel
+     case. The field is barely lightened — 0.02, not 0.05. On d048 the real
+     mouldings are the SAME navy as the door and are legible only by their
+     shadow; ours lifted the field far enough to read as a second, paler
+     colour panelled into the leaf, which is a thing the photographs never
+     show. A moulding is a shape, not a tint. */
+  const one = (py, ph) => `
+      ${bevel(x, py, w, ph, 26, paint, true)}
+      <rect x="${x + 26}" y="${py + 26}" width="${w - 52}" height="${ph - 52}"
+            fill="${lighten(paint, 0.02)}"/>
+      ${bevel(x + 26, py + 26, w - 52, ph - 52, 9, paint, false)}
+      <rect x="${x + 35}" y="${py + 35}" width="${w - 70}" height="${ph - 70}"
+            fill="url(#keyLight)" opacity="0.30"/>
+      <!-- it sits proud, so it casts down onto the field below -->
+      <rect x="${x}" y="${py + ph}" width="${w}" height="16"
+            fill="#000" opacity="0.22" filter="url(#contact)"/>`;
+
+  /* The classic two-panel face: a tall upper and a short lower, which is what
+     d048 carries and what our single bottom-quarter panel could not say. Only
+     drawn on a solid leaf — with glazing above, there is nowhere for it. */
+  if (upper) {
+    const uTop = ly + lh * 0.15, uBot = ly + lh * 0.56;
+    if (winBottom <= ly + 1 && uBot - uTop >= 300) {
+      return `<g data-detail="panel" data-panels="2">
+        ${one(uTop, uBot - uTop)}${one(ly + lh * 0.63, lh * 0.29)}</g>`;
+    }
+  }
+  return `<g data-detail="panel">${one(top, h)}</g>`;
 }
 
 /**
