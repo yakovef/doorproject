@@ -38,6 +38,15 @@ function init() {
 
   $('#copy-btn').addEventListener('click', onCopy);
 
+  /* The crop depends on the stage's shape, so it has to be recomputed
+     whenever that changes — a rotated phone, a dragged window, or one of the
+     notice strips appearing and taking height off the stage. */
+  if (typeof ResizeObserver === 'function') {
+    new ResizeObserver(fitStage).observe($('#stage'));
+  } else {
+    window.addEventListener('resize', fitStage);
+  }
+
   paint();
 }
 
@@ -179,6 +188,7 @@ function paint() {
   $('#stage').innerHTML = render(state);
   $('.stage-wrap').dataset.light =
     String($('#stage').querySelector('svg').dataset.light === 'true');
+  fitStage();
 
   $('#price').textContent = formatAgorot(priceAgorot(state));
   $('#code').textContent = encodeCode(state);
@@ -207,6 +217,38 @@ function paint() {
   $('#wa-btn').href = whatsappUrl(state);
 
   announce(describe(state));
+}
+
+/**
+ * Let the room reach the edges of the stage.
+ *
+ * The renderer draws the door in a box that stops just outside the frame, and
+ * paints wall and floor far beyond it. Fitted the ordinary way that box gets
+ * letterboxed and the door reads as a picture of a door hung on the page. So
+ * the viewBox is widened here to exactly the stage's shape, centred on the
+ * same point: the door does not move or change size by a pixel — `meet` would
+ * have chosen this same scale — but the crop now falls on wall and floor
+ * instead of on nothing.
+ */
+function fitStage() {
+  /* Bare mode is the measurement harness (tools/frame.mjs, recreate.mjs and
+     friends), and a harness wants the drawing's own frame: the door filling
+     its box, nothing around it. Those tools measure the leaf, the frame and
+     the hardware, none of which the surrounding room touches. */
+  if (document.documentElement.classList.contains('is-bare')) return;
+
+  const stage = $('#stage');
+  const svg = stage.querySelector('svg');
+  if (!svg) return;
+
+  const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
+  const box = stage.getBoundingClientRect();
+  if (!(w > 0 && h > 0 && box.width > 0 && box.height > 0)) return;
+
+  const scale = Math.min(box.width / w, box.height / h);
+  const vw = box.width / scale, vh = box.height / scale;
+  svg.setAttribute('viewBox',
+    `${((w - vw) / 2).toFixed(1)} ${((h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
 }
 
 /**

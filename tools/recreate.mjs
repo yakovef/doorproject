@@ -16,10 +16,10 @@ import jpeg from 'jpeg-js';
    is close the gap is the finding, and it is named here rather than hidden. */
 const CASES = [
   { id: 'd026', label: 'basic ₪3,750',
-    q: 'c=ral-7040&w=none&g=none&n=coral&d=plain&f=brass&s=standard&h=right-in',
+    q: 'c=rb-7080d&w=none&g=none&n=coral&d=plain&f=brass&s=standard&h=right-in',
     gap: 'window grey added this round; exact match' },
   { id: 'd097', label: 'luxury ₪7,500',
-    q: 'c=ral-9016&w=tallwin&g=grid-light&n=coral&d=panel&f=steel&s=standard&h=right-in',
+    q: 'c=rb-9016d&w=tallwin&g=grid-light&n=coral&d=panel&f=steel&s=standard&h=right-in',
     gap: 'grid-light added; photo also has scroll motifs inside the grid' },
 ];
 
@@ -53,14 +53,21 @@ for (const c of CASES) {
   const q = hand ? c.q.replace(/h=[a-z-]+/, `h=${hand}`) : c.q;
 
   const p = await b.newPage({ viewport: { width: 620, height: 1000 }, deviceScaleFactor: 2 });
-  await p.goto(`file://${process.cwd()}/index.html?bare=1&v=5&${q}`);
+  await p.goto(`file://${process.cwd()}/index.html?bare=1&${q}`);
   await p.waitForTimeout(500);
-  const box = await p.evaluate(() => {
-    const s = document.querySelector('.door-svg').getBoundingClientRect();
-    return { x: s.x, y: s.y, width: s.width, height: s.height };
+  /* Ask the page how tall the leaf came out, rather than multiplying the shot
+     by a constant. The constant was 0.735 — the leaf's share of the drawing's
+     height — and it silently stopped being true the moment the air around the
+     door changed, which put every proportion below on a different ruler
+     without anything looking broken. */
+  const geo = await p.evaluate(() => {
+    const svg = document.querySelector('.door-svg');
+    const s = svg.getBoundingClientRect();
+    const l = svg.querySelector('#leaf rect').getBoundingClientRect();
+    return { box: { x: s.x, y: s.y, width: s.width, height: s.height }, leafH: l.height };
   });
   const shot = `/tmp/rec-${c.id}.png`;
-  await p.screenshot({ path: shot, clip: box });
+  await p.screenshot({ path: shot, clip: geo.box });
   await p.close();
 
   /* Match on LEAF height: the photo's leaf and ours must be the same number of
@@ -70,8 +77,7 @@ for (const c of CASES) {
   const H = 1100;
   const photoScale = H / rec.leaf.h;
   const pw = Math.round(photo.w * photoScale), ph = Math.round(photo.h * photoScale);
-  // our leaf is ~0.74 of the render's height for a standard door
-  const oursScale = H / (ours.h * 0.735);
+  const oursScale = H / (geo.leafH * 2);        // 2 = deviceScaleFactor
   const ow = Math.round(ours.w * oursScale), oh = Math.round(ours.h * oursScale);
 
   const A = scale(photo, pw, ph), B = scale(ours, ow, oh);

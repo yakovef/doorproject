@@ -72,7 +72,7 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 
 async function measure(colourId) {
   const p = await b.newPage({ viewport: { width: 700, height: 1000 }, deviceScaleFactor: 2 });
-  await p.goto(`file://${process.cwd()}/index.html?bare=1&v=4&c=${colourId}`
+  await p.goto(`file://${process.cwd()}/index.html?bare=1&c=${colourId}`
              + `&w=none&g=none&n=idan&d=plain&f=steel&s=standard&h=right-in`);
   await p.waitForTimeout(500);
 
@@ -139,8 +139,8 @@ async function measure(colourId) {
 
 const T = targets();
 const rows = [
-  ['dark  (RAL 7016 anthracite)', 'ral-7016', T.dark],
-  ['light (RAL 9016 white)',      'ral-9016', T.light],
+  ['dark  (RAL 0097D anthracite)', 'rb-0097d', T.dark],
+  ['light (RAL 9016D white)',      'rb-9016d', T.light],
 ];
 
 const f = v => v == null ? '   —  ' : v.toFixed(3).padStart(6);

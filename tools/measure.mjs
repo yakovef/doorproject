@@ -95,19 +95,19 @@ for (const [name, file, f] of PHOTOS) {
 /* Ours, shot bare and cropped to the leaf via the renderer's own data hooks. */
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 for (const [name, q] of [
-  ['ours  (anthracite, RAL 7016)', 'c=ral-7016'],
-  ['ours  (white, RAL 9016)', 'c=ral-9016'],
+  ['ours  (anthracite, RAL 0097D)', 'c=rb-0097d'],
+  ['ours  (white, RAL 9016D)', 'c=rb-9016d'],
 ]) {
   const p = await b.newPage({ viewport: { width: 900, height: 1200 }, deviceScaleFactor: 1 });
-  await p.goto(`file://${process.cwd()}/index.html?bare=1&v=3&${q}&w=none&g=none&n=channel&d=plain&f=steel&s=standard&h=right-in`);
+  await p.goto(`file://${process.cwd()}/index.html?bare=1&${q}&w=none&g=none&n=channel&d=plain&f=steel&s=standard&h=right-in`);
   await p.waitForTimeout(500);
+  /* The browser already knows where the leaf landed. Reconstructing it from
+     the viewBox and a scale factor meant re-deriving, by hand, a mapping that
+     also has to account for the viewBox origin — which stopped being zero the
+     day the room grew past the drawing. */
   const box = await p.evaluate(() => {
-    const svg = document.querySelector('#stage svg');
-    const g = svg.querySelector('#leaf');
-    const vb = svg.viewBox.baseVal, r = svg.getBoundingClientRect();
-    const k = r.width / vb.width;
-    return { x: r.x + +g.dataset.x * k, y: r.y + (svg.querySelector('#leaf rect').y.baseVal.value) * k,
-             w: +g.dataset.w * k, h: svg.querySelector('#leaf rect').height.baseVal.value * k };
+    const r = document.querySelector('#stage svg #leaf rect').getBoundingClientRect();
+    return { x: r.x, y: r.y, w: r.width, h: r.height };
   });
   await p.screenshot({ path: '/tmp/ours.png' });
   const img = load('/tmp/ours.png');

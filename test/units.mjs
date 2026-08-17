@@ -4,9 +4,10 @@
  */
 import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
-import { LIGHT } from '../js/renderer.js';
 import { priceAgorot, shekels } from '../js/price.js';
-import { render } from '../js/renderer.js';
+import {
+  detailGlyph, finishGlyph, grilleGlyph, handleGlyph, LIGHT, render, sizeGlyph, windowGlyph,
+} from '../js/renderer.js';
 import { decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 
 let pass = 0, fail = 0;
@@ -359,6 +360,35 @@ group('the face wash does not tint the paint');
       `keyWash foot stop on ${c.id} is ${foot.col} at ${foot.at}, not #000 at 1: ` +
       `a tinted foot turns saturated doors brown`);
   }
+}
+
+// ── 6b. No two options may show the same picture ───────────────────
+/* The newest member of the family that vanishes rather than breaks. The handle
+   glyph knew four styles and sent everything else to one `else` branch, so
+   nine of the fifteen handles drew an identical circle-and-bar: nine tiles,
+   nine names, nine prices, one picture. Nothing was missing, nothing errored,
+   and choosing a handle was guesswork.
+   Two tiles that look alike are the same defect as a tile that draws nothing,
+   so both are pinned the same way — by comparing the markup, not the code
+   path that produced it. */
+group('every option tile draws its own picture');
+{
+  const seen = new Map();
+  const check = (kind, id, svg) => {
+    const art = svg.replace(/\s+/g, ' ').trim();
+    ok(art.length > 60, `${kind} glyph for ${id} is empty`);
+    const key = `${kind}:${art}`;
+    ok(!seen.has(key),
+      `${kind} "${id}" draws exactly the same picture as "${seen.get(key)}" — ` +
+      `two priced options a customer cannot tell apart`);
+    seen.set(key, id);
+  };
+  for (const h of HANDLES) check('handle', h.id, handleGlyph(h));
+  for (const w of WINDOWS) check('window', w.id, windowGlyph(w));
+  for (const g of GRILLES) check('grille', g.id, grilleGlyph(g));
+  for (const d of DETAILS) check('detail', d.id, detailGlyph(d));
+  for (const f of FINISHES) check('finish', f.id, finishGlyph(f));
+  for (const s of Object.values(SIZES)) check('size', s.id, sizeGlyph(s));
 }
 
 // ── 7. Leaf-and-a-half hinges against the frame, not the fixed panel ──

@@ -12,7 +12,12 @@ const options = {
   entryPoints: ['js/app.js'],
   bundle: true,
   format: 'iife',          // classic script: works from file://
-  target: ['es2019'],
+  /* es2020, because the short code is built on BigInt (url-state.js: the
+     field layout is 35 bits wide and `<<` truncates at 32). Under es2019
+     esbuild warned on every BigInt literal and passed it through unchanged —
+     the bundle worked, but five standing warnings on every build is exactly
+     where a real one hides. BigInt has shipped everywhere since Safari 14. */
+  target: ['es2020'],
   outfile: 'assets/bundle.js',
   legalComments: 'none',
   charset: 'utf8',

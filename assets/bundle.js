@@ -263,8 +263,7 @@
     light: { peak: 0.1, mid: 0.05, low: 0.09, foot: 0.1, head: 0.02, grain: 0.09, drift: 0.09 }
   };
   var CASING = 46;
-  var RET_NEAR = 78;
-  var RET_FAR = 46;
+  var RETURN = 62;
   var RET_HEAD = 148;
   var MULLION = 22;
   var REBATE = 50;
@@ -298,7 +297,8 @@
     bar: 0.36
     // lever thickness at the root, in plate widths
   };
-  var PAD = { x: 70, top: 95, bottom: 150 };
+  var PAD = { x: 70, top: 110, bottom: 300 };
+  var SCENE = 4200;
   function render(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const colour = byId(COLOURS, state2.colour);
@@ -313,15 +313,23 @@
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
-    const x0 = PAD.x + CASING + RET_NEAR;
+    const x0 = PAD.x + CASING + RETURN;
     const x1 = x0 + totalW;
     const y0 = PAD.top + CASING + RET_HEAD;
     const floorY = y0 + leafH;
     const view = {
-      w: x1 + RET_FAR + CASING + PAD.x,
+      w: x1 + RETURN + CASING + PAD.x,
       h: floorY + THRESHOLD + PAD.bottom
     };
     const y = (aff) => floorY - aff;
+    const revX0 = x0 - RETURN;
+    const revX1 = x1 + RETURN;
+    const revY0 = y0 - RET_HEAD;
+    const casX0 = revX0 - CASING;
+    const casX1 = revX1 + CASING;
+    const casY0 = revY0 - CASING;
+    const baseY = floorY + THRESHOLD;
+    const openW = totalW + RETURN * 2;
     const hingeOnLeft = inside ? handing.hinge === "right" : handing.hinge === "left";
     const mainX = sideW && !hingeOnLeft ? x0 + sideW + MULLION : x0;
     const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
@@ -370,16 +378,18 @@
     <rect x="${lx + lw - 5}" y="${y0 + 20}" width="3" height="${leafH - 40}"
           fill="#fff" opacity="0.13"/>
     <rect x="${lx}" y="${floorY - AO_FOOT}" width="${lw}" height="${AO_FOOT}" fill="url(#aoBottom)"/>`;
-    const band = (inset, w, fill) => {
-      const d = inset + w / 2;
-      return `<path d="M ${x0 - d} ${floorY + THRESHOLD} L ${x0 - d} ${y0 - d}
-                     L ${x1 + d} ${y0 - d} L ${x1 + d} ${floorY + THRESHOLD}"
-                  fill="none" stroke="${fill}" stroke-width="${w}" stroke-linejoin="miter"/>`;
-    };
+    const reveal = `
+      <rect x="${x0 - EDGE}" y="${y0 - EDGE}" width="${totalW + EDGE * 2}"
+            height="${EDGE}" fill="url(#edgeTop)"/>
+      <rect x="${x0 - EDGE}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
+            fill="url(#edgeLeft)"/>
+      <rect x="${x1}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
+            fill="url(#edgeRight)"/>`;
     return `
 <svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint2)}"
+     data-fit-w="${view.w}" data-fit-h="${view.h}"
      aria-label="${describe(state2)}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="leafFill" x1="0" y1="0" x2="0" y2="1">
@@ -505,16 +515,18 @@
       <stop offset="0" stop-color="${darken(paint2, pale ? 0.2 : 0.34)}"/>
       <stop offset="1" stop-color="${darken(paint2, pale ? 0.34 : 0.52)}"/>
     </linearGradient>
-    /* I had this jamb sunlit — brighter than the leaf — because the green
-       door's photographs show it that way, caught square-on by the afternoon
-       sun. Reverted: a strongly lit plane on one side only reads as a light
-       source rather than a surface, and beside two shadowed planes it looks
-       like a mistake rather than like weather. The photograph is honest about
-       that one door at that one hour; a configurator has to hold for every
-       door at every hour, and the reading that survives both is three planes
-       all turning away into shade, the far one least deeply because it faces
-       back toward the light. Same family as the near jamb, two thirds the
-       depth. */
+    <!-- I had this jamb sunlit — brighter than the leaf — because the green
+         door's photographs show it that way, caught square-on by the afternoon
+         sun. Reverted: a strongly lit plane on one side only reads as a light
+         source rather than a surface, and beside two shadowed planes it looks
+         like a mistake rather than like weather. The photograph is honest
+         about that one door at that one hour; a configurator has to hold for
+         every door at every hour, and the reading that survives both is three
+         planes all turning away into shade, the far one least deeply because
+         it faces back toward the light. Same family as the near jamb, two
+         thirds the depth.
+         (This was a /* */ block sitting inside the SVG template literal, so it
+         was being emitted into the markup as stray text on every render.) -->
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
       <stop offset="0" stop-color="${darken(paint2, pale ? 0.13 : 0.22)}"/>
       <stop offset="1" stop-color="${darken(paint2, pale ? 0.23 : 0.38)}"/>
@@ -532,9 +544,30 @@
       <stop offset="1"   stop-color="${LIGHT.cool}" stop-opacity="0.06"/>
     </linearGradient>
 
-    <linearGradient id="edgeShade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${darken(paint2, pale ? 0.14 : 0.22)}"/>
-      <stop offset="1" stop-color="${darken(paint2, pale ? 0.24 : 0.38)}"/>
+    <!-- One ramp per side, each running PERPENDICULAR to its own edge: darkest
+         hard against the leaf, gone again 38 mm out. It used to be a single
+         gradient down the whole frame applied as one stroked band, which made
+         the head a flat grey bar of constant tone — a painted stripe between
+         two objects, which is precisely the thing the twenty-door measurement
+         said the junction is not.
+         Pure black at falling alpha, like every other occlusion here: it
+         multiplies whatever is underneath instead of replacing it, so the ramp
+         reads across casing, soffit and jamb without flattening the tonal
+         differences that tell those three planes apart. -->
+    <linearGradient id="edgeTop" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
+    </linearGradient>
+    <linearGradient id="edgeLeft" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
+    </linearGradient>
+    <linearGradient id="edgeRight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
 
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
@@ -542,9 +575,16 @@
       <stop offset="0.3" stop-color="${darken(paint2, pale ? 0.12 : 0.2)}"/>
       <stop offset="1"   stop-color="${darken(paint2, pale ? 0.3 : 0.48)}"/>
     </linearGradient>
-    <linearGradient id="casingFace" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="${lighten(paint2, 0.1)}"/>
-      <stop offset="1" stop-color="${darken(paint2, 0.06)}"/>
+    <!-- The casing is one flat plane facing the viewer, and one plane takes one
+         gradient: brightest at the head where the key reaches it, falling away
+         down the jambs toward the floor, leaning slightly to the light's side.
+         It used to be three separately-toned rectangles butted at the corners,
+         which put a hard horizontal step across the top of each jamb — right
+         where a viewer looks to read the frame's depth. -->
+    <linearGradient id="casingFace" x1="0" y1="0" x2="0.30" y2="1">
+      <stop offset="0"    stop-color="${lighten(paint2, 0.09)}"/>
+      <stop offset="0.34" stop-color="${lighten(paint2, 0.03)}"/>
+      <stop offset="1"    stop-color="${darken(paint2, pale ? 0.13 : 0.19)}"/>
     </linearGradient>
 
     <!-- Brushed nickel, lit from upper-left. The bright band sits off-centre
@@ -733,7 +773,14 @@
       <stop offset="1" stop-color="#CFE0EA" stop-opacity="0"/>
     </linearGradient>
 
-    <radialGradient id="vignette" cx="0.5" cy="0.44" r="0.78">
+    <!-- In user space, not bounding-box units: the rect it paints now reaches
+         far past the drawing so the wall can fill the screen, and a
+         bounding-box vignette would have stretched with it until it did
+         nothing. Anchored on the door instead, so however wide the window is,
+         the falloff stays centred on the thing being looked at. -->
+    <radialGradient id="vignette" gradientUnits="userSpaceOnUse"
+                    cx="${Math.round(view.w / 2)}" cy="${Math.round(view.h * 0.44)}"
+                    r="${Math.round(Math.max(view.w, view.h) * 0.62)}">
       <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
       <stop offset="1"    stop-color="#000" stop-opacity="${LIGHT.vignette}"/>
     </radialGradient>
@@ -761,7 +808,8 @@
       </feComponentTransfer>
     </filter>
     <filter id="wallGrain" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="11"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="11"
+                    stitchTiles="stitch"/>
       <feColorMatrix type="saturate" values="0"/>
       <feComponentTransfer>
         <feFuncR type="linear" slope="1.6" intercept="-0.3"/>
@@ -769,6 +817,14 @@
         <feFuncB type="linear" slope="1.6" intercept="-0.3"/>
       </feComponentTransfer>
     </filter>
+    <!-- One filtered tile, repeated, instead of one filter over the whole
+         room. The wall now runs thousands of units past the door, and asking
+         a browser for a turbulence buffer that size to carry a 7% texture is
+         how a colour change turns into a visible stall. stitchTiles keeps the
+         seams out of it. -->
+    <pattern id="wallTex" width="240" height="240" patternUnits="userSpaceOnUse">
+      <rect width="240" height="240" filter="url(#wallGrain)"/>
+    </pattern>
     <filter id="frost" x="-5%" y="-5%" width="110%" height="110%">
       <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="5"/>
       <feColorMatrix type="saturate" values="0"/>
@@ -784,106 +840,94 @@
     <filter id="hwShadow" x="-60%" y="-30%" width="240%" height="170%">
       <feGaussianBlur stdDeviation="9"/>
     </filter>
+    <filter id="frameShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
   </defs>
 
-  <!-- ── wall and floor ───────────────────────────────────────── -->
+  <!-- ── wall and floor ───────────────────────────────────────────
+       Painted far past the drawing's own bounds (see SCENE): the page widens
+       the viewBox to the screen's shape, so whatever the window aspect is,
+       what reaches the edges is room and not a cut-off rectangle. -->
   <g id="backdrop">
-    <rect x="0" y="0" width="${view.w}" height="${floorY + THRESHOLD}" fill="var(--wall)"/>
-    <rect x="0" y="${floorY + THRESHOLD}" width="${view.w}"
-          height="${view.h - floorY - THRESHOLD}" fill="var(--floor)"/>
-    <rect x="0" y="0" width="${view.w}" height="${view.h}"
-          filter="url(#wallGrain)" opacity="0.07" style="mix-blend-mode:multiply"/>
-    <line x1="0" y1="${floorY + THRESHOLD}" x2="${view.w}" y2="${floorY + THRESHOLD}"
+    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
+          height="${baseY + SCENE}" fill="var(--wall)"/>
+    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}"
+          height="${view.h - baseY + SCENE}" fill="var(--floor)"/>
+    <!-- Tiled rather than one filtered rect. A feTurbulence over a surface
+         this size is a large offscreen buffer for a 7% texture; the pattern
+         stitches, so it costs one tile. -->
+    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
+          height="${view.h + SCENE * 2}"
+          fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
+    <line x1="${-SCENE}" y1="${baseY}" x2="${view.w + SCENE}" y2="${baseY}"
           stroke="#000" stroke-opacity="0.16" stroke-width="2"
           vector-effect="non-scaling-stroke"/>
   </g>
 
   <!-- ── cast shadow: soft pool plus a hard contact line ──────── -->
   <g id="shadow">
-    <ellipse cx="${(x0 + x1) / 2}" cy="${floorY + THRESHOLD + 40}"
+    <ellipse cx="${(x0 + x1) / 2}" cy="${baseY + 40}"
              rx="${totalW * 0.6}" ry="34" fill="#000" opacity="0.18" filter="url(#softShadow)"/>
-    <rect x="${x0 - RET_NEAR - CASING}" y="${floorY + THRESHOLD - 3}"
-          width="${totalW + RET_NEAR + RET_FAR + CASING * 2}" height="13"
+    <rect x="${casX0}" y="${baseY - 3}" width="${openW + CASING * 2}" height="13"
           fill="#000" opacity="0.42" filter="url(#contact)"/>
   </g>
 
   <!-- ── frame: casing face, then the return faces you see into ── -->
   <g id="frame">
-    <path d="M ${x0 - RET_NEAR - CASING} ${floorY + THRESHOLD}
-             L ${x0 - RET_NEAR - CASING} ${y0 - RET_HEAD - CASING}
-             L ${x1 + RET_FAR + CASING} ${y0 - RET_HEAD - CASING}
-             L ${x1 + RET_FAR + CASING} ${floorY + THRESHOLD}
-             L ${x1 + RET_FAR} ${floorY + THRESHOLD}
-             L ${x1 + RET_FAR} ${y0 - RET_HEAD}
-             L ${x0 - RET_NEAR} ${y0 - RET_HEAD}
-             L ${x0 - RET_NEAR} ${floorY + THRESHOLD} Z"
-          fill="${paint2}"/>
-    <rect x="${x0 - RET_NEAR - CASING}" y="${y0 - RET_HEAD - CASING}"
-          width="${totalW + RET_NEAR + RET_FAR + CASING * 2}" height="${CASING}"
-          fill="${lighten(paint2, 0.07)}"/>
-    <rect x="${x0 - RET_NEAR - CASING}" y="${y0 - RET_HEAD}" width="${CASING}"
-          height="${floorY + THRESHOLD - y0 + RET_HEAD}" fill="url(#casingFace)"/>
-    <rect x="${x1 + RET_FAR}" y="${y0 - RET_HEAD}" width="${CASING}"
-          height="${floorY + THRESHOLD - y0 + RET_HEAD}"
-          fill="${darken(paint2, pale ? 0.09 : 0.14)}"/>
+    <!-- The casing stands a few millimetres proud of the plaster, so it drops
+         a short shadow down and right of itself. Small, but it is the
+         difference between a frame fixed INTO a wall and one printed onto it. -->
+    <path d="M ${casX0} ${casY0} H ${casX1} V ${baseY} H ${casX0} Z"
+          transform="translate(7 11)" fill="#000" opacity="0.22"
+          filter="url(#frameShadow)"/>
+
+    <!-- The casing is ONE plane. Head and jambs face the same way and take the
+         same light, so they are one shape under one gradient — three fills
+         butted together is what put a horizontal colour step across the top of
+         each jamb, at exactly the height a viewer reads as the frame's most
+         important corner. -->
+    <path d="M ${casX0} ${casY0} H ${casX1} V ${baseY} H ${revX1} V ${revY0}
+             H ${revX0} V ${baseY} H ${casX0} Z" fill="url(#casingFace)"/>
     <!-- light catch where the casing meets the wall -->
-    <line x1="${x0 - RET_NEAR - CASING}" y1="${y0 - RET_HEAD - CASING}"
-          x2="${x1 + RET_FAR + CASING}" y2="${y0 - RET_HEAD - CASING}"
+    <line x1="${casX0}" y1="${casY0}" x2="${casX1}" y2="${casY0}"
           stroke="#fff" stroke-opacity="0.16" stroke-width="2"
           vector-effect="non-scaling-stroke"/>
 
-    <!-- the soffit, drawn first so the jamb returns and their mitres lie over it -->
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint2}"/>
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="url(#soffit)"/>
-
-    <!-- the returns: three surfaces turning away from the camera -->
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint2}"/>
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retNear)"/>
-
-    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint2}"/>
-    <!-- The sunlit jamb's highlight goes on LAST. Painted before the vertical
-         fall, the fall simply covered it and the plane came out as dark as its
-         opposite number, which is the whole reason the opening read flat. -->
-    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retFar)"/>
-
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint2}"/>
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="url(#soffit)"/>
+    <!-- ── the opening: three planes turning back from the wall ──
+         Trapezoids, not rectangles. Where the soffit meets a jamb, the real
+         boundary runs from the opening's outer corner to its inner one — a
+         true mitre, which arrives for free once each plane is the shape it
+         actually projects to. It used to be three rectangles stacked in the
+         hope that a line drawn on top would suggest the corner. -->
+    <path d="M ${revX0} ${revY0} H ${revX1} L ${x1} ${y0} H ${x0} Z" fill="url(#soffit)"/>
+    <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${baseY} H ${revX0} Z" fill="url(#retNear)"/>
+    <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${baseY} H ${revX1} Z" fill="url(#retFar)"/>
 
     <!-- hard arris where casing turns into return -->
-    <line x1="${x0 - RET_NEAR}" y1="${y0 - RET_HEAD}" x2="${x0 - RET_NEAR}" y2="${floorY + THRESHOLD}"
+    <line x1="${revX0}" y1="${revY0}" x2="${revX0}" y2="${baseY}"
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-    <line x1="${x1 + RET_FAR}" y1="${y0 - RET_HEAD}" x2="${x1 + RET_FAR}" y2="${floorY + THRESHOLD}"
+    <line x1="${revX1}" y1="${revY0}" x2="${revX1}" y2="${baseY}"
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
 
-    <!-- The mitre. Where soffit meets jamb the photographs show a hard 45
-         degree seam, not a blend — two planes at different angles to the light
-         meeting on a line. Without it the box corners look moulded. -->
-    <path d="M ${x0 - RET_NEAR} ${y0 - RET_HEAD} L ${x0} ${y0}" fill="none"
-          stroke="#000" stroke-opacity="0.34" stroke-width="1.5"
+    <!-- The mitre seam itself. The trapezoids already meet along this line;
+         the stroke is the darkening any two planes show where they fold. -->
+    <path d="M ${revX0} ${revY0} L ${x0} ${y0}" fill="none"
+          stroke="#000" stroke-opacity="0.20" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
-    <path d="M ${x1 + RET_FAR} ${y0 - RET_HEAD} L ${x1} ${y0}" fill="none"
-          stroke="#000" stroke-opacity="0.26" stroke-width="1.5"
+    <path d="M ${revX1} ${revY0} L ${x1} ${y0}" fill="none"
+          stroke="#000" stroke-opacity="0.16" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
 
-    <!-- ── the reveal: quirk, bead, gap, mitred at both top corners ── -->
-    <g id="reveal">
-      ${band(0, EDGE, "url(#edgeShade)")}
-    </g>
+    <!-- ── the reveal: the soft ramp where frame meets leaf ── -->
+    <g id="reveal">${reveal}</g>
   </g>
 
   <!-- ── threshold ────────────────────────────────────────────── -->
   <g id="threshold">
-    <rect x="${x0 - RET_NEAR}" y="${floorY}" width="${totalW + RET_NEAR + RET_FAR}"
+    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
           height="${THRESHOLD}" fill="${darken(paint2, 0.3)}"/>
-    <rect x="${x0 - RET_NEAR}" y="${floorY}" width="${totalW + RET_NEAR + RET_FAR}"
+    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
           height="4" fill="#fff" opacity="0.18"/>
     <!-- Ribbed, because every sill in the photographs is: an extruded
          aluminium threshold with four or five flutes running its length,
@@ -891,11 +935,11 @@
          step. -->
     ${Array.from({ length: 4 }, (_, i) => {
       const ry = floorY + 7 + i * ((THRESHOLD - 9) / 4);
-      return `<rect x="${x0 - RET_NEAR + 4}" y="${ry}"
-                    width="${totalW + RET_NEAR + RET_FAR - 8}" height="2"
+      return `<rect x="${x0 - RETURN + 4}" y="${ry}"
+                    width="${totalW + RETURN + RETURN - 8}" height="2"
                     fill="#000" opacity="0.30"/>
-              <rect x="${x0 - RET_NEAR + 4}" y="${ry + 2}"
-                    width="${totalW + RET_NEAR + RET_FAR - 8}" height="1.4"
+              <rect x="${x0 - RETURN + 4}" y="${ry + 2}"
+                    width="${totalW + RETURN + RETURN - 8}" height="1.4"
                     fill="#fff" opacity="0.22"/>`;
     }).join("")}
   </g>
@@ -954,7 +998,8 @@
     ${handle.lock ? "" : inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
-  <rect x="0" y="0" width="${view.w}" height="${view.h}" fill="url(#vignette)"/>
+  <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
+        height="${view.h + SCENE * 2}" fill="url(#vignette)"/>
 </svg>`.trim();
   }
   function bevel(x, y, w, h, d, paint2, raised = true) {
@@ -1841,44 +1886,115 @@
           fill="none" stroke="currentColor" stroke-width="44"/>
   </svg>`;
   }
-  function handleGlyph(handle) {
-    const W = 950, H = 2100, pad = 40, cx = W - 200;
-    let art;
-    if (handle.style === "channel") {
-      art = `<rect x="${cx - 40}" y="${H / 2 - handle.len / 2}" width="80" height="${handle.len}"
-                 rx="8" fill="none" stroke="currentColor" stroke-width="34"/>`;
-    } else if (handle.style === "grab") {
-      const gy = H * GRAB.fromTop, gh = W * GRAB.len / 2;
-      art = `<circle cx="${cx}" cy="${H / 2}" r="46" fill="currentColor"/>
-           <rect x="${cx - 190}" y="${H / 2 - 22}" width="190" height="44" rx="22" fill="currentColor"/>
-           <rect x="${W / 2 - gh}" y="${gy - 26}" width="${gh * 2}" height="52" rx="26"
-                 fill="currentColor"/>`;
-    } else if (handle.style === "plate") {
-      const pw = 150, ph = 380, t = H / 2 - ph * PLATE.lever;
-      art = `<rect x="${cx - pw / 2}" y="${t}" width="${pw}" height="${ph}" rx="${pw / 2}"
-                 fill="currentColor"/>
-           <rect x="${cx - 300}" y="${H / 2 - 32}" width="300" height="64" rx="32"
-                 fill="currentColor"/>
-           <circle cx="${cx}" cy="${t + ph * PLATE.key}" r="26" fill="#fff" opacity="0.7"/>`;
-    } else if (handle.len) {
-      art = `<rect x="${cx - 26}" y="${H / 2 - handle.len / 2}" width="52" height="${handle.len}"
-                 rx="26" fill="currentColor"/>`;
-    } else {
-      art = `<circle cx="${cx}" cy="${H / 2}" r="46" fill="currentColor"/>
-           <rect x="${cx - 190}" y="${H / 2 - 22}" width="190" height="44" rx="22" fill="currentColor"/>`;
+  var HANDLE_GLYPH = {
+    // Coral: plain lever on a round rose, reaching toward the hinge.
+    lever: () => ({ box: [-172, -48, 52, 48], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>` }),
+    // Almog: swan-neck, raked 15 degrees up, and thicker at the tip than the root.
+    almog: () => ({ box: [-244, -62, 52, 46], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <path d="M 0 13 L -218 -47 L -218 -26 L 0 29 Z"/>` }),
+    // Rotem: lever and cylinder on one waisted backplate.
+    plate: () => ({ box: [-172, -88, 56, 184], art: `
+    <rect x="-45" y="-72" width="90" height="240" rx="45"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <circle cx="0" cy="106" r="13" fill="var(--paper)"/>` }),
+    // Knob on a long backplate — the plate carries the keyway too.
+    knobplate: () => ({ box: [-58, -118, 58, 214], art: `
+    <rect x="-48" y="-102" width="96" height="300" rx="30"/>
+    <circle cx="0" cy="0" r="30" fill="var(--paper)"/>
+    <circle cx="0" cy="0" r="21"/>
+    <circle cx="0" cy="120" r="12" fill="var(--paper)"/>` }),
+    // Cadoor: a free-standing ovoid, no rose — taller than wide, on a stub shank.
+    cadoor: () => ({ box: [-44, -48, 86, 48], art: `
+    <rect x="34" y="-11" width="45" height="22" rx="11"/>
+    <ellipse cx="0" cy="0" rx="34" ry="40"/>` }),
+    // Sapir: square cushion knob on a square rose, the knob offset off the plate.
+    sapir: () => ({ box: [-78, -46, 46, 52], art: `
+    <rect x="-36" y="-36" width="72" height="72" rx="3"/>
+    <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper)"/>
+    <rect x="-65" y="-23" width="62" height="62" rx="7"/>` }),
+    // Luna: a half-disc, chord against the stile.
+    luna: () => ({ box: [-118, -238, 122, 238], art: `
+    <path d="M 114 -230 A 230 230 0 0 0 114 230 Z"/>` }),
+    // Shiran: the ornate pull — spigot, bulge, disc, parallel shaft, mirrored.
+    shiran: () => ({ box: [-48, -252, 48, 252], art: `
+    <rect x="-7" y="-240" width="14" height="17"/>
+    <rect x="-7" y="223" width="14" height="17"/>
+    <ellipse cx="0" cy="-214" rx="24" ry="15"/>
+    <ellipse cx="0" cy="210" rx="25" ry="15"/>
+    <circle cx="0" cy="-150" r="42"/>
+    <circle cx="0" cy="150" r="43"/>
+    <rect x="-21" y="-111" width="42" height="223"/>` }),
+    // Recessed channel: a void in the leaf, so it is drawn as one.
+    channel: (h) => {
+      const half = Math.min(h.len, 2050 - 420) / 2;
+      return { box: [-58, -half - 30, 58, half + 30], art: `
+    <rect x="-21" y="${-half}" width="42" height="${half * 2}" rx="4"
+          fill="none" stroke="currentColor" stroke-width="9"/>
+    <rect x="-11" y="${-half + 26}" width="22" height="${half * 2 - 52}" rx="4"
+          opacity="0.45"/>` };
+    },
+    // Coral plus the horizontal bow. The bow is centred on the leaf, far inboard
+    // of the lever, so it runs off the left of the tile — which is what it does.
+    grab: () => ({ box: [-300, -52, 52, 224], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <path d="M -300 158 Q -190 143 -80 158 L -80 182 Q -190 197 -300 182 Z"/>
+    <circle cx="-80" cy="170" r="17"/>` }),
+    /* Pull bars. All five are a vertical rod, so what separates them is
+       slenderness, the end caps and the fixings — which is exactly what the
+       product photographs say separates them in the shop. */
+    bar: (h) => {
+      const half = Math.min(h.len, 2050 - 320) / 2;
+      const w = h.w || 30, spec = BARS[h.bar] || BARS.idan;
+      const fix = spec.fix.t.map((t) => {
+        const y = -half + half * 2 * t, s = w * spec.fix.size;
+        return spec.fix.kind === "clamp" || spec.fix.kind === "shoe" ? `<rect x="${-s / 2}" y="${y - s * 0.5}" width="${s}" height="${s}" rx="${w * 0.1}"/>` : `<rect x="${w / 2}" y="${y - s * 0.28}" width="${w * spec.fix.proj}" height="${s * 0.56}"
+                 rx="${s * 0.28}"/>`;
+      }).join("");
+      return { box: [-w * 2.2, -half - 26, w * 2.2, half + 26], art: `
+    ${fix}
+    <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"/>` };
     }
-    return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
-    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor"
-          stroke-width="44" opacity="0.5"/>
-    ${art}
+  };
+  function handleGlyph(handle) {
+    const make = HANDLE_GLYPH[handle.style] || HANDLE_GLYPH.lever;
+    const { box, art } = make(handle);
+    const A = 3 / 4;
+    let [x0, y0, x1, y1] = box;
+    let w = x1 - x0, h = y1 - y0;
+    if (w / h < A) {
+      const t = h * A;
+      x0 -= (t - w) / 2;
+      w = t;
+    } else {
+      const t = w / A;
+      y0 -= (t - h) / 2;
+      h = t;
+    }
+    return `<svg viewBox="${x0.toFixed(1)} ${y0.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}"
+               class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
   </svg>`;
   }
   function detailGlyph(detail) {
     const W = 950, H = 2100, pad = 40;
+    const inset = 105;
+    const panelAt = (top, bot) => `<rect x="${inset}" y="${H * top}"
+        width="${W - inset * 2}" height="${H * (bot - top)}"
+        fill="none" stroke="currentColor" stroke-width="36"/>`;
+    const panels = !detail.panel ? "" : detail.panels === 2 ? panelAt(0.15, 0.56) + panelAt(0.63, 0.92) : panelAt(0.7, 0.96);
+    const n = detail.strips || 0;
+    const strips = Array.from({ length: n }, (_, i) => {
+      const y = H * (0.09 + (n > 1 ? i * 0.82 / (n - 1) : 0.41));
+      return `<rect x="${W * 0.09}" y="${y - 14}" width="${W * 0.82}" height="28"
+                  fill="currentColor"/>`;
+    }).join("");
     return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
-    ${detail.panel ? `<rect x="105" y="${H * 0.6}" width="${W - 210}" height="${H * 0.3}"
-          fill="none" stroke="currentColor" stroke-width="36"/>` : ""}
+    ${panels}${strips}
     ${detail.groove ? `<rect x="${W * 0.7 - 18}" y="190" width="18" height="${H - 380}"
           fill="currentColor"/>` : ""}
   </svg>`;
@@ -1985,27 +2101,27 @@
       [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail],
       [Math.max(0, FINISHES.findIndex((f) => f.id === state2.finish)), BITS.finish]
     ];
-    let bits = /* @__PURE__ */ BigInt("0");
+    let bits = 0n;
     for (const [value, width] of parts) {
       const w = BigInt(width);
-      bits = bits << w | BigInt(value) & (/* @__PURE__ */ BigInt("1") << w) - /* @__PURE__ */ BigInt("1");
+      bits = bits << w | BigInt(value) & (1n << w) - 1n;
     }
     let out = "";
-    for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[Number(bits >> BigInt(i) & /* @__PURE__ */ BigInt("31"))];
+    for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[Number(bits >> BigInt(i) & 31n)];
     return "DM-" + out;
   }
   function decodeCode(code) {
     const clean = String(code).toUpperCase().replace(/^DM-?/, "").replace(/[^0-9A-Z]/g, "").replace(/[IL]/g, "1").replace(/O/g, "0").replace(/U/g, "V");
     if (clean.length !== TOTAL_BITS / 5) return null;
-    let bits = /* @__PURE__ */ BigInt("0");
+    let bits = 0n;
     for (const ch of clean) {
       const v = ALPHABET.indexOf(ch);
       if (v < 0) return null;
-      bits = bits << /* @__PURE__ */ BigInt("5") | BigInt(v);
+      bits = bits << 5n | BigInt(v);
     }
     const read = (width) => {
       const shift = BigInt(TOTAL_BITS - width - consumed);
-      const v = Number(bits >> shift & (/* @__PURE__ */ BigInt("1") << BigInt(width)) - /* @__PURE__ */ BigInt("1"));
+      const v = Number(bits >> shift & (1n << BigInt(width)) - 1n);
       consumed += width;
       return v;
     };
@@ -2149,6 +2265,11 @@
     if (PLACEHOLDER) $("#placeholder-note").hidden = false;
     if (notice) showNotice(notice);
     $("#copy-btn").addEventListener("click", onCopy);
+    if (typeof ResizeObserver === "function") {
+      new ResizeObserver(fitStage).observe($("#stage"));
+    } else {
+      window.addEventListener("resize", fitStage);
+    }
     paint();
   }
   function buildColours() {
@@ -2259,6 +2380,7 @@
     const size = SIZES[state.size] || SIZES.standard;
     $("#stage").innerHTML = render(state);
     $(".stage-wrap").dataset.light = String($("#stage").querySelector("svg").dataset.light === "true");
+    fitStage();
     $("#price").textContent = formatAgorot(priceAgorot(state));
     $("#code").textContent = encodeCode(state);
     const win = byId(WINDOWS, state.window);
@@ -2284,6 +2406,21 @@
     gateGrilles(byId(WINDOWS, state.window));
     $("#wa-btn").href = whatsappUrl(state);
     announce(describe(state));
+  }
+  function fitStage() {
+    if (document.documentElement.classList.contains("is-bare")) return;
+    const stage = $("#stage");
+    const svg = stage.querySelector("svg");
+    if (!svg) return;
+    const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
+    const box = stage.getBoundingClientRect();
+    if (!(w > 0 && h > 0 && box.width > 0 && box.height > 0)) return;
+    const scale = Math.min(box.width / w, box.height / h);
+    const vw = box.width / scale, vh = box.height / scale;
+    svg.setAttribute(
+      "viewBox",
+      `${((w - vw) / 2).toFixed(1)} ${((h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
+    );
   }
   function gateGrilles(win) {
     const solid = win.rects.length === 0;

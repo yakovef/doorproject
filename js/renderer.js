@@ -29,9 +29,9 @@ const FINISH_TONES = {
 };
 
 /* ── The light. Everything shades from this. ────────────────────────
-   Key is high and ~30° left of camera. The camera itself sits a little
-   right of centre, which is why the LEFT return reads wider — symmetric
-   depth looks like a diagram. */
+   Key is high and ~30° left of camera. The camera is square on to the door,
+   so the two jamb returns are the same width (see RETURN) and the light,
+   not the geometry, is what tells them apart. */
 export const LIGHT = {
   key: 0.24,       // face wash amplitude
   ao: 0.26,        // occlusion at a tight junction
@@ -121,8 +121,22 @@ const FALLOFF = {
    genuinely shallow installations in thin walls (d003, d106). These land
    between the two rather than at either end. */
 const CASING   = 46;   // flat frame face against the wall
-const RET_NEAR = 78;   // visible return, shadowed side
-const RET_FAR  = 46;   // visible return, sunlit side
+
+/* ── SQUARE-ON, so the jambs match ──────────────────────────────────
+   The two jamb returns were 78 and 46, which is an off-axis view: you see
+   more of the near jamb than the far one when you stand to one side of a
+   door. True of a photograph, wrong here, because nothing else in the
+   drawing agrees with it — leaf, casing, threshold and hardware are all
+   drawn dead square-on, so the only thing the mismatch communicated was that
+   one side of the frame is wider than the other.
+
+   Both are now 62, the mean of the two, so the frame's overall width is
+   unchanged and nothing else in the layout moves. Depth still reads, because
+   it never came from the jamb asymmetry: it comes from the soffit, which is
+   the one plane a standing viewer genuinely looks up into, and from the two
+   jambs shading at different rates. Light from one side, seen head on — that
+   is a door in a wall. */
+const RETURN   = 62;   // both jamb returns, equal
 const RET_HEAD = 148;  // the soffit — the deepest of the three, and by a lot
 /* Between two leaves the real joint is a line, not a post: on d125's equal
    pair the leaves almost touch. 46 mm drew a wide lit band that read as a
@@ -203,7 +217,21 @@ const PLATE = {
   bar: 0.36,      // lever thickness at the root, in plate widths
 };
 
-const PAD = { x: 70, top: 95, bottom: 150 };
+/* Air around the door. `bottom` is the one that shows: it is how much floor
+   stands in front of the threshold, and at 150 the door sat on the bottom
+   edge of its own picture like a product cut-out. A doorway photographed from
+   two metres away has a metre of floor under it. */
+const PAD = { x: 70, top: 110, bottom: 300 };
+
+/* How far past the drawing's own bounds the wall and floor keep going.
+   The door's natural box stops just outside the casing, and a room that ends
+   in a rectangle reads as a photograph pasted onto a page rather than as a
+   place. So the backdrop is painted well beyond the natural viewBox, and the
+   page widens the viewBox to the shape of the screen (see fitStage in
+   app.js) — which means the crop is always wall and floor, never door.
+   Tools and tests that use the SVG standalone get the natural box and never
+   see the overspill. */
+const SCENE = 4200;
 
 export function render(state) {
   const size    = SIZES[state.size] || SIZES.standard;
@@ -230,16 +258,28 @@ export function render(state) {
   const totalW = leafW + (sideW ? sideW + MULLION : 0);
 
   // Left edge of the leaf opening; returns and casing sit outside it.
-  const x0 = PAD.x + CASING + RET_NEAR;
+  const x0 = PAD.x + CASING + RETURN;
   const x1 = x0 + totalW;
   const y0 = PAD.top + CASING + RET_HEAD;
   const floorY = y0 + leafH;
 
   const view = {
-    w: x1 + RET_FAR + CASING + PAD.x,
+    w: x1 + RETURN + CASING + PAD.x,
     h: floorY + THRESHOLD + PAD.bottom,
   };
   const y = aff => floorY - aff;
+
+  /* The frame, named once. Every plane of the opening is one of these lines,
+     and having them as names rather than as arithmetic repeated eleven times
+     is what makes the corner mitres below possible to read. */
+  const revX0 = x0 - RETURN;            // the opening at the wall face, left
+  const revX1 = x1 + RETURN;            //   "                          right
+  const revY0 = y0 - RET_HEAD;          //   "                          head
+  const casX0 = revX0 - CASING;         // the casing's outer edge, left
+  const casX1 = revX1 + CASING;         //   "                     right
+  const casY0 = revY0 - CASING;         //   "                     top
+  const baseY = floorY + THRESHOLD;     // where every vertical meets the floor
+  const openW = totalW + RETURN * 2;    // the opening, wall face to wall face
 
   const hingeOnLeft = inside ? handing.hinge === 'right' : handing.hinge === 'left';
 
@@ -315,21 +355,23 @@ export function render(state) {
           fill="#fff" opacity="0.13"/>
     <rect x="${lx}" y="${floorY - AO_FOOT}" width="${lw}" height="${AO_FOOT}" fill="url(#aoBottom)"/>`;
 
-  /* The reveal: three mitred bands running up one jamb, across the head and
-     down the other. Stroking one path per band gets the 45-degree corner
-     mitres for free, and those mitres are named in the photographs as the
-     frame's most distinctive detail. */
-  const band = (inset, w, fill) => {
-    const d = inset + w / 2;
-    return `<path d="M ${x0 - d} ${floorY + THRESHOLD} L ${x0 - d} ${y0 - d}
-                     L ${x1 + d} ${y0 - d} L ${x1 + d} ${floorY + THRESHOLD}"
-                  fill="none" stroke="${fill}" stroke-width="${w}" stroke-linejoin="miter"/>`;
-  };
+  /* The reveal: the soft ramp on the FRAME side of the leaf's edge, one band
+     per side so each can darken toward its own edge (see edgeTop/Left/Right).
+     Head first, then the jambs below it, so the two never overlap and the
+     corners are not darkened twice. */
+  const reveal = `
+      <rect x="${x0 - EDGE}" y="${y0 - EDGE}" width="${totalW + EDGE * 2}"
+            height="${EDGE}" fill="url(#edgeTop)"/>
+      <rect x="${x0 - EDGE}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
+            fill="url(#edgeLeft)"/>
+      <rect x="${x1}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
+            fill="url(#edgeRight)"/>`;
 
   return `
 <svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint)}"
+     data-fit-w="${view.w}" data-fit-h="${view.h}"
      aria-label="${describe(state)}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="leafFill" x1="0" y1="0" x2="0" y2="1">
@@ -455,16 +497,18 @@ export function render(state) {
       <stop offset="0" stop-color="${darken(paint, pale ? 0.20 : 0.34)}"/>
       <stop offset="1" stop-color="${darken(paint, pale ? 0.34 : 0.52)}"/>
     </linearGradient>
-    /* I had this jamb sunlit — brighter than the leaf — because the green
-       door's photographs show it that way, caught square-on by the afternoon
-       sun. Reverted: a strongly lit plane on one side only reads as a light
-       source rather than a surface, and beside two shadowed planes it looks
-       like a mistake rather than like weather. The photograph is honest about
-       that one door at that one hour; a configurator has to hold for every
-       door at every hour, and the reading that survives both is three planes
-       all turning away into shade, the far one least deeply because it faces
-       back toward the light. Same family as the near jamb, two thirds the
-       depth. */
+    <!-- I had this jamb sunlit — brighter than the leaf — because the green
+         door's photographs show it that way, caught square-on by the afternoon
+         sun. Reverted: a strongly lit plane on one side only reads as a light
+         source rather than a surface, and beside two shadowed planes it looks
+         like a mistake rather than like weather. The photograph is honest
+         about that one door at that one hour; a configurator has to hold for
+         every door at every hour, and the reading that survives both is three
+         planes all turning away into shade, the far one least deeply because
+         it faces back toward the light. Same family as the near jamb, two
+         thirds the depth.
+         (This was a /* */ block sitting inside the SVG template literal, so it
+         was being emitted into the markup as stray text on every render.) -->
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
       <stop offset="0" stop-color="${darken(paint, pale ? 0.13 : 0.22)}"/>
       <stop offset="1" stop-color="${darken(paint, pale ? 0.23 : 0.38)}"/>
@@ -482,9 +526,30 @@ export function render(state) {
       <stop offset="1"   stop-color="${LIGHT.cool}" stop-opacity="0.06"/>
     </linearGradient>
 
-    <linearGradient id="edgeShade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${darken(paint, pale ? 0.14 : 0.22)}"/>
-      <stop offset="1" stop-color="${darken(paint, pale ? 0.24 : 0.38)}"/>
+    <!-- One ramp per side, each running PERPENDICULAR to its own edge: darkest
+         hard against the leaf, gone again 38 mm out. It used to be a single
+         gradient down the whole frame applied as one stroked band, which made
+         the head a flat grey bar of constant tone — a painted stripe between
+         two objects, which is precisely the thing the twenty-door measurement
+         said the junction is not.
+         Pure black at falling alpha, like every other occlusion here: it
+         multiplies whatever is underneath instead of replacing it, so the ramp
+         reads across casing, soffit and jamb without flattening the tonal
+         differences that tell those three planes apart. -->
+    <linearGradient id="edgeTop" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
+    </linearGradient>
+    <linearGradient id="edgeLeft" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
+    </linearGradient>
+    <linearGradient id="edgeRight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
 
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
@@ -492,9 +557,16 @@ export function render(state) {
       <stop offset="0.3" stop-color="${darken(paint, pale ? 0.12 : 0.20)}"/>
       <stop offset="1"   stop-color="${darken(paint, pale ? 0.30 : 0.48)}"/>
     </linearGradient>
-    <linearGradient id="casingFace" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="${lighten(paint, 0.10)}"/>
-      <stop offset="1" stop-color="${darken(paint, 0.06)}"/>
+    <!-- The casing is one flat plane facing the viewer, and one plane takes one
+         gradient: brightest at the head where the key reaches it, falling away
+         down the jambs toward the floor, leaning slightly to the light's side.
+         It used to be three separately-toned rectangles butted at the corners,
+         which put a hard horizontal step across the top of each jamb — right
+         where a viewer looks to read the frame's depth. -->
+    <linearGradient id="casingFace" x1="0" y1="0" x2="0.30" y2="1">
+      <stop offset="0"    stop-color="${lighten(paint, 0.09)}"/>
+      <stop offset="0.34" stop-color="${lighten(paint, 0.03)}"/>
+      <stop offset="1"    stop-color="${darken(paint, pale ? 0.13 : 0.19)}"/>
     </linearGradient>
 
     <!-- Brushed nickel, lit from upper-left. The bright band sits off-centre
@@ -683,7 +755,14 @@ export function render(state) {
       <stop offset="1" stop-color="#CFE0EA" stop-opacity="0"/>
     </linearGradient>
 
-    <radialGradient id="vignette" cx="0.5" cy="0.44" r="0.78">
+    <!-- In user space, not bounding-box units: the rect it paints now reaches
+         far past the drawing so the wall can fill the screen, and a
+         bounding-box vignette would have stretched with it until it did
+         nothing. Anchored on the door instead, so however wide the window is,
+         the falloff stays centred on the thing being looked at. -->
+    <radialGradient id="vignette" gradientUnits="userSpaceOnUse"
+                    cx="${Math.round(view.w / 2)}" cy="${Math.round(view.h * 0.44)}"
+                    r="${Math.round(Math.max(view.w, view.h) * 0.62)}">
       <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
       <stop offset="1"    stop-color="#000" stop-opacity="${LIGHT.vignette}"/>
     </radialGradient>
@@ -711,7 +790,8 @@ export function render(state) {
       </feComponentTransfer>
     </filter>
     <filter id="wallGrain" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="11"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="11"
+                    stitchTiles="stitch"/>
       <feColorMatrix type="saturate" values="0"/>
       <feComponentTransfer>
         <feFuncR type="linear" slope="1.6" intercept="-0.3"/>
@@ -719,6 +799,14 @@ export function render(state) {
         <feFuncB type="linear" slope="1.6" intercept="-0.3"/>
       </feComponentTransfer>
     </filter>
+    <!-- One filtered tile, repeated, instead of one filter over the whole
+         room. The wall now runs thousands of units past the door, and asking
+         a browser for a turbulence buffer that size to carry a 7% texture is
+         how a colour change turns into a visible stall. stitchTiles keeps the
+         seams out of it. -->
+    <pattern id="wallTex" width="240" height="240" patternUnits="userSpaceOnUse">
+      <rect width="240" height="240" filter="url(#wallGrain)"/>
+    </pattern>
     <filter id="frost" x="-5%" y="-5%" width="110%" height="110%">
       <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="5"/>
       <feColorMatrix type="saturate" values="0"/>
@@ -734,106 +822,94 @@ export function render(state) {
     <filter id="hwShadow" x="-60%" y="-30%" width="240%" height="170%">
       <feGaussianBlur stdDeviation="9"/>
     </filter>
+    <filter id="frameShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
   </defs>
 
-  <!-- ── wall and floor ───────────────────────────────────────── -->
+  <!-- ── wall and floor ───────────────────────────────────────────
+       Painted far past the drawing's own bounds (see SCENE): the page widens
+       the viewBox to the screen's shape, so whatever the window aspect is,
+       what reaches the edges is room and not a cut-off rectangle. -->
   <g id="backdrop">
-    <rect x="0" y="0" width="${view.w}" height="${floorY + THRESHOLD}" fill="var(--wall)"/>
-    <rect x="0" y="${floorY + THRESHOLD}" width="${view.w}"
-          height="${view.h - floorY - THRESHOLD}" fill="var(--floor)"/>
-    <rect x="0" y="0" width="${view.w}" height="${view.h}"
-          filter="url(#wallGrain)" opacity="0.07" style="mix-blend-mode:multiply"/>
-    <line x1="0" y1="${floorY + THRESHOLD}" x2="${view.w}" y2="${floorY + THRESHOLD}"
+    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
+          height="${baseY + SCENE}" fill="var(--wall)"/>
+    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}"
+          height="${view.h - baseY + SCENE}" fill="var(--floor)"/>
+    <!-- Tiled rather than one filtered rect. A feTurbulence over a surface
+         this size is a large offscreen buffer for a 7% texture; the pattern
+         stitches, so it costs one tile. -->
+    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
+          height="${view.h + SCENE * 2}"
+          fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
+    <line x1="${-SCENE}" y1="${baseY}" x2="${view.w + SCENE}" y2="${baseY}"
           stroke="#000" stroke-opacity="0.16" stroke-width="2"
           vector-effect="non-scaling-stroke"/>
   </g>
 
   <!-- ── cast shadow: soft pool plus a hard contact line ──────── -->
   <g id="shadow">
-    <ellipse cx="${(x0 + x1) / 2}" cy="${floorY + THRESHOLD + 40}"
+    <ellipse cx="${(x0 + x1) / 2}" cy="${baseY + 40}"
              rx="${totalW * 0.6}" ry="34" fill="#000" opacity="0.18" filter="url(#softShadow)"/>
-    <rect x="${x0 - RET_NEAR - CASING}" y="${floorY + THRESHOLD - 3}"
-          width="${totalW + RET_NEAR + RET_FAR + CASING * 2}" height="13"
+    <rect x="${casX0}" y="${baseY - 3}" width="${openW + CASING * 2}" height="13"
           fill="#000" opacity="0.42" filter="url(#contact)"/>
   </g>
 
   <!-- ── frame: casing face, then the return faces you see into ── -->
   <g id="frame">
-    <path d="M ${x0 - RET_NEAR - CASING} ${floorY + THRESHOLD}
-             L ${x0 - RET_NEAR - CASING} ${y0 - RET_HEAD - CASING}
-             L ${x1 + RET_FAR + CASING} ${y0 - RET_HEAD - CASING}
-             L ${x1 + RET_FAR + CASING} ${floorY + THRESHOLD}
-             L ${x1 + RET_FAR} ${floorY + THRESHOLD}
-             L ${x1 + RET_FAR} ${y0 - RET_HEAD}
-             L ${x0 - RET_NEAR} ${y0 - RET_HEAD}
-             L ${x0 - RET_NEAR} ${floorY + THRESHOLD} Z"
-          fill="${paint}"/>
-    <rect x="${x0 - RET_NEAR - CASING}" y="${y0 - RET_HEAD - CASING}"
-          width="${totalW + RET_NEAR + RET_FAR + CASING * 2}" height="${CASING}"
-          fill="${lighten(paint, 0.07)}"/>
-    <rect x="${x0 - RET_NEAR - CASING}" y="${y0 - RET_HEAD}" width="${CASING}"
-          height="${floorY + THRESHOLD - y0 + RET_HEAD}" fill="url(#casingFace)"/>
-    <rect x="${x1 + RET_FAR}" y="${y0 - RET_HEAD}" width="${CASING}"
-          height="${floorY + THRESHOLD - y0 + RET_HEAD}"
-          fill="${darken(paint, pale ? 0.09 : 0.14)}"/>
+    <!-- The casing stands a few millimetres proud of the plaster, so it drops
+         a short shadow down and right of itself. Small, but it is the
+         difference between a frame fixed INTO a wall and one printed onto it. -->
+    <path d="M ${casX0} ${casY0} H ${casX1} V ${baseY} H ${casX0} Z"
+          transform="translate(7 11)" fill="#000" opacity="0.22"
+          filter="url(#frameShadow)"/>
+
+    <!-- The casing is ONE plane. Head and jambs face the same way and take the
+         same light, so they are one shape under one gradient — three fills
+         butted together is what put a horizontal colour step across the top of
+         each jamb, at exactly the height a viewer reads as the frame's most
+         important corner. -->
+    <path d="M ${casX0} ${casY0} H ${casX1} V ${baseY} H ${revX1} V ${revY0}
+             H ${revX0} V ${baseY} H ${casX0} Z" fill="url(#casingFace)"/>
     <!-- light catch where the casing meets the wall -->
-    <line x1="${x0 - RET_NEAR - CASING}" y1="${y0 - RET_HEAD - CASING}"
-          x2="${x1 + RET_FAR + CASING}" y2="${y0 - RET_HEAD - CASING}"
+    <line x1="${casX0}" y1="${casY0}" x2="${casX1}" y2="${casY0}"
           stroke="#fff" stroke-opacity="0.16" stroke-width="2"
           vector-effect="non-scaling-stroke"/>
 
-    <!-- the soffit, drawn first so the jamb returns and their mitres lie over it -->
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint}"/>
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="url(#soffit)"/>
-
-    <!-- the returns: three surfaces turning away from the camera -->
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint}"/>
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}" width="${RET_NEAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retNear)"/>
-
-    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="${paint}"/>
-    <!-- The sunlit jamb's highlight goes on LAST. Painted before the vertical
-         fall, the fall simply covered it and the plane came out as dark as its
-         opposite number, which is the whole reason the opening read flat. -->
-    <rect x="${x1}" y="${y0 - RET_HEAD}" width="${RET_FAR}"
-          height="${floorY - y0 + RET_HEAD + THRESHOLD}" fill="url(#retFar)"/>
-
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="${paint}"/>
-    <rect x="${x0 - RET_NEAR}" y="${y0 - RET_HEAD}"
-          width="${totalW + RET_NEAR + RET_FAR}" height="${RET_HEAD}" fill="url(#soffit)"/>
+    <!-- ── the opening: three planes turning back from the wall ──
+         Trapezoids, not rectangles. Where the soffit meets a jamb, the real
+         boundary runs from the opening's outer corner to its inner one — a
+         true mitre, which arrives for free once each plane is the shape it
+         actually projects to. It used to be three rectangles stacked in the
+         hope that a line drawn on top would suggest the corner. -->
+    <path d="M ${revX0} ${revY0} H ${revX1} L ${x1} ${y0} H ${x0} Z" fill="url(#soffit)"/>
+    <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${baseY} H ${revX0} Z" fill="url(#retNear)"/>
+    <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${baseY} H ${revX1} Z" fill="url(#retFar)"/>
 
     <!-- hard arris where casing turns into return -->
-    <line x1="${x0 - RET_NEAR}" y1="${y0 - RET_HEAD}" x2="${x0 - RET_NEAR}" y2="${floorY + THRESHOLD}"
+    <line x1="${revX0}" y1="${revY0}" x2="${revX0}" y2="${baseY}"
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-    <line x1="${x1 + RET_FAR}" y1="${y0 - RET_HEAD}" x2="${x1 + RET_FAR}" y2="${floorY + THRESHOLD}"
+    <line x1="${revX1}" y1="${revY0}" x2="${revX1}" y2="${baseY}"
           stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
 
-    <!-- The mitre. Where soffit meets jamb the photographs show a hard 45
-         degree seam, not a blend — two planes at different angles to the light
-         meeting on a line. Without it the box corners look moulded. -->
-    <path d="M ${x0 - RET_NEAR} ${y0 - RET_HEAD} L ${x0} ${y0}" fill="none"
-          stroke="#000" stroke-opacity="0.34" stroke-width="1.5"
+    <!-- The mitre seam itself. The trapezoids already meet along this line;
+         the stroke is the darkening any two planes show where they fold. -->
+    <path d="M ${revX0} ${revY0} L ${x0} ${y0}" fill="none"
+          stroke="#000" stroke-opacity="0.20" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
-    <path d="M ${x1 + RET_FAR} ${y0 - RET_HEAD} L ${x1} ${y0}" fill="none"
-          stroke="#000" stroke-opacity="0.26" stroke-width="1.5"
+    <path d="M ${revX1} ${revY0} L ${x1} ${y0}" fill="none"
+          stroke="#000" stroke-opacity="0.16" stroke-width="1.5"
           vector-effect="non-scaling-stroke"/>
 
-    <!-- ── the reveal: quirk, bead, gap, mitred at both top corners ── -->
-    <g id="reveal">
-      ${band(0, EDGE, 'url(#edgeShade)')}
-    </g>
+    <!-- ── the reveal: the soft ramp where frame meets leaf ── -->
+    <g id="reveal">${reveal}</g>
   </g>
 
   <!-- ── threshold ────────────────────────────────────────────── -->
   <g id="threshold">
-    <rect x="${x0 - RET_NEAR}" y="${floorY}" width="${totalW + RET_NEAR + RET_FAR}"
+    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
           height="${THRESHOLD}" fill="${darken(paint, 0.30)}"/>
-    <rect x="${x0 - RET_NEAR}" y="${floorY}" width="${totalW + RET_NEAR + RET_FAR}"
+    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
           height="4" fill="#fff" opacity="0.18"/>
     <!-- Ribbed, because every sill in the photographs is: an extruded
          aluminium threshold with four or five flutes running its length,
@@ -841,11 +917,11 @@ export function render(state) {
          step. -->
     ${Array.from({ length: 4 }, (_, i) => {
       const ry = floorY + 7 + i * ((THRESHOLD - 9) / 4);
-      return `<rect x="${x0 - RET_NEAR + 4}" y="${ry}"
-                    width="${totalW + RET_NEAR + RET_FAR - 8}" height="2"
+      return `<rect x="${x0 - RETURN + 4}" y="${ry}"
+                    width="${totalW + RETURN + RETURN - 8}" height="2"
                     fill="#000" opacity="0.30"/>
-              <rect x="${x0 - RET_NEAR + 4}" y="${ry + 2}"
-                    width="${totalW + RET_NEAR + RET_FAR - 8}" height="1.4"
+              <rect x="${x0 - RETURN + 4}" y="${ry + 2}"
+                    width="${totalW + RETURN + RETURN - 8}" height="1.4"
                     fill="#fff" opacity="0.22"/>`;
     }).join('')}
   </g>
@@ -887,7 +963,8 @@ export function render(state) {
       : inside ? thumbTurn(lockX, y(CYLINDER_AFF)) : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
-  <rect x="0" y="0" width="${view.w}" height="${view.h}" fill="url(#vignette)"/>
+  <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
+        height="${view.h + SCENE * 2}" fill="url(#vignette)"/>
 </svg>`.trim();
 }
 
@@ -2086,46 +2163,165 @@ export function sizeGlyph(size) {
   </svg>`;
 }
 
+/**
+ * Handle thumbnails — the silhouette of the FITTING, not a door with a fitting
+ * on it.
+ *
+ * Rewritten because nine of the fifteen handles drew the same picture. The
+ * glyph knew four styles and everything else fell through to one `else`, so
+ * Coral, Almog, Sapir, Cadoor, Luna, Shiran and the knob-on-backplate were
+ * seven identical circle-and-bars carrying seven different names and seven
+ * different prices — and a customer choosing between them was guessing. Not a
+ * crash, not a blank: seven wrong pictures that each looked like a picture.
+ *
+ * The four it did know were drawn on a whole 2100 mm door, which puts a 78 mm
+ * rose at about one pixel of tile. So the frame is the fitting now, scaled to
+ * fill a 3:4 box. True relative size between handles is given up — a pull bar
+ * and a knob fill the same box — in exchange for telling them apart, which is
+ * what the tile is for. The stage still shows every one of them to scale.
+ *
+ * Every silhouette below traces the art the door itself draws; the numbers are
+ * the same measured millimetres, so a tile cannot drift from its door.
+ */
+const HANDLE_GLYPH = {
+  // Coral: plain lever on a round rose, reaching toward the hinge.
+  lever: () => ({ box: [-172, -48, 52, 48], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>` }),
+
+  // Almog: swan-neck, raked 15 degrees up, and thicker at the tip than the root.
+  almog: () => ({ box: [-244, -62, 52, 46], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <path d="M 0 13 L -218 -47 L -218 -26 L 0 29 Z"/>` }),
+
+  // Rotem: lever and cylinder on one waisted backplate.
+  plate: () => ({ box: [-172, -88, 56, 184], art: `
+    <rect x="-45" y="-72" width="90" height="240" rx="45"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <circle cx="0" cy="106" r="13" fill="var(--paper)"/>` }),
+
+  // Knob on a long backplate — the plate carries the keyway too.
+  knobplate: () => ({ box: [-58, -118, 58, 214], art: `
+    <rect x="-48" y="-102" width="96" height="300" rx="30"/>
+    <circle cx="0" cy="0" r="30" fill="var(--paper)"/>
+    <circle cx="0" cy="0" r="21"/>
+    <circle cx="0" cy="120" r="12" fill="var(--paper)"/>` }),
+
+  // Cadoor: a free-standing ovoid, no rose — taller than wide, on a stub shank.
+  cadoor: () => ({ box: [-44, -48, 86, 48], art: `
+    <rect x="34" y="-11" width="45" height="22" rx="11"/>
+    <ellipse cx="0" cy="0" rx="34" ry="40"/>` }),
+
+  // Sapir: square cushion knob on a square rose, the knob offset off the plate.
+  sapir: () => ({ box: [-78, -46, 46, 52], art: `
+    <rect x="-36" y="-36" width="72" height="72" rx="3"/>
+    <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper)"/>
+    <rect x="-65" y="-23" width="62" height="62" rx="7"/>` }),
+
+  // Luna: a half-disc, chord against the stile.
+  luna: () => ({ box: [-118, -238, 122, 238], art: `
+    <path d="M 114 -230 A 230 230 0 0 0 114 230 Z"/>` }),
+
+  // Shiran: the ornate pull — spigot, bulge, disc, parallel shaft, mirrored.
+  shiran: () => ({ box: [-48, -252, 48, 252], art: `
+    <rect x="-7" y="-240" width="14" height="17"/>
+    <rect x="-7" y="223" width="14" height="17"/>
+    <ellipse cx="0" cy="-214" rx="24" ry="15"/>
+    <ellipse cx="0" cy="210" rx="25" ry="15"/>
+    <circle cx="0" cy="-150" r="42"/>
+    <circle cx="0" cy="150" r="43"/>
+    <rect x="-21" y="-111" width="42" height="223"/>` }),
+
+  // Recessed channel: a void in the leaf, so it is drawn as one.
+  channel: (h) => {
+    const half = Math.min(h.len, 2050 - 420) / 2;
+    return { box: [-58, -half - 30, 58, half + 30], art: `
+    <rect x="-21" y="${-half}" width="42" height="${half * 2}" rx="4"
+          fill="none" stroke="currentColor" stroke-width="9"/>
+    <rect x="-11" y="${-half + 26}" width="22" height="${half * 2 - 52}" rx="4"
+          opacity="0.45"/>` };
+  },
+
+  // Coral plus the horizontal bow. The bow is centred on the leaf, far inboard
+  // of the lever, so it runs off the left of the tile — which is what it does.
+  grab: () => ({ box: [-300, -52, 52, 224], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <path d="M -300 158 Q -190 143 -80 158 L -80 182 Q -190 197 -300 182 Z"/>
+    <circle cx="-80" cy="170" r="17"/>` }),
+
+  /* Pull bars. All five are a vertical rod, so what separates them is
+     slenderness, the end caps and the fixings — which is exactly what the
+     product photographs say separates them in the shop. */
+  bar: (h) => {
+    const half = Math.min(h.len, 2050 - 320) / 2;
+    const w = h.w || 30, spec = BARS[h.bar] || BARS.idan;
+    const fix = spec.fix.t.map(t => {
+      const y = -half + half * 2 * t, s = w * spec.fix.size;
+      return spec.fix.kind === 'clamp' || spec.fix.kind === 'shoe'
+        ? `<rect x="${-s / 2}" y="${y - s * 0.5}" width="${s}" height="${s}" rx="${w * 0.1}"/>`
+        : `<rect x="${w / 2}" y="${y - s * 0.28}" width="${w * spec.fix.proj}" height="${s * 0.56}"
+                 rx="${s * 0.28}"/>`;
+    }).join('');
+    return { box: [-w * 2.2, -half - 26, w * 2.2, half + 26], art: `
+    ${fix}
+    <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"/>` };
+  },
+};
+
 export function handleGlyph(handle) {
-  const W = 950, H = 2100, pad = 40, cx = W - 200;
-  let art;
-  if (handle.style === 'channel') {
-    art = `<rect x="${cx - 40}" y="${H / 2 - handle.len / 2}" width="80" height="${handle.len}"
-                 rx="8" fill="none" stroke="currentColor" stroke-width="34"/>`;
-  } else if (handle.style === 'grab') {
-    const gy = H * GRAB.fromTop, gh = W * GRAB.len / 2;
-    art = `<circle cx="${cx}" cy="${H / 2}" r="46" fill="currentColor"/>
-           <rect x="${cx - 190}" y="${H / 2 - 22}" width="190" height="44" rx="22" fill="currentColor"/>
-           <rect x="${W / 2 - gh}" y="${gy - 26}" width="${gh * 2}" height="52" rx="26"
-                 fill="currentColor"/>`;
-  } else if (handle.style === 'plate') {
-    const pw = 150, ph = 380, t = H / 2 - ph * PLATE.lever;
-    art = `<rect x="${cx - pw / 2}" y="${t}" width="${pw}" height="${ph}" rx="${pw / 2}"
-                 fill="currentColor"/>
-           <rect x="${cx - 300}" y="${H / 2 - 32}" width="300" height="64" rx="32"
-                 fill="currentColor"/>
-           <circle cx="${cx}" cy="${t + ph * PLATE.key}" r="26" fill="#fff" opacity="0.7"/>`;
-  } else if (handle.len) {
-    art = `<rect x="${cx - 26}" y="${H / 2 - handle.len / 2}" width="52" height="${handle.len}"
-                 rx="26" fill="currentColor"/>`;
-  } else {
-    art = `<circle cx="${cx}" cy="${H / 2}" r="46" fill="currentColor"/>
-           <rect x="${cx - 190}" y="${H / 2 - 22}" width="190" height="44" rx="22" fill="currentColor"/>`;
-  }
-  return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
-    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor"
-          stroke-width="44" opacity="0.5"/>
-    ${art}
+  const make = HANDLE_GLYPH[handle.style] || HANDLE_GLYPH.lever;
+  const { box, art } = make(handle);
+
+  /* Fit the art into a fixed 3:4 window, so a rose and a 1150 mm pull bar
+     produce tiles the same shape. Without this the bar's own bounds are 12:1
+     and it renders as a hairline four pixels wide. */
+  const A = 3 / 4;
+  let [x0, y0, x1, y1] = box;
+  let w = x1 - x0, h = y1 - y0;
+  if (w / h < A) { const t = h * A; x0 -= (t - w) / 2; w = t; }
+  else           { const t = w / A; y0 -= (t - h) / 2; h = t; }
+
+  return `<svg viewBox="${x0.toFixed(1)} ${y0.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}"
+               class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
   </svg>`;
 }
 
-/** Detail glyph: where the panel and groove sit on the leaf. */
+/**
+ * Detail glyph: where the panel, groove and applied strips sit on the leaf.
+ *
+ * It knew `panel` and `groove` and nothing else, so the three details added
+ * since — eleven metal strips at ₪440, three strips at ₪320 and the two-panel
+ * face at ₪520 — each showed the picture of a cheaper option. Same failure as
+ * the handle tiles, found by the same test the moment it existed.
+ *
+ * Proportions are the renderer's own, so the tile and the door agree.
+ */
 export function detailGlyph(detail) {
   const W = 950, H = 2100, pad = 40;
+  const inset = 105;
+
+  const panelAt = (top, bot) => `<rect x="${inset}" y="${H * top}"
+        width="${W - inset * 2}" height="${H * (bot - top)}"
+        fill="none" stroke="currentColor" stroke-width="36"/>`;
+
+  // raisedPanel: one panel in the bottom quarter, or the classic tall-over-short pair
+  const panels = !detail.panel ? ''
+    : detail.panels === 2 ? panelAt(0.15, 0.56) + panelAt(0.63, 0.92)
+    : panelAt(0.70, 0.96);
+
+  // metalStrips: horizontal, inset a tenth each side, evenly spaced 0.09–0.91
+  const n = detail.strips || 0;
+  const strips = Array.from({ length: n }, (_, i) => {
+    const y = H * (0.09 + (n > 1 ? (i * 0.82) / (n - 1) : 0.41));
+    return `<rect x="${W * 0.09}" y="${y - 14}" width="${W * 0.82}" height="28"
+                  fill="currentColor"/>`;
+  }).join('');
+
   return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
-    ${detail.panel ? `<rect x="105" y="${H * 0.60}" width="${W - 210}" height="${H * 0.30}"
-          fill="none" stroke="currentColor" stroke-width="36"/>` : ''}
+    ${panels}${strips}
     ${detail.groove ? `<rect x="${W * 0.70 - 18}" y="190" width="18" height="${H - 380}"
           fill="currentColor"/>` : ''}
   </svg>`;

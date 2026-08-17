@@ -132,9 +132,10 @@ body {
 /* ── stage ────────────────────────────────────────────────── */
 
 .stage-wrap {
-  padding: 8px 16px 0;
-  /* Tracks the wall so the darkening applied for light doors covers the whole
-     stage, instead of showing the SVG as a lighter box on a darker field. */
+  /* No padding around the stage: the drawing carries its own wall and floor
+     now, and they are meant to run to the edges of this column. Padding here
+     would put a frame of page around the room. */
+  padding: 0;
   background: var(--wall);
   transition: background-color .3s var(--ease);
   border-block-end: 1px solid var(--rule);
@@ -143,7 +144,6 @@ body {
 @media (min-width: 1100px) {
   .stage-wrap {
     border-block-end: 0;
-    padding: 16px 20px 8px;
     block-size: 100%;
     display: flex; flex-direction: column; justify-content: center;
     overflow: hidden;
@@ -152,8 +152,7 @@ body {
 
 .stage {
   /* The door is never allowed off-screen — seeing it is the product. */
-  block-size: 46vh;
-  display: grid; place-items: center;
+  block-size: 52vh;
   transition: background-color .3s var(--ease);
 }
 @media (min-width: 1100px) {
@@ -164,14 +163,17 @@ body {
 .stage-wrap[data-light="true"] { --wall: #E4E0D7; --floor: #D6D2C8; }
 
 .door-svg {
-  max-block-size: 46vh; max-inline-size: 100%; block-size: auto;
+  /* Fills the stage rather than sitting fitted inside it. The door itself is
+     drawn at exactly the size a fitted SVG would have chosen — app.js widens
+     the viewBox by precisely the amount that would otherwise be letterbox —
+     so the extra area shows more room, never a bigger door. */
+  inline-size: 100%; block-size: 100%;
   display: block;
   /* The drawing NEVER mirrors with the interface. A right-hinged door is a
      physical fact; flipping it would mean ordering the wrong door.
      PLAN.md §6.1 */
   direction: ltr;
 }
-@media (min-width: 1100px) { .door-svg { max-block-size: 100%; } }
 
 .door-svg rect, .door-svg path, .door-svg circle {
   transition: fill .22s var(--ease), stroke .22s var(--ease);
@@ -265,6 +267,11 @@ body {
 .tile.is-selected .tile__art { color: var(--ink); }
 .glyph { block-size: 54px; inline-size: auto; display: block; }
 .glyph--sq { inline-size: 38px; }
+/* Hardware is chosen at arm's length in a shop, so its tile gets the room a
+   door outline does not need: a door glyph is a rectangle either way, but a
+   swan-neck and a cushion knob are only different if you can see them. */
+.tiles--hw { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+.tiles--hw .tile__art, .glyph--hw { block-size: 74px; }
 
 .tile__name { font-size: .74rem; line-height: 1.2; }
 .tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }
@@ -390,5 +397,11 @@ body {
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar { display: none; }
 .is-bare .layout { display: block; block-size: 100dvh; }
 .is-bare .stage-wrap { block-size: 100dvh; padding: 0; border: 0; }
-.is-bare .stage { block-size: 100dvh; }
-.is-bare .door-svg { max-block-size: 100dvh; }
+/* Natural framing, not the full-bleed room: app.js leaves the viewBox alone
+   in bare mode, so the SVG keeps its intrinsic aspect and every tool that
+   clips a fraction of `#stage svg` still lands on the door. */
+.is-bare .stage { block-size: 100dvh; display: grid; place-items: center; }
+.is-bare .door-svg {
+  inline-size: auto; block-size: auto;
+  max-inline-size: 100%; max-block-size: 100dvh;
+}

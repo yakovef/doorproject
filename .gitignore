@@ -1,3 +1,6 @@
 node_modules/
 .DS_Store
 research/works/works.mhtml
+
+# scratch harnesses, not part of the toolkit
+tools/_*.mjs
