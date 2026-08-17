@@ -248,7 +248,7 @@
   var RET_NEAR = 25;
   var RET_FAR = 6;
   var RET_HEAD = 51;
-  var MULLION = 46;
+  var MULLION = 22;
   var REBATE = 50;
   var GAP = 10;
   var BEAD = 6;
@@ -259,8 +259,8 @@
   var PEEPHOLE_R = 30;
   var HINGES_AFF = [303, 1057, 1799];
   var LOCK_BACKSET = 72;
-  var LOCK_R = 40;
-  var LEVER_ROSETTE = 37;
+  var LOCK_R = 33;
+  var LEVER_ROSETTE = 30;
   var LEVER_REACH = 145;
   var LOCK_CLEAR = 15;
   var BAR_INSET = 0.19;
@@ -658,22 +658,31 @@
     <!-- Glazing is darker than the wall: you are looking into an unlit
          interior. The top carries a cool sky reflection, the base warms
          slightly from the floor. -->
+    <!-- Darkened after d125. Beside the photograph our pane read as a pale
+         blue-grey card; the real one is nearly black in its lower two thirds
+         with the street showing through it. Glass on an entrance door is a
+         hole, and a hole is dark — the only bright part is what the sky puts
+         back in the top. -->
     <linearGradient id="glass" x1="0.1" y1="0" x2="0.6" y2="1">
-      <stop offset="0"    stop-color="#8FA3B0"/>
-      <stop offset="0.18" stop-color="#5E6C76"/>
-      <stop offset="0.62" stop-color="#3D474E"/>
-      <stop offset="1"    stop-color="#4C545A"/>
+      <stop offset="0"    stop-color="#6E8290"/>
+      <stop offset="0.18" stop-color="#3E4A53"/>
+      <stop offset="0.62" stop-color="#232A2F"/>
+      <stop offset="1"    stop-color="#2C3238"/>
     </linearGradient>
 
     <!-- One hard diagonal streak. A straight edge reads as glass; a soft
          gradient reads as grey paint. -->
+    <!-- The reflected band across the glass. It had hard edges at 0.341 and
+         0.521, which on a photograph never happens — a window reflects a room,
+         and a room has no step function in it. Softened at both ends and
+         halved: it was competing with the glazing bars for attention. -->
     <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0"     stop-color="#fff" stop-opacity="0.02"/>
-      <stop offset="0.34"  stop-color="#fff" stop-opacity="0.02"/>
-      <stop offset="0.341" stop-color="#fff" stop-opacity="0.20"/>
-      <stop offset="0.52"  stop-color="#fff" stop-opacity="0.20"/>
-      <stop offset="0.521" stop-color="#fff" stop-opacity="0.03"/>
-      <stop offset="1"     stop-color="#fff" stop-opacity="0.03"/>
+      <stop offset="0"    stop-color="#fff" stop-opacity="0.02"/>
+      <stop offset="0.30" stop-color="#fff" stop-opacity="0.03"/>
+      <stop offset="0.40" stop-color="#fff" stop-opacity="0.11"/>
+      <stop offset="0.50" stop-color="#fff" stop-opacity="0.10"/>
+      <stop offset="0.60" stop-color="#fff" stop-opacity="0.03"/>
+      <stop offset="1"    stop-color="#fff" stop-opacity="0.02"/>
     </linearGradient>
 
     <linearGradient id="skyRefl" x1="0" y1="0" x2="0" y2="1">
@@ -949,8 +958,8 @@
     </g>`;
   }
   function aperture({ x, y, w, h, paint: paint2, edge, grille, key }) {
-    const M = 62;
-    const S = 22;
+    const M = 46;
+    const S = 17;
     const id = `cl-${key}`;
     return `
     <g>
@@ -969,8 +978,13 @@
       ${bevel(x, y, w, h, 8, paint2, false)}
 
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
+      <!-- Frost at 0.30 on a SCREEN blend was making every opening read as
+           bathroom glass. The measured doors are glazed with clear or lightly
+           patterned glass and the pane comes out DARKER than the leaf, because
+           what you see through it is a room or a street, not a light box.
+           Screen only ever lightens, so this had nowhere to go but pale. -->
       <rect x="${x}" y="${y}" width="${w}" height="${h}"
-            filter="url(#frost)" opacity="0.30" style="mix-blend-mode:screen"/>
+            filter="url(#frost)" opacity="0.10" style="mix-blend-mode:screen"/>
       <!-- reflected sky across the upper third -->
       <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>

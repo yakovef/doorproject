@@ -84,7 +84,10 @@ const CASING   = 46;   // flat frame face against the wall
 const RET_NEAR = 25;   // visible return, camera side (wide)
 const RET_FAR  = 6;   // visible return, far side — nearly edge-on
 const RET_HEAD = 51;   // visible return under the head — the deepest of the three
-const MULLION  = 46;
+/* Between two leaves the real joint is a line, not a post: on d125's equal
+   pair the leaves almost touch. 46 mm drew a wide lit band that read as a
+   structural mullion the door does not have. */
+const MULLION  = 22;
 const REBATE   = 50;   // frame rebate: how far the leaf sits inside the opening
 
 /* The reveal profile, read outward from the leaf. Every works photograph has
@@ -111,8 +114,12 @@ const PEEPHOLE_AFF = 1600;  // 0.762 H
 const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
 const HINGES_AFF   = [303, 1057, 1799];   // 0.144 / 0.504 / 0.857 H
 const LOCK_BACKSET = 72;    // 0.076 W from the closing edge
-const LOCK_R       = 40;    // 0.083 W across — the escutcheon is the bigger disc
-const LEVER_ROSETTE = 37;   // ratio to the escutcheon is 1.08, not 1.2
+/* Both discs came down about a fifth after d016: side by side with the
+   photograph our rose and escutcheon were plainly oversized, reading as
+   commercial ironmongery on a domestic door. The ratio between them (1.08)
+   was right and is preserved. */
+const LOCK_R       = 33;    // 0.078 W across — the escutcheon is the bigger disc
+const LEVER_ROSETTE = 30;   // ratio to the escutcheon is 1.08, not 1.2
 const LEVER_REACH  = 145;   // 4.0 rosette radii, and exactly horizontal
                             // (0.151 W on the door metrology; the product
                             //  photographs agree at 4.0-4.7 radii)
@@ -557,22 +564,31 @@ export function render(state) {
     <!-- Glazing is darker than the wall: you are looking into an unlit
          interior. The top carries a cool sky reflection, the base warms
          slightly from the floor. -->
+    <!-- Darkened after d125. Beside the photograph our pane read as a pale
+         blue-grey card; the real one is nearly black in its lower two thirds
+         with the street showing through it. Glass on an entrance door is a
+         hole, and a hole is dark — the only bright part is what the sky puts
+         back in the top. -->
     <linearGradient id="glass" x1="0.1" y1="0" x2="0.6" y2="1">
-      <stop offset="0"    stop-color="#8FA3B0"/>
-      <stop offset="0.18" stop-color="#5E6C76"/>
-      <stop offset="0.62" stop-color="#3D474E"/>
-      <stop offset="1"    stop-color="#4C545A"/>
+      <stop offset="0"    stop-color="#6E8290"/>
+      <stop offset="0.18" stop-color="#3E4A53"/>
+      <stop offset="0.62" stop-color="#232A2F"/>
+      <stop offset="1"    stop-color="#2C3238"/>
     </linearGradient>
 
     <!-- One hard diagonal streak. A straight edge reads as glass; a soft
          gradient reads as grey paint. -->
+    <!-- The reflected band across the glass. It had hard edges at 0.341 and
+         0.521, which on a photograph never happens — a window reflects a room,
+         and a room has no step function in it. Softened at both ends and
+         halved: it was competing with the glazing bars for attention. -->
     <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0"     stop-color="#fff" stop-opacity="0.02"/>
-      <stop offset="0.34"  stop-color="#fff" stop-opacity="0.02"/>
-      <stop offset="0.341" stop-color="#fff" stop-opacity="0.20"/>
-      <stop offset="0.52"  stop-color="#fff" stop-opacity="0.20"/>
-      <stop offset="0.521" stop-color="#fff" stop-opacity="0.03"/>
-      <stop offset="1"     stop-color="#fff" stop-opacity="0.03"/>
+      <stop offset="0"    stop-color="#fff" stop-opacity="0.02"/>
+      <stop offset="0.30" stop-color="#fff" stop-opacity="0.03"/>
+      <stop offset="0.40" stop-color="#fff" stop-opacity="0.11"/>
+      <stop offset="0.50" stop-color="#fff" stop-opacity="0.10"/>
+      <stop offset="0.60" stop-color="#fff" stop-opacity="0.03"/>
+      <stop offset="1"    stop-color="#fff" stop-opacity="0.02"/>
     </linearGradient>
 
     <linearGradient id="skyRefl" x1="0" y1="0" x2="0" y2="1">
@@ -883,8 +899,13 @@ function aperture({ x, y, w, h, paint, edge, grille, key }) {
      the ten glazed doors in the corpus carry one.
      Two steps rather than one, because a single bevel of any width still reads
      as a chamfered hole; it is the second plane that says "applied timber". */
-  const M = 62;                       // moulding width
-  const S = 22;                       // the outer step, proud of the leaf
+  /* 46, not the 62 I first used. Measured on d125 the moulding is 0.058 of
+     leaf width — about 49 mm — and at 62 it grew far enough outboard to run
+     under the pull bar, which is a collision the renderer has no business
+     creating. Wide enough to read as a moulding, narrow enough to stay out of
+     the hardware's way. */
+  const M = 46;                       // moulding width
+  const S = 17;                       // the outer step, proud of the leaf
   const id = `cl-${key}`;
   return `
     <g>
@@ -903,8 +924,13 @@ function aperture({ x, y, w, h, paint, edge, grille, key }) {
       ${bevel(x, y, w, h, 8, paint, false)}
 
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
+      <!-- Frost at 0.30 on a SCREEN blend was making every opening read as
+           bathroom glass. The measured doors are glazed with clear or lightly
+           patterned glass and the pane comes out DARKER than the leaf, because
+           what you see through it is a room or a street, not a light box.
+           Screen only ever lightens, so this had nowhere to go but pale. -->
       <rect x="${x}" y="${y}" width="${w}" height="${h}"
-            filter="url(#frost)" opacity="0.30" style="mix-blend-mode:screen"/>
+            filter="url(#frost)" opacity="0.10" style="mix-blend-mode:screen"/>
       <!-- reflected sky across the upper third -->
       <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
