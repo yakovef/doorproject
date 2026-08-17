@@ -46,6 +46,16 @@ export const COLOURS = [
   { id: 'ral-6009', ral: '6009', hex: '#27352A', he: 'ירוק אשוח',    en: 'Fir green',       delta: 25000 },
   { id: 'ral-5011', ral: '5011', hex: '#1F2D3D', he: 'כחול פלדה',    en: 'Steel blue',      delta: 25000 },
   { id: 'ral-3005', ral: '3005', hex: '#5C1F26', he: 'אדום יין',     en: 'Wine red',        delta: 25000 },
+  /* The taupe band, appended from the corpus. Brown was 7 of the 30 measured
+     doors — second only to grey — and the catalogue had exactly one, RAL 8017
+     chocolate, which is none of them: the real ones are warm mid greys and
+     grey-browns. Measured leaves that landed here: #54473B, #6B6362, #817373,
+     #9A8776, #583C28. Appended rather than inserted, so no existing index
+     moves. Prices are placeholders like every other number in this file. */
+  { id: 'ral-7022', ral: '7022', hex: '#4C4A43', he: 'אפור אומברה',  en: 'Umbra grey',      delta: 0 },
+  { id: 'ral-8019', ral: '8019', hex: '#6B6362', he: 'חום אפרפר',    en: 'Grey brown',      delta: 25000 },
+  { id: 'ral-7036', ral: '7036', hex: '#817373', he: 'אפור פלטינה',  en: 'Platinum grey',   delta: 0 },
+  { id: 'ral-1035', ral: '1035', hex: '#9A8776', he: 'בז' + "'" + ' פנינה',   en: 'Pearl beige',     delta: 25000 },
 ];
 
 /**
@@ -130,6 +140,11 @@ export const GRILLES = [
   { id: 'bars',    he: 'סורג ישר',   en: 'Straight',   delta: 22000 },
   { id: 'lattice', he: 'סורג משבצות',en: 'Lattice',    delta: 30000 },
   { id: 'scroll',  he: 'סורג מעוצב', en: 'Scrollwork', delta: 46000 },
+  /* Ours were all diagonal or straight; the measured doors are mostly an
+     ORTHOGONAL grid of squares, sometimes with a scroll motif set into it.
+     Appended rather than repurposing `lattice`, because both patterns are
+     real and a shared link must keep meaning what it meant. */
+  { id: 'grid',    he: 'סורג רשת',   en: 'Square grid', delta: 30000 },
 ];
 
 /**
@@ -156,6 +171,14 @@ export const DETAILS = [
   { id: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    delta: 38000, panel: true,  groove: false },
   { id: 'groove', he: 'חריץ אנכי',      en: 'Vertical groove',delta: 24000, panel: false, groove: true  },
   { id: 'both',   he: 'פאנל וחריץ',     en: 'Panel + groove', delta: 54000, panel: true,  groove: true  },
+  /* The designed tier's signature, and we had it backwards. Of the seven
+     measured doors with line work on the face, only two are milled grooves;
+     four are APPLIED metal strips — polished stainless, brushed steel, pale
+     brass — reading 1.1 to 2x BRIGHTER than the paint, not darker. Drawing
+     those as a recessed shadow is the single easiest way to render this tier
+     wrong. Counts observed: 3, 7 and 11 strips. */
+  { id: 'strips', he: 'פסי מתכת',       en: 'Metal strips',   delta: 44000, panel: false, groove: false, strips: 7 },
+  { id: 'strips3',he: 'שלושה פסים',     en: 'Three strips',   delta: 32000, panel: false, groove: false, strips: 3 },
 ];
 
 /** Ironmongery finish. One variable, and it changes every metal part. */

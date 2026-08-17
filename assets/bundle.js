@@ -18,7 +18,17 @@
     { id: "ral-8017", ral: "8017", hex: "#45302B", he: "חום שוקולד", en: "Chocolate brown", delta: 25e3 },
     { id: "ral-6009", ral: "6009", hex: "#27352A", he: "ירוק אשוח", en: "Fir green", delta: 25e3 },
     { id: "ral-5011", ral: "5011", hex: "#1F2D3D", he: "כחול פלדה", en: "Steel blue", delta: 25e3 },
-    { id: "ral-3005", ral: "3005", hex: "#5C1F26", he: "אדום יין", en: "Wine red", delta: 25e3 }
+    { id: "ral-3005", ral: "3005", hex: "#5C1F26", he: "אדום יין", en: "Wine red", delta: 25e3 },
+    /* The taupe band, appended from the corpus. Brown was 7 of the 30 measured
+       doors — second only to grey — and the catalogue had exactly one, RAL 8017
+       chocolate, which is none of them: the real ones are warm mid greys and
+       grey-browns. Measured leaves that landed here: #54473B, #6B6362, #817373,
+       #9A8776, #583C28. Appended rather than inserted, so no existing index
+       moves. Prices are placeholders like every other number in this file. */
+    { id: "ral-7022", ral: "7022", hex: "#4C4A43", he: "אפור אומברה", en: "Umbra grey", delta: 0 },
+    { id: "ral-8019", ral: "8019", hex: "#6B6362", he: "חום אפרפר", en: "Grey brown", delta: 25e3 },
+    { id: "ral-7036", ral: "7036", hex: "#817373", he: "אפור פלטינה", en: "Platinum grey", delta: 0 },
+    { id: "ral-1035", ral: "1035", hex: "#9A8776", he: "בז' פנינה", en: "Pearl beige", delta: 25e3 }
   ];
   var WINDOWS = [
     { id: "none", he: "ללא חלון", en: "Solid", delta: 0, rects: [] },
@@ -109,7 +119,12 @@
     { id: "none", he: "ללא סורג", en: "No grille", delta: 0 },
     { id: "bars", he: "סורג ישר", en: "Straight", delta: 22e3 },
     { id: "lattice", he: "סורג משבצות", en: "Lattice", delta: 3e4 },
-    { id: "scroll", he: "סורג מעוצב", en: "Scrollwork", delta: 46e3 }
+    { id: "scroll", he: "סורג מעוצב", en: "Scrollwork", delta: 46e3 },
+    /* Ours were all diagonal or straight; the measured doors are mostly an
+       ORTHOGONAL grid of squares, sometimes with a scroll motif set into it.
+       Appended rather than repurposing `lattice`, because both patterns are
+       real and a shared link must keep meaning what it meant. */
+    { id: "grid", he: "סורג רשת", en: "Square grid", delta: 3e4 }
   ];
   var HANDINGS = [
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "left" },
@@ -119,7 +134,15 @@
     { id: "plain", he: "חלק", en: "Plain", delta: 0, panel: false, groove: false },
     { id: "panel", he: "פאנל תחתון", en: "Lower panel", delta: 38e3, panel: true, groove: false },
     { id: "groove", he: "חריץ אנכי", en: "Vertical groove", delta: 24e3, panel: false, groove: true },
-    { id: "both", he: "פאנל וחריץ", en: "Panel + groove", delta: 54e3, panel: true, groove: true }
+    { id: "both", he: "פאנל וחריץ", en: "Panel + groove", delta: 54e3, panel: true, groove: true },
+    /* The designed tier's signature, and we had it backwards. Of the seven
+       measured doors with line work on the face, only two are milled grooves;
+       four are APPLIED metal strips — polished stainless, brushed steel, pale
+       brass — reading 1.1 to 2x BRIGHTER than the paint, not darker. Drawing
+       those as a recessed shadow is the single easiest way to render this tier
+       wrong. Counts observed: 3, 7 and 11 strips. */
+    { id: "strips", he: "פסי מתכת", en: "Metal strips", delta: 44e3, panel: false, groove: false, strips: 7 },
+    { id: "strips3", he: "שלושה פסים", en: "Three strips", delta: 32e3, panel: false, groove: false, strips: 3 }
   ];
   var FINISHES = [
     { id: "steel", he: "ניקל מוברש", en: "Brushed nickel", delta: 0 },
@@ -819,6 +842,7 @@
   <g id="detail">
     ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint2, winBottom) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
+    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone) : ""}
   </g>
 
   <!-- ── glazing ──────────────────────────────────────────────── -->
@@ -888,6 +912,27 @@
             fill="#000" opacity="0.22" filter="url(#contact)"/>
     </g>`;
   }
+  function metalStrips(lx, ly, lw, lh, count, tone) {
+    const top = ly + lh * 0.1, bot = ly + lh * 0.9;
+    const wStrip = Math.max(14, Math.round(lw * 0.022));
+    const span = lw * 0.52;
+    const x0s = lx + (lw - span) / 2;
+    const gap = count > 1 ? span / (count - 1) : 0;
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      const cx = count > 1 ? x0s + gap * i : lx + lw / 2;
+      const x = Math.round(cx - wStrip / 2);
+      out.push(`
+      <rect x="${x + 3}" y="${top + 3}" width="${wStrip}" height="${bot - top}"
+            fill="#000" opacity="0.22"/>
+      <rect x="${x}" y="${top}" width="${wStrip}" height="${bot - top}" fill="${tone[2]}"/>
+      <rect x="${x}" y="${top}" width="${Math.max(2, wStrip * 0.3)}" height="${bot - top}"
+            fill="${tone[0]}"/>
+      <rect x="${x + wStrip - Math.max(2, wStrip * 0.22)}" y="${top}"
+            width="${Math.max(2, wStrip * 0.22)}" height="${bot - top}" fill="${tone[4]}"/>`);
+    }
+    return `<g data-detail="strips" data-count="${count}">${out.join("")}</g>`;
+  }
   function inlayGroove(lx, ly, lw, lh, paint2, hingeOnLeft, winSpan) {
     const w = 18;
     let x = hingeOnLeft ? lx + lw * 0.3 : lx + lw * 0.7 - w;
@@ -949,6 +994,13 @@
         out.push(bar(x + o, y, x + o + h, y + h, 9));
         out.push(bar(x + o, y + h, x + o + h, y, 9));
       }
+      return out.join("");
+    }
+    if (kind === "grid") {
+      const step2 = Math.min(w, h) / Math.max(2, Math.round(Math.min(w, h) / 105));
+      const out = [];
+      for (let gx = x + step2; gx < x + w - 1; gx += step2) out.push(bar(gx, y, gx, y + h, 9));
+      for (let gy = y + step2; gy < y + h - 1; gy += step2) out.push(bar(x, gy, x + w, gy, 9));
       return out.join("");
     }
     if (kind === "scroll") {
@@ -1691,7 +1743,7 @@
   }
 
   // js/url-state.js
-  var VERSION = 4;
+  var VERSION = 5;
   var DEFAULTS = {
     colour: "ral-7016",
     window: "rect",
@@ -1753,14 +1805,14 @@
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   var BITS = {
     version: 3,
-    colour: 6,
+    colour: 7,
     size: 4,
     handing: 2,
     window: 5,
-    grille: 2,
-    handle: 4,
-    detail: 2,
-    finish: 2
+    grille: 3,
+    handle: 5,
+    detail: 3,
+    finish: 3
   };
   var TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   function encodeCode(state2) {
@@ -1776,24 +1828,27 @@
       [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail],
       [Math.max(0, FINISHES.findIndex((f) => f.id === state2.finish)), BITS.finish]
     ];
-    let bits = 0;
-    for (const [value, width] of parts) bits = bits << width >>> 0 | value & (1 << width) - 1;
+    let bits = /* @__PURE__ */ BigInt("0");
+    for (const [value, width] of parts) {
+      const w = BigInt(width);
+      bits = bits << w | BigInt(value) & (/* @__PURE__ */ BigInt("1") << w) - /* @__PURE__ */ BigInt("1");
+    }
     let out = "";
-    for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[bits >>> i & 31];
+    for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[Number(bits >> BigInt(i) & /* @__PURE__ */ BigInt("31"))];
     return "DM-" + out;
   }
   function decodeCode(code) {
     const clean = String(code).toUpperCase().replace(/^DM-?/, "").replace(/[^0-9A-Z]/g, "").replace(/[IL]/g, "1").replace(/O/g, "0").replace(/U/g, "V");
     if (clean.length !== TOTAL_BITS / 5) return null;
-    let bits = 0;
+    let bits = /* @__PURE__ */ BigInt("0");
     for (const ch of clean) {
       const v = ALPHABET.indexOf(ch);
       if (v < 0) return null;
-      bits = bits << 5 >>> 0 | v;
+      bits = bits << /* @__PURE__ */ BigInt("5") | BigInt(v);
     }
     const read = (width) => {
-      const shift = TOTAL_BITS - width - consumed;
-      const v = bits >>> shift & (1 << width) - 1;
+      const shift = BigInt(TOTAL_BITS - width - consumed);
+      const v = Number(bits >> shift & (/* @__PURE__ */ BigInt("1") << BigInt(width)) - /* @__PURE__ */ BigInt("1"));
       consumed += width;
       return v;
     };

@@ -738,6 +738,7 @@ export function render(state) {
   <g id="detail">
     ${detail.panel ? raisedPanel(mainX, y0, leafW, leafH, paint, winBottom) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
+    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone) : ''}
   </g>
 
   <!-- ── glazing ──────────────────────────────────────────────── -->
@@ -811,6 +812,44 @@ function raisedPanel(lx, ly, lw, lh, paint, winBottom) {
  * A single fine vertical recess — the cheapest detail with a real payoff.
  * Kept clear of the glazing for the same reason as the panel.
  */
+/**
+ * Applied metal strips: the designed tier's signature, and the one thing we
+ * were drawing with the contrast reversed.
+ *
+ * Of the seven measured doors with line work, only two are milled grooves.
+ * Four are strips laid ON the face — polished stainless, brushed steel, pale
+ * brass — measuring 1.1 to 2x BRIGHTER than the paint. A recessed groove and
+ * an applied strip are the same line at opposite signs, and the sign is the
+ * whole read: one says the door was cut, the other says something was added
+ * to it.
+ *
+ * Full height, stopping short top and bottom the way every measured example
+ * does, spaced evenly across the middle of the leaf. Each strip gets a lit
+ * top-left arris, a body, and its own drop shadow onto the paint below-right,
+ * because a thing standing proud of a surface has to cast something.
+ */
+function metalStrips(lx, ly, lw, lh, count, tone) {
+  const top = ly + lh * 0.10, bot = ly + lh * 0.90;
+  const wStrip = Math.max(14, Math.round(lw * 0.022));
+  const span = lw * 0.52;                       // the band they occupy
+  const x0s = lx + (lw - span) / 2;
+  const gap = count > 1 ? span / (count - 1) : 0;
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const cx = count > 1 ? x0s + gap * i : lx + lw / 2;
+    const x = Math.round(cx - wStrip / 2);
+    out.push(`
+      <rect x="${x + 3}" y="${top + 3}" width="${wStrip}" height="${bot - top}"
+            fill="#000" opacity="0.22"/>
+      <rect x="${x}" y="${top}" width="${wStrip}" height="${bot - top}" fill="${tone[2]}"/>
+      <rect x="${x}" y="${top}" width="${Math.max(2, wStrip * 0.30)}" height="${bot - top}"
+            fill="${tone[0]}"/>
+      <rect x="${x + wStrip - Math.max(2, wStrip * 0.22)}" y="${top}"
+            width="${Math.max(2, wStrip * 0.22)}" height="${bot - top}" fill="${tone[4]}"/>`);
+  }
+  return `<g data-detail="strips" data-count="${count}">${out.join('')}</g>`;
+}
+
 function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
   const w = 18;
   let x = hingeOnLeft ? lx + lw * 0.30 : lx + lw * 0.70 - w;
@@ -879,6 +918,17 @@ function grillePaths(kind, x, y, w, h) {
       out.push(bar(x + o, y, x + o + h, y + h, 9));
       out.push(bar(x + o, y + h, x + o + h, y, 9));
     }
+    return out.join('');
+  }
+  /* An orthogonal grid of squares. Ours were all diagonal or all vertical;
+     the measured doors overwhelmingly carry this — a square mesh, the bars
+     the same weight both ways, sized so the squares come out roughly square
+     rather than at whatever the opening's aspect happens to give. */
+  if (kind === 'grid') {
+    const step = Math.min(w, h) / Math.max(2, Math.round(Math.min(w, h) / 105));
+    const out = [];
+    for (let gx = x + step; gx < x + w - 1; gx += step) out.push(bar(gx, y, gx, y + h, 9));
+    for (let gy = y + step; gy < y + h - 1; gy += step) out.push(bar(x, gy, x + w, gy, 9));
     return out.join('');
   }
   if (kind === 'scroll') {

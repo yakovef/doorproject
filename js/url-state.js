@@ -10,11 +10,15 @@
 
 import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 
-/* 4: the handle at index 3 changed meaning (the fictional half-moon D-handle
+/* 5: the code's fields were widened (see BITS) and the catalogue grew, so
+   every index shifted. Aliases cannot rescue a code, because a code stores a
+   NUMBER and a number carries no name to alias — hence the bump, so an older
+   code is refused with a notice rather than decoded into a different door.
+   4: the handle at index 3 changed meaning (the fictional half-moon D-handle
    became "lever + horizontal grab bar", which is what the installations
    actually show). Bumping rather than reusing means an older code is refused
    with a notice instead of quietly decoding into a different door. */
-export const VERSION = 4;
+export const VERSION = 5;
 
 export const DEFAULTS = {
   colour:  'ral-7016',
@@ -90,10 +94,10 @@ export function fromQuery(search) {
 }
 
 // ── Short code ────────────────────────────────────────────────────
-// 30 bits, laid out with room to grow:
-//   version 3 | colour 6 | size 4 | handing 2 | window 5
-//   | grille 2 | handle 4 | detail 2 | finish 2
-// -> 6 Crockford base32 characters, still short enough to read aloud.
+// 35 bits, laid out with room to grow:
+//   version 3 | colour 7 | size 4 | handing 2 | window 5
+//   | grille 3 | handle 5 | detail 3 | finish 3
+// -> 7 Crockford base32 characters, still short enough to read aloud.
 //
 // The handle field took the spare bit when the range grew to the real Rav
 // Bariach products. Four bits is sixteen slots against fourteen used, so the
@@ -101,9 +105,18 @@ export function fromQuery(search) {
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
-const BITS = { version: 3, colour: 6, size: 4, handing: 2, window: 5,
-               grille: 2, handle: 4, detail: 2, finish: 2 };
-const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 25 -> 5 chars
+/* Widened before any of these fields filled up, which is the only moment it
+   is free. `grille` and `detail` were both at 4 of 4 and `finish` at 3 of 4:
+   a fifth grille would have overflowed its two bits and been stored as
+   grille 0, silently — the customer picks scrollwork, reads the code down the
+   phone, and Peretz builds a door with no grille at all. Not an error, not a
+   refusal, just a different door. PLAN.md §8.2 names that as the worst thing
+   this site can do.
+   35 bits is 7 characters instead of 6. Capacities now: 128 colours, 16 sizes,
+   4 handings, 32 windows, 8 grilles, 32 handles, 8 details, 8 finishes. */
+const BITS = { version: 3, colour: 7, size: 4, handing: 2, window: 5,
+               grille: 3, handle: 5, detail: 3, finish: 3 };
+const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 35 -> 7 chars
 
 export function encodeCode(state) {
   const sizeKeys = Object.keys(SIZES);
@@ -119,11 +132,18 @@ export function encodeCode(state) {
     [Math.max(0, FINISHES.findIndex(f => f.id === state.finish)), BITS.finish],
   ];
 
-  let bits = 0;
-  for (const [value, width] of parts) bits = ((bits << width) >>> 0) | (value & ((1 << width) - 1));
+  /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
+     the field layout is 35 wide — the old 30-bit version fitted only by luck.
+     Shifting past 32 wraps silently, which would corrupt the very codes this
+     widening exists to protect. */
+  let bits = 0n;
+  for (const [value, width] of parts) {
+    const w = BigInt(width);
+    bits = (bits << w) | (BigInt(value) & ((1n << w) - 1n));
+  }
 
   let out = '';
-  for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[(bits >>> i) & 31];
+  for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[Number((bits >> BigInt(i)) & 31n)];
   return 'DM-' + out;
 }
 
@@ -133,16 +153,16 @@ export function decodeCode(code) {
     .replace(/[IL]/g, '1').replace(/O/g, '0').replace(/U/g, 'V');
   if (clean.length !== TOTAL_BITS / 5) return null;
 
-  let bits = 0;
+  let bits = 0n;
   for (const ch of clean) {
     const v = ALPHABET.indexOf(ch);
     if (v < 0) return null;
-    bits = ((bits << 5) >>> 0) | v;
+    bits = (bits << 5n) | BigInt(v);
   }
 
   const read = width => {
-    const shift = TOTAL_BITS - width - consumed;
-    const v = (bits >>> shift) & ((1 << width) - 1);
+    const shift = BigInt(TOTAL_BITS - width - consumed);
+    const v = Number((bits >> shift) & ((1n << BigInt(width)) - 1n));
     consumed += width;
     return v;
   };

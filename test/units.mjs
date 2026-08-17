@@ -43,7 +43,8 @@ group('short code round-trip');
     const back = decodeCode(code);
     ok(back && ['colour', 'size', 'handing', 'window', 'grille', 'handle', 'detail', 'finish'].every(k => back[k] === st[k]),
        `${code} did not round-trip for ${Object.values(st).join('/')}`);
-    ok(/^DM-[0-9A-HJKMNP-TV-Z]{6}$/.test(code), `malformed code: ${code}`);
+    // 7 characters since the fields were widened at VERSION 5 (35 bits).
+    ok(/^DM-[0-9A-HJKMNP-TV-Z]{7}$/.test(code), `malformed code: ${code}`);
     ok(!seen.has(code), `code collision: ${code}`);
     seen.set(code, 1);
     n++;
