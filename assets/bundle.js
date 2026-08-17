@@ -9,38 +9,26 @@
     half: { id: "half", he: "דלת וחצי", en: "Leaf and half", w: 950, h: 2100, base: 449500, side: 400 }
   };
   var COLOURS = [
-    { id: "ral-9016", ral: "9016", hex: "#F1F0EA", he: "לבן תנועה", en: "Traffic white", delta: 0 },
-    { id: "ral-1013", ral: "1013", hex: "#E3D9C6", he: "לבן פנינה", en: "Oyster white", delta: 0 },
-    { id: "ral-7035", ral: "7035", hex: "#C5C7C4", he: "אפור בהיר", en: "Light grey", delta: 0 },
-    { id: "ral-7016", ral: "7016", hex: "#383E42", he: "אפור אנתרציט", en: "Anthracite", delta: 0 },
-    { id: "ral-7024", ral: "7024", hex: "#474A51", he: "אפור גרפיט", en: "Graphite grey", delta: 0 },
-    { id: "ral-9005", ral: "9005", hex: "#15161A", he: "שחור", en: "Jet black", delta: 0 },
-    { id: "ral-8017", ral: "8017", hex: "#45302B", he: "חום שוקולד", en: "Chocolate brown", delta: 25e3 },
-    { id: "ral-6009", ral: "6009", hex: "#27352A", he: "ירוק אשוח", en: "Fir green", delta: 25e3 },
-    { id: "ral-5011", ral: "5011", hex: "#1F2D3D", he: "כחול פלדה", en: "Steel blue", delta: 25e3 },
-    { id: "ral-3005", ral: "3005", hex: "#5C1F26", he: "אדום יין", en: "Wine red", delta: 25e3 },
-    /* The taupe band, appended from the corpus. Brown was 7 of the 30 measured
-       doors — second only to grey — and the catalogue had exactly one, RAL 8017
-       chocolate, which is none of them: the real ones are warm mid greys and
-       grey-browns. Measured leaves that landed here: #54473B, #6B6362, #817373,
-       #9A8776, #583C28. Appended rather than inserted, so no existing index
-       moves. Prices are placeholders like every other number in this file. */
-    { id: "ral-7022", ral: "7022", hex: "#4C4A43", he: "אפור אומברה", en: "Umbra grey", delta: 0 },
-    { id: "ral-8019", ral: "8019", hex: "#6B6362", he: "חום אפרפר", en: "Grey brown", delta: 25e3 },
-    { id: "ral-7036", ral: "7036", hex: "#817373", he: "אפור פלטינה", en: "Platinum grey", delta: 0 },
-    { id: "ral-1035", ral: "1035", hex: "#9A8776", he: "בז' פנינה", en: "Pearl beige", delta: 25e3 },
-    /* Two more the recreations demanded. d092's leaf is a muted sage-teal
-       #678184 and nothing we owned was within reach of it — the nearest was a
-       mauve-brown, which is not the same colour family, let alone the same
-       colour. d016 and d078 both sit in a cool mid grey (#969AA3, #666A6D)
-       between RAL 7024 and 7035, a gap wide enough that neither recreation
-       could be honest about its paint. */
-    { id: "ral-7033", ral: "7033", hex: "#678184", he: "ירוק מרווה", en: "Sage green", delta: 25e3 },
-    { id: "ral-7046", ral: "7046", hex: "#7E858C", he: "אפור פלדה", en: "Slate grey", delta: 0 },
-    /* d026's leaf, and I missed it by adding 7046 alone: that door is #A2A7AD
-       at luminance 166 and slate lands at 132, a whole step below. The light
-       cool greys need two entries, not one. */
-    { id: "ral-7040", ral: "7040", hex: "#A2A7AD", he: "אפור חלון", en: "Window grey", delta: 0 }
+    /* dark */
+    { id: "rb-9005d", ral: "9005D", hex: "#1D1A18", he: "שחור", en: "Black", delta: 0, aliases: ["ral-9005"] },
+    { id: "rb-7021d", ral: "7021D", hex: "#2D2D2B", he: "אפור פחם", en: "Charcoal", delta: 0 },
+    { id: "rb-5103d", ral: "5103D", hex: "#3D3F54", he: "כחול לילה", en: "Night blue", delta: 0, aliases: ["ral-5011"] },
+    { id: "rb-7126d", ral: "7126D", hex: "#453F3F", he: "חום-אפור כהה", en: "Dark umber", delta: 0, aliases: ["ral-7022"] },
+    { id: "rb-0097d", ral: "0097D", hex: "#4B4952", he: "אפור אנתרציט", en: "Anthracite", delta: 0, aliases: ["ral-7016", "ral-7024"] },
+    { id: "rb-6459d", ral: "6459D", hex: "#4F6454", he: "ירוק בקבוק", en: "Bottle green", delta: 0, aliases: ["ral-6009"] },
+    { id: "rb-rb09d", ral: "RB09D", hex: "#55412F", he: "חום", en: "Brown", delta: 0, aliases: ["ral-8017", "ral-3005"] },
+    { id: "rb-7110d", ral: "7110D", hex: "#565357", he: "אפור כהה", en: "Dark grey", delta: 0, aliases: ["ral-8019"] },
+    /* mid */
+    { id: "rb-7322d", ral: "7322D", hex: "#61697A", he: "כחול פלדה", en: "Steel blue", delta: 0 },
+    { id: "rb-6219d", ral: "6219D", hex: "#7A8272", he: "ירוק מרווה", en: "Sage green", delta: 0, aliases: ["ral-7036", "ral-7033"] },
+    { id: "rb-0096d", ral: "0096D", hex: "#86868A", he: "אפור בינוני", en: "Mid grey", delta: 0, aliases: ["ral-7046"] },
+    { id: "rb-7240d", ral: "7240D", hex: "#A1928A", he: "טאופ", en: "Taupe", delta: 0, aliases: ["ral-1035"] },
+    { id: "rb-2030d", ral: "2030D", hex: "#BF9367", he: "קרמל", en: "Caramel", delta: 0 },
+    /* light */
+    { id: "rb-7080d", ral: "7080D", hex: "#B7B4B2", he: "אפור בהיר", en: "Light grey", delta: 0, aliases: ["ral-7040"] },
+    { id: "rb-9001d", ral: "9001D", hex: "#DDCDBD", he: "שמנת", en: "Cream", delta: 0, aliases: ["ral-1013", "ral-7035"] },
+    { id: "rb-9302d", ral: "9302D", hex: "#ECEBE7", he: "לבן שבור", en: "Off-white", delta: 0 },
+    { id: "rb-9016d", ral: "9016D", hex: "#F1F0EA", he: "לבן", en: "White", delta: 0, aliases: ["ral-9016"] }
   ];
   var WINDOWS = [
     { id: "none", he: "ללא חלון", en: "Solid", delta: 0, rects: [] },
@@ -1950,9 +1938,9 @@
   }
 
   // js/url-state.js
-  var VERSION = 5;
+  var VERSION = 6;
   var DEFAULTS = {
-    colour: "ral-7016",
+    colour: "rb-0097d",
     window: "rect",
     grille: "none",
     handle: "idan",

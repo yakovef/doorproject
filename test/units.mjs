@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, VIEWS, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, VIEWS, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
 import { LIGHT } from '../js/renderer.js';
 import { priceAgorot, shekels } from '../js/price.js';
@@ -14,7 +14,7 @@ const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' +
 const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
-const base = { colour: 'ral-7016', window: 'none', grille: 'none', handle: 'idan',
+const base = { colour: 'rb-0097d', window: 'none', grille: 'none', handle: 'idan',
                detail: 'plain', finish: 'steel',
                size: 'standard', handing: 'right-in', view: 'out' };
 
@@ -72,7 +72,7 @@ for (const st of everyState()) {
 {
   const bad = fromQuery('?v=3&c=ral-nope&w=rect&g=none&n=bar-long&d=plain&f=steel&s=standard&h=right-in');
   ok(bad.notice === 'option-unknown', 'unknown option must notify, never silently default');
-  ok(bad.state.colour === 'ral-7016', 'unknown option should fall back to default');
+  ok(bad.state.colour === 'rb-0097d', 'unknown option should fall back to default');
   ok(fromQuery('?v=3&i=1').state.view === 'in', 'inside view lost from url');
   ok(!toQuery({ ...base }).includes('i=1'), 'default view should not clutter the url');
   // 'f' now means finish, so it must not be mistaken for the inside-view flag.
@@ -85,7 +85,12 @@ group('price');
 {
   const P = st => shekels(priceAgorot({ ...base, ...st }));
   ok(P({}) === 3195, `standard anthracite solid should be ₪3,195, got ${P({})}`);
-  ok(P({ colour: 'ral-3005' }) === 3445, 'wine red adds ₪250');
+  /* Every colour is delta 0 now: the manufacturer's chart gives codes, not
+     prices, and the old per-colour premiums were our invention. */
+  for (const c of COLOURS) ok(P({ colour: c.id }) === P({}), `colour ${c.id} must not change the price yet`);
+  // A link shared before the chart replaced the list must still open a door.
+  ok(P({ colour: 'ral-9005' }) === P({}), 'retired ral-9005 should still resolve');
+  ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
   ok(P({ size: 'wide' }) === 3495, 'wide band');
   ok(P({ window: 'rect' }) === 3815, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
   ok(P({ window: 'rect', grille: 'scroll' }) === 4275, 'scrollwork grille adds ₪460');

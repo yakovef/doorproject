@@ -10,7 +10,10 @@
 
 import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS } from './catalog.js';
 
-/* 5: the code's fields were widened (see BITS) and the catalogue grew, so
+/* 6: the whole colour list was replaced by the manufacturer's own chart, so
+   every colour index moved. Aliases keep shared LINKS working; they cannot
+   help a code, which stores a number.
+   5: the code's fields were widened (see BITS) and the catalogue grew, so
    every index shifted. Aliases cannot rescue a code, because a code stores a
    NUMBER and a number carries no name to alias — hence the bump, so an older
    code is refused with a notice rather than decoded into a different door.
@@ -18,10 +21,10 @@ import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, SIZES, WINDOWS 
    became "lever + horizontal grab bar", which is what the installations
    actually show). Bumping rather than reusing means an older code is refused
    with a notice instead of quietly decoding into a different door. */
-export const VERSION = 5;
+export const VERSION = 6;
 
 export const DEFAULTS = {
-  colour:  'ral-7016',
+  colour:  'rb-0097d',
   window:  'rect',
   grille:  'none',
   handle:  'idan',
