@@ -282,12 +282,14 @@
   var CYLINDER_AFF = 904;
   var PEEPHOLE_AFF = 1600;
   var PEEPHOLE_R = 30;
-  var LOCK_BACKSET = 72;
+  var LOCK_BACKSET = 60;
+  var LOCK_BACKSET_GRIP = 49;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
   var LEVER_REACH = 145;
   var LOCK_CLEAR = 15;
-  var BAR_INSET = 0.19;
+  var BAR_GAP = 0.125;
+  var BAR_GAP_MIN = 0.09;
   var GRAB = { fromTop: 0.585, len: 0.3, ratio: 1 / 15, boss: 17 };
   var THRESHOLD = 42;
   var PLATE = {
@@ -387,7 +389,8 @@
     const mainX = sideW && !hingeOnLeft ? x0 + sideW + MULLION : x0;
     const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
     const mainX1 = mainX + leafW;
-    const lockX = hingeOnLeft ? mainX1 - LOCK_BACKSET : mainX + LOCK_BACKSET;
+    const backset = lockBackset(handle);
+    const lockX = hingeOnLeft ? mainX1 - backset : mainX + backset;
     const inward = hingeOnLeft ? -1 : 1;
     const hingeX = hingeOnLeft ? mainX : mainX1;
     const leverDir = hingeOnLeft ? -1 : 1;
@@ -1298,10 +1301,15 @@ ${body}
     const grip = handleFootprint(handle, leafH);
     if (!grip.vy && !grip.hx) return 0;
     const lock = handleFootprint(lockset, leafH);
-    const clear = lock.hx + grip.hx + LOCK_CLEAR;
-    const want = handle.inset ? leafW * handle.inset - LOCK_BACKSET : grip.vy > 200 ? leafW * BAR_INSET - LOCK_BACKSET : 0;
+    const body = lock.hx + grip.hx + LOCK_CLEAR;
+    const floor = Math.max(body, leafW * BAR_GAP_MIN);
+    const want = handle.inset ? leafW * handle.inset - lockBackset(handle) : grip.vy > 200 ? leafW * BAR_GAP : 0;
     const room = toGlass - grip.hx - LOCK_CLEAR;
-    return Math.round(Math.max(clear, Math.min(want, room), 0));
+    return Math.round(Math.max(floor, Math.min(want, room), 0));
+  }
+  function lockBackset(handle) {
+    const grip = handleFootprint(handle, 2e3);
+    return grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
   }
   var GRIP_ART = {
     none: () => "",

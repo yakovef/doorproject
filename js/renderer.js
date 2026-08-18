@@ -183,7 +183,23 @@ const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
    rebate: every outside photograph on the works page shows a leaf with none on
    it, and the inside face they were drawn on no longer exists. The hinge and
    thumb-turn art went with it — a hundred lines that could not be reached. */
-const LOCK_BACKSET = 72;    // 0.076 W from the closing edge
+/**
+ * Where the lock furniture sits, in mm from the closing edge.
+ *
+ * Measured over the thirty hand-read installations: the median lockset axis is
+ * 0.070 of leaf width from the edge, which on a standard leaf (850 mm) is
+ * 60 mm. We had 72, a fifth too far inboard.
+ *
+ * And it moves. On the ten doors that carry a pull bar as well, the lockset
+ * median is 0.057 — the fitter takes it OUT towards the stile to make room for
+ * the bar. That is not a detail: it is half of why a real door has a visible
+ * hand's width between the two fittings and ours did not.
+ *
+ * mm rather than a fraction because a lock case has a backset, and a backset
+ * is a property of the lock, not of how wide the door happens to be.
+ */
+const LOCK_BACKSET = 60;    // 0.070 W — the measured median, no grip present
+const LOCK_BACKSET_GRIP = 49;  // 0.057 W — where it goes when a bar shares the stile
 /* Both discs came down about a fifth after d016: side by side with the
    photograph our rose and escutcheon were plainly oversized, reading as
    commercial ironmongery on a domestic door. The ratio between them (1.08)
@@ -200,6 +216,29 @@ const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
    inboard, usually lining up with a glazing or inlay feature, with the lock
    furniture outboard of them. Only one of eight hugged the stile. */
 const BAR_INSET = 0.19;
+
+/**
+ * The GAP between the bar's axis and the lockset's, as a fraction of leaf
+ * width. This is the quantity that was reported as wrong from the outside —
+ * "make the pull handles a little bit more far from the main handle and
+ * keyhole" — so it is now measured directly rather than falling out of two
+ * other numbers.
+ *
+ * All ten installations carrying both:
+ *   0.090  0.096  0.100  0.108  0.116  0.134  0.143  0.154  0.169  0.185
+ *   median 0.125 — 106 mm on a standard leaf. The tightest is 0.090, 77 mm.
+ *
+ * What we drew before was 89 mm at best, and on a glazed door it collapsed to
+ * the sum of the two fittings' half-widths plus 15 mm of air — 61 mm, well
+ * under anything installed. The floor is now the tightest REAL door, not the
+ * point at which two drawings stop overlapping.
+ *
+ * These three numbers agree with each other, which is the reason to trust
+ * them: lock at 0.057 plus gap 0.125 lands the bar at 0.182, and the measured
+ * median bar inset is 0.183.
+ */
+const BAR_GAP     = 0.125;
+const BAR_GAP_MIN = 0.090;
 
 /* The horizontal grab bar. All 18 instances are centred on the leaf width at
    a mid rail, 0.30 of leaf width long at about 1:15, on ball collars — and
@@ -355,12 +394,15 @@ export function render(state) {
   const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
   const mainX1 = mainX + leafW;
 
-  /* The lock owns the stile: its backset is what defines where the lock side
-     of the door is, so it never moves. A handle whose art runs down past the
-     escutcheon stands off towards the leaf centre instead — a pull bar drawn
-     through the keyhole is the single loudest "this is a drawing" tell, and
-     it is not what ref-00 or any of the works photographs show. */
-  const lockX   = hingeOnLeft ? mainX1 - LOCK_BACKSET : mainX + LOCK_BACKSET;
+  /* The lock owns the stile, and a grip stands off towards the leaf centre
+     rather than sharing it — a pull bar drawn through the keyhole is the
+     single loudest "this is a drawing" tell, and it is not what any of the
+     works photographs show.
+     The backset is not quite fixed: on the ten installations carrying a bar
+     as well, the lockset is measurably further OUT (0.057 of leaf width
+     against 0.070) because the fitter is making room for it. */
+  const backset = lockBackset(handle);
+  const lockX   = hingeOnLeft ? mainX1 - backset : mainX + backset;
   const inward  = hingeOnLeft ? -1 : 1;
   const hingeX  = hingeOnLeft ? mainX : mainX1;
   const leverDir = hingeOnLeft ? -1 : 1;
@@ -1500,15 +1542,32 @@ export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) 
      edge of a centred window, so a door with a Rotem backplate and an Idan bar
      had the bar lying across the glass. The keyway is the thing that must stay
      clear, and it is inside the body. */
-  const clear = lock.hx + grip.hx + LOCK_CLEAR;
-  const want = handle.inset ? leafW * handle.inset - LOCK_BACKSET
-             : grip.vy > 200 ? leafW * BAR_INSET - LOCK_BACKSET : 0;
+  const body = lock.hx + grip.hx + LOCK_CLEAR;
+  /* The floor is the tightest gap anyone actually installs, not the point at
+     which the two drawings stop overlapping. Those are different numbers —
+     61 mm against 77 — and using the smaller one is how a glazed door ended up
+     with the bar tucked against the lever. */
+  const floor = Math.max(body, leafW * BAR_GAP_MIN);
+  const want = handle.inset ? leafW * handle.inset - lockBackset(handle)
+             : grip.vy > 200 ? leafW * BAR_GAP : 0;
   /* And it must not run across the glass. `toGlass` is the distance from the
      lock's axis to the near edge of the glazing; the bar has to stop short of
      it. Where a wide window leaves no room, clearing the lockset still wins —
      a bar over a pane is wrong, a bar drawn through a lever is worse. */
   const room = toGlass - grip.hx - LOCK_CLEAR;
-  return Math.round(Math.max(clear, Math.min(want, room), 0));
+  return Math.round(Math.max(floor, Math.min(want, room), 0));
+}
+
+/**
+ * How far the lock furniture sits from the closing edge for THIS door.
+ *
+ * A door with a pull bar on it has its lockset further out — measured, 0.057
+ * of leaf width against 0.070 — because the fitter is making room. Exported
+ * so the tests can assert the two positions rather than infer them.
+ */
+export function lockBackset(handle) {
+  const grip = handleFootprint(handle, 2000);
+  return grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
 }
 
 /**

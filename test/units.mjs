@@ -271,16 +271,19 @@ for (const n of HANDLES) {
 group('the grip clears the lockset');
 {
   const num = (svg, re) => Number(re.exec(svg)[1]);
-  let n = 0, tightest = Infinity;
+  let n = 0, tightest = Infinity, closest = { axis: Infinity, label: '-' };
   /* EXHAUSTIVE here, because this is the one place a grip and a lockset
      interact: every grip against every lockset, on every size band and both
-     handings. A pull bar drawn through a lever is the loudest "this is a
-     drawing" tell there is, and on a narrow leaf the two have barely 60 mm
-     between them. */
+     handings — AND every window, which was the hole in this sweep. The glazing
+     is what squeezes the bar: `gripStandoff` caps the standoff at the near
+     edge of the pane, so the tightest gap the drawing ever produces is on a
+     glazed narrow leaf, and this loop never varied the window, so the case the
+     assertion below exists for was the one case it never reached. */
   for (const hn of HANDLES) for (const kn of LOCKSETS) for (const sz of sizeKeys)
-    for (const hd of HANDINGS) {
-      const svg = render({ ...base, handle: hn.id, lockset: kn.id, size: sz, handing: hd.id });
-      const label = `${hn.id}+${kn.id}/${sz}/${hd.id}`;
+    for (const hd of HANDINGS) for (const wn of WINDOWS) {
+      const svg = render({ ...base, handle: hn.id, lockset: kn.id, size: sz,
+                           handing: hd.id, window: wn.id });
+      const label = `${hn.id}+${kn.id}/${sz}/${hd.id}/${wn.id}`;
       const leaf = { x: num(svg, /id="leaf" data-x="([-\d.]+)"/),
                      w: num(svg, /id="leaf"[^>]*data-w="([\d.]+)"/) };
 
@@ -329,6 +332,20 @@ group('the grip clears the lockset');
            `the grip overlaps the lockset (${label}): gapX ${gapX.toFixed(0)}, gapY ${gapY.toFixed(0)}`);
         tightest = Math.min(tightest, Math.max(gapX, gapY));
 
+        /* Not overlapping is not the standard, and treating it as one is how
+           this got reported from the outside. Across the ten installations
+           carrying both a bar and a lockset the axis-to-axis gap runs 0.090 to
+           0.185 of leaf width, median 0.125. We drew 61 mm — 0.072 — whenever
+           glazing squeezed the bar, on the grounds that at 61 mm the two boxes
+           stop touching. Boxes stopping touching is not what a hand needs. */
+        if (grip.vy > 200) {
+          const axis = Math.abs(grip.x - lock.x) / leaf.w;
+          ok(axis >= 0.088,
+             `bar and lockset only ${axis.toFixed(3)} of leaf width apart — tighter `
+             + `than any of the ten installed doors that carry both (${label})`);
+          if (axis < closest.axis) closest = { axis, label };
+        }
+
         /* The grip may only stand off towards the leaf centre — never out past
            the lockset towards the closing edge, where there is no door left to
            hold on to. */
@@ -341,7 +358,8 @@ group('the grip clears the lockset');
       }
       n++;
     }
-  console.log(`  (${n} renders, tightest clearance ${Math.round(tightest)}mm)`);
+  console.log(`  (${n} renders, closest bodies ${Math.round(tightest)}mm; `
+    + `tightest bar-to-lockset ${closest.axis.toFixed(3)} of leaf width on ${closest.label})`);
 }
 
 // ── 6c. What the works photographs actually show ──────────────────
