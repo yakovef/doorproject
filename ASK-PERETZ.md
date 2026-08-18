@@ -42,8 +42,6 @@ gets this answered in thirty seconds; a definition does not.*
 **מנעול וידית:** קורל · רותם · כדור · ספיר · אלמוג · כדור על אורך ·
 ריבועי · מנעול חכם.
 
-**תוספות (אפשר כמה):** עינית · פתח דואר · מקוש טבעת · מחזיר דלת · שלט שם.
-
 **זכוכית:** שקופה · מעוצבת · מחורצת.
 
 > **"מנעול חכם — איזה דגם אתה מתקין, וכמה הוא עולה?"** (ראינו אותו על
@@ -61,21 +59,25 @@ it is not one.*
 
 ---
 
-## 2b. איזו ידית מגיעה באיזה גימור?
+## 2b. גימור הידיות — הורדנו את הבחירה, ויש כאן סתירה ⚠
 
-> **"אילו ידיות אפשר להזמין בכל שלושת הגימורים — ניקל מוברש, שחור מט, פליז?
-> ואילו מגיעות בגימור אחד בלבד?"**
+הבחירה בגימור (ניקל מוברש / שחור מט / פליז) הוסרה מהאתר. כל ידית מצוירת
+בגימור אחד: שירן בפליז, כל השאר בניקל מוברש.
 
-מה שהנחנו כרגע, לפי תמונות המוצר:
-**שירן — פליז בלבד** · כל השאר — שלושת הגימורים.
+> **"מתוך עשר הדלתות שניסינו לשחזר — בשש מהן הידית או המנעול הם פליז או
+> שחור, לא ניקל. אתה כן מזמין גימורים שונים, או שזה מה שהיצרן שולח?"**
 
-*Until this was noticed the finish tiles were live for every handle and priced
-at up to ₪220, while the drawing did not change at all for some of them — the
-message going to Peretz read "Shiran, matte black", a door that does not exist.
-Shiran is now fixed in the catalogue and the tiles say why. The recessed
-channel used to be listed here too; since the split it is a grip with a lever
-beside it, so the door does have metal on it and the finish means something
-again. If any of this is wrong it is one line: `HANDLES[].finish`.*
+d003 · d026 · d106 — פליז · d087 · d113 · d122 — שחור
+
+*This one needs an answer, because the evidence points the other way. The
+finish was withdrawn on the instruction that it is not something customers
+choose — a reasonable thing to be true, and the ₪220 it charged for a
+non-choice was worse than useless. But it is not a decorative axis in the
+photographs: SIX of the ten doors we recreate carry brass or black hardware,
+and `npm run recreate` now records each of those as a gap between his door and
+ours. If he does order in different finishes, this comes back as a fact about
+each handle (`HANDLES[].finish`) rather than as a priced tile — which is what
+Shiran already is.*
 
 ---
 

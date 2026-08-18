@@ -16,7 +16,7 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { ADDONS, addonsOf, byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { darken, isLight, lighten, scaleTone, silhouette } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
@@ -387,16 +387,14 @@ export function render(state) {
   const glazing = byId(GLAZINGS, state.glazing);
   const grille  = byId(GRILLES, state.grille);
   const handle  = byId(HANDLES, state.handle);
-  const addons  = addonsOf(state);
-  const has     = id => addons.some(a => a.id === id);
   const lockset = byId(LOCKSETS, state.lockset);
   const detail  = byId(DETAILS, state.detail);
-  /* The handle's own finish wins over the chosen one — Luna is matte black and
-     Shiran is antique brass whatever the tiles say, and the recessed channel
-     has no metal on it at all. Anything with a finish still needs a tone for
-     the fixings, so a handle with none falls back to brushed nickel. */
+  /* The finish is the handle's own or brushed nickel; it stopped being a
+     customer choice when the group was withdrawn. Shiran is an antique brass
+     casting and says so on its catalogue entry, which is where a fact about a
+     product belongs. */
   const finish  = effectiveFinish(state);
-  const tone    = FINISH_TONES[finish ? finish.id : 'steel'] || FINISH_TONES.steel;
+  const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
 
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
@@ -474,44 +472,6 @@ export function render(state) {
      the fix is not to correct both, it is to have one. */
   const standoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
   const handleX = lockX + inward * standoff;
-
-  /* Where a centred add-on can actually go: between the hinge edge and the
-     grip's inboard edge, or the whole leaf when there is no grip.
-
-     "The whole leaf" used to be written `lockX + inward * leafW`, which walks
-     a full leaf width INBOARD FROM THE LOCK and therefore lands past the hinge
-     edge by exactly the backset. The two ends then came out the wrong way
-     round and the room between them measured 60 mm, not 850 — so on every door
-     with no pull handle the nameplate was drawn zero wide with a -24 border
-     inside it, which the browser refuses to draw and the console reported 120
-     times. `conflicts()` meanwhile said the plate was fine, because
-     `plateRoom()` had the arithmetic right. Same shape of bug as the standoff
-     above: one quantity, two computations, and only one of them correct.
-     So the width now comes from `plateRoom` itself rather than from a second
-     derivation that happens to agree today. */
-  const plate = (() => {
-    const foot = handleFootprint(handle, leafH);
-    const inner = foot.vy ? handleX + inward * (foot.in + 30) : hingeX - inward * leafW;
-    const lo = Math.min(hingeX, inner), hi = Math.max(hingeX, inner);
-    return { cx: (lo + hi) / 2, room: plateRoom(state) };
-  })();
-
-  /**
-   * Where a centre-line add-on goes: its own height if the leaf is clear
-   * there, otherwise just below the glazing.
-   *
-   * `clear` is the room the fitting needs under it, as a fraction of leaf
-   * height. Moving it is deliberate — the alternative is not drawing it, and
-   * a paid-for option that silently draws nothing is the bug this codebase
-   * keeps producing (CLAUDE.md §5). A knocker 200 mm lower than the
-   * photographs is a small wrongness; a knocker that is not there is an order
-   * Peretz cannot fill.
-   */
-  const addonY = (aff, clear) => {
-    const want = y(aff);
-    if (!winSpan || want - leafH * clear > winBottom || want + leafH * clear < y0 + (win.rects[0] ? win.rects[0].top : 0)) return want;
-    return Math.min(winBottom + leafH * (clear + 0.03), y0 + leafH * 0.90);
-  };
 
   const paint = colour.hex;
   const edge  = silhouette(paint);
@@ -1028,10 +988,6 @@ export function render(state) {
          neither does a phone camera focused on the door. Without this the
          scene behind the pane reads as flat graphic shapes stuck to the glass
          rather than as something a distance away. -->
-    <filter id="paneSoft" x="-6%" y="-6%" width="112%" height="112%">
-      <feGaussianBlur stdDeviation="1.4"/>
-    </filter>
-
     <filter id="softShadow" x="-40%" y="-80%" width="180%" height="300%">
       <feGaussianBlur stdDeviation="30"/>
     </filter>
@@ -1202,32 +1158,6 @@ export function render(state) {
               centreX, leafW, y0)}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
-  </g>
-
-  <!-- ── add-ons ──────────────────────────────────────────────────
-       Chosen, not inferred. The peephole used to live in the hardware group
-       above, drawn whenever the leaf had no window: on every solid door
-       whether anyone wanted one, and on no glazed door
-       even though d076 has a peephole above a knocker on a leaf that also has
-       glass. It was never in the price, never in the summary, and never in the
-       message that goes to Peretz.
-
-       Positions are fractions of the leaf read off the photographs. Where a
-       window would be in the way the add-on moves below it rather than being
-       dropped — a thing that silently disappears is this codebase's oldest
-       failure mode (CLAUDE.md §5) and the peephole was an instance of it. -->
-  <!-- Centred add-ons are centred on the space that is FREE, not on the leaf.
-       A recessed channel runs almost the leaf's full height 255 mm in from the
-       closing edge, and on a narrow leaf a 300 mm letterplate centred on the
-       leaf runs straight into it — 26 designs, found by npm run collide once
-       it started measuring the drawing rather than the declared boxes.
-       A fitter would put the plate in the space that is left, so this does. -->
-  <g id="addons">
-    ${has('peep') ? peephole(centreX, addonY(PEEPHOLE_AFF, 0.09)) : ''}
-    ${has('knocker') ? knocker(centreX, addonY(1560, 0.13), tone) : ''}
-    ${has('nameplate') ? nameplate(plate.cx, addonY(1730, 0.09), tone, plate.room) : ''}
-    ${has('mail') ? letterplate(plate.cx, y0 + leafH * 0.80, tone, plate.room) : ''}
-    ${has('closer') ? doorCloser(hingeX, y0 + leafH * 0.045, hingeOnLeft ? 1 : -1, tone) : ''}
   </g>
 
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
@@ -1561,114 +1491,6 @@ function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
  * Returned in two parts, because they go either side of the grille: ironwork
  * sits in front of the glass, not behind its texture.
  */
-/**
- * What is BEHIND clear glass.
- *
- * `npm run glass` measures the pane against the leaf beside it, in five bands
- * top to bottom, on two numbers: `tone` (how bright the band is relative to
- * the paint) and `spread` (how much contrast there is WITHIN the band). Over
- * the ten glazed doors in the corpus:
- *
- *   photographs   tone   0.92 0.65 0.79 0.68 0.54
- *                 spread 1.13 1.02 1.08 1.35 1.28
- *   ours (before) tone   0.67 0.58 0.49 0.46 0.46
- *                 spread 0.61 0.17 0.13 0.10 0.06
- *
- * The tool's own verdict was the useful half: TONE IS NOT THE GAP, STRUCTURE
- * IS. We were six times too flat across the middle of the pane and twenty-one
- * times too flat at its foot. No adjustment to a gradient fixes that, because
- * a gradient has no structure by construction -- and every previous attempt at
- * this pane was an adjustment to the gradient.
- *
- * A window is not a surface. It is an aperture with a street behind it, and
- * the street has a skyline, a building opposite, planting, and a pavement. So
- * this draws those, as a handful of hard-edged masses. Deliberately not a
- * picture of a particular street: the shapes are generic and derived from the
- * pane's own proportions, because a recognisable scene repeated in every door
- * would be worse than a flat one.
- *
- * Everything is a multiple of the LEAF's paint, through `scaleTone`, so a pane
- * in a black door and a pane in a white one both land on the measured RATIO
- * rather than both landing on the same grey.
- */
-function paneScene(x, y, w, h, paint) {
-  const t = (m, a = 1) => `fill="${scaleTone(paint, m)}"${a < 1 ? ` opacity="${a}"` : ''}`;
-  const band = (y0, y1, m, a) =>
-    `<rect x="${x}" y="${(y + h * y0).toFixed(1)}" width="${w}" height="${(h * (y1 - y0)).toFixed(1)}" ${t(m, a)}/>`;
-  const box = (x0, y0, x1, y1, m, a) =>
-    `<rect x="${(x + w * x0).toFixed(1)}" y="${(y + h * y0).toFixed(1)}" width="${(w * (x1 - x0)).toFixed(1)}" height="${(h * (y1 - y0)).toFixed(1)}" ${t(m, a)}/>`;
-  const blob = (x0, y0, rx, ry, m, a) =>
-    `<ellipse cx="${(x + w * x0).toFixed(1)}" cy="${(y + h * y0).toFixed(1)}" rx="${(w * rx).toFixed(1)}" ry="${(h * ry).toFixed(1)}" ${t(m, a)}/>`;
-
-  /* Deterministic, because a door that looks different every time it is drawn
-     cannot be compared with itself and cannot be photographed for Peretz.
-     Math.random is also banned in this codebase's tooling for the same
-     reason. A small LCG on a fixed seed gives scatter without chance. */
-  let seed = 0x2f6e2b1;
-  const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
-
-  /* FIRST ATTEMPT, kept as a warning: five big flat rectangles hitting the
-     measured band tones, with a couple of large blocks for contrast. It scored
-     almost perfectly — spread 0.80/0.94/1.04/1.05/1.01 against the corpus's
-     1.13/1.02/1.08/1.35/1.28 — and looked like a De Stijl painting. A metric
-     that counts brightest-minus-darkest inside a band is satisfied by ANY high
-     contrast, including six enormous blocks of black and white.
-     What a real pane's contrast is made of is MANY SMALL THINGS: leaves,
-     twigs, railings, the glazing bars of the building opposite. Same spread,
-     completely different picture. So the masses below are the same tones as
-     that first attempt, broken into pieces the size they are in a photograph
-     and softened by url(#paneSoft), which is what glass does to a street two
-     metres behind it. */
-
-  const sky = [];
-  for (let i = 0; i < 26; i++) {
-    const u = rnd(), v = rnd();
-    sky.push(blob(0.05 + u * 0.90, 0.02 + v * 0.16, 0.03 + rnd() * 0.05, 0.008 + rnd() * 0.014,
-                  0.62 + rnd() * 0.80, 0.62));
-  }
-  /* The building opposite: a mid mass with a grid of small openings, which is
-     what actually generates contrast in the upper middle of every photograph
-     in the corpus. */
-  const windows = [];
-  for (let r = 0; r < 4; r++) {
-    for (let c = 0; c < 5; c++) {
-      const wx = 0.06 + c * 0.19, wy = 0.26 + r * 0.062;
-      const lit = (r === 1 && c === 2) || (r === 3 && c === 0) || (r === 2 && c === 4);
-      windows.push(box(wx, wy, wx + 0.115, wy + 0.046, lit ? 1.34 : 0.09 + rnd() * 0.20));
-    }
-  }
-  /* Planting. Small, overlapping, and in a range of tones — one flat dark
-     rectangle here is what made the lower half read as a hole. */
-  const leaves = [];
-  for (let i = 0; i < 90; i++) {
-    const u = rnd(), v = rnd();
-    leaves.push(blob(-0.02 + u * 1.04, 0.56 + v * 0.34, 0.022 + rnd() * 0.045, 0.010 + rnd() * 0.022,
-                     0.10 + rnd() * 1.05, 0.85));
-  }
-
-  return `
-    <!-- sky, broken by cloud and by a parapet coming in from one side -->
-    ${band(0.00, 0.20, 1.34)}
-    ${sky.join('')}
-    ${box(0.62, 0.00, 1.02, 0.15, 0.30)}
-    ${box(0.62, 0.02, 0.78, 0.15, 0.52)}
-    ${band(0.20, 0.24, 0.72)}
-    <!-- the building opposite -->
-    ${band(0.24, 0.52, 0.58)}
-    ${windows.join('')}
-    <!-- a lit wall across the middle: the brightest thing in the pane, and the
-         reason the middle band's spread is over 1.0 in every photograph -->
-    ${band(0.52, 0.58, 1.28)}
-    ${band(0.58, 0.62, 0.94)}
-    <!-- planting, then the pavement bouncing light back up -->
-    ${band(0.62, 0.86, 0.34)}
-    ${leaves.join('')}
-    ${[0.16, 0.40, 0.63, 0.87].map(u => box(u - 0.012, 0.60, u + 0.012, 0.88, 0.60, 0.8)).join('')}
-    ${band(0.86, 1.00, 1.02)}
-    ${box(0.00, 0.86, 0.46, 0.93, 0.30)}
-    ${box(0.46, 0.88, 1.00, 0.94, 0.66)}`;
-}
-
 function glazingArt(kind, x, y, w, h, paint) {
   if (kind === 'reeded') {
     /* Vertical flutes. Each rod is a little lens: a bright line down its
@@ -1753,11 +1575,20 @@ function aperture({ x, y, w, h, paint, edge, grille, glazing, key }) {
            edge before the pane turns the other way -->
       ${bevel(x, y, w, h, 8, paint, false)}
 
+      <!-- A PANE, not a picture.
+           This carried a drawn street for a while: a skyline, a building
+           opposite with lit windows, planting, a pavement. It came out of the
+           glass tool, which measures our pane against the photographs in five
+           bands and said we were six to twenty-one times too flat — and the
+           scene did fix that number. It also made every window the busiest
+           thing in the drawing, competing with the door for attention when the
+           door is what is being sold. Reported from the outside, in as many
+           words: the old one looked better.
+           So the pane is a gradient again, and the measurement stays in
+           tools/glass.mjs as a description of what a photograph does rather
+           than as a target to hit. A configurator is not a photograph; it has
+           to show a customer their door, and a quiet pane does that. -->
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
-      <!-- the street behind the pane. Clipped, because these are hard-edged
-           masses and the whole point is that they have edges. -->
-      ${glass ? '' : `<clipPath id="sc-${key}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
-      <g clip-path="url(#sc-${key})" filter="url(#paneSoft)">${paneScene(x, y, w, h, paint)}</g>`}
       <!-- Frost at 0.30 on a SCREEN blend was making every opening read as
            bathroom glass. The measured doors are glazed with clear or lightly
            patterned glass and the pane comes out DARKER than the leaf, because
@@ -2010,26 +1841,6 @@ export function gripClashesGlass(state) {
   const floor = Math.max(lock.in + grip.out + LOCK_CLEAR, leafW * BAR_GAP_MIN);
   const room = glassClearance(state) - grip.in - LOCK_CLEAR;
   return floor > room;
-}
-
-/**
- * How much width a centred add-on has to work with, once the grip has taken
- * its share of the leaf. Exported so the rules ask the drawing rather than
- * keeping their own copy of the arithmetic — the last time those two answered
- * the same question separately they disagreed by 40 mm.
- */
-export function plateRoom(state) {
-  const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
-  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  const foot = handleFootprint(handle, leafH);
-  if (!foot.vy) return leafW - 70;
-  const standoff = gripStandoff(handle, byId(LOCKSETS, state.lockset), leafW, leafH,
-                                glassClearance(state));
-  /* Measured inboard from the closing edge: the grip's inboard face, then the
-     rest of the leaf to the hinge. */
-  const inner = lockBackset(handle, byId(LOCKSETS, state.lockset)) + standoff + foot.in + 30;
-  return Math.max(0, leafW - inner - 70);
 }
 
 /**
@@ -2852,150 +2663,6 @@ function lever(cx, cy, dir) {
     </g>`;
 }
 
-/* Centred on the leaf, always. Every photograph on the works page puts it on
-   the leaf's centre line — offsetting it towards the hinge, as this did, is
-   the kind of small wrongness that registers before anyone can name it. */
-const peephole = (cx, cy) => {
-  const R = PEEPHOLE_R;
-  return `
-    <!-- Radially: a soft halo, a dark ring, then a small bright boss at the
-         centre. Measured off 3300 — the middle is BRIGHTER than the leaf, so
-         drawing a dark disc with a shiny bezel had it inside out. -->
-    <circle cx="${cx + 2}" cy="${cy + 3}" r="${R * 0.75}" fill="#000" opacity="0.18" filter="url(#hwShadow)"/>
-    <circle cx="${cx}" cy="${cy}" r="${R}" fill="#000" opacity="0.07"/>
-    <circle cx="${cx}" cy="${cy}" r="${R * 0.62}" fill="#000" opacity="0.30"/>
-    <circle cx="${cx}" cy="${cy}" r="${R * 0.38}" fill="url(#metal)"/>
-    <path d="${arcPath(cx, cy, R * 0.5, 140, 310)}" fill="none" stroke="#fff"
-          stroke-opacity="0.22" stroke-width="1.8"/>
-    <circle cx="${cx}" cy="${cy}" r="${R * 0.16}" fill="#1A1D20"/>`;
-};
-
-// ═══════════════════════════════════════════════════════════════════
-//  ADD-ONS — things fixed to the leaf that are not the lock.
-//
-//  All five are on Peretz's doors and none was in the configurator. They are
-//  the only multi-select group: a door carries as many as its owner wants, and
-//  four of the five appear beside each other in the corpus.
-//
-//  Placement is by fraction of the leaf, taken from where they sit in the
-//  photographs, and every one of them is drawn square-on with its own drop
-//  shadow — a thing bolted to a door has to cast something, or it reads as
-//  printed on.
-// ═══════════════════════════════════════════════════════════════════
-
-/**
- * Letterplate. Four doors — d100 d103 d108 d129 — always low, always
- * horizontal, always with the flap's shadow line under the frame.
- *
- * The thing that makes it read is that it is a HOLE with a lid: the aperture
- * behind the flap is the darkest value anywhere on the leaf, darker than the
- * reveal, because it goes into an unlit hall.
- */
-function letterplate(cx, cy, tone, room = Infinity) {
-  const w = Math.min(300, room), h = 78, r = 8;
-  const x = cx - w / 2, y = cy - h / 2;
-  return `
-    <g data-addon="mail" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
-       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
-      <rect x="${x + 4}" y="${y + 6}" width="${w}" height="${h}" rx="${r}"
-            fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${tone[2]}"/>
-      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.20}" rx="${r * 0.6}" fill="${tone[0]}"/>
-      <rect x="${x}" y="${y + h * 0.84}" width="${w}" height="${h * 0.16}" fill="${tone[4]}"/>
-      <!-- the aperture: a hall behind it, so this is the darkest value on the leaf -->
-      <rect x="${x + w * 0.07}" y="${y + h * 0.26}" width="${w * 0.86}" height="${h * 0.30}"
-            rx="3" fill="#0B0D0F"/>
-      <!-- the flap, hanging closed over it, catching the key on its top edge -->
-      <rect x="${x + w * 0.05}" y="${y + h * 0.30}" width="${w * 0.90}" height="${h * 0.44}"
-            rx="4" fill="${tone[3]}"/>
-      <rect x="${x + w * 0.05}" y="${y + h * 0.30}" width="${w * 0.90}" height="4"
-            fill="${tone[0]}"/>
-    </g>`;
-}
-
-/**
- * Ring knocker. Five doors — d048 d067 d070 d076 d080 — and on three of them
- * it is the most ornate thing in the picture.
- *
- * A ring is the one fitting here that is genuinely three-dimensional
- * square-on: it hangs off its boss and the bottom of the loop rests against
- * the door, so the shadow is not a uniform offset — it is tight at the top,
- * where the ring touches, and wide at the bottom, where it stands away.
- */
-function knocker(cx, cy, tone) {
-  const R = 52, t = 13;
-  return `
-    <g data-addon="knocker" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
-       data-hx="${R.toFixed(1)}" data-vy="${(R * 1.4).toFixed(1)}">
-      <ellipse cx="${cx + 4}" cy="${cy + R * 0.75}" rx="${R * 0.95}" ry="${R * 0.9}"
-               fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
-      <!-- the ring, hanging: wider than tall by a touch, as a loose ring does -->
-      <ellipse cx="${cx}" cy="${cy + R * 0.66}" rx="${R * 0.86}" ry="${R * 0.94}"
-               fill="none" stroke="${tone[2]}" stroke-width="${t}"/>
-      <path d="${arcPath(cx, cy + R * 0.66, R * 0.86, 150, 340)}" fill="none"
-            stroke="${tone[0]}" stroke-width="${t * 0.34}" stroke-opacity="0.95"/>
-      <path d="${arcPath(cx, cy + R * 0.66, R * 0.86, 20, 140)}" fill="none"
-            stroke="#000" stroke-width="${t * 0.30}" stroke-opacity="0.34"/>
-      <!-- the boss it hangs from, over the top of the ring -->
-      <ellipse cx="${cx}" cy="${cy}" rx="${R * 0.44}" ry="${R * 0.36}" fill="${tone[1]}"/>
-      <ellipse cx="${cx}" cy="${cy - R * 0.07}" rx="${R * 0.30}" ry="${R * 0.20}"
-               fill="${tone[0]}" opacity="0.85"/>
-    </g>`;
-}
-
-/**
- * Door closer. Five doors — d010 d031 d032 d074 d115 — on the top rail,
- * hinge side, arm folded across.
- *
- * Drawn small and pale on purpose. It is a functional fitting nobody chose for
- * its looks, and giving it the contrast of a knocker would make every door
- * that has one look like it has a machine bolted to it, which is not what the
- * photographs show at door scale.
- */
-function doorCloser(hx, y, dir, tone) {
-  const w = 210, h = 62;
-  const x = hx - (dir > 0 ? 0 : w) + dir * 40;
-  return `
-    <g data-addon="closer" data-cx="${(x + w / 2).toFixed(1)}" data-cy="${(y + h / 2).toFixed(1)}"
-       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
-      <rect x="${x + 3}" y="${y + 5}" width="${w}" height="${h}" rx="9"
-            fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="${tone[3]}"/>
-      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.24}" rx="6" fill="${tone[1]}"/>
-      <!-- the arm, folded back along the rail towards the frame -->
-      <rect x="${x + (dir > 0 ? w * 0.62 : -w * 0.42)}" y="${y + h * 0.30}"
-            width="${w * 0.80}" height="${h * 0.26}" rx="${h * 0.13}" fill="${tone[2]}"/>
-      <circle cx="${x + (dir > 0 ? w * 0.80 : w * 0.20)}" cy="${y + h * 0.43}" r="${h * 0.20}"
-              fill="${tone[1]}"/>
-    </g>`;
-}
-
-/**
- * Nameplate. Two doors — d082 carries "RAFAEL JEWELRY", d115 a notice holder.
- *
- * No lettering is drawn. We do not know what it would say, and inventing a
- * name puts a word on a customer's door that they did not choose — the plate
- * is the product, the engraving is a conversation with Peretz.
- */
-function nameplate(cx, cy, tone, room = Infinity) {
-  const w = Math.min(260, room), h = 86;
-  const x = cx - w / 2, y = cy - h / 2;
-  return `
-    <g data-addon="nameplate" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
-       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
-      <rect x="${x + 3}" y="${y + 5}" width="${w}" height="${h}" rx="5"
-            fill="#000" opacity="0.28" filter="url(#hwShadow)"/>
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${tone[2]}"/>
-      <rect x="${x}" y="${y}" width="${w}" height="3" fill="${tone[0]}"/>
-      <rect x="${x}" y="${y + h - 3}" width="${w}" height="3" fill="${tone[4]}"/>
-      <!-- an engraved border, which is all these plates have before the name -->
-      <rect x="${x + 12}" y="${y + 12}" width="${w - 24}" height="${h - 24}" rx="2"
-            fill="none" stroke="#000" stroke-opacity="0.28" stroke-width="1.6"/>
-      <rect x="${x + 13}" y="${y + 13}" width="${w - 24}" height="${h - 24}" rx="2"
-            fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="1.2"/>
-    </g>`;
-}
-
 /** Bow over blade, with the warding visible inside. Shared by the round
  *  escutcheon and the backplate, so the two can never drift apart. */
 /** Rav Bariach's own dimple key: a plain wide horizontal slot in a raised
@@ -3104,9 +2771,7 @@ export function describe(state, lang = 'he') {
       ? `, ${byId(GLAZINGS, state.glazing).he}` : '';
     const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
     const grip = hd.style === 'none' ? '' : `${hd.he}, `;
-    const extra = addonsOf(state);
-    const add = extra.length ? `, ${extra.map(a => a.he).join(', ')}` : '';
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}${fn ? ' ' + fn.he : ''}${add}, ${s.he}, פתיחה ${h.he}.`;
+    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he} ${fn.he}, ${s.he}, פתיחה ${h.he}.`;
   }
   return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
 }
@@ -3381,60 +3046,3 @@ export function glazingGlyph(glazing) {
   </svg>`;
 }
 
-/**
- * Add-on glyph: the fitting on the leaf, so its POSITION is part of the tile.
- *
- * Position is half of what distinguishes these. A letterplate and a nameplate
- * are both a horizontal rectangle; one is low and open, the other is high and
- * bordered, and a tile that shows only the rectangle would be two identical
- * pictures with two different prices — which this project has shipped twice
- * (CLAUDE.md §5, items 5 and 6).
- */
-export function addonGlyph(addon) {
-  const W = 950, H = 2100, pad = 40;
-  const art = {
-    peep: `<circle cx="${W / 2}" cy="${H * 0.24}" r="46" fill="none"
-                   stroke="currentColor" stroke-width="30"/>
-           <circle cx="${W / 2}" cy="${H * 0.24}" r="15" fill="currentColor"/>`,
-    mail: `<rect x="${W * 0.16}" y="${H * 0.78}" width="${W * 0.68}" height="${H * 0.045}"
-                 rx="12" fill="none" stroke="currentColor" stroke-width="30"/>
-           <rect x="${W * 0.24}" y="${H * 0.792}" width="${W * 0.52}" height="${H * 0.014}"
-                 fill="currentColor"/>`,
-    knocker: `<ellipse cx="${W / 2}" cy="${H * 0.44}" rx="78" ry="86" fill="none"
-                       stroke="currentColor" stroke-width="30"/>
-              <ellipse cx="${W / 2}" cy="${H * 0.365}" rx="42" ry="30" fill="currentColor"/>`,
-    closer: `<rect x="${W * 0.10}" y="${H * 0.055}" width="${W * 0.40}" height="${H * 0.032}"
-                   rx="14" fill="currentColor"/>
-             <rect x="${W * 0.34}" y="${H * 0.064}" width="${W * 0.40}" height="${H * 0.014}"
-                   rx="7" fill="currentColor"/>`,
-    nameplate: `<rect x="${W * 0.22}" y="${H * 0.30}" width="${W * 0.56}" height="${H * 0.05}"
-                      fill="none" stroke="currentColor" stroke-width="30"/>
-                <rect x="${W * 0.28}" y="${H * 0.317}" width="${W * 0.44}" height="8"
-                      fill="currentColor" opacity="0.6"/>`,
-  }[addon.id] || '';
-  return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
-    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
-    ${art}
-  </svg>`;
-}
-
-/** Finish glyph: the actual metal, as a turned disc. */
-export function finishGlyph(finish) {
-  const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
-  const S = 300, c = S / 2;
-  return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
-    <defs>
-      <linearGradient id="fg-${finish.id}" x1="0.1" y1="0" x2="0.9" y2="1">
-        <stop offset="0" stop-color="${tone[0]}"/><stop offset="0.38" stop-color="${tone[2]}"/>
-        <stop offset="0.6" stop-color="${tone[3]}"/><stop offset="1" stop-color="${tone[5]}"/>
-      </linearGradient>
-    </defs>
-    <circle cx="${c}" cy="${c}" r="${c - 16}" fill="url(#fg-${finish.id})"/>
-    <path d="${arcPath(c, c, c - 22, 135, 315)}" fill="none" stroke="#fff"
-          stroke-opacity="0.45" stroke-width="9"/>
-    <path d="${arcPath(c, c, c - 22, 315, 135)}" fill="none" stroke="#000"
-          stroke-opacity="0.3" stroke-width="9"/>
-    <circle cx="${c}" cy="${c}" r="${c - 16}" fill="none" stroke="currentColor"
-            stroke-opacity="0.35" stroke-width="8"/>
-  </svg>`;
-}

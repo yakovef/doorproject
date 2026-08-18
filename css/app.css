@@ -234,15 +234,57 @@ body {
 }
 @media (min-width: 1100px) { .panel { padding: 22px 20px 28px; } }
 
-/* ── the cabinet ──────────────────────────────────────────────
-   Closed, a category is one 56px row: its name, what is chosen in it, and a
-   chevron. Eleven of those is a list you can take in at a glance, where
-   eleven expanded groups was a page you had to scroll past to reach the
-   button that is the point of the site. */
+/* ── the cabinet, two deep ────────────────────────────────────
+   Level one is four SECTIONS — how it looks, its glass, its handles, its
+   measurements. Level two is the categories inside one of them. Level three
+   is the options.
+
+   The two levels have to look like two levels or the fold reads as a bug, and
+   the cheapest way to say so is the type: a section is a heading in sentence
+   case at reading size, a category is the small letter-spaced caps this panel
+   already used. Indentation alone would not do it — at 320px there is not
+   enough width to indent with. */
 .panel--choose { gap: 0; }
 
+.sect { border-block-end: 1px solid var(--rule); }
+.sect:first-child { border-block-start: 1px solid var(--rule); }
+
+.sect__head {
+  appearance: none; -webkit-appearance: none;
+  background: none; border: 0; inline-size: 100%;
+  font: inherit; color: inherit; text-align: start; cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  min-block-size: 68px; padding: 12px 2px;
+}
+.sect__head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+
+.sect__text { flex: 0 1 auto; min-inline-size: 0; display: grid; gap: 2px; }
+.sect__title { font-size: 1rem; font-weight: 600; color: var(--ink); }
+/* What is inside, for a customer who does not yet know which of the four
+   holds the thing they came to change. */
+.sect__sub {
+  font-size: .74rem; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* The choices made inside, so a closed section still answers its own
+   question. Truncates rather than wrapping: a row that changes height as the
+   selection changes makes the list jump under the finger. */
+.sect__now {
+  flex: 1 1 auto; min-inline-size: 0;
+  font-size: .78rem; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-align: end;
+}
+.sect.is-open .sect__now { visibility: hidden; }
+.sect__body { padding-block-end: 8px; }
+
+/* Inset from the section's own rule, so the nesting is visible at a glance
+   even with every category closed. */
+.sect__body .field { margin-inline-start: 10px; }
+.sect__body .field:first-child { border-block-start: 1px solid var(--rule); }
+.sect__body .field:last-child { border-block-end: 0; }
+
 .field { border-block-end: 1px solid var(--rule); }
-.field:first-child { border-block-start: 1px solid var(--rule); }
 
 .field__head {
   appearance: none; -webkit-appearance: none;
@@ -278,7 +320,13 @@ body {
   transform: rotate(45deg); transition: transform .16s ease;
   margin-block-end: 4px;
 }
-.field.is-open .field__chev { transform: rotate(-135deg); margin-block: 4px 0; }
+/* DOWN when open, not sideways. The closed state points along the reading
+   direction — "there is more this way" — and the open state has to turn
+   through a right angle to mean "and here it is". It was rotate(-135deg),
+   which is the same corner pointing the other way along the SAME axis: two
+   states that differ only in which way a horizontal arrow faces, which is
+   how a chevron ends up meaning nothing. */
+.field.is-open .field__chev { transform: rotate(-45deg); margin-block: 4px 0; }
 .field.is-open .field__title { color: var(--ink); }
 
 .field__body { padding-block: 4px 20px; }
@@ -287,6 +335,8 @@ body {
    group as well as on the tile — the tile's own line is four characters wide
    at 78px and cannot carry a sentence. */
 .field__note { margin: 10px 0 0; font-size: .78rem; color: var(--warn); }
+
+.sect.is-open > .sect__head .field__chev { transform: rotate(-45deg); margin-block: 4px 0; }
 
 @media (prefers-reduced-motion: reduce) { .field__chev { transition: none; } }
 

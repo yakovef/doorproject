@@ -15,7 +15,7 @@
  * Run: npm run hardware
  */
 import { chromium } from 'playwright';
-import { FINISHES, HANDLES, LOCKSETS } from '../js/catalog.js';
+import { HANDLES, LOCKSETS } from '../js/catalog.js';
 
 /* Both groups, and one pairing of the two — the combination the split exists
    for is a pull bar with a lever-and-cylinder backplate beside it, and that is
@@ -55,5 +55,5 @@ for (const [name, opts] of CASES) {
   await p.close();
 }
 console.log(`${CASES.length} crops, ${HANDLES.length} grips, ${LOCKSETS.length} locksets, ` +
-            `${FINISHES.length} finishes`);
+            'one finish each');
 await b.close();

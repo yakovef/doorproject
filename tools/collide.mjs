@@ -21,25 +21,23 @@
  * inside ONE page load rather than one navigation each.
  *
  * Run: npm run collide          every grip x lockset x window x size
- *      npm run collide -- all   add every add-on and detail as well
+ *      npm run collide -- all   add every face detail as well
  */
 import { chromium } from 'playwright';
-import { ADDONS, DETAILS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
+import { DETAILS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { conflicts } from '../js/rules.js';
 
 const deep = process.argv.includes('all');
 const boxes = process.argv.includes('boxes');
 
-/* Objects that may never overlap, and the ones that legitimately may.
-   A moulding surrounds a pane by construction, and the add-ons sit inside a
-   panel on purpose, so those pairs are exempt by name rather than by silence. */
+/* Pairs exempted BY NAME, over and above the layer rule below.
+   Most of this list used to be add-ons sitting inside a panel on purpose —
+   `panel|peep`, `strips|mail` and so on — and it went when they did. What is
+   left is worth keeping short: every line here is a collision this tool has
+   been told not to look at. */
 const ALLOWED = new Set([
+  /* A moulding surrounds a pane by construction. */
   'panel|pane', 'pane|panel',
-  'panel|peep', 'peep|panel', 'panel|mail', 'mail|panel',
-  'panel|knocker', 'knocker|panel', 'panel|nameplate', 'nameplate|panel',
-  'strips|peep', 'peep|strips', 'strips|mail', 'mail|strips',
-  'strips|knocker', 'knocker|strips', 'strips|nameplate', 'nameplate|strips',
-  'groove|peep', 'peep|groove',
   /* The keyway escutcheon belongs to its own lockset when they sit together. */
   'lockset|lock', 'lock|lockset',
 ]);
@@ -54,27 +52,37 @@ for (const h of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
   for (const sz of ['standard', 'narrow']) for (const hd of ['right-in', 'left-in']) {
     const st = {
       colour: 'rb-0097d', window: w.id, glazing: 'clear', grille: 'none',
-      handle: h.id, lockset: k.id, detail: 'plain', finish: 'steel',
-      size: sz, handing: hd, addons: deep ? ADDONS.map(a => a.id) : [],
+      handle: h.id, lockset: k.id, detail: 'plain',
+      size: sz, handing: hd,
     };
     /* Only designs the rules allow: a collision inside a combination the site
        already refuses is not a bug, it is the refusal working. */
     const c = conflicts(st);
     if (c.handle[h.id] || c.lockset[k.id] || c.window[w.id]) continue;
-    if ((st.addons || []).some(a => c.addons[a])) continue;
     cases.push(st);
   }
 if (deep) {
-  for (const d of DETAILS) for (const w of WINDOWS) {
-    const st = {
-      colour: 'rb-0097d', window: w.id, glazing: 'clear', grille: 'none',
-      handle: 'idan', lockset: 'coral', detail: d.id, finish: 'steel',
-      size: 'standard', handing: 'right-in', addons: ADDONS.map(a => a.id),
-    };
-    const c = conflicts(st);
-    if (c.detail[d.id] || c.handle.idan || (st.addons || []).some(a => c.addons[a])) continue;
-    cases.push(st);
-  }
+  /* Every face detail against every window, on both sizes and both handings.
+     The fixture pairs the bar with the CYLINDER: it used to say `coral`, and
+     the moment a pull bar beside a lever became a refusal, every one of these
+     cases was skipped by the buildable filter and `-- all` quietly swept the
+     same 576 designs as the plain run. A deep sweep that adds nothing reports
+     success exactly as loudly as one that works. */
+  let added = 0;
+  for (const d of DETAILS) for (const w of WINDOWS)
+    for (const sz of ['standard', 'narrow']) for (const hd of ['right-in', 'left-in']) {
+      const st = {
+        colour: 'rb-0097d', window: w.id, glazing: 'clear', grille: 'none',
+        handle: 'idan', lockset: 'cylinder', detail: d.id,
+        size: sz, handing: hd,
+      };
+      const c = conflicts(st);
+      if (c.detail[d.id] || c.handle.idan || c.window[w.id]) continue;
+      cases.push(st);
+      added++;
+    }
+  console.log(`  (deep: ${added} face-detail designs on top of the base sweep)`);
+  if (!added) { console.error('  ✗ the deep sweep added nothing — its fixture is unbuildable'); process.exit(1); }
 }
 
 if (boxes) {
@@ -83,8 +91,8 @@ if (boxes) {
   const rows = await p.evaluate(({ handles, locksets }) => {
     const host = document.getElementById('stage');
     const base = { colour: 'rb-0097d', window: 'none', glazing: 'clear', grille: 'none',
-                   handle: 'none', lockset: 'coral', detail: 'plain', finish: 'steel',
-                   size: 'standard', handing: 'right-in', addons: [] };
+                   handle: 'none', lockset: 'coral', detail: 'plain',
+                   size: 'standard', handing: 'right-in' };
     const out = [];
     /* The METAL's bounds, not the drawing's.
        A fitting's group also contains the shadow it drops on the leaf, offset
@@ -180,19 +188,24 @@ const hits = await p.evaluate(({ cases, allowed }) => {
   const host = document.getElementById('stage');
   const out = [];
   const NAME = el =>
-    el.dataset.hw || el.dataset.addon || (el.dataset.pane ? 'pane' : null) || el.dataset.detail;
+    el.dataset.hw || (el.dataset.pane ? 'pane' : null) || el.dataset.detail;
+  /* Three LAYERS, and which layer a thing is on decides what an overlap
+     means. The face detail — a moulded panel, an inlaid groove, applied metal
+     strips — is part of the door's surface. The hardware is bolted through
+     that surface and stands up to 50 mm proud of it. The glass is a hole. */
+  const LAYER = el => el.dataset.hw ? 'hw' : el.dataset.pane ? 'glass' : 'face';
 
   for (const st of cases) {
     host.innerHTML = window.__render(st);
     const svg = host.querySelector('svg');
     const parts = [];
-    for (const el of svg.querySelectorAll('[data-hw],[data-addon],[data-pane],[data-detail]')) {
+    for (const el of svg.querySelectorAll('[data-hw],[data-pane],[data-detail]')) {
       const n = NAME(el);
       if (!n || n === 'lockset-art') continue;
       let box;
       try { box = el.getBBox(); } catch { continue; }
       if (!box || !box.width || !box.height) continue;
-      parts.push({ el, n, x: box.x, y: box.y, w: box.width, h: box.height });
+      parts.push({ el, n, layer: LAYER(el), x: box.x, y: box.y, w: box.width, h: box.height });
     }
     for (let i = 0; i < parts.length; i++) {
       for (let j = i + 1; j < parts.length; j++) {
@@ -202,6 +215,17 @@ const hits = await p.evaluate(({ cases, allowed }) => {
            name those look like overlaps and accounted for 1,580 of the first
            run's 3,344 hits. Asked by containment they are what they are. */
         if (a.el.contains(c.el) || c.el.contains(a.el)) continue;
+        /* HARDWARE OVER FACE DETAIL is layering, not collision. A pull bar
+           crosses applied metal strips on d078 and a moulded panel on d087 and
+           d122; the bar is 50 mm off the door and the strips are on it, so in
+           a square-on drawing the bar is simply in front. Refusing those
+           combinations would refuse three of Peretz's own doors.
+           This is exactly the argument the LEVER used to be excused by, and it
+           was wrong there — because a lever and a bar are BOTH hardware, both
+           standing off the same face, and neither is behind the other. The
+           distinction is the layer, not the depth. */
+        if ((a.layer === 'hw') !== (c.layer === 'hw')
+            && a.layer !== 'glass' && c.layer !== 'glass') continue;
         if (allowed.includes(`${a.n}|${c.n}`)) continue;
         const ox = Math.min(a.x + a.w, c.x + c.w) - Math.max(a.x, c.x);
         const oy = Math.min(a.y + a.h, c.y + c.h) - Math.max(a.y, c.y);

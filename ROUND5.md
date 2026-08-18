@@ -470,10 +470,76 @@ Both are one shape of mistake, and it now has a name in CLAUDE.md §5: **a
 quantity computed in two places is a promise that somebody will change one of
 them.**
 
+### Reported from the outside, again: three things at once
+
+The owner looked at the finished round and asked for three changes. Two of them
+undo work from this round, which is the useful part.
+
+**1. The window is too detailed — the old look was better.** True, and the
+reason it happened is instructive. `npm run glass` said the pane was six to
+twenty-one times flatter than a photograph, so a street was drawn behind it:
+skyline, building opposite, planting, pavement. It hit the number. It also made
+every window the busiest object in the drawing, competing with the door for
+attention when the door is what is being sold. **A configurator is not a
+photograph.** The pane is a gradient again; the tool stays as a description of
+what a photograph does rather than as a target to hit.
+
+**2. Remove תוספות and גימור ידיות entirely — "those features don't exist, or
+at least I don't know that they are."** Both gone, everywhere: the tiles, the
+drawing, the price, the rules, the WhatsApp message, the URL and the short
+code. Add-ons took a fifth of the catalogue and five decisions; the finish
+charged up to ₪220 for a choice the business does not offer.
+
+Two things had to be handled carefully rather than deleted:
+
+- The parameter letters `f` and `a` are **retired for good**. A link in
+  somebody's WhatsApp history still carries them, so `fromQuery` ignores them
+  deliberately and **without a notice** — withdrawing an option is our change,
+  not that customer's mistake. The short code cannot be so gentle: its bit
+  layout renumbered, so `VERSION` moved to 9 and an older code is refused. It
+  is now eight characters instead of nine.
+- `FINISHES` survives as a tone table, because the DRAWING still has to know
+  what colour a piece of metal is. What went is the choice. `effectiveFinish`
+  now answers "whatever the grip declares, else brushed nickel", which keeps
+  the one real fact in the group: the Shiran is an antique brass casting.
+
+**And the corpus disagrees with the finish withdrawal.** Six of the ten doors
+we recreate carry brass or black hardware — d003 d026 d106 brass, d087 d113
+d122 black — and `npm run recreate` now records each as a gap between his door
+and ours. That is a question for Peretz (ASK-PERETZ.md §2b), not grounds for
+keeping tiles he says he does not sell. If the answer comes back that he does
+order in different finishes, it returns as a fact about each handle rather than
+as a priced option.
+
+**3. Three or four main categories, then the categories, then the options.**
+Four sections — מראה הדלת, חלון וזכוכית, ידיות ומנעול, מידה ופתיחה — each
+opening onto its own categories, one open at a time at both levels. Not a
+tidier arrangement of nine headings but a shorter list of bigger questions,
+each one something a customer already has an opinion about before they arrive.
+Nobody arrives with an opinion about `glazing` as distinct from `grille`.
+
+Four is the floor rather than a preference: a section holding one category is a
+click that reveals a click, which is worse than the list it replaced.
+
+**One real bug fell out of it.** `npm run collide -- all` had been reporting
+success while sweeping nothing extra: its deep fixture paired a pull bar with a
+lever, and the moment that became a refusal every deep case was filtered out.
+A sweep that adds nothing reports success exactly as loudly as one that works,
+so it now counts what it added and fails if that is zero. With it fixed, 52
+overlaps appeared — face detail under hardware — and they turned out to be
+**layering, not collision**: a moulding or a metal strip is on the door's
+surface and a grip stands 50 mm proud of it, so the grip is simply in front.
+Refusing those would refuse three of Peretz's own doors (d078, d087, d122).
+That is now one rule about layers, not six exemptions by name — and it is
+carefully NOT the argument that excused the lever, because a lever and a bar
+are both hardware, both standing off the same face, neither behind the other.
+The distinction is the layer, not the depth.
+
 ### What is still open after this round
 
-- The pane's scene is generic by design, and on a narrow slot it reads as
-  texture rather than as a view. Good enough at door scale; worth revisiting.
+- The finish question above is the one open item that changes what we draw.
+- The pane is deliberately plain now. If it ever needs more, the lesson is that
+  the measurement is not the goal — the door is.
 - `grid` sets an ogee motif into the mesh because d097 has one. d097 also has
   *scrolls inside the grid*, which we draw as two bare S-curves.
 - The corpus has motifs we have no vocabulary for: interlocking circles

@@ -8,10 +8,19 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { ADDONS, COLOURS, DETAILS, FINISHES, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { COLOURS, DETAILS, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
-/* 8: two new axes. `z` is the glazing (clear / obscured / reeded) and `a` is
+/* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
+   the owner's instruction, so `f` and `a` are gone from the link and their
+   bits are gone from the code — which shortens it from nine characters to
+   eight and, more to the point, renumbers every field after them. A version-8
+   code decoded under this layout would be a different door, so it is refused
+   with a notice instead. The two PARAMETER NAMES stay retired for good: `f`
+   and `a` must never be reused for anything else, because a link in somebody's
+   WhatsApp history still carries them and the parser must go on ignoring them
+   rather than reading them as something new.
+   8: two new axes. `z` is the glazing (clear / obscured / reeded) and `a` is
    the add-ons, which is the first field that is not one-of-a-list — a door
    carries any number of them, so it is a comma list in the URL and a BITMASK
    in the code. Every existing field was also re-widened at the same time,
@@ -34,7 +43,7 @@ import { repair } from './rules.js';
    became "lever + horizontal grab bar", which is what the installations
    actually show). Bumping rather than reusing means an older code is refused
    with a notice instead of quietly decoding into a different door. */
-export const VERSION = 8;
+export const VERSION = 9;
 
 export const DEFAULTS = {
   colour:  'rb-0097d',
@@ -51,19 +60,8 @@ export const DEFAULTS = {
      starting state and not only about the interesting edges. */
   lockset: 'cylinder',
   detail:  'plain',
-  finish:  'steel',
   size:    'standard',
   handing: 'right-in',
-  /* EMPTY, and the reason is a rule discovered after this line was first
-     written as ['peep']. A peephole is at eye level on the centre line, the
-     default door is glazed, and its window is exactly there — so the default
-     was a design the rules refuse. Every page load repaired itself, showed the
-     customer a notice about a link they had not followed, and opened a
-     category to explain a change nobody had made.
-     It is also right on the evidence: all four glazed doors in the measured
-     set record `peephole.present: false`. A door with a window does not need
-     one, and the corpus agrees. On a solid door it is one tap away. */
-  addons:  [],
 };
 
 // ── Query string ──────────────────────────────────────────────────
@@ -79,14 +77,8 @@ export function toQuery(state) {
   p.set('n', state.handle);
   p.set('k', state.lockset);
   p.set('d', state.detail);
-  p.set('f', state.finish);
   p.set('s', state.size);
   p.set('h', state.handing);
-  /* Always written, even when empty, so that "no add-ons" is a statement in
-     the link rather than an absence that reads as "unspecified" and gets the
-     default peephole back. A door someone deliberately ordered without a
-     peephole must survive being shared. */
-  p.set('a', ADDONS.filter(o => (state.addons || []).includes(o.id)).map(o => o.id).join(','));
   return '?' + p.toString();
 }
 
@@ -131,7 +123,6 @@ export function fromQuery(search) {
     if (hit) { state.lockset = hit.id; state.handle = 'none'; notice = null; }
   }
   take('detail', 'd', DETAILS);
-  take('finish', 'f', FINISHES);
   take('handing', 'h', HANDINGS);
 
   const rawSize = p.get('s');
@@ -140,20 +131,11 @@ export function fromQuery(search) {
     else notice = 'option-unknown';
   }
 
-  /* Add-ons: a comma list, and the one field where an empty value is a real
-     answer rather than a missing one. Order is normalised to the catalogue's
-     so that the same door always produces the same link, and an unrecognised
-     name sets the notice like every other option — never dropped in silence. */
-  const rawAdd = p.get('a');
-  if (rawAdd != null) {
-    const want = rawAdd.split(',').map(s => s.trim()).filter(Boolean);
-    const hits = [];
-    for (const nameOrAlias of want) {
-      const hit = ADDONS.find(o => o.id === nameOrAlias || (o.aliases || []).includes(nameOrAlias));
-      if (hit) hits.push(hit.id); else notice = 'option-unknown';
-    }
-    state.addons = ADDONS.filter(o => hits.includes(o.id)).map(o => o.id);
-  }
+  /* `f` and `a` — the finish and the add-ons — are read by nobody now, and
+     deliberately do not set the notice. A link carrying them was written when
+     the site offered them; the door it names is still buildable and still that
+     customer's door, so it opens as itself rather than being flagged as
+     damaged. Withdrawing an option is our change, not their mistake. */
 
   return settle(state, notice);
 }
@@ -202,21 +184,28 @@ function settle(state, notice) {
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
 /* Capacities against what is used today:
-     version 16 / 8      colour  64 / 17     size     8 / 6
+     version 16 / 9      colour  64 / 17     size     8 / 6
      handing  4 / 2      window  16 / 6      grille   16 / 7
      handle  16 / 10     lockset 16 / 10     detail   16 / 9
-     finish   8 / 3      glazing  4 / 3      addons   5 / 5  (a MASK)
-   Every one has room except `addons`, where five bits means five add-ons
-   exactly and a sixth needs another bump. That is deliberate: a mask cannot
-   be over-provisioned cheaply, and five is what the corpus shows.
+     glazing  4 / 3
+   Every one has room, which is the point of keeping any: a field that
+   overflows does not throw. An eighth grille in three bits would have been
+   stored as grille 0 — the customer picks scrollwork, reads the code down the
+   phone, and Peretz builds a door with no grille. Not an error, not a refusal,
+   just a different door.
 
-   The reason to keep headroom at all: a field that overflows does not throw.
-   An eighth grille in three bits would have been stored as grille 0 — the
-   customer picks scrollwork, reads the code down the phone, and Peretz builds
-   a door with no grille. Not an error, not a refusal, just a different door. */
+   The finish's 3 bits and the add-ons' 5-bit MASK came out when those groups
+   were withdrawn, taking the code from 45 bits to 37 and from nine characters
+   to eight. Both are gone from the layout entirely rather than left as dead
+   zeroes: a reserved field nobody writes is a field somebody eventually
+   reuses, and the VERSION is what protects the old codes, not the padding. */
 const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4, grille: 4,
-               handle: 4, lockset: 4, detail: 4, finish: 3, glazing: 2, addons: 5 };
-const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 45 -> 9 chars
+               handle: 4, lockset: 4, detail: 4, glazing: 2 };
+/* 37 bits, which does not divide by 5 — so the code carries 40 and the top
+   three are always zero. Rounding UP is the only safe direction: truncating to
+   seven characters would drop the low bits of the glazing. */
+const TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
+const PAD_BITS = TOTAL_BITS - Object.values(BITS).reduce((a, b) => a + b, 0);
 
 export function encodeCode(state) {
   const sizeKeys = Object.keys(SIZES);
@@ -230,12 +219,8 @@ export function encodeCode(state) {
     [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
     [Math.max(0, LOCKSETS.findIndex(k => k.id === state.lockset)), BITS.lockset],
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
-    [Math.max(0, FINISHES.findIndex(f => f.id === state.finish)), BITS.finish],
     [Math.max(0, GLAZINGS.findIndex(z => z.id === state.glazing)), BITS.glazing],
-    /* A mask, not an index — the only field of its kind. `bit` comes from the
-       catalogue rather than from array position, so reordering the add-on
-       tiles for the UI cannot silently renumber what a code means. */
-    [ADDONS.reduce((m, a) => m | ((state.addons || []).includes(a.id) ? 1 << a.bit : 0), 0), BITS.addons],
+    [0, PAD_BITS],                       // to the next whole character
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -285,16 +270,13 @@ export function decodeCode(code) {
   const handle  = HANDLES[read(BITS.handle)];
   const lockset = LOCKSETS[read(BITS.lockset)];
   const detail  = DETAILS[read(BITS.detail)];
-  const finish  = FINISHES[read(BITS.finish)];
   const glazing = GLAZINGS[read(BITS.glazing)];
-  const mask    = read(BITS.addons);
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail || !finish || !glazing) return null;
+      || !detail || !glazing) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
-    finish: finish.id, glazing: glazing.id,
-    addons: ADDONS.filter(a => mask & (1 << a.bit)).map(a => a.id),
+    glazing: glazing.id,
   };
 }

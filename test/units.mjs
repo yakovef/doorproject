@@ -2,11 +2,11 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { ADDONS, byId, COLOURS, DETAILS, FINISHES, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import {
-  addonGlyph, detailGlyph, finishGlyph, glazingGlyph, grilleGlyph, handleGlyph, LIGHT,
+  detailGlyph, glazingGlyph, grilleGlyph, handleGlyph, LIGHT,
   locksetGlyph, render, sizeGlyph, windowGlyph,
 } from '../js/renderer.js';
 import { conflicts, repair } from '../js/rules.js';
@@ -18,18 +18,13 @@ const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
 const base = { colour: 'rb-0097d', window: 'none', glazing: 'clear', grille: 'none',
-               handle: 'idan', lockset: 'coral', detail: 'plain', finish: 'steel',
-               size: 'standard', handing: 'right-in', addons: [] };
+               handle: 'idan', lockset: 'coral', detail: 'plain',
+               size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'glazing', 'grille', 'handle',
-              'lockset', 'detail', 'finish', 'addons'];
-
-/* `addons` is an array, so the round-trip checks cannot compare with ===.
-   They did, silently, for exactly as long as it took to write this line. */
-const eq = (a, b) => Array.isArray(a) || Array.isArray(b)
-  ? JSON.stringify(a || []) === JSON.stringify(b || []) : a === b;
+              'lockset', 'detail'];
 
 /* The code's length is derived, never typed. It was written as {8} and the
    day the layout grew to nine characters that produced 280 failures saying
@@ -58,16 +53,14 @@ const CODE_RE = new RegExp(`^DM-[0-9A-HJKMNP-TV-Z]{${CODE_LEN}}$`);
  */
 const buildable = st => {
   const c = conflicts(st);
-  return KEYS.every(k => k === 'addons'
-    ? (st.addons || []).every(a => !(c.addons || {})[a])
-    : !(c[k] || {})[st[k]]);
+  return KEYS.every(k => !(c[k] || {})[st[k]]);
 };
 
 function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
     for (const w of WINDOWS) for (const g of GRILLES) {
       const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
-                     glazing: 'clear', detail: 'plain', finish: 'steel', addons: [] };
+                     glazing: 'clear', detail: 'plain' };
       const out = [];
       for (const n of HANDLES) out.push({ ...stem, handle: n.id, lockset: 'coral' });
       for (const k of LOCKSETS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: k.id });
@@ -76,17 +69,15 @@ function* everyState() {
          couples glazing to a lockset, and the things that DO couple have
          their own sweeps. */
       for (const z of GLAZINGS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: 'coral', glazing: z.id });
-      for (const a of ADDONS) out.push({ ...stem, handle: 'idan', lockset: 'coral', addons: [a.id] });
-      out.push({ ...stem, handle: 'idan', lockset: 'coral', addons: ADDONS.map(a => a.id) });
       for (const st of out) if (buildable(st)) yield st;
     }
 }
 
-/** Every detail x finish x window combination, at one colour and size. */
+/** Every detail x window x fitting combination, at one colour and size. */
 function* everyDetail() {
-  for (const d of DETAILS) for (const f of FINISHES) for (const w of WINDOWS)
+  for (const d of DETAILS) for (const w of WINDOWS)
     for (const n of HANDLES) for (const k of LOCKSETS)
-      yield { ...base, detail: d.id, finish: f.id, window: w.id, handle: n.id, lockset: k.id };
+      yield { ...base, detail: d.id, window: w.id, handle: n.id, lockset: k.id };
 }
 
 /* ── 0. The door the page opens on ────────────────────────────────
@@ -114,7 +105,7 @@ group('short code round-trip');
   for (const st of everyState()) {
     const code = encodeCode(st);
     const back = decodeCode(code);
-    ok(back && KEYS.every(k => eq(back[k], st[k])),
+    ok(back && KEYS.every(k => back[k] === st[k]),
        `${code} did not round-trip for ${Object.values(st).join('/')}`);
     ok(CODE_RE.test(code), `malformed code: ${code}`);
     ok(!seen.has(code), `code collision: ${code}`);
@@ -138,18 +129,31 @@ for (const st of everyState()) {
   const { state: back, notice } = fromQuery(toQuery(st));
   ok(!notice, `unexpected notice for ${toQuery(st)}`);
   for (const k of KEYS) {
-    ok(eq(back[k], st[k]), `url lost ${k} (${st[k]} -> ${back[k]})`);
+    ok(back[k] === st[k], `url lost ${k} (${st[k]} -> ${back[k]})`);
   }
 }
 {
   const bad = fromQuery('?v=3&c=ral-nope&w=rect&g=none&n=bar-long&d=plain&f=steel&s=standard&h=right-in');
   ok(bad.notice === 'option-unknown', 'unknown option must notify, never silently default');
   ok(bad.state.colour === 'rb-0097d', 'unknown option should fall back to default');
-  ok(fromQuery('?v=3&f=brass').state.finish === 'brass', 'finish lost from url');
   // The inside view is gone. An old link carrying i=1 must open the door, not
   // fail, and must not leave a stray key behind in the state.
   ok(fromQuery('?v=3&i=1').state.view === undefined, 'i=1 should no longer set anything');
   ok(!toQuery({ ...base }).includes('i=1'), 'the url must not carry a view flag');
+
+  /* A link written while the finish and the add-ons were on offer is in
+     somebody's WhatsApp history. It must open the door it names, WITHOUT a
+     notice — withdrawing an option is our change, not that customer's mistake
+     — and without leaving a key behind that nothing downstream reads. */
+  const old = fromQuery('?v=8&c=rb-0097d&w=rect&z=clear&g=none&n=idan&k=cylinder'
+                      + '&d=plain&f=brass&s=standard&h=right-in&a=peep,mail');
+  ok(old.notice === null, `a pre-withdrawal link should open quietly, got ${old.notice}`);
+  ok(old.state.finish === undefined, 'f= must not survive into the state');
+  ok(old.state.addons === undefined, 'a= must not survive into the state');
+  ok(old.state.window === 'rect' && old.state.handle === 'idan',
+     'a pre-withdrawal link must still open the door it names');
+  ok(!toQuery(base).includes('f=') && !toQuery(base).includes('a='),
+     'the url must not carry the withdrawn fields');
 }
 
 // ── 3. Price ──────────────────────────────────────────────────────
@@ -172,7 +176,11 @@ group('price');
   ok(P({ window: 'rect' }) === 4075, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
   ok(P({ window: 'rect', grille: 'scroll' }) === 4535, 'scrollwork grille adds ₪460');
   ok(P({ detail: 'panel' }) === 3835, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
-  ok(P({ finish: 'brass' }) === 3675, `brass should add ₪220, got ${P({ finish: 'brass' })}`);
+  /* The finish and the add-ons are withdrawn, so nothing may be charged for
+     them — including through a stale link that still names one. */
+  ok(P({ finish: 'brass' }) === P({}), 'a withdrawn finish must not add to the price');
+  ok(P({ addons: ['peep', 'mail', 'knocker'] }) === P({}),
+     'withdrawn add-ons must not add to the price');
   /* The whole point of the split: a pull bar and a backplate on one door. */
   ok(P({ handle: 'idan', lockset: 'plate' }) === 3515,
      `Idan with a Rotem backplate should be ₪3,515, got ${P({ handle: 'idan', lockset: 'plate' })}`);
@@ -253,20 +261,20 @@ group('renderer invariants');
   console.log(`  (${n} renders)`);
 }
 
-// ── 5b. Detail and finish ─────────────────────────────────────────
+// ── 5b. Detail ────────────────────────────────────────────────────
 group('detail and finish');
 {
   let n = 0;
   for (const st of everyDetail()) {
     const svg = render(st);
-    const label = `${st.detail}/${st.finish}/${st.window}/${st.handle}`;
+    const label = `${st.detail}/${st.window}/${st.handle}/${st.lockset}`;
     ok(!/NaN|undefined|Infinity/.test(svg), `numeric hole: ${label}`);
     const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
     ok(new Set(ids).size === ids.length, `duplicate id in ${label}`);
     const d = DETAILS.find(x => x.id === st.detail);
     ok(svg.includes('data-detail="panel"') === d.panel, `panel mismatch: ${label}`);
     ok(svg.includes('data-detail="groove"') === d.groove, `groove mismatch: ${label}`);
-    // Every finish must actually change the metal, or the axis is decorative.
+    // The metal still gets a tone, even though nobody chooses it any more.
     ok(svg.includes('--hw-mid:'), `finish tone not applied: ${label}`);
 
     /* Moulded detail must never cross the glazing — a panel drawn under a
@@ -458,28 +466,15 @@ for (const hd of HANDINGS) for (const sz of sizeKeys) {
      rebate, and not one outside photograph on the works page shows one. */
   ok(!/data-hw="hinge"/.test(out), `hinges drawn on the street face (${label})`);
 
-  /* The peephole is a CHOICE now, and both halves of that are worth pinning.
-     It used to be drawn whenever the leaf had no window — never asked for,
-     never priced, never in the message to Peretz, and never on a glazed door
-     even though the photographs have it on one. */
-  {
-    const off = render({ ...st, addons: [] });
-    ok(!/<circle[^>]*fill="url\(#metal\)"/.test(off),
-       `a peephole nobody asked for (${label})`);
-
-    // On, it is on the leaf's centre line, which is where every photograph puts it.
-    const on = render({ ...st, addons: ['peep'] });
-    const leafX = Number(/id="leaf" data-x="([-\d.]+)"/.exec(on)[1]);
-    const leafW = Number(/id="leaf"[^>]*data-w="([\d.]+)"/.exec(on)[1]);
-    const m = /<circle cx="([-\d.]+)"[^>]*fill="url\(#metal\)"/.exec(on);
-    ok(m, `the peephole was chosen and not drawn (${label})`);
-    if (m) ok(Math.abs(Number(m[1]) - (leafX + leafW / 2)) < 1,
-              `peephole off the centre line (${label})`);
-
-    // And it survives glazing, which is the case the old rule got wrong.
-    ok(/<circle[^>]*fill="url\(#metal\)"/.test(render({ ...st, window: 'rect', addons: ['peep'] })),
-       `the peephole vanished because the door has a window (${label})`);
-  }
+  /* The add-ons are withdrawn, and a withdrawn fitting must be GONE from the
+     drawing, not merely unreachable from the tiles. The peephole is the one
+     worth naming: it spent months being drawn on every solid door because the
+     renderer inferred it rather than being asked, never priced and never
+     mentioned to Peretz. A stale link naming it must not bring it back — that
+     would be the same defect with a URL in front of it. */
+  ok(!/data-addon=/.test(out), `a withdrawn add-on is still drawn (${label})`);
+  ok(!/data-addon=/.test(render({ ...st, addons: ['peep', 'mail', 'knocker'] })),
+     `a stale link resurrected a withdrawn add-on (${label})`);
 }
 
 // ── 5c. Every url(#id) must resolve to something we defined ────────
@@ -507,8 +502,8 @@ group('no dangling gradient or filter references');
     }
     checked++;
   };
-  for (const n of HANDLES) for (const f of FINISHES) {
-    sweep(`${n.id}/${f.id}`, { ...base, handle: n.id, finish: f.id, window: 'tallwin', detail: 'panel' });
+  for (const n of HANDLES) for (const k of LOCKSETS) {
+    sweep(`${n.id}/${k.id}`, { ...base, handle: n.id, lockset: k.id, window: 'tallwin', detail: 'panel' });
   }
   for (const g of GRILLES) sweep(`grille ${g.id}`, { ...base, window: 'tallwin', grille: g.id });
   for (const d of DETAILS) sweep(`detail ${d.id}`, { ...base, detail: d.id });
@@ -599,32 +594,21 @@ group('every option tile draws its own picture');
   for (const w of WINDOWS) check('window', w.id, windowGlyph(w));
   for (const g of GRILLES) check('grille', g.id, grilleGlyph(g));
   for (const d of DETAILS) check('detail', d.id, detailGlyph(d));
-  for (const f of FINISHES) check('finish', f.id, finishGlyph(f));
   for (const s of Object.values(SIZES)) check('size', s.id, sizeGlyph(s));
 }
 
 // ── 6c. Nothing may be charged for that does not change the door ───
-/* Found by looking at a black-finish Shiran and seeing a brass handle. Four
-   of the fifteen handles reference only fixed-tone gradients, so the finish
-   tiles — priced at ₪120 and ₪220 — changed nothing in the drawing for them,
-   and the message still went out saying "Shiran, matte black", which is a
-   door Peretz cannot build.
+/* The rule holds in both directions: money and pixels move together. If two
+   designs draw identically they must cost the same, and if they cost
+   differently they must look different.
 
-   The rule that holds in both directions: money and pixels move together. If
-   two designs draw identically they must cost the same, and if they cost
-   differently they must look different. */
+   The finish is the reason this group exists and is no longer in it. Four
+   handles referenced only fixed-tone gradients, so the finish tiles — ₪120 and
+   ₪220 — changed nothing in the drawing for them, while the message still went
+   out saying "Shiran, matte black": a door Peretz cannot build. The group is
+   withdrawn now, which settles that particular case by removing the money
+   rather than by drawing the pixels. */
 group('a priced option changes the door, and a free one does not');
-for (const n of HANDLES) {
-  for (const f of FINISHES.slice(1)) {
-    const a = { ...base, handle: n.id, finish: FINISHES[0].id };
-    const b = { ...base, handle: n.id, finish: f.id };
-    const draws = render(a) !== render(b);
-    const costs = priceAgorot(a) !== priceAgorot(b);
-    ok(draws === costs, costs
-      ? `handle ${n.id}: the ${f.id} finish costs ₪${shekels(f.delta)} and changes nothing`
-      : `handle ${n.id}: the ${f.id} finish changes the drawing but is not charged for`);
-  }
-}
 for (const [key, list, ctx] of [
   ['window', WINDOWS, {}],
   ['grille', GRILLES, { window: 'tallwin' }],
@@ -643,25 +627,32 @@ for (const [key, list, ctx] of [
 }
 
 /* The finish must reach the METAL, not merely change the document.
-   `a priced option changes the door` passed for every finish while the pull
-   bars ignored it completely: the lever's gradient moved, the bar's did not,
-   and the bar is the largest piece of metal on the door. Choosing matte black
-   gave a polished steel bar, ₪220 was charged for it, and the message to
-   Peretz said "Idan, matte black". Found by recreating d087, whose bar is
-   black, and getting a steel one. Assert the actual object. */
+   The bars ignored it completely once: the lever's gradient moved, the bar's
+   did not, and the bar is the largest piece of metal on the door — so choosing
+   matte black gave a polished steel bar and charged ₪220 for it. The finish is
+   no longer chosen, but one real difference survives, and it is the one that
+   the wrong drawing was about: the Shiran is an antique brass casting and
+   every other grip is brushed nickel. If that stops reaching the metal, the
+   message goes out naming a door we did not draw, exactly as before.
+
+   `effectiveFinish` is asserted alongside the drawing, because agreeing with
+   itself is the whole job of that function. */
 group('the finish reaches every piece of metal');
-for (const hn of HANDLES.filter(h => h.style === 'bar')) {
-  const seen = new Map();
-  for (const f of FINISHES) {
-    const svg = render({ ...base, handle: hn.id, finish: f.id });
-    const grad = new RegExp(`<linearGradient id="bar[A-Za-z]+"[\\s\\S]*?</linearGradient>`).exec(svg);
-    ok(grad, `${hn.id}/${f.id}: no bar gradient in the drawing at all`);
-    if (!grad) continue;
-    for (const [other, id] of seen) {
-      ok(other !== grad[0],
-         `${hn.id}: the bar is identical in ${id} and ${f.id} — the finish is priced and not drawn`);
-    }
-    seen.set(grad[0], f.id);
+{
+  const brassGrip = HANDLES.find(h => h.finish === 'brass');
+  ok(brassGrip, 'no grip declares its own finish any more — this group is dead');
+  if (brassGrip) {
+    ok(effectiveFinish({ ...base, handle: brassGrip.id }).id === 'brass',
+       `${brassGrip.id} should be built in brass`);
+    ok(effectiveFinish({ ...base, handle: 'idan' }).id === 'steel',
+       'a grip with no declared finish should be brushed nickel');
+    /* A withdrawn choice must not come back through a stale link: the door is
+       whatever its grip says, whatever `finish` a URL still carries. */
+    ok(effectiveFinish({ ...base, handle: 'idan', finish: 'black' }).id === 'steel',
+       'a stale f= resurrected the withdrawn finish');
+    const mid = st => /--hw-mid:([^;"]+)/.exec(render(st))[1];
+    ok(mid({ ...base, handle: brassGrip.id }) !== mid({ ...base, handle: 'idan' }),
+       `${brassGrip.id} draws in the same metal as a brushed-nickel grip`);
   }
 }
 

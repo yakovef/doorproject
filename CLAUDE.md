@@ -129,29 +129,70 @@ turn it into a black picture frame painted on. The photograph shows a
 The window surround uses the same primitive. It is the same object.
 
 ### The glass
-A pane is **not a surface**. `npm run glass` measures it in five bands against
-the leaf beside it, on tone and on *spread* — the contrast INSIDE one band —
-and spread is the number that matters: the corpus runs 1.0 to 1.35, and a
-gradient of any kind runs 0.1. `paneScene()` draws a street: skyline, building
-opposite, planting, pavement, in many small elements.
+Clear glazing is a quiet diagonal gradient plus a soft sheen, and this is the
+one place where a measurement was taken, acted on, and then **deliberately
+reverted**.
 
-Many small elements, specifically. An attempt made of six large blocks scored
-almost perfectly on spread and looked like a De Stijl painting — the metric is
-satisfied by any high contrast at all. Deterministic (a fixed-seed LCG), because
-a door that differs between renders cannot be compared with itself.
+`npm run glass` measures the pane in five bands against the leaf beside it, on
+tone and on *spread* — the contrast INSIDE one band. The corpus runs 1.0 to
+1.35 and a gradient of any kind runs 0.1, so a `paneScene()` was built: a
+drawn street, skyline, building opposite, planting, pavement, in many small
+elements. It hit the number. It also made every window the busiest thing in
+the drawing, and the owner said plainly that the old one looked better. He is
+right, and the reason is worth keeping: **a configurator is not a
+photograph.** Its job is to show a customer their door, and a pane that
+competes with the door for attention is working against that whatever it
+measures. The tool stays as a description of what a photograph does, not as a
+target to hit.
 
-Obscured and reeded glazing measure 0.18–0.56 of the leaf's tone: they are
-DARKER than the paint, because behind them is an unlit hall rather than a
-street. Drawn pale they read as white plastic let into the door.
+(One finding survives from that attempt and is still true of anything drawn in
+a pane: contrast made of six large blocks scores almost perfectly on spread and
+looks like a De Stijl painting. The metric is satisfied by any high contrast at
+all.)
 
-### Add-ons
-`ADDONS` is the only **multi-select** group — peephole, letterplate, knocker,
-closer, nameplate — so `state.addons` is an array and the short code packs it
-as a BITMASK keyed on each entry's own `bit`, never on array position.
+Obscured and reeded glazing are patterns a customer chose, so they stay
+patterned. They measure 0.18–0.56 of the leaf's tone: DARKER than the paint,
+because behind them is an unlit hall rather than a street. Drawn pale they read
+as white plastic let into the door.
 
-The peephole is why the group exists. It used to be drawn whenever the leaf had
-no window: never chosen, never priced, never in the message, and never on a
-glazed door although the photographs have it on one.
+### Withdrawn: add-ons, and the handle finish
+Two groups are gone at the owner's instruction — he does not sell them, so
+offering them priced the door for work that would not happen.
+
+- **Add-ons** (peephole, letterplate, ring knocker, door closer, nameplate) —
+  the only multi-select group there ever was, packed into the short code as a
+  bitmask.
+- **The finish** (brushed nickel, matte black, brass) — now a property of the
+  product rather than a choice. `FINISHES` survives as the tone table the
+  drawing needs, and `effectiveFinish` answers "whatever the grip declares,
+  else nickel": the brass Shiran is the only grip that departs.
+
+Both ids and both URL parameters (`a`, `f`) stay **retired for good**. A link
+in somebody's WhatsApp history still carries them, so `fromQuery` ignores them
+deliberately and without a notice — withdrawing an option is our change, not
+that customer's mistake. Never reuse either letter for anything else. The
+short code's VERSION moved to 9 because the bit layout did.
+
+The corpus disagrees with the finish withdrawal and the disagreement is on
+record: six of the ten recreated doors carry brass or black hardware. That is
+a question for Peretz (ASK-PERETZ.md §2b), not a reason to keep the tiles.
+
+### The cabinet — two levels
+The choices panel opens on **four sections** — מראה הדלת, חלון וזכוכית,
+ידיות ומנעול, מידה ופתיחה — each of which opens onto its own categories, each
+of which opens onto its options. One open at a time at both levels.
+
+It has been flattened twice, in the same direction, for the same reason: a
+customer arriving cold should see a handful of questions they already have
+opinions about, not a parts catalogue. First every option was folded behind its
+category (eleven headings), then the categories were folded behind these four.
+Four is the floor — a section holding one category is a click that reveals a
+click.
+
+`SECTIONS` and `GROUPS` in app.js are the whole thing; a group names its
+section with `in`. `npm run audit` asserts that nothing is open on first paint
+and drives BOTH levels to reach every option, because a category nobody can
+click looks exactly like a working page from anywhere else.
 
 ### Rules — `js/rules.js`
 One table, read by the tiles, by `fromQuery` and by the price. A rule that
@@ -170,8 +211,6 @@ What it currently refuses, and why:
 | grip / lockset that would cross the glazing | geometric | `gripClashesGlass`, `locksetClashesGlass` |
 | grab bar + a centred window, grab bar + long lever | geometric | the bow is centred on the LEAF and does not move |
 | a window that leaves NO lockset room | geometric | `duo` on the 800 mm leaf reaches to 100 mm of the closing edge |
-| letterplate under a low window, plate narrower than 220/160 mm | geometric | `plateRoom` |
-| peephole where the glass crosses eye level | geometric | the one add-on that may not be slid out of the way |
 
 `repair()` moves a design to the nearest buildable one and says what changed.
 It must be idempotent, and it must always LAND somewhere buildable — asserting
@@ -188,22 +227,27 @@ can take the window away and leave a grille behind with nothing to sit in.
 
 ### Hardware — two groups
 - **`HANDLES` = the grip** (what you pull): none, idan, ella, nitzan, shahar,
-  ron, shiran, grab, channel.
+  ron, shiran, blade, grab, channel.
 - **`LOCKSETS` = the lock furniture** (what you turn, and the keyway): coral,
-  plate, cadoor, sapir, almog, knobplate.
+  cylinder, plate, cadoor, sapir, almog, knobplate, digital, square.
 
 Every door has a lockset; the grip is optional. They were one list, which made
 "Idan bar + Rotem backplate" — a combination Peretz installs constantly —
 unreachable.
 
-Placement: the lockset owns the stile at `LOCK_BACKSET = 72`. The grip stands
-off inboard by `gripStandoff()`, which clears the lockset's **body** (not the
-lever's reach — a lever sits ~30 mm proud, a bar ~50 mm on standoffs, so the
-blade sweeps behind the bar) and dodges the glazing where there is room.
+Placement: the lockset owns the stile at `lockBackset()` — 60 mm normally,
+49 mm on a door with a grip (measured: the fitter makes room), and never closer
+to the closing edge than the fitting is wide. The grip stands off inboard by
+`gripStandoff()`, which clears the lockset and dodges the glazing where there
+is room.
 
-`handleFootprint()` returns `hx` (symmetric), `vy`, and `reach` for the part
-that extends inboard only. Folding a lever's reach into `hx` puts the fitting
-off the edge of the leaf.
+`handleFootprint()` returns `{ out, in, vy }` — outboard, inboard, half-height
+— and every one of those numbers is **measured off the drawing** with
+`npm run collide -- boxes`, never asserted. It used to return a symmetric `hx`
+plus a separate `reach` that the clearance check ignored, on the argument that a
+lever sits ~30 mm proud and a bar ~50 mm on standoffs so the blade sweeps
+behind it. True of a real door, false of a picture seen square-on, and it drew
+a lever through a pull bar on 862 designs (§5, item 10).
 
 ---
 
@@ -291,6 +335,8 @@ outside — by the customer, or by a browser console — while `npm test` was gr
     a `width="-24"` border inside it. A negative width is not a small rectangle;
     the browser logs an error and draws nothing. Nothing in `npm test` parses
     the SVG, so only `npm run audit` — which watches the console — ever knew.
+    (Both the nameplate and `plateRoom` have since been withdrawn with the rest
+    of the add-ons. The assertion against negative geometry stays.)
 
 None threw. All looked like a working page. **Tests catch wrong output easily
 and absent output almost never**, unless someone goes looking on purpose.

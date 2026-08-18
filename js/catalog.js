@@ -281,31 +281,21 @@ export const GLAZINGS = [
   { id: 'reeded',  he: 'זכוכית מחורצת', en: 'Reeded',           delta: 28000 },
 ];
 
-/**
- * Add-ons — things fixed to the leaf that are not the lock.
- *
- * ⚠ THE ONLY MULTI-SELECT GROUP. Every other group is one-of; a door carries
- * as many of these as its owner wants, and four of the five appear beside each
- * other in the corpus. `state.addons` is therefore an ARRAY of ids, and it is
- * packed into the short code as a BITMASK rather than an index.
- *
- * The peephole is the reason this group exists. It was drawn — but as an
- * automatic consequence of having no window, which is wrong twice over: it is
- * a thing a customer chooses, and glazed doors carry them too (d076 has a
- * peephole above a knocker on a leaf that also has glass). `bit` is the mask
- * position and is as much a wire format as an id: never renumber one.
- */
-export const ADDONS = [
-  { id: 'peep',      bit: 0, he: 'עינית',        en: 'Peephole',    delta: 6000 },
-  { id: 'mail',      bit: 1, he: 'פתח דואר',     en: 'Letterplate', delta: 22000 },
-  { id: 'knocker',   bit: 2, he: 'מקוש טבעת',    en: 'Ring knocker', delta: 26000 },
-  { id: 'closer',    bit: 3, he: 'מחזיר דלת',    en: 'Door closer', delta: 38000 },
-  { id: 'nameplate', bit: 4, he: 'שלט שם',       en: 'Nameplate',   delta: 14000 },
-];
+/* ── WITHDRAWN: add-ons ──────────────────────────────────────────────
+   There was a fifth-of-the-catalogue group here — peephole, letterplate, ring
+   knocker, door closer, nameplate — the only multi-select in the site, packed
+   into the short code as a bitmask. It is gone at the owner's instruction:
+   these are not things his customers order from him, so offering them priced
+   the door for work that would not happen and put five more decisions in front
+   of the one that matters.
 
-/** The add-ons a state carries, in catalogue order, unknown ids dropped. */
-export const addonsOf = state =>
-  ADDONS.filter(a => (state.addons || []).includes(a.id));
+   Kept as a note rather than deleted silently, because the ids `peep`, `mail`,
+   `knocker`, `closer` and `nameplate` were a public wire format and a link
+   written before this still carries them. `fromQuery` ignores what it does not
+   know, so such a link opens the same door without them; the short code
+   refuses outright, because its VERSION moved when the bit layout did.
+   If any of them comes back, the drawings are in the git history at cf060ed
+   and the bit positions above must not be reused for anything else. */
 
 /** Decorative iron grille over the glazing. Only meaningful with a window. */
 export const GRILLES = [
@@ -386,42 +376,36 @@ export const DETAILS = [
 ];
 
 /**
- * Ironmongery finish.
+ * Ironmongery finish — a PROPERTY OF THE PRODUCT, no longer a customer choice.
  *
- * Not every handle takes one. Luna is a matte black casting and Shiran an
- * antique brass one — the renderer has drawn them that way since they were
- * measured off the product shots — and the recessed channel has no metal on
- * it at all, being a void in the leaf. For those three the finish tiles were
- * live, priced at up to ₪220, and changed nothing whatsoever in the drawing.
- * Worse than a picture that does not update: the WhatsApp message went out
- * saying "Shiran, matte black", which is a door Peretz cannot build.
+ * This was a priced group of three: brushed nickel, matte black, brass. It is
+ * withdrawn at the owner's instruction — he does not sell the handle in a
+ * choice of finishes, he sells the handle the manufacturer sends. Charging up
+ * to ₪220 for a decision that is not on offer is the same defect as charging
+ * for something the drawing does not show, arrived at from the other side.
  *
- * A handle's own `finish` now wins over the choice, everywhere at once — in
- * the drawing, in the price, in the summary and in the message — and the
- * tiles say so instead of pretending. Which handles really come in which
- * finishes is a question for Peretz; see ASK-PERETZ.md.
+ * The table stays, because the DRAWING still needs to know what colour a piece
+ * of metal is, and because one real fact survives the withdrawal: Shiran is an
+ * antique brass casting and always has been. That belongs to the handle, and
+ * it is declared on the handle.
+ *
+ * `steel` must stay first: it is the default for everything that does not say
+ * otherwise. Ids stay as they are — a link written before this carries `f=`,
+ * and it should resolve rather than error.
  */
 export const FINISHES = [
-  { id: 'steel', he: 'ניקל מוברש', en: 'Brushed nickel', delta: 0 },
-  { id: 'black', he: 'שחור מט',    en: 'Matte black',    delta: 12000 },
-  { id: 'brass', he: 'פליז',       en: 'Brass',          delta: 22000 },
+  { id: 'steel', he: 'ניקל מוברש', en: 'Brushed nickel' },
+  { id: 'black', he: 'שחור מט',    en: 'Matte black' },
+  { id: 'brass', he: 'פליז',       en: 'Brass' },
 ];
 
-
 /**
- * The finish this door is actually built in — null when the handle has no
- * metal to finish. Everything that shows a finish to anyone goes through
- * here, so the drawing, the price, the spec line and the message can never
- * disagree about it.
+ * The finish this door is built in: whatever its grip declares, else brushed
+ * nickel. One function, so the drawing, the spec line and the message cannot
+ * disagree about it — which they did, out loud, when this was a choice.
  */
 export function effectiveFinish(state) {
-  /* Every door now carries a lockset, so there is always metal on it and the
-     finish always means something — the "no metal parts" case went away with
-     the split, because the recessed channel is a grip and the lever beside it
-     is still a lever. What survives is a grip supplied in one finish only:
-     Shiran is antique brass, and hardware on a door matches. */
-  const h = byId(HANDLES, state.handle);
-  return byId(FINISHES, h.finish || state.finish);
+  return byId(FINISHES, byId(HANDLES, state.handle).finish || 'steel');
 }
 
 /* Aliases count: a superseded id must resolve to its replacement rather than

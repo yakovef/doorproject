@@ -5,7 +5,7 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { addonsOf, byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { encodeCode, toQuery } from './url-state.js';
 
@@ -42,13 +42,11 @@ export function message(state) {
     ...(w.rects.length && g.id !== 'none' ? [`סורג: ${g.he}`] : []),
     ...(byId(HANDLES, state.handle).style === 'none'
         ? [] : [`ידית משיכה: ${byId(HANDLES, state.handle).he}`]),
-    `מנעול וידית: ${byId(LOCKSETS, state.lockset).he}${fin ? ` · ${fin.he}` : ''}`,
+    /* The finish is still named even though it is no longer chosen: it is a
+       fact about what Peretz has to order, and the one grip that departs from
+       brushed nickel — the brass Shiran — is the reason the line exists. */
+    `מנעול וידית: ${byId(LOCKSETS, state.lockset).he} · ${fin.he}`,
     ...(state.detail !== 'plain' ? [`עיצוב: ${byId(DETAILS, state.detail).he}`] : []),
-    /* Add-ons on one line, and the line appears only when there are any. A
-       peephole is a real item on the order — it was drawn for months without
-       ever being mentioned to Peretz, because the drawing decided it rather
-       than the customer. */
-    ...(addonsOf(state).length ? [`תוספות: ${addonsOf(state).map(a => a.he).join(' · ')}`] : []),
     `מידה: ${s.he}`,
     `פתיחה: ${h.he}`,
     `מחיר באתר: ${formatAgorot(priceAgorot(state))} — כולל התקנה ומע״מ`,

@@ -35,8 +35,16 @@ const VIEWS = [
    already outlived one rename; with the panel now generated from a table in
    app.js, a hand-kept copy in the audit would go stale the first time a
    category was added and its symptom would be the new category never being
-   audited — silence, not a failure. */
-const groupsOn = p => p.$$eval('.field[data-group]', els => els.map(e => e.dataset.group));
+   audited — silence, not a failure.
+
+   Each category is returned WITH THE SECTION IT LIVES IN, because a category
+   is now two clicks from the page: the fold is what this audit most needs to
+   drive, since a category nobody can reach looks exactly like a working page
+   from anywhere else. */
+const groupsOn = p => p.$$eval('.field[data-group]', els => els.map(e => ({
+  key: e.dataset.group,
+  section: e.closest('.sect').dataset.section,
+})));
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 let faults = 0;
@@ -51,28 +59,35 @@ for (const v of VIEWS) {
   await p.waitForTimeout(400);
   console.log(`\n${v.name}  ${v.w}x${v.h}`);
 
-  /* The cabinet: on first paint the customer must see the CATEGORIES and no
-     options at all. That is the whole change, so it is asserted rather than
-     assumed — a regression here looks like a working page. */
+  /* The cabinet: on first paint the customer must see the four SECTIONS and
+     nothing else — no category headings and no options. That is the whole
+     change, so it is asserted rather than assumed; a regression here looks
+     like a working page. */
   const shut = await p.evaluate(() => ({
-    heads: document.querySelectorAll('.field__head').length,
+    sections: document.querySelectorAll('.sect__head').length,
+    openSections: [...document.querySelectorAll('.sect__body')].filter(b => !b.hidden).length,
     open: [...document.querySelectorAll('.field__body')].filter(b => !b.hidden).length,
-    visibleOptions: [...document.querySelectorAll('[role="radio"],[role="checkbox"]')]
+    visibleHeads: [...document.querySelectorAll('.field__head')]
+      .filter(e => e.getBoundingClientRect().height > 0).length,
+    visibleOptions: [...document.querySelectorAll('[role="radio"]')]
       .filter(e => e.getBoundingClientRect().height > 0).length,
   }));
-  if (!shut.heads) fault(v.name, 'no categories rendered');
+  if (!shut.sections) fault(v.name, 'no sections rendered');
+  if (shut.sections > 4) fault(v.name, `${shut.sections} top-level sections — the fold is meant to be short`);
+  if (shut.openSections) fault(v.name, `${shut.openSections} sections already open on load`);
   if (shut.open) fault(v.name, `${shut.open} categories already open on load`);
+  if (shut.visibleHeads) fault(v.name, `${shut.visibleHeads} category rows visible before a section was opened`);
   if (shut.visibleOptions) fault(v.name, `${shut.visibleOptions} options visible before anything was opened`);
 
-  /* Tap targets, measured with every category OPEN — a hidden element has no
-     size, so measuring them closed would pass everything by measuring
-     nothing. */
+  /* Tap targets, measured with every body OPEN at BOTH levels — a hidden
+     element has no size, so measuring them closed would pass everything by
+     measuring nothing. */
   await p.evaluate(() => {
-    document.querySelectorAll('.field__body').forEach(b => { b.hidden = false; });
+    document.querySelectorAll('.sect__body,.field__body').forEach(b => { b.hidden = false; });
   });
   const small = await p.evaluate(() => {
     const out = [];
-    for (const el of document.querySelectorAll('[role="radio"], [role="checkbox"], .btn, .bar__phone, .field__head')) {
+    for (const el of document.querySelectorAll('[role="radio"], .btn, .bar__phone, .field__head, .sect__head')) {
       const r = el.getBoundingClientRect();
       if (r.height < 44 || r.width < 30) {
         out.push(`${el.className.split(' ')[0]}:${el.dataset.id || el.id || el.textContent.trim().slice(0, 12)} ${Math.round(r.width)}x${Math.round(r.height)}`);
@@ -85,11 +100,19 @@ for (const v of VIEWS) {
   await p.waitForTimeout(300);
 
   const seen = new Map();
-  for (const key of await groupsOn(p)) {
+  for (const { key, section } of await groupsOn(p)) {
     const g = `.field[data-group="${key}"]`;
-    /* Open it the way a person does. Clicking an option inside a closed
-       category would still work through the DOM and would prove nothing about
-       whether anyone can reach it. */
+    /* Open it the way a person does, both levels, section first. Clicking an
+       option inside a closed category would still work through the DOM and
+       would prove nothing about whether anyone can reach it — and with the
+       cabinet two deep, "can anyone reach it" is the question. */
+    await p.$eval(`.sect[data-section="${section}"] .sect__head`, el => {
+      if (el.getAttribute('aria-expanded') !== 'true') el.click();
+    });
+    await p.waitForTimeout(60);
+    if (!await p.$eval(`.sect[data-section="${section}"] .sect__body`, el => !el.hidden)) {
+      fault(v.name, `section ${section} would not open`); continue;
+    }
     await p.$eval(`${g} .field__head`, el => {
       if (el.getAttribute('aria-expanded') !== 'true') el.click();
     });
@@ -97,8 +120,7 @@ for (const v of VIEWS) {
     const opened = await p.$eval(`${g} .field__body`, el => !el.hidden);
     if (!opened) { fault(v.name, `${key} would not open`); continue; }
 
-    const ids = await p.$$eval(`${g} [role="radio"],${g} [role="checkbox"]`,
-                               els => els.map(e => e.dataset.id));
+    const ids = await p.$$eval(`${g} [role="radio"]`, els => els.map(e => e.dataset.id));
     if (!ids.length) { fault(v.name, `${key} rendered no options`); continue; }
 
     for (const id of ids) {

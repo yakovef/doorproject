@@ -44,8 +44,8 @@
  * state the interface would not let you build.
  */
 
-import { byId, DETAILS, FINISHES, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
-import { gripClashesGlass, gripClashesLockset, locksetClashesGlass, plateRoom } from './renderer.js';
+import { byId, DETAILS, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { gripClashesGlass, gripClashesLockset, locksetClashesGlass } from './renderer.js';
 
 /** Does this detail put ruled line work on the face? */
 export const isLineWork = detail => !!(detail.strips || detail.groove);
@@ -103,18 +103,12 @@ export function conflicts(state) {
   const lined = isLineWork(byId(DETAILS, state.detail));
 
   const out = { window: {}, glazing: {}, grille: {}, detail: {}, handle: {},
-                addons: {}, finish: {}, lockset: {}, size: {}, colour: {}, handing: {} };
-
-  /* Some grips are supplied in one finish only — Shiran is antique brass and
-     always has been. This used to live in app.js as its own gate, which meant
-     the ONE table was two tables and the second one only ran in the browser:
-     a link asking for a matte-black Shiran got a brass door and no notice. */
+                lockset: {}, size: {}, colour: {}, handing: {} };
   const grip = byId(HANDLES, state.handle);
-  if (grip.finish) {
-    for (const f of FINISHES) {
-      if (f.id !== grip.finish) out.finish[f.id] = `${grip.he} — ${byId(FINISHES, grip.finish).he} בלבד`;
-    }
-  }
+
+  /* The finish rule that used to live here is gone with the group it gated.
+     A grip supplied in one finish only — Shiran, antique brass — is now simply
+     drawn in it, because there is no longer a choice for it to contradict. */
 
   /* A grille and a glass treatment both need glass to be applied to. */
   if (!glazed) {
@@ -215,37 +209,6 @@ export function conflicts(state) {
     for (const w of WINDOWS) if (acrossCentre(w)) out.window[w.id] = 'המאחז חוצה את החלון';
   }
 
-  /* GEOMETRIC: the letterplate sits at 0.80 of leaf height. A window that
-     reaches past 0.74 leaves it nowhere to go — and unlike the centre-line
-     add-ons it cannot slide down, because below it is the bottom rail. */
-  const win = byId(WINDOWS, state.window);
-  const reach = win.rects.length
-    ? Math.max(...win.rects.map(r => (r.top + r.h) / 2050)) : 0;
-  if (reach > 0.74) out.addons.mail = 'החלון מגיע נמוך מדי';
-
-  /* GEOMETRIC: a peephole is at EYE LEVEL and on the centre line. That is not
-     a preference, it is what the thing is for — and it is the one add-on the
-     renderer must not slide out of the way, because the alternative position
-     is chest height, where nobody has ever fitted one. So when the glazing
-     crosses that height on the centre line, the peephole is refused with a
-     reason rather than drawn somewhere wrong.
-     `duo` deliberately survives this: its two lights sit either side of the
-     centre and leave the middle of the leaf clear, which is exactly where the
-     peephole goes. */
-  /* GEOMETRIC: a plate needs a minimum width to be the thing it is. A letter
-     is 220 mm across and a nameplate below 160 mm has nowhere to put a name.
-     The drawing centres both in whatever space the grip leaves, so this only
-     bites where that space has run out. */
-  const room = plateRoom(state);
-  if (room < 220) out.addons.mail = out.addons.mail || 'אין רוחב לפתח דואר';
-  if (room < 160) out.addons.nameplate = 'אין רוחב לשלט';
-
-  const eye = (2050 - 1600) / 2050;                      // PEEPHOLE_AFF, from the top
-  const blocksEye = win.rects.some(r =>
-    r.top / 2050 < eye && (r.top + r.h) / 2050 > eye
-    && Math.abs(r.dx || 0) < r.w / 2 + 40);
-  if (blocksEye) out.addons.peep = 'החלון תופס את גובה העינית';
-
   return out;
 }
 
@@ -344,26 +307,6 @@ export function repair(state, intent = null) {
     if (s.glazing && s.glazing !== 'clear') { s.glazing = 'clear'; changed.push('glazing'); }
   }
 
-  /* A grip supplied in one finish only settles the finish FIELD, not just the
-     drawing. `effectiveFinish` already made the door, the price, the summary
-     and the message agree — but the stored state went on saying "steel" while
-     every one of them said brass, so the design was carrying a value nothing
-     could act on. Found by asserting that `repair` always lands somewhere
-     buildable, which is a different question from "does it look right". */
-  const grip = byId(HANDLES, s.handle);
-  if (grip.finish && s.finish !== grip.finish) {
-    s.finish = grip.finish;
-    changed.push('finish');
-  }
-
-  /* Drop any add-on the design no longer has room for, whichever it is. */
-  const c = conflicts(s);
-  const lost = (s.addons || []).filter(a => c.addons[a]);
-  if (lost.length) {
-    s.addons = s.addons.filter(a => !c.addons[a]);
-    changed.push('addons');
-  }
-
   return { state: s, changed };
 }
 
@@ -375,6 +318,4 @@ export const repairSaid = changed => ({
   glazing: 'החזרנו זכוכית שקופה — אין חלון',
   handle:  'הסרנו את ידית המשיכה — אין לה מקום כאן',
   lockset: 'החלפנו לצילינדר בלבד — לא מתקינים ידית מסתובבת עם ידית משיכה',
-  finish:  'התאמנו את הגימור — הידית מגיעה בגימור אחד בלבד',
-  addons:  'הסרנו תוספת שאין לה מקום ליד החלון',
 }[changed[0]] || null);

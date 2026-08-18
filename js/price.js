@@ -7,7 +7,7 @@
  * configurator must not break it.
  */
 
-import { addonsOf, byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
 export function priceAgorot(state) {
@@ -16,24 +16,15 @@ export function priceAgorot(state) {
   const win    = byId(WINDOWS, state.window);
   const grille = byId(GRILLES, state.grille);
 
-  /* The finish is charged only when it is a choice. The recessed channel is a
-     void in the leaf with no metal on it, and Luna and Shiran each come in one
-     finish — all three used to take up to ₪220 for a decision the customer
-     could not make and the drawing did not show. Where the handle carries its
-     own finish, that finish is part of the handle's price: "Shiran costs ₪420
-     and comes in brass" is a sentence a customer can act on; "₪420 plus a ₪220
-     brass surcharge you cannot decline" is not. */
-  const handle = byId(HANDLES, state.handle);
-  const finish = effectiveFinish(state);
+  /* Nothing here for the finish or the add-ons any more, and the reason is
+     the same one in both directions: money and the door move together. The
+     finish took up to ₪220 for a decision the owner does not actually offer,
+     and the add-ons priced five fittings he does not fit. A surcharge for
+     something that will not happen is a hidden cost with a label on it. */
   let total = size.base + colour.delta + win.delta
-            + handle.delta
+            + byId(HANDLES, state.handle).delta
             + byId(LOCKSETS, state.lockset).delta
-            + byId(DETAILS, state.detail).delta
-            + (finish && !handle.finish ? finish.delta : 0)
-            /* Add-ons are the one group that SUMS rather than picking one: a
-               door can carry a peephole and a letterplate and a closer, and
-               each is bought separately. */
-            + addonsOf(state).reduce((s, a) => s + a.delta, 0);
+            + byId(DETAILS, state.detail).delta;
   /* A grille needs glazing to sit in, and so does the glass treatment itself —
      neither can be charged on a solid door. Same rule, same reason: the
      configurator must never take money for something the drawing does not

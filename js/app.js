@@ -1,33 +1,39 @@
 /**
  * Wiring, and the cabinet.
  *
- * ── the cabinet ──────────────────────────────────────────────────────
+ * ── the cabinet, now two deep ────────────────────────────────────────
  * The choices panel used to render every option in every group on first
  * paint: eleven headings, sixty-odd tiles, before the customer had decided
  * anything. It read as a parts catalogue, and on a phone it put the WhatsApp
  * button — the entire purpose of the site (PLAN.md §0) — eight screens down.
  *
- * Now the page opens showing the CATEGORIES: what each one is, what is
- * currently chosen, and what it adds to the price. Opening one reveals its
- * options. One at a time, so the panel never grows past a screen or two and
- * the send panel stays in reach.
+ * One level of folding fixed the tiles and left the headings: nine categories
+ * is still a list to read before anything can be chosen, and the two most
+ * obscure of them were things the business does not actually sell. Those are
+ * withdrawn, and what remains folds again.
+ *
+ * So the page now opens on FOUR questions — how it looks, its glass, its
+ * handles, its measurements — and each opens onto its own categories, and each
+ * of those onto its options. One open at a time at BOTH levels, which is what
+ * keeps the panel to a screen however deep the customer goes.
  *
  * ── one table ────────────────────────────────────────────────────────
- * Every group is a row in GROUPS below, and everything downstream — building,
- * selecting, gating, summarising — walks that list. The two categories added
- * this round were one row each. What used to happen instead is visible in the
- * git history: a group meant edits in index.html, buildTiles, paint,
- * markSelected and a bespoke gate function, and the gate that lived only here
- * was invisible to shared links.
+ * Every group is a row in GROUPS and every group belongs to exactly one
+ * SECTION; everything downstream — building, selecting, gating, summarising —
+ * walks those two lists. Withdrawing the add-ons and the finish this round was
+ * two deleted rows here and nothing else in this file. What used to happen
+ * instead is visible in the git history: a group meant edits in index.html,
+ * buildTiles, paint, markSelected and a bespoke gate function, and the gate
+ * that lived only here was invisible to shared links.
  */
 
 import {
-  ADDONS, addonsOf, byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GLAZINGS,
+  byId, COLOURS, DETAILS, GLAZINGS,
   GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import {
-  addonGlyph, describe, detailGlyph, finishGlyph, glazingGlyph, grilleGlyph,
+  describe, detailGlyph, glazingGlyph, grilleGlyph,
   handleGlyph, locksetGlyph, render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair, repairSaid } from './rules.js';
@@ -42,42 +48,69 @@ let urlTimer = null;
 /**
  * The categories, in the order a customer decides them.
  *
- * `kind` picks the tile shape. `multi` marks the one group that is not
- * one-of-a-list. `delta` defaults to the option's own; size overrides it
- * because a size carries a base price rather than a surcharge.
+ * `kind` picks the tile shape. `delta` defaults to the option's own; size
+ * overrides it because a size carries a base price rather than a surcharge.
+ * `in` names the section this category folds under — see SECTIONS below.
+ *
+ * Two rows are gone from this list and are worth naming, because their ids
+ * remain a wire format: `addons` (peephole, letterplate, ring knocker, door
+ * closer, nameplate) and `finish` (brushed nickel, matte black, brass). Both
+ * were withdrawn at the owner's instruction — they are not things his
+ * customers order — and everything that made them work went with them.
  */
 const GROUPS = [
-  { key: 'colour', title: 'צבע', kind: 'swatch', list: () => COLOURS,
+  { key: 'colour', title: 'צבע', in: 'look', kind: 'swatch', list: () => COLOURS,
     label: c => c.he, meta: c => `RAL ${c.ral}` },
 
-  { key: 'window', title: 'חלון', kind: 'tile', list: () => WINDOWS, glyph: windowGlyph },
+  { key: 'detail', title: 'עיצוב החזית', in: 'look', kind: 'tile', list: () => DETAILS,
+    glyph: detailGlyph },
 
-  { key: 'glazing', title: 'זכוכית', kind: 'sq', list: () => GLAZINGS, glyph: glazingGlyph,
+  { key: 'window', title: 'חלון', in: 'glass', kind: 'tile', list: () => WINDOWS,
+    glyph: windowGlyph },
+
+  { key: 'glazing', title: 'זכוכית', in: 'glass', kind: 'sq', list: () => GLAZINGS,
+    glyph: glazingGlyph,
     hint: 'מה רואים דרך הזכוכית. מעוצבת ומחורצת מכניסות אור בלי מראה החוצה.' },
 
-  { key: 'grille', title: 'סורג', kind: 'sq', list: () => GRILLES, glyph: grilleGlyph },
+  { key: 'grille', title: 'סורג', in: 'glass', kind: 'sq', list: () => GRILLES,
+    glyph: grilleGlyph },
 
-  { key: 'handle', title: 'ידית משיכה', kind: 'hw', list: () => HANDLES, glyph: handleGlyph,
-    hint: 'הידית האנכית. אפשר גם בלעדיה.' },
+  { key: 'handle', title: 'ידית משיכה', in: 'hw', kind: 'hw', list: () => HANDLES,
+    glyph: handleGlyph, hint: 'הידית האנכית. אפשר גם בלעדיה.' },
 
-  { key: 'lockset', title: 'מנעול וידית', kind: 'hw', list: () => LOCKSETS, glyph: locksetGlyph,
-    hint: 'הידית שמסובבים והצילינדר. יש בכל דלת.' },
+  { key: 'lockset', title: 'מנעול וידית', in: 'hw', kind: 'hw', list: () => LOCKSETS,
+    glyph: locksetGlyph, hint: 'הידית שמסובבים והצילינדר. יש בכל דלת.' },
 
-  { key: 'detail', title: 'עיצוב', kind: 'tile', list: () => DETAILS, glyph: detailGlyph },
+  { key: 'size', title: 'מידה', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
+    glyph: sizeGlyph, delta: z => z.base - SIZES.standard.base,
+    hint: 'נמדוד אצלכם במדויק — בחינם.' },
 
-  { key: 'addons', title: 'תוספות', kind: 'tile', list: () => ADDONS, glyph: addonGlyph,
-    multi: true, hint: 'אפשר לבחור כמה שרוצים, או אף אחת.' },
-
-  { key: 'finish', title: 'גימור ידיות', kind: 'sq', list: () => FINISHES, glyph: finishGlyph },
-
-  { key: 'size', title: 'מידה', kind: 'tile', list: () => Object.values(SIZES), glyph: sizeGlyph,
-    delta: z => z.base - SIZES.standard.base, hint: 'נמדוד אצלכם במדויק — בחינם.' },
-
-  { key: 'handing', title: 'כיוון פתיחה', kind: 'pill', list: () => HANDINGS,
+  { key: 'handing', title: 'כיוון פתיחה', in: 'fit', kind: 'pill', list: () => HANDINGS,
     hint: 'לא בטוחים? נבדוק יחד במדידה.' },
 ];
 
-const groupOf = key => GROUPS.find(g => g.key === key);
+/**
+ * The four questions the page opens on.
+ *
+ * Not a tidier arrangement of the same nine headings — a shorter list of
+ * BIGGER questions, each one something a customer already has an opinion about
+ * before they arrive. "What colour, and does it have panels" is one thought.
+ * "Does it have glass, and what kind" is another. Nobody arrives with an
+ * opinion about `glazing` as distinct from `grille`.
+ *
+ * Four is also as far as this can usefully fold: a section holding one
+ * category is a click that reveals a click, which is worse than the list it
+ * replaced.
+ */
+const SECTIONS = [
+  { key: 'look',  title: 'מראה הדלת',   sub: 'צבע ועיצוב החזית' },
+  { key: 'glass', title: 'חלון וזכוכית', sub: 'חלון, סוג זכוכית, סורג' },
+  { key: 'hw',    title: 'ידיות ומנעול', sub: 'ידית משיכה, מנעול' },
+  { key: 'fit',   title: 'מידה ופתיחה',  sub: 'גודל הדלת וכיוון הפתיחה' },
+];
+
+const groupsIn = key => GROUPS.filter(g => g.in === key);
+const sectionOf = key => (GROUPS.find(g => g.key === key) || {}).in;
 
 // ── boot ──────────────────────────────────────────────────────────
 
@@ -103,48 +136,64 @@ function init() {
   paint();
 
   /* A shared link is a door somebody chose deliberately. Open the first
-     category it disagrees with the default about, so the page arrives
-     explaining itself rather than looking like the stock door. */
-  const differs = GROUPS.find(g => !same(state[g.key], DEFAULTS[g.key]));
-  if (differs) open(differs.key);
+     category it disagrees with the default about — and the section that
+     category lives in, or the customer would arrive at a page that has opened
+     something they cannot see. */
+  const differs = GROUPS.find(g => state[g.key] !== DEFAULTS[g.key]);
+  if (differs) { openSection(differs.in); open(differs.key); }
 }
-
-const same = (a, b) => Array.isArray(a) || Array.isArray(b)
-  ? JSON.stringify(a || []) === JSON.stringify(b || []) : a === b;
 
 // ── the panel ─────────────────────────────────────────────────────
 
 function buildPanel() {
   const wrap = $('#choices');
-  for (const g of GROUPS) {
-    const field = document.createElement('div');
-    field.className = 'field';
-    field.dataset.group = g.key;
-    field.innerHTML = `
-      <button class="field__head" type="button" aria-expanded="false"
-              id="head-${g.key}" aria-controls="body-${g.key}">
-        <span class="field__title">${g.title}</span>
-        <span class="field__now" data-now></span>
+  for (const sec of SECTIONS) {
+    const box = document.createElement('section');
+    box.className = 'sect';
+    box.dataset.section = sec.key;
+    box.innerHTML = `
+      <button class="sect__head" type="button" aria-expanded="false"
+              id="sect-head-${sec.key}" aria-controls="sect-body-${sec.key}">
+        <span class="sect__text">
+          <span class="sect__title">${sec.title}</span>
+          <span class="sect__sub">${sec.sub}</span>
+        </span>
+        <span class="sect__now" data-sect-now></span>
         <span class="field__chev" aria-hidden="true"></span>
       </button>
-      <div class="field__body" id="body-${g.key}" role="region"
-           aria-labelledby="head-${g.key}" hidden>
-        <div class="field__opts"></div>
-        ${g.hint ? `<p class="field__hint">${g.hint}</p>` : ''}
-        <p class="field__note" data-note hidden></p>
-      </div>`;
-    wrap.appendChild(field);
+      <div class="sect__body" id="sect-body-${sec.key}" role="region"
+           aria-labelledby="sect-head-${sec.key}" hidden></div>`;
+    wrap.appendChild(box);
+    box.querySelector('.sect__head').addEventListener('click', () => toggleSection(sec.key));
 
-    field.querySelector('.field__head').addEventListener('click', () => toggle(g.key));
-    buildOptions(g, field.querySelector('.field__opts'));
+    const body = box.querySelector('.sect__body');
+    for (const g of groupsIn(sec.key)) {
+      const field = document.createElement('div');
+      field.className = 'field';
+      field.dataset.group = g.key;
+      field.innerHTML = `
+        <button class="field__head" type="button" aria-expanded="false"
+                id="head-${g.key}" aria-controls="body-${g.key}">
+          <span class="field__title">${g.title}</span>
+          <span class="field__now" data-now></span>
+          <span class="field__chev" aria-hidden="true"></span>
+        </button>
+        <div class="field__body" id="body-${g.key}" role="region"
+             aria-labelledby="head-${g.key}" hidden>
+          <div class="field__opts"></div>
+          ${g.hint ? `<p class="field__hint">${g.hint}</p>` : ''}
+          <p class="field__note" data-note hidden></p>
+        </div>`;
+      body.appendChild(field);
+
+      field.querySelector('.field__head').addEventListener('click', () => toggle(g.key));
+      buildOptions(g, field.querySelector('.field__opts'));
+    }
   }
 }
 
 function buildOptions(g, host) {
-  /* A multi-select group is a set of checkboxes, not radios. It is the only
-     one, and getting the role wrong would tell a screen-reader user that
-     choosing a letterplate un-chooses the peephole. */
-  host.setAttribute('role', g.multi ? 'group' : 'radiogroup');
+  host.setAttribute('role', 'radiogroup');
   host.setAttribute('aria-label', g.title);
   host.className = 'field__opts '
     + { swatch: 'swatches', pill: 'pills', tile: 'tiles', sq: 'tiles tiles--sq', hw: 'tiles tiles--hw' }[g.kind];
@@ -153,7 +202,7 @@ function buildOptions(g, host) {
     const b = document.createElement('button');
     b.type = 'button';
     b.dataset.id = o.id;
-    b.setAttribute('role', g.multi ? 'checkbox' : 'radio');
+    b.setAttribute('role', 'radio');
 
     if (g.kind === 'swatch') {
       b.className = 'swatch';
@@ -179,6 +228,32 @@ function buildOptions(g, host) {
   keyboardGrid(host, id => choose(g, id));
 }
 
+/**
+ * Open one thing at each level, closing whatever else was open there.
+ *
+ * Closing a SECTION also closes the category inside it. Without that, opening
+ * the section again re-reveals options the customer left behind three
+ * decisions ago, and the panel is suddenly two screens tall again — which is
+ * the whole thing the cabinet exists to prevent.
+ */
+function openSection(key) {
+  for (const sec of SECTIONS) {
+    const on = sec.key === key;
+    const head = $(`#sect-head-${sec.key}`), body = $(`#sect-body-${sec.key}`);
+    head.setAttribute('aria-expanded', String(on));
+    body.hidden = !on;
+    head.closest('.sect').classList.toggle('is-open', on);
+    if (!on) for (const g of groupsIn(sec.key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
+  }
+  fitStage();
+}
+
+function closeGroup(key) {
+  $(`#head-${key}`).setAttribute('aria-expanded', 'false');
+  $(`#body-${key}`).hidden = true;
+  $(`#head-${key}`).closest('.field').classList.remove('is-open');
+}
+
 /** Open one category, closing whichever was open. */
 function open(key) {
   for (const g of GROUPS) {
@@ -189,6 +264,10 @@ function open(key) {
     head.closest('.field').classList.toggle('is-open', on);
   }
   fitStage();
+}
+
+function toggleSection(key) {
+  openSection($(`#sect-head-${key}`).getAttribute('aria-expanded') === 'true' ? null : key);
 }
 
 function toggle(key) {
@@ -207,16 +286,7 @@ function toggle(key) {
  * a shared URL cannot disagree about what is buildable.
  */
 function choose(g, id) {
-  let next;
-  if (g.multi) {
-    const have = (state.addons || []).includes(id);
-    const picked = have ? state.addons.filter(a => a !== id) : [...(state.addons || []), id];
-    next = { ...state, addons: ADDONS.filter(a => picked.includes(a.id)).map(a => a.id) };
-  } else {
-    next = { ...state, [g.key]: id };
-  }
-
-  const { state: fixed, changed } = repair(next, g.key);
+  const { state: fixed, changed } = repair({ ...state, [g.key]: id }, g.key);
   set(fixed);
   if (changed.length) toast(repairSaid(changed));
 }
@@ -238,7 +308,7 @@ function set(next) {
 /** Arrow-key navigation with roving tabindex, per PLAN.md §14. */
 function keyboardGrid(wrap, act) {
   wrap.addEventListener('keydown', e => {
-    const items = [...wrap.querySelectorAll('[role="radio"],[role="checkbox"]')];
+    const items = [...wrap.querySelectorAll('[role="radio"]')];
     const i = items.indexOf(document.activeElement);
     if (i < 0) return;
 
@@ -255,9 +325,7 @@ function keyboardGrid(wrap, act) {
     e.preventDefault();
     next = Math.max(0, Math.min(items.length - 1, next));
     items[next].focus();
-    /* Arrowing through a multi-select must MOVE, not toggle: otherwise
-       walking the list with the keyboard ticks every box on the way past. */
-    if (items[next].getAttribute('role') === 'radio') act(items[next].dataset.id);
+    act(items[next].dataset.id);
   });
 }
 
@@ -272,17 +340,22 @@ function columnCount(wrap, items) {
 
 /** What a closed category shows: the choice that has been made in it. */
 function nowLabel(g) {
-  if (g.multi) {
-    const on = addonsOf(state);
-    return on.length ? on.map(a => a.he).join(' · ') : 'ללא';
-  }
-  if (g.key === 'finish') {
-    const f = effectiveFinish(state);
-    return f ? f.he : 'ללא';
-  }
   const list = g.list();
   const hit = list.find(o => o.id === state[g.key]) || list[0];
   return hit ? hit.he : '';
+}
+
+/**
+ * What a closed SECTION shows: the choices inside it, joined.
+ *
+ * Not a count and not "4 options" — the point of a closed section is that the
+ * customer can see what it currently says without opening it, or the fold has
+ * hidden the answer along with the question. Defaults are included: "no pull
+ * handle" is a decision the door carries, and leaving it out would make the
+ * section read as unanswered.
+ */
+function sectionLabel(sec) {
+  return groupsIn(sec.key).map(nowLabel).filter(Boolean).join(' · ');
 }
 
 function paint() {
@@ -300,16 +373,13 @@ function paint() {
 
   const win = byId(WINDOWS, state.window);
   const grille = byId(GRILLES, state.grille);
-  const finish = effectiveFinish(state);
-  const extras = addonsOf(state);
   $('#summary').textContent = [
     colour.he, `RAL ${colour.ral}`, win.he,
     ...(win.rects.length && state.glazing !== 'clear' ? [byId(GLAZINGS, state.glazing).he] : []),
     ...(win.rects.length && grille.id !== 'none' ? [grille.he] : []),
     ...(byId(HANDLES, state.handle).style === 'none' ? [] : [byId(HANDLES, state.handle).he]),
-    `${byId(LOCKSETS, state.lockset).he}${finish ? ` ${finish.he}` : ''}`,
+    byId(LOCKSETS, state.lockset).he,
     ...(state.detail !== 'plain' ? [byId(DETAILS, state.detail).he] : []),
-    ...extras.map(a => a.he),
     size.he, handing.he,
   ].join(' · ');
 
@@ -318,6 +388,9 @@ function paint() {
     const field = $(`.field[data-group="${g.key}"]`);
     field.querySelector('[data-now]').textContent = nowLabel(g);
     markGroup(g, blocked[g.key] || {});
+  }
+  for (const sec of SECTIONS) {
+    $(`.sect[data-section="${sec.key}"] [data-sect-now]`).textContent = sectionLabel(sec);
   }
 
   $('#wa-btn').href = whatsappUrl(state);
@@ -334,12 +407,10 @@ function paint() {
  * happened".
  */
 function markGroup(g, blocked) {
-  const chosen = g.multi ? (state.addons || [])
-    : [g.key === 'finish' ? (effectiveFinish(state) || {}).id : state[g.key]];
+  const chosen = [state[g.key]];
 
   let anyBlocked = false;
-  document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"],`
-                          + `.field[data-group="${g.key}"] [role="checkbox"]`).forEach(el => {
+  document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"]`).forEach(el => {
     const id = el.dataset.id;
     const on = chosen.includes(id);
     el.setAttribute('aria-checked', String(on));
@@ -352,21 +423,7 @@ function markGroup(g, blocked) {
     el.classList.toggle('is-blocked', !!why);
     const slot = el.querySelector('.tile__why');
     if (slot) { slot.hidden = !why; slot.textContent = why || ''; }
-
-    /* A finish that comes with the handle is inside the handle's price, so
-       the tile must not go on advertising a surcharge nobody can decline. */
-    if (g.key === 'finish') {
-      const meta = el.querySelector('.tile__meta');
-      const fixed = !!byId(HANDLES, state.handle).finish;
-      meta.textContent = deltaLabel(fixed ? 0 : Math.max(0, byId(FINISHES, id).delta));
-    }
   });
-
-  /* A multi-select with nothing chosen still needs one reachable stop. */
-  if (g.multi && !chosen.length) {
-    const first = document.querySelector(`.field[data-group="${g.key}"] [role="checkbox"]`);
-    if (first) first.tabIndex = 0;
-  }
 
   const note = $(`.field[data-group="${g.key}"] [data-note]`);
   if (note) {
