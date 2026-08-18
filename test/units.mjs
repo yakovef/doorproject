@@ -372,10 +372,11 @@ group('the grip clears the lockset');
     for (const hd of HANDINGS) for (const wn of WINDOWS) {
       const st = { ...base, handle: hn.id, lockset: kn.id, size: sz,
                    handing: hd.id, window: wn.id };
-      /* Only pairings the rules allow. A pull bar beside a lever is now
-         refused outright -- not one of the ten installed bar doors has one --
-         so asserting they clear each other is asserting about a door the site
-         will not build. */
+      /* Only pairings the rules allow — which is now EVERY grip against every
+         lockset. The pull-bar-beside-a-lever refusal was withdrawn at the
+         owner's request, so this sweep carries the load that rule used to:
+         where the two used to be kept apart by being forbidden, they are now
+         kept apart by `gripStandoff`, and this is what proves it. */
       if (!buildable(st)) continue;
       const svg = render(st);
       const label = `${hn.id}+${kn.id}/${sz}/${hd.id}/${wn.id}`;
@@ -424,9 +425,12 @@ group('the grip clears the lockset');
           vy:  num(svg, /data-hw="handle"[^>]*data-vy="([-\d.]+)"/s),
         };
         // Gap along each axis; positive on either axis means the boxes miss.
-        /* Bodies, not reaches. The lever's blade passes behind the bar on a
-           real door; what may never overlap is the fitting the key goes into
-           and the thing your hand wraps round. */
+        /* `out` and `in` are the DRAWN extents, measured with
+           `npm run collide -- boxes` — not the catalogue's old symmetric
+           guess, which excluded the lever's reach and let the blade cross the
+           bar on 862 designs. With the pairing no longer refused this is the
+           only thing standing between a lever and a bar, so it has to be the
+           real geometry. */
         const gapX = Math.abs(grip.x - lock.x) - (grip.out + lock.in);
         const gapY = Math.abs(grip.y - lock.y) - (grip.vy + lock.vy);
         ok(Math.max(gapX, gapY) > 0,
@@ -737,6 +741,26 @@ group('rules: nothing unbuildable can be reached');
   for (const st of everyState()) { ok(buildable(st), `everyState yielded an unbuildable door`); break; }
 
   console.log(`  (${n} designs repaired and re-checked)`);
+}
+
+// ── 8a. A grip is a grip; only the lockset is lock furniture ──────
+/* Found while allowing every lockset beside every pull handle. The horizontal
+   grab bar drew its OWN lever — a leftover from when "lever + grab bar" was
+   one product, before the grip and the lockset were split into two fields. So
+   a grab bar beside a plain cylinder drew a lever the customer never chose,
+   that nothing charged for, and that never reached the message to Peretz; and
+   a grab bar beside a Coral drew two.
+
+   A thing that APPEARS rather than breaks, which is CLAUDE.md §5 read
+   backwards: no error, a page that works, and the wrong door.
+
+   Asserted against the CYLINDER, which is the one lockset carrying no lever at
+   all — so any lever left on the door had to come from the grip. */
+group('a grip never draws lock furniture');
+for (const h of HANDLES) {
+  const svg = render({ ...base, handle: h.id, lockset: 'cylinder' });
+  const n = [...svg.matchAll(/data-kind="lever"/g)].length;
+  ok(n === 0, `grip "${h.id}" draws ${n} lever(s) of its own beside a cylinder-only lockset`);
 }
 
 // ── 8b. A moulding is not a raised panel ──────────────────────────

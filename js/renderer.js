@@ -1863,11 +1863,15 @@ export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) 
      count the lockset's BODY only, on the argument that a lever sits 30 mm
      proud of the door and a bar 50 mm on its standoffs, so the blade sweeps
      BEHIND the bar. That argument is about a real door. This is a drawing seen
-     square-on, and in the drawing the blade crosses the bar — which is what
-     was reported from the outside, on three separate screenshots.
-     Where the two genuinely cannot share a stile the answer is not more space,
-     it is the rule in js/rules.js: not one of the ten installed doors that
-     carry a pull bar has a lever beside it. */
+     square-on, and in the drawing the blade crossed the bar — reported from
+     the outside, on three separate screenshots.
+
+     This line is now the ONLY thing keeping a grip clear of the lock furniture:
+     the rule that used to refuse a bar beside a lever has been withdrawn at the
+     owner's request, so every lockset must be placeable beside every grip. It
+     is enough, because it is a floor rather than a preference — whatever the
+     lever reaches, the bar starts past it. The Almog swan-neck is the binding
+     case at 220 mm inboard, which puts a bar 0.30 of the leaf's width in. */
   const body = lock.in + grip.out + LOCK_CLEAR;
   /* The floor is the tightest gap anyone actually installs, not the point at
      which the two drawings stop overlapping. */
@@ -1876,8 +1880,10 @@ export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) 
              : grip.vy > 200 ? Math.max(leafW * BAR_GAP, body) : 0;
   /* And it must not run across the glass. `toGlass` is the distance from the
      lock's axis to the near edge of the glazing; the bar has to stop short of
-     it. Where a wide window leaves no room, clearing the lockset still wins —
-     a bar over a pane is wrong, a bar drawn through a lever is worse. */
+     it. Where a wide window leaves no room, clearing the lockset still WINS —
+     `floor` is outside the Math.min — because a bar over a pane is wrong and a
+     bar through a lever is worse. The rules refuse that combination before it
+     is ever drawn; this is only what the renderer does when asked anyway. */
   const room = toGlass - grip.in - LOCK_CLEAR;
   return Math.round(Math.max(floor, Math.min(want, room), 0));
 }
@@ -1957,12 +1963,19 @@ export function gripClashesLockset(state) {
   const handle = byId(HANDLES, state.handle);
   if (handle.style !== 'grab') return false;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  const grip = handleFootprint(handle, leafH);
   const lock = handleFootprint(byId(LOCKSETS, state.lockset), leafH);
-  /* Both measured inboard from the closing edge. The bow is centred, so its
-     near end sits at half the leaf minus half its own length. */
-  const bowNear = leafW / 2 - (grip.in - 40) / 2;
-  return lockBackset(handle, byId(LOCKSETS, state.lockset)) + lock.in + LOCK_CLEAR > bowNear;
+  /* The bow used to be centred on the leaf unconditionally, so on a narrow
+     leaf a long lever reached past its near end and the pairing had to be
+     refused. It is not centred unconditionally any more — `grabHandle` slides
+     it toward the hinge when the lock furniture needs the room, and gives up
+     length rather than position if the stile runs out. So this asks the one
+     question left: is there any room at all between the lock furniture and the
+     hinge edge to put a bar in?
+
+     Both measured inboard from the closing edge. */
+  const clearOf = lockBackset(handle, byId(LOCKSETS, state.lockset)) + lock.in + LOCK_CLEAR;
+  const GRAB_MIN = 180;                       // a bow shorter than this is not a grab bar
+  return leafW - 45 - clearOf < GRAB_MIN;
 }
 
 /**
@@ -2073,20 +2086,43 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
   const w = leafW * GRAB.len * GRAB.ratio;
   const by = y0 + leafH * GRAB.fromTop;   // below the lever, on the mid rail
   const boss = GRAB.boss, swell = w * 1.5;
+
+  /* CENTRED ON THE LEAF, as every installed grab bar is — but pushed toward
+     the hinge when the lock furniture needs the room.
+     `cx` is where `gripStandoff` placed this grip, and by construction that is
+     already at least `lock.in + out + LOCK_CLEAR` from the lock's axis, so it
+     is a position the bow's near end can safely take. Whichever of the two is
+     FURTHER inboard wins: the centred one on a door with a small escutcheon,
+     the standoff on a door with an Almog swan-neck reaching 220 mm across.
+
+     This is what the withdrawn pull-bar-versus-lever rule used to hide. The
+     vertical bars all move with `gripStandoff`; the bow did not, because it is
+     the one grip centred on the leaf rather than hung off the stile — so it
+     was the single pairing still refused after the rule went. */
+  const span = half - boss;                        // centre to boss centre
+  const centredNear = centreX - dir * span;
+  const near = dir > 0 ? Math.max(centredNear, cx) : Math.min(centredNear, cx);
+  /* ...and never off the hinge edge. If clearing the lock would push the far
+     boss past the stile, the bow gives up length rather than position: a short
+     grab bar is a grab bar, one hanging off the door is not. */
+  const hingeStop = centreX + dir * (leafW / 2 - 45);
+  const far = dir > 0 ? Math.min(near + 2 * span, hingeStop)
+                      : Math.max(near - 2 * span, hingeStop);
+  const bowC = (near + far) / 2;
+  const bowSpan = Math.abs(far - near) / 2;
   const bar = (dx, dy, fill, op = 1) => `
-      <path d="M ${centreX - half + boss + dx} ${by - w / 2 + dy}
-               C ${centreX - half * 0.45 + dx} ${by - swell / 2 + dy}
-                 ${centreX + half * 0.45 + dx} ${by - swell / 2 + dy}
-                 ${centreX + half - boss + dx} ${by - w / 2 + dy}
-               L ${centreX + half - boss + dx} ${by + w / 2 + dy}
-               C ${centreX + half * 0.45 + dx} ${by + swell / 2 + dy}
-                 ${centreX - half * 0.45 + dx} ${by + swell / 2 + dy}
-                 ${centreX - half + boss + dx} ${by + w / 2 + dy} Z"
+      <path d="M ${bowC - bowSpan + dx} ${by - w / 2 + dy}
+               C ${bowC - bowSpan * 0.45 + dx} ${by - swell / 2 + dy}
+                 ${bowC + bowSpan * 0.45 + dx} ${by - swell / 2 + dy}
+                 ${bowC + bowSpan + dx} ${by - w / 2 + dy}
+               L ${bowC + bowSpan + dx} ${by + w / 2 + dy}
+               C ${bowC + bowSpan * 0.45 + dx} ${by + swell / 2 + dy}
+                 ${bowC - bowSpan * 0.45 + dx} ${by + swell / 2 + dy}
+                 ${bowC - bowSpan + dx} ${by + w / 2 + dy} Z"
             fill="${fill}" opacity="${op}"/>`;
-  const ends = [centreX - half + boss, centreX + half - boss];
+  const ends = [bowC - bowSpan, bowC + bowSpan];
   return `
     <g>
-      ${lever(cx, cy, dir)}
       <g data-hw="grab">
         ${bar(6, 9, '#000', 0.30)}
         ${ends.map(ex => `
@@ -2102,13 +2138,13 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
         <path d="${arcPath(ex, by, boss - 3, 140, 315)}" fill="none" stroke="#fff"
               stroke-opacity="0.42" stroke-width="3"/>`).join('')}
         <!-- one specular along the top of the swell -->
-        <path d="M ${centreX - half + boss + 4} ${by - w / 2 + 3}
-                 C ${centreX - half * 0.45} ${by - swell / 2 + 4}
-                   ${centreX + half * 0.45} ${by - swell / 2 + 4}
-                   ${centreX + half - boss - 4} ${by - w / 2 + 3}
-                 L ${centreX + half - boss - 4} ${by - w / 2 + 8}
-                 C ${centreX + half * 0.45} ${by - swell / 2 + 10}
-                   ${centreX - half * 0.45} ${by - swell / 2 + 10}
+        <path d="M ${bowC - bowSpan + 4} ${by - w / 2 + 3}
+                 C ${bowC - bowSpan * 0.45} ${by - swell / 2 + 4}
+                   ${bowC + bowSpan * 0.45} ${by - swell / 2 + 4}
+                   ${bowC + bowSpan - 4} ${by - w / 2 + 3}
+                 L ${bowC + bowSpan - 4} ${by - w / 2 + 8}
+                 C ${bowC + bowSpan * 0.45} ${by - swell / 2 + 10}
+                   ${bowC - bowSpan * 0.45} ${by - swell / 2 + 10}
                    ${centreX - half + boss + 4} ${by - w / 2 + 8} Z"
               fill="#fff" opacity="0.5"/>
       </g>
@@ -2698,8 +2734,14 @@ function lever(cx, cy, dir) {
      spindle so the rose stays put. */
   const L = LEVER_REACH;
   const at = t => cx + dir * t;               // distance along the lever
+  /* `data-kind` so a test can count levers. The horizontal grab bar used to
+     draw one of these itself — a leftover from when "lever + grab bar" was a
+     single product, before the grip and the lockset were split — so a grab bar
+     beside a cylinder drew a lever nobody chose, that nothing charged for, and
+     that never appeared in the message to Peretz. A thing that APPEARS rather
+     than breaks, which is the same family as CLAUDE.md §5 read backwards. */
   return `
-    <g transform="rotate(${dir * 12} ${cx} ${cy})">
+    <g data-kind="lever" transform="rotate(${dir * 12} ${cx} ${cy})">
       <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
                Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
                Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}

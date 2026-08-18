@@ -127,25 +127,24 @@ export function conflicts(state) {
     for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = 'לא משלבים חלון עם קווי מתכת';
   }
 
-  /* OBSERVED, and the clearest count in the whole corpus: of the TEN doors
-     carrying a pull bar, NOT ONE has a lever beside it. Eight have a plain
-     cylinder escutcheon and two have a smart lock. It is obvious once seen —
-     the bar IS the handle, so the outside face needs a keyway and nothing
-     more, and a lever there is both redundant and physically in the way.
-     Reported from the outside on three screenshots of a lever drawn straight
-     through a pull bar. Both directions, so whichever tile is being looked at
-     explains itself. */
-  const leverNames = LOCKSETS.filter(k => k.lever).map(k => k.he).join(' / ');
-  if (grip.pull) {
-    for (const k of LOCKSETS) {
-      if (k.lever) out.lockset[k.id] = 'לא מתקינים ידית מסתובבת עם ידית משיכה';
-    }
-  }
-  if (byId(LOCKSETS, state.lockset).lever) {
-    for (const h of HANDLES) {
-      if (h.pull) out.handle[h.id] = `לא משלבים עם ${leverNames}`;
-    }
-  }
+  /* WITHDRAWN: pull bar x lever. This was the strongest OBSERVED rule in the
+     table — of the ten installed doors carrying a pull bar, not one has a
+     lever beside it; eight have a plain cylinder and two a smart lock. It was
+     added after three screenshots showed a lever drawn straight through a bar.
+
+     The owner has since asked for every lockset to work with every pull
+     handle, and to move the BAR instead of refusing the pairing. That is his
+     call to make and the corpus does not forbid it — zero occurrences in a
+     gallery of his favourite work is not the same as "cannot be built", and
+     the drawing has no trouble with it: `gripStandoff` already floors the gap
+     at `lock.in + grip.out + LOCK_CLEAR`, so the bar simply sits further
+     inboard. The overlap was never geometry, it was a footprint that lied
+     about the lever's reach, and that was fixed separately.
+
+     What it costs is recorded rather than hidden: a bar clearing an Almog
+     swan-neck stands 0.30 of the leaf's width in, so on a glazed narrow leaf
+     the GEOMETRIC glass rules below refuse more combinations than they used
+     to. Those stay — a bar drawn across a pane is a different claim. */
 
   /* GEOMETRIC: a grip that would have to be drawn across the glass. Asked of
      the renderer's own arithmetic rather than listed here, so it stays true
@@ -254,16 +253,6 @@ export function repair(state, intent = null) {
     else { s.detail = 'plain'; changed.push('detail'); }
   }
 
-  /* A pull bar and a lever cannot share a door. Which one yields depends on
-     what was just asked for, and the LOCKSET is the one with somewhere to go:
-     `cylinder` is what eight of the ten installed bar doors carry, so the
-     customer keeps the bar they chose and the lever becomes the keyway that
-     really goes with it. */
-  if (byId(HANDLES, s.handle).pull && byId(LOCKSETS, s.lockset).lever) {
-    if (intent === 'lockset') { s.handle = 'none'; changed.push('handle'); }
-    else { s.lockset = 'cylinder'; changed.push('lockset'); }
-  }
-
   /* The grab bar is centred on the leaf and runs across a centred window. */
   if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === 'grab') {
     if (intent === 'handle') { s.window = 'none'; changed.push('window'); }
@@ -317,5 +306,5 @@ export const repairSaid = changed => ({
   grille: 'הסרנו את הסורג — אין חלון',
   glazing: 'החזרנו זכוכית שקופה — אין חלון',
   handle:  'הסרנו את ידית המשיכה — אין לה מקום כאן',
-  lockset: 'החלפנו לצילינדר בלבד — לא מתקינים ידית מסתובבת עם ידית משיכה',
+  lockset: 'החלפנו את המנעול — אין לו מקום ליד החלון',
 }[changed[0]] || null);

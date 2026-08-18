@@ -1622,10 +1622,10 @@ ${body}
     const handle = byId(HANDLES, state2.handle);
     if (handle.style !== "grab") return false;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    const grip = handleFootprint(handle, leafH);
     const lock = handleFootprint(byId(LOCKSETS, state2.lockset), leafH);
-    const bowNear = leafW / 2 - (grip.in - 40) / 2;
-    return lockBackset(handle, byId(LOCKSETS, state2.lockset)) + lock.in + LOCK_CLEAR > bowNear;
+    const clearOf = lockBackset(handle, byId(LOCKSETS, state2.lockset)) + lock.in + LOCK_CLEAR;
+    const GRAB_MIN = 180;
+    return leafW - 45 - clearOf < GRAB_MIN;
   }
   function lockBackset(handle, lockset) {
     const grip = handleFootprint(handle, 2e3);
@@ -1696,20 +1696,26 @@ ${body}
     const w = leafW * GRAB.len * GRAB.ratio;
     const by = y0 + leafH * GRAB.fromTop;
     const boss = GRAB.boss, swell = w * 1.5;
+    const span = half - boss;
+    const centredNear = centreX - dir * span;
+    const near = dir > 0 ? Math.max(centredNear, cx) : Math.min(centredNear, cx);
+    const hingeStop = centreX + dir * (leafW / 2 - 45);
+    const far = dir > 0 ? Math.min(near + 2 * span, hingeStop) : Math.max(near - 2 * span, hingeStop);
+    const bowC = (near + far) / 2;
+    const bowSpan = Math.abs(far - near) / 2;
     const bar = (dx, dy, fill, op = 1) => `
-      <path d="M ${centreX - half + boss + dx} ${by - w / 2 + dy}
-               C ${centreX - half * 0.45 + dx} ${by - swell / 2 + dy}
-                 ${centreX + half * 0.45 + dx} ${by - swell / 2 + dy}
-                 ${centreX + half - boss + dx} ${by - w / 2 + dy}
-               L ${centreX + half - boss + dx} ${by + w / 2 + dy}
-               C ${centreX + half * 0.45 + dx} ${by + swell / 2 + dy}
-                 ${centreX - half * 0.45 + dx} ${by + swell / 2 + dy}
-                 ${centreX - half + boss + dx} ${by + w / 2 + dy} Z"
+      <path d="M ${bowC - bowSpan + dx} ${by - w / 2 + dy}
+               C ${bowC - bowSpan * 0.45 + dx} ${by - swell / 2 + dy}
+                 ${bowC + bowSpan * 0.45 + dx} ${by - swell / 2 + dy}
+                 ${bowC + bowSpan + dx} ${by - w / 2 + dy}
+               L ${bowC + bowSpan + dx} ${by + w / 2 + dy}
+               C ${bowC + bowSpan * 0.45 + dx} ${by + swell / 2 + dy}
+                 ${bowC - bowSpan * 0.45 + dx} ${by + swell / 2 + dy}
+                 ${bowC - bowSpan + dx} ${by + w / 2 + dy} Z"
             fill="${fill}" opacity="${op}"/>`;
-    const ends = [centreX - half + boss, centreX + half - boss];
+    const ends = [bowC - bowSpan, bowC + bowSpan];
     return `
     <g>
-      ${lever(cx, cy, dir)}
       <g data-hw="grab">
         ${bar(6, 9, "#000", 0.3)}
         ${ends.map((ex) => `
@@ -1725,13 +1731,13 @@ ${body}
         <path d="${arcPath(ex, by, boss - 3, 140, 315)}" fill="none" stroke="#fff"
               stroke-opacity="0.42" stroke-width="3"/>`).join("")}
         <!-- one specular along the top of the swell -->
-        <path d="M ${centreX - half + boss + 4} ${by - w / 2 + 3}
-                 C ${centreX - half * 0.45} ${by - swell / 2 + 4}
-                   ${centreX + half * 0.45} ${by - swell / 2 + 4}
-                   ${centreX + half - boss - 4} ${by - w / 2 + 3}
-                 L ${centreX + half - boss - 4} ${by - w / 2 + 8}
-                 C ${centreX + half * 0.45} ${by - swell / 2 + 10}
-                   ${centreX - half * 0.45} ${by - swell / 2 + 10}
+        <path d="M ${bowC - bowSpan + 4} ${by - w / 2 + 3}
+                 C ${bowC - bowSpan * 0.45} ${by - swell / 2 + 4}
+                   ${bowC + bowSpan * 0.45} ${by - swell / 2 + 4}
+                   ${bowC + bowSpan - 4} ${by - w / 2 + 3}
+                 L ${bowC + bowSpan - 4} ${by - w / 2 + 8}
+                 C ${bowC + bowSpan * 0.45} ${by - swell / 2 + 10}
+                   ${bowC - bowSpan * 0.45} ${by - swell / 2 + 10}
                    ${centreX - half + boss + 4} ${by - w / 2 + 8} Z"
               fill="#fff" opacity="0.5"/>
       </g>
@@ -2145,7 +2151,7 @@ ${body}
     const L = LEVER_REACH;
     const at = (t) => cx + dir * t;
     return `
-    <g transform="rotate(${dir * 12} ${cx} ${cy})">
+    <g data-kind="lever" transform="rotate(${dir * 12} ${cx} ${cy})">
       <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
                Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
                Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}
@@ -2512,17 +2518,6 @@ ${body}
     if (lined) {
       for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = "לא משלבים חלון עם קווי מתכת";
     }
-    const leverNames = LOCKSETS.filter((k) => k.lever).map((k) => k.he).join(" / ");
-    if (grip.pull) {
-      for (const k of LOCKSETS) {
-        if (k.lever) out.lockset[k.id] = "לא מתקינים ידית מסתובבת עם ידית משיכה";
-      }
-    }
-    if (byId(LOCKSETS, state2.lockset).lever) {
-      for (const h of HANDLES) {
-        if (h.pull) out.handle[h.id] = `לא משלבים עם ${leverNames}`;
-      }
-    }
     for (const h of HANDLES) {
       if (h.style === "none" || out.handle[h.id]) continue;
       if (gripClashesGlass({ ...state2, handle: h.id })) {
@@ -2577,15 +2572,6 @@ ${body}
       } else {
         s.detail = "plain";
         changed.push("detail");
-      }
-    }
-    if (byId(HANDLES, s.handle).pull && byId(LOCKSETS, s.lockset).lever) {
-      if (intent === "lockset") {
-        s.handle = "none";
-        changed.push("handle");
-      } else {
-        s.lockset = "cylinder";
-        changed.push("lockset");
       }
     }
     if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === "grab") {
@@ -2644,7 +2630,7 @@ ${body}
     grille: "הסרנו את הסורג — אין חלון",
     glazing: "החזרנו זכוכית שקופה — אין חלון",
     handle: "הסרנו את ידית המשיכה — אין לה מקום כאן",
-    lockset: "החלפנו לצילינדר בלבד — לא מתקינים ידית מסתובבת עם ידית משיכה"
+    lockset: "החלפנו את המנעול — אין לו מקום ליד החלון"
   })[changed[0]] || null;
 
   // js/url-state.js

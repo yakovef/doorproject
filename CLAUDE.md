@@ -249,10 +249,31 @@ What it currently refuses, and why:
 | --- | --- | --- |
 | grille or glass treatment with no glass | geometric | nothing to apply it to |
 | line work + glazing, line work + panel | observed | 0 of 31; 11 and 10 separately |
-| pull grip + lever lockset | observed | 0 of the 10 installed bar doors |
 | grip / lockset that would cross the glazing | geometric | `gripClashesGlass`, `locksetClashesGlass` |
-| grab bar + a centred window, grab bar + long lever | geometric | the bow is centred on the LEAF and does not move |
+| grab bar + a centred window | geometric | the bow is centred on the LEAF |
+| a lockset leaving no room for any grab bar at all | geometric | the bow gives up length, then gives up |
 | a window that leaves NO lockset room | geometric | `duo` on the 800 mm leaf reaches to 100 mm of the closing edge |
+
+**Every grip works with every lockset**, on every size — 90 of 90 pairings.
+There WAS an observed rule refusing a pull bar beside a lever (0 of the ten
+installed bar doors has one), and it was withdrawn at the owner's request:
+move the bar, do not refuse the sale. Zero occurrences in a gallery of his
+favourite work is not the same as "cannot be built", and nothing geometric
+stops it — `gripStandoff` floors the gap at `lock.in + grip.out + LOCK_CLEAR`,
+so the bar simply sits further inboard. The overlap that prompted the rule was
+a footprint lying about the lever's reach, fixed separately.
+
+That rule was hiding two things, both now fixed. The horizontal grab bar is the
+one grip centred on the LEAF rather than hung off the stile, so `gripStandoff`
+never moved it — it slides toward the hinge now, and gives up length rather
+than position when the stile runs out. And it drew its OWN lever, left over
+from when "lever + grab bar" was a single product, so a grab bar beside a
+cylinder drew a lever nobody chose.
+
+What it costs is recorded rather than hidden: a bar clearing an Almog swan-neck
+stands 0.30 of the leaf's width in, so the geometric GLASS rules refuse more
+window combinations than before. Those stay — a bar across a pane is a
+different claim from a bar beside a lever.
 
 `repair()` moves a design to the nearest buildable one and says what changed.
 It must be idempotent, and it must always LAND somewhere buildable — asserting
