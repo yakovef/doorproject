@@ -9,6 +9,8 @@ import {
   detailGlyph, glazingGlyph, grilleGlyph, handleGlyph, LIGHT,
   locksetGlyph, render, sizeGlyph, windowGlyph,
 } from '../js/renderer.js';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { conflicts, repair } from '../js/rules.js';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 
@@ -729,6 +731,40 @@ group('rules: nothing unbuildable can be reached');
   for (const st of everyState()) { ok(buildable(st), `everyState yielded an unbuildable door`); break; }
 
   console.log(`  (${n} designs repaired and re-checked)`);
+}
+
+// ── 9. A deploy has to reach the person looking at it ─────────────
+/* The newest instance of the family in CLAUDE.md §5, and the first one
+   reported by the owner rather than by an instrument.
+
+   `index.html` linked `css/app.css` and `assets/bundle.js` by bare name. Those
+   two files ARE the site, so a returning browser served its cached copies and
+   a deploy that replaced the entire interface arrived looking identical.
+   Nothing was broken: GitHub Pages had built and published the new commit
+   inside a minute, and the old files were simply the ones being asked for.
+
+   `tools/build.mjs` now stamps each reference with a hash of the file's own
+   contents. This asserts the stamp is PRESENT and CURRENT — a stale hash is
+   worse than none, because it looks deliberate. */
+group('a new build reaches a browser that has been here before');
+{
+  const html = readFileSync('index.html', 'utf8');
+  const stamp = f => createHash('sha256').update(readFileSync(f)).digest('hex').slice(0, 8);
+  for (const [asset, re] of [
+    ['css/app.css', /href="css\/app\.css(\?v=([0-9a-f]+))?"/],
+    ['assets/bundle.js', /src="assets\/bundle\.js(\?v=([0-9a-f]+))?"/],
+  ]) {
+    const m = re.exec(html);
+    ok(m, `index.html no longer references ${asset} — this check is dead`);
+    if (!m) continue;
+    ok(m[2], `${asset} is linked with no ?v= — a returning browser will use its cached copy `
+           + 'and the deploy will look like nothing happened');
+    if (m[2]) {
+      ok(m[2] === stamp(asset),
+         `${asset} is stamped ?v=${m[2]} but its contents hash to ${stamp(asset)} — `
+       + 'run npm run build before committing, or the stamp is a lie');
+    }
+  }
 }
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} passed, ${fail} failed\n`);
