@@ -16,7 +16,9 @@
     "recreate": "node tools/recreate.mjs",
     "audit": "node tools/audit.mjs",
     "glass": "node tools/glass.mjs",
-    "mottle": "node tools/mottle.mjs"
+    "mottle": "node tools/mottle.mjs",
+    "leaf": "node tools/leaf.mjs",
+    "triage": "node tools/triage.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

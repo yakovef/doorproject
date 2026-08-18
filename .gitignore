@@ -4,3 +4,10 @@ research/works/works.mhtml
 
 # scratch harnesses, not part of the toolkit
 tools/_*.mjs
+
+# Contact sheets: 17 MB, and every one is a pure function of the photographs
+# plus `npm run triage`. What is worth keeping from that pass is the READING
+# of them (research/works/INVENTORY.md) and the descriptors they were ordered
+# by (research/works/auto/), and both of those are committed.
+screenshots/sheet-*.png
+screenshots/leaf-check.png
