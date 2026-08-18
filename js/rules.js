@@ -44,8 +44,8 @@
  * state the interface would not let you build.
  */
 
-import { byId, DETAILS, FINISHES, GLAZINGS, GRILLES, HANDLES, SIZES, WINDOWS } from './catalog.js';
-import { gripClashesGlass } from './renderer.js';
+import { byId, DETAILS, FINISHES, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { gripClashesGlass, gripClashesLockset, locksetClashesGlass, plateRoom } from './renderer.js';
 
 /** Does this detail put ruled line work on the face? */
 export const isLineWork = detail => !!(detail.strips || detail.groove);
@@ -66,6 +66,31 @@ export const isLineWork = detail => !!(detail.strips || detail.groove);
 export const leafGlazed = state => byId(WINDOWS, state.window).rects.length > 0;
 export const isGlazed = state =>
   leafGlazed(state) || !!(SIZES[state.size] || {}).sideGlazed;
+
+/** Would this lockset fit this design, glass and grip both considered? */
+const locksetFits = (state, id) =>
+  !locksetClashesGlass({ ...state, lockset: id }) && !gripClashesLockset({ ...state, lockset: id });
+
+/**
+ * The lockset to fall back on when the chosen one has nowhere to go, or null
+ * when NOTHING fits.
+ *
+ * Cylinder first: it is the shallowest fitting in the range bar the smart lock
+ * and it is what eight of the ten installed bar doors carry, so falling back
+ * to it is falling back to the commonest lock furniture Peretz sells rather
+ * than to an upsell.
+ *
+ * The null case is the one that mattered. `repair` used to answer "become the
+ * cylinder" unconditionally, and on a narrow leaf with two lights the cylinder
+ * does not fit either — the outboard light sits directly over the lock
+ * position — so it set the lockset to the value it already held, reported a
+ * change, and handed back a door that was still unbuildable. Round and round.
+ */
+export function fallbackLockset(state) {
+  if (locksetFits(state, 'cylinder')) return 'cylinder';
+  const k = LOCKSETS.find(x => locksetFits(state, x.id));
+  return k ? k.id : null;
+}
 
 /**
  * Every option that cannot be chosen from where the design currently stands,
@@ -108,14 +133,86 @@ export function conflicts(state) {
     for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = 'לא משלבים חלון עם קווי מתכת';
   }
 
+  /* OBSERVED, and the clearest count in the whole corpus: of the TEN doors
+     carrying a pull bar, NOT ONE has a lever beside it. Eight have a plain
+     cylinder escutcheon and two have a smart lock. It is obvious once seen —
+     the bar IS the handle, so the outside face needs a keyway and nothing
+     more, and a lever there is both redundant and physically in the way.
+     Reported from the outside on three screenshots of a lever drawn straight
+     through a pull bar. Both directions, so whichever tile is being looked at
+     explains itself. */
+  const leverNames = LOCKSETS.filter(k => k.lever).map(k => k.he).join(' / ');
+  if (grip.pull) {
+    for (const k of LOCKSETS) {
+      if (k.lever) out.lockset[k.id] = 'לא מתקינים ידית מסתובבת עם ידית משיכה';
+    }
+  }
+  if (byId(LOCKSETS, state.lockset).lever) {
+    for (const h of HANDLES) {
+      if (h.pull) out.handle[h.id] = `לא משלבים עם ${leverNames}`;
+    }
+  }
+
   /* GEOMETRIC: a grip that would have to be drawn across the glass. Asked of
      the renderer's own arithmetic rather than listed here, so it stays true
      when a window size or a bar section changes. */
   for (const h of HANDLES) {
-    if (h.style === 'none') continue;
+    if (h.style === 'none' || out.handle[h.id]) continue;
     if (gripClashesGlass({ ...state, handle: h.id })) {
       out.handle[h.id] = 'אין מקום בין המנעול לחלון';
     }
+  }
+
+  /* GEOMETRIC: the LOCKSET's own reach against the glazing. Only the grip was
+     ever checked here; a lever reaches 152 mm inboard and the Almog swan-neck
+     220, and on a narrow leaf with a tall light the moulding starts at 131. */
+  for (const k of LOCKSETS) {
+    if (locksetClashesGlass({ ...state, lockset: k.id })) {
+      out.lockset[k.id] = out.lockset[k.id] || 'אין מקום בין המנעול לחלון';
+    }
+  }
+
+  /* GEOMETRIC: the grab bar's bow against a long lever, which only bites on a
+     narrow leaf — the bow is centred and does not move out of the way. */
+  for (const k of LOCKSETS) {
+    if (gripClashesLockset({ ...state, lockset: k.id })) {
+      out.lockset[k.id] = out.lockset[k.id] || 'אין מקום בין המאחז למנעול';
+    }
+  }
+  for (const h of HANDLES) {
+    if (gripClashesLockset({ ...state, handle: h.id })) {
+      out.handle[h.id] = out.handle[h.id] || 'אין מקום בין המאחז למנעול';
+    }
+  }
+
+  /* GEOMETRIC: a window that leaves no lockset anywhere to go at all.
+     On the narrow 800 mm leaf the outboard light of `duo` reaches to within
+     100 mm of the closing edge, and the escutcheon alone — 60 mm backset plus
+     a 33 mm radius, before the moulding round the pane — needs more than that.
+     No lock furniture we make is small enough, so it is the WINDOW that is
+     unbuildable here and not the lockset, and both directions have to say so:
+     the customer may have chosen either one first. */
+  for (const w of WINDOWS) {
+    if (out.window[w.id] || !w.rects.length) continue;
+    if (!fallbackLockset({ ...state, window: w.id })) out.window[w.id] = 'אין מקום למנעול לצד החלון';
+  }
+  for (const key of Object.keys(SIZES)) {
+    if (!fallbackLockset({ ...state, size: key })) out.size[key] = 'אין מקום למנעול לצד החלון';
+  }
+
+  /* GEOMETRIC: the horizontal grab bar is centred on the LEAF, not on the
+     stile, so it runs straight across a centred window. Every one of the nine
+     installed grab bars is on a solid or panelled leaf. */
+  const bandTop = 0.42, bandBot = 0.60;              // the bar's own height band
+  const acrossCentre = win => win.rects.some(r =>
+    r.top / 2050 < bandBot && (r.top + r.h) / 2050 > bandTop
+    && Math.abs(r.dx || 0) < r.w / 2 + 60);
+  if (acrossCentre(byId(WINDOWS, state.window))) {
+    const grab = HANDLES.find(h => h.style === 'grab');
+    if (grab) out.handle[grab.id] = 'המאחז חוצה את החלון';
+  }
+  if (byId(HANDLES, state.handle).style === 'grab') {
+    for (const w of WINDOWS) if (acrossCentre(w)) out.window[w.id] = 'המאחז חוצה את החלון';
   }
 
   /* GEOMETRIC: the letterplate sits at 0.80 of leaf height. A window that
@@ -135,6 +232,14 @@ export function conflicts(state) {
      `duo` deliberately survives this: its two lights sit either side of the
      centre and leave the middle of the leaf clear, which is exactly where the
      peephole goes. */
+  /* GEOMETRIC: a plate needs a minimum width to be the thing it is. A letter
+     is 220 mm across and a nameplate below 160 mm has nowhere to put a name.
+     The drawing centres both in whatever space the grip leaves, so this only
+     bites where that space has run out. */
+  const room = plateRoom(state);
+  if (room < 220) out.addons.mail = out.addons.mail || 'אין רוחב לפתח דואר';
+  if (room < 160) out.addons.nameplate = 'אין רוחב לשלט';
+
   const eye = (2050 - 1600) / 2050;                      // PEEPHOLE_AFF, from the top
   const blocksEye = win.rects.some(r =>
     r.top / 2050 < eye && (r.top + r.h) / 2050 > eye
@@ -186,13 +291,37 @@ export function repair(state, intent = null) {
     else { s.detail = 'plain'; changed.push('detail'); }
   }
 
-  /* Only once ALL the glass is gone. Taking the leaf's window away on a
-     sidelight door leaves a glazed panel still standing beside it, and
-     clearing its grille and its glass treatment there would be throwing away
-     two things the customer chose and can still see. */
-  if (!isGlazed(s)) {
-    if (s.grille !== 'none') { s.grille = 'none'; changed.push('grille'); }
-    if (s.glazing && s.glazing !== 'clear') { s.glazing = 'clear'; changed.push('glazing'); }
+  /* A pull bar and a lever cannot share a door. Which one yields depends on
+     what was just asked for, and the LOCKSET is the one with somewhere to go:
+     `cylinder` is what eight of the ten installed bar doors carry, so the
+     customer keeps the bar they chose and the lever becomes the keyway that
+     really goes with it. */
+  if (byId(HANDLES, s.handle).pull && byId(LOCKSETS, s.lockset).lever) {
+    if (intent === 'lockset') { s.handle = 'none'; changed.push('handle'); }
+    else { s.lockset = 'cylinder'; changed.push('lockset'); }
+  }
+
+  /* The grab bar is centred on the leaf and runs across a centred window. */
+  if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === 'grab') {
+    if (intent === 'handle') { s.window = 'none'; changed.push('window'); }
+    else { s.handle = 'none'; changed.push('handle'); }
+  }
+
+  /* A lockset with nowhere to go becomes the smallest one that has somewhere
+     — normally the cylinder, which is what eight of the ten bar doors carry.
+     And when NOTHING fits, the glass is what yields: every door needs a lock,
+     not every door needs a window. */
+  if (locksetClashesGlass(s) || gripClashesLockset(s)) {
+    if (intent === 'lockset') { s.handle = 'none'; s.window = 'none'; changed.push('window'); }
+    else {
+      const k = fallbackLockset(s);
+      if (k) { s.lockset = k; changed.push('lockset'); }
+      else { s.window = 'none'; changed.push('window'); }
+    }
+    /* The grab bar's bow is centred on the LEAF, so taking the window away
+       does not move it out of the lockset's way. If the pair still does not
+       fit after all that, the grip is the last thing left to give. */
+    if (gripClashesLockset(s)) { s.handle = 'none'; changed.push('handle'); }
   }
 
   /* A grip with nowhere to go loses the grip, never the window: the window is
@@ -200,6 +329,19 @@ export function repair(state, intent = null) {
   if (gripClashesGlass(s)) {
     if (intent === 'handle') { s.window = 'none'; changed.push('window'); }
     else { s.handle = 'none'; changed.push('handle'); }
+  }
+
+  /* LAST, and only once ALL the glass is gone. This used to run straight after
+     the line-work repair, which was too early: three of the repairs below it
+     can also take the window away, and when one of them did, the grille and
+     the obscure glass stayed behind with nothing left to be applied to — a
+     door `repair` had just declared repaired and `conflicts` still refused.
+     Taking the leaf's window away on a sidelight door is different: a glazed
+     panel is still standing beside it, so the grille and the glass treatment
+     the customer chose are still visible and still theirs. */
+  if (!isGlazed(s)) {
+    if (s.grille !== 'none') { s.grille = 'none'; changed.push('grille'); }
+    if (s.glazing && s.glazing !== 'clear') { s.glazing = 'clear'; changed.push('glazing'); }
   }
 
   /* A grip supplied in one finish only settles the finish FIELD, not just the
@@ -231,7 +373,8 @@ export const repairSaid = changed => ({
   detail: 'הסרנו את קווי המתכת — לא משלבים אותם עם חלון',
   grille: 'הסרנו את הסורג — אין חלון',
   glazing: 'החזרנו זכוכית שקופה — אין חלון',
-  handle:  'הסרנו את ידית המשיכה — אין לה מקום ליד החלון',
+  handle:  'הסרנו את ידית המשיכה — אין לה מקום כאן',
+  lockset: 'החלפנו לצילינדר בלבד — לא מתקינים ידית מסתובבת עם ידית משיכה',
   finish:  'התאמנו את הגימור — הידית מגיעה בגימור אחד בלבד',
   addons:  'הסרנו תוספת שאין לה מקום ליד החלון',
 }[changed[0]] || null);

@@ -42,7 +42,14 @@ export const DEFAULTS = {
   glazing: 'clear',
   grille:  'none',
   handle:  'idan',
-  lockset: 'coral',
+  /* CYLINDER, not the lever it was. The default door carries a pull bar, and
+     of the ten installed doors that carry one, eight have exactly this beside
+     it and not one has a lever — so the old default was a door the rules now
+     refuse, and the DEFAULTS-is-buildable assertion caught it the moment the
+     rule landed. Second time that assertion has earned its keep in two
+     commits, which is a fair argument for writing tests about the boring
+     starting state and not only about the interesting edges. */
+  lockset: 'cylinder',
   detail:  'plain',
   finish:  'steel',
   size:    'standard',

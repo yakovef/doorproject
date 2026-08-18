@@ -69,9 +69,10 @@
       w: 32,
       style: "bar",
       bar: "idan",
+      pull: true,
       aliases: ["bar-long", "luna"]
     },
-    { id: "ella", he: "אלה", en: "Ella", delta: 38e3, len: 900, w: 34, style: "bar", bar: "ella" },
+    { id: "ella", he: "אלה", en: "Ella", delta: 38e3, len: 900, w: 34, style: "bar", bar: "ella", pull: true },
     {
       id: "nitzan",
       he: "ניצן",
@@ -81,6 +82,7 @@
       w: 26,
       style: "bar",
       bar: "nitzan",
+      pull: true,
       aliases: ["bar-short"]
     },
     {
@@ -92,9 +94,10 @@
       w: 30,
       style: "bar",
       bar: "shahar",
+      pull: true,
       aliases: ["bar-flat"]
     },
-    { id: "ron", he: "רון", en: "Ron", delta: 28e3, len: 900, w: 16, style: "bar", bar: "ron" },
+    { id: "ron", he: "רון", en: "Ron", delta: 28e3, len: 900, w: 16, style: "bar", bar: "ron", pull: true },
     /* The ornate pull, the horizontal bow, and the recess. */
     {
       id: "shiran",
@@ -103,6 +106,7 @@
       delta: 52e3,
       len: 0,
       style: "shiran",
+      pull: true,
       finish: "brass"
     },
     {
@@ -121,7 +125,8 @@
       delta: 4e4,
       len: 1554,
       inset: 0.3,
-      style: "channel"
+      style: "channel",
+      pull: true
     },
     /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
        the tubes: a wide rectangular ribbon standing off the leaf, catching the
@@ -137,11 +142,22 @@
       len: 1e3,
       w: 62,
       style: "bar",
-      bar: "blade"
+      bar: "blade",
+      pull: true
     }
   ];
   var LOCKSETS = [
-    { id: "coral", he: "קורל", en: "Coral", delta: 0, style: "lever", aliases: ["lever"] },
+    { id: "coral", he: "קורל", en: "Coral", delta: 0, style: "lever", aliases: ["lever"], lever: true },
+    /* Cylinder only: a keyway escutcheon and nothing else.
+       This is the commonest lock furniture in the whole corpus on the doors that
+       matter most, and it was not offered. Of the TEN doors carrying a pull bar,
+       EIGHT have exactly this beside it and the other two have a smart lock.
+       Not one of the ten has a lever — which makes sense the moment you see it:
+       the bar IS the handle. You pull the door open by the bar, so the outside
+       face needs a keyway and nothing more. A lever there would be redundant,
+       and it is also physically in the way, which is what the configurator was
+       drawing. */
+    { id: "cylinder", he: "צילינדר בלבד", en: "Cylinder only", delta: 0, style: "cylinder", lock: true },
     /* `longplate` is retired one commit after it was added, and the reason is
        worth keeping. It went in because six doors on the hardware contact sheet
        looked like they carried a plate running a third of the stile. Measured
@@ -162,11 +178,12 @@
       delta: 6e3,
       style: "plate",
       lock: true,
+      lever: true,
       aliases: ["longplate"]
     },
     { id: "cadoor", he: "כדור", en: "Cadoor", delta: 4e3, style: "cadoor" },
     { id: "sapir", he: "ספיר", en: "Sapir", delta: 1e4, style: "sapir" },
-    { id: "almog", he: "אלמוג", en: "Almog", delta: 16e3, style: "almog" },
+    { id: "almog", he: "אלמוג", en: "Almog", delta: 16e3, style: "almog", lever: true },
     /* Knob on a long backplate — the bronze fitting on d092, named three times
        across the luxury tier. A different object from a knob on a rose: the
        plate carries the keyway too, so it locks like the Rotem backplate. */
@@ -199,12 +216,17 @@
     /* Two square backplates stacked, lever on the upper — four doors (d032 d037
        d059 d066). A whole hardware family in squares rather than rounds, and
        nothing else in the range looks remotely like it. */
+    /* `lock: true` — the LOWER square carries the cylinder, which is what d032
+       and d037 show. Without it a separate round escutcheon was drawn on top
+       of the plates, 22 x 22 mm into them, on every square-backplate door. */
     {
       id: "square",
       he: "ריבועי",
       en: "Square backplates",
       delta: 12e3,
-      style: "square"
+      style: "square",
+      lever: true,
+      lock: true
     }
   ];
   var GLAZINGS = [
@@ -416,6 +438,7 @@
   var LEVER_ROSETTE = 30;
   var LEVER_REACH = 145;
   var LOCK_CLEAR = 15;
+  var APERTURE_MOULD = 40;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
   var GRAB = { fromTop: 0.585, len: 0.3, ratio: 1 / 15, boss: 17 };
@@ -520,7 +543,7 @@
     const mainX = sideW && !hingeOnLeft ? x0 + sideW + MULLION : x0;
     const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
     const mainX1 = mainX + leafW;
-    const backset = lockBackset(handle);
+    const backset = lockBackset(handle, lockset);
     const lockX = hingeOnLeft ? mainX1 - backset : mainX + backset;
     const inward = hingeOnLeft ? -1 : 1;
     const hingeX = hingeOnLeft ? mainX : mainX1;
@@ -531,9 +554,14 @@
       x: centreX + Math.min(...win.rects.map((r) => (r.dx || 0) - r.w / 2)),
       x1: centreX + Math.max(...win.rects.map((r) => (r.dx || 0) + r.w / 2))
     } : null;
-    const glassEdge = winSpan ? Math.abs((hingeOnLeft ? winSpan.x1 : winSpan.x) - lockX) : Infinity;
-    const standoff = gripStandoff(handle, lockset, leafW, leafH, glassEdge);
+    const standoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
     const handleX = lockX + inward * standoff;
+    const plate = (() => {
+      const foot = handleFootprint(handle, leafH);
+      const inner = foot.vy ? handleX + inward * (foot.in + 30) : hingeX - inward * leafW;
+      const lo = Math.min(hingeX, inner), hi = Math.max(hingeX, inner);
+      return { cx: (lo + hi) / 2, room: plateRoom(state2) };
+    })();
     const addonY = (aff, clear) => {
       const want = y(aff);
       if (!winSpan || want - leafH * clear > winBottom || want + leafH * clear < y0 + (win.rects[0] ? win.rects[0].top : 0)) return want;
@@ -1253,11 +1281,17 @@
        window would be in the way the add-on moves below it rather than being
        dropped — a thing that silently disappears is this codebase's oldest
        failure mode (CLAUDE.md §5) and the peephole was an instance of it. -->
+  <!-- Centred add-ons are centred on the space that is FREE, not on the leaf.
+       A recessed channel runs almost the leaf's full height 255 mm in from the
+       closing edge, and on a narrow leaf a 300 mm letterplate centred on the
+       leaf runs straight into it — 26 designs, found by npm run collide once
+       it started measuring the drawing rather than the declared boxes.
+       A fitter would put the plate in the space that is left, so this does. -->
   <g id="addons">
     ${has("peep") ? peephole(centreX, addonY(PEEPHOLE_AFF, 0.09)) : ""}
     ${has("knocker") ? knocker(centreX, addonY(1560, 0.13), tone) : ""}
-    ${has("nameplate") ? nameplate(centreX, addonY(1730, 0.09), tone) : ""}
-    ${has("mail") ? letterplate(centreX, y0 + leafH * 0.8, tone) : ""}
+    ${has("nameplate") ? nameplate(plate.cx, addonY(1730, 0.09), tone, plate.room) : ""}
+    ${has("mail") ? letterplate(plate.cx, y0 + leafH * 0.8, tone, plate.room) : ""}
     ${has("closer") ? doorCloser(hingeX, y0 + leafH * 0.045, hingeOnLeft ? 1 : -1, tone) : ""}
   </g>
 
@@ -1489,7 +1523,7 @@ ${body}
   }
   function aperture({ x, y, w, h, paint: paint2, edge, grille, glazing, key }) {
     const glass = glazingArt(glazing, x, y, w, h, paint2);
-    const M = 40;
+    const M = APERTURE_MOULD;
     const id = `cl-${key}`;
     return `
     <g data-pane="${key}" data-glazing="${glazing || "clear"}">
@@ -1594,41 +1628,51 @@ ${body}
   function handleFootprint(handle, leafH) {
     switch (handle.style) {
       case "none":
-        return { hx: 0, vy: 0 };
+        return { out: 0, in: 0, vy: 0 };
       case "channel":
-        return { hx: 21, vy: channelHalf(handle.len, leafH) };
+        return { out: 21, in: 21, vy: channelHalf(handle.len, leafH) };
+      /* The bow is centred on the LEAF, not on the grip's own axis, so almost
+         all of it lies inboard — 416 mm of it. */
       case "grab":
-        return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
+        return { out: 40, in: 416, vy: 115 };
       case "lever":
-        return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE, reach: LEVER_REACH };
+        return { out: 40, in: 152, vy: 51 };
       case "plate":
-        return { hx: PLATE.w / 2, vy: PLATE.h / 2, reach: PLATE.w * PLATE.reach };
+        return { out: 47, in: 119, vy: 129 };
       case "almog":
-        return { hx: 39, vy: 39, reach: 39 * 2 * 2.8 };
+        return { out: 42, in: 220, vy: 42 };
       case "cadoor":
-        return { hx: 34, vy: 40 };
+        return { out: 78, in: 41, vy: 48 };
       case "sapir":
-        return { hx: 36, vy: 36 };
+        return { out: 36, in: 74, vy: 43 };
       case "knobplate":
-        return { hx: 48, vy: 150 };
+        return { out: 53, in: 48, vy: 153 };
+      case "cylinder":
+        return { out: LOCK_R + 8, in: LOCK_R + 8, vy: LOCK_R + 8 };
       case "digital":
-        return { hx: 28, vy: 113 };
+        return { out: 28, in: 33, vy: 116 };
       case "square":
-        return { hx: 41, vy: 95, reach: LEVER_REACH };
+        return { out: 41, in: 152, vy: 99 };
       case "shiran":
-        return { hx: 44, vy: 240 };
-      default:
-        return { hx: (handle.w || 30) / 2, vy: barHalf(handle.len, leafH) };
+        return { out: 43, in: 43, vy: 240 };
+      default: {
+        const w = handle.w || 30;
+        return {
+          out: Math.max(29, w * 1.15),
+          in: Math.max(36, w * 1.15),
+          vy: barHalf(handle.len, leafH)
+        };
+      }
     }
   }
   function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) {
     const grip = handleFootprint(handle, leafH);
-    if (!grip.vy && !grip.hx) return 0;
+    if (!grip.vy && !grip.out) return 0;
     const lock = handleFootprint(lockset, leafH);
-    const body = lock.hx + grip.hx + LOCK_CLEAR;
+    const body = lock.in + grip.out + LOCK_CLEAR;
     const floor = Math.max(body, leafW * BAR_GAP_MIN);
-    const want = handle.inset ? leafW * handle.inset - lockBackset(handle) : grip.vy > 200 ? leafW * BAR_GAP : 0;
-    const room = toGlass - grip.hx - LOCK_CLEAR;
+    const want = handle.inset ? leafW * handle.inset - lockBackset(handle, lockset) : grip.vy > 200 ? Math.max(leafW * BAR_GAP, body) : 0;
+    const room = toGlass - grip.in - LOCK_CLEAR;
     return Math.round(Math.max(floor, Math.min(want, room), 0));
   }
   function glassClearance(state2) {
@@ -1641,22 +1685,55 @@ ${body}
       const lo = leafW / 2 + (r.dx || 0) - r.w / 2, hi = leafW / 2 + (r.dx || 0) + r.w / 2;
       return hingeOnLeft ? leafW - hi : lo;
     });
-    return Math.min(...u) - lockBackset(byId(HANDLES, state2.handle));
+    return Math.min(...u) - APERTURE_MOULD - lockBackset(byId(HANDLES, state2.handle), byId(LOCKSETS, state2.lockset));
   }
   function gripClashesGlass(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const handle = byId(HANDLES, state2.handle);
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const grip = handleFootprint(handle, leafH);
-    if (!grip.vy && !grip.hx) return false;
+    if (!grip.vy && !grip.out) return false;
     const lock = handleFootprint(byId(LOCKSETS, state2.lockset), leafH);
-    const floor = Math.max(lock.hx + grip.hx + LOCK_CLEAR, leafW * BAR_GAP_MIN);
-    const room = glassClearance(state2) - grip.hx - LOCK_CLEAR;
+    const floor = Math.max(lock.in + grip.out + LOCK_CLEAR, leafW * BAR_GAP_MIN);
+    const room = glassClearance(state2) - grip.in - LOCK_CLEAR;
     return floor > room;
   }
-  function lockBackset(handle) {
+  function plateRoom(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const handle = byId(HANDLES, state2.handle);
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const foot = handleFootprint(handle, leafH);
+    if (!foot.vy) return leafW - 70;
+    const standoff = gripStandoff(
+      handle,
+      byId(LOCKSETS, state2.lockset),
+      leafW,
+      leafH,
+      glassClearance(state2)
+    );
+    const inner = lockBackset(handle, byId(LOCKSETS, state2.lockset)) + standoff + foot.in + 30;
+    return Math.max(0, leafW - inner - 70);
+  }
+  function locksetClashesGlass(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const lock = handleFootprint(byId(LOCKSETS, state2.lockset), size.h - REBATE);
+    return lock.in + LOCK_CLEAR > glassClearance(state2);
+  }
+  function gripClashesLockset(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const handle = byId(HANDLES, state2.handle);
+    if (handle.style !== "grab") return false;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const grip = handleFootprint(handle, leafH);
+    const lock = handleFootprint(byId(LOCKSETS, state2.lockset), leafH);
+    const bowNear = leafW / 2 - (grip.in - 40) / 2;
+    return lockBackset(handle, byId(LOCKSETS, state2.lockset)) + lock.in + LOCK_CLEAR > bowNear;
+  }
+  function lockBackset(handle, lockset) {
     const grip = handleFootprint(handle, 2e3);
-    return grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
+    const base = grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
+    const out = lockset ? handleFootprint(lockset, 2e3).out : 0;
+    return Math.max(base, out + 10);
   }
   var GRIP_ART = {
     none: () => "",
@@ -1673,7 +1750,10 @@ ${body}
     knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
     sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir),
     digital: (h, g) => digitalLock(g.cx, g.cy, g.dir),
-    square: (h, g) => squarePlates(g.cx, g.cy, g.dir)
+    square: (h, g) => squarePlates(g.cx, g.cy, g.dir),
+    /* Cylinder only: the escutcheon IS the lockset. Eight of the ten doors that
+       carry a pull bar have exactly this beside it and nothing more. */
+    cylinder: (h, g) => cylinder(g.cx, g.cy, true)
   };
   function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0) {
     const draw = GRIP_ART[handle.style];
@@ -1682,14 +1762,15 @@ ${body}
     if (!art) return "";
     const foot = handleFootprint(handle, leafH);
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}">${art}</g>`;
+             data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
+             data-vy="${foot.vy}">${art}</g>`;
   }
   function locksetArt(lockset, cx, cy, dir) {
     const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
     const foot = handleFootprint(lockset, 0);
     return `<g data-hw="lockset" data-style="${lockset.style}"
-             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
-             data-reach="${Math.round(foot.reach || 0)}"
+             data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
+             data-vy="${foot.vy}"
              data-carries-lock="${!!lockset.lock}">${draw(lockset, { cx, cy, dir })}</g>`;
   }
   var channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
@@ -2033,6 +2114,10 @@ ${body}
       ${plate(topY)}
       ${plate(topY + S + gap)}
       ${lever(cx, cy, dir)}
+      <!-- the keyway is IN the lower plate, which is what d032 and d037 show.
+           Drawing it as a separate round escutcheon put a disc across the
+           square, 22 mm into it, on every door with this fitting. -->
+      ${keyway(cx, topY + S + gap + S / 2)}
     </g>`;
   }
   function cadoorKnob(cx, cy, dir) {
@@ -2042,9 +2127,15 @@ ${body}
     <g>
       <ellipse cx="${cx + dir * 5}" cy="${cy + 9}" rx="${rx}" ry="${ry}"
                fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      <!-- the shank, seen almost edge-on and mostly hidden by the ball -->
-      <rect x="${cx - dir * rx * 1.1}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
-            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"/>
+      <!-- The shank, seen almost edge-on and mostly hidden by the ball. It
+           used to be drawn on the OUTBOARD side, which put 78 mm of knob
+           beyond a 49 mm backset — 29 mm of it hanging off the closing edge of
+           the door. Invisible until the footprints were measured off the art
+           instead of asserted. It points inboard now, which is also where the
+           spindle goes. -->
+      <rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
+            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"
+            transform="${dir < 0 ? `translate(${-rx * 1.2} 0)` : ""}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
                transform="rotate(${tilt} ${cx} ${cy})"/>
       <!-- the terminator: a hard bright band over a dark one, not a gradient -->
@@ -2220,8 +2311,8 @@ ${body}
           stroke-opacity="0.22" stroke-width="1.8"/>
     <circle cx="${cx}" cy="${cy}" r="${R * 0.16}" fill="#1A1D20"/>`;
   };
-  function letterplate(cx, cy, tone) {
-    const w = 300, h = 78, r = 8;
+  function letterplate(cx, cy, tone, room = Infinity) {
+    const w = Math.min(300, room), h = 78, r = 8;
     const x = cx - w / 2, y = cy - h / 2;
     return `
     <g data-addon="mail" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
@@ -2278,8 +2369,8 @@ ${body}
               fill="${tone[1]}"/>
     </g>`;
   }
-  function nameplate(cx, cy, tone) {
-    const w = 260, h = 86;
+  function nameplate(cx, cy, tone, room = Infinity) {
+    const w = Math.min(260, room), h = 86;
     const x = cx - w / 2, y = cy - h / 2;
     return `
     <g data-addon="nameplate" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
@@ -2316,11 +2407,12 @@ ${body}
         <rect x="-2" y="-8" width="4" height="1.6" fill="#6B7075" opacity="0.8"/>
         <rect x="-2" y="-4" width="3" height="1.4" fill="#6B7075" opacity="0.7"/>
       </g>`;
-  var cylinder = (cx, cy) => {
+  var cylinder = (cx, cy, owned = false) => {
     const R = LOCK_R;
     const kx = cx, ky = cy + 2;
     return `
-    <g data-hw="lock" data-kind="cylinder" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+    <g data-hw="lock"${owned ? ' data-owner="lockset"' : ""} data-kind="cylinder"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       ${disc(cx, cy, R)}
       <!-- The escutcheon is DOMED, not a flat plate. On d026 and d030 it is
            plainly a little hemisphere standing off the door with a highlight
@@ -2429,6 +2521,15 @@ ${body}
     lever: () => ({ box: [-172, -48, 52, 48], art: `
     <circle cx="0" cy="0" r="39"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>` }),
+    /* Cylinder only: an escutcheon with a euro keyway and nothing else. It had
+       no entry here, so it fell to the `else` branch and drew a lever — the
+       picture of the one lockset it exists to be an alternative to. Same shape
+       as the door draws, at tile scale. */
+    cylinder: () => ({ box: [-52, -52, 52, 52], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <path d="M -12 -16 a 12 12 0 1 1 24 0 l 3.6 30 a 4.4 4.4 0 0 1 -4.4 4.8
+             h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper)"/>
+    <path d="M -4 -18 a 4 4 0 1 1 8 0 l 1.4 24 h -10.8 Z"/>` }),
     // Almog: swan-neck, raked 15 degrees up, and thicker at the tip than the root.
     almog: () => ({ box: [-244, -62, 52, 46], art: `
     <circle cx="0" cy="0" r="39"/>
@@ -2618,6 +2719,12 @@ ${body}
   var isLineWork = (detail) => !!(detail.strips || detail.groove);
   var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
   var isGlazed = (state2) => leafGlazed(state2) || !!(SIZES[state2.size] || {}).sideGlazed;
+  var locksetFits = (state2, id) => !locksetClashesGlass({ ...state2, lockset: id }) && !gripClashesLockset({ ...state2, lockset: id });
+  function fallbackLockset(state2) {
+    if (locksetFits(state2, "cylinder")) return "cylinder";
+    const k = LOCKSETS.find((x) => locksetFits(state2, x.id));
+    return k ? k.id : null;
+  }
   function conflicts(state2) {
     const glazed = isGlazed(state2);
     const onLeaf = leafGlazed(state2);
@@ -2652,15 +2759,60 @@ ${body}
     if (lined) {
       for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = "לא משלבים חלון עם קווי מתכת";
     }
+    const leverNames = LOCKSETS.filter((k) => k.lever).map((k) => k.he).join(" / ");
+    if (grip.pull) {
+      for (const k of LOCKSETS) {
+        if (k.lever) out.lockset[k.id] = "לא מתקינים ידית מסתובבת עם ידית משיכה";
+      }
+    }
+    if (byId(LOCKSETS, state2.lockset).lever) {
+      for (const h of HANDLES) {
+        if (h.pull) out.handle[h.id] = `לא משלבים עם ${leverNames}`;
+      }
+    }
     for (const h of HANDLES) {
-      if (h.style === "none") continue;
+      if (h.style === "none" || out.handle[h.id]) continue;
       if (gripClashesGlass({ ...state2, handle: h.id })) {
         out.handle[h.id] = "אין מקום בין המנעול לחלון";
       }
     }
+    for (const k of LOCKSETS) {
+      if (locksetClashesGlass({ ...state2, lockset: k.id })) {
+        out.lockset[k.id] = out.lockset[k.id] || "אין מקום בין המנעול לחלון";
+      }
+    }
+    for (const k of LOCKSETS) {
+      if (gripClashesLockset({ ...state2, lockset: k.id })) {
+        out.lockset[k.id] = out.lockset[k.id] || "אין מקום בין המאחז למנעול";
+      }
+    }
+    for (const h of HANDLES) {
+      if (gripClashesLockset({ ...state2, handle: h.id })) {
+        out.handle[h.id] = out.handle[h.id] || "אין מקום בין המאחז למנעול";
+      }
+    }
+    for (const w of WINDOWS) {
+      if (out.window[w.id] || !w.rects.length) continue;
+      if (!fallbackLockset({ ...state2, window: w.id })) out.window[w.id] = "אין מקום למנעול לצד החלון";
+    }
+    for (const key of Object.keys(SIZES)) {
+      if (!fallbackLockset({ ...state2, size: key })) out.size[key] = "אין מקום למנעול לצד החלון";
+    }
+    const bandTop = 0.42, bandBot = 0.6;
+    const acrossCentre = (win2) => win2.rects.some((r) => r.top / 2050 < bandBot && (r.top + r.h) / 2050 > bandTop && Math.abs(r.dx || 0) < r.w / 2 + 60);
+    if (acrossCentre(byId(WINDOWS, state2.window))) {
+      const grab = HANDLES.find((h) => h.style === "grab");
+      if (grab) out.handle[grab.id] = "המאחז חוצה את החלון";
+    }
+    if (byId(HANDLES, state2.handle).style === "grab") {
+      for (const w of WINDOWS) if (acrossCentre(w)) out.window[w.id] = "המאחז חוצה את החלון";
+    }
     const win = byId(WINDOWS, state2.window);
     const reach = win.rects.length ? Math.max(...win.rects.map((r) => (r.top + r.h) / 2050)) : 0;
     if (reach > 0.74) out.addons.mail = "החלון מגיע נמוך מדי";
+    const room = plateRoom(state2);
+    if (room < 220) out.addons.mail = out.addons.mail || "אין רוחב לפתח דואר";
+    if (room < 160) out.addons.nameplate = "אין רוחב לשלט";
     const eye = (2050 - 1600) / 2050;
     const blocksEye = win.rects.some((r) => r.top / 2050 < eye && (r.top + r.h) / 2050 > eye && Math.abs(r.dx || 0) < r.w / 2 + 40);
     if (blocksEye) out.addons.peep = "החלון תופס את גובה העינית";
@@ -2683,14 +2835,42 @@ ${body}
         changed.push("detail");
       }
     }
-    if (!isGlazed(s)) {
-      if (s.grille !== "none") {
-        s.grille = "none";
-        changed.push("grille");
+    if (byId(HANDLES, s.handle).pull && byId(LOCKSETS, s.lockset).lever) {
+      if (intent === "lockset") {
+        s.handle = "none";
+        changed.push("handle");
+      } else {
+        s.lockset = "cylinder";
+        changed.push("lockset");
       }
-      if (s.glazing && s.glazing !== "clear") {
-        s.glazing = "clear";
-        changed.push("glazing");
+    }
+    if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === "grab") {
+      if (intent === "handle") {
+        s.window = "none";
+        changed.push("window");
+      } else {
+        s.handle = "none";
+        changed.push("handle");
+      }
+    }
+    if (locksetClashesGlass(s) || gripClashesLockset(s)) {
+      if (intent === "lockset") {
+        s.handle = "none";
+        s.window = "none";
+        changed.push("window");
+      } else {
+        const k = fallbackLockset(s);
+        if (k) {
+          s.lockset = k;
+          changed.push("lockset");
+        } else {
+          s.window = "none";
+          changed.push("window");
+        }
+      }
+      if (gripClashesLockset(s)) {
+        s.handle = "none";
+        changed.push("handle");
       }
     }
     if (gripClashesGlass(s)) {
@@ -2700,6 +2880,16 @@ ${body}
       } else {
         s.handle = "none";
         changed.push("handle");
+      }
+    }
+    if (!isGlazed(s)) {
+      if (s.grille !== "none") {
+        s.grille = "none";
+        changed.push("grille");
+      }
+      if (s.glazing && s.glazing !== "clear") {
+        s.glazing = "clear";
+        changed.push("glazing");
       }
     }
     const grip = byId(HANDLES, s.handle);
@@ -2720,7 +2910,8 @@ ${body}
     detail: "הסרנו את קווי המתכת — לא משלבים אותם עם חלון",
     grille: "הסרנו את הסורג — אין חלון",
     glazing: "החזרנו זכוכית שקופה — אין חלון",
-    handle: "הסרנו את ידית המשיכה — אין לה מקום ליד החלון",
+    handle: "הסרנו את ידית המשיכה — אין לה מקום כאן",
+    lockset: "החלפנו לצילינדר בלבד — לא מתקינים ידית מסתובבת עם ידית משיכה",
     finish: "התאמנו את הגימור — הידית מגיעה בגימור אחד בלבד",
     addons: "הסרנו תוספת שאין לה מקום ליד החלון"
   })[changed[0]] || null;
@@ -2733,7 +2924,14 @@ ${body}
     glazing: "clear",
     grille: "none",
     handle: "idan",
-    lockset: "coral",
+    /* CYLINDER, not the lever it was. The default door carries a pull bar, and
+       of the ten installed doors that carry one, eight have exactly this beside
+       it and not one has a lever — so the old default was a door the rules now
+       refuse, and the DEFAULTS-is-buildable assertion caught it the moment the
+       rule landed. Second time that assertion has earned its keep in two
+       commits, which is a fair argument for writing tests about the boring
+       starting state and not only about the interesting edges. */
+    lockset: "cylinder",
     detail: "plain",
     finish: "steel",
     size: "standard",
@@ -3301,6 +3499,9 @@ ${body}
       "combination-fixed": "השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר."
     }[kind] || "חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.";
     el.hidden = false;
+  }
+  if (new URLSearchParams(location.search).has("bare")) {
+    window.__render = render;
   }
   document.addEventListener("DOMContentLoaded", () => {
     $("#phone-link").href = `tel:${PHONE_E164}`;

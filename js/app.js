@@ -444,6 +444,15 @@ function showNotice(kind) {
 
 // ── go ────────────────────────────────────────────────────────────
 
+/* The measurement hook. `?bare=1` is already the harnesses' mode — it turns
+   off `fitStage` so a tool sees the drawing's own frame — and this exposes the
+   pure render function alongside it, so `tools/collide.mjs` can sweep
+   thousands of designs inside ONE page load instead of navigating per case.
+   Guarded, because production has no business carrying it. */
+if (new URLSearchParams(location.search).has('bare')) {
+  window.__render = render;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   $('#phone-link').href = `tel:${PHONE_E164}`;
   $('#phone-link').textContent = PHONE_DISPLAY;

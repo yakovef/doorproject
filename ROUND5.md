@@ -398,6 +398,78 @@ repaired on load, and produces no notice from a bare page load. It did not
 exist because nobody had considered that the starting position could be
 illegal.
 
+### Reported from the outside: three screenshots of hardware sitting on hardware
+
+The round was called finished and then three screenshots arrived showing a
+lever's blade drawn straight through a pull bar, and a lever crossing a window.
+The claim in them was right and the reason was worth the rest of the round.
+
+**Why nothing caught it.** `the grip clears the lockset` was exhaustive over
+every grip × lockset × size × handing, and it passed, because it compared the
+footprints the catalogue **declares** rather than the shapes the renderer
+**draws**. The lever's `reach` was deliberately left out of its declared
+footprint, on the argument that a lever stands 30 mm proud of the door and a
+bar 50 mm out on its standoffs, so the blade sweeps behind it. That is a true
+statement about a real door and a false one about a picture seen square-on —
+and the site sells the picture. 862 designs drew the collision.
+
+So `tools/collide.mjs`: render in a browser, ask every drawn object for its own
+`getBBox()`, report every overlapping pair. **No declared number anywhere in
+the loop.** Two things had to be right for it to be usable:
+
+- *Nesting is not collision.* A keyway is inside its own escutcheon; a grab
+  bar's rose is inside the group that draws it. Asked by name those are 1,580
+  of the first run's 3,344 hits. Asked by `Node.contains`, they are what they
+  are.
+- *Only buildable designs.* A collision inside a combination the rules already
+  refuse is not a bug, it is the refusal working.
+
+`npm run collide -- boxes` prints each fitting's true drawn footprint, and
+`handleFootprint` now returns those numbers — `{ out, in, vy }`, measured, in
+place of a single symmetric `hx` that was a guess. Several were badly wrong:
+the Cadoor knob reaches **78 mm** outboard, more than the 49 mm backset a door
+with a grip uses, so it was hanging 29 mm off the closing edge of the leaf. Its
+shank now points inboard, and `lockBackset` never seats a fitting closer to the
+edge than the fitting is wide.
+
+**What actually cannot go with what.** The user's own example — "a window or a
+pattern and a pull handle" — the corpus contradicts: bars sit beside windows on
+four doors and beside line work on five. Counted rather than assumed, the
+clearest number in the whole corpus is a different one: **of the ten doors
+carrying a pull bar, not one has a lever beside it.** Eight have a plain
+cylinder escutcheon and two a smart lock. Obvious in hindsight — the bar *is*
+the handle, so the street face needs a keyway and nothing more, and a lever
+there is both redundant and in the way, which is exactly what the screenshots
+showed. That is now a rule, and `cylinder` — the commonest lock furniture on
+the doors that matter most — was not even in the catalogue before this.
+
+Also added, all geometric and all computed from the renderer's own arithmetic
+rather than listed: the lockset's own reach against the glazing (a lever
+reaches 152 mm inboard, the Almog swan-neck 220, and a narrow leaf with a tall
+light starts its moulding at 131), the grab bar's centred bow against a long
+lever, and a window that leaves **no** lockset room at all — `duo` on the
+800 mm leaf puts its outboard light within 100 mm of the closing edge, which is
+less than the escutcheon alone needs.
+
+Both sweeps are clean: 576 designs of grip × lockset × window × size × handing,
+and 202 more with every add-on and detail on top.
+
+**Two more of the same kind, found on the way.** `render()` and the rules each
+worked out how far the glass sat from the lock, one measuring to the pane and
+the other to the moulding, 40 mm apart — 48 designs drew the channel across the
+surround while `conflicts()` said the door was fine. And `render()` derived the
+width available to a centred plate itself instead of asking `plateRoom()`, its
+version walking a leaf width inboard from the **lock** instead of the hinge, so
+every door with no pull handle drew its nameplate zero wide with a `width="-24"`
+border inside it. A negative width is not a small rectangle — the browser logs
+an error and draws nothing — and nothing in `npm test` parses the SVG, so only
+`npm run audit`, which watches the console, ever knew: 120 console errors under
+a suite of 716,357 green assertions.
+
+Both are one shape of mistake, and it now has a name in CLAUDE.md §5: **a
+quantity computed in two places is a promise that somebody will change one of
+them.**
+
 ### What is still open after this round
 
 - The pane's scene is generic by design, and on a narrow slot it reads as

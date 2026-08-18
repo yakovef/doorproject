@@ -79,6 +79,29 @@ again. If any of this is wrong it is one line: `HANDLES[].finish`.*
 
 ---
 
+## 2c. מה לא הולך עם מה?
+
+> **"על דלת עם ידית משיכה אנכית — אתה מתקין גם ידית מסתובבת, או רק צילינדר?"**
+
+מתוך 130 ההתקנות שיש לנו: **מכל עשר הדלתות עם ידית משיכה, באף אחת אין ידית
+מסתובבת לצידה.** בשמונה יש צילינדר בלבד ובשתיים מנעול חכם. האתר חוסם את
+הצירוף הזה עכשיו ומציע צילינדר במקום.
+
+> **"חלון כפול (שני חלונות) על דלת צרה 80 ס\"מ — אתה בכלל מייצר את זה?"**
+
+לפי המידות שלנו החלון החיצוני מגיע עד 10 ס\"מ מקצה הדלת, ושם יושב המנעול. אין
+מקום. חסמנו — אבל אם אתה כן מייצר את זה, זו שורה אחת לשנות.
+
+*This is the one place where a rule came from the customer's own report rather
+than from the corpus, and it turned out he was half right in an interesting
+way. He said a pull bar does not go with a window or a pattern; the corpus says
+it does — four doors and five doors. What it never goes with is a LEVER, at
+0 of 10, which is what his screenshots were actually showing. Worth confirming
+with Peretz because it is a claim about his own practice, and because a rule
+that refuses a sale should be one he recognises.*
+
+---
+
 ## 3. צבעים
 
 > **"אילו צבעי RAL אפשר להזמין, ואילו מהם עולים יותר? כמה?"**

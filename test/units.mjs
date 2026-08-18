@@ -218,6 +218,15 @@ group('renderer invariants');
       ok(!/NaN|undefined|Infinity/.test(svg), `numeric hole in output: ${label}`);
       ok(svg.startsWith('<svg') && svg.endsWith('</svg>'), `malformed svg: ${label}`);
 
+      /* A negative width is not a small rectangle, it is an error the browser
+         logs and then declines to draw. Nothing here parses the SVG, so this
+         never failed a single assertion while every door without a pull handle
+         emitted `width="-24"` and dropped the nameplate's engraved border.
+         Only the browser knew, and only because `npm run audit` watches the
+         console. `r` and the radii are in for the same reason. */
+      const neg = /\s(width|height|r|rx|ry|stroke-width)="(-[\d.]+)"/.exec(svg);
+      ok(!neg, neg && `${neg[1]}="${neg[2]}" is not a shape, it is an error: ${label}`);
+
       // Duplicate ids are how clip-paths and gradients silently cross-wire.
       const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
       ok(new Set(ids).size === ids.length, `duplicate id in ${label}`);
@@ -335,7 +344,7 @@ for (const n of HANDLES) {
 group('the grip clears the lockset');
 {
   const num = (svg, re) => Number(re.exec(svg)[1]);
-  let n = 0, tightest = Infinity, closest = { axis: Infinity, label: '-' };
+  let n = 0, n0 = 0, tightest = Infinity, closest = { axis: Infinity, label: '-' };
   /* EXHAUSTIVE here, because this is the one place a grip and a lockset
      interact: every grip against every lockset, on every size band and both
      handings — AND every window, which was the hole in this sweep. The glazing
@@ -345,17 +354,28 @@ group('the grip clears the lockset');
      assertion below exists for was the one case it never reached. */
   for (const hn of HANDLES) for (const kn of LOCKSETS) for (const sz of sizeKeys)
     for (const hd of HANDINGS) for (const wn of WINDOWS) {
-      const svg = render({ ...base, handle: hn.id, lockset: kn.id, size: sz,
-                           handing: hd.id, window: wn.id });
+      const st = { ...base, handle: hn.id, lockset: kn.id, size: sz,
+                   handing: hd.id, window: wn.id };
+      /* Only pairings the rules allow. A pull bar beside a lever is now
+         refused outright -- not one of the ten installed bar doors has one --
+         so asserting they clear each other is asserting about a door the site
+         will not build. */
+      if (!buildable(st)) continue;
+      const svg = render(st);
       const label = `${hn.id}+${kn.id}/${sz}/${hd.id}/${wn.id}`;
+      n0++;
       const leaf = { x: num(svg, /id="leaf" data-x="([-\d.]+)"/),
                      w: num(svg, /id="leaf"[^>]*data-w="([\d.]+)"/) };
 
       /* Whatever the pairing, the door gets exactly one way to unlock it:
          either the lockset carries the cylinder on its own backplate, or a
-         separate escutcheon sits beside it. Never both, never neither. */
+         separate escutcheon sits beside it. Never both, never neither.
+         SEPARATE is the word that matters. The cylinder-only lockset draws an
+         escutcheon as its own art — that is the entire product — so counting
+         every escutcheon on the door called it a door with two keyways. The
+         drawing marks which one it is; ask for the unowned ones. */
       const carries = /data-carries-lock="true"/.test(svg);
-      const escutcheons = [...svg.matchAll(/data-hw="lock"/g)].length;
+      const escutcheons = [...svg.matchAll(/data-hw="lock"(?! data-owner)/g)].length;
       ok(carries === !!kn.lock, `data-carries-lock disagrees with the catalogue (${label})`);
       ok(escutcheons === (carries ? 0 : 1),
          `expected ${carries ? 0 : 1} separate escutcheon, found ${escutcheons} (${label})`);
@@ -366,16 +386,16 @@ group('the grip clears the lockset');
       const lock = {
         x:  num(svg, /data-hw="lockset"[^>]*data-cx="([-\d.]+)"/s),
         y:  num(svg, /data-hw="lockset"[^>]*data-cy="([-\d.]+)"/s),
-        hx: num(svg, /data-hw="lockset"[^>]*data-hx="([-\d.]+)"/s),
-        vy: num(svg, /data-hw="lockset"[^>]*data-vy="([-\d.]+)"/s),
-        reach: num(svg, /data-hw="lockset"[^>]*data-reach="([-\d.]+)"/s),
+        out: num(svg, /data-hw="lockset"[^>]*data-out="([-\d.]+)"/s),
+        in:  num(svg, /data-hw="lockset"[^>]*data-in="([-\d.]+)"/s),
+        vy:  num(svg, /data-hw="lockset"[^>]*data-vy="([-\d.]+)"/s),
       };
       /* The body is symmetric about its centre; the lever's blade reaches
          inboard only. Both ends have to land on the leaf. */
       const inward = Math.sign(leaf.x + leaf.w / 2 - lock.x);
-      ok(lock.x - lock.hx > leaf.x && lock.x + lock.hx < leaf.x + leaf.w,
+      ok(lock.x - inward * lock.out > leaf.x - 1 && lock.x - inward * lock.out < leaf.x + leaf.w + 1,
          `the lockset hangs off the leaf (${label})`);
-      const tip = lock.x + inward * (lock.hx + lock.reach);
+      const tip = lock.x + inward * lock.in;
       ok(tip > leaf.x && tip < leaf.x + leaf.w,
          `the lever reaches off the leaf (${label})`);
 
@@ -383,14 +403,15 @@ group('the grip clears the lockset');
         const grip = {
           x:  num(svg, /data-hw="handle"[^>]*data-cx="([-\d.]+)"/s),
           y:  num(svg, /data-hw="handle"[^>]*data-cy="([-\d.]+)"/s),
-          hx: num(svg, /data-hw="handle"[^>]*data-hx="([-\d.]+)"/s),
-          vy: num(svg, /data-hw="handle"[^>]*data-vy="([-\d.]+)"/s),
+          out: num(svg, /data-hw="handle"[^>]*data-out="([-\d.]+)"/s),
+          in:  num(svg, /data-hw="handle"[^>]*data-in="([-\d.]+)"/s),
+          vy:  num(svg, /data-hw="handle"[^>]*data-vy="([-\d.]+)"/s),
         };
         // Gap along each axis; positive on either axis means the boxes miss.
         /* Bodies, not reaches. The lever's blade passes behind the bar on a
            real door; what may never overlap is the fitting the key goes into
            and the thing your hand wraps round. */
-        const gapX = Math.abs(grip.x - lock.x) - (grip.hx + lock.hx);
+        const gapX = Math.abs(grip.x - lock.x) - (grip.out + lock.in);
         const gapY = Math.abs(grip.y - lock.y) - (grip.vy + lock.vy);
         ok(Math.max(gapX, gapY) > 0,
            `the grip overlaps the lockset (${label}): gapX ${gapX.toFixed(0)}, gapY ${gapY.toFixed(0)}`);
@@ -417,7 +438,7 @@ group('the grip clears the lockset');
         const toGrip = Math.sign(grip.x - lock.x);
         ok(toGrip === 0 || toGrip === toHinge,
            `the grip stands off the wrong way, past the closing edge (${label})`);
-        ok(grip.x - grip.hx > leaf.x && grip.x + grip.hx < leaf.x + leaf.w,
+        ok(grip.x - grip.out > leaf.x - 1 && grip.x + grip.out < leaf.x + leaf.w + 1,
            `the grip hangs off the leaf (${label})`);
       }
       n++;

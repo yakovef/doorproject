@@ -160,10 +160,31 @@ kinds, and the distinction is load-bearing: **observed** (zero of 31 measured
 doors) and **geometric** (computed from the renderer's own numbers, so it
 cannot drift from the drawing).
 
+What it currently refuses, and why:
+
+| refused | kind | evidence |
+| --- | --- | --- |
+| grille or glass treatment with no glass | geometric | nothing to apply it to |
+| line work + glazing, line work + panel | observed | 0 of 31; 11 and 10 separately |
+| pull grip + lever lockset | observed | 0 of the 10 installed bar doors |
+| grip / lockset that would cross the glazing | geometric | `gripClashesGlass`, `locksetClashesGlass` |
+| grab bar + a centred window, grab bar + long lever | geometric | the bow is centred on the LEAF and does not move |
+| a window that leaves NO lockset room | geometric | `duo` on the 800 mm leaf reaches to 100 mm of the closing edge |
+| letterplate under a low window, plate narrower than 220/160 mm | geometric | `plateRoom` |
+| peephole where the glass crosses eye level | geometric | the one add-on that may not be slid out of the way |
+
 `repair()` moves a design to the nearest buildable one and says what changed.
 It must be idempotent, and it must always LAND somewhere buildable — asserting
 that, rather than that the result looks right, is what found a grip whose
-finish settled the drawing but never the state.
+finish settled the drawing but never the state, and later a repair that
+answered "become the cylinder" to a door where the cylinder does not fit
+either, over and over.
+
+Two ordering constraints in `repair()`, both learned by breaking them:
+glazing repairs run **before** line-work repairs, because turning a window on
+is what makes line work impossible; and the "no glass, so no grille and no
+obscure glazing" cleanup runs **last**, because three of the repairs below it
+can take the window away and leave a grille behind with nothing to sit in.
 
 ### Hardware — two groups
 - **`HANDLES` = the grip** (what you pull): none, idan, ella, nitzan, shahar,
@@ -214,7 +235,7 @@ horizontal light direction were all *correct in the photo* and wrong here.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Seven so far:
+**Things that vanish rather than break.** Twelve so far:
 
 1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
    nothing at all.
@@ -244,6 +265,33 @@ horizontal light direction were all *correct in the photo* and wrong here.
    "re-measure when the pane changes". The pane was rebuilt and the constant
    was not, so the tool reported the rebuild as having done nothing.
 
+**10–12 are one sub-family: a quantity computed in two places.** Two
+computations of the same number is not redundancy, it is a promise that
+somebody will change one of them. Every instance below was reported from the
+outside — by the customer, or by a browser console — while `npm test` was green.
+
+10. `handleFootprint` returned what the catalogue **declared** a fitting
+    occupied, and the clearance sweep compared those declarations. The lever's
+    `reach` was deliberately outside the declared footprint, on the argument
+    that a blade sweeps behind a bar on standoffs — true of a real door, false
+    of a picture seen square-on. So the drawing put a lever's blade **through**
+    a pull bar on 862 designs and the sweep passed every one. Fixed by
+    measuring the footprints off the art (`npm run collide -- boxes`) and by
+    `npm run collide`, which asks the browser for each object's real `getBBox`
+    and never consults a declared number at all.
+11. `render()` and `glassClearance()` both worked out how far the glass was
+    from the lock — one to the pane's edge, the other to the moulding's, 40 mm
+    apart. The drawing placed the recessed channel across the surround on 48
+    designs while `conflicts()` said the door was fine. Fixed by having
+    `render()` call the rules' version.
+12. The same again, ten lines below: `render()` derived the width available to
+    a centred plate itself instead of asking `plateRoom()`, and its version
+    walked a leaf width inboard **from the lock** rather than from the hinge —
+    so on every door with no pull handle the nameplate came out zero wide with
+    a `width="-24"` border inside it. A negative width is not a small rectangle;
+    the browser logs an error and draws nothing. Nothing in `npm test` parses
+    the SVG, so only `npm run audit` — which watches the console — ever knew.
+
 None threw. All looked like a working page. **Tests catch wrong output easily
 and absent output almost never**, unless someone goes looking on purpose.
 
@@ -258,7 +306,11 @@ not only that it is correct:
 - `a priced option changes the door, and a free one does not` — money and
   pixels move together, in both directions.
 - `the grip clears the lockset` — exhaustive: every grip × lockset × size ×
-  handing.
+  handing × window.
+- `npm run collide` — renders in a browser and asks every drawn object for its
+  own `getBBox()`. No declared number anywhere in the loop, so it cannot be
+  fooled by a footprint the catalogue asserts and the drawing ignores.
+- no negative `width`/`height`/`r`/`rx`/`ry`/`stroke-width` in any render.
 - `the face wash does not tint the paint` — the tint rule.
 - the moulding must draw all four sides, they must take different light, and
   **nothing may fill the interior**.

@@ -248,6 +248,11 @@ const LEVER_REACH  = 145;   // 4.0 rosette radii, and exactly horizontal
                             // (0.151 W on the door metrology; the product
                             //  photographs agree at 4.0-4.7 radii)
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
+/* The moulded surround around a pane, each side. It is part of the window as
+   far as anything else on the leaf is concerned: a bar that stops at the
+   glass still crosses the raised moulding, which is what `npm run collide`
+   reported on 93 designs once it started measuring the drawing. */
+const APERTURE_MOULD = 40;
 /* Where a pull bar sits, as a fraction of leaf width from the closing edge.
    Measured across every installation square-on enough to trust: 0.052, 0.128,
    0.156, 0.167, 0.21, 0.275, 0.28, 0.31 — median 0.19. Real bars are markedly
@@ -442,7 +447,7 @@ export function render(state) {
      The backset is not quite fixed: on the ten installations carrying a bar
      as well, the lockset is measurably further OUT (0.057 of leaf width
      against 0.070) because the fitter is making room for it. */
-  const backset = lockBackset(handle);
+  const backset = lockBackset(handle, lockset);
   const lockX   = hingeOnLeft ? mainX1 - backset : mainX + backset;
   const inward  = hingeOnLeft ? -1 : 1;
   const hingeX  = hingeOnLeft ? mainX : mainX1;
@@ -458,10 +463,38 @@ export function render(state) {
     x1: centreX + Math.max(...win.rects.map(r => (r.dx || 0) + r.w / 2)),
   } : null;
 
-  const glassEdge = winSpan
-    ? Math.abs((hingeOnLeft ? winSpan.x1 : winSpan.x) - lockX) : Infinity;
-  const standoff = gripStandoff(handle, lockset, leafW, leafH, glassEdge);
+  /* ONE computation of this quantity, not two.
+     This used to be `Math.abs((hingeOnLeft ? winSpan.x1 : winSpan.x) - lockX)`
+     — the distance from the lock's axis to the GLASS. `glassClearance()`, which
+     the rules use to decide whether a combination is allowed, measures to the
+     moulding's outer edge instead. So the drawing placed the recessed channel
+     40 mm further inboard than the rules believed it would, and it crossed the
+     surround on 48 designs while `conflicts()` said the door was fine.
+     Two functions computing the same thing is how they end up disagreeing;
+     the fix is not to correct both, it is to have one. */
+  const standoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
   const handleX = lockX + inward * standoff;
+
+  /* Where a centred add-on can actually go: between the hinge edge and the
+     grip's inboard edge, or the whole leaf when there is no grip.
+
+     "The whole leaf" used to be written `lockX + inward * leafW`, which walks
+     a full leaf width INBOARD FROM THE LOCK and therefore lands past the hinge
+     edge by exactly the backset. The two ends then came out the wrong way
+     round and the room between them measured 60 mm, not 850 — so on every door
+     with no pull handle the nameplate was drawn zero wide with a -24 border
+     inside it, which the browser refuses to draw and the console reported 120
+     times. `conflicts()` meanwhile said the plate was fine, because
+     `plateRoom()` had the arithmetic right. Same shape of bug as the standoff
+     above: one quantity, two computations, and only one of them correct.
+     So the width now comes from `plateRoom` itself rather than from a second
+     derivation that happens to agree today. */
+  const plate = (() => {
+    const foot = handleFootprint(handle, leafH);
+    const inner = foot.vy ? handleX + inward * (foot.in + 30) : hingeX - inward * leafW;
+    const lo = Math.min(hingeX, inner), hi = Math.max(hingeX, inner);
+    return { cx: (lo + hi) / 2, room: plateRoom(state) };
+  })();
 
   /**
    * Where a centre-line add-on goes: its own height if the leaf is clear
@@ -1183,11 +1216,17 @@ export function render(state) {
        window would be in the way the add-on moves below it rather than being
        dropped — a thing that silently disappears is this codebase's oldest
        failure mode (CLAUDE.md §5) and the peephole was an instance of it. -->
+  <!-- Centred add-ons are centred on the space that is FREE, not on the leaf.
+       A recessed channel runs almost the leaf's full height 255 mm in from the
+       closing edge, and on a narrow leaf a 300 mm letterplate centred on the
+       leaf runs straight into it — 26 designs, found by npm run collide once
+       it started measuring the drawing rather than the declared boxes.
+       A fitter would put the plate in the space that is left, so this does. -->
   <g id="addons">
     ${has('peep') ? peephole(centreX, addonY(PEEPHOLE_AFF, 0.09)) : ''}
     ${has('knocker') ? knocker(centreX, addonY(1560, 0.13), tone) : ''}
-    ${has('nameplate') ? nameplate(centreX, addonY(1730, 0.09), tone) : ''}
-    ${has('mail') ? letterplate(centreX, y0 + leafH * 0.80, tone) : ''}
+    ${has('nameplate') ? nameplate(plate.cx, addonY(1730, 0.09), tone, plate.room) : ''}
+    ${has('mail') ? letterplate(plate.cx, y0 + leafH * 0.80, tone, plate.room) : ''}
     ${has('closer') ? doorCloser(hingeX, y0 + leafH * 0.045, hingeOnLeft ? 1 : -1, tone) : ''}
   </g>
 
@@ -1705,7 +1744,7 @@ function aperture({ x, y, w, h, paint, edge, grille, glazing, key }) {
      surround is not a lighter thing applied to the door; it is the door's own
      paint, shaped. Widened to 40 at the same time, because the measured
      profile needs room to be a profile. */
-  const M = 40;                       // moulding width
+  const M = APERTURE_MOULD;
   const id = `cl-${key}`;
   return `
     <g data-pane="${key}" data-glazing="${glazing || 'clear'}">
@@ -1838,32 +1877,53 @@ function grillePaths(kind, x, y, w, h, tint) {
 /* ── hardware ───────────────────────────────────────────────────── */
 
 /**
- * The art's footprint about its own centre, in mm: `hx` either side, `vy` above
- * and below, and `reach` for the part that only extends INBOARD.
+ * What a fitting ACTUALLY occupies, in mm, measured off the drawing.
  *
- * A lever's blade is the reason `reach` exists. It swings towards the leaf
- * centre and nowhere else, so folding it into `hx` made the fitting look 145 mm
- * wide on the closing-edge side too, which put it off the edge of the leaf.
- * The body is symmetric; the blade is not.
+ * ⚠ Read this before changing a number. These used to be a symmetric `hx` plus
+ * an optional inboard `reach`, written by hand, and they were wrong: by 10 to
+ * 20 mm on every pull bar, and by 386 mm on the grab bar, whose bow is centred
+ * on the LEAF while its footprint claimed a 30 mm rose. Everything downstream
+ * believed them — the clearance test, the glazing check, the standoff — so the
+ * drawing put a lever's blade through a pull bar on 862 designs and nothing
+ * complained, because nothing was looking at the drawing.
  *
- * Declared once so the placement maths and the tests read the same numbers the
- * drawing does.
+ * They are read from `npm run collide -- boxes` now, which renders each
+ * fitting and asks it for its own getBBox(). Two numbers, because a lever is
+ * not symmetric:
+ *
+ *   out   towards the CLOSING EDGE
+ *   in    towards the leaf's centre — which is where a lever's blade goes
+ *
+ * If you change how a fitting is drawn, re-run that command and paste the
+ * numbers back. A footprint that disagrees with the art is worse than no
+ * footprint, because it is believed.
  */
 function handleFootprint(handle, leafH) {
   switch (handle.style) {
-    case 'none':    return { hx: 0, vy: 0 };
-    case 'channel': return { hx: 21, vy: channelHalf(handle.len, leafH) };
-    case 'grab':    return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE };
-    case 'lever':   return { hx: LEVER_ROSETTE, vy: LEVER_ROSETTE, reach: LEVER_REACH };
-    case 'plate':   return { hx: PLATE.w / 2, vy: PLATE.h / 2, reach: PLATE.w * PLATE.reach };
-    case 'almog':   return { hx: 39, vy: 39, reach: 39 * 2 * 2.80 };
-    case 'cadoor':  return { hx: 34, vy: 40 };
-    case 'sapir':   return { hx: 36, vy: 36 };
-    case 'knobplate': return { hx: 48, vy: 150 };
-    case 'digital': return { hx: 28, vy: 113 };
-    case 'square':  return { hx: 41, vy: 95, reach: LEVER_REACH };
-    case 'shiran':  return { hx: 44, vy: 240 };
-    default:        return { hx: (handle.w || 30) / 2, vy: barHalf(handle.len, leafH) };
+    case 'none':    return { out: 0, in: 0, vy: 0 };
+    case 'channel': return { out: 21, in: 21, vy: channelHalf(handle.len, leafH) };
+    /* The bow is centred on the LEAF, not on the grip's own axis, so almost
+       all of it lies inboard — 416 mm of it. */
+    case 'grab':    return { out: 40, in: 416, vy: 115 };
+    case 'lever':   return { out: 40, in: 152, vy: 51 };
+    case 'plate':   return { out: 47, in: 119, vy: 129 };
+    case 'almog':   return { out: 42, in: 220, vy: 42 };
+    case 'cadoor':  return { out: 78, in: 41, vy: 48 };
+    case 'sapir':   return { out: 36, in: 74, vy: 43 };
+    case 'knobplate': return { out: 53, in: 48, vy: 153 };
+    case 'cylinder': return { out: LOCK_R + 8, in: LOCK_R + 8, vy: LOCK_R + 8 };
+    case 'digital': return { out: 28, in: 33, vy: 116 };
+    case 'square':  return { out: 41, in: 152, vy: 99 };
+    case 'shiran':  return { out: 43, in: 43, vy: 240 };
+    default: {
+      /* Pull bars. The drawn width runs past the section because of the
+         standoff shadow: measured out/in per product, 16/36 idan, 29/29 ella,
+         29/29 nitzan, 15/34 shahar, 13/19 ron, 70/70 blade. Derived from the
+         section with a floor at the widest reading, which errs the safe way. */
+      const w = handle.w || 30;
+      return { out: Math.max(29, w * 1.15), in: Math.max(36, w * 1.15),
+               vy: barHalf(handle.len, leafH) };
+    }
   }
 }
 
@@ -1879,30 +1939,28 @@ function handleFootprint(handle, leafH) {
  */
 export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) {
   const grip = handleFootprint(handle, leafH);
-  if (!grip.vy && !grip.hx) return 0;                // nothing to place
+  if (!grip.vy && !grip.out) return 0;                // nothing to place
   const lock = handleFootprint(lockset, leafH);
-  /* The lockset's BODY is what the grip has to clear, not the lever's reach. A
-     lever sits about 30 mm proud of the door and a pull bar about 50 on its
-     standoffs, so the blade sweeps behind the bar — which is exactly what a
-     real door with both fittings looks like, and why the bar is drawn over the
-     lever rather than beside it.
-     Counting the reach as solid pushed the bar 195 mm inboard, past the near
-     edge of a centred window, so a door with a Rotem backplate and an Idan bar
-     had the bar lying across the glass. The keyway is the thing that must stay
-     clear, and it is inside the body. */
-  const body = lock.hx + grip.hx + LOCK_CLEAR;
+  /* The lockset's INBOARD extent against the grip's OUTBOARD one. This used to
+     count the lockset's BODY only, on the argument that a lever sits 30 mm
+     proud of the door and a bar 50 mm on its standoffs, so the blade sweeps
+     BEHIND the bar. That argument is about a real door. This is a drawing seen
+     square-on, and in the drawing the blade crosses the bar — which is what
+     was reported from the outside, on three separate screenshots.
+     Where the two genuinely cannot share a stile the answer is not more space,
+     it is the rule in js/rules.js: not one of the ten installed doors that
+     carry a pull bar has a lever beside it. */
+  const body = lock.in + grip.out + LOCK_CLEAR;
   /* The floor is the tightest gap anyone actually installs, not the point at
-     which the two drawings stop overlapping. Those are different numbers —
-     61 mm against 77 — and using the smaller one is how a glazed door ended up
-     with the bar tucked against the lever. */
+     which the two drawings stop overlapping. */
   const floor = Math.max(body, leafW * BAR_GAP_MIN);
-  const want = handle.inset ? leafW * handle.inset - lockBackset(handle)
-             : grip.vy > 200 ? leafW * BAR_GAP : 0;
+  const want = handle.inset ? leafW * handle.inset - lockBackset(handle, lockset)
+             : grip.vy > 200 ? Math.max(leafW * BAR_GAP, body) : 0;
   /* And it must not run across the glass. `toGlass` is the distance from the
      lock's axis to the near edge of the glazing; the bar has to stop short of
      it. Where a wide window leaves no room, clearing the lockset still wins —
      a bar over a pane is wrong, a bar drawn through a lever is worse. */
-  const room = toGlass - grip.hx - LOCK_CLEAR;
+  const room = toGlass - grip.in - LOCK_CLEAR;
   return Math.round(Math.max(floor, Math.min(want, room), 0));
 }
 
@@ -1926,7 +1984,10 @@ export function glassClearance(state) {
     const lo = leafW / 2 + (r.dx || 0) - r.w / 2, hi = leafW / 2 + (r.dx || 0) + r.w / 2;
     return hingeOnLeft ? leafW - hi : lo;
   });
-  return Math.min(...u) - lockBackset(byId(HANDLES, state.handle));
+  /* To the MOULDING's outer edge, not to the glass: a fitting that stops at
+     the pane still runs across the raised surround. */
+  return Math.min(...u) - APERTURE_MOULD
+       - lockBackset(byId(HANDLES, state.handle), byId(LOCKSETS, state.lockset));
 }
 
 /**
@@ -1944,11 +2005,66 @@ export function gripClashesGlass(state) {
   const handle = byId(HANDLES, state.handle);
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const grip = handleFootprint(handle, leafH);
-  if (!grip.vy && !grip.hx) return false;
+  if (!grip.vy && !grip.out) return false;
   const lock = handleFootprint(byId(LOCKSETS, state.lockset), leafH);
-  const floor = Math.max(lock.hx + grip.hx + LOCK_CLEAR, leafW * BAR_GAP_MIN);
-  const room = glassClearance(state) - grip.hx - LOCK_CLEAR;
+  const floor = Math.max(lock.in + grip.out + LOCK_CLEAR, leafW * BAR_GAP_MIN);
+  const room = glassClearance(state) - grip.in - LOCK_CLEAR;
   return floor > room;
+}
+
+/**
+ * How much width a centred add-on has to work with, once the grip has taken
+ * its share of the leaf. Exported so the rules ask the drawing rather than
+ * keeping their own copy of the arithmetic — the last time those two answered
+ * the same question separately they disagreed by 40 mm.
+ */
+export function plateRoom(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const handle = byId(HANDLES, state.handle);
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const foot = handleFootprint(handle, leafH);
+  if (!foot.vy) return leafW - 70;
+  const standoff = gripStandoff(handle, byId(LOCKSETS, state.lockset), leafW, leafH,
+                                glassClearance(state));
+  /* Measured inboard from the closing edge: the grip's inboard face, then the
+     rest of the leaf to the hinge. */
+  const inner = lockBackset(handle, byId(LOCKSETS, state.lockset)) + standoff + foot.in + 30;
+  return Math.max(0, leafW - inner - 70);
+}
+
+/**
+ * Does the LOCKSET itself run into the glazing?
+ *
+ * Only the grip was ever checked. But a lever reaches 152 mm inboard and the
+ * Almog swan-neck 220, and on a narrow leaf with a tall light the glazing
+ * starts at 131 — so the blade crossed the pane on 34 designs, with nothing
+ * looking.
+ */
+export function locksetClashesGlass(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const lock = handleFootprint(byId(LOCKSETS, state.lockset), size.h - REBATE);
+  return lock.in + LOCK_CLEAR > glassClearance(state);
+}
+
+/**
+ * Does the grip run into the lockset, where the grip is drawn?
+ *
+ * `gripStandoff` places most grips, and for those this is already satisfied by
+ * construction. The horizontal grab bar is the exception: it is centred on the
+ * LEAF and ignores the standoff entirely, so on a narrow leaf its bow reaches
+ * back past a long lever. Asked directly rather than assumed.
+ */
+export function gripClashesLockset(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const handle = byId(HANDLES, state.handle);
+  if (handle.style !== 'grab') return false;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const grip = handleFootprint(handle, leafH);
+  const lock = handleFootprint(byId(LOCKSETS, state.lockset), leafH);
+  /* Both measured inboard from the closing edge. The bow is centred, so its
+     near end sits at half the leaf minus half its own length. */
+  const bowNear = leafW / 2 - (grip.in - 40) / 2;
+  return lockBackset(handle, byId(LOCKSETS, state.lockset)) + lock.in + LOCK_CLEAR > bowNear;
 }
 
 /**
@@ -1958,9 +2074,15 @@ export function gripClashesGlass(state) {
  * of leaf width against 0.070 — because the fitter is making room. Exported
  * so the tests can assert the two positions rather than infer them.
  */
-export function lockBackset(handle) {
+export function lockBackset(handle, lockset) {
   const grip = handleFootprint(handle, 2000);
-  return grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
+  const base = grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
+  /* ...but never so close to the closing edge that the fitting hangs off it.
+     The Cadoor knob reaches 78 mm outboard and the knob-on-backplate 53, both
+     more than the 49 mm backset a door with a grip uses, so both projected
+     past the leaf's edge. Measured, not assumed: `npm run collide -- boxes`. */
+  const out = lockset ? handleFootprint(lockset, 2000).out : 0;
+  return Math.max(base, out + 10);
 }
 
 /**
@@ -1988,6 +2110,9 @@ const LOCK_ART = {
   sapir:   (h, g) => sapirKnob(g.cx, g.cy, g.dir),
   digital: (h, g) => digitalLock(g.cx, g.cy, g.dir),
   square:  (h, g) => squarePlates(g.cx, g.cy, g.dir),
+  /* Cylinder only: the escutcheon IS the lockset. Eight of the ten doors that
+     carry a pull bar have exactly this beside it and nothing more. */
+  cylinder: (h, g) => cylinder(g.cx, g.cy, true),
 };
 
 function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0) {
@@ -1997,15 +2122,16 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0) {
   if (!art) return '';
   const foot = handleFootprint(handle, leafH);
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}">${art}</g>`;
+             data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
+             data-vy="${foot.vy}">${art}</g>`;
 }
 
 function locksetArt(lockset, cx, cy, dir) {
   const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
   const foot = handleFootprint(lockset, 0);
   return `<g data-hw="lockset" data-style="${lockset.style}"
-             data-cx="${cx}" data-cy="${cy}" data-hx="${foot.hx}" data-vy="${foot.vy}"
-             data-reach="${Math.round(foot.reach || 0)}"
+             data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
+             data-vy="${foot.vy}"
              data-carries-lock="${!!lockset.lock}">${draw(lockset, { cx, cy, dir })}</g>`;
 }
 
@@ -2464,6 +2590,10 @@ function squarePlates(cx, cy, dir) {
       ${plate(topY)}
       ${plate(topY + S + gap)}
       ${lever(cx, cy, dir)}
+      <!-- the keyway is IN the lower plate, which is what d032 and d037 show.
+           Drawing it as a separate round escutcheon put a disc across the
+           square, 22 mm into it, on every door with this fitting. -->
+      ${keyway(cx, topY + S + gap + S / 2)}
     </g>`;
 }
 
@@ -2474,9 +2604,15 @@ function cadoorKnob(cx, cy, dir) {
     <g>
       <ellipse cx="${cx + dir * 5}" cy="${cy + 9}" rx="${rx}" ry="${ry}"
                fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      <!-- the shank, seen almost edge-on and mostly hidden by the ball -->
-      <rect x="${cx - dir * rx * 1.1}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
-            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"/>
+      <!-- The shank, seen almost edge-on and mostly hidden by the ball. It
+           used to be drawn on the OUTBOARD side, which put 78 mm of knob
+           beyond a 49 mm backset — 29 mm of it hanging off the closing edge of
+           the door. Invisible until the footprints were measured off the art
+           instead of asserted. It points inboard now, which is also where the
+           spindle goes. -->
+      <rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
+            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"
+            transform="${dir < 0 ? `translate(${-rx * 1.2} 0)` : ''}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
                transform="rotate(${tilt} ${cx} ${cy})"/>
       <!-- the terminator: a hard bright band over a dark one, not a gradient -->
@@ -2755,8 +2891,8 @@ const peephole = (cx, cy) => {
  * behind the flap is the darkest value anywhere on the leaf, darker than the
  * reveal, because it goes into an unlit hall.
  */
-function letterplate(cx, cy, tone) {
-  const w = 300, h = 78, r = 8;
+function letterplate(cx, cy, tone, room = Infinity) {
+  const w = Math.min(300, room), h = 78, r = 8;
   const x = cx - w / 2, y = cy - h / 2;
   return `
     <g data-addon="mail" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
@@ -2841,8 +2977,8 @@ function doorCloser(hx, y, dir, tone) {
  * name puts a word on a customer's door that they did not choose — the plate
  * is the product, the engraving is a conversation with Peretz.
  */
-function nameplate(cx, cy, tone) {
-  const w = 260, h = 86;
+function nameplate(cx, cy, tone, room = Infinity) {
+  const w = Math.min(260, room), h = 86;
   const x = cx - w / 2, y = cy - h / 2;
   return `
     <g data-addon="nameplate" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
@@ -2894,12 +3030,22 @@ const keyway = (kx, ky, s = 1) => `
  * silhouette (round bow over a tapered blade slot) rather than a dot.
  *
  * 66 mm across, which is life-size against a 950 mm leaf.
+ *
+ * `owned` says this escutcheon IS the lockset rather than sitting beside one.
+ * Every door gets exactly one way to unlock it, and that takes three shapes: a
+ * keyway on the lockset's own backplate (Rotem, the smart lock), a separate
+ * escutcheon below a lever, or — on eight of the ten doors that carry a pull
+ * bar — this escutcheon alone, standing in for the whole lockset. The drawing
+ * is identical in the last two cases, so the marker has to carry the
+ * difference; without it a cylinder-only door reads as a door with two
+ * keyways, which is how the test found this.
  */
-const cylinder = (cx, cy) => {
+const cylinder = (cx, cy, owned = false) => {
   const R = LOCK_R;
   const kx = cx, ky = cy + 2;          // cylinder sits marginally low, as it does in life
   return `
-    <g data-hw="lock" data-kind="cylinder" data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+    <g data-hw="lock"${owned ? ' data-owner="lockset"' : ''} data-kind="cylinder"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       ${disc(cx, cy, R)}
       <!-- The escutcheon is DOMED, not a flat plate. On d026 and d030 it is
            plainly a little hemisphere standing off the door with a highlight
@@ -3038,6 +3184,16 @@ const FITTING_GLYPH = {
   lever: () => ({ box: [-172, -48, 52, 48], art: `
     <circle cx="0" cy="0" r="39"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>` }),
+
+  /* Cylinder only: an escutcheon with a euro keyway and nothing else. It had
+     no entry here, so it fell to the `else` branch and drew a lever — the
+     picture of the one lockset it exists to be an alternative to. Same shape
+     as the door draws, at tile scale. */
+  cylinder: () => ({ box: [-52, -52, 52, 52], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <path d="M -12 -16 a 12 12 0 1 1 24 0 l 3.6 30 a 4.4 4.4 0 0 1 -4.4 4.8
+             h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper)"/>
+    <path d="M -4 -18 a 4 4 0 1 1 8 0 l 1.4 24 h -10.8 Z"/>` }),
 
   // Almog: swan-neck, raked 15 degrees up, and thicker at the tip than the root.
   almog: () => ({ box: [-244, -62, 52, 46], art: `

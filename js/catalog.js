@@ -158,22 +158,22 @@ export const HANDLES = [
      installed doors measure, and the section thicknesses keep the products'
      relative slenderness: ella is the stockiest at L/W 15, ron the slimmest
      at L/W 27. */
-  { id: 'idan',    he: 'עידן',  en: 'Idan',   delta: 26000, len: 1050, w: 32, style: 'bar', bar: 'idan',
+  { id: 'idan',    he: 'עידן',  en: 'Idan',   delta: 26000, len: 1050, w: 32, style: 'bar', bar: 'idan', pull: true,
     aliases: ['bar-long', 'luna'] },
-  { id: 'ella',    he: 'אלה',   en: 'Ella',   delta: 38000, len: 900,  w: 34, style: 'bar', bar: 'ella' },
-  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', delta: 30000, len: 800,  w: 26, style: 'bar', bar: 'nitzan',
+  { id: 'ella',    he: 'אלה',   en: 'Ella',   delta: 38000, len: 900,  w: 34, style: 'bar', bar: 'ella', pull: true },
+  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', delta: 30000, len: 800,  w: 26, style: 'bar', bar: 'nitzan', pull: true,
     aliases: ['bar-short'] },
-  { id: 'shahar',  he: 'שחר',   en: 'Shahar', delta: 34000, len: 1150, w: 30, style: 'bar', bar: 'shahar',
+  { id: 'shahar',  he: 'שחר',   en: 'Shahar', delta: 34000, len: 1150, w: 30, style: 'bar', bar: 'shahar', pull: true,
     aliases: ['bar-flat'] },
-  { id: 'ron',     he: 'רון',   en: 'Ron',    delta: 28000, len: 900,  w: 16, style: 'bar', bar: 'ron' },
+  { id: 'ron',     he: 'רון',   en: 'Ron',    delta: 28000, len: 900,  w: 16, style: 'bar', bar: 'ron', pull: true },
 
   /* The ornate pull, the horizontal bow, and the recess. */
-  { id: 'shiran',  he: 'שירן',   en: 'Shiran', delta: 52000, len: 0, style: 'shiran',
+  { id: 'shiran',  he: 'שירן',   en: 'Shiran', delta: 52000, len: 0, style: 'shiran', pull: true,
     finish: 'brass' },
   { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', delta: 18000, len: 0, style: 'grab',
     aliases: ['dee'] },
   { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
-    delta: 40000, len: 1554, inset: 0.30, style: 'channel' },
+    delta: 40000, len: 1554, inset: 0.30, style: 'channel', pull: true },
 
   /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
      the tubes: a wide rectangular ribbon standing off the leaf, catching the
@@ -182,7 +182,7 @@ export const HANDLES = [
      corpus has three of them — round, square and this — where we modelled five
      bars differing mainly in their fixings. */
   { id: 'blade',   he: 'להב שטוח', en: 'Flat blade', delta: 44000, len: 1000, w: 62,
-    style: 'bar', bar: 'blade' },
+    style: 'bar', bar: 'blade', pull: true },
 ];
 
 /**
@@ -201,7 +201,18 @@ export const HANDLES = [
  * a link written when it existed still opens a door.
  */
 export const LOCKSETS = [
-  { id: 'coral',   he: 'קורל',  en: 'Coral',  delta: 0,     style: 'lever', aliases: ['lever'] },
+  { id: 'coral',   he: 'קורל',  en: 'Coral',  delta: 0,     style: 'lever', aliases: ['lever'], lever: true },
+
+  /* Cylinder only: a keyway escutcheon and nothing else.
+     This is the commonest lock furniture in the whole corpus on the doors that
+     matter most, and it was not offered. Of the TEN doors carrying a pull bar,
+     EIGHT have exactly this beside it and the other two have a smart lock.
+     Not one of the ten has a lever — which makes sense the moment you see it:
+     the bar IS the handle. You pull the door open by the bar, so the outside
+     face needs a keyway and nothing more. A lever there would be redundant,
+     and it is also physically in the way, which is what the configurator was
+     drawing. */
+  { id: 'cylinder', he: 'צילינדר בלבד', en: 'Cylinder only', delta: 0, style: 'cylinder', lock: true },
   /* `longplate` is retired one commit after it was added, and the reason is
      worth keeping. It went in because six doors on the hardware contact sheet
      looked like they carried a plate running a third of the stile. Measured
@@ -215,11 +226,11 @@ export const LOCKSETS = [
      contact sheet triages, it does not measure; and an automatic span that
      comes back equal to its own search window twice is telling you to draw the
      thing with a scale over it instead of tuning the detector a third time. */
-  { id: 'plate',   he: 'רותם',  en: 'Rotem',  delta: 6000,  style: 'plate', lock: true,
+  { id: 'plate',   he: 'רותם',  en: 'Rotem',  delta: 6000,  style: 'plate', lock: true, lever: true,
     aliases: ['longplate'] },
   { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', delta: 4000,  style: 'cadoor' },
   { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  delta: 10000, style: 'sapir' },
-  { id: 'almog',   he: 'אלמוג',  en: 'Almog',  delta: 16000, style: 'almog' },
+  { id: 'almog',   he: 'אלמוג',  en: 'Almog',  delta: 16000, style: 'almog', lever: true },
   /* Knob on a long backplate — the bronze fitting on d092, named three times
      across the luxury tier. A different object from a knob on a rose: the
      plate carries the keyway too, so it locks like the Rotem backplate. */
@@ -243,8 +254,11 @@ export const LOCKSETS = [
   /* Two square backplates stacked, lever on the upper — four doors (d032 d037
      d059 d066). A whole hardware family in squares rather than rounds, and
      nothing else in the range looks remotely like it. */
+  /* `lock: true` — the LOWER square carries the cylinder, which is what d032
+     and d037 show. Without it a separate round escutcheon was drawn on top
+     of the plates, 22 x 22 mm into them, on every square-backplate door. */
   { id: 'square', he: 'ריבועי', en: 'Square backplates', delta: 12000,
-    style: 'square' },
+    style: 'square', lever: true, lock: true },
 ];
 
 /**
