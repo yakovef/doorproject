@@ -8,6 +8,12 @@ made a third time.
 `PLAN.md` is the product plan. `REALISM.md` is the drawing's measurement log
 and the forward plan. `ASK-PERETZ.md` is everything blocked on a human.
 
+**`AGENT.md` is the brief for the recurring agent** that wakes up every five
+hours, forms its own opinion about the site and pushes straight to the live
+branch. `AGENT-LOG.md` is what it did — newest first, including the runs where
+it changed nothing. If something in the drawing changed and no human asked for
+it, that log is where to look.
+
 ---
 
 ## 0. What this is
