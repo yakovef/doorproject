@@ -103,15 +103,29 @@ designs.
 
 ### 1.4 What comes out
 
-- `research/works/auto/leaf.json` — leaf box for all 129
-- `research/works/auto/desc.json` — descriptors
-- `research/works/auto/clusters.json` — cluster assignments and representatives
-- `screenshots/sheet-leaves-*.png` — every leaf, tiled
-- `screenshots/sheet-hardware-*.png` — every hardware crop, zoomed and tiled
-- `screenshots/sheet-cluster-*.png` — one sheet per cluster
+*Corrected after the fact — this section described files that were planned and
+then not built, which in a document whose whole point is the record is worse
+than describing nothing. What exists:*
 
-Then, and only then, images get opened: cluster representatives and singletons.
-Target ≤ 25 images for the whole corpus.
+- `research/works/auto/leaf.json` — leaf box for all 129
+- `research/works/auto/desc.json` — descriptors, each carrying its cluster
+- `screenshots/sheet-doors-*.png` — every door, whole, tiled 32 to a sheet
+- `screenshots/sheet-hw-*.png` — every hardware crop, zoomed, 24 to a sheet
+- `screenshots/sheet-top-*.png` — every leaf top, for peepholes and knockers
+
+No separate `clusters.json` (the assignment rides on each descriptor) and no
+per-cluster sheet: the sheets are SORTED by cluster instead, which turned out
+to be the better answer — repeats end up adjacent, so a design carried by
+eleven doors is read once and the next ten are skipped by eye in a second.
+
+**The novelty filter was planned and not built.** The idea was to run the same
+descriptor over our own renderer's output and mark any cluster already close to
+something we draw. What replaced it was cluster-sorted sheets plus reading the
+catalogue — which found the repeats, but by judgement rather than by
+arithmetic, and judgement is what got `longplate` wrong. Worth building before
+the next corpus arrives.
+
+Fourteen images were opened for the whole corpus.
 
 ### 1.5 The inventory
 
