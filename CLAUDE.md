@@ -63,12 +63,14 @@ js/colour.js        darken / lighten / scaleTone / contrast / silhouette
 js/app.js           wiring; fitStage() widens the viewBox to the stage
 test/units.mjs      ~1.96M assertions, no framework
 tools/*.mjs         measurement instruments, not scripts (see §7)
-research/works/     128 door photographs + 31 measured records
+research/works/     129 door photographs (one is the logo) + 33 measured records
+                    INVENTORY.md: every fitting in the corpus, and whether we draw it
 ```
 
 **Commands:** `npm run build` · `npm test` · `npm run audit` ·
 `npm run shot` · `npm run hardware` · `npm run recreate` · `npm run frame` ·
-`npm run glass` · `npm run mottle` · `npm run measure` · `npm run ask`
+`npm run glass` · `npm run mottle` · `npm run measure` · `npm run ask` ·
+`npm run leaf` · `npm run triage`
 
 `npm test` is string-level. `npm run audit` opens the real page at five
 viewports and clicks every option in every group — everything that lives in
@@ -125,6 +127,43 @@ turn it into a black picture frame painted on. The photograph shows a
 **sculpted ramp with quirks cut into it** — mass *and* detail.
 
 The window surround uses the same primitive. It is the same object.
+
+### The glass
+A pane is **not a surface**. `npm run glass` measures it in five bands against
+the leaf beside it, on tone and on *spread* — the contrast INSIDE one band —
+and spread is the number that matters: the corpus runs 1.0 to 1.35, and a
+gradient of any kind runs 0.1. `paneScene()` draws a street: skyline, building
+opposite, planting, pavement, in many small elements.
+
+Many small elements, specifically. An attempt made of six large blocks scored
+almost perfectly on spread and looked like a De Stijl painting — the metric is
+satisfied by any high contrast at all. Deterministic (a fixed-seed LCG), because
+a door that differs between renders cannot be compared with itself.
+
+Obscured and reeded glazing measure 0.18–0.56 of the leaf's tone: they are
+DARKER than the paint, because behind them is an unlit hall rather than a
+street. Drawn pale they read as white plastic let into the door.
+
+### Add-ons
+`ADDONS` is the only **multi-select** group — peephole, letterplate, knocker,
+closer, nameplate — so `state.addons` is an array and the short code packs it
+as a BITMASK keyed on each entry's own `bit`, never on array position.
+
+The peephole is why the group exists. It used to be drawn whenever the leaf had
+no window: never chosen, never priced, never in the message, and never on a
+glazed door although the photographs have it on one.
+
+### Rules — `js/rules.js`
+One table, read by the tiles, by `fromQuery` and by the price. A rule that
+lives only in the interface is a rule a shared link walks straight past. Two
+kinds, and the distinction is load-bearing: **observed** (zero of 31 measured
+doors) and **geometric** (computed from the renderer's own numbers, so it
+cannot drift from the drawing).
+
+`repair()` moves a design to the nearest buildable one and says what changed.
+It must be idempotent, and it must always LAND somewhere buildable — asserting
+that, rather than that the result looks right, is what found a grip whose
+finish settled the drawing but never the state.
 
 ### Hardware — two groups
 - **`HANDLES` = the grip** (what you pull): none, idan, ella, nitzan, shahar,
@@ -195,6 +234,15 @@ horizontal light direction were all *correct in the photo* and wrong here.
 7. The finish option charged up to ₪220 and changed no pixel for four handles,
    and the message went out reading "Shiran, matte black" — a door that does
    not exist.
+8. The same thing again, in a place the fix for #7 did not reach: the five
+   pull-bar gradients are absolute hexes measured off product photographs, so
+   **a pull bar ignored the finish entirely**. Matte black gave polished steel,
+   ₪220 was charged, and the drawing changed anyway — because the LEVER beside
+   the bar recoloured — so "a priced option changes the door" passed. The
+   assertion has to name the object, not the document.
+9. `tools/glass.mjs` held our own numbers in a constant with a comment saying
+   "re-measure when the pane changes". The pane was rebuilt and the constant
+   was not, so the tool reported the rebuild as having done nothing.
 
 None threw. All looked like a working page. **Tests catch wrong output easily
 and absent output almost never**, unless someone goes looking on purpose.
@@ -250,12 +298,21 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm run mottle` | slow horizontal unevenness of the paint |
 | `npm run measure` | contrast, profile, warmth, texture — ours vs photographs |
 | `npm run hardware` | close crops of every grip, every lockset, and pairings |
-| `npm run shot` | the whole page at nine sizes |
+| `npm run shot` | the whole page at twelve sizes and designs |
+| `npm run leaf` | the leaf box in all 129 photographs — see the warning in its header |
+| `npm run triage` | descriptors, clusters, and the contact sheets |
 
-**Tools must ask the page, not assume.** Three of them held constants that had
-silently stopped being true: a `0.735` leaf-height ratio, a viewBox origin
-assumed to be zero, crop fractions of the whole picture. They read
-`#leaf rect`'s bounding box now. `tools/hardware.mjs` and `screenshot.mjs` are
+**Tools must ask the page, not assume.** FOUR of them have now held constants
+that silently stopped being true: a `0.735` leaf-height ratio, a viewBox origin
+assumed to be zero, crop fractions of the whole picture, and — found in round
+five — `glass.mjs` holding OUR OWN measured numbers in a constant, so a rebuilt
+pane was reported as unchanged. They read `#leaf rect`'s bounding box now, and
+glass.mjs opens the page.
+
+**A contact sheet triages; it does not measure.** Round five read six doors off
+a 150 × 330 tile as carrying a long backplate and built one. Measured with a
+ruler drawn over the crop in units of leaf height, every one is 84 × 230 mm —
+the plate we already had. When a number matters, put a scale on the picture. `tools/hardware.mjs` and `screenshot.mjs` are
 driven from the catalogue, because a hand-kept copy had drifted onto handles
 and colours that no longer existed.
 
@@ -280,6 +337,15 @@ Scratch harnesses go in `tools/_*.mjs`, which is gitignored.
 - **Blocked options are `aria-disabled`, never `disabled`** — still focusable,
   still clickable, and they say why. Playwright's actionability check refuses
   them, so the audit uses `el.click()`.
+- **`minmax(0, 1fr)`, never a bare `1fr` or an implicit `auto` track**, on any
+  grid containing the stage. An `auto` track is floored at its content's
+  min-content width, the stage's content is an SVG whose intrinsic size comes
+  from a viewBox that `fitStage` widens to match the stage, and the loop
+  settles 67 px past the edge of a 320 px screen.
+- **The short code is nine characters and its VERSION field is four bits.**
+  Version 8 does not fit in three, so a decoder built for this layout reads an
+  older code's version as 14 or 15 and refuses it — which is wanted, and the
+  length check refuses it a line earlier anyway.
 
 ---
 
@@ -291,11 +357,9 @@ which colours he stocks and which cost extra, which grips and which locksets he
 orders, which finishes each comes in, the distance/pricing contradiction, and
 permission to use the photographs.
 
-**Next on the drawing** (`REALISM.md` §7): the glass. Measured, it is the
-last flat thing we draw — our spread is 6× too small across the middle of the
-pane and 20× at its foot, because a window is not a surface, it is an aperture
-with a street behind it. The corpus also splits cleanly into clear and
-obscured glazing, which is **a product option we do not offer at all**.
+**Done in round five** (`ROUND5.md`): the glass rebuild — spread now measures
+1× the corpus in every band, from 6–21× too flat — and clear / obscured /
+reeded as a real option.
 
 §7.3 lists the eight kinds of photograph that would unlock the rest, ranked.
 Square-on matters more than good lighting.

@@ -23,14 +23,19 @@
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import jpeg from 'jpeg-js';
+import { chromium } from 'playwright';
+import { PNG } from 'pngjs';
 
 const lum = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
 const BANDS = [0.02, 0.20, 0.40, 0.60, 0.80];
 
-/* Ours, measured the same way on 2025-08-17 with tallwin + no grille on a
-   white leaf. Kept here rather than re-shot on every run so the tool stays a
-   plain reader with no browser in it; re-measure when the pane changes. */
-const OURS = { tone: [0.67, 0.58, 0.49, 0.46, 0.46], spread: [0.61, 0.17, 0.13, 0.10, 0.06] };
+/* ⚠ This used to be a CONSTANT — the numbers as measured one afternoon, with
+   a note saying "re-measure when the pane changes". The pane changed and the
+   constant did not, so the tool went on reporting a six-times-too-flat pane
+   after the pane had been rebuilt, and the rebuild looked like it had done
+   nothing. That is precisely the failure CLAUDE.md §7 names: a tool that holds
+   a number instead of asking for one, whose symptom is silence.
+   It opens the page now. */
 
 const rows = [];
 for (const f of readdirSync('research/works/data2').filter(n => /^d\d+\.json$/.test(n))) {
@@ -89,6 +94,7 @@ const med = a => a.slice().sort((x, y) => x - y)[a.length >> 1];
 const col = key => BANDS.map((_, i) => med(rows.map(r => r[key][i])));
 console.log(`\n  photographs  tone   ${fmt(col('tone'))}`);
 console.log(`               spread ${fmt(col('spread'))}`);
+const OURS = await measureOurs();
 console.log(`\n  ours         tone   ${fmt(OURS.tone)}`);
 console.log(`               spread ${fmt(OURS.spread)}`);
 
@@ -96,3 +102,51 @@ const gaps = col('spread').map((v, i) => v / OURS.spread[i]).slice(1);   // band
 console.log(`\n  Our pane is ${Math.round(Math.min(...gaps))}x too flat in the middle and ` +
             `${Math.round(Math.max(...gaps))}x at the foot. Tone is not the gap; structure is.`);
 console.log(`  ${rows.length} panes. Spread above ~1.0 is clear glazing, below ~0.4 obscured.\n`);
+
+
+/**
+ * Our own pane, measured through the browser exactly as the photographs are:
+ * same bands, same fractions, same division by the leaf's own midpoint. The
+ * one thing that must match is the METHOD, or the comparison is between two
+ * different quantities that happen to share a name.
+ */
+async function measureOurs() {
+  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  const p = await b.newPage({ viewport: { width: 900, height: 1200 }, deviceScaleFactor: 1 });
+  await p.goto(`file://${process.cwd()}/index.html?bare=1&c=rb-9016d&w=tallwin&z=clear`
+             + '&g=none&n=none&k=coral&d=plain&f=steel&s=standard&h=right-in&a=');
+  await p.waitForTimeout(500);
+  const geo = await p.evaluate(() => {
+    const svg = document.querySelector('#stage svg');
+    const L = svg.querySelector('#leaf rect').getBoundingClientRect();
+    const g = svg.querySelector('[data-pane] rect').getBoundingClientRect();
+    return { L: { x: L.x, y: L.y, w: L.width, h: L.height },
+             W: { x: g.x, y: g.y, w: g.width, h: g.height } };
+  });
+  await p.screenshot({ path: '/tmp/glass-ours.png' });
+  await b.close();
+  const png = PNG.sync.read(readFileSync('/tmp/glass-ours.png'));
+  const img = { w: png.width, h: png.height, d: png.data };
+
+  let s = 0, n = 0;
+  for (let y = geo.L.y + geo.L.h * 0.80 | 0; y < geo.L.y + geo.L.h * 0.90; y++) {
+    for (let x = geo.L.x + geo.L.w * 0.15 | 0; x < geo.L.x + geo.L.w * 0.85; x++) {
+      s += lum(img.d, (y * img.w + x) * 4); n++;
+    }
+  }
+  const leafMid = s / n;
+  const band = t => {
+    let sum = 0, count = 0, mn = 255, mx = 0;
+    for (let y = geo.W.y + geo.W.h * t | 0; y < geo.W.y + geo.W.h * (t + 0.09); y++) {
+      for (let x = geo.W.x + geo.W.w * 0.15 | 0; x < geo.W.x + geo.W.w * 0.85; x++) {
+        const v = lum(img.d, (y * img.w + x) * 4);
+        sum += v; count++;
+        if (v < mn) mn = v;
+        if (v > mx) mx = v;
+      }
+    }
+    return { tone: sum / count / leafMid, spread: (mx - mn) / leafMid };
+  };
+  const bands = BANDS.map(band);
+  return { tone: bands.map(x => x.tone), spread: bands.map(x => x.spread) };
+}

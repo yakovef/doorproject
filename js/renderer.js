@@ -28,6 +28,44 @@ const FINISH_TONES = {
   brass: ['#EFE5CE', '#D9CBA6', '#BCAD86', '#9C8F6C', '#C7BA9B', '#7C7154'],
 };
 
+
+/**
+ * Recolour a measured metal profile into another finish.
+ *
+ * The five bar gradients below are measured off the manufacturer's own
+ * product photographs — the exact pattern of blown highlights, dark cores and
+ * returns that separates a round tube from a square section at a glance. They
+ * are also, as written, absolute hexes, which means A PULL BAR IGNORES THE
+ * FINISH ENTIRELY. Pick matte black with an Idan bar and the drawing gives you
+ * polished steel, the price still takes ₪220, and the message to Peretz says
+ * "Idan, brass".
+ *
+ * That is CLAUDE.md §5 item 7 exactly, in a place the earlier fix did not
+ * reach: the fix then covered handles that DECLARE a fixed finish, and the
+ * bars neither declare one nor honour the chosen one. Found by recreating
+ * d087, whose bar is black, and getting a steel one.
+ *
+ * The profile is the valuable part and must survive, so this maps each stop's
+ * LUMINANCE onto the chosen finish's own six-step ramp. Same highlights in the
+ * same places, in brass or in black. The corpus has all three: black bars on
+ * d060 d066 d087 d113 d122, brass on d045 d072 d074 d082, steel on the rest.
+ */
+function inFinish(hex, tone) {
+  const { r, g, b } = toRgbLocal(hex);
+  /* Position on the ramp, 0 = brightest. The ramp is ordered light to dark
+     with a lit return at index 4, so it is sampled by index rather than
+     interpolated: the return is a feature of the metal, not a mistake. */
+  const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  const order = [0, 1, 2, 4, 3, 5];             // brightest to darkest
+  const i = Math.min(order.length - 1, Math.max(0, Math.round((1 - l) * (order.length - 1))));
+  return tone[order[i]];
+}
+const toRgbLocal = hex => ({
+  r: parseInt(hex.slice(1, 3), 16),
+  g: parseInt(hex.slice(3, 5), 16),
+  b: parseInt(hex.slice(5, 7), 16),
+});
+
 /* ── The light. Everything shades from this. ────────────────────────
    Key is high and ~30° left of camera. The camera is square on to the door,
    so the two jamb returns are the same width (see RETURN) and the light,
@@ -746,47 +784,47 @@ export function render(state) {
          gradient for both is what makes rendered bars look like tubes of
          toothpaste. -->
     <linearGradient id="barRound" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#4A4440"/>
-      <stop offset="0.10" stop-color="#FFFFFF"/>
-      <stop offset="0.167" stop-color="#FFFFFF"/>
-      <stop offset="0.283" stop-color="#4E4846"/>
-      <stop offset="0.40" stop-color="#FCFBF6"/>
-      <stop offset="0.467" stop-color="#F2F0EA"/>
-      <stop offset="0.633" stop-color="#302E2A"/>
-      <stop offset="0.815" stop-color="#766B65"/>
-      <stop offset="1"    stop-color="#564E47"/>
+      <stop offset="0"    stop-color="${inFinish('#4A4440', tone)}"/>
+      <stop offset="0.10" stop-color="${inFinish('#FFFFFF', tone)}"/>
+      <stop offset="0.167" stop-color="${inFinish('#FFFFFF', tone)}"/>
+      <stop offset="0.283" stop-color="${inFinish('#4E4846', tone)}"/>
+      <stop offset="0.40" stop-color="${inFinish('#FCFBF6', tone)}"/>
+      <stop offset="0.467" stop-color="${inFinish('#F2F0EA', tone)}"/>
+      <stop offset="0.633" stop-color="${inFinish('#302E2A', tone)}"/>
+      <stop offset="0.815" stop-color="${inFinish('#766B65', tone)}"/>
+      <stop offset="1"    stop-color="${inFinish('#564E47', tone)}"/>
     </linearGradient>
     <linearGradient id="barBrass" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#7D7467"/>
-      <stop offset="0.19" stop-color="#DCBF8C"/>
-      <stop offset="0.40" stop-color="#624E2C"/>
-      <stop offset="0.53" stop-color="#5A4727"/>
-      <stop offset="0.72" stop-color="#B99B69"/>
-      <stop offset="0.78" stop-color="#FFF8E0"/>
-      <stop offset="0.86" stop-color="#C0A87E"/>
-      <stop offset="1"    stop-color="#817F82"/>
+      <stop offset="0"    stop-color="${inFinish('#7D7467', tone)}"/>
+      <stop offset="0.19" stop-color="${inFinish('#DCBF8C', tone)}"/>
+      <stop offset="0.40" stop-color="${inFinish('#624E2C', tone)}"/>
+      <stop offset="0.53" stop-color="${inFinish('#5A4727', tone)}"/>
+      <stop offset="0.72" stop-color="${inFinish('#B99B69', tone)}"/>
+      <stop offset="0.78" stop-color="${inFinish('#FFF8E0', tone)}"/>
+      <stop offset="0.86" stop-color="${inFinish('#C0A87E', tone)}"/>
+      <stop offset="1"    stop-color="${inFinish('#817F82', tone)}"/>
     </linearGradient>
     <linearGradient id="barMatte" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#5C5D5A"/>
-      <stop offset="0.32" stop-color="#6D6D69"/>
-      <stop offset="0.74" stop-color="#666462"/>
-      <stop offset="1"    stop-color="#5A5955"/>
+      <stop offset="0"    stop-color="${inFinish('#5C5D5A', tone)}"/>
+      <stop offset="0.32" stop-color="${inFinish('#6D6D69', tone)}"/>
+      <stop offset="0.74" stop-color="${inFinish('#666462', tone)}"/>
+      <stop offset="1"    stop-color="${inFinish('#5A5955', tone)}"/>
     </linearGradient>
     <linearGradient id="barPolish" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#D1CCBF"/>
-      <stop offset="0.037" stop-color="#F5F4F2"/>
-      <stop offset="0.444" stop-color="#F7F6F4"/>
-      <stop offset="0.519" stop-color="#FFFFFF"/>
-      <stop offset="0.560" stop-color="#A9ACA9"/>
-      <stop offset="0.778" stop-color="#96938D"/>
-      <stop offset="1"    stop-color="#999591"/>
+      <stop offset="0"    stop-color="${inFinish('#D1CCBF', tone)}"/>
+      <stop offset="0.037" stop-color="${inFinish('#F5F4F2', tone)}"/>
+      <stop offset="0.444" stop-color="${inFinish('#F7F6F4', tone)}"/>
+      <stop offset="0.519" stop-color="${inFinish('#FFFFFF', tone)}"/>
+      <stop offset="0.560" stop-color="${inFinish('#A9ACA9', tone)}"/>
+      <stop offset="0.778" stop-color="${inFinish('#96938D', tone)}"/>
+      <stop offset="1"    stop-color="${inFinish('#999591', tone)}"/>
     </linearGradient>
     <linearGradient id="barDark" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#55565C"/>
-      <stop offset="0.14" stop-color="#525255"/>
-      <stop offset="0.50" stop-color="#515054"/>
-      <stop offset="0.92" stop-color="#4E4E50"/>
-      <stop offset="1"    stop-color="#6D6B6C"/>
+      <stop offset="0"    stop-color="${inFinish('#55565C', tone)}"/>
+      <stop offset="0.14" stop-color="${inFinish('#525255', tone)}"/>
+      <stop offset="0.50" stop-color="${inFinish('#515054', tone)}"/>
+      <stop offset="0.92" stop-color="${inFinish('#4E4E50', tone)}"/>
+      <stop offset="1"    stop-color="${inFinish('#6D6B6C', tone)}"/>
     </linearGradient>
 
     <!-- Almog's blade: bright top, dark belly, bounce along the bottom, and
@@ -953,6 +991,14 @@ export function render(state) {
       <feGaussianBlur stdDeviation="1.5"/>
     </filter>
 
+    <!-- Glass two metres in front of a street does not resolve it sharply, and
+         neither does a phone camera focused on the door. Without this the
+         scene behind the pane reads as flat graphic shapes stuck to the glass
+         rather than as something a distance away. -->
+    <filter id="paneSoft" x="-6%" y="-6%" width="112%" height="112%">
+      <feGaussianBlur stdDeviation="1.4"/>
+    </filter>
+
     <filter id="softShadow" x="-40%" y="-80%" width="180%" height="300%">
       <feGaussianBlur stdDeviation="30"/>
     </filter>
@@ -1071,15 +1117,26 @@ export function render(state) {
   ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${
       /* A SIDELIGHT is glass by definition — that is the whole product, and
          four doors in the corpus have one (d117 d122 d123 d128). It does not
-         copy the main leaf's window: on all four the side panel is a single
-         tall light running most of the panel's height whatever the door beside
-         it is doing, and one of them has a solid door next to a glazed
+         take the main leaf's window SHAPE: on all four the side panel is its
+         own slim light, and one of them has a solid door beside a glazed
          sidelight. דלת וחצי is the other case and keeps its old behaviour,
-         where the second leaf mirrors the first. */
+         where the second leaf mirrors the first.
+         But it does follow the leaf's COMPOSITION. Beside d122 our sidelight
+         was one tall pane against a photograph where it is glass over a
+         moulded panel, laid out to the same heights as the door next to it —
+         which is the whole visual point of a sidelight, that it reads as part
+         of the same object. So the pane stops where the leaf's glazing stops
+         and the panel below repeats. */
       size.sideGlazed
-        ? aperture({ x: sideX + 95, y: y0 + leafH * 0.09,
-                     w: sideW - 190, h: leafH * 0.79,
-                     paint, edge, grille, glazing: glazing.id, key: 's' })
+        ? (() => {
+            const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
+            const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
+            return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
+                              paint, edge, grille, glazing: glazing.id, key: 's' })
+              + (detail.panel
+                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, false)
+                  : '');
+          })()
       : win.rects[0] && sideW > 320
         ? aperture({ x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
                      y: y0 + win.rects[0].top,
@@ -1288,14 +1345,24 @@ function mouldGradients(paint, pale) {
 /**
  * The moulded rectangles that make up the "designed" face.
  *
- * Geometry measured on the same three doors, as fractions of the leaf:
- *   inset each side   0.17  0.21  0.23      -> 0.18 (the two wider readings
- *                                              are off-axis doors, where the
- *                                              far stile foreshortens)
- *   upper rect  top   0.047 0.072 0.113     -> 0.07
- *               foot  0.536 0.569 0.631     -> 0.57
- *   lower rect  top   0.650 0.674 0.695     -> 0.67
- *               foot  0.879 0.922 0.909     -> 0.91
+ * Geometry re-read against SIX doors with a ruler drawn over each leaf in
+ * units of leaf height — d048 d051 d087 (two panels) and d097 d106 d122 (a
+ * window over one). The vertical placement turned out to be right within
+ * 0.015 everywhere, which is worth knowing: the thing that looked wrong beside
+ * d048 was not where the panels sat.
+ *
+ *   inset each side   0.14 0.12 0.20 0.13 0.10 0.13  -> 0.13   (was 0.18)
+ *   upper rect  top   0.055 0.075 0.100             -> 0.07    unchanged
+ *               foot  0.635 0.575 0.545             -> 0.58
+ *   lower rect  top   0.700 0.655 0.640             -> 0.66
+ *               foot  0.925 0.925 0.885             -> 0.92
+ *   lone lower  top   0.745 0.680 0.640             -> 0.68
+ *               foot  0.885 0.895 0.905             -> 0.90
+ *
+ * The inset was the error, and it was a big one: 0.18 each side leaves the
+ * panel 64% of the leaf's width where the real ones are 74%. A panel that is
+ * a tenth of the door too narrow on both sides reads as a picture frame hung
+ * on the leaf rather than as the leaf's own construction.
  *
  * Kept clear of the glazing: mouldings crossing a pane is not a door. Returns
  * '' when there is no room, and the caller must survive that — the last time
@@ -1303,7 +1370,7 @@ function mouldGradients(paint, pale) {
  */
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper) {
   const band = lw * 0.09;
-  const inset = lw * 0.18;
+  const inset = lw * 0.13;
   const x = lx + inset, w = lw - inset * 2;
   const rect = (t, b) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale);
 
@@ -1312,11 +1379,11 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper) {
      nowhere for the upper one. */
   if (upper && winBottom <= ly + 1) {
     return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
-               data-band="${band.toFixed(1)}">${rect(0.07, 0.57)}${rect(0.67, 0.91)}</g>`;
+               data-band="${band.toFixed(1)}">${rect(0.07, 0.58)}${rect(0.66, 0.92)}</g>`;
   }
 
-  const top = Math.max(ly + lh * 0.67, winBottom + lw * 0.08);
-  const bottom = ly + lh * 0.91;
+  const top = Math.max(ly + lh * 0.68, winBottom + lw * 0.08);
+  const bottom = ly + lh * 0.90;
   const art = moulding(x, top, w, bottom - top, band, paint, pale);
   /* `data-top` so a test can ask where the moulding starts instead of parsing
      the first path out of the markup. It did that until this rewrite, and the
@@ -1382,17 +1449,30 @@ function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
      "ruled line work", and d078 settles it at a glance: eleven bands running
      across the leaf, not up it. They also run nearly the full width — inset
      about a tenth each side — rather than sitting in a central band.
-     Spacing is even here. The real one is graduated, tighter at the head and
-     foot than in the middle, which is a refinement worth having only once the
-     orientation is right. */
+     Spacing is graduated, from the eleven measured positions -- see below. */
   const x0s = lx + lw * 0.09, x1s = lx + lw * 0.91;
   const wide = x1s - x0s;
   const t = Math.max(8, Math.round(lh * 0.008));    // strip thickness
-  const top = ly + lh * 0.09, bot = ly + lh * 0.91;
-  const gap = count > 1 ? (bot - top) / (count - 1) : 0;
+  /* Span and spacing both re-read off d078, whose eleven strips are recorded
+     one by one in research/works/data2/d078.json:
+       0.021 0.076 0.156 0.235 0.342 0.485 0.626 0.730 0.810 0.889 0.944
+     Two things follow. They run almost the whole height -- 0.02 to 0.94, not
+     the 0.09 to 0.91 drawn here. And they are GRADUATED: tight at the head and
+     foot, open across the middle. The gaps are .055 .080 .079 .107 .143 .141
+     .104 .080 .079 .055, a symmetric fan. Evenly spaced they read as a
+     barcode; graduated they read as a design, which is what the tier is
+     selling.
+     Normalised, those eleven positions sit within 0.023 of
+     0.6*smoothstep(u) + 0.4*u -- which is where the expression comes from. It
+     is a fit to eleven measurements, not a curve picked because it looked
+     about right. The comment that used to sit here said the real one is
+     graduated and called it "a refinement worth having only once the
+     orientation is right". The orientation has been right for two rounds. */
+  const top = ly + lh * 0.02, bot = ly + lh * 0.94;
+  const spread = u => 0.6 * (u * u * (3 - 2 * u)) + 0.4 * u;
   const out = [];
   for (let i = 0; i < count; i++) {
-    const cy = count > 1 ? top + gap * i : ly + lh / 2;
+    const cy = count > 1 ? top + (bot - top) * spread(i / (count - 1)) : ly + lh / 2;
     const y = Math.round(cy - t / 2);
     out.push(`
       <rect x="${x0s + 3}" y="${y + 3}" width="${wide}" height="${t}"
@@ -1442,7 +1522,115 @@ function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
  * Returned in two parts, because they go either side of the grille: ironwork
  * sits in front of the glass, not behind its texture.
  */
-function glazingArt(kind, x, y, w, h) {
+/**
+ * What is BEHIND clear glass.
+ *
+ * `npm run glass` measures the pane against the leaf beside it, in five bands
+ * top to bottom, on two numbers: `tone` (how bright the band is relative to
+ * the paint) and `spread` (how much contrast there is WITHIN the band). Over
+ * the ten glazed doors in the corpus:
+ *
+ *   photographs   tone   0.92 0.65 0.79 0.68 0.54
+ *                 spread 1.13 1.02 1.08 1.35 1.28
+ *   ours (before) tone   0.67 0.58 0.49 0.46 0.46
+ *                 spread 0.61 0.17 0.13 0.10 0.06
+ *
+ * The tool's own verdict was the useful half: TONE IS NOT THE GAP, STRUCTURE
+ * IS. We were six times too flat across the middle of the pane and twenty-one
+ * times too flat at its foot. No adjustment to a gradient fixes that, because
+ * a gradient has no structure by construction -- and every previous attempt at
+ * this pane was an adjustment to the gradient.
+ *
+ * A window is not a surface. It is an aperture with a street behind it, and
+ * the street has a skyline, a building opposite, planting, and a pavement. So
+ * this draws those, as a handful of hard-edged masses. Deliberately not a
+ * picture of a particular street: the shapes are generic and derived from the
+ * pane's own proportions, because a recognisable scene repeated in every door
+ * would be worse than a flat one.
+ *
+ * Everything is a multiple of the LEAF's paint, through `scaleTone`, so a pane
+ * in a black door and a pane in a white one both land on the measured RATIO
+ * rather than both landing on the same grey.
+ */
+function paneScene(x, y, w, h, paint) {
+  const t = (m, a = 1) => `fill="${scaleTone(paint, m)}"${a < 1 ? ` opacity="${a}"` : ''}`;
+  const band = (y0, y1, m, a) =>
+    `<rect x="${x}" y="${(y + h * y0).toFixed(1)}" width="${w}" height="${(h * (y1 - y0)).toFixed(1)}" ${t(m, a)}/>`;
+  const box = (x0, y0, x1, y1, m, a) =>
+    `<rect x="${(x + w * x0).toFixed(1)}" y="${(y + h * y0).toFixed(1)}" width="${(w * (x1 - x0)).toFixed(1)}" height="${(h * (y1 - y0)).toFixed(1)}" ${t(m, a)}/>`;
+  const blob = (x0, y0, rx, ry, m, a) =>
+    `<ellipse cx="${(x + w * x0).toFixed(1)}" cy="${(y + h * y0).toFixed(1)}" rx="${(w * rx).toFixed(1)}" ry="${(h * ry).toFixed(1)}" ${t(m, a)}/>`;
+
+  /* Deterministic, because a door that looks different every time it is drawn
+     cannot be compared with itself and cannot be photographed for Peretz.
+     Math.random is also banned in this codebase's tooling for the same
+     reason. A small LCG on a fixed seed gives scatter without chance. */
+  let seed = 0x2f6e2b1;
+  const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+
+  /* FIRST ATTEMPT, kept as a warning: five big flat rectangles hitting the
+     measured band tones, with a couple of large blocks for contrast. It scored
+     almost perfectly — spread 0.80/0.94/1.04/1.05/1.01 against the corpus's
+     1.13/1.02/1.08/1.35/1.28 — and looked like a De Stijl painting. A metric
+     that counts brightest-minus-darkest inside a band is satisfied by ANY high
+     contrast, including six enormous blocks of black and white.
+     What a real pane's contrast is made of is MANY SMALL THINGS: leaves,
+     twigs, railings, the glazing bars of the building opposite. Same spread,
+     completely different picture. So the masses below are the same tones as
+     that first attempt, broken into pieces the size they are in a photograph
+     and softened by url(#paneSoft), which is what glass does to a street two
+     metres behind it. */
+
+  const sky = [];
+  for (let i = 0; i < 26; i++) {
+    const u = rnd(), v = rnd();
+    sky.push(blob(0.05 + u * 0.90, 0.02 + v * 0.16, 0.03 + rnd() * 0.05, 0.008 + rnd() * 0.014,
+                  0.62 + rnd() * 0.80, 0.62));
+  }
+  /* The building opposite: a mid mass with a grid of small openings, which is
+     what actually generates contrast in the upper middle of every photograph
+     in the corpus. */
+  const windows = [];
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 5; c++) {
+      const wx = 0.06 + c * 0.19, wy = 0.26 + r * 0.062;
+      const lit = (r === 1 && c === 2) || (r === 3 && c === 0) || (r === 2 && c === 4);
+      windows.push(box(wx, wy, wx + 0.115, wy + 0.046, lit ? 1.34 : 0.09 + rnd() * 0.20));
+    }
+  }
+  /* Planting. Small, overlapping, and in a range of tones — one flat dark
+     rectangle here is what made the lower half read as a hole. */
+  const leaves = [];
+  for (let i = 0; i < 90; i++) {
+    const u = rnd(), v = rnd();
+    leaves.push(blob(-0.02 + u * 1.04, 0.56 + v * 0.34, 0.022 + rnd() * 0.045, 0.010 + rnd() * 0.022,
+                     0.10 + rnd() * 1.05, 0.85));
+  }
+
+  return `
+    <!-- sky, broken by cloud and by a parapet coming in from one side -->
+    ${band(0.00, 0.20, 1.34)}
+    ${sky.join('')}
+    ${box(0.62, 0.00, 1.02, 0.15, 0.30)}
+    ${box(0.62, 0.02, 0.78, 0.15, 0.52)}
+    ${band(0.20, 0.24, 0.72)}
+    <!-- the building opposite -->
+    ${band(0.24, 0.52, 0.58)}
+    ${windows.join('')}
+    <!-- a lit wall across the middle: the brightest thing in the pane, and the
+         reason the middle band's spread is over 1.0 in every photograph -->
+    ${band(0.52, 0.58, 1.28)}
+    ${band(0.58, 0.62, 0.94)}
+    <!-- planting, then the pavement bouncing light back up -->
+    ${band(0.62, 0.86, 0.34)}
+    ${leaves.join('')}
+    ${[0.16, 0.40, 0.63, 0.87].map(u => box(u - 0.012, 0.60, u + 0.012, 0.88, 0.60, 0.8)).join('')}
+    ${band(0.86, 1.00, 1.02)}
+    ${box(0.00, 0.86, 0.46, 0.93, 0.30)}
+    ${box(0.46, 0.88, 1.00, 0.94, 0.66)}`;
+}
+
+function glazingArt(kind, x, y, w, h, paint) {
   if (kind === 'reeded') {
     /* Vertical flutes. Each rod is a little lens: a bright line down its
        crown, a dark one in the valley beside it. Read at door scale it is a
@@ -1450,11 +1638,17 @@ function glazingArt(kind, x, y, w, h) {
     const pitch = Math.max(16, Math.min(30, w / 9));
     const n = Math.max(3, Math.round(w / pitch));
     const p = w / n;
-    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#C8CFD4" opacity="0.62"/>`;
+    /* Tone from the corpus, not from an idea of what frosted glass looks like.
+       `npm run glass` separates obscured panes from clear ones by spread, and
+       the obscured ones measure 0.18 to 0.56 of the leaf's own value -- they
+       are DARKER than the paint, because behind them is an unlit hall rather
+       than a street. Drawn pale, as this was, an obscured pane reads as white
+       plastic let into the door. */
+    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.52)}"/>`;
     for (let i = 0; i < n; i++) {
       const bx = x + p * i;
-      out += `<rect x="${bx}" y="${y}" width="${p * 0.30}" height="${h}" fill="#fff" opacity="0.40"/>`
-           + `<rect x="${bx + p * 0.70}" y="${y}" width="${p * 0.30}" height="${h}" fill="#2A3136" opacity="0.24"/>`;
+      out += `<rect x="${bx}" y="${y}" width="${p * 0.30}" height="${h}" fill="${scaleTone(paint, 0.86)}"/>`
+           + `<rect x="${bx + p * 0.70}" y="${y}" width="${p * 0.30}" height="${h}" fill="${scaleTone(paint, 0.30)}"/>`;
     }
     return { veil: out, over: '' };
   }
@@ -1465,15 +1659,19 @@ function glazingArt(kind, x, y, w, h) {
     const cell = Math.max(26, Math.min(52, w / 6));
     const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
     const cw = w / cols, ch = h / rows;
-    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#CBD2D6" opacity="0.70"/>`;
+    /* Same correction as the reeded glass, and the motif is bolder: beside
+       d106 ours was a faint tracery on a white field where the real one is a
+       strong cream figure on a dark ground. The pattern is the product; a
+       pattern you have to look for is not one. */
+    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.46)}"/>`;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const cx = x + cw * (c + 0.5), cy = y + ch * (r + 0.5);
-        const rx = cw * 0.36, ry = ch * 0.36;
-        out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${Math.min(rx, ry).toFixed(1)}"
-                        fill="none" stroke="#fff" stroke-opacity="0.42" stroke-width="2.4"/>`
-             + `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(Math.min(rx, ry) * 0.42).toFixed(1)}"
-                        fill="#fff" fill-opacity="0.26"/>`;
+        const rr = Math.min(cw, ch) * 0.50;
+        out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}"
+                        fill="none" stroke="${scaleTone(paint, 1.02)}" stroke-width="${(rr * 0.22).toFixed(1)}"/>`
+             + `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(rr * 0.30).toFixed(1)}"
+                        fill="${scaleTone(paint, 0.88)}"/>`;
       }
     }
     return { veil: out, over: '' };
@@ -1483,7 +1681,7 @@ function glazingArt(kind, x, y, w, h) {
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 function aperture({ x, y, w, h, paint, edge, grille, glazing, key }) {
-  const glass = glazingArt(glazing, x, y, w, h);
+  const glass = glazingArt(glazing, x, y, w, h, paint);
   /* The architrave. It was a 30 mm band with a single 10 mm bevel, and that
      thinness is most of why a glazed door of ours read as CAD next to a
      photograph: on the measured doors the surround is a MOULDING, wide and
@@ -1517,6 +1715,10 @@ function aperture({ x, y, w, h, paint, edge, grille, glazing, key }) {
       ${bevel(x, y, w, h, 8, paint, false)}
 
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
+      <!-- the street behind the pane. Clipped, because these are hard-edged
+           masses and the whole point is that they have edges. -->
+      ${glass ? '' : `<clipPath id="sc-${key}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
+      <g clip-path="url(#sc-${key})" filter="url(#paneSoft)">${paneScene(x, y, w, h, paint)}</g>`}
       <!-- Frost at 0.30 on a SCREEN blend was making every opening read as
            bathroom glass. The measured doors are glazed with clear or lightly
            patterned glass and the pane comes out DARKER than the leaf, because
@@ -1658,8 +1860,7 @@ function handleFootprint(handle, leafH) {
     case 'cadoor':  return { hx: 34, vy: 40 };
     case 'sapir':   return { hx: 36, vy: 36 };
     case 'knobplate': return { hx: 48, vy: 150 };
-    case 'longplate': return { hx: 42, vy: 215, reach: LEVER_REACH };
-    case 'digital': return { hx: 48, vy: 150 };
+    case 'digital': return { hx: 28, vy: 113 };
     case 'square':  return { hx: 41, vy: 95, reach: LEVER_REACH };
     case 'shiran':  return { hx: 44, vy: 240 };
     default:        return { hx: (handle.w || 30) / 2, vy: barHalf(handle.len, leafH) };
@@ -1785,7 +1986,6 @@ const LOCK_ART = {
   cadoor:  (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
   knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
   sapir:   (h, g) => sapirKnob(g.cx, g.cy, g.dir),
-  longplate: (h, g) => longPlate(g.cx, g.cy, g.dir),
   digital: (h, g) => digitalLock(g.cx, g.cy, g.dir),
   square:  (h, g) => squarePlates(g.cx, g.cy, g.dir),
 };
@@ -2193,45 +2393,6 @@ function knobPlate(cx, cy, dir) {
 }
 
 /**
- * Lever on a long backplate. Six doors — d003 d005 d010 d011 d023 d070 — which
- * makes it the commonest fitting in the corpus after the plain rose, and it
- * was not in the catalogue at all.
- *
- * Not the Rotem plate made taller. The Rotem plate is 240 mm and waisted, and
- * it reads as an escutcheon around a lever. This runs 430 mm — a third of the
- * stile — with parallel sides and a square-ish end, and it reads as a STRIP
- * screwed to the door with a lever coming out of it. The lever sits high on
- * it and the keyway low, with most of the plate's length between them, which
- * is the proportion that identifies it across a courtyard.
- */
-function longPlate(cx, cy, dir) {
-  const W = 84, H = 430, r = 14;
-  const x = cx - W / 2, y = cy - H * 0.22;
-  const d = `M ${x} ${y + r} Q ${x} ${y} ${x + r} ${y} L ${x + W - r} ${y}
-             Q ${x + W} ${y} ${x + W} ${y + r} L ${x + W} ${y + H - r}
-             Q ${x + W} ${y + H} ${x + W - r} ${y + H} L ${x + r} ${y + H}
-             Q ${x} ${y + H} ${x} ${y + H - r} Z`;
-  return `
-    <g data-hw="lockset-art" data-style="longplate">
-      <path d="${d}" fill="#000" opacity="0.34" transform="translate(${dir * 6} 7)"
-            filter="url(#hwShadow)"/>
-      <path d="${d}" fill="url(#plateFace)"/>
-      <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.55" stroke-width="3"
-            transform="translate(${dir * 1.2} -1.6)"/>
-      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.40" stroke-width="2"
-            transform="translate(${dir * -1.6} 2.2)"/>
-      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-      <!-- two fixing screws, top and bottom, which the photographs all show -->
-      ${[y + 26, y + H - 26].map(sy => `
-        <circle cx="${cx}" cy="${sy}" r="5" fill="#000" opacity="0.34"/>
-        <circle cx="${cx - 0.7}" cy="${sy - 0.7}" r="4" fill="url(#metal)"/>`).join('')}
-      ${lever(cx, cy, dir)}
-      ${keyway(cx, y + H * 0.80)}
-    </g>`;
-}
-
-/**
  * Keypad lock. Five doors — d070 d081 d084 d087 d113 — which is as common here
  * as the recessed channel we already sell, and it was not offered.
  *
@@ -2242,34 +2403,38 @@ function longPlate(cx, cy, dir) {
  * recessed circles, dark on dark, legible only by their own rims.
  */
 function digitalLock(cx, cy, dir) {
-  const W = 96, H = 300, r = 12;
-  const x = cx - W / 2, y = cy - H * 0.34;
-  const rows = 4, cols = 3;
-  const padTop = y + H * 0.08, padH = H * 0.56;
-  const keys = [];
-  for (let ry = 0; ry < rows; ry++) {
-    for (let cxi = 0; cxi < cols; cxi++) {
-      const bx = x + W * 0.18 + (W * 0.64) * (cxi / (cols - 1));
-      const by = padTop + padH * (ry / (rows - 1));
-      keys.push(`<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="8.5" fill="#101215"/>
-                 <circle cx="${bx.toFixed(1)}" cy="${(by - 0.8).toFixed(1)}" r="8.5" fill="none"
-                         stroke="#fff" stroke-opacity="0.16" stroke-width="1.4"/>`);
-    }
-  }
+  /* 56 x 226, measured off d087 with a ruler drawn over the crop in units of
+     leaf height. The first version was 96 x 300 — a third again as wide and
+     a third taller — and carried a twelve-button keypad, which came from the
+     English name of the product rather than from any door. What d087 actually
+     has is a slim black slab with two small reader icons near the top and a
+     round thumb-turn below: no buttons at all. */
+  const W = 56, H = 226, r = 9;
+  const x = cx - W / 2, y = cy - H * 0.36;
   return `
     <g data-hw="lockset-art" data-style="digital">
-      <rect x="${x + dir * 6}" y="${y + 7}" width="${W}" height="${H}" rx="${r}"
+      <rect x="${x + dir * 5}" y="${y + 6}" width="${W}" height="${H}" rx="${r}"
             fill="#000" opacity="0.36" filter="url(#hwShadow)"/>
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="#25292D"/>
       <!-- one soft band of key light down the slab, and no specular anywhere:
            this is the only fitting on the door that is not polished metal -->
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="url(#keyWash)" opacity="0.5"/>
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="none"
-            stroke="#fff" stroke-opacity="0.16" stroke-width="1.6"/>
-      ${keys.join('')}
-      <!-- the thumb-turn and the emergency keyway share the foot of the body -->
-      <rect x="${cx - 20}" y="${y + H * 0.72}" width="40" height="12" rx="6" fill="url(#metal)"/>
-      ${keySlot(cx, y + H * 0.86, 11)}
+            stroke="#fff" stroke-opacity="0.16" stroke-width="1.4"/>
+      <!-- the reader window: glossier than the body, so it takes a highlight
+           the matte slab around it does not -->
+      <rect x="${x + W * 0.20}" y="${y + H * 0.08}" width="${W * 0.60}" height="${H * 0.23}"
+            rx="4" fill="#15181B"/>
+      <rect x="${x + W * 0.20}" y="${y + H * 0.08}" width="${W * 0.60}" height="${H * 0.05}"
+            rx="2" fill="#fff" opacity="0.10"/>
+      ${[0.36, 0.64].map(u => `
+        <circle cx="${(x + W * u).toFixed(1)}" cy="${(y + H * 0.40).toFixed(1)}" r="3.6"
+                fill="#fff" opacity="0.22"/>`).join('')}
+      <!-- the thumb-turn, a real turned knob standing off the slab -->
+      <circle cx="${cx}" cy="${y + H * 0.60}" r="12" fill="#000" opacity="0.34"/>
+      <circle cx="${cx}" cy="${(y + H * 0.60) - 1}" r="11" fill="url(#metal)"/>
+      <circle cx="${cx - 3}" cy="${y + H * 0.60 - 4}" r="4" fill="#fff" opacity="0.35"/>
+      ${keySlot(cx, y + H * 0.85, 8)}
     </g>`;
 }
 
@@ -2892,26 +3057,16 @@ const FITTING_GLYPH = {
     <circle cx="0" cy="0" r="21"/>
     <circle cx="0" cy="120" r="12" fill="var(--paper)"/>` }),
 
-  /* Lever on a long backplate: a STRIP, not a taller Rotem. Parallel sides,
-     squared-off ends, the lever high on it and the keyway near the foot, with
-     most of the length between them — that proportion is the identification. */
-  longplate: () => ({ box: [-172, -128, 56, 320], art: `
-    <rect x="-42" y="-95" width="84" height="430" rx="14"/>
-    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <circle cx="0" cy="249" r="13" fill="var(--paper)"/>
-    <circle cx="0" cy="-69" r="5" fill="var(--paper)"/>
-    <circle cx="0" cy="309" r="5" fill="var(--paper)"/>` }),
-
-  /* Keypad: the button grid IS the tile. Nothing else about a black slab
-     distinguishes it from a black slab. */
-  digital: () => ({ box: [-58, -118, 58, 214], art: `
-    <rect x="-48" y="-102" width="96" height="300" rx="12"/>
-    ${Array.from({ length: 12 }, (_, i) => {
-      const cxk = -31 + 31 * (i % 3), cyk = -78 + 56 * Math.floor(i / 3);
-      return `<circle cx="${cxk}" cy="${cyk}" r="9" fill="var(--paper)"/>`;
-    }).join('')}
-    <rect x="-20" y="114" width="40" height="12" rx="6" fill="var(--paper)"/>
-    <circle cx="0" cy="156" r="12" fill="var(--paper)"/>` }),
+  /* The smart lock: a slim black slab with a reader window near the top, a
+     round thumb-turn, and the key override at the foot. Measured off d087 at
+     56 x 226 mm — the twelve-button keypad drawn first came from the English
+     word rather than from the door. */
+  digital: () => ({ box: [-40, -96, 40, 150], art: `
+    <rect x="-28" y="-80" width="56" height="226" rx="10"/>
+    <rect x="-17" y="-62" width="34" height="52" rx="5" fill="var(--paper)"/>
+    <circle cx="0" cy="44" r="15" fill="var(--paper)"/>
+    <circle cx="0" cy="44" r="9"/>
+    <rect x="-12" y="104" width="24" height="9" rx="4" fill="var(--paper)"/>` }),
 
   /* Two squares. Nothing else in the range has a corner, which is the whole
      point of drawing it this way. */
@@ -3059,7 +3214,7 @@ export function detailGlyph(detail) {
  */
 export function glazingGlyph(glazing) {
   const S = 300;
-  const art = glazingArt(glazing.id, 0, 0, S, S);
+  const art = glazingArt(glazing.id, 0, 0, S, S, '#8E979D');
   return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
     ${art ? art.veil

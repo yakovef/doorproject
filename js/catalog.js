@@ -202,7 +202,21 @@ export const HANDLES = [
  */
 export const LOCKSETS = [
   { id: 'coral',   he: 'קורל',  en: 'Coral',  delta: 0,     style: 'lever', aliases: ['lever'] },
-  { id: 'plate',   he: 'רותם',  en: 'Rotem',  delta: 6000,  style: 'plate', lock: true },
+  /* `longplate` is retired one commit after it was added, and the reason is
+     worth keeping. It went in because six doors on the hardware contact sheet
+     looked like they carried a plate running a third of the stile. Measured
+     properly — a crop of each fitting with a ruler in leaf-height units drawn
+     over it — every one of them is 84 x 230 mm, which is this plate. There is
+     no long backplate anywhere in the 129 photographs. The contact sheet's
+     tiles are 150 x 330, a 1:2.2 window on a 1:2.4 leaf, and a 230 mm plate
+     fills a third of that height; "a third of the tile" became "a third of the
+     stile" somewhere between the eye and the note.
+     Two lessons, both already in CLAUDE.md §6 and both re-learned here: a
+     contact sheet triages, it does not measure; and an automatic span that
+     comes back equal to its own search window twice is telling you to draw the
+     thing with a scale over it instead of tuning the detector a third time. */
+  { id: 'plate',   he: 'רותם',  en: 'Rotem',  delta: 6000,  style: 'plate', lock: true,
+    aliases: ['longplate'] },
   { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', delta: 4000,  style: 'cadoor' },
   { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  delta: 10000, style: 'sapir' },
   { id: 'almog',   he: 'אלמוג',  en: 'Almog',  delta: 16000, style: 'almog' },
@@ -216,18 +230,14 @@ export const LOCKSETS = [
      Every one of these was already on Peretz's doors; none of them was in the
      catalogue. Ordered by how many installations carry it. */
 
-  /* Lever on a long narrow backplate — six doors (d003 d005 d010 d011 d023
-     d070). Different object from the Rotem plate, which is 240 mm: these run
-     a third of the stile, carry the keyway at the foot, and read as a strip
-     rather than an escutcheon. The commonest fitting in the corpus after the
-     plain rose. */
-  { id: 'longplate', he: 'ידית על אורך', en: 'Lever on long backplate', delta: 9000,
-    style: 'longplate', lock: true },
-
-  /* Keypad / smart lock — five doors (d070 d081 d084 d087 d113). It IS the
-     keyway, so no separate escutcheon is drawn beside it. Not a decoration:
-     it is as common here as the recessed channel we already sell. */
-  { id: 'digital', he: 'מנעול קודן', en: 'Keypad lock', delta: 145000,
+  /* Smart lock — five doors (d070 d081 d084 d087 d113). It IS the keyway, so
+     no separate escutcheon is drawn beside it. Not a decoration: as common
+     here as the recessed channel we already sell.
+     Called מנעול חכם rather than מנעול קודן because the measured ones are not
+     keypads. d087's is a slim black body with two small reader icons and a
+     round thumb-turn — no buttons at all — and the twelve-button grid drawn
+     first was invented from the English word. */
+  { id: 'digital', he: 'מנעול חכם', en: 'Smart lock', delta: 145000,
     style: 'digital', lock: true },
 
   /* Two square backplates stacked, lever on the upper — four doors (d032 d037
@@ -301,6 +311,15 @@ export const GRILLES = [
      than a variant — `light` tells the renderer to take the leaf colour. */
   { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', delta: 30000, light: true },
   { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Scrollwork, door colour',  delta: 46000, light: true },
+  /* Plain straight muntins in the door's own colour, and it took a recreation
+     to notice they were unreachable. `grid` deliberately sets an ogee motif
+     into the mesh because d097 has one — but d100, d110 and d113 carry a bare
+     orthogonal grid with no ornament at all, and the only way to draw one was
+     `bars`, which is black ironwork. So a white door with white muntins, one
+     of the commonest glazed doors there is, could not be built.
+     Appended, not inserted: appending leaves every existing index alone, which
+     is the difference between a new option and a code VERSION bump. */
+  { id: 'bars-light',   he: 'סורג ישר בהיר',   en: 'Straight, door colour',    delta: 22000, light: true },
 ];
 
 /**

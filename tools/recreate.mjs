@@ -12,18 +12,48 @@ import { chromium } from 'playwright';
 import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
 
-/* Each recreation is the closest the CURRENT catalogue can get. Where nothing
-   is close the gap is the finding, and it is named here rather than hidden. */
+/**
+ * Ten doors, chosen to span the vocabulary rather than to flatter it: plain,
+ * two kinds of backplate, two panelled faces, metal strips, a glazed light
+ * with muntins, obscured glazing, a smart lock, and a sidelight.
+ *
+ * Every query is built from the hand-measured record — handing from `lock.x`,
+ * colour from the sampled hex, the window from the measured rect, the hardware
+ * from what the record names — and NOT adjusted afterwards to whatever looks
+ * closest. Where the catalogue has nothing near, `gap` says so: the difference
+ * is the finding, not something to tune away.
+ */
 const CASES = [
-  { id: 'd026', label: 'basic ₪3,750',
-    q: 'c=rb-7080d&w=none&g=none&n=none&k=coral&d=plain&f=brass&s=standard&h=right-in',
-    gap: 'window grey added this round; exact match' },
-  { id: 'd097', label: 'luxury ₪7,500',
-    q: 'c=rb-9016d&w=tallwin&g=grid-light&n=none&k=coral&d=panel&f=steel&s=standard&h=right-in',
-    gap: 'grid-light added; photo also has scroll motifs inside the grid' },
-  { id: 'd062', label: 'designed ₪5,000',
-    q: 'c=rb-5103d&w=none&g=none&n=grab&k=coral&d=panel2&f=steel&s=standard&h=right-in',
-    gap: 'the applied-moulding rewrite was measured on this door and d048/d076' },
+  { id: 'd003', label: 'basic 3195 - waisted plate',
+    q: 'c=rb-7110d&w=none&z=clear&g=none&n=none&k=plate&d=plain&f=brass&s=standard&h=right-in&a=peep',
+    gap: 'measured with a ruler: this plate is 84 x 230 mm, which is the Rotem plate' },
+  { id: 'd012', label: 'basic 3450 - Rotem plate',
+    q: 'c=rb-7080d&w=none&z=clear&g=none&n=none&k=plate&d=plain&f=steel&s=standard&h=right-in&a=peep',
+    gap: 'leaf is #B2BAC8, a pale blue-grey the Rav Bariach chart has no entry for' },
+  { id: 'd026', label: 'basic 3750 - lever and cylinder',
+    q: 'c=rb-7080d&w=none&z=clear&g=none&n=none&k=coral&d=plain&f=brass&s=standard&h=left-in&a=peep',
+    gap: 'closest match in the set; the ribbed aluminium sill is the only thing missing' },
+  { id: 'd048', label: 'designed 4800 - two panels, knocker',
+    q: 'c=rb-5103d&w=none&z=clear&g=none&n=none&k=coral&d=panel2&f=steel&s=standard&h=left-in&a=peep,knocker',
+    gap: 'the photo sets the peephole INSIDE the knocker ring; we draw them apart' },
+  { id: 'd078', label: 'designed 5900 - eleven strips',
+    q: 'c=rb-0096d&w=none&z=clear&g=none&n=nitzan&k=cadoor&d=strips&f=steel&s=standard&h=left-in&a=peep',
+    gap: 'the bar is 0.32 of leaf height; our shortest is 0.39' },
+  { id: 'd087', label: 'designed 8000 - smart lock, long bar',
+    q: 'c=rb-9005d&w=none&z=clear&g=none&n=shahar&k=digital&d=panel2&f=black&s=standard&h=left-in&a=peep',
+    gap: 'the bar is 0.73 of leaf height; our longest is 0.56' },
+  { id: 'd097', label: 'luxury 7500 - tall light, muntins',
+    q: 'c=rb-9016d&w=tallwin&z=clear&g=grid-light&n=none&k=coral&d=panel&f=steel&s=standard&h=right-in&a=',
+    gap: 'scroll motifs are set INTO the grid; we draw grid or scroll, never both' },
+  { id: 'd106', label: 'luxury 8500 - obscured glass',
+    q: 'c=rb-7080d&w=tallwin&z=obscure&g=scroll-light&n=none&k=plate&d=panel&f=brass&s=standard&h=right-in&a=',
+    gap: 'the grille is interlocking circles, a motif we do not have' },
+  { id: 'd113', label: 'luxury 9500 - smart lock, glazed slot',
+    q: 'c=rb-9001d&w=tallwin&z=clear&g=bars-light&n=idan&k=digital&d=plain&f=black&s=standard&h=left-in&a=',
+    gap: 'the slot is 0.33 of leaf width; tallwin is 0.42, the narrowest tall light we have' },
+  { id: 'd122', label: 'luxury 13900 - sidelight, reeded',
+    q: 'c=rb-6219d&w=tallwin&z=reeded&g=bars-light&n=idan&k=coral&d=panel&f=black&s=sidelight&h=left-in&a=',
+    gap: 'sidelight and reeded glass both added this round' },
 ];
 
 const load = f => f.endsWith('.png')

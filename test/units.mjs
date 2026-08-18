@@ -604,6 +604,29 @@ for (const [key, list, ctx] of [
   }
 }
 
+/* The finish must reach the METAL, not merely change the document.
+   `a priced option changes the door` passed for every finish while the pull
+   bars ignored it completely: the lever's gradient moved, the bar's did not,
+   and the bar is the largest piece of metal on the door. Choosing matte black
+   gave a polished steel bar, ₪220 was charged for it, and the message to
+   Peretz said "Idan, matte black". Found by recreating d087, whose bar is
+   black, and getting a steel one. Assert the actual object. */
+group('the finish reaches every piece of metal');
+for (const hn of HANDLES.filter(h => h.style === 'bar')) {
+  const seen = new Map();
+  for (const f of FINISHES) {
+    const svg = render({ ...base, handle: hn.id, finish: f.id });
+    const grad = new RegExp(`<linearGradient id="bar[A-Za-z]+"[\\s\\S]*?</linearGradient>`).exec(svg);
+    ok(grad, `${hn.id}/${f.id}: no bar gradient in the drawing at all`);
+    if (!grad) continue;
+    for (const [other, id] of seen) {
+      ok(other !== grad[0],
+         `${hn.id}: the bar is identical in ${id} and ${f.id} — the finish is priced and not drawn`);
+    }
+    seen.set(grad[0], f.id);
+  }
+}
+
 // ── 7. Leaf-and-a-half hinges against the frame, not the fixed panel ──
 group('leaf and a half');
 for (const h of HANDINGS) {

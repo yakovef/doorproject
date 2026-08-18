@@ -37,9 +37,17 @@ gets this answered in thirty seconds; a definition does not.*
 > **"כמה תוספת על כל אחת?"**
 
 **ידיות משיכה (אנכיות):** עידן · אלה · ניצן · שחר · רון · שירן ·
-מאחז אופקי · ידית שקועה — ואפשר גם בלי.
+להב שטוח · מאחז אופקי · ידית שקועה — ואפשר גם בלי.
 
-**מנעול וידית:** קורל · רותם · כדור · ספיר · אלמוג · כדור על אורך.
+**מנעול וידית:** קורל · רותם · כדור · ספיר · אלמוג · כדור על אורך ·
+ריבועי · מנעול חכם.
+
+**תוספות (אפשר כמה):** עינית · פתח דואר · מקוש טבעת · מחזיר דלת · שלט שם.
+
+**זכוכית:** שקופה · מעוצבת · מחורצת.
+
+> **"מנעול חכם — איזה דגם אתה מתקין, וכמה הוא עולה?"** (ראינו אותו על
+> חמש דלתות: d070 d081 d084 d087 d113 — נפוץ כמו הידית השקועה.)
 
 *Two lists now, not one. A grip and a lockset are separate objects bought
 separately and fitted to the same door — the gallery is full of doors carrying
@@ -75,8 +83,16 @@ again. If any of this is wrong it is one line: `HANDLES[].finish`.*
 
 > **"אילו צבעי RAL אפשר להזמין, ואילו מהם עולים יותר? כמה?"**
 
-עכשיו באתר: 9016, 1013, 7035, 7016, 7024, 9005, 8017, 6009, 5011, 3005 —
-כולם המצאה שלנו.
+> **"התקנת דלת אדומה (d095) ודלת בצבע חרדל (d127). הן לא מופיעות בלוח הצבעים
+> של רב בריח שממנו לקחנו. זה צבע מיוחד? כמה זה עולה?"**
+
+עכשיו באתר: לוח הצבעים של רב בריח — 17 גוונים.
+
+*Three colours in the works gallery have no counterpart on the chart we sample:
+a pillar-box red (d095), a mustard yellow (d127), and the cool light grey of
+d026, whose leaf measures #A2A7AD where our lightest grey is the warm #B7B4B2.
+Either the chart is not the whole range or these were special orders. Both are
+doors he installed, so this is a question rather than a colour to invent.*
 
 ---
 

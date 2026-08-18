@@ -31,7 +31,7 @@ const SHOTS = [
   { name: 'grey',     w: 1280, h: 720,
     q: '?c=rb-7110d&w=rect&z=obscure&g=lattice&n=none&k=coral&d=panel&f=steel&s=standard&h=right-in&a=peep,mail' },
   { name: 'plate',    w: 1280, h: 720,
-    q: '?c=rb-9016d&w=none&z=clear&g=none&n=none&k=longplate&d=plain&f=brass&s=standard&h=right-in&a=peep,nameplate' },
+    q: '?c=rb-9016d&w=none&z=clear&g=none&n=none&k=plate&d=plain&f=brass&s=standard&h=right-in&a=peep,nameplate' },
   { name: 'strips',   w: 1280, h: 720,
     q: '?c=rb-0097d&w=none&z=clear&g=none&n=shiran&k=cadoor&d=strips&f=black&s=standard&h=right-in&a=peep' },
   /* Round five: the two new axes and the new hardware, each on a door that

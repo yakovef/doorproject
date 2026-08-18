@@ -142,7 +142,28 @@
   ];
   var LOCKSETS = [
     { id: "coral", he: "קורל", en: "Coral", delta: 0, style: "lever", aliases: ["lever"] },
-    { id: "plate", he: "רותם", en: "Rotem", delta: 6e3, style: "plate", lock: true },
+    /* `longplate` is retired one commit after it was added, and the reason is
+       worth keeping. It went in because six doors on the hardware contact sheet
+       looked like they carried a plate running a third of the stile. Measured
+       properly — a crop of each fitting with a ruler in leaf-height units drawn
+       over it — every one of them is 84 x 230 mm, which is this plate. There is
+       no long backplate anywhere in the 129 photographs. The contact sheet's
+       tiles are 150 x 330, a 1:2.2 window on a 1:2.4 leaf, and a 230 mm plate
+       fills a third of that height; "a third of the tile" became "a third of the
+       stile" somewhere between the eye and the note.
+       Two lessons, both already in CLAUDE.md §6 and both re-learned here: a
+       contact sheet triages, it does not measure; and an automatic span that
+       comes back equal to its own search window twice is telling you to draw the
+       thing with a scale over it instead of tuning the detector a third time. */
+    {
+      id: "plate",
+      he: "רותם",
+      en: "Rotem",
+      delta: 6e3,
+      style: "plate",
+      lock: true,
+      aliases: ["longplate"]
+    },
     { id: "cadoor", he: "כדור", en: "Cadoor", delta: 4e3, style: "cadoor" },
     { id: "sapir", he: "ספיר", en: "Sapir", delta: 1e4, style: "sapir" },
     { id: "almog", he: "אלמוג", en: "Almog", delta: 16e3, style: "almog" },
@@ -160,26 +181,17 @@
     /* ── added in round five, from the hardware contact sheets ──────────
        Every one of these was already on Peretz's doors; none of them was in the
        catalogue. Ordered by how many installations carry it. */
-    /* Lever on a long narrow backplate — six doors (d003 d005 d010 d011 d023
-       d070). Different object from the Rotem plate, which is 240 mm: these run
-       a third of the stile, carry the keyway at the foot, and read as a strip
-       rather than an escutcheon. The commonest fitting in the corpus after the
-       plain rose. */
-    {
-      id: "longplate",
-      he: "ידית על אורך",
-      en: "Lever on long backplate",
-      delta: 9e3,
-      style: "longplate",
-      lock: true
-    },
-    /* Keypad / smart lock — five doors (d070 d081 d084 d087 d113). It IS the
-       keyway, so no separate escutcheon is drawn beside it. Not a decoration:
-       it is as common here as the recessed channel we already sell. */
+    /* Smart lock — five doors (d070 d081 d084 d087 d113). It IS the keyway, so
+       no separate escutcheon is drawn beside it. Not a decoration: as common
+       here as the recessed channel we already sell.
+       Called מנעול חכם rather than מנעול קודן because the measured ones are not
+       keypads. d087's is a slim black body with two small reader icons and a
+       round thumb-turn — no buttons at all — and the twelve-button grid drawn
+       first was invented from the English word. */
     {
       id: "digital",
-      he: "מנעול קודן",
-      en: "Keypad lock",
+      he: "מנעול חכם",
+      en: "Smart lock",
       delta: 145e3,
       style: "digital",
       lock: true
@@ -226,7 +238,16 @@
        as common as ironwork across the glazed doors, so it is an axis rather
        than a variant — `light` tells the renderer to take the leaf colour. */
     { id: "grid-light", he: "סורג רשת בהיר", en: "Square grid, door colour", delta: 3e4, light: true },
-    { id: "scroll-light", he: "סורג מעוצב בהיר", en: "Scrollwork, door colour", delta: 46e3, light: true }
+    { id: "scroll-light", he: "סורג מעוצב בהיר", en: "Scrollwork, door colour", delta: 46e3, light: true },
+    /* Plain straight muntins in the door's own colour, and it took a recreation
+       to notice they were unreachable. `grid` deliberately sets an ogee motif
+       into the mesh because d097 has one — but d100, d110 and d113 carry a bare
+       orthogonal grid with no ornament at all, and the only way to draw one was
+       `bars`, which is black ironwork. So a white door with white muntins, one
+       of the commonest glazed doors there is, could not be built.
+       Appended, not inserted: appending leaves every existing index alone, which
+       is the difference between a new option and a code VERSION bump. */
+    { id: "bars-light", he: "סורג ישר בהיר", en: "Straight, door colour", delta: 22e3, light: true }
   ];
   var HANDINGS = [
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "left" },
@@ -350,6 +371,18 @@
     black: ["#5E6165", "#3D4043", "#26282B", "#171819", "#313437", "#0F1011"],
     brass: ["#EFE5CE", "#D9CBA6", "#BCAD86", "#9C8F6C", "#C7BA9B", "#7C7154"]
   };
+  function inFinish(hex, tone) {
+    const { r, g, b } = toRgbLocal(hex);
+    const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    const order = [0, 1, 2, 4, 3, 5];
+    const i = Math.min(order.length - 1, Math.max(0, Math.round((1 - l) * (order.length - 1))));
+    return tone[order[i]];
+  }
+  var toRgbLocal = (hex) => ({
+    r: parseInt(hex.slice(1, 3), 16),
+    g: parseInt(hex.slice(3, 5), 16),
+    b: parseInt(hex.slice(5, 7), 16)
+  });
   var LIGHT = {
     key: 0.24,
     // face wash amplitude
@@ -790,47 +823,47 @@
          gradient for both is what makes rendered bars look like tubes of
          toothpaste. -->
     <linearGradient id="barRound" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#4A4440"/>
-      <stop offset="0.10" stop-color="#FFFFFF"/>
-      <stop offset="0.167" stop-color="#FFFFFF"/>
-      <stop offset="0.283" stop-color="#4E4846"/>
-      <stop offset="0.40" stop-color="#FCFBF6"/>
-      <stop offset="0.467" stop-color="#F2F0EA"/>
-      <stop offset="0.633" stop-color="#302E2A"/>
-      <stop offset="0.815" stop-color="#766B65"/>
-      <stop offset="1"    stop-color="#564E47"/>
+      <stop offset="0"    stop-color="${inFinish("#4A4440", tone)}"/>
+      <stop offset="0.10" stop-color="${inFinish("#FFFFFF", tone)}"/>
+      <stop offset="0.167" stop-color="${inFinish("#FFFFFF", tone)}"/>
+      <stop offset="0.283" stop-color="${inFinish("#4E4846", tone)}"/>
+      <stop offset="0.40" stop-color="${inFinish("#FCFBF6", tone)}"/>
+      <stop offset="0.467" stop-color="${inFinish("#F2F0EA", tone)}"/>
+      <stop offset="0.633" stop-color="${inFinish("#302E2A", tone)}"/>
+      <stop offset="0.815" stop-color="${inFinish("#766B65", tone)}"/>
+      <stop offset="1"    stop-color="${inFinish("#564E47", tone)}"/>
     </linearGradient>
     <linearGradient id="barBrass" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#7D7467"/>
-      <stop offset="0.19" stop-color="#DCBF8C"/>
-      <stop offset="0.40" stop-color="#624E2C"/>
-      <stop offset="0.53" stop-color="#5A4727"/>
-      <stop offset="0.72" stop-color="#B99B69"/>
-      <stop offset="0.78" stop-color="#FFF8E0"/>
-      <stop offset="0.86" stop-color="#C0A87E"/>
-      <stop offset="1"    stop-color="#817F82"/>
+      <stop offset="0"    stop-color="${inFinish("#7D7467", tone)}"/>
+      <stop offset="0.19" stop-color="${inFinish("#DCBF8C", tone)}"/>
+      <stop offset="0.40" stop-color="${inFinish("#624E2C", tone)}"/>
+      <stop offset="0.53" stop-color="${inFinish("#5A4727", tone)}"/>
+      <stop offset="0.72" stop-color="${inFinish("#B99B69", tone)}"/>
+      <stop offset="0.78" stop-color="${inFinish("#FFF8E0", tone)}"/>
+      <stop offset="0.86" stop-color="${inFinish("#C0A87E", tone)}"/>
+      <stop offset="1"    stop-color="${inFinish("#817F82", tone)}"/>
     </linearGradient>
     <linearGradient id="barMatte" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#5C5D5A"/>
-      <stop offset="0.32" stop-color="#6D6D69"/>
-      <stop offset="0.74" stop-color="#666462"/>
-      <stop offset="1"    stop-color="#5A5955"/>
+      <stop offset="0"    stop-color="${inFinish("#5C5D5A", tone)}"/>
+      <stop offset="0.32" stop-color="${inFinish("#6D6D69", tone)}"/>
+      <stop offset="0.74" stop-color="${inFinish("#666462", tone)}"/>
+      <stop offset="1"    stop-color="${inFinish("#5A5955", tone)}"/>
     </linearGradient>
     <linearGradient id="barPolish" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#D1CCBF"/>
-      <stop offset="0.037" stop-color="#F5F4F2"/>
-      <stop offset="0.444" stop-color="#F7F6F4"/>
-      <stop offset="0.519" stop-color="#FFFFFF"/>
-      <stop offset="0.560" stop-color="#A9ACA9"/>
-      <stop offset="0.778" stop-color="#96938D"/>
-      <stop offset="1"    stop-color="#999591"/>
+      <stop offset="0"    stop-color="${inFinish("#D1CCBF", tone)}"/>
+      <stop offset="0.037" stop-color="${inFinish("#F5F4F2", tone)}"/>
+      <stop offset="0.444" stop-color="${inFinish("#F7F6F4", tone)}"/>
+      <stop offset="0.519" stop-color="${inFinish("#FFFFFF", tone)}"/>
+      <stop offset="0.560" stop-color="${inFinish("#A9ACA9", tone)}"/>
+      <stop offset="0.778" stop-color="${inFinish("#96938D", tone)}"/>
+      <stop offset="1"    stop-color="${inFinish("#999591", tone)}"/>
     </linearGradient>
     <linearGradient id="barDark" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#55565C"/>
-      <stop offset="0.14" stop-color="#525255"/>
-      <stop offset="0.50" stop-color="#515054"/>
-      <stop offset="0.92" stop-color="#4E4E50"/>
-      <stop offset="1"    stop-color="#6D6B6C"/>
+      <stop offset="0"    stop-color="${inFinish("#55565C", tone)}"/>
+      <stop offset="0.14" stop-color="${inFinish("#525255", tone)}"/>
+      <stop offset="0.50" stop-color="${inFinish("#515054", tone)}"/>
+      <stop offset="0.92" stop-color="${inFinish("#4E4E50", tone)}"/>
+      <stop offset="1"    stop-color="${inFinish("#6D6B6C", tone)}"/>
     </linearGradient>
 
     <!-- Almog's blade: bright top, dark belly, bounce along the bottom, and
@@ -997,6 +1030,14 @@
       <feGaussianBlur stdDeviation="1.5"/>
     </filter>
 
+    <!-- Glass two metres in front of a street does not resolve it sharply, and
+         neither does a phone camera focused on the door. Without this the
+         scene behind the pane reads as flat graphic shapes stuck to the glass
+         rather than as something a distance away. -->
+    <filter id="paneSoft" x="-6%" y="-6%" width="112%" height="112%">
+      <feGaussianBlur stdDeviation="1.4"/>
+    </filter>
+
     <filter id="softShadow" x="-40%" y="-80%" width="180%" height="300%">
       <feGaussianBlur stdDeviation="30"/>
     </filter>
@@ -1113,22 +1154,31 @@
 
   ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${/* A SIDELIGHT is glass by definition — that is the whole product, and
        four doors in the corpus have one (d117 d122 d123 d128). It does not
-       copy the main leaf's window: on all four the side panel is a single
-       tall light running most of the panel's height whatever the door beside
-       it is doing, and one of them has a solid door next to a glazed
+       take the main leaf's window SHAPE: on all four the side panel is its
+       own slim light, and one of them has a solid door beside a glazed
        sidelight. דלת וחצי is the other case and keeps its old behaviour,
-       where the second leaf mirrors the first. */
-    size.sideGlazed ? aperture({
-      x: sideX + 95,
-      y: y0 + leafH * 0.09,
-      w: sideW - 190,
-      h: leafH * 0.79,
-      paint: paint2,
-      edge,
-      grille,
-      glazing: glazing.id,
-      key: "s"
-    }) : win.rects[0] && sideW > 320 ? aperture({
+       where the second leaf mirrors the first.
+       But it does follow the leaf's COMPOSITION. Beside d122 our sidelight
+       was one tall pane against a photograph where it is glass over a
+       moulded panel, laid out to the same heights as the door next to it —
+       which is the whole visual point of a sidelight, that it reads as part
+       of the same object. So the pane stops where the leaf's glazing stops
+       and the panel below repeats. */
+    size.sideGlazed ? (() => {
+      const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
+      const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
+      return aperture({
+        x: sideX + 95,
+        y: top,
+        w: sideW - 190,
+        h: tall,
+        paint: paint2,
+        edge,
+        grille,
+        glazing: glazing.id,
+        key: "s"
+      }) + (detail.panel ? appliedFrame(sideX, y0, sideW, leafH, paint2, pale, top + tall, false) : "");
+    })() : win.rects[0] && sideW > 320 ? aperture({
       x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
       y: y0 + win.rects[0].top,
       w: Math.min(win.rects[0].w, sideW - 240),
@@ -1277,15 +1327,15 @@ ${body}
   }
   function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper) {
     const band = lw * 0.09;
-    const inset = lw * 0.18;
+    const inset = lw * 0.13;
     const x = lx + inset, w = lw - inset * 2;
     const rect = (t, b) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale);
     if (upper && winBottom <= ly + 1) {
       return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
-               data-band="${band.toFixed(1)}">${rect(0.07, 0.57)}${rect(0.67, 0.91)}</g>`;
+               data-band="${band.toFixed(1)}">${rect(0.07, 0.58)}${rect(0.66, 0.92)}</g>`;
     }
-    const top = Math.max(ly + lh * 0.67, winBottom + lw * 0.08);
-    const bottom = ly + lh * 0.91;
+    const top = Math.max(ly + lh * 0.68, winBottom + lw * 0.08);
+    const bottom = ly + lh * 0.9;
     const art = moulding(x, top, w, bottom - top, band, paint2, pale);
     return art ? `<g data-detail="panel" data-top="${top.toFixed(1)}"
                    data-band="${band.toFixed(1)}">${art}</g>` : "";
@@ -1296,10 +1346,10 @@ ${body}
       const t2 = Math.max(8, Math.round(lw * 0.018));
       const bandW = lw * 0.34;
       const band0 = hingeOnLeft ? lx + lw * 0.1 : lx + lw * 0.56;
-      const gap2 = count > 1 ? bandW / (count - 1) : 0;
+      const gap = count > 1 ? bandW / (count - 1) : 0;
       const out2 = [];
       for (let i = 0; i < count; i++) {
-        const x = Math.round(count > 1 ? band0 + gap2 * i : band0 + bandW / 2);
+        const x = Math.round(count > 1 ? band0 + gap * i : band0 + bandW / 2);
         out2.push(`
         <rect x="${x + 3}" y="${top2 + 3}" width="${t2}" height="${bot2 - top2}"
               fill="#000" opacity="0.22"/>
@@ -1314,11 +1364,11 @@ ${body}
     const x0s = lx + lw * 0.09, x1s = lx + lw * 0.91;
     const wide = x1s - x0s;
     const t = Math.max(8, Math.round(lh * 8e-3));
-    const top = ly + lh * 0.09, bot = ly + lh * 0.91;
-    const gap = count > 1 ? (bot - top) / (count - 1) : 0;
+    const top = ly + lh * 0.02, bot = ly + lh * 0.94;
+    const spread = (u) => 0.6 * (u * u * (3 - 2 * u)) + 0.4 * u;
     const out = [];
     for (let i = 0; i < count; i++) {
-      const cy = count > 1 ? top + gap * i : ly + lh / 2;
+      const cy = count > 1 ? top + (bot - top) * spread(i / (count - 1)) : ly + lh / 2;
       const y = Math.round(cy - t / 2);
       out.push(`
       <rect x="${x0s + 3}" y="${y + 3}" width="${wide}" height="${t}"
@@ -1346,15 +1396,76 @@ ${body}
             fill="${darken(paint2, 0.34)}"/>
     </g>`;
   }
-  function glazingArt(kind, x, y, w, h) {
+  function paneScene(x, y, w, h, paint2) {
+    const t = (m, a = 1) => `fill="${scaleTone(paint2, m)}"${a < 1 ? ` opacity="${a}"` : ""}`;
+    const band = (y0, y1, m, a) => `<rect x="${x}" y="${(y + h * y0).toFixed(1)}" width="${w}" height="${(h * (y1 - y0)).toFixed(1)}" ${t(m, a)}/>`;
+    const box = (x0, y0, x1, y1, m, a) => `<rect x="${(x + w * x0).toFixed(1)}" y="${(y + h * y0).toFixed(1)}" width="${(w * (x1 - x0)).toFixed(1)}" height="${(h * (y1 - y0)).toFixed(1)}" ${t(m, a)}/>`;
+    const blob = (x0, y0, rx, ry, m, a) => `<ellipse cx="${(x + w * x0).toFixed(1)}" cy="${(y + h * y0).toFixed(1)}" rx="${(w * rx).toFixed(1)}" ry="${(h * ry).toFixed(1)}" ${t(m, a)}/>`;
+    let seed = 49734321;
+    const rnd = () => (seed = seed * 1103515245 + 12345 & 2147483647) / 2147483647;
+    const sky = [];
+    for (let i = 0; i < 26; i++) {
+      const u = rnd(), v = rnd();
+      sky.push(blob(
+        0.05 + u * 0.9,
+        0.02 + v * 0.16,
+        0.03 + rnd() * 0.05,
+        8e-3 + rnd() * 0.014,
+        0.62 + rnd() * 0.8,
+        0.62
+      ));
+    }
+    const windows = [];
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 5; c++) {
+        const wx = 0.06 + c * 0.19, wy = 0.26 + r * 0.062;
+        const lit = r === 1 && c === 2 || r === 3 && c === 0 || r === 2 && c === 4;
+        windows.push(box(wx, wy, wx + 0.115, wy + 0.046, lit ? 1.34 : 0.09 + rnd() * 0.2));
+      }
+    }
+    const leaves = [];
+    for (let i = 0; i < 90; i++) {
+      const u = rnd(), v = rnd();
+      leaves.push(blob(
+        -0.02 + u * 1.04,
+        0.56 + v * 0.34,
+        0.022 + rnd() * 0.045,
+        0.01 + rnd() * 0.022,
+        0.1 + rnd() * 1.05,
+        0.85
+      ));
+    }
+    return `
+    <!-- sky, broken by cloud and by a parapet coming in from one side -->
+    ${band(0, 0.2, 1.34)}
+    ${sky.join("")}
+    ${box(0.62, 0, 1.02, 0.15, 0.3)}
+    ${box(0.62, 0.02, 0.78, 0.15, 0.52)}
+    ${band(0.2, 0.24, 0.72)}
+    <!-- the building opposite -->
+    ${band(0.24, 0.52, 0.58)}
+    ${windows.join("")}
+    <!-- a lit wall across the middle: the brightest thing in the pane, and the
+         reason the middle band's spread is over 1.0 in every photograph -->
+    ${band(0.52, 0.58, 1.28)}
+    ${band(0.58, 0.62, 0.94)}
+    <!-- planting, then the pavement bouncing light back up -->
+    ${band(0.62, 0.86, 0.34)}
+    ${leaves.join("")}
+    ${[0.16, 0.4, 0.63, 0.87].map((u) => box(u - 0.012, 0.6, u + 0.012, 0.88, 0.6, 0.8)).join("")}
+    ${band(0.86, 1, 1.02)}
+    ${box(0, 0.86, 0.46, 0.93, 0.3)}
+    ${box(0.46, 0.88, 1, 0.94, 0.66)}`;
+  }
+  function glazingArt(kind, x, y, w, h, paint2) {
     if (kind === "reeded") {
       const pitch = Math.max(16, Math.min(30, w / 9));
       const n = Math.max(3, Math.round(w / pitch));
       const p = w / n;
-      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#C8CFD4" opacity="0.62"/>`;
+      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.52)}"/>`;
       for (let i = 0; i < n; i++) {
         const bx = x + p * i;
-        out += `<rect x="${bx}" y="${y}" width="${p * 0.3}" height="${h}" fill="#fff" opacity="0.40"/><rect x="${bx + p * 0.7}" y="${y}" width="${p * 0.3}" height="${h}" fill="#2A3136" opacity="0.24"/>`;
+        out += `<rect x="${bx}" y="${y}" width="${p * 0.3}" height="${h}" fill="${scaleTone(paint2, 0.86)}"/><rect x="${bx + p * 0.7}" y="${y}" width="${p * 0.3}" height="${h}" fill="${scaleTone(paint2, 0.3)}"/>`;
       }
       return { veil: out, over: "" };
     }
@@ -1362,14 +1473,14 @@ ${body}
       const cell = Math.max(26, Math.min(52, w / 6));
       const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
       const cw = w / cols, ch = h / rows;
-      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#CBD2D6" opacity="0.70"/>`;
+      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.46)}"/>`;
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const cx = x + cw * (c + 0.5), cy = y + ch * (r + 0.5);
-          const rx = cw * 0.36, ry = ch * 0.36;
-          out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${Math.min(rx, ry).toFixed(1)}"
-                        fill="none" stroke="#fff" stroke-opacity="0.42" stroke-width="2.4"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(Math.min(rx, ry) * 0.42).toFixed(1)}"
-                        fill="#fff" fill-opacity="0.26"/>`;
+          const rr = Math.min(cw, ch) * 0.5;
+          out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}"
+                        fill="none" stroke="${scaleTone(paint2, 1.02)}" stroke-width="${(rr * 0.22).toFixed(1)}"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(rr * 0.3).toFixed(1)}"
+                        fill="${scaleTone(paint2, 0.88)}"/>`;
         }
       }
       return { veil: out, over: "" };
@@ -1377,7 +1488,7 @@ ${body}
     return null;
   }
   function aperture({ x, y, w, h, paint: paint2, edge, grille, glazing, key }) {
-    const glass = glazingArt(glazing, x, y, w, h);
+    const glass = glazingArt(glazing, x, y, w, h, paint2);
     const M = 40;
     const id = `cl-${key}`;
     return `
@@ -1388,6 +1499,10 @@ ${body}
       ${bevel(x, y, w, h, 8, paint2, false)}
 
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#glass)"/>
+      <!-- the street behind the pane. Clipped, because these are hard-edged
+           masses and the whole point is that they have edges. -->
+      ${glass ? "" : `<clipPath id="sc-${key}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
+      <g clip-path="url(#sc-${key})" filter="url(#paneSoft)">${paneScene(x, y, w, h, paint2)}</g>`}
       <!-- Frost at 0.30 on a SCREEN blend was making every opening read as
            bathroom glass. The measured doors are glazed with clear or lightly
            patterned glass and the pane comes out DARKER than the leaf, because
@@ -1496,10 +1611,8 @@ ${body}
         return { hx: 36, vy: 36 };
       case "knobplate":
         return { hx: 48, vy: 150 };
-      case "longplate":
-        return { hx: 42, vy: 215, reach: LEVER_REACH };
       case "digital":
-        return { hx: 48, vy: 150 };
+        return { hx: 28, vy: 113 };
       case "square":
         return { hx: 41, vy: 95, reach: LEVER_REACH };
       case "shiran":
@@ -1559,7 +1672,6 @@ ${body}
     cadoor: (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
     knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
     sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir),
-    longplate: (h, g) => longPlate(g.cx, g.cy, g.dir),
     digital: (h, g) => digitalLock(g.cx, g.cy, g.dir),
     square: (h, g) => squarePlates(g.cx, g.cy, g.dir)
   };
@@ -1875,61 +1987,33 @@ ${body}
       ${keyway(cx, y + H * 0.78)}
     </g>`;
   }
-  function longPlate(cx, cy, dir) {
-    const W = 84, H = 430, r = 14;
-    const x = cx - W / 2, y = cy - H * 0.22;
-    const d = `M ${x} ${y + r} Q ${x} ${y} ${x + r} ${y} L ${x + W - r} ${y}
-             Q ${x + W} ${y} ${x + W} ${y + r} L ${x + W} ${y + H - r}
-             Q ${x + W} ${y + H} ${x + W - r} ${y + H} L ${x + r} ${y + H}
-             Q ${x} ${y + H} ${x} ${y + H - r} Z`;
-    return `
-    <g data-hw="lockset-art" data-style="longplate">
-      <path d="${d}" fill="#000" opacity="0.34" transform="translate(${dir * 6} 7)"
-            filter="url(#hwShadow)"/>
-      <path d="${d}" fill="url(#plateFace)"/>
-      <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.55" stroke-width="3"
-            transform="translate(${dir * 1.2} -1.6)"/>
-      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.40" stroke-width="2"
-            transform="translate(${dir * -1.6} 2.2)"/>
-      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-      <!-- two fixing screws, top and bottom, which the photographs all show -->
-      ${[y + 26, y + H - 26].map((sy) => `
-        <circle cx="${cx}" cy="${sy}" r="5" fill="#000" opacity="0.34"/>
-        <circle cx="${cx - 0.7}" cy="${sy - 0.7}" r="4" fill="url(#metal)"/>`).join("")}
-      ${lever(cx, cy, dir)}
-      ${keyway(cx, y + H * 0.8)}
-    </g>`;
-  }
   function digitalLock(cx, cy, dir) {
-    const W = 96, H = 300, r = 12;
-    const x = cx - W / 2, y = cy - H * 0.34;
-    const rows = 4, cols = 3;
-    const padTop = y + H * 0.08, padH = H * 0.56;
-    const keys = [];
-    for (let ry = 0; ry < rows; ry++) {
-      for (let cxi = 0; cxi < cols; cxi++) {
-        const bx = x + W * 0.18 + W * 0.64 * (cxi / (cols - 1));
-        const by = padTop + padH * (ry / (rows - 1));
-        keys.push(`<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="8.5" fill="#101215"/>
-                 <circle cx="${bx.toFixed(1)}" cy="${(by - 0.8).toFixed(1)}" r="8.5" fill="none"
-                         stroke="#fff" stroke-opacity="0.16" stroke-width="1.4"/>`);
-      }
-    }
+    const W = 56, H = 226, r = 9;
+    const x = cx - W / 2, y = cy - H * 0.36;
     return `
     <g data-hw="lockset-art" data-style="digital">
-      <rect x="${x + dir * 6}" y="${y + 7}" width="${W}" height="${H}" rx="${r}"
+      <rect x="${x + dir * 5}" y="${y + 6}" width="${W}" height="${H}" rx="${r}"
             fill="#000" opacity="0.36" filter="url(#hwShadow)"/>
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="#25292D"/>
       <!-- one soft band of key light down the slab, and no specular anywhere:
            this is the only fitting on the door that is not polished metal -->
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="url(#keyWash)" opacity="0.5"/>
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="none"
-            stroke="#fff" stroke-opacity="0.16" stroke-width="1.6"/>
-      ${keys.join("")}
-      <!-- the thumb-turn and the emergency keyway share the foot of the body -->
-      <rect x="${cx - 20}" y="${y + H * 0.72}" width="40" height="12" rx="6" fill="url(#metal)"/>
-      ${keySlot(cx, y + H * 0.86, 11)}
+            stroke="#fff" stroke-opacity="0.16" stroke-width="1.4"/>
+      <!-- the reader window: glossier than the body, so it takes a highlight
+           the matte slab around it does not -->
+      <rect x="${x + W * 0.2}" y="${y + H * 0.08}" width="${W * 0.6}" height="${H * 0.23}"
+            rx="4" fill="#15181B"/>
+      <rect x="${x + W * 0.2}" y="${y + H * 0.08}" width="${W * 0.6}" height="${H * 0.05}"
+            rx="2" fill="#fff" opacity="0.10"/>
+      ${[0.36, 0.64].map((u) => `
+        <circle cx="${(x + W * u).toFixed(1)}" cy="${(y + H * 0.4).toFixed(1)}" r="3.6"
+                fill="#fff" opacity="0.22"/>`).join("")}
+      <!-- the thumb-turn, a real turned knob standing off the slab -->
+      <circle cx="${cx}" cy="${y + H * 0.6}" r="12" fill="#000" opacity="0.34"/>
+      <circle cx="${cx}" cy="${y + H * 0.6 - 1}" r="11" fill="url(#metal)"/>
+      <circle cx="${cx - 3}" cy="${y + H * 0.6 - 4}" r="4" fill="#fff" opacity="0.35"/>
+      ${keySlot(cx, y + H * 0.85, 8)}
     </g>`;
   }
   function squarePlates(cx, cy, dir) {
@@ -2360,25 +2444,16 @@ ${body}
     <circle cx="0" cy="0" r="30" fill="var(--paper)"/>
     <circle cx="0" cy="0" r="21"/>
     <circle cx="0" cy="120" r="12" fill="var(--paper)"/>` }),
-    /* Lever on a long backplate: a STRIP, not a taller Rotem. Parallel sides,
-       squared-off ends, the lever high on it and the keyway near the foot, with
-       most of the length between them — that proportion is the identification. */
-    longplate: () => ({ box: [-172, -128, 56, 320], art: `
-    <rect x="-42" y="-95" width="84" height="430" rx="14"/>
-    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <circle cx="0" cy="249" r="13" fill="var(--paper)"/>
-    <circle cx="0" cy="-69" r="5" fill="var(--paper)"/>
-    <circle cx="0" cy="309" r="5" fill="var(--paper)"/>` }),
-    /* Keypad: the button grid IS the tile. Nothing else about a black slab
-       distinguishes it from a black slab. */
-    digital: () => ({ box: [-58, -118, 58, 214], art: `
-    <rect x="-48" y="-102" width="96" height="300" rx="12"/>
-    ${Array.from({ length: 12 }, (_, i) => {
-      const cxk = -31 + 31 * (i % 3), cyk = -78 + 56 * Math.floor(i / 3);
-      return `<circle cx="${cxk}" cy="${cyk}" r="9" fill="var(--paper)"/>`;
-    }).join("")}
-    <rect x="-20" y="114" width="40" height="12" rx="6" fill="var(--paper)"/>
-    <circle cx="0" cy="156" r="12" fill="var(--paper)"/>` }),
+    /* The smart lock: a slim black slab with a reader window near the top, a
+       round thumb-turn, and the key override at the foot. Measured off d087 at
+       56 x 226 mm — the twelve-button keypad drawn first came from the English
+       word rather than from the door. */
+    digital: () => ({ box: [-40, -96, 40, 150], art: `
+    <rect x="-28" y="-80" width="56" height="226" rx="10"/>
+    <rect x="-17" y="-62" width="34" height="52" rx="5" fill="var(--paper)"/>
+    <circle cx="0" cy="44" r="15" fill="var(--paper)"/>
+    <circle cx="0" cy="44" r="9"/>
+    <rect x="-12" y="104" width="24" height="9" rx="4" fill="var(--paper)"/>` }),
     /* Two squares. Nothing else in the range has a corner, which is the whole
        point of drawing it this way. */
     square: () => ({ box: [-172, -60, 56, 152], art: `
@@ -2483,7 +2558,7 @@ ${body}
   }
   function glazingGlyph(glazing) {
     const S = 300;
-    const art = glazingArt(glazing.id, 0, 0, S, S);
+    const art = glazingArt(glazing.id, 0, 0, S, S, "#8E979D");
     return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
     ${art ? art.veil : `<rect x="0" y="0" width="${S}" height="${S * 0.42}" fill="#B9C6CE" opacity="0.75"/>
