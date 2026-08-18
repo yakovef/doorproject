@@ -89,6 +89,23 @@ function* everyDetail() {
       yield { ...base, detail: d.id, finish: f.id, window: w.id, handle: n.id, lockset: k.id };
 }
 
+/* ── 0. The door the page opens on ────────────────────────────────
+   DEFAULTS must be BUILDABLE. It was not: the default door is glazed and the
+   default add-ons carried a peephole, which the rules refuse at eye level
+   behind a window. Every single page load therefore repaired itself, showed
+   a notice about a link the customer had not followed, and opened a category
+   to explain a change nobody had made. Nothing threw; the page just started
+   apologising to everyone. */
+group('the default door is one we can build');
+{
+  ok(buildable(DEFAULTS), 'DEFAULTS is not a buildable door');
+  const { changed } = repair(DEFAULTS);
+  ok(!changed.length, `DEFAULTS gets repaired on load, changing: ${changed.join(', ')}`);
+  const fresh = fromQuery('');
+  ok(!fresh.notice, `a bare page load shows a notice: ${fresh.notice}`);
+  ok(fromQuery(toQuery(DEFAULTS)).notice === null, 'the default door round-trips with a notice');
+}
+
 // ── 1. Short code ─────────────────────────────────────────────────
 group('short code round-trip');
 {

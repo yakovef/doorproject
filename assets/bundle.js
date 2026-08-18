@@ -2661,6 +2661,9 @@ ${body}
     const win = byId(WINDOWS, state2.window);
     const reach = win.rects.length ? Math.max(...win.rects.map((r) => (r.top + r.h) / 2050)) : 0;
     if (reach > 0.74) out.addons.mail = "החלון מגיע נמוך מדי";
+    const eye = (2050 - 1600) / 2050;
+    const blocksEye = win.rects.some((r) => r.top / 2050 < eye && (r.top + r.h) / 2050 > eye && Math.abs(r.dx || 0) < r.w / 2 + 40);
+    if (blocksEye) out.addons.peep = "החלון תופס את גובה העינית";
     return out;
   }
   function repair(state2, intent = null) {
@@ -2705,8 +2708,9 @@ ${body}
       changed.push("finish");
     }
     const c = conflicts(s);
-    if (c.addons.mail && (s.addons || []).includes("mail")) {
-      s.addons = s.addons.filter((a) => a !== "mail");
+    const lost = (s.addons || []).filter((a) => c.addons[a]);
+    if (lost.length) {
+      s.addons = s.addons.filter((a) => !c.addons[a]);
       changed.push("addons");
     }
     return { state: s, changed };
@@ -2718,7 +2722,7 @@ ${body}
     glazing: "החזרנו זכוכית שקופה — אין חלון",
     handle: "הסרנו את ידית המשיכה — אין לה מקום ליד החלון",
     finish: "התאמנו את הגימור — הידית מגיעה בגימור אחד בלבד",
-    addons: "הסרנו את פתח הדואר — החלון מגיע נמוך מדי"
+    addons: "הסרנו תוספת שאין לה מקום ליד החלון"
   })[changed[0]] || null;
 
   // js/url-state.js
@@ -2734,11 +2738,16 @@ ${body}
     finish: "steel",
     size: "standard",
     handing: "right-in",
-    /* The peephole is on by default because it is on almost every door in the
-       corpus. It used to be drawn unconditionally on solid doors and never on
-       glazed ones; now it is a choice with a sensible starting position, which
-       is what it always should have been. */
-    addons: ["peep"]
+    /* EMPTY, and the reason is a rule discovered after this line was first
+       written as ['peep']. A peephole is at eye level on the centre line, the
+       default door is glazed, and its window is exactly there — so the default
+       was a design the rules refuse. Every page load repaired itself, showed the
+       customer a notice about a link they had not followed, and opened a
+       category to explain a change nobody had made.
+       It is also right on the evidence: all four glazed doors in the measured
+       set record `peephole.present: false`. A door with a window does not need
+       one, and the corpus agrees. On a solid door it is one tap away. */
+    addons: []
   };
   function toQuery(state2) {
     const p = new URLSearchParams();
@@ -2811,7 +2820,7 @@ ${body}
   }
   function settle(state2, notice) {
     const { state: fixed, changed } = repair(state2);
-    return { state: fixed, notice: changed.length ? "combination-fixed" : notice };
+    return { state: fixed, notice: notice || (changed.length ? "combination-fixed" : null) };
   }
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   var BITS = {

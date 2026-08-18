@@ -47,11 +47,16 @@ export const DEFAULTS = {
   finish:  'steel',
   size:    'standard',
   handing: 'right-in',
-  /* The peephole is on by default because it is on almost every door in the
-     corpus. It used to be drawn unconditionally on solid doors and never on
-     glazed ones; now it is a choice with a sensible starting position, which
-     is what it always should have been. */
-  addons:  ['peep'],
+  /* EMPTY, and the reason is a rule discovered after this line was first
+     written as ['peep']. A peephole is at eye level on the centre line, the
+     default door is glazed, and its window is exactly there — so the default
+     was a design the rules refuse. Every page load repaired itself, showed the
+     customer a notice about a link they had not followed, and opened a
+     category to explain a change nobody had made.
+     It is also right on the evidence: all four glazed doors in the measured
+     set record `peephole.present: false`. A door with a window does not need
+     one, and the corpus agrees. On a solid door it is one tap away. */
+  addons:  [],
 };
 
 // ── Query string ──────────────────────────────────────────────────
@@ -157,7 +162,12 @@ export function fromQuery(search) {
  */
 function settle(state, notice) {
   const { state: fixed, changed } = repair(state);
-  return { state: fixed, notice: changed.length ? 'combination-fixed' : notice };
+  /* An existing notice WINS. `option-unknown` means a name in the link matched
+     nothing we sell — the customer is looking at a different door and must be
+     told that first; `combination-fixed` is the milder statement that a
+     buildable door was assembled from what they asked for. Overwriting the
+     first with the second buries the worse news under the better. */
+  return { state: fixed, notice: notice || (changed.length ? 'combination-fixed' : null) };
 }
 
 // ── Short code ────────────────────────────────────────────────────

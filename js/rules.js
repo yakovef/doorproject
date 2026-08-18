@@ -126,6 +126,21 @@ export function conflicts(state) {
     ? Math.max(...win.rects.map(r => (r.top + r.h) / 2050)) : 0;
   if (reach > 0.74) out.addons.mail = 'החלון מגיע נמוך מדי';
 
+  /* GEOMETRIC: a peephole is at EYE LEVEL and on the centre line. That is not
+     a preference, it is what the thing is for — and it is the one add-on the
+     renderer must not slide out of the way, because the alternative position
+     is chest height, where nobody has ever fitted one. So when the glazing
+     crosses that height on the centre line, the peephole is refused with a
+     reason rather than drawn somewhere wrong.
+     `duo` deliberately survives this: its two lights sit either side of the
+     centre and leave the middle of the leaf clear, which is exactly where the
+     peephole goes. */
+  const eye = (2050 - 1600) / 2050;                      // PEEPHOLE_AFF, from the top
+  const blocksEye = win.rects.some(r =>
+    r.top / 2050 < eye && (r.top + r.h) / 2050 > eye
+    && Math.abs(r.dx || 0) < r.w / 2 + 40);
+  if (blocksEye) out.addons.peep = 'החלון תופס את גובה העינית';
+
   return out;
 }
 
@@ -199,9 +214,11 @@ export function repair(state, intent = null) {
     changed.push('finish');
   }
 
+  /* Drop any add-on the design no longer has room for, whichever it is. */
   const c = conflicts(s);
-  if (c.addons.mail && (s.addons || []).includes('mail')) {
-    s.addons = s.addons.filter(a => a !== 'mail');
+  const lost = (s.addons || []).filter(a => c.addons[a]);
+  if (lost.length) {
+    s.addons = s.addons.filter(a => !c.addons[a]);
     changed.push('addons');
   }
 
@@ -216,5 +233,5 @@ export const repairSaid = changed => ({
   glazing: 'החזרנו זכוכית שקופה — אין חלון',
   handle:  'הסרנו את ידית המשיכה — אין לה מקום ליד החלון',
   finish:  'התאמנו את הגימור — הידית מגיעה בגימור אחד בלבד',
-  addons:  'הסרנו את פתח הדואר — החלון מגיע נמוך מדי',
+  addons:  'הסרנו תוספת שאין לה מקום ליד החלון',
 }[changed[0]] || null);
