@@ -86,33 +86,94 @@ if (boxes) {
                    handle: 'none', lockset: 'coral', detail: 'plain', finish: 'steel',
                    size: 'standard', handing: 'right-in', addons: [] };
     const out = [];
+    /* The METAL's bounds, not the drawing's.
+       A fitting's group also contains the shadow it drops on the leaf, offset
+       11 mm across and 13 mm down, and `getBBox` on the group counts it — so
+       every pull bar measured 7 mm longer than the bar is and every declared
+       footprint looked 7 mm too small. A shadow cannot collide with anything;
+       it falls ON things. Each one carries a `filter`, which is what makes it
+       separable — but only if the walk visits LEAF SHAPES. Ask a wrapping <g>
+       and it hands back the union of its children, filtered ones included, and
+       excluding the shadow achieves nothing. Restricting to shapes also drops
+       whatever lives under <defs>: a gradient's contents are not on the door,
+       and one of them put the plate's bounds 1,356 mm above its own axis. */
+    const SHAPES = 'rect,circle,ellipse,line,path,polygon,polyline,text,image';
+    const metalBox = (root, svg) => {
+      /* `getBBox` answers in the element's OWN coordinate system, and the
+         keyway is drawn inside a translated, scaled group — so its paths read
+         back as sitting 975 mm across and 1,356 mm above the fitting they are
+         part of, which is how the plate, the knob-plate and the square set each
+         came to claim most of the door. Every box is carried up into the
+         drawing's own space before it is used. */
+      const inv = svg.getScreenCTM().inverse();
+      const pt = svg.createSVGPoint();
+      let box = null;
+      for (const el of root.querySelectorAll(SHAPES)) {
+        if (el.hasAttribute('filter')) continue;
+        /* `getBBox` also reports geometry BEFORE clipping, so a reflection
+           trimmed to a backplate measures whatever rect was drawn to make it.
+           The clip's own outline is one of the shapes here, so skipping the
+           clipped copy loses nothing. */
+        if (el.hasAttribute('clip-path') || el.hasAttribute('mask')) continue;
+        if (el.closest('defs,clipPath,mask,pattern,marker,symbol')) continue;
+        let b; try { b = el.getBBox(); } catch { continue; }
+        if (!b.width && !b.height) continue;
+        const m = inv.multiply(el.getScreenCTM());
+        for (const [px, py] of [[b.x, b.y], [b.x + b.width, b.y],
+                                [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]]) {
+          pt.x = px; pt.y = py;
+          const q = pt.matrixTransform(m);
+          box = box ? { x: Math.min(box.x, q.x), y: Math.min(box.y, q.y),
+                        x1: Math.max(box.x1, q.x), y1: Math.max(box.y1, q.y) }
+                    : { x: q.x, y: q.y, x1: q.x, y1: q.y };
+        }
+      }
+      return box && { x: box.x, y: box.y, width: box.x1 - box.x, height: box.y1 - box.y };
+    };
     const read = (st, sel, label) => {
       host.innerHTML = window.__render(st);
       const svg = host.querySelector('svg');
       const el = svg.querySelector(sel);
-      const leaf = svg.querySelector('#leaf rect').getBBox();
       if (!el) return;
-      const b = el.getBBox();
-      const cx = Number(el.dataset.cx), cy = Number(el.dataset.cy);
+      const b = metalBox(el, svg);
+      if (!b) return;
+      const cx = Number(el.dataset.cx);
+      /* OUT and IN are named from the CLOSING EDGE, not from the screen, so
+         the numbers can be compared with `handleFootprint` directly whichever
+         way the door is hung. The fitting sits near the closing edge, so
+         whichever side of the leaf's centre it is on is the outboard side. */
+      const leaf = svg.querySelector('#leaf rect').getBBox();
+      const outward = cx > leaf.x + leaf.width / 2 ? 1 : -1;
+      const left = cx - b.x, right = b.x + b.width - cx;
       out.push({ label,
-        hxL: +(cx - b.x).toFixed(0), hxR: +(b.x + b.width - cx).toFixed(0),
+        out: +(outward > 0 ? right : left).toFixed(0),
+        in:  +(outward > 0 ? left : right).toFixed(0),
         vy: +(b.height / 2).toFixed(0),
-        declHx: Number(el.dataset.hx), declVy: Number(el.dataset.vy),
-        declReach: Number(el.dataset.reach || 0) });
+        declOut: Number(el.dataset.out), declIn: Number(el.dataset.in),
+        declVy: Number(el.dataset.vy) });
     };
     for (const h of handles) read({ ...base, handle: h }, '[data-hw="handle"]', 'grip ' + h);
     for (const k of locksets) read({ ...base, lockset: k }, '[data-hw="lockset"]', 'lock ' + k);
     return out;
   }, { handles: HANDLES.map(h => h.id), locksets: LOCKSETS.map(k => k.id) });
   await b.close();
-  console.log('\nwhat each fitting actually occupies, in mm, against what it declares\n');
-  console.log('fitting            drawn out  drawn in   drawn vy   declared hx  vy  reach');
+  console.log('\nwhere the METAL of each fitting reaches, in mm from its own axis.');
+  console.log('OUT is toward the closing edge, IN toward the hinge. A ✗ marks a');
+  console.log('declared footprint the drawing does not fit inside.\n');
+  console.log('fitting             drawn out   in    vy    declared out   in    vy');
+  const n = (v, w) => String(Math.round(v)).padStart(w);
+  let bad = 0;
   for (const r of rows) {
-    console.log(r.label.padEnd(18)
-      + String(r.hxL).padStart(9) + String(r.hxR).padStart(11) + String(r.vy).padStart(11)
-      + String(r.declHx).padStart(13) + String(r.declVy).padStart(4) + String(r.declReach).padStart(7));
+    const off = r.out > r.declOut + 1 || r.in > r.declIn + 1 || r.vy > r.declVy + 1;
+    if (off) bad++;
+    console.log((off ? '✗ ' : '  ') + r.label.padEnd(17)
+      + n(r.out, 8) + n(r.in, 6) + n(r.vy, 6)
+      + n(r.declOut, 14) + n(r.declIn, 6) + n(r.declVy, 6));
   }
-  process.exit(0);
+  console.log(bad ? `\n  ✗ ${bad} fittings draw outside what they declare\n`
+                  : '\n  ✓ every fitting fits inside what it declares\n');
+  process.exitCode = bad ? 1 : 0;
+  process.exit(process.exitCode);
 }
 
 const hits = await p.evaluate(({ cases, allowed }) => {
