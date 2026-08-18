@@ -35,60 +35,18 @@
     </div>
   </section>
 
-  <!-- ── choices ──────────────────────────────────────────── -->
-  <section class="panel panel--choose" aria-label="התאמת הדלת">
+  <!-- ── choices ──────────────────────────────────────────────────
+       The categories, and nothing else, until one is opened.
 
-    <div class="field">
-      <h2 class="field__title">צבע</h2>
-      <div class="swatches" id="colours"></div>
-    </div>
+       This was eleven groups and sixty-odd tiles, all expanded, on first
+       paint: a customer arriving at the page was shown a parts catalogue
+       before they had decided anything, and on a phone the WhatsApp button —
+       the entire purpose of the site — was eight screens below the fold.
 
-    <div class="field">
-      <h2 class="field__title">חלון</h2>
-      <div class="tiles" id="windows"></div>
-    </div>
-
-    <div class="field">
-      <h2 class="field__title">סורג</h2>
-      <div class="tiles tiles--sq" id="grilles"></div>
-    </div>
-
-    <div class="field">
-      <h2 class="field__title">ידית משיכה</h2>
-      <div class="tiles tiles--hw" id="handles"></div>
-      <p class="field__hint">הידית האנכית. אפשר גם בלעדיה.</p>
-    </div>
-
-    <div class="field">
-      <h2 class="field__title">מנעול וידית</h2>
-      <div class="tiles tiles--hw" id="locksets"></div>
-      <p class="field__hint">הידית שמסובבים והצילינדר. יש בכל דלת.</p>
-    </div>
-
-    <div class="field">
-      <h2 class="field__title">עיצוב</h2>
-      <div class="tiles" id="details"></div>
-    </div>
-
-    <div class="field">
-      <h2 class="field__title">גימור ידיות</h2>
-      <div class="tiles tiles--sq" id="finishes"></div>
-      <p class="field__hint" id="finish-note" hidden></p>
-    </div>
-
-    <div class="field">
-      <h2 class="field__title">מידה</h2>
-      <div class="tiles" id="sizes"></div>
-      <p class="field__hint">נמדוד אצלכם במדויק — בחינם.</p>
-    </div>
-
-    <div class="field">
-      <h2 class="field__title">כיוון פתיחה</h2>
-      <div class="pills" id="handings"></div>
-      <p class="field__hint">לא בטוחים? נבדוק יחד במדידה.</p>
-    </div>
-
-  </section>
+       Built from the GROUPS table in app.js rather than written out here, so
+       that adding a category is one line in one place. The two added this
+       round, glazing and add-ons, were exactly that. -->
+  <section class="panel panel--choose" id="choices" aria-label="התאמת הדלת"></section>
 
   <!-- ── the handoff: the whole point of the site ─────────── -->
   <section class="panel panel--send" aria-label="שליחת הדלת">

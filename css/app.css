@@ -118,11 +118,22 @@ body {
 .layout {
   display: grid;
   gap: 0;
+  /* minmax(0, 1fr), not the implicit `auto`.
+     A grid track sized `auto` is floored at its content's MIN-CONTENT width,
+     and the stage's content is an SVG whose intrinsic size comes from its
+     viewBox. app.js widens that viewBox to the stage's shape, so `auto` closes
+     a loop: wider viewBox -> wider intrinsic size -> wider track -> wider
+     stage -> wider viewBox. It settles, but it settles 67 px past the edge of
+     a 320 px phone, and the symptom is a page that scrolls sideways. Caught by
+     the audit, never by a unit test — this fault has no markup. */
+  grid-template-columns: minmax(0, 1fr);
 }
+/* Same floor on the children, for the same reason. */
+.stage-wrap, .panel { min-inline-size: 0; }
 
 @media (min-width: 1100px) {
   .layout {
-    grid-template-columns: minmax(300px, 360px) 1fr minmax(300px, 360px);
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) minmax(300px, 360px);
     flex: 1;
     min-block-size: 0;      /* lets the columns scroll instead of the page */
     overflow: hidden;
@@ -211,15 +222,73 @@ body {
 
 /* ── panel ────────────────────────────────────────────────── */
 
-.panel { padding: 20px 16px 32px; display: grid; gap: 26px; align-content: start; }
+/* minmax(0, 1fr) here for the same reason as on .layout: `.panel` is a grid,
+   its implicit column is `auto`, and `auto` is floored at its content's
+   min-content width. One long category row was enough to push the whole panel
+   52 px past a 320 px screen — the panel measured 320 and its scrollWidth 372,
+   which is the signature of exactly this. */
+.panel {
+  padding: 20px 16px 32px;
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  gap: 26px; align-content: start;
+}
 @media (min-width: 1100px) { .panel { padding: 22px 20px 28px; } }
 
+/* ── the cabinet ──────────────────────────────────────────────
+   Closed, a category is one 56px row: its name, what is chosen in it, and a
+   chevron. Eleven of those is a list you can take in at a glance, where
+   eleven expanded groups was a page you had to scroll past to reach the
+   button that is the point of the site. */
+.panel--choose { gap: 0; }
+
+.field { border-block-end: 1px solid var(--rule); }
+.field:first-child { border-block-start: 1px solid var(--rule); }
+
+.field__head {
+  appearance: none; -webkit-appearance: none;
+  background: none; border: 0; inline-size: 100%;
+  font: inherit; color: inherit; text-align: start; cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  /* 56, not 44: this is the primary control of the page now, and the tap
+     target guidance is a floor rather than a target. */
+  min-block-size: 56px; padding: 8px 2px;
+}
+/* Inset, because a full-width row's outline would otherwise be clipped by
+   the panel's own edge on the narrow layout. */
+.field__head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+
 .field__title {
-  margin: 0 0 10px;
+  margin: 0;
   font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
   color: var(--ink-2); font-weight: 600;
+  flex: 0 0 auto;
 }
-.field__hint { margin: 8px 0 0; font-size: .78rem; color: var(--ink-2); }
+/* The current choice, which is the whole reason a closed row is useful.
+   It truncates rather than wrapping: a row that changes height as the
+   selection changes makes the list jump under the finger. */
+.field__now {
+  flex: 1 1 auto; min-inline-size: 0;
+  font-size: .84rem; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-align: end;
+}
+.field__chev {
+  flex: 0 0 auto; inline-size: 10px; block-size: 10px;
+  border-inline-end: 2px solid var(--ink-2); border-block-end: 2px solid var(--ink-2);
+  transform: rotate(45deg); transition: transform .16s ease;
+  margin-block-end: 4px;
+}
+.field.is-open .field__chev { transform: rotate(-135deg); margin-block: 4px 0; }
+.field.is-open .field__title { color: var(--ink); }
+
+.field__body { padding-block: 4px 20px; }
+.field__hint { margin: 10px 0 0; font-size: .78rem; color: var(--ink-2); }
+/* Why something in this group is unavailable, said once at the foot of the
+   group as well as on the tile — the tile's own line is four characters wide
+   at 78px and cannot carry a sentence. */
+.field__note { margin: 10px 0 0; font-size: .78rem; color: var(--warn); }
+
+@media (prefers-reduced-motion: reduce) { .field__chev { transition: none; } }
 
 /* ── swatches ─────────────────────────────────────────────── */
 

@@ -31,8 +31,12 @@ const VIEWS = [
   { name: 'wide',    w: 1680, h: 950 },
 ];
 
-const GROUPS = ['#colours', '#windows', '#grilles', '#handles', '#locksets',
-                '#details', '#finishes', '#sizes', '#handings'];
+/* Read off the page rather than listed here. The list was hand-kept and it had
+   already outlived one rename; with the panel now generated from a table in
+   app.js, a hand-kept copy in the audit would go stale the first time a
+   category was added and its symptom would be the new category never being
+   audited — silence, not a failure. */
+const groupsOn = p => p.$$eval('.field[data-group]', els => els.map(e => e.dataset.group));
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 let faults = 0;
@@ -47,12 +51,28 @@ for (const v of VIEWS) {
   await p.waitForTimeout(400);
   console.log(`\n${v.name}  ${v.w}x${v.h}`);
 
-  /* Tap targets. 44 px is the floor everywhere it is written down, and it is
-     the difference between choosing a colour and choosing the one next to it
-     with a thumb. */
+  /* The cabinet: on first paint the customer must see the CATEGORIES and no
+     options at all. That is the whole change, so it is asserted rather than
+     assumed — a regression here looks like a working page. */
+  const shut = await p.evaluate(() => ({
+    heads: document.querySelectorAll('.field__head').length,
+    open: [...document.querySelectorAll('.field__body')].filter(b => !b.hidden).length,
+    visibleOptions: [...document.querySelectorAll('[role="radio"],[role="checkbox"]')]
+      .filter(e => e.getBoundingClientRect().height > 0).length,
+  }));
+  if (!shut.heads) fault(v.name, 'no categories rendered');
+  if (shut.open) fault(v.name, `${shut.open} categories already open on load`);
+  if (shut.visibleOptions) fault(v.name, `${shut.visibleOptions} options visible before anything was opened`);
+
+  /* Tap targets, measured with every category OPEN — a hidden element has no
+     size, so measuring them closed would pass everything by measuring
+     nothing. */
+  await p.evaluate(() => {
+    document.querySelectorAll('.field__body').forEach(b => { b.hidden = false; });
+  });
   const small = await p.evaluate(() => {
     const out = [];
-    for (const el of document.querySelectorAll('[role="radio"], .btn, .bar__phone')) {
+    for (const el of document.querySelectorAll('[role="radio"], [role="checkbox"], .btn, .bar__phone, .field__head')) {
       const r = el.getBoundingClientRect();
       if (r.height < 44 || r.width < 30) {
         out.push(`${el.className.split(' ')[0]}:${el.dataset.id || el.id || el.textContent.trim().slice(0, 12)} ${Math.round(r.width)}x${Math.round(r.height)}`);
@@ -61,11 +81,25 @@ for (const v of VIEWS) {
     return out;
   });
   small.forEach(s => fault(v.name, `tap target under 44px: ${s}`));
+  await p.reload();
+  await p.waitForTimeout(300);
 
   const seen = new Map();
-  for (const g of GROUPS) {
-    const ids = await p.$$eval(`${g} [role="radio"]`, els => els.map(e => e.dataset.id));
-    if (!ids.length) { fault(v.name, `${g} rendered no options`); continue; }
+  for (const key of await groupsOn(p)) {
+    const g = `.field[data-group="${key}"]`;
+    /* Open it the way a person does. Clicking an option inside a closed
+       category would still work through the DOM and would prove nothing about
+       whether anyone can reach it. */
+    await p.$eval(`${g} .field__head`, el => {
+      if (el.getAttribute('aria-expanded') !== 'true') el.click();
+    });
+    await p.waitForTimeout(60);
+    const opened = await p.$eval(`${g} .field__body`, el => !el.hidden);
+    if (!opened) { fault(v.name, `${key} would not open`); continue; }
+
+    const ids = await p.$$eval(`${g} [role="radio"],${g} [role="checkbox"]`,
+                               els => els.map(e => e.dataset.id));
+    if (!ids.length) { fault(v.name, `${key} rendered no options`); continue; }
 
     for (const id of ids) {
       /* el.click(), not page.click(): options that the current design blocks
@@ -95,28 +129,28 @@ for (const v of VIEWS) {
         };
       });
 
-      if (!s.hasSvg) { fault(v.name, `${g}=${id}: no door rendered`); continue; }
-      if (s.overflowX > 1) fault(v.name, `${g}=${id}: page scrolls sideways by ${s.overflowX}px`);
+      if (!s.hasSvg) { fault(v.name, `${key}=${id}: no door rendered`); continue; }
+      if (s.overflowX > 1) fault(v.name, `${key}=${id}: page scrolls sideways by ${s.overflowX}px`);
       if (!s.leaf || s.leaf.w < 20 || s.leaf.h < 40) {
-        fault(v.name, `${g}=${id}: leaf is ${s.leaf ? `${Math.round(s.leaf.w)}x${Math.round(s.leaf.h)}` : 'missing'}`);
+        fault(v.name, `${key}=${id}: leaf is ${s.leaf ? `${Math.round(s.leaf.w)}x${Math.round(s.leaf.h)}` : 'missing'}`);
       } else {
         const clip = Math.max(0, s.stage.x - s.leaf.x, s.stage.y - s.leaf.y,
                               (s.leaf.x + s.leaf.w) - (s.stage.x + s.stage.w),
                               (s.leaf.y + s.leaf.h) - (s.stage.y + s.stage.h));
-        if (clip > 1) fault(v.name, `${g}=${id}: the leaf is cut off by ${Math.round(clip)}px`);
+        if (clip > 1) fault(v.name, `${key}=${id}: the leaf is cut off by ${Math.round(clip)}px`);
       }
-      if (!/\d/.test(s.price)) fault(v.name, `${g}=${id}: price reads "${s.price}"`);
-      if (!CODE.test(s.code)) fault(v.name, `${g}=${id}: code reads "${s.code}"`);
-      if (!s.wa || !s.wa.startsWith('https://')) fault(v.name, `${g}=${id}: WhatsApp link is "${s.wa}"`);
-      if (!s.summary.trim()) fault(v.name, `${g}=${id}: the spec line is empty`);
+      if (!/\d/.test(s.price)) fault(v.name, `${key}=${id}: price reads "${s.price}"`);
+      if (!CODE.test(s.code)) fault(v.name, `${key}=${id}: code reads "${s.code}"`);
+      if (!s.wa || !s.wa.startsWith('https://')) fault(v.name, `${key}=${id}: WhatsApp link is "${s.wa}"`);
+      if (!s.summary.trim()) fault(v.name, `${key}=${id}: the spec line is empty`);
 
       /* Two designs that differ must not share a code — that is an order for
          the wrong door, arriving by telephone with nothing to catch it. */
-      const key = s.code;
-      if (seen.has(key) && seen.get(key) !== s.summary) {
-        fault(v.name, `${g}=${id}: code ${key} is shared with a different design`);
+      const code = s.code;
+      if (seen.has(code) && seen.get(code) !== s.summary) {
+        fault(v.name, `${key}=${id}: code ${code} is shared with a different design`);
       }
-      seen.set(key, s.summary);
+      seen.set(code, s.summary);
     }
   }
   errs.forEach(e => fault(v.name, `console: ${e}`));

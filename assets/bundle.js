@@ -6,7 +6,22 @@
     narrow: { id: "narrow", he: "צרה", en: "Narrow", w: 800, h: 2100, base: 309500 },
     wide: { id: "wide", he: "רחבה", en: "Wide", w: 1100, h: 2100, base: 349500 },
     tall: { id: "tall", he: "גבוהה", en: "Tall", w: 950, h: 2400, base: 369500 },
-    half: { id: "half", he: "דלת וחצי", en: "Leaf and half", w: 950, h: 2100, base: 449500, side: 400 }
+    half: { id: "half", he: "דלת וחצי", en: "Leaf and half", w: 950, h: 2100, base: 449500, side: 400 },
+    /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
+       d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
+       narrow one beside it — but the narrow one does not open and is glass, so
+       it is a different product and a different price. `sideGlazed` is what the
+       renderer reads. */
+    sidelight: {
+      id: "sidelight",
+      he: "עם חלון צד",
+      en: "With sidelight",
+      w: 950,
+      h: 2100,
+      base: 429500,
+      side: 400,
+      sideGlazed: true
+    }
   };
   var COLOURS = [
     /* dark */
@@ -107,6 +122,22 @@
       len: 1554,
       inset: 0.3,
       style: "channel"
+    },
+    /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
+       the tubes: a wide rectangular ribbon standing off the leaf, catching the
+       key across one broad face instead of wrapping it round a cylinder. The
+       section is the most visible thing about a pull bar at door scale, and the
+       corpus has three of them — round, square and this — where we modelled five
+       bars differing mainly in their fixings. */
+    {
+      id: "blade",
+      he: "להב שטוח",
+      en: "Flat blade",
+      delta: 44e3,
+      len: 1e3,
+      w: 62,
+      style: "bar",
+      bar: "blade"
     }
   ];
   var LOCKSETS = [
@@ -125,8 +156,60 @@
       delta: 22e3,
       style: "knobplate",
       lock: true
+    },
+    /* ── added in round five, from the hardware contact sheets ──────────
+       Every one of these was already on Peretz's doors; none of them was in the
+       catalogue. Ordered by how many installations carry it. */
+    /* Lever on a long narrow backplate — six doors (d003 d005 d010 d011 d023
+       d070). Different object from the Rotem plate, which is 240 mm: these run
+       a third of the stile, carry the keyway at the foot, and read as a strip
+       rather than an escutcheon. The commonest fitting in the corpus after the
+       plain rose. */
+    {
+      id: "longplate",
+      he: "ידית על אורך",
+      en: "Lever on long backplate",
+      delta: 9e3,
+      style: "longplate",
+      lock: true
+    },
+    /* Keypad / smart lock — five doors (d070 d081 d084 d087 d113). It IS the
+       keyway, so no separate escutcheon is drawn beside it. Not a decoration:
+       it is as common here as the recessed channel we already sell. */
+    {
+      id: "digital",
+      he: "מנעול קודן",
+      en: "Keypad lock",
+      delta: 145e3,
+      style: "digital",
+      lock: true
+    },
+    /* Two square backplates stacked, lever on the upper — four doors (d032 d037
+       d059 d066). A whole hardware family in squares rather than rounds, and
+       nothing else in the range looks remotely like it. */
+    {
+      id: "square",
+      he: "ריבועי",
+      en: "Square backplates",
+      delta: 12e3,
+      style: "square"
     }
   ];
+  var GLAZINGS = [
+    { id: "clear", he: "זכוכית שקופה", en: "Clear", delta: 0 },
+    /* Acid-etched or patterned: light through, no picture. */
+    { id: "obscure", he: "זכוכית מעוצבת", en: "Obscured", delta: 24e3 },
+    /* Vertical flutes. Reads as a run of bright and dark bands, not as a haze. */
+    { id: "reeded", he: "זכוכית מחורצת", en: "Reeded", delta: 28e3 }
+  ];
+  var ADDONS = [
+    { id: "peep", bit: 0, he: "עינית", en: "Peephole", delta: 6e3 },
+    { id: "mail", bit: 1, he: "פתח דואר", en: "Letterplate", delta: 22e3 },
+    { id: "knocker", bit: 2, he: "מקוש טבעת", en: "Ring knocker", delta: 26e3 },
+    { id: "closer", bit: 3, he: "מחזיר דלת", en: "Door closer", delta: 38e3 },
+    { id: "nameplate", bit: 4, he: "שלט שם", en: "Nameplate", delta: 14e3 }
+  ];
+  var addonsOf = (state2) => ADDONS.filter((a) => (state2.addons || []).includes(a.id));
   var GRILLES = [
     { id: "none", he: "ללא סורג", en: "No grille", delta: 0 },
     { id: "bars", he: "סורג ישר", en: "Straight", delta: 22e3 },
@@ -151,9 +234,14 @@
   ];
   var DETAILS = [
     { id: "plain", he: "חלק", en: "Plain", delta: 0, panel: false, groove: false },
-    { id: "panel", he: "פאנל תחתון", en: "Lower panel", delta: 38e3, panel: true, groove: false },
+    /* `both` — panel AND groove on one leaf — is retired. Counted across the 31
+       hand-measured installations, ruled line work and a moulded panel share a
+       leaf on exactly ZERO of them: eleven doors carry line work, ten carry a
+       panel, and no door carries both. It was a combination we invented and
+       priced at ₪540. Its id resolves here so a link written when it existed
+       still opens a door — the panel, which is the more visible half. */
+    { id: "panel", he: "פאנל תחתון", en: "Lower panel", delta: 38e3, panel: true, groove: false, aliases: ["both"] },
     { id: "groove", he: "חריץ אנכי", en: "Vertical groove", delta: 24e3, panel: false, groove: true },
-    { id: "both", he: "פאנל וחריץ", en: "Panel + groove", delta: 54e3, panel: true, groove: true },
     /* The designed tier's signature, and we had it backwards. Of the seven
        measured doors with line work on the face, only two are milled grooves;
        four are APPLIED metal strips — polished stainless, brushed steel, pale
@@ -164,7 +252,14 @@
     { id: "strips3", he: "שלושה פסים", en: "Three strips", delta: 32e3, panel: false, groove: false, strips: 3 },
     /* The classic two-panel face — tall upper, short lower — which d048 carries
        and a single bottom-quarter panel cannot describe. Solid leaves only. */
-    { id: "panel2", he: "שני פאנלים", en: "Two panels", delta: 52e3, panel: true, groove: false, panels: 2 }
+    { id: "panel2", he: "שני פאנלים", en: "Two panels", delta: 52e3, panel: true, groove: false, panels: 2 },
+    /* The strips run BOTH ways and we drew one. `strips` and `strips3` are
+       horizontal — d078's eleven bands settled that in an earlier round — but
+       five doors (d034 d037 d038 d040 d043) run them up the leaf instead, and a
+       customer picking "metal strips" for one of those got the other axis with
+       no warning. Vertical strips are fewer and longer: three or four, in the
+       half of the leaf away from the lock. */
+    { id: "stripsv", he: "פסים אנכיים", en: "Vertical strips", delta: 44e3, panel: false, groove: false, strips: 4, vertical: true }
   ];
   var FINISHES = [
     { id: "steel", he: "ניקל מוברש", en: "Brushed nickel", delta: 0 },
@@ -185,8 +280,8 @@
     const grille = byId(GRILLES, state2.grille);
     const handle = byId(HANDLES, state2.handle);
     const finish = effectiveFinish(state2);
-    let total = size.base + colour.delta + win.delta + handle.delta + byId(LOCKSETS, state2.lockset).delta + byId(DETAILS, state2.detail).delta + (finish && !handle.finish ? finish.delta : 0);
-    if (win.rects.length) total += grille.delta;
+    let total = size.base + colour.delta + win.delta + handle.delta + byId(LOCKSETS, state2.lockset).delta + byId(DETAILS, state2.detail).delta + (finish && !handle.finish ? finish.delta : 0) + addonsOf(state2).reduce((s, a) => s + a.delta, 0);
+    if (win.rects.length) total += grille.delta + byId(GLAZINGS, state2.glazing).delta;
     return Math.ceil(total / 500) * 500;
   }
   var fmt = new Intl.NumberFormat("he-IL", {
@@ -359,8 +454,11 @@
     const colour = byId(COLOURS, state2.colour);
     const handing = byId(HANDINGS, state2.handing);
     const win = byId(WINDOWS, state2.window);
+    const glazing = byId(GLAZINGS, state2.glazing);
     const grille = byId(GRILLES, state2.grille);
     const handle = byId(HANDLES, state2.handle);
+    const addons = addonsOf(state2);
+    const has = (id) => addons.some((a) => a.id === id);
     const lockset = byId(LOCKSETS, state2.lockset);
     const detail = byId(DETAILS, state2.detail);
     const finish = effectiveFinish(state2);
@@ -403,6 +501,11 @@
     const glassEdge = winSpan ? Math.abs((hingeOnLeft ? winSpan.x1 : winSpan.x) - lockX) : Infinity;
     const standoff = gripStandoff(handle, lockset, leafW, leafH, glassEdge);
     const handleX = lockX + inward * standoff;
+    const addonY = (aff, clear) => {
+      const want = y(aff);
+      if (!winSpan || want - leafH * clear > winBottom || want + leafH * clear < y0 + (win.rects[0] ? win.rects[0].top : 0)) return want;
+      return Math.min(winBottom + leafH * (clear + 0.03), y0 + leafH * 0.9);
+    };
     const paint2 = colour.hex;
     const edge = silhouette(paint2);
     const deep = darken(paint2, 0.55);
@@ -1008,7 +1111,24 @@
     }).join("")}
   </g>
 
-  ${sideW ? `<g id="side-leaf">${leaf(sideX, sideW)}${win.rects[0] && sideW > 320 ? aperture({
+  ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${/* A SIDELIGHT is glass by definition — that is the whole product, and
+       four doors in the corpus have one (d117 d122 d123 d128). It does not
+       copy the main leaf's window: on all four the side panel is a single
+       tall light running most of the panel's height whatever the door beside
+       it is doing, and one of them has a solid door next to a glazed
+       sidelight. דלת וחצי is the other case and keeps its old behaviour,
+       where the second leaf mirrors the first. */
+    size.sideGlazed ? aperture({
+      x: sideX + 95,
+      y: y0 + leafH * 0.09,
+      w: sideW - 190,
+      h: leafH * 0.79,
+      paint: paint2,
+      edge,
+      grille,
+      glazing: glazing.id,
+      key: "s"
+    }) : win.rects[0] && sideW > 320 ? aperture({
       x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
       y: y0 + win.rects[0].top,
       w: Math.min(win.rects[0].w, sideW - 240),
@@ -1016,6 +1136,7 @@
       paint: paint2,
       edge,
       grille,
+      glazing: glazing.id,
       key: "s"
     }) : ""}</g>` : ""}
 
@@ -1026,7 +1147,16 @@
   <g id="detail">
     ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint2, pale, winBottom, detail.panels === 2) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
-    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone) : ""}
+    ${detail.strips ? metalStrips(
+      mainX,
+      y0,
+      leafW,
+      leafH,
+      detail.strips,
+      tone,
+      detail.vertical,
+      hingeOnLeft
+    ) : ""}
   </g>
 
   <!-- ── glazing ──────────────────────────────────────────────── -->
@@ -1039,13 +1169,13 @@
       paint: paint2,
       edge,
       grille,
+      glazing: glazing.id,
       key: "m" + i
     })).join("")}
   </g>
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
-    ${win.rects.length ? "" : peephole(centreX, y(PEEPHOLE_AFF))}
     ${gripArt(
       handle,
       handleX,
@@ -1059,6 +1189,26 @@
     )}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? "" : cylinder(lockX, y(CYLINDER_AFF))}
+  </g>
+
+  <!-- ── add-ons ──────────────────────────────────────────────────
+       Chosen, not inferred. The peephole used to live in the hardware group
+       above, drawn whenever the leaf had no window: on every solid door
+       whether anyone wanted one, and on no glazed door
+       even though d076 has a peephole above a knocker on a leaf that also has
+       glass. It was never in the price, never in the summary, and never in the
+       message that goes to Peretz.
+
+       Positions are fractions of the leaf read off the photographs. Where a
+       window would be in the way the add-on moves below it rather than being
+       dropped — a thing that silently disappears is this codebase's oldest
+       failure mode (CLAUDE.md §5) and the peephole was an instance of it. -->
+  <g id="addons">
+    ${has("peep") ? peephole(centreX, addonY(PEEPHOLE_AFF, 0.09)) : ""}
+    ${has("knocker") ? knocker(centreX, addonY(1560, 0.13), tone) : ""}
+    ${has("nameplate") ? nameplate(centreX, addonY(1730, 0.09), tone) : ""}
+    ${has("mail") ? letterplate(centreX, y0 + leafH * 0.8, tone) : ""}
+    ${has("closer") ? doorCloser(hingeX, y0 + leafH * 0.045, hingeOnLeft ? 1 : -1, tone) : ""}
   </g>
 
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
@@ -1140,7 +1290,27 @@ ${body}
     return art ? `<g data-detail="panel" data-top="${top.toFixed(1)}"
                    data-band="${band.toFixed(1)}">${art}</g>` : "";
   }
-  function metalStrips(lx, ly, lw, lh, count, tone) {
+  function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
+    if (vertical) {
+      const top2 = ly + lh * 0.12, bot2 = ly + lh * 0.88;
+      const t2 = Math.max(8, Math.round(lw * 0.018));
+      const bandW = lw * 0.34;
+      const band0 = hingeOnLeft ? lx + lw * 0.1 : lx + lw * 0.56;
+      const gap2 = count > 1 ? bandW / (count - 1) : 0;
+      const out2 = [];
+      for (let i = 0; i < count; i++) {
+        const x = Math.round(count > 1 ? band0 + gap2 * i : band0 + bandW / 2);
+        out2.push(`
+        <rect x="${x + 3}" y="${top2 + 3}" width="${t2}" height="${bot2 - top2}"
+              fill="#000" opacity="0.22"/>
+        <rect x="${x}" y="${top2}" width="${t2}" height="${bot2 - top2}" fill="${tone[2]}"/>
+        <rect x="${x}" y="${top2}" width="${Math.max(2, t2 * 0.34)}" height="${bot2 - top2}"
+              fill="${tone[0]}"/>
+        <rect x="${x + t2 - Math.max(2, t2 * 0.24)}" y="${top2}"
+              width="${Math.max(2, t2 * 0.24)}" height="${bot2 - top2}" fill="${tone[4]}"/>`);
+      }
+      return `<g data-detail="strips" data-count="${count}" data-axis="vertical">${out2.join("")}</g>`;
+    }
     const x0s = lx + lw * 0.09, x1s = lx + lw * 0.91;
     const wide = x1s - x0s;
     const t = Math.max(8, Math.round(lh * 8e-3));
@@ -1159,7 +1329,7 @@ ${body}
       <rect x="${x0s}" y="${y + t - Math.max(2, t * 0.24)}" width="${wide}"
             height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`);
     }
-    return `<g data-detail="strips" data-count="${count}">${out.join("")}</g>`;
+    return `<g data-detail="strips" data-count="${count}" data-axis="horizontal">${out.join("")}</g>`;
   }
   function inlayGroove(lx, ly, lw, lh, paint2, hingeOnLeft, winSpan) {
     const w = 18;
@@ -1176,11 +1346,42 @@ ${body}
             fill="${darken(paint2, 0.34)}"/>
     </g>`;
   }
-  function aperture({ x, y, w, h, paint: paint2, edge, grille, key }) {
+  function glazingArt(kind, x, y, w, h) {
+    if (kind === "reeded") {
+      const pitch = Math.max(16, Math.min(30, w / 9));
+      const n = Math.max(3, Math.round(w / pitch));
+      const p = w / n;
+      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#C8CFD4" opacity="0.62"/>`;
+      for (let i = 0; i < n; i++) {
+        const bx = x + p * i;
+        out += `<rect x="${bx}" y="${y}" width="${p * 0.3}" height="${h}" fill="#fff" opacity="0.40"/><rect x="${bx + p * 0.7}" y="${y}" width="${p * 0.3}" height="${h}" fill="#2A3136" opacity="0.24"/>`;
+      }
+      return { veil: out, over: "" };
+    }
+    if (kind === "obscure") {
+      const cell = Math.max(26, Math.min(52, w / 6));
+      const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
+      const cw = w / cols, ch = h / rows;
+      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#CBD2D6" opacity="0.70"/>`;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cx = x + cw * (c + 0.5), cy = y + ch * (r + 0.5);
+          const rx = cw * 0.36, ry = ch * 0.36;
+          out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${Math.min(rx, ry).toFixed(1)}"
+                        fill="none" stroke="#fff" stroke-opacity="0.42" stroke-width="2.4"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(Math.min(rx, ry) * 0.42).toFixed(1)}"
+                        fill="#fff" fill-opacity="0.26"/>`;
+        }
+      }
+      return { veil: out, over: "" };
+    }
+    return null;
+  }
+  function aperture({ x, y, w, h, paint: paint2, edge, grille, glazing, key }) {
+    const glass = glazingArt(glazing, x, y, w, h);
     const M = 40;
     const id = `cl-${key}`;
     return `
-    <g>
+    <g data-pane="${key}" data-glazing="${glazing || "clear"}">
       ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint2, isLight(paint2))}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
            edge before the pane turns the other way -->
@@ -1194,8 +1395,12 @@ ${body}
            Screen only ever lightens, so this had nowhere to go but pale. -->
       <rect x="${x}" y="${y}" width="${w}" height="${h}"
             filter="url(#frost)" opacity="0.10" style="mix-blend-mode:screen"/>
-      <!-- reflected sky across the upper third -->
-      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
+      <!-- reflected sky across the upper third. Obscured and reeded glass has
+           nothing to reflect it off: the surface that would carry the sky is
+           the same surface that has been etched away, which is exactly why
+           those panes read as a lit panel rather than as a hole. -->
+      ${glass ? "" : `<rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>`}
+      ${glass ? glass.veil : ""}
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
       <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint2, 0.1) : null)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
@@ -1291,6 +1496,12 @@ ${body}
         return { hx: 36, vy: 36 };
       case "knobplate":
         return { hx: 48, vy: 150 };
+      case "longplate":
+        return { hx: 42, vy: 215, reach: LEVER_REACH };
+      case "digital":
+        return { hx: 48, vy: 150 };
+      case "square":
+        return { hx: 41, vy: 95, reach: LEVER_REACH };
       case "shiran":
         return { hx: 44, vy: 240 };
       default:
@@ -1306,6 +1517,29 @@ ${body}
     const want = handle.inset ? leafW * handle.inset - lockBackset(handle) : grip.vy > 200 ? leafW * BAR_GAP : 0;
     const room = toGlass - grip.hx - LOCK_CLEAR;
     return Math.round(Math.max(floor, Math.min(want, room), 0));
+  }
+  function glassClearance(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const win = byId(WINDOWS, state2.window);
+    if (!win.rects.length) return Infinity;
+    const leafW = size.w - REBATE * 2;
+    const hingeOnLeft = byId(HANDINGS, state2.handing).hinge === "left";
+    const u = win.rects.map((r) => {
+      const lo = leafW / 2 + (r.dx || 0) - r.w / 2, hi = leafW / 2 + (r.dx || 0) + r.w / 2;
+      return hingeOnLeft ? leafW - hi : lo;
+    });
+    return Math.min(...u) - lockBackset(byId(HANDLES, state2.handle));
+  }
+  function gripClashesGlass(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const handle = byId(HANDLES, state2.handle);
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const grip = handleFootprint(handle, leafH);
+    if (!grip.vy && !grip.hx) return false;
+    const lock = handleFootprint(byId(LOCKSETS, state2.lockset), leafH);
+    const floor = Math.max(lock.hx + grip.hx + LOCK_CLEAR, leafW * BAR_GAP_MIN);
+    const room = glassClearance(state2) - grip.hx - LOCK_CLEAR;
+    return floor > room;
   }
   function lockBackset(handle) {
     const grip = handleFootprint(handle, 2e3);
@@ -1324,7 +1558,10 @@ ${body}
     almog: (h, g) => almogLever(g.cx, g.cy, g.dir),
     cadoor: (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
     knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
-    sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir)
+    sapir: (h, g) => sapirKnob(g.cx, g.cy, g.dir),
+    longplate: (h, g) => longPlate(g.cx, g.cy, g.dir),
+    digital: (h, g) => digitalLock(g.cx, g.cy, g.dir),
+    square: (h, g) => squarePlates(g.cx, g.cy, g.dir)
   };
   function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0) {
     const draw = GRIP_ART[handle.style];
@@ -1451,6 +1688,19 @@ ${body}
       cap: "shoe",
       rx: 0.08,
       fix: { kind: "shoe", t: [0.035, 0.965], proj: 0.33, size: 1.57, tall: 1.86 }
+    },
+    /* The flat blade — d034, d073, d104. A wide ribbon rather than a tube, and
+       the section is what identifies it: a round bar shows two blown highlights
+       with a dark core between them, and this shows ONE broad even face with a
+       hard bright arris down each long edge, because a flat surface facing the
+       camera returns the key light uniformly instead of wrapping it. Nearly
+       square corners, and the fixings vanish behind the width of it. */
+    blade: {
+      tone: "barPolish",
+      cap: "flat",
+      rx: 0.04,
+      stub: 1,
+      fix: { kind: "clamp", t: [0.1, 0.9], proj: 0.3, size: 0.62, tall: 0.9 }
     }
   };
   function pullBar(cx, cy, handle, leafH) {
@@ -1623,6 +1873,82 @@ ${body}
            drawing a keyhole there would say the door locks with a key from
            the inside, which it does not. -->
       ${keyway(cx, y + H * 0.78)}
+    </g>`;
+  }
+  function longPlate(cx, cy, dir) {
+    const W = 84, H = 430, r = 14;
+    const x = cx - W / 2, y = cy - H * 0.22;
+    const d = `M ${x} ${y + r} Q ${x} ${y} ${x + r} ${y} L ${x + W - r} ${y}
+             Q ${x + W} ${y} ${x + W} ${y + r} L ${x + W} ${y + H - r}
+             Q ${x + W} ${y + H} ${x + W - r} ${y + H} L ${x + r} ${y + H}
+             Q ${x} ${y + H} ${x} ${y + H - r} Z`;
+    return `
+    <g data-hw="lockset-art" data-style="longplate">
+      <path d="${d}" fill="#000" opacity="0.34" transform="translate(${dir * 6} 7)"
+            filter="url(#hwShadow)"/>
+      <path d="${d}" fill="url(#plateFace)"/>
+      <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.55" stroke-width="3"
+            transform="translate(${dir * 1.2} -1.6)"/>
+      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.40" stroke-width="2"
+            transform="translate(${dir * -1.6} 2.2)"/>
+      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+      <!-- two fixing screws, top and bottom, which the photographs all show -->
+      ${[y + 26, y + H - 26].map((sy) => `
+        <circle cx="${cx}" cy="${sy}" r="5" fill="#000" opacity="0.34"/>
+        <circle cx="${cx - 0.7}" cy="${sy - 0.7}" r="4" fill="url(#metal)"/>`).join("")}
+      ${lever(cx, cy, dir)}
+      ${keyway(cx, y + H * 0.8)}
+    </g>`;
+  }
+  function digitalLock(cx, cy, dir) {
+    const W = 96, H = 300, r = 12;
+    const x = cx - W / 2, y = cy - H * 0.34;
+    const rows = 4, cols = 3;
+    const padTop = y + H * 0.08, padH = H * 0.56;
+    const keys = [];
+    for (let ry = 0; ry < rows; ry++) {
+      for (let cxi = 0; cxi < cols; cxi++) {
+        const bx = x + W * 0.18 + W * 0.64 * (cxi / (cols - 1));
+        const by = padTop + padH * (ry / (rows - 1));
+        keys.push(`<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="8.5" fill="#101215"/>
+                 <circle cx="${bx.toFixed(1)}" cy="${(by - 0.8).toFixed(1)}" r="8.5" fill="none"
+                         stroke="#fff" stroke-opacity="0.16" stroke-width="1.4"/>`);
+      }
+    }
+    return `
+    <g data-hw="lockset-art" data-style="digital">
+      <rect x="${x + dir * 6}" y="${y + 7}" width="${W}" height="${H}" rx="${r}"
+            fill="#000" opacity="0.36" filter="url(#hwShadow)"/>
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="#25292D"/>
+      <!-- one soft band of key light down the slab, and no specular anywhere:
+           this is the only fitting on the door that is not polished metal -->
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="url(#keyWash)" opacity="0.5"/>
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="none"
+            stroke="#fff" stroke-opacity="0.16" stroke-width="1.6"/>
+      ${keys.join("")}
+      <!-- the thumb-turn and the emergency keyway share the foot of the body -->
+      <rect x="${cx - 20}" y="${y + H * 0.72}" width="40" height="12" rx="6" fill="url(#metal)"/>
+      ${keySlot(cx, y + H * 0.86, 11)}
+    </g>`;
+  }
+  function squarePlates(cx, cy, dir) {
+    const S = 82, r = 5, gap = 26;
+    const plate = (py, label) => `
+      <rect x="${cx - S / 2 + dir * 5}" y="${py + 6}" width="${S}" height="${S}" rx="${r}"
+            fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
+      <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="url(#plateFace)"/>
+      <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="none"
+            stroke="#fff" stroke-opacity="0.55" stroke-width="2.6"
+            transform="translate(${dir * 1.1} -1.4)"/>
+      <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="none"
+            stroke="#000" stroke-opacity="0.34" stroke-width="1.4"/>`;
+    const topY = cy - S / 2;
+    return `
+    <g data-hw="lockset-art" data-style="square">
+      ${plate(topY)}
+      ${plate(topY + S + gap)}
+      ${lever(cx, cy, dir)}
     </g>`;
   }
   function cadoorKnob(cx, cy, dir) {
@@ -1810,6 +2136,82 @@ ${body}
           stroke-opacity="0.22" stroke-width="1.8"/>
     <circle cx="${cx}" cy="${cy}" r="${R * 0.16}" fill="#1A1D20"/>`;
   };
+  function letterplate(cx, cy, tone) {
+    const w = 300, h = 78, r = 8;
+    const x = cx - w / 2, y = cy - h / 2;
+    return `
+    <g data-addon="mail" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
+       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
+      <rect x="${x + 4}" y="${y + 6}" width="${w}" height="${h}" rx="${r}"
+            fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${tone[2]}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.2}" rx="${r * 0.6}" fill="${tone[0]}"/>
+      <rect x="${x}" y="${y + h * 0.84}" width="${w}" height="${h * 0.16}" fill="${tone[4]}"/>
+      <!-- the aperture: a hall behind it, so this is the darkest value on the leaf -->
+      <rect x="${x + w * 0.07}" y="${y + h * 0.26}" width="${w * 0.86}" height="${h * 0.3}"
+            rx="3" fill="#0B0D0F"/>
+      <!-- the flap, hanging closed over it, catching the key on its top edge -->
+      <rect x="${x + w * 0.05}" y="${y + h * 0.3}" width="${w * 0.9}" height="${h * 0.44}"
+            rx="4" fill="${tone[3]}"/>
+      <rect x="${x + w * 0.05}" y="${y + h * 0.3}" width="${w * 0.9}" height="4"
+            fill="${tone[0]}"/>
+    </g>`;
+  }
+  function knocker(cx, cy, tone) {
+    const R = 52, t = 13;
+    return `
+    <g data-addon="knocker" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
+       data-hx="${R.toFixed(1)}" data-vy="${(R * 1.4).toFixed(1)}">
+      <ellipse cx="${cx + 4}" cy="${cy + R * 0.75}" rx="${R * 0.95}" ry="${R * 0.9}"
+               fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
+      <!-- the ring, hanging: wider than tall by a touch, as a loose ring does -->
+      <ellipse cx="${cx}" cy="${cy + R * 0.66}" rx="${R * 0.86}" ry="${R * 0.94}"
+               fill="none" stroke="${tone[2]}" stroke-width="${t}"/>
+      <path d="${arcPath(cx, cy + R * 0.66, R * 0.86, 150, 340)}" fill="none"
+            stroke="${tone[0]}" stroke-width="${t * 0.34}" stroke-opacity="0.95"/>
+      <path d="${arcPath(cx, cy + R * 0.66, R * 0.86, 20, 140)}" fill="none"
+            stroke="#000" stroke-width="${t * 0.3}" stroke-opacity="0.34"/>
+      <!-- the boss it hangs from, over the top of the ring -->
+      <ellipse cx="${cx}" cy="${cy}" rx="${R * 0.44}" ry="${R * 0.36}" fill="${tone[1]}"/>
+      <ellipse cx="${cx}" cy="${cy - R * 0.07}" rx="${R * 0.3}" ry="${R * 0.2}"
+               fill="${tone[0]}" opacity="0.85"/>
+    </g>`;
+  }
+  function doorCloser(hx, y, dir, tone) {
+    const w = 210, h = 62;
+    const x = hx - (dir > 0 ? 0 : w) + dir * 40;
+    return `
+    <g data-addon="closer" data-cx="${(x + w / 2).toFixed(1)}" data-cy="${(y + h / 2).toFixed(1)}"
+       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
+      <rect x="${x + 3}" y="${y + 5}" width="${w}" height="${h}" rx="9"
+            fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="${tone[3]}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.24}" rx="6" fill="${tone[1]}"/>
+      <!-- the arm, folded back along the rail towards the frame -->
+      <rect x="${x + (dir > 0 ? w * 0.62 : -w * 0.42)}" y="${y + h * 0.3}"
+            width="${w * 0.8}" height="${h * 0.26}" rx="${h * 0.13}" fill="${tone[2]}"/>
+      <circle cx="${x + (dir > 0 ? w * 0.8 : w * 0.2)}" cy="${y + h * 0.43}" r="${h * 0.2}"
+              fill="${tone[1]}"/>
+    </g>`;
+  }
+  function nameplate(cx, cy, tone) {
+    const w = 260, h = 86;
+    const x = cx - w / 2, y = cy - h / 2;
+    return `
+    <g data-addon="nameplate" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
+       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
+      <rect x="${x + 3}" y="${y + 5}" width="${w}" height="${h}" rx="5"
+            fill="#000" opacity="0.28" filter="url(#hwShadow)"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${tone[2]}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="3" fill="${tone[0]}"/>
+      <rect x="${x}" y="${y + h - 3}" width="${w}" height="3" fill="${tone[4]}"/>
+      <!-- an engraved border, which is all these plates have before the name -->
+      <rect x="${x + 12}" y="${y + 12}" width="${w - 24}" height="${h - 24}" rx="2"
+            fill="none" stroke="#000" stroke-opacity="0.28" stroke-width="1.6"/>
+      <rect x="${x + 13}" y="${y + 13}" width="${w - 24}" height="${h - 24}" rx="2"
+            fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="1.2"/>
+    </g>`;
+  }
   var keySlot = (kx, ky, r = 13) => `
       <g data-hw="keyway">
         <circle cx="${kx}" cy="${ky}" r="${r}" fill="url(#euroSteel)"/>
@@ -1887,9 +2289,12 @@ ${body}
     const s = SIZES[state2.size] || SIZES.standard;
     if (lang === "he") {
       const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
+      const glass = w.rects.length && state2.glazing && state2.glazing !== "clear" ? `, ${byId(GLAZINGS, state2.glazing).he}` : "";
       const det = dt.id === "plain" ? "" : `, ${dt.he}`;
       const grip = hd.style === "none" ? "" : `${hd.he}, `;
-      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${grip}${lk.he}${fn ? " " + fn.he : ""}, ${s.he}, פתיחה ${h.he}.`;
+      const extra = addonsOf(state2);
+      const add = extra.length ? `, ${extra.map((a) => a.he).join(", ")}` : "";
+      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}${fn ? " " + fn.he : ""}${add}, ${s.he}, פתיחה ${h.he}.`;
     }
     return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
   }
@@ -1920,6 +2325,14 @@ ${body}
                aria-hidden="true" preserveAspectRatio="xMidYMid meet">
     ${size.side ? `<rect x="0" y="0" width="${size.side}" height="${size.h}" fill="none"
           stroke="currentColor" stroke-width="44" opacity="0.45"/>` : ""}
+    ${/* דלת וחצי and a sidelight are the same rectangle on the plan and a
+       completely different product on the wall: one is a second leaf that
+       opens, the other is fixed glass. Without the pane in the tile they
+       were byte-identical pictures at two prices — which is exactly the
+       failure the glyph-distinctness test exists to catch, and it caught
+       this one the same hour it was written. */
+    size.sideGlazed ? `<rect x="95" y="${size.h * 0.09}" width="${size.side - 190}"
+          height="${size.h * 0.79}" fill="currentColor" opacity="0.30"/>` : ""}
     <rect x="${size.side ? size.side + 46 : 0}" y="0" width="${size.w}" height="${size.h}"
           fill="none" stroke="currentColor" stroke-width="44"/>
   </svg>`;
@@ -1947,6 +2360,32 @@ ${body}
     <circle cx="0" cy="0" r="30" fill="var(--paper)"/>
     <circle cx="0" cy="0" r="21"/>
     <circle cx="0" cy="120" r="12" fill="var(--paper)"/>` }),
+    /* Lever on a long backplate: a STRIP, not a taller Rotem. Parallel sides,
+       squared-off ends, the lever high on it and the keyway near the foot, with
+       most of the length between them — that proportion is the identification. */
+    longplate: () => ({ box: [-172, -128, 56, 320], art: `
+    <rect x="-42" y="-95" width="84" height="430" rx="14"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <circle cx="0" cy="249" r="13" fill="var(--paper)"/>
+    <circle cx="0" cy="-69" r="5" fill="var(--paper)"/>
+    <circle cx="0" cy="309" r="5" fill="var(--paper)"/>` }),
+    /* Keypad: the button grid IS the tile. Nothing else about a black slab
+       distinguishes it from a black slab. */
+    digital: () => ({ box: [-58, -118, 58, 214], art: `
+    <rect x="-48" y="-102" width="96" height="300" rx="12"/>
+    ${Array.from({ length: 12 }, (_, i) => {
+      const cxk = -31 + 31 * (i % 3), cyk = -78 + 56 * Math.floor(i / 3);
+      return `<circle cx="${cxk}" cy="${cyk}" r="9" fill="var(--paper)"/>`;
+    }).join("")}
+    <rect x="-20" y="114" width="40" height="12" rx="6" fill="var(--paper)"/>
+    <circle cx="0" cy="156" r="12" fill="var(--paper)"/>` }),
+    /* Two squares. Nothing else in the range has a corner, which is the whole
+       point of drawing it this way. */
+    square: () => ({ box: [-172, -60, 56, 152], art: `
+    <rect x="-41" y="-41" width="82" height="82" rx="5"/>
+    <rect x="-41" y="67" width="82" height="82" rx="5"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <circle cx="0" cy="108" r="12" fill="var(--paper)"/>` }),
     // Cadoor: a free-standing ovoid, no rose — taller than wide, on a stub shank.
     cadoor: () => ({ box: [-44, -48, 86, 48], art: `
     <rect x="34" y="-11" width="45" height="22" rx="11"/>
@@ -2026,16 +2465,58 @@ ${body}
         fill="none" stroke="currentColor" stroke-width="36"/>`;
     const panels = !detail.panel ? "" : detail.panels === 2 ? panelAt(0.07, 0.57) + panelAt(0.67, 0.91) : panelAt(0.67, 0.91);
     const n = detail.strips || 0;
-    const strips = Array.from({ length: n }, (_, i) => {
+    const strips = detail.vertical ? Array.from({ length: n }, (_, i) => {
+      const x = W * (0.1 + (n > 1 ? i * 0.34 / (n - 1) : 0.17));
+      return `<rect x="${x - 9}" y="${H * 0.12}" width="18" height="${H * 0.76}"
+                      fill="currentColor"/>`;
+    }).join("") : Array.from({ length: n }, (_, i) => {
       const y = H * (0.09 + (n > 1 ? i * 0.82 / (n - 1) : 0.41));
       return `<rect x="${W * 0.09}" y="${y - 14}" width="${W * 0.82}" height="28"
-                  fill="currentColor"/>`;
+                      fill="currentColor"/>`;
     }).join("");
     return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
     ${panels}${strips}
     ${detail.groove ? `<rect x="${W * 0.7 - 18}" y="190" width="18" height="${H - 380}"
           fill="currentColor"/>` : ""}
+  </svg>`;
+  }
+  function glazingGlyph(glazing) {
+    const S = 300;
+    const art = glazingArt(glazing.id, 0, 0, S, S);
+    return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
+    <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
+    ${art ? art.veil : `<rect x="0" y="0" width="${S}" height="${S * 0.42}" fill="#B9C6CE" opacity="0.75"/>
+             <path d="M 0 ${S} L ${S * 0.62} ${S * 0.3} L ${S} ${S * 0.62} L ${S} ${S} Z"
+                   fill="#4E5A61" opacity="0.55"/>`}
+    <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
+  </svg>`;
+  }
+  function addonGlyph(addon) {
+    const W = 950, H = 2100, pad = 40;
+    const art = {
+      peep: `<circle cx="${W / 2}" cy="${H * 0.24}" r="46" fill="none"
+                   stroke="currentColor" stroke-width="30"/>
+           <circle cx="${W / 2}" cy="${H * 0.24}" r="15" fill="currentColor"/>`,
+      mail: `<rect x="${W * 0.16}" y="${H * 0.78}" width="${W * 0.68}" height="${H * 0.045}"
+                 rx="12" fill="none" stroke="currentColor" stroke-width="30"/>
+           <rect x="${W * 0.24}" y="${H * 0.792}" width="${W * 0.52}" height="${H * 0.014}"
+                 fill="currentColor"/>`,
+      knocker: `<ellipse cx="${W / 2}" cy="${H * 0.44}" rx="78" ry="86" fill="none"
+                       stroke="currentColor" stroke-width="30"/>
+              <ellipse cx="${W / 2}" cy="${H * 0.365}" rx="42" ry="30" fill="currentColor"/>`,
+      closer: `<rect x="${W * 0.1}" y="${H * 0.055}" width="${W * 0.4}" height="${H * 0.032}"
+                   rx="14" fill="currentColor"/>
+             <rect x="${W * 0.34}" y="${H * 0.064}" width="${W * 0.4}" height="${H * 0.014}"
+                   rx="7" fill="currentColor"/>`,
+      nameplate: `<rect x="${W * 0.22}" y="${H * 0.3}" width="${W * 0.56}" height="${H * 0.05}"
+                      fill="none" stroke="currentColor" stroke-width="30"/>
+                <rect x="${W * 0.28}" y="${H * 0.317}" width="${W * 0.44}" height="8"
+                      fill="currentColor" opacity="0.6"/>`
+    }[addon.id] || "";
+    return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
+    ${art}
   </svg>`;
   }
   function finishGlyph(finish) {
@@ -2058,24 +2539,138 @@ ${body}
   </svg>`;
   }
 
+  // js/rules.js
+  var isLineWork = (detail) => !!(detail.strips || detail.groove);
+  var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
+  var isGlazed = (state2) => leafGlazed(state2) || !!(SIZES[state2.size] || {}).sideGlazed;
+  function conflicts(state2) {
+    const glazed = isGlazed(state2);
+    const onLeaf = leafGlazed(state2);
+    const lined = isLineWork(byId(DETAILS, state2.detail));
+    const out = {
+      window: {},
+      glazing: {},
+      grille: {},
+      detail: {},
+      handle: {},
+      addons: {},
+      finish: {},
+      lockset: {},
+      size: {},
+      colour: {},
+      handing: {}
+    };
+    const grip = byId(HANDLES, state2.handle);
+    if (grip.finish) {
+      for (const f of FINISHES) {
+        if (f.id !== grip.finish) out.finish[f.id] = `${grip.he} — ${byId(FINISHES, grip.finish).he} בלבד`;
+      }
+    }
+    if (!glazed) {
+      for (const g of GRILLES) if (g.id !== "none") out.grille[g.id] = "דורש חלון";
+      for (const z of GLAZINGS) if (z.id !== "clear") out.glazing[z.id] = "דורש חלון";
+    }
+    for (const d of DETAILS) {
+      if (onLeaf && isLineWork(d)) out.detail[d.id] = "לא משלבים קווי מתכת עם חלון";
+      if (isLineWork(d) && d.panel) out.detail[d.id] = "לא משלבים קווי מתכת עם פאנל";
+    }
+    if (lined) {
+      for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = "לא משלבים חלון עם קווי מתכת";
+    }
+    for (const h of HANDLES) {
+      if (h.style === "none") continue;
+      if (gripClashesGlass({ ...state2, handle: h.id })) {
+        out.handle[h.id] = "אין מקום בין המנעול לחלון";
+      }
+    }
+    const win = byId(WINDOWS, state2.window);
+    const reach = win.rects.length ? Math.max(...win.rects.map((r) => (r.top + r.h) / 2050)) : 0;
+    if (reach > 0.74) out.addons.mail = "החלון מגיע נמוך מדי";
+    return out;
+  }
+  function repair(state2, intent = null) {
+    let s = { ...state2 };
+    const changed = [];
+    if (intent !== "window" && !isGlazed(s) && (s.grille !== "none" || s.glazing && s.glazing !== "clear")) {
+      s.window = "rect";
+      changed.push("window");
+    }
+    const lined = isLineWork(byId(DETAILS, s.detail));
+    if (leafGlazed(s) && lined) {
+      if (intent === "detail") {
+        s.window = "none";
+        changed.push("window");
+      } else {
+        s.detail = "plain";
+        changed.push("detail");
+      }
+    }
+    if (!isGlazed(s)) {
+      if (s.grille !== "none") {
+        s.grille = "none";
+        changed.push("grille");
+      }
+      if (s.glazing && s.glazing !== "clear") {
+        s.glazing = "clear";
+        changed.push("glazing");
+      }
+    }
+    if (gripClashesGlass(s)) {
+      if (intent === "handle") {
+        s.window = "none";
+        changed.push("window");
+      } else {
+        s.handle = "none";
+        changed.push("handle");
+      }
+    }
+    const grip = byId(HANDLES, s.handle);
+    if (grip.finish && s.finish !== grip.finish) {
+      s.finish = grip.finish;
+      changed.push("finish");
+    }
+    const c = conflicts(s);
+    if (c.addons.mail && (s.addons || []).includes("mail")) {
+      s.addons = s.addons.filter((a) => a !== "mail");
+      changed.push("addons");
+    }
+    return { state: s, changed };
+  }
+  var repairSaid = (changed) => ({
+    window: "התאמנו את החלון",
+    detail: "הסרנו את קווי המתכת — לא משלבים אותם עם חלון",
+    grille: "הסרנו את הסורג — אין חלון",
+    glazing: "החזרנו זכוכית שקופה — אין חלון",
+    handle: "הסרנו את ידית המשיכה — אין לה מקום ליד החלון",
+    finish: "התאמנו את הגימור — הידית מגיעה בגימור אחד בלבד",
+    addons: "הסרנו את פתח הדואר — החלון מגיע נמוך מדי"
+  })[changed[0]] || null;
+
   // js/url-state.js
-  var VERSION = 7;
+  var VERSION = 8;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "rect",
+    glazing: "clear",
     grille: "none",
     handle: "idan",
     lockset: "coral",
     detail: "plain",
     finish: "steel",
     size: "standard",
-    handing: "right-in"
+    handing: "right-in",
+    /* The peephole is on by default because it is on almost every door in the
+       corpus. It used to be drawn unconditionally on solid doors and never on
+       glazed ones; now it is a choice with a sensible starting position, which
+       is what it always should have been. */
+    addons: ["peep"]
   };
   function toQuery(state2) {
     const p = new URLSearchParams();
     p.set("v", String(VERSION));
     p.set("c", state2.colour);
     p.set("w", state2.window);
+    p.set("z", state2.glazing);
     p.set("g", state2.grille);
     p.set("n", state2.handle);
     p.set("k", state2.lockset);
@@ -2083,6 +2678,7 @@ ${body}
     p.set("f", state2.finish);
     p.set("s", state2.size);
     p.set("h", state2.handing);
+    p.set("a", ADDONS.filter((o) => (state2.addons || []).includes(o.id)).map((o) => o.id).join(","));
     return "?" + p.toString();
   }
   function fromQuery(search) {
@@ -2092,7 +2688,7 @@ ${body}
     const code = p.get("code");
     if (code) {
       const decoded = decodeCode(code);
-      if (decoded) return { state: decoded, notice: null };
+      if (decoded) return settle(decoded, null);
       notice = "code-unknown";
     }
     const take = (key, param, list, idOf = (o) => o.id) => {
@@ -2104,6 +2700,7 @@ ${body}
     };
     take("colour", "c", COLOURS);
     take("window", "w", WINDOWS);
+    take("glazing", "z", GLAZINGS);
     take("grille", "g", GRILLES);
     take("handle", "n", HANDLES);
     take("lockset", "k", LOCKSETS);
@@ -2124,20 +2721,37 @@ ${body}
       if (SIZES[rawSize]) state2.size = rawSize;
       else notice = "option-unknown";
     }
-    return { state: state2, notice };
+    const rawAdd = p.get("a");
+    if (rawAdd != null) {
+      const want = rawAdd.split(",").map((s) => s.trim()).filter(Boolean);
+      const hits = [];
+      for (const nameOrAlias of want) {
+        const hit = ADDONS.find((o) => o.id === nameOrAlias || (o.aliases || []).includes(nameOrAlias));
+        if (hit) hits.push(hit.id);
+        else notice = "option-unknown";
+      }
+      state2.addons = ADDONS.filter((o) => hits.includes(o.id)).map((o) => o.id);
+    }
+    return settle(state2, notice);
+  }
+  function settle(state2, notice) {
+    const { state: fixed, changed } = repair(state2);
+    return { state: fixed, notice: changed.length ? "combination-fixed" : notice };
   }
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   var BITS = {
-    version: 3,
-    colour: 7,
-    size: 4,
+    version: 4,
+    colour: 6,
+    size: 3,
     handing: 2,
-    window: 5,
-    grille: 3,
-    handle: 5,
+    window: 4,
+    grille: 4,
+    handle: 4,
     lockset: 4,
-    detail: 3,
-    finish: 4
+    detail: 4,
+    finish: 3,
+    glazing: 2,
+    addons: 5
   };
   var TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   function encodeCode(state2) {
@@ -2152,7 +2766,12 @@ ${body}
       [Math.max(0, HANDLES.findIndex((n) => n.id === state2.handle)), BITS.handle],
       [Math.max(0, LOCKSETS.findIndex((k) => k.id === state2.lockset)), BITS.lockset],
       [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail],
-      [Math.max(0, FINISHES.findIndex((f) => f.id === state2.finish)), BITS.finish]
+      [Math.max(0, FINISHES.findIndex((f) => f.id === state2.finish)), BITS.finish],
+      [Math.max(0, GLAZINGS.findIndex((z) => z.id === state2.glazing)), BITS.glazing],
+      /* A mask, not an index — the only field of its kind. `bit` comes from the
+         catalogue rather than from array position, so reordering the add-on
+         tiles for the UI cannot silently renumber what a code means. */
+      [ADDONS.reduce((m, a) => m | ((state2.addons || []).includes(a.id) ? 1 << a.bit : 0), 0), BITS.addons]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -2190,7 +2809,9 @@ ${body}
     const lockset = LOCKSETS[read(BITS.lockset)];
     const detail = DETAILS[read(BITS.detail)];
     const finish = FINISHES[read(BITS.finish)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !finish) return null;
+    const glazing = GLAZINGS[read(BITS.glazing)];
+    const mask = read(BITS.addons);
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !finish || !glazing) return null;
     return {
       colour: colour.id,
       size,
@@ -2200,7 +2821,9 @@ ${body}
       handle: handle.id,
       lockset: lockset.id,
       detail: detail.id,
-      finish: finish.id
+      finish: finish.id,
+      glazing: glazing.id,
+      addons: ADDONS.filter((a) => mask & 1 << a.bit).map((a) => a.id)
     };
   }
 
@@ -2222,10 +2845,19 @@ ${body}
       "",
       `צבע: ${c.he} (RAL ${c.ral})`,
       `חלון: ${w.he}`,
+      /* The glass and the grille are named only when there is glass, for the
+         same reason the grille always was: a line saying "glazing: clear" on a
+         solid door is a line Peretz has to read and discard. */
+      ...w.rects.length && state2.glazing !== "clear" ? [`זכוכית: ${byId(GLAZINGS, state2.glazing).he}`] : [],
       ...w.rects.length && g.id !== "none" ? [`סורג: ${g.he}`] : [],
       ...byId(HANDLES, state2.handle).style === "none" ? [] : [`ידית משיכה: ${byId(HANDLES, state2.handle).he}`],
       `מנעול וידית: ${byId(LOCKSETS, state2.lockset).he}${fin ? ` · ${fin.he}` : ""}`,
       ...state2.detail !== "plain" ? [`עיצוב: ${byId(DETAILS, state2.detail).he}`] : [],
+      /* Add-ons on one line, and the line appears only when there are any. A
+         peephole is a real item on the order — it was drawn for months without
+         ever being mentioned to Peretz, because the drawing decided it rather
+         than the customer. */
+      ...addonsOf(state2).length ? [`תוספות: ${addonsOf(state2).map((a) => a.he).join(" · ")}`] : [],
       `מידה: ${s.he}`,
       `פתיחה: ${h.he}`,
       `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — כולל התקנה ומע״מ`,
@@ -2259,74 +2891,73 @@ ${body}
   var $ = (sel) => document.querySelector(sel);
   var state = { ...DEFAULTS };
   var urlTimer = null;
+  var GROUPS = [
+    {
+      key: "colour",
+      title: "צבע",
+      kind: "swatch",
+      list: () => COLOURS,
+      label: (c) => c.he,
+      meta: (c) => `RAL ${c.ral}`
+    },
+    { key: "window", title: "חלון", kind: "tile", list: () => WINDOWS, glyph: windowGlyph },
+    {
+      key: "glazing",
+      title: "זכוכית",
+      kind: "sq",
+      list: () => GLAZINGS,
+      glyph: glazingGlyph,
+      hint: "מה רואים דרך הזכוכית. מעוצבת ומחורצת מכניסות אור בלי מראה החוצה."
+    },
+    { key: "grille", title: "סורג", kind: "sq", list: () => GRILLES, glyph: grilleGlyph },
+    {
+      key: "handle",
+      title: "ידית משיכה",
+      kind: "hw",
+      list: () => HANDLES,
+      glyph: handleGlyph,
+      hint: "הידית האנכית. אפשר גם בלעדיה."
+    },
+    {
+      key: "lockset",
+      title: "מנעול וידית",
+      kind: "hw",
+      list: () => LOCKSETS,
+      glyph: locksetGlyph,
+      hint: "הידית שמסובבים והצילינדר. יש בכל דלת."
+    },
+    { key: "detail", title: "עיצוב", kind: "tile", list: () => DETAILS, glyph: detailGlyph },
+    {
+      key: "addons",
+      title: "תוספות",
+      kind: "tile",
+      list: () => ADDONS,
+      glyph: addonGlyph,
+      multi: true,
+      hint: "אפשר לבחור כמה שרוצים, או אף אחת."
+    },
+    { key: "finish", title: "גימור ידיות", kind: "sq", list: () => FINISHES, glyph: finishGlyph },
+    {
+      key: "size",
+      title: "מידה",
+      kind: "tile",
+      list: () => Object.values(SIZES),
+      glyph: sizeGlyph,
+      delta: (z) => z.base - SIZES.standard.base,
+      hint: "נמדוד אצלכם במדויק — בחינם."
+    },
+    {
+      key: "handing",
+      title: "כיוון פתיחה",
+      kind: "pill",
+      list: () => HANDINGS,
+      hint: "לא בטוחים? נבדוק יחד במדידה."
+    }
+  ];
   function init() {
     const { state: parsed, notice } = fromQuery(window.location.search);
     state = parsed;
-    buildColours();
-    buildTiles(
-      "#windows",
-      WINDOWS,
-      "סוג חלון",
-      (w) => windowGlyph(w),
-      (w) => w.he,
-      (w) => w.delta,
-      (id) => set({ window: id })
-    );
-    buildTiles(
-      "#grilles",
-      GRILLES,
-      "סורג",
-      (g) => grilleGlyph(g),
-      (g) => g.he,
-      (g) => g.delta,
-      chooseGrille
-    );
-    buildTiles(
-      "#handles",
-      HANDLES,
-      "ידית משיכה",
-      (n) => handleGlyph(n),
-      (n) => n.he,
-      (n) => n.delta,
-      (id) => set({ handle: id })
-    );
-    buildTiles(
-      "#locksets",
-      LOCKSETS,
-      "מנעול וידית",
-      (k) => locksetGlyph(k),
-      (k) => k.he,
-      (k) => k.delta,
-      (id) => set({ lockset: id })
-    );
-    buildTiles(
-      "#details",
-      DETAILS,
-      "עיצוב",
-      (d) => detailGlyph(d),
-      (d) => d.he,
-      (d) => d.delta,
-      (id) => set({ detail: id })
-    );
-    buildTiles(
-      "#finishes",
-      FINISHES,
-      "גימור ידיות",
-      (f) => finishGlyph(f),
-      (f) => f.he,
-      (f) => f.delta,
-      (id) => set({ finish: id })
-    );
-    buildTiles(
-      "#sizes",
-      Object.values(SIZES),
-      "מידה",
-      (z) => sizeGlyph(z),
-      (z) => z.he,
-      (z) => z.base - SIZES.standard.base,
-      (id) => set({ size: id })
-    );
-    buildHandings();
+    buildPanel();
     if (PLACEHOLDER) $("#placeholder-note").hidden = false;
     if (notice) showNotice(notice);
     $("#copy-btn").addEventListener("click", onCopy);
@@ -2336,75 +2967,106 @@ ${body}
       window.addEventListener("resize", fitStage);
     }
     paint();
+    const differs = GROUPS.find((g) => !same(state[g.key], DEFAULTS[g.key]));
+    if (differs) open(differs.key);
   }
-  function buildColours() {
-    const wrap = $("#colours");
-    wrap.setAttribute("role", "radiogroup");
-    wrap.setAttribute("aria-label", "צבע הדלת");
-    COLOURS.forEach((c) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "swatch";
-      b.dataset.id = c.id;
-      b.setAttribute("role", "radio");
-      b.title = `${c.he} · RAL ${c.ral}`;
-      b.innerHTML = `
-      <span class="swatch__chip" style="--chip:${c.hex}"></span>
-      <span class="swatch__name">${c.he}</span>
-      <span class="swatch__meta">RAL ${c.ral} · ${deltaLabel(c.delta)}</span>`;
-      b.addEventListener("click", () => set({ colour: c.id }));
-      wrap.appendChild(b);
-    });
-    keyboardGrid(wrap, (id) => set({ colour: id }));
-  }
-  function buildHandings() {
-    const wrap = $("#handings");
-    wrap.setAttribute("role", "radiogroup");
-    wrap.setAttribute("aria-label", "כיוון פתיחה");
-    HANDINGS.forEach((h) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "pill";
-      b.dataset.id = h.id;
-      b.setAttribute("role", "radio");
-      b.textContent = h.he;
-      b.addEventListener("click", () => set({ handing: h.id }));
-      wrap.appendChild(b);
-    });
-    keyboardGrid(wrap, (id) => set({ handing: id }));
-  }
-  function buildTiles(sel, list, label, glyph, name, delta, choose) {
-    const wrap = $(sel);
-    wrap.setAttribute("role", "radiogroup");
-    wrap.setAttribute("aria-label", label);
-    list.forEach((o) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "tile";
-      b.dataset.id = o.id;
-      b.setAttribute("role", "radio");
-      b.innerHTML = `
-      <span class="tile__art">${glyph(o)}</span>
-      <span class="tile__name">${name(o)}</span>
-      <span class="tile__meta">${deltaLabel(Math.max(0, delta(o)))}</span>
-      <span class="tile__why" hidden></span>`;
-      b.addEventListener("click", () => choose(o.id));
-      wrap.appendChild(b);
-    });
-    keyboardGrid(wrap, choose);
-  }
-  function chooseGrille(id) {
-    const win = byId(WINDOWS, state.window);
-    if (id !== "none" && !win.rects.length) {
-      set({ grille: id, window: "rect" });
-      toast("הוספנו חלון מלבני — סורג דורש חלון");
-      return;
+  var same = (a, b) => Array.isArray(a) || Array.isArray(b) ? JSON.stringify(a || []) === JSON.stringify(b || []) : a === b;
+  function buildPanel() {
+    const wrap = $("#choices");
+    for (const g of GROUPS) {
+      const field = document.createElement("div");
+      field.className = "field";
+      field.dataset.group = g.key;
+      field.innerHTML = `
+      <button class="field__head" type="button" aria-expanded="false"
+              id="head-${g.key}" aria-controls="body-${g.key}">
+        <span class="field__title">${g.title}</span>
+        <span class="field__now" data-now></span>
+        <span class="field__chev" aria-hidden="true"></span>
+      </button>
+      <div class="field__body" id="body-${g.key}" role="region"
+           aria-labelledby="head-${g.key}" hidden>
+        <div class="field__opts"></div>
+        ${g.hint ? `<p class="field__hint">${g.hint}</p>` : ""}
+        <p class="field__note" data-note hidden></p>
+      </div>`;
+      wrap.appendChild(field);
+      field.querySelector(".field__head").addEventListener("click", () => toggle(g.key));
+      buildOptions(g, field.querySelector(".field__opts"));
     }
-    set({ grille: id });
   }
-  function keyboardGrid(wrap, choose) {
+  function buildOptions(g, host) {
+    host.setAttribute("role", g.multi ? "group" : "radiogroup");
+    host.setAttribute("aria-label", g.title);
+    host.className = "field__opts " + { swatch: "swatches", pill: "pills", tile: "tiles", sq: "tiles tiles--sq", hw: "tiles tiles--hw" }[g.kind];
+    for (const o of g.list()) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.dataset.id = o.id;
+      b.setAttribute("role", g.multi ? "checkbox" : "radio");
+      if (g.kind === "swatch") {
+        b.className = "swatch";
+        b.title = `${o.he} · RAL ${o.ral}`;
+        b.innerHTML = `
+        <span class="swatch__chip" style="--chip:${o.hex}"></span>
+        <span class="swatch__name">${o.he}</span>
+        <span class="swatch__meta">RAL ${o.ral} · ${deltaLabel(o.delta)}</span>`;
+      } else if (g.kind === "pill") {
+        b.className = "pill";
+        b.textContent = o.he;
+      } else {
+        b.className = "tile";
+        b.innerHTML = `
+        <span class="tile__art">${g.glyph(o)}</span>
+        <span class="tile__name">${o.he}</span>
+        <span class="tile__meta">${deltaLabel(Math.max(0, (g.delta || ((x) => x.delta))(o)))}</span>
+        <span class="tile__why" hidden></span>`;
+      }
+      b.addEventListener("click", () => choose(g, o.id));
+      host.appendChild(b);
+    }
+    keyboardGrid(host, (id) => choose(g, id));
+  }
+  function open(key) {
+    for (const g of GROUPS) {
+      const on = g.key === key;
+      const head = $(`#head-${g.key}`), body = $(`#body-${g.key}`);
+      head.setAttribute("aria-expanded", String(on));
+      body.hidden = !on;
+      head.closest(".field").classList.toggle("is-open", on);
+    }
+    fitStage();
+  }
+  function toggle(key) {
+    open($(`#head-${key}`).getAttribute("aria-expanded") === "true" ? null : key);
+  }
+  function choose(g, id) {
+    let next;
+    if (g.multi) {
+      const have = (state.addons || []).includes(id);
+      const picked = have ? state.addons.filter((a) => a !== id) : [...state.addons || [], id];
+      next = { ...state, addons: ADDONS.filter((a) => picked.includes(a.id)).map((a) => a.id) };
+    } else {
+      next = { ...state, [g.key]: id };
+    }
+    const { state: fixed, changed } = repair(next, g.key);
+    set(fixed);
+    if (changed.length) toast(repairSaid(changed));
+  }
+  function set(next) {
+    state = next;
+    paint();
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(() => {
+      try {
+        history.replaceState(null, "", toQuery(state));
+      } catch {
+      }
+    }, 300);
+  }
+  function keyboardGrid(wrap, act) {
     wrap.addEventListener("keydown", (e) => {
-      const items = [...wrap.querySelectorAll('[role="radio"]')];
+      const items = [...wrap.querySelectorAll('[role="radio"],[role="checkbox"]')];
       const i = items.indexOf(document.activeElement);
       if (i < 0) return;
       const cols = columnCount(wrap, items);
@@ -2419,7 +3081,7 @@ ${body}
       e.preventDefault();
       next = Math.max(0, Math.min(items.length - 1, next));
       items[next].focus();
-      choose(items[next].dataset.id);
+      if (items[next].getAttribute("role") === "radio") act(items[next].dataset.id);
     });
   }
   function columnCount(wrap, items) {
@@ -2428,16 +3090,18 @@ ${body}
     const n = items.findIndex((el) => el.getBoundingClientRect().top > top + 1);
     return n === -1 ? items.length : n;
   }
-  function set(patch) {
-    state = { ...state, ...patch };
-    paint();
-    clearTimeout(urlTimer);
-    urlTimer = setTimeout(() => {
-      try {
-        history.replaceState(null, "", toQuery(state));
-      } catch {
-      }
-    }, 300);
+  function nowLabel(g) {
+    if (g.multi) {
+      const on = addonsOf(state);
+      return on.length ? on.map((a) => a.he).join(" · ") : "ללא";
+    }
+    if (g.key === "finish") {
+      const f = effectiveFinish(state);
+      return f ? f.he : "ללא";
+    }
+    const list = g.list();
+    const hit = list.find((o) => o.id === state[g.key]) || list[0];
+    return hit ? hit.he : "";
   }
   function paint() {
     const colour = byId(COLOURS, state.colour);
@@ -2451,30 +3115,63 @@ ${body}
     const win = byId(WINDOWS, state.window);
     const grille = byId(GRILLES, state.grille);
     const finish = effectiveFinish(state);
+    const extras = addonsOf(state);
     $("#summary").textContent = [
       colour.he,
       `RAL ${colour.ral}`,
       win.he,
+      ...win.rects.length && state.glazing !== "clear" ? [byId(GLAZINGS, state.glazing).he] : [],
       ...win.rects.length && grille.id !== "none" ? [grille.he] : [],
       ...byId(HANDLES, state.handle).style === "none" ? [] : [byId(HANDLES, state.handle).he],
       `${byId(LOCKSETS, state.lockset).he}${finish ? ` ${finish.he}` : ""}`,
       ...state.detail !== "plain" ? [byId(DETAILS, state.detail).he] : [],
+      ...extras.map((a) => a.he),
       size.he,
       handing.he
     ].join(" · ");
-    markSelected("#colours", state.colour);
-    markSelected("#windows", state.window);
-    markSelected("#grilles", state.grille);
-    markSelected("#handles", state.handle);
-    markSelected("#locksets", state.lockset);
-    markSelected("#details", state.detail);
-    markSelected("#finishes", finish ? finish.id : null);
-    markSelected("#sizes", state.size);
-    markSelected("#handings", state.handing);
-    gateGrilles(byId(WINDOWS, state.window));
-    gateFinishes(byId(HANDLES, state.handle), finish);
+    const blocked = conflicts(state);
+    for (const g of GROUPS) {
+      const field = $(`.field[data-group="${g.key}"]`);
+      field.querySelector("[data-now]").textContent = nowLabel(g);
+      markGroup(g, blocked[g.key] || {});
+    }
     $("#wa-btn").href = whatsappUrl(state);
     announce(describe(state));
+  }
+  function markGroup(g, blocked) {
+    const chosen = g.multi ? state.addons || [] : [g.key === "finish" ? (effectiveFinish(state) || {}).id : state[g.key]];
+    let anyBlocked = false;
+    document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"],.field[data-group="${g.key}"] [role="checkbox"]`).forEach((el) => {
+      const id = el.dataset.id;
+      const on = chosen.includes(id);
+      el.setAttribute("aria-checked", String(on));
+      el.tabIndex = on || !chosen.length && el === el.parentElement.firstElementChild ? 0 : -1;
+      el.classList.toggle("is-selected", on);
+      const why = blocked[id];
+      anyBlocked = anyBlocked || !!why;
+      el.setAttribute("aria-disabled", String(!!why));
+      el.classList.toggle("is-blocked", !!why);
+      const slot = el.querySelector(".tile__why");
+      if (slot) {
+        slot.hidden = !why;
+        slot.textContent = why || "";
+      }
+      if (g.key === "finish") {
+        const meta = el.querySelector(".tile__meta");
+        const fixed = !!byId(HANDLES, state.handle).finish;
+        meta.textContent = deltaLabel(fixed ? 0 : Math.max(0, byId(FINISHES, id).delta));
+      }
+    });
+    if (g.multi && !chosen.length) {
+      const first = document.querySelector(`.field[data-group="${g.key}"] [role="checkbox"]`);
+      if (first) first.tabIndex = 0;
+    }
+    const note = $(`.field[data-group="${g.key}"] [data-note]`);
+    if (note) {
+      const first = Object.values(blocked)[0];
+      note.hidden = !anyBlocked;
+      note.textContent = anyBlocked ? first : "";
+    }
   }
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
@@ -2491,42 +3188,6 @@ ${body}
       `${((w - vw) / 2).toFixed(1)} ${((h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
     );
   }
-  function gateGrilles(win) {
-    const solid = win.rects.length === 0;
-    document.querySelectorAll('#grilles [role="radio"]').forEach((el) => {
-      const blocked = solid && el.dataset.id !== "none";
-      el.setAttribute("aria-disabled", String(blocked));
-      el.classList.toggle("is-blocked", blocked);
-      const why = el.querySelector(".tile__why");
-      why.hidden = !blocked;
-      why.textContent = blocked ? "דורש חלון" : "";
-    });
-  }
-  function gateFinishes(handle, finish) {
-    const fixed = !!handle.finish;
-    document.querySelectorAll('#finishes [role="radio"]').forEach((el) => {
-      const blocked = fixed && el.dataset.id !== (finish && finish.id);
-      el.setAttribute("aria-disabled", String(blocked));
-      el.classList.toggle("is-blocked", blocked);
-      const why = el.querySelector(".tile__why");
-      why.hidden = !blocked;
-      why.textContent = blocked ? finish ? `${handle.he} — ${finish.he} בלבד` : "אין חלקי מתכת" : "";
-      const meta = el.querySelector(".tile__meta");
-      const own = byId(FINISHES, el.dataset.id);
-      meta.textContent = deltaLabel(fixed ? 0 : Math.max(0, own.delta));
-    });
-    const note = $("#finish-note");
-    note.hidden = !fixed;
-    note.textContent = !fixed ? "" : finish ? `ידית ${handle.he} מגיעה בגימור ${finish.he} בלבד.` : `ידית שקועה היא שקע בדלת עצמה — אין בה חלקי מתכת לגמור.`;
-  }
-  function markSelected(sel, id) {
-    document.querySelectorAll(`${sel} [role="radio"]`).forEach((el) => {
-      const on = el.dataset.id === id;
-      el.setAttribute("aria-checked", String(on));
-      el.tabIndex = on ? 0 : -1;
-      el.classList.toggle("is-selected", on);
-    });
-  }
   var liveTimer = null;
   function announce(text) {
     clearTimeout(liveTimer);
@@ -2540,6 +3201,7 @@ ${body}
   }
   var toastTimer = null;
   function toast(text) {
+    if (!text) return;
     const el = $("#toast");
     el.textContent = text;
     el.hidden = false;
@@ -2550,7 +3212,10 @@ ${body}
   }
   function showNotice(kind) {
     const el = $("#notice");
-    el.textContent = kind === "code-unknown" ? "הקוד לא זוהה — מציגים דלת ברירת מחדל." : "חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.";
+    el.textContent = {
+      "code-unknown": "הקוד לא זוהה — מציגים דלת ברירת מחדל.",
+      "combination-fixed": "השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר."
+    }[kind] || "חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.";
     el.hidden = false;
   }
   document.addEventListener("DOMContentLoaded", () => {
