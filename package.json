@@ -19,7 +19,8 @@
     "mottle": "node tools/mottle.mjs",
     "leaf": "node tools/leaf.mjs",
     "triage": "node tools/triage.mjs",
-    "collide": "node tools/collide.mjs"
+    "collide": "node tools/collide.mjs",
+    "profile": "node tools/profile.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

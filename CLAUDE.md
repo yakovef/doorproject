@@ -70,7 +70,7 @@ research/works/     129 door photographs (one is the logo) + 33 measured records
 **Commands:** `npm run build` · `npm test` · `npm run audit` ·
 `npm run shot` · `npm run hardware` · `npm run recreate` · `npm run frame` ·
 `npm run glass` · `npm run mottle` · `npm run measure` · `npm run ask` ·
-`npm run leaf` · `npm run triage`
+`npm run leaf` · `npm run triage` · `npm run profile` · `npm run collide`
 
 `npm test` is string-level. `npm run audit` opens the real page at five
 viewports and clicks every option in every group — everything that lives in
@@ -112,6 +112,27 @@ of thirty measured doors, split light/dark.
 structural **opening**, not the leaf; drawing them as the same thing made every
 door too squat.
 
+### The leaf's vertical fall
+`FALLOFF` was fitted to a nine-row median across thirty doors, written into its
+own comment — and for a long time nothing asked the DRAWING whether it still
+produced those rows. `npm run mottle` divides the vertical fall OUT to measure
+sideways unevenness, and every other instrument looks at one object. So the
+number the whole lighting model rests on had no check on it.
+
+`npm run profile` is that check now, and it earned itself immediately: `bloom`,
+the pendant reflection in the upper third, was scaled by `fall.peak` — which is
+*larger* on dark paint than light — while its own comment said it "barely
+registers on dark paint". It made the top too bright, and because the rows are
+relative to the leaf's own brightest row, the whole lower half read as too
+dark. Worst row 0.163 off the median; now 0.040.
+
+**The symptom was nowhere near the cause.** What got reported was that on a
+two-panel door the LOWER panel looked flat where the upper was modelled. Both
+panels are the same construction and the same paint, so a difference between
+them can only come from the leaf underneath — which was plunging through the
+middle and flattening at the foot, so the upper panel straddled the plunge and
+the lower sat in the dead tail. Nothing was wrong at the bottom.
+
 ### Applied mouldings — the "designed" face
 **A panel on these doors is not a panel.** It is a strip of moulding 60–90 mm
 wide laid on the face in a rectangle, and **the face inside the rectangle is
@@ -127,6 +148,16 @@ turn it into a black picture frame painted on. The photograph shows a
 **sculpted ramp with quirks cut into it** — mass *and* detail.
 
 The window surround uses the same primitive. It is the same object.
+
+**The inset has been wrong in both directions.** It started at 0.18, was
+"corrected" to 0.13 by a pass that read six doors off a contact sheet, and both
+make the panel too WIDE — so a pull bar was drawn straight across the panel's
+stile. Settled by an edge-gradient ruler over the photographs, which agrees
+with the hand-measured records and not with 0.13: real panel edges sit at
+**0.21–0.39** of leaf width, and the two doors carrying an upper *and* a lower
+panel are at 0.23. `PANEL_INSET` is 0.23, and it yields further (to a measured
+maximum of 0.39) to leave a flat stile for a pull bar — which is exactly what
+d087, the one door with both, does.
 
 ### The glass
 Clear glazing is a quiet diagonal gradient plus a soft sheen, and this is the
@@ -394,6 +425,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm run frame` | our reveal, measured the way the photographs were |
 | `npm run glass` | what is inside the pane, band by band, against the corpus |
 | `npm run mottle` | slow horizontal unevenness of the paint |
+| `npm run profile` | the leaf's VERTICAL fall, against the medians FALLOFF was fitted to |
 | `npm run measure` | contrast, profile, warmth, texture — ours vs photographs |
 | `npm run hardware` | close crops of every grip, every lockset, and pairings |
 | `npm run shot` | the whole page at twelve sizes and designs |

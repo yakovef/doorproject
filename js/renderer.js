@@ -101,9 +101,30 @@ export const LIGHT = {
    instead of the end of a fall. Whatever happens down there must read as the
    shadow continuing, never as an event. */
 const FALLOFF = {
-  dark:  { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.16, drift: 0.13 },
-  light: { peak: 0.10, mid: 0.05, low: 0.09, foot: 0.10, head: 0.02, grain: 0.09, drift: 0.09 },
+  dark:  { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.16, drift: 0.13,
+           bloom: 0.05 },
+  light: { peak: 0.10, mid: 0.05, low: 0.09, foot: 0.10, head: 0.02, grain: 0.09, drift: 0.09,
+           bloom: 0.75 },
 };
+
+/* `bloom` is the pendant bulb's reflection, and it is a MEASURED OBJECT ON A
+   WHITE DOOR. Its own comment always said "on dark paint it barely registers,
+   which is also what the photographs show" — and it was scaled by `fall.peak`,
+   which is LARGER on dark paint than light, so on a dark door it registered
+   hardest of all. It now has its own strength, and the nine-row profile is how
+   that was set: 0.75 (unchanged) on light paint, and on dark paint
+
+     bloom   0.75   0.35   0.25   0.15   0.05   none
+     err     0.064  0.043  0.039  0.034  0.028  0.027
+
+   so 0.05 is where the drawing stops disagreeing with the photographs, and a
+   trace of the object survives rather than deleting it outright.
+
+   Why it mattered enough to find: the rows are relative to the leaf's own
+   brightest row, so an over-bright top makes the WHOLE lower half read as too
+   dark. The visible symptom was that a lower moulded panel shaded at half the
+   rate of the upper one — reported from the outside as "the bottom thing looks
+   different from the top one". Nothing was wrong at the bottom. */
 
 /* `drift` and `grain` both halved, for two reasons that turn out to be one.
    Sampling seven columns across the leaf, a dark door of ours fell 12% from
@@ -248,6 +269,7 @@ const LEVER_REACH  = 145;   // 4.0 rosette radii, and exactly horizontal
                             // (0.151 W on the door metrology; the product
                             //  photographs agree at 4.0-4.7 radii)
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
+const PANEL_GAP    = 25;    // flat stile left between a pull bar and a moulded panel
 /* The moulded surround around a pane, each side. It is part of the window as
    far as anything else on the leaf is concerned: a bar that stops at the
    glass still crosses the raised moulding, which is what `npm run collide`
@@ -473,6 +495,18 @@ export function render(state) {
   const standoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
   const handleX = lockX + inward * standoff;
 
+  /* How far inboard of the closing edge a moulded panel has to start, so that
+     the pull bar has a flat stile to stand on. Measured from the closing edge,
+     so handing drops out of it.
+
+     Only for a grip that runs DOWN THE STILE — `pull` marks exactly those. The
+     horizontal grab bar is centred on the leaf and crosses the panel's middle
+     rather than its edge, which no amount of inset would fix and which is a
+     different question. */
+  const gripClear = handle.pull
+    ? lockBackset(handle, lockset) + standoff + handleFootprint(handle, leafH).in + PANEL_GAP
+    : 0;
+
   const paint = colour.hex;
   const edge  = silhouette(paint);
   const deep  = darken(paint, 0.55);
@@ -551,11 +585,11 @@ export function render(state) {
            the dip was left over from tuning against a stairwell shot where
            the lamp was below the lintel. -->
       <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${fall.peak}"/>
-      <stop offset="0.15" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.86).toFixed(3)}"/>
-      <stop offset="0.32" stop-color="${LIGHT.warm}" stop-opacity="${fall.mid}"/>
-      <stop offset="0.48" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
-      <stop offset="0.64" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
-      <stop offset="0.82" stop-color="${LIGHT.cool}" stop-opacity="${fall.low}"/>
+      <stop offset="0.18" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.86).toFixed(3)}"/>
+      <stop offset="0.45" stop-color="${LIGHT.warm}" stop-opacity="${fall.mid}"/>
+      <stop offset="0.62" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
+      <stop offset="0.78" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
+      <stop offset="0.91" stop-color="${LIGHT.cool}" stop-opacity="${fall.low}"/>
       <!-- Pure black, and it must stay pure black. Compositing black at
            alpha a multiplies every channel by (1-a), so hue and saturation
            come through untouched and only the value falls. Any TINTED dark
@@ -574,8 +608,8 @@ export function render(state) {
          what the photographs show. -->
     <radialGradient id="bloom" cx="0.42" cy="0.22" r="0.62"
                     gradientTransform="translate(0 0.22) scale(1 0.66) translate(0 -0.22)">
-      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.75).toFixed(3)}"/>
-      <stop offset="0.55" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.22).toFixed(3)}"/>
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * fall.bloom).toFixed(3)}"/>
+      <stop offset="0.55" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * fall.bloom * 0.29).toFixed(3)}"/>
       <stop offset="1"    stop-color="${LIGHT.warm}" stop-opacity="0"/>
     </radialGradient>
 
@@ -1138,7 +1172,7 @@ export function render(state) {
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom, detail.panels === 2) : ''}
+    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom, detail.panels === 2, gripClear) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone,
                                   detail.vertical, hingeOnLeft) : ''}
@@ -1320,7 +1354,6 @@ function mouldGradients(paint, pale) {
  * 0.015 everywhere, which is worth knowing: the thing that looked wrong beside
  * d048 was not where the panels sat.
  *
- *   inset each side   0.14 0.12 0.20 0.13 0.10 0.13  -> 0.13   (was 0.18)
  *   upper rect  top   0.055 0.075 0.100             -> 0.07    unchanged
  *               foot  0.635 0.575 0.545             -> 0.58
  *   lower rect  top   0.700 0.655 0.640             -> 0.66
@@ -1328,18 +1361,51 @@ function mouldGradients(paint, pale) {
  *   lone lower  top   0.745 0.680 0.640             -> 0.68
  *               foot  0.885 0.895 0.905             -> 0.90
  *
- * The inset was the error, and it was a big one: 0.18 each side leaves the
- * panel 64% of the leaf's width where the real ones are 74%. A panel that is
- * a tenth of the door too narrow on both sides reads as a picture frame hung
- * on the leaf rather than as the leaf's own construction.
+ * ── the inset, measured three times ──────────────────────────────────
+ * This line has now been wrong in both directions and it is worth saying how.
+ * It began at 0.18, was "corrected" to 0.13 by a pass that read six doors off
+ * a contact sheet, and both are too WIDE a panel. Reported from the outside:
+ * a pull bar drawn straight across the panel's stile, "in the real door it
+ * will never be possible."
+ *
+ * Settled by drawing a ruler across the photographs — an edge-gradient scan
+ * along two rows of each panelled door — and by the hand-measured records,
+ * which agree with each other and not with 0.13:
+ *
+ *              ruler          record
+ *   d048       0.208 0.210    0.24
+ *   d087       0.241 0.263    0.23
+ *   d099       0.389          0.31
+ *   d108       0.303 0.308    0.35
+ *
+ * The real range is 0.21 to 0.39, and the two doors with an upper AND a lower
+ * panel — the case in the complaint — sit at 0.23. That is the default now.
+ * The 0.13 pass measured a third of a contact-sheet tile and called it a third
+ * of the leaf, which is the same mistake that briefly invented a `longplate`.
+ *
+ * ── and it yields to the grip ────────────────────────────────────────
+ * 0.23 alone is not enough on our drawing: the pull bar sits at 0.18 of leaf
+ * width (the median of ten installations) and reaches 0.043 inboard, so it
+ * lands 5 mm from a panel at 0.23 — touching. d087, the ONE door carrying both
+ * a bar and panels, resolves it exactly as a fitter would: the bar is out at
+ * 0.142 with a clear flat stile between it and the panel at 0.23.
+ *
+ * So `clearTo` pushes the panel inboard far enough to leave that stile, and
+ * the measured range has room for it — 0.25 is comfortably inside 0.21-0.39.
+ * The panel yields rather than the bar because the bar's position is measured
+ * across ten doors and the panel's across four with a wide spread. It stays
+ * SYMMETRIC, as every measured door is; a panel shoved off-centre to dodge one
+ * fitting would be a worse drawing than the one being fixed.
  *
  * Kept clear of the glazing: mouldings crossing a pane is not a door. Returns
  * '' when there is no room, and the caller must survive that — the last time
  * this dropped itself silently it did so on 84 window-and-panel combinations.
  */
-function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper) {
+const PANEL_INSET = 0.23;      // measured minimum, and the two-panel doors' own
+const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real one
+function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0) {
   const band = lw * 0.09;
-  const inset = lw * 0.13;
+  const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
   const x = lx + inset, w = lw - inset * 2;
   const rect = (t, b) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale);
 

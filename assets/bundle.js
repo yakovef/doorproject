@@ -408,8 +408,26 @@
     cool: "#0C1622"
   };
   var FALLOFF = {
-    dark: { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.16, drift: 0.13 },
-    light: { peak: 0.1, mid: 0.05, low: 0.09, foot: 0.1, head: 0.02, grain: 0.09, drift: 0.09 }
+    dark: {
+      peak: 0.16,
+      mid: 0.08,
+      low: 0.17,
+      foot: 0.19,
+      head: 0.02,
+      grain: 0.16,
+      drift: 0.13,
+      bloom: 0.05
+    },
+    light: {
+      peak: 0.1,
+      mid: 0.05,
+      low: 0.09,
+      foot: 0.1,
+      head: 0.02,
+      grain: 0.09,
+      drift: 0.09,
+      bloom: 0.75
+    }
   };
   var CASING = 46;
   var RETURN = 62;
@@ -425,6 +443,7 @@
   var LEVER_ROSETTE = 30;
   var LEVER_REACH = 145;
   var LOCK_CLEAR = 15;
+  var PANEL_GAP = 25;
   var APERTURE_MOULD = 40;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
@@ -541,6 +560,7 @@
     } : null;
     const standoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
     const handleX = lockX + inward * standoff;
+    const gripClear = handle.pull ? lockBackset(handle, lockset) + standoff + handleFootprint(handle, leafH).in + PANEL_GAP : 0;
     const paint2 = colour.hex;
     const edge = silhouette(paint2);
     const deep = darken(paint2, 0.55);
@@ -599,11 +619,11 @@
            the dip was left over from tuning against a stairwell shot where
            the lamp was below the lintel. -->
       <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${fall.peak}"/>
-      <stop offset="0.15" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.86).toFixed(3)}"/>
-      <stop offset="0.32" stop-color="${LIGHT.warm}" stop-opacity="${fall.mid}"/>
-      <stop offset="0.48" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
-      <stop offset="0.64" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
-      <stop offset="0.82" stop-color="${LIGHT.cool}" stop-opacity="${fall.low}"/>
+      <stop offset="0.18" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.86).toFixed(3)}"/>
+      <stop offset="0.45" stop-color="${LIGHT.warm}" stop-opacity="${fall.mid}"/>
+      <stop offset="0.62" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.28).toFixed(3)}"/>
+      <stop offset="0.78" stop-color="${LIGHT.cool}" stop-opacity="${(fall.low * 0.62).toFixed(3)}"/>
+      <stop offset="0.91" stop-color="${LIGHT.cool}" stop-opacity="${fall.low}"/>
       <!-- Pure black, and it must stay pure black. Compositing black at
            alpha a multiplies every channel by (1-a), so hue and saturation
            come through untouched and only the value falls. Any TINTED dark
@@ -622,8 +642,8 @@
          what the photographs show. -->
     <radialGradient id="bloom" cx="0.42" cy="0.22" r="0.62"
                     gradientTransform="translate(0 0.22) scale(1 0.66) translate(0 -0.22)">
-      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.75).toFixed(3)}"/>
-      <stop offset="0.55" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * 0.22).toFixed(3)}"/>
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * fall.bloom).toFixed(3)}"/>
+      <stop offset="0.55" stop-color="${LIGHT.warm}" stop-opacity="${(fall.peak * fall.bloom * 0.29).toFixed(3)}"/>
       <stop offset="1"    stop-color="${LIGHT.warm}" stop-opacity="0"/>
     </radialGradient>
 
@@ -1193,7 +1213,7 @@
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint2, pale, winBottom, detail.panels === 2) : ""}
+    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint2, pale, winBottom, detail.panels === 2, gripClear) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
     ${detail.strips ? metalStrips(
       mainX,
@@ -1303,9 +1323,11 @@ ${body}
     const g = (id, x1, y1, x2, y2, lift) => `<linearGradient id="mould-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(lift)}</linearGradient>`;
     return g("t", 0, 0, 0, 1, MOULD_SIDE.top) + g("b", 0, 1, 0, 0, MOULD_SIDE.bottom) + g("l", 0, 0, 1, 0, MOULD_SIDE.left) + g("r", 1, 0, 0, 0, MOULD_SIDE.right);
   }
-  function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper) {
+  var PANEL_INSET = 0.23;
+  var PANEL_INSET_MAX = 0.39;
+  function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0) {
     const band = lw * 0.09;
-    const inset = lw * 0.13;
+    const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
     const x = lx + inset, w = lw - inset * 2;
     const rect = (t, b) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale);
     if (upper && winBottom <= ly + 1) {

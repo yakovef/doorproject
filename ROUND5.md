@@ -535,6 +535,61 @@ carefully NOT the argument that excused the lever, because a lever and a bar
 are both hardware, both standing off the same face, neither behind the other.
 The distinction is the layer, not the depth.
 
+### Reported from the outside: a bar on the moulding, and two panels that disagree
+
+Both fixed by measuring, and in both cases the number in the code was wrong
+rather than the number being missing.
+
+**The pull bar was drawn across the panel's stile.** "In the real door it will
+never be possible" — correct. The panel inset has now been wrong in both
+directions: 0.18 originally, "corrected" to 0.13 by a pass that read six doors
+off a contact sheet, and both make the panel too wide. An edge-gradient ruler
+run across the photographs settles it, and agrees with the hand-measured
+records rather than with 0.13:
+
+                 ruler           record
+      d048       0.208 0.210     0.24
+      d087       0.241 0.263     0.23
+      d099       0.389           0.31
+      d108       0.303 0.308     0.35
+
+Real panel edges sit at 0.21–0.39 of leaf width; the two doors carrying an
+upper AND a lower panel are at 0.23. That is the default now, and it yields
+further — up to the measured maximum of 0.39 — to leave a flat stile under a
+pull bar. Which is precisely what d087 does: the one installed door with both a
+bar and panels has the bar out at 0.142 and the panel edge at 0.23, with clear
+stile between them. The PANEL yields rather than the bar, because the bar's
+position is measured across ten doors and the panel's across four.
+
+**The lower panel looked flat where the upper looked modelled.** This one was
+worth the detour, because the symptom was nowhere near the cause. Both panels
+are the same construction and the same paint, so a difference between them can
+only come from the leaf underneath — and our leaf was plunging through the
+middle and then flattening, so the upper panel straddled the plunge and the
+lower sat in the dead tail. Measured as a shading rate per unit of leaf height:
+ours ran -1.20 upper against -0.64 lower, where d048 — the cleanest two-panel
+door in the corpus — runs -2.29 and -2.55, essentially the same rate in both.
+
+The cause was `bloom`, the pendant reflection in the upper third. Its own
+comment said it "barely registers on dark paint"; it was scaled by `fall.peak`,
+which is LARGER on dark paint than on light, so on a dark door it registered
+hardest of all. The rows are normalised to the leaf's own brightest row, so an
+over-bright top makes the ENTIRE lower half read as too dark. Nothing was wrong
+at the bottom.
+
+Found by ablation — remove one overlay at a time and see which restores the
+profile — then set by sweep: 0.75 / 0.35 / 0.25 / 0.15 / 0.05 / none gives mean
+error 0.064 / 0.043 / 0.039 / 0.034 / 0.028 / 0.027, so 0.05 is where the
+drawing stops disagreeing and a trace of the object survives. Worst row against
+the corpus median: 0.163 to 0.040. Panel rate ratio: 0.53 to 1.02.
+
+**And the hole it hid in is now instrumented.** `FALLOFF` was fitted to a
+nine-row median across thirty doors and nothing ever asked the drawing whether
+it still produced those rows: `npm run mottle` divides the vertical fall OUT by
+design, and every other tool looks at one object rather than at the face.
+`npm run profile` asks exactly that question, and reports the two panels' rates
+beside it, because the rate is what a person actually notices.
+
 ### What is still open after this round
 
 - The finish question above is the one open item that changes what we draw.
