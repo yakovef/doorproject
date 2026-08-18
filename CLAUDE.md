@@ -140,7 +140,18 @@ the same plane, the same paint and the same texture as the face outside it.**
 
 `MOULD` is the measured cross-section off d048, sixteen stops, carried as a
 gradient across four mitred trapezoids — one per side, because each run sits at
-a different angle to the key. `MOULD_SIDE` holds the per-side gain.
+a different angle to the key. `MOULD_SIDE` holds the per-side gain, and it
+scales the moulding's **relief** — never its absolute tone.
+
+That distinction is the whole of a bug worth remembering. `MOULD` begins and
+ends at tone 1.00, the paint exactly, because a moulding meets the same flat
+face on **both** sides. The gain used to multiply the whole run, endpoints
+included, so the top run's edges came out 1.10× the paint and the bottom run's
+0.87×: a light rim above the field and a dark rim below it, which is precisely
+how one shades a raised panel. The drawing was contradicting the paragraph
+above it, and it was reported from the outside as the panel "bulging". Pinned
+now by `the face inside a moulding is the face outside it`, which asserts every
+run's end stops equal the paint, for every colour.
 
 Both ways of getting this wrong were reached on the way: fine lines alone
 leave the band flat and it reads as an outline etched into the door; fat lines

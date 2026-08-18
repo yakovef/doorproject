@@ -1303,7 +1303,7 @@ ${body}
     [0.94, 0.96],
     [1, 1]
   ];
-  var MOULD_SIDE = { top: 1.1, left: 0.98, right: 0.93, bottom: 0.87 };
+  var MOULD_SIDE = { top: 0.95, left: 1.01, right: 1.04, bottom: 1.07 };
   function moulding(x, y, w, h, band, paint2, pale) {
     if (w <= band * 2.2 || h <= band * 2.2) return "";
     const side = (d, o) => `<path d="${d}" fill="url(#mould-${o})"/>`;
@@ -1319,7 +1319,7 @@ ${body}
   }
   function mouldGradients(paint2, pale) {
     const relief = pale ? 0.34 : 1;
-    const stops = (lift) => MOULD.map(([at, tone]) => `<stop offset="${at}" stop-color="${scaleTone(paint2, (1 + (tone - 1) * relief) * lift)}"/>`).join("");
+    const stops = (lift) => MOULD.map(([at, tone]) => `<stop offset="${at}" stop-color="${scaleTone(paint2, 1 + (tone - 1) * relief * lift)}"/>`).join("");
     const g = (id, x1, y1, x2, y2, lift) => `<linearGradient id="mould-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(lift)}</linearGradient>`;
     return g("t", 0, 0, 0, 1, MOULD_SIDE.top) + g("b", 0, 1, 0, 0, MOULD_SIDE.bottom) + g("l", 0, 0, 1, 0, MOULD_SIDE.left) + g("r", 1, 0, 0, 0, MOULD_SIDE.right);
   }

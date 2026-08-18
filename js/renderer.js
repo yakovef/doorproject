@@ -1283,12 +1283,30 @@ const MOULD = [
   [0.79, 0.36], [0.87, 0.70], [0.94, 0.96], [1.00, 1.00],
 ];
 
-/* One gain per side. Key is high and left, so every run of the rectangle sits
-   at a different angle to it: measured on d062, the top run's deepest quirk
-   bottoms out at 0.55 and the bottom run's at 0.27, with the two verticals
-   between them. Without this the rectangle reads as an engraved line rather
-   than as something standing off the door. */
-const MOULD_SIDE = { top: 1.10, left: 0.98, right: 0.93, bottom: 0.87 };
+/* One gain per side, applied to the moulding's RELIEF — how deep its quirks
+   cut — and never to its absolute tone. Key is high and left, so every run of
+   the rectangle sits at a different angle to it: measured on d062, the top
+   run's deepest quirk is the shallowest of the four and the bottom run's the
+   deepest, with the two verticals between them. Without this the rectangle
+   reads as an engraved line rather than as something standing off the door.
+
+   ⚠ IT USED TO MULTIPLY THE WHOLE RUN, and that is a different thing. `MOULD`
+   begins and ends at tone 1.00 — the paint exactly — because a moulding meets
+   the same flat face on BOTH sides. Multiplying the run scaled those endpoints
+   too, so the top run's edges came out 1.10x the paint and the bottom run's
+   0.87x: a light rim above the field and a dark rim below it, which is
+   precisely how you shade a raised panel.
+
+   And these panels are not raised. There is nothing inside the rectangle — it
+   is a strip of moulding laid on the face, and the face inside it is the same
+   plane, the same paint and the same texture as the face outside. CLAUDE.md
+   has said so since the moulding was first drawn; the drawing quietly said
+   otherwise, and it was reported from the outside as the panel "bulging".
+
+   The numbers below are re-derived so that each run's deepest quirk lands on
+   exactly the value it had before — only the endpoints move, and they move
+   onto the paint. */
+const MOULD_SIDE = { top: 0.95, left: 1.01, right: 1.04, bottom: 1.07 };
 
 /**
  * A rectangle of applied moulding. No field, no fill, nothing inside it — the
@@ -1332,8 +1350,11 @@ function mouldGradients(paint, pale) {
      around it. One factor rather than two, because a single door of each is
      not enough to justify separate numbers for the beads and the quirks. */
   const relief = pale ? 0.34 : 1;
+  /* The gain multiplies the DEVIATION from the paint, so tone 1.00 stays the
+     paint whatever the gain is, and both edges of every run meet the face
+     without a step. */
   const stops = lift => MOULD.map(([at, tone]) =>
-    `<stop offset="${at}" stop-color="${scaleTone(paint, (1 + (tone - 1) * relief) * lift)}"/>`).join('');
+    `<stop offset="${at}" stop-color="${scaleTone(paint, 1 + (tone - 1) * relief * lift)}"/>`).join('');
   /* Outer edge first in every case, so one measured profile serves all four:
      the top run reads downward, the bottom run upward, and the two verticals
      inward from their own side of the rectangle. */

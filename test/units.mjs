@@ -311,8 +311,14 @@ group('detail and finish');
 
     const grads = [...svg.matchAll(/<linearGradient id="mould-[tblr]"[\s\S]*?<\/linearGradient>/g)];
     ok(grads.length === 4, `expected 4 moulding gradients on ${c.id}, got ${grads.length}`);
-    const first = grads.map(g => /stop-color="(#[0-9a-fA-F]{6})"/.exec(g[0])[1]);
-    ok(new Set(first).size > 1, `every side of the moulding on ${c.id} takes the same light`);
+    /* The four runs must differ — but NOT at their end stops, which are the
+       paint on every side by construction now, because a moulding meets the
+       same flat face at both edges. This used to read the first stop, which
+       carried the per-side gain and therefore differed; making the edges meet
+       the face correctly turned that assertion into a false alarm. What has to
+       differ is the RELIEF between the edges, so compare the runs whole. */
+    const bodies = grads.map(g => g[0]);
+    ok(new Set(bodies).size === 4, `every side of the moulding on ${c.id} takes the same light`);
 
     const filled = [...block.matchAll(/<(?:rect|path)[^>]*fill="(?!url\(#mould|none)([^"]+)"/g)]
       .map(m => m[1]).filter(v => v !== '#000');
@@ -731,6 +737,42 @@ group('rules: nothing unbuildable can be reached');
   for (const st of everyState()) { ok(buildable(st), `everyState yielded an unbuildable door`); break; }
 
   console.log(`  (${n} designs repaired and re-checked)`);
+}
+
+// ── 8b. A moulding is not a raised panel ──────────────────────────
+/* THE MODEL: a panel on these doors is a strip of moulding laid on the face in
+   a rectangle. There is nothing inside it. The face within the rectangle is
+   the same plane, the same paint and the same texture as the face outside it —
+   CLAUDE.md has said so since the moulding was first drawn.
+
+   The drawing quietly said otherwise. `MOULD` begins and ends at tone 1.00,
+   the paint exactly, because a moulding meets that same flat face on both
+   sides — but the per-side gain multiplied the WHOLE run, endpoints included,
+   so the top run's edges came out 1.10x the paint and the bottom run's 0.87x.
+   A light rim above the field and a dark rim below it is precisely how one
+   shades a raised panel, and that is what a person saw: the panel "bulging".
+
+   Asserted on the gradient stops rather than on pixels, because this is exact
+   arithmetic and a pixel probe a few millimetres either side of the edge
+   measures the paint's own mottle instead. */
+group('the face inside a moulding is the face outside it');
+for (const c of COLOURS) {
+  const svg = render({ ...base, colour: c.id, handle: 'none', lockset: 'coral',
+                       detail: 'panel2', window: 'none' });
+  const paint = c.hex.toLowerCase();
+  for (const side of ['t', 'b', 'l', 'r']) {
+    const g = new RegExp(`<linearGradient id="mould-${side}"[\\s\\S]*?</linearGradient>`).exec(svg);
+    ok(g, `no mould-${side} gradient on ${c.id} — this check is dead`);
+    if (!g) continue;
+    const stops = [...g[0].matchAll(/offset="([\d.]+)"\s+stop-color="([^"]+)"/g)];
+    ok(stops.length > 2, `mould-${side} on ${c.id} has ${stops.length} stops`);
+    for (const [label, st] of [['outer', stops[0]], ['inner', stops[stops.length - 1]]]) {
+      ok(st[2].toLowerCase() === paint,
+        `mould-${side}'s ${label} edge on ${c.id} is ${st[2]}, not the paint ${paint} — `
+      + 'a moulding meets the same flat face on both sides, and a rim that differs '
+      + 'from it draws a raised panel where there is none');
+    }
+  }
 }
 
 // ── 9. A deploy has to reach the person looking at it ─────────────
