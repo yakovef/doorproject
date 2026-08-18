@@ -2,28 +2,40 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
+import { ADDONS, byId, COLOURS, DETAILS, FINISHES, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, silhouette } from '../js/colour.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import {
-  detailGlyph, finishGlyph, grilleGlyph, handleGlyph, LIGHT, locksetGlyph, render,
-  sizeGlyph, windowGlyph,
+  addonGlyph, detailGlyph, finishGlyph, glazingGlyph, grilleGlyph, handleGlyph, LIGHT,
+  locksetGlyph, render, sizeGlyph, windowGlyph,
 } from '../js/renderer.js';
-import { decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
+import { conflicts, repair } from '../js/rules.js';
+import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' + msg));
 const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
-const base = { colour: 'rb-0097d', window: 'none', grille: 'none', handle: 'idan',
-               lockset: 'coral', detail: 'plain', finish: 'steel',
-               size: 'standard', handing: 'right-in' };
+const base = { colour: 'rb-0097d', window: 'none', glazing: 'clear', grille: 'none',
+               handle: 'idan', lockset: 'coral', detail: 'plain', finish: 'steel',
+               size: 'standard', handing: 'right-in', addons: [] };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
-const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle', 'lockset',
-              'detail', 'finish'];
+const KEYS = ['colour', 'size', 'handing', 'window', 'glazing', 'grille', 'handle',
+              'lockset', 'detail', 'finish', 'addons'];
+
+/* `addons` is an array, so the round-trip checks cannot compare with ===.
+   They did, silently, for exactly as long as it took to write this line. */
+const eq = (a, b) => Array.isArray(a) || Array.isArray(b)
+  ? JSON.stringify(a || []) === JSON.stringify(b || []) : a === b;
+
+/* The code's length is derived, never typed. It was written as {8} and the
+   day the layout grew to nine characters that produced 280 failures saying
+   "malformed code" about codes that were perfectly well formed. */
+const CODE_LEN = encodeCode(DEFAULTS).length - 3;
+const CODE_RE = new RegExp(`^DM-[0-9A-HJKMNP-TV-Z]{${CODE_LEN}}$`);
 
 /**
  * Every reachable design.
@@ -35,13 +47,38 @@ const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle', 'lockse
  * them couples a grip to a lockset. The one thing that does couple them is the
  * clearance between them, and that has its own exhaustive sweep further down.
  */
+/**
+ * Can this exact design be built — is every one of its own choices allowed
+ * from where the rest of it stands?
+ *
+ * This is what "reachable" has to mean now that there are rules. Without it
+ * the generator happily produced a solid door with scrollwork on its
+ * non-existent glass, and every check downstream was asserting things about
+ * doors the interface refuses to make and `fromQuery` repairs on arrival.
+ */
+const buildable = st => {
+  const c = conflicts(st);
+  return KEYS.every(k => k === 'addons'
+    ? (st.addons || []).every(a => !(c.addons || {})[a])
+    : !(c[k] || {})[st[k]]);
+};
+
 function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
     for (const w of WINDOWS) for (const g of GRILLES) {
       const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
-                     detail: 'plain', finish: 'steel' };
-      for (const n of HANDLES) yield { ...stem, handle: n.id, lockset: 'coral' };
-      for (const k of LOCKSETS.slice(1)) yield { ...stem, handle: 'idan', lockset: k.id };
+                     glazing: 'clear', detail: 'plain', finish: 'steel', addons: [] };
+      const out = [];
+      for (const n of HANDLES) out.push({ ...stem, handle: n.id, lockset: 'coral' });
+      for (const k of LOCKSETS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: k.id });
+      /* Additive again for the two new axes. Multiplying them in would take
+         this generator past three million designs; nothing checked here
+         couples glazing to a lockset, and the things that DO couple have
+         their own sweeps. */
+      for (const z of GLAZINGS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: 'coral', glazing: z.id });
+      for (const a of ADDONS) out.push({ ...stem, handle: 'idan', lockset: 'coral', addons: [a.id] });
+      out.push({ ...stem, handle: 'idan', lockset: 'coral', addons: ADDONS.map(a => a.id) });
+      for (const st of out) if (buildable(st)) yield st;
     }
 }
 
@@ -60,10 +97,9 @@ group('short code round-trip');
   for (const st of everyState()) {
     const code = encodeCode(st);
     const back = decodeCode(code);
-    ok(back && KEYS.every(k => back[k] === st[k]),
+    ok(back && KEYS.every(k => eq(back[k], st[k])),
        `${code} did not round-trip for ${Object.values(st).join('/')}`);
-    // 8 characters since the grip and the lockset became separate fields (40 bits).
-    ok(/^DM-[0-9A-HJKMNP-TV-Z]{8}$/.test(code), `malformed code: ${code}`);
+    ok(CODE_RE.test(code), `malformed code: ${code}`);
     ok(!seen.has(code), `code collision: ${code}`);
     seen.set(code, 1);
     n++;
@@ -85,7 +121,7 @@ for (const st of everyState()) {
   const { state: back, notice } = fromQuery(toQuery(st));
   ok(!notice, `unexpected notice for ${toQuery(st)}`);
   for (const k of KEYS) {
-    ok(back[k] === st[k], `url lost ${k} (${st[k]} -> ${back[k]})`);
+    ok(eq(back[k], st[k]), `url lost ${k} (${st[k]} -> ${back[k]})`);
   }
 }
 {
@@ -169,10 +205,21 @@ group('renderer invariants');
       const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
       ok(new Set(ids).size === ids.length, `duplicate id in ${label}`);
 
-      // A grille must never be drawn where there is no glazing.
+      /* A grille must never be drawn where there is no glazing — on the LEAF.
+         Scoped to the leaf's own panes since the sidelight arrived: that size
+         is a solid door beside a fixed glazed panel, which is what d123 is,
+         and the check as written ("no clipPath anywhere in the document")
+         called every one of them a bug. The narrower assertion is also the
+         one that was meant: the question is whether the leaf grew glass it
+         was not asked for. */
       const win = WINDOWS.find(w => w.id === st.window);
       if (!win.rects.length) {
-        ok(!svg.includes('clipPath'), `glazing drawn on a solid door: ${label}`);
+        ok(!/data-pane="m/.test(svg), `glazing drawn on a solid leaf: ${label}`);
+      }
+      /* And the sidelight must always have its pane, whatever the leaf is
+         doing — the one thing a customer is buying when they pick it. */
+      if (SIZES[st.size].sideGlazed) {
+        ok(/data-pane="s"/.test(svg), `the sidelight has no glass: ${label}`);
       }
       n++;
     }
@@ -372,13 +419,28 @@ for (const hd of HANDINGS) for (const sz of sizeKeys) {
   /* These doors open inwards. From the street the hinges are inside the
      rebate, and not one outside photograph on the works page shows one. */
   ok(!/data-hw="hinge"/.test(out), `hinges drawn on the street face (${label})`);
-  // The peephole is on the leaf's centre line in every photograph.
+
+  /* The peephole is a CHOICE now, and both halves of that are worth pinning.
+     It used to be drawn whenever the leaf had no window — never asked for,
+     never priced, never in the message to Peretz, and never on a glazed door
+     even though the photographs have it on one. */
   {
-    const svg = out;
-    const leafX = Number(/id="leaf" data-x="([-\d.]+)"/.exec(svg)[1]);
-    const leafW = Number(/id="leaf"[^>]*data-w="([\d.]+)"/.exec(svg)[1]);
-    const eye = Number(/<circle cx="([-\d.]+)"[^>]*fill="url\(#metal\)"/.exec(svg)[1]);
-    ok(Math.abs(eye - (leafX + leafW / 2)) < 1, `peephole off the centre line (${label})`);
+    const off = render({ ...st, addons: [] });
+    ok(!/<circle[^>]*fill="url\(#metal\)"/.test(off),
+       `a peephole nobody asked for (${label})`);
+
+    // On, it is on the leaf's centre line, which is where every photograph puts it.
+    const on = render({ ...st, addons: ['peep'] });
+    const leafX = Number(/id="leaf" data-x="([-\d.]+)"/.exec(on)[1]);
+    const leafW = Number(/id="leaf"[^>]*data-w="([\d.]+)"/.exec(on)[1]);
+    const m = /<circle cx="([-\d.]+)"[^>]*fill="url\(#metal\)"/.exec(on);
+    ok(m, `the peephole was chosen and not drawn (${label})`);
+    if (m) ok(Math.abs(Number(m[1]) - (leafX + leafW / 2)) < 1,
+              `peephole off the centre line (${label})`);
+
+    // And it survives glazing, which is the case the old rule got wrong.
+    ok(/<circle[^>]*fill="url\(#metal\)"/.test(render({ ...st, window: 'rect', addons: ['peep'] })),
+       `the peephole vanished because the door has a window (${label})`);
   }
 }
 
@@ -555,6 +617,66 @@ for (const h of HANDINGS) {
   // Hinges belong on an outer edge of the opening, never at the mullion.
   const nearEdge = hingeXs.every(x => x < total * 0.30 || x > total * 0.70);
   ok(nearEdge, `hinges sit at the mullion instead of the frame (${h.id}): ${hingeXs}`);
+}
+
+// ── 8. What cannot go with what ───────────────────────────────────
+/* The rules exist so that a customer cannot order a door Peretz would have to
+   telephone them about. That only holds if EVERY route into the state obeys
+   them — a tile click, a shared link, and a code read down the phone — so
+   what is asserted here is not the rules themselves but that all three routes
+   agree, and that `repair` always lands somewhere buildable. */
+group('rules: nothing unbuildable can be reached');
+{
+  let n = 0;
+
+  /* `repair` must be a fixed point: repairing a repaired design changes
+      nothing. Without this a rule that fights another rule would oscillate,
+      and the symptom would be a tile that flickers between two answers. */
+  const check = st => {
+    const { state: once } = repair(st);
+    const { state: twice, changed } = repair(once);
+    ok(!changed.length, `repair did not settle for ${Object.values(st).join('/')}`);
+    ok(JSON.stringify(once) === JSON.stringify(twice), 'repair is not idempotent');
+    ok(buildable(once), `repair produced an unbuildable door from ${Object.values(st).join('/')}`);
+    n++;
+  };
+
+  /* The combinations the corpus says do not exist, and the ones geometry
+     forbids — every one asserted to be both blocked and repairable. */
+  for (const d of DETAILS) for (const w of WINDOWS) for (const sz of sizeKeys) {
+    check({ ...base, detail: d.id, window: w.id, size: sz, glazing: 'obscure', grille: 'grid' });
+  }
+  for (const hn of HANDLES) for (const w of WINDOWS) for (const sz of sizeKeys) {
+    check({ ...base, handle: hn.id, window: w.id, size: sz });
+  }
+
+  /* Line work never shares a leaf with glazing: 0 of 31 installed doors. */
+  for (const d of DETAILS.filter(d => d.strips || d.groove)) {
+    ok(conflicts({ ...base, window: 'rect' }).detail[d.id],
+       `${d.id} should be blocked on a glazed door`);
+    ok(!conflicts({ ...base, window: 'none' }).detail[d.id],
+       `${d.id} should be free on a solid door`);
+  }
+
+  /* A grille and a glass treatment both need glass to be applied to. */
+  for (const g of GRILLES.slice(1)) ok(conflicts({ ...base, window: 'none' }).grille[g.id],
+    `grille ${g.id} should be blocked with no window`);
+  for (const z of GLAZINGS.slice(1)) ok(conflicts({ ...base, window: 'none' }).glazing[z.id],
+    `glazing ${z.id} should be blocked with no window`);
+
+  /* A shared link carrying a forbidden combination must arrive repaired AND
+     announced. Silently opening a different door is the worst thing this site
+     can do (PLAN.md §8.2); silently opening a collision is the second. */
+  const link = fromQuery('?v=8&c=rb-0097d&w=rect&z=clear&g=none&n=idan&k=coral'
+                       + '&d=strips&f=steel&s=standard&h=right-in&a=peep');
+  ok(link.notice === 'combination-fixed', 'a forbidden link must say it was changed');
+  ok(buildable(link.state), 'a forbidden link must arrive buildable');
+
+  /* And every reachable design really is reachable — the generator and the
+     rules must be reading the same table. */
+  for (const st of everyState()) { ok(buildable(st), `everyState yielded an unbuildable door`); break; }
+
+  console.log(`  (${n} designs repaired and re-checked)`);
 }
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} passed, ${fail} failed\n`);

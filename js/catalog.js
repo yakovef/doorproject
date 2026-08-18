@@ -34,6 +34,13 @@ export const SIZES = {
   wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide',          w: 1100, h: 2100, base: 349500 },
   tall:     { id: 'tall',     he: 'גבוהה',      en: 'Tall',          w: 950,  h: 2400, base: 369500 },
   half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', w: 950,  h: 2100, base: 449500, side: 400 },
+  /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
+     d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
+     narrow one beside it — but the narrow one does not open and is glass, so
+     it is a different product and a different price. `sideGlazed` is what the
+     renderer reads. */
+  sidelight: { id: 'sidelight', he: 'עם חלון צד', en: 'With sidelight', w: 950, h: 2100,
+               base: 429500, side: 400, sideGlazed: true },
 };
 
 /**
@@ -167,6 +174,15 @@ export const HANDLES = [
     aliases: ['dee'] },
   { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
     delta: 40000, len: 1554, inset: 0.30, style: 'channel' },
+
+  /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
+     the tubes: a wide rectangular ribbon standing off the leaf, catching the
+     key across one broad face instead of wrapping it round a cylinder. The
+     section is the most visible thing about a pull bar at door scale, and the
+     corpus has three of them — round, square and this — where we modelled five
+     bars differing mainly in their fixings. */
+  { id: 'blade',   he: 'להב שטוח', en: 'Flat blade', delta: 44000, len: 1000, w: 62,
+    style: 'bar', bar: 'blade' },
 ];
 
 /**
@@ -195,7 +211,77 @@ export const LOCKSETS = [
      plate carries the keyway too, so it locks like the Rotem backplate. */
   { id: 'knobplate', he: 'כדור על אורך', en: 'Knob on backplate', delta: 22000,
     style: 'knobplate', lock: true },
+
+  /* ── added in round five, from the hardware contact sheets ──────────
+     Every one of these was already on Peretz's doors; none of them was in the
+     catalogue. Ordered by how many installations carry it. */
+
+  /* Lever on a long narrow backplate — six doors (d003 d005 d010 d011 d023
+     d070). Different object from the Rotem plate, which is 240 mm: these run
+     a third of the stile, carry the keyway at the foot, and read as a strip
+     rather than an escutcheon. The commonest fitting in the corpus after the
+     plain rose. */
+  { id: 'longplate', he: 'ידית על אורך', en: 'Lever on long backplate', delta: 9000,
+    style: 'longplate', lock: true },
+
+  /* Keypad / smart lock — five doors (d070 d081 d084 d087 d113). It IS the
+     keyway, so no separate escutcheon is drawn beside it. Not a decoration:
+     it is as common here as the recessed channel we already sell. */
+  { id: 'digital', he: 'מנעול קודן', en: 'Keypad lock', delta: 145000,
+    style: 'digital', lock: true },
+
+  /* Two square backplates stacked, lever on the upper — four doors (d032 d037
+     d059 d066). A whole hardware family in squares rather than rounds, and
+     nothing else in the range looks remotely like it. */
+  { id: 'square', he: 'ריבועי', en: 'Square backplates', delta: 12000,
+    style: 'square' },
 ];
+
+/**
+ * Glazing — what the glass itself is, as opposed to the shape of the hole.
+ *
+ * A new axis, because it is orthogonal to everything else: any window shape
+ * can be clear or obscured, with or without a grille over it. Six doors in the
+ * corpus are obscured (d102 d104 d106 d109 d111 d114) and on every one of them
+ * it is the most prominent single thing about the door — REALISM.md §7 had
+ * already measured the corpus splitting cleanly into clear and obscured and
+ * recorded it as "a product option we do not offer at all".
+ *
+ * Only meaningful when there is a window, exactly like the grille.
+ */
+export const GLAZINGS = [
+  { id: 'clear',   he: 'זכוכית שקופה',  en: 'Clear',            delta: 0 },
+  /* Acid-etched or patterned: light through, no picture. */
+  { id: 'obscure', he: 'זכוכית מעוצבת', en: 'Obscured',         delta: 24000 },
+  /* Vertical flutes. Reads as a run of bright and dark bands, not as a haze. */
+  { id: 'reeded',  he: 'זכוכית מחורצת', en: 'Reeded',           delta: 28000 },
+];
+
+/**
+ * Add-ons — things fixed to the leaf that are not the lock.
+ *
+ * ⚠ THE ONLY MULTI-SELECT GROUP. Every other group is one-of; a door carries
+ * as many of these as its owner wants, and four of the five appear beside each
+ * other in the corpus. `state.addons` is therefore an ARRAY of ids, and it is
+ * packed into the short code as a BITMASK rather than an index.
+ *
+ * The peephole is the reason this group exists. It was drawn — but as an
+ * automatic consequence of having no window, which is wrong twice over: it is
+ * a thing a customer chooses, and glazed doors carry them too (d076 has a
+ * peephole above a knocker on a leaf that also has glass). `bit` is the mask
+ * position and is as much a wire format as an id: never renumber one.
+ */
+export const ADDONS = [
+  { id: 'peep',      bit: 0, he: 'עינית',        en: 'Peephole',    delta: 6000 },
+  { id: 'mail',      bit: 1, he: 'פתח דואר',     en: 'Letterplate', delta: 22000 },
+  { id: 'knocker',   bit: 2, he: 'מקוש טבעת',    en: 'Ring knocker', delta: 26000 },
+  { id: 'closer',    bit: 3, he: 'מחזיר דלת',    en: 'Door closer', delta: 38000 },
+  { id: 'nameplate', bit: 4, he: 'שלט שם',       en: 'Nameplate',   delta: 14000 },
+];
+
+/** The add-ons a state carries, in catalogue order, unknown ids dropped. */
+export const addonsOf = state =>
+  ADDONS.filter(a => (state.addons || []).includes(a.id));
 
 /** Decorative iron grille over the glazing. Only meaningful with a window. */
 export const GRILLES = [
@@ -238,9 +324,14 @@ export const HANDINGS = [
  */
 export const DETAILS = [
   { id: 'plain',  he: 'חלק',            en: 'Plain',          delta: 0,     panel: false, groove: false },
-  { id: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    delta: 38000, panel: true,  groove: false },
+  /* `both` — panel AND groove on one leaf — is retired. Counted across the 31
+     hand-measured installations, ruled line work and a moulded panel share a
+     leaf on exactly ZERO of them: eleven doors carry line work, ten carry a
+     panel, and no door carries both. It was a combination we invented and
+     priced at ₪540. Its id resolves here so a link written when it existed
+     still opens a door — the panel, which is the more visible half. */
+  { id: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    delta: 38000, panel: true,  groove: false, aliases: ['both'] },
   { id: 'groove', he: 'חריץ אנכי',      en: 'Vertical groove',delta: 24000, panel: false, groove: true  },
-  { id: 'both',   he: 'פאנל וחריץ',     en: 'Panel + groove', delta: 54000, panel: true,  groove: true  },
   /* The designed tier's signature, and we had it backwards. Of the seven
      measured doors with line work on the face, only two are milled grooves;
      four are APPLIED metal strips — polished stainless, brushed steel, pale
@@ -252,6 +343,13 @@ export const DETAILS = [
   /* The classic two-panel face — tall upper, short lower — which d048 carries
      and a single bottom-quarter panel cannot describe. Solid leaves only. */
   { id: 'panel2', he: 'שני פאנלים',     en: 'Two panels',     delta: 52000, panel: true,  groove: false, panels: 2 },
+  /* The strips run BOTH ways and we drew one. `strips` and `strips3` are
+     horizontal — d078's eleven bands settled that in an earlier round — but
+     five doors (d034 d037 d038 d040 d043) run them up the leaf instead, and a
+     customer picking "metal strips" for one of those got the other axis with
+     no warning. Vertical strips are fewer and longer: three or four, in the
+     half of the leaf away from the lock. */
+  { id: 'stripsv', he: 'פסים אנכיים',   en: 'Vertical strips', delta: 44000, panel: false, groove: false, strips: 4, vertical: true },
 ];
 
 /**

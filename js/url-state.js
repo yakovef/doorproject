@@ -8,9 +8,16 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { ADDONS, COLOURS, DETAILS, FINISHES, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { repair } from './rules.js';
 
-/* 7: the handle list split in two. A grip and a lockset are separate objects
+/* 8: two new axes. `z` is the glazing (clear / obscured / reeded) and `a` is
+   the add-ons, which is the first field that is not one-of-a-list — a door
+   carries any number of them, so it is a comma list in the URL and a BITMASK
+   in the code. Every existing field was also re-widened at the same time,
+   because changing the layout is the expensive part and doing it once is
+   cheaper than doing it twice: see BITS.
+   7: the handle list split in two. A grip and a lockset are separate objects
    fitted to the same door, so they are separate fields — `n` is the grip and
    the new `k` is the lock furniture. Every id keeps its meaning and a link
    written before the split still opens the right door (fromQuery moves a
@@ -27,11 +34,12 @@ import { COLOURS, DETAILS, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES
    became "lever + horizontal grab bar", which is what the installations
    actually show). Bumping rather than reusing means an older code is refused
    with a notice instead of quietly decoding into a different door. */
-export const VERSION = 7;
+export const VERSION = 8;
 
 export const DEFAULTS = {
   colour:  'rb-0097d',
   window:  'rect',
+  glazing: 'clear',
   grille:  'none',
   handle:  'idan',
   lockset: 'coral',
@@ -39,6 +47,11 @@ export const DEFAULTS = {
   finish:  'steel',
   size:    'standard',
   handing: 'right-in',
+  /* The peephole is on by default because it is on almost every door in the
+     corpus. It used to be drawn unconditionally on solid doors and never on
+     glazed ones; now it is a choice with a sensible starting position, which
+     is what it always should have been. */
+  addons:  ['peep'],
 };
 
 // ── Query string ──────────────────────────────────────────────────
@@ -49,6 +62,7 @@ export function toQuery(state) {
   p.set('v', String(VERSION));
   p.set('c', state.colour);
   p.set('w', state.window);
+  p.set('z', state.glazing);
   p.set('g', state.grille);
   p.set('n', state.handle);
   p.set('k', state.lockset);
@@ -56,6 +70,11 @@ export function toQuery(state) {
   p.set('f', state.finish);
   p.set('s', state.size);
   p.set('h', state.handing);
+  /* Always written, even when empty, so that "no add-ons" is a statement in
+     the link rather than an absence that reads as "unspecified" and gets the
+     default peephole back. A door someone deliberately ordered without a
+     peephole must survive being shared. */
+  p.set('a', ADDONS.filter(o => (state.addons || []).includes(o.id)).map(o => o.id).join(','));
   return '?' + p.toString();
 }
 
@@ -72,7 +91,7 @@ export function fromQuery(search) {
   const code = p.get('code');
   if (code) {
     const decoded = decodeCode(code);
-    if (decoded) return { state: decoded, notice: null };
+    if (decoded) return settle(decoded, null);
     notice = 'code-unknown';
   }
 
@@ -86,6 +105,7 @@ export function fromQuery(search) {
 
   take('colour', 'c', COLOURS);
   take('window', 'w', WINDOWS);
+  take('glazing', 'z', GLAZINGS);
   take('grille', 'g', GRILLES);
   take('handle', 'n', HANDLES);
   take('lockset', 'k', LOCKSETS);
@@ -108,38 +128,78 @@ export function fromQuery(search) {
     else notice = 'option-unknown';
   }
 
-  return { state, notice };
+  /* Add-ons: a comma list, and the one field where an empty value is a real
+     answer rather than a missing one. Order is normalised to the catalogue's
+     so that the same door always produces the same link, and an unrecognised
+     name sets the notice like every other option — never dropped in silence. */
+  const rawAdd = p.get('a');
+  if (rawAdd != null) {
+    const want = rawAdd.split(',').map(s => s.trim()).filter(Boolean);
+    const hits = [];
+    for (const nameOrAlias of want) {
+      const hit = ADDONS.find(o => o.id === nameOrAlias || (o.aliases || []).includes(nameOrAlias));
+      if (hit) hits.push(hit.id); else notice = 'option-unknown';
+    }
+    state.addons = ADDONS.filter(o => hits.includes(o.id)).map(o => o.id);
+  }
+
+  return settle(state, notice);
+}
+
+/**
+ * The last gate before a design becomes a door.
+ *
+ * A link can carry any combination — it was hand-edited, or written before a
+ * rule existed, or the catalogue moved under it. Rendering it anyway produces
+ * a collision, and quietly rendering something else produces the worst failure
+ * this site has (PLAN.md §8.2). So it is repaired to the nearest buildable
+ * door and the customer is TOLD, in a strip at the top of the page.
+ */
+function settle(state, notice) {
+  const { state: fixed, changed } = repair(state);
+  return { state: fixed, notice: changed.length ? 'combination-fixed' : notice };
 }
 
 // ── Short code ────────────────────────────────────────────────────
-// 40 bits, laid out with room to grow:
-//   version 3 | colour 7 | size 4 | handing 2 | window 5
-//   | grille 3 | handle 5 | lockset 4 | detail 3 | finish 4
-// -> 8 Crockford base32 characters, still short enough to read aloud.
+// 45 bits -> 9 Crockford base32 characters, still short enough to read aloud.
 //
-// 40 bits, up from 35, because the handle field became two: a grip and a
-// lockset are separate objects on the same door. The eighth character is the
-// price of saying so, and it also means every pre-split code fails the length
-// check and is refused outright rather than decoded into a different door.
+// Nine, up from eight, and the ninth character buys two whole axes: what the
+// glass is, and which add-ons are on the door. Leaving the add-ons out of the
+// code was considered and rejected — a customer who telephones would then read
+// out a door with no peephole and no letterplate and be sent one anyway, which
+// is precisely the silent-difference failure the code exists to prevent
+// (PLAN.md §8.2). A character is cheaper than a wrong door.
 //
-// The handle field took the spare bit when the range grew to the real Rav
-// Bariach products. Four bits is sixteen slots against fourteen used, so the
-// code length is unchanged and there is still room for two more.
+// The whole layout was re-cut at the same time rather than bolting two fields
+// on the end, because changing the layout is what costs a VERSION bump and
+// doing it once is cheaper than doing it twice. Several fields were absurdly
+// wide — 128 colours for a list of seventeen — and the space paid for the new
+// ones.
+//
+// The VERSION FIELD ITSELF widened, 3 bits to 4, because version 8 does not
+// fit in three. That is not a detail: a decoder built for this layout reads
+// four bits where an old code wrote three, so it reads an old code's version
+// as 14 or 15, matches nothing, and refuses. Which is the wanted behaviour,
+// and the length check refuses it one line earlier anyway.
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
-/* Widened before any of these fields filled up, which is the only moment it
-   is free. `grille` and `detail` were both at 4 of 4 and `finish` at 3 of 4:
-   a fifth grille would have overflowed its two bits and been stored as
-   grille 0, silently — the customer picks scrollwork, reads the code down the
-   phone, and Peretz builds a door with no grille at all. Not an error, not a
-   refusal, just a different door. PLAN.md §8.2 names that as the worst thing
-   this site can do.
-   Capacities now: 128 colours, 16 sizes, 4 handings, 32 windows, 8 grilles,
-   32 grips, 16 locksets, 8 details, 16 finishes. */
-const BITS = { version: 3, colour: 7, size: 4, handing: 2, window: 5,
-               grille: 3, handle: 5, lockset: 4, detail: 3, finish: 4 };
-const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 40 -> 8 chars
+/* Capacities against what is used today:
+     version 16 / 8      colour  64 / 17     size     8 / 6
+     handing  4 / 2      window  16 / 6      grille   16 / 7
+     handle  16 / 10     lockset 16 / 10     detail   16 / 9
+     finish   8 / 3      glazing  4 / 3      addons   5 / 5  (a MASK)
+   Every one has room except `addons`, where five bits means five add-ons
+   exactly and a sixth needs another bump. That is deliberate: a mask cannot
+   be over-provisioned cheaply, and five is what the corpus shows.
+
+   The reason to keep headroom at all: a field that overflows does not throw.
+   An eighth grille in three bits would have been stored as grille 0 — the
+   customer picks scrollwork, reads the code down the phone, and Peretz builds
+   a door with no grille. Not an error, not a refusal, just a different door. */
+const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4, grille: 4,
+               handle: 4, lockset: 4, detail: 4, finish: 3, glazing: 2, addons: 5 };
+const TOTAL_BITS = Object.values(BITS).reduce((a, b) => a + b, 0); // 45 -> 9 chars
 
 export function encodeCode(state) {
   const sizeKeys = Object.keys(SIZES);
@@ -154,6 +214,11 @@ export function encodeCode(state) {
     [Math.max(0, LOCKSETS.findIndex(k => k.id === state.lockset)), BITS.lockset],
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
     [Math.max(0, FINISHES.findIndex(f => f.id === state.finish)), BITS.finish],
+    [Math.max(0, GLAZINGS.findIndex(z => z.id === state.glazing)), BITS.glazing],
+    /* A mask, not an index — the only field of its kind. `bit` comes from the
+       catalogue rather than from array position, so reordering the add-on
+       tiles for the UI cannot silently renumber what a code means. */
+    [ADDONS.reduce((m, a) => m | ((state.addons || []).includes(a.id) ? 1 << a.bit : 0), 0), BITS.addons],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -204,12 +269,15 @@ export function decodeCode(code) {
   const lockset = LOCKSETS[read(BITS.lockset)];
   const detail  = DETAILS[read(BITS.detail)];
   const finish  = FINISHES[read(BITS.finish)];
+  const glazing = GLAZINGS[read(BITS.glazing)];
+  const mask    = read(BITS.addons);
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail || !finish) return null;
+      || !detail || !finish || !glazing) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
-    finish: finish.id,
+    finish: finish.id, glazing: glazing.id,
+    addons: ADDONS.filter(a => mask & (1 << a.bit)).map(a => a.id),
   };
 }

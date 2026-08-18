@@ -58,7 +58,7 @@ here; it is on the list for Peretz.
 | what it is | doors | verdict |
 |---|---|---|
 | **Lever on a round rose + separate round cylinder escutcheon below** | d007 d008 d009 d014 d015 d016 d017 d019 d020 d025 d026 d027 d028 d033 d039 d044 d046 d047 d048 d061 d063 d064 d065 d072 d090 d093 d094 d097 d099 d105 d127 d128 d129 | **have** — `coral`. The commonest fitting in the corpus by a wide margin |
-| **Lever on a shaped ("waisted") backplate** with keyhole | d002 d004 d006 d012 d022 d029 d031 d056 d059 d123 | **have-ish** — `plate` is a plain rectangle; every one of these is waisted, wider at the ends than the middle |
+| **Lever on a shaped ("waisted") backplate** with keyhole | d002 d004 d006 d012 d022 d029 d031 d056 d059 d123 | **have** — `plate`. I wrote "have-ish, ours is a plain rectangle" here and then read the code: `PLATE.waist = 0.91` and the outline is eight Bézier segments built specifically so it would not read as a peanut. Corrected. |
 | **Lever on a long narrow backplate**, ~200–400 mm | d003 d005 d010 d011 d023 d070 | **MISSING as drawn** — `plate` is short. These run a third of the stile |
 | **Round knob** on a rose + cylinder | d030 d095 | **have** — `cadoor` |
 | **Two square backplates stacked** — lever on one, cylinder on the other | d032 d037 d059 d066 | **MISSING** — a whole square-hardware family |
@@ -119,8 +119,8 @@ Six doors, and on every one it is the most prominent thing about the door.
 
 | pattern | doors | verdict |
 |---|---|---|
-| Applied metal strips, **horizontal** | d039 d044 d045 d064 d066 d073 d074 d081 d086 d036 | **have** but drawn vertical only |
-| Applied metal strips, **vertical** | d034 d037 d040 d043 d038 | **have** |
+| Applied metal strips, **horizontal** | d039 d044 d045 d064 d066 d073 d074 d081 d086 d036 | **have** — `strips` (11) and `strips3` (3) |
+| Applied metal strips, **vertical** | d034 d037 d038 d040 d043 | **MISSING**. I had this the wrong way round on the first pass and asserted we drew vertical only; `metalStrips()` draws horizontal, which a render confirms (697 × 16 rects). It is the vertical run we cannot draw |
 | **Cross composition** — one long vertical crossed by horizontals | d035 d047 d066 d074 | **MISSING** as a pattern; three of the four also use the pull bar as the vertical member |
 | **Staggered strips** — different lengths, offset | d043 d044 d045 | **MISSING** |
 | Moulded panel, one | d042 d053 d058 d061 d069 d071 | **have** — `panel` |
@@ -128,9 +128,16 @@ Six doors, and on every one it is the most prominent thing about the door.
 | **Full classical composition** — cornice over the light, pilasters, plinth | d080 d103 d112 d129 d076 | **MISSING**, as recorded in CLAUDE.md §9 |
 | **Arched raised panel** | d071 | **MISSING** |
 
-**Finding: the strips are more often horizontal than vertical** — ten doors to
-five — and we draw only vertical. The catalogue entry says "metal strips"; half
-the installed ones are the other way round.
+**Finding: the strips run both ways** — ten doors horizontal, five vertical —
+and we draw only horizontal. The catalogue calls the option "metal strips"
+without saying which way, so a customer picking it for a d037-style door gets
+the other axis with no warning.
+
+*(This row was written backwards the first time, from memory of a commit
+message rather than from the code. Both corrections in this file came from
+going back to the source; neither would have been caught by looking harder at
+the photographs, which is worth remembering — half of "what is missing" is a
+question about our own code, not about the corpus.)*
 
 ---
 
@@ -147,20 +154,27 @@ invent.**
 
 ## 7. What to build, in order of how many doors carry it
 
-1. Horizontal metal strips (10 doors) — an orientation flag on `strips`
-2. Waisted backplate lockset (10)
-3. Peephole as a real, always-available choice (most of the corpus)
-4. Long backplate lockset (6)
-5. Obscured glazing (6)
-6. Digital keypad lock (5)
-7. Ring knocker (5)
+1. Peephole as a real, always-available choice (most of the corpus)
+2. Long backplate carrying a lever (6 doors)
+3. Obscured glazing (6)
+4. Digital keypad lock (5)
+5. Ring knocker (5)
+6. Door closer (5)
+7. Vertical metal strips (5)
 8. Square backplate pair (4)
 9. Letterplate (4)
-10. Door closer (5)
-11. Sidelight (4)
-12. Flat blade pull bar (3)
+10. Sidelight (4)
+11. Flat blade pull bar (3)
+12. Nameplate (2)
 13. Cross / staggered strip patterns (4+3)
 14. Transom (4), arched panel (1), curved bow pull (1) — recorded, not built
 
 Items 1–12 are Phase 2. Item 13 needs a pattern vocabulary rather than a new
 option. Item 14 is one door each and goes to REALISM.md as a note.
+
+**Five of these twelve are not alternatives to anything** — a peephole, a
+letterplate, a knocker, a closer and a nameplate can all be on the same door,
+and four of them appear alongside each other in the corpus. So they are not a
+new radio group, they are the configurator's first multi-select, which reaches
+the URL, the short code (a bitmask, not an index), the price, the summary and
+the WhatsApp message.

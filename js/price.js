@@ -7,7 +7,7 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { addonsOf, byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
 export function priceAgorot(state) {
@@ -29,9 +29,16 @@ export function priceAgorot(state) {
             + handle.delta
             + byId(LOCKSETS, state.lockset).delta
             + byId(DETAILS, state.detail).delta
-            + (finish && !handle.finish ? finish.delta : 0);
-  // A grille needs glazing to sit in, so it cannot be charged on a solid door.
-  if (win.rects.length) total += grille.delta;
+            + (finish && !handle.finish ? finish.delta : 0)
+            /* Add-ons are the one group that SUMS rather than picking one: a
+               door can carry a peephole and a letterplate and a closer, and
+               each is bought separately. */
+            + addonsOf(state).reduce((s, a) => s + a.delta, 0);
+  /* A grille needs glazing to sit in, and so does the glass treatment itself —
+     neither can be charged on a solid door. Same rule, same reason: the
+     configurator must never take money for something the drawing does not
+     show and Peretz cannot fit. */
+  if (win.rects.length) total += grille.delta + byId(GLAZINGS, state.glazing).delta;
 
   // Round up to the nearest ₪5 so quoted figures stay tidy.
   return Math.ceil(total / 500) * 500;

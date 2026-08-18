@@ -16,7 +16,7 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { ADDONS, addonsOf, byId, COLOURS, DETAILS, effectiveFinish, FINISHES, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { darken, isLight, lighten, scaleTone, silhouette } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
@@ -341,8 +341,11 @@ export function render(state) {
   const colour  = byId(COLOURS, state.colour);
   const handing = byId(HANDINGS, state.handing);
   const win     = byId(WINDOWS, state.window);
+  const glazing = byId(GLAZINGS, state.glazing);
   const grille  = byId(GRILLES, state.grille);
   const handle  = byId(HANDLES, state.handle);
+  const addons  = addonsOf(state);
+  const has     = id => addons.some(a => a.id === id);
   const lockset = byId(LOCKSETS, state.lockset);
   const detail  = byId(DETAILS, state.detail);
   /* The handle's own finish wins over the chosen one — Luna is matte black and
@@ -421,6 +424,23 @@ export function render(state) {
     ? Math.abs((hingeOnLeft ? winSpan.x1 : winSpan.x) - lockX) : Infinity;
   const standoff = gripStandoff(handle, lockset, leafW, leafH, glassEdge);
   const handleX = lockX + inward * standoff;
+
+  /**
+   * Where a centre-line add-on goes: its own height if the leaf is clear
+   * there, otherwise just below the glazing.
+   *
+   * `clear` is the room the fitting needs under it, as a fraction of leaf
+   * height. Moving it is deliberate — the alternative is not drawing it, and
+   * a paid-for option that silently draws nothing is the bug this codebase
+   * keeps producing (CLAUDE.md §5). A knocker 200 mm lower than the
+   * photographs is a small wrongness; a knocker that is not there is an order
+   * Peretz cannot fill.
+   */
+  const addonY = (aff, clear) => {
+    const want = y(aff);
+    if (!winSpan || want - leafH * clear > winBottom || want + leafH * clear < y0 + (win.rects[0] ? win.rects[0].top : 0)) return want;
+    return Math.min(winBottom + leafH * (clear + 0.03), y0 + leafH * 0.90);
+  };
 
   const paint = colour.hex;
   const edge  = silhouette(paint);
@@ -1048,12 +1068,23 @@ export function render(state) {
     }).join('')}
   </g>
 
-  ${sideW ? `<g id="side-leaf">${leaf(sideX, sideW)}${
-      win.rects[0] && sideW > 320
+  ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${
+      /* A SIDELIGHT is glass by definition — that is the whole product, and
+         four doors in the corpus have one (d117 d122 d123 d128). It does not
+         copy the main leaf's window: on all four the side panel is a single
+         tall light running most of the panel's height whatever the door beside
+         it is doing, and one of them has a solid door next to a glazed
+         sidelight. דלת וחצי is the other case and keeps its old behaviour,
+         where the second leaf mirrors the first. */
+      size.sideGlazed
+        ? aperture({ x: sideX + 95, y: y0 + leafH * 0.09,
+                     w: sideW - 190, h: leafH * 0.79,
+                     paint, edge, grille, glazing: glazing.id, key: 's' })
+      : win.rects[0] && sideW > 320
         ? aperture({ x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
                      y: y0 + win.rects[0].top,
                      w: Math.min(win.rects[0].w, sideW - 240), h: win.rects[0].h,
-                     paint, edge, grille, key: 's' })
+                     paint, edge, grille, glazing: glazing.id, key: 's' })
         : ''}</g>` : ''}
 
   <!-- ── main leaf ────────────────────────────────────────────── -->
@@ -1063,24 +1094,44 @@ export function render(state) {
   <g id="detail">
     ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom, detail.panels === 2) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
-    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone) : ''}
+    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone,
+                                  detail.vertical, hingeOnLeft) : ''}
   </g>
 
   <!-- ── glazing ──────────────────────────────────────────────── -->
   <g id="glazing">
     ${win.rects.map((r, i) => aperture({
       x: centreX + (r.dx || 0) - r.w / 2, y: y0 + r.top,
-      w: r.w, h: r.h, paint, edge, grille, key: 'm' + i,
+      w: r.w, h: r.h, paint, edge, grille, glazing: glazing.id, key: 'm' + i,
     })).join('')}
   </g>
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
-    ${win.rects.length ? '' : peephole(centreX, y(PEEPHOLE_AFF))}
     ${gripArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint,
               centreX, leafW, y0)}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
+  </g>
+
+  <!-- ── add-ons ──────────────────────────────────────────────────
+       Chosen, not inferred. The peephole used to live in the hardware group
+       above, drawn whenever the leaf had no window: on every solid door
+       whether anyone wanted one, and on no glazed door
+       even though d076 has a peephole above a knocker on a leaf that also has
+       glass. It was never in the price, never in the summary, and never in the
+       message that goes to Peretz.
+
+       Positions are fractions of the leaf read off the photographs. Where a
+       window would be in the way the add-on moves below it rather than being
+       dropped — a thing that silently disappears is this codebase's oldest
+       failure mode (CLAUDE.md §5) and the peephole was an instance of it. -->
+  <g id="addons">
+    ${has('peep') ? peephole(centreX, addonY(PEEPHOLE_AFF, 0.09)) : ''}
+    ${has('knocker') ? knocker(centreX, addonY(1560, 0.13), tone) : ''}
+    ${has('nameplate') ? nameplate(centreX, addonY(1730, 0.09), tone) : ''}
+    ${has('mail') ? letterplate(centreX, y0 + leafH * 0.80, tone) : ''}
+    ${has('closer') ? doorCloser(hingeX, y0 + leafH * 0.045, hingeOnLeft ? 1 : -1, tone) : ''}
   </g>
 
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
@@ -1296,7 +1347,37 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper) {
  * top-left arris, a body, and its own drop shadow onto the paint below-right,
  * because a thing standing proud of a surface has to cast something.
  */
-function metalStrips(lx, ly, lw, lh, count, tone) {
+function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
+  /* ── the other axis ──────────────────────────────────────────────
+     Five doors run the strips UP the leaf, not across it: d034 d037 d038 d040
+     d043. Fewer of them and longer, grouped in the half of the leaf away from
+     the lock, because that is the half with nothing else on it.
+     Two things change besides the rotation. The lit arris moves from the top
+     edge to the LEFT edge, since the key is high and to the left and a
+     vertical strip presents its side to it rather than its top. And the run
+     stops well short of the head and foot, as every one of the five does. */
+  if (vertical) {
+    const top = ly + lh * 0.12, bot = ly + lh * 0.88;
+    const t = Math.max(8, Math.round(lw * 0.018));
+    /* Away from the lock: the lock is on the closing edge, which is the side
+       opposite the hinges. */
+    const bandW = lw * 0.34;
+    const band0 = hingeOnLeft ? lx + lw * 0.10 : lx + lw * 0.56;
+    const gap = count > 1 ? bandW / (count - 1) : 0;
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      const x = Math.round(count > 1 ? band0 + gap * i : band0 + bandW / 2);
+      out.push(`
+        <rect x="${x + 3}" y="${top + 3}" width="${t}" height="${bot - top}"
+              fill="#000" opacity="0.22"/>
+        <rect x="${x}" y="${top}" width="${t}" height="${bot - top}" fill="${tone[2]}"/>
+        <rect x="${x}" y="${top}" width="${Math.max(2, t * 0.34)}" height="${bot - top}"
+              fill="${tone[0]}"/>
+        <rect x="${x + t - Math.max(2, t * 0.24)}" y="${top}"
+              width="${Math.max(2, t * 0.24)}" height="${bot - top}" fill="${tone[4]}"/>`);
+    }
+    return `<g data-detail="strips" data-count="${count}" data-axis="vertical">${out.join('')}</g>`;
+  }
   /* HORIZONTAL. I drew them vertical first, from the tier summary's phrase
      "ruled line work", and d078 settles it at a glance: eleven bands running
      across the leaf, not up it. They also run nearly the full width — inset
@@ -1322,7 +1403,7 @@ function metalStrips(lx, ly, lw, lh, count, tone) {
       <rect x="${x0s}" y="${y + t - Math.max(2, t * 0.24)}" width="${wide}"
             height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`);
   }
-  return `<g data-detail="strips" data-count="${count}">${out.join('')}</g>`;
+  return `<g data-detail="strips" data-count="${count}" data-axis="horizontal">${out.join('')}</g>`;
 }
 
 function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
@@ -1342,8 +1423,67 @@ function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
     </g>`;
 }
 
+/**
+ * What the GLASS is, as opposed to what shape the hole is.
+ *
+ * Six doors in the corpus are glazed with something other than clear —
+ * d102 d104 d106 d109 d111 d114 — and on every one of them it is the most
+ * prominent single thing about the door. REALISM.md §7 had already measured
+ * this and filed it as "a product option we do not offer at all".
+ *
+ * The physics that matters is one sentence: **obscured glass stops being a
+ * window and becomes a lamp.** Clear glazing is an aperture with a street
+ * behind it, so it comes out darker than the leaf and carries a reflection of
+ * the sky across its top. Obscured glazing scatters that street into a flat
+ * bright field with no picture in it, and the sky reflection has nothing to
+ * reflect off. So this does not just add a pattern on top of the clear pane —
+ * it replaces what is behind the pattern too.
+ *
+ * Returned in two parts, because they go either side of the grille: ironwork
+ * sits in front of the glass, not behind its texture.
+ */
+function glazingArt(kind, x, y, w, h) {
+  if (kind === 'reeded') {
+    /* Vertical flutes. Each rod is a little lens: a bright line down its
+       crown, a dark one in the valley beside it. Read at door scale it is a
+       run of hard vertical bands, which is why it never reads as "frosted". */
+    const pitch = Math.max(16, Math.min(30, w / 9));
+    const n = Math.max(3, Math.round(w / pitch));
+    const p = w / n;
+    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#C8CFD4" opacity="0.62"/>`;
+    for (let i = 0; i < n; i++) {
+      const bx = x + p * i;
+      out += `<rect x="${bx}" y="${y}" width="${p * 0.30}" height="${h}" fill="#fff" opacity="0.40"/>`
+           + `<rect x="${bx + p * 0.70}" y="${y}" width="${p * 0.30}" height="${h}" fill="#2A3136" opacity="0.24"/>`;
+    }
+    return { veil: out, over: '' };
+  }
+  if (kind === 'obscure') {
+    /* Acid-etched or rolled pattern. d106 is the clearest: a repeating
+       four-petal figure on a square lattice, the petals slightly brighter than
+       the ground because they are the thicker glass. */
+    const cell = Math.max(26, Math.min(52, w / 6));
+    const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
+    const cw = w / cols, ch = h / rows;
+    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#CBD2D6" opacity="0.70"/>`;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cx = x + cw * (c + 0.5), cy = y + ch * (r + 0.5);
+        const rx = cw * 0.36, ry = ch * 0.36;
+        out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${Math.min(rx, ry).toFixed(1)}"
+                        fill="none" stroke="#fff" stroke-opacity="0.42" stroke-width="2.4"/>`
+             + `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(Math.min(rx, ry) * 0.42).toFixed(1)}"
+                        fill="#fff" fill-opacity="0.26"/>`;
+      }
+    }
+    return { veil: out, over: '' };
+  }
+  return null;                                   // clear: the pane as it was
+}
+
 /* ── a glazed opening, with a raised moulded surround ───────────── */
-function aperture({ x, y, w, h, paint, edge, grille, key }) {
+function aperture({ x, y, w, h, paint, edge, grille, glazing, key }) {
+  const glass = glazingArt(glazing, x, y, w, h);
   /* The architrave. It was a 30 mm band with a single 10 mm bevel, and that
      thinness is most of why a glazed door of ours read as CAD next to a
      photograph: on the measured doors the surround is a MOULDING, wide and
@@ -1370,7 +1510,7 @@ function aperture({ x, y, w, h, paint, edge, grille, key }) {
   const M = 40;                       // moulding width
   const id = `cl-${key}`;
   return `
-    <g>
+    <g data-pane="${key}" data-glazing="${glazing || 'clear'}">
       ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint, isLight(paint))}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
            edge before the pane turns the other way -->
@@ -1384,8 +1524,12 @@ function aperture({ x, y, w, h, paint, edge, grille, key }) {
            Screen only ever lightens, so this had nowhere to go but pale. -->
       <rect x="${x}" y="${y}" width="${w}" height="${h}"
             filter="url(#frost)" opacity="0.10" style="mix-blend-mode:screen"/>
-      <!-- reflected sky across the upper third -->
-      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
+      <!-- reflected sky across the upper third. Obscured and reeded glass has
+           nothing to reflect it off: the surface that would carry the sky is
+           the same surface that has been etched away, which is exactly why
+           those panes read as a lit panel rather than as a hole. -->
+      ${glass ? '' : `<rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>`}
+      ${glass ? glass.veil : ''}
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
       <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint, 0.10) : null)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
@@ -1514,6 +1658,9 @@ function handleFootprint(handle, leafH) {
     case 'cadoor':  return { hx: 34, vy: 40 };
     case 'sapir':   return { hx: 36, vy: 36 };
     case 'knobplate': return { hx: 48, vy: 150 };
+    case 'longplate': return { hx: 42, vy: 215, reach: LEVER_REACH };
+    case 'digital': return { hx: 48, vy: 150 };
+    case 'square':  return { hx: 41, vy: 95, reach: LEVER_REACH };
     case 'shiran':  return { hx: 44, vy: 240 };
     default:        return { hx: (handle.w || 30) / 2, vy: barHalf(handle.len, leafH) };
   }
@@ -1559,6 +1706,51 @@ export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) 
 }
 
 /**
+ * How much room there is between the lock's axis and the near edge of the
+ * glazing, in mm. Infinity on a solid door.
+ *
+ * Leaf-local and measured inboard from the CLOSING edge, so handing drops out
+ * of it — which is the only way to be sure this agrees with `render()`, whose
+ * own version of the same quantity is expressed in stage coordinates with a
+ * sign flip in it.
+ */
+export function glassClearance(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const win = byId(WINDOWS, state.window);
+  if (!win.rects.length) return Infinity;
+  const leafW = size.w - REBATE * 2;
+  const hingeOnLeft = byId(HANDINGS, state.handing).hinge === 'left';
+  /* Nearest glass edge to the closing edge, as a distance inboard from it. */
+  const u = win.rects.map(r => {
+    const lo = leafW / 2 + (r.dx || 0) - r.w / 2, hi = leafW / 2 + (r.dx || 0) + r.w / 2;
+    return hingeOnLeft ? leafW - hi : lo;
+  });
+  return Math.min(...u) - lockBackset(byId(HANDLES, state.handle));
+}
+
+/**
+ * Does this grip have to be drawn over the glass?
+ *
+ * `gripStandoff` floors the gap at the tightest installed one and lets the
+ * glazing lose that argument, because a bar drawn through a lever is worse
+ * than a bar drawn over a pane. That is the right call INSIDE the renderer —
+ * something has to be drawn — but it means a door can be configured that
+ * nobody would fit. This is the same arithmetic asked as a question, so the
+ * UI can refuse the combination instead of drawing it badly.
+ */
+export function gripClashesGlass(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const handle = byId(HANDLES, state.handle);
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const grip = handleFootprint(handle, leafH);
+  if (!grip.vy && !grip.hx) return false;
+  const lock = handleFootprint(byId(LOCKSETS, state.lockset), leafH);
+  const floor = Math.max(lock.hx + grip.hx + LOCK_CLEAR, leafW * BAR_GAP_MIN);
+  const room = glassClearance(state) - grip.hx - LOCK_CLEAR;
+  return floor > room;
+}
+
+/**
  * How far the lock furniture sits from the closing edge for THIS door.
  *
  * A door with a pull bar on it has its lockset further out — measured, 0.057
@@ -1593,6 +1785,9 @@ const LOCK_ART = {
   cadoor:  (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
   knobplate: (h, g) => knobPlate(g.cx, g.cy, g.dir),
   sapir:   (h, g) => sapirKnob(g.cx, g.cy, g.dir),
+  longplate: (h, g) => longPlate(g.cx, g.cy, g.dir),
+  digital: (h, g) => digitalLock(g.cx, g.cy, g.dir),
+  square:  (h, g) => squarePlates(g.cx, g.cy, g.dir),
 };
 
 function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0) {
@@ -1738,6 +1933,16 @@ const BARS = {
   ron: {
     tone: 'barDark', cap: 'shoe', rx: 0.08,
     fix: { kind: 'shoe', t: [0.035, 0.965], proj: 0.33, size: 1.57, tall: 1.86 },
+  },
+  /* The flat blade — d034, d073, d104. A wide ribbon rather than a tube, and
+     the section is what identifies it: a round bar shows two blown highlights
+     with a dark core between them, and this shows ONE broad even face with a
+     hard bright arris down each long edge, because a flat surface facing the
+     camera returns the key light uniformly instead of wrapping it. Nearly
+     square corners, and the fixings vanish behind the width of it. */
+  blade: {
+    tone: 'barPolish', cap: 'flat', rx: 0.04, stub: 1,
+    fix: { kind: 'clamp', t: [0.10, 0.90], proj: 0.30, size: 0.62, tall: 0.9 },
   },
 };
 
@@ -1984,6 +2189,116 @@ function knobPlate(cx, cy, dir) {
            drawing a keyhole there would say the door locks with a key from
            the inside, which it does not. -->
       ${keyway(cx, y + H * 0.78)}
+    </g>`;
+}
+
+/**
+ * Lever on a long backplate. Six doors — d003 d005 d010 d011 d023 d070 — which
+ * makes it the commonest fitting in the corpus after the plain rose, and it
+ * was not in the catalogue at all.
+ *
+ * Not the Rotem plate made taller. The Rotem plate is 240 mm and waisted, and
+ * it reads as an escutcheon around a lever. This runs 430 mm — a third of the
+ * stile — with parallel sides and a square-ish end, and it reads as a STRIP
+ * screwed to the door with a lever coming out of it. The lever sits high on
+ * it and the keyway low, with most of the plate's length between them, which
+ * is the proportion that identifies it across a courtyard.
+ */
+function longPlate(cx, cy, dir) {
+  const W = 84, H = 430, r = 14;
+  const x = cx - W / 2, y = cy - H * 0.22;
+  const d = `M ${x} ${y + r} Q ${x} ${y} ${x + r} ${y} L ${x + W - r} ${y}
+             Q ${x + W} ${y} ${x + W} ${y + r} L ${x + W} ${y + H - r}
+             Q ${x + W} ${y + H} ${x + W - r} ${y + H} L ${x + r} ${y + H}
+             Q ${x} ${y + H} ${x} ${y + H - r} Z`;
+  return `
+    <g data-hw="lockset-art" data-style="longplate">
+      <path d="${d}" fill="#000" opacity="0.34" transform="translate(${dir * 6} 7)"
+            filter="url(#hwShadow)"/>
+      <path d="${d}" fill="url(#plateFace)"/>
+      <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.55" stroke-width="3"
+            transform="translate(${dir * 1.2} -1.6)"/>
+      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.40" stroke-width="2"
+            transform="translate(${dir * -1.6} 2.2)"/>
+      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+      <!-- two fixing screws, top and bottom, which the photographs all show -->
+      ${[y + 26, y + H - 26].map(sy => `
+        <circle cx="${cx}" cy="${sy}" r="5" fill="#000" opacity="0.34"/>
+        <circle cx="${cx - 0.7}" cy="${sy - 0.7}" r="4" fill="url(#metal)"/>`).join('')}
+      ${lever(cx, cy, dir)}
+      ${keyway(cx, y + H * 0.80)}
+    </g>`;
+}
+
+/**
+ * Keypad lock. Five doors — d070 d081 d084 d087 d113 — which is as common here
+ * as the recessed channel we already sell, and it was not offered.
+ *
+ * It IS the keyway (`lock: true` in the catalogue), so nothing else is drawn
+ * beside it. Two things carry the read: the body is a matte black slab, the
+ * only object on these doors that is not metal-finished and does not take the
+ * key light the way metal does; and the buttons are a grid of slightly
+ * recessed circles, dark on dark, legible only by their own rims.
+ */
+function digitalLock(cx, cy, dir) {
+  const W = 96, H = 300, r = 12;
+  const x = cx - W / 2, y = cy - H * 0.34;
+  const rows = 4, cols = 3;
+  const padTop = y + H * 0.08, padH = H * 0.56;
+  const keys = [];
+  for (let ry = 0; ry < rows; ry++) {
+    for (let cxi = 0; cxi < cols; cxi++) {
+      const bx = x + W * 0.18 + (W * 0.64) * (cxi / (cols - 1));
+      const by = padTop + padH * (ry / (rows - 1));
+      keys.push(`<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="8.5" fill="#101215"/>
+                 <circle cx="${bx.toFixed(1)}" cy="${(by - 0.8).toFixed(1)}" r="8.5" fill="none"
+                         stroke="#fff" stroke-opacity="0.16" stroke-width="1.4"/>`);
+    }
+  }
+  return `
+    <g data-hw="lockset-art" data-style="digital">
+      <rect x="${x + dir * 6}" y="${y + 7}" width="${W}" height="${H}" rx="${r}"
+            fill="#000" opacity="0.36" filter="url(#hwShadow)"/>
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="#25292D"/>
+      <!-- one soft band of key light down the slab, and no specular anywhere:
+           this is the only fitting on the door that is not polished metal -->
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="url(#keyWash)" opacity="0.5"/>
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="none"
+            stroke="#fff" stroke-opacity="0.16" stroke-width="1.6"/>
+      ${keys.join('')}
+      <!-- the thumb-turn and the emergency keyway share the foot of the body -->
+      <rect x="${cx - 20}" y="${y + H * 0.72}" width="40" height="12" rx="6" fill="url(#metal)"/>
+      ${keySlot(cx, y + H * 0.86, 11)}
+    </g>`;
+}
+
+/**
+ * Two square backplates, stacked — lever on the upper, cylinder on the lower.
+ * Four doors: d032 d037 d059 d066.
+ *
+ * Worth its own entry because nothing else in the range is square. Every other
+ * fitting here is a disc or a rounded strip, and at a glance across a street
+ * the corner is the whole identity of this one — which is also why the corners
+ * are only lightly rounded rather than radiused into a squircle.
+ */
+function squarePlates(cx, cy, dir) {
+  const S = 82, r = 5, gap = 26;
+  const plate = (py, label) => `
+      <rect x="${cx - S / 2 + dir * 5}" y="${py + 6}" width="${S}" height="${S}" rx="${r}"
+            fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
+      <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="url(#plateFace)"/>
+      <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="none"
+            stroke="#fff" stroke-opacity="0.55" stroke-width="2.6"
+            transform="translate(${dir * 1.1} -1.4)"/>
+      <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="none"
+            stroke="#000" stroke-opacity="0.34" stroke-width="1.4"/>`;
+  const topY = cy - S / 2;
+  return `
+    <g data-hw="lockset-art" data-style="square">
+      ${plate(topY)}
+      ${plate(topY + S + gap)}
+      ${lever(cx, cy, dir)}
     </g>`;
 }
 
@@ -2254,6 +2569,132 @@ const peephole = (cx, cy) => {
     <circle cx="${cx}" cy="${cy}" r="${R * 0.16}" fill="#1A1D20"/>`;
 };
 
+// ═══════════════════════════════════════════════════════════════════
+//  ADD-ONS — things fixed to the leaf that are not the lock.
+//
+//  All five are on Peretz's doors and none was in the configurator. They are
+//  the only multi-select group: a door carries as many as its owner wants, and
+//  four of the five appear beside each other in the corpus.
+//
+//  Placement is by fraction of the leaf, taken from where they sit in the
+//  photographs, and every one of them is drawn square-on with its own drop
+//  shadow — a thing bolted to a door has to cast something, or it reads as
+//  printed on.
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Letterplate. Four doors — d100 d103 d108 d129 — always low, always
+ * horizontal, always with the flap's shadow line under the frame.
+ *
+ * The thing that makes it read is that it is a HOLE with a lid: the aperture
+ * behind the flap is the darkest value anywhere on the leaf, darker than the
+ * reveal, because it goes into an unlit hall.
+ */
+function letterplate(cx, cy, tone) {
+  const w = 300, h = 78, r = 8;
+  const x = cx - w / 2, y = cy - h / 2;
+  return `
+    <g data-addon="mail" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
+       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
+      <rect x="${x + 4}" y="${y + 6}" width="${w}" height="${h}" rx="${r}"
+            fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${tone[2]}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.20}" rx="${r * 0.6}" fill="${tone[0]}"/>
+      <rect x="${x}" y="${y + h * 0.84}" width="${w}" height="${h * 0.16}" fill="${tone[4]}"/>
+      <!-- the aperture: a hall behind it, so this is the darkest value on the leaf -->
+      <rect x="${x + w * 0.07}" y="${y + h * 0.26}" width="${w * 0.86}" height="${h * 0.30}"
+            rx="3" fill="#0B0D0F"/>
+      <!-- the flap, hanging closed over it, catching the key on its top edge -->
+      <rect x="${x + w * 0.05}" y="${y + h * 0.30}" width="${w * 0.90}" height="${h * 0.44}"
+            rx="4" fill="${tone[3]}"/>
+      <rect x="${x + w * 0.05}" y="${y + h * 0.30}" width="${w * 0.90}" height="4"
+            fill="${tone[0]}"/>
+    </g>`;
+}
+
+/**
+ * Ring knocker. Five doors — d048 d067 d070 d076 d080 — and on three of them
+ * it is the most ornate thing in the picture.
+ *
+ * A ring is the one fitting here that is genuinely three-dimensional
+ * square-on: it hangs off its boss and the bottom of the loop rests against
+ * the door, so the shadow is not a uniform offset — it is tight at the top,
+ * where the ring touches, and wide at the bottom, where it stands away.
+ */
+function knocker(cx, cy, tone) {
+  const R = 52, t = 13;
+  return `
+    <g data-addon="knocker" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
+       data-hx="${R.toFixed(1)}" data-vy="${(R * 1.4).toFixed(1)}">
+      <ellipse cx="${cx + 4}" cy="${cy + R * 0.75}" rx="${R * 0.95}" ry="${R * 0.9}"
+               fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
+      <!-- the ring, hanging: wider than tall by a touch, as a loose ring does -->
+      <ellipse cx="${cx}" cy="${cy + R * 0.66}" rx="${R * 0.86}" ry="${R * 0.94}"
+               fill="none" stroke="${tone[2]}" stroke-width="${t}"/>
+      <path d="${arcPath(cx, cy + R * 0.66, R * 0.86, 150, 340)}" fill="none"
+            stroke="${tone[0]}" stroke-width="${t * 0.34}" stroke-opacity="0.95"/>
+      <path d="${arcPath(cx, cy + R * 0.66, R * 0.86, 20, 140)}" fill="none"
+            stroke="#000" stroke-width="${t * 0.30}" stroke-opacity="0.34"/>
+      <!-- the boss it hangs from, over the top of the ring -->
+      <ellipse cx="${cx}" cy="${cy}" rx="${R * 0.44}" ry="${R * 0.36}" fill="${tone[1]}"/>
+      <ellipse cx="${cx}" cy="${cy - R * 0.07}" rx="${R * 0.30}" ry="${R * 0.20}"
+               fill="${tone[0]}" opacity="0.85"/>
+    </g>`;
+}
+
+/**
+ * Door closer. Five doors — d010 d031 d032 d074 d115 — on the top rail,
+ * hinge side, arm folded across.
+ *
+ * Drawn small and pale on purpose. It is a functional fitting nobody chose for
+ * its looks, and giving it the contrast of a knocker would make every door
+ * that has one look like it has a machine bolted to it, which is not what the
+ * photographs show at door scale.
+ */
+function doorCloser(hx, y, dir, tone) {
+  const w = 210, h = 62;
+  const x = hx - (dir > 0 ? 0 : w) + dir * 40;
+  return `
+    <g data-addon="closer" data-cx="${(x + w / 2).toFixed(1)}" data-cy="${(y + h / 2).toFixed(1)}"
+       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
+      <rect x="${x + 3}" y="${y + 5}" width="${w}" height="${h}" rx="9"
+            fill="#000" opacity="0.26" filter="url(#hwShadow)"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="${tone[3]}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.24}" rx="6" fill="${tone[1]}"/>
+      <!-- the arm, folded back along the rail towards the frame -->
+      <rect x="${x + (dir > 0 ? w * 0.62 : -w * 0.42)}" y="${y + h * 0.30}"
+            width="${w * 0.80}" height="${h * 0.26}" rx="${h * 0.13}" fill="${tone[2]}"/>
+      <circle cx="${x + (dir > 0 ? w * 0.80 : w * 0.20)}" cy="${y + h * 0.43}" r="${h * 0.20}"
+              fill="${tone[1]}"/>
+    </g>`;
+}
+
+/**
+ * Nameplate. Two doors — d082 carries "RAFAEL JEWELRY", d115 a notice holder.
+ *
+ * No lettering is drawn. We do not know what it would say, and inventing a
+ * name puts a word on a customer's door that they did not choose — the plate
+ * is the product, the engraving is a conversation with Peretz.
+ */
+function nameplate(cx, cy, tone) {
+  const w = 260, h = 86;
+  const x = cx - w / 2, y = cy - h / 2;
+  return `
+    <g data-addon="nameplate" data-cx="${cx.toFixed(1)}" data-cy="${cy.toFixed(1)}"
+       data-hx="${(w / 2).toFixed(1)}" data-vy="${(h / 2).toFixed(1)}">
+      <rect x="${x + 3}" y="${y + 5}" width="${w}" height="${h}" rx="5"
+            fill="#000" opacity="0.28" filter="url(#hwShadow)"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${tone[2]}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="3" fill="${tone[0]}"/>
+      <rect x="${x}" y="${y + h - 3}" width="${w}" height="3" fill="${tone[4]}"/>
+      <!-- an engraved border, which is all these plates have before the name -->
+      <rect x="${x + 12}" y="${y + 12}" width="${w - 24}" height="${h - 24}" rx="2"
+            fill="none" stroke="#000" stroke-opacity="0.28" stroke-width="1.6"/>
+      <rect x="${x + 13}" y="${y + 13}" width="${w - 24}" height="${h - 24}" rx="2"
+            fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="1.2"/>
+    </g>`;
+}
+
 /** Bow over blade, with the warding visible inside. Shared by the round
  *  escutcheon and the backplate, so the two can never drift apart. */
 /** Rav Bariach's own dimple key: a plain wide horizontal slot in a raised
@@ -2348,9 +2789,13 @@ export function describe(state, lang = 'he') {
   const s = SIZES[state.size] || SIZES.standard;
   if (lang === 'he') {
     const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
+    const glass = w.rects.length && state.glazing && state.glazing !== 'clear'
+      ? `, ${byId(GLAZINGS, state.glazing).he}` : '';
     const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
     const grip = hd.style === 'none' ? '' : `${hd.he}, `;
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${grille}${det}, ${grip}${lk.he}${fn ? ' ' + fn.he : ''}, ${s.he}, פתיחה ${h.he}.`;
+    const extra = addonsOf(state);
+    const add = extra.length ? `, ${extra.map(a => a.he).join(', ')}` : '';
+    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}${fn ? ' ' + fn.he : ''}${add}, ${s.he}, פתיחה ${h.he}.`;
   }
   return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
 }
@@ -2386,6 +2831,14 @@ export function sizeGlyph(size) {
                aria-hidden="true" preserveAspectRatio="xMidYMid meet">
     ${size.side ? `<rect x="0" y="0" width="${size.side}" height="${size.h}" fill="none"
           stroke="currentColor" stroke-width="44" opacity="0.45"/>` : ''}
+    ${/* דלת וחצי and a sidelight are the same rectangle on the plan and a
+         completely different product on the wall: one is a second leaf that
+         opens, the other is fixed glass. Without the pane in the tile they
+         were byte-identical pictures at two prices — which is exactly the
+         failure the glyph-distinctness test exists to catch, and it caught
+         this one the same hour it was written. */
+      size.sideGlazed ? `<rect x="95" y="${size.h * 0.09}" width="${size.side - 190}"
+          height="${size.h * 0.79}" fill="currentColor" opacity="0.30"/>` : ''}
     <rect x="${size.side ? size.side + 46 : 0}" y="0" width="${size.w}" height="${size.h}"
           fill="none" stroke="currentColor" stroke-width="44"/>
   </svg>`;
@@ -2438,6 +2891,35 @@ const FITTING_GLYPH = {
     <circle cx="0" cy="0" r="30" fill="var(--paper)"/>
     <circle cx="0" cy="0" r="21"/>
     <circle cx="0" cy="120" r="12" fill="var(--paper)"/>` }),
+
+  /* Lever on a long backplate: a STRIP, not a taller Rotem. Parallel sides,
+     squared-off ends, the lever high on it and the keyway near the foot, with
+     most of the length between them — that proportion is the identification. */
+  longplate: () => ({ box: [-172, -128, 56, 320], art: `
+    <rect x="-42" y="-95" width="84" height="430" rx="14"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <circle cx="0" cy="249" r="13" fill="var(--paper)"/>
+    <circle cx="0" cy="-69" r="5" fill="var(--paper)"/>
+    <circle cx="0" cy="309" r="5" fill="var(--paper)"/>` }),
+
+  /* Keypad: the button grid IS the tile. Nothing else about a black slab
+     distinguishes it from a black slab. */
+  digital: () => ({ box: [-58, -118, 58, 214], art: `
+    <rect x="-48" y="-102" width="96" height="300" rx="12"/>
+    ${Array.from({ length: 12 }, (_, i) => {
+      const cxk = -31 + 31 * (i % 3), cyk = -78 + 56 * Math.floor(i / 3);
+      return `<circle cx="${cxk}" cy="${cyk}" r="9" fill="var(--paper)"/>`;
+    }).join('')}
+    <rect x="-20" y="114" width="40" height="12" rx="6" fill="var(--paper)"/>
+    <circle cx="0" cy="156" r="12" fill="var(--paper)"/>` }),
+
+  /* Two squares. Nothing else in the range has a corner, which is the whole
+     point of drawing it this way. */
+  square: () => ({ box: [-172, -60, 56, 152], art: `
+    <rect x="-41" y="-41" width="82" height="82" rx="5"/>
+    <rect x="-41" y="67" width="82" height="82" rx="5"/>
+    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <circle cx="0" cy="108" r="12" fill="var(--paper)"/>` }),
 
   // Cadoor: a free-standing ovoid, no rose — taller than wide, on a stub shank.
   cadoor: () => ({ box: [-44, -48, 86, 48], art: `
@@ -2543,19 +3025,85 @@ export function detailGlyph(detail) {
     : detail.panels === 2 ? panelAt(0.07, 0.57) + panelAt(0.67, 0.91)
     : panelAt(0.67, 0.91);
 
-  // metalStrips: horizontal, inset a tenth each side, evenly spaced 0.09–0.91
+  /* metalStrips, both axes. Horizontal: inset a tenth each side, evenly spaced
+     0.09–0.91. Vertical: fewer, longer, grouped in one third of the leaf —
+     and the tile has to show that difference, because "metal strips" names
+     two options that look nothing alike on the door. */
   const n = detail.strips || 0;
-  const strips = Array.from({ length: n }, (_, i) => {
-    const y = H * (0.09 + (n > 1 ? (i * 0.82) / (n - 1) : 0.41));
-    return `<rect x="${W * 0.09}" y="${y - 14}" width="${W * 0.82}" height="28"
-                  fill="currentColor"/>`;
-  }).join('');
+  const strips = detail.vertical
+    ? Array.from({ length: n }, (_, i) => {
+        const x = W * (0.10 + (n > 1 ? (i * 0.34) / (n - 1) : 0.17));
+        return `<rect x="${x - 9}" y="${H * 0.12}" width="18" height="${H * 0.76}"
+                      fill="currentColor"/>`;
+      }).join('')
+    : Array.from({ length: n }, (_, i) => {
+        const y = H * (0.09 + (n > 1 ? (i * 0.82) / (n - 1) : 0.41));
+        return `<rect x="${W * 0.09}" y="${y - 14}" width="${W * 0.82}" height="28"
+                      fill="currentColor"/>`;
+      }).join('');
 
   return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
     ${panels}${strips}
     ${detail.groove ? `<rect x="${W * 0.70 - 18}" y="190" width="18" height="${H - 380}"
           fill="currentColor"/>` : ''}
+  </svg>`;
+}
+
+/**
+ * Glazing glyph: the pane, at the size a tile can actually show it.
+ *
+ * Drawn from the same `glazingArt` the door uses, so the tile cannot promise
+ * a pattern the stage does not draw. A tile that shows its own invention is
+ * the "nine handles, one picture" bug in a different costume.
+ */
+export function glazingGlyph(glazing) {
+  const S = 300;
+  const art = glazingArt(glazing.id, 0, 0, S, S);
+  return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
+    <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
+    ${art ? art.veil
+          : `<rect x="0" y="0" width="${S}" height="${S * 0.42}" fill="#B9C6CE" opacity="0.75"/>
+             <path d="M 0 ${S} L ${S * 0.62} ${S * 0.30} L ${S} ${S * 0.62} L ${S} ${S} Z"
+                   fill="#4E5A61" opacity="0.55"/>`}
+    <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
+  </svg>`;
+}
+
+/**
+ * Add-on glyph: the fitting on the leaf, so its POSITION is part of the tile.
+ *
+ * Position is half of what distinguishes these. A letterplate and a nameplate
+ * are both a horizontal rectangle; one is low and open, the other is high and
+ * bordered, and a tile that shows only the rectangle would be two identical
+ * pictures with two different prices — which this project has shipped twice
+ * (CLAUDE.md §5, items 5 and 6).
+ */
+export function addonGlyph(addon) {
+  const W = 950, H = 2100, pad = 40;
+  const art = {
+    peep: `<circle cx="${W / 2}" cy="${H * 0.24}" r="46" fill="none"
+                   stroke="currentColor" stroke-width="30"/>
+           <circle cx="${W / 2}" cy="${H * 0.24}" r="15" fill="currentColor"/>`,
+    mail: `<rect x="${W * 0.16}" y="${H * 0.78}" width="${W * 0.68}" height="${H * 0.045}"
+                 rx="12" fill="none" stroke="currentColor" stroke-width="30"/>
+           <rect x="${W * 0.24}" y="${H * 0.792}" width="${W * 0.52}" height="${H * 0.014}"
+                 fill="currentColor"/>`,
+    knocker: `<ellipse cx="${W / 2}" cy="${H * 0.44}" rx="78" ry="86" fill="none"
+                       stroke="currentColor" stroke-width="30"/>
+              <ellipse cx="${W / 2}" cy="${H * 0.365}" rx="42" ry="30" fill="currentColor"/>`,
+    closer: `<rect x="${W * 0.10}" y="${H * 0.055}" width="${W * 0.40}" height="${H * 0.032}"
+                   rx="14" fill="currentColor"/>
+             <rect x="${W * 0.34}" y="${H * 0.064}" width="${W * 0.40}" height="${H * 0.014}"
+                   rx="7" fill="currentColor"/>`,
+    nameplate: `<rect x="${W * 0.22}" y="${H * 0.30}" width="${W * 0.56}" height="${H * 0.05}"
+                      fill="none" stroke="currentColor" stroke-width="30"/>
+                <rect x="${W * 0.28}" y="${H * 0.317}" width="${W * 0.44}" height="8"
+                      fill="currentColor" opacity="0.6"/>`,
+  }[addon.id] || '';
+  return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
+    ${art}
   </svg>`;
 }
 
