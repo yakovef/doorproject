@@ -362,6 +362,28 @@ part, so each stop's luminance is now mapped onto the chosen finish's own ramp:
 same highlights in the same places, in brass or black. Pinned by a new
 assertion that compares the bar's own gradient across finishes.
 
+### After the ten — one more, found by looking rather than measuring
+
+On a glazed leaf the peephole was being slid down below the window to chest
+height, because the add-on placement rule says *move it rather than drop it* —
+right for a knocker, wrong for this. A peephole is at eye level on the centre
+line; that is what the thing is for. The corpus settles it: **all four glazed
+doors in the measured set record `peephole.present: false`.** It is refused
+now, with a reason, rather than drawn somewhere nobody fits one. `duo` survives
+the rule, because its two lights leave the centre of the leaf clear.
+
+**And that made the DEFAULT DOOR unbuildable.** The default is glazed and the
+default add-ons carried a peephole, so every page load repaired itself, showed
+a notice about a link the customer had not followed, and opened a category to
+explain a change nobody had made. Nothing threw; the page simply started
+apologising to everyone. The audit's own "no categories open on load"
+assertion — written the same day, for the cabinet — is what caught it.
+
+There is now a test group asserting that `DEFAULTS` is buildable, is not
+repaired on load, and produces no notice from a bare page load. It did not
+exist because nobody had considered that the starting position could be
+illegal.
+
 ### What is still open after this round
 
 - The pane's scene is generic by design, and on a narrow slot it reads as
