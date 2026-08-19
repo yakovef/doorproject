@@ -21,6 +21,38 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The moulding is 70 mm, and two things had to move to let it be.** Picked
+  from the drawing against a sheet of four widths on the door that prompted it.
+  The panel had been 83 and read as swollen, but that was the LIGHT, not the
+  width — widening only became safe once the moulding took the leaf's own wash.
+  Both frames move together; it is one constant.
+  **Lights side by side are now ONE opening with a mullion.** `duo` is two
+  rectangles 100 mm apart: at 40 mm each got its own architrave with 20 to
+  spare, at 70 the two architraves interpenetrate — mitres crossing in mid-air.
+  It is also not what a two-light door is. Rectangles sharing a top and a
+  height are merged and the gaps become mullions, which is the only arrangement
+  that fits on any leaf we make. The mullion is filled from the LEAF's
+  rectangle clipped to itself, for the same reason the moulding is: painted
+  with `url(#leafFill)` on its own box it compressed the whole head-to-foot
+  ramp into 230 mm of bar.
+  **And an opening leaves the ironmongery its stile.** `MOUNT_REACH = 121` —
+  measured, the Cadoor rose, the deepest `data-mount` across every grip x
+  lockset — plus `LOCK_CLEAR`. No architrave may come closer to the closing
+  edge than that; where it would, the opening is scaled about the leaf's centre
+  until it does, width only. Without it a narrow leaf bolts the knob straight
+  onto the moulding, which is the thing the owner's son named as impossible.
+  `npm run collide -- boxes` re-measures the 121 and fails if it has grown.
+  **`bossReach`** measures a bar's bolted end rather than its drawn footprint,
+  which runs 11 mm wider because the standoff's SHADOW is part of it. Against a
+  moulding that difference decides whether the default door is buildable at
+  all; against the LEVER it does not apply and the drawn box stays — trying it
+  there produced 22 drawn overlaps in one collide run.
+  **The cost, stated:** 204 more of the 6,480 grip x lockset x window x size
+  combinations are refused than at 40 mm, all of them "no room between the lock
+  and the window", all of them a bar beside a light. A movable bar is what
+  gives them back — with a position to choose, the question stops being "does
+  it fit where we put it" and becomes "does it fit anywhere".
+
 - **One moulding per door.** The applied moulding was two different widths:
   40 mm round a pane, 0.09 of leaf width — 83 mm — round a panel. So a door
   carrying both showed two mouldings, one twice the weight of the other, and it

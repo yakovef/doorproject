@@ -444,7 +444,7 @@
   var LEVER_REACH = 145;
   var LOCK_CLEAR = 15;
   var PANEL_GAP = 25;
-  var MOULD_BAND = 40;
+  var MOULD_BAND = 70;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
   var GRAB = { fromTop: 0.585, len: 0.3, ratio: 1 / 15, boss: 17 };
@@ -553,10 +553,11 @@
     const hingeX = hingeOnLeft ? mainX : mainX1;
     const leverDir = hingeOnLeft ? -1 : 1;
     const centreX = mainX + leafW / 2;
-    const winBottom = win.rects.length ? y0 + Math.max(...win.rects.map((r) => r.top + r.h)) : y0;
-    const winSpan = win.rects.length ? {
-      x: centreX + Math.min(...win.rects.map((r) => (r.dx || 0) - r.w / 2)),
-      x1: centreX + Math.max(...win.rects.map((r) => (r.dx || 0) + r.w / 2))
+    const openings = apertureLayout(win, leafW);
+    const winBottom = openings.length ? y0 + Math.max(...openings.map((o) => o.top + o.h)) : y0;
+    const winSpan = openings.length ? {
+      x: mainX + Math.min(...openings.map((o) => o.x)),
+      x1: mainX + Math.max(...openings.map((o) => o.x + o.w))
     } : null;
     const rawStandoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
     const panelled = detail.panel && !win.rects.length;
@@ -1285,11 +1286,12 @@
 
   <!-- ── glazing ──────────────────────────────────────────────── -->
   <g id="glazing">
-    ${win.rects.map((r, i) => aperture({
-      x: centreX + (r.dx || 0) - r.w / 2,
-      y: y0 + r.top,
-      w: r.w,
-      h: r.h,
+    ${openings.map((o, i) => aperture({
+      x: mainX + o.x,
+      y: y0 + o.top,
+      w: o.w,
+      h: o.h,
+      splits: o.splits.map((sp) => ({ x: mainX + sp.x, w: sp.w })),
       paint: paint2,
       edge,
       grille,
@@ -1504,7 +1506,46 @@ ${body}
     }
     return null;
   }
-  function aperture({ x, y, w, h, paint: paint2, edge, grille, glazing, key, leaf = null }) {
+  var MOUNT_REACH = 121;
+  var HW_STILE = MOUNT_REACH + LOCK_CLEAR;
+  function apertureLayout(win, leafW) {
+    const rows = /* @__PURE__ */ new Map();
+    for (const r of win.rects || []) {
+      const k = `${r.top}|${r.h}`;
+      if (!rows.has(k)) rows.set(k, []);
+      rows.get(k).push(r);
+    }
+    const c = leafW / 2;
+    const maxHalf = c - HW_STILE - MOULD_BAND;
+    const out = [];
+    for (const list of rows.values()) {
+      const sorted = [...list].sort((a, b) => (a.dx || 0) - (b.dx || 0));
+      const edges = sorted.map((r) => [c + (r.dx || 0) - r.w / 2, c + (r.dx || 0) + r.w / 2]);
+      const lo = edges[0][0], hi = edges[edges.length - 1][1];
+      const half = Math.max(c - lo, hi - c);
+      const k = half > maxHalf ? Math.max(0, maxHalf) / half : 1;
+      const at = (x) => c + (x - c) * k;
+      const splits = [];
+      for (let i = 1; i < edges.length; i++) {
+        splits.push({ x: at(edges[i - 1][1]), w: at(edges[i][0]) - at(edges[i - 1][1]) });
+      }
+      out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
+    }
+    return out;
+  }
+  function aperture({
+    x,
+    y,
+    w,
+    h,
+    paint: paint2,
+    edge,
+    grille,
+    glazing,
+    key,
+    leaf = null,
+    splits = []
+  }) {
     const glass = glazingArt(glazing, x, y, w, h, paint2);
     const M = MOULD_BAND;
     const id = `cl-${key}`;
@@ -1560,6 +1601,25 @@ ${body}
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none"
             stroke="${darken(paint2, 0.6)}" stroke-width="2"
             vector-effect="non-scaling-stroke"/>
+      <!-- MULLIONS. Two lights side by side are one cased opening with a solid
+           bar between them, not two openings that happen to be near each
+           other. It is the door's own material, so it takes the door's own
+           paint and a rebate down each side exactly like the one the glass is
+           set behind — the same primitive, turned the other way up on each
+           face. Drawn last so the grille runs behind it, which is what a
+           grille bedded into each light does. -->
+      ${splits.map((sp, i) => {
+      const id2 = `mul-${key}-${i}`;
+      const box = `x="${sp.x}" y="${y}" width="${sp.w}" height="${h}"`;
+      const wash = (g) => leaf ? `<rect x="${leaf.x}" y="${leaf.y}" width="${leaf.w}" height="${leaf.h}"
+                   fill="url(#${g})"/>` : "";
+      return `
+      <clipPath id="${id2}"><rect ${box}/></clipPath>
+      ${leaf ? `<g data-relight="mullion" clip-path="url(#${id2})">
+        ${wash("leafFill")}${wash("keyWash")}${wash("bloom")}
+      </g>` : `<rect ${box} fill="${paint2}"/>`}
+      ${bevel(sp.x, y, sp.w, h, 8, paint2, true)}`;
+    }).join("")}
     </g>`;
   }
   function grillePaths(kind, x, y, w, h, tint) {
@@ -1674,7 +1734,7 @@ ${body}
     const body = lock.in + grip.out + LOCK_CLEAR;
     const floor = Math.max(body, leafW * BAR_GAP_MIN);
     const want = handle.inset ? leafW * handle.inset - lockBackset(handle, lockset) : grip.vy > 200 ? Math.max(leafW * BAR_GAP, body) : 0;
-    const room = toGlass - grip.in - LOCK_CLEAR;
+    const room = toGlass - bossReach(handle) - LOCK_CLEAR;
     return Math.round(Math.max(floor, Math.min(want, room), 0));
   }
   function glassClearance(state2) {
@@ -1683,10 +1743,7 @@ ${body}
     if (!win.rects.length) return Infinity;
     const leafW = size.w - REBATE * 2;
     const hingeOnLeft = byId(HANDINGS, state2.handing).hinge === "left";
-    const u = win.rects.map((r) => {
-      const lo = leafW / 2 + (r.dx || 0) - r.w / 2, hi = leafW / 2 + (r.dx || 0) + r.w / 2;
-      return hingeOnLeft ? leafW - hi : lo;
-    });
+    const u = apertureLayout(win, leafW).map((o) => hingeOnLeft ? leafW - (o.x + o.w) : o.x);
     return Math.min(...u) - MOULD_BAND - lockBackset(byId(HANDLES, state2.handle), byId(LOCKSETS, state2.lockset));
   }
   function gripClashesGlass(state2) {
@@ -1697,7 +1754,7 @@ ${body}
     if (!grip.vy && !grip.out) return false;
     const lock = handleFootprint(byId(LOCKSETS, state2.lockset), leafH);
     const floor = Math.max(lock.in + grip.out + LOCK_CLEAR, leafW * BAR_GAP_MIN);
-    const room = glassClearance(state2) - grip.in - LOCK_CLEAR;
+    const room = glassClearance(state2) - bossReach(handle) - LOCK_CLEAR;
     return floor > room;
   }
   function gripClashesLockset(state2) {
@@ -1831,6 +1888,12 @@ ${body}
               fill="#fff" opacity="0.5"/>
       </g>
     </g>`;
+  }
+  var bossHalf = (spec, w) => spec.fix.kind === "clamp" ? w * 1.13 : w * Math.max(spec.fix.size || 1, 1) / 2;
+  function bossReach(handle) {
+    if (handle.style !== "bar") return handleFootprint(handle, 2050).in;
+    const w = handle.w || 30;
+    return Math.round(Math.max(w / 2, bossHalf(BARS[handle.bar] || BARS.idan, w)));
   }
   var BARS = {
     // Round tube. TWO blown highlights with a dark separator — the tube's tell.
@@ -2382,10 +2445,11 @@ ${body}
   }
   function windowGlyph(win) {
     const W = 950, H = 2100, pad = 40;
-    const rects = win.rects.map((r) => {
-      const x = W / 2 + (r.dx || 0) - r.w / 2;
-      return `<rect x="${x}" y="${r.top}" width="${r.w}" height="${r.h}"
-                  fill="#7C8891" stroke="#3A3D40" stroke-width="26"/>`;
+    const rects = apertureLayout(win, W - 100).map((o) => {
+      const x = 50 + o.x;
+      return `<rect x="${x}" y="${o.top}" width="${o.w}" height="${o.h}"
+                  fill="#7C8891" stroke="#3A3D40" stroke-width="26"/>` + o.splits.map((sp) => `<rect x="${50 + sp.x}" y="${o.top}" width="${sp.w}"
+                  height="${o.h}" fill="currentColor"/>`).join("");
     }).join("");
     return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>

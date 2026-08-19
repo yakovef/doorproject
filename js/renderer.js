@@ -285,15 +285,20 @@ const PANEL_GAP    = 25;    // flat stile left between a pull bar and a moulded 
    as the extent of the edge activity across a scanned row) and a heavy one at
    0.069-0.098 (d048 d087 d092 d099 d106). Ours was drawing the heavy panel
    with the slim surround, which is neither.
-   40 mm is the surround's own existing value, kept because it is the one the
-   owner's son asked the panel to look like. In mm rather than a fraction of
-   the leaf because moulding is bought by the metre: a wide door gets a wider
-   panel, not a wider moulding round it.
+   70 mm, chosen from the drawing against a sheet of four widths — 40, 55, 70,
+   85 — on the door that prompted this. It sits between the corpus's two
+   stocks, nearer the heavy one, and it is the width the owner's son picked.
+   40 was the surround's own value and served while the panel was being brought
+   into line with it; the panel had been 83 and read as swollen, but that was
+   the LIGHT and not the width, and widening only became safe once the moulding
+   took the leaf's own wash.
+   In mm rather than a fraction of the leaf because moulding is bought by the
+   metre: a wide door gets a wider panel, not a wider moulding round it.
    It is part of the window as far as anything else on the leaf is concerned:
    a bar that stops at the glass still crosses the raised moulding, which is
    what `npm run collide` reported on 93 designs once it started measuring the
    drawing. */
-const MOULD_BAND = 40;
+const MOULD_BAND = 70;
 /* Where a pull bar sits, as a fraction of leaf width from the closing edge.
    Measured across every installation square-on enough to trust: 0.052, 0.128,
    0.156, 0.167, 0.21, 0.275, 0.28, 0.31 — median 0.19. Real bars are markedly
@@ -493,13 +498,20 @@ export function render(state) {
   const leverDir = hingeOnLeft ? -1 : 1;
   const centreX = mainX + leafW / 2;
 
+  /* The openings as they are actually cut — merged where lights sit side by
+     side, and narrowed where the architrave would otherwise take the stile the
+     ironmongery is bolted to. Everything downstream reads THESE and not the
+     catalogue's rectangles, or the drawing and the rules disagree about where
+     the glass is. Leaf-local, so add mainX to reach stage space. */
+  const openings = apertureLayout(win, leafW);
+
   /* The glazing envelope, so moulded detail and the grip can be kept clear of
      it. Declared before the grip is placed, because the grip now reads it. */
-  const winBottom = win.rects.length
-    ? y0 + Math.max(...win.rects.map(r => r.top + r.h)) : y0;
-  const winSpan = win.rects.length ? {
-    x:  centreX + Math.min(...win.rects.map(r => (r.dx || 0) - r.w / 2)),
-    x1: centreX + Math.max(...win.rects.map(r => (r.dx || 0) + r.w / 2)),
+  const winBottom = openings.length
+    ? y0 + Math.max(...openings.map(o => o.top + o.h)) : y0;
+  const winSpan = openings.length ? {
+    x:  mainX + Math.min(...openings.map(o => o.x)),
+    x1: mainX + Math.max(...openings.map(o => o.x + o.w)),
   } : null;
 
   /* ONE computation of this quantity, not two.
@@ -1286,9 +1298,10 @@ export function render(state) {
 
   <!-- ── glazing ──────────────────────────────────────────────── -->
   <g id="glazing">
-    ${win.rects.map((r, i) => aperture({
-      x: centreX + (r.dx || 0) - r.w / 2, y: y0 + r.top,
-      w: r.w, h: r.h, paint, edge, grille, glazing: glazing.id, key: 'm' + i,
+    ${openings.map((o, i) => aperture({
+      x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
+      splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
+      paint, edge, grille, glazing: glazing.id, key: 'm' + i,
       leaf: { x: mainX, y: y0, w: leafW, h: leafH },
     })).join('')}
   </g>
@@ -1801,8 +1814,91 @@ function glazingArt(kind, x, y, w, h, paint) {
   return null;                                   // clear: the pane as it was
 }
 
+/* How deep the BOLTED part of the ironmongery reaches inboard from the closing
+   edge — the flat face no moulding may take.
+
+   Measured on the drawing rather than guessed: every grip x lockset rendered,
+   every `data-mount` box read, the deepest is the Cadoor rose at 121 mm.
+   126 leaves five for the drawing's own strokes.
+
+   This is the number that decides how wide a light can be. It used to be
+   nothing, and it worked only because the surround was 40 mm: on a narrow leaf
+   with a rect light the flat stile came to 130 mm, four clear of the rose. At
+   70 the same door bolts the knob straight onto the moulding, which is the
+   thing the owner's son named as impossible in so many words.
+
+   Plus LOCK_CLEAR, which is this file's existing figure for the air a fitting
+   leaves around itself. Without it the escutcheon lands five millimetres from
+   the architrave — legal, and it looks like a mistake.
+
+   `npm run collide -- boxes` re-measures the 121 and says so, because it is an
+   input to the drawing rather than a property of it: a fitting that grows will
+   move it, and this project has left that kind of number behind in a comment
+   before. */
+export const MOUNT_REACH = 121;
+const HW_STILE = MOUNT_REACH + LOCK_CLEAR;
+
+/**
+ * The openings as they are actually cut, which is not what the catalogue asks
+ * for on every leaf.
+ *
+ * Two things happen here, and both exist because the moulding got wider.
+ *
+ * LIGHTS SIDE BY SIDE ARE ONE OPENING. `duo` is two rectangles 100 mm apart,
+ * and at 40 mm each got its own architrave with 20 mm to spare. At 70 the two
+ * architraves interpenetrate — mitres crossing in mid-air, which is not a
+ * thing that can be built. It is also not what a two-light door is: a real one
+ * is a single cased opening with a MULLION between the lights. So rectangles
+ * that share a top and a height are merged into one opening and the gaps
+ * between them become mullions. This is the only arrangement that fits at all,
+ * on any leaf we make.
+ *
+ * AND AN OPENING LEAVES THE HARDWARE ITS STILE. The architrave may come no
+ * closer to the closing edge than HW_STILE. Where it would, the opening is
+ * scaled about the leaf's centre until it does — width only, since a narrow
+ * door has narrower lights and not shorter ones. It stays centred, because
+ * every measured door's is.
+ *
+ * The alternative was to narrow the moulding instead, and it is worse: the
+ * door would carry two moulding widths again, which is the defect this all
+ * started as. A light 8% narrower is invisible; a door with two different
+ * frames on it is what got reported.
+ *
+ * Returns leaf-local coordinates — x from the leaf's own left edge — so the
+ * one caller that needs them in stage space adds its own offset, and
+ * `glassClearance` can ask the same question without knowing where the leaf
+ * was drawn.
+ */
+export function apertureLayout(win, leafW) {
+  const rows = new Map();
+  for (const r of win.rects || []) {
+    const k = `${r.top}|${r.h}`;
+    if (!rows.has(k)) rows.set(k, []);
+    rows.get(k).push(r);
+  }
+  const c = leafW / 2;
+  const maxHalf = c - HW_STILE - MOULD_BAND;
+  const out = [];
+  for (const list of rows.values()) {
+    const sorted = [...list].sort((a, b) => (a.dx || 0) - (b.dx || 0));
+    const edges = sorted.map(r => [c + (r.dx || 0) - r.w / 2, c + (r.dx || 0) + r.w / 2]);
+    const lo = edges[0][0], hi = edges[edges.length - 1][1];
+    /* One factor for the whole group, about the leaf's centre. */
+    const half = Math.max(c - lo, hi - c);
+    const k = half > maxHalf ? Math.max(0, maxHalf) / half : 1;
+    const at = x => c + (x - c) * k;
+    const splits = [];
+    for (let i = 1; i < edges.length; i++) {
+      splits.push({ x: at(edges[i - 1][1]), w: at(edges[i][0]) - at(edges[i - 1][1]) });
+    }
+    out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
+  }
+  return out;
+}
+
 /* ── a glazed opening, with a raised moulded surround ───────────── */
-function aperture({ x, y, w, h, paint, edge, grille, glazing, key, leaf = null }) {
+function aperture({ x, y, w, h, paint, edge, grille, glazing, key, leaf = null,
+                    splits = [] }) {
   const glass = glazingArt(glazing, x, y, w, h, paint);
   /* The architrave. It was a 30 mm band with a single 10 mm bevel, and that
      thinness is most of why a glazed door of ours read as CAD next to a
@@ -1878,6 +1974,33 @@ function aperture({ x, y, w, h, paint, edge, grille, glazing, key, leaf = null }
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none"
             stroke="${darken(paint, 0.6)}" stroke-width="2"
             vector-effect="non-scaling-stroke"/>
+      <!-- MULLIONS. Two lights side by side are one cased opening with a solid
+           bar between them, not two openings that happen to be near each
+           other. It is the door's own material, so it takes the door's own
+           paint and a rebate down each side exactly like the one the glass is
+           set behind — the same primitive, turned the other way up on each
+           face. Drawn last so the grille runs behind it, which is what a
+           grille bedded into each light does. -->
+      ${splits.map((sp, i) => {
+        /* The leaf's own fill, at the height the mullion actually sits at.
+           Painting `url(#leafFill)` straight onto the mullion's rectangle put
+           the leaf's whole head-to-foot ramp inside 230 mm of bar — bright at
+           its top, dark at its foot, on a piece of door that spans a fortieth
+           of the leaf. Object-bounding-box gradients answer to whatever they
+           are painted on. So it is the same trick the moulding uses: the LEAF's
+           rectangle, clipped to the mullion. */
+        const id = `mul-${key}-${i}`;
+        const box = `x="${sp.x}" y="${y}" width="${sp.w}" height="${h}"`;
+        const wash = g => leaf
+          ? `<rect x="${leaf.x}" y="${leaf.y}" width="${leaf.w}" height="${leaf.h}"
+                   fill="url(#${g})"/>` : '';
+        return `
+      <clipPath id="${id}"><rect ${box}/></clipPath>
+      ${leaf ? `<g data-relight="mullion" clip-path="url(#${id})">
+        ${wash('leafFill')}${wash('keyWash')}${wash('bloom')}
+      </g>` : `<rect ${box} fill="${paint}"/>`}
+      ${bevel(sp.x, y, sp.w, h, 8, paint, true)}`;
+      }).join('')}
     </g>`;
 }
 
@@ -2053,6 +2176,14 @@ export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) 
      is enough, because it is a floor rather than a preference — whatever the
      lever reaches, the bar starts past it. The Almog swan-neck is the binding
      case at 220 mm inboard, which puts a bar 0.30 of the leaf's width in. */
+  /* THE DRAWN BOXES, on both sides, and this is deliberate.
+     It was briefly changed to the grip's metal on the same argument that
+     `bossReach` rests on — a standoff's shadow is not something a lever can
+     hit. Against a MOULDING that argument holds, because the question there is
+     what the standoff lands on. Against the lever it does not: the lever's
+     blade and the bar are both drawn, and the complaint that put this line
+     here was three screenshots of a blade crossing a bar. `npm run collide`
+     said so immediately — 22 drawn overlaps and one handle through another. */
   const body = lock.in + grip.out + LOCK_CLEAR;
   /* The floor is the tightest gap anyone actually installs, not the point at
      which the two drawings stop overlapping. */
@@ -2065,7 +2196,7 @@ export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) 
      `floor` is outside the Math.min — because a bar over a pane is wrong and a
      bar through a lever is worse. The rules refuse that combination before it
      is ever drawn; this is only what the renderer does when asked anyway. */
-  const room = toGlass - grip.in - LOCK_CLEAR;
+  const room = toGlass - bossReach(handle) - LOCK_CLEAR;
   return Math.round(Math.max(floor, Math.min(want, room), 0));
 }
 
@@ -2084,11 +2215,13 @@ export function glassClearance(state) {
   if (!win.rects.length) return Infinity;
   const leafW = size.w - REBATE * 2;
   const hingeOnLeft = byId(HANDINGS, state.handing).hinge === 'left';
-  /* Nearest glass edge to the closing edge, as a distance inboard from it. */
-  const u = win.rects.map(r => {
-    const lo = leafW / 2 + (r.dx || 0) - r.w / 2, hi = leafW / 2 + (r.dx || 0) + r.w / 2;
-    return hingeOnLeft ? leafW - hi : lo;
-  });
+  /* Nearest glass edge to the closing edge, as a distance inboard from it.
+     Read off the same layout the drawing uses, not off the catalogue's
+     rectangles: on a narrow leaf the opening is cut narrower than the
+     catalogue asks, and a rule measuring the uncut figure would refuse
+     combinations that fit. */
+  const u = apertureLayout(win, leafW).map(o =>
+    hingeOnLeft ? leafW - (o.x + o.w) : o.x);
   /* To the MOULDING's outer edge, not to the glass: a fitting that stops at
      the pane still runs across the raised surround. */
   return Math.min(...u) - MOULD_BAND
@@ -2113,7 +2246,10 @@ export function gripClashesGlass(state) {
   if (!grip.vy && !grip.out) return false;
   const lock = handleFootprint(byId(LOCKSETS, state.lockset), leafH);
   const floor = Math.max(lock.in + grip.out + LOCK_CLEAR, leafW * BAR_GAP_MIN);
-  const room = glassClearance(state) - grip.in - LOCK_CLEAR;
+  /* The BOSS against the moulding, not the drawn footprint: what has to land
+     on flat steel is the standoff, and the extra 11 mm the footprint carries
+     is the shadow it drops. See `bossReach`. */
+  const room = glassClearance(state) - bossReach(handle) - LOCK_CLEAR;
   return floor > room;
 }
 
@@ -2376,6 +2512,34 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
  *
  * All figures normalised to the bar's own width, off the product photographs.
  */
+/**
+ * How far a bar's BOLTED-DOWN end reaches either side of its own axis.
+ *
+ * Not the same as `handleFootprint().in`, and the difference is the whole
+ * point: that figure is the drawn footprint, which on a bar runs 11 mm wider
+ * than the metal because the standoff's SHADOW is part of what is drawn. A
+ * shadow cannot land on anything. Measured against a moulding it made the
+ * default door — a bar, a cylinder and a rect light on a standard leaf —
+ * unbuildable by 3.6 mm the moment the surround widened, while the standoff
+ * itself had 17 mm to spare.
+ *
+ * Whichever is wider, the bar or the fixing that holds it. Read from the same
+ * `spec.fix` numbers `fixArt` draws with, so the two cannot drift; the clamp is
+ * the one kind whose backplate is wider than its declared size, and it is
+ * spelled out in both places.
+ *
+ * This is also the shape the owner's son named when he asked for a bar to turn
+ * red: "the 2 points that are connecting it".
+ */
+const bossHalf = (spec, w) =>
+  spec.fix.kind === 'clamp' ? w * 1.13 : w * Math.max(spec.fix.size || 1, 1) / 2;
+
+export function bossReach(handle) {
+  if (handle.style !== 'bar') return handleFootprint(handle, 2050).in;
+  const w = handle.w || 30;
+  return Math.round(Math.max(w / 2, bossHalf(BARS[handle.bar] || BARS.idan, w)));
+}
+
 const BARS = {
   // Round tube. TWO blown highlights with a dark separator — the tube's tell.
   idan: {
@@ -3132,10 +3296,17 @@ export function describe(state, lang = 'he') {
 
 export function windowGlyph(win) {
   const W = 950, H = 2100, pad = 40;
-  const rects = win.rects.map(r => {
-    const x = W / 2 + (r.dx || 0) - r.w / 2;
-    return `<rect x="${x}" y="${r.top}" width="${r.w}" height="${r.h}"
-                  fill="#7C8891" stroke="#3A3D40" stroke-width="26"/>`;
+  /* From the same layout the door is cut to, on a standard leaf, so the tile
+     cannot promise an opening the stage does not cut. `duo` is the case that
+     matters: two rectangles in the catalogue, ONE opening with a mullion on
+     the door, and a tile showing two separate lights would be advertising a
+     door we stopped drawing. */
+  const rects = apertureLayout(win, W - 100).map(o => {
+    const x = 50 + o.x;
+    return `<rect x="${x}" y="${o.top}" width="${o.w}" height="${o.h}"
+                  fill="#7C8891" stroke="#3A3D40" stroke-width="26"/>`
+      + o.splits.map(sp => `<rect x="${50 + sp.x}" y="${o.top}" width="${sp.w}"
+                  height="${o.h}" fill="currentColor"/>`).join('');
   }).join('');
   return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
