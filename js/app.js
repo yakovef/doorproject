@@ -102,7 +102,16 @@ const GROUPS = [
  */
 const SECTIONS = [
   { key: 'look',  title: 'מראה הדלת',   sub: 'צבע ועיצוב החזית' },
-  { key: 'glass', title: 'חלון וזכוכית', sub: 'חלון, זכוכית, סורג' },
+  /* The sub names the categories INSIDE the section, and this one outlived
+     them: it promised "חלון, זכוכית, סורג" — three choices — after the glazing
+     axis was deleted and the grille list absorbed the etched-glass patterns,
+     leaving two. It advertised a question the page no longer asks, in the one
+     caption whose whole job is to say what is behind the fold, on the section
+     whose commit was called "One question about the window".
+     These are the two category titles verbatim, the way `hw` below carries
+     its own. Hand-kept prose beside a generated list is a drift point: if a
+     row moves in or out of GROUPS, this line has to move with it. */
+  { key: 'glass', title: 'חלון וזכוכית', sub: 'חלון, עיצוב החלון' },
   { key: 'hw',    title: 'ידיות ומנעול', sub: 'ידית משיכה, מנעול' },
   { key: 'fit',   title: 'מידה ופתיחה',  sub: 'גודל הדלת וכיוון הפתיחה' },
 ];

@@ -23,6 +23,71 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-19 20:57 UTC — run 5: the window section still advertised a question that had been deleted
+
+**Looked at:** the round that deleted the glazing axis, rebuilt GRILLES to
+fourteen designs and redrew every window and grip from the photographs
+(ddde929, a06f1d5, 1741d39). Page at 390 and 1280, every section and category
+opened, the new tiles at 3×, three motifs at pane size, and the order message.
+
+**Instruments:** test ✓ (1,590,563) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`, MOUNT_REACH 121) · recreate ✓ · shot ✓.
+Green before my change and after it.
+
+**The wire format, checked first, because this round moved it.** VERSION is 10
+and the layout lost the glazing's two bits, so old codes and old links are the
+risk. Both are handled:
+
+- Real v9 codes this site printed a few hours ago — `DM-J40408G0`,
+  `DM-J40408N8`, `DM-J4949TN8` — all decode to `null` and arrive as
+  `code-unknown`. Worth stating because the length check no longer helps: v9
+  and v10 codes are BOTH eight characters, so the four-bit version field is
+  doing this alone now, where CLAUDE.md §8 still describes length as catching
+  it a line earlier.
+- Retired ids alias instead of breaking: `duo`/`square` → rectangle,
+  `lattice` → mesh, `bars`/`bars-light` → grid/grid-light, and `z=` is ignored
+  in silence like `f=` and `a=`. A v9 link carrying `w=duo&z=obscure&g=lattice`
+  opens as a real door with no notice.
+- The order message keeps the distinction the merge could have lost: `סורג:`
+  for a bolted grille, `זכוכית:` for the five patterns etched into the pane,
+  and neither on a solid door.
+
+**Changed:** one line. The `glass` section's fold caption still read
+`חלון, זכוכית, סורג` — three choices — when the section now holds two, and one
+of the three names an axis deleted in the same round. The caption whose only
+job is to say what is behind the fold was advertising a question the page no
+longer asks, on the section whose commit was called "One question about the
+window". It now reads `חלון, עיצוב החלון`: the two category titles verbatim,
+which is exactly what the `hw` section's caption already is. Unclipped at 320,
+390 and 1280.
+
+**No assertion added, and the reason is worth recording.** The obvious guard —
+a section's caption must name the categories in it — cannot be written against
+the other three, because their captions are deliberate prose rather than joins:
+`fit` says `גודל הדלת` where its category is `מידה`. Making it assertable
+means rewriting the owner's copy to suit a test, which is the wrong way round.
+The drift is noted in a comment at the line instead.
+
+**Left alone deliberately:**
+- **The עץ (tree) motif.** Its tile reads as an ink blob at 54 px where its
+  neighbours read as patterns, and beside d114 ours is one thick stem with
+  three fronds where the photograph is a spreading tree of slender branching
+  ribbons. But I could not make that objective: measured as ornament coverage
+  against the pane, tree is 66.9% against a 60.3% median — under `reeded` and
+  `mesh` at 72.6%, which look fine. Density does not separate "blob" from
+  "legitimately dense", so what I have is an eye, not a measurement. And the
+  code's own comment documents a close reading of d114 — serpentine stem,
+  shepherd's crook round an almond void, three or four large lobed masses,
+  nothing thinner than 0.035 W — decided hours ago. That is a taste call with
+  the photograph in hand; re-deciding it by eye is what never #4 is about.
+  Recorded so the next run does not re-derive it: if the owner ever says the
+  tree reads wrong, the lead is that the real one BRANCHES and ours does not.
+- The mobile sticky CTA, and the three that need Peretz.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-19 16:09 UTC — run 4: a repaired link said the door could not be built, when only the handle had moved
 
 **Looked at:** the new draggable handle — the newest and least-worn surface —
