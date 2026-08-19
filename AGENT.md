@@ -88,6 +88,30 @@ solid material, because depth does not help a screw.
 
 ---
 
+## The price is for the door that is drawn
+
+`priceAgorot` adds up the catalogue's deltas. The renderer draws whatever it
+can fit. Nothing made those two agree, and where the drawing quietly does
+something else, the customer is charged for a door they are not looking at.
+
+That happened. `appliedFrame` drops to a single panel the moment there is
+glazing on the leaf — there is nowhere for the upper rectangle to go — while
+the tile, the WhatsApp message and the price all went on saying שני פאנלים at
+₪520. Thirty combinations. It stood for rounds, and no assertion was looking,
+because every check on the panel asked how it was DRAWN and none asked whether
+the panel the customer bought was on the door.
+
+So: **when the renderer decides it cannot draw something, that is a rule, not a
+detail of the drawing.** Put it in `js/rules.js` where the price and the link
+parser can see it, and let `repair` move the design to what will actually be
+built. A silent downgrade inside `render()` is a lie with a number attached.
+
+`npm test` now sweeps every buildable detail x window x size and compares
+`data-panels` in the markup against what the catalogue charges for. Extend it
+whenever a new option can be silently reduced.
+
+---
+
 ## How to know whether you are right
 
 Guessing is what this project keeps having to undo. There are instruments, and

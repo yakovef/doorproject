@@ -47,7 +47,12 @@ const SHOTS = [
   { name: 'grey',     w: 1280, h: 720,
     q: '?c=rb-7110d&w=rect&z=obscure&g=lattice&n=none&k=coral&d=panel&f=steel&s=standard&h=right-in&a=peep,mail' },
   { name: 'plate',    w: 1280, h: 720,
-    q: '?c=rb-9016d&w=none&z=clear&g=none&n=none&k=plate&d=plain&f=brass&s=standard&h=right-in&a=peep,nameplate' },
+    /* The two-panel face lives here now, because it needs a SOLID leaf: a
+       window takes the upper panel's place, and the sheet's only panel2 shot
+       used to carry a strip light, so it photographed a one-panel door under a
+       name and a price for two. That is the defect this round fixed, and the
+       shot that was hiding it. */
+    q: '?c=rb-9016d&w=none&z=clear&g=none&n=none&k=plate&d=panel2&f=brass&s=standard&h=right-in&a=peep,nameplate' },
   { name: 'strips',   w: 1280, h: 720,
     q: '?c=rb-0097d&w=none&z=clear&g=none&n=shiran&k=cadoor&d=strips&f=black&s=standard&h=right-in&a=peep' },
   /* Round five: the two new axes and the new hardware, each on a door that
@@ -61,7 +66,7 @@ const SHOTS = [
   { name: 'halfleaf', w: 1280, h: 720,
     q: '?c=rb-9001d&w=duo&z=clear&g=bars&n=none&k=sapir&d=plain&f=steel&s=half&h=left-in&a=peep' },
   { name: 'tablet',   w: 834,  h: 1112, full: true,
-    q: '?c=rb-2030d&w=strip&z=clear&g=scroll&n=none&k=knobplate&d=panel2&f=brass&s=tall&h=left-in&a=peep,mail' },
+    q: '?c=rb-2030d&w=strip&z=clear&g=scroll&n=none&k=knobplate&d=panel&f=brass&s=tall&h=left-in&a=peep,mail' },
 ];
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });

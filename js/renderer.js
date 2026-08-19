@@ -270,11 +270,30 @@ const LEVER_REACH  = 145;   // 4.0 rosette radii, and exactly horizontal
                             //  photographs agree at 4.0-4.7 radii)
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
 const PANEL_GAP    = 25;    // flat stile left between a pull bar and a moulded panel
-/* The moulded surround around a pane, each side. It is part of the window as
-   far as anything else on the leaf is concerned: a bar that stops at the
-   glass still crosses the raised moulding, which is what `npm run collide`
-   reported on 93 designs once it started measuring the drawing. */
-const APERTURE_MOULD = 40;
+/* ONE MOULDING PER DOOR. This is the width of the applied moulding, each side,
+   wherever it appears — around a pane and around a panel alike.
+   It used to be two numbers: 40 mm around the glass and 0.09 of leaf width —
+   83 mm on a standard leaf — around a panel. So a door carrying both showed
+   two different mouldings, one twice the weight of the other, and it was
+   reported from the outside as liking the window's frame and not the panel's.
+   The photographs say the same thing. Reading the moulding off the seven doors
+   that carry a window AND a panel — d092 d097 d099 d106 d108 d116 d122 — the
+   two are the same stock every time, which is what a joiner would expect: you
+   buy moulding by the metre and run it round everything on the door. What the
+   corpus does have is two different STOCKS, and both are consistent within a
+   door: a slim one at 0.017-0.028 of leaf width (d097 d108 d116 d122, measured
+   as the extent of the edge activity across a scanned row) and a heavy one at
+   0.069-0.098 (d048 d087 d092 d099 d106). Ours was drawing the heavy panel
+   with the slim surround, which is neither.
+   40 mm is the surround's own existing value, kept because it is the one the
+   owner's son asked the panel to look like. In mm rather than a fraction of
+   the leaf because moulding is bought by the metre: a wide door gets a wider
+   panel, not a wider moulding round it.
+   It is part of the window as far as anything else on the leaf is concerned:
+   a bar that stops at the glass still crosses the raised moulding, which is
+   what `npm run collide` reported on 93 designs once it started measuring the
+   drawing. */
+const MOULD_BAND = 40;
 /* Where a pull bar sits, as a fraction of leaf width from the closing edge.
    Measured across every installation square-on enough to trust: 0.052, 0.128,
    0.156, 0.167, 0.21, 0.275, 0.28, 0.31 — median 0.19. Real bars are markedly
@@ -504,13 +523,16 @@ export function render(state) {
      the thing with somewhere to go.
 
      So on a panelled leaf the bar moves in past the panel's outer moulding and
-     stands on the flat field inside it, which is where he drew it. The band is
-     0.09 of leaf width, so the field begins at PANEL_INSET + 0.09 from the
-     closing edge; PANEL_GAP past that keeps the standoffs off the moulding's
-     inner arris. The bar still has to clear the lock furniture, so this is a
-     floor and never a ceiling — whichever is further inboard wins. */
+     stands on the flat field inside it, which is where he drew it. The field
+     begins one MOULD_BAND past PANEL_INSET from the closing edge; PANEL_GAP
+     past that keeps the standoffs off the moulding's inner arris. The bar still
+     has to clear the lock furniture, so this is a floor and never a ceiling —
+     whichever is further inboard wins.
+     Read from MOULD_BAND rather than repeating its value. The band has since
+     changed width, and this line was the second place the old 0.09 was written
+     down — exactly the promise that somebody will change one of them. */
   const panelled = detail.panel && !win.rects.length;
-  const insideField = leafW * (PANEL_INSET + 0.09) + PANEL_GAP - lockBackset(handle, lockset);
+  const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - lockBackset(handle, lockset);
   const standoff = handle.pull && panelled
     ? Math.max(rawStandoff, insideField)
     : rawStandoff;
@@ -1237,7 +1259,8 @@ export function render(state) {
             const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
             const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
             return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
-                              paint, edge, grille, glazing: glazing.id, key: 's' })
+                              paint, edge, grille, glazing: glazing.id, key: 's',
+                              leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
               + (detail.panel
                   ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, false, 0, 's')
                   : '');
@@ -1246,7 +1269,8 @@ export function render(state) {
         ? aperture({ x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
                      y: y0 + win.rects[0].top,
                      w: Math.min(win.rects[0].w, sideW - 240), h: win.rects[0].h,
-                     paint, edge, grille, glazing: glazing.id, key: 's' })
+                     paint, edge, grille, glazing: glazing.id, key: 's',
+                     leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
         : ''}</g>` : ''}
 
   <!-- ── main leaf ────────────────────────────────────────────── -->
@@ -1265,6 +1289,7 @@ export function render(state) {
     ${win.rects.map((r, i) => aperture({
       x: centreX + (r.dx || 0) - r.w / 2, y: y0 + r.top,
       w: r.w, h: r.h, paint, edge, grille, glazing: glazing.id, key: 'm' + i,
+      leaf: { x: mainX, y: y0, w: leafW, h: leafH },
     })).join('')}
   </g>
 
@@ -1566,16 +1591,18 @@ function mouldGradients(paint, pale) {
 const PANEL_INSET = 0.23;      // measured minimum, and the two-panel doors' own
 const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real one
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm') {
-  const band = lw * 0.09;
+  const band = MOULD_BAND;     // the same stock that goes round a pane
   const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
   const x = lx + inset, w = lw - inset * 2;
   /* The leaf's own rectangle, carried down to `moulding` so the panel can be
      lit by the same wash as the face around it. `key` keeps the clip-path ids
-     apart — a door can carry two panels and a sidelight, and a duplicate id is
-     how gradients and clips silently cross-wire (the test suite checks). */
+     apart — a door can carry two panels, a sidelight and up to two panes, all
+     of them mouldings now, and a duplicate id is how gradients and clips
+     silently cross-wire (the test suite checks). `p` for panel, against the
+     `a` an aperture prefixes with. */
   const leaf = { x: lx, y: ly, w: lw, h: lh };
   const rect = (t, b, n) =>
-    moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `${key}${n}`);
+    moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `p${key}${n}`);
 
   /* The classic two-rectangle face, which is what nearly every designed door
      in the gallery carries. Only on a solid leaf: with glazing above there is
@@ -1587,7 +1614,7 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
 
   const top = Math.max(ly + lh * 0.68, winBottom + lw * 0.08);
   const bottom = ly + lh * 0.90;
-  const art = moulding(x, top, w, bottom - top, band, paint, pale, leaf, `${key}0`);
+  const art = moulding(x, top, w, bottom - top, band, paint, pale, leaf, `p${key}0`);
   /* `data-top` so a test can ask where the moulding starts instead of parsing
      the first path out of the markup. It did that until this rewrite, and the
      assertion it was protecting — that mouldings never cross the glazing —
@@ -1775,7 +1802,7 @@ function glazingArt(kind, x, y, w, h, paint) {
 }
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
-function aperture({ x, y, w, h, paint, edge, grille, glazing, key }) {
+function aperture({ x, y, w, h, paint, edge, grille, glazing, key, leaf = null }) {
   const glass = glazingArt(glazing, x, y, w, h, paint);
   /* The architrave. It was a 30 mm band with a single 10 mm bevel, and that
      thinness is most of why a glazed door of ours read as CAD next to a
@@ -1799,12 +1826,19 @@ function aperture({ x, y, w, h, paint, edge, grille, glazing, key }) {
      into a second, paler colour, precisely the mistake the panel had. A
      surround is not a lighter thing applied to the door; it is the door's own
      paint, shaped. Widened to 40 at the same time, because the measured
-     profile needs room to be a profile. */
-  const M = APERTURE_MOULD;
+     profile needs room to be a profile.
+     It is the same object all the way down now: the panel reads MOULD_BAND
+     from here, and the surround takes the leaf's own light the way the panel
+     does. A moulding that stayed at absolute tone while the face fell away
+     under it is what "the inside of it is bulging out" was; leaving the
+     surround exempt would have been the same defect, waiting for a door with a
+     window low enough to show it. */
+  const M = MOULD_BAND;
   const id = `cl-${key}`;
   return `
     <g data-pane="${key}" data-glazing="${glazing || 'clear'}">
-      ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint, isLight(paint))}
+      ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint, isLight(paint),
+                 leaf, `a${key}`)}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
            edge before the pane turns the other way -->
       ${bevel(x, y, w, h, 8, paint, false)}
@@ -2057,7 +2091,7 @@ export function glassClearance(state) {
   });
   /* To the MOULDING's outer edge, not to the glass: a fitting that stops at
      the pane still runs across the raised surround. */
-  return Math.min(...u) - APERTURE_MOULD
+  return Math.min(...u) - MOULD_BAND
        - lockBackset(byId(HANDLES, state.handle), byId(LOCKSETS, state.lockset));
 }
 
@@ -2203,18 +2237,29 @@ const channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
  *
  * `panelled` clamps it so both END BOSSES land on flat field rather than on a
  * moulding — you bolt a standoff through a flat face, not through a profile,
- * and the owner marked exactly this. With the panels at 0.07-0.58 and
- * 0.66-0.92 and a band of 0.09 W, the open fields are 0.107-0.543 and
- * 0.697-0.883, and the bar is centred at 0.498 of leaf height — so the foot
- * needs a half-length between 0.200 and 0.385 of it. Six of the seven bars
- * already sit inside that; only Nitzan misses, by 8 mm, and gains 10.
+ * and the owner marked exactly this. The lower panel is what binds: its
+ * rectangle runs 0.66 to 0.92 of leaf height, its flat field is that less one
+ * MOULD_BAND at each end, and the bar is centred on HANDLE_AFF. The upper end
+ * is never the binding one — the upper panel's field is four times as deep.
+ *
+ * ⚠ THIS USED TO BE TWO FIXED FRACTIONS, 0.200 and 0.385, arithmetic done by
+ * hand from a band of 0.09 W on a 2050 mm leaf and then written down as a
+ * result. Both premises have since moved — the band is 40 mm now, and a tall
+ * door's leaf is 2350 — so the numbers were right for one door out of six.
+ * Computed here instead, from the same two constants the moulding is drawn
+ * from, so it cannot be true of only the door it was derived on. Six of the
+ * seven bars sit inside the window either way; only Nitzan is clamped.
+ *
  * Clamped HERE rather than in the drawing so `handleFootprint` and `pullBar`
  * cannot disagree about how long the bar is — that is the mistake this file
  * keeps having to relearn.
  */
 const barHalf = (len, leafH, panelled = false) => {
   const half = Math.min(len, leafH - 320) / 2;
-  return panelled ? Math.min(Math.max(half, leafH * 0.200), leafH * 0.385) : half;
+  if (!panelled) return half;
+  const clearOfTopRun  = leafH * 0.66 + MOULD_BAND - HANDLE_AFF;
+  const insideFootRun  = leafH * 0.92 - MOULD_BAND - HANDLE_AFF;
+  return Math.min(Math.max(half, clearOfTopRun), insideFootRun);
 };
 
 /** Recessed vertical channel with the grip inside — the style in ref-00. */

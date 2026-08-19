@@ -198,6 +198,17 @@ const hits = await p.evaluate(({ cases, allowed }) => {
   for (const st of cases) {
     host.innerHTML = window.__render(st);
     const svg = host.querySelector('svg');
+    /* LIGHT IS NOT MATERIAL. A moulding is put back under the leaf's own wash
+       by re-laying the leaf's gradients clipped to the moulding's own outline,
+       so each `data-relight` group holds rects the size of the WHOLE LEAF —
+       they have to be, or the gradients would land at the wrong offsets.
+       `getBBox` reports geometry before clipping, so a pane or a panel
+       containing one hands back the entire leaf as its bounds. Every pair in
+       the sweep then overlaps every other, which is how a surround gaining its
+       relight turned a clean run into 610 hits, none of them real.
+       Removed rather than skipped: nothing here draws, and a thing that cannot
+       be touched has no business in a collision test. */
+    for (const g of svg.querySelectorAll('[data-relight]')) g.remove();
     const parts = [];
     for (const el of svg.querySelectorAll('[data-hw],[data-pane],[data-detail]')) {
       const n = NAME(el);

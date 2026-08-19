@@ -136,6 +136,31 @@ export function conflicts(state) {
     for (const z of GLAZINGS) if (z.id !== 'clear') out.glazing[z.id] = 'דורש חלון';
   }
 
+  /* A WINDOW TAKES THE UPPER PANEL'S PLACE.
+     The two-panel face is a tall upper rectangle over a short lower one, and
+     the upper one occupies 0.07 to 0.58 of the leaf — which is exactly where
+     every window we sell sits. The DRAWING has always known this: appliedFrame
+     falls back to the lone lower panel the moment there is any glazing on the
+     leaf, and OBSERVED agrees with it. Seven doors in the corpus carry a
+     window over a panel — d092 d097 d099 d106 d108 d116 d122 — and every one
+     of them has a single panel under the glass. Not one has two.
+     What the drawing never did was tell the PRICE. So a customer who chose two
+     panels and then a window saw one panel and was charged ₪520 for two: the
+     configurator taking money for something it does not show, which is the one
+     thing PLAN.md §0 says it exists not to do. Reported from the outside, in
+     those words, with the screenshot.
+     Only the DETAIL is refused, not the windows. Losing the upper panel is not
+     losing the window's worth of door — it is the same door at a lower price,
+     and `repair` performs it — so greying out every window because two panels
+     are selected would overstate a change the customer will barely notice.
+     Read off `panels` rather than the id, so a third panelled face added later
+     is covered without anybody remembering to come back here. */
+  if (onLeaf) {
+    for (const d of DETAILS) if (d.panels === 2) {
+      out.detail[d.id] = 'החלון תופס את מקומו של הפאנל העליון';
+    }
+  }
+
   /* OBSERVED: ruled line work never shares a leaf with glazing, and never
      with a moulded panel. Both directions are reported, so whichever tile the
      customer is looking at explains itself. */
@@ -291,9 +316,27 @@ export function isBlocked(state, group, id) {
 }
 
 /**
+ * Human-readable Hebrew for each repair, named by WHAT WAS DONE rather than by
+ * which group moved. `repair` picks the sentence at the moment it makes the
+ * change, which is the only place that knows why.
+ */
+const SAID = {
+  windowAdded:   'הוספנו חלון — הסורג והזכוכית צריכים אותו',
+  windowGone:    'הסרנו את החלון',
+  lineWorkGone:  'הסרנו את קווי המתכת — לא משלבים אותם עם חלון',
+  onePanel:      'עברנו לפאנל אחד — החלון תופס את מקומו של העליון',
+  faceCleared:   'החלקנו את הדלת — ידית שקועה דורשת פנים חלקות',
+  grilleGone:    'הסרנו את הסורג — אין חלון',
+  glazingGone:   'החזרנו זכוכית שקופה — אין חלון',
+  gripGone:      'הסרנו את ידית המשיכה — אין לה מקום כאן',
+  locksetSwapped:'החלפנו את המנעול — אין לו מקום ליד המאחז',
+};
+
+/**
  * Move a design to the nearest buildable one, and say what changed.
  *
- * Returns { state, changed: [ 'grille' | ... ] }. Used in two places that
+ * Returns { state, changed: [ 'grille' | ... ], said: [ sentence, ... ] } —
+ * one sentence per change, in step with it. Used in two places that
  * must agree: the click handler, where picking a grille on a solid door adds
  * the window rather than refusing; and `fromQuery`, so a link carrying an
  * unbuildable combination opens something real WITH A NOTICE rather than
@@ -306,6 +349,16 @@ export function isBlocked(state, group, id) {
 export function repair(state, intent = null) {
   let s = { ...state };
   const changed = [];
+  /* WHAT changed and WHY, kept side by side and pushed together.
+     The toast used to be a lookup keyed on the group — one sentence for
+     `detail`, one for `handle` — which can only be right while each group has
+     a single reason to move. It stopped being right the moment two panels
+     could yield to a window as well as line work could: the customer dropped
+     to one panel and was told we had removed their metal strips. The file
+     already says that a toast naming the wrong culprit is worse than no toast
+     at all; this is the shape that keeps producing them. */
+  const said = [];
+  const change = (group, why) => { changed.push(group); said.push(why); };
 
   /* Asking for a grille or a glass treatment on a solid door means asking for
      glass. Fix that first, and only if it was not the window itself that was
@@ -313,7 +366,7 @@ export function repair(state, intent = null) {
   if (intent !== 'window' && !isGlazed(s)
       && (s.grille !== 'none' || (s.glazing && s.glazing !== 'clear'))) {
     s.window = 'rect';
-    changed.push('window');
+    change('window', SAID.windowAdded);
   }
 
   const lined = isLineWork(byId(DETAILS, s.detail));
@@ -322,8 +375,23 @@ export function repair(state, intent = null) {
     /* Whichever the customer just asked for wins; the other yields. Without
        an intent — a link — the WINDOW wins, because glass is the more
        expensive and more visible of the two to lose silently. */
-    if (intent === 'detail') { s.window = 'none'; changed.push('window'); }
-    else { s.detail = 'plain'; changed.push('detail'); }
+    if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
+    else { s.detail = 'plain'; change('detail', SAID.lineWorkGone); }
+  }
+
+  /* Two panels and a window want the same half of the leaf, and the window
+     takes it. The face drops to the single lower panel — a real option at a
+     real price, and the one the drawing was already showing.
+     Same rule as line work above and the same tie-break: whichever the
+     customer just clicked wins. Clicking שני פאנלים on a glazed door means
+     they want the pair, so the glass goes; arriving down a link means the
+     glass stays and the price comes down by ₪140. */
+  if (leafGlazed(s) && byId(DETAILS, s.detail).panels === 2) {
+    if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
+    else {
+      const one = DETAILS.find(d => d.panel && d.panels !== 2);
+      if (one) { s.detail = one.id; change('detail', SAID.onePanel); }
+    }
   }
 
   /* The recessed channel wants a plain leaf. Whichever the customer just asked
@@ -332,18 +400,18 @@ export function repair(state, intent = null) {
   if (byId(HANDLES, s.handle).style === 'channel'
       && (leafGlazed(s) || faceWorked(byId(DETAILS, s.detail)))) {
     if (intent === 'handle') {
-      if (leafGlazed(s)) { s.window = 'none'; changed.push('window'); }
-      if (faceWorked(byId(DETAILS, s.detail))) { s.detail = 'plain'; changed.push('detail'); }
+      if (leafGlazed(s)) { s.window = 'none'; change('window', SAID.windowGone); }
+      if (faceWorked(byId(DETAILS, s.detail))) { s.detail = 'plain'; change('detail', SAID.faceCleared); }
     } else {
       s.handle = 'none';
-      changed.push('handle');
+      change('handle', SAID.gripGone);
     }
   }
 
   /* The grab bar is centred on the leaf and runs across a centred window. */
   if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === 'grab') {
-    if (intent === 'handle') { s.window = 'none'; changed.push('window'); }
-    else { s.handle = 'none'; changed.push('handle'); }
+    if (intent === 'handle') { s.window = 'none'; change('window', SAID.windowGone); }
+    else { s.handle = 'none'; change('handle', SAID.gripGone); }
   }
 
   /* The grab bar against the lock furniture. The window used to be part of
@@ -357,17 +425,17 @@ export function repair(state, intent = null) {
   if (gripClashesLockset(s)) {
     if (intent !== 'lockset') {
       const k = fallbackLockset(s);
-      if (k) { s.lockset = k; changed.push('lockset'); }
+      if (k) { s.lockset = k; change('lockset', SAID.locksetSwapped); }
     }
     /* If the pair still does not fit, the grip is the last thing left to give. */
-    if (gripClashesLockset(s)) { s.handle = 'none'; changed.push('handle'); }
+    if (gripClashesLockset(s)) { s.handle = 'none'; change('handle', SAID.gripGone); }
   }
 
   /* A grip with nowhere to go loses the grip, never the window: the window is
      the thing the customer can see from the street. */
   if (gripClashesGlass(s)) {
-    if (intent === 'handle') { s.window = 'none'; changed.push('window'); }
-    else { s.handle = 'none'; changed.push('handle'); }
+    if (intent === 'handle') { s.window = 'none'; change('window', SAID.windowGone); }
+    else { s.handle = 'none'; change('handle', SAID.gripGone); }
   }
 
   /* LAST, and only once ALL the glass is gone. This used to run straight after
@@ -379,22 +447,9 @@ export function repair(state, intent = null) {
      panel is still standing beside it, so the grille and the glass treatment
      the customer chose are still visible and still theirs. */
   if (!isGlazed(s)) {
-    if (s.grille !== 'none') { s.grille = 'none'; changed.push('grille'); }
-    if (s.glazing && s.glazing !== 'clear') { s.glazing = 'clear'; changed.push('glazing'); }
+    if (s.grille !== 'none') { s.grille = 'none'; change('grille', SAID.grilleGone); }
+    if (s.glazing && s.glazing !== 'clear') { s.glazing = 'clear'; change('glazing', SAID.glazingGone); }
   }
 
-  return { state: s, changed };
+  return { state: s, changed, said };
 }
-
-/** Human-readable Hebrew for what `repair` did, for the toast. */
-export const repairSaid = changed => ({
-  window: 'התאמנו את החלון',
-  detail: 'הסרנו את קווי המתכת — לא משלבים אותם עם חלון',
-  grille: 'הסרנו את הסורג — אין חלון',
-  glazing: 'החזרנו זכוכית שקופה — אין חלון',
-  handle:  'הסרנו את ידית המשיכה — אין לה מקום כאן',
-  /* Not "beside the window" any more: a lockset is only ever moved out of the
-     way of the grab bar now, and a toast that names the wrong culprit is worse
-     than no toast at all. */
-  lockset: 'החלפנו את המנעול — אין לו מקום ליד המאחז',
-}[changed[0]] || null);

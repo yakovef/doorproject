@@ -21,6 +21,55 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **One moulding per door.** The applied moulding was two different widths:
+  40 mm round a pane, 0.09 of leaf width — 83 mm — round a panel. So a door
+  carrying both showed two mouldings, one twice the weight of the other, and it
+  was reported from the outside as liking the window's frame and not the
+  panel's. The same 16-stop cross-section stretched over twice the distance is
+  what turned crisp joinery into a soft swell.
+  The photographs agree. Reading the moulding off the seven doors that carry a
+  window AND a panel (d092 d097 d099 d106 d108 d116 d122 — an edge-cluster scan
+  across a row of the leaf), the two are the same stock every time. What the
+  corpus has is two different STOCKS, each consistent within its own door: slim
+  at 0.017–0.028 of leaf width (d097 d108 d116 d122) and heavy at 0.069–0.098
+  (d048 d087 d092 d099 d106). Ours drew the heavy panel with the slim surround,
+  which is neither. `MOULD_BAND = 40` is now read by both, in mm rather than a
+  fraction because moulding is bought by the metre.
+  The cost is recorded rather than hidden: on d048 and d087 — heavy-stock doors
+  — our recreation is now thinner than the photograph, and `npm run recreate`
+  says so. A second stock would be a new priced option and belongs to Peretz.
+  Two derived numbers moved with it, both of which had the old band written
+  down a second time: the pull bar's inboard limit on a panelled leaf, and the
+  clamp that keeps its end bosses off the moulding — the latter had been two
+  fixed fractions, arithmetic done by hand for a 2050 mm leaf and true of one
+  door size out of six.
+  The surround takes the leaf's own light now too, the way the panel already
+  did. `npm run collide` strips `[data-relight]` before measuring, because
+  those rects are the whole leaf by construction and `getBBox` reports geometry
+  before clipping — leaving them in turned a clean sweep into 610 phantom hits.
+- **Two panels and a window cannot share a leaf, and the price now knows it.**
+  The upper rectangle occupies 0.07–0.58 of the leaf, which is exactly where
+  every window sits, so `appliedFrame` has always dropped silently to the lone
+  lower panel when there is glazing. It never told the price: the tile said
+  שני פאנלים, the message said שני פאנלים, and ₪520 was charged for a door
+  showing one panel worth ₪380. Thirty combinations of window and size.
+  Reported from the outside with the screenshot.
+  OBSERVED agrees — the seven corpus doors with a window over a panel all have
+  a single panel under the glass, none has two. `conflicts` refuses the DETAIL
+  only, not the windows: dropping to one panel is the same door at a lower
+  price, so greying out every window would overstate it. `repair` performs it,
+  and the tie-break is the line-work one — whichever the customer just clicked
+  wins.
+  Guarded by a new test: **a panel that is charged for is a panel that is
+  drawn**, over every buildable detail x window x size, reading `data-panels`
+  out of the markup. Backing the rule out fails it 30 times.
+- **`repair` says why, not which group.** The toast was a lookup keyed on the
+  group that moved, which can only be right while a group has one reason to
+  move. The moment two panels could yield to a window as well as line work
+  could, a customer dropping to one panel was told we had removed their metal
+  strips. `repair` now returns `said` alongside `changed`, one sentence chosen
+  by the branch that made the change.
+
 - **The moulding is lit by the same light as the door it is stuck to.** The
   four `mould-*` gradients are absolute tones built from the paint, and they
   are drawn OVER the leaf, so they never received `leafFill`, `keyWash` or

@@ -648,6 +648,42 @@ for (const [key, list, ctx] of [
   }
 }
 
+/* WHAT IS CHARGED FOR IS WHAT IS DRAWN.
+   The check above asks that a priced option change the door AT ALL. This one
+   asks the harder question: does it change it into the thing it is named and
+   priced for?
+
+   It exists because of the one that got away. `panels: 2` costs ₪520 against
+   ₪380 for the single lower panel, and `appliedFrame` has always dropped
+   silently to the single panel the moment there is glazing on the leaf —
+   there is nowhere for the upper rectangle to go. The tile still said שני
+   פאנלים, the message still said שני פאנלים, and the price still said ₪520,
+   on a door showing one. Thirty combinations of window and size. Reported
+   from the outside with a screenshot, and nothing in the suite was looking:
+   every check here was about how a panel is DRAWN, none about whether the
+   panel the customer bought is on the door.
+
+   Asked of the markup rather than of a browser, because `data-panels` is put
+   there by the drawing for exactly this kind of question. */
+group('a panel that is charged for is a panel that is drawn');
+{
+  let n = 0, missing = 0;
+  for (const d of DETAILS) for (const w of WINDOWS) for (const size of sizeKeys) {
+    const st = { ...base, detail: d.id, window: w.id, size, handle: 'none' };
+    if (!buildable(st)) continue;
+    n++;
+    const svg = render(st);
+    const g = /<g data-detail="panel"([^>]*)>/.exec(svg);
+    const drawn = g ? (/data-panels="2"/.test(g[1]) ? 2 : 1) : 0;
+    const paid = d.panel ? (d.panels === 2 ? 2 : 1) : 0;
+    if (drawn !== paid) missing++;
+    ok(drawn === paid,
+       `${d.id}/${w.id}/${size}: the price is for ${paid} panel(s) at ₪${shekels(d.delta)}, `
+     + `the drawing shows ${drawn}`);
+  }
+  console.log(`  (${n} buildable faces, ${missing} charged for a panel they do not show)`);
+}
+
 /* The finish must reach the METAL, not merely change the document.
    The bars ignored it completely once: the lever's gradient moved, the bar's
    did not, and the bar is the largest piece of metal on the door — so choosing

@@ -444,7 +444,7 @@
   var LEVER_REACH = 145;
   var LOCK_CLEAR = 15;
   var PANEL_GAP = 25;
-  var APERTURE_MOULD = 40;
+  var MOULD_BAND = 40;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
   var GRAB = { fromTop: 0.585, len: 0.3, ratio: 1 / 15, boss: 17 };
@@ -560,7 +560,7 @@
     } : null;
     const rawStandoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
     const panelled = detail.panel && !win.rects.length;
-    const insideField = leafW * (PANEL_INSET + 0.09) + PANEL_GAP - lockBackset(handle, lockset);
+    const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - lockBackset(handle, lockset);
     const standoff = handle.pull && panelled ? Math.max(rawStandoff, insideField) : rawStandoff;
     const handleX = lockX + inward * standoff;
     const paint2 = colour.hex;
@@ -1248,7 +1248,8 @@
         edge,
         grille,
         glazing: glazing.id,
-        key: "s"
+        key: "s",
+        leaf: { x: sideX, y: y0, w: sideW, h: leafH }
       }) + (detail.panel ? appliedFrame(sideX, y0, sideW, leafH, paint2, pale, top + tall, false, 0, "s") : "");
     })() : win.rects[0] && sideW > 320 ? aperture({
       x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
@@ -1259,7 +1260,8 @@
       edge,
       grille,
       glazing: glazing.id,
-      key: "s"
+      key: "s",
+      leaf: { x: sideX, y: y0, w: sideW, h: leafH }
     }) : ""}</g>` : ""}
 
   <!-- ── main leaf ────────────────────────────────────────────── -->
@@ -1292,7 +1294,8 @@
       edge,
       grille,
       glazing: glazing.id,
-      key: "m" + i
+      key: "m" + i,
+      leaf: { x: mainX, y: y0, w: leafW, h: leafH }
     })).join("")}
   </g>
 
@@ -1400,18 +1403,18 @@ ${body}
   var PANEL_INSET = 0.23;
   var PANEL_INSET_MAX = 0.39;
   function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m") {
-    const band = lw * 0.09;
+    const band = MOULD_BAND;
     const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
     const x = lx + inset, w = lw - inset * 2;
     const leaf = { x: lx, y: ly, w: lw, h: lh };
-    const rect = (t, b, n) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale, leaf, `${key}${n}`);
+    const rect = (t, b, n) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale, leaf, `p${key}${n}`);
     if (upper && winBottom <= ly + 1) {
       return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
                data-band="${band.toFixed(1)}">${rect(0.07, 0.58, 0)}${rect(0.66, 0.92, 1)}</g>`;
     }
     const top = Math.max(ly + lh * 0.68, winBottom + lw * 0.08);
     const bottom = ly + lh * 0.9;
-    const art = moulding(x, top, w, bottom - top, band, paint2, pale, leaf, `${key}0`);
+    const art = moulding(x, top, w, bottom - top, band, paint2, pale, leaf, `p${key}0`);
     return art ? `<g data-detail="panel" data-top="${top.toFixed(1)}"
                    data-band="${band.toFixed(1)}">${art}</g>` : "";
   }
@@ -1501,13 +1504,23 @@ ${body}
     }
     return null;
   }
-  function aperture({ x, y, w, h, paint: paint2, edge, grille, glazing, key }) {
+  function aperture({ x, y, w, h, paint: paint2, edge, grille, glazing, key, leaf = null }) {
     const glass = glazingArt(glazing, x, y, w, h, paint2);
-    const M = APERTURE_MOULD;
+    const M = MOULD_BAND;
     const id = `cl-${key}`;
     return `
     <g data-pane="${key}" data-glazing="${glazing || "clear"}">
-      ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint2, isLight(paint2))}
+      ${moulding(
+      x - M,
+      y - M,
+      w + M * 2,
+      h + M * 2,
+      M,
+      paint2,
+      isLight(paint2),
+      leaf,
+      `a${key}`
+    )}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
            edge before the pane turns the other way -->
       ${bevel(x, y, w, h, 8, paint2, false)}
@@ -1674,7 +1687,7 @@ ${body}
       const lo = leafW / 2 + (r.dx || 0) - r.w / 2, hi = leafW / 2 + (r.dx || 0) + r.w / 2;
       return hingeOnLeft ? leafW - hi : lo;
     });
-    return Math.min(...u) - APERTURE_MOULD - lockBackset(byId(HANDLES, state2.handle), byId(LOCKSETS, state2.lockset));
+    return Math.min(...u) - MOULD_BAND - lockBackset(byId(HANDLES, state2.handle), byId(LOCKSETS, state2.lockset));
   }
   function gripClashesGlass(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
@@ -1744,7 +1757,10 @@ ${body}
   var channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
   var barHalf = (len, leafH, panelled = false) => {
     const half = Math.min(len, leafH - 320) / 2;
-    return panelled ? Math.min(Math.max(half, leafH * 0.2), leafH * 0.385) : half;
+    if (!panelled) return half;
+    const clearOfTopRun = leafH * 0.66 + MOULD_BAND - HANDLE_AFF;
+    const insideFootRun = leafH * 0.92 - MOULD_BAND - HANDLE_AFF;
+    return Math.min(Math.max(half, clearOfTopRun), insideFootRun);
   };
   function channelHandle(cx, cy, len, leafH, paint2) {
     const half = channelHalf(len, leafH);
@@ -2590,6 +2606,11 @@ ${body}
       for (const g of GRILLES) if (g.id !== "none") out.grille[g.id] = "דורש חלון";
       for (const z of GLAZINGS) if (z.id !== "clear") out.glazing[z.id] = "דורש חלון";
     }
+    if (onLeaf) {
+      for (const d of DETAILS) if (d.panels === 2) {
+        out.detail[d.id] = "החלון תופס את מקומו של הפאנל העליון";
+      }
+    }
     for (const d of DETAILS) {
       if (onLeaf && isLineWork(d)) out.detail[d.id] = "לא משלבים קווי מתכת עם חלון";
       if (isLineWork(d) && d.panel) out.detail[d.id] = "לא משלבים קווי מתכת עם פאנל";
@@ -2638,45 +2659,73 @@ ${body}
     }
     return out;
   }
+  var SAID = {
+    windowAdded: "הוספנו חלון — הסורג והזכוכית צריכים אותו",
+    windowGone: "הסרנו את החלון",
+    lineWorkGone: "הסרנו את קווי המתכת — לא משלבים אותם עם חלון",
+    onePanel: "עברנו לפאנל אחד — החלון תופס את מקומו של העליון",
+    faceCleared: "החלקנו את הדלת — ידית שקועה דורשת פנים חלקות",
+    grilleGone: "הסרנו את הסורג — אין חלון",
+    glazingGone: "החזרנו זכוכית שקופה — אין חלון",
+    gripGone: "הסרנו את ידית המשיכה — אין לה מקום כאן",
+    locksetSwapped: "החלפנו את המנעול — אין לו מקום ליד המאחז"
+  };
   function repair(state2, intent = null) {
     let s = { ...state2 };
     const changed = [];
+    const said = [];
+    const change = (group, why) => {
+      changed.push(group);
+      said.push(why);
+    };
     if (intent !== "window" && !isGlazed(s) && (s.grille !== "none" || s.glazing && s.glazing !== "clear")) {
       s.window = "rect";
-      changed.push("window");
+      change("window", SAID.windowAdded);
     }
     const lined = isLineWork(byId(DETAILS, s.detail));
     if (leafGlazed(s) && lined) {
       if (intent === "detail") {
         s.window = "none";
-        changed.push("window");
+        change("window", SAID.windowGone);
       } else {
         s.detail = "plain";
-        changed.push("detail");
+        change("detail", SAID.lineWorkGone);
+      }
+    }
+    if (leafGlazed(s) && byId(DETAILS, s.detail).panels === 2) {
+      if (intent === "detail") {
+        s.window = "none";
+        change("window", SAID.windowGone);
+      } else {
+        const one = DETAILS.find((d) => d.panel && d.panels !== 2);
+        if (one) {
+          s.detail = one.id;
+          change("detail", SAID.onePanel);
+        }
       }
     }
     if (byId(HANDLES, s.handle).style === "channel" && (leafGlazed(s) || faceWorked(byId(DETAILS, s.detail)))) {
       if (intent === "handle") {
         if (leafGlazed(s)) {
           s.window = "none";
-          changed.push("window");
+          change("window", SAID.windowGone);
         }
         if (faceWorked(byId(DETAILS, s.detail))) {
           s.detail = "plain";
-          changed.push("detail");
+          change("detail", SAID.faceCleared);
         }
       } else {
         s.handle = "none";
-        changed.push("handle");
+        change("handle", SAID.gripGone);
       }
     }
     if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === "grab") {
       if (intent === "handle") {
         s.window = "none";
-        changed.push("window");
+        change("window", SAID.windowGone);
       } else {
         s.handle = "none";
-        changed.push("handle");
+        change("handle", SAID.gripGone);
       }
     }
     if (gripClashesLockset(s)) {
@@ -2684,46 +2733,35 @@ ${body}
         const k = fallbackLockset(s);
         if (k) {
           s.lockset = k;
-          changed.push("lockset");
+          change("lockset", SAID.locksetSwapped);
         }
       }
       if (gripClashesLockset(s)) {
         s.handle = "none";
-        changed.push("handle");
+        change("handle", SAID.gripGone);
       }
     }
     if (gripClashesGlass(s)) {
       if (intent === "handle") {
         s.window = "none";
-        changed.push("window");
+        change("window", SAID.windowGone);
       } else {
         s.handle = "none";
-        changed.push("handle");
+        change("handle", SAID.gripGone);
       }
     }
     if (!isGlazed(s)) {
       if (s.grille !== "none") {
         s.grille = "none";
-        changed.push("grille");
+        change("grille", SAID.grilleGone);
       }
       if (s.glazing && s.glazing !== "clear") {
         s.glazing = "clear";
-        changed.push("glazing");
+        change("glazing", SAID.glazingGone);
       }
     }
-    return { state: s, changed };
+    return { state: s, changed, said };
   }
-  var repairSaid = (changed) => ({
-    window: "התאמנו את החלון",
-    detail: "הסרנו את קווי המתכת — לא משלבים אותם עם חלון",
-    grille: "הסרנו את הסורג — אין חלון",
-    glazing: "החזרנו זכוכית שקופה — אין חלון",
-    handle: "הסרנו את ידית המשיכה — אין לה מקום כאן",
-    /* Not "beside the window" any more: a lockset is only ever moved out of the
-       way of the grab bar now, and a toast that names the wrong culprit is worse
-       than no toast at all. */
-    lockset: "החלפנו את המנעול — אין לו מקום ליד המאחז"
-  })[changed[0]] || null;
 
   // js/url-state.js
   var VERSION = 9;
@@ -3164,9 +3202,9 @@ ${body}
     open($(`#head-${key}`).getAttribute("aria-expanded") === "true" ? null : key);
   }
   function choose(g, id) {
-    const { state: fixed, changed } = repair({ ...state, [g.key]: id }, g.key);
+    const { state: fixed, said } = repair({ ...state, [g.key]: id }, g.key);
     set(fixed);
-    if (changed.length) toast(repairSaid(changed));
+    if (said.length) toast(said[0]);
   }
   function set(next) {
     state = next;

@@ -36,7 +36,7 @@ import {
   describe, detailGlyph, glazingGlyph, grilleGlyph,
   handleGlyph, locksetGlyph, render, sizeGlyph, windowGlyph,
 } from './renderer.js';
-import { conflicts, repair, repairSaid } from './rules.js';
+import { conflicts, repair } from './rules.js';
 import { copyMessage, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 
@@ -286,9 +286,13 @@ function toggle(key) {
  * a shared URL cannot disagree about what is buildable.
  */
 function choose(g, id) {
-  const { state: fixed, changed } = repair({ ...state, [g.key]: id }, g.key);
+  /* `said` comes back from the repair itself, one sentence per change, because
+     the branch that made the change is the only place that knows why it did.
+     It used to be looked up afterwards from the group name, which is right
+     only while a group has one reason to move. */
+  const { state: fixed, said } = repair({ ...state, [g.key]: id }, g.key);
   set(fixed);
-  if (changed.length) toast(repairSaid(changed));
+  if (said.length) toast(said[0]);
 }
 
 function set(next) {

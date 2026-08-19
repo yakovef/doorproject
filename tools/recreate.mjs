@@ -35,13 +35,16 @@ const CASES = [
     gap: 'brass lever in the photograph, nickel in ours; also missing the ribbed aluminium sill' },
   { id: 'd048', label: 'designed 4800 - two panels',
     q: 'c=rb-5103d&w=none&z=clear&g=none&n=none&k=coral&d=panel2&s=standard&h=left-in',
-    gap: 'the photo has a peephole set inside a ring knocker; both are withdrawn options' },
+    gap: 'the photo has a peephole set inside a ring knocker (both withdrawn), and its '
+       + 'moulding is the corpus\'s HEAVY stock at 0.084 of leaf width where we now draw '
+       + 'the slim one at 0.043 — see MOULD_BAND' },
   { id: 'd078', label: 'designed 5900 - eleven strips',
     q: 'c=rb-0096d&w=none&z=clear&g=none&n=nitzan&k=cadoor&d=strips&s=standard&h=left-in',
     gap: 'the bar is 0.32 of leaf height; our shortest is 0.39' },
   { id: 'd087', label: 'designed 8000 - smart lock, long bar',
     q: 'c=rb-9005d&w=none&z=clear&g=none&n=shahar&k=digital&d=panel2&s=standard&h=left-in',
-    gap: 'the bar is 0.73 of leaf height (our longest is 0.56) and BLACK, which we no longer offer' },
+    gap: 'the bar is 0.73 of leaf height (our longest is 0.56) and BLACK, which we no '
+       + 'longer offer; its moulding is the heavy stock too, at 0.070 of leaf width' },
   { id: 'd097', label: 'luxury 7500 - tall light, muntins',
     q: 'c=rb-9016d&w=tallwin&z=clear&g=grid-light&n=none&k=coral&d=panel&s=standard&h=right-in',
     gap: 'scroll motifs are set INTO the grid; we draw grid or scroll, never both' },
