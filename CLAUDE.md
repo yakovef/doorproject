@@ -21,6 +21,15 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The opening's three planes are set as ONE relationship**, not from three
+  separate medians — doing it separately made the soffit disagree with the
+  jambs and was reported as "the shading on top is very different from the
+  sides". Each plane is now a *gentle ramp about its own value* rather than one
+  being a steep gradient beside two flat ones: a flat plane under a distant key
+  is nearly uniform, and a smear beside two surfaces reads as a mistake.
+  Values, from the reveal-tone medians split at leaf luminance 150 —
+  head/near/far = **0.70/0.89/0.86 light**, 0.53/0.54/0.74 dark. The head is
+  the darkest plane on both bands; that is what makes an opening read as a box.
 - **Shadows retuned against the records, not by eye.** The head reveal carried
   a full-width rectangle of black at 0.26 alpha (`edgeTop`) — reported on a
   white door as "a rectangle that is half black half transparent". Removed: it
@@ -86,6 +95,18 @@ visible.
 - **All money is in agorot (integers).** Never floats.
 - Never disable TLS verification or unset `HTTPS_PROXY`.
 - Prices, colours and options are `PLACEHOLDER = true` until Peretz answers.
+
+---
+
+## 1b. One gotcha that has cost three builds
+
+**Never put a backtick in a comment inside `renderer.js`'s SVG template
+literals.** The whole drawing is one big template string, so `` `like this` ``
+in a prose comment terminates it and the file stops parsing. It reads as
+`SyntaxError: Unexpected identifier` pointing at an innocent word. Write the
+name plainly instead. `node --check js/renderer.js` catches it instantly —
+and `npm run build` will happily leave the previous bundle in place if you
+have silenced its output, which is how it survives to be noticed later.
 
 ---
 

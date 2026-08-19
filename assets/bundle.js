@@ -727,8 +727,8 @@
          somewhere to compare it to. Reported from the outside as simply "the
          shadowing is too much, you can see it especially on a white door". -->
     <linearGradient id="retNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="${darken(paint2, pale ? 0.06 : 0.2)}"/>
-      <stop offset="1" stop-color="${darken(paint2, pale ? 0.16 : 0.34)}"/>
+      <stop offset="0" stop-color="${darken(paint2, pale ? 0.07 : 0.28)}"/>
+      <stop offset="1" stop-color="${darken(paint2, pale ? 0.15 : 0.36)}"/>
     </linearGradient>
     <!-- I had this jamb sunlit — brighter than the leaf — because the green
          door's photographs show it that way, caught square-on by the afternoon
@@ -745,8 +745,8 @@
     <!-- Same retune, same source: far_tone medians are 0.86 light, 0.74 dark.
          The far jamb was already the lighter of the two, so it moved less. -->
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="${darken(paint2, pale ? 0.07 : 0.06)}"/>
-      <stop offset="1" stop-color="${darken(paint2, pale ? 0.17 : 0.18)}"/>
+      <stop offset="0" stop-color="${darken(paint2, pale ? 0.1 : 0.04)}"/>
+      <stop offset="1" stop-color="${darken(paint2, pale ? 0.18 : 0.12)}"/>
     </linearGradient>
     <!-- The junction ramp, referenced by the reveal band. Darkest against the
          leaf and recovering outward, per the twenty-door measurement — and in
@@ -789,10 +789,32 @@
 
     ${mouldGradients(paint2, pale)}
 
+    <!-- ── the three planes of the opening ────────────────────────
+         ONE opening, ONE light, so these are set as a RELATIONSHIP and not
+         from three separate medians. Getting that wrong is what produced the
+         complaint that "the shading on top is very different from the sides",
+         and the difference was not only tone: the soffit was a strong ramp
+         running from lighter-than-the-paint to far darker, while the jambs
+         had been flattened almost to a single value. A gradient beside two
+         flat planes reads as a smear beside two surfaces.
+
+         A flat plane under a distant key is very nearly UNIFORM. So each of
+         the three is now a gentle ramp about its own measured value, and what
+         separates them is the value, which is what the angle to the light
+         actually changes:
+
+                        light doors      dark doors
+           head          0.70             0.53      faces down, gets least
+           near jamb     0.89             0.54
+           far jamb      0.86             0.74
+
+         Medians of the reveal tones over the 33 measured records, split
+         at leaf luminance 150. The head is the darkest plane on both bands,
+         by a lot on a light door — that is real, and it is what makes an
+         opening read as a box rather than as a picture frame. -->
     <linearGradient id="soffit" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"   stop-color="${lighten(paint2, 0.06)}"/>
-      <stop offset="0.3" stop-color="${darken(paint2, pale ? 0.12 : 0.2)}"/>
-      <stop offset="1"   stop-color="${darken(paint2, pale ? 0.3 : 0.48)}"/>
+      <stop offset="0" stop-color="${darken(paint2, pale ? 0.26 : 0.3)}"/>
+      <stop offset="1" stop-color="${darken(paint2, pale ? 0.34 : 0.38)}"/>
     </linearGradient>
     <!-- The casing is one flat plane facing the viewer, and one plane takes one
          gradient: brightest at the head where the key reaches it, falling away
