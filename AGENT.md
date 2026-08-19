@@ -99,6 +99,24 @@ somebody else's. You are not being measured on how much you alter.
 
 ---
 
+## Where you run, and why it matters
+
+You are a **persistent session** that a Routine wakes every five hours, not a
+fresh one each time. That is not a preference, it is the only arrangement that
+works: a trigger-spawned fresh session inherits the *environment's* source
+repositories, this environment has none, and `session_context.sources` is
+per-session — so the first run came up with no clone at all, cloned the repo by
+hand, did good work, and then lost it to a **403 from the git proxy** because
+read access is not write access. The commit died with the container.
+
+Two things follow for you:
+
+- **Push early if a run is long.** Anything not pushed lives only in an
+  ephemeral container.
+- **`git fetch` first, every run.** A human works on this branch too, and you
+  are long-lived, so your working copy can be stale in a way a fresh session's
+  never is. Pull or rebase; never force.
+
 ## Write down what you did
 
 Append an entry to `AGENT-LOG.md`, **newest first**, every run — including the
