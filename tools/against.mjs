@@ -65,6 +65,14 @@ const GRIP_DOORS = {
   channel: ['d084'],
 };
 
+/* The opening each family's own doors are glazed with, so a sheet compares
+   like with like. Read off the measured rects in research/works/data2/. */
+const WINDOW_SIZE = {
+  grid: 'rect', scroll: 'tallwin', iron: 'rect', quatrefoil: 'strip',
+  arch: 'tallwin', deco: 'strip', circles: 'broad', vine: 'rect',
+  tree: 'strip', mesh: 'tallwin', reeded: 'rect',
+};
+
 const leaves = JSON.parse(readFileSync('research/works/auto/leaf.json', 'utf8'));
 
 /** A window's worth of one photograph, and whether its leaf box is real. */
@@ -82,7 +90,14 @@ function crop(id, band) {
 }
 
 const WIN_BAND  = { x0: 0.12, x1: 0.88, y0: 0.03, y1: 0.72 };
-const GRIP_BAND = { x0: 0.00, x1: 1.00, y0: 0.14, y1: 0.86 };
+/* ⚠ THE WHOLE LEAF, not a band of it. This was 0.14 to 0.86 of the leaf's
+   height — a crop that shows the hardware nicely and lies about everything
+   else. Three independent readers measured a bar against it, took the crop's
+   height for the leaf's, and each reported the same bar as 0.68-0.71 of leaf
+   height when it is 0.51: 0.51 / 0.72 = 0.71, the reported number exactly.
+   A sheet that invites a proportion to be read off it has to be a proportion
+   somebody can read. */
+const GRIP_BAND = { x0: 0.00, x1: 1.00, y0: 0.00, y1: 1.00 };
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const page = await b.newPage({ viewport: { width: 700, height: 1100 }, deviceScaleFactor: 2 });
@@ -130,9 +145,15 @@ for (const g of GRILLES) {
     if (c) cells.push({ img: c.img, x: c.cx, y: c.cy, w: c.cw, h: c.ch,
                         label: id + (c.sure ? '' : '?') });
   }
-  const win = byId(WINDOWS, 'tallwin');
+  /* ⚠ THE OPENING ITS OWN DOORS CARRY, not one size for all eleven.
+     Every tile used to be shot on `tallwin`, an aspect of 1:4, and NINE of
+     eleven readers independently reported the design as badly over-slender
+     against photographs whose windows are 1:2.4 to 1:2.9. The drawings were
+     fine; the sheet was comparing a rectangular light against a tall one and
+     the difference is the sheet's, not the door's. */
+  const win = byId(WINDOWS, WINDOW_SIZE[g.id.replace(/-light$/, '')] || 'tallwin');
   const [op] = apertureLayout(win, leafW);
-  const img = await ours(`c=rb-9302d&w=tallwin&g=${g.id}&n=none&k=coral&d=plain&s=standard&h=right-in`,
+  const img = await ours(`c=rb-9302d&w=${win.id}&g=${g.id}&n=none&k=coral&d=plain&s=standard&h=right-in`,
     (leaf, k) => ({ x: leaf.x + op.x * k - op.w * k * 0.2, y: leaf.y + op.top * k - op.w * k * 0.2,
                     width: op.w * k * 1.4, height: op.h * k + op.w * k * 0.4 }));
   cells.push({ img, x: 0, y: 0, w: img.w, h: img.h, label: 'ours', ours: true });
@@ -149,8 +170,7 @@ for (const h of HANDLES) {
                         label: id + (c.sure ? '' : '?') });
   }
   const img = await ours(`c=rb-9302d&w=none&g=none&n=${h.id}&k=cylinder&d=plain&s=standard&h=right-in`,
-    (leaf) => ({ x: leaf.x, y: leaf.y + leaf.height * 0.14,
-                 width: leaf.width, height: leaf.height * 0.72 }));
+    (leaf) => ({ x: leaf.x, y: leaf.y, width: leaf.width, height: leaf.height }));
   cells.push({ img, x: 0, y: 0, w: img.w, h: img.h, label: 'ours', ours: true });
   sheet(h.id, cells);
 }

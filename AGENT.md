@@ -150,6 +150,7 @@ they disagree with the drawing often enough to be worth running:
 | `npm run profile` | the leaf's vertical fall against the corpus median |
 | `npm run collide` | real `getBBox()` geometry; `-- all` and `-- boxes` too |
 | `npm run recreate` | ten doors beside ten photographs |
+| `npm run against` | each design and grip beside its own source doors, cropped |
 | `npm run shot` | screenshots of twelve states |
 
 **`research/works/` holds 129 photographs of doors Peretz actually built**, and
@@ -157,7 +158,7 @@ they disagree with the drawing often enough to be worth running:
 look at one. Comparing against a photograph is how nearly every good change in
 this repo was found.
 
-**All six must be green before you push.** If something is red, fix it or
+**All of them must be green before you push.** If something is red, fix it or
 revert — never push red. `npm run build` before you commit, or the deployed
 bundle will not match the source.
 
@@ -202,6 +203,22 @@ different product.
 So: **before you quote a proportion, check `src`, and read the original in
 `research/works/doors/` when the number matters.** A crop is a convenience. The
 photograph is the evidence.
+
+**And a comparison sheet has to be a comparison.** The same round built
+`tools/against.mjs` to stand our drawing beside the doors it copies, then made
+two mistakes inside it that cost more than they saved. It cropped each grip to
+the middle 0.72 of the leaf, so three independent readers measured a bar
+against the crop, took it for the leaf, and each reported the same bar as 0.71
+of leaf height when it is 0.51 — 0.51 / 0.72, the reported number exactly. And
+it shot every window design on one opening, `tallwin` at 1:4, so nine readers
+out of eleven reported the pane as badly over-slender against photographs whose
+windows are 1:2.4. Acting on either would have made the drawings worse: the
+bars would have gone below anything in the corpus.
+
+Both faults have the same shape as the leaf.json one, and it is the shape to
+watch for. **The measurement was fine and the frame of reference was not.**
+When a finding is unanimous and surprising, suspect the instrument before the
+drawing.
 
 The same shape of error, one level up: **two tools that measure the same thing
 must ask the same question.** `metalBox` in `tools/collide.mjs` had always

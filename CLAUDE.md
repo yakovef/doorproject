@@ -74,6 +74,35 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   off such a crop is scaled by an unknown factor. Read the original before
   trusting a number. See §8.
 
+- **Then the rebuild was checked against the photographs, and half the
+  complaints were the harness's.** Sixteen readings of the new drawings. Three
+  of them independently reported every pull bar as a third too long, and nine
+  of eleven reported every pane as far too slender. Both were the SHEET: it
+  cropped a grip to the middle 0.72 of the leaf and shot every window design on
+  `tallwin` whatever its own doors carry, so readers measured against a crop
+  and called it a leaf, and compared a 1:4 opening against 1:2.4 photographs.
+  Corrected to true leaf height the bars run 0.44 to 0.51 against a photographed
+  0.36 to 0.54 — shortening them as asked would have put every one below
+  anything in the corpus. **A comparison sheet has to be a comparison**, and
+  `tools/against.mjs` now crops whole leaves and shoots each design on the
+  opening its own doors are glazed with.
+  **What the check did find, and what was fixed:** the metal had no specular —
+  `FINISH_TONES` was a six-step BODY ramp whose brightest entry is 228 against
+  a pale leaf reaching 230, so every bar on the site was darker than the door
+  it was bolted to at every point along it. A seventh step, the specular, puts
+  a brushed tube at 2.3x a dark leaf and 1.03x a near-white one while its own
+  falloff keeps the measured 1.00 → 0.69 → 0.64 shape. The tree did not branch
+  (d114 forks repeatedly and every limb ends in a splayed hand); `grid` drew
+  two columns on a rectangular light where d091 and d122 both carry three,
+  because a threshold read off d091's 0.48 was set at 0.40 and our `rect` is
+  0.396; the quatrefoil column was a fifth short; and the scroll motif
+  overhung its own mullions and was drawn HEAVIER than the grid it hangs in
+  when d097 has it at 0.65 of the bar.
+  ⚠ **And `arch` lost its centre mullion.** One reading put a full-height bar
+  below the impost, a second disputed it, so I opened d121: both leaves in that
+  frame show crossing arcs, bare glass, horizontal rails, and not one vertical
+  member. It was invented.
+
 - **The short code is eight characters again.** It was nine for two rounds, and
   the ninth was carrying the glazing axis and the add-ons — both withdrawn. The
   bits came OUT of the layout rather than being left as reserved zeroes: a

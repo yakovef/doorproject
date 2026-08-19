@@ -22,10 +22,21 @@ import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex,
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
    light → mid → dark → a weaker second return near the far edge. That double
    highlight is what separates metal from grey plastic. */
+/* ⚠ SEVEN STEPS, AND THE SEVENTH IS THE POINT. The first six are the metal's
+   body: brightest to darkest with a lit return at index 4. The seventh is the
+   SPECULAR — the place the key light actually lands — and there was no such
+   step, so the brightest a steel fitting could ever be was #E4E7E9, value 228,
+   against a pale leaf whose own face reaches 230. Every bar on the site was
+   therefore darker than the door it was bolted to, at every point along it,
+   and read as grey plastic.
+   Every photographed bar is conspicuously brighter than its leaf: d034 is a
+   near-white blade on a mid-grey door, d073 bright silver on navy, d074 and
+   d082 gleaming brass. A brushed tube catching the key goes to near-white and
+   nothing in a six-step body ramp can say so. */
 const FINISH_TONES = {
-  steel: ['#E4E7E9', '#C6CBCF', '#9FA5AA', '#80868B', '#99A0A5', '#6A7075'],
-  black: ['#5E6165', '#3D4043', '#26282B', '#171819', '#313437', '#0F1011'],
-  brass: ['#EFE5CE', '#D9CBA6', '#BCAD86', '#9C8F6C', '#C7BA9B', '#7C7154'],
+  steel: ['#E4E7E9', '#C6CBCF', '#9FA5AA', '#80868B', '#99A0A5', '#6A7075', '#F7F9FA'],
+  black: ['#5E6165', '#3D4043', '#26282B', '#171819', '#313437', '#0F1011', '#8A8E93'],
+  brass: ['#EFE5CE', '#D9CBA6', '#BCAD86', '#9C8F6C', '#C7BA9B', '#7C7154', '#FDF6E2'],
 };
 
 
@@ -56,7 +67,7 @@ function inFinish(hex, tone) {
      with a lit return at index 4, so it is sampled by index rather than
      interpolated: the return is a feature of the metal, not a mistake. */
   const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-  const order = [0, 1, 2, 4, 3, 5];             // brightest to darkest
+  const order = [6, 0, 1, 2, 4, 3, 5];         // specular, then brightest to darkest
   const i = Math.min(order.length - 1, Math.max(0, Math.round((1 - l) * (order.length - 1))));
   return tone[order[i]];
 }
@@ -948,8 +959,8 @@ export function render(state) {
       <stop offset="0"    stop-color="${inFinish('#4A453F', tone)}"/>
       <stop offset="0.07" stop-color="${inFinish('#7E7A73', tone)}"/>
       <stop offset="0.16" stop-color="${inFinish('#B4B0A8', tone)}"/>
-      <stop offset="0.32" stop-color="${inFinish('#EDEBE5', tone)}"/>
-      <stop offset="0.42" stop-color="${inFinish('#DFDCD4', tone)}"/>
+      <stop offset="0.32" stop-color="${inFinish('#FCFBF7', tone)}"/>
+      <stop offset="0.42" stop-color="${inFinish('#EBE8E1', tone)}"/>
       <stop offset="0.58" stop-color="${inFinish('#A9A39B', tone)}"/>
       <stop offset="0.74" stop-color="${inFinish('#7A746D', tone)}"/>
       <stop offset="0.90" stop-color="${inFinish('#4A443E', tone)}"/>
@@ -2420,7 +2431,17 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g') {
     const g = toRgb(paint);
     const av = (g.r + g.g + g.b) / 3;
     const base = mix(paint, toHex({ r: av, g: av, b: av }), 0.65);
-    const n = Math.max(24, Math.min(40, Math.round(w / (w / 34))));
+    /* ⚠ THE PITCH IS NOT ESTABLISHED, and this is deliberately not the
+       number the first reading gave. It said 34 flutes across the pane, from
+       an FFT of d125; re-run over four independent bands only ONE peaks at
+       that period, with a signal-to-noise under 2, and the other three peak at
+       the JPEG floor. That pane is overwhelmingly a mirror of the building
+       opposite, and its only corroborating door turns out to carry rain glass
+       rather than reeded. Drawn at 34 it reads as flat grey corduroy, where
+       reeded glass is a run of legible vertical rods.
+       18 is a compromise and nobody should defend it as measured. Do not tune
+       it to a number — if this glass matters, photograph it square-on. */
+    const n = Math.max(12, Math.min(24, Math.round(w / (w / 18))));
     const p = w / n;
     const ramp = uid('r'), flute = uid('f'), pat = uid('p');
     const stops = [[0, 0.60], [0.06, 0.55], [0.18, 0.78], [0.40, 0.62],
@@ -2500,8 +2521,13 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g') {
 
     const pitch = w * 0.26;
     const n = Math.max(4, Math.round(h / pitch));
-    /* The stem, cut by both the top and the bottom edge. */
-    const stemX = t => x + w * (0.51 + 0.11 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
+    /* The stem, cut by both the top and the bottom edge, and swinging far
+       enough across the pane that the motifs hanging off it are cut by the
+       SIDE edges too. It wandered 0.11 of the width and the leaves reached
+       0.19 beyond that, which left a clear margin of bare glass down both
+       sides — and this is a repeating film cut by an opening, not a motif
+       placed in the middle of one. Both photographs run off all four edges. */
+    const stemX = t => x + w * (0.50 + 0.20 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
     let d = `M ${n2(stemX(-0.03))} ${n2(y - h * 0.03)}`;
     for (let i = 1; i <= 48; i++) {
       const t = -0.03 + (1.06 * i) / 48;
@@ -2516,7 +2542,7 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g') {
     for (let i = 0; i < n; i++) {
       const t = (i + 0.5) / n;
       const ay = y + h * t, side = i % 2 ? 1 : -1;
-      const ax = stemX(t) + side * w * 0.19;
+      const ax = stemX(t) + side * w * 0.26;
       if (KIND[i % 8] === 'cluster') {
         const r = w * 0.065;
         let k = 0;
@@ -2580,40 +2606,40 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g') {
      A near-BLACK filled silhouette, and ours was drawn brighter than the leaf.
      From across a room ours was a white tree and the real one is a black one:
      the polarity was the single most visible error on the pane.
-     Then the shape. The real stem is serpentine — it enters the bottom edge
-     right of centre, S-curves across, bottoms out in a broad U and climbs back
-     — and it ends at the head in a thick shepherd's crook curling round a
-     light almond void. Ours drew a straight parallel-sided trunk at a fixed
-     u=0.30 with a squared-off top.
-     And it had NO LEAVES, only a regular ladder of seven branches each ending
-     in the same two antler twigs. The real design has three or four large
-     solid lobed leaf masses carrying most of the black, and no hairlines at
-     all: nothing on that door is thinner than about 0.035 W. */
+     ⚠ AND IT FORKS. The first rebuild gave it one serpentine stem with three
+     leaf masses hung off the side, which is a plant. d114 is a TREE: a trunk
+     that divides, and divides again, every limb tapering as it goes and every
+     one of them ending in a splayed fan of three to five fingers. The black
+     runs edge to edge and off the top of the pane. What it reads as at door
+     scale is coral — thick ribbons branching into open hands — and nothing
+     about that survives if the branching is replaced by a stem.
+     No hairlines anywhere: nothing on that door is thinner than about 0.035 W,
+     so this is filled tapering ribbons and never a stroked path. */
   if (kind === 'tree') {
     const ground = scaleTone(paint, 0.42);
     let ink = scaleTone(paint, 0.12);
     if (luminance(ink) > luminance(ground) * 0.30) ink = '#17120F';
     let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="${ground}"/>`;
-    const P = (u, v) => [x + w * u, y + h * v];
     const fill = d => `<path d="${d}" fill="${ink}"/>`;
 
-    /* A filled ribbon from a spine and a half-width along it: the real
-       elements taper root to tip and meet in filleted junctions, which a
-       stroked path cannot do. */
+    /* A filled ribbon from a spine and a half-width along it: the real limbs
+       taper root to tip and meet in filleted junctions, which a stroked path
+       cannot do. Catmull-Rom through the control points so a three-point limb
+       still curves. */
     const ribbon = (spine, hw) => {
       const pts = [];
-      for (let i = 0; i <= 40; i++) {
-        const t = (i / 40) * (spine.length - 1);
+      for (let i = 0; i <= 26; i++) {
+        const t = (i / 26) * (spine.length - 1);
         const k = Math.min(spine.length - 2, Math.floor(t)), f = t - k;
         const a = spine[k], b = spine[k + 1];
         const pv = spine[Math.max(0, k - 1)], nx = spine[Math.min(spine.length - 1, k + 2)];
-        const cr = (p0, p1, p2, p3, j) => {
+        const cr = j => {
           const t2 = f * f, t3 = t2 * f;
-          return 0.5 * ((2 * p1[j]) + (-p0[j] + p2[j]) * f
-            + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2
-            + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3);
+          return 0.5 * ((2 * a[j]) + (-pv[j] + b[j]) * f
+            + (2 * pv[j] - 5 * a[j] + 4 * b[j] - nx[j]) * t2
+            + (-pv[j] + 3 * a[j] - 3 * b[j] + nx[j]) * t3);
         };
-        pts.push([cr(pv, a, b, nx, 0), cr(pv, a, b, nx, 1), i / 40]);
+        pts.push([cr(0), cr(1), i / 26]);
       }
       const left = [], right = [];
       for (let i = 0; i < pts.length; i++) {
@@ -2628,66 +2654,53 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g') {
            + ' L ' + right.reverse().map(p => `${n2(p[0])} ${n2(p[1])}`).join(' L ') + ' Z';
     };
 
-    const spine = [[0.60, 1.04], [0.62, 0.86], [0.50, 0.72], [0.36, 0.60],
-                   [0.46, 0.44], [0.54, 0.28], [0.60, 0.10]].map(([u, v]) => P(u, v));
-    out += fill(ribbon(spine, t => w * (0.078 - 0.033 * t)));
-    /* The crook, and its void is the point of the feature: if it fills in the
-       curl wants a bigger radius, never a thinner band. */
-    const crook = [[0.60, 0.10], [0.72, 0.03], [0.92, 0.05], [0.96, 0.12],
-                   [0.86, 0.16], [0.80, 0.11]].map(([u, v]) => P(u, v));
-    out += fill(ribbon(crook, () => w * 0.055));
-    const limb = [[0.53, 0.28], [0.46, 0.20], [0.38, 0.10], [0.34, -0.03]].map(([u, v]) => P(u, v));
-    out += fill(ribbon(limb, t => w * (0.050 - 0.020 * t)));
-    out += fill(ribbon([[0.10, 0.93], [0.20, 0.955], [0.30, 0.965], [0.42, 0.925],
-                        [0.52, 0.87]].map(([u, v]) => P(u, v)), () => w * 0.0225));
-    out += fill(`M ${P(0.355, 0.005).map(n2).join(' ')} L ${P(0.375, 0.005).map(n2).join(' ')}
-                 L ${P(0.372, 0.055).map(n2).join(' ')} Z`);
+    /* The splayed hand every limb ends in. Three to five fingers, the middle
+       one longest, each a tapering ribbon with a blunt round tip. */
+    const FING = [[-0.62, 0.72], [-0.28, 0.95], [0.06, 1.00], [0.40, 0.88], [0.72, 0.66]];
+    const fan = (px, py, ang, hw, n) => {
+      const o = [];
+      const use = FING.slice(0, n).map((f, i) => FING[(i + (5 - n)) % 5]);
+      for (const [spread, len] of use) {
+        const a = ang + spread;
+        const R = hw * 6.4 * len;
+        const mid = [px + Math.cos(a - spread * 0.35) * R * 0.55,
+                     py + Math.sin(a - spread * 0.35) * R * 0.55];
+        o.push(fill(ribbon([[px, py], mid, [px + Math.cos(a) * R, py + Math.sin(a) * R]],
+                           t => hw * (0.92 - 0.55 * t * t))));
+      }
+      return o.join('');
+    };
 
-    const N = Math.max(3, Math.min(6, Math.round(h / (w * 1.25))));
-    for (let i = 0; i < N; i++) {
-      const v = (i + 0.5) / N, side = i % 2 ? 1 : -1;
-      /* Root the leaf on the stem where the stem actually is at that height,
-         not on the pane's centreline. */
-      let ru = 0.5;
-      for (let k = 0; k < spine.length - 1; k++) {
-        const a = spine[k], b = spine[k + 1], vy = y + h * v;
-        if ((a[1] - vy) * (b[1] - vy) <= 0) {
-          const f = (vy - a[1]) / ((b[1] - a[1]) || 1);
-          ru = (a[0] + (b[0] - a[0]) * f - x) / w;
-        }
-      }
-      const root = [x + w * ru, y + h * v];
-      const LOBE = [0.42, 0.36, 0.27], ANG = [-12, 16, 44];
-      const reachOf = k => Math.min(LOBE[k] + (i % 2 && k === 0 ? 0.06 : 0),
-                                    side > 0 ? 0.98 - ru : ru - 0.02);
-      /* THE PALM. Without it the three lobes are three spikes meeting at a
-         point and the leaf reads as a bird's foot — which is exactly what the
-         first render of this came out as. On d114 the slits between the lobes
-         stop two thirds of the way back and the inner third is one mass. */
-      const palm = [];
-      for (const s of [-1, 1]) {
-        for (let k = 0; k < 3; k++) {
-          const kk = s < 0 ? k : 2 - k;
-          const a = (ANG[kk] * Math.PI) / 180;
-          const rr = reachOf(kk) * (s < 0 ? 0.52 : 0.44);
-          palm.push([x + w * (ru + side * rr * Math.cos(a)) - s * side * w * 0.045,
-                     y + h * v + w * rr * Math.sin(a)]);
-        }
-      }
-      out += fill('M ' + palm.map(p => `${n2(p[0])} ${n2(p[1])}`).join(' L ') + ' Z');
-      LOBE.forEach((len, k) => {
-        const a = (ANG[k] * Math.PI) / 180;
-        const reach = reachOf(k);
-        const tip = [x + w * (ru + side * reach * Math.cos(a)), y + h * v + w * reach * Math.sin(a)];
-        /* Convex on the UPPER edge, and the bulge is perpendicular to the lobe
-           rather than straight up, so the steeply raked lobe curves as much as
-           the near-horizontal one. */
-        const bulge = w * reach * 0.16;
-        const mid = [(root[0] + tip[0]) / 2 + Math.sin(a) * bulge * side,
-                     (root[1] + tip[1]) / 2 - Math.cos(a) * bulge];
-        out += fill(ribbon([root, mid, tip], t => w * (0.098 - 0.076 * t * t)));
-      });
-    }
+    /* Fixed bends and spreads rather than anything random: the same door must
+       draw the same tree every time, or the memoised geometry key is a lie. */
+    const BEND = [0.30, -0.34, 0.26, -0.22, 0.36, -0.28];
+    const SPREAD = [0.62, 0.54, 0.70, 0.48];
+    let seq = 0;
+    const limb = (px, py, ang, len, hw, depth) => {
+      const bend = BEND[seq++ % BEND.length] * (depth ? 1 : 0.6);
+      const ex = px + Math.cos(ang + bend) * len, ey = py + Math.sin(ang + bend) * len;
+      const mid = [px + Math.cos(ang + bend * 0.35) * len * 0.55,
+                   py + Math.sin(ang + bend * 0.35) * len * 0.55];
+      out += fill(ribbon([[px, py], mid, [ex, ey]], t => hw * (1 - 0.42 * t)));
+      if (depth <= 0) { out += fan(ex, ey, ang + bend, hw, 4); return; }
+      const s = SPREAD[depth % SPREAD.length];
+      limb(ex, ey, ang + bend - s, len * 0.72, hw * 0.66, depth - 1);
+      limb(ex, ey, ang + bend + s * 0.8, len * 0.80, hw * 0.70, depth - 1);
+    };
+
+    const UP = -Math.PI / 2;
+    /* The trunk enters the bottom edge right of centre and is cut by it. */
+    const rootX = x + w * 0.58, rootY = y + h * 1.03;
+    const trunkLen = h * 0.30, trunkHW = w * 0.135;
+    const tipX = rootX - w * 0.14, tipY = rootY - trunkLen;
+    out += fill(ribbon([[rootX, rootY], [rootX + w * 0.04, rootY - trunkLen * 0.5],
+                        [tipX, tipY]], t => trunkHW * (1 - 0.28 * t)));
+    limb(tipX, tipY, UP - 0.42, h * 0.24, trunkHW * 0.74, 2);
+    limb(tipX, tipY, UP + 0.34, h * 0.26, trunkHW * 0.78, 2);
+    /* Two low limbs off the trunk itself, which is what stops the bottom
+       third of the pane reading as a bare post. */
+    limb(rootX + w * 0.02, rootY - trunkLen * 0.42, UP - 0.95, h * 0.13, trunkHW * 0.52, 0);
+    limb(rootX + w * 0.03, rootY - trunkLen * 0.20, UP + 1.02, h * 0.11, trunkHW * 0.48, 0);
     return { veil: out, over: '' };
   }
 
@@ -3074,7 +3087,13 @@ function grillePaths(kind, x, y, w, h, tint) {
      because `light` is one axis over the whole list and collapsing the pair
      would leave two prices on one picture. It is a question for Peretz. */
   if (kind === 'grid') {
-    const cols = w / h >= 0.75 ? 4 : w / h >= 0.40 ? 3 : 2;
+    /* ⚠ 0.38, not 0.40, and the two hundredths matter. d091 and d122 are the
+       two doors that carry three columns and four rows, and both are
+       RECTANGULAR openings — our `rect` is 357 x 902, an aspect of 0.396,
+       which fell a fraction the wrong side of a threshold set from d091's own
+       0.48 and drew them with two columns. A boundary picked off one door and
+       applied to another door's opening is the whole of that error. */
+    const cols = w / h >= 0.75 ? 4 : w / h >= 0.38 ? 3 : 2;
     const rows = Math.max(2, Math.min(6, Math.round((cols * h) / (w * 1.75))));
     const sw = Math.max(3, (w / cols) * 0.09);
     const out = [];
@@ -3125,7 +3144,14 @@ function grillePaths(kind, x, y, w, h, tint) {
        the shadow with the shape, and four shadows pointing four ways is the
        one thing that stops ornament reading as metal. */
     const block = (bx, by, S) => {
-      const rib = S * 0.046;
+      /* ⚠ FINER THAN THE BARS, not heavier. Two readings disagreed about this
+         — one measured the ribbon at 1.35 times the grid bar, a second
+         re-measured d097 at 10 px of scroll against 16 px of bar, 0.65 — and
+         the second is what the sheet shows: in d089, d093 and d097 the
+         straight grid is the heaviest thing in the window and the scrollwork
+         is fine wire threaded through it. Drawn the other way up the tile came
+         out about 38% inkier than d097's cell. */
+      const rib = w * 0.022 * 0.65;
       const piece = (mx, my) => {
         const P = (u, v) => [bx + (mx > 0 ? u : 1 - u) * S, by + (my > 0 ? v : 1 - v) * S];
         const dir = mx * my;
@@ -3146,8 +3172,14 @@ function grillePaths(kind, x, y, w, h, tint) {
         .map(([mx, my]) => ink(piece(mx, my), rib)).join('');
     };
 
+    /* INSIDE the mullions. The spirals swing about their eyes, so a motif
+       authored to the block's full width overhangs it — measured at 15%, with
+       the outer coils crossing the vertical bars. Nothing in any photograph
+       crosses a bar: d089, d093 and d097 are tangent to them and d102 is
+       inset. 0.86 of the span is what keeps the widest coil off the iron. */
+    const S = Bw * 0.86;
     const tops = two ? [y + m, y + h - m - Bh] : [y + h - m - Bh];
-    for (const ty of tops) out.push(block(x + m, ty + (Bh - Bw) / 2, Bw));
+    for (const ty of tops) out.push(block(x + m + (Bw - S) / 2, ty + (Bh - S) / 2, S));
     return out.join('');
   }
 
@@ -3174,8 +3206,19 @@ function grillePaths(kind, x, y, w, h, tint) {
     }
 
     const p = w * 0.80;
-    let n = Math.max(2, Math.round(h / p) - 1);
-    while (n > 2 && (h - (n - 1) * p) / 2 < w * 0.45) n--;
+    /* FIVE on d104, and we drew four. `round(h / p) - 1` took one off to keep
+       the end medallions clear of the border, and then the guard below took
+       another: the column came out a fifth shorter than the photograph's at
+       every size. The count is the pitch, and the guard only has to keep the
+       last rosette off the border bar. */
+    /* The run is (n-1) pitches long and has to sit inside the border with a
+       medallion's own reach to spare at each end, so the count comes from the
+       USABLE height rather than the whole pane. On d104's 114 x 526 light that
+       gives five, which is what the photograph has; `round(h / p)` gave six
+       and `round(h / p) - 1` gave four, and neither was derived from anything.
+       The count is the pitch. */
+    let n = Math.max(2, Math.round((h - w * 1.5) / p) + 1);
+    while (n > 2 && (h - (n - 1) * p) / 2 < w * 0.30) n--;
     const cx = x + w / 2;
     for (let i = 0; i < n; i++) {
       const cy = y + h / 2 + (i - (n - 1) / 2) * p;
@@ -3189,7 +3232,11 @@ function grillePaths(kind, x, y, w, h, tint) {
       }
       /* The lozenge: four edges bowed INWARD, which is what makes it read as
          cast lace rather than as a diamond. */
-      const hw = w * 0.062, hh = w * 0.090, bow = w * 0.010;
+      /* Lighter than the grid it hangs in. d104's rosette is open lacework —
+         the dark glass shows through every curl — and ours read as a solid
+         blob with a heavy centre. The lozenge shrinks and the scroll ribbon
+         goes under the bar weight, which is what makes it lace. */
+      const hw = w * 0.050, hh = w * 0.074, bow = w * 0.010;
       out.push(solid(`M ${n2(cx)} ${n2(cy - hh)}
                       Q ${n2(cx + hw - bow)} ${n2(cy - hh + bow)} ${n2(cx + hw)} ${n2(cy)}
                       Q ${n2(cx + hw - bow)} ${n2(cy + hh - bow)} ${n2(cx)} ${n2(cy + hh)}
@@ -3200,9 +3247,9 @@ function grillePaths(kind, x, y, w, h, tint) {
          springs from its flank and curls back in. */
       for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
         out.push(ink(poly(curl(cx + sx * w * 0.055, cy + sy * w * 0.135,
-                               cx, cy + sy * hh, 1.0, sx * sy)), w * 0.022));
+                               cx, cy + sy * hh, 1.0, sx * sy)), w * 0.017));
         out.push(ink(poly(curl(cx + sx * w * 0.110, cy + sy * w * 0.075,
-                               cx + sx * hw, cy, 1.0, -sx * sy)), w * 0.022));
+                               cx + sx * hw, cy, 1.0, -sx * sy)), w * 0.017));
       }
       /* The bead chain to the next medallion — spindle, bead, short spindle,
          bead, spindle. Ours left these gaps empty, which is the single biggest
@@ -3226,19 +3273,26 @@ function grillePaths(kind, x, y, w, h, tint) {
   }
 
   /* ── קשת — d121 ─────────────────────────────────────────────────────
-     Gothic, not Roman. Two POINTED arches meeting at a vertex on the
-     centreline, a descending V between them, an impost bar the whole tracery
-     lands on, and a plain two-column grid below it. The two X crossings at
-     (0.222, 0.262) and (0.778, 0.262) are the most recognisable thing on the
-     door, and ours had neither: it drew three concentric round domes over a
-     full-pane mesh, with a vertical stub above the arch where the real mullion
-     is below it. Every line is the same weight — that is a finding, not an
-     omission. */
+     Long crossing arcs over an otherwise empty pane, with two or three plain
+     horizontal rails low down. The X where the arcs cross is the most
+     recognisable thing on the door, and ours had drawn three concentric round
+     domes over a full-pane mesh instead.
+     ⚠ NO VERTICAL, ANYWHERE. This branch carried a full-height centre mullion
+     below the impost, splitting the lower two thirds into a six-rectangle
+     grid, on the strength of one reading of one photograph. A second reading
+     disputed it, so I opened d121 and looked: BOTH leaves in that frame — the
+     wide one and the narrow one beside it — show crossing arcs, then bare
+     glass, then horizontal rails, and not one vertical member on either. The
+     mullion was invented and is gone.
+     ⚠ AND THIS IS THE THINNEST EVIDENCE IN THE LIST. One door, shot at about
+     16 degrees of keystone with its right third glared out, and its automatic
+     leaf box lands between two leaves rather than on one. Every fraction below
+     is a reading of that single frame. Do not tune them; if this design
+     matters, photograph it. */
   if (kind === 'arch') {
     const sw = Math.max(5, w * 0.033);
     const out = [];
     out.push(line(x, V(0.409), x + w, V(0.409), sw));
-    out.push(line(U(0.5), V(0.404), U(0.5), y + h, sw));
     out.push(line(x, V(0.693), x + w, V(0.693), sw));
     out.push(line(x, V(0.846), x + w, V(0.846), sw));
     const arc = (x0, v0, cx0, cv, x1, v1) =>
@@ -3803,7 +3857,7 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
              whole of the standoff anyone is allowed to draw. -->
         ${POST.map(t => `
         <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#nickelSoft)"/>
-        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.22"/>`).join('')}
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.10"/>`).join('')}
 
         <!-- Outboard stems, visibly thinner than the shaft; then the terminal
              beads, which is what every one of these doors ends in. -->
@@ -3830,8 +3884,8 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
         ${POST.map(t => `
         <ellipse cx="${n1(P(t))}" cy="${n1(by)}" rx="${n1(D * 0.675)}" ry="${n1(D * 0.725)}"
                  fill="url(#nickel)"/>
-        <ellipse cx="${n1(P(t) - D * 0.18)}" cy="${n1(by - D * 0.22)}" rx="${n1(D * 0.22)}"
-                 ry="${n1(D * 0.26)}" fill="#fff" opacity="0.40"/>`).join('')}
+        <ellipse cx="${n1(P(t) - D * 0.16)}" cy="${n1(by - D * 0.26)}" rx="${n1(D * 0.34)}"
+                 ry="${n1(D * 0.17)}" fill="#fff" opacity="0.32"/>`).join('')}
       </g>
     </g>`;
 }
@@ -3909,11 +3963,11 @@ const BARS = {
   // The slim rod: d072 at 0.017 of leaf width, d035 at 0.022, d074 at 0.024.
   ron:    { tone: 'barTube',  rx: 0.30, fix: { t: [0.10, 0.90] } },
   // Flat strap, standard width — d049, d066, d034, d104.
-  nitzan: { tone: 'barStrap', rx: 0.05, fix: { t: [0.10, 0.89] } },
+  nitzan: { tone: 'barStrap', rx: 0.02, fix: { t: [0.10, 0.89] } },
   // Flat strap, long — d060 runs 0.60 of leaf height against d049's 0.45.
-  shahar: { tone: 'barStrap', rx: 0.04, fix: { t: [0.15, 0.85] } },
+  shahar: { tone: 'barStrap', rx: 0.02, fix: { t: [0.15, 0.85] } },
   // Flat strap, wide — d073, the one bar in the corpus past 0.07 of leaf width.
-  blade:  { tone: 'barStrap', rx: 0.05, fix: { t: [0.09, 0.95] } },
+  blade:  { tone: 'barStrap', rx: 0.03, fix: { t: [0.09, 0.95] } },
 };
 
 function pullBar(cx, cy, handle, leafH, panelled) {
@@ -3935,8 +3989,8 @@ function pullBar(cx, cy, handle, leafH, panelled) {
      four kinds of assembly and none of them is on a door. */
   const feet = spec.fix.t.map(t => `
       <ellipse cx="${(cx + w * 0.55).toFixed(1)}" cy="${(at(t) + w * 0.45).toFixed(1)}"
-               rx="${(w * 0.75).toFixed(1)}" ry="${(w * 0.75).toFixed(1)}"
-               fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`).join('');
+               rx="${(w * 0.70).toFixed(1)}" ry="${(w * 0.70).toFixed(1)}"
+               fill="#000" opacity="0.17" filter="url(#hwShadow)"/>`).join('');
 
   return `
     <g>

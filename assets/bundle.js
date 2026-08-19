@@ -415,14 +415,14 @@
 
   // js/renderer.js
   var FINISH_TONES = {
-    steel: ["#E4E7E9", "#C6CBCF", "#9FA5AA", "#80868B", "#99A0A5", "#6A7075"],
-    black: ["#5E6165", "#3D4043", "#26282B", "#171819", "#313437", "#0F1011"],
-    brass: ["#EFE5CE", "#D9CBA6", "#BCAD86", "#9C8F6C", "#C7BA9B", "#7C7154"]
+    steel: ["#E4E7E9", "#C6CBCF", "#9FA5AA", "#80868B", "#99A0A5", "#6A7075", "#F7F9FA"],
+    black: ["#5E6165", "#3D4043", "#26282B", "#171819", "#313437", "#0F1011", "#8A8E93"],
+    brass: ["#EFE5CE", "#D9CBA6", "#BCAD86", "#9C8F6C", "#C7BA9B", "#7C7154", "#FDF6E2"]
   };
   function inFinish(hex, tone) {
     const { r, g, b } = toRgbLocal(hex);
     const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-    const order = [0, 1, 2, 4, 3, 5];
+    const order = [6, 0, 1, 2, 4, 3, 5];
     const i = Math.min(order.length - 1, Math.max(0, Math.round((1 - l) * (order.length - 1))));
     return tone[order[i]];
   }
@@ -945,8 +945,8 @@
       <stop offset="0"    stop-color="${inFinish("#4A453F", tone)}"/>
       <stop offset="0.07" stop-color="${inFinish("#7E7A73", tone)}"/>
       <stop offset="0.16" stop-color="${inFinish("#B4B0A8", tone)}"/>
-      <stop offset="0.32" stop-color="${inFinish("#EDEBE5", tone)}"/>
-      <stop offset="0.42" stop-color="${inFinish("#DFDCD4", tone)}"/>
+      <stop offset="0.32" stop-color="${inFinish("#FCFBF7", tone)}"/>
+      <stop offset="0.42" stop-color="${inFinish("#EBE8E1", tone)}"/>
       <stop offset="0.58" stop-color="${inFinish("#A9A39B", tone)}"/>
       <stop offset="0.74" stop-color="${inFinish("#7A746D", tone)}"/>
       <stop offset="0.90" stop-color="${inFinish("#4A443E", tone)}"/>
@@ -1808,7 +1808,7 @@ ${body}
       const g = toRgb(paint2);
       const av = (g.r + g.g + g.b) / 3;
       const base = mix(paint2, toHex({ r: av, g: av, b: av }), 0.65);
-      const n = Math.max(24, Math.min(40, Math.round(w / (w / 34))));
+      const n = Math.max(12, Math.min(24, Math.round(w / (w / 18))));
       const p = w / n;
       const ramp = uid("r"), flute = uid("f"), pat = uid("p");
       const stops = [
@@ -1873,7 +1873,7 @@ ${body}
                      fill="${scaleTone(paint2, 0.46)}"/>`;
       const pitch = w * 0.26;
       const n = Math.max(4, Math.round(h / pitch));
-      const stemX = (t) => x + w * (0.51 + 0.11 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
+      const stemX = (t) => x + w * (0.5 + 0.2 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
       let d = `M ${n2(stemX(-0.03))} ${n2(y - h * 0.03)}`;
       for (let i = 1; i <= 48; i++) {
         const t = -0.03 + 1.06 * i / 48;
@@ -1887,7 +1887,7 @@ ${body}
       for (let i = 0; i < n; i++) {
         const t = (i + 0.5) / n;
         const ay = y + h * t, side = i % 2 ? 1 : -1;
-        const ax = stemX(t) + side * w * 0.19;
+        const ax = stemX(t) + side * w * 0.26;
         if (KIND[i % 8] === "cluster") {
           const r = w * 0.065;
           let k = 0;
@@ -1958,20 +1958,19 @@ ${body}
       let ink = scaleTone(paint2, 0.12);
       if (luminance(ink) > luminance(ground) * 0.3) ink = "#17120F";
       let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="${ground}"/>`;
-      const P = (u, v) => [x + w * u, y + h * v];
       const fill = (d) => `<path d="${d}" fill="${ink}"/>`;
-      const ribbon = (spine2, hw) => {
+      const ribbon = (spine, hw) => {
         const pts = [];
-        for (let i = 0; i <= 40; i++) {
-          const t = i / 40 * (spine2.length - 1);
-          const k = Math.min(spine2.length - 2, Math.floor(t)), f = t - k;
-          const a = spine2[k], b = spine2[k + 1];
-          const pv = spine2[Math.max(0, k - 1)], nx = spine2[Math.min(spine2.length - 1, k + 2)];
-          const cr = (p0, p1, p2, p3, j) => {
+        for (let i = 0; i <= 26; i++) {
+          const t = i / 26 * (spine.length - 1);
+          const k = Math.min(spine.length - 2, Math.floor(t)), f = t - k;
+          const a = spine[k], b = spine[k + 1];
+          const pv = spine[Math.max(0, k - 1)], nx = spine[Math.min(spine.length - 1, k + 2)];
+          const cr = (j) => {
             const t2 = f * f, t3 = t2 * f;
-            return 0.5 * (2 * p1[j] + (-p0[j] + p2[j]) * f + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3);
+            return 0.5 * (2 * a[j] + (-pv[j] + b[j]) * f + (2 * pv[j] - 5 * a[j] + 4 * b[j] - nx[j]) * t2 + (-pv[j] + 3 * a[j] - 3 * b[j] + nx[j]) * t3);
           };
-          pts.push([cr(pv, a, b, nx, 0), cr(pv, a, b, nx, 1), i / 40]);
+          pts.push([cr(0), cr(1), i / 26]);
         }
         const left = [], right = [];
         for (let i = 0; i < pts.length; i++) {
@@ -1984,78 +1983,56 @@ ${body}
         }
         return "M " + left.map((p) => `${n2(p[0])} ${n2(p[1])}`).join(" L ") + " L " + right.reverse().map((p) => `${n2(p[0])} ${n2(p[1])}`).join(" L ") + " Z";
       };
-      const spine = [
-        [0.6, 1.04],
-        [0.62, 0.86],
-        [0.5, 0.72],
-        [0.36, 0.6],
-        [0.46, 0.44],
-        [0.54, 0.28],
-        [0.6, 0.1]
-      ].map(([u, v]) => P(u, v));
-      out += fill(ribbon(spine, (t) => w * (0.078 - 0.033 * t)));
-      const crook = [
-        [0.6, 0.1],
-        [0.72, 0.03],
-        [0.92, 0.05],
-        [0.96, 0.12],
-        [0.86, 0.16],
-        [0.8, 0.11]
-      ].map(([u, v]) => P(u, v));
-      out += fill(ribbon(crook, () => w * 0.055));
-      const limb = [[0.53, 0.28], [0.46, 0.2], [0.38, 0.1], [0.34, -0.03]].map(([u, v]) => P(u, v));
-      out += fill(ribbon(limb, (t) => w * (0.05 - 0.02 * t)));
-      out += fill(ribbon([
-        [0.1, 0.93],
-        [0.2, 0.955],
-        [0.3, 0.965],
-        [0.42, 0.925],
-        [0.52, 0.87]
-      ].map(([u, v]) => P(u, v)), () => w * 0.0225));
-      out += fill(`M ${P(0.355, 5e-3).map(n2).join(" ")} L ${P(0.375, 5e-3).map(n2).join(" ")}
-                 L ${P(0.372, 0.055).map(n2).join(" ")} Z`);
-      const N = Math.max(3, Math.min(6, Math.round(h / (w * 1.25))));
-      for (let i = 0; i < N; i++) {
-        const v = (i + 0.5) / N, side = i % 2 ? 1 : -1;
-        let ru = 0.5;
-        for (let k = 0; k < spine.length - 1; k++) {
-          const a = spine[k], b = spine[k + 1], vy = y + h * v;
-          if ((a[1] - vy) * (b[1] - vy) <= 0) {
-            const f = (vy - a[1]) / (b[1] - a[1] || 1);
-            ru = (a[0] + (b[0] - a[0]) * f - x) / w;
-          }
-        }
-        const root = [x + w * ru, y + h * v];
-        const LOBE = [0.42, 0.36, 0.27], ANG = [-12, 16, 44];
-        const reachOf = (k) => Math.min(
-          LOBE[k] + (i % 2 && k === 0 ? 0.06 : 0),
-          side > 0 ? 0.98 - ru : ru - 0.02
-        );
-        const palm = [];
-        for (const s of [-1, 1]) {
-          for (let k = 0; k < 3; k++) {
-            const kk = s < 0 ? k : 2 - k;
-            const a = ANG[kk] * Math.PI / 180;
-            const rr = reachOf(kk) * (s < 0 ? 0.52 : 0.44);
-            palm.push([
-              x + w * (ru + side * rr * Math.cos(a)) - s * side * w * 0.045,
-              y + h * v + w * rr * Math.sin(a)
-            ]);
-          }
-        }
-        out += fill("M " + palm.map((p) => `${n2(p[0])} ${n2(p[1])}`).join(" L ") + " Z");
-        LOBE.forEach((len, k) => {
-          const a = ANG[k] * Math.PI / 180;
-          const reach = reachOf(k);
-          const tip = [x + w * (ru + side * reach * Math.cos(a)), y + h * v + w * reach * Math.sin(a)];
-          const bulge = w * reach * 0.16;
+      const FING = [[-0.62, 0.72], [-0.28, 0.95], [0.06, 1], [0.4, 0.88], [0.72, 0.66]];
+      const fan = (px, py, ang, hw, n) => {
+        const o = [];
+        const use = FING.slice(0, n).map((f, i) => FING[(i + (5 - n)) % 5]);
+        for (const [spread, len] of use) {
+          const a = ang + spread;
+          const R = hw * 6.4 * len;
           const mid = [
-            (root[0] + tip[0]) / 2 + Math.sin(a) * bulge * side,
-            (root[1] + tip[1]) / 2 - Math.cos(a) * bulge
+            px + Math.cos(a - spread * 0.35) * R * 0.55,
+            py + Math.sin(a - spread * 0.35) * R * 0.55
           ];
-          out += fill(ribbon([root, mid, tip], (t) => w * (0.098 - 0.076 * t * t)));
-        });
-      }
+          o.push(fill(ribbon(
+            [[px, py], mid, [px + Math.cos(a) * R, py + Math.sin(a) * R]],
+            (t) => hw * (0.92 - 0.55 * t * t)
+          )));
+        }
+        return o.join("");
+      };
+      const BEND = [0.3, -0.34, 0.26, -0.22, 0.36, -0.28];
+      const SPREAD = [0.62, 0.54, 0.7, 0.48];
+      let seq = 0;
+      const limb = (px, py, ang, len, hw, depth) => {
+        const bend = BEND[seq++ % BEND.length] * (depth ? 1 : 0.6);
+        const ex = px + Math.cos(ang + bend) * len, ey = py + Math.sin(ang + bend) * len;
+        const mid = [
+          px + Math.cos(ang + bend * 0.35) * len * 0.55,
+          py + Math.sin(ang + bend * 0.35) * len * 0.55
+        ];
+        out += fill(ribbon([[px, py], mid, [ex, ey]], (t) => hw * (1 - 0.42 * t)));
+        if (depth <= 0) {
+          out += fan(ex, ey, ang + bend, hw, 4);
+          return;
+        }
+        const s = SPREAD[depth % SPREAD.length];
+        limb(ex, ey, ang + bend - s, len * 0.72, hw * 0.66, depth - 1);
+        limb(ex, ey, ang + bend + s * 0.8, len * 0.8, hw * 0.7, depth - 1);
+      };
+      const UP = -Math.PI / 2;
+      const rootX = x + w * 0.58, rootY = y + h * 1.03;
+      const trunkLen = h * 0.3, trunkHW = w * 0.135;
+      const tipX = rootX - w * 0.14, tipY = rootY - trunkLen;
+      out += fill(ribbon([
+        [rootX, rootY],
+        [rootX + w * 0.04, rootY - trunkLen * 0.5],
+        [tipX, tipY]
+      ], (t) => trunkHW * (1 - 0.28 * t)));
+      limb(tipX, tipY, UP - 0.42, h * 0.24, trunkHW * 0.74, 2);
+      limb(tipX, tipY, UP + 0.34, h * 0.26, trunkHW * 0.78, 2);
+      limb(rootX + w * 0.02, rootY - trunkLen * 0.42, UP - 0.95, h * 0.13, trunkHW * 0.52, 0);
+      limb(rootX + w * 0.03, rootY - trunkLen * 0.2, UP + 1.02, h * 0.11, trunkHW * 0.48, 0);
       return { veil: out, over: "" };
     }
     if (kind === "mesh") {
@@ -2257,7 +2234,7 @@ ${body}
     };
     const poly = (pts, cont) => pts.map(([px, py], i) => `${i ? "L" : cont ? "L" : "M"} ${n2(px)} ${n2(py)}`).join(" ");
     if (kind === "grid") {
-      const cols = w / h >= 0.75 ? 4 : w / h >= 0.4 ? 3 : 2;
+      const cols = w / h >= 0.75 ? 4 : w / h >= 0.38 ? 3 : 2;
       const rows = Math.max(2, Math.min(6, Math.round(cols * h / (w * 1.75))));
       const sw = Math.max(3, w / cols * 0.09);
       const out = [];
@@ -2278,10 +2255,10 @@ ${body}
       const rows = [y + h - m - Bh];
       if (two) rows.push(y + m + Bh);
       const out = borderGrid(m, rows, b);
-      const block = (bx, by, S) => {
-        const rib = S * 0.046;
+      const block = (bx, by, S2) => {
+        const rib = w * 0.022 * 0.65;
         const piece = (mx, my) => {
-          const P = (u, v) => [bx + (mx > 0 ? u : 1 - u) * S, by + (my > 0 ? v : 1 - v) * S];
+          const P = (u, v) => [bx + (mx > 0 ? u : 1 - u) * S2, by + (my > 0 ? v : 1 - v) * S2];
           const dir = mx * my;
           const [ex, ey] = P(0.31, 0.11);
           const [ox, oy] = P(0.09, 0.28);
@@ -2294,8 +2271,9 @@ ${body}
         };
         return [[1, 1], [-1, 1], [1, -1], [-1, -1]].map(([mx, my]) => ink(piece(mx, my), rib)).join("");
       };
+      const S = Bw * 0.86;
       const tops = two ? [y + m, y + h - m - Bh] : [y + h - m - Bh];
-      for (const ty of tops) out.push(block(x + m, ty + (Bh - Bw) / 2, Bw));
+      for (const ty of tops) out.push(block(x + m + (Bw - S) / 2, ty + (Bh - S) / 2, S));
       return out.join("");
     }
     if (kind === "quatrefoil") {
@@ -2310,8 +2288,8 @@ ${body}
         out.push(line(x + w - 2 * u, gy, x + w, gy, b));
       }
       const p = w * 0.8;
-      let n = Math.max(2, Math.round(h / p) - 1);
-      while (n > 2 && (h - (n - 1) * p) / 2 < w * 0.45) n--;
+      let n = Math.max(2, Math.round((h - w * 1.5) / p) + 1);
+      while (n > 2 && (h - (n - 1) * p) / 2 < w * 0.3) n--;
       const cx = x + w / 2;
       for (let i = 0; i < n; i++) {
         const cy = y + h / 2 + (i - (n - 1) / 2) * p;
@@ -2321,7 +2299,7 @@ ${body}
           out.push(solid(`M ${n2(lx - lw)} ${n2(cy)} Q ${n2(lx)} ${n2(cy - lh)} ${n2(lx + lw)} ${n2(cy)}
                         Q ${n2(lx)} ${n2(cy + lh)} ${n2(lx - lw)} ${n2(cy)} Z`, lh));
         }
-        const hw = w * 0.062, hh = w * 0.09, bow = w * 0.01;
+        const hw = w * 0.05, hh = w * 0.074, bow = w * 0.01;
         out.push(solid(`M ${n2(cx)} ${n2(cy - hh)}
                       Q ${n2(cx + hw - bow)} ${n2(cy - hh + bow)} ${n2(cx + hw)} ${n2(cy)}
                       Q ${n2(cx + hw - bow)} ${n2(cy + hh - bow)} ${n2(cx)} ${n2(cy + hh)}
@@ -2335,7 +2313,7 @@ ${body}
             cy + sy * hh,
             1,
             sx * sy
-          )), w * 0.022));
+          )), w * 0.017));
           out.push(ink(poly(curl(
             cx + sx * w * 0.11,
             cy + sy * w * 0.075,
@@ -2343,7 +2321,7 @@ ${body}
             cy,
             1,
             -sx * sy
-          )), w * 0.022));
+          )), w * 0.017));
         }
         if (i < n - 1) {
           const gap = p, top = cy + w * 0.19;
@@ -2366,7 +2344,6 @@ ${body}
       const sw = Math.max(5, w * 0.033);
       const out = [];
       out.push(line(x, V(0.409), x + w, V(0.409), sw));
-      out.push(line(U(0.5), V(0.404), U(0.5), y + h, sw));
       out.push(line(x, V(0.693), x + w, V(0.693), sw));
       out.push(line(x, V(0.846), x + w, V(0.846), sw));
       const arc = (x0, v0, cx0, cv, x1, v1) => ink(`M ${n2(U(x0))} ${n2(V(v0))} Q ${n2(U(cx0))} ${n2(V(cv))} ${n2(U(x1))} ${n2(V(v1))}`, sw);
@@ -2640,7 +2617,7 @@ ${body}
              whole of the standoff anyone is allowed to draw. -->
         ${POST.map((t) => `
         <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#nickelSoft)"/>
-        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.22"/>`).join("")}
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.10"/>`).join("")}
 
         <!-- Outboard stems, visibly thinner than the shaft; then the terminal
              beads, which is what every one of these doors ends in. -->
@@ -2667,8 +2644,8 @@ ${body}
         ${POST.map((t) => `
         <ellipse cx="${n1(P(t))}" cy="${n1(by)}" rx="${n1(D * 0.675)}" ry="${n1(D * 0.725)}"
                  fill="url(#nickel)"/>
-        <ellipse cx="${n1(P(t) - D * 0.18)}" cy="${n1(by - D * 0.22)}" rx="${n1(D * 0.22)}"
-                 ry="${n1(D * 0.26)}" fill="#fff" opacity="0.40"/>`).join("")}
+        <ellipse cx="${n1(P(t) - D * 0.16)}" cy="${n1(by - D * 0.26)}" rx="${n1(D * 0.34)}"
+                 ry="${n1(D * 0.17)}" fill="#fff" opacity="0.32"/>`).join("")}
       </g>
     </g>`;
   }
@@ -2684,11 +2661,11 @@ ${body}
     // The slim rod: d072 at 0.017 of leaf width, d035 at 0.022, d074 at 0.024.
     ron: { tone: "barTube", rx: 0.3, fix: { t: [0.1, 0.9] } },
     // Flat strap, standard width — d049, d066, d034, d104.
-    nitzan: { tone: "barStrap", rx: 0.05, fix: { t: [0.1, 0.89] } },
+    nitzan: { tone: "barStrap", rx: 0.02, fix: { t: [0.1, 0.89] } },
     // Flat strap, long — d060 runs 0.60 of leaf height against d049's 0.45.
-    shahar: { tone: "barStrap", rx: 0.04, fix: { t: [0.15, 0.85] } },
+    shahar: { tone: "barStrap", rx: 0.02, fix: { t: [0.15, 0.85] } },
     // Flat strap, wide — d073, the one bar in the corpus past 0.07 of leaf width.
-    blade: { tone: "barStrap", rx: 0.05, fix: { t: [0.09, 0.95] } }
+    blade: { tone: "barStrap", rx: 0.03, fix: { t: [0.09, 0.95] } }
   };
   function pullBar(cx, cy, handle, leafH, panelled) {
     const spec = BARS[handle.bar] || BARS.idan;
@@ -2698,8 +2675,8 @@ ${body}
     const at = (t) => top + L * t;
     const feet = spec.fix.t.map((t) => `
       <ellipse cx="${(cx + w * 0.55).toFixed(1)}" cy="${(at(t) + w * 0.45).toFixed(1)}"
-               rx="${(w * 0.75).toFixed(1)}" ry="${(w * 0.75).toFixed(1)}"
-               fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`).join("");
+               rx="${(w * 0.7).toFixed(1)}" ry="${(w * 0.7).toFixed(1)}"
+               fill="#000" opacity="0.17" filter="url(#hwShadow)"/>`).join("");
     return `
     <g>
       <rect x="${(cx - w / 2 + w * 0.55).toFixed(1)}" y="${(top + w * 0.45).toFixed(1)}"
