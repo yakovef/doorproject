@@ -57,7 +57,7 @@ const cases = [];
 for (const h of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
   for (const sz of ['standard', 'narrow', 'wide']) for (const hd of ['right-in', 'left-in']) {
     const st = {
-      colour: 'rb-0097d', window: w.id, glazing: 'clear', grille: 'none',
+      colour: 'rb-0097d', window: w.id, grille: 'none',
       handle: h.id, lockset: k.id, detail: 'plain',
       size: sz, handing: hd,
     };
@@ -78,7 +78,7 @@ if (deep) {
   for (const d of DETAILS) for (const w of WINDOWS)
     for (const sz of ['standard', 'narrow', 'wide']) for (const hd of ['right-in', 'left-in']) {
       const st = {
-        colour: 'rb-0097d', window: w.id, glazing: 'clear', grille: 'none',
+        colour: 'rb-0097d', window: w.id, grille: 'none',
         handle: 'idan', lockset: 'cylinder', detail: d.id,
         size: sz, handing: hd,
       };
@@ -96,7 +96,7 @@ if (boxes) {
      the drawing rather than the drawing checked against a guess. */
   const rows = await p.evaluate(({ handles, locksets }) => {
     const host = document.getElementById('stage');
-    const base = { colour: 'rb-0097d', window: 'none', glazing: 'clear', grille: 'none',
+    const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
                    handle: 'none', lockset: 'coral', detail: 'plain',
                    size: 'standard', handing: 'right-in' };
     const out = [];

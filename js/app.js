@@ -28,12 +28,12 @@
  */
 
 import {
-  byId, COLOURS, DETAILS, GLAZINGS,
+  byId, COLOURS, DETAILS,
   GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import {
-  describe, detailGlyph, glazingGlyph, gripAt, gripCanRotate, gripHome,
+  describe, detailGlyph, gripAt, gripCanRotate, gripHome,
   gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
   render, sizeGlyph, windowGlyph,
 } from './renderer.js';
@@ -69,11 +69,7 @@ const GROUPS = [
   { key: 'window', title: 'חלון', in: 'glass', kind: 'tile', list: () => WINDOWS,
     glyph: windowGlyph },
 
-  { key: 'glazing', title: 'זכוכית', in: 'glass', kind: 'sq', list: () => GLAZINGS,
-    glyph: glazingGlyph,
-    hint: 'מה רואים דרך הזכוכית. מעוצבת ומחורצת מכניסות אור בלי מראה החוצה.' },
-
-  { key: 'grille', title: 'סורג', in: 'glass', kind: 'sq', list: () => GRILLES,
+  { key: 'grille', title: 'עיצוב החלון', in: 'glass', kind: 'sq', list: () => GRILLES,
     glyph: grilleGlyph },
 
   { key: 'handle', title: 'ידית משיכה', in: 'hw', kind: 'hw', list: () => HANDLES,
@@ -97,7 +93,8 @@ const GROUPS = [
  * BIGGER questions, each one something a customer already has an opinion about
  * before they arrive. "What colour, and does it have panels" is one thought.
  * "Does it have glass, and what kind" is another. Nobody arrives with an
- * opinion about `glazing` as distinct from `grille`.
+ * opinion about the glass as distinct from the grille — which is why there is
+ * one list for what is in the window now, and not two.
  *
  * Four is also as far as this can usefully fold: a section holding one
  * category is a click that reveals a click, which is worse than the list it
@@ -389,7 +386,6 @@ function paint() {
   const grille = byId(GRILLES, state.grille);
   $('#summary').textContent = [
     colour.he, `RAL ${colour.ral}`, win.he,
-    ...(win.rects.length && state.glazing !== 'clear' ? [byId(GLAZINGS, state.glazing).he] : []),
     ...(win.rects.length && grille.id !== 'none' ? [grille.he] : []),
     ...(byId(HANDLES, state.handle).style === 'none' ? [] : [byId(HANDLES, state.handle).he]),
     byId(LOCKSETS, state.lockset).he,

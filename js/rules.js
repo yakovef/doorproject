@@ -51,9 +51,9 @@
  * state the interface would not let you build.
  */
 
-import { byId, DETAILS, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
-         gripPlacement, nearestGrip } from './renderer.js';
+         gripPlacement, nearestGrip, panelFits } from './renderer.js';
 
 /** Does this detail put ruled line work on the face? */
 export const isLineWork = detail => !!(detail.strips || detail.groove);
@@ -123,7 +123,7 @@ export function conflicts(state) {
   const onLeaf = leafGlazed(state);
   const lined = isLineWork(byId(DETAILS, state.detail));
 
-  const out = { window: {}, glazing: {}, grille: {}, detail: {}, handle: {},
+  const out = { window: {}, grille: {}, detail: {}, handle: {},
                 lockset: {}, size: {}, colour: {}, handing: {} };
   const grip = byId(HANDLES, state.handle);
 
@@ -131,10 +131,9 @@ export function conflicts(state) {
      A grip supplied in one finish only — Shiran, antique brass — is now simply
      drawn in it, because there is no longer a choice for it to contradict. */
 
-  /* A grille and a glass treatment both need glass to be applied to. */
+  /* Ironwork and worked glass alike need a window to be in. */
   if (!glazed) {
     for (const g of GRILLES) if (g.id !== 'none') out.grille[g.id] = 'דורש חלון';
-    for (const z of GLAZINGS) if (z.id !== 'clear') out.glazing[z.id] = 'דורש חלון';
   }
 
   /* A WINDOW TAKES THE UPPER PANEL'S PLACE.
@@ -159,6 +158,18 @@ export function conflicts(state) {
   if (onLeaf) {
     for (const d of DETAILS) if (d.panels === 2) {
       out.detail[d.id] = 'החלון תופס את מקומו של הפאנל העליון';
+    }
+    /* And a TALL light leaves no room for the lone one either. Same rule as
+       above, one step further: `appliedFrame` draws nothing at all when the
+       rectangle it is given is smaller than the moulding that goes round it,
+       and the price went on charging for the panel. The corpus says the same —
+       the three doors with an opening past 0.62 of leaf height carry no panel.
+       Asked of the drawing's own arithmetic, so it cannot drift. */
+    for (const d of DETAILS) {
+      if (!d.panel || out.detail[d.id]) continue;
+      if (!panelFits({ ...state, detail: d.id })) {
+        out.detail[d.id] = 'אין מקום לפאנל מתחת לחלון';
+      }
     }
   }
 
@@ -340,9 +351,9 @@ const SAID = {
   windowGone:    'הסרנו את החלון',
   lineWorkGone:  'הסרנו את קווי המתכת — לא משלבים אותם עם חלון',
   onePanel:      'עברנו לפאנל אחד — החלון תופס את מקומו של העליון',
+  noPanelRoom:   'הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום',
   faceCleared:   'החלקנו את הדלת — ידית שקועה דורשת פנים חלקות',
   grilleGone:    'הסרנו את הסורג — אין חלון',
-  glazingGone:   'החזרנו זכוכית שקופה — אין חלון',
   gripGone:      'הסרנו את ידית המשיכה — אין לה מקום כאן',
   locksetSwapped:'החלפנו את המנעול — אין לו מקום ליד המאחז',
   gripMoved:     'הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה',
@@ -377,11 +388,10 @@ export function repair(state, intent = null) {
   const said = [];
   const change = (group, why) => { changed.push(group); said.push(why); };
 
-  /* Asking for a grille or a glass treatment on a solid door means asking for
-     glass. Fix that first, and only if it was not the window itself that was
+  /* Asking for a grille or worked glass on a solid door means asking for a
+     window. Fix that first, and only if it was not the window itself that was
      just chosen. */
-  if (intent !== 'window' && !isGlazed(s)
-      && (s.grille !== 'none' || (s.glazing && s.glazing !== 'clear'))) {
+  if (intent !== 'window' && !isGlazed(s) && s.grille !== 'none') {
     s.window = 'rect';
     change('window', SAID.windowAdded);
   }
@@ -403,6 +413,12 @@ export function repair(state, intent = null) {
      customer just clicked wins. Clicking שני פאנלים on a glazed door means
      they want the pair, so the glass goes; arriving down a link means the
      glass stays and the price comes down by ₪140. */
+  /* No room under the glass for a panel of any kind: the face goes plain. */
+  if (leafGlazed(s) && byId(DETAILS, s.detail).panel && !panelFits(s)) {
+    if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
+    else { s.detail = 'plain'; change('detail', SAID.noPanelRoom); }
+  }
+
   if (leafGlazed(s) && byId(DETAILS, s.detail).panels === 2) {
     if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
     else {
@@ -492,11 +508,10 @@ export function repair(state, intent = null) {
      the obscure glass stayed behind with nothing left to be applied to — a
      door `repair` had just declared repaired and `conflicts` still refused.
      Taking the leaf's window away on a sidelight door is different: a glazed
-     panel is still standing beside it, so the grille and the glass treatment
-     the customer chose are still visible and still theirs. */
+     panel is still standing beside it, so the window design the customer chose
+     is still visible and still theirs. */
   if (!isGlazed(s)) {
     if (s.grille !== 'none') { s.grille = 'none'; change('grille', SAID.grilleGone); }
-    if (s.glazing && s.glazing !== 'clear') { s.glazing = 'clear'; change('glazing', SAID.glazingGone); }
   }
 
   return { state: s, changed, said };

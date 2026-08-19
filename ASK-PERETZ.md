@@ -42,8 +42,6 @@ gets this answered in thirty seconds; a definition does not.*
 **מנעול וידית:** קורל · רותם · כדור · ספיר · אלמוג · כדור על אורך ·
 ריבועי · מנעול חכם.
 
-**זכוכית:** שקופה · מעוצבת · מחורצת.
-
 > **"מנעול חכם — איזה דגם אתה מתקין, וכמה הוא עולה?"** (ראינו אותו על
 > חמש דלתות: d070 d081 d084 d087 d113 — נפוץ כמו הידית השקועה.)
 
@@ -90,10 +88,11 @@ Shiran already is.*
 מאפשר כל שילוב — פשוט מרחיקים את ידית המשיכה כדי שלא תתנגש. שאלה אליך: זה
 משהו שאתה מייצר?
 
-> **"חלון כפול (שני חלונות) על דלת צרה 80 ס\"מ — אתה בכלל מייצר את זה?"**
+> **"על דלת עם חלון רחב — יש בכלל מקום לידית משיכה אנכית?"**
 
-לפי המידות שלנו החלון החיצוני מגיע עד 10 ס\"מ מקצה הדלת, ושם יושב המנעול. אין
-מקום. חסמנו — אבל אם אתה כן מייצר את זה, זו שורה אחת לשנות.
+לפי המידות שלנו: בחלון הרחב (0.50 מרוחב הדלת) נשארים 14 ס\"מ של עמוד מכל צד,
+וזה בדיוק מה שהמנעול תופס. האתר מוריד את ידית המשיכה ואומר למה. אם אתה כן
+מרכיב שם ידית — או שהחלון הרחב שלך צר יותר — תגיד ונשנה מספר אחד.
 
 *The bar-versus-lever rule was added from the corpus and then withdrawn on the
 owner's instruction: move the bar, do not refuse the sale. That is the right
@@ -123,8 +122,54 @@ doors he installed, so this is a question rather than a colour to invent.*
 
 ## 4. חלונות וסורגים
 
-> **"אילו סוגי חלון אתה מזמין, ומה התוספת על כל אחד?"**
-> **"אילו סורגים?"**
+שלח את `screenshots/desktop.png`, `screenshots/grey.png` ו-`screenshots/panel.png`.
+
+> **"ארבע מידות חלון — אלה שאתה מזמין? מה התוספת על כל אחת?"**
+
+| החלון | המידה אצלנו | מהדלתות שלך |
+|---|---|---|
+| צוהר אנכי | 27×142 ס\"מ | d113 · d125 |
+| חלון מלבני | 36×90 ס\"מ | d099 · d108 · d116 · d122 |
+| חלון גבוה | 36×142 ס\"מ | d097 · d128 |
+| חלון רחב | 43×103 ס\"מ | d092 · d106 |
+
+*Cut from the ten hand-measured openings and NOT invented: the four clusters
+are 0.32×0.69, 0.42×0.44, 0.42×0.69 and 0.50×0.50 of the leaf. The double
+window is gone — the owner's son said flatly that there is no such thing on his
+father's doors, and re-reading all 128 photographs agreed: every glazed door
+has exactly ONE opening. `duo` and `square` resolve to the rectangle so an old
+link still opens a door.*
+
+> **"14 עיצובי חלון — אילו מהם אתה באמת מזמין, ומה התוספת על כל אחד?"**
+
+**סורג ברזל:** רשת · רשת עם מדליונים · ברזל מחושל · מדליוני פרח · קשת ·
+קווים גיאומטריים — וכל אחד מהם גם בגוון הדלת ולא רק בשחור.
+
+**זכוכית מעוצבת (בתוך השמשה, לא מעליה):** עיגולים שזורים · גפן · עץ ·
+זכוכית מעוצבת · זכוכית מחורצת.
+
+⚠ **המחירים כאן הם ניחוש.** אלה התוספות שהאתר מציג היום, ואף אחת מהן לא באה
+ממך:
+
+| | ₪ היום | | ₪ היום |
+|---|---|---|---|
+| רשת | 300 | מדליוני פרח | 520 |
+| רשת עם מדליונים | 460 | קשת | 380 |
+| ברזל מחושל | 620 | קווים גיאומטריים | 420 |
+| עיגולים שזורים | 300 | גפן · עץ | 340 |
+| זכוכית מעוצבת | 240 | זכוכית מחורצת | 280 |
+
+*One list, not two. There was a separate "glass" question — clear · obscured ·
+reeded — and it is gone at the owner's son's instruction. But five of the
+patterns in the photographs are etched INTO the pane rather than bolted over
+it (d106 d109 d111 d114 d122), so they moved here: the customer answers one
+question, "what does the window look like", which is the one they actually ask.
+Every entry above appears on at least one of his doors, deduplicated; there is
+no diagonal lattice anywhere in the gallery, which was ours.*
+
+⚠ *Three of his doors — d102, d116, d122 — carry a grille AND worked glass.
+One list means one choice, so on the site those are the grille. If he sells the
+combination, this is where it comes back.*
 
 ---
 
@@ -167,7 +212,7 @@ buying direct from the brand. His call, not ours.*
 | 1 | ימין/שמאל | correctness of every order |
 | 2 | which grips, which locksets | both hardware lists |
 | 3 | colours + prices | the colour list |
-| 4 | windows + prices | the window list |
+| 4 | windows + window designs + prices | the window list and the סורג list |
 | 5 | prices per size | every price shown |
 | 6 | distance | the price promise |
 | 7 | permission | the works gallery, and launch |

@@ -96,23 +96,42 @@ export const COLOURS = [
 ];
 
 /**
- * Window openings. `rects` are in mm, centred on the leaf unless `dx` shifts
- * them, measured from the top of the leaf. An empty list means a solid door.
+ * Window openings. `rects` are in mm, centred on the leaf, measured from the
+ * top of the leaf. An empty list means a solid door.
  *
- * Retuned against the ten glazed doors in research/works/data2. Every one puts
- * the glass markedly higher than we did — median top 0.085 of leaf height
- * against our 0.20-0.23 — and the median opening is 0.42 of leaf width by 0.50
- * of its height. `tallwin` was 0.58 tall, which on the corrected (slimmer)
- * leaf also left the lower panel 20 mm short of the room it needs, so the
- * renderer silently dropped the panel on every tallwin + panel combination.
+ * ── re-cut from the photographs, and one option deleted ──────────────
+ * Every glazed door on the works page was measured. Ten carry a window and
+ * EVERY ONE OF THEM HAS EXACTLY ONE OPENING — reported from the outside as
+ * "I can assure you that there is no double windows", and the records agree:
+ * `window.count` is 1 on all ten. `duo` was invented here. It is gone.
+ *
+ * What is left is the four sizes the ten doors actually cluster into, each
+ * backed by at least two of them (w and h as fractions of the leaf):
+ *
+ *   slot    d113 0.331x0.620   d125 0.304x0.760            -> 0.32 x 0.69
+ *   rect    d108 0.401x0.363   d099 0.429x0.454
+ *           d122 0.434x0.454   d116 0.405x0.487            -> 0.42 x 0.44
+ *   tall    d097 0.441x0.605   d128 0.402x0.781            -> 0.42 x 0.69
+ *   broad   d092 0.493x0.471   d106 0.509x0.518            -> 0.50 x 0.50
+ *
+ * `square` goes with `duo`: 0.32 by 0.13 of the leaf, a third of the height of
+ * the shortest real opening, and nothing in 128 photographs looks like it.
+ * Both ids stay reachable as aliases so a shared link still opens a door.
+ *
+ * Tops are measured too — 0.059 to 0.131, median 0.085 — and they are what
+ * puts the glass high on the leaf where the photographs put it.
  */
 export const WINDOWS = [
-  { id: 'none',   he: 'ללא חלון',       en: 'Solid',            delta: 0,      rects: [] },
-  { id: 'square', he: 'חלון מרובע',     en: 'Square',           delta: 45000,  rects: [{ w: 270, h: 270, top: 300 }] },
-  { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular',      delta: 62000,  rects: [{ w: 360, h: 740, top: 265 }] },
-  { id: 'strip',  he: 'צוהר אנכי',      en: 'Vertical slot',    delta: 58000,  rects: [{ w: 190, h: 900, top: 220 }] },
-  { id: 'duo',    he: 'שני חלונות',     en: 'Two lights',       delta: 74000,  rects: [{ w: 200, h: 230, top: 300, dx: -150 }, { w: 200, h: 230, top: 300, dx: 150 }] },
-  { id: 'tallwin',he: 'חלון גבוה',      en: 'Tall light',       delta: 88000,  rects: [{ w: 357, h: 1025, top: 175 }] },
+  { id: 'none',   he: 'ללא חלון',       en: 'Solid',         delta: 0,     rects: [] },
+  { id: 'strip',  he: 'צוהר אנכי',      en: 'Vertical slot', delta: 58000,
+    rects: [{ w: 272, h: 1415, top: 205 }] },
+  { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular',   delta: 62000,
+    aliases: ['square', 'duo'],
+    rects: [{ w: 357, h: 902, top: 185 }] },
+  { id: 'tallwin',he: 'חלון גבוה',      en: 'Tall light',    delta: 88000,
+    rects: [{ w: 357, h: 1415, top: 174 }] },
+  { id: 'broad',  he: 'חלון רחב',       en: 'Wide light',    delta: 92000,
+    rects: [{ w: 425, h: 1025, top: 158 }] },
 ];
 
 /**
@@ -261,25 +280,21 @@ export const LOCKSETS = [
     style: 'square', lever: true, lock: true },
 ];
 
-/**
- * Glazing — what the glass itself is, as opposed to the shape of the hole.
- *
- * A new axis, because it is orthogonal to everything else: any window shape
- * can be clear or obscured, with or without a grille over it. Six doors in the
- * corpus are obscured (d102 d104 d106 d109 d111 d114) and on every one of them
- * it is the most prominent single thing about the door — REALISM.md §7 had
- * already measured the corpus splitting cleanly into clear and obscured and
- * recorded it as "a product option we do not offer at all".
- *
- * Only meaningful when there is a window, exactly like the grille.
- */
-export const GLAZINGS = [
-  { id: 'clear',   he: 'זכוכית שקופה',  en: 'Clear',            delta: 0 },
-  /* Acid-etched or patterned: light through, no picture. */
-  { id: 'obscure', he: 'זכוכית מעוצבת', en: 'Obscured',         delta: 24000 },
-  /* Vertical flutes. Reads as a run of bright and dark bands, not as a haze. */
-  { id: 'reeded',  he: 'זכוכית מחורצת', en: 'Reeded',           delta: 28000 },
-];
+/* ── WITHDRAWN: the glass as its own choice ──────────────────────────
+   There was a GLAZINGS axis here — clear, obscured, reeded — priced and packed
+   into the short code. It is gone at the owner's son's instruction: "remove
+   entirely the category that I circled in red".
+
+   The PATTERNS it carried are not gone, because they are on his father's
+   doors. They moved into GRILLES, which is now one question — what is in the
+   window — with `glass: true` marking the ones that are in the pane rather
+   than bolted over it. Six doors carry worked glass (d102 d104 d106 d109 d111
+   d114) and on every one of them it is the most prominent thing about the
+   door; deleting it would have deleted them.
+
+   The parameter name `z` is retired for good. A link in somebody's WhatsApp
+   history still carries it and the parser must go on ignoring it rather than
+   reading it as something new. */
 
 /* ── WITHDRAWN: add-ons ──────────────────────────────────────────────
    There was a fifth-of-the-catalogue group here — peephole, letterplate, ring
@@ -297,33 +312,71 @@ export const GLAZINGS = [
    If any of them comes back, the drawings are in the git history at cf060ed
    and the bit positions above must not be reused for anything else. */
 
-/** Decorative iron grille over the glazing. Only meaningful with a window. */
+/**
+ * WHAT IS IN THE WINDOW — ironwork and worked glass in one list.
+ *
+ * ── why one list ─────────────────────────────────────────────────────
+ * This was two categories: a grille over the glass, and the glass itself. The
+ * owner's son deleted the glass one outright, and five of the patterns in the
+ * photographs are etched INTO the glass rather than bolted over it — the
+ * grapes on d109 and d111, the tree on d114, the circles on d106, the reeded
+ * flutes on d122. Dropping them would have deleted real doors from the site.
+ * So there is one question now, which is the one a customer actually asks:
+ * what does the window look like.
+ *
+ * ── read off all 128 photographs, deduplicated ───────────────────────
+ * His instruction was to copy what appears, even once, and not to count the
+ * same thing twice. Every glazed door on the works page is d089-d129; d001 to
+ * d088 carry no glass at all. What is there:
+ *
+ *   plain grid          d091 d100 d107 d110 d113 d117 d122
+ *   grid + medallions   d089 d093 d095 d097 d099 d102 d116
+ *   ornate ironwork     d090 d092 d101 d103 d108 d112 d119 d124 d128 d129
+ *   quatrefoil column   d104
+ *   arch / fan          d121
+ *   art-deco lines      d123
+ *   interlocking rings  d106
+ *   grape and vine      d109 d111
+ *   tree                d114
+ *   fine mesh           d102 d105 d116 d127
+ *   reeded              d122 d125
+ *   nothing at all      d094 d115 d125
+ *
+ * ⚠ AND NO DIAGONAL LATTICE ANYWHERE. `lattice` was ours. It resolves to the
+ * fine etched mesh, which is the closest thing that exists.
+ *
+ * `light` means the ironwork is the door's own colour rather than black —
+ * roughly as common as black across the gallery, so it is an axis and not a
+ * variant. `glass` means the pattern is IN the pane: no shadow, no relief, and
+ * a grille's rules about ironwork do not apply to it.
+ *
+ * ⚠ ONE THING THE MERGE COSTS, recorded rather than hidden: d102, d116 and
+ * d122 carry a grille AND worked glass. One list means one choice, so those
+ * doors are represented by their grille, which is the more visible half.
+ *
+ * Ids are a wire format. `bars` and `bars-light` were straight muntins, which
+ * is the plain grid; `lattice` was the invented diagonal. All three resolve.
+ */
 export const GRILLES = [
-  { id: 'none',    he: 'ללא סורג',   en: 'No grille',  delta: 0 },
-  { id: 'bars',    he: 'סורג ישר',   en: 'Straight',   delta: 22000 },
-  { id: 'lattice', he: 'סורג משבצות',en: 'Lattice',    delta: 30000 },
-  { id: 'scroll',  he: 'סורג מעוצב', en: 'Scrollwork', delta: 46000 },
-  /* Ours were all diagonal or straight; the measured doors are mostly an
-     ORTHOGONAL grid of squares, sometimes with a scroll motif set into it.
-     Appended rather than repurposing `lattice`, because both patterns are
-     real and a shared link must keep meaning what it meant. */
-  { id: 'grid',    he: 'סורג רשת',   en: 'Square grid', delta: 30000 },
-  /* Muntins in the door's OWN colour, not black. d097 is the clearest case:
-     white bars on a white door, legible only by their shadow, and drawing
-     them dark inverts the single most visible thing about that pane. Roughly
-     as common as ironwork across the glazed doors, so it is an axis rather
-     than a variant — `light` tells the renderer to take the leaf colour. */
-  { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', delta: 30000, light: true },
-  { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Scrollwork, door colour',  delta: 46000, light: true },
-  /* Plain straight muntins in the door's own colour, and it took a recreation
-     to notice they were unreachable. `grid` deliberately sets an ogee motif
-     into the mesh because d097 has one — but d100, d110 and d113 carry a bare
-     orthogonal grid with no ornament at all, and the only way to draw one was
-     `bars`, which is black ironwork. So a white door with white muntins, one
-     of the commonest glazed doors there is, could not be built.
-     Appended, not inserted: appending leaves every existing index alone, which
-     is the difference between a new option and a code VERSION bump. */
-  { id: 'bars-light',   he: 'סורג ישר בהיר',   en: 'Straight, door colour',    delta: 22000, light: true },
+  { id: 'none',    he: 'ללא סורג',       en: 'None',            delta: 0 },
+  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid',     delta: 30000, aliases: ['bars'] },
+  { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', delta: 30000, light: true, aliases: ['bars-light'] },
+  { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls', delta: 46000 },
+  { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Grid with scrolls, door colour', delta: 46000, light: true },
+  /* The heavy ornamental ironwork: bars with scrolled crowns and centres, no
+     grid behind it. The commonest thing in the luxury band. */
+  { id: 'iron',    he: 'ברזל מחושל',     en: 'Wrought iron',    delta: 62000 },
+  { id: 'iron-light',   he: 'ברזל מחושל בהיר', en: 'Wrought iron, door colour', delta: 62000, light: true },
+  /* The three that appear exactly once, kept at his instruction. */
+  { id: 'quatrefoil',   he: 'מדליוני פרח',     en: 'Quatrefoil column', delta: 52000 },
+  { id: 'arch',    he: 'קשת',            en: 'Arch',            delta: 38000 },
+  { id: 'deco',    he: 'קווים גיאומטריים', en: 'Art-deco lines', delta: 42000 },
+  /* Worked GLASS. In the pane, not on it. */
+  { id: 'circles', he: 'עיגולים שזורים', en: 'Interlocking rings', delta: 30000, glass: true },
+  { id: 'vine',    he: 'גפן',            en: 'Grape and vine',  delta: 34000, glass: true },
+  { id: 'tree',    he: 'עץ',             en: 'Tree',            delta: 34000, glass: true },
+  { id: 'mesh',    he: 'זכוכית מעוצבת',  en: 'Etched mesh',     delta: 24000, glass: true, aliases: ['lattice'] },
+  { id: 'reeded',  he: 'זכוכית מחורצת',  en: 'Reeded',          delta: 28000, glass: true },
 ];
 
 /**

@@ -21,6 +21,68 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **One question about the window instead of three, and all of it read off the
+  photographs.** Four instructions from the outside, in one message.
+  **The glazing axis is deleted.** "Remove it entirely, as I said" — `GLAZINGS`
+  (clear · obscured · reeded) is gone, with its group, its price and its two
+  bits in the short code. The parameter `z` is retired for good and `fromQuery`
+  must go on ignoring it: a link in somebody's WhatsApp history still carries
+  it, and reading it as something new would open a different door.
+  **What the glass carried is not gone, because it is on his father's doors.**
+  Five of the patterns in the gallery are etched INTO the pane rather than
+  bolted over it — the rings on d106, the grapes on d109 and d111, the tree on
+  d114, the flutes on d122 — and deleting them would have deleted those doors
+  from the site. They moved into `GRILLES`, which is now ONE list answering the
+  question a customer actually asks: what does the window look like. `glass:
+  true` marks the ones that are in the pane, where a grille's rules about
+  ironwork do not apply. ⚠ The cost, recorded rather than hidden: d102, d116
+  and d122 carry a grille AND worked glass, and one list means one choice, so
+  those three are represented by their grille.
+  **The list is read off all 128 photographs, deduplicated**, which is what was
+  asked for — copy what appears even once, never count the same thing twice.
+  Fourteen designs where there were seven, every one of them on a real door,
+  and **no diagonal lattice anywhere**: `lattice` was ours, invented, and it
+  resolves to the fine etched mesh, which is the closest thing that exists.
+  `bars`/`bars-light` were straight muntins, so they resolve to the plain grid.
+  **The windows are re-cut from the ten measured openings, and the double one
+  is gone.** "I can assure you that there is no double windows" — and the
+  records agree without qualification: `window.count` is 1 on all ten. `duo`
+  was invented, `square` was 0.13 of the leaf in height when the shortest real
+  opening is 0.36, and both now resolve to the rectangle. What is left is the
+  four clusters the ten doors fall into, each backed by at least two of them.
+  **And the panel takes the window's own edges.** "Make the size of windows and
+  plates the same so that they match" — `appliedFrame` aligns the panel to the
+  opening's outer edges on a glazed leaf. `faceObstacles` did not follow, and
+  `npm run collide` caught it within the hour: twelve doors where the rules
+  believed a moulding stood 19 mm from where the drawing had put it. That
+  cross-check exists for exactly this, and it was the second description of the
+  same rectangle drifting from the first.
+  **`VERSION` is 10** — the bit layout moved (glazing's 2 bits gone, grille
+  widened 4→5), so an older short code is refused with a notice rather than
+  decoded into a different door. Ids are aliased; INDICES cannot be.
+
+- **The two comparison sheets were describing a catalogue that no longer
+  existed.** `npm run shot` and `npm run recreate` between them named `z=`,
+  `f=`, `a=`, `g=lattice`, `g=bars`, `w=duo` — every one an alias or an ignored
+  key, so every one went on producing a valid door and nothing said a word.
+  Both sheets are re-cut against the records: the four glazed recreations get
+  the window their `window.rects` actually measure (d106 is `broad`, d113 is
+  `strip`, d122 is `rect` — they all said `tallwin`, because that was once the
+  only tall opening we had), and the twelve shots now name all four window
+  sizes and seven of the fourteen designs.
+  **Three "catalogue gaps" closed by the rebuild** and are gone from the sheet:
+  d113's 0.33-wide slot, d106's interlocking rings, and d097's scrolls set INTO
+  the grid rather than instead of it.
+  **And `recreate` had no repair check.** `shot` has asked "did the rules have
+  to change this door on the way in?" for two rounds; `recreate` did not, and it
+  was the tool that needed it more — a shot that arrives repaired is a layout
+  under the wrong name, but a recreation that arrives repaired is a comparison
+  against a door nobody built, which is the tool's entire output. d122 was
+  standing bar-less beside a photograph of a door with a 1056 mm bar down it.
+  Two queries also contradicted their own records: d078 and d122 both name
+  `lock.kind: "round-escutcheon"` and both were given a knob or a lever.
+  It exits non-zero now, like `shot`.
+
 - **Which grips can be turned, and what happens when none of them can.**
   Two things, both reported from the outside.
   `gripCanRotate` asked the CATALOGUE how long a grip is, and the catalogue

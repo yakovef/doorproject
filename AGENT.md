@@ -161,6 +161,26 @@ this repo was found.
 revert — never push red. `npm run build` before you commit, or the deployed
 bundle will not match the source.
 
+**A tool green on a query it no longer understands is not a passing tool.**
+`shot` and `recreate` build doors from query strings, and `fromQuery` is
+deliberately forgiving: it ignores keys it does not know and resolves retired
+ids through `aliases`. So both sheets went on printing "clean" for three rounds
+while naming a glazing axis that had been deleted, a lattice grille that never
+existed, and a double window nobody builds. Nothing was broken; the tools had
+simply stopped describing the site.
+
+Two habits close that gap, and both are cheap:
+
+- **When you retire an id or a key, grep the tools for it.** The catalogue's
+  aliases exist to keep a CUSTOMER's link working. They are not there to spare
+  you from updating a fixture, and a fixture that survives on an alias is a
+  fixture that is testing history.
+- **Ask every fixture whether the rules had to repair it.** `fromQuery`
+  returns a `notice` and both sheets now fail on it. Without that check a door
+  arrives silently altered and the sheet photographs something nobody chose —
+  which on `recreate` means the whole output, a list of differences between his
+  door and ours, is measured against a door that is not ours either.
+
 ---
 
 ## Doing nothing is a good answer

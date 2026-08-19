@@ -2,8 +2,13 @@ node_modules/
 .DS_Store
 research/works/works.mhtml
 
-# scratch harnesses, not part of the toolkit
+# Scratch harnesses, not part of the toolkit. A round that reads the
+# photographs writes a handful of throwaway contact-sheet scripts; what is
+# worth keeping from them is the READING, which goes into the catalogue
+# comments and ASK-PERETZ.md. The root pattern is here because the last round's
+# five landed there and sat in `git status` for a week.
 tools/_*.mjs
+/_*.mjs
 
 # Contact sheets: 17 MB, and every one is a pure function of the photographs
 # plus `npm run triage`. What is worth keeping from that pass is the READING

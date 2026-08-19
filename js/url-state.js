@@ -8,7 +8,7 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, DETAILS, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
 /* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
@@ -43,12 +43,19 @@ import { repair } from './rules.js';
    became "lever + horizontal grab bar", which is what the installations
    actually show). Bumping rather than reusing means an older code is refused
    with a notice instead of quietly decoding into a different door. */
-export const VERSION = 9;
+/* 10: THREE things moved at once, and any one of them alone would have needed
+   this. The glass stopped being its own axis — `z` is retired and its two bits
+   are gone. The window list lost `duo` and `square`, which no door in 128
+   photographs has, so every window index after them shifted. And the grille
+   list went from eight entries to fifteen, because the glass patterns moved
+   into it. A version-9 code read under this layout is a different door, so it
+   is refused with a notice.
+   `z` joins `f` and `a` in retirement: never reuse the letter. */
+export const VERSION = 10;
 
 export const DEFAULTS = {
   colour:  'rb-0097d',
   window:  'rect',
-  glazing: 'clear',
   grille:  'none',
   handle:  'idan',
   /* CYLINDER, not the lever it was. The default door carries a pull bar, and
@@ -72,7 +79,6 @@ export function toQuery(state) {
   p.set('v', String(VERSION));
   p.set('c', state.colour);
   p.set('w', state.window);
-  p.set('z', state.glazing);
   p.set('g', state.grille);
   p.set('n', state.handle);
   p.set('k', state.lockset);
@@ -124,7 +130,6 @@ export function fromQuery(search) {
 
   take('colour', 'c', COLOURS);
   take('window', 'w', WINDOWS);
-  take('glazing', 'z', GLAZINGS);
   take('grille', 'g', GRILLES);
   take('handle', 'n', HANDLES);
   take('lockset', 'k', LOCKSETS);
@@ -211,26 +216,30 @@ function settle(state, notice) {
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
 /* Capacities against what is used today:
-     version 16 / 9      colour  64 / 17     size     8 / 6
-     handing  4 / 2      window  16 / 6      grille   16 / 7
+     version 16 / 10     colour  64 / 17     size     8 / 6
+     handing  4 / 2      window  16 / 5      grille   32 / 15
      handle  16 / 10     lockset 16 / 10     detail   16 / 9
-     glazing  4 / 3
    Every one has room, which is the point of keeping any: a field that
    overflows does not throw. An eighth grille in three bits would have been
    stored as grille 0 — the customer picks scrollwork, reads the code down the
    phone, and Peretz builds a door with no grille. Not an error, not a refusal,
    just a different door.
 
-   The finish's 3 bits and the add-ons' 5-bit MASK came out when those groups
-   were withdrawn, taking the code from 45 bits to 37 and from nine characters
-   to eight. Both are gone from the layout entirely rather than left as dead
-   zeroes: a reserved field nobody writes is a field somebody eventually
-   reuses, and the VERSION is what protects the old codes, not the padding. */
-const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4, grille: 4,
-               handle: 4, lockset: 4, detail: 4, glazing: 2 };
-/* 37 bits, which does not divide by 5 — so the code carries 40 and the top
-   three are always zero. Rounding UP is the only safe direction: truncating to
-   seven characters would drop the low bits of the glazing. */
+   ⚠ THE GRILLE FIELD IS FIVE BITS NOW. It was four, and the list has just gone
+   from eight entries to fifteen — one more and four bits would have silently
+   stored the fifteenth as the first. Widened while the layout was being re-cut
+   anyway, which is the cheap moment to do it.
+
+   The glazing's 2 bits came out with the axis, as the finish's 3 and the
+   add-ons' 5-bit MASK did before them. Gone from the layout entirely rather
+   than left as dead zeroes: a reserved field nobody writes is a field somebody
+   eventually reuses, and the VERSION is what protects the old codes, not the
+   padding. */
+const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4, grille: 5,
+               handle: 4, lockset: 4, detail: 4 };
+/* 36 bits, which does not divide by 5 — so the code carries 40 and the top
+   four are always zero. Rounding UP is the only safe direction: truncating
+   would drop the low bits of the last field. */
 const TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
 const PAD_BITS = TOTAL_BITS - Object.values(BITS).reduce((a, b) => a + b, 0);
 
@@ -246,7 +255,6 @@ export function encodeCode(state) {
     [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
     [Math.max(0, LOCKSETS.findIndex(k => k.id === state.lockset)), BITS.lockset],
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
-    [Math.max(0, GLAZINGS.findIndex(z => z.id === state.glazing)), BITS.glazing],
     [0, PAD_BITS],                       // to the next whole character
   ];
 
@@ -297,13 +305,11 @@ export function decodeCode(code) {
   const handle  = HANDLES[read(BITS.handle)];
   const lockset = LOCKSETS[read(BITS.lockset)];
   const detail  = DETAILS[read(BITS.detail)];
-  const glazing = GLAZINGS[read(BITS.glazing)];
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail || !glazing) return null;
+      || !detail) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
-    glazing: glazing.id,
   };
 }

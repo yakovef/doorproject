@@ -47,11 +47,35 @@
   ];
   var WINDOWS = [
     { id: "none", he: "ללא חלון", en: "Solid", delta: 0, rects: [] },
-    { id: "square", he: "חלון מרובע", en: "Square", delta: 45e3, rects: [{ w: 270, h: 270, top: 300 }] },
-    { id: "rect", he: "חלון מלבני", en: "Rectangular", delta: 62e3, rects: [{ w: 360, h: 740, top: 265 }] },
-    { id: "strip", he: "צוהר אנכי", en: "Vertical slot", delta: 58e3, rects: [{ w: 190, h: 900, top: 220 }] },
-    { id: "duo", he: "שני חלונות", en: "Two lights", delta: 74e3, rects: [{ w: 200, h: 230, top: 300, dx: -150 }, { w: 200, h: 230, top: 300, dx: 150 }] },
-    { id: "tallwin", he: "חלון גבוה", en: "Tall light", delta: 88e3, rects: [{ w: 357, h: 1025, top: 175 }] }
+    {
+      id: "strip",
+      he: "צוהר אנכי",
+      en: "Vertical slot",
+      delta: 58e3,
+      rects: [{ w: 272, h: 1415, top: 205 }]
+    },
+    {
+      id: "rect",
+      he: "חלון מלבני",
+      en: "Rectangular",
+      delta: 62e3,
+      aliases: ["square", "duo"],
+      rects: [{ w: 357, h: 902, top: 185 }]
+    },
+    {
+      id: "tallwin",
+      he: "חלון גבוה",
+      en: "Tall light",
+      delta: 88e3,
+      rects: [{ w: 357, h: 1415, top: 174 }]
+    },
+    {
+      id: "broad",
+      he: "חלון רחב",
+      en: "Wide light",
+      delta: 92e3,
+      rects: [{ w: 425, h: 1025, top: 158 }]
+    }
   ];
   var HANDLES = [
     { id: "none", he: "ללא ידית משיכה", en: "No pull", delta: 0, len: 0, style: "none" },
@@ -229,39 +253,26 @@
       lock: true
     }
   ];
-  var GLAZINGS = [
-    { id: "clear", he: "זכוכית שקופה", en: "Clear", delta: 0 },
-    /* Acid-etched or patterned: light through, no picture. */
-    { id: "obscure", he: "זכוכית מעוצבת", en: "Obscured", delta: 24e3 },
-    /* Vertical flutes. Reads as a run of bright and dark bands, not as a haze. */
-    { id: "reeded", he: "זכוכית מחורצת", en: "Reeded", delta: 28e3 }
-  ];
   var GRILLES = [
-    { id: "none", he: "ללא סורג", en: "No grille", delta: 0 },
-    { id: "bars", he: "סורג ישר", en: "Straight", delta: 22e3 },
-    { id: "lattice", he: "סורג משבצות", en: "Lattice", delta: 3e4 },
-    { id: "scroll", he: "סורג מעוצב", en: "Scrollwork", delta: 46e3 },
-    /* Ours were all diagonal or straight; the measured doors are mostly an
-       ORTHOGONAL grid of squares, sometimes with a scroll motif set into it.
-       Appended rather than repurposing `lattice`, because both patterns are
-       real and a shared link must keep meaning what it meant. */
-    { id: "grid", he: "סורג רשת", en: "Square grid", delta: 3e4 },
-    /* Muntins in the door's OWN colour, not black. d097 is the clearest case:
-       white bars on a white door, legible only by their shadow, and drawing
-       them dark inverts the single most visible thing about that pane. Roughly
-       as common as ironwork across the glazed doors, so it is an axis rather
-       than a variant — `light` tells the renderer to take the leaf colour. */
-    { id: "grid-light", he: "סורג רשת בהיר", en: "Square grid, door colour", delta: 3e4, light: true },
-    { id: "scroll-light", he: "סורג מעוצב בהיר", en: "Scrollwork, door colour", delta: 46e3, light: true },
-    /* Plain straight muntins in the door's own colour, and it took a recreation
-       to notice they were unreachable. `grid` deliberately sets an ogee motif
-       into the mesh because d097 has one — but d100, d110 and d113 carry a bare
-       orthogonal grid with no ornament at all, and the only way to draw one was
-       `bars`, which is black ironwork. So a white door with white muntins, one
-       of the commonest glazed doors there is, could not be built.
-       Appended, not inserted: appending leaves every existing index alone, which
-       is the difference between a new option and a code VERSION bump. */
-    { id: "bars-light", he: "סורג ישר בהיר", en: "Straight, door colour", delta: 22e3, light: true }
+    { id: "none", he: "ללא סורג", en: "None", delta: 0 },
+    { id: "grid", he: "סורג רשת", en: "Square grid", delta: 3e4, aliases: ["bars"] },
+    { id: "grid-light", he: "סורג רשת בהיר", en: "Square grid, door colour", delta: 3e4, light: true, aliases: ["bars-light"] },
+    { id: "scroll", he: "סורג מעוצב", en: "Grid with scrolls", delta: 46e3 },
+    { id: "scroll-light", he: "סורג מעוצב בהיר", en: "Grid with scrolls, door colour", delta: 46e3, light: true },
+    /* The heavy ornamental ironwork: bars with scrolled crowns and centres, no
+       grid behind it. The commonest thing in the luxury band. */
+    { id: "iron", he: "ברזל מחושל", en: "Wrought iron", delta: 62e3 },
+    { id: "iron-light", he: "ברזל מחושל בהיר", en: "Wrought iron, door colour", delta: 62e3, light: true },
+    /* The three that appear exactly once, kept at his instruction. */
+    { id: "quatrefoil", he: "מדליוני פרח", en: "Quatrefoil column", delta: 52e3 },
+    { id: "arch", he: "קשת", en: "Arch", delta: 38e3 },
+    { id: "deco", he: "קווים גיאומטריים", en: "Art-deco lines", delta: 42e3 },
+    /* Worked GLASS. In the pane, not on it. */
+    { id: "circles", he: "עיגולים שזורים", en: "Interlocking rings", delta: 3e4, glass: true },
+    { id: "vine", he: "גפן", en: "Grape and vine", delta: 34e3, glass: true },
+    { id: "tree", he: "עץ", en: "Tree", delta: 34e3, glass: true },
+    { id: "mesh", he: "זכוכית מעוצבת", en: "Etched mesh", delta: 24e3, glass: true, aliases: ["lattice"] },
+    { id: "reeded", he: "זכוכית מחורצת", en: "Reeded", delta: 28e3, glass: true }
   ];
   var HANDINGS = [
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "left" },
@@ -313,7 +324,7 @@
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
     let total = size.base + colour.delta + win.delta + byId(HANDLES, state2.handle).delta + byId(LOCKSETS, state2.lockset).delta + byId(DETAILS, state2.detail).delta;
-    if (win.rects.length) total += grille.delta + byId(GLAZINGS, state2.glazing).delta;
+    if (win.rects.length) total += grille.delta;
     return Math.ceil(total / 500) * 500;
   }
   var fmt = new Intl.NumberFormat("he-IL", {
@@ -516,7 +527,6 @@
     const colour = byId(COLOURS, state2.colour);
     const handing = byId(HANDINGS, state2.handing);
     const win = byId(WINDOWS, state2.window);
-    const glazing = byId(GLAZINGS, state2.glazing);
     const grille = byId(GRILLES, state2.grille);
     const handle = byId(HANDLES, state2.handle);
     const lockset = byId(LOCKSETS, state2.lockset);
@@ -1248,7 +1258,6 @@
         paint: paint2,
         edge,
         grille,
-        glazing: glazing.id,
         key: "s",
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
       }) + (detail.panel ? appliedFrame(sideX, y0, sideW, leafH, paint2, pale, top + tall, false, 0, "s") : "");
@@ -1260,7 +1269,6 @@
       paint: paint2,
       edge,
       grille,
-      glazing: glazing.id,
       key: "s",
       leaf: { x: sideX, y: y0, w: sideW, h: leafH }
     }) : ""}</g>` : ""}
@@ -1270,7 +1278,19 @@
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint2, pale, winBottom, detail.panels === 2) : ""}
+    ${detail.panel ? appliedFrame(
+      mainX,
+      y0,
+      leafW,
+      leafH,
+      paint2,
+      pale,
+      winBottom,
+      detail.panels === 2,
+      0,
+      "m",
+      openings.length ? Math.min(...openings.map((o) => o.x)) - MOULD_BAND : null
+    ) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
     ${detail.strips ? metalStrips(
       mainX,
@@ -1295,7 +1315,6 @@
       paint: paint2,
       edge,
       grille,
-      glazing: glazing.id,
       key: "m" + i,
       leaf: { x: mainX, y: y0, w: leafW, h: leafH }
     })).join("")}
@@ -1410,9 +1429,9 @@ ${body}
   var PANEL_INSET = 0.23;
   var PANEL_INSET_MAX = 0.39;
   var PANEL_ROWS = { pair: [[0.07, 0.58], [0.66, 0.92]], lone: [0.68, 0.9] };
-  function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m") {
+  function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m", alignTo = null) {
     const band = MOULD_BAND;
-    const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
+    const inset = alignTo != null ? Math.max(0, alignTo) : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
     const x = lx + inset, w = lw - inset * 2;
     const leaf = { x: lx, y: ly, w: lw, h: lh };
     const rect = (t, b, n) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale, leaf, `p${key}${n}`);
@@ -1466,7 +1485,7 @@ ${body}
       h: o.h + MOULD_BAND * 2
     }));
     if (detail.panel) {
-      const inset = leafW * PANEL_INSET;
+      const inset = openings.length ? Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND) : leafW * PANEL_INSET;
       const winBottom = openings.length ? Math.max(...openings.map((o) => o.top + o.h)) : 0;
       const rows = detail.panels === 2 && !openings.length ? PANEL_ROWS.pair : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
       for (const [t, b] of rows) {
@@ -1483,6 +1502,19 @@ ${body}
     }
     return out;
   }, (st) => `${st.size}|${st.detail}|${st.window}`);
+  function panelFits(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const detail = byId(DETAILS, state2.detail);
+    if (!detail.panel) return true;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW);
+    if (!openings.length) return true;
+    const winBottom = Math.max(...openings.map((o) => o.top + o.h));
+    const top = Math.max(leafH * PANEL_ROWS.lone[0], winBottom + leafW * 0.08);
+    const bottom = leafH * PANEL_ROWS.lone[1];
+    const inset = Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND);
+    return leafW - inset * 2 > MOULD_BAND * 2.2 && bottom - top > MOULD_BAND * 2.2;
+  }
   var homeKey = (st) => `${st.size}|${st.handle}|${st.lockset}|${st.detail}|${st.window}|${st.handing}`;
   var HOME_CACHE = /* @__PURE__ */ new Map();
   function gripHome(state2) {
@@ -1710,7 +1742,78 @@ ${body}
       }
       return { veil: out, over: "" };
     }
-    if (kind === "obscure") {
+    if (kind === "circles") {
+      const cell = Math.max(40, Math.min(96, w / 3.4));
+      const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
+      const cw = w / cols, ch = h / rows;
+      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.44)}"/>`;
+      const ring = (cx, cy, r) => `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="none"
+               stroke="${scaleTone(paint2, 1.05)}" stroke-width="${(r * 0.17).toFixed(1)}"/>`;
+      for (let r = 0; r <= rows; r++) {
+        for (let c = 0; c <= cols; c++) {
+          const rr = Math.min(cw, ch) * 0.62;
+          out += ring(x + cw * c, y + ch * r, rr);
+          if (r < rows && c < cols) out += ring(x + cw * (c + 0.5), y + ch * (r + 0.5), rr);
+        }
+      }
+      return { veil: out, over: "" };
+    }
+    if (kind === "vine") {
+      const ink = scaleTone(paint2, 1.06);
+      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.46)}"/>`;
+      const n = Math.max(2, Math.round(h / (w * 1.15)));
+      for (let i = 0; i < n; i++) {
+        const cy = y + h * (i + 0.5) / n, cx = x + w * (i % 2 ? 0.62 : 0.38);
+        const r = Math.min(w * 0.11, h / (n * 5));
+        for (let row = 0; row < 4; row++) {
+          const per = 4 - row;
+          for (let k = 0; k < per; k++) {
+            const bx = cx + (k - (per - 1) / 2) * r * 2.05;
+            const by = cy + row * r * 1.75 - r;
+            out += `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${r.toFixed(1)}"
+                          fill="none" stroke="${ink}" stroke-width="${(r * 0.28).toFixed(1)}"/>`;
+          }
+        }
+        const sx = cx, sy = cy - r * 2.4;
+        out += `<path d="M ${sx} ${sy} c ${w * 0.1} ${-h * 0.06} ${w * 0.2} ${-h * 0.02}
+                       ${w * 0.16} ${-h * 0.09}" fill="none" stroke="${ink}"
+                    stroke-width="${(r * 0.3).toFixed(1)}" stroke-linecap="round"/>`;
+      }
+      return { veil: out, over: "" };
+    }
+    if (kind === "tree") {
+      const ink = scaleTone(paint2, 1.04);
+      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.42)}"/>`;
+      const bx = x + w * 0.3, by = y + h;
+      out += `<path d="M ${bx - w * 0.05} ${by} C ${bx - w * 0.02} ${y + h * 0.55}
+                     ${bx + w * 0.04} ${y + h * 0.4} ${bx + w * 0.02} ${y + h * 0.08}
+                     L ${bx + w * 0.1} ${y + h * 0.08}
+                     C ${bx + w * 0.1} ${y + h * 0.45} ${bx + w * 0.06} ${y + h * 0.6}
+                     ${bx + w * 0.09} ${by} Z" fill="${ink}"/>`;
+      for (const [t, reach, up, side] of [
+        [0.7, 0.6, 0.17, 1],
+        [0.6, 0.34, 0.12, -1],
+        [0.5, 0.55, 0.15, 1],
+        [0.4, 0.4, 0.13, -1],
+        [0.3, 0.62, 0.14, 1],
+        [0.2, 0.3, 0.1, -1],
+        [0.12, 0.44, 0.09, 1]
+      ]) {
+        const ex = bx + w * reach * side, ey = y + h * (t - up * 0.6);
+        out += `<path d="M ${bx + w * 0.03} ${y + h * t}
+                       Q ${bx + w * reach * 0.55 * side} ${y + h * (t - up)} ${ex} ${ey}"
+                    fill="none" stroke="${ink}" stroke-width="${(w * 0.03).toFixed(1)}"
+                    stroke-linecap="round"/>`;
+        for (const f of [0.45, 0.75]) {
+          const tx = bx + w * reach * f * side, ty = y + h * (t - up * f * 0.9);
+          out += `<path d="M ${tx} ${ty} q ${w * 0.05 * side} ${-h * 0.035}
+                         ${w * 0.11 * side} ${-h * 0.045}" fill="none" stroke="${ink}"
+                      stroke-width="${(w * 0.016).toFixed(1)}" stroke-linecap="round"/>`;
+        }
+      }
+      return { veil: out, over: "" };
+    }
+    if (kind === "mesh") {
       const cell = Math.max(26, Math.min(52, w / 6));
       const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
       const cw = w / cols, ch = h / rows;
@@ -1763,16 +1866,15 @@ ${body}
     paint: paint2,
     edge,
     grille,
-    glazing,
     key,
     leaf = null,
     splits = []
   }) {
-    const glass = glazingArt(glazing, x, y, w, h, paint2);
+    const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint2) : null;
     const M = MOULD_BAND;
     const id = `cl-${key}`;
     return `
-    <g data-pane="${key}" data-glazing="${glazing || "clear"}">
+    <g data-pane="${key}" data-glass="${grille.glass ? grille.id : "clear"}">
       ${moulding(
       x - M,
       y - M,
@@ -1814,8 +1916,14 @@ ${body}
            the same surface that has been etched away, which is exactly why
            those panes read as a lit panel rather than as a hole. -->
       ${glass ? "" : `<rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>`}
-      ${glass ? glass.veil : ""}
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
+      <!-- THE GLASS IS CUT TO THE HOLE, like the ironwork over it. The veil
+           used to be drawn unclipped, which was invisible while every pattern
+           was a rect exactly the size of the pane — and the moment one of them
+           had a figure that runs off the edge, d106's interlocking rings,
+           half a ring's worth of scallops appeared on the door beside the
+           opening. A pattern is in the glass; the glass stops at the frame. -->
+      <g clip-path="url(#${id})">${glass ? glass.veil : ""}</g>
       <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint2, 0.1) : null)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
@@ -1860,33 +1968,75 @@ ${body}
       const n = Math.max(2, Math.round(w / 90));
       return Array.from({ length: n - 1 }, (_, i) => bar(x + w * (i + 1) / n, y, x + w * (i + 1) / n, y + h)).join("");
     }
-    if (kind === "lattice") {
-      const step2 = 110, out = [];
-      for (let o = -h; o < w + h; o += step2) {
-        out.push(bar(x + o, y, x + o + h, y + h, 9));
-        out.push(bar(x + o, y + h, x + o + h, y, 9));
-      }
-      return out.join("");
-    }
-    if (kind === "grid") {
+    const mesh = () => {
       const step2 = Math.min(w, h) / Math.max(2, Math.round(Math.min(w, h) / 105));
       const out = [];
       for (let gx = x + step2; gx < x + w - 1; gx += step2) out.push(bar(gx, y, gx, y + h, 9));
       for (let gy = y + step2; gy < y + h - 1; gy += step2) out.push(bar(x, gy, x + w, gy, 9));
-      const rr = Math.min(w * 0.3, h * 0.075);
+      return out;
+    };
+    const iron = (d, sw = 9) => `
+      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28"
+            stroke-width="${sw}" transform="translate(3 3)"/>
+      <path d="${d}" fill="none" stroke="${body}" stroke-width="${sw}"
+            stroke-linecap="round"/>
+      <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.4"
+            stroke-width="${sw / 3}" transform="translate(-1.5 -1.5)"/>`;
+    if (kind === "grid") return mesh().join("");
+    if (kind === "scroll") {
+      const out = mesh();
+      const rr = Math.min(w * 0.2, h * 0.07);
       for (const t of [0.2, 0.8]) {
         const cy2 = y + h * t, cx2 = x + w / 2;
-        const d = `M ${cx2 - rr * 2} ${cy2} a ${rr} ${rr} 0 1 1 ${rr * 2} 0
-                 a ${rr} ${rr} 0 1 0 ${rr * 2} 0`;
-        out.push(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28"
-                      stroke-width="9" transform="translate(3 3)"/>
-                <path d="${d}" fill="none" stroke="${body}" stroke-width="9"/>
-                <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.4"
-                      stroke-width="3" transform="translate(-1.5 -1.5)"/>`);
+        out.push(iron(`M ${cx2 - rr * 2} ${cy2} a ${rr} ${rr} 0 1 1 ${rr * 2} 0
+                     a ${rr} ${rr} 0 1 0 ${rr * 2} 0`));
       }
       return out.join("");
     }
-    if (kind === "scroll") {
+    if (kind === "quatrefoil") {
+      const out = [
+        bar(x + w * 0.28, y, x + w * 0.28, y + h, 8),
+        bar(x + w * 0.72, y, x + w * 0.72, y + h, 8)
+      ];
+      const n = Math.max(3, Math.round(h / (w * 0.9)));
+      const rr = Math.min(w * 0.17, h / (n * 3));
+      for (let i = 0; i < n; i++) {
+        const cy2 = y + h * (i + 0.5) / n, cx2 = x + w / 2;
+        out.push(bar(x, cy2, x + w, cy2, 7));
+        for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+          out.push(iron(`M ${cx2} ${cy2} q ${dx * rr - dy * rr * 0.7} ${dy * rr + dx * rr * 0.7}
+                       ${dx * rr * 2} ${dy * rr * 2}
+                       q ${-dx * rr + dy * rr * 0.7} ${-dy * rr - dx * rr * 0.7}
+                       ${-dx * rr * 2} ${-dy * rr * 2}`, 6));
+        }
+      }
+      return out.join("");
+    }
+    if (kind === "arch") {
+      const out = mesh();
+      const cy2 = y + h * 0.3;
+      for (const k of [1, 0.78, 0.6]) {
+        const r = Math.max(w * 0.5, w * 0.78 * k);
+        const rise = h * 0.16 * k;
+        out.push(iron(`M ${x} ${cy2} Q ${x + w / 2} ${cy2 - rise} ${x + w} ${cy2}`, 8));
+        void r;
+      }
+      out.push(bar(x + w / 2, y, x + w / 2, y + h * 0.3, 8));
+      return out.join("");
+    }
+    if (kind === "deco") {
+      const out = [];
+      for (const [ix, iy] of [[0.12, 0.1], [0.24, 0.2], [0.36, 0.3]]) {
+        const rx = x + w * ix, ry = y + h * iy;
+        const rw = w * (1 - ix * 2), rh = h * (1 - iy * 2);
+        out.push(iron(`M ${rx} ${ry} H ${rx + rw} V ${ry + rh} H ${rx} Z`, 8));
+      }
+      for (const t of [0.1, 0.9]) {
+        out.push(bar(x, y + h * t, x + w, y + h * t, 8));
+      }
+      return out.join("");
+    }
+    if (kind === "iron") {
       const out = [];
       const n = Math.max(3, Math.round(w / 95));
       for (let i = 1; i < n; i++) out.push(bar(x + w * i / n, y, x + w * i / n, y + h, 9));
@@ -1900,10 +2050,15 @@ ${body}
                     stroke-width="2.5" transform="translate(-1.5 -1.5)"/>`;
       };
       const rr = Math.min(w / (n * 1.6), h * 0.055);
-      for (const t of [0.22, 0.5, 0.78]) {
+      for (const t of [0.2, 0.42, 0.62, 0.82]) {
         const cy = y + h * t;
         out.push(bar(x, cy, x + w, cy, 8));
         for (let i = 0; i < n; i++) out.push(scroll(x + w * (i + 0.5) / n, cy, rr));
+      }
+      const crownY = y + h * 0.11;
+      out.push(iron(`M ${x} ${crownY} Q ${x + w / 2} ${y + h * 0.02} ${x + w} ${crownY}`, 9));
+      for (let i = 0; i < n; i++) {
+        out.push(scroll(x + w * (i + 0.5) / n, crownY + rr * 1.1, rr * 0.8));
       }
       return out.join("");
     }
@@ -2679,9 +2834,10 @@ ${body}
   }
   function grilleGlyph(grille) {
     const S = 300;
+    const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, "#8E979D") : null;
     return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
-    <g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>
+    ${glass ? glass.veil : `<g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>`}
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
   }
@@ -2847,17 +3003,6 @@ ${body}
           fill="currentColor"/>` : ""}
   </svg>`;
   }
-  function glazingGlyph(glazing) {
-    const S = 300;
-    const art = glazingArt(glazing.id, 0, 0, S, S, "#8E979D");
-    return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
-    <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
-    ${art ? art.veil : `<rect x="0" y="0" width="${S}" height="${S * 0.42}" fill="#B9C6CE" opacity="0.75"/>
-             <path d="M 0 ${S} L ${S * 0.62} ${S * 0.3} L ${S} ${S * 0.62} L ${S} ${S} Z"
-                   fill="#4E5A61" opacity="0.55"/>`}
-    <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
-  </svg>`;
-  }
 
   // js/rules.js
   var isLineWork = (detail) => !!(detail.strips || detail.groove);
@@ -2876,7 +3021,6 @@ ${body}
     const lined = isLineWork(byId(DETAILS, state2.detail));
     const out = {
       window: {},
-      glazing: {},
       grille: {},
       detail: {},
       handle: {},
@@ -2888,11 +3032,16 @@ ${body}
     const grip = byId(HANDLES, state2.handle);
     if (!glazed) {
       for (const g of GRILLES) if (g.id !== "none") out.grille[g.id] = "דורש חלון";
-      for (const z of GLAZINGS) if (z.id !== "clear") out.glazing[z.id] = "דורש חלון";
     }
     if (onLeaf) {
       for (const d of DETAILS) if (d.panels === 2) {
         out.detail[d.id] = "החלון תופס את מקומו של הפאנל העליון";
+      }
+      for (const d of DETAILS) {
+        if (!d.panel || out.detail[d.id]) continue;
+        if (!panelFits({ ...state2, detail: d.id })) {
+          out.detail[d.id] = "אין מקום לפאנל מתחת לחלון";
+        }
       }
     }
     for (const d of DETAILS) {
@@ -2948,9 +3097,9 @@ ${body}
     windowGone: "הסרנו את החלון",
     lineWorkGone: "הסרנו את קווי המתכת — לא משלבים אותם עם חלון",
     onePanel: "עברנו לפאנל אחד — החלון תופס את מקומו של העליון",
+    noPanelRoom: "הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום",
     faceCleared: "החלקנו את הדלת — ידית שקועה דורשת פנים חלקות",
     grilleGone: "הסרנו את הסורג — אין חלון",
-    glazingGone: "החזרנו זכוכית שקופה — אין חלון",
     gripGone: "הסרנו את ידית המשיכה — אין לה מקום כאן",
     locksetSwapped: "החלפנו את המנעול — אין לו מקום ליד המאחז",
     gripMoved: "הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה",
@@ -2964,7 +3113,7 @@ ${body}
       changed.push(group);
       said.push(why);
     };
-    if (intent !== "window" && !isGlazed(s) && (s.grille !== "none" || s.glazing && s.glazing !== "clear")) {
+    if (intent !== "window" && !isGlazed(s) && s.grille !== "none") {
       s.window = "rect";
       change("window", SAID.windowAdded);
     }
@@ -2976,6 +3125,15 @@ ${body}
       } else {
         s.detail = "plain";
         change("detail", SAID.lineWorkGone);
+      }
+    }
+    if (leafGlazed(s) && byId(DETAILS, s.detail).panel && !panelFits(s)) {
+      if (intent === "detail") {
+        s.window = "none";
+        change("window", SAID.windowGone);
+      } else {
+        s.detail = "plain";
+        change("detail", SAID.noPanelRoom);
       }
     }
     if (leafGlazed(s) && byId(DETAILS, s.detail).panels === 2) {
@@ -3055,20 +3213,15 @@ ${body}
         s.grille = "none";
         change("grille", SAID.grilleGone);
       }
-      if (s.glazing && s.glazing !== "clear") {
-        s.glazing = "clear";
-        change("glazing", SAID.glazingGone);
-      }
     }
     return { state: s, changed, said };
   }
 
   // js/url-state.js
-  var VERSION = 9;
+  var VERSION = 10;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "rect",
-    glazing: "clear",
     grille: "none",
     handle: "idan",
     /* CYLINDER, not the lever it was. The default door carries a pull bar, and
@@ -3088,7 +3241,6 @@ ${body}
     p.set("v", String(VERSION));
     p.set("c", state2.colour);
     p.set("w", state2.window);
-    p.set("z", state2.glazing);
     p.set("g", state2.grille);
     p.set("n", state2.handle);
     p.set("k", state2.lockset);
@@ -3120,7 +3272,6 @@ ${body}
     };
     take("colour", "c", COLOURS);
     take("window", "w", WINDOWS);
-    take("glazing", "z", GLAZINGS);
     take("grille", "g", GRILLES);
     take("handle", "n", HANDLES);
     take("lockset", "k", LOCKSETS);
@@ -3160,11 +3311,10 @@ ${body}
     size: 3,
     handing: 2,
     window: 4,
-    grille: 4,
+    grille: 5,
     handle: 4,
     lockset: 4,
-    detail: 4,
-    glazing: 2
+    detail: 4
   };
   var TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
   var PAD_BITS = TOTAL_BITS - Object.values(BITS).reduce((a, b) => a + b, 0);
@@ -3180,7 +3330,6 @@ ${body}
       [Math.max(0, HANDLES.findIndex((n) => n.id === state2.handle)), BITS.handle],
       [Math.max(0, LOCKSETS.findIndex((k) => k.id === state2.lockset)), BITS.lockset],
       [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail],
-      [Math.max(0, GLAZINGS.findIndex((z) => z.id === state2.glazing)), BITS.glazing],
       [0, PAD_BITS]
       // to the next whole character
     ];
@@ -3219,8 +3368,7 @@ ${body}
     const handle = HANDLES[read(BITS.handle)];
     const lockset = LOCKSETS[read(BITS.lockset)];
     const detail = DETAILS[read(BITS.detail)];
-    const glazing = GLAZINGS[read(BITS.glazing)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !glazing) return null;
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail) return null;
     return {
       colour: colour.id,
       size,
@@ -3229,8 +3377,7 @@ ${body}
       grille: grille.id,
       handle: handle.id,
       lockset: lockset.id,
-      detail: detail.id,
-      glazing: glazing.id
+      detail: detail.id
     };
   }
 
@@ -3239,6 +3386,11 @@ ${body}
   var PHONE_E164 = "972532197466";
   function shareUrl(state2) {
     return window.location.href.split(/[?#]/)[0] + toQuery(state2);
+  }
+  function glassOrGrilleLine(g) {
+    const label = g.glass ? "זכוכית" : "סורג";
+    const name = g.he.startsWith(label + " ") ? g.he.slice(label.length + 1) : g.he;
+    return `${label}: ${name}`;
   }
   function message(state2) {
     const c = byId(COLOURS, state2.colour);
@@ -3252,11 +3404,15 @@ ${body}
       "",
       `צבע: ${c.he} (RAL ${c.ral})`,
       `חלון: ${w.he}`,
-      /* The glass and the grille are named only when there is glass, for the
-         same reason the grille always was: a line saying "glazing: clear" on a
-         solid door is a line Peretz has to read and discard. */
-      ...w.rects.length && state2.glazing !== "clear" ? [`זכוכית: ${byId(GLAZINGS, state2.glazing).he}`] : [],
-      ...w.rects.length && g.id !== "none" ? [`סורג: ${g.he}`] : [],
+      /* Named only when there is a window to put it in: a line about the glass
+         on a solid door is a line Peretz has to read and discard.
+         AND NAMED FOR WHAT IT IS. One list now covers ironwork bolted over the
+         pane and patterns etched into it, and they are two different things to
+         order from two different suppliers — "סורג: זכוכית מחורצת" reads as a
+         grille made of reeded glass, which is not a thing. `glass` is already on
+         the catalogue entry because the drawing needs it; the order needs it
+         for a plainer reason. */
+      ...w.rects.length && g.id !== "none" ? [glassOrGrilleLine(g)] : [],
       ...byId(HANDLES, state2.handle).style === "none" ? [] : [`ידית משיכה: ${byId(HANDLES, state2.handle).he}`],
       /* The finish is still named even though it is no longer chosen: it is a
          fact about what Peretz has to order, and the one grip that departs from
@@ -3323,17 +3479,8 @@ ${body}
       glyph: windowGlyph
     },
     {
-      key: "glazing",
-      title: "זכוכית",
-      in: "glass",
-      kind: "sq",
-      list: () => GLAZINGS,
-      glyph: glazingGlyph,
-      hint: "מה רואים דרך הזכוכית. מעוצבת ומחורצת מכניסות אור בלי מראה החוצה."
-    },
-    {
       key: "grille",
-      title: "סורג",
+      title: "עיצוב החלון",
       in: "glass",
       kind: "sq",
       list: () => GRILLES,
@@ -3586,7 +3733,6 @@ ${body}
       colour.he,
       `RAL ${colour.ral}`,
       win.he,
-      ...win.rects.length && state.glazing !== "clear" ? [byId(GLAZINGS, state.glazing).he] : [],
       ...win.rects.length && grille.id !== "none" ? [grille.he] : [],
       ...byId(HANDLES, state.handle).style === "none" ? [] : [byId(HANDLES, state.handle).he],
       byId(LOCKSETS, state.lockset).he,

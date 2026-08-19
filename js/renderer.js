@@ -16,7 +16,7 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { darken, isLight, lighten, scaleTone, silhouette, toRgb } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
@@ -436,7 +436,6 @@ export function render(state) {
   const colour  = byId(COLOURS, state.colour);
   const handing = byId(HANDINGS, state.handing);
   const win     = byId(WINDOWS, state.window);
-  const glazing = byId(GLAZINGS, state.glazing);
   const grille  = byId(GRILLES, state.grille);
   const handle  = byId(HANDLES, state.handle);
   const lockset = byId(LOCKSETS, state.lockset);
@@ -1281,7 +1280,7 @@ export function render(state) {
             const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
             const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
             return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
-                              paint, edge, grille, glazing: glazing.id, key: 's',
+                              paint, edge, grille, key: 's',
                               leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
               + (detail.panel
                   ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, false, 0, 's')
@@ -1291,7 +1290,7 @@ export function render(state) {
         ? aperture({ x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
                      y: y0 + win.rects[0].top,
                      w: Math.min(win.rects[0].w, sideW - 240), h: win.rects[0].h,
-                     paint, edge, grille, glazing: glazing.id, key: 's',
+                     paint, edge, grille, key: 's',
                      leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
         : ''}</g>` : ''}
 
@@ -1300,7 +1299,9 @@ export function render(state) {
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom, detail.panels === 2) : ''}
+    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
+        detail.panels === 2, 0, 'm',
+        openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone,
                                   detail.vertical, hingeOnLeft) : ''}
@@ -1311,7 +1312,7 @@ export function render(state) {
     ${openings.map((o, i) => aperture({
       x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
       splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
-      paint, edge, grille, glazing: glazing.id, key: 'm' + i,
+      paint, edge, grille, key: 'm' + i,
       leaf: { x: mainX, y: y0, w: leafW, h: leafH },
     })).join('')}
   </g>
@@ -1622,9 +1623,21 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
    without rendering one. Written down twice they would drift, and the thing
    that would drift is where a customer may stand a handle. */
 const PANEL_ROWS = { pair: [[0.07, 0.58], [0.66, 0.92]], lone: [0.68, 0.90] };
-function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm') {
+function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm',
+                      alignTo = null) {
   const band = MOULD_BAND;     // the same stock that goes round a pane
-  const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
+  /* THE PANEL LINES UP WITH THE WINDOW ABOVE IT.
+     Reported from the outside — "make the size of windows and plates the same
+     so that they match" — and the photographs agree to within one per cent. On
+     d097 the window's architrave runs 0.263 to 0.748 of the leaf and the
+     panel's moulding runs 0.274 to 0.754: the same object twice, stacked. Ours
+     were 0.589 and 0.540, two different widths on one door, which is the same
+     defect as the two moulding weights and just as visible.
+     So on a glazed leaf the panel takes the opening's own outer edges. On a
+     solid one there is nothing to line up with and PANEL_INSET stands. */
+  const inset = alignTo != null
+    ? Math.max(0, alignTo)
+    : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
   const x = lx + inset, w = lw - inset * 2;
   /* The leaf's own rectangle, carried down to `moulding` so the panel can be
      lit by the same wash as the face around it. `key` keeps the clip-path ids
@@ -1755,7 +1768,15 @@ export const faceObstacles = memo(function faceObstacles(state) {
   }));
 
   if (detail.panel) {
-    const inset = leafW * PANEL_INSET;
+    /* The SAME inset `appliedFrame` draws with — the opening's outer edge on a
+       glazed leaf, PANEL_INSET on a solid one. It was PANEL_INSET either way,
+       and `npm run collide` caught it the moment the panel started lining up
+       with the window: twelve doors where the rules believed a moulding stood
+       19 mm from where the drawing had put it. That check exists for exactly
+       this, and this is the second description drifting. */
+    const inset = openings.length
+      ? Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND)
+      : leafW * PANEL_INSET;
     const winBottom = openings.length ? Math.max(...openings.map(o => o.top + o.h)) : 0;
     const rows = detail.panels === 2 && !openings.length
       ? PANEL_ROWS.pair
@@ -1770,6 +1791,38 @@ export const faceObstacles = memo(function faceObstacles(state) {
   }
   return out;
 }, st => `${st.size}|${st.detail}|${st.window}`);
+
+/**
+ * Is there room under the glazing for the panel the customer is paying for?
+ *
+ * `appliedFrame` returns '' when the rectangle it is asked for is smaller than
+ * the moulding that would go round it — which is right, a moulding cannot be
+ * narrower than itself — and the price went on charging ₪380 for it. The new
+ * window sizes are the reason it matters: the tall light is 0.69 of the leaf
+ * where the old one was 0.50, and under it there is nothing left.
+ *
+ * The corpus agrees, which is worth saying because it makes this a fact about
+ * doors rather than about our arithmetic: of the ten glazed doors, the seven
+ * with a panel under the glass all have openings 0.36 to 0.61 of leaf height,
+ * and the three tallest — d125 at 0.76, d128 at 0.78, d113 at 0.62 — carry no
+ * panel at all.
+ *
+ * Asked of the same numbers `appliedFrame` draws with, so it cannot drift from
+ * what actually appears.
+ */
+export function panelFits(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const detail = byId(DETAILS, state.detail);
+  if (!detail.panel) return true;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const openings = apertureLayout(byId(WINDOWS, state.window), leafW);
+  if (!openings.length) return true;
+  const winBottom = Math.max(...openings.map(o => o.top + o.h));
+  const top = Math.max(leafH * PANEL_ROWS.lone[0], winBottom + leafW * 0.08);
+  const bottom = leafH * PANEL_ROWS.lone[1];
+  const inset = Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND);
+  return (leafW - inset * 2) > MOULD_BAND * 2.2 && (bottom - top) > MOULD_BAND * 2.2;
+}
 
 /**
  * Where the grip sits when nobody has moved it: `x` inboard from the CLOSING
@@ -2321,10 +2374,100 @@ function glazingArt(kind, x, y, w, h, paint) {
     }
     return { veil: out, over: '' };
   }
-  if (kind === 'obscure') {
-    /* Acid-etched or rolled pattern. d106 is the clearest: a repeating
-       four-petal figure on a square lattice, the petals slightly brighter than
-       the ground because they are the thicker glass. */
+  /* INTERLOCKING RINGS — d106, and it is the whole door: a repeating figure of
+     overlapping circles on a square pitch, the ring lines brighter than the
+     ground because they are where the glass is left thick. */
+  if (kind === 'circles') {
+    /* d106 shows seven or eight rings across the opening, not twenty. */
+    const cell = Math.max(40, Math.min(96, w / 3.4));
+    const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
+    const cw = w / cols, ch = h / rows;
+    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.44)}"/>`;
+    const ring = (cx, cy, r) =>
+      `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="none"
+               stroke="${scaleTone(paint, 1.05)}" stroke-width="${(r * 0.17).toFixed(1)}"/>`;
+    /* Rings on the cell centres AND on the corners: that overlap is the
+       pattern. One lattice of circles is a polka dot. */
+    for (let r = 0; r <= rows; r++) {
+      for (let c = 0; c <= cols; c++) {
+        const rr = Math.min(cw, ch) * 0.62;
+        out += ring(x + cw * c, y + ch * r, rr);
+        if (r < rows && c < cols) out += ring(x + cw * (c + 0.5), y + ch * (r + 0.5), rr);
+      }
+    }
+    return { veil: out, over: '' };
+  }
+
+  /* GRAPE AND VINE — d109 and d111. Bold outlined bunches with a curling stem
+     up the pane. Drawn as outline only, because that is what an etched figure
+     is: the glass is cut away round the line, not filled. */
+  if (kind === 'vine') {
+    const ink = scaleTone(paint, 1.06);
+    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.46)}"/>`;
+    const n = Math.max(2, Math.round(h / (w * 1.15)));
+    for (let i = 0; i < n; i++) {
+      const cy = y + h * (i + 0.5) / n, cx = x + w * (i % 2 ? 0.62 : 0.38);
+      const r = Math.min(w * 0.11, h / (n * 5));
+      /* A bunch: five rows narrowing to a point, drawn as outlined berries. */
+      for (let row = 0; row < 4; row++) {
+        const per = 4 - row;
+        for (let k = 0; k < per; k++) {
+          const bx = cx + (k - (per - 1) / 2) * r * 2.05;
+          const by = cy + row * r * 1.75 - r;
+          out += `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${r.toFixed(1)}"
+                          fill="none" stroke="${ink}" stroke-width="${(r * 0.28).toFixed(1)}"/>`;
+        }
+      }
+      /* the stem, curling away from the bunch */
+      const sx = cx, sy = cy - r * 2.4;
+      out += `<path d="M ${sx} ${sy} c ${w * 0.10} ${-h * 0.06} ${w * 0.20} ${-h * 0.02}
+                       ${w * 0.16} ${-h * 0.09}" fill="none" stroke="${ink}"
+                    stroke-width="${(r * 0.30).toFixed(1)}" stroke-linecap="round"/>`;
+    }
+    return { veil: out, over: '' };
+  }
+
+  /* A TREE — d114. One trunk off-centre with branches reaching across the
+     pane, filled rather than outlined: on that door the figure reads as a
+     silhouette, not as a line drawing. */
+  if (kind === 'tree') {
+    const ink = scaleTone(paint, 1.04);
+    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.42)}"/>`;
+    const bx = x + w * 0.30, by = y + h;
+    out += `<path d="M ${bx - w * 0.05} ${by} C ${bx - w * 0.02} ${y + h * 0.55}
+                     ${bx + w * 0.04} ${y + h * 0.40} ${bx + w * 0.02} ${y + h * 0.08}
+                     L ${bx + w * 0.10} ${y + h * 0.08}
+                     C ${bx + w * 0.10} ${y + h * 0.45} ${bx + w * 0.06} ${y + h * 0.60}
+                     ${bx + w * 0.09} ${by} Z" fill="${ink}"/>`;
+    /* Branches both ways and enough of them to read as a tree. Four thin ones
+       up one side was a sapling; d114 fills the pane. Each carries a couple of
+       twigs, because a bare arc reads as a wire. */
+    for (const [t, reach, up, side] of [
+      [0.70, 0.60, 0.17, 1], [0.60, 0.34, 0.12, -1], [0.50, 0.55, 0.15, 1],
+      [0.40, 0.40, 0.13, -1], [0.30, 0.62, 0.14, 1], [0.20, 0.30, 0.10, -1],
+      [0.12, 0.44, 0.09, 1]]) {
+      const ex = bx + w * reach * side, ey = y + h * (t - up * 0.6);
+      out += `<path d="M ${bx + w * 0.03} ${y + h * t}
+                       Q ${bx + w * reach * 0.55 * side} ${y + h * (t - up)} ${ex} ${ey}"
+                    fill="none" stroke="${ink}" stroke-width="${(w * 0.030).toFixed(1)}"
+                    stroke-linecap="round"/>`;
+      for (const f of [0.45, 0.75]) {
+        const tx = bx + w * reach * f * side, ty = y + h * (t - up * f * 0.9);
+        out += `<path d="M ${tx} ${ty} q ${w * 0.05 * side} ${-h * 0.035}
+                         ${w * 0.11 * side} ${-h * 0.045}" fill="none" stroke="${ink}"
+                      stroke-width="${(w * 0.016).toFixed(1)}" stroke-linecap="round"/>`;
+      }
+    }
+    return { veil: out, over: '' };
+  }
+
+  if (kind === 'mesh') {
+    /* The fine etched texture behind a grille on d102, d105, d116 and d127: a
+       small repeating four-petal figure on a square lattice, the petals
+       slightly brighter than the ground because they are the thicker glass.
+       It used to be called `obscure` and stood for every patterned glass
+       there is; d106's interlocking rings have their own branch now, because
+       they are a different figure at four times the scale. */
     const cell = Math.max(26, Math.min(52, w / 6));
     const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
     const cw = w / cols, ch = h / rows;
@@ -2431,9 +2574,13 @@ export const apertureLayout = memo(function apertureLayout(win, leafW) {
 }, (win, leafW) => `${win.id}|${leafW}`);
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
-function aperture({ x, y, w, h, paint, edge, grille, glazing, key, leaf = null,
+function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
                     splits = [] }) {
-  const glass = glazingArt(glazing, x, y, w, h, paint);
+  /* WORKED GLASS IS A GRILLE NOW. The pattern in the pane and the ironwork
+     over it were two choices and are one, so the same option decides both:
+     `glass: true` in the catalogue means it is etched into the glass, and
+     `glazingArt` draws it exactly as it drew the old glazing. */
+  const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint) : null;
   /* The architrave. It was a 30 mm band with a single 10 mm bevel, and that
      thinness is most of why a glazed door of ours read as CAD next to a
      photograph: on the measured doors the surround is a MOULDING, wide and
@@ -2466,7 +2613,7 @@ function aperture({ x, y, w, h, paint, edge, grille, glazing, key, leaf = null,
   const M = MOULD_BAND;
   const id = `cl-${key}`;
   return `
-    <g data-pane="${key}" data-glazing="${glazing || 'clear'}">
+    <g data-pane="${key}" data-glass="${grille.glass ? grille.id : 'clear'}">
       ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint, isLight(paint),
                  leaf, `a${key}`)}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
@@ -2499,8 +2646,14 @@ function aperture({ x, y, w, h, paint, edge, grille, glazing, key, leaf = null,
            the same surface that has been etched away, which is exactly why
            those panes read as a lit panel rather than as a hole. -->
       ${glass ? '' : `<rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>`}
-      ${glass ? glass.veil : ''}
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
+      <!-- THE GLASS IS CUT TO THE HOLE, like the ironwork over it. The veil
+           used to be drawn unclipped, which was invisible while every pattern
+           was a rect exactly the size of the pane — and the moment one of them
+           had a figure that runs off the edge, d106's interlocking rings,
+           half a ring's worth of scallops appeared on the door beside the
+           opening. A pattern is in the glass; the glass stops at the frame. -->
+      <g clip-path="url(#${id})">${glass ? glass.veil : ''}</g>
       <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint, 0.10) : null)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
@@ -2565,36 +2718,110 @@ function grillePaths(kind, x, y, w, h, tint) {
     return Array.from({ length: n - 1 }, (_, i) =>
       bar(x + (w * (i + 1)) / n, y, x + (w * (i + 1)) / n, y + h)).join('');
   }
-  if (kind === 'lattice') {
-    const step = 110, out = [];
-    for (let o = -h; o < w + h; o += step) {
-      out.push(bar(x + o, y, x + o + h, y + h, 9));
-      out.push(bar(x + o, y + h, x + o + h, y, 9));
-    }
-    return out.join('');
-  }
+  /* GONE: `lattice`, a diagonal criss-cross of bars. It is on no door in 128
+     photographs — we invented it. The id resolves to the etched mesh, which is
+     the nearest thing that exists. */
   /* An orthogonal grid of squares. Ours were all diagonal or all vertical;
      the measured doors overwhelmingly carry this — a square mesh, the bars
      the same weight both ways, sized so the squares come out roughly square
      rather than at whatever the opening's aspect happens to give. */
-  if (kind === 'grid') {
+  /* The plain orthogonal mesh, and nothing set into it. Seven doors carry it
+     bare — d091 d100 d107 d110 d113 d117 d122 — and it used to be impossible
+     to ask for, because this branch always added the medallions. Those are
+     `scroll` now, which is what the catalogue always called them. */
+  const mesh = () => {
     const step = Math.min(w, h) / Math.max(2, Math.round(Math.min(w, h) / 105));
     const out = [];
     for (let gx = x + step; gx < x + w - 1; gx += step) out.push(bar(gx, y, gx, y + h, 9));
     for (let gy = y + step; gy < y + h - 1; gy += step) out.push(bar(x, gy, x + w, gy, 9));
-    /* d097 sets an ornament into the grid at top and bottom — the mesh is the
-       field and the scroll is the event. A plain grid alone is a security
-       bar; the motif is what makes it a door someone chose. */
-    const rr = Math.min(w * 0.30, h * 0.075);
+    return out;
+  };
+  /* A shape drawn in the ironwork's three passes: shadow, body, gleam. */
+  const iron = (d, sw = 9) => `
+      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28"
+            stroke-width="${sw}" transform="translate(3 3)"/>
+      <path d="${d}" fill="none" stroke="${body}" stroke-width="${sw}"
+            stroke-linecap="round"/>
+      <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.4"
+            stroke-width="${sw / 3}" transform="translate(-1.5 -1.5)"/>`;
+
+  if (kind === 'grid') return mesh().join('');
+
+  /* The mesh with an ornament set into it at top and bottom. Seven doors:
+     d089 d093 d095 d097 d099 d102 d116. The mesh is the field and the scroll
+     is the event — a plain grid alone is a security bar. */
+  if (kind === 'scroll') {
+    const out = mesh();
+    /* FOUR RADII ACROSS — the motif is two opposed circles, so its width is
+       4·rr and the radius is a fifth of the opening, not a third. At w*0.30 it
+       was 1.2 of the pane and its ends were cropped by the glass.
+       It was w*0.15 for one round, which is 0.60 of the pane, and beside the
+       photograph of d097 that reads as a small mark floating in a security
+       grid where the real one is the thing you look at. Measured off the
+       photograph the ornament spans about 0.85 of the light; 0.20 puts ours at
+       0.80, which is as close as this shape gets without touching the rebate.
+       The vertical cap stays — on a short opening the width is not the binding
+       constraint and two of these would meet in the middle. */
+    const rr = Math.min(w * 0.20, h * 0.07);
     for (const t of [0.20, 0.80]) {
       const cy2 = y + h * t, cx2 = x + w / 2;
-      const d = `M ${cx2 - rr * 2} ${cy2} a ${rr} ${rr} 0 1 1 ${rr * 2} 0
-                 a ${rr} ${rr} 0 1 0 ${rr * 2} 0`;
-      out.push(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28"
-                      stroke-width="9" transform="translate(3 3)"/>
-                <path d="${d}" fill="none" stroke="${body}" stroke-width="9"/>
-                <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.4"
-                      stroke-width="3" transform="translate(-1.5 -1.5)"/>`);
+      out.push(iron(`M ${cx2 - rr * 2} ${cy2} a ${rr} ${rr} 0 1 1 ${rr * 2} 0
+                     a ${rr} ${rr} 0 1 0 ${rr * 2} 0`));
+    }
+    return out.join('');
+  }
+
+  /* A COLUMN OF QUATREFOILS on a sparse grid — d104, once, and kept at the
+     owner's son's instruction. Four petals round a centre, repeated up the
+     pane between two vertical bars. */
+  if (kind === 'quatrefoil') {
+    const out = [bar(x + w * 0.28, y, x + w * 0.28, y + h, 8),
+                 bar(x + w * 0.72, y, x + w * 0.72, y + h, 8)];
+    const n = Math.max(3, Math.round(h / (w * 0.9)));
+    const rr = Math.min(w * 0.17, h / (n * 3));
+    for (let i = 0; i < n; i++) {
+      const cy2 = y + h * (i + 0.5) / n, cx2 = x + w / 2;
+      out.push(bar(x, cy2, x + w, cy2, 7));
+      for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+        out.push(iron(`M ${cx2} ${cy2} q ${dx * rr - dy * rr * 0.7} ${dy * rr + dx * rr * 0.7}
+                       ${dx * rr * 2} ${dy * rr * 2}
+                       q ${-dx * rr + dy * rr * 0.7} ${-dy * rr - dx * rr * 0.7}
+                       ${-dx * rr * 2} ${-dy * rr * 2}`, 6));
+      }
+    }
+    return out.join('');
+  }
+
+  /* AN ARCH over a plain grid — d121. A fan of ribs springing from the
+     opening's shoulders, which is the whole of that door's ornament. */
+  if (kind === 'arch') {
+    const out = mesh();
+    /* Every radius stays at or above half the span. An arc commanded to join
+       two points further apart than its diameter is drawn scaled up by the
+       renderer, so the inner ribs came out the same size as the outer one and
+       the fan read as a single fat line. */
+    const cy2 = y + h * 0.30;
+    for (const k of [1.00, 0.78, 0.60]) {
+      const r = Math.max(w * 0.5, w * 0.78 * k);
+      const rise = h * 0.16 * k;
+      out.push(iron(`M ${x} ${cy2} Q ${x + w / 2} ${cy2 - rise} ${x + w} ${cy2}`, 8));
+      void r;
+    }
+    out.push(bar(x + w / 2, y, x + w / 2, y + h * 0.30, 8));
+    return out.join('');
+  }
+
+  /* ART-DECO STRAIGHT LINES — d123. No curve anywhere on it: a stepped
+     rectangle inside a border, all of it at right angles. */
+  if (kind === 'deco') {
+    const out = [];
+    for (const [ix, iy] of [[0.12, 0.10], [0.24, 0.20], [0.36, 0.30]]) {
+      const rx = x + w * ix, ry = y + h * iy;
+      const rw = w * (1 - ix * 2), rh = h * (1 - iy * 2);
+      out.push(iron(`M ${rx} ${ry} H ${rx + rw} V ${ry + rh} H ${rx} Z`, 8));
+    }
+    for (const t of [0.10, 0.90]) {
+      out.push(bar(x, y + h * t, x + w, y + h * t, 8));
     }
     return out.join('');
   }
@@ -2604,7 +2831,11 @@ function grillePaths(kind, x, y, w, h, tint) {
      worked between them in bands. What reads as "wrought iron" at a glance is
      the density and the curvature, not any one motif, so this draws a full
      comb and three bands of scrolls rather than one big emblem. */
-  if (kind === 'scroll') {
+  /* WROUGHT IRON: the dense ornamental comb, ten doors and the commonest
+     thing in the luxury band — d090 d092 d101 d103 d108 d112 d119 d124 d128
+     d129. It used to answer to `scroll`, which the catalogue used for the
+     grid-with-medallions; the two had been the same word for two objects. */
+  if (kind === 'iron') {
     const out = [];
     const n = Math.max(3, Math.round(w / 95));           // the comb
     for (let i = 1; i < n; i++) out.push(bar(x + (w * i) / n, y, x + (w * i) / n, y + h, 9));
@@ -2620,10 +2851,20 @@ function grillePaths(kind, x, y, w, h, tint) {
                     stroke-width="2.5" transform="translate(-1.5 -1.5)"/>`;
     };
     const rr = Math.min(w / (n * 1.6), h * 0.055);
-    for (const t of [0.22, 0.5, 0.78]) {
+    /* FOUR bands and a crown, not three bands and nothing. Beside d090, d092
+       and d108 the drawing was too sparse to read as wrought iron: those doors
+       are dense, and the top of the opening always carries an arched crown
+       that the bands hang from. Density and curvature are what say "ironwork"
+       at a glance — no single motif does it. */
+    for (const t of [0.20, 0.42, 0.62, 0.82]) {
       const cy = y + h * t;
       out.push(bar(x, cy, x + w, cy, 8));
       for (let i = 0; i < n; i++) out.push(scroll(x + (w * (i + 0.5)) / n, cy, rr));
+    }
+    const crownY = y + h * 0.11;
+    out.push(iron(`M ${x} ${crownY} Q ${x + w / 2} ${y + h * 0.02} ${x + w} ${crownY}`, 9));
+    for (let i = 0; i < n; i++) {
+      out.push(scroll(x + (w * (i + 0.5)) / n, crownY + rr * 1.1, rr * 0.8));
     }
     return out.join('');
   }
@@ -3891,9 +4132,15 @@ export function windowGlyph(win) {
 
 export function grilleGlyph(grille) {
   const S = 300;
+  /* Ironwork and worked glass in one tile, because they are one list now. A
+     glass option drew NOTHING here while the drawing was fetched from
+     `grillePaths` alone — five tiles identical to "no grille", each with its
+     own price on it. `npm test` catches exactly that, and did. */
+  const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, '#8E979D') : null;
   return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
-    <g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>
+    ${glass ? glass.veil
+            : `<g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>`}
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
 }
@@ -4123,23 +4370,7 @@ export function detailGlyph(detail) {
   </svg>`;
 }
 
-/**
- * Glazing glyph: the pane, at the size a tile can actually show it.
- *
- * Drawn from the same `glazingArt` the door uses, so the tile cannot promise
- * a pattern the stage does not draw. A tile that shows its own invention is
- * the "nine handles, one picture" bug in a different costume.
- */
-export function glazingGlyph(glazing) {
-  const S = 300;
-  const art = glazingArt(glazing.id, 0, 0, S, S, '#8E979D');
-  return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
-    <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
-    ${art ? art.veil
-          : `<rect x="0" y="0" width="${S}" height="${S * 0.42}" fill="#B9C6CE" opacity="0.75"/>
-             <path d="M 0 ${S} L ${S * 0.62} ${S * 0.30} L ${S} ${S * 0.62} L ${S} ${S} Z"
-                   fill="#4E5A61" opacity="0.55"/>`}
-    <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
-  </svg>`;
-}
+/* GONE: `glazingGlyph`. The glass stopped being its own choice, so there is no
+   glazing tile to draw. The patterns it drew are grille options now and
+   `grilleGlyph` draws them, through the same `glazingArt` this one used. */
 

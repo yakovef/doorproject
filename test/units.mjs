@@ -2,11 +2,11 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import {
-  detailGlyph, faceObstacles, glazingGlyph, gripAt, gripCanRotate, gripFeet,
+  detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT, locksetGlyph,
   nearestGrip, render, sizeGlyph, windowGlyph,
 } from '../js/renderer.js';
@@ -20,13 +20,13 @@ const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' +
 const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
-const base = { colour: 'rb-0097d', window: 'none', glazing: 'clear', grille: 'none',
+const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
                handle: 'idan', lockset: 'coral', detail: 'plain',
                size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
-const KEYS = ['colour', 'size', 'handing', 'window', 'glazing', 'grille', 'handle',
+const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
               'lockset', 'detail'];
 
 /* The code's length is derived, never typed. It was written as {8} and the
@@ -63,22 +63,17 @@ function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
     for (const w of WINDOWS) for (const g of GRILLES) {
       const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
-                     glazing: 'clear', detail: 'plain' };
+                     detail: 'plain' };
       const out = [];
       for (const n of HANDLES) out.push({ ...stem, handle: n.id, lockset: 'coral' });
       for (const k of LOCKSETS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: k.id });
-      /* Additive again for the two new axes. Multiplying them in would take
-         this generator past three million designs; nothing checked here
-         couples glazing to a lockset, and the things that DO couple have
-         their own sweeps. */
-      for (const z of GLAZINGS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: 'coral', glazing: z.id });
       for (const st of out) if (buildable(st)) yield st;
     }
 }
 
 /** Every design the GRIP's position could depend on: what is on the face, what
- *  is beside it on the stile, and how big the leaf is. Colour and glazing
- *  cannot move a handle, so they are held still. */
+ *  is beside it on the stile, and how big the leaf is. Colour cannot move a
+ *  handle, so it is held still. */
 function* everyPlacement() {
   for (const n of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
     for (const d of DETAILS) for (const size of sizeKeys) for (const h of HANDINGS) {
@@ -566,16 +561,24 @@ group('no dangling gradient or filter references');
    branch in grillePaths, so it returned an empty string. The option was
    selectable, priced at ₪300, and drew nothing at all — the same class of
    silent-wrong-door failure as the short code overflow. Every grille that is
-   not 'none' must put strokes inside the glazing. */
+   not 'none' must put MARKS inside the opening.
+
+   ⚠ IT USED TO COUNT ONLY `<line>` AND `<path>`, which was every shape
+   ironwork is made of and none of the shapes worked glass is made of. When the
+   glass patterns moved into this list, four of them — circles, mesh, reeded,
+   and the rings — drew nothing this check could see, and it failed them for
+   rendering nothing while they rendered perfectly. The claim was right and the
+   measurement was too narrow. */
 group('every grille draws something');
 for (const g of GRILLES) {
   const svg = render({ ...base, window: 'tallwin', grille: g.id });
-  const marks = (svg.match(/<line |<path /g) || []).length;
+  const MARK = /<line |<path |<circle |<ellipse |<rect |<polygon /g;
+  const marks = (svg.match(MARK) || []).length;
   if (g.id === 'none') {
     ok(true, 'none needs no bars');
   } else {
     const bare = render({ ...base, window: 'tallwin', grille: 'none' });
-    const bareMarks = (bare.match(/<line |<path /g) || []).length;
+    const bareMarks = (bare.match(MARK) || []).length;
     ok(marks > bareMarks + 4,
       `grille ${g.id} drew ${marks - bareMarks} extra marks: a priced option that renders nothing`);
   }
@@ -882,7 +885,7 @@ group('rules: nothing unbuildable can be reached');
   /* The combinations the corpus says do not exist, and the ones geometry
      forbids — every one asserted to be both blocked and repairable. */
   for (const d of DETAILS) for (const w of WINDOWS) for (const sz of sizeKeys) {
-    check({ ...base, detail: d.id, window: w.id, size: sz, glazing: 'obscure', grille: 'grid' });
+    check({ ...base, detail: d.id, window: w.id, size: sz, grille: 'grid' });
   }
   for (const hn of HANDLES) for (const w of WINDOWS) for (const sz of sizeKeys) {
     check({ ...base, handle: hn.id, window: w.id, size: sz });
@@ -899,8 +902,6 @@ group('rules: nothing unbuildable can be reached');
   /* A grille and a glass treatment both need glass to be applied to. */
   for (const g of GRILLES.slice(1)) ok(conflicts({ ...base, window: 'none' }).grille[g.id],
     `grille ${g.id} should be blocked with no window`);
-  for (const z of GLAZINGS.slice(1)) ok(conflicts({ ...base, window: 'none' }).glazing[z.id],
-    `glazing ${z.id} should be blocked with no window`);
 
   /* A shared link carrying a forbidden combination must arrive repaired AND
      announced. Silently opening a different door is the worst thing this site

@@ -7,7 +7,7 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, DETAILS, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
 export function priceAgorot(state) {
@@ -25,11 +25,11 @@ export function priceAgorot(state) {
             + byId(HANDLES, state.handle).delta
             + byId(LOCKSETS, state.lockset).delta
             + byId(DETAILS, state.detail).delta;
-  /* A grille needs glazing to sit in, and so does the glass treatment itself —
-     neither can be charged on a solid door. Same rule, same reason: the
+  /* A grille needs a window to sit in — and so does worked glass, which is in
+     the same list now. Neither can be charged on a solid door: the
      configurator must never take money for something the drawing does not
      show and Peretz cannot fit. */
-  if (win.rects.length) total += grille.delta + byId(GLAZINGS, state.glazing).delta;
+  if (win.rects.length) total += grille.delta;
 
   // Round up to the nearest ₪5 so quoted figures stay tidy.
   return Math.ceil(total / 500) * 500;

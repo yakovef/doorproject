@@ -5,7 +5,7 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { encodeCode, toQuery } from './url-state.js';
 
@@ -19,6 +19,24 @@ export function shareUrl(state) {
      literal string "null", and the one line of this message that matters most
      would arrive as "null/index.html?…". */
   return window.location.href.split(/[?#]/)[0] + toQuery(state);
+}
+
+/**
+ * What is in the window, labelled for the man who has to order it.
+ *
+ * One list covers both now, and they are two different things bought from two
+ * different suppliers: ironwork bolted over the pane, and a pattern worked
+ * into the glass itself. `סורג: זכוכית מחורצת` reads as a grille made of
+ * reeded glass, which nobody sells.
+ *
+ * The tiles need the fuller name — `זכוכית מעוצבת` tells a customer scanning
+ * fourteen options which half of the list they are looking at — so the word is
+ * dropped HERE rather than taken out of the catalogue, where it is doing work.
+ */
+function glassOrGrilleLine(g) {
+  const label = g.glass ? 'זכוכית' : 'סורג';
+  const name = g.he.startsWith(label + ' ') ? g.he.slice(label.length + 1) : g.he;
+  return `${label}: ${name}`;
 }
 
 /** The message Peretz receives. */
@@ -35,11 +53,15 @@ export function message(state) {
     '',
     `צבע: ${c.he} (RAL ${c.ral})`,
     `חלון: ${w.he}`,
-    /* The glass and the grille are named only when there is glass, for the
-       same reason the grille always was: a line saying "glazing: clear" on a
-       solid door is a line Peretz has to read and discard. */
-    ...(w.rects.length && state.glazing !== 'clear' ? [`זכוכית: ${byId(GLAZINGS, state.glazing).he}`] : []),
-    ...(w.rects.length && g.id !== 'none' ? [`סורג: ${g.he}`] : []),
+    /* Named only when there is a window to put it in: a line about the glass
+       on a solid door is a line Peretz has to read and discard.
+       AND NAMED FOR WHAT IT IS. One list now covers ironwork bolted over the
+       pane and patterns etched into it, and they are two different things to
+       order from two different suppliers — "סורג: זכוכית מחורצת" reads as a
+       grille made of reeded glass, which is not a thing. `glass` is already on
+       the catalogue entry because the drawing needs it; the order needs it
+       for a plainer reason. */
+    ...(w.rects.length && g.id !== 'none' ? [glassOrGrilleLine(g)] : []),
     ...(byId(HANDLES, state.handle).style === 'none'
         ? [] : [`ידית משיכה: ${byId(HANDLES, state.handle).he}`]),
     /* The finish is still named even though it is no longer chosen: it is a

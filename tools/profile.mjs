@@ -81,7 +81,7 @@ const shoot = async () => {
 };
 
 let faults = 0;
-const base = { window: 'none', glazing: 'clear', grille: 'none', lockset: 'cylinder',
+const base = { window: 'none', grille: 'none', lockset: 'cylinder',
                size: 'standard', handing: 'right-in' };
 
 console.log('\nthe leaf, nine rows, against the medians FALLOFF was fitted to\n');
