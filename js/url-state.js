@@ -79,6 +79,21 @@ export function toQuery(state) {
   p.set('d', state.detail);
   p.set('s', state.size);
   p.set('h', state.handing);
+  /* `gp` — where the customer stood the grip, in millimetres: inboard from the
+     closing edge, down from the leaf's top, then 0 or 90 for which way up.
+     Written ONLY when they moved it, so every door nobody dragged produces
+     exactly the URL it always did.
+     It is in the link and NOT in the code, at the owner's son's instruction:
+     the position is a picture of what the customer had in mind, not an
+     instruction his father builds to, and the code is the thing read down a
+     telephone as a specification. Putting it in the code would have cost a
+     VERSION bump and every code written so far. The link still carries it, so
+     the door Peretz taps through to is the door they were looking at, and the
+     stage says underneath that the final position is set on site. */
+  if (state.grip) {
+    const g = state.grip;
+    p.set('gp', `${Math.round(g.x)},${Math.round(g.y)},${g.rot === 90 ? 90 : 0}`);
+  }
   return '?' + p.toString();
 }
 
@@ -129,6 +144,18 @@ export function fromQuery(search) {
   if (rawSize != null) {
     if (SIZES[rawSize]) state.size = rawSize;
     else notice = 'option-unknown';
+  }
+
+  const rawGrip = p.get('gp');
+  if (rawGrip != null) {
+    const [gx, gy, gr] = rawGrip.split(',').map(Number);
+    /* A position that is not three numbers is a link somebody edited by hand.
+       It does not earn `option-unknown` — nothing was misnamed and the door is
+       still theirs — so the grip simply goes home, which is where it would
+       have been if they had never dragged it. */
+    if ([gx, gy].every(Number.isFinite)) {
+      state.grip = { x: gx, y: gy, rot: gr === 90 ? 90 : 0 };
+    }
   }
 
   /* `f` and `a` — the finish and the add-ons — are read by nobody now, and

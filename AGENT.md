@@ -112,6 +112,32 @@ whenever a new option can be silently reduced.
 
 ---
 
+## The handle can be moved, so ask rather than compute
+
+`gripHome` places the grip and `gripPlacement` says whether a place is legal.
+Those are two different jobs and the second is the authority: home is computed
+by arithmetic that was derived in x and says nothing about y, so it is run
+through the check and corrected before anybody sees it.
+
+If you add anything to the face — a new detail, a new window shape, a moulding
+that moves — add it to `faceObstacles` in the same commit. It is the list of
+rectangles a bolted foot may not land on, and it is written in plain arithmetic
+because `rules.js` has to ask the question in node where there is no getBBox.
+That makes it a SECOND description of the drawing. `npm run collide` compares
+the two on every swept design; if you change one and not the other it fails and
+names the door.
+
+And keep the two halves of the rule apart, because they are not the same claim:
+
+- **What is bolted** — the feet, the rosettes, the backplates — must land on
+  flat steel. Depth does not help a screw.
+- **What is cantilevered** — the bar between the feet, a lever's blade — may
+  pass over a moulding, because it stands 50 mm off a face the moulding stands
+  8 mm off. It may NOT pass over the glass, which is a different argument: not
+  contact, but that nobody fits a handle across a window.
+
+---
+
 ## How to know whether you are right
 
 Guessing is what this project keeps having to undo. There are instruments, and

@@ -550,11 +550,15 @@ export function render(state) {
      changed width, and this line was the second place the old 0.09 was written
      down — exactly the promise that somebody will change one of them. */
   const panelled = detail.panel && !win.rects.length;
-  const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - lockBackset(handle, lockset);
-  const standoff = handle.pull && panelled
-    ? Math.max(rawStandoff, insideField)
-    : rawStandoff;
-  const handleX = lockX + inward * standoff;
+  /* WHERE THE GRIP ACTUALLY STANDS. The arithmetic above and below this line
+     is `gripHome`'s, and it lives there now because the customer can drag the
+     grip: with two possible positions, something outside the drawing has to be
+     able to name the first one — to snap back to it, and to know whether this
+     design still carries it. `rawStandoff` is left here because the recessed
+     channel's own placement still reads it. */
+  const place = gripAt(state);
+  const handleX = lockX + inward * (place.x - lockBackset(handle, lockset));
+  const handleY = y0 + place.y;
 
   const paint = colour.hex;
   const edge  = silhouette(paint);
@@ -1314,14 +1318,18 @@ export function render(state) {
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
-    ${gripArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint,
-              centreX, leafW, y0, panelled)}
+    ${gripArt(handle, handleX, handleY, leafH, leverDir, paint,
+              centreX, leafW, y0, panelled && place.rot !== 90, place.rot)}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
+  <!-- The vignette is LIGHT, and light is not something you can touch. It is
+       drawn last and covers the whole scene, so without this it swallowed
+       every pointer event on the stage — the handle could not be picked up at
+       all, and nothing in the console said why. -->
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-        height="${view.h + SCENE * 2}" fill="url(#vignette)"/>
+        height="${view.h + SCENE * 2}" fill="url(#vignette)" pointer-events="none"/>
 `;
 
   return `
@@ -1609,6 +1617,11 @@ function mouldGradients(paint, pale) {
  */
 const PANEL_INSET = 0.23;      // measured minimum, and the two-panel doors' own
 const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real one
+/* The rows, as fractions of leaf height, named because two things read them:
+   the drawing below and `faceObstacles`, which has to know where a moulding is
+   without rendering one. Written down twice they would drift, and the thing
+   that would drift is where a customer may stand a handle. */
+const PANEL_ROWS = { pair: [[0.07, 0.58], [0.66, 0.92]], lone: [0.68, 0.90] };
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm') {
   const band = MOULD_BAND;     // the same stock that goes round a pane
   const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
@@ -1627,12 +1640,13 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
      in the gallery carries. Only on a solid leaf: with glazing above there is
      nowhere for the upper one. */
   if (upper && winBottom <= ly + 1) {
-    return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
-               data-band="${band.toFixed(1)}">${rect(0.07, 0.58, 0)}${rect(0.66, 0.92, 1)}</g>`;
+    return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * PANEL_ROWS.pair[0][0]).toFixed(1)}"
+               data-band="${band.toFixed(1)}">${
+      PANEL_ROWS.pair.map(([t, bt], n) => rect(t, bt, n)).join('')}</g>`;
   }
 
-  const top = Math.max(ly + lh * 0.68, winBottom + lw * 0.08);
-  const bottom = ly + lh * 0.90;
+  const top = Math.max(ly + lh * PANEL_ROWS.lone[0], winBottom + lw * 0.08);
+  const bottom = ly + lh * PANEL_ROWS.lone[1];
   const art = moulding(x, top, w, bottom - top, band, paint, pale, leaf, `p${key}0`);
   /* `data-top` so a test can ask where the moulding starts instead of parsing
      the first path out of the markup. It did that until this rewrite, and the
@@ -1641,6 +1655,368 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
      fragile about. */
   return art ? `<g data-detail="panel" data-top="${top.toFixed(1)}"
                    data-band="${band.toFixed(1)}">${art}</g>` : '';
+}
+
+/* ── WHERE A GRIP MAY STAND ───────────────────────────────────────────
+ *
+ * The owner's son asked for the pull handle to be dragged anywhere on the
+ * door, and to go red where it cannot go. His rule, in his words: red "when
+ * the 2 points that are connecting it are on the panel frame or window, or
+ * overlapping with a lever".
+ *
+ * That is a sharper rule than it looks, and it is the RIGHT one. The bar
+ * itself stands 50 mm off the door on its standoffs, so it may pass over a
+ * moulding — two of his father's own doors have a bar crossing a panel, and
+ * the depth argument that got three other rules withdrawn applies here too.
+ * What may NOT pass over anything is what is bolted through: the feet. A
+ * standoff needs flat steel under it. So the bar is free and its feet are not,
+ * which is exactly what he said.
+ *
+ * Everything below works in LEAF-LOCAL millimetres — x from the leaf's left
+ * edge as drawn, y down from its top — because that is the space the drag
+ * happens in. The one place handing enters is `gripHome`, which measures from
+ * the CLOSING edge, since that is what a backset is measured from.
+ */
+
+/* The flat the leaf keeps at its own edges, where nothing may be bolted: the
+   lock case runs up the closing edge, the hinges up the other, and the leaf's
+   arris is rolled. EDGE is this file's existing figure for the ramp at the
+   leaf's edge — 38 mm, 0.045 of leaf width — and it is the right one to reuse:
+   inside it the drawing is no longer flat face. */
+const EDGE_FLAT = EDGE;
+
+const hingeLeftOf = state => byId(HANDINGS, state.handing).hinge === 'left';
+
+/* Whether the bar is drawn at its PANELLED length — shortened at both ends so
+   its feet land in the panel's flat fields rather than on the mouldings.
+   `render` decides this, and everything that reasons about where the feet are
+   has to decide it the same way. It did not, and the answer was 3,900 default
+   positions declared unbuildable by their own drawing: the feet were being
+   computed from the bar's catalogue length while the door drew a shorter one.
+   A quantity computed in two places, exactly as advertised. */
+const gripPanelled = (state, place) =>
+  byId(DETAILS, state.detail).panel
+  && !byId(WINDOWS, state.window).rects.length
+  && place.rot !== 90;
+
+/** Does a foot (a circle, roughly) land on this obstacle? */
+const footHits = (f, ob) => {
+  const inside = (x, y, r) => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h;
+  const near = { x: ob.x - f.r, y: ob.y - f.r, w: ob.w + f.r * 2, h: ob.h + f.r * 2 };
+  if (!inside(f.x, f.y, near)) return false;
+  if (!ob.band) return true;
+  /* A ring: the moulding is the band, and the flat field inside it is where a
+     bar on a panelled door is supposed to stand. */
+  const hole = { x: ob.x + ob.band + f.r, y: ob.y + ob.band + f.r,
+                 w: ob.w - (ob.band + f.r) * 2, h: ob.h - (ob.band + f.r) * 2 };
+  return !(hole.w > 0 && hole.h > 0 && inside(f.x, f.y, hole));
+};
+
+/**
+ * Every rectangle on the face that a bolted foot may not land on, leaf-local.
+ *
+ * Openings come with their architrave included — the pane and its surround are
+ * one object as far as anything bolted through the leaf is concerned. Panels
+ * come as RINGS, because the field inside a panel is flat door and a bar
+ * standing in it is what d087 and d122 both show.
+ *
+ * Computed rather than read off the drawing so that `rules.js` can ask the
+ * question in node. `npm test` checks the answers against the mouldings the
+ * browser actually draws, which is what keeps the two honest.
+ */
+export function faceObstacles(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const detail = byId(DETAILS, state.detail);
+  const openings = apertureLayout(byId(WINDOWS, state.window), leafW);
+  const out = openings.map(o => ({
+    kind: 'window', x: o.x - MOULD_BAND, y: o.top - MOULD_BAND,
+    w: o.w + MOULD_BAND * 2, h: o.h + MOULD_BAND * 2,
+  }));
+
+  if (detail.panel) {
+    const inset = leafW * PANEL_INSET;
+    const winBottom = openings.length ? Math.max(...openings.map(o => o.top + o.h)) : 0;
+    const rows = detail.panels === 2 && !openings.length
+      ? PANEL_ROWS.pair
+      : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
+    for (const [t, b] of rows) {
+      const r = { kind: 'panel', x: inset, y: leafH * t,
+                  w: leafW - inset * 2, h: leafH * (b - t), band: MOULD_BAND };
+      /* `moulding` draws nothing at all below this size, and an obstacle that
+         is not on the door would refuse a handle for a frame nobody can see. */
+      if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
+    }
+  }
+  return out;
+}
+
+/**
+ * Where the grip sits when nobody has moved it: `x` inboard from the CLOSING
+ * edge, `y` down from the leaf's top, both in mm.
+ *
+ * This is the arithmetic `render` used to do inline. It is a function now
+ * because the customer can move the grip, and the moment there are two
+ * possible positions something has to be able to say what the first one was —
+ * to draw it, to snap back to it, and to know whether the design still carries
+ * the default at all.
+ */
+export function gripHome(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const handle = byId(HANDLES, state.handle);
+  const lockset = byId(LOCKSETS, state.lockset);
+  const detail = byId(DETAILS, state.detail);
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const backset = lockBackset(handle, lockset);
+  const raw = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
+  const panelled = detail.panel && !byId(WINDOWS, state.window).rects.length;
+  const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
+  const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
+  const raw0 = { x: backset + standoff, y: leafH - HANDLE_AFF, rot: 0 };
+  /* AND IT HAS TO BE A PLACE THE GRIP CAN ACTUALLY STAND.
+     The arithmetic above is a good guess and not a proof: it works in x, where
+     it was derived, and says nothing about y. `barHalf` shortens a bar on a
+     panelled door so its feet clear the mouldings, but it reasons from the
+     bar's ENDS while the feet sit at 0.14 and 0.88 along it, and it uses the
+     two-panel rows on a door that may carry the lone one. Asked exactly, 980
+     default positions stood a foot on a panel moulding — the very thing the
+     shortening was added to prevent.
+     So the guess is checked and corrected here, once, and every other caller
+     gets a home position that is buildable by construction. */
+  return gripPlacement(state, raw0).ok ? raw0 : nearestGrip(state, raw0);
+}
+
+/** Can this grip be turned on its side at all? Most of them cannot. */
+export function gripCanRotate(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const handle = byId(HANDLES, state.handle);
+  if (handle.style !== 'bar') return false;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  /* Turned sideways a bar has to fit BETWEEN the stiles at its own catalogue
+     length, and five of the seven are longer than a standard leaf is wide —
+     Shahar is 1150 mm against 850. Shortening it to fit was the alternative and
+     the owner's son chose against it, so what is left is a bar that turns only
+     where it genuinely fits: on a WIDE leaf, and only Nitzan, Ella and Ron.
+     Both ends need flat face to land on, which is EDGE_FLAT — the lock's own
+     stile is not the constraint here, since a horizontal bar at lock height is
+     refused by the lockset check instead, wherever it is. */
+  return handle.len > 0 && handle.len <= leafW - EDGE_FLAT * 2 && leafH > 0;
+}
+
+/** The grip's position for this design: the customer's, or its home. */
+export function gripAt(state) {
+  const home = gripHome(state);
+  const g = state.grip;
+  if (!g) return home;
+  const rot = g.rot === 90 && gripCanRotate(state) ? 90 : 0;
+  return { x: g.x, y: g.y, rot };
+}
+
+/**
+ * The bolted feet, leaf-local, as circles.
+ *
+ * A bar's are where `pullBar` draws its fixings — the same `fix.t` fractions
+ * along the same `barHalf`, so a bar that changes length moves its own feet.
+ * Everything else is treated as one foot at its centre, which is what a
+ * backplate or a recess is.
+ */
+export function gripFeet(state, place = null) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const handle = byId(HANDLES, state.handle);
+  if (handle.style === 'none') return [];
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const p = place || gripAt(state);
+  const cx = hingeLeftOf(state) ? leafW - p.x : p.x;
+  const cy = p.y;
+
+  /* THE HORIZONTAL BOW HAS NO FEET WE CAN PLACE. It is centred on the LEAF
+     rather than on the grip's axis — `grabHandle` reads `centreX` and ignores
+     the x we hand it — so its two fixings are near the stiles wherever the
+     customer puts it, and modelling it as one 416 mm foot at the centre said
+     every door it is on runs off its own edge. It travels up and down and not
+     across, and its ends are on flat face on every door we draw: `rules.js`
+     already refuses it across a centred window, and the nine installed ones
+     are all on solid or panelled leaves. */
+  if (handle.style === 'grab') return [];
+  if (handle.style !== 'bar') {
+    const f = handleFootprint(handle, leafH);
+    return [{ x: cx, y: cy, r: Math.max(f.out, f.in), long: f.vy }];
+  }
+  const half = barHalf(handle.len, leafH, gripPanelled(state, p));
+  const r = bossReach(handle);
+  const spec = BARS[handle.bar] || BARS.idan;
+  return spec.fix.t.map(t => {
+    const along = -half + half * 2 * t;
+    return p.rot === 90 ? { x: cx + along, y: cy, r } : { x: cx, y: cy + along, r };
+  });
+}
+
+/**
+ * Is the grip where it is standing buildable, and if not, which rule.
+ *
+ * Reasons are shown to the customer while they drag, so they are in Hebrew and
+ * they name the thing in the way, not the rule.
+ */
+export function gripPlacement(state, place = null) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const handle = byId(HANDLES, state.handle);
+  const p = place || gripAt(state);
+  const at = { ...p, ok: true, why: null };
+  if (handle.style === 'none') return at;
+
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const feet = gripFeet(state, p);
+  const obstacles = faceObstacles(state);
+  const bad = why => ({ ...p, ok: false, why });
+
+  /* THE WHOLE OBJECT ON THE DOOR, before anything about where it is bolted.
+     Checking only the feet let a rotated bar hang 70 mm off the closing edge:
+     both standoffs were comfortably on the leaf and the bar between them was
+     not. The feet are inboard of the ends by design — that is what `fix.t`
+     is — so they can never answer this question. */
+  const half = handleFootprint(handle, leafH, gripPanelled(state, p)).vy;
+  const cx = hingeLeftOf(state) ? leafW - p.x : p.x;
+  const lo = p.rot === 90 ? cx - half : p.y - half;
+  const hi = p.rot === 90 ? cx + half : p.y + half;
+  const span = p.rot === 90 ? leafW : leafH;
+  if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad('הידית חורגת מהדלת');
+
+  /* AND NOT ON THE HINGE SIDE. A pull standing upright past the leaf's centre
+     line is on the half of the door that barely moves: there is no leverage
+     there and nobody fits one. Every bar in the corpus sits between 0.05 and
+     0.31 of the leaf's width from the closing edge, so the centre line is a
+     generous limit rather than a tight one — and without it, 374 designs whose
+     handle had to move for a panel slid clear across the door instead of
+     lifting 50 mm, which is what a fitter would do.
+     Only upright: a bar laid on its side spans the leaf, and its centre
+     belongs near the middle.
+     0.55 and not 0.50: on a narrow leaf a blade grip beside an Almog
+     swan-neck has to stand 355 mm in, which is past the middle of a 700 mm
+     leaf, and refusing that pairing outright is not this rule's business. */
+  if (p.rot === 0 && p.x > leafW * 0.55) return bad('ידית משיכה לא מותקנת בצד הצירים');
+
+  for (const f of feet) {
+    if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT
+        || f.y - f.r < EDGE_FLAT || f.y + f.r > leafH - EDGE_FLAT) {
+      return bad('הידית חורגת מהדלת');
+    }
+    for (const ob of obstacles) {
+      if (footHits(f, ob)) {
+        return bad(ob.kind === 'window' ? 'הרגליים על מסגרת החלון'
+                                        : 'הרגליים על מסגרת הפאנל');
+      }
+    }
+  }
+
+  /* And the lock furniture, which is the one thing on this face that is NOT
+     behind the bar: both stand off the same leaf, so neither is in front. The
+     lever's own drawn reach is what has to be cleared, as everywhere else. */
+  const lockset = byId(LOCKSETS, state.lockset);
+  const lock = handleFootprint(lockset, leafH);
+  const hingeOnLeft = hingeLeftOf(state);
+  const backset = lockBackset(handle, lockset);
+  const lockX = hingeOnLeft ? leafW - backset : backset;
+  const grip = handleFootprint(handle, leafH);
+  const gw = p.rot === 90 ? grip.vy : Math.max(grip.out, grip.in);
+  const gh = p.rot === 90 ? Math.max(grip.out, grip.in) : grip.vy;
+  /* The same arithmetic `gripStandoff` places the grip with, asked as a
+     question — so the position it chooses is by definition one this accepts.
+     Written as two boxes first, and that was wrong twice over: a symmetric box
+     around an asymmetric footprint, and no test of whether the two are even at
+     the same HEIGHT. A bar dropped to the foot of the door was being refused
+     for touching a lever 800 mm above it. */
+  const lockY = leafH - HANDLE_AFF;
+  const meet = Math.abs(p.y - lockY) < gh + lock.vy;
+  if (meet && Math.abs(cx - lockX) < lock.in + gw + LOCK_CLEAR) {
+    return bad('הידית נוגעת במנעול');
+  }
+
+  /* AND THE SHAFT DOES NOT CROSS THE GLASS.
+     The feet rule above is about what is BOLTED, and it is the owner's son's
+     rule; this is the older one, and both are needed. Left to the feet alone
+     the search cheerfully lifted a bar clear of a panel moulding and stood it
+     straight down the middle of the light — feet on solid face at both ends,
+     shaft across the pane. Nobody fits that, and the site has refused it since
+     `gripClashesGlass` was written.
+     The GLASS, not the opening: a bar may cross the architrave, which stands
+     8 mm proud while the bar is 50 mm off the door on its standoffs. That is
+     the same depth argument that lets a bar cross a moulded panel on d087 and
+     d122, and it is why this reads `o` rather than the obstacle list. */
+  for (const o of apertureLayout(byId(WINDOWS, state.window), leafW)) {
+    if (Math.abs(cx - (o.x + o.w / 2)) < gw + o.w / 2
+        && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
+      return bad('הידית חוצה את החלון');
+    }
+  }
+
+  return at;
+}
+
+/**
+ * The nearest place this grip CAN stand to where the customer let go of it.
+ *
+ * A search rather than an inverse, because the obstacles are a list of
+ * rectangles and the answer has to be right for all of them at once. Rings
+ * outward in 10 mm steps, which on the largest leaf is 120 tries and runs in
+ * under a millisecond; returns the home position if nothing at all fits, since
+ * a door always has to be able to show its handle somewhere.
+ */
+export function nearestGrip(state, want) {
+  if (gripPlacement(state, want).ok) return want;
+  /* Rings, but ELLIPTICAL — three times as wide as they are tall.
+     A handle's HEIGHT is ergonomic and its distance from the edge is a style
+     choice, so when something is in the way the honest move is sideways. A
+     circular search does not know that: it moved 2,332 default positions off
+     the affordance height, one of them by 480 mm, when sliding the bar 40 mm
+     inboard would have done. Cost is the same either way — the search stops at
+     the first ring that has anything in it. */
+  /* Sideways first and hard — a tenth of a millimetre up for every millimetre
+     across — then, only if the whole leaf offers nothing on that path, a plain
+     circular sweep. Sixteen designs out of 9,876 need the second pass, all of
+     them a long bar on a narrow leaf where sliding it inboard runs into the
+     glazing and the only way out is down. */
+  for (const stretch of [4, 1]) {
+    for (let ring = 1; ring <= 40; ring++) {
+      const d = ring * 10 * (stretch === 1 ? 2 : 1);
+      let best = null, bestD = Infinity;
+      for (let a = 0; a < 24; a++) {
+        const th = (a / 24) * Math.PI * 2;
+        const cand = { x: Math.round((want.x + Math.cos(th) * d * stretch) / 5) * 5,
+                       y: Math.round((want.y + Math.sin(th) * d) / 5) * 5,
+                       rot: want.rot };
+        if (!gripPlacement(state, cand).ok) continue;
+        const dist = (cand.x - want.x) ** 2 + ((cand.y - want.y) * stretch) ** 2;
+        if (dist < bestD) { bestD = dist; best = cand; }
+      }
+      if (best) return best;
+    }
+  }
+  /* AND IF THE RINGS FOUND NOTHING, SWEEP THE WHOLE LEAF.
+     Rings sample 24 angles, which is plenty when the answer is a broad region
+     and useless when it is an island. Twelve designs have one: a long bar
+     between a light and a panel, where the only spots that work are 83 out of
+     seventeen thousand. The rings walked straight past them and the default
+     position came back refused — on a door that can perfectly well carry its
+     own handle.
+     A 10 mm grid over the leaf is about 15,000 placement checks — plain
+     arithmetic, no drawing. Far too slow to do first and completely fine as a
+     last resort, which is what the two ring passes above buy. 20 mm was tried
+     and still walked past a narrow door whose island is 238 spots wide. */
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  let best = null, bestD = Infinity;
+  for (let x = EDGE_FLAT; x < leafW; x += 10) {
+    for (let y = EDGE_FLAT; y < leafH; y += 10) {
+      const cand = { x, y, rot: want.rot };
+      const d = (x - want.x) ** 2 + ((y - want.y) * 2) ** 2;
+      if (d >= bestD || !gripPlacement(state, cand).ok) continue;
+      bestD = d; best = cand;
+    }
+  }
+  /* Truly nowhere: hand back what was asked for rather than the home position,
+     which is itself computed THROUGH this function — sending it here was a
+     cycle that recursed until the stack gave out. */
+  return best || want;
 }
 
 /**
@@ -2353,15 +2729,21 @@ const LOCK_ART = {
   cylinder: (h, g) => cylinder(g.cx, g.cy, true),
 };
 
-function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled) {
+function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled, rot = 0) {
   const draw = GRIP_ART[handle.style];
   if (!draw) return '';
   const art = draw(handle, { cx, cy, dir, paint, centreX, leafW, leafH, y0, panelled });
   if (!art) return '';
   const foot = handleFootprint(handle, leafH, panelled);
+  /* Turned on its side about its own centre. A rotation is the honest way to
+     draw it — every highlight, every collar and the shadow it drops all turn
+     with the bar, which is what happens when you hang the same object the
+     other way up. Drawing a second horizontal version would be a second thing
+     to keep in step with the first. */
+  const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : '';
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
-             data-vy="${foot.vy}">${art}</g>`;
+             data-vy="${foot.vy}" data-rot="${rot}"${turned}>${art}</g>`;
 }
 
 function locksetArt(lockset, cx, cy, dir) {
@@ -2399,8 +2781,13 @@ const channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
 const barHalf = (len, leafH, panelled = false) => {
   const half = Math.min(len, leafH - 320) / 2;
   if (!panelled) return half;
-  const clearOfTopRun  = leafH * 0.66 + MOULD_BAND - HANDLE_AFF;
-  const insideFootRun  = leafH * 0.92 - MOULD_BAND - HANDLE_AFF;
+  /* HANDLE_AFF is an affordance height off the FLOOR; the panel rows are
+     fractions from the leaf's TOP. Subtracting one from the other directly
+     put every clamp 30 mm out — small, and exactly the kind of small this
+     file has been caught by before. */
+  const centre = leafH - HANDLE_AFF;
+  const clearOfTopRun  = leafH * PANEL_ROWS.pair[1][0] + MOULD_BAND - centre;
+  const insideFootRun  = leafH * PANEL_ROWS.pair[1][1] - MOULD_BAND - centre;
   return Math.min(Math.max(half, clearOfTopRun), insideFootRun);
 };
 

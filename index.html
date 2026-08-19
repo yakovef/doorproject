@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
-<link rel="stylesheet" href="css/app.css?v=6faad1ec">
+<link rel="stylesheet" href="css/app.css?v=e53b3126">
 </head>
 <body>
 
@@ -32,6 +32,15 @@
     <div class="stage" id="stage"></div>
     <div class="stage__bar">
       <p class="stage__note">הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם.</p>
+      <!-- The handle can be dragged on the door itself. These are the same
+           two moves for anyone not using a pointer, and the only way to turn
+           it — a rotate gesture on a door handle would be a guess. Hidden
+           entirely when the door has no pull handle on it. -->
+      <div class="grip-bar" id="grip-bar" hidden>
+        <span class="grip-bar__hint">גררו את הידית למקום שתרצו</span>
+        <button type="button" class="grip-bar__btn" id="grip-rot">סובבו</button>
+        <button type="button" class="grip-bar__btn" id="grip-home">למקום המקורי</button>
+      </div>
     </div>
   </section>
 
@@ -96,6 +105,6 @@
     document.documentElement.classList.add('is-bare');
   }
 </script>
-<script src="assets/bundle.js?v=311add3a"></script>
+<script src="assets/bundle.js?v=62269d8f"></script>
 </body>
 </html>

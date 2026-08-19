@@ -33,8 +33,9 @@ import {
 } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import {
-  describe, detailGlyph, glazingGlyph, grilleGlyph,
-  handleGlyph, locksetGlyph, render, sizeGlyph, windowGlyph,
+  describe, detailGlyph, glazingGlyph, gripAt, gripCanRotate, gripHome,
+  gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
+  render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
 import { copyMessage, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
@@ -123,6 +124,15 @@ function init() {
   if (notice) showNotice(notice);
 
   $('#copy-btn').addEventListener('click', onCopy);
+  $('#grip-rot').addEventListener('click', () => {
+    if (!gripCanRotate(state)) {
+      toast('הידית הזו ארוכה מרוחב הדלת — אפשר לסובב רק ידית שנכנסת בין המזוזות');
+      return;
+    }
+    const now = gripAt(state);
+    placeGrip({ ...now, rot: now.rot === 90 ? 0 : 90 }, true);
+  });
+  $('#grip-home').addEventListener('click', () => set({ ...state, grip: null }));
 
   /* The crop depends on the stage's shape, so it has to be recomputed
      whenever that changes — a rotated phone, a dragged window, one of the
@@ -399,6 +409,144 @@ function paint() {
 
   $('#wa-btn').href = whatsappUrl(state);
   announce(describe(state));
+  armGrip();
+}
+
+/* ── moving the handle ────────────────────────────────────────────
+ *
+ * The grip is the one object on the stage a customer can touch. Dragging it
+ * does not re-render the door: the group is moved with a `transform` while the
+ * pointer is down, because a full `render()` per pointermove is a few hundred
+ * nodes replaced sixty times a second and on a phone that is what the drag
+ * feels like. One render on release, through `set`, so the price line, the
+ * link and the code all follow as they do for every other change.
+ *
+ * A position that cannot be built goes red under the finger and SNAPS BACK on
+ * release, to the nearest place that works, with the reason in the toast. The
+ * owner's son chose snap-back over leaving it stuck: nobody can end up holding
+ * a door that cannot be made.
+ */
+let dragging = null;
+
+function armGrip() {
+  const bar = $('#grip-bar');
+  const g = $('#stage svg [data-hw="handle"]');
+  bar.hidden = !g;
+  if (!g) return;
+
+  g.classList.add('grip-live');
+  g.setAttribute('tabindex', '0');
+  g.setAttribute('role', 'button');
+  g.setAttribute('aria-label', 'מיקום הידית. גררו, או הזיזו עם מקשי החיצים');
+  g.addEventListener('pointerdown', onGripDown);
+  g.addEventListener('keydown', onGripKey);
+
+  const rot = $('#grip-rot');
+  const can = gripCanRotate(state);
+  rot.setAttribute('aria-disabled', String(!can));
+  rot.title = can ? '' : 'הידית הזו ארוכה מרוחב הדלת — אי אפשר להניח אותה לרוחב';
+  /* Moved, and saying so. The position is not part of the order — it is not in
+     the code and not in the WhatsApp message, at the owner's son's instruction
+     — so a customer who has dragged the handle somewhere is told, plainly,
+     that where it ends up is settled on site. Anything less would be the site
+     promising something nobody is building to. */
+  const home = gripHome(state), now = gripAt(state);
+  const moved = !(now.x === home.x && now.y === home.y && now.rot === 0);
+  $('#grip-home').hidden = !moved;
+  $('.grip-bar__hint').textContent = moved
+    ? 'מיקום הידית להמחשה — נקבע בהתקנה'
+    : 'גררו את הידית למקום שתרצו';
+}
+
+/** Pointer position in LEAF-LOCAL millimetres, x from the leaf's left edge. */
+function leafPoint(svg, ev) {
+  const pt = svg.createSVGPoint();
+  pt.x = ev.clientX; pt.y = ev.clientY;
+  const q = pt.matrixTransform(svg.getScreenCTM().inverse());
+  const leaf = svg.querySelector('#leaf rect').getBBox();
+  return { x: q.x - leaf.x, y: q.y - leaf.y, leaf };
+}
+
+const hingeLeft = () => byId(HANDINGS, state.handing).hinge === 'left';
+/* The design stores the grip's distance from the CLOSING edge, because that is
+   the edge a backset is measured from and it means flipping the handing
+   mirrors the handle instead of leaving it behind. The drawing works from the
+   leaf's left. One conversion, used both ways round. */
+const fromEdge = (x, leafW) => (hingeLeft() ? leafW - x : x);
+
+function onGripDown(ev) {
+  const svg = $('#stage svg');
+  const g = ev.currentTarget;
+  const p = leafPoint(svg, ev);
+  const now = gripAt(state);
+  dragging = {
+    g, svg, leaf: p.leaf,
+    cx0: Number(g.dataset.cx), cy0: Number(g.dataset.cy),
+    /* Where inside the handle they took hold, so it does not jump to centre
+       itself under the finger the moment it moves. */
+    dx: p.x - fromEdge(now.x, p.leaf.width), dy: p.y - now.y,
+    rot: now.rot, at: now,
+  };
+  g.setPointerCapture(ev.pointerId);
+  g.addEventListener('pointermove', onGripMove);
+  g.addEventListener('pointerup', onGripUp);
+  g.addEventListener('pointercancel', onGripUp);
+  ev.preventDefault();
+}
+
+/** Snap to 5 mm: finer than anyone can aim and coarser than a float. */
+const snap = v => Math.round(v / 5) * 5;
+
+function onGripMove(ev) {
+  if (!dragging) return;
+  const { svg, leaf, g } = dragging;
+  const p = leafPoint(svg, ev);
+  const want = {
+    x: snap(fromEdge(p.x - dragging.dx, leaf.width)),
+    y: snap(p.y - dragging.dy),
+    rot: dragging.rot,
+  };
+  dragging.at = want;
+  const fit = gripPlacement(state, want);
+  g.classList.toggle('grip-bad', !fit.ok);
+  const sx = leaf.x + fromEdge(want.x, leaf.width), sy = leaf.y + want.y;
+  g.setAttribute('transform',
+    (want.rot === 90 ? `rotate(90 ${sx} ${sy}) ` : '')
+    + `translate(${(sx - dragging.cx0).toFixed(1)} ${(sy - dragging.cy0).toFixed(1)})`);
+  ev.preventDefault();
+}
+
+function onGripUp() {
+  if (!dragging) return;
+  const { g, at } = dragging;
+  g.removeEventListener('pointermove', onGripMove);
+  g.removeEventListener('pointerup', onGripUp);
+  g.removeEventListener('pointercancel', onGripUp);
+  dragging = null;
+  placeGrip(at, true);
+}
+
+/** Commit a position, snapping back to the nearest buildable one. */
+function placeGrip(want, saySo) {
+  const fit = gripPlacement(state, want);
+  const at = fit.ok ? want : nearestGrip(state, want);
+  set({ ...state, grip: at });
+  if (!fit.ok && saySo) toast(fit.why + ' — הזזנו למקום הקרוב שאפשר');
+  $('#stage svg [data-hw="handle"]').focus({ preventScroll: true });
+}
+
+/* 10 mm a press, 50 with shift: the same two speeds the option grids use. */
+function onGripKey(ev) {
+  const step = ev.shiftKey ? 50 : 10;
+  const now = gripAt(state);
+  const move = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[ev.key];
+  if (!move) return;
+  /* Left and right are named from the SCREEN, not from the door: an arrow
+     that moves the handle the other way on a left-hung door would be a bug
+     nobody could describe. */
+  const dir = hingeLeft() ? -1 : 1;
+  placeGrip({ x: now.x + move[0] * step * dir, y: now.y + move[1] * step, rot: now.rot }, false);
+  ev.preventDefault();
 }
 
 /**

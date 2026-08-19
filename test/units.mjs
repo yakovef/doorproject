@@ -6,8 +6,9 @@ import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, H
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import {
-  detailGlyph, glazingGlyph, grilleGlyph, handleGlyph, LIGHT,
-  locksetGlyph, render, sizeGlyph, windowGlyph,
+  detailGlyph, faceObstacles, glazingGlyph, gripAt, gripCanRotate, gripFeet,
+  gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT, locksetGlyph,
+  nearestGrip, render, sizeGlyph, windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -72,6 +73,18 @@ function* everyState() {
          their own sweeps. */
       for (const z of GLAZINGS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: 'coral', glazing: z.id });
       for (const st of out) if (buildable(st)) yield st;
+    }
+}
+
+/** Every design the GRIP's position could depend on: what is on the face, what
+ *  is beside it on the stile, and how big the leaf is. Colour and glazing
+ *  cannot move a handle, so they are held still. */
+function* everyPlacement() {
+  for (const n of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
+    for (const d of DETAILS) for (const size of sizeKeys) for (const h of HANDINGS) {
+      const st = { ...base, handle: n.id, lockset: k.id, window: w.id,
+                   detail: d.id, size, handing: h.id };
+      if (buildable(st)) yield st;
     }
 }
 
@@ -682,6 +695,99 @@ group('a panel that is charged for is a panel that is drawn');
      + `the drawing shows ${drawn}`);
   }
   console.log(`  (${n} buildable faces, ${missing} charged for a panel they do not show)`);
+}
+
+/* ── the handle, and where it may stand ───────────────────────────────
+   The customer can drag the pull handle anywhere on the door. What decides
+   whether a spot is buildable is what is BOLTED — the two feet — and the
+   owner's son gave the rule in one line: red when they are on the panel frame
+   or the window, or when the handle fouls the lever.
+
+   Three things are asserted, and the first is the one that matters. Every
+   door we draw has to be able to show its own handle: if the position the
+   drawing chooses by default is one the rules refuse, the site is arguing
+   with itself, and every drag starts from an illegal position. */
+group('every door can stand its own handle');
+{
+  let n = 0, off = [];
+  for (const st of everyPlacement()) {
+    n++;
+    const p = gripPlacement(st);
+    ok(p.ok, `${st.handle}+${st.lockset}/${st.window}/${st.detail}/${st.size}: `
+           + `the default handle position is refused — ${p.why}`);
+    /* And it should still be at the height a hand reaches. It moves where a
+       moulding is in the way, and the drawing prefers sideways, but a handle
+       that has crept a long way up or down the door is a defect even when it
+       is legal. 485 mm is the worst in the catalogue today: a short Ron bar
+       between a rect light and a panel on a wide leaf. */
+    const want = (SIZES[st.size].h - 50) - 1020;
+    const dy = Math.abs(gripHome(st).y - want);
+    if (dy > 1) off.push(dy);
+    ok(dy <= 500, `${st.handle}/${st.window}/${st.detail}/${st.size}: the handle sits `
+                + `${Math.round(dy)} mm off the height a hand reaches`);
+  }
+  off.sort((a, b) => b - a);
+  console.log(`  (${n} designs, ${off.length} whose handle moved for a moulding, `
+            + `worst ${Math.round(off[0] || 0)} mm, median ${Math.round(off[off.length >> 1] || 0)} mm)`);
+}
+
+group('a handle on a frame is refused, and told why');
+{
+  const st = { ...base, window: 'tallwin', detail: 'panel', handle: 'idan',
+               lockset: 'cylinder', size: 'standard', handing: 'right-in' };
+  const win = faceObstacles(st).find(o => o.kind === 'window');
+  ok(win, 'no window obstacle on a glazed door — this check is dead');
+  /* Straight onto the middle of the architrave, on the LOCK side of the leaf —
+     put it on the hinge side and the hinge rule answers first, which is
+     correct and not what this check is about. */
+  const onFrame = { x: 850 - (win.x + win.w - 20), y: win.y + win.h / 2, rot: 0 };
+  const bad = gripPlacement(st, onFrame);
+  ok(!bad.ok, 'a foot on the window architrave should be refused');
+  ok(/חלון/.test(bad.why || ''), `the reason should name the window, got "${bad.why}"`);
+
+  /* And the way out of it is a position that IS buildable, every time. */
+  let i = 0;
+  for (const st2 of everyPlacement()) {
+    if (i++ % 97) continue;
+    const wild = { x: 40, y: 200, rot: 0 };
+    const near = nearestGrip(st2, wild);
+    ok(gripPlacement(st2, near).ok,
+       `nearestGrip handed back an unbuildable spot on ${st2.handle}/${st2.window}/${st2.size}`);
+  }
+}
+
+group('the handle position rides in the link and not in the code');
+{
+  /* A position the door can actually take, so that what is being tested is
+     the round trip and not `repair` doing its job on the way in. */
+  const spot = { ...gripHome(DEFAULTS), y: gripHome(DEFAULTS).y - 100 };
+  ok(gripPlacement(DEFAULTS, spot).ok, 'the fixture position should be buildable');
+  const moved = { ...DEFAULTS, grip: spot };
+  const q = toQuery(moved);
+  ok(q.includes('gp='), `the link should carry the position, got ${q}`);
+  const back = fromQuery(q);
+  ok(back.state.grip && back.state.grip.x === spot.x && back.state.grip.y === spot.y,
+     `the link should bring the position back, got ${JSON.stringify(back.state.grip)}`);
+  ok(!toQuery(DEFAULTS).includes('gp='),
+     'a door nobody dragged should produce exactly the link it always did');
+
+  /* DELIBERATE, and the reason is worth an assertion rather than a comment:
+     the code is read down a telephone as a specification, and the owner's son
+     ruled that the position is a picture rather than something his father
+     builds to. Carrying it would also have cost a VERSION bump and every code
+     written so far. If that decision is ever reversed, this line fails and
+     says where to look. */
+  ok(encodeCode(moved) === encodeCode(DEFAULTS),
+     'the short code must NOT carry the handle position');
+
+  /* A link with the handle somewhere impossible opens on a real door. */
+  const wild = fromQuery(toQuery({ ...DEFAULTS, grip: { x: 300, y: 300, rot: 0 } }));
+  ok(gripPlacement(wild.state).ok, 'a link with an impossible handle position must be repaired');
+
+  /* And rotation only survives where it fits. */
+  const turned = fromQuery(toQuery({ ...DEFAULTS, handle: 'shahar', grip: { x: 160, y: 1030, rot: 90 } }));
+  ok(!gripCanRotate(turned.state), 'shahar is longer than a standard leaf is wide');
+  ok(gripAt(turned.state).rot === 0, 'a rotation the leaf cannot take must come back upright');
 }
 
 /* The finish must reach the METAL, not merely change the document.

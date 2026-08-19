@@ -220,6 +220,39 @@ body {
   min-block-size: 36px; padding: 6px 18px; font-size: .82rem;
 }
 
+/* ── the handle, and moving it ─────────────────────────────
+   The grip is the one thing on the stage you can touch. It gets a real
+   pointer, a focus ring of its own, and `touch-action: none` so a finger
+   dragging it moves the handle instead of scrolling the page — which is what
+   happens by default and is indistinguishable, to the customer, from the
+   feature not existing. */
+.grip-bar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  justify-content: center;
+}
+.grip-bar__hint { font-size: .72rem; color: var(--ink-2); }
+.grip-bar__btn {
+  min-block-size: 34px; padding: 5px 14px;
+  border: 1px solid var(--rule); border-radius: 999px;
+  background: var(--paper-up); color: var(--ink); font: inherit; font-size: .78rem;
+  cursor: pointer;
+}
+.grip-bar__btn:hover { border-color: var(--ink-2); }
+.grip-bar__btn[aria-disabled="true"] { opacity: .45; cursor: default; }
+
+[data-hw="handle"].grip-live { cursor: grab; touch-action: none; }
+[data-hw="handle"].grip-live:active { cursor: grabbing; }
+[data-hw="handle"].grip-live:focus-visible {
+  outline: 3px solid var(--accent); outline-offset: 3px;
+}
+/* RED, and it has to be red on metal — the grips are greys and browns under
+   gradients, so a tint would barely show. A colour matrix that keeps the
+   modelling and throws away everything but the red channel does: the bar still
+   reads as a bar, lit the same way, and it is unmistakably wrong. */
+[data-hw="handle"].grip-bad {
+  filter: grayscale(1) sepia(1) saturate(18) hue-rotate(-56deg) brightness(.95);
+}
+
 /* ── panel ────────────────────────────────────────────────── */
 
 /* minmax(0, 1fr) here for the same reason as on .layout: `.panel` is a grid,

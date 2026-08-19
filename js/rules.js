@@ -52,7 +52,7 @@
  */
 
 import { byId, DETAILS, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
-import { gripClashesGlass, gripClashesLockset } from './renderer.js';
+import { gripCanRotate, gripClashesGlass, gripClashesLockset, gripPlacement, nearestGrip } from './renderer.js';
 
 /** Does this detail put ruled line work on the face? */
 export const isLineWork = detail => !!(detail.strips || detail.groove);
@@ -330,6 +330,8 @@ const SAID = {
   glazingGone:   'החזרנו זכוכית שקופה — אין חלון',
   gripGone:      'הסרנו את ידית המשיכה — אין לה מקום כאן',
   locksetSwapped:'החלפנו את המנעול — אין לו מקום ליד המאחז',
+  gripMoved:     'הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה',
+  gripHome:      'הידית הוסרה, ואיתה המיקום שבחרתם לה',
 };
 
 /**
@@ -436,6 +438,31 @@ export function repair(state, intent = null) {
   if (gripClashesGlass(s)) {
     if (intent === 'handle') { s.window = 'none'; change('window', SAID.windowGone); }
     else { s.handle = 'none'; change('handle', SAID.gripGone); }
+  }
+
+  /* THE GRIP THE CUSTOMER MOVED, on a door that has changed under it.
+     A position is chosen against one arrangement of windows, panels and lock
+     furniture, and every one of those can change afterwards — from a tile, or
+     from a link written weeks ago. So the position is re-asked here rather
+     than trusted, and moved to the nearest place that still works. It is the
+     same `nearestGrip` the drag uses on release; a design arriving down a link
+     and a design arriving from a click must not be able to disagree about
+     where a handle can stand.
+     A grip that is gone takes its position with it, and a bar that can no
+     longer be turned comes back upright — otherwise a stale `gp=` in a URL
+     would carry a rotation the leaf cannot take. */
+  if (s.grip) {
+    if (byId(HANDLES, s.handle).style === 'none') {
+      s.grip = null;
+      change('grip', SAID.gripHome);
+    } else {
+      const want = { ...s.grip, rot: s.grip.rot === 90 && gripCanRotate(s) ? 90 : 0 };
+      const near = gripPlacement(s, want).ok ? want : nearestGrip(s, want);
+      if (near.x !== s.grip.x || near.y !== s.grip.y || near.rot !== s.grip.rot) {
+        s.grip = near;
+        change('grip', SAID.gripMoved);
+      }
+    }
   }
 
   /* LAST, and only once ALL the glass is gone. This used to run straight after

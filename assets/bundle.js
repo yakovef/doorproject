@@ -561,9 +561,9 @@
     } : null;
     const rawStandoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
     const panelled = detail.panel && !win.rects.length;
-    const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - lockBackset(handle, lockset);
-    const standoff = handle.pull && panelled ? Math.max(rawStandoff, insideField) : rawStandoff;
-    const handleX = lockX + inward * standoff;
+    const place = gripAt(state2);
+    const handleX = lockX + inward * (place.x - lockBackset(handle, lockset));
+    const handleY = y0 + place.y;
     const paint2 = colour.hex;
     const edge = silhouette(paint2);
     const fall = isLight(paint2) ? FALLOFF.light : FALLOFF.dark;
@@ -1306,21 +1306,26 @@
     ${gripArt(
       handle,
       handleX,
-      y(HANDLE_AFF),
+      handleY,
       leafH,
       leverDir,
       paint2,
       centreX,
       leafW,
       y0,
-      panelled
+      panelled && place.rot !== 90,
+      place.rot
     )}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? "" : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
+  <!-- The vignette is LIGHT, and light is not something you can touch. It is
+       drawn last and covers the whole scene, so without this it swallowed
+       every pointer event on the stage — the handle could not be picked up at
+       all, and nothing in the console said why. -->
   <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-        height="${view.h + SCENE * 2}" fill="url(#vignette)"/>
+        height="${view.h + SCENE * 2}" fill="url(#vignette)" pointer-events="none"/>
 `;
     return `
 <svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
@@ -1404,6 +1409,7 @@ ${body}
   }
   var PANEL_INSET = 0.23;
   var PANEL_INSET_MAX = 0.39;
+  var PANEL_ROWS = { pair: [[0.07, 0.58], [0.66, 0.92]], lone: [0.68, 0.9] };
   function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m") {
     const band = MOULD_BAND;
     const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
@@ -1411,14 +1417,193 @@ ${body}
     const leaf = { x: lx, y: ly, w: lw, h: lh };
     const rect = (t, b, n) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale, leaf, `p${key}${n}`);
     if (upper && winBottom <= ly + 1) {
-      return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
-               data-band="${band.toFixed(1)}">${rect(0.07, 0.58, 0)}${rect(0.66, 0.92, 1)}</g>`;
+      return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * PANEL_ROWS.pair[0][0]).toFixed(1)}"
+               data-band="${band.toFixed(1)}">${PANEL_ROWS.pair.map(([t, bt], n) => rect(t, bt, n)).join("")}</g>`;
     }
-    const top = Math.max(ly + lh * 0.68, winBottom + lw * 0.08);
-    const bottom = ly + lh * 0.9;
+    const top = Math.max(ly + lh * PANEL_ROWS.lone[0], winBottom + lw * 0.08);
+    const bottom = ly + lh * PANEL_ROWS.lone[1];
     const art = moulding(x, top, w, bottom - top, band, paint2, pale, leaf, `p${key}0`);
     return art ? `<g data-detail="panel" data-top="${top.toFixed(1)}"
                    data-band="${band.toFixed(1)}">${art}</g>` : "";
+  }
+  var EDGE_FLAT = EDGE;
+  var hingeLeftOf = (state2) => byId(HANDINGS, state2.handing).hinge === "left";
+  var gripPanelled = (state2, place) => byId(DETAILS, state2.detail).panel && !byId(WINDOWS, state2.window).rects.length && place.rot !== 90;
+  var footHits = (f, ob) => {
+    const inside = (x, y, r) => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h;
+    const near = { x: ob.x - f.r, y: ob.y - f.r, w: ob.w + f.r * 2, h: ob.h + f.r * 2 };
+    if (!inside(f.x, f.y, near)) return false;
+    if (!ob.band) return true;
+    const hole = {
+      x: ob.x + ob.band + f.r,
+      y: ob.y + ob.band + f.r,
+      w: ob.w - (ob.band + f.r) * 2,
+      h: ob.h - (ob.band + f.r) * 2
+    };
+    return !(hole.w > 0 && hole.h > 0 && inside(f.x, f.y, hole));
+  };
+  function faceObstacles(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const detail = byId(DETAILS, state2.detail);
+    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW);
+    const out = openings.map((o) => ({
+      kind: "window",
+      x: o.x - MOULD_BAND,
+      y: o.top - MOULD_BAND,
+      w: o.w + MOULD_BAND * 2,
+      h: o.h + MOULD_BAND * 2
+    }));
+    if (detail.panel) {
+      const inset = leafW * PANEL_INSET;
+      const winBottom = openings.length ? Math.max(...openings.map((o) => o.top + o.h)) : 0;
+      const rows = detail.panels === 2 && !openings.length ? PANEL_ROWS.pair : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
+      for (const [t, b] of rows) {
+        const r = {
+          kind: "panel",
+          x: inset,
+          y: leafH * t,
+          w: leafW - inset * 2,
+          h: leafH * (b - t),
+          band: MOULD_BAND
+        };
+        if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
+      }
+    }
+    return out;
+  }
+  function gripHome(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const handle = byId(HANDLES, state2.handle);
+    const lockset = byId(LOCKSETS, state2.lockset);
+    const detail = byId(DETAILS, state2.detail);
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const backset = lockBackset(handle, lockset);
+    const raw = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
+    const panelled = detail.panel && !byId(WINDOWS, state2.window).rects.length;
+    const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
+    const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
+    const raw0 = { x: backset + standoff, y: leafH - HANDLE_AFF, rot: 0 };
+    return gripPlacement(state2, raw0).ok ? raw0 : nearestGrip(state2, raw0);
+  }
+  function gripCanRotate(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const handle = byId(HANDLES, state2.handle);
+    if (handle.style !== "bar") return false;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    return handle.len > 0 && handle.len <= leafW - EDGE_FLAT * 2 && leafH > 0;
+  }
+  function gripAt(state2) {
+    const home = gripHome(state2);
+    const g = state2.grip;
+    if (!g) return home;
+    const rot = g.rot === 90 && gripCanRotate(state2) ? 90 : 0;
+    return { x: g.x, y: g.y, rot };
+  }
+  function gripFeet(state2, place = null) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const handle = byId(HANDLES, state2.handle);
+    if (handle.style === "none") return [];
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const p = place || gripAt(state2);
+    const cx = hingeLeftOf(state2) ? leafW - p.x : p.x;
+    const cy = p.y;
+    if (handle.style === "grab") return [];
+    if (handle.style !== "bar") {
+      const f = handleFootprint(handle, leafH);
+      return [{ x: cx, y: cy, r: Math.max(f.out, f.in), long: f.vy }];
+    }
+    const half = barHalf(handle.len, leafH, gripPanelled(state2, p));
+    const r = bossReach(handle);
+    const spec = BARS[handle.bar] || BARS.idan;
+    return spec.fix.t.map((t) => {
+      const along = -half + half * 2 * t;
+      return p.rot === 90 ? { x: cx + along, y: cy, r } : { x: cx, y: cy + along, r };
+    });
+  }
+  function gripPlacement(state2, place = null) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const handle = byId(HANDLES, state2.handle);
+    const p = place || gripAt(state2);
+    const at = { ...p, ok: true, why: null };
+    if (handle.style === "none") return at;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const feet = gripFeet(state2, p);
+    const obstacles = faceObstacles(state2);
+    const bad = (why) => ({ ...p, ok: false, why });
+    const half = handleFootprint(handle, leafH, gripPanelled(state2, p)).vy;
+    const cx = hingeLeftOf(state2) ? leafW - p.x : p.x;
+    const lo = p.rot === 90 ? cx - half : p.y - half;
+    const hi = p.rot === 90 ? cx + half : p.y + half;
+    const span = p.rot === 90 ? leafW : leafH;
+    if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad("הידית חורגת מהדלת");
+    if (p.rot === 0 && p.x > leafW * 0.55) return bad("ידית משיכה לא מותקנת בצד הצירים");
+    for (const f of feet) {
+      if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT || f.y - f.r < EDGE_FLAT || f.y + f.r > leafH - EDGE_FLAT) {
+        return bad("הידית חורגת מהדלת");
+      }
+      for (const ob of obstacles) {
+        if (footHits(f, ob)) {
+          return bad(ob.kind === "window" ? "הרגליים על מסגרת החלון" : "הרגליים על מסגרת הפאנל");
+        }
+      }
+    }
+    const lockset = byId(LOCKSETS, state2.lockset);
+    const lock = handleFootprint(lockset, leafH);
+    const hingeOnLeft = hingeLeftOf(state2);
+    const backset = lockBackset(handle, lockset);
+    const lockX = hingeOnLeft ? leafW - backset : backset;
+    const grip = handleFootprint(handle, leafH);
+    const gw = p.rot === 90 ? grip.vy : Math.max(grip.out, grip.in);
+    const gh = p.rot === 90 ? Math.max(grip.out, grip.in) : grip.vy;
+    const lockY = leafH - HANDLE_AFF;
+    const meet = Math.abs(p.y - lockY) < gh + lock.vy;
+    if (meet && Math.abs(cx - lockX) < lock.in + gw + LOCK_CLEAR) {
+      return bad("הידית נוגעת במנעול");
+    }
+    for (const o of apertureLayout(byId(WINDOWS, state2.window), leafW)) {
+      if (Math.abs(cx - (o.x + o.w / 2)) < gw + o.w / 2 && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
+        return bad("הידית חוצה את החלון");
+      }
+    }
+    return at;
+  }
+  function nearestGrip(state2, want) {
+    if (gripPlacement(state2, want).ok) return want;
+    for (const stretch of [4, 1]) {
+      for (let ring = 1; ring <= 40; ring++) {
+        const d = ring * 10 * (stretch === 1 ? 2 : 1);
+        let best2 = null, bestD2 = Infinity;
+        for (let a = 0; a < 24; a++) {
+          const th = a / 24 * Math.PI * 2;
+          const cand = {
+            x: Math.round((want.x + Math.cos(th) * d * stretch) / 5) * 5,
+            y: Math.round((want.y + Math.sin(th) * d) / 5) * 5,
+            rot: want.rot
+          };
+          if (!gripPlacement(state2, cand).ok) continue;
+          const dist = (cand.x - want.x) ** 2 + ((cand.y - want.y) * stretch) ** 2;
+          if (dist < bestD2) {
+            bestD2 = dist;
+            best2 = cand;
+          }
+        }
+        if (best2) return best2;
+      }
+    }
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    let best = null, bestD = Infinity;
+    for (let x = EDGE_FLAT; x < leafW; x += 10) {
+      for (let y = EDGE_FLAT; y < leafH; y += 10) {
+        const cand = { x, y, rot: want.rot };
+        const d = (x - want.x) ** 2 + ((y - want.y) * 2) ** 2;
+        if (d >= bestD || !gripPlacement(state2, cand).ok) continue;
+        bestD = d;
+        best = cand;
+      }
+    }
+    return best || want;
   }
   function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
     if (vertical) {
@@ -1793,15 +1978,16 @@ ${body}
        carry a pull bar have exactly this beside it and nothing more. */
     cylinder: (h, g) => cylinder(g.cx, g.cy, true)
   };
-  function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0, panelled) {
+  function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0, panelled, rot = 0) {
     const draw = GRIP_ART[handle.style];
     if (!draw) return "";
     const art = draw(handle, { cx, cy, dir, paint: paint2, centreX, leafW, leafH, y0, panelled });
     if (!art) return "";
     const foot = handleFootprint(handle, leafH, panelled);
+    const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : "";
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
-             data-vy="${foot.vy}">${art}</g>`;
+             data-vy="${foot.vy}" data-rot="${rot}"${turned}>${art}</g>`;
   }
   function locksetArt(lockset, cx, cy, dir) {
     const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
@@ -1815,8 +2001,9 @@ ${body}
   var barHalf = (len, leafH, panelled = false) => {
     const half = Math.min(len, leafH - 320) / 2;
     if (!panelled) return half;
-    const clearOfTopRun = leafH * 0.66 + MOULD_BAND - HANDLE_AFF;
-    const insideFootRun = leafH * 0.92 - MOULD_BAND - HANDLE_AFF;
+    const centre = leafH - HANDLE_AFF;
+    const clearOfTopRun = leafH * PANEL_ROWS.pair[1][0] + MOULD_BAND - centre;
+    const insideFootRun = leafH * PANEL_ROWS.pair[1][1] - MOULD_BAND - centre;
     return Math.min(Math.max(half, clearOfTopRun), insideFootRun);
   };
   function channelHandle(cx, cy, len, leafH, paint2) {
@@ -2732,7 +2919,9 @@ ${body}
     grilleGone: "הסרנו את הסורג — אין חלון",
     glazingGone: "החזרנו זכוכית שקופה — אין חלון",
     gripGone: "הסרנו את ידית המשיכה — אין לה מקום כאן",
-    locksetSwapped: "החלפנו את המנעול — אין לו מקום ליד המאחז"
+    locksetSwapped: "החלפנו את המנעול — אין לו מקום ליד המאחז",
+    gripMoved: "הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה",
+    gripHome: "הידית הוסרה, ואיתה המיקום שבחרתם לה"
   };
   function repair(state2, intent = null) {
     let s = { ...state2 };
@@ -2814,6 +3003,19 @@ ${body}
         change("handle", SAID.gripGone);
       }
     }
+    if (s.grip) {
+      if (byId(HANDLES, s.handle).style === "none") {
+        s.grip = null;
+        change("grip", SAID.gripHome);
+      } else {
+        const want = { ...s.grip, rot: s.grip.rot === 90 && gripCanRotate(s) ? 90 : 0 };
+        const near = gripPlacement(s, want).ok ? want : nearestGrip(s, want);
+        if (near.x !== s.grip.x || near.y !== s.grip.y || near.rot !== s.grip.rot) {
+          s.grip = near;
+          change("grip", SAID.gripMoved);
+        }
+      }
+    }
     if (!isGlazed(s)) {
       if (s.grille !== "none") {
         s.grille = "none";
@@ -2859,6 +3061,10 @@ ${body}
     p.set("d", state2.detail);
     p.set("s", state2.size);
     p.set("h", state2.handing);
+    if (state2.grip) {
+      const g = state2.grip;
+      p.set("gp", `${Math.round(g.x)},${Math.round(g.y)},${g.rot === 90 ? 90 : 0}`);
+    }
     return "?" + p.toString();
   }
   function fromQuery(search) {
@@ -2899,6 +3105,13 @@ ${body}
     if (rawSize != null) {
       if (SIZES[rawSize]) state2.size = rawSize;
       else notice = "option-unknown";
+    }
+    const rawGrip = p.get("gp");
+    if (rawGrip != null) {
+      const [gx, gy, gr] = rawGrip.split(",").map(Number);
+      if ([gx, gy].every(Number.isFinite)) {
+        state2.grip = { x: gx, y: gy, rot: gr === 90 ? 90 : 0 };
+      }
     }
     return settle(state2, notice);
   }
@@ -3143,6 +3356,15 @@ ${body}
     if (PLACEHOLDER) $("#placeholder-note").hidden = false;
     if (notice) showNotice(notice);
     $("#copy-btn").addEventListener("click", onCopy);
+    $("#grip-rot").addEventListener("click", () => {
+      if (!gripCanRotate(state)) {
+        toast("הידית הזו ארוכה מרוחב הדלת — אפשר לסובב רק ידית שנכנסת בין המזוזות");
+        return;
+      }
+      const now = gripAt(state);
+      placeGrip({ ...now, rot: now.rot === 90 ? 0 : 90 }, true);
+    });
+    $("#grip-home").addEventListener("click", () => set({ ...state, grip: null }));
     if (typeof ResizeObserver === "function") {
       new ResizeObserver(fitStage).observe($("#stage"));
     } else {
@@ -3349,6 +3571,107 @@ ${body}
     }
     $("#wa-btn").href = whatsappUrl(state);
     announce(describe(state));
+    armGrip();
+  }
+  var dragging = null;
+  function armGrip() {
+    const bar = $("#grip-bar");
+    const g = $('#stage svg [data-hw="handle"]');
+    bar.hidden = !g;
+    if (!g) return;
+    g.classList.add("grip-live");
+    g.setAttribute("tabindex", "0");
+    g.setAttribute("role", "button");
+    g.setAttribute("aria-label", "מיקום הידית. גררו, או הזיזו עם מקשי החיצים");
+    g.addEventListener("pointerdown", onGripDown);
+    g.addEventListener("keydown", onGripKey);
+    const rot = $("#grip-rot");
+    const can = gripCanRotate(state);
+    rot.setAttribute("aria-disabled", String(!can));
+    rot.title = can ? "" : "הידית הזו ארוכה מרוחב הדלת — אי אפשר להניח אותה לרוחב";
+    const home = gripHome(state), now = gripAt(state);
+    const moved = !(now.x === home.x && now.y === home.y && now.rot === 0);
+    $("#grip-home").hidden = !moved;
+    $(".grip-bar__hint").textContent = moved ? "מיקום הידית להמחשה — נקבע בהתקנה" : "גררו את הידית למקום שתרצו";
+  }
+  function leafPoint(svg, ev) {
+    const pt = svg.createSVGPoint();
+    pt.x = ev.clientX;
+    pt.y = ev.clientY;
+    const q = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const leaf = svg.querySelector("#leaf rect").getBBox();
+    return { x: q.x - leaf.x, y: q.y - leaf.y, leaf };
+  }
+  var hingeLeft = () => byId(HANDINGS, state.handing).hinge === "left";
+  var fromEdge = (x, leafW) => hingeLeft() ? leafW - x : x;
+  function onGripDown(ev) {
+    const svg = $("#stage svg");
+    const g = ev.currentTarget;
+    const p = leafPoint(svg, ev);
+    const now = gripAt(state);
+    dragging = {
+      g,
+      svg,
+      leaf: p.leaf,
+      cx0: Number(g.dataset.cx),
+      cy0: Number(g.dataset.cy),
+      /* Where inside the handle they took hold, so it does not jump to centre
+         itself under the finger the moment it moves. */
+      dx: p.x - fromEdge(now.x, p.leaf.width),
+      dy: p.y - now.y,
+      rot: now.rot,
+      at: now
+    };
+    g.setPointerCapture(ev.pointerId);
+    g.addEventListener("pointermove", onGripMove);
+    g.addEventListener("pointerup", onGripUp);
+    g.addEventListener("pointercancel", onGripUp);
+    ev.preventDefault();
+  }
+  var snap = (v) => Math.round(v / 5) * 5;
+  function onGripMove(ev) {
+    if (!dragging) return;
+    const { svg, leaf, g } = dragging;
+    const p = leafPoint(svg, ev);
+    const want = {
+      x: snap(fromEdge(p.x - dragging.dx, leaf.width)),
+      y: snap(p.y - dragging.dy),
+      rot: dragging.rot
+    };
+    dragging.at = want;
+    const fit = gripPlacement(state, want);
+    g.classList.toggle("grip-bad", !fit.ok);
+    const sx = leaf.x + fromEdge(want.x, leaf.width), sy = leaf.y + want.y;
+    g.setAttribute(
+      "transform",
+      (want.rot === 90 ? `rotate(90 ${sx} ${sy}) ` : "") + `translate(${(sx - dragging.cx0).toFixed(1)} ${(sy - dragging.cy0).toFixed(1)})`
+    );
+    ev.preventDefault();
+  }
+  function onGripUp() {
+    if (!dragging) return;
+    const { g, at } = dragging;
+    g.removeEventListener("pointermove", onGripMove);
+    g.removeEventListener("pointerup", onGripUp);
+    g.removeEventListener("pointercancel", onGripUp);
+    dragging = null;
+    placeGrip(at, true);
+  }
+  function placeGrip(want, saySo) {
+    const fit = gripPlacement(state, want);
+    const at = fit.ok ? want : nearestGrip(state, want);
+    set({ ...state, grip: at });
+    if (!fit.ok && saySo) toast(fit.why + " — הזזנו למקום הקרוב שאפשר");
+    $('#stage svg [data-hw="handle"]').focus({ preventScroll: true });
+  }
+  function onGripKey(ev) {
+    const step2 = ev.shiftKey ? 50 : 10;
+    const now = gripAt(state);
+    const move = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[ev.key];
+    if (!move) return;
+    const dir = hingeLeft() ? -1 : 1;
+    placeGrip({ x: now.x + move[0] * step2 * dir, y: now.y + move[1] * step2, rot: now.rot }, false);
+    ev.preventDefault();
   }
   function markGroup(g, blocked) {
     const chosen = [state[g.key]];

@@ -21,6 +21,54 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The pull handle can be dragged anywhere on the door, and goes red where it
+  cannot go.** Asked for in those words, with the rule attached: red "when the
+  2 points that are connecting it are on the panel frame or window, or
+  overlapping with a lever". That is the right rule and a sharper one than it
+  looks — the BAR may cross a moulding, because it stands 50 mm off the door on
+  its standoffs and two of the corpus doors show exactly that; what may not is
+  what is bolted through. So `gripFeet` gives a grip its feet (a bar's are at
+  its own `fix.t` fractions, the same numbers `pullBar` draws with) and
+  `faceObstacles` gives the face its no-go rectangles — openings with their
+  architrave, panels as RINGS, since the flat field inside a panel is where a
+  bar belongs.
+  Four more rules came out of drawing it: the whole object stays on the leaf
+  (a rotated bar hung 70 mm off the closing edge with both feet comfortably
+  on); the shaft does not cross the GLASS (the search happily lifted a bar
+  clear of a panel and stood it down the middle of the light); the grip clears
+  the lock furniture, asked as the same arithmetic `gripStandoff` places it
+  with; and a pull does not stand past 0.55 of the leaf from the closing edge,
+  because the hinge half of a door has no leverage in it.
+  `nearestGrip` is what a red drop lands on — rings, elliptical so a handle
+  slides sideways before it climbs, then a plain sweep of the whole leaf for
+  the dozen doors whose only valid spots are an island of 83 in seventeen
+  thousand. `gripHome` runs itself through the same search, so **every one of
+  the 9,876 buildable doors can stand its own handle** — asserted, and it could
+  not before: 980 default positions stood a foot on a panel moulding, because
+  `barHalf` shortens a bar by reasoning from its ENDS while the feet sit at
+  0.14 and 0.88 along it, and it used the two-panel rows on doors carrying the
+  lone one. 3,306 handles now move for a moulding; the median move is 5 mm and
+  the worst 485.
+  **Rotation only where it fits**, at the owner's son's choice over shortening
+  the bar: five of the seven are longer than a standard leaf is wide, so it is
+  Nitzan, Ella and Ron on a wide leaf and nothing else. The button says why.
+  **The position rides in the LINK and not in the code** — also his call: it is
+  a picture of what the customer had in mind rather than something his father
+  builds to, so it stays out of the thing that is read down a telephone as a
+  specification, and no VERSION bump was needed. `toQuery` writes `gp` only
+  when the handle has been moved, and the stage says underneath, once it has
+  been, that the final position is settled on site. A test asserts the code
+  does NOT carry it, so if that decision is ever reversed the line fails and
+  says where to look.
+  `repair` re-asks the position on every change, because a spot chosen against
+  one arrangement of windows and panels is not a spot against the next.
+  `npm run collide` now also checks `faceObstacles` — computed in arithmetic so
+  `rules.js` can ask it in node — against the mouldings the browser actually
+  draws, because a second description of the same thing is a thing that drifts.
+- **The vignette no longer eats the pointer.** It is drawn last and covers the
+  whole scene, so nothing on the stage could be clicked at all, and nothing
+  said why. Light is not something you can touch: `pointer-events="none"`.
+
 - **The moulding is 70 mm, and two things had to move to let it be.** Picked
   from the drawing against a sheet of four widths on the door that prompted it.
   The panel had been 83 and read as swollen, but that was the LIGHT, not the

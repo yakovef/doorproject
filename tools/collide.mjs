@@ -26,7 +26,7 @@
 import { chromium } from 'playwright';
 import { DETAILS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { conflicts } from '../js/rules.js';
-import { MOUNT_REACH } from '../js/renderer.js';
+import { faceObstacles, MOUNT_REACH } from '../js/renderer.js';
 
 const deep = process.argv.includes('all');
 const boxes = process.argv.includes('boxes');
@@ -220,6 +220,61 @@ if (boxes) {
   process.exit(process.exitCode);
 }
 
+/* WHAT THE RULES BELIEVE IS ON THE FACE, AGAINST WHAT IS DRAWN THERE.
+   `faceObstacles` is the list of rectangles a bolted foot may not land on, and
+   it is computed in plain arithmetic so that `rules.js` can ask the question in
+   node — where there is no browser and no getBBox. That makes it a SECOND
+   description of the mouldings, and a second description is a thing that
+   drifts. So it is carried into the page and checked against the boxes the
+   drawing hands back for the same door.
+   Windows are compared to the pane group's own bounds, which include the
+   architrave — that is deliberate on both sides, since the architrave is what
+   a foot would land on. Panels are compared to the moulding paths. */
+const obstacleCases = cases.map(st => ({ st, want: faceObstacles(st) }));
+
+const drift = await p.evaluate(rows => {
+  const host = document.getElementById('stage');
+  const out = [];
+  for (const { st, want } of rows) {
+    host.innerHTML = window.__render(st);
+    const svg = host.querySelector('svg');
+    const leaf = svg.querySelector('#leaf rect').getBBox();
+    const got = [];
+    for (const el of svg.querySelectorAll('[data-pane]')) {
+      /* The relight rects are the whole leaf; strip them first, as the sweep
+         below does, or every pane measures as the door. */
+      for (const g of el.querySelectorAll('[data-relight]')) g.remove();
+      const b = el.getBBox();
+      got.push({ kind: 'window', x: b.x - leaf.x, y: b.y - leaf.y, w: b.width, h: b.height });
+    }
+    for (const el of svg.querySelectorAll('[data-detail="panel"]')) {
+      for (const g of el.querySelectorAll('[data-relight]')) g.remove();
+      /* Rectangle by rectangle, not the group: a two-panel face is ONE group
+         holding two mouldings, and its bounds are the union — 1,743 mm of
+         "panel" covering the whole leaf, including the flat gap between them
+         where a bar's foot is perfectly welcome. Each panel is its top run
+         paired with its bottom one, in document order. */
+      const runs = o => [...el.querySelectorAll(`path[fill="url(#mould-${o})"]`)].map(e => e.getBBox());
+      const tops = runs('t'), bots = runs('b');
+      tops.forEach((t, i) => {
+        const bt = bots[i];
+        if (!bt) return;
+        got.push({ kind: 'panel', x: t.x - leaf.x, y: t.y - leaf.y,
+                   w: t.width, h: bt.y + bt.height - t.y });
+      });
+    }
+    const key = o => `${o.kind} ${Math.round(o.x)},${Math.round(o.y)} ${Math.round(o.w)}x${Math.round(o.h)}`;
+    const near = (a, c) => a.kind === c.kind && ['x', 'y', 'w', 'h'].every(k => Math.abs(a[k] - c[k]) <= 2);
+    for (const a of want) {
+      if (!got.some(c => near(a, c))) {
+        out.push({ st: `${st.handle}+${st.lockset}/${st.window}/${st.detail}/${st.size}`,
+                   want: key(a), got: got.map(key).join(' | ') || '(nothing drawn)' });
+      }
+    }
+  }
+  return out;
+}, obstacleCases);
+
 const hits = await p.evaluate(({ cases, allowed }) => {
   const host = document.getElementById('stage');
   const out = [];
@@ -328,10 +383,21 @@ const hits = await p.evaluate(({ cases, allowed }) => {
 
 await b.close();
 
+console.log(`\n${obstacleCases.length} designs: what the placement rules think is on the face,`);
+console.log('against the mouldings the drawing actually puts there\n');
+if (!drift.length) {
+  console.log('  ✓ faceObstacles agrees with the drawing everywhere\n');
+} else {
+  for (const d of drift.slice(0, 6)) {
+    console.log(`  ✗ ${d.st}\n      rules expect ${d.want}\n      drawing has  ${d.got}`);
+  }
+  console.log(`\n  ✗ ${drift.length} obstacles the rules believe in and the drawing does not\n`);
+}
+
 console.log(`\n${cases.length} buildable designs swept, real drawn geometry\n`);
 if (!hits.length) {
   console.log('  ✓ nothing overlaps anything it should not\n');
-  process.exitCode = 0;
+  process.exitCode = drift.length ? 1 : 0;
 } else {
   const byPair = new Map();
   for (const h of hits) {
