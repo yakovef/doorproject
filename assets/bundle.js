@@ -3301,8 +3301,8 @@ ${body}
     return settle(state2, notice);
   }
   function settle(state2, notice) {
-    const { state: fixed, changed } = repair(state2);
-    return { state: fixed, notice: notice || (changed.length ? "combination-fixed" : null) };
+    const { state: fixed, changed, said } = repair(state2);
+    return { state: fixed, said, notice: notice || (changed.length ? "combination-fixed" : null) };
   }
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   var BITS = {
@@ -3531,11 +3531,11 @@ ${body}
   ];
   var groupsIn = (key) => GROUPS.filter((g) => g.in === key);
   function init() {
-    const { state: parsed, notice } = fromQuery(window.location.search);
+    const { state: parsed, notice, said } = fromQuery(window.location.search);
     state = parsed;
     buildPanel();
     if (PLACEHOLDER) $("#placeholder-note").hidden = false;
-    if (notice) showNotice(notice);
+    if (notice) showNotice(notice, said);
     $("#copy-btn").addEventListener("click", onCopy);
     $("#grip-rot").addEventListener("click", () => {
       if (!gripCanRotate(state)) {
@@ -3956,12 +3956,13 @@ ${body}
       el.hidden = true;
     }, 4e3);
   }
-  function showNotice(kind) {
+  function showNotice(kind, said) {
     const el = $("#notice");
-    el.textContent = {
+    const generic = {
       "code-unknown": "הקוד לא זוהה — מציגים דלת ברירת מחדל.",
       "combination-fixed": "השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר."
     }[kind] || "חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.";
+    el.textContent = kind === "combination-fixed" && said && said.length ? said.join(" · ") + "." : generic;
     el.hidden = false;
   }
   if (new URLSearchParams(location.search).has("bare")) {

@@ -911,6 +911,34 @@ group('rules: nothing unbuildable can be reached');
   ok(link.notice === 'combination-fixed', 'a forbidden link must say it was changed');
   ok(buildable(link.state), 'a forbidden link must arrive buildable');
 
+  /* A REPAIR MUST SAY WHAT IT DID, not merely that it happened.
+     `combination-fixed` is one kind covering many events, and the page used to
+     print one line for all of them: "the combination in the link cannot be
+     manufactured, we adjusted it to the nearest door". That is false for the
+     commonest event of the lot. A stale `gp=` moves the HANDLE, whose position
+     is deliberately not in the code, not in the WhatsApp message, and
+     described on the stage as settled on site — so nothing about the door the
+     customer ordered changed, and Peretz was being told it could not be built.
+     Asserted at the boundary the page actually reads. */
+  ok(link.said.length, 'a repaired link must carry the sentences that explain it');
+
+  {
+    const solid = { ...DEFAULTS };
+    const DESIGN = ['colour', 'window', 'glazing', 'grille', 'handle',
+                    'lockset', 'detail', 'size', 'handing'];
+    let posOnly = 0;
+    for (let x = 0; x <= 800; x += 50) for (let y = 0; y <= 2000; y += 100) {
+      const r = fromQuery(toQuery({ ...solid, grip: { x, y, rot: 0 } }));
+      if (r.notice !== 'combination-fixed') continue;
+      if (DESIGN.some(k => r.state[k] !== solid[k])) continue;   // the design moved too
+      posOnly++;
+      ok(r.said.length === 1 && /הידית/.test(r.said[0]),
+         `a link that only moved the handle must say so, got ${JSON.stringify(r.said)}`);
+    }
+    ok(posOnly > 100,
+       `the position-only case should be common enough to matter, saw ${posOnly}`);
+  }
+
   /* And every reachable design really is reachable — the generator and the
      rules must be reading the same table. */
   for (const st of everyState()) { ok(buildable(st), `everyState yielded an unbuildable door`); break; }

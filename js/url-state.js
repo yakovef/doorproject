@@ -104,9 +104,11 @@ export function toQuery(state) {
 }
 
 /**
- * Returns { state, notice }. `notice` is set when a parameter was present but
- * unrecognised — the customer is TOLD, never silently given a different door
- * (PLAN.md §8.2: silent data loss on a shared link is the worst failure here).
+ * Returns { state, notice, said }. `notice` is set when a parameter was present
+ * but unrecognised — the customer is TOLD, never silently given a different
+ * door (PLAN.md §8.2: silent data loss on a shared link is the worst failure
+ * here). `said` is the repair's own sentences, one per change, for the page to
+ * print instead of a generic line; see `settle`.
  */
 export function fromQuery(search) {
   const p = new URLSearchParams(search);
@@ -182,35 +184,49 @@ export function fromQuery(search) {
  * door and the customer is TOLD, in a strip at the top of the page.
  */
 function settle(state, notice) {
-  const { state: fixed, changed } = repair(state);
+  const { state: fixed, changed, said } = repair(state);
   /* An existing notice WINS. `option-unknown` means a name in the link matched
      nothing we sell — the customer is looking at a different door and must be
      told that first; `combination-fixed` is the milder statement that a
      buildable door was assembled from what they asked for. Overwriting the
-     first with the second buries the worse news under the better. */
-  return { state: fixed, notice: notice || (changed.length ? 'combination-fixed' : null) };
+     first with the second buries the worse news under the better.
+
+     `said` rides along, because the kind alone cannot say what happened.
+     `repair` already writes one exact sentence per change — that fix was made
+     for the toast when a customer dropping to one panel was told we had
+     removed their metal strips — and this, the second reader of the same
+     repair, was still throwing them away and printing one generic line.
+     It read "the combination in the link cannot be manufactured", which is
+     false for the commonest repair there is: a stale `gp=` moves the HANDLE,
+     and the handle's position is not part of the order at all. Measured on the
+     default door, 1,344 of 1,353 positions repair the position and nothing
+     else, and every one of them said the door could not be built. Peretz
+     opening that link has to ask which door it is — the one question this site
+     exists to make unnecessary. */
+  return { state: fixed, said, notice: notice || (changed.length ? 'combination-fixed' : null) };
 }
 
 // ── Short code ────────────────────────────────────────────────────
-// 45 bits -> 9 Crockford base32 characters, still short enough to read aloud.
+// 36 bits -> 40 -> 8 Crockford base32 characters, short enough to read aloud.
 //
-// Nine, up from eight, and the ninth character buys two whole axes: what the
-// glass is, and which add-ons are on the door. Leaving the add-ons out of the
-// code was considered and rejected — a customer who telephones would then read
-// out a door with no peephole and no letterplate and be sent one anyway, which
-// is precisely the silent-difference failure the code exists to prevent
-// (PLAN.md §8.2). A character is cheaper than a wrong door.
+// It was NINE characters for two rounds, and the ninth was carrying two axes
+// that no longer exist: what the glass is, and which add-ons are on the door.
+// Both were withdrawn at the owner's instruction, so their 2 and 5 bits came
+// OUT of the layout rather than being left as reserved zeroes — a field nobody
+// writes is a field somebody eventually reuses, and what protects an old code
+// is the VERSION, never the padding.
 //
-// The whole layout was re-cut at the same time rather than bolting two fields
-// on the end, because changing the layout is what costs a VERSION bump and
-// doing it once is cheaper than doing it twice. Several fields were absurdly
-// wide — 128 colours for a list of seventeen — and the space paid for the new
-// ones.
+// The layout is re-cut whole each time rather than having fields bolted on the
+// end or hollowed out in place, because changing it at all is what costs a
+// VERSION bump, and doing it once is cheaper than doing it twice. Several
+// fields were absurdly wide — 128 colours for a list of seventeen — and that
+// space has paid for every widening since, the grille's included.
 //
-// The VERSION FIELD ITSELF widened, 3 bits to 4, because version 8 does not
-// fit in three. That is not a detail: a decoder built for this layout reads
-// four bits where an old code wrote three, so it reads an old code's version
-// as 14 or 15, matches nothing, and refuses. Which is the wanted behaviour,
+// The VERSION FIELD ITSELF is 4 bits, widened from 3 when version 8 arrived
+// and version 8 would not fit. That is not a detail: a decoder built for this
+// layout reads four bits where an old code wrote three, so it reads an old
+// code's version as 14 or 15, matches nothing, and refuses. That is the wanted
+// behaviour,
 // and the length check refuses it one line earlier anyway.
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U

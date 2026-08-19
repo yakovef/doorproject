@@ -21,6 +21,12 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The short code is eight characters again.** It was nine for two rounds, and
+  the ninth was carrying the glazing axis and the add-ons — both withdrawn. The
+  bits came OUT of the layout rather than being left as reserved zeroes: a
+  field nobody writes is a field somebody eventually reuses, and what protects
+  an old code is the VERSION, never the padding. 36 bits, padded to 40.
+
 - **One question about the window instead of three, and all of it read off the
   photographs.** Four instructions from the outside, in one message.
   **The glazing axis is deleted.** "Remove it entirely, as I said" — `GLAZINGS`

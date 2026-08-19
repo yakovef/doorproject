@@ -113,12 +113,12 @@ const sectionOf = key => (GROUPS.find(g => g.key === key) || {}).in;
 // ── boot ──────────────────────────────────────────────────────────
 
 function init() {
-  const { state: parsed, notice } = fromQuery(window.location.search);
+  const { state: parsed, notice, said } = fromQuery(window.location.search);
   state = parsed;
 
   buildPanel();
   if (PLACEHOLDER) $('#placeholder-note').hidden = false;
-  if (notice) showNotice(notice);
+  if (notice) showNotice(notice, said);
 
   $('#copy-btn').addEventListener('click', onCopy);
   $('#grip-rot').addEventListener('click', () => {
@@ -735,12 +735,35 @@ function toast(text) {
   toastTimer = setTimeout(() => { el.hidden = true; }, 4000);
 }
 
-function showNotice(kind) {
+/**
+ * The strip a customer — or Peretz, opening their link — reads on arrival.
+ *
+ * `said` is the repair's own account of what it did, one sentence per change,
+ * and it is preferred over the generic line for exactly the reason the toast
+ * prefers it: a lookup keyed on the KIND of notice can only be right while a
+ * kind has one thing it can mean. `combination-fixed` has many. The commonest
+ * of them by far is a stale `gp=` that moved nothing but the HANDLE, which is
+ * not part of the order and which the stage already describes as settled on
+ * site — and that arrived reading "the combination in the link cannot be
+ * manufactured, we adjusted it to the nearest door". A false alarm, and the
+ * expensive kind: it invites the clarifying question the site exists to
+ * remove.
+ *
+ * `option-unknown` and `code-unknown` keep their own words and are NOT
+ * overridden. They are the worse news — a name that matched nothing we sell,
+ * so the customer is looking at a different door — and `settle` deliberately
+ * lets them win over the milder statement. The sentences describe the repair,
+ * which is the milder half of what happened.
+ */
+function showNotice(kind, said) {
   const el = $('#notice');
-  el.textContent = {
+  const generic = {
     'code-unknown': 'הקוד לא זוהה — מציגים דלת ברירת מחדל.',
     'combination-fixed': 'השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר.',
   }[kind] || 'חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.';
+  el.textContent = kind === 'combination-fixed' && said && said.length
+    ? said.join(' · ') + '.'
+    : generic;
   el.hidden = false;
 }
 
