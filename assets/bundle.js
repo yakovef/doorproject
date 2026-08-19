@@ -688,15 +688,15 @@
          it the other way round (0.62 light, 0.42 dark) from a single fixed
          opacity, which is the same colour-blind mistake as the returns. -->
     <linearGradient id="aoBottom" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.3 : 0.26}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.14 : 0.13}"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoLeft" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.24"/>
+      <stop offset="0" stop-color="#000" stop-opacity="0.09"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoRight" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.24"/>
+      <stop offset="0" stop-color="#000" stop-opacity="0.09"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
 
@@ -777,14 +777,14 @@
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
     <linearGradient id="edgeLeft" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.13"/>
-      <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
-      <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
+      <stop offset="0"    stop-color="#000" stop-opacity="0.05"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="0.02"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="edgeRight" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.13"/>
-      <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
-      <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
+      <stop offset="0"    stop-color="#000" stop-opacity="0.05"/>
+      <stop offset="0.45" stop-color="#000" stop-opacity="0.02"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0"/>
     </linearGradient>
 
     ${mouldGradients(paint2, pale)}

@@ -21,6 +21,14 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The soft overlays cut back hard, and the jambs made to read like the
+  soffit.** The leaf's side AO 0.24 → 0.09, the contact shadow 0.30 → 0.14, and
+  the jamb edge bands 0.13 → 0.05. That last one also had a real defect: the
+  ramp ran 0.13 → 0.14 → 0.03, so it was darkest in the MIDDLE of the band
+  rather than hard against the leaf — the middle stop was left behind when the
+  first was halved. A white door now reads as white with a clean opening around
+  it, which is what the corpus shows: a light leaf's vertical profile runs
+  0.91–0.98 nearly the whole way down, so flat is correct, not bland.
 - **The opening's three planes are set as ONE relationship**, not from three
   separate medians — doing it separately made the soffit disagree with the
   jambs and was reported as "the shading on top is very different from the
