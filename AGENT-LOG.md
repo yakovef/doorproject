@@ -23,6 +23,20 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-19 07:41 UTC — run 2 (plumbing only): push path verified from this session
+
+**Looked at:** nothing in the site. This run exists only to prove the write
+path that run 1 lost its work to.
+**Instruments:** none run — the tree was clean and untouched at HEAD.
+**Changed:** this entry, and nothing else. The push path was verified from
+this session.
+**Left alone deliberately:** everything. Everything was green and pushed
+minutes before this run, and a change made to have made one is the thing
+`AGENT.md` warns against.
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-19 — run 1 (smoke test): found a real bug, could not push
 
 **Looked at:** the closed accordion at phone and desktop widths.
