@@ -568,19 +568,36 @@ group('no dangling gradient or filter references');
    glass patterns moved into this list, four of them — circles, mesh, reeded,
    and the rings — drew nothing this check could see, and it failed them for
    rendering nothing while they rendered perfectly. The claim was right and the
-   measurement was too narrow. */
-group('every grille draws something');
-for (const g of GRILLES) {
-  const svg = render({ ...base, window: 'tallwin', grille: g.id });
-  const MARK = /<line |<path |<circle |<ellipse |<rect |<polygon /g;
-  const marks = (svg.match(MARK) || []).length;
-  if (g.id === 'none') {
-    ok(true, 'none needs no bars');
-  } else {
-    const bare = render({ ...base, window: 'tallwin', grille: 'none' });
-    const bareMarks = (bare.match(MARK) || []).length;
-    ok(marks > bareMarks + 4,
-      `grille ${g.id} drew ${marks - bareMarks} extra marks: a priced option that renders nothing`);
+   measurement was too narrow.
+
+   ⚠ AND THEN IT COUNTED ELEMENTS, which is the same mistake one level up.
+   It read "more than four shape tags beyond the bare pane". That is a proxy
+   for ornament, and the proxy broke the moment a design was drawn WELL: the
+   etched diaper is twelve by fifty diamonds emitted as one <pattern> tile and
+   painted with a single rect, and the reeded pane is two rects over a gradient
+   ramp. Both are dense, correct drawings; both scored 1 and 2. Counting tags
+   rewards the naive implementation and fails the efficient one, which is a
+   test steering the code the wrong way.
+   What the check is actually FOR is that a priced option changes the door.
+   So it measures that directly — the markup must differ substantially from
+   the bare pane — and it adds the half that was always missing: no two
+   grilles may render the SAME door. That is the failure this section exists
+   to catch, and an element count could never have seen it. */
+group('every grille draws something, and no two draw the same thing');
+{
+  const bare = render({ ...base, window: 'tallwin', grille: 'none' });
+  const seen = new Map();
+  for (const g of GRILLES) {
+    const svg = render({ ...base, window: 'tallwin', grille: g.id });
+    if (g.id === 'none') { ok(true, 'none needs no bars'); continue; }
+    /* 400 characters is well under the leanest real design — reeded, the one
+       carried almost entirely by two gradients, adds 1,082 — and well over
+       anything an attribute change could produce. */
+    ok(svg.length - bare.length > 400,
+       `grille ${g.id} added ${svg.length - bare.length} characters: a priced option that renders nothing`);
+    const twin = seen.get(svg);
+    ok(!twin, `grille ${g.id} renders exactly the door ${twin} renders: two prices, one picture`);
+    seen.set(svg, g.id);
   }
 }
 

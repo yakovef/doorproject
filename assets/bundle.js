@@ -79,11 +79,19 @@
   ];
   var HANDLES = [
     { id: "none", he: "ללא ידית משיכה", en: "No pull", delta: 0, len: 0, style: "none" },
-    /* Pull bars. `bar` selects the section, fixings and tone profile; see BARS in
-       the renderer. Lengths sit inside the 0.38-0.55 of leaf height that the
-       installed doors measure, and the section thicknesses keep the products'
-       relative slenderness: ella is the stockiest at L/W 15, ron the slimmest
-       at L/W 27. */
+    /* Pull bars. `bar` selects the section and the tone profile; see BARS in the
+       renderer.
+       ⚠ THE WIDTHS WERE THE THING THAT WAS WRONG. Read against the leaf on
+       twenty-one bar-carrying doors, a round tube measures 0.036 of leaf width
+       (range 0.017-0.048) and a flat strap 0.052 (0.046-0.077); lengths cluster
+       at 0.45 and 0.48 of leaf height respectively. Our lengths were between 0%
+       and 15% out and four of them are unchanged — but three of the six bars
+       were 50% to 80% too NARROW, which at catalogue-thumbnail size is the
+       difference between a handle and a pinstripe. The comment that used to sit
+       here claimed "ella the stockiest at L/W 15, ron the slimmest at L/W 27",
+       and neither figure was even its own arithmetic: 900/34 is 26.5 and 900/16
+       is 56. A number nobody could reproduce from the line above it.
+       The measured widths, on an 850 x 2050 leaf: */
     {
       id: "idan",
       he: "עידן",
@@ -96,14 +104,29 @@
       pull: true,
       aliases: ["bar-long", "luna"]
     },
-    { id: "ella", he: "אלה", en: "Ella", delta: 38e3, len: 900, w: 34, style: "bar", bar: "ella", pull: true },
+    /* Brass, and the catalogue never said so: with no `finish` of its own
+       `effectiveFinish` fell through to steel and the bar the inventory calls
+       brass rendered silver on every door. d072, d074 and d082 are gold rods at
+       0.017-0.024 of leaf width — half what we drew. */
+    {
+      id: "ella",
+      he: "אלה",
+      en: "Ella",
+      delta: 38e3,
+      len: 1e3,
+      w: 20,
+      style: "bar",
+      bar: "ella",
+      pull: true,
+      finish: "brass"
+    },
     {
       id: "nitzan",
       he: "ניצן",
       en: "Nitzan",
       delta: 3e4,
-      len: 800,
-      w: 26,
+      len: 1e3,
+      w: 44,
       style: "bar",
       bar: "nitzan",
       pull: true,
@@ -114,14 +137,14 @@
       he: "שחר",
       en: "Shahar",
       delta: 34e3,
-      len: 1150,
-      w: 30,
+      len: 1230,
+      w: 40,
       style: "bar",
       bar: "shahar",
       pull: true,
       aliases: ["bar-flat"]
     },
-    { id: "ron", he: "רון", en: "Ron", delta: 28e3, len: 900, w: 16, style: "bar", bar: "ron", pull: true },
+    { id: "ron", he: "רון", en: "Ron", delta: 28e3, len: 900, w: 18, style: "bar", bar: "ron", pull: true },
     /* The ornate pull, the horizontal bow, and the recess. */
     {
       id: "shiran",
@@ -142,12 +165,15 @@
       style: "grab",
       aliases: ["dee"]
     },
+    /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
+       runs nearly the whole leaf and it is twice as wide as we drew it. */
     {
       id: "channel",
       he: "ידית שקועה",
       en: "Recessed channel",
       delta: 4e4,
-      len: 1554,
+      len: 1780,
+      w: 85,
       inset: 0.3,
       style: "channel",
       pull: true
@@ -458,7 +484,7 @@
   var MOULD_BAND = 70;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
-  var GRAB = { fromTop: 0.585, len: 0.3, ratio: 1 / 15, boss: 17 };
+  var GRAB = { fromTop: 0.59, len: 0.33, ratio: 1 / 15 };
   var THRESHOLD = 42;
   var PLATE = {
     w: 90,
@@ -897,21 +923,88 @@
       <stop offset="1"   stop-color="#7C8288"/>
     </linearGradient>
 
-    <!-- Pull-bar cross-sections, each measured off its own product photograph.
-         A round tube carries two narrow blown highlights with a dark separator
-         between them; a prism holds one or two broad flat plateaux. Using one
-         gradient for both is what makes rendered bars look like tubes of
-         toothpaste. -->
-    <linearGradient id="barRound" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish("#4A4440", tone)}"/>
-      <stop offset="0.10" stop-color="${inFinish("#FFFFFF", tone)}"/>
-      <stop offset="0.167" stop-color="${inFinish("#FFFFFF", tone)}"/>
-      <stop offset="0.283" stop-color="${inFinish("#4E4846", tone)}"/>
-      <stop offset="0.40" stop-color="${inFinish("#FCFBF6", tone)}"/>
-      <stop offset="0.467" stop-color="${inFinish("#F2F0EA", tone)}"/>
-      <stop offset="0.633" stop-color="${inFinish("#302E2A", tone)}"/>
-      <stop offset="0.815" stop-color="${inFinish("#766B65", tone)}"/>
-      <stop offset="1"    stop-color="${inFinish("#564E47", tone)}"/>
+    <!-- ── PULL-BAR CROSS-SECTIONS ────────────────────────────────────
+         TWO SECTIONS, NOT FIVE. Twenty-one bar-carrying doors, measured
+         across their width at mid-height, fall into exactly two groups and
+         nothing else: a round tube that WRAPS, and a flat strap that does
+         not. d035 reads 103,142,212,231,202,76 across eleven pixels — one
+         peak, a hard dark rim each side. d049's face reads 192,196,191,193,
+         191,190,193,193,193,193,192,191,191,192,192,192,192,193,193,193,191,
+         190,189 across twenty-three — a dead-even plane inside 3.6%.
+         There were five ramps here and they were the whole of what told our
+         bars apart, which is how six products came to differ mainly in
+         fixings that no photograph shows.
+
+         ⚠ THE OLD ROUND RAMP WAS A FOLDED RIBBON, not a tube: two blown-white
+         plateaux of identical value with a dark stripe between them and the
+         DARKEST tone in the middle of the bar. A cylinder goes dark at its
+         rims and bright once, off centre. Measured on the photographs the
+         peak-to-trough is about 3.2:1 (d035 233:57, d065 215:25) and the
+         minimum sits at 0.86-0.96 across, never in the interior. -->
+    <linearGradient id="barTube" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="${inFinish("#4A453F", tone)}"/>
+      <stop offset="0.07" stop-color="${inFinish("#7E7A73", tone)}"/>
+      <stop offset="0.16" stop-color="${inFinish("#B4B0A8", tone)}"/>
+      <stop offset="0.32" stop-color="${inFinish("#EDEBE5", tone)}"/>
+      <stop offset="0.42" stop-color="${inFinish("#DFDCD4", tone)}"/>
+      <stop offset="0.58" stop-color="${inFinish("#A9A39B", tone)}"/>
+      <stop offset="0.74" stop-color="${inFinish("#7A746D", tone)}"/>
+      <stop offset="0.90" stop-color="${inFinish("#4A443E", tone)}"/>
+      <stop offset="1"    stop-color="${inFinish("#6A635C", tone)}"/>
+    </linearGradient>
+    <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
+         drew them silver, because ella carried no finish key of its own and
+         effectiveFinish fell through to steel. -->
+    <linearGradient id="barGold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#6B5230"/>
+      <stop offset="0.07" stop-color="#95733F"/>
+      <stop offset="0.16" stop-color="#C79E5C"/>
+      <stop offset="0.32" stop-color="#F5D191"/>
+      <stop offset="0.42" stop-color="#E4BE7C"/>
+      <stop offset="0.58" stop-color="#B0863F"/>
+      <stop offset="0.74" stop-color="#84632F"/>
+      <stop offset="0.90" stop-color="#4A2F0C"/>
+      <stop offset="1"    stop-color="#7A5C33"/>
+    </linearGradient>
+    <!-- The flat strap: two hairline arrises and one uniform field between
+         them. Total swing across the middle 89% stays under 4%. -->
+    <linearGradient id="barStrap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"     stop-color="${inFinish("#9B9992", tone)}"/>
+      <stop offset="0.055" stop-color="${inFinish("#CFCDC7", tone)}"/>
+      <stop offset="0.945" stop-color="${inFinish("#C9C7C1", tone)}"/>
+      <stop offset="1"     stop-color="${inFinish("#9B9992", tone)}"/>
+    </linearGradient>
+    <!-- ALONG the length, which is where a strap keeps all its modelling and
+         where every one of our bars had none. Measured bar-face over adjacent
+         paint on d049: 1.15 at the head falling monotonically to 0.75 at the
+         foot; d060 and d066 give the same shape. Written as a black overlay,
+         so it multiplies whatever section is underneath instead of replacing
+         it — the same reason the leaf's own wash is black and not a tint. -->
+    <!-- The grab bar shaft, ACROSS its diameter: a near-black line at the
+         top, a fast ramp, a narrow specular a third down, a fast fall, a broad
+         dark core through the belly, then a soft bounce along the bottom and a
+         dark bottom edge. Ours was one flat white ribbon with no dark core at
+         all, which is why it looked unlit rather than turned. -->
+    <linearGradient id="grabRod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="${inFinish("#3A3733", tone)}"/>
+      <stop offset="0.06" stop-color="${inFinish("#8C8880", tone)}"/>
+      <stop offset="0.18" stop-color="${inFinish("#DDD9D1", tone)}"/>
+      <stop offset="0.30" stop-color="${inFinish("#F4F2ED", tone)}"/>
+      <stop offset="0.42" stop-color="${inFinish("#B9B4AC", tone)}"/>
+      <stop offset="0.58" stop-color="${inFinish("#5A554F", tone)}"/>
+      <stop offset="0.78" stop-color="${inFinish("#4E4943", tone)}"/>
+      <stop offset="0.90" stop-color="${inFinish("#9A948C", tone)}"/>
+      <stop offset="1"    stop-color="${inFinish("#4A4540", tone)}"/>
+    </linearGradient>
+    <linearGradient id="barFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.035"/>
+      <stop offset="0.06" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.15" stop-color="#000" stop-opacity="0.018"/>
+      <stop offset="0.25" stop-color="#000" stop-opacity="0.123"/>
+      <stop offset="0.40" stop-color="#000" stop-opacity="0.228"/>
+      <stop offset="0.55" stop-color="#000" stop-opacity="0.307"/>
+      <stop offset="0.70" stop-color="#000" stop-opacity="0.351"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.360"/>
     </linearGradient>
     <linearGradient id="barBrass" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"    stop-color="${inFinish("#7D7467", tone)}"/>
@@ -922,28 +1015,6 @@
       <stop offset="0.78" stop-color="${inFinish("#FFF8E0", tone)}"/>
       <stop offset="0.86" stop-color="${inFinish("#C0A87E", tone)}"/>
       <stop offset="1"    stop-color="${inFinish("#817F82", tone)}"/>
-    </linearGradient>
-    <linearGradient id="barMatte" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish("#5C5D5A", tone)}"/>
-      <stop offset="0.32" stop-color="${inFinish("#6D6D69", tone)}"/>
-      <stop offset="0.74" stop-color="${inFinish("#666462", tone)}"/>
-      <stop offset="1"    stop-color="${inFinish("#5A5955", tone)}"/>
-    </linearGradient>
-    <linearGradient id="barPolish" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish("#D1CCBF", tone)}"/>
-      <stop offset="0.037" stop-color="${inFinish("#F5F4F2", tone)}"/>
-      <stop offset="0.444" stop-color="${inFinish("#F7F6F4", tone)}"/>
-      <stop offset="0.519" stop-color="${inFinish("#FFFFFF", tone)}"/>
-      <stop offset="0.560" stop-color="${inFinish("#A9ACA9", tone)}"/>
-      <stop offset="0.778" stop-color="${inFinish("#96938D", tone)}"/>
-      <stop offset="1"    stop-color="${inFinish("#999591", tone)}"/>
-    </linearGradient>
-    <linearGradient id="barDark" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish("#55565C", tone)}"/>
-      <stop offset="0.14" stop-color="${inFinish("#525255", tone)}"/>
-      <stop offset="0.50" stop-color="${inFinish("#515054", tone)}"/>
-      <stop offset="0.92" stop-color="${inFinish("#4E4E50", tone)}"/>
-      <stop offset="1"    stop-color="${inFinish("#6D6B6C", tone)}"/>
     </linearGradient>
 
     <!-- Almog's blade: bright top, dark belly, bounce along the bottom, and
@@ -1730,104 +1801,294 @@ ${body}
             fill="${darken(paint2, 0.34)}"/>
     </g>`;
   }
-  function glazingArt(kind, x, y, w, h, paint2) {
+  function glazingArt(kind, x, y, w, h, paint2, key = "g") {
+    const n2 = (v) => v.toFixed(1);
+    const uid = (s) => `gz-${key}-${s}`;
     if (kind === "reeded") {
-      const pitch = Math.max(16, Math.min(30, w / 9));
-      const n = Math.max(3, Math.round(w / pitch));
+      const g = toRgb(paint2);
+      const av = (g.r + g.g + g.b) / 3;
+      const base = mix(paint2, toHex({ r: av, g: av, b: av }), 0.65);
+      const n = Math.max(24, Math.min(40, Math.round(w / (w / 34))));
       const p = w / n;
-      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.52)}"/>`;
-      for (let i = 0; i < n; i++) {
-        const bx = x + p * i;
-        out += `<rect x="${bx}" y="${y}" width="${p * 0.3}" height="${h}" fill="${scaleTone(paint2, 0.86)}"/><rect x="${bx + p * 0.7}" y="${y}" width="${p * 0.3}" height="${h}" fill="${scaleTone(paint2, 0.3)}"/>`;
-      }
-      return { veil: out, over: "" };
+      const ramp = uid("r"), flute = uid("f"), pat = uid("p");
+      const stops = [
+        [0, 0.6],
+        [0.06, 0.55],
+        [0.18, 0.78],
+        [0.4, 0.62],
+        [0.62, 0.5],
+        [0.82, 0.38],
+        [1, 0.28]
+      ].map(([o, m]) => `<stop offset="${o}" stop-color="${scaleTone(base, m)}"/>`).join("");
+      const soft = [
+        [0, "#000", 0.15],
+        [0.17, "#000", 0.05],
+        [0.34, "#000", 0],
+        [0.5, "#fff", 0.11],
+        [0.66, "#fff", 0],
+        [0.83, "#000", 0.05],
+        [1, "#000", 0.15]
+      ].map(([o, c, a]) => `<stop offset="${o}" stop-color="${c}" stop-opacity="${a}"/>`).join("");
+      return {
+        veil: `
+      <defs>
+        <linearGradient id="${ramp}" gradientUnits="userSpaceOnUse"
+                        x1="${n2(x)}" y1="${n2(y)}" x2="${n2(x)}" y2="${n2(y + h)}">${stops}</linearGradient>
+        <linearGradient id="${flute}" x1="0" y1="0" x2="1" y2="0">${soft}</linearGradient>
+        <pattern id="${pat}" patternUnits="userSpaceOnUse" x="${n2(x)}" y="${n2(y)}"
+                 width="${n2(p)}" height="${n2(h)}">
+          <rect x="0" y="0" width="${n2(p)}" height="${n2(h)}" fill="url(#${flute})"/>
+        </pattern>
+      </defs>
+      <rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="url(#${ramp})"/>
+      <rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="url(#${pat})"/>`,
+        over: ""
+      };
     }
     if (kind === "circles") {
-      const cell = Math.max(40, Math.min(96, w / 3.4));
-      const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
-      const cw = w / cols, ch = h / rows;
-      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.44)}"/>`;
-      const ring = (cx, cy, r) => `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="none"
-               stroke="${scaleTone(paint2, 1.05)}" stroke-width="${(r * 0.17).toFixed(1)}"/>`;
-      for (let r = 0; r <= rows; r++) {
-        for (let c = 0; c <= cols; c++) {
-          const rr = Math.min(cw, ch) * 0.62;
-          out += ring(x + cw * c, y + ch * r, rr);
-          if (r < rows && c < cols) out += ring(x + cw * (c + 0.5), y + ch * (r + 0.5), rr);
+      const s = w / 7, r = s;
+      const sw = Math.max(1, r * 0.11);
+      const ink = scaleTone(paint2, 1.06);
+      let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
+                     fill="${scaleTone(paint2, 0.44)}"/>`;
+      const rows = Math.ceil(h / s) + 1;
+      let d = "";
+      for (let i = -1; i <= 8; i++) {
+        for (let j = -1; j <= rows; j++) {
+          if ((i + j) % 2 === 0) continue;
+          const cx = x + i * s, cy = y + j * s;
+          d += `M ${n2(cx - r)} ${n2(cy)} a ${n2(r)} ${n2(r)} 0 1 0 ${n2(r * 2)} 0
+              a ${n2(r)} ${n2(r)} 0 1 0 ${n2(-r * 2)} 0 `;
         }
       }
+      out += `<path d="${d}" fill="none" stroke="${ink}" stroke-width="${sw.toFixed(2)}"/>`;
       return { veil: out, over: "" };
     }
     if (kind === "vine") {
       const ink = scaleTone(paint2, 1.06);
-      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.46)}"/>`;
-      const n = Math.max(2, Math.round(h / (w * 1.15)));
+      const STEM = w * 0.03, OUT = w * 0.021, THIN = w * 0.014;
+      const str = (d2, sw) => `<path d="${d2}" fill="none" stroke="${ink}"
+      stroke-width="${sw.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
+                     fill="${scaleTone(paint2, 0.46)}"/>`;
+      const pitch = w * 0.26;
+      const n = Math.max(4, Math.round(h / pitch));
+      const stemX = (t) => x + w * (0.51 + 0.11 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
+      let d = `M ${n2(stemX(-0.03))} ${n2(y - h * 0.03)}`;
+      for (let i = 1; i <= 48; i++) {
+        const t = -0.03 + 1.06 * i / 48;
+        d += ` L ${n2(stemX(t))} ${n2(y + h * t)}`;
+      }
+      out += str(d, STEM);
+      const KIND = ["leaf", "cluster", "leaf", "leaf", "cluster", "leaf", "cluster", "leaf"];
+      const LSZ = [1, 0.86, 1.15, 0.94, 1.08, 0.9];
+      const LROT = [-25, 15, -10, 30, -35, 20];
+      const BR = [1, 0.95, 0.78, 0.92, 1.18, 1.02, 0.95, 1.05, 1];
       for (let i = 0; i < n; i++) {
-        const cy = y + h * (i + 0.5) / n, cx = x + w * (i % 2 ? 0.62 : 0.38);
-        const r = Math.min(w * 0.11, h / (n * 5));
-        for (let row = 0; row < 4; row++) {
-          const per = 4 - row;
-          for (let k = 0; k < per; k++) {
-            const bx = cx + (k - (per - 1) / 2) * r * 2.05;
-            const by = cy + row * r * 1.75 - r;
-            out += `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${r.toFixed(1)}"
-                          fill="none" stroke="${ink}" stroke-width="${(r * 0.28).toFixed(1)}"/>`;
+        const t = (i + 0.5) / n;
+        const ay = y + h * t, side = i % 2 ? 1 : -1;
+        const ax = stemX(t) + side * w * 0.19;
+        if (KIND[i % 8] === "cluster") {
+          const r = w * 0.065;
+          let k = 0;
+          [3, 3, 2, 1].forEach((per, row) => {
+            for (let c = 0; c < per; c++) {
+              const f = BR[k % BR.length];
+              k++;
+              const bx = ax + (c - (per - 1) / 2) * r * 2.04 + (row % 2 ? r * 0.5 : 0);
+              const by = ay + row * r * 1.76;
+              out += `<circle cx="${n2(bx)}" cy="${n2(by)}" r="${n2(r * f)}" fill="none"
+                            stroke="${ink}" stroke-width="${OUT.toFixed(2)}"/>`;
+            }
+          });
+          out += str(`M ${n2(stemX(t))} ${n2(ay - r)} Q ${n2((stemX(t) + ax) / 2)} ${n2(ay - r * 1.8)}
+                    ${n2(ax)} ${n2(ay - r * 1.1)}`, THIN);
+        } else {
+          const L = w * 0.34 * LSZ[i % LSZ.length], H2 = L * 0.82;
+          const a = LROT[i % LROT.length] * side * Math.PI / 180;
+          const pt = (u, v) => {
+            const px = u * L * 0.5, py = v * H2 * 0.5;
+            return [
+              n2(ax + px * Math.cos(a) - py * Math.sin(a)),
+              n2(ay + px * Math.sin(a) + py * Math.cos(a))
+            ];
+          };
+          const lobe = [
+            [0, -1],
+            [0.34, -0.55],
+            [0.3, -0.3],
+            [0.72, -0.42],
+            [0.6, 0.02],
+            [0.95, 0.3],
+            [0.42, 0.42],
+            [0.2, 0.86],
+            [0, 0.55]
+          ];
+          let ld = `M ${pt(0, -1).join(" ")}`;
+          for (const [u, v] of lobe.slice(1)) ld += ` Q ${pt(u * 1.12, v * 0.92).join(" ")} ${pt(u, v).join(" ")}`;
+          for (const [u, v] of [...lobe].reverse().slice(1)) {
+            ld += ` Q ${pt(-u * 1.12, v * 0.92).join(" ")} ${pt(-u, v).join(" ")}`;
+          }
+          out += str(ld + " Z", OUT);
+          out += str(`M ${pt(0, 0.55).join(" ")} L ${n2(stemX(t))} ${n2(ay + H2 * 0.2)}`, THIN);
+          for (const [u, v] of [[0, -0.62], [0.42, -0.2], [-0.42, -0.2]]) {
+            out += str(`M ${pt(0, 0.5).join(" ")} L ${pt(u, v).join(" ")}`, THIN);
           }
         }
-        const sx = cx, sy = cy - r * 2.4;
-        out += `<path d="M ${sx} ${sy} c ${w * 0.1} ${-h * 0.06} ${w * 0.2} ${-h * 0.02}
-                       ${w * 0.16} ${-h * 0.09}" fill="none" stroke="${ink}"
-                    stroke-width="${(r * 0.3).toFixed(1)}" stroke-linecap="round"/>`;
+      }
+      const tn = Math.max(2, Math.round(h / (1.4 * w)));
+      for (let i = 0; i < tn; i++) {
+        const t = (i + 0.5) / tn, side = i % 2 ? -1 : 1;
+        const sx = stemX(t), sy = y + h * t;
+        let td = `M ${n2(sx)} ${n2(sy)}`, ex = sx, ey = sy;
+        for (let k = 1; k <= 22; k++) {
+          const a = k / 22 * Math.PI * 2.2 * side;
+          const r = w * (0.07 - 0.045 * (k / 22));
+          ex = sx + side * w * 0.1 + Math.cos(a) * r;
+          ey = sy + Math.sin(a) * r;
+          td += ` L ${n2(ex)} ${n2(ey)}`;
+        }
+        out += str(td, THIN);
+        out += `<circle cx="${n2(ex)}" cy="${n2(ey)}" r="${n2(w * 0.012)}" fill="${ink}"/>`;
       }
       return { veil: out, over: "" };
     }
     if (kind === "tree") {
-      const ink = scaleTone(paint2, 1.04);
-      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.42)}"/>`;
-      const bx = x + w * 0.3, by = y + h;
-      out += `<path d="M ${bx - w * 0.05} ${by} C ${bx - w * 0.02} ${y + h * 0.55}
-                     ${bx + w * 0.04} ${y + h * 0.4} ${bx + w * 0.02} ${y + h * 0.08}
-                     L ${bx + w * 0.1} ${y + h * 0.08}
-                     C ${bx + w * 0.1} ${y + h * 0.45} ${bx + w * 0.06} ${y + h * 0.6}
-                     ${bx + w * 0.09} ${by} Z" fill="${ink}"/>`;
-      for (const [t, reach, up, side] of [
-        [0.7, 0.6, 0.17, 1],
-        [0.6, 0.34, 0.12, -1],
-        [0.5, 0.55, 0.15, 1],
-        [0.4, 0.4, 0.13, -1],
-        [0.3, 0.62, 0.14, 1],
-        [0.2, 0.3, 0.1, -1],
-        [0.12, 0.44, 0.09, 1]
-      ]) {
-        const ex = bx + w * reach * side, ey = y + h * (t - up * 0.6);
-        out += `<path d="M ${bx + w * 0.03} ${y + h * t}
-                       Q ${bx + w * reach * 0.55 * side} ${y + h * (t - up)} ${ex} ${ey}"
-                    fill="none" stroke="${ink}" stroke-width="${(w * 0.03).toFixed(1)}"
-                    stroke-linecap="round"/>`;
-        for (const f of [0.45, 0.75]) {
-          const tx = bx + w * reach * f * side, ty = y + h * (t - up * f * 0.9);
-          out += `<path d="M ${tx} ${ty} q ${w * 0.05 * side} ${-h * 0.035}
-                         ${w * 0.11 * side} ${-h * 0.045}" fill="none" stroke="${ink}"
-                      stroke-width="${(w * 0.016).toFixed(1)}" stroke-linecap="round"/>`;
+      const ground = scaleTone(paint2, 0.42);
+      let ink = scaleTone(paint2, 0.12);
+      if (luminance(ink) > luminance(ground) * 0.3) ink = "#17120F";
+      let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="${ground}"/>`;
+      const P = (u, v) => [x + w * u, y + h * v];
+      const fill = (d) => `<path d="${d}" fill="${ink}"/>`;
+      const ribbon = (spine2, hw) => {
+        const pts = [];
+        for (let i = 0; i <= 40; i++) {
+          const t = i / 40 * (spine2.length - 1);
+          const k = Math.min(spine2.length - 2, Math.floor(t)), f = t - k;
+          const a = spine2[k], b = spine2[k + 1];
+          const pv = spine2[Math.max(0, k - 1)], nx = spine2[Math.min(spine2.length - 1, k + 2)];
+          const cr = (p0, p1, p2, p3, j) => {
+            const t2 = f * f, t3 = t2 * f;
+            return 0.5 * (2 * p1[j] + (-p0[j] + p2[j]) * f + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3);
+          };
+          pts.push([cr(pv, a, b, nx, 0), cr(pv, a, b, nx, 1), i / 40]);
         }
+        const left = [], right = [];
+        for (let i = 0; i < pts.length; i++) {
+          const p0 = pts[Math.max(0, i - 1)], p1 = pts[Math.min(pts.length - 1, i + 1)];
+          const dx = p1[0] - p0[0], dy = p1[1] - p0[1];
+          const L = Math.hypot(dx, dy) || 1;
+          const r = hw(pts[i][2]);
+          left.push([pts[i][0] - dy / L * r, pts[i][1] + dx / L * r]);
+          right.push([pts[i][0] + dy / L * r, pts[i][1] - dx / L * r]);
+        }
+        return "M " + left.map((p) => `${n2(p[0])} ${n2(p[1])}`).join(" L ") + " L " + right.reverse().map((p) => `${n2(p[0])} ${n2(p[1])}`).join(" L ") + " Z";
+      };
+      const spine = [
+        [0.6, 1.04],
+        [0.62, 0.86],
+        [0.5, 0.72],
+        [0.36, 0.6],
+        [0.46, 0.44],
+        [0.54, 0.28],
+        [0.6, 0.1]
+      ].map(([u, v]) => P(u, v));
+      out += fill(ribbon(spine, (t) => w * (0.078 - 0.033 * t)));
+      const crook = [
+        [0.6, 0.1],
+        [0.72, 0.03],
+        [0.92, 0.05],
+        [0.96, 0.12],
+        [0.86, 0.16],
+        [0.8, 0.11]
+      ].map(([u, v]) => P(u, v));
+      out += fill(ribbon(crook, () => w * 0.055));
+      const limb = [[0.53, 0.28], [0.46, 0.2], [0.38, 0.1], [0.34, -0.03]].map(([u, v]) => P(u, v));
+      out += fill(ribbon(limb, (t) => w * (0.05 - 0.02 * t)));
+      out += fill(ribbon([
+        [0.1, 0.93],
+        [0.2, 0.955],
+        [0.3, 0.965],
+        [0.42, 0.925],
+        [0.52, 0.87]
+      ].map(([u, v]) => P(u, v)), () => w * 0.0225));
+      out += fill(`M ${P(0.355, 5e-3).map(n2).join(" ")} L ${P(0.375, 5e-3).map(n2).join(" ")}
+                 L ${P(0.372, 0.055).map(n2).join(" ")} Z`);
+      const N = Math.max(3, Math.min(6, Math.round(h / (w * 1.25))));
+      for (let i = 0; i < N; i++) {
+        const v = (i + 0.5) / N, side = i % 2 ? 1 : -1;
+        let ru = 0.5;
+        for (let k = 0; k < spine.length - 1; k++) {
+          const a = spine[k], b = spine[k + 1], vy = y + h * v;
+          if ((a[1] - vy) * (b[1] - vy) <= 0) {
+            const f = (vy - a[1]) / (b[1] - a[1] || 1);
+            ru = (a[0] + (b[0] - a[0]) * f - x) / w;
+          }
+        }
+        const root = [x + w * ru, y + h * v];
+        const LOBE = [0.42, 0.36, 0.27], ANG = [-12, 16, 44];
+        const reachOf = (k) => Math.min(
+          LOBE[k] + (i % 2 && k === 0 ? 0.06 : 0),
+          side > 0 ? 0.98 - ru : ru - 0.02
+        );
+        const palm = [];
+        for (const s of [-1, 1]) {
+          for (let k = 0; k < 3; k++) {
+            const kk = s < 0 ? k : 2 - k;
+            const a = ANG[kk] * Math.PI / 180;
+            const rr = reachOf(kk) * (s < 0 ? 0.52 : 0.44);
+            palm.push([
+              x + w * (ru + side * rr * Math.cos(a)) - s * side * w * 0.045,
+              y + h * v + w * rr * Math.sin(a)
+            ]);
+          }
+        }
+        out += fill("M " + palm.map((p) => `${n2(p[0])} ${n2(p[1])}`).join(" L ") + " Z");
+        LOBE.forEach((len, k) => {
+          const a = ANG[k] * Math.PI / 180;
+          const reach = reachOf(k);
+          const tip = [x + w * (ru + side * reach * Math.cos(a)), y + h * v + w * reach * Math.sin(a)];
+          const bulge = w * reach * 0.16;
+          const mid = [
+            (root[0] + tip[0]) / 2 + Math.sin(a) * bulge * side,
+            (root[1] + tip[1]) / 2 - Math.cos(a) * bulge
+          ];
+          out += fill(ribbon([root, mid, tip], (t) => w * (0.098 - 0.076 * t * t)));
+        });
       }
       return { veil: out, over: "" };
     }
     if (kind === "mesh") {
-      const cell = Math.max(26, Math.min(52, w / 6));
-      const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
-      const cw = w / cols, ch = h / rows;
-      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint2, 0.46)}"/>`;
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const cx = x + cw * (c + 0.5), cy = y + ch * (r + 0.5);
-          const rr = Math.min(cw, ch) * 0.5;
-          out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}"
-                        fill="none" stroke="${scaleTone(paint2, 1.02)}" stroke-width="${(rr * 0.22).toFixed(1)}"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(rr * 0.3).toFixed(1)}"
-                        fill="${scaleTone(paint2, 0.88)}"/>`;
-        }
-      }
-      return { veil: out, over: "" };
+      const d = w / 12, r = d / 2, pid = uid("m");
+      const bow = r * 0.1, s = r * 0.55, ib = s * 0.18;
+      const cell = (cx, cy) => {
+        const edge = `M ${n2(cx)} ${n2(cy - r)}
+        Q ${n2(cx + r * 0.5 + bow)} ${n2(cy - r * 0.5 - bow)} ${n2(cx + r)} ${n2(cy)}
+        Q ${n2(cx + r * 0.5 + bow)} ${n2(cy + r * 0.5 + bow)} ${n2(cx)} ${n2(cy + r)}
+        Q ${n2(cx - r * 0.5 - bow)} ${n2(cy + r * 0.5 + bow)} ${n2(cx - r)} ${n2(cy)}
+        Q ${n2(cx - r * 0.5 - bow)} ${n2(cy - r * 0.5 - bow)} ${n2(cx)} ${n2(cy - r)} Z`;
+        const star = `M ${n2(cx)} ${n2(cy - s)}
+        Q ${n2(cx + s * 0.5 - ib)} ${n2(cy - s * 0.5 + ib)} ${n2(cx + s)} ${n2(cy)}
+        Q ${n2(cx + s * 0.5 - ib)} ${n2(cy + s * 0.5 - ib)} ${n2(cx)} ${n2(cy + s)}
+        Q ${n2(cx - s * 0.5 + ib)} ${n2(cy + s * 0.5 - ib)} ${n2(cx - s)} ${n2(cy)}
+        Q ${n2(cx - s * 0.5 + ib)} ${n2(cy - s * 0.5 + ib)} ${n2(cx)} ${n2(cy - s)} Z`;
+        return `<path d="${edge}" fill="none" stroke="${scaleTone(paint2, 0.8)}"
+                    stroke-width="${(d * 0.1).toFixed(2)}" stroke-linejoin="round"/>
+              <path d="${star}" fill="none" stroke="${scaleTone(paint2, 0.88)}"
+                    stroke-width="${(d * 0.075).toFixed(2)}" stroke-linejoin="round"/>
+              <circle cx="${n2(cx)}" cy="${n2(cy)}" r="${n2(d * 0.062)}"
+                      fill="${scaleTone(paint2, 0.95)}"/>`;
+      };
+      return {
+        veil: `
+      <defs><pattern id="${pid}" patternUnits="userSpaceOnUse"
+                     x="${n2(x)}" y="${n2(y)}" width="${n2(d)}" height="${n2(d)}">
+        <rect x="0" y="0" width="${n2(d)}" height="${n2(d)}" fill="${scaleTone(paint2, 0.42)}"/>
+        ${cell(0, 0)}${cell(d, 0)}${cell(0, d)}${cell(d, d)}${cell(d / 2, d / 2)}
+      </pattern></defs>
+      <rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="url(#${pid})"/>`,
+        over: ""
+      };
     }
     return null;
   }
@@ -1870,7 +2131,7 @@ ${body}
     leaf = null,
     splits = []
   }) {
-    const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint2) : null;
+    const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint2, key) : null;
     const M = MOULD_BAND;
     const id = `cl-${key}`;
     return `
@@ -1956,110 +2217,236 @@ ${body}
     kind = String(kind).replace(/-light$/, "");
     const body = tint || "#232527";
     const gleam = tint ? "#fff" : "#8A8F94";
-    const bar = (x1, y1, x2, y2, sw = 13) => `
-    <line x1="${x1 + 3}" y1="${y1 + 3}" x2="${x2 + 3}" y2="${y2 + 3}"
-          stroke="#000" stroke-opacity="0.35" stroke-width="${sw}" stroke-linecap="round"/>
-    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="${body}" stroke-width="${sw}" stroke-linecap="round"/>
-    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="${gleam}" stroke-opacity="0.5" stroke-width="${sw * 0.28}" stroke-linecap="round"
-          transform="translate(-${sw * 0.22} -${sw * 0.22})"/>`;
-    if (kind === "bars") {
-      const n = Math.max(2, Math.round(w / 90));
-      return Array.from({ length: n - 1 }, (_, i) => bar(x + w * (i + 1) / n, y, x + w * (i + 1) / n, y + h)).join("");
-    }
-    const mesh = () => {
-      const step2 = Math.min(w, h) / Math.max(2, Math.round(Math.min(w, h) / 105));
+    const U = (f) => x + w * f;
+    const V = (f) => y + h * f;
+    const n2 = (v) => v.toFixed(1);
+    const strokeOf = (d, colour, sw, op, cap) => `<path d="${d}" fill="none" stroke="${colour}" stroke-width="${sw.toFixed(2)}"
+           stroke-opacity="${op}" stroke-linecap="${cap}" stroke-linejoin="round"/>`;
+    const ink = (d, sw, cap = "round") => {
+      const o = sw * 0.24;
+      return `<g transform="translate(${o.toFixed(2)} ${o.toFixed(2)})">
+              ${strokeOf(d, "#000", sw, 0.26, cap)}</g>
+            ${strokeOf(d, body, sw, 1, cap)}
+            <g transform="translate(${(-o * 0.6).toFixed(2)} ${(-o * 0.6).toFixed(2)})">
+              ${strokeOf(d, gleam, sw * 0.3, 0.16, cap)}</g>`;
+    };
+    const MARGIN = 0.13;
+    const solid = (d, ref) => {
+      const o = (ref || w * 0.02) * 0.24;
+      return `<g transform="translate(${o.toFixed(2)} ${o.toFixed(2)})">
+              <path d="${d}" fill="#000" fill-opacity="0.26"/></g>
+            <path d="${d}" fill="${body}"/>`;
+    };
+    const line = (x1, y1, x2, y2, sw, cap = "round") => ink(`M ${n2(x1)} ${n2(y1)} L ${n2(x2)} ${n2(y2)}`, sw, cap);
+    const dot = (cx, cy, r) => solid(`M ${n2(cx - r)} ${n2(cy)} a ${n2(r)} ${n2(r)} 0 1 0 ${n2(r * 2)} 0
+           a ${n2(r)} ${n2(r)} 0 1 0 ${n2(-r * 2)} 0`, r);
+    const collar = (cx, cy, bw, bh) => solid(`M ${n2(cx - bw / 2)} ${n2(cy - bh / 2)} h ${n2(bw)} v ${n2(bh)}
+           h ${n2(-bw)} Z`, bh);
+    const curl = (cx, cy, sx, sy, turns, dir) => {
+      const rOut = Math.hypot(sx - cx, sy - cy) || 1;
+      const ph = Math.atan2(sy - cy, sx - cx);
+      const steps = Math.max(14, Math.round(turns * 18));
+      const pts = [];
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const a = ph - dir * turns * 2 * Math.PI * t;
+        const r = rOut * (1 - t) + rOut * 0.15 * t;
+        pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+      }
+      return pts;
+    };
+    const poly = (pts, cont) => pts.map(([px, py], i) => `${i ? "L" : cont ? "L" : "M"} ${n2(px)} ${n2(py)}`).join(" ");
+    if (kind === "grid") {
+      const cols = w / h >= 0.75 ? 4 : w / h >= 0.4 ? 3 : 2;
+      const rows = Math.max(2, Math.min(6, Math.round(cols * h / (w * 1.75))));
+      const sw = Math.max(3, w / cols * 0.09);
       const out = [];
-      for (let gx = x + step2; gx < x + w - 1; gx += step2) out.push(bar(gx, y, gx, y + h, 9));
-      for (let gy = y + step2; gy < y + h - 1; gy += step2) out.push(bar(x, gy, x + w, gy, 9));
+      for (let i = 1; i < cols; i++) out.push(line(U(i / cols), y, U(i / cols), y + h, sw, "butt"));
+      for (let j = 1; j < rows; j++) out.push(line(x, V(j / rows), x + w, V(j / rows), sw, "butt"));
+      return out.join("");
+    }
+    const borderGrid = (m, extraY, b) => {
+      const out = [line(x + m, y, x + m, y + h, b), line(x + w - m, y, x + w - m, y + h, b)];
+      for (const gy of [y + m, y + h - m, ...extraY]) out.push(line(x, gy, x + w, gy, b));
       return out;
     };
-    const iron = (d, sw = 9) => `
-      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28"
-            stroke-width="${sw}" transform="translate(3 3)"/>
-      <path d="${d}" fill="none" stroke="${body}" stroke-width="${sw}"
-            stroke-linecap="round"/>
-      <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.4"
-            stroke-width="${sw / 3}" transform="translate(-1.5 -1.5)"/>`;
-    if (kind === "grid") return mesh().join("");
     if (kind === "scroll") {
-      const out = mesh();
-      const rr = Math.min(w * 0.2, h * 0.07);
-      for (const t of [0.2, 0.8]) {
-        const cy2 = y + h * t, cx2 = x + w / 2;
-        out.push(iron(`M ${cx2 - rr * 2} ${cy2} a ${rr} ${rr} 0 1 1 ${rr * 2} 0
-                     a ${rr} ${rr} 0 1 0 ${rr * 2} 0`));
-      }
+      const m = Math.min(w * 0.19, h * 0.1);
+      const Bw = w - 2 * m, Bh = 1.08 * Bw;
+      const two = 2 * Bh + 0.5 * Bw <= h - 2 * m;
+      const b = w * 0.022;
+      const rows = [y + h - m - Bh];
+      if (two) rows.push(y + m + Bh);
+      const out = borderGrid(m, rows, b);
+      const block = (bx, by, S) => {
+        const rib = S * 0.046;
+        const piece = (mx, my) => {
+          const P = (u, v) => [bx + (mx > 0 ? u : 1 - u) * S, by + (my > 0 ? v : 1 - v) * S];
+          const dir = mx * my;
+          const [ex, ey] = P(0.31, 0.11);
+          const [ox, oy] = P(0.09, 0.28);
+          const [t1x, t1y] = P(0.5, 0.19);
+          const [t2x, t2y] = P(0.17, 0.5);
+          const [t3x, t3y] = P(5e-3, 0.395);
+          const inner = curl(ex, ey, ...P(0.428, 0.14), 1.25, dir);
+          const outer = curl(ox, oy, t3x, t3y, 1.25, -dir);
+          return poly([...inner].reverse()) + ` L ${n2(t1x)} ${n2(t1y)} C ${P(0.5, 0.36).map(n2).join(" ")} ${P(0.24, 0.5).map(n2).join(" ")} ${n2(t2x)} ${n2(t2y)} C ${P(0.08, 0.5).map(n2).join(" ")} ${P(5e-3, 0.455).map(n2).join(" ")} ${n2(t3x)} ${n2(t3y)} ` + poly(outer, true);
+        };
+        return [[1, 1], [-1, 1], [1, -1], [-1, -1]].map(([mx, my]) => ink(piece(mx, my), rib)).join("");
+      };
+      const tops = two ? [y + m, y + h - m - Bh] : [y + h - m - Bh];
+      for (const ty of tops) out.push(block(x + m, ty + (Bh - Bw) / 2, Bw));
       return out.join("");
     }
     if (kind === "quatrefoil") {
-      const out = [
-        bar(x + w * 0.28, y, x + w * 0.28, y + h, 8),
-        bar(x + w * 0.72, y, x + w * 0.72, y + h, 8)
-      ];
-      const n = Math.max(3, Math.round(h / (w * 0.9)));
-      const rr = Math.min(w * 0.17, h / (n * 3));
+      const u = w * MARGIN, b = w * 0.026;
+      const out = [];
+      for (const f of [u, 2 * u, w - 2 * u, w - u]) out.push(line(x + f, y, x + f, y + h, b));
+      for (const gy of [y + u, y + 2 * u, y + h - 2 * u, y + h - u]) {
+        out.push(line(x, gy, x + w, gy, b));
+      }
+      for (const gy of [y + h / 2 - u / 2, y + h / 2 + u / 2]) {
+        out.push(line(x, gy, x + 2 * u, gy, b));
+        out.push(line(x + w - 2 * u, gy, x + w, gy, b));
+      }
+      const p = w * 0.8;
+      let n = Math.max(2, Math.round(h / p) - 1);
+      while (n > 2 && (h - (n - 1) * p) / 2 < w * 0.45) n--;
+      const cx = x + w / 2;
       for (let i = 0; i < n; i++) {
-        const cy2 = y + h * (i + 0.5) / n, cx2 = x + w / 2;
-        out.push(bar(x, cy2, x + w, cy2, 7));
-        for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
-          out.push(iron(`M ${cx2} ${cy2} q ${dx * rr - dy * rr * 0.7} ${dy * rr + dx * rr * 0.7}
-                       ${dx * rr * 2} ${dy * rr * 2}
-                       q ${-dx * rr + dy * rr * 0.7} ${-dy * rr - dx * rr * 0.7}
-                       ${-dx * rr * 2} ${-dy * rr * 2}`, 6));
+        const cy = y + h / 2 + (i - (n - 1) / 2) * p;
+        out.push(line(x + 2 * u, cy, x + w - 2 * u, cy, b));
+        for (const s of [-1, 1]) {
+          const lx = cx + s * w * 0.165, lw = w * 0.045, lh = w * 0.0225;
+          out.push(solid(`M ${n2(lx - lw)} ${n2(cy)} Q ${n2(lx)} ${n2(cy - lh)} ${n2(lx + lw)} ${n2(cy)}
+                        Q ${n2(lx)} ${n2(cy + lh)} ${n2(lx - lw)} ${n2(cy)} Z`, lh));
+        }
+        const hw = w * 0.062, hh = w * 0.09, bow = w * 0.01;
+        out.push(solid(`M ${n2(cx)} ${n2(cy - hh)}
+                      Q ${n2(cx + hw - bow)} ${n2(cy - hh + bow)} ${n2(cx + hw)} ${n2(cy)}
+                      Q ${n2(cx + hw - bow)} ${n2(cy + hh - bow)} ${n2(cx)} ${n2(cy + hh)}
+                      Q ${n2(cx - hw + bow)} ${n2(cy + hh - bow)} ${n2(cx - hw)} ${n2(cy)}
+                      Q ${n2(cx - hw + bow)} ${n2(cy - hh + bow)} ${n2(cx)} ${n2(cy - hh)} Z`, hw));
+        for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+          out.push(ink(poly(curl(
+            cx + sx * w * 0.055,
+            cy + sy * w * 0.135,
+            cx,
+            cy + sy * hh,
+            1,
+            sx * sy
+          )), w * 0.022));
+          out.push(ink(poly(curl(
+            cx + sx * w * 0.11,
+            cy + sy * w * 0.075,
+            cx + sx * hw,
+            cy,
+            1,
+            -sx * sy
+          )), w * 0.022));
+        }
+        if (i < n - 1) {
+          const gap = p, top = cy + w * 0.19;
+          const run = gap - w * 0.38;
+          const seq = [[0.115, 0.03], [0.079, 0.06], [0.06, 0.03], [0.079, 0.06], [0.115, 0.03]];
+          const total = seq.reduce((a, s) => a + s[0], 0);
+          let at = top + (run - total * w) / 2;
+          for (const [lh, lw] of seq) {
+            const cy2 = at + w * lh / 2;
+            out.push(solid(`M ${n2(cx)} ${n2(cy2 - w * lh / 2)}
+                          Q ${n2(cx + w * lw)} ${n2(cy2)} ${n2(cx)} ${n2(cy2 + w * lh / 2)}
+                          Q ${n2(cx - w * lw)} ${n2(cy2)} ${n2(cx)} ${n2(cy2 - w * lh / 2)} Z`, w * lw));
+            at += w * lh;
+          }
         }
       }
       return out.join("");
     }
     if (kind === "arch") {
-      const out = mesh();
-      const cy2 = y + h * 0.3;
-      for (const k of [1, 0.78, 0.6]) {
-        const r = Math.max(w * 0.5, w * 0.78 * k);
-        const rise = h * 0.16 * k;
-        out.push(iron(`M ${x} ${cy2} Q ${x + w / 2} ${cy2 - rise} ${x + w} ${cy2}`, 8));
-        void r;
-      }
-      out.push(bar(x + w / 2, y, x + w / 2, y + h * 0.3, 8));
+      const sw = Math.max(5, w * 0.033);
+      const out = [];
+      out.push(line(x, V(0.409), x + w, V(0.409), sw));
+      out.push(line(U(0.5), V(0.404), U(0.5), y + h, sw));
+      out.push(line(x, V(0.693), x + w, V(0.693), sw));
+      out.push(line(x, V(0.846), x + w, V(0.846), sw));
+      const arc = (x0, v0, cx0, cv, x1, v1) => ink(`M ${n2(U(x0))} ${n2(V(v0))} Q ${n2(U(cx0))} ${n2(V(cv))} ${n2(U(x1))} ${n2(V(v1))}`, sw);
+      out.push(arc(0, 0.16, 0.145, 0.037, 0.5, 7e-3));
+      out.push(arc(1, 0.16, 0.855, 0.037, 0.5, 7e-3));
+      out.push(arc(0, 0.22, 0.363, 0.27, 0.5, 0.404));
+      out.push(arc(1, 0.22, 0.637, 0.27, 0.5, 0.404));
+      out.push(arc(0, 0.37, 0.139, 0.242, 0.5, 0.205));
+      out.push(arc(1, 0.37, 0.861, 0.242, 0.5, 0.205));
       return out.join("");
     }
     if (kind === "deco") {
+      const sw = Math.max(2, w * 0.022);
       const out = [];
-      for (const [ix, iy] of [[0.12, 0.1], [0.24, 0.2], [0.36, 0.3]]) {
-        const rx = x + w * ix, ry = y + h * iy;
-        const rw = w * (1 - ix * 2), rh = h * (1 - iy * 2);
-        out.push(iron(`M ${rx} ${ry} H ${rx + rw} V ${ry + rh} H ${rx} Z`, 8));
-      }
-      for (const t of [0.1, 0.9]) {
-        out.push(bar(x, y + h * t, x + w, y + h * t, 8));
+      for (const f of [MARGIN, MARGIN * 2, 1 - MARGIN * 2, 1 - MARGIN]) out.push(line(U(f), y, U(f), y + h, sw));
+      const B = y + h, k = Math.min(1, h * 0.45 / (w * 0.689));
+      for (const f of [0.196, 0.333, 0.552, 0.689]) {
+        out.push(line(x, B - w * f * k, x + w, B - w * f * k, sw));
       }
       return out.join("");
     }
     if (kind === "iron") {
+      const UH = Math.min(1, 2.2 * w / h);
+      const thin = w * 0.013, spine = w * 0.02, rib = w * 0.026;
       const out = [];
-      const n = Math.max(3, Math.round(w / 95));
-      for (let i = 1; i < n; i++) out.push(bar(x + w * i / n, y, x + w * i / n, y + h, 9));
-      const scroll = (cx, cy, rr2) => {
-        const d = `M ${cx - rr2} ${cy} a ${rr2 * 0.5} ${rr2 * 0.5} 0 1 1 ${rr2} 0
-                 a ${rr2 * 0.5} ${rr2 * 0.5} 0 1 0 ${rr2} 0`;
-        return `<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.3"
-                    stroke-width="8" transform="translate(3 3)"/>
-              <path d="${d}" fill="none" stroke="${body}" stroke-width="8"/>
-              <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.35"
-                    stroke-width="2.5" transform="translate(-1.5 -1.5)"/>`;
+      const capY = (f, up) => up ? y + h * f * UH : y + h * (1 - f * UH);
+      for (const k of [1, 5]) out.push(line(U(k / 6), V(0.02), U(k / 6), V(0.98), thin));
+      for (const k of [2, 4]) {
+        out.push(line(U(k / 6), capY(0.245, true), U(k / 6), capY(0.245, false), thin));
+      }
+      out.push(line(U(0.5), capY(0.19, true), U(0.5), capY(0.19, false), spine));
+      const yb = V(0.51), cr = w * 0.065;
+      out.push(line(x, yb, x + w, yb, w * 0.022));
+      for (let k = 0; k < 6; k++) {
+        const ccx = U((2 * k + 1) / 12);
+        out.push(ink(`M ${n2(ccx - cr)} ${n2(yb)} a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(cr * 2)} 0
+                    a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(-cr * 2)} 0`, w * 0.023));
+      }
+      for (let k = 1; k <= 5; k++) out.push(collar(U(k / 6), yb, w * 0.045, w * 0.028));
+      const cap = (up) => {
+        const Y = (f) => capY(f, up);
+        const s = up ? 1 : -1;
+        const o = [];
+        for (const sx of [-1, 1]) {
+          const vx = U(0.5 + sx * 0.425), vy = Y(0.054);
+          o.push(ink(poly(curl(vx, vy, U(0.5 + sx * 0.5), Y(0.012), 1.25, sx * s)), rib));
+        }
+        o.push(ink(`M ${n2(U(1 / 6))} ${n2(Y(0.217))} Q ${n2(U(0.5))} ${n2(Y(-0.12))}
+                  ${n2(U(5 / 6))} ${n2(Y(0.217))}`, rib));
+        o.push(ink(`M ${n2(U(1 / 6))} ${n2(Y(0.245))} Q ${n2(U(0.5))} ${n2(Y(0.199))}
+                  ${n2(U(5 / 6))} ${n2(Y(0.245))}`, w * 0.022));
+        for (const f of [0.28, 0.72]) o.push(dot(U(f), Y(0.232), w * 0.028));
+        const lx = U(0.5);
+        o.push(solid(`M ${n2(lx)} ${n2(Y(0.094))}
+                    Q ${n2(lx + w * 0.025)} ${n2(Y(0.128))} ${n2(lx + w * 9e-3)} ${n2(Y(0.185))}
+                    L ${n2(lx - w * 9e-3)} ${n2(Y(0.185))}
+                    Q ${n2(lx - w * 0.025)} ${n2(Y(0.128))} ${n2(lx)} ${n2(Y(0.094))} Z`, w * 0.05));
+        o.push(collar(lx, Y(0.192), w * 0.048, w * 0.022));
+        for (const sx of [-1, 1]) {
+          o.push(ink(poly(curl(
+            U(0.5 + sx * 0.105),
+            Y(0.152),
+            U(0.5 + sx * 0.2),
+            Y(0.216),
+            1,
+            sx * s
+          )), rib));
+          o.push(collar(U(0.5 + sx / 3), Y(0.28), w * 0.045, w * 0.025));
+          o.push(ink(poly(curl(
+            U(0.5 + sx * 0.265),
+            Y(0.262),
+            U(0.5 + sx / 3),
+            Y(0.28),
+            1,
+            -sx * s
+          )), w * 0.024));
+        }
+        return o.join("");
       };
-      const rr = Math.min(w / (n * 1.6), h * 0.055);
-      for (const t of [0.2, 0.42, 0.62, 0.82]) {
-        const cy = y + h * t;
-        out.push(bar(x, cy, x + w, cy, 8));
-        for (let i = 0; i < n; i++) out.push(scroll(x + w * (i + 0.5) / n, cy, rr));
-      }
-      const crownY = y + h * 0.11;
-      out.push(iron(`M ${x} ${crownY} Q ${x + w / 2} ${y + h * 0.02} ${x + w} ${crownY}`, 9));
-      for (let i = 0; i < n; i++) {
-        out.push(scroll(x + w * (i + 0.5) / n, crownY + rr * 1.1, rr * 0.8));
-      }
+      out.push(cap(true), cap(false));
       return out.join("");
     }
     return "";
@@ -2070,10 +2457,15 @@ ${body}
         return { out: 0, in: 0, vy: 0 };
       case "channel":
         return { out: 21, in: 21, vy: channelHalf(handle.len, leafH) };
-      /* The bow is centred on the LEAF, not on the grip's own axis, so almost
-         all of it lies inboard — 416 mm of it. */
+      /* The bar is centred on the LEAF, not on the grip's own axis, so almost
+         all of it lies inboard. It was 416 mm when the drawing was a lens with a
+         ball at each extremity; the turned spindle that replaced it measures 300
+         inboard and 20 the other way, and its tallest element is a post ball at
+         0.725 of the shaft's diameter rather than a swell at 1.5 times it.
+         Kept a shade generous — the drawn shape is what `npm run collide -- boxes`
+         checks against, and it errs the safe way. */
       case "grab":
-        return { out: 40, in: 416, vy: 115 };
+        return { out: 26, in: 320, vy: 26 };
       case "lever":
         return { out: 40, in: 152, vy: 51 };
       case "plate":
@@ -2097,8 +2489,8 @@ ${body}
       default: {
         const w = handle.w || 30;
         return {
-          out: Math.max(29, w * 1.15),
-          in: Math.max(36, w * 1.15),
+          out: Math.ceil(w * 0.55),
+          in: Math.ceil(w * 0.55),
           vy: barHalf(handle.len, leafH, panelled)
         };
       }
@@ -2214,118 +2606,89 @@ ${body}
   }
   function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
     const half = leafW * GRAB.len / 2;
-    const w = leafW * GRAB.len * GRAB.ratio;
+    const D = leafW * GRAB.len * GRAB.ratio;
     const by = y0 + leafH * GRAB.fromTop;
-    const boss = GRAB.boss, swell = w * 1.5;
-    const span = half - boss;
+    const span = half - D * 0.9;
     const centredNear = centreX - dir * span;
     const near = dir > 0 ? Math.max(centredNear, cx) : Math.min(centredNear, cx);
     const hingeStop = centreX + dir * (leafW / 2 - 45);
     const far = dir > 0 ? Math.min(near + 2 * span, hingeStop) : Math.max(near - 2 * span, hingeStop);
-    const bowC = (near + far) / 2;
-    const bowSpan = Math.abs(far - near) / 2;
-    const bar = (dx, dy, fill, op = 1) => `
-      <path d="M ${bowC - bowSpan + dx} ${by - w / 2 + dy}
-               C ${bowC - bowSpan * 0.45 + dx} ${by - swell / 2 + dy}
-                 ${bowC + bowSpan * 0.45 + dx} ${by - swell / 2 + dy}
-                 ${bowC + bowSpan + dx} ${by - w / 2 + dy}
-               L ${bowC + bowSpan + dx} ${by + w / 2 + dy}
-               C ${bowC + bowSpan * 0.45 + dx} ${by + swell / 2 + dy}
-                 ${bowC - bowSpan * 0.45 + dx} ${by + swell / 2 + dy}
-                 ${bowC - bowSpan + dx} ${by + w / 2 + dy} Z"
-            fill="${fill}" opacity="${op}"/>`;
-    const ends = [bowC - bowSpan, bowC + bowSpan];
+    const x0 = Math.min(near, far) - D * 0.9, x1 = Math.max(near, far) + D * 0.9;
+    const L = x1 - x0;
+    const P = (f) => x0 + L * f;
+    const n1 = (v) => v.toFixed(1);
+    const rod = (a, b, hh, rx, fill) => `
+      <rect x="${n1(P(a))}" y="${n1(by - hh)}" width="${n1(P(b) - P(a))}"
+            height="${n1(hh * 2)}" rx="${n1(rx)}" fill="${fill}"/>`;
+    const POST = [0.175, 0.825];
     return `
     <g>
       <g data-hw="grab">
-        ${bar(6, 9, "#000", 0.3)}
-        ${ends.map((ex) => `
-        <circle cx="${ex + 5}" cy="${by + 8}" r="${boss}" fill="#000" opacity="0.28"
-                filter="url(#hwShadow)"/>`).join("")}
-        ${bar(0, 0, "url(#nickel)")}
-        <!-- turned collars where the bar meets each ball -->
-        ${ends.map((ex) => `
-        <rect x="${ex - 5}" y="${by - w * 0.75}" width="10" height="${w * 1.5}" rx="3"
-              fill="url(#nickelSoft)"/>`).join("")}
-        ${ends.map((ex) => `
-        <circle cx="${ex}" cy="${by}" r="${boss}" fill="url(#nickel)"/>
-        <path d="${arcPath(ex, by, boss - 3, 140, 315)}" fill="none" stroke="#fff"
-              stroke-opacity="0.42" stroke-width="3"/>`).join("")}
-        <!-- one specular along the top of the swell -->
-        <path d="M ${bowC - bowSpan + 4} ${by - w / 2 + 3}
-                 C ${bowC - bowSpan * 0.45} ${by - swell / 2 + 4}
-                   ${bowC + bowSpan * 0.45} ${by - swell / 2 + 4}
-                   ${bowC + bowSpan - 4} ${by - w / 2 + 3}
-                 L ${bowC + bowSpan - 4} ${by - w / 2 + 8}
-                 C ${bowC + bowSpan * 0.45} ${by - swell / 2 + 10}
-                   ${bowC - bowSpan * 0.45} ${by - swell / 2 + 10}
-                   ${centreX - half + boss + 4} ${by - w / 2 + 8} Z"
-              fill="#fff" opacity="0.5"/>
+        <!-- The shadow is a tight band under the shaft and two rounder, darker
+             pools under the posts, because only the posts stand proud. It was
+             a diagonally offset copy of the whole bar, which is what a flat
+             cut-out throws, not a turned spindle on two feet. -->
+        <rect x="${n1(P(0.1))}" y="${n1(by + D * 0.28)}" width="${n1(P(0.9) - P(0.1))}"
+              height="${n1(D * 0.55)}" rx="${n1(D * 0.27)}" fill="#000" opacity="0.22"
+              filter="url(#hwShadow)"/>
+        ${POST.map((t) => `
+        <ellipse cx="${n1(P(t) + D * 0.15)}" cy="${n1(by + D * 0.9)}" rx="${n1(D * 1.1)}"
+                 ry="${n1(D * 0.55)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`).join("")}
+
+        <!-- The rose behind each ball. Square-on it is concentric with the
+             ball, so all that shows is a ring of it — and that ring is the
+             whole of the standoff anyone is allowed to draw. -->
+        ${POST.map((t) => `
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#nickelSoft)"/>
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.22"/>`).join("")}
+
+        <!-- Outboard stems, visibly thinner than the shaft; then the terminal
+             beads, which is what every one of these doors ends in. -->
+        ${rod(0.075, 0.155, D * 0.3, D * 0.15, "url(#nickel)")}
+        ${rod(0.845, 0.925, D * 0.3, D * 0.15, "url(#nickel)")}
+        ${rod(0.03, 0.078, D * 0.55, D * 0.5, "url(#nickel)")}
+        ${rod(0.922, 0.97, D * 0.55, D * 0.5, "url(#nickel)")}
+        ${rod(0, 0.032, D * 0.22, D * 0.11, "url(#nickel)")}
+        ${rod(0.968, 1, D * 0.22, D * 0.11, "url(#nickel)")}
+        <!-- the flat rings just outboard of each ball -->
+        ${rod(0.106, 0.124, D * 0.6, D * 0.1, "url(#nickelSoft)")}
+        ${rod(0.876, 0.894, D * 0.6, D * 0.1, "url(#nickelSoft)")}
+
+        <!-- The shaft: constant diameter, and the tone runs ACROSS it. A dark
+             line at the top, a narrow specular at a third down, a broad dark
+             core through the belly and a soft bounce along the bottom. Ours
+             was one flat white ribbon, which is why it looked unlit. -->
+        ${rod(0.2, 0.8, D / 2, D * 0.16, "url(#grabRod)")}
+        <!-- step collars where the shaft meets each ball -->
+        ${rod(0.203, 0.228, D * 0.575, D * 0.2, "url(#nickelSoft)")}
+        ${rod(0.772, 0.797, D * 0.575, D * 0.2, "url(#nickelSoft)")}
+
+        <!-- the post balls, turned and standing in front of their roses -->
+        ${POST.map((t) => `
+        <ellipse cx="${n1(P(t))}" cy="${n1(by)}" rx="${n1(D * 0.675)}" ry="${n1(D * 0.725)}"
+                 fill="url(#nickel)"/>
+        <ellipse cx="${n1(P(t) - D * 0.18)}" cy="${n1(by - D * 0.22)}" rx="${n1(D * 0.22)}"
+                 ry="${n1(D * 0.26)}" fill="#fff" opacity="0.40"/>`).join("")}
       </g>
     </g>`;
   }
-  var bossHalf = (spec, w) => spec.fix.kind === "clamp" ? w * 1.13 : w * Math.max(spec.fix.size || 1, 1) / 2;
   function bossReach(handle) {
     if (handle.style !== "bar") return handleFootprint(handle, 2050).in;
-    const w = handle.w || 30;
-    return Math.round(Math.max(w / 2, bossHalf(BARS[handle.bar] || BARS.idan, w)));
+    return Math.round((handle.w || 30) / 2);
   }
   var BARS = {
-    // Round tube. TWO blown highlights with a dark separator — the tube's tell.
-    idan: {
-      tone: "barRound",
-      cap: "bullnose",
-      rx: 0.5,
-      fix: { kind: "cylinder", t: [0.138, 0.879], proj: 1.71, size: 0.87 }
-    },
-    // Round rod, dark-cored and twin-rimmed, warm. The collars are the event:
-    // fat turned bosses with near-black undercut grooves, and the rod steps
-    // down to 0.91 W beyond them.
-    ella: {
-      tone: "barBrass",
-      cap: "dome",
-      rx: 0.5,
-      stub: 0.91,
-      fix: { kind: "collar", t: [0.184, 0.805], proj: 0.59, size: 1.72, tall: 1.3 }
-    },
-    // Square, one face on: almost a flat fill, 20 levels of contrast across it.
-    // The clamp blocks INTERRUPT the bar, over a wider back-plate with screws.
-    nitzan: {
-      tone: "barMatte",
-      cap: "flat",
-      rx: 0.05,
-      stub: 0.8,
-      fix: { kind: "clamp", t: [0.169, 0.826], proj: 0.9, size: 1.23, tall: 1.2 }
-    },
-    // Square at yaw: two flat faces across a hard step, brightest of the range.
-    // No standoffs at all — both ends mitre into legs that run back to the door.
-    shahar: {
-      tone: "barPolish",
-      cap: "none",
-      rx: 0.06,
-      fix: { kind: "leg", t: [0.019, 0.975], proj: 1.24, size: 0.6 }
-    },
-    // Matte anthracite, the only cool one, and the only two-tone handle: bright
-    // brushed shoes cap both extremities and there is nothing in between.
-    ron: {
-      tone: "barDark",
-      cap: "shoe",
-      rx: 0.08,
-      fix: { kind: "shoe", t: [0.035, 0.965], proj: 0.33, size: 1.57, tall: 1.86 }
-    },
-    /* The flat blade — d034, d073, d104. A wide ribbon rather than a tube, and
-       the section is what identifies it: a round bar shows two blown highlights
-       with a dark core between them, and this shows ONE broad even face with a
-       hard bright arris down each long edge, because a flat surface facing the
-       camera returns the key light uniformly instead of wrapping it. Nearly
-       square corners, and the fixings vanish behind the width of it. */
-    blade: {
-      tone: "barPolish",
-      cap: "flat",
-      rx: 0.04,
-      stub: 1,
-      fix: { kind: "clamp", t: [0.1, 0.9], proj: 0.3, size: 0.62, tall: 0.9 }
-    }
+    // Standard round tube — a dozen doors, the commonest grip Peretz fits.
+    idan: { tone: "barTube", rx: 0.3, fix: { t: [0.14, 0.85] } },
+    // The same cylinder in brass. d072, d074, d082.
+    ella: { tone: "barGold", rx: 0.3, fix: { t: [0.15, 0.8] } },
+    // The slim rod: d072 at 0.017 of leaf width, d035 at 0.022, d074 at 0.024.
+    ron: { tone: "barTube", rx: 0.3, fix: { t: [0.1, 0.9] } },
+    // Flat strap, standard width — d049, d066, d034, d104.
+    nitzan: { tone: "barStrap", rx: 0.05, fix: { t: [0.1, 0.89] } },
+    // Flat strap, long — d060 runs 0.60 of leaf height against d049's 0.45.
+    shahar: { tone: "barStrap", rx: 0.04, fix: { t: [0.15, 0.85] } },
+    // Flat strap, wide — d073, the one bar in the corpus past 0.07 of leaf width.
+    blade: { tone: "barStrap", rx: 0.05, fix: { t: [0.09, 0.95] } }
   };
   function pullBar(cx, cy, handle, leafH, panelled) {
     const spec = BARS[handle.bar] || BARS.idan;
@@ -2333,50 +2696,22 @@ ${body}
     const w = handle.w || 30, r = w * spec.rx;
     const top = cy - half, bot = cy + half, L = half * 2;
     const at = (t) => top + L * t;
-    const stub = w * (spec.stub || 1);
-    const fx = spec.fix;
-    const fixArt = (behind) => fx.t.map((t) => {
-      const y = at(t), sz = w * (fx.size || 1);
-      if ((fx.kind === "cylinder" || fx.kind === "leg") && behind) return `
-      <ellipse cx="${cx + 11}" cy="${y + 13}" rx="${w * 0.78}" ry="${sz * 0.62}"
-               fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`;
-      if (fx.kind === "collar" && !behind) return `
-      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
-            rx="${w * 0.18}" fill="url(#nickel)"/>
-      ${[-0.3, 0.02].map((o) => `
-      <rect x="${cx - sz / 2}" y="${y + w * fx.tall * o}" width="${sz}" height="${w * 0.2}"
-            fill="#000" opacity="0.72"/>`).join("")}
-      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz * 0.16}"
-            height="${w * fx.tall}" fill="#fff" opacity="0.34"/>`;
-      if (fx.kind === "clamp" && !behind) return `
-      <rect x="${cx - w * 1.13}" y="${y - w * fx.tall / 2 - 2}" width="${w * 2.26}"
-            height="${w * fx.tall + 4}" rx="3" fill="url(#nickelSoft)" opacity="0.55"/>
-      <rect x="${cx - w * 1.13}" y="${y - w * fx.tall / 2 - 2}" width="${w * 2.26}"
-            height="${w * fx.tall + 4}" rx="3" fill="#000" opacity="0.42"/>
-      <circle cx="${cx + w * 0.83}" cy="${y}" r="${w * 0.14}" fill="#000" opacity="0.5"/>
-      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
-            rx="2" fill="url(#nickel)"/>`;
-      if (fx.kind === "shoe" && !behind) return `
-      <rect x="${cx - w * fx.size / 2}" y="${y - w * fx.tall / 2}" width="${w * fx.size}"
-            height="${w * fx.tall}" rx="${w * 0.22}" fill="url(#nickel)"/>
-      <rect x="${cx - w * fx.size / 2 + 2}" y="${y - w * fx.tall / 2 + 2}" width="${w * 0.22}"
-            height="${w * fx.tall - 4}" rx="2" fill="#fff" opacity="0.5"/>`;
-      return "";
-    }).join("");
-    const capR = spec.cap === "dome" ? w * 0.15 : spec.cap === "bullnose" ? w * 0.148 : r;
-    const shaftTop = spec.cap === "shoe" ? top + w * 0.9 : top;
-    const shaftBot = spec.cap === "shoe" ? bot - w * 0.9 : bot;
+    const feet = spec.fix.t.map((t) => `
+      <ellipse cx="${(cx + w * 0.55).toFixed(1)}" cy="${(at(t) + w * 0.45).toFixed(1)}"
+               rx="${(w * 0.75).toFixed(1)}" ry="${(w * 0.75).toFixed(1)}"
+               fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`).join("");
     return `
     <g>
-      <rect x="${cx - w / 2 + 11}" y="${shaftTop + 13}" width="${w}" height="${shaftBot - shaftTop}"
-            rx="${capR}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      ${fixArt(true)}
-      <!-- the stubs beyond the fixings step down on two of the products -->
-      <rect x="${cx - stub / 2}" y="${shaftTop}" width="${stub}" height="${shaftBot - shaftTop}"
-            rx="${capR}" fill="url(#${spec.tone})"/>
-      ${stub !== w ? `<rect x="${cx - w / 2}" y="${at(fx.t[0])}" width="${w}"
-            height="${at(fx.t[1]) - at(fx.t[0])}" fill="url(#${spec.tone})"/>` : ""}
-      ${fixArt(false)}
+      <rect x="${(cx - w / 2 + w * 0.55).toFixed(1)}" y="${(top + w * 0.45).toFixed(1)}"
+            width="${w}" height="${L}" rx="${r}"
+            fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
+      ${feet}
+      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${L}" rx="${r}"
+            fill="url(#${spec.tone})"/>
+      <!-- and the fall down its length, which every bar here was missing: our
+           five were flat greys top to bottom on a leaf that is not. -->
+      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${L}" rx="${r}"
+            fill="url(#barFall)"/>
     </g>`;
   }
   function plateHandle(cx, cy, dir) {
@@ -2834,7 +3169,7 @@ ${body}
   }
   function grilleGlyph(grille) {
     const S = 300;
-    const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, "#8E979D") : null;
+    const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, "#8E979D", "t" + grille.id) : null;
     return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
     ${glass ? glass.veil : `<g>${grillePaths(grille.id, 0, 0, S, S, grille.light ? "#D8D8D4" : null)}</g>`}
@@ -2942,19 +3277,23 @@ ${body}
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
     <path d="M -300 158 Q -190 143 -80 158 L -80 182 Q -190 197 -300 182 Z"/>
     <circle cx="-80" cy="170" r="17"/>` }),
-    /* Pull bars. All five are a vertical rod, so what separates them is
-       slenderness, the end caps and the fixings — which is exactly what the
-       product photographs say separates them in the shop. */
+    /* Pull bars.
+       ⚠ THE BOX IS FIXED, and it has to be. Every other glyph here scales its
+       own art to fill the tile, which is right when the fittings are different
+       objects — a knob and a recess tell themselves apart at any size. The bars
+       are not different objects: they are one or other of two sections at four
+       sizes, and the fixings that used to distinguish them in this tile were
+       invented and are gone. Normalised to their own bounding box, a 1230 mm
+       strap and a 1000 mm one are the same picture, and the file already
+       records what that costs — seven fittings once shared one drawing under
+       seven names and seven prices.
+       So a bar is drawn at TRUE SIZE inside a fixed slice of leaf. Length and
+       slenderness are then the whole of what a customer compares, which is what
+       they are on the door. */
     bar: (h) => {
-      const half = Math.min(h.len, 2050 - 320) / 2;
+      const half = Math.min(h.len, 1240) / 2;
       const w = h.w || 30, spec = BARS[h.bar] || BARS.idan;
-      const fix = spec.fix.t.map((t) => {
-        const y = -half + half * 2 * t, s = w * spec.fix.size;
-        return spec.fix.kind === "clamp" || spec.fix.kind === "shoe" ? `<rect x="${-s / 2}" y="${y - s * 0.5}" width="${s}" height="${s}" rx="${w * 0.1}"/>` : `<rect x="${w / 2}" y="${y - s * 0.28}" width="${w * spec.fix.proj}" height="${s * 0.56}"
-                 rx="${s * 0.28}"/>`;
-      }).join("");
-      return { box: [-w * 2.2, -half - 26, w * 2.2, half + 26], art: `
-    ${fix}
+      return { box: [-170, -650, 170, 650], art: `
     <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"/>` };
     }
   };

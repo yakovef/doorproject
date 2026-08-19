@@ -21,6 +21,59 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Every window design and every pull handle redrawn from the photographs.**
+  "Our window options are not nearly accurate to their real counterparts. Make
+  them look the same as in the images. Then I want you to do the same thing
+  with pull handles." Eleven designs and nine grips were each read off the
+  works page against our own render at the same crop. The verdict on all eleven
+  windows was *wrong* — not *partly*.
+  **Three mistakes ran through the lot.** A MESH WHERE THERE IS A BORDER: four
+  families covered the whole pane in small squares and no real door has that;
+  what they have is two verticals set in from the edges and three or four
+  horizontals, a frame with a big clear middle, because the point of a window
+  is to see through it. SQUIGGLES WHERE THERE ARE SPIRALS: ours drew opposed
+  semicircles, two open ends and no curl, where every curl on these doors winds
+  about a turn and a quarter into a stopped eye. And FIXED PIXEL OFFSETS —
+  `bar` and `iron` offset their shadow by 3 and their gleam by 1.5 whatever the
+  stroke, so the same grille came out proportionally three times heavier on a
+  272 mm opening than on a 425 mm one.
+  **One house rule now stated once instead of discovered eight times: ornament
+  is sized by the pane's WIDTH and never by its height.** The openings run 272
+  x 1415 to 425 x 1025, so anything scaled off the height is a different
+  drawing on every door. d129 is the most slender pane in the corpus and its
+  ironwork is the same size as squat d108's, with a longer bare run between.
+  **And one border module, `MARGIN = 0.13` of pane width**, which had already
+  drifted into three implementations: d104's border verticals sit at 0.130 /
+  0.265 / 0.735 / 0.870 and d123's at 0.120 / 0.259 / 0.741 / 0.880 — the same
+  four numbers within one per cent, under two different names.
+  **The bars were selling their fixings.** Ella's banded collars, Nitzan's
+  clamp blocks over a backplate with a screw head, Ron's bright two-tone end
+  shoes, Shahar's mitred legs, Blade's dark plates — all invented, and between
+  them the only thing that told six products apart. Twenty-one bar-carrying
+  doors show unbroken metal end to end; the one door in 128 with anything
+  clamped to a bar is d122 and it looks like none of the three. What a standoff
+  may leave in a dead square-on elevation is a local thickening of the drop
+  shadow, and that is now all of it.
+  **Two sections, not five.** Read across the width, the corpus splits cleanly
+  and refuses to split further: a round tube WRAPS (one off-centre peak, a dark
+  rim at each silhouette edge, about 3:1 — d035 reads 103,142,212,231,202,76)
+  and a flat strap does not (d049's face is flat inside 3.6% across 23 px, and
+  keeps all its modelling ALONG the length, 1.15 at the head to 0.75 at the
+  foot). Difference between products moved into section and size, which is
+  where the photographs put it.
+  **The widths were the thing that was wrong.** Lengths were 0% to 15% out;
+  three of six bars were 50% to 80% too NARROW, which at thumbnail size is the
+  difference between a handle and a pinstripe. Nitzan 26→44, Shahar 30→40,
+  Ella 34→20 (and brass at last — with no `finish` of its own it had been
+  rendering silver), channel 42→85, grab 0.30→0.33 of leaf width.
+  ⚠ **`research/works/auto/leaf.json` is not trustworthy for 41 of 129 doors.**
+  They carry `src: "fallback"` and 27 of them share ONE identical box. Any
+  contact sheet built from it crops those doors to a generic rectangle that may
+  miss the leaf entirely — d124's "ironwork" reading was a neighbouring window,
+  d099's was the fixed side-glazing — and any leaf-relative proportion measured
+  off such a crop is scaled by an unknown factor. Read the original before
+  trusting a number. See §8.
+
 - **The short code is eight characters again.** It was nine for two rounds, and
   the ninth was carrying the glazing axis and the add-ons — both withdrawn. The
   bits came OUT of the layout rather than being left as reserved zeroes: a
@@ -916,6 +969,28 @@ Scratch harnesses go in `tools/_*.mjs`, which is gitignored.
   Version 8 does not fit in three, so a decoder built for this layout reads an
   older code's version as 14 or 15 and refuses it — which is wanted, and the
   length check refuses it a line earlier anyway.
+- **`research/works/auto/leaf.json` is a fallback for 41 of 129 doors, and 27
+  of those share ONE box.** `src` says which: 57 `auto`, 31 `hand`, 41
+  `fallback`. A fallback entry is a generic centre rectangle, not a measurement
+  — on d124 and d099 it lands on a neighbouring window and on the fixed
+  side-glazing respectively, and on d076 and d080 it bounds the leaf's raised
+  PANEL rather than the leaf. Anything cropped from it is a picture of
+  somewhere near the door, and any leaf-relative fraction taken off such a crop
+  is scaled by an unknown factor: measuring d035's tube on its fallback tile
+  gives 0.043 of leaf width against 0.022 on the original, which is a whole
+  product category of error. **Check `src` before you measure**, and read the
+  original in `research/works/doors/` when the number matters. This has already
+  put one wrong figure into a specification and it will do it again.
+- **A DROP SHADOW IS NOT AN OBJECT, and two tools have to agree about that.**
+  `metalBox` in `tools/collide.mjs` has always skipped elements carrying a
+  `filter`; the sweep in the same file measured whole `[data-hw]` groups, which
+  include them. The two asked different questions for three rounds without
+  anybody noticing, because every shadow offset was a small constant. They
+  scale with the fitting now — a bar standing 40–50 mm off the leaf throws a
+  shadow a full bar-width clear of itself — and the disagreement surfaced
+  instantly as 165 "collisions" where a bar's shadow crossed a lever with 12 mm
+  of air between the metal. The sweep strips them now, for the same reason it
+  already stripped `data-relight` and `data-hitpad`.
 
 ---
 

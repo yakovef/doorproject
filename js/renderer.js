@@ -17,7 +17,7 @@
  */
 
 import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
-import { darken, isLight, lighten, scaleTone, silhouette, toRgb } from './colour.js';
+import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
    light → mid → dark → a weaker second return near the far edge. That double
@@ -335,11 +335,14 @@ const BAR_INSET = 0.19;
 const BAR_GAP     = 0.125;
 const BAR_GAP_MIN = 0.090;
 
-/* The horizontal grab bar. All 18 instances are centred on the leaf width at
-   a mid rail, 0.30 of leaf width long at about 1:15, on ball collars — and
-   every single one is on a door that already has a lever. It is an accessory,
-   never a door's main grip, which is why it ships as "lever + grab bar". */
-const GRAB = { fromTop: 0.585, len: 0.30, ratio: 1 / 15, boss: 17 };
+/* The horizontal grab bar. Every instance is centred on the leaf width at a
+   mid rail, on ball collars — and every single one is on a door that already
+   has a lever. It is an accessory, never a door's main grip, which is why it
+   ships as "lever + grab bar".
+   `len` is 0.33 of leaf width, measured tip to tip across six doors: d051
+   0.371, d062 0.375, d067 0.308, d068 0.321, d070 0.306. It was 0.30, the
+   bottom of that range. The 1:15 slenderness was already right. */
+const GRAB = { fromTop: 0.59, len: 0.33, ratio: 1 / 15 };
 const THRESHOLD    = 42;   // a real sill is a chunky extrusion, ~0.02 H, not a strip
 
 /* The backplate that carries lever and cylinder together — the fitting on
@@ -923,21 +926,88 @@ export function render(state) {
       <stop offset="1"   stop-color="#7C8288"/>
     </linearGradient>
 
-    <!-- Pull-bar cross-sections, each measured off its own product photograph.
-         A round tube carries two narrow blown highlights with a dark separator
-         between them; a prism holds one or two broad flat plateaux. Using one
-         gradient for both is what makes rendered bars look like tubes of
-         toothpaste. -->
-    <linearGradient id="barRound" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish('#4A4440', tone)}"/>
-      <stop offset="0.10" stop-color="${inFinish('#FFFFFF', tone)}"/>
-      <stop offset="0.167" stop-color="${inFinish('#FFFFFF', tone)}"/>
-      <stop offset="0.283" stop-color="${inFinish('#4E4846', tone)}"/>
-      <stop offset="0.40" stop-color="${inFinish('#FCFBF6', tone)}"/>
-      <stop offset="0.467" stop-color="${inFinish('#F2F0EA', tone)}"/>
-      <stop offset="0.633" stop-color="${inFinish('#302E2A', tone)}"/>
-      <stop offset="0.815" stop-color="${inFinish('#766B65', tone)}"/>
-      <stop offset="1"    stop-color="${inFinish('#564E47', tone)}"/>
+    <!-- ── PULL-BAR CROSS-SECTIONS ────────────────────────────────────
+         TWO SECTIONS, NOT FIVE. Twenty-one bar-carrying doors, measured
+         across their width at mid-height, fall into exactly two groups and
+         nothing else: a round tube that WRAPS, and a flat strap that does
+         not. d035 reads 103,142,212,231,202,76 across eleven pixels — one
+         peak, a hard dark rim each side. d049's face reads 192,196,191,193,
+         191,190,193,193,193,193,192,191,191,192,192,192,192,193,193,193,191,
+         190,189 across twenty-three — a dead-even plane inside 3.6%.
+         There were five ramps here and they were the whole of what told our
+         bars apart, which is how six products came to differ mainly in
+         fixings that no photograph shows.
+
+         ⚠ THE OLD ROUND RAMP WAS A FOLDED RIBBON, not a tube: two blown-white
+         plateaux of identical value with a dark stripe between them and the
+         DARKEST tone in the middle of the bar. A cylinder goes dark at its
+         rims and bright once, off centre. Measured on the photographs the
+         peak-to-trough is about 3.2:1 (d035 233:57, d065 215:25) and the
+         minimum sits at 0.86-0.96 across, never in the interior. -->
+    <linearGradient id="barTube" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="${inFinish('#4A453F', tone)}"/>
+      <stop offset="0.07" stop-color="${inFinish('#7E7A73', tone)}"/>
+      <stop offset="0.16" stop-color="${inFinish('#B4B0A8', tone)}"/>
+      <stop offset="0.32" stop-color="${inFinish('#EDEBE5', tone)}"/>
+      <stop offset="0.42" stop-color="${inFinish('#DFDCD4', tone)}"/>
+      <stop offset="0.58" stop-color="${inFinish('#A9A39B', tone)}"/>
+      <stop offset="0.74" stop-color="${inFinish('#7A746D', tone)}"/>
+      <stop offset="0.90" stop-color="${inFinish('#4A443E', tone)}"/>
+      <stop offset="1"    stop-color="${inFinish('#6A635C', tone)}"/>
+    </linearGradient>
+    <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
+         drew them silver, because ella carried no finish key of its own and
+         effectiveFinish fell through to steel. -->
+    <linearGradient id="barGold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#6B5230"/>
+      <stop offset="0.07" stop-color="#95733F"/>
+      <stop offset="0.16" stop-color="#C79E5C"/>
+      <stop offset="0.32" stop-color="#F5D191"/>
+      <stop offset="0.42" stop-color="#E4BE7C"/>
+      <stop offset="0.58" stop-color="#B0863F"/>
+      <stop offset="0.74" stop-color="#84632F"/>
+      <stop offset="0.90" stop-color="#4A2F0C"/>
+      <stop offset="1"    stop-color="#7A5C33"/>
+    </linearGradient>
+    <!-- The flat strap: two hairline arrises and one uniform field between
+         them. Total swing across the middle 89% stays under 4%. -->
+    <linearGradient id="barStrap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"     stop-color="${inFinish('#9B9992', tone)}"/>
+      <stop offset="0.055" stop-color="${inFinish('#CFCDC7', tone)}"/>
+      <stop offset="0.945" stop-color="${inFinish('#C9C7C1', tone)}"/>
+      <stop offset="1"     stop-color="${inFinish('#9B9992', tone)}"/>
+    </linearGradient>
+    <!-- ALONG the length, which is where a strap keeps all its modelling and
+         where every one of our bars had none. Measured bar-face over adjacent
+         paint on d049: 1.15 at the head falling monotonically to 0.75 at the
+         foot; d060 and d066 give the same shape. Written as a black overlay,
+         so it multiplies whatever section is underneath instead of replacing
+         it — the same reason the leaf's own wash is black and not a tint. -->
+    <!-- The grab bar shaft, ACROSS its diameter: a near-black line at the
+         top, a fast ramp, a narrow specular a third down, a fast fall, a broad
+         dark core through the belly, then a soft bounce along the bottom and a
+         dark bottom edge. Ours was one flat white ribbon with no dark core at
+         all, which is why it looked unlit rather than turned. -->
+    <linearGradient id="grabRod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="${inFinish('#3A3733', tone)}"/>
+      <stop offset="0.06" stop-color="${inFinish('#8C8880', tone)}"/>
+      <stop offset="0.18" stop-color="${inFinish('#DDD9D1', tone)}"/>
+      <stop offset="0.30" stop-color="${inFinish('#F4F2ED', tone)}"/>
+      <stop offset="0.42" stop-color="${inFinish('#B9B4AC', tone)}"/>
+      <stop offset="0.58" stop-color="${inFinish('#5A554F', tone)}"/>
+      <stop offset="0.78" stop-color="${inFinish('#4E4943', tone)}"/>
+      <stop offset="0.90" stop-color="${inFinish('#9A948C', tone)}"/>
+      <stop offset="1"    stop-color="${inFinish('#4A4540', tone)}"/>
+    </linearGradient>
+    <linearGradient id="barFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.035"/>
+      <stop offset="0.06" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.15" stop-color="#000" stop-opacity="0.018"/>
+      <stop offset="0.25" stop-color="#000" stop-opacity="0.123"/>
+      <stop offset="0.40" stop-color="#000" stop-opacity="0.228"/>
+      <stop offset="0.55" stop-color="#000" stop-opacity="0.307"/>
+      <stop offset="0.70" stop-color="#000" stop-opacity="0.351"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.360"/>
     </linearGradient>
     <linearGradient id="barBrass" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"    stop-color="${inFinish('#7D7467', tone)}"/>
@@ -948,28 +1018,6 @@ export function render(state) {
       <stop offset="0.78" stop-color="${inFinish('#FFF8E0', tone)}"/>
       <stop offset="0.86" stop-color="${inFinish('#C0A87E', tone)}"/>
       <stop offset="1"    stop-color="${inFinish('#817F82', tone)}"/>
-    </linearGradient>
-    <linearGradient id="barMatte" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish('#5C5D5A', tone)}"/>
-      <stop offset="0.32" stop-color="${inFinish('#6D6D69', tone)}"/>
-      <stop offset="0.74" stop-color="${inFinish('#666462', tone)}"/>
-      <stop offset="1"    stop-color="${inFinish('#5A5955', tone)}"/>
-    </linearGradient>
-    <linearGradient id="barPolish" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish('#D1CCBF', tone)}"/>
-      <stop offset="0.037" stop-color="${inFinish('#F5F4F2', tone)}"/>
-      <stop offset="0.444" stop-color="${inFinish('#F7F6F4', tone)}"/>
-      <stop offset="0.519" stop-color="${inFinish('#FFFFFF', tone)}"/>
-      <stop offset="0.560" stop-color="${inFinish('#A9ACA9', tone)}"/>
-      <stop offset="0.778" stop-color="${inFinish('#96938D', tone)}"/>
-      <stop offset="1"    stop-color="${inFinish('#999591', tone)}"/>
-    </linearGradient>
-    <linearGradient id="barDark" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish('#55565C', tone)}"/>
-      <stop offset="0.14" stop-color="${inFinish('#525255', tone)}"/>
-      <stop offset="0.50" stop-color="${inFinish('#515054', tone)}"/>
-      <stop offset="0.92" stop-color="${inFinish('#4E4E50', tone)}"/>
-      <stop offset="1"    stop-color="${inFinish('#6D6B6C', tone)}"/>
     </linearGradient>
 
     <!-- Almog's blade: bright top, dark belly, bounce along the bottom, and
@@ -2352,141 +2400,336 @@ function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
  * Returned in two parts, because they go either side of the grille: ironwork
  * sits in front of the glass, not behind its texture.
  */
-function glazingArt(kind, x, y, w, h, paint) {
+function glazingArt(kind, x, y, w, h, paint, key = 'g') {
+  const n2 = v => v.toFixed(1);
+  const uid = s => `gz-${key}-${s}`;
+
+  /* ── זכוכית מחורצת — REEDED ─────────────────────────────────────────
+     The flutes are not the event. Both photographs — d125's clear reeded pane
+     and d122's behind its muntins — put about 2.5:1 of range into a VERTICAL
+     RAMP, bright under the head and darkest at the foot, and only about a
+     tenth of that into the reeding itself. Ours had it exactly the other way
+     round: 2.7:1 across ten hard-edged stripes and nothing at all head to
+     foot, which is why it read as a graphic and not as glass.
+     Pitch was three times too coarse as well. d125 shows about 34 flutes
+     across the pane; ours drew ten, which is an awning.
+     And the glass is far more NEUTRAL than its leaf: d122's is a grey-white
+     pane in a sage-green door. Multiplying the paint tinted the whole opening
+     with the door's own hue at full saturation. */
   if (kind === 'reeded') {
-    /* Vertical flutes. Each rod is a little lens: a bright line down its
-       crown, a dark one in the valley beside it. Read at door scale it is a
-       run of hard vertical bands, which is why it never reads as "frosted". */
-    const pitch = Math.max(16, Math.min(30, w / 9));
-    const n = Math.max(3, Math.round(w / pitch));
+    const g = toRgb(paint);
+    const av = (g.r + g.g + g.b) / 3;
+    const base = mix(paint, toHex({ r: av, g: av, b: av }), 0.65);
+    const n = Math.max(24, Math.min(40, Math.round(w / (w / 34))));
     const p = w / n;
-    /* Tone from the corpus, not from an idea of what frosted glass looks like.
-       `npm run glass` separates obscured panes from clear ones by spread, and
-       the obscured ones measure 0.18 to 0.56 of the leaf's own value -- they
-       are DARKER than the paint, because behind them is an unlit hall rather
-       than a street. Drawn pale, as this was, an obscured pane reads as white
-       plastic let into the door. */
-    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.52)}"/>`;
-    for (let i = 0; i < n; i++) {
-      const bx = x + p * i;
-      out += `<rect x="${bx}" y="${y}" width="${p * 0.30}" height="${h}" fill="${scaleTone(paint, 0.86)}"/>`
-           + `<rect x="${bx + p * 0.70}" y="${y}" width="${p * 0.30}" height="${h}" fill="${scaleTone(paint, 0.30)}"/>`;
-    }
-    return { veil: out, over: '' };
+    const ramp = uid('r'), flute = uid('f'), pat = uid('p');
+    const stops = [[0, 0.60], [0.06, 0.55], [0.18, 0.78], [0.40, 0.62],
+                   [0.62, 0.50], [0.82, 0.38], [1, 0.28]]
+      .map(([o, m]) => `<stop offset="${o}" stop-color="${scaleTone(base, m)}"/>`).join('');
+    const soft = [[0, '#000', 0.15], [0.17, '#000', 0.05], [0.34, '#000', 0],
+                  [0.50, '#fff', 0.11], [0.66, '#fff', 0], [0.83, '#000', 0.05],
+                  [1, '#000', 0.15]]
+      .map(([o, c, a]) => `<stop offset="${o}" stop-color="${c}" stop-opacity="${a}"/>`).join('');
+    return { veil: `
+      <defs>
+        <linearGradient id="${ramp}" gradientUnits="userSpaceOnUse"
+                        x1="${n2(x)}" y1="${n2(y)}" x2="${n2(x)}" y2="${n2(y + h)}">${stops}</linearGradient>
+        <linearGradient id="${flute}" x1="0" y1="0" x2="1" y2="0">${soft}</linearGradient>
+        <pattern id="${pat}" patternUnits="userSpaceOnUse" x="${n2(x)}" y="${n2(y)}"
+                 width="${n2(p)}" height="${n2(h)}">
+          <rect x="0" y="0" width="${n2(p)}" height="${n2(h)}" fill="url(#${flute})"/>
+        </pattern>
+      </defs>
+      <rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="url(#${ramp})"/>
+      <rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="url(#${pat})"/>`,
+      over: '' };
   }
-  /* INTERLOCKING RINGS — d106, and it is the whole door: a repeating figure of
-     overlapping circles on a square pitch, the ring lines brighter than the
-     ground because they are where the glass is left thick. */
+
+  /* ── עיגולים שזורים — d106 ──────────────────────────────────────────
+     The radius is the whole design. On the door a ring's radius is EXACTLY
+     the grid step, so a ring is tangent to its four orthogonal neighbours and
+     overlaps only its diagonal ones — which is what makes the pointed-oval
+     lenses and the four-pointed star of dark ground inside every ring.
+     Ours used 0.62 of the cell. At 0.62 the orthogonal neighbours cross too,
+     and every extra crossing manufactured ornament that is not on the door:
+     the little dark squares, diamonds and wedges were all artefacts of that
+     one number. Ink coverage came out at 57% of the pane against a measured
+     30%, so ours read as a white lattice with dark specks where the door is a
+     dark pane with a light drawing on it.
+     Seven steps across the width, always — a proportion, not a pixel clamp. */
   if (kind === 'circles') {
-    /* d106 shows seven or eight rings across the opening, not twenty. */
-    const cell = Math.max(40, Math.min(96, w / 3.4));
-    const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
-    const cw = w / cols, ch = h / rows;
-    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.44)}"/>`;
-    const ring = (cx, cy, r) =>
-      `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="none"
-               stroke="${scaleTone(paint, 1.05)}" stroke-width="${(r * 0.17).toFixed(1)}"/>`;
-    /* Rings on the cell centres AND on the corners: that overlap is the
-       pattern. One lattice of circles is a polka dot. */
-    for (let r = 0; r <= rows; r++) {
-      for (let c = 0; c <= cols; c++) {
-        const rr = Math.min(cw, ch) * 0.62;
-        out += ring(x + cw * c, y + ch * r, rr);
-        if (r < rows && c < cols) out += ring(x + cw * (c + 0.5), y + ch * (r + 0.5), rr);
+    const s = w / 7, r = s;
+    const sw = Math.max(1, r * 0.11);
+    const ink = scaleTone(paint, 1.06);
+    let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
+                     fill="${scaleTone(paint, 0.44)}"/>`;
+    const rows = Math.ceil(h / s) + 1;
+    let d = '';
+    for (let i = -1; i <= 8; i++) {
+      for (let j = -1; j <= rows; j++) {
+        if ((i + j) % 2 === 0) continue;
+        const cx = x + i * s, cy = y + j * s;
+        d += `M ${n2(cx - r)} ${n2(cy)} a ${n2(r)} ${n2(r)} 0 1 0 ${n2(r * 2)} 0
+              a ${n2(r)} ${n2(r)} 0 1 0 ${n2(-r * 2)} 0 `;
       }
     }
+    /* One flat stroke, no shadow and no gleam: this is etched glass, not a
+       forged member. The three-pass ironwork vocabulary belongs to
+       grillePaths and reads as relief the moment it is used here. */
+    out += `<path d="${d}" fill="none" stroke="${ink}" stroke-width="${sw.toFixed(2)}"/>`;
     return { veil: out, over: '' };
   }
 
-  /* GRAPE AND VINE — d109 and d111. Bold outlined bunches with a curling stem
-     up the pane. Drawn as outline only, because that is what an etched figure
-     is: the glass is cut away round the line, not filled. */
+  /* ── גפן — d109 and d111 ────────────────────────────────────────────
+     A repeating film cut by the opening, not a motif placed in the middle of
+     it: one sinuous stem running off both ends with leaves and bunches tied to
+     it by thin stalks, and tendrils filling the gaps.
+     The LEAF is the dominant thing — five leaves to three bunches, each as
+     wide as a whole bunch — and ours had none at all, so the pane read as
+     fruit floating in a void. The berries were also twice life size: 0.22 W
+     against a measured 0.12-0.14 W, which put one bunch across most of the
+     opening. And three identical bunches at identical spacing is not what a
+     drawn film does. */
   if (kind === 'vine') {
     const ink = scaleTone(paint, 1.06);
-    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.46)}"/>`;
-    const n = Math.max(2, Math.round(h / (w * 1.15)));
+    const STEM = w * 0.030, OUT = w * 0.021, THIN = w * 0.014;
+    const str = (d, sw) => `<path d="${d}" fill="none" stroke="${ink}"
+      stroke-width="${sw.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
+                     fill="${scaleTone(paint, 0.46)}"/>`;
+
+    const pitch = w * 0.26;
+    const n = Math.max(4, Math.round(h / pitch));
+    /* The stem, cut by both the top and the bottom edge. */
+    const stemX = t => x + w * (0.51 + 0.11 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
+    let d = `M ${n2(stemX(-0.03))} ${n2(y - h * 0.03)}`;
+    for (let i = 1; i <= 48; i++) {
+      const t = -0.03 + (1.06 * i) / 48;
+      d += ` L ${n2(stemX(t))} ${n2(y + h * t)}`;
+    }
+    out += str(d, STEM);
+
+    const KIND = ['leaf', 'cluster', 'leaf', 'leaf', 'cluster', 'leaf', 'cluster', 'leaf'];
+    const LSZ = [1.00, 0.86, 1.15, 0.94, 1.08, 0.90];
+    const LROT = [-25, 15, -10, 30, -35, 20];
+    const BR = [1.00, 0.95, 0.78, 0.92, 1.18, 1.02, 0.95, 1.05, 1.00];
     for (let i = 0; i < n; i++) {
-      const cy = y + h * (i + 0.5) / n, cx = x + w * (i % 2 ? 0.62 : 0.38);
-      const r = Math.min(w * 0.11, h / (n * 5));
-      /* A bunch: five rows narrowing to a point, drawn as outlined berries. */
-      for (let row = 0; row < 4; row++) {
-        const per = 4 - row;
-        for (let k = 0; k < per; k++) {
-          const bx = cx + (k - (per - 1) / 2) * r * 2.05;
-          const by = cy + row * r * 1.75 - r;
-          out += `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${r.toFixed(1)}"
-                          fill="none" stroke="${ink}" stroke-width="${(r * 0.28).toFixed(1)}"/>`;
+      const t = (i + 0.5) / n;
+      const ay = y + h * t, side = i % 2 ? 1 : -1;
+      const ax = stemX(t) + side * w * 0.19;
+      if (KIND[i % 8] === 'cluster') {
+        const r = w * 0.065;
+        let k = 0;
+        [3, 3, 2, 1].forEach((per, row) => {
+          for (let c = 0; c < per; c++) {
+            const f = BR[k % BR.length]; k++;
+            const bx = ax + (c - (per - 1) / 2) * r * 2.04 + (row % 2 ? r * 0.5 : 0);
+            const by = ay + row * r * 1.76;
+            out += `<circle cx="${n2(bx)}" cy="${n2(by)}" r="${n2(r * f)}" fill="none"
+                            stroke="${ink}" stroke-width="${OUT.toFixed(2)}"/>`;
+          }
+        });
+        out += str(`M ${n2(stemX(t))} ${n2(ay - r)} Q ${n2((stemX(t) + ax) / 2)} ${n2(ay - r * 1.8)}
+                    ${n2(ax)} ${n2(ay - r * 1.1)}`, THIN);
+      } else {
+        /* A five-lobed grape leaf: pointed centre lobe, two side lobes, two
+           basal ones, four V-notches cutting in to about a third of the half
+           width, and a heart-shaped base where the petiole enters. */
+        const L = w * 0.34 * LSZ[i % LSZ.length], H2 = L * 0.82;
+        const a = ((LROT[i % LROT.length] * side) * Math.PI) / 180;
+        const pt = (u, v) => {
+          const px = u * L * 0.5, py = v * H2 * 0.5;
+          return [n2(ax + px * Math.cos(a) - py * Math.sin(a)),
+                  n2(ay + px * Math.sin(a) + py * Math.cos(a))];
+        };
+        const lobe = [[0, -1], [0.34, -0.55], [0.30, -0.30], [0.72, -0.42], [0.60, 0.02],
+                      [0.95, 0.30], [0.42, 0.42], [0.20, 0.86], [0, 0.55]];
+        let ld = `M ${pt(0, -1).join(' ')}`;
+        for (const [u, v] of lobe.slice(1)) ld += ` Q ${pt(u * 1.12, v * 0.92).join(' ')} ${pt(u, v).join(' ')}`;
+        for (const [u, v] of [...lobe].reverse().slice(1)) {
+          ld += ` Q ${pt(-u * 1.12, v * 0.92).join(' ')} ${pt(-u, v).join(' ')}`;
+        }
+        out += str(ld + ' Z', OUT);
+        out += str(`M ${pt(0, 0.55).join(' ')} L ${n2(stemX(t))} ${n2(ay + H2 * 0.2)}`, THIN);
+        for (const [u, v] of [[0, -0.62], [0.42, -0.20], [-0.42, -0.20]]) {
+          out += str(`M ${pt(0, 0.5).join(' ')} L ${pt(u, v).join(' ')}`, THIN);
         }
       }
-      /* the stem, curling away from the bunch */
-      const sx = cx, sy = cy - r * 2.4;
-      out += `<path d="M ${sx} ${sy} c ${w * 0.10} ${-h * 0.06} ${w * 0.20} ${-h * 0.02}
-                       ${w * 0.16} ${-h * 0.09}" fill="none" stroke="${ink}"
-                    stroke-width="${(r * 0.30).toFixed(1)}" stroke-linecap="round"/>`;
+    }
+    /* Tendrils: open spirals that never close into a ring — a closed loop
+       reads as a stray berry. */
+    const tn = Math.max(2, Math.round(h / (1.4 * w)));
+    for (let i = 0; i < tn; i++) {
+      const t = (i + 0.5) / tn, side = i % 2 ? -1 : 1;
+      const sx = stemX(t), sy = y + h * t;
+      let td = `M ${n2(sx)} ${n2(sy)}`, ex = sx, ey = sy;
+      for (let k = 1; k <= 22; k++) {
+        const a = (k / 22) * Math.PI * 2.2 * side;
+        const r = w * (0.07 - 0.045 * (k / 22));
+        ex = sx + side * w * 0.10 + Math.cos(a) * r;
+        ey = sy + Math.sin(a) * r;
+        td += ` L ${n2(ex)} ${n2(ey)}`;
+      }
+      out += str(td, THIN);
+      out += `<circle cx="${n2(ex)}" cy="${n2(ey)}" r="${n2(w * 0.012)}" fill="${ink}"/>`;
     }
     return { veil: out, over: '' };
   }
 
-  /* A TREE — d114. One trunk off-centre with branches reaching across the
-     pane, filled rather than outlined: on that door the figure reads as a
-     silhouette, not as a line drawing. */
+  /* ── עץ — d114 ──────────────────────────────────────────────────────
+     A near-BLACK filled silhouette, and ours was drawn brighter than the leaf.
+     From across a room ours was a white tree and the real one is a black one:
+     the polarity was the single most visible error on the pane.
+     Then the shape. The real stem is serpentine — it enters the bottom edge
+     right of centre, S-curves across, bottoms out in a broad U and climbs back
+     — and it ends at the head in a thick shepherd's crook curling round a
+     light almond void. Ours drew a straight parallel-sided trunk at a fixed
+     u=0.30 with a squared-off top.
+     And it had NO LEAVES, only a regular ladder of seven branches each ending
+     in the same two antler twigs. The real design has three or four large
+     solid lobed leaf masses carrying most of the black, and no hairlines at
+     all: nothing on that door is thinner than about 0.035 W. */
   if (kind === 'tree') {
-    const ink = scaleTone(paint, 1.04);
-    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.42)}"/>`;
-    const bx = x + w * 0.30, by = y + h;
-    out += `<path d="M ${bx - w * 0.05} ${by} C ${bx - w * 0.02} ${y + h * 0.55}
-                     ${bx + w * 0.04} ${y + h * 0.40} ${bx + w * 0.02} ${y + h * 0.08}
-                     L ${bx + w * 0.10} ${y + h * 0.08}
-                     C ${bx + w * 0.10} ${y + h * 0.45} ${bx + w * 0.06} ${y + h * 0.60}
-                     ${bx + w * 0.09} ${by} Z" fill="${ink}"/>`;
-    /* Branches both ways and enough of them to read as a tree. Four thin ones
-       up one side was a sapling; d114 fills the pane. Each carries a couple of
-       twigs, because a bare arc reads as a wire. */
-    for (const [t, reach, up, side] of [
-      [0.70, 0.60, 0.17, 1], [0.60, 0.34, 0.12, -1], [0.50, 0.55, 0.15, 1],
-      [0.40, 0.40, 0.13, -1], [0.30, 0.62, 0.14, 1], [0.20, 0.30, 0.10, -1],
-      [0.12, 0.44, 0.09, 1]]) {
-      const ex = bx + w * reach * side, ey = y + h * (t - up * 0.6);
-      out += `<path d="M ${bx + w * 0.03} ${y + h * t}
-                       Q ${bx + w * reach * 0.55 * side} ${y + h * (t - up)} ${ex} ${ey}"
-                    fill="none" stroke="${ink}" stroke-width="${(w * 0.030).toFixed(1)}"
-                    stroke-linecap="round"/>`;
-      for (const f of [0.45, 0.75]) {
-        const tx = bx + w * reach * f * side, ty = y + h * (t - up * f * 0.9);
-        out += `<path d="M ${tx} ${ty} q ${w * 0.05 * side} ${-h * 0.035}
-                         ${w * 0.11 * side} ${-h * 0.045}" fill="none" stroke="${ink}"
-                      stroke-width="${(w * 0.016).toFixed(1)}" stroke-linecap="round"/>`;
+    const ground = scaleTone(paint, 0.42);
+    let ink = scaleTone(paint, 0.12);
+    if (luminance(ink) > luminance(ground) * 0.30) ink = '#17120F';
+    let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="${ground}"/>`;
+    const P = (u, v) => [x + w * u, y + h * v];
+    const fill = d => `<path d="${d}" fill="${ink}"/>`;
+
+    /* A filled ribbon from a spine and a half-width along it: the real
+       elements taper root to tip and meet in filleted junctions, which a
+       stroked path cannot do. */
+    const ribbon = (spine, hw) => {
+      const pts = [];
+      for (let i = 0; i <= 40; i++) {
+        const t = (i / 40) * (spine.length - 1);
+        const k = Math.min(spine.length - 2, Math.floor(t)), f = t - k;
+        const a = spine[k], b = spine[k + 1];
+        const pv = spine[Math.max(0, k - 1)], nx = spine[Math.min(spine.length - 1, k + 2)];
+        const cr = (p0, p1, p2, p3, j) => {
+          const t2 = f * f, t3 = t2 * f;
+          return 0.5 * ((2 * p1[j]) + (-p0[j] + p2[j]) * f
+            + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2
+            + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3);
+        };
+        pts.push([cr(pv, a, b, nx, 0), cr(pv, a, b, nx, 1), i / 40]);
       }
+      const left = [], right = [];
+      for (let i = 0; i < pts.length; i++) {
+        const p0 = pts[Math.max(0, i - 1)], p1 = pts[Math.min(pts.length - 1, i + 1)];
+        const dx = p1[0] - p0[0], dy = p1[1] - p0[1];
+        const L = Math.hypot(dx, dy) || 1;
+        const r = hw(pts[i][2]);
+        left.push([pts[i][0] - (dy / L) * r, pts[i][1] + (dx / L) * r]);
+        right.push([pts[i][0] + (dy / L) * r, pts[i][1] - (dx / L) * r]);
+      }
+      return 'M ' + left.map(p => `${n2(p[0])} ${n2(p[1])}`).join(' L ')
+           + ' L ' + right.reverse().map(p => `${n2(p[0])} ${n2(p[1])}`).join(' L ') + ' Z';
+    };
+
+    const spine = [[0.60, 1.04], [0.62, 0.86], [0.50, 0.72], [0.36, 0.60],
+                   [0.46, 0.44], [0.54, 0.28], [0.60, 0.10]].map(([u, v]) => P(u, v));
+    out += fill(ribbon(spine, t => w * (0.078 - 0.033 * t)));
+    /* The crook, and its void is the point of the feature: if it fills in the
+       curl wants a bigger radius, never a thinner band. */
+    const crook = [[0.60, 0.10], [0.72, 0.03], [0.92, 0.05], [0.96, 0.12],
+                   [0.86, 0.16], [0.80, 0.11]].map(([u, v]) => P(u, v));
+    out += fill(ribbon(crook, () => w * 0.055));
+    const limb = [[0.53, 0.28], [0.46, 0.20], [0.38, 0.10], [0.34, -0.03]].map(([u, v]) => P(u, v));
+    out += fill(ribbon(limb, t => w * (0.050 - 0.020 * t)));
+    out += fill(ribbon([[0.10, 0.93], [0.20, 0.955], [0.30, 0.965], [0.42, 0.925],
+                        [0.52, 0.87]].map(([u, v]) => P(u, v)), () => w * 0.0225));
+    out += fill(`M ${P(0.355, 0.005).map(n2).join(' ')} L ${P(0.375, 0.005).map(n2).join(' ')}
+                 L ${P(0.372, 0.055).map(n2).join(' ')} Z`);
+
+    const N = Math.max(3, Math.min(6, Math.round(h / (w * 1.25))));
+    for (let i = 0; i < N; i++) {
+      const v = (i + 0.5) / N, side = i % 2 ? 1 : -1;
+      /* Root the leaf on the stem where the stem actually is at that height,
+         not on the pane's centreline. */
+      let ru = 0.5;
+      for (let k = 0; k < spine.length - 1; k++) {
+        const a = spine[k], b = spine[k + 1], vy = y + h * v;
+        if ((a[1] - vy) * (b[1] - vy) <= 0) {
+          const f = (vy - a[1]) / ((b[1] - a[1]) || 1);
+          ru = (a[0] + (b[0] - a[0]) * f - x) / w;
+        }
+      }
+      const root = [x + w * ru, y + h * v];
+      const LOBE = [0.42, 0.36, 0.27], ANG = [-12, 16, 44];
+      const reachOf = k => Math.min(LOBE[k] + (i % 2 && k === 0 ? 0.06 : 0),
+                                    side > 0 ? 0.98 - ru : ru - 0.02);
+      /* THE PALM. Without it the three lobes are three spikes meeting at a
+         point and the leaf reads as a bird's foot — which is exactly what the
+         first render of this came out as. On d114 the slits between the lobes
+         stop two thirds of the way back and the inner third is one mass. */
+      const palm = [];
+      for (const s of [-1, 1]) {
+        for (let k = 0; k < 3; k++) {
+          const kk = s < 0 ? k : 2 - k;
+          const a = (ANG[kk] * Math.PI) / 180;
+          const rr = reachOf(kk) * (s < 0 ? 0.52 : 0.44);
+          palm.push([x + w * (ru + side * rr * Math.cos(a)) - s * side * w * 0.045,
+                     y + h * v + w * rr * Math.sin(a)]);
+        }
+      }
+      out += fill('M ' + palm.map(p => `${n2(p[0])} ${n2(p[1])}`).join(' L ') + ' Z');
+      LOBE.forEach((len, k) => {
+        const a = (ANG[k] * Math.PI) / 180;
+        const reach = reachOf(k);
+        const tip = [x + w * (ru + side * reach * Math.cos(a)), y + h * v + w * reach * Math.sin(a)];
+        /* Convex on the UPPER edge, and the bulge is perpendicular to the lobe
+           rather than straight up, so the steeply raked lobe curves as much as
+           the near-horizontal one. */
+        const bulge = w * reach * 0.16;
+        const mid = [(root[0] + tip[0]) / 2 + Math.sin(a) * bulge * side,
+                     (root[1] + tip[1]) / 2 - Math.cos(a) * bulge];
+        out += fill(ribbon([root, mid, tip], t => w * (0.098 - 0.076 * t * t)));
+      });
     }
     return { veil: out, over: '' };
   }
 
+  /* ── זכוכית מעוצבת — the etched diaper ─────────────────────────────
+     A 45-degree lattice of scalloped diamonds, each holding a concave-sided
+     four-pointed star and a bright centre speck, beaded at every crossing.
+     d102, d105, d116 and d127 all carry it and the dominant read is DIAGONAL.
+     Ours drew an orthogonal grid of circles at nearly twice the scale, which
+     reads as objects rather than as texture, and left a four-cornered gap of
+     bare ground at every cell corner — a second pattern that is not there.
+     No circle of any size appears anywhere in this glass. */
   if (kind === 'mesh') {
-    /* The fine etched texture behind a grille on d102, d105, d116 and d127: a
-       small repeating four-petal figure on a square lattice, the petals
-       slightly brighter than the ground because they are the thicker glass.
-       It used to be called `obscure` and stood for every patterned glass
-       there is; d106's interlocking rings have their own branch now, because
-       they are a different figure at four times the scale. */
-    const cell = Math.max(26, Math.min(52, w / 6));
-    const cols = Math.max(2, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
-    const cw = w / cols, ch = h / rows;
-    /* Same correction as the reeded glass, and the motif is bolder: beside
-       d106 ours was a faint tracery on a white field where the real one is a
-       strong cream figure on a dark ground. The pattern is the product; a
-       pattern you have to look for is not one. */
-    let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${scaleTone(paint, 0.46)}"/>`;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const cx = x + cw * (c + 0.5), cy = y + ch * (r + 0.5);
-        const rr = Math.min(cw, ch) * 0.50;
-        out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}"
-                        fill="none" stroke="${scaleTone(paint, 1.02)}" stroke-width="${(rr * 0.22).toFixed(1)}"/>`
-             + `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(rr * 0.30).toFixed(1)}"
-                        fill="${scaleTone(paint, 0.88)}"/>`;
-      }
-    }
-    return { veil: out, over: '' };
+    const d = w / 12, r = d / 2, pid = uid('m');
+    const bow = r * 0.10, s = r * 0.55, ib = s * 0.18;
+    const cell = (cx, cy) => {
+      const edge = `M ${n2(cx)} ${n2(cy - r)}
+        Q ${n2(cx + r * 0.5 + bow)} ${n2(cy - r * 0.5 - bow)} ${n2(cx + r)} ${n2(cy)}
+        Q ${n2(cx + r * 0.5 + bow)} ${n2(cy + r * 0.5 + bow)} ${n2(cx)} ${n2(cy + r)}
+        Q ${n2(cx - r * 0.5 - bow)} ${n2(cy + r * 0.5 + bow)} ${n2(cx - r)} ${n2(cy)}
+        Q ${n2(cx - r * 0.5 - bow)} ${n2(cy - r * 0.5 - bow)} ${n2(cx)} ${n2(cy - r)} Z`;
+      const star = `M ${n2(cx)} ${n2(cy - s)}
+        Q ${n2(cx + s * 0.5 - ib)} ${n2(cy - s * 0.5 + ib)} ${n2(cx + s)} ${n2(cy)}
+        Q ${n2(cx + s * 0.5 - ib)} ${n2(cy + s * 0.5 - ib)} ${n2(cx)} ${n2(cy + s)}
+        Q ${n2(cx - s * 0.5 + ib)} ${n2(cy + s * 0.5 - ib)} ${n2(cx - s)} ${n2(cy)}
+        Q ${n2(cx - s * 0.5 + ib)} ${n2(cy - s * 0.5 + ib)} ${n2(cx)} ${n2(cy - s)} Z`;
+      return `<path d="${edge}" fill="none" stroke="${scaleTone(paint, 0.80)}"
+                    stroke-width="${(d * 0.10).toFixed(2)}" stroke-linejoin="round"/>
+              <path d="${star}" fill="none" stroke="${scaleTone(paint, 0.88)}"
+                    stroke-width="${(d * 0.075).toFixed(2)}" stroke-linejoin="round"/>
+              <circle cx="${n2(cx)}" cy="${n2(cy)}" r="${n2(d * 0.062)}"
+                      fill="${scaleTone(paint, 0.95)}"/>`;
+    };
+    /* One tile, tiled — twelve by fifty-odd cells drawn one at a time is
+       thousands of elements per opening, and this is a texture. */
+    return { veil: `
+      <defs><pattern id="${pid}" patternUnits="userSpaceOnUse"
+                     x="${n2(x)}" y="${n2(y)}" width="${n2(d)}" height="${n2(d)}">
+        <rect x="0" y="0" width="${n2(d)}" height="${n2(d)}" fill="${scaleTone(paint, 0.42)}"/>
+        ${cell(0, 0)}${cell(d, 0)}${cell(0, d)}${cell(d, d)}${cell(d / 2, d / 2)}
+      </pattern></defs>
+      <rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="url(#${pid})"/>`,
+      over: '' };
   }
   return null;                                   // clear: the pane as it was
 }
@@ -2580,7 +2823,7 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
      over it were two choices and are one, so the same option decides both:
      `glass: true` in the catalogue means it is etched into the glass, and
      `glazingArt` draws it exactly as it drew the old glazing. */
-  const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint) : null;
+  const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint, key) : null;
   /* The architrave. It was a 30 mm band with a single 10 mm bevel, and that
      thinness is most of why a glazed door of ours read as CAD next to a
      photograph: on the measured doors the surround is a MOULDING, wide and
@@ -2690,8 +2933,36 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
       }).join('')}
     </g>`;
 }
-
-/** Ironwork. Bars are objects: lit top edge, dark underside, own shadow. */
+/**
+ * Ironwork and painted glazing bars — every design read off the photographs.
+ *
+ * ── the rule that governs all of it ──────────────────────────────────
+ * ORNAMENT IS SIZED BY THE PANE'S WIDTH AND NEVER BY ITS HEIGHT. The openings
+ * we sell run from 272 x 1415 mm to 425 x 1025 mm, so anything scaled off the
+ * height is a different drawing on every door. The photographs settle it: d129
+ * is the most slender pane in the corpus and its ironwork is the same size as
+ * squat d108's, with a longer bare run between the two ends. Extra height goes
+ * into plain glass.
+ *
+ * ── what these branches used to be ───────────────────────────────────
+ * Every one of them was rebuilt after the owner's son said the window designs
+ * "are not nearly accurate to their real counterparts". Eleven readings of the
+ * works page, one per family, against our own render at the same crop. The
+ * verdict on all eleven was the same word, and it was not "partly".
+ *
+ * Three mistakes ran through the lot and are worth naming once:
+ *   A MESH WHERE THERE IS A BORDER. Four families drew a field of small
+ *   squares over the whole pane. Not one real door has that. What they have is
+ *   two vertical bars set in from the edges and three or four horizontals — a
+ *   frame with a big clear middle, because the point of a window is to see
+ *   through it.
+ *   SQUIGGLES WHERE THERE ARE SPIRALS. Ours drew opposed semicircles: two open
+ *   ends and no curl. Every curl on these doors winds about a turn and a
+ *   quarter into a stopped eye, which is what forged scrollwork is.
+ *   FIXED PIXEL OFFSETS. `bar` and `iron` offset their shadow by 3 and their
+ *   gleam by 1.5 whatever the stroke, so the same grille came out proportion-
+ *   ally three times heavier on a narrow opening than on a wide one.
+ */
 function grillePaths(kind, x, y, w, h, tint) {
   /* `tint` is the bar's own colour. Ironwork is near-black, but muntins in the
      door's own paint are just as common — d097 is white bars on a white door,
@@ -2704,168 +2975,387 @@ function grillePaths(kind, x, y, w, h, tint) {
   kind = String(kind).replace(/-light$/, '');
   const body = tint || '#232527';
   const gleam = tint ? '#fff' : '#8A8F94';
-  const bar = (x1, y1, x2, y2, sw = 13) => `
-    <line x1="${x1 + 3}" y1="${y1 + 3}" x2="${x2 + 3}" y2="${y2 + 3}"
-          stroke="#000" stroke-opacity="0.35" stroke-width="${sw}" stroke-linecap="round"/>
-    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="${body}" stroke-width="${sw}" stroke-linecap="round"/>
-    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-          stroke="${gleam}" stroke-opacity="0.5" stroke-width="${sw * 0.28}" stroke-linecap="round"
-          transform="translate(-${sw * 0.22} -${sw * 0.22})"/>`;
 
-  if (kind === 'bars') {
-    const n = Math.max(2, Math.round(w / 90));
-    return Array.from({ length: n - 1 }, (_, i) =>
-      bar(x + (w * (i + 1)) / n, y, x + (w * (i + 1)) / n, y + h)).join('');
-  }
-  /* GONE: `lattice`, a diagonal criss-cross of bars. It is on no door in 128
-     photographs — we invented it. The id resolves to the etched mesh, which is
-     the nearest thing that exists. */
-  /* An orthogonal grid of squares. Ours were all diagonal or all vertical;
-     the measured doors overwhelmingly carry this — a square mesh, the bars
-     the same weight both ways, sized so the squares come out roughly square
-     rather than at whatever the opening's aspect happens to give. */
-  /* The plain orthogonal mesh, and nothing set into it. Seven doors carry it
-     bare — d091 d100 d107 d110 d113 d117 d122 — and it used to be impossible
-     to ask for, because this branch always added the medallions. Those are
-     `scroll` now, which is what the catalogue always called them. */
-  const mesh = () => {
-    const step = Math.min(w, h) / Math.max(2, Math.round(Math.min(w, h) / 105));
-    const out = [];
-    for (let gx = x + step; gx < x + w - 1; gx += step) out.push(bar(gx, y, gx, y + h, 9));
-    for (let gy = y + step; gy < y + h - 1; gy += step) out.push(bar(x, gy, x + w, gy, 9));
-    return out;
+  const U = f => x + w * f;
+  const V = f => y + h * f;
+  const n2 = v => v.toFixed(1);
+
+  const strokeOf = (d, colour, sw, op, cap) =>
+    `<path d="${d}" fill="none" stroke="${colour}" stroke-width="${sw.toFixed(2)}"
+           stroke-opacity="${op}" stroke-linecap="${cap}" stroke-linejoin="round"/>`;
+
+  /**
+   * A forged member: shadow, body, lit edge.
+   *
+   * ⚠ THE OFFSETS ARE FRACTIONS OF THE MEMBER'S OWN STROKE, not constants.
+   * They were 3 and 1.5 in absolute units, so a 0.013 W hairline on a wide
+   * opening cast the same shadow as a 0.026 W scroll on a narrow one, and the
+   * whole pattern read heavier on the narrow door. Nobody chose that.
+   */
+  const ink = (d, sw, cap = 'round') => {
+    const o = sw * 0.24;
+    return `<g transform="translate(${o.toFixed(2)} ${o.toFixed(2)})">
+              ${strokeOf(d, '#000', sw, 0.26, cap)}</g>
+            ${strokeOf(d, body, sw, 1, cap)}
+            <g transform="translate(${(-o * 0.6).toFixed(2)} ${(-o * 0.6).toFixed(2)})">
+              ${strokeOf(d, gleam, sw * 0.30, 0.16, cap)}</g>`;
   };
-  /* A shape drawn in the ironwork's three passes: shadow, body, gleam. */
-  const iron = (d, sw = 9) => `
-      <path d="${d}" fill="none" stroke="#000" stroke-opacity="0.28"
-            stroke-width="${sw}" transform="translate(3 3)"/>
-      <path d="${d}" fill="none" stroke="${body}" stroke-width="${sw}"
-            stroke-linecap="round"/>
-      <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.4"
-            stroke-width="${sw / 3}" transform="translate(-1.5 -1.5)"/>`;
 
-  if (kind === 'grid') return mesh().join('');
+  /* ── THE BORDER MODULE, ONE NUMBER ──────────────────────────────────
+     m = 0.13 of the pane's WIDTH is the workshop's inset, and it turned up
+     three times under three names before anybody noticed it was one number:
+     d104's border verticals sit at 0.130 / 0.265 / 0.735 / 0.870 of the pane
+     and d123's at 0.120 / 0.259 / 0.741 / 0.880 — the same four figures within
+     one per cent, a doubled line inset from each stile. The single-line
+     version is the scroll doors' margin; the head-and-foot-only version is
+     what d100, d113 and d117 carry.
+     It lives here because CLAUDE.md §5 is right: a quantity computed in two
+     places is a promise that somebody will change one of them, and this one
+     had already drifted into three. */
+  const MARGIN = 0.13;
 
-  /* The mesh with an ornament set into it at top and bottom. Seven doors:
-     d089 d093 d095 d097 d099 d102 d116. The mesh is the field and the scroll
-     is the event — a plain grid alone is a security bar. */
-  if (kind === 'scroll') {
-    const out = mesh();
-    /* FOUR RADII ACROSS — the motif is two opposed circles, so its width is
-       4·rr and the radius is a fifth of the opening, not a third. At w*0.30 it
-       was 1.2 of the pane and its ends were cropped by the glass.
-       It was w*0.15 for one round, which is 0.60 of the pane, and beside the
-       photograph of d097 that reads as a small mark floating in a security
-       grid where the real one is the thing you look at. Measured off the
-       photograph the ornament spans about 0.85 of the light; 0.20 puts ours at
-       0.80, which is as close as this shape gets without touching the rebate.
-       The vertical cap stays — on a short opening the width is not the binding
-       constraint and two of these would meet in the middle. */
-    const rr = Math.min(w * 0.20, h * 0.07);
-    for (const t of [0.20, 0.80]) {
-      const cy2 = y + h * t, cx2 = x + w / 2;
-      out.push(iron(`M ${cx2 - rr * 2} ${cy2} a ${rr} ${rr} 0 1 1 ${rr * 2} 0
-                     a ${rr} ${rr} 0 1 0 ${rr * 2} 0`));
+  /** A member that is SOLID rather than a line: a lozenge, a rosette, a
+      collar. The lance under d103's dome is a filled shape and a stroked
+      outline of it is a different object. */
+  const solid = (d, ref) => {
+    const o = (ref || w * 0.02) * 0.24;
+    return `<g transform="translate(${o.toFixed(2)} ${o.toFixed(2)})">
+              <path d="${d}" fill="#000" fill-opacity="0.26"/></g>
+            <path d="${d}" fill="${body}"/>`;
+  };
+
+  const line = (x1, y1, x2, y2, sw, cap = 'round') =>
+    ink(`M ${n2(x1)} ${n2(y1)} L ${n2(x2)} ${n2(y2)}`, sw, cap);
+
+  const dot = (cx, cy, r) =>
+    solid(`M ${n2(cx - r)} ${n2(cy)} a ${n2(r)} ${n2(r)} 0 1 0 ${n2(r * 2)} 0
+           a ${n2(r)} ${n2(r)} 0 1 0 ${n2(-r * 2)} 0`, r);
+
+  /** A filled rounded block — the collars that punctuate every joint. */
+  const collar = (cx, cy, bw, bh) =>
+    solid(`M ${n2(cx - bw / 2)} ${n2(cy - bh / 2)} h ${n2(bw)} v ${n2(bh)}
+           h ${n2(-bw)} Z`, bh);
+
+  /* A SPIRAL, as a dense polyline. Winding is what separates ornamental
+     ironwork from a squiggle: every curl in these photographs turns about a
+     turn and a quarter into a stopped eye, and no single SVG arc does that.
+     Returned OUTER END FIRST so a ribbon can run into it and stop. */
+  const curl = (cx, cy, sx, sy, turns, dir) => {
+    const rOut = Math.hypot(sx - cx, sy - cy) || 1;
+    const ph = Math.atan2(sy - cy, sx - cx);
+    const steps = Math.max(14, Math.round(turns * 18));
+    const pts = [];
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const a = ph - dir * turns * 2 * Math.PI * t;
+      const r = rOut * (1 - t) + rOut * 0.15 * t;
+      pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
     }
+    return pts;
+  };
+  const poly = (pts, cont) => pts.map(([px, py], i) =>
+    `${i ? 'L' : (cont ? 'L' : 'M')} ${n2(px)} ${n2(py)}`).join(' ');
+
+  /* ── סורג רשת — PAINTED GLAZING BARS ────────────────────────────────
+     Not ironwork at all, and that is the finding. Every readable door — d091
+     navy, d122 sage, d110/d113/d117 cream, d107 red — carries muntins in the
+     LEAF'S OWN PAINT dividing the light into a handful of tall rectangles.
+     Nothing is black, nothing is metallic, and the contrast sign flips with
+     the glass rather than with the bar: navy bars read dark against pale
+     glass, cream bars read light against dark glass, and both are the door.
+     Ours drew a near-black mesh of about 36 roughly SQUARE cells. Square cells
+     are what made it read as a security grille; the real lights measure 1.57x
+     (d091), 1.68x (d122) and 2.16x (d110) taller than wide.
+     The division is EXACT — thirds and quarters on d091 and d122, fifths on
+     d110 — so every light is the same size. Ours marched a fixed step from the
+     top and left an odd remainder at the bottom.
+     ⚠ Recorded rather than acted on: all seven measured doors carry the
+     PAINTED variant, so `grid` (dark) has no photograph behind it. It stays,
+     because `light` is one axis over the whole list and collapsing the pair
+     would leave two prices on one picture. It is a question for Peretz. */
+  if (kind === 'grid') {
+    const cols = w / h >= 0.75 ? 4 : w / h >= 0.40 ? 3 : 2;
+    const rows = Math.max(2, Math.min(6, Math.round((cols * h) / (w * 1.75))));
+    const sw = Math.max(3, (w / cols) * 0.09);
+    const out = [];
+    for (let i = 1; i < cols; i++) out.push(line(U(i / cols), y, U(i / cols), y + h, sw, 'butt'));
+    for (let j = 1; j < rows; j++) out.push(line(x, V(j / rows), x + w, V(j / rows), sw, 'butt'));
     return out.join('');
   }
 
-  /* A COLUMN OF QUATREFOILS on a sparse grid — d104, once, and kept at the
-     owner's son's instruction. Four petals round a centre, repeated up the
-     pane between two vertical bars. */
+  /* ── the BORDER GRID ────────────────────────────────────────────────
+     Two vertical bars set in from the edges and horizontals at the margins.
+     This is the shared skeleton of the designed tier — the scroll doors carry
+     it, d104's quatrefoil column carries it, and d116 carries it under a
+     different ornament — and every one of those branches used to invent its
+     own field of squares instead. It is the reason a customer can see out. */
+  const borderGrid = (m, extraY, b) => {
+    const out = [line(x + m, y, x + m, y + h, b), line(x + w - m, y, x + w - m, y + h, b)];
+    for (const gy of [y + m, y + h - m, ...extraY]) out.push(line(x, gy, x + w, gy, b));
+    return out;
+  };
+
+  /* ── סורג מעוצב — BORDER GRID + SQUARE SCROLL BLOCKS ────────────────
+     d089 is the reference: white grille on a white leaf, square-on, highest
+     contrast in the set. Two verticals, three horizontals, and ONE square
+     block of scrollwork in the lower cell with plain glass above.
+     The block is exactly as wide as the span between the verticals and as
+     tall as it is wide — 87 x 86 px on d089, 175 x 173 on d097. Inside it,
+     eight tight volutes in four mirrored pairs, meeting at four tangency
+     points, around a clear rounded-diamond void.
+     Ours drew a full mesh plus two flat opposed semicircles at 0.20 and 0.80
+     of the height: a squiggle with no curl, twice as wide as tall, floating
+     free of anything. Every single element above was missing. */
+  if (kind === 'scroll') {
+    const m = Math.min(w * 0.19, h * 0.10);
+    const Bw = w - 2 * m, Bh = 1.08 * Bw;
+    /* Two blocks or one. d093, d097 and d102 carry both; d089 and d095 carry
+       only the lower one and leave the top two thirds plain. The test is
+       whether both fit with a clear middle left over, which is what a tall
+       narrow opening decides for itself. */
+    const two = 2 * Bh + 0.5 * Bw <= h - 2 * m;
+    const b = w * 0.022;
+    const rows = [y + h - m - Bh];
+    if (two) rows.push(y + m + Bh);
+    const out = borderGrid(m, rows, b);
+
+    /* One quadrant of the motif, authored once in the block's unit square and
+       emitted four times mirrored. Mirroring the COORDINATES rather than the
+       drawing keeps the light coming from one direction — a mirrored <g> flips
+       the shadow with the shape, and four shadows pointing four ways is the
+       one thing that stops ornament reading as metal. */
+    const block = (bx, by, S) => {
+      const rib = S * 0.046;
+      const piece = (mx, my) => {
+        const P = (u, v) => [bx + (mx > 0 ? u : 1 - u) * S, by + (my > 0 ? v : 1 - v) * S];
+        const dir = mx * my;
+        const [ex, ey] = P(0.310, 0.110);      // the inner eye
+        const [ox, oy] = P(0.090, 0.280);      // the outer eye
+        const [t1x, t1y] = P(0.500, 0.190);    // meets its twin on the centreline
+        const [t2x, t2y] = P(0.170, 0.500);    // meets the twin from the half below
+        const [t3x, t3y] = P(0.005, 0.395);
+        const inner = curl(ex, ey, ...P(0.428, 0.140), 1.25, dir);
+        const outer = curl(ox, oy, t3x, t3y, 1.25, -dir);
+        return poly([...inner].reverse())
+          + ` L ${n2(t1x)} ${n2(t1y)}`
+          + ` C ${P(0.500, 0.360).map(n2).join(' ')} ${P(0.240, 0.500).map(n2).join(' ')} ${n2(t2x)} ${n2(t2y)}`
+          + ` C ${P(0.080, 0.500).map(n2).join(' ')} ${P(0.005, 0.455).map(n2).join(' ')} ${n2(t3x)} ${n2(t3y)} `
+          + poly(outer, true);
+      };
+      return [[1, 1], [-1, 1], [1, -1], [-1, -1]]
+        .map(([mx, my]) => ink(piece(mx, my), rib)).join('');
+    };
+
+    const tops = two ? [y + m, y + h - m - Bh] : [y + h - m - Bh];
+    for (const ty of tops) out.push(block(x + m, ty + (Bh - Bw) / 2, Bw));
+    return out.join('');
+  }
+
+  /* ── מדליוני פרח — d104 ─────────────────────────────────────────────
+     A double border of four verticals and four horizontals, and down the
+     centreline a chain of five medallions linked by spindles and beads. The
+     medallion is a filled concave lozenge inside eight C-scrolls, with a short
+     arm that runs only between the two INNER verticals — not full width.
+     Ours drew two verticals, four hollow petals per motif, a full-width bar at
+     every motif, no border at all and nothing at all between the motifs, which
+     is where most of the real density lives. */
   if (kind === 'quatrefoil') {
-    const out = [bar(x + w * 0.28, y, x + w * 0.28, y + h, 8),
-                 bar(x + w * 0.72, y, x + w * 0.72, y + h, 8)];
-    const n = Math.max(3, Math.round(h / (w * 0.9)));
-    const rr = Math.min(w * 0.17, h / (n * 3));
+    const u = w * MARGIN, b = w * 0.026;
+    const out = [];
+    for (const f of [u, 2 * u, w - 2 * u, w - u]) out.push(line(x + f, y, x + f, y + h, b));
+    for (const gy of [y + u, y + 2 * u, y + h - 2 * u, y + h - u]) {
+      out.push(line(x, gy, x + w, gy, b));
+    }
+    /* The mid-height pair, running only from each edge in to the inner
+       vertical: the medallion's own arm fills the middle at that level. */
+    for (const gy of [y + h / 2 - u / 2, y + h / 2 + u / 2]) {
+      out.push(line(x, gy, x + 2 * u, gy, b));
+      out.push(line(x + w - 2 * u, gy, x + w, gy, b));
+    }
+
+    const p = w * 0.80;
+    let n = Math.max(2, Math.round(h / p) - 1);
+    while (n > 2 && (h - (n - 1) * p) / 2 < w * 0.45) n--;
+    const cx = x + w / 2;
     for (let i = 0; i < n; i++) {
-      const cy2 = y + h * (i + 0.5) / n, cx2 = x + w / 2;
-      out.push(bar(x, cy2, x + w, cy2, 7));
-      for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
-        out.push(iron(`M ${cx2} ${cy2} q ${dx * rr - dy * rr * 0.7} ${dy * rr + dx * rr * 0.7}
-                       ${dx * rr * 2} ${dy * rr * 2}
-                       q ${-dx * rr + dy * rr * 0.7} ${-dy * rr - dx * rr * 0.7}
-                       ${-dx * rr * 2} ${-dy * rr * 2}`, 6));
+      const cy = y + h / 2 + (i - (n - 1) / 2) * p;
+      /* The arm, inner vertical to inner vertical, with a pointed leaf on each
+         side of the medallion. */
+      out.push(line(x + 2 * u, cy, x + w - 2 * u, cy, b));
+      for (const s of [-1, 1]) {
+        const lx = cx + s * w * 0.165, lw = w * 0.045, lh = w * 0.0225;
+        out.push(solid(`M ${n2(lx - lw)} ${n2(cy)} Q ${n2(lx)} ${n2(cy - lh)} ${n2(lx + lw)} ${n2(cy)}
+                        Q ${n2(lx)} ${n2(cy + lh)} ${n2(lx - lw)} ${n2(cy)} Z`, lh));
+      }
+      /* The lozenge: four edges bowed INWARD, which is what makes it read as
+         cast lace rather than as a diamond. */
+      const hw = w * 0.062, hh = w * 0.090, bow = w * 0.010;
+      out.push(solid(`M ${n2(cx)} ${n2(cy - hh)}
+                      Q ${n2(cx + hw - bow)} ${n2(cy - hh + bow)} ${n2(cx + hw)} ${n2(cy)}
+                      Q ${n2(cx + hw - bow)} ${n2(cy + hh - bow)} ${n2(cx)} ${n2(cy + hh)}
+                      Q ${n2(cx - hw + bow)} ${n2(cy + hh - bow)} ${n2(cx - hw)} ${n2(cy)}
+                      Q ${n2(cx - hw + bow)} ${n2(cy - hh + bow)} ${n2(cx)} ${n2(cy - hh)} Z`, hw));
+      /* Eight volutes, two per quadrant. The inner pair springs from the
+         lozenge's point and reads as a fleur-de-lis crown; the outer pair
+         springs from its flank and curls back in. */
+      for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+        out.push(ink(poly(curl(cx + sx * w * 0.055, cy + sy * w * 0.135,
+                               cx, cy + sy * hh, 1.0, sx * sy)), w * 0.022));
+        out.push(ink(poly(curl(cx + sx * w * 0.110, cy + sy * w * 0.075,
+                               cx + sx * hw, cy, 1.0, -sx * sy)), w * 0.022));
+      }
+      /* The bead chain to the next medallion — spindle, bead, short spindle,
+         bead, spindle. Ours left these gaps empty, which is the single biggest
+         loss of density on that door. */
+      if (i < n - 1) {
+        const gap = p, top = cy + w * 0.19;
+        const run = gap - w * 0.38;
+        const seq = [[0.115, 0.030], [0.079, 0.060], [0.060, 0.030], [0.079, 0.060], [0.115, 0.030]];
+        const total = seq.reduce((a, s) => a + s[0], 0);
+        let at = top + (run - total * w) / 2;
+        for (const [lh, lw] of seq) {
+          const cy2 = at + w * lh / 2;
+          out.push(solid(`M ${n2(cx)} ${n2(cy2 - w * lh / 2)}
+                          Q ${n2(cx + w * lw)} ${n2(cy2)} ${n2(cx)} ${n2(cy2 + w * lh / 2)}
+                          Q ${n2(cx - w * lw)} ${n2(cy2)} ${n2(cx)} ${n2(cy2 - w * lh / 2)} Z`, w * lw));
+          at += w * lh;
+        }
       }
     }
     return out.join('');
   }
 
-  /* AN ARCH over a plain grid — d121. A fan of ribs springing from the
-     opening's shoulders, which is the whole of that door's ornament. */
+  /* ── קשת — d121 ─────────────────────────────────────────────────────
+     Gothic, not Roman. Two POINTED arches meeting at a vertex on the
+     centreline, a descending V between them, an impost bar the whole tracery
+     lands on, and a plain two-column grid below it. The two X crossings at
+     (0.222, 0.262) and (0.778, 0.262) are the most recognisable thing on the
+     door, and ours had neither: it drew three concentric round domes over a
+     full-pane mesh, with a vertical stub above the arch where the real mullion
+     is below it. Every line is the same weight — that is a finding, not an
+     omission. */
   if (kind === 'arch') {
-    const out = mesh();
-    /* Every radius stays at or above half the span. An arc commanded to join
-       two points further apart than its diameter is drawn scaled up by the
-       renderer, so the inner ribs came out the same size as the outer one and
-       the fan read as a single fat line. */
-    const cy2 = y + h * 0.30;
-    for (const k of [1.00, 0.78, 0.60]) {
-      const r = Math.max(w * 0.5, w * 0.78 * k);
-      const rise = h * 0.16 * k;
-      out.push(iron(`M ${x} ${cy2} Q ${x + w / 2} ${cy2 - rise} ${x + w} ${cy2}`, 8));
-      void r;
-    }
-    out.push(bar(x + w / 2, y, x + w / 2, y + h * 0.30, 8));
+    const sw = Math.max(5, w * 0.033);
+    const out = [];
+    out.push(line(x, V(0.409), x + w, V(0.409), sw));
+    out.push(line(U(0.5), V(0.404), U(0.5), y + h, sw));
+    out.push(line(x, V(0.693), x + w, V(0.693), sw));
+    out.push(line(x, V(0.846), x + w, V(0.846), sw));
+    const arc = (x0, v0, cx0, cv, x1, v1) =>
+      ink(`M ${n2(U(x0))} ${n2(V(v0))} Q ${n2(U(cx0))} ${n2(V(cv))} ${n2(U(x1))} ${n2(V(v1))}`, sw);
+    out.push(arc(0.000, 0.160, 0.145, 0.037, 0.500, 0.007));
+    out.push(arc(1.000, 0.160, 0.855, 0.037, 0.500, 0.007));
+    out.push(arc(0.000, 0.220, 0.363, 0.270, 0.500, 0.404));
+    out.push(arc(1.000, 0.220, 0.637, 0.270, 0.500, 0.404));
+    out.push(arc(0.000, 0.370, 0.139, 0.242, 0.500, 0.205));
+    out.push(arc(1.000, 0.370, 0.861, 0.242, 0.500, 0.205));
     return out.join('');
   }
 
-  /* ART-DECO STRAIGHT LINES — d123. No curve anywhere on it: a stepped
-     rectangle inside a border, all of it at right angles. */
+  /* ── קווים גיאומטריים — d123 ────────────────────────────────────────
+     Eight straight lines and nothing else. Four run the full height in two
+     mirrored pairs; four run the full width, all four clustered in the bottom
+     fifth, where they cross the verticals in a small plaid block. The centre
+     of the pane is bare glass from top to bottom.
+     Ours drew three nested closed rectangles with the heaviest ornament
+     exactly where the photograph has nothing at all.
+     ⚠ The horizontals are positioned by the pane's WIDTH, not its height. The
+     pair gaps are the same 0.137 W module as the vertical pairs, which is what
+     makes the crossings come out square on any opening; by fractions of the
+     height they drift apart on a 1415 mm light and stop reading as a group. */
   if (kind === 'deco') {
+    const sw = Math.max(2, w * 0.022);
     const out = [];
-    for (const [ix, iy] of [[0.12, 0.10], [0.24, 0.20], [0.36, 0.30]]) {
-      const rx = x + w * ix, ry = y + h * iy;
-      const rw = w * (1 - ix * 2), rh = h * (1 - iy * 2);
-      out.push(iron(`M ${rx} ${ry} H ${rx + rw} V ${ry + rh} H ${rx} Z`, 8));
-    }
-    for (const t of [0.10, 0.90]) {
-      out.push(bar(x, y + h * t, x + w, y + h * t, 8));
+    for (const f of [MARGIN, MARGIN * 2, 1 - MARGIN * 2, 1 - MARGIN]) out.push(line(U(f), y, U(f), y + h, sw));
+    const B = y + h, k = Math.min(1, (h * 0.45) / (w * 0.689));
+    for (const f of [0.196, 0.333, 0.552, 0.689]) {
+      out.push(line(x, B - w * f * k, x + w, B - w * f * k, sw));
     }
     return out.join('');
   }
-  /* Scrollwork. It used to be one circle and a cross, which beside d092 is not
-     ornamental ironwork — it is a gunsight. The real thing is DENSE: a comb of
-     vertical bars running the height of the pane, with S-scrolls and C-scrolls
-     worked between them in bands. What reads as "wrought iron" at a glance is
-     the density and the curvature, not any one motif, so this draws a full
-     comb and three bands of scrolls rather than one big emblem. */
-  /* WROUGHT IRON: the dense ornamental comb, ten doors and the commonest
-     thing in the luxury band — d090 d092 d101 d103 d108 d112 d119 d124 d128
-     d129. It used to answer to `scroll`, which the catalogue used for the
-     grid-with-medallions; the two had been the same word for two objects. */
-  if (kind === 'iron') {
-    const out = [];
-    const n = Math.max(3, Math.round(w / 95));           // the comb
-    for (let i = 1; i < n; i++) out.push(bar(x + (w * i) / n, y, x + (w * i) / n, y + h, 9));
 
-    // an S-scroll drawn as two opposed arcs, with its own drop shadow
-    const scroll = (cx, cy, rr) => {
-      const d = `M ${cx - rr} ${cy} a ${rr * 0.5} ${rr * 0.5} 0 1 1 ${rr} 0
-                 a ${rr * 0.5} ${rr * 0.5} 0 1 0 ${rr} 0`;
-      return `<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.3"
-                    stroke-width="8" transform="translate(3 3)"/>
-              <path d="${d}" fill="none" stroke="${body}" stroke-width="8"/>
-              <path d="${d}" fill="none" stroke="${gleam}" stroke-opacity="0.35"
-                    stroke-width="2.5" transform="translate(-1.5 -1.5)"/>`;
+  /* ── ברזל מחושל — the arch-and-chain grille ─────────────────────────
+     ONE composition, not a repeating pattern, and mirror-symmetric about the
+     pane's own middle. Five vertical bars at sixths with a heavier centre
+     spine; a single band of six open circles threaded on a rail at half
+     height; and at each end a cap — corner volutes, a tall dome, a shallow
+     impost with two rosettes, and a fleur-de-lis whose lance points at the
+     spine. Between the caps and the band, about 45% of the pane's height is
+     BARE GLASS crossed only by five thin bars. That emptiness is the loudest
+     fact about the design.
+     Ours drew four bands of S-waves, four verticals at fifths, a flat crown
+     and nothing at the foot. Two doors are the reason it went wrong: d128
+     carries an all-over scroll diaper and d124's crop missed the leaf, and a
+     dense uniform field is what you get if you average those in.
+     The stroke ratio is the other half of it. Ornament runs about twice the
+     weight of the field — ours drew the ornament THINNER than the structure,
+     which is backwards, and figure never separated from ground. */
+  if (kind === 'iron') {
+    /* The caps do not stretch. `UH` compresses every ornament offset on a
+       slender opening so the cap stays a compact ornament at the head of a
+       long bare run — which is exactly what d129, the most slender pane in the
+       corpus, does. At the photographed aspect it is 1 and changes nothing. */
+    const UH = Math.min(1, (2.2 * w) / h);
+    const thin = w * 0.013, spine = w * 0.020, rib = w * 0.026;
+    const out = [];
+    const capY = (f, up) => up ? y + h * f * UH : y + h * (1 - f * UH);
+
+    for (const k of [1, 5]) out.push(line(U(k / 6), V(0.02), U(k / 6), V(0.98), thin));
+    for (const k of [2, 4]) {
+      out.push(line(U(k / 6), capY(0.245, true), U(k / 6), capY(0.245, false), thin));
+    }
+    out.push(line(U(0.5), capY(0.19, true), U(0.5), capY(0.19, false), spine));
+
+    /* THE CHAIN. Six open circles on a straight rail, the two end ones clipped
+       by the glass edge — which is correct, and they must not be shrunk to
+       fit. Ours drew an S-wave squiggle: corrugation, where the door has a
+       chain. */
+    const yb = V(0.51), cr = w * 0.065;
+    out.push(line(x, yb, x + w, yb, w * 0.022));
+    for (let k = 0; k < 6; k++) {
+      const ccx = U((2 * k + 1) / 12);
+      out.push(ink(`M ${n2(ccx - cr)} ${n2(yb)} a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(cr * 2)} 0
+                    a ${n2(cr)} ${n2(cr)} 0 1 0 ${n2(-cr * 2)} 0`, w * 0.023));
+    }
+    for (let k = 1; k <= 5; k++) out.push(collar(U(k / 6), yb, w * 0.045, w * 0.028));
+
+    const cap = up => {
+      const Y = f => capY(f, up);
+      const s = up ? 1 : -1;
+      const o = [];
+      /* Corner volutes: all four corners of the real pane carry one, and ours
+         had bare glass in every corner. */
+      for (const sx of [-1, 1]) {
+        const vx = U(0.5 + sx * 0.425), vy = Y(0.054);
+        o.push(ink(poly(curl(vx, vy, U(0.5 + sx * 0.5), Y(0.012), 1.25, sx * s)), rib));
+      }
+      /* The dome, and it is a dome: it springs at 0.217 and crowns at 0.030, a
+         rise of 0.19 H. Ours rose 0.09 from 0.11 — an eyebrow drawn OVER the
+         pattern rather than a vault the ornament sits inside. */
+      o.push(ink(`M ${n2(U(1 / 6))} ${n2(Y(0.217))} Q ${n2(U(0.5))} ${n2(Y(-0.120))}
+                  ${n2(U(5 / 6))} ${n2(Y(0.217))}`, rib));
+      o.push(ink(`M ${n2(U(1 / 6))} ${n2(Y(0.245))} Q ${n2(U(0.5))} ${n2(Y(0.199))}
+                  ${n2(U(5 / 6))} ${n2(Y(0.245))}`, w * 0.022));
+      for (const f of [0.28, 0.72]) o.push(dot(U(f), Y(0.232), w * 0.028));
+      /* The fleur. Its lance is the eye's first landing point on every
+         readable photograph and ours had nothing on the centreline at all. */
+      const lx = U(0.5);
+      o.push(solid(`M ${n2(lx)} ${n2(Y(0.094))}
+                    Q ${n2(lx + w * 0.025)} ${n2(Y(0.128))} ${n2(lx + w * 0.009)} ${n2(Y(0.185))}
+                    L ${n2(lx - w * 0.009)} ${n2(Y(0.185))}
+                    Q ${n2(lx - w * 0.025)} ${n2(Y(0.128))} ${n2(lx)} ${n2(Y(0.094))} Z`, w * 0.05));
+      o.push(collar(lx, Y(0.192), w * 0.048, w * 0.022));
+      for (const sx of [-1, 1]) {
+        o.push(ink(poly(curl(U(0.5 + sx * 0.105), Y(0.152),
+                             U(0.5 + sx * 0.200), Y(0.216), 1.0, sx * s)), rib));
+        /* Shoulder scrolls, hung off the outer verticals behind a collar. */
+        o.push(collar(U(0.5 + sx / 3), Y(0.280), w * 0.045, w * 0.025));
+        o.push(ink(poly(curl(U(0.5 + sx * 0.265), Y(0.262),
+                             U(0.5 + sx / 3), Y(0.280), 1.0, -sx * s)), w * 0.024));
+      }
+      return o.join('');
     };
-    const rr = Math.min(w / (n * 1.6), h * 0.055);
-    /* FOUR bands and a crown, not three bands and nothing. Beside d090, d092
-       and d108 the drawing was too sparse to read as wrought iron: those doors
-       are dense, and the top of the opening always carries an arched crown
-       that the bands hang from. Density and curvature are what say "ironwork"
-       at a glance — no single motif does it. */
-    for (const t of [0.20, 0.42, 0.62, 0.82]) {
-      const cy = y + h * t;
-      out.push(bar(x, cy, x + w, cy, 8));
-      for (let i = 0; i < n; i++) out.push(scroll(x + (w * (i + 0.5)) / n, cy, rr));
-    }
-    const crownY = y + h * 0.11;
-    out.push(iron(`M ${x} ${crownY} Q ${x + w / 2} ${y + h * 0.02} ${x + w} ${crownY}`, 9));
-    for (let i = 0; i < n; i++) {
-      out.push(scroll(x + (w * (i + 0.5)) / n, crownY + rr * 1.1, rr * 0.8));
-    }
+    out.push(cap(true), cap(false));
     return out.join('');
   }
   return '';
@@ -2899,9 +3389,14 @@ function handleFootprint(handle, leafH, panelled = false) {
   switch (handle.style) {
     case 'none':    return { out: 0, in: 0, vy: 0 };
     case 'channel': return { out: 21, in: 21, vy: channelHalf(handle.len, leafH) };
-    /* The bow is centred on the LEAF, not on the grip's own axis, so almost
-       all of it lies inboard — 416 mm of it. */
-    case 'grab':    return { out: 40, in: 416, vy: 115 };
+    /* The bar is centred on the LEAF, not on the grip's own axis, so almost
+       all of it lies inboard. It was 416 mm when the drawing was a lens with a
+       ball at each extremity; the turned spindle that replaced it measures 300
+       inboard and 20 the other way, and its tallest element is a post ball at
+       0.725 of the shaft's diameter rather than a swell at 1.5 times it.
+       Kept a shade generous — the drawn shape is what `npm run collide -- boxes`
+       checks against, and it errs the safe way. */
+    case 'grab':    return { out: 26, in: 320, vy: 26 };
     case 'lever':   return { out: 40, in: 152, vy: 51 };
     case 'plate':   return { out: 47, in: 119, vy: 129 };
     case 'almog':   return { out: 42, in: 220, vy: 42 };
@@ -2913,12 +3408,17 @@ function handleFootprint(handle, leafH, panelled = false) {
     case 'square':  return { out: 41, in: 152, vy: 99 };
     case 'shiran':  return { out: 43, in: 43, vy: 240 };
     default: {
-      /* Pull bars. The drawn width runs past the section because of the
-         standoff shadow: measured out/in per product, 16/36 idan, 29/29 ella,
-         29/29 nitzan, 15/34 shahar, 13/19 ron, 70/70 blade. Derived from the
-         section with a floor at the widest reading, which errs the safe way. */
+      /* Pull bars, and this is now simply the bar. It used to carry a floor of
+         29 out and 36 in — the widest reading across six products — because
+         the drawn width ran past the section wherever a clamp or a collar
+         stuck out. Nothing sticks out any more: measured, every bar's metal
+         reaches exactly its own half width (16 idan, 10 ella, 22 nitzan, 20
+         shahar, 9 ron, 31 blade), and the floors were declaring three times
+         that on the slim rods.
+         A tenth over the section, for the drawing's own strokes and the
+         rounded ends. `npm run collide -- boxes` checks it. */
       const w = handle.w || 30;
-      return { out: Math.max(29, w * 1.15), in: Math.max(36, w * 1.15),
+      return { out: Math.ceil(w * 0.55), in: Math.ceil(w * 0.55),
                vy: barHalf(handle.len, leafH, panelled) };
     }
   }
@@ -3234,83 +3734,104 @@ function channelHandle(cx, cy, len, leafH, paint) {
 }
 
 /**
- * Lever, plus the horizontal grab bar that so often accompanies it.
+ * The horizontal grab bar — a turned spindle, not a bow.
  *
- * This replaces a "half-moon D-handle" that was wrong twice over: it was
- * drawn as a filled half-disc, which corresponds to no real object, and it
- * was offered as a door's main grip. Across 128 installations the bow appears
- * 18 times and every single one is horizontal, centred on the leaf width at a
- * mid rail, and secondary to a lever that is already there.
+ * ⚠ IT WAS A LENS. Ours swelled to a fifth of its own length at mid-span and
+ * carried a ball at each extremity. On all seven readable doors it is a plain
+ * STRAIGHT cylinder of constant diameter, and its two posts stand well INBOARD
+ * at 0.175 and 0.825 of the tip-to-tip length — the bar then continues past
+ * each of them for another 0.175 of its length, through a step collar, an end
+ * ring and a turned terminal bead. About a third of the real silhouette, the
+ * whole of both outboard ends, was simply absent from ours.
  *
- * Seen square-on a bow is a swelled bar between two ball collars — the swell
- * and the collars are the only things separating it from a plain pull.
+ * Placement is unchanged and is load-bearing: this is the one grip centred on
+ * the LEAF rather than hung off the stile, so `rules.js` refuses it across a
+ * centred window and `gripFeet` declines to model its feet at all.
  */
 function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
   const half = (leafW * GRAB.len) / 2;
-  const w = leafW * GRAB.len * GRAB.ratio;
-  const by = y0 + leafH * GRAB.fromTop;   // below the lever, on the mid rail
-  const boss = GRAB.boss, swell = w * 1.5;
+  const D = leafW * GRAB.len * GRAB.ratio;          // the shaft's diameter
+  const by = y0 + leafH * GRAB.fromTop;             // below the lever, mid rail
 
   /* CENTRED ON THE LEAF, as every installed grab bar is — but pushed toward
      the hinge when the lock furniture needs the room.
      `cx` is where `gripStandoff` placed this grip, and by construction that is
      already at least `lock.in + out + LOCK_CLEAR` from the lock's axis, so it
-     is a position the bow's near end can safely take. Whichever of the two is
+     is a position the bar's near end can safely take. Whichever of the two is
      FURTHER inboard wins: the centred one on a door with a small escutcheon,
      the standoff on a door with an Almog swan-neck reaching 220 mm across.
 
      This is what the withdrawn pull-bar-versus-lever rule used to hide. The
-     vertical bars all move with `gripStandoff`; the bow did not, because it is
+     vertical bars all move with `gripStandoff`; the bar did not, because it is
      the one grip centred on the leaf rather than hung off the stile — so it
      was the single pairing still refused after the rule went. */
-  const span = half - boss;                        // centre to boss centre
+  const span = half - D * 0.9;                      // centre to post centre
   const centredNear = centreX - dir * span;
   const near = dir > 0 ? Math.max(centredNear, cx) : Math.min(centredNear, cx);
   /* ...and never off the hinge edge. If clearing the lock would push the far
-     boss past the stile, the bow gives up length rather than position: a short
+     post past the stile, the bar gives up length rather than position: a short
      grab bar is a grab bar, one hanging off the door is not. */
   const hingeStop = centreX + dir * (leafW / 2 - 45);
   const far = dir > 0 ? Math.min(near + 2 * span, hingeStop)
                       : Math.max(near - 2 * span, hingeStop);
-  const bowC = (near + far) / 2;
-  const bowSpan = Math.abs(far - near) / 2;
-  const bar = (dx, dy, fill, op = 1) => `
-      <path d="M ${bowC - bowSpan + dx} ${by - w / 2 + dy}
-               C ${bowC - bowSpan * 0.45 + dx} ${by - swell / 2 + dy}
-                 ${bowC + bowSpan * 0.45 + dx} ${by - swell / 2 + dy}
-                 ${bowC + bowSpan + dx} ${by - w / 2 + dy}
-               L ${bowC + bowSpan + dx} ${by + w / 2 + dy}
-               C ${bowC + bowSpan * 0.45 + dx} ${by + swell / 2 + dy}
-                 ${bowC - bowSpan * 0.45 + dx} ${by + swell / 2 + dy}
-                 ${bowC - bowSpan + dx} ${by + w / 2 + dy} Z"
-            fill="${fill}" opacity="${op}"/>`;
-  const ends = [bowC - bowSpan, bowC + bowSpan];
+
+  const x0 = Math.min(near, far) - D * 0.9, x1 = Math.max(near, far) + D * 0.9;
+  const L = x1 - x0;
+  const P = f => x0 + L * f;                        // along the bar, tip to tip
+  const n1 = v => v.toFixed(1);
+  const rod = (a, b, hh, rx, fill) => `
+      <rect x="${n1(P(a))}" y="${n1(by - hh)}" width="${n1(P(b) - P(a))}"
+            height="${n1(hh * 2)}" rx="${n1(rx)}" fill="${fill}"/>`;
+  const POST = [0.175, 0.825];
+
   return `
     <g>
       <g data-hw="grab">
-        ${bar(6, 9, '#000', 0.30)}
-        ${ends.map(ex => `
-        <circle cx="${ex + 5}" cy="${by + 8}" r="${boss}" fill="#000" opacity="0.28"
-                filter="url(#hwShadow)"/>`).join('')}
-        ${bar(0, 0, 'url(#nickel)')}
-        <!-- turned collars where the bar meets each ball -->
-        ${ends.map(ex => `
-        <rect x="${ex - 5}" y="${by - w * 0.75}" width="10" height="${w * 1.5}" rx="3"
-              fill="url(#nickelSoft)"/>`).join('')}
-        ${ends.map(ex => `
-        <circle cx="${ex}" cy="${by}" r="${boss}" fill="url(#nickel)"/>
-        <path d="${arcPath(ex, by, boss - 3, 140, 315)}" fill="none" stroke="#fff"
-              stroke-opacity="0.42" stroke-width="3"/>`).join('')}
-        <!-- one specular along the top of the swell -->
-        <path d="M ${bowC - bowSpan + 4} ${by - w / 2 + 3}
-                 C ${bowC - bowSpan * 0.45} ${by - swell / 2 + 4}
-                   ${bowC + bowSpan * 0.45} ${by - swell / 2 + 4}
-                   ${bowC + bowSpan - 4} ${by - w / 2 + 3}
-                 L ${bowC + bowSpan - 4} ${by - w / 2 + 8}
-                 C ${bowC + bowSpan * 0.45} ${by - swell / 2 + 10}
-                   ${bowC - bowSpan * 0.45} ${by - swell / 2 + 10}
-                   ${centreX - half + boss + 4} ${by - w / 2 + 8} Z"
-              fill="#fff" opacity="0.5"/>
+        <!-- The shadow is a tight band under the shaft and two rounder, darker
+             pools under the posts, because only the posts stand proud. It was
+             a diagonally offset copy of the whole bar, which is what a flat
+             cut-out throws, not a turned spindle on two feet. -->
+        <rect x="${n1(P(0.10))}" y="${n1(by + D * 0.28)}" width="${n1(P(0.90) - P(0.10))}"
+              height="${n1(D * 0.55)}" rx="${n1(D * 0.27)}" fill="#000" opacity="0.22"
+              filter="url(#hwShadow)"/>
+        ${POST.map(t => `
+        <ellipse cx="${n1(P(t) + D * 0.15)}" cy="${n1(by + D * 0.9)}" rx="${n1(D * 1.1)}"
+                 ry="${n1(D * 0.55)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`).join('')}
+
+        <!-- The rose behind each ball. Square-on it is concentric with the
+             ball, so all that shows is a ring of it — and that ring is the
+             whole of the standoff anyone is allowed to draw. -->
+        ${POST.map(t => `
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#nickelSoft)"/>
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.22"/>`).join('')}
+
+        <!-- Outboard stems, visibly thinner than the shaft; then the terminal
+             beads, which is what every one of these doors ends in. -->
+        ${rod(0.075, 0.155, D * 0.30, D * 0.15, 'url(#nickel)')}
+        ${rod(0.845, 0.925, D * 0.30, D * 0.15, 'url(#nickel)')}
+        ${rod(0.030, 0.078, D * 0.55, D * 0.5, 'url(#nickel)')}
+        ${rod(0.922, 0.970, D * 0.55, D * 0.5, 'url(#nickel)')}
+        ${rod(0.000, 0.032, D * 0.22, D * 0.11, 'url(#nickel)')}
+        ${rod(0.968, 1.000, D * 0.22, D * 0.11, 'url(#nickel)')}
+        <!-- the flat rings just outboard of each ball -->
+        ${rod(0.106, 0.124, D * 0.60, D * 0.10, 'url(#nickelSoft)')}
+        ${rod(0.876, 0.894, D * 0.60, D * 0.10, 'url(#nickelSoft)')}
+
+        <!-- The shaft: constant diameter, and the tone runs ACROSS it. A dark
+             line at the top, a narrow specular at a third down, a broad dark
+             core through the belly and a soft bounce along the bottom. Ours
+             was one flat white ribbon, which is why it looked unlit. -->
+        ${rod(0.20, 0.80, D / 2, D * 0.16, 'url(#grabRod)')}
+        <!-- step collars where the shaft meets each ball -->
+        ${rod(0.203, 0.228, D * 0.575, D * 0.2, 'url(#nickelSoft)')}
+        ${rod(0.772, 0.797, D * 0.575, D * 0.2, 'url(#nickelSoft)')}
+
+        <!-- the post balls, turned and standing in front of their roses -->
+        ${POST.map(t => `
+        <ellipse cx="${n1(P(t))}" cy="${n1(by)}" rx="${n1(D * 0.675)}" ry="${n1(D * 0.725)}"
+                 fill="url(#nickel)"/>
+        <ellipse cx="${n1(P(t) - D * 0.18)}" cy="${n1(by - D * 0.22)}" rx="${n1(D * 0.22)}"
+                 ry="${n1(D * 0.26)}" fill="#fff" opacity="0.40"/>`).join('')}
       </g>
     </g>`;
 }
@@ -3328,74 +3849,71 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
  * All figures normalised to the bar's own width, off the product photographs.
  */
 /**
- * How far a bar's BOLTED-DOWN end reaches either side of its own axis.
+ * How far a bar's fixings reach across the leaf.
  *
- * Not the same as `handleFootprint().in`, and the difference is the whole
- * point: that figure is the drawn footprint, which on a bar runs 11 mm wider
- * than the metal because the standoff's SHADOW is part of what is drawn. A
- * shadow cannot land on anything. Measured against a moulding it made the
- * default door — a bar, a cylinder and a rect light on a standard leaf —
- * unbuildable by 3.6 mm the moment the surround widened, while the standoff
- * itself had 17 mm to spare.
+ * ⚠ IT IS THE BAR'S OWN HALF WIDTH NOW, and that is a finding rather than a
+ * simplification. Twenty-one bar-carrying doors were read at magnification and
+ * NOT ONE of them holds anything wider than the bar itself: no clamp plate, no
+ * collar, no end shoe, no backplate, no screw head. The only door in 128 with
+ * hardware clamped to a bar is d122, and it looks like none of the three
+ * assemblies we were drawing. So the widest thing at a fixing is the bar.
  *
- * Whichever is wider, the bar or the fixing that holds it. Read from the same
- * `spec.fix` numbers `fixArt` draws with, so the two cannot drift; the clamp is
- * the one kind whose backplate is wider than its declared size, and it is
- * spelled out in both places.
+ * It used to read `spec.fix` — the numbers `fixArt` drew the clamps with — so
+ * that the two could not drift. They cannot drift now because there is nothing
+ * to drift from.
  *
- * This is also the shape the owner's son named when he asked for a bar to turn
- * red: "the 2 points that are connecting it".
+ * This is the shape the owner's son named when he asked for a bar to turn red:
+ * "the 2 points that are connecting it".
  */
-const bossHalf = (spec, w) =>
-  spec.fix.kind === 'clamp' ? w * 1.13 : w * Math.max(spec.fix.size || 1, 1) / 2;
-
 export function bossReach(handle) {
   if (handle.style !== 'bar') return handleFootprint(handle, 2050).in;
-  const w = handle.w || 30;
-  return Math.round(Math.max(w / 2, bossHalf(BARS[handle.bar] || BARS.idan, w)));
+  return Math.round((handle.w || 30) / 2);
 }
 
+/**
+ * ── SIX BARS, TWO SECTIONS ───────────────────────────────────────────
+ *
+ * What separates one pull bar from another on a real door is its SECTION and
+ * its size, and nothing else. Read across the width at mid-height, the corpus
+ * splits cleanly in two and refuses to split further:
+ *
+ *   ROUND TUBE — the profile wraps. One peak, off centre, with a dark rim at
+ *   each silhouette edge and about 3:1 between them. d035, d045, d046, d063,
+ *   d072, d074, d102, d113, d125.
+ *
+ *   FLAT STRAP — the profile does not wrap at all. One dead-even face inside
+ *   3.6% between two hairline arrises, with all the modelling running ALONG
+ *   the length instead. d034, d049, d060, d066, d073, d104.
+ *
+ * ⚠ WE WERE SELLING THE FIXINGS. Five ramps and five fixing assemblies — Ella's
+ * banded collars, Nitzan's clamp blocks over a backplate with a screw head,
+ * Ron's bright two-tone end shoes, Shahar's mitred legs, Blade's dark plates —
+ * and every one of them was invented. They were also, between them, the only
+ * thing that told our bars apart, which is why removing them and putting the
+ * difference back into section and size is one change and not two.
+ * INVENTORY.md's "square-section bar on square standoff blocks" does not
+ * survive the photographs either: the three doors it names show unbroken metal
+ * end to end, and even their SHADOWS have no thickening to give a fixing
+ * position away.
+ *
+ * What a standoff may leave in a dead square-on elevation is a local
+ * thickening of the drop shadow, and that is all `fix.t` is for now — that,
+ * and telling `gripFeet` where the bolts are, which is what decides whether a
+ * dragged handle is standing on solid material.
+ */
 const BARS = {
-  // Round tube. TWO blown highlights with a dark separator — the tube's tell.
-  idan: {
-    tone: 'barRound', cap: 'bullnose', rx: 0.5,
-    fix: { kind: 'cylinder', t: [0.138, 0.879], proj: 1.71, size: 0.87 },
-  },
-  // Round rod, dark-cored and twin-rimmed, warm. The collars are the event:
-  // fat turned bosses with near-black undercut grooves, and the rod steps
-  // down to 0.91 W beyond them.
-  ella: {
-    tone: 'barBrass', cap: 'dome', rx: 0.5, stub: 0.91,
-    fix: { kind: 'collar', t: [0.184, 0.805], proj: 0.59, size: 1.72, tall: 1.3 },
-  },
-  // Square, one face on: almost a flat fill, 20 levels of contrast across it.
-  // The clamp blocks INTERRUPT the bar, over a wider back-plate with screws.
-  nitzan: {
-    tone: 'barMatte', cap: 'flat', rx: 0.05, stub: 0.80,
-    fix: { kind: 'clamp', t: [0.169, 0.826], proj: 0.90, size: 1.23, tall: 1.2 },
-  },
-  // Square at yaw: two flat faces across a hard step, brightest of the range.
-  // No standoffs at all — both ends mitre into legs that run back to the door.
-  shahar: {
-    tone: 'barPolish', cap: 'none', rx: 0.06,
-    fix: { kind: 'leg', t: [0.019, 0.975], proj: 1.24, size: 0.6 },
-  },
-  // Matte anthracite, the only cool one, and the only two-tone handle: bright
-  // brushed shoes cap both extremities and there is nothing in between.
-  ron: {
-    tone: 'barDark', cap: 'shoe', rx: 0.08,
-    fix: { kind: 'shoe', t: [0.035, 0.965], proj: 0.33, size: 1.57, tall: 1.86 },
-  },
-  /* The flat blade — d034, d073, d104. A wide ribbon rather than a tube, and
-     the section is what identifies it: a round bar shows two blown highlights
-     with a dark core between them, and this shows ONE broad even face with a
-     hard bright arris down each long edge, because a flat surface facing the
-     camera returns the key light uniformly instead of wrapping it. Nearly
-     square corners, and the fixings vanish behind the width of it. */
-  blade: {
-    tone: 'barPolish', cap: 'flat', rx: 0.04, stub: 1,
-    fix: { kind: 'clamp', t: [0.10, 0.90], proj: 0.30, size: 0.62, tall: 0.9 },
-  },
+  // Standard round tube — a dozen doors, the commonest grip Peretz fits.
+  idan:   { tone: 'barTube',  rx: 0.30, fix: { t: [0.14, 0.85] } },
+  // The same cylinder in brass. d072, d074, d082.
+  ella:   { tone: 'barGold',  rx: 0.30, fix: { t: [0.15, 0.80] } },
+  // The slim rod: d072 at 0.017 of leaf width, d035 at 0.022, d074 at 0.024.
+  ron:    { tone: 'barTube',  rx: 0.30, fix: { t: [0.10, 0.90] } },
+  // Flat strap, standard width — d049, d066, d034, d104.
+  nitzan: { tone: 'barStrap', rx: 0.05, fix: { t: [0.10, 0.89] } },
+  // Flat strap, long — d060 runs 0.60 of leaf height against d049's 0.45.
+  shahar: { tone: 'barStrap', rx: 0.04, fix: { t: [0.15, 0.85] } },
+  // Flat strap, wide — d073, the one bar in the corpus past 0.07 of leaf width.
+  blade:  { tone: 'barStrap', rx: 0.05, fix: { t: [0.09, 0.95] } },
 };
 
 function pullBar(cx, cy, handle, leafH, panelled) {
@@ -3404,64 +3922,34 @@ function pullBar(cx, cy, handle, leafH, panelled) {
   const w = handle.w || 30, r = w * spec.rx;
   const top = cy - half, bot = cy + half, L = half * 2;
   const at = t => top + L * t;
-  const stub = w * (spec.stub || 1);
 
-  /* The standoffs used to project sideways from the bar, because every product
-     photograph is yawed just enough to show them. This drawing is not: the
-     leaf, the frame, the threshold and the mouldings are all dead square-on,
-     and a bracket sticking out to one side is the one thing on the door
-     announcing a viewpoint nothing else shares. Seen square-on a standoff is
-     behind its own bar and invisible, so what is left of it is the shadow it
-     drops on the leaf — a local thickening of the bar's own shadow where it is
-     actually held off the door.
-     Collars, clamps and end shoes stay: those are ON the bar, wrapping or
-     interrupting it, and they are visible from any angle at all. */
-  const fx = spec.fix;
-  const fixArt = (behind) => fx.t.map(t => {
-    const y = at(t), sz = w * (fx.size || 1);
-    if ((fx.kind === 'cylinder' || fx.kind === 'leg') && behind) return `
-      <ellipse cx="${cx + 11}" cy="${y + 13}" rx="${w * 0.78}" ry="${sz * 0.62}"
-               fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`;
-    if (fx.kind === 'collar' && !behind) return `
-      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
-            rx="${w * 0.18}" fill="url(#nickel)"/>
-      ${[-0.30, 0.02].map(o => `
-      <rect x="${cx - sz / 2}" y="${y + w * fx.tall * o}" width="${sz}" height="${w * 0.20}"
-            fill="#000" opacity="0.72"/>`).join('')}
-      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz * 0.16}"
-            height="${w * fx.tall}" fill="#fff" opacity="0.34"/>`;
-    if (fx.kind === 'clamp' && !behind) return `
-      <rect x="${cx - w * 1.13}" y="${y - w * fx.tall / 2 - 2}" width="${w * 2.26}"
-            height="${w * fx.tall + 4}" rx="3" fill="url(#nickelSoft)" opacity="0.55"/>
-      <rect x="${cx - w * 1.13}" y="${y - w * fx.tall / 2 - 2}" width="${w * 2.26}"
-            height="${w * fx.tall + 4}" rx="3" fill="#000" opacity="0.42"/>
-      <circle cx="${cx + w * 0.83}" cy="${y}" r="${w * 0.14}" fill="#000" opacity="0.5"/>
-      <rect x="${cx - sz / 2}" y="${y - w * fx.tall / 2}" width="${sz}" height="${w * fx.tall}"
-            rx="2" fill="url(#nickel)"/>`;
-    if (fx.kind === 'shoe' && !behind) return `
-      <rect x="${cx - w * fx.size / 2}" y="${y - w * fx.tall / 2}" width="${w * fx.size}"
-            height="${w * fx.tall}" rx="${w * 0.22}" fill="url(#nickel)"/>
-      <rect x="${cx - w * fx.size / 2 + 2}" y="${y - w * fx.tall / 2 + 2}" width="${w * 0.22}"
-            height="${w * fx.tall - 4}" rx="2" fill="#fff" opacity="0.5"/>`;
-    return '';
-  }).join('');
-
-  // Bullnose and dome only differ in how much of the width the cap eats.
-  const capR = spec.cap === 'dome' ? w * 0.15 : spec.cap === 'bullnose' ? w * 0.148 : r;
-  const shaftTop = spec.cap === 'shoe' ? top + w * 0.9 : top;
-  const shaftBot = spec.cap === 'shoe' ? bot - w * 0.9 : bot;
+  /* THE STANDOFFS ARE BEHIND THE BAR AND THAT IS THE WHOLE OF THEM.
+     This drawing is dead square-on — leaf, frame, threshold and mouldings all
+     — and every product photograph is yawed a few degrees, which is the only
+     reason a standoff appears beside a bar in one. Seen truly square-on it is
+     hidden by its own tube. What survives is the shadow: a local darkening
+     where the bar is actually held off the door, near-circular because the
+     rose that casts it measures 1.4 to 1.6 of the tube's diameter in BOTH
+     directions.
+     Nothing is drawn in front of the bar any more. That branch used to hold
+     four kinds of assembly and none of them is on a door. */
+  const feet = spec.fix.t.map(t => `
+      <ellipse cx="${(cx + w * 0.55).toFixed(1)}" cy="${(at(t) + w * 0.45).toFixed(1)}"
+               rx="${(w * 0.75).toFixed(1)}" ry="${(w * 0.75).toFixed(1)}"
+               fill="#000" opacity="0.30" filter="url(#hwShadow)"/>`).join('');
 
   return `
     <g>
-      <rect x="${cx - w / 2 + 11}" y="${shaftTop + 13}" width="${w}" height="${shaftBot - shaftTop}"
-            rx="${capR}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      ${fixArt(true)}
-      <!-- the stubs beyond the fixings step down on two of the products -->
-      <rect x="${cx - stub / 2}" y="${shaftTop}" width="${stub}" height="${shaftBot - shaftTop}"
-            rx="${capR}" fill="url(#${spec.tone})"/>
-      ${stub !== w ? `<rect x="${cx - w / 2}" y="${at(fx.t[0])}" width="${w}"
-            height="${at(fx.t[1]) - at(fx.t[0])}" fill="url(#${spec.tone})"/>` : ''}
-      ${fixArt(false)}
+      <rect x="${(cx - w / 2 + w * 0.55).toFixed(1)}" y="${(top + w * 0.45).toFixed(1)}"
+            width="${w}" height="${L}" rx="${r}"
+            fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
+      ${feet}
+      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${L}" rx="${r}"
+            fill="url(#${spec.tone})"/>
+      <!-- and the fall down its length, which every bar here was missing: our
+           five were flat greys top to bottom on a leaf that is not. -->
+      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${L}" rx="${r}"
+            fill="url(#barFall)"/>
     </g>`;
 }
 
@@ -4136,7 +4624,7 @@ export function grilleGlyph(grille) {
      glass option drew NOTHING here while the drawing was fetched from
      `grillePaths` alone — five tiles identical to "no grille", each with its
      own price on it. `npm test` catches exactly that, and did. */
-  const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, '#8E979D') : null;
+  const glass = grille.glass ? glazingArt(grille.id, 0, 0, S, S, '#8E979D', 't' + grille.id) : null;
   return `<svg viewBox="0 0 ${S} ${S}" class="glyph glyph--sq" aria-hidden="true">
     <rect x="0" y="0" width="${S}" height="${S}" fill="#7C8891"/>
     ${glass ? glass.veil
@@ -4280,21 +4768,23 @@ const FITTING_GLYPH = {
     <path d="M -300 158 Q -190 143 -80 158 L -80 182 Q -190 197 -300 182 Z"/>
     <circle cx="-80" cy="170" r="17"/>` }),
 
-  /* Pull bars. All five are a vertical rod, so what separates them is
-     slenderness, the end caps and the fixings — which is exactly what the
-     product photographs say separates them in the shop. */
+  /* Pull bars.
+     ⚠ THE BOX IS FIXED, and it has to be. Every other glyph here scales its
+     own art to fill the tile, which is right when the fittings are different
+     objects — a knob and a recess tell themselves apart at any size. The bars
+     are not different objects: they are one or other of two sections at four
+     sizes, and the fixings that used to distinguish them in this tile were
+     invented and are gone. Normalised to their own bounding box, a 1230 mm
+     strap and a 1000 mm one are the same picture, and the file already
+     records what that costs — seven fittings once shared one drawing under
+     seven names and seven prices.
+     So a bar is drawn at TRUE SIZE inside a fixed slice of leaf. Length and
+     slenderness are then the whole of what a customer compares, which is what
+     they are on the door. */
   bar: (h) => {
-    const half = Math.min(h.len, 2050 - 320) / 2;
+    const half = Math.min(h.len, 1240) / 2;
     const w = h.w || 30, spec = BARS[h.bar] || BARS.idan;
-    const fix = spec.fix.t.map(t => {
-      const y = -half + half * 2 * t, s = w * spec.fix.size;
-      return spec.fix.kind === 'clamp' || spec.fix.kind === 'shoe'
-        ? `<rect x="${-s / 2}" y="${y - s * 0.5}" width="${s}" height="${s}" rx="${w * 0.1}"/>`
-        : `<rect x="${w / 2}" y="${y - s * 0.28}" width="${w * spec.fix.proj}" height="${s * 0.56}"
-                 rx="${s * 0.28}"/>`;
-    }).join('');
-    return { box: [-w * 2.2, -half - 26, w * 2.2, half + 26], art: `
-    ${fix}
+    return { box: [-170, -650, 170, 650], art: `
     <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"/>` };
   },
 };

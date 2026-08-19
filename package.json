@@ -20,7 +20,8 @@
     "leaf": "node tools/leaf.mjs",
     "triage": "node tools/triage.mjs",
     "collide": "node tools/collide.mjs",
-    "profile": "node tools/profile.mjs"
+    "profile": "node tools/profile.mjs",
+    "against": "node tools/against.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

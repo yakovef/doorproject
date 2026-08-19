@@ -311,6 +311,26 @@ const hits = await p.evaluate(({ cases, allowed }) => {
        finger can hold, not something the door has on it. Left in, every grip
        measures 120 mm wide and collides with its own lockset. */
     for (const g of svg.querySelectorAll('[data-hitpad]')) g.remove();
+    /* AND THE DROP SHADOWS, which is the same rule a third time and the one
+       place this file was not applying it.
+       `metalBox` above — the `-- boxes` reader — has always skipped any
+       element carrying a `filter`, and says why: a shadow is where the light
+       is not, and getBBox on a parent group hands back the union of its
+       children with the filtered ones included. The SWEEP measured those
+       groups whole, so it was asking a different question from the footprint
+       check twenty lines above it, and the two disagreed.
+       It went unnoticed for three rounds because every shadow offset was a
+       small constant — +11 and +13 mm whatever the fitting. They scale with
+       the fitting now, which is what the photographs show (a bar standing 40
+       to 50 mm off the leaf throws a shadow a full bar-width clear of itself,
+       not a hairline), and the moment they did, 165 designs were reported as
+       collisions where a bar's shadow fell across a lever with 12 mm of air
+       between the two pieces of metal.
+       A shadow overlapping a lever is a drawing doing its job. Removed rather
+       than skipped, for the same reason as the two above. */
+    for (const g of svg.querySelectorAll('[filter]')) {
+      if (/hwShadow/.test(g.getAttribute('filter') || '')) g.remove();
+    }
     const parts = [];
     for (const el of svg.querySelectorAll('[data-hw],[data-pane],[data-detail]')) {
       const n = NAME(el);

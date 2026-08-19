@@ -183,6 +183,38 @@ Two habits close that gap, and both are cheap:
 
 ---
 
+## Check what the measurement was taken FROM
+
+Two rounds running, the wrong answer came from a good method pointed at bad
+input, and neither time did anything complain.
+
+**`research/works/auto/leaf.json` is a fallback for 41 of its 129 entries, and
+27 of those share one identical rectangle.** Every entry carries `src`: `auto`,
+`hand` or `fallback`. A fallback is not a measurement — it is a generic centre
+crop, and on d124 it lands on a neighbouring window, on d099 on the fixed
+side-glazing beside the door, on d076 and d080 on the leaf's raised panel
+rather than the leaf. Any contact sheet built from it shows somewhere near the
+door, and any leaf-relative fraction taken off such a tile is scaled by an
+unknown factor. Measured on its fallback tile, d035's pull bar is 0.043 of leaf
+width; measured on the original it is 0.022. That is not a refinement, it is a
+different product.
+
+So: **before you quote a proportion, check `src`, and read the original in
+`research/works/doors/` when the number matters.** A crop is a convenience. The
+photograph is the evidence.
+
+The same shape of error, one level up: **two tools that measure the same thing
+must ask the same question.** `metalBox` in `tools/collide.mjs` had always
+skipped filtered elements — a shadow is where the light is not — while the
+sweep twenty lines below measured whole groups, shadows included. They
+disagreed for three rounds in silence, because every shadow offset was a small
+constant and the difference was under a millimetre. The moment the offsets
+started scaling with the fitting, the sweep reported 165 collisions where a
+bar's shadow crossed a lever with 12 mm of air between the metal. Nothing had
+broken; the two halves of one instrument had simply never agreed.
+
+---
+
 ## Doing nothing is a good answer
 
 You will wake up nearly five times a day. Most of the time there will be

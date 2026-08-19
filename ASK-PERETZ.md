@@ -55,6 +55,33 @@ Rather than guess which to cut, cut the ones he does not stock.*
 *`luna`, the black half-disc, is gone. It was offered as a door's main grip and
 it is not one.*
 
+> **"שירן — אתה בכלל מזמין את הידית הזאת?"** ⚠
+> **"ואם כן — תשלח תמונה שלה, כי אין לנו אף אחת."**
+
+*⚠ `shiran` appears on NONE of the 128 photographs. Every other grip we sell
+was found on a real door: idan on a dozen, the flat strap on six, the brass rod
+on three, the grab bar on seven, the recessed channel on one. The nearest thing
+in the whole corpus to what we draw for Shiran is the ring knocker on d076,
+d080, d048 and d067 — and that is a different object: about a third of the size,
+on the leaf's centreline rather than by the closing edge, hung off a rose rather
+than threaded on a bar, with an OPEN aperture where we draw a filled disc, and
+on every one of those four doors it coexists with a lever and is not the pull.
+So Shiran is drawn from nothing. It stays in the list because a link written
+before now may carry it, but it is the one grip whose picture we cannot check.*
+
+*Two products the photographs show and the catalogue does not, both left out
+deliberately rather than forgotten:*
+- *the curved sabre pull on d078 — one door, nothing else in the range curves,
+  and it needs its own collision footprint;*
+- *the ring knocker (d076 d080 d048 d067) — a real stock item, but an ornament
+  rather than a grip, so it belongs with the withdrawn add-ons and not here.*
+
+> **"הידיות אצלנו יצאו דקות מדי — תיקנו לפי התמונות. תסתכל שזה נראה נכון."**
+
+*Measured against the leaf on twenty-one doors: a round tube is 0.036 of leaf
+width, a flat strap 0.052. Three of our six bars were 50–80% too narrow. The
+corrected widths are in `js/catalog.js`; the lengths were already close.*
+
 ---
 
 ## 2b. גימור הידיות — הורדנו את הבחירה, ויש כאן סתירה ⚠
@@ -170,6 +197,29 @@ no diagonal lattice anywhere in the gallery, which was ours.*
 ⚠ *Three of his doors — d102, d116, d122 — carry a grille AND worked glass.
 One list means one choice, so on the site those are the grille. If he sells the
 combination, this is where it comes back.*
+
+> **"סורג בצבע הדלת או בשחור — מה אתה מוכר יותר?"** ⚠
+
+*⚠ A real gap between the list and the photographs. Every option above is
+offered twice, once in black ironwork and once in the door's own paint, and it
+is the PAINTED one his doors carry almost every time: all seven of the plain
+grid doors, five of the six scroll doors, d104's whole medallion column, and
+four of the ten wrought-iron ones. Nothing in the corpus is a black grid. The
+black variants stay because dark ironwork is real in the luxury band and
+because collapsing the pair would leave two prices on one picture — but if he
+does not sell black on the plain grid, half this list can go, which is a
+shorter list in front of a cold visitor.*
+
+> **"החלונות והסורגים ציירנו מחדש לפי התמונות באתר שלך. תסתכל שאלה הדגמים
+> הנכונים."**
+
+*Every one of the eleven was rebuilt this round after "our window options are
+not nearly accurate to their real counterparts". They are now read off the
+works page rather than invented: the plain grid is a handful of tall
+rectangles in the door's paint rather than a cage of small squares; the scroll
+doors are a bordered light with a square block of eight volutes rather than a
+full mesh; the wrought iron is a comb of five bars with a chain of six rings at
+half height and a fleur under a dome at each end, with the middle left bare.*
 
 ---
 

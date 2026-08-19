@@ -172,27 +172,42 @@ export const WINDOWS = [
 export const HANDLES = [
   { id: 'none',    he: 'ללא ידית משיכה', en: 'No pull', delta: 0, len: 0, style: 'none' },
 
-  /* Pull bars. `bar` selects the section, fixings and tone profile; see BARS in
-     the renderer. Lengths sit inside the 0.38-0.55 of leaf height that the
-     installed doors measure, and the section thicknesses keep the products'
-     relative slenderness: ella is the stockiest at L/W 15, ron the slimmest
-     at L/W 27. */
+  /* Pull bars. `bar` selects the section and the tone profile; see BARS in the
+     renderer.
+     ⚠ THE WIDTHS WERE THE THING THAT WAS WRONG. Read against the leaf on
+     twenty-one bar-carrying doors, a round tube measures 0.036 of leaf width
+     (range 0.017-0.048) and a flat strap 0.052 (0.046-0.077); lengths cluster
+     at 0.45 and 0.48 of leaf height respectively. Our lengths were between 0%
+     and 15% out and four of them are unchanged — but three of the six bars
+     were 50% to 80% too NARROW, which at catalogue-thumbnail size is the
+     difference between a handle and a pinstripe. The comment that used to sit
+     here claimed "ella the stockiest at L/W 15, ron the slimmest at L/W 27",
+     and neither figure was even its own arithmetic: 900/34 is 26.5 and 900/16
+     is 56. A number nobody could reproduce from the line above it.
+     The measured widths, on an 850 x 2050 leaf: */
   { id: 'idan',    he: 'עידן',  en: 'Idan',   delta: 26000, len: 1050, w: 32, style: 'bar', bar: 'idan', pull: true,
     aliases: ['bar-long', 'luna'] },
-  { id: 'ella',    he: 'אלה',   en: 'Ella',   delta: 38000, len: 900,  w: 34, style: 'bar', bar: 'ella', pull: true },
-  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', delta: 30000, len: 800,  w: 26, style: 'bar', bar: 'nitzan', pull: true,
+  /* Brass, and the catalogue never said so: with no `finish` of its own
+     `effectiveFinish` fell through to steel and the bar the inventory calls
+     brass rendered silver on every door. d072, d074 and d082 are gold rods at
+     0.017-0.024 of leaf width — half what we drew. */
+  { id: 'ella',    he: 'אלה',   en: 'Ella',   delta: 38000, len: 1000, w: 20, style: 'bar', bar: 'ella', pull: true,
+    finish: 'brass' },
+  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', delta: 30000, len: 1000, w: 44, style: 'bar', bar: 'nitzan', pull: true,
     aliases: ['bar-short'] },
-  { id: 'shahar',  he: 'שחר',   en: 'Shahar', delta: 34000, len: 1150, w: 30, style: 'bar', bar: 'shahar', pull: true,
+  { id: 'shahar',  he: 'שחר',   en: 'Shahar', delta: 34000, len: 1230, w: 40, style: 'bar', bar: 'shahar', pull: true,
     aliases: ['bar-flat'] },
-  { id: 'ron',     he: 'רון',   en: 'Ron',    delta: 28000, len: 900,  w: 16, style: 'bar', bar: 'ron', pull: true },
+  { id: 'ron',     he: 'רון',   en: 'Ron',    delta: 28000, len: 900,  w: 18, style: 'bar', bar: 'ron', pull: true },
 
   /* The ornate pull, the horizontal bow, and the recess. */
   { id: 'shiran',  he: 'שירן',   en: 'Shiran', delta: 52000, len: 0, style: 'shiran', pull: true,
     finish: 'brass' },
   { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', delta: 18000, len: 0, style: 'grab',
     aliases: ['dee'] },
+  /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
+     runs nearly the whole leaf and it is twice as wide as we drew it. */
   { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
-    delta: 40000, len: 1554, inset: 0.30, style: 'channel', pull: true },
+    delta: 40000, len: 1780, w: 85, inset: 0.30, style: 'channel', pull: true },
 
   /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
      the tubes: a wide rectangular ribbon standing off the leaf, catching the
