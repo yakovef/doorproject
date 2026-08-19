@@ -21,6 +21,58 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Which grips can be turned, and what happens when none of them can.**
+  Two things, both reported from the outside.
+  `gripCanRotate` asked the CATALOGUE how long a grip is, and the catalogue
+  does not know: `len` is how long a BAR is drawn and it is 0 on the two grips
+  that are not bars. So Shiran — 480 mm, the shortest pull in the range — was
+  refused rotation on every leaf we make, while an 1150 mm bar was merely
+  refused on most of them. It asks the DRAWN footprint now, which is the same
+  number `gripPlacement` measures the grip with, so the button and the rule
+  cannot disagree. Shiran turns on every leaf; Ella, Nitzan and Ron on a wide
+  one; the long bars nowhere, which is the honest answer.
+  And **a grip that cannot stand up anywhere is now laid down instead** — 108
+  designs draw a horizontal handle from the start. `gripHome` searches upright,
+  over the whole leaf, and only then tries flat.
+  **The rules ask the same question the drawing does.** `conflicts` refused on
+  `gripClashesGlass`, which asks whether the grip fits at ONE position — the
+  standoff beside the lock, at hand height. That was the only position there
+  was; it is not any more. Measured: 6,108 designs refused, **4,960 of them
+  with a perfectly good upright position** the search finds without trouble.
+  `gripFitsAnywhere` replaces it. Refusals fall from 3,918 of 6,480 to 2,338,
+  and the buildable space goes from 9,876 designs to 12,810.
+  `gripClashesGlass` was kept as a cheap pre-filter for one round and that was
+  the wrong shape too — it knows about glazing and nothing else, so a grip
+  whose feet land on a panel moulding sailed past it. One question now.
+  **A height band, from the corpus.** The ten installed pull bars sit at 0.430
+  to 0.512 of leaf height, centre; ours is 0.502. Without a band the search
+  dropped an Ella bar 520 mm, where it spans the bottom half of the door and
+  your hand reaches its top corner. 0.38–0.60 is that band with room either
+  side. Handles still move for a moulding — 3,088 of them — but the median move
+  is 105 mm and the worst 340, all inside what real doors do.
+  **Four things the instruments caught on the way**, each a rule that was true
+  until the handle could move: `gripPlacement` was missing `BAR_GAP_MIN`, so
+  808 designs stood a bar closer to its lockset than any installed door; the
+  test that guards that gap compared horizontal distance with no regard for
+  HEIGHT, and failed 808 designs for a bar standing 0.03 W from a lever 800 mm
+  underneath it; a rotated grip still declared its upright footprint, so
+  everything reading it measured a laid-down Shiran as 86 wide and 480 tall
+  when it is 480 wide and 86 tall; and the placement knew about the lockset but
+  not about the SECOND escutcheon `render` draws below every plain lever, so a
+  bar laid across a wide leaf came to rest touching it. `npm run collide` would
+  have said so — on a leaf size the sweep did not visit, which is why WIDE is
+  in it now.
+  **And the search is bounded on purpose.** It used to sweep the whole leaf on
+  a 10 mm grid: fine once per drawing, ruinous once the RULES ask it, which
+  took `npm test` from 43 seconds past two minutes. It is about 150 tests now —
+  two lines through the wanted point, a measured 11x17 lattice, then a halving
+  walk back toward what was asked for — and `faceObstacles`, `apertureLayout`
+  and the answer itself are memoised on the six fields a placement depends on.
+  The price is roughly a dozen combinations out of 45,000 refused for having
+  nowhere to put a handle when a finer search would have found somewhere. They
+  are refused rather than drawn wrong, and the rules and the drawing now run
+  the SAME search, so the two cannot disagree about what is buildable.
+
 - **The drag did not work on a phone, and it was one line.** Reported from the
   outside: the handle moved a couple of pixels at a time, and teleported while
   the finger was still down. `pointercancel` was wired to the same handler as

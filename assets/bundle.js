@@ -1442,7 +1442,18 @@ ${body}
     };
     return !(hole.w > 0 && hole.h > 0 && inside(f.x, f.y, hole));
   };
-  function faceObstacles(state2) {
+  var memo = (fn, key) => {
+    const cache = /* @__PURE__ */ new Map();
+    return (...args) => {
+      const k = key(...args);
+      if (cache.has(k)) return cache.get(k);
+      const v = fn(...args);
+      if (cache.size > 4e3) cache.clear();
+      cache.set(k, v);
+      return v;
+    };
+  };
+  var faceObstacles = memo(function faceObstacles2(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const detail = byId(DETAILS, state2.detail);
@@ -1471,8 +1482,19 @@ ${body}
       }
     }
     return out;
-  }
+  }, (st) => `${st.size}|${st.detail}|${st.window}`);
+  var homeKey = (st) => `${st.size}|${st.handle}|${st.lockset}|${st.detail}|${st.window}|${st.handing}`;
+  var HOME_CACHE = /* @__PURE__ */ new Map();
   function gripHome(state2) {
+    const key = homeKey(state2);
+    const hit = HOME_CACHE.get(key);
+    if (hit) return hit;
+    const found = gripHomeUncached(state2);
+    if (HOME_CACHE.size > 6e4) HOME_CACHE.clear();
+    HOME_CACHE.set(key, found);
+    return found;
+  }
+  function gripHomeUncached(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const handle = byId(HANDLES, state2.handle);
     const lockset = byId(LOCKSETS, state2.lockset);
@@ -1484,14 +1506,27 @@ ${body}
     const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
     const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
     const raw0 = { x: backset + standoff, y: leafH - HANDLE_AFF, rot: 0 };
-    return gripPlacement(state2, raw0).ok ? raw0 : nearestGrip(state2, raw0);
+    if (gripPlacement(state2, raw0).ok) return raw0;
+    const upright = nearestGrip(state2, raw0);
+    if (gripPlacement(state2, upright).ok) return upright;
+    if (gripCanRotate(state2)) {
+      const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
+      const laid = gripPlacement(state2, flat).ok ? flat : nearestGrip(state2, flat);
+      if (gripPlacement(state2, laid).ok) return laid;
+    }
+    return upright;
   }
+  var gripFitsAnywhere = memo(
+    (state2) => gripPlacement(state2, gripHome(state2)).ok,
+    homeKey
+  );
   function gripCanRotate(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const handle = byId(HANDLES, state2.handle);
-    if (handle.style !== "bar") return false;
+    if (handle.style === "none" || handle.style === "grab") return false;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    return handle.len > 0 && handle.len <= leafW - EDGE_FLAT * 2 && leafH > 0;
+    const long = handleFootprint(handle, leafH).vy * 2;
+    return long > 0 && long <= leafW - EDGE_FLAT * 2;
   }
   function gripAt(state2) {
     const home = gripHome(state2);
@@ -1537,6 +1572,9 @@ ${body}
     const hi = p.rot === 90 ? cx + half : p.y + half;
     const span = p.rot === 90 ? leafW : leafH;
     if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad("הידית חורגת מהדלת");
+    if (p.y < leafH * 0.38 || p.y > leafH * 0.6) {
+      return bad("הידית גבוהה או נמוכה מדי לשימוש");
+    }
     if (p.rot === 0 && p.x > leafW * 0.55) return bad("ידית משיכה לא מותקנת בצד הצירים");
     for (const f of feet) {
       if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT || f.y - f.r < EDGE_FLAT || f.y + f.r > leafH - EDGE_FLAT) {
@@ -1556,10 +1594,14 @@ ${body}
     const grip = handleFootprint(handle, leafH);
     const gw = p.rot === 90 ? grip.vy : Math.max(grip.out, grip.in);
     const gh = p.rot === 90 ? Math.max(grip.out, grip.in) : grip.vy;
-    const lockY = leafH - HANDLE_AFF;
-    const meet = Math.abs(p.y - lockY) < gh + lock.vy;
-    if (meet && Math.abs(cx - lockX) < lock.in + gw + LOCK_CLEAR) {
-      return bad("הידית נוגעת במנעול");
+    const locks = [{ y: leafH - HANDLE_AFF, inward: lock.in, vy: lock.vy }];
+    if (!lockset.lock) {
+      locks.push({ y: leafH - CYLINDER_AFF, inward: LOCK_R, vy: LOCK_R });
+    }
+    for (const L of locks) {
+      const meet = Math.abs(p.y - L.y) < gh + L.vy + LOCK_CLEAR;
+      const clear = Math.max(L.inward + gw + LOCK_CLEAR, leafW * BAR_GAP_MIN);
+      if (meet && Math.abs(cx - lockX) < clear) return bad("הידית נוגעת במנעול");
     }
     for (const o of apertureLayout(byId(WINDOWS, state2.window), leafW)) {
       if (Math.abs(cx - (o.x + o.w / 2)) < gw + o.w / 2 && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
@@ -1570,40 +1612,35 @@ ${body}
   }
   function nearestGrip(state2, want) {
     if (gripPlacement(state2, want).ok) return want;
-    for (const stretch of [4, 1]) {
-      for (let ring = 1; ring <= 40; ring++) {
-        const d = ring * 10 * (stretch === 1 ? 2 : 1);
-        let best2 = null, bestD2 = Infinity;
-        for (let a = 0; a < 24; a++) {
-          const th = a / 24 * Math.PI * 2;
-          const cand = {
-            x: Math.round((want.x + Math.cos(th) * d * stretch) / 5) * 5,
-            y: Math.round((want.y + Math.sin(th) * d) / 5) * 5,
-            rot: want.rot
-          };
-          if (!gripPlacement(state2, cand).ok) continue;
-          const dist = (cand.x - want.x) ** 2 + ((cand.y - want.y) * stretch) ** 2;
-          if (dist < bestD2) {
-            bestD2 = dist;
-            best2 = cand;
-          }
-        }
-        if (best2) return best2;
-      }
-    }
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     let best = null, bestD = Infinity;
-    for (let x = EDGE_FLAT; x < leafW; x += 10) {
-      for (let y = EDGE_FLAT; y < leafH; y += 10) {
-        const cand = { x, y, rot: want.rot };
-        const d = (x - want.x) ** 2 + ((y - want.y) * 2) ** 2;
-        if (d >= bestD || !gripPlacement(state2, cand).ok) continue;
-        bestD = d;
-        best = cand;
+    const tryAt = (x, y) => {
+      const cand = { x: Math.round(x / 5) * 5, y: Math.round(y / 5) * 5, rot: want.rot };
+      const d = (cand.x - want.x) ** 2 + ((cand.y - want.y) * 2) ** 2;
+      if (d >= bestD || !gripPlacement(state2, cand).ok) return;
+      bestD = d;
+      best = cand;
+    };
+    const xLo = EDGE_FLAT, xHi = want.rot === 90 ? leafW - EDGE_FLAT : leafW * 0.55;
+    const yLo = EDGE_FLAT, yHi = leafH - EDGE_FLAT;
+    const at = (lo, hi, i, n) => lo + (hi - lo) * i / n;
+    for (let i = 0; i <= 24; i++) tryAt(at(xLo, xHi, i, 24), want.y);
+    for (let i = 0; i <= 24; i++) tryAt(want.x, at(yLo, yHi, i, 24));
+    for (let ix = 0; ix <= 11; ix++) {
+      for (let iy = 0; iy <= 17; iy++) tryAt(at(xLo, xHi, ix, 11), at(yLo, yHi, iy, 17));
+    }
+    if (!best) return want;
+    for (const axis of ["y", "x"]) {
+      let step2 = Math.abs(best[axis] - want[axis]) / 2;
+      while (step2 >= 5) {
+        const toward = best[axis] + Math.sign(want[axis] - best[axis]) * step2;
+        const cand = { ...best, [axis]: Math.round(toward / 5) * 5 };
+        if (gripPlacement(state2, cand).ok) best = cand;
+        step2 /= 2;
       }
     }
-    return best || want;
+    return best;
   }
   function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
     if (vertical) {
@@ -1693,7 +1730,7 @@ ${body}
   }
   var MOUNT_REACH = 121;
   var HW_STILE = MOUNT_REACH + LOCK_CLEAR;
-  function apertureLayout(win, leafW) {
+  var apertureLayout = memo(function apertureLayout2(win, leafW) {
     const rows = /* @__PURE__ */ new Map();
     for (const r of win.rects || []) {
       const k = `${r.top}|${r.h}`;
@@ -1717,7 +1754,7 @@ ${body}
       out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
     }
     return out;
-  }
+  }, (win, leafW) => `${win.id}|${leafW}`);
   function aperture({
     x,
     y,
@@ -1931,17 +1968,6 @@ ${body}
     const u = apertureLayout(win, leafW).map((o) => hingeOnLeft ? leafW - (o.x + o.w) : o.x);
     return Math.min(...u) - MOULD_BAND - lockBackset(byId(HANDLES, state2.handle), byId(LOCKSETS, state2.lockset));
   }
-  function gripClashesGlass(state2) {
-    const size = SIZES[state2.size] || SIZES.standard;
-    const handle = byId(HANDLES, state2.handle);
-    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    const grip = handleFootprint(handle, leafH);
-    if (!grip.vy && !grip.out) return false;
-    const lock = handleFootprint(byId(LOCKSETS, state2.lockset), leafH);
-    const floor = Math.max(lock.in + grip.out + LOCK_CLEAR, leafW * BAR_GAP_MIN);
-    const room = glassClearance(state2) - bossReach(handle) - LOCK_CLEAR;
-    return floor > room;
-  }
   function gripClashesLockset(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const handle = byId(HANDLES, state2.handle);
@@ -1985,6 +2011,7 @@ ${body}
     if (!art) return "";
     const foot = handleFootprint(handle, leafH, panelled);
     const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : "";
+    const box = rot === 90 ? { out: foot.vy, in: foot.vy, vy: Math.max(foot.out, foot.in) } : foot;
     const padW = Math.max(120, foot.out + foot.in);
     const padH = Math.max(120, foot.vy * 2);
     const pad = `<rect data-hitpad="1" x="${cx - padW / 2}" y="${cy - padH / 2}"
@@ -1992,8 +2019,8 @@ ${body}
                      data-cx="${cx}" data-cy="${cy}" data-w="${padW}" data-h="${padH}"
                      fill="transparent" pointer-events="all"/>`;
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
-             data-vy="${foot.vy}" data-rot="${rot}"${turned}>${pad}${art}</g>`;
+             data-cx="${cx}" data-cy="${cy}" data-out="${box.out}" data-in="${box.in}"
+             data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}</g>`;
   }
   function locksetArt(lockset, cx, cy, dir) {
     const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
@@ -2891,8 +2918,8 @@ ${body}
     }
     for (const h of HANDLES) {
       if (h.style === "none" || out.handle[h.id]) continue;
-      if (gripClashesGlass({ ...state2, handle: h.id })) {
-        out.handle[h.id] = "אין מקום בין המנעול לחלון";
+      if (!gripFitsAnywhere({ ...state2, handle: h.id, grip: null })) {
+        out.handle[h.id] = "אין מקום לידית הזו על הדלת";
       }
     }
     for (const k of LOCKSETS) {
@@ -3000,7 +3027,7 @@ ${body}
         change("handle", SAID.gripGone);
       }
     }
-    if (gripClashesGlass(s)) {
+    if (!gripFitsAnywhere({ ...s, grip: null })) {
       if (intent === "handle") {
         s.window = "none";
         change("window", SAID.windowGone);
@@ -3015,7 +3042,8 @@ ${body}
         change("grip", SAID.gripHome);
       } else {
         const want = { ...s.grip, rot: s.grip.rot === 90 && gripCanRotate(s) ? 90 : 0 };
-        const near = gripPlacement(s, want).ok ? want : nearestGrip(s, want);
+        let near = gripPlacement(s, want).ok ? want : nearestGrip(s, want);
+        if (!gripPlacement(s, near).ok) near = gripHome(s);
         if (near.x !== s.grip.x || near.y !== s.grip.y || near.rot !== s.grip.rot) {
           s.grip = near;
           change("grip", SAID.gripMoved);
@@ -3702,7 +3730,8 @@ ${body}
   }
   function placeGrip(want, saySo) {
     const fit = gripPlacement(state, want);
-    const at = fit.ok ? want : nearestGrip(state, want);
+    let at = fit.ok ? want : nearestGrip(state, want);
+    if (!gripPlacement(state, at).ok) at = gripHome(state);
     set({ ...state, grip: at });
     if (!fit.ok && saySo) toast(fit.why + " — הזזנו למקום הקרוב שאפשר");
     const g = $('#stage svg [data-hw="handle"]');

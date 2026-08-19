@@ -1712,6 +1712,26 @@ const footHits = (f, ob) => {
   return !(hole.w > 0 && hole.h > 0 && inside(f.x, f.y, hole));
 };
 
+/* Both of these answer the same question thousands of times inside one search:
+   `nearestGrip` walks up to fifteen thousand candidate positions and the door
+   does not change while it walks. Rebuilding the openings and the obstacle
+   list at every step was most of the cost of asking whether a handle fits
+   anywhere — it took the rules' new question from tolerable to two minutes of
+   `npm test`. The answers depend on the door alone, so they are kept.
+   The returned arrays are treated as READ-ONLY by every caller; a mutation
+   would be shared with every later caller of the same door. */
+const memo = (fn, key) => {
+  const cache = new Map();
+  return (...args) => {
+    const k = key(...args);
+    if (cache.has(k)) return cache.get(k);
+    const v = fn(...args);
+    if (cache.size > 4000) cache.clear();
+    cache.set(k, v);
+    return v;
+  };
+};
+
 /**
  * Every rectangle on the face that a bolted foot may not land on, leaf-local.
  *
@@ -1724,7 +1744,7 @@ const footHits = (f, ob) => {
  * question in node. `npm test` checks the answers against the mouldings the
  * browser actually draws, which is what keeps the two honest.
  */
-export function faceObstacles(state) {
+export const faceObstacles = memo(function faceObstacles(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const detail = byId(DETAILS, state.detail);
@@ -1749,7 +1769,7 @@ export function faceObstacles(state) {
     }
   }
   return out;
-}
+}, st => `${st.size}|${st.detail}|${st.window}`);
 
 /**
  * Where the grip sits when nobody has moved it: `x` inboard from the CLOSING
@@ -1761,7 +1781,38 @@ export function faceObstacles(state) {
  * to draw it, to snap back to it, and to know whether the design still carries
  * the default at all.
  */
+/* WHAT A HOME POSITION DEPENDS ON, and nothing else: the leaf's size, what is
+   on its face, what is beside the grip on the stile, and which way it is hung.
+   Not the colour, not the glass, not the grille — none of those move anything.
+
+   `gripHome` searches, and the search is not cheap: rings first, and a 10 mm
+   sweep of the whole leaf for the doors whose only valid spots are an island.
+   `conflicts` now asks it for every grip in the catalogue, and `conflicts` is
+   called a few hundred thousand times by the test sweep alone — which took
+   `npm test` from 43 seconds to past two minutes the moment the rules started
+   asking the real question.
+
+   ⚠ A KEY THAT LEAVES SOMETHING OUT IS A WRONG ANSWER CACHED. If a new field
+   ever moves a handle, it belongs in this line, and the symptom of forgetting
+   would be a door drawn with the previous door's handle position. */
+const homeKey = st =>
+  `${st.size}|${st.handle}|${st.lockset}|${st.detail}|${st.window}|${st.handing}`;
+const HOME_CACHE = new Map();
+
 export function gripHome(state) {
+  const key = homeKey(state);
+  const hit = HOME_CACHE.get(key);
+  if (hit) return hit;
+  const found = gripHomeUncached(state);
+  /* The key space is the catalogue's own product — about 45,000 — and a page
+     visits a handful. The bound is there so a long sweep cannot grow it
+     without limit, not because it is expected to be reached. */
+  if (HOME_CACHE.size > 60000) HOME_CACHE.clear();
+  HOME_CACHE.set(key, found);
+  return found;
+}
+
+function gripHomeUncached(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const handle = byId(HANDLES, state.handle);
   const lockset = byId(LOCKSETS, state.lockset);
@@ -1783,24 +1834,71 @@ export function gripHome(state) {
      shortening was added to prevent.
      So the guess is checked and corrected here, once, and every other caller
      gets a home position that is buildable by construction. */
-  return gripPlacement(state, raw0).ok ? raw0 : nearestGrip(state, raw0);
+  if (gripPlacement(state, raw0).ok) return raw0;
+  const upright = nearestGrip(state, raw0);
+  if (gripPlacement(state, upright).ok) return upright;
+
+  /* AND IF IT WILL NOT STAND UP ANYWHERE, LAY IT DOWN.
+     Asked for from the outside: "if there is a window, and the pull handle
+     can't fit vertically, then draw it horizontally from the go." A leaf with
+     a tall light and a long lever can leave an upright grip nowhere at all —
+     the light takes the middle of the door and the lever takes the stile — and
+     the door still wants a handle on it. Laid across, at the same height a
+     hand reaches, it has the whole width of the leaf to sit in.
+     Only where it fits lying down, which `gripCanRotate` answers from the
+     drawing, and only after upright has been given the whole leaf to try. A
+     handle that could stand up should stand up: that is what every door in the
+     corpus does. */
+  if (gripCanRotate(state)) {
+    const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
+    const laid = gripPlacement(state, flat).ok ? flat : nearestGrip(state, flat);
+    if (gripPlacement(state, laid).ok) return laid;
+  }
+  return upright;
 }
 
-/** Can this grip be turned on its side at all? Most of them cannot. */
+/**
+ * Is there anywhere at all on this door for this grip?
+ *
+ * `gripHome` searches upright, then flat, and returns the best it found — so
+ * asking whether its answer is legal is the same as asking whether the door
+ * can carry the handle. Used by `rules.js` in place of the old question, which
+ * was whether the grip fitted at ONE computed position.
+ */
+export const gripFitsAnywhere = memo(
+  state => gripPlacement(state, gripHome(state)).ok, homeKey);
+
+/**
+ * Can this grip be turned on its side at all?
+ *
+ * Turned sideways it has to fit BETWEEN the stiles at its own length — five of
+ * the seven bars are longer than a standard leaf is wide, Shahar being 1150 mm
+ * against 850. Shortening one to fit was the alternative and the owner's son
+ * chose against it, so what is left turns only where it genuinely fits. Both
+ * ends need flat face to land on, which is EDGE_FLAT; the lock's own stile is
+ * not the constraint here, since a horizontal grip at lock height is refused by
+ * the lockset check instead, wherever it sits.
+ *
+ * ⚠ IT USED TO ASK THE CATALOGUE, and the catalogue does not know. `len` is
+ * how long a BAR is drawn, and it is 0 on the two grips that are not bars —
+ * so Shiran, which is 480 mm and the shortest pull in the range, was refused
+ * rotation on every leaf we make while an 1150 mm bar was merely refused on
+ * most of them. Reported from the outside, in as many words: "shiran for sure
+ * is small enough but I can't."
+ * The DRAWN footprint knows. It is the same number `gripPlacement` measures
+ * the grip's extent with, so the button and the rule cannot disagree about
+ * whether a thing fits.
+ */
 export function gripCanRotate(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const handle = byId(HANDLES, state.handle);
-  if (handle.style !== 'bar') return false;
+  /* Nothing to turn, and one that is already lying down: the horizontal bow is
+     drawn from the leaf's centre outwards and standing it up is a different
+     object, not a rotation. */
+  if (handle.style === 'none' || handle.style === 'grab') return false;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  /* Turned sideways a bar has to fit BETWEEN the stiles at its own catalogue
-     length, and five of the seven are longer than a standard leaf is wide —
-     Shahar is 1150 mm against 850. Shortening it to fit was the alternative and
-     the owner's son chose against it, so what is left is a bar that turns only
-     where it genuinely fits: on a WIDE leaf, and only Nitzan, Ella and Ron.
-     Both ends need flat face to land on, which is EDGE_FLAT — the lock's own
-     stile is not the constraint here, since a horizontal bar at lock height is
-     refused by the lockset check instead, wherever it is. */
-  return handle.len > 0 && handle.len <= leafW - EDGE_FLAT * 2 && leafH > 0;
+  const long = handleFootprint(handle, leafH).vy * 2;
+  return long > 0 && long <= leafW - EDGE_FLAT * 2;
 }
 
 /** The grip's position for this design: the customer's, or its home. */
@@ -1881,6 +1979,23 @@ export function gripPlacement(state, place = null) {
   const span = p.rot === 90 ? leafW : leafH;
   if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad('הידית חורגת מהדלת');
 
+  /* AND AT A HEIGHT SOMEBODY WOULD FIT IT AT.
+     Measured, from the ten installed doors carrying a pull bar: the bar's
+     CENTRE sits at 0.430, 0.463, 0.464, 0.477, 0.484, 0.500, 0.504, 0.509,
+     0.512 and 0.512 of leaf height. Not one leaves 0.43-0.52. Our own nominal
+     — HANDLE_AFF off the floor — lands at 0.502, in the middle of them.
+     0.38 to 0.60 is that band with room either side, and it is the difference
+     between a handle that had to move for a window and a handle at knee
+     height: without it the search happily dropped an Ella bar 520 mm, where it
+     spans the bottom half of the door and your hand reaches its top corner.
+     Nothing in the corpus looks like that.
+     Where the band leaves a grip nowhere, the door refuses it — which is what
+     the site did before the search existed, so nothing is lost. Laying it down
+     is the way out, and `gripHome` tries that first. */
+  if (p.y < leafH * 0.38 || p.y > leafH * 0.60) {
+    return bad('הידית גבוהה או נמוכה מדי לשימוש');
+  }
+
   /* AND NOT ON THE HINGE SIDE. A pull standing upright past the leaf's centre
      line is on the half of the door that barely moves: there is no leverage
      there and nobody fits one. Every bar in the corpus sits between 0.05 and
@@ -1925,10 +2040,35 @@ export function gripPlacement(state, place = null) {
      around an asymmetric footprint, and no test of whether the two are even at
      the same HEIGHT. A bar dropped to the foot of the door was being refused
      for touching a lever 800 mm above it. */
-  const lockY = leafH - HANDLE_AFF;
-  const meet = Math.abs(p.y - lockY) < gh + lock.vy;
-  if (meet && Math.abs(cx - lockX) < lock.in + gw + LOCK_CLEAR) {
-    return bad('הידית נוגעת במנעול');
+  /* EVERY LOCK OBJECT ON THE STILE, not just the lockset. `render` draws a
+     SECOND escutcheon at CYLINDER_AFF for any lock furniture that does not
+     carry its own lock — every plain lever has one — and this check knew
+     nothing about it, because the lockset's footprint describes the lever.
+     Laid down at hand height, an Ella bar on a wide leaf came to rest with its
+     end shoe against that cylinder. It is `data-hw="lock"` in the drawing, so
+     `npm run collide` would have said so too, on a leaf size the sweep did not
+     happen to visit — which is why WIDE is in that sweep now. */
+  const locks = [{ y: leafH - HANDLE_AFF, inward: lock.in, vy: lock.vy }];
+  if (!lockset.lock) {
+    locks.push({ y: leafH - CYLINDER_AFF, inward: LOCK_R, vy: LOCK_R });
+  }
+  /* LOCK_CLEAR of air VERTICALLY as well as across. Without it a grip laid
+     down came to rest exactly touching the lockset's box — the search walks it
+     until the two stop overlapping, and "stopped overlapping" is not a gap.
+     `npm test` reads it as a gap of precisely zero and says so. Air is air
+     whichever way the two objects are stacked. */
+  /* The SAME floor `gripStandoff` places the grip with, both halves of it: the
+     two drawn boxes apart, and never tighter than the tightest gap anyone
+     actually installs. The second half was missing, and `npm test` found it
+     the moment the rules stopped refusing on the old question — 808 designs
+     stood a bar 0.017 to 0.078 of the leaf's width from its lockset, against
+     0.090 on the closest of the ten installed doors that carry both.
+     Only where the two are at the same HEIGHT. A bar dropped to the foot of
+     the door has no argument with a lever 800 mm above it. */
+  for (const L of locks) {
+    const meet = Math.abs(p.y - L.y) < gh + L.vy + LOCK_CLEAR;
+    const clear = Math.max(L.inward + gw + LOCK_CLEAR, leafW * BAR_GAP_MIN);
+    if (meet && Math.abs(cx - lockX) < clear) return bad('הידית נוגעת במנעול');
   }
 
   /* AND THE SHAFT DOES NOT CROSS THE GLASS.
@@ -1963,60 +2103,72 @@ export function gripPlacement(state, place = null) {
  */
 export function nearestGrip(state, want) {
   if (gripPlacement(state, want).ok) return want;
-  /* Rings, but ELLIPTICAL — three times as wide as they are tall.
-     A handle's HEIGHT is ergonomic and its distance from the edge is a style
-     choice, so when something is in the way the honest move is sideways. A
-     circular search does not know that: it moved 2,332 default positions off
-     the affordance height, one of them by 480 mm, when sliding the bar 40 mm
-     inboard would have done. Cost is the same either way — the search stops at
-     the first ring that has anything in it. */
-  /* Sideways first and hard — a tenth of a millimetre up for every millimetre
-     across — then, only if the whole leaf offers nothing on that path, a plain
-     circular sweep. Sixteen designs out of 9,876 need the second pass, all of
-     them a long bar on a narrow leaf where sliding it inboard runs into the
-     glazing and the only way out is down. */
-  for (const stretch of [4, 1]) {
-    for (let ring = 1; ring <= 40; ring++) {
-      const d = ring * 10 * (stretch === 1 ? 2 : 1);
-      let best = null, bestD = Infinity;
-      for (let a = 0; a < 24; a++) {
-        const th = (a / 24) * Math.PI * 2;
-        const cand = { x: Math.round((want.x + Math.cos(th) * d * stretch) / 5) * 5,
-                       y: Math.round((want.y + Math.sin(th) * d) / 5) * 5,
-                       rot: want.rot };
-        if (!gripPlacement(state, cand).ok) continue;
-        const dist = (cand.x - want.x) ** 2 + ((cand.y - want.y) * stretch) ** 2;
-        if (dist < bestD) { bestD = dist; best = cand; }
-      }
-      if (best) return best;
-    }
-  }
-  /* AND IF THE RINGS FOUND NOTHING, SWEEP THE WHOLE LEAF.
-     Rings sample 24 angles, which is plenty when the answer is a broad region
-     and useless when it is an island. Twelve designs have one: a long bar
-     between a light and a panel, where the only spots that work are 83 out of
-     seventeen thousand. The rings walked straight past them and the default
-     position came back refused — on a door that can perfectly well carry its
-     own handle.
-     A 10 mm grid over the leaf is about 15,000 placement checks — plain
-     arithmetic, no drawing. Far too slow to do first and completely fine as a
-     last resort, which is what the two ring passes above buy. 20 mm was tried
-     and still walked past a narrow door whose island is 238 spots wide. */
   const size = SIZES[state.size] || SIZES.standard;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+
   let best = null, bestD = Infinity;
-  for (let x = EDGE_FLAT; x < leafW; x += 10) {
-    for (let y = EDGE_FLAT; y < leafH; y += 10) {
-      const cand = { x, y, rot: want.rot };
-      const d = (x - want.x) ** 2 + ((y - want.y) * 2) ** 2;
-      if (d >= bestD || !gripPlacement(state, cand).ok) continue;
-      bestD = d; best = cand;
+  const tryAt = (x, y) => {
+    const cand = { x: Math.round(x / 5) * 5, y: Math.round(y / 5) * 5, rot: want.rot };
+    /* Distance FIRST. Most candidates are further away than something already
+       found, and the cheapest placement test is the one not run. */
+    const d = (cand.x - want.x) ** 2 + ((cand.y - want.y) * 2) ** 2;
+    if (d >= bestD || !gripPlacement(state, cand).ok) return;
+    bestD = d; best = cand;
+  };
+
+  /* Vertical twice as expensive as horizontal, because a handle's HEIGHT is
+     ergonomic and its distance from the edge is a style choice. Upright it may
+     not pass the leaf's middle; laid down it is centred there by nature. */
+  const xLo = EDGE_FLAT, xHi = want.rot === 90 ? leafW - EDGE_FLAT : leafW * 0.55;
+  const yLo = EDGE_FLAT, yHi = leafH - EDGE_FLAT;
+  const at = (lo, hi, i, n) => lo + (hi - lo) * i / n;
+
+  /* Along the stile at this height, then up the door at this offset. Between
+     them these two lines find almost everything: what blocks a handle is a
+     window or a panel, and both leave a clear band beside them or under them. */
+  for (let i = 0; i <= 24; i++) tryAt(at(xLo, xHi, i, 24), want.y);
+  for (let i = 0; i <= 24; i++) tryAt(want.x, at(yLo, yHi, i, 24));
+  /* And a lattice for when neither line is clear. 11 x 17 measured against 7 x
+     11 and 15 x 23: it refuses 1,482 of 6,480 against the exhaustive search's
+     1,424, where the coarse one refuses 1,668. Denser is NOT monotonically
+     better — 15 x 23 lands on different millimetres and refuses 1,660 — which
+     is what sampling is, and the reason the number is measured rather than
+     reasoned about. */
+  for (let ix = 0; ix <= 11; ix++) {
+    for (let iy = 0; iy <= 17; iy++) tryAt(at(xLo, xHi, ix, 11), at(yLo, yHi, iy, 17));
+  }
+
+  /* ⚠ BOUNDED ON PURPOSE, and it used to sweep the whole leaf on a 10 mm grid.
+     That found an island of 83 valid spots in seventeen thousand on a dozen
+     exotic doors — and cost fifteen thousand placement tests to do it. Fine
+     once per drawing; ruinous once the RULES started asking the same question,
+     which they must, or a handle is refused for not fitting where we first
+     thought to put it. Measured: two minutes of `npm test`.
+     So the search is a fixed budget of about 150 tests, and the price is that
+     roughly a dozen combinations out of 45,000 are refused for having nowhere
+     to put a handle when a fine enough search would have found somewhere. They
+     are refused rather than drawn wrong, and `conflicts` and the drawing now
+     run the SAME search, so the two cannot disagree about what is buildable —
+     which is worth more than the dozen. */
+  if (!best) return want;
+
+  /* AND THEN WALK IT BACK. The lattice lands on multiples of 80-odd
+     millimetres, so a handle that needed to move 20 mm was being moved 160 —
+     measured as the median of everything that moved, against 5 mm for the
+     unbounded search this replaced. Halving the offset toward what was asked
+     for, one axis at a time, costs about sixteen more tests and gives the
+     precision back: whatever the coarse pass found is already valid, so every
+     step here is a free improvement or nothing. */
+  for (const axis of ['y', 'x']) {
+    let step = Math.abs(best[axis] - want[axis]) / 2;
+    while (step >= 5) {
+      const toward = best[axis] + Math.sign(want[axis] - best[axis]) * step;
+      const cand = { ...best, [axis]: Math.round(toward / 5) * 5 };
+      if (gripPlacement(state, cand).ok) best = cand;
+      step /= 2;
     }
   }
-  /* Truly nowhere: hand back what was asked for rather than the home position,
-     which is itself computed THROUGH this function — sending it here was a
-     cycle that recursed until the stack gave out. */
-  return best || want;
+  return best;
 }
 
 /**
@@ -2251,7 +2403,7 @@ const HW_STILE = MOUNT_REACH + LOCK_CLEAR;
  * `glassClearance` can ask the same question without knowing where the leaf
  * was drawn.
  */
-export function apertureLayout(win, leafW) {
+export const apertureLayout = memo(function apertureLayout(win, leafW) {
   const rows = new Map();
   for (const r of win.rects || []) {
     const k = `${r.top}|${r.h}`;
@@ -2276,7 +2428,7 @@ export function apertureLayout(win, leafW) {
     out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
   }
   return out;
-}
+}, (win, leafW) => `${win.id}|${leafW}`);
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 function aperture({ x, y, w, h, paint, edge, grille, glazing, key, leaf = null,
@@ -2741,6 +2893,15 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
      other way up. Drawing a second horizontal version would be a second thing
      to keep in step with the first. */
   const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : '';
+  /* TURNED, THE FOOTPRINT TURNS WITH IT. `out` and `in` are horizontal and
+     `vy` is vertical, so a grip on its side swaps them — its reach across the
+     door is what used to be its length, and its height is what used to be its
+     width. Left unswapped, everything that reads these attributes measured a
+     laid-down Shiran as 86 mm wide and 480 tall when it is 480 wide and 86
+     tall, and `npm test` duly found it overlapping a lockset it clears. */
+  const box = rot === 90
+    ? { out: foot.vy, in: foot.vy, vy: Math.max(foot.out, foot.in) }
+    : foot;
   /* SOMETHING A FINGER CAN HOLD.
      A pull bar is 16 to 62 mm of section, which on a phone is four or five
      pixels of screen — you cannot put a fingertip on that, and the drag was
@@ -2762,8 +2923,8 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
                      data-cx="${cx}" data-cy="${cy}" data-w="${padW}" data-h="${padH}"
                      fill="transparent" pointer-events="all"/>`;
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
-             data-vy="${foot.vy}" data-rot="${rot}"${turned}>${pad}${art}</g>`;
+             data-cx="${cx}" data-cy="${cy}" data-out="${box.out}" data-in="${box.in}"
+             data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}</g>`;
 }
 
 function locksetArt(lockset, cx, cy, dir) {

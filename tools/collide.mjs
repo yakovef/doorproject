@@ -49,8 +49,13 @@ await p.goto(`file://${process.cwd()}/index.html?bare=1`);
 await p.waitForFunction(() => typeof window.__render === 'function');
 
 const cases = [];
+/* WIDE is in the sweep now. It was standard and narrow, on the reasoning that
+   those are the tight cases — and the tight cases are not the only ones. A
+   grip that cannot stand upright is laid down instead, and a WIDE leaf is
+   precisely where one fits: an Ella bar laid across a wide door came to rest
+   touching the cylinder escutcheon, on a size this loop did not visit. */
 for (const h of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
-  for (const sz of ['standard', 'narrow']) for (const hd of ['right-in', 'left-in']) {
+  for (const sz of ['standard', 'narrow', 'wide']) for (const hd of ['right-in', 'left-in']) {
     const st = {
       colour: 'rb-0097d', window: w.id, glazing: 'clear', grille: 'none',
       handle: h.id, lockset: k.id, detail: 'plain',
@@ -71,7 +76,7 @@ if (deep) {
      success exactly as loudly as one that works. */
   let added = 0;
   for (const d of DETAILS) for (const w of WINDOWS)
-    for (const sz of ['standard', 'narrow']) for (const hd of ['right-in', 'left-in']) {
+    for (const sz of ['standard', 'narrow', 'wide']) for (const hd of ['right-in', 'left-in']) {
       const st = {
         colour: 'rb-0097d', window: w.id, glazing: 'clear', grille: 'none',
         handle: 'idan', lockset: 'cylinder', detail: d.id,

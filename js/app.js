@@ -616,7 +616,13 @@ function onGripAbandon() {
 /** Commit a position, snapping back to the nearest buildable one. */
 function placeGrip(want, saySo) {
   const fit = gripPlacement(state, want);
-  const at = fit.ok ? want : nearestGrip(state, want);
+  let at = fit.ok ? want : nearestGrip(state, want);
+  /* The search is a fixed budget and it can come back empty — it samples about
+     150 places and a door can have valid ones it did not sample. Home is the
+     one position we always know works, because it is how the door was drawn
+     before anybody touched it. Never leave the customer holding a door that
+     cannot be made. */
+  if (!gripPlacement(state, at).ok) at = gripHome(state);
   set({ ...state, grip: at });
   if (!fit.ok && saySo) toast(fit.why + ' — הזזנו למקום הקרוב שאפשר');
   const g = $('#stage svg [data-hw="handle"]');

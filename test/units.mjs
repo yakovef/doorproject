@@ -466,7 +466,20 @@ group('the grip clears the lockset');
            0.185 of leaf width, median 0.125. We drew 61 mm — 0.072 — whenever
            glazing squeezed the bar, on the grounds that at 61 mm the two boxes
            stop touching. Boxes stopping touching is not what a hand needs. */
-        if (grip.vy > 200) {
+        /* ⚠ AND ONLY WHERE THE TWO ARE AT THE SAME HEIGHT. This used to compare
+           the horizontal distance and nothing else, which was right for as long
+           as the grip was always drawn at the lockset's own height — it was,
+           and it is not any more. A handle can be moved now, and where a light
+           and a lever leave it nowhere beside them the drawing puts it above or
+           below instead. The check then failed 808 designs for standing a bar
+           0.03 of the leaf from a lever that was 800 mm underneath it.
+           The measured 0.090-0.185 describes doors where a hand reaching the
+           bar reaches past the lever. Where their vertical bands do not meet,
+           it is not describing anything. Same question the renderer has to ask,
+           and the same one AGENT.md says to ask out loud before writing a rule
+           of this shape: are these two things at the same height? */
+        const sameHeight = Math.abs(grip.y - lock.y) < grip.vy + lock.vy;
+        if (grip.vy > 200 && sameHeight) {
           const axis = Math.abs(grip.x - lock.x) / leaf.w;
           ok(axis >= 0.088,
              `bar and lockset only ${axis.toFixed(3)} of leaf width apart — tighter `
@@ -737,10 +750,11 @@ group('a handle on a frame is refused, and told why');
                lockset: 'cylinder', size: 'standard', handing: 'right-in' };
   const win = faceObstacles(st).find(o => o.kind === 'window');
   ok(win, 'no window obstacle on a glazed door — this check is dead');
-  /* Straight onto the middle of the architrave, on the LOCK side of the leaf —
-     put it on the hinge side and the hinge rule answers first, which is
-     correct and not what this check is about. */
-  const onFrame = { x: 850 - (win.x + win.w - 20), y: win.y + win.h / 2, rot: 0 };
+  /* Straight onto the architrave, on the LOCK side of the leaf and at the
+     height a hand reaches — put it on the hinge side, or high up the door, and
+     one of those rules answers first, which is correct and not what this check
+     is about. `tallwin` runs from 175 to 1200 mm, so it crosses 1030. */
+  const onFrame = { x: 850 - (win.x + win.w - 20), y: 2050 - 1020, rot: 0 };
   const bad = gripPlacement(st, onFrame);
   ok(!bad.ok, 'a foot on the window architrave should be refused');
   ok(/חלון/.test(bad.why || ''), `the reason should name the window, got "${bad.why}"`);
@@ -749,10 +763,18 @@ group('a handle on a frame is refused, and told why');
   let i = 0;
   for (const st2 of everyPlacement()) {
     if (i++ % 97) continue;
+    /* Dropped somewhere absurd. The search has a FIXED budget — about 150
+       samples — so it may legitimately come back with nothing, and the callers
+       fall back to home. What must never happen is that it hands back a spot
+       it has not checked. */
     const wild = { x: 40, y: 200, rot: 0 };
     const near = nearestGrip(st2, wild);
-    ok(gripPlacement(st2, near).ok,
-       `nearestGrip handed back an unbuildable spot on ${st2.handle}/${st2.window}/${st2.size}`);
+    ok(gripPlacement(st2, near).ok || (near.x === wild.x && near.y === wild.y),
+       `nearestGrip moved the grip somewhere unbuildable on `
+     + `${st2.handle}/${st2.window}/${st2.size}`);
+    ok(gripPlacement(st2, gripHome(st2)).ok,
+       `and home is where the callers fall back to, so home must work on `
+     + `${st2.handle}/${st2.window}/${st2.size}`);
   }
 }
 

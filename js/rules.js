@@ -52,7 +52,8 @@
  */
 
 import { byId, DETAILS, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
-import { gripCanRotate, gripClashesGlass, gripClashesLockset, gripPlacement, nearestGrip } from './renderer.js';
+import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
+         gripPlacement, nearestGrip } from './renderer.js';
 
 /** Does this detail put ruled line work on the face? */
 export const isLineWork = detail => !!(detail.strips || detail.groove);
@@ -225,13 +226,27 @@ export function conflicts(state) {
     }
   }
 
-  /* GEOMETRIC: a grip that would have to be drawn across the glass. Asked of
-     the renderer's own arithmetic rather than listed here, so it stays true
-     when a window size or a bar section changes. */
+  /* GEOMETRIC: a grip with nowhere on the door to go.
+     `gripClashesGlass` asks whether the grip fits at ONE position — the
+     standoff `gripStandoff` computes, beside the lock, at the height a hand
+     reaches. That was the only position there was. It is not any more: the
+     customer can move the handle, `gripHome` searches for a place that works,
+     and where nothing upright works it lays the grip down. Asking the old
+     question refused 6,108 designs, and 4,960 of them had a perfectly good
+     upright position that the search finds without difficulty. Refusing a door
+     because a handle does not fit where we first thought to put it is the same
+     over-refusal this table has had to withdraw three times already.
+     `gripClashesGlass` was kept as a cheap filter in front of this for one
+     round, and it was the wrong shape: it knows about GLAZING and nothing
+     else, so a grip whose feet land on a panel moulding sailed past it and the
+     drawing was left placing a handle it could not place. One question, asked
+     of the thing that actually decides. The answer is memoised on the six
+     fields a placement depends on, which is what makes asking it of every grip
+     in the catalogue affordable. */
   for (const h of HANDLES) {
     if (h.style === 'none' || out.handle[h.id]) continue;
-    if (gripClashesGlass({ ...state, handle: h.id })) {
-      out.handle[h.id] = 'אין מקום בין המנעול לחלון';
+    if (!gripFitsAnywhere({ ...state, handle: h.id, grip: null })) {
+      out.handle[h.id] = 'אין מקום לידית הזו על הדלת';
     }
   }
 
@@ -434,8 +449,10 @@ export function repair(state, intent = null) {
   }
 
   /* A grip with nowhere to go loses the grip, never the window: the window is
-     the thing the customer can see from the street. */
-  if (gripClashesGlass(s)) {
+     the thing the customer can see from the street. Same two-stage question as
+     `conflicts` — the cheap arithmetic first, and the search only when it says
+     there is a problem. */
+  if (!gripFitsAnywhere({ ...s, grip: null })) {
     if (intent === 'handle') { s.window = 'none'; change('window', SAID.windowGone); }
     else { s.handle = 'none'; change('handle', SAID.gripGone); }
   }
@@ -457,7 +474,11 @@ export function repair(state, intent = null) {
       change('grip', SAID.gripHome);
     } else {
       const want = { ...s.grip, rot: s.grip.rot === 90 && gripCanRotate(s) ? 90 : 0 };
-      const near = gripPlacement(s, want).ok ? want : nearestGrip(s, want);
+      let near = gripPlacement(s, want).ok ? want : nearestGrip(s, want);
+      /* And home when even that finds nowhere: the search has a fixed budget,
+         and a link can carry a position on a door that has changed out of all
+         recognition under it. */
+      if (!gripPlacement(s, near).ok) near = gripHome(s);
       if (near.x !== s.grip.x || near.y !== s.grip.y || near.rot !== s.grip.rot) {
         s.grip = near;
         change('grip', SAID.gripMoved);
