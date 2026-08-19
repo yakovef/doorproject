@@ -23,6 +23,82 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-19 16:09 UTC — run 4: a repaired link said the door could not be built, when only the handle had moved
+
+**Looked at:** the new draggable handle — the newest and least-worn surface —
+at 390 and 1280, dragged with a real pointer on both, plus the `gp=` parameter
+as untrusted wire input. Pulled 3 commits from the human first (565c966,
+b258b6b, f760fab) and re-read the section they added to `AGENT.md`.
+
+**Instruments:** test ✓ (2,031,429) · audit ✓ (5 viewports, drag checks
+included) · profile ✓ · collide ✓ (2,052 base / 2,146 `all` / `boxes` ✓,
+MOUNT_REACH 121) · recreate ✓ · shot ✓ (12 clean). Build stamps `index.html`,
+which is why it is in the diff.
+
+**Changed:** `settle()` now passes `repair`'s own sentences through as `said`,
+and `showNotice` prints them instead of one generic line. Two files, plus an
+assertion.
+
+**How it was found.** The drag itself is sound — I tried to break it and could
+not. `gp` is well defended: `99999,99999`, `-1,-1`, `1e308`, `NaN`, `abc`,
+wrong arity, empty — every one clamps to a legal position or goes home, with no
+negative geometry and no NaN reaching the markup. The caveat "מיקום הידית
+להמחשה — נקבע בהתקנה" survives arriving by link, which is the case that
+matters, because that is the page *Peretz* opens.
+
+What was wrong was the sentence next to it. A link whose handle position needs
+correcting arrived reading:
+
+> השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר.
+> ("the combination in the link cannot be manufactured — we adjusted it to the
+> nearest door")
+
+Nothing about the door had changed. Colour, window, glass, grille, grip,
+lockset, detail, size, handing — all exactly as chosen. Only the handle had
+moved, and the handle's position is deliberately not in the short code, not in
+the WhatsApp message, and described on the stage as settled on site. So the one
+person the site exists to save a question is handed a reason to ask one.
+
+Measured on the default door, sweeping a 25 × 50 mm lattice of positions:
+
+    positions probed                    1353
+    legal, no repair at all                9
+    ONLY the handle moved               1344   <- all told the door was changed
+    the design itself was repaired         0
+
+**The cause is a fix that was made once and not carried.** `repair` already
+writes one exact sentence per change, and `SAID.gripMoved` — "הזזנו את הידית —
+במקום שבחרתם היא כבר לא מתאימה" — is the right words, already written. The log
+records making that change for the *toast*, because a customer dropping to one
+panel was being told we had removed their metal strips. The link notice is the
+second reader of the same repair and was still a lookup keyed on the KIND of
+notice, which can only be right while a kind means one thing. `combination-fixed`
+means many things; a stale `gp=` is by far the commonest.
+
+`option-unknown` and `code-unknown` keep their own words and are not
+overridden — they are the worse news, and `settle` already ruled they win.
+
+**Assertion:** a repaired link must carry the sentences that explain it, and a
+link that moved only the handle must say so — swept over the same lattice,
+skipping any case where a design field also moved. Backing the fix out fails it
+five times over. Checked the longer strip at 320 px: it wraps to two lines, no
+clipping, no sideways scroll.
+
+**Left alone deliberately:**
+- **The drag preview leaving the leaf.** Drag the handle far enough and it
+  floats on the wall beside the door, red. It looks odd, but red-under-the-
+  finger-then-snap-back is the interaction the human specified two commits ago
+  and it is legible. Taste, not fault.
+- **The `·` between two sentences** wrapping to the far end of the second line
+  in RTL. The page already uses ` · ` as its separator; changing it here only
+  would be drift.
+- The mobile sticky CTA, the transom/motif backlog, and the three that need
+  Peretz (finish, the three off-chart colours, prices).
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-19 10:54 UTC — run 3: two suspicions measured away; one real fault found in an instrument
 
 **Looked at:** the real page in Chromium at 390 and 1280, all four sections and
