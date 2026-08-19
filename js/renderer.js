@@ -201,7 +201,7 @@ const RET_HEAD = 148;  // the soffit — the deepest of the three, and by a lot
    pair the leaves almost touch. 46 mm drew a wide lit band that read as a
    structural mullion the door does not have. */
 const MULLION  = 22;
-const REBATE   = 50;   // frame rebate: how far the leaf sits inside the opening
+export const REBATE = 50;   // frame rebate: how far the leaf sits inside the opening
 
 /* The reveal profile, read outward from the leaf. Every works photograph has
    these three bands and the renderer had none of them: it went straight from
@@ -298,7 +298,13 @@ const PANEL_GAP    = 25;    // flat stile left between a pull bar and a moulded 
    a bar that stops at the glass still crosses the raised moulding, which is
    what `npm run collide` reported on 93 designs once it started measuring the
    drawing. */
-const MOULD_BAND = 70;
+/* Exported so the instruments can state OUR width instead of keeping their own
+   copy of it. tools/recreate.mjs held one — "the slim one at 0.043" — written
+   when this was 40 mm, and it went on reporting 0.043 and calling d048's
+   moulding a gap after the band moved to 70 and closed it. That is the fifth
+   tool in this repo to hold a number about our own drawing that quietly
+   stopped being true (CLAUDE.md §7); a tool must ask, not remember. */
+export const MOULD_BAND = 70;
 /* Where a pull bar sits, as a fraction of leaf width from the closing edge.
    Measured across every installation square-on enough to trust: 0.052, 0.128,
    0.156, 0.167, 0.21, 0.275, 0.28, 0.31 — median 0.19. Real bars are markedly

@@ -11,6 +11,18 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
+import { MOULD_BAND, REBATE } from '../js/renderer.js';
+import { SIZES } from '../js/catalog.js';
+
+/* Our applied moulding as a fraction of the standard leaf, DERIVED. The gap
+   notes below compare the photographs' measured stock against ours, and this
+   side of that comparison used to be typed in: it read "the slim one at 0.043"
+   from when MOULD_BAND was 40 mm, and stayed there when the band moved to 70
+   and closed the gap it was reporting. Same fault as glass.mjs holding our own
+   pane numbers (CLAUDE.md §5 item 9) — a tool that remembers what the drawing
+   does will eventually be describing a drawing that no longer exists. */
+const OURS_BAND = MOULD_BAND / (SIZES.standard.w - REBATE * 2);
+const ours = OURS_BAND.toFixed(3);
 
 /**
  * Ten doors, chosen to span the vocabulary rather than to flatter it: plain,
@@ -35,9 +47,9 @@ const CASES = [
     gap: 'brass lever in the photograph, nickel in ours; also missing the ribbed aluminium sill' },
   { id: 'd048', label: 'designed 4800 - two panels',
     q: 'c=rb-5103d&w=none&z=clear&g=none&n=none&k=coral&d=panel2&s=standard&h=left-in',
-    gap: 'the photo has a peephole set inside a ring knocker (both withdrawn), and its '
-       + 'moulding is the corpus\'s HEAVY stock at 0.084 of leaf width where we now draw '
-       + 'the slim one at 0.043 — see MOULD_BAND' },
+    gap: 'the photo has a peephole set inside a ring knocker (both withdrawn); its '
+       + `moulding is the corpus's HEAVY stock at 0.084 of leaf width and ours is ${ours} `
+       + '— see MOULD_BAND' },
   { id: 'd078', label: 'designed 5900 - eleven strips',
     q: 'c=rb-0096d&w=none&z=clear&g=none&n=nitzan&k=cadoor&d=strips&s=standard&h=left-in',
     gap: 'the bar is 0.32 of leaf height; our shortest is 0.39' },
