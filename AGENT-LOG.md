@@ -23,6 +23,35 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-19 — run 1 (smoke test): found a real bug, could not push
+
+**Looked at:** the closed accordion at phone and desktop widths.
+**Instruments:** all six green.
+**Found:** the static section sub-caption (`.sect__sub`, e.g. "חלון, סוג
+זכוכית, סורג") was truncating to "…", unlike the line beside it which is
+*meant* to truncate because it changes with the selection. Correct catch.
+**Changed:** nothing reached origin. **The push was refused 403** — the
+trigger-fired session had read access to the repo but not write, and the
+environment came up with no clone at all. The commit died with the container.
+
+**Fixed afterwards from the interactive session**, which does hold push
+credentials — see the commit that follows this entry. The finding was
+reproduced properly first (clipped by 6px at 1280 and 1680, 17px at 320),
+then fixed further than the original: letting the caption wrap alone left
+"סורג" orphaned on a second line and made one row taller than the other three.
+The real fault was underneath it — `.sect__now` was `flex: 1 1 auto` and
+`.sect__text` was `flex: 0 1 auto`, so the line that is DESIGNED to be cut
+short was claiming space from the line that is not.
+
+**Plumbing:** the Routine now fires into a session that has the repository
+attached with push credentials, instead of a fresh one that does not. A
+trigger-spawned session inherits the ENVIRONMENT's sources, and this
+environment has none; `session_context.sources` is per-session.
+
+**Commit:** none from the run itself.
+
+---
+
 ## 2026-08-18 — set up, no run yet
 
 The Routine was created in this session: every five hours, a fresh session in

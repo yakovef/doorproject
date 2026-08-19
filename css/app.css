@@ -258,19 +258,38 @@ body {
 }
 .sect__head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 
-.sect__text { flex: 0 1 auto; min-inline-size: 0; display: grid; gap: 2px; }
+/* The text block takes the space it needs; the line beside it yields.
+   It was the other way round — `.sect__now` grew and this shrank — which is
+   backwards, because `.sect__now` is the one designed to be cut short and this
+   one is not. With the priorities swapped the description fits on one line at
+   every width above 320px instead of orphaning its last word. */
+.sect__text { flex: 1 1 auto; min-inline-size: 0; display: grid; gap: 2px; }
 .sect__title { font-size: 1rem; font-weight: 600; color: var(--ink); }
 /* What is inside, for a customer who does not yet know which of the four
    holds the thing they came to change. */
+/* WRAPS, where the line below it truncates — and the difference is the whole
+   point. This text is STATIC: it comes from the SECTIONS table and says what
+   is inside the section, so it reads the same on every visit. Truncating it
+   to "חלון, סוג זכוכי…" hides the last item of a list whose entire job is to
+   tell a customer which of the four headings holds the thing they came to
+   change, and buys nothing in return.
+   It got `nowrap` because the rule was written by copying the one below,
+   whose reasoning — a row that changes height as the selection changes makes
+   the list jump under the finger — is true of a line that CHANGES and false
+   of one that cannot. Measured before it was believed: clipped by 6px at
+   1280 and 1680, and by 17px at 320. */
 .sect__sub {
   font-size: .74rem; color: var(--ink-2);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  /* If it does have to take two lines on a narrow column, break them evenly
+     rather than leaving one word stranded underneath. */
+  text-wrap: balance;
 }
 /* The choices made inside, so a closed section still answers its own
    question. Truncates rather than wrapping: a row that changes height as the
    selection changes makes the list jump under the finger. */
 .sect__now {
-  flex: 1 1 auto; min-inline-size: 0;
+  /* 5rem so it always shows something — cut short is useful, absent is not. */
+  flex: 0 1 auto; min-inline-size: 5rem;
   font-size: .78rem; color: var(--ink-2);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   text-align: end;
