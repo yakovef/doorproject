@@ -558,9 +558,11 @@
       x: centreX + Math.min(...win.rects.map((r) => (r.dx || 0) - r.w / 2)),
       x1: centreX + Math.max(...win.rects.map((r) => (r.dx || 0) + r.w / 2))
     } : null;
-    const standoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
+    const rawStandoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
+    const panelled = detail.panel && !win.rects.length;
+    const insideField = leafW * (PANEL_INSET + 0.09) + PANEL_GAP - lockBackset(handle, lockset);
+    const standoff = handle.pull && panelled ? Math.max(rawStandoff, insideField) : rawStandoff;
     const handleX = lockX + inward * standoff;
-    const gripClear = handle.pull ? lockBackset(handle, lockset) + standoff + handleFootprint(handle, leafH).in + PANEL_GAP : 0;
     const paint2 = colour.hex;
     const edge = silhouette(paint2);
     const deep = darken(paint2, 0.55);
@@ -594,8 +596,6 @@
           fill="#fff" opacity="0.13"/>
     <rect x="${lx}" y="${floorY - AO_FOOT}" width="${lw}" height="${AO_FOOT}" fill="url(#aoBottom)"/>`;
     const reveal = `
-      <rect x="${x0 - EDGE}" y="${y0 - EDGE}" width="${totalW + EDGE * 2}"
-            height="${EDGE}" fill="url(#edgeTop)"/>
       <rect x="${x0 - EDGE}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
             fill="url(#edgeLeft)"/>
       <rect x="${x1}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
@@ -688,7 +688,7 @@
          it the other way round (0.62 light, 0.42 dark) from a single fixed
          opacity, which is the same colour-blind mistake as the returns. -->
     <linearGradient id="aoBottom" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.55 : 0.26}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.3 : 0.26}"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoLeft" x1="0" y1="0" x2="1" y2="0">
@@ -720,9 +720,15 @@
          from the light. A shaded plane is the SAME PAINT with less light on
          it, so each stop is now a darkened version of the leaf colour at full
          opacity. Same tones, no film. -->
+    <!-- Retuned against the records rather than by eye. The reveal's near_tone
+         across the corpus, split at leaf luminance 150, gives a median of 0.89
+         on LIGHT doors and 0.54 on dark ones — and ours measured 0.76 and 0.40.
+         Too dark on both, and much too dark on white, where the eye has
+         somewhere to compare it to. Reported from the outside as simply "the
+         shadowing is too much, you can see it especially on a white door". -->
     <linearGradient id="retNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="${darken(paint2, pale ? 0.2 : 0.34)}"/>
-      <stop offset="1" stop-color="${darken(paint2, pale ? 0.34 : 0.52)}"/>
+      <stop offset="0" stop-color="${darken(paint2, pale ? 0.06 : 0.2)}"/>
+      <stop offset="1" stop-color="${darken(paint2, pale ? 0.16 : 0.34)}"/>
     </linearGradient>
     <!-- I had this jamb sunlit — brighter than the leaf — because the green
          door's photographs show it that way, caught square-on by the afternoon
@@ -736,9 +742,11 @@
          thirds the depth.
          (This was a /* */ block sitting inside the SVG template literal, so it
          was being emitted into the markup as stray text on every render.) -->
+    <!-- Same retune, same source: far_tone medians are 0.86 light, 0.74 dark.
+         The far jamb was already the lighter of the two, so it moved less. -->
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="${darken(paint2, pale ? 0.13 : 0.22)}"/>
-      <stop offset="1" stop-color="${darken(paint2, pale ? 0.23 : 0.38)}"/>
+      <stop offset="0" stop-color="${darken(paint2, pale ? 0.07 : 0.06)}"/>
+      <stop offset="1" stop-color="${darken(paint2, pale ? 0.17 : 0.18)}"/>
     </linearGradient>
     <!-- The junction ramp, referenced by the reveal band. Darkest against the
          leaf and recovering outward, per the twenty-door measurement — and in
@@ -769,12 +777,12 @@
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
     <linearGradient id="edgeLeft" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0"    stop-color="#000" stop-opacity="0.13"/>
       <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
     <linearGradient id="edgeRight" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0"    stop-color="#000" stop-opacity="0.13"/>
       <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
@@ -1213,7 +1221,7 @@
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint2, pale, winBottom, detail.panels === 2, gripClear) : ""}
+    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint2, pale, winBottom, detail.panels === 2) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
     ${detail.strips ? metalStrips(
       mainX,
@@ -1253,7 +1261,8 @@
       paint2,
       centreX,
       leafW,
-      y0
+      y0,
+      panelled
     )}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? "" : cylinder(lockX, y(CYLINDER_AFF))}
@@ -1539,7 +1548,7 @@ ${body}
     }
     return "";
   }
-  function handleFootprint(handle, leafH) {
+  function handleFootprint(handle, leafH, panelled = false) {
     switch (handle.style) {
       case "none":
         return { out: 0, in: 0, vy: 0 };
@@ -1574,7 +1583,7 @@ ${body}
         return {
           out: Math.max(29, w * 1.15),
           in: Math.max(36, w * 1.15),
-          vy: barHalf(handle.len, leafH)
+          vy: barHalf(handle.len, leafH, panelled)
         };
       }
     }
@@ -1637,7 +1646,7 @@ ${body}
     none: () => "",
     channel: (h, g) => channelHandle(g.cx, g.cy, h.len, g.leafH, g.paint),
     grab: (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
-    bar: (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
+    bar: (h, g) => pullBar(g.cx, g.cy, h, g.leafH, g.panelled),
     shiran: (h, g) => shiranPull(g.cx, g.cy, g.leafH)
   };
   var LOCK_ART = {
@@ -1653,12 +1662,12 @@ ${body}
        carry a pull bar have exactly this beside it and nothing more. */
     cylinder: (h, g) => cylinder(g.cx, g.cy, true)
   };
-  function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0) {
+  function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0, panelled) {
     const draw = GRIP_ART[handle.style];
     if (!draw) return "";
-    const art = draw(handle, { cx, cy, dir, paint: paint2, centreX, leafW, leafH, y0 });
+    const art = draw(handle, { cx, cy, dir, paint: paint2, centreX, leafW, leafH, y0, panelled });
     if (!art) return "";
-    const foot = handleFootprint(handle, leafH);
+    const foot = handleFootprint(handle, leafH, panelled);
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
              data-vy="${foot.vy}">${art}</g>`;
@@ -1672,7 +1681,10 @@ ${body}
              data-carries-lock="${!!lockset.lock}">${draw(lockset, { cx, cy, dir })}</g>`;
   }
   var channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
-  var barHalf = (len, leafH) => Math.min(len, leafH - 320) / 2;
+  var barHalf = (len, leafH, panelled = false) => {
+    const half = Math.min(len, leafH - 320) / 2;
+    return panelled ? Math.min(Math.max(half, leafH * 0.2), leafH * 0.385) : half;
+  };
   function channelHandle(cx, cy, len, leafH, paint2) {
     const half = channelHalf(len, leafH);
     const w = 42;
@@ -1800,9 +1812,9 @@ ${body}
       fix: { kind: "clamp", t: [0.1, 0.9], proj: 0.3, size: 0.62, tall: 0.9 }
     }
   };
-  function pullBar(cx, cy, handle, leafH) {
+  function pullBar(cx, cy, handle, leafH, panelled) {
     const spec = BARS[handle.bar] || BARS.idan;
-    const half = barHalf(handle.len, leafH);
+    const half = barHalf(handle.len, leafH, panelled);
     const w = handle.w || 30, r = w * spec.rx;
     const top = cy - half, bot = cy + half, L = half * 2;
     const at = (t) => top + L * t;
@@ -2151,7 +2163,7 @@ ${body}
     const L = LEVER_REACH;
     const at = (t) => cx + dir * t;
     return `
-    <g data-kind="lever" transform="rotate(${dir * 12} ${cx} ${cy})">
+    <g data-kind="lever">
       <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
                Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
                Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}

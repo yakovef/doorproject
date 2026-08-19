@@ -16,6 +16,44 @@ it, that log is where to look.
 
 ---
 
+## 0b. Change log — the short version
+
+Newest first. **Every change gets a line here**, so this file alone carries the
+facts a fresh context needs. Detail lives in the section it belongs to.
+
+- **Shadows retuned against the records, not by eye.** The head reveal carried
+  a full-width rectangle of black at 0.26 alpha (`edgeTop`) — reported on a
+  white door as "a rectangle that is half black half transparent". Removed: it
+  double-darkened the soffit, which already ramps, and being a rectangle over a
+  trapezoid it ignored the perspective. Jamb returns lightened to the corpus
+  medians (`frame.reveal.near_tone`/`far_tone`, split at leaf luminance 150):
+  light 0.89/0.86, dark 0.54/0.74. Ours had been 0.76/0.90 light. Contact
+  shadow at the foot 0.55 → 0.30 on pale.
+- **The Coral lever is horizontal.** It had a 12° droop on the argument that
+  levers hang. The owner says this one does not.
+- **A pull bar on a panelled door goes INSIDE the panel**, and the panel keeps
+  its size. It used to be the other way round — the panel shrank to leave the
+  bar a stile — and "the frame becoming smaller can't happen". `barHalf` clamps
+  the bar on a panelled leaf so both end bosses land on flat field, never on a
+  moulding: half-length between 0.200 and 0.385 of leaf height.
+- **Every grip works with every lockset** (90/90, all sizes). The observed
+  bar-vs-lever refusal was withdrawn at the owner's request: move the bar.
+- **The moulding is not a raised panel** — `MOULD_SIDE` scales relief, never
+  absolute tone, so both edges of every run land exactly on the paint.
+- **`bloom` was over-bright on dark paint**, which made the whole lower half of
+  the leaf read too dark and one panel shade at half the rate of the other.
+- **Panel inset is 0.23** (measured 0.21–0.39), not the 0.13 a contact-sheet
+  pass produced.
+- **Add-ons and the handle finish are withdrawn**; `f=` and `a=` are retired
+  URL parameters, ignored without a notice. Short code VERSION 9, 8 characters.
+- **The choices panel is four sections**, each opening onto its categories.
+- **The clear pane is a gradient again** — the drawn street was measurably
+  right and visibly wrong.
+- **Assets are cache-stamped** (`?v=<hash>`) or a deploy never reaches a
+  returning browser.
+
+---
+
 ## 0. What this is
 
 A door configurator for **דלתות מגן** (Dlatot Magen), Rishon LeZion. The

@@ -117,6 +117,14 @@ Two things follow for you:
   are long-lived, so your working copy can be stale in a way a fresh session's
   never is. Pull or rebase; never force.
 
+## Keep CLAUDE.md's change log current
+
+`CLAUDE.md` §0b is a newest-first list of every change, one line each. **Add
+your line when you change something**, so that file alone carries what a fresh
+context needs — the owner compacts this conversation regularly and anything
+only in chat is gone. Detail goes in the section it belongs to; §0b is the
+index.
+
 ## Write down what you did
 
 Append an entry to `AGENT-LOG.md`, **newest first**, every run — including the

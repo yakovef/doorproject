@@ -492,20 +492,29 @@ export function render(state) {
      surround on 48 designs while `conflicts()` said the door was fine.
      Two functions computing the same thing is how they end up disagreeing;
      the fix is not to correct both, it is to have one. */
-  const standoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
+  const rawStandoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
+
+  /* A PULL BAR ON A PANELLED DOOR GOES INSIDE THE PANEL, and the panel keeps
+     its size.
+
+     This used to work the other way round: the panel was pushed inboard to
+     leave the bar a flat stile beside it. The owner's objection is exact — the
+     frame becoming smaller because of a handle "can't happen". A panel's
+     proportions are the door's design; a handle is bolted on afterwards and is
+     the thing with somewhere to go.
+
+     So on a panelled leaf the bar moves in past the panel's outer moulding and
+     stands on the flat field inside it, which is where he drew it. The band is
+     0.09 of leaf width, so the field begins at PANEL_INSET + 0.09 from the
+     closing edge; PANEL_GAP past that keeps the standoffs off the moulding's
+     inner arris. The bar still has to clear the lock furniture, so this is a
+     floor and never a ceiling — whichever is further inboard wins. */
+  const panelled = detail.panel && !win.rects.length;
+  const insideField = leafW * (PANEL_INSET + 0.09) + PANEL_GAP - lockBackset(handle, lockset);
+  const standoff = handle.pull && panelled
+    ? Math.max(rawStandoff, insideField)
+    : rawStandoff;
   const handleX = lockX + inward * standoff;
-
-  /* How far inboard of the closing edge a moulded panel has to start, so that
-     the pull bar has a flat stile to stand on. Measured from the closing edge,
-     so handing drops out of it.
-
-     Only for a grip that runs DOWN THE STILE — `pull` marks exactly those. The
-     horizontal grab bar is centred on the leaf and crosses the panel's middle
-     rather than its edge, which no amount of inset would fix and which is a
-     different question. */
-  const gripClear = handle.pull
-    ? lockBackset(handle, lockset) + standoff + handleFootprint(handle, leafH).in + PANEL_GAP
-    : 0;
 
   const paint = colour.hex;
   const edge  = silhouette(paint);
@@ -558,9 +567,21 @@ export function render(state) {
      per side so each can darken toward its own edge (see edgeTop/Left/Right).
      Head first, then the jambs below it, so the two never overlap and the
      corners are not darkened twice. */
+  /* NO BAND ACROSS THE HEAD. There was one — a full-width rectangle of black
+     at 0.26 alpha fading to 0.03 — and it was reported from the outside, on a
+     white door, as "a rectangle that is half black half transparent". Which is
+     exactly what it was.
+     Two things made it read as pasted on rather than as shading. It sat over
+     the SOFFIT, already the darkest plane in the drawing and already carrying
+     its own gradient down to the leaf, so the junction was described twice.
+     And it was a RECTANGLE laid over a trapezoid: the soffit narrows with
+     perspective and this did not, so its straight bottom edge cut across the
+     geometry instead of following it.
+     Measured, it dragged the soffit's foot to 0.59 of the leaf on a white door
+     where the corpus median for a head reveal is 0.70. The soffit's own
+     gradient does this job; the jambs keep their bands because there is no
+     second plane there doing it for them. */
   const reveal = `
-      <rect x="${x0 - EDGE}" y="${y0 - EDGE}" width="${totalW + EDGE * 2}"
-            height="${EDGE}" fill="url(#edgeTop)"/>
       <rect x="${x0 - EDGE}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
             fill="url(#edgeLeft)"/>
       <rect x="${x1}" y="${y0}" width="${EDGE}" height="${floorY - y0}"
@@ -654,7 +675,7 @@ export function render(state) {
          it the other way round (0.62 light, 0.42 dark) from a single fixed
          opacity, which is the same colour-blind mistake as the returns. -->
     <linearGradient id="aoBottom" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.55 : 0.26}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${pale ? 0.30 : 0.26}"/>
       <stop offset="1" stop-color="#000" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="aoLeft" x1="0" y1="0" x2="1" y2="0">
@@ -686,9 +707,15 @@ export function render(state) {
          from the light. A shaded plane is the SAME PAINT with less light on
          it, so each stop is now a darkened version of the leaf colour at full
          opacity. Same tones, no film. -->
+    <!-- Retuned against the records rather than by eye. The reveal's near_tone
+         across the corpus, split at leaf luminance 150, gives a median of 0.89
+         on LIGHT doors and 0.54 on dark ones — and ours measured 0.76 and 0.40.
+         Too dark on both, and much too dark on white, where the eye has
+         somewhere to compare it to. Reported from the outside as simply "the
+         shadowing is too much, you can see it especially on a white door". -->
     <linearGradient id="retNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="${darken(paint, pale ? 0.20 : 0.34)}"/>
-      <stop offset="1" stop-color="${darken(paint, pale ? 0.34 : 0.52)}"/>
+      <stop offset="0" stop-color="${darken(paint, pale ? 0.06 : 0.20)}"/>
+      <stop offset="1" stop-color="${darken(paint, pale ? 0.16 : 0.34)}"/>
     </linearGradient>
     <!-- I had this jamb sunlit — brighter than the leaf — because the green
          door's photographs show it that way, caught square-on by the afternoon
@@ -702,9 +729,11 @@ export function render(state) {
          thirds the depth.
          (This was a /* */ block sitting inside the SVG template literal, so it
          was being emitted into the markup as stray text on every render.) -->
+    <!-- Same retune, same source: far_tone medians are 0.86 light, 0.74 dark.
+         The far jamb was already the lighter of the two, so it moved less. -->
     <linearGradient id="retFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="${darken(paint, pale ? 0.13 : 0.22)}"/>
-      <stop offset="1" stop-color="${darken(paint, pale ? 0.23 : 0.38)}"/>
+      <stop offset="0" stop-color="${darken(paint, pale ? 0.07 : 0.06)}"/>
+      <stop offset="1" stop-color="${darken(paint, pale ? 0.17 : 0.18)}"/>
     </linearGradient>
     <!-- The junction ramp, referenced by the reveal band. Darkest against the
          leaf and recovering outward, per the twenty-door measurement — and in
@@ -735,12 +764,12 @@ export function render(state) {
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
     <linearGradient id="edgeLeft" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0"    stop-color="#000" stop-opacity="0.13"/>
       <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
     <linearGradient id="edgeRight" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.26"/>
+      <stop offset="0"    stop-color="#000" stop-opacity="0.13"/>
       <stop offset="0.45" stop-color="#000" stop-opacity="0.14"/>
       <stop offset="1"    stop-color="#000" stop-opacity="0.03"/>
     </linearGradient>
@@ -1172,7 +1201,7 @@ export function render(state) {
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom, detail.panels === 2, gripClear) : ''}
+    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom, detail.panels === 2) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone,
                                   detail.vertical, hingeOnLeft) : ''}
@@ -1189,7 +1218,7 @@ export function render(state) {
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
     ${gripArt(handle, handleX, y(HANDLE_AFF), leafH, leverDir, paint,
-              centreX, leafW, y0)}
+              centreX, leafW, y0, panelled)}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
@@ -1816,7 +1845,7 @@ function grillePaths(kind, x, y, w, h, tint) {
  * numbers back. A footprint that disagrees with the art is worse than no
  * footprint, because it is believed.
  */
-function handleFootprint(handle, leafH) {
+function handleFootprint(handle, leafH, panelled = false) {
   switch (handle.style) {
     case 'none':    return { out: 0, in: 0, vy: 0 };
     case 'channel': return { out: 21, in: 21, vy: channelHalf(handle.len, leafH) };
@@ -1840,7 +1869,7 @@ function handleFootprint(handle, leafH) {
          section with a floor at the widest reading, which errs the safe way. */
       const w = handle.w || 30;
       return { out: Math.max(29, w * 1.15), in: Math.max(36, w * 1.15),
-               vy: barHalf(handle.len, leafH) };
+               vy: barHalf(handle.len, leafH, panelled) };
     }
   }
 }
@@ -2008,7 +2037,7 @@ const GRIP_ART = {
   none:    () => '',
   channel: (h, g) => channelHandle(g.cx, g.cy, h.len, g.leafH, g.paint),
   grab:    (h, g) => grabHandle(g.cx, g.cy, g.dir, g.centreX, g.leafW, g.leafH, g.y0),
-  bar:     (h, g) => pullBar(g.cx, g.cy, h, g.leafH),
+  bar:     (h, g) => pullBar(g.cx, g.cy, h, g.leafH, g.panelled),
   shiran:  (h, g) => shiranPull(g.cx, g.cy, g.leafH),
 };
 
@@ -2026,12 +2055,12 @@ const LOCK_ART = {
   cylinder: (h, g) => cylinder(g.cx, g.cy, true),
 };
 
-function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0) {
+function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled) {
   const draw = GRIP_ART[handle.style];
   if (!draw) return '';
-  const art = draw(handle, { cx, cy, dir, paint, centreX, leafW, leafH, y0 });
+  const art = draw(handle, { cx, cy, dir, paint, centreX, leafW, leafH, y0, panelled });
   if (!art) return '';
-  const foot = handleFootprint(handle, leafH);
+  const foot = handleFootprint(handle, leafH, panelled);
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
              data-vy="${foot.vy}">${art}</g>`;
@@ -2047,7 +2076,24 @@ function locksetArt(lockset, cx, cy, dir) {
 }
 
 const channelHalf = (len, leafH) => Math.min(len, leafH - 420) / 2;
-const barHalf     = (len, leafH) => Math.min(len, leafH - 320) / 2;
+/**
+ * Half a pull bar's drawn length.
+ *
+ * `panelled` clamps it so both END BOSSES land on flat field rather than on a
+ * moulding — you bolt a standoff through a flat face, not through a profile,
+ * and the owner marked exactly this. With the panels at 0.07-0.58 and
+ * 0.66-0.92 and a band of 0.09 W, the open fields are 0.107-0.543 and
+ * 0.697-0.883, and the bar is centred at 0.498 of leaf height — so the foot
+ * needs a half-length between 0.200 and 0.385 of it. Six of the seven bars
+ * already sit inside that; only Nitzan misses, by 8 mm, and gains 10.
+ * Clamped HERE rather than in the drawing so `handleFootprint` and `pullBar`
+ * cannot disagree about how long the bar is — that is the mistake this file
+ * keeps having to relearn.
+ */
+const barHalf = (len, leafH, panelled = false) => {
+  const half = Math.min(len, leafH - 320) / 2;
+  return panelled ? Math.min(Math.max(half, leafH * 0.200), leafH * 0.385) : half;
+};
 
 /** Recessed vertical channel with the grip inside — the style in ref-00. */
 function channelHandle(cx, cy, len, leafH, paint) {
@@ -2206,9 +2252,9 @@ const BARS = {
   },
 };
 
-function pullBar(cx, cy, handle, leafH) {
+function pullBar(cx, cy, handle, leafH, panelled) {
   const spec = BARS[handle.bar] || BARS.idan;
-  const half = barHalf(handle.len, leafH);
+  const half = barHalf(handle.len, leafH, panelled);
   const w = handle.w || 30, r = w * spec.rx;
   const top = cy - half, bot = cy + half, L = half * 2;
   const at = t => top + L * t;
@@ -2727,11 +2773,13 @@ const disc = (cx, cy, r) => `
  * thing is built from the rosette outward so it cannot degenerate.
  */
 function lever(cx, cy, dir) {
-  /* Levers hang. Every one in the photographs sits nose-down by 10-15 degrees
-     — it is sprung to horizontal but the handle's own weight and the latch's
-     slack take it below, and a lever drawn dead level is the single clearest
-     tell that a door was drawn rather than photographed. Rotated about the
-     spindle so the rose stays put. */
+  /* HORIZONTAL. This carried a 12-degree droop, on the argument that a lever
+     hangs — sprung to level, but pulled below it by its own weight and the
+     latch's slack. The owner, who sells these, says the Coral does not: it
+     sits level, and the droop was the clearest thing wrong with it. Kept as a
+     note because the reasoning was not silly, it was just not true of this
+     product; if a future lever really does hang, the rotation goes back on
+     that lever rather than on all of them. */
   const L = LEVER_REACH;
   const at = t => cx + dir * t;               // distance along the lever
   /* `data-kind` so a test can count levers. The horizontal grab bar used to
@@ -2741,7 +2789,7 @@ function lever(cx, cy, dir) {
      that never appeared in the message to Peretz. A thing that APPEARS rather
      than breaks, which is the same family as CLAUDE.md §5 read backwards. */
   return `
-    <g data-kind="lever" transform="rotate(${dir * 12} ${cx} ${cy})">
+    <g data-kind="lever">
       <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
                Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
                Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}
