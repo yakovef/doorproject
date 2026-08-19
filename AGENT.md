@@ -63,6 +63,31 @@ was wrong. An assertion quietly loosened is worse than the bug it was hiding.
 
 ---
 
+## One mistake this project keeps making: forgetting that doors have depth
+
+Three compatibility rules have now been written and then withdrawn, and all
+three were the same error. You are looking at a **square-on elevation**, which
+has no depth in it, so two things that overlap in the drawing look like two
+things that collide. On the actual door they are usually at different heights
+off the face: a lever is bolted through the leaf and stands 30–60 mm proud, a
+pull bar 50 mm on its standoffs, the glass sits flush behind a 40 mm surround.
+The pull-bar-versus-lever refusal, the panel shrinking to make room for a bar,
+and the lockset-versus-glazing refusal all died of this.
+
+The lockset one was the worst, because it was also wrong on its own terms: it
+compared two HORIZONTAL distances and never asked whether the glass and the
+handle were even at the same height. Of the 89 pairings it refused, only 21 put
+the fitting over a pane at all.
+
+So before you write a rule of that shape, ask two questions out loud. **Are
+these two things at the same height?** — measure it, do not look at it. **Which
+of them is in front?** If one is in front, the answer is compositing order and
+a shadow, not a refusal. The exception is what is BOLTED DOWN: `data-mount`
+marks the rosettes and backplates, and `npm run collide` asserts those land on
+solid material, because depth does not help a screw.
+
+---
+
 ## How to know whether you are right
 
 Guessing is what this project keeps having to undo. There are instruments, and

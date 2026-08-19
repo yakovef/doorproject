@@ -21,6 +21,28 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Every main handle now works with every glass option.** `locksetClashesGlass`
+  is gone, with the window and size refusals that only existed to close its
+  loop, and `collide` no longer counts hardware over a pane as a hit. The
+  owner's argument is depth: lock furniture is bolted THROUGH the leaf and
+  stands 30–60 mm proud, the glass is set flush behind a 40 mm surround, so a
+  blade that overlaps a pane in a square-on drawing passes in front of it.
+  The rule was also wrong on its own terms — it compared two HORIZONTAL
+  distances and never asked whether the glass and the handle were at the same
+  height, so of the 89 pairings it refused, measured on real geometry only 21
+  overlap a pane at all; the rest were swan-necks beside high square lights
+  that stop 500 mm above the lever. **This is the third rule withdrawn for the
+  same reason** (after pull-bar-vs-lever, and the panel shrinking for a bar): a
+  square-on elevation has no depth in it, and two things overlapping in a flat
+  drawing are not two things touching.
+  What replaces it is narrower and measured: `data-mount` marks the BOLTED-DOWN
+  shape of each fitting — rosette, backplate, smart-lock slab — and `npm run
+  collide` asserts it never lands on glass, because you cannot bolt anything to
+  a pane. Across 1,966 glazed designs and 2,580 mount boxes the tightest gap is
+  **8 mm** (Cadoor + tallwin + narrow: the escutcheon sits 32 mm into the 40 mm
+  surround), so a wider rose or a wider window has to be re-measured there.
+  No `VERSION` bump — no id, option order or bit layout moved, and an old short
+  code now opens the door it always encoded instead of arriving repaired.
 - **The soft overlays cut back hard, and the jambs made to read like the
   soffit.** The leaf's side AO 0.24 → 0.09, the contact shadow 0.30 → 0.14, and
   the jamb edge bands 0.13 → 0.05. That last one also had a real defect: the

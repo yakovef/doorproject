@@ -1987,19 +1987,23 @@ export function gripClashesGlass(state) {
   return floor > room;
 }
 
-/**
- * Does the LOCKSET itself run into the glazing?
- *
- * Only the grip was ever checked. But a lever reaches 152 mm inboard and the
- * Almog swan-neck 220, and on a narrow leaf with a tall light the glazing
- * starts at 131 — so the blade crossed the pane on 34 designs, with nothing
- * looking.
- */
-export function locksetClashesGlass(state) {
-  const size = SIZES[state.size] || SIZES.standard;
-  const lock = handleFootprint(byId(LOCKSETS, state.lockset), size.h - REBATE);
-  return lock.in + LOCK_CLEAR > glassClearance(state);
-}
+/* GONE: `locksetClashesGlass`. It asked whether the lock furniture's drawn
+   width reached past the aperture moulding, and refused the pairing when it
+   did — 89 combinations, every one of which the owner says he builds.
+
+   The reason it was wrong is worth keeping, because it is the same reason the
+   pull-bar-versus-lever rule was wrong: this is a square-on elevation and a
+   square-on elevation has no depth in it. Lock furniture is bolted THROUGH the
+   leaf and stands 30-60 mm proud; the glass is set flush behind a 40 mm
+   surround. A blade drawn across a pane passes in front of it.
+
+   Nothing replaces it, and nothing should without a new argument. What DOES
+   still hold the line is `gripClashesGlass` below — a pull bar is a second
+   object competing for the same stile, not a blade sweeping over a pane — and
+   the compositing order in `render`, where `#hardware` is drawn after
+   `#glazing` and every fitting casts `hwShadow` onto whatever is under it.
+
+   `glassClearance` stays: `gripStandoff` needs it. */
 
 /**
  * Does the grip run into the lockset, where the grip is drawn?
@@ -2417,7 +2421,7 @@ function plateHandle(cx, cy, dir) {
             fill="#000" opacity="0.40" filter="url(#hwShadow)"/>
 
       <!-- the plate: mid-dark face, bright rim, one lit band off centre -->
-      <path d="${outline}" fill="url(#plateFace)"/>
+      <path data-mount="backplate" d="${outline}" fill="url(#plateFace)"/>
       <path d="${outline}" fill="none" stroke="#fff" stroke-opacity="0.62" stroke-width="3.4"
             transform="translate(${dir * 1.2} -1.6)"/>
       <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.46" stroke-width="2.4"
@@ -2503,7 +2507,7 @@ function knobPlate(cx, cy, dir) {
     <g data-hw="handle" data-style="knobplate">
       <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
             filter="url(#hwShadow)"/>
-      <path d="${d}" fill="url(#nickel)"/>
+      <path data-mount="backplate" d="${d}" fill="url(#nickel)"/>
       <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2"
             vector-effect="non-scaling-stroke"/>
       <!-- the knob, standing off the plate -->
@@ -2543,7 +2547,8 @@ function digitalLock(cx, cy, dir) {
     <g data-hw="lockset-art" data-style="digital">
       <rect x="${x + dir * 5}" y="${y + 6}" width="${W}" height="${H}" rx="${r}"
             fill="#000" opacity="0.36" filter="url(#hwShadow)"/>
-      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="#25292D"/>
+      <rect data-mount="slab"
+            x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="#25292D"/>
       <!-- one soft band of key light down the slab, and no specular anywhere:
            this is the only fitting on the door that is not polished metal -->
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="url(#keyWash)" opacity="0.5"/>
@@ -2580,7 +2585,8 @@ function squarePlates(cx, cy, dir) {
   const plate = (py, label) => `
       <rect x="${cx - S / 2 + dir * 5}" y="${py + 6}" width="${S}" height="${S}" rx="${r}"
             fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
-      <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="url(#plateFace)"/>
+      <rect data-mount="plate"
+            x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="url(#plateFace)"/>
       <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="none"
             stroke="#fff" stroke-opacity="0.55" stroke-width="2.6"
             transform="translate(${dir * 1.1} -1.4)"/>
@@ -2643,7 +2649,8 @@ function sapirKnob(cx, cy, dir) {
     <g>
       <rect x="${cx - half + dir * 6}" y="${cy - half + 8}" width="${side}" height="${side}"
             rx="${r}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      <rect x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
+      <rect data-mount="plate"
+            x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
             fill="url(#plateFace)"/>
       <rect x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
             fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="2"/>
@@ -2777,14 +2784,19 @@ function brushing(cx, cy, rFrom, rTo, n = 14) {
 }
 
 /** A turned disc: cast shadow, body, machined steps, brushing, rim. */
+/* `data-mount` — see the note on MOUNTING vs REACH above `handleFootprint`.
+   A rosette is bolted flat to the leaf, so it has to land on solid material;
+   the blade growing out of it does not. */
 const disc = (cx, cy, r) => `
+    <g data-mount="rose">
       <circle cx="${cx + 3}" cy="${cy + 5}" r="${r}" fill="#000" opacity="0.36"
               filter="url(#hwShadow)"/>
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#nickel)"/>
       ${step(cx, cy, r - 1.5, 3, 0.5, 0.34)}
       ${step(cx, cy, r * 0.82, 2.4, 0.34, 0.26)}
       ${step(cx, cy, r * 0.7, 2, 0.26, 0.2)}
-      ${brushing(cx, cy, r * 0.16, r * 0.62)}`;
+      ${brushing(cx, cy, r * 0.16, r * 0.62)}
+    </g>`;
 
 /**
  * Brushed-nickel lever on a turned rosette, after the supplied hardware photo:

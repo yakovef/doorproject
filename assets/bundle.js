@@ -1643,11 +1643,6 @@ ${body}
     const room = glassClearance(state2) - grip.in - LOCK_CLEAR;
     return floor > room;
   }
-  function locksetClashesGlass(state2) {
-    const size = SIZES[state2.size] || SIZES.standard;
-    const lock = handleFootprint(byId(LOCKSETS, state2.lockset), size.h - REBATE);
-    return lock.in + LOCK_CLEAR > glassClearance(state2);
-  }
   function gripClashesLockset(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const handle = byId(HANDLES, state2.handle);
@@ -1933,7 +1928,7 @@ ${body}
             fill="#000" opacity="0.40" filter="url(#hwShadow)"/>
 
       <!-- the plate: mid-dark face, bright rim, one lit band off centre -->
-      <path d="${outline}" fill="url(#plateFace)"/>
+      <path data-mount="backplate" d="${outline}" fill="url(#plateFace)"/>
       <path d="${outline}" fill="none" stroke="#fff" stroke-opacity="0.62" stroke-width="3.4"
             transform="translate(${dir * 1.2} -1.6)"/>
       <path d="${outline}" fill="none" stroke="#000" stroke-opacity="0.46" stroke-width="2.4"
@@ -1990,7 +1985,7 @@ ${body}
     <g data-hw="handle" data-style="knobplate">
       <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
             filter="url(#hwShadow)"/>
-      <path d="${d}" fill="url(#nickel)"/>
+      <path data-mount="backplate" d="${d}" fill="url(#nickel)"/>
       <path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.30" stroke-width="2"
             vector-effect="non-scaling-stroke"/>
       <!-- the knob, standing off the plate -->
@@ -2013,7 +2008,8 @@ ${body}
     <g data-hw="lockset-art" data-style="digital">
       <rect x="${x + dir * 5}" y="${y + 6}" width="${W}" height="${H}" rx="${r}"
             fill="#000" opacity="0.36" filter="url(#hwShadow)"/>
-      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="#25292D"/>
+      <rect data-mount="slab"
+            x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="#25292D"/>
       <!-- one soft band of key light down the slab, and no specular anywhere:
            this is the only fitting on the door that is not polished metal -->
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="${r}" fill="url(#keyWash)" opacity="0.5"/>
@@ -2040,7 +2036,8 @@ ${body}
     const plate = (py, label) => `
       <rect x="${cx - S / 2 + dir * 5}" y="${py + 6}" width="${S}" height="${S}" rx="${r}"
             fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
-      <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="url(#plateFace)"/>
+      <rect data-mount="plate"
+            x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="url(#plateFace)"/>
       <rect x="${cx - S / 2}" y="${py}" width="${S}" height="${S}" rx="${r}" fill="none"
             stroke="#fff" stroke-opacity="0.55" stroke-width="2.6"
             transform="translate(${dir * 1.1} -1.4)"/>
@@ -2094,7 +2091,8 @@ ${body}
     <g>
       <rect x="${cx - half + dir * 6}" y="${cy - half + 8}" width="${side}" height="${side}"
             rx="${r}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
-      <rect x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
+      <rect data-mount="plate"
+            x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
             fill="url(#plateFace)"/>
       <rect x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
             fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="2"/>
@@ -2174,13 +2172,15 @@ ${body}
     return out;
   }
   var disc = (cx, cy, r) => `
+    <g data-mount="rose">
       <circle cx="${cx + 3}" cy="${cy + 5}" r="${r}" fill="#000" opacity="0.36"
               filter="url(#hwShadow)"/>
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#nickel)"/>
       ${step(cx, cy, r - 1.5, 3, 0.5, 0.34)}
       ${step(cx, cy, r * 0.82, 2.4, 0.34, 0.26)}
       ${step(cx, cy, r * 0.7, 2, 0.26, 0.2)}
-      ${brushing(cx, cy, r * 0.16, r * 0.62)}`;
+      ${brushing(cx, cy, r * 0.16, r * 0.62)}
+    </g>`;
   function lever(cx, cy, dir) {
     const L = LEVER_REACH;
     const at = (t) => cx + dir * t;
@@ -2519,7 +2519,7 @@ ${body}
   var isLineWork = (detail) => !!(detail.strips || detail.groove);
   var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
   var isGlazed = (state2) => leafGlazed(state2) || !!(SIZES[state2.size] || {}).sideGlazed;
-  var locksetFits = (state2, id) => !locksetClashesGlass({ ...state2, lockset: id }) && !gripClashesLockset({ ...state2, lockset: id });
+  var locksetFits = (state2, id) => !gripClashesLockset({ ...state2, lockset: id });
   function fallbackLockset(state2) {
     if (locksetFits(state2, "cylinder")) return "cylinder";
     const k = LOCKSETS.find((x) => locksetFits(state2, x.id));
@@ -2559,11 +2559,6 @@ ${body}
       }
     }
     for (const k of LOCKSETS) {
-      if (locksetClashesGlass({ ...state2, lockset: k.id })) {
-        out.lockset[k.id] = out.lockset[k.id] || "אין מקום בין המנעול לחלון";
-      }
-    }
-    for (const k of LOCKSETS) {
       if (gripClashesLockset({ ...state2, lockset: k.id })) {
         out.lockset[k.id] = out.lockset[k.id] || "אין מקום בין המאחז למנעול";
       }
@@ -2572,13 +2567,6 @@ ${body}
       if (gripClashesLockset({ ...state2, handle: h.id })) {
         out.handle[h.id] = out.handle[h.id] || "אין מקום בין המאחז למנעול";
       }
-    }
-    for (const w of WINDOWS) {
-      if (out.window[w.id] || !w.rects.length) continue;
-      if (!fallbackLockset({ ...state2, window: w.id })) out.window[w.id] = "אין מקום למנעול לצד החלון";
-    }
-    for (const key of Object.keys(SIZES)) {
-      if (!fallbackLockset({ ...state2, size: key })) out.size[key] = "אין מקום למנעול לצד החלון";
     }
     const bandTop = 0.42, bandBot = 0.6;
     const acrossCentre = (win) => win.rects.some((r) => r.top / 2050 < bandBot && (r.top + r.h) / 2050 > bandTop && Math.abs(r.dx || 0) < r.w / 2 + 60);
@@ -2617,19 +2605,12 @@ ${body}
         changed.push("handle");
       }
     }
-    if (locksetClashesGlass(s) || gripClashesLockset(s)) {
-      if (intent === "lockset") {
-        s.handle = "none";
-        s.window = "none";
-        changed.push("window");
-      } else {
+    if (gripClashesLockset(s)) {
+      if (intent !== "lockset") {
         const k = fallbackLockset(s);
         if (k) {
           s.lockset = k;
           changed.push("lockset");
-        } else {
-          s.window = "none";
-          changed.push("window");
         }
       }
       if (gripClashesLockset(s)) {
@@ -2664,7 +2645,10 @@ ${body}
     grille: "הסרנו את הסורג — אין חלון",
     glazing: "החזרנו זכוכית שקופה — אין חלון",
     handle: "הסרנו את ידית המשיכה — אין לה מקום כאן",
-    lockset: "החלפנו את המנעול — אין לו מקום ליד החלון"
+    /* Not "beside the window" any more: a lockset is only ever moved out of the
+       way of the grab bar now, and a toast that names the wrong culprit is worse
+       than no toast at all. */
+    lockset: "החלפנו את המנעול — אין לו מקום ליד המאחז"
   })[changed[0]] || null;
 
   // js/url-state.js

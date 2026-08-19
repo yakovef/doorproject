@@ -215,23 +215,61 @@ const hits = await p.evaluate(({ cases, allowed }) => {
            name those look like overlaps and accounted for 1,580 of the first
            run's 3,344 hits. Asked by containment they are what they are. */
         if (a.el.contains(c.el) || c.el.contains(a.el)) continue;
-        /* HARDWARE OVER FACE DETAIL is layering, not collision. A pull bar
-           crosses applied metal strips on d078 and a moulded panel on d087 and
-           d122; the bar is 50 mm off the door and the strips are on it, so in
-           a square-on drawing the bar is simply in front. Refusing those
-           combinations would refuse three of Peretz's own doors.
-           This is exactly the argument the LEVER used to be excused by, and it
-           was wrong there — because a lever and a bar are BOTH hardware, both
-           standing off the same face, and neither is behind the other. The
+        /* HARDWARE OVER ANYTHING THAT IS NOT HARDWARE is layering, not
+           collision. A pull bar crosses applied metal strips on d078 and a
+           moulded panel on d087 and d122; the bar is 50 mm off the door and
+           the strips are on it, so in a square-on drawing the bar is simply in
+           front. Refusing those would refuse three of Peretz's own doors.
+           The GLASS used to be excepted from that — hardware over a pane
+           counted as a hit — and the exception was the flat-drawing mistake in
+           miniature: a lever bolted through the stile and standing 30-60 mm
+           proud is in front of a pane set flush behind a 40 mm surround, in
+           exactly the way it is in front of a moulding. The owner made that
+           ruling and `js/rules.js` now follows it, so this tool has to as well
+           or it reports 89 designs the site deliberately allows.
+           Hardware against hardware stays a real hit: a lever and a bar are
+           BOTH standing off the same face and neither is behind the other. So
+           does glass against face detail — a panel moulding over a pane is a
+           hole in the wrong place, not a thing in front of one. The
            distinction is the layer, not the depth. */
-        if ((a.layer === 'hw') !== (c.layer === 'hw')
-            && a.layer !== 'glass' && c.layer !== 'glass') continue;
+        if ((a.layer === 'hw') !== (c.layer === 'hw')) continue;
         if (allowed.includes(`${a.n}|${c.n}`)) continue;
         const ox = Math.min(a.x + a.w, c.x + c.w) - Math.max(a.x, c.x);
         const oy = Math.min(a.y + a.h, c.y + c.h) - Math.max(a.y, c.y);
         /* 2 mm of slack: shadows and non-scaling strokes bleed a pixel. */
         if (ox > 2 && oy > 2) {
           out.push({ pair: `${a.n} x ${c.n}`, ox: Math.round(ox), oy: Math.round(oy),
+                     st: `${st.handle}+${st.lockset}/${st.window}/${st.size}/${st.handing}`
+                        + (st.detail !== 'plain' ? `/${st.detail}` : '') });
+        }
+      }
+    }
+
+    /* THE ONE THING DEPTH DOES NOT EXCUSE.
+       Hardware over glass is allowed above because a lever is cantilevered out
+       over the pane on its spindle. But the part it is cantilevered FROM — the
+       rosette, the backplate, the smart lock's slab — is bolted flat to the
+       leaf, and you cannot bolt anything to a sheet of glass. So the exemption
+       is scoped to exactly what earns it: `data-mount` marks the bolted-down
+       shape in each fitting's art, and it must land on solid material.
+       This is what actually replaces `locksetClashesGlass`, and it is a
+       narrower claim measured on the drawing rather than a wider one asserted
+       from a footprint table.
+       It passes everywhere, but not by much: across 1,966 glazed designs and
+       2,580 mount boxes the tightest gap is 8 mm, on a Cadoor knob beside a
+       tall light on a narrow leaf, where the cylinder escutcheon sits 32 mm
+       into the 40 mm aperture surround. Solid steel, but there is no room
+       left — so a wider rose, a wider window or a smaller backset is a change
+       that has to be re-measured here rather than reasoned about. */
+    for (const m of svg.querySelectorAll('[data-mount]')) {
+      let M; try { M = m.getBBox(); } catch { continue; }
+      for (const pane of svg.querySelectorAll('[data-pane]')) {
+        const P = pane.getBBox();
+        const ox = Math.min(M.x + M.width, P.x + P.width) - Math.max(M.x, P.x);
+        const oy = Math.min(M.y + M.height, P.y + P.height) - Math.max(M.y, P.y);
+        if (ox > 2 && oy > 2) {
+          out.push({ pair: `${m.dataset.mount} bolted to glass`,
+                     ox: Math.round(ox), oy: Math.round(oy),
                      st: `${st.handle}+${st.lockset}/${st.window}/${st.size}/${st.handing}`
                         + (st.detail !== 'plain' ? `/${st.detail}` : '') });
         }

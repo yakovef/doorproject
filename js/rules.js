@@ -20,6 +20,13 @@
  *   "this does not fit", and they are computed from the same numbers the
  *   drawing uses rather than listed, so they cannot drift away from it.
  *
+ * A GEOMETRIC rule is only as good as its model of the door, and the model
+ * here is a square-on elevation — which has no depth in it. That is how the
+ * lockset-versus-glazing rule came to refuse 89 buildable doors: two things
+ * overlapping in a flat drawing are not two things touching. Both withdrawals
+ * below turned out to be this same mistake, so a third rule of this shape
+ * deserves the question asked out loud before it is written.
+ *
  * ── what the corpus actually said ────────────────────────────────────
  * This was checked rather than assumed, and it came back partly against the
  * assumption that prompted it. Counted over 31 measured doors:
@@ -45,7 +52,7 @@
  */
 
 import { byId, DETAILS, GLAZINGS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
-import { gripClashesGlass, gripClashesLockset, locksetClashesGlass } from './renderer.js';
+import { gripClashesGlass, gripClashesLockset } from './renderer.js';
 
 /** Does this detail put ruled line work on the face? */
 export const isLineWork = detail => !!(detail.strips || detail.groove);
@@ -67,9 +74,14 @@ export const leafGlazed = state => byId(WINDOWS, state.window).rects.length > 0;
 export const isGlazed = state =>
   leafGlazed(state) || !!(SIZES[state.size] || {}).sideGlazed;
 
-/** Would this lockset fit this design, glass and grip both considered? */
-const locksetFits = (state, id) =>
-  !locksetClashesGlass({ ...state, lockset: id }) && !gripClashesLockset({ ...state, lockset: id });
+/**
+ * Would this lockset fit this design?
+ *
+ * Only the GRIP is asked now. The glazing used to be asked too — see the
+ * withdrawal note in `conflicts` — and the difference matters here more than
+ * anywhere else, because this is what `repair` and the window rules read.
+ */
+const locksetFits = (state, id) => !gripClashesLockset({ ...state, lockset: id });
 
 /**
  * The lockset to fall back on when the chosen one has nowhere to go, or null
@@ -80,11 +92,16 @@ const locksetFits = (state, id) =>
  * to it is falling back to the commonest lock furniture Peretz sells rather
  * than to an upsell.
  *
- * The null case is the one that mattered. `repair` used to answer "become the
- * cylinder" unconditionally, and on a narrow leaf with two lights the cylinder
- * does not fit either — the outboard light sits directly over the lock
- * position — so it set the lockset to the value it already held, reported a
- * change, and handed back a door that was still unbuildable. Round and round.
+ * The null case used to bite on a narrow leaf with two lights, where the
+ * outboard light sat directly over the lock position and even the cylinder had
+ * nowhere to go: `repair` answered "become the cylinder" unconditionally, set
+ * the lockset to the value it already held, reported a change, and handed back
+ * a door that was still unbuildable. Round and round.
+ *
+ * That cannot happen now the glazing is no longer consulted — the cylinder
+ * clears a grab bar on the narrowest leaf we make with 539 mm of stile to
+ * spare. The null branch stays anyway, because it costs one line and the whole
+ * point of the loop above is that the fitting range is allowed to change.
  */
 export function fallbackLockset(state) {
   if (locksetFits(state, 'cylinder')) return 'cylinder';
@@ -156,14 +173,38 @@ export function conflicts(state) {
     }
   }
 
-  /* GEOMETRIC: the LOCKSET's own reach against the glazing. Only the grip was
-     ever checked here; a lever reaches 152 mm inboard and the Almog swan-neck
-     220, and on a narrow leaf with a tall light the moulding starts at 131. */
-  for (const k of LOCKSETS) {
-    if (locksetClashesGlass({ ...state, lockset: k.id })) {
-      out.lockset[k.id] = out.lockset[k.id] || 'אין מקום בין המנעול לחלון';
-    }
-  }
+  /* WITHDRAWN: lockset x glazing. This refused 89 combinations — every design
+     where the lock furniture's drawn width reached past the aperture moulding.
+     It was added because a lever's blade was crossing a pane on 34 designs
+     with nothing looking.
+
+     The owner's objection is the one thing the check never modelled: DEPTH.
+     Lock furniture is bolted THROUGH the leaf and stands 30-60 mm proud of it;
+     the glass is set flush into the leaf behind a 40 mm surround. So a blade
+     that reads as overlapping the pane in a square-on drawing passes in FRONT
+     of it on the real door and touches nothing. He sells these; he would know.
+
+     And the check was worse than debatable, it was WRONG — it compared two
+     horizontal distances and never asked whether the glass and the handle were
+     at the same HEIGHT. Measured on the real drawn geometry, only 21 of the
+     refusals put the lockset's box over a pane at all. The other fifty were
+     doors like a swan-neck beside two high square lights, where the panes stop
+     500 mm above the lever and nothing could ever have touched. That is not a
+     rule anyone would have written on purpose.
+
+     Of the 21 that do overlap it is the BLADE every time, never the plate:
+     `npm run collide` now measures the bolted-down shape of each fitting
+     (`data-mount`) against every pane across 1,966 glazed designs, and the
+     tightest gap is 8 mm of solid steel. So the physical constraint that
+     matters here — you cannot bolt a rosette to a sheet of glass — is checked,
+     and it holds everywhere. It is checked in the tool rather than asserted
+     here because it is a fact about the drawing, and the drawing is what
+     changes.
+
+     The rest is compositing: `#hardware` is drawn after `#glazing` and every
+     fitting casts `hwShadow`, so a blade over a pane throws a shadow onto the
+     glass and reads as standing off it. That is the honest way to draw
+     "elevated" — not by refusing the pairing. */
 
   /* GEOMETRIC: the grab bar's bow against a long lever, which only bites on a
      narrow leaf — the bow is centred and does not move out of the way. */
@@ -178,20 +219,15 @@ export function conflicts(state) {
     }
   }
 
-  /* GEOMETRIC: a window that leaves no lockset anywhere to go at all.
-     On the narrow 800 mm leaf the outboard light of `duo` reaches to within
-     100 mm of the closing edge, and the escutcheon alone — 60 mm backset plus
-     a 33 mm radius, before the moulding round the pane — needs more than that.
-     No lock furniture we make is small enough, so it is the WINDOW that is
-     unbuildable here and not the lockset, and both directions have to say so:
-     the customer may have chosen either one first. */
-  for (const w of WINDOWS) {
-    if (out.window[w.id] || !w.rects.length) continue;
-    if (!fallbackLockset({ ...state, window: w.id })) out.window[w.id] = 'אין מקום למנעול לצד החלון';
-  }
-  for (const key of Object.keys(SIZES)) {
-    if (!fallbackLockset({ ...state, size: key })) out.size[key] = 'אין מקום למנעול לצד החלון';
-  }
+  /* GONE WITH IT: the window and size refusals that read "אין מקום למנעול
+     לצד החלון". They existed to close the loop the rule above opened — a
+     narrow leaf with two lights left NO lock furniture anywhere to go, so the
+     customer had to be told from the window's side as well as the lockset's,
+     since they may have picked either one first.
+     `fallbackLockset` no longer consults the glazing, so neither loop can
+     fire: the window is not an input to what a lockset clashes with any more.
+     A loop that cannot fire is worse than no loop, because it reads as a live
+     rule. */
 
   /* GEOMETRIC: the horizontal grab bar is centred on the LEAF, not on the
      stile, so it runs straight across a centred window. Every one of the nine
@@ -259,20 +295,20 @@ export function repair(state, intent = null) {
     else { s.handle = 'none'; changed.push('handle'); }
   }
 
-  /* A lockset with nowhere to go becomes the smallest one that has somewhere
-     — normally the cylinder, which is what eight of the ten bar doors carry.
-     And when NOTHING fits, the glass is what yields: every door needs a lock,
-     not every door needs a window. */
-  if (locksetClashesGlass(s) || gripClashesLockset(s)) {
-    if (intent === 'lockset') { s.handle = 'none'; s.window = 'none'; changed.push('window'); }
-    else {
+  /* The grab bar against the lock furniture. The window used to be part of
+     this repair and is not any more — the bow is centred on the LEAF, so
+     taking the glass away never moved it out of the lockset's way, and now
+     that the glazing is not consulted at all there is nothing here for it to
+     do. What is left is a stile too short for both objects.
+     Whichever the customer just asked for wins. Without an intent — a link —
+     the lockset yields first, because every door needs a lock and the fallback
+     is the cylinder that eight of the ten installed bar doors carry. */
+  if (gripClashesLockset(s)) {
+    if (intent !== 'lockset') {
       const k = fallbackLockset(s);
       if (k) { s.lockset = k; changed.push('lockset'); }
-      else { s.window = 'none'; changed.push('window'); }
     }
-    /* The grab bar's bow is centred on the LEAF, so taking the window away
-       does not move it out of the lockset's way. If the pair still does not
-       fit after all that, the grip is the last thing left to give. */
+    /* If the pair still does not fit, the grip is the last thing left to give. */
     if (gripClashesLockset(s)) { s.handle = 'none'; changed.push('handle'); }
   }
 
@@ -306,5 +342,8 @@ export const repairSaid = changed => ({
   grille: 'הסרנו את הסורג — אין חלון',
   glazing: 'החזרנו זכוכית שקופה — אין חלון',
   handle:  'הסרנו את ידית המשיכה — אין לה מקום כאן',
-  lockset: 'החלפנו את המנעול — אין לו מקום ליד החלון',
+  /* Not "beside the window" any more: a lockset is only ever moved out of the
+     way of the grab bar now, and a toast that names the wrong culprit is worse
+     than no toast at all. */
+  lockset: 'החלפנו את המנעול — אין לו מקום ליד המאחז',
 }[changed[0]] || null);
