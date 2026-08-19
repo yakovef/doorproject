@@ -3,7 +3,7 @@
  * Run: npm test
  */
 import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
-import { contrast, silhouette } from '../js/colour.js';
+import { contrast, lighten, silhouette } from '../js/colour.js';
 import { priceAgorot, shekels } from '../js/price.js';
 import {
   detailGlyph, glazingGlyph, grilleGlyph, handleGlyph, LIGHT,
@@ -303,9 +303,19 @@ group('detail and finish');
     const svg = render({ ...base, colour: c.id, detail: 'panel2' });
     /* The panel group only. Sliced to the end of the document it swallowed the
        hardware drawn after it, and the first thing it found was the nickel on
-       a lever — a false alarm that would have hidden a real one. */
-    const from = svg.indexOf('data-detail="panel"');
-    const block = svg.slice(from, svg.indexOf('</g>', from));
+       a lever — a false alarm that would have hidden a real one.
+
+       The relight comes out FIRST, and the order matters twice over. Each of
+       its rects is the whole leaf, clipped to the moulding — correct on the
+       page, indistinguishable from an interior fill in a string — so the fill
+       check below has to skip it. And it is a nested <g>, so leaving it in
+       would end the slice at ITS closing tag instead of the panel group's,
+       quietly shrinking this whole block to the first run of the first panel.
+       An assertion that narrows without failing is the worse of the two bugs. */
+    const clean = svg.replace(/<g data-relight="moulding"[\s\S]*?<\/g>/g, '');
+    const from = clean.indexOf('data-detail="panel"');
+    const block = clean.slice(from, clean.indexOf('</g>', from));
+    ok(block.includes('mould-r'), `the panel block on ${c.id} was cut short — this check is dead`);
     const sides = [...block.matchAll(/fill="url\(#mould-([tblr])\)"/g)].map(m => m[1]);
     ok(new Set(sides).size === 4, `moulding on ${c.id} draws ${new Set(sides).size} of its 4 sides`);
 
@@ -778,12 +788,28 @@ for (const h of HANDLES) {
 
    Asserted on the gradient stops rather than on pixels, because this is exact
    arithmetic and a pixel probe a few millimetres either side of the edge
-   measures the paint's own mottle instead. */
+   measures the paint's own mottle instead.
+
+   ⚠ THE EXPECTED VALUE CHANGED, and what it used to be was wrong. This asked
+   for the bare catalogue hex — "the paint" — on the argument that the face is
+   flat. The face is not flat and never was: it is `leafFill` (a ramp from
+   lighten 0.04 at the head to darken 0.05 at the foot) under `keyWash` and
+   `bloom`. So the value this insisted on is the value the face takes at NO
+   height on the door, and the check passed while the rim missed the face by up
+   to 15 units at the foot — reported from the outside, again, as the lower
+   panel "bulging out". The same symptom as the bug this group was written for,
+   from the other end of the same confusion.
+   The rim now starts from the head of the leaf's own ramp and is carried down
+   it by `leafShade`, so it meets the face at every height instead of at one.
+   That second half is a fact about compositing and cannot be read off a
+   gradient stop, so it is checked where there is a browser to check it:
+   `npm run profile` measures the rendered rim against the rendered face beside
+   it, on both panels. This assertion is now only the arithmetic half. */
 group('the face inside a moulding is the face outside it');
 for (const c of COLOURS) {
   const svg = render({ ...base, colour: c.id, handle: 'none', lockset: 'coral',
                        detail: 'panel2', window: 'none' });
-  const paint = c.hex.toLowerCase();
+  const head = lighten(c.hex, 0.04).toLowerCase();
   for (const side of ['t', 'b', 'l', 'r']) {
     const g = new RegExp(`<linearGradient id="mould-${side}"[\\s\\S]*?</linearGradient>`).exec(svg);
     ok(g, `no mould-${side} gradient on ${c.id} — this check is dead`);
@@ -791,12 +817,16 @@ for (const c of COLOURS) {
     const stops = [...g[0].matchAll(/offset="([\d.]+)"\s+stop-color="([^"]+)"/g)];
     ok(stops.length > 2, `mould-${side} on ${c.id} has ${stops.length} stops`);
     for (const [label, st] of [['outer', stops[0]], ['inner', stops[stops.length - 1]]]) {
-      ok(st[2].toLowerCase() === paint,
-        `mould-${side}'s ${label} edge on ${c.id} is ${st[2]}, not the paint ${paint} — `
-      + 'a moulding meets the same flat face on both sides, and a rim that differs '
-      + 'from it draws a raised panel where there is none');
+      ok(st[2].toLowerCase() === head,
+        `mould-${side}'s ${label} edge on ${c.id} is ${st[2]}, not the leaf's own `
+      + `head colour ${head} — a moulding meets the same face on both sides, and a `
+      + 'rim that differs from it draws a raised panel where there is none');
     }
   }
+  /* And the relight that carries that rim down the door has to be there. */
+  ok(/fill="url\(#leafShade\)"/.test(svg),
+     `no leafShade over the moulding on ${c.id} — the rim matches the face at the `
+   + 'head and drifts off it further down, which is the bug this group exists for');
 }
 
 // ── 9. A deploy has to reach the person looking at it ─────────────

@@ -21,6 +21,44 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The moulding is lit by the same light as the door it is stuck to.** The
+  four `mould-*` gradients are absolute tones built from the paint, and they
+  are drawn OVER the leaf, so they never received `leafFill`, `keyWash` or
+  `bloom`. Measured on a white two-panel door: both mouldings peak at 250 while
+  the face beside them is 240 at the upper panel and 225 at the lower — so the
+  upper bead stood 4% over its field and the lower 11%, and the lower read as
+  swelling out of the door. Reported as exactly that.
+  Fixed by putting them back under the light rather than re-tuning them: the
+  moulding's base is now `LEAF_TOP` (the head of the leaf's own fill ramp) and
+  the three washes are re-laid over it, clipped to the moulding, drawn from the
+  LEAF's rectangle so each gradient lands at the same offset it did on the
+  face. `leafShade` is `leafFill` restated as a black-alpha multiplier, since
+  an opaque gradient cannot be re-applied; `mix(A,B,t) === A*(1 - t*(1-B/A))`
+  makes that exact to within a fraction of one channel unit.
+  **This is the second time a panel has been reported as "bulging" and the
+  second different cause** — the first was the per-side gain scaling whole runs
+  instead of relief. `npm run profile` now measures the bead against the face
+  beside it on both panels and fails if they disagree by more than 3%; backing
+  the fix out reads 1.41 on dark and 1.05 on light, so the check is live.
+- **The black lines down the frame are gone.** Two `<line>`s, the paint
+  darkened 0.55 at full opacity on a non-scaling 1.5px stroke, one per jamb,
+  drawn where the casing turns into the return. On a white door they read as
+  ink. A fold between two lit surfaces is a change of VALUE — the casing face
+  and the returns already differ — and the head never had one, which is why
+  the top of the frame looked right while the sides did not.
+- **The recessed channel (ידית שקועה) needs a plain leaf.** It is a HOLE cut
+  into the door, 1554 mm of it at 0.30 of the leaf's width — the exact inverse
+  of the depth argument below, since there is no in-front to be had. It is now
+  refused with any window and with any worked face (panel, strips, groove), in
+  both directions, and `repair` keeps whichever the customer just chose.
+- **`npm run shot` now refuses to photograph a repaired query.** The warning
+  that every shot must be buildable was a comment, and a comment is not a
+  check: `grey` had been photographing a plain cylinder while naming a Coral
+  lever, and `laptop` named a channel over a groove. `fromQuery` returns the
+  notice; nobody was reading it. Three more turned up the moment it did — a
+  pull bar cannot sit beside a LEVER on a glazed leaf, which is a live
+  consequence of withdrawing the bar-versus-lever rule and is recorded in
+  `js/rules.js`. Beside a cylinder or a smart lock the same bar fits.
 - **Every main handle now works with every glass option.** `locksetClashesGlass`
   is gone, with the window and size refusals that only existed to close its
   loop, and `collide` no longer counts hardware over a pane as a hit. The

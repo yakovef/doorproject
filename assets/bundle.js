@@ -565,8 +565,10 @@
     const handleX = lockX + inward * standoff;
     const paint2 = colour.hex;
     const edge = silhouette(paint2);
-    const deep = darken(paint2, 0.55);
     const fall = isLight(paint2) ? FALLOFF.light : FALLOFF.dark;
+    const LEAF_TOP = lighten(paint2, 0.04);
+    const LEAF_FOOT = darken(paint2, 0.05);
+    const LEAF_FALL = leafFallOf(LEAF_TOP, LEAF_FOOT);
     const pale = isLight(paint2);
     const AO_SIDE = Math.round(leafW * 0.14);
     const AO_FOOT = Math.round(leafH * 0.065);
@@ -602,8 +604,23 @@
             fill="url(#edgeRight)"/>`;
     const defs = `
     <linearGradient id="leafFill" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${lighten(paint2, 0.04)}"/>
-      <stop offset="1" stop-color="${darken(paint2, 0.05)}"/>
+      <stop offset="0" stop-color="${LEAF_TOP}"/>
+      <stop offset="1" stop-color="${LEAF_FOOT}"/>
+    </linearGradient>
+
+    <!-- The SAME ramp as leafFill, expressed as a multiplier instead of as a
+         colour, so that anything drawn OVER the leaf can be put back under the
+         leaf's own light. leafFill is opaque and cannot be re-applied; black at
+         alpha a multiplies every channel by (1-a), and mix(A,B,t) is exactly
+         A*(1 - t*(1 - B/A)), so a linear alpha ramp from 0 to 1-FOOT/TOP
+         reproduces it. The one place it is used is the panel moulding.
+         Per-channel the three ratios differ by about 0.013 on saturated paint,
+         so the foot of a moulding is up to one unit of one channel off a true
+         leafFill — below what any display shows, and worth far less than a
+         second copy of the ramp that could drift from this one. -->
+    <linearGradient id="leafShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${LEAF_FALL}"/>
     </linearGradient>
 
     <!-- The key wash. Vertical, because that is what the photographs measure:
@@ -787,7 +804,7 @@
       <stop offset="1"    stop-color="#000" stop-opacity="0"/>
     </linearGradient>
 
-    ${mouldGradients(paint2, pale)}
+    ${mouldGradients(LEAF_TOP, pale)}
 
     <!-- ── the three planes of the opening ────────────────────────
          ONE opening, ONE light, so these are set as a RELATIONSHIP and not
@@ -1160,11 +1177,18 @@
     <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${baseY} H ${revX0} Z" fill="url(#retNear)"/>
     <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${baseY} H ${revX1} Z" fill="url(#retFar)"/>
 
-    <!-- hard arris where casing turns into return -->
-    <line x1="${revX0}" y1="${revY0}" x2="${revX0}" y2="${baseY}"
-          stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-    <line x1="${revX1}" y1="${revY0}" x2="${revX1}" y2="${baseY}"
-          stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+    <!-- NO DRAWN ARRIS WHERE THE CASING TURNS INTO THE RETURN. There were two
+         — one down each jamb, the paint darkened 0.55, at full opacity on a
+         non-scaling 1.5px stroke — and on a white door they read as two black
+         lines ruled down the frame. Reported from the outside, circled.
+
+         The fold is real, but a fold between two lit surfaces is a change of
+         VALUE, not a line: the casing face and the two returns already differ,
+         which is all a 90° turn in diffuse light gives you. A hard stroke at
+         constant width says "ink", and it said it loudest on pale paint where
+         the two planes it separated were only a few units apart.
+         The head never had one, which is exactly why the top of the frame was
+         reported as looking right while the sides did not. -->
 
     <!-- The mitre seam itself. The trapezoids already meet along this line;
          the stroke is the darkening any two planes show where they fold. -->
@@ -1225,7 +1249,7 @@
         grille,
         glazing: glazing.id,
         key: "s"
-      }) + (detail.panel ? appliedFrame(sideX, y0, sideW, leafH, paint2, pale, top + tall, false) : "");
+      }) + (detail.panel ? appliedFrame(sideX, y0, sideW, leafH, paint2, pale, top + tall, false, 0, "s") : "");
     })() : win.rects[0] && sideW > 320 ? aperture({
       x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
       y: y0 + win.rects[0].top,
@@ -1335,11 +1359,25 @@ ${body}
     [1, 1]
   ];
   var MOULD_SIDE = { top: 0.95, left: 1.01, right: 1.04, bottom: 1.07 };
-  function moulding(x, y, w, h, band, paint2, pale) {
+  function moulding(x, y, w, h, band, paint2, pale, leaf = null, key = "") {
     if (w <= band * 2.2 || h <= band * 2.2) return "";
     const side = (d, o) => `<path d="${d}" fill="url(#mould-${o})"/>`;
     const b = band;
-    return side(`M ${x} ${y} H ${x + w} L ${x + w - b} ${y + b} H ${x + b} Z`, "t") + side(`M ${x} ${y + h} H ${x + w} L ${x + w - b} ${y + h - b} H ${x + b} Z`, "b") + side(`M ${x} ${y} L ${x + b} ${y + b} V ${y + h - b} L ${x} ${y + h} Z`, "l") + side(`M ${x + w} ${y} L ${x + w - b} ${y + b} V ${y + h - b} L ${x + w} ${y + h} Z`, "r") + [
+    const runs = [
+      [`M ${x} ${y} H ${x + w} L ${x + w - b} ${y + b} H ${x + b} Z`, "t"],
+      [`M ${x} ${y + h} H ${x + w} L ${x + w - b} ${y + h - b} H ${x + b} Z`, "b"],
+      [`M ${x} ${y} L ${x + b} ${y + b} V ${y + h - b} L ${x} ${y + h} Z`, "l"],
+      [`M ${x + w} ${y} L ${x + w - b} ${y + b} V ${y + h - b} L ${x + w} ${y + h} Z`, "r"]
+    ];
+    const geometry = runs.map(([d, o]) => side(d, o)).join("");
+    const wash = (g) => `<rect x="${leaf.x}" y="${leaf.y}" width="${leaf.w}"
+                           height="${leaf.h}" fill="url(#${g})"/>`;
+    const relight = leaf ? `
+      <clipPath id="mouldClip${key}">${runs.map(([d]) => `<path d="${d}"/>`).join("")}</clipPath>
+      <g data-relight="moulding" clip-path="url(#mouldClip${key})">
+        ${wash("leafShade")}${wash("keyWash")}${wash("bloom")}
+      </g>` : "";
+    return geometry + relight + [
       [x, y, x + b, y + b],
       [x + w, y, x + w - b, y + b],
       [x, y + h, x + b, y + h - b],
@@ -1347,6 +1385,11 @@ ${body}
     ].map(([a, c, e, f]) => `<path d="M ${a} ${c} L ${e} ${f}" fill="none" stroke="#000"
               stroke-opacity="${pale ? 0.05 : 0.09}" stroke-width="0.9"
               vector-effect="non-scaling-stroke"/>`).join("");
+  }
+  function leafFallOf(top, foot) {
+    const a = toRgb(top), b = toRgb(foot);
+    const r = [["r"], ["g"], ["b"]].map(([k]) => 1 - b[k] / a[k]);
+    return (r.reduce((s, v) => s + v) / 3).toFixed(4);
   }
   function mouldGradients(paint2, pale) {
     const relief = pale ? 0.34 : 1;
@@ -1356,18 +1399,19 @@ ${body}
   }
   var PANEL_INSET = 0.23;
   var PANEL_INSET_MAX = 0.39;
-  function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0) {
+  function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m") {
     const band = lw * 0.09;
     const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
     const x = lx + inset, w = lw - inset * 2;
-    const rect = (t, b) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale);
+    const leaf = { x: lx, y: ly, w: lw, h: lh };
+    const rect = (t, b, n) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale, leaf, `${key}${n}`);
     if (upper && winBottom <= ly + 1) {
       return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
-               data-band="${band.toFixed(1)}">${rect(0.07, 0.58)}${rect(0.66, 0.92)}</g>`;
+               data-band="${band.toFixed(1)}">${rect(0.07, 0.58, 0)}${rect(0.66, 0.92, 1)}</g>`;
     }
     const top = Math.max(ly + lh * 0.68, winBottom + lw * 0.08);
     const bottom = ly + lh * 0.9;
-    const art = moulding(x, top, w, bottom - top, band, paint2, pale);
+    const art = moulding(x, top, w, bottom - top, band, paint2, pale, leaf, `${key}0`);
     return art ? `<g data-detail="panel" data-top="${top.toFixed(1)}"
                    data-band="${band.toFixed(1)}">${art}</g>` : "";
   }
@@ -2517,6 +2561,7 @@ ${body}
 
   // js/rules.js
   var isLineWork = (detail) => !!(detail.strips || detail.groove);
+  var faceWorked = (detail) => !!detail.panel || isLineWork(detail);
   var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
   var isGlazed = (state2) => leafGlazed(state2) || !!(SIZES[state2.size] || {}).sideGlazed;
   var locksetFits = (state2, id) => !gripClashesLockset({ ...state2, lockset: id });
@@ -2551,6 +2596,20 @@ ${body}
     }
     if (lined) {
       for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = "לא משלבים חלון עם קווי מתכת";
+    }
+    const CHANNEL = HANDLES.find((h) => h.style === "channel");
+    if (CHANNEL) {
+      if (onLeaf || faceWorked(byId(DETAILS, state2.detail))) {
+        out.handle[CHANNEL.id] = "ידית שקועה דורשת דלת חלקה";
+      }
+      if (grip.style === "channel") {
+        for (const w of WINDOWS) if (w.rects.length) {
+          out.window[w.id] = out.window[w.id] || "לא משתלב עם ידית שקועה";
+        }
+        for (const d of DETAILS) if (faceWorked(d)) {
+          out.detail[d.id] = out.detail[d.id] || "לא משתלב עם ידית שקועה";
+        }
+      }
     }
     for (const h of HANDLES) {
       if (h.style === "none" || out.handle[h.id]) continue;
@@ -2594,6 +2653,21 @@ ${body}
       } else {
         s.detail = "plain";
         changed.push("detail");
+      }
+    }
+    if (byId(HANDLES, s.handle).style === "channel" && (leafGlazed(s) || faceWorked(byId(DETAILS, s.detail)))) {
+      if (intent === "handle") {
+        if (leafGlazed(s)) {
+          s.window = "none";
+          changed.push("window");
+        }
+        if (faceWorked(byId(DETAILS, s.detail))) {
+          s.detail = "plain";
+          changed.push("detail");
+        }
+      } else {
+        s.handle = "none";
+        changed.push("handle");
       }
     }
     if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === "grab") {

@@ -121,6 +121,73 @@ for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
             + `lower/upper ${ratio.toFixed(2)}  ${flat ? '(too flat to judge)' : bad ? '✗' : '✓'}`);
 }
 
+/* ── the moulding against the face it sits on ─────────────────────────
+   The check that catches a panel "bulging", which is the complaint this
+   drawing has now drawn twice from two different causes.
+
+   A moulding is a strip laid on the door, so how far its brightest bead stands
+   above the face BESIDE it is a property of the moulding — the same on the
+   upper panel and the lower one. It was not. The gradients are absolute tones
+   built from the paint, while the face under them falls away down the leaf, so
+   on a white door the upper bead stood 4% over its field and the lower one
+   11%. Same moulding, drawn twice, reading as two different depths.
+
+   Measured as a MAX over the run rather than a probe at the rim: MOULD drops
+   from tone 1.00 to 0.72 within 7% of the band, about 5 mm, so a point sample
+   at the edge lands on the quirk or on the paint's own mottle depending on
+   rounding. The peak is stable.
+
+   The tolerance is on the RATIO of the two, not on either value: what the bead
+   does over the field is a design decision and may change, but it has to be
+   the same decision at both heights. */
+console.log('\nthe moulding\'s bead against the face beside it, upper panel vs lower');
+console.log('(a strip of moulding stands off the door by the same amount wherever');
+console.log(' it is stuck — if the two disagree, one of them is drawn as a bulge)\n');
+for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
+  await draw({ ...base, colour, handle: 'none', detail: 'panel2' });
+  const spec = await p.evaluate(() => {
+    const svg = document.querySelector('#stage svg');
+    const m = svg.getScreenCTM();
+    const pt = svg.createSVGPoint();
+    const at = (x, y) => { pt.x = x; pt.y = y;
+      const q = pt.matrixTransform(m); return [q.x, q.y]; };
+    /* The two top runs, straight from the drawing. */
+    const leaf = svg.querySelector('#leaf rect').getBBox();
+    return [...svg.querySelectorAll('[data-detail="panel"] path')]
+      .filter(e => e.getAttribute('fill') === 'url(#mould-t)')
+      .map(e => {
+        const r = e.getBBox();
+        const x = r.x + r.width * 0.5;           // mid-run, clear of both mitres
+        /* BESIDE, and at the same height. The reference started as one point
+           above the run and that was wrong on a dark door: the leaf falls fast
+           enough there that a sample half a band higher is brighter than the
+           bead by more than the bead stands proud, so the measurement changed
+           sign. Sampling at the SAME y, out on the stile, removes the leaf's
+           own vertical fall from the comparison entirely — which is the whole
+           point, since that fall is the thing being corrected for.
+           0.18 of the leaf's width is chosen to sit between the edge occlusion
+           (0.14 W) and the panel (0.23 W): plain face on both counts. */
+        const ys = Array.from({ length: 24 }, (_, i) => r.y + r.height * (i + 0.5) / 24);
+        return {
+          run:  ys.map(y => at(x, y)),
+          side: ys.map(y => at(leaf.x + leaf.width * 0.18, y)),
+        };
+      });
+  });
+  const lum = await shoot();
+  const [up, lo] = spec.map(s => {
+    const run = s.run.map(lum);
+    const peak = run.indexOf(Math.max(...run));      // where the bead is brightest
+    return run[peak] / lum(s.side[peak]);            // against the face at that height
+  });
+  const ratio = lo / up;
+  const bad = Math.abs(ratio - 1) > 0.03;
+  if (bad) faults++;
+  const pc = v => `${v >= 1 ? '+' : ''}${((v - 1) * 100).toFixed(1)}%`;
+  console.log(`  ${band}  upper ${pc(up)}  lower ${pc(lo)}  `
+            + `lower/upper ${ratio.toFixed(3)}  ${bad ? '✗' : '✓'}`);
+}
+
 await b.close();
 console.log(faults ? `\n✗ ${faults} faults\n` : '\n✓ the leaf falls the way the photographs do\n');
 process.exitCode = faults ? 1 : 0;

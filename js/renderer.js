@@ -17,7 +17,7 @@
  */
 
 import { byId, COLOURS, DETAILS, effectiveFinish, GLAZINGS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
-import { darken, isLight, lighten, scaleTone, silhouette } from './colour.js';
+import { darken, isLight, lighten, scaleTone, silhouette, toRgb } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
    light → mid → dark → a weaker second return near the far edge. That double
@@ -518,8 +518,17 @@ export function render(state) {
 
   const paint = colour.hex;
   const edge  = silhouette(paint);
-  const deep  = darken(paint, 0.55);
   const fall  = isLight(paint) ? FALLOFF.light : FALLOFF.dark;
+
+  /* The leaf's own fill, named at both ends because THREE things need it and
+     they must not drift: the opaque `leafFill` gradient, the `leafShade`
+     multiplier that puts applied moulding back under the same ramp, and the
+     moulding's own base tone — which is LEAF_TOP, not the bare paint, because
+     a moulding standing on the leaf starts from the leaf's colour and falls
+     with it. */
+  const LEAF_TOP  = lighten(paint, 0.04);
+  const LEAF_FOOT = darken(paint, 0.05);
+  const LEAF_FALL = leafFallOf(LEAF_TOP, LEAF_FOOT);
 
   const pale = isLight(paint);
 
@@ -589,8 +598,23 @@ export function render(state) {
 
   const defs = `
     <linearGradient id="leafFill" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${lighten(paint, 0.04)}"/>
-      <stop offset="1" stop-color="${darken(paint, 0.05)}"/>
+      <stop offset="0" stop-color="${LEAF_TOP}"/>
+      <stop offset="1" stop-color="${LEAF_FOOT}"/>
+    </linearGradient>
+
+    <!-- The SAME ramp as leafFill, expressed as a multiplier instead of as a
+         colour, so that anything drawn OVER the leaf can be put back under the
+         leaf's own light. leafFill is opaque and cannot be re-applied; black at
+         alpha a multiplies every channel by (1-a), and mix(A,B,t) is exactly
+         A*(1 - t*(1 - B/A)), so a linear alpha ramp from 0 to 1-FOOT/TOP
+         reproduces it. The one place it is used is the panel moulding.
+         Per-channel the three ratios differ by about 0.013 on saturated paint,
+         so the foot of a moulding is up to one unit of one channel off a true
+         leafFill — below what any display shows, and worth far less than a
+         second copy of the ramp that could drift from this one. -->
+    <linearGradient id="leafShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${LEAF_FALL}"/>
     </linearGradient>
 
     <!-- The key wash. Vertical, because that is what the photographs measure:
@@ -774,7 +798,7 @@ export function render(state) {
       <stop offset="1"    stop-color="#000" stop-opacity="0"/>
     </linearGradient>
 
-    ${mouldGradients(paint, pale)}
+    ${mouldGradients(LEAF_TOP, pale)}
 
     <!-- ── the three planes of the opening ────────────────────────
          ONE opening, ONE light, so these are set as a RELATIONSHIP and not
@@ -1148,11 +1172,18 @@ export function render(state) {
     <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${baseY} H ${revX0} Z" fill="url(#retNear)"/>
     <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${baseY} H ${revX1} Z" fill="url(#retFar)"/>
 
-    <!-- hard arris where casing turns into return -->
-    <line x1="${revX0}" y1="${revY0}" x2="${revX0}" y2="${baseY}"
-          stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-    <line x1="${revX1}" y1="${revY0}" x2="${revX1}" y2="${baseY}"
-          stroke="${deep}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+    <!-- NO DRAWN ARRIS WHERE THE CASING TURNS INTO THE RETURN. There were two
+         — one down each jamb, the paint darkened 0.55, at full opacity on a
+         non-scaling 1.5px stroke — and on a white door they read as two black
+         lines ruled down the frame. Reported from the outside, circled.
+
+         The fold is real, but a fold between two lit surfaces is a change of
+         VALUE, not a line: the casing face and the two returns already differ,
+         which is all a 90° turn in diffuse light gives you. A hard stroke at
+         constant width says "ink", and it said it loudest on pale paint where
+         the two planes it separated were only a few units apart.
+         The head never had one, which is exactly why the top of the frame was
+         reported as looking right while the sides did not. -->
 
     <!-- The mitre seam itself. The trapezoids already meet along this line;
          the stroke is the darkening any two planes show where they fold. -->
@@ -1208,7 +1239,7 @@ export function render(state) {
             return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
                               paint, edge, grille, glazing: glazing.id, key: 's' })
               + (detail.panel
-                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, false)
+                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, false, 0, 's')
                   : '');
           })()
       : win.rects[0] && sideW > 320
@@ -1364,7 +1395,7 @@ const MOULD_SIDE = { top: 0.95, left: 1.01, right: 1.04, bottom: 1.07 };
  * door's own paint and its own texture show straight through, which is the
  * point.
  */
-function moulding(x, y, w, h, band, paint, pale) {
+function moulding(x, y, w, h, band, paint, pale, leaf = null, key = '') {
   if (w <= band * 2.2 || h <= band * 2.2) return '';
 
   /* Four mitred trapezoids, each filled with the measured cross-section as a
@@ -1373,10 +1404,55 @@ function moulding(x, y, w, h, band, paint, pale) {
      hundred and seventy-six a stop-per-stroke version would have taken. */
   const side = (d, o) => `<path d="${d}" fill="url(#mould-${o})"/>`;
   const b = band;
-  return side(`M ${x} ${y} H ${x + w} L ${x + w - b} ${y + b} H ${x + b} Z`, 't')
-       + side(`M ${x} ${y + h} H ${x + w} L ${x + w - b} ${y + h - b} H ${x + b} Z`, 'b')
-       + side(`M ${x} ${y} L ${x + b} ${y + b} V ${y + h - b} L ${x} ${y + h} Z`, 'l')
-       + side(`M ${x + w} ${y} L ${x + w - b} ${y + b} V ${y + h - b} L ${x + w} ${y + h} Z`, 'r')
+  const runs = [
+    [`M ${x} ${y} H ${x + w} L ${x + w - b} ${y + b} H ${x + b} Z`, 't'],
+    [`M ${x} ${y + h} H ${x + w} L ${x + w - b} ${y + h - b} H ${x + b} Z`, 'b'],
+    [`M ${x} ${y} L ${x + b} ${y + b} V ${y + h - b} L ${x} ${y + h} Z`, 'l'],
+    [`M ${x + w} ${y} L ${x + w - b} ${y + b} V ${y + h - b} L ${x + w} ${y + h} Z`, 'r'],
+  ];
+
+  /* THE SAME LIGHT FALLS ON THE MOULDING AS ON THE DOOR IT IS STUCK TO.
+     The four fills above are ABSOLUTE tones — `paint` scaled by the measured
+     cross-section — and they are drawn OVER the leaf, so they do not receive
+     the leaf's own key wash. That is fine at the top of the door, where the
+     wash has barely started, and wrong further down: measured on a white
+     two-panel door, both mouldings peak at 250 while the face they sit on is
+     240 beside the upper panel and 225 beside the lower. So the upper bead
+     stands 10 above its field and the lower one 25, and the lower reads as a
+     fat rounded thing swelling out of the door. Reported exactly that way —
+     "the inside of it is bulging out".
+     The fix is not to re-tune the gradients; it is to stop exempting them from
+     the light. The leaf lays down three things over its fill — the fill's own
+     ramp, the key wash and the bloom — and all three are re-laid here, clipped
+     to the moulding so nothing else is touched, and drawn from the LEAF's
+     rectangle so each gradient lands at the same offset it did on the face.
+     Same ramps, same heights, same defs: a second copy of the falloff here
+     would be a second thing to keep in step, which is how this file has gone
+     wrong before.
+     Only those three. The edge and foot occlusions never reach a panel — the
+     inset is 0.23 W against a 0.14 W side band, and the lower panel stops at
+     0.92 H against a foot band starting at 0.935 — and the drift and grain are
+     texture rather than light.
+     After this the moulding meets the face without a step at BOTH ends of
+     every run, at any height, which is what `MOULD` starting and ending at
+     tone 1.00 was always claiming and only ever delivered at one height. */
+  const geometry = runs.map(([d, o]) => side(d, o)).join('');
+  const wash = g => `<rect x="${leaf.x}" y="${leaf.y}" width="${leaf.w}"
+                           height="${leaf.h}" fill="url(#${g})"/>`;
+  const relight = leaf ? `
+      <clipPath id="mouldClip${key}">${runs.map(([d]) => `<path d="${d}"/>`).join('')}</clipPath>
+      <g data-relight="moulding" clip-path="url(#mouldClip${key})">
+        ${wash('leafShade')}${wash('keyWash')}${wash('bloom')}
+      </g>` : '';
+  /* `data-relight` is not decoration. Each of those rects is the whole LEAF —
+     it has to be, or the gradients land at the wrong offsets — and clipped to
+     the moulding, so on the page it touches nothing else. But the test that
+     guards "nothing fills the panel's interior" reads the markup as a string
+     and cannot see a clip-path, and that test is worth keeping strict: it is
+     the one standing between this drawing and a raised panel. So the relight
+     says what it is, and the test skips exactly this and nothing else. */
+
+  return geometry + relight
   /* The mitre joint itself: four lengths of moulding cut at 45° and butted, not
      a moulded frame. A close crop of d076 shows it as a hairline and nothing
      more — at any weight you can actually notice, it stops reading as a joint
@@ -1394,6 +1470,20 @@ function moulding(x, y, w, h, band, paint, pale) {
  * amount of it. Emitted into the defs, and dropped again by usedDefs on any
  * door that has no moulding on it.
  */
+/**
+ * How far the leaf's fill falls from head to foot, as the alpha of a black
+ * overlay that reproduces it. See the `leafShade` gradient.
+ *
+ * Averaged over the three channels: the per-channel ratios differ slightly on
+ * saturated paint, and one number that is a fraction of a unit wrong on each
+ * beats three that are exact and three times as easy to get out of step.
+ */
+function leafFallOf(top, foot) {
+  const a = toRgb(top), b = toRgb(foot);
+  const r = [['r'], ['g'], ['b']].map(([k]) => 1 - b[k] / a[k]);
+  return (r.reduce((s, v) => s + v) / 3).toFixed(4);
+}
+
 function mouldGradients(paint, pale) {
   /* Compressed on light paint, per the cream door: d076 spans 0.78 to 1.02
      where navy d048 spans 0.27 to 1.16. A near-white paint has no headroom
@@ -1475,23 +1565,29 @@ function mouldGradients(paint, pale) {
  */
 const PANEL_INSET = 0.23;      // measured minimum, and the two-panel doors' own
 const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real one
-function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0) {
+function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm') {
   const band = lw * 0.09;
   const inset = Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
   const x = lx + inset, w = lw - inset * 2;
-  const rect = (t, b) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale);
+  /* The leaf's own rectangle, carried down to `moulding` so the panel can be
+     lit by the same wash as the face around it. `key` keeps the clip-path ids
+     apart — a door can carry two panels and a sidelight, and a duplicate id is
+     how gradients and clips silently cross-wire (the test suite checks). */
+  const leaf = { x: lx, y: ly, w: lw, h: lh };
+  const rect = (t, b, n) =>
+    moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `${key}${n}`);
 
   /* The classic two-rectangle face, which is what nearly every designed door
      in the gallery carries. Only on a solid leaf: with glazing above there is
      nowhere for the upper one. */
   if (upper && winBottom <= ly + 1) {
     return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * 0.07).toFixed(1)}"
-               data-band="${band.toFixed(1)}">${rect(0.07, 0.58)}${rect(0.66, 0.92)}</g>`;
+               data-band="${band.toFixed(1)}">${rect(0.07, 0.58, 0)}${rect(0.66, 0.92, 1)}</g>`;
   }
 
   const top = Math.max(ly + lh * 0.68, winBottom + lw * 0.08);
   const bottom = ly + lh * 0.90;
-  const art = moulding(x, top, w, bottom - top, band, paint, pale);
+  const art = moulding(x, top, w, bottom - top, band, paint, pale, leaf, `${key}0`);
   /* `data-top` so a test can ask where the moulding starts instead of parsing
      the first path out of the markup. It did that until this rewrite, and the
      assertion it was protecting — that mouldings never cross the glazing —

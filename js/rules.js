@@ -57,6 +57,9 @@ import { gripClashesGlass, gripClashesLockset } from './renderer.js';
 /** Does this detail put ruled line work on the face? */
 export const isLineWork = detail => !!(detail.strips || detail.groove);
 
+/** Does this detail put ANYTHING on the face — moulding or line work alike? */
+export const faceWorked = detail => !!detail.panel || isLineWork(detail);
+
 /**
  * Two different questions, and conflating them broke the sidelight the first
  * time it was drawn.
@@ -162,6 +165,40 @@ export function conflicts(state) {
      swan-neck stands 0.30 of the leaf's width in, so on a glazed narrow leaf
      the GEOMETRIC glass rules below refuse more combinations than they used
      to. Those stay — a bar drawn across a pane is a different claim. */
+
+  /* THE RECESSED CHANNEL IS A HOLE, and this is the exact inverse of the depth
+     argument the rule below it was withdrawn for.
+
+     Everything else on this door stands OFF the face — a lever 30-60 mm, a
+     pull bar 50 mm on its standoffs — so it passes in front of whatever it
+     crosses and the drawing only has to get the compositing order right. The
+     ידית שקועה does the opposite: it is a channel cut INTO the leaf, 1554 mm
+     of it, on the axis 0.30 of the leaf's width in. There is no in-front to be
+     had. A moulding laid across it would have to bridge a void, a metal strip
+     would run off the edge into it, and a window would have to share the same
+     hole. The owner's words are the general form of it: it cannot go with
+     anything that overlaps it.
+
+     Every one of them does overlap it, which is why this is stated once rather
+     than computed per option: the panel spans 0.23-0.77 of the width, the
+     strips and the groove cross the whole face, and the channel is longer than
+     three quarters of the leaf. So the rule is simply that this grip wants a
+     plain leaf, and it is reported from both sides — the customer may have
+     picked the pattern first. */
+  const CHANNEL = HANDLES.find(h => h.style === 'channel');
+  if (CHANNEL) {
+    if (onLeaf || faceWorked(byId(DETAILS, state.detail))) {
+      out.handle[CHANNEL.id] = 'ידית שקועה דורשת דלת חלקה';
+    }
+    if (grip.style === 'channel') {
+      for (const w of WINDOWS) if (w.rects.length) {
+        out.window[w.id] = out.window[w.id] || 'לא משתלב עם ידית שקועה';
+      }
+      for (const d of DETAILS) if (faceWorked(d)) {
+        out.detail[d.id] = out.detail[d.id] || 'לא משתלב עם ידית שקועה';
+      }
+    }
+  }
 
   /* GEOMETRIC: a grip that would have to be drawn across the glass. Asked of
      the renderer's own arithmetic rather than listed here, so it stays true
@@ -287,6 +324,20 @@ export function repair(state, intent = null) {
        expensive and more visible of the two to lose silently. */
     if (intent === 'detail') { s.window = 'none'; changed.push('window'); }
     else { s.detail = 'plain'; changed.push('detail'); }
+  }
+
+  /* The recessed channel wants a plain leaf. Whichever the customer just asked
+     for wins; without an intent the CHANNEL yields, because a pattern and a
+     window are both things you can see from the street and a grip is not. */
+  if (byId(HANDLES, s.handle).style === 'channel'
+      && (leafGlazed(s) || faceWorked(byId(DETAILS, s.detail)))) {
+    if (intent === 'handle') {
+      if (leafGlazed(s)) { s.window = 'none'; changed.push('window'); }
+      if (faceWorked(byId(DETAILS, s.detail))) { s.detail = 'plain'; changed.push('detail'); }
+    } else {
+      s.handle = 'none';
+      changed.push('handle');
+    }
   }
 
   /* The grab bar is centred on the leaf and runs across a centred window. */
