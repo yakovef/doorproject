@@ -240,7 +240,8 @@ body {
 .grip-bar__btn:hover { border-color: var(--ink-2); }
 .grip-bar__btn[aria-disabled="true"] { opacity: .45; cursor: default; }
 
-[data-hw="handle"].grip-live { cursor: grab; touch-action: none; }
+[data-hw="handle"].grip-live,
+[data-hw="handle"].grip-live * { cursor: grab; touch-action: none; }
 [data-hw="handle"].grip-live:active { cursor: grabbing; }
 [data-hw="handle"].grip-live:focus-visible {
   outline: 3px solid var(--accent); outline-offset: 3px;

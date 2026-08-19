@@ -21,6 +21,32 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The drag did not work on a phone, and it was one line.** Reported from the
+  outside: the handle moved a couple of pixels at a time, and teleported while
+  the finger was still down. `pointercancel` was wired to the same handler as
+  `pointerup` — and a mobile browser fires cancel the moment it decides a
+  gesture is a page scroll, so a finger moving at any speed ENDED the drag,
+  which is what commits the position and snaps it. Two symptoms, one cause.
+  A cancel is an interruption and not a decision: it abandons the drag and puts
+  the handle back, committing nothing and saying nothing.
+  Two more things were wrong underneath. The browser should never have called
+  it a scroll — `touch-action: none` on an SVG group is not reliable, so the
+  grip also takes a non-passive `touchstart`/`touchmove` that `preventDefault`,
+  which is the one way every mobile browser honours. And the move and up
+  listeners hung off the grip element, which works exactly as long as pointer
+  capture holds; capture was the thing being lost. They are on `window` now.
+  **And the target was four pixels of bar.** `gripArt` draws an invisible
+  `data-hitpad` 120 mm across — a floor, not the answer, since the door is
+  scaled to the screen and 120 mm of door is 20 css pixels on a phone.
+  `sizeHitPad` grows it to 44 real pixels through the SVG's own screen matrix,
+  and again after every re-fit, so a rotated phone keeps it. The measuring
+  tools drop `[data-hitpad]` — left in, every grip measures 120 mm wide and
+  collides with its own lockset.
+  `npm run audit` drives all of it at five viewports now: a 220 px drag has to
+  track every move, a completed drag has to commit, a cancelled one has to
+  change nothing, and the target has to reach 44 px. Backing the cancel fix out
+  fails it five times; disabling `sizeHitPad` fails it five more.
+
 - **The pull handle can be dragged anywhere on the door, and goes red where it
   cannot go.** Asked for in those words, with the rule attached: red "when the
   2 points that are connecting it are on the panel frame or window, or

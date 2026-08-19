@@ -2741,9 +2741,29 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
      other way up. Drawing a second horizontal version would be a second thing
      to keep in step with the first. */
   const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : '';
+  /* SOMETHING A FINGER CAN HOLD.
+     A pull bar is 16 to 62 mm of section, which on a phone is four or five
+     pixels of screen — you cannot put a fingertip on that, and the drag was
+     reported as unusable before this. So the group carries an invisible pad,
+     120 mm across and never shorter than that. That is a FLOOR and not the
+     answer: the door is scaled to whatever screen it lands on, and on a phone
+     120 mm of door is 20 css pixels — reported from the outside as barely
+     being able to drag it. `sizeHitPad` in app.js grows it to 44 real pixels
+     through the SVG's own screen matrix. Its own centre and floor are carried
+     on the rect so that growing it needs nothing else from the drawing.
+     `transparent` and not `none`: a fill of `none` is not painted and does not
+     receive a pointer at all, which is the whole point of the rect.
+     It is marked so the measuring tools can drop it — it is not on the door,
+     and `npm run collide` would otherwise see every grip as 120 mm wide. */
+  const padW = Math.max(120, foot.out + foot.in);
+  const padH = Math.max(120, foot.vy * 2);
+  const pad = `<rect data-hitpad="1" x="${cx - padW / 2}" y="${cy - padH / 2}"
+                     width="${padW}" height="${padH}"
+                     data-cx="${cx}" data-cy="${cy}" data-w="${padW}" data-h="${padH}"
+                     fill="transparent" pointer-events="all"/>`;
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
-             data-vy="${foot.vy}" data-rot="${rot}"${turned}>${art}</g>`;
+             data-vy="${foot.vy}" data-rot="${rot}"${turned}>${pad}${art}</g>`;
 }
 
 function locksetArt(lockset, cx, cy, dir) {

@@ -421,12 +421,34 @@ function paint() {
  * feels like. One render on release, through `set`, so the price line, the
  * link and the code all follow as they do for every other change.
  *
- * A position that cannot be built goes red under the finger and SNAPS BACK on
- * release, to the nearest place that works, with the reason in the toast. The
- * owner's son chose snap-back over leaving it stuck: nobody can end up holding
- * a door that cannot be made.
+ * A position that cannot be built goes red under the finger and snaps to the
+ * nearest place that works WHEN THE FINGER LIFTS, never before. Red is what it
+ * says while you are still holding it; moving it is what happens when you let
+ * go.
+ *
+ * ── it did not work on a phone, and here is why ──────────────────────
+ * Reported from the outside: the handle moved a couple of pixels at a time and
+ * teleported while the finger was still down. One cause, three mistakes.
+ *
+ * `pointercancel` was wired to the same handler as `pointerup`. A mobile
+ * browser fires cancel the moment it decides a gesture is a page scroll — so a
+ * finger moving faster than a few pixels ENDED the drag, which committed the
+ * position and snapped it. Both symptoms, one line. A cancel is an
+ * interruption, not a decision: it now abandons the drag and puts the handle
+ * back where it was, with nothing committed and nothing said.
+ *
+ * The browser should never have decided it was a scroll. `touch-action: none`
+ * on an SVG group is not reliable, so the grip also takes a non-passive
+ * `touchstart` and `touchmove` that call `preventDefault` — the one way to
+ * stop a page scrolling under a finger that every mobile browser honours.
+ *
+ * And the move and up listeners hung off the grip element itself, which is
+ * fine exactly as long as the pointer capture holds. Capture is the thing
+ * being lost here. They hang off `window` now, so once a drag has started
+ * nothing but a lift can end it.
  */
 let dragging = null;
+const swallowTouch = ev => ev.preventDefault();
 
 function armGrip() {
   const bar = $('#grip-bar');
@@ -440,6 +462,11 @@ function armGrip() {
   g.setAttribute('aria-label', 'מיקום הידית. גררו, או הזיזו עם מקשי החיצים');
   g.addEventListener('pointerdown', onGripDown);
   g.addEventListener('keydown', onGripKey);
+  /* Non-passive, so `preventDefault` is allowed to mean something. Chrome
+     assumes a touch listener is passive unless told otherwise, and a passive
+     listener cannot stop the page scrolling. */
+  g.addEventListener('touchstart', swallowTouch, { passive: false });
+  g.addEventListener('touchmove', swallowTouch, { passive: false });
 
   const rot = $('#grip-rot');
   const can = gripCanRotate(state);
@@ -450,12 +477,44 @@ function armGrip() {
      — so a customer who has dragged the handle somewhere is told, plainly,
      that where it ends up is settled on site. Anything less would be the site
      promising something nobody is building to. */
+  sizeHitPad();
+
   const home = gripHome(state), now = gripAt(state);
   const moved = !(now.x === home.x && now.y === home.y && now.rot === 0);
   $('#grip-home').hidden = !moved;
   $('.grip-bar__hint').textContent = moved
     ? 'מיקום הידית להמחשה — נקבע בהתקנה'
     : 'גררו את הידית למקום שתרצו';
+}
+
+/**
+ * The grip's touch target, in SCREEN terms.
+ *
+ * `gripArt` draws the pad 120 mm across, which is the right thing for a
+ * drawing to know and the wrong unit for a finger: the door is scaled to fit
+ * whatever screen it lands on, and on a phone 120 mm of door came out as 20
+ * css pixels. Reported from the outside as barely being able to drag it.
+ *
+ * So the drawing gives the pad a floor and the page gives it a size. 44 px is
+ * the smallest target a touch interface should offer; the pad is grown to that
+ * in both directions, measured through the SVG's own screen matrix so it is
+ * right at any zoom, on any viewport, after any re-fit.
+ */
+const TOUCH_TARGET = 44;
+function sizeHitPad() {
+  const svg = $('#stage svg');
+  const pad = svg && svg.querySelector('[data-hitpad]');
+  if (!pad) return;
+  const m = svg.getScreenCTM();
+  if (!m || !m.a || !m.d) return;
+  const mmPerPx = { x: 1 / Math.abs(m.a), y: 1 / Math.abs(m.d) };
+  const cx = Number(pad.dataset.cx), cy = Number(pad.dataset.cy);
+  const w = Math.max(Number(pad.dataset.w), TOUCH_TARGET * mmPerPx.x);
+  const h = Math.max(Number(pad.dataset.h), TOUCH_TARGET * mmPerPx.y);
+  pad.setAttribute('x', cx - w / 2);
+  pad.setAttribute('y', cy - h / 2);
+  pad.setAttribute('width', w);
+  pad.setAttribute('height', h);
 }
 
 /** Pointer position in LEAF-LOCAL millimetres, x from the leaf's left edge. */
@@ -487,11 +546,20 @@ function onGripDown(ev) {
     dx: p.x - fromEdge(now.x, p.leaf.width), dy: p.y - now.y,
     rot: now.rot, at: now,
   };
-  g.setPointerCapture(ev.pointerId);
-  g.addEventListener('pointermove', onGripMove);
-  g.addEventListener('pointerup', onGripUp);
-  g.addEventListener('pointercancel', onGripUp);
+  /* Capture is still asked for — it is what keeps a mouse drag working outside
+     the window — but nothing depends on it holding. */
+  try { g.setPointerCapture(ev.pointerId); } catch { /* not all pointers can */ }
+  window.addEventListener('pointermove', onGripMove, { passive: false });
+  window.addEventListener('pointerup', onGripUp);
+  window.addEventListener('pointercancel', onGripAbandon);
   ev.preventDefault();
+}
+
+/** Take the listeners down. Called by both endings. */
+function unhook() {
+  window.removeEventListener('pointermove', onGripMove);
+  window.removeEventListener('pointerup', onGripUp);
+  window.removeEventListener('pointercancel', onGripAbandon);
 }
 
 /** Snap to 5 mm: finer than anyone can aim and coarser than a float. */
@@ -518,12 +586,31 @@ function onGripMove(ev) {
 
 function onGripUp() {
   if (!dragging) return;
-  const { g, at } = dragging;
-  g.removeEventListener('pointermove', onGripMove);
-  g.removeEventListener('pointerup', onGripUp);
-  g.removeEventListener('pointercancel', onGripUp);
+  const { at } = dragging;
   dragging = null;
+  unhook();
   placeGrip(at, true);
+}
+
+/**
+ * The pointer was taken away from us — the system claimed the gesture, a phone
+ * call arrived, the finger left the screen edge.
+ *
+ * Nothing is committed. The handle goes back to where it was, which is the one
+ * position we know the customer chose on purpose. Treating this as a drop is
+ * what made the handle teleport mid-drag on a phone, and it was worse than a
+ * lost gesture: the door changed while nobody had decided anything.
+ */
+function onGripAbandon() {
+  if (!dragging) return;
+  const { g } = dragging;
+  dragging = null;
+  unhook();
+  g.classList.remove('grip-bad');
+  g.removeAttribute('transform');
+  if (gripAt(state).rot === 90) {
+    g.setAttribute('transform', `rotate(90 ${g.dataset.cx} ${g.dataset.cy})`);
+  }
 }
 
 /** Commit a position, snapping back to the nearest buildable one. */
@@ -532,7 +619,8 @@ function placeGrip(want, saySo) {
   const at = fit.ok ? want : nearestGrip(state, want);
   set({ ...state, grip: at });
   if (!fit.ok && saySo) toast(fit.why + ' — הזזנו למקום הקרוב שאפשר');
-  $('#stage svg [data-hw="handle"]').focus({ preventScroll: true });
+  const g = $('#stage svg [data-hw="handle"]');
+  if (g) g.focus({ preventScroll: true });
 }
 
 /* 10 mm a press, 50 with shift: the same two speeds the option grids use. */
@@ -615,6 +703,9 @@ function fitStage() {
   const vw = box.width / scale, vh = box.height / scale;
   svg.setAttribute('viewBox',
     `${((w - vw) / 2).toFixed(1)} ${((h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+  /* The crop just changed, so the scale did, so the touch target is the wrong
+     size. A rotated phone is the case that matters. */
+  sizeHitPad();
 }
 
 // Debounced so arrowing through ten colours announces once on settle,

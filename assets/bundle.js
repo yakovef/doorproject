@@ -1985,9 +1985,15 @@ ${body}
     if (!art) return "";
     const foot = handleFootprint(handle, leafH, panelled);
     const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : "";
+    const padW = Math.max(120, foot.out + foot.in);
+    const padH = Math.max(120, foot.vy * 2);
+    const pad = `<rect data-hitpad="1" x="${cx - padW / 2}" y="${cy - padH / 2}"
+                     width="${padW}" height="${padH}"
+                     data-cx="${cx}" data-cy="${cy}" data-w="${padW}" data-h="${padH}"
+                     fill="transparent" pointer-events="all"/>`;
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-out="${foot.out}" data-in="${foot.in}"
-             data-vy="${foot.vy}" data-rot="${rot}"${turned}>${art}</g>`;
+             data-vy="${foot.vy}" data-rot="${rot}"${turned}>${pad}${art}</g>`;
   }
   function locksetArt(lockset, cx, cy, dir) {
     const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
@@ -3574,6 +3580,7 @@ ${body}
     armGrip();
   }
   var dragging = null;
+  var swallowTouch = (ev) => ev.preventDefault();
   function armGrip() {
     const bar = $("#grip-bar");
     const g = $('#stage svg [data-hw="handle"]');
@@ -3585,14 +3592,33 @@ ${body}
     g.setAttribute("aria-label", "מיקום הידית. גררו, או הזיזו עם מקשי החיצים");
     g.addEventListener("pointerdown", onGripDown);
     g.addEventListener("keydown", onGripKey);
+    g.addEventListener("touchstart", swallowTouch, { passive: false });
+    g.addEventListener("touchmove", swallowTouch, { passive: false });
     const rot = $("#grip-rot");
     const can = gripCanRotate(state);
     rot.setAttribute("aria-disabled", String(!can));
     rot.title = can ? "" : "הידית הזו ארוכה מרוחב הדלת — אי אפשר להניח אותה לרוחב";
+    sizeHitPad();
     const home = gripHome(state), now = gripAt(state);
     const moved = !(now.x === home.x && now.y === home.y && now.rot === 0);
     $("#grip-home").hidden = !moved;
     $(".grip-bar__hint").textContent = moved ? "מיקום הידית להמחשה — נקבע בהתקנה" : "גררו את הידית למקום שתרצו";
+  }
+  var TOUCH_TARGET = 44;
+  function sizeHitPad() {
+    const svg = $("#stage svg");
+    const pad = svg && svg.querySelector("[data-hitpad]");
+    if (!pad) return;
+    const m = svg.getScreenCTM();
+    if (!m || !m.a || !m.d) return;
+    const mmPerPx = { x: 1 / Math.abs(m.a), y: 1 / Math.abs(m.d) };
+    const cx = Number(pad.dataset.cx), cy = Number(pad.dataset.cy);
+    const w = Math.max(Number(pad.dataset.w), TOUCH_TARGET * mmPerPx.x);
+    const h = Math.max(Number(pad.dataset.h), TOUCH_TARGET * mmPerPx.y);
+    pad.setAttribute("x", cx - w / 2);
+    pad.setAttribute("y", cy - h / 2);
+    pad.setAttribute("width", w);
+    pad.setAttribute("height", h);
   }
   function leafPoint(svg, ev) {
     const pt = svg.createSVGPoint();
@@ -3622,11 +3648,19 @@ ${body}
       rot: now.rot,
       at: now
     };
-    g.setPointerCapture(ev.pointerId);
-    g.addEventListener("pointermove", onGripMove);
-    g.addEventListener("pointerup", onGripUp);
-    g.addEventListener("pointercancel", onGripUp);
+    try {
+      g.setPointerCapture(ev.pointerId);
+    } catch {
+    }
+    window.addEventListener("pointermove", onGripMove, { passive: false });
+    window.addEventListener("pointerup", onGripUp);
+    window.addEventListener("pointercancel", onGripAbandon);
     ev.preventDefault();
+  }
+  function unhook() {
+    window.removeEventListener("pointermove", onGripMove);
+    window.removeEventListener("pointerup", onGripUp);
+    window.removeEventListener("pointercancel", onGripAbandon);
   }
   var snap = (v) => Math.round(v / 5) * 5;
   function onGripMove(ev) {
@@ -3650,19 +3684,29 @@ ${body}
   }
   function onGripUp() {
     if (!dragging) return;
-    const { g, at } = dragging;
-    g.removeEventListener("pointermove", onGripMove);
-    g.removeEventListener("pointerup", onGripUp);
-    g.removeEventListener("pointercancel", onGripUp);
+    const { at } = dragging;
     dragging = null;
+    unhook();
     placeGrip(at, true);
+  }
+  function onGripAbandon() {
+    if (!dragging) return;
+    const { g } = dragging;
+    dragging = null;
+    unhook();
+    g.classList.remove("grip-bad");
+    g.removeAttribute("transform");
+    if (gripAt(state).rot === 90) {
+      g.setAttribute("transform", `rotate(90 ${g.dataset.cx} ${g.dataset.cy})`);
+    }
   }
   function placeGrip(want, saySo) {
     const fit = gripPlacement(state, want);
     const at = fit.ok ? want : nearestGrip(state, want);
     set({ ...state, grip: at });
     if (!fit.ok && saySo) toast(fit.why + " — הזזנו למקום הקרוב שאפשר");
-    $('#stage svg [data-hw="handle"]').focus({ preventScroll: true });
+    const g = $('#stage svg [data-hw="handle"]');
+    if (g) g.focus({ preventScroll: true });
   }
   function onGripKey(ev) {
     const step2 = ev.shiftKey ? 50 : 10;
@@ -3713,6 +3757,7 @@ ${body}
       "viewBox",
       `${((w - vw) / 2).toFixed(1)} ${((h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
     );
+    sizeHitPad();
   }
   var liveTimer = null;
   function announce(text) {

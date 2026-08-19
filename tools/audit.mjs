@@ -177,6 +177,76 @@ for (const v of VIEWS) {
   }
   errs.forEach(e => fault(v.name, `console: ${e}`));
   if (!small.length && !errs.length) console.log('  clicked every option, clean');
+
+  /* ── DRAGGING THE HANDLE ──────────────────────────────────────────
+     Three faults, all reported from a phone and none of them visible to
+     anything that renders SVG strings:
+
+     the handle moved a couple of pixels and stopped, because `pointercancel`
+     was wired to the same handler as `pointerup` and a mobile browser fires
+     cancel the moment it thinks a gesture is a page scroll;
+
+     it teleported while the finger was still down — the same line, since
+     ending a drag is what commits and snaps it;
+
+     and the target was four pixels of bar. The pad is drawn 120 mm across and
+     grown to 44 real pixels by the page, so this asks the page and not the
+     drawing.
+
+     A cancel is dispatched deliberately here rather than hoped for. It is the
+     one part of a touch drag that a desktop browser will not produce on its
+     own, and it is the part that was broken. */
+  {
+    await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=tallwin&n=idan`
+               + '&k=cylinder&d=panel&s=standard&h=right-in');
+    await p.waitForTimeout(300);
+    const gp = () => (p.url().match(/gp=([^&]*)/) || [])[1] || null;
+    const pad = await p.$('[data-hitpad]');
+    const box = pad && await pad.boundingBox();
+    if (!box) fault(v.name, 'the handle has no touch target at all');
+    else if (box.width < 44 || box.height < 44) {
+      fault(v.name, `the handle's touch target is ${Math.round(box.width)}x`
+                     + `${Math.round(box.height)} px, under the 44 minimum`);
+    }
+
+    const g = await (await p.$('[data-hw="handle"]')).boundingBox();
+    const cx = g.x + g.width / 2, cy = g.y + g.height / 2;
+
+    /* A long drag must track every step of the way, not stop after the first. */
+    await p.mouse.move(cx, cy);
+    await p.mouse.down();
+    const seen = [];
+    for (const dy of [20, 70, 140, 220]) {
+      await p.mouse.move(cx, cy + dy);
+      seen.push(await p.$eval('[data-hw="handle"]', e => e.getAttribute('transform')));
+    }
+    await p.mouse.up();
+    await p.waitForTimeout(400);
+    if (new Set(seen).size < seen.length) {
+      fault(v.name, `a 220 px drag tracked ${new Set(seen).size} of ${seen.length} moves`);
+    }
+    if (!gp()) fault(v.name, 'a completed drag did not move the handle');
+
+    /* And an interrupted one must change nothing. */
+    const before = gp();
+    const g2 = await (await p.$('[data-hw="handle"]')).boundingBox();
+    await p.mouse.move(g2.x + g2.width / 2, g2.y + g2.height / 2);
+    await p.mouse.down();
+    await p.mouse.move(g2.x + g2.width / 2 - 30, g2.y + g2.height / 2 - 120, { steps: 5 });
+    await p.evaluate(() =>
+      window.dispatchEvent(new PointerEvent('pointercancel', { pointerId: 1, bubbles: true })));
+    await p.waitForTimeout(300);
+    await p.mouse.up();
+    await p.waitForTimeout(300);
+    if (gp() !== before) {
+      fault(v.name, `a cancelled drag moved the handle anyway (${before} -> ${gp()})`);
+    }
+    if (await p.$eval('[data-hw="handle"]', e => e.getAttribute('transform'))) {
+      fault(v.name, 'a cancelled drag left the handle displaced');
+    }
+    if (!faults) console.log('  the handle drags, and a cancelled drag changes nothing');
+  }
+
   await p.close();
 }
 await b.close();
