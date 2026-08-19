@@ -243,8 +243,16 @@ body {
 [data-hw="handle"].grip-live,
 [data-hw="handle"].grip-live * { cursor: grab; touch-action: none; }
 [data-hw="handle"].grip-live:active { cursor: grabbing; }
-[data-hw="handle"].grip-live:focus-visible {
-  outline: 3px solid var(--accent); outline-offset: 3px;
+/* THE RING FOLLOWS THE HANDLE, NOT THE TOUCH TARGET.
+   This was `outline: 3px solid` on the group, and an outline traces whichever
+   child reaches furthest — which is the invisible hit pad, grown to 44 css
+   pixels for a fingertip. So focusing a 35 mm rod drew a box 131 mm wide
+   around it, and it was reported from the outside as the hit box being huge.
+   The pad still grows, because a finger still needs it; the ring is drawn on a
+   second rect that is the handle's own size and is never grown. */
+[data-hw="handle"].grip-live:focus-visible { outline: none; }
+[data-hw="handle"].grip-live:focus-visible [data-chrome="focus"] {
+  stroke: var(--accent); stroke-width: 3; vector-effect: non-scaling-stroke;
 }
 /* RED, and it has to be red on metal — the grips are greys and browns under
    gradients, so a tint would barely show. A colour matrix that keeps the

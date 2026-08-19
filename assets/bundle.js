@@ -2441,8 +2441,12 @@ ${body}
          0.725 of the shaft's diameter rather than a swell at 1.5 times it.
          Kept a shade generous — the drawn shape is what `npm run collide -- boxes`
          checks against, and it errs the safe way. */
+      /* `atY` because this is the ONE grip not drawn at the grip's own axis: it
+         hangs on the mid rail at GRAB.fromTop of the leaf, roughly 280 mm below
+         where every other fitting sits. Read from the same constant the drawing
+         uses, so the touch pad cannot land somewhere the bar is not. */
       case "grab":
-        return { out: 26, in: 320, vy: 26 };
+        return { out: 26, in: 320, vy: 26, atY: GRAB.fromTop };
       case "lever":
         return { out: 40, in: 152, vy: 51 };
       case "plate":
@@ -2536,15 +2540,21 @@ ${body}
     const foot = handleFootprint(handle, leafH, panelled);
     const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : "";
     const box = rot === 90 ? { out: foot.vy, in: foot.vy, vy: Math.max(foot.out, foot.in) } : foot;
-    const padW = Math.max(120, foot.out + foot.in);
-    const padH = Math.max(120, foot.vy * 2);
-    const pad = `<rect data-hitpad="1" x="${cx - padW / 2}" y="${cy - padH / 2}"
+    const padL = cx - (dir > 0 ? foot.out : foot.in);
+    const padR = cx + (dir > 0 ? foot.in : foot.out);
+    const padW = padR - padL, padH = foot.vy * 2;
+    const padCx = (padL + padR) / 2;
+    const padCy = foot.atY != null ? y0 + leafH * foot.atY : cy;
+    const pad = `<rect data-hitpad="1" x="${padL}" y="${padCy - foot.vy}"
                      width="${padW}" height="${padH}"
-                     data-cx="${cx}" data-cy="${cy}" data-w="${padW}" data-h="${padH}"
+                     data-cx="${padCx}" data-cy="${padCy}" data-w="${padW}" data-h="${padH}"
                      fill="transparent" pointer-events="all"/>`;
+    const ring = `<rect data-chrome="focus" x="${padL}" y="${padCy - foot.vy}"
+                      width="${padW}" height="${padH}" rx="6"
+                      fill="none" pointer-events="none"/>`;
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-out="${box.out}" data-in="${box.in}"
-             data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}</g>`;
+             data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
   }
   function locksetArt(lockset, cx, cy, dir) {
     const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
@@ -3247,13 +3257,30 @@ ${body}
     <rect x="-11" y="${-half + 26}" width="22" height="${half * 2 - 52}" rx="4"
           opacity="0.45"/>` };
     },
-    // Coral plus the horizontal bow. The bow is centred on the leaf, far inboard
-    // of the lever, so it runs off the left of the tile — which is what it does.
-    grab: () => ({ box: [-300, -52, 52, 224], art: `
-    <circle cx="0" cy="0" r="39"/>
-    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <path d="M -300 158 Q -190 143 -80 158 L -80 182 Q -190 197 -300 182 Z"/>
-    <circle cx="-80" cy="170" r="17"/>` }),
+    /* The horizontal grab bar, AND NOTHING ELSE.
+       ⚠ This tile used to draw a Coral lever above the bar — a rose and a blade
+       — on the argument that a grab bar always shares its door with a lockset.
+       It does, and that is not this tile's job: every other fitting here is its
+       own silhouette, the lockset has its own list and its own tiles, and a
+       customer comparing grips was being shown a lever inside the one option
+       that is not a lever. Reported from the outside in those words.
+       What is left traces the drawing on the door: a straight spindle of
+       constant diameter, two posts set INBOARD at 0.175 and 0.825 of the length,
+       and beyond each of them a stem, a ring and a turned terminal bead. */
+    grab: () => {
+      const L = 560, D = L / 15, y = 0;
+      const P = (f) => -L / 2 + L * f;
+      const rod = (a, b, hh, r) => `<rect x="${P(a)}" y="${y - hh}" width="${P(b) - P(a)}" height="${hh * 2}" rx="${r}"/>`;
+      return { box: [-L / 2 - 6, -D * 1.1, L / 2 + 6, D * 1.1], art: `
+    ${rod(0, 0.032, D * 0.22, D * 0.11)}${rod(0.968, 1, D * 0.22, D * 0.11)}
+    ${rod(0.03, 0.078, D * 0.55, D * 0.5)}${rod(0.922, 0.97, D * 0.55, D * 0.5)}
+    ${rod(0.075, 0.155, D * 0.3, D * 0.15)}${rod(0.845, 0.925, D * 0.3, D * 0.15)}
+    ${rod(0.106, 0.124, D * 0.6, D * 0.1)}${rod(0.876, 0.894, D * 0.6, D * 0.1)}
+    ${rod(0.2, 0.8, D * 0.5, D * 0.16)}
+    ${rod(0.203, 0.228, D * 0.575, D * 0.2)}${rod(0.772, 0.797, D * 0.575, D * 0.2)}
+    <ellipse cx="${P(0.175)}" cy="${y}" rx="${D * 0.675}" ry="${D * 0.725}"/>
+    <ellipse cx="${P(0.825)}" cy="${y}" rx="${D * 0.675}" ry="${D * 0.725}"/>` };
+    },
     /* Pull bars.
        ⚠ THE BOX IS FIXED, and it has to be. Every other glyph here scales its
        own art to fill the tile, which is right when the fittings are different

@@ -21,6 +21,36 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The grip's hit box was the size of the touch target, and you could see
+  it.** Reported from the outside: the handle's hit box shows as huge, and the
+  grab bar's tile still draws a lever. Three separate faults behind one
+  screenshot.
+  **The pad had a 120 mm floor and was centred on the grip's own axis.** Both
+  wrong. The floor was never needed — `sizeHitPad` already grows the pad to 44
+  real pixels through the SVG's screen matrix, which is the honest way to say
+  "big enough for a finger" on a drawing that scales, and a millimetre floor
+  beside it is a second answer that can only be wrong at some zoom. The
+  centring was worse: `out` and `in` are not symmetric, and the grab bar
+  reaches 26 mm one way and 320 the other because it hangs off the stile and is
+  centred on the LEAF. Laid out symmetrically that pad was 346 mm wide in the
+  wrong place, covering the lockset and a stripe of bare door.
+  **And the grab bar is the one grip not drawn at the grip's axis** — it hangs
+  on the mid rail, about 280 mm below every other fitting, so even a correctly
+  sized pad landed above it. `handleFootprint` carries `atY` for it now, read
+  from the same `GRAB.fromTop` the drawing uses.
+  ⚠ **The visible box was the FOCUS RING, and it is a different object from the
+  touch target.** An `outline` on the group traces whichever child reaches
+  furthest, which is the pad after it has been grown for a fingertip — so
+  making the target big enough to hit and making the ring hug the handle were
+  one knob turned two ways. They are two rects now: the pad grows, and
+  `data-chrome="focus"` stays at the handle's own size and carries the ring.
+  Both are stripped by `npm run collide`, which measures the door.
+  **And the grab tile drew a Coral lever above the bar**, on the argument that
+  a grab bar always shares its door with a lockset. It does, and that is not
+  the tile's job — the lockset has its own list and its own tiles, and a
+  customer comparing grips was being shown a lever inside the one option that
+  is not one.
+
 - **Every window design and every pull handle redrawn from the photographs.**
   "Our window options are not nearly accurate to their real counterparts. Make
   them look the same as in the images. Then I want you to do the same thing

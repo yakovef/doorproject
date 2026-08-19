@@ -495,15 +495,22 @@ function armGrip() {
 /**
  * The grip's touch target, in SCREEN terms.
  *
- * `gripArt` draws the pad 120 mm across, which is the right thing for a
- * drawing to know and the wrong unit for a finger: the door is scaled to fit
- * whatever screen it lands on, and on a phone 120 mm of door came out as 20
+ * `gripArt` draws the pad at the handle's own size, which is the right thing
+ * for a drawing to know and the wrong unit for a finger: the door is scaled to
+ * fit whatever screen it lands on, and on a phone a 32 mm bar is four or five
  * css pixels. Reported from the outside as barely being able to drag it.
  *
- * So the drawing gives the pad a floor and the page gives it a size. 44 px is
- * the smallest target a touch interface should offer; the pad is grown to that
- * in both directions, measured through the SVG's own screen matrix so it is
- * right at any zoom, on any viewport, after any re-fit.
+ * So the drawing gives the pad the handle and the page gives it a floor. 44 px
+ * is the smallest target a touch interface should offer, measured through the
+ * SVG's own screen matrix so it is right at any zoom, on any viewport, after
+ * any re-fit.
+ *
+ * ⚠ THE PAD IS NOT WHAT YOU SEE. It was, and that is what got reported as the
+ * hit box being huge: the browser's focus outline sits on the GROUP and traces
+ * whichever child reaches furthest, which is this rect after it has been grown
+ * to a fingertip. So the drawing carries a second rect, `data-chrome="focus"`,
+ * at the handle's own size and never grown, and the ring is drawn on that.
+ * Grow this one freely — nobody looks at it.
  */
 const TOUCH_TARGET = 44;
 function sizeHitPad() {

@@ -129,8 +129,10 @@ if (boxes) {
            The clip's own outline is one of the shapes here, so skipping the
            clipped copy loses nothing. */
         if (el.hasAttribute('clip-path') || el.hasAttribute('mask')) continue;
-        /* The grip's touch target. Invisible, 120 mm across, and on no door. */
-        if (el.hasAttribute('data-hitpad')) continue;
+        /* The grip's touch target and its focus ring. Invisible, and on no
+           door: one is something a finger can hold and the other is something
+           the browser draws round it. */
+        if (el.hasAttribute('data-hitpad') || el.hasAttribute('data-chrome')) continue;
         if (el.closest('defs,clipPath,mask,pattern,marker,symbol')) continue;
         let b; try { b = el.getBBox(); } catch { continue; }
         if (!b.width && !b.height) continue;
@@ -310,7 +312,7 @@ const hits = await p.evaluate(({ cases, allowed }) => {
     /* And the grip's touch target, for the same reason: it is something a
        finger can hold, not something the door has on it. Left in, every grip
        measures 120 mm wide and collides with its own lockset. */
-    for (const g of svg.querySelectorAll('[data-hitpad]')) g.remove();
+    for (const g of svg.querySelectorAll('[data-hitpad],[data-chrome]')) g.remove();
     /* AND THE DROP SHADOWS, which is the same rule a third time and the one
        place this file was not applying it.
        `metalBox` above — the `-- boxes` reader — has always skipped any

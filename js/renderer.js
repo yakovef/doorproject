@@ -3450,7 +3450,11 @@ function handleFootprint(handle, leafH, panelled = false) {
        0.725 of the shaft's diameter rather than a swell at 1.5 times it.
        Kept a shade generous — the drawn shape is what `npm run collide -- boxes`
        checks against, and it errs the safe way. */
-    case 'grab':    return { out: 26, in: 320, vy: 26 };
+    /* `atY` because this is the ONE grip not drawn at the grip's own axis: it
+       hangs on the mid rail at GRAB.fromTop of the leaf, roughly 280 mm below
+       where every other fitting sits. Read from the same constant the drawing
+       uses, so the touch pad cannot land somewhere the bar is not. */
+    case 'grab':    return { out: 26, in: 320, vy: 26, atY: GRAB.fromTop };
     case 'lever':   return { out: 40, in: 152, vy: 51 };
     case 'plate':   return { out: 47, in: 119, vy: 129 };
     case 'almog':   return { out: 42, in: 220, vy: 42 };
@@ -3697,29 +3701,51 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
   const box = rot === 90
     ? { out: foot.vy, in: foot.vy, vy: Math.max(foot.out, foot.in) }
     : foot;
-  /* SOMETHING A FINGER CAN HOLD.
+  /* SOMETHING A FINGER CAN HOLD — AND NOTHING MORE THAN THAT.
      A pull bar is 16 to 62 mm of section, which on a phone is four or five
-     pixels of screen — you cannot put a fingertip on that, and the drag was
-     reported as unusable before this. So the group carries an invisible pad,
-     120 mm across and never shorter than that. That is a FLOOR and not the
-     answer: the door is scaled to whatever screen it lands on, and on a phone
-     120 mm of door is 20 css pixels — reported from the outside as barely
-     being able to drag it. `sizeHitPad` in app.js grows it to 44 real pixels
-     through the SVG's own screen matrix. Its own centre and floor are carried
-     on the rect so that growing it needs nothing else from the drawing.
+     pixels of screen; you cannot put a fingertip on that, and the drag was
+     reported as unusable before there was a pad at all.
+     ⚠ THE PAD IS THE HANDLE NOW. It used to be a 120 mm floor CENTRED ON THE
+     GRIP'S OWN AXIS, and both halves of that were wrong. The floor made every
+     pad far larger than the thing it stands for — and it was never needed,
+     because `sizeHitPad` in app.js already grows the pad to 44 real pixels
+     through the SVG's own screen matrix, which is the honest way to say "big
+     enough for a finger" on a drawing that scales. Two answers to one
+     question, and the millimetre one could only ever be wrong at some zoom.
+     The centring was worse. `out` and `in` are measured from the grip's axis
+     and they are NOT symmetric — the grab bar reaches 26 mm one way and 320
+     the other, because it hangs off the stile and is centred on the leaf. Laid
+     out symmetrically that pad was 346 mm wide in the wrong place, covering
+     the lockset and a stripe of bare door beside it. It is visible, too: the
+     focus ring outlines the whole group, so what a keyboard user saw was a
+     rectangle over most of the door with the handle off to one side of it.
      `transparent` and not `none`: a fill of `none` is not painted and does not
      receive a pointer at all, which is the whole point of the rect.
-     It is marked so the measuring tools can drop it — it is not on the door,
-     and `npm run collide` would otherwise see every grip as 120 mm wide. */
-  const padW = Math.max(120, foot.out + foot.in);
-  const padH = Math.max(120, foot.vy * 2);
-  const pad = `<rect data-hitpad="1" x="${cx - padW / 2}" y="${cy - padH / 2}"
+     It is marked so the measuring tools can drop it — it is not on the door. */
+  const padL = cx - (dir > 0 ? foot.out : foot.in);
+  const padR = cx + (dir > 0 ? foot.in : foot.out);
+  const padW = padR - padL, padH = foot.vy * 2;
+  const padCx = (padL + padR) / 2;
+  const padCy = foot.atY != null ? y0 + leafH * foot.atY : cy;
+  const pad = `<rect data-hitpad="1" x="${padL}" y="${padCy - foot.vy}"
                      width="${padW}" height="${padH}"
-                     data-cx="${cx}" data-cy="${cy}" data-w="${padW}" data-h="${padH}"
+                     data-cx="${padCx}" data-cy="${padCy}" data-w="${padW}" data-h="${padH}"
                      fill="transparent" pointer-events="all"/>`;
+  /* THE FOCUS RING IS NOT THE TOUCH TARGET, and conflating them is what was
+     reported. A finger needs 44 css pixels and the audit asserts it; the eye
+     needs to be shown the handle. While the ring was the browser's own outline
+     on the group, it traced whichever child reached furthest — the pad — so
+     making the target big enough to hit and making the ring hug the handle
+     were the same knob turned two ways.
+     They are two objects now. This one is never grown, never painted until the
+     group takes visible focus, and marked as chrome so the measuring tools
+     drop it exactly as they drop the pad: it is not on the door. */
+  const ring = `<rect data-chrome="focus" x="${padL}" y="${padCy - foot.vy}"
+                      width="${padW}" height="${padH}" rx="6"
+                      fill="none" pointer-events="none"/>`;
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
              data-cx="${cx}" data-cy="${cy}" data-out="${box.out}" data-in="${box.in}"
-             data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}</g>`;
+             data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
 }
 
 function locksetArt(lockset, cx, cy, dir) {
@@ -4814,13 +4840,31 @@ const FITTING_GLYPH = {
           opacity="0.45"/>` };
   },
 
-  // Coral plus the horizontal bow. The bow is centred on the leaf, far inboard
-  // of the lever, so it runs off the left of the tile — which is what it does.
-  grab: () => ({ box: [-300, -52, 52, 224], art: `
-    <circle cx="0" cy="0" r="39"/>
-    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <path d="M -300 158 Q -190 143 -80 158 L -80 182 Q -190 197 -300 182 Z"/>
-    <circle cx="-80" cy="170" r="17"/>` }),
+  /* The horizontal grab bar, AND NOTHING ELSE.
+     ⚠ This tile used to draw a Coral lever above the bar — a rose and a blade
+     — on the argument that a grab bar always shares its door with a lockset.
+     It does, and that is not this tile's job: every other fitting here is its
+     own silhouette, the lockset has its own list and its own tiles, and a
+     customer comparing grips was being shown a lever inside the one option
+     that is not a lever. Reported from the outside in those words.
+     What is left traces the drawing on the door: a straight spindle of
+     constant diameter, two posts set INBOARD at 0.175 and 0.825 of the length,
+     and beyond each of them a stem, a ring and a turned terminal bead. */
+  grab: () => {
+    const L = 560, D = L / 15, y = 0;
+    const P = f => -L / 2 + L * f;
+    const rod = (a, b, hh, r) =>
+      `<rect x="${P(a)}" y="${y - hh}" width="${P(b) - P(a)}" height="${hh * 2}" rx="${r}"/>`;
+    return { box: [-L / 2 - 6, -D * 1.1, L / 2 + 6, D * 1.1], art: `
+    ${rod(0.000, 0.032, D * 0.22, D * 0.11)}${rod(0.968, 1.000, D * 0.22, D * 0.11)}
+    ${rod(0.030, 0.078, D * 0.55, D * 0.5)}${rod(0.922, 0.970, D * 0.55, D * 0.5)}
+    ${rod(0.075, 0.155, D * 0.30, D * 0.15)}${rod(0.845, 0.925, D * 0.30, D * 0.15)}
+    ${rod(0.106, 0.124, D * 0.60, D * 0.10)}${rod(0.876, 0.894, D * 0.60, D * 0.10)}
+    ${rod(0.20, 0.80, D * 0.5, D * 0.16)}
+    ${rod(0.203, 0.228, D * 0.575, D * 0.2)}${rod(0.772, 0.797, D * 0.575, D * 0.2)}
+    <ellipse cx="${P(0.175)}" cy="${y}" rx="${D * 0.675}" ry="${D * 0.725}"/>
+    <ellipse cx="${P(0.825)}" cy="${y}" rx="${D * 0.675}" ry="${D * 0.725}"/>` };
+  },
 
   /* Pull bars.
      ⚠ THE BOX IS FIXED, and it has to be. Every other glyph here scales its
