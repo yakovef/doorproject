@@ -634,10 +634,19 @@ body {
   border-block-start: 1px solid var(--rule);
   box-shadow: 0 -6px 18px rgba(23, 23, 21, .06);
 }
+/* Contents centred inside a readable measure rather than stretched edge to
+   edge. On a 390 px phone the two fill the bar anyway; on an 834 px tablet,
+   left to itself, the button became a green slab most of the screen wide with
+   the price marooned at one end. */
+.dock > * { flex: 0 0 auto; }
+.dock { justify-content: center; }
 .dock__price { display: flex; flex-direction: column; line-height: 1.15; }
 .dock__label { font-size: .68rem; color: var(--ink-2); }
 .dock__figure { font-size: 1.2rem; font-weight: 700; white-space: nowrap; }
-.dock__send { flex: 1; min-block-size: 46px; padding: 10px 14px; font-size: .95rem; }
+.dock__send {
+  flex: 1 1 auto; max-inline-size: 22rem;
+  min-block-size: 46px; padding: 10px 14px; font-size: .95rem;
+}
 
 /* The page has to end above the dock, or the last thing on it — the link to
    his real work — sits underneath a bar and can be neither read nor tapped. */
