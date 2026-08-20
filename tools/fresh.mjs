@@ -42,6 +42,57 @@ import { build } from 'esbuild';
  * version buys nothing but friction. It says so out loud when it acts, because
  * a tool that silently edits the working tree is its own kind of surprise.
  */
+/**
+ * ── the same problem, one level out: the comparison SHEETS ──────────
+ *
+ * `assertFreshBundle` stops a tool measuring the previous version of the
+ * drawing. Nothing stopped the IMAGES those tools write from doing the same,
+ * and the recurring agent caught it: the threshold was made bare aluminium,
+ * `npm run shot`'s twelve sheets were regenerated and `npm run recreate`'s ten
+ * were not, so the sheets a human opens to judge our door against a photograph
+ * — the artefact behind REALISM.md §6, *compare against a photograph, every
+ * time* — were showing a threshold the site had stopped drawing. It measured
+ * the band: rgb(59,57,60) to rgb(132,130,124), more than double the luminance.
+ * That is the whole failure mode of this project in miniature. Nothing throws,
+ * every file is present, the picture is the wrong picture — and the next
+ * person to open it may "fix" something already fixed.
+ *
+ * The stamp is a hash of what the DRAWING is — `js/renderer.js` and
+ * `js/catalog.js` — and not of the tool that drew the sheet. A tool's own
+ * comments changing is not a reason to spend three minutes regenerating
+ * thirty PNGs; the drawing changing is.
+ */
+const SHEET_DEPS = ['js/renderer.js', 'js/catalog.js'];
+const STAMP_FILE = 'screenshots/.stamps.json';
+
+const depHash = () => createHash('sha256')
+  .update(SHEET_DEPS.map(f => readFileSync(f)).join('\n')).digest('hex').slice(0, 12);
+
+const readStamps = () => {
+  try { return JSON.parse(readFileSync(STAMP_FILE, 'utf8')); } catch { return {}; }
+};
+
+/** Called by a sheet-writing tool once it has finished writing them. */
+export function stampSheets(name) {
+  const all = readStamps();
+  all[name] = depHash();
+  writeFileSync(STAMP_FILE, JSON.stringify(all, null, 2) + '\n');
+}
+
+/**
+ * Which sheet families are stale, as a list of names. Empty means all current.
+ * Returns `{ stale, unknown }` — `unknown` is a family that has never been
+ * stamped at all, which is the same problem wearing a different hat.
+ */
+export function staleSheets(names) {
+  const want = depHash();
+  const all = readStamps();
+  return {
+    stale: names.filter(n => all[n] && all[n] !== want),
+    unknown: names.filter(n => !all[n]),
+  };
+}
+
 export async function assertFreshBundle() {
   const options = {
     entryPoints: ['js/app.js'],

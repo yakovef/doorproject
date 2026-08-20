@@ -9,7 +9,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
-import { assertFreshBundle } from './fresh.mjs';
+import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
 import { MOULD_BAND, REBATE } from '../js/renderer.js';
@@ -207,3 +207,8 @@ for (const c of CASES) {
 }
 await b.close();
 process.exitCode = bad ? 1 : 0;
+
+/* The sheets are current as of this drawing. `npm test` checks the stamp, so
+   a change to the renderer or the catalogue that is not followed by a
+   regeneration is caught rather than left for somebody to read as a finding. */
+stampSheets('recreate');

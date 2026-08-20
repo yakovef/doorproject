@@ -28,7 +28,7 @@
  */
 import { readFileSync, mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
-import { assertFreshBundle } from './fresh.mjs';
+import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { PNG } from 'pngjs';
 import { load, canvas, blit, save, text } from './imglib.mjs';
 import { GRILLES, HANDLES, SIZES, WINDOWS, byId } from '../js/catalog.js';
@@ -180,3 +180,8 @@ for (const h of HANDLES) {
 
 await b.close();
 void PNG;
+
+/* The sheets are current as of this drawing. `npm test` checks the stamp, so
+   a change to the renderer or the catalogue that is not followed by a
+   regeneration is caught rather than left for somebody to read as a finding. */
+stampSheets('against');

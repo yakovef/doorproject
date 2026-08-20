@@ -23,7 +23,8 @@
     "profile": "node tools/profile.mjs",
     "against": "node tools/against.mjs",
     "fuzz": "node tools/fuzz.mjs",
-    "corpus": "node tools/corpus.mjs"
+    "corpus": "node tools/corpus.mjs",
+    "sheets": "npm run shot && npm run recreate && npm run corpus && npm run against"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

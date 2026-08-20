@@ -21,6 +21,24 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The comparison sheets had silently lagged the drawing, and now they
+  cannot.** `assertFreshBundle` stops a tool measuring the previous version of
+  the renderer; nothing stopped the IMAGES those tools write from doing the
+  same. The recurring agent caught it: the threshold was made bare aluminium,
+  `npm run shot`'s twelve sheets were regenerated in that commit and
+  `npm run recreate`'s ten were not, so the sheets a person opens to judge our
+  door against a photograph — the artefact behind REALISM.md §6, the governing
+  rule of the project — were showing a threshold the site had stopped drawing.
+  It measured the band rather than calling them stale: rgb(59,57,60) against
+  rgb(132,130,124), more than double the luminance.
+  Each generating tool stamps `screenshots/.stamps.json` with a hash of what
+  the DRAWING is — `js/renderer.js` and `js/catalog.js`, not the tool, so a
+  comment in a harness does not cost three minutes of regeneration — and
+  `npm test` refuses a stale or unstamped family. `npm run sheets` regenerates
+  all four. It is worse than a stale bundle, because the next person to open
+  d003 sees the old threshold beside the photograph and may "fix" something
+  already fixed.
+
 - **Nothing anywhere had ever pressed a key.** The audit clicks, the fuzzer
   clicks, the suite renders strings — so the roving tabindex and the arrow-key
   grid in app.js were carried by nobody, on a page whose whole content is a

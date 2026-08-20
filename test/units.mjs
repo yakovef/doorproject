@@ -1206,5 +1206,48 @@ group('every option the customer pays for is named in the message');
   console.log(`  (${n} messages read, ${priced} surcharges checked against their sentence)`);
 }
 
+/* ── 13. THE COMPARISON SHEETS ARE OF THIS DRAWING ────────────────────
+   REALISM.md §6 is the governing rule of the whole project: compare against a
+   photograph, every time. The sheets under `screenshots/` ARE that comparison
+   — they are what a person opens to decide whether our door looks like his.
+
+   And they had silently lagged. The threshold was made bare aluminium instead
+   of painted with the door; `npm run shot`'s twelve sheets were regenerated
+   in the same commit and `npm run recreate`'s ten were not. The recurring
+   agent found it and measured the band it was wrong by: rgb(59,57,60) against
+   rgb(132,130,124), more than double the luminance. A visible element,
+   changed on purpose, still shown the old way.
+
+   That is this project's whole failure mode in miniature — nothing throws,
+   every file is present, the picture is the wrong picture — and it is worse
+   than a stale bundle, because the next person to open d003 sees the old
+   threshold beside the photograph and may "fix" something already fixed.
+
+   Each generating tool stamps `screenshots/.stamps.json` with a hash of what
+   the DRAWING is: `js/renderer.js` and `js/catalog.js`. Not of the tool, so a
+   comment in a harness does not cost three minutes of regeneration; of the
+   drawing, because that is what a sheet is a picture of.
+
+   Fix with `npm run sheets`. */
+group('the comparison sheets are pictures of THIS drawing');
+{
+  const { staleSheets } = await import('../tools/fresh.mjs');
+  const FAMILIES = ['shot', 'recreate', 'corpus', 'against'];
+  const { stale, unknown } = staleSheets(FAMILIES);
+  for (const n of stale) {
+    ok(false, `screenshots from "npm run ${n}" were made from a different renderer `
+            + 'than the one in js/ — they show a door the site no longer draws. '
+            + 'Run: npm run sheets');
+  }
+  for (const n of unknown) {
+    ok(false, `"npm run ${n}" has never stamped its sheets, so nothing can tell `
+            + 'whether they are current. Run: npm run sheets');
+  }
+  if (!stale.length && !unknown.length) {
+    ok(true, 'sheets current');
+    console.log(`  (${FAMILIES.length} sheet families, all drawn from the current renderer)`);
+  }
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

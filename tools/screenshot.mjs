@@ -13,7 +13,7 @@
  * Run: npm run shot
  */
 import { chromium } from 'playwright';
-import { assertFreshBundle } from './fresh.mjs';
+import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { fromQuery } from '../js/url-state.js';
 
 /* Every query here must be a BUILDABLE door. They go through the same rules
@@ -115,3 +115,8 @@ for (const s of SHOTS) {
 }
 await b.close();
 process.exitCode = bad ? 1 : 0;
+
+/* The sheets are current as of this drawing. `npm test` checks the stamp, so
+   a change to the renderer or the catalogue that is not followed by a
+   regeneration is caught rather than left for somebody to read as a finding. */
+stampSheets('shot');

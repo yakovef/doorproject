@@ -38,7 +38,7 @@
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
-import { assertFreshBundle } from './fresh.mjs';
+import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { canvas, blit, load, rect, save, text } from './imglib.mjs';
 import { COLOURS, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS, byId }
   from '../js/catalog.js';
@@ -503,3 +503,8 @@ for (let i = 0; i < rows.length; i++) {
 }
 await b.close();
 console.log('\nphoto left, ours right, in each pair. leaf heights matched.\n');
+
+/* The sheets are current as of this drawing. `npm test` checks the stamp, so
+   a change to the renderer or the catalogue that is not followed by a
+   regeneration is caught rather than left for somebody to read as a finding. */
+stampSheets('corpus');
