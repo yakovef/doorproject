@@ -355,6 +355,27 @@ const BAR_GAP_MIN = 0.090;
    bottom of that range. The 1:15 slenderness was already right. */
 const GRAB = { fromTop: 0.59, len: 0.33, ratio: 1 / 15 };
 const THRESHOLD    = 42;   // a real sill is a chunky extrusion, ~0.02 H, not a strip
+/**
+ * The sill's own colour, and it is NOT the door's.
+ *
+ * It was `darken(paint, 0.30)` — a dark version of whatever the leaf is
+ * painted — and the photographs say a threshold is a bare aluminium extrusion
+ * with a tone of its own. Measured on the twelve metal sills in the records,
+ * as `frame.threshold.tone x colour.lum`:
+ *
+ *   leaf lum   43  56  86 101 104 118 166 172 175 185
+ *   sill lum  150  76 180 136 155 160  99 100 131  43
+ *
+ * Scattered, and flat: the sill does not track the leaf. Median 131 of 255,
+ * and the ratio to the leaf runs from 0.23 on a white door to 3.47 on a dark
+ * one — which is the same statement read the other way round.
+ *
+ * `darken(paint, 0.30)` gave a black door a sill at luminance 18 where the
+ * corpus says 130, so the brightest object at the foot of the drawing was
+ * missing from every dark door we make — and most of them are dark.
+ * Neutral, faintly warm, and left alone by the paint.
+ */
+const SILL_METAL   = '#87857F';   // luminance 133
 
 /* The backplate that carries lever and cylinder together — the fitting on
    three of the four doors we could measure. Waisted, not a plain stadium:
@@ -1303,7 +1324,7 @@ export function render(state) {
   <!-- ── threshold ────────────────────────────────────────────── -->
   <g id="threshold">
     <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
-          height="${THRESHOLD}" fill="${darken(paint, 0.30)}"/>
+          height="${THRESHOLD}" fill="${SILL_METAL}"/>
     <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
           height="4" fill="#fff" opacity="0.18"/>
     <!-- Ribbed, because every sill in the photographs is: an extruded

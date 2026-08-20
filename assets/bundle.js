@@ -585,6 +585,7 @@
   var BAR_GAP_MIN = 0.09;
   var GRAB = { fromTop: 0.59, len: 0.33, ratio: 1 / 15 };
   var THRESHOLD = 42;
+  var SILL_METAL = "#87857F";
   var PLATE = {
     w: 90,
     // 0.095 W
@@ -1387,7 +1388,7 @@
   <!-- ── threshold ────────────────────────────────────────────── -->
   <g id="threshold">
     <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
-          height="${THRESHOLD}" fill="${darken(paint2, 0.3)}"/>
+          height="${THRESHOLD}" fill="${SILL_METAL}"/>
     <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
           height="4" fill="#fff" opacity="0.18"/>
     <!-- Ribbed, because every sill in the photographs is: an extruded

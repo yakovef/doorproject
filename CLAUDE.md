@@ -21,6 +21,34 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The threshold is bare aluminium and we were painting it with the door.**
+  It was `darken(paint, 0.30)`, a dark version of whatever the leaf is painted.
+  Measured on the twelve metal sills in the records, as
+  `frame.threshold.tone x colour.lum`: leaf luminance 43, 56, 86, 101, 104,
+  118, 166, 172, 175, 185 against sill luminance 150, 76, 180, 136, 155, 160,
+  99, 100, 131, 43. Scattered, and FLAT — the sill does not track the leaf,
+  median 131 of 255, and the ratio to the leaf runs 0.23 on a white door to
+  3.47 on a dark one, which is the same statement read the other way round.
+  On a black door we drew it at luminance 18 where the corpus says 130, so the
+  brightest object at the foot of the drawing was missing from every dark door
+  we make, and most of them are dark.
+
+- **`npm run frame` had been crashing on every run**, and its width readings
+  were reporting the drawing as wrong when it is right. d062 carries no
+  `colour` — it was measured for the moulding study alone — so `targets()`
+  threw. The tool is not in the standard green-light pass, which is how a tool
+  stays broken: nobody runs it, so nobody watches it fall over.
+  Its `near_w` scan reads 0.127 against a CONSTRUCTED reveal of
+  `REBATE / leafW` = 0.059, which is inside the photographic 0.045-0.067 — the
+  scan runs through the casing, which the file already said of the other two
+  widths and not of this one. The constructed figure is printed beside the scan
+  now, read from the renderer's constant rather than typed.
+  ⚠ And `head_sh` will always read "off": it samples the top of the leaf face,
+  where the corpus median is 0.443 — the dark band the owner's son had removed
+  in as many words. The corpus disagrees with a deliberate decision and the
+  decision wins. Left in the output and labelled, because a row that quietly
+  vanishes is a fact nobody can re-examine.
+
 - **The record says two things about a colour and only one of them is a
   measurement.** `colour.hex` is a median over the leaf; `colour.family` is
   what the person looking at the photograph called it. `npm run corpus` used

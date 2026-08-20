@@ -10,13 +10,34 @@
  * Tones are luminance ÷ the leaf's own midpoint luminance, exactly as the
  * agents computed them, so a dark door and a white one are comparable.
  *
- * CAVEAT on the width readings. The scan walks outward until the tone climbs
- * back to 0.97 of the leaf, which on the FAR jamb and under the HEAD runs
- * straight through the casing's own 0.13 darkening overlay and keeps going.
- * So far_w and head_w read wide and are not worth tuning against; near_w is
- * clean. The widths that matter are the constructed ones, and as of the
- * rebate change they are near 0.062, far 0.040, head 0.093 of leaf width,
- * against photographic 0.045-0.067, 0.031-0.038 and 0.093.
+ * ⚠ THE WIDTH READINGS ARE ALL SCAN ARTEFACTS NOW, not just two of them.
+ * The scan walks outward until the tone climbs back to 0.97 of the leaf, which
+ * on the FAR jamb and under the HEAD runs straight through the casing's own
+ * 0.13 darkening overlay and keeps going. This note used to exempt `near_w` as
+ * clean; it is not, and it reports 0.127 against a CONSTRUCTED reveal of
+ * REBATE / leafW = 0.059, which sits inside the photographic 0.045-0.067. So a
+ * reader of this tool saw "off" against a number that is right.
+ * The constructed width is printed beside the scan for exactly that reason —
+ * read from the renderer's own constant rather than typed here, because the
+ * last version of this note quoted 0.062 from a rebate that had since moved.
+ *
+ * ⚠ AND IT HAD BEEN CRASHING. d062 carries no `colour`, so `targets()` threw
+ * on every run. This tool is not in the standard green-light pass, which is
+ * how a tool stays broken: nobody runs it, so nobody watches it fall over.
+ * Anything it says about the drawing is therefore un-validated until it has
+ * been checked a second way — the near reveal above is what that check looks
+ * like, and it went against the tool.
+ *
+ * ⚠ `head_sh` WILL ALWAYS READ "off" AND MUST NOT BE ACTED ON. It samples the
+ * top of the leaf FACE, and the corpus median there is 0.443 — a distinct dark
+ * band across the head of the door. That band was drawn once and the owner's
+ * son had it taken out in as many words: "remove the half-black rectangle
+ * across the top of the opening". Our 1.19 is the key light coming from high
+ * up, which is the drawing behaving as designed.
+ * Same shape as the finish withdrawal: the corpus disagrees with a decision
+ * somebody made on purpose, and the decision wins. Left in the output rather
+ * than deleted, because a row that quietly vanishes is a fact nobody can
+ * re-examine.
  *
  * Run: npm run frame
  */
@@ -24,6 +45,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
 import { PNG } from 'pngjs';
+import { REBATE } from '../js/renderer.js';
+import { SIZES } from '../js/catalog.js';
 
 const DIR = 'research/works/data2/';
 const lum = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
@@ -36,8 +59,16 @@ const median = a => {
 
 /** Corpus medians, split the way the light model splits: by leaf lightness. */
 function targets() {
+  /* ⚠ NOT EVERY RECORD IS A FULL ONE. d062 was measured for the applied
+     moulding study alone and carries a leaf box, a handle and nothing else —
+     no `colour` — so the split below threw and this tool crashed on every run.
+     It is not in the standard green-light pass, which is exactly how a tool
+     stays broken: nobody runs it, so nobody watches it fall over.
+     Skipped rather than defaulted: a door with no measured colour cannot
+     contribute to a median of measured colours. */
   const rows = readdirSync(DIR).filter(f => /^d\d+\.json$/.test(f))
-    .map(f => JSON.parse(readFileSync(DIR + f, 'utf8')));
+    .map(f => JSON.parse(readFileSync(DIR + f, 'utf8')))
+    .filter(r => r.colour && r.colour.lum != null);
   const of = sel => {
     const s = rows.filter(sel);
     const R = r => (r.frame && r.frame.reveal) || {};
@@ -153,11 +184,20 @@ const line = (k, ours, want) => {
   console.log('   ' + k.padEnd(11) + ' ours' + f(ours) + '   photos' + f(want) + flag);
 };
 
+/* The reveal the drawing actually CONSTRUCTS, asked of the renderer rather
+   than typed into this file — where the previous version of it went stale the
+   moment the rebate moved. */
+const CONSTRUCTED_NEAR = REBATE / (SIZES.standard.w - REBATE * 2);
+
 for (const [label, id, want] of rows) {
   const ours = await measure(id);
   console.log(`\n${label}   (${want.n} photographs)`);
   for (const k of ['near_w', 'far_w', 'head_w', 'near_tone', 'far_tone', 'head_tone',
                    'tone_top', 'tone_bot', 'floor', 'head_sh'])
     line(k, ours[k], want[k]);
+  /* The three `_w` rows above are what the SCAN saw, and the scan runs through
+     the casing. This is what the drawing is built to. */
+  console.log('   ' + 'near_w built'.padEnd(11) + ' ours' + f(CONSTRUCTED_NEAR)
+            + '   photos' + f(want.near_w) + '   <- the reveal the renderer constructs');
 }
 await b.close();
