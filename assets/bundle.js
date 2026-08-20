@@ -1608,16 +1608,17 @@ ${body}
     const panelled = detail.panel && !byId(WINDOWS, state2.window).rects.length;
     const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
     const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
-    const raw0 = { x: backset + standoff, y: leafH - HANDLE_AFF, rot: 0 };
+    const homeY = handle.style === "grab" ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
+    const raw0 = { x: backset + standoff, y: homeY, rot: 0 };
     if (gripPlacement(state2, raw0).ok) return raw0;
     const upright = nearestGrip(state2, raw0);
-    if (gripPlacement(state2, upright).ok) return upright;
+    if (gripPlacement(state2, upright).ok && Math.abs(upright.y - raw0.y) <= HOME_REACH) return upright;
     if (gripCanRotate(state2)) {
       const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
       const laid = gripPlacement(state2, flat).ok ? flat : nearestGrip(state2, flat);
-      if (gripPlacement(state2, laid).ok) return laid;
+      if (gripPlacement(state2, laid).ok && Math.abs(laid.y - flat.y) <= HOME_REACH) return laid;
     }
-    return upright;
+    return gripPlacement(state2, upright).ok && Math.abs(upright.y - raw0.y) <= HOME_REACH ? upright : raw0;
   }
   var gripFitsAnywhere = memo(
     (state2) => gripPlacement(state2, gripHome(state2)).ok,
@@ -1675,7 +1676,7 @@ ${body}
     const hi = p.rot === 90 ? cx + half : p.y + half;
     const span = p.rot === 90 ? leafW : leafH;
     if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad("הידית חורגת מהדלת");
-    if (p.y < leafH * 0.38 || p.y > leafH * 0.6) {
+    if (p.y < leafH * 0.18 || p.y > leafH * 0.82) {
       return bad("הידית גבוהה או נמוכה מדי לשימוש");
     }
     if (p.rot === 0 && p.x > leafW * 0.55) return bad("ידית משיכה לא מותקנת בצד הצירים");
@@ -1713,6 +1714,7 @@ ${body}
     }
     return at;
   }
+  var HOME_REACH = 500;
   function nearestGrip(state2, want) {
     if (gripPlacement(state2, want).ok) return want;
     const size = SIZES[state2.size] || SIZES.standard;
@@ -2441,16 +2443,25 @@ ${body}
          0.725 of the shaft's diameter rather than a swell at 1.5 times it.
          Kept a shade generous — the drawn shape is what `npm run collide -- boxes`
          checks against, and it errs the safe way. */
-      /* `atY` because this is the ONE grip not drawn at the grip's own axis: it
-         hangs on the mid rail at GRAB.fromTop of the leaf, roughly 280 mm below
-         where every other fitting sits. Read from the same constant the drawing
-         uses, so the touch pad cannot land somewhere the bar is not. */
+      /* No `atY` any more: the bar is drawn at the grip's own axis like every
+         other fitting, and its default height is set in `gripHome` instead. It
+         had one while the drawing pinned it to the mid rail whatever the rules
+         said, which is the same fact that stopped it being draggable. */
       case "grab":
-        return { out: 26, in: 320, vy: 26, atY: GRAB.fromTop };
+        return { out: 26, in: 320, vy: 26 };
+      /* ⚠ `vy` IS A REACH FROM THE AXIS, not half a height, and for these four
+         the two are not the same number. `cy` is the LEVER SPINDLE and it sits
+         0.30 down a backplate, so the plate hangs 0.70 of its height below the
+         axis — 170 mm where half its height is 129. Every rule here treats `vy`
+         as a reach, so all four were clearing things they sit on top of: the
+         drawing put a Shiran pull 25 mm into a Rotem plate and the rules said
+         fine. Re-measured by `npm run collide -- boxes`, which used to report
+         half the height and now reports the reach, for the same reason `out` and
+         `in` stopped being one symmetric `hx`. */
       case "lever":
         return { out: 40, in: 152, vy: 51 };
       case "plate":
-        return { out: 47, in: 119, vy: 129 };
+        return { out: 47, in: 119, vy: 170 };
       case "almog":
         return { out: 42, in: 220, vy: 42 };
       case "cadoor":
@@ -2458,13 +2469,13 @@ ${body}
       case "sapir":
         return { out: 36, in: 74, vy: 43 };
       case "knobplate":
-        return { out: 53, in: 48, vy: 153 };
+        return { out: 53, in: 48, vy: 198 };
       case "cylinder":
         return { out: LOCK_R + 8, in: LOCK_R + 8, vy: LOCK_R + 8 };
       case "digital":
-        return { out: 28, in: 33, vy: 116 };
+        return { out: 28, in: 33, vy: 145 };
       case "square":
-        return { out: 41, in: 152, vy: 99 };
+        return { out: 41, in: 152, vy: 149 };
       case "shiran":
         return { out: 43, in: 43, vy: 240 };
       default: {
@@ -2535,25 +2546,28 @@ ${body}
   function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0, panelled, rot = 0) {
     const draw = GRIP_ART[handle.style];
     if (!draw) return "";
-    const art = draw(handle, { cx, cy, dir, paint: paint2, centreX, leafW, leafH, y0, panelled });
+    const drawn = draw(handle, { cx, cy, dir, paint: paint2, centreX, leafW, leafH, y0, panelled });
+    const art = typeof drawn === "string" ? drawn : drawn && drawn.svg;
+    const own = typeof drawn === "string" ? null : drawn && drawn.box;
     if (!art) return "";
     const foot = handleFootprint(handle, leafH, panelled);
     const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : "";
     const box = rot === 90 ? { out: foot.vy, in: foot.vy, vy: Math.max(foot.out, foot.in) } : foot;
-    const padL = cx - (dir > 0 ? foot.out : foot.in);
-    const padR = cx + (dir > 0 ? foot.in : foot.out);
-    const padW = padR - padL, padH = foot.vy * 2;
+    const padL = own ? own.x : cx - (dir > 0 ? foot.out : foot.in);
+    const padR = own ? own.x + own.w : cx + (dir > 0 ? foot.in : foot.out);
+    const padW = padR - padL, padH = own ? own.h : foot.vy * 2;
     const padCx = (padL + padR) / 2;
-    const padCy = foot.atY != null ? y0 + leafH * foot.atY : cy;
-    const pad = `<rect data-hitpad="1" x="${padL}" y="${padCy - foot.vy}"
+    const padCy = own ? own.y + own.h / 2 : foot.atY != null ? y0 + leafH * foot.atY : cy;
+    const pad = `<rect data-hitpad="1" x="${padL}" y="${padCy - padH / 2}"
                      width="${padW}" height="${padH}"
                      data-cx="${padCx}" data-cy="${padCy}" data-w="${padW}" data-h="${padH}"
                      fill="transparent" pointer-events="all"/>`;
-    const ring = `<rect data-chrome="focus" x="${padL}" y="${padCy - foot.vy}"
+    const ring = `<rect data-chrome="focus" x="${padL}" y="${padCy - padH / 2}"
                       width="${padW}" height="${padH}" rx="6"
                       fill="none" pointer-events="none"/>`;
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-out="${box.out}" data-in="${box.in}"
+             data-cx="${cx}" data-cy="${cy}" data-aty="${padCy}"
+             data-out="${box.out}" data-in="${box.in}"
              data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
   }
   function locksetArt(lockset, cx, cy, dir) {
@@ -2594,7 +2608,7 @@ ${body}
   function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
     const half = leafW * GRAB.len / 2;
     const D = leafW * GRAB.len * GRAB.ratio;
-    const by = y0 + leafH * GRAB.fromTop;
+    const by = cy;
     const span = half - D * 0.9;
     const centredNear = centreX - dir * span;
     const near = dir > 0 ? Math.max(centredNear, cx) : Math.min(centredNear, cx);
@@ -2608,7 +2622,8 @@ ${body}
       <rect x="${n1(P(a))}" y="${n1(by - hh)}" width="${n1(P(b) - P(a))}"
             height="${n1(hh * 2)}" rx="${n1(rx)}" fill="${fill}"/>`;
     const POST = [0.175, 0.825];
-    return `
+    const drew = { x: x0, y: by - D * 0.85, w: L, h: D * 1.7 };
+    const svg = `
     <g>
       <g data-hw="grab">
         <!-- The shadow is a tight band under the shaft and two rounder, darker
@@ -2658,6 +2673,7 @@ ${body}
                  ry="${n1(D * 0.17)}" fill="#fff" opacity="0.32"/>`).join("")}
       </g>
     </g>`;
+    return { svg, box: drew };
   }
   function bossReach(handle) {
     if (handle.style !== "bar") return handleFootprint(handle, 2050).in;

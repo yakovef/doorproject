@@ -222,6 +222,52 @@ for (const v of VIEWS) {
                      + `${Math.round(box.height)} px, under the 44 minimum`);
     }
 
+    /* AND WHAT YOU SEE IS THE HANDLE, which is a different claim from the one
+       above and was in conflict with it for three rounds. The touch target has
+       to be 44 px whatever the drawing is; the FOCUS RING has to be the size
+       of the thing it is outlining. While both were one rect the browser drew
+       its outline round the grown pad, and a 35 mm rod got a box 131 mm wide —
+       reported from the outside, twice, as the hit box being huge.
+       So: the ring may not be bigger than the art it rings. Checked on the
+       GRAB bar, which is the case that goes wrong first because it is the one
+       grip centred on the leaf rather than hung off the stile — a pad laid out
+       symmetrically about the grip's axis lands beside it, not on it. */
+    for (const hd of ['right-in', 'left-in']) {
+      await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=none&n=grab`
+                 + `&k=coral&d=plain&s=standard&h=${hd}`);
+      await p.waitForTimeout(250);
+      const m = await p.evaluate(() => {
+        const g = document.querySelector('.door-svg [data-hw="handle"]');
+        const ring = g && g.querySelector('[data-chrome="focus"]');
+        if (!ring) return null;
+        const r = ring.getBoundingClientRect();
+        let a = 1e9, z = -1e9, t = 1e9, u = -1e9;
+        for (const el of g.querySelectorAll('rect,ellipse,circle,path')) {
+          if (el.hasAttribute('data-hitpad') || el.hasAttribute('data-chrome')) continue;
+          const b = el.getBoundingClientRect();
+          if (!b.width || !b.height) continue;
+          a = Math.min(a, b.x); z = Math.max(z, b.x + b.width);
+          t = Math.min(t, b.y); u = Math.max(u, b.y + b.height);
+        }
+        return { ring: [r.x, r.y, r.width, r.height], art: [a, t, z - a, u - t] };
+      });
+      if (!m) { fault(v.name, `[${hd}] the handle has no focus ring to draw`); continue; }
+      const slack = 4;
+      if (m.ring[2] > m.art[2] + slack || m.ring[3] > m.art[3] + slack) {
+        fault(v.name, `[${hd}] the focus ring is ${Math.round(m.ring[2])}x`
+                     + `${Math.round(m.ring[3])} px round a handle that is only `
+                     + `${Math.round(m.art[2])}x${Math.round(m.art[3])}`);
+      }
+      /* And it is ON the handle, not beside it. */
+      if (m.ring[0] > m.art[0] + m.art[2] || m.ring[0] + m.ring[2] < m.art[0]
+          || m.ring[1] > m.art[1] + m.art[3] || m.ring[1] + m.ring[3] < m.art[1]) {
+        fault(v.name, `[${hd}] the focus ring does not overlap the handle it rings`);
+      }
+    }
+    await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=tallwin&n=idan`
+               + '&k=cylinder&d=panel&s=standard&h=right-in');
+    await p.waitForTimeout(300);
+
     const g = await (await p.$('[data-hw="handle"]')).boundingBox();
     const cx = g.x + g.width / 2, cy = g.y + g.height / 2;
 

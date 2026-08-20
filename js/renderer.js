@@ -1935,7 +1935,12 @@ function gripHomeUncached(state) {
   const panelled = detail.panel && !byId(WINDOWS, state.window).rects.length;
   const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
   const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
-  const raw0 = { x: backset + standoff, y: leafH - HANDLE_AFF, rot: 0 };
+  /* The grab bar's own height. Every other fitting hangs at HANDLE_AFF off the
+     floor; this one sits on the mid rail, and the measured median across d051,
+     d062, d067, d068, d070 and d077 is 0.59 of leaf height. It used to be a
+     constant inside the drawing, which is why the bar could not be dragged. */
+  const homeY = handle.style === 'grab' ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
+  const raw0 = { x: backset + standoff, y: homeY, rot: 0 };
   /* AND IT HAS TO BE A PLACE THE GRIP CAN ACTUALLY STAND.
      The arithmetic above is a good guess and not a proof: it works in x, where
      it was derived, and says nothing about y. `barHalf` shortens a bar on a
@@ -1947,8 +1952,21 @@ function gripHomeUncached(state) {
      So the guess is checked and corrected here, once, and every other caller
      gets a home position that is buildable by construction. */
   if (gripPlacement(state, raw0).ok) return raw0;
+  /* ⚠ THE DEFAULT STAYS AT HAND HEIGHT EVEN THOUGH A DRAG NO LONGER HAS TO.
+     `gripPlacement` used to refuse anything outside 0.38-0.60 of leaf height,
+     and that single band was quietly doing two jobs: it was the customer's
+     limit AND it was what kept this search from wandering. Opening the band to
+     0.18-0.82 at the owner's son's request freed the drag and freed the search
+     with it, and `npm test` said so immediately — a tall leaf with a strip
+     light put its DEFAULT handle 595 mm below the height a hand reaches, on a
+     door that had simply been refused before.
+     A default is not a choice. `HOME_REACH` is how far this is willing to
+     move a handle nobody has touched; past it the door is refused, which is
+     what it did before the band opened. Drags are unaffected — they come
+     through `gripPlacement` with a position the customer picked. */
   const upright = nearestGrip(state, raw0);
-  if (gripPlacement(state, upright).ok) return upright;
+  if (gripPlacement(state, upright).ok
+      && Math.abs(upright.y - raw0.y) <= HOME_REACH) return upright;
 
   /* AND IF IT WILL NOT STAND UP ANYWHERE, LAY IT DOWN.
      Asked for from the outside: "if there is a window, and the pull handle
@@ -1964,9 +1982,16 @@ function gripHomeUncached(state) {
   if (gripCanRotate(state)) {
     const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
     const laid = gripPlacement(state, flat).ok ? flat : nearestGrip(state, flat);
-    if (gripPlacement(state, laid).ok) return laid;
+    if (gripPlacement(state, laid).ok
+        && Math.abs(laid.y - flat.y) <= HOME_REACH) return laid;
   }
-  return upright;
+  /* Nothing within reach of hand height, standing or lying down. Hand back the
+     ideal — which is refused, or we would have returned it at the top — so
+     `gripFitsAnywhere` says no and the door refuses the combination, exactly
+     as it did while the placement band was the only limit. The alternative is
+     a door that opens with its handle at knee height and nobody choosing it. */
+  return gripPlacement(state, upright).ok
+      && Math.abs(upright.y - raw0.y) <= HOME_REACH ? upright : raw0;
 }
 
 /**
@@ -2091,20 +2116,26 @@ export function gripPlacement(state, place = null) {
   const span = p.rot === 90 ? leafW : leafH;
   if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad('הידית חורגת מהדלת');
 
-  /* AND AT A HEIGHT SOMEBODY WOULD FIT IT AT.
+  /* AND AT A HEIGHT SOMEBODY COULD REACH.
      Measured, from the ten installed doors carrying a pull bar: the bar's
      CENTRE sits at 0.430, 0.463, 0.464, 0.477, 0.484, 0.500, 0.504, 0.509,
-     0.512 and 0.512 of leaf height. Not one leaves 0.43-0.52. Our own nominal
-     — HANDLE_AFF off the floor — lands at 0.502, in the middle of them.
-     0.38 to 0.60 is that band with room either side, and it is the difference
-     between a handle that had to move for a window and a handle at knee
-     height: without it the search happily dropped an Ella bar 520 mm, where it
-     spans the bottom half of the door and your hand reaches its top corner.
-     Nothing in the corpus looks like that.
-     Where the band leaves a grip nowhere, the door refuses it — which is what
-     the site did before the search existed, so nothing is lost. Laying it down
-     is the way out, and `gripHome` tries that first. */
-  if (p.y < leafH * 0.38 || p.y > leafH * 0.60) {
+     0.512 and 0.512 of leaf height. Not one leaves 0.43-0.52, and our own
+     nominal — HANDLE_AFF off the floor — lands at 0.502, in the middle of
+     them. That is a description of what Peretz has installed, and it stays
+     written down.
+     ⚠ IT IS NOT THE LIMIT ANY MORE. The band was 0.38-0.60 — the corpus with
+     a little room either side — and the owner's son asked for it opened up in
+     so many words: "make the height restrictions not that restrictive, make me
+     able to move them more up and more down if i want". So the rule now says
+     what it can defend rather than what the corpus happens to contain: a grip
+     you cannot reach is not a grip, and the rest is the customer's business.
+     0.18 to 0.82 of leaf height on a 2050 mm leaf is a centre between 370 mm
+     down from the head and 370 mm up from the foot.
+     For anything long this never binds — the whole-object rule above already
+     does. A 1230 mm Shahar bar can only sit between 0.33 and 0.67 whatever
+     this says. It is the SHORT grips this frees, which are exactly the ones
+     worth dragging: the grab bar, and Shiran. */
+  if (p.y < leafH * 0.18 || p.y > leafH * 0.82) {
     return bad('הידית גבוהה או נמוכה מדי לשימוש');
   }
 
@@ -2213,6 +2244,14 @@ export function gripPlacement(state, place = null) {
  * under a millisecond; returns the home position if nothing at all fits, since
  * a door always has to be able to show its handle somewhere.
  */
+/* How far `gripHome` will shift a handle nobody has touched before giving up
+   and letting the door be refused. 500 mm is the figure `npm test` has always
+   asserted the default against; it is written down here so that the assertion
+   and the code are the same number rather than two guesses that happen to
+   agree. It bounds the DEFAULT only — a customer may drag anywhere the rules
+   allow, which is a much wider band. */
+const HOME_REACH = 500;
+
 export function nearestGrip(state, want) {
   if (gripPlacement(state, want).ok) return want;
   const size = SIZES[state.size] || SIZES.standard;
@@ -3450,20 +3489,29 @@ function handleFootprint(handle, leafH, panelled = false) {
        0.725 of the shaft's diameter rather than a swell at 1.5 times it.
        Kept a shade generous — the drawn shape is what `npm run collide -- boxes`
        checks against, and it errs the safe way. */
-    /* `atY` because this is the ONE grip not drawn at the grip's own axis: it
-       hangs on the mid rail at GRAB.fromTop of the leaf, roughly 280 mm below
-       where every other fitting sits. Read from the same constant the drawing
-       uses, so the touch pad cannot land somewhere the bar is not. */
-    case 'grab':    return { out: 26, in: 320, vy: 26, atY: GRAB.fromTop };
+    /* No `atY` any more: the bar is drawn at the grip's own axis like every
+       other fitting, and its default height is set in `gripHome` instead. It
+       had one while the drawing pinned it to the mid rail whatever the rules
+       said, which is the same fact that stopped it being draggable. */
+    case 'grab':    return { out: 26, in: 320, vy: 26 };
+    /* ⚠ `vy` IS A REACH FROM THE AXIS, not half a height, and for these four
+       the two are not the same number. `cy` is the LEVER SPINDLE and it sits
+       0.30 down a backplate, so the plate hangs 0.70 of its height below the
+       axis — 170 mm where half its height is 129. Every rule here treats `vy`
+       as a reach, so all four were clearing things they sit on top of: the
+       drawing put a Shiran pull 25 mm into a Rotem plate and the rules said
+       fine. Re-measured by `npm run collide -- boxes`, which used to report
+       half the height and now reports the reach, for the same reason `out` and
+       `in` stopped being one symmetric `hx`. */
     case 'lever':   return { out: 40, in: 152, vy: 51 };
-    case 'plate':   return { out: 47, in: 119, vy: 129 };
+    case 'plate':   return { out: 47, in: 119, vy: 170 };
     case 'almog':   return { out: 42, in: 220, vy: 42 };
     case 'cadoor':  return { out: 78, in: 41, vy: 48 };
     case 'sapir':   return { out: 36, in: 74, vy: 43 };
-    case 'knobplate': return { out: 53, in: 48, vy: 153 };
+    case 'knobplate': return { out: 53, in: 48, vy: 198 };
     case 'cylinder': return { out: LOCK_R + 8, in: LOCK_R + 8, vy: LOCK_R + 8 };
-    case 'digital': return { out: 28, in: 33, vy: 116 };
-    case 'square':  return { out: 41, in: 152, vy: 99 };
+    case 'digital': return { out: 28, in: 33, vy: 145 };
+    case 'square':  return { out: 41, in: 152, vy: 149 };
     case 'shiran':  return { out: 43, in: 43, vy: 240 };
     default: {
       /* Pull bars, and this is now simply the bar. It used to carry a floor of
@@ -3683,7 +3731,13 @@ const LOCK_ART = {
 function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled, rot = 0) {
   const draw = GRIP_ART[handle.style];
   if (!draw) return '';
-  const art = draw(handle, { cx, cy, dir, paint, centreX, leafW, leafH, y0, panelled });
+  /* A grip may hand back its own drawn box as well as its markup. Only the
+     grab bar does — it is the one drawn neither at the grip's axis nor
+     symmetrically about it — and the alternative was writing its geometry down
+     a second time so the touch pad could find it. */
+  const drawn = draw(handle, { cx, cy, dir, paint, centreX, leafW, leafH, y0, panelled });
+  const art = typeof drawn === 'string' ? drawn : drawn && drawn.svg;
+  const own = typeof drawn === 'string' ? null : drawn && drawn.box;
   if (!art) return '';
   const foot = handleFootprint(handle, leafH, panelled);
   /* Turned on its side about its own centre. A rotation is the honest way to
@@ -3722,12 +3776,13 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
      `transparent` and not `none`: a fill of `none` is not painted and does not
      receive a pointer at all, which is the whole point of the rect.
      It is marked so the measuring tools can drop it — it is not on the door. */
-  const padL = cx - (dir > 0 ? foot.out : foot.in);
-  const padR = cx + (dir > 0 ? foot.in : foot.out);
-  const padW = padR - padL, padH = foot.vy * 2;
+  const padL = own ? own.x : cx - (dir > 0 ? foot.out : foot.in);
+  const padR = own ? own.x + own.w : cx + (dir > 0 ? foot.in : foot.out);
+  const padW = padR - padL, padH = own ? own.h : foot.vy * 2;
   const padCx = (padL + padR) / 2;
-  const padCy = foot.atY != null ? y0 + leafH * foot.atY : cy;
-  const pad = `<rect data-hitpad="1" x="${padL}" y="${padCy - foot.vy}"
+  const padCy = own ? own.y + own.h / 2
+              : foot.atY != null ? y0 + leafH * foot.atY : cy;
+  const pad = `<rect data-hitpad="1" x="${padL}" y="${padCy - padH / 2}"
                      width="${padW}" height="${padH}"
                      data-cx="${padCx}" data-cy="${padCy}" data-w="${padW}" data-h="${padH}"
                      fill="transparent" pointer-events="all"/>`;
@@ -3740,11 +3795,12 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
      They are two objects now. This one is never grown, never painted until the
      group takes visible focus, and marked as chrome so the measuring tools
      drop it exactly as they drop the pad: it is not on the door. */
-  const ring = `<rect data-chrome="focus" x="${padL}" y="${padCy - foot.vy}"
+  const ring = `<rect data-chrome="focus" x="${padL}" y="${padCy - padH / 2}"
                       width="${padW}" height="${padH}" rx="6"
                       fill="none" pointer-events="none"/>`;
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-out="${box.out}" data-in="${box.in}"
+             data-cx="${cx}" data-cy="${cy}" data-aty="${padCy}"
+             data-out="${box.out}" data-in="${box.in}"
              data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
 }
 
@@ -3831,7 +3887,15 @@ function channelHandle(cx, cy, len, leafH, paint) {
 function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
   const half = (leafW * GRAB.len) / 2;
   const D = leafW * GRAB.len * GRAB.ratio;          // the shaft's diameter
-  const by = y0 + leafH * GRAB.fromTop;             // below the lever, mid rail
+  /* ⚠ WHERE IT WAS PUT, not a constant. This read `y0 + leafH * GRAB.fromTop`
+     and ignored `cy` altogether, so the one grip a customer is most likely to
+     want to move was the one grip that could not move: dragging it wrote a new
+     position into the link and the drawing carried on drawing it on the mid
+     rail. Reported from the outside as not being able to move it up or down.
+     GRAB.fromTop is still the figure — it is the measured median across seven
+     installed doors — but it is the DEFAULT now, handed to `gripHome`, and
+     after that this draws wherever the handle actually is. */
+  const by = cy;                                    // below the lever, mid rail
 
   /* CENTRED ON THE LEAF, as every installed grab bar is — but pushed toward
      the hinge when the lock furniture needs the room.
@@ -3864,7 +3928,14 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
             height="${n1(hh * 2)}" rx="${n1(rx)}" fill="${fill}"/>`;
   const POST = [0.175, 0.825];
 
-  return `
+  /* WHAT IT ACTUALLY DREW, handed back rather than described again.
+     The footprint in `handleFootprint` is a shade generous on purpose — it is
+     what the placement rules budget for — and the focus ring wants the real
+     thing. Deriving the ring from the footprint put a 98 px box round an 80 px
+     bar; deriving it from a second copy of this arithmetic would be the exact
+     drift this file keeps getting caught by. So the drawing says. */
+  const drew = { x: x0, y: by - D * 0.85, w: L, h: D * 1.7 };
+  const svg = `
     <g>
       <g data-hw="grab">
         <!-- The shadow is a tight band under the shaft and two rounder, darker
@@ -3914,6 +3985,7 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
                  ry="${n1(D * 0.17)}" fill="#fff" opacity="0.32"/>`).join('')}
       </g>
     </g>`;
+  return { svg, box: drew };
 }
 
 /**

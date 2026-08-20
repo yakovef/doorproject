@@ -163,10 +163,27 @@ if (boxes) {
       const leaf = svg.querySelector('#leaf rect').getBBox();
       const outward = cx > leaf.x + leaf.width / 2 ? 1 : -1;
       const left = cx - b.x, right = b.x + b.width - cx;
+      /* ⚠ REACH FROM THE AXIS, not half the height — the same thing `out` and
+         `in` have measured since they stopped being one symmetric `hx`.
+         `vy` was `height / 2`, and every rule that uses it treats it as a
+         reach from `cy`: a fitting drawn asymmetrically about its own axis
+         therefore lied about the half it hangs. The Rotem plate is the case —
+         `cy` is the LEVER SPINDLE and sits 0.30 down the plate, so the plate
+         reaches 0.70 of its height BELOW the axis and half its height is 20 mm
+         short of that. The rules cleared a Shiran pull past it and the drawing
+         put the two 25 mm into each other. Same fitting, same mistake, second
+         axis. */
+      /* About the centre the drawing REPORTS, when it reports one. The grab
+         bar is the only fitting drawn away from its own axis — it hangs on the
+         mid rail, 280 mm below every other one — so measuring its reach from
+         `cy` says 291 mm for a bar 52 mm tall. `data-aty` is where gripArt put
+         it, so the two cannot disagree. */
+      const cy = Number(el.dataset.aty ?? el.dataset.cy);
+      const up = cy - b.y, down = b.y + b.height - cy;
       out.push({ label,
         out: +(outward > 0 ? right : left).toFixed(0),
         in:  +(outward > 0 ? left : right).toFixed(0),
-        vy: +(b.height / 2).toFixed(0),
+        vy: +Math.max(up, down).toFixed(0),
         declOut: Number(el.dataset.out), declIn: Number(el.dataset.in),
         declVy: Number(el.dataset.vy) });
     };
@@ -333,12 +350,54 @@ const hits = await p.evaluate(({ cases, allowed }) => {
     for (const g of svg.querySelectorAll('[filter]')) {
       if (/hwShadow/.test(g.getAttribute('filter') || '')) g.remove();
     }
+    /* ⚠ THE SAME QUESTION `metalBox` ASKS, and for two rounds this asked a
+       different one. Up there the footprint reader walks LEAF SHAPES and skips
+       anything clipped, because `getBBox` reports geometry BEFORE clipping —
+       so a reflection trimmed to a backplate measures whatever rect was drawn
+       to make it. Down here the sweep asked the wrapping group, and a group
+       hands back the union of its children with the clipped ones at full size.
+       The Rotem plate is the case: `-- boxes` measures it at 47 x 119 x 122 mm
+       and its group's own getBBox is 1023 x 1524 — the whole leaf — because it
+       contains one clipped highlight. Every design carrying it was overlapping
+       everything, and it stayed hidden only because the pairings that would
+       have shown it were refused for another reason until the placement band
+       opened.
+       This is the third time the two halves of this file have measured
+       differently (relight, then shadows, now clips). They share one walk now:
+       if `metalBox` skips it, the sweep does not see it either. */
+    const SHAPE = 'rect,circle,ellipse,line,path,polygon,polyline,text,image';
+    const inv = svg.getScreenCTM().inverse();
+    const drawnBox = root => {
+      let a = Infinity, z = -Infinity, t = Infinity, u = -Infinity;
+      for (const el of root.querySelectorAll(SHAPE)) {
+        if (el.hasAttribute('filter')) continue;
+        if (el.hasAttribute('clip-path') || el.hasAttribute('mask')) continue;
+        if (el.hasAttribute('data-hitpad') || el.hasAttribute('data-chrome')) continue;
+        if (el.closest('defs,clipPath,mask,pattern,marker,symbol')) continue;
+        let b; try { b = el.getBBox(); } catch { continue; }
+        if (!b.width && !b.height) continue;
+        /* Into the DRAWING's own space, the way `metalBox` does it. getBBox
+           answers in the element's own coordinates and the keyway is drawn
+           inside a translated, scaled group — raw, its paths read back as
+           sitting 975 mm across and 1,356 mm above the fitting they belong to,
+           which is how the plate came to claim most of the door. */
+        const m = inv.multiply(el.getScreenCTM());
+        for (const [px, py] of [[b.x, b.y], [b.x + b.width, b.y],
+                                [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]]) {
+          const x = m.a * px + m.c * py + m.e;
+          const y = m.b * px + m.d * py + m.f;
+          a = Math.min(a, x); z = Math.max(z, x);
+          t = Math.min(t, y); u = Math.max(u, y);
+        }
+      }
+      return isFinite(a) ? { x: a, y: t, width: z - a, height: u - t } : null;
+    };
     const parts = [];
     for (const el of svg.querySelectorAll('[data-hw],[data-pane],[data-detail]')) {
       const n = NAME(el);
       if (!n || n === 'lockset-art') continue;
       let box;
-      try { box = el.getBBox(); } catch { continue; }
+      try { box = drawnBox(el); } catch { continue; }
       if (!box || !box.width || !box.height) continue;
       parts.push({ el, n, layer: LAYER(el), x: box.x, y: box.y, w: box.width, h: box.height });
     }

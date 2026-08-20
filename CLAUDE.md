@@ -21,6 +21,43 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The handle can be dragged much further, and the grab bar can be dragged at
+  all.** "Make the height restrictions not that restrictive, make me able to
+  move them more up and more down if i want."
+  **The band was 0.38-0.60 of leaf height and is now 0.18-0.82.** The old
+  figure was the corpus — ten installed bars sit between 0.430 and 0.512 — and
+  a description of what Peretz builds is not the same thing as a limit on what
+  a customer may ask for. The measured range stays written down; the rule now
+  says only what it can defend, which is that a grip has to be reachable. On
+  the short grips that is 1,310 mm of travel where there was 451, and 1,628
+  more designs are buildable.
+  ⚠ **One band was doing two jobs.** It was also what stopped `gripHome`'s
+  search wandering, and opening it put a DEFAULT handle 595 mm below hand
+  height on a tall leaf with a strip light. A default is not a choice:
+  `HOME_REACH` (500 mm, the figure `npm test` already asserted) bounds what the
+  automatic search will accept, and past it the door is refused as it was
+  before. Drags are untouched — they arrive with a position somebody picked.
+  **And the grab bar could not move vertically at all.** `grabHandle` drew it
+  at `y0 + leafH * GRAB.fromTop` and ignored `cy`, so dragging it wrote a new
+  position into the link while the drawing carried on putting it on the mid
+  rail. It draws at its own axis now, and 0.59 of leaf height — the measured
+  median across seven doors — became its DEFAULT in `gripHome` instead of a
+  constant buried in the drawing.
+  ⚠ **`vy` was half a height where every rule reads it as a reach from the
+  axis**, and for four fittings those are different numbers: `cy` is the lever
+  SPINDLE and sits 0.30 down a backplate, so a Rotem plate hangs 170 mm below
+  its axis where half its height is 129. The rules cleared a Shiran pull past
+  it and the drawing put the two 25 mm into each other. Plate 129→170,
+  knob-plate 153→198, smart lock 116→145, square pair 99→149. `out` and `in`
+  stopped being one symmetric `hx` two rounds ago; this is the same correction
+  on the other axis.
+  ⚠ **And the collision sweep measured clipped geometry.** Third time the two
+  halves of `collide.mjs` have asked different questions — relight, then
+  shadows, now clips. `getBBox` reports geometry BEFORE clipping, so the Rotem
+  plate's group measured 1023 x 1524 mm, the whole leaf, because it contains
+  one clipped highlight; `metalBox` had always skipped those and the sweep had
+  not. They share one walk now.
+
 - **The grip's hit box was the size of the touch target, and you could see
   it.** Reported from the outside: the handle's hit box shows as huge, and the
   grab bar's tile still draws a lever. Three separate faults behind one
