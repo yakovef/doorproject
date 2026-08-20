@@ -23,6 +23,67 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-20 05:50 UTC — run 7: nothing worth changing
+
+**Looked at:** nothing new had been pushed since run 6, so rather than repeat
+that run's probes I went at three surfaces nothing has ever checked: handing,
+keyboard operation, and forced-colors.
+
+**Instruments:** test ✓ (1,590,563) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`, MOUNT_REACH 121) · recreate ✓ · shot ✓.
+Build reproduces the committed bundle.
+
+**Changed:** nothing.
+
+**1. Handing is self-consistent.** The one item on the ASK-PERETZ list that
+costs real money, so worth pinning what is ours from what is his. The
+convention — which way ימין means — is his. What is ours is that the drawing
+not contradict itself, and it does not: on the default door the lockset sits at
+0.942 of leaf width right-hinged and 0.062 left, the grip at 0.828 and 0.172,
+both pairs summing to 1.000 within a thousandth. The SVG is `direction: ltr`
+with `transform: none` on both, so the interface never mirrors the drawing.
+
+**2. The keyboard works, including the part I expected to find broken.**
+Every group is a `radiogroup` of `role="radio"` tiles with exactly one tabbable
+member — the selected one — which is the roving-tabindex pattern done right.
+Arrows move and select within the group, Home and End jump to the ends, and
+ArrowLeft advances (correct in RTL). A blocked tile is reachable by arrow, is
+not `disabled`, carries `aria-disabled="true"`, shows its reason on the tile,
+and when chosen behaves exactly as a click does — applied, repaired, and
+explained by a toast. Tab reaches the WhatsApp button.
+
+**3. Forced colors.** In Windows High Contrast the seventeen colour swatches
+would collapse to one system colour without `forced-color-adjust: none`, and a
+customer could not pick a colour at all. Emulated it: six sampled chips keep
+six distinct fills, same as normal mode. The existing CSS block does its job.
+
+**Two false alarms, and they are the entry.** Both times the measurement was
+wrong, not the site:
+
+- I read handing as dropping the grip on both sides. The grip was not there
+  because my query — idan beside a Coral swan-neck on a glazed leaf — is not
+  buildable, and `repair` had correctly removed it and said so.
+- I read arrow-key navigation as dead across all eight groups. It is not: I
+  had dispatched a synthetic `KeyboardEvent`, which the page does not act on.
+  Real key presses navigate and select perfectly. `keyboardGrid` has been there
+  all along, and had I trusted my probe I would have "fixed" working code.
+
+**This is the third run where my instrument was wrong rather than the drawing**
+— percent-of-tile flattering sparse glyphs in run 3, an antialiased fringe
+making a brass bar read cool in run 6, and now a synthetic event that fires
+nothing. It is the same lesson `against.mjs` learned when three readers called
+every pull bar a third too long and the crop was at fault. **Drive the page the
+way a person does — real keys, real pointers — and when a probe says something
+is broadly broken, suspect the probe first.**
+
+**Left alone deliberately:** the mobile sticky CTA; the transom and classical
+composition backlog; and the three that need Peretz — the hardware finish, the
+three off-chart colours, and every price.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-20 00:51 UTC — run 6: nothing worth changing
 
 **Looked at:** the two commits since the last run — the against.mjs check with
