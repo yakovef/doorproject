@@ -23,6 +23,70 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-20 00:51 UTC — run 6: nothing worth changing
+
+**Looked at:** the two commits since the last run — the against.mjs check with
+the specular fix and the rebuilt tree (e3cb8e1), and the grip hit box, focus
+ring and grab tile (7330c58). Page at 390 and 1280, all four sections, the
+handle tiles, and doors on navy and white.
+
+**Instruments:** test ✓ (1,590,563) · audit ✓ (5 viewports, drag included) ·
+profile ✓ · collide ✓ (base / `all` / `boxes`, MOUNT_REACH 121) · recreate ✓ ·
+shot ✓ (12 clean). Build reproduces the committed bundle; no console errors at
+either width.
+
+**Changed:** nothing.
+
+**Confirmed the two fixes do what they say**, rather than taking the commit
+messages for it. The pad measures 44 × 44 css px at both widths while the
+focus rect is 6 px at 390 and 8 px at 1280 — the bar's own width — so the two
+objects really are separate and the ring hugs the handle. The grab tile draws
+a bare horizontal bar with no lever, and states its own refusal.
+
+**Three things probed that had not been probed before, all sound:**
+
+1. **Money is integer agorot.** A standing constraint in CLAUDE.md §1 that
+   nothing was asserting end to end. Priced every buildable design —
+   **1,197,990** of them — and every one is a non-negative integer.
+   Range 309,500 to 826,500 agorot (₪3,095 to ₪8,265).
+
+2. **The three surfaces Peretz can act on agree.** Price on screen, price and
+   code in the WhatsApp message, all describing one door — checked through a
+   clean load, three different repairs, an old v9 code, and an unknown option.
+   Agree in all six.
+
+   Worth writing down because it looked like a fault for a minute: the message's
+   link is NOT the URL the customer arrived on. Arrive on a link naming metal
+   strips over glass and the address bar keeps saying so while the message
+   carries the repaired door. That is the right way round — the message must
+   describe what is on screen — and the address bar keeping the original means
+   a reload re-shows the notice instead of silently swallowing it. Not a defect;
+   recorded so the next run does not re-open it.
+
+3. **The finish reaches every fitting.** Measured the drawn metal per hardware
+   group across brass and nickel grips. Body warmth on a brass door: handle
+   0.23, lockset 0.26, lock 0.16 — against −0.05 to −0.06 everywhere on a
+   nickel one. The keyway stays cool on both, which is right: it is a slot, not
+   a fitting.
+
+   One false alarm, recorded because the metric is the lesson. Ella measured
+   −0.155 — cool on a brass door — and it is the thinnest bar in the range at
+   20 mm, so against a navy leaf the antialiased fringe outweighs the metal in
+   any sample of the box. It is visibly gold at 3×. Sampling the brightest
+   pixel is just as wrong in the other direction: a specular is near-white on
+   brass as much as on nickel, which is what made the escutcheon look silver to
+   me in the first place. Thin metal on a dark leaf cannot be judged by
+   averaging its bounding box.
+
+**Left alone deliberately:** the address bar not being rewritten after a
+repair (above); the mobile sticky CTA; the transom and classical-composition
+backlog; and the three that need Peretz — the hardware finish, the three
+off-chart colours, and every price.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-19 20:57 UTC — run 5: the window section still advertised a question that had been deleted
 
 **Looked at:** the round that deleted the glazing axis, rebuilt GRILLES to
