@@ -23,6 +23,62 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-20 20:49 UTC — run 10: the ten comparison sheets still showed a threshold we stopped drawing
+
+**Looked at:** six human commits — the sidelight grille pricing, the pinned
+stage on a phone, the dock, the colour record, the bare-aluminium threshold and
+the two gallery windows. Page at 390 and 1280, the new dock driven by real
+scrolling.
+
+**Instruments:** test ✓ (2,763,814) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`) · recreate ✓ · shot ✓. Green throughout.
+
+**Changed:** the ten `screenshots/recreate-*.png` regenerated. No source file
+moved — `js/`, `css/`, `tools/`, `test/` and `index.html` are byte-identical,
+and the bundle rebuilds unchanged.
+
+**Why.** `65e08f4` made the threshold bare aluminium instead of painting it
+with the door, and regenerated the twelve `shot` sheets. It did not regenerate
+the ten `recreate` sheets, and nothing noticed. Those are the ones a human
+opens to judge our door against the photograph — the artefact behind the
+governing rule in REALISM.md §6, *compare against a photograph, every time* —
+so they were showing a threshold the site had stopped drawing.
+
+Measured before touching them, because "the images look stale" is a feeling.
+The difference is one band, 522 × 22 px at 0.874–0.889 of the sheet's height,
+and inside it the threshold goes **rgb(59,57,60) → rgb(132,130,124)** —
+near-black to mid-grey, more than double the luminance. Not encoder noise: a
+visible element, changed on purpose, still shown the old way. d106 alone is
+byte-identical, its crop not reaching the threshold.
+
+The cost is honest: ten large PNGs is real history. It is worth it because a
+comparison sheet that lags is worse than none — the next person to open
+d003 sees the old painted threshold beside the photograph and may "fix"
+something already fixed.
+
+**The gap, for a human to weigh.** `assertFreshBundle` exists so the bundle
+cannot drift from source; there is no equivalent for the screenshots, which is
+why half of them refreshed and half did not in the same commit. A full pixel
+check would cost minutes and fire on antialiasing; a cheap version would ask
+whether any sheet predates the newest commit touching `js/renderer.js`. I have
+not built either — on the run after four straight probe failures, adding
+machinery on my own initiative is not the move.
+
+**Checked and sound, so it is not re-opened:**
+- **The dock stands down correctly.** It looked wrong in my first screenshot —
+  dock and send card both on screen — so I measured it instead of reporting it:
+  `.send` at ratio 0 with the dock shown, ratio 1.00 with it hidden, and
+  restored on scrolling back up. The screenshot had caught it before the
+  observer fired. Fifth probe artifact this week, first one caught before it
+  reached the log.
+
+**Left alone deliberately:** the transom and classical-composition backlog, and
+the three that need Peretz.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-20 16:05 UTC — run 9: nothing worth changing. A four-hour false alarm, and the rule I should have reused
 
 **Looked at:** `df557f5`, which opened the handle's height band from 0.38–0.60
