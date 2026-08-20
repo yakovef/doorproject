@@ -23,6 +23,61 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-20 10:52 UTC — run 8: two grip-bar buttons were 34px, and the check that should have said so kept a list
+
+**Looked at:** nothing had been pushed since run 7, so again I went at surfaces
+nothing has driven: the COPY button — the other way an order reaches Peretz —
+and a phone in LANDSCAPE, which none of the audit's five viewports is.
+
+**Instruments:** test ✓ (1,590,563) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`, MOUNT_REACH 121) · recreate ✓ · shot ✓.
+Green before the change and after it.
+
+**Sound, and now on record:**
+- **The copy button gives exactly the WhatsApp message.** Byte-for-byte on a
+  default door, a fully-specified one, and a link arriving repaired. Two
+  customers who chose the same door hand Peretz the same specification whichever
+  route they take.
+- **A rotated phone is fine.** 844×390 and 568×320: no sideways scroll, the door
+  is not clipped, and the hit pad still measures 44 css px across — which is the
+  claim `sizeHitPad` makes about surviving a re-fit, now checked rather than
+  believed.
+
+**Changed — the fault the landscape sweep turned up on the way.**
+`.grip-bar__btn` was `min-block-size: 34px`. Both buttons in the grip bar carry
+it: **`#grip-rot` at 60×34 and `#grip-home` at 104×34**, ten pixels under the
+44 this project holds every other target to, on the phone, for the control that
+rotates the handle. `.brand` was 43×80 — one pixel, the kind only a ruler
+finds. Both fixed; the rotate button keeps its size and the label is centred.
+
+**Why nothing said so.** `npm run audit`'s tap-target check asked a hand-kept
+list of classes — `[role="radio"], .btn, .bar__phone, .field__head,
+.sect__head`. `.grip-bar__btn` is on none of them, so the buttons that arrived
+with the drag feature three rounds ago were never measured, and the check sat
+green beside them. That is the same staleness the group list in the same file
+was already rewritten to avoid, and its own comment names the symptom: *"a
+hand-kept copy would go stale the first time a category was added and its
+symptom would be the new category never being audited — silence, not a
+failure."* The lesson had been learned ten lines above and not applied here.
+
+It derives now: every `button`, `a[href]`, `input`, `select`, `[role="radio"]`
+and `[role="button"]` that is rendered, minus one real exemption — a link
+inside a sentence, which WCAG 2.5.8 exempts because growing it would break the
+paragraph. That covers the two remaining sub-44 links, both inline in body text.
+
+**The check is live.** Backing the CSS out fails it fifteen times, three
+targets across five viewports — and it named `#grip-home`, which my own probe
+had missed because it is hidden until the handle has been moved and the audit
+unhides bodies before measuring. The instrument found more than I did.
+
+**Left alone deliberately:** the mobile sticky CTA; the transom and classical
+composition backlog; and the three that need Peretz — the hardware finish, the
+three off-chart colours, and every price.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-20 05:50 UTC — run 7: nothing worth changing
 
 **Looked at:** nothing new had been pushed since run 6, so rather than repeat

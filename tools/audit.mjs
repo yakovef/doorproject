@@ -85,12 +85,25 @@ for (const v of VIEWS) {
   await p.evaluate(() => {
     document.querySelectorAll('.sect__body,.field__body').forEach(b => { b.hidden = false; });
   });
+  /* DERIVED, not listed. This asked a hand-kept set of classes —
+     [role="radio"], .btn, .bar__phone, .field__head, .sect__head — and the
+     rotate button in the grip bar is on none of them, so it sat at 34px for
+     three rounds with the check green beside it. Same staleness the group list
+     above was already rewritten to avoid: a list of what to measure stops
+     being true the moment somebody adds a control, and its symptom is silence.
+     So: everything a person can operate, minus the one exemption that is real
+     — a link inside a sentence, which WCAG 2.5.8 exempts because growing it
+     would break the paragraph it sits in. Zero-size means not rendered. */
   const small = await p.evaluate(() => {
     const out = [];
-    for (const el of document.querySelectorAll('[role="radio"], .btn, .bar__phone, .field__head, .sect__head')) {
+    for (const el of document.querySelectorAll(
+      'button, a[href], input, select, [role="radio"], [role="button"]')) {
       const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) continue;
+      if (el.closest('p')) continue;
       if (r.height < 44 || r.width < 30) {
-        out.push(`${el.className.split(' ')[0]}:${el.dataset.id || el.id || el.textContent.trim().slice(0, 12)} ${Math.round(r.width)}x${Math.round(r.height)}`);
+        const cls = String(el.className || '').split(' ')[0];
+        out.push(`${cls || el.tagName.toLowerCase()}:${el.dataset.id || el.id || el.textContent.trim().slice(0, 12)} ${Math.round(r.width)}x${Math.round(r.height)}`);
       }
     }
     return out;

@@ -74,7 +74,10 @@ body {
   background: var(--paper);
 }
 
-.brand { text-decoration: none; color: inherit; display: grid; }
+/* Its two lines of text come to 43px, one short of the minimum, which is the
+   kind of miss only a measurement finds. */
+.brand { text-decoration: none; color: inherit; display: grid; align-content: center;
+         min-block-size: 44px; }
 .brand__name { font-weight: 700; font-size: 1.05rem; letter-spacing: .01em; }
 .brand__sub {
   font-size: .7rem; letter-spacing: .14em; color: var(--ink-2);
@@ -231,8 +234,14 @@ body {
   justify-content: center;
 }
 .grip-bar__hint { font-size: .72rem; color: var(--ink-2); }
+/* 44px, like every other target on the page. It was 34 — a standalone control
+   on the phone, ten pixels under the minimum this project holds itself to, and
+   the audit never said so because its tap-target check enumerated a list of
+   classes that this one is not on. Both buttons in the grip bar carry it, so
+   the reset button was the same ten pixels short whenever it appeared. */
 .grip-bar__btn {
-  min-block-size: 34px; padding: 5px 14px;
+  min-block-size: 44px; padding: 5px 14px;
+  display: inline-flex; align-items: center; justify-content: center;
   border: 1px solid var(--rule); border-radius: 999px;
   background: var(--paper-up); color: var(--ink); font: inherit; font-size: .78rem;
   cursor: pointer;
