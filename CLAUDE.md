@@ -21,6 +21,30 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The record says two things about a colour and only one of them is a
+  measurement.** `colour.hex` is a median over the leaf; `colour.family` is
+  what the person looking at the photograph called it. `npm run corpus` used
+  only the hex and was wrong in the three places the instrument is weakest: a
+  glossy black door (d087, hex #66686D) came out STEEL BLUE, an oxblood one
+  (d015, #42170D) came out BLACK, and a sage one (d092, #678184) came out MID
+  GREY. All three are obvious in the photograph and all three were
+  arithmetically correct — a median over a glossy dark leaf is a measurement of
+  the light in the street.
+  The family CONSTRAINS and the hex CHOOSES now, with the classification
+  computed from each catalogue entry's own hex so a colour added later is
+  classified without anybody coming back here.
+  ⚠ The thresholds had to be TUNED against all thirty, not written down and
+  left. The strict first set fixed the three it was written for and broke six
+  that were right. And one of them matters on its own: `grey` as C* < 10 lets
+  the SAGE GREEN in at C* 9.8, so three warm-grey doors came back green. C* < 8
+  keeps it out — the gap between taupe at 7.5 and sage at 9.8 is in the data,
+  not in the threshold.
+  Mean miss over the thirty is now ΔE94 7.6, median 6.6.
+  ⚠ **And a tool that fills a hole with its default and prints no residual is
+  claiming to have measured something it never looked at.** The records carry
+  `detail.panel` as a boolean and no count, so "one panel" was a default
+  dressed as a derivation — d087 plainly has two. It reports the unknown now.
+
 - **On a phone you could not see the door you were painting.** The page is
   door, then choices, then price, so scrolling to a list of seventeen colours
   put the door off the top of the screen. Measured on a 390x844 phone with the

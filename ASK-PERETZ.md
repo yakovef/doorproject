@@ -163,12 +163,19 @@ doors he installed, so this is a question rather than a colour to invent.*
 
 *⚠ AND A HOLE IN THE MIDDLE OF THE CHART, which `npm run corpus` found by
 matching all thirty measured leaves against it in CIE Lab. The mean miss is
-ΔE94 6.2 — close but never the same colour, which is what "להמחשה בלבד" on the
-chart means in practice. The pattern in the misses is the interesting part:
-five doors are WARM MID GREYS — #7C7771, #817373, #837F7C, #82756C, #6D6A62 —
-and the chart's mid greys are all cool (#86868A, #565357). The nearest entry to
-three of them is the sage green, so a door Peretz built in warm grey is drawn
-GREEN on the site. Grey against green is not a shade a customer forgives.*
+ΔE94 7.6, median 6.6 — close but never the same colour, which is what
+"להמחשה בלבד" on the chart means in practice. The pattern in the misses is the
+interesting part: five doors are WARM MID GREYS — #7C7771, #817373, #837F7C,
+#82756C, #6D6A62 — and the chart's mid greys are all cool (#86868A at C* 2.3,
+#565357 at 2.8). The only thing near them in the chart is the SAGE GREEN at
+C* 9.8, and until the matcher was told to keep a green out of the grey family
+that is what three of them were drawn as. A warm grey door drawn green is not a
+shade a customer forgives.*
+
+*The other end of the same hole: no dark red-brown. d015's leaf measures
+#42170D, an oxblood, and the nearest thing in the chart is either black
+(ΔE 12) or a mid brown (ΔE 15). The colour list already carries the note that
+there is no red in this range.*
 
 *Not fixable from here: adding a warm grey to the list would be inventing a
 paint Rav Bariach may not sell, and the colour is ordered by the code on the

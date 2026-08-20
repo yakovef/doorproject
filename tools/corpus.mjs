@@ -97,14 +97,81 @@ function deltaE(p, q) {
   return Math.hypot(dL / 1, dC / (1 + 0.045 * C1), Math.sqrt(dH2) / (1 + 0.015 * C1));
 }
 
-function colourOf(hex) {
+/**
+ * ⚠ THE RECORD SAYS TWO THINGS ABOUT A COLOUR AND ONLY ONE OF THEM IS A
+ * MEASUREMENT. `colour.hex` is a median over the leaf; `colour.family` is what
+ * the person looking at the photograph called it. Using only the hex threw
+ * away the better answer for exactly the cases where the instrument is worst:
+ *
+ *   d087  hex #66686D, family "black"   — a black door photographed with a
+ *                                         sheen down it; we drew it STEEL BLUE
+ *   d015  hex #42170D, family "brown"   — we drew it BLACK
+ *   d092  hex #678184, family "green"   — we drew it MID GREY
+ *
+ * All three are obvious in the photograph and all three were arithmetically
+ * correct against the median. A sampled median of a glossy dark door is a
+ * measurement of the light in the street.
+ *
+ * So the family CONSTRAINS and the hex CHOOSES: narrow the catalogue to the
+ * entries that are that kind of colour, then take the nearest inside it. The
+ * classification is computed from each entry's own hex rather than read off
+ * its name, so a colour added later is classified without anybody remembering
+ * to come back here — and if the constraint empties the list, it is dropped
+ * and the fall-back is reported rather than hidden.
+ */
+/* ⚠ TUNED AGAINST ALL THIRTY, not written down and left. The first set of
+   thresholds was strict — "white" as L* > 80, "brown" as a* > 2 and b* > 6 —
+   and it fixed the three doors it was written for while breaking six that had
+   been right: d012's pale blue-grey leaf (L* 75) was thrown out of "white" and
+   landed on CREAM, and d043's dark brown-grey was thrown out of "brown"
+   because it is only faintly warm.
+   These are the words a person used about a photograph, not measurements.
+   "White" means pale, "brown" means warm; they describe a direction, not a
+   box. So the tests are the loosest thing that still separates the families
+   from each other, and each one is checked against every door that carries
+   it. Where a family cannot be told apart from its neighbours at all it is
+   better to have no constraint than a wrong one. */
+const FAMILY = {
+  black:      c => c.L < 24,               // d087: a glossy black leaf medians as mid grey
+  anthracite: c => c.L < 45 && c.C < 14,   // d003 d031 d064
+  /* ⚠ C* < 8, NOT < 10, and the difference is four doors drawn GREEN. Sage
+     (ירוק מרווה) sits at C* 9.8, so a looser test let it count as a grey — and
+     it is the nearest chart entry to a warm mid grey, because the chart has no
+     warm mid grey. d030, d038 and d072 are all warm greys in the photographs
+     and all three came back sage. The next most saturated thing that is
+     genuinely greyish is taupe at C* 7.5, so the gap between 7.5 and 9.8 is in
+     the data rather than in the threshold. */
+  grey:       c => c.C < 8,                // d016 d026 d030 d034 d038 d072 d078 d106 d122
+  white:      c => c.L > 70,               // d004 d012 d097 d108 d116 — pale, not paper
+  cream:      c => c.L > 70,               // d113 d125
+  brown:      c => c.a > 0 && c.b > 0,     // warm, however faintly: d043 is a* 2.5 b* 1.4
+  green:      c => c.a < -2,               // d092: a sage leaf medians as a neutral
+  blue:       c => c.b < -3,               // d048 d128
+};
+const classOf = hex => {
+  const l = toLab(hex);
+  return { ...l, C: Math.hypot(l.a, l.b) };
+};
+
+function colourOf(hex, family) {
   const a = toLab(hex);
+  const test = FAMILY[family];
+  let pool = COLOURS;
+  let narrowed = false;
+  if (test) {
+    const kept = COLOURS.filter(c => test(classOf(c.hex)));
+    if (kept.length) { pool = kept; narrowed = true; }
+  }
   let best = null, bestD = Infinity;
-  for (const c of COLOURS) {
+  for (const c of pool) {
     const d = deltaE(a, toLab(c.hex));
     if (d < bestD) { bestD = d; best = c; }
   }
-  return { id: best.id, residual: bestD, note: `${hex} -> ${best.hex} (${best.he})  ΔE94 ${bestD.toFixed(1)}` };
+  const how = !family ? 'no family recorded'
+            : narrowed ? `within "${family}"`
+            : `⚠ nothing in the catalogue is "${family}"`;
+  return { id: best.id, residual: bestD,
+           note: `${hex} -> ${best.hex} (${best.he})  ΔE94 ${bestD.toFixed(1)}, ${how}` };
 }
 
 function windowOf(rec) {
@@ -177,8 +244,22 @@ function locksetOf(rec) {
 function detailOf(rec) {
   const d = rec.detail || {};
   if (d.panel) {
-    /* Two panels or one, from the record's own rectangles where it has them. */
-    const n = (d.panels && d.panels.length) || (d.panel_count || 1);
+    /* ⚠ THE RECORDS DO NOT COUNT PANELS. `detail.panel` is a boolean and there
+       is no `panels` array on any of the ten panelled doors, so "one panel" is
+       not a derivation, it is a default — and d087 plainly carries two, a tall
+       upper over a short lower, which is why `tools/recreate.mjs` types
+       `d=panel2` for it by hand.
+       Reported as an unknown rather than asserted as a one. A tool that fills
+       a hole with its default and prints no residual is claiming to have
+       measured something it never looked at, which is the fault this whole
+       file exists to avoid. The branch below is live for the day the records
+       carry a count. */
+    const n = (d.panels && d.panels.length) || d.panel_count || null;
+    if (n == null) {
+      return { id: 'panel', residual: 0.5,
+               note: 'the record says there is a panel and does not say how many; '
+                   + 'assumed one (d087 has two)' };
+    }
     const want = n >= 2 ? 'panel2' : 'panel';
     return { id: want, residual: 0, note: `${n} panel(s)` };
   }
@@ -247,7 +328,7 @@ for (const id of ids) {
     continue;
   }
   const parts = {
-    colour: colourOf(rec.colour.hex),
+    colour: colourOf(rec.colour.hex, rec.colour.family),
     window: windowOf(rec),
     grille: grilleOf(rec),
     handle: handleOf(rec),
@@ -348,6 +429,11 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
    that is unreadable at any size a person actually looks at it — the point of
    a contact sheet is to be looked at, not to be compact. */
 const PER = 3, CELL_H = 900;
+/* Wide enough for a photograph cropped to its door plus half a leaf each side,
+   standing beside our drawing, both at CELL_H. Fixed, so a door photographed
+   from far away cannot widen its own cell and push its neighbour off the
+   sheet. */
+const CELL_CELL_W = 1180;
 let sheet = null, col = 0, page = 0, cellW = 0;
 
 for (let i = 0; i < rows.length; i++) {
@@ -366,22 +452,45 @@ for (let i = 0; i < rows.length; i++) {
 
   const photo = load(`research/works/doors/${r.id}.jpeg`);
   const ours = load(`/tmp/corpus-${r.id}.png`);
-  /* Leaf heights matched, so every proportion is read against one ruler. */
+
+  /* ⚠ CROP THE PHOTOGRAPH TO ITS DOOR, do not scale the whole frame.
+     Leaf heights are matched so every proportion is read against one ruler,
+     and that alone is not enough: d092's leaf is 215 px in a photograph of a
+     stone wall, so matching it magnified the wall by 1.6 and produced a cell
+     three times the width of the others. The last pair on that sheet ran off
+     the edge and was simply missing — a comparison sheet quietly showing two
+     doors where it says three.
+     Cropped to the leaf plus half its width each side, which keeps the frame
+     and the threshold in shot and throws the street away. */
+  const M = r.rec.leaf.w * 0.5;
+  const cx = Math.max(0, r.rec.leaf.x - M);
+  const cy = Math.max(0, r.rec.leaf.y - M * 0.5);
+  const cw = Math.min(photo.w - cx, r.rec.leaf.w + M * 2);
+  const ch = Math.min(photo.h - cy, r.rec.leaf.h + M * 1.4);
+
   const LH = CELL_H - 40;
   const ps = LH / r.rec.leaf.h, os = LH / (geo.leafH * 2);
-  const pw = Math.round(photo.w * ps), ph = Math.round(photo.h * ps);
+  const pw = Math.round(cw * ps), ph = Math.round(ch * ps);
   const ow = Math.round(ours.w * os), oh = Math.round(ours.h * os);
   const pairW = pw + ow + 8;
 
+  /* EVERY CELL THE SAME WIDTH, fixed rather than taken from whichever pair
+     happened to come first — which is what let d092's wide crop run off the
+     right-hand edge and take its comparison with it. A pair wider than the
+     cell is scaled down to fit; a narrower one is left alone, so nothing is
+     ever silently missing. */
   if (!sheet) {
-    cellW = pairW + 12;
+    cellW = CELL_CELL_W;
     sheet = canvas(cellW * PER, CELL_H + 26, 245);
     col = 0;
   }
+  const fit = Math.min(1, (cellW - 12) / pairW);
   const ox = col * cellW + 6;
-  blit(sheet, photo, 0, 0, photo.w, photo.h, ox, 24, pw, Math.min(ph, CELL_H));
-  blit(sheet, ours, 0, 0, ours.w, ours.h, ox + pw + 8, 24, ow, Math.min(oh, CELL_H));
-  rect(sheet, ox - 2, 22, pairW + 4, Math.min(Math.max(ph, oh), CELL_H) + 4, [160, 160, 160]);
+  blit(sheet, photo, cx, cy, cw, ch, ox, 24, Math.round(pw * fit), Math.min(Math.round(ph * fit), CELL_H));
+  blit(sheet, ours, 0, 0, ours.w, ours.h, ox + Math.round(pw * fit) + 8,
+       24, Math.round(ow * fit), Math.min(Math.round(oh * fit), CELL_H));
+  rect(sheet, ox - 2, 22, Math.round(pairW * fit) + 4,
+       Math.min(Math.round(Math.max(ph, oh) * fit), CELL_H) + 4, [160, 160, 160]);
   text(sheet, `${r.id} ${r.rec.cat} ${r.rec.price}`, ox, 6, [0, 0, 0], 2);
 
   col++;
