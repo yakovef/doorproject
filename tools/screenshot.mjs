@@ -13,6 +13,7 @@
  * Run: npm run shot
  */
 import { chromium } from 'playwright';
+import { assertFreshBundle } from './fresh.mjs';
 import { fromQuery } from '../js/url-state.js';
 
 /* Every query here must be a BUILDABLE door. They go through the same rules
@@ -90,6 +91,8 @@ const SHOTS = [
   { name: 'tablet',   w: 834,  h: 1112, full: true,
     q: '?c=rb-2030d&w=strip&g=scroll&n=none&k=knobplate&d=panel&s=tall&h=left-in' },
 ];
+
+await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 let bad = 0;

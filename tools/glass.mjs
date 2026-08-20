@@ -24,6 +24,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import jpeg from 'jpeg-js';
 import { chromium } from 'playwright';
+import { assertFreshBundle } from './fresh.mjs';
 import { PNG } from 'pngjs';
 
 const lum = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
@@ -111,6 +112,7 @@ console.log(`  ${rows.length} panes. Spread above ~1.0 is clear glazing, below ~
  * different quantities that happen to share a name.
  */
 async function measureOurs() {
+  await assertFreshBundle();
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const p = await b.newPage({ viewport: { width: 900, height: 1200 }, deviceScaleFactor: 1 });
   await p.goto(`file://${process.cwd()}/index.html?bare=1&c=rb-9016d&w=tallwin&z=clear`

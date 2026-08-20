@@ -89,19 +89,32 @@ corrected widths are in `js/catalog.js`; the lengths were already close.*
 הבחירה בגימור (ניקל מוברש / שחור מט / פליז) הוסרה מהאתר. כל ידית מצוירת
 בגימור אחד: שירן בפליז, כל השאר בניקל מוברש.
 
-> **"מתוך עשר הדלתות שניסינו לשחזר — בשש מהן הידית או המנעול הם פליז או
-> שחור, לא ניקל. אתה כן מזמין גימורים שונים, או שזה מה שהיצרן שולח?"**
+> **"מתוך שלושים הדלתות שמדדנו — בשלוש-עשרה מהן הידית או המנעול הם פליז,
+> ברונזה או שחור, לא ניקל. אתה כן מזמין גימורים שונים, או שזה מה שהיצרן
+> שולח?"**
+
+הספירה המלאה, מכל שלושים הדלתות המדודות (`npm run corpus`):
+
+| גימור | כמה דלתות |
+|---|---|
+| ניקל / פלדה | 12 |
+| שחור | 6 |
+| כרום | 5 |
+| פליז | 4 |
+| ברונזה | 3 |
 
 d003 · d026 · d106 — פליז · d087 · d113 · d122 — שחור
 
-*This one needs an answer, because the evidence points the other way. The
-finish was withdrawn on the instruction that it is not something customers
-choose — a reasonable thing to be true, and the ₪220 it charged for a
-non-choice was worse than useless. But it is not a decorative axis in the
-photographs: SIX of the ten doors we recreate carry brass or black hardware,
-and `npm run recreate` now records each of those as a gap between his door and
-ours. If he does order in different finishes, this comes back as a fact about
-each handle (`HANDLES[].finish`) rather than as a priced tile — which is what
+*This one needs an answer, because the evidence points the other way, and the
+count has moved since it was first written. It said six of TEN recreations;
+`npm run corpus` now derives all thirty measured doors from their own records
+and the tally above is what came back — 13 of 30, better than two in five,
+carry hardware that is not brushed nickel. Black alone is on six.
+The finish was withdrawn on the instruction that it is not something customers
+choose, which is a reasonable thing to be true, and the ₪220 it charged for a
+non-choice was worse than useless. But two in five is not a decorative edge
+case. If he does order in different finishes, this comes back as a fact about
+each product (`HANDLES[].finish`) rather than as a priced tile — which is what
 Shiran already is.*
 
 ---
@@ -139,11 +152,28 @@ says he does not fit them together, it goes back in as one line.*
 
 עכשיו באתר: לוח הצבעים של רב בריח — 17 גוונים.
 
+> **"חמש מהדלתות שלך אפורות-חמות — האפור שלנו נוטה לכחול ואחת מהן יוצאת אצלנו
+> ירוקה. יש בלוח של רב בריח אפור חם, או שזה גוון מיוחד?"**
+
 *Three colours in the works gallery have no counterpart on the chart we sample:
 a pillar-box red (d095), a mustard yellow (d127), and the cool light grey of
 d026, whose leaf measures #A2A7AD where our lightest grey is the warm #B7B4B2.
 Either the chart is not the whole range or these were special orders. Both are
 doors he installed, so this is a question rather than a colour to invent.*
+
+*⚠ AND A HOLE IN THE MIDDLE OF THE CHART, which `npm run corpus` found by
+matching all thirty measured leaves against it in CIE Lab. The mean miss is
+ΔE94 6.2 — close but never the same colour, which is what "להמחשה בלבד" on the
+chart means in practice. The pattern in the misses is the interesting part:
+five doors are WARM MID GREYS — #7C7771, #817373, #837F7C, #82756C, #6D6A62 —
+and the chart's mid greys are all cool (#86868A, #565357). The nearest entry to
+three of them is the sage green, so a door Peretz built in warm grey is drawn
+GREEN on the site. Grey against green is not a shade a customer forgives.*
+
+*Not fixable from here: adding a warm grey to the list would be inventing a
+paint Rav Bariach may not sell, and the colour is ordered by the code on the
+sheet rather than by our hex — so the wrong hex makes a wrong PICTURE, not a
+wrong order. It still has to be asked.*
 
 ---
 
@@ -210,6 +240,20 @@ because collapsing the pair would leave two prices on one picture — but if he
 does not sell black on the plain grid, half this list can go, which is a
 shorter list in front of a cold visitor.*
 
+> **"את פסי המתכת אתה עושה גם שקועים בדלת וגם מודבקים עליה? באתר יש רק
+> מודבקים."**
+
+*Measured on every line-work door, by finding each line and reading its tone
+against the paint beside it: four are DARKER than the paint and four are
+BRIGHTER. d016, d030, d038 and d072 are milled grooves — d038's three read at
+0.31 of the paint's brightness — and d034, d043, d064 and d078 are applied
+strips, d064's at 2.4x. The catalogue offers a recessed line in ONE form only,
+a single vertical groove, so d038's three recessed verticals and d063's four
+recessed horizontals are both drawn as bright applied strips. It is the same
+line at opposite signs and the sign is the whole read: one says the door was
+cut, the other says something was laid on it. Whether that is worth two more
+products is his call, not ours.*
+
 > **"החלונות והסורגים ציירנו מחדש לפי התמונות באתר שלך. תסתכל שאלה הדגמים
 > הנכונים."**
 
@@ -228,6 +272,21 @@ half height and a fleur under a dome at each end, with the middle left bare.*
 > **"מה המחיר המלא — דלת + התקנה + מע״מ — לכל מידה?"**
 
 באתר `דלתות מגן` כתוב "החל מ־₪3,195" ואנחנו עוגנים לזה. צריך את השאר.
+
+> **"הוספנו אפשרות חדשה — חריץ היקפי סביב הדלת (d004, d031). כמה זה מוסיף?"**
+> **"בשתי דלתות שלך ידית המשיכה ארוכה מכל מה שיש באתר — 0.73 ו-0.86 מגובה
+> הדלת, ואצלנו הכי ארוכה 0.61. איזו ידית זו?"**
+
+*The perimeter groove is priced at ₪260 — one notch above the single vertical
+groove at ₪240, since it is four scribed lines rather than one. Invented like
+every other number in `js/catalog.js`, and flagged here rather than quietly.*
+
+*The long bars are d072 (0.861 of leaf height) and d087 (0.726). Ours run 0.45
+to 0.61, so both of those doors are drawn with a bar noticeably shorter than
+the one in the photograph. Adding a longer one costs nothing in the short code
+— `HANDLES` is appended to, and the field has six spare slots — but it needs a
+NAME he can put on a purchase order, and inventing one would be worse than the
+gap.*
 
 ---
 

@@ -4,7 +4,7 @@
  */
 import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
-import { priceAgorot, shekels } from '../js/price.js';
+import { formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT, locksetGlyph,
@@ -730,6 +730,61 @@ group('a panel that is charged for is a panel that is drawn');
   console.log(`  (${n} buildable faces, ${missing} charged for a panel they do not show)`);
 }
 
+/* AND THE SAME QUESTION FROM THE OTHER SIDE: what is DRAWN is what is CHARGED.
+   The panel check above is one half of a symmetry and this is the other. It
+   was written after the missing half cost real money.
+
+   A SIDELIGHT door carries 400 mm of glass beside the leaf. `isGlazed` has
+   always known that — d128 has wrought iron in its side panel and no window in
+   its leaf at all — so the rules allow a grille there and the drawing puts one
+   in. `priceAgorot` asked a DIFFERENT question, `win.rects.length`, which is
+   about the leaf's own window, found none, and charged nothing. All fourteen
+   grilles were free on that size, up to ₪620 of ironwork given away on every
+   one of them.
+
+   The two-panel defect this file already documents was the same fault with the
+   opposite sign: money for something not drawn. Peretz loses either way.
+
+   Asked of every group in the catalogue rather than of the grille alone,
+   because the fault was never about grilles — it was about the price
+   recomputing a fact that three other files already knew. And asked WITHOUT a
+   context that quietly guarantees the answer: the old "a priced option changes
+   the door" check pins `window: 'tallwin'` before touching a grille, which is
+   exactly the case that works. */
+group('what the drawing shows is what the price charges');
+{
+  let n = 0;
+  for (const [key, list, off] of [
+    ['grille',  GRILLES,  'none'],
+    ['window',  WINDOWS,  'none'],
+    ['detail',  DETAILS,  'plain'],
+    ['handle',  HANDLES,  'none'],
+    ['lockset', LOCKSETS, 'cylinder'],
+  ]) {
+    for (const size of sizeKeys) for (const w of WINDOWS) for (const o of list) {
+      if (o.id === off) continue;
+      const st = { ...base, handle: 'none', lockset: 'cylinder', window: w.id, size,
+                   [key]: o.id };
+      const zero = { ...st, [key]: off };
+      if (!buildable(st) || !buildable(zero)) continue;
+      n++;
+      const drawn = render(st) !== render(zero);
+      const paid = priceAgorot(st) - priceAgorot(zero);
+      /* One direction only, and deliberately. "Charged implies drawn" is the
+         panel check above; this is "drawn implies charged" — but only where
+         the list price says the option costs something. Two options that are
+         both free and both look different (a cylinder against a Coral lever)
+         are not a fault, they are the catalogue. */
+      if (o.delta) {
+        ok(!drawn || paid !== 0,
+           `${key}="${o.id}" costs ₪${shekels(o.delta)} on the tile but is drawn `
+         + `free on ${size}/${w.id} — the door shows it and the price does not`);
+      }
+    }
+  }
+  console.log(`  (${n} option/size/window combinations priced against the drawing)`);
+}
+
 /* ── the handle, and where it may stand ───────────────────────────────
    The customer can drag the pull handle anywhere on the door. What decides
    whether a spot is buildable is what is BOLTED — the two feet — and the
@@ -1071,6 +1126,84 @@ group('a new build reaches a browser that has been here before');
        + 'run npm run build before committing, or the stamp is a lie');
     }
   }
+}
+
+/* ── 12. THE MESSAGE ──────────────────────────────────────────────────
+   PLAN.md §3 calls this the product: everything else on the site exists to get
+   a customer to a message Peretz can act on without a clarifying question.
+   Nothing in this suite had ever read one.
+
+   That was not a theoretical gap. A sidelight door with wrought iron in its
+   side panel produced a message with NO LINE ABOUT THE IRONWORK — the drawing
+   showed it, the price charged ₪620 for it, and the order Peretz builds from
+   did not mention it. The line asked `w.rects.length`, the leaf's own window,
+   where every other reader of that fact asks `isGlazed`.
+
+   So the invariant is stated in the only form that would have caught it:
+   ANYTHING THE CUSTOMER IS CHARGED FOR IS NAMED IN THE MESSAGE. Not "the
+   message is non-empty", not "it has seven lines" — a surcharge with no
+   sentence beside it is an order Peretz cannot fill.
+
+   `shareUrl` reads `window.location.href`, because on file:// some browsers
+   report `location.origin` as the string "null". Node has no window, so it is
+   shimmed rather than the function being made testable a different way: what
+   is under test is the message a browser produces. */
+group('every option the customer pays for is named in the message');
+{
+  globalThis.window = globalThis.window
+    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+  const { message } = await import('../js/share.js');
+
+  let n = 0, priced = 0;
+  for (const size of sizeKeys) for (const w of WINDOWS) for (const g of GRILLES)
+    for (const d of DETAILS) for (const hn of HANDLES) {
+      const st = { ...base, size, window: w.id, grille: g.id, detail: d.id,
+                   handle: hn.id, lockset: 'cylinder' };
+      if (!buildable(st)) continue;
+      n++;
+      const text = message(st);
+
+      /* Every group, asked the same way: if this option adds money, its own
+         name has to appear somewhere in the message. */
+      for (const o of [byId(WINDOWS, st.window), byId(GRILLES, st.grille),
+                       byId(DETAILS, st.detail), byId(HANDLES, st.handle),
+                       byId(LOCKSETS, st.lockset)]) {
+        if (!o.delta) continue;
+        /* The grille is the one option whose surcharge is conditional — it is
+           charged only where there is glass for it to be applied to — so the
+           question is asked of the PRICE and not of the list, which is exactly
+           the distinction the defect turned on. */
+        const charged = priceAgorot(st) !== priceAgorot({ ...st, grille: 'none' })
+                      || o !== byId(GRILLES, st.grille);
+        if (!charged) continue;
+        priced++;
+        /* `he` is the catalogue's own name; the message may drop a leading
+           word from it (סורג / זכוכית), so the distinctive tail is what is
+           looked for. */
+        const name = o.he.replace(/^(סורג|זכוכית)\s+/, '');
+        ok(text.includes(name),
+           `${size}/${w.id}/${g.id}/${d.id}/${hn.id}: charged ₪${shekels(o.delta)} `
+         + `for "${o.he}" and the message never names it`);
+      }
+
+      /* And the three things Peretz needs whatever the door is. */
+      ok(/קוד: DM-/.test(text), 'the message carries no design code');
+      ok(/לצפייה: http/.test(text), 'the message carries no link back to the drawing');
+      ok(text.includes(formatAgorot(priceAgorot(st))),
+         'the message quotes a price the page does not');
+    }
+
+  /* The link in the message must reopen THIS door. It is the line that matters
+     most — Peretz taps it and decodes nothing. */
+  for (const st of everyState()) {
+    const link = /לצפייה: (\S+)/.exec(message(st))[1];
+    const back = fromQuery(link.slice(link.indexOf('?'))).state;
+    for (const k of KEYS) {
+      ok(back[k] === st[k],
+         `the message's own link reopens a different door: ${k} ${st[k]} -> ${back[k]}`);
+    }
+  }
+  console.log(`  (${n} messages read, ${priced} surcharges checked against their sentence)`);
 }
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} passed, ${fail} failed\n`);

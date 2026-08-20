@@ -21,7 +21,9 @@
     "triage": "node tools/triage.mjs",
     "collide": "node tools/collide.mjs",
     "profile": "node tools/profile.mjs",
-    "against": "node tools/against.mjs"
+    "against": "node tools/against.mjs",
+    "fuzz": "node tools/fuzz.mjs",
+    "corpus": "node tools/corpus.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

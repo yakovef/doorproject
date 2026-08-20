@@ -5,7 +5,8 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, isGlazed,
+         LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { encodeCode, toQuery } from './url-state.js';
 
@@ -61,7 +62,15 @@ export function message(state) {
        grille made of reeded glass, which is not a thing. `glass` is already on
        the catalogue entry because the drawing needs it; the order needs it
        for a plainer reason. */
-    ...(w.rects.length && g.id !== 'none' ? [glassOrGrilleLine(g)] : []),
+    /* ⚠ `isGlazed`, not `w.rects.length`. This asked about the LEAF's own
+       window, and on a sidelight door the glass is beside the leaf: the rules
+       allow a grille, the drawing puts wrought iron in that panel, the price
+       charges ₪620 for it — and this line, the one Peretz actually builds
+       from, said nothing at all. The customer pays for ironwork and the order
+       does not mention it, which is PLAN.md §0 failing at the exact point it
+       exists to succeed. Third file to answer this question its own way; there
+       is one answer now and it is in the catalogue. */
+    ...(isGlazed(state) && g.id !== 'none' ? [glassOrGrilleLine(g)] : []),
     ...(byId(HANDLES, state.handle).style === 'none'
         ? [] : [`ידית משיכה: ${byId(HANDLES, state.handle).he}`]),
     /* The finish is still named even though it is no longer chosen: it is a

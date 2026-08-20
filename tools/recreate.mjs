@@ -9,10 +9,11 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { assertFreshBundle } from './fresh.mjs';
 import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
 import { MOULD_BAND, REBATE } from '../js/renderer.js';
-import { SIZES } from '../js/catalog.js';
+import { HANDLES, SIZES } from '../js/catalog.js';
 import { fromQuery } from '../js/url-state.js';
 
 /* Our applied moulding as a fraction of the standard leaf, DERIVED. The gap
@@ -24,6 +25,16 @@ import { fromQuery } from '../js/url-state.js';
    does will eventually be describing a drawing that no longer exists. */
 const OURS_BAND = MOULD_BAND / (SIZES.standard.w - REBATE * 2);
 const ours = OURS_BAND.toFixed(3);
+
+/* And the same for the bar range, for exactly the same reason. Two gap notes
+   below said "our shortest is 0.39" and "our longest is 0.56" — both typed in,
+   both wrong by the time anybody read them again, because the bar widths and
+   lengths were re-measured a round later and neither figure followed. Asked of
+   the catalogue every run. */
+const LEAF_H = SIZES.standard.h - REBATE * 2;
+const barLens = HANDLES.filter(h => h.style === 'bar').map(h => h.len / LEAF_H);
+const shortestBar = Math.min(...barLens).toFixed(2);
+const longestBar = Math.max(...barLens).toFixed(2);
 
 /**
  * Ten doors, chosen to span the vocabulary rather than to flatter it: plain,
@@ -57,10 +68,10 @@ const CASES = [
        is "pull-bar": a bar with a cylinder beside it and no knob or lever
        anywhere, which is what eight of the ten installed bar doors carry. */
     q: 'c=rb-0096d&w=none&g=none&n=nitzan&k=cylinder&d=strips&s=standard&h=left-in',
-    gap: 'the bar is 0.32 of leaf height; our shortest is 0.39' },
+    gap: `the bar is 0.32 of leaf height; our shortest is ${shortestBar}` },
   { id: 'd087', label: 'designed 8000 - smart lock, long bar',
     q: 'c=rb-9005d&w=none&g=none&n=shahar&k=digital&d=panel2&s=standard&h=left-in',
-    gap: 'the bar is 0.73 of leaf height (our longest is 0.56) and BLACK, which we no '
+    gap: `the bar is 0.73 of leaf height (our longest is ${longestBar}) and BLACK, which we no `
        + `longer offer; its moulding measures 0.070 of leaf width against our ${ours}, `
        + 'so ours is now the heavier of the two' },
 
@@ -79,9 +90,14 @@ const CASES = [
        + 'real ornament is denser scrollwork where ours is a single opposed pair' },
   { id: 'd106', label: 'luxury 8500 - interlocking rings',
     q: 'c=rb-7080d&w=broad&g=circles&n=none&k=plate&d=panel&s=standard&h=right-in',
-    gap: 'the motif is right and the PITCH is not — side by side ours reads finer, '
-       + 'because the ring cell is capped at 96 mm and this opening is 425 mm wide. '
-       + 'Its plate is brass' },
+    /* ⚠ This note claimed the ring cell was "capped at 96 mm", and there has
+       been no such cap since the glass patterns were redrawn — a tool
+       describing a drawing that no longer exists, which is CLAUDE.md §5 in its
+       purest form. It also had the direction backwards: ours read COARSER than
+       the photograph, not finer. The pitch is a measurement now (54 mm, from
+       d106's own pane two ways), so what is left is the finish. */
+    gap: 'its plate is brass in the photograph, and the finish is withdrawn, so '
+       + 'ours is nickel' },
   { id: 'd113', label: 'luxury 9500 - smart lock, glazed slot',
     q: 'c=rb-9001d&w=strip&g=grid-light&n=idan&k=digital&d=plain&s=standard&h=left-in',
     gap: 'the bar and the lock body are black in the photograph; ours are nickel' },
@@ -112,6 +128,8 @@ function scale(src, w, h) {
   }
   return out;
 }
+
+await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 let bad = 0;

@@ -16,6 +16,7 @@
  * Run: npm run audit
  */
 import { chromium } from 'playwright';
+import { assertFreshBundle } from './fresh.mjs';
 import { DEFAULTS, encodeCode } from '../js/url-state.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
@@ -45,6 +46,8 @@ const groupsOn = p => p.$$eval('.field[data-group]', els => els.map(e => ({
   key: e.dataset.group,
   section: e.closest('.sect').dataset.section,
 })));
+
+await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 let faults = 0;

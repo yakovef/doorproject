@@ -37,6 +37,7 @@
  * Run: npm run profile
  */
 import { chromium } from 'playwright';
+import { assertFreshBundle } from './fresh.mjs';
 import { PNG } from 'pngjs';
 
 /* The medians `FALLOFF` was fitted to, at rows 0.055 + n*0.111 down the leaf. */
@@ -48,6 +49,8 @@ const ROWS = {
    own spread is wider than this, and a drawing that hit them exactly would be
    fitted to noise. It is set to catch DRIFT, not to certify a match. */
 const TOL = 0.09;
+
+await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 700, height: 1200 }, deviceScaleFactor: 2 });

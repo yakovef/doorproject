@@ -51,12 +51,17 @@
  * state the interface would not let you build.
  */
 
-import { byId, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, DETAILS, GRILLES, HANDLES, isGlazed, leafGlazed, LOCKSETS, WINDOWS }
+  from './catalog.js';
 import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
          gripPlacement, nearestGrip, panelFits } from './renderer.js';
 
-/** Does this detail put ruled line work on the face? */
-export const isLineWork = detail => !!(detail.strips || detail.groove);
+/** Does this detail put ruled line work on the face?
+ *  `perimeter` counts: it is a groove like any other, and both doors that
+ *  carry one are solid — so the OBSERVED rule below, that ruled line work
+ *  never shares a leaf with glazing, has nothing to say against it and
+ *  everything to say for it. */
+export const isLineWork = detail => !!(detail.strips || detail.groove || detail.perimeter);
 
 /** Does this detail put ANYTHING on the face — moulding or line work alike? */
 export const faceWorked = detail => !!detail.panel || isLineWork(detail);
@@ -73,10 +78,14 @@ export const faceWorked = detail => !!detail.panel || isLineWork(detail);
  * line-work rule cares about, because what the corpus says is that ruled
  * strips and glazing never share a leaf FACE. A pane in the panel next to it
  * is not competing for the same surface.
+ *
+ * Both now live in `js/catalog.js` and are re-exported from here, because the
+ * PRICE needs them too and the price must not import the rules — the rules
+ * import the renderer. They were answered a third time inside `priceAgorot`,
+ * as `win.rects.length`, and that third answer gave every grille away free on
+ * a sidelight door. One definition, three readers.
  */
-export const leafGlazed = state => byId(WINDOWS, state.window).rects.length > 0;
-export const isGlazed = state =>
-  leafGlazed(state) || !!(SIZES[state.size] || {}).sideGlazed;
+export { isGlazed, leafGlazed };
 
 /**
  * Would this lockset fit this design?

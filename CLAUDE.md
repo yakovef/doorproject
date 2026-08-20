@@ -21,6 +21,112 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Every grille was FREE on a sidelight door, and the order never mentioned
+  it.** Found by a new instrument, not by a screenshot. `isGlazed` has known
+  since the sidelight was drawn that 400 mm of glass beside the leaf is glass —
+  d128 has wrought iron in its side panel and no window in its leaf at all — so
+  the rules allow a grille there and the drawing puts one in. `priceAgorot` and
+  `message()` each asked a DIFFERENT question, `win.rects.length`, which is
+  about the leaf's own window. All fourteen grilles were free on that size, up
+  to ₪620 of ironwork given away, and the WhatsApp message Peretz builds from
+  had no line about it at all.
+  It is the two-panel defect with the sign flipped: that one charged for
+  something the drawing did not show, this one showed something the price did
+  not charge for. CLAUDE.md §5 — a quantity computed in two places — except it
+  was computed in three. `isGlazed`/`leafGlazed` moved to `js/catalog.js` and
+  `js/rules.js` re-exports them, because the price must not import the rules
+  (the rules import the renderer).
+  Two new assertions: **what the drawing shows is what the price charges**, and
+  **every option the customer pays for is named in the message** — the first
+  test in the suite ever to read a message at all, on the file PLAN.md §3 calls
+  the product.
+
+- **`npm run fuzz`** — combinations, not options. The audit clicks every option
+  once from the default door, so no two non-default choices ever meet, and
+  every rule in `js/rules.js` is a rule about a PAIR. Two phases: 30,000 random
+  designs across all nine axes at once in node, then random CLICK WALKS in a
+  real browser — thirty tiles in a row, checked after every one, which is the
+  only thing that exercises `repair`'s `intent` as a sequence. Seeded and
+  replayable. 200,000 designs and 9,000 clicks over five seeds: clean.
+
+- **`npm run corpus`** — recreate all thirty measured doors from their own
+  records, and print what the catalogue could not say. `npm run recreate` holds
+  ten hand-written query strings, and a hand-written query is a place to cheat
+  without meaning to. Nothing here is typed: colour by CIE Lab ΔE94, window by
+  measured fractions, handing by the grip's side, grille off the catalogue's
+  own `doors` lists (the evidence moved out of the prose and onto the entries).
+  **Every one of the thirty is a door the site will let you build** — no rule
+  refuses a real door. What it found is below.
+  ⚠ Its first colour metric was weighted RGB and it chose visibly wrong paint:
+  a warm neutral grey came back SAGE GREEN, because what separates a grey from
+  a green is not distance but chroma DIRECTION, and in RGB a neutral and a
+  saturated colour of the same lightness sit close together. A bad metric there
+  invents gaps in the catalogue and hides real ones.
+
+- **The strips were a fence and the real ones are a composition.** Every
+  multi-line door in the corpus staggers them and ours drew every line the same
+  length. Measured, by walking each line's own column or row until the tone
+  stops departing from the paint:
+  *vertical* — d038 runs 0.372-0.656, 0.126-0.693, 0.071-0.905 and d043
+  0.405-0.831, 0.166-0.816, 0.037-0.767, so the tops climb monotonically
+  outward off a common foot at 0.778, and the outermost line is better than
+  twice the innermost;
+  *horizontal* — d064's seven all start at the hinge stile (0.020-0.035) and
+  all end somewhere different (0.963, 0.719, 0.625, 0.934, 0.618, 0.708,
+  0.947), and d078's top three do the same mirrored.
+  ⚠ Ordered by DISTANCE FROM THE OUTER EDGE, not by index: the band is laid out
+  from the hinge side, so `i` counts inward on one handing and outward on the
+  other, and off the index the fan would be mirrored on left-hand doors.
+  ⚠ **And the span and the graduation are functions of the COUNT**, which one
+  door could not show. Fitted across three: span = 0.458 + 0.044n, within 0.043
+  of d063's four, d064's seven and d078's eleven. The smoothstep graduation is
+  real at eleven and absent at four — d063's are evenly spaced to within 0.006
+  — so it is blended in with the count. Flat, it had put three strips at 0.02,
+  0.50 and 0.94 of the leaf: one on the top rail and one on the bottom.
+
+- **A perimeter groove**, which two doors carry and the catalogue had nothing
+  like. d004 at 0.023 of leaf width inset and d031 at 0.021, and on both it is
+  the only thing on the face; `npm run corpus` was deriving them as three
+  horizontal metal strips. APPENDED to `DETAILS`, which costs no VERSION bump —
+  the short code stores a position, so adding at the END renumbers nothing.
+  Six spare slots in that field, and the same is true of every other list.
+
+- **The interlocking rings were 1.29x too coarse**, and the tool was reporting
+  the opposite. `w / 7` — "a proportion, not a pixel clamp" — was right about
+  pixels and wrong about millimetres: an applied film has ONE repeat and is cut
+  to the opening, so the ring cannot grow with the window. Measured on d106 two
+  ways that agree, autocorrelation down the pane and counting ring centres at
+  8x: 54 mm, a ring 108 mm across, 8.9 steps in its 484 mm pane where we drew
+  seven. `npm run recreate` meanwhile said ours "reads finer" and blamed a
+  96 mm cap that had been deleted a round earlier — §5 again, a tool describing
+  a drawing that no longer exists. Two more typed-in figures in that file, the
+  bar range, were also wrong (0.39/0.56 against a real 0.45/0.61) and are
+  derived now.
+
+- **`tools/fresh.mjs`** — every tool that opens `index.html` measures
+  `assets/bundle.js`, and that file only changes when `npm run build` runs. It
+  cost a wrong conclusion during the ring measurement: the drawing changed, the
+  comparison came back byte-identical, and the obvious reading was "the change
+  did nothing". The guard builds the source into memory, compares, and rebuilds
+  if they differ — rebuilding rather than scolding, because a guard that only
+  refuses still costs the whole run and the second time it fires people just
+  prefix `npm run build &&` and stop thinking about it.
+
+- **The weather bar is not line work.** d016 and d030 each record one
+  horizontal groove at y ≈ 0.977, and a crop of either foot at 6x shows the
+  raised aluminium sweep strip across the bottom of the leaf — a thing every
+  one of these doors has and no customer chooses. Derived as line work it put
+  three metal strips on two plain doors: a measurement that was correct about
+  what it saw and wrong about what it meant.
+
+- **What the corpus says we cannot draw**, recorded rather than guessed at:
+  13 of 30 doors carry hardware that is not brushed nickel (black 6, chrome 5,
+  brass 4, bronze 3) and the finish is withdrawn; five leaves are warm mid
+  greys and the chart's mid greys are all cool, so three of them are drawn
+  SAGE GREEN; four doors have recessed line work where we only offer applied;
+  two pull bars are longer than anything we sell (0.86 and 0.73 against our
+  0.61). All in ASK-PERETZ.md — every one of them is his call, not ours.
+
 - **The handle can be dragged much further, and the grab bar can be dragged at
   all.** "Make the height restrictions not that restrictive, make me able to
   move them more up and more down if i want."

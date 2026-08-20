@@ -24,6 +24,7 @@
  *      npm run collide -- all   add every face detail as well
  */
 import { chromium } from 'playwright';
+import { assertFreshBundle } from './fresh.mjs';
 import { DETAILS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { conflicts } from '../js/rules.js';
 import { faceObstacles, MOUNT_REACH } from '../js/renderer.js';
@@ -42,6 +43,8 @@ const ALLOWED = new Set([
   /* The keyway escutcheon belongs to its own lockset when they sit together. */
   'lockset|lock', 'lock|lockset',
 ]);
+
+await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 800, height: 1100 }, deviceScaleFactor: 1 });

@@ -28,6 +28,7 @@
  */
 import { readFileSync, mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { assertFreshBundle } from './fresh.mjs';
 import { PNG } from 'pngjs';
 import { load, canvas, blit, save, text } from './imglib.mjs';
 import { GRILLES, HANDLES, SIZES, WINDOWS, byId } from '../js/catalog.js';
@@ -98,6 +99,8 @@ const WIN_BAND  = { x0: 0.12, x1: 0.88, y0: 0.03, y1: 0.72 };
    A sheet that invites a proportion to be read off it has to be a proportion
    somebody can read. */
 const GRIP_BAND = { x0: 0.00, x1: 1.00, y0: 0.00, y1: 1.00 };
+
+await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const page = await b.newPage({ viewport: { width: 700, height: 1100 }, deviceScaleFactor: 2 });

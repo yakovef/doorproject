@@ -124,13 +124,17 @@ export const COLOURS = [
 export const WINDOWS = [
   { id: 'none',   he: 'ללא חלון',       en: 'Solid',         delta: 0,     rects: [] },
   { id: 'strip',  he: 'צוהר אנכי',      en: 'Vertical slot', delta: 58000,
+    doors: ['d113', 'd125'],
     rects: [{ w: 272, h: 1415, top: 205 }] },
   { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular',   delta: 62000,
     aliases: ['square', 'duo'],
+    doors: ['d108', 'd099', 'd122', 'd116'],
     rects: [{ w: 357, h: 902, top: 185 }] },
   { id: 'tallwin',he: 'חלון גבוה',      en: 'Tall light',    delta: 88000,
+    doors: ['d097', 'd128'],
     rects: [{ w: 357, h: 1415, top: 174 }] },
   { id: 'broad',  he: 'חלון רחב',       en: 'Wide light',    delta: 92000,
+    doors: ['d092', 'd106'],
     rects: [{ w: 425, h: 1025, top: 158 }] },
 ];
 
@@ -371,27 +375,54 @@ export const LOCKSETS = [
  *
  * Ids are a wire format. `bars` and `bars-light` were straight muntins, which
  * is the plain grid; `lattice` was the invented diagonal. All three resolve.
+ *
+ * ── `doors` — the evidence, made readable by a machine ────────────────
+ * The list above was prose for two rounds, which meant every tool that wanted
+ * to ask "which real door is this option?" had to keep its own copy of it, and
+ * a hand-kept copy of a list goes stale silently. It is on the entries now.
+ * `npm run corpus` recreates every measured door from its own record and needs
+ * exactly this to know which grille each one carries; `npm test` asserts every
+ * id here has a photograph behind it.
+ * The `-light` variants share their parent's doors: what `light` changes is
+ * the colour of the same ironwork, and the photographs were read for pattern
+ * rather than for that.
  */
 export const GRILLES = [
-  { id: 'none',    he: 'ללא סורג',       en: 'None',            delta: 0 },
-  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid',     delta: 30000, aliases: ['bars'] },
+  { id: 'none',    he: 'ללא סורג',       en: 'None',            delta: 0,
+    doors: ['d094', 'd115'] },
+  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid',     delta: 30000, aliases: ['bars'],
+    doors: ['d091', 'd100', 'd107', 'd110', 'd113', 'd117', 'd122'] },
   { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', delta: 30000, light: true, aliases: ['bars-light'] },
-  { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls', delta: 46000 },
+  { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls', delta: 46000,
+    doors: ['d089', 'd093', 'd095', 'd097', 'd099', 'd102', 'd116'] },
   { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Grid with scrolls, door colour', delta: 46000, light: true },
   /* The heavy ornamental ironwork: bars with scrolled crowns and centres, no
      grid behind it. The commonest thing in the luxury band. */
-  { id: 'iron',    he: 'ברזל מחושל',     en: 'Wrought iron',    delta: 62000 },
+  { id: 'iron',    he: 'ברזל מחושל',     en: 'Wrought iron',    delta: 62000,
+    doors: ['d090', 'd092', 'd101', 'd103', 'd108', 'd112', 'd119', 'd124', 'd128', 'd129'] },
   { id: 'iron-light',   he: 'ברזל מחושל בהיר', en: 'Wrought iron, door colour', delta: 62000, light: true },
   /* The three that appear exactly once, kept at his instruction. */
-  { id: 'quatrefoil',   he: 'מדליוני פרח',     en: 'Quatrefoil column', delta: 52000 },
-  { id: 'arch',    he: 'קשת',            en: 'Arch',            delta: 38000 },
-  { id: 'deco',    he: 'קווים גיאומטריים', en: 'Art-deco lines', delta: 42000 },
+  { id: 'quatrefoil',   he: 'מדליוני פרח',     en: 'Quatrefoil column', delta: 52000,
+    doors: ['d104'] },
+  { id: 'arch',    he: 'קשת',            en: 'Arch',            delta: 38000, doors: ['d121'] },
+  { id: 'deco',    he: 'קווים גיאומטריים', en: 'Art-deco lines', delta: 42000, doors: ['d123'] },
   /* Worked GLASS. In the pane, not on it. */
-  { id: 'circles', he: 'עיגולים שזורים', en: 'Interlocking rings', delta: 30000, glass: true },
-  { id: 'vine',    he: 'גפן',            en: 'Grape and vine',  delta: 34000, glass: true },
-  { id: 'tree',    he: 'עץ',             en: 'Tree',            delta: 34000, glass: true },
-  { id: 'mesh',    he: 'זכוכית מעוצבת',  en: 'Etched mesh',     delta: 24000, glass: true, aliases: ['lattice'] },
-  { id: 'reeded',  he: 'זכוכית מחורצת',  en: 'Reeded',          delta: 28000, glass: true },
+  { id: 'circles', he: 'עיגולים שזורים', en: 'Interlocking rings', delta: 30000, glass: true,
+    doors: ['d106'] },
+  { id: 'vine',    he: 'גפן',            en: 'Grape and vine',  delta: 34000, glass: true,
+    doors: ['d109', 'd111'] },
+  { id: 'tree',    he: 'עץ',             en: 'Tree',            delta: 34000, glass: true,
+    doors: ['d114'] },
+  { id: 'mesh',    he: 'זכוכית מעוצבת',  en: 'Etched mesh',     delta: 24000, glass: true, aliases: ['lattice'],
+    doors: ['d102', 'd105', 'd116', 'd127'] },
+  /* ⚠ d125 was in TWO of the prose lists — under `reeded` and under "nothing
+     at all" — and turning the prose into data is what made the contradiction
+     visible. A crop of its pane at 5x settles it as far as a photograph can:
+     the glass is mostly a mirror of the street, with faint vertical flutes
+     showing where the reflection is distorted across the middle third. So it
+     is reeded and it is barely reeded. Left here, and named in ASK-PERETZ. */
+  { id: 'reeded',  he: 'זכוכית מחורצת',  en: 'Reeded',          delta: 28000, glass: true,
+    doors: ['d122', 'd125'] },
 ];
 
 /**
@@ -441,6 +472,19 @@ export const DETAILS = [
      no warning. Vertical strips are fewer and longer: three or four, in the
      half of the leaf away from the lock. */
   { id: 'stripsv', he: 'פסים אנכיים',   en: 'Vertical strips', delta: 44000, panel: false, groove: false, strips: 4, vertical: true },
+  /* A groove scribed round the leaf, a hand's breadth in from every edge —
+     d004 at 0.023 of the leaf's width and d031 at 0.021, so the inset here is
+     their mean. On both of them it is the ONLY thing on the face, and the
+     catalogue had nothing remotely like it: all the other line work runs
+     across the leaf or up it, so `npm run corpus` derived both doors as three
+     horizontal metal strips and stood them beside photographs of a plain leaf
+     with a rectangle scribed round it.
+     ⚠ APPENDED, deliberately. `DETAILS` is indexed by position in the short
+     code, so inserting anywhere else would renumber every entry after it and
+     cost a VERSION bump; adding at the END leaves every existing index alone.
+     The field is four bits — sixteen — and this is the eighth. */
+  { id: 'perimeter', he: 'חריץ היקפי',  en: 'Perimeter groove', delta: 26000,
+    panel: false, groove: false, perimeter: 0.022 },
 ];
 
 /**
@@ -483,3 +527,30 @@ export const byId = (list, id) =>
   list.find(o => o.id === id) ||
   list.find(o => (o.aliases || []).includes(id)) ||
   list[0];
+
+/**
+ * IS THERE GLASS IN THIS DESIGN, and is it in the LEAF?
+ *
+ * Two different questions and they are answered here, in the catalogue, rather
+ * than in the rules — because three files need them and one of them must not
+ * import the rules. `js/rules.js` re-exports both, so every existing caller is
+ * unchanged.
+ *
+ * ⚠ WHY THIS MOVED. `priceAgorot` had its own third answer, written inline as
+ * `win.rects.length`, and it was wrong for the one size where the two questions
+ * come apart. A sidelight door has 400 mm of glass standing beside the leaf, so
+ * the rules allow a grille and the drawing puts it in that panel — 34,000
+ * characters of wrought iron on a door whose leaf has no window at all. The
+ * price asked about the LEAF's window, found none, and charged nothing. Every
+ * one of the fourteen grilles was free there, up to ₪620 of ironwork given
+ * away, and it was the exact inverse of the two-panel defect that this file
+ * already carries a warning about: that one charged for something the drawing
+ * did not show, this one showed something the price did not charge for. Same
+ * fault, same cost to Peretz, opposite sign.
+ *
+ * CLAUDE.md §5: a quantity computed in two places is a promise that somebody
+ * will change one of them. It was computed in three.
+ */
+export const leafGlazed = state => byId(WINDOWS, state.window).rects.length > 0;
+export const isGlazed = state =>
+  leafGlazed(state) || !!(SIZES[state.size] || {}).sideGlazed;

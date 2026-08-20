@@ -22,6 +22,7 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { assertFreshBundle } from './fresh.mjs';
 import { PNG } from 'pngjs';
 
 const DIR = 'research/works/data2/';
@@ -67,6 +68,8 @@ function patch(img, x, y, w, h) {
     }
   return n ? s / n : null;
 }
+
+await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 

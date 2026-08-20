@@ -7,7 +7,8 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed, LOCKSETS, SIZES, WINDOWS }
+  from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
 export function priceAgorot(state) {
@@ -28,8 +29,16 @@ export function priceAgorot(state) {
   /* A grille needs a window to sit in — and so does worked glass, which is in
      the same list now. Neither can be charged on a solid door: the
      configurator must never take money for something the drawing does not
-     show and Peretz cannot fit. */
-  if (win.rects.length) total += grille.delta;
+     show and Peretz cannot fit.
+     ⚠ ASKED OF `isGlazed`, NOT of the leaf's own window. This line read
+     `win.rects.length` and that is a different question on the one size where
+     the two come apart: a sidelight door carries 400 mm of glass BESIDE the
+     leaf, so the rules allow a grille, the drawing puts it in that panel, and
+     the price found no window on the leaf and charged nothing. All fourteen
+     grilles were free there — ₪620 of wrought iron given away — and every
+     other reader of "is there glass here" had had the right answer for two
+     rounds. */
+  if (isGlazed(state)) total += grille.delta;
 
   // Round up to the nearest ₪5 so quoted figures stay tidy.
   return Math.ceil(total / 500) * 500;

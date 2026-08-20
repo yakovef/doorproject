@@ -1361,6 +1361,7 @@ export function render(state) {
     ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
         detail.panels === 2, 0, 'm',
         openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null) : ''}
+    ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint, detail.perimeter) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone,
                                   detail.vertical, hingeOnLeft) : ''}
@@ -2352,24 +2353,58 @@ function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
      vertical strip presents its side to it rather than its top. And the run
      stops well short of the head and foot, as every one of the five does. */
   if (vertical) {
-    const top = ly + lh * 0.12, bot = ly + lh * 0.88;
     const t = Math.max(8, Math.round(lw * 0.018));
     /* Away from the lock: the lock is on the closing edge, which is the side
        opposite the hinges. */
     const bandW = lw * 0.34;
     const band0 = hingeOnLeft ? lx + lw * 0.10 : lx + lw * 0.56;
     const gap = count > 1 ? bandW / (count - 1) : 0;
+
+    /* ── THEY ARE NOT THE SAME LENGTH, and that is the design ─────────
+       Every one of them ran 0.12 to 0.88 of the leaf, four identical bars in
+       a row, and not one door in the corpus looks like that. d037, d040, d043
+       and d038 all FAN: each successive line reaches higher than the last, so
+       the group reads as a composition rather than as a fence.
+
+       Measured — each line's own top and bottom found by walking its column
+       until the tone stops departing from the paint beside it:
+
+         d038  0.372-0.656   0.126-0.693   0.071-0.905
+         d043  0.405-0.831   0.166-0.816   0.037-0.767
+
+       Two things are common to both and neither was drawn. The TOPS climb
+       monotonically outward — 0.372, 0.126, 0.071 and 0.405, 0.166, 0.037 —
+       and the BOTTOMS stay roughly level, mean 0.778 over the six. So the fan
+       opens upward from a common foot, and the line nearest the leaf's outer
+       edge is the long one: the shortest is 0.28-0.43 of the leaf and the
+       longest 0.73-0.83, better than twice its length.
+
+       ORDERED BY DISTANCE FROM THE OUTER EDGE, not by index, because the band
+       is laid out from the hinge side and `i` therefore counts inward on one
+       handing and outward on the other. Drawn off the index the fan would have
+       been correct on right-hand doors and mirrored on left-hand ones — the
+       same handing trap that made half the recreations compare mirrored
+       doors. */
+    const FOOT = 0.778;                     // mean of the six measured bottoms
+    const HEAD_IN = 0.39, HEAD_OUT = 0.05;  // innermost and outermost tops
     const out = [];
     for (let i = 0; i < count; i++) {
       const x = Math.round(count > 1 ? band0 + gap * i : band0 + bandW / 2);
+      /* 0 at the leaf's outer (hinge) edge, 1 at the middle of the leaf. */
+      const inward = count > 1
+        ? (hingeOnLeft ? i / (count - 1) : 1 - i / (count - 1))
+        : 0.5;
+      const top = ly + lh * (HEAD_OUT + (HEAD_IN - HEAD_OUT) * inward);
+      const bot = ly + lh * FOOT;
+      const h = bot - top;
       out.push(`
-        <rect x="${x + 3}" y="${top + 3}" width="${t}" height="${bot - top}"
+        <rect x="${x + 3}" y="${(top + 3).toFixed(1)}" width="${t}" height="${h.toFixed(1)}"
               fill="#000" opacity="0.22"/>
-        <rect x="${x}" y="${top}" width="${t}" height="${bot - top}" fill="${tone[2]}"/>
-        <rect x="${x}" y="${top}" width="${Math.max(2, t * 0.34)}" height="${bot - top}"
+        <rect x="${x}" y="${top.toFixed(1)}" width="${t}" height="${h.toFixed(1)}" fill="${tone[2]}"/>
+        <rect x="${x}" y="${top.toFixed(1)}" width="${Math.max(2, t * 0.34)}" height="${h.toFixed(1)}"
               fill="${tone[0]}"/>
-        <rect x="${x + t - Math.max(2, t * 0.24)}" y="${top}"
-              width="${Math.max(2, t * 0.24)}" height="${bot - top}" fill="${tone[4]}"/>`);
+        <rect x="${x + t - Math.max(2, t * 0.24)}" y="${top.toFixed(1)}"
+              width="${Math.max(2, t * 0.24)}" height="${h.toFixed(1)}" fill="${tone[4]}"/>`);
     }
     return `<g data-detail="strips" data-count="${count}" data-axis="vertical">${out.join('')}</g>`;
   }
@@ -2378,8 +2413,6 @@ function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
      across the leaf, not up it. They also run nearly the full width — inset
      about a tenth each side — rather than sitting in a central band.
      Spacing is graduated, from the eleven measured positions -- see below. */
-  const x0s = lx + lw * 0.09, x1s = lx + lw * 0.91;
-  const wide = x1s - x0s;
   const t = Math.max(8, Math.round(lh * 0.008));    // strip thickness
   /* Span and spacing both re-read off d078, whose eleven strips are recorded
      one by one in research/works/data2/d078.json:
@@ -2396,12 +2429,63 @@ function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
      about right. The comment that used to sit here said the real one is
      graduated and called it "a refinement worth having only once the
      orientation is right". The orientation has been right for two rounds. */
-  const top = ly + lh * 0.02, bot = ly + lh * 0.94;
-  const spread = u => 0.6 * (u * u * (3 - 2 * u)) + 0.4 * u;
+  /* ── HOW FAR THE RUN REACHES, AND HOW EVENLY ──────────────────────
+     Both were read off d078 alone and both are functions of the COUNT, which
+     is visible the moment a second and third door are measured:
+
+       count 4   d063   0.199 0.402 0.611 0.808              span 0.609
+       count 7   d064   0.084 0.270 0.322 0.501 0.671 0.720 0.893   span 0.809
+       count 11  d078   0.021 0.076 0.156 ... 0.889 0.944     span 0.923
+
+     A few bands sit in the middle of the leaf; many of them reach nearly the
+     whole height. Fitted, span = 0.458 + 0.044n, which lands within 0.043 of
+     all three.
+     And the GRADUATION — tight at the head and foot, open across the middle —
+     is real at eleven and absent at four: d063's are evenly spaced to within
+     0.006. So the smoothstep is blended in with the count rather than applied
+     flat, which is what put three strips at 0.02, 0.50 and 0.94 of the leaf,
+     one on the top rail and one on the bottom.
+     The old constants were 0.02 and 0.94 for every count, which is d078's span
+     given to a door with three lines on it. */
+  const span = Math.min(0.95, 0.458 + 0.044 * count);
+  const top = ly + lh * (0.5 - span / 2), bot = ly + lh * (0.5 + span / 2);
+  const graded = Math.max(0, Math.min(1, (count - 4) / 7));
+  const spread = u => {
+    const s = 0.6 * (u * u * (3 - 2 * u)) + 0.4 * u;
+    return u + (s - u) * graded;
+  };
+
+  /* ── AND THEY ARE NOT ALL THE SAME WIDTH EITHER ───────────────────
+     Same fault as the vertical run above, on the other axis: eleven identical
+     bars from 0.09 to 0.91 of the leaf, and no door in the corpus does that.
+     Measured, each band's own left and right edge found by walking its row:
+
+       d064  starts 0.020 0.020 0.020 0.022 0.031 0.033 0.035
+             ends   0.963 0.719 0.625 0.934 0.618 0.708 0.947
+       d063  widths 0.626 0.530 0.519 0.684
+       d078  widths 0.629 0.843 0.642 0.223 0.492 0.194 0.364 0.264 ...
+
+     d064 is the clean case and it says two things. Every band starts at the
+     SAME EDGE — 0.020 to 0.035, which is the hinge stile, the half with
+     nothing else on it — and every band ends somewhere different. d078's top
+     three do the same thing mirrored (0.963, 0.959, 0.957 against its own
+     hinge edge, the door being handed the other way).
+
+     So: anchored at the hinge edge, free ends following d064's own rhythm,
+     cycled for any count. It is one door's composition rather than a law, and
+     that is the honest description of it — but it is one door's composition
+     against SEVEN IDENTICAL BARS, which is nobody's.
+
+     ⚠ The rhythm must not be random. A drawing that changes between two
+     renders of the same design is a drawing a customer cannot share. */
+  const RHYTHM = [0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91];
+  const anchor = hingeOnLeft ? lx + lw * 0.03 : lx + lw * 0.97;
   const out = [];
   for (let i = 0; i < count; i++) {
     const cy = count > 1 ? top + (bot - top) * spread(i / (count - 1)) : ly + lh / 2;
     const y = Math.round(cy - t / 2);
+    const wide = Math.round(lw * RHYTHM[i % RHYTHM.length]);
+    const x0s = hingeOnLeft ? anchor : anchor - wide;
     out.push(`
       <rect x="${x0s + 3}" y="${y + 3}" width="${wide}" height="${t}"
             fill="#000" opacity="0.22"/>
@@ -2412,6 +2496,49 @@ function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
             height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`);
   }
   return `<g data-detail="strips" data-count="${count}" data-axis="horizontal">${out.join('')}</g>`;
+}
+
+/**
+ * A groove following the leaf's own edge, a hand's breadth in.
+ *
+ * Two doors carry one — d004 at 0.023 of the leaf's width inset and d031 at
+ * 0.021 — and there was no option remotely like it: the catalogue's line work
+ * all runs across the face or up it, so `npm run corpus` derived both doors as
+ * THREE HORIZONTAL METAL STRIPS and stood them beside photographs of a plain
+ * leaf with a single rectangle scribed round it.
+ *
+ * It is the whole design on those doors. Nothing else is on the face.
+ *
+ * The inset is measured as a fraction of the leaf's WIDTH and applied on all
+ * four sides, which is what the photographs show — the rectangle is a constant
+ * distance from every edge, not a scaled copy of the leaf. On a 2,050 mm leaf
+ * that is about 19 mm from the head and the foot as well as from the stiles,
+ * which reads as a scribed line rather than as a panel.
+ *
+ * Drawn with the same `bevel` the inlay groove uses, so a groove is a groove
+ * whichever direction it runs: one primitive, and the light comes from the
+ * same place in both.
+ */
+function edgeGroove(lx, ly, lw, lh, paint, inset) {
+  const m = Math.round(lw * inset);
+  const w = Math.max(8, Math.round(lw * 0.014));
+  const x = lx + m, y = ly + m;
+  const bw = lw - m * 2, bh = lh - m * 2;
+  const dark = darken(paint, 0.34);
+  /* Four sides, each its own bevelled channel, rather than one stroked
+     rectangle: a groove has a lit arris and a shaded one, and which is which
+     depends on the side. `bevel` already knows that. */
+  return `
+    <g data-detail="perimeter" data-inset="${inset}">
+      ${bevel(x, y, bw, w, 4, paint, false)}
+      ${bevel(x, y + bh - w, bw, w, 4, paint, false)}
+      ${bevel(x, y, w, bh, 4, paint, false)}
+      ${bevel(x + bw - w, y, w, bh, 4, paint, false)}
+      <rect x="${x + 4}" y="${y + 4}" width="${bw - 8}" height="${w - 8}" fill="${dark}"/>
+      <rect x="${x + 4}" y="${y + bh - w + 4}" width="${bw - 8}" height="${w - 8}" fill="${dark}"/>
+      <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${bh - 8}" fill="${dark}"/>
+      <rect x="${x + bw - w + 4}" y="${y + 4}" width="${w - 8}" height="${bh - 8}" fill="${dark}"/>
+    </g>`;
 }
 
 function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
@@ -2516,16 +2643,34 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g') {
      one number. Ink coverage came out at 57% of the pane against a measured
      30%, so ours read as a white lattice with dark specks where the door is a
      dark pane with a light drawing on it.
-     Seven steps across the width, always — a proportion, not a pixel clamp. */
+     ⚠ AND THE STEP IS A LENGTH, NOT A FRACTION. It was `w / 7` — "seven steps
+     across the width, always, a proportion and not a pixel clamp" — and the
+     argument was right about pixels and wrong about millimetres. This is an
+     applied film: the supplier makes it at one repeat and cuts it to the
+     opening, so the ring is the same size in a slot as in a wide light, and a
+     proportion makes the ring grow with the window.
+     MEASURED on d106, the only door in 129 photographs that carries it, two
+     ways that agree: autocorrelation down the pane gives a fundamental of 24.5
+     px with its double at 49, and counting ring centres across a row at 8x
+     gives 48.75 px between them. The leaf is 428 px for 950 mm, so the step is
+     54 mm and a ring is 108 mm across, tangent to its orthogonal neighbours.
+     Its pane is 484 mm — 8.9 steps — where `w / 7` put seven, so ours was 1.29
+     times too coarse, and `npm run recreate` said "ours reads finer" about a
+     drawing that read heavier. The note was describing a 96 mm clamp that had
+     already been deleted; see CLAUDE.md §5 on tools that remember the drawing.
+     Rounded to a whole number of steps so the opening cuts the pattern
+     symmetrically, which is what a film fitted to a rebate does. */
   if (kind === 'circles') {
-    const s = w / 7, r = s;
+    const STEP = 54;
+    const cols = Math.max(4, Math.round(w / STEP));
+    const s = w / cols, r = s;
     const sw = Math.max(1, r * 0.11);
     const ink = scaleTone(paint, 1.06);
     let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
                      fill="${scaleTone(paint, 0.44)}"/>`;
     const rows = Math.ceil(h / s) + 1;
     let d = '';
-    for (let i = -1; i <= 8; i++) {
+    for (let i = -1; i <= cols + 1; i++) {
       for (let j = -1; j <= rows; j++) {
         if ((i + j) % 2 === 0) continue;
         const cx = x + i * s, cy = y + j * s;
@@ -5009,16 +5154,27 @@ export function detailGlyph(detail) {
      0.09–0.91. Vertical: fewer, longer, grouped in one third of the leaf —
      and the tile has to show that difference, because "metal strips" names
      two options that look nothing alike on the door. */
+  /* ⚠ AND THE TILE HAS TO SHOW THE STAGGER, because the door does.
+     These were four identical bars and eleven identical bands, matching a
+     drawing that was itself wrong; now that the drawing fans them, a tile
+     showing a fence would be advertising a different door. Same fractions the
+     renderer uses, so the two cannot drift: the vertical run climbs from 0.39
+     to 0.05 off a common foot at 0.778, and the horizontal run is anchored at
+     one edge with free ends following the measured rhythm. */
   const n = detail.strips || 0;
+  const RHYTHM = [0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91];
   const strips = detail.vertical
     ? Array.from({ length: n }, (_, i) => {
         const x = W * (0.10 + (n > 1 ? (i * 0.34) / (n - 1) : 0.17));
-        return `<rect x="${x - 9}" y="${H * 0.12}" width="18" height="${H * 0.76}"
+        const top = H * (0.05 + 0.34 * (n > 1 ? i / (n - 1) : 0.5));
+        return `<rect x="${x - 9}" y="${top}" width="18" height="${H * 0.778 - top}"
                       fill="currentColor"/>`;
       }).join('')
     : Array.from({ length: n }, (_, i) => {
-        const y = H * (0.09 + (n > 1 ? (i * 0.82) / (n - 1) : 0.41));
-        return `<rect x="${W * 0.09}" y="${y - 14}" width="${W * 0.82}" height="28"
+        const span = Math.min(0.95, 0.458 + 0.044 * n);
+        const y = H * (0.5 - span / 2 + (n > 1 ? (i * span) / (n - 1) : span / 2));
+        return `<rect x="${W * 0.03}" y="${y - 14}"
+                      width="${W * RHYTHM[i % RHYTHM.length]}" height="28"
                       fill="currentColor"/>`;
       }).join('');
 
@@ -5027,6 +5183,10 @@ export function detailGlyph(detail) {
     ${panels}${strips}
     ${detail.groove ? `<rect x="${W * 0.70 - 18}" y="190" width="18" height="${H - 380}"
           fill="currentColor"/>` : ''}
+    ${detail.perimeter ? `<rect x="${W * detail.perimeter}" y="${W * detail.perimeter}"
+          width="${W * (1 - detail.perimeter * 2)}"
+          height="${H - W * detail.perimeter * 2}"
+          fill="none" stroke="currentColor" stroke-width="18"/>` : ''}
   </svg>`;
 }
 
