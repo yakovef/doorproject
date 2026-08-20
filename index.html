@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
-<link rel="stylesheet" href="css/app.css?v=e6062a45">
+<link rel="stylesheet" href="css/app.css?v=565af76c">
 </head>
 <body>
 
@@ -30,19 +30,29 @@
   <section class="stage-wrap" aria-labelledby="stage-h">
     <h1 class="sr-only" id="stage-h">בחירת דלת כניסה</h1>
     <div class="stage" id="stage"></div>
-    <div class="stage__bar">
-      <p class="stage__note">הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם.</p>
-      <!-- The handle can be dragged on the door itself. These are the same
-           two moves for anyone not using a pointer, and the only way to turn
-           it — a rotate gesture on a door handle would be a guess. Hidden
-           entirely when the door has no pull handle on it. -->
-      <div class="grip-bar" id="grip-bar" hidden>
-        <span class="grip-bar__hint">גררו את הידית למקום שתרצו</span>
-        <button type="button" class="grip-bar__btn" id="grip-rot">סובבו</button>
-        <button type="button" class="grip-bar__btn" id="grip-home">למקום המקורי</button>
-      </div>
-    </div>
   </section>
+
+  <!-- ⚠ OUTSIDE the stage, and it used to be inside.
+       On a phone the stage is sticky now, so that a customer scrolling a list
+       of seventeen colours can still see the door they are painting — which is
+       the entire premise of a configurator and was not true: the door scrolled
+       off the top and they were choosing a paint chip blind.
+       Anything inside that sticky block is pinned with it, and this band is
+       190 px of note and buttons. Pinning it would have cost a quarter of the
+       screen to a hint and an advanced control, so it stays in the flow and
+       scrolls away under the door. It is what you use AFTER choosing. -->
+  <div class="stage__bar">
+    <p class="stage__note">הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם.</p>
+    <!-- The handle can be dragged on the door itself. These are the same
+         two moves for anyone not using a pointer, and the only way to turn
+         it — a rotate gesture on a door handle would be a guess. Hidden
+         entirely when the door has no pull handle on it. -->
+    <div class="grip-bar" id="grip-bar" hidden>
+      <span class="grip-bar__hint">גררו את הידית למקום שתרצו</span>
+      <button type="button" class="grip-bar__btn" id="grip-rot">סובבו</button>
+      <button type="button" class="grip-bar__btn" id="grip-home">למקום המקורי</button>
+    </div>
+  </div>
 
   <!-- ── choices ──────────────────────────────────────────────────
        The categories, and nothing else, until one is opened.
@@ -62,7 +72,7 @@
     <div class="send">
       <div class="send__price">
         <span class="send__label">מחיר משוער</span>
-        <strong class="send__figure" id="price">—</strong>
+        <strong class="send__figure" id="price" data-price>—</strong>
         <span class="send__incl">כולל דלת, התקנה מלאה ומע״מ</span>
       </div>
 
@@ -70,7 +80,7 @@
 
       <p class="send__lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
 
-      <a class="btn btn--wa" id="wa-btn" href="#" target="_blank" rel="noopener">
+      <a class="btn btn--wa" id="wa-btn" href="#" target="_blank" rel="noopener" data-wa>
         <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
           <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
         </svg>
@@ -96,6 +106,35 @@
   </section>
 </main>
 
+<!-- ── the dock ─────────────────────────────────────────────────
+     A phone shows the door, then the choices, then the price — and measured on
+     a 390x844 screen the price sits 1,796 px down and the WhatsApp button
+     1,991. So a customer picking a colour cannot see what it costs, and the
+     one button the whole site exists to get them to is two screens away the
+     entire time they are deciding.
+
+     This is that price and that button, pinned to the foot of the screen on a
+     phone and absent on desktop, where the send panel is already beside the
+     door. It shows the same number from the same statement: `paint` writes to
+     every `[data-price]` and every `[data-wa]`, so the dock and the card
+     cannot drift apart.
+
+     The card stays as it is. It carries the spec line to proof-read, the code
+     to read down a telephone, the copy button and the fine print — none of
+     which belongs in a 64 px bar. -->
+<div class="dock" aria-hidden="false">
+  <div class="dock__price">
+    <span class="dock__label">מחיר משוער</span>
+    <strong class="dock__figure" data-price>—</strong>
+  </div>
+  <a class="btn btn--wa dock__send" href="#" target="_blank" rel="noopener" data-wa>
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+      <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
+    </svg>
+    שלחו בוואטסאפ
+  </a>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
 
@@ -105,6 +144,6 @@
     document.documentElement.classList.add('is-bare');
   }
 </script>
-<script src="assets/bundle.js?v=c5aa4469"></script>
+<script src="assets/bundle.js?v=c1039079"></script>
 </body>
 </html>

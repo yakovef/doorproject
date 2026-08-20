@@ -4065,6 +4065,15 @@ ${body}
     } else {
       window.addEventListener("resize", fitStage);
     }
+    if (typeof IntersectionObserver === "function") {
+      const dock = $(".dock");
+      new IntersectionObserver(
+        ([e]) => {
+          dock.hidden = e.isIntersecting;
+        },
+        { threshold: 0.35 }
+      ).observe($(".send"));
+    }
     paint();
     const differs = GROUPS.find((g) => state[g.key] !== DEFAULTS[g.key]);
     if (differs) {
@@ -4237,9 +4246,12 @@ ${body}
     const handing = byId(HANDINGS, state.handing);
     const size = SIZES[state.size] || SIZES.standard;
     $("#stage").innerHTML = render(state);
-    $(".stage-wrap").dataset.light = String($("#stage").querySelector("svg").dataset.light === "true");
+    $(".layout").dataset.light = String($("#stage").querySelector("svg").dataset.light === "true");
     fitStage();
-    $("#price").textContent = formatAgorot(priceAgorot(state));
+    const money = formatAgorot(priceAgorot(state));
+    document.querySelectorAll("[data-price]").forEach((el) => {
+      el.textContent = money;
+    });
     $("#code").textContent = encodeCode(state);
     const win = byId(WINDOWS, state.window);
     const grille = byId(GRILLES, state.grille);
@@ -4247,7 +4259,13 @@ ${body}
       colour.he,
       `RAL ${colour.ral}`,
       win.he,
-      ...win.rects.length && grille.id !== "none" ? [grille.he] : [],
+      /* ⚠ `isGlazed`, not `win.rects.length`. FOURTH place to ask this question
+         its own way — the price, the WhatsApp message and this line all asked
+         about the leaf's own window, and a sidelight door's glass is beside the
+         leaf. The spec line under the price is what a customer proof-reads
+         before they send, so on a sidelight with ironwork it showed them a door
+         with no ironwork in it and then charged for some. */
+      ...isGlazed(state) && grille.id !== "none" ? [grille.he] : [],
       ...byId(HANDLES, state.handle).style === "none" ? [] : [byId(HANDLES, state.handle).he],
       byId(LOCKSETS, state.lockset).he,
       ...state.detail !== "plain" ? [byId(DETAILS, state.detail).he] : [],
@@ -4263,7 +4281,10 @@ ${body}
     for (const sec of SECTIONS) {
       $(`.sect[data-section="${sec.key}"] [data-sect-now]`).textContent = sectionLabel(sec);
     }
-    $("#wa-btn").href = whatsappUrl(state);
+    const wa = whatsappUrl(state);
+    document.querySelectorAll("[data-wa]").forEach((el) => {
+      el.href = wa;
+    });
     announce(describe(state));
     armGrip();
   }
@@ -4301,8 +4322,8 @@ ${body}
     if (!m || !m.a || !m.d) return;
     const mmPerPx = { x: 1 / Math.abs(m.a), y: 1 / Math.abs(m.d) };
     const cx = Number(pad.dataset.cx), cy = Number(pad.dataset.cy);
-    const w = Math.max(Number(pad.dataset.w), TOUCH_TARGET * mmPerPx.x);
-    const h = Math.max(Number(pad.dataset.h), TOUCH_TARGET * mmPerPx.y);
+    const w = Math.max(Number(pad.dataset.w), (TOUCH_TARGET + 0.5) * mmPerPx.x);
+    const h = Math.max(Number(pad.dataset.h), (TOUCH_TARGET + 0.5) * mmPerPx.y);
     pad.setAttribute("x", cx - w / 2);
     pad.setAttribute("y", cy - h / 2);
     pad.setAttribute("width", w);

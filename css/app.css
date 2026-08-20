@@ -134,16 +134,35 @@ body {
 /* Same floor on the children, for the same reason. */
 .stage-wrap, .panel { min-inline-size: 0; }
 
+/* ── THE DOOR STAYS IN VIEW WHILE YOU CHOOSE ──────────────────
+   On a phone the page is door, then choices, then price — so scrolling down
+   to a list of seventeen colours put the door off the top of the screen, and
+   a customer tapped a swatch without being able to see what it did. That is
+   the one thing a configurator has to get right, and it did not.
+   The stage is pinned instead. The grip bar was moved OUT of it in the markup
+   for this: pinning 190 px of hint and advanced buttons alongside the door
+   would have spent a quarter of the screen on the least urgent thing on it.
+   Slightly shorter than it was — 92vw rather than 118vw, about 43% of a
+   390x844 screen — which also means the first category is visible on arrival
+   instead of a full screen of door with no sign there is anything to do. */
+@media (max-width: 1099px) {
+  .stage-wrap { position: sticky; inset-block-start: 0; z-index: 3; }
+}
+
 @media (min-width: 1100px) {
   .layout {
     grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) minmax(300px, 360px);
+    /* Two rows now that the grip bar is its own element: the door takes the
+       height that is going and the bar sits under it, both inside column 2. */
+    grid-template-rows: minmax(0, 1fr) auto;
     flex: 1;
     min-block-size: 0;      /* lets the columns scroll instead of the page */
     overflow: hidden;
   }
-  .panel--choose { grid-column: 1; grid-row: 1; border-inline-start: 1px solid var(--rule); }
+  .panel--choose { grid-column: 1; grid-row: 1 / span 2; border-inline-start: 1px solid var(--rule); }
   .stage-wrap    { grid-column: 2; grid-row: 1; }
-  .panel--send   { grid-column: 3; grid-row: 1; border-inline-end: 1px solid var(--rule); }
+  .stage__bar    { grid-column: 2; grid-row: 2; }
+  .panel--send   { grid-column: 3; grid-row: 1 / span 2; border-inline-end: 1px solid var(--rule); }
 
   /* Each column scrolls on its own, so a long swatch list never pushes the
      door or the send button off screen. */
@@ -182,12 +201,28 @@ body {
   block-size: clamp(54vh, 118vw, 74vh);
   transition: background-color .3s var(--ease);
 }
+/* ⚠ AFTER the rule it overrides, not before it. A media query adds no
+   specificity, so the mobile height sat above this for one build and lost to
+   it silently — the stage measured 460 px where the override says 359, and
+   nothing about the page looked broken.
+   Shorter than it was, because the stage is pinned now: at 118vw the door
+   filled a phone on arrival with no sign that there was anything to do below
+   it, and once stuck it left 317 px for the choices. At 92vw it is about 43%
+   of a 390x844 screen, the first category shows on arrival, and there is room
+   for three rows of swatches under it. */
+@media (max-width: 1099px) {
+  .stage { block-size: clamp(38vh, 92vw, 54vh); }
+}
 @media (min-width: 1100px) {
   .stage { block-size: auto; flex: 1 1 auto; min-block-size: 0; }
 }
 
 /* Light doors would vanish on a light ground, so the stage sinks a shade. */
-.stage-wrap[data-light="true"] { --wall: #E4E0D7; --floor: #D6D2C8; }
+/* Set on `.layout`, not on `.stage-wrap`. The grip bar is a SIBLING of the
+   stage now rather than a child, and it paints itself with `--wall` so that
+   there is no seam between the door and the choices — on the stage the
+   variable would not reach it, and a light door got a bar half a shade off. */
+.layout[data-light="true"] { --wall: #E4E0D7; --floor: #D6D2C8; }
 
 .door-svg {
   /* Fills the stage rather than sitting fitted inside it. The door itself is
@@ -213,7 +248,13 @@ body {
   flex: 0 0 auto;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   padding-block: 8px 10px;
+  /* It carried the stage's background when it lived inside it. It is its own
+     element now, so it has to say so, or it reads as a hole between the door
+     and the choices. */
+  background: var(--wall);
+  border-block-end: 1px solid var(--rule);
 }
+@media (min-width: 1100px) { .stage__bar { border-block-end: 0; } }
 .stage__note {
   margin: 0;
   text-align: center;
@@ -568,6 +609,45 @@ body {
 
 .proof { margin: 0; font-size: .85rem; color: var(--ink-2); }
 .proof a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: .25em; }
+
+/* ── the dock ─────────────────────────────────────────────────
+   The price and the send button, pinned to the foot of a phone.
+
+   Measured before it existed, on a 390x844 screen with the first category
+   opened the way a person opens it: the first colour swatch sat at y=827, the
+   price at 1,796 and the WhatsApp button at 1,991. So for the whole time a
+   customer is choosing, the number they care about and the button this site
+   exists to get them to are both two screens away — and picking a colour
+   appears to do nothing at all.
+
+   Phone only. Above 1100px the send panel is already a column beside the door
+   and a second copy of it would be noise. */
+.dock {
+  position: fixed; inset-block-end: 0; inset-inline: 0;
+  z-index: 40;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  /* Plus the home indicator on an iPhone, which would otherwise sit on top of
+     the button. `viewport-fit=cover` is already set in the head. */
+  padding-block-end: calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--paper-up);
+  border-block-start: 1px solid var(--rule);
+  box-shadow: 0 -6px 18px rgba(23, 23, 21, .06);
+}
+.dock__price { display: flex; flex-direction: column; line-height: 1.15; }
+.dock__label { font-size: .68rem; color: var(--ink-2); }
+.dock__figure { font-size: 1.2rem; font-weight: 700; white-space: nowrap; }
+.dock__send { flex: 1; min-block-size: 46px; padding: 10px 14px; font-size: .95rem; }
+
+/* The page has to end above the dock, or the last thing on it — the link to
+   his real work — sits underneath a bar and can be neither read nor tapped. */
+@media (max-width: 1099px) {
+  body { padding-block-end: 78px; }
+}
+@media (min-width: 1100px) {
+  .dock { display: none; }
+}
+.is-bare .dock { display: none; }
 
 /* ── toast ────────────────────────────────────────────────── */
 

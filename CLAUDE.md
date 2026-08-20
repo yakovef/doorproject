@@ -21,6 +21,36 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **On a phone you could not see the door you were painting.** The page is
+  door, then choices, then price, so scrolling to a list of seventeen colours
+  put the door off the top of the screen. Measured on a 390x844 phone with the
+  first category opened the way a person opens it: the first swatch sat at
+  y=827, the price at 1,796 and the WhatsApp button at 1,991. So a customer
+  tapped a colour without being able to see what it did, without seeing what it
+  cost, and with the one button the site exists to reach two screens away the
+  whole time.
+  **The stage is sticky** below 1100px and the grip bar moved OUT of it in the
+  markup, because anything inside a pinned block is pinned with it and that
+  band is 89 px of hint and advanced buttons. The stage is also shorter on a
+  phone — 92vw rather than 118vw — which is worth saying plainly: the door got
+  smaller and the page got better, because at full height it filled the screen
+  on arrival with no sign that there was anything to do below it.
+  **And a dock**: the price and the send button pinned to the foot, standing
+  down (`hidden`, so it leaves the accessibility tree too) once the real send
+  card is on screen and the same offer would be made twice.
+  ⚠ `paint` writes to every `[data-price]` and every `[data-wa]` rather than to
+  two ids — two elements each fetching their own copy of a number is §5 again,
+  and there are two of each now.
+  ⚠ **A media query adds no specificity.** The mobile stage height sat above
+  the rule it overrides for one build and lost to it silently: the stage
+  measured 460 px where the override said 359 and nothing looked broken.
+  ⚠ **And 44 px is a floor, so do not compute exactly 44.** The touch pad was
+  sized to precisely `TOUCH_TARGET * mmPerPx`, and once the matrix and the
+  layout had each rounded once it came back as 43.99 — the audit caught it on a
+  320 px screen the moment the stage height changed the scale. It was always
+  that fragile; the change only moved which viewport showed it. Half a pixel
+  over now, which is invisible and cannot round under.
+
 - **Every grille was FREE on a sidelight door, and the order never mentioned
   it.** Found by a new instrument, not by a screenshot. `isGlazed` has known
   since the sidelight was drawn that 400 mm of glass beside the leaf is glass —

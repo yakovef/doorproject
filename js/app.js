@@ -29,7 +29,7 @@
 
 import {
   byId, COLOURS, DETAILS,
-  GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
+  GRILLES, HANDINGS, HANDLES, isGlazed, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import {
@@ -147,6 +147,21 @@ function init() {
     new ResizeObserver(fitStage).observe($('#stage'));
   } else {
     window.addEventListener('resize', fitStage);
+  }
+
+  /* THE DOCK STANDS DOWN when the real send card is on screen. The dock exists
+     because on a phone the price and the WhatsApp button are two screens below
+     wherever the customer is choosing; once they have scrolled to the card
+     itself, both are right there and a fixed bar showing the same number over
+     the top of it is just the same offer made twice.
+     `hidden` rather than a class, so it is out of the accessibility tree too —
+     two buttons saying "send in WhatsApp" is worse for a screen reader than
+     for anyone.
+     Guarded, and it degrades to a dock that is simply always there. */
+  if (typeof IntersectionObserver === 'function') {
+    const dock = $('.dock');
+    new IntersectionObserver(([e]) => { dock.hidden = e.isIntersecting; },
+                             { threshold: 0.35 }).observe($('.send'));
   }
 
   paint();
@@ -384,18 +399,33 @@ function paint() {
   const size = SIZES[state.size] || SIZES.standard;
 
   $('#stage').innerHTML = render(state);
-  $('.stage-wrap').dataset.light =
+  /* On `.layout`, not on `.stage-wrap`: the grip bar is a sibling of the stage
+     now and paints itself with the same `--wall`, so the variable has to be
+     set somewhere that reaches both or a light door gets a bar half a shade
+     off the room behind it. */
+  $('.layout').dataset.light =
     String($('#stage').querySelector('svg').dataset.light === 'true');
   fitStage();
 
-  $('#price').textContent = formatAgorot(priceAgorot(state));
+  /* Written to EVERY element that claims to show it, not to one id. There are
+     two now — the card in the send panel and the dock pinned to the foot of a
+     phone — and two elements each fetching their own copy of a number is the
+     shape CLAUDE.md §5 is about. One statement, however many places show it. */
+  const money = formatAgorot(priceAgorot(state));
+  document.querySelectorAll('[data-price]').forEach(el => { el.textContent = money; });
   $('#code').textContent = encodeCode(state);
 
   const win = byId(WINDOWS, state.window);
   const grille = byId(GRILLES, state.grille);
   $('#summary').textContent = [
     colour.he, `RAL ${colour.ral}`, win.he,
-    ...(win.rects.length && grille.id !== 'none' ? [grille.he] : []),
+    /* ⚠ `isGlazed`, not `win.rects.length`. FOURTH place to ask this question
+       its own way — the price, the WhatsApp message and this line all asked
+       about the leaf's own window, and a sidelight door's glass is beside the
+       leaf. The spec line under the price is what a customer proof-reads
+       before they send, so on a sidelight with ironwork it showed them a door
+       with no ironwork in it and then charged for some. */
+    ...(isGlazed(state) && grille.id !== 'none' ? [grille.he] : []),
     ...(byId(HANDLES, state.handle).style === 'none' ? [] : [byId(HANDLES, state.handle).he]),
     byId(LOCKSETS, state.lockset).he,
     ...(state.detail !== 'plain' ? [byId(DETAILS, state.detail).he] : []),
@@ -412,7 +442,8 @@ function paint() {
     $(`.sect[data-section="${sec.key}"] [data-sect-now]`).textContent = sectionLabel(sec);
   }
 
-  $('#wa-btn').href = whatsappUrl(state);
+  const wa = whatsappUrl(state);
+  document.querySelectorAll('[data-wa]').forEach(el => { el.href = wa; });
   announce(describe(state));
   armGrip();
 }
@@ -521,8 +552,18 @@ function sizeHitPad() {
   if (!m || !m.a || !m.d) return;
   const mmPerPx = { x: 1 / Math.abs(m.a), y: 1 / Math.abs(m.d) };
   const cx = Number(pad.dataset.cx), cy = Number(pad.dataset.cy);
-  const w = Math.max(Number(pad.dataset.w), TOUCH_TARGET * mmPerPx.x);
-  const h = Math.max(Number(pad.dataset.h), TOUCH_TARGET * mmPerPx.y);
+  /* ⚠ HALF A PIXEL OVER, not exactly on. Sized to exactly 44, the rect comes
+     back from `getBoundingClientRect` as 43.99-something once the matrix and
+     the layout have each rounded once, and 44 is a FLOOR — a target computed
+     to land precisely on a minimum lands under it about half the time.
+     It went unnoticed until the stage was made shorter on a phone: the scale
+     changed, the arithmetic landed on the other side of the boundary, and the
+     audit reported a 320 px screen with a 43-and-a-bit target. The number was
+     always this fragile; the height change only moved which viewport showed
+     it. Rounding UP is the only safe direction, as it is for the short code's
+     bit count, and half a pixel is invisible. */
+  const w = Math.max(Number(pad.dataset.w), (TOUCH_TARGET + 0.5) * mmPerPx.x);
+  const h = Math.max(Number(pad.dataset.h), (TOUCH_TARGET + 0.5) * mmPerPx.y);
   pad.setAttribute('x', cx - w / 2);
   pad.setAttribute('y', cy - h / 2);
   pad.setAttribute('width', w);
