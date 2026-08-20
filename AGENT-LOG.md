@@ -23,6 +23,75 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-20 16:05 UTC — run 9: nothing worth changing. A four-hour false alarm, and the rule I should have reused
+
+**Looked at:** `df557f5`, which opened the handle's height band from 0.38–0.60
+to 0.18–0.82 at the owner's request and made the grab bar draggable at all.
+Three times the travel is three times the surface, and `npm run collide` sweeps
+buildable designs at their DEFAULT positions — the dragged space is a different
+space — so that is where I went.
+
+**Instruments:** test ✓ (1,945,451) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`) · recreate ✓ · shot ✓. Green throughout.
+
+**Changed:** nothing.
+
+**What is genuinely verified, so the next run need not redo it:**
+- **The grab bar's fix works.** Its bug was that a drag wrote a position into
+  the link and the drawing carried on drawing it on the mid rail. Dragged now,
+  the drawn axis matches the link to **0 mm**, and it travels 834 mm up to land
+  at 0.183 of leaf height — the new floor.
+- **Dragged positions do not collide.** 45 grip × lockset pairs, each dragged
+  hard at the closing edge with a real pointer, measured with `collide`'s own
+  rule: **0 overlaps, tightest clearance 14 mm** (shiran + almog), which is
+  `LOCK_CLEAR` to within rounding. The rules and the drawing agree across the
+  widened band.
+
+**The false alarm, which is the entry.** I first measured that 4 of 11 pairs
+put metal through metal — blade + cylinder −16 mm, + coral −21, + digital −24,
+nitzan + cylinder −4 — and had walked the boundary to "prove" the rules accept
+from x=142 where the drawing needs x≥176. All of it was wrong, in three
+compounding ways, every one of them written down in this repo already:
+
+1. **Raw `getBBox` answers in each element's OWN coordinate system.** I compared
+   boxes from differently-transformed groups as though they shared one.
+   `collide.mjs` says so in as many words — the keyway reads back 975 mm across
+   and 1,356 mm above the fitting it belongs to.
+2. **I counted the drop shadow as metal.** CLAUDE.md §8: a shadow is not an
+   object, and it now scales with the fitting, so a bar standing off the leaf
+   throws one a full bar-width clear of itself. The blade's metal reaches 31 mm
+   from its axis; my box was 54.
+3. **I used a footprint from three runs ago.** I remembered blade as 70/70 and
+   built the whole argument on it. The bars were redrawn in `1741d39`; it is
+   35/35 declared against 31 drawn, and `gripPlacement` using `gw = 35` is
+   exactly right.
+
+The correct measuring rule already existed, fully commented, in the file whose
+job this is. I wrote my own instead of reusing it, and it cost the run.
+
+**Fourth probe failure in a row, and the pattern is now specific enough to
+state as a rule.** Percent-of-tile flattering sparse glyphs; an antialiased
+fringe making a brass bar read cool; a synthetic `KeyboardEvent` that fires
+nothing; and now three ways of mismeasuring a bounding box. Every one said the
+site was broadly broken and every one was the instrument.
+
+> **Before writing a probe, look for the one this repo already has.**
+> `collide.mjs` knows how to measure a fitting, `against.mjs` how to crop a
+> leaf, `profile.mjs` how to read the fall. Reusing the primitive is not
+> tidiness — it is the only way the measurement means the same thing twice.
+
+**Worth a human's eye, not mine to decide:** `collide` sweeps default positions
+only. Dragged positions are now a large, customer-reachable space and I checked
+them by hand this once. If that is worth a standing check, the primitive is
+already in `collide.mjs` and the sweep is 45 pairs.
+
+**Left alone deliberately:** the mobile sticky CTA; the transom and classical
+composition backlog; and the three that need Peretz.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-20 10:52 UTC — run 8: two grip-bar buttons were 34px, and the check that should have said so kept a list
 
 **Looked at:** nothing had been pushed since run 7, so again I went at surfaces
