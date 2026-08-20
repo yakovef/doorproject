@@ -105,6 +105,16 @@ export const COLOURS = [
  * "I can assure you that there is no double windows", and the records agree:
  * `window.count` is 1 on all ten. `duo` was invented here. It is gone.
  *
+ * ⚠ THE TEN RECORDS AGREE; THE 128 PHOTOGRAPHS DO NOT. d107 and d110 each
+ * carry two tall narrow lights side by side on ONE leaf — d107's set in their
+ * own moulded surrounds over a large lower panel, d110's gridded over two
+ * panels — and both are single leaves rather than pairs. Neither is one of the
+ * ten that were measured, which is how "the records agree" and "the corpus
+ * agrees" came to be written as if they were the same sentence.
+ * It stays removed: the owner's son said flatly that there is no such door,
+ * and two photographs against his own account of his own work is a question
+ * for him (ASK-PERETZ §4), not a licence for us to put the option back.
+ *
  * What is left is the four sizes the ten doors actually cluster into, each
  * backed by at least two of them (w and h as fractions of the leaf):
  *

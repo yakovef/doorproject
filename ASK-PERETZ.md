@@ -198,11 +198,35 @@ wrong order. It still has to be asked.*
 | חלון רחב | 43×103 ס\"מ | d092 · d106 |
 
 *Cut from the ten hand-measured openings and NOT invented: the four clusters
-are 0.32×0.69, 0.42×0.44, 0.42×0.69 and 0.50×0.50 of the leaf. The double
-window is gone — the owner's son said flatly that there is no such thing on his
-father's doors, and re-reading all 128 photographs agreed: every glazed door
-has exactly ONE opening. `duo` and `square` resolve to the rectangle so an old
-link still opens a door.*
+are 0.32×0.69, 0.42×0.44, 0.42×0.69 and 0.50×0.50 of the leaf.*
+
+> **"בשתי דלתות בגלריה יש שני חלונות צרים זה לצד זה על אותה דלת — d107
+> ו-d110. אמרת שאין דלת עם שני חלונות. אלה שלך?"** ⚠
+
+*The double window was removed on the owner's son's flat statement that there
+is no such thing on his father's doors, and the note here used to add that
+re-reading all 128 photographs agreed. It does not. **d107 and d110 each carry
+TWO tall narrow lights side by side on ONE leaf** — d107's are set in their own
+moulded surrounds over a large lower panel, d110's are gridded and sit over two
+panels. Both are single leaves, not pairs.
+That is his statement against two of his own photographs, so it stays removed
+and becomes a question with the pictures attached rather than an option we put
+back. `duo` and `square` resolve to the rectangle, so an old link still opens
+a door.*
+
+> **"על כמה דלתות יוקרה יש מסגרת קלאסית — כרכוב מעל החלון ובסיס מעוצב מתחת.
+> אנחנו לא מציירים את זה בכלל. זה דגם קבוע או תוספת?"** ⚠
+
+d101 · d103 · d108 · d112 · d129
+
+*Five doors carry a whole composition the site has no way to express: an
+entablature over the light, a moulded plinth block under it with its own
+cornice and base, and the letterplate set into that block. Beside them our
+luxury tier is a plain rectangle of moulding, which is the right drawing for
+the other thirty-six glazed doors and the wrong one for these five.
+Not added: it is a substantial drawing and, more to the point, a product
+question. If it is a fixed model rather than an option, it belongs in a
+different place than a tile.*
 
 > **"14 עיצובי חלון — אילו מהם אתה באמת מזמין, ומה התוספת על כל אחד?"**
 

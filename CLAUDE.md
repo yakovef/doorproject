@@ -21,6 +21,22 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Two things the corpus says that nobody had looked for**, both left in the
+  catalogue as questions rather than acted on:
+  ⚠ **The double window exists.** `duo` was removed on the owner's son's flat
+  statement that his father does not build one, and the note beside it added
+  that re-reading all 128 photographs agreed. It does not: **d107 and d110 each
+  carry two tall narrow lights side by side on ONE leaf**, both single leaves
+  rather than pairs. Neither is among the ten that were hand-measured, which is
+  how "the ten records agree" and "the corpus agrees" came to be written as the
+  same sentence. It stays removed — his account of his own work against two
+  photographs is a question for him, not a licence to put an option back.
+  ⚠ **A classical composition we cannot draw at all** — an entablature over the
+  light, a moulded plinth block under it with its own cornice and base, the
+  letterplate set into the block. d101, d103, d108, d112, d129. Five of the
+  forty-one glazed doors, so the plain rectangle of moulding we draw is right
+  for thirty-six of them and has nothing to say about these.
+
 - **The threshold is bare aluminium and we were painting it with the door.**
   It was `darken(paint, 0.30)`, a dark version of whatever the leaf is painted.
   Measured on the twelve metal sills in the records, as
