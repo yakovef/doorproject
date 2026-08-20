@@ -21,6 +21,18 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Nothing anywhere had ever pressed a key.** The audit clicks, the fuzzer
+  clicks, the suite renders strings — so the roving tabindex and the arrow-key
+  grid in app.js were carried by nobody, on a page whose whole content is a
+  two-deep fold of buttons. `npm run audit` now drives it the way a person
+  does at all five viewports: tab to a section, Enter, tab to a category,
+  Enter, arrow around the options. It works, and it is asserted now.
+  The assertion is that an arrow key changes the DOOR, not that Enter does
+  something: `role="radio"` in a radiogroup means selection follows focus, so
+  Enter on an already-selected option is correctly a no-op — and a grid that
+  moves a highlight while leaving the drawing behind is the failure worth
+  catching.
+
 - **Two things the corpus says that nobody had looked for**, both left in the
   catalogue as questions rather than acted on:
   ⚠ **The double window exists.** `duo` was removed on the owner's son's flat

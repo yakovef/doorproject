@@ -309,6 +309,90 @@ for (const v of VIEWS) {
     if (!faults) console.log('  the handle drags, and a cancelled drag changes nothing');
   }
 
+  /* ── THE WHOLE THING FROM THE KEYBOARD ────────────────────────────
+     Nothing anywhere had ever pressed a key. The audit clicks, the fuzzer
+     clicks, the suite renders strings — so the roving tabindex and the
+     arrow-key grid in app.js were carried by nobody, on a page whose entire
+     content is a two-deep fold of buttons.
+     Driven the way a person does it: tab to a section, open it, tab to a
+     category, open it, arrow around inside the options. `role="radio"` in a
+     radiogroup means selection FOLLOWS focus, so an arrow key must change the
+     DOOR — that is the assertion, and not that Enter does something, because
+     on an already-selected option Enter is correctly a no-op.
+     Run at every viewport: what is reachable depends on what is rendered, and
+     the panel is laid out differently on a phone. */
+  {
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForTimeout(300);
+
+    /* Tab until a section head has focus rather than counting presses — the
+       header's links come first and there is no reason for this check to know
+       how many of them there are. */
+    let head = null;
+    for (let i = 0; i < 20 && !head; i++) {
+      await p.keyboard.press('Tab');
+      head = await p.evaluate(() => {
+        const a = document.activeElement;
+        return a && a.classList && a.classList.contains('sect__head') ? a.id : null;
+      });
+    }
+    if (!head) fault(v.name, 'no section heading can be reached with Tab');
+    else {
+      await p.keyboard.press('Enter');
+      await p.waitForTimeout(150);
+      if (!await p.evaluate(() => [...document.querySelectorAll('.sect__body')].some(b => !b.hidden))) {
+        fault(v.name, 'Enter on a section heading does not open it');
+      }
+
+      await p.keyboard.press('Tab');
+      await p.waitForTimeout(80);
+      if (!await p.evaluate(() => document.activeElement.classList.contains('field__head'))) {
+        fault(v.name, 'Tab from an open section does not reach a category');
+      }
+
+      await p.keyboard.press('Enter');
+      await p.waitForTimeout(150);
+      if (!await p.evaluate(() => !!document.querySelector('.field__body:not([hidden])'))) {
+        fault(v.name, 'Enter on a category heading does not open it');
+      }
+
+      await p.keyboard.press('Tab');
+      await p.waitForTimeout(80);
+      const first = await p.evaluate(() =>
+        document.activeElement.getAttribute('role') === 'radio'
+          ? document.activeElement.dataset.id : null);
+      if (!first) fault(v.name, 'Tab from an open category does not reach an option');
+      else {
+        const codeBefore = await p.$eval('#code', e => e.textContent);
+        await p.keyboard.press('ArrowLeft');
+        await p.waitForTimeout(200);
+        const moved = await p.evaluate(() => document.activeElement.dataset.id);
+        const codeAfter = await p.$eval('#code', e => e.textContent);
+        if (moved === first) fault(v.name, 'an arrow key does not move between options');
+        /* Selection follows focus in a radiogroup, so the DOOR has to change.
+           A grid that moves a highlight and leaves the drawing behind is the
+           failure this is looking for. */
+        else if (codeAfter === codeBefore) {
+          fault(v.name, `arrowing from ${first} to ${moved} left the door unchanged`);
+        }
+        const checked = await p.evaluate(() =>
+          document.activeElement.getAttribute('aria-checked'));
+        if (checked !== 'true') {
+          fault(v.name, `the focused option reads aria-checked="${checked}" after an arrow key`);
+        }
+        /* And it has to be VISIBLE that it is focused. */
+        const ring = await p.evaluate(() => {
+          const cs = getComputedStyle(document.activeElement);
+          return { style: cs.outlineStyle, shadow: cs.boxShadow };
+        });
+        if (ring.style === 'none' && ring.shadow === 'none') {
+          fault(v.name, 'a focused option draws no focus ring at all');
+        }
+      }
+    }
+    if (!faults) console.log('  and the whole thing works from the keyboard');
+  }
+
   await p.close();
 }
 await b.close();
