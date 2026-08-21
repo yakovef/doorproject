@@ -23,6 +23,62 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-21 10:49 UTC — run 13: nothing worth changing. The delivery channel measured, and a contradiction that is not one
+
+**Looked at:** nothing new pushed for the third run running, so I went at the
+delivery mechanism itself — the wa.me URL — and then at what the order says
+about a sidelight door.
+
+**Instruments:** test ✓ (2,763,815) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`) · recreate ✓ · shot ✓. Tree clean
+throughout.
+
+**Changed:** nothing.
+
+**1. The WhatsApp URL cannot overflow.** The whole site funnels into one tap
+that carries the order inside a URL, and a URL past what the platform will hold
+does not error — it truncates, and a truncated order is a partial specification
+that looks complete. Nothing had ever measured it. Across **1,431,060**
+buildable doors the longest is **1,545 characters** (1,572 with a dragged
+handle); the message itself is 401. Hebrew inflates it three to four times
+under percent-encoding and it is still far inside the 2,000 that people design
+to. Recorded with the numbers so nobody re-derives it, and so a future line
+added to the message can be weighed against real headroom.
+
+**2. A line that looks like a contradiction, and is not.** The longest door is
+a sidelight with no leaf window, and its order reads:
+
+    חלון: ללא חלון
+    זכוכית: עיגולים שזורים
+
+— "window: none", then a glass pattern, three lines above `מידה: עם חלון צד`.
+Read top-down that looks like a question Peretz would have to ask, which is the
+one thing this site exists to prevent. So I asked the drawing where the grille
+actually goes, rather than deciding from the text:
+
+    leaf window + iron : #glazing 24 → 142 shapes,  #side-leaf 36 → 154
+    no leaf window     : #glazing 0  →   0,         #side-leaf 36 → 154
+
+**One design covers every pane on the door** — the leaf's light and the side
+light both, each scaled to its own pane width, which the render confirms. So
+there is no "which pane" to ask about: the pattern is wherever the glass is,
+and on that door the size line says where that is. The message is complete as
+written. `2781180` had already made this line ask `isGlazed` rather than the
+leaf's own window, and that was the whole fix.
+
+Not changed, and worth saying why: the wording is the owner's product language,
+the two lines that produce the effect were each written deliberately, and the
+information is all present. Inventing a qualifier nobody asked for is how a
+considered design drifts.
+
+**Left alone deliberately:** the transom and classical-composition backlog, and
+the three that need Peretz — the hardware finish, the three off-chart colours,
+and every price.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-21 05:51 UTC — run 12: nothing worth changing. Audited my own fix from both sides
 
 **Looked at:** nothing new had been pushed, so the first job was the one I owed
