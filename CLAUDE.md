@@ -21,6 +21,43 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The rule was checking the one place the Shiran is not bolted.** "Why can i
+  put the pull handle on that" — a screenshot with a rosette square on the
+  window's moulding and the drag showing green.
+  `gripFeet` gave every grip that is not a bar ONE foot at its own centre, with
+  `r` from `handleFootprint`. On the Shiran that centre is the bare shaft: it
+  bolts through two brass discs 150 mm above and below it, and nothing looked
+  at either. A bar has had two feet from `BARS[].fix` since the drag was built;
+  the Shiran is the same kind of object and was the only one modelled as a dot.
+  `SHIRAN` now states its height and its two fixing fractions once, read by the
+  drawing AND by the rule, and the discs carry `data-mount` so the instrument
+  can see them too. 54 of 855 otherwise-buildable designs stop offering it, and
+  the default position moved clear of the moulding.
+  ⚠ **`collide -- boxes` then reported MOUNT_REACH 252 mm short, and it is
+  not.** That figure is about LOCK FURNITURE, which is bolted at a fixed
+  backset so the aperture must leave room for it. A grip MOVES —
+  `gripPlacement` checks its feet where it stands — so the aperture owes it
+  nothing. The sweep read every `[data-mount]` and its comment said "the
+  deepest reading has always been a lockset's", which was true only while no
+  grip declared one. Two figures now, and the grip's is reported rather than
+  asserted.
+
+- **Choosing a handle made the door smaller.** The grip controls are `hidden`
+  until the door carries a pull, and they sat in the page's flow under the
+  stage — which on desktop is the flexible `1fr` row above them. So picking a
+  handle grew the `auto` row and shrank the door. Only constant things may live
+  in that row; the note that is left never changes.
+  They stand in the wall beside the door now, absolutely positioned, where the
+  owner's son drew a circle and asked for them.
+  ⚠ **Their width is MEASURED, not chosen.** `fitStage` publishes `--wall`, the
+  gap between the stage's edge and the door's casing, because the door's drawn
+  width changes with the SIZE — a sidelight is far wider than a narrow leaf —
+  and again with every viewport. A hand-picked `min(30vw, 9.5rem)` fitted a
+  standard leaf on a laptop and landed on the frame by seven pixels on a 390 px
+  phone. `npm run audit` checks both halves at every viewport and every size:
+  the leaf is the same height with and without a handle, and the controls clear
+  the frame.
+
 - **The comparison sheets had silently lagged the drawing, and now they
   cannot.** `assertFreshBundle` stops a tool measuring the previous version of
   the renderer; nothing stopped the IMAGES those tools write from doing the

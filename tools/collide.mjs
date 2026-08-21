@@ -195,10 +195,22 @@ if (boxes) {
 
     /* How far inboard from the CLOSING EDGE does anything BOLTED reach? That
        is the flat stile a moulding may not take, and it is what sizes every
-       aperture. Every grip against every lockset, because the pair share the
-       stile and a grip can push a lockset's own art nowhere — but the deepest
-       reading has always been a lockset's. */
+       aperture.
+       ⚠ LOCK FURNITURE ONLY, and the distinction is load-bearing. A lockset is
+       bolted at a FIXED backset from the closing edge, so the aperture has to
+       leave room for it or the drawing bolts a rosette to a moulding. A GRIP
+       is movable: `gripPlacement` checks its feet against the mouldings at
+       whatever position it is standing, and where nothing works the rules
+       refuse it. The aperture owes it nothing.
+       This loop read every `[data-mount]`, and the comment here said "the
+       deepest reading has always been a lockset's" — true only because no grip
+       declared a mount. The Shiran does now, two brass discs where it bolts
+       through, and at 373 mm inboard it made MOUNT_REACH look 252 mm short. It
+       is not short; it is a different measurement.
+       Both are reported, because a grip's fixings ARE worth seeing — that is
+       the reason they were marked at all. */
     const deepest = { reach: 0, what: '', on: '' };
+    const deepestGrip = { reach: 0, what: '', on: '' };
     for (const h of handles) for (const k of locksets) {
       host.innerHTML = window.__render({ ...base, handle: h, lockset: k });
       const svg = host.querySelector('svg');
@@ -206,16 +218,18 @@ if (boxes) {
       for (const m of svg.querySelectorAll('[data-mount]')) {
         const B = m.getBBox();
         const r = Math.min(B.x + B.width - leaf.x, leaf.x + leaf.width - B.x);
-        if (r > deepest.reach) {
-          deepest.reach = Math.round(r);
-          deepest.what = m.dataset.mount;
-          deepest.on = `${h}+${k}`;
+        const owner = m.closest('[data-hw]');
+        const into = owner && owner.dataset.hw === 'handle' ? deepestGrip : deepest;
+        if (r > into.reach) {
+          into.reach = Math.round(r);
+          into.what = m.dataset.mount;
+          into.on = `${h}+${k}`;
         }
       }
     }
-    return { out, deepest };
+    return { out, deepest, deepestGrip };
   }, { handles: HANDLES.map(h => h.id), locksets: LOCKSETS.map(k => k.id) });
-  const { out: rowsOut, deepest } = rows;
+  const { out: rowsOut, deepest, deepestGrip } = rows;
   await b.close();
   console.log('\nwhere the METAL of each fitting reaches, in mm from its own axis.');
   console.log('OUT is toward the closing edge, IN toward the hinge. A ✗ marks a');
@@ -238,12 +252,22 @@ if (boxes) {
      is exactly the kind of number this project has previously left behind in a
      comment. Printed here rather than asserted, because it is an input to the
      drawing and not a property of it. */
-  console.log(`the deepest BOLTED part, mm inboard from the closing edge:`);
+  console.log(`the deepest bolted LOCK FURNITURE, mm inboard from the closing edge:`);
   console.log(`  ${deepest.reach}  (${deepest.what} on ${deepest.on})`
             + `   —  renderer.js MOUNT_REACH is ${MOUNT_REACH}`);
   console.log(deepest.reach > MOUNT_REACH
     ? `  ✗ MOUNT_REACH is short by ${deepest.reach - MOUNT_REACH} mm\n`
     : `  ✓ MOUNT_REACH covers it\n`);
+  /* The grip's own fixings, reported and not asserted against MOUNT_REACH.
+     A grip moves, so the aperture is not sized around it — `gripPlacement`
+     checks its feet where it stands, which is what the Shiran's two discs were
+     added to `gripFeet` for. The number is here because a fixing that reaches
+     further than anyone expected is worth seeing whether or not a rule
+     currently reads it. */
+  if (deepestGrip.reach) {
+    console.log(`the deepest bolted GRIP fixing (checked per position, not by the aperture):`);
+    console.log(`  ${deepestGrip.reach}  (${deepestGrip.what} on ${deepestGrip.on})\n`);
+  }
   if (deepest.reach > MOUNT_REACH) process.exitCode = 1;
   process.exitCode = bad ? 1 : 0;
   process.exit(process.exitCode);

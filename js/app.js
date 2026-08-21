@@ -765,6 +765,24 @@ function fitStage() {
   /* The crop just changed, so the scale did, so the touch target is the wrong
      size. A rotated phone is the case that matters. */
   sizeHitPad();
+
+  /* HOW MUCH WALL THERE IS BESIDE THE DOOR, in css pixels, published for the
+     grip controls to stand in.
+     They are absolutely positioned in that wall, and their width cannot be a
+     guess: the door's drawn width changes with the SIZE — a sidelight or a
+     leaf-and-a-half is far wider than a narrow leaf — and it changes again
+     with every viewport, because `fitStage` scales the whole drawing to the
+     stage. A hand-picked `min(30vw, 9.5rem)` fitted a standard leaf on a
+     laptop and overlapped the frame by seven pixels on a 390 px phone, which
+     is the kind of number that is right until somebody opens it on a phone.
+     Measured off `#frame`, which is the whole door assembly including its
+     casing — not the leaf, whose edge is 158 mm inside it. */
+  const frame = svg.querySelector('#frame');
+  if (frame) {
+    const f = frame.getBoundingClientRect();
+    const wall = Math.max(0, Math.min(f.x - box.x, box.x + box.width - (f.x + f.width)));
+    $('.stage-wrap').style.setProperty('--wall', `${Math.round(wall)}px`);
+  }
 }
 
 // Debounced so arrowing through ten colours announces once on settle,

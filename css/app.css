@@ -167,8 +167,13 @@ body {
 @media (min-width: 1100px) {
   .layout {
     grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) minmax(300px, 360px);
-    /* Two rows now that the grip bar is its own element: the door takes the
-       height that is going and the bar sits under it, both inside column 2. */
+    /* Two rows: the door takes the height that is going and the note sits
+       under it, both inside column 2.
+       ⚠ ONLY CONSTANT THINGS MAY LIVE IN ROW 2. It is `auto`, so whatever is
+       in it takes what it needs and row 1 — the stage — gets the rest. The
+       grip buttons were here, and they are hidden until the door has a pull
+       handle, so choosing one made row 2 taller and THE DOOR SMALLER. They
+       stand in the wall now instead; the note that is left never changes. */
     grid-template-rows: minmax(0, 1fr) auto;
     flex: 1;
     min-block-size: 0;      /* lets the columns scroll instead of the page */
@@ -194,6 +199,10 @@ body {
   background: var(--wall);
   transition: background-color .3s var(--ease);
   border-block-end: 1px solid var(--rule);
+  /* The grip controls stand in the wall, absolutely, so this has to be their
+     containing block. On a phone it is already `sticky`, which positions too;
+     saying it here as well means the two do not have to be read together. */
+  position: relative;
 }
 
 @media (min-width: 1100px) {
@@ -285,19 +294,50 @@ body {
    dragging it moves the handle instead of scrolling the page — which is what
    happens by default and is indistinguishable, to the customer, from the
    feature not existing. */
+/* ── the grip controls, standing in the wall ──────────────────
+   They were a row under the door, and they are `hidden` until the door has a
+   pull handle — so choosing one made the row appear, and on desktop the stage
+   is the flexible row above it: THE DOOR SHRANK the moment you gave it a
+   handle. Reported from the outside in those words. Anything in flow beside a
+   flexible stage does that, whatever height it is.
+   So they are out of flow, in the empty wall beside the door, which is where
+   the owner's son drew a circle and asked for them. The door's size no longer
+   depends on whether it has a handle.
+   Vertically centred on the inline-start edge — the right, in RTL, which is
+   the side he circled. `inset-inline` rather than `left`, so an English build
+   puts them on the other side without a second rule. */
 .grip-bar {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  justify-content: center;
+  position: absolute;
+  /* `--wall` is the measured gap between the stage's edge and the door's
+     casing, published by `fitStage` on every re-fit. It has to be measured:
+     the door's drawn width changes with the SIZE — a sidelight is far wider
+     than a narrow leaf — and again with every viewport, so a hand-picked
+     width fits a standard leaf on a laptop and lands on the frame on a phone.
+     The fallback is for the instant before the first paint. */
+  inset-inline-start: 8px;
+  inline-size: min(calc(var(--wall, 9.5rem) - 20px), 9.5rem);
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+  text-align: center;
 }
-.grip-bar__hint { font-size: .72rem; color: var(--ink-2); }
+.grip-bar__hint {
+  font-size: .72rem; color: var(--ink-2);
+  line-height: 1.35;
+}
 /* 44px, like every other target on the page. It was 34 — a standalone control
    on the phone, ten pixels under the minimum this project holds itself to, and
    the audit never said so because its tap-target check enumerated a list of
    classes that this one is not on. Both buttons in the grip bar carry it, so
    the reset button was the same ten pixels short whenever it appeared. */
 .grip-bar__btn {
-  min-block-size: 44px; padding: 5px 14px;
+  min-block-size: 44px; padding: 5px 10px;
+  /* In a column narrow enough to fit the wall, a label has to be allowed to
+     wrap — and a wrapped label makes the button taller, never narrower, so the
+     44 px floor is untouched. */
   display: inline-flex; align-items: center; justify-content: center;
+  text-align: center; line-height: 1.25;
   border: 1px solid var(--rule); border-radius: 999px;
   background: var(--paper-up); color: var(--ink); font: inherit; font-size: .78rem;
   cursor: pointer;

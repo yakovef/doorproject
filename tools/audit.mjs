@@ -408,6 +408,60 @@ for (const v of VIEWS) {
     if (!faults) console.log('  and the whole thing works from the keyboard');
   }
 
+  /* ── CHOOSING A HANDLE MUST NOT RESIZE THE DOOR ───────────────────
+     The grip controls are `hidden` until the door has a pull handle, and they
+     used to sit in the page's flow under the stage — which on desktop is the
+     flexible row above them. So picking a handle made the row appear and the
+     door shrank, reported from the outside in exactly those words. Nothing
+     here was looking: every check in this file measures one state at a time.
+     Two states, one measurement. And the controls now stand in the wall beside
+     the door, so the second half is that they have to CLEAR it — at every size,
+     because a sidelight is far wider than a narrow leaf and the wall it leaves
+     on a 320 px phone is the case that goes wrong. */
+  {
+    const leafHeight = async q => {
+      await p.goto(`file://${process.cwd()}/index.html?${q}`);
+      await p.waitForTimeout(350);
+      return p.$eval('#leaf rect', e => Math.round(e.getBoundingClientRect().height));
+    };
+    const stem = 'c=rb-0097d&w=none&g=none&k=cylinder&d=plain&h=right-in';
+    for (const size of ['standard', 'sidelight']) {
+      const bare = await leafHeight(`${stem}&s=${size}&n=none`);
+      const held = await leafHeight(`${stem}&s=${size}&n=shiran`);
+      if (bare !== held) {
+        fault(v.name, `choosing a pull handle resized the door on ${size}: `
+                    + `the leaf went from ${bare} px to ${held}`);
+      }
+    }
+
+    for (const size of ['standard', 'narrow', 'wide', 'tall', 'half', 'sidelight']) {
+      await p.goto(`file://${process.cwd()}/index.html?${stem}&s=${size}&n=shiran`);
+      await p.waitForTimeout(350);
+      const m = await p.evaluate(() => {
+        const gb = document.getElementById('grip-bar');
+        if (gb.hidden) return null;
+        const g = gb.getBoundingClientRect();
+        const f = document.querySelector('.door-svg #frame').getBoundingClientRect();
+        return { g: [g.x, g.x + g.width, g.width], f: [f.x, f.x + f.width] };
+      });
+      if (!m) { fault(v.name, `no grip controls on a ${size} door carrying a pull`); continue; }
+      /* Half a pixel of slack: these are laid out from a measured `--wall` and
+         a rounded css pixel is not a collision. */
+      if (!(m.g[1] <= m.f[0] + 0.5 || m.g[0] >= m.f[1] - 0.5)) {
+        fault(v.name, `the grip controls sit on the ${size} door: `
+                    + `${Math.round(m.g[0])}..${Math.round(m.g[1])} against a frame at `
+                    + `${Math.round(m.f[0])}..${Math.round(m.f[1])}`);
+      }
+      /* And they have to stay wide enough to be a control rather than a
+         sliver, which is the other way a measured width can go wrong. */
+      if (m.g[2] < 56) {
+        fault(v.name, `the grip controls are ${Math.round(m.g[2])} px wide on ${size}`);
+      }
+    }
+    if (!faults) console.log('  the door keeps its size when it gains a handle, '
+                           + 'and the controls stand clear of it');
+  }
+
   await p.close();
 }
 await b.close();

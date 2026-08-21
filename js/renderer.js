@@ -2095,7 +2095,29 @@ export function gripFeet(state, place = null) {
      already refuses it across a centred window, and the nine installed ones
      are all on solid or panelled leaves. */
   if (handle.style === 'grab') return [];
+
+  /* THE SHIRAN IS A PULL ON TWO MOUNTS, like a bar, and it was the only one of
+     them modelled as a dot at its own centre — which is the bare shaft, the
+     one part of it that is not fixed to anything. Its discs sit 150 mm above
+     and below that on a standard leaf, so a rosette could stand square on the
+     window's moulding with the drag showing green. Reported from the outside:
+     "why can i put the pull handle on that".
+     Read off `SHIRAN`, which the drawing reads too, so the fixings the rule
+     checks are the fixings the drawing draws. */
+  if (handle.style === 'shiran') {
+    const H = SHIRAN.h(leafH);
+    const r = (H / 5.49) * SHIRAN.disc / 2;
+    return SHIRAN.fix.map(t => ({ x: cx, y: cy - H / 2 + H * t, r }));
+  }
+
   if (handle.style !== 'bar') {
+    /* What is left is the recessed channel, and it has no feet: it is a void
+       cut into the leaf rather than something bolted to it. Modelling it as a
+       circle at its centre is wrong in the same way as the Shiran was, and it
+       cannot bite — `rules.js` refuses the channel outright on any leaf that
+       is glazed or has face work, so `faceObstacles` is empty every time this
+       runs. Kept as one foot rather than sampled along its length, because a
+       sampled model would be code that can never execute. */
     const f = handleFootprint(handle, leafH);
     return [{ x: cx, y: cy, r: Math.max(f.out, f.in), long: f.vy }];
   }
@@ -4631,13 +4653,45 @@ function lunaPull(cx, cy, dir) {
  * The shaft is a plain round cylinder — two highlights with a dark core — so
  * it takes the same twin-rim treatment as the Ella rod.
  */
+/**
+ * Where the Shiran is BOLTED, and how big it is — one statement, read by the
+ * drawing below AND by `gripFeet`, because the rule that matters about a grip
+ * is where its fixings land.
+ *
+ * ⚠ THE RULE WAS CHECKING THE ONE PLACE IT IS NOT FIXED. `gripFeet` handed
+ * every non-bar grip a single circle at its CENTRE — for the Shiran, the bare
+ * shaft between the two discs — with `r` taken from `handleFootprint`, 43 mm.
+ * The discs it actually bolts through are 150 mm above and below that, and
+ * nothing looked at them. So a customer could stand the pull with a rosette
+ * square on the window's moulding and the drag stayed green, which is exactly
+ * the case the owner's son reported: "why can i put the pull handle on that".
+ *
+ * A bar has had two feet from `BARS[].fix` since the drag was built. The
+ * Shiran is the same kind of object — a pull on two mounts — and was the only
+ * one of them modelled as a dot.
+ */
+const SHIRAN = {
+  /** Its overall height on a given leaf. */
+  h: leafH => Math.min(480, leafH - 320),
+  /** The two mounting discs, as fractions of that height, top-down. */
+  fix: [0.188, 0.813],
+  /** Disc diameter as a fraction of W, and W is H/5.49. */
+  disc: 0.964,
+};
+
 function shiranPull(cx, cy, leafH) {
-  const H = Math.min(480, leafH - 320), W = H / 5.49;
+  const H = SHIRAN.h(leafH), W = H / 5.49;
   const top = cy - H / 2;
   const at = t => top + H * t;
   const wAt = f => W * f;
+  /* `data-mount` — see the note above `handleFootprint`. These two discs are
+     what the pull is bolted through, and neither the rules nor
+     `npm run collide -- boxes` could see them: the rule looked at the shaft
+     between them and the sweep had nothing marked to measure. Marked now, so
+     the instrument re-derives MOUNT_REACH from the real fixings. */
   const disc = (t, f) => `
-      <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) / 2}" fill="url(#brassDisc)"/>
+      <circle data-mount="shiran-disc" cx="${cx}" cy="${at(t)}"
+              r="${wAt(f) / 2}" fill="url(#brassDisc)"/>
       <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) / 2 - 1.5}" fill="none"
               stroke="#FFF3D4" stroke-opacity="0.55" stroke-width="2"/>
       <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) * 0.31}" fill="#000" opacity="0.45"/>`;
@@ -4659,8 +4713,8 @@ function shiranPull(cx, cy, leafH) {
       <!-- the shaft, and the discs it lands on -->
       <rect x="${cx - wAt(0.48) / 2}" y="${at(0.269)}" width="${wAt(0.48)}" height="${H * 0.465}"
             fill="url(#barBrass)"/>
-      ${disc(0.188, 0.964)}
-      ${disc(0.813, 0.989)}
+      ${disc(SHIRAN.fix[0], SHIRAN.disc)}
+      ${disc(SHIRAN.fix[1], 0.989)}
       ${bulge(0.055, 0.554)}
       ${bulge(0.938, 0.577)}
       <!-- the turned bulbs standing proud of each disc -->

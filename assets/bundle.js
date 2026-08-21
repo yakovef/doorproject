@@ -1749,6 +1749,11 @@ ${body}
     const cx = hingeLeftOf(state2) ? leafW - p.x : p.x;
     const cy = p.y;
     if (handle.style === "grab") return [];
+    if (handle.style === "shiran") {
+      const H = SHIRAN.h(leafH);
+      const r2 = H / 5.49 * SHIRAN.disc / 2;
+      return SHIRAN.fix.map((t) => ({ x: cx, y: cy - H / 2 + H * t, r: r2 }));
+    }
     if (handle.style !== "bar") {
       const f = handleFootprint(handle, leafH);
       return [{ x: cx, y: cy, r: Math.max(f.out, f.in), long: f.vy }];
@@ -3076,13 +3081,22 @@ ${body}
             rx="${kr * 0.5}" fill="#fff" opacity="0.5"/>
     </g>`;
   }
+  var SHIRAN = {
+    /** Its overall height on a given leaf. */
+    h: (leafH) => Math.min(480, leafH - 320),
+    /** The two mounting discs, as fractions of that height, top-down. */
+    fix: [0.188, 0.813],
+    /** Disc diameter as a fraction of W, and W is H/5.49. */
+    disc: 0.964
+  };
   function shiranPull(cx, cy, leafH) {
-    const H = Math.min(480, leafH - 320), W = H / 5.49;
+    const H = SHIRAN.h(leafH), W = H / 5.49;
     const top = cy - H / 2;
     const at = (t) => top + H * t;
     const wAt = (f) => W * f;
     const disc2 = (t, f) => `
-      <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) / 2}" fill="url(#brassDisc)"/>
+      <circle data-mount="shiran-disc" cx="${cx}" cy="${at(t)}"
+              r="${wAt(f) / 2}" fill="url(#brassDisc)"/>
       <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) / 2 - 1.5}" fill="none"
               stroke="#FFF3D4" stroke-opacity="0.55" stroke-width="2"/>
       <circle cx="${cx}" cy="${at(t)}" r="${wAt(f) * 0.31}" fill="#000" opacity="0.45"/>`;
@@ -3104,8 +3118,8 @@ ${body}
       <!-- the shaft, and the discs it lands on -->
       <rect x="${cx - wAt(0.48) / 2}" y="${at(0.269)}" width="${wAt(0.48)}" height="${H * 0.465}"
             fill="url(#barBrass)"/>
-      ${disc2(0.188, 0.964)}
-      ${disc2(0.813, 0.989)}
+      ${disc2(SHIRAN.fix[0], SHIRAN.disc)}
+      ${disc2(SHIRAN.fix[1], 0.989)}
       ${bulge(0.055, 0.554)}
       ${bulge(0.938, 0.577)}
       <!-- the turned bulbs standing proud of each disc -->
@@ -4469,6 +4483,12 @@ ${body}
       `${((w - vw) / 2).toFixed(1)} ${((h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
     );
     sizeHitPad();
+    const frame = svg.querySelector("#frame");
+    if (frame) {
+      const f = frame.getBoundingClientRect();
+      const wall = Math.max(0, Math.min(f.x - box.x, box.x + box.width - (f.x + f.width)));
+      $(".stage-wrap").style.setProperty("--wall", `${Math.round(wall)}px`);
+    }
   }
   var liveTimer = null;
   function announce(text) {

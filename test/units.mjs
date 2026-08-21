@@ -375,6 +375,65 @@ for (const n of HANDLES) {
    there is, and it is the third collision-class bug this renderer has had
    (panel over glazing, hinges at the mullion, handle over lock). Assert the
    footprints stay apart over every design, not just the one that was fixed. */
+/* THE FEET THE RULE CHECKS ARE THE FIXINGS THE DRAWING DRAWS.
+   `gripPlacement` refuses a position when a FOOT lands on a moulding, and for
+   every grip that is not a bar `gripFeet` used to return one circle at the
+   grip's own centre. On the Shiran that centre is the bare shaft: it is bolted
+   through two brass discs 150 mm above and below it, and neither was checked.
+   So a rosette could stand square on the window's surround with the drag
+   showing green — reported from the outside as "why can i put the pull handle
+   on that".
+   Asserted against the MARKUP rather than against a constant, because the
+   whole failure was the rule and the drawing disagreeing about where the thing
+   is fixed. `data-mount` is what the drawing declares; if the two ever part
+   company again this is where it shows. */
+group('a grip is checked where it is actually bolted');
+{
+  const st = { ...base, handle: 'shiran', lockset: 'cylinder', window: 'none' };
+  const svg = render(st);
+  const discs = [...svg.matchAll(/data-mount="shiran-disc"[^>]*cy="([\d.]+)"[^>]*r="([\d.]+)"/g)]
+    .map(m => ({ cy: Number(m[1]), r: Number(m[2]) }));
+  ok(discs.length === 2, `the Shiran draws ${discs.length} mounting discs, expected 2`);
+
+  const feet = gripFeet(st, gripAt(st));
+  ok(feet.length === 2, `gripFeet gives the Shiran ${feet.length} feet, expected 2`);
+
+  /* The drawing is in leaf-local millimetres offset by the leaf's own origin,
+     so the discs and the feet are compared on their SPACING and their radius —
+     the two things a foot model has to get right — rather than on an absolute
+     y that would just be re-deriving the layout here. */
+  if (discs.length === 2 && feet.length === 2) {
+    const drawnGap = Math.abs(discs[1].cy - discs[0].cy);
+    const footGap = Math.abs(feet[1].y - feet[0].y);
+    ok(Math.abs(drawnGap - footGap) < 1,
+       `the rule spaces the Shiran's feet ${footGap.toFixed(1)} mm apart and the `
+     + `drawing spaces its discs ${drawnGap.toFixed(1)} mm`);
+    ok(Math.abs(discs[0].r - feet[0].r) < 2,
+       `the rule uses a ${feet[0].r.toFixed(1)} mm foot where the drawing bolts `
+     + `through a ${discs[0].r.toFixed(1)} mm disc`);
+  }
+
+  /* And the fault itself: a position that puts a disc on the window's surround
+     has to be refused. Walked rather than asserted at one point, because the
+     old model refused nothing anywhere in this band. */
+  {
+    const glazed = { ...base, handle: 'shiran', lockset: 'cylinder', window: 'rect' };
+    const obs = faceObstacles(glazed).find(o => o.kind === 'window');
+    let refusedInBand = 0, checked = 0;
+    for (let y = Math.round(obs.y); y < obs.y + obs.h; y += 25) {
+      const pl = gripPlacement(glazed, { x: 155, y, rot: 0 });
+      if (pl.why === 'הידית גבוהה או נמוכה מדי לשימוש'
+          || pl.why === 'הידית חורגת מהדלת') continue;   // a different rule
+      checked++;
+      if (!pl.ok) refusedInBand++;
+    }
+    ok(checked > 10, `only ${checked} positions fell inside the window's band to test`);
+    ok(refusedInBand === checked,
+       `${checked - refusedInBand} of ${checked} positions inside the window's surround `
+     + 'were allowed — a disc can be bolted to the moulding');
+  }
+}
+
 group('the grip clears the lockset');
 {
   const num = (svg, re) => Number(re.exec(svg)[1]);

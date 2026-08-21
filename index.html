@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
-<link rel="stylesheet" href="css/app.css?v=26abf967">
+<link rel="stylesheet" href="css/app.css?v=bff7a4cb">
 </head>
 <body>
 
@@ -30,28 +30,38 @@
   <section class="stage-wrap" aria-labelledby="stage-h">
     <h1 class="sr-only" id="stage-h">בחירת דלת כניסה</h1>
     <div class="stage" id="stage"></div>
-  </section>
 
-  <!-- ⚠ OUTSIDE the stage, and it used to be inside.
-       On a phone the stage is sticky now, so that a customer scrolling a list
-       of seventeen colours can still see the door they are painting — which is
-       the entire premise of a configurator and was not true: the door scrolled
-       off the top and they were choosing a paint chip blind.
-       Anything inside that sticky block is pinned with it, and this band is
-       190 px of note and buttons. Pinning it would have cost a quarter of the
-       screen to a hint and an advanced control, so it stays in the flow and
-       scrolls away under the door. It is what you use AFTER choosing. -->
-  <div class="stage__bar">
-    <p class="stage__note">הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם.</p>
-    <!-- The handle can be dragged on the door itself. These are the same
-         two moves for anyone not using a pointer, and the only way to turn
-         it — a rotate gesture on a door handle would be a guess. Hidden
-         entirely when the door has no pull handle on it. -->
+    <!-- ⚠ INSIDE the stage and OUT OF FLOW, and both halves of that matter.
+         It sat under the door in the page's flow, and it is `hidden` until the
+         door has a pull handle — so choosing one made the row appear, and on
+         desktop the stage is the `1fr` row above it: the door SHRANK the
+         moment you gave it a handle. Reported from the outside in those words.
+         Anything in flow beside a flexible stage does that. So it is absolute
+         now, standing in the empty wall beside the door, where the owner's son
+         drew a circle and asked for it. The door's size stops depending on
+         whether it has a handle at all.
+         The note below stays in flow: it is always there, so it never resizes
+         anything, and a sentence about measuring on site does not belong
+         floating on the wall. -->
     <div class="grip-bar" id="grip-bar" hidden>
       <span class="grip-bar__hint">גררו את הידית למקום שתרצו</span>
       <button type="button" class="grip-bar__btn" id="grip-rot">סובבו</button>
       <button type="button" class="grip-bar__btn" id="grip-home">למקום המקורי</button>
     </div>
+  </section>
+
+  <!-- ⚠ OUTSIDE the stage, and it used to be inside.
+       On a phone the stage is sticky, so that a customer scrolling a list of
+       seventeen colours can still see the door they are painting — which is
+       the entire premise of a configurator and was not true: the door scrolled
+       off the top and they were choosing a paint chip blind. Anything inside
+       that sticky block is pinned with it, so this sentence stays in the flow
+       and scrolls away under the door.
+       It is one line and it is never hidden, which is why it can live here
+       while the grip buttons cannot: a row that appears and disappears beside
+       a flexible stage resizes the door. -->
+  <div class="stage__bar">
+    <p class="stage__note">הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם.</p>
   </div>
 
   <!-- ── choices ──────────────────────────────────────────────────
@@ -144,6 +154,6 @@
     document.documentElement.classList.add('is-bare');
   }
 </script>
-<script src="assets/bundle.js?v=d4f326eb"></script>
+<script src="assets/bundle.js?v=2dfab931"></script>
 </body>
 </html>
