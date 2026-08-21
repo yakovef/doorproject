@@ -23,6 +23,62 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-21 15:51 UTC — run 14: nothing worth changing. A redesign plan I am deliberately not starting
+
+**Looked at:** five human commits — the Shiran bolt rule and the handle that
+shrank the door, the black ground, the rotated grip and the box left behind,
+plus `README.md` and `REDESIGN.md`. Page at 390 and 1280.
+
+**Instruments:** test ✓ (2,763,765) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`, now reporting the deepest bolted grip
+fixing separately at 373 mm) · recreate ✓ · shot ✓. Tree clean throughout.
+
+**Changed:** nothing.
+
+**REDESIGN.md, and why I am not executing it.** Five staged commits, each
+scoped to leave the instruments green, stage 1 pure CSS and markup. It is
+tempting and it is well specified — and I cannot see the mockup. The plan is a
+*reading* of an image that arrived from outside; phrases like "the soft shadow
+the mockup uses", "the mockup's card treatment", "radius ~16" describe a target
+I have no access to. Implementing them would be me inventing a look and calling
+it somebody else's, which is the precise failure this project keeps undoing,
+and on the owner's own product surface. It stays the human's to execute. What
+I can do is what §5 of that plan asks — keep the instruments honest under it —
+and that is the standing job anyway.
+
+**Verified rather than assumed:**
+- **The black ground is gone.** `--wall` reads rgb(245,243,239) at both widths,
+  and the stage no longer has a visible edge against the page.
+- **The grip controls stand in the wall now**, so choosing a handle no longer
+  takes height from grid row 2 and shrinks the door. Deliberate, commented, and
+  the audit asserts the door does not resize.
+
+**`README.md` checked claim by claim, because it is a promise made to somebody
+standing in a customer's living room.** It says three files are a working site
+you can send over WhatsApp, so I copied exactly `index.html`, `css/app.css` and
+`assets/bundle.js` into an empty directory and opened it over `file://`:
+
+    door drawn      334 svg nodes        sections        4
+    price           ‏4,075 ‏₪             code            DM-M4040480
+    whatsapp link   built                stylesheet      live
+    a priced choice ‏4,075 → ‏4,255       failed requests none, no console errors
+
+253 KB against the stated 260. Every command in its table exists, including
+`sheets`. And the ZIP figure is exact: 184M excluding `.git`, which is what
+GitHub actually packages. The document is true.
+
+⚠ One probe of mine was wrong again and is worth the line: I first tested the
+offline claim by clicking a COLOUR and reported the price "UNCHANGED". All
+seventeen colours are `כלול` — the total correctly does not move. The site was
+right and the probe was asking the wrong question, which is now five for five.
+
+**Left alone deliberately:** the redesign stages, the transom and
+classical-composition backlog, and the three that need Peretz.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-21 10:49 UTC — run 13: nothing worth changing. The delivery channel measured, and a contradiction that is not one
 
 **Looked at:** nothing new pushed for the third run running, so I went at the
