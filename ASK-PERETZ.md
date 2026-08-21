@@ -345,6 +345,59 @@ buying direct from the brand. His call, not ours.*
 
 ---
 
+## 8. טווח המידות — איזה רוחב כל מידה מכסה? ⚠ חוסם
+
+> **"לקוח מודד פתח של 78 ס״מ. איזו מידה הוא צריך לבחור?"**
+> **"תן לי לכל אחת מהמידות את הרוחב מ־X עד Y ס״מ:"**
+>
+> | מידה | מרוחב | עד רוחב |
+> |---|---|---|
+> | צרה | | |
+> | סטנדרטית | | |
+> | רחבה | | |
+> | גבוהה | | |
+> | דלת וחצי | | |
+> | עם חלון צד | | |
+>
+> **"ולגבוהה — מאיזה גובה עד איזה גובה?"**
+
+*Why this blocks a visible piece of the site. The size tiles are meant to print
+the band each one serves, so a customer with an odd opening can tell which tile
+is theirs instead of guessing or telephoning. One band arrived from outside as
+an example — "60 to 98 is standard" — and it cannot be right as stated, because
+the catalog draws `צרה` at 800 mm, which sits inside it. Two overlapping bands
+are worse than none: they make a customer choose wrong and feel certain about
+it. So the tiles show only the name until these numbers come back. Nothing is
+being guessed here.*
+
+*Note the drawn widths are the **leaf**, not the opening. If his bands are
+opening sizes, say so — the two differ by the frame.*
+
+---
+
+## 9. שלוש שאלות קטנות שנפתחו מהעיצוב החדש
+
+> **"כמה שנות אחריות, ועל מה — הדלת, המנעול, הצבע?"**
+
+*The foot of the page is getting four badges and אחריות is one of them. "אחריות
+מלאה" with no term is a claim nobody can hold us to, which is the same as no
+claim at all. `אחריות ל־X שנים` is worth more, and it is true.*
+
+> **"יש לך צבעים מטאליים או דמויי־עץ, או שהכול מהלוח הרגיל?"**
+
+*The new design groups colours under three tabs — חלקים / מתכתי / דמוי עץ. All
+seventeen of ours are solid `D` codes off the Rav Bariach chart, so two of the
+three tabs would open on nothing. The tabs ship only if there is a second
+range behind them.*
+
+> **"הדלתות מיוצרות בארץ?"**
+
+*`ייצור כחול לבן` is another of the four badges. The colour chart is Rav
+Bariach, which is Israeli — but the badge is about the door he sells, not about
+the chart it is finished from.*
+
+---
+
 ## What I need back, minimally, to flip `PLACEHOLDER` to `false`
 
 | | Question | Blocks |
@@ -356,5 +409,9 @@ buying direct from the brand. His call, not ours.*
 | 5 | prices per size | every price shown |
 | 6 | distance | the price promise |
 | 7 | permission | the works gallery, and launch |
+| 8 | width bands per size | the range printed on each size tile |
+| 9 | warranty term · metallic range · made-in-Israel | three of the four foot badges |
 
-1 and 5 are the two that stop launch on their own.
+1 and 5 are the two that stop launch on their own. 8 and 9 hold back a piece
+of the new design each, and neither blocks launch — the tile drops its range
+line and the badge drops its number.

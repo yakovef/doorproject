@@ -21,6 +21,55 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **`REDESIGN.md` — the visual pass, planned but not yet built.** A mockup
+  arrived from outside: *make the app look like this more.* Read against a shot
+  of ours at the same size, the bones already agree — three columns in the same
+  order, same brand, same ground, WhatsApp as the one action. The gap is
+  surface: it wraps the choices in a **card** with numbered sections `01`–`04`
+  and a four-step indicator, opens all four at once, shows a spec **table**
+  where we show a sentence of middots, prints a real headline, and puts four
+  trust badges at the foot. Five staged commits, look-only.
+  ⚠ **Three of its ideas do not survive contact with the product.** There is no
+  3D model to spin, and `PLAN.md` picked a square-on elevation because that is
+  what the workshop builds from — so the viewer bar ships with two icons, not
+  three. Free ± centimetre steppers cannot exist while the short code packs
+  size as an **index into a list**: there is no index for 97 cm, and allowing
+  one costs a `VERSION` bump. And it deletes the visible `DM-` code, which is
+  how an order gets taken down a telephone; the save button goes BESIDE it.
+  ⚠ **Decisions taken from outside, so they are not re-litigated:** the send
+  button stays WhatsApp green (recognised without reading); desktop opens all
+  four sections but a **phone keeps the accordion** — all-open on 390 px puts
+  the send button two screens under the fold, the exact fault the accordion was
+  built to fix; no new tile artwork and no live per-option previews, since the
+  tiles already carry glyphs and the effort belongs on the one door in the
+  stage; all four trust badges are true and all four ship.
+  ⚠ **Size ranges ship EMPTY.** The tiles are meant to print the width band
+  each size serves. The one band offered — "60 to 98 is standard" — cannot be
+  right as stated, because the catalog draws `צרה` at 800 mm, inside it. Two
+  overlapping bands are worse than none: a customer chooses wrong and is
+  confident about it. `ASK-PERETZ.md` §8 asks for all six. Until they come back
+  the tiles show only the name. Same reflex as every price being `PLACEHOLDER`.
+  ⚠ **The finish tabs are held back for the same reason** — all seventeen of
+  our colours are solid `D` codes off one chart, so `גימור מתכתי` and `דמוי עץ`
+  would open on nothing. Tabs with two empty panes are worse than no tabs.
+  `ASK-PERETZ.md` §9.
+
+- **`README.md` — how to open the app without clicking a link.** Asked from
+  outside, in those words, which is what a repository with no README earns.
+  Three routes: GitHub Pages with the settings path spelled out (this branch IS
+  the default branch, and `.nojekyll` is committed and not optional);
+  **Download ZIP → unzip → double-click `index.html`**; and `git clone`.
+  ⚠ **Verified, not assumed:** `index.html`, `css/app.css` and
+  `assets/bundle.js` copied ALONE into an empty folder and opened over `file://`
+  render the door, the price, the code and the WhatsApp link with an empty
+  console. That is **260 KB of a 184 MB checkout** — `research/` is 63 M and
+  `screenshots/` 138 M — so the three files are named explicitly. They fit in a
+  WhatsApp message or on a memory stick, which is how the owner will actually
+  carry this into a customer's living room.
+  ⚠ It also records WHY `file://` works — `PLAN.md` §8.1 requires it, so
+  `build.mjs` flattens the modules into one classic script — and the
+  consequence: **a change in `js/` is invisible until `npm run build`.**
+
 - **A rotated grip was refused where it fits, and every drop left a grey box on
   the door.** Two reports, one screenshot.
   ⚠ **`gripFeet` ignored the rotation.** The Shiran branch added in the entry
