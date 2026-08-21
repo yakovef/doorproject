@@ -23,6 +23,59 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-21 05:51 UTC — run 12: nothing worth changing. Audited my own fix from both sides
+
+**Looked at:** nothing new had been pushed, so the first job was the one I owed
+— run 11's fix was a broad `!important`, and I had only ever tested the half
+that suits me. Then `corpus-links.md`, the artefact that hands Peretz his own
+doors.
+
+**Instruments:** test ✓ (2,763,815) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`) · recreate ✓ · shot ✓ · corpus ✓. Tree stays
+clean through all of them, so every sheet family is current.
+
+**Changed:** nothing.
+
+**1. `[hidden] { display: none !important }` checked in the OTHER direction.**
+Last run I proved it hides what should be hidden. A rule that broad can fail
+the opposite way — something that never comes back — and that failure is just
+as silent. So every element the page toggles was driven into its visible state
+and asked for its box:
+
+    placeholder-note  390x58    notice (repaired link)  390x37
+    grip-bar          208x44    toast (after a repair)  358x45
+    dock              390x67    sect__body opened       358x365
+    grip-home (moved) 104x44    field__body opened      348x243
+
+and the two that read `display: none` are the two that should: `grip-home` on a
+door nobody dragged, and a `.tile__why` on a tile that is not blocked. The one
+case worth naming separately, because CLAUDE.md requires it: a blocked tile
+still **says why** — six blocked details, each 99×30 with its sentence, against
+0×0 on the two that are free. The rule does not over-reach.
+
+**2. All thirty links in `corpus-links.md` open the door their row names.**
+That file exists to be handed to Peretz — *open a few and tell us what is
+wrong* — so a row whose link arrives repaired would have him reporting a fault
+that is ours, about a door he did not build. Parsed all thirty: no notice, and
+no field differs from what the query asked for. Sound.
+
+**3. `npm run corpus` runs clean** and its residuals are its own report of
+known catalogue gaps — colour ΔE 2.8 to 12.6 across the thirty, which is the
+band `449d20b` measured when it made the classification read the family as well
+as the hex. Not a fault, and deliberately not interpreted further: reading a
+tool's residual scale by guessing is how the last four false alarms started.
+
+**Verified visually:** the phone shows one button in the grip bar now, not two.
+Run 11's ghost is gone where it was most visible.
+
+**Left alone deliberately:** the transom and classical-composition backlog, and
+the three that need Peretz — the hardware finish, the three off-chart colours,
+and every price.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-21 01:03 UTC — run 11: I broke `hidden` in run 8, and a ghost button has been on every page load since
 
 **Looked at:** the two commits since — the keyboard test and the sheet-stamp
