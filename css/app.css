@@ -355,7 +355,21 @@ body {
    around it, and it was reported from the outside as the hit box being huge.
    The pad still grows, because a finger still needs it; the ring is drawn on a
    second rect that is the handle's own size and is never grown. */
-[data-hw="handle"].grip-live:focus-visible { outline: none; }
+/* ⚠ `:focus`, NOT `:focus-visible`, and that one word was the whole of the
+   "lines left behind" report.
+   Dropping a drag focuses the handle so a keyboard user keeps their place —
+   and a MOUSE drop is plain `:focus`, never `:focus-visible`. So this rule did
+   not apply, Chromium painted its own `outline: auto` on the group, and an
+   outline traces whichever child reaches furthest: the touch pad, grown to
+   44 css pixels. On a rotated Shiran that is a box 135 x 45 round art that is
+   135 x 24, so its top and bottom edges show as two grey lines above and below
+   the handle — and they appear after every drop, at whatever position the
+   handle was left in.
+   Same fault as the original "the hit box shows as huge", fixed for the
+   keyboard case and left standing for the pointer case. The browser's ring is
+   off in BOTH states now; ours is drawn only when `:focus-visible` says a
+   focus indicator is wanted, which is what that pseudo-class is for. */
+[data-hw="handle"].grip-live:focus { outline: none; }
 [data-hw="handle"].grip-live:focus-visible [data-chrome="focus"] {
   stroke: var(--accent); stroke-width: 3; vector-effect: non-scaling-stroke;
 }

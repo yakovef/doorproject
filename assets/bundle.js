@@ -1748,23 +1748,20 @@ ${body}
     const p = place || gripAt(state2);
     const cx = hingeLeftOf(state2) ? leafW - p.x : p.x;
     const cy = p.y;
+    const along = (offsets, r) => offsets.map((d) => p.rot === 90 ? { x: cx + d, y: cy, r } : { x: cx, y: cy + d, r });
     if (handle.style === "grab") return [];
     if (handle.style === "shiran") {
       const H = SHIRAN.h(leafH);
-      const r2 = H / 5.49 * SHIRAN.disc / 2;
-      return SHIRAN.fix.map((t) => ({ x: cx, y: cy - H / 2 + H * t, r: r2 }));
+      const r = H / 5.49 * SHIRAN.disc / 2;
+      return along(SHIRAN.fix.map((t) => -H / 2 + H * t), r);
     }
     if (handle.style !== "bar") {
       const f = handleFootprint(handle, leafH);
       return [{ x: cx, y: cy, r: Math.max(f.out, f.in), long: f.vy }];
     }
     const half = barHalf(handle.len, leafH, gripPanelled(state2, p));
-    const r = bossReach(handle);
     const spec = BARS[handle.bar] || BARS.idan;
-    return spec.fix.t.map((t) => {
-      const along = -half + half * 2 * t;
-      return p.rot === 90 ? { x: cx + along, y: cy, r } : { x: cx, y: cy + along, r };
-    });
+    return along(spec.fix.t.map((t) => -half + half * 2 * t), bossReach(handle));
   }
   function gripPlacement(state2, place = null) {
     const size = SIZES[state2.size] || SIZES.standard;

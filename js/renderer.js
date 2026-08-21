@@ -2086,6 +2086,22 @@ export function gripFeet(state, place = null) {
   const cx = hingeLeftOf(state) ? leafW - p.x : p.x;
   const cy = p.y;
 
+  /**
+   * Fixings at these distances ALONG THE GRIP'S OWN AXIS, turned with it.
+   *
+   * ⚠ A grip laid on its side has its mounts left and right of centre, not
+   * above and below, and forgetting that is a false REFUSAL rather than a
+   * false permission — the worst way round, because the customer is told they
+   * cannot build something they can. The Shiran was added here without it and
+   * a rotated pull under a window came up red with its discs nowhere near the
+   * moulding. Reported from the outside: "now i cant put it here although i
+   * should be able to".
+   * The bar branch had this right from the start and the two now share one
+   * line, so the next fixing added cannot get it wrong on its own.
+   */
+  const along = (offsets, r) => offsets.map(d =>
+    p.rot === 90 ? { x: cx + d, y: cy, r } : { x: cx, y: cy + d, r });
+
   /* THE HORIZONTAL BOW HAS NO FEET WE CAN PLACE. It is centred on the LEAF
      rather than on the grip's axis — `grabHandle` reads `centreX` and ignores
      the x we hand it — so its two fixings are near the stiles wherever the
@@ -2107,7 +2123,7 @@ export function gripFeet(state, place = null) {
   if (handle.style === 'shiran') {
     const H = SHIRAN.h(leafH);
     const r = (H / 5.49) * SHIRAN.disc / 2;
-    return SHIRAN.fix.map(t => ({ x: cx, y: cy - H / 2 + H * t, r }));
+    return along(SHIRAN.fix.map(t => -H / 2 + H * t), r);
   }
 
   if (handle.style !== 'bar') {
@@ -2122,12 +2138,8 @@ export function gripFeet(state, place = null) {
     return [{ x: cx, y: cy, r: Math.max(f.out, f.in), long: f.vy }];
   }
   const half = barHalf(handle.len, leafH, gripPanelled(state, p));
-  const r = bossReach(handle);
   const spec = BARS[handle.bar] || BARS.idan;
-  return spec.fix.t.map(t => {
-    const along = -half + half * 2 * t;
-    return p.rot === 90 ? { x: cx + along, y: cy, r } : { x: cx, y: cy + along, r };
-  });
+  return along(spec.fix.t.map(t => -half + half * 2 * t), bossReach(handle));
 }
 
 /**

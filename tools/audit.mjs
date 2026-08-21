@@ -17,6 +17,7 @@
  */
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
+import { load } from './imglib.mjs';
 import { DEFAULTS, encodeCode } from '../js/url-state.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
@@ -273,9 +274,18 @@ for (const v of VIEWS) {
        GRAB bar, which is the case that goes wrong first because it is the one
        grip centred on the leaf rather than hung off the stile — a pad laid out
        symmetrically about the grip's axis lands beside it, not on it. */
-    for (const hd of ['right-in', 'left-in']) {
-      await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=none&n=grab`
-                 + `&k=coral&d=plain&s=standard&h=${hd}`);
+    /* ⚠ AND THE ROTATED PULL, which is the case that was still wrong after the
+       grab bar was fixed. A grip laid on its side has a pad 135 x 45 css px
+       round art that is 135 x 24, so the pad's own edges show above and below
+       it — which is what the browser's `outline: auto` traced. */
+    const RINGS = [
+      'c=rb-9016d&w=none&n=grab&k=coral&d=plain&s=standard&h=right-in',
+      'c=rb-9016d&w=none&n=grab&k=coral&d=plain&s=standard&h=left-in',
+      'c=rb-0097d&w=rect&n=shiran&k=cylinder&d=plain&s=standard&h=right-in&gp=285,1280,90',
+      'c=rb-0097d&w=rect&n=shiran&k=cylinder&d=plain&s=standard&h=right-in',
+    ];
+    for (const hd of RINGS) {
+      await p.goto(`file://${process.cwd()}/index.html?${hd}`);
       await p.waitForTimeout(250);
       const m = await p.evaluate(() => {
         const g = document.querySelector('.door-svg [data-hw="handle"]');
@@ -304,6 +314,19 @@ for (const v of VIEWS) {
           || m.ring[1] > m.art[1] + m.art[3] || m.ring[1] + m.ring[3] < m.art[1]) {
         fault(v.name, `[${hd}] the focus ring does not overlap the handle it rings`);
       }
+
+      /* ⚠ THE BROWSER'S OWN OUTLINE IS NOT CHECKED HERE, and that is
+         deliberate. `outline: auto` on the group traces whichever child
+         reaches furthest — the touch pad — so the ring can be perfect above
+         and the customer still see a box; that is precisely the "lines left
+         behind" fault. But it cannot be reproduced from a harness: Chromium
+         reports focus-visible for a scripted `focus()` AND for a synthesised
+         mouse press, so a check written here reads the state that was already
+         suppressed and passes while the real one is broken. It did exactly
+         that on the first attempt.
+         A check that cannot fire is worse than no check, because it reads as a
+         live rule. What catches this instead is the pixel comparison after a
+         real drag, further down — which found it at 1,530 pixels. */
     }
     await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=tallwin&n=idan`
                + '&k=cylinder&d=panel&s=standard&h=right-in');
@@ -345,6 +368,59 @@ for (const v of VIEWS) {
       fault(v.name, 'a cancelled drag left the handle displaced');
     }
     if (!faults) console.log('  the handle drags, and a cancelled drag changes nothing');
+  }
+
+  /* ── A DRAG LEAVES NOTHING BEHIND ─────────────────────────────────
+     The strongest form of the check above, and the one that would have caught
+     all three reports of a visible box round the handle: drag it about, then
+     load the RESULTING LINK fresh and compare the two pictures pixel for
+     pixel. A shared link is the door; if the screen after a drag is not the
+     screen that link produces, something is on the door that is not part of
+     it.
+     It found the browser's own focus outline sitting round the touch pad after
+     every drop — 1,530 pixels, four grey lines above and below the handle.
+     Once at one viewport: this is about the drag, not the layout, and it costs
+     two navigations and two screenshots. */
+  if (v.name === 'laptop') {
+    await p.goto(`file://${process.cwd()}/index.html`
+               + '?c=rb-0097d&w=rect&g=none&n=shiran&k=cylinder&d=plain&s=standard&h=right-in');
+    await p.waitForTimeout(350);
+    await p.click('#grip-rot');
+    await p.waitForTimeout(300);
+    const leaf = await p.$eval('#leaf rect', e => {
+      const r = e.getBoundingClientRect();
+      return { x: Math.round(r.x), y: Math.round(r.y),
+               width: Math.round(r.width), height: Math.round(r.height) };
+    });
+    const gb = await (await p.$('[data-hw="handle"]')).boundingBox();
+    const cx = gb.x + gb.width / 2, cy = gb.y + gb.height / 2;
+    await p.mouse.move(cx, cy);
+    await p.mouse.down();
+    for (const d of [-40, -120, -200, -120, -30]) {
+      await p.mouse.move(cx, cy + d);
+      await p.waitForTimeout(60);
+    }
+    await p.mouse.up();
+    await p.waitForTimeout(450);
+    const url = p.url();
+    await p.screenshot({ path: '/tmp/audit-dragged.png', clip: leaf });
+    await p.goto(url);
+    await p.waitForTimeout(500);
+    await p.screenshot({ path: '/tmp/audit-fresh.png', clip: leaf });
+
+    const A = load('/tmp/audit-dragged.png'), B = load('/tmp/audit-fresh.png');
+    let diff = 0;
+    for (let i = 0; i < Math.min(A.d.length, B.d.length); i += 4) {
+      if (Math.abs(A.d[i] - B.d[i]) + Math.abs(A.d[i + 1] - B.d[i + 1])
+        + Math.abs(A.d[i + 2] - B.d[i + 2]) > 18) diff++;
+    }
+    /* A hair of slack for antialiasing on the handle's own edges; the fault
+       this exists for was fifteen hundred pixels. */
+    if (diff > 120) {
+      fault(v.name, `after a drag the door differs from a fresh load of its own link `
+                  + `by ${diff} pixels — something is on the door that the link does not carry`);
+    }
+    if (!faults) console.log('  and a drag leaves the door exactly as its own link draws it');
   }
 
   /* ── THE WHOLE THING FROM THE KEYBOARD ────────────────────────────

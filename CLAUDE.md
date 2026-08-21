@@ -21,6 +21,33 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **A rotated grip was refused where it fits, and every drop left a grey box on
+  the door.** Two reports, one screenshot.
+  ⚠ **`gripFeet` ignored the rotation.** The Shiran branch added in the entry
+  below always laid its two fixings above and below the centre, so a pull laid
+  on its side had its discs DRAWN left and right and CHECKED up and down —
+  against a moulding they were nowhere near. The bar branch had had this right
+  from the start; they share one `along()` now, so the next fixing added cannot
+  get it wrong on its own. A false refusal is the worse direction: the customer
+  is told they cannot build something they can.
+  ⚠ **And the "lines left behind" were the browser's own focus ring.** Dropping
+  a drag focuses the handle so a keyboard user keeps their place, and a MOUSE
+  drop is plain `:focus`, never `:focus-visible` — so the rule suppressing
+  Chromium's `outline: auto` did not apply, and an outline traces whichever
+  child reaches furthest: the touch pad, grown to 44 px. On a rotated Shiran
+  that is a box 135x45 round art 135x24, and its top and bottom edges read as
+  grey lines above and below the handle. The same fault as "the hit box shows
+  as huge", fixed for the keyboard case two rounds ago and left standing for
+  the pointer case. One word: `:focus`, not `:focus-visible`.
+  ⚠ **The check that catches it is a PIXEL COMPARISON**, and the obvious check
+  is one that cannot fire. Reading the computed outline from a harness passes
+  either way — Chromium reports focus-visible for a scripted `focus()` and for
+  a synthesised mouse press alike — so it reads the state that was already
+  suppressed. What works: drag the handle about, load the RESULTING LINK fresh,
+  compare the two pictures. A shared link is the door, so anything on screen
+  that the link does not carry is not part of it. It found this at 1,530
+  pixels, and it would have caught all three reports of a visible box.
+
 - **The rule was checking the one place the Shiran is not bolted.** "Why can i
   put the pull handle on that" — a screenshot with a rosette square on the
   window's moulding and the drag showing green.
