@@ -23,6 +23,74 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-21 20:50 UTC — run 15: reproduced the new audit's claims by hand. One of them is a thing I missed
+
+**Looked at:** `a2e6734`, which rewrote `REDESIGN.md` from a look plan into an
+audit — nine ways to build the wrong door. A plan that will cost a `VERSION`
+bump should not rest on numbers nobody re-derived, so this run reproduced the
+consequential ones independently.
+
+**Instruments:** test ✓ (2,763,765) · audit ✓ · profile ✓ · collide ✓ (base /
+`all`) · recreate ✓ · shot ✓. Tree clean.
+
+**Changed:** nothing. Verifying is the contribution here; the plan is the
+human's to execute, and two of its four mechanical findings turn on decisions
+that are explicitly not mine — the hardware finish, and what a thing costs.
+
+**1. The sidelight grille — CONFIRMED, and I am the reason it survived.**
+
+    standard  + rect  + iron  → charged ₪620   (one pane)
+    sidelight + none  + iron  → charged ₪620   (one pane)
+    sidelight + rect  + iron  → charged ₪620   (TWO panes)
+
+Run 13 measured this exact door and stopped one question short. I confirmed the
+drawing was coherent — `#glazing` 24→142 **and** `#side-leaf` 36→154, one design
+across every pane — wrote "the message is complete as written", and never asked
+what it charged. The drawing half was right and the half that matters was never
+looked at. That is the whole lesson of items 10–12 in CLAUDE.md §5 and I walked
+past it while quoting the neighbouring paragraph.
+⚠ What the second pane *should* cost is not mine: pricing it at 2× would be
+inventing a figure, which `AGENT.md` forbids in as many words.
+
+**2. No check character — CONFIRMED within sampling.** 400 buildable doors,
+every single-character substitution over the Crockford alphabet, 99,200 typos:
+
+    refused                    55.0%   (plan says 55.6)
+    decodes to the SAME door    6.0%   (6.0)
+    decodes to a DIFFERENT door 38.9%  (38.4)  ← silent
+      of those, identical price 20.0%  ("a fifth")
+
+`DM-M0000000 → DM-M1000000` is a different colour at the same ₪3,195: one
+misheard character, no warning, and the money does not disagree either. On the
+one artefact built to be read down a telephone. The premise holds.
+⚠ The remedy costs a `VERSION` bump and rests on "not one code has ever been
+issued" — a fact about the business, not the code. I cannot check it and will
+not assume it.
+
+**3. The finish on the lockset line — CONFIRMED mechanically:**
+
+    grip ella   + coral → מנעול וידית: קורל · פליז
+    grip idan   + coral → מנעול וידית: קורל · ניקל מוברש
+
+A brass grip makes the Coral lever print as brass. Whether that is wrong is the
+hardware-finish question, which is one of the three on `ASK-PERETZ.md` that I
+must not decide. Reported, not touched.
+
+**4. The dragged grip — substance right, phrasing off.** The code IS identical
+and that is deliberate: CLAUDE.md records it as the owner's son's instruction,
+and `npm test` asserts it. But `message()` is *not* "identical to the default
+door" — I diffed them, and line 11 differs, the `לצפייה:` link carrying `gp=`.
+Every human-readable line matches; only the link moves. So the finding is real
+as *no readable line names the position*, and belongs beside the recorded
+decision rather than being reversed by accident.
+
+**Left alone deliberately:** all nine findings, the five look stages, and the
+three that need Peretz.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-21 15:51 UTC — run 14: nothing worth changing. A redesign plan I am deliberately not starting
 
 **Looked at:** five human commits — the Shiran bolt rule and the handle that
