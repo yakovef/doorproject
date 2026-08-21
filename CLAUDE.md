@@ -21,38 +21,119 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
-- **`REDESIGN.md` — the visual pass, planned but not yet built.** A mockup
-  arrived from outside: *make the app look like this more.* Read against a shot
-  of ours at the same size, the bones already agree — three columns in the same
-  order, same brand, same ground, WhatsApp as the one action. The gap is
-  surface: it wraps the choices in a **card** with numbered sections `01`–`04`
-  and a four-step indicator, opens all four at once, shows a spec **table**
-  where we show a sentence of middots, prints a real headline, and puts four
-  trust badges at the foot. Five staged commits, look-only.
-  ⚠ **Three of its ideas do not survive contact with the product.** There is no
-  3D model to spin, and `PLAN.md` picked a square-on elevation because that is
-  what the workshop builds from — so the viewer bar ships with two icons, not
-  three. Free ± centimetre steppers cannot exist while the short code packs
-  size as an **index into a list**: there is no index for 97 cm, and allowing
-  one costs a `VERSION` bump. And it deletes the visible `DM-` code, which is
-  how an order gets taken down a telephone; the save button goes BESIDE it.
-  ⚠ **Decisions taken from outside, so they are not re-litigated:** the send
-  button stays WhatsApp green (recognised without reading); desktop opens all
-  four sections but a **phone keeps the accordion** — all-open on 390 px puts
-  the send button two screens under the fold, the exact fault the accordion was
-  built to fix; no new tile artwork and no live per-option previews, since the
-  tiles already carry glyphs and the effort belongs on the one door in the
-  stage; all four trust badges are true and all four ship.
-  ⚠ **Size ranges ship EMPTY.** The tiles are meant to print the width band
-  each size serves. The one band offered — "60 to 98 is standard" — cannot be
-  right as stated, because the catalog draws `צרה` at 800 mm, inside it. Two
-  overlapping bands are worse than none: a customer chooses wrong and is
-  confident about it. `ASK-PERETZ.md` §8 asks for all six. Until they come back
-  the tiles show only the name. Same reflex as every price being `PLACEHOLDER`.
-  ⚠ **The finish tabs are held back for the same reason** — all seventeen of
-  our colours are solid `D` codes off one chart, so `גימור מתכתי` and `דמוי עץ`
-  would open on nothing. Tabs with two empty panes are worse than no tabs.
-  `ASK-PERETZ.md` §9.
+- **`REDESIGN.md` REWRITTEN — the look plan was answering a smaller question
+  than the project has.** A mockup arrived from outside (*make the app look
+  like this more*) and the first draft answered it as five stages of CSS. It
+  was then re-read by fourteen agents and **every claim below was reproduced by
+  hand before it was written down.** The bones already agree with the mockup;
+  the gap is surface. But held against `PLAN.md` §0 — *an unambiguous order* —
+  the allocation is the finding: `renderer.js` 68 commits, `screenshots/` 76
+  (138 MB), **`share.js` 12.** ~0.9% of 2.76 M assertions ever read the thing
+  the plan calls the product. Nothing in the look plan would have found any of
+  what follows.
+  ⚠ **NINE WAYS TO BUILD THE WRONG DOOR, four mechanical, all verified.**
+  (1) `share.js:79` prints `effectiveFinish` on the LOCKSET line and
+  `catalog.js:530` defines it as the GRIP's finish — `ella`+`coral` emits
+  "קורל · פליז", a brass Coral, and Coral is a nickel lever. 18 of 90
+  grip×lockset pairs. The drawing agrees with the message, so proof-reading the
+  picture cannot catch it. §5 in its purest form, surviving the finish
+  withdrawal that was meant to kill it. (2) A sidelight with a leaf window
+  draws **282 paths against 150** and is charged once — ~₪620 of ironwork given
+  away per order, because `2781180` fixed the question and not the *count*.
+  (3) The message says `חלון: ללא חלון` then `סורג: ברזל מחושל`, and Peretz
+  must infer the panel from the size line. (4) **A dragged grip reaches the
+  long URL and NOTHING else** — `message()` is identical to the default door
+  and `encodeCode` returns `DM-M4040480` byte for byte, so two visibly
+  different doors share one code.
+  ⚠ **38.4% OF SINGLE-CHARACTER TYPOS DECODE TO A DIFFERENT VALID DOOR.**
+  99,200 trials: 55.6% refused, 6.0% same door, **38,053 silent wrong doors**,
+  21.9% of those at an identical price. Median ₪200, max ₪1,930 — on the one
+  artefact built for the telephone. `TOTAL_BITS = 40`, `PAD_BITS = 4`: four
+  bits are **already reserved and already transmitted and never checked**. A
+  4-bit check cuts it to ~2.4% at zero extra characters. It needs a VERSION
+  bump, and **no code has ever been issued** — free today, impossible later.
+  ⚠ **THREE INSTRUMENTS ARE LYING**, all breaking §7 one level up: they hold a
+  *selector* or a *sampling method*, not a number. `profile.mjs:81` reads ONE
+  PIXEL per point at `TOL = 0.09`, and run over the corpus **30 of 31 real
+  doors fail it** — the tolerance is 2–6× tighter than the photographs' own
+  spread, so our drawing passes *because it is smoother than any real door*.
+  That is the mechanism that has held the leaf flat, and the file records
+  `grain`/`drift` being halved and half-restored under it. `glass.mjs:122`
+  selects `[data-pane] rect`, which is the moulding's 850×2050 wash rect, not
+  the 357×902 pane — every glass number it has printed is meaningless.
+  `mottle`'s target is **53% scene lighting**: remove a smooth dome and the
+  corpus median halves, and the doors we are trying to be sit at 0.014–0.028,
+  not the 0.089–0.155 outliers. Honest gap 2–4×, not 7–100×.
+  ⚠ **`inFinish` DESTROYS 56% OF THE MEASURED RANGE, ON THE ONLY FINISH WE
+  SHIP.** `barTube`'s nine stops were derived from d035 and d065 at 3.64:1,
+  asymmetric, a cylinder. What ships is `159 164 202 249 231 202 164 159 159` —
+  **1.57:1, symmetric, five distinct values**, with two ramp entries provably
+  unreachable by any input. The comment says "the profile is the valuable part
+  and must survive". Installed bars run median 5.46; the manufacturer's own
+  studio shot runs 5.10. Fix is ~4 lines: interpolate, do not bucket.
+  ⚠ **The handle photographs settle the drawing-system question, and not the
+  obvious way.** `research/handles/rb/` has 36 cut-out product shots. Do NOT
+  composite them: the Idan bar has **two specular peaks** (t=0.11, 0.44 — a
+  two-softbox setup) where seven of ten installed bars have one at t≈0.54. And
+  they are not images: silhouette edges vertical to **0.00 px SD**, every row
+  matching the mid row within 1–4% — *a pull bar's photograph is 28 numbers,
+  and a cross-section is exactly what a `linearGradient` is*. **THE RULE: the
+  product photograph is the authority on the METAL, the corpus is the authority
+  on the LIGHT.** Bonus fixture: `shahar` and `shahar-black` differ in 0 alpha
+  pixels of 208,638 and map by luminance at RMS 0.43/255 — one photograph and
+  the manufacturer's own remap, which is what `inFinish` exists to do.
+  ⚠ **Four rival drawing systems were built and judged by three lenses, and all
+  three ranked them identically**: hybrid > svg-deeper > raster > 3D. Verdict:
+  adopt none whole. Raster proved `getImageData`/`toDataURL` **throw
+  SecurityError over `file://`** (every canvas-recolour design is dead) and that
+  real door paint IS diffuse (0.75 ΔE94 for a pure luminance map over 31
+  leaves) — but +36% over budget and 13 binaries to keep fresh. 3D produced the
+  best single result in the exercise (**a two-parameter physical point light
+  beats the sixteen hand-tuned `FALLOFF` constants**, light-family worst row
+  0.030 vs 0.087, ambient fitting to zero) and is still rejected: it strands
+  `collide.mjs`'s 24 `getBBox` calls, and its own `--disable-gpu` measurement
+  forces a permanent second renderer, so its headline byte saving cannot
+  happen. **Take its light model, not its renderer.**
+  ⚠ **61% of buildable doors blow REALISM.md's own 40 KB gate** (276 of 450),
+  worst 374,160 bytes — but **118,634 of those bytes are the same path written
+  again**: 840 long `d=` attributes, 344 distinct, 2.44× each, because `ink()`
+  emits three times. `<defs><path id>` + `<use>` recovers a third of the worst
+  door without touching a coordinate. The size argument against SVG is a bug.
+  ⚠ **With JS off — or ANY throw in the unguarded `init()` — the page looks
+  finished and does nothing**: empty stage, `—` for price and code, zero
+  choices, and **both full-width green send buttons at `href="#"`**. No
+  `<noscript>`. And `renderer.js:4974` references `GLAZINGS`, deleted with the
+  axis; it is a landmine, NOT live, because `fromQuery` strips `z=`.
+  ⚠ **The grip controls are unusable at 1100–1200 px right now.** `audit`
+  visits 834 then 1280; the three-column layout starts at 1100. At 1100 with a
+  sidelight the grip bar is **0 px** and its buttons 22 px against a 44 px
+  floor. Two lines in `VIEWS`. A regression of a change made by request two
+  rounds ago, invisible to every instrument.
+  ⚠ **The mockup's four-step indicator has no honest source.** `nowLabel`
+  (`app.js:379`) falls back to `list[0]`, so `sectionLabel` can never be empty
+  and **any state-derived indicator reads 4/4 on arrival**. That fallback is
+  deliberate — "no pull handle" is a decision the door carries. So the stepper
+  becomes a NAVIGATOR, not a progress bar.
+  ⚠ **The card is free; the tokens are not.** `background+radius+margin` on
+  `.panel--choose` itself moves the door **zero pixels** at 1100/1280/1536. But
+  `--rule` is 1.28:1 on paper and used 18×, and `app.css:546` hard-codes the
+  swatch-ring surface, so a white card gets invisible dividers and 17 beige
+  haloes. One `--surface` token is the highest-value line in the look plan.
+  And `openSection` sets `on = sec.key === key` for EVERY section, so
+  open-on-desktop makes any heading click collapse all four.
+  ⚠ **Decisions taken from outside, not to be re-litigated:** green send
+  button; desktop opens all four but a phone keeps the accordion; no new tile
+  artwork and no per-option previews; all four trust badges true. Size bands
+  ship EMPTY — "60–98 standard" swallows `צרה` at 800 mm, and overlapping bands
+  make a customer choose wrong and feel certain (`ASK-PERETZ.md` §8). Finish
+  tabs held back — all 17 colours are solid `D` codes, so two panes open on
+  nothing (§9).
+  ⚠ **And `catalog.js:394` claims a test that does not exist** — "npm test
+  asserts every id here has a photograph behind it"; `grep -rn "\.doors" test/`
+  returns nothing. A false claim of coverage is worse than none, because it
+  stops the next person looking. Same shape: `encodeCode` MASKS on overflow, so
+  a 17th `DETAILS` entry silently encodes as index 0 — and `units.mjs:66` pins
+  `detail: 'plain'`, so the sweep never varies the field nearest its ceiling.
 
 - **`README.md` — how to open the app without clicking a link.** Asked from
   outside, in those words, which is what a repository with no README earns.
