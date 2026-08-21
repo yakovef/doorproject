@@ -781,7 +781,14 @@ function fitStage() {
   if (frame) {
     const f = frame.getBoundingClientRect();
     const wall = Math.max(0, Math.min(f.x - box.x, box.x + box.width - (f.x + f.width)));
-    $('.stage-wrap').style.setProperty('--wall', `${Math.round(wall)}px`);
+    /* ⚠ `--wall-gap`, NOT `--wall`. `--wall` is the wall's COLOUR and has been
+       since the first stylesheet, and the SVG's own backdrop is painted with
+       `fill="var(--wall)"` — so setting it to a pixel length on `.stage-wrap`
+       cascaded into the drawing, made the fill invalid, and every door came up
+       on a BLACK ground. Reported from the outside within minutes.
+       A custom property set from script inherits into everything below it,
+       including markup this file never looks at. Name one for what it is. */
+    $('.stage-wrap').style.setProperty('--wall-gap', `${Math.round(wall)}px`);
   }
 }
 

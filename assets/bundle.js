@@ -4487,7 +4487,7 @@ ${body}
     if (frame) {
       const f = frame.getBoundingClientRect();
       const wall = Math.max(0, Math.min(f.x - box.x, box.x + box.width - (f.x + f.width)));
-      $(".stage-wrap").style.setProperty("--wall", `${Math.round(wall)}px`);
+      $(".stage-wrap").style.setProperty("--wall-gap", `${Math.round(wall)}px`);
     }
   }
   var liveTimer = null;

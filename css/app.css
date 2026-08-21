@@ -308,14 +308,14 @@ body {
    puts them on the other side without a second rule. */
 .grip-bar {
   position: absolute;
-  /* `--wall` is the measured gap between the stage's edge and the door's
+  /* `--wall-gap` is the measured gap between the stage's edge and the door's
      casing, published by `fitStage` on every re-fit. It has to be measured:
      the door's drawn width changes with the SIZE — a sidelight is far wider
      than a narrow leaf — and again with every viewport, so a hand-picked
      width fits a standard leaf on a laptop and lands on the frame on a phone.
      The fallback is for the instant before the first paint. */
   inset-inline-start: 8px;
-  inline-size: min(calc(var(--wall, 9.5rem) - 20px), 9.5rem);
+  inline-size: min(calc(var(--wall-gap, 9.5rem) - 20px), 9.5rem);
   inset-block-start: 50%;
   transform: translateY(-50%);
   z-index: 2;

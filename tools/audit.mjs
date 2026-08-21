@@ -75,6 +75,29 @@ for (const v of VIEWS) {
     visibleOptions: [...document.querySelectorAll('[role="radio"]')]
       .filter(e => e.getBoundingClientRect().height > 0).length,
   }));
+  /* THE DRAWING IS PAINTED ON THE WALL, and it can stop being.
+     `#backdrop` is filled with `fill="var(--wall)"`, so any script that sets
+     `--wall` to something that is not a colour makes the fill invalid and the
+     backdrop falls back to the initial value — BLACK. That happened: the grip
+     controls needed the measured gap beside the door, `fitStage` published it
+     as `--wall`, and a name that had meant the wall's COLOUR since the first
+     stylesheet started meaning a pixel length. Every door came up on a black
+     ground. A custom property set from script inherits into everything below
+     it, including markup the setter never looks at.
+     Asked of the COMPUTED fill rather than of the variable, because the
+     variable being wrong is only one of the ways this can go. */
+  const ground = await p.evaluate(() => {
+    const bd = document.querySelector('.door-svg #backdrop rect');
+    if (!bd) return null;
+    const f = getComputedStyle(bd).fill;
+    const m = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/.exec(f);
+    return { fill: f, lum: m ? (+m[1] * 0.2126 + +m[2] * 0.7152 + +m[3] * 0.0722) : null };
+  });
+  if (!ground) fault(v.name, 'the drawing has no backdrop to paint');
+  else if (ground.lum == null || ground.lum < 60) {
+    fault(v.name, `the drawing's backdrop computes to ${ground.fill} — the wall is unpainted`);
+  }
+
   if (!shut.sections) fault(v.name, 'no sections rendered');
   if (shut.sections > 4) fault(v.name, `${shut.sections} top-level sections — the fold is meant to be short`);
   if (shut.openSections) fault(v.name, `${shut.openSections} sections already open on load`);
