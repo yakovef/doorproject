@@ -82,6 +82,21 @@ for (const v of VIEWS) {
   if (shut.visibleHeads) fault(v.name, `${shut.visibleHeads} category rows visible before a section was opened`);
   if (shut.visibleOptions) fault(v.name, `${shut.visibleOptions} options visible before anything was opened`);
 
+  /* WHAT IS HIDDEN MUST ACTUALLY BE GONE.
+     `hidden` is only `display: none` in the UA stylesheet, so any author rule
+     setting `display` on the element silently beats it. That happened: giving
+     `.grip-bar__btn` `display: inline-flex` left `#grip-home` rendered at
+     104x44 on every fresh load, visible and clickable, offering to undo a drag
+     nobody had made. Reading `el.hidden` says `true` throughout — the property
+     is not the picture — so this asks the BOX, which is the only thing a
+     customer sees. Run before the bodies below are force-opened, or the
+     unhiding this check exists to detect is done by the audit itself. */
+  const ghosts = await p.evaluate(() => [...document.querySelectorAll('[hidden]')]
+    .map(el => ({ el, r: el.getBoundingClientRect() }))
+    .filter(({ r }) => r.width > 0 && r.height > 0)
+    .map(({ el, r }) => `${el.id || el.className || el.tagName} ${Math.round(r.width)}x${Math.round(r.height)}`));
+  ghosts.forEach(g => fault(v.name, `marked hidden but still drawn: ${g}`));
+
   /* Tap targets, measured with every body OPEN at BOTH levels — a hidden
      element has no size, so measuring them closed would pass everything by
      measuring nothing. */

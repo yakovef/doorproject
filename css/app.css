@@ -31,6 +31,21 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* THE `hidden` ATTRIBUTE HAS TO WIN.
+   It is only `display: none` in the browser's own stylesheet, so ANY author
+   rule that sets `display` on the same element beats it — and the page leans
+   on `hidden` for two things it genuinely must not show: the dock when the
+   send card is already on screen, and the grip bar's "back to original"
+   button on a door nobody has dragged.
+   It was defeated exactly that way. `.grip-bar__btn` was given
+   `display: inline-flex` to centre its label after the button grew to 44 px,
+   and from then on `#grip-home` sat there on every fresh load — 104x44,
+   visible, and clickable — offering to undo a move that had not happened.
+   Nothing caught it: `el.hidden` still read `true`, which is the property and
+   not the picture. So the attribute is made to mean what the markup assumes,
+   once, here, rather than being re-defended by every rule that sets display. */
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {

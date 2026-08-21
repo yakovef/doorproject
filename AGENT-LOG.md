@@ -23,6 +23,68 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-21 01:03 UTC — run 11: I broke `hidden` in run 8, and a ghost button has been on every page load since
+
+**Looked at:** the two commits since — the keyboard test and the sheet-stamp
+guard, both built from gaps these entries left. Page at 1280, all four
+sections, phone landscape, and the new `npm run fuzz`.
+
+**Instruments:** test ✓ (2,763,815) · audit ✓ (5 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`) · recreate ✓ · shot ✓ · fuzz ✓ (30,000
+designs, 1,800 clicks). Green before the change and after it.
+
+**Changed:** `[hidden] { display: none !important; }` in the reset, and an
+audit check that nothing carrying `hidden` is still drawn. CSS only — the
+bundle is untouched; `index.html` carries the stylesheet's cache stamp and the
+`shot` sheets move because the ghost is gone from them.
+
+**The fault, and it is mine.** Run 8 gave `.grip-bar__btn`
+`display: inline-flex` to centre its label after the button grew to 44 px.
+`hidden` is only `display: none` in the browser's own stylesheet, so any author
+rule setting `display` on the same element beats it. From that commit onward
+**`#grip-home` — "למקום המקורי", back to original position — was rendered at
+104×44 on every fresh page load, visible and clickable**, offering to undo a
+drag nobody had made. Three runs, and it was in the screenshots I took each
+time.
+
+Two reasons nothing caught it, both worth keeping:
+
+- **`el.hidden` still reads `true`.** The property is not the picture. My own
+  first probe this run asked exactly that and came back clean; only asking the
+  BOX — 104×44, `display: flex`, `elementFromPoint` landing on the button —
+  showed it. That is the repo's oldest lesson wearing yet another costume:
+  never ask the declaration when you can ask the drawing.
+- **The dock was fine**, which is what made it look fine. Nothing overrides the
+  dock's display, so `hidden` works there, and the one place it was defeated
+  was the one place a rule had been added.
+
+Fixed at the root rather than at the symptom: the attribute is made to mean
+what the markup assumes, once, in the reset, instead of being re-defended by
+every future rule that sets `display`. Verified both ways — `display: none`,
+0×0 on a fresh load; back to `flex`, 104×44 after a drag.
+
+**Guarded.** The audit now asks every `[hidden]` element for its box, before it
+force-opens the panel bodies (or it would be detecting its own unhiding).
+Backing the CSS line out fails it five times, once per viewport, naming
+`grip-home 104x44`.
+
+**Also checked, sound:**
+- **The sheet-stamp guard is live.** Perturbed one family's hash: `npm test`
+  fails with *"screenshots from npm run against were made from a different
+  renderer… Run: npm run sheets"*. It does what it says.
+- **The pinned stage in landscape.** All four sections reach fully uncovered
+  and clickable at 844×390 and 568×320. My first pass said otherwise; it had
+  used `scrollIntoView({block:'center'})`, which parks a row under a stage
+  pinned to the top by construction. Asking what a person scrolling can reach
+  gives 69/69 px free on every section.
+
+**Left alone deliberately:** the transom and classical-composition backlog, and
+the three that need Peretz.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-20 20:49 UTC — run 10: the ten comparison sheets still showed a threshold we stopped drawing
 
 **Looked at:** six human commits — the sidelight grille pricing, the pinned
