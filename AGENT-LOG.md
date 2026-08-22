@@ -23,6 +23,73 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-22 00:55 UTC — run 16: `npm run glass` was measuring the whole leaf and calling it the glass
+
+**Looked at:** the audit's §2, "the instruments are lying" — three tools said to
+hold a *selector* or a *sampling method* rather than a number. Of its nine
+findings this is the only family that is mine: a tool measuring the wrong
+object is not a price, not the wire format, not the hardware finish, and
+fixing one changes no pixel of the site.
+
+**Instruments:** test ✓ (2,763,765) · audit ✓ · profile ✓ · collide ✓ (base /
+`all` / `boxes`) · recreate ✓ · shot ✓. Only `tools/glass.mjs` differs; the
+bundle rebuilds unchanged.
+
+**Changed:** `tools/glass.mjs` selects the pane instead of whatever rect comes
+first, and throws by name if it cannot find it.
+
+**Verified before touching it**, because the last five things I was sure of
+were my own probe. `[data-pane] rect` returns rect 0, and the rects inside that
+group are:
+
+    rect 0  url(#leafShade)   850 x 2050    ← what the tool measured
+    rect 1  url(#keyWash)     850 x 2050
+    rect 2  url(#bloom)       850 x 2050
+    rect 3  url(#glass)       357 x 1415    ← the pane
+
+The whole leaf, against a pane 357 wide. `geo.W` is what defines the five
+bands, so every tone and spread this tool has printed was sampled across the
+door: the moulding's bright bead and dark quirk set the min and max that
+*become* `spread`, and the lowest band sat below the glass on bare paint.
+
+**What it cost, measured both ways:**
+
+    before (the leaf)  tone 1.03 0.81 0.74 0.71 1.00   spread 0.72 0.71 0.70 0.66 0.24
+    after  (the pane)  tone 0.74 0.64 0.55 0.51 0.51   spread 0.18 0.14 0.15 0.12 0.07
+    photographs        tone 0.92 0.65 0.79 0.68 0.54   spread 1.13 1.02 1.08 1.35 1.28
+
+The tool had been **flattering the drawing four times over** on the number it
+exists to report, and its verdict moved from "1× too flat in the middle and 5×
+at the foot" to 7× and 17×.
+
+**Corroboration that this is a restoration, not a redefinition:** the file's own
+docstring says *"Ours runs 0.06 to 0.17"*. That is the corrected figure, not the
+broken one. The header was written when the selector still found the pane, and
+kept the true number while the tool drifted away from it — the group gained the
+moulding's wash rects and `querySelector` silently started answering with a
+different object. Same file and same failure as CLAUDE.md §5 item 9, one level
+up: that time it remembered a NUMBER, this time a SELECTOR.
+
+**It fails loudly now.** Renaming the glass fill makes it throw *"no rect filled
+url(#glass) inside [data-pane] … FIX THE SELECTOR rather than letting it fall
+back to whatever rect is first"* rather than quietly measuring the leaf again.
+
+⚠ **The worse number is not a mandate.** CLAUDE.md records that this exact
+measurement was taken, acted on with a drawn street, hit, and then
+**deliberately reverted** — the owner said the plain pane looked better and the
+file keeps the reasoning: a configurator is not a photograph. 17× is now an
+honest description of a deliberate choice. Nobody should read it as a call to
+rebuild the pane.
+
+**Left alone:** `profile`'s tolerance and `mottle`'s dome — both are re-derivations
+of what a measurement should be, which is a bigger claim than fixing a selector,
+and both feed numbers the drawing was tuned against. And the other six findings,
+which are the human's or Peretz's.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-21 20:50 UTC — run 15: reproduced the new audit's claims by hand. One of them is a thing I missed
 
 **Looked at:** `a2e6734`, which rewrote `REDESIGN.md` from a look plan into an

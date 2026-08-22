@@ -121,7 +121,24 @@ async function measureOurs() {
   const geo = await p.evaluate(() => {
     const svg = document.querySelector('#stage svg');
     const L = svg.querySelector('#leaf rect').getBoundingClientRect();
-    const g = svg.querySelector('[data-pane] rect').getBoundingClientRect();
+    /* THE PANE, not the first rect that happens to be inside its group.
+       This asked for `[data-pane] rect` and got rect 0, which is the moulding's
+       leafShade wash — 850 x 2050, the WHOLE LEAF, against a pane of 357.
+       So every band this tool has printed was sampled across the door: the
+       moulding's bright bead and dark quirk set the min and max that become
+       `spread`, and the lowest band sat entirely below the glass on bare paint.
+       The numbers were not slightly off, they were about a different object.
+       Same file, same failure as CLAUDE.md §5 item 9, one level up: that time
+       it remembered a NUMBER, this time it remembered a SELECTOR — and a
+       selector stops being true the moment the group gains a child, which is
+       exactly what happened when the moulding took the leaf's own wash. */
+    const pane = svg.querySelector('[data-pane] rect[fill="url(#glass)"]');
+    if (!pane) throw new Error(
+      'glass.mjs: no rect filled url(#glass) inside [data-pane]. The pane is '
+      + 'not where this tool expects it — FIX THE SELECTOR rather than letting '
+      + 'it fall back to whatever rect is first, which is how it came to '
+      + 'measure the whole leaf and call it the glass.');
+    const g = pane.getBoundingClientRect();
     return { L: { x: L.x, y: L.y, w: L.width, h: L.height },
              W: { x: g.x, y: g.y, w: g.width, h: g.height } };
   });
