@@ -670,6 +670,17 @@ group('no dangling gradient or filter references');
     for (const u of new Set([...svg.matchAll(/url\(#([^)]+)\)/g)].map(m => m[1]))) {
       ok(defined.has(u), `url(#${u}) is referenced but never defined (${label})`);
     }
+    /* ⚠ AND `<use>`, WHICH IS A SECOND WAY TO POINT AT AN ID. This checked
+       `url(#…)` alone, which was every reference the drawing had — until the
+       ironwork stopped writing each path three times and started writing it
+       once with three `<use href="#…">` hanging off it. That is 639 new
+       references on a single door, in a file whose whole subject is that SVG
+       paints NOTHING for a reference it cannot resolve: no error, no crash,
+       the feature simply absent. Exactly the failure this group was written
+       for, arriving through a door the group could not see. */
+    for (const u of new Set([...svg.matchAll(/(?:xlink:)?href="#([^"]+)"/g)].map(m => m[1]))) {
+      ok(defined.has(u), `<use href="#${u}"> is referenced but never defined (${label})`);
+    }
     checked++;
   };
   for (const n of HANDLES) for (const k of LOCKSETS) {

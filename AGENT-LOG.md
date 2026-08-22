@@ -23,6 +23,62 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-22 21:07 UTC — run 20: `<use>` is a second way to dangle, and the guard for that could not see it
+
+**Looked at:** the four Stage 0 commits, including the one that stopped `ink()`
+writing every path three times. Verified last run's report was actually fixed,
+then went looking for what the new structure opened.
+
+**Instruments:** test ✓ (2,764,159, up 159 — the widened guard) · audit ✓ ·
+profile ✓ · collide ✓ (base / `all`) · recreate ✓ · shot ✓. Only
+`test/units.mjs` differs; no site file, no bundle change.
+
+**Changed:** the dangling-reference sweep now checks `href="#…"` as well as
+`url(#…)`.
+
+**1. Last run's report is fixed, confirmed by re-measuring rather than
+assuming.** The grip controls across the band that was broken:
+
+    before (run 19)   1100 sidelight  bar 0x130   button 22x44   ← half the floor
+    now               1100 sidelight  bar 120x83  button 120x44
+    now               1100–1280, standard and sidelight alike, all 120x44
+
+Constant across the whole band, and the audit has its own check for it. The
+door still gets its leaf, narrowest 125 px at 1100 sidelight.
+
+**2. The new fault, and it arrived with the fix for something else.**
+`ink()` now writes each path once and hangs three paints off three `<use
+href="#…">` elements. That is **639 new references on a single door** — and
+the assertion whose entire subject is this failure only ever matched
+`url(#…)`.
+
+The group is called *no dangling gradient or filter references* and its comment
+is the clearest statement of the failure family in the repo: SVG paints
+**nothing** for a reference it cannot resolve — no error, no crash, the feature
+simply absent, tests green. A `<use>` pointing at a missing id fails exactly
+that way, and until now nothing looked.
+
+Swept today it is clean, so this goes green immediately rather than red. But
+verified live: breaking one `href` gives *"`<use href="#NOPEk425_478_0">` is
+referenced but never defined (grille grid)"*, naming the reference and the
+door.
+
+**3. The byte claims — partly confirmed, and I will not pretend to more.** My
+sweep enumerates a different population from the commit's (380 doors against
+its 450; it varies fields I held still), so I cannot confirm its exact worst
+and mean. What is unambiguous and mine: `render()` is pure — two calls on one
+state byte-identical — **zero dangling `#id` references across every door**,
+and the worst door at 286,931 bytes with 79% of my population over
+REALISM.md's 40 KB gate. The commit's own caveat, *"this did not fix that"*,
+holds; on my population it holds harder.
+
+**Left alone:** the 40 KB gate itself, `profile`'s tolerance (withdrawn by the
+human this round too), `mottle`'s dome, and what is Peretz's.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-22 16:04 UTC — run 19: the catalogue claimed a test that did not exist. It exists now
 
 **Looked at:** two of the audit's findings I had not checked myself — the grip
