@@ -344,6 +344,46 @@ half height and a fleur under a dome at each end, with the middle left bare.*
 
 ---
 
+## 4b. סורג בשני פאנלים — כמה זה עולה? ⚠ חוסם מחיר
+
+על דלת עם **חלון צד** או **דלת וחצי**, הסורג — או הזכוכית המעוצבת — נכנס
+בשני מקומות: גם בכנף וגם בפאנל שלידה. האתר צייר שניים וגבה על אחד. כלומר
+בכל הזמנה כזאת נתנו פאנל ברזל שלם בחינם, בערך ₪620.
+
+תיקנו: המחיר מוכפל במספר הפאנלים, וההודעה אומרת איפה וכמה:
+
+    סורג: ברזל מחושל — בכנף הדלת ובחלון הצד (2 יחידות)
+
+> **"על דלת עם חלון צד או דלת וחצי, הסורג — או הזכוכית המעוצבת — נכנס בשני
+> מקומות. אתה גובה על שני פאנלים מלאים, או שהפאנל הצדדי זול יותר כי הוא
+> צר?"** ⚠
+>
+> **"בדלת וחצי, בכנף הקטנה: אתה שם חלון צר תואם — אצלנו יוצא כ‑11 ס״מ מול
+> ~36 ס״מ בכנף הגדולה — או שאין שם חלון בכלל? ואם יש, הסורג עליו נחשב פאנל
+> מלא?"** ⚠
+
+הרוחב אצלנו, כפי שהציור חותך אותו:
+
+| דלת | הפאנל הצדדי | הכנף |
+|---|---|---|
+| עם חלון צד | ~16 ס״מ | ~36 ס״מ |
+| דלת וחצי | ~11 ס״מ | 27–43 ס״מ |
+
+*The multiplication is now structural and the per-panel figure is still
+`PLACEHOLDER`, so a "no, the narrow one is half price" costs one number in
+`GRILLES` and no code. It applies to BOTH families in that table — the five
+`glass: true` designs (מעגלים, גפן, עץ, רשת, מחורצת) are multiplied by the same
+line as the ironwork, so answering about סורג alone does not answer this.*
+
+*⚠ And the 11 cm slot is why the message says `חלון צר תואם` and NOT
+`חלון זהה`. The דלת וחצי side leaf is clamped to 110 mm on every window in the
+catalogue, against a leaf light of 272–425 mm. Calling it identical would have
+put a brand-new false sentence into the order — Peretz would build a 425 mm
+light in the small leaf, or ring up — which is the exact fault this change
+exists to remove.*
+
+---
+
 ## 5. מחירים
 
 > **"מה המחיר המלא — דלת + התקנה + מע״מ — לכל מידה?"**

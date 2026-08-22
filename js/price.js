@@ -7,7 +7,7 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed, LOCKSETS, SIZES, WINDOWS }
+import { byId, COLOURS, DETAILS, GRILLES, HANDLES, paneCount, LOCKSETS, SIZES, WINDOWS }
   from './catalog.js';
 
 /** Total in agorot, gross (VAT included). */
@@ -38,7 +38,17 @@ export function priceAgorot(state) {
      grilles were free there — ₪620 of wrought iron given away — and every
      other reader of "is there glass here" had had the right answer for two
      rounds. */
-  if (isGlazed(state)) total += grille.delta;
+  /* ⚠ PER PANEL. This read `if (isGlazed(state)) total += grille.delta` — a
+     BOOLEAN — and ironwork is sold by the panel. A sidelight door with a
+     window in its leaf gets two wrought-iron panels (the drawing cuts 282
+     <path> against 150) and was charged for one: about ₪620 given away on
+     every such order, and the same on a דלת וחצי, whose second leaf mirrors
+     the first's window and takes the first's grille with it.
+     Commit 2781180 fixed the QUESTION and never added the COUNT, which is how
+     the give-away outlived the commit written about it. `paneCount` is the one
+     enumeration; the drawing calls `aperture()` once per entry in the same
+     list, so the figure and the picture cannot disagree about how many. */
+  total += grille.delta * paneCount(state);
 
   // Round up to the nearest ₪5 so quoted figures stay tidy.
   return Math.ceil(total / 500) * 500;

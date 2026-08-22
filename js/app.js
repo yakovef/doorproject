@@ -29,7 +29,7 @@
 
 import {
   byId, COLOURS, declaredFinish, DETAILS,
-  GRILLES, HANDINGS, HANDLES, isGlazed, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
+  GRILLES, HANDINGS, HANDLES, isGlazed, LOCKSETS, paneCount, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import {
@@ -413,6 +413,21 @@ function paint() {
      shape CLAUDE.md §5 is about. One statement, however many places show it. */
   const money = formatAgorot(priceAgorot(state));
   document.querySelectorAll('[data-price]').forEach(el => { el.textContent = money; });
+
+  /* ⚠ THE GRILLE CHIPS ARE PER-PANEL TOO, and they are built once at init from
+     `o.delta` alone. Ironwork is charged by the panel now, so on a sidelight or
+     a דלת וחצי a tile reading "+₪620" beside a figure that moved ₪1,240 is the
+     same defect one screen over — and it is the screen the customer is
+     proof-reading. One quantity, two places, one of them stale: CLAUDE.md §5,
+     reintroduced by the fix that cites it if this loop is not here.
+     Only the grille group needs it: nothing else in `GROUPS` is priced by a
+     count. */
+  const panes = Math.max(1, paneCount(state));
+  document.querySelectorAll('.field[data-group="grille"] .tile').forEach(b => {
+    const meta = b.querySelector('.tile__meta');
+    const o = byId(GRILLES, b.dataset.id);
+    if (meta && o) meta.textContent = deltaLabel(Math.max(0, o.delta) * panes);
+  });
   $('#code').textContent = encodeCode(state);
 
   const win = byId(WINDOWS, state.window);

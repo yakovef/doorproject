@@ -615,5 +615,130 @@ export const byId = (list, id) =>
  * will change one of them. It was computed in three.
  */
 export const leafGlazed = state => byId(WINDOWS, state.window).rects.length > 0;
-export const isGlazed = state =>
-  leafGlazed(state) || !!(SIZES[state.size] || {}).sideGlazed;
+
+/**
+ * The narrowest side OPENING that can carry a copy of the leaf's window, in
+ * millimetres of opening (not of leaf).
+ *
+ * A דלת וחצי side leaf mirrors the main leaf's aperture, clamped by the
+ * renderer to `sideW - 240`; below this there is not enough glass left to be a
+ * window at all. Both sizes that carry a side leaf declare `side: 400`, so the
+ * guard passes today — it is here for the day somebody adds a narrower one,
+ * because this number decides HOW MANY PANELS EXIST and panels are charged
+ * for now.
+ *
+ * Stated as an OPENING width on purpose. The equivalent leaf-width test would
+ * need `REBATE`, which lives in the renderer, and the catalogue must not
+ * import the renderer — moving `REBATE` here instead would rewrite the imports
+ * of six tools to buy nothing.
+ */
+export const SIDE_OPENING_MIN = 370;
+
+/**
+ * ── HOW MANY PANELS OF GLASS, AND WHICH ONES ─────────────────────────
+ *
+ * The one enumeration of the glazed panels in a design. `priceAgorot`
+ * multiplies `grille.delta` by the panes counted here, and `js/share.js` names
+ * the panels from their own Hebrew. Nobody counts twice.
+ *
+ * ⚠ WHY IT EXISTS. `priceAgorot` added `grille.delta` ONCE, gated on a
+ * boolean. Ironwork is priced per panel and the code had no notion of
+ * quantity, so a sidelight door with a window in its leaf got TWO wrought-iron
+ * panels for the price of one — the drawing put a grille in the leaf and
+ * another in the side light, measured at 282 <path> against 150, and roughly
+ * ₪620 of ironwork went out free on every such order. דלת וחצי did the same.
+ * Commit 2781180 fixed the QUESTION (`win.rects.length` became
+ * `isGlazed(state)`) and never added a COUNT, which is how the give-away
+ * outlived the commit written about it.
+ *
+ * CLAUDE.md §5: a quantity computed in two places is a promise that somebody
+ * will change one of them. The renderer decided the side pane with two inline
+ * conditions and the price had no equivalent of either.
+ *
+ * Each entry carries three names, because three readers need different ones:
+ *   `he`    the panel as a subject   — "חלון הצד"
+ *   `inHe`  the panel as a location  — "בחלון הצד"
+ *   `isHe`  what the panel IS
+ * Stored rather than derived: Hebrew prefixing eats the definite article
+ * (ב + החלון -> בחלון), and a rule for that is a rule that will be wrong for
+ * the fourth panel somebody adds.
+ */
+export function glazedPanels(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const win  = byId(WINDOWS, state.window);
+  /* Distinct (top, height) rows — exactly what the renderer's `apertureLayout`
+     groups by. Every window in the catalogue has one row today; `duo` had two. */
+  const rows = new Set((win.rects || []).map(r => `${r.top}|${r.h}`)).size;
+  const out = [];
+  if (rows) {
+    out.push({ id: 'leaf', panes: rows,
+               he: 'כנף הדלת', inHe: 'בכנף הדלת', isHe: win.he });
+  }
+  /* A sidelight is glass BY DEFINITION — that is the whole product, and four
+     doors in the corpus have one (d117 d122 d123 d128). It does not take the
+     leaf's window shape; it is its own fixed light, and it is there whether or
+     not the leaf has a window at all. That is the panel the price could not
+     see. */
+  if (size.sideGlazed) {
+    out.push({ id: 'side', panes: 1,
+               he: 'חלון הצד', inHe: 'בחלון הצד', isHe: 'זיגוג קבוע' });
+  } else if (rows && size.side > SIDE_OPENING_MIN) {
+    /* ⚠ NOT "חלון זהה". The דלת וחצי side leaf does NOT get an identical
+       window: the renderer clamps its aperture to `min(rects[0].w, sideW-240)`,
+       which comes out at 110 mm on every window in the catalogue, against a
+       leaf light of 272–425 mm. Calling it identical would put a NEW false
+       sentence into the one artefact this whole change exists to make true —
+       Peretz would build a 425 mm light in the small leaf, or ring up. It is a
+       narrow matching light, and whether it is even a full panel of ironwork
+       at 110 mm is a question for Peretz: ASK-PERETZ.md §4b. */
+    out.push({ id: 'side', panes: 1,
+               he: 'הכנף הצדדית', inHe: 'בכנף הצדדית', isHe: 'חלון צר תואם' });
+  }
+  return out;
+}
+
+/** Total glazed openings in the design. What ironwork is counted in. */
+export const paneCount = state =>
+  glazedPanels(state).reduce((n, p) => n + p.panes, 0);
+
+/**
+ * WHERE the ironwork goes, as a phrase, and HOW MANY panels it is.
+ *
+ * The message, the spec line under the price and the drawing's accessible name
+ * all printed the grille's name and nothing else. On a door with a second
+ * panel that is a clarifying question by construction:
+ *
+ *     חלון: ללא חלון          ← no window
+ *     סורג: ברזל מחושל        ← wrought-iron grille
+ *     מידה: עם חלון צד        ← with sidelight
+ *
+ * Peretz had to infer from the SIZE line, three rows away, that the ironwork
+ * goes in the side panel. PLAN.md §0 is one sentence long and that is the
+ * sentence it forbids.
+ *
+ * ⚠ THE COUNT IS NEVER OPTIONAL ONCE IT IS ABOVE ONE, and the WHERE is. An
+ * early `return ''` for "one panel, and it is the leaf" is right about the
+ * location — "בכנף הדלת" on a door that has only a leaf is noise in the
+ * artefact that can least afford it — but it must not swallow the quantity.
+ * A two-row leaf window (`duo`, if it ever comes back) is ONE panel and TWO
+ * panes: the price would double and the message would say nothing.
+ */
+export function grillePlacement(state) {
+  const panels = glazedPanels(state);
+  const n = paneCount(state);
+  const count = n > 1 ? ` (${n} יחידות)` : '';
+  /* No glass at all: there is no grille to place, and joining an empty list
+     produced a bare " — " dangling off the end of the line. A door with no
+     window can still carry a `grille` in its state — `repair` clears it, but
+     this function must not depend on that having happened yet. */
+  if (!panels.length) return '';
+  if (panels.length === 1 && panels[0].id === 'leaf') return count;
+  return ` — ${panels.map(p => p.inHe).join(' ו')}` + count;
+}
+
+/* Derived from the enumeration above rather than restating it, so "is there
+   glass" and "how much glass" can never disagree. Exactly equivalent to the
+   old `leafGlazed(state) || !!SIZES[state.size].sideGlazed`: the דלת וחצי side
+   pane this now also sees requires a leaf window, which `leafGlazed` already
+   answered true for. */
+export const isGlazed = state => paneCount(state) > 0;

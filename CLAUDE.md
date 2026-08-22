@@ -44,6 +44,50 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 1.2 + 1.3 — two panels of ironwork for the price of one.**
+  `REDESIGN.md` §1.2 and §1.3, one root cause. `priceAgorot` did
+  `if (isGlazed(state)) total += grille.delta` — a BOOLEAN — and ironwork is
+  sold by the panel. A sidelight door with a window in its leaf draws **282
+  `<path>` against 150** and paid for one panel: roughly **₪620 given away per
+  order**, and the same on a דלת וחצי, whose second leaf mirrors the first's
+  window and takes its grille along. Commit `2781180` fixed the QUESTION
+  (`win.rects.length` → `isGlazed`) and never added the COUNT, which is how the
+  give-away outlived the commit written about it.
+  ⚠ **One enumeration, `glazedPanels`.** The price multiplies by it, the
+  message names the panels from their own Hebrew, and the drawing calls
+  `aperture()` once per entry — so the figure and the picture cannot disagree
+  about how many. The load-bearing test is falsifiable and asks the DRAWING:
+  `data-pane` count must equal `paneCount`. Reintroducing the boolean fails it
+  on every two-panel design.
+  ⚠ **And the message stopped contradicting itself.** It said `חלון: ללא חלון`
+  then `סורג: ברזל מחושל`, leaving Peretz to infer the panel from the SIZE line
+  three rows away. Now: `סורג: ברזל מחושל — בכנף הדלת ובחלון הצד (2 יחידות)`.
+  Silent on an ordinary one-leaf door, because "בכנף הדלת" where there is
+  nowhere else is noise in the artefact that can least afford it.
+  ⚠ **A skeptic stopped the fix shipping a NEW false sentence.** The spec
+  labelled the דלת וחצי side panel `חלון זהה` — "an identical window". The
+  renderer clamps that aperture to `min(rects[0].w, sideW-240)` = **110 mm on
+  every window in the catalogue**, against a leaf light of 272–425. Peretz
+  would have built a 425 mm light in the small leaf. It says `חלון צר תואם`,
+  and the 11 cm is a question in `ASK-PERETZ.md` §4b.
+  ⚠ **And it caught the fix reintroducing §5 in the act of citing it.** Grille
+  tiles are built once at init from `o.delta`, so a sidelight door would show
+  `+₪620` on the chip beside a figure moving **₪1,240** — one quantity, two
+  places, one stale, on the screen the customer proof-reads. `paint()` now
+  rewrites the grille chips per panel. Verified in the browser: chip and actual
+  agree at ₪620 / ₪1,240 / ₪1,240 across standard, sidelight and half.
+  ⚠ **Two more corrections taken.** `grillePlacement` returned `''` for
+  "one panel, and it is the leaf" and swallowed the COUNT with it — a two-row
+  window (`duo`, if it returns) would double the price and print nothing; the
+  count is now unconditional above one. And `SIDE_OPENING_MIN` is stated as an
+  OPENING width so the catalogue does not need `REBATE`, which lives in the
+  renderer and is imported by six tools — moving it would have rewritten all of
+  them to buy nothing.
+  ⚠ **Blast radius:** no code, no link, no id, no VERSION, no price DOWN. The
+  only prices that move are the ones that were undercharging, by exactly one
+  `grille.delta`. The question for Peretz names **worked glass as well as
+  ironwork**, because the same line multiplies the five `glass: true` designs.
+
 - **Stage 1.1 — a brass lockset that is not manufactured.** `REDESIGN.md` §1.1.
   `share.js` printed `effectiveFinish(state)` on the LOCKSET line and
   `catalog.js` defines that as the **GRIP's** finish, so `ella + coral` sent

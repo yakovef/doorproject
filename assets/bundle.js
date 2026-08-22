@@ -441,7 +441,50 @@
   }
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
   var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
-  var isGlazed = (state2) => leafGlazed(state2) || !!(SIZES[state2.size] || {}).sideGlazed;
+  var SIDE_OPENING_MIN = 370;
+  function glazedPanels(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const win = byId(WINDOWS, state2.window);
+    const rows = new Set((win.rects || []).map((r) => `${r.top}|${r.h}`)).size;
+    const out = [];
+    if (rows) {
+      out.push({
+        id: "leaf",
+        panes: rows,
+        he: "כנף הדלת",
+        inHe: "בכנף הדלת",
+        isHe: win.he
+      });
+    }
+    if (size.sideGlazed) {
+      out.push({
+        id: "side",
+        panes: 1,
+        he: "חלון הצד",
+        inHe: "בחלון הצד",
+        isHe: "זיגוג קבוע"
+      });
+    } else if (rows && size.side > SIDE_OPENING_MIN) {
+      out.push({
+        id: "side",
+        panes: 1,
+        he: "הכנף הצדדית",
+        inHe: "בכנף הצדדית",
+        isHe: "חלון צר תואם"
+      });
+    }
+    return out;
+  }
+  var paneCount = (state2) => glazedPanels(state2).reduce((n, p) => n + p.panes, 0);
+  function grillePlacement(state2) {
+    const panels = glazedPanels(state2);
+    const n = paneCount(state2);
+    const count = n > 1 ? ` (${n} יחידות)` : "";
+    if (!panels.length) return "";
+    if (panels.length === 1 && panels[0].id === "leaf") return count;
+    return ` — ${panels.map((p) => p.inHe).join(" ו")}` + count;
+  }
+  var isGlazed = (state2) => paneCount(state2) > 0;
 
   // js/price.js
   function priceAgorot(state2) {
@@ -450,7 +493,7 @@
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
     let total = size.base + colour.delta + win.delta + byId(HANDLES, state2.handle).delta + byId(LOCKSETS, state2.lockset).delta + byId(DETAILS, state2.detail).delta;
-    if (isGlazed(state2)) total += grille.delta;
+    total += grille.delta * paneCount(state2);
     return Math.ceil(total / 500) * 500;
   }
   var fmt = new Intl.NumberFormat("he-IL", {
@@ -3916,10 +3959,10 @@ ${body}
   function shareUrl(state2) {
     return window.location.href.split(/[?#]/)[0] + toQuery(state2);
   }
-  function glassOrGrilleLine(g) {
+  function glassOrGrilleLine(g, state2) {
     const label = g.glass ? "זכוכית" : "סורג";
     const name = g.he.startsWith(label + " ") ? g.he.slice(label.length + 1) : g.he;
-    return `${label}: ${name}`;
+    return `${label}: ${name}${grillePlacement(state2)}`;
   }
   function gripLine(h) {
     const fin = declaredFinish(h);
@@ -3953,7 +3996,7 @@ ${body}
          does not mention it, which is PLAN.md §0 failing at the exact point it
          exists to succeed. Third file to answer this question its own way; there
          is one answer now and it is in the catalogue. */
-      ...isGlazed(state2) && g.id !== "none" ? [glassOrGrilleLine(g)] : [],
+      ...isGlazed(state2) && g.id !== "none" ? [glassOrGrilleLine(g, state2)] : [],
       /* The grip carries its own finish; `gripLine` has the full account. The
          finish is still named even though it is no longer chosen — it is a fact
          about what Peretz has to order, and the TWO grips that depart from
@@ -4295,6 +4338,12 @@ ${body}
     const money = formatAgorot(priceAgorot(state));
     document.querySelectorAll("[data-price]").forEach((el) => {
       el.textContent = money;
+    });
+    const panes = Math.max(1, paneCount(state));
+    document.querySelectorAll('.field[data-group="grille"] .tile').forEach((b) => {
+      const meta = b.querySelector(".tile__meta");
+      const o = byId(GRILLES, b.dataset.id);
+      if (meta && o) meta.textContent = deltaLabel(Math.max(0, o.delta) * panes);
     });
     $("#code").textContent = encodeCode(state);
     const win = byId(WINDOWS, state.window);

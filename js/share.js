@@ -5,7 +5,7 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { byId, COLOURS, declaredFinish, DETAILS, GRILLES, HANDINGS, HANDLES, isGlazed,
+import { byId, COLOURS, declaredFinish, DETAILS, GRILLES, grillePlacement, HANDINGS, HANDLES, isGlazed,
          LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { encodeCode, toQuery } from './url-state.js';
@@ -34,10 +34,17 @@ export function shareUrl(state) {
  * fourteen options which half of the list they are looking at — so the word is
  * dropped HERE rather than taken out of the catalogue, where it is doing work.
  */
-function glassOrGrilleLine(g) {
+function glassOrGrilleLine(g, state) {
   const label = g.glass ? 'זכוכית' : 'סורג';
   const name = g.he.startsWith(label + ' ') ? g.he.slice(label.length + 1) : g.he;
-  return `${label}: ${name}`;
+  /* ⚠ WHERE IT GOES, AND HOW MANY. This line used to print the name alone, and
+     on a door with a second panel that is a clarifying question by
+     construction — Peretz read "חלון: ללא חלון" and then "סורג: ברזל מחושל"
+     and had to infer from the SIZE line, three rows away, that the ironwork
+     goes in the side panel. And now that the price multiplies by the panel
+     count, a customer proof-reading the figure has to be able to see why it
+     doubled. `grillePlacement` is silent on the ordinary one-leaf door. */
+  return `${label}: ${name}${grillePlacement(state)}`;
 }
 
 /**
@@ -108,7 +115,7 @@ export function message(state) {
        does not mention it, which is PLAN.md §0 failing at the exact point it
        exists to succeed. Third file to answer this question its own way; there
        is one answer now and it is in the catalogue. */
-    ...(isGlazed(state) && g.id !== 'none' ? [glassOrGrilleLine(g)] : []),
+    ...(isGlazed(state) && g.id !== 'none' ? [glassOrGrilleLine(g, state)] : []),
     /* The grip carries its own finish; `gripLine` has the full account. The
        finish is still named even though it is no longer chosen — it is a fact
        about what Peretz has to order, and the TWO grips that depart from

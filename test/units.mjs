@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, paneCount, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
@@ -1394,6 +1394,80 @@ group('every option the customer pays for is named in the message');
    Two of Peretz's photographs settle the underlying question in opposite
    directions: d072 is a gold bar beside a near-black escutcheon, d128 a chrome
    tube beside a bronze one. The two finishes are independent, both ways. */
+/* ⚠ IRONWORK IS SOLD BY THE PANEL, AND WAS CHARGED BY THE BOOLEAN.
+   `priceAgorot` did `if (isGlazed(state)) total += grille.delta`. A sidelight
+   door with a window in its leaf has TWO wrought-iron panels — the drawing cuts
+   282 <path> against 150 — and paid for one. About ₪620 an order, and the same
+   on a דלת וחצי, whose second leaf mirrors the first's window and takes its
+   grille along. Commit 2781180 fixed the QUESTION and never added the COUNT.
+
+   The first assertion is the load-bearing one and it is FALSIFIABLE: it asks
+   the DRAWING how many panes it cut and compares that with the number the
+   price multiplies by. Change either side alone and it fires. */
+group('ironwork is counted, and the drawing agrees with the bill');
+{
+  globalThis.window = globalThis.window
+    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+  const { message } = await import('../js/share.js');
+  let two = 0, checked = 0;
+
+  /* No pull bar in the stem: `idan` conflicts with four of the five windows,
+     and this group's subject is the WINDOW axis crossed with the SIZE axis.
+     With the bar in, `buildable` threw away 24 of 30 designs and the group
+     asserted almost nothing — which its own "no design has two panels" guard
+     caught, and which is why that guard is there. */
+  const stem = { ...base, handle: 'none', lockset: 'cylinder' };
+  for (const size of Object.keys(SIZES)) for (const w of WINDOWS) {
+    const st = { ...stem, size, window: w.id, grille: 'iron' };
+    if (!buildable(st)) continue;
+    checked++;
+    const n = paneCount(st);
+
+    /* 1. THE DRAWING AND THE COUNT. `data-pane` is one per aperture drawn. */
+    const drawn = (render(st).match(/data-pane/g) || []).length;
+    ok(drawn === n,
+       `${size}/${w.id}: the drawing cuts ${drawn} pane(s), paneCount says ${n}`);
+
+    /* 2. THE MONEY. Every panel is charged, exactly once. */
+    const iron = byId(GRILLES, 'iron');
+    const paid = priceAgorot(st) - priceAgorot({ ...st, grille: 'none' });
+    ok(paid === iron.delta * n,
+       `${size}/${w.id}: ${n} panel(s) at ₪${shekels(iron.delta)} each is `
+     + `₪${shekels(iron.delta * n)}; the price charges ₪${shekels(paid)}`);
+
+    /* 3. AND THE MESSAGE SAYS SO. A doubled figure a customer cannot account
+          for is its own kind of ambiguity. */
+    if (n > 1) {
+      two++;
+      const line = message(st).split('\n').find(l => l.startsWith('סורג'));
+      ok(line && line.includes(`(${n} יחידות)`),
+         `${size}/${w.id}: charged for ${n} panels and the message says "${line}"`);
+      for (const panel of glazedPanels(st)) {
+        ok(line.includes(panel.inHe),
+           `${size}/${w.id}: ironwork goes ${panel.inHe} and the message never says so`);
+      }
+    }
+  }
+  ok(two > 0, 'no design has two panels — this group is asserting nothing');
+
+  /* 4. The sentence Peretz actually reads, pinned as a literal. The
+        assertions above derive what they expect from the same catalogue that
+        produced it, so they would all stay green if the Hebrew were rewritten
+        as nonsense. This one would not. */
+  ok(message({ ...stem, size: 'sidelight', window: 'rect', grille: 'iron' }).split('\n')
+       .includes('סורג: ברזל מחושל — בכנף הדלת ובחלון הצד (2 יחידות)'),
+     'the sentence Peretz reads about a two-panel door has changed');
+
+  /* 5. And the ordinary door stays quiet: "בכנף הדלת" on a door that has only
+        a leaf is noise in the one artefact that cannot afford any. */
+  ok(grillePlacement({ ...stem, size: 'standard', window: 'rect' }) === '',
+     'a one-leaf door should not be told where its only grille is');
+  ok(grillePlacement({ ...stem, size: 'standard', window: 'none' }) === '',
+     'a door with no glass should say nothing about where a grille goes');
+
+  console.log(`  (${checked} designs, ${two} of them carrying two panels)`);
+}
+
 group('a finish is named on the fitting that has one, and nowhere else');
 {
   globalThis.window = globalThis.window
