@@ -21,6 +21,30 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Two instruments were measuring the wrong thing, and both are fixed.**
+  `npm run glass` asked for `[data-pane] rect` and got rect 0 — the moulding's
+  `leafShade` wash, **850 × 2050, the whole leaf**, against a pane 357 wide. So
+  every band it printed was sampled across the door: the moulding's bright bead
+  and dark quirk set the min and max that BECOME `spread`, and the lowest band
+  sat below the glass on bare paint. Measured both ways, our spread runs 0.18
+  0.14 0.15 0.12 0.07 on the pane against 0.72 0.71 0.70 0.66 0.24 on the leaf
+  — it had been **flattering the drawing fourfold** on the one number it exists
+  to report, and its verdict moves from 1× and 5× too flat to 7× and 17×. Its
+  own docstring already said "ours runs 0.06 to 0.17", which is the CORRECTED
+  figure: the header kept the truth while the selector drifted after the
+  moulding gained its wash rects. It throws by name now if the pane moves.
+  ⚠ **That worse number is not a mandate** — the pane rebuild was tried, hit
+  this number, and was deliberately reverted (§ the glass). It is an honest
+  description of a deliberate choice.
+  And `npm run mottle` could not report OURS at all without being handed a PNG,
+  which nobody ever did — so its only figure for us was the **0.032** written
+  into its header and copied into §6 below. `drift` was halved afterwards and
+  neither was; a plain leaf measures **0.016**. It renders the leaf and
+  measures it every run now, and prints a panelled one beside it, because the
+  metric divides out only the vertical fall — a moulding is unevenness as far
+  as it is concerned, and d048, one of the two photographs it compares against,
+  is a two-panel door.
+
 - **`REDESIGN.md` REWRITTEN — the look plan was answering a smaller question
   than the project has.** A mockup arrived from outside (*make the app look
   like this more*) and the first draft answered it as five stages of CSS. It
@@ -1416,8 +1440,15 @@ not only that it is correct:
 Twice now the obvious fix would have been wrong:
 
 - Beside a photograph our leaf looked blotchy; the move was to turn the drift
-  down. Measured (`npm run mottle`): photographs 0.089 and 0.155, ours
-  **0.032**. We have less than half a real door's unevenness, not more.
+  down. Measured (`npm run mottle`): photographs 0.089 and 0.155, ours far
+  below both. The conclusion held and still holds — we have *less* unevenness
+  than a real door, not more.
+  ⚠ This line said **0.032** for a long time after it had stopped being true.
+  `drift` was halved and the number was not, so the record described a leaf we
+  had stopped drawing; a plain leaf measures about **0.016**. The tool now
+  renders our leaf and measures it on every run rather than waiting for
+  somebody to hand it a PNG — which nobody ever did, which is exactly why the
+  figure was able to rot here unnoticed. Do not re-copy it into this file.
 - I "corrected" the frame returns 3× narrower using the corpus field `reveal`
   — which is the shadow *gap*, not the returns. Wrong quantity entirely.
 

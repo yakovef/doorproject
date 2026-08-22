@@ -23,6 +23,58 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-22 05:54 UTC — run 17: `npm run mottle` could not measure us at all, so it remembered instead
+
+**Looked at:** the second of the audit's three lying instruments. Last run I
+left `mottle` alone because §2.3's real claim — that half a photograph's figure
+is scene lighting, not paint — is a re-derivation of what the metric should be,
+and that is a larger thing than an agent should decide alone. **That is still
+left alone.** But the same section notes something much smaller sitting beside
+it, and that part is mine.
+
+**Instruments:** test ✓ (2,763,765) · audit ✓ · profile ✓ · collide ✓ (base /
+`all`) · recreate ✓ · shot ✓ · glass ✓. Only `tools/mottle.mjs` and `CLAUDE.md`
+differ; no site file, no bundle change.
+
+**Changed:** `mottle` renders our leaf and measures it, instead of printing
+*"pass a PNG of our leaf as the first argument"*.
+
+**The fault.** Nobody ever passed it one. In fourteen runs I never did either —
+I ran the tool, read two photograph figures and a shrug, and moved on. So the
+only number this project has ever had for OURS was the one typed into the
+header the afternoon it was written, and copied from there into `CLAUDE.md` §6:
+
+    header and §6 claimed   0.032
+    plain anthracite         0.0163
+    plain navy               0.0178
+    plain white              0.0093
+
+`drift` was halved and neither the header nor the record followed, so both
+described a leaf we had stopped drawing — **by about a factor of two**, on the
+number the whole "measure before fixing" section rests on. Corrected in both,
+with a line telling the next reader not to copy it back.
+
+**A tool that cannot answer without a manual step will be a tool nobody asks.**
+That is the real lesson and it is why the fix is derivation rather than a
+better constant: it opens the page now, exactly as `glass.mjs` was made to.
+Third tool in this repo to hold a number about our own drawing — `recreate` in
+run 3, `glass` in run 16, `mottle` today.
+
+**One thing the measurement surfaced, printed rather than acted on.** The metric
+divides out the vertical fall and nothing else, so a moulding reads as
+unevenness: our plain leaf is 0.0178 and the same door with two panels is
+0.0969. One of the two photographs it compares against — d048 — **is a
+two-panel door**, at 0.1550. Plain-against-panelled is not like-for-like, so
+the tool now prints both of ours, labelled, and says so. That is data, not a
+new metric; which comparison is fair stays a human's call, next to §2.3.
+
+**Left alone, still:** the dome decomposition, `profile`'s tolerance, and the
+seven findings that are the human's or Peretz's.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-22 00:55 UTC — run 16: `npm run glass` was measuring the whole leaf and calling it the glass
 
 **Looked at:** the audit's §2, "the instruments are lying" — three tools said to
