@@ -44,6 +44,37 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **The 374 KB door: `ink()` wrote every path three times.** `REDESIGN.md` §3.4.
+  A forged ironwork member is drawn three times — shadow, body, lit edge — and
+  each carried its own full copy of `d`. A curl is a dense polyline, so across
+  all 450 buildable size × window × grille doors the worst (half / strip /
+  quatrefoil) came to **374,160 bytes**, 1.44x the entire shipped app, of which
+  **118,634 were the same path data written again**: 840 long `d=` attributes,
+  only 344 distinct, 2.44x each.
+  ⚠ **A `<use>` is a reference and stroke paint is INHERITED**, so the three
+  paints hang off three `<use>` elements while the geometry is written once.
+  Worst door **374,160 → 284,353**, mean 53,616. The 40 KB gate is still failed
+  by 61% of doors — this did not fix that, it removed the duplication.
+  ⚠ **Proof the drawing did not move: ZERO of the 110 sheets changed.** Not one
+  byte, across `corpus`, `recreate`, `against` and the full-page screenshots.
+  That is the check this repo already had lying around and it is the right one
+  for a structural change — the picture is the assertion.
+  ⚠ **The id is derived from the PANE'S OWN GEOMETRY, never a counter.**
+  `render(state)` is pure and two calls on one state must return identical
+  strings — `test/units.mjs` compares whole renders for equality to catch two
+  grilles drawing the same door, and a module-level counter would make every
+  render differ from the last. A door can carry two panes, so the pane's
+  rounded origin keeps them apart. Verified: identical on repeat, 168 ids on a
+  sidelight, all unique.
+  ⚠ **`solid()` deliberately keeps its two copies.** The stroke master carries
+  `fill="none"` so it never paints while sitting in the body, and a presentation
+  attribute on the referenced element beats anything inherited through a `<use>`
+  — so a filled `<use>` of that master would paint nothing. Giving `solid` an
+  unfilled master means the masters can no longer live in the body, which means
+  collecting them behind a `<defs>`, which means restructuring a 460-line
+  function with five return points, for a helper that duplicates twice rather
+  than three times on the shortest paths in the file. The saving is in `ink`.
+
 - **Stage 0 item 6 WITHDRAWN: `profile.mjs` measured, and left alone.**
   `REDESIGN.md` §2.1 asked for the gate to be rebased on band means and a
   corpus-derived per-row tolerance. Implemented in a mirror and measured, it is

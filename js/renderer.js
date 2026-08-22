@@ -3232,8 +3232,47 @@ function grillePaths(kind, x, y, w, h, tint) {
   const V = f => y + h * f;
   const n2 = v => v.toFixed(1);
 
+  /* ── ONE COPY OF THE GEOMETRY, THREE PAINTS OF IT ───────────────────
+     `ink` draws a forged member three times — shadow, body, lit edge — and
+     `solid` twice. Every one of those carried its own full copy of `d`, and a
+     curl is a dense polyline: measured across all 450 buildable size × window ×
+     grille doors, the worst (half / strip / quatrefoil) came to **374,160
+     bytes**, 1.44x the entire shipped app, of which **118,634 were the same
+     path data written again** — 840 long `d=` attributes, only 344 distinct,
+     2.44x each. 61% of buildable doors exceeded REALISM.md's own 40 KB gate.
+
+     A `<use>` is a reference, and stroke paint is an INHERITED property, so the
+     three paints can hang off three `<use>` elements while the geometry is
+     written once. `fill="none"` stays on the path itself, where a presentation
+     attribute beats inheritance, so the master never paints.
+
+     ⚠ The id is derived from the PANE'S OWN GEOMETRY, not from a counter.
+     `render(state)` is pure and two calls on one state must return identical
+     strings — `test/units.mjs` compares whole renders for equality to catch two
+     grilles that draw the same door, and a module-level counter would make
+     every render differ from the last. A door can carry two panes (a leaf and
+     a sidelight), so the pane's rounded origin is what keeps them apart.
+
+     ⚠ `usedDefs` walks `href="#…"` transitively, but only ever resolves ids it
+     finds in the DEFS block. These live in the body, so the pruner skips them
+     and cannot mistake one for an unreachable gradient. */
+  const uid = `k${Math.round(x)}_${Math.round(y)}`;
+  let seq = 0;
+  const master = new Map();
+  const ref = d => {
+    if (!master.has(d)) master.set(d, `${uid}_${seq++}`);
+    return master.get(d);
+  };
+  const emitted = new Set();
+  /** The master path, written once, the first time this `d` is asked for. */
+  const define = d => {
+    const id = ref(d);
+    if (emitted.has(id)) return '';
+    emitted.add(id);
+    return `<path id="${id}" d="${d}" fill="none"/>`;
+  };
   const strokeOf = (d, colour, sw, op, cap) =>
-    `<path d="${d}" fill="none" stroke="${colour}" stroke-width="${sw.toFixed(2)}"
+    `${define(d)}<use href="#${ref(d)}" stroke="${colour}" stroke-width="${sw.toFixed(2)}"
            stroke-opacity="${op}" stroke-linecap="${cap}" stroke-linejoin="round"/>`;
 
   /**
@@ -3269,8 +3308,20 @@ function grillePaths(kind, x, y, w, h, tint) {
   /** A member that is SOLID rather than a line: a lozenge, a rosette, a
       collar. The lance under d103's dome is a filled shape and a stroked
       outline of it is a different object. */
-  const solid = (d, ref) => {
-    const o = (ref || w * 0.02) * 0.24;
+  /* ⚠ `solid` DELIBERATELY KEEPS ITS TWO COPIES, and the reason is the master.
+     A stroke master carries `fill="none"` so that it never paints on its own
+     while sitting in the body — and a presentation attribute on the referenced
+     element beats anything inherited through a `<use>`, so a filled `<use>` of
+     that same master would paint nothing at all. Giving `solid` its own
+     unfilled master would mean the masters could no longer live in the body,
+     which means collecting them and prepending a `<defs>` — and `grillePaths`
+     has five return points, so that is a restructure of a 460-line function
+     for a helper that duplicates twice rather than three times, on dots,
+     collars and lozenges that are the shortest paths in the file.
+     The saving is in `ink`. This is left alone on purpose.
+     (Its second parameter is renamed only so it stops shadowing `ref` above.) */
+  const solid = (d, gauge) => {
+    const o = (gauge || w * 0.02) * 0.24;
     return `<g transform="translate(${o.toFixed(2)} ${o.toFixed(2)})">
               <path d="${d}" fill="#000" fill-opacity="0.26"/></g>
             <path d="${d}" fill="${body}"/>`;

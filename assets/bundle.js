@@ -2334,7 +2334,21 @@ ${body}
     const U = (f) => x + w * f;
     const V = (f) => y + h * f;
     const n2 = (v) => v.toFixed(1);
-    const strokeOf = (d, colour, sw, op, cap) => `<path d="${d}" fill="none" stroke="${colour}" stroke-width="${sw.toFixed(2)}"
+    const uid = `k${Math.round(x)}_${Math.round(y)}`;
+    let seq = 0;
+    const master = /* @__PURE__ */ new Map();
+    const ref = (d) => {
+      if (!master.has(d)) master.set(d, `${uid}_${seq++}`);
+      return master.get(d);
+    };
+    const emitted = /* @__PURE__ */ new Set();
+    const define = (d) => {
+      const id = ref(d);
+      if (emitted.has(id)) return "";
+      emitted.add(id);
+      return `<path id="${id}" d="${d}" fill="none"/>`;
+    };
+    const strokeOf = (d, colour, sw, op, cap) => `${define(d)}<use href="#${ref(d)}" stroke="${colour}" stroke-width="${sw.toFixed(2)}"
            stroke-opacity="${op}" stroke-linecap="${cap}" stroke-linejoin="round"/>`;
     const ink = (d, sw, cap = "round") => {
       const o = sw * 0.24;
@@ -2345,8 +2359,8 @@ ${body}
               ${strokeOf(d, gleam, sw * 0.3, 0.16, cap)}</g>`;
     };
     const MARGIN = 0.13;
-    const solid = (d, ref) => {
-      const o = (ref || w * 0.02) * 0.24;
+    const solid = (d, gauge) => {
+      const o = (gauge || w * 0.02) * 0.24;
       return `<g transform="translate(${o.toFixed(2)} ${o.toFixed(2)})">
               <path d="${d}" fill="#000" fill-opacity="0.26"/></g>
             <path d="${d}" fill="${body}"/>`;
@@ -2463,10 +2477,10 @@ ${body}
         if (i < n - 1) {
           const gap = p, top = cy + w * 0.19;
           const run = gap - w * 0.38;
-          const seq = [[0.115, 0.03], [0.079, 0.06], [0.06, 0.03], [0.079, 0.06], [0.115, 0.03]];
-          const total = seq.reduce((a, s) => a + s[0], 0);
+          const seq2 = [[0.115, 0.03], [0.079, 0.06], [0.06, 0.03], [0.079, 0.06], [0.115, 0.03]];
+          const total = seq2.reduce((a, s) => a + s[0], 0);
           let at = top + (run - total * w) / 2;
-          for (const [lh, lw] of seq) {
+          for (const [lh, lw] of seq2) {
             const cy2 = at + w * lh / 2;
             out.push(solid(`M ${n2(cx)} ${n2(cy2 - w * lh / 2)}
                           Q ${n2(cx + w * lw)} ${n2(cy2)} ${n2(cx)} ${n2(cy2 + w * lh / 2)}
