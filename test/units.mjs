@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
@@ -1381,6 +1381,87 @@ group('every option the customer pays for is named in the message');
     }
   }
   console.log(`  (${n} messages read, ${priced} surcharges checked against their sentence)`);
+}
+
+/* ⚠ A FINISH IS A FACT ABOUT A PRODUCT, AND IT MUST APPEAR ON THAT PRODUCT.
+   `share.js` printed `effectiveFinish` — the GRIP's finish — on the LOCKSET
+   line, so `ella + coral` ordered a brass Coral. Coral is a nickel lever; no
+   such product is made. 18 of 90 grip x lockset pairs went out that way, and
+   `describe()` — the accessible name — said the same thing, and the on-screen
+   spec line said nothing at all, so a customer could proof-read the line,
+   find it right, and send an order for something that does not exist.
+
+   Two of Peretz's photographs settle the underlying question in opposite
+   directions: d072 is a gold bar beside a near-black escutcheon, d128 a chrome
+   tube beside a bronze one. The two finishes are independent, both ways. */
+group('a finish is named on the fitting that has one, and nowhere else');
+{
+  globalThis.window = globalThis.window
+    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+  const { message } = await import('../js/share.js');
+  const names = FINISHES.map(f => f.he);
+  let checked = 0, withFinish = 0;
+
+  for (const hn of HANDLES) for (const k of LOCKSETS) {
+    const st = { ...base, handle: hn.id, lockset: k.id };
+    if (!buildable(st)) continue;
+    checked++;
+    const lines = message(st).split('\n');
+    const lockLine = lines.find(l => l.startsWith('מנעול וידית:'));
+    const gripLine = lines.find(l => l.startsWith('ידית משיכה:'));
+
+    /* 1. The lockset line never names a finish. No lockset declares one. */
+    for (const f of names) {
+      ok(!lockLine.includes(f),
+         `${hn.id}+${k.id}: the lockset line says "${lockLine}" — `
+       + `"${f}" is not a fact about ${k.id}, it walked over from the grip`);
+    }
+
+    /* 2. A grip that declares a finish says so on its own line. */
+    const want = declaredFinish(hn);
+    if (want) {
+      withFinish++;
+      ok(gripLine && gripLine.includes(want.he),
+         `${hn.id} is made in ${want.he} and its own line does not say so: "${gripLine}"`);
+    } else if (gripLine) {
+      /* 3. And a grip that declares nothing has NOTHING invented for it —
+            no "ניקל מוברש" default. The corpus carries the same round tube in
+            steel, chrome and black; 13 of 30 measured doors are not nickel. */
+      for (const f of names) {
+        ok(!gripLine.includes(f),
+           `${hn.id} declares no finish and the message says "${gripLine}" — `
+         + 'the renderer\'s fallback is not a specification');
+      }
+    }
+  }
+  ok(withFinish > 0, 'no grip declares a finish — this group is asserting nothing');
+
+  /* ⚠ AND `declaredFinish` MUST NOT FALL THROUGH TO THE FIRST ENTRY.
+     `byId` does, and `FINISHES[0]` is brushed nickel — so written the obvious
+     way this helper answers "ניקל מוברש" for a bar the catalogue records as
+     chrome, and the invented fact walks straight back in. The ids that will do
+     it are already written down: ASK-PERETZ §2b counts five chrome doors and
+     three bronze, and LOCKSETS calls knobplate "the bronze fitting on d092".
+     Without this, the group above passes while being wrong, because it asks
+     the same broken function what to expect. */
+  for (const bad of ['chrome', 'bronze', 'gold', 'anodised', '']) {
+    ok(declaredFinish({ finish: bad }) === null,
+       `declaredFinish({finish:"${bad}"}) returned `
+     + `${JSON.stringify(declaredFinish({ finish: bad }))} instead of null — `
+     + 'an unknown finish is being answered with the first entry in the table');
+  }
+  ok(declaredFinish(null) === null && declaredFinish({}) === null,
+     'declaredFinish should answer null for a product with no finish at all');
+
+  /* A finish id FINISHES does not carry drops SILENTLY out of the order. That
+     is the safe direction, but it is still a fact Peretz needed — so it is
+     named here the day somebody writes it, rather than found in a phone call. */
+  for (const o of [...HANDLES, ...LOCKSETS]) {
+    ok(!o.finish || declaredFinish(o),
+       `${o.id} is recorded as being made in "${o.finish}" and FINISHES has no `
+     + 'such entry — the order will be silent about a finish we actually know');
+  }
+  console.log(`  (${checked} grip x lockset pairs, ${withFinish} carrying a declared finish)`);
 }
 
 /* ── 13. THE COMPARISON SHEETS ARE OF THIS DRAWING ────────────────────

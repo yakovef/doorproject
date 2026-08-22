@@ -44,6 +44,55 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 1.1 — a brass lockset that is not manufactured.** `REDESIGN.md` §1.1.
+  `share.js` printed `effectiveFinish(state)` on the LOCKSET line and
+  `catalog.js` defines that as the **GRIP's** finish, so `ella + coral` sent
+  Peretz `מנעול וידית: קורל · פליז` — an order for brass Coral lever
+  furniture. Coral is a nickel lever. The brass had walked across from the bar
+  to the lock.
+  ⚠ **Three places said it and a fourth stayed silent.** The message, the
+  `aria-label` from `describe()`, and — saying nothing at all — the on-screen
+  spec line. So a customer could proof-read the line under the price, find it
+  correct, and send an order for a product that does not exist. The drawing
+  agreed with the message, so the picture could not catch it either.
+  ⚠ **The corpus settles it in BOTH directions**, which is why the fix is not
+  "match the lockset to the grip": on d072 a gold bar stands beside a
+  near-black escutcheon (R−B +75 against +6); on d128 a cold chrome tube beside
+  a bronze one (R−B −3 against +24). A brass grip does not imply brass lock
+  furniture and a steel grip does not imply steel lock furniture.
+  ⚠ **Two rules.** The finish goes on the fitting that DECLARES it (Ella and
+  Shiran are brass, and that is a fact about those two products). Nothing is
+  said about a fitting that declares nothing — **no `ניקל מוברש` default
+  anywhere**. `LOCKSETS` records no finish because none has been measured, so
+  the lockset line names none. Silence is not a regression: a fact the message
+  omits is one Peretz fills from his own stock; a fact it invents is one he
+  acts on.
+  ⚠ **This overrules `REDESIGN.md` §1.1's own "← correct" annotation.** That
+  row called `קורל · ניקל מוברש` correct; it is the renderer's `|| 'steel'`
+  fallback printed as a specification. So the defect was not 18 of 90 pairs —
+  EVERY message named a finish for a fitting that declares none, and the
+  accessible name changes on every design.
+  ⚠ **A skeptic caught a BLOCKING bug in the fix before it was written.**
+  `declaredFinish` written the obvious way — `byId(FINISHES, o.finish)` — falls
+  through to `list[0]`, which is brushed nickel, so a bar recorded as chrome
+  would answer "ניקל מוברש" and walk the invented fact straight back in. And
+  the new test could not see it, because it asked the same broken function what
+  to expect. The ids are already written down: ASK-PERETZ §2b counts five
+  chrome doors and three bronze, and `knobplate` is called "the bronze fitting
+  on d092". `declaredFinish` is an exact match or an alias, else `null`, and
+  the group asserts that directly for five unknown ids.
+  ⚠ **`effectiveFinish` survives, re-scoped and honest**: it is now documented
+  as what it actually is — the single tone THE DRAWING paints metal in — and
+  expressed through `declaredFinish` so the two cannot drift. The drawing still
+  disagrees with the order on those 18 pairs (one gradient family per door), and
+  that is recorded in ASK-PERETZ §2b1 rather than hidden. The picture is an
+  illustration; the message is the order.
+  ⚠ **Verified:** reintroducing the defect fails **90 assertions**, one per
+  grip × lockset pair; removing it returns green. Exactly one sheet moved
+  (`strips.png`), as predicted. No price, no code, no link, no id, no VERSION.
+  And `ASK-PERETZ.md` §2b's own sentence had gone stale by the same mistake —
+  "שירן בפליז" when Ella is brass too — fixed in the same edit.
+
 - **`inFinish` was destroying 56% of a measured range, on the only finish we
   ship.** `REDESIGN.md` §3.1 — the largest single fidelity win available, and a
   defect repair rather than a taste bet.

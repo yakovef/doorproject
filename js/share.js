@@ -5,7 +5,7 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, isGlazed,
+import { byId, COLOURS, declaredFinish, DETAILS, GRILLES, HANDINGS, HANDLES, isGlazed,
          LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { encodeCode, toQuery } from './url-state.js';
@@ -40,6 +40,44 @@ function glassOrGrilleLine(g) {
   return `${label}: ${name}`;
 }
 
+/**
+ * The grip, and its finish ON THE LINE THAT NAMES THE THING THAT HAS ONE.
+ *
+ * ⚠ THIS IS WHERE A BRASS LOCKSET THAT DOES NOT EXIST CAME FROM. The finish
+ * used to be appended to the LOCKSET line, and the value appended was
+ * `effectiveFinish` — the GRIP's finish, which is what the renderer paints all
+ * the metal in. So `handle=ella, lockset=coral` sent Peretz
+ * "מנעול וידית: קורל · פליז": an instruction to order brass Coral lever
+ * furniture. Coral is a nickel lever. Ella is a brass PULL BAR, and the brass
+ * in that sentence had walked across from the bar to the lock. Eighteen of the
+ * ninety grip × lockset pairs went out that way, and PLAN.md §0 is precisely
+ * that Peretz can act on the message without a clarifying question — he cannot
+ * order a product that is not manufactured.
+ *
+ * Two rules, and they are different rules:
+ *
+ * 1. THE FINISH GOES ON THE FITTING THAT DECLARES IT. Ella is brass and Shiran
+ *    is an antique brass casting; that is a fact about those two products and
+ *    it belongs beside their names.
+ *
+ * 2. NOTHING IS SAID ABOUT A FITTING THAT DECLARES NOTHING — no "ניקל מוברש"
+ *    default, on the grip line or anywhere. The corpus carries the same round
+ *    tube in steel, in chrome and in black, and 13 of the 30 measured doors
+ *    have hardware that is not nickel. Printing the renderer's fallback as
+ *    though it were a specification is inventing a fact, and this whole defect
+ *    is one invented fact travelling one line too far.
+ *
+ * The LOCKSET line therefore names no finish at all: `LOCKSETS` records none,
+ * because none has ever been measured. That silence is deliberate and it is
+ * the open question in ASK-PERETZ.md §2b1 — Peretz may well order lock
+ * furniture in a finish, and if he says so it becomes `LOCKSETS[].finish` and
+ * comes back through this same helper. It does not come back as a guess.
+ */
+function gripLine(h) {
+  const fin = declaredFinish(h);
+  return `ידית משיכה: ${h.he}${fin ? ` · ${fin.he}` : ''}`;
+}
+
 /** The message Peretz receives. */
 export function message(state) {
   const c = byId(COLOURS, state.colour);
@@ -47,7 +85,7 @@ export function message(state) {
   const s = SIZES[state.size] || SIZES.standard;
   const w = byId(WINDOWS, state.window);
   const g = byId(GRILLES, state.grille);
-  const fin = effectiveFinish(state);
+  const grip = byId(HANDLES, state.handle);
 
   return [
     'שלום, בחרתי דלת באתר:',
@@ -71,12 +109,19 @@ export function message(state) {
        exists to succeed. Third file to answer this question its own way; there
        is one answer now and it is in the catalogue. */
     ...(isGlazed(state) && g.id !== 'none' ? [glassOrGrilleLine(g)] : []),
-    ...(byId(HANDLES, state.handle).style === 'none'
-        ? [] : [`ידית משיכה: ${byId(HANDLES, state.handle).he}`]),
-    /* The finish is still named even though it is no longer chosen: it is a
-       fact about what Peretz has to order, and the one grip that departs from
-       brushed nickel — the brass Shiran — is the reason the line exists. */
-    `מנעול וידית: ${byId(LOCKSETS, state.lockset).he} · ${fin.he}`,
+    /* The grip carries its own finish; `gripLine` has the full account. The
+       finish is still named even though it is no longer chosen — it is a fact
+       about what Peretz has to order, and the TWO grips that depart from
+       brushed nickel, the brass Ella and the brass Shiran, are the reason it
+       is named at all. The comment that stood here said "the one grip", which
+       went stale the day Ella gained `finish: 'brass'` and nobody revisited
+       the sentence. It is named HERE because these are the products it is a
+       fact about. */
+    ...(grip.style === 'none' ? [] : [gripLine(grip)]),
+    /* AND NOT ON THIS LINE. `LOCKSETS` declares no finish, so none is printed.
+       What used to be printed here was the GRIP's, and it named lock furniture
+       that is not manufactured. */
+    `מנעול וידית: ${byId(LOCKSETS, state.lockset).he}`,
     ...(state.detail !== 'plain' ? [`עיצוב: ${byId(DETAILS, state.detail).he}`] : []),
     `מידה: ${s.he}`,
     `פתיחה: ${h.he}`,

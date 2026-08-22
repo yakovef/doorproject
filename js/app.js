@@ -28,7 +28,7 @@
  */
 
 import {
-  byId, COLOURS, DETAILS,
+  byId, COLOURS, declaredFinish, DETAILS,
   GRILLES, HANDINGS, HANDLES, isGlazed, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
@@ -426,7 +426,17 @@ function paint() {
        before they send, so on a sidelight with ironwork it showed them a door
        with no ironwork in it and then charged for some. */
     ...(isGlazed(state) && grille.id !== 'none' ? [grille.he] : []),
-    ...(byId(HANDLES, state.handle).style === 'none' ? [] : [byId(HANDLES, state.handle).he]),
+    /* ⚠ The grip's finish is on the GRIP, and it is on this line because THIS
+       is the line a customer proof-reads before pressing send. It was on
+       neither: the message named a finish and named it on the wrong fitting,
+       and this line named none at all — so the two disagreed and the
+       disagreement was invisible. A customer could read this line, find it
+       correct, and send Peretz an order for a brass Coral, which is not a
+       product. One statement, however many places show it. */
+    ...(byId(HANDLES, state.handle).style === 'none' ? [] : [
+      byId(HANDLES, state.handle).he
+      + (declaredFinish(byId(HANDLES, state.handle))
+         ? ` ${declaredFinish(byId(HANDLES, state.handle)).he}` : '')]),
     byId(LOCKSETS, state.lockset).he,
     ...(state.detail !== 'plain' ? [byId(DETAILS, state.detail).he] : []),
     size.he, handing.he,

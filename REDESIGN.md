@@ -51,8 +51,18 @@ Every item verified by hand. Reproduction is one command each.
 ```
 handle=ella   lockset=coral  ->  מנעול וידית: קורל · פליז     ← Coral is a NICKEL lever
 handle=shiran lockset=plate  ->  מנעול וידית: רותם · פליז
-handle=idan   lockset=coral  ->  מנעול וידית: קורל · ניקל מוברש  ← correct
+handle=idan   lockset=coral  ->  מנעול וידית: קורל · ניקל מוברש  ← NOT correct either
 ```
+
+**⚠ That third annotation said "← correct" and it was wrong; the fix overrules
+it.** `ניקל מוברש` there is the renderer's `|| 'steel'` fallback printed as
+though it were a specification. No lockset in the catalogue records a finish,
+because none has ever been measured — and the corpus carries the same round
+tube in steel, in chrome and in black, with 13 of 30 measured doors on hardware
+that is not nickel. So the defect is not 18 of 90 pairs; **every** message was
+naming a finish for a fitting that declares none. The fix therefore removes the
+word from the lockset line entirely rather than correcting which finish it
+names, and the accessible name changes on every design, not on eighteen.
 
 Ella is the brass *pull bar*. The message tells Peretz to order brass *lock
 furniture*. Two of ten grips carry a `finish`, so **18 of 90 grip×lockset pairs

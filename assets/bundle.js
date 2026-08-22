@@ -435,8 +435,9 @@
     { id: "black", he: "שחור מט", en: "Matte black" },
     { id: "brass", he: "פליז", en: "Brass" }
   ];
+  var declaredFinish = (o) => !o || !o.finish ? null : FINISHES.find((f) => f.id === o.finish || (f.aliases || []).includes(o.finish)) || null;
   function effectiveFinish(state2) {
-    return byId(FINISHES, byId(HANDLES, state2.handle).finish || "steel");
+    return declaredFinish(byId(HANDLES, state2.handle)) || byId(FINISHES, "steel");
   }
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
   var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
@@ -3308,14 +3309,14 @@ ${body}
     const hd = byId(HANDLES, state2.handle);
     const lk = byId(LOCKSETS, state2.lockset);
     const dt = byId(DETAILS, state2.detail);
-    const fn = effectiveFinish(state2);
+    const gfn = declaredFinish(hd);
     const s = SIZES[state2.size] || SIZES.standard;
     if (lang === "he") {
       const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
       const glass = w.rects.length && state2.glazing && state2.glazing !== "clear" ? `, ${byId(GLAZINGS, state2.glazing).he}` : "";
       const det = dt.id === "plain" ? "" : `, ${dt.he}`;
-      const grip = hd.style === "none" ? "" : `${hd.he}, `;
-      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he} ${fn.he}, ${s.he}, פתיחה ${h.he}.`;
+      const grip = hd.style === "none" ? "" : `${hd.he}${gfn ? ` ${gfn.he}` : ""}, `;
+      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}, ${s.he}, פתיחה ${h.he}.`;
     }
     return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
   }
@@ -3920,13 +3921,17 @@ ${body}
     const name = g.he.startsWith(label + " ") ? g.he.slice(label.length + 1) : g.he;
     return `${label}: ${name}`;
   }
+  function gripLine(h) {
+    const fin = declaredFinish(h);
+    return `ידית משיכה: ${h.he}${fin ? ` · ${fin.he}` : ""}`;
+  }
   function message(state2) {
     const c = byId(COLOURS, state2.colour);
     const h = byId(HANDINGS, state2.handing);
     const s = SIZES[state2.size] || SIZES.standard;
     const w = byId(WINDOWS, state2.window);
     const g = byId(GRILLES, state2.grille);
-    const fin = effectiveFinish(state2);
+    const grip = byId(HANDLES, state2.handle);
     return [
       "שלום, בחרתי דלת באתר:",
       "",
@@ -3949,11 +3954,19 @@ ${body}
          exists to succeed. Third file to answer this question its own way; there
          is one answer now and it is in the catalogue. */
       ...isGlazed(state2) && g.id !== "none" ? [glassOrGrilleLine(g)] : [],
-      ...byId(HANDLES, state2.handle).style === "none" ? [] : [`ידית משיכה: ${byId(HANDLES, state2.handle).he}`],
-      /* The finish is still named even though it is no longer chosen: it is a
-         fact about what Peretz has to order, and the one grip that departs from
-         brushed nickel — the brass Shiran — is the reason the line exists. */
-      `מנעול וידית: ${byId(LOCKSETS, state2.lockset).he} · ${fin.he}`,
+      /* The grip carries its own finish; `gripLine` has the full account. The
+         finish is still named even though it is no longer chosen — it is a fact
+         about what Peretz has to order, and the TWO grips that depart from
+         brushed nickel, the brass Ella and the brass Shiran, are the reason it
+         is named at all. The comment that stood here said "the one grip", which
+         went stale the day Ella gained `finish: 'brass'` and nobody revisited
+         the sentence. It is named HERE because these are the products it is a
+         fact about. */
+      ...grip.style === "none" ? [] : [gripLine(grip)],
+      /* AND NOT ON THIS LINE. `LOCKSETS` declares no finish, so none is printed.
+         What used to be printed here was the GRIP's, and it named lock furniture
+         that is not manufactured. */
+      `מנעול וידית: ${byId(LOCKSETS, state2.lockset).he}`,
       ...state2.detail !== "plain" ? [`עיצוב: ${byId(DETAILS, state2.detail).he}`] : [],
       `מידה: ${s.he}`,
       `פתיחה: ${h.he}`,
@@ -4297,7 +4310,16 @@ ${body}
          before they send, so on a sidelight with ironwork it showed them a door
          with no ironwork in it and then charged for some. */
       ...isGlazed(state) && grille.id !== "none" ? [grille.he] : [],
-      ...byId(HANDLES, state.handle).style === "none" ? [] : [byId(HANDLES, state.handle).he],
+      /* ⚠ The grip's finish is on the GRIP, and it is on this line because THIS
+         is the line a customer proof-reads before pressing send. It was on
+         neither: the message named a finish and named it on the wrong fitting,
+         and this line named none at all — so the two disagreed and the
+         disagreement was invisible. A customer could read this line, find it
+         correct, and send Peretz an order for a brass Coral, which is not a
+         product. One statement, however many places show it. */
+      ...byId(HANDLES, state.handle).style === "none" ? [] : [
+        byId(HANDLES, state.handle).he + (declaredFinish(byId(HANDLES, state.handle)) ? ` ${declaredFinish(byId(HANDLES, state.handle)).he}` : "")
+      ],
       byId(LOCKSETS, state.lockset).he,
       ...state.detail !== "plain" ? [byId(DETAILS, state.detail).he] : [],
       size.he,

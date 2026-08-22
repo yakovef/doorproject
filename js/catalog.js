@@ -532,12 +532,55 @@ export const FINISHES = [
 ];
 
 /**
- * The finish this door is built in: whatever its grip declares, else brushed
- * nickel. One function, so the drawing, the spec line and the message cannot
- * disagree about it — which they did, out loud, when this was a choice.
+ * The finish a PRODUCT is recorded as being made in, or `null` when the
+ * catalogue records none — or records one this table has never heard of.
+ *
+ * ⚠ NOT `byId`. `byId` falls through to `list[0]` for an id it does not know,
+ * and `FINISHES[0]` is brushed nickel. Written the obvious way, as
+ * `byId(FINISHES, o.finish)`, this helper answers "ניקל מוברש" for a bar the
+ * catalogue records as chrome — and the order goes out naming a finish nobody
+ * measured, which is the exact defect this function exists to prevent, walking
+ * back in through the fallback a dozen lines below the comment that warns
+ * about it.
+ *
+ * The ids that will do it are already written down: `ASK-PERETZ.md` §2b counts
+ * five chrome doors and three bronze, and the `knobplate` entry above calls it
+ * "the bronze fitting on d092". Neither word is in `FINISHES`. So: an exact
+ * match or an alias, else nothing.
+ *
+ * `null` means "we do not know", and the order then says nothing rather than
+ * saying brushed nickel. A fact the message omits is one Peretz fills from his
+ * own stock; a fact the message invents is one he acts on.
+ */
+export const declaredFinish = o => !o || !o.finish ? null
+  : (FINISHES.find(f => f.id === o.finish
+                     || (f.aliases || []).includes(o.finish)) || null);
+
+/**
+ * The single tone THE DRAWING paints metal in.
+ *
+ * ⚠ This used to be documented as "the finish this door is built in", and that
+ * sentence was the defect. A door is not built in a finish. Each fitting
+ * bolted to it is made in one, and they need not agree — two of Peretz's own
+ * photographs settle it in opposite directions. On d072 the pull bar is a gold
+ * rod (R−B +75 at its recorded axis) beside a near-black escutcheon (R−B +6).
+ * On d128 a cold chrome tube (R−B −3) stands beside a bronze escutcheon
+ * (R−B +24). A brass grip does not imply brass lock furniture, and a steel
+ * grip does not imply steel lock furniture.
+ *
+ * So this is no longer allowed to describe the ORDER — `share.js` and
+ * `describe()` ask `declaredFinish` per fitting now. It survives only as what
+ * it actually is: the renderer builds ONE set of metal gradients per door, and
+ * this picks which. That is a real limitation of the drawing and it is
+ * recorded in `REDESIGN.md` rather than papered over — a brass Ella still
+ * paints the Coral lever beside it gold.
  */
 export function effectiveFinish(state) {
-  return byId(FINISHES, byId(HANDLES, state.handle).finish || 'steel');
+  /* Stated once, through `declaredFinish`, so the two cannot drift: the paint
+     is whatever the grip declares, and brushed nickel only where it declares
+     nothing. Spelled out a second time as `byId(FINISHES, …finish || 'steel')`
+     this was two copies of one rule in adjacent functions — §5. */
+  return declaredFinish(byId(HANDLES, state.handle)) || byId(FINISHES, 'steel');
 }
 
 /* Aliases count: a superseded id must resolve to its replacement rather than

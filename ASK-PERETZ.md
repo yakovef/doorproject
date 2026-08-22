@@ -87,7 +87,7 @@ corrected widths are in `js/catalog.js`; the lengths were already close.*
 ## 2b. גימור הידיות — הורדנו את הבחירה, ויש כאן סתירה ⚠
 
 הבחירה בגימור (ניקל מוברש / שחור מט / פליז) הוסרה מהאתר. כל ידית מצוירת
-בגימור אחד: שירן בפליז, כל השאר בניקל מוברש.
+בגימור אחד: אלה ושירן בפליז, כל השאר בניקל מוברש.
 
 > **"מתוך שלושים הדלתות שמדדנו — בשלוש-עשרה מהן הידית או המנעול הם פליז,
 > ברונזה או שחור, לא ניקל. אתה כן מזמין גימורים שונים, או שזה מה שהיצרן
@@ -116,6 +116,52 @@ non-choice was worse than useless. But two in five is not a decorative edge
 case. If he does order in different finishes, this comes back as a fact about
 each product (`HANDLES[].finish`) rather than as a priced tile — which is what
 Shiran already is.*
+
+---
+
+## 2b1. גימור המנעול — שאלה פתוחה, ובינתיים אנחנו שותקים ⚠
+
+עד עכשיו ההודעה שהלקוח שולח אליך אמרה, למשל:
+
+    ידית משיכה: אלה
+    מנעול וידית: קורל · פליז
+
+והפליז הזה הוא הגימור של **ידית המשיכה**, לא של המנעול. קורל היא ידית ניקל —
+אין קורל בפליז להזמין. ב-18 מתוך 90 הצירופים של ידית משיכה ומנעול יצאה אליך
+הזמנה למוצר שלא קיים. תיקנו: הגימור עבר לשורה של ידית המשיכה, ושורת המנעול
+לא אומרת גימור בכלל:
+
+    ידית משיכה: אלה · פליז
+    מנעול וידית: קורל
+
+שתי תמונות משלך מראות ששני הגימורים באמת עצמאיים — ובשני הכיוונים:
+
+| דלת | ידית המשיכה | המנעול שלידה |
+|---|---|---|
+| d072 | פס זהב/פליז — RGB 181,153,106 | אסקוצ'ן עגול כהה — RGB 49,46,43 |
+| d128 | צינור כרום קר — RGB 156,153,159 | אסקוצ'ן ברונזה — RGB 96,81,72 |
+
+> **"המנעולים — קורל, רותם, אלמוג, כדור, ריבועי — באיזה גימור אתה מזמין
+> אותם? יש בחירה, או שזה מה שהיצרן שולח?"** ⚠
+> **"ואם לקוח בחר ידית משיכה מפליז (אלה או שירן) — אתה מתאים לה מנעול בפליז,
+> או שהמנעול נשאר בגימור הרגיל?"** ⚠
+> **"אם אין התאמה — אתה רוצה שנכתוב את זה בהודעה, כדי שלא תצטרך לשאול את
+> הלקוח?"**
+
+*No price moves and none is invented: the finish carries no `delta` and cannot
+while it is not a choice. What moves is a SENTENCE. Until he answers, the order
+says nothing about the lockset's finish, deliberately — a fact the message omits
+is one he fills from his own stock, a fact the message invents is one he acts
+on. If the answer is that lock furniture does come in finishes, it becomes
+`LOCKSETS[].finish` — a property of a product, exactly as `HANDLES[].finish`
+already is — and the same one line in `share.js` prints it. It never comes back
+as an axis: `f=` is retired forever.*
+
+⚠ *The drawing still disagrees with the order on those 18 pairs: the renderer
+builds ONE set of metal gradients per door from the grip's finish, so a brass
+Ella still paints the Coral lever beside it gold. That is recorded in
+`REDESIGN.md` rather than hidden, and it is the smaller fault of the two — the
+picture is an illustration, the message is the order.*
 
 ---
 

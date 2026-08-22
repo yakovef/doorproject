@@ -16,7 +16,7 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
@@ -5064,15 +5064,22 @@ export function describe(state, lang = 'he') {
   const hd = byId(HANDLES, state.handle);
   const lk = byId(LOCKSETS, state.lockset);
   const dt = byId(DETAILS, state.detail);
-  const fn = effectiveFinish(state);
+  /* ⚠ `declaredFinish` of the GRIP, not `effectiveFinish` of the door.
+     This sentence is what a screen-reader user is TOLD THE DOOR IS, and it
+     said "קורל פליז" — brass Coral — whenever the grip was one of the two
+     brass ones, for the same reason the WhatsApp message did: it printed the
+     drawing's single metal tone as though it were a fact about the lockset.
+     There is no brass Coral. Two of Peretz's own photographs settle it in
+     opposite directions; `catalog.js effectiveFinish` carries them. */
+  const gfn = declaredFinish(hd);
   const s = SIZES[state.size] || SIZES.standard;
   if (lang === 'he') {
     const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
     const glass = w.rects.length && state.glazing && state.glazing !== 'clear'
       ? `, ${byId(GLAZINGS, state.glazing).he}` : '';
     const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
-    const grip = hd.style === 'none' ? '' : `${hd.he}, `;
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he} ${fn.he}, ${s.he}, פתיחה ${h.he}.`;
+    const grip = hd.style === 'none' ? '' : `${hd.he}${gfn ? ` ${gfn.he}` : ''}, `;
+    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}, ${s.he}, פתיחה ${h.he}.`;
   }
   return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
 }
