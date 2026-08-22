@@ -23,6 +23,66 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-22 16:04 UTC — run 19: the catalogue claimed a test that did not exist. It exists now
+
+**Looked at:** two of the audit's findings I had not checked myself — the grip
+controls between 1100 and 1280 px, and `catalog.js`'s claim of coverage.
+
+**Instruments:** test ✓ (2,763,880, up 115 — the new assertion) · audit ✓ ·
+profile ✓ · collide ✓ (base / `all`) · recreate ✓ · shot ✓. Only
+`test/units.mjs` differs; no site file, no bundle change.
+
+**Changed:** the assertion `catalog.js` has been claiming for two rounds.
+
+**1. A false claim of coverage — CONFIRMED and fixed.** `catalog.js:394` says
+of the `doors` lists, in as many words: *"`npm test` asserts every id here has
+a photograph behind it."* It did not. `grep -rn "\.doors" test/` returned
+nothing.
+
+That is worse than no claim, because it stops the next person looking — the
+same shape as a tool that remembers a number, and the same cure: make the
+sentence true rather than delete it. These lists are load-bearing: `npm run
+corpus` reads them to know which grille each measured door carries, so a
+typo'd id recreates a door as the wrong thing, silently.
+
+Now asserted across every list that carries `doors` — **49 citations, every one
+with a photograph** — with the id shape checked too, so `d9999` or `106` fails
+as loudly as a missing file. Verified live: pointing `circles` at `d999` gives
+*"GRILLES.circles cites d999 and research/works/doors/d999.jpeg does not
+exist."*
+
+**2. The grip controls at 1100–1280 — CONFIRMED, and reported rather than
+fixed.** Measured across the band, standard and sidelight:
+
+    1099  one-column layout    bar 152x68   button 152x44   fine
+    1100  sidelight            bar   0x130  button  22x44   ← half the floor
+    1150  sidelight            bar  18x130  button  22x44
+    1200  sidelight            bar  43x114  button  43x44
+    1280  sidelight            bar  83x83   button  83x44   fine
+
+`inline-size: min(calc(var(--wall-gap) - 20px), 9.5rem)` collapses when the
+wall does, and at 1100 a sidelight door fills the middle column completely.
+**My own audit is why it hid**: `VIEWS` goes 834 → 1280, straddling the whole
+broken band. The tap-target check would have caught it — it flags `width < 30`
+and these are 22 — so the check is right and the *viewport list* is the gap,
+which is the same list-versus-derive lesson as run 8, one level over.
+
+⚠ I did not add the viewport, because doing so alone turns the audit red and
+`AGENT.md` says never push red — and I did not fix the layout either. Every fix
+I could see is a design decision with a documented trap beside it: putting the
+controls back under the door is what made **the door shrink** (`28deefc`), and
+a width floor puts them over the drawing. `REDESIGN.md` stage 5 has the grip
+bar's placement explicitly in scope. Deciding it now, on the eve of that,
+would be me designing over a plan. **The exact line needed is
+`{ name: 'narrow-desk', w: 1152, h: 800 }`, and it should land with the fix.**
+
+**Left alone:** `profile`'s tolerance, `mottle`'s dome, and the findings that
+are the human's or Peretz's.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-22 10:47 UTC — run 18: nothing changed. The third lying instrument's premise reproduced, and stopped there
 
 **Looked at:** `REDESIGN.md` §2.1, the last of the three instruments and the

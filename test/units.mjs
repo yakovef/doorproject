@@ -11,7 +11,7 @@ import {
   nearestGrip, render, sizeGlyph, windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { conflicts, repair } from '../js/rules.js';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 
@@ -555,6 +555,40 @@ group('the grip clears the lockset');
     }
   console.log(`  (${n} renders, closest bodies ${Math.round(tightest)}mm; `
     + `tightest bar-to-lockset ${closest.axis.toFixed(3)} of leaf width on ${closest.label})`);
+}
+
+// ── 6b2. The evidence on the entries is real evidence ─────────────
+/* `catalog.js` says of the `doors` lists, in as many words: "npm test asserts
+   every id here has a photograph behind it." It did not. `grep -rn "\.doors"
+   test/` returned nothing at all, so for two rounds the catalogue carried a
+   claim of coverage that no assertion backed.
+
+   A false claim of coverage is worse than none, because it stops the next
+   person looking — the same shape as a tool that remembers a number, and the
+   same cure: make the sentence true rather than delete it. These lists are not
+   decoration. `npm run corpus` reads them to know which grille each measured
+   door carries, so a typo'd id there is a door recreated as the wrong thing,
+   silently. */
+group('every door named as evidence has a photograph behind it');
+{
+  let named = 0;
+  for (const [list, name] of [[GRILLES, 'GRILLES'], [WINDOWS, 'WINDOWS'],
+                              [DETAILS, 'DETAILS'], [HANDLES, 'HANDLES'],
+                              [LOCKSETS, 'LOCKSETS'], [COLOURS, 'COLOURS']]) {
+    for (const o of list) {
+      if (!o.doors) continue;
+      ok(Array.isArray(o.doors) && o.doors.length,
+         `${name}.${o.id}.doors should be a non-empty list, got ${JSON.stringify(o.doors)}`);
+      for (const id of o.doors) {
+        named++;
+        ok(/^d\d{3}$/.test(id), `${name}.${o.id} names "${id}", which is not a door id`);
+        ok(existsSync(`research/works/doors/${id}.jpeg`),
+           `${name}.${o.id} cites ${id} and research/works/doors/${id}.jpeg does not exist`);
+      }
+    }
+  }
+  ok(named > 40, `only ${named} door citations found — has the evidence been dropped?`);
+  console.log(`  (${named} citations, every one with a photograph)`);
 }
 
 // ── 6c. What the works photographs actually show ──────────────────
