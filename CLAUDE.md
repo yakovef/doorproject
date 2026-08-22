@@ -44,6 +44,58 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 1.6 + 1.7 — the page failed looking like it had worked.**
+  Measured with scripting off at 390×844: `#stage` empty, `#price` and `#code`
+  both `—`, `#choices` with no children, and **both full-width green WhatsApp
+  buttons pointing at `#`**. A complete, professional, styled page in which
+  nothing worked and nothing said so. The header telephone was the only live
+  element. `init()` carried no `try`, so any throw produced the same screen
+  with scripting fully on — this was never only about JavaScript being off.
+  ⚠ **FOUR routes reach that screen, and three were found by asking "what else
+  produces this" rather than reasoning forward from the first.** Scripting off;
+  `init()` threw; a `paint()` throw one click in (`render()` throws BEFORE the
+  `innerHTML` assignment, so the stage keeps the PREVIOUS door while the price,
+  code and link beside it describe the new one); and — the one a skeptic added
+  — **the bundle simply not arriving**, where `<noscript>` is inert because
+  scripting is ON and no handler was ever registered, so `fail()` cannot run.
+  A bad deploy, a poisoned cache, a CSP, a parse error. This repo already has a
+  group about a stale bundle reaching a returning browser, so it is not
+  hypothetical. Two lines after the bundle tag close it, no-op on every working
+  load.
+  ⚠ **ONE copy of the degraded stylesheet, two ways in.** `noscript` is parsed
+  as RAW TEXT when scripting is on — HTML spec, not a Chromium quirk — so its
+  single child is the literal `<style>…</style>` source. The browser applies it
+  when scripting is off; `degrade()` reads `.textContent` back and appends it
+  when something threw. The alternative was the same rules twice, which is §5
+  wearing a stylesheet.
+  ⚠ **`.stage`, not `.stage-wrap`**, in that sheet: the wrap holds the page's
+  only `<h1>` as `.sr-only` text, and hiding it left a page with no heading for
+  anyone reading it aloud.
+  ⚠ **The button changes its LABEL too.** `שלחו את הדלת בוואטסאפ` over a
+  message with no door in it is the dead `href="#"` again one layer up — it
+  works, and it is not what it says. Degraded it reads `שלחו לנו הודעה`.
+  ⚠ **`fail()` does not swallow.** It logs, degrades, repoints both buttons at
+  a real conversation, and **rethrows out of a timeout** so `window.onerror`
+  and the audit's `pageerror` listener still see it. A page that quietly
+  repaired itself would take the only report of the fault with it.
+  ⚠ **The audit now drives all four routes**, and its predicate is DERIVED —
+  an element is lying if it is on screen and still showing its placeholder — so
+  a panel added later is covered without anybody remembering. Verified
+  falsifiable: deleting `.stage` from the degraded sheet gives
+  `✗ [no-js] #stage on screen still showing a placeholder` and
+  `✗ [bundle-404]`. **My first two probes were themselves wrong** — one judged
+  `#stage` by its text when it holds an SVG, and one broke `getElementById`,
+  which `degrade()` needs, so the injection disabled the recovery it was
+  testing. Both are named in the tool.
+  ⚠ **And the `GLAZINGS` landmine is defused.** `renderer.js` named
+  `byId(GLAZINGS, state.glazing).he` for a table deleted with the glazing axis:
+  unimported, undefined, guarded behind `state.glazing &&`, and a
+  `ReferenceError` out of both `render()` and `describe()` the moment anything
+  set that key — which by the measurement above blanks the entire page. NOT
+  reachable (`fromQuery` never reads the retired `z=`), so it is recorded as a
+  landmine rather than dressed up as a live fault. Zero sheets moved, because
+  the clause never executed.
+
 - **Stage 1.2 + 1.3 — two panels of ironwork for the price of one.**
   `REDESIGN.md` §1.2 and §1.3, one root cause. `priceAgorot` did
   `if (isGlazed(state)) total += grille.delta` — a BOOLEAN — and ironwork is

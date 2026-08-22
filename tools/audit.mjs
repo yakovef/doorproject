@@ -579,6 +579,111 @@ for (const v of VIEWS) {
 
   await p.close();
 }
+
+/* ── A PAGE THAT CANNOT START HAS TO LOOK LIKE ONE ──────────────────
+ *
+ * Measured before this existed, Chromium with scripting off at 390x844: the
+ * page came up complete — brand, price card, fine print, two full-width green
+ * WhatsApp buttons — with `#stage` empty, `#price` and `#code` both "—",
+ * `#choices` with no children, and both buttons pointing at `#`. Styled,
+ * professional and entirely inert, with no way for a customer to tell it from
+ * a page still loading. The header telephone number was the only thing on it
+ * that worked.
+ *
+ * FOUR routes get here and every one of them is checked, because three of them
+ * were found by asking "what else produces that screen" rather than by
+ * reasoning forward from the first:
+ *
+ *   happy         nothing degraded, the door drawn, the real message offered
+ *   scripting off the browser applies the <noscript> stylesheet
+ *   init() threw  `guard`/`fail` in app.js injects the same stylesheet
+ *   bundle 404    scripting is ON so <noscript> is inert and no handler was
+ *                 ever registered — the inline check after the bundle tag is
+ *                 the only thing that catches it. A bad deploy, a poisoned
+ *                 cache, a CSP or a parse error all land here, and this repo
+ *                 already has a test group about a stale bundle reaching a
+ *                 returning browser, so it is not hypothetical.
+ *
+ * The predicate is DERIVED, not a list of expected strings: an element is
+ * lying if it is on screen and still showing its placeholder. That way a panel
+ * added to the page later is covered without anybody remembering to add it
+ * here — the failure mode AGENT-LOG run 8 is about.
+ */
+{
+  const URL = `file://${process.cwd()}/index.html`;
+  const probe = pg => pg.evaluate(() => {
+    /* `__rect` is the pristine getBoundingClientRect stashed by the fault
+       injection before it broke the real one. A probe that breaks with the
+       page measures nothing. */
+    const rect = e => (window.__rect ? window.__rect.call(e) : e.getBoundingClientRect());
+    const vis = sel => { const e = document.querySelector(sel);
+      if (!e) return false; const r = rect(e);
+      return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; };
+    const lying = [];
+    for (const sel of ['#stage', '#choices']) {
+      const e = document.querySelector(sel);
+      if (e && vis(sel) && !e.children.length) lying.push(sel);
+    }
+    for (const sel of ['#price', '#summary', '#code']) {
+      const e = document.querySelector(sel);
+      const t = e && e.textContent.trim();
+      if (vis(sel) && (!t || t === '—')) lying.push(sel);
+    }
+    return {
+      down: vis('#down'),
+      lying,
+      dead: [...document.querySelectorAll('[data-wa]')]
+        .filter(a => !/^https:\/\/wa\.me\//.test(a.getAttribute('href') || '')).length,
+      promising: [...document.querySelectorAll('.wa__on')]
+        .filter(e => getComputedStyle(e).display !== 'none').length,
+    };
+  });
+
+  const routes = [
+    ['happy', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+        await pg.goto(URL); await pg.waitForTimeout(700); return pg; }],
+    ['no-js', async () => { const c = await b.newContext(
+          { javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+        const pg = await c.newPage(); await pg.goto(URL); await pg.waitForTimeout(400); return pg; }],
+    ['init-threw', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+        /* Break something `init()` needs WITHOUT breaking `getElementById`,
+           which `degrade()` itself calls — an injection that disables the
+           recovery is testing nothing. */
+        await pg.addInitScript(() => {
+          window.__rect = Element.prototype.getBoundingClientRect;
+          Object.defineProperty(Element.prototype, 'getBoundingClientRect',
+            { value: () => { throw new Error('injected'); } });
+        });
+        pg.on('pageerror', () => {});   // expected: `fail` rethrows on purpose
+        await pg.goto(URL); await pg.waitForTimeout(700); return pg; }],
+    ['bundle-404', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+        await pg.route('**/bundle.js*', r => r.abort());
+        await pg.goto(URL); await pg.waitForTimeout(700); return pg; }],
+  ];
+
+  console.log('\nthe page cannot come up styled and inert');
+  for (const [name, open] of routes) {
+    const pg = await open();
+    const r = await probe(pg);
+    if (r.lying.length) {
+      fault(name, `${r.lying.join(', ')} on screen still showing a placeholder — `
+                + 'the page looks finished and is not');
+    }
+    if (r.dead) fault(name, `${r.dead} send button(s) do not point at wa.me`);
+    if (name === 'happy') {
+      if (r.down) fault(name, 'the "cannot load" strip is showing on a working page');
+      if (!r.promising) fault(name, 'a working page does not offer to send the door');
+    } else {
+      if (!r.down) fault(name, 'nothing tells the customer the door did not load');
+      if (r.promising) {
+        fault(name, 'the button still promises to send a door there is no door for');
+      }
+    }
+    await pg.close();
+  }
+  if (!faults) console.log('  a page that cannot start says so, and still reaches Peretz');
+}
+
 await b.close();
 
 console.log(faults ? `\n✗ ${faults} faults\n` : '\n✓ no faults\n');

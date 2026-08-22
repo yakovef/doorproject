@@ -5075,8 +5075,18 @@ export function describe(state, lang = 'he') {
   const s = SIZES[state.size] || SIZES.standard;
   if (lang === 'he') {
     const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
-    const glass = w.rects.length && state.glazing && state.glazing !== 'clear'
-      ? `, ${byId(GLAZINGS, state.glazing).he}` : '';
+    /* ⚠ GONE: a second clause here named `byId(GLAZINGS, state.glazing).he`.
+       `GLAZINGS` was deleted from the catalogue when glass stopped being its
+       own axis and its patterns moved into `GRILLES`; the identifier survived
+       here, unimported and undefined, guarded behind `state.glazing &&` — so
+       it was invisible for as long as nothing set that key, and a
+       `ReferenceError` out of BOTH `describe()` and `render()` the moment
+       anything did. And by the measurement above, that error blanks the whole
+       page: the cost of setting `state.glazing` once, anywhere, was the site.
+       It was NOT reachable — `fromQuery` never reads the retired `z=`, and no
+       GROUPS row writes the key — so it was a landmine and not a live fault,
+       and it is recorded at that severity rather than dressed up. */
+    const glass = '';
     const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
     const grip = hd.style === 'none' ? '' : `${hd.he}${gfn ? ` ${gfn.he}` : ''}, `;
     return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}, ${s.he}, פתיחה ${h.he}.`;

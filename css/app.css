@@ -699,6 +699,16 @@ body {
 .btn--wa { background: var(--wa); color: #fff; }
 .btn--wa:hover { filter: brightness(1.05); }
 
+/* The send button carries BOTH its labels and shows one.
+   `שלחו את הדלת בוואטסאפ` is true only while there is a door to send. With the
+   app down the same button opens a WhatsApp saying the page did not load, and
+   promising a door over that message is the dead `href="#"` bug again one
+   layer up — it works, and it is not what it says.
+   The swap itself lives in the single degraded stylesheet inside the
+   `<noscript>` in index.html, so it happens for scripting-off and for a thrown
+   `init()` from one set of rules. Only the resting state is here. */
+.wa__off { display: none; }
+
 .btn--ghost {
   background: none; color: var(--ink);
   border-color: var(--rule);

@@ -38,7 +38,7 @@ import {
   render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
-import { copyMessage, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
+import { copyMessage, fallbackWhatsappUrl, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 
 const $ = sel => document.querySelector(sel);
@@ -328,7 +328,12 @@ function choose(g, id) {
 
 function set(next) {
   state = next;
-  paint();
+  /* `guard` — see the bottom of this file. A throw out of `paint()` mid-click
+     is the same defect one click in: `render()` throws BEFORE the `innerHTML`
+     assignment, so the stage keeps the PREVIOUS door while the price, the code
+     and the WhatsApp link beside it all describe the new one. A page showing
+     one door and offering another is worse than the blank page it replaces. */
+  guard(paint)();
 
   // Debounced: WebKit throws above ~100 history writes per 30s, and clicking
   // through swatches reaches that easily (PLAN.md §8.2).
@@ -897,8 +902,82 @@ if (new URLSearchParams(location.search).has('bare')) {
   window.__render = render;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+/* ── WHEN THE APP CANNOT START ────────────────────────────────────
+ *
+ * `init()` ran unguarded, and the screen a throw produced was measured: an
+ * empty stage where the door goes, `—` for the price, `—` for the code, no
+ * choices at all, and two full-width green WhatsApp buttons pointing at `#`.
+ * A page that looks finished and is inert. That is the worst shape a failure
+ * can take here, because a customer cannot tell it from a page still loading,
+ * and the one thing PLAN.md §0 asks for — a message Peretz can act on — is
+ * exactly what is missing.
+ *
+ * Note what this DOES NOT do: it does not swallow the error and it does not
+ * carry on with half an app. The error is logged and then rethrown out of a
+ * timeout, so it still reaches `window.onerror`, the audit's `pageerror`
+ * listener and anything we ever hang off it — a page that quietly repaired
+ * itself would take the only report of the fault with it. `npm run audit`
+ * fails on a page error, deliberately: this handler is what the CUSTOMER gets,
+ * never a licence for the app to be broken.
+ *
+ * What the customer gets: the honest strip (`#down`), the telephone as a live
+ * `tel:` link, and both WhatsApp buttons pointing at a real conversation —
+ * reset here explicitly rather than trusted to still be the markup's, because
+ * `paint()` may have thrown at any point, including after it wrote the hrefs.
+ */
+function fail(err) {
+  console.error('[dlatot-magen] the configurator could not start:', err);
+  try {
+    degrade();
+    document.querySelectorAll('[data-wa]').forEach(el => {
+      el.href = fallbackWhatsappUrl();
+      el.removeAttribute('target');   // a blocked popup on a broken page is a
+                                      // dead end; open in the same tab
+    });
+  } catch (e) {
+    console.error('[dlatot-magen] the fallback itself failed:', e);
+  }
+  // Rethrown asynchronously: handled for the customer, still reported to us.
+  setTimeout(() => { throw err; });
+}
+
+/**
+ * Apply the degraded stylesheet that lives in the `<noscript>`.
+ *
+ * ⚠ `noscript` is parsed as RAW TEXT when scripting is ON, so its single child
+ * is the literal `<style>…</style>` source rather than a stylesheet. That is
+ * the HTML spec, not a Chromium quirk, and it is what lets ONE copy of those
+ * rules serve both failures — the browser applies them when scripting is off,
+ * and this reads them back and appends them when scripting is on and something
+ * threw. Two rule-lists would agree until the day somebody added a panel to
+ * one of them.
+ *
+ * Nothing here comes from a URL or from a customer; it is our own markup read
+ * back. Idempotent, because more than one route can call it.
+ */
+function degrade() {
+  const css = document.getElementById('down-css');
+  if (!css || document.getElementById('down-css-live')) return;
+  document.head.insertAdjacentHTML('beforeend',
+    css.textContent.replace('<style>', '<style id="down-css-live">'));
+}
+
+/* Every entry the browser has into this file goes through here. */
+const guard = fn => (...a) => { try { return fn(...a); } catch (e) { fail(e); } };
+
+/* ⚠ THE THIRD FAILURE ROUTE, WHICH NEITHER OF THE OTHER TWO COVERS: scripting
+   is ON and this bundle never arrives. A 404 after a bad deploy, a poisoned
+   cache, a CSP, a parse error. `<noscript>` is inert because scripting is on,
+   and no handler was ever registered, so `fail()` cannot run — the page comes
+   up styled, complete and dead, which is the original defect verbatim. This
+   repo already has a test group about a stale bundle reaching a returning
+   browser, so it is not hypothetical.
+   `index.html` sets the flag below immediately after the bundle tag; if this
+   file evaluated, it is already true and the check there does nothing. */
+window.__up = 1;
+
+document.addEventListener('DOMContentLoaded', guard(() => {
   $('#phone-link').href = `tel:${PHONE_E164}`;
   $('#phone-link').textContent = PHONE_DISPLAY;
   init();
-});
+}));

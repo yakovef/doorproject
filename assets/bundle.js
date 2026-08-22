@@ -3356,7 +3356,7 @@ ${body}
     const s = SIZES[state2.size] || SIZES.standard;
     if (lang === "he") {
       const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
-      const glass = w.rects.length && state2.glazing && state2.glazing !== "clear" ? `, ${byId(GLAZINGS, state2.glazing).he}` : "";
+      const glass = "";
       const det = dt.id === "plain" ? "" : `, ${dt.he}`;
       const grip = hd.style === "none" ? "" : `${hd.he}${gfn ? ` ${gfn.he}` : ""}, `;
       return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}, ${s.he}, פתיחה ${h.he}.`;
@@ -4022,6 +4022,8 @@ ${body}
     ].join("\n");
   }
   var whatsappUrl = (state2) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2))}`;
+  var FALLBACK_TEXT = "שלום, ניסיתי לבנות דלת באתר והעמוד לא נטען אצלי, אז אין לי קוד לשלוח. אפשר לחזור אליי ולעזור לי לבחור דלת?";
+  var fallbackWhatsappUrl = () => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(FALLBACK_TEXT)}`;
   async function copyMessage(state2) {
     const text = message(state2);
     try {
@@ -4285,7 +4287,7 @@ ${body}
   }
   function set(next) {
     state = next;
-    paint();
+    guard(paint)();
     clearTimeout(urlTimer);
     urlTimer = setTimeout(() => {
       try {
@@ -4615,9 +4617,40 @@ ${body}
   if (new URLSearchParams(location.search).has("bare")) {
     window.__render = render;
   }
-  document.addEventListener("DOMContentLoaded", () => {
+  function fail(err) {
+    console.error("[dlatot-magen] the configurator could not start:", err);
+    try {
+      degrade();
+      document.querySelectorAll("[data-wa]").forEach((el) => {
+        el.href = fallbackWhatsappUrl();
+        el.removeAttribute("target");
+      });
+    } catch (e) {
+      console.error("[dlatot-magen] the fallback itself failed:", e);
+    }
+    setTimeout(() => {
+      throw err;
+    });
+  }
+  function degrade() {
+    const css = document.getElementById("down-css");
+    if (!css || document.getElementById("down-css-live")) return;
+    document.head.insertAdjacentHTML(
+      "beforeend",
+      css.textContent.replace("<style>", '<style id="down-css-live">')
+    );
+  }
+  var guard = (fn) => (...a) => {
+    try {
+      return fn(...a);
+    } catch (e) {
+      fail(e);
+    }
+  };
+  window.__up = 1;
+  document.addEventListener("DOMContentLoaded", guard(() => {
     $("#phone-link").href = `tel:${PHONE_E164}`;
     $("#phone-link").textContent = PHONE_DISPLAY;
     init();
-  });
+  }));
 })();

@@ -145,6 +145,42 @@ export function message(state) {
 export const whatsappUrl = state =>
   `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state))}`;
 
+/* ── WHAT THE BUTTON DOES WHEN THERE IS NO DOOR ──────────────────────
+ *
+ * Both send buttons shipped as `href="#"` and were given a real address by
+ * `paint()`. Measured in Chromium with scripting off: the page comes up
+ * complete — brand, price card, fine print, two full-width green buttons — and
+ * `[data-wa]` reads `["#", "#"]`. A customer taps the one control the whole
+ * site exists for and the page scrolls a pixel. The header telephone number
+ * was the only working element on it. And `init()` carried no `try`, so ANY
+ * throw produced the same screen with scripting fully on — this was never only
+ * about JavaScript being switched off.
+ *
+ * So the markup carries THIS address and `paint()` upgrades it. The worst case
+ * stops being a dead button and becomes a WhatsApp to Peretz with no door in
+ * it — a lead he can answer, rather than a customer who leaves.
+ *
+ * The text is written to be UNMISTAKABLE from a real order. A real order opens
+ * `שלום, בחרתי דלת באתר:` and carries a colour, a size, a price and a code;
+ * this one says in the customer's own voice that the page did not load and
+ * that they have no code, so Peretz neither hunts for a spec that was never
+ * sent nor asks them to read one out. It is also the only way we ever hear
+ * that the page failed for somebody: nothing else on a static site reports.
+ * ASK-PERETZ.md §11 puts the wording, and whether he wants these at all, to him.
+ *
+ * Exported rather than written into `index.html` by hand, because the phone
+ * number and the wording would then live in two files and drift — §5 in its
+ * usual costume. The markup DOES carry the built string (it has to; it is read
+ * with no JavaScript running), and `test/units.mjs` asserts the two are
+ * byte-identical, the same way the `?v=` stamps are asserted current.
+ */
+export const FALLBACK_TEXT =
+  'שלום, ניסיתי לבנות דלת באתר והעמוד לא נטען אצלי, אז אין לי קוד לשלוח. '
++ 'אפשר לחזור אליי ולעזור לי לבחור דלת?';
+
+export const fallbackWhatsappUrl = () =>
+  `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(FALLBACK_TEXT)}`;
+
 export async function copyMessage(state) {
   const text = message(state);
   try {

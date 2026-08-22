@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
-<link rel="stylesheet" href="css/app.css?v=7fb9b775">
+<link rel="stylesheet" href="css/app.css?v=8494e745">
 </head>
 <body>
 
@@ -23,6 +23,61 @@
   <strong>גרסת פיתוח.</strong> הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.
 </p>
 <p class="strip strip--warn" id="notice" hidden></p>
+
+<!-- ⚠ THE PAGE FAILING HAS TO LOOK LIKE THE PAGE FAILING.
+
+     Measured in Chromium with scripting off, 390x844: `#stage` empty, `#price`
+     and `#code` both "—", `#choices` with no children, and both green send
+     buttons pointing at "#". A complete, professional, styled page in which
+     nothing worked and nothing said so. `init()` carried no `try`, so any
+     throw at all produced that same screen with scripting fully on.
+
+     This strip is what a customer reads instead. It is `hidden` in the markup
+     and revealed by the ONE stylesheet below, which the browser applies when
+     scripting is off and `fail()` in app.js injects when scripting is on and
+     the app threw. Two different failures, one sentence, one place to edit it.
+
+     The telephone number is a real `tel:` link and not prose, because it is
+     the only route left that needs nothing from us. It is followed by Hebrew
+     rather than by the full stop, deliberately: a Latin-digit run at the very
+     end of an RTL sentence takes the neutral punctuation with it and the stop
+     lands on the wrong side of the number. -->
+<p class="strip strip--warn" id="down" role="alert" hidden>
+  <strong>הדלת לא נטענת בדפדפן הזה.</strong>
+  אפשר לשלוח לנו הודעה בוואטסאפ, או להתקשר אלינו למספר
+  <a href="tel:972532197466">053-219-7466</a> ונעזור לכם לבחור דלת.
+</p>
+
+<!-- ⚠ ONE COPY OF THE DEGRADED STYLESHEET, WITH TWO WAYS IN.
+
+     With scripting off the browser applies what is in here. With scripting on
+     the parser puts these bytes in a single TEXT node — that is what `noscript`
+     means to a scripted parser — so `fail()` reads `.textContent` and appends
+     it to the head. The alternative was the same rules twice, once here and
+     once behind an `.app-down` class in css/app.css, which is §5 wearing a
+     stylesheet: the two lists would agree until the day somebody added a panel
+     to one of them.
+
+     What it does: takes away everything that is lying, leaves everything that
+     still works. Gone are the empty stage, the price, the spec line, the
+     design code, the copy button and the whole choices panel — every one of
+     which is showing a placeholder or an empty box and reads as "loading".
+     Left are the header telephone, this strip, the WhatsApp buttons and the
+     fine print. The button LABEL changes with them: `שלחו את הדלת בוואטסאפ`
+     over a message with no door in it is the same lie one layer down. -->
+<noscript id="down-css"><style>
+  #down[hidden] { display: block !important; }
+  #choices, .stage, .grip-bar, .stage__bar, .dock__price,
+  .send__price, .send__spec, .send__lead, .send__alt { display: none; }
+  .wa__on { display: none; }
+  .wa__off { display: inline; }
+  /* ⚠ `.stage`, not `.stage-wrap`. The wrap holds the page's only `<h1>`, as
+     `.sr-only` text — hiding the wrap took the document's heading with it and
+     left a page with no heading at all for anyone reading it aloud. So the
+     empty box goes and the wrap collapses to nothing around the heading that
+     stays. Above 1100 px it is also `block-size: 100%` of a flex column, which
+     would hold a whole empty column open. */
+</style></noscript>
 
 <main class="layout">
 
@@ -90,11 +145,12 @@
 
       <p class="send__lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
 
-      <a class="btn btn--wa" id="wa-btn" href="#" target="_blank" rel="noopener" data-wa>
+      <a class="btn btn--wa" id="wa-btn" href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F" target="_blank" rel="noopener" data-wa>
         <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
           <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
         </svg>
-        שלחו את הדלת בוואטסאפ
+        <span class="wa__on">שלחו את הדלת בוואטסאפ</span>
+        <span class="wa__off">שלחו לנו הודעה בוואטסאפ</span>
       </a>
 
       <div class="send__alt">
@@ -137,11 +193,12 @@
     <span class="dock__label">מחיר משוער</span>
     <strong class="dock__figure" data-price>—</strong>
   </div>
-  <a class="btn btn--wa dock__send" href="#" target="_blank" rel="noopener" data-wa>
+  <a class="btn btn--wa dock__send" href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F" target="_blank" rel="noopener" data-wa>
     <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
       <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
     </svg>
-    שלחו בוואטסאפ
+    <span class="wa__on">שלחו בוואטסאפ</span>
+    <span class="wa__off">שלחו הודעה</span>
   </a>
 </div>
 
@@ -154,6 +211,19 @@
     document.documentElement.classList.add('is-bare');
   }
 </script>
-<script src="assets/bundle.js?v=3ce31ecb"></script>
+<script src="assets/bundle.js?v=2de8715e"></script>
+<!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
+     cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
+     ever registered, so `fail()` never runs. A 404 after a bad deploy, a
+     poisoned cache, a CSP, a parse error — and the page comes up styled,
+     complete and dead, which is exactly the defect all of this exists to
+     remove. `js/app.js` sets `window.__up` at module scope, so on every
+     working load this is a no-op that runs after the paint and flashes
+     nothing. -->
+<script>
+  window.__up || document.head.insertAdjacentHTML('beforeend',
+    document.getElementById('down-css').textContent
+      .replace('<style>', '<style id="down-css-live">'));
+</script>
 </body>
 </html>

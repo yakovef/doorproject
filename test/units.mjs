@@ -1404,6 +1404,46 @@ group('every option the customer pays for is named in the message');
    The first assertion is the load-bearing one and it is FALSIFIABLE: it asks
    the DRAWING how many panes it cut and compares that with the number the
    price multiplies by. Change either side alone and it fires. */
+/* ⚠ THE MARKUP CARRIES A BUILT STRING, SO IT CAN DRIFT FROM THE BUILDER.
+   Both send buttons must work with no JavaScript running, which means the
+   fallback wa.me address has to be IN index.html — and the phone number and
+   the wording then live in two files. §5 in its usual costume. This pins them
+   together, the same way the `?v=` cache stamps are pinned.
+   The page is also asserted to carry the pieces the degraded state needs, so
+   that deleting one of them is a red test rather than a silently dead page.
+   `npm run audit` drives the four real failure routes; this is the cheap
+   half that runs in two milliseconds. */
+group('the page still reaches Peretz with no JavaScript');
+{
+  const { fallbackWhatsappUrl } = await import('../js/share.js');
+  const html = readFileSync('index.html', 'utf8');
+  const href = fallbackWhatsappUrl();
+
+  ok(!/href="#"/.test(html),
+     'a send button ships with href="#": with no JavaScript it is a dead control '
+   + 'on the one thing the whole site exists to get pressed');
+  const built = (html.match(/href="(https:\/\/wa\.me\/[^"]*)"/g) || []);
+  ok(built.length >= 2,
+     `index.html carries ${built.length} wa.me hrefs; both send buttons need one`);
+  for (const h of built) {
+    ok(h === `href="${href}"`,
+       `index.html carries a wa.me href that fallbackWhatsappUrl() does not build:\n`
+     + `  markup ${h}\n  code   href="${href}"`);
+  }
+  ok(/<noscript id="down-css">/.test(html),
+     'index.html has no <noscript id="down-css">: with scripting off nothing '
+   + 'hides the empty stage and the "—" price, and js/app.js degrade() has '
+   + 'nothing to read back');
+  ok(/id="down"/.test(html),
+     'index.html has no #down strip, so a page that cannot start says nothing');
+  ok(/window\.__up \|\|/.test(html),
+     'index.html has no bundle-404 guard: scripting on and the bundle missing '
+   + 'is the one route <noscript> and fail() both miss');
+  ok(/class="wa__off"/.test(html) && /class="wa__on"/.test(html),
+     'the send buttons carry only one label, so a degraded page still promises '
+   + 'to send a door it does not have');
+}
+
 group('ironwork is counted, and the drawing agrees with the bill');
 {
   globalThis.window = globalThis.window
