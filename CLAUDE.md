@@ -44,6 +44,36 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 0 item 6 WITHDRAWN: `profile.mjs` measured, and left alone.**
+  `REDESIGN.md` §2.1 asked for the gate to be rebased on band means and a
+  corpus-derived per-row tolerance. Implemented in a mirror and measured, it is
+  **worse than what it replaces**, and the plan now says so.
+  ⚠ **Our light band lands at 0.090 against a tolerance of 0.09** under band
+  means — it passes only because the comparison is `>`. A gate with no margin
+  is worse than the one it replaces. (Single pixel: dark 0.040, light 0.087.
+  Band mean: dark 0.050, light 0.090.)
+  ⚠ **The corpus's light median is physically impossible**: band means over all
+  eleven light doors give `0.85 0.87 0.83 0.73 0.82 0.84 0.87 0.85 0.93` — the
+  leaf brightening toward the FLOOR. No painted door under one light does that,
+  so the light subset is mismeasured somewhere and its medians cannot be a
+  target until somebody finds out where. Recorded as `ASK-PERETZ.md` §10, which
+  is ours and not Peretz's.
+  ⚠ **The dark medians the tool already holds are RIGHT** — band-mean corpus
+  median `0.95 0.95 0.91 0.83 0.76 0.69 0.66 0.62 0.57` against the tool's
+  `0.96 0.96 0.90 0.84 0.80 0.72 0.67 0.62 0.57`, inside 0.04 at every row.
+  There was nothing to correct. And the plain, unglazed subset that is the
+  tool's actual subject is **4 dark and 2 light**, with half-IQRs to 0.39.
+  ⚠ **One point went the proposal's way and is worth keeping**: a corpus-derived
+  tolerance would NOT fail open, which was the stated fear — fed a dead-flat
+  leaf and a double-steep leaf it rejects both, by 0.21 dark and 0.08 light. The
+  objection is the margin and the data, not the principle.
+  ⚠ **And §2.1's charge was overstated.** The tool's own comment says its
+  tolerance is "set to catch DRIFT, not to certify a match", so it never
+  certified fidelity. The narrower true finding stands: **28-30 of 30 real
+  doors fail this gate, so no leaf-texture work may steer by it.** The
+  recurring agent reached the same stop from caution two runs earlier; this is
+  the same conclusion with the measurement behind it.
+
 - **Stage 0 of `REDESIGN.md`, part 1 — the instruments, and the live regression
   they were not looking at.** Chosen from outside over the prettier work:
   *bugs first.*

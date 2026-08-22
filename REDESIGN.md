@@ -222,9 +222,53 @@ a dark door "fell 12% where the photographs rise 3%", then `grain` was put back
 because d026's orange peel called for it. **The instrument has been holding the
 leaf flat.**
 
-Fix: band means (±0.045 H) and a per-row tolerance derived from the corpus's
-own half-IQR. That is not weakening an assertion — it replaces a tolerance no
-photograph satisfies with one the photographs produce.
+**⚠ THE PROPOSED FIX WAS TRIED AND IS WITHDRAWN. Measured, it is worse.**
+
+The recommendation here was band means (±0.045 H) plus a per-row tolerance from
+the corpus's own half-IQR. It was implemented in a mirror and measured, and
+four findings kill it:
+
+1. **Our drawing lands exactly on the tolerance.** Both methods, against the
+   gate as it stands:
+
+   ```
+   dark   single pixel  0.99 1.00 0.92 0.87 0.77 0.68 0.64 0.61 0.56   worst 0.040
+   dark   band mean     1.00 0.99 0.94 0.89 0.82 0.70 0.66 0.62 0.55   worst 0.050
+   light  single pixel  1.00 1.00 1.00 0.98 0.96 0.95 0.93 0.90 0.85   worst 0.087
+   light  band mean     1.00 1.00 0.99 0.99 0.96 0.95 0.93 0.90 0.83   worst 0.090
+   ```
+
+   Band means put the light band at **0.090 against a tolerance of 0.09** — it
+   passes only because the comparison is `>`. A gate with zero margin is worse
+   than the one it replaces.
+
+2. **The corpus's light median is physically impossible.** Band means over all
+   eleven light doors give `0.85 0.87 0.83 0.73 0.82 0.84 0.87 0.85 0.93` — the
+   leaf gets *brighter* toward the floor. A falloff does not do that. Something
+   in the light subset is mismeasured, and its medians cannot be used as a
+   target until somebody finds out what.
+
+3. **The subset that is actually the tool's subject is too small.** Plain,
+   unglazed, no worked face: **4 dark and 2 light**, with half-IQRs to 0.39.
+
+4. **The dark medians the tool already holds are right.** Band-mean corpus
+   median `0.95 0.95 0.91 0.83 0.76 0.69 0.66 0.62 0.57` against the tool's
+   `0.96 0.96 0.90 0.84 0.80 0.72 0.67 0.62 0.57` — inside 0.04 everywhere.
+   There is nothing to correct.
+
+One thing the measurement did settle in the proposal's favour: a corpus-derived
+tolerance would **not** fail open, which was the stated fear. Fed a dead-flat
+leaf and a double-steep leaf it rejects both, by 0.21 (dark) and 0.08 (light).
+The objection is the margin and the data, not the principle.
+
+**What is actually true, stated narrowly.** The tool's own comment already says
+its tolerance is "set to catch DRIFT, not to certify a match" — so §2.1's
+charge that it "mechanically forbids the fidelity it certifies" was overstated:
+it never certified fidelity. The real finding is smaller and still worth
+having: **28 to 30 of 30 real doors fail this gate, so nobody may steer leaf
+texture by it**, and the light band carries a data anomaly that has to be
+understood before its medians are trusted. Both are now recorded; the tool is
+left alone.
 
 ### 2.2 `npm run glass` measures the whole door and calls it the glass
 
@@ -493,14 +537,16 @@ of it can regress the app.
    `everyState()` (§2.5).
 4. Add `js/colour.js` to `SHEET_DEPS`.
 5. Delete the false coverage claim at `catalog.js:394`, or make it true.
-6. Rebase `profile.mjs` on band means and a corpus-derived per-row tolerance
-   (§2.1), and report `mottle` raw *and* dome-removed (§2.3).
+6. ~~Rebase `profile.mjs` on band means and a corpus-derived per-row
+   tolerance.~~ **WITHDRAWN — measured and rejected, see §2.1.** Band means put
+   our light band at exactly the tolerance, the corpus's light median is
+   physically impossible, and the dark medians the tool holds are already
+   right. `mottle`'s dome decomposition stands as a separate question.
 
-> ⚠ Item 6 is the one change in this plan that could be mistaken for weakening
-> an assertion, which `AGENT.md` forbids. State the argument in the commit: the
-> current tolerance is one **no photograph in the corpus satisfies**, and the
-> replacement is derived from the corpus's own spread. It is strictly more
-> honest and it is the precondition for any texture work.
+> The withdrawal is the point, not a retreat from it. This plan asked for the
+> gate to be redesigned; the measurement said the gate is fine and the DATA
+> behind half of it is not. Changing it anyway would have been changing a
+> measured number by eye, in the one instrument that certifies every push.
 
 ### Stage 1 — the handoff · **2 to 3 days** · this is the product
 

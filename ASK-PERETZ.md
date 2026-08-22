@@ -398,6 +398,28 @@ the chart it is finished from.*
 
 ---
 
+## 10. אחת לנו, לא לפרץ — הדלתות הבהירות במדידות
+
+*Not a question for Peretz. Recorded here because it is the only open list.*
+
+The nine-row falloff median over the eleven light-coloured measured doors,
+sampled as band means, comes out **non-monotonic**:
+
+    0.85 0.87 0.83 0.73 0.82 0.84 0.87 0.85 0.93
+
+The leaf gets brighter toward the floor. No painted door under one light does
+that, so something in the light subset is mismeasured — a leaf box that catches
+the threshold or the floor, a door photographed against the sun, or a normalisation
+that divides by the wrong row. The dark band (n=19) is clean and matches what
+`tools/profile.mjs` already holds to inside 0.04.
+
+Until that is understood, `ROWS.light` in `profile.mjs` cannot be re-derived
+from the corpus, and no leaf-texture work should be steered by it. See
+`REDESIGN.md` §2.1 for the full measurement and why the proposed replacement
+was withdrawn.
+
+---
+
 ## What I need back, minimally, to flip `PLACEHOLDER` to `false`
 
 | | Question | Blocks |
