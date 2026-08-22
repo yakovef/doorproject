@@ -519,11 +519,16 @@
     brass: ["#EFE5CE", "#D9CBA6", "#BCAD86", "#9C8F6C", "#C7BA9B", "#7C7154", "#FDF6E2"]
   };
   function inFinish(hex, tone) {
+    if (tone === FINISH_TONES.steel) return hex;
     const { r, g, b } = toRgbLocal(hex);
     const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
     const order = [6, 0, 1, 2, 4, 3, 5];
-    const i = Math.min(order.length - 1, Math.max(0, Math.round((1 - l) * (order.length - 1))));
-    return tone[order[i]];
+    const pos = Math.min(1, Math.max(0, 1 - l)) * (order.length - 1);
+    const lo = Math.floor(pos), hi = Math.min(order.length - 1, lo + 1);
+    const t = pos - lo;
+    const A = toRgbLocal(tone[order[lo]]), B = toRgbLocal(tone[order[hi]]);
+    const mixed = (k) => Math.round(A[k] + (B[k] - A[k]) * t);
+    return `#${[mixed("r"), mixed("g"), mixed("b")].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
   }
   var toRgbLocal = (hex) => ({
     r: parseInt(hex.slice(1, 3), 16),

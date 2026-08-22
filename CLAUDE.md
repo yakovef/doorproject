@@ -44,6 +44,39 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **`inFinish` was destroying 56% of a measured range, on the only finish we
+  ship.** `REDESIGN.md` §3.1 — the largest single fidelity win available, and a
+  defect repair rather than a taste bet.
+  ⚠ **Steel is the profile's own finish, so it is the IDENTITY.** Every profile
+  that passes through `inFinish` was measured off a photograph of a BRUSHED
+  STEEL bar (`barTube` stop by stop from d035 and d065, `barStrap` from d049);
+  brass has its own literal `barGold` and never arrives. So on a steel door the
+  function was being asked to convert steel into steel, and the only correct
+  answer is the number that was measured. It was returning something else.
+  ⚠ **What shipped.** Nine authored stops at luminance
+  `70 122 176 251 232 164 117 69 100` came out as
+  `159 164 202 249 231 202 164 159 159` — nine distinct values collapsed to
+  five, contrast **3.64:1 down to 1.57:1**, and symmetric. A cylinder goes dark
+  at one rim and bright once, off centre; what shipped was a soft pill. Two
+  ramp entries were unreachable from any input in the file.
+  ⚠ **The comment defending it was wrong on its own terms.** It said the ramp
+  "is sampled by index rather than interpolated" because of "a lit return at
+  index 4". Ordered through `order`, the steel ramp reads `249 231 202 164 159
+  133 111` — strictly decreasing. There is no return. The premise was wrong and
+  it cost 56% of a measured range on every door.
+  ⚠ **Measured, source and screen.** Gradient stops 1.57:1 → **3.64:1**, nine
+  distinct values restored. The RENDERED bar, cross-section on screen, median
+  of nine rows: **2.91:1 → 3.52:1**, peak staying off-centre at t≈0.21. For
+  calibration, ten installed bars run 2.33–9.20, median **5.46**, and the
+  manufacturer's own studio shot of the Idan bar runs 5.10 — so this moves us
+  from 1.88× under the real thing to 1.55× under it. Real, and not the whole
+  distance.
+  ⚠ Black still reaches the remap through a grip that declares its own finish,
+  and is **interpolated now rather than bucketed** — strictly better, but still
+  bounded by a ramp narrower than the measured profile, so a black bar reads
+  flatter than a steel one. Recorded rather than hidden. This is NOT a route
+  back to the withdrawn finish axis; `f=` stays retired forever.
+
 - **The 374 KB door: `ink()` wrote every path three times.** `REDESIGN.md` §3.4.
   A forged ironwork member is drawn three times — shadow, body, lit edge — and
   each carried its own full copy of `d`. A curl is a dense polyline, so across

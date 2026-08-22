@@ -62,14 +62,61 @@ const FINISH_TONES = {
  * d060 d066 d087 d113 d122, brass on d045 d072 d074 d082, steel on the rest.
  */
 function inFinish(hex, tone) {
+  /* ⚠ STEEL IS THE PROFILE'S OWN FINISH, SO IT IS THE IDENTITY.
+     Every profile that passes through here was measured off a photograph of a
+     BRUSHED STEEL bar — `barTube` stop by stop from d035 and d065, `barStrap`
+     from d049. Brass has its own literal gradient (`barGold`) and never comes
+     here. So when the door's finish is steel this function is being asked to
+     convert steel into steel, and the only correct answer is the number that
+     was measured.
+
+     It was not doing that. The seven-bucket lookup below turned the nine
+     authored stops
+
+         #4A453F #7E7A73 #B4B0A8 #FCFBF7 #EBE8E1 #A9A39B #7A746D #4A443E #6A635C
+             70     122     176     251     232     164     117      69     100
+
+     into
+
+         #99A0A5 #9FA5AA #C6CBCF #F7F9FA #E4E7E9 #C6CBCF #9FA5AA #99A0A5 #99A0A5
+            159     164     202     249     231     202     164     159     159
+
+     — nine distinct values collapsed to five, contrast **3.64:1 down to
+     1.57:1**, and SYMMETRIC. A cylinder goes dark at one rim and bright once,
+     off centre; what shipped was a soft pill. Two ramp entries (#80868B and
+     #6A7075) were unreachable from any input in the file. For calibration, ten
+     pull bars measured off the installed photographs run 2.33 to 9.20, median
+     5.46, and the manufacturer's own studio shot of the Idan bar runs 5.10.
+     We were shipping 1.57.
+
+     The comment that stood here justified the bucketing — "the ramp is ordered
+     light to dark with a lit return at index 4, so it is sampled by index
+     rather than interpolated: the return is a feature of the metal". Ordered
+     through `order`, the steel ramp reads 249 231 202 164 159 133 111, which
+     is strictly decreasing. There is no return. The premise was wrong and it
+     cost 56% of a measured range on every door we ship.
+
+     ⚠ The finish axis is WITHDRAWN and this is not a route back to it (`f=` is
+     retired forever). Black still reaches here through a grip that declares its
+     own finish, and it is interpolated now rather than bucketed — strictly
+     better, though still bounded by its ramp, which is narrower than the
+     measured profile. A black bar will read flatter than a steel one. That is
+     a known limit of a six-step body ramp, recorded rather than hidden. */
+  if (tone === FINISH_TONES.steel) return hex;
+
   const { r, g, b } = toRgbLocal(hex);
-  /* Position on the ramp, 0 = brightest. The ramp is ordered light to dark
-     with a lit return at index 4, so it is sampled by index rather than
-     interpolated: the return is a feature of the metal, not a mistake. */
   const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
   const order = [6, 0, 1, 2, 4, 3, 5];         // specular, then brightest to darkest
-  const i = Math.min(order.length - 1, Math.max(0, Math.round((1 - l) * (order.length - 1))));
-  return tone[order[i]];
+  /* Interpolate between the two neighbouring ramp entries instead of rounding
+     to one of them: the profile's SHAPE is the thing worth carrying across, and
+     rounding is what threw it away. */
+  const pos = Math.min(1, Math.max(0, 1 - l)) * (order.length - 1);
+  const lo = Math.floor(pos), hi = Math.min(order.length - 1, lo + 1);
+  const t = pos - lo;
+  const A = toRgbLocal(tone[order[lo]]), B = toRgbLocal(tone[order[hi]]);
+  const mixed = k => Math.round(A[k] + (B[k] - A[k]) * t);
+  return `#${[mixed('r'), mixed('g'), mixed('b')]
+    .map(v => v.toString(16).padStart(2, '0')).join('')}`;
 }
 const toRgbLocal = hex => ({
   r: parseInt(hex.slice(1, 3), 16),
