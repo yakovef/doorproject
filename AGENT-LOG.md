@@ -23,6 +23,65 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-22 10:47 UTC — run 18: nothing changed. The third lying instrument's premise reproduced, and stopped there
+
+**Looked at:** `REDESIGN.md` §2.1, the last of the three instruments and the
+only one that is a **gate** — `npm run profile` is one of the six that must be
+green before anyone pushes. Two runs ago I said re-deriving its tolerance is
+larger than an agent should decide alone. That still stands. What I owed was
+the premise, independently, the way run 15 did for the check character.
+
+**Instruments:** test ✓ (2,763,765) · audit ✓ · profile ✓ · collide ✓ (base /
+`all`) · recreate ✓ · shot ✓. Tree clean; nothing changed this run.
+
+**The claim, reproduced with its own method.** Nine points at x = 0.42 of leaf
+width, y = 0.055 + i·0.111, one sample each, normalised by the brightest,
+worst row against the band median at `TOL = 0.09`. Applied to the photographs
+the medians were fitted from, using only the **31 `src: "hand"`** leaf boxes,
+because CLAUDE.md §8 says a fallback box is a picture of somewhere near a door:
+
+    all hand-measured (30 with a colour record)   30 fail, 0 pass
+      dark  19 doors, median worst row 0.414
+      light 11 doors, median worst row 0.663
+
+⚠ **I then made it as fair as it can be made**, because x = 0.42 on a panelled
+or glazed photograph crosses a moulding, a pane or the lock furniture, and that
+is not paint. Restricted to doors with no window and no worked face — the
+tool's actual subject:
+
+    plain, unglazed, hand-boxed          6 fail, 0 pass
+      dark   4 doors, median worst row 0.418
+      light  2 doors, median worst row 0.308
+    our drawing                          dark 0.040, light 0.087 — inside TOL
+
+**Not one real door passes, on the fairest subset available, at deviations four
+to seven times the tolerance.** Our drawing passes, and the mechanism is in the
+audit: `ROWS` is a MEDIAN across thirty doors, which is smooth by construction,
+applied as a per-door gate against single-pixel samples, which are not.
+
+**My numbers are not identical to the plan's** and I would rather say so than
+imply agreement I did not get: it reports 24 dark / 7 light and medians of
+0.351 / 0.319 with d038 passing; I get 19 / 11, medians 0.414 / 0.663, and
+nothing passing. Almost certainly a different dark/light split — I used
+`colour.lum < 150`, the threshold CLAUDE.md uses elsewhere. **The direction and
+the size of the effect are the same, and mine is the harsher reading.**
+
+**Why I stopped there.** Fixing `glass` and `mottle` was correcting tools that
+measured the wrong object or remembered a number — no judgement about what the
+right answer is. This one is different in kind and in consequence: the proposed
+replacement (band means over ±0.045 H, per-row tolerance from the corpus's own
+half-IQR) is a *design of a measurement*, and it is the gate that certifies the
+drawing for every push including the human's. Got wrong it fails open, and
+nothing downstream would say so. `AGENT.md` permits changing an assertion that
+is genuinely wrong; it does not make me the right author of a new one here.
+
+**Left alone:** `profile`'s tolerance, `mottle`'s dome, and the seven findings
+that are the human's or Peretz's.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-22 05:54 UTC — run 17: `npm run mottle` could not measure us at all, so it remembered instead
 
 **Looked at:** the second of the audit's three lying instruments. Last run I
