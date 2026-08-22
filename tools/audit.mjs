@@ -25,12 +25,28 @@ import { DEFAULTS, encodeCode } from '../js/url-state.js';
    here turned that into 280 audit failures that were all the same fact. */
 const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
 
+/* ⚠ 1100 AND 1152 ARE HERE BECAUSE THIS LIST USED TO STEP 834 -> 1280, AND THE
+   THREE-COLUMN LAYOUT BEGINS AT 1100. Nothing had ever opened the band in
+   between, and the band was broken: measured at 1100 on a sidelight the grip
+   bar came out 0 px wide and its buttons 22, against the 44 px floor this same
+   file asserts everywhere else. The controls a customer is told to press were
+   unpressable on any 1100-1240 px laptop showing a wide door — a regression of
+   a change made by request, invisible to every instrument in the repo.
+
+   The lesson is AGENT-LOG run 8's, one level up: a hand-kept list inside a
+   check is how the grip bar's two 34 px buttons went unmeasured the first
+   time. A VIEWPORT list is a hand-kept list too, and the viewport that matters
+   is the one just past a breakpoint, not the round number a laptop happens to
+   be. `css/app.css` has exactly one breakpoint, 1100, so it is here; 1152 is
+   the far side of the band, where the wall is only just wide enough. */
 const VIEWS = [
-  { name: 'phone',   w: 390,  h: 844 },
-  { name: 'phone-s', w: 320,  h: 568 },
-  { name: 'tablet',  w: 834,  h: 1112 },
-  { name: 'laptop',  w: 1280, h: 720 },
-  { name: 'wide',    w: 1680, h: 950 },
+  { name: 'phone',    w: 390,  h: 844 },
+  { name: 'phone-s',  w: 320,  h: 568 },
+  { name: 'tablet',   w: 834,  h: 1112 },
+  { name: 'cusp',     w: 1100, h: 800 },
+  { name: 'narrow-d', w: 1152, h: 800 },
+  { name: 'laptop',   w: 1280, h: 720 },
+  { name: 'wide',     w: 1680, h: 950 },
 ];
 
 /* Read off the page rather than listed here. The list was hand-kept and it had

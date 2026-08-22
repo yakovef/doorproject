@@ -13,7 +13,7 @@ import {
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { conflicts, repair } from '../js/rules.js';
-import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
+import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' + msg));
@@ -123,6 +123,40 @@ group('short code round-trip');
     n++;
   }
   console.log(`  (${n} designs)`);
+
+  /* ⚠ EVERY LIST MUST STILL FIT IN ITS FIELD, and nothing asserted this.
+     `encodeCode` masks rather than throws, so the seventeenth `DETAILS` entry
+     would encode as index 0 and Peretz would build a plain door from a code
+     that reads perfectly. The sweep above cannot catch it either: `everyState`
+     pins `detail: 'plain'`, so the field closest to its ceiling is the one
+     field never varied.
+     This is the assertion that makes a catalogue APPEND safe, which is the
+     operation the whole VERSION discipline exists to keep free. */
+  for (const [field, list] of [['colour', COLOURS], ['size', Object.keys(SIZES)],
+                               ['handing', HANDINGS], ['window', WINDOWS],
+                               ['grille', GRILLES], ['handle', HANDLES],
+                               ['lockset', LOCKSETS], ['detail', DETAILS]]) {
+    const cap = 2 ** BITS[field];
+    ok(list.length <= cap,
+       `${field} has ${list.length} entries and ${BITS[field]} bits (max ${cap}); `
+       + 'appending one more encodes as index 0 in silence');
+  }
+  ok(VERSION < 2 ** BITS.version,
+     `VERSION ${VERSION} does not fit in ${BITS.version} bits`);
+
+  /* And vary `detail` for real, cheaply — the sweep pins it, so without this
+     the round-trip has never seen seven of its eight values. A narrow stem
+     rather than an eighth dimension on 275,000 designs. */
+  let dn = 0;
+  for (const d of DETAILS) for (const w of WINDOWS) for (const s of Object.keys(SIZES)) {
+    const st = { ...base, detail: d.id, window: w.id, size: s };
+    if (!buildable(st)) continue;
+    const back = decodeCode(encodeCode(st));
+    ok(back && back.detail === d.id,
+       `detail ${d.id} did not round-trip on ${s}/${w.id}: got ${back && back.detail}`);
+    dn++;
+  }
+  console.log(`  (${dn} designs varying the front detail, which the sweep pins)`);
 
   // Read-aloud tolerance: a customer says these over the phone.
   const ref = encodeCode(base);
@@ -691,6 +725,45 @@ group('every grille draws something, and no two draw the same thing');
     const twin = seen.get(svg);
     ok(!twin, `grille ${g.id} renders exactly the door ${twin} renders: two prices, one picture`);
     seen.set(svg, g.id);
+  }
+}
+
+/* ⚠ THE HALF OF THE CATALOGUE'S CLAIM THAT GROUP 6b2 STRUCTURALLY CANNOT COVER.
+   Both halves came out of the same finding within the same hours, from two
+   directions, and they are complementary rather than duplicated. Keep both:
+
+     6b2, above   every id an entry CITES is a real door id with a photograph on
+                  disk. It skips any entry carrying no `doors` at all, so it can
+                  never notice an option that cites NOTHING.
+     this group   every priced grille cites SOMETHING. That is the other way the
+                  evidence fails, and the more expensive one: a priced option
+                  with nothing behind it is how invented designs — `lattice`,
+                  `bars`, `bars-light` — reached a customer-facing list before
+                  being withdrawn.
+
+   A `-light` variant legitimately inherits its parent's doors: `light` changes
+   the colour of the same ironwork, not the pattern, and the photographs were
+   read for pattern. So it is asked for a parent that exists rather than for
+   doors of its own. */
+group('every grille names the doors it was read from');
+{
+  const byIdent = new Map(GRILLES.map(g => [g.id, g]));
+  for (const g of GRILLES) {
+    if (g.id === 'none') continue;
+    const parentId = g.id.endsWith('-light') ? g.id.slice(0, -6) : null;
+    if (parentId) {
+      const parent = byIdent.get(parentId);
+      ok(parent, `grille ${g.id} inherits evidence from ${parentId}, which is not in the list`);
+      ok(parent && Array.isArray(parent.doors) && parent.doors.length,
+         `grille ${g.id} inherits from ${parentId}, which itself names no doors`);
+      continue;
+    }
+    ok(Array.isArray(g.doors) && g.doors.length > 0,
+       `grille ${g.id} names no door it was read from: it is a priced option with no evidence`);
+    for (const d of g.doors || []) {
+      ok(/^d\d{3}$/.test(d),
+         `grille ${g.id} cites "${d}", which is not a corpus record id`);
+    }
   }
 }
 

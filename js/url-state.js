@@ -251,8 +251,17 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    than left as dead zeroes: a reserved field nobody writes is a field somebody
    eventually reuses, and the VERSION is what protects the old codes, not the
    padding. */
-const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4, grille: 5,
-               handle: 4, lockset: 4, detail: 4 };
+/* ⚠ EXPORTED so a test can assert the lists still fit inside it.
+   `encodeCode` packs each field with `BigInt(i) & ((1n << w) - 1n)`, and a
+   mask does not throw — it WRAPS. A seventeenth `DETAILS` entry has index 16,
+   which is four bits of zero, so it encodes as index 0: the customer picks the
+   new front detail, reads the code down the telephone, and Peretz builds a
+   plain door. Nothing anywhere reports a fault.
+   That is the one way a catalogue APPEND — the operation this whole VERSION
+   discipline exists to keep free — can be silently wrong, and `detail` is the
+   field nearest its ceiling. */
+export const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4,
+                      grille: 5, handle: 4, lockset: 4, detail: 4 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */

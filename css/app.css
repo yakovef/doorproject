@@ -23,6 +23,16 @@
   --sp: 4px;
   --radius: 2px;
 
+  /* The wall strip the grip controls stand in, reserved out of the stage above
+     1100 px and zero below it (on a phone the controls are in flow under the
+     door). 148 leaves the bar 128 after its own 8 px inset and the 20 px the
+     `.grip-bar` width rule takes off — comfortably past the 56 px the audit
+     demands and past a 44 px touch target on each button.
+     One number in one place: the padding that reserves the strip and the width
+     the bar is allowed to take are the same quantity, and CLAUDE.md §5 is the
+     record of what happens when a quantity like that lives in two. */
+  --grip-strip: 0px;
+
   --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
   --sans: "Segoe UI", "Arial Hebrew", Arial, system-ui, sans-serif;
 
@@ -211,7 +221,32 @@ body {
     block-size: 100%;
     display: flex; flex-direction: column; justify-content: center;
     overflow: hidden;
+    /* ⚠ THE STRIP IS RESERVED WHETHER OR NOT THE DOOR CARRIES A HANDLE, and
+       that is the point of it rather than an oversight.
+
+       The grip controls stand in the wall beside the door, and their width
+       came entirely from whatever wall happened to be left over. Between 1100
+       and 1240 px there is none left over. Measured at 1100 on a sidelight the
+       bar came out 0 px wide and its buttons 22, against the 44 px floor the
+       same audit enforces everywhere else — so the buttons that were moved
+       into the wall by request were unpressable on a 1100 px laptop, in a band
+       `audit.mjs` had never opened (it steps 834 -> 1280).
+
+       Reserving the strip ON DEMAND is the obvious fix and the one thing that
+       must not happen: a strip that appears when a pull handle is chosen takes
+       its width out of the door, and THE DOOR SHRINKING WHEN IT GAINS A HANDLE
+       is the exact fault that put these controls in the wall to begin with.
+       So the padding is unconditional. The door is fitted into what is left,
+       always, and choosing a handle changes nothing about its size — which is
+       what `audit.mjs` asserts, and why that assertion still passes.
+
+       `.grip-bar` is absolutely positioned against this element, and an
+       absolutely positioned box is laid out against the PADDING box — so its
+       `inset-inline-start` measures from the outer edge and the bar lands
+       inside the reserved strip rather than beyond it. */
+    padding-inline-start: var(--grip-strip);
   }
+  :root { --grip-strip: 148px; }
 }
 
 .stage {
@@ -315,7 +350,14 @@ body {
      width fits a standard leaf on a laptop and lands on the frame on a phone.
      The fallback is for the instant before the first paint. */
   inset-inline-start: 8px;
-  inline-size: min(calc(var(--wall-gap, 9.5rem) - 20px), 9.5rem);
+  /* Above 1100 the strip is reserved, so the floor is guaranteed rather than
+     hoped for: `--grip-strip` minus this element's own 8 px inset and 20 px of
+     breathing room is the width, and `--wall-gap` only widens it when the door
+     leaves more wall than the strip reserved. Below 1100 `--grip-strip` is 0
+     and the old measured behaviour is unchanged. */
+  inline-size: min(
+    max(calc(var(--grip-strip) - 28px), calc(var(--wall-gap, 9.5rem) - 20px)),
+    9.5rem);
   inset-block-start: 50%;
   transform: translateY(-50%);
   z-index: 2;

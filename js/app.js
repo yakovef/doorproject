@@ -780,7 +780,19 @@ function fitStage() {
   const frame = svg.querySelector('#frame');
   if (frame) {
     const f = frame.getBoundingClientRect();
-    const wall = Math.max(0, Math.min(f.x - box.x, box.x + box.width - (f.x + f.width)));
+    /* ⚠ Measured against the WRAP, not against `.stage`. Above 1100 px the
+       wrap carries `padding-inline-start: var(--grip-strip)` so the controls
+       always have somewhere to stand, and `.stage` begins after it. Measuring
+       from `.stage` would report only the wall left over INSIDE the door's own
+       box and miss the reserved strip entirely, shrinking the number by the
+       whole strip at exactly the widths where the wall is most generous.
+       The wrap's rect is its padding box, which is also what the absolutely
+       positioned `.grip-bar` is laid out against — so the number published
+       here and the box the bar sits in are the same box, by construction
+       rather than by two agreeing measurements. */
+    const wrap = $('.stage-wrap').getBoundingClientRect();
+    const wall = Math.max(0,
+      Math.min(f.x - wrap.x, wrap.x + wrap.width - (f.x + f.width)));
     /* ⚠ `--wall-gap`, NOT `--wall`. `--wall` is the wall's COLOUR and has been
        since the first stylesheet, and the SVG's own backdrop is painted with
        `fill="var(--wall)"` — so setting it to a pixel length on `.stage-wrap`

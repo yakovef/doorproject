@@ -57,12 +57,19 @@ import { build } from 'esbuild';
  * every file is present, the picture is the wrong picture — and the next
  * person to open it may "fix" something already fixed.
  *
- * The stamp is a hash of what the DRAWING is — `js/renderer.js` and
- * `js/catalog.js` — and not of the tool that drew the sheet. A tool's own
- * comments changing is not a reason to spend three minutes regenerating
- * thirty PNGs; the drawing changing is.
+ * The stamp is a hash of what the DRAWING is — and not of the tool that drew
+ * the sheet. A tool's own comments changing is not a reason to spend three
+ * minutes regenerating thirty PNGs; the drawing changing is.
+ *
+ * ⚠ `js/colour.js` is in the list because it was MISSING from it. It exports
+ * `darken`, `lighten` and `mix`, and `renderer.js` calls them at 23 gradient
+ * sites — so editing one of those three functions moves every gradient in the
+ * drawing while all 110 committed sheets go on claiming to be current, because
+ * the hash they are stamped against never saw the file that changed them. A
+ * staleness check blind to one of the drawing's own inputs is the same class
+ * of fault as the staleness it exists to catch.
  */
-const SHEET_DEPS = ['js/renderer.js', 'js/catalog.js'];
+const SHEET_DEPS = ['js/renderer.js', 'js/catalog.js', 'js/colour.js'];
 const STAMP_FILE = 'screenshots/.stamps.json';
 
 const depHash = () => createHash('sha256')

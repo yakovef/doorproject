@@ -4483,7 +4483,11 @@ ${body}
     const frame = svg.querySelector("#frame");
     if (frame) {
       const f = frame.getBoundingClientRect();
-      const wall = Math.max(0, Math.min(f.x - box.x, box.x + box.width - (f.x + f.width)));
+      const wrap = $(".stage-wrap").getBoundingClientRect();
+      const wall = Math.max(
+        0,
+        Math.min(f.x - wrap.x, wrap.x + wrap.width - (f.x + f.width))
+      );
       $(".stage-wrap").style.setProperty("--wall-gap", `${Math.round(wall)}px`);
     }
   }

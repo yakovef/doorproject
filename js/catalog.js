@@ -393,6 +393,16 @@ export const LOCKSETS = [
  * `npm run corpus` recreates every measured door from its own record and needs
  * exactly this to know which grille each one carries; `npm test` asserts every
  * id here has a photograph behind it.
+ *
+ * ⚠ THAT LAST CLAUSE WAS FALSE WHEN IT WAS WRITTEN, AND IS TRUE NOW. Nothing
+ * under `test/` had ever read `.doors` — `grep -rn "\.doors" test/` returned
+ * nothing — and the only reader in the repo was `tools/corpus.mjs`, which
+ * walks the relation backwards (record -> grille) and therefore cannot notice
+ * a grille carrying no evidence at all. A false claim of coverage is worse
+ * than no coverage, because it is exactly the thing that stops the next person
+ * looking. The assertion this sentence promises now exists; see "every grille
+ * names the doors it was read from" in `test/units.mjs`.
+ *
  * The `-light` variants share their parent's doors: what `light` changes is
  * the colour of the same ironwork, and the photographs were read for pattern
  * rather than for that.

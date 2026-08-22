@@ -44,6 +44,57 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 0 of `REDESIGN.md`, part 1 — the instruments, and the live regression
+  they were not looking at.** Chosen from outside over the prettier work:
+  *bugs first.*
+  ⚠ **THE GRIP CONTROLS WERE UNPRESSABLE BETWEEN 1100 AND 1240 px, RIGHT NOW.**
+  `audit.mjs` stepped 834 → 1280 and the three-column layout begins at **1100**,
+  so the band was never opened. Measured at 1100 on a sidelight: grip bar
+  **0 px wide**, buttons **22 px** against the 44 px floor the same file
+  asserts everywhere else. The buttons moved into the wall *by request* two
+  rounds ago were unusable on any 1100-px laptop showing a wide door.
+  ⚠ **The fix reserves the strip UNCONDITIONALLY, and that is the point of
+  it.** `.stage-wrap` gets `padding-inline-start: var(--grip-strip)` above
+  1100. Reserving *on demand* is the obvious fix and the one thing that must
+  not happen — a strip that appears when a pull handle is chosen takes its
+  width out of the door, and **the door shrinking when it gains a handle** is
+  the exact fault that put these controls in the wall in the first place.
+  Verified across twelve viewport × size combinations: every one passes, and
+  the door's width with and without a handle differs by **0.0 px** at all of
+  them. `--grip-strip` is one number in one place — the padding that reserves
+  the strip and the width the bar may take are the same quantity.
+  ⚠ **`fitStage` now measures the wall against the WRAP, not `.stage`.** The
+  wrap's rect is its padding box, which is also what the absolutely positioned
+  `.grip-bar` is laid out against — so the published number and the box the bar
+  sits in are the same box by construction. Measuring from `.stage` would have
+  missed the reserved strip entirely and under-reported by 148 px at exactly
+  the widths where the wall is most generous.
+  ⚠ **1100 and 1152 added to `VIEWS`.** The lesson is AGENT-LOG run 8's, one
+  level up: a hand-kept list inside a check is how the grip bar's two 34 px
+  buttons went unmeasured the first time — and **a viewport list is a hand-kept
+  list too.** The viewport that matters is the one just past a breakpoint, not
+  the round number a laptop happens to be.
+  ⚠ **`glass.mjs` and `npm run mottle`** were found from both sides within
+  the same hours; the entry above is the agent's and is the better account.
+  My own reading agreed on the selector and on the corrected spread.
+  ⚠ **`js/colour.js` added to `SHEET_DEPS`.** It feeds `darken`/`lighten`/`mix`
+  to 23 gradient sites; editing one moved every gradient while 110 sheets went
+  on claiming to be current. Landing it invalidated every sheet — and
+  regenerating changed **only the 10 full-page app screenshots** (the CSS moved
+  the desktop layout). Every `corpus-*`, `recreate-*` and `against-*` sheet came
+  back **byte-identical**, which is the proof the drawing did not move — and
+  also the argument for hashing the drawing's OUTPUT rather than its source.
+  ⚠ **`BITS` is exported and asserted.** `encodeCode` masks rather than throws,
+  so a 17th `DETAILS` entry encodes as **index 0** — the customer picks it,
+  reads the code down the phone, Peretz builds a plain door, nothing reports a
+  fault. And `everyState()` pins `detail: 'plain'`, so the field nearest its
+  ceiling was the one field never varied. Now: a capacity assertion per list,
+  and a narrow sweep that varies the detail for real rather than an eighth
+  dimension on 275,000 designs.
+  ⚠ **`catalog.js`'s false coverage claim** was found from both sides in the
+  same hours and is fixed in `abc7a22`; the header now says which assertion
+  makes it true. A false claim of coverage is worse than none, because it is
+  exactly what stops the next person looking.
 
 - **`REDESIGN.md` REWRITTEN — the look plan was answering a smaller question
   than the project has.** A mockup arrived from outside (*make the app look
