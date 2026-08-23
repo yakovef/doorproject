@@ -521,6 +521,34 @@ was withdrawn.
 
 ---
 
+## 11. שלוש שאלות שנפתחו מהמוקאפ השני
+
+*From `REALISM2.md` §8. Three of the mockup's items were refused because they
+would make a claim on Peretz's behalf that nobody has confirmed. All three are
+five-second answers and none of them blocks launch.*
+
+**11a. כפתור וואטסאפ שני, כהה, בראש העמוד?**
+המוקאפ מצייר כפתור וואטסאפ כהה בשורה העליונה, בנוסף לכפתור הירוק שבכרטיס
+השליחה. הירוק נשאר ירוק — זו החלטה סגורה. השאלה היא רק אם מותר שיהיה כפתור
+וואטסאפ **שני**, כניסה נוספת מלמעלה. בינתיים לא בנינו.
+
+**11b. הניווט העליון — להשאיר או להוריד?**
+במוקאפ אין `דגמים / עיצוב אישי / צור קשר` בכלל. אצלנו כל אחד מהם מצביע על משהו
+שקיים, ו־`דגמים` הוא הקישור לעבודות האמיתיות שלך — שכבת האמון של האתר. השארנו.
+הקישור לעבודות קיים גם בתחתית כרטיס השליחה, כך שאפשר להוריד את הניווט בלי לאבד
+אותו — אבל זו החלטה, לא תוצאת לוואי של העתקת תמונה.
+
+**11c. ארבע השורות בפס האמון — מה בדיוק מותר לכתוב?**
+הפס חזר עכשיו גם למסך הגדול, על הקיר שמאחורי הדלת. הוא נושא ארבע כותרות בלבד:
+`אחריות`, `התקנה מקצועית`, `ייצור כחול לבן`, `שירות אישי וליווי`. המוקאפ מוסיף
+מתחת לכל אחת משפט הסבר — `התקנה מקצועית בכל רחבי הארץ`, `חומרים מעולים` וכו׳ —
+וזה ארבע הבטחות חדשות בשמך. לא נכתבו. תגיד לנו מה נכון ונכתוב את זה.
+
+⚠ `אחריות` עדיין בלי מספר שנים — זו שאלה 9, והיא עדיין פתוחה. המוקאפ כותב
+`אחריות מלאה על המוצר וההתקנה`, ואנחנו לא כותבים הבטחה בלי תקופה.
+
+---
+
 ## What I need back, minimally, to flip `PLACEHOLDER` to `false`
 
 | | Question | Blocks |
@@ -534,6 +562,7 @@ was withdrawn.
 | 7 | permission | the works gallery, and launch |
 | 8 | width bands per size | the range printed on each size tile |
 | 9 | warranty term · metallic range · made-in-Israel | three of the four foot badges |
+| 11 | second CTA · the nav · the trust sublines | three items of the second mockup |
 
 1 and 5 were the two that stop launch on their own. **1 is answered and fixed**,
 so **5 — a starting price per size band — is now the only thing standing between

@@ -12,8 +12,8 @@
    reads like this file is still a second opinion about what a door is. */
 import { byId, HANDLES } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
-import { gripAt, gripHome } from './renderer.js';
-import { specLines } from './spec.js';
+import { gripAt, gripHome, render } from './renderer.js';
+import { handingWords, specLines } from './spec.js';
 import { encodeCode, toQuery } from './url-state.js';
 
 export const PHONE_DISPLAY = '053-219-7466';
@@ -211,6 +211,11 @@ export function message(state) {
        (ruled from outside to be a picture settled on site, not something
        Peretz builds to), the money, the code and the link. */
     ...specLines(state),
+    /* ⚠ AND THE OPENING SPELLED OUT. `פתיחה: שמאל, פנימה` above is the name,
+       and the name is the exact ambiguity that had this site building mirrored
+       doors until 23.8.2026 — see `handingWords`. Peretz reads this line and
+       there is nothing left to ask. */
+    handingWords(state),
     ...gripAddendum(state),
     `מחיר באתר: ${formatAgorot(priceAgorot(state))} — ${PRICE_INCLUDES}`,
     /* The caveat the CARD states twice and the dock a third time, and which
@@ -266,6 +271,110 @@ export const FALLBACK_TEXT =
 
 export const fallbackWhatsappUrl = () =>
   `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(FALLBACK_TEXT)}`;
+
+/* ── THE ORDER HAS NEVER HAD A PICTURE IN IT ──────────────────────────
+ *
+ * Peretz receives eleven lines of Hebrew, a price, a code and a link. All of
+ * it is correct and none of it is the door. He has to open the link to see
+ * what was chosen, and if he wants to hand the job to the workshop he has to
+ * describe it again — while the customer spent ten minutes looking at a
+ * drawing of exactly the right thing.
+ *
+ * So the drawing goes with the message. `navigator.share` with a file puts the
+ * PNG and the text into WhatsApp together; he sees the door, and he can
+ * forward the picture to anyone without them needing this site at all.
+ *
+ * ⚠ THREE CONDITIONS, AND EACH ONE HAS ALREADY BITTEN THIS PROJECT ONCE.
+ *
+ * 1. HTTPS ONLY. Canvas raster of an SVG over `file://` throws SecurityError —
+ *    REDESIGN.md found that during the raster-renderer evaluation, and it is
+ *    the same condition `shareUrl` already tests for, so both read it from one
+ *    place. Off http(s) the button stays exactly the `wa.me` link it is today.
+ * 2. THE SVG NEEDS AN EXPLICIT SIZE. `render()` emits `viewBox` and no
+ *    `width`/`height`, which is right for a page that fits it to a stage — and
+ *    an `<img>` given an SVG with no intrinsic size falls back to 300x150 and
+ *    silently crops the door in half. The size is put back from the viewBox
+ *    the drawing already carries, so there is no second idea of how big it is.
+ * 3. NO PAGE STYLES REACH IT. An SVG rasterised through an `<img>` renders in
+ *    its own context, so `var(--wall)` and `var(--floor)` resolve to their
+ *    FALLBACKS. That is not a bug to work around: it is exactly why those
+ *    fallbacks exist (`index.html`'s css-404 route), and it means the picture
+ *    Peretz gets is the room's default tone whatever the customer's screen was
+ *    doing. Written down because the first instinct on seeing it is to "fix"
+ *    a wall that is already correct.
+ */
+export const canSharePicture = () =>
+  /^https?:$/.test(window.location.protocol)
+  && typeof navigator !== 'undefined'
+  && typeof navigator.share === 'function'
+  && typeof navigator.canShare === 'function';
+
+/** The door as a PNG blob, or a rejection saying which step would not go. */
+export async function doorPng(state, width = 1000) {
+  const svg = render(state);
+  const box = /viewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(svg);
+  if (!box) throw new Error('the drawing has no viewBox to take a size from');
+  const w = Number(box[1]), h = Number(box[2]);
+  const sized = svg.replace('<svg ', `<svg width="${w}" height="${h}" `);
+
+  const url = URL.createObjectURL(new Blob([sized], { type: 'image/svg+xml;charset=utf-8' }));
+  try {
+    const img = new Image();
+    await new Promise((res, rej) => {
+      img.onload = res;
+      img.onerror = () => rej(new Error('the drawing would not rasterise'));
+      img.src = url;
+    });
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(width);
+    cv.height = Math.round(width * h / w);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    const png = await new Promise(res => cv.toBlob(res, 'image/png'));
+    if (!png) throw new Error('the canvas produced no image');
+    return png;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+/**
+ * Send the door — as a picture with the order under it where that is possible,
+ * and as today's `wa.me` link everywhere else.
+ *
+ * ⚠ THREE OUTCOMES, NOT TWO, AND THE THIRD IS THE ONE WORTH HAVING.
+ *
+ *   'sent'         the share sheet took it. Nothing else to do.
+ *   'unavailable'  no share support, no picture, or the browser refused the
+ *                  payload — the caller should follow the `wa.me` link, which
+ *                  is a complete order and always was.
+ *   'dismissed'    a person opened the sheet and closed it again.
+ *
+ * A boolean would fold the last two together, and the consequence is not
+ * cosmetic: a customer who taps send, sees the sheet, changes their mind and
+ * closes it would have WhatsApp opened for them anyway a moment later. That is
+ * the page arguing with somebody who has just said no.
+ */
+export async function sendDoor(state) {
+  if (!canSharePicture()) return 'unavailable';
+  let file;
+  try {
+    file = new File([await doorPng(state)], 'delet.png', { type: 'image/png' });
+  } catch {
+    return 'unavailable';              // no picture; the link still works
+  }
+  const payload = { files: [file], text: message(state) };
+  if (!navigator.canShare(payload)) return 'unavailable';
+  try {
+    await navigator.share(payload);
+    return 'sent';
+  } catch (e) {
+    /* `AbortError` is a person changing their mind. Anything else — most
+       likely a browser refusing a gesture that did not survive the `await`,
+       which Safari does — means the sheet never really happened, so the link
+       should run. */
+    return (e && e.name === 'AbortError') ? 'dismissed' : 'unavailable';
+  }
+}
 
 export async function copyMessage(state) {
   const text = message(state);

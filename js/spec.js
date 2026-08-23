@@ -152,6 +152,33 @@ export function specRows(state) {
   return rows;
 }
 
+/**
+ * Which way the door opens, said so that it cannot be misread.
+ *
+ * ⚠ THIS EXISTS BECAUSE `שמאל, פנימה` IS NOT ENOUGH, and the project has the
+ * scar to prove it. `ASK-PERETZ.md` §1 stood open for months over exactly this
+ * — ימין means two different things depending on which side of the door you
+ * are standing on — and when it was finally answered on 23.8.2026 the answer
+ * revealed that the site had the convention BACKWARDS: every order it had ever
+ * produced named the mirror of the door on the customer's screen.
+ *
+ * The name alone carries the same ambiguity into the order and onto the
+ * workshop sheet. Three facts together cannot: which side the hinge is on,
+ * which side the cylinder is on, and that both are read from OUTSIDE.
+ *
+ * Derived from `HANDINGS[].hinge` — the same field the renderer draws from —
+ * so this sentence and the picture beside it cannot disagree. It is NOT in
+ * `specRows`: that row is also the one-line summary a 320 px phone has to fit,
+ * and a clause this long would push the rest of the door off it. One
+ * statement, read by the message and by the sheet.
+ */
+export function handingWords(state) {
+  const hn = byId(HANDINGS, state.handing);
+  const hinge = hn.hinge === 'left' ? 'שמאל' : 'ימין';
+  const lock  = hn.hinge === 'left' ? 'ימין' : 'שמאל';
+  return `ציר בצד ${hinge}, צילינדר בצד ${lock} — במבט מבחוץ`;
+}
+
 /** The rows as `label: value` lines — what the order is made of. */
 export const specLines = state => specRows(state).map(r => `${r.label}: ${r.value}`);
 

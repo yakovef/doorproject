@@ -28,11 +28,55 @@
      a card, not less. Measured before changing anything.) */
   --surface:    #EFEDE8;
   --accent:     #B08D57;
+  /* ⚠ AND A DARKER STEP FOR ANYTHING THAT IS READ OR THAT DRAWS A STATE.
+     `--accent` is the mockup's tan and it is right for a hairline underline on
+     a number nobody has to decode. It is not right for text, and it is not
+     right for the border that says WHICH TILE IS SELECTED. Measured with
+     `contrast()` from `js/colour.js`, against the three grounds this page
+     actually uses:
+
+                     on #fff   on #EFEDE8 (paper)  on #F5F3EF (paper-up)
+       #B08D57         3.09          2.64                  2.79
+       #8A6A3B         4.99          4.27                  4.51
+       #7E6134         5.76          4.92                  5.20
+
+     REALISM2.md §A2 proposes `#8A6A3B` on the strength of the white column
+     alone — and the card is only white ABOVE 1100 px. Below it the panel sits
+     on `--paper`, where that colour measures 4.27:1 and misses. Nearly every
+     visitor arrives on a phone, so the colour is chosen on the ground the
+     phone actually paints: `#7E6134` clears 4.5:1 on all three.
+
+     The selection border takes it too. WCAG 1.4.11 asks 3:1 of a visual
+     boundary that conveys STATE, and `--accent` on paper is 2.64 — so a
+     selected tile on a phone would be the one control on the page whose
+     "chosen" ring nobody with poor sight can find. The tan stays where it is
+     decoration; this is where it means something. */
+  --accent-ink: #7E6134;
   --wa:         #1EA95A;
   --warn:       #A4442E;
 
   --sp: 4px;
-  --radius: 2px;
+
+  /* ── RADIUS IS A SCALE, NOT A NUMBER ────────────────────────────────
+     `--radius: 2px` everywhere is the single clearest reason the shipped page
+     read as a wireframe beside the mockup (REALISM2.md §A1). One token could
+     not be right for a 340 px card and a 14 px swatch chip at the same time,
+     so it was right for neither.
+     ⚠ A radius is an ABSOLUTE length, so the steps are not one number scaled.
+     `--r-chip` is 4px and not a proportional 10px, because 10px on a 14px
+     square is a circle — and a round chip beside seventeen round swatches
+     would say "colour you can pick" about a thing that is only a label. */
+  --r-card: 18px;   /* the choices card, the send card, the toast */
+  --r-tile: 12px;   /* option tiles */
+  --r-chip: 4px;    /* the 14px swatch beside a spec row */
+  --r-pill: 999px;  /* every button — see the note on `.btn` */
+
+  /* One shadow for anything that floats, rather than three hand-written ones
+     that agree until somebody edits a single card. ⚠ The DOCK is deliberately
+     not on it: it is pinned to the BOTTOM of the screen, so its shadow has to
+     be cast upward, and a shadow pointing the other way is a different
+     quantity rather than a second copy of this one. */
+  --shadow-card: 0 10px 32px rgb(23 23 21 / .07), 0 2px 8px rgb(23 23 21 / .05);
 
   /* The wall strip the grip controls stand in, reserved out of the stage above
      1100 px and zero below it (on a phone the controls are in flow under the
@@ -112,8 +156,10 @@ body {
 
 /* Its two lines of text come to 43px, one short of the minimum, which is the
    kind of miss only a measurement finds. */
-.brand { text-decoration: none; color: inherit; display: grid; align-content: center;
-         min-block-size: 44px; }
+.brand { text-decoration: none; color: inherit; display: flex; align-items: center;
+         gap: 10px; min-block-size: 44px; }
+.brand__mark { flex: 0 0 auto; border-radius: 6px; }
+.brand__text { display: grid; align-content: center; }
 .brand__name { font-weight: 700; font-size: 1.05rem; letter-spacing: .01em; }
 .brand__sub {
   font-size: .7rem; letter-spacing: .14em; color: var(--ink-2);
@@ -121,17 +167,27 @@ body {
 .bar__phone {
   font-family: var(--mono); font-size: .9rem;
   color: var(--ink);
-  /* The underline is drawn on the TEXT, so the box around it can grow to a
-     44px thumb without the rule sliding away from the number. It was a 104x24
-     target — on one of the two actions the whole site exists to produce. */
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-block-size: 44px; padding-inline: 6px;
+  direction: ltr;
+}
+/* ⚠ THE UNDERLINE IS ON THE NUMBER, NOT ON THE LINK BOX — and it moved here
+   the day the handset icon arrived. `text-decoration` set on an element is
+   painted across every inline descendant of it, so with the rule on
+   `.bar__phone` the tan line was struck straight through the middle of the
+   icon. It has always needed to be on the text rather than the box for the
+   original reason too: the box grows to a 44 px thumb — it was a 104x24 target
+   on one of the two actions the whole site exists to produce — and an
+   underline on a 44 px box floats well below the digits it belongs to. */
+.bar__phone > span {
   text-decoration: underline;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
-  display: inline-flex; align-items: center;
-  min-block-size: 44px; padding-inline: 6px;
-  direction: ltr;
 }
+.bar__ico { flex: 0 0 auto; }
+.bar__phone .bar__ico { color: var(--ink-2); }
 
 /* ── nav, saved, trust ────────────────────────────────────── */
 
@@ -152,13 +208,13 @@ body {
 .bar__end { display: flex; align-items: center; gap: 8px; }
 .bar__saved {
   appearance: none; background: var(--ink); color: #fff;
-  border: 0; border-radius: 999px;
+  border: 0; border-radius: var(--r-pill);
   min-block-size: 44px; padding-inline: 14px;
   font: 600 .82rem var(--sans); cursor: pointer;
   display: inline-flex; align-items: center; gap: 6px;
 }
 .bar__count {
-  background: rgb(255 255 255 / .22); border-radius: 999px;
+  background: rgb(255 255 255 / .22); border-radius: var(--r-pill);
   padding: 1px 7px; font-variant-numeric: tabular-nums;
 }
 
@@ -180,7 +236,7 @@ body {
 .saved__row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
 .saved__open {
   appearance: none; background: none; border: 1px solid var(--rule);
-  border-radius: 999px; min-block-size: 44px; padding-inline: 12px;
+  border-radius: var(--r-pill); min-block-size: 44px; padding-inline: 12px;
   font: 500 .82rem var(--sans); color: var(--ink); cursor: pointer;
   /* Takes the room that is left and gives the × a fixed place to stand.
      `min-inline-size: 0` because a flex item will not shrink below its
@@ -207,9 +263,55 @@ body {
   background: var(--paper-up);
   font-size: .78rem; color: var(--ink-2);
 }
-/* Above 1100 the page is one screen with no scroll, and the band is the least
-   urgent thing on it — the send card is already beside the door. */
-@media (min-width: 1100px) { .trust { display: none; } }
+.trust__i { display: inline-flex; align-items: center; gap: 6px; }
+.trust__ico {
+  inline-size: 16px; block-size: 16px; flex: 0 0 auto;
+  fill: none; stroke: currentColor; stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: .8;
+}
+
+/* ── THE BAND ON THE WALL, ABOVE 1100 ────────────────────────────────
+   It used to be `display: none` here, and the reason was real: the page is
+   one screen with `overflow: hidden` and `.layout` is `flex: 1`, so anything
+   given HEIGHT at the foot takes it straight out of the door — the same
+   mechanism by which a 70 px headline once faked a 5.2% drawing regression in
+   `npm run profile`.
+
+   `position: fixed` costs the door nothing at all, which is the same argument
+   that put the grip controls in the wall. And it is placed inside the stage's
+   own column rather than across the whole page, because the two panels either
+   side of it scroll internally and a band laid over them would cover whatever
+   the customer had scrolled to.
+   ⚠ THE COLUMN'S BOX IS MEASURED, NOT GUESSED. `--stage-l` and `--stage-w`
+   are published by `fitStage()` off the same rect it already reads for
+   `--wall-gap`, on the same re-fit, so the box the band is placed in and the
+   box that was measured are one box by construction. The fallbacks cover the
+   instant before the first paint.
+   ⚠ `--ink`, NOT `--ink-2`, and that is a measurement. Over the drawn floor
+   `#6B6862` is 4.30:1, and over a light door's floor (`--floor: #D6D2C8`)
+   it is 3.68 — under the 4.5 this page holds itself to, on the two grounds
+   this band will actually sit on. `#171715` measures 13.90 and 11.89. */
+@media (min-width: 1100px) {
+  .trust {
+    position: fixed;
+    inset-block-end: 0;
+    left: var(--stage-l, 0px);
+    inline-size: var(--stage-w, 100%);
+    z-index: 2;
+    justify-content: center; gap: 4px 24px;
+    padding: 10px 16px 12px;
+    background: none;
+    border-block-start: 0;
+    color: var(--ink);
+    font-size: .74rem; font-weight: 600;
+    letter-spacing: .01em;
+    /* A message, never a control — and it lies over the wall the grip buttons
+       stand in. Without this it would swallow a drag that started low. */
+    pointer-events: none;
+  }
+  .trust__ico { opacity: .7; }
+}
 
 /* ── strips ───────────────────────────────────────────────── */
 
@@ -492,6 +594,12 @@ body {
 .grip-bar__hint {
   font-size: .72rem; color: var(--ink-2);
   line-height: 1.35;
+  display: grid; justify-items: center; gap: 3px;
+}
+.grip-bar__ico {
+  inline-size: 22px; block-size: 22px;
+  fill: none; stroke: currentColor; stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round;
 }
 /* 44px, like every other target on the page. It was 34 — a standalone control
    on the phone, ten pixels under the minimum this project holds itself to, and
@@ -505,7 +613,7 @@ body {
      44 px floor is untouched. */
   display: inline-flex; align-items: center; justify-content: center;
   text-align: center; line-height: 1.25;
-  border: 1px solid var(--rule); border-radius: 999px;
+  border: 1px solid var(--rule); border-radius: var(--r-pill);
   background: var(--paper-up); color: var(--ink); font: inherit; font-size: .78rem;
   cursor: pointer;
 }
@@ -589,10 +697,10 @@ body {
     background: var(--surface);
     border: 1px solid var(--rule);
     border-inline-start: 1px solid var(--rule);
-    border-radius: 14px;
+    border-radius: var(--r-card);
     margin: 14px;
     block-size: calc(100% - 28px);
-    box-shadow: 0 1px 2px rgb(23 23 21 / .04), 0 8px 24px rgb(23 23 21 / .06);
+    box-shadow: var(--shadow-card);
   }
 }
 
@@ -616,17 +724,26 @@ body {
 .spec { display: grid; gap: 0; margin: 2px 0 14px; }
 .spec__row {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  /* icon · label · value · swatch. The icon column is a fixed 18 px whether or
+     not the row has one, so nine rows of labels line up rather than stepping
+     in and out as `glazing` appears on a two-panel door. */
+  grid-template-columns: 18px auto 1fr auto;
   align-items: center; gap: 8px;
   padding: 7px 0;
   border-block-end: 1px solid var(--rule);
   font-size: .82rem;
 }
+.spec__ico {
+  inline-size: 17px; block-size: 17px;
+  fill: none; stroke: var(--ink-2); stroke-width: 1.4;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: .85;
+}
 .spec__row:last-child { border-block-end: 0; }
 .spec__label { font-weight: 600; color: var(--ink); }
 .spec__value { color: var(--ink-2); text-align: end; }
 .spec__chip {
-  inline-size: 14px; block-size: 14px; border-radius: 3px;
+  inline-size: 14px; block-size: 14px; border-radius: var(--r-chip);
   background: var(--chip); border: 1px solid rgb(0 0 0 / .22);
 }
 @media (max-width: 1099px) {
@@ -638,29 +755,74 @@ body {
   }
 }
 
+/* ── THE NAVIGATOR, AS CIRCLES ──────────────────────────────────────
+   From the mockup: an outlined circle per section joined by a hairline, the
+   number and the label beneath, the active one ringed in the accent.
+   ⚠ IT IS STILL A TABLE OF CONTENTS. No ticks, no filled connector running up
+   to "where you are", no `3 מתוך 4` — every one of those is a claim about
+   PROGRESS, and progress here cannot be honest: `nowLabel` falls back to
+   `list[0]`, so all four sections carry a value on first paint and any
+   state-derived indicator reads 4/4 before the customer has touched anything.
+   Measured, and written down in REDESIGN.md §4. */
 .steps {
-  display: flex; gap: 6px; flex-wrap: wrap;
-  padding: 2px 0 12px;
+  position: relative;
+  display: flex; gap: 4px;
+  padding: 6px 0 14px;
   border-block-end: 1px solid var(--rule);
   margin-block-end: 4px;
   counter-reset: step;
 }
+/* The connector, drawn once behind the row rather than as a border on each
+   circle — four separate half-lines would leave a seam wherever the flex
+   gap fell. It stops short of the outer circles so it does not run off the
+   ends of the card. */
+.steps::before {
+  content: '';
+  position: absolute; z-index: 0;
+  inset-inline: 12%;
+  inset-block-start: calc(6px + 22px);       /* the circles' own centre line */
+  block-size: 1px; background: var(--rule);
+}
 .steps__step {
   counter-increment: step;
-  flex: 1 1 auto;
-  display: inline-flex; align-items: center; gap: 6px;
+  position: relative; z-index: 1;
+  flex: 1 1 0; min-inline-size: 44px;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 5px;
   min-block-size: 44px;            /* the floor this file enforces everywhere */
-  padding: 4px 8px;
-  background: none; border: 1px solid transparent; border-radius: 999px;
-  font: 500 .76rem/1.2 var(--sans); color: var(--ink-2);
-  cursor: pointer; text-align: start;
+  padding: 0 2px;
+  background: none; border: 0;
+  font: 500 .72rem/1.2 var(--sans); color: var(--ink-2);
+  cursor: pointer; text-align: center;
 }
+.steps__c {
+  inline-size: 44px; block-size: 44px;       /* 44, not the mockup's 40 — a floor is a floor */
+  display: grid; place-items: center;
+  border: 1px solid var(--rule); border-radius: 50%;
+  /* ⚠ `--surface`, so the circle punches a hole in the connector behind it on
+     WHATEVER it is sitting on. It is `--paper` below 1100 and `#fff` inside
+     the desktop card, and a hard-coded fill would show as a ring of the wrong
+     beige on one of the two. */
+  background: var(--surface);
+  color: var(--ink-2);
+  transition: border-color .12s var(--ease), color .12s var(--ease);
+}
+.steps__g {
+  inline-size: 21px; block-size: 21px;
+  fill: none; stroke: currentColor; stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.steps__l { display: inline-flex; align-items: baseline; gap: 5px; }
 .steps__n::before {
   content: counter(step, decimal-leading-zero);
-  font: 600 10px/1 var(--mono); letter-spacing: .06em; opacity: .7;
+  font: 600 10px/1 var(--mono); letter-spacing: .06em; color: var(--accent-ink);
 }
-.steps__step:hover { border-color: var(--rule); }
-.steps__step.is-on { color: var(--ink); border-color: var(--rule); background: var(--paper-up); }
+.steps__step:hover .steps__c { border-color: var(--ink-2); color: var(--ink); }
+.steps__step.is-on { color: var(--ink); }
+.steps__step.is-on .steps__c {
+  border-color: var(--accent); color: var(--accent-ink);
+  background: var(--paper-up);
+  box-shadow: 0 0 0 3px rgb(176 141 87 / .18);
+}
 /* ⚠ 44 px BOTH WAYS. Below 1100 the title is hidden and only the counter
    shows, which made these buttons 31 px wide against the 44 px floor this
    stylesheet honours everywhere else — and the audit waved them through
@@ -670,7 +832,12 @@ body {
    `display: none` takes the only text out of the accessibility tree. */
 @media (max-width: 1099px) {
   .steps__t { display: none; }
-  .steps__step { flex: 0 0 auto; min-inline-size: 44px; justify-content: center; }
+  /* The circle is already 44 px both ways, so hiding the title costs the
+     button nothing — which is what the note above was about when the button
+     WAS its label and measured 31 px wide with the title gone. The accessible
+     NAME is still set explicitly in app.js, because `display: none` takes the
+     only text out of the accessibility tree. */
+  .steps__step { min-inline-size: 44px; }
 }
 
 .panel--choose { counter-reset: sect; }
@@ -679,8 +846,12 @@ body {
   content: counter(sect, decimal-leading-zero);
   font: 600 11px/1 var(--mono);
   letter-spacing: .06em;
-  color: var(--ink-2);
-  opacity: .65;
+  /* ⚠ AND NO `opacity`. It was `--ink-2` at .65, which is a measured contrast
+     multiplied by an unmeasured one — 0.65 of anything cannot be checked with
+     `contrast()` because the value that reaches the eye depends on the ground.
+     `--accent-ink` is chosen against the two grounds this counter actually
+     sits on (4.92:1 on paper, 5.76:1 on the white card) and then left alone. */
+  color: var(--accent-ink);
   align-self: center;
   min-inline-size: 1.6em;
 }
@@ -807,6 +978,102 @@ body {
 
 @media (prefers-reduced-motion: reduce) { .field__chev { transition: none; } }
 
+/* ── THE GALLERY OF REAL DOORS ────────────────────────────────────── */
+
+/* The opener sits above the navigator, so it is the first thing in the panel
+   and the first offer the page makes. Full width and quiet — it is an
+   alternative to choosing, not a competitor to the send button. */
+.works-open {
+  appearance: none; -webkit-appearance: none;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  inline-size: 100%; min-block-size: 56px;
+  margin-block-end: 12px; padding: 10px 14px;
+  background: var(--paper-up);
+  border: 1px solid var(--rule); border-radius: var(--r-tile);
+  font: inherit; color: var(--ink); text-align: start; cursor: pointer;
+}
+.works-open:hover { border-color: var(--accent); }
+.works-open__t { font-weight: 600; font-size: .92rem; }
+.works-open__n { font-size: .74rem; color: var(--accent-ink); white-space: nowrap; }
+
+.works {
+  inline-size: min(1000px, 94vw);
+  max-block-size: 88dvh;
+  padding: 0;
+  border: 0; border-radius: var(--r-card);
+  /* Its own surface, re-declared: anything inside that has to match what is
+     BEHIND it reads `--surface`, and this is a white card over a dim
+     backdrop rather than the page's paper. */
+  --surface: #fff;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.works::backdrop { background: rgb(23 23 21 / .55); }
+.works__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px 10px;
+}
+.works__h { margin: 0; font-size: 1.05rem; }
+.works__x {
+  appearance: none; background: none; border: 1px solid var(--rule);
+  border-radius: var(--r-pill);
+  min-inline-size: 44px; min-block-size: 44px;
+  font: inherit; color: var(--ink); cursor: pointer;
+}
+.works__x:hover { border-color: var(--ink-2); }
+.works__lede { margin: 0; padding: 0 18px 12px; font-size: .82rem; color: var(--ink-2); }
+
+.works__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 12px;
+  padding: 0 18px 18px;
+  /* This box is the scroll container, so it is also the observer's root — see
+     `buildWorks`. A door is drawn when it comes within a screen of here and
+     thrown away again when it leaves. */
+  max-block-size: calc(88dvh - 118px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.work {
+  appearance: none; -webkit-appearance: none;
+  display: grid; gap: 6px;
+  padding: 8px 8px 10px;
+  background: var(--paper-up);
+  border: 1px solid var(--rule); border-radius: var(--r-tile);
+  font: inherit; color: inherit; cursor: pointer;
+  transition: border-color .12s var(--ease);
+}
+.work:hover { border-color: var(--accent); }
+/* ⚠ A FIXED BOX WHETHER OR NOT THE DOOR INSIDE IT HAS BEEN DRAWN YET. The art
+   is filled in and emptied again as the grid scrolls, and a cell that
+   collapsed when its door was thrown away would move every tile below it —
+   which moves them through the observer, which redraws them. A lazy grid that
+   reflows is a lazy grid that thrashes. */
+.work__art {
+  display: block; block-size: 132px;
+  background: var(--wall);
+  border-radius: 8px; overflow: hidden;
+}
+/* The drawing never mirrors with the interface, here as on the stage: a
+   right-hinged door is a physical fact. PLAN.md §6.1 */
+.work__art svg { inline-size: 100%; block-size: 100%; display: block; direction: ltr; }
+.work__meta { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
+.work__name {
+  font-size: .74rem; color: var(--ink-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.work__price { font-size: .78rem; font-weight: 600; white-space: nowrap; }
+
+/* Bare mode photographs the drawing and no page around it. The dialog draws
+   nothing until it is opened and the opener is inside the panel, which is
+   hidden already — but anything added to the page joins this list the same
+   day, which is the rule that stopped a headline faking a 5.2% regression. */
+.is-bare .works, .is-bare .works-open { display: none; }
+
 /* ── swatches ─────────────────────────────────────────────── */
 
 /* ── COLOURS AS CIRCLES ─────────────────────────────────────────────
@@ -821,7 +1088,13 @@ body {
    the accessible name still carries both. */
 .swatches {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  /* 50, up from 46, because the chip grew from 40 to 44 and its selected ring
+     stands 4 px outside that — 44 + 2 gap + 2 ring = 48, which a 46 px track
+     would clip on the one control this page asks you to choose by LOOKING.
+     Measured at the narrowest layout the audit opens (320 px, minus the
+     panel's 32 px of padding and the field's 10 px inset): four to a row where
+     there were five, so seventeen colours take five rows instead of four. */
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
   gap: 10px;
 }
 
@@ -836,7 +1109,7 @@ body {
 
 .swatch__chip {
   --ring: transparent;
-  display: block; inline-size: 40px; block-size: 40px;
+  display: block; inline-size: 44px; block-size: 44px;
   background: var(--chip);
   border: 1px solid rgb(0 0 0 / .22);
   border-radius: 50%;
@@ -844,9 +1117,11 @@ body {
   transition: box-shadow .12s var(--ease);
 }
 .swatch__name, .swatch__meta { display: none; }
-.swatch.is-selected .swatch__chip { --ring: var(--ink); }
+/* The gap-ring construction is already the mockup's. What changes is only its
+   colour — the same move as the tile border, for the same measured reason. */
+.swatch.is-selected .swatch__chip { --ring: var(--accent-ink); }
 .swatch:hover .swatch__chip { --ring: var(--rule); }
-.swatch.is-selected:hover .swatch__chip { --ring: var(--ink); }
+.swatch.is-selected:hover .swatch__chip { --ring: var(--accent-ink); }
 
 .swatch__name { font-size: .82rem; line-height: 1.25; }
 .swatch__meta {
@@ -864,17 +1139,47 @@ body {
 
 .tile {
   appearance: none; -webkit-appearance: none;
-  background: none; padding: 6px 4px 7px;
+  background: none; padding: 10px 8px 12px;
   font: inherit; color: inherit; text-align: center;
   cursor: pointer;
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border-radius: var(--r-tile);
   display: grid; gap: 3px; justify-items: center;
   min-block-size: 44px;
+  /* the check badge is drawn against this box */
+  position: relative;
   transition: border-color .12s var(--ease), box-shadow .12s var(--ease);
 }
 .tile:hover { border-color: var(--ink-2); }
-.tile.is-selected { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.tile.is-selected { border-color: var(--accent-ink); box-shadow: inset 0 0 0 1px var(--accent-ink); }
+
+/* ── THE CHECK BADGE ────────────────────────────────────────────────
+   From the mockup. A ring alone says "this one is different"; a tick says
+   "this one is chosen", and on a grid of sixteen grille patterns that is a
+   real difference.
+   ⚠ `content: ''` WITH THE TICK AS A BACKGROUND IMAGE, not `content: '✓'`.
+   Generated text content is not reliably kept out of the accessibility tree —
+   several screen readers announce it — and the state is already carried
+   properly by `aria-checked` on the `role="radio"`. A background image cannot
+   be announced by anything. It is also `pointer-events: none`, because the
+   badge sits over the corner of a 44 px target and must not eat a tap.
+   The disc is `--accent-ink` rather than `--accent`: see the note at the top
+   of this file — the tan measures 2.64:1 on paper and a white tick on it
+   would be a mark nobody with poor sight can read. */
+.tile.is-selected::after {
+  content: '';
+  position: absolute; inset-block-start: -6px; inset-inline-end: -6px;
+  inline-size: 18px; block-size: 18px;
+  border-radius: 50%;
+  background: var(--accent-ink)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.6 6.3 4.8 8.5 9.4 3.9' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 12px 12px no-repeat;
+  pointer-events: none;
+}
+/* An unavailable option is dimmed to .55, and a badge saying "chosen" on a
+   tile the rules are about to move you off would be the page contradicting
+   itself. `markGroup` can leave a tile both selected and blocked. */
+.tile.is-blocked::after { display: none; }
 
 .tile__art { display: block; block-size: 54px; color: var(--ink-2); }
 .tile.is-selected .tile__art { color: var(--ink); }
@@ -886,7 +1191,7 @@ body {
 .tiles--hw { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
 .tiles--hw .tile__art, .glyph--hw { block-size: 74px; }
 
-.tile__name { font-size: .74rem; line-height: 1.2; }
+.tile__name { font-size: .78rem; line-height: 1.2; }
 .tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }
 .tile__why  { font-family: var(--mono); font-size: .6rem; color: var(--warn); }
 
@@ -906,19 +1211,30 @@ body {
   background: var(--paper-up);
   color: var(--ink);
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border-radius: var(--r-pill);
   transition: border-color .12s var(--ease), background-color .12s var(--ease);
 }
 .pill:hover { border-color: var(--ink-2); }
-.pill.is-selected { border-color: var(--ink); background: var(--paper); box-shadow: inset 0 0 0 1px var(--ink); }
+.pill.is-selected {
+  border-color: var(--accent-ink); background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--accent-ink);
+}
 
 /* ── the send block ───────────────────────────────────────── */
 
+/* ⚠ WHITE, AND IT RE-DECLARES `--surface` FOR THE SAME REASON THE CHOICES
+   CARD DOES. Nothing inside it draws a ring in the page's background today,
+   but the token exists precisely so that the next thing added here does not
+   repeat the seventeen-beige-haloes bug described at the top of this file.
+   `--rule` needs no re-measuring on the change: #D6D3CB is 1.50:1 on white
+   against 1.28:1 on paper, so the dividers get MORE visible, not less. */
 .send {
+  --surface: #fff;
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 18px 16px;
-  background: var(--paper-up);
+  border-radius: var(--r-card);
+  padding: 20px 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
   display: grid; gap: 12px;
 }
 
@@ -927,8 +1243,13 @@ body {
   font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
   color: var(--ink-2);
 }
+/* Light and large, from the mockup: a price is the biggest thing on the card
+   and it does not have to shout as well. 300 falls back to 400 in a face with
+   no light weight (Arial Hebrew has none), which is a smaller figure than the
+   one it replaces rather than a broken one. */
 .send__figure {
-  font-size: 1.9rem; font-weight: 600; line-height: 1.1;
+  font-size: 2.2rem; font-weight: 300; line-height: 1.1;
+  letter-spacing: -.01em;
   font-variant-numeric: tabular-nums;
 }
 .send__incl { font-size: .78rem; color: var(--ink-2); }
@@ -946,7 +1267,13 @@ body {
   font: inherit; font-weight: 600;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   min-block-size: 52px; padding: 12px 18px;
-  border-radius: var(--radius); border: 1px solid transparent;
+  /* ⚠ A PILL, LIKE EVERY OTHER BUTTON ON THE PAGE. `.bar__saved`,
+     `.saved__open`, `.grip-bar__btn` and `.steps__step` were all already
+     999px, so the square corners left the site's PRIMARY call to action as
+     the one button shaped unlike the rest of them. This is the shape changing
+     to match what shipped, not the mockup's near-black pill arriving: the
+     green is settled from outside (REDESIGN.md §4) and is untouched. */
+  border-radius: var(--r-pill); border: 1px solid transparent;
   text-decoration: none; cursor: pointer;
   transition: filter .12s var(--ease);
 }
@@ -1057,7 +1384,8 @@ html.is-live .wa__off { display: none; }
   inset-inline: 16px;
   margin-inline: auto; max-inline-size: 26rem;
   background: var(--ink); color: var(--paper);
-  padding: 12px 16px; border-radius: var(--radius);
+  padding: 12px 16px; border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
   font-size: .86rem; text-align: center;
   z-index: 50;
   /* ⚠ THE TOAST USED TO EAT THE SEND BUTTON. It is `fixed` at the bottom with
@@ -1089,9 +1417,101 @@ html.is-live .wa__off { display: none; }
 
 @media (forced-colors: active) {
   .swatch__chip { forced-color-adjust: none; }
-  .pill.is-selected, .swatch.is-selected .swatch__chip { outline: 2px solid CanvasText; }
+  /* ⚠ `.tile.is-selected` JOINS THIS LIST THE DAY ITS RING BECOMES A COLOUR.
+     Forced colours throw every author colour away, so a selected tile whose
+     only mark is a `--accent-ink` border and an `--accent-ink` disc has NO
+     mark at all in that mode. The badge's tick is a background image, which
+     forced colours also drop. An outline is the one thing the mode keeps. */
+  .pill.is-selected, .tile.is-selected,
+  .swatch.is-selected .swatch__chip { outline: 2px solid CanvasText; }
 }
 
+
+/* ── THE ORDER SHEET ─────────────────────────────────────────────────
+   `?sheet=1` on the same page. Hidden entirely otherwise, so it costs a
+   normal visit one empty element and nothing else. */
+.sheet { display: none; }
+
+.is-sheet body { background: #fff; display: block; block-size: auto; overflow: visible; }
+/* Everything the configurator is, gone. The list is explicit rather than
+   `body > *` because `#sheet` and the live regions have to survive it, and a
+   rule that hides everything and then un-hides three things is two rules that
+   have to agree. */
+.is-sheet .bar, .is-sheet .saved, .is-sheet .strip, .is-sheet .layout,
+.is-sheet .dock, .is-sheet .trust, .is-sheet .toast, .is-sheet .works,
+.is-sheet .works-open { display: none !important; }
+.is-sheet .sheet { display: block; }
+
+.sheet {
+  inline-size: min(190mm, 96vw);
+  margin: 0 auto; padding: 14mm 0;
+  color: var(--ink);
+}
+.sheet__top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; padding-block-end: 8px;
+  border-block-end: 2px solid var(--ink);
+}
+.sheet__brand { font-weight: 700; font-size: 1.25rem; }
+.sheet__sub { font-size: .78rem; color: var(--ink-2); }
+.sheet__code { font-family: var(--mono); font-size: .9rem; direction: ltr; }
+.sheet__code b { font-size: 1.05rem; }
+
+.sheet__body {
+  display: grid; gap: 10mm;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: start;
+  padding-block: 8mm;
+}
+/* Two columns is an A4 layout, and this page is opened on a phone before it is
+   ever printed — measured at 390 px, the spec column comes out about 170 px
+   wide and every value wraps to four lines, including the colour name and its
+   manufacturer code. A sheet that cannot be proof-read on the device it was
+   sent to is a sheet nobody checks before ordering from it. */
+@media (max-width: 700px) {
+  .sheet__body { grid-template-columns: minmax(0, 1fr); gap: 6mm; }
+  .sheet__art svg { max-block-size: 60vh; }
+}
+.sheet__art { margin: 0; }
+.sheet__art svg {
+  inline-size: 100%; block-size: auto; max-block-size: 150mm;
+  display: block; direction: ltr;         /* never mirrors — PLAN.md §6.1 */
+}
+.sheet__dims {
+  margin-block-start: 4px; text-align: center;
+  font-family: var(--mono); font-size: .8rem; color: var(--ink-2);
+}
+.sheet__spec { display: grid; gap: 0; }
+.sheet__row {
+  display: grid; grid-template-columns: 7.5em minmax(0, 1fr) auto;
+  align-items: baseline; gap: 8px;
+  padding: 6px 0; border-block-end: 1px solid var(--rule);
+  font-size: .88rem;
+}
+.sheet__row--wide { grid-template-columns: 7.5em minmax(0, 1fr); }
+.sheet__k { font-weight: 600; color: var(--ink-2); }
+.sheet__v small { display: block; font-size: .74rem; color: var(--ink-2); }
+.sheet__chip {
+  inline-size: 16px; block-size: 16px; border-radius: var(--r-chip);
+  background: var(--chip); border: 1px solid rgb(0 0 0 / .28);
+  align-self: center;
+}
+.sheet__foot {
+  padding-block-start: 6px; border-block-start: 1px solid var(--rule);
+  font-size: .76rem; color: var(--ink-2);
+}
+
+@media print {
+  /* A4 with the browser's own margins; the sheet sets its own measure. */
+  @page { size: A4 portrait; margin: 12mm; }
+  .sheet { inline-size: auto; padding: 0; }
+  /* Chromium drops backgrounds when printing unless the page asks. The colour
+     chip beside the paint row IS the fact on that row, so it has to survive —
+     without this it prints as an empty outline and the sheet says nothing
+     about the colour except its name. */
+  .sheet__chip { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .sheet__art svg { max-block-size: 140mm; }
+}
 
 /* ── bare mode: the stage only, for tools/compare.mjs ─────── */
 /* ⚠ `.stage__h1` IS IN THIS LIST, and leaving it out cost a false alarm.

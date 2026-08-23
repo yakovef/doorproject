@@ -716,6 +716,12 @@
     rows.push({ key: "handing", label: "פתיחה", id: hn.id, value: hn.he });
     return rows;
   }
+  function handingWords(state2) {
+    const hn = byId(HANDINGS, state2.handing);
+    const hinge = hn.hinge === "left" ? "שמאל" : "ימין";
+    const lock = hn.hinge === "left" ? "ימין" : "שמאל";
+    return `ציר בצד ${hinge}, צילינדר בצד ${lock} — במבט מבחוץ`;
+  }
   var specLines = (state2) => specRows(state2).map((r) => `${r.label}: ${r.value}`);
   var summaryLine = (state2) => specRows(state2).map((r) => r.value).join(" · ");
   var describeSentence = (state2) => `דלת כניסה פלדה, ${specRows(state2).map((r) => r.value).join(", ")}.`;
@@ -829,6 +835,8 @@
   var RET_HEAD = 148;
   var MULLION = 22;
   var REBATE = 50;
+  var ALC_SIDE = 160;
+  var ALC_HEAD = 300;
   var EDGE = 38;
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
@@ -939,6 +947,9 @@
     const casY0 = revY0 - CASING;
     const baseY = floorY + THRESHOLD;
     const openW = totalW + RETURN * 2;
+    const alcX0 = casX0 - ALC_SIDE;
+    const alcX1 = casX1 + ALC_SIDE;
+    const alcY0 = casY0 - ALC_HEAD;
     const hingeOnLeft = handing.hinge === "left";
     const mainX = sideW && !hingeOnLeft ? x0 + sideW + MULLION : x0;
     const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
@@ -1557,6 +1568,97 @@
     <filter id="frameShadow" x="-15%" y="-15%" width="130%" height="130%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
+
+    <!-- ── THE ROOM ──────────────────────────────────────────────────
+         ⚠ EVERY ONE OF THESE IS A BLACK OR WHITE OVERLAY, NOT A COLOUR.
+         The wall and floor are painted with the CSS variables --wall and
+         --floor so that .layout[data-light] can sink the whole room a shade
+         behind a pale door — and a gradient built here out of literal hexes
+         would not move with them, so a light door would get a correctly-sunk
+         wall with a recess still shaded for the old one. Modelling the planes
+         as value changes over whatever colour the page has chosen keeps one
+         statement of what the room is made of, and it is the same rule the
+         frame's own arris follows: a fold between two lit surfaces is a
+         change of VALUE, not a colour of its own. -->
+    <linearGradient id="alcSoffit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.055"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.135"/>
+    </linearGradient>
+    <!-- The two returns shade at different rates, which is what a 90° turn in
+         light coming from one side actually does — and it is the only thing
+         left saying which side the key is on once the planes are neutral. -->
+    <linearGradient id="alcNear" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.045"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.105"/>
+    </linearGradient>
+    <linearGradient id="alcFar" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.020"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.060"/>
+    </linearGradient>
+
+    <!-- ⚠ THIS REPLACES A RULED LINE, and that is the whole point of it.
+         Where the wall met the floor there was a 2 px non-scaling stroke of
+         black at 0.16 — the third time this drawing has drawn a fold as ink.
+         The other two are already recorded above: the black arris down each
+         jamb, reported from outside and circled, and edgeTop's full-width
+         rectangle. A skirting shadow is a change of value that falls off over
+         about a hand's width and then keeps going, much fainter, as the floor
+         recedes. Two effects, one gradient: steep to 18%, then a long tail. -->
+    <linearGradient id="floorFall" gradientUnits="userSpaceOnUse"
+                    x1="0" y1="${baseY}" x2="0" y2="${baseY + 1100}">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.20"/>
+      <stop offset="0.06" stop-color="#000" stop-opacity="0.075"/>
+      <stop offset="0.18" stop-color="#000" stop-opacity="0.038"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- ── THE REFLECTION ───────────────────────────────────────────
+         The door, mirrored in the floor, as a a use element of the group that draws
+         it. A a use element is a REFERENCE: about two hundred bytes on every door
+         rather than a second copy of one that reaches 70 KB. Same argument
+         that took the worst door from 374,160 bytes to 284,353.
+         usedDefs prunes to what the markup points at, and it resolves
+         transitively — so mask="url(#floorFade)" keeps the mask, and the
+         mask's own url(#floorFadeG) keeps the gradient inside it. The
+         the no-dangling-url()  assertion is what proves that actually happened. -->
+    <linearGradient id="floorFadeG" gradientUnits="userSpaceOnUse"
+                    x1="0" y1="${baseY}" x2="0" y2="${baseY + 900}">
+      <stop offset="0"    stop-color="#fff"/>
+      <stop offset="0.55" stop-color="#4a4a4a"/>
+      <stop offset="1"    stop-color="#000"/>
+    </linearGradient>
+    <mask id="floorFade" maskUnits="userSpaceOnUse"
+          x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="900">
+      <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="900"
+            fill="url(#floorFadeG)"/>
+    </mask>
+    <filter id="floorBlur" x="-8%" y="-8%" width="116%" height="116%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+
+    <!-- ── THE SCONCES ──────────────────────────────────────────────
+         ⚠ THEIR LIGHT STOPS AT THE WALL, and that is a refusal rather than an
+         oversight. LIGHT says ONE key, high and about 30° left of camera,
+         and that single fact is load-bearing for more of this drawing than
+         anything else in it: FALLOFF's nine-row medians fitted across thirty
+         photographs, MOULD_SIDE's per-side relief gain, keyWash, bloom, and
+         the warm/cool split that CLAUDE.md §4 records as the first absence
+         that read as plastic. Two symmetric wall lights say the scene has two
+         keys placed symmetrically, and re-fitting a corpus-measured model to
+         match them would be tuning by eye against nothing — there is no door
+         in research/ photographed between two sconces. REALISM.md §6.
+         So the wall may flatter and the leaf keeps its instruments, and the
+         disagreement is written down here instead of hidden. -->
+    <linearGradient id="sconceBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.28"/>
+      <stop offset="0.35" stop-color="#000" stop-opacity="0.10"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.34"/>
+    </linearGradient>
+    <radialGradient id="sconceGlow" cx="0.5" cy="0" r="1">
+      <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.30"/>
+      <stop offset="0.4" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
+      <stop offset="1"   stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
 `;
     const body = `
 
@@ -1583,9 +1685,48 @@
     <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
           height="${view.h + SCENE * 2}"
           fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
-    <line x1="${-SCENE}" y1="${baseY}" x2="${view.w + SCENE}" y2="${baseY}"
-          stroke="#000" stroke-opacity="0.16" stroke-width="2"
+
+    <!-- ── the sconces, and their light on the plaster ──────────────
+         Painted BEFORE the alcove, so the recess's own shading sits on top of
+         the cone rather than being washed out by it — a light thrown across a
+         wall does not brighten the inside of a recess it is beside.
+         pointer-events is left alone: these are inside #backdrop, which
+         nothing on the page reaches for, and only the vignette ever had to
+         disclaim them because it covers the handle. -->
+    ${[alcX0 - 320, alcX1 + 320].map((sx) => {
+      const sy = casY0 + (baseY - casY0) * 0.24;
+      return `<rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
+                    fill="var(--wall, #F5F3EF)"/>
+              <rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
+                    fill="url(#sconceBody)"/>
+              <rect x="${sx - 30}" y="${sy + 146}" width="60" height="8" rx="4"
+                    fill="${LIGHT.warm}" opacity="0.55"/>
+              <ellipse cx="${sx}" cy="${sy + 150}" rx="290" ry="${baseY - sy - 150}"
+                       fill="url(#sconceGlow)"/>`;
+    }).join("")}
+
+    <!-- ── the alcove: the wall steps forward around the door ───────
+         Three mitred trapezoids from the recess's outer rectangle back to the
+         casing, exactly as #frame turns from the casing back to the leaf.
+         No fill of their own — the wall rect above is already the right
+         colour, and these only say how much light each plane catches. -->
+    <path d="M ${alcX0} ${alcY0} H ${alcX1} L ${casX1} ${casY0} H ${casX0} Z"
+          fill="url(#alcSoffit)"/>
+    <path d="M ${alcX0} ${alcY0} L ${casX0} ${casY0} V ${baseY} H ${alcX0} Z"
+          fill="url(#alcNear)"/>
+    <path d="M ${alcX1} ${alcY0} L ${casX1} ${casY0} V ${baseY} H ${alcX1} Z"
+          fill="url(#alcFar)"/>
+    <!-- The light catch along the recess's own outer edge, the same 0.16 white
+         the casing takes where it meets the plaster. -->
+    <path d="M ${alcX0} ${alcY0} H ${alcX1}" fill="none"
+          stroke="#fff" stroke-opacity="0.16" stroke-width="2"
           vector-effect="non-scaling-stroke"/>
+
+    <!-- Where the wall meets the floor. See floorFall: this is the ruled
+         line that used to be here, replaced by the change of value a fold
+         between two lit surfaces actually makes. -->
+    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="1100"
+          fill="url(#floorFall)"/>
   </g>
 
   <!-- ── cast shadow: soft pool plus a hard contact line ──────── -->
@@ -1595,6 +1736,14 @@
     <rect x="${casX0}" y="${baseY - 3}" width="${openW + CASING * 2}" height="13"
           fill="#000" opacity="0.42" filter="url(#contact)"/>
   </g>
+
+  <!-- ⚠ EVERYTHING THE FLOOR REFLECTS IS INSIDE THIS GROUP, and nothing else
+       is. #backdrop and #shadow stay outside it: a wall does not appear
+       upside down in the floor in front of it, and a cast shadow reflected is
+       a second shadow nobody cast. What is in here is the object standing in
+       the room — frame, threshold, both leaves, the moulding, the glass and
+       the hardware — which is exactly the list that ends at #hardware. -->
+  <g id="door">
 
   <!-- ── frame: casing face, then the return faces you see into ── -->
   <g id="frame">
@@ -1786,6 +1935,44 @@
     )}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? "" : cylinder(lockX, y(CYLINDER_AFF))}
+  </g>
+
+  </g><!-- /#door -->
+
+  <!-- ── the door, mirrored in the floor ──────────────────────────
+       The highest value per byte in the whole room: a polished entrance floor
+       throws the door back at you, and ours was matte to the point of reading
+       as paper. ~200 bytes, because a a use element points at #door rather than
+       drawing it again.
+
+       ⚠ IT IS NOT IN THE ACCESSIBILITY TREE AND IT IS NOT IN ANY MEASUREMENT.
+       a use element builds a shadow tree, which querySelectorAll does not enter —
+       so tools/collide.mjs's sweep over [data-hw], [data-pane] and
+       [data-detail], npm run profile's #leaf rect and npm run glass's
+       [data-pane] rect all see exactly what they saw before, one copy each.
+       That was worth checking rather than assuming: REALISM2.md §D3 calls a
+       strip in collide.mjs a required change, and it is not one — the sweep
+       was re-run over all 1,490 designs to be sure. aria-hidden because the
+       element carries no name and a reflection is not a fact about the door.
+
+       0.13 alpha, blurred, and masked to nothing over about 900 mm of floor —
+       past which a real reflection has lost to the surface's own scatter. -->
+  <!-- ⚠ THE MASK IS ON THE GROUP AND THE FLIP IS ON THE CHILD, and putting
+       both on one element drew nothing at all. maskUnits="userSpaceOnUse"
+       resolves the mask's own x/y/width/height in the user space of the
+       element referencing it — which INCLUDES that element's own transform. So
+       with the mask on the flipped use, the band written at y = baseY..+900
+       came out mirrored to baseY-900..baseY: a window over the DOOR rather
+       than over the floor, and the reflection was masked away completely.
+       Caught by looking at a screenshot. Nothing asserted it, and nothing
+       could have: a mask that hides everything and a feature that was never
+       drawn are the same picture, which is why REALISM.md §6 says to compare
+       against something real every time.
+       An untransformed wrapper carries the parent's user space, so the band is
+       the floor band — said once, in the coordinates everything else uses. -->
+  <g mask="url(#floorFade)" aria-hidden="true" pointer-events="none">
+    <use href="#door" transform="translate(0 ${2 * baseY}) scale(1 -1)"
+         opacity="0.13" filter="url(#floorBlur)"/>
   </g>
 
   <!-- The vignette is LIGHT, and light is not something you can touch. It is
@@ -4242,6 +4429,11 @@ ${body}
          (ruled from outside to be a picture settled on site, not something
          Peretz builds to), the money, the code and the link. */
       ...specLines(state2),
+      /* ⚠ AND THE OPENING SPELLED OUT. `פתיחה: שמאל, פנימה` above is the name,
+         and the name is the exact ambiguity that had this site building mirrored
+         doors until 23.8.2026 — see `handingWords`. Peretz reads this line and
+         there is nothing left to ask. */
+      handingWords(state2),
       ...gripAddendum(state2),
       `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — ${PRICE_INCLUDES}`,
       /* The caveat the CARD states twice and the dock a third time, and which
@@ -4260,6 +4452,49 @@ ${body}
   var whatsappUrl = (state2) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2))}`;
   var FALLBACK_TEXT = "שלום, ניסיתי לבנות דלת באתר והעמוד לא נטען אצלי, אז אין לי קוד לשלוח. אפשר לחזור אליי ולעזור לי לבחור דלת?";
   var fallbackWhatsappUrl = () => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(FALLBACK_TEXT)}`;
+  var canSharePicture = () => /^https?:$/.test(window.location.protocol) && typeof navigator !== "undefined" && typeof navigator.share === "function" && typeof navigator.canShare === "function";
+  async function doorPng(state2, width = 1e3) {
+    const svg = render(state2);
+    const box = /viewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(svg);
+    if (!box) throw new Error("the drawing has no viewBox to take a size from");
+    const w = Number(box[1]), h = Number(box[2]);
+    const sized = svg.replace("<svg ", `<svg width="${w}" height="${h}" `);
+    const url = URL.createObjectURL(new Blob([sized], { type: "image/svg+xml;charset=utf-8" }));
+    try {
+      const img = new Image();
+      await new Promise((res, rej) => {
+        img.onload = res;
+        img.onerror = () => rej(new Error("the drawing would not rasterise"));
+        img.src = url;
+      });
+      const cv = document.createElement("canvas");
+      cv.width = Math.round(width);
+      cv.height = Math.round(width * h / w);
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      const png = await new Promise((res) => cv.toBlob(res, "image/png"));
+      if (!png) throw new Error("the canvas produced no image");
+      return png;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+  async function sendDoor(state2) {
+    if (!canSharePicture()) return "unavailable";
+    let file;
+    try {
+      file = new File([await doorPng(state2)], "delet.png", { type: "image/png" });
+    } catch {
+      return "unavailable";
+    }
+    const payload = { files: [file], text: message(state2) };
+    if (!navigator.canShare(payload)) return "unavailable";
+    try {
+      await navigator.share(payload);
+      return "sent";
+    } catch (e) {
+      return e && e.name === "AbortError" ? "dismissed" : "unavailable";
+    }
+  }
   async function copyMessage(state2) {
     const text = message(state2);
     try {
@@ -4277,6 +4512,40 @@ ${body}
       return ok;
     }
   }
+
+  // js/works.js
+  var WORKS = [
+    { id: "d003", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
+    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
+    { id: "d012", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
+    { id: "d015", state: { colour: "rb-9005d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
+    { id: "d016", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
+    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
+    { id: "d026", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
+    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
+    { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "left-in" } },
+    { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "right-in" } },
+    { id: "d034", state: { colour: "rb-0096d", detail: "groove", window: "none", grille: "none", handle: "nitzan", lockset: "cylinder", size: "standard", handing: "right-in" } },
+    { id: "d038", state: { colour: "rb-7110d", detail: "stripsv", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
+    { id: "d043", state: { colour: "rb-7126d", detail: "stripsv", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
+    { id: "d048", state: { colour: "rb-5103d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
+    { id: "d051", state: { colour: "rb-7240d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
+    { id: "d063", state: { colour: "rb-7240d", detail: "strips3", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
+    { id: "d064", state: { colour: "rb-7110d", detail: "strips", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
+    { id: "d072", state: { colour: "rb-0096d", detail: "groove", window: "none", grille: "none", handle: "shahar", lockset: "cylinder", size: "standard", handing: "left-in" } },
+    { id: "d078", state: { colour: "rb-7110d", detail: "strips", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
+    { id: "d087", state: { colour: "rb-7021d", detail: "panel", window: "none", grille: "none", handle: "shahar", lockset: "digital", size: "standard", handing: "right-in" } },
+    { id: "d092", state: { colour: "rb-6219d", detail: "panel", window: "broad", grille: "iron", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in" } },
+    { id: "d097", state: { colour: "rb-7080d", detail: "panel", window: "tallwin", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
+    { id: "d099", state: { colour: "rb-7126d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
+    { id: "d106", state: { colour: "rb-7080d", detail: "panel", window: "broad", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
+    { id: "d108", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "iron", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
+    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "ella", lockset: "digital", size: "standard", handing: "right-in" } },
+    { id: "d116", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
+    { id: "d122", state: { colour: "rb-7240d", detail: "panel", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in" } },
+    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "reeded", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in" } },
+    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "tallwin", grille: "iron", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in" } }
+  ];
 
   // js/app.js
   var $ = (sel) => document.querySelector(sel);
@@ -4352,6 +4621,7 @@ ${body}
     }
   ];
   var SECTIONS = [
+    { key: "fit", title: "מבנה הדלת", sub: "גודל הדלת וכיוון הפתיחה" },
     { key: "look", title: "מראה הדלת", sub: "צבע ועיצוב החזית" },
     /* The sub names the categories INSIDE the section, and this one outlived
        them: it promised "חלון, זכוכית, סורג" — three choices — after the glazing
@@ -4361,11 +4631,35 @@ ${body}
        whose commit was called "One question about the window".
        These are the two category titles verbatim, the way `hw` below carries
        its own. Hand-kept prose beside a generated list is a drift point: if a
-       row moves in or out of GROUPS, this line has to move with it. */
+       row moves in or out of GROUPS, this line has to move with it — and so
+       does the sub, in the same edit. */
     { key: "glass", title: "חלון וזכוכית", sub: "חלון, עיצוב החלון" },
-    { key: "hw", title: "ידיות ומנעול", sub: "ידית משיכה, מנעול" },
-    { key: "fit", title: "מידה ופתיחה", sub: "גודל הדלת וכיוון הפתיחה" }
+    { key: "hw", title: "ידיות ומנעול", sub: "ידית משיכה, מנעול" }
   ];
+  var SECTION_ICON = {
+    fit: '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.2 3.6v16.8"/><path d="M15.4 12.4a.55.55 0 1 0 0-1.1.55.55 0 0 0 0 1.1Z"/>',
+    look: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
+    glass: '<path d="M4 4.6h16v11.6H4Z"/><path d="M12 4.6v11.6M4 10.4h16"/><path d="M7 19.4h10"/>',
+    hw: '<path d="M4.6 12h9.8"/><path d="M14.4 8.6h3.2v6.8h-3.2Z"/><path d="M18.4 12h1"/>'
+  };
+  function sectionIcon(key) {
+    if (!Object.prototype.hasOwnProperty.call(SECTION_ICON, key)) {
+      throw new Error(`SECTION_ICON has no glyph for the "${key}" section — every section needs one, or its navigator circle draws nothing`);
+    }
+    return `<svg class="steps__g" viewBox="0 0 24 24" aria-hidden="true">${SECTION_ICON[key]}</svg>`;
+  }
+  var SPEC_ICON = {
+    colour: '<circle cx="12" cy="12" r="7.6"/><path d="M12 4.4v15.2"/>',
+    window: '<path d="M4.6 5h14.8v11.4H4.6Z"/><path d="M12 5v11.4M4.6 10.7h14.8"/>',
+    glazing: '<path d="M3.4 6.2h7.2v11.6H3.4Z"/><path d="M13.4 6.2h7.2v11.6h-7.2Z"/>',
+    grille: '<path d="M4.6 5h14.8v14H4.6Z"/><path d="M9.5 5v14M14.5 5v14M4.6 12h14.8"/>',
+    handle: '<path d="M8.4 5.6h3v12.8h-3Z"/><path d="M11.4 12h4.6"/>',
+    lockset: '<path d="M5 12h8.6"/><path d="M13.6 9.2h4.4v5.6h-4.4Z"/><path d="M8.2 15.6a.7.7 0 1 0 0-1.4.7.7 0 0 0 0 1.4Z"/>',
+    detail: '<path d="M5.2 4.4h13.6v15.2H5.2Z"/><path d="M8.4 7.6h7.2v8.8H8.4Z"/>',
+    size: '<path d="M4.4 4.4v15.2M19.6 4.4v15.2"/><path d="M4.4 12h15.2"/><path d="m7.4 9.4-3 2.6 3 2.6M16.6 9.4l3 2.6-3 2.6"/>',
+    handing: '<path d="M6 3.8h12v16.4H6Z"/><path d="m14.6 8.6 3.4 3.4-3.4 3.4"/>'
+  };
+  var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
   var groupsIn = (key) => GROUPS.filter((g) => g.in === key);
   function init() {
     const { state: parsed, notice, said } = fromQuery(window.location.search);
@@ -4384,6 +4678,20 @@ ${body}
     });
     $("#grip-home").addEventListener("click", () => set({ ...state, grip: null }));
     $("#save-btn").addEventListener("click", saveCurrent);
+    $("#works-close").addEventListener("click", closeWorks);
+    document.querySelectorAll("[data-wa]").forEach((el) => {
+      el.addEventListener("click", async (ev) => {
+        if (!canSharePicture()) return;
+        ev.preventDefault();
+        let how = "unavailable";
+        try {
+          how = await sendDoor(state);
+        } catch {
+        }
+        if (how === "sent" || how === "dismissed") return;
+        window.location.href = el.href;
+      });
+    });
     $("#saved-btn").addEventListener("click", () => {
       const box = $("#saved"), btn = $("#saved-btn");
       const show = box.hidden;
@@ -4406,6 +4714,7 @@ ${body}
       ).observe($(".send"));
     }
     paint();
+    if (document.documentElement.classList.contains("is-sheet")) buildSheet();
     const differs = GROUPS.find((g) => state[g.key] !== DEFAULTS[g.key]);
     arrive(differs);
     if (typeof window.matchMedia === "function") {
@@ -4426,8 +4735,103 @@ ${body}
       if (differs) open(differs.key);
     }
   }
+  var worksObserver = null;
+  function buildWorks() {
+    const grid = $("#works-grid");
+    if (!grid || grid.childElementCount) return;
+    const draw = (tile) => {
+      if (tile.dataset.drawn === "1") return;
+      tile.querySelector(".work__art").innerHTML = render({ ...DEFAULTS, ...WORKS[Number(tile.dataset.i)].state });
+      tile.dataset.drawn = "1";
+    };
+    const undraw = (tile) => {
+      if (tile.dataset.drawn !== "1") return;
+      tile.querySelector(".work__art").replaceChildren();
+      tile.dataset.drawn = "0";
+    };
+    for (const [i, w] of WORKS.entries()) {
+      const st = { ...DEFAULTS, ...w.state };
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "work";
+      b.dataset.i = String(i);
+      b.setAttribute("aria-label", describe(st));
+      b.innerHTML = `<span class="work__art" aria-hidden="true"></span><span class="work__meta"><span class="work__name">${byId(COLOURS, st.colour).he}</span><span class="work__price">${formatAgorot(priceAgorot(st))}</span></span>`;
+      b.addEventListener("click", () => {
+        set({ ...DEFAULTS, ...w.state, grip: null });
+        closeWorks();
+        toast("טענו את הדלת. אפשר לשנות כל פרט.");
+      });
+      grid.appendChild(b);
+    }
+    if (typeof IntersectionObserver === "function") {
+      worksObserver = new IntersectionObserver((entries) => {
+        for (const e of entries) (e.isIntersecting ? draw : undraw)(e.target);
+      }, { root: $("#works"), rootMargin: "400px 0px" });
+      grid.querySelectorAll(".work").forEach((t) => worksObserver.observe(t));
+    } else {
+      grid.querySelectorAll(".work").forEach(draw);
+    }
+  }
+  function openWorks() {
+    buildWorks();
+    const d = $("#works");
+    if (typeof d.showModal === "function") d.showModal();
+    else d.setAttribute("open", "");
+  }
+  function closeWorks() {
+    const d = $("#works");
+    if (typeof d.close === "function") d.close();
+    else d.removeAttribute("open");
+  }
+  function buildSheet() {
+    const host = $("#sheet");
+    if (!host) return;
+    const sz = SIZES[state.size] || SIZES.standard;
+    const totalW = sz.w + (sz.side || 0);
+    const rows = specRows(state).map((r) => `<div class="sheet__row"><span class="sheet__k">${r.label}</span><span class="sheet__v">${r.value}</span>` + (r.hex ? `<span class="sheet__chip" style="--chip:${r.hex}"></span>` : "") + "</div>").join("");
+    host.innerHTML = `
+    <header class="sheet__top">
+      <div>
+        <div class="sheet__brand">דלתות מגן</div>
+        <div class="sheet__sub">ראשון לציון · ${PHONE_DISPLAY}</div>
+      </div>
+      <div class="sheet__code">קוד: <b>${encodeCode(state)}</b></div>
+    </header>
+
+    <div class="sheet__body">
+      <figure class="sheet__art">
+        ${render(state)}
+        <figcaption class="sheet__dims">
+          ${totalW} × ${sz.h} מ״מ · ${sz.he}${sz.side ? ` (כנף ${sz.w} + ${sz.side})` : ""}
+        </figcaption>
+      </figure>
+
+      <div class="sheet__spec">
+        ${rows}
+        <div class="sheet__row sheet__row--wide">
+          <span class="sheet__k">כיוון</span>
+          <span class="sheet__v">${handingWords(state)}</span>
+        </div>
+        <div class="sheet__row sheet__row--wide">
+          <span class="sheet__k">מחיר משוער</span>
+          <span class="sheet__v"><b>${formatAgorot(priceAgorot(state))}</b>
+            <small>${PRICE_INCLUDES}</small></span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="sheet__foot">${PRICE_CAVEAT}</footer>`;
+  }
   function buildPanel() {
     const wrap = $("#choices");
+    const opener = document.createElement("button");
+    opener.type = "button";
+    opener.className = "works-open";
+    opener.id = "works-btn";
+    opener.innerHTML = `<span class="works-open__t">התחילו מדלת שכבר התקנו</span><span class="works-open__n">${WORKS.length} דלתות אמיתיות</span>`;
+    opener.addEventListener("click", openWorks);
+    wrap.appendChild(opener);
     const nav = document.createElement("nav");
     nav.className = "steps";
     nav.setAttribute("aria-label", "מעבר בין חלקי הבחירה");
@@ -4436,7 +4840,7 @@ ${body}
       b.type = "button";
       b.className = "steps__step";
       b.dataset.step = sec.key;
-      b.innerHTML = `<span class="steps__n" aria-hidden="true"></span><span class="steps__t">${sec.title}</span>`;
+      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span><span class="steps__l"><span class="steps__n" aria-hidden="true"></span><span class="steps__t">${sec.title}</span></span>`;
       b.setAttribute("aria-label", sec.title);
       b.addEventListener("click", () => {
         if ($(`#sect-head-${sec.key}`).getAttribute("aria-expanded") !== "true") {
@@ -4765,7 +5169,7 @@ ${body}
         const row = document.createElement("div");
         row.className = "spec__row";
         row.dataset.key = r.key;
-        row.innerHTML = `<span class="spec__label">${r.label}</span><span class="spec__value">${r.value}</span>` + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : "");
+        row.innerHTML = specIcon(r.key) + `<span class="spec__label">${r.label}</span><span class="spec__value">${r.value}</span>` + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : "");
         return row;
       }));
     }
@@ -4974,6 +5378,9 @@ ${body}
         Math.min(f.x - wrap.x, wrap.x + wrap.width - (f.x + f.width))
       );
       $(".stage-wrap").style.setProperty("--wall-gap", `${Math.round(wall)}px`);
+      const root = document.documentElement.style;
+      root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
+      root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);
     }
   }
   var liveTimer = null;
@@ -5047,7 +5454,7 @@ ${body}
   }
   document.addEventListener("DOMContentLoaded", guard(() => {
     $("#phone-link").href = `tel:${PHONE_TEL}`;
-    $("#phone-link").textContent = PHONE_DISPLAY;
+    $("#phone-link [data-phone-text]").textContent = PHONE_DISPLAY;
     init();
   }));
 })();

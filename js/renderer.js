@@ -262,6 +262,35 @@ const RET_HEAD = 148;  // the soffit — the deepest of the three, and by a lot
 const MULLION  = 22;
 export const REBATE = 50;   // frame rebate: how far the leaf sits inside the opening
 
+/* ── THE ALCOVE: A SECOND, OUTER OPENING ────────────────────────────
+   The wall steps forward around the door, so the casing sits at the back of a
+   shallow recess rather than flat against a plane of plaster that runs to the
+   edge of the screen. It is the single change that makes the drawing read as
+   a PLACE rather than as a door on a background (`REALISM2.md` §D1).
+
+   Built from the primitive the frame already proved: three mitred trapezoids,
+   an outer rectangle at the wall face turning back to an inner one. The inner
+   rectangle here is the casing's own outer edge, so the two openings are the
+   same construction at two depths and their mitres agree by geometry.
+
+   ⚠ THESE NUMBERS ARE PROPORTION, NOT MEASUREMENT, AND THAT IS SAID OUT LOUD.
+   Every other depth in this file — CASING 46, RETURN 62, RET_HEAD 148 — came
+   off a photograph. Nothing in research/ shows the wall around one of these
+   doors from far enough back to measure a recess, so these are chosen to sit
+   in the same ratio the frame's own planes do (a soffit roughly twice the
+   jamb return) at a scale that reads at a glance. If a photograph ever shows
+   one, it wins: REALISM.md §6.
+
+   The alcove's outer edge falls OUTSIDE the natural viewBox — `casX0` is
+   exactly `PAD.x`, so a 160 mm return starts 90 mm to the left of the drawing's
+   own box. That is deliberate and harmless: `fitStage` widens the viewBox to
+   the stage's shape and always ends up far wider than the natural one, so on
+   the page the whole recess shows. In `?bare=1` — the harness, which keeps the
+   natural box — the outer edge is clipped, and the harness is looking at the
+   LEAF, which is 178 mm further in. */
+const ALC_SIDE = 160;  // the recess's return, each side, at the wall face
+const ALC_HEAD = 300;  // its soffit — the plane you look up into, so deeper
+
 /* The reveal profile, read outward from the leaf. Every works photograph has
    these three bands and the renderer had none of them: it went straight from
    leaf to return face. The BEAD is the important one — a 2px line at up to
@@ -599,6 +628,9 @@ export function render(state) {
   const casY0 = revY0 - CASING;         //   "                     top
   const baseY = floorY + THRESHOLD;     // where every vertical meets the floor
   const openW = totalW + RETURN * 2;    // the opening, wall face to wall face
+  const alcX0 = casX0 - ALC_SIDE;       // the recess at the wall face, left
+  const alcX1 = casX1 + ALC_SIDE;       //   "                          right
+  const alcY0 = casY0 - ALC_HEAD;       //   "                          head
 
   const hingeOnLeft = handing.hinge === 'left';
 
@@ -1314,6 +1346,97 @@ export function render(state) {
     <filter id="frameShadow" x="-15%" y="-15%" width="130%" height="130%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
+
+    <!-- ── THE ROOM ──────────────────────────────────────────────────
+         ⚠ EVERY ONE OF THESE IS A BLACK OR WHITE OVERLAY, NOT A COLOUR.
+         The wall and floor are painted with the CSS variables --wall and
+         --floor so that .layout[data-light] can sink the whole room a shade
+         behind a pale door — and a gradient built here out of literal hexes
+         would not move with them, so a light door would get a correctly-sunk
+         wall with a recess still shaded for the old one. Modelling the planes
+         as value changes over whatever colour the page has chosen keeps one
+         statement of what the room is made of, and it is the same rule the
+         frame's own arris follows: a fold between two lit surfaces is a
+         change of VALUE, not a colour of its own. -->
+    <linearGradient id="alcSoffit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.055"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.135"/>
+    </linearGradient>
+    <!-- The two returns shade at different rates, which is what a 90° turn in
+         light coming from one side actually does — and it is the only thing
+         left saying which side the key is on once the planes are neutral. -->
+    <linearGradient id="alcNear" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.045"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.105"/>
+    </linearGradient>
+    <linearGradient id="alcFar" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.020"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.060"/>
+    </linearGradient>
+
+    <!-- ⚠ THIS REPLACES A RULED LINE, and that is the whole point of it.
+         Where the wall met the floor there was a 2 px non-scaling stroke of
+         black at 0.16 — the third time this drawing has drawn a fold as ink.
+         The other two are already recorded above: the black arris down each
+         jamb, reported from outside and circled, and edgeTop's full-width
+         rectangle. A skirting shadow is a change of value that falls off over
+         about a hand's width and then keeps going, much fainter, as the floor
+         recedes. Two effects, one gradient: steep to 18%, then a long tail. -->
+    <linearGradient id="floorFall" gradientUnits="userSpaceOnUse"
+                    x1="0" y1="${baseY}" x2="0" y2="${baseY + 1100}">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.20"/>
+      <stop offset="0.06" stop-color="#000" stop-opacity="0.075"/>
+      <stop offset="0.18" stop-color="#000" stop-opacity="0.038"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- ── THE REFLECTION ───────────────────────────────────────────
+         The door, mirrored in the floor, as a a use element of the group that draws
+         it. A a use element is a REFERENCE: about two hundred bytes on every door
+         rather than a second copy of one that reaches 70 KB. Same argument
+         that took the worst door from 374,160 bytes to 284,353.
+         usedDefs prunes to what the markup points at, and it resolves
+         transitively — so mask="url(#floorFade)" keeps the mask, and the
+         mask's own url(#floorFadeG) keeps the gradient inside it. The
+         the no-dangling-url()  assertion is what proves that actually happened. -->
+    <linearGradient id="floorFadeG" gradientUnits="userSpaceOnUse"
+                    x1="0" y1="${baseY}" x2="0" y2="${baseY + 900}">
+      <stop offset="0"    stop-color="#fff"/>
+      <stop offset="0.55" stop-color="#4a4a4a"/>
+      <stop offset="1"    stop-color="#000"/>
+    </linearGradient>
+    <mask id="floorFade" maskUnits="userSpaceOnUse"
+          x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="900">
+      <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="900"
+            fill="url(#floorFadeG)"/>
+    </mask>
+    <filter id="floorBlur" x="-8%" y="-8%" width="116%" height="116%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+
+    <!-- ── THE SCONCES ──────────────────────────────────────────────
+         ⚠ THEIR LIGHT STOPS AT THE WALL, and that is a refusal rather than an
+         oversight. LIGHT says ONE key, high and about 30° left of camera,
+         and that single fact is load-bearing for more of this drawing than
+         anything else in it: FALLOFF's nine-row medians fitted across thirty
+         photographs, MOULD_SIDE's per-side relief gain, keyWash, bloom, and
+         the warm/cool split that CLAUDE.md §4 records as the first absence
+         that read as plastic. Two symmetric wall lights say the scene has two
+         keys placed symmetrically, and re-fitting a corpus-measured model to
+         match them would be tuning by eye against nothing — there is no door
+         in research/ photographed between two sconces. REALISM.md §6.
+         So the wall may flatter and the leaf keeps its instruments, and the
+         disagreement is written down here instead of hidden. -->
+    <linearGradient id="sconceBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.28"/>
+      <stop offset="0.35" stop-color="#000" stop-opacity="0.10"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.34"/>
+    </linearGradient>
+    <radialGradient id="sconceGlow" cx="0.5" cy="0" r="1">
+      <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.30"/>
+      <stop offset="0.4" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
+      <stop offset="1"   stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
 `;
 
   const body = `
@@ -1341,9 +1464,48 @@ export function render(state) {
     <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
           height="${view.h + SCENE * 2}"
           fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
-    <line x1="${-SCENE}" y1="${baseY}" x2="${view.w + SCENE}" y2="${baseY}"
-          stroke="#000" stroke-opacity="0.16" stroke-width="2"
+
+    <!-- ── the sconces, and their light on the plaster ──────────────
+         Painted BEFORE the alcove, so the recess's own shading sits on top of
+         the cone rather than being washed out by it — a light thrown across a
+         wall does not brighten the inside of a recess it is beside.
+         pointer-events is left alone: these are inside #backdrop, which
+         nothing on the page reaches for, and only the vignette ever had to
+         disclaim them because it covers the handle. -->
+    ${[alcX0 - 320, alcX1 + 320].map(sx => {
+      const sy = casY0 + (baseY - casY0) * 0.24;   // about a third up the wall
+      return `<rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
+                    fill="var(--wall, #F5F3EF)"/>
+              <rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
+                    fill="url(#sconceBody)"/>
+              <rect x="${sx - 30}" y="${sy + 146}" width="60" height="8" rx="4"
+                    fill="${LIGHT.warm}" opacity="0.55"/>
+              <ellipse cx="${sx}" cy="${sy + 150}" rx="290" ry="${baseY - sy - 150}"
+                       fill="url(#sconceGlow)"/>`;
+    }).join('')}
+
+    <!-- ── the alcove: the wall steps forward around the door ───────
+         Three mitred trapezoids from the recess's outer rectangle back to the
+         casing, exactly as #frame turns from the casing back to the leaf.
+         No fill of their own — the wall rect above is already the right
+         colour, and these only say how much light each plane catches. -->
+    <path d="M ${alcX0} ${alcY0} H ${alcX1} L ${casX1} ${casY0} H ${casX0} Z"
+          fill="url(#alcSoffit)"/>
+    <path d="M ${alcX0} ${alcY0} L ${casX0} ${casY0} V ${baseY} H ${alcX0} Z"
+          fill="url(#alcNear)"/>
+    <path d="M ${alcX1} ${alcY0} L ${casX1} ${casY0} V ${baseY} H ${alcX1} Z"
+          fill="url(#alcFar)"/>
+    <!-- The light catch along the recess's own outer edge, the same 0.16 white
+         the casing takes where it meets the plaster. -->
+    <path d="M ${alcX0} ${alcY0} H ${alcX1}" fill="none"
+          stroke="#fff" stroke-opacity="0.16" stroke-width="2"
           vector-effect="non-scaling-stroke"/>
+
+    <!-- Where the wall meets the floor. See floorFall: this is the ruled
+         line that used to be here, replaced by the change of value a fold
+         between two lit surfaces actually makes. -->
+    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="1100"
+          fill="url(#floorFall)"/>
   </g>
 
   <!-- ── cast shadow: soft pool plus a hard contact line ──────── -->
@@ -1353,6 +1515,14 @@ export function render(state) {
     <rect x="${casX0}" y="${baseY - 3}" width="${openW + CASING * 2}" height="13"
           fill="#000" opacity="0.42" filter="url(#contact)"/>
   </g>
+
+  <!-- ⚠ EVERYTHING THE FLOOR REFLECTS IS INSIDE THIS GROUP, and nothing else
+       is. #backdrop and #shadow stay outside it: a wall does not appear
+       upside down in the floor in front of it, and a cast shadow reflected is
+       a second shadow nobody cast. What is in here is the object standing in
+       the room — frame, threshold, both leaves, the moulding, the glass and
+       the hardware — which is exactly the list that ends at #hardware. -->
+  <g id="door">
 
   <!-- ── frame: casing face, then the return faces you see into ── -->
   <g id="frame">
@@ -1503,6 +1673,44 @@ export function render(state) {
               centreX, leafW, y0, panelled && place.rot !== 90, place.rot)}
     ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
     ${lockset.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
+  </g>
+
+  </g><!-- /#door -->
+
+  <!-- ── the door, mirrored in the floor ──────────────────────────
+       The highest value per byte in the whole room: a polished entrance floor
+       throws the door back at you, and ours was matte to the point of reading
+       as paper. ~200 bytes, because a a use element points at #door rather than
+       drawing it again.
+
+       ⚠ IT IS NOT IN THE ACCESSIBILITY TREE AND IT IS NOT IN ANY MEASUREMENT.
+       a use element builds a shadow tree, which querySelectorAll does not enter —
+       so tools/collide.mjs's sweep over [data-hw], [data-pane] and
+       [data-detail], npm run profile's #leaf rect and npm run glass's
+       [data-pane] rect all see exactly what they saw before, one copy each.
+       That was worth checking rather than assuming: REALISM2.md §D3 calls a
+       strip in collide.mjs a required change, and it is not one — the sweep
+       was re-run over all 1,490 designs to be sure. aria-hidden because the
+       element carries no name and a reflection is not a fact about the door.
+
+       0.13 alpha, blurred, and masked to nothing over about 900 mm of floor —
+       past which a real reflection has lost to the surface's own scatter. -->
+  <!-- ⚠ THE MASK IS ON THE GROUP AND THE FLIP IS ON THE CHILD, and putting
+       both on one element drew nothing at all. maskUnits="userSpaceOnUse"
+       resolves the mask's own x/y/width/height in the user space of the
+       element referencing it — which INCLUDES that element's own transform. So
+       with the mask on the flipped use, the band written at y = baseY..+900
+       came out mirrored to baseY-900..baseY: a window over the DOOR rather
+       than over the floor, and the reflection was masked away completely.
+       Caught by looking at a screenshot. Nothing asserted it, and nothing
+       could have: a mask that hides everything and a feature that was never
+       drawn are the same picture, which is why REALISM.md §6 says to compare
+       against something real every time.
+       An untransformed wrapper carries the parent's user space, so the band is
+       the floor band — said once, in the coordinates everything else uses. -->
+  <g mask="url(#floorFade)" aria-hidden="true" pointer-events="none">
+    <use href="#door" transform="translate(0 ${2 * baseY}) scale(1 -1)"
+         opacity="0.13" filter="url(#floorBlur)"/>
   </g>
 
   <!-- The vignette is LIGHT, and light is not something you can touch. It is
@@ -3340,8 +3548,8 @@ function grillePaths(kind, x, y, w, h, tint) {
      path data written again** — 840 long `d=` attributes, only 344 distinct,
      2.44x each. 61% of buildable doors exceeded REALISM.md's own 40 KB gate.
 
-     A `<use>` is a reference, and stroke paint is an INHERITED property, so the
-     three paints can hang off three `<use>` elements while the geometry is
+     A a use element is a reference, and stroke paint is an INHERITED property, so the
+     three paints can hang off three a use element elements while the geometry is
      written once. `fill="none"` stays on the path itself, where a presentation
      attribute beats inheritance, so the master never paints.
 
@@ -3410,7 +3618,7 @@ function grillePaths(kind, x, y, w, h, tint) {
   /* ⚠ `solid` DELIBERATELY KEEPS ITS TWO COPIES, and the reason is the master.
      A stroke master carries `fill="none"` so that it never paints on its own
      while sitting in the body — and a presentation attribute on the referenced
-     element beats anything inherited through a `<use>`, so a filled `<use>` of
+     element beats anything inherited through a a use element, so a filled a use element of
      that same master would paint nothing at all. Giving `solid` its own
      unfilled master would mean the masters could no longer live in the body,
      which means collecting them and prepending a `<defs>` — and `grillePaths`

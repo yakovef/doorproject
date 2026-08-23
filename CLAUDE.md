@@ -6,7 +6,9 @@ most valuable — the mistakes that have already been made here, so they are not
 made a third time.
 
 `PLAN.md` is the product plan. `REALISM.md` is the drawing's measurement log
-and the forward plan. `ASK-PERETZ.md` is everything blocked on a human.
+and the governing rule; **`REALISM2.md` is the forward plan** and `MOCKUP2.md`
+is the reading of the mockup it answers. `ASK-PERETZ.md` is everything blocked
+on a human.
 
 **`AGENT.md` is the brief for the recurring agent** that wakes up every five
 hours, forms its own opinion about the site and pushes straight to the live
@@ -20,6 +22,112 @@ it, that log is where to look.
 
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
+
+- **The 40 KB byte gate is retired and `npm run latency` replaces it.**
+  REALISM.md G6 asked that a door's SVG stay under 40,000 bytes, and it was
+  measuring a quantity nobody pays: the string is built in memory and assigned
+  to `innerHTML`, so it never crosses a network — and **12,075 of the default
+  door's 41,971 bytes are XML comments**, 29%, because the renderer explains
+  itself to whoever opens the inspector. A byte gate is largely a gate on how
+  much the drawing documents itself, and 61% of doors already failed it.
+  What a customer feels is the DOM rebuilt under their thumb. Measured at 6×
+  CPU throttle on a 390×844 phone: **default 66 ms / 378 elements, sidelight
+  with ironwork 142 ms / 867, and the heaviest door the catalogue can build is
+  2,139 elements** — found by sweeping every size × window × grille × detail
+  rather than by guessing, and it turns out to be a strip light with quatrefoil
+  ironwork on a leaf-and-a-half, not the door anyone would have picked. Gate at
+  600 ms, with the arithmetic behind that number in `tools/latency.mjs`.
+  ⚠ **That measurement settled an open question rather than opening one.** An
+  outside review proposed hoisting the palette to CSS variables so a colour tap
+  repaints incrementally. At 66–142 ms for the two doors measurable here the
+  refactor is not justified, and it would put a second way of producing the
+  drawing beside `render(state)` — the shape §5 is about. Not built, on the
+  number. Revisit if the gate goes red.
+
+- **⚠ CHROMIUM DIES IN THIS CONTAINER, AND THE INSTRUMENTS NOW SURVIVE IT.**
+  Headless Chromium here kills its own renderer under raster pressure at no
+  fixed threshold: `npm run shot` died on its second page, `npm run audit` on
+  its sixth viewport, a scratch probe after four. Verified against the
+  COMMITTED tree, so it is the container and not this round's changes — and
+  `--disable-gpu`, `--disable-dev-shm-usage`, `--single-process`,
+  `--num-raster-threads=1` and six other flag sets were each measured and none
+  of them help. `tools/screenshot.mjs` already met this once and its note has
+  the lesson: **the ceiling moves with load, so any constant fitted to it is a
+  guess with an expiry date.** So the tools stop retreating and learn to get
+  back up — `tools/browser.mjs` relaunches the browser and retakes the reading,
+  printing every relaunch so a run that needed six does not read as a quiet
+  one. ⚠ It is not a retry that turns a red check green: a crashed renderer is
+  the ABSENCE of a measurement, and anything that is not the browser dying is
+  rethrown on the first attempt.
+  ⚠ **What it does NOT fix: this container cannot render the page above about
+  1,000 px wide at all** — 1280×720 crashes every time on a fresh browser. So
+  `npm run sheets` and `npm run audit` cannot complete here, and the four sheet
+  families are committed STALE with `npm test` red on exactly those four
+  assertions. They are not weakened and not deleted; they are correct and they
+  are telling the truth. One `npm run sheets` on a healthy container clears
+  them.
+
+- **The second mockup, built: tokens, chrome, structure first, and a room.**
+  `MOCKUP2.md` is the reading and `REALISM2.md` the decision; stages A–D have
+  landed. Radius became a scale (`--r-card` / `--r-tile` / `--r-chip` /
+  `--r-pill`), the accent is spent in its five places, the navigator is four
+  circles that are still a table of contents, the spec rows carry icons keyed
+  off `row.key`, the trust band came back to the desktop, **מבנה הדלת became
+  section 01** with no `VERSION` bump, and the door stands in an alcove with a
+  reflection in the floor. Every ⚠ in those two files saying "do not build this
+  as drawn" was honoured; the plants are cut on the byte ledger as they said.
+  ⚠ **Four of the plan's own numbers were corrected by measuring them.**
+  `--accent-ink` is `#7E6134` and not the proposed `#8A6A3B`, because that
+  colour was chosen against WHITE and the choices card is only white above
+  1100 px — on the paper a phone actually paints it measures 4.27:1 and misses.
+  The spec icons key off `row.key` and not `row.id`, which is the OPTION and
+  would need sixty-four entries. `tools/collide.mjs` needs no strip for the
+  floor reflection — a `<use>` builds a shadow tree that `querySelectorAll`
+  does not enter, and the sweep was re-run over all 1,490 designs to be sure.
+  And the room cost **+6,571 bytes and +44 elements** on every door against a
+  budget of ~1,400 bytes, which is over — and which the byte gate above was
+  retired for measuring in the first place.
+
+- **The order has a picture in it, and the opening is spelled out.**
+  `navigator.share({ files, text })` sends a PNG of the door with the same
+  message; https-only, because a canvas raster over `file://` throws, which is
+  the condition `shareUrl` already tests. Everywhere else the `wa.me` link is
+  untouched — the href is never hollowed out, so the label-and-href pact holds
+  for every route the handler does not cover. ⚠ Three outcomes, not two: a
+  customer who opens the share sheet and closes it must not then have WhatsApp
+  opened for them anyway.
+  And `handingWords()` in `js/spec.js` says **ציר בצד ימין, צילינדר בצד שמאל —
+  במבט מבחוץ** in the order and on the sheet. `פתיחה: שמאל, פנימה` alone is the
+  exact ambiguity that had this site building mirrored doors until 23.8.2026;
+  three facts together cannot be misread. Not in `specRows`, because that row
+  is also the one-line summary a 320 px phone has to fit.
+
+- **The page opens on thirty doors Peretz actually built.** `js/works.js` is
+  generated by `npm run corpus` from the same rows that write
+  `screenshots/corpus-links.md`, so nothing in it is typed — the derivation
+  exists because handing was typed on eight recreations once and was wrong on
+  four of them. ⚠ **Our drawings, not the photographs**: those are 63 MB in
+  `research/` and PLAN.md §8.1 is the promise that three files are the whole
+  site. ⚠ **Drawn as they scroll into view and UNDRAWN as they leave** — thirty
+  doors at once is upwards of fifteen thousand nodes inside a click handler;
+  clearing on exit matters as much as drawing on entry, or the grid just
+  accumulates. ⚠ **No prices in the file**: the page has one statement of what
+  a door costs and it is `priceAgorot` on the state being shown.
+
+- **`index.html?sheet=1&…` is an A4 order sheet.** The elevation with its
+  dimensions, every option as a row, the handing in words, the code and the
+  price — over `decodeCode`, `specRows` and `render`, which were already pure
+  and already exported. No second page and no second renderer: a `sheet.html`
+  would be a fourth file to copy and a fourth file to forget.
+
+- **⚠ AN ASSERTION WAS COUNTING PROSE.** The ironwork group asked
+  `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
+  document. About 29% of that document is XML comments, so the moment a comment
+  mentioned the attribute by name every door in the catalogue gained two
+  phantom panes and twenty-five assertions failed, none of them about anything
+  that had moved. Now `/\sdata-pane="/`, which is what the sentence beside it
+  always meant. **Prose is not geometry** — worth remembering the next time a
+  check greps the drawing for a word.
 
 - **Every price is in `js/prices.js` now — one screen of plain shekels.** The
   70 numbers were inline in `catalog.js`, one `delta:` at a time, threaded
@@ -1806,9 +1914,22 @@ record: six of the ten recreated doors carry brass or black hardware. That is
 a question for Peretz (ASK-PERETZ.md §2b), not a reason to keep the tiles.
 
 ### The cabinet — two levels
-The choices panel opens on **four sections** — מראה הדלת, חלון וזכוכית,
-ידיות ומנעול, מידה ופתיחה — each of which opens onto its own categories, each
+The choices panel opens on **four sections** — מבנה הדלת, מראה הדלת,
+חלון וזכוכית, ידיות ומנעול — each of which opens onto its own categories, each
 of which opens onto its options. One open at a time at both levels.
+
+⚠ **STRUCTURE IS FIRST, AND IT USED TO BE LAST.** `מבנה הדלת` (the size list
+and which way it opens) sat in section 04, behind the colour, the window and
+the hardware. It is the thing a customer has an opinion about before arriving
+— "we need a wide one, with a side light" — and the thing that changes the
+drawing most; asking for the paint first and the shape of the door last is
+backwards. From the second mockup (`MOCKUP2.md` §3.1, `REALISM2.md` §3).
+The reorder costs nothing in the wire format: section keys (`fit`, `look`,
+`glass`, `hw`) appear in the DOM as `data-step` and nowhere in
+`js/url-state.js`, so no `VERSION` bump, no alias, and every link and every
+`DM-` code ever written still decodes to the same door. The `01`–`04` follow
+for free because they are a CSS counter — this reorder is precisely the event
+a stored digit would have gone stale on.
 
 It has been flattened twice, in the same direction, for the same reason: a
 customer arriving cold should see a handful of questions they already have

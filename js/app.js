@@ -38,10 +38,12 @@ import {
   render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
-import { specRows, summaryLine } from './spec.js';
-import { copyMessage, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE, gripDeparture,
-         PHONE_DISPLAY, PHONE_TEL, whatsappUrl } from './share.js';
+import { handingWords, specRows, summaryLine } from './spec.js';
+import { canSharePicture, copyMessage, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE,
+         gripDeparture, PHONE_DISPLAY, PHONE_TEL, PRICE_CAVEAT, PRICE_INCLUDES,
+         sendDoor, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
+import { WORKS } from './works.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -108,7 +110,31 @@ const GROUPS = [
  * category is a click that reveals a click, which is worse than the list it
  * replaced.
  */
+/* ⚠ STRUCTURE IS THE FIRST QUESTION NOW, AND IT USED TO BE THE LAST.
+   `מבנה הדלת` — the size list and which way it opens — sat in section 04,
+   behind the colour, the window and the hardware. It is the thing a customer
+   has an opinion about before they arrive ("we need a wide one, with a side
+   light") and the thing that changes the drawing most; asking for the paint
+   first and the shape of the door last is backwards. From the second mockup,
+   read in `MOCKUP2.md` §3.1 and decided in `REALISM2.md` §3.
+
+   What this costs: NOTHING in the wire format. Section keys — `fit`, `look`,
+   `glass`, `hw` — appear in the DOM as `data-step`/`data-section` and nowhere
+   in `js/url-state.js`, so no `VERSION` bump, no alias, and every link and
+   every `DM-` code ever written still decodes to the same door. The option
+   ids and their indices are untouched; this list is not one of them.
+
+   The `01`–`04` follow for free, because they are a CSS counter on
+   `.panel--choose` rather than a digit stored here. This reorder is precisely
+   the event a stored digit would have gone stale on.
+
+   ⚠ `size` STAYS ONE GROUP. The mockup splits "structure" (side light, leaf
+   and a half, double, single) from "dimensions"; ours is one list, one set of
+   bits in the code, and its six tiles carry both facts at once. And the size
+   BANDS stay empty — `ASK-PERETZ.md` §8: overlapping bands make a customer
+   choose wrong and feel certain about it. */
 const SECTIONS = [
+  { key: 'fit',   title: 'מבנה הדלת',   sub: 'גודל הדלת וכיוון הפתיחה' },
   { key: 'look',  title: 'מראה הדלת',   sub: 'צבע ועיצוב החזית' },
   /* The sub names the categories INSIDE the section, and this one outlived
      them: it promised "חלון, זכוכית, סורג" — three choices — after the glazing
@@ -118,11 +144,91 @@ const SECTIONS = [
      whose commit was called "One question about the window".
      These are the two category titles verbatim, the way `hw` below carries
      its own. Hand-kept prose beside a generated list is a drift point: if a
-     row moves in or out of GROUPS, this line has to move with it. */
+     row moves in or out of GROUPS, this line has to move with it — and so
+     does the sub, in the same edit. */
   { key: 'glass', title: 'חלון וזכוכית', sub: 'חלון, עיצוב החלון' },
   { key: 'hw',    title: 'ידיות ומנעול', sub: 'ידית משיכה, מנעול' },
-  { key: 'fit',   title: 'מידה ופתיחה',  sub: 'גודל הדלת וכיוון הפתיחה' },
 ];
+
+/**
+ * One line glyph per section, for the navigator's circles.
+ *
+ * ⚠ THIS IS NOT THE "no new tile artwork" DECISION BEING REOPENED. That
+ * decision is about the sixty-four OPTION tiles — `detailGlyph`,
+ * `windowGlyph`, `grilleGlyph`, `handleGlyph`, `locksetGlyph`, `sizeGlyph`
+ * already draw every one of them, and an assertion compares the markup of
+ * every tile against every other so that nine handles can never again share
+ * one picture. Those glyphs are 54–74 px and carry the difference between two
+ * things you are choosing between.
+ *
+ * These are four 20 px marks that say WHICH QUESTION, not which answer. An
+ * option glyph shrunk to 20 px is a smudge — `sizeGlyph`'s frame alone is
+ * seven nested rectangles — so reusing one would be worse for the reader and
+ * would also couple the navigator to a drawing that exists to be compared
+ * against thirty photographs.
+ *
+ * Keyed by SECTION key, and `sectionIcon` throws on a section that has none
+ * rather than interpolating `undefined` into the markup — the same guard
+ * `priceInto` puts on the price table, for the same reason: a silent hole is
+ * worse than a loud one.
+ */
+const SECTION_ICON = {
+  fit:   '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.2 3.6v16.8"/>'
+       + '<path d="M15.4 12.4a.55.55 0 1 0 0-1.1.55.55 0 0 0 0 1.1Z"/>',
+  look:  '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
+  glass: '<path d="M4 4.6h16v11.6H4Z"/><path d="M12 4.6v11.6M4 10.4h16"/>'
+       + '<path d="M7 19.4h10"/>',
+  hw:    '<path d="M4.6 12h9.8"/><path d="M14.4 8.6h3.2v6.8h-3.2Z"/>'
+       + '<path d="M18.4 12h1"/>',
+};
+
+function sectionIcon(key) {
+  if (!Object.prototype.hasOwnProperty.call(SECTION_ICON, key)) {
+    throw new Error(`SECTION_ICON has no glyph for the "${key}" section — every `
+                  + 'section needs one, or its navigator circle draws nothing');
+  }
+  return `<svg class="steps__g" viewBox="0 0 24 24" aria-hidden="true">`
+       + `${SECTION_ICON[key]}</svg>`;
+}
+
+/**
+ * A mark on the leading edge of each spec row.
+ *
+ * ⚠ KEYED OFF `row.key`, NOT `row.id`. `REALISM2.md` §B4 says `row.id`, and
+ * that is the wrong field: `id` is the OPTION the row landed on — `rb-9005d`,
+ * `quatrefoil`, `knobplate` — so a table keyed by it would need an entry for
+ * every one of the sixty-four options and would draw nothing the day a new
+ * one was added. `key` is the FIELD — nine of them, fixed by `specRows` — and
+ * a field is what an icon can describe.
+ *
+ * This is the reason `specRows` returns rows and not a string (js/spec.js):
+ * the picker can decorate its rendering without the shared statement of what
+ * the door IS learning anything about how it is drawn. `aria-hidden`, because
+ * the label beside it already says the word.
+ *
+ * A row whose key has no icon draws no icon and no gap. That is deliberately
+ * NOT an error, unlike `sectionIcon`: the four navigator circles are the whole
+ * control and an empty one is a broken page, while a spec row without a mark
+ * is a spec row — the label carries it. `glazing` only exists on a two-panel
+ * door, and pretending otherwise would be inventing a rule to guard.
+ */
+const SPEC_ICON = {
+  colour:  '<circle cx="12" cy="12" r="7.6"/><path d="M12 4.4v15.2"/>',
+  window:  '<path d="M4.6 5h14.8v11.4H4.6Z"/><path d="M12 5v11.4M4.6 10.7h14.8"/>',
+  glazing: '<path d="M3.4 6.2h7.2v11.6H3.4Z"/><path d="M13.4 6.2h7.2v11.6h-7.2Z"/>',
+  grille:  '<path d="M4.6 5h14.8v14H4.6Z"/><path d="M9.5 5v14M14.5 5v14M4.6 12h14.8"/>',
+  handle:  '<path d="M8.4 5.6h3v12.8h-3Z"/><path d="M11.4 12h4.6"/>',
+  lockset: '<path d="M5 12h8.6"/><path d="M13.6 9.2h4.4v5.6h-4.4Z"/>'
+         + '<path d="M8.2 15.6a.7.7 0 1 0 0-1.4.7.7 0 0 0 0 1.4Z"/>',
+  detail:  '<path d="M5.2 4.4h13.6v15.2H5.2Z"/><path d="M8.4 7.6h7.2v8.8H8.4Z"/>',
+  size:    '<path d="M4.4 4.4v15.2M19.6 4.4v15.2"/><path d="M4.4 12h15.2"/>'
+         + '<path d="m7.4 9.4-3 2.6 3 2.6M16.6 9.4l3 2.6-3 2.6"/>',
+  handing: '<path d="M6 3.8h12v16.4H6Z"/><path d="m14.6 8.6 3.4 3.4-3.4 3.4"/>',
+};
+
+const specIcon = key => (Object.prototype.hasOwnProperty.call(SPEC_ICON, key)
+  ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>`
+  : '<span class="spec__ico" aria-hidden="true"></span>');
 
 const groupsIn = key => GROUPS.filter(g => g.in === key);
 const sectionOf = key => (GROUPS.find(g => g.key === key) || {}).in;
@@ -148,6 +254,37 @@ function init() {
   });
   $('#grip-home').addEventListener('click', () => set({ ...state, grip: null }));
   $('#save-btn').addEventListener('click', saveCurrent);
+  $('#works-close').addEventListener('click', closeWorks);
+
+  /* ── THE PICTURE GOES WITH THE ORDER ──────────────────────────────
+     Both send buttons keep their `wa.me` href and keep it correct — that is
+     what works with no JavaScript, on a desktop, over `file://`, and in every
+     browser without Web Share Level 2. Where a browser CAN carry a file, the
+     handler takes over and sends the drawing with the same text.
+     ⚠ `href` untouched, deliberately. The label-and-href pact (see
+     `.wa__on` in app.css) is that the button never promises more than the
+     address behind it delivers; hollowing the href out to make room for a
+     handler would break that for every route the handler does not cover. */
+  document.querySelectorAll('[data-wa]').forEach(el => {
+    /* ⚠ NOT WRAPPED IN `guard`. That helper is a synchronous try/catch, and a
+       rejected promise walks straight past one — so an async handler inside it
+       LOOKS protected and is not. The whole body is its own try/catch instead,
+       and every failure lands on the same line: follow the href, which is a
+       complete order and has been since before any of this existed. */
+    el.addEventListener('click', async ev => {
+      if (!canSharePicture()) return;              // let the link do its job
+      ev.preventDefault();
+      let how = 'unavailable';
+      try { how = await sendDoor(state); } catch { /* fall through to the link */ }
+      if (how === 'sent' || how === 'dismissed') return;
+      /* The share could not happen, so the order still has to. `location`
+         rather than `window.open`: the raster took us out of the click's
+         transient activation, and a popup opened from outside one is blocked
+         — silently, which on this button means the customer taps and nothing
+         at all happens. */
+      window.location.href = el.href;
+    });
+  });
   $('#saved-btn').addEventListener('click', () => {
     const box = $('#saved'), btn = $('#saved-btn');
     const show = box.hidden;
@@ -181,6 +318,12 @@ function init() {
   }
 
   paint();
+
+  /* Built once, after the first paint, and only when it is going to be seen.
+     The sheet is a document rather than an interface: nothing on it responds
+     to anything, so rebuilding it on every change would be work for a page
+     nobody is clicking. */
+  if (document.documentElement.classList.contains('is-sheet')) buildSheet();
 
   /* A shared link is a door somebody chose deliberately. Open the first
      category it disagrees with the default about — and the section that
@@ -230,8 +373,188 @@ function arrive(differs) {
 
 // ── the panel ─────────────────────────────────────────────────────
 
+/* ── THE GALLERY OF DOORS HE ACTUALLY BUILT ───────────────────────────
+ *
+ * Thirty real installations from `js/works.js`, each drawn by the same
+ * `render(state)` the stage uses, so tapping one is continuous with the page
+ * it drops you into rather than a jump from a picture to a diagram.
+ *
+ * ⚠ THE DOORS ARE DRAWN AS THEY SCROLL INTO VIEW AND UNDRAWN AS THEY LEAVE.
+ * This is the whole engineering content of the feature. One door is 379
+ * elements on the default and 860 on a sidelight; thirty at once is upwards of
+ * fifteen thousand nodes built inside a click handler, on a phone — the same
+ * cost the outside review measured as 315 ms for ONE door at 6x CPU throttle.
+ * An `IntersectionObserver` with a screen of margin keeps six to ten alive at
+ * a time, and the count stops depending on how many doors Peretz has built.
+ *
+ * Clearing on exit matters as much as drawing on entry: without it the grid
+ * accumulates every door the customer has scrolled past, which is the same
+ * fault arriving a few seconds later.
+ *
+ * Guarded: with no `IntersectionObserver` every tile is drawn once, up front —
+ * slow on an old browser, still correct. Same shape as the dock's guard.
+ */
+let worksObserver = null;
+
+function buildWorks() {
+  const grid = $('#works-grid');
+  if (!grid || grid.childElementCount) return;
+
+  const draw = tile => {
+    if (tile.dataset.drawn === '1') return;
+    tile.querySelector('.work__art').innerHTML =
+      render({ ...DEFAULTS, ...WORKS[Number(tile.dataset.i)].state });
+    tile.dataset.drawn = '1';
+  };
+  const undraw = tile => {
+    if (tile.dataset.drawn !== '1') return;
+    tile.querySelector('.work__art').replaceChildren();
+    tile.dataset.drawn = '0';
+  };
+
+  for (const [i, w] of WORKS.entries()) {
+    const st = { ...DEFAULTS, ...w.state };
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'work';
+    b.dataset.i = String(i);
+    /* The NAME is what the door IS, not what we filed it under. `d003` is an
+       index into a research folder and means nothing to a customer; the
+       drawing's own description is the sentence this page already trusts to
+       say what a door is to somebody who cannot see it. */
+    b.setAttribute('aria-label', describe(st));
+    b.innerHTML = '<span class="work__art" aria-hidden="true"></span>'
+      + '<span class="work__meta">'
+      + `<span class="work__name">${byId(COLOURS, st.colour).he}</span>`
+      + `<span class="work__price">${formatAgorot(priceAgorot(st))}</span>`
+      + '</span>';
+    /* ⚠ THE PRICE IS COMPUTED, NOT CARRIED. `js/works.js` deliberately holds no
+       money: the page has exactly one statement of what a door costs and it is
+       `priceAgorot` on the state being shown. A figure stored beside each door
+       would be a second one, and it would be quoting a past job at a new
+       customer besides. */
+    b.addEventListener('click', () => {
+      /* Through `set`, like every other choice on the page, so the URL, the
+         price, the code, the order and the announcement all follow. `grip` is
+         dropped deliberately: these doors carry no measured grip position, and
+         inheriting the previous door's would put a handle where nobody put
+         one. */
+      set({ ...DEFAULTS, ...w.state, grip: null });
+      closeWorks();
+      toast('טענו את הדלת. אפשר לשנות כל פרט.');
+    });
+    grid.appendChild(b);
+  }
+
+  if (typeof IntersectionObserver === 'function') {
+    worksObserver = new IntersectionObserver(entries => {
+      for (const e of entries) (e.isIntersecting ? draw : undraw)(e.target);
+    }, { root: $('#works'), rootMargin: '400px 0px' });
+    grid.querySelectorAll('.work').forEach(t => worksObserver.observe(t));
+  } else {
+    grid.querySelectorAll('.work').forEach(draw);
+  }
+}
+
+function openWorks() {
+  buildWorks();
+  const d = $('#works');
+  /* `showModal` rather than `show`: it traps focus, closes on Escape and makes
+     the rest of the page inert, none of which is worth hand-writing. Guarded
+     because `<dialog>` is the one element here an old browser might not have,
+     and a gallery that will not open must not take the configurator with it —
+     `init()` is wrapped, but a throw inside a click handler is not. */
+  if (typeof d.showModal === 'function') d.showModal();
+  else d.setAttribute('open', '');
+}
+
+function closeWorks() {
+  const d = $('#works');
+  if (typeof d.close === 'function') d.close();
+  else d.removeAttribute('open');
+}
+
+/* ── THE ORDER AS A DOCUMENT ──────────────────────────────────────────
+ *
+ * `?sheet=1` renders the same state as an A4 order sheet. Everything on it
+ * comes from a function that already existed and is already the single
+ * statement of its fact: `render` for the drawing, `specRows` for the options,
+ * `priceAgorot` for the money, `encodeCode` for the code. Nothing here knows
+ * anything about a door that the configurator does not.
+ *
+ * ⚠ THE HANDING IS SPELLED OUT, and that row is the reason this page is worth
+ * printing at all. `ASK-PERETZ.md` §1 was open for months because ימין means
+ * two different things depending on which side of the door you are standing
+ * on, and until 23.8.2026 this site had the convention BACKWARDS — every order
+ * it produced named the mirror of the door on the customer's screen. A sheet
+ * that says only `שמאל, פנימה` reproduces exactly that ambiguity in print. So
+ * it says which side the hinge is on, which side the cylinder is on, and that
+ * both are read from OUTSIDE — the three facts that together cannot be
+ * misread. Derived from `HANDINGS[].hinge`, so it cannot disagree with the
+ * drawing beside it.
+ */
+function buildSheet() {
+  const host = $('#sheet');
+  if (!host) return;
+
+  const sz = SIZES[state.size] || SIZES.standard;
+  /* The side panel is part of the opening, so the ordered width is the leaf
+     plus it — a workshop reading 950 for a דלת וחצי builds the wrong hole. */
+  const totalW = sz.w + (sz.side || 0);
+
+  const rows = specRows(state).map(r =>
+    `<div class="sheet__row"><span class="sheet__k">${r.label}</span>`
+    + `<span class="sheet__v">${r.value}</span>`
+    + (r.hex ? `<span class="sheet__chip" style="--chip:${r.hex}"></span>` : '')
+    + '</div>').join('');
+
+  host.innerHTML = `
+    <header class="sheet__top">
+      <div>
+        <div class="sheet__brand">דלתות מגן</div>
+        <div class="sheet__sub">ראשון לציון · ${PHONE_DISPLAY}</div>
+      </div>
+      <div class="sheet__code">קוד: <b>${encodeCode(state)}</b></div>
+    </header>
+
+    <div class="sheet__body">
+      <figure class="sheet__art">
+        ${render(state)}
+        <figcaption class="sheet__dims">
+          ${totalW} × ${sz.h} מ״מ · ${sz.he}${sz.side ? ` (כנף ${sz.w} + ${sz.side})` : ''}
+        </figcaption>
+      </figure>
+
+      <div class="sheet__spec">
+        ${rows}
+        <div class="sheet__row sheet__row--wide">
+          <span class="sheet__k">כיוון</span>
+          <span class="sheet__v">${handingWords(state)}</span>
+        </div>
+        <div class="sheet__row sheet__row--wide">
+          <span class="sheet__k">מחיר משוער</span>
+          <span class="sheet__v"><b>${formatAgorot(priceAgorot(state))}</b>
+            <small>${PRICE_INCLUDES}</small></span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="sheet__foot">${PRICE_CAVEAT}</footer>`;
+}
+
 function buildPanel() {
   const wrap = $('#choices');
+
+  /* The first offer the panel makes, above the navigator: somewhere to start
+     that is not a list of sixty options. */
+  const opener = document.createElement('button');
+  opener.type = 'button';
+  opener.className = 'works-open';
+  opener.id = 'works-btn';
+  opener.innerHTML = '<span class="works-open__t">התחילו מדלת שכבר התקנו</span>'
+    + `<span class="works-open__n">${WORKS.length} דלתות אמיתיות</span>`;
+  opener.addEventListener('click', openWorks);
+  wrap.appendChild(opener);
 
   /* ── THE NAVIGATOR ───────────────────────────────────────────────
      The mockup draws a four-step progress indicator, and this is not one,
@@ -259,8 +582,13 @@ function buildPanel() {
     b.type = 'button';
     b.className = 'steps__step';
     b.dataset.step = sec.key;
-    b.innerHTML = `<span class="steps__n" aria-hidden="true"></span>`
-                + `<span class="steps__t">${sec.title}</span>`;
+    /* The mockup's circles. Still a table of contents and not a progress bar —
+       see the note above; `nowLabel` falls back to `list[0]`, so anything
+       derived from `state` reads 4/4 before the customer has touched
+       anything. What the circle carries is the QUESTION, never an answer. */
+    b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`
+                + `<span class="steps__l"><span class="steps__n" aria-hidden="true"></span>`
+                + `<span class="steps__t">${sec.title}</span></span>`;
     /* ⚠ THE NAME, EXPLICITLY. Below 1100 px `.steps__t` is `display: none` and
        the number comes from `.steps__n::before`, which is `aria-hidden` — so
        the only text in the button was hidden from the accessibility tree and
@@ -816,7 +1144,8 @@ function paint() {
       const row = document.createElement('div');
       row.className = 'spec__row';
       row.dataset.key = r.key;
-      row.innerHTML = `<span class="spec__label">${r.label}</span>`
+      row.innerHTML = specIcon(r.key)
+        + `<span class="spec__label">${r.label}</span>`
         + `<span class="spec__value">${r.value}</span>`
         + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : '');
       return row;
@@ -1205,6 +1534,22 @@ function fitStage() {
        A custom property set from script inherits into everything below it,
        including markup this file never looks at. Name one for what it is. */
     $('.stage-wrap').style.setProperty('--wall-gap', `${Math.round(wall)}px`);
+
+    /* WHERE THE STAGE'S COLUMN IS, for the trust band to sit inside.
+       Above 1100 px the band is `position: fixed` at the foot of the screen —
+       the only way to give it height without taking that height out of the
+       door — and fixed means it is placed against the VIEWPORT, which knows
+       nothing about the three-column grid. So it is told, off the rect this
+       function has already read: same measurement, same re-fit, same box.
+       ⚠ Set on the root, because `.trust` is not a descendant of the wrap; and
+       named for a length, after `--wall` was once handed a pixel value and
+       every door came up on a black ground.
+       Physical `left`/`width`, not logical: this is a box placed at measured
+       viewport coordinates, and `getBoundingClientRect().x` is measured from
+       the left edge in both writing directions. */
+    const root = document.documentElement.style;
+    root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);
+    root.setProperty('--stage-w', `${Math.round(wrap.width)}px`);
   }
 }
 
@@ -1355,6 +1700,8 @@ try { clearTimeout(window.__downTimer); } catch { /* no timer, nothing to do */ 
 
 document.addEventListener('DOMContentLoaded', guard(() => {
   $('#phone-link').href = `tel:${PHONE_TEL}`;   // RFC 3966 — not the wa.me form
-  $('#phone-link').textContent = PHONE_DISPLAY;
+  /* The SPAN, not the link: the link also holds an icon, and `textContent` on
+     a parent replaces every child it has. See the note in index.html. */
+  $('#phone-link [data-phone-text]').textContent = PHONE_DISPLAY;
   init();
 }));

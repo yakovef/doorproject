@@ -13,7 +13,8 @@ import {
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { conflicts, repair } from '../js/rules.js';
-import { describeSentence, specRows, summaryLine } from '../js/spec.js';
+import { describeSentence, handingWords, specRows, summaryLine } from '../js/spec.js';
+import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
 
 let pass = 0, fail = 0;
@@ -1904,8 +1905,19 @@ group('ironwork is counted, and the drawing agrees with the bill');
     checked++;
     const n = paneCount(st);
 
-    /* 1. THE DRAWING AND THE COUNT. `data-pane` is one per aperture drawn. */
-    const drawn = (render(st).match(/data-pane/g) || []).length;
+    /* 1. THE DRAWING AND THE COUNT. `data-pane` is one per aperture drawn.
+       ⚠ THE ATTRIBUTE, NOT THE WORD. This was `/data-pane/g`, which counts
+       every occurrence of those nine characters ANYWHERE in the emitted
+       document — and about 29% of that document is XML comments, because this
+       drawing explains itself to whoever opens the element inspector. The
+       moment a comment mentioned the attribute by name (the reflection's note
+       about which sweeps do and do not see it) every door in the catalogue
+       gained two phantom panes and twenty-five assertions failed, none of them
+       about anything that had moved in the drawing.
+       Prose is not geometry. `\sdata-pane="` matches only where the renderer
+       actually cut an aperture, which is what the sentence above always meant
+       and is strictly narrower than what it asked for. */
+    const drawn = (render(st).match(/\sdata-pane="/g) || []).length;
     ok(drawn === n,
        `${size}/${w.id}: the drawing cuts ${drawn} pane(s), paneCount says ${n}`);
 
@@ -2068,6 +2080,99 @@ group('the comparison sheets are pictures of THIS drawing');
     ok(true, 'sheets current');
     console.log(`  (${FAMILIES.length} sheet families, all drawn from the current renderer)`);
   }
+}
+
+group('every door in the gallery is one the site can actually build');
+{
+  /* The gallery is the first offer the page makes, and each tile promises
+     "this exact door, ready to change". A tile whose design the rules quietly
+     repair delivers a DIFFERENT door from the one drawn on it — and the
+     customer has no way to know, because the thing they tapped and the thing
+     they got are both drawn by the same renderer. */
+  ok(WORKS.length > 0, 'the gallery has doors in it at all');
+
+  const seen = new Set();
+  for (const w of WORKS) {
+    ok(!seen.has(w.id), `${w.id} appears twice in the gallery`);
+    seen.add(w.id);
+
+    const full = { ...DEFAULTS, ...w.state };
+    const { state: got, notice } = fromQuery(toQuery(full));
+    ok(!notice, `${w.id}: the gallery's own door arrives with a notice (${notice})`);
+    for (const k of KEYS) {
+      ok(got[k] === full[k],
+         `${w.id}: the rules move ${k} from ${full[k]} to ${got[k]} — the tile draws `
+       + 'one door and tapping it gives you another');
+    }
+    /* And it has to survive the code, because that is what reaches Peretz. */
+    ok(CODE_RE.test(encodeCode(full)), `${w.id}: does not encode to a well-formed code`);
+  }
+
+  /* ⚠ THE TWO OUTPUTS OF ONE RUN, COMPARED. `npm run corpus` writes both
+     `js/works.js` and `screenshots/corpus-links.md` from the same rows in the
+     same block, so they cannot disagree — unless one of them is regenerated
+     and the other is not, which is a `git add` away and is exactly the drift
+     this compares for. */
+  const md = existsSync('screenshots/corpus-links.md')
+    ? readFileSync('screenshots/corpus-links.md', 'utf8') : '';
+  ok(md.length > 0, 'screenshots/corpus-links.md is missing');
+  if (md) {
+    const listed = [...md.matchAll(/^\| (d\d{3}) \|.*?\| `([^`]+)` \|$/gm)]
+      .map(m => ({ id: m[1], q: m[2] }));
+    ok(listed.length === WORKS.length,
+       `the table lists ${listed.length} doors and js/works.js holds ${WORKS.length} — `
+     + 'one of them was regenerated without the other. Run: npm run corpus -- --quiet');
+    for (const [i, row] of listed.entries()) {
+      const w = WORKS[i];
+      if (!w) continue;
+      ok(row.id === w.id, `row ${i}: the table says ${row.id}, js/works.js says ${w.id}`);
+      ok(row.q === toQuery({ ...DEFAULTS, ...w.state }),
+         `${w.id}: the table's query and js/works.js describe different doors`);
+    }
+  }
+}
+
+group('the opening is spelled out so it cannot be read the wrong way round');
+{
+  /* ⚠ THIS IS THE ASSERTION THE OLD BUG WOULD HAVE FAILED. `HANDINGS[].hinge`
+     was the other way round until 23.8.2026 and every order named the mirror
+     of the door on screen. Nothing caught it, because every check compared our
+     drawing to our drawing.
+     So this does not read `hinge` and agree with it. It asks WHERE THE KEYHOLE
+     IS DRAWN — the lockset's own x against the leaf's centre — and requires
+     the sentence to name that side. A test that read the field would have
+     agreed with the bug. */
+  for (const h of HANDINGS) {
+    const st = { ...base, handing: h.id, lockset: 'plate', handle: 'none' };
+    const svg = render(st);
+
+    const leaf = /<g id="leaf" data-x="([\d.-]+)" data-w="([\d.]+)"/.exec(svg);
+    ok(!!leaf, `${h.id}: the drawing has no leaf to measure against`);
+    if (!leaf) continue;
+    const centre = Number(leaf[1]) + Number(leaf[2]) / 2;
+
+    /* `data-cx` is the lockset's own centre, published by the renderer for
+       `tools/collide.mjs` — a measurement the drawing already makes about
+       itself, rather than a coordinate scraped out of the first path. */
+    const lock = /data-hw="lockset"[^>]*?\sdata-cx="([\d.-]+)"/.exec(svg);
+    ok(!!lock, `${h.id}: no lockset found in the drawing`);
+    if (!lock) continue;
+
+    const drawnSide = Number(lock[1]) > centre ? 'ימין' : 'שמאל';
+    const words = handingWords(st);
+    ok(words.includes(`צילינדר בצד ${drawnSide}`),
+       `${h.id}: the keyhole is drawn on the ${drawnSide} of the leaf, and the order `
+     + `says "${words}"`);
+    ok(words.includes('מבחוץ'),
+       `${h.id}: the sentence does not say which side you are standing on, which is `
+     + 'the half of the ambiguity that cost this project months');
+  }
+
+  /* And the two handings must not say the same thing, which is the failure a
+     constant would produce. */
+  ok(handingWords({ ...base, handing: 'left-in' })
+     !== handingWords({ ...base, handing: 'right-in' }),
+     'both handings produce the same sentence');
 }
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} passed, ${fail} failed\n`);
