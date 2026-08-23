@@ -64,8 +64,16 @@ const fmt = new Intl.NumberFormat('he-IL', {
 export const formatAgorot = a => fmt.format(a / 100);
 export const shekels = a => Math.round(a / 100);
 
-/** Per-option surcharge label. "כלול", never "₪0" and never "חינם". */
+/**
+ * Per-option surcharge label. "כלול", never "₪0" and never "חינם".
+ *
+ * ⚠ A DISCOUNT IS A REAL ANSWER. This had no vocabulary for one, and its
+ * caller clamped with `Math.max(0, …)` to hide the gap — so the narrow door,
+ * which is ₪100 BELOW standard, advertised itself as "כלול" and then took ₪100
+ * off when it was tapped. A price that moves in a direction the label never
+ * mentioned is the same defect as one that moves further than it said.
+ */
 export function deltaLabel(agorot, lang = 'he') {
   if (!agorot) return { he: 'כלול', en: 'Included', ru: 'Включено' }[lang];
-  return '+' + fmt.format(agorot / 100);
+  return (agorot < 0 ? '−' : '+') + fmt.format(Math.abs(agorot) / 100);
 }

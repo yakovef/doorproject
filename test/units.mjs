@@ -150,6 +150,21 @@ group('short code round-trip');
   ok(VERSION < 2 ** BITS.version,
      `VERSION ${VERSION} does not fit in ${BITS.version} bits`);
 
+  /* ⚠ AND PRINT THE HEADROOM, because the hand-kept copy of it in
+     `js/url-state.js` went stale in three of its nine rows and named the wrong
+     field as the one at risk. A budget nobody can see is a budget nobody
+     thinks about; measured, it cannot drift. */
+  {
+    const rows = [['version', { length: VERSION + 1 }], ['colour', COLOURS],
+                  ['size', Object.keys(SIZES)], ['handing', HANDINGS],
+                  ['window', WINDOWS], ['grille', GRILLES], ['handle', HANDLES],
+                  ['lockset', LOCKSETS], ['detail', DETAILS]]
+      .map(([f, l]) => ({ f, spare: 2 ** BITS[f] - l.length }))
+      .sort((a, b) => a.spare - b.spare);
+    console.log(`  (short-code headroom, tightest first: `
+              + `${rows.map(r => `${r.f} ${r.spare}`).join(' · ')})`);
+  }
+
   /* And vary `detail` for real, cheaply — the sweep pins it, so without this
      the round-trip has never seen seven of its eight values. A narrow stem
      rather than an eighth dimension on 275,000 designs. */
@@ -234,6 +249,68 @@ for (const st of everyState()) {
   // The inside view is gone. An old link carrying i=1 must open the door, not
   // fail, and must not leave a stray key behind in the state.
   ok(fromQuery('?v=3&i=1').state.view === undefined, 'i=1 should no longer set anything');
+
+  /* ⚠ THREE WAYS TO GET A DIFFERENT DOOR IN SILENCE, all of them closed here.
+     PLAN.md §8.2: "Unknown param → default + a visible notice, never a silent
+     fallback. Silent data loss on a shared link is the worst failure this site
+     can have." */
+
+  // 1. SIZES is a plain object, so every Object.prototype key was truthy and
+  //    was accepted as a size band: notice null, priceAgorot NaN, a spec row
+  //    reading "מידה: undefined", and NaN ₪ in the card, the dock and the
+  //    WhatsApp message — while encodeCode returned a STANDARD door's code.
+  for (const key of ['constructor', '__proto__', 'toString', 'valueOf',
+                     'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable']) {
+    const r = fromQuery(`?s=${key}`);
+    ok(r.notice === 'option-unknown', `?s=${key} passed as a size band in silence`);
+    ok(SIZES[r.state.size], `?s=${key} left state.size = ${JSON.stringify(r.state.size)}, `
+                          + 'which no lookup resolves — the price becomes NaN');
+  }
+
+  // 2. The n= → k= migration cleared the notice unconditionally, and it runs
+  //    after c, w and g have been read — so an unrecognised COLOUR came out
+  //    silent as long as the link also carried an old n=.
+  ok(fromQuery('?c=ral-does-not-exist&n=plate').notice === 'option-unknown',
+     'the lockset migration swallowed a notice raised by an earlier field — the '
+   + 'customer is looking at a different colour and is not told');
+  ok(fromQuery('?w=no-such-window&n=coral').notice === 'option-unknown',
+     'the lockset migration swallowed a notice raised for the window');
+  ok(fromQuery('?n=plate').notice === null,
+     'a plain old-style link is not damaged and must not be flagged as such');
+
+  // 3. Unknown parameter NAMES were never looked at — only values. The
+  //    spelled-out names a person would guess produced the default door and
+  //    said nothing, and toQuery then dropped the keys on the first
+  //    replaceState, so the evidence left the address bar 300ms later.
+  ok(fromQuery('?colour=rb-9016d&size=wide').notice === 'option-unknown',
+     '?colour= and ?size= were discarded in silence');
+  ok(fromQuery('?C=rb-9016d').notice === 'option-unknown',
+     'a capitalised parameter name was discarded in silence');
+  for (const retired of ['?f=steel', '?a=peephole', '?z=1', '?i=1']) {
+    ok(fromQuery(retired).notice === null,
+       `${retired} names an option WE withdrew, not a customer mistake — it must open `
+     + 'as itself rather than being flagged as damaged');
+  }
+  for (const good of ['?v=11', '?bare=1', '?c=rb-9016d']) {
+    ok(fromQuery(good).notice === null, `${good} is a parameter we write ourselves`);
+  }
+  /* `gp=` is ours too, but a grip POSITION can be illegal as well as a
+     parameter name being unknown, and those are different facts:
+     `?gp=200,300,0` names a place the handle cannot go, so `repair` moves it
+     to 160,565 and says "הזזנו את הידית" — `combination-fixed`, and correct.
+     Demanding `null` here was my mistake and this suite caught it. The claim
+     is only that the parameter NAME is recognised. */
+  ok(fromQuery('?gp=200,300,0').notice !== 'option-unknown',
+     '?gp= is a parameter we write ourselves and must not read as an unknown one');
+
+  /* A code read down the telephone is typed as ?d=, which PLAN.md §3.2
+     documents and which used to land on the DETAIL axis. */
+  const spoken = encodeCode({ ...base, colour: 'rb-9005d', size: 'wide' });
+  ok(fromQuery(`?d=${spoken}`).state.colour === 'rb-9005d'
+  && fromQuery(`?d=${spoken}`).state.size === 'wide',
+     `?d=${spoken} did not open the door that code names`);
+  ok(fromQuery('?d=panel').state.detail === 'panel',
+     '?d= stopped working as the detail axis, which is what it mostly is');
   ok(!toQuery({ ...base }).includes('i=1'), 'the url must not carry a view flag');
 
   /* A link written while the finish and the add-ons were on offer is in
@@ -1266,6 +1343,24 @@ for (const h of HANDLES) {
   ok(n === 0, `grip "${h.id}" draws ${n} lever(s) of its own beside a cylinder-only lockset`);
 }
 
+/* ⚠ AND THE MIRROR, which is the half that was missing while the bug was in.
+   `knobPlate` tagged itself `data-hw="handle"` where every other lockset art
+   says `lockset-art` — and `app.js` finds the draggable grip with
+   `[data-hw="handle"]`, first match in the document. So on a door with NO pull
+   handle the lock furniture BECAME the grip: focusable, announced as "handle
+   position, drag it", dragging did nothing because there is no grip to move,
+   and a `gp=` for a handle that does not exist went into the link sent to
+   Peretz. 1,730 buildable designs. The group above asserted this in one
+   direction only, which is why it held for as long as it did. */
+group('a lockset never draws a grip');
+for (const k of LOCKSETS) {
+  const st = repair({ ...base, handle: 'none', lockset: k.id }).state;
+  if (st.handle !== 'none') continue;         // the rules gave it a grip; not this test
+  const n = [...render(st).matchAll(/data-hw="handle"/g)].length;
+  ok(n === 0, `lockset "${k.id}" draws ${n} grip group(s) on a door that has no grip — `
+            + 'app.js will make it draggable and put a gp= for it in the order');
+}
+
 // ── 8b. A moulding is not a raised panel ──────────────────────────
 /* THE MODEL: a panel on these doors is a strip of moulding laid on the face in
    a rectangle. There is nothing inside it. The face within the rectangle is
@@ -1335,6 +1430,24 @@ for (const c of COLOURS) {
    `tools/build.mjs` now stamps each reference with a hash of the file's own
    contents. This asserts the stamp is PRESENT and CURRENT — a stale hash is
    worse than none, because it looks deliberate. */
+/* ⚠ AND THE STAMP CHECK BELOW CANNOT SEE A STALE BUNDLE. README.md said this
+   command could: "after every change in js/ you must run npm run build,
+   otherwise the site that opens is the previous version. `npm test` catches
+   that." It did not. Skipping the build leaves the bundle's bytes untouched,
+   so its hash is untouched, so the stamp below is still correct and the suite
+   is green — while Pages serves the previous site. Proven in a scratch mirror:
+   change one toast string in js/app.js, skip the build, and every assertion
+   passed with the new string nowhere in the bundle. `js/app.js` is not even
+   imported by this file, so the whole wiring layer could drift in silence.
+   Fifty milliseconds of esbuild closes it, and makes the README true. */
+group('the bundle in the repo is the build of the js/ in the repo');
+{
+  const { checkFreshBundle } = await import('../tools/fresh.mjs');
+  const { fresh } = await checkFreshBundle();
+  ok(fresh, 'assets/bundle.js is not what js/ builds to — the site that opens would be '
+          + 'the previous version of the code. Run: npm run build');
+}
+
 group('a new build reaches a browser that has been here before');
 {
   const html = readFileSync('index.html', 'utf8');
@@ -1379,7 +1492,7 @@ group('a new build reaches a browser that has been here before');
 group('every option the customer pays for is named in the message');
 {
   globalThis.window = globalThis.window
-    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+    || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
   const { message } = await import('../js/share.js');
 
   let n = 0, priced = 0;
@@ -1472,7 +1585,7 @@ group('every option the customer pays for is named in the message');
 group('one statement of what the door is, and every reader uses it');
 {
   globalThis.window = globalThis.window
-    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+    || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
   const { message } = await import('../js/share.js');
   let n = 0, withGrille = 0;
 
@@ -1536,7 +1649,7 @@ group('one statement of what the door is, and every reader uses it');
 group('a handle the customer moved reaches the order');
 {
   globalThis.window = globalThis.window
-    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+    || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
   const { message, gripDeparture } = await import('../js/share.js');
   const LINE = 'מיקום הידית:';
   let moved = 0, still = 0, flatHome = 0;
@@ -1630,12 +1743,80 @@ group('the page still reaches Peretz with no JavaScript');
   ok(/class="wa__off"/.test(html) && /class="wa__on"/.test(html),
      'the send buttons carry only one label, so a degraded page still promises '
    + 'to send a door it does not have');
+
+  /* ⚠ RFC 3966. A `tel:` number with no leading `+` is a LOCAL number and
+     needs a `phone-context` to mean anything — so `tel:972532197466` asks an
+     Israeli handset to dial 972532197466 domestically, while the label beside
+     it reads 053-219-7466. One constant was serving both `wa.me` (which wants
+     the digits bare) and `tel:` (which does not), and only one of them was
+     right. This is the single route that survives every failure route in this
+     file, which is the reason index.html calls it "the only route left that
+     needs nothing from us". */
+  const tels = html.match(/href="tel:[^"]*"/g) || [];
+  ok(tels.length >= 3, `index.html carries ${tels.length} tel: links; the header, the `
+                     + 'down strip and the fine print each need one');
+  for (const t of tels) {
+    ok(t.startsWith('href="tel:+'),
+       `${t} is not an RFC 3966 global number — without the leading + a dialler `
+     + 'treats it as a local number and the call fails');
+  }
+  const { PHONE_TEL, PHONE_E164 } = await import('../js/share.js');
+  ok(PHONE_TEL === `+${PHONE_E164}`,
+     `PHONE_TEL (${PHONE_TEL}) and PHONE_E164 (${PHONE_E164}) describe different `
+   + 'telephones — one of the two channels is dialling the wrong number');
+  ok(tels.every(t => t === `href="tel:${PHONE_TEL}"`),
+     'a tel: href in index.html is not the number js/share.js exports');
+
+  /* ⚠ ONE PROMISE, ONE WORDING. The card says these and the order says these,
+     and the order used to say neither the same way — it carried "כולל התקנה
+     ומע״מ" and no estimate caveat at all, so the one line the customer is told
+     three times was the line Peretz never saw. They are exported from
+     `share.js` the way `GRIP_ILLUSTRATIVE` and `FALLBACK_TEXT` are; this is
+     what stops the markup's copy drifting away from them again. */
+  const { PRICE_INCLUDES, PRICE_CAVEAT } = await import('../js/share.js');
+  ok(html.includes(PRICE_INCLUDES),
+     `index.html no longer contains PRICE_INCLUDES ("${PRICE_INCLUDES}") — the card `
+   + 'and the order are describing the same price in two different sentences');
+  ok(html.includes(PRICE_CAVEAT),
+     `index.html no longer contains PRICE_CAVEAT ("${PRICE_CAVEAT}")`);
+}
+
+/* ⚠ TWO RESOLVERS, ONE ORDER. `byId` in the catalogue tries ids first and
+   aliases second, and its own comment explains why: a superseded id must reach
+   its replacement rather than falling through to whichever entry happens to
+   list it. `take` in `url-state.js` did it in one pass, so the alias would have
+   won over a live id of the same name — and `take` is the reader that actually
+   faces stale links. Both are two-pass now. No list collides today; nothing
+   asserted that, which is the part that made it a matter of luck. */
+group('no catalogue list reuses a name as both an id and an alias');
+{
+  const lists = { COLOURS, WINDOWS, GRILLES, HANDLES, LOCKSETS, DETAILS, HANDINGS };
+  for (const [name, list] of Object.entries(lists)) {
+    const ids = new Set(list.map(o => o.id));
+    for (const o of list) {
+      for (const a of o.aliases || []) {
+        ok(!ids.has(a), `${name}: "${a}" is an alias of "${o.id}" AND an id in the same `
+                      + 'list — byId and take would resolve it to different options');
+      }
+    }
+  }
+  /* And the `n=` → `k=` migration searches LOCKSETS with whatever `n=` holds,
+     so the day a HANDLES name is also a LOCKSETS name, that link deletes the
+     customer's pull bar without a word. */
+  const lockNames = new Set(LOCKSETS.flatMap(o => [o.id, ...(o.aliases || [])]));
+  for (const h of HANDLES) {
+    for (const n of [h.id, ...(h.aliases || [])]) {
+      if (n === 'none') continue;   // both lists name it, and both mean it
+      ok(!lockNames.has(n), `"${n}" names both a pull handle and a lockset — an old `
+                          + '?n= link carrying it silently removes the grip');
+    }
+  }
 }
 
 group('ironwork is counted, and the drawing agrees with the bill');
 {
   globalThis.window = globalThis.window
-    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+    || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
   const { message } = await import('../js/share.js');
   let two = 0, checked = 0;
 
@@ -1699,7 +1880,7 @@ group('ironwork is counted, and the drawing agrees with the bill');
 group('a finish is named on the fitting that has one, and nowhere else');
 {
   globalThis.window = globalThis.window
-    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+    || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
   const { message } = await import('../js/share.js');
   const names = FINISHES.map(f => f.he);
   let checked = 0, withFinish = 0;

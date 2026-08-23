@@ -143,8 +143,25 @@ Three things make this work:
 
 1. **The link back.** Peretz taps it and sees exactly what the customer saw. He
    decodes nothing.
-2. **The short code.** For customers who phone instead of message — four
+   ⚠ **Only over http(s).** Opened from a folder — README.md §2, the starred
+   route — `window.location.href` is a path on the CUSTOMER'S OWN DISK, and
+   this line arrived as `file:///C:/Users/…/Downloads/index.html?…`, which
+   Peretz taps and gets nothing from. `shareUrl` returns `null` off http(s)
+   now and the line is dropped rather than faked: `קוד:` above it carries the
+   whole door, and a missing line beats a dead one. It comes back by itself the
+   day this is served from a host.
+2. **The short code.** For customers who phone instead of message — eight
    characters read aloud, typed into the site, same door on screen.
+   ⚠ **Half built, and the sketch above is out of date twice.** It is EIGHT
+   body characters, not four, and has been since VERSION 10. `?code=DM-…` and
+   `?d=DM-…` both open the door a code names — `?d=` because that is what the
+   line above documents and what a person would type, and it used to land on
+   the DETAIL axis and produce the default door under a notice saying "some of
+   the options in this link are unavailable", which was false in both halves.
+   But `index.html` contains no `<input>` anywhere, so there is nowhere on the
+   page to type one: Peretz would have to edit the address bar. The encoder,
+   the check nibble and the version discipline are all sound and all currently
+   unreachable from outside.
 3. **The price the customer was shown.** Prevents the conversation starting
    with a misunderstanding.
 

@@ -28,8 +28,8 @@
  */
 
 import {
-  byId, COLOURS, declaredFinish, DETAILS,
-  GRILLES, HANDINGS, HANDLES, isGlazed, LOCKSETS, paneCount, PLACEHOLDER, SIZES, WINDOWS,
+  byId, colourCode, COLOURS, DETAILS,
+  GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
 import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import {
@@ -40,7 +40,7 @@ import {
 import { conflicts, repair } from './rules.js';
 import { specRows, summaryLine } from './spec.js';
 import { copyMessage, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE, gripDeparture,
-         PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
+         PHONE_DISPLAY, PHONE_TEL, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 
 const $ = sel => document.querySelector(sel);
@@ -62,8 +62,9 @@ let urlTimer = null;
  * customers order — and everything that made them work went with them.
  */
 const GROUPS = [
-  { key: 'colour', title: 'צבע', in: 'look', kind: 'swatch', list: () => COLOURS,
-    label: c => c.he, meta: c => `RAL ${c.ral}` },
+  /* `label` and `meta` used to sit here and nothing read either of them; `meta`
+     also spelled the chart code "RAL", which it is not — see `colourCode`. */
+  { key: 'colour', title: 'צבע', in: 'look', kind: 'swatch', list: () => COLOURS },
 
   { key: 'detail', title: 'עיצוב החזית', in: 'look', kind: 'tile', list: () => DETAILS,
     glyph: detailGlyph },
@@ -81,7 +82,12 @@ const GROUPS = [
     glyph: locksetGlyph, hint: 'הידית שמסובבים והצילינדר. יש בכל דלת.' },
 
   { key: 'size', title: 'מידה', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
-    glyph: sizeGlyph, delta: z => z.base - SIZES.standard.base,
+    /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was
+       the reason the narrow door read "כלול" and then took ₪100 off: it is a
+       difference from a FIXED baseline, clamped at zero by the label. Prices
+       come from `tileSurcharge` now, which asks `priceAgorot` what tapping
+       actually does, so no group needs its own idea of what a price is. */
+    glyph: sizeGlyph,
     hint: 'נמדוד אצלכם במדויק — בחינם.' },
 
   { key: 'handing', title: 'כיוון פתיחה', in: 'fit', kind: 'pill', list: () => HANDINGS,
@@ -187,8 +193,35 @@ function init() {
      pick: somebody following a link is looking at a door somebody else built,
      and the thing they most want to change is the thing that was changed. */
   const differs = GROUPS.find(g => state[g.key] !== DEFAULTS[g.key]);
+  arrive(differs);
+
+  /* ⚠ AND AGAIN WHENEVER THE ANSWER CHANGES. `soloSections()` is asked afresh
+     on every click, but the ARRIVAL above ran once and nothing re-ran it, so
+     crossing 1100 px left the fold in the other device's shape — measured in
+     both directions:
+
+       desktop → phone   all four open on a 390 px screen, which is precisely
+                         the state the accordion exists to prevent, with the
+                         send button pushed down the page
+       phone → desktop   all four closed, giving the desktop back the 614 px of
+                         empty card the note above says was measured and fixed
+
+     Not a hypothetical: a dragged window does it, and so does an iPad Pro
+     turned on its side. `matchMedia` fires only on the crossing, so this costs
+     nothing while somebody is merely resizing within one mode. */
+  if (typeof window.matchMedia === 'function') {
+    const wide = window.matchMedia('(min-width: 1100px)');
+    const onCross = () => arrive(GROUPS.find(g => state[g.key] !== DEFAULTS[g.key]));
+    if (typeof wide.addEventListener === 'function') wide.addEventListener('change', guard(onCross));
+    else if (typeof wide.addListener === 'function') wide.addListener(guard(onCross));
+  }
+}
+
+/** Put the fold into the shape this viewport wants. */
+function arrive(differs) {
   if (soloSections()) {
     if (differs) { openSection(differs.in); open(differs.key); }
+    else closeAllSections();
   } else {
     openAllSections();
     if (differs) open(differs.key);
@@ -228,11 +261,27 @@ function buildPanel() {
     b.dataset.step = sec.key;
     b.innerHTML = `<span class="steps__n" aria-hidden="true"></span>`
                 + `<span class="steps__t">${sec.title}</span>`;
+    /* ⚠ THE NAME, EXPLICITLY. Below 1100 px `.steps__t` is `display: none` and
+       the number comes from `.steps__n::before`, which is `aria-hidden` — so
+       the only text in the button was hidden from the accessibility tree and
+       the only visible text was hidden from the name computation. All four
+       measured `{role: "button", name: ""}` on a phone. The label has to be
+       set here rather than by unhiding the span, because the span is hidden
+       for a layout reason that is still correct. */
+    b.setAttribute('aria-label', sec.title);
     b.addEventListener('click', () => {
       if ($(`#sect-head-${sec.key}`).getAttribute('aria-expanded') !== 'true') {
         openSection(sec.key);
       }
-      $(`#sect-head-${sec.key}`).scrollIntoView({ block: 'nearest' });
+      /* ⚠ `start`, NOT `nearest`. `nearest` does nothing when the element is
+         already inside the viewport by the browser's reckoning — and the dock
+         is `position: fixed`, so 78 px of "inside the viewport" is underneath
+         it. The heading the customer had just asked to see landed 77–97%
+         behind the green bar at every width below 1100, and TOOK FOCUS while
+         invisible, which is WCAG 2.4.11 on top of the nuisance. The clearance
+         is `scroll-margin-block` in the stylesheet, because the dock's height
+         is declared there. */
+      $(`#sect-head-${sec.key}`).scrollIntoView({ block: 'start' });
       $(`#sect-head-${sec.key}`).focus();
     });
     nav.appendChild(b);
@@ -284,6 +333,50 @@ function buildPanel() {
   }
 }
 
+/**
+ * What tapping this option does to the total, in agorot.
+ *
+ * The only honest answer to the number printed on a tile, because it is
+ * computed the same way the figure the customer is watching is computed —
+ * `priceAgorot`, through `repair`, on the state they actually have. A label
+ * derived from `o.delta` alone cannot express a charge that depends on another
+ * axis, and ironwork's does: it is sold by the panel, and the window and the
+ * size decide how many panels there are.
+ *
+ * Negative is real and is shown: the narrow door is ₪100 CHEAPER than
+ * standard, and its tile used to read "כלול" and then take ₪100 off.
+ */
+function tileSurcharge(g, o, state) {
+  if (state[g.key] === o.id) return 0;
+  const after = repair({ ...state, [g.key]: o.id }).state;
+  return priceAgorot(after) - priceAgorot(state);
+}
+
+/** Repaint every option's price label against the door as it stands. */
+function repriceOptions(state) {
+  for (const g of GROUPS) {
+    const host = document.querySelector(`.field[data-group="${g.key}"]`);
+    if (!host) continue;
+    for (const b of host.querySelectorAll('[data-id]')) {
+      const o = g.list().find(x => x.id === b.dataset.id);
+      if (!o) continue;
+      const label = deltaLabel(tileSurcharge(g, o, state));
+      const meta = b.querySelector('.tile__meta');
+      if (meta) { meta.textContent = label; continue; }
+      /* Swatches hide their meta by CSS, so the accessible name is where a
+         surcharge would actually reach somebody. Every colour is ₪0 today;
+         the day one is not, this is already right. */
+      const sw = b.querySelector('.swatch__meta');
+      if (sw) {
+        sw.textContent = `${colourCode(o)} · ${label}`;
+        b.title = `${o.he} · ${colourCode(o)}${label === deltaLabel(0) ? '' : ` · ${label}`}`;
+        b.setAttribute('aria-label', `${o.he}, ${colourCode(o)}`
+                       + (label === deltaLabel(0) ? '' : `, ${label}`));
+      }
+    }
+  }
+}
+
 function buildOptions(g, host) {
   host.setAttribute('role', 'radiogroup');
   host.setAttribute('aria-label', g.title);
@@ -302,12 +395,12 @@ function buildOptions(g, host) {
          accessible name and the tooltip still carry both. A circle with no
          name is a colour a blind customer cannot choose, and Peretz orders by
          the number on the manufacturer's sheet. */
-      b.title = `${o.he} · RAL ${o.ral}`;
-      b.setAttribute('aria-label', `${o.he}, RAL ${o.ral}`);
+      b.title = `${o.he} · ${colourCode(o)}`;
+      b.setAttribute('aria-label', `${o.he}, ${colourCode(o)}`);
       b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
         <span class="swatch__name">${o.he}</span>
-        <span class="swatch__meta">RAL ${o.ral} · ${deltaLabel(o.delta)}</span>`;
+        <span class="swatch__meta">${colourCode(o)} · ${deltaLabel(tileSurcharge(g, o, state))}</span>`;
     } else if (g.kind === 'pill') {
       b.className = 'pill';
       b.textContent = o.he;
@@ -316,13 +409,13 @@ function buildOptions(g, host) {
       b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
         <span class="tile__name">${o.he}</span>
-        <span class="tile__meta">${deltaLabel(Math.max(0, (g.delta || (x => x.delta))(o)))}</span>
+        <span class="tile__meta">${deltaLabel(tileSurcharge(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
     }
     b.addEventListener('click', () => choose(g, o.id));
     host.appendChild(b);
   }
-  keyboardGrid(host, id => choose(g, id));
+  keyboardGrid(host);
 }
 
 /**
@@ -424,6 +517,17 @@ function paintSaved() {
   const btn = $('#saved-btn');
   if (!btn) return;
   btn.hidden = !list.length;
+  /* ⚠ AND SHUT THE DRAWER WITH IT. Hiding the toggle used to be all this did,
+     so deleting the last saved design left the open panel pinned under the
+     header — "עדיין לא שמרתם עיצוב." — with its only control removed from the
+     page and `aria-expanded="true"` still claiming it was open. Nothing but a
+     reload could close it. A disclosure whose button is gone has to be shut,
+     not merely orphaned. */
+  if (!list.length) {
+    const box = $('#saved');
+    if (box) box.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+  }
   document.querySelectorAll('[data-saved-count]').forEach(e => { e.textContent = String(list.length); });
   const box = $('[data-saved-list]');
   const none = $('[data-saved-empty]');
@@ -485,6 +589,12 @@ function closeSection(key) {
 /** Every section open. What a desktop arrives at. */
 function openAllSections() {
   for (const sec of SECTIONS) openSection(sec.key);
+}
+
+/** Every section shut. What a phone arrives at, and what it returns to when a
+    window narrows back across 1100 px with all four hanging open. */
+function closeAllSections() {
+  for (const sec of SECTIONS) closeSection(sec.key);
 }
 
 function closeGroup(key) {
@@ -557,13 +667,36 @@ function set(next) {
   }, 300);
 }
 
-/** Arrow-key navigation with roving tabindex, per PLAN.md §14. */
-function keyboardGrid(wrap, act) {
+/**
+ * Arrow-key navigation with roving tabindex, per PLAN.md §14.
+ *
+ * ⚠ ARROWS MOVE FOCUS. THEY DO NOT CHOOSE. This used to call `act` on every
+ * arrow — selection-follows-focus, which ARIA does allow, but only for a
+ * listbox whose options are independent. Ours are not: `choose` runs `repair`,
+ * and `repair` reaches across axes. Measured on a broad-window ironwork door,
+ * simply BROWSING the face-design list with the arrow keys:
+ *
+ *   plain → panel → groove   removed the window and its ironwork, ₪1,540
+ *   …and arrowing back to `plain` did not bring either of them back.
+ *
+ * Four repair toasts fired and overwrote each other, so nothing on screen said
+ * what had happened. A keyboard user cannot look at a list without destroying
+ * work, which the mouse user beside them can do freely. Space and Enter choose
+ * — the WAI-ARIA manual-selection pattern, which exists for exactly this.
+ *
+ * `tools/audit.mjs` asserted the old behaviour ("selection follows focus … so
+ * the DOOR has to change"). That assertion is restated there, not deleted:
+ * Enter on a focused option still has to change the door.
+ */
+function keyboardGrid(wrap) {
   wrap.addEventListener('keydown', e => {
     const items = [...wrap.querySelectorAll('[role="radio"]')];
     const i = items.indexOf(document.activeElement);
     if (i < 0) return;
 
+    /* Space and Enter are not handled here on purpose: these are real
+       `<button>` elements, so the browser turns both into a click and the
+       click listener chooses. One path, the same one the mouse uses. */
     const cols = columnCount(wrap, items);
     let next = null;
     if (e.key === 'ArrowRight') next = i - 1;      // RTL: right is "previous"
@@ -577,7 +710,6 @@ function keyboardGrid(wrap, act) {
     e.preventDefault();
     next = Math.max(0, Math.min(items.length - 1, next));
     items[next].focus();
-    act(items[next].dataset.id);
   });
 }
 
@@ -631,26 +763,33 @@ function paint() {
   const money = formatAgorot(priceAgorot(state));
   document.querySelectorAll('[data-price]').forEach(el => { el.textContent = money; });
 
-  /* ⚠ THE GRILLE CHIPS ARE PER-PANEL TOO, and they are built once at init from
-     `o.delta` alone. Ironwork is charged by the panel now, so on a sidelight or
-     a דלת וחצי a tile reading "+₪620" beside a figure that moved ₪1,240 is the
-     same defect one screen over — and it is the screen the customer is
-     proof-reading. One quantity, two places, one of them stale: CLAUDE.md §5,
-     reintroduced by the fix that cites it if this loop is not here.
-     Only the grille group needs it: nothing else in `GROUPS` is priced by a
-     count. */
+  /* ⚠ EVERY GROUP, FROM THE REAL ARITHMETIC. This loop used to run over the
+     grille group alone, under a comment ending "Only the grille group needs
+     it: nothing else in `GROUPS` is priced by a count." True, and beside the
+     point — nothing else is PRICED by a count, but the window and the size are
+     what CHANGE the count, so their tiles were the ones lying:
+
+       sidelight + ironwork, the חלון מלבני tile printed  +₪620
+       the price then moved                               ₪1,240
+
+     748 tiles across the buildable space printed a surcharge that did not
+     match the move. The old loop also floored the pane count at 1, so on an
+     unglazed דלת וחצי the iron tile printed ₪620 for a click that costs
+     ₪1,240 — the boolean this whole change removed, put back one screen over.
+
+     A tile now answers the question the customer is actually asking, which is
+     not "what is this option's list price" but "what happens to my total if I
+     tap this". `repair` is included because tapping runs it: choose ironwork
+     on a door with no glass and it fits a window, and that window is part of
+     the bill. One arithmetic, one place, no group knowing anything special
+     about panes. */
   /* The navigator marks what is OPEN, which is a fact about the page rather
      than about the door — so it is refreshed wherever the fold changes, not
      only here. `aria-current` rather than a class alone: a screen reader
      should be told which of the four it is looking at. */
   markSteps();
 
-  const panes = Math.max(1, paneCount(state));
-  document.querySelectorAll('.field[data-group="grille"] .tile').forEach(b => {
-    const meta = b.querySelector('.tile__meta');
-    const o = byId(GRILLES, b.dataset.id);
-    if (meta && o) meta.textContent = deltaLabel(Math.max(0, o.delta) * panes);
-  });
+  repriceOptions(state);
   $('#code').textContent = encodeCode(state);
 
   const win = byId(WINDOWS, state.window);
@@ -696,6 +835,12 @@ function paint() {
 
   const wa = whatsappUrl(state);
   document.querySelectorAll('[data-wa]').forEach(el => { el.href = wa; });
+  /* ⚠ THE LABEL AND THE HREF CHANGE TOGETHER, and this is the line that makes
+     that true. The buttons rest on "שלחו לנו הודעה" over the fallback message;
+     the moment they point at a real door, they may say so. Set here rather
+     than at boot: what licenses the sentence is the href on the line above,
+     not the fact that a script ran. */
+  document.documentElement.classList.add('is-live');
   announce(describe(state));
   armGrip();
 }
@@ -1204,9 +1349,12 @@ const guard = fn => (...a) => { try { return fn(...a); } catch (e) { fail(e); } 
    `index.html` sets the flag below immediately after the bundle tag; if this
    file evaluated, it is already true and the check there does nothing. */
 window.__up = 1;
+/* Disarm the stall timer armed in the head. Reaching this line IS the bundle
+   arriving, which is the only thing that timer is waiting to hear. */
+try { clearTimeout(window.__downTimer); } catch { /* no timer, nothing to do */ }
 
 document.addEventListener('DOMContentLoaded', guard(() => {
-  $('#phone-link').href = `tel:${PHONE_E164}`;
+  $('#phone-link').href = `tel:${PHONE_TEL}`;   // RFC 3966 — not the wa.me form
   $('#phone-link').textContent = PHONE_DISPLAY;
   init();
 }));

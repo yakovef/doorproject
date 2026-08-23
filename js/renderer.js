@@ -452,7 +452,41 @@ const PAD = { x: 70, top: 110, bottom: 300 };
    app.js) — which means the crop is always wall and floor, never door.
    Tools and tests that use the SVG standalone get the natural box and never
    see the overspill. */
-const SCENE = 4200;
+/* How far the room is painted past the door on every side. `fitStage` widens
+   the viewBox to the stage's aspect ratio without bound, so on a wide-and-short
+   stage the crop reached past the paint and the floor and skirting stopped
+   dead: measured 24–52 px of bare page at each end on every phone held in
+   LANDSCAPE (740x360 through 932x430), while every portrait and desktop size
+   came out covered. It is four rects and a line, so the fix is to paint more
+   of the room rather than to constrain the fit.
+
+   ⚠ 8000 IS MEASURED, NOT PICKED. Unpainted margin at each end, negative
+   meaning covered, across the six landscape sizes above plus 1024x400:
+
+     4200   +24 .. +52     the bug
+     6000   -17 .. -106    covered, but only 17 px of margin at 1024x400
+     8000  -177 .. -275    covered everywhere with room to spare
+    15000  -738 .. -878    also covered, and pointlessly
+
+   I reached for 15000 first, on no evidence. It is worth saying why that was
+   wrong beyond being untidy: a huge backdrop is real work for the rasteriser,
+   and this repo photographs the page as part of its test suite. Pick the
+   smallest number the measurement supports. */
+const SCENE = 8000;
+
+/**
+ * One value, escaped for an XML attribute.
+ *
+ * ⚠ The drawing's `aria-label` is catalogue Hebrew interpolated straight into
+ * markup. Nothing in the catalogue contains `&`, `<` or `"` TODAY — which is
+ * the only reason every SVG on the site is well-formed — but there was no
+ * escaper on the way in, so the first colour named `Black & brass`, or any
+ * Hebrew name carrying gershayim the way `מע״מ` already does elsewhere in this
+ * codebase, would have made every door the site draws malformed at once. A
+ * latent hole whose blast radius is the entire product is worth one line.
+ */
+const xmlAttr = s => String(s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
 /**
  * Keep only the definitions this door actually points at.
@@ -1289,10 +1323,18 @@ export function render(state) {
        the viewBox to the screen's shape, so whatever the window aspect is,
        what reaches the edges is room and not a cut-off rectangle. -->
   <g id="backdrop">
+    <!-- ⚠ THE FALLBACKS ARE THE POINT. A CSS variable with no second argument
+         resolves to nothing when the stylesheet does not arrive, and an unset
+         fill paints BLACK: measured with app.css aborted and everything else
+         intact, the door came up correctly drawn on a solid black rectangle,
+         ground luminance 0 against 243. The audit even holds a check for that
+         exact symptom and had no route that produced it. The page survives
+         losing its stylesheet in every other respect — the phone link and both
+         WhatsApp links still work — so the room should survive it too. -->
     <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-          height="${baseY + SCENE}" fill="var(--wall)"/>
+          height="${baseY + SCENE}" fill="var(--wall, #F5F3EF)"/>
     <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}"
-          height="${view.h - baseY + SCENE}" fill="var(--floor)"/>
+          height="${view.h - baseY + SCENE}" fill="var(--floor, #E6E2DA)"/>
     <!-- Tiled rather than one filtered rect. A feTurbulence over a surface
          this size is a large offscreen buffer for a 7% texture; the pattern
          stitches, so it costs one tile. -->
@@ -1403,7 +1445,16 @@ export function render(state) {
          which is the whole visual point of a sidelight, that it reads as part
          of the same object. So the pane stops where the leaf's glazing stops
          and the panel below repeats. */
-      size.sideGlazed
+      /* ⚠ THE SAME THRESHOLD AS THE BRANCH BELOW. This one had no guard at
+         all, while its sibling has carried `sideW > 320` — which is exactly
+         `SIDE_OPENING_MIN` — since the day panels started being charged for.
+         Add a narrower glazed band, which `SIDE_OPENING_MIN`'s own docstring
+         says is what it exists for, and the aperture goes to `w = sideW - 190`
+         unchecked: at side 240 it is zero and at side 200 it is **-40**, seven
+         attributes of inside-out rectangle. `glazedPanels` counted and CHARGED
+         for that pane, because it pushed the sidelight panel before the test
+         its sibling has to pass. How many panels exist now has one answer. */
+      size.sideGlazed && sideW > 320
         ? (() => {
             const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
             const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
@@ -1467,7 +1518,7 @@ export function render(state) {
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint)}"
      data-fit-w="${view.w}" data-fit-h="${view.h}"
-     aria-label="${describe(state)}" xmlns="http://www.w3.org/2000/svg">
+     aria-label="${xmlAttr(describe(state))}" xmlns="http://www.w3.org/2000/svg">
   <defs>${usedDefs(defs, body)}</defs>
 ${body}
 </svg>`.trim();
@@ -4562,8 +4613,21 @@ function knobPlate(cx, cy, dir) {
   const d = `M ${x} ${y + r} Q ${x} ${y} ${x + W / 2} ${y} Q ${x + W} ${y} ${x + W} ${y + r}
              L ${x + W} ${y + H - r} Q ${x + W} ${y + H} ${x + W / 2} ${y + H}
              Q ${x} ${y + H} ${x} ${y + H - r} Z`;
+  /* ⚠ `data-hw="lockset-art"`, NOT `"handle"`. This is a LOCKSET — a knob on a
+     plate — and it was the only lockset in the catalogue tagging itself as the
+     pull grip, where `digitalLock` and `squarePlates` beside it both say
+     `lockset-art`. `app.js` finds the draggable grip with
+     `$('#stage svg [data-hw="handle"]')`, first match in document order, so on
+     a door with NO pull handle this knob-plate WAS the grip: the toolbar
+     appeared, the lock furniture took focus and announced itself as
+     "מיקום הידית — גררו, או הזיזו עם מקשי החיצים", dragging moved nothing
+     because `gripArt` draws nothing when `handle` is `none`, and the link sent
+     to Peretz quietly collected a `gp=` position for a handle that does not
+     exist. 1,730 of the buildable designs, every one of them this lockset.
+     The suite asserted the mirror of this — that a grip never draws lock
+     furniture — and only the mirror. */
   return `
-    <g data-hw="handle" data-style="knobplate">
+    <g data-hw="lockset-art" data-style="knobplate">
       <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
             filter="url(#hwShadow)"/>
       <path data-mount="backplate" d="${d}" fill="url(#nickel)"/>
@@ -5174,7 +5238,7 @@ const FITTING_GLYPH = {
   cylinder: () => ({ box: [-52, -52, 52, 52], art: `
     <circle cx="0" cy="0" r="39"/>
     <path d="M -12 -16 a 12 12 0 1 1 24 0 l 3.6 30 a 4.4 4.4 0 0 1 -4.4 4.8
-             h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper)"/>
+             h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper, #EFEDE8)"/>
     <path d="M -4 -18 a 4 4 0 1 1 8 0 l 1.4 24 h -10.8 Z"/>` }),
 
   // Almog: swan-neck, raked 15 degrees up, and thicker at the tip than the root.
@@ -5186,14 +5250,14 @@ const FITTING_GLYPH = {
   plate: () => ({ box: [-172, -88, 56, 184], art: `
     <rect x="-45" y="-72" width="90" height="240" rx="45"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <circle cx="0" cy="106" r="13" fill="var(--paper)"/>` }),
+    <circle cx="0" cy="106" r="13" fill="var(--paper, #EFEDE8)"/>` }),
 
   // Knob on a long backplate — the plate carries the keyway too.
   knobplate: () => ({ box: [-58, -118, 58, 214], art: `
     <rect x="-48" y="-102" width="96" height="300" rx="30"/>
-    <circle cx="0" cy="0" r="30" fill="var(--paper)"/>
+    <circle cx="0" cy="0" r="30" fill="var(--paper, #EFEDE8)"/>
     <circle cx="0" cy="0" r="21"/>
-    <circle cx="0" cy="120" r="12" fill="var(--paper)"/>` }),
+    <circle cx="0" cy="120" r="12" fill="var(--paper, #EFEDE8)"/>` }),
 
   /* The smart lock: a slim black slab with a reader window near the top, a
      round thumb-turn, and the key override at the foot. Measured off d087 at
@@ -5201,10 +5265,10 @@ const FITTING_GLYPH = {
      word rather than from the door. */
   digital: () => ({ box: [-40, -96, 40, 150], art: `
     <rect x="-28" y="-80" width="56" height="226" rx="10"/>
-    <rect x="-17" y="-62" width="34" height="52" rx="5" fill="var(--paper)"/>
-    <circle cx="0" cy="44" r="15" fill="var(--paper)"/>
+    <rect x="-17" y="-62" width="34" height="52" rx="5" fill="var(--paper, #EFEDE8)"/>
+    <circle cx="0" cy="44" r="15" fill="var(--paper, #EFEDE8)"/>
     <circle cx="0" cy="44" r="9"/>
-    <rect x="-12" y="104" width="24" height="9" rx="4" fill="var(--paper)"/>` }),
+    <rect x="-12" y="104" width="24" height="9" rx="4" fill="var(--paper, #EFEDE8)"/>` }),
 
   /* Two squares. Nothing else in the range has a corner, which is the whole
      point of drawing it this way. */
@@ -5212,7 +5276,7 @@ const FITTING_GLYPH = {
     <rect x="-41" y="-41" width="82" height="82" rx="5"/>
     <rect x="-41" y="67" width="82" height="82" rx="5"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <circle cx="0" cy="108" r="12" fill="var(--paper)"/>` }),
+    <circle cx="0" cy="108" r="12" fill="var(--paper, #EFEDE8)"/>` }),
 
   // Cadoor: a free-standing ovoid, no rose — taller than wide, on a stub shank.
   cadoor: () => ({ box: [-44, -48, 86, 48], art: `
@@ -5222,7 +5286,7 @@ const FITTING_GLYPH = {
   // Sapir: square cushion knob on a square rose, the knob offset off the plate.
   sapir: () => ({ box: [-78, -46, 46, 52], art: `
     <rect x="-36" y="-36" width="72" height="72" rx="3"/>
-    <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper)"/>
+    <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper, #EFEDE8)"/>
     <rect x="-65" y="-23" width="62" height="62" rx="7"/>` }),
 
   // Shiran: the ornate pull — spigot, bulge, disc, parallel shaft, mirrored.

@@ -21,6 +21,56 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Five agents were turned on the shipped site — one per lane, so they could
+  not all find the same defect — and produced 43 verified faults in code that
+  was green on every instrument in the repo.** All fixed; the full table is
+  `REDESIGN.md` §4b.1. Four of them share one shape, and it is worth carrying
+  in your head: **an instrument that cannot see the thing it is named after.**
+  - `.stage-wrap` was **never `sticky` at any width**. The rule sat in a media
+    query ABOVE the base rule that re-declares `position: relative`, and a
+    media query adds no specificity, so the later declaration won. Measured
+    `relative` at 390/768/1099, door 78 px off the top of a phone by the time
+    the colour grid was in reach. **Nothing in the repo had ever scrolled the
+    page**, so no instrument could see it. `npm run audit` scrolls now.
+  - **`npm test` could not detect a stale bundle and `README.md` said it
+    could.** The check hashed the bundle against `index.html`'s stamp; nothing
+    ever built `js/` and compared. Skip the build → bytes unchanged → hash
+    unchanged → stamp still correct → green, while Pages serves the previous
+    site. `checkFreshBundle()` closes it and the README sentence is now true.
+  - **`recreate`, `corpus` and `against` all photograph `index.html?bare=1`**,
+    and their staleness check hashed only the three drawing files. Proof is in
+    the repo: a commit touching only CSS and markup moved ten committed sheets
+    while `.stamps.json` had a one-line diff. `SHEET_DEPS` is deleted; all four
+    families hash `PAGE_DEPS`, and the bundle covers the rest by construction.
+  - **`knobPlate` tagged itself `data-hw="handle"`** — the pull-grip marker.
+    `app.js` takes the first match in the document, so on 1,730 designs with NO
+    pull handle the lock furniture BECAME the draggable grip: focusable,
+    announced as "handle position, drag it", dragging did nothing, and a `gp=`
+    for a nonexistent handle went into the order. The suite asserted the mirror
+    — *a grip never draws lock furniture* — and only the mirror.
+  - **`?s=constructor` priced a door at `NaN`.** `SIZES` is a plain object, so
+    every `Object.prototype` key was truthy: `notice: null`, `NaN ₪` in the
+    card, the dock and the WhatsApp message, a spec row reading
+    `מידה: undefined` — and `encodeCode` returning a *standard* door's code.
+    Eighteen `SIZES[x] || SIZES.standard` guards downstream, all defeated by an
+    inherited key, all written because that one line was expected to hold.
+  - **The order sent Peretz a `file:///C:/Users/…` link** on the route
+    `README.md` recommends with a star. `shareUrl` returns `null` off http(s)
+    now and the line is dropped rather than faked.
+  - **Every `tel:` link lacked its `+`**, so RFC 3966 reads it as a local
+    number — the one channel that survives every failure route this repo has.
+  - The toast covered the send button with `pointer-events: auto`; arrow keys
+    through a tile group *chose* each option and `repair` destroyed ₪1,540 of
+    door irreversibly; the window and size tiles printed `+₪620` beside a price
+    that moved ₪1,240; a דלת וחצי drew two lights and named one.
+  ⚠ **And one fault I introduced while fixing another**, recorded because the
+  lesson is the file's whole thesis: moving the sticky rule, I left its
+  explanation where the rule had been — after a comment that was ALREADY
+  CLOSED. The prose became loose CSS, the parser swallowed the desktop
+  `@media` block behind it, the three-column layout silently stopped applying,
+  the page grew to 4,185 px and dragging broke at every width ≥ 1100. The
+  scroll assertion written that morning caught it that afternoon.
+
 - **Two instruments were measuring the wrong thing, and both are fixed.**
   `npm run glass` asked for `[data-pane] rect` and got rect 0 — the moulding's
   `leafShade` wash, **850 × 2050, the whole leaf**, against a pane 357 wide. So
@@ -612,8 +662,12 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   ⚠ **With JS off — or ANY throw in the unguarded `init()` — the page looks
   finished and does nothing**: empty stage, `—` for price and code, zero
   choices, and **both full-width green send buttons at `href="#"`**. No
-  `<noscript>`. And `renderer.js:4974` references `GLAZINGS`, deleted with the
-  axis; it is a landmine, NOT live, because `fromQuery` strips `z=`.
+  `<noscript>`. And `describe()` referenced `GLAZINGS`, deleted with the axis;
+  it was a landmine, NOT live, because `fromQuery` strips `z=`. Both fixed.
+  ⚠ This line used to say `renderer.js:4974`, which today is an unrelated
+  key-slot helper — as did `REDESIGN.md` twice. **Cite symbols, not line
+  numbers**: a line number in prose is a claim with no test behind it, and it
+  rots silently while three documents go on pointing at the wrong place.
   ⚠ **The grip controls are unusable at 1100–1200 px right now.** `audit`
   visits 834 then 1280; the three-column layout starts at 1100. At 1100 with a
   sidelight the grip bar is **0 px** and its buttons 22 px against a 44 px
@@ -653,7 +707,7 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   ⚠ **Verified, not assumed:** `index.html`, `css/app.css` and
   `assets/bundle.js` copied ALONE into an empty folder and opened over `file://`
   render the door, the price, the code and the WhatsApp link with an empty
-  console. That is **260 KB of a 184 MB checkout** — `research/` is 63 M and
+  console. That is **286 KB of a 184 MB checkout** — `research/` is 63 M and
   `screenshots/` 138 M — so the three files are named explicitly. They fit in a
   WhatsApp message or on a memory stick, which is how the owner will actually
   carry this into a customer's living room.
@@ -2006,7 +2060,7 @@ Scratch harnesses go in `tools/_*.mjs`, which is gitignored.
   min-content width, the stage's content is an SVG whose intrinsic size comes
   from a viewBox that `fitStage` widens to match the stage, and the loop
   settles 67 px past the edge of a 320 px screen.
-- **The short code is nine characters and its VERSION field is four bits.**
+- **The short code is eight body characters and its VERSION field is four bits.**
   Version 8 does not fit in three, so a decoder built for this layout reads an
   older code's version as 14 or 15 and refuses it — which is wanted, and the
   length check refuses it a line earlier anyway.
@@ -2056,8 +2110,13 @@ moulded rectangles, not two; d080 is a full classical composition — cornice,
 pilasters, plinth — we have no vocabulary for.
 
 **Not started:** CI, deploy to `design.dlatotmagen.co.il`, prerendering the
-default door into `index.html`, a mobile sticky CTA (the WhatsApp button is
-below eight option groups on a phone), English and Russian.
+default door into `index.html`, English and Russian.
+
+⚠ The **mobile sticky CTA** used to sit in that list and it SHIPS — `.dock` in
+`index.html`, `position: fixed` at the bottom below 1100 px, price and green
+button both. It stayed listed as unbuilt long enough that an unattended agent
+could have built it a second time. A finished feature filed under "not started"
+is worse than no list at all.
 
 ---
 

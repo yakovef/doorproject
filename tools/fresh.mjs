@@ -29,6 +29,8 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { build } from 'esbuild';
+/* The build's own options, not a copy of them — see the note on the export. */
+import { options } from './build.mjs';
 
 /**
  * Make sure `assets/bundle.js` is exactly what the current `js/` builds to,
@@ -61,15 +63,17 @@ import { build } from 'esbuild';
  * the sheet. A tool's own comments changing is not a reason to spend three
  * minutes regenerating thirty PNGs; the drawing changing is.
  *
- * ⚠ `js/colour.js` is in the list because it was MISSING from it. It exports
- * `darken`, `lighten` and `mix`, and `renderer.js` calls them at 23 gradient
- * sites — so editing one of those three functions moves every gradient in the
- * drawing while all 110 committed sheets go on claiming to be current, because
- * the hash they are stamped against never saw the file that changed them. A
- * staleness check blind to one of the drawing's own inputs is the same class
- * of fault as the staleness it exists to catch.
+ * ⚠ `js/colour.js` was MISSING from the list this paragraph used to introduce.
+ * It exports `darken`, `lighten` and `mix`, and `renderer.js` calls them at 23
+ * gradient sites — so editing one of those three functions moved every
+ * gradient in the drawing while all 110 committed sheets went on claiming to
+ * be current, because the hash they were stamped against never saw the file
+ * that changed them. A staleness check blind to one of the drawing's own
+ * inputs is the same class of fault as the staleness it exists to catch.
+ *
+ * That list is gone now — it went stale a second time, in the same way, and
+ * the fix was to stop keeping one by hand. See `DEPS_FOR` below.
  */
-const SHEET_DEPS = ['js/renderer.js', 'js/catalog.js', 'js/colour.js'];
 /**
  * ⚠ AND `npm run shot` DEPENDS ON MORE THAN THE DRAWING.
  *
@@ -95,7 +99,35 @@ const SHEET_DEPS = ['js/renderer.js', 'js/catalog.js', 'js/colour.js'];
  * browser tool gets this far.
  */
 const PAGE_DEPS = ['assets/bundle.js', 'css/app.css', 'index.html'];
-const DEPS_FOR = name => (name === 'shot' ? PAGE_DEPS : SHEET_DEPS);
+/**
+ * ⚠ ALL FOUR FAMILIES PHOTOGRAPH A PAGE, so all four hash the page.
+ *
+ * The `SHEET_DEPS` note above says `recreate`, `corpus` and `against` "crop the
+ * door and nothing else, so the drawing's own files are exactly their inputs".
+ * They do not. All three navigate a browser to `index.html?bare=1`:
+ *
+ *   tools/against.mjs   page.goto(`file://${cwd}/index.html?bare=1&${q}`)
+ *   tools/recreate.mjs  p.goto(`file://${cwd}/index.html?bare=1&${q}`)
+ *   tools/corpus.mjs    p.goto(`file://${cwd}/index.html?bare=1&…`)
+ *
+ * so their real inputs are the bundle, the stylesheet and the markup — plus
+ * `js/url-state.js` and `js/rules.js`, which decide what door a query even
+ * becomes, and which `SHEET_DEPS` never named either.
+ *
+ * The repo carries the proof. The commit that added `.stage__h1`, `.steps` and
+ * `.trust` to the bare-mode hide list touched ONLY `css/app.css` and
+ * `index.html` — and it moved ten committed sheets, six `corpus` and four
+ * `recreate`. `.stamps.json` in that same commit has a one-line diff, because
+ * `shot` was the only family hashing CSS. Had those ten not been regenerated
+ * by hand, the suite would have gone on certifying them as pictures of THIS
+ * drawing.
+ *
+ * So the split is gone. `PAGE_DEPS` for everything: strictly safer, because
+ * `assets/bundle.js` covers renderer, catalog, colour, url-state and rules by
+ * construction — and it deletes a hand-kept list, which is the objection this
+ * file already raises against itself twice above.
+ */
+const DEPS_FOR = () => PAGE_DEPS;
 const STAMP_FILE = 'screenshots/.stamps.json';
 
 const depHash = name => createHash('sha256')
@@ -126,20 +158,35 @@ export function staleSheets(names) {
   };
 }
 
-export async function assertFreshBundle() {
-  const options = {
-    entryPoints: ['js/app.js'],
-    bundle: true,
-    format: 'iife',
-    target: ['es2020'],
-    legalComments: 'none',
-    charset: 'utf8',
-  };
-  const out = await build({ ...options, write: false });
+/**
+ * Is `assets/bundle.js` the build of the `js/` on disk right now? Writes
+ * nothing.
+ *
+ * ⚠ `npm test` COULD NOT SEE A STALE BUNDLE, AND README.md SAID IT COULD:
+ * "after every change in js/ you must run npm run build, otherwise the site
+ * that opens is the previous version. `npm test` catches that." It did not.
+ * The suite hashes `assets/bundle.js` and compares it to the `?v=` stamp in
+ * `index.html` — but nothing ran esbuild, so nothing ever compared `js/` to
+ * the bundle. Skip the build and the bundle's bytes do not change, so its hash
+ * does not change, so the stamp is still right, so the suite is green while
+ * Pages serves the previous site. `js/app.js` is not even imported by the
+ * suite, so the whole wiring layer could diverge in silence.
+ *
+ * Proven in a scratch mirror: edit one toast string in `js/app.js`, skip the
+ * build, and the suite passed every assertion with the new string nowhere in
+ * the bundle. The sentence in README.md is true now because of this function.
+ */
+export async function checkFreshBundle() {
+  const out = await build({ ...options, outfile: undefined, write: false });
   const built = out.outputFiles[0].text;
   let onDisk = null;
   try { onDisk = readFileSync('assets/bundle.js', 'utf8'); } catch { /* absent */ }
-  if (built === onDisk) return false;
+  return { fresh: built === onDisk, built };
+}
+
+export async function assertFreshBundle() {
+  const { fresh, built } = await checkFreshBundle();
+  if (fresh) return false;
 
   console.log('  ⟳ assets/bundle.js was stale — rebuilding, so this run measures js/ '
             + 'and not the previous version of the drawing');

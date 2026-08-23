@@ -201,7 +201,7 @@ for (const v of VIEWS) {
       const r = el.getBoundingClientRect();
       if (!r.width || !r.height) continue;
       if (el.closest('p')) continue;
-      if (r.height < 44 || r.width < 30) {
+      if (r.height < 44 || r.width < 44) {
         const cls = String(el.className || '').split(' ')[0];
         out.push(`${cls || el.tagName.toLowerCase()}:${el.dataset.id || el.id || el.textContent.trim().slice(0, 12)} ${Math.round(r.width)}x${Math.round(r.height)}`);
       }
@@ -209,6 +209,40 @@ for (const v of VIEWS) {
     return out;
   });
   small.forEach(s => fault(v.name, `tap target under 44px: ${s}`));
+
+  /* ⚠ NOTHING IN THIS FILE EVER SCROLLED THE PAGE, and that is how the stage
+     came to be un-pinned at every width without a single instrument noticing.
+     The sticky rule sat in a media query ABOVE the base rule that re-declares
+     `position: relative` — a media query adds no specificity, so the later
+     declaration won and the door was never pinned. Measured before the fix:
+     computed `relative` at 390, 768 and 1099, and the stage 78 px off the top
+     of a 390x844 screen by the time the colour grid was in reach. The one
+     thing a configurator has to get right.
+     Below 1100 the page scrolls and the door must stay; at and above it the
+     panel scrolls instead and the page itself must not move at all. */
+  {
+    const s = await p.evaluate(async () => {
+      window.scrollTo(0, 600);
+      await new Promise(r => requestAnimationFrame(r));
+      const el = document.querySelector('.stage-wrap');
+      return { y: window.scrollY, pos: getComputedStyle(el).position,
+               bottom: Math.round(el.getBoundingClientRect().bottom) };
+    });
+    if (v.w < 1100) {
+      if (s.pos !== 'sticky') {
+        fault(v.name, `.stage-wrap computes position:${s.pos}, not sticky — the door `
+                    + 'scrolls away while the customer chooses');
+      }
+      if (s.y > 0 && s.bottom <= 0) {
+        fault(v.name, `the door is entirely off screen (bottom ${s.bottom}px) after scrolling`);
+      }
+    } else if (s.y !== 0) {
+      fault(v.name, `the page itself scrolled to ${s.y} at ${v.w}px — above 1100 the two `
+                  + 'columns scroll and the page does not');
+    }
+    await p.evaluate(() => window.scrollTo(0, 0));
+  }
+
   await p.reload();
   await p.waitForTimeout(300);
 
@@ -567,18 +601,31 @@ for (const v of VIEWS) {
         await p.keyboard.press('ArrowLeft');
         await p.waitForTimeout(200);
         const moved = await p.evaluate(() => document.activeElement.dataset.id);
-        const codeAfter = await p.$eval('#code', e => e.textContent);
+        const codeMid = await p.$eval('#code', e => e.textContent);
         if (moved === first) fault(v.name, 'an arrow key does not move between options');
-        /* Selection follows focus in a radiogroup, so the DOOR has to change.
-           A grid that moves a highlight and leaves the drawing behind is the
-           failure this is looking for. */
-        else if (codeAfter === codeBefore) {
-          fault(v.name, `arrowing from ${first} to ${moved} left the door unchanged`);
+        /* ⚠ RESTATED, NOT DELETED. This used to require the opposite — that
+           arrowing CHANGE the door, selection-follows-focus. It does not any
+           more, and the reason is a measurement: `choose` runs `repair`, which
+           reaches across axes, so simply BROWSING the face-design list with the
+           arrow keys removed a window and its ironwork, ₪1,540 of door, and
+           arrowing back did not restore it. A keyboard user could not look at a
+           list without destroying work that a mouse user beside them can browse
+           freely. So the two halves are asserted separately: an arrow MUST NOT
+           change the door, and Enter MUST. */
+        if (codeMid !== codeBefore) {
+          fault(v.name, `arrowing from ${first} to ${moved} changed the door — a keyboard `
+                      + 'user cannot browse a list without altering it');
+        }
+        await p.keyboard.press('Enter');
+        await p.waitForTimeout(200);
+        const codeAfter = await p.$eval('#code', e => e.textContent);
+        if (codeAfter === codeBefore) {
+          fault(v.name, `Enter on the focused option ${moved} left the door unchanged`);
         }
         const checked = await p.evaluate(() =>
           document.activeElement.getAttribute('aria-checked'));
         if (checked !== 'true') {
-          fault(v.name, `the focused option reads aria-checked="${checked}" after an arrow key`);
+          fault(v.name, `the chosen option reads aria-checked="${checked}" after Enter`);
         }
         /* And it has to be VISIBLE that it is focused. */
         const ring = await p.evaluate(() => {
@@ -743,6 +790,29 @@ for (const v of VIEWS) {
         });
         const pg = await c.newPage();
         await pg.goto(URL); await pg.waitForTimeout(700); return pg; }],
+    /* ⚠ A SIXTH: THE STYLESHEET NOT ARRIVING. This file already carries a
+       luminance check whose own comment names the symptom — "Every door came
+       up on a black ground" — and had no route that produced it. Measured with
+       app.css aborted and nothing else touched: ground fill rgb(0,0,0),
+       luminance 0 against 243 on the happy path, because an SVG `fill` set to
+       a CSS variable that does not resolve paints black.
+       Like `no-storage`, this must come up NORMAL. The page is unstyled but
+       usable, and the phone link and both wa.me links survive — the customer
+       can still reach the shop, which is the half that matters. The renderer
+       carries `var(--wall, #F5F3EF)` fallbacks now so the room survives too. */
+    ['css-404', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+        await pg.route('**/app.css*', r => r.abort());
+        await pg.goto(URL); await pg.waitForTimeout(700); return pg; }],
+    /* ⚠ A SEVENTH: THE BUNDLE STALLING RATHER THAN FAILING. `bundle-404`
+       aborts, and an abort RESOLVES — which is the only reason the inline
+       guard placed after the script tag catches it. A stall never resolves, so
+       that guard never runs: a dead cell, a captive portal, a proxy holding
+       the socket. Measured, the page sat at 3s, 8s and 15s showing brand,
+       headline, an empty stage, "מחיר משוער —" and two green send buttons.
+       index.html arms a 4s timer for exactly this; the wait here is past it. */
+    ['bundle-stalls', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+        await pg.route('**/bundle.js*', () => { /* deliberately never settles */ });
+        await pg.goto(URL, { waitUntil: 'commit' }); await pg.waitForTimeout(5200); return pg; }],
   ];
 
   console.log('\nthe page cannot come up styled and inert');
@@ -754,7 +824,9 @@ for (const v of VIEWS) {
                 + 'the page looks finished and is not');
     }
     if (r.dead) fault(name, `${r.dead} send button(s) do not point at wa.me`);
-    if (name === 'happy' || name === 'no-storage') {
+    /* `css-404` joins the two routes that must come up NORMAL: losing the
+       stylesheet costs the page its looks and nothing else. */
+    if (name === 'happy' || name === 'no-storage' || name === 'css-404') {
       if (r.down) fault(name, 'the "cannot load" strip is showing on a working page');
       if (!r.promising) fault(name, 'a working page does not offer to send the door');
     } else {

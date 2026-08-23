@@ -5,49 +5,72 @@
  * single clarifying question. Everything else on the site exists to get here.
  */
 
-import { byId, COLOURS, declaredFinish, DETAILS, GRILLES, grillePlacement, HANDINGS, HANDLES, isGlazed,
-         LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+/* Only what this file still reads. It used to pull in nine more — COLOURS,
+   DETAILS, GRILLES, HANDINGS, WINDOWS, SIZES, isGlazed, declaredFinish,
+   grillePlacement — from the days when `message()` assembled the door itself.
+   `spec.js` does that now, and an import list that still names the catalogue
+   reads like this file is still a second opinion about what a door is. */
+import { byId, HANDLES } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { gripAt, gripHome } from './renderer.js';
 import { specLines } from './spec.js';
 import { encodeCode, toQuery } from './url-state.js';
 
 export const PHONE_DISPLAY = '053-219-7466';
-export const PHONE_E164    = '972532197466';   // for wa.me and tel:
+/* ⚠ TWO CONSTANTS, BECAUSE THE TWO SCHEMES DISAGREE. `wa.me` wants the digits
+   bare; `tel:` is RFC 3966, where a number with no leading `+` is a LOCAL
+   number and needs a `phone-context` parameter to mean anything. Every
+   `tel:` href on the page was `tel:972532197466`, so a handset was asked to
+   dial 972532197466 domestically while the label beside it read 053-219-7466.
+   One constant was serving both and only one of them was right — and the
+   telephone is the single route that survives every failure this page has,
+   which is why `index.html` calls it "the only route left that needs nothing
+   from us". */
+export const PHONE_E164    = '972532197466';    // wa.me — it wants no '+'
+export const PHONE_TEL     = '+972532197466';   // tel: — RFC 3966 global number
 
+/* One promise, one sentence, one place. The card says these, the dock says
+   them, and until now the message said neither the same way. */
+export const PRICE_INCLUDES = 'כולל דלת, התקנה מלאה ומע״מ';
+export const PRICE_CAVEAT   = 'מחיר משוער. המחיר הסופי נקבע לאחר מדידה.';
+
+/**
+ * The address to send Peretz, or `null` when this page has none worth sending.
+ *
+ * ⚠ THE STARRED ROUTE IN README.md HAS NO PUBLIC ADDRESS. §2 tells the
+ * customer to download the ZIP and double-click `index.html` — and this line
+ * was built from `window.location.href`, so the one line of the message that
+ * matters most arrived as
+ *
+ *     לצפייה: file:///C:/Users/.../Downloads/doorproject/index.html?v=11&c=…
+ *
+ * a path on the CUSTOMER'S OWN DISK. Peretz taps it and gets nothing. The
+ * function already knew about `file://` — it is written the way it is because
+ * `location.origin` returns the literal string "null" there — and then handed
+ * back the local path anyway.
+ *
+ * There is no public host to substitute: GitHub Pages' address depends on the
+ * account, and `design.dlatotmagen.co.il` (PLAN.md §7) is not deployed. Naming
+ * either would be inventing a fact. So off http(s) the link is simply not
+ * sent: `קוד:` above it already carries the whole door, and a missing line
+ * beats a dead one. When the site is served over http(s) — Pages under any
+ * account name, or the custom domain later — the page's own URL is right, and
+ * that is what goes.
+ */
 export function shareUrl(state) {
-  /* Built from the page's own URL rather than from origin + pathname. On
-     file:// — which PLAN.md §8.1 requires to work, because Peretz opens the
-     folder on his own laptop — some browsers report `location.origin` as the
-     literal string "null", and the one line of this message that matters most
-     would arrive as "null/index.html?…". */
+  if (!/^https?:$/.test(window.location.protocol)) return null;
   return window.location.href.split(/[?#]/)[0] + toQuery(state);
 }
 
-/**
- * What is in the window, labelled for the man who has to order it.
- *
- * One list covers both now, and they are two different things bought from two
- * different suppliers: ironwork bolted over the pane, and a pattern worked
- * into the glass itself. `סורג: זכוכית מחורצת` reads as a grille made of
- * reeded glass, which nobody sells.
- *
- * The tiles need the fuller name — `זכוכית מעוצבת` tells a customer scanning
- * fourteen options which half of the list they are looking at — so the word is
- * dropped HERE rather than taken out of the catalogue, where it is doing work.
- */
-function glassOrGrilleLine(g, state) {
-  const label = g.glass ? 'זכוכית' : 'סורג';
-  const name = g.he.startsWith(label + ' ') ? g.he.slice(label.length + 1) : g.he;
-  /* ⚠ WHERE IT GOES, AND HOW MANY. This line used to print the name alone, and
-     on a door with a second panel that is a clarifying question by
-     construction — Peretz read "חלון: ללא חלון" and then "סורג: ברזל מחושל"
-     and had to infer from the SIZE line, three rows away, that the ironwork
-     goes in the side panel. And now that the price multiplies by the panel
-     count, a customer proof-reading the figure has to be able to see why it
-     doubled. `grillePlacement` is silent on the ordinary one-leaf door. */
-  return `${label}: ${name}${grillePlacement(state)}`;
-}
+/* The grille line used to be built HERE, by a `glassOrGrilleLine()` that
+   nothing called. `message()` gets it from `specLines(state)`, and `spec.js`
+   held its own copy of the same three rules — the label choice, the prefix
+   strip, and `grillePlacement`. Two hand-written statements of one rule, in
+   the file whose entire thesis is that the second copy is how the first comes
+   to be wrong: the next person to change how a grille is named would have
+   found this one, changed it, watched nothing happen, and been one step from
+   changing the wrong one. Deleted. The reasoning it carried lives on
+   `specRows` in `js/spec.js`, next to the code that does the work. */
 
 /**
  * How this door's grip departs from an untouched one — the ONE definition of
@@ -189,12 +212,18 @@ export function message(state) {
        Peretz builds to), the money, the code and the link. */
     ...specLines(state),
     ...gripAddendum(state),
-    `מחיר באתר: ${formatAgorot(priceAgorot(state))} — כולל התקנה ומע״מ`,
+    `מחיר באתר: ${formatAgorot(priceAgorot(state))} — ${PRICE_INCLUDES}`,
+    /* The caveat the CARD states twice and the dock a third time, and which
+       the order used to leave out entirely — so the one line the customer was
+       most carefully told was the one Peretz never saw. Exported rather than
+       written here for the reason `GRIP_ILLUSTRATIVE` is: it was four Hebrew
+       literals in three files for one promise. */
+    PRICE_CAVEAT,
     `קוד: ${encodeCode(state)}`,
-    '',
-    // The link matters more than anything above it: Peretz taps it and sees
-    // exactly what the customer saw. He decodes nothing.
-    `לצפייה: ${shareUrl(state)}`,
+    /* The link matters more than anything above it: Peretz taps it and sees
+       exactly what the customer saw. He decodes nothing. It is dropped, not
+       faked, when this page has no address worth tapping — see `shareUrl`. */
+    ...(shareUrl(state) ? ['', `לצפייה: ${shareUrl(state)}`] : []),
   ].join('\n');
 }
 

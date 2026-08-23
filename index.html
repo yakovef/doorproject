@@ -7,7 +7,12 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
-<link rel="stylesheet" href="css/app.css?v=0e6ff21c">
+<!-- A door, as a data URI. There was no icon and no favicon.ico, so every load
+     took a 404 for one and the tab showed a blank page. Inline because the
+     whole point of PLAN.md §8.1 is that these three files work alone from a
+     folder, and a fourth file to copy is a fourth file to forget. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css?v=52570a9f">
 </head>
 <body>
 
@@ -28,11 +33,11 @@
   <nav class="nav" aria-label="ניווט ראשי">
     <a class="nav__a" href="https://dlatotmagen.co.il/works">דגמים</a>
     <span class="nav__a is-here" aria-current="page">עיצוב אישי</span>
-    <a class="nav__a" href="tel:972532197466">צור קשר</a>
+    <a class="nav__a" href="tel:+972532197466">צור קשר</a>
   </nav>
 
   <div class="bar__end">
-    <a class="bar__phone" id="phone-link" href="tel:972532197466">053-219-7466</a>
+    <a class="bar__phone" id="phone-link" href="tel:+972532197466">053-219-7466</a>
     <!-- The saved designs live in this browser and nowhere else; see app.js. -->
     <button class="bar__saved" id="saved-btn" type="button" hidden
             aria-expanded="false" aria-controls="saved">
@@ -78,7 +83,7 @@
 <p class="strip strip--warn" id="down" role="alert" hidden>
   <strong>הדלת לא נטענת בדפדפן הזה.</strong>
   אפשר לשלוח לנו הודעה בוואטסאפ, או להתקשר אלינו למספר
-  <a href="tel:972532197466">053-219-7466</a> ונעזור לכם לבחור דלת.
+  <a href="tel:+972532197466">053-219-7466</a> ונעזור לכם לבחור דלת.
 </p>
 
 <!-- ⚠ ONE COPY OF THE DEGRADED STYLESHEET, WITH TWO WAYS IN.
@@ -102,8 +107,9 @@
   #down[hidden] { display: block !important; }
   #choices, .stage, .grip-bar, .stage__bar, .dock__price,
   .send__price, .send__spec, .send__lead, .send__alt { display: none; }
-  .wa__on { display: none; }
-  .wa__off { display: inline; }
+  /* The label swap used to be repeated here. It is the RESTING state in
+     app.css now — the page is honest before JavaScript and `paint()` upgrades
+     it with `is-live` — so this block no longer has to say it. */
   /* ⚠ `.stage`, not `.stage-wrap`. The wrap holds the page's only `<h1>`, as
      `.sr-only` text — hiding the wrap took the document's heading with it and
      left a page with no heading at all for anyone reading it aloud. So the
@@ -215,7 +221,7 @@
 
       <p class="send__fine">
         מחיר משוער. המחיר הסופי נקבע לאחר מדידה.
-        אפשר גם להתקשר — <a href="tel:972532197466">053-219-7466</a>.
+        אפשר גם להתקשר — <a href="tel:+972532197466">053-219-7466</a>.
       </p>
     </div>
 
@@ -269,7 +275,11 @@
   <span class="trust__i">אחריות</span>
 </footer>
 
-<div class="toast" id="toast" hidden></div>
+<!-- `role="status"` is an implicit polite live region. Without it the toast was
+     visible-only: a repair took the customer's window away, #live announced the
+     NEW door, and so the FACT was conveyed while the REASON never was. This is
+     the element that carries the reason. -->
+<div class="toast" id="toast" role="status" hidden></div>
 <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
 
 <script>
@@ -277,8 +287,28 @@
   if (new URLSearchParams(location.search).has('bare')) {
     document.documentElement.classList.add('is-bare');
   }
+
+  /* ⚠ A REQUEST THAT NEVER RESOLVES DEFEATS THE GUARD BELOW. That guard is a
+     classic script placed after the bundle, so it cannot run until the bundle
+     request SETTLES. An abort settles — that is the bundle-404 route, and it
+     works. A stall does not: a dead cell, a captive portal, a proxy holding
+     the socket open. Measured with the request routed to a promise that never
+     resolves: at 3s, 8s and 15s the page still showed brand, headline, an
+     empty box where the door goes, "מחיר משוער —" and two green send buttons,
+     with no timeout anywhere to end it. Verbatim the screen this whole
+     apparatus exists to prevent.
+     So the fallback is ARMED before the bundle and disarmed by it. Four
+     seconds is past the slowest honest load measured here (3.8s uncompressed
+     on Slow 3G) and far short of a customer giving up. */
+  window.__downTimer = setTimeout(function () {
+    if (window.__up) return;
+    var css = document.getElementById('down-css');
+    if (!css || document.getElementById('down-css-live')) return;
+    document.head.insertAdjacentHTML('beforeend',
+      css.textContent.replace('<style>', '<style id="down-css-live">'));
+  }, 4000);
 </script>
-<script src="assets/bundle.js?v=d7ab6ae1"></script>
+<script src="assets/bundle.js?v=597b3822"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

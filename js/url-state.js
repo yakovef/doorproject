@@ -137,17 +137,53 @@ export function fromQuery(search) {
   const state = { ...DEFAULTS };
   let notice = null;
 
-  const code = p.get('code');
+  /* ⚠ A PARAMETER NAME WE DO NOT KNOW IS ALSO SILENT DATA LOSS. Every check
+     below asks whether a VALUE is one we recognise; none of them asked whether
+     the KEY was. `?colour=rb-9016d&size=wide` — the spelled-out names a person
+     would guess — set no notice and opened the default anthracite standard
+     door, and then `toQuery` dropped both keys on the first `replaceState`, so
+     300 ms later the address bar held no evidence that anything had been
+     asked for. PLAN.md §8.2 asks for the opposite in as many words.
+
+     `f`, `a` and `z` are listed rather than merely ignored. They ARE ignored
+     deliberately — see the note where they used to be read — but "a parameter
+     we retired" and "a parameter that was never ours" are different facts, and
+     until they were two lists the exemption covered both. */
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'd', 's', 'h', 'gp', 'code', 'bare']);
+  /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
+     still. Withdrawing an option is OUR change and not the customer's mistake,
+     so a link carrying one opens as itself. */
+  const RETIRED = new Set(['f', 'a', 'z', 'i']);
+  for (const key of p.keys()) {
+    if (!KNOWN.has(key) && !RETIRED.has(key)) notice = notice || 'option-unknown';
+  }
+
+  /* PLAN.md §3.2 wrote this entry point as `?d=DM-…`, and `d` is the detail
+     axis — so the one URL a person would type from a code read down the
+     telephone landed on `take('detail', …)`, produced the DEFAULT door, and
+     said "some of the options in this link are unavailable — showing the
+     closest", which is false twice over: nothing in the link was an option,
+     and what came up was the default rather than anything close. Every code
+     starts `DM-`, and no detail id does, so the two cannot be confused. */
+  const code = p.get('code') || (/^DM-/i.test(p.get('d') || '') ? p.get('d') : null);
   if (code) {
     const decoded = decodeCode(code);
     if (decoded) return settle(decoded, null);
     notice = 'code-unknown';
   }
 
+  /* Ids first, ALIASES second — `byId` resolves in that order and explains
+     why: a superseded id must reach its replacement rather than falling
+     through to whichever entry happens to list it. One pass gave the alias
+     priority over a live id of the same name, so the two resolvers would
+     disagree the day any list ever reuses a name. No list does today; this
+     is the reader that faces stale links, so it should not be the one that
+     has to be right by luck. */
   const take = (key, param, list, idOf = o => o.id) => {
     const raw = p.get(param);
     if (raw == null) return;
-    const hit = list.find(o => idOf(o) === raw || (o.aliases || []).includes(raw));
+    const hit = list.find(o => idOf(o) === raw)
+             || list.find(o => (o.aliases || []).includes(raw));
     if (hit) state[key] = idOf(hit);
     else notice = 'option-unknown';
   };
@@ -155,7 +191,11 @@ export function fromQuery(search) {
   take('colour', 'c', COLOURS);
   take('window', 'w', WINDOWS);
   take('grille', 'g', GRILLES);
+  /* Held across the next line so the migration below can undo the notice IT
+     caused without touching one that was already standing. */
+  const beforeHandle = notice;
   take('handle', 'n', HANDLES);
+  const handleRaisedIt = notice !== beforeHandle;
   take('lockset', 'k', LOCKSETS);
 
   /* A link written before the grip and the lockset were separate fields names
@@ -163,15 +203,51 @@ export function fromQuery(search) {
      are in people's WhatsApp history and Peretz opens them months later. */
   const rawN = p.get('n');
   if (rawN && !p.get('k')) {
-    const hit = LOCKSETS.find(o => o.id === rawN || (o.aliases || []).includes(rawN));
-    if (hit) { state.lockset = hit.id; state.handle = 'none'; notice = null; }
+    const hit = LOCKSETS.find(o => o.id === rawN)
+             || LOCKSETS.find(o => (o.aliases || []).includes(rawN));
+    /* ⚠ THIS USED TO CLEAR THE NOTICE OUTRIGHT, and it runs after `take` has
+       already looked at `c`, `w` and `g` — so a link whose COLOUR was
+       unrecognised came out silent as long as it also carried an old `n=`.
+       `?c=ral-does-not-exist` said "some options are unavailable";
+       `?c=ral-does-not-exist&n=plate` said nothing and quietly served
+       anthracite. That is precisely what `settle` twelve lines down is written
+       to prevent, in its words: an existing notice WINS, because the customer
+       is looking at a different door and has to be told that first.
+       Only THIS migration's own notice is cleared — the one `take('handle')`
+       raised a moment ago for a value that turned out to be a lockset. */
+    if (hit) {
+      state.lockset = hit.id;
+      state.handle = 'none';
+      if (handleRaisedIt) notice = beforeHandle;
+    }
   }
   take('detail', 'd', DETAILS);
   take('handing', 'h', HANDINGS);
 
   const rawSize = p.get('s');
   if (rawSize != null) {
-    if (SIZES[rawSize]) state.size = rawSize;
+    /* ⚠ `Object.hasOwn`, NOT `SIZES[rawSize]`. `SIZES` is a plain object
+       literal, so `constructor`, `__proto__`, `toString`, `valueOf` and every
+       other name on `Object.prototype` came back truthy and was accepted as a
+       size band. `?s=constructor` produced no notice, a `state.size` that no
+       lookup could resolve, `priceAgorot` → **NaN**, a spec row reading
+       "מידה: undefined", and `NaN ₪` in the price card, in the phone dock and
+       in the WhatsApp message — while `encodeCode` handed back the code for a
+       STANDARD door, because it packs with `Math.max(0, findIndex(...))` and
+       an unknown id is index 0.
+
+       Every other field reaches `encodeCode` already canonicalised by `take`,
+       so `s=` was the only route into that silent zero. There are eighteen
+       `SIZES[state.size] || SIZES.standard` guards downstream and an inherited
+       key defeats all eighteen, because `Object` and `Object.prototype` are
+       themselves truthy. They are not the bug — they are eighteen pieces of
+       evidence that this line was expected to hold.
+
+       `hasOwnProperty.call` rather than `Object.hasOwn`, which is ES2022:
+       the bundle targets es2020 and nothing in it currently raises the browser
+       floor above that. A one-line guard is not worth costing somebody their
+       door. */
+    if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state.size = rawSize;
     else notice = 'option-unknown';
   }
 
@@ -275,13 +351,32 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    padding. */
 /* ⚠ EXPORTED so a test can assert the lists still fit inside it.
    `encodeCode` packs each field with `BigInt(i) & ((1n << w) - 1n)`, and a
-   mask does not throw — it WRAPS. A seventeenth `DETAILS` entry has index 16,
-   which is four bits of zero, so it encodes as index 0: the customer picks the
-   new front detail, reads the code down the telephone, and Peretz builds a
-   plain door. Nothing anywhere reports a fault.
-   That is the one way a catalogue APPEND — the operation this whole VERSION
-   discipline exists to keep free — can be silently wrong, and `detail` is the
-   field nearest its ceiling. */
+   mask does not throw — it WRAPS. A list that outgrows its field stores its
+   new last entry as index 0: the customer picks the new option, reads the code
+   down the telephone, and Peretz builds the FIRST one. Nothing reports a
+   fault. That is the one way a catalogue APPEND — the operation this whole
+   VERSION discipline exists to keep free — can be silently wrong.
+
+   ⚠ AND THE FIELD TO WATCH IS `size`, NOT `detail`. This warning used to name
+   `detail` as "the field nearest its ceiling" and print a table beside it.
+   Measured, the order is:
+
+     size 2 spare · handing 2 · version 4 · handle 6 · lockset 7 ·
+     detail 8 · window 11 · grille 17 · colour 47
+
+   `detail` is the THIRD ROOMIEST, with four times the headroom of the field
+   the warning should have been about — and `SIZES`, at 6 of 8, is the one list
+   ASK-PERETZ.md expects the owner to REPLACE WHOLESALE (§8, the size bands).
+   A door shop naming nine bands is not exotic; the ninth would encode as index
+   0 and Peretz would build a standard door from a code that reads perfectly.
+   `handing` is level with it at 2 of 4: the two outward-opening hands fill it
+   exactly, and a fifth wraps to `right-in`.
+
+   No table is kept here any more. `npm test` measures the spare per field and
+   prints it — three of the nine rows of the hand-kept one had gone stale, in
+   a comment whose whole job is to make somebody think about the budget.
+   If `size` needs widening, `detail`, `handle` and `lockset` can each give a
+   bit back and the payload stays at 36. */
 export const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4,
                       grille: 5, handle: 4, lockset: 4, detail: 4 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top

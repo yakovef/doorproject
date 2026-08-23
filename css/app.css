@@ -165,14 +165,29 @@ body {
 .saved {
   margin: 0; padding: 10px 16px;
   background: var(--paper-up); border-block-end: 1px solid var(--rule);
+  /* Six saved designs measured 639 px of an 844 px phone screen, pushing the
+     door and every control off it. The drawer is a drawer, not a page. */
+  max-block-size: 40vh; overflow-y: auto;
 }
 .saved__none { margin: 0; font-size: .82rem; color: var(--ink-2); }
 .saved__list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
-.saved__row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+/* ⚠ `nowrap`. The pill carries a whole `summaryLine` and had no width floor,
+   so on a phone it took the entire row and the 44 px delete button wrapped
+   into the 6 px gap ABOVE the next entry: measured 10 px from a pill to its
+   own ×, and 6 px from that × to the NEXT design's pill. The control nearest
+   your thumb deleted the wrong door. At 1440 the rows did stay on one line,
+   but the pills were 513 px and 810 px, so the × jumped 297 px between rows. */
+.saved__row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
 .saved__open {
   appearance: none; background: none; border: 1px solid var(--rule);
   border-radius: 999px; min-block-size: 44px; padding-inline: 12px;
   font: 500 .82rem var(--sans); color: var(--ink); cursor: pointer;
+  /* Takes the room that is left and gives the × a fixed place to stand.
+     `min-inline-size: 0` because a flex item will not shrink below its
+     content without it, which is what pushed the × out of the row. */
+  flex: 1 1 auto; min-inline-size: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  text-align: start;
 }
 .saved__drop {
   appearance: none; background: none; border: 0; cursor: pointer;
@@ -243,10 +258,15 @@ body {
    would have spent a quarter of the screen on the least urgent thing on it.
    Slightly shorter than it was — 92vw rather than 118vw, about 43% of a
    390x844 screen — which also means the first category is visible on arrival
-   instead of a full screen of door with no sign there is anything to do. */
-@media (max-width: 1099px) {
-  .stage-wrap { position: sticky; inset-block-start: 0; z-index: 3; }
-}
+   instead of a full screen of door with no sign there is anything to do.
+
+   ⚠ THE RULE ITSELF LIVES BELOW `.stage-wrap`, NOT HERE. It used to sit at this
+   point in the file, above the base rule — and the base rule re-declares
+   `position: relative`. A media query adds NO specificity, so the later
+   declaration won and the stage was never sticky at any width: measured
+   `position: relative` at 390, 768 and 1099, with the door 78 px off the top
+   of a 390x844 screen by the time the colour grid was in reach. Exactly the
+   defect the paragraph above says was fixed. Search for `position: sticky`. */
 
 @media (min-width: 1100px) {
   .layout {
@@ -284,9 +304,20 @@ body {
   transition: background-color .3s var(--ease);
   border-block-end: 1px solid var(--rule);
   /* The grip controls stand in the wall, absolutely, so this has to be their
-     containing block. On a phone it is already `sticky`, which positions too;
-     saying it here as well means the two do not have to be read together. */
+     containing block. ⚠ This declaration once carried a comment saying it was
+     merely restating what the phone already got from `position: sticky`. It
+     was not restating it — it was OVERRIDING it, because it comes later in the
+     file at equal specificity, and a media query adds none. The sticky rule
+     now lives directly below, where it wins. `sticky` is itself a positioned
+     value, so the grip bar keeps its containing block either way. */
   position: relative;
+}
+
+/* THE DOOR STAYS IN VIEW WHILE YOU CHOOSE — see the long note further up.
+   Placed AFTER `.stage-wrap` deliberately: same specificity, so the one that
+   comes last is the one that applies. */
+@media (max-width: 1099px) {
+  .stage-wrap { position: sticky; inset-block-start: 0; z-index: 3; }
 }
 
 @media (min-width: 1100px) {
@@ -630,7 +661,17 @@ body {
 }
 .steps__step:hover { border-color: var(--rule); }
 .steps__step.is-on { color: var(--ink); border-color: var(--rule); background: var(--paper-up); }
-@media (max-width: 1099px) { .steps__t { display: none; } .steps__step { flex: 0 0 auto; } }
+/* ⚠ 44 px BOTH WAYS. Below 1100 the title is hidden and only the counter
+   shows, which made these buttons 31 px wide against the 44 px floor this
+   stylesheet honours everywhere else — and the audit waved them through
+   because its own width floor was 30, one pixel under what they measured.
+   The title is hidden for a real layout reason and stays hidden; the button
+   keeps the size a thumb needs. The accessible NAME is set in app.js, since
+   `display: none` takes the only text out of the accessibility tree. */
+@media (max-width: 1099px) {
+  .steps__t { display: none; }
+  .steps__step { flex: 0 0 auto; min-inline-size: 44px; justify-content: center; }
+}
 
 .panel--choose { counter-reset: sect; }
 .sect__head { counter-increment: sect; }
@@ -655,6 +696,15 @@ body {
   min-block-size: 68px; padding: 12px 2px;
 }
 .sect__head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+
+/* Clearance for the navigator's jump. `.dock` is `position: fixed` and 78 px
+   tall, and `scrollIntoView` cannot see the padding the BODY carries for it —
+   so a heading scrolled to `start` came to rest under the green bar, 77–97% of
+   it hidden, while holding focus. The dock's height is declared here, so the
+   allowance belongs here too. */
+@media (max-width: 1099px) {
+  .sect__head { scroll-margin-block: 8px calc(78px + 12px + env(safe-area-inset-bottom, 0px)); }
+}
 
 /* The text block takes the space it needs; the line beside it yields.
    It was the other way round — `.sect__now` grew and this shrank — which is
@@ -913,7 +963,22 @@ body {
    The swap itself lives in the single degraded stylesheet inside the
    `<noscript>` in index.html, so it happens for scripting-off and for a thrown
    `init()` from one set of rules. Only the resting state is here. */
-.wa__off { display: none; }
+/* ⚠ THE RESTING STATE IS THE HONEST ONE, AND IT USED TO BE THE OTHER WAY.
+   `.wa__off` was hidden here, so the markup default read "שלחו את הדלת
+   בוואטסאפ" — send the door — over an `href` that is `FALLBACK_TEXT`: "the
+   page didn't load for me, so I have no code to send." Label and href said
+   opposite things on EVERY page load until `paint()` ran. Measured at 390x844
+   over a local server: 594 ms of that on Regular 3G gzipped, 1,094 ms on Slow
+   3G, and unbounded when the bundle stalls. A tap inside that window reports
+   a failure that did not happen — and `share.js` says that message "is also
+   the only way we ever hear that the page failed for somebody".
+   So the page rests on the truth and `paint()` upgrades it: `is-live` goes on
+   `<html>` once there is a real door to send. One direction, and the state
+   before JavaScript is the state that is true before JavaScript. */
+.wa__on { display: none; }
+.wa__off { display: inline; }
+html.is-live .wa__on { display: inline; }
+html.is-live .wa__off { display: none; }
 
 .btn--ghost {
   background: none; color: var(--ink);
@@ -995,6 +1060,20 @@ body {
   padding: 12px 16px; border-radius: var(--radius);
   font-size: .86rem; text-align: center;
   z-index: 50;
+  /* ⚠ THE TOAST USED TO EAT THE SEND BUTTON. It is `fixed` at the bottom with
+     a higher `z-index` than `.dock`, so on a phone it covered the whole green
+     bar: `elementFromPoint` at the centre of `.dock__send` returned the toast,
+     and a tap did nothing for the four seconds it was up. Repair toasts fire
+     on every cross-axis click, so the site's one call to action was dead for a
+     large share of the time a customer spends exploring.
+     It is a message, not a control — nothing in it is ever clicked. */
+  pointer-events: none;
+}
+/* And lifted clear of the dock rather than laid over it, so the price and the
+   button stay readable while it is up. 78px is the dock's own reserved
+   height, declared below. */
+@media (max-width: 1099px) {
+  .toast { inset-block-end: calc(78px + 12px + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* ── reduced motion ───────────────────────────────────────── */

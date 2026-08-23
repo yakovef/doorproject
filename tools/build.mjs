@@ -31,9 +31,18 @@
  */
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { build, context } from 'esbuild';
 
-const options = {
+/**
+ * ⚠ EXPORTED, because `tools/fresh.mjs` needs exactly these and used to keep
+ * its own hand-copy. They agreed — but `fresh.mjs` WRITES `assets/bundle.js`,
+ * so the day this file gained `minify`, or moved `target`, every browser tool
+ * would have silently overwritten the correct bundle with a differently-built
+ * one and re-stamped `index.html` to match. Two definitions of how this
+ * project is built, one of them able to overwrite the other's output.
+ */
+export const options = {
   entryPoints: ['js/app.js'],
   bundle: true,
   format: 'iife',          // classic script: works from file://
@@ -77,13 +86,20 @@ function stampHtml() {
   return html;
 }
 
-if (process.argv.includes('--watch')) {
-  const ctx = await context(options);
-  await ctx.watch();
-  stampHtml();
-  console.log('watching…');
-} else {
-  await build(options);
-  console.log('built assets/bundle.js');
-  stampHtml();
+/* ⚠ ONLY WHEN THIS FILE IS THE COMMAND. `tools/fresh.mjs` imports `options`
+   from here so the two cannot drift, and a top-level build would then fire —
+   writing the bundle and re-stamping index.html — merely because something
+   asked what the build options are. `npm run build` and `npm run dev` are
+   unaffected: there, this file IS argv[1]. */
+if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
+  if (process.argv.includes('--watch')) {
+    const ctx = await context(options);
+    await ctx.watch();
+    stampHtml();
+    console.log('watching…');
+  } else {
+    await build(options);
+    console.log('built assets/bundle.js');
+    stampHtml();
+  }
 }

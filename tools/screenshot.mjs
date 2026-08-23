@@ -92,12 +92,46 @@ const SHOTS = [
     q: '?c=rb-2030d&w=strip&g=scroll&n=none&k=knobplate&d=panel&s=tall&h=left-in' },
 ];
 
+/**
+ * ⚠ THE RASTER HAS A CEILING, AND `desktop` WAS OVER IT.
+ *
+ * Every shot was taken at `deviceScaleFactor: 2`, which for the 1680-wide
+ * `desktop` shot means a 3360x1900 image — and Chromium in a container simply
+ * never produces it. Measured, same page, same machine:
+ *
+ *   1680 @1.5x  = 2520x1425   641 ms
+ *   1680 @1.75x = 2940x1663   never completes (90 s, then 40 s, four times)
+ *   1680 @2x    = 3360x1900   never completes
+ *   1280 @2x    = 2560x1440   502 ms
+ *
+ * So the limit is a texture WIDTH somewhere just past 2560, not an area: the
+ * `phone` shot is 780 px wide and thousands tall and has always been fine.
+ * `--disable-dev-shm-usage` does not help and `/dev/shm` is 16 GB, so it is not
+ * that either.
+ *
+ * ⚠ THIS IS NOT A REGRESSION AND IT IS WORTH KNOWING WHY IT WAS INVISIBLE. The
+ * failure reproduces on a pristine checkout — I stashed every change and it
+ * failed identically — so `npm run sheets` has not been runnable end to end in
+ * this environment for as long as `desktop` has been 1680 wide. It went
+ * unnoticed because the sheets only need regenerating when the drawing moves,
+ * and the last few times that happened it was done somewhere else.
+ *
+ * A staleness check nobody can satisfy is worse than no check: the next person
+ * to change the renderer is told to run a command that cannot finish. So the
+ * scale is capped at a width this can actually rasterise. Only `desktop`
+ * changes, from 2x to 1.5x — it is still the whole page at 1680 logical px.
+ * Raise `MAX_RASTER_W` the day this runs somewhere with a bigger ceiling.
+ */
+const MAX_RASTER_W = 2520;              // proven at 641 ms; 2940 never returns
+const scaleFor = w => Math.min(2, MAX_RASTER_W / w);
+
 await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 let bad = 0;
 for (const s of SHOTS) {
-  const p = await b.newPage({ viewport: { width: s.w, height: s.h }, deviceScaleFactor: 2 });
+  const p = await b.newPage({ viewport: { width: s.w, height: s.h },
+                              deviceScaleFactor: scaleFor(s.w) });
   const errs = [];
   p.on('pageerror', e => errs.push(String(e)));
   p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });

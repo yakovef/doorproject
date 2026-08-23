@@ -436,6 +436,7 @@
     { id: "brass", he: "פליז", en: "Brass" }
   ];
   var declaredFinish = (o) => !o || !o.finish ? null : FINISHES.find((f) => f.id === o.finish || (f.aliases || []).includes(o.finish)) || null;
+  var colourCode = (c) => `רב בריח ${c.ral}`;
   function effectiveFinish(state2) {
     return declaredFinish(byId(HANDLES, state2.handle)) || byId(FINISHES, "steel");
   }
@@ -456,7 +457,7 @@
         isHe: win.he
       });
     }
-    if (size.sideGlazed) {
+    if (size.sideGlazed && size.side > SIDE_OPENING_MIN) {
       out.push({
         id: "side",
         panes: 1,
@@ -507,7 +508,7 @@
   var formatAgorot = (a) => fmt.format(a / 100);
   function deltaLabel(agorot, lang = "he") {
     if (!agorot) return { he: "כלול", en: "Included", ru: "Включено" }[lang];
-    return "+" + fmt.format(agorot / 100);
+    return (agorot < 0 ? "−" : "+") + fmt.format(Math.abs(agorot) / 100);
   }
 
   // js/spec.js
@@ -522,9 +523,27 @@
     const hn = byId(HANDINGS, state2.handing);
     const fin = declaredFinish(hd);
     const rows = [
-      { key: "colour", label: "צבע", id: c.id, hex: c.hex, value: `${c.he} (RAL ${c.ral})` },
+      /* ⚠ NOT "RAL". These are Rav Bariach's own chart codes — the catalogue says
+         so where it defines them ("Codes are theirs"), and the RAL numbers we
+         once invented were retired into `aliases` precisely because they were
+         wrong. RAL Classic is four digits, 1000–9023, no suffix; not one of the
+         seventeen here is a RAL designation, and `RAL 0097D` and `RAL RB09D`
+         name nothing anybody can order. Same shape as the brass Coral lockset:
+         a fact asserted in the order that the customer never chose and no
+         supplier can fill. `colourCode` is in the catalogue so the five readers
+         of this string cannot drift apart again. */
+      { key: "colour", label: "צבע", id: c.id, hex: c.hex, value: `${c.he} (${colourCode(c)})` },
       { key: "window", label: "חלון", id: w.id, value: w.he }
     ];
+    const panels = glazedPanels(state2);
+    if (panels.length > 1) {
+      rows.push({
+        key: "glazing",
+        label: "זיגוג",
+        id: w.id,
+        value: panels.map((p) => `${p.he}: ${p.isHe}`).join(" · ")
+      });
+    }
     if (isGlazed(state2) && g.id !== "none") {
       const label = g.glass ? "זכוכית" : "סורג";
       const name = g.he.startsWith(label + " ") ? g.he.slice(label.length + 1) : g.he;
@@ -535,17 +554,16 @@
         value: `${name}${grillePlacement(state2)}`
       });
     }
-    if (hd.style !== "none") {
-      rows.push({
-        key: "handle",
-        label: "ידית משיכה",
-        id: hd.id,
-        value: `${hd.he}${fin ? ` · ${fin.he}` : ""}`
-      });
-    }
+    rows.push({
+      key: "handle",
+      label: "ידית משיכה",
+      id: hd.id,
+      value: `${hd.he}${fin ? ` · ${fin.he}` : ""}`
+    });
     rows.push({ key: "lockset", label: "מנעול וידית", id: lk.id, value: lk.he });
     if (dt.id !== "plain") {
-      rows.push({ key: "detail", label: "עיצוב", id: dt.id, value: dt.he });
+      const n = dt.strips ? ` (${dt.strips})` : "";
+      rows.push({ key: "detail", label: "עיצוב", id: dt.id, value: `${dt.he}${n}` });
     }
     rows.push({ key: "size", label: "מידה", id: state2.size, value: sz.he });
     rows.push({ key: "handing", label: "פתיחה", id: hn.id, value: hn.he });
@@ -697,7 +715,8 @@
     // lever thickness at the root, in plate widths
   };
   var PAD = { x: 70, top: 110, bottom: 300 };
-  var SCENE = 4200;
+  var SCENE = 8e3;
+  var xmlAttr = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   function usedDefs(defs, body) {
     const blocks = topLevelElements(defs);
     const byId2 = /* @__PURE__ */ new Map();
@@ -1399,10 +1418,18 @@
        the viewBox to the screen's shape, so whatever the window aspect is,
        what reaches the edges is room and not a cut-off rectangle. -->
   <g id="backdrop">
+    <!-- ⚠ THE FALLBACKS ARE THE POINT. A CSS variable with no second argument
+         resolves to nothing when the stylesheet does not arrive, and an unset
+         fill paints BLACK: measured with app.css aborted and everything else
+         intact, the door came up correctly drawn on a solid black rectangle,
+         ground luminance 0 against 243. The audit even holds a check for that
+         exact symptom and had no route that produced it. The page survives
+         losing its stylesheet in every other respect — the phone link and both
+         WhatsApp links still work — so the room should survive it too. -->
     <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-          height="${baseY + SCENE}" fill="var(--wall)"/>
+          height="${baseY + SCENE}" fill="var(--wall, #F5F3EF)"/>
     <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}"
-          height="${view.h - baseY + SCENE}" fill="var(--floor)"/>
+          height="${view.h - baseY + SCENE}" fill="var(--floor, #E6E2DA)"/>
     <!-- Tiled rather than one filtered rect. A feTurbulence over a surface
          this size is a large offscreen buffer for a 7% texture; the pattern
          stitches, so it costs one tile. -->
@@ -1512,7 +1539,16 @@
        which is the whole visual point of a sidelight, that it reads as part
        of the same object. So the pane stops where the leaf's glazing stops
        and the panel below repeats. */
-    size.sideGlazed ? (() => {
+    /* ⚠ THE SAME THRESHOLD AS THE BRANCH BELOW. This one had no guard at
+       all, while its sibling has carried `sideW > 320` — which is exactly
+       `SIDE_OPENING_MIN` — since the day panels started being charged for.
+       Add a narrower glazed band, which `SIDE_OPENING_MIN`'s own docstring
+       says is what it exists for, and the aperture goes to `w = sideW - 190`
+       unchecked: at side 240 it is zero and at side 200 it is **-40**, seven
+       attributes of inside-out rectangle. `glazedPanels` counted and CHARGED
+       for that pane, because it pushed the sidelight panel before the test
+       its sibling has to pass. How many panels exist now has one answer. */
+    size.sideGlazed && sideW > 320 ? (() => {
       const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
       const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
       return aperture({
@@ -1617,7 +1653,7 @@
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint2)}"
      data-fit-w="${view.w}" data-fit-h="${view.h}"
-     aria-label="${describe(state2)}" xmlns="http://www.w3.org/2000/svg">
+     aria-label="${xmlAttr(describe(state2))}" xmlns="http://www.w3.org/2000/svg">
   <defs>${usedDefs(defs, body)}</defs>
 ${body}
 </svg>`.trim();
@@ -3061,7 +3097,7 @@ ${body}
              L ${x + W} ${y + H - r} Q ${x + W} ${y + H} ${x + W / 2} ${y + H}
              Q ${x} ${y + H} ${x} ${y + H - r} Z`;
     return `
-    <g data-hw="handle" data-style="knobplate">
+    <g data-hw="lockset-art" data-style="knobplate">
       <path d="${d}" fill="#000" opacity="0.26" transform="translate(5 6)"
             filter="url(#hwShadow)"/>
       <path data-mount="backplate" d="${d}" fill="url(#nickel)"/>
@@ -3453,7 +3489,7 @@ ${body}
     cylinder: () => ({ box: [-52, -52, 52, 52], art: `
     <circle cx="0" cy="0" r="39"/>
     <path d="M -12 -16 a 12 12 0 1 1 24 0 l 3.6 30 a 4.4 4.4 0 0 1 -4.4 4.8
-             h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper)"/>
+             h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper, #EFEDE8)"/>
     <path d="M -4 -18 a 4 4 0 1 1 8 0 l 1.4 24 h -10.8 Z"/>` }),
     // Almog: swan-neck, raked 15 degrees up, and thicker at the tip than the root.
     almog: () => ({ box: [-244, -62, 52, 46], art: `
@@ -3463,30 +3499,30 @@ ${body}
     plate: () => ({ box: [-172, -88, 56, 184], art: `
     <rect x="-45" y="-72" width="90" height="240" rx="45"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <circle cx="0" cy="106" r="13" fill="var(--paper)"/>` }),
+    <circle cx="0" cy="106" r="13" fill="var(--paper, #EFEDE8)"/>` }),
     // Knob on a long backplate — the plate carries the keyway too.
     knobplate: () => ({ box: [-58, -118, 58, 214], art: `
     <rect x="-48" y="-102" width="96" height="300" rx="30"/>
-    <circle cx="0" cy="0" r="30" fill="var(--paper)"/>
+    <circle cx="0" cy="0" r="30" fill="var(--paper, #EFEDE8)"/>
     <circle cx="0" cy="0" r="21"/>
-    <circle cx="0" cy="120" r="12" fill="var(--paper)"/>` }),
+    <circle cx="0" cy="120" r="12" fill="var(--paper, #EFEDE8)"/>` }),
     /* The smart lock: a slim black slab with a reader window near the top, a
        round thumb-turn, and the key override at the foot. Measured off d087 at
        56 x 226 mm — the twelve-button keypad drawn first came from the English
        word rather than from the door. */
     digital: () => ({ box: [-40, -96, 40, 150], art: `
     <rect x="-28" y="-80" width="56" height="226" rx="10"/>
-    <rect x="-17" y="-62" width="34" height="52" rx="5" fill="var(--paper)"/>
-    <circle cx="0" cy="44" r="15" fill="var(--paper)"/>
+    <rect x="-17" y="-62" width="34" height="52" rx="5" fill="var(--paper, #EFEDE8)"/>
+    <circle cx="0" cy="44" r="15" fill="var(--paper, #EFEDE8)"/>
     <circle cx="0" cy="44" r="9"/>
-    <rect x="-12" y="104" width="24" height="9" rx="4" fill="var(--paper)"/>` }),
+    <rect x="-12" y="104" width="24" height="9" rx="4" fill="var(--paper, #EFEDE8)"/>` }),
     /* Two squares. Nothing else in the range has a corner, which is the whole
        point of drawing it this way. */
     square: () => ({ box: [-172, -60, 56, 152], art: `
     <rect x="-41" y="-41" width="82" height="82" rx="5"/>
     <rect x="-41" y="67" width="82" height="82" rx="5"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <circle cx="0" cy="108" r="12" fill="var(--paper)"/>` }),
+    <circle cx="0" cy="108" r="12" fill="var(--paper, #EFEDE8)"/>` }),
     // Cadoor: a free-standing ovoid, no rose — taller than wide, on a stub shank.
     cadoor: () => ({ box: [-44, -48, 86, 48], art: `
     <rect x="34" y="-11" width="45" height="22" rx="11"/>
@@ -3494,7 +3530,7 @@ ${body}
     // Sapir: square cushion knob on a square rose, the knob offset off the plate.
     sapir: () => ({ box: [-78, -46, 46, 52], art: `
     <rect x="-36" y="-36" width="72" height="72" rx="3"/>
-    <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper)"/>
+    <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper, #EFEDE8)"/>
     <rect x="-65" y="-23" width="62" height="62" rx="7"/>` }),
     // Shiran: the ornate pull — spigot, bulge, disc, parallel shaft, mirrored.
     shiran: () => ({ box: [-48, -252, 48, 252], art: `
@@ -3863,7 +3899,12 @@ ${body}
     const p = new URLSearchParams(search);
     const state2 = { ...DEFAULTS };
     let notice = null;
-    const code = p.get("code");
+    const KNOWN = /* @__PURE__ */ new Set(["v", "c", "w", "g", "n", "k", "d", "s", "h", "gp", "code", "bare"]);
+    const RETIRED = /* @__PURE__ */ new Set(["f", "a", "z", "i"]);
+    for (const key of p.keys()) {
+      if (!KNOWN.has(key) && !RETIRED.has(key)) notice = notice || "option-unknown";
+    }
+    const code = p.get("code") || (/^DM-/i.test(p.get("d") || "") ? p.get("d") : null);
     if (code) {
       const decoded = decodeCode(code);
       if (decoded) return settle(decoded, null);
@@ -3872,29 +3913,31 @@ ${body}
     const take = (key, param, list, idOf = (o) => o.id) => {
       const raw = p.get(param);
       if (raw == null) return;
-      const hit = list.find((o) => idOf(o) === raw || (o.aliases || []).includes(raw));
+      const hit = list.find((o) => idOf(o) === raw) || list.find((o) => (o.aliases || []).includes(raw));
       if (hit) state2[key] = idOf(hit);
       else notice = "option-unknown";
     };
     take("colour", "c", COLOURS);
     take("window", "w", WINDOWS);
     take("grille", "g", GRILLES);
+    const beforeHandle = notice;
     take("handle", "n", HANDLES);
+    const handleRaisedIt = notice !== beforeHandle;
     take("lockset", "k", LOCKSETS);
     const rawN = p.get("n");
     if (rawN && !p.get("k")) {
-      const hit = LOCKSETS.find((o) => o.id === rawN || (o.aliases || []).includes(rawN));
+      const hit = LOCKSETS.find((o) => o.id === rawN) || LOCKSETS.find((o) => (o.aliases || []).includes(rawN));
       if (hit) {
         state2.lockset = hit.id;
         state2.handle = "none";
-        notice = null;
+        if (handleRaisedIt) notice = beforeHandle;
       }
     }
     take("detail", "d", DETAILS);
     take("handing", "h", HANDINGS);
     const rawSize = p.get("s");
     if (rawSize != null) {
-      if (SIZES[rawSize]) state2.size = rawSize;
+      if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state2.size = rawSize;
       else notice = "option-unknown";
     }
     const rawGrip = p.get("gp");
@@ -4000,7 +4043,11 @@ ${body}
   // js/share.js
   var PHONE_DISPLAY = "053-219-7466";
   var PHONE_E164 = "972532197466";
+  var PHONE_TEL = "+972532197466";
+  var PRICE_INCLUDES = "כולל דלת, התקנה מלאה ומע״מ";
+  var PRICE_CAVEAT = "מחיר משוער. המחיר הסופי נקבע לאחר מדידה.";
   function shareUrl(state2) {
+    if (!/^https?:$/.test(window.location.protocol)) return null;
     return window.location.href.split(/[?#]/)[0] + toQuery(state2);
   }
   function gripDeparture(state2) {
@@ -4049,12 +4096,18 @@ ${body}
          Peretz builds to), the money, the code and the link. */
       ...specLines(state2),
       ...gripAddendum(state2),
-      `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — כולל התקנה ומע״מ`,
+      `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — ${PRICE_INCLUDES}`,
+      /* The caveat the CARD states twice and the dock a third time, and which
+         the order used to leave out entirely — so the one line the customer was
+         most carefully told was the one Peretz never saw. Exported rather than
+         written here for the reason `GRIP_ILLUSTRATIVE` is: it was four Hebrew
+         literals in three files for one promise. */
+      PRICE_CAVEAT,
       `קוד: ${encodeCode(state2)}`,
-      "",
-      // The link matters more than anything above it: Peretz taps it and sees
-      // exactly what the customer saw. He decodes nothing.
-      `לצפייה: ${shareUrl(state2)}`
+      /* The link matters more than anything above it: Peretz taps it and sees
+         exactly what the customer saw. He decodes nothing. It is dropped, not
+         faked, when this page has no address worth tapping — see `shareUrl`. */
+      ...shareUrl(state2) ? ["", `לצפייה: ${shareUrl(state2)}`] : []
     ].join("\n");
   }
   var whatsappUrl = (state2) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2))}`;
@@ -4083,15 +4136,9 @@ ${body}
   var state = { ...DEFAULTS };
   var urlTimer = null;
   var GROUPS = [
-    {
-      key: "colour",
-      title: "צבע",
-      in: "look",
-      kind: "swatch",
-      list: () => COLOURS,
-      label: (c) => c.he,
-      meta: (c) => `RAL ${c.ral}`
-    },
+    /* `label` and `meta` used to sit here and nothing read either of them; `meta`
+       also spelled the chart code "RAL", which it is not — see `colourCode`. */
+    { key: "colour", title: "צבע", in: "look", kind: "swatch", list: () => COLOURS },
     {
       key: "detail",
       title: "עיצוב החזית",
@@ -4140,8 +4187,12 @@ ${body}
       in: "fit",
       kind: "tile",
       list: () => Object.values(SIZES),
+      /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was
+         the reason the narrow door read "כלול" and then took ₪100 off: it is a
+         difference from a FIXED baseline, clamped at zero by the label. Prices
+         come from `tileSurcharge` now, which asks `priceAgorot` what tapping
+         actually does, so no group needs its own idea of what a price is. */
       glyph: sizeGlyph,
-      delta: (z) => z.base - SIZES.standard.base,
       hint: "נמדוד אצלכם במדויק — בחינם."
     },
     {
@@ -4209,11 +4260,20 @@ ${body}
     }
     paint();
     const differs = GROUPS.find((g) => state[g.key] !== DEFAULTS[g.key]);
+    arrive(differs);
+    if (typeof window.matchMedia === "function") {
+      const wide = window.matchMedia("(min-width: 1100px)");
+      const onCross = () => arrive(GROUPS.find((g) => state[g.key] !== DEFAULTS[g.key]));
+      if (typeof wide.addEventListener === "function") wide.addEventListener("change", guard(onCross));
+      else if (typeof wide.addListener === "function") wide.addListener(guard(onCross));
+    }
+  }
+  function arrive(differs) {
     if (soloSections()) {
       if (differs) {
         openSection(differs.in);
         open(differs.key);
-      }
+      } else closeAllSections();
     } else {
       openAllSections();
       if (differs) open(differs.key);
@@ -4230,11 +4290,12 @@ ${body}
       b.className = "steps__step";
       b.dataset.step = sec.key;
       b.innerHTML = `<span class="steps__n" aria-hidden="true"></span><span class="steps__t">${sec.title}</span>`;
+      b.setAttribute("aria-label", sec.title);
       b.addEventListener("click", () => {
         if ($(`#sect-head-${sec.key}`).getAttribute("aria-expanded") !== "true") {
           openSection(sec.key);
         }
-        $(`#sect-head-${sec.key}`).scrollIntoView({ block: "nearest" });
+        $(`#sect-head-${sec.key}`).scrollIntoView({ block: "start" });
         $(`#sect-head-${sec.key}`).focus();
       });
       nav.appendChild(b);
@@ -4282,6 +4343,33 @@ ${body}
       }
     }
   }
+  function tileSurcharge(g, o, state2) {
+    if (state2[g.key] === o.id) return 0;
+    const after = repair({ ...state2, [g.key]: o.id }).state;
+    return priceAgorot(after) - priceAgorot(state2);
+  }
+  function repriceOptions(state2) {
+    for (const g of GROUPS) {
+      const host = document.querySelector(`.field[data-group="${g.key}"]`);
+      if (!host) continue;
+      for (const b of host.querySelectorAll("[data-id]")) {
+        const o = g.list().find((x) => x.id === b.dataset.id);
+        if (!o) continue;
+        const label = deltaLabel(tileSurcharge(g, o, state2));
+        const meta = b.querySelector(".tile__meta");
+        if (meta) {
+          meta.textContent = label;
+          continue;
+        }
+        const sw = b.querySelector(".swatch__meta");
+        if (sw) {
+          sw.textContent = `${colourCode(o)} · ${label}`;
+          b.title = `${o.he} · ${colourCode(o)}${label === deltaLabel(0) ? "" : ` · ${label}`}`;
+          b.setAttribute("aria-label", `${o.he}, ${colourCode(o)}` + (label === deltaLabel(0) ? "" : `, ${label}`));
+        }
+      }
+    }
+  }
   function buildOptions(g, host) {
     host.setAttribute("role", "radiogroup");
     host.setAttribute("aria-label", g.title);
@@ -4293,12 +4381,12 @@ ${body}
       b.setAttribute("role", "radio");
       if (g.kind === "swatch") {
         b.className = "swatch";
-        b.title = `${o.he} · RAL ${o.ral}`;
-        b.setAttribute("aria-label", `${o.he}, RAL ${o.ral}`);
+        b.title = `${o.he} · ${colourCode(o)}`;
+        b.setAttribute("aria-label", `${o.he}, ${colourCode(o)}`);
         b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
         <span class="swatch__name">${o.he}</span>
-        <span class="swatch__meta">RAL ${o.ral} · ${deltaLabel(o.delta)}</span>`;
+        <span class="swatch__meta">${colourCode(o)} · ${deltaLabel(tileSurcharge(g, o, state))}</span>`;
       } else if (g.kind === "pill") {
         b.className = "pill";
         b.textContent = o.he;
@@ -4307,13 +4395,13 @@ ${body}
         b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
         <span class="tile__name">${o.he}</span>
-        <span class="tile__meta">${deltaLabel(Math.max(0, (g.delta || ((x) => x.delta))(o)))}</span>
+        <span class="tile__meta">${deltaLabel(tileSurcharge(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
       }
       b.addEventListener("click", () => choose(g, o.id));
       host.appendChild(b);
     }
-    keyboardGrid(host, (id) => choose(g, id));
+    keyboardGrid(host);
   }
   var soloSections = () => !window.matchMedia("(min-width: 1100px)").matches;
   function openSection(key) {
@@ -4366,6 +4454,11 @@ ${body}
     const btn = $("#saved-btn");
     if (!btn) return;
     btn.hidden = !list.length;
+    if (!list.length) {
+      const box2 = $("#saved");
+      if (box2) box2.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+    }
     document.querySelectorAll("[data-saved-count]").forEach((e) => {
       e.textContent = String(list.length);
     });
@@ -4427,6 +4520,9 @@ ${body}
   function openAllSections() {
     for (const sec of SECTIONS) openSection(sec.key);
   }
+  function closeAllSections() {
+    for (const sec of SECTIONS) closeSection(sec.key);
+  }
   function closeGroup(key) {
     $(`#head-${key}`).setAttribute("aria-expanded", "false");
     $(`#body-${key}`).hidden = true;
@@ -4466,7 +4562,7 @@ ${body}
       }
     }, 300);
   }
-  function keyboardGrid(wrap, act) {
+  function keyboardGrid(wrap) {
     wrap.addEventListener("keydown", (e) => {
       const items = [...wrap.querySelectorAll('[role="radio"]')];
       const i = items.indexOf(document.activeElement);
@@ -4483,7 +4579,6 @@ ${body}
       e.preventDefault();
       next = Math.max(0, Math.min(items.length - 1, next));
       items[next].focus();
-      act(items[next].dataset.id);
     });
   }
   function columnCount(wrap, items) {
@@ -4512,12 +4607,7 @@ ${body}
       el.textContent = money;
     });
     markSteps();
-    const panes = Math.max(1, paneCount(state));
-    document.querySelectorAll('.field[data-group="grille"] .tile').forEach((b) => {
-      const meta = b.querySelector(".tile__meta");
-      const o = byId(GRILLES, b.dataset.id);
-      if (meta && o) meta.textContent = deltaLabel(Math.max(0, o.delta) * panes);
-    });
+    repriceOptions(state);
     $("#code").textContent = encodeCode(state);
     const win = byId(WINDOWS, state.window);
     const grille = byId(GRILLES, state.grille);
@@ -4545,6 +4635,7 @@ ${body}
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.href = wa;
     });
+    document.documentElement.classList.add("is-live");
     announce(describe(state));
     armGrip();
   }
@@ -4803,8 +4894,12 @@ ${body}
     }
   };
   window.__up = 1;
+  try {
+    clearTimeout(window.__downTimer);
+  } catch {
+  }
   document.addEventListener("DOMContentLoaded", guard(() => {
-    $("#phone-link").href = `tel:${PHONE_E164}`;
+    $("#phone-link").href = `tel:${PHONE_TEL}`;
     $("#phone-link").textContent = PHONE_DISPLAY;
     init();
   }));

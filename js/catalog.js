@@ -557,6 +557,24 @@ export const declaredFinish = o => !o || !o.finish ? null
                      || (f.aliases || []).includes(o.finish)) || null);
 
 /**
+ * How a colour is named in writing — chart code and whose chart it is.
+ *
+ * ⚠ IT IS NOT A RAL NUMBER. Five places printed `RAL ${c.ral}`: the message,
+ * the spec table, `#summary`, the drawing's `aria-label` and the swatch's own
+ * title. Every one of them was asserting something untrue — `ral` holds Rav
+ * Bariach's chart code, as the COLOURS block above says where it defines
+ * them, and the RAL numbers this project once invented were retired into
+ * `aliases` exactly because they were wrong. RAL Classic is four digits,
+ * 1000–9023, no suffix; `0097D`, `RB09D`, `6459D` and `2030D` are not RAL
+ * designations and name nothing a supplier can fill.
+ *
+ * The failure mode is the brass Coral lockset's: a fact in the order that the
+ * customer never chose and nobody manufactures. One helper, so the five
+ * readers cannot drift apart again.
+ */
+export const colourCode = c => `רב בריח ${c.ral}`;
+
+/**
  * The single tone THE DRAWING paints metal in.
  *
  * ⚠ This used to be documented as "the finish this door is built in", and that
@@ -679,7 +697,13 @@ export function glazedPanels(state) {
      leaf's window shape; it is its own fixed light, and it is there whether or
      not the leaf has a window at all. That is the panel the price could not
      see. */
-  if (size.sideGlazed) {
+  /* ⚠ `> SIDE_OPENING_MIN` HERE TOO. This push used to be unconditional, so a
+     glazed side narrower than the renderer will cut got counted and charged
+     for while the drawing emitted a negative width — the price billing for a
+     pane that is not there. Both branches ask the same question now. Today's
+     only glazed band is 400, so nothing changes for any door on the site; the
+     day somebody adds a narrow one, the two answers still agree. */
+  if (size.sideGlazed && size.side > SIDE_OPENING_MIN) {
     out.push({ id: 'side', panes: 1,
                he: 'חלון הצד', inHe: 'בחלון הצד', isHe: 'זיגוג קבוע' });
   } else if (rows && size.side > SIDE_OPENING_MIN) {

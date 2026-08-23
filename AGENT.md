@@ -145,16 +145,31 @@ they disagree with the drawing often enough to be worth running:
 
 | | |
 |---|---|
-| `npm test` | ~930k assertions, string-level |
-| `npm run audit` | the real page at five viewports, clicking every option |
+| `npm test` | string-level assertions — it prints its own total, which grows |
+| `npm run audit` | the real page at every viewport in `VIEWS`, clicking every option |
 | `npm run profile` | the leaf's vertical fall against the corpus median |
 | `npm run collide` | real `getBBox()` geometry; `-- all` and `-- boxes` too |
 | `npm run recreate` | ten doors beside ten photographs |
 | `npm run against` | each design and grip beside its own source doors, cropped |
 | `npm run shot` | screenshots of twelve states |
 
+⚠ **Three of these were lying, and what they now check is new.** Five agents
+driving the shipped site found 43 faults that every instrument here called
+green — see `CLAUDE.md` §0b. What changed:
+
+- `npm test` now **builds `js/` and compares it to `assets/bundle.js`**. It
+  could not see a stale bundle before, while `README.md` said it could.
+- `npm run audit` now **scrolls the page** — nothing in the repo ever did, which
+  is how the stage came to be un-pinned at every width with no instrument
+  noticing — and carries two more failure routes: the stylesheet 404ing, and
+  the bundle STALLING rather than failing (an abort resolves and the inline
+  guard catches it; a stall never resolves and nothing did).
+- the sheet staleness check hashes the **page**, not three drawing files.
+  `recreate`, `corpus` and `against` all photograph `index.html?bare=1`, so CSS
+  and markup are their inputs too, and were unhashed.
+
 **`research/works/` holds 129 photographs of doors Peretz actually built**, and
-33 hand-measured records. When you want to know what a real door looks like,
+31 hand-measured records in `research/works/data2`. When you want to know what a real door looks like,
 look at one. Comparing against a photograph is how nearly every good change in
 this repo was found.
 

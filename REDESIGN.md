@@ -170,20 +170,30 @@ Two fixes, both already promised in `PLAN.md` and both unbuilt: put the bare
 becomes a WhatsApp with no door in it, instead of a dead button); and prerender
 the default door into `index.html` (`PLAN.md` §8.1 asks for it by name).
 
-### 1.7 A landmine at `renderer.js:4974`
+### 1.7 A landmine in `describe()` — ✅ FIXED
 
-`byId(GLAZINGS, state.glazing)` — `GLAZINGS` was deleted from the catalog with
-the glazing axis. Any state carrying `glazing` throws `ReferenceError` from
+`byId(GLAZINGS, state.glazing)` — `GLAZINGS` was deleted from the catalogue
+with the glazing axis. Any state carrying `glazing` threw `ReferenceError` from
 both `render()` and `describe()`, which by §1.6 blanks the whole page.
 
-**It is not currently reachable**: `fromQuery` strips `z=`, so `state.glazing`
-can never be set from a URL. This is a trap for the next person, not a live
-bug — recorded here at its true severity, not the severity it first appeared to
-have.
+**It was never reachable**: `fromQuery` strips `z=`, so `state.glazing` could
+not be set from a URL. A trap for the next person, not a live bug — recorded at
+its true severity, not the severity it first appeared to have.
 
-### 1.8 The grip controls are unusable between 1100 and 1200 px — right now
+Gone: the call site was removed, and `grep -rn GLAZINGS js/` now returns a
+single hit, a historical sentence in `js/catalog.js`.
 
-`audit.mjs:28` visits 390, 320, 834, 1280, 1680. The three-column layout begins
+⚠ This heading, this file at §5, and `CLAUDE.md` all used to cite it as
+**`renderer.js:4974`** — a line that today holds an unrelated key-slot helper.
+**Cite symbols, not line numbers.** A line number in prose is a claim with no
+test behind it, and it rots in complete silence: three separate documents went
+on pointing a future reader at the wrong line.
+
+### 1.8 The grip controls were unusable between 1100 and 1200 px — ✅ FIXED
+
+`VIEWS` in `tools/audit.mjs` visited 390, 320, 834, 1280, 1680 (the paragraph
+below cited it as `audit.mjs:28`; it is not there any more either). The
+three-column layout begins
 at **1100**. Nothing has ever opened the band between 834 and 1280. Measured,
 Shiran handle:
 
@@ -551,6 +561,53 @@ hides its own corrections teaches nothing.
 | 3.4 | `ink()` deduplicated | worst door 374 KB → 284 KB |
 | 4 | the look | card, numbers, headline, navigator, spec table, circles, nav, badges, saving |
 
+### 4b.1 A second reading, by five agents driving the shipped site
+
+Five investigators were then turned on the finished thing — one per lane, so
+they could not all find the same defect: a browser at every width, the wire
+format, the order against the drawing, the SVG itself, and the cold open. They
+found **43 verified faults in code that was green on every instrument in the
+repo.** Every one below was reproduced independently before it was fixed.
+
+The pattern is worth naming, because it is the same one four times over: **an
+instrument that cannot see the thing it is named after.**
+
+| what was wrong | why nothing caught it |
+|---|---|
+| `.stage-wrap` was never `sticky` at any width — a media query above the base rule that re-declares `position: relative`, and a media query adds no specificity. The door was 78 px off the top of a 390×844 phone by the time the colour grid was in reach | **nothing in the repo ever scrolled the page** |
+| `npm test` could not see a stale bundle, and `README.md` said it could. Skipping the build leaves the bundle's bytes untouched, so its hash matches its stamp, so the suite is green while Pages serves the previous site | the check hashed the bundle against `index.html`, never `js/` against the bundle. `js/app.js` was not imported by the suite at all |
+| `recreate`, `corpus` and `against` all photograph `index.html?bare=1`, and their staleness check hashed only the three drawing files. The repo carries the proof: a commit touching **only** CSS and markup moved ten committed sheets while the stamp file had a one-line diff | `SHEET_DEPS` was a hand-kept list, and its own comment said the three tools "crop the door and nothing else" |
+| `knobPlate` tagged itself `data-hw="handle"` — the pull-grip marker — so on 1,730 designs with **no** pull handle, the lock furniture became the draggable grip: focusable, announced as "handle position, drag it", dragging did nothing, and a `gp=` for a handle that does not exist went into the order | the suite asserted the mirror — *a grip never draws lock furniture* — and only the mirror |
+| `?s=constructor` was accepted as a size band. `SIZES` is a plain object, so every `Object.prototype` key is truthy: `notice: null`, `priceAgorot` → **NaN**, a spec row reading `מידה: undefined`, `NaN ₪` in the card, the dock and the WhatsApp message — while `encodeCode` returned a *standard* door's code | eighteen `SIZES[state.size] \|\| SIZES.standard` guards downstream, all defeated by an inherited key, all written because this line was expected to hold |
+| opened the way `README.md` recommends with a star — Download ZIP, double-click — the order's one link read `file:///C:/Users/…/Downloads/index.html`, a path on the customer's own disk | `shareUrl` already knew about `file://`; it was written to fix `location.origin` returning `"null"`, and handed back the local path anyway |
+| every `tel:` link was `tel:972532197466` with no `+`. RFC 3966 reads that as a *local* number, so a handset dials it domestically while the label beside it says 053-219-7466 | one constant served both `wa.me` (which wants the digits bare) and `tel:` (which does not) |
+| the toast sat over the dock at `z-index: 50` with `pointer-events: auto`, so the green send button — the site's one call to action — was dead for four seconds at a time, and repair toasts fire on every cross-axis click | no instrument ever put a toast up and then tried to press the button under it |
+| arrowing through a tile group *chose* each option in turn, and `choose` runs `repair`: browsing the face-design list removed a window and its ironwork, ₪1,540, unrecoverably | the audit asserted the opposite — that arrowing must change the door |
+| the window and size tiles printed a one-panel surcharge for a per-panel charge: `+₪620` beside a price that then moved ₪1,240 | only the *grille* tiles were repriced, under a comment correctly stating that nothing else is priced by a count — and missing that two things *change* the count |
+| a דלת וחצי draws two lights and the order named one. `glazedPanels()` had built the second sentence all along and nothing read it; the side panel appeared only if the customer also bought ironwork | the fact was appended to the grille row instead of standing on its own |
+| every colour was labelled `RAL` in front of a code that is not a RAL number — `RAL 0097D`, `RAL RB09D` name nothing orderable | the catalogue says plainly where it defines them that the codes are Rav Bariach's |
+
+Also fixed: `ללא ידית משיכה` vanished from the order entirely; eleven strips and
+four strips were both "strips"; a stalled bundle left the page styled and inert
+for ever, because the guard for that is a script *after* the one that stalls;
+the send button's label contradicted its own href on every load until `paint()`
+ran; losing the stylesheet drew every door on a **black** ground; the fold stuck
+in the wrong mode across 1100 px; the navigator scrolled headings behind the
+dock and gave its four buttons no accessible name; the saved-list delete sat
+nearer the *next* design than its own; the room stopped short of the stage on
+every phone in landscape; `glassOrGrilleLine()` was a dead second copy of the
+naming rule, in the file whose whole thesis is that the second copy is how the
+first comes to be wrong.
+
+⚠ **And one I introduced while fixing another.** Moving the sticky rule, I left
+its explanation where the rule had been — after a comment that was already
+closed. The prose became loose CSS, the parser swallowed the desktop `@media`
+block behind it, and the three-column layout silently stopped applying: the page
+grew to 4,185 px, the grip fell below the fold, and dragging broke at every
+width ≥ 1100. **The new scroll assertion caught it on the first run.** An
+instrument written that morning found a fault made that afternoon, which is the
+entire argument for writing them.
+
 **Still open, and all of it is Peretz's:** the size bands (§8), the warranty
 term, the metallic range and made-in-Israel (§9), the lock finish (§2b1), the
 two-panel price (§4b), and question 1 — right hand or left — which decides
@@ -602,7 +659,7 @@ of it can regress the app.
     those same rows. **This is where the look plan and the correctness plan are
     the same work.**
 12. **`href="https://wa.me/972532197466"` in the markup**, upgraded by JS; wrap
-    `init()` in a `try`; add a `<noscript>` (§1.6). Fix `renderer.js:4974` (§1.7).
+    `init()` in a `try`; add a `<noscript>` (§1.6). Remove the `GLAZINGS` landmine from `describe()` (§1.7).
 
 ### Stage 2 — the one `VERSION` bump, taken deliberately · **1 day**
 
