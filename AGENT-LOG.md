@@ -23,6 +23,68 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-23 10:52 UTC — run 23: nothing worth changing. Drove the saved-designs drawer, which nothing had
+
+**Looked at:** no new pushes, so the newest customer-facing surface — the saved
+designs drawer from Stage 4, which is the only state this site keeps between
+visits and which no run had ever driven.
+
+**Instruments:** test ✓ (5,674,573) · audit ✓ · profile ✓ · collide ✓ (base /
+`all` / `boxes`) · recreate ✓ · shot ✓. Tree clean.
+
+**Changed:** nothing.
+
+**1. The `tablet.png` question is settled, and run 22's answer holds under a
+sharper test.** I had called the recurring diff environmental. The check that
+could have overturned it: `0148903` re-stamped without regenerating, so if the
+sheet had been stale then, the stamp would have frozen the staleness in place.
+It did not — `7ed3fdf`, the newest commit, regenerated `tablet.png` itself. So
+the file IS current and the two machines genuinely round one hairline
+differently. **Expect it dirty after every `shot` on this machine; do not
+commit it.**
+
+**2. The saved drawer, driven end to end.** Every path a customer has:
+
+    save                    count 0 → 1, localStorage `dm.saved.v1`
+    what is stored          the QUERY STRING, not a code — links are the
+                            durable format, so aliases keep it readable forever
+    survives a reload       yes, count still 1
+    restore                 comes back as DM-P096AHR0 — the exact door saved
+    delete                  count 0, storage `[]`
+    save the same door 5x   stays at 1 (deduplicated)
+    save 30 more            capped at 6
+    which 6                 newest-first, oldest dropped
+
+**And it survives a version bump, which is the real durability question for a
+new persistent store.** Planted designs saved under older wire formats: a
+version-10 `g=lattice` came back as `זכוכית מעוצבת` and a version-9
+`w=duo&z=obscure&g=bars` as `חלון מלבני · רשת` — every retired id aliasing to
+its successor, `z=` ignored, no notice, no console error. Storing the link
+rather than the code is what makes that work, and it is the right choice.
+
+⚠ **One rough edge, recorded rather than fixed.** A stored entry that is not a
+query string at all — I planted the literal text `total rubbish, not a query at
+all` — is shown in the drawer as a legitimate saved design and restores as the
+DEFAULT door, with nothing to say it is not one the customer saved. Against the
+project's own standard (`fromQuery` never silently substitutes) that is a
+blemish. Against reachability it is close to nothing: the site only ever writes
+valid query strings, and a truncated store fails `JSON.parse` outright and is
+caught, so producing a garbage *element* needs valid JSON containing a bad
+string — hand-editing. There is precedent for handling unauthored malformed
+input quietly (a hand-edited `gp=` goes home without a notice, deliberately).
+Not worth a change; worth knowing.
+
+⚠ **And my own comparison was wrong once more.** I flagged the cap as not
+keeping the newest six. It does — the list is newest-first, so the kept set was
+the newest six in reverse, and my equality check ignored ordering. Reading the
+actual values rather than the verdict is what caught it.
+
+**Left alone:** everything.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-23 05:51 UTC — run 22: nothing worth changing, and a PNG diff that is NOT evidence
 
 **Looked at:** the five commits that landed Stage 4 and the 43-fault sweep, and
