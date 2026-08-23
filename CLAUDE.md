@@ -44,6 +44,20 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Bare mode has to stay bare, and forgetting it faked a drawing regression.**
+  `npm run profile` reported the moulding's bead against the face at **-5.2%**
+  on the upper panel against **-0.9%** before, and nothing about the drawing
+  had changed. The headline lives INSIDE `.stage-wrap` — it has to, because
+  above 1100 px a heading beside `.layout` takes its height straight out of the
+  door — and `.stage-wrap` is the one page element `?bare=1` KEEPS. So the
+  stage lost 70 px, the door was drawn smaller, and a 5% difference read across
+  a handful of pixels moved. Fewer pixels, not a different door.
+  ⚠ **Bare mode exists so the harness photographs THE DRAWING and no page
+  around it**, so anything added to the stage wrap belongs in that hide-list
+  the same day: the headline, the navigator, the trust band, the saved drawer
+  and the grip bar are all in it now. Back to `-0.9% / +0.7%`, ratio 1.016 —
+  the numbers from before the look work, to the digit.
+
 - **Stage 4, second half — the navigator, the spec table, circles, and the
   chrome.** The look plan is finished.
   ⚠ **The mockup's step indicator is a NAVIGATOR, and a progress bar there

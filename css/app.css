@@ -1015,7 +1015,19 @@ body {
 
 
 /* ── bare mode: the stage only, for tools/compare.mjs ─────── */
-.is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar { display: none; }
+/* ⚠ `.stage__h1` IS IN THIS LIST, and leaving it out cost a false alarm.
+   The headline lives INSIDE `.stage-wrap` (it has to; above 1100 px a heading
+   beside `.layout` takes its height out of the door), and `.stage-wrap` is the
+   one page element bare mode KEEPS. So the headline stayed, the stage lost
+   70 px, the door was drawn smaller, and `npm run profile`'s bead-against-face
+   measurement — a 5% difference read across a handful of pixels — reported the
+   upper panel at -5.2% against -0.9% before. Nothing about the drawing had
+   changed; there were simply fewer pixels to measure it in.
+   Bare mode exists so the harness photographs THE DRAWING and no page around
+   it. Anything added to the stage wrap belongs here the same day. */
+.is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
+.is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
+.is-bare .grip-bar { display: none; }
 .is-bare .layout { display: block; block-size: 100dvh; }
 .is-bare .stage-wrap { block-size: 100dvh; padding: 0; border: 0; }
 /* Natural framing, not the full-bleed room: app.js leaves the viewBox alone
