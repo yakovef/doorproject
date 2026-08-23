@@ -23,6 +23,60 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-23 05:51 UTC — run 22: nothing worth changing, and a PNG diff that is NOT evidence
+
+**Looked at:** the five commits that landed Stage 4 and the 43-fault sweep, and
+the redesigned page at 390 and 1440. `PAGE_DEPS` from last run was adopted and
+the sheets re-stamped under it.
+
+**Instruments:** test ✓ (5,674,573) · audit ✓ · profile ✓ · collide ✓ (base /
+`all`) · recreate ✓ · shot ✓. Tree clean.
+
+**Changed:** nothing.
+
+**The thing worth writing down is a finding I did NOT make.** Regenerating the
+sheets left `screenshots/tablet.png` differing from the committed copy, while
+the stamp guard passed — the exact shape of run 21, five hours after run 21.
+Ran the same control: three regenerations, all byte-identical to each other,
+all differing from committed. Last run that was enough, and it was right.
+
+**This time it is not, and the difference is the point.** Measured, the diff is
+**two rows out of 3,986** — y 1488–1489, full width, largest channel delta 29:
+
+    committed      row 1488  214,211,203     row 1490  245,243,239
+    regenerated    row 1488  239,237,232     row 1490  245,243,239
+
+The floor-to-wall boundary in the drawing lands **one CSS pixel higher** in my
+render. Nothing about the page changed; a fractional layout value rounded the
+other way. Deterministic *within* a machine and different *across* one, which
+is why three identical runs prove nothing here.
+
+⚠ So: **a modified PNG after `npm run shot` is not evidence of staleness.**
+Run 21's was — the diff there was a code string, `DM-M00010G0` against
+`DM-P00010GA`, content a person could read. This one is a hairline. The
+question is never "does git report a diff" but "what changed inside it", and
+committing my copy would have flipped the file back and forth between machines
+for nothing. This is also the argument for the stamp being the mechanism rather
+than byte comparison — the stamp asks what the page is BUILT from, which does
+not move with sub-pixel rounding.
+
+**A second near-miss, same shape.** In the full-page phone capture the dock sits
+across section 03 and appears to bury it. That is `position: fixed` in a
+full-page screenshot, which renders once at its viewport offset. Driven on a
+real 390×844 viewport instead, all four sections reach **69/69 px uncovered and
+clickable**. Reported nothing.
+
+**The redesign itself reads well** — the white card, the 01–04 navigator, the
+spec table with its swatch, the headline, the trust badges. `DM-P4040481` on
+screen is a version-11 code, and the colour row now says *(רב בריח 0097D)*
+rather than RAL, which it never was.
+
+**Left alone:** everything. Two things looked like faults and neither was.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-23 01:02 UTC — run 21: the twelve page sheets were showing a code the site now refuses
 
 **Looked at:** the five Stage 1–2 commits, including VERSION 11 and the check
