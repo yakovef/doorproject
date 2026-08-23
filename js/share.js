@@ -9,6 +9,7 @@ import { byId, COLOURS, declaredFinish, DETAILS, GRILLES, grillePlacement, HANDI
          LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { gripAt, gripHome } from './renderer.js';
+import { specLines } from './spec.js';
 import { encodeCode, toQuery } from './url-state.js';
 
 export const PHONE_DISPLAY = '053-219-7466';
@@ -148,31 +149,25 @@ export const GRIP_ILLUSTRATIVE = 'להמחשה — נקבע בהתקנה';
  * furniture in a finish, and if he says so it becomes `LOCKSETS[].finish` and
  * comes back through this same helper. It does not come back as a guess.
  */
-function gripLines(state) {
-  const h = byId(HANDLES, state.handle);
-  if (h.style === 'none') return [];
-  const fin = declaredFinish(h);
+function gripAddendum(state) {
   const { flat, shifted } = gripDeparture(state);
   return [
-    /* TWO FACTS, and they are not the same KIND of fact, so they are not one
-       line.
+    /* TWO FACTS, and they are not the same KIND of fact.
 
-       THE BAR LIES DOWN is something Peretz BUILDS TO, so it sits on the
-       handle's own line in the same breath as which handle it is. It is named
-       whenever it is true, not only when somebody asked for it — `gripHome`
-       lays a bar down by itself where nothing upright fits.
+       THE BAR LIES DOWN is something Peretz BUILDS TO — a horizontal pull is
+       different drilling from an upright one — so it rides on the handle's own
+       spec row, added here because `js/spec.js` cannot see it: the grip
+       geometry lives in the renderer, and rows that imported it would make
+       `renderer -> spec -> renderer` a cycle. It is named whenever it is true,
+       not only when somebody asked: `gripHome` lays a bar down by itself where
+       nothing upright fits, on 88 designs nobody has touched.
 
        THE BAR IS NOT IN THE USUAL PLACE is a PICTURE of what the customer had
        in mind. It was ruled from outside that the position is not a
-       specification and that the final spot is set on site; the stage says so
-       under the door in exactly these words. The order says the same thing in
-       the same register rather than a bolder one, and points at the link,
-       which carries the millimetres in `gp=`. Printing the millimetres HERE
-       would state a measurement as a specification, which is the thing that
-       ruling says it is not. Whether Peretz would rather have the numbers is
-       his call: ASK-PERETZ.md §9b. */
-    `ידית משיכה: ${h.he}${fin ? ` · ${fin.he}` : ''}`
-      + (flat ? ' — מותקנת לרוחב הדלת' : ''),
+       specification and that the final spot is set on site — which is exactly
+       why it is an ADDENDUM here and not a row in the spec. The stage says the
+       same thing under the door, in the same words, from `GRIP_ILLUSTRATIVE`. */
+    ...(flat ? ['הערה: ידית המשיכה מותקנת לרוחב הדלת'] : []),
     ...(shifted ? [`מיקום הידית: הזזתי אותה ממקומה הרגיל. ${GRIP_ILLUSTRATIVE}, `
                    + 'והמיקום המדויק בקישור.'] : []),
   ];
@@ -180,50 +175,20 @@ function gripLines(state) {
 
 /** The message Peretz receives. */
 export function message(state) {
-  const c = byId(COLOURS, state.colour);
-  const h = byId(HANDINGS, state.handing);
-  const s = SIZES[state.size] || SIZES.standard;
-  const w = byId(WINDOWS, state.window);
-  const g = byId(GRILLES, state.grille);
-
   return [
     'שלום, בחרתי דלת באתר:',
     '',
-    `צבע: ${c.he} (RAL ${c.ral})`,
-    `חלון: ${w.he}`,
-    /* Named only when there is a window to put it in: a line about the glass
-       on a solid door is a line Peretz has to read and discard.
-       AND NAMED FOR WHAT IT IS. One list now covers ironwork bolted over the
-       pane and patterns etched into it, and they are two different things to
-       order from two different suppliers — "סורג: זכוכית מחורצת" reads as a
-       grille made of reeded glass, which is not a thing. `glass` is already on
-       the catalogue entry because the drawing needs it; the order needs it
-       for a plainer reason. */
-    /* ⚠ `isGlazed`, not `w.rects.length`. This asked about the LEAF's own
-       window, and on a sidelight door the glass is beside the leaf: the rules
-       allow a grille, the drawing puts wrought iron in that panel, the price
-       charges ₪620 for it — and this line, the one Peretz actually builds
-       from, said nothing at all. The customer pays for ironwork and the order
-       does not mention it, which is PLAN.md §0 failing at the exact point it
-       exists to succeed. Third file to answer this question its own way; there
-       is one answer now and it is in the catalogue. */
-    ...(isGlazed(state) && g.id !== 'none' ? [glassOrGrilleLine(g, state)] : []),
-    /* The grip carries its own finish; `gripLine` has the full account. The
-       finish is still named even though it is no longer chosen — it is a fact
-       about what Peretz has to order, and the TWO grips that depart from
-       brushed nickel, the brass Ella and the brass Shiran, are the reason it
-       is named at all. The comment that stood here said "the one grip", which
-       went stale the day Ella gained `finish: 'brass'` and nobody revisited
-       the sentence. It is named HERE because these are the products it is a
-       fact about. */
-    ...gripLines(state),
-    /* AND NOT ON THIS LINE. `LOCKSETS` declares no finish, so none is printed.
-       What used to be printed here was the GRIP's, and it named lock furniture
-       that is not manufactured. */
-    `מנעול וידית: ${byId(LOCKSETS, state.lockset).he}`,
-    ...(state.detail !== 'plain' ? [`עיצוב: ${byId(DETAILS, state.detail).he}`] : []),
-    `מידה: ${s.he}`,
-    `פתיחה: ${h.he}`,
+    /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door
+       itself, and so did `#summary`, and so did `describe()`, and the three
+       disagreed — the grille was free on every sidelight door for weeks
+       because they asked "is there glass here" three ways, and after two of
+       them were fixed `describe()` still announced a door with no ironwork on
+       it while this message charged ₪620 for some. One statement now.
+       What stays here is what is NOT a specification: the grip's position
+       (ruled from outside to be a picture settled on site, not something
+       Peretz builds to), the money, the code and the link. */
+    ...specLines(state),
+    ...gripAddendum(state),
     `מחיר באתר: ${formatAgorot(priceAgorot(state))} — כולל התקנה ומע״מ`,
     `קוד: ${encodeCode(state)}`,
     '',

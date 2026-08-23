@@ -510,6 +510,51 @@
     return "+" + fmt.format(agorot / 100);
   }
 
+  // js/spec.js
+  function specRows(state2) {
+    const c = byId(COLOURS, state2.colour);
+    const w = byId(WINDOWS, state2.window);
+    const g = byId(GRILLES, state2.grille);
+    const hd = byId(HANDLES, state2.handle);
+    const lk = byId(LOCKSETS, state2.lockset);
+    const dt = byId(DETAILS, state2.detail);
+    const sz = SIZES[state2.size] || SIZES.standard;
+    const hn = byId(HANDINGS, state2.handing);
+    const fin = declaredFinish(hd);
+    const rows = [
+      { key: "colour", label: "צבע", id: c.id, hex: c.hex, value: `${c.he} (RAL ${c.ral})` },
+      { key: "window", label: "חלון", id: w.id, value: w.he }
+    ];
+    if (isGlazed(state2) && g.id !== "none") {
+      const label = g.glass ? "זכוכית" : "סורג";
+      const name = g.he.startsWith(label + " ") ? g.he.slice(label.length + 1) : g.he;
+      rows.push({
+        key: "grille",
+        label,
+        id: g.id,
+        value: `${name}${grillePlacement(state2)}`
+      });
+    }
+    if (hd.style !== "none") {
+      rows.push({
+        key: "handle",
+        label: "ידית משיכה",
+        id: hd.id,
+        value: `${hd.he}${fin ? ` · ${fin.he}` : ""}`
+      });
+    }
+    rows.push({ key: "lockset", label: "מנעול וידית", id: lk.id, value: lk.he });
+    if (dt.id !== "plain") {
+      rows.push({ key: "detail", label: "עיצוב", id: dt.id, value: dt.he });
+    }
+    rows.push({ key: "size", label: "מידה", id: state2.size, value: sz.he });
+    rows.push({ key: "handing", label: "פתיחה", id: hn.id, value: hn.he });
+    return rows;
+  }
+  var specLines = (state2) => specRows(state2).map((r) => `${r.label}: ${r.value}`);
+  var summaryLine = (state2) => specRows(state2).map((r) => r.value).join(" · ");
+  var describeSentence = (state2) => `דלת כניסה פלדה, ${specRows(state2).map((r) => r.value).join(", ")}.`;
+
   // js/colour.js
   var clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
   function toRgb(hex) {
@@ -3345,23 +3390,12 @@ ${body}
     </g>`;
   };
   function describe(state2, lang = "he") {
+    if (lang === "he") return describeSentence(state2);
     const c = byId(COLOURS, state2.colour);
-    const h = byId(HANDINGS, state2.handing);
     const w = byId(WINDOWS, state2.window);
-    const g = byId(GRILLES, state2.grille);
-    const hd = byId(HANDLES, state2.handle);
-    const lk = byId(LOCKSETS, state2.lockset);
-    const dt = byId(DETAILS, state2.detail);
-    const gfn = declaredFinish(hd);
-    const s = SIZES[state2.size] || SIZES.standard;
-    if (lang === "he") {
-      const grille = w.rects.length && g.id !== "none" ? `, ${g.he}` : "";
-      const glass = "";
-      const det = dt.id === "plain" ? "" : `, ${dt.he}`;
-      const grip = hd.style === "none" ? "" : `${hd.he}${gfn ? ` ${gfn.he}` : ""}, `;
-      return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}, ${s.he}, פתיחה ${h.he}.`;
-    }
-    return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
+    const s2 = SIZES[state2.size] || SIZES.standard;
+    const h = byId(HANDINGS, state2.handing);
+    return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s2.en}, ${h.en}`;
   }
   function windowGlyph(win) {
     const W = 950, H = 2100, pad = 40;
@@ -3969,11 +4003,6 @@ ${body}
   function shareUrl(state2) {
     return window.location.href.split(/[?#]/)[0] + toQuery(state2);
   }
-  function glassOrGrilleLine(g, state2) {
-    const label = g.glass ? "זכוכית" : "סורג";
-    const name = g.he.startsWith(label + " ") ? g.he.slice(label.length + 1) : g.he;
-    return `${label}: ${name}${grillePlacement(state2)}`;
-  }
   function gripDeparture(state2) {
     if (byId(HANDLES, state2.handle).style === "none") {
       return { flat: false, shifted: false, moved: false };
@@ -3983,77 +4012,43 @@ ${body}
     return { flat: now.rot === 90, shifted, moved: shifted || now.rot !== home.rot };
   }
   var GRIP_ILLUSTRATIVE = "להמחשה — נקבע בהתקנה";
-  function gripLines(state2) {
-    const h = byId(HANDLES, state2.handle);
-    if (h.style === "none") return [];
-    const fin = declaredFinish(h);
+  function gripAddendum(state2) {
     const { flat, shifted } = gripDeparture(state2);
     return [
-      /* TWO FACTS, and they are not the same KIND of fact, so they are not one
-             line.
+      /* TWO FACTS, and they are not the same KIND of fact.
       
-             THE BAR LIES DOWN is something Peretz BUILDS TO, so it sits on the
-             handle's own line in the same breath as which handle it is. It is named
-             whenever it is true, not only when somebody asked for it — `gripHome`
-             lays a bar down by itself where nothing upright fits.
+             THE BAR LIES DOWN is something Peretz BUILDS TO — a horizontal pull is
+             different drilling from an upright one — so it rides on the handle's own
+             spec row, added here because `js/spec.js` cannot see it: the grip
+             geometry lives in the renderer, and rows that imported it would make
+             `renderer -> spec -> renderer` a cycle. It is named whenever it is true,
+             not only when somebody asked: `gripHome` lays a bar down by itself where
+             nothing upright fits, on 88 designs nobody has touched.
       
              THE BAR IS NOT IN THE USUAL PLACE is a PICTURE of what the customer had
              in mind. It was ruled from outside that the position is not a
-             specification and that the final spot is set on site; the stage says so
-             under the door in exactly these words. The order says the same thing in
-             the same register rather than a bolder one, and points at the link,
-             which carries the millimetres in `gp=`. Printing the millimetres HERE
-             would state a measurement as a specification, which is the thing that
-             ruling says it is not. Whether Peretz would rather have the numbers is
-             his call: ASK-PERETZ.md §9b. */
-      `ידית משיכה: ${h.he}${fin ? ` · ${fin.he}` : ""}` + (flat ? " — מותקנת לרוחב הדלת" : ""),
+             specification and that the final spot is set on site — which is exactly
+             why it is an ADDENDUM here and not a row in the spec. The stage says the
+             same thing under the door, in the same words, from `GRIP_ILLUSTRATIVE`. */
+      ...flat ? ["הערה: ידית המשיכה מותקנת לרוחב הדלת"] : [],
       ...shifted ? [`מיקום הידית: הזזתי אותה ממקומה הרגיל. ${GRIP_ILLUSTRATIVE}, והמיקום המדויק בקישור.`] : []
     ];
   }
   function message(state2) {
-    const c = byId(COLOURS, state2.colour);
-    const h = byId(HANDINGS, state2.handing);
-    const s = SIZES[state2.size] || SIZES.standard;
-    const w = byId(WINDOWS, state2.window);
-    const g = byId(GRILLES, state2.grille);
     return [
       "שלום, בחרתי דלת באתר:",
       "",
-      `צבע: ${c.he} (RAL ${c.ral})`,
-      `חלון: ${w.he}`,
-      /* Named only when there is a window to put it in: a line about the glass
-         on a solid door is a line Peretz has to read and discard.
-         AND NAMED FOR WHAT IT IS. One list now covers ironwork bolted over the
-         pane and patterns etched into it, and they are two different things to
-         order from two different suppliers — "סורג: זכוכית מחורצת" reads as a
-         grille made of reeded glass, which is not a thing. `glass` is already on
-         the catalogue entry because the drawing needs it; the order needs it
-         for a plainer reason. */
-      /* ⚠ `isGlazed`, not `w.rects.length`. This asked about the LEAF's own
-         window, and on a sidelight door the glass is beside the leaf: the rules
-         allow a grille, the drawing puts wrought iron in that panel, the price
-         charges ₪620 for it — and this line, the one Peretz actually builds
-         from, said nothing at all. The customer pays for ironwork and the order
-         does not mention it, which is PLAN.md §0 failing at the exact point it
-         exists to succeed. Third file to answer this question its own way; there
-         is one answer now and it is in the catalogue. */
-      ...isGlazed(state2) && g.id !== "none" ? [glassOrGrilleLine(g, state2)] : [],
-      /* The grip carries its own finish; `gripLine` has the full account. The
-         finish is still named even though it is no longer chosen — it is a fact
-         about what Peretz has to order, and the TWO grips that depart from
-         brushed nickel, the brass Ella and the brass Shiran, are the reason it
-         is named at all. The comment that stood here said "the one grip", which
-         went stale the day Ella gained `finish: 'brass'` and nobody revisited
-         the sentence. It is named HERE because these are the products it is a
-         fact about. */
-      ...gripLines(state2),
-      /* AND NOT ON THIS LINE. `LOCKSETS` declares no finish, so none is printed.
-         What used to be printed here was the GRIP's, and it named lock furniture
-         that is not manufactured. */
-      `מנעול וידית: ${byId(LOCKSETS, state2.lockset).he}`,
-      ...state2.detail !== "plain" ? [`עיצוב: ${byId(DETAILS, state2.detail).he}`] : [],
-      `מידה: ${s.he}`,
-      `פתיחה: ${h.he}`,
+      /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door
+         itself, and so did `#summary`, and so did `describe()`, and the three
+         disagreed — the grille was free on every sidelight door for weeks
+         because they asked "is there glass here" three ways, and after two of
+         them were fixed `describe()` still announced a door with no ironwork on
+         it while this message charged ₪620 for some. One statement now.
+         What stays here is what is NOT a specification: the grip's position
+         (ruled from outside to be a picture settled on site, not something
+         Peretz builds to), the money, the code and the link. */
+      ...specLines(state2),
+      ...gripAddendum(state2),
       `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — כולל התקנה ומע״מ`,
       `קוד: ${encodeCode(state2)}`,
       "",
@@ -4391,32 +4386,7 @@ ${body}
     $("#code").textContent = encodeCode(state);
     const win = byId(WINDOWS, state.window);
     const grille = byId(GRILLES, state.grille);
-    $("#summary").textContent = [
-      colour.he,
-      `RAL ${colour.ral}`,
-      win.he,
-      /* ⚠ `isGlazed`, not `win.rects.length`. FOURTH place to ask this question
-         its own way — the price, the WhatsApp message and this line all asked
-         about the leaf's own window, and a sidelight door's glass is beside the
-         leaf. The spec line under the price is what a customer proof-reads
-         before they send, so on a sidelight with ironwork it showed them a door
-         with no ironwork in it and then charged for some. */
-      ...isGlazed(state) && grille.id !== "none" ? [grille.he] : [],
-      /* ⚠ The grip's finish is on the GRIP, and it is on this line because THIS
-         is the line a customer proof-reads before pressing send. It was on
-         neither: the message named a finish and named it on the wrong fitting,
-         and this line named none at all — so the two disagreed and the
-         disagreement was invisible. A customer could read this line, find it
-         correct, and send Peretz an order for a brass Coral, which is not a
-         product. One statement, however many places show it. */
-      ...byId(HANDLES, state.handle).style === "none" ? [] : [
-        byId(HANDLES, state.handle).he + (declaredFinish(byId(HANDLES, state.handle)) ? ` ${declaredFinish(byId(HANDLES, state.handle)).he}` : "")
-      ],
-      byId(LOCKSETS, state.lockset).he,
-      ...state.detail !== "plain" ? [byId(DETAILS, state.detail).he] : [],
-      size.he,
-      handing.he
-    ].join(" · ");
+    $("#summary").textContent = summaryLine(state);
     const blocked = conflicts(state);
     for (const g of GROUPS) {
       const field = $(`.field[data-group="${g.key}"]`);

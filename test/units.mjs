@@ -13,6 +13,7 @@ import {
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { conflicts, repair } from '../js/rules.js';
+import { describeSentence, specRows, summaryLine } from '../js/spec.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
 
 let pass = 0, fail = 0;
@@ -1454,6 +1455,72 @@ group('every option the customer pays for is named in the message');
    The first assertion is the load-bearing one and it is FALSIFIABLE: it asks
    the DRAWING how many panes it cut and compares that with the number the
    price multiplies by. Change either side alone and it fires. */
+/* ⚠ FOUR PLACES DESCRIBED A DOOR AND THEY DISAGREED, TWICE, FOR MONEY.
+   The grille was free on every sidelight door for weeks because three files
+   asked "is there glass here" three ways. Two were then fixed and `describe()`
+   — the drawing's aria-label, the one description nobody sighted ever sees —
+   was not: on `sidelight / no leaf window / wrought iron` a screen reader
+   announced a door with no ironwork on it while the order beneath charged ₪620
+   for some. §5, twice over, in the artefact PLAN.md §0 calls the product.
+
+   ⚠ AND THE OBVIOUS TEST FOR THIS CANNOT SEE THE DEFECT. Asserting things
+   about `js/spec.js` proves the SOURCE is right; the defect was a SINK that
+   had drifted off its source. So the last assertion in each loop below reads
+   the actual `render()` output and the actual page — hard-coding the
+   aria-label to a fixed string passes every assertion that only reads
+   `spec.js`, which would be this fix wearing the defect's clothes. */
+group('one statement of what the door is, and every reader uses it');
+{
+  globalThis.window = globalThis.window
+    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+  const { message } = await import('../js/share.js');
+  let n = 0, withGrille = 0;
+
+  for (const st of everyState()) {
+    n++;
+    const rows = specRows(st);
+    const said = describeSentence(st);
+    const text = message(st);
+
+    /* 1. Every row reaches the order, and the summary, and the sentence. */
+    for (const r of rows) {
+      ok(text.includes(`${r.label}: ${r.value}`),
+         `row "${r.key}" is not in the order: ${r.label}: ${r.value}`);
+      ok(summaryLine(st).includes(r.value),
+         `row "${r.key}" is not in the spec line: ${r.value}`);
+      ok(said.includes(r.value),
+         `row "${r.key}" is not in the accessible name: ${r.value}`);
+      ok(r.id != null, `row "${r.key}" carries no catalogue id`);
+    }
+    if (rows.some(r => r.key === 'grille')) withGrille++;
+
+    /* 2. A charged grille MUST be a row. This is the money half: the price
+          multiplies by the panel count, so a door that pays for ironwork and
+          does not name it is the original defect returning. */
+    const paid = priceAgorot(st) !== priceAgorot({ ...st, grille: 'none' });
+    if (paid) {
+      ok(rows.some(r => r.key === 'grille'),
+         `${st.size}/${st.window}/${st.grille}: charged for ironwork and no row names it`);
+    }
+
+    /* 3. ⚠ AND THE DRAWING ACTUALLY USES IT. Everything above reads `spec.js`
+          directly and would not notice `render()` ceasing to call `describe()`
+          — which is the exact shape of drift that put the wrong sentence on
+          the drawing in the first place. */
+    if (n % 97 === 0) {
+      ok(render(st).includes(`aria-label="${said}"`),
+         `the drawing's accessible name is not the rows: ${st.size}/${st.window}/${st.grille}`);
+    }
+  }
+  ok(withGrille > 0, 'no design has a grille row — this group is asserting nothing');
+  console.log(`  (${n} doors, one description each, ${withGrille} naming ironwork)`);
+
+  /* 4. The colour row carries a real swatch, because the spec table paints it. */
+  const colourRow = specRows(base).find(r => r.key === 'colour');
+  ok(/^#[0-9A-Fa-f]{6}$/.test(colourRow.hex || ''),
+     `the colour row's swatch is not a hex: ${colourRow.hex}`);
+}
+
 /* ⚠ A DRAGGED HANDLE USED TO REACH PERETZ IN NO FORM AT ALL.
    The customer drags the bar, presses סובבו, the drawing changes — and the
    message was byte for byte the message for the door they started from, while

@@ -44,6 +44,40 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 1 item 11 — `js/spec.js`: one statement of what the door is.** Four
+  places described a door and each did it its own way — the message, `#summary`,
+  `describe()` (the drawing's `aria-label`), and the tiles. They disagreed
+  twice, and both times for money. The grille was free on every sidelight door
+  for weeks because three of them asked "is there glass here" three ways; two
+  were then corrected and **`describe()` was not**, so on `sidelight / no leaf
+  window / wrought iron` a screen reader announced a door with no ironwork on
+  it while the order beneath charged ₪620 for some. §5, twice, in the artefact
+  §0 calls the product.
+  ⚠ **ROWS, not a string.** Three readers need three renderings of the same
+  facts — `label: value` lines, a middot line, one flowing sentence — so the
+  shared thing has to be the FACTS. Rows carry `id` and `hex` too, so the
+  mockup's spec table is this list with a different renderer rather than a
+  fifth description of the door.
+  ⚠ **The grip's position is deliberately NOT a row**, and that exclusion is
+  also what keeps the file importable by the renderer. It is not a
+  specification (ruled from outside; settled on site), so `share.js` adds it as
+  an addendum from `gripDeparture` — and because rows depend on the CATALOGUE
+  and nothing else, `renderer -> spec` is acyclic. Rows that needed
+  `gripHome`/`gripAt` would have made `renderer -> spec -> renderer`.
+  ⚠ **THE OBVIOUS TEST FOR THIS CANNOT SEE THE DEFECT**, and a reviewer caught
+  the fix about to ship wearing the defect's clothes. Assertions about
+  `spec.js` prove the SOURCE is right; the defect was a SINK that had drifted
+  off its source. Hard-coding `#summary` to `'דלת'` and the `aria-label` to
+  `'דלת'` passes every assertion that only reads `spec.js`. So two assertions
+  read the sinks: `npm test` checks `render(st)` literally contains
+  `aria-label="${describeSentence(st)}"`, and `npm run audit` — the only
+  instrument that can see the real page — decodes the on-screen code and checks
+  `#summary` equals `summaryLine(state)`. Both verified to fire on exactly that
+  mutation.
+  ⚠ `describe(state, 'en')` is called by nothing and `PLAN.md` §6's
+  `content/copy.json` is unbuilt, so the English branch is left as it was
+  rather than given a second row-renderer nobody reads.
+
 - **Stage 2 — VERSION 11: the four pad bits became a check nibble.**
   38.4% of one-character typos used to decode to a DIFFERENT, VALID, BUILDABLE
   door with no warning — 38,053 of 99,200 trials, a fifth of them at an

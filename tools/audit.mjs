@@ -18,7 +18,8 @@
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
 import { load } from './imglib.mjs';
-import { DEFAULTS, encodeCode } from '../js/url-state.js';
+import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
+import { summaryLine } from '../js/spec.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
    the grip and the lockset became separate fields, and a hard-coded length
@@ -236,6 +237,20 @@ for (const v of VIEWS) {
       if (!CODE.test(s.code)) fault(v.name, `${key}=${id}: code reads "${s.code}"`);
       if (!s.wa || !s.wa.startsWith('https://')) fault(v.name, `${key}=${id}: WhatsApp link is "${s.wa}"`);
       if (!s.summary.trim()) fault(v.name, `${key}=${id}: the spec line is empty`);
+      /* ⚠ AND IT MUST BE THE ROWS, not a fourth assembly of them. `npm test`
+         proves `summaryLine(state)` is the rows; only a browser can prove that
+         the line ON THE PAGE is `summaryLine(state)`. Four readers of one door
+         disagreed twice and cost money, and the last one to be corrected was
+         the one nobody sighted ever sees — so an assertion that reads only the
+         source is this fix wearing the defect's clothes.
+         The code carries all eight axes, so the state comes back without the
+         page having to expose it. */
+      const back = decodeCode(s.code);
+      if (back && summaryLine(back) !== s.summary.trim()) {
+        fault(v.name, `${key}=${id}: the spec line reads "${s.summary.trim()}" and `
+                    + `the rows say "${summaryLine(back)}" — #summary has drifted `
+                    + 'off js/spec.js');
+      }
 
       /* Two designs that differ must not share a code — that is an order for
          the wrong door, arriving by telephone with nothing to catch it. */

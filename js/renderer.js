@@ -17,6 +17,7 @@
  */
 
 import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
 /* Ironmongery tones. Six stops each, because a metal's cross-section is
@@ -5057,41 +5058,26 @@ const cylinder = (cx, cy, owned = false) => {
 
 /** Plain-language description, used as the SVG's accessible name. */
 export function describe(state, lang = 'he') {
+  /* ⚠ THE ROWS, from `js/spec.js`. This function assembled the door itself and
+     was the LAST of four readers to be corrected, which is exactly what made
+     it dangerous: it is the one description nobody sighted ever sees. It went
+     on asking `w.rects.length` for the grille long after the message and the
+     spec line had moved to `isGlazed`, so on a sidelight door with wrought
+     iron beside the leaf a screen reader announced a door with no ironwork on
+     it while the order beneath charged ₪620 for some.
+     `spec.js` imports the catalogue and nothing else, so this import does not
+     make a cycle — see the note there about why the grip's position is
+     deliberately not a row. */
+  if (lang === 'he') return describeSentence(state);
+  /* English is a stub and has been: `describe(state, 'en')` is called by
+     nothing, and `PLAN.md` §6's `content/copy.json` — every user-visible
+     string keyed, three values each — is unbuilt. Left as it was rather than
+     given a second row-renderer nobody reads. */
   const c = byId(COLOURS, state.colour);
-  const h = byId(HANDINGS, state.handing);
   const w = byId(WINDOWS, state.window);
-  const g = byId(GRILLES, state.grille);
-  const hd = byId(HANDLES, state.handle);
-  const lk = byId(LOCKSETS, state.lockset);
-  const dt = byId(DETAILS, state.detail);
-  /* ⚠ `declaredFinish` of the GRIP, not `effectiveFinish` of the door.
-     This sentence is what a screen-reader user is TOLD THE DOOR IS, and it
-     said "קורל פליז" — brass Coral — whenever the grip was one of the two
-     brass ones, for the same reason the WhatsApp message did: it printed the
-     drawing's single metal tone as though it were a fact about the lockset.
-     There is no brass Coral. Two of Peretz's own photographs settle it in
-     opposite directions; `catalog.js effectiveFinish` carries them. */
-  const gfn = declaredFinish(hd);
-  const s = SIZES[state.size] || SIZES.standard;
-  if (lang === 'he') {
-    const grille = w.rects.length && g.id !== 'none' ? `, ${g.he}` : '';
-    /* ⚠ GONE: a second clause here named `byId(GLAZINGS, state.glazing).he`.
-       `GLAZINGS` was deleted from the catalogue when glass stopped being its
-       own axis and its patterns moved into `GRILLES`; the identifier survived
-       here, unimported and undefined, guarded behind `state.glazing &&` — so
-       it was invisible for as long as nothing set that key, and a
-       `ReferenceError` out of BOTH `describe()` and `render()` the moment
-       anything did. And by the measurement above, that error blanks the whole
-       page: the cost of setting `state.glazing` once, anywhere, was the site.
-       It was NOT reachable — `fromQuery` never reads the retired `z=`, and no
-       GROUPS row writes the key — so it was a landmine and not a live fault,
-       and it is recorded at that severity rather than dressed up. */
-    const glass = '';
-    const det = dt.id === 'plain' ? '' : `, ${dt.he}`;
-    const grip = hd.style === 'none' ? '' : `${hd.he}${gfn ? ` ${gfn.he}` : ''}, `;
-    return `דלת כניסה פלדה, ${c.he} (RAL ${c.ral}), ${w.he}${glass}${grille}${det}, ${grip}${lk.he}, ${s.he}, פתיחה ${h.he}.`;
-  }
-  return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s.en}, ${h.en}`;
+  const s2 = SIZES[state.size] || SIZES.standard;
+  const h = byId(HANDINGS, state.handing);
+  return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s2.en}, ${h.en}`;
 }
 
 /* ─── Option thumbnails, from the same geometry the stage uses ──── */

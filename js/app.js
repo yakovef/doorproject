@@ -38,6 +38,7 @@ import {
   render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
+import { summaryLine } from './spec.js';
 import { copyMessage, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE, gripDeparture,
          PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
@@ -438,30 +439,12 @@ function paint() {
 
   const win = byId(WINDOWS, state.window);
   const grille = byId(GRILLES, state.grille);
-  $('#summary').textContent = [
-    colour.he, `RAL ${colour.ral}`, win.he,
-    /* ⚠ `isGlazed`, not `win.rects.length`. FOURTH place to ask this question
-       its own way — the price, the WhatsApp message and this line all asked
-       about the leaf's own window, and a sidelight door's glass is beside the
-       leaf. The spec line under the price is what a customer proof-reads
-       before they send, so on a sidelight with ironwork it showed them a door
-       with no ironwork in it and then charged for some. */
-    ...(isGlazed(state) && grille.id !== 'none' ? [grille.he] : []),
-    /* ⚠ The grip's finish is on the GRIP, and it is on this line because THIS
-       is the line a customer proof-reads before pressing send. It was on
-       neither: the message named a finish and named it on the wrong fitting,
-       and this line named none at all — so the two disagreed and the
-       disagreement was invisible. A customer could read this line, find it
-       correct, and send Peretz an order for a brass Coral, which is not a
-       product. One statement, however many places show it. */
-    ...(byId(HANDLES, state.handle).style === 'none' ? [] : [
-      byId(HANDLES, state.handle).he
-      + (declaredFinish(byId(HANDLES, state.handle))
-         ? ` ${declaredFinish(byId(HANDLES, state.handle)).he}` : '')]),
-    byId(LOCKSETS, state.lockset).he,
-    ...(state.detail !== 'plain' ? [byId(DETAILS, state.detail).he] : []),
-    size.he, handing.he,
-  ].join(' · ');
+  /* ⚠ THE ROWS, from `js/spec.js`. This list was assembled here, and in
+     `share.js`, and in `describe()`, and the three disagreed — which is how a
+     customer came to proof-read a line with no ironwork on it and send an
+     order charging ₪620 for some. One statement, however many places show it,
+     exactly as the price is. */
+  $('#summary').textContent = summaryLine(state);
 
   const blocked = conflicts(state);
   for (const g of GROUPS) {
