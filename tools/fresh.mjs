@@ -70,10 +70,36 @@ import { build } from 'esbuild';
  * of fault as the staleness it exists to catch.
  */
 const SHEET_DEPS = ['js/renderer.js', 'js/catalog.js', 'js/colour.js'];
+/**
+ * ⚠ AND `npm run shot` DEPENDS ON MORE THAN THE DRAWING.
+ *
+ * The note above is right for three of the four families: `recreate`, `corpus`
+ * and `against` crop the door and nothing else, so the drawing's own files are
+ * exactly their inputs. `shot` photographs the WHOLE PAGE — twelve full-page
+ * screenshots — so the stylesheet, the markup and the wiring are its inputs
+ * too, and none of them were hashed.
+ *
+ * It had already gone wrong when this was written: the sheets were last made
+ * at `4d017df`, five commits then changed `css/app.css`, `js/app.js` and
+ * `js/share.js`, and all twelve went on claiming to be current. Regenerating
+ * twice gave byte-identical output both times and differed from the committed
+ * copy both times, which is what rules out a flaky renderer and leaves only
+ * "the pictures are old". Exactly the fault this file exists to catch, through
+ * the one door it was not watching — the same shape as `js/colour.js` missing
+ * from the list above, one level out.
+ *
+ * DERIVED, not listed. `assets/bundle.js` is every line of JavaScript the page
+ * actually runs, so hashing it covers the drawing, the wiring and the message
+ * without a list of files anybody has to remember to extend — and
+ * `assertFreshBundle` has already guaranteed it matches the source before any
+ * browser tool gets this far.
+ */
+const PAGE_DEPS = ['assets/bundle.js', 'css/app.css', 'index.html'];
+const DEPS_FOR = name => (name === 'shot' ? PAGE_DEPS : SHEET_DEPS);
 const STAMP_FILE = 'screenshots/.stamps.json';
 
-const depHash = () => createHash('sha256')
-  .update(SHEET_DEPS.map(f => readFileSync(f)).join('\n')).digest('hex').slice(0, 12);
+const depHash = name => createHash('sha256')
+  .update(DEPS_FOR(name).map(f => readFileSync(f)).join('\n')).digest('hex').slice(0, 12);
 
 const readStamps = () => {
   try { return JSON.parse(readFileSync(STAMP_FILE, 'utf8')); } catch { return {}; }
@@ -82,7 +108,7 @@ const readStamps = () => {
 /** Called by a sheet-writing tool once it has finished writing them. */
 export function stampSheets(name) {
   const all = readStamps();
-  all[name] = depHash();
+  all[name] = depHash(name);
   writeFileSync(STAMP_FILE, JSON.stringify(all, null, 2) + '\n');
 }
 
@@ -92,10 +118,10 @@ export function stampSheets(name) {
  * stamped at all, which is the same problem wearing a different hat.
  */
 export function staleSheets(names) {
-  const want = depHash();
   const all = readStamps();
   return {
-    stale: names.filter(n => all[n] && all[n] !== want),
+    /* Per family, because they no longer share one set of inputs. */
+    stale: names.filter(n => all[n] && all[n] !== depHash(n)),
     unknown: names.filter(n => !all[n]),
   };
 }

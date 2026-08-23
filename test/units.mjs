@@ -1795,9 +1795,17 @@ group('the comparison sheets are pictures of THIS drawing');
   const FAMILIES = ['shot', 'recreate', 'corpus', 'against'];
   const { stale, unknown } = staleSheets(FAMILIES);
   for (const n of stale) {
-    ok(false, `screenshots from "npm run ${n}" were made from a different renderer `
-            + 'than the one in js/ — they show a door the site no longer draws. '
-            + 'Run: npm run sheets');
+    /* `shot` photographs the whole page, so what went stale under it may be
+       the stylesheet or the markup rather than the drawing. Saying "a door the
+       site no longer draws" about a CSS change would send the reader looking
+       in the wrong file. */
+    ok(false, n === 'shot'
+      ? 'screenshots from "npm run shot" were made from a different PAGE than the '
+        + 'one in js/ + css/ + index.html — bundle, stylesheet or markup has moved '
+        + 'under them. Run: npm run sheets'
+      : `screenshots from "npm run ${n}" were made from a different renderer `
+        + 'than the one in js/ — they show a door the site no longer draws. '
+        + 'Run: npm run sheets');
   }
   for (const n of unknown) {
     ok(false, `"npm run ${n}" has never stamped its sheets, so nothing can tell `

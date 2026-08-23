@@ -23,6 +23,69 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-23 01:02 UTC — run 21: the twelve page sheets were showing a code the site now refuses
+
+**Looked at:** the five Stage 1–2 commits, including VERSION 11 and the check
+nibble — the wire-format change I declined to make in run 15 and which the
+human has now made properly.
+
+**Instruments:** test ✓ · audit ✓ · profile ✓ · collide ✓ (base / `all`) ·
+recreate ✓ · shot ✓ — re-run after a mid-run rebase; the suite is 5,533,014
+assertions now, `45af970` having landed `js/spec.js` while this ran.
+
+⚠ **What this commit carries changed under it, and the log should say so.** I
+found the twelve sheets stale and regenerated them; the human's `45af970`
+then regenerated them too, so the rebase left my copies identical to theirs and
+git kept nothing. The commit is therefore the GUARD and the stamp, not the
+pictures — the pictures were already put right by somebody else while I was
+measuring why nothing had noticed they were wrong. The finding stands exactly
+as measured; only the diff is smaller than it was.
+
+**Changed:** the sheet-freshness guard now hashes what each family actually
+depends on, instead of one shared list.
+
+**The fault, and it is the run-10 finding coming back through the guard built
+to stop it.** `SHEET_DEPS` is `renderer.js`, `catalog.js`, `colour.js` — the
+DRAWING. That is exactly right for `recreate`, `corpus` and `against`, which
+crop the door and nothing else. **`shot` photographs the whole page**, so the
+stylesheet, the markup and the wiring are its inputs too, and none were hashed.
+
+It had already gone wrong. The sheets were last made at `4d017df`; five commits
+since changed `css/app.css`, `js/app.js` and `js/share.js`; all twelve went on
+reporting fresh.
+
+⚠ **Ruled out nondeterminism before believing it** — regenerated twice, got
+byte-identical output both times and a difference from the committed copy both
+times. That leaves only "the pictures are old".
+
+**What was actually stale is the sharpest possible illustration.** The diff is
+one 20-pixel band, 463 pixels, 0.01% of the sheet. Cropped and read:
+
+    committed sheet   קוד: DM-M00010G0      ← version 10
+    the page today    קוד: DM-P00010GA      ← version 11, check nibble
+
+`decodeCode('DM-M00010G0')` returns **null**. The twelve sheets a person opens
+to see the finished page were displaying **a code the site refuses**, on the
+artefact whose whole subject is that code — and the guard said fresh.
+
+**Fixed by deriving.** `shot` is stamped against `assets/bundle.js`,
+`css/app.css` and `index.html`: the bundle is every line of JavaScript the page
+runs, so it covers the drawing, the wiring and the message with no list anybody
+has to remember to extend, and `assertFreshBundle` has already proved it
+matches source. The other three keep the drawing's files. Verified live — the
+widened guard fails before regeneration and passes after.
+
+Its message is per-family too. Telling a reader that a CSS change means "a door
+the site no longer draws" sends them to the wrong file; `shot` now says *"a
+different PAGE than the one in js/ + css/ + index.html"*.
+
+**Left alone:** the 40 KB gate, `profile`'s tolerance, `mottle`'s dome, and
+what is Peretz's.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-22 21:07 UTC — run 20: `<use>` is a second way to dangle, and the guard for that could not see it
 
 **Looked at:** the four Stage 0 commits, including the one that stopped `ink()`
