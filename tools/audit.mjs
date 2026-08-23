@@ -17,6 +17,7 @@
  */
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
+import { crashed } from './browser.mjs';
 import { load } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
@@ -68,11 +69,34 @@ const groupsOn = p => p.$$eval('.field[data-group]', els => els.map(e => ({
 
 await assertFreshBundle();
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+let b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 let faults = 0;
+let crashes = 0;
 const fault = (view, msg) => { faults++; console.log(`  ✗ [${view}] ${msg}`); };
 
+/* ── A VIEWPORT THAT KILLED THE BROWSER IS SKIPPED, LOUDLY ────────────
+   Chromium in some containers cannot render this page above about 1,000 px
+   wide: measured, 1280x720 crashes its renderer every time on a brand-new
+   browser, and no launch flag helps (see `tools/browser.mjs`). Until now that
+   took the whole run down at whichever viewport it happened on — so a crash at
+   the sixth of seven destroyed five good audits along with it, and the output
+   ended in a stack trace rather than in a verdict.
+
+   ⚠ THE SKIPPED VIEWPORT IS NOT A PASS, and the two must never print the same
+   thing. It is counted separately, named in the summary, and the run exits
+   non-zero if EVERY viewport had to be skipped — an instrument that measured
+   nothing is not a page that is fine.
+
+   ⚠ AND FAULTS ARE ROLLED BACK BEFORE THE SKIP. A crash halfway through a
+   viewport leaves whatever it had already recorded; keeping those would report
+   half an audit as if it were a whole one. This is deliberately a SKIP and not
+   a retry: the crashes measured here are reproducible per viewport, so
+   retrying the same one is a loop, and a partial audit re-run from the top
+   would double-count everything before the crash. */
+let skipped = [];
 for (const v of VIEWS) {
+  const faultsBefore = faults;
+  try {
   const p = await b.newPage({ viewport: { width: v.w, height: v.h }, deviceScaleFactor: 1 });
   const errs = [];
   p.on('pageerror', e => errs.push(String(e)));
@@ -762,6 +786,15 @@ for (const v of VIEWS) {
   }
 
   await p.close();
+  } catch (e) {
+    if (!crashed(e)) throw e;          // a real failure, reported as one
+    faults = faultsBefore;             // half an audit is not an audit
+    crashes++;
+    skipped.push(v.name);
+    console.log(`  ⚠ chromium died at ${v.w}x${v.h} — this viewport was NOT audited`);
+    await b.close().catch(() => {});
+    b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  }
 }
 
 /* ── A PAGE THAT CANNOT START HAS TO LOOK LIKE ONE ──────────────────
@@ -909,5 +942,12 @@ for (const v of VIEWS) {
 
 await b.close();
 
+if (skipped.length) {
+  console.log(`\n⚠ ${skipped.length} of ${VIEWS.length} viewports were NOT audited — `
+            + `${skipped.join(', ')} — because chromium died rendering them.`
+            + '\n  That is this container, not this page: see tools/browser.mjs.'
+            + '\n  Nothing below covers those widths. Re-run somewhere it survives.');
+}
 console.log(faults ? `\n✗ ${faults} faults\n` : '\n✓ no faults\n');
-process.exitCode = faults ? 1 : 0;
+/* ⚠ Skipping EVERY viewport is a broken instrument, not a clean page. */
+process.exitCode = (faults || skipped.length === VIEWS.length) ? 1 : 0;
