@@ -44,6 +44,45 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 1.4 — a dragged handle reached Peretz in no form at all.** The
+  customer drags the bar, presses סובבו, the drawing changes — and `message()`
+  returned byte for byte the message for the door they started from, while
+  `encodeCode` returned the DEFAULT door's code character for character. Two
+  visibly different doors, one order. Only `gp=` on the tail of the link
+  carried it, which is the one part nobody reads.
+  ⚠ **THREE questions, not one**, answered by different facts: `flat` (the bar
+  lies across the leaf — a fact about the DOOR, since `gripHome` lays a bar
+  down by itself where nothing upright fits), `shifted` (x or y is not where an
+  untouched door would put it — the customer's doing), and `moved` (any of the
+  three differs from home — what the "back to its place" button wants).
+  ⚠ **`moved` COMPARES ROTATION AGAINST HOME'S, NOT AGAINST 0.** `app.js` had
+  `now.rot === 0` written out by hand, which is the same thing on every door
+  whose home stands up and wrong on the **88** where it does not — 72 a Shiran
+  on a broad light with a bottom panel, 16 a Ron on a wide leaf. Those doors
+  offered to put the handle back where it already was, under a hint saying the
+  position was only an illustration. Copying that mistake into the message
+  would have put a line about a moved handle into 88 orders nobody had touched.
+  My own sweep reproduces the figure independently: **11,744 untouched doors
+  silent, 15,920 moves named, 88 lying down at home.**
+  ⚠ **`gripDeparture` lives in `share.js`, NOT beside the other grip functions
+  in `renderer.js`** — a reviewer's correction, and a good one. It is not
+  geometry, it is a fact about the ORDER; and `SHEET_DEPS` hashes
+  `renderer.js`, so fifty lines of comment prose there would have cost a
+  three-minute regeneration of 110 sheets for a change that draws nothing.
+  Confirmed: this landed with **no sheets run at all**.
+  ⚠ **Two facts, two lines, because they are not the same KIND of fact.** The
+  bar lying down is something Peretz BUILDS TO, so it goes on the handle's own
+  line. The bar not being in the usual place is a PICTURE of what the customer
+  had in mind — it was ruled from outside that the position is not a
+  specification and is settled on site — so the order says that in the same
+  register the stage does, and points at the link for the millimetres. Printing
+  the millimetres would state a measurement as a specification.
+  ⚠ **One Hebrew string, two places.** The stage's hint and the order's line
+  make the same promise, and two hand-kept literals making one promise is this
+  codebase's characteristic bug — a poor thing to introduce in the fix whose
+  thesis is that a second hand-written copy is how the first came to be wrong.
+  `GRIP_ILLUSTRATIVE` is the shared fragment, composed into both.
+
 - **Stage 1.6 + 1.7 — the page failed looking like it had worked.**
   Measured with scripting off at 390×844: `#stage` empty, `#price` and `#code`
   both `—`, `#choices` with no children, and **both full-width green WhatsApp

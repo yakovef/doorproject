@@ -38,7 +38,8 @@ import {
   render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
-import { copyMessage, fallbackWhatsappUrl, PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
+import { copyMessage, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE, gripDeparture,
+         PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 
 const $ = sel => document.querySelector(sel);
@@ -545,11 +546,18 @@ function armGrip() {
      promising something nobody is building to. */
   sizeHitPad();
 
-  const home = gripHome(state), now = gripAt(state);
-  const moved = !(now.x === home.x && now.y === home.y && now.rot === 0);
+  /* ⚠ `gripDeparture`, not the comparison written out here. This read
+     `now.rot === 0`, which is the same thing on every door whose home stands
+     up and wrong on the 88 where it does not — `gripHome` lays a bar down by
+     itself where nothing upright fits, so an untouched Shiran on a broad light
+     offered to put its handle back where it already was, under a hint saying
+     the position was only an illustration. And `share.js` asked the question
+     not at all, which is how a dragged handle reached Peretz in no form
+     whatever. One definition, in the file that sends the order. */
+  const { moved } = gripDeparture(state);
   $('#grip-home').hidden = !moved;
   $('.grip-bar__hint').textContent = moved
-    ? 'מיקום הידית להמחשה — נקבע בהתקנה'
+    ? `מיקום הידית ${GRIP_ILLUSTRATIVE}`
     : 'גררו את הידית למקום שתרצו';
 }
 

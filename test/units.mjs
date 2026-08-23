@@ -1404,6 +1404,77 @@ group('every option the customer pays for is named in the message');
    The first assertion is the load-bearing one and it is FALSIFIABLE: it asks
    the DRAWING how many panes it cut and compares that with the number the
    price multiplies by. Change either side alone and it fires. */
+/* ⚠ A DRAGGED HANDLE USED TO REACH PERETZ IN NO FORM AT ALL.
+   The customer drags the bar, presses סובבו, the drawing changes — and the
+   message was byte for byte the message for the door they started from, while
+   the short code was the DEFAULT door's code character for character. Two
+   visibly different doors, one order (REDESIGN.md §1.4).
+
+   The second half of this group is the one that matters and it is the one an
+   obvious fix gets wrong: an untouched door must say NOTHING. `gripHome` lays
+   a bar down by itself where nothing upright fits, so a comparison against
+   `rot === 0` — which is what app.js had written out by hand — reports 88
+   untouched doors as moved. A line Peretz has to read and discard is exactly
+   what PLAN.md §0 forbids. */
+group('a handle the customer moved reaches the order');
+{
+  globalThis.window = globalThis.window
+    || { location: { href: 'https://dlatotmagen.example/index.html' } };
+  const { message, gripDeparture } = await import('../js/share.js');
+  const LINE = 'מיקום הידית:';
+  let moved = 0, still = 0, flatHome = 0;
+
+  for (const st of everyPlacement()) {
+    const home = gripHome(st);
+    const untouched = message(st);
+
+    /* 1. AN UNTOUCHED DOOR IS SILENT. Including the ones whose home is
+          already rotated — those are the 88 an obvious fix talks over. */
+    still++;
+    ok(!untouched.includes(LINE),
+       `an untouched door talks about where its handle is: ${st.handle}/${st.size}/${st.window}`);
+    const dep = gripDeparture(st);
+    ok(!dep.moved,
+       `an untouched door reports itself as moved: ${st.handle}/${st.size}/${st.window}`);
+    if (dep.flat) {
+      flatHome++;
+      /* And a bar that lies down at home says so on the handle's line, because
+         Peretz drills for it either way — that is not a report of a drag. */
+      ok(untouched.includes('מותקנת לרוחב הדלת'),
+         `${st.handle}/${st.size}/${st.window}: home is rotated and the order never says so`);
+    }
+
+    /* 2. MOVE IT AND THE ORDER CHANGES. Only where the move is legal, or the
+          renderer puts the grip straight back and nothing moved after all. */
+    for (const d of [80, 160]) {
+      const at = { x: home.x, y: home.y - d, rot: home.rot };
+      if (!gripPlacement(st, at).ok) continue;
+      const shifted = { ...st, grip: at };
+      if (!gripDeparture(shifted).shifted) continue;
+      moved++;
+      const text = message(shifted);
+      ok(text !== untouched,
+         `the handle moved ${d} mm and the order Peretz receives did not change: `
+       + `${st.handle}/${st.size}/${st.window}`);
+      ok(text.includes(LINE),
+         `the handle moved ${d} mm and no line names it: ${st.handle}/${st.size}`);
+    }
+  }
+  ok(moved > 0, 'no handle could be moved anywhere — this group is asserting nothing');
+  ok(flatHome > 0,
+     'no door has a rotated home position — the 88-door case is not being exercised');
+  console.log(`  (${still} untouched doors silent, ${moved} moves named, `
+            + `${flatHome} lying down at home)`);
+
+  /* 3. A door with no pull bar departs from nothing, and `message` is called
+        on states that never went through `repair`. */
+  const bare = { ...base, handle: 'none', grip: { x: 10, y: 10, rot: 90 } };
+  ok(!message(bare).includes(LINE),
+     'a door with no pull handle reports a handle position');
+  ok(!message(bare).includes('מותקנת לרוחב'),
+     'a door with no pull handle reports the handle lying down');
+}
+
 /* ⚠ THE MARKUP CARRIES A BUILT STRING, SO IT CAN DRIFT FROM THE BUILDER.
    Both send buttons must work with no JavaScript running, which means the
    fallback wa.me address has to be IN index.html — and the phone number and

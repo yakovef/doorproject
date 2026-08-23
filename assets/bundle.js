@@ -3964,9 +3964,41 @@ ${body}
     const name = g.he.startsWith(label + " ") ? g.he.slice(label.length + 1) : g.he;
     return `${label}: ${name}${grillePlacement(state2)}`;
   }
-  function gripLine(h) {
+  function gripDeparture(state2) {
+    if (byId(HANDLES, state2.handle).style === "none") {
+      return { flat: false, shifted: false, moved: false };
+    }
+    const home = gripHome(state2), now = gripAt(state2);
+    const shifted = now.x !== home.x || now.y !== home.y;
+    return { flat: now.rot === 90, shifted, moved: shifted || now.rot !== home.rot };
+  }
+  var GRIP_ILLUSTRATIVE = "להמחשה — נקבע בהתקנה";
+  function gripLines(state2) {
+    const h = byId(HANDLES, state2.handle);
+    if (h.style === "none") return [];
     const fin = declaredFinish(h);
-    return `ידית משיכה: ${h.he}${fin ? ` · ${fin.he}` : ""}`;
+    const { flat, shifted } = gripDeparture(state2);
+    return [
+      /* TWO FACTS, and they are not the same KIND of fact, so they are not one
+             line.
+      
+             THE BAR LIES DOWN is something Peretz BUILDS TO, so it sits on the
+             handle's own line in the same breath as which handle it is. It is named
+             whenever it is true, not only when somebody asked for it — `gripHome`
+             lays a bar down by itself where nothing upright fits.
+      
+             THE BAR IS NOT IN THE USUAL PLACE is a PICTURE of what the customer had
+             in mind. It was ruled from outside that the position is not a
+             specification and that the final spot is set on site; the stage says so
+             under the door in exactly these words. The order says the same thing in
+             the same register rather than a bolder one, and points at the link,
+             which carries the millimetres in `gp=`. Printing the millimetres HERE
+             would state a measurement as a specification, which is the thing that
+             ruling says it is not. Whether Peretz would rather have the numbers is
+             his call: ASK-PERETZ.md §9b. */
+      `ידית משיכה: ${h.he}${fin ? ` · ${fin.he}` : ""}` + (flat ? " — מותקנת לרוחב הדלת" : ""),
+      ...shifted ? [`מיקום הידית: הזזתי אותה ממקומה הרגיל. ${GRIP_ILLUSTRATIVE}, והמיקום המדויק בקישור.`] : []
+    ];
   }
   function message(state2) {
     const c = byId(COLOURS, state2.colour);
@@ -3974,7 +4006,6 @@ ${body}
     const s = SIZES[state2.size] || SIZES.standard;
     const w = byId(WINDOWS, state2.window);
     const g = byId(GRILLES, state2.grille);
-    const grip = byId(HANDLES, state2.handle);
     return [
       "שלום, בחרתי דלת באתר:",
       "",
@@ -4005,7 +4036,7 @@ ${body}
          went stale the day Ella gained `finish: 'brass'` and nobody revisited
          the sentence. It is named HERE because these are the products it is a
          fact about. */
-      ...grip.style === "none" ? [] : [gripLine(grip)],
+      ...gripLines(state2),
       /* AND NOT ON THIS LINE. `LOCKSETS` declares no finish, so none is printed.
          What used to be printed here was the GRIP's, and it named lock furniture
          that is not manufactured. */
@@ -4412,10 +4443,9 @@ ${body}
     rot.setAttribute("aria-disabled", String(!can));
     rot.title = can ? "" : "הידית הזו ארוכה מרוחב הדלת — אי אפשר להניח אותה לרוחב";
     sizeHitPad();
-    const home = gripHome(state), now = gripAt(state);
-    const moved = !(now.x === home.x && now.y === home.y && now.rot === 0);
+    const { moved } = gripDeparture(state);
     $("#grip-home").hidden = !moved;
-    $(".grip-bar__hint").textContent = moved ? "מיקום הידית להמחשה — נקבע בהתקנה" : "גררו את הידית למקום שתרצו";
+    $(".grip-bar__hint").textContent = moved ? `מיקום הידית ${GRIP_ILLUSTRATIVE}` : "גררו את הידית למקום שתרצו";
   }
   var TOUCH_TARGET = 44;
   function sizeHitPad() {

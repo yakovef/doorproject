@@ -8,6 +8,7 @@
 import { byId, COLOURS, declaredFinish, DETAILS, GRILLES, grillePlacement, HANDINGS, HANDLES, isGlazed,
          LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
+import { gripAt, gripHome } from './renderer.js';
 import { encodeCode, toQuery } from './url-state.js';
 
 export const PHONE_DISPLAY = '053-219-7466';
@@ -48,6 +49,73 @@ function glassOrGrilleLine(g, state) {
 }
 
 /**
+ * How this door's grip departs from an untouched one — the ONE definition of
+ * "the customer moved the handle", for everything that has to say so.
+ *
+ * There were two, and they did not agree. `app.js` wrote the comparison out by
+ * hand to decide whether to offer the "back to its place" button; `share.js`
+ * never asked the question at all. So a dragged handle changed the drawing,
+ * changed the link, and reached Peretz in no form whatever (REDESIGN.md §1.4):
+ * the message was byte for byte the message for the door they started from,
+ * and the short code was the DEFAULT door's code, character for character.
+ * Two visibly different doors, one order.
+ *
+ * THREE QUESTIONS, NOT ONE, because different facts answer them and different
+ * callers read them:
+ *
+ *   `flat`    — the bar lies across the leaf. A fact about the DOOR, not about
+ *               a drag: `gripHome` lays a grip down by itself where nothing
+ *               upright fits, and on 88 of the 11,744 handle-relevant
+ *               configurations the sweep enumerates (`everyPlacement()` —
+ *               colour and grille cannot move a handle), about 0.75% of every
+ *               door we can build, home is ALREADY rot 90 with nobody having
+ *               touched anything: 72 a Shiran on a leaf carrying a broad light
+ *               and a bottom panel, 16 a Ron on a wide leaf.
+ *   `shifted` — x or y is not where an untouched door would have put it. This
+ *               is the customer's doing and nothing else's.
+ *   `moved`   — any of the three differs from home. What the page's "back to
+ *               its place" button wants: a rotation is something to undo even
+ *               when x and y never changed.
+ *
+ * ⚠ `moved` COMPARES ROTATION AGAINST HOME'S, NOT AGAINST 0. `app.js` had
+ * `now.rot === 0` written in by hand, which is the same thing on every door
+ * whose home stands up and WRONG on the 88 where it does not: an untouched
+ * door offered to put its handle back where it already was, under a hint
+ * saying the position was only an illustration.
+ *
+ * A door with no pull bar departs from nothing. `state.grip` is supposed to go
+ * when the grip goes and `repair` does that, but `message` is called on states
+ * that never went through `repair`, and a sentence about a handle that is not
+ * on the door is a clarifying question by construction.
+ *
+ * ⚠ It lives HERE, in `share.js`, and not beside the other grip functions in
+ * `renderer.js`, on purpose. It is not geometry — it is a fact about the
+ * ORDER. And `SHEET_DEPS` hashes `renderer.js`, so putting fifty lines of
+ * comment prose there would cost a three-minute regeneration of 110 sheets for
+ * a change that draws nothing. `app.js` already imports this file.
+ */
+export function gripDeparture(state) {
+  if (byId(HANDLES, state.handle).style === 'none') {
+    return { flat: false, shifted: false, moved: false };
+  }
+  const home = gripHome(state), now = gripAt(state);
+  const shifted = now.x !== home.x || now.y !== home.y;
+  return { flat: now.rot === 90, shifted, moved: shifted || now.rot !== home.rot };
+}
+
+/**
+ * ONE sentence, in two places that must not drift.
+ *
+ * The stage says this under the door the moment a handle is dragged, and the
+ * order says it to Peretz. They are the same promise — that where the bar ends
+ * up is settled on site — and two hand-kept Hebrew literals making one promise
+ * is this codebase's characteristic bug, which is a poor thing to introduce in
+ * the fix whose whole thesis is that a second hand-written copy is how the
+ * first one came to be wrong.
+ */
+export const GRIP_ILLUSTRATIVE = 'להמחשה — נקבע בהתקנה';
+
+/**
  * The grip, and its finish ON THE LINE THAT NAMES THE THING THAT HAS ONE.
  *
  * ⚠ THIS IS WHERE A BRASS LOCKSET THAT DOES NOT EXIST CAME FROM. The finish
@@ -80,9 +148,34 @@ function glassOrGrilleLine(g, state) {
  * furniture in a finish, and if he says so it becomes `LOCKSETS[].finish` and
  * comes back through this same helper. It does not come back as a guess.
  */
-function gripLine(h) {
+function gripLines(state) {
+  const h = byId(HANDLES, state.handle);
+  if (h.style === 'none') return [];
   const fin = declaredFinish(h);
-  return `ידית משיכה: ${h.he}${fin ? ` · ${fin.he}` : ''}`;
+  const { flat, shifted } = gripDeparture(state);
+  return [
+    /* TWO FACTS, and they are not the same KIND of fact, so they are not one
+       line.
+
+       THE BAR LIES DOWN is something Peretz BUILDS TO, so it sits on the
+       handle's own line in the same breath as which handle it is. It is named
+       whenever it is true, not only when somebody asked for it — `gripHome`
+       lays a bar down by itself where nothing upright fits.
+
+       THE BAR IS NOT IN THE USUAL PLACE is a PICTURE of what the customer had
+       in mind. It was ruled from outside that the position is not a
+       specification and that the final spot is set on site; the stage says so
+       under the door in exactly these words. The order says the same thing in
+       the same register rather than a bolder one, and points at the link,
+       which carries the millimetres in `gp=`. Printing the millimetres HERE
+       would state a measurement as a specification, which is the thing that
+       ruling says it is not. Whether Peretz would rather have the numbers is
+       his call: ASK-PERETZ.md §9b. */
+    `ידית משיכה: ${h.he}${fin ? ` · ${fin.he}` : ''}`
+      + (flat ? ' — מותקנת לרוחב הדלת' : ''),
+    ...(shifted ? [`מיקום הידית: הזזתי אותה ממקומה הרגיל. ${GRIP_ILLUSTRATIVE}, `
+                   + 'והמיקום המדויק בקישור.'] : []),
+  ];
 }
 
 /** The message Peretz receives. */
@@ -92,7 +185,6 @@ export function message(state) {
   const s = SIZES[state.size] || SIZES.standard;
   const w = byId(WINDOWS, state.window);
   const g = byId(GRILLES, state.grille);
-  const grip = byId(HANDLES, state.handle);
 
   return [
     'שלום, בחרתי דלת באתר:',
@@ -124,7 +216,7 @@ export function message(state) {
        went stale the day Ella gained `finish: 'brass'` and nobody revisited
        the sentence. It is named HERE because these are the products it is a
        fact about. */
-    ...(grip.style === 'none' ? [] : [gripLine(grip)]),
+    ...gripLines(state),
     /* AND NOT ON THIS LINE. `LOCKSETS` declares no finish, so none is printed.
        What used to be printed here was the GRIP's, and it named lock furniture
        that is not manufactured. */
