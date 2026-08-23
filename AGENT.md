@@ -158,6 +158,7 @@ they disagree with the drawing often enough to be worth running:
 | `npm run recreate` | ten doors beside ten photographs |
 | `npm run against` | each design and grip beside its own source doors, cropped |
 | `npm run shot` | screenshots of twelve states |
+| `npm run latency` | a tap at 6× CPU throttle, against a 600 ms gate |
 
 ⚠ **Three of these were lying, and what they now check is new.** Five agents
 driving the shipped site found 43 faults that every instrument here called
@@ -182,6 +183,26 @@ this repo was found.
 **All of them must be green before you push.** If something is red, fix it or
 revert — never push red. `npm run build` before you commit, or the deployed
 bundle will not match the source.
+
+⚠ **THE ONE EXCEPTION, AND IT IS SITTING RED RIGHT NOW.** Chromium in some of
+these containers cannot render the page above about 1,000 px wide — 1280×720
+crashes its renderer every time on a brand-new browser, and no launch flag
+helps (ten sets were measured; see `CLAUDE.md` §0b). Where that is true,
+`npm run sheets` and `npm run audit` cannot complete, and `npm test` reports
+four failures saying the sheet families are stale.
+
+**Those four are true and must not be silenced.** Do not delete them, do not
+weaken them, do not stamp the sheets by hand. What to do instead:
+
+1. Try `npm run sheets` first — `tools/browser.mjs` relaunches a dead browser
+   and retakes the reading, so a container that only crashes occasionally now
+   gets through. If it completes, the four go green and everything is normal.
+2. If it cannot, that is the one state in which pushing with `npm test` red is
+   right — the alternative is committing pictures that certify a door the site
+   no longer draws. **Say so in the commit message**, name the four, and leave
+   them for a healthier container.
+
+Anything else red is red.
 
 **A tool green on a query it no longer understands is not a passing tool.**
 `shot` and `recreate` build doors from query strings, and `fromQuery` is

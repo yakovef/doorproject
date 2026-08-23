@@ -1,5 +1,11 @@
 # REALISM — plan to make the door believable
 
+> **The forward plan now lives in `REALISM2.md`** — the scene, the finish pass,
+> and the order to do it in. This file stays as the measurement log and the
+> governing rule (§6), under its own name: sixteen files cite `REALISM.md` by
+> name and section, including `test/units.mjs` and five tools, and renaming it
+> would rot every one of those citations in silence.
+
 > Companion to `PLAN.md`. This document exists because the current drawing
 > fails the only test that matters: **a visitor looks at it and does not
 > believe it.** Nothing else on the site survives that.
@@ -273,8 +279,29 @@ invisible in a 60 px tile. Both halves are requirements.
 invariants: bevel light and dark edges always on opposite sides; every hardware
 item has a cast shadow; noise filters are defined exactly once per document.
 
-**G6 — WEIGHT.** Rendered SVG stays under 40 KB and a colour change still
-repaints within one frame. Filters are the risk — measure, do not assume.
+**G6 — WEIGHT. ~~Rendered SVG stays under 40 KB~~ RETIRED, 23.8.2026. The
+second half stands and is now the whole gate: `npm run latency`.**
+
+The byte half was measuring a quantity nobody pays. Two readings retired it:
+
+- **The bytes are never transferred.** `render(state)` builds a string in
+  memory and `paint()` assigns it to `innerHTML`. The site is three files and
+  the drawing is not one of them; an outside review measured the worst door at
+  17.7 KB brotli, which is what a byte gate would be for if anything were
+  sending it.
+- **The gate was counting the comments.** The default door is 41,971 bytes of
+  which **12,075 are XML comments** — 29% — because the renderer explains
+  itself to whoever opens the element inspector, like every other file here. A
+  byte gate is therefore in large part a gate on how much the drawing
+  documents itself, and 61% of buildable doors already failed it.
+
+What a customer feels is the DOM being rebuilt under their thumb — 378
+elements on the default door, 867 on a sidelight, 2,139 on the heaviest the
+catalogue can build, every one of them replaced on every tap. `npm run latency`
+measures that at 6× CPU throttle on a 390×844 phone and gates on 600 ms; the
+reasoning behind that number, and why it is deliberately not fitted to today's
+reading, is in `tools/latency.mjs`. Filters are still the risk. Measure, do not
+assume — that part never changed.
 
 ---
 

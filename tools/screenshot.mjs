@@ -12,8 +12,8 @@
  *
  * Run: npm run shot
  */
-import { chromium } from 'playwright';
 import { assertFreshBundle, stampSheets } from './fresh.mjs';
+import { pagePool, deathNote } from './browser.mjs';
 import { fromQuery } from '../js/url-state.js';
 
 /* Every query here must be a BUILDABLE door. They go through the same rules
@@ -129,22 +129,37 @@ const SHOTS = [
  * are committed artefacts guarded by a content hash. A scale that silently
  * varies with machine load would make the same command produce different bytes
  * on different days, and the hash would report drift that is not there.
+ *
+ * ⚠ AND 1x WAS STILL NOT ENOUGH. Measured after the note above was written, on
+ * an unchanged checkout: `phone` came out clean and the SECOND shot died with
+ * `Target crashed`. The ceiling had moved again, below the smallest thing this
+ * file asks for. There is no scale left to retreat to, so the retreat stops
+ * here and `tools/browser.mjs` picks the browser back up instead — see the
+ * note in that file about why a relaunch is not a check being weakened.
  */
 const PAGE_SCALE = 1;
 
 await assertFreshBundle();
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const pool = pagePool();
 let bad = 0;
 for (const s of SHOTS) {
-  const p = await b.newPage({ viewport: { width: s.w, height: s.h },
-                              deviceScaleFactor: PAGE_SCALE });
-  const errs = [];
-  p.on('pageerror', e => errs.push(String(e)));
-  p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
-  await p.goto('file://' + process.cwd() + '/index.html' + s.q);
-  await p.waitForTimeout(700);
-  await p.screenshot({ path: `screenshots/${s.name}.png`, fullPage: !!s.full });
+  /* ⚠ EVERYTHING FROM THE GOTO TO THE SHOT IS INSIDE ONE ATTEMPT, deliberately.
+     A crash halfway through leaves no page and no half-written PNG worth
+     keeping, so the whole reading is retaken rather than resumed — and `errs`
+     is built fresh per attempt so a console error from a page that then died
+     cannot be carried into the run that replaced it. */
+  const errs = await pool.use(
+    { viewport: { width: s.w, height: s.h }, deviceScaleFactor: PAGE_SCALE },
+    async p => {
+      const seen = [];
+      p.on('pageerror', e => seen.push(String(e)));
+      p.on('console', m => { if (m.type() === 'error') seen.push(m.text()); });
+      await p.goto('file://' + process.cwd() + '/index.html' + s.q);
+      await p.waitForTimeout(700);
+      await p.screenshot({ path: `screenshots/${s.name}.png`, fullPage: !!s.full });
+      return seen;
+    });
   /* Did the rules have to change this door on the way in? If so the file on
      disk is not the design named above, and every later comparison against it
      is against something nobody chose. */
@@ -152,9 +167,9 @@ for (const s of SHOTS) {
   if (notice) errs.push(`the query arrives repaired (${notice}) — this shot is not the door it names`);
   if (errs.length) bad++;
   console.log(s.name.padEnd(9), errs.length ? 'ERRORS: ' + errs.join(' | ') : 'clean');
-  await p.close();
 }
-await b.close();
+console.log(deathNote(pool));
+await pool.close();
 process.exitCode = bad ? 1 : 0;
 
 /* The sheets are current as of this drawing. `npm test` checks the stamp, so
