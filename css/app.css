@@ -16,6 +16,17 @@
   --ink:        #171715;
   --ink-2:      #6B6862;
   --rule:       #D6D3CB;
+  /* ⚠ THE COLOUR AN ELEMENT IS ACTUALLY SITTING ON, which is not always the
+     page's. The swatch ring below used to name `--paper` directly, and the
+     moment the choices panel became a white card every one of the seventeen
+     colour chips grew a beige halo — the ring's "gap" was painted in the
+     page's background over a white surface. Anything that has to match what is
+     BEHIND it reads this instead, and a container that changes its background
+     re-declares it.
+     (`--rule` was reported as the other casualty and it is not: #D6D3CB is
+     1.50:1 on white against 1.28:1 on paper, so dividers get MORE visible on
+     a card, not less. Measured before changing anything.) */
+  --surface:    #EFEDE8;
   --accent:     #B08D57;
   --wa:         #1EA95A;
   --warn:       #A4442E;
@@ -249,6 +260,26 @@ body {
   :root { --grip-strip: 148px; }
 }
 
+/* The page's heading, which was `sr-only` and is now the first thing read.
+   Small and quiet: it names the page, it does not compete with the door, and
+   on a phone every pixel it takes is a pixel off the stage — so below 1100 it
+   is tighter still. */
+.stage__h1 {
+  margin: 0; padding: 14px 16px 6px;
+  font: 600 clamp(17px, 2.2vw, 22px)/1.25 var(--sans);
+  color: var(--ink);
+  text-align: center;
+}
+.stage__lede {
+  display: block; margin-block-start: 4px;
+  font: 400 clamp(12px, 1.4vw, 14px)/1.35 var(--sans);
+  color: var(--ink-2);
+}
+@media (max-width: 1099px) {
+  .stage__h1 { padding: 10px 14px 4px; }
+  .stage__lede { display: none; }   /* the door is the scarce thing here */
+}
+
 .stage {
   /* The door is never allowed off-screen — seeing it is the product.
      Height rather than width decides how big the door comes out, because the
@@ -449,6 +480,47 @@ body {
    enough width to indent with. */
 .panel--choose { gap: 0; }
 
+/* ── THE CHOICES, AS A CARD ─────────────────────────────────────────
+   From the mockup. Measured before it was written: applying this to
+   `.panel--choose` ITSELF, with no wrapper element, moves the door by ZERO
+   pixels at 1100, 1280 and 1536 — the grid track is `minmax(300px, 360px)`
+   and a margin on a grid item comes out of the item, never out of the stage's
+   `1fr`. So `audit.mjs`'s "the door keeps its size" assertion is untouched by
+   construction rather than by luck.
+   `--surface` is re-declared because the card IS a different surface; see the
+   note at the top of this file about the seventeen beige haloes. */
+@media (min-width: 1100px) {
+  .panel--choose {
+    --surface: #fff;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-inline-start: 1px solid var(--rule);
+    border-radius: 14px;
+    margin: 14px;
+    block-size: calc(100% - 28px);
+    box-shadow: 0 1px 2px rgb(23 23 21 / .04), 0 8px 24px rgb(23 23 21 / .06);
+  }
+}
+
+/* ── 01 02 03 04 ────────────────────────────────────────────────────
+   A counter, not a field on SECTIONS and not a hand-written digit in the
+   template: the number is a fact about POSITION, and a stored one goes stale
+   the first time somebody reorders the list — which is the whole failure this
+   file keeps paying for. Reordering SECTIONS renumbers these for free.
+   They are `::before` on the head, so they are decoration and never reach the
+   accessible name; a screen reader gets the title, which is what it wants. */
+.panel--choose { counter-reset: sect; }
+.sect__head { counter-increment: sect; }
+.sect__head::before {
+  content: counter(sect, decimal-leading-zero);
+  font: 600 11px/1 var(--mono);
+  letter-spacing: .06em;
+  color: var(--ink-2);
+  opacity: .65;
+  align-self: center;
+  min-inline-size: 1.6em;
+}
+
 .sect { border-block-end: 1px solid var(--rule); }
 .sect:first-child { border-block-start: 1px solid var(--rule); }
 
@@ -585,7 +657,7 @@ body {
   background: var(--chip);
   border: 1px solid rgb(0 0 0 / .22);
   border-radius: var(--radius);
-  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ring);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ring);
   transition: box-shadow .12s var(--ease);
 }
 .swatch.is-selected .swatch__chip { --ring: var(--ink); }

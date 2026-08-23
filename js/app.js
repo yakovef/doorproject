@@ -172,8 +172,19 @@ function init() {
      category it disagrees with the default about — and the section that
      category lives in, or the customer would arrive at a page that has opened
      something they cannot see. */
+  /* ⚠ TWO ARRIVALS, because the two devices are answering different
+     questions. A desktop has room for all four sections and looks wrong
+     without them — measured, 614 px of empty card. A phone has room for one,
+     and opening the section a shared link differs in is the useful one to
+     pick: somebody following a link is looking at a door somebody else built,
+     and the thing they most want to change is the thing that was changed. */
   const differs = GROUPS.find(g => state[g.key] !== DEFAULTS[g.key]);
-  if (differs) { openSection(differs.in); open(differs.key); }
+  if (soloSections()) {
+    if (differs) { openSection(differs.in); open(differs.key); }
+  } else {
+    openAllSections();
+    if (differs) open(differs.key);
+  }
 }
 
 // ── the panel ─────────────────────────────────────────────────────
@@ -269,16 +280,57 @@ function buildOptions(g, host) {
  * decisions ago, and the panel is suddenly two screens tall again — which is
  * the whole thing the cabinet exists to prevent.
  */
+/**
+ * ── ONE OPEN AT A TIME, OR ALL OF THEM, AND THE VIEWPORT DECIDES ────
+ *
+ * A phone keeps the accordion. It exists because the panel used to render
+ * every option in every group on first paint, which put the WhatsApp button —
+ * the entire purpose of the site — eight screens down; all four open on a
+ * 390 px screen puts it back about two.
+ *
+ * A desktop opens all four. The mockup does, and the measurement agrees: at
+ * 1536x1024 the choices column is 918 px tall and its content ended at 304,
+ * so 614 px of it was empty. Drawing a card with a shadow round that made the
+ * emptiness LEGIBLE rather than smaller.
+ *
+ * ⚠ THE NAIVE VERSION OF THIS BREAKS EVERY HEADING. `toggleSection` asks
+ * whether the section is open and passes `null` if it is, and `openSection`
+ * sets `on = sec.key === key` for EVERY section — so with four open, clicking
+ * any one heading closed all four. The exclusivity is not a property of the
+ * function, it is a property of the DEVICE, so it is asked here and nowhere
+ * else. On a wide screen a heading toggles only itself.
+ */
+const soloSections = () => !window.matchMedia('(min-width: 1100px)').matches;
+
 function openSection(key) {
+  const solo = soloSections();
   for (const sec of SECTIONS) {
-    const on = sec.key === key;
     const head = $(`#sect-head-${sec.key}`), body = $(`#sect-body-${sec.key}`);
+    /* Wide: every other section keeps whatever it was. Narrow: only `key`. */
+    const on = sec.key === key ? true
+             : solo ? false
+             : head.getAttribute('aria-expanded') === 'true';
     head.setAttribute('aria-expanded', String(on));
     body.hidden = !on;
     head.closest('.sect').classList.toggle('is-open', on);
     if (!on) for (const g of groupsIn(sec.key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
   }
   fitStage();
+}
+
+/** Shut one section without touching the others. */
+function closeSection(key) {
+  const head = $(`#sect-head-${key}`), body = $(`#sect-body-${key}`);
+  head.setAttribute('aria-expanded', 'false');
+  body.hidden = true;
+  head.closest('.sect').classList.remove('is-open');
+  for (const g of groupsIn(key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
+  fitStage();
+}
+
+/** Every section open. What a desktop arrives at. */
+function openAllSections() {
+  for (const sec of SECTIONS) openSection(sec.key);
 }
 
 function closeGroup(key) {
@@ -300,7 +352,11 @@ function open(key) {
 }
 
 function toggleSection(key) {
-  openSection($(`#sect-head-${key}`).getAttribute('aria-expanded') === 'true' ? null : key);
+  const open = $(`#sect-head-${key}`).getAttribute('aria-expanded') === 'true';
+  /* Closing is per-section either way; only OPENING is exclusive, and only on
+     a narrow screen. Passing `null` to `openSection` was what made a click on
+     one heading shut all four once they could all be open. */
+  if (open) closeSection(key); else openSection(key);
 }
 
 function toggle(key) {

@@ -44,6 +44,46 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 4, first half — the card, the numbers, the headline, and all four
+  sections open on a desktop.**
+  ⚠ **`--surface`, the colour an element is actually SITTING on.** The swatch
+  ring named `--paper` directly, so the moment the choices panel became a white
+  card all seventeen colour chips grew a beige halo — the ring's gap painted in
+  the page's background over a white surface.
+  ⚠ **The other reported casualty was not one, and it was measured before it
+  was "fixed".** `--rule` at `#D6D3CB` is **1.50:1 on white against 1.28:1 on
+  paper**, so dividers get MORE visible on a card, not less. The claim that a
+  white card would have invisible internal rules does not survive arithmetic.
+  ⚠ **The card is free.** Applying background, radius, border and margin to
+  `.panel--choose` ITSELF, with no wrapper, moves the door by **zero pixels** at
+  1100, 1280 and 1536 — the track is `minmax(300px, 360px)` and a margin on a
+  grid item comes out of the item, never out of the stage's `1fr`. The "door
+  keeps its size" assertion is untouched by construction.
+  ⚠ **`01`–`04` are a CSS counter**, not a field on `SECTIONS` and not a digit
+  in the template. The number is a fact about POSITION and a stored one goes
+  stale the first time somebody reorders the list. `::before`, so it is
+  decoration and never reaches the accessible name.
+  ⚠ **The `<h1>` was `sr-only`** — the page opened on a door, a price and sixty
+  options with nothing saying what any of it was for. Same element, same id
+  (`.stage-wrap` names it in `aria-labelledby`), and INSIDE the stage wrap:
+  above 1100 px `body` is `100dvh; overflow: hidden` with `.layout { flex: 1 }`,
+  so a heading beside the layout takes its height straight out of the door.
+  ⚠ **Open-on-desktop, accordion-on-phone — and the naive version breaks every
+  heading.** `toggleSection` passed `null` to `openSection`, which sets
+  `on = sec.key === key` for EVERY section, so with four open a click on any
+  heading shut all four. Exclusivity is a property of the DEVICE, not of the
+  function, so it is asked once in `soloSections()`. The phone keeps the
+  accordion for a measured reason: all four open on 390 px puts the WhatsApp
+  button about two screens down. The desktop opens all four because the column
+  is 918 px tall with 304 px of content — 614 px of empty card, which a border
+  round it makes MORE legible, not less.
+  ⚠ **Three audit assertions restated, all strictly stronger.** The arrival
+  state is now asserted per viewport (four open on a desktop, none on a phone)
+  rather than "nothing open anywhere"; a new check clicks one desktop heading
+  and requires the other three to survive; and the keyboard walk asks the
+  section's state, presses Enter, and requires it to FLIP — the old
+  "Enter opens it" was true under one behaviour and inverts under the other.
+
 - **Stage 1 item 11 — `js/spec.js`: one statement of what the door is.** Four
   places described a door and each did it its own way — the message, `#summary`,
   `describe()` (the drawing's `aria-label`), and the tiles. They disagreed

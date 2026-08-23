@@ -4201,9 +4201,14 @@ ${body}
     }
     paint();
     const differs = GROUPS.find((g) => state[g.key] !== DEFAULTS[g.key]);
-    if (differs) {
-      openSection(differs.in);
-      open(differs.key);
+    if (soloSections()) {
+      if (differs) {
+        openSection(differs.in);
+        open(differs.key);
+      }
+    } else {
+      openAllSections();
+      if (differs) open(differs.key);
     }
   }
   function buildPanel() {
@@ -4282,10 +4287,12 @@ ${body}
     }
     keyboardGrid(host, (id) => choose(g, id));
   }
+  var soloSections = () => !window.matchMedia("(min-width: 1100px)").matches;
   function openSection(key) {
+    const solo = soloSections();
     for (const sec of SECTIONS) {
-      const on = sec.key === key;
       const head = $(`#sect-head-${sec.key}`), body = $(`#sect-body-${sec.key}`);
+      const on = sec.key === key ? true : solo ? false : head.getAttribute("aria-expanded") === "true";
       head.setAttribute("aria-expanded", String(on));
       body.hidden = !on;
       head.closest(".sect").classList.toggle("is-open", on);
@@ -4294,6 +4301,17 @@ ${body}
       }
     }
     fitStage();
+  }
+  function closeSection(key) {
+    const head = $(`#sect-head-${key}`), body = $(`#sect-body-${key}`);
+    head.setAttribute("aria-expanded", "false");
+    body.hidden = true;
+    head.closest(".sect").classList.remove("is-open");
+    for (const g of groupsIn(key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
+    fitStage();
+  }
+  function openAllSections() {
+    for (const sec of SECTIONS) openSection(sec.key);
   }
   function closeGroup(key) {
     $(`#head-${key}`).setAttribute("aria-expanded", "false");
@@ -4311,7 +4329,9 @@ ${body}
     fitStage();
   }
   function toggleSection(key) {
-    openSection($(`#sect-head-${key}`).getAttribute("aria-expanded") === "true" ? null : key);
+    const open2 = $(`#sect-head-${key}`).getAttribute("aria-expanded") === "true";
+    if (open2) closeSection(key);
+    else openSection(key);
   }
   function toggle(key) {
     open($(`#head-${key}`).getAttribute("aria-expanded") === "true" ? null : key);

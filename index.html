@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
-<link rel="stylesheet" href="css/app.css?v=8494e745">
+<link rel="stylesheet" href="css/app.css?v=f1829138">
 </head>
 <body>
 
@@ -83,7 +83,19 @@
 
   <!-- ── the door ─────────────────────────────────────────── -->
   <section class="stage-wrap" aria-labelledby="stage-h">
-    <h1 class="sr-only" id="stage-h">בחירת דלת כניסה</h1>
+    <!-- ⚠ VISIBLE NOW, and it is the same `<h1>` it always was. The page had a
+         heading only a screen reader could find: `sr-only`, so a sighted
+         customer arrived at a door, a price and sixty options with nothing
+         saying what any of it was for. From the mockup.
+         It keeps its id, because `.stage-wrap` names it in `aria-labelledby`
+         and a renamed id would silently unlabel the region.
+         It is INSIDE `.stage-wrap`, not a sibling of `.layout`: above 1100 px
+         `body` is `100dvh` with `overflow: hidden` and `.layout` is `flex: 1`,
+         so a heading beside the layout takes its height straight out of the
+         door at every desktop size. Inside, the stage flexes around it. -->
+    <h1 class="stage__h1" id="stage-h">בנו את הדלת שלכם
+      <span class="stage__lede">בחרו את הפרטים ותראו את השינוי בזמן אמת</span>
+    </h1>
     <div class="stage" id="stage"></div>
 
     <!-- ⚠ INSIDE the stage and OUT OF FLOW, and both halves of that matter.
@@ -211,7 +223,7 @@
     document.documentElement.classList.add('is-bare');
   }
 </script>
-<script src="assets/bundle.js?v=b7b40299"></script>
+<script src="assets/bundle.js?v=ba97b0ff"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

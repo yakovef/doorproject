@@ -118,10 +118,51 @@ for (const v of VIEWS) {
 
   if (!shut.sections) fault(v.name, 'no sections rendered');
   if (shut.sections > 4) fault(v.name, `${shut.sections} top-level sections — the fold is meant to be short`);
-  if (shut.openSections) fault(v.name, `${shut.openSections} sections already open on load`);
+
+  /* ⚠ THE ARRIVAL STATE IS DIFFERENT ON THE TWO DEVICES, AND BOTH ARE
+     ASSERTED. This used to be one rule — nothing open, anywhere — which was
+     right while the page had one behaviour.
+     A PHONE keeps it, and the reason is measured: the panel used to render
+     every option in every group on first paint and put the WhatsApp button
+     eight screens down; all four open on a 390 px screen puts it back about
+     two, and the button is the entire purpose of the site.
+     A DESKTOP opens all four, from the mockup, and because the column is
+     918 px tall with 304 px of content in it — 614 px of empty card, made
+     more legible rather than less by drawing a border round it.
+     Stated per viewport, so neither can regress into the other's behaviour.
+     `wide` here is the same 1100 px breakpoint `css/app.css` uses; naming it
+     twice is the drift this file has been bitten by before, so it is derived
+     from the viewport under test rather than listed. */
+  const wide = v.w >= 1100;
+  if (wide) {
+    if (shut.openSections !== 4) {
+      fault(v.name, `${shut.openSections} of 4 sections open on load — a desktop `
+                  + 'arrives with the whole panel showing');
+    }
+    if (!shut.visibleHeads) fault(v.name, 'no category rows visible on a desktop load');
+  } else {
+    if (shut.openSections) fault(v.name, `${shut.openSections} sections already open on load`);
+    if (shut.visibleHeads) fault(v.name, `${shut.visibleHeads} category rows visible before a section was opened`);
+  }
   if (shut.open) fault(v.name, `${shut.open} categories already open on load`);
-  if (shut.visibleHeads) fault(v.name, `${shut.visibleHeads} category rows visible before a section was opened`);
   if (shut.visibleOptions) fault(v.name, `${shut.visibleOptions} options visible before anything was opened`);
+
+  /* AND ON A DESKTOP, CLICKING ONE HEADING MUST NOT SHUT THE OTHERS. That is
+     not hypothetical: `toggleSection` passed `null` to `openSection`, which
+     set `on = sec.key === key` for every section, so the first click on any
+     heading closed all four the moment they could all be open. */
+  if (wide) {
+    await p.click('.sect__head');
+    await p.waitForTimeout(200);
+    const after = await p.evaluate(() =>
+      [...document.querySelectorAll('.sect__body')].filter(b => !b.hidden).length);
+    if (after !== 3) {
+      fault(v.name, `closing one section left ${after} of the other 3 open — `
+                  + 'one heading is shutting the whole panel');
+    }
+    await p.click('.sect__head');          // put it back for the walk below
+    await p.waitForTimeout(200);
+  }
 
   /* WHAT IS HIDDEN MUST ACTUALLY BE GONE.
      `hidden` is only `display: none` in the UA stylesheet, so any author rule
@@ -483,11 +524,25 @@ for (const v of VIEWS) {
     }
     if (!head) fault(v.name, 'no section heading can be reached with Tab');
     else {
+      /* ⚠ ENTER TOGGLES, and which direction that is depends on the device:
+         a desktop arrives with all four sections open, so Enter CLOSES the
+         first one. This used to assert "Enter opens it", which was true while
+         the page had one behaviour and inverts under the other — so it asks
+         the state, flips it, and checks it flipped. Strictly stronger than
+         the one-directional version it replaces, and it works at every
+         viewport without knowing the breakpoint. */
+      const wasOpen = await p.evaluate(id =>
+        document.getElementById(id).getAttribute('aria-expanded') === 'true', head);
       await p.keyboard.press('Enter');
       await p.waitForTimeout(150);
-      if (!await p.evaluate(() => [...document.querySelectorAll('.sect__body')].some(b => !b.hidden))) {
-        fault(v.name, 'Enter on a section heading does not open it');
+      const nowOpen = await p.evaluate(id =>
+        document.getElementById(id).getAttribute('aria-expanded') === 'true', head);
+      if (nowOpen === wasOpen) {
+        fault(v.name, `Enter on a section heading did not toggle it `
+                    + `(it was ${wasOpen ? 'open' : 'shut'} and still is)`);
       }
+      /* Leave it OPEN for the rest of the walk, whichever way it just went. */
+      if (!nowOpen) { await p.keyboard.press('Enter'); await p.waitForTimeout(150); }
 
       await p.keyboard.press('Tab');
       await p.waitForTimeout(80);
