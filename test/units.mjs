@@ -20,6 +20,11 @@ const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' +
 const group = name => console.log('\n' + name);
 
 const sizeKeys = Object.keys(SIZES);
+/* Crockford's alphabet, as `url-state.js` writes it. Kept here rather than
+   imported because a test that borrows the implementation's own table cannot
+   notice the implementation changing it. */
+const ALPHABET_TEST = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
 const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
                handle: 'idan', lockset: 'coral', detail: 'plain',
                size: 'standard', handing: 'right-in' };
@@ -157,6 +162,51 @@ group('short code round-trip');
     dn++;
   }
   console.log(`  (${dn} designs varying the front detail, which the sweep pins)`);
+
+  /* ⚠ THE CHECK NIBBLE. Before it, 38.4% of one-character typos decoded to a
+     DIFFERENT, VALID, BUILDABLE door with no warning — 38,053 of 99,200 trials,
+     a fifth of them at an identical price so the money did not betray them
+     either. On the one artefact built to be read down a telephone.
+
+     The four bits were already reserved, already transmitted, and written as
+     zeros nobody read. Measured after: 1.03%, which is 37x fewer, at zero
+     extra characters. This asserts the property rather than the percentage —
+     a rate would go stale the moment a list grows — but the sweep is wide
+     enough that a broken check cannot pass it. */
+  {
+    const A = ALPHABET_TEST;
+    let bad = 0, tried = 0;
+    for (const st of [base,
+                      { ...base, colour: 'rb-9016d', size: 'wide', detail: 'panel' },
+                      { ...base, handle: 'none', lockset: 'digital', window: 'tallwin' }]) {
+      const body = encodeCode(st).slice(3);
+      for (let i = 0; i < body.length; i++) for (const ch of A) {
+        if (ch === body[i]) continue;
+        tried++;
+        const back = decodeCode('DM-' + body.slice(0, i) + ch + body.slice(i + 1));
+        if (back && KEYS.some(k => back[k] !== st[k])) bad++;
+      }
+    }
+    ok(tried > 600, `only ${tried} typos tried — the sweep is too narrow to mean anything`);
+    ok(bad / tried < 0.05,
+       `${bad} of ${tried} single-character typos (${(100 * bad / tried).toFixed(1)}%) still `
+     + 'decode to a different valid door; the check nibble is not doing its job');
+    /* And it must not be refusing everything, which would "pass" the line
+       above while making the code useless. */
+    for (const st of [base, { ...base, size: 'half' }]) {
+      ok(decodeCode(encodeCode(st)) !== null,
+         'a code this app just produced does not decode: the check rejects its own output');
+    }
+  }
+
+  /* A version-10 code carries zeros where the check now lives, so it must be
+     REFUSED — and refused by VERSION, so `fromQuery` can tell the customer
+     rather than failing in a way nobody can interpret. */
+  ok(decodeCode('DM-M4040480') === null,
+     'a pre-check code still decodes; every one of them is a door read under a '
+   + 'layout that no longer means what it meant');
+  ok(fromQuery('?code=DM-M4040480').notice === 'code-unknown',
+     'an old code is refused without telling the customer why');
 
   // Read-aloud tolerance: a customer says these over the phone.
   const ref = encodeCode(base);

@@ -3790,7 +3790,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 10;
+  var VERSION = 11;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "rect",
@@ -3889,7 +3889,17 @@ ${body}
     detail: 4
   };
   var TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
-  var PAD_BITS = TOTAL_BITS - Object.values(BITS).reduce((a, b) => a + b, 0);
+  var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
+  var PAD_BITS = TOTAL_BITS - PAYLOAD_BITS;
+  var checkNibble = (payload) => {
+    let r = 15;
+    for (let i = PAYLOAD_BITS - 1; i >= 0; i--) {
+      const bit = Number(payload >> BigInt(i) & 1n);
+      r = (r << 1 | bit) & 31;
+      if (r & 16) r ^= 19;
+    }
+    return r & 15;
+  };
   function encodeCode(state2) {
     const sizeKeys = Object.keys(SIZES);
     const parts = [
@@ -3901,15 +3911,14 @@ ${body}
       [Math.max(0, GRILLES.findIndex((g) => g.id === state2.grille)), BITS.grille],
       [Math.max(0, HANDLES.findIndex((n) => n.id === state2.handle)), BITS.handle],
       [Math.max(0, LOCKSETS.findIndex((k) => k.id === state2.lockset)), BITS.lockset],
-      [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail],
-      [0, PAD_BITS]
-      // to the next whole character
+      [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
       const w = BigInt(width);
       bits = bits << w | BigInt(value) & (1n << w) - 1n;
     }
+    bits = bits << BigInt(PAD_BITS) | BigInt(checkNibble(bits));
     let out = "";
     for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[Number(bits >> BigInt(i) & 31n)];
     return "DM-" + out;
@@ -3930,6 +3939,7 @@ ${body}
       return v;
     };
     let consumed = 0;
+    if (Number(bits & (1n << BigInt(PAD_BITS)) - 1n) !== checkNibble(bits >> BigInt(PAD_BITS))) return null;
     const version = read(BITS.version);
     if (version !== VERSION) return null;
     const colour = COLOURS[read(BITS.colour)];

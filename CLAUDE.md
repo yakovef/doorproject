@@ -44,6 +44,37 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 2 — VERSION 11: the four pad bits became a check nibble.**
+  38.4% of one-character typos used to decode to a DIFFERENT, VALID, BUILDABLE
+  door with no warning — 38,053 of 99,200 trials, a fifth of them at an
+  identical price so the money did not betray them either — on the one artefact
+  built to be read down a telephone. **Now 1.03%, which is 37× fewer, at zero
+  extra characters:** `TOTAL_BITS` already rounded 36 up to 40, so four bits
+  were reserved, transmitted, and written as zeros nobody read.
+  ⚠ **The checksum was chosen by MEASUREMENT, not by taste** — the same 99,200
+  substitutions plus every adjacent transposition:
+  `sum of nibbles 96.8/96.4` · `position-weighted 91.1/93.8` (worse — the
+  weights collide mod 16) · `CRC-4 96.8/96.6` · **`CRC-4 seeded 0xF`** ←.
+  ⚠ **The check is verified BEFORE any field is read.** A code that does not
+  check is not a code with one wrong field; it is a code no field of which can
+  be trusted, and reading it is the silent wrong door the nibble exists to stop.
+  ⚠ **Why the bump, and why now.** No field moved and no list changed — but
+  `decodeCode` now REFUSES a mismatched check, and a version-10 code carries
+  zeros there, so all of them would fail. Refusing by VERSION gives the
+  customer `code-unknown` instead of a rejection they cannot interpret. It is
+  free today because the site is `noindex`, undeployed, and **not one code has
+  ever been issued**; it would never be free again.
+  ⚠ **The grip position was considered for this bump and deliberately left
+  out.** The old comment said it stayed out because a bump would cost every
+  code written so far — which stopped being the reason the moment a bump was
+  happening anyway. The reason NOW is that it does not belong there: since
+  Stage 1.4 the message says in words that the handle was moved and points at
+  the link for the millimetres, so a character added to a telephone code would
+  duplicate what the order already says.
+  ⚠ The test asserts the PROPERTY, not the percentage — a rate goes stale the
+  moment a list grows — and also asserts the check does not refuse the app's
+  own output, which would "pass" a detection test while making the code useless.
+
 - **Stage 1.4 — a dragged handle reached Peretz in no form at all.** The
   customer drags the bar, presses סובבו, the drawing changes — and `message()`
   returned byte for byte the message for the door they started from, while

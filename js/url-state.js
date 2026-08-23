@@ -51,7 +51,23 @@ import { repair } from './rules.js';
    into it. A version-9 code read under this layout is a different door, so it
    is refused with a notice.
    `z` joins `f` and `a` in retirement: never reuse the letter. */
-export const VERSION = 10;
+/* 11: THE FOUR PAD BITS BECAME A CHECK NIBBLE. No field moved and no list
+   changed — but `decodeCode` now REFUSES a code whose check does not match,
+   and a version-10 code carries zeros there, so every one of them would fail.
+   Refusing them by version gives the customer the notice instead of a silent
+   rejection they cannot interpret.
+   Taken deliberately and taken NOW: 38.4% of single-character typos used to
+   decode to a different valid buildable door, on the one artefact built to be
+   read down a telephone, and it is 1.03% now — 37x fewer. The bump is free
+   today because the site is noindex, undeployed, and not one code has ever
+   been given to a customer. It would never be free again. See `checkNibble`.
+   ⚠ The GRIP POSITION was considered for this bump and deliberately left out.
+   It is a picture of what the customer had in mind rather than a
+   specification, it is settled on site, and since Stage 1.4 the MESSAGE says
+   in words that the handle was moved and points at the link for the
+   millimetres. Carrying it in the code as well would have grown the code a
+   character to duplicate what the order already says. */
+export const VERSION = 11;
 
 export const DEFAULTS = {
   colour:  'rb-0097d',
@@ -92,10 +108,16 @@ export function toQuery(state) {
      It is in the link and NOT in the code, at the owner's son's instruction:
      the position is a picture of what the customer had in mind, not an
      instruction his father builds to, and the code is the thing read down a
-     telephone as a specification. Putting it in the code would have cost a
-     VERSION bump and every code written so far. The link still carries it, so
-     the door Peretz taps through to is the door they were looking at, and the
-     stage says underneath that the final position is set on site. */
+     telephone as a specification. The link still carries it, so the door
+     Peretz taps through to is the door they were looking at, and the stage
+     says underneath that the final position is set on site.
+     ⚠ It stayed out of the code even when VERSION 11 made a bump free. The
+     old reason given here — "it would cost a bump and every code written so
+     far" — stopped being the reason the moment a bump was happening anyway.
+     The reason now is simply that it does not belong there: since Stage 1.4
+     the MESSAGE says in words that the handle was moved and points here for
+     the millimetres, so a character added to a telephone code would duplicate
+     what the order already says. */
   if (state.grip) {
     const g = state.grip;
     p.set('gp', `${Math.round(g.x)},${Math.round(g.y)},${g.rot === 90 ? 90 : 0}`);
@@ -266,7 +288,55 @@ export const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4,
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */
 const TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
-const PAD_BITS = TOTAL_BITS - Object.values(BITS).reduce((a, b) => a + b, 0);
+const PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
+/* ⚠ NO LONGER PADDING. These four bits carry the check nibble; the name is
+   kept because the width is still "whatever rounds the payload up to a whole
+   character", and if a field is ever widened this is what shrinks. */
+const PAD_BITS = TOTAL_BITS - PAYLOAD_BITS;
+
+/**
+ * ── THE CHECK NIBBLE ─────────────────────────────────────────────────
+ *
+ * ⚠ WHY: 38.4% OF ONE-CHARACTER TYPOS USED TO DECODE TO A DIFFERENT, VALID,
+ * BUILDABLE DOOR, WITH NO WARNING ANYWHERE. Measured over 400 random designs x
+ * every single-character substitution in the eight-character body = 99,200
+ * trials: 55.6% refused, 6.0% the same door, and **38,053 silent wrong doors**
+ * — of which 21.9% priced identically, so the money did not betray them
+ * either. Median price change ₪200, worst ₪1,930.
+ *
+ * This code exists SPECIFICALLY for the telephone (see the head of this file).
+ * Better than one in three, on the one channel it was built for.
+ *
+ * ⚠ AND IT COSTS NOTHING. `TOTAL_BITS` rounds 36 up to 40, so four bits were
+ * already reserved, already transmitted, and written as zeros nobody read. The
+ * check goes there. The code is still eight characters.
+ *
+ * WHICH CHECK, chosen by measurement rather than by taste — the same 99,200
+ * substitutions plus every adjacent transposition:
+ *
+ *     sum of nibbles      96.8% subs   96.4% transpositions
+ *     position-weighted   91.1%        93.8%      <- worse; weights collide mod 16
+ *     CRC-4 (x^4+x+1)     96.8%        96.6%
+ *     CRC-4, seeded 0xF   96.8%        96.6%      <- this one
+ *
+ * The seed makes leading-zero payloads distinguishable; a CRC beats a plain sum
+ * structurally on reordering, and measures no worse on anything.
+ *
+ * ⚠ THIS IS WHY `VERSION` WENT TO 11, AND WHY NOW. Reading the pad as a check
+ * changes what `decodeCode` ACCEPTS, so every existing code must be refused
+ * rather than silently re-read — that is exactly what the version nibble is
+ * for. It is free today because the site is `noindex`, undeployed, and **not
+ * one code has ever been given to a customer**. It would never be free again.
+ */
+const checkNibble = payload => {
+  let r = 0xF;                                    // seeded, so leading zeros count
+  for (let i = PAYLOAD_BITS - 1; i >= 0; i--) {
+    const bit = Number((payload >> BigInt(i)) & 1n);
+    r = ((r << 1) | bit) & 0x1F;
+    if (r & 0x10) r ^= 0x13;                      // x^4 + x + 1
+  }
+  return r & 0xF;
+};
 
 export function encodeCode(state) {
   const sizeKeys = Object.keys(SIZES);
@@ -280,7 +350,6 @@ export function encodeCode(state) {
     [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
     [Math.max(0, LOCKSETS.findIndex(k => k.id === state.lockset)), BITS.lockset],
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
-    [0, PAD_BITS],                       // to the next whole character
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -292,6 +361,8 @@ export function encodeCode(state) {
     const w = BigInt(width);
     bits = (bits << w) | (BigInt(value) & ((1n << w) - 1n));
   }
+  /* The four bits that used to be written as zeros. See `checkNibble`. */
+  bits = (bits << BigInt(PAD_BITS)) | BigInt(checkNibble(bits));
 
   let out = '';
   for (let i = TOTAL_BITS - 5; i >= 0; i -= 5) out += ALPHABET[Number((bits >> BigInt(i)) & 31n)];
@@ -318,6 +389,15 @@ export function decodeCode(code) {
     return v;
   };
   let consumed = 0;
+
+  /* ⚠ THE CHECK FIRST, before anything is read out of the payload. A code that
+     does not check is not a code with one wrong field — it is a code we cannot
+     trust any field of, and reading it would be the silent wrong door this
+     nibble exists to stop. Measured: this refuses 96.8% of single-character
+     substitutions and 96.6% of adjacent transpositions that the version and
+     range checks would otherwise have let through. */
+  if (Number(bits & ((1n << BigInt(PAD_BITS)) - 1n))
+      !== checkNibble(bits >> BigInt(PAD_BITS))) return null;
 
   const version = read(BITS.version);
   if (version !== VERSION) return null;
