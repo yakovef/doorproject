@@ -1,5 +1,11 @@
 # REALISM — plan to make the door believable
 
+> **The forward plan now lives in `REALISM2.md`** — the scene, the finish pass,
+> and the order to do it in. This file stays as the measurement log and the
+> governing rule (§6), under its own name: sixteen files cite `REALISM.md` by
+> name and section, including `test/units.mjs` and five tools, and renaming it
+> would rot every one of those citations in silence.
+
 > Companion to `PLAN.md`. This document exists because the current drawing
 > fails the only test that matters: **a visitor looks at it and does not
 > believe it.** Nothing else on the site survives that.

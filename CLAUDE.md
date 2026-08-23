@@ -21,7 +21,19 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
-- **Five agents were turned on the shipped site — one per lane, so they could
+- **`REALISM2.md` — the plan for the second mockup, written and not yet
+  built.** A full-page render arrived from outside; `MOCKUP2.md` is the
+  *reading* (what it asks, what it costs, the nine items refused with their
+  lines of record) and `REALISM2.md` is the *decision*: six stages, A→F —
+  tokens, chrome, מבנה הדלת becomes section 01, the room (alcove, floor
+  reflection as a `<use>`, sconces whose light stops at the wall), the leaf's
+  grain under mottle-and-photograph gates, and the ≥1280 overlay layout.
+  `REALISM.md` keeps its name — sixteen files cite it — and carries a pointer.
+  ⚠ Three numbers in the plan were measured before being written down
+  (backdrop = 1,354 B of a 35,400 B default door; accent on white = 3.09:1 —
+  the draft asserted 2.72 from memory and was corrected by the measurement),
+  and the plants are cut by the byte ledger: D1–D4 ≈ 1,400 B, plants ≈ 3,000 B
+  against a 40 KB gate the default door clears by 4.6 KB.
   not all find the same defect — and produced 43 verified faults in code that
   was green on every instrument in the repo.** All fixed; the full table is
   `REDESIGN.md` §4b.1. Four of them share one shape, and it is worth carrying
