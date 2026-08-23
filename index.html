@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
-<link rel="stylesheet" href="css/app.css?v=f1829138">
+<link rel="stylesheet" href="css/app.css?v=1bf91ca7">
 </head>
 <body>
 
@@ -16,8 +16,41 @@
     <span class="brand__name">דלתות מגן</span>
     <span class="brand__sub">בונים דלת</span>
   </a>
-  <a class="bar__phone" id="phone-link" href="tel:972532197466">053-219-7466</a>
+
+  <!-- ⚠ EVERY LINK GOES SOMEWHERE THAT EXISTS. The mockup draws
+       דגמים / עיצוב אישי / צור קשר as three pages; two of them are not built
+       and `PLAN.md` §9 still lists /works and /about as unwritten. A nav item
+       that goes nowhere is worse than no nav item, so דגמים points at the real
+       works gallery on the main site — the trust layer PLAN.md §4 leans on —
+       and צור קשר at the telephone, which is the one channel that always
+       works. עיצוב אישי is this page and says so with `aria-current`, rather
+       than being a link to where you already are. -->
+  <nav class="nav" aria-label="ניווט ראשי">
+    <a class="nav__a" href="https://dlatotmagen.co.il/works">דגמים</a>
+    <span class="nav__a is-here" aria-current="page">עיצוב אישי</span>
+    <a class="nav__a" href="tel:972532197466">צור קשר</a>
+  </nav>
+
+  <div class="bar__end">
+    <a class="bar__phone" id="phone-link" href="tel:972532197466">053-219-7466</a>
+    <!-- The saved designs live in this browser and nowhere else; see app.js. -->
+    <button class="bar__saved" id="saved-btn" type="button" hidden
+            aria-expanded="false" aria-controls="saved">
+      העיצוב שלי <span class="bar__count" data-saved-count>0</span>
+    </button>
+  </div>
 </header>
+
+<!-- ⚠ THE SAVED LIST IS THIS BROWSER'S AND NOBODY ELSE'S. It is `localStorage`
+     — nothing leaves the machine, nothing reaches us, and it survives nothing
+     but this browser on this device. That is why the `DM-` code and the link
+     stay exactly where they were: they are the things a customer can actually
+     SEND, and this is only a convenience for holding two doors side by side
+     before choosing one. -->
+<div class="saved" id="saved" hidden>
+  <p class="saved__none" data-saved-empty>עדיין לא שמרתם עיצוב.</p>
+  <ul class="saved__list" data-saved-list></ul>
+</div>
 
 <p class="strip" id="placeholder-note" hidden>
   <strong>גרסת פיתוח.</strong> הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.
@@ -153,7 +186,16 @@
         <span class="send__incl">כולל דלת, התקנה מלאה ומע״מ</span>
       </div>
 
-      <p class="send__spec" id="summary"></p>
+      <!-- ⚠ TWO RENDERINGS OF ONE LIST, and neither is redundant.
+           `#spec` is the mockup's table — label, value, swatch — and `#summary`
+           is the same `specRows(state)` as a single line. The line is what a
+           320 px phone has room for, and it is also what `npm run audit`
+           compares against `summaryLine(state)` to prove the page has not
+           drifted off `js/spec.js`, which is the check that would have caught
+           the accessible name announcing a door with no ironwork on it while
+           the order charged ₪620 for some. -->
+      <div class="spec" id="spec" aria-hidden="true"></div>
+      <p class="send__spec sr-only" id="summary"></p>
 
       <p class="send__lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
 
@@ -167,6 +209,7 @@
 
       <div class="send__alt">
         <button class="btn btn--ghost" id="copy-btn" type="button">העתקת הפרטים</button>
+        <button class="btn btn--ghost" id="save-btn" type="button">שמירת העיצוב</button>
         <span class="send__code">קוד: <b id="code">—</b></span>
       </div>
 
@@ -214,6 +257,18 @@
   </a>
 </div>
 
+<!-- ⚠ FOUR CLAIMS MADE ON PERETZ'S BEHALF, and all four were confirmed from
+     outside before they were written. The warranty deliberately does NOT say
+     "אחריות מלאה": a promise with no term is one nobody can be held to, which
+     is the same as no promise. `ASK-PERETZ.md` §9 asks how many years and on
+     what, and the number goes in the moment he answers. -->
+<footer class="trust" aria-label="למה אנחנו">
+  <span class="trust__i">שירות אישי וליווי</span>
+  <span class="trust__i">התקנה מקצועית</span>
+  <span class="trust__i">ייצור כחול לבן</span>
+  <span class="trust__i">אחריות</span>
+</footer>
+
 <div class="toast" id="toast" hidden></div>
 <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
 
@@ -223,7 +278,7 @@
     document.documentElement.classList.add('is-bare');
   }
 </script>
-<script src="assets/bundle.js?v=ba97b0ff"></script>
+<script src="assets/bundle.js?v=d7ab6ae1"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

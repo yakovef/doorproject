@@ -729,6 +729,20 @@ for (const v of VIEWS) {
     ['bundle-404', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
         await pg.route('**/bundle.js*', r => r.abort());
         await pg.goto(URL); await pg.waitForTimeout(700); return pg; }],
+    /* ⚠ A FIFTH ROUTE, and it is the saved-designs feature's own. Reading
+       `localStorage` THROWS rather than returning null in a private window
+       with site data blocked, so an unguarded read at boot takes the whole
+       page down — and by everything above, "down" here means styled, complete
+       and inert. A convenience for holding two doors side by side is not
+       permitted to cost the site, so this route must come up NORMAL: the door
+       drawn, the price real, nothing degraded. */
+    ['no-storage', async () => { const c = await b.newContext({ viewport: { width: 390, height: 844 } });
+        await c.addInitScript(() => {
+          Object.defineProperty(window, 'localStorage',
+            { get() { throw new Error('site data blocked'); } });
+        });
+        const pg = await c.newPage();
+        await pg.goto(URL); await pg.waitForTimeout(700); return pg; }],
   ];
 
   console.log('\nthe page cannot come up styled and inert');
@@ -740,7 +754,7 @@ for (const v of VIEWS) {
                 + 'the page looks finished and is not');
     }
     if (r.dead) fault(name, `${r.dead} send button(s) do not point at wa.me`);
-    if (name === 'happy') {
+    if (name === 'happy' || name === 'no-storage') {
       if (r.down) fault(name, 'the "cannot load" strip is showing on a working page');
       if (!r.promising) fault(name, 'a working page does not offer to send the door');
     } else {

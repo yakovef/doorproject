@@ -38,7 +38,7 @@ import {
   render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
-import { summaryLine } from './spec.js';
+import { specRows, summaryLine } from './spec.js';
 import { copyMessage, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE, gripDeparture,
          PHONE_DISPLAY, PHONE_E164, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
@@ -141,6 +141,14 @@ function init() {
     placeGrip({ ...now, rot: now.rot === 90 ? 0 : 90 }, true);
   });
   $('#grip-home').addEventListener('click', () => set({ ...state, grip: null }));
+  $('#save-btn').addEventListener('click', saveCurrent);
+  $('#saved-btn').addEventListener('click', () => {
+    const box = $('#saved'), btn = $('#saved-btn');
+    const show = box.hidden;
+    box.hidden = !show;
+    btn.setAttribute('aria-expanded', String(show));
+  });
+  paintSaved();
 
   /* The crop depends on the stage's shape, so it has to be recomputed
      whenever that changes — a rotated phone, a dragged window, one of the
@@ -191,6 +199,46 @@ function init() {
 
 function buildPanel() {
   const wrap = $('#choices');
+
+  /* ── THE NAVIGATOR ───────────────────────────────────────────────
+     The mockup draws a four-step progress indicator, and this is not one,
+     deliberately.
+     ⚠ A PROGRESS BAR HERE WOULD BE A LIE, and the lie is structural rather
+     than a matter of wording: `nowLabel` falls back to `list[0]`, so every
+     category always has a value and `sectionLabel` can never return empty.
+     Measured on first paint, before the customer has touched anything, all
+     four sections already read complete — `אפור אנתרציט · חלק`,
+     `חלון מלבני · ללא סורג`, `עידן · צילינדר בלבד`, `סטנדרטית · ימין, פנימה`.
+     That fallback is deliberate and right: "no pull handle" is a decision the
+     door carries, not a blank. So any indicator derived from `state` reads 4/4
+     on arrival, which is worse than no indicator.
+     What it IS: a table of contents. It names the four sections, marks the
+     ones that are open, and jumps. On a phone, where one section is open at a
+     time, that is real navigation; on a desktop it is a map of a card too tall
+     to take in at once. It carries NO VALUES — those are in the spec table
+     beside the price, and a second copy of them here is the duplication this
+     codebase keeps paying for. */
+  const nav = document.createElement('nav');
+  nav.className = 'steps';
+  nav.setAttribute('aria-label', 'מעבר בין חלקי הבחירה');
+  for (const sec of SECTIONS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'steps__step';
+    b.dataset.step = sec.key;
+    b.innerHTML = `<span class="steps__n" aria-hidden="true"></span>`
+                + `<span class="steps__t">${sec.title}</span>`;
+    b.addEventListener('click', () => {
+      if ($(`#sect-head-${sec.key}`).getAttribute('aria-expanded') !== 'true') {
+        openSection(sec.key);
+      }
+      $(`#sect-head-${sec.key}`).scrollIntoView({ block: 'nearest' });
+      $(`#sect-head-${sec.key}`).focus();
+    });
+    nav.appendChild(b);
+  }
+  wrap.appendChild(nav);
+
   for (const sec of SECTIONS) {
     const box = document.createElement('section');
     box.className = 'sect';
@@ -250,7 +298,12 @@ function buildOptions(g, host) {
 
     if (g.kind === 'swatch') {
       b.className = 'swatch';
+      /* ⚠ The name and the RAL are hidden by CSS, not removed — so the
+         accessible name and the tooltip still carry both. A circle with no
+         name is a colour a blind customer cannot choose, and Peretz orders by
+         the number on the manufacturer's sheet. */
       b.title = `${o.he} · RAL ${o.ral}`;
+      b.setAttribute('aria-label', `${o.he}, RAL ${o.ral}`);
       b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
         <span class="swatch__name">${o.he}</span>
@@ -315,7 +368,107 @@ function openSection(key) {
     head.closest('.sect').classList.toggle('is-open', on);
     if (!on) for (const g of groupsIn(sec.key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
   }
+  markSteps();
   fitStage();
+}
+
+/* ── SAVED DESIGNS ───────────────────────────────────────────────────
+ *
+ * A customer comparing two doors had nowhere to put the first one. The design
+ * IS the address bar and `fromQuery` round-trips it perfectly, but nothing on
+ * the page ever said so, so closing the tab lost it.
+ *
+ * ⚠ THIS IS NOT A REPLACEMENT FOR THE CODE OR THE LINK, and the mockup's
+ * version — which deletes the visible `DM-` code and puts a heart there — was
+ * declined for that reason. The code is how an order is taken down a
+ * telephone; the link is how Peretz sees the exact door. Those are the things
+ * a customer can SEND. This is `localStorage`: it never leaves the machine,
+ * never reaches us, and does not survive a different browser or a cleared
+ * cache. A convenience for holding two doors side by side, nothing more, and
+ * the copy says so.
+ *
+ * ⚠ EVERY ACCESS IS WRAPPED. `localStorage` THROWS rather than returning null
+ * in a private window with site data blocked, and an unguarded read at boot
+ * would take down the whole page — which, per the `<noscript>` work, means a
+ * styled and inert screen with two dead buttons. A door-saving convenience is
+ * not permitted to cost the site.
+ */
+const SAVED_KEY = 'dm.saved.v1';
+const SAVED_MAX = 6;
+
+const savedRead = () => {
+  try {
+    const raw = localStorage.getItem(SAVED_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list.filter(x => typeof x === 'string') : [];
+  } catch { return []; }
+};
+const savedWrite = list => {
+  try { localStorage.setItem(SAVED_KEY, JSON.stringify(list.slice(0, SAVED_MAX))); return true; }
+  catch { return false; }
+};
+
+/** The stored form is the QUERY, because that is the only representation that
+ *  survives a catalogue change with a notice rather than silently. */
+function saveCurrent() {
+  const q = toQuery(state);
+  const list = savedRead().filter(x => x !== q);
+  list.unshift(q);
+  if (!savedWrite(list)) { toast('הדפדפן הזה לא מאפשר לשמור עיצובים'); return; }
+  toast('העיצוב נשמר בדפדפן הזה');
+  paintSaved();
+}
+
+function paintSaved() {
+  const list = savedRead();
+  const btn = $('#saved-btn');
+  if (!btn) return;
+  btn.hidden = !list.length;
+  document.querySelectorAll('[data-saved-count]').forEach(e => { e.textContent = String(list.length); });
+  const box = $('[data-saved-list]');
+  const none = $('[data-saved-empty]');
+  if (!box) return;
+  if (none) none.hidden = list.length > 0;
+  box.replaceChildren(...list.map(q => {
+    const li = document.createElement('li');
+    li.className = 'saved__row';
+    const open = document.createElement('button');
+    open.type = 'button';
+    open.className = 'saved__open';
+    /* Named by what the door IS, from the same rows everything else uses. */
+    let label = q;
+    try { label = summaryLine(fromQuery(q).state); } catch { /* keep the query */ }
+    open.textContent = label;
+    open.addEventListener('click', () => {
+      const { state: st } = fromQuery(q);
+      set(st);
+      $('#saved').hidden = true;
+      $('#saved-btn').setAttribute('aria-expanded', 'false');
+    });
+    const drop = document.createElement('button');
+    drop.type = 'button';
+    drop.className = 'saved__drop';
+    drop.setAttribute('aria-label', `הסרת ${label}`);
+    drop.textContent = '×';
+    drop.addEventListener('click', () => {
+      savedWrite(savedRead().filter(x => x !== q));
+      paintSaved();
+    });
+    li.append(open, drop);
+    return li;
+  }));
+}
+
+/** Which sections are open, on the navigator. */
+function markSteps() {
+  for (const sec of SECTIONS) {
+    const b = document.querySelector(`.steps__step[data-step="${sec.key}"]`);
+    const head = $(`#sect-head-${sec.key}`);
+    if (!b || !head) continue;
+    const on = head.getAttribute('aria-expanded') === 'true';
+    b.classList.toggle('is-on', on);
+    if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+  }
 }
 
 /** Shut one section without touching the others. */
@@ -325,6 +478,7 @@ function closeSection(key) {
   body.hidden = true;
   head.closest('.sect').classList.remove('is-open');
   for (const g of groupsIn(key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
+  markSteps();
   fitStage();
 }
 
@@ -485,6 +639,12 @@ function paint() {
      reintroduced by the fix that cites it if this loop is not here.
      Only the grille group needs it: nothing else in `GROUPS` is priced by a
      count. */
+  /* The navigator marks what is OPEN, which is a fact about the page rather
+     than about the door — so it is refreshed wherever the fold changes, not
+     only here. `aria-current` rather than a class alone: a screen reader
+     should be told which of the four it is looking at. */
+  markSteps();
+
   const panes = Math.max(1, paneCount(state));
   document.querySelectorAll('.field[data-group="grille"] .tile').forEach(b => {
     const meta = b.querySelector('.tile__meta');
@@ -501,6 +661,28 @@ function paint() {
      order charging ₪620 for some. One statement, however many places show it,
      exactly as the price is. */
   $('#summary').textContent = summaryLine(state);
+
+  /* ── THE SPEC TABLE ──────────────────────────────────────────────
+     The mockup's best idea, and it costs almost nothing here because the rows
+     already exist: this is `specRows(state)` with a different renderer, not a
+     fifth description of the door. Label on the right, value on the left, and
+     a swatch where the row carries one.
+     `#summary` above stays and is not redundant — it is the same rows as ONE
+     line, which is what a 320 px phone has room for, and it is what
+     `npm run audit` compares against `summaryLine` to prove the page has not
+     drifted off `js/spec.js`. The table is the desktop's version of it. */
+  const table = $('#spec');
+  if (table) {
+    table.replaceChildren(...specRows(state).map(r => {
+      const row = document.createElement('div');
+      row.className = 'spec__row';
+      row.dataset.key = r.key;
+      row.innerHTML = `<span class="spec__label">${r.label}</span>`
+        + `<span class="spec__value">${r.value}</span>`
+        + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : '');
+      return row;
+    }));
+  }
 
   const blocked = conflicts(state);
   for (const g of GROUPS) {

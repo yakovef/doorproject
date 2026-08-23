@@ -531,6 +531,33 @@ from that list and feeds 23 gradients — a live staleness hole worth one line.)
 
 ---
 
+## 4b. WHAT HAS LANDED
+
+Everything in stages 0 to 4 below is built, green and pushed. Kept as written
+rather than tidied away, because the reasoning is the point: several items were
+changed or withdrawn by measurement after they were planned, and a plan that
+hides its own corrections teaches nothing.
+
+| stage | | note |
+|---|---|---|
+| 0 | instruments | item 6 **withdrawn** — measured and rejected, §2.1 |
+| 1.1 | brass lockset | overruled §1.1's own "← correct" annotation |
+| 1.2/1.3 | ironwork per panel | ~₪620 an order |
+| 1.4 | dragged grip in the order | |
+| 1.6/1.7 | the page that failed silently | a 4th failure route found in review |
+| 11 | `js/spec.js`, one description | the sinks are asserted, not just the source |
+| 2 | VERSION 11, check nibble | 38.4% → 1.03% typo collisions |
+| 3.1 | `inFinish` | 1.57:1 → 3.64:1 |
+| 3.4 | `ink()` deduplicated | worst door 374 KB → 284 KB |
+| 4 | the look | card, numbers, headline, navigator, spec table, circles, nav, badges, saving |
+
+**Still open, and all of it is Peretz's:** the size bands (§8), the warranty
+term, the metallic range and made-in-Israel (§9), the lock finish (§2b1), the
+two-panel price (§4b), and question 1 — right hand or left — which decides
+whether half of all orders arrive mirrored.
+
+---
+
 ## 5. THE PLAN
 
 Ordered by *what it saves divided by what it costs*, which is a different order

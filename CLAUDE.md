@@ -44,6 +44,44 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   metric divides out only the vertical fall — a moulding is unevenness as far
   as it is concerned, and d048, one of the two photographs it compares against,
   is a two-panel door.
+- **Stage 4, second half — the navigator, the spec table, circles, and the
+  chrome.** The look plan is finished.
+  ⚠ **The mockup's step indicator is a NAVIGATOR, and a progress bar there
+  would be structurally dishonest.** `nowLabel` falls back to `list[0]`, so
+  every category always has a value and `sectionLabel` can never be empty —
+  measured on first paint, before anything is touched, all four sections
+  already read complete. That fallback is right ("no pull handle" is a decision
+  the door carries), so any state-derived indicator reads 4/4 on arrival. What
+  shipped is a table of contents: it names the four sections, marks what is
+  open, and jumps. **It carries no values** — those are in the spec table, and
+  a second copy here is the duplication this codebase keeps paying for.
+  ⚠ **The spec table is `specRows(state)` with a different renderer**, which is
+  the whole point of having built the rows: the mockup's best idea cost almost
+  nothing. `#summary` stays as the same rows in ONE line — what a 320 px phone
+  has room for, and what `npm run audit` compares against `summaryLine` to
+  prove the page has not drifted off `js/spec.js`.
+  ⚠ **Colour circles: the name and the RAL MOVE, they do not disappear.**
+  Peretz orders by the number on the manufacturer's sheet, so losing it would
+  cost something real. It is on the `title`, in the `aria-label`, in the spec
+  table and in the order — what is dropped is only its repetition seventeen
+  times over.
+  ⚠ **Every nav link goes somewhere that exists.** The mockup draws three pages
+  and two are unbuilt (`PLAN.md` §9 still lists /works and /about). `דגמים`
+  points at the real works gallery, `צור קשר` at the telephone, and
+  `עיצוב אישי` is `aria-current` rather than a link to where you already are.
+  ⚠ **The warranty badge says `אחריות`, not `אחריות מלאה`** — a promise with no
+  term is one nobody can be held to, which is the same as no promise.
+  `ASK-PERETZ.md` §9 asks for the number.
+  ⚠ **Saving is `localStorage` and every access is wrapped.** It THROWS rather
+  than returning null in a private window with site data blocked, and an
+  unguarded read at boot takes the whole page down — which, per the work above,
+  means styled, complete and inert with two dead buttons. A door-saving
+  convenience is not permitted to cost the site, so `no-storage` is now the
+  **fifth route** in the audit's failure-route block, and it must come up
+  NORMAL. Verified: zero page errors, door drawn, price real. And the visible
+  `DM-` code stays exactly where it is — the mockup replaces it with the heart,
+  and the code is the thing a customer can actually send.
+
 - **Stage 4, first half — the card, the numbers, the headline, and all four
   sections open on a desktop.**
   ⚠ **`--surface`, the colour an element is actually SITTING on.** The swatch

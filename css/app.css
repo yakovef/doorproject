@@ -133,6 +133,69 @@ body {
   direction: ltr;
 }
 
+/* ── nav, saved, trust ────────────────────────────────────── */
+
+.nav { display: flex; gap: 2px; }
+.nav__a {
+  display: inline-flex; align-items: center;
+  min-block-size: 44px; padding-inline: 10px;
+  font-size: .86rem; color: var(--ink-2); text-decoration: none;
+  border-block-end: 2px solid transparent;
+}
+.nav__a:hover { color: var(--ink); }
+.nav__a.is-here { color: var(--ink); font-weight: 600; border-block-end-color: var(--ink); }
+/* A phone has no room for three more words above the door, and every one of
+   them is reachable another way — the works link is at the foot of the send
+   card and the telephone is right here in the header. */
+@media (max-width: 1099px) { .nav { display: none; } }
+
+.bar__end { display: flex; align-items: center; gap: 8px; }
+.bar__saved {
+  appearance: none; background: var(--ink); color: #fff;
+  border: 0; border-radius: 999px;
+  min-block-size: 44px; padding-inline: 14px;
+  font: 600 .82rem var(--sans); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.bar__count {
+  background: rgb(255 255 255 / .22); border-radius: 999px;
+  padding: 1px 7px; font-variant-numeric: tabular-nums;
+}
+
+.saved {
+  margin: 0; padding: 10px 16px;
+  background: var(--paper-up); border-block-end: 1px solid var(--rule);
+}
+.saved__none { margin: 0; font-size: .82rem; color: var(--ink-2); }
+.saved__list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.saved__row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.saved__open {
+  appearance: none; background: none; border: 1px solid var(--rule);
+  border-radius: 999px; min-block-size: 44px; padding-inline: 12px;
+  font: 500 .82rem var(--sans); color: var(--ink); cursor: pointer;
+}
+.saved__drop {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  min-block-size: 44px; min-inline-size: 44px;
+  color: var(--ink-2); font-size: 1.1rem;
+}
+
+/* ── THE TRUST BAND ──────────────────────────────────────────────────
+   Four claims, all confirmed from outside before they were written. The
+   warranty says `אחריות` and not `אחריות מלאה` on purpose: a promise with no
+   term is one nobody can be held to. ASK-PERETZ.md §9 asks for the number. */
+.trust {
+  flex: 0 0 auto;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 26px;
+  padding: 12px 16px;
+  border-block-start: 1px solid var(--rule);
+  background: var(--paper-up);
+  font-size: .78rem; color: var(--ink-2);
+}
+/* Above 1100 the page is one screen with no scroll, and the band is the least
+   urgent thing on it — the send card is already beside the door. */
+@media (min-width: 1100px) { .trust { display: none; } }
+
 /* ── strips ───────────────────────────────────────────────── */
 
 .strip {
@@ -509,6 +572,66 @@ body {
    file keeps paying for. Reordering SECTIONS renumbers these for free.
    They are `::before` on the head, so they are decoration and never reach the
    accessible name; a screen reader gets the title, which is what it wants. */
+/* ── THE NAVIGATOR ──────────────────────────────────────────────────
+   Four chips, numbered by the same counter the headings use so the two can
+   never disagree about which section is which. A table of contents, not a
+   progress bar — see the note in app.js about why a progress bar here cannot
+   be honest. */
+/* ── THE SPEC TABLE ─────────────────────────────────────────────────
+   From the mockup. One row per fact, label on the right, value on the left.
+   On a phone it collapses to the single line (`#summary`) instead — six rows
+   of table is a lot of a 390 px screen to spend on something the customer
+   already chose. */
+.spec { display: grid; gap: 0; margin: 2px 0 14px; }
+.spec__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 8px;
+  padding: 7px 0;
+  border-block-end: 1px solid var(--rule);
+  font-size: .82rem;
+}
+.spec__row:last-child { border-block-end: 0; }
+.spec__label { font-weight: 600; color: var(--ink); }
+.spec__value { color: var(--ink-2); text-align: end; }
+.spec__chip {
+  inline-size: 14px; block-size: 14px; border-radius: 3px;
+  background: var(--chip); border: 1px solid rgb(0 0 0 / .22);
+}
+@media (max-width: 1099px) {
+  .spec { display: none; }
+  /* and the one-line version comes back out of the screen-reader-only box */
+  #summary.sr-only {
+    position: static; inline-size: auto; block-size: auto;
+    margin: 0; overflow: visible; clip-path: none; white-space: normal;
+  }
+}
+
+.steps {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 2px 0 12px;
+  border-block-end: 1px solid var(--rule);
+  margin-block-end: 4px;
+  counter-reset: step;
+}
+.steps__step {
+  counter-increment: step;
+  flex: 1 1 auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-block-size: 44px;            /* the floor this file enforces everywhere */
+  padding: 4px 8px;
+  background: none; border: 1px solid transparent; border-radius: 999px;
+  font: 500 .76rem/1.2 var(--sans); color: var(--ink-2);
+  cursor: pointer; text-align: start;
+}
+.steps__n::before {
+  content: counter(step, decimal-leading-zero);
+  font: 600 10px/1 var(--mono); letter-spacing: .06em; opacity: .7;
+}
+.steps__step:hover { border-color: var(--rule); }
+.steps__step.is-on { color: var(--ink); border-color: var(--rule); background: var(--paper-up); }
+@media (max-width: 1099px) { .steps__t { display: none; } .steps__step { flex: 0 0 auto; } }
+
 .panel--choose { counter-reset: sect; }
 .sect__head { counter-increment: sect; }
 .sect__head::before {
@@ -636,9 +759,19 @@ body {
 
 /* ── swatches ─────────────────────────────────────────────── */
 
+/* ── COLOURS AS CIRCLES ─────────────────────────────────────────────
+   From the mockup, and it earns its place: seventeen labelled tiles is a wall
+   of text to read before choosing something you choose by LOOKING. Circles put
+   the whole range on one glance.
+   ⚠ THE NAME AND THE RAL DO NOT DISAPPEAR, they move. Peretz orders by the
+   number on the manufacturer's sheet, so losing it would cost something real —
+   it is on the swatch's `title`, in the spec table beside the price, and in
+   the order. What is dropped is only its repetition seventeen times over.
+   Every chip is 44 px, which is the floor this file enforces everywhere, and
+   the accessible name still carries both. */
 .swatches {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
   gap: 10px;
 }
 
@@ -647,19 +780,20 @@ body {
   background: none; border: 0; padding: 0;
   font: inherit; color: inherit; text-align: start;
   cursor: pointer;
-  display: grid; gap: 5px;
+  display: grid; place-items: center;
   min-block-size: 44px;
 }
 
 .swatch__chip {
   --ring: transparent;
-  display: block; block-size: 46px;
+  display: block; inline-size: 40px; block-size: 40px;
   background: var(--chip);
   border: 1px solid rgb(0 0 0 / .22);
-  border-radius: var(--radius);
+  border-radius: 50%;
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ring);
   transition: box-shadow .12s var(--ease);
 }
+.swatch__name, .swatch__meta { display: none; }
 .swatch.is-selected .swatch__chip { --ring: var(--ink); }
 .swatch:hover .swatch__chip { --ring: var(--rule); }
 .swatch.is-selected:hover .swatch__chip { --ring: var(--ink); }

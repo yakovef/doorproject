@@ -4185,6 +4185,14 @@ ${body}
       placeGrip({ ...now, rot: now.rot === 90 ? 0 : 90 }, true);
     });
     $("#grip-home").addEventListener("click", () => set({ ...state, grip: null }));
+    $("#save-btn").addEventListener("click", saveCurrent);
+    $("#saved-btn").addEventListener("click", () => {
+      const box = $("#saved"), btn = $("#saved-btn");
+      const show = box.hidden;
+      box.hidden = !show;
+      btn.setAttribute("aria-expanded", String(show));
+    });
+    paintSaved();
     if (typeof ResizeObserver === "function") {
       new ResizeObserver(fitStage).observe($("#stage"));
     } else {
@@ -4213,6 +4221,25 @@ ${body}
   }
   function buildPanel() {
     const wrap = $("#choices");
+    const nav = document.createElement("nav");
+    nav.className = "steps";
+    nav.setAttribute("aria-label", "מעבר בין חלקי הבחירה");
+    for (const sec of SECTIONS) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "steps__step";
+      b.dataset.step = sec.key;
+      b.innerHTML = `<span class="steps__n" aria-hidden="true"></span><span class="steps__t">${sec.title}</span>`;
+      b.addEventListener("click", () => {
+        if ($(`#sect-head-${sec.key}`).getAttribute("aria-expanded") !== "true") {
+          openSection(sec.key);
+        }
+        $(`#sect-head-${sec.key}`).scrollIntoView({ block: "nearest" });
+        $(`#sect-head-${sec.key}`).focus();
+      });
+      nav.appendChild(b);
+    }
+    wrap.appendChild(nav);
     for (const sec of SECTIONS) {
       const box = document.createElement("section");
       box.className = "sect";
@@ -4267,6 +4294,7 @@ ${body}
       if (g.kind === "swatch") {
         b.className = "swatch";
         b.title = `${o.he} · RAL ${o.ral}`;
+        b.setAttribute("aria-label", `${o.he}, RAL ${o.ral}`);
         b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
         <span class="swatch__name">${o.he}</span>
@@ -4300,7 +4328,92 @@ ${body}
         for (const g of groupsIn(sec.key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
       }
     }
+    markSteps();
     fitStage();
+  }
+  var SAVED_KEY = "dm.saved.v1";
+  var SAVED_MAX = 6;
+  var savedRead = () => {
+    try {
+      const raw = localStorage.getItem(SAVED_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list.filter((x) => typeof x === "string") : [];
+    } catch {
+      return [];
+    }
+  };
+  var savedWrite = (list) => {
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(list.slice(0, SAVED_MAX)));
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  function saveCurrent() {
+    const q = toQuery(state);
+    const list = savedRead().filter((x) => x !== q);
+    list.unshift(q);
+    if (!savedWrite(list)) {
+      toast("הדפדפן הזה לא מאפשר לשמור עיצובים");
+      return;
+    }
+    toast("העיצוב נשמר בדפדפן הזה");
+    paintSaved();
+  }
+  function paintSaved() {
+    const list = savedRead();
+    const btn = $("#saved-btn");
+    if (!btn) return;
+    btn.hidden = !list.length;
+    document.querySelectorAll("[data-saved-count]").forEach((e) => {
+      e.textContent = String(list.length);
+    });
+    const box = $("[data-saved-list]");
+    const none = $("[data-saved-empty]");
+    if (!box) return;
+    if (none) none.hidden = list.length > 0;
+    box.replaceChildren(...list.map((q) => {
+      const li = document.createElement("li");
+      li.className = "saved__row";
+      const open2 = document.createElement("button");
+      open2.type = "button";
+      open2.className = "saved__open";
+      let label = q;
+      try {
+        label = summaryLine(fromQuery(q).state);
+      } catch {
+      }
+      open2.textContent = label;
+      open2.addEventListener("click", () => {
+        const { state: st } = fromQuery(q);
+        set(st);
+        $("#saved").hidden = true;
+        $("#saved-btn").setAttribute("aria-expanded", "false");
+      });
+      const drop = document.createElement("button");
+      drop.type = "button";
+      drop.className = "saved__drop";
+      drop.setAttribute("aria-label", `הסרת ${label}`);
+      drop.textContent = "×";
+      drop.addEventListener("click", () => {
+        savedWrite(savedRead().filter((x) => x !== q));
+        paintSaved();
+      });
+      li.append(open2, drop);
+      return li;
+    }));
+  }
+  function markSteps() {
+    for (const sec of SECTIONS) {
+      const b = document.querySelector(`.steps__step[data-step="${sec.key}"]`);
+      const head = $(`#sect-head-${sec.key}`);
+      if (!b || !head) continue;
+      const on = head.getAttribute("aria-expanded") === "true";
+      b.classList.toggle("is-on", on);
+      if (on) b.setAttribute("aria-current", "true");
+      else b.removeAttribute("aria-current");
+    }
   }
   function closeSection(key) {
     const head = $(`#sect-head-${key}`), body = $(`#sect-body-${key}`);
@@ -4308,6 +4421,7 @@ ${body}
     body.hidden = true;
     head.closest(".sect").classList.remove("is-open");
     for (const g of groupsIn(key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
+    markSteps();
     fitStage();
   }
   function openAllSections() {
@@ -4397,6 +4511,7 @@ ${body}
     document.querySelectorAll("[data-price]").forEach((el) => {
       el.textContent = money;
     });
+    markSteps();
     const panes = Math.max(1, paneCount(state));
     document.querySelectorAll('.field[data-group="grille"] .tile').forEach((b) => {
       const meta = b.querySelector(".tile__meta");
@@ -4407,6 +4522,16 @@ ${body}
     const win = byId(WINDOWS, state.window);
     const grille = byId(GRILLES, state.grille);
     $("#summary").textContent = summaryLine(state);
+    const table = $("#spec");
+    if (table) {
+      table.replaceChildren(...specRows(state).map((r) => {
+        const row = document.createElement("div");
+        row.className = "spec__row";
+        row.dataset.key = r.key;
+        row.innerHTML = `<span class="spec__label">${r.label}</span><span class="spec__value">${r.value}</span>` + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : "");
+        return row;
+      }));
+    }
     const blocked = conflicts(state);
     for (const g of GROUPS) {
       const field = $(`.field[data-group="${g.key}"]`);
