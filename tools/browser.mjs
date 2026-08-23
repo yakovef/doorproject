@@ -82,7 +82,17 @@ export function pagePool({ tries = 5, args } = {}) {
           if (!crashed(e)) { await p?.close().catch(() => {}); throw e; }
           deaths++;
           await bury();
-          console.log(`  (chromium died — relaunching, attempt ${n + 1} of ${tries})`);
+          /* ⚠ Only when there IS another attempt. This said
+             `attempt ${n + 1} of ${tries}` unconditionally, so the last death
+             printed "attempt 6 of 5" and then threw — a line that promises a
+             sixth try immediately before giving up. Small, and exactly the
+             kind of thing that makes somebody reading a failed run distrust
+             the rest of its output. */
+          if (n < tries) {
+            console.log(`  (chromium died — relaunching, attempt ${n + 1} of ${tries})`);
+          } else {
+            console.log(`  (chromium died — ${tries} attempts, giving up on this reading)`);
+          }
         }
       }
       throw last;

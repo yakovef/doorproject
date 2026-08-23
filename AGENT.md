@@ -185,7 +185,10 @@ revert — never push red. `npm run build` before you commit, or the deployed
 bundle will not match the source.
 
 ⚠ **THE ONE EXCEPTION, AND IT IS SITTING RED RIGHT NOW.** Chromium in some of
-these containers cannot render the page above about 1,000 px wide — 1280×720
+these containers stop being able to rasterise this page at all, and the ceiling
+FALLS the longer the container lives: 834×1112 passed early in one session,
+1099×720 passed once and failed twenty minutes later, 1280×720 never passed at
+all, and by the end even a 620×1000 leaf crop would not come back. 1280×720
 crashes its renderer every time on a brand-new browser, and no launch flag
 helps (ten sets were measured; see `CLAUDE.md` §0b). Where that is true,
 `npm run sheets` and `npm run audit` cannot complete, and `npm test` reports

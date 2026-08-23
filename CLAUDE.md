@@ -59,13 +59,25 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   one. ⚠ It is not a retry that turns a red check green: a crashed renderer is
   the ABSENCE of a measurement, and anything that is not the browser dying is
   rethrown on the first attempt.
-  ⚠ **What it does NOT fix: this container cannot render the page above about
-  1,000 px wide at all** — 1280×720 crashes every time on a fresh browser. So
-  `npm run sheets` and `npm run audit` cannot complete here, and the four sheet
-  families are committed STALE with `npm test` red on exactly those four
+  ⚠ **What it does NOT fix: the raster itself, and THE CEILING FALLS AS THE
+  CONTAINER AGES.** Measured in order over one session: 834×1112 passed early;
+  1099×720 passed once and failed twenty minutes later; **1280×720 never
+  passed** — five consecutive fresh browsers, ten flag sets; and by the end a
+  620×1000 leaf crop would not rasterise at either scale (2× never returned
+  inside a 120-second timeout; 1× failed with
+  `Protocol error (Page.captureScreenshot): Unable to capture screenshot`).
+  Even 390×844, reliable all session, crashed on the last audit run. This is
+  not a width to stay under — it is the rasteriser degrading, and the only
+  cure is a fresh container.
+  So `npm run sheets` and `npm run audit` cannot complete here, and the four
+  sheet families are committed STALE with `npm test` red on exactly those four
   assertions. They are not weakened and not deleted; they are correct and they
   are telling the truth. One `npm run sheets` on a healthy container clears
-  them.
+  them. ⚠ **Dropping `recreate`/`corpus`/`against` from 2× to 1× to squeeze
+  them through was considered and refused**: those three are read to judge the
+  DRAWING against thirty photographs, and halving their resolution to suit a
+  sick container is fitting the instrument to the room — the mistake
+  `tools/screenshot.mjs` has already recorded twice.
 
 - **The second mockup, built: tokens, chrome, structure first, and a room.**
   `MOCKUP2.md` is the reading and `REALISM2.md` the decision; stages A–D have

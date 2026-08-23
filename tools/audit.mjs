@@ -75,9 +75,11 @@ let crashes = 0;
 const fault = (view, msg) => { faults++; console.log(`  ✗ [${view}] ${msg}`); };
 
 /* ── A VIEWPORT THAT KILLED THE BROWSER IS SKIPPED, LOUDLY ────────────
-   Chromium in some containers cannot render this page above about 1,000 px
-   wide: measured, 1280x720 crashes its renderer every time on a brand-new
-   browser, and no launch flag helps (see `tools/browser.mjs`). Until now that
+   Chromium in some containers stops being able to rasterise this page, and the
+   ceiling falls the longer the container lives: measured, 1280x720 crashed its
+   renderer on five consecutive brand-new browsers under ten flag sets, 1099
+   passed once and failed twenty minutes later, and by the end even 390x844 —
+   reliable all session — went down (see `tools/browser.mjs`). Until now that
    took the whole run down at whichever viewport it happened on — so a crash at
    the sixth of seven destroyed five good audits along with it, and the output
    ended in a stack trace rather than in a verdict.
