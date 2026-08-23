@@ -23,6 +23,57 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-23 16:08 UTC — run 24: the spec TABLE was the one sink nobody was watching
+
+**Looked at:** no new pushes, so the property `js/spec.js` exists to guarantee —
+that the table a customer proof-reads and the message Peretz receives are one
+statement of the door.
+
+**Instruments:** test ✓ (5,674,573) · audit ✓ (7 viewports) · profile ✓ ·
+collide ✓ (base / `all`) · recreate ✓ · shot ✓. Only `tools/audit.mjs` differs.
+
+**Changed:** `npm run audit` now checks the spec table against `specRows`, row
+for row, as it already checked `#summary` against `summaryLine`.
+
+**How this was found, including the part where my own check was worthless.**
+I first compared the rendered table against the WhatsApp message across eight
+doors and got eight greens. Then I tried to falsify it — put a wrong value in
+`spec.js` — and it stayed green. **Of course it did:** `share.js` imports
+`specLines` and `app.js` imports `specRows`, both from `spec.js`, so moving the
+source moves both and they agree by construction. A test of that is a test of
+nothing.
+
+Falsified properly by perturbing a **consumer** instead — appending a marker in
+`app.js`'s own table renderer — and then the interesting result:
+
+    npm test    ✗ 4 failed — all four are SHEET-STALENESS checks, which fire
+                  for any change to the page and say nothing about the table
+    npm audit   ✓ no faults, with every row on screen reading "… ZZTOP"
+
+So the table could show a customer one door while the order carried another,
+and the only instrument that can see the page was not looking.
+
+**Why this is the same fault twice.** CLAUDE.md already records it for
+`#summary`: *assertions about `spec.js` prove the SOURCE is right; the defect
+was a SINK that had drifted off its source*. That was fixed — the audit decodes
+the on-screen code and compares. Then Stage 4 built a **second sink** beside it,
+the spec table, and nothing followed it here. The source-level chain is
+thorough (`npm test` asserts every row reaches the order, the summary and the
+accessible name) and thoroughness at the source is exactly what makes a
+drifted sink invisible.
+
+Row for row rather than on the concatenation, because a table that agrees on
+the joined string and disagrees about which row holds what is still wrong.
+Verified live: the marker gives *"spec row 0 on the page is 'colour: שחור
+(רב בריח 9005D) ZZTOP' and js/spec.js says 'colour: שחור (רב בריח 9005D)' —
+#spec has drifted off js/spec.js"*, naming the row, the page and the source.
+
+**Left alone:** everything else. Tool only — no site file, no bundle change.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-23 10:52 UTC — run 23: nothing worth changing. Drove the saved-designs drawer, which nothing had
 
 **Looked at:** no new pushes, so the newest customer-facing surface — the saved

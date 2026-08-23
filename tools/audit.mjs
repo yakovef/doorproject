@@ -19,7 +19,7 @@ import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
 import { load } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
-import { summaryLine } from '../js/spec.js';
+import { specRows, summaryLine } from '../js/spec.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
    the grip and the lockset became separate fields, and a hard-coded length
@@ -295,6 +295,12 @@ for (const v of VIEWS) {
           code: document.getElementById('code').textContent,
           wa: document.getElementById('wa-btn').getAttribute('href'),
           summary: document.getElementById('summary').textContent,
+          /* The OTHER sink. `#summary` is one line under the price; `#spec` is
+             the table a desktop customer actually proof-reads, row by row. */
+          spec: [...document.querySelectorAll('#spec .spec__row')].map(r => ({
+            key: r.dataset.key,
+            value: (r.querySelector('.spec__value') || {}).textContent || '',
+          })),
         };
       });
 
@@ -325,6 +331,35 @@ for (const v of VIEWS) {
         fault(v.name, `${key}=${id}: the spec line reads "${s.summary.trim()}" and `
                     + `the rows say "${summaryLine(back)}" — #summary has drifted `
                     + 'off js/spec.js');
+      }
+      /* ⚠ AND THE TABLE, for exactly the same reason one line up. The argument
+         above was made for `#summary` and then a SECOND sink was built beside
+         it in Stage 4 — the spec table — and nothing followed it here. Proved
+         rather than assumed: appending a marker to the table's own renderer in
+         `app.js` left `npm run audit` green and `npm test` failing only its
+         sheet-staleness checks, which fire for any change to the page and say
+         nothing about whether the table is right. So the table could show a
+         customer one door while the order carried another, and the only
+         instrument that can see the page was not looking.
+         Row for row against `specRows`, because a table that agrees on the
+         concatenation and disagrees on which row holds what is still wrong. */
+      if (back) {
+        const want = specRows(back);
+        if (s.spec.length !== want.length) {
+          fault(v.name, `${key}=${id}: the spec table has ${s.spec.length} rows and `
+                      + `js/spec.js says ${want.length}`);
+        } else {
+          for (let i = 0; i < want.length; i++) {
+            const got = s.spec[i].value.replace(/\s+/g, ' ').trim();
+            const exp = String(want[i].value).replace(/\s+/g, ' ').trim();
+            if (s.spec[i].key !== want[i].key || got !== exp) {
+              fault(v.name, `${key}=${id}: spec row ${i} on the page is `
+                          + `"${s.spec[i].key}: ${got}" and js/spec.js says `
+                          + `"${want[i].key}: ${exp}" — #spec has drifted off js/spec.js`);
+              break;
+            }
+          }
+        }
       }
 
       /* Two designs that differ must not share a code — that is an order for
