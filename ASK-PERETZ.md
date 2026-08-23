@@ -13,19 +13,34 @@
 
 ---
 
-## 1. ימין או שמאל? ⚠ הכי חשוב
+## 1. ימין או שמאל? ✅ נענה — 23.8.2026
 
-שלח לפרץ את שתי התמונות: `screenshots/handing-a.png` ו-`handing-b.png`.
+**התשובה, מיעקב:**
 
-> **"על איזו דלת מהשתיים היית אומר ללקוח 'זאת דלת ימין'?"**
+> *"at our app we are looking from the outside, so a left door is a keyhole on
+> the right."*
 
-**למה זה קריטי:** אם נטעה כאן, כל לקוח שיזמין דרך האתר יקבל דלת הפוכה.
-זו הטעות היחידה ברשימה שעולה כסף אמיתי.
+כלומר: ימין/שמאל הוא **הצד שאליו הדלת נפתחת** — צד הצירים — **במבט מבחוץ**,
+שזה בדיוק המבט של הציור. דלת שמאל = צירים משמאל = **צילינדר מימין**.
 
-*In the code: `HANDINGS[].hinge` is the hinge side **as seen from outside**.
-Israeli trade usage varies on whether ימין names the hinge side or the handle
-side, and whether it is read from outside or inside. We have guessed. A picture
-gets this answered in thirty seconds; a definition does not.*
+⚠ **וזה היה הפוך אצלנו.** לפני התיקון, בכנף שנמתחת מ-x=178 עד x=1028, דלת
+`שמאל` ציירה את הצילינדר ב-x=238 — כלומר משמאל. כל הזמנה שיצאה מהאתר תיארה את
+תמונת הראי של הדלת שעל המסך. זו הייתה הטעות היחידה ברשימה שעולה כסף אמיתי,
+והיא הייתה חיה.
+
+*Fixed in `HANDINGS`: the two `hinge` values were swapped. **No `VERSION`
+bump** — the short code stores the INDEX of this list, and neither the ids nor
+their order changed, so every code and link ever written still decodes to the
+same entry. Reordering the rows would have required a bump; changing what they
+mean did not.*
+
+*Pinned by `npm test`, in a group that asks WHERE THE KEYHOLE IS DRAWN across
+every size × lockset × handing — deliberately not by reading `HANDINGS[].hinge`,
+because that field was the thing that was wrong. A test that read it would have
+agreed with the bug.*
+
+*`screenshots/handing-a.png` and `handing-b.png` are kept: if Peretz ever
+disagrees with Yakov's reading, they settle it in thirty seconds.*
 
 ---
 
@@ -510,7 +525,7 @@ was withdrawn.
 
 | | Question | Blocks |
 |---|---|---|
-| 1 | ימין/שמאל | correctness of every order |
+| ~~1~~ | ~~ימין/שמאל~~ | ✅ **answered 23.8.2026 — and we had it backwards.** See §1 |
 | 2 | which grips, which locksets | both hardware lists |
 | 3 | colours + prices | the colour list |
 | 4 | windows + window designs + prices | the window list and the סורג list |
@@ -520,6 +535,16 @@ was withdrawn.
 | 8 | width bands per size | the range printed on each size tile |
 | 9 | warranty term · metallic range · made-in-Israel | three of the four foot badges |
 
-1 and 5 are the two that stop launch on their own. 8 and 9 hold back a piece
-of the new design each, and neither blocks launch — the tile drops its range
-line and the badge drops its number.
+1 and 5 were the two that stop launch on their own. **1 is answered and fixed**,
+so **5 — a starting price per size band — is now the only thing standing between
+this and a real launch.** 8 and 9 hold back a piece of the new design each, and
+neither blocks launch: the tile drops its range line and the badge drops its
+number.
+
+⚠ **This file is 500+ lines and that is the reason it went nine days
+unanswered.** Nobody answers a document this long between jobs. Question 1 was
+settled the moment it was asked as one sentence, by the person who already knew
+the answer — no pictures, no meeting. When you want the rest, take question 5
+alone, in his words, and leave the other eight here for the conversation.
+PLAN.md §0 demands the customer hand Peretz something he can act on without a
+single clarifying question; this file has never once held itself to that.

@@ -47,6 +47,12 @@ here that costs somebody actual money, and it is invisible when it happens.
 answers `ASK-PERETZ.md`. Adding a priced option is fine; inventing what it
 costs is not.
 
+Every price lives in **`js/prices.js`**, in plain shekels, one screen — it is
+written for the evening the owner says the real numbers out loud, not for you.
+Adding an option means adding its price there in the same commit: `priceInto`
+in `catalog.js` throws at load if an option has no price or a price has no
+option, because the alternative is a door that silently costs nothing.
+
 **3. Never push anywhere but `claude/door-builder-website-plan-rgg7gu`, and
 never open a pull request.** That branch is what GitHub Pages serves.
 

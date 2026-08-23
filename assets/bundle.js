@@ -1,12 +1,165 @@
 (() => {
-  // js/catalog.js
+  // js/prices.js
   var PLACEHOLDER = true;
+  function agorot(shekels) {
+    if (typeof shekels !== "number" || !Number.isFinite(shekels)) {
+      throw new Error(`price must be a number, got ${JSON.stringify(shekels)}`);
+    }
+    const a = Math.round(shekels * 100);
+    if (Math.abs(shekels * 100 - a) > 1e-6) {
+      throw new Error(`price ${shekels} is finer than an agora — use at most two decimals`);
+    }
+    return a;
+  }
+  var SIZE = {
+    standard: 3195,
+    // סטנדרטית
+    narrow: 3095,
+    // צרה          — cheaper than standard, and the tile says so
+    wide: 3495,
+    // רחבה
+    tall: 3695,
+    // גבוהה
+    half: 4495,
+    // דלת וחצי     — two leaves
+    sidelight: 4295
+    // עם חלון צד   — one leaf and a fixed light
+  };
+  var WINDOW = {
+    none: 0,
+    // ללא חלון
+    strip: 580,
+    // צוהר אנכי
+    rect: 620,
+    // חלון מלבני
+    tallwin: 880,
+    // חלון גבוה
+    broad: 920
+    // חלון רחב
+  };
+  var GRILLE = {
+    none: 0,
+    // ללא סורג
+    grid: 300,
+    // סורג רשת
+    "grid-light": 300,
+    // סורג רשת בהיר
+    scroll: 460,
+    // סורג מעוצב
+    "scroll-light": 460,
+    // סורג מעוצב בהיר
+    iron: 620,
+    // ברזל מחושל
+    "iron-light": 620,
+    // ברזל מחושל בהיר
+    quatrefoil: 520,
+    // מדליוני פרח
+    arch: 380,
+    // קשת
+    deco: 420,
+    // קווים גיאומטריים
+    circles: 300,
+    // עיגולים שזורים
+    vine: 340,
+    // גפן
+    tree: 340,
+    // עץ
+    /* Worked GLASS rather than ironwork — etched into the pane, bought from a
+       different supplier. Priced together here only because they are the same
+       row on the customer's screen. */
+    mesh: 240,
+    // זכוכית מעוצבת
+    reeded: 280
+    // זכוכית מחורצת
+  };
+  var DETAIL = {
+    plain: 0,
+    // חלק
+    panel: 380,
+    // פאנל תחתון
+    groove: 240,
+    // חריץ אנכי
+    strips: 440,
+    // פסי מתכת      — eleven bands
+    strips3: 320,
+    // שלושה פסים
+    panel2: 520,
+    // שני פאנלים
+    stripsv: 440,
+    // פסים אנכיים   — four bands
+    perimeter: 260
+    // חריץ היקפי
+  };
+  var HANDLE = {
+    none: 0,
+    // ללא ידית משיכה
+    idan: 260,
+    // עידן
+    ella: 380,
+    // אלה
+    nitzan: 300,
+    // ניצן
+    shahar: 340,
+    // שחר
+    ron: 280,
+    // רון
+    shiran: 520,
+    // שירן
+    grab: 180,
+    // מאחז אופקי
+    channel: 400,
+    // ידית שקועה
+    blade: 440
+    // להב שטוח
+  };
+  var LOCKSET = {
+    coral: 0,
+    // קורל          — the one included as standard
+    cylinder: 0,
+    // צילינדר בלבד
+    plate: 60,
+    // רותם
+    cadoor: 40,
+    // כדור
+    sapir: 100,
+    // ספיר
+    almog: 160,
+    // אלמוג
+    knobplate: 220,
+    // כדור על אורך
+    digital: 1450,
+    // מנעול חכם     — by far the largest single add-on
+    square: 120
+    // ריבועי
+  };
+  var COLOUR = {
+    "rb-9005d": 0,
+    "rb-7021d": 0,
+    "rb-5103d": 0,
+    "rb-7126d": 0,
+    "rb-0097d": 0,
+    "rb-6459d": 0,
+    "rb-rb09d": 0,
+    "rb-7110d": 0,
+    "rb-7322d": 0,
+    "rb-6219d": 0,
+    "rb-0096d": 0,
+    "rb-7240d": 0,
+    "rb-2030d": 0,
+    "rb-7080d": 0,
+    "rb-9001d": 0,
+    "rb-9302d": 0,
+    "rb-9016d": 0
+  };
+
+  // js/catalog.js
+  var PLACEHOLDER2 = PLACEHOLDER;
   var SIZES = {
-    standard: { id: "standard", he: "סטנדרטית", en: "Standard", w: 950, h: 2100, base: 319500 },
-    narrow: { id: "narrow", he: "צרה", en: "Narrow", w: 800, h: 2100, base: 309500 },
-    wide: { id: "wide", he: "רחבה", en: "Wide", w: 1100, h: 2100, base: 349500 },
-    tall: { id: "tall", he: "גבוהה", en: "Tall", w: 950, h: 2400, base: 369500 },
-    half: { id: "half", he: "דלת וחצי", en: "Leaf and half", w: 950, h: 2100, base: 449500, side: 400 },
+    standard: { id: "standard", he: "סטנדרטית", en: "Standard", w: 950, h: 2100 },
+    narrow: { id: "narrow", he: "צרה", en: "Narrow", w: 800, h: 2100 },
+    wide: { id: "wide", he: "רחבה", en: "Wide", w: 1100, h: 2100 },
+    tall: { id: "tall", he: "גבוהה", en: "Tall", w: 950, h: 2400 },
+    half: { id: "half", he: "דלת וחצי", en: "Leaf and half", w: 950, h: 2100, side: 400 },
     /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
        d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
        narrow one beside it — but the narrow one does not open and is glass, so
@@ -18,40 +171,38 @@
       en: "With sidelight",
       w: 950,
       h: 2100,
-      base: 429500,
       side: 400,
       sideGlazed: true
     }
   };
   var COLOURS = [
     /* dark */
-    { id: "rb-9005d", ral: "9005D", hex: "#1D1A18", he: "שחור", en: "Black", delta: 0, aliases: ["ral-9005"] },
-    { id: "rb-7021d", ral: "7021D", hex: "#2D2D2B", he: "אפור פחם", en: "Charcoal", delta: 0 },
-    { id: "rb-5103d", ral: "5103D", hex: "#3D3F54", he: "כחול לילה", en: "Night blue", delta: 0, aliases: ["ral-5011"] },
-    { id: "rb-7126d", ral: "7126D", hex: "#453F3F", he: "חום-אפור כהה", en: "Dark umber", delta: 0, aliases: ["ral-7022"] },
-    { id: "rb-0097d", ral: "0097D", hex: "#4B4952", he: "אפור אנתרציט", en: "Anthracite", delta: 0, aliases: ["ral-7016", "ral-7024"] },
-    { id: "rb-6459d", ral: "6459D", hex: "#4F6454", he: "ירוק בקבוק", en: "Bottle green", delta: 0, aliases: ["ral-6009"] },
-    { id: "rb-rb09d", ral: "RB09D", hex: "#55412F", he: "חום", en: "Brown", delta: 0, aliases: ["ral-8017", "ral-3005"] },
-    { id: "rb-7110d", ral: "7110D", hex: "#565357", he: "אפור כהה", en: "Dark grey", delta: 0, aliases: ["ral-8019"] },
+    { id: "rb-9005d", ral: "9005D", hex: "#1D1A18", he: "שחור", en: "Black", aliases: ["ral-9005"] },
+    { id: "rb-7021d", ral: "7021D", hex: "#2D2D2B", he: "אפור פחם", en: "Charcoal" },
+    { id: "rb-5103d", ral: "5103D", hex: "#3D3F54", he: "כחול לילה", en: "Night blue", aliases: ["ral-5011"] },
+    { id: "rb-7126d", ral: "7126D", hex: "#453F3F", he: "חום-אפור כהה", en: "Dark umber", aliases: ["ral-7022"] },
+    { id: "rb-0097d", ral: "0097D", hex: "#4B4952", he: "אפור אנתרציט", en: "Anthracite", aliases: ["ral-7016", "ral-7024"] },
+    { id: "rb-6459d", ral: "6459D", hex: "#4F6454", he: "ירוק בקבוק", en: "Bottle green", aliases: ["ral-6009"] },
+    { id: "rb-rb09d", ral: "RB09D", hex: "#55412F", he: "חום", en: "Brown", aliases: ["ral-8017", "ral-3005"] },
+    { id: "rb-7110d", ral: "7110D", hex: "#565357", he: "אפור כהה", en: "Dark grey", aliases: ["ral-8019"] },
     /* mid */
-    { id: "rb-7322d", ral: "7322D", hex: "#61697A", he: "כחול פלדה", en: "Steel blue", delta: 0 },
-    { id: "rb-6219d", ral: "6219D", hex: "#7A8272", he: "ירוק מרווה", en: "Sage green", delta: 0, aliases: ["ral-7036", "ral-7033"] },
-    { id: "rb-0096d", ral: "0096D", hex: "#86868A", he: "אפור בינוני", en: "Mid grey", delta: 0, aliases: ["ral-7046"] },
-    { id: "rb-7240d", ral: "7240D", hex: "#A1928A", he: "טאופ", en: "Taupe", delta: 0, aliases: ["ral-1035"] },
-    { id: "rb-2030d", ral: "2030D", hex: "#BF9367", he: "קרמל", en: "Caramel", delta: 0 },
+    { id: "rb-7322d", ral: "7322D", hex: "#61697A", he: "כחול פלדה", en: "Steel blue" },
+    { id: "rb-6219d", ral: "6219D", hex: "#7A8272", he: "ירוק מרווה", en: "Sage green", aliases: ["ral-7036", "ral-7033"] },
+    { id: "rb-0096d", ral: "0096D", hex: "#86868A", he: "אפור בינוני", en: "Mid grey", aliases: ["ral-7046"] },
+    { id: "rb-7240d", ral: "7240D", hex: "#A1928A", he: "טאופ", en: "Taupe", aliases: ["ral-1035"] },
+    { id: "rb-2030d", ral: "2030D", hex: "#BF9367", he: "קרמל", en: "Caramel" },
     /* light */
-    { id: "rb-7080d", ral: "7080D", hex: "#B7B4B2", he: "אפור בהיר", en: "Light grey", delta: 0, aliases: ["ral-7040"] },
-    { id: "rb-9001d", ral: "9001D", hex: "#DDCDBD", he: "שמנת", en: "Cream", delta: 0, aliases: ["ral-1013", "ral-7035"] },
-    { id: "rb-9302d", ral: "9302D", hex: "#ECEBE7", he: "לבן שבור", en: "Off-white", delta: 0 },
-    { id: "rb-9016d", ral: "9016D", hex: "#F1F0EA", he: "לבן", en: "White", delta: 0, aliases: ["ral-9016"] }
+    { id: "rb-7080d", ral: "7080D", hex: "#B7B4B2", he: "אפור בהיר", en: "Light grey", aliases: ["ral-7040"] },
+    { id: "rb-9001d", ral: "9001D", hex: "#DDCDBD", he: "שמנת", en: "Cream", aliases: ["ral-1013", "ral-7035"] },
+    { id: "rb-9302d", ral: "9302D", hex: "#ECEBE7", he: "לבן שבור", en: "Off-white" },
+    { id: "rb-9016d", ral: "9016D", hex: "#F1F0EA", he: "לבן", en: "White", aliases: ["ral-9016"] }
   ];
   var WINDOWS = [
-    { id: "none", he: "ללא חלון", en: "Solid", delta: 0, rects: [] },
+    { id: "none", he: "ללא חלון", en: "Solid", rects: [] },
     {
       id: "strip",
       he: "צוהר אנכי",
       en: "Vertical slot",
-      delta: 58e3,
       doors: ["d113", "d125"],
       rects: [{ w: 272, h: 1415, top: 205 }]
     },
@@ -59,7 +210,6 @@
       id: "rect",
       he: "חלון מלבני",
       en: "Rectangular",
-      delta: 62e3,
       aliases: ["square", "duo"],
       doors: ["d108", "d099", "d122", "d116"],
       rects: [{ w: 357, h: 902, top: 185 }]
@@ -68,7 +218,6 @@
       id: "tallwin",
       he: "חלון גבוה",
       en: "Tall light",
-      delta: 88e3,
       doors: ["d097", "d128"],
       rects: [{ w: 357, h: 1415, top: 174 }]
     },
@@ -76,13 +225,12 @@
       id: "broad",
       he: "חלון רחב",
       en: "Wide light",
-      delta: 92e3,
       doors: ["d092", "d106"],
       rects: [{ w: 425, h: 1025, top: 158 }]
     }
   ];
   var HANDLES = [
-    { id: "none", he: "ללא ידית משיכה", en: "No pull", delta: 0, len: 0, style: "none" },
+    { id: "none", he: "ללא ידית משיכה", en: "No pull", len: 0, style: "none" },
     /* Pull bars. `bar` selects the section and the tone profile; see BARS in the
        renderer.
        ⚠ THE WIDTHS WERE THE THING THAT WAS WRONG. Read against the leaf on
@@ -100,7 +248,6 @@
       id: "idan",
       he: "עידן",
       en: "Idan",
-      delta: 26e3,
       len: 1050,
       w: 32,
       style: "bar",
@@ -116,7 +263,6 @@
       id: "ella",
       he: "אלה",
       en: "Ella",
-      delta: 38e3,
       len: 1e3,
       w: 20,
       style: "bar",
@@ -128,7 +274,6 @@
       id: "nitzan",
       he: "ניצן",
       en: "Nitzan",
-      delta: 3e4,
       len: 1e3,
       w: 44,
       style: "bar",
@@ -140,7 +285,6 @@
       id: "shahar",
       he: "שחר",
       en: "Shahar",
-      delta: 34e3,
       len: 1230,
       w: 40,
       style: "bar",
@@ -148,13 +292,12 @@
       pull: true,
       aliases: ["bar-flat"]
     },
-    { id: "ron", he: "רון", en: "Ron", delta: 28e3, len: 900, w: 18, style: "bar", bar: "ron", pull: true },
+    { id: "ron", he: "רון", en: "Ron", len: 900, w: 18, style: "bar", bar: "ron", pull: true },
     /* The ornate pull, the horizontal bow, and the recess. */
     {
       id: "shiran",
       he: "שירן",
       en: "Shiran",
-      delta: 52e3,
       len: 0,
       style: "shiran",
       pull: true,
@@ -164,7 +307,6 @@
       id: "grab",
       he: "מאחז אופקי",
       en: "Grab bar",
-      delta: 18e3,
       len: 0,
       style: "grab",
       aliases: ["dee"]
@@ -175,7 +317,6 @@
       id: "channel",
       he: "ידית שקועה",
       en: "Recessed channel",
-      delta: 4e4,
       len: 1780,
       w: 85,
       inset: 0.3,
@@ -192,7 +333,6 @@
       id: "blade",
       he: "להב שטוח",
       en: "Flat blade",
-      delta: 44e3,
       len: 1e3,
       w: 62,
       style: "bar",
@@ -201,7 +341,7 @@
     }
   ];
   var LOCKSETS = [
-    { id: "coral", he: "קורל", en: "Coral", delta: 0, style: "lever", aliases: ["lever"], lever: true },
+    { id: "coral", he: "קורל", en: "Coral", style: "lever", aliases: ["lever"], lever: true },
     /* Cylinder only: a keyway escutcheon and nothing else.
        This is the commonest lock furniture in the whole corpus on the doors that
        matter most, and it was not offered. Of the TEN doors carrying a pull bar,
@@ -211,7 +351,7 @@
        face needs a keyway and nothing more. A lever there would be redundant,
        and it is also physically in the way, which is what the configurator was
        drawing. */
-    { id: "cylinder", he: "צילינדר בלבד", en: "Cylinder only", delta: 0, style: "cylinder", lock: true },
+    { id: "cylinder", he: "צילינדר בלבד", en: "Cylinder only", style: "cylinder", lock: true },
     /* `longplate` is retired one commit after it was added, and the reason is
        worth keeping. It went in because six doors on the hardware contact sheet
        looked like they carried a plate running a third of the stile. Measured
@@ -229,15 +369,14 @@
       id: "plate",
       he: "רותם",
       en: "Rotem",
-      delta: 6e3,
       style: "plate",
       lock: true,
       lever: true,
       aliases: ["longplate"]
     },
-    { id: "cadoor", he: "כדור", en: "Cadoor", delta: 4e3, style: "cadoor" },
-    { id: "sapir", he: "ספיר", en: "Sapir", delta: 1e4, style: "sapir" },
-    { id: "almog", he: "אלמוג", en: "Almog", delta: 16e3, style: "almog", lever: true },
+    { id: "cadoor", he: "כדור", en: "Cadoor", style: "cadoor" },
+    { id: "sapir", he: "ספיר", en: "Sapir", style: "sapir" },
+    { id: "almog", he: "אלמוג", en: "Almog", style: "almog", lever: true },
     /* Knob on a long backplate — the bronze fitting on d092, named three times
        across the luxury tier. A different object from a knob on a rose: the
        plate carries the keyway too, so it locks like the Rotem backplate. */
@@ -245,7 +384,6 @@
       id: "knobplate",
       he: "כדור על אורך",
       en: "Knob on backplate",
-      delta: 22e3,
       style: "knobplate",
       lock: true
     },
@@ -263,7 +401,6 @@
       id: "digital",
       he: "מנעול חכם",
       en: "Smart lock",
-      delta: 145e3,
       style: "digital",
       lock: true
     },
@@ -277,7 +414,6 @@
       id: "square",
       he: "ריבועי",
       en: "Square backplates",
-      delta: 12e3,
       style: "square",
       lever: true,
       lock: true
@@ -288,52 +424,46 @@
       id: "none",
       he: "ללא סורג",
       en: "None",
-      delta: 0,
       doors: ["d094", "d115"]
     },
     {
       id: "grid",
       he: "סורג רשת",
       en: "Square grid",
-      delta: 3e4,
       aliases: ["bars"],
       doors: ["d091", "d100", "d107", "d110", "d113", "d117", "d122"]
     },
-    { id: "grid-light", he: "סורג רשת בהיר", en: "Square grid, door colour", delta: 3e4, light: true, aliases: ["bars-light"] },
+    { id: "grid-light", he: "סורג רשת בהיר", en: "Square grid, door colour", light: true, aliases: ["bars-light"] },
     {
       id: "scroll",
       he: "סורג מעוצב",
       en: "Grid with scrolls",
-      delta: 46e3,
       doors: ["d089", "d093", "d095", "d097", "d099", "d102", "d116"]
     },
-    { id: "scroll-light", he: "סורג מעוצב בהיר", en: "Grid with scrolls, door colour", delta: 46e3, light: true },
+    { id: "scroll-light", he: "סורג מעוצב בהיר", en: "Grid with scrolls, door colour", light: true },
     /* The heavy ornamental ironwork: bars with scrolled crowns and centres, no
        grid behind it. The commonest thing in the luxury band. */
     {
       id: "iron",
       he: "ברזל מחושל",
       en: "Wrought iron",
-      delta: 62e3,
       doors: ["d090", "d092", "d101", "d103", "d108", "d112", "d119", "d124", "d128", "d129"]
     },
-    { id: "iron-light", he: "ברזל מחושל בהיר", en: "Wrought iron, door colour", delta: 62e3, light: true },
+    { id: "iron-light", he: "ברזל מחושל בהיר", en: "Wrought iron, door colour", light: true },
     /* The three that appear exactly once, kept at his instruction. */
     {
       id: "quatrefoil",
       he: "מדליוני פרח",
       en: "Quatrefoil column",
-      delta: 52e3,
       doors: ["d104"]
     },
-    { id: "arch", he: "קשת", en: "Arch", delta: 38e3, doors: ["d121"] },
-    { id: "deco", he: "קווים גיאומטריים", en: "Art-deco lines", delta: 42e3, doors: ["d123"] },
+    { id: "arch", he: "קשת", en: "Arch", doors: ["d121"] },
+    { id: "deco", he: "קווים גיאומטריים", en: "Art-deco lines", doors: ["d123"] },
     /* Worked GLASS. In the pane, not on it. */
     {
       id: "circles",
       he: "עיגולים שזורים",
       en: "Interlocking rings",
-      delta: 3e4,
       glass: true,
       doors: ["d106"]
     },
@@ -341,7 +471,6 @@
       id: "vine",
       he: "גפן",
       en: "Grape and vine",
-      delta: 34e3,
       glass: true,
       doors: ["d109", "d111"]
     },
@@ -349,7 +478,6 @@
       id: "tree",
       he: "עץ",
       en: "Tree",
-      delta: 34e3,
       glass: true,
       doors: ["d114"]
     },
@@ -357,7 +485,6 @@
       id: "mesh",
       he: "זכוכית מעוצבת",
       en: "Etched mesh",
-      delta: 24e3,
       glass: true,
       aliases: ["lattice"],
       doors: ["d102", "d105", "d116", "d127"]
@@ -372,43 +499,42 @@
       id: "reeded",
       he: "זכוכית מחורצת",
       en: "Reeded",
-      delta: 28e3,
       glass: true,
       doors: ["d122", "d125"]
     }
   ];
   var HANDINGS = [
-    { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "left" },
-    { id: "left-in", he: "שמאל, פנימה", en: "Left, inward", hinge: "right" }
+    { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "right" },
+    { id: "left-in", he: "שמאל, פנימה", en: "Left, inward", hinge: "left" }
   ];
   var DETAILS = [
-    { id: "plain", he: "חלק", en: "Plain", delta: 0, panel: false, groove: false },
+    { id: "plain", he: "חלק", en: "Plain", panel: false, groove: false },
     /* `both` — panel AND groove on one leaf — is retired. Counted across the 31
        hand-measured installations, ruled line work and a moulded panel share a
        leaf on exactly ZERO of them: eleven doors carry line work, ten carry a
        panel, and no door carries both. It was a combination we invented and
        priced at ₪540. Its id resolves here so a link written when it existed
        still opens a door — the panel, which is the more visible half. */
-    { id: "panel", he: "פאנל תחתון", en: "Lower panel", delta: 38e3, panel: true, groove: false, aliases: ["both"] },
-    { id: "groove", he: "חריץ אנכי", en: "Vertical groove", delta: 24e3, panel: false, groove: true },
+    { id: "panel", he: "פאנל תחתון", en: "Lower panel", panel: true, groove: false, aliases: ["both"] },
+    { id: "groove", he: "חריץ אנכי", en: "Vertical groove", panel: false, groove: true },
     /* The designed tier's signature, and we had it backwards. Of the seven
        measured doors with line work on the face, only two are milled grooves;
        four are APPLIED metal strips — polished stainless, brushed steel, pale
        brass — reading 1.1 to 2x BRIGHTER than the paint, not darker. Drawing
        those as a recessed shadow is the single easiest way to render this tier
        wrong. Counts observed: 3, 7 and 11 strips. */
-    { id: "strips", he: "פסי מתכת", en: "Metal strips", delta: 44e3, panel: false, groove: false, strips: 11 },
-    { id: "strips3", he: "שלושה פסים", en: "Three strips", delta: 32e3, panel: false, groove: false, strips: 3 },
+    { id: "strips", he: "פסי מתכת", en: "Metal strips", panel: false, groove: false, strips: 11 },
+    { id: "strips3", he: "שלושה פסים", en: "Three strips", panel: false, groove: false, strips: 3 },
     /* The classic two-panel face — tall upper, short lower — which d048 carries
        and a single bottom-quarter panel cannot describe. Solid leaves only. */
-    { id: "panel2", he: "שני פאנלים", en: "Two panels", delta: 52e3, panel: true, groove: false, panels: 2 },
+    { id: "panel2", he: "שני פאנלים", en: "Two panels", panel: true, groove: false, panels: 2 },
     /* The strips run BOTH ways and we drew one. `strips` and `strips3` are
        horizontal — d078's eleven bands settled that in an earlier round — but
        five doors (d034 d037 d038 d040 d043) run them up the leaf instead, and a
        customer picking "metal strips" for one of those got the other axis with
        no warning. Vertical strips are fewer and longer: three or four, in the
        half of the leaf away from the lock. */
-    { id: "stripsv", he: "פסים אנכיים", en: "Vertical strips", delta: 44e3, panel: false, groove: false, strips: 4, vertical: true },
+    { id: "stripsv", he: "פסים אנכיים", en: "Vertical strips", panel: false, groove: false, strips: 4, vertical: true },
     /* A groove scribed round the leaf, a hand's breadth in from every edge —
        d004 at 0.023 of the leaf's width and d031 at 0.021, so the inset here is
        their mean. On both of them it is the ONLY thing on the face, and the
@@ -424,7 +550,6 @@
       id: "perimeter",
       he: "חריץ היקפי",
       en: "Perimeter groove",
-      delta: 26e3,
       panel: false,
       groove: false,
       perimeter: 0.022
@@ -486,6 +611,28 @@
     return ` — ${panels.map((p) => p.inHe).join(" ו")}` + count;
   }
   var isGlazed = (state2) => paneCount(state2) > 0;
+  function priceInto(what, list, table, key) {
+    const seen = /* @__PURE__ */ new Set();
+    for (const o of list) {
+      if (!Object.prototype.hasOwnProperty.call(table, o.id)) {
+        throw new Error(`prices.js has no ${what} price for "${o.id}" — every option needs one, or it silently costs nothing`);
+      }
+      o[key] = agorot(table[o.id]);
+      seen.add(o.id);
+    }
+    for (const id of Object.keys(table)) {
+      if (!seen.has(id)) {
+        throw new Error(`prices.js prices a ${what} called "${id}" that is not in the catalogue — a renamed id, or a price nobody will ever be charged`);
+      }
+    }
+  }
+  priceInto("size", Object.values(SIZES), SIZE, "base");
+  priceInto("colour", COLOURS, COLOUR, "delta");
+  priceInto("window", WINDOWS, WINDOW, "delta");
+  priceInto("grille", GRILLES, GRILLE, "delta");
+  priceInto("detail", DETAILS, DETAIL, "delta");
+  priceInto("handle", HANDLES, HANDLE, "delta");
+  priceInto("lockset", LOCKSETS, LOCKSET, "delta");
 
   // js/price.js
   function priceAgorot(state2) {
@@ -506,9 +653,9 @@
     // max-below-min throws a RangeError.
   });
   var formatAgorot = (a) => fmt.format(a / 100);
-  function deltaLabel(agorot, lang = "he") {
-    if (!agorot) return { he: "כלול", en: "Included", ru: "Включено" }[lang];
-    return (agorot < 0 ? "−" : "+") + fmt.format(Math.abs(agorot) / 100);
+  function deltaLabel(agorot2, lang = "he") {
+    if (!agorot2) return { he: "כלול", en: "Included", ru: "Включено" }[lang];
+    return (agorot2 < 0 ? "−" : "+") + fmt.format(Math.abs(agorot2) / 100);
   }
 
   // js/spec.js
@@ -4224,7 +4371,7 @@ ${body}
     const { state: parsed, notice, said } = fromQuery(window.location.search);
     state = parsed;
     buildPanel();
-    if (PLACEHOLDER) $("#placeholder-note").hidden = false;
+    if (PLACEHOLDER2) $("#placeholder-note").hidden = false;
     if (notice) showNotice(notice, said);
     $("#copy-btn").addEventListener("click", onCopy);
     $("#grip-rot").addEventListener("click", () => {

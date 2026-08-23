@@ -93,37 +93,44 @@ const SHOTS = [
 ];
 
 /**
- * ⚠ THE RASTER HAS A CEILING, AND `desktop` WAS OVER IT.
+ * ⚠ THESE ARE 1x, AND THE CEILING THAT FORCED IT IS NOT A FIXED NUMBER.
  *
- * Every shot was taken at `deviceScaleFactor: 2`, which for the 1680-wide
- * `desktop` shot means a 3360x1900 image — and Chromium in a container simply
- * never produces it. Measured, same page, same machine:
+ * Every shot used to be `deviceScaleFactor: 2`, which for the 1680-wide
+ * `desktop` shot is a 3360x1900 image, and Chromium in this container never
+ * produces it — 30 s, 45 s and 90 s timeouts, four attempts, with
+ * `--disable-dev-shm-usage` and with `/dev/shm` at 16 GB. Not a regression
+ * either: I stashed every local change and a pristine checkout failed
+ * identically, so `npm run sheets` had not been runnable end to end here for as
+ * long as `desktop` has been 1680 wide. It went unnoticed because the sheets
+ * only need regenerating when the drawing moves.
  *
- *   1680 @1.5x  = 2520x1425   641 ms
- *   1680 @1.75x = 2940x1663   never completes (90 s, then 40 s, four times)
- *   1680 @2x    = 3360x1900   never completes
- *   1280 @2x    = 2560x1440   502 ms
+ * ⚠ MY FIRST FIX WAS WRONG AND IS WORTH LEAVING ON THE RECORD. I measured a
+ * threshold and capped the width to it:
  *
- * So the limit is a texture WIDTH somewhere just past 2560, not an area: the
- * `phone` shot is 780 px wide and thousands tall and has always been fine.
- * `--disable-dev-shm-usage` does not help and `/dev/shm` is 16 GB, so it is not
- * that either.
+ *   1680 @1.5x  = 2520x1425    641 ms  ✓
+ *   1280 @2x    = 2560x1440    502 ms  ✓
+ *   1680 @1.75x = 2940x1663    never returns
  *
- * ⚠ THIS IS NOT A REGRESSION AND IT IS WORTH KNOWING WHY IT WAS INVISIBLE. The
- * failure reproduces on a pristine checkout — I stashed every change and it
- * failed identically — so `npm run sheets` has not been runnable end to end in
- * this environment for as long as `desktop` has been 1680 wide. It went
- * unnoticed because the sheets only need regenerating when the drawing moves,
- * and the last few times that happened it was done somewhere else.
+ * and concluded the limit was a texture width just past 2560. An hour later,
+ * under a busier container, 2560x1440 failed three times out of three. The
+ * ceiling MOVES with whatever else is running. Any constant fitted to it is a
+ * guess with an expiry date, and the failure mode is a crashed sheet run that
+ * leaves the committed pictures stale — which is precisely what these stamps
+ * exist to prevent.
  *
- * A staleness check nobody can satisfy is worse than no check: the next person
- * to change the renderer is told to run a command that cannot finish. So the
- * scale is capped at a width this can actually rasterise. Only `desktop`
- * changes, from 2x to 1.5x — it is still the whole page at 1680 logical px.
- * Raise `MAX_RASTER_W` the day this runs somewhere with a bigger ceiling.
+ * So: a fixed 1x, chosen because it is far below any ceiling observed and
+ * because it cannot drift. These twelve are WHOLE-PAGE shots and they are read
+ * to judge LAYOUT — where things sit, what is clipped, what overlaps — which 1x
+ * carries perfectly well. The families that are read to judge the DRAWING
+ * (`recreate`, `corpus`, `against`) shoot 620–700 px wide and stay at 2x, well
+ * inside every ceiling seen.
+ *
+ * Determinism matters more than resolution here for a specific reason: these
+ * are committed artefacts guarded by a content hash. A scale that silently
+ * varies with machine load would make the same command produce different bytes
+ * on different days, and the hash would report drift that is not there.
  */
-const MAX_RASTER_W = 2520;              // proven at 641 ms; 2940 never returns
-const scaleFor = w => Math.min(2, MAX_RASTER_W / w);
+const PAGE_SCALE = 1;
 
 await assertFreshBundle();
 
@@ -131,7 +138,7 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 let bad = 0;
 for (const s of SHOTS) {
   const p = await b.newPage({ viewport: { width: s.w, height: s.h },
-                              deviceScaleFactor: scaleFor(s.w) });
+                              deviceScaleFactor: PAGE_SCALE });
   const errs = [];
   p.on('pageerror', e => errs.push(String(e)));
   p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });

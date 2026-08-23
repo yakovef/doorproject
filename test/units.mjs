@@ -1361,6 +1361,37 @@ for (const k of LOCKSETS) {
             + 'app.js will make it draggable and put a gp= for it in the order');
 }
 
+/* ⚠ THE ONE MISTAKE IN ASK-PERETZ.md THAT COSTS REAL MONEY, PINNED.
+   Answered by the owner's son, 23.8.2026: "at our app we are looking from the
+   outside, so a left door is a keyhole on the right." Both values in HANDINGS
+   were the other way round when he said it, so every order the site produced
+   named the mirror of the door on screen.
+   Asserted against the DRAWING rather than against the `hinge` field, because
+   the field is what was wrong: a test that reads `hinge` would have agreed with
+   the bug. This asks where the keyhole actually lands on the leaf. */
+group('a שמאל door puts the keyhole on the right, seen from outside');
+for (const size of Object.keys(SIZES)) {
+  for (const k of LOCKSETS) {
+    for (const [handing, side] of [['left-in', 'right'], ['right-in', 'left']]) {
+      const st = repair({ ...base, size, handing, handle: 'none', lockset: k.id }).state;
+      if (st.handing !== handing || st.lockset !== k.id) continue;
+      const svg = render(st);
+      const i = svg.indexOf('data-hw="lockset"');
+      if (i < 0) continue;
+      const m = /(?:translate\(|cx="|x=")\s*(-?[\d.]+)/.exec(svg.slice(i, i + 400));
+      if (!m) continue;
+      const leaf = /<g id="leaf"[\s\S]{0,300}?x="([\d.]+)"[^>]*width="([\d.]+)"/.exec(svg);
+      if (!leaf) continue;
+      const centre = +leaf[1] + +leaf[2] / 2;
+      const at = +m[1] > centre ? 'right' : 'left';
+      ok(at === side,
+         `${handing} / ${size} / ${k.id}: the keyhole is drawn on the ${at}, and a `
+       + `${handing === 'left-in' ? 'שמאל' : 'ימין'} door carries it on the ${side}. `
+       + 'Every order for this door would name its mirror.');
+    }
+  }
+}
+
 // ── 8b. A moulding is not a raised panel ──────────────────────────
 /* THE MODEL: a panel on these doors is a strip of moulding laid on the face in
    a rectangle. There is nothing inside it. The face within the rectangle is
@@ -1788,6 +1819,47 @@ group('the page still reaches Peretz with no JavaScript');
    won over a live id of the same name — and `take` is the reader that actually
    faces stale links. Both are two-pass now. No list collides today; nothing
    asserted that, which is the part that made it a matter of luck. */
+/* ⚠ THE MONEY MOVED OUT OF THE VOCABULARY, so this asserts they cannot drift.
+   Every price now lives in `js/prices.js` as plain shekels — one screen, for
+   the evening the real numbers arrive. `priceInto` in catalog.js already
+   THROWS on a mismatch at load, which is the strong guard; this is the one
+   that names the problem in the suite's own words rather than as a stack
+   trace, and it also pins the shape of the money itself. */
+group('every option has exactly one price, in whole agorot');
+{
+  const { SIZE, COLOUR, WINDOW, GRILLE, DETAIL, HANDLE, LOCKSET, agorot } =
+    await import('../js/prices.js');
+  const pairs = [['size', Object.values(SIZES), SIZE, 'base'],
+                 ['colour', COLOURS, COLOUR, 'delta'], ['window', WINDOWS, WINDOW, 'delta'],
+                 ['grille', GRILLES, GRILLE, 'delta'], ['detail', DETAILS, DETAIL, 'delta'],
+                 ['handle', HANDLES, HANDLE, 'delta'], ['lockset', LOCKSETS, LOCKSET, 'delta']];
+  for (const [what, list, table, key] of pairs) {
+    for (const o of list) {
+      ok(Object.prototype.hasOwnProperty.call(table, o.id),
+         `prices.js has no ${what} price for "${o.id}" — it would cost nothing`);
+      ok(Number.isInteger(o[key]) && o[key] >= 0,
+         `${what} "${o.id}" carries ${o[key]} — prices are non-negative whole agorot`);
+      if (Object.prototype.hasOwnProperty.call(table, o.id)) {
+        ok(o[key] === agorot(table[o.id]),
+           `${what} "${o.id}" is ${o[key]} agorot but prices.js says ${table[o.id]} shekels`);
+      }
+    }
+    const ids = new Set(list.map(o => o.id));
+    for (const id of Object.keys(table)) {
+      ok(ids.has(id), `prices.js prices a ${what} "${id}" that is not in the catalogue`);
+    }
+  }
+  /* Half an agora is not a thing, and a price that quietly became one would be
+     invisible in every shekel-rounded display. */
+  for (const bad of [3195.001, 0.005, NaN, Infinity, '3195', null]) {
+    let threw = false;
+    try { agorot(bad); } catch { threw = true; }
+    ok(threw, `agorot(${JSON.stringify(bad)}) must be refused, not rounded away`);
+  }
+  ok(agorot(3195) === 319500 && agorot(0) === 0 && agorot(12.34) === 1234,
+     'agorot() does not convert shekels correctly');
+}
+
 group('no catalogue list reuses a name as both an id and an alias');
 {
   const lists = { COLOURS, WINDOWS, GRILLES, HANDLES, LOCKSETS, DETAILS, HANDINGS };

@@ -305,9 +305,28 @@ function detailOf(rec) {
   return { id: 'plain', residual: 0, note: 'plain face' };
 }
 
-/** From the grip's side, never typed. */
+/**
+ * From the grip's side, never typed.
+ *
+ * ⚠ INVERTED ON 23.8.2026, WITH THE CONVENTION ITSELF. `HANDINGS` had ימין and
+ * שמאל the wrong way round; looking from outside, a שמאל door carries its
+ * keyhole on the RIGHT, so both `hinge` values were swapped in `js/catalog.js`.
+ *
+ * This line is why that fix was not a one-liner. It maps a MEASUREMENT — which
+ * side the hardware sits on in the photograph — onto a handing id, and it was
+ * written against the old meaning: hardware on the left of the leaf
+ * (`handle.x < 0.5`) used to be `left-in`. Under the corrected convention that
+ * same door is `right-in`, because the NAME FOLLOWS THE HINGE, which is the
+ * other side from the hardware.
+ *
+ * Left unflipped, all 31 corpus sheets would have drawn the mirror of their own
+ * photographs — and these sheets are the instrument we use to judge whether the
+ * drawing is right, so it would have read as the RENDERER breaking. A
+ * convention change has to reach every reader of the convention, including the
+ * ones that only ever consume it.
+ */
 const handingOf = rec => (rec.handle && rec.handle.x != null)
-  ? (rec.handle.x < 0.5 ? 'left-in' : 'right-in') : 'right-in';
+  ? (rec.handle.x < 0.5 ? 'right-in' : 'left-in') : 'right-in';
 
 /* ── run ─────────────────────────────────────────────────────────── */
 

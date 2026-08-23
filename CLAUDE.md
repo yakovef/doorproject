@@ -21,6 +21,43 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **Every price is in `js/prices.js` now — one screen of plain shekels.** The
+  70 numbers were inline in `catalog.js`, one `delta:` at a time, threaded
+  through 780 lines of colour measurements and hardware footprints. To change a
+  price you had to find it. That is fine for a codebase and wrong for the thing
+  this project is actually waiting on: the owner's son sitting down with his
+  father, who says the real figures out loud once. `PLACEHOLDER` moved with
+  them, so flipping it is the last edit of that same evening, in that same file.
+  ⚠ **Splitting money from vocabulary has exactly one failure mode** — a list
+  gains an option, nobody adds a price, `undefined` becomes 0, and the site
+  gives a door away in silence. So `priceInto` at the foot of `catalog.js`
+  THROWS at load on a missing price AND on a price for an option that does not
+  exist, naming the id. The two files cannot drift without the site refusing to
+  start, which is the loudest failure available and the right one for money.
+  Verified behaviour-identical: all **324,000** design prices captured before
+  the move and compared after — **0 differ**.
+
+- **ימין/שמאל IS ANSWERED, AND EVERY ORDER THE SITE PRODUCED WAS MIRRORED.**
+  The owner's son, 23.8.2026: *"at our app we are looking from the outside, so a
+  left door is a keyhole on the right."* One sentence, and it settles both
+  halves of the ambiguity ASK-PERETZ.md §1 had open for nine days — the side
+  AND the viewpoint. Measured before the fix, leaf spanning x 178–1028: a
+  `שמאל` door drew its keyhole at x=238, on the LEFT. Both `hinge` values in
+  `HANDINGS` were the wrong way round, so the door Peretz was told to build was
+  the mirror of the door on the customer's screen. The single item in
+  ASK-PERETZ.md flagged as costing real money, and it was live the whole time.
+  ⚠ **No `VERSION` bump, and know why before you touch this list again:** the
+  short code stores the INDEX of `HANDINGS`. Ids and order are untouched — only
+  a property changed — so every code ever written still decodes to the same
+  entry. REORDERING those two rows would require a bump. Changing what they
+  mean did not.
+  Pinned by a test that asks **where the keyhole is drawn**, across every size ×
+  lockset × handing — deliberately not by reading `HANDINGS[].hinge`, because
+  that field is what was wrong. A test that read it would have agreed with the
+  bug, which is the same trap §5 keeps describing.
+  **What is left before launch is now one question:** a starting price per size
+  band (ASK-PERETZ.md §5). Everything else degrades gracefully.
+
 - **Five agents were turned on the shipped site — one per lane, so they could
   not all find the same defect — and produced 43 verified faults in code that
   was green on every instrument in the repo.** All fixed; the full table is
