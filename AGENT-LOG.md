@@ -23,6 +23,58 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-23 21:01 UTC — run 25: the price on the page was unguarded too, and it is the number that costs money
+
+**Looked at:** no new pushes. Last run closed the spec table's sink; the
+obvious next question is which other page values are shown without anything
+comparing them to their source. The price is the highest-stakes one there is.
+
+**Instruments:** test ✓ (5,674,573) · audit ✓ (7 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`) · recreate ✓ · shot ✓. Only
+`tools/audit.mjs` differs.
+
+**Changed:** the audit now compares the price on the page against
+`priceAgorot`, and every `[data-price]` copy against the card's.
+
+**The gap, proved the same way as last run.** `tools/audit.mjs` asserted of the
+price only that it **contains a digit** and that it changed when the door did.
+So I added 100 agorot inside `paint`'s own `[data-price]` loop:
+
+    npm test    ✗ 4 failed — all sheet-staleness, which fire for any page change
+    npm audit   ✓ no faults, with every price on the page a shekel high
+
+A render path showing the wrong figure passed. `npm test` proves `priceAgorot`
+is right — I swept 1,197,990 buildable designs for that in run 6 — and
+thoroughness at the source is exactly what makes a drifted sink invisible.
+Third instance of one pattern: `#summary`, then the spec table, now the price.
+
+**Two checks, because the page shows the number twice.** The card and the dock
+both carry `data-price`, which is CLAUDE.md §5's own shape — *two elements each
+fetching their own copy of a number*. So one check says the card equals
+`priceAgorot(decoded)`, and a second says every other copy equals the card.
+Both verified live:
+
+    both wrong   "the price reads ‏4,076 ‏₪ and priceAgorot says ‏4,075 ‏₪
+                  — #price has drifted off js/price.js"
+    dock only    "[data-price] #1 reads ‏4,076 ‏₪ and the card says ‏4,075 ‏₪
+                  — two copies of one number"
+
+The second is the one that matters more: a customer reading the dock and a
+customer reading the card would have been quoted different figures for the same
+door, and every source-level assertion would have stayed green.
+
+**Compared against `formatAgorot(priceAgorot(back))`, not against digits.**
+Stripping to digits would survive a broken formatter — a thousands separator
+lost, the currency dropped — and the formatted string is what a customer
+actually reads. The state comes from decoding the on-screen code, so the page
+supplies both halves and nothing has to be passed in.
+
+**Left alone:** everything else. Tool only — no site file, no bundle change.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-23 16:08 UTC — run 24: the spec TABLE was the one sink nobody was watching
 
 **Looked at:** no new pushes, so the property `js/spec.js` exists to guarantee —

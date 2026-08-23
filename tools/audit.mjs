@@ -19,6 +19,7 @@ import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
 import { load } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
+import { formatAgorot, priceAgorot } from '../js/price.js';
 import { specRows, summaryLine } from '../js/spec.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
@@ -292,6 +293,10 @@ for (const v of VIEWS) {
           leaf: lb && { x: lb.x, y: lb.y, w: lb.width, h: lb.height },
           stage: { x: sb.x, y: sb.y, w: sb.width, h: sb.height },
           price: document.getElementById('price').textContent,
+          /* EVERY copy of it. The card and the dock both carry `data-price`,
+             and two elements each fetching their own copy of a number is the
+             shape CLAUDE.md §5 is about. */
+          prices: [...document.querySelectorAll('[data-price]')].map(e => e.textContent),
           code: document.getElementById('code').textContent,
           wa: document.getElementById('wa-btn').getAttribute('href'),
           summary: document.getElementById('summary').textContent,
@@ -343,6 +348,33 @@ for (const v of VIEWS) {
          instrument that can see the page was not looking.
          Row for row against `specRows`, because a table that agrees on the
          concatenation and disagrees on which row holds what is still wrong. */
+      /* ⚠ AND THE PRICE, which is the number a customer decides on and the
+         number Peretz is handed. This file asserted only that it CONTAINS A
+         DIGIT and that it changed when the door did — so a render path that
+         showed the wrong figure passed. Proved: adding 100 agorot inside
+         `paint`'s own `[data-price]` loop left `npm run audit` green with every
+         price on the page a shekel high, and `npm test` failing only its
+         sheet-staleness checks, which fire for any change to the page.
+         `npm test` proves `priceAgorot` is right; only a browser can prove the
+         number ON THE PAGE is `priceAgorot`. Same argument as `#summary` and
+         the spec table, on the one value where being wrong costs money
+         directly — and the page shows it TWICE, in the card and in the dock,
+         which is CLAUDE.md §5's own shape. */
+      if (back) {
+        const wantPrice = formatAgorot(priceAgorot(back));
+        if (s.price.trim() !== wantPrice) {
+          fault(v.name, `${key}=${id}: the price reads "${s.price.trim()}" and `
+                      + `priceAgorot says "${wantPrice}" — #price has drifted off js/price.js`);
+        }
+        for (const [i, shown] of s.prices.entries()) {
+          if (shown.trim() !== wantPrice) {
+            fault(v.name, `${key}=${id}: [data-price] #${i} reads "${shown.trim()}" `
+                        + `and the card says "${wantPrice}" — two copies of one number`);
+            break;
+          }
+        }
+      }
+
       if (back) {
         const want = specRows(back);
         if (s.spec.length !== want.length) {
