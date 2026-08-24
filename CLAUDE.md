@@ -176,9 +176,11 @@ with those four red is right, and it still stands for the days it degrades.
 
 **As of the classical-set round the container was healthy** — `npm test`
 **4,377,785 / 0**, `npm run audit` clean, `npm run collide -- boxes` clean,
-`npm run recreate` clean (known catalogue gaps only), sheets current. Two
-things are red and both are measured below; neither is new drawing damage —
-both are instrument gaps found and traced, not yet closed.
+`npm run recreate` clean (known catalogue gaps only), sheets current. **And
+`npm run collide -- all` is clean now too**, for the first time — see below;
+that entry is struck through rather than deleted because the diagnosis in it
+is the useful part. One thing is still red, it is measured below, and it is
+not drawing damage: an instrument gap found and traced, not yet closed.
 
 - **`npm run profile` red on the dark band, two of its three checks — and it is
   not the drawing.** The panel-rate and moulding-bead checks (not the primary
@@ -195,28 +197,34 @@ both are instrument gaps found and traced, not yet closed.
   the way FALLOFF's own docstring already explains doing once for the same
   reason, and that needs a wide-enough neighbourhood average verified not to
   mask a real asymmetry, which is more than a five-hour run should rush.
-- **`npm run collide -- all` red on the classical set, two findings — and
-  neither is the drawing either.** `faceObstacles` describes the set's cornice,
-  frieze, shelf and plinth as `moulding`-kind obstacles off the same
-  `CLASSIC_ROWS`/`CLASSIC_COLS` constants `classicSet()` draws from, so the
-  two cannot disagree about POSITION. What's actually red: `collide.mjs`'s
-  drift-check reader was never taught to look for the `moulding` kind (it only
-  knows `window` and `panel`), so those four rectangles can never be
-  independently confirmed against the drawing — a reader gap, not a drift.
-  And the reported "classic x pane" 496×921 mm hit on four designs is the
-  OUTER `<g data-detail="classic">` wrapper's bounding box (cornice-to-plinth)
-  unavoidably spanning the window's row in the gap between the pieces, even
-  though nothing in the composition actually touches the glass — verified off
-  the row constants directly (cornice/frieze end at 0.148, shelf starts at
-  0.557, the window is 0.159–0.540). A third, unconfirmed thing: `footHits`'s
-  "ring with a walkable flat middle" treatment — right for a raised panel — is
-  applied to all six classic rows including the four that are not panels and
-  may have no legitimate flat middle at all; whether any reachable customer
-  state can actually place a foot there was not traced. See `AGENT-LOG.md`
-  run 29 for the full reasoning. **Not fixed** — the honest fix tags
-  `classicSet()`'s individual pieces so both checks read them instead of the
-  composite, which needs verifying against all three findings at once rather
-  than three separate rushed edits.
+- ~~**`npm run collide -- all` red on the classical set**~~ ✅ **fixed in the
+  round after run 29 diagnosed it, and the diagnosis was right on all three
+  counts.** Both symptoms were TAGGING and one was a real drawing fault:
+  - `classicSet` returned one `<g data-detail="classic">`, whose bounding box
+    runs cornice to plinth and crosses the window's row in the gap between the
+    pieces — four "classic x pane" overlaps where nothing comes near the glass.
+    Each piece is in its own `<g data-detail="moulding" data-piece="…">` now and
+    the wrapper carries `data-set` instead, which neither reader selects on.
+  - the drift reader knew `window` and `panel` and had no third kind, so five
+    drawn rectangles could never be confirmed — twenty obstacles "the rules
+    believe in and the drawing does not", every one of them on the door. It
+    reads `[data-detail="moulding"]` now, measuring the union of the shapes
+    marked `data-face` — the block's own face, the cap's corona and hollow, the
+    bracket's body — so it measures ink and not a claim.
+  - and once it could see them it found a REAL fault immediately: the rules
+    declared the band at the shelf's width while the drawing had narrowed the
+    face and hung the brackets outside it. `classicPieces` is one table now,
+    drawn from and declared from, and the band's span covers its brackets
+    because a pull bar through a corbel is through a corbel.
+  - **the last four overlaps were the drawing being wrong.** The set's light was
+    cased in the range's 70 mm stock like every other opening; the set's own
+    rows leave 59 between the frieze and the glass and NINE at the foot, where
+    the shelf is what closes the light. At 70 all round, the casing and the
+    shelf's corona were two pieces of joinery drawn through each other for 61
+    mm. `CLASSIC_BAND` and `CLASSIC_BAND_FOOT`, read by the drawing and by the
+    obstacle alike. ⚠ The third, unconfirmed thing run 29 raised — `footHits`
+    treating all the classic rows as rings with a walkable middle — is still
+    unconfirmed and still worth tracing.
 
 What to know for the days it degrades:
 
@@ -994,6 +1002,30 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **`npm run collide -- all` is clean for the first time, and getting there
+  found a real fault the instrument could not previously see.** The recurring
+  agent diagnosed the red in run 29 and left the fix to whoever owned the
+  drawing, which by then was this round. Its reading was right on every count:
+  two of the three symptoms were TAGGING, not geometry — a composite group
+  whose bounding box crossed the window's row, and a drift reader that knew
+  `window` and `panel` and had no third kind, so five drawn rectangles could
+  never be confirmed. `classicPieces` is one table now, drawn from and declared
+  from; each piece is in its own tagged group; the reader unions the shapes
+  marked `data-face`, which are real ink.
+  ⚠ **AND THE MOMENT IT COULD SEE THEM IT FOUND TWO REAL FAULTS.** The rules
+  declared the shelf band at the shelf's full width while the drawing had
+  narrowed the face to 0.429 and hung the brackets outside it — drift that had
+  been sitting there since the band was narrowed, invisible because nothing
+  could read a moulding. And the set's light was cased in the range's 70 mm
+  stock like every other opening, where the set's own measured rows leave 59
+  above the glass and NINE at the foot, because the shelf is what closes that
+  light: at 70 the casing and the shelf's corona were drawn through each other
+  for 61 mm. `CLASSIC_BAND` and `CLASSIC_BAND_FOOT`, read by the drawing and by
+  the obstacle alike.
+  The lesson is the instrument's, not the drawing's: **a check that cannot name
+  a thing cannot check it, and it will report that as the thing being absent
+  rather than as itself being blind.** Twenty obstacles "the rules believe in
+  and the drawing does not" were all on the door.
 - **Five more doors put through the same loop, and the most complicated ones
   in the corpus turned out to be the same product as the new one.** d101, d103,
   d112 and d129 all carry the classical set — cornice, frieze block with an

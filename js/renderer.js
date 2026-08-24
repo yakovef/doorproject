@@ -2200,6 +2200,8 @@ export function render(state) {
   <!-- ── glazing ──────────────────────────────────────────────── -->
   <g id="glazing">
     ${openings.map((o, i) => aperture({
+      band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
+      bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
       x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
       splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
       paint, edge, grille, key: 'm' + i,
@@ -2814,9 +2816,14 @@ export const faceObstacles = memo(function faceObstacles(state) {
   const detail = byId(DETAILS, state.detail);
   const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
                                   byId(DETAILS, state.detail));
+  /* ⚠ THE SAME BAND THE DRAWING CASES IT IN. This said MOULD_BAND flat, and
+     for the classical set the drawing now says 59: an obstacle eleven
+     millimetres bigger than the thing it describes is the §5 shape again. */
+  const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
+  const paneFoot = detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND;
   const out = openings.map(o => ({
-    kind: 'window', x: o.x - MOULD_BAND, y: o.top - MOULD_BAND,
-    w: o.w + MOULD_BAND * 2, h: o.h + MOULD_BAND * 2,
+    kind: 'window', x: o.x - paneBand, y: o.top - paneBand,
+    w: o.w + paneBand * 2, h: o.h + paneBand + paneFoot,
   }));
 
   /* ⚠ THE CLASSICAL SET IS NOT A PANELLED FACE PLUS A WINDOW, and asking the
@@ -2832,13 +2839,15 @@ export const faceObstacles = memo(function faceObstacles(state) {
      collide` would happily stand a pull bar through the middle of the shelf.
      Read off the set's own tables, like everything else about it. */
   if (detail.classic) {
-    for (const [row, col] of [['cornice', 'cornice'], ['frieze', 'frieze'],
-                              ['shelf', 'shelf'], ['band', 'shelf'],
-                              ['panel', 'panel'], ['plinth', 'plinth']]) {
-      const [t, b] = CLASSIC_ROWS[row], [x0, x1] = CLASSIC_COLS[col];
-      out.push({ kind: row === 'panel' ? 'panel' : 'moulding',
-                 x: leafW * x0, y: leafH * t,
-                 w: leafW * (x1 - x0), h: leafH * (b - t), band: MOULD_BAND });
+    /* ⚠ OFF `classicPieces`, THE SAME TABLE `classicSet` DRAWS FROM. It used
+       to be a second list written here, and that is the §5 shape exactly: the
+       band's columns had already drifted — the rules said the shelf's span,
+       the drawing had narrowed the face to 0.286-0.714 and hung the brackets
+       outside it. Nothing caught that, because `collide.mjs`'s drift reader
+       had no way to see a moulding at all. Both ends of that are fixed
+       together or neither is worth fixing. */
+    for (const q of classicPieces(leafW, leafH)) {
+      out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND });
     }
     return out;
   }
@@ -4257,7 +4266,7 @@ export const apertureLayout = memo(function apertureLayout(win, leafW, detail) {
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
-                    splits = [] }) {
+                    splits = [], band = MOULD_BAND, bandFoot = band }) {
   /* WORKED GLASS IS A GRILLE NOW. The pattern in the pane and the ironwork
      over it were two choices and are one, so the same option decides both:
      `glass: true` in the catalogue means it is etched into the glass, and
@@ -4292,11 +4301,18 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
      under it is what "the inside of it is bulging out" was; leaving the
      surround exempt would have been the same defect, waiting for a door with a
      window low enough to show it. */
-  const M = MOULD_BAND;
+  /* ⚠ THE BAND IS A PARAMETER NOW, and the classical set is why. Every other
+     opening in the range is cased in the same 70 mm stock the panels use. The
+     set is not: its light is closed at the bottom by the SHELF, and its rows
+     leave 59 mm between the frieze and the glass, so a 70 mm casing runs into
+     the frieze above and 61 mm into the shelf below. `npm run collide -- all`
+     reported that as eight "moulding x pane" overlaps and it was right — two
+     pieces of joinery drawn through each other, not an instrument artefact. */
+  const M = band, MF = bandFoot;
   const id = `cl-${key}`;
   return `
     <g data-pane="${key}" data-glass="${grille.glass ? grille.id : 'clear'}">
-      ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint, isLight(paint),
+      ${moulding(x - M, y - M, w + M * 2, h + M + MF, M, paint, isLight(paint),
                  leaf, `a${key}`)}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
            edge before the pane turns the other way -->
@@ -5108,6 +5124,64 @@ const CLASSIC_COLS = {
    0.423 of its width, which on our 850 x 2050 leaf is 360 x 819 at 318 from
    the head — close to the catalogue's own `rect` and not the same as it. */
 const CLASSIC_GLASS = { top: 0.155, bot: 0.5545, x0: 0.289, x1: 0.711 };
+/* The stock the SET's light is cased in, and it is not the range's 70 mm.
+   Ruler-read: the frieze block ends at 0.126 of the leaf and the glass starts
+   at 0.155, which leaves 0.029 — 59 mm on a 2,050 leaf. At 70 the casing runs
+   into the frieze above it and 61 mm into the shelf below, and the shelf is
+   what closes this light at the bottom in the first place. */
+export const CLASSIC_BAND = 59;
+/* And at the FOOT of that light there is barely any casing at all, because the
+   SHELF is what closes it: 0.5545 to 0.559 of the leaf, nine millimetres. Drawn
+   with 59 all round, the casing and the shelf's corona are two pieces of
+   joinery through each other for fifty of them — which `npm run collide -- all`
+   reported, correctly, as an overlap. */
+export const CLASSIC_BAND_FOOT = 9;
+
+/**
+ * THE SET'S PIECES AS RECTANGLES, NAMED ONCE.
+ *
+ * ⚠ THIS EXISTS BECAUSE `npm run collide -- all` COULD NOT CHECK THE SET, and
+ * the diagnosis is not mine — the recurring agent traced it in run 29 and left
+ * the fix for whoever owned the drawing, which by then was this round. Two
+ * separate things were wrong and both were about TAGGING rather than geometry:
+ *
+ *   the sweep saw one composite. `classicSet` returned everything inside a
+ *     single `<g data-detail="classic">`, whose bounding box runs cornice to
+ *     plinth and therefore crosses the window's row in the gap between the
+ *     pieces. Four designs were reported as "classic x pane" overlaps where
+ *     nothing in the composition comes near the glass.
+ *   the drift reader saw nothing. It knows how to find a `window` and a
+ *     `panel` in the markup and there was no third thing to find, so the five
+ *     moulding rectangles `faceObstacles` declares could never be confirmed
+ *     against the drawing — 20 obstacles "the rules believe in and the drawing
+ *     does not", every one of them actually drawn.
+ *
+ * So the pieces are named here, `classicSet` draws them from this table and
+ * tags each one, and `faceObstacles` declares them from the same table. The
+ * two cannot disagree about position — which is what that check is for, and
+ * it can now do its job instead of reporting a tagging artefact.
+ *
+ * ⚠ THE BAND'S SPAN INCLUDES ITS BRACKETS. The face between the corbels is
+ * 0.286 to 0.714 of the leaf, but the corbels hang outside it to 0.210 and
+ * 0.790, and a pull bar put through a corbel is through a corbel. An obstacle
+ * is what is ON the door, not what the joinery drawing calls one piece.
+ */
+export function classicPieces(leafW, leafH) {
+  const R = CLASSIC_ROWS, C = CLASSIC_COLS;
+  const of = (row, x0, x1) => ({
+    x: leafW * x0, y: leafH * R[row][0],
+    w: leafW * (x1 - x0), h: leafH * (R[row][1] - R[row][0]),
+  });
+  return [
+    { piece: 'cornice', kind: 'moulding', ...of('cornice', ...C.cornice) },
+    { piece: 'frieze',  kind: 'moulding', ...of('frieze',  ...C.frieze)  },
+    { piece: 'shelf',   kind: 'moulding', ...of('shelf',   ...C.shelf)   },
+    { piece: 'band',    kind: 'moulding', ...of('band',    0.210, 0.790) },
+    { piece: 'panel',   kind: 'panel',    ...of('panel',   ...C.panel)   },
+    { piece: 'plinth',  kind: 'moulding', ...of('plinth',  ...C.plinth)  },
+    { piece: 'foot',    kind: 'moulding', ...of('foot',    ...C.plinth)  },
+  ];
+}
 
 /**
  * A PROJECTING ENTABLATURE: corona, cavetto, and the shadow it throws.
@@ -5163,14 +5237,14 @@ function classicCap(x, y, w, h, paint, key = 'c', flare = false, coronaF = 0.68)
     ${/* the shadow the whole thing throws on the leaf */''}
     <rect x="${n(x)}" y="${n(flare ? y - h * 0.2 : y + h)}" width="${n(w)}"
           height="${n(h * 0.80)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
-    <path d="${hollow}" fill="url(#${id})"/>
+    <path data-face d="${hollow}" fill="url(#${id})"/>
     ${/* the corona: a lit top face, then a hard drip line under its front */''}
     ${/* ⚠ THE ENDS ARE MITRED BACK, and a square end is the tell of a plank.
           The photograph's corona is cut at 45 degrees at both returns, so the
           slab reads as a length of moulding stopped against the leaf rather
           than as a board that ran out. One trapezoid instead of a rect. */''}
     ${flare ? '' : `
-      <path d="M ${n(x)} ${n(y)} H ${n(x + w)} L ${n(x + w - back)} ${n(y + corona)}
+      <path data-face d="M ${n(x)} ${n(y)} H ${n(x + w)} L ${n(x + w - back)} ${n(y + corona)}
                H ${n(x + back)} Z" fill="${lighten(paint, 0.15)}"/>
       <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(lip)}"
             fill="${lighten(paint, 0.34)}"/>
@@ -5178,8 +5252,8 @@ function classicCap(x, y, w, h, paint, key = 'c', flare = false, coronaF = 0.68)
                H ${n(x + w - back * 0.4)} L ${n(x + w - back)} ${n(y + corona)}
                H ${n(x + back)} Z" fill="#000" opacity="0.38"/>`}
     ${flare ? `
-      <rect x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}" height="${n(corona)}"
-            fill="${lighten(paint, 0.08)}"/>
+      <rect data-face x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}"
+            height="${n(corona)}" fill="${lighten(paint, 0.08)}"/>
       <rect x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}" height="${n(h * 0.04)}"
             fill="${lighten(paint, 0.22)}"/>` : ''}`;
 }
@@ -5299,7 +5373,13 @@ function classicCorbel(x, y, w, h, paint, flip = false) {
 
   /* the bracket's body, so the reeds have something to sit on */
   let out = `
-    <path d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
+    ${/* ⚠ `data-face`: the bracket is part of the BAND piece, and the band's
+          declared span reaches out to cover it. Without this mark the drift
+          reader measured the face between the brackets and the rules declared
+          the face plus the brackets, and the two disagreed by seven
+          centimetres a side — which is the drift that check exists to find,
+          arriving from the tagging rather than from the geometry. */''}
+    <path data-face d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
              L ${n(ox)} ${n(y + h)} Z" fill="${paint}"/>
     <path d="M ${n(at(face))} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
              L ${n(at(face))} ${n(y + h)} Z" fill="${lighten(paint, 0.05)}"/>`;
@@ -5421,8 +5501,17 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone) {
   const X = f => lx + lw * f;
   const leaf = { x: lx, y: ly, w: lw, h: lh };
   const out = [];
-  const span = (row, col) => [X(C[col][0]), Y(R[row][0]),
-                              (C[col][1] - C[col][0]) * lw, (R[row][1] - R[row][0]) * lh];
+  /* ⚠ EACH PIECE IN ITS OWN TAGGED GROUP, not one composite. See
+     `classicPieces` for why: an outer `<g data-detail="classic">` has a
+     bounding box running cornice to plinth, and `npm run collide -- all` read
+     that as the set overlapping the glass on four designs while nothing in it
+     comes near the glass. `data-face` marks the shape that DEFINES a piece —
+     the block's own face, the cap's corona and hollow — so the drift reader
+     measures ink rather than a claim, and the shadows and the brackets stay
+     inside the group where the sweep can still see them. */
+  const P = Object.fromEntries(classicPieces(lw, lh).map(q => [q.piece, q]));
+  const piece = (name, art) =>
+    out.push(`<g data-detail="moulding" data-piece="${name}">${art}</g>`);
 
   /* A block standing PROUD of the leaf: lit along its top and left, shadowed
      along its bottom and right, over a soft cast shadow. Four rectangles.
@@ -5437,7 +5526,8 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone) {
     return `
       <rect x="${n(bx)}" y="${n(by + e)}" width="${n(bw)}" height="${n(bh)}"
             fill="#000" opacity="0.18" filter="url(#hwShadow)"/>
-      <rect x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(bh)}" fill="${paint}"/>
+      <rect data-face x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(bh)}"
+            fill="${paint}"/>
       <rect x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(e)}"
             fill="${lighten(paint, 0.22)}"/>
       <rect x="${n(bx)}" y="${n(by)}" width="${n(e)}" height="${n(bh)}"
@@ -5457,52 +5547,51 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone) {
      of the cornice by analogy with the shelf. The ruled photograph has a plain
      moulded return there and nothing else; the brackets belong to the shelf
      alone, which is what makes the shelf read as a shelf. */
-  const fz = span('frieze', 'frieze');
-  out.push(block(...fz));
-  out.push(inBand(...fz, 'cfb', 'flute', 'oval'));
-  const cn = span('cornice', 'cornice');
-  out.push(beadRun(X(C.cornice[0]) + lw * 0.036, Y((R.beads[0] + R.beads[1]) / 2),
-                   (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072, beadR, paint));
-  out.push(classicCap(...cn, paint, 'cn'));
+  const at = q => [lx + q.x, ly + q.y, q.w, q.h];
+  piece('frieze', block(...at(P.frieze)) + inBand(...at(P.frieze), 'cfb', 'flute', 'oval'));
+  piece('cornice',
+    beadRun(X(C.cornice[0]) + lw * 0.036, Y((R.beads[0] + R.beads[1]) / 2),
+            (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072, beadR, paint)
+    + classicCap(...at(P.cornice), paint, 'cn'));
 
-  /* ── THE SHELF: its own corona, two brackets, and the band they carry ── */
-  /* ⚠ THE BAND IS NARROWER THAN THE SHELF, and it was drawn the same width.
-     Ruler-read: the slab spans 0.649 of the leaf and the face under it only
-     0.429, because the two brackets take the ends. Drawn full width the
-     brackets sat ON the band instead of beside it, which is why they read as
-     striped rectangles stuck to the door. */
-  const ba = span('band', 'band');
-  out.push(block(...ba));
-  out.push(inBand(...ba, 'cbt', 'tablet', 'plain'));
-  /* ⚠ THE BRACKETS HANG OFF THE BAND, NOT OFF THE SHELF'S ENDS. Placed at the
-     slab's corners they left four centimetres of bare leaf between each
-     bracket and the face it is supposed to be carrying, and the pair read as
-     loose reeded strips stuck either side. On the door the corbel's inner
-     edge touches the band: 0.219 against 0.225 of the leaf, six thousandths
-     apart. */
+  /* ── THE SHELF: its own corona, two brackets, and the band they carry ──
+     ⚠ THE BAND'S FACE IS NARROWER THAN THE SHELF, and it was drawn the same
+     width. Ruler-read: the slab spans 0.649 of the leaf and the face under it
+     only 0.429, because the two brackets take the ends. Drawn full width, the
+     brackets sat ON the band instead of beside it and read as striped
+     rectangles stuck to the door.
+     ⚠ AND THE BRACKETS HANG OFF THE BAND, not off the slab's corners — placed
+     there they left four centimetres of bare leaf between each bracket and the
+     face it is supposed to be carrying. On the door the corbel's inner edge
+     touches the band, 0.219 against 0.225 of the leaf. The `band` PIECE spans
+     0.210 to 0.790 so that it covers the brackets as well: an obstacle is what
+     is on the door, not what the joinery calls one piece. */
+  const faceX = X(C.band[0]), faceW = (C.band[1] - C.band[0]) * lw;
   const cbW = lw * 0.070, cbGap = lw * 0.006;
-  for (const flip of [false, true]) {
-    out.push(classicCorbel(flip ? X(C.band[1]) + cbGap : X(C.band[0]) - cbGap - cbW,
-                           Y(R.shelf[1]), cbW,
-                           (R.band[1] - R.shelf[1]) * lh, paint, flip));
-  }
-  out.push(classicCap(...span('shelf', 'shelf'), paint, 'sh', false, 0.51));
+  piece('band',
+    block(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh)
+    + inBand(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh,
+             'cbt', 'tablet', 'plain')
+    + [false, true].map(flip => classicCorbel(
+        flip ? X(C.band[1]) + cbGap : X(C.band[0]) - cbGap - cbW,
+        Y(R.shelf[1]), cbW, (R.band[1] - R.shelf[1]) * lh, paint, flip)).join(''));
+  piece('shelf', classicCap(...at(P.shelf), paint, 'sh', false, 0.51));
   /* THE SET'S OWN PULL. Part of the face, not of the hardware axis — see the
      catalogue entry: this door carries it AND a long vertical bar, and
      `state.handle` holds one grip. */
   out.push(classicPull(X(0.5), Y((R.band[0] + R.band[1]) / 2), lw * 0.33, lh * 0.028, tone));
 
   /* ── the panel ──────────────────────────────────────────────────
-     ⚠ TAGGED `data-detail="panel"`, NOT `classic`, AND THAT IS LOAD-BEARING.
-     Three assertions read the markup rather than the catalogue to ask whether
-     the panel a customer is charged for is a panel that is drawn — and the set
-     charges for one and draws one. Wrapping it in the set's own name hid it
-     from all three, and 297 combinations reported a face with no panel on it
-     while the price list took ₪1,680. `data-top` is there for the same reason:
-     the third check goes DEAD rather than failing without it.
+     ⚠ TAGGED `data-detail="panel"`, AND THAT IS LOAD-BEARING. Three assertions
+     read the markup rather than the catalogue to ask whether the panel a
+     customer is charged for is a panel that is drawn — and the set charges for
+     one and draws one. Wrapping it in the set's own name hid it from all
+     three, and 297 combinations reported a face with no panel while the price
+     list took ₪1,680. `data-top` is there for the same reason: the third check
+     goes DEAD rather than failing without it.
      This one keeps `moulding()`. A panel is what that section was measured on,
      and the photograph's panel surround is a broad ogee, not a band. */
-  const pn = span('panel', 'panel');
+  const pn = at(P.panel);
   out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">`
     + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn')
     + `</g>`);
@@ -5511,16 +5600,16 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone) {
      Stacked in that order — block, bead course UNDER it, ogee to the floor.
      The first version had the beads on top and no block at all: a string of
      dots above a bare rectangle, which is neither piece. */
-  const pl = span('plinth', 'plinth');
-  out.push(block(...pl));
-  out.push(inBand(...pl, 'cpb', 'flute', 'oval'));
-  out.push(beadRun(X(C.plinth[0]) - lw * 0.006, Y((R.pbeads[0] + R.pbeads[1]) / 2),
-                   (C.plinth[1] - C.plinth[0]) * lw + lw * 0.012, beadR, paint));
-  out.push(classicCap(X(C.plinth[0]) - lw * 0.020, Y(R.foot[0]),
-                      (C.plinth[1] - C.plinth[0]) * lw + lw * 0.040,
-                      (R.foot[1] - R.foot[0]) * lh, paint, 'ft', true));
+  piece('plinth',
+    block(...at(P.plinth)) + inBand(...at(P.plinth), 'cpb', 'flute', 'oval')
+    + beadRun(X(C.plinth[0]) - lw * 0.006, Y((R.pbeads[0] + R.pbeads[1]) / 2),
+              (C.plinth[1] - C.plinth[0]) * lw + lw * 0.012, beadR, paint));
+  piece('foot', classicCap(...at(P.foot), paint, 'ft', true));
 
-  return `<g data-detail="classic">${out.join('')}</g>`;
+  /* ⚠ `data-set`, NOT `data-detail`, on the wrapper. Both of `collide.mjs`'s
+     readers select on `[data-detail]`, and a group carrying the whole
+     composition answers with a bounding box that runs cornice to plinth. */
+  return `<g data-set="classic">${out.join('')}</g>`;
 }
 
 /**

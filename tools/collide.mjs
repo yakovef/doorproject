@@ -343,6 +343,23 @@ const drift = await p.evaluate(rows => {
       const b = el.getBBox();
       got.push({ kind: 'window', x: b.x - leaf.x, y: b.y - leaf.y, w: b.width, h: b.height });
     }
+    /* ⚠ A THIRD KIND, AND ITS ABSENCE WAS THE WHOLE OF ONE RED RUN. This
+       reader knew `window` and `panel` and nothing else, so the classical
+       set's five moulding rectangles could never be confirmed against the
+       drawing: twenty obstacles "the rules believe in and the drawing does
+       not", every one of them drawn. `data-face` marks the shape that DEFINES
+       each piece — the block's own face, the cap's corona and its hollow — so
+       what is measured here is ink and not a claim. */
+    for (const el of svg.querySelectorAll('[data-detail="moulding"]')) {
+      let a = Infinity, z = -Infinity, t = Infinity, u = -Infinity;
+      for (const f of el.querySelectorAll('[data-face]')) {
+        const b = f.getBBox();
+        a = Math.min(a, b.x); z = Math.max(z, b.x + b.width);
+        t = Math.min(t, b.y); u = Math.max(u, b.y + b.height);
+      }
+      if (!isFinite(a)) continue;
+      got.push({ kind: 'moulding', x: a - leaf.x, y: t - leaf.y, w: z - a, h: u - t });
+    }
     for (const el of svg.querySelectorAll('[data-detail="panel"]')) {
       for (const g of el.querySelectorAll('[data-relight]')) g.remove();
       /* Rectangle by rectangle, not the group: a two-panel face is ONE group

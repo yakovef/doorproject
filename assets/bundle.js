@@ -2484,6 +2484,8 @@
   <!-- ── glazing ──────────────────────────────────────────────── -->
   <g id="glazing">
     ${openings.map((o, i) => aperture({
+      band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
+      bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
       x: mainX + o.x,
       y: y0 + o.top,
       w: o.w,
@@ -2766,31 +2768,18 @@ ${body}
       leafW,
       byId(DETAILS, state2.detail)
     );
+    const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
+    const paneFoot = detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND;
     const out = openings.map((o) => ({
       kind: "window",
-      x: o.x - MOULD_BAND,
-      y: o.top - MOULD_BAND,
-      w: o.w + MOULD_BAND * 2,
-      h: o.h + MOULD_BAND * 2
+      x: o.x - paneBand,
+      y: o.top - paneBand,
+      w: o.w + paneBand * 2,
+      h: o.h + paneBand + paneFoot
     }));
     if (detail.classic) {
-      for (const [row, col] of [
-        ["cornice", "cornice"],
-        ["frieze", "frieze"],
-        ["shelf", "shelf"],
-        ["band", "shelf"],
-        ["panel", "panel"],
-        ["plinth", "plinth"]
-      ]) {
-        const [t, b] = CLASSIC_ROWS[row], [x0, x1] = CLASSIC_COLS[col];
-        out.push({
-          kind: row === "panel" ? "panel" : "moulding",
-          x: leafW * x0,
-          y: leafH * t,
-          w: leafW * (x1 - x0),
-          h: leafH * (b - t),
-          band: MOULD_BAND
-        });
+      for (const q of classicPieces(leafW, leafH)) {
+        out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND });
       }
       return out;
     }
@@ -3422,10 +3411,12 @@ ${body}
     grille,
     key,
     leaf = null,
-    splits = []
+    splits = [],
+    band = MOULD_BAND,
+    bandFoot = band
   }) {
     const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint2, key) : null;
-    const M = MOULD_BAND;
+    const M = band, MF = bandFoot;
     const id = `cl-${key}`;
     return `
     <g data-pane="${key}" data-glass="${grille.glass ? grille.id : "clear"}">
@@ -3433,7 +3424,7 @@ ${body}
       x - M,
       y - M,
       w + M * 2,
-      h + M * 2,
+      h + M + MF,
       M,
       paint2,
       isLight(paint2),
@@ -3845,6 +3836,26 @@ ${body}
     // width 0.555
   };
   var CLASSIC_GLASS = { top: 0.155, bot: 0.5545, x0: 0.289, x1: 0.711 };
+  var CLASSIC_BAND = 59;
+  var CLASSIC_BAND_FOOT = 9;
+  function classicPieces(leafW, leafH) {
+    const R = CLASSIC_ROWS, C = CLASSIC_COLS;
+    const of = (row, x0, x1) => ({
+      x: leafW * x0,
+      y: leafH * R[row][0],
+      w: leafW * (x1 - x0),
+      h: leafH * (R[row][1] - R[row][0])
+    });
+    return [
+      { piece: "cornice", kind: "moulding", ...of("cornice", ...C.cornice) },
+      { piece: "frieze", kind: "moulding", ...of("frieze", ...C.frieze) },
+      { piece: "shelf", kind: "moulding", ...of("shelf", ...C.shelf) },
+      { piece: "band", kind: "moulding", ...of("band", 0.21, 0.79) },
+      { piece: "panel", kind: "panel", ...of("panel", ...C.panel) },
+      { piece: "plinth", kind: "moulding", ...of("plinth", ...C.plinth) },
+      { piece: "foot", kind: "moulding", ...of("foot", ...C.plinth) }
+    ];
+  }
   function classicCap(x, y, w, h, paint2, key = "c", flare = false, coronaF = 0.68) {
     const n = (v) => Number(v.toFixed(1));
     const back = w * 0.03;
@@ -3869,7 +3880,7 @@ ${body}
     ""}
     <rect x="${n(x)}" y="${n(flare ? y - h * 0.2 : y + h)}" width="${n(w)}"
           height="${n(h * 0.8)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
-    <path d="${hollow}" fill="url(#${id})"/>
+    <path data-face d="${hollow}" fill="url(#${id})"/>
     ${/* the corona: a lit top face, then a hard drip line under its front */
     ""}
     ${/* ⚠ THE ENDS ARE MITRED BACK, and a square end is the tell of a plank.
@@ -3878,7 +3889,7 @@ ${body}
         than as a board that ran out. One trapezoid instead of a rect. */
     ""}
     ${flare ? "" : `
-      <path d="M ${n(x)} ${n(y)} H ${n(x + w)} L ${n(x + w - back)} ${n(y + corona)}
+      <path data-face d="M ${n(x)} ${n(y)} H ${n(x + w)} L ${n(x + w - back)} ${n(y + corona)}
                H ${n(x + back)} Z" fill="${lighten(paint2, 0.15)}"/>
       <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(lip)}"
             fill="${lighten(paint2, 0.34)}"/>
@@ -3886,8 +3897,8 @@ ${body}
                H ${n(x + w - back * 0.4)} L ${n(x + w - back)} ${n(y + corona)}
                H ${n(x + back)} Z" fill="#000" opacity="0.38"/>`}
     ${flare ? `
-      <rect x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}" height="${n(corona)}"
-            fill="${lighten(paint2, 0.08)}"/>
+      <rect data-face x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}"
+            height="${n(corona)}" fill="${lighten(paint2, 0.08)}"/>
       <rect x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}" height="${n(h * 0.04)}"
             fill="${lighten(paint2, 0.22)}"/>` : ""}`;
   }
@@ -3937,7 +3948,14 @@ ${body}
     const pitch = face / REEDS, amp = pitch * 0.62;
     const at = (t) => ox + s * t;
     let out = `
-    <path d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
+    ${/* ⚠ `data-face`: the bracket is part of the BAND piece, and the band's
+        declared span reaches out to cover it. Without this mark the drift
+        reader measured the face between the brackets and the rules declared
+        the face plus the brackets, and the two disagreed by seven
+        centimetres a side — which is the drift that check exists to find,
+        arriving from the tagging rather than from the geometry. */
+    ""}
+    <path data-face d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
              L ${n(ox)} ${n(y + h)} Z" fill="${paint2}"/>
     <path d="M ${n(at(face))} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
              L ${n(at(face))} ${n(y + h)} Z" fill="${lighten(paint2, 0.05)}"/>`;
@@ -4023,18 +4041,15 @@ ${body}
     const X = (f) => lx + lw * f;
     const leaf = { x: lx, y: ly, w: lw, h: lh };
     const out = [];
-    const span = (row, col) => [
-      X(C[col][0]),
-      Y(R[row][0]),
-      (C[col][1] - C[col][0]) * lw,
-      (R[row][1] - R[row][0]) * lh
-    ];
+    const P = Object.fromEntries(classicPieces(lw, lh).map((q) => [q.piece, q]));
+    const piece = (name, art) => out.push(`<g data-detail="moulding" data-piece="${name}">${art}</g>`);
     const block = (bx, by, bw, bh) => {
       const e = Math.max(1.5, lw * 6e-3);
       return `
       <rect x="${n(bx)}" y="${n(by + e)}" width="${n(bw)}" height="${n(bh)}"
             fill="#000" opacity="0.18" filter="url(#hwShadow)"/>
-      <rect x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(bh)}" fill="${paint2}"/>
+      <rect data-face x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(bh)}"
+            fill="${paint2}"/>
       <rect x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(e)}"
             fill="${lighten(paint2, 0.22)}"/>
       <rect x="${n(bx)}" y="${n(by)}" width="${n(e)}" height="${n(bh)}"
@@ -4057,56 +4072,55 @@ ${body}
       ends,
       mid
     );
-    const fz = span("frieze", "frieze");
-    out.push(block(...fz));
-    out.push(inBand(...fz, "cfb", "flute", "oval"));
-    const cn = span("cornice", "cornice");
-    out.push(beadRun(
-      X(C.cornice[0]) + lw * 0.036,
-      Y((R.beads[0] + R.beads[1]) / 2),
-      (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072,
-      beadR,
-      paint2
-    ));
-    out.push(classicCap(...cn, paint2, "cn"));
-    const ba = span("band", "band");
-    out.push(block(...ba));
-    out.push(inBand(...ba, "cbt", "tablet", "plain"));
+    const at = (q) => [lx + q.x, ly + q.y, q.w, q.h];
+    piece("frieze", block(...at(P.frieze)) + inBand(...at(P.frieze), "cfb", "flute", "oval"));
+    piece(
+      "cornice",
+      beadRun(
+        X(C.cornice[0]) + lw * 0.036,
+        Y((R.beads[0] + R.beads[1]) / 2),
+        (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072,
+        beadR,
+        paint2
+      ) + classicCap(...at(P.cornice), paint2, "cn")
+    );
+    const faceX = X(C.band[0]), faceW = (C.band[1] - C.band[0]) * lw;
     const cbW = lw * 0.07, cbGap = lw * 6e-3;
-    for (const flip of [false, true]) {
-      out.push(classicCorbel(
+    piece(
+      "band",
+      block(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh) + inBand(
+        faceX,
+        Y(R.band[0]),
+        faceW,
+        (R.band[1] - R.band[0]) * lh,
+        "cbt",
+        "tablet",
+        "plain"
+      ) + [false, true].map((flip) => classicCorbel(
         flip ? X(C.band[1]) + cbGap : X(C.band[0]) - cbGap - cbW,
         Y(R.shelf[1]),
         cbW,
         (R.band[1] - R.shelf[1]) * lh,
         paint2,
         flip
-      ));
-    }
-    out.push(classicCap(...span("shelf", "shelf"), paint2, "sh", false, 0.51));
+      )).join("")
+    );
+    piece("shelf", classicCap(...at(P.shelf), paint2, "sh", false, 0.51));
     out.push(classicPull(X(0.5), Y((R.band[0] + R.band[1]) / 2), lw * 0.33, lh * 0.028, tone));
-    const pn = span("panel", "panel");
+    const pn = at(P.panel);
     out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">` + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint2, pale, leaf, "cpn") + `</g>`);
-    const pl = span("plinth", "plinth");
-    out.push(block(...pl));
-    out.push(inBand(...pl, "cpb", "flute", "oval"));
-    out.push(beadRun(
-      X(C.plinth[0]) - lw * 6e-3,
-      Y((R.pbeads[0] + R.pbeads[1]) / 2),
-      (C.plinth[1] - C.plinth[0]) * lw + lw * 0.012,
-      beadR,
-      paint2
-    ));
-    out.push(classicCap(
-      X(C.plinth[0]) - lw * 0.02,
-      Y(R.foot[0]),
-      (C.plinth[1] - C.plinth[0]) * lw + lw * 0.04,
-      (R.foot[1] - R.foot[0]) * lh,
-      paint2,
-      "ft",
-      true
-    ));
-    return `<g data-detail="classic">${out.join("")}</g>`;
+    piece(
+      "plinth",
+      block(...at(P.plinth)) + inBand(...at(P.plinth), "cpb", "flute", "oval") + beadRun(
+        X(C.plinth[0]) - lw * 6e-3,
+        Y((R.pbeads[0] + R.pbeads[1]) / 2),
+        (C.plinth[1] - C.plinth[0]) * lw + lw * 0.012,
+        beadR,
+        paint2
+      )
+    );
+    piece("foot", classicCap(...at(P.foot), paint2, "ft", true));
+    return `<g data-set="classic">${out.join("")}</g>`;
   }
   function classicPull(cx, cy, len, thick, tone) {
     const n = (v) => Number(v.toFixed(1));
