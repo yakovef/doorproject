@@ -106,17 +106,24 @@ export const VERSION = 12;
  * means the assertion is doing less work than it used to; that is a reason to
  * keep it, not to relax it.
  *
- * ⚠ `lockset: 'none'` IS AN OPEN BUSINESS QUESTION, not just a UI state. See
- * ASK-PERETZ.md §13 — whether he will quote a door with no lock furniture at
- * all. Until that is answered the order names it in words, so nothing goes to
- * the workshop as a silence.
+ * ⚠ IT STARTS WITH A KEYHOLE, AND IT HAS TO. For one round this said
+ * `lockset: 'none'` — a leaf with no lever, no knob and no keyway — and
+ * ASK-PERETZ §13 asked whether Peretz would quote a door that way. The answer
+ * was immediate: *"make the door start with just a keyhole. there can't be a
+ * door without a keyhole."* Right, and it should not have needed asking: a
+ * door you cannot lock is not a door, and PLAN.md §0 says the order must be
+ * something he can act on without a clarifying question.
+ * So the bare door is bare of everything a customer ADDS — no window, no face
+ * design, no pull handle, no ironwork — and carries the one fitting every door
+ * has. `cylinder` is literally that: the keyway escutcheon and nothing else,
+ * and the commonest lock furniture in the whole corpus.
  */
 export const DEFAULTS = {
   colour:  'rb-0097d',
   window:  'none',
   grille:  'none',
   handle:  'none',
-  lockset: 'none',
+  lockset: 'cylinder',
   detail:  'plain',
   size:    'standard',
   handing: 'right-in',

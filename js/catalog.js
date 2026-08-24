@@ -301,7 +301,8 @@ export const LOCKSETS = [
      face needs a keyway and nothing more. A lever there would be redundant,
      and it is also physically in the way, which is what the configurator was
      drawing. */
-  { id: 'cylinder', he: 'צילינדר בלבד', en: 'Cylinder only', style: 'cylinder', lock: true },
+  { id: 'cylinder', he: 'צילינדר בלבד', en: 'Cylinder only', style: 'cylinder', lock: true,
+    aliases: ['none'] },
   /* `longplate` is retired one commit after it was added, and the reason is
      worth keeping. It went in because six doors on the hardware contact sheet
      looked like they carried a plate running a third of the stile. Measured
@@ -349,41 +350,22 @@ export const LOCKSETS = [
   { id: 'square', he: 'ריבועי', en: 'Square backplates',
     style: 'square', lever: true, lock: true },
 
-  /* ── THE DOOR YOU ARRIVE ON ─────────────────────────────────────────
-     A leaf with no lock furniture on it at all — no lever, no knob, no
-     keyway. Asked for from outside: *"i want that when you open up the app for
-     the first time, you just see a door with nothing, no handle even no
-     keyhole, and then you add things to that."* It is the DEFAULT lockset now,
-     so the first paint is a bare leaf and everything on the door is something
-     the customer put there.
-
-     ⚠ AND IT IS A REAL PRODUCT DECISION, NOT A UI TRICK, WHICH IS WHY IT IS
-     HERE AND NOT A NULL. `state.lockset` is packed into the short code and
-     printed in the order; a door with no lock furniture has to be a thing the
-     catalogue can NAME, or the message goes out with a silence in it and
-     Peretz has to telephone — the one failure PLAN.md §0 forbids. So it says
-     what it means, in the order and on the tile: the door comes prepped and
-     the furniture is not part of it.
-     ⚠ Whether Peretz actually sells a door that way is ASK-PERETZ §13 and it
-     is NOT yet answered. If the answer is no, this entry loses its price and
-     gains a rule refusing it at send time; the id stays either way.
-
-     ⚠ NO `lock` FLAG, AND THAT WAS TEMPTING AND WRONG. `lock: true` means the
-     fitting carries the cylinder on its OWN backplate, so `render` should not
-     draw a separate escutcheon beside it — and setting it here would suppress
-     that escutcheon, which is the behaviour wanted. It would also be a lie in
-     the data: this fitting does not carry a cylinder, it is the absence of
-     one, and `data-carries-lock="true"` on a door with no lock would be read
-     by the next person as "the keyway is on the plate". `style: 'none'` is
-     what suppresses the art, `render` asks for that style by name, and the
-     test asserts ZERO keyways here where it asserts one everywhere else.
-     `gripPlacement` reads the same style to skip the clearance check, so there
-     is no invisible box on the stile for a grip to be refused by either.
-     ⚠ APPENDED. LOCKSETS is packed as an INDEX (4 bits, 9 entries of 16), so
-     adding at the END renumbers nothing. Anywhere else in this list and every
-     code ever read down the telephone would decode into a different door. */
-  { id: 'none', he: 'ללא ידית ומנעול', en: 'No lock furniture',
-    style: 'none' },
+  /* ⚠ THERE WAS A `none` LOCKSET HERE — no lever, no knob, no keyway — and it
+     lasted one round. It was added so the page could open on a completely
+     bare leaf, and ASK-PERETZ §13 asked whether Peretz would quote a door
+     that way. The answer came back immediately and it is a flat no:
+     *"make the door start with just a keyhole. there can't be a door without
+     a keyhole."*
+     That is the right answer and it should have been obvious: a door you
+     cannot lock is not a door, and PLAN.md §0 says the order has to be
+     something Peretz can act on without a clarifying question. "No lock
+     furniture" is a clarifying question with a price on it.
+     The page still opens on a leaf with nothing ADDED to it — no window, no
+     face design, no pull handle — which is what the request was actually
+     about. It just opens with the keyway every door has.
+     Its id aliases onto the cylinder, which is the smallest real thing it
+     could have meant. No VERSION bump: it was the LAST entry, so removing it
+     renumbers nothing. */
 ];
 
 /* ── WITHDRAWN: the glass as its own choice ──────────────────────────

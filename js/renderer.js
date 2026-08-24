@@ -346,6 +346,41 @@ const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
  */
 const LOCK_BACKSET = 60;    // 0.070 W — the measured median, no grip present
 const LOCK_BACKSET_GRIP = 49;  // 0.057 W — where it goes when a bar shares the stile
+
+/**
+ * ⚠ WHERE THE KEYHOLE IS. ONE NUMBER, EVERY DOOR, NO EXCEPTIONS.
+ *
+ * Reported from outside twice. The first round stopped the GRIP moving it; the
+ * second: *"the keyhole still moves left and right a little bit if I change
+ * some handles."* Right again, and from the other side — `lockBackset` returns
+ * `max(base, out + 10)` so that a wide knob cannot hang off the leaf, and that
+ * made the keyway a function of the LOCK FURNITURE: coral 50, sapir 49, almog
+ * 52, square 51, plate 57, knobplate 63, cadoor 88. A 39 mm spread on the one
+ * object a customer stares at.
+ *
+ * THE KEYWAY IS ITS OWN OBJECT AND IT DOES NOT HAVE TO DODGE ANYTHING. It is
+ * drawn at CYLINDER_AFF, 116 mm below the lever, so a knob 78 mm wide at hand
+ * height is not competing with it for space. Only the FURNITURE needs to move
+ * out; the keyhole can stand still, and now does.
+ *
+ * ⚠ 63 IS DERIVED, NOT PICKED. It is the largest `out + 10` among the four
+ * locksets that carry the cylinder ON THEIR OWN BACKPLATE — plate 57,
+ * knobplate 63, square 51, digital 38 — because on those the keyway is part of
+ * the plate and cannot be placed independently of it. Any smaller and a
+ * knob-on-backplate hangs off the closing edge; any larger and every door's
+ * lock sits further in than it needs to. So the plate family sits AT the
+ * keyway backset and the loose-escutcheon family has its keyway drawn there
+ * regardless of where its lever went.
+ *
+ * ⚠ AND IT IS A BETTER NUMBER THAN THE ONE IT REPLACES, which is a pleasant
+ * accident and worth recording so nobody "corrects" it back. 63/850 is 0.0741
+ * of leaf width; the pooled median over the thirty measured records is 0.0695.
+ * The 49 that was here is 0.057 — the low end. Measured cost: 732 of 3,600
+ * grip x lockset x size x handing x window combinations have no grip home,
+ * against 694 at 49. (88, which would have let ONE constant serve the
+ * furniture as well, costs 880 — which is why the furniture keeps its own.)
+ */
+const KEYWAY_BACKSET = 63;
 /* Both discs came down about a fifth after d016: side by side with the
    photograph our rose and escutcheon were plainly oversized, reading as
    commercial ironmongery on a domestic door. The ratio between them (1.08)
@@ -611,6 +646,115 @@ const STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
 const SCONCE_OUT = SCENE_MAX.openW / 2 + RETURN + CASING + 280;
 
 /**
+ * ── THE WALL LAMPS ────────────────────────────────────────────────────
+ * Reported from outside: *"make the two things outside the door on either
+ * side, lamps and complete them."* They were a 60 x 150 rounded rectangle with
+ * a shading gradient and an 8 mm warm strip at the foot — enough to place a
+ * light source, not enough to be a light. At door scale that is a grey pill on
+ * the plaster, and "the two things" is exactly how it read.
+ *
+ * ⚠ THE LAMP IS AN OBJECT, NOT A PLANE OF THE ROOM, so it gets a material of
+ * its own rather than a black overlay on the wall. That rule (CLAUDE.md §4,
+ * "every plane is a black or white overlay") is about the wall, the floor and
+ * the returns — surfaces whose colour IS the room's colour and which have to
+ * move with it. A bronze fitting screwed to that wall is a thing standing in
+ * front of it, and painting it in wall-minus-alpha would make it a hole rather
+ * than a lamp.
+ *
+ * ⚠ AND IT IS LIT BY THE SAME KEY AS EVERYTHING ELSE — high and about 30° left
+ * of camera, per LIGHT. So the body is brightest a quarter of the way in from
+ * its left edge, the right edge is the darkest thing on it, and the cast
+ * shadow falls down and to the RIGHT. Getting that backwards on a small object
+ * is invisible one at a time and obvious when there are two of them
+ * symmetrically placed, which is the case here.
+ *
+ * 96 x 250 mm, which is an ordinary exterior sconce beside a 950 mm door. The
+ * old 60 x 150 was small for a real fitting as well as illegible.
+ */
+const LAMP = { w: 96, h: 250 };
+/* Dark bronze — the commonest finish on an exterior fitting, and the one that
+   reads against pale plaster at any door colour. Literal, because this is the
+   lamp's own material and not a shade of the room; see the note above. */
+const LAMP_DARK = '#3A3733';
+
+/**
+ * One wall light, drawn from its top-left. `sy` is the top of the body.
+ *
+ * Written as a function rather than inline in the room's template for the
+ * reason `bevel` and `moulding` are: it is eleven elements with a value
+ * structure, and eleven elements inside a nested template literal is where
+ * this file has historically gone wrong (see §1b — a backtick in a comment
+ * inside the big string stops the whole drawing parsing).
+ */
+function wallLamp(sx, sy, baseY) {
+  const { w, h } = LAMP;
+  const n = v => Number(v.toFixed(1));
+  const x0 = sx - w / 2;
+  const capH = h * 0.055;                 // the cast top, slightly proud
+  const rimY = sy + h - capH;             // and its twin at the foot
+  const proud = w * 0.08;                 // how far both stand out from the body
+  return `
+      <!-- ⚠ BOTH WASHES ARE PAINTED FIRST, ON THE WALL, BEHIND THE FITTING.
+           They were after it, and the upward one is a warm ellipse wide enough
+           to cover the lamp — so it lay ACROSS the body at 0.30 and bleached
+           its top two thirds, leaving a dark band at the foot that read as a
+           join in the metal. Light thrown at a wall lands on the wall; the
+           thing throwing it is in front of that. Caught by looking at a 3x
+           crop, which is the only way this kind of fault ever shows.
+
+           Down to the floor, and a shorter one up the wall, because a fitting
+           open at both ends throws both ways — and the upward one is most of
+           what makes it read as a LAMP rather than as a bright dot. -->
+      <ellipse cx="${n(sx)}" cy="${n((rimY + capH + baseY) / 2)}" rx="${n(w * 3.0)}"
+               ry="${n((baseY - rimY - capH) / 2)}" fill="url(#sconceGlow)"/>
+      <ellipse cx="${n(sx)}" cy="${n(sy + capH - h * 0.8)}" rx="${n(w * 1.9)}"
+               ry="${n(h * 0.8)}" fill="url(#lampUp)"/>
+
+      <!-- The shadow the fitting throws on the plaster: down and to the right,
+           because the key is high and to the left. Soft, and only just there —
+           an exterior wall in daylight, not a studio. -->
+      <rect x="${n(x0 + proud * 1.4)}" y="${n(sy + capH)}" width="${n(w)}"
+            height="${n(h)}" rx="${n(w * 0.18)}" fill="#000" opacity="0.16"
+            filter="url(#softShadow)"/>
+
+      <!-- Backplate: the part actually screwed to the wall. Narrower than the
+           body and a shade darker, so the body reads as standing off it. -->
+      <rect x="${n(sx - w * 0.30)}" y="${n(sy - h * 0.02)}" width="${n(w * 0.60)}"
+            height="${n(h * 1.04)}" rx="${n(w * 0.10)}" fill="${LAMP_DARK}"/>
+
+      <!-- The body, and the one gradient that says which way the light comes
+           from. Everything else on the lamp is a band or a highlight. -->
+      <rect x="${n(x0)}" y="${n(sy + capH * 0.5)}" width="${n(w)}"
+            height="${n(h - capH)}" rx="${n(w * 0.16)}" fill="url(#lampBody)"/>
+
+      <!-- Cast top and foot rim, standing proud of the body on both sides.
+           These are what stop it reading as a pill: a real fitting is made of
+           parts, and the joints between them catch the light. -->
+      <rect x="${n(x0 - proud)}" y="${n(sy)}" width="${n(w + proud * 2)}"
+            height="${n(capH)}" rx="${n(capH * 0.45)}" fill="url(#lampCap)"/>
+      <rect x="${n(x0 - proud)}" y="${n(rimY)}" width="${n(w + proud * 2)}"
+            height="${n(capH)}" rx="${n(capH * 0.45)}" fill="url(#lampCap)"/>
+
+      <!-- The specular down the key side. One narrow band at a quarter width,
+           which is where a cylinder's highlight sits under a 30° key. -->
+      <rect x="${n(x0 + w * 0.17)}" y="${n(sy + h * 0.14)}" width="${n(w * 0.11)}"
+            height="${n(h * 0.70)}" rx="${n(w * 0.055)}"
+            fill="#fff" opacity="0.20"/>
+
+      <!-- THE LIT APERTURE, which is the whole point and was an 8 mm strip.
+           The lamp is open top and bottom — an up-and-down sconce, which is
+           what goes beside a front door — so there is a glowing mouth at each
+           end and the brighter one is the bottom, where the fitting throws its
+           working light. -->
+      <ellipse cx="${n(sx)}" cy="${n(rimY + capH * 0.5)}" rx="${n(w * 0.40)}"
+               ry="${n(capH * 0.42)}" fill="${LIGHT.warm}" opacity="0.92"/>
+      <ellipse cx="${n(sx)}" cy="${n(sy + capH * 0.5)}" rx="${n(w * 0.34)}"
+               ry="${n(capH * 0.36)}" fill="${LIGHT.warm}" opacity="0.55"/>
+
+`;
+}
+
+/**
  * One value, escaped for an XML attribute.
  *
  * ⚠ The drawing's `aria-label` is catalogue Hebrew interpolated straight into
@@ -812,6 +956,8 @@ export function render(state) {
      against 0.070) because the fitter is making room for it. */
   const backset = lockBackset(handle, lockset);
   const lockX   = hingeOnLeft ? mainX1 - backset : mainX + backset;
+  /* The keyhole's own axis. One number for every door in the range. */
+  const keyX    = hingeOnLeft ? mainX1 - KEYWAY_BACKSET : mainX + KEYWAY_BACKSET;
   const inward  = hingeOnLeft ? -1 : 1;
   const hingeX  = hingeOnLeft ? mainX : mainX1;
   const leverDir = hingeOnLeft ? -1 : 1;
@@ -1605,11 +1751,40 @@ export function render(state) {
          in research/ photographed between two sconces. REALISM.md §6.
          So the wall may flatter and the leaf keeps its instruments, and the
          disagreement is written down here instead of hidden. -->
-    <linearGradient id="sconceBody" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.28"/>
-      <stop offset="0.35" stop-color="#000" stop-opacity="0.10"/>
-      <stop offset="1"    stop-color="#000" stop-opacity="0.34"/>
+    <!-- The lamp's body, and the ONE gradient that says where the light is:
+         darkest at the shadow edge, brightest a quarter in from the key side,
+         falling again to a rim-lit far edge. That last stop is what makes a
+         cylinder read as round rather than as a flat tab — a cylinder under a
+         single key has a dark core and a faint bounce on the away side, and
+         leaving the bounce out is the commonest way to draw a pipe as a
+         rectangle.
+         ⚠ Its predecessor was black-on-wall at 0.28 / 0.10 / 0.34, which made
+         the fitting a translucent smudge of the plaster behind it. The lamp is
+         an object; see LAMP_DARK. -->
+    <linearGradient id="lampBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#22201D"/>
+      <stop offset="0.26" stop-color="#5A554E"/>
+      <stop offset="0.62" stop-color="#312E2A"/>
+      <stop offset="0.88" stop-color="#201E1B"/>
+      <stop offset="1"    stop-color="#413C36"/>
     </linearGradient>
+    <!-- Cast top and foot rim: the same metal a shade lighter, because a
+         machined band catches the key across its whole face where the barrel
+         only catches it along one line. -->
+    <linearGradient id="lampCap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#2A2724"/>
+      <stop offset="0.28" stop-color="#6B655C"/>
+      <stop offset="0.70" stop-color="#3B3833"/>
+      <stop offset="1"    stop-color="#4A443D"/>
+    </linearGradient>
+    <!-- The short wash UP the wall. Weaker and tighter than the downward one:
+         the fitting's upper aperture is smaller and there is no floor above it
+         to bounce off. -->
+    <radialGradient id="lampUp" cx="0.5" cy="1" r="1">
+      <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.30"/>
+      <stop offset="0.5" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
+      <stop offset="1"   stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
     <!-- ⚠ cy="0" IS THE TOP OF THE ELLIPSE'S OWN BOX, and the ellipse has to
          be positioned so that top IS THE LAMP. It was centred ON the lamp with
          a radius reaching the floor, which puts the box's top a whole radius
@@ -1662,21 +1837,12 @@ export function render(state) {
          pointer-events is left alone: these are inside #backdrop, which
          nothing on the page reaches for, and only the vignette ever had to
          disclaim them because it covers the handle. -->
-    ${[MID_X - SCONCE_OUT, MID_X + SCONCE_OUT].map(sx => {
+    ${[MID_X - SCONCE_OUT, MID_X + SCONCE_OUT].map(sx =>
       /* ⚠ And their HEIGHT is off the scene too, not off `casY0`. A tall door
          lifts its own casing 300 mm, and with `casY0` in this line both lamps
          rose with it — the wall fittings climbing the wall because the door
          beside them got taller. About a third up from the floor, always. */
-      const sy = STAGE_BOX.y + (baseY - STAGE_BOX.y) * 0.24;
-      return `<rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
-                    fill="var(--wall, #F5F3EF)"/>
-              <rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
-                    fill="url(#sconceBody)"/>
-              <rect x="${sx - 30}" y="${sy + 146}" width="60" height="8" rx="4"
-                    fill="${LIGHT.warm}" opacity="0.55"/>
-              <ellipse cx="${sx}" cy="${(sy + 150 + baseY) / 2}" rx="290"
-                       ry="${(baseY - sy - 150) / 2}" fill="url(#sconceGlow)"/>`;
-    }).join('')}
+      wallLamp(sx, STAGE_BOX.y + (baseY - STAGE_BOX.y) * 0.24, baseY)).join('')}
 
     <!-- ⚠ THE ALCOVE WAS DRAWN HERE — three mitred trapezoids stepping the
          wall forward around the casing — AND IT IS GONE. See the long note
@@ -1897,7 +2063,13 @@ export function render(state) {
           door the page opens on. Asked of the STYLE rather than of a `lock`
           flag on the bare entry: see its note in catalog.js for why giving it
           one would have been a lie in the data that happened to draw right. */''
-      }${lockset.lock || lockset.style === 'none' ? '' : cylinder(lockX, y(CYLINDER_AFF))}
+      }${/* ⚠ `keyX`, NOT `lockX`. The separate escutcheon is its own object and
+             it stands still; the lever or knob above it may have had to move
+             out to keep off the leaf's edge, and that is the furniture's
+             business, not the keyhole's. See KEYWAY_BACKSET — this is the
+             second round the keyhole has had to be nailed down, and the first
+             fix only caught the grip. */''
+      }${lockset.lock ? '' : cylinder(keyX, y(CYLINDER_AFF))}
   </g>
 
   </g><!-- /#door -->
@@ -2586,6 +2758,9 @@ function gripHomeUncached(state) {
     ? (leafW - GRAB.len) / 2
     : backset + standoff;
   const raw0 = { x: homeX, y: homeY, rot: 0 };
+  /* The height a hand reaches on THIS leaf — the one yardstick every
+     HOME_REACH test below is measured against. See the note further down. */
+  const reachY = leafH - HANDLE_AFF;
   /* AND IT HAS TO BE A PLACE THE GRIP CAN ACTUALLY STAND.
      The arithmetic above is a good guess and not a proof: it works in x, where
      it was derived, and says nothing about y. `barHalf` shortens a bar on a
@@ -2608,10 +2783,24 @@ function gripHomeUncached(state) {
      A default is not a choice. `HOME_REACH` is how far this is willing to
      move a handle nobody has touched; past it the door is refused, which is
      what it did before the band opened. Drags are unaffected — they come
-     through `gripPlacement` with a position the customer picked. */
+     through `gripPlacement` with a position the customer picked.
+
+     ⚠ MEASURED FROM HAND HEIGHT, NOT FROM THIS GRIP'S OWN NOMINAL. These three
+     comparisons read `raw0.y`, which is the same thing for every grip except
+     one: the horizontal bow's nominal is `GRAB.fromTop` (0.59 of the leaf),
+     180 mm below where a hand goes. Beside a 1,415 mm vertical slot the bow
+     has nowhere to stand but under it, and 500 mm from ITS nominal reached
+     y = 1,646 — 0.80 of the leaf, about 400 mm off the floor. A knee rail.
+     `npm test` said so in five places the moment the blanket refusal came out,
+     and it was measuring against hand height while this measured against the
+     grip's own; two yardsticks for one question, which is §5 in miniature.
+     One yardstick now, and it is the one the assertion uses. The effect is
+     confined to the grab bar — for every other grip `raw0.y` IS this — and
+     what it buys is that a door with no reachable place for a bow REFUSES it,
+     through `gripFitsAnywhere`, with a reason on the tile. */
   const upright = nearestGrip(state, raw0);
   if (gripPlacement(state, upright).ok
-      && Math.abs(upright.y - raw0.y) <= HOME_REACH) return upright;
+      && Math.abs(upright.y - reachY) <= HOME_REACH) return upright;
 
   /* AND IF IT WILL NOT STAND UP ANYWHERE, LAY IT DOWN.
      Asked for from the outside: "if there is a window, and the pull handle
@@ -2628,7 +2817,7 @@ function gripHomeUncached(state) {
     const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
     const laid = gripPlacement(state, flat).ok ? flat : nearestGrip(state, flat);
     if (gripPlacement(state, laid).ok
-        && Math.abs(laid.y - flat.y) <= HOME_REACH) return laid;
+        && Math.abs(laid.y - reachY) <= HOME_REACH) return laid;
   }
   /* Nothing within reach of hand height, standing or lying down. Hand back the
      ideal — which is refused, or we would have returned it at the top — so
@@ -2636,7 +2825,7 @@ function gripHomeUncached(state) {
      as it did while the placement band was the only limit. The alternative is
      a door that opens with its handle at knee height and nobody choosing it. */
   return gripPlacement(state, upright).ok
-      && Math.abs(upright.y - raw0.y) <= HOME_REACH ? upright : raw0;
+      && Math.abs(upright.y - reachY) <= HOME_REACH ? upright : raw0;
 }
 
 /**
@@ -2929,10 +3118,17 @@ export function gripPlacement(state, place = null) {
      demanded around an object that is not on the door — and the customer would
      be refused a grip position for touching nothing. The bare door is the one
      the page opens on, so this is the commonest state there is. */
-  const locks = lockset.style === 'none' ? []
-    : [{ y: leafH - lockAff(lockset), inward: lock.in, vy: lock.vy }];
-  if (locks.length && !lockset.lock) {
-    locks.push({ y: leafH - CYLINDER_AFF, inward: LOCK_R, vy: LOCK_R });
+  /* ⚠ EACH LOCK OBJECT CARRIES ITS OWN `x`, because they no longer share one.
+     The furniture sits at `backset` and the separate escutcheon at
+     KEYWAY_BACKSET — up to 25 mm apart on a Cadoor — so a single `backset` for
+     both would have this rule clearing a keyhole that is somewhere else. That
+     is CLAUDE.md §5's whole family and it would have been introduced by the
+     very change that fixed the keyhole. */
+  const locks = [{ x: backset, y: leafH - lockAff(lockset), out: lock.out,
+                   inward: lock.in, vy: lock.vy }];
+  if (!lockset.lock) {
+    locks.push({ x: KEYWAY_BACKSET, y: leafH - CYLINDER_AFF,
+                 out: LOCK_R, inward: LOCK_R, vy: LOCK_R });
   }
   /* LOCK_CLEAR of air VERTICALLY as well as across. Without it a grip laid
      down came to rest exactly touching the lockset's box — the search walks it
@@ -2968,12 +3164,12 @@ export function gripPlacement(state, place = null) {
      tightest gap anyone actually installs, measured on the ten doors carrying
      both — but it is applied as a gap between the two BOXES rather than
      between their centres, which is the quantity it was measured as. */
-  const lockOut = handleFootprint(lockset, leafH).out;
   for (const L of locks) {
     const meet = Math.abs(p.y - L.y) < gh + L.vy + LOCK_CLEAR;
     if (!meet) continue;
-    /* Both in closing-edge coordinates: the lock's own box, and the grip's. */
-    const lo0 = backset - lockOut, lo1 = backset + L.inward;
+    /* Both in closing-edge coordinates: this lock object's box, and the
+       grip's. `L.x`, not `backset` — see the note where `locks` is built. */
+    const lo0 = L.x - L.out, lo1 = L.x + L.inward;
     if (gx0 < lo1 + LOCK_CLEAR && gx1 > lo0 - LOCK_CLEAR) {
       return bad('הידית נוגעת במנעול');
     }
@@ -2988,7 +3184,7 @@ export function gripPlacement(state, place = null) {
        installed doors carrying both. `gripStandoff` floors the axis distance
        and this asks the same question, so the position it chooses is by
        construction one this accepts — which is the property that broke. */
-    if (Math.abs(p.x - backset) < leafW * BAR_GAP_MIN) {
+    if (Math.abs(p.x - L.x) < leafW * BAR_GAP_MIN) {
       return bad('הידית נוגעת במנעול');
     }
   }
@@ -4757,9 +4953,28 @@ export function lockBackset(handle, lockset) {
      not assumed: `npm run collide -- boxes`. This one DOES depend on the
      lockset and must: it is the fitting's own width, not a fitter's
      preference, and a knob drawn half off the leaf is not a smaller error. */
+  /* ⚠ A FITTING THAT CARRIES THE KEYWAY SITS WHERE THE KEYWAY SITS. On the
+     plate family — and on the cylinder-only escutcheon, which IS a keyway and
+     nothing else — the cylinder cannot be placed independently of the thing it
+     is set into. KEYWAY_BACKSET is derived from exactly those so that none of
+     them overhangs the closing edge there. Everything else has its keyway
+     drawn as a SEPARATE escutcheon at KEYWAY_BACKSET whatever this returns, so
+     this is free to move a wide knob out of trouble without taking the
+     keyhole with it. */
+  if (lockset && lockset.lock) return KEYWAY_BACKSET;
   const out = lockset ? handleFootprint(lockset, 2000).out : 0;
   return Math.max(LOCK_BACKSET_GRIP, out + 10);
 }
+
+/**
+ * Where the KEYHOLE is drawn, leaf-local, inboard from the closing edge.
+ *
+ * A constant, deliberately — see KEYWAY_BACKSET. Exported as a function anyway
+ * so the drawing, the placement rules and the tests reach it by one name: the
+ * day a size band needs its own figure, this is the single line that changes
+ * rather than four call sites agreeing by luck.
+ */
+export const keywayBackset = () => KEYWAY_BACKSET;
 
 /**
  * One entry per style. Each takes the catalogue entry and a context object, so
@@ -4789,12 +5004,11 @@ const LOCK_ART = {
   /* Cylinder only: the escutcheon IS the lockset. Eight of the ten doors that
      carry a pull bar have exactly this beside it and nothing more. */
   cylinder: (h, g) => cylinder(g.cx, g.cy, true),
-  /* Nothing at all — the bare leaf the page now opens on. It still goes
-     through `locksetArt`, so the door keeps a `data-hw="lockset"` group with a
-     zero footprint: `npm run collide` and the audit both enumerate that
-     attribute, and a fitting that vanishes from the DOM entirely reads to them
-     as a page that failed to draw rather than as a door with no lock. */
-  none: () => '',
+  /* ⚠ `none: () => ''` WAS HERE, for a lockset that no longer exists. Every
+     door has a keyway — see the note where the bare lockset was withdrawn in
+     catalog.js. Removed rather than left as a harmless dead branch: an entry
+     in this table is a claim that the catalogue can produce that style, and
+     the next person reading it would go looking for the option. */
 };
 
 function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled, rot = 0) {

@@ -133,15 +133,8 @@
     // כדור על אורך
     digital: 1450,
     // מנעול חכם     — by far the largest single add-on
-    square: 120,
+    square: 120
     // ריבועי
-    /* The door as it first appears: no lever, no knob, no keyway. It is the
-       DEFAULT, so this figure is subtracted from nothing — it is the price of
-       the door with the furniture left off. ⚠ Whether Peretz sells one that way
-       at all is ASK-PERETZ.md §13, unanswered; if the answer is no, this becomes
-       a rule rather than a price. */
-    none: 0
-    // ללא ידית ומנעול
   };
   var COLOUR = {
     "rb-9005d": 0,
@@ -384,7 +377,14 @@
        face needs a keyway and nothing more. A lever there would be redundant,
        and it is also physically in the way, which is what the configurator was
        drawing. */
-    { id: "cylinder", he: "צילינדר בלבד", en: "Cylinder only", style: "cylinder", lock: true },
+    {
+      id: "cylinder",
+      he: "צילינדר בלבד",
+      en: "Cylinder only",
+      style: "cylinder",
+      lock: true,
+      aliases: ["none"]
+    },
     /* `longplate` is retired one commit after it was added, and the reason is
        worth keeping. It went in because six doors on the hardware contact sheet
        looked like they carried a plate running a third of the stile. Measured
@@ -450,46 +450,23 @@
       style: "square",
       lever: true,
       lock: true
-    },
-    /* ── THE DOOR YOU ARRIVE ON ─────────────────────────────────────────
-         A leaf with no lock furniture on it at all — no lever, no knob, no
-         keyway. Asked for from outside: *"i want that when you open up the app for
-         the first time, you just see a door with nothing, no handle even no
-         keyhole, and then you add things to that."* It is the DEFAULT lockset now,
-         so the first paint is a bare leaf and everything on the door is something
-         the customer put there.
-    
-         ⚠ AND IT IS A REAL PRODUCT DECISION, NOT A UI TRICK, WHICH IS WHY IT IS
-         HERE AND NOT A NULL. `state.lockset` is packed into the short code and
-         printed in the order; a door with no lock furniture has to be a thing the
-         catalogue can NAME, or the message goes out with a silence in it and
-         Peretz has to telephone — the one failure PLAN.md §0 forbids. So it says
-         what it means, in the order and on the tile: the door comes prepped and
-         the furniture is not part of it.
-         ⚠ Whether Peretz actually sells a door that way is ASK-PERETZ §13 and it
-         is NOT yet answered. If the answer is no, this entry loses its price and
-         gains a rule refusing it at send time; the id stays either way.
-    
-         ⚠ NO `lock` FLAG, AND THAT WAS TEMPTING AND WRONG. `lock: true` means the
-         fitting carries the cylinder on its OWN backplate, so `render` should not
-         draw a separate escutcheon beside it — and setting it here would suppress
-         that escutcheon, which is the behaviour wanted. It would also be a lie in
-         the data: this fitting does not carry a cylinder, it is the absence of
-         one, and `data-carries-lock="true"` on a door with no lock would be read
-         by the next person as "the keyway is on the plate". `style: 'none'` is
-         what suppresses the art, `render` asks for that style by name, and the
-         test asserts ZERO keyways here where it asserts one everywhere else.
-         `gripPlacement` reads the same style to skip the clearance check, so there
-         is no invisible box on the stile for a grip to be refused by either.
-         ⚠ APPENDED. LOCKSETS is packed as an INDEX (4 bits, 9 entries of 16), so
-         adding at the END renumbers nothing. Anywhere else in this list and every
-         code ever read down the telephone would decode into a different door. */
-    {
-      id: "none",
-      he: "ללא ידית ומנעול",
-      en: "No lock furniture",
-      style: "none"
     }
+    /* ⚠ THERE WAS A `none` LOCKSET HERE — no lever, no knob, no keyway — and it
+       lasted one round. It was added so the page could open on a completely
+       bare leaf, and ASK-PERETZ §13 asked whether Peretz would quote a door
+       that way. The answer came back immediately and it is a flat no:
+       *"make the door start with just a keyhole. there can't be a door without
+       a keyhole."*
+       That is the right answer and it should have been obvious: a door you
+       cannot lock is not a door, and PLAN.md §0 says the order has to be
+       something Peretz can act on without a clarifying question. "No lock
+       furniture" is a clarifying question with a price on it.
+       The page still opens on a leaf with nothing ADDED to it — no window, no
+       face design, no pull handle — which is what the request was actually
+       about. It just opens with the keyway every door has.
+       Its id aliases onto the cylinder, which is the smallest real thing it
+       could have meant. No VERSION bump: it was the LAST entry, so removing it
+       renumbers nothing. */
   ];
   var GRILLES = [
     {
@@ -1010,6 +987,7 @@
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
   var LOCK_BACKSET_GRIP = 49;
+  var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
   var LEVER_REACH = 145;
@@ -1053,6 +1031,75 @@
   var BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
   var STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
   var SCONCE_OUT = SCENE_MAX.openW / 2 + RETURN + CASING + 280;
+  var LAMP = { w: 96, h: 250 };
+  var LAMP_DARK = "#3A3733";
+  function wallLamp(sx, sy, baseY) {
+    const { w, h } = LAMP;
+    const n = (v) => Number(v.toFixed(1));
+    const x0 = sx - w / 2;
+    const capH = h * 0.055;
+    const rimY = sy + h - capH;
+    const proud = w * 0.08;
+    return `
+      <!-- ⚠ BOTH WASHES ARE PAINTED FIRST, ON THE WALL, BEHIND THE FITTING.
+           They were after it, and the upward one is a warm ellipse wide enough
+           to cover the lamp — so it lay ACROSS the body at 0.30 and bleached
+           its top two thirds, leaving a dark band at the foot that read as a
+           join in the metal. Light thrown at a wall lands on the wall; the
+           thing throwing it is in front of that. Caught by looking at a 3x
+           crop, which is the only way this kind of fault ever shows.
+
+           Down to the floor, and a shorter one up the wall, because a fitting
+           open at both ends throws both ways — and the upward one is most of
+           what makes it read as a LAMP rather than as a bright dot. -->
+      <ellipse cx="${n(sx)}" cy="${n((rimY + capH + baseY) / 2)}" rx="${n(w * 3)}"
+               ry="${n((baseY - rimY - capH) / 2)}" fill="url(#sconceGlow)"/>
+      <ellipse cx="${n(sx)}" cy="${n(sy + capH - h * 0.8)}" rx="${n(w * 1.9)}"
+               ry="${n(h * 0.8)}" fill="url(#lampUp)"/>
+
+      <!-- The shadow the fitting throws on the plaster: down and to the right,
+           because the key is high and to the left. Soft, and only just there —
+           an exterior wall in daylight, not a studio. -->
+      <rect x="${n(x0 + proud * 1.4)}" y="${n(sy + capH)}" width="${n(w)}"
+            height="${n(h)}" rx="${n(w * 0.18)}" fill="#000" opacity="0.16"
+            filter="url(#softShadow)"/>
+
+      <!-- Backplate: the part actually screwed to the wall. Narrower than the
+           body and a shade darker, so the body reads as standing off it. -->
+      <rect x="${n(sx - w * 0.3)}" y="${n(sy - h * 0.02)}" width="${n(w * 0.6)}"
+            height="${n(h * 1.04)}" rx="${n(w * 0.1)}" fill="${LAMP_DARK}"/>
+
+      <!-- The body, and the one gradient that says which way the light comes
+           from. Everything else on the lamp is a band or a highlight. -->
+      <rect x="${n(x0)}" y="${n(sy + capH * 0.5)}" width="${n(w)}"
+            height="${n(h - capH)}" rx="${n(w * 0.16)}" fill="url(#lampBody)"/>
+
+      <!-- Cast top and foot rim, standing proud of the body on both sides.
+           These are what stop it reading as a pill: a real fitting is made of
+           parts, and the joints between them catch the light. -->
+      <rect x="${n(x0 - proud)}" y="${n(sy)}" width="${n(w + proud * 2)}"
+            height="${n(capH)}" rx="${n(capH * 0.45)}" fill="url(#lampCap)"/>
+      <rect x="${n(x0 - proud)}" y="${n(rimY)}" width="${n(w + proud * 2)}"
+            height="${n(capH)}" rx="${n(capH * 0.45)}" fill="url(#lampCap)"/>
+
+      <!-- The specular down the key side. One narrow band at a quarter width,
+           which is where a cylinder's highlight sits under a 30° key. -->
+      <rect x="${n(x0 + w * 0.17)}" y="${n(sy + h * 0.14)}" width="${n(w * 0.11)}"
+            height="${n(h * 0.7)}" rx="${n(w * 0.055)}"
+            fill="#fff" opacity="0.20"/>
+
+      <!-- THE LIT APERTURE, which is the whole point and was an 8 mm strip.
+           The lamp is open top and bottom — an up-and-down sconce, which is
+           what goes beside a front door — so there is a glowing mouth at each
+           end and the brighter one is the bottom, where the fitting throws its
+           working light. -->
+      <ellipse cx="${n(sx)}" cy="${n(rimY + capH * 0.5)}" rx="${n(w * 0.4)}"
+               ry="${n(capH * 0.42)}" fill="${LIGHT.warm}" opacity="0.92"/>
+      <ellipse cx="${n(sx)}" cy="${n(sy + capH * 0.5)}" rx="${n(w * 0.34)}"
+               ry="${n(capH * 0.36)}" fill="${LIGHT.warm}" opacity="0.55"/>
+
+`;
+  }
   var xmlAttr = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   function usedDefs(defs, body) {
     const blocks = topLevelElements(defs);
@@ -1143,6 +1190,7 @@
     const mainX1 = mainX + leafW;
     const backset = lockBackset(handle, lockset);
     const lockX = hingeOnLeft ? mainX1 - backset : mainX + backset;
+    const keyX = hingeOnLeft ? mainX1 - KEYWAY_BACKSET : mainX + KEYWAY_BACKSET;
     const inward = hingeOnLeft ? -1 : 1;
     const hingeX = hingeOnLeft ? mainX : mainX1;
     const leverDir = hingeOnLeft ? -1 : 1;
@@ -1849,11 +1897,40 @@
          in research/ photographed between two sconces. REALISM.md §6.
          So the wall may flatter and the leaf keeps its instruments, and the
          disagreement is written down here instead of hidden. -->
-    <linearGradient id="sconceBody" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.28"/>
-      <stop offset="0.35" stop-color="#000" stop-opacity="0.10"/>
-      <stop offset="1"    stop-color="#000" stop-opacity="0.34"/>
+    <!-- The lamp's body, and the ONE gradient that says where the light is:
+         darkest at the shadow edge, brightest a quarter in from the key side,
+         falling again to a rim-lit far edge. That last stop is what makes a
+         cylinder read as round rather than as a flat tab — a cylinder under a
+         single key has a dark core and a faint bounce on the away side, and
+         leaving the bounce out is the commonest way to draw a pipe as a
+         rectangle.
+         ⚠ Its predecessor was black-on-wall at 0.28 / 0.10 / 0.34, which made
+         the fitting a translucent smudge of the plaster behind it. The lamp is
+         an object; see LAMP_DARK. -->
+    <linearGradient id="lampBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#22201D"/>
+      <stop offset="0.26" stop-color="#5A554E"/>
+      <stop offset="0.62" stop-color="#312E2A"/>
+      <stop offset="0.88" stop-color="#201E1B"/>
+      <stop offset="1"    stop-color="#413C36"/>
     </linearGradient>
+    <!-- Cast top and foot rim: the same metal a shade lighter, because a
+         machined band catches the key across its whole face where the barrel
+         only catches it along one line. -->
+    <linearGradient id="lampCap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#2A2724"/>
+      <stop offset="0.28" stop-color="#6B655C"/>
+      <stop offset="0.70" stop-color="#3B3833"/>
+      <stop offset="1"    stop-color="#4A443D"/>
+    </linearGradient>
+    <!-- The short wash UP the wall. Weaker and tighter than the downward one:
+         the fitting's upper aperture is smaller and there is no floor above it
+         to bounce off. -->
+    <radialGradient id="lampUp" cx="0.5" cy="1" r="1">
+      <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.30"/>
+      <stop offset="0.5" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
+      <stop offset="1"   stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
     <!-- ⚠ cy="0" IS THE TOP OF THE ELLIPSE'S OWN BOX, and the ellipse has to
          be positioned so that top IS THE LAMP. It was centred ON the lamp with
          a radius reaching the floor, which puts the box's top a whole radius
@@ -1905,17 +1982,13 @@
          pointer-events is left alone: these are inside #backdrop, which
          nothing on the page reaches for, and only the vignette ever had to
          disclaim them because it covers the handle. -->
-    ${[MID_X - SCONCE_OUT, MID_X + SCONCE_OUT].map((sx) => {
-      const sy = STAGE_BOX.y + (baseY - STAGE_BOX.y) * 0.24;
-      return `<rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
-                    fill="var(--wall, #F5F3EF)"/>
-              <rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
-                    fill="url(#sconceBody)"/>
-              <rect x="${sx - 30}" y="${sy + 146}" width="60" height="8" rx="4"
-                    fill="${LIGHT.warm}" opacity="0.55"/>
-              <ellipse cx="${sx}" cy="${(sy + 150 + baseY) / 2}" rx="290"
-                       ry="${(baseY - sy - 150) / 2}" fill="url(#sconceGlow)"/>`;
-    }).join("")}
+    ${[MID_X - SCONCE_OUT, MID_X + SCONCE_OUT].map((sx) => (
+      /* ⚠ And their HEIGHT is off the scene too, not off `casY0`. A tall door
+         lifts its own casing 300 mm, and with `casY0` in this line both lamps
+         rose with it — the wall fittings climbing the wall because the door
+         beside them got taller. About a third up from the floor, always. */
+      wallLamp(sx, STAGE_BOX.y + (baseY - STAGE_BOX.y) * 0.24, baseY)
+    )).join("")}
 
     <!-- ⚠ THE ALCOVE WAS DRAWN HERE — three mitred trapezoids stepping the
          wall forward around the casing — AND IT IS GONE. See the long note
@@ -2177,7 +2250,13 @@
         door the page opens on. Asked of the STYLE rather than of a `lock`
         flag on the bare entry: see its note in catalog.js for why giving it
         one would have been a lie in the data that happened to draw right. */
-    ""}${lockset.lock || lockset.style === "none" ? "" : cylinder(lockX, y(CYLINDER_AFF))}
+    ""}${/* ⚠ `keyX`, NOT `lockX`. The separate escutcheon is its own object and
+        it stands still; the lever or knob above it may have had to move
+        out to keep off the leaf's edge, and that is the furniture's
+        business, not the keyhole's. See KEYWAY_BACKSET — this is the
+        second round the keyhole has had to be nailed down, and the first
+        fix only caught the grip. */
+    ""}${lockset.lock ? "" : cylinder(keyX, y(CYLINDER_AFF))}
   </g>
 
   </g><!-- /#door -->
@@ -2429,15 +2508,16 @@ ${body}
     const homeY = handle.style === "grab" ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
     const homeX = handle.style === "grab" ? (leafW - GRAB.len) / 2 : backset + standoff;
     const raw0 = { x: homeX, y: homeY, rot: 0 };
+    const reachY = leafH - HANDLE_AFF;
     if (gripPlacement(state2, raw0).ok) return raw0;
     const upright = nearestGrip(state2, raw0);
-    if (gripPlacement(state2, upright).ok && Math.abs(upright.y - raw0.y) <= HOME_REACH) return upright;
+    if (gripPlacement(state2, upright).ok && Math.abs(upright.y - reachY) <= HOME_REACH) return upright;
     if (gripCanRotate(state2)) {
       const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
       const laid = gripPlacement(state2, flat).ok ? flat : nearestGrip(state2, flat);
-      if (gripPlacement(state2, laid).ok && Math.abs(laid.y - flat.y) <= HOME_REACH) return laid;
+      if (gripPlacement(state2, laid).ok && Math.abs(laid.y - reachY) <= HOME_REACH) return laid;
     }
-    return gripPlacement(state2, upright).ok && Math.abs(upright.y - raw0.y) <= HOME_REACH ? upright : raw0;
+    return gripPlacement(state2, upright).ok && Math.abs(upright.y - reachY) <= HOME_REACH ? upright : raw0;
   }
   var gripFitsAnywhere = memo(
     (state2) => gripPlacement(state2, gripHome(state2)).ok,
@@ -2529,19 +2609,30 @@ ${body}
     const lockX = hingeOnLeft ? leafW - backset : backset;
     const grip = handleFootprint(handle, leafH);
     const gh = p.rot === 90 ? Math.max(grip.out, grip.in) : grip.vy;
-    const locks = lockset.style === "none" ? [] : [{ y: leafH - lockAff(lockset), inward: lock.in, vy: lock.vy }];
-    if (locks.length && !lockset.lock) {
-      locks.push({ y: leafH - CYLINDER_AFF, inward: LOCK_R, vy: LOCK_R });
+    const locks = [{
+      x: backset,
+      y: leafH - lockAff(lockset),
+      out: lock.out,
+      inward: lock.in,
+      vy: lock.vy
+    }];
+    if (!lockset.lock) {
+      locks.push({
+        x: KEYWAY_BACKSET,
+        y: leafH - CYLINDER_AFF,
+        out: LOCK_R,
+        inward: LOCK_R,
+        vy: LOCK_R
+      });
     }
-    const lockOut = handleFootprint(lockset, leafH).out;
     for (const L of locks) {
       const meet = Math.abs(p.y - L.y) < gh + L.vy + LOCK_CLEAR;
       if (!meet) continue;
-      const lo0 = backset - lockOut, lo1 = backset + L.inward;
+      const lo0 = L.x - L.out, lo1 = L.x + L.inward;
       if (gx0 < lo1 + LOCK_CLEAR && gx1 > lo0 - LOCK_CLEAR) {
         return bad("הידית נוגעת במנעול");
       }
-      if (Math.abs(p.x - backset) < leafW * BAR_GAP_MIN) {
+      if (Math.abs(p.x - L.x) < leafW * BAR_GAP_MIN) {
         return bad("הידית נוגעת במנעול");
       }
     }
@@ -3414,6 +3505,7 @@ ${body}
     return leafW - EDGE_FLAT - clearOf < GRAB.len;
   }
   function lockBackset(handle, lockset) {
+    if (lockset && lockset.lock) return KEYWAY_BACKSET;
     const out = lockset ? handleFootprint(lockset, 2e3).out : 0;
     return Math.max(LOCK_BACKSET_GRIP, out + 10);
   }
@@ -3435,13 +3527,12 @@ ${body}
     square: (h, g) => squarePlates(g.cx, g.cy, g.dir),
     /* Cylinder only: the escutcheon IS the lockset. Eight of the ten doors that
        carry a pull bar have exactly this beside it and nothing more. */
-    cylinder: (h, g) => cylinder(g.cx, g.cy, true),
-    /* Nothing at all — the bare leaf the page now opens on. It still goes
-       through `locksetArt`, so the door keeps a `data-hw="lockset"` group with a
-       zero footprint: `npm run collide` and the audit both enumerate that
-       attribute, and a fitting that vanishes from the DOM entirely reads to them
-       as a page that failed to draw rather than as a door with no lock. */
-    none: () => ""
+    cylinder: (h, g) => cylinder(g.cx, g.cy, true)
+    /* ⚠ `none: () => ''` WAS HERE, for a lockset that no longer exists. Every
+       door has a keyway — see the note where the bare lockset was withdrawn in
+       catalog.js. Removed rather than left as a harmless dead branch: an entry
+       in this table is a claim that the catalogue can produce that style, and
+       the next person reading it would go looking for the option. */
   };
   function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0, panelled, rot = 0) {
     const draw = GRIP_ART[handle.style];
@@ -4329,6 +4420,14 @@ ${body}
         out.handle[h.id] = "אין מקום לידית הזו על הדלת";
       }
     }
+    if (grip.style !== "none") {
+      for (const w of WINDOWS) {
+        if (out.window[w.id]) continue;
+        if (!gripFitsAnywhere({ ...state2, window: w.id, grip: null })) {
+          out.window[w.id] = "אין מקום לידית שבחרתם עם החלון הזה";
+        }
+      }
+    }
     for (const k of LOCKSETS) {
       if (gripClashesLockset({ ...state2, lockset: k.id })) {
         out.lockset[k.id] = out.lockset[k.id] || "אין מקום בין המאחז למנעול";
@@ -4338,15 +4437,6 @@ ${body}
       if (gripClashesLockset({ ...state2, handle: h.id })) {
         out.handle[h.id] = out.handle[h.id] || "אין מקום בין המאחז למנעול";
       }
-    }
-    const bandTop = 0.42, bandBot = 0.6;
-    const acrossCentre = (win) => win.rects.some((r) => r.top / 2050 < bandBot && (r.top + r.h) / 2050 > bandTop && Math.abs(r.dx || 0) < r.w / 2 + 60);
-    if (acrossCentre(byId(WINDOWS, state2.window))) {
-      const grab = HANDLES.find((h) => h.style === "grab");
-      if (grab) out.handle[grab.id] = "המאחז חוצה את החלון";
-    }
-    if (byId(HANDLES, state2.handle).style === "grab") {
-      for (const w of WINDOWS) if (acrossCentre(w)) out.window[w.id] = "המאחז חוצה את החלון";
     }
     return out;
   }
@@ -4482,7 +4572,7 @@ ${body}
     window: "none",
     grille: "none",
     handle: "none",
-    lockset: "none",
+    lockset: "cylinder",
     detail: "plain",
     size: "standard",
     handing: "right-in"

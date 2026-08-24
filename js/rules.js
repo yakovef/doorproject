@@ -270,6 +270,27 @@ export function conflicts(state) {
     }
   }
 
+  /* ⚠ AND THE SAME QUESTION FROM THE WINDOW'S SIDE, because the customer may
+     have picked either one first.
+     The withdrawn `acrossCentre` rule did grey the windows when a grab bar was
+     chosen, and dropping it without this would have left one direction told
+     and the other silent: pick the vertical slot with a bow already on the
+     door and `repair` takes the bow away, correctly and with a notice, but
+     with nothing on the tile beforehand to say it was going to.
+     Asked of `gripFitsAnywhere` rather than of a band, so it generalises to
+     every grip and cannot drift from the drawing — and so it is one question
+     with two readers rather than two rules that must agree. Memoised on the
+     six fields a placement depends on, which is what makes asking it of every
+     window as well as every grip affordable. */
+  if (grip.style !== 'none') {
+    for (const w of WINDOWS) {
+      if (out.window[w.id]) continue;
+      if (!gripFitsAnywhere({ ...state, window: w.id, grip: null })) {
+        out.window[w.id] = 'אין מקום לידית שבחרתם עם החלון הזה';
+      }
+    }
+  }
+
   /* WITHDRAWN: lockset x glazing. This refused 89 combinations — every design
      where the lock furniture's drawn width reached past the aperture moulding.
      It was added because a lever's blade was crossing a pane on 34 designs
@@ -326,20 +347,34 @@ export function conflicts(state) {
      A loop that cannot fire is worse than no loop, because it reads as a live
      rule. */
 
-  /* GEOMETRIC: the horizontal grab bar is centred on the LEAF, not on the
-     stile, so it runs straight across a centred window. Every one of the nine
-     installed grab bars is on a solid or panelled leaf. */
-  const bandTop = 0.42, bandBot = 0.60;              // the bar's own height band
-  const acrossCentre = win => win.rects.some(r =>
-    r.top / 2050 < bandBot && (r.top + r.h) / 2050 > bandTop
-    && Math.abs(r.dx || 0) < r.w / 2 + 60);
-  if (acrossCentre(byId(WINDOWS, state.window))) {
-    const grab = HANDLES.find(h => h.style === 'grab');
-    if (grab) out.handle[grab.id] = 'המאחז חוצה את החלון';
-  }
-  if (byId(HANDLES, state.handle).style === 'grab') {
-    for (const w of WINDOWS) if (acrossCentre(w)) out.window[w.id] = 'המאחז חוצה את החלון';
-  }
+  /* ⚠ A BLANKET REFUSAL OF THE GRAB BAR ON ANY GLAZED LEAF WAS HERE, AND ITS
+     STATED PREMISE IS NO LONGER TRUE.
+
+     It read: "the horizontal grab bar is centred on the LEAF, not on the
+     stile, so it runs straight across a centred window", and refused the bar
+     against a hardcoded band — `r.top / 2050 < 0.60 && (r.top + r.h) / 2050 >
+     0.42`. That was a fair description of a bar pinned to the leaf's centre at
+     a fixed height, which is what it was when this was written.
+
+     It is not pinned any more. `grabHandle` draws it where it is placed, and
+     `gripPlacement` asks the real question — the bow's interval against each
+     aperture's, at the height it is actually at. Reported from outside with a
+     screenshot: *"there is space for the מאחז אופקי but I can't place it."*
+     Measured across every size and window: the bar has a legal home on ALL
+     eighteen combinations, with 686 legal positions on a standard leaf with
+     the rectangle and 909 on a wide one. This rule was refusing every one.
+
+     ⚠ AND IT WAS A SECOND ANSWER TO A QUESTION ALREADY ASKED. Twenty lines up,
+     `conflicts` runs `gripFitsAnywhere` over every grip — the honest version,
+     computed from the drawing's own geometry — so a grab bar that genuinely
+     has nowhere to go is refused there, by the same code that refuses every
+     other grip, and told the same way. Two answers, and the cruder one won.
+     CLAUDE.md §5 all over: a quantity computed in two places.
+
+     The hardcoded 2050 is worth one more line, because it is the tell. A leaf
+     is 2050 mm only on four of the six size bands; on a tall door this rule
+     was measuring fractions of the wrong door. A rule that cannot see the door
+     it is judging is not a rule about that door. */
 
   return out;
 }

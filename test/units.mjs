@@ -631,22 +631,19 @@ group('the grip clears the lockset');
          escutcheon as its own art — that is the entire product — so counting
          every escutcheon on the door called it a door with two keyways. The
          drawing marks which one it is; ask for the unowned ones. */
-      /* ⚠ AND ZERO IS A REAL ANSWER NOW, ON EXACTLY ONE FITTING. The bare
-         lockset — the door the page opens on — has no lever, no knob and no
-         keyway, so "exactly one keyway" is false for it and was false 60 times
-         the moment it was added. The fix is NOT to relax this to "at most
-         one": that would stop it catching the defect it exists for, which is a
-         door that quietly loses its keyway. The expected COUNT comes from the
-         catalogue instead, so the assertion now also proves the bare door
-         draws no stray escutcheon — strictly more than it checked before. */
-      const wantKeys = kn.style === 'none' ? 0 : 1;
+      /* ⚠ BACK TO EXACTLY ONE, AND IT WAS BRIEFLY `kn.style === 'none' ? 0 : 1`.
+         A bare lockset — no lever, no knob, no keyway — existed for one round
+         and this had to allow zero for it. It is withdrawn: *"there can't be a
+         door without a keyhole."* So the invariant is unconditional again, and
+         that is the stronger form; the conditional version could not have
+         caught a door that lost its keyway to a bug rather than to a choice. */
       const carries = /data-carries-lock="true"/.test(svg);
       const escutcheons = [...svg.matchAll(/data-hw="lock"(?! data-owner)/g)].length;
       ok(carries === !!kn.lock, `data-carries-lock disagrees with the catalogue (${label})`);
-      ok(escutcheons === (carries ? 0 : wantKeys),
-         `expected ${carries ? 0 : wantKeys} separate escutcheon, found ${escutcheons} (${label})`);
-      ok([...svg.matchAll(/data-hw="keyway"/g)].length === wantKeys,
-         `the street face needs ${wantKeys} keyway (${label})`);
+      ok(escutcheons === (carries ? 0 : 1),
+         `expected ${carries ? 0 : 1} separate escutcheon, found ${escutcheons} (${label})`);
+      ok([...svg.matchAll(/data-hw="keyway"/g)].length === 1,
+         `the street face needs exactly one keyway (${label})`);
 
       // The lockset is always drawn, and always on the leaf.
       const lock = {
@@ -705,16 +702,7 @@ group('the grip clears the lockset');
            and the same one AGENT.md says to ask out loud before writing a rule
            of this shape: are these two things at the same height? */
         const sameHeight = Math.abs(grip.y - lock.y) < grip.vy + lock.vy;
-        /* ⚠ AND ONLY WHERE THERE IS A LOCKSET TO BE CLEAR OF. The bare
-           lockset — no lever, no knob, no keyway, the door the page opens on —
-           has a footprint of zero at the backset, and `lockBackset` still
-           returns a number for it because it has to return something. So this
-           measured the distance from a bar to a fitting that is not on the
-           door and called 0.066 too tight. The 0.090-0.185 band is measured
-           across ten doors that CARRY BOTH; where one of the two is absent it
-           is not describing anything, which is the same sentence the
-           same-height guard above already makes about the other axis. */
-        if (grip.vy > 200 && sameHeight && kn.style !== 'none') {
+        if (grip.vy > 200 && sameHeight) {
           const axis = Math.abs(grip.x - lock.x) / leaf.w;
           ok(axis >= 0.088,
              `bar and lockset only ${axis.toFixed(3)} of leaf width apart — tighter `

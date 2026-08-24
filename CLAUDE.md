@@ -143,11 +143,12 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **3,988,350 assertions passing, 0 failed**, no framework, plain
+- `npm test` — **3,704,013 assertions passing, 0 failed**, no framework, plain
   node. It was 5.68M before the 24.8 interface round; the catalogue lists
   changed length and the combinatorial sweeps are the product of those lengths,
-  so the total moves with the range. ⚠ A FALL IN THIS NUMBER IS NOT EVIDENCE OF
-  ANYTHING. It is not a coverage metric — read the failure count.
+  so the total moves with the range — twice in one day, as the window list was
+  cut and then the bare lockset withdrawn. ⚠ A FALL IN THIS NUMBER IS NOT
+  EVIDENCE OF ANYTHING. It is not a coverage metric — read the failure count.
 - `npm run collide` — clean over **1,224 buildable designs**, real `getBBox`
   geometry from a browser, `all` and `boxes`, including the whole hardware
   rework of 24.8 and `faceObstacles` agreeing with the drawing everywhere. It
@@ -172,9 +173,9 @@ to establish each run.** `AGENT.md` has the one circumstance in which pushing
 with those four red is right, and it still stands for the days it degrades.
 
 **As of the 24.8 interface round the container was healthy and everything is
-green** — `npm test` 3,988,350 / 0, `npm run sheets` completed, `npm run audit`
-clean at all seven viewports, `npm run collide` clean. One thing is still red
-and it is measured below.
+green** — `npm test` **3,704,013 / 0**, `npm run sheets` completed all four
+families, `npm run audit` clean at all seven viewports, `npm run collide` clean
+over 1,224 designs. One thing is still red and it is measured below.
 
 What to know for the days it degrades:
 
@@ -864,6 +865,71 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **Four follow-ups from a screenshot, and two of them were rules refusing
+  what the geometry allows.**
+  - **The grab bar could not be placed on any glazed leaf, and the rule saying
+    so had had its premise removed the round before.** `conflicts` carried a
+    blanket refusal against a hardcoded band — *"the horizontal grab bar is
+    centred on the LEAF, not on the stile, so it runs straight across a centred
+    window"* — which was a fair description of a bar pinned to the leaf's
+    centre, and that pinning is exactly what the previous round took out.
+    Measured: the bow has a legal home on **all eighteen** size × window
+    combinations, 686 legal positions on a standard leaf with the rectangle.
+    ⚠ AND IT WAS A SECOND ANSWER TO A QUESTION ALREADY ASKED — twenty lines
+    above it, `gripFitsAnywhere` asks the honest version for every grip. Two
+    answers, cruder one wins: §5 again. Its hardcoded `2050` was the tell, a
+    leaf height that is only right on four of the six size bands.
+    ⚠ **AND IT WAS ACCIDENTALLY RIGHT ABOUT ONE CASE**, which `npm test` caught
+    within a minute of the deletion: beside the 1,415 mm VERTICAL SLOT the bow
+    genuinely has nowhere to stand but under it, at 0.80 of the leaf — about
+    400 mm off the floor, a knee rail. Five assertions said so.
+    The cause was two yardsticks for one question. `gripHome` measured its
+    `HOME_REACH` from the grip's OWN nominal height, and the bow's nominal is
+    `GRAB.fromTop`, 0.59 of the leaf — 180 mm below where a hand goes — so 500
+    mm of slack from there reached y = 1,646. The assertion measured from hand
+    height and got 620. One yardstick now (`reachY`, hand height, for every
+    grip), so the slot REFUSES the bow through `gripFitsAnywhere` with a reason
+    on the tile, and the rectangle — the door in the screenshot — allows it.
+    The symmetric block was added at the same time: choosing the slot with a
+    bow already on the door used to be silent until `repair` took the bow away.
+    Same function, two readers, no second rule — and generalising it rather
+    than special-casing the bow turned out to surface exactly the right set.
+    With the DEFAULT cylinder no window is greyed for any grip; windows grey
+    only where a bar is paired with a WIDE LEVER (coral, plate, almog, square),
+    which is a pairing the corpus does not contain — of the ten installed doors
+    carrying a pull bar, eight have a plain cylinder and not one has a lever.
+    Checked against the gallery as well: none of the thirty real doors is
+    repaired by any of this.
+  - **The keyhole still moved — from the LOCKSET this time.** The last round
+    stopped the grip moving it and left `max(base, out + 10)`, which is a
+    function of the lock furniture: coral 50, sapir 49, almog 52, square 51,
+    plate 57, knobplate 63, cadoor 88. **The keyway is its own object and does
+    not have to dodge anything** — it sits 116 mm below the lever, so a wide
+    knob is not competing with it. `KEYWAY_BACKSET = 63` is where every keyhole
+    on every door now is, derived as the largest `out + 10` among the four
+    locksets that carry the cylinder on their own backplate. Verified: 427 on
+    every lockset and every grip. It is also a better number than the 49 it
+    replaces — 0.0741 of leaf width against the corpus median 0.0695. One
+    constant for the furniture as well (88) was measured and rejected: 880
+    combinations lose their grip home against 694.
+  - **`lockset: 'none'` is withdrawn and ASK-PERETZ §13 is ANSWERED.** *"make
+    the door start with just a keyhole. there can't be a door without a
+    keyhole."* Correct, and it should not have needed asking. The page still
+    opens bare of everything a customer ADDS; it opens with the cylinder, which
+    is the commonest lock furniture in the corpus. `n=none` aliases onto it. No
+    VERSION bump — it was the last entry, so nothing renumbered.
+  - **The sconces are lamps now.** They were a 60 × 250 rounded rectangle with
+    a shading gradient and an 8 mm warm strip — enough to place a light source,
+    not enough to be a light, and reported as *"the two things outside the
+    door"*. `wallLamp()` draws a 96 × 250 bronze fitting: backplate, body with
+    a real cylinder gradient, cast top and foot rim standing proud, a specular
+    down the key side, and a lit aperture at each end.
+    ⚠ Both washes are painted BEFORE the fitting. They were after it, and the
+    upward one is wide enough to cover the lamp — so it lay across the body at
+    0.30 and bleached its top two thirds, leaving a dark band at the foot that
+    read as a join in the metal. Caught on a 3× crop, which is the only way
+    that kind of fault shows.
+
 - **Fourteen things reported from outside, in one round — and the biggest of
   them was that the room moved when the door did.** Every item below arrived as
   a sentence from the person building this for their father, looking at the
@@ -946,7 +1012,7 @@ how it got there. Detail lives in the section it belongs to.
     code has ever reached a customer.
 
   **The container turned out healthy, so everything was regenerated and the
-  round finishes fully green:** `npm test` 3,988,350 / 0, `npm run sheets`
+  round finishes fully green:** `npm test` 0 failed, `npm run sheets`
   completed all four families, `npm run audit` clean at all seven viewports,
   `npm run collide` clean over 1,224 designs.
   ⚠ **`npm run audit` earned its keep twice in one run.** It caught the

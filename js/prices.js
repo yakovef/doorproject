@@ -172,12 +172,6 @@ export const LOCKSET = {
   knobplate: 220,    // כדור על אורך
   digital:   1450,   // מנעול חכם     — by far the largest single add-on
   square:    120,    // ריבועי
-  /* The door as it first appears: no lever, no knob, no keyway. It is the
-     DEFAULT, so this figure is subtracted from nothing — it is the price of
-     the door with the furniture left off. ⚠ Whether Peretz sells one that way
-     at all is ASK-PERETZ.md §13, unanswered; if the answer is no, this becomes
-     a rule rather than a price. */
-  none:      0,      // ללא ידית ומנעול
 };
 
 /* ── colour ───────────────────────────────────────────────────────────
