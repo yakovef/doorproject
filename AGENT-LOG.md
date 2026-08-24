@@ -91,7 +91,7 @@ corrected CLAUDE.md §0c, which had "npm test reports 4 failures" written down
 as a standing fact — it is a fact about a degraded container, not about the
 repository, and this run's container was healthy.
 
-**Commit:** see below.
+**Commit:** `60cb6e3`
 
 ---
 
