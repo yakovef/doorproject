@@ -118,7 +118,7 @@ before touching the claim — it is reproducibly red, exactly the two findings
 above. Corrected in the same commit, per CLAUDE.md's own instruction to fix
 what is already there when found wrong, not just add to it.
 
-**Commit:** see below.
+**Commit:** `a89ed71`
 
 ---
 
