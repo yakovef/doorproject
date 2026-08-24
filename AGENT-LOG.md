@@ -116,7 +116,7 @@ not silenced, not guessed at, not stamped over.** No shipped file moved this
 run, so there is nothing to push that changes the live site; committing only
 this log entry.
 
-**Commit:** see below.
+**Commit:** `a5f03a2`
 
 ---
 
