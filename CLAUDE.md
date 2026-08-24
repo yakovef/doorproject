@@ -44,6 +44,23 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   1081`). Staged G(1) flow → G(2) element-by-element → G(3) reveal, each
   independently shippable; the audit asserts send-exists-at-every-step as its
   load-bearing check.
+  ⚠ Owner-settled refinements: the guide OPENS on a handsome warm-neutral
+  paint with **just a keyhole** (a plain cylinder — "nothing" means the plainest
+  *good-looking* door, never a grey primer slab), which also makes step-2 colour
+  a two-layer crossfade between two real colours rather than a special first
+  paint; **"בנו לי דלת סטנדרטית"** is a one-tap jump to a finished standard door
+  for the customer who won't be walked through five steps; **next / back / and a
+  multi-step rail jump all use ONE ~250ms card slide** (the door never slides,
+  it is the calm anchor); the interface micro-interactions are price-counts-up,
+  tile-select ring+check, a step-rail that fills only BEHIND you, and a gentle
+  first-load assemble — light-reacting-to-paint was considered and cut. The
+  reduced-motion path stays a clean cut (no special static reveal). ⚠ And
+  `DESIGN-LEVEL.md` §2 is now the **single source of truth for the token
+  values** — `REALISM2.md` points at it and restates nothing, after `--r-card`,
+  `--shadow-card` and `--rule` had drifted across the two docs (the §5 bug in
+  the plans themselves); `--rule` is reverted to the measured `#D6D3CB`, and the
+  webfont's zero-layout-shift promise is marked offline-only (online needs
+  `@font-face` metric overrides or it FOUT-jumps on swap).
 - **`DESIGN-LEVEL.md` — the north-star for the LOOK, calibrated against ten
   premium product sites.** The owner supplied two batches of style references
   (dev-tool SaaS, then premium product brands: BMW, Rivian, Heart Aerospace,

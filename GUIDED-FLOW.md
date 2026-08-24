@@ -80,7 +80,14 @@ Step 5  ✓ הדלת שלכם   the reveal + the price + send   (the handoff)
 
 The screen, at every step:
 - **The door** — always on the stage, left/centre, live. It begins as a plain
-  slab in a neutral paint and gains each feature as it is chosen.
+  leaf in a **handsome warm-neutral paint with just a keyhole** — a plain
+  cylinder lock, because every real door has one — and **nothing else**: no
+  window, no panels, no pull handle. It gains each feature as it is chosen.
+  ⚠ It opens ALREADY PAINTED, never on a grey primer slab: a raw slab reads as
+  cheap on the one screen that has to sell, and starting on a real colour also
+  makes step 2 a *re-paint* — a crossfade between two real colours (§3.3) —
+  rather than a special first-paint case. "Nothing" here means the plainest
+  handsome door, a colour and a keyhole, never an empty or ugly one.
 - **One question** — the current step's options, in a calm card, one group of
   tiles at a time. This is the "not overwhelmed" payoff: four tiles, not sixty.
 - **A step rail** — the navigator circles from `DESIGN-LEVEL.md`/Stage B, now
@@ -106,6 +113,15 @@ JS on top of the working all-visible layout. If the bundle never arrives or the
 guide's own code throws, the base panel is what is already there — the existing
 `down`/`fail()` apparatus (`index.html`) is untouched, and "styled, complete and
 inert" is still impossible. Guides never gates, at the failure layer too.
+
+⚠ **"בנו לי דלת סטנדרטית" — one tap to a finished door.** At the guide's start
+(and reachable from the step rail) sits a button that jumps straight to a
+sensible, real, buildable standard door and drops the customer at the reveal /
+full view to edit from there. It is the express lane for the person who knows
+what they want and does not want to be walked through five steps — the guide is
+the on-ramp, this is the shortcut past it. It sets the same `state` as any other
+choice, so the result is sendable immediately and it carries no new machinery:
+it is one predefined `state`, applied.
 
 ---
 
@@ -166,6 +182,17 @@ No diff engine. The guide supplies the *knowledge of what changed*; the renderer
 supplies the *tagged group*; WAAPI supplies the *enter*. This is the whole trick,
 and it is why element-by-element is buildable on top of a full-redraw renderer.
 
+⚠ **One step does not fit this model, and it is the colour.** Recolouring the
+leaf is not a *new element* — it is the same leaf with a different fill, and
+after `paint()` the old colour is **gone from the DOM**, so there is nothing to
+wash *from*. The paint step is the single exception: it keeps the PREVIOUS SVG
+as a layer beneath the new one and reveals the new colour through a moving mask
+(a two-layer crossfade), then drops the old layer. That is the one place a
+second SVG is held for a beat; every other step animates a fresh tagged group as
+above. And because the door now OPENS already painted (§1), colour is always a
+change between two real colours — never a first paint — so the crossfade is the
+natural and only case, not a special one.
+
 ### 3.3 The animation vocabulary — one gesture per kind of change
 
 Each step animates in the way that matches what physically happened, not one
@@ -174,7 +201,7 @@ generic fade:
 | step | what changed | the gesture | on |
 |---|---|---|---|
 | 1 structure | the slab's shape / a second leaf | the new leaf **grows in** from the hinge; handing flips with a soft mirror | the leaf group |
-| 2 paint | the whole leaf recolours | a **wash** sweeps across the leaf, old colour to new (a moving mask, ~500ms), not an instant swap | the leaf fill |
+| 2 paint | the whole leaf recolours | a **wash** sweeps old colour to new via a **two-layer crossfade** (§3.2 — the one step that holds the previous door for a beat), ~500ms | leaf, layered |
 | 2 design | panels / lines appear | mouldings **draw on** — scale from their centre-line + fade, 60ms staggered per side | `[data-detail]` |
 | 3 window | glass + ironwork arrive | the aperture **opens** (scale-Y from the head) then the grille **fades/draws in** just behind it | `[data-pane]` |
 | 4 handle | the pull / lock arrives | the handle **slides into place** from a few mm out + settles; the lock furniture fades on | `[data-hw]`, `[data-mount]` |
@@ -182,9 +209,24 @@ generic fade:
 
 Durations sit in the 300–600ms band (premium, not sluggish); easing is the
 project's own `--ease` (`cubic-bezier(.33,1,.68,1)`) so motion matches the UI.
-Between-step **UI** transitions (the question card sliding out, the next sliding
-in) run alongside and are pure CSS on the panels — cheap and independent of the
-door.
+
+⚠ **Step 1 must not let the door jump smaller as it grows.** Adding a sidelight
+makes the door WIDER, and `fitStage()` rescales the viewBox to fit the stage —
+so naively the whole door would snap smaller the instant the side panel appears,
+fighting the grow-in. The fix: hold the door's on-screen scale steady for the
+grow-in, animating the new leaf in the door's own coordinates and easing the
+`fitStage` rescale over the same ~400ms rather than applying it in one frame.
+(The reveal's whole-door breath is a CSS transform on the `<svg>` for the same
+reason — never a viewBox jump.)
+
+The between-step **UI** transitions run alongside, pure CSS on the panels and
+independent of the door: tapping **הבא** slides the current question card out
+toward the start edge while the next slides in from the end edge (RTL-aware);
+**חזרה** reverses it; and **jumping via the step rail** — tapping any circle to
+leap several steps at once — uses the **same ~250ms slide in the direction of
+travel, no matter how many steps it skips** (the swoosh is never scaled to the
+distance). The DOOR never slides — it stays the calm anchor while the question
+panels move over it.
 
 ### 3.4 The reveal (step 5)
 
@@ -246,6 +288,36 @@ sheet moves because of animation — animation adds no geometry to the SVG strin
   hundreds of paths; we fade/scale the grille *group*, not stroke-dash each curl.
   Recorded as a possible later flourish, explicitly out of the first build.
 
+### 3.7 The interface micro-interactions — quiet, functional, never decorative
+
+The same taste as the door: nothing loops, nothing competes with the drawing.
+These live in the chrome (`app.css` / `app.js`), not the SVG.
+
+- **Price counts up.** On any change the price number *rolls* to the new value
+  — tabular numerals keep it from reflowing — rather than snapping. ~400ms,
+  ease-out. The premium fintech tell.
+- **Tile select.** Choosing an option draws the accent ring around the tile in a
+  quick sweep and pops the check badge in with a tiny scale-bounce — it confirms
+  the pick instantly, before the door's own animation has finished.
+- **Step-rail fill.** The hairline connecting the step circles fills with accent
+  as each step completes, and the current circle carries a soft breathing ring.
+  ⚠ It fills only ever BEHIND you, never ahead — every step already has a valid
+  default (the navigator rule from `DESIGN-LEVEL.md`), so a bar that ran ahead
+  would be the 4/4-on-arrival dishonesty in motion. Progress *behind*, never
+  *promised ahead*.
+- **First-load assemble.** On arrival the starting door (colour + keyhole)
+  fades and settles up gently rather than popping in — a quiet, one-time echo of
+  the reveal.
+- **Directional step slide** — covered in §3.3.
+
+⚠ **Deliberately excluded: light reacting to paint.** Tying the room's sconces
+to the chosen colour was considered and cut — it pulls attention to the chrome
+and risks the door reading differently from its final installed look. The door
+is the only thing allowed to be loud.
+
+All of the above obey `prefers-reduced-motion` exactly as §3.5 requires: under
+reduce they cut to their end state instantly — no roll, no sweep, no slide.
+
 ---
 
 ## 4. WHAT IT TOUCHES, AND HOW IT IS VERIFIED
@@ -266,6 +338,18 @@ where "guides never gates" is proven, not asserted:
   This is the single most important assertion in the whole feature.
 - **Every step has a valid door.** Decode the on-screen `DM-` code at each step;
   it must be a buildable door (the default-per-group guarantee).
+- **The starting door is the plain one.** On first paint of the guide the door
+  carries a colour and a keyhole and **nothing else** — no `[data-pane]`, no
+  panel `[data-detail]`, no pull `[data-hw]` — proving "start from nothing"
+  is honoured and that it is still a real, priced, sendable door.
+- **"בנו לי דלת סטנדרטית" lands somewhere buildable.** Tapping it yields a door
+  whose decoded code is valid and whose price is real — it is one predefined
+  `state`, and `repair()` must not have to touch it.
+- **The rail never lies after a repair.** Jump back, make a change that triggers
+  `repair()` to alter an earlier step's choice, and assert the rail's value and
+  check for that earlier step now match the repaired `state` — a stale checkmark
+  is the silent-wrong-door failure this whole codebase exists to prevent. (This
+  is correctness, and it holds with or without the rail's fill animation.)
 - **Jump-buttons work.** Clicking a step on the rail navigates there; "עריכה
   מלאה" drops to the full panel and every option is still reachable (the existing
   both-levels audit walk, now also from full-edit).

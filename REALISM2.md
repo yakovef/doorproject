@@ -61,14 +61,11 @@ that read it. No markup, no renderer, no behaviour.
 ### A1. Radius becomes a scale
 
 `--radius: 2px` is the single clearest reason the shipped page reads as a
-wireframe beside the mockup. Replace the one token with:
-
-```
---r-card: 18px;    /* .send, .panel--choose card, .saved, toast, dock */
---r-tile: 12px;    /* .tile, .pill surfaces that are boxes */
---r-chip: 10px;    /* spec chips, small squares */
---r-pill: 999px;   /* already used ad hoc in five places — name it */
-```
+wireframe beside the mockup. Replace the one token with the **radius scale in
+`DESIGN-LEVEL.md` §2** (`--r-card` / `--r-tile` / `--r-chip` / `--r-pill`).
+⚠ The values live only there — that section is the single source of truth, and
+this file must not restate a number (the two docs already disagreed on
+`--r-card` once, which is the `CLAUDE.md` §5 bug in the plans).
 
 Sweep every `var(--radius)` and literal radius to the right step. ⚠ Keep
 `--radius` itself as an alias of `--r-tile` for one commit rather than deleting
@@ -102,10 +99,10 @@ from memory; the measurement said 3.09. The rule works.)
   gap paints the surface it actually sits on. `--rule` on white is 1.50:1,
   *more* visible than on paper — measured in the Stage 4 work, no change
   needed.
-- One shadow token, used everywhere a card floats:
-  `--shadow-card: 0 10px 32px rgb(23 23 21 / .07), 0 2px 8px rgb(23 23 21 / .05);`
-  The dock and the toast take the same token; three hand-written shadows is the
-  §5 shape.
+- One shadow token, used everywhere a card floats: **`--shadow-card`, defined in
+  `DESIGN-LEVEL.md` §2** (soft and warm). The dock and the toast take the same
+  token; three hand-written shadows is the §5 shape — and so is defining the
+  token twice, so the value stays in §2 only.
 - ⚠ No translucency/backdrop-blur yet. Over today's flat wall it buys nothing;
   over Stage D's scene it is worth re-testing — but `backdrop-filter` forces a
   compositing layer under a sticky stage on a phone, so it is measured (scroll

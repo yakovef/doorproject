@@ -80,11 +80,16 @@ The move:
   one or two places, the way BMW rations weight 700.
 
 ⚠ **Load discipline, so the enhancement never becomes a liability:**
-`font-display: swap`; the system stack is a *real* fallback with matched
-metrics so nothing reflows badly; and one measured check — with the network
-blocked (the `file://` route) the page must render identically in the system
-stack with no layout shift and no blank text. If Assistant fails to load, a
-customer must never see less than they see today.
+`font-display: swap`; the system stack is a *real* fallback. ⚠ **"Matched
+metrics" is work, not a wish, and the zero-shift guarantee is OFFLINE-ONLY
+unless it is done.** With the network blocked (`file://`) the fallback is what
+renders from the first frame, so there is no shift — that is the check §5
+asserts. But ONLINE, `font-display: swap` paints the fallback first and then
+swaps Assistant in, and the two faces have different metrics, so text reflows on
+swap (a FOUT jump) UNLESS the `@font-face` carries `size-adjust` /
+`ascent-override` / `descent-override` tuned to the fallback. So: measure the
+two stacks and set those overrides; only then is the swap shift-free online too.
+Either way, if Assistant never loads a customer must never see less than today.
 
 ### 1.2 The product is the only colour
 
@@ -157,6 +162,13 @@ grip controls / hint kept off the drawing (already the plan).
 
 ## 2. THE TARGET TOKENS (what "at this level" is, concretely)
 
+⚠ **This block is the SINGLE SOURCE OF TRUTH for the token values.** Radius,
+shadow, ink, rule, accent — the numbers live here and nowhere else. `REALISM2.md`
+Stage A points at this section; it must not restate a value, because a value in
+two files is the `CLAUDE.md` §5 bug in the plans themselves (it already bit once
+— `--r-card` and `--shadow-card` had disagreed across the two docs, and `--rule`
+had been given a lighter hex here that silently broke its own measured 1.50:1).
+
 This is the palette and scale the stages implement. Warm-neutral, one accent,
 soft radii, whisper type. Nothing here is a webfont dependency — the font is the
 one online enhancement; every value below works offline.
@@ -171,10 +183,13 @@ one online enhancement; every value below works offline.
   --floor:      #E6E2DA;
 
   /* — ink: warm near-black, not pure black (every reference avoids #000) — */
-  --ink:        #1C1A17;   /* was #171715 — a touch warmer, BMW's #262626 logic */
+  --ink:        #1C1A17;   /* warm near-black — marginally lighter/warmer than the
+                              old #171715, BMW's soft-black logic; still ~15:1 on paper */
   --ink-2:      #6B6862;   /* secondary */
   --ink-3:      #9A968E;   /* muted / helper (new tier, for label restraint) */
-  --rule:       #E2DFD8;   /* hairline on white */
+  --rule:       #D6D3CB;   /* hairline — KEEP; measured 1.50:1 on white, 1.28:1 on
+                              paper (CLAUDE.md). A lighter hex fails the divider it
+                              is drawn as — do not lift it without re-measuring. */
 
   /* — the one accent, and its readable sibling — */
   --accent:     #B08D57;   /* rings, borders, selected state — NEVER text */
@@ -274,7 +289,10 @@ the level is verified, not asserted:
 
 - **Type:** the `<h1>` computes to weight 300 and ≥34px at every viewport; a
   network-blocked load renders in the fallback stack with **zero layout shift**
-  (measured, `?` no-network route added to the audit's failure block).
+  (measured, no-network route added to the audit's failure block). ⚠ This check
+  is the OFFLINE guarantee; the ONLINE swap is shift-free only once the
+  `@font-face` metric overrides of §1.1 are set and measured — assert the
+  online FOUT jump is ≤ a tolerance too, or it is not actually done.
 - **Accent contrast:** every site that renders accent as *text* passes ≥4.5:1
   via `contrast()`; ring/border uses are exempt and asserted as such.
 - **One-accent discipline:** an audit assertion that no element outside the
