@@ -459,7 +459,7 @@ export function repair(state, intent = null) {
 
   /* ⚠ THE CLASSICAL SET BRINGS ITS OWN LIGHT, and it is a particular one.
      `apertureLayout` substitutes `detail.winRect` for whatever the window
-     option would have drawn — 356 x 781 at 326 from the head, so that the
+     option would have drawn — 360 x 819 at 318 from the head, so that the
      glass clears the frieze above it and the shelf below — which means that
      choosing the set with the צוהר אנכי would have quietly drawn a rectangle
      while the tile, the price and the order all said a slot. A substitution

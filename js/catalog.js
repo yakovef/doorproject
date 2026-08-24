@@ -698,7 +698,7 @@ export const DETAILS = [
      for Peretz and it is asked. */
   { id: 'classic', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false,
     classic: true, grab: true, needsWindow: true, doors: ['newdoor'],
-    winRect: { w: 356, h: 781, top: 326 } },
+    winRect: { w: 360, h: 819, top: 318 } },
 ];
 
 /**

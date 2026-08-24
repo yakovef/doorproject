@@ -509,7 +509,7 @@ each other rather than to the leaf, and `CLASSIC_ROWS` / `CLASSIC_COLS` /
 about it are load-bearing and easy to undo by accident:
 
 - **It supplies its own opening.** `apertureLayout(win, leafW, detail)`
-  substitutes `detail.winRect` (356 x 781 at 326 from the head) for whatever
+  substitutes `detail.winRect` (360 x 819 at 318 from the head) for whatever
   the window option would have drawn, so the glass clears the frieze above it
   and the shelf below. `repair` forces `window: 'rect'` off `needsWindow`, so
   the substitution can never be invisible.
@@ -1014,7 +1014,7 @@ how it got there. Detail lives in the section it belongs to.
     sixteen `DETAILS` slots, appended, so no `VERSION` bump.
   - **⚠ IT BRINGS ITS OWN LIGHT, and that is why `apertureLayout` changed
     shape.** The catalogue rectangle is 357 x 902 at 185 from the head; the set
-    needs 356 x 781 at 326, or the glass runs into the frieze above it and the
+    needs 360 x 819 at 318, or the glass runs into the frieze above it and the
     shelf below. `apertureLayout(win, leafW, detail)` substitutes
     `detail.winRect` — the detail threaded through rather than the rect
     overridden at the call site, which would have been §5. Five callers

@@ -2398,11 +2398,34 @@ function bevel(x, y, w, h, d, paint, raised = true) {
    actually shows is a sculpted ramp WITH fine quirks cut into it — mass and
    detail, and the mass is the half that was missing. */
 const MOULD = [
-  [0.00, 1.00], [0.07, 0.72], [0.10, 0.44], [0.15, 1.14],
-  [0.19, 0.34], [0.25, 1.02], [0.30, 0.52], [0.38, 1.05],
-  [0.46, 0.86], [0.52, 1.12], [0.60, 0.62], [0.70, 1.10],
-  [0.79, 0.36], [0.87, 0.70], [0.94, 0.96], [1.00, 1.00],
+  /* ⚠ RE-MEASURED, AND IT WENT FROM SEVEN REVERSALS TO TWO. The first section
+     had sixteen stops swinging between 0.34 and 1.14 — seven light/dark
+     alternations across a 70 mm band — and at drawing scale that is not a
+     moulding, it is hatching. Every recreation round described the same
+     symptom in different words: "four or five thin engraved lines where the
+     real one is one broad lit face". It was read off a low-resolution crop
+     where the noise WAS the signal.
+     Re-read with `tools/_section.mjs` across the panel's left run on the
+     4000 px photograph in `research/newdoor/`, luminance normalised by the
+     flat paint either side of it. What is actually there, outer edge inward:
+
+        1.00  the leaf's own face
+        0.68  ONE deep quirk, a third of the way in
+        1.16  ONE broad lit face, the ogee's top
+        1.00  the field, which is the same paint again
+
+     Two zones. A real ovolo has a hollow and a round and nothing else, and
+     that is what the photograph shows at every scale you care to look at.
+     Endpoints stay at exactly 1.00: a moulding meets the same flat face on
+     both sides, and anything else shades the field like a raised panel — see
+     the note on MOULD_SIDE below, which is the same mistake caught earlier
+     from the other end. */
+  [0.00, 1.00], [0.10, 0.94], [0.20, 0.86], [0.30, 0.71],
+  [0.36, 0.68], [0.44, 0.82], [0.52, 0.93], [0.60, 1.14],
+  [0.70, 1.16], [0.78, 1.06], [0.86, 1.12], [0.94, 1.05],
+  [1.00, 1.00],
 ];
+
 
 /* One gain per side, applied to the moulding's RELIEF — how deep its quirks
    cut — and never to its absolute tone. Key is high and left, so every run of
@@ -4626,23 +4649,29 @@ function grillePaths(kind, x, y, w, h, tint) {
      shadow on one side and a lit edge on the other. Same geometry family,
      different object. */
   if (kind === 'rings') {
-    /* ⚠ TWO ACROSS THE PANE, not a fixed ring in millimetres. The measured
-       door gives 2.05 across its 356 mm light, and a panel cut from stock
-       would hold 174 mm however wide the light is — but our narrowest opening
-       is the 150 mm צוהר אנכי, which would then show less than one ring and
-       read as a mistake rather than as a cut panel. Scaling is what every
-       other branch in here does and it reproduces this door exactly. */
-    const PX = w / 2;
-    const PY = PX * (440 / 512);        // the cell is not square: 0.86
-    const R  = PX * 0.955 / 2;          // a whisker inside tangent
-    const sw = Math.max(1.1, PX * (4.7 / 174));
+    /* ⚠ THE LATTICE IS SQUARE AND THE RINGS ARE TANGENT, and the elaborate
+       thing that stood here before — a rectangular cell 0.955 of the pitch
+       across and 1.10 along, with a rosette in the diagonal gaps AND a smaller
+       pair at every crossing — was built on a pane measurement taken off a
+       crop that was not the pane. Re-measured against `tools/_upright.mjs`'s
+       leaf crop, at matched scale beside our own render:
 
-    /* Centred on the pane rather than run from its corner, so a pane of any
-       proportion is cut symmetrically — which is what the photograph shows at
-       both long edges of the light. */
-    const nx = 2, ny = Math.max(2, Math.round(h / PY));
-    const ox = x + (w - nx * PX) / 2, oy = y + (h - ny * PY) / 2;
-    const cxOf = i => ox + (i + 0.5) * PX, cyOf = j => oy + (j + 0.5) * PY;
+         ring pitch      240 px of a 676 px pane  =  0.355 of the light
+         ring diameter   240 px                   =  THE SAME, so tangent
+         across          676 / 240                =  2.8 rings
+         down            1516 / 240                =  6.3 rows
+
+       Square, tangent, 2.8 across. The overlap I thought I could see was the
+       COMMAS bridging the tangency points, which is what they are for.
+       ⚠ And there is no separate ornament at the crossings. Four commas per
+       diagonal gap and nothing else; the extra pairs put a chain of ornament
+       down every column of the pane and turned an airy grille into a mesh. */
+    const ACROSS = 2.8;
+    const PX = w / ACROSS, R = PX / 2;
+    const sw = Math.max(1.1, PX * 0.038);   // 9 px of a 240 px pitch
+    const nx = Math.ceil(ACROSS), ny = Math.ceil(h / PX);
+    const ox = x + (w - nx * PX) / 2, oy = y + (h - ny * PX) / 2;
+    const cxOf = i => ox + (i + 0.5) * PX, cyOf = j => oy + (j + 0.5) * PX;
 
     let d = '';
     for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
@@ -4651,61 +4680,38 @@ function grillePaths(kind, x, y, w, h, tint) {
             a ${n2(R)} ${n2(R)} 0 1 0 ${n2(-R * 2)} 0 `;
     }
 
-    /* THE ROSETTE — four commas in the diagonal gap, and the numbers below are
-       NOT the measured ones. That is deliberate and it is the only place in
-       this branch where drawing and measurement part company, so it is written
-       down rather than left for somebody to "correct".
-
-       Measured off the composite, the four commas together span 0.62 of the
-       pitch across and 0.51 down, with the tails starting about a third of the
-       pitch out. Drawn at that size the tails reach across the ring interiors
-       and the pane stops reading as rings-with-ornament and starts reading as
-       one mesh — which is what it looked like beside the photograph, twice.
-       The photograph gets away with it because a real comma is a forged scroll
-       end, thick at the shoulder and drawn to a point, so its mass is at the
-       eye; ours is a constant stroke, so the same span puts far more ink at
-       the tail. Two thirds of the measured span, at 1.55 of the ring's own
-       stroke, is where the two read alike.
-       `curl` takes the EYE first and the free end second, so the pair of
-       offsets reads inside-out. One turn and a twentieth, not one and a bit:
-       at 1.15 the tail wrapped past its own shoulder and every comma closed up
-       into a link of chain. */
-    const EYE_X = 0.090, EYE_Y = 0.090, TAIL_X = 0.21, TAIL_Y = 0.21, TURNS = 1.05;
+    /* THE MOUSTACHES, AND THEY SIT AT THE TANGENCIES — not in the diagonal
+       gaps, which is where two rebuilds of this branch put them and is why
+       both came out as a mesh. Beside the photograph at matched scale the
+       structure is plain: every point where two rings touch carries a PAIR of
+       commas, one belonging to each ring, tails meeting at a cusp on the
+       tangency and eyes swung out to either side. Four tangencies to a ring,
+       each shared with a neighbour, so two commas per ring per axis and
+       nothing at all in the concave squares between four rings — those stay
+       open, and that openness is half of what the pane looks like.
+       `curl` takes the EYE first and the free end second, so each comma is
+       written from its eye back to the cusp it grows out of. */
+    const EYE_P = 0.190, EYE_A = 0.090, CUSP = 0.050, TURNS = 0.68;
     let cur = '';
-    for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
-      const gx = cxOf(i) + PX / 2, gy = cyOf(j) + PY / 2;
-      for (const ux of [-1, 1]) for (const uy of [-1, 1]) {
-        cur += poly(curl(gx + ux * PX * EYE_X,  gy + uy * PY * EYE_Y,
-                         gx + ux * PX * TAIL_X, gy + uy * PY * TAIL_Y,
-                         TURNS, ux * uy > 0 ? -1 : 1)) + ' ';
-      }
-    }
-
-    /* AND A PAIR AT EVERY CROSSING. Counting ornament columns across the light
-       is what caught this: the photograph has four to the pane, and rosettes
-       alone give two. The other two are here — where two rings cross, a comma
-       on each, back to back and lying across the line joining the rings. They
-       are smaller than the rosette's, which is why the repeat stays one whole
-       cell instead of halving: the two kinds of ornament are not the same
-       ornament, and an autocorrelation can tell. */
-    const CROSS = 0.52;
-    const crossPair = (mx, my, ax, ay) => {
+    const pair = (mx, my, ax, ay) => {
       const px = -ay, py = ax;
-      let s = '';
+      /* ⚠ TWO COMMAS, NOT FOUR. Drawn on both sides of the tangency they
+         closed into a four-lobed clover at every crossing and the pane came
+         out as a field of flowers. The photograph has one moustache per
+         tangency: two commas, mirrored about the ring-to-ring axis, tails
+         meeting at a cusp on the tangency point and eyes swung out. */
       for (const k of [-1, 1]) {
-        s += poly(curl(mx + (px * k * EYE_X  + ax * EYE_X)  * PX * CROSS,
-                       my + (py * k * EYE_Y  + ay * EYE_Y)  * PY * CROSS,
-                       mx + px * k * PX * TAIL_X * CROSS,
-                       my + py * k * PY * TAIL_Y * CROSS,
-                       TURNS, k > 0 ? 1 : -1)) + ' ';
+        cur += poly(curl(mx + (px * k * EYE_P - ax * EYE_A) * PX,
+                         my + (py * k * EYE_P - ay * EYE_A) * PX,
+                         mx + ax * CUSP * PX, my + ay * CUSP * PX,
+                         TURNS, k > 0 ? 1 : -1)) + ' ';
       }
-      return s;
     };
     for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
-      cur += crossPair(cxOf(i) + PX / 2, cyOf(j), 1, 0);
-      cur += crossPair(cxOf(i), cyOf(j) + PY / 2, 0, 1);
+      pair(cxOf(i) + PX / 2, cyOf(j), 1, 0);      // between side neighbours
+      pair(cxOf(i), cyOf(j) + PX / 2, 0, 1);      // and stacked ones
     }
-    return ink(d, sw) + ink(cur, sw * 1.55);
+    return ink(d, sw) + ink(cur, sw * 1.30);
   }
 
   if (kind === 'grid') {
@@ -5055,205 +5061,345 @@ function grillePaths(kind, x, y, w, h, tint) {
  * Fractions of leaf HEIGHT, top down:
  */
 const CLASSIC_ROWS = {
-  cornice: [0.040, 0.068],   // the projecting cap, widest thing on the door
-  frieze:  [0.074, 0.148],   // bead border, oval boss, two round bosses
-  shelf:   [0.557, 0.591],   // the corbelled shelf's own cap
-  band:    [0.597, 0.659],   // its face, carrying the horizontal pull
-  panel:   [0.665, 0.886],   // the raised panel
-  plinth:  [0.892, 0.968],   // bead border and an oval boss again
+  /* ⚠ THIS TABLE HAS BEEN WRONG TWICE, AND BOTH TIMES FOR THE SAME REASON: the
+     picture the fractions were read off was not the leaf.
+     `/tmp/photo-upright.png` was the whole rotated photograph with the door
+     inside it and background all round, so a fraction of THAT picture is not a
+     fraction of the door — every row came out 2 to 5 per cent low, which is a
+     centimetre and a half at the ends of a real door and is exactly why three
+     separate readings disagreed with each other.
+     `tools/_upright.mjs` now cuts the leaf out of `research/newdoor/full.jpg`
+     by a box stated once, and the check that it is the right box is free: the
+     crop comes out 1537 x 3698, an aspect of 0.416, against our own leaf's
+     0.415. A door is not a square; if the crop's aspect matches the model's,
+     the crop is the door.
+     Everything below is then read off THAT with a ruler drawn on it
+     (`tools/_ruler.mjs`, a red line every 0.05 and an orange tick every 0.01)
+     rather than off a luminance derivative alone — the derivative finds every
+     edge including the plastic sheeting over the top of this door, and the
+     first version of this table mistook two of those for the cornice. */
+  cornice: [0.029, 0.057],   // corona and the cavetto under it, as one cap
+  beads:   [0.060, 0.072],   // the bead course, in its own recess
+  frieze:  [0.076, 0.126],   // the raised block: flutes, tablet, oval
+  shelf:   [0.559, 0.600],   // the shelf's own corona and hollow
+  band:    [0.600, 0.670],   // its face, carrying the horizontal pull
+  panel:   [0.681, 0.918],   // the raised panel
+  plinth:  [0.924, 0.953],   // the frieze upside down
+  pbeads:  [0.957, 0.971],   // its bead course, UNDER the block
+  foot:    [0.971, 1.000],   // and the splayed ogee down to the floor
 };
-/* Fractions of leaf WIDTH. The cornice and plinth project past everything
-   else, which is what makes the composition read as a column rather than as
-   four unrelated rectangles. */
+/* Fractions of leaf WIDTH.
+   ⚠ WIDTHS, CENTRED — not the left and right edges as measured. The
+   photograph is a phone shot of a two-metre door and its right-hand features
+   read four to five per cent low against its left-hand ones: the cornice
+   measures 0.181 to 0.828 (centre 0.505) while the shelf below it measures
+   0.123 to 0.798 (centre 0.460), and no real door has its shelf shifted 4.5%
+   off its cornice. The distortion cancels in the WIDTH and does not cancel in
+   the position, so the widths are what is kept and the middle is the middle. */
 const CLASSIC_COLS = {
-  cornice: [0.183, 0.817],
-  frieze:  [0.215, 0.785],
-  shelf:   [0.202, 0.804],
-  panel:   [0.228, 0.772],
-  plinth:  [0.202, 0.804],
+  cornice: [0.177, 0.823],   // width 0.647
+  frieze:  [0.228, 0.772],   // width 0.545
+  shelf:   [0.176, 0.824],   // width 0.649 — the widest thing on the door
+  band:    [0.286, 0.714],   // width 0.429 — the face BETWEEN the two brackets
+  panel:   [0.242, 0.758],   // width 0.516
+  plinth:  [0.223, 0.777],   // width 0.555
 };
-/* The window the set is built around, as fractions of the leaf. `rules.js`
-   requires the rectangular window with this set, and these are what it comes
-   out as on the photographed door — close enough to WINDOWS.rect that the
-   catalogue's own opening is used rather than a second one invented here. */
-const CLASSIC_GLASS = { top: 0.159, bot: 0.540, x0: 0.293, x1: 0.712 };
+/* The window the set is built around. 0.155 to 0.5545 of the leaf's height and
+   0.423 of its width, which on our 850 x 2050 leaf is 360 x 819 at 318 from
+   the head — close to the catalogue's own `rect` and not the same as it. */
+const CLASSIC_GLASS = { top: 0.155, bot: 0.5545, x0: 0.289, x1: 0.711 };
 
 /**
- * One horizontal member standing proud of the leaf: a cornice, a shelf cap, a
- * plinth base. Two planes and a shadow, never a ruled line — CLAUDE.md §4.
+ * A PROJECTING ENTABLATURE: corona, cavetto, and the shadow it throws.
+ *
+ * ⚠ THE FIRST TWO VERSIONS WERE PLANKS, and beside the photograph that is
+ * exactly what they looked like — a ruler laid on the door. Three stepped
+ * rectangles is not a cornice either: it reads as three rulers.
+ *
+ * What makes a cornice a cornice is that it stands OFF the face, so light
+ * strikes its top and nothing strikes underneath. Two surfaces do all the
+ * work:
+ *
+ *   the CORONA   a flat slab, its top face the brightest thing in the drawing
+ *                and its front edge cut by a hard dark drip line
+ *   the CAVETTO  a hollow sweeping back and down from the drip to the wall —
+ *                DARK where the corona overhangs it, lightening towards the
+ *                bottom where it catches bounce off the door
+ *
+ * plus a soft shadow thrown on the leaf below. That is the whole illusion, and
+ * it is three shapes rather than the six the first version used.
+ *
+ * `flare` turns it upside down for the foot of the plinth: there the hollow
+ * splays OUT as it descends and the wide edge is at the bottom.
  */
-function classicCap(x, y, w, h, paint) {
+function classicCap(x, y, w, h, paint, key = 'c', flare = false, coronaF = 0.68) {
   const n = v => Number(v.toFixed(1));
-  /* ⚠ THREE STEPS, BECAUSE A CORNICE IS NOT A SLAB. The first version was one
-     rectangle with a lit top edge, and beside the photograph it read as a
-     ruler laid on the door. What makes a cornice project is that each course
-     oversails the one below it and casts a shadow on it — so the widest and
-     lightest plane is the top, and the darkest line is under the overhang. */
-  const s1 = w * 0.030, s2 = w * 0.016;
+  const back = w * 0.030;            // how far the hollow returns to the wall
+  const corona = h * (flare ? 0.20 : coronaF);   // ruler-read per cap, see classicSet
+  const lip = h * 0.10;              // the bright fillet on the corona's top
+  const id = `cav-${key}`;
+
+  /* The hollow, as one path. Written from the wide edge to the narrow one so
+     the same four points serve both orientations. */
+  const wide = flare
+    ? [x, y + h, x + w, y + h]                       // splays out at the foot
+    : [x, y + corona, x + w, y + corona];            // overhangs at the head
+  const narrow = flare
+    ? [x + back, y, x + w - back, y]
+    : [x + back, y + h, x + w - back, y + h];
+  const hollow = `M ${n(wide[0])} ${n(wide[1])}
+      C ${n(wide[0] + back * 0.2)} ${n((wide[1] + narrow[1]) / 2)}
+        ${n(narrow[0])} ${n((wide[1] + narrow[1]) / 2)} ${n(narrow[0])} ${n(narrow[1])}
+      H ${n(narrow[2])}
+      C ${n(narrow[2])} ${n((wide[3] + narrow[3]) / 2)}
+        ${n(wide[2] - back * 0.2)} ${n((wide[3] + narrow[3]) / 2)} ${n(wide[2])} ${n(wide[3])} Z`;
+
   return `
-    <rect x="${n(x)}" y="${n(y + h)}" width="${n(w)}" height="${n(h * 0.7)}"
-          fill="#000" opacity="0.22" filter="url(#hwShadow)"/>
-    <rect x="${n(x + s1 + s2)}" y="${n(y + h * 0.62)}" width="${n(w - (s1 + s2) * 2)}"
-          height="${n(h * 0.38)}" fill="${darken(paint, 0.10)}"/>
-    <rect x="${n(x + s1)}" y="${n(y + h * 0.34)}" width="${n(w - s1 * 2)}"
-          height="${n(h * 0.30)}" fill="${lighten(paint, 0.04)}"/>
-    <rect x="${n(x + s1)}" y="${n(y + h * 0.58)}" width="${n(w - s1 * 2)}"
-          height="${n(h * 0.07)}" fill="#000" opacity="0.16"/>
-    <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h * 0.36)}"
-          fill="${lighten(paint, 0.11)}"/>
-    <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h * 0.13)}"
-          fill="${lighten(paint, 0.24)}"/>
-    <rect x="${n(x)}" y="${n(y + h * 0.30)}" width="${n(w)}" height="${n(h * 0.07)}"
-          fill="#000" opacity="0.20"/>`;
+    <linearGradient id="${id}" x1="0" y1="${flare ? 1 : 0}" x2="0" y2="${flare ? 0 : 1}">
+      <stop offset="0"    stop-color="${darken(paint, 0.34)}"/>
+      <stop offset="0.55" stop-color="${darken(paint, 0.14)}"/>
+      <stop offset="1"    stop-color="${lighten(paint, 0.06)}"/>
+    </linearGradient>
+    ${/* the shadow the whole thing throws on the leaf */''}
+    <rect x="${n(x)}" y="${n(flare ? y - h * 0.2 : y + h)}" width="${n(w)}"
+          height="${n(h * 0.80)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
+    <path d="${hollow}" fill="url(#${id})"/>
+    ${/* the corona: a lit top face, then a hard drip line under its front */''}
+    ${/* ⚠ THE ENDS ARE MITRED BACK, and a square end is the tell of a plank.
+          The photograph's corona is cut at 45 degrees at both returns, so the
+          slab reads as a length of moulding stopped against the leaf rather
+          than as a board that ran out. One trapezoid instead of a rect. */''}
+    ${flare ? '' : `
+      <path d="M ${n(x)} ${n(y)} H ${n(x + w)} L ${n(x + w - back)} ${n(y + corona)}
+               H ${n(x + back)} Z" fill="${lighten(paint, 0.15)}"/>
+      <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(lip)}"
+            fill="${lighten(paint, 0.34)}"/>
+      <path d="M ${n(x + back * 0.4)} ${n(y + corona - h * 0.055)}
+               H ${n(x + w - back * 0.4)} L ${n(x + w - back)} ${n(y + corona)}
+               H ${n(x + back)} Z" fill="#000" opacity="0.38"/>`}
+    ${flare ? `
+      <rect x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}" height="${n(corona)}"
+            fill="${lighten(paint, 0.08)}"/>
+      <rect x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}" height="${n(h * 0.04)}"
+            fill="${lighten(paint, 0.22)}"/>` : ''}`;
 }
 
 /**
- * A run of beads — the small repeating hemispheres that edge every band on
- * this door. Drawn as circles at a pitch derived from the run's own length so
- * a wide door gets more beads rather than bigger ones, which is what a
- * moulding stock actually does.
+ * A BEAD-AND-REEL COURSE: hemispheres in a sunk channel, nearly touching.
+ *
+ * ⚠ THE CHANNEL IS HALF OF IT. Drawn as circles on the leaf's own paint the
+ * run reads as a string of pearls glued to a flat door, because nothing says
+ * the beads are set into anything. The photograph shows them in a recess with
+ * a dark line above and a lit fillet below, and it is that pair — not the
+ * beads — that makes the course read as carved.
+ *
+ * Pitch is 2.42 diameters, measured at the plinth: bead 0.0046 of the leaf's
+ * width on a 0.0112 pitch. The count comes from the run's own length so a wide
+ * door gets more beads rather than bigger ones, which is what stock does.
  */
 function beadRun(x, y, w, r, paint, vertical = false) {
   const n = v => Number(v.toFixed(1));
-  const span = w;
-  /* ⚠ 2.42, NOT 2.6, AND THE RADIUS CAME DOWN WITH IT. Measured at the plinth
-     of `research/newdoor/`: bead 0.0046 of the leaf's width on a pitch of
-     0.0112, so 2.42 diameters apart — very nearly touching. At 2.6 with a
-     radius half again too big the course read as a row of pearls strung across
-     a gap, which is what it looked like beside the photograph. */
   const pitch = r * 2.42;
-  const count = Math.max(2, Math.round(span / pitch));
-  const step = span / count;
-  /* the fillet above and below: without it the beads float. */
+  const count = Math.max(2, Math.round(w / pitch));
+  const step = w / count;
   let out = vertical ? '' : `
-    <rect x="${n(x)}" y="${n(y - r * 1.5)}" width="${n(span)}" height="${n(r * 0.36)}"
-          fill="${lighten(paint, 0.18)}"/>
-    <rect x="${n(x)}" y="${n(y + r * 1.2)}" width="${n(span)}" height="${n(r * 0.34)}"
-          fill="${darken(paint, 0.14)}"/>`;
+    <rect x="${n(x)}" y="${n(y - r * 1.7)}" width="${n(w)}" height="${n(r * 3.4)}"
+          fill="${darken(paint, 0.07)}"/>
+    <rect x="${n(x)}" y="${n(y - r * 1.7)}" width="${n(w)}" height="${n(r * 0.45)}"
+          fill="${darken(paint, 0.22)}"/>
+    <rect x="${n(x)}" y="${n(y + r * 1.25)}" width="${n(w)}" height="${n(r * 0.45)}"
+          fill="${lighten(paint, 0.22)}"/>`;
   for (let i = 0; i < count; i++) {
     const c = (i + 0.5) * step;
     const cx = vertical ? x : x + c, cy = vertical ? y + c : y;
-    out += `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}" fill="${lighten(paint, 0.13)}"/>`
-         + `<circle cx="${n(cx - r * 0.22)}" cy="${n(cy - r * 0.26)}" r="${n(r * 0.42)}"
-                    fill="${lighten(paint, 0.30)}"/>`;
+    out += `<circle cx="${n(cx + r * 0.12)}" cy="${n(cy + r * 0.16)}" r="${n(r)}"
+                    fill="${darken(paint, 0.22)}"/>`
+         + `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}" fill="${lighten(paint, 0.10)}"/>`
+         + `<circle cx="${n(cx - r * 0.26)}" cy="${n(cy - r * 0.30)}" r="${n(r * 0.40)}"
+                    fill="${lighten(paint, 0.34)}"/>`;
   }
   return out;
 }
 
-/** The oval boss at the centre of the frieze and the plinth. */
+/**
+ * The oval cartouche at the middle of the frieze and of the plinth: a raised
+ * RING with a flat field inside it, not a soft blob.
+ *
+ * ⚠ AND IT IS HALF THE SIZE IT WAS. Ruler-read off the photograph at 0.072 of
+ * the leaf's width by 0.0167 of its height, against the 0.15 x 0.038 the first
+ * version drew — twice over in both directions, which is what turned a small
+ * moulded oval into a dinner plate.
+ */
 function classicBoss(cx, cy, rx, ry, paint) {
   const n = v => Number(v.toFixed(1));
-  return `
-    <ellipse cx="${n(cx)}" cy="${n(cy + ry * 0.18)}" rx="${n(rx)}" ry="${n(ry)}"
-             fill="${darken(paint, 0.13)}"/>
-    <ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(rx)}" ry="${n(ry)}"
-             fill="${lighten(paint, 0.05)}"/>
-    <ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(rx * 0.68)}" ry="${n(ry * 0.62)}"
-             fill="${darken(paint, 0.07)}"/>
-    <ellipse cx="${n(cx - rx * 0.10)}" cy="${n(cy - ry * 0.16)}" rx="${n(rx * 0.44)}"
-             ry="${n(ry * 0.36)}" fill="${lighten(paint, 0.16)}"/>`;
+  const ov = (sx, sy, f) =>
+    `<ellipse cx="${n(cx)}" cy="${n(cy + sy)}" rx="${n(rx * sx)}" ry="${n(ry * sx)}" fill="${f}"/>`;
+  return ov(1.06,  ry * 0.28, darken(paint, 0.26))        // the shadow it sits in
+       + ov(1.00, -ry * 0.14,  lighten(paint, 0.30))      // the rim, lit from above
+       + ov(1.00,  ry * 0.10,  darken(paint, 0.06))       // and shaded below
+       + ov(0.94,  0,          lighten(paint, 0.08))      // the ring's own face
+       + ov(0.62,  ry * 0.10,  darken(paint, 0.22))       // the hollow inside it
+       + ov(0.58,  0,          darken(paint, 0.04));
 }
 
 /**
- * A corbel — the scrolled bracket at each end of the shelf and the cornice.
- * Three stepped flutes rolling over, which is what the photograph shows and
- * what distinguishes this range from a plain bolection.
+ * FLUTES: rounded-end grooves cut INTO a face, and that is the whole point.
+ *
+ * The first version drew raised bars with a lit edge, which is the same
+ * geometry inverted — and inverted is what it looked like beside the
+ * photograph, three light sticks where the door has three shadows. A groove is
+ * dark on the side the light comes from and lit on the far side; a bar is the
+ * other way round. One sign flip, and it is the difference between carved and
+ * stuck-on.
+ */
+function classicFlutes(x, y, w, h, paint, count = 3) {
+  const n = v => Number(v.toFixed(1));
+  const pitch = w / count, gw = pitch * 0.42, r = gw / 2;
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    const gx = x + (i + 0.5) * pitch - r;
+    out += `<rect x="${n(gx)}" y="${n(y)}" width="${n(gw)}" height="${n(h)}"
+                  rx="${n(r)}" fill="${darken(paint, 0.16)}"/>`
+         + `<rect x="${n(gx + gw * 0.55)}" y="${n(y)}" width="${n(gw * 0.45)}"
+                  height="${n(h)}" rx="${n(r * 0.9)}" fill="${lighten(paint, 0.16)}"/>`
+         + `<rect x="${n(gx)}" y="${n(y)}" width="${n(gw * 0.30)}" height="${n(h)}"
+                  rx="${n(r * 0.6)}" fill="${darken(paint, 0.26)}"/>`;
+  }
+  return out;
+}
+
+/**
+ * A corbel — the bracket under each end of the shelf.
+ *
+ * ⚠ REBUILT FOUR TIMES FROM ONE PHOTOGRAPH, and each failure is worth keeping
+ * because each was a different way of not looking:
+ *   three rounded bars stepped 0.13 h apart covered one another → a pale blob
+ *   four ribs stepped further apart                             → a stack of dashes
+ *   vertical grooves in a tapering face                         → a comb
+ *   the flipped copy mirrored with `transform-origin`, which is a CSS property
+ *     and not an SVG attribute, so it mirrored about x = 0       → a wedge
+ *     that flew off the side of the door
+ *
+ * What is actually there, at 2.4x on the photograph: FIVE CONVEX REEDS side by
+ * side, each following a shallow S — bulging out at the top, waisting towards
+ * the middle, bulging again at the foot — lit along their crowns and dark in
+ * the grooves between, with a plain return on the inner side where the bracket
+ * meets the band. Convex, not sunk: they catch the light in a line down the
+ * middle of each reed, which a groove cannot do.
+ *
+ * Mirroring is arithmetic, never a transform: `s` is the sign and `ox` the
+ * outer edge, and the two brackets are the same numbers with one flipped.
  */
 function classicCorbel(x, y, w, h, paint, flip = false) {
   const n = v => Number(v.toFixed(1));
-  /* ⚠ THE FLUTES RUN DOWN, NOT ACROSS, and this is the second time this
-     bracket has been rebuilt from the same photograph. Version one drew three
-     rounded bars stepped 0.13 h apart which covered each other and came out as
-     one pale blob; version two spread them to four and they came out as a
-     stack of horizontal dashes, which is what the close-up of the shelf showed
-     up beside the real thing. What is actually under each end of that shelf is
-     a bracket with FOUR VERTICAL GROOVES in its face, tapering in as it drops
-     and rolling over at the foot. Flutes run with the drop of a bracket for
-     the same reason they run with the height of a column. */
-  const flutes = 4;
-  const foot = h * 0.13;                     // the roll-over at the bottom
-  const body = h - foot;
-  const taper = w * 0.16;                    // how much narrower the foot is
-  const s = flip ? -1 : 1;
-  const ox = flip ? x + w : x;
-  const edge = t => ox + s * (t * (w - taper * t));   // outer face, tapering
-  let out = `<path d="M ${n(ox)} ${n(y)} L ${n(edge(1))} ${n(y)}
-                      L ${n(edge(1) - s * taper)} ${n(y + body)}
-                      Q ${n(edge(1) - s * taper)} ${n(y + h)} ${n(ox)} ${n(y + h)} Z"
-                   fill="${lighten(paint, 0.09)}"/>`;
-  for (let i = 0; i < flutes; i++) {
-    /* Each groove is a shadow with a lit lip on its far side: that pair is the
-       whole of what makes a hollow read as a hollow at this size. */
-    const t0 = (i + 0.18) / flutes, t1 = (i + 0.82) / flutes;
-    const gx0 = edge(t0), gx1 = edge(t1);
-    const bx0 = gx0 - s * taper * t0, bx1 = gx1 - s * taper * t1;
-    out += `<path d="M ${n(gx0)} ${n(y)} L ${n(gx1)} ${n(y)}
-                     L ${n(bx1)} ${n(y + body)} L ${n(bx0)} ${n(y + body)} Z"
-                  fill="${darken(paint, 0.14)}"/>`
-         + `<path d="M ${n(gx1)} ${n(y)} L ${n(gx1 + s * (gx1 - gx0) * 0.22)} ${n(y)}
-                     L ${n(bx1 + s * (bx1 - bx0) * 0.22)} ${n(y + body)}
-                     L ${n(bx1)} ${n(y + body)} Z"
-                  fill="${lighten(paint, 0.22)}"/>`;
+  const s = flip ? -1 : 1, ox = flip ? x + w : x;
+  const REEDS = 4, face = w * 0.74;              // the rest is the plain return
+  const pitch = face / REEDS, amp = pitch * 0.62;
+  const at = t => ox + s * t;
+
+  /* the bracket's body, so the reeds have something to sit on */
+  let out = `
+    <path d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
+             L ${n(ox)} ${n(y + h)} Z" fill="${paint}"/>
+    <path d="M ${n(at(face))} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
+             L ${n(at(face))} ${n(y + h)} Z" fill="${lighten(paint, 0.05)}"/>`;
+
+  for (let i = 0; i < REEDS; i++) {
+    const cx = (i + 0.5) * pitch;
+    /* the S: out at the head, in at the waist, out again at the foot */
+    const d = `M ${n(at(cx + amp * 0.25))} ${n(y)}
+               C ${n(at(cx + amp * 0.25))} ${n(y + h * 0.22)}
+                 ${n(at(cx - amp * 0.55))} ${n(y + h * 0.34)}
+                 ${n(at(cx - amp * 0.55))} ${n(y + h * 0.56)}
+               C ${n(at(cx - amp * 0.55))} ${n(y + h * 0.80)}
+                 ${n(at(cx + amp * 0.10))} ${n(y + h * 0.86)}
+                 ${n(at(cx + amp * 0.10))} ${n(y + h)}`;
+    const stroke = (wd, col, dx, op = 1) =>
+      `<path d="${d}" fill="none" stroke="${col}" stroke-width="${n(wd)}"
+             stroke-linecap="round" stroke-opacity="${op}"
+             transform="translate(${n(dx)} 0)"/>`;
+    out += stroke(pitch * 1.00, darken(paint, 0.30), s * pitch * 0.16)
+         + stroke(pitch * 0.84, paint, 0)
+         + stroke(pitch * 0.26, lighten(paint, 0.20), -s * pitch * 0.17, 0.80);
   }
-  /* the roll, and the shadow it throws on the leaf below it */
-  out += `<path d="M ${n(ox)} ${n(y + body)} L ${n(edge(1) - s * taper)} ${n(y + body)}
-                   Q ${n(edge(1) - s * taper)} ${n(y + h)} ${n(ox)} ${n(y + h)} Z"
-                fill="${lighten(paint, 0.16)}"/>`
-       + `<path d="M ${n(ox)} ${n(y + h - foot * 0.34)}
-                   L ${n(edge(1) - s * taper * 1.1)} ${n(y + h - foot * 0.62)}
-                   Q ${n(edge(1) - s * taper * 1.1)} ${n(y + h)} ${n(ox)} ${n(y + h)} Z"
-                fill="#000" opacity="0.17"/>`;
+  /* the shadow the whole bracket throws where it meets the leaf */
+  out += `<path d="M ${n(ox)} ${n(y + h - h * 0.10)} L ${n(at(w))} ${n(y + h - h * 0.16)}
+                   L ${n(at(w))} ${n(y + h)} L ${n(ox)} ${n(y + h)} Z"
+                fill="#000" opacity="0.14"/>`;
   return out;
 }
 
 /**
- * THE BAND THAT APPEARS THREE TIMES. The frieze under the cornice, the band
- * under the shelf and the block above the plinth are one composition on this
- * door, not three: a raised block at each end and a wide tablet between them,
- * and it took a close-up of all three side by side to see that they are the
- * same piece of joinery turned upside down.
+ * THE BAND THAT APPEARS THREE TIMES — the frieze under the cornice, the band
+ * under the shelf, and the block above the plinth. One composition on this
+ * door, not three: a raised end at each side and a wide tablet between them.
+ * It took a close-up of all three side by side to see that they are the same
+ * piece of joinery turned upside down.
  *
- *   ends   'tablet' — a plain sunk square, which is what the shelf carries and
- *                     what the pull's finials bolt through
- *          'flute'  — three vertical grooves, which is what the frieze and the
- *                     plinth carry
+ *   ends   'tablet' — a plain sunk square, which the shelf carries and which
+ *                     the pull's finials bolt through
+ *          'flute'  — three grooves, which the frieze and the plinth carry
  *   middle 'plain'  — the shelf, because the pull goes there
- *          'oval'   — an oval cartouche with a round boss either side of it
+ *          'oval'   — an oval cartouche with a round boss either side
  *
- * ⚠ EVERY FRACTION HERE IS OFF THE PHOTOGRAPH and they are written as a table
- * for that reason: 0.10/0.28, 0.29/0.71, 0.72/0.90 of the band's inner width
- * for the three pieces, bosses at 0.10 of the LEAF either side of centre, an
- * oval of 0.033 leaf widths by 0.0089 leaf heights. The bosses were at 0.175
- * and the oval at twice this size, both invented, and both looked it.
+ * ⚠ THE COLUMN TABLE IS RULER-READ AND IT MOVED. It was 0.10/0.28, 0.29/0.71,
+ * 0.72/0.90 of the band's inner width, invented from a low-resolution crop; on
+ * the ruled picture the flutes occupy 0.10 to 0.19 and the tablet 0.225 to
+ * 0.778, so the ends were nearly twice as wide as they should be and the
+ * tablet a fifth too narrow. That is why the oval looked cramped between them.
  */
 function classicBand(x, y, w, h, paint, pale, leaf, key, ends, middle) {
   const n = v => Number(v.toFixed(1));
-  const th = h * 0.80, ty = y + (h - th) / 2;
-  const band = MOULD_BAND * 0.42;
-  const piece = (a, b, i) =>
-    moulding(x + w * a, ty, w * (b - a), th, band, paint, pale, leaf, `${key}${i}`);
-  let out = piece(0.29, 0.71, 1);
+  const th = h * 0.74, ty = y + (h - th) / 2;
+  const END = [[0.10, 0.19], [0.81, 0.90]], MID = [0.225, 0.778];
 
-  for (const [a, b, i] of [[0.10, 0.28, 0], [0.72, 0.90, 2]]) {
-    if (ends === 'tablet') { out += piece(a, b, i); continue; }
-    /* three grooves, each a shadow with a lit lip on its far side */
-    const bx = x + w * a, bw = w * (b - a);
-    for (let f = 0; f < 3; f++) {
-      const fx = bx + bw * (0.18 + f * 0.24), fw = bw * 0.13;
-      out += `<rect x="${n(fx)}" y="${n(ty + th * 0.12)}" width="${n(fw)}"
-                    height="${n(th * 0.76)}" rx="${n(fw * 0.5)}"
-                    fill="${darken(paint, 0.13)}"/>`
-           + `<rect x="${n(fx + fw)}" y="${n(ty + th * 0.12)}" width="${n(fw * 0.30)}"
-                    height="${n(th * 0.76)}" rx="${n(fw * 0.15)}"
-                    fill="${lighten(paint, 0.20)}"/>`;
-    }
+  /* The sunk field the whole composition sits in: one shadow line at the top
+     and one lit fillet at the bottom, which is what a rebate looks like. */
+  let out = `
+    <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}"
+          fill="${darken(paint, 0.07)}"/>
+    <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h * 0.06)}"
+          fill="#000" opacity="0.16"/>
+    <rect x="${n(x)}" y="${n(y + h * 0.94)}" width="${n(w)}" height="${n(h * 0.06)}"
+          fill="${lighten(paint, 0.20)}"/>`;
+
+  /* THE TABLET: a raised slab with a lit top edge and a shadow under it, and a
+     fine stipple across its face. The stipple is what the photograph has and
+     what our flat fill did not — at this scale it is most of the difference
+     between "a rectangle" and "a cast panel". */
+  const slab = (a, b, texture) => {
+    const sx = x + w * a, sw = w * (b - a);
+    return `
+      <rect x="${n(sx)}" y="${n(ty + th * 0.06)}" width="${n(sw)}" height="${n(th)}"
+            fill="#000" opacity="0.16"/>
+      <rect x="${n(sx)}" y="${n(ty)}" width="${n(sw)}" height="${n(th)}"
+            fill="${lighten(paint, 0.04)}"/>
+      <rect x="${n(sx)}" y="${n(ty)}" width="${n(sw)}" height="${n(th * 0.10)}"
+            fill="${lighten(paint, 0.20)}"/>
+      ${/* ⚠ OVERLAY, NOT A FILL. `url(#grain)` painted straight on at 0.55 put
+            an opaque grey noise over the tablet and turned a green cast panel
+            into a slab of concrete — the filter's output is grey, so painting
+            it IS painting grey. Blended at a fifth it modulates the paint
+            underneath instead, which is what orange-peel does to a colour. */''}
+      ${texture ? `<rect x="${n(sx)}" y="${n(ty)}" width="${n(sw)}" height="${n(th)}"
+            fill="url(#grainTex)" opacity="0.22"
+            style="mix-blend-mode:overlay"/>` : ''}
+      <rect x="${n(sx)}" y="${n(ty)}" width="${n(sw)}" height="${n(th)}" fill="none"
+            stroke="${darken(paint, 0.18)}" stroke-width="1.2"
+            vector-effect="non-scaling-stroke"/>`;
+  };
+
+  out += slab(MID[0], MID[1], true);
+  for (const [a, b] of END) {
+    if (ends === 'tablet') { out += slab(a, b, false); continue; }
+    out += classicFlutes(x + w * a, ty + th * 0.12, w * (b - a), th * 0.76, paint, 3);
   }
   if (middle === 'oval') {
     const cx = x + w / 2, cy = y + h / 2;
-    out += classicBoss(cx, cy, leaf.w * 0.033, leaf.h * 0.0089, paint);
+    out += classicBoss(cx, cy, leaf.w * 0.036, leaf.h * 0.0084, paint);
     for (const d of [-1, 1]) {
-      out += classicBoss(cx + d * leaf.w * 0.10, cy,
-                         leaf.w * 0.0072, leaf.w * 0.0072, paint);
+      out += classicBoss(cx + d * leaf.w * 0.088, cy,
+                         leaf.w * 0.0073, leaf.w * 0.0073, paint);
     }
   }
   return out;
@@ -5269,79 +5415,110 @@ function classicBand(x, y, w, h, paint, pale, leaf, key, ends, middle) {
    `detail.winRect`, so the rows below already know where the glass is. It was
    taking one and never reading it. */
 function classicSet(lx, ly, lw, lh, paint, pale, tone) {
+  const n = v => Number(v.toFixed(1));
   const R = CLASSIC_ROWS, C = CLASSIC_COLS;
   const Y = f => ly + lh * f;
   const X = f => lx + lw * f;
   const leaf = { x: lx, y: ly, w: lw, h: lh };
-  const band = MOULD_BAND * 0.72;      // lighter stock than a lone panel's
   const out = [];
+  const span = (row, col) => [X(C[col][0]), Y(R[row][0]),
+                              (C[col][1] - C[col][0]) * lw, (R[row][1] - R[row][0]) * lh];
 
-  /* ── the cornice, over a frieze with its bosses ─────────────── */
-  const [fz0, fz1] = R.frieze, [fx0, fx1] = C.frieze;
-  /* The bead course runs along the TOP of the frieze, tucked under the
-     cornice, and the band fills what is left below it. */
-  const fzH = (fz1 - fz0) * lh, beadR = lw * 0.0050;
-  out.push(moulding(X(fx0), Y(fz0), (fx1 - fx0) * lw, fzH,
-                    band, paint, pale, leaf, 'cfz'));
-  out.push(beadRun(X(fx0) + lw * 0.040, Y(fz0) + fzH * 0.20,
-                   (fx1 - fx0) * lw - lw * 0.080, beadR, paint));
-  out.push(classicBand(X(fx0) + lw * 0.030, Y(fz0) + fzH * 0.34,
-                       (fx1 - fx0) * lw - lw * 0.060, fzH * 0.56,
-                       paint, pale, leaf, 'cfb', 'flute', 'oval'));
-  const [cn0, cn1] = R.cornice, [cx0, cx1] = C.cornice;
-  out.push(classicCap(X(cx0), Y(cn0), (cx1 - cx0) * lw, (cn1 - cn0) * lh, paint));
-  for (const [cbx, flip] of [[cx0, false], [cx1 - lw * 0.055 / lw, true]]) {
-    out.push(classicCorbel(X(cx0) + (flip ? (cx1 - cx0) * lw - lw * 0.055 : 0),
-                           Y(cn1), lw * 0.055, (fz1 - cn1) * lh, paint, flip));
+  /* A block standing PROUD of the leaf: lit along its top and left, shadowed
+     along its bottom and right, over a soft cast shadow. Four rectangles.
+     ⚠ This replaces `moulding()` for the set's three bands, and deliberately.
+     `MOULD` is a measured section and it is right for a PANEL — but run round
+     a band a twentieth of the leaf tall it puts every one of its stops into
+     nine millimetres, and the eye reads that as engraving rather than as a
+     piece of timber laid on. The photograph's bands have one edge each side
+     and nothing between. */
+  const block = (bx, by, bw, bh) => {
+    const e = Math.max(1.5, lw * 0.006);
+    return `
+      <rect x="${n(bx)}" y="${n(by + e)}" width="${n(bw)}" height="${n(bh)}"
+            fill="#000" opacity="0.18" filter="url(#hwShadow)"/>
+      <rect x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(bh)}" fill="${paint}"/>
+      <rect x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(e)}"
+            fill="${lighten(paint, 0.22)}"/>
+      <rect x="${n(bx)}" y="${n(by)}" width="${n(e)}" height="${n(bh)}"
+            fill="${lighten(paint, 0.14)}"/>
+      <rect x="${n(bx)}" y="${n(by + bh - e)}" width="${n(bw)}" height="${n(e)}"
+            fill="${darken(paint, 0.22)}"/>
+      <rect x="${n(bx + bw - e)}" y="${n(by)}" width="${n(e)}" height="${n(bh)}"
+            fill="${darken(paint, 0.14)}"/>`;
+  };
+  const beadR = lw * 0.0046;                      // measured at the plinth
+  const inBand = (bx, by, bw, bh, key, ends, mid) =>
+    classicBand(bx + lw * 0.018, by + bh * 0.14, bw - lw * 0.036, bh * 0.72,
+                paint, pale, leaf, key, ends, mid);
+
+  /* ── THE HEAD: a frieze block, a bead course, the cornice over both ──
+     ⚠ NO CORBELS UP HERE. The first version hung a fluted bracket off each end
+     of the cornice by analogy with the shelf. The ruled photograph has a plain
+     moulded return there and nothing else; the brackets belong to the shelf
+     alone, which is what makes the shelf read as a shelf. */
+  const fz = span('frieze', 'frieze');
+  out.push(block(...fz));
+  out.push(inBand(...fz, 'cfb', 'flute', 'oval'));
+  const cn = span('cornice', 'cornice');
+  out.push(beadRun(X(C.cornice[0]) + lw * 0.036, Y((R.beads[0] + R.beads[1]) / 2),
+                   (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072, beadR, paint));
+  out.push(classicCap(...cn, paint, 'cn'));
+
+  /* ── THE SHELF: its own corona, two brackets, and the band they carry ── */
+  /* ⚠ THE BAND IS NARROWER THAN THE SHELF, and it was drawn the same width.
+     Ruler-read: the slab spans 0.649 of the leaf and the face under it only
+     0.429, because the two brackets take the ends. Drawn full width the
+     brackets sat ON the band instead of beside it, which is why they read as
+     striped rectangles stuck to the door. */
+  const ba = span('band', 'band');
+  out.push(block(...ba));
+  out.push(inBand(...ba, 'cbt', 'tablet', 'plain'));
+  /* ⚠ THE BRACKETS HANG OFF THE BAND, NOT OFF THE SHELF'S ENDS. Placed at the
+     slab's corners they left four centimetres of bare leaf between each
+     bracket and the face it is supposed to be carrying, and the pair read as
+     loose reeded strips stuck either side. On the door the corbel's inner
+     edge touches the band: 0.219 against 0.225 of the leaf, six thousandths
+     apart. */
+  const cbW = lw * 0.070, cbGap = lw * 0.006;
+  for (const flip of [false, true]) {
+    out.push(classicCorbel(flip ? X(C.band[1]) + cbGap : X(C.band[0]) - cbGap - cbW,
+                           Y(R.shelf[1]), cbW,
+                           (R.band[1] - R.shelf[1]) * lh, paint, flip));
   }
-
-  /* ── the corbelled shelf, and the pull it carries ───────────── */
-  const [sh0, sh1] = R.shelf, [bd0, bd1] = R.band, [sx0, sx1] = C.shelf;
-  out.push(moulding(X(sx0) + lw * 0.055, Y(bd0), (sx1 - sx0) * lw - lw * 0.110,
-                    (bd1 - bd0) * lh, band * 0.8, paint, pale, leaf, 'cbd'));
-  out.push(classicBand(X(sx0) + lw * 0.055, Y(bd0), (sx1 - sx0) * lw - lw * 0.110,
-                       (bd1 - bd0) * lh, paint, pale, leaf, 'cbt', 'tablet', 'plain'));
-  out.push(classicCap(X(sx0), Y(sh0), (sx1 - sx0) * lw, (sh1 - sh0) * lh, paint));
-  out.push(classicCorbel(X(sx0), Y(sh1), lw * 0.055, (bd1 - sh1) * lh, paint, false));
-  out.push(classicCorbel(X(sx1) - lw * 0.055, Y(sh1), lw * 0.055, (bd1 - sh1) * lh, paint, true));
+  out.push(classicCap(...span('shelf', 'shelf'), paint, 'sh', false, 0.51));
   /* THE SET'S OWN PULL. Part of the face, not of the hardware axis — see the
      catalogue entry: this door carries it AND a long vertical bar, and
      `state.handle` holds one grip. */
-  out.push(classicPull(X(0.5), Y((bd0 + bd1) / 2), lw * 0.33, lh * 0.028, tone));
+  out.push(classicPull(X(0.5), Y((R.band[0] + R.band[1]) / 2), lw * 0.33, lh * 0.028, tone));
 
   /* ── the panel ──────────────────────────────────────────────────
      ⚠ TAGGED `data-detail="panel"`, NOT `classic`, AND THAT IS LOAD-BEARING.
-     Two assertions read the markup rather than the catalogue to ask whether
+     Three assertions read the markup rather than the catalogue to ask whether
      the panel a customer is charged for is a panel that is drawn — and the set
      charges for one and draws one. Wrapping it in the set's own name hid it
-     from both, and 297 combinations reported a face with no panel on it while
-     the price list took ₪1,680. The set is the outer group; this is the piece
-     inside it that the price is about. */
-  const [pn0, pn1] = R.panel, [px0, px1] = C.panel;
-  /* ⚠ AND IT REPORTS `data-top`, because a third assertion reads that to check
-     no moulding crosses the glazing. Without it the check does not fail — it
-     goes DEAD, silently, on every combination the set appears in, which is
-     what it says in its own message when the attribute goes missing. */
-  out.push(`<g data-detail="panel" data-panels="1" data-top="${Y(pn0).toFixed(1)}">`
-    + moulding(X(px0), Y(pn0), (px1 - px0) * lw, (pn1 - pn0) * lh,
-               MOULD_BAND, paint, pale, leaf, 'cpn')
+     from all three, and 297 combinations reported a face with no panel on it
+     while the price list took ₪1,680. `data-top` is there for the same reason:
+     the third check goes DEAD rather than failing without it.
+     This one keeps `moulding()`. A panel is what that section was measured on,
+     and the photograph's panel surround is a broad ogee, not a band. */
+  const pn = span('panel', 'panel');
+  out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">`
+    + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn')
     + `</g>`);
 
-  /* ── the plinth ─────────────────────────────────────────────── */
-  /* ⚠ THE PLINTH IS THE FRIEZE UPSIDE DOWN, and it is stacked in that order:
-     the band first, the bead course UNDER it, then the ogee at the foot. Ours
-     had the beads on top and no band at all — a string of dots above a bare
-     rectangle — which is neither piece. */
-  const [pl0, pl1] = R.plinth, [lx0, lx1] = C.plinth;
-  const plH = (pl1 - pl0) * lh;
-  out.push(moulding(X(lx0), Y(pl0), (lx1 - lx0) * lw, plH,
-                    band, paint, pale, leaf, 'cpl'));
-  out.push(classicBand(X(lx0) + lw * 0.030, Y(pl0) + plH * 0.12,
-                       (lx1 - lx0) * lw - lw * 0.060, plH * 0.56,
-                       paint, pale, leaf, 'cpb', 'flute', 'oval'));
-  out.push(beadRun(X(lx0) + lw * 0.040, Y(pl0) + plH * 0.80,
-                   (lx1 - lx0) * lw - lw * 0.080, beadR, paint));
-  out.push(classicCap(X(lx0), Y(pl1), (lx1 - lx0) * lw, lh * 0.016, paint));
+  /* ── THE PLINTH: the frieze upside down, then the splayed foot ──
+     Stacked in that order — block, bead course UNDER it, ogee to the floor.
+     The first version had the beads on top and no block at all: a string of
+     dots above a bare rectangle, which is neither piece. */
+  const pl = span('plinth', 'plinth');
+  out.push(block(...pl));
+  out.push(inBand(...pl, 'cpb', 'flute', 'oval'));
+  out.push(beadRun(X(C.plinth[0]) - lw * 0.006, Y((R.pbeads[0] + R.pbeads[1]) / 2),
+                   (C.plinth[1] - C.plinth[0]) * lw + lw * 0.012, beadR, paint));
+  out.push(classicCap(X(C.plinth[0]) - lw * 0.020, Y(R.foot[0]),
+                      (C.plinth[1] - C.plinth[0]) * lw + lw * 0.040,
+                      (R.foot[1] - R.foot[0]) * lh, paint, 'ft', true));
 
   return `<g data-detail="classic">${out.join('')}</g>`;
 }
