@@ -45,7 +45,9 @@ photograph (`REALISM.md` §3 measured this). That ceiling does not move. What
 DOES move the perceived level is the two things these sites prove:
 
 - **the room around the object** (Rivian's environment, Heart's sky) — which
-  for us is Stage D: alcove, floor reflection, sconces; and
+  for us is Stage D: sconces (shipped) + a light pool, vignette, and a matte
+  graded floor (the alcove and a mirror floor were tried/considered and cut —
+  see `REALISM2.md` Stage D status); and
 - **the restraint of everything else** — which is Stages A–C.
 
 A frozen frame of our door will never be a BMW photo. The *page* it sits in
@@ -104,8 +106,9 @@ The move (this is Stage F in REALISM2, and Stage D makes it pay off):
 - Desaturate the chrome one notch: dividers, tile borders and inactive text all
   step toward grey so the only saturated things on screen are the painted leaf
   and the single tan accent.
-- The room (Stage D) is what makes this land: once the door has a lit alcove
-  and a floor that reflects it, "the product is the only colour" becomes true
+- The room (Stage D) is what makes this land: once the door has a warm light
+  pool on it, a fallen-off vignette around it and a graded matte floor beneath,
+  "the product is the only colour" becomes true
   by construction, because the door is then the only thing in the frame with
   depth and warmth in it.
 
@@ -238,7 +241,7 @@ says what REALISM2 stage does the work and what "at this level" adds to it.
 | 2 | **Tokens** | A | the §2 palette exactly — warm ink, `--accent-ink`, radius scale, one soft shadow |
 | 3 | **Chrome** | B | header logo from the favicon glyph, navigator circles (still a navigator, never a progress bar), tile/swatch restyle in accent, spec-row icons off `row.id`, trust band on the scene |
 | 4 | **Structure-first** | C | מבנה הדלת becomes section 01 — no VERSION bump (verified: section keys absent from `url-state.js`) |
-| 5 | **The room** | D | alcove, floor gradient + skirting glow, the `<use>` reflection (stripped in `collide.mjs`), sconces whose light stops at the wall (`LIGHT` stays one key — nothing in `research/` shows a door between two sconces) |
+| 5 | **The room** | D | sconces + vignette (SHIPPED); a warm light pool making the door the hero, a deepened vignette, a matte graded floor, and the keyhole as real hardware — all lighting the wall/floor, `LIGHT` stays one key (alcove + mirror floor cut, see Stage D status) |
 | 6 | **The leaf** | E | grain/drift toward the corpus, gated by `mottle` + photographs, **never** by `profile` (28–30 of 30 real doors fail it) |
 | 7 | **Immersive layout** | F | full-bleed door with floating cards at ≥1280; `fitStage` measures `--wall` to the card's inner edge; overlay yields to the controls if the 12 viewport×size checks won't settle |
 

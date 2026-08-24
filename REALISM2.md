@@ -283,69 +283,67 @@ mockup's own door         70,748 B      (61% of doors already fail G6)
 budget for the room:      ~1,400 B net  — see D6
 ```
 
-### D1. The alcove
+> ⚠ **STATUS AGAINST THE LIVE BRANCH — read before touching Stage D.** This
+> plan was written on a branch cut from an older `claude/door-builder-website-
+> plan-rgg7gu`. The live branch has since moved ~6 commits ahead and the
+> recurring agent has already done much of Stage D, so parts of the sub-steps
+> below are DONE, and one is REVERTED-ON-PURPOSE. Reconcile against the live
+> renderer, do not re-run what shipped:
+> - **D4 sconces — SHIPPED.** Two lit wall cylinders (`SCONCE_OUT`,
+>   `sconceGlow`, `lampGlow`) throwing an up-and-down glow, measured as "an
+>   ordinary exterior sconce beside a 950 mm door." The vignette (`LIGHT.vignette
+>   = 0.07`) is live too. Keep.
+> - **D1 alcove — BUILT AND REVERTED. DO NOT REBUILD.** It shipped, was reported
+>   from outside as *"a grey box that frames the door,"* and was removed with a
+>   measured rationale now in the renderer: a recess seen dead square-on has no
+>   perspective to sell it, so its two shaded returns read as a flat grey
+>   rectangle; and its depths were *proportion, not measurement* — nothing in
+>   `research/` shows the wall far enough back to measure a recess, so under
+>   REALISM.md §6 it "loses to nothing at all." The frame's three MEASURED
+>   returns plus the casing's cast shadow carry the set-back instead. **§D1 is
+>   struck.**
+> - **D3 floor reflection — struck.** The live branch ran the leaf to the floor
+>   line and lets the frame returns carry depth; and the owner has now chosen a
+>   **matte** floor (below), so a mirror is off the table — it would be the same
+>   tuned-by-eye move that sank the alcove.
+>
+> What remains of Stage D is the three owner-chosen refinements below (D-a/b/c),
+> not the original D1–D4.
 
-The wall steps forward around the door: an outer recess ~300 mm deep, its own
-soffit, two returns, the casing at the back of it. Built from the primitive the
-frame already proved — three mitred trapezoids under three gradients — keyed
-off the WALL tone, not the paint, drawn in `#backdrop` before `#shadow`.
-~400 bytes. The opening reads as architecture instead of a rectangle of
-plaster, and nothing inside the casing moves.
+### D-a. Light pool + vignette — make the door the hero *(owner: pool+vignette)*
 
-### D2. The floor
+The scene is evenly lit and reads a little sterile. Add a **warm pool of light**
+centred on the door — a soft radial in `LIGHT.warm` over the wall and floor
+immediately around the leaf — and **deepen the existing `vignette`** so the
+corners of the scene fall off. The eye then goes to the door, BMW/Rivian
+staging.
+⚠ **This lights the WALL and FLOOR, never the leaf's model.** It is a pool on
+the plaster and the pool's own falloff, not a re-fit of `FALLOFF` — the door
+keeps its one measured key (the same discipline that keeps the sconces off the
+leaf). A gentle scene-ambient warmth ON the leaf is allowed ONLY as a flat wash
+that does not claim a direction — it must not touch the nine-row fall. Tune the
+pool and vignette by eye against the *page*, but assert the leaf's
+`npm run profile` / `mottle` numbers are unchanged before and after, so the
+pool provably did not leak onto the door.
 
-- Two-stop vertical gradient on the floor rect: brighter to camera, cooler at
-  the wall. ~80 bytes.
-- **The 0.16 rule dies.** Where wall meets floor becomes a short vertical
-  gradient — a skirting shadow, a change of VALUE. This is the same correction
-  this drawing has made twice already (the jamb arris lines, `edgeTop`): a fold
-  between two lit surfaces is not a drawn line.
+### D-b. The floor — matte, with a soft gradient *(owner: matte, not reflective)*
 
-### D3. The reflection *(the highest value-per-byte in the whole plan)*
+- A gentle vertical gradient on the floor: brighter near the door, cooler and
+  darker toward the edges — plus the existing contact shadow. Honest: most of
+  the thirty records stand on matte tile or stone, so a matte graded floor
+  survives "compare to a photograph"; a mirror does not.
+- If the old `0.16` wall/floor rule is still a hard line on the live branch,
+  it becomes a short vertical gradient — a skirting shadow, a change of VALUE,
+  the correction this drawing has already made twice (jamb arris, `edgeTop`).
 
-Wrap frame + leaf in `<g id="door">`, then:
+### D-c. The keyhole reads as real hardware
 
-```
-<use href="#door" transform="translate(0 ${2 * baseY}) scale(1 -1)"
-     opacity="0.13" filter="url(#floorBlur)" mask="url(#floorFade)"/>
-```
-
-A `<use>` is a reference — ~200 bytes on every door, not a doubling of a 70 KB
-one (the same argument that took the worst door from 374,160 to 284,353 B).
-`floorFade` runs to zero over ~900 mm of floor; `floorBlur` a mild
-`feGaussianBlur`.
-
-⚠ Three obligations, none optional:
-
-1. **`tools/collide.mjs` strips the reflection** before measuring, exactly as
-   it already strips `[data-relight]`, `[data-hitpad]`, `[data-chrome]` and
-   `hwShadow` — otherwise the sweep reports every door colliding with its own
-   mirror image. This is the fourth documented instance of the two halves of
-   that file asking different questions; do not create the fifth.
-2. `#floorBlur` and `#floorFade` must survive `usedDefs()` — it prunes from
-   the markup, the `<use>`/`mask`/`filter` references count, and the existing
-   `no dangling url()` assertion is the check that they did.
-3. The repeat-render equality assertion in `test/units.mjs` stays green — the
-   pane-geometry-derived ids make the mirrored references stable; verify, do
-   not assume.
-
-### D4. The sconces — fixtures on the wall, light that stops at the wall
-
-Two small cylinder fixtures flanking the alcove, each dropping a warm radial
-cone (`LIGHT.warm`, alpha 0.10 → 0) DOWN the plaster, clipped to the wall,
-painted under the alcove's own shading. ~600 bytes both sides.
-
-⚠ **The door's light does not move.** `LIGHT` is one key, high, ~30° left, and
-everything measured — `FALLOFF`'s nine-row medians over thirty photographs,
-`MOULD_SIDE`, `keyWash`, `bloom`, the warm/cool split — hangs off that single
-fact. Two symmetric sconces imply two symmetric keys; following them onto the
-leaf would be re-fitting a corpus-measured model to a picture with no
-photograph behind it, the one thing REALISM.md §6 forbids. The wall may
-flatter; the leaf keeps its instruments. The disagreement is recorded here the
-way the grip-finish disagreement is recorded in `ASK-PERETZ.md` §2b1.
-
-No blend modes on the cones — a plain warm radial at low alpha does the job
-without giving `?bare=1` and `collide` a new rendering variable to re-verify.
+On the plain starting door the cylinder is the ONLY fitting on the leaf, so it
+carries the whole "is this a real door" read — and at drawing scale it can look
+like a flat grey dot. Give it a small brushed-metal escutcheon with a single
+lit rim and a soft drop, from the same `inFinish` steel ramp the pull bars use,
+so it reads as machined hardware set into the leaf. Small, and it is the first
+thing a customer looks at on a bare door.
 
 ### D5. The wall itself
 
@@ -387,12 +385,24 @@ scene-lighting correction), and the pane spread sits at 0.07–0.18 against
 the number, and was reverted because it made every window the busiest thing in
 the drawing. That revert is not reopened by this plan.
 
+⚠ **Owner choice: SUBTLE SATIN, not "push to match the photos."** The target is
+a leaf that stops reading as a flat rectangle — a restrained sheen and a modest
+grain — NOT the corpus maximum. Do not chase 0.089–0.155; stop at the first
+step where the leaf reads as painted steel beside the photograph. This is the
+same lesson as the reverted pane rebuild: hitting the number is not the goal,
+looking right is.
+
 What moves, and under which gate:
 
+- **A satin sheen** — a broad, soft vertical specular highlight down the leaf
+  (a wide gradient at low contrast), which is what "satin" actually reads as and
+  is distinct from mottle. It follows the one measured key, so it costs no new
+  light model. This is the single biggest "is it a flat rectangle" fix.
 - **`grain` and `drift` in `FALLOFF` rise in measured steps** (≤ +25% per
   step), judged each step by `npm run mottle` — which now renders and measures
   our own leaf every run — and by eye against d048/d087 in the regenerated
-  `recreate` sheets, side by side, per REALISM.md §6.
+  `recreate` sheets, side by side, per REALISM.md §6. Stop early (the satin
+  choice above), do not run to the corpus ceiling.
 - ⚠ **`npm run profile` is not the gate for this work and must not become
   one.** 28–30 of 30 real doors fail its tolerance; our leaf passes it *because
   it is smoother than any real door*. It stays what it is — a drift alarm on

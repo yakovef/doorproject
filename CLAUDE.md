@@ -21,6 +21,29 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **The door + surroundings design pass — planned, and reconciled with what
+  already SHIPPED.** Looking at the live site, the owner asked what the DOOR and
+  its SCENE should become (the sidebar/guide chrome is largely built). ⚠ The
+  planning branch (`app-design-mockup-review-qt00n6`) had drifted from live
+  (`door-builder-website-plan-rgg7gu`, ~6 commits ahead): the recurring agent
+  had already shipped the **sconces + vignette + threshold**, and had **built
+  the alcove and reverted it** — reported from outside as "a grey box that
+  frames the door," struck because a square-on recess has no perspective to sell
+  it and its depths were proportion-not-measurement (REALISM.md §6). So
+  `REALISM2.md` Stage D was rewritten: a **STATUS block** marks sconces/vignette
+  DONE and the alcove REVERTED-DO-NOT-REBUILD, and the old D1 alcove + D3
+  `<use>` floor reflection are **struck**. Three owner-chosen refinements replace
+  them, all honest (they light the wall/floor, never re-fit the leaf's one
+  measured key): **D-a** a warm light pool on the door + a deepened vignette to
+  make it the hero; **D-b** a **matte** graded floor (a mirror was refused — the
+  same tuned-by-eye move that sank the alcove); **D-c** the keyhole drawn as
+  real brushed hardware (it is the only fitting on the bare starting door). And
+  Stage E is capped to **subtle satin** (a soft vertical sheen + a modest grain
+  bump), NOT pushed to the corpus 0.089–0.155 — stop where it stops reading as a
+  flat rectangle. DESIGN-LEVEL's room references updated to match. ⚠ The bigger
+  process note: this whole plan set lives on a stale branch while the live
+  branch moves under it — the executing agent should reconcile against live
+  before building, not assume the plan's "not built" is still true.
 - **`GUIDED-FLOW.md` — Stage G, the step-by-step build, written not built.**
   The owner's idea: start from nothing and assemble a door one question at a
   time so a customer is not overwhelmed by sixty options at once, with an
