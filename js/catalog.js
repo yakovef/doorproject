@@ -631,8 +631,18 @@ export const DETAILS = [
      The rows themselves are in PANEL_ROWS beside the pair they are derived
      from, not here: this file says WHAT a door can be and the renderer says
      where the metal goes. */
+  /* ⚠ THE MIDDLE ONE IS A HANDLE PLATE, and `grab: true` is what says the face
+     brings its own pull. Three photographs of this door — installed, as a
+     catalogue shot, and in white — all carry the same turned bar bolted across
+     that middle rectangle, which is why it is a ninth of the leaf tall and sits
+     at hand height instead of a third of the way down. It is the same fitting
+     the classical set has on its shelf and it is drawn the same way, as part of
+     the FACE, so the hardware axis stays free for whatever else goes on the
+     door. See PANEL_ROWS in renderer.js for the rows and the ±0.03 on them.
+     The name stays "three panels" because that is what it was asked for as and
+     what a customer counts; the plate is the third. */
   { id: 'panel3', he: 'שלושה פאנלים',   en: 'Three panels',   panel: true,  groove: false,
-    panels: 3, top: true },
+    panels: 3, top: true, grab: true },
 
   /* ── APPLIED STRIPS ───────────────────────────────────────────────
      The designed tier's signature, and we had it backwards at first. Of the
@@ -669,6 +679,19 @@ export const DETAILS = [
   { id: 'stripsv', he: 'פסים אנכיים',   en: 'Vertical strips', panel: false, groove: false, strips: 4, vertical: true },
   { id: 'stripsv6', he: 'שישה פסים אנכיים', en: 'Six vertical strips',
     panel: false, groove: false, strips: 6, vertical: true },
+  /* ⚠ THE CROSS, AND THE INVENTORY HAS CALLED IT MISSING FOR THREE ROUNDS.
+     `research/works/INVENTORY.md` lists it under the face designs as *"Cross
+     composition — one long vertical crossed by horizontals: d035 d047 d066
+     d074 — MISSING as a pattern"*, and asked for from outside as *"look at
+     doors with stripes and add those varients to that category."* Four doors
+     out of the corpus's fifteen striped ones, which makes it the largest
+     stripe pattern we did not draw.
+     The count is 5 — one vertical and four horizontals — so the order and the
+     price read it the same way the other stripe options are read. See
+     `metalStrips` for the measurements and for why the vertical is a strip
+     here and the pull bar on three of the four real doors. */
+  { id: 'stripsx', he: 'פס אנכי חוצה',  en: 'Crossed strips',
+    panel: false, groove: false, strips: 5, cross: true, doors: ['d047', 'd074'] },
 
   /* ── THE CLASSICAL SET ─────────────────────────────────────────────
      A whole composition rather than one feature: a projecting cornice over a
@@ -715,7 +738,7 @@ export const DETAILS = [
      `research/newdoor/`. Whether those five are the same product is a question
      for Peretz and it is asked. */
   { id: 'classic', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false,
-    classic: true, grab: true, needsWindow: true, doors: ['newdoor'],
+    classic: true, grab: true, rectOnly: true, doors: ['newdoor'],
     winRect: { w: 360, h: 819, top: 318 } },
 ];
 

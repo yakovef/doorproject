@@ -1860,20 +1860,28 @@ export function render(state) {
       <stop offset="0.14" stop-color="${LIGHT.warm}" stop-opacity="0.038"/>
       <stop offset="0.34" stop-color="${LIGHT.warm}" stop-opacity="0"/>
     </linearGradient>
-    <!-- ⚠ BLACK IRONMONGERY, AND IT IS MEASURED. The new door's bar, its
-         turned pull and its keyway escutcheon are all one dark neutral: the
-         median of every dark pixel across its four photographs is #2A2627 to
-         #36322E, warmth (r−b) 2 to 8. Our brass runs r−b above 40, which is
-         why the photographs read as bronze until somebody measured them.
-         A cylinder, not a flat bar: dark at both edges, one narrow specular a
-         third across, and a bounce along the far side. -->
+    <!-- THE TURNED PULL'S ROD. A cylinder, not a flat bar: dark at both edges,
+         one narrow specular a third across, and a bounce along the far side.
+         ⚠ WRITTEN IN THE DOOR'S OWN TONE RAMP, not in absolute hexes, and the
+         three-panel photographs are why. The six stops were measured off
+         research/newdoor, whose every fitting is black — median dark pixel
+         #2A2627 to #36322E, warmth (r−b) 2 to 8, which is why those files read
+         as bronze until somebody sampled them. That is the DOOR's finish, not
+         this fitting's: the same turned pull is POLISHED on all three of the
+         three-panel doors and black on the classical one, because on each it
+         matches the rest of the ironmongery.
+         ⚠ AND inFinish COULD NOT FIX IT, WHICH IS WORTH KNOWING. That helper
+         converts a profile measured on STEEL into another finish, so steel is
+         its identity — feed it a profile measured on BLACK and a steel door
+         gets the black back unchanged. The cure is not a second converter but
+         to stop writing the profile in one finish's numbers at all: the shape
+         below is the same six-step cylinder expressed as indices into
+         FINISH_TONES, so it lands within a couple of values of the measurement
+         on a black door and follows every other finish by construction.
+         Same defect as CLAUDE.md §5 item 8, on a different object. -->
     <linearGradient id="blackRod" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"    stop-color="#171615"/>
-      <stop offset="0.20" stop-color="#4A4744"/>
-      <stop offset="0.34" stop-color="#6E6A65"/>
-      <stop offset="0.55" stop-color="#302E2C"/>
-      <stop offset="0.86" stop-color="#191817"/>
-      <stop offset="1"    stop-color="#3A3835"/>
+      ${[[0, 5], [0.20, 1], [0.34, 0], [0.55, 4], [0.86, 3], [1, 4]]
+        .map(([at, k]) => `<stop offset="${at}" stop-color="${tone[k]}"/>`).join('')}
     </linearGradient>
     <linearGradient id="lampGlow" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.42"/>
@@ -2184,17 +2192,30 @@ export function render(state) {
           sized to a shelf — so it draws itself, and `appliedFrame` is skipped
           rather than asked to place a panel inside it. See CLASSIC_ROWS. */''}
     ${detail.classic
-        ? classicSet(mainX, y0, leafW, leafH, paint, pale, tone)
+        ? classicSet(mainX, y0, leafW, leafH, paint, pale, tone, openings.length > 0)
         : ''}
     ${detail.panel && !detail.classic
         ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
             hasUpperPanel(detail) ? panelRows(detail) : null, 0, 'm',
-            openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null)
+            openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null,
+            panelInset(detail))
+        : ''}
+    ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND IT COMES WITH THE
+          HANDLE. All three photographs of this face carry the same turned pull
+          bolted across that plate — the same fitting the classical set has on
+          its shelf — which is what the plate is for and why it is short. Drawn
+          as part of the FACE, like the set's, so `state.handle` stays free for
+          whatever else the customer wants: `grab: true` on the catalogue entry
+          is the flag, and it is now on two faces rather than one. */''}
+    ${detail.grab && !detail.classic && hasUpperPanel(detail)
+        ? (rows => classicPull(mainX + leafW / 2,
+                               y0 + leafH * (rows[1][0] + rows[1][1]) / 2,
+                               leafW * 0.33, leafH * 0.028, tone))(panelRows(detail))
         : ''}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint, detail.perimeter) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone,
-                                  detail.vertical, hingeOnLeft) : ''}
+                                  detail.vertical, hingeOnLeft, detail.cross) : ''}
   </g>
 
   <!-- ── glazing ──────────────────────────────────────────────── -->
@@ -2639,20 +2660,42 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  * `pair` is measured off d048 and is the classic: a tall upper over a short
  * lower, 0.08 of gap between them, the whole composition running 0.07 to 0.92.
  *
- * `trio` AND `top` ARE DERIVED FROM `pair`, NOT INVENTED BESIDE IT. Asked for
- * from outside as "an option of three panels, its the 2 panels, and another
- * one in the middle" and "an option of only the top panel" — so both keep the
- * pair's envelope and the pair's gap, and only the division changes. The
- * trio's heights run 0.30, 0.23, 0.16: the same tall-to-short fall the pair
- * has, one step longer. Nothing here is a new measurement and it should not
- * become one without a photograph (REALISM.md §6).
+ * ⚠ `trio` IS MEASURED NOW, AND IT IS NOT THE PAIR WITH A PANEL INSERTED.
+ * It used to be derived from `pair` — three rectangles falling 0.30, 0.23,
+ * 0.16, on the reasoning that "three panels" meant the pair plus one more —
+ * and the note here said so and asked that it not become a measurement without
+ * a photograph. Three arrived: a black door installed, the same door as a
+ * catalogue shot, and a white one, all sent in with *"i dont like how the 3
+ * panels look, so there is 3 images of how it needs to look."*
+ *
+ * They are all one composition and it is not three panels at all:
+ *
+ *     a TALL upper panel, 0.375 of the leaf
+ *     a SHORT plate, 0.09 — and the pull bar is bolted across it
+ *     a MEDIUM lower panel, 0.30
+ *
+ * The middle rectangle is a HANDLE PLATE. That is why it is short, why it sits
+ * at hand height rather than at a third of the way down, and why deriving it
+ * from the pair could never have produced it: the pair's proportions are about
+ * how a panelled door is divided, and this one's are about where a hand goes.
+ *
+ * ⚠ AND THE TRIO'S PANELS ARE WIDER. `PANEL_INSET` is 0.23 and measured, but
+ * measured on the one- and two-panel doors; on all three of these photographs
+ * the panels run to about 0.15 of the leaf from each edge. Read off the
+ * catalogue shot, which is the only one of the three square-on: 0.131 and
+ * 0.133. The other two agree to within four hundredths, which is as much as an
+ * angled snapshot can be asked for — so the figure is 0.15 and the honest
+ * error on it is ±0.03, stated here rather than implied by three decimals.
  */
 const PANEL_ROWS = {
   pair: [[0.07, 0.58], [0.66, 0.92]],
-  trio: [[0.07, 0.37], [0.45, 0.68], [0.76, 0.92]],
+  trio: [[0.055, 0.430], [0.455, 0.545], [0.575, 0.875]],
   top:  [[0.07, 0.58]],
   lone: [0.68, 0.90],
 };
+/* How far a panelled face keeps its rectangles from the leaf's edges. One per
+   composition, because they are different products: see the note above. */
+const PANEL_INSETS = { trio: 0.15 };
 
 /**
  * The rows THIS face wants — one statement, read by the drawing, by the
@@ -2668,8 +2711,11 @@ const panelRows = detail =>
   : detail.panels === 2 ? PANEL_ROWS.pair
   : detail.top ? PANEL_ROWS.top
   : [PANEL_ROWS.lone];
+/** And the inset that goes with them — same shape, same three readers. */
+const panelInset = detail =>
+  (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm',
-                      alignTo = null) {
+                      alignTo = null, inset0 = PANEL_INSET) {
   const band = MOULD_BAND;     // the same stock that goes round a pane
   /* THE PANEL LINES UP WITH THE WINDOW ABOVE IT.
      Reported from the outside — "make the size of windows and plates the same
@@ -2679,10 +2725,12 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
      were 0.589 and 0.540, two different widths on one door, which is the same
      defect as the two moulding weights and just as visible.
      So on a glazed leaf the panel takes the opening's own outer edges. On a
-     solid one there is nothing to line up with and PANEL_INSET stands. */
+     solid one there is nothing to line up with and the composition's own inset
+     stands — `inset0`, which is PANEL_INSET for every face but the trio; see
+     the note on PANEL_INSETS. */
   const inset = alignTo != null
     ? Math.max(0, alignTo)
-    : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
+    : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * inset0, clearTo));
   const x = lx + inset, w = lw - inset * 2;
   /* The leaf's own rectangle, carried down to `moulding` so the panel can be
      lit by the same wash as the face around it. `key` keeps the clip-path ids
@@ -2846,7 +2894,7 @@ export const faceObstacles = memo(function faceObstacles(state) {
        outside it. Nothing caught that, because `collide.mjs`'s drift reader
        had no way to see a moulding at all. Both ends of that are fixed
        together or neither is worth fixing. */
-    for (const q of classicPieces(leafW, leafH)) {
+    for (const q of classicPieces(leafW, leafH, openings.length > 0)) {
       out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND });
     }
     return out;
@@ -2861,7 +2909,7 @@ export const faceObstacles = memo(function faceObstacles(state) {
        this, and this is the second description drifting. */
     const inset = openings.length
       ? Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND)
-      : leafW * PANEL_INSET;
+      : leafW * panelInset(detail);
     const winBottom = openings.length ? Math.max(...openings.map(o => o.top + o.h)) : 0;
     /* `hasUpperPanel`, not `panels === 2` — see its docstring in catalog.js.
        The rows themselves come from `panelRows`, which is the one statement of
@@ -3572,7 +3620,44 @@ export function nearestGrip(state, want) {
  * top-left arris, a body, and its own drop shadow onto the paint below-right,
  * because a thing standing proud of a surface has to cast something.
  */
-function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
+function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft, cross = false) {
+  /* ── THE CROSS ───────────────────────────────────────────────────
+     One long vertical member with short horizontals crossing it, grouped in
+     the half of the leaf away from the lock. Four doors carry it — d035, d047,
+     d066, d074 — and the inventory has listed it as MISSING for three rounds.
+     ⚠ ON THREE OF THE FOUR THE VERTICAL IS THE PULL BAR, not a strip. d035 is
+     the clearest: two horizontals at 0.426 and 0.609 of the leaf running very
+     nearly its full width, and the only vertical thing they cross is the
+     handle. So this option draws the version that does NOT depend on the
+     hardware — d047's, where the vertical is a strip of its own — and a
+     customer who wants d035's gets it by putting a bar on a striped door,
+     which the drawing already allows.
+     Ruler-read off d047: the vertical at 0.309 of the leaf's width from the
+     hinge side, 0.155 to 0.864 of its height; the horizontals in TWO PAIRS at
+     0.420/0.448 and 0.578/0.606, each running 0.167 to 0.556. The pairing is
+     the character of it — evenly spaced they read as a ladder. */
+  if (cross) {
+    const tv = Math.max(8, Math.round(lw * 0.018));
+    const th = Math.max(6, Math.round(lh * 0.007));
+    const X = f => lx + lw * (hingeOnLeft ? f : 1 - f);
+    const vx = Math.round(X(0.309)) - tv / 2;
+    const bar = (x, y, w, h, lit) => `
+      <rect x="${(x + 3).toFixed(1)}" y="${(y + 3).toFixed(1)}" width="${w.toFixed(1)}"
+            height="${h.toFixed(1)}" fill="#000" opacity="0.22"/>
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
+            height="${h.toFixed(1)}" fill="${tone[2]}"/>
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}"
+            width="${(lit === 'v' ? Math.max(2, w * 0.34) : w).toFixed(1)}"
+            height="${(lit === 'v' ? h : Math.max(2, h * 0.34)).toFixed(1)}"
+            fill="${tone[0]}"/>`;
+    const out = [bar(vx, ly + lh * 0.155, tv, lh * (0.864 - 0.155), 'v')];
+    for (const y of [0.420, 0.448, 0.578, 0.606]) {
+      const a = X(0.167), b = X(0.556);
+      out.push(bar(Math.min(a, b), ly + lh * y, Math.abs(b - a), th, 'h'));
+    }
+    return `<g data-detail="strips" data-count="5" data-axis="cross">${out.join('')}</g>`;
+  }
+
   /* ── the other axis ──────────────────────────────────────────────
      Five doors run the strips UP the leaf, not across it: d034 d037 d038 d040
      d043. Fewer of them and longer, grouped in the half of the leaf away from
@@ -5166,12 +5251,13 @@ export const CLASSIC_BAND_FOOT = 9;
  * 0.790, and a pull bar put through a corbel is through a corbel. An obstacle
  * is what is ON the door, not what the joinery drawing calls one piece.
  */
-export function classicPieces(leafW, leafH) {
+export function classicPieces(leafW, leafH, glazed = true) {
   const R = CLASSIC_ROWS, C = CLASSIC_COLS;
   const of = (row, x0, x1) => ({
     x: leafW * x0, y: leafH * R[row][0],
     w: leafW * (x1 - x0), h: leafH * (R[row][1] - R[row][0]),
   });
+  const G = CLASSIC_GLASS;
   return [
     { piece: 'cornice', kind: 'moulding', ...of('cornice', ...C.cornice) },
     { piece: 'frieze',  kind: 'moulding', ...of('frieze',  ...C.frieze)  },
@@ -5180,6 +5266,27 @@ export function classicPieces(leafW, leafH) {
     { piece: 'panel',   kind: 'panel',    ...of('panel',   ...C.panel)   },
     { piece: 'plinth',  kind: 'moulding', ...of('plinth',  ...C.plinth)  },
     { piece: 'foot',    kind: 'moulding', ...of('foot',    ...C.plinth)  },
+    /* ⚠ AND A PANEL WHERE THE LIGHT WOULD BE, WHEN THERE IS NO LIGHT. The set
+       was built round a window and `needsWindow` forced one; a photograph of
+       the same set SOLID — cornice, frieze, a big raised panel with a peephole
+       and a ring knocker, shelf, panel, plinth — says that is one variant of
+       two, not the product. It takes the light's own rectangle so the two
+       variants are the same composition with the glass swapped for timber,
+       which is what the door shows.
+       It is a `moulding` piece and not a `panel` one, deliberately: the price
+       charges for the SET, and the set's own composition is not a second panel
+       the customer bought. The lower panel is still the one thing tagged
+       `data-detail="panel"`, and still the one thing the price is about. */
+    ...(glazed ? [] : [{ piece: 'light', kind: 'moulding',
+      /* ⚠ THE PANEL'S COLUMNS, NOT THE GLASS'S. On the solid door the upper
+         rectangle and the lower one are the same width — 250 to 545 and 245 to
+         550 of the same photograph — where the LIGHT on the glazed one is much
+         narrower than either. Sized to the glass it came out as a tall slot
+         with a wide margin either side, which is a window drawn in timber
+         rather than a panel. The rows stay the light's, so the two variants
+         are the same composition with the glass swapped for timber. */
+      x: leafW * C.panel[0], y: leafH * G.top,
+      w: leafW * (C.panel[1] - C.panel[0]), h: leafH * (G.bot - G.top) }]),
   ];
 }
 
@@ -5494,7 +5601,7 @@ function classicBand(x, y, w, h, paint, pale, leaf, key, ends, middle) {
    place itself around whatever glazing it finds — it OWNS the opening, through
    `detail.winRect`, so the rows below already know where the glass is. It was
    taking one and never reading it. */
-function classicSet(lx, ly, lw, lh, paint, pale, tone) {
+function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
   const n = v => Number(v.toFixed(1));
   const R = CLASSIC_ROWS, C = CLASSIC_COLS;
   const Y = f => ly + lh * f;
@@ -5509,7 +5616,7 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone) {
      the block's own face, the cap's corona and hollow — so the drift reader
      measures ink rather than a claim, and the shadows and the brackets stay
      inside the group where the sweep can still see them. */
-  const P = Object.fromEntries(classicPieces(lw, lh).map(q => [q.piece, q]));
+  const P = Object.fromEntries(classicPieces(lw, lh, glazed).map(q => [q.piece, q]));
   const piece = (name, art) =>
     out.push(`<g data-detail="moulding" data-piece="${name}">${art}</g>`);
 
@@ -5549,6 +5656,11 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone) {
      alone, which is what makes the shelf read as a shelf. */
   const at = q => [lx + q.x, ly + q.y, q.w, q.h];
   piece('frieze', block(...at(P.frieze)) + inBand(...at(P.frieze), 'cfb', 'flute', 'oval'));
+  /* ⚠ AND WHERE THE LIGHT WOULD BE, A PANEL — when the customer has not asked
+     for glass. The set is the same composition either way; only the material
+     in that rectangle changes. Drawn before the cornice so the head's shadow
+     falls on it. */
+  if (!glazed) piece('light', moulding(...at(P.light), MOULD_BAND, paint, pale, leaf, 'clt'));
   piece('cornice',
     beadRun(X(C.cornice[0]) + lw * 0.036, Y((R.beads[0] + R.beads[1]) / 2),
             (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072, beadR, paint)
@@ -7401,7 +7513,17 @@ export function detailGlyph(detail) {
      one edge with free ends following the measured rhythm. */
   const n = detail.strips || 0;
   const RHYTHM = [0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91];
-  const strips = detail.vertical
+  /* ⚠ THE CROSS NEEDS ITS OWN TILE. Sent through the horizontal branch it
+     draws five bands and is then indistinguishable from חמישה פסים — two
+     names, two prices, one picture, which is the defect `every option tile
+     draws its own picture` exists to catch. Same fractions the door uses. */
+  const strips = detail.cross
+    ? [`<rect x="${W * 0.309 - 11}" y="${H * 0.155}" width="22"
+              height="${H * (0.864 - 0.155)}" fill="currentColor"/>`,
+       ...[0.420, 0.448, 0.578, 0.606].map(y =>
+         `<rect x="${W * 0.167}" y="${H * y - 9}" width="${W * (0.556 - 0.167)}"
+                height="18" fill="currentColor"/>`)].join('')
+    : detail.vertical
     ? Array.from({ length: n }, (_, i) => {
         const x = W * (0.10 + (n > 1 ? (i * 0.34) / (n - 1) : 0.17));
         const top = H * (0.05 + 0.34 * (n > 1 ? i / (n - 1) : 0.5));

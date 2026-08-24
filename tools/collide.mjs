@@ -352,7 +352,17 @@ const drift = await p.evaluate(rows => {
        what is measured here is ink and not a claim. */
     for (const el of svg.querySelectorAll('[data-detail="moulding"]')) {
       let a = Infinity, z = -Infinity, t = Infinity, u = -Infinity;
-      for (const f of el.querySelectorAll('[data-face]')) {
+      /* ⚠ TWO WAYS A PIECE DEFINES ITSELF, because the set has two kinds of
+         piece. The blocks and the caps mark their own face with `data-face`.
+         The panel that stands where the light goes on a SOLID set is drawn by
+         `moulding()` — the same measured section every panel in the range
+         uses — and its ink is the four mitred `mould-*` runs, which is what
+         the panel reader below measures too. Neither is a claim; both are the
+         shapes that are actually on the door. */
+      const faces = el.querySelectorAll('[data-face]');
+      const marks = faces.length ? faces
+        : el.querySelectorAll('path[fill^="url(#mould-"]');
+      for (const f of marks) {
         const b = f.getBBox();
         a = Math.min(a, b.x); z = Math.max(z, b.x + b.width);
         t = Math.min(t, b.y); u = Math.max(u, b.y + b.height);

@@ -1002,6 +1002,61 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **Three photographs of the three-panel face, two of the classical set, and a
+  standing instruction to look at the striped doors.** Sent in as *"i dont like
+  how the 3 panels look, so there is 3 images of how it needs to look… also
+  here is another 2 doors with the set that you copied… also look at doors with
+  stripes and add those varients to that category."*
+  - **⚠ THE THREE-PANEL FACE IS NOT THREE PANELS.** `trio` was DERIVED from
+    `pair` — three rectangles falling 0.30, 0.23, 0.16 — and the note beside it
+    said so and asked that it not become a measurement without a photograph.
+    Three arrived, and they are all one composition: a tall upper panel, a
+    SHORT plate at 0.09 of the leaf, and a medium lower one. **The middle
+    rectangle is a handle plate**, with the turned pull bolted across it. That
+    is why it is short, why it sits at hand height rather than a third of the
+    way down, and why deriving it from the pair could never have produced it —
+    the pair's proportions are about how a door is divided and this one's are
+    about where a hand goes. `grab: true` is on two faces now instead of one.
+    The panels are wider too: 0.15 of the leaf from each edge against
+    `PANEL_INSET`'s 0.23, which is measured but measured on the one- and
+    two-panel doors. `panelInset` is the second half of `panelRows` and has the
+    same three readers.
+  - **The turned pull follows the door's finish.** Its six stops were absolute
+    hexes measured off `research/newdoor/`, whose every fitting is black — and
+    the same pull is POLISHED on all three of the three-panel doors. ⚠ AND
+    `inFinish` COULD NOT FIX IT: that helper converts a profile measured on
+    STEEL, so steel is its identity, and a profile measured on BLACK comes back
+    unchanged on a steel door. The cure was not a second converter but to stop
+    writing the profile in any one finish's numbers — the rod is six indices
+    into `FINISH_TONES` now, landing within a couple of values of the
+    measurement on a black door and following every other finish by
+    construction. CLAUDE.md §5 item 8 a second time, on a different object.
+  - **The classical set is built solid as well as glazed.** `needsWindow` forced
+    the rectangle; a photograph of the same set with a raised panel where the
+    glass goes — every other piece identical — says that is one variant of two.
+    `rectOnly` replaces it: the set still refuses the צוהר אנכי, because it
+    substitutes its own rectangle for whatever the window option would have
+    drawn and a substitution nobody can see is the same bug as a price for a
+    panel that is not drawn. The solid panel takes the LOWER panel's columns,
+    not the glass's — on the photograph the two rectangles are the same width
+    where the light is much narrower than either.
+  - **`stripsx` — the cross, MISSING in the inventory for three rounds.** Four
+    of the corpus's fifteen striped doors carry it, the largest stripe pattern
+    we could not draw. ⚠ On three of the four the vertical member is the PULL
+    BAR and not a strip at all — d035 is two horizontals and a handle — so the
+    option draws d047's version, where the vertical is a strip of its own, and
+    a customer who wants d035's puts a bar on a striped door. Ruler-read off
+    d047: the vertical at 0.309 of the leaf from the hinge side, 0.155 to
+    0.864; the horizontals in TWO PAIRS at 0.420/0.448 and 0.578/0.606. The
+    pairing is the character of it — evenly spaced they read as a ladder.
+  - **`collide.mjs`'s moulding reader learned the set's second kind of piece.**
+    The blocks and caps mark their own face with `data-face`; the panel that
+    stands where the light goes on a solid set is drawn by `moulding()` and its
+    ink is the four mitred runs. Both are shapes actually on the door, neither
+    is a claim, and `-- all` is clean over 1,358 designs.
+  - **`research/works/INVENTORY.md` was three rounds stale** and said MISSING
+    for the vertical strips, the staggered ones, the cross and the whole
+    classical composition. All four are drawn; the table says so now.
 - **`npm run collide -- all` is clean for the first time, and getting there
   found a real fault the instrument could not previously see.** The recurring
   agent diagnosed the red in run 29 and left the fix to whoever owned the

@@ -120,12 +120,12 @@ Six doors, and on every one it is the most prominent thing about the door.
 | pattern | doors | verdict |
 |---|---|---|
 | Applied metal strips, **horizontal** | d039 d044 d045 d064 d066 d073 d074 d081 d086 d036 | **have** — `strips` (11) and `strips3` (3) |
-| Applied metal strips, **vertical** | d034 d037 d038 d040 d043 | **MISSING**. I had this the wrong way round on the first pass and asserted we drew vertical only; `metalStrips()` draws horizontal, which a render confirms (697 × 16 rects). It is the vertical run we cannot draw |
-| **Cross composition** — one long vertical crossed by horizontals | d035 d047 d066 d074 | **MISSING** as a pattern; three of the four also use the pull bar as the vertical member |
-| **Staggered strips** — different lengths, offset | d043 d044 d045 | **MISSING** |
+| Applied metal strips, **vertical** | d034 d037 d038 d040 d043 | **have** — `stripsv` (4) and `stripsv6` (6). It was MISSING when this table was written, and the note then said so twice over: I had the axis the wrong way round on the first pass and asserted we drew vertical only, when `metalStrips()` drew horizontal |
+| **Cross composition** — one long vertical crossed by horizontals | d035 d047 d066 d074 | **have** — `stripsx`, ruler-read off d047. ⚠ On three of the four the vertical member is the PULL BAR, not a strip; the option draws d047's version, where it is a strip of its own, and a customer who wants d035's puts a bar on a striped door |
+| **Staggered strips** — different lengths, offset | d043 d044 d045 | **have** — the fan is in `metalStrips` for both axes: the horizontals follow a measured rhythm of lengths and the verticals climb from a common foot |
 | Moulded panel, one | d042 d053 d058 d061 d069 d071 | **have** — `panel` |
 | Moulded panels, two | d048 d051 d065 d067 d077 d087 d103 | **have** — `panel2` |
-| **Full classical composition** — cornice over the light, pilasters, plinth | d080 d103 d112 d129 d076 | **MISSING**, as recorded in CLAUDE.md §9 |
+| **Full classical composition** — cornice over the light, pilasters, plinth | d080 d103 d112 d129 d076 | **have** — `classic`, built from `research/newdoor/` and checked against d101 d103 d112 d129. Glazed or solid: a photograph of the same set with a raised panel where the glass goes settled that it is one product in two variants |
 | **Arched raised panel** | d071 | **MISSING** |
 
 **Finding: the strips run both ways** — ten doors horizontal, five vertical —

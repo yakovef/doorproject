@@ -182,17 +182,24 @@ export function conflicts(state) {
     }
   }
 
-  /* The classical set and its own light — the other half of the repair above.
-     Reported from both sides, because the customer may have picked either
-     first: every window that is not the rectangle is refused while the set is
-     on, and the set is refused while the window is not the rectangle. */
+  /* The classical set and its own light — the other half of the repair below.
+     ⚠ IT NO LONGER NEEDS A WINDOW, IT ONLY REFUSES THE WRONG ONE. `needsWindow`
+     forced the rectangle, and a photograph of the same set built SOLID — the
+     glass swapped for a raised panel with a peephole and a ring knocker, every
+     other piece identical — says that is one of two variants and not a fault.
+     What the set genuinely cannot take is the צוהר אנכי: it substitutes its own
+     356 x 819 rectangle for whatever the window option would have drawn, so
+     choosing the slot would put a rectangle on the door while the tile, the
+     price and the order all said a slot. `rectOnly`, not `needsWindow`, and
+     reported from both sides because the customer may have picked either
+     first. */
   for (const d of DETAILS) {
-    if (d.needsWindow && state.window !== 'rect') {
-      out.detail[d.id] = out.detail[d.id] || 'הסט הקלאסי דורש חלון מלבני';
+    if (d.rectOnly && state.window !== 'rect' && state.window !== 'none') {
+      out.detail[d.id] = out.detail[d.id] || 'הסט הקלאסי לא משתלב עם צוהר אנכי';
     }
   }
-  if (byId(DETAILS, state.detail).needsWindow) {
-    for (const w of WINDOWS) if (w.id !== 'rect') {
+  if (byId(DETAILS, state.detail).rectOnly) {
+    for (const w of WINDOWS) if (w.id !== 'rect' && w.id !== 'none') {
       out.window[w.id] = out.window[w.id] || 'הסט הקלאסי מגיע עם חלון מלבני משלו';
     }
   }
@@ -418,7 +425,7 @@ const SAID = {
   gripMoved:     'הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה',
   gripHome:      'הידית הוסרה, ואיתה המיקום שבחרתם לה',
   setWindow:     'התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו',
-  setGone:       'הסרנו את הסט הקלאסי — הוא דורש חלון מלבני',
+  setGone:       'הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי',
 };
 
 /**
@@ -464,11 +471,12 @@ export function repair(state, intent = null) {
      choosing the set with the צוהר אנכי would have quietly drawn a rectangle
      while the tile, the price and the order all said a slot. A substitution
      nobody can see is the same bug as a price for a panel that is not drawn.
-     So the pairing is repaired rather than allowed: the set implies the
-     rectangle, and asking for a different opening puts the face back to
-     plain. Keyed off `needsWindow` rather than the id, so a second set added
-     later is covered without anybody remembering to come back here. */
-  if (byId(DETAILS, s.detail).needsWindow && s.window !== 'rect') {
+     ⚠ BUT `none` IS FINE, and it used to be forced to the rectangle. The set
+     is built solid as well as glazed — same cornice, same frieze, same shelf,
+     a raised panel where the glass goes — so the only pairing to repair is the
+     slot. Keyed off `rectOnly` rather than the id, so a second set added later
+     is covered without anybody remembering to come back here. */
+  if (byId(DETAILS, s.detail).rectOnly && s.window !== 'rect' && s.window !== 'none') {
     if (intent === 'window') { s.detail = 'plain'; change('detail', SAID.setGone); }
     else { s.window = 'rect'; change('window', SAID.setWindow); }
   }

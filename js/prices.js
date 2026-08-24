@@ -149,6 +149,7 @@ export const DETAIL = {
   strips:    640,    // אחד עשר פסים
   stripsv:   440,    // פסים אנכיים     — four bands
   stripsv6:  540,    // שישה פסים אנכיים
+  stripsx:   460,    // פס אנכי חוצה    — one long member and four short ones
   /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
      and plinth, all as one. Priced well above a single panel because it is
      six applied pieces and a fitting, not one. ⚠ A guess like every figure in
