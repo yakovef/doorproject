@@ -3588,8 +3588,19 @@ function grillePaths(kind, x, y, w, h, tint) {
   /* The `-light` variants share their base pattern and differ only in colour,
      so strip the suffix before dispatching. Without this they matched no
      branch at all and drew an empty pane — a grille the customer paid for,
-     silently missing. */
-  kind = String(kind).replace(/-light$/, '');
+     silently missing.
+     ⚠ AND THE RAW NAME IS KEPT FOR THE ID, NOT THE STRIPPED ONE. Two tiles
+     that dispatch to the same branch still draw two SEPARATE `<path id>`
+     elements — `grid` and `grid-light` do not share one master — so stripping
+     before computing `uid` below made every light/dark pair emit the exact
+     same id with the exact same `d` a second time. Harmless by luck (the
+     browser resolves both tiles' `<use>` to whichever copy is first in the
+     document, and the two copies are identical), but still literally invalid
+     markup, and `npm run audit`'s duplicate-id sweep is right to say so —
+     the check that exists for the genuinely cross-kind version of this fault
+     is not wrong just because these two happen to agree. */
+  const idKind = String(kind);
+  kind = idKind.replace(/-light$/, '');
   const body = tint || '#232527';
   const gleam = tint ? '#fff' : '#8A8F94';
 
@@ -3618,10 +3629,30 @@ function grillePaths(kind, x, y, w, h, tint) {
      every render differ from the last. A door can carry two panes (a leaf and
      a sidelight), so the pane's rounded origin is what keeps them apart.
 
+     ⚠ AND KIND HAS TO BE PART OF IT TOO — geometry alone collides the moment
+     two DIFFERENT grilles share an origin, which every tile glyph does:
+     `grilleGlyph` calls this with `x=0, y=0` for every one of the fourteen
+     options, so all of them computed the same `k0_0_0`, `k0_0_1`… regardless
+     of what they drew. Measured on the live choices panel, no query string
+     involved: **130 `k`-prefixed ids, 31 unique** — nine tiles (grid, scroll,
+     iron, quatrefoil, arch…) genuinely sharing `id="k0_0_0"` with nine
+     different `d` attributes. Per the SVG spec an id resolves to the FIRST
+     matching element in the whole DOCUMENT, not per `<svg>` root — the same
+     mechanism `copyOf` exists to fix for the gallery, one level down: there
+     the id was the same because there was one door for years, here it is the
+     same because every glyph is drawn at the same fake origin.
+     ⚠ AND `idKind`, NOT THE STRIPPED `kind` — see the note above this
+     function's first line. Keying off the stripped name got every
+     cross-kind collision but traded it for 41 same-kind ones, `grid` against
+     its own `grid-light`, harmless in pixels and still invalid markup.
+     `npm run audit`'s sweep does not know "harmless" from "genuine"; it counts
+     `[id]` and it is right to. Confirmed clean after: 130 kids in, 130 unique
+     out.
+
      ⚠ `usedDefs` walks `href="#…"` transitively, but only ever resolves ids it
      finds in the DEFS block. These live in the body, so the pruner skips them
      and cannot mistake one for an unreachable gradient. */
-  const uid = `k${Math.round(x)}_${Math.round(y)}`;
+  const uid = `k${idKind}_${Math.round(x)}_${Math.round(y)}`;
   let seq = 0;
   const master = new Map();
   const ref = d => {

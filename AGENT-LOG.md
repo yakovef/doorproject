@@ -23,6 +23,78 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-24 07:17 UTC — run 27: fourteen grille tiles shared one id apiece, and the pixels hid it
+
+**Looked at:** two new human commits since run 26 — `29e5c0b` (a six-lens
+review of the previous round, gallery id-collision fixes, a trust-band CSS
+bug, plus 14+ smaller findings) and `1bef09e` (CLAUDE.md rewritten with §0a
+orientation and §0c "where it stands today"). Fast-forwarded cleanly, no
+conflicts. Built, opened the site in Chromium at 390×844 and 1440×900,
+clicked through all four sections. Container was healthy this run —
+`npm run sheets` completed on the first try.
+
+**Instruments:** test ✓ (5,676,741) · audit ✓ (no faults, was 2) · profile ✓ ·
+collide ✓ (`all` / `boxes`) · recreate ✓ · latency ✓ (80/164/410 ms against a
+600 ms gate). All green before pushing.
+
+**Changed:** two faults in `tools/collide.mjs`'s sibling instrument this
+round were in the drawing itself, both surfaced by `npm run audit`'s
+order-sheet checks.
+
+**1. `npm run audit` found `99 duplicated id(s)` on `?sheet=1`, and the cause
+was not the sheet.** Traced it to `grilleGlyph()`, which draws every option's
+tile preview at a fake origin — `grillePaths(grille.id, 0, 0, S, S, …)` — and
+the ironwork id generator only keyed off `x, y`. Every tile therefore computed
+the same sequence, `k0_0_0`, `k0_0_1`… Measured directly on the plain live
+page, no sheet or query string involved:
+
+    130 `k`-prefixed ids, 31 unique — nine tiles (grid, scroll, iron,
+    quatrefoil, arch…) genuinely sharing id="k0_0_0" with nine DIFFERENT `d`
+    attributes.
+
+Per the SVG spec an id resolves to the first matching element in the whole
+document, not per `<svg>` root — the exact mechanism `copyOf` exists to fix
+for the gallery, landed one commit earlier in the same round I pulled. Same
+disease, CLAUDE.md §5 in a third costume: an id computed in one place
+(geometry) and consumed in another (every `<use href>` in the document), never
+asked to be unique because for years each glyph was the only reader of it.
+
+**And it painted correctly anyway**, which is why nothing had caught it before
+the audit's duplicate-id sweep. Isolated before/after screenshots of the
+choices panel with every other change held constant: **0 px differ.** The
+browser's first-match-wins resolution happened to land on a shape close enough
+that nine colliding curls did not visibly break the tile — the markup was
+invalid the whole time and the picture never said so. Fixed by keying `uid`
+off the grille's own id as well as its geometry. A `-light` variant shares its
+base pattern's `d`, and keying off the STRIPPED name (my first attempt)
+recreated the fault at 41 remaining same-kind collisions, harmless in pixels
+and still invalid; keying off the raw name gives `-light` its own copy. 130
+kids in, 130 unique out, confirmed by direct DOM query.
+
+**2. The order sheet also carried two `<h1>`.** `.is-sheet .layout {
+display: none }` hides the base page's heading visually, but `display: none`
+does not remove an element from the DOM — a document meant to be navigated by
+its headings had one hidden `<h1 id="stage-h">` sitting beside
+`buildSheet()`'s own `<h1 class="sheet__brand">`. `.layout` is now actually
+removed from the DOM in sheet mode rather than only CSS-hidden; nothing past
+that point in `?sheet=1` reads it.
+
+Verified the fixed sheet in the browser: one heading, the ironwork drawn
+correctly on both leaf and sidelight panes, dimensions, price, and the
+handing spelled out (ציר בצד שמאל, צילינדר בצד ימין — במבט מבחוץ).
+
+**Left alone deliberately:** everything else the six-lens review already
+covered — I did not re-verify their 29 confirmed findings, only pulled the
+result. The three catalogue gaps `npm run recreate` reports (d106, d113, d122
+— hardware finish, withdrawn axis) are unchanged and are Peretz's call. Also
+corrected CLAUDE.md §0c, which had "npm test reports 4 failures" written down
+as a standing fact — it is a fact about a degraded container, not about the
+repository, and this run's container was healthy.
+
+**Commit:** see below.
+
+---
+
 ## 2026-08-24 01:06 UTC — run 26: the branch was red, and `collide -- boxes` was printing a ✗ it then threw away
 
 **Looked at:** five human commits since run 25. `npm test` came up **4 failed**

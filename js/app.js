@@ -340,6 +340,21 @@ function init() {
      to anything, so rebuilding it on every change would be work for a page
      nobody is clicking. */
   if (document.documentElement.classList.contains('is-sheet')) {
+    /* ⚠ REMOVED, NOT HIDDEN. `.is-sheet .layout { display: none }` already
+       makes the configurator invisible and inert on the printed page, but
+       `display: none` leaves the element — and everything inside it —
+       sitting in the DOM. `.layout` carries the page's OTHER heading,
+       `<h1 class="stage__h1" id="stage-h">`, so a shared sheet URL had two
+       `<h1>` elements: one hidden, one printed. A document meant to be
+       navigated by its headings cannot have a hidden one competing with the
+       real one, and `npm run audit` counts `document.querySelectorAll('h1')`
+       without asking whether either is visible — rightly, since a hidden
+       heading is still there for anything that reads markup rather than
+       paint (a screen reader with CSS disabled, a "save as" copy). Nothing
+       past this point reads `.layout` in sheet mode: `paint()` above already
+       built it once and nothing rebuilds it, since the sheet does not
+       respond to clicks. */
+    $('.layout')?.remove();
     buildSheet();
     /* ⚠ AND THE NOTICE FOLLOWS IT ONTO THE PAGE. The sheet hides `.strip`, so
        a link the rules had to repair — a retired colour, an impossible

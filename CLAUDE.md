@@ -138,24 +138,30 @@ written rather than rewritten, but do not add more.
 
 ### Green
 
-- `npm test` — **5,676,740 assertions passing**, no framework, plain node.
-- `npm run collide` — clean over 1,490 buildable designs, real `getBBox`
+- `npm test` — **5,676,741 assertions passing**, no framework, plain node.
+- `npm run audit`, `npm run collide` (`all` / `boxes`), `npm run profile`,
+  `npm run recreate`, `npm run latency` — all clean. `npm run sheets`
+  completed and all four screenshot families are current.
+- `npm run collide` — clean over 1,568 buildable designs, real `getBBox`
   geometry from a browser.
-- `npm run latency` — 66 ms on the default door, 142 ms on a sidelight with
-  ironwork, at 6× CPU throttle on a 390×844 phone, against a 600 ms gate.
+- `npm run latency` — 80 ms on the default door, 164 ms on a sidelight with
+  ironwork, 410 ms on the heaviest buildable door, at 6× CPU throttle on a
+  390×844 phone, against a 600 ms gate.
 - The drawing recreates all 30 measured doors; the order carries the full
   specification, a picture, an unambiguous opening direction, a price and a
   code.
 
-### Red, and known
-
-- **`npm test` reports 4 failures: the four screenshot families are stale.**
-  They are correct — the page changed and the committed pictures were made from
-  an older one. See §7 for why they cannot always be regenerated, and
-  `AGENT.md` for the one circumstance in which pushing with them red is right.
-  **Never silence them.**
-- **`npm run audit` and `npm run sheets` cannot run in a degraded container.**
-  §7 again.
+⚠ **The "Red, and known" section that used to sit here was itself going
+stale.** It said `npm test` reports 4 failures and `npm run audit` /
+`npm run sheets` cannot run, as a standing fact about the container. That was
+true when it was written and is not a property of this repository — it is a
+property of whichever container happens to be running it, and it recovers the
+moment a healthy one runs `npm run sheets`. Two runs since have found a clean
+container and gone fully green (24.8.2026, runs 26 and 27 in `AGENT-LOG.md`).
+Treat container health as something to CHECK each run, not something to
+assume from this file — see `AGENT.md`'s note on the one circumstance in which
+pushing with those four red is right, which still stands for the day this
+degrades again.
 
 ### Blocked on a human
 
@@ -790,6 +796,46 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **Fourteen grille tiles collided on their own ids, and it was invisible
+  because the pixels came out right by luck.** `grilleGlyph` draws every
+  option's preview at a fake origin, `grillePaths(grille.id, 0, 0, S, S, …)`,
+  and the ironwork id generator only keyed off `x, y` — so all of them
+  produced the same sequence, `k0_0_0`, `k0_0_1`… Measured on the live choices
+  panel, no query string involved: **130 `k`-prefixed ids, 31 unique**, nine
+  tiles (grid, scroll, iron, quatrefoil, arch…) genuinely sharing
+  `id="k0_0_0"` with nine different `d` attributes. Per the SVG spec an id
+  resolves to the FIRST matching element in the whole document, not per `<svg>`
+  root — the same mechanism `copyOf` exists to fix for the gallery, one commit
+  earlier in the same round, and CLAUDE.md §5 by name: an id computed in one
+  place and consumed in another, never asked to be unique per document because
+  for years each glyph was the only thing on the page reading it.
+  ⚠ **And it painted correctly anyway, which is why nothing had ever caught
+  it.** Isolated before/after screenshots of the choices panel, with every
+  other change held constant: **0 px differ.** The browser's first-match-wins
+  behaviour happened to land on a `<path>` whichever tile drew first, and nine
+  colliding shapes did not visibly break because most of a grille's outline
+  survives on the other, non-colliding ids — the markup was invalid the whole
+  time and the picture never told anyone. `npm run audit`'s duplicate-id sweep
+  — added for the gallery — caught it on the order sheet as **99 duplicated
+  id(s)**, which is exactly `130 total − 31 unique`: not a sheet-specific
+  fault, the same live bug reached through a different door.
+  `uid` now keys off the grille's own id too. A `-light` variant still shares
+  its base pattern's `d`, and keeping the stripped name there recreated the
+  same fault at 41 remaining collisions — so the id uses the RAW name and
+  `-light` gets its own (byte-duplicate but valid) copy. 130 kids in, 130
+  unique out.
+  ⚠ **And the order sheet had a second, unrelated defect the same audit run
+  caught: two `<h1>`.** `.is-sheet .layout { display: none }` hides the base
+  page's heading visually, but `display: none` does not remove an element from
+  the DOM — so a printed document meant to be navigated by its headings
+  carried one hidden `<h1 id="stage-h">` competing with `buildSheet`'s own
+  `<h1 class="sheet__brand">`. `.layout` is now actually removed from the DOM
+  in sheet mode, not just hidden — nothing past that point in `?sheet=1` reads
+  it, since the sheet does not respond to clicks and never rebuilds.
+  Both verified with a full instrument pass: test ✓ 5,676,741 · audit ✓ (no
+  faults, was 2) · profile ✓ · collide ✓ (`all` / `boxes`) · recreate ✓ ·
+  latency ✓ · sheets regenerated clean. No id, price, code or `VERSION` moved.
 
 - **This file was rewritten for a fresh reader, and `ROUND5.md` was deleted.**
   The change log had grown to 74% of CLAUDE.md and sat ABOVE everything a new

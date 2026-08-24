@@ -2814,13 +2814,14 @@ ${body}
     </g>`;
   }
   function grillePaths(kind, x, y, w, h, tint) {
-    kind = String(kind).replace(/-light$/, "");
+    const idKind = String(kind);
+    kind = idKind.replace(/-light$/, "");
     const body = tint || "#232527";
     const gleam = tint ? "#fff" : "#8A8F94";
     const U = (f) => x + w * f;
     const V = (f) => y + h * f;
     const n2 = (v) => v.toFixed(1);
-    const uid = `k${Math.round(x)}_${Math.round(y)}`;
+    const uid = `k${idKind}_${Math.round(x)}_${Math.round(y)}`;
     let seq = 0;
     const master = /* @__PURE__ */ new Map();
     const ref = (d) => {
@@ -4757,6 +4758,7 @@ ${body}
     }
     paint();
     if (document.documentElement.classList.contains("is-sheet")) {
+      $(".layout")?.remove();
       buildSheet();
       const strip = $("#notice"), slot = $("#sheet-notice");
       if (slot && strip && !strip.hidden && strip.textContent.trim()) {
