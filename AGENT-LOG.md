@@ -102,7 +102,7 @@ per the section's own established pattern (kept, not deleted, because the
 diagnosis is the useful part) and moved into Green. Test count refreshed to
 5,158,800 throughout.
 
-**Commit:** see below.
+**Commit:** `268b5bf`
 
 ---
 
