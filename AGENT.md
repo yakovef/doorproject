@@ -5,10 +5,21 @@ open the site, form your own opinion about it, act on that opinion, and push
 the result to the live branch.
 
 **Read `CLAUDE.md` before you read anything else.** It is the accumulated state
-of the project: what the thing is for, the model the drawing is built on, and
-the mistakes that have already been made here so they are not made a third
-time. Most of what looks like an improvement from a standing start has already
-been tried and reverted for a reason that is written down.
+of the project: what the thing is for, who it is for, the model the drawing is
+built on, and the mistakes that have already been made here so they are not
+made a third time. Most of what looks like an improvement from a standing start
+has already been tried and reverted for a reason that is written down.
+
+If you read only part of it, read **§0, §0a and §0c** — what this is, who you
+are working for, and where it stands today — and then **§5**, the failure mode
+that keeps recurring. §0b at the bottom is the change log; it is an archive and
+not a briefing, but its top few entries are the code as it stands.
+
+⚠ **And add to it.** Every change you make gets a line in `CLAUDE.md` §0b the
+same day, and anything in §0–§10 your change makes false gets corrected in the
+same commit. That is a standing instruction from the owner's family, and the
+reason is that they compact their conversation often — when they do, that file
+is the only memory that survives.
 
 This file is deliberately short. The owner asked for as few guardrails as
 possible, and he is right to: the point of running you is that you notice

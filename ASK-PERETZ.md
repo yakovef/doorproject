@@ -549,6 +549,29 @@ five-second answers and none of them blocks launch.*
 
 ---
 
+## 12. לפי איזו מידה אתה מזמין? ⚠ חוסם את דף ההזמנה
+
+*Not a launch blocker — the sheet simply prints less until this is answered.*
+
+דף ההזמנה (`index.html?sheet=1`) מדפיס מידות. השאלה היא איזה מספר אתה באמת
+צריך לראות שם, כי לנו יש שניים והם לא מסכימים:
+
+- **`SIZES` בקטלוג** אומר `950 × 2100` לדלת סטנדרטית. זה **הפתח**, לא הכנף —
+  הכנף יוצאת `850 × 2050` אחרי שקע המשקוף.
+- **לדלת עם חלון צד** יש אצלנו `950` כנף ועוד `400` חלון צד. אם זה שני פתחים
+  נפרדים הסכום הוא `1350`. אבל הציור מצייר **פתח אחד** שמכיל את שניהם עם מזוזה
+  של `22` מ״מ ביניהם, ואחרי השקעים זה יוצא `1322`. הפרש של 28 מ״מ.
+
+בינתיים הדף מדפיס רק את מה שכתוב בקטלוג — `950 × 2100` ואת חלון הצד בשורה
+נפרדת — ולא מחבר שום דבר. סכום שאף אחד לא אישר, על דף שמזמינים לפיו, הוא בדיוק
+הדבר שאסור לנו להמציא.
+
+**שתי שאלות קטנות:**
+1. אתה מזמין לפי הפתח או לפי הכנף?
+2. דלת עם חלון צד / דלת וחצי — זה פתח אחד או שניים?
+
+---
+
 ## What I need back, minimally, to flip `PLACEHOLDER` to `false`
 
 | | Question | Blocks |
@@ -563,6 +586,7 @@ five-second answers and none of them blocks launch.*
 | 8 | width bands per size | the range printed on each size tile |
 | 9 | warranty term · metallic range · made-in-Israel | three of the four foot badges |
 | 11 | second CTA · the nav · the trust sublines | three items of the second mockup |
+| 12 | opening or leaf · one opening or two | the dimensions on the A4 order sheet |
 
 1 and 5 were the two that stop launch on their own. **1 is answered and fixed**,
 so **5 — a starting price per size band — is now the only thing standing between
