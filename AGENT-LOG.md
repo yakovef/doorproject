@@ -98,7 +98,7 @@ coordinate, and the one number that looked wrong turned out to be correct.
 The hardware finish, the three off-chart colours and every price, all human
 calls in `ASK-PERETZ.md`. `MOUNT_REACH` itself, because it measures 121.
 
-**Commit:** `215a5df`
+**Commit:** `20d9309`
 
 ---
 
