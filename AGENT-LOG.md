@@ -23,6 +23,85 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-24 01:06 UTC — run 26: the branch was red, and `collide -- boxes` was printing a ✗ it then threw away
+
+**Looked at:** five human commits since run 25. `npm test` came up **4 failed**
+on a clean tree, all four sheet families stale — so the branch was red as
+pushed. Ran the whole suite from there.
+
+**Instruments:** test ✓ (5,676,680) · audit ✓ (no faults) · profile ✓ ·
+collide ✓ (`all` / `boxes`) · recreate ✓ · shot ✓. All six green before pushing.
+
+**Changed:** regenerated all four sheet families, and fixed three faults in
+`tools/collide.mjs`. Nothing in `js/` or `css/` moved — the drawing is
+untouched, and `git diff` on `js/renderer.js`, `assets/bundle.js` and
+`index.html` is empty.
+
+**1. The sheets were genuinely stale, and the history says exactly how.**
+`1649e9d` regenerated all 33 sheets and wrote `.stamps.json`. `37fc142` ("the
+second mockup, built") then rewrote the page — `css/app.css` +522,
+`index.html` +145, `assets/bundle.js` +423 — regenerated **exactly one**
+screenshot (`phone.png`), and never re-stamped. So 32 sheets were pictures of
+the pre-mockup page while the suite failed four assertions saying so. This is
+not the container ceiling AGENT.md warns about: `npm run sheets` completed
+normally here. Magnitude, against the committed copies —
+
+    phone.png     390x2031 -> 390x2099   (68 px taller: a layout change)
+    laptop.png    32.19% of pixels differ, max channel delta 237
+    corpus-00     9.33% differ, max 48      recreate-d003  9.22% differ, max 49
+
+— and regenerating twice gave byte-identical output both times, which is what
+rules out a flaky renderer and leaves only "the pictures are old". Opened
+`phone.png` and confirmed the page renders correctly in this container: Hebrew
+fonts present, nav, trust band, navigator and spec table all drawn.
+
+**2. `MOUNT_REACH is short by 3 mm` was three millimetres of shadow.** The
+`-- boxes` reader took `getBBox()` on each `[data-mount]`, and `getBBox` on a
+wrapping group returns the union of its children — including the cast shadow
+`disc` draws inside the rosette's own group at `cx + 3`. Measured both ways:
+
+    whole group, shadow included   124 mm   ✗ "short by 3 mm"
+    the metal only                 121 mm   ✓  = MOUNT_REACH, exactly
+
+The 3 is the shadow's own x offset, to the millimetre. **`MOUNT_REACH = 121`
+was right all along** and I changed no measured number — the third outing of
+the fault CLAUDE.md §8 and AGENT.md both already record by name ("a drop shadow
+is not an object"), in the one reader in that file which had never been handed
+`metalBox`. It uses it now instead of growing a fourth copy of the question.
+
+**3. And my own first fix hid five of the six fittings.** `metalBox` walks
+`querySelectorAll`, which finds descendants only — so handed a bare
+`<circle data-mount="shiran-disc">` it returned null and the caller skipped the
+fitting. Every `data-mount` except the Cadoor rose is a leaf shape (two
+backplates, a slab, two plates, the Shiran's discs), so my first version
+measured one of six and called it the deepest. Caught because the grip line
+disappeared from the output. Absent output, not wrong output — CLAUDE.md §5,
+from inside the instrument meant to catch it. `metalBox` now includes the root
+when the root is itself a shape; the grip figure is back at 373 mm, unchanged.
+
+**4. The gate could not fail.** Under the two lines that decide the exit code:
+
+    if (deepest.reach > MOUNT_REACH) process.exitCode = 1;
+    process.exitCode = bad ? 1 : 0;          // <- clobbers the line above
+
+The MOUNT_REACH verdict was computed, printed with a ✗, and overwritten before
+anything could read it. With `bad` at 0 the command exited **green while
+telling the screen it was short** — and both `renderer.js`'s own note and
+CLAUDE.md say of this command that it "re-measures the 121 and fails if it has
+grown". It did not fail; it could not. Verified falsifiable in both directions:
+understating the constant to 118 gives `✗ short by 3 mm` and **exit 1**, the
+true 121 gives ✓ and **exit 0**, and `js/renderer.js` was restored
+byte-identical afterwards.
+
+**Left alone deliberately:** the drawing — nothing here was a reason to move a
+coordinate, and the one number that looked wrong turned out to be correct.
+The hardware finish, the three off-chart colours and every price, all human
+calls in `ASK-PERETZ.md`. `MOUNT_REACH` itself, because it measures 121.
+
+**Commit:** `215a5df`
+
+---
+
 ## 2026-08-23 21:01 UTC — run 25: the price on the page was unguarded too, and it is the number that costs money
 
 **Looked at:** no new pushes. Last run closed the spec table's sink; the

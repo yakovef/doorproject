@@ -125,7 +125,21 @@ if (boxes) {
       const inv = svg.getScreenCTM().inverse();
       const pt = svg.createSVGPoint();
       let box = null;
-      for (const el of root.querySelectorAll(SHAPES)) {
+      /* ⚠ THE ROOT ITSELF COUNTS WHEN THE ROOT IS A SHAPE, and forgetting that
+         empties the answer rather than shrinking it. `querySelectorAll` walks
+         DESCENDANTS, so handed a bare `<circle data-mount="shiran-disc">` this
+         returned null and its caller skipped the fitting entirely. Every
+         `data-mount` in the renderer except the Cadoor rose is a leaf shape —
+         two backplates, a slab, two plates and the Shiran's discs — so reading
+         mounts through this function without the line below measured exactly
+         one of the six and called it the deepest. Absent output, not wrong
+         output: CLAUDE.md §5, from inside the instrument meant to catch it.
+         Harmless for the `[data-hw]` groups the footprint rows pass in, since a
+         <g> matches nothing here. */
+      const parts = root.matches(SHAPES)
+        ? [root, ...root.querySelectorAll(SHAPES)]
+        : [...root.querySelectorAll(SHAPES)];
+      for (const el of parts) {
         if (el.hasAttribute('filter')) continue;
         /* `getBBox` also reports geometry BEFORE clipping, so a reflection
            trimmed to a backplate measures whatever rect was drawn to make it.
@@ -216,7 +230,25 @@ if (boxes) {
       const svg = host.querySelector('svg');
       const leaf = svg.querySelector('#leaf rect').getBBox();
       for (const m of svg.querySelectorAll('[data-mount]')) {
-        const B = m.getBBox();
+        /* ⚠ THE METAL, NOT THE SHADOW — and this asked for the shadow for as
+           long as the reading has existed. `getBBox` on a wrapping group hands
+           back the union of its children, and `disc` draws the rosette's cast
+           shadow INSIDE the `data-mount` group, offset to `cx + 3`. So the
+           deepest lock furniture read 124 mm where the bolted rose reaches 121,
+           and the tool printed `✗ MOUNT_REACH is short by 3 mm` about three
+           millimetres of shade. The 3 is the shadow's own x offset, exactly.
+           A shadow cannot be bolted to anything; it falls ON things.
+           `metalBox` above has always skipped whatever carries a `filter` and
+           says why, and CLAUDE.md §8 records the same fault in the OTHER sweep
+           in this file, where it invented 165 collisions between metal with
+           12 mm of air between it. This is that fault's third outing, in the
+           one reader here that had never been handed the primitive — so it uses
+           it rather than growing a fourth copy of the question. It also carries
+           the box into the drawing's own space, which a raw `getBBox` does not:
+           the plate, the slab and the keyway are drawn inside translated groups
+           and answer in their own coordinates. */
+        const B = metalBox(m, svg);
+        if (!B) continue;
         const r = Math.min(B.x + B.width - leaf.x, leaf.x + leaf.width - B.x);
         const owner = m.closest('[data-hw]');
         const into = owner && owner.dataset.hw === 'handle' ? deepestGrip : deepest;
@@ -268,8 +300,19 @@ if (boxes) {
     console.log(`the deepest bolted GRIP fixing (checked per position, not by the aperture):`);
     console.log(`  ${deepestGrip.reach}  (${deepestGrip.what} on ${deepestGrip.on})\n`);
   }
-  if (deepest.reach > MOUNT_REACH) process.exitCode = 1;
-  process.exitCode = bad ? 1 : 0;
+  /* ⚠ AND THE VERDICT ABOVE WAS THROWN AWAY ON THE VERY NEXT LINE.
+     `if (deepest.reach > MOUNT_REACH) process.exitCode = 1` was followed by an
+     UNCONDITIONAL `process.exitCode = bad ? 1 : 0`, so the MOUNT_REACH result
+     was computed, printed with a ✗, and then overwritten by the footprint
+     verdict before anything could read it. With `bad` at 0 this command exited
+     GREEN while telling the screen it was short — and the note over
+     `MOUNT_REACH` in renderer.js, and CLAUDE.md with it, says of this very
+     command that it "re-measures the 121 and fails if it has grown". It did
+     not fail; it could not. An instrument that cannot report the thing it is
+     named after is this repo's oldest shape, and a false claim of coverage is
+     worse than none, because it is exactly what stops the next person looking.
+     Both readings gate now, and each names itself on the way out. */
+  process.exitCode = (bad || deepest.reach > MOUNT_REACH) ? 1 : 0;
   process.exit(process.exitCode);
 }
 

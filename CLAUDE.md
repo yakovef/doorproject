@@ -178,6 +178,38 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   **What is left before launch is now one question:** a starting price per size
   band (ASK-PERETZ.md §5). Everything else degrades gracefully.
 
+- **`npm run collide -- boxes` printed a ✗ and then exited green, and the ✗ was
+  three millimetres of shadow.** Two independent faults in one reader, plus the
+  32 stale sheets that had the branch sitting red.
+  ⚠ **`MOUNT_REACH is short by 3 mm` was never true.** The reader took
+  `getBBox()` on each `[data-mount]`, and on a wrapping group that returns the
+  union of its children — including the cast shadow `disc` draws INSIDE the
+  rosette's own group at `cx + 3`. Whole group 124 mm; the metal alone **121,
+  exactly `MOUNT_REACH`**, the difference being the shadow's own x offset to the
+  millimetre. So no measured number moved. It is the third outing of the fault
+  §8 already records by name — *a drop shadow is not an object* — in the one
+  reader in that file never handed `metalBox`, which has skipped `[filter]`
+  since the day it was written.
+  ⚠ **And the first fix hid five of the six fittings.** `metalBox` walks
+  `querySelectorAll`, which finds DESCENDANTS only, so a bare
+  `<circle data-mount="shiran-disc">` returned null and was skipped. Every
+  `data-mount` but the rose is a leaf shape — two backplates, a slab, two
+  plates, the discs — so it measured one of six and called it the deepest.
+  Caught only because the grip line vanished from the output: §5, from inside
+  the instrument that exists to catch §5. It takes the root when the root is a
+  shape now.
+  ⚠ **The gate could not fail.** `if (deepest.reach > MOUNT_REACH)
+  process.exitCode = 1` was followed by an unconditional
+  `process.exitCode = bad ? 1 : 0`, which threw the verdict away one line after
+  it was made — so the command exited GREEN while printing ✗, and the note over
+  `MOUNT_REACH` saying it "fails if it has grown" was false. Falsifiable both
+  ways now: 118 gives exit 1, 121 gives exit 0.
+  ⚠ **32 of 33 sheets were the pre-mockup page.** `1649e9d` stamped all of
+  them; `37fc142` then rewrote `css/app.css` +522, `index.html` +145 and the
+  bundle, regenerated ONE screenshot, and never re-stamped. `phone.png` came
+  back 68 px taller and `laptop.png` 32% different, byte-identical across two
+  regenerations. Not the container ceiling — `npm run sheets` completed here.
+
 - **Five agents were turned on the shipped site — one per lane, so they could
   not all find the same defect — and produced 43 verified faults in code that
   was green on every instrument in the repo.** All fixed; the full table is
