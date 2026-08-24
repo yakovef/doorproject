@@ -531,14 +531,20 @@ a plan is for:
   argued from the spec.
 
 **And the room cost more than the ledger allowed.** §D6 budgets D1–D4 at
-≈1,400 bytes; measured, they are **+6,571 bytes and +44 elements on every
-door**, 2,848 of those bytes being the XML comments that explain the
-light-model refusal. That would have blown the 40 KB gate — which is the gate
-this round retired, for measuring bytes nobody transfers and comments nobody
-downloads. The number that replaced it says the room costs **+44 elements on
-378**, and the two doors measurable in this container answer a tap in 66 ms and
-142 ms at 6× CPU throttle. The plants stay cut; on this evidence they always
-should have been.
+≈1,400 bytes; measured, they are **+8,314 bytes and +44 elements on every
+door**, 4,732 of those bytes being the XML comments that explain the
+light-model refusal and the two defects later found inside it. That would have
+blown the 40 KB gate — which is the gate this round retired, for measuring
+bytes nobody transfers and comments nobody downloads. The number that replaced
+it says the room costs **+44 elements on 335**, and the two doors measurable in
+this container answer a tap in 66 ms and 142 ms at 6× CPU throttle. The plants
+stay cut; on this evidence they always should have been.
+
+⚠ **The `61%` in §4's own ledger above is left as written.** It was true when
+the plan was drafted; with the room in it is 94% of 42,090 buildable designs.
+Correcting a plan's prose after the fact hides what it believed when it chose,
+and the arithmetic that matters — that the gate was measuring the wrong
+quantity — is stronger with the drift left visible than with it tidied away.
 
 ### Why F is not built
 

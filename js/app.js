@@ -35,13 +35,13 @@ import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
 import {
   describe, detailGlyph, gripAt, gripCanRotate, gripHome,
   gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
-  render, sizeGlyph, windowGlyph,
+  copyOf, render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
 import { canSharePicture, copyMessage, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE,
-         gripDeparture, PHONE_DISPLAY, PHONE_TEL, PRICE_CAVEAT, PRICE_INCLUDES,
-         sendDoor, whatsappUrl } from './share.js';
+         gripAddendum, gripDeparture, PHONE_DISPLAY, PHONE_TEL, PRICE_CAVEAT,
+         PRICE_INCLUDES, sendDoor, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 import { WORKS } from './works.js';
 
@@ -273,9 +273,25 @@ function init() {
        complete order and has been since before any of this existed. */
     el.addEventListener('click', async ev => {
       if (!canSharePicture()) return;              // let the link do its job
+      /* ⚠ A MODIFIED CLICK IS NOT A TAP. `preventDefault` on every click took
+         ctrl/cmd-click, shift-click and middle-click away from both send
+         buttons — the three ways a person opens a link in a new tab or window,
+         and the only way to keep the design on screen while checking the
+         message. `ev.button` is 0 for a left click; `auxclick` carries the
+         middle one and never reaches here at all. */
+      if (ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
       ev.preventDefault();
+      /* ⚠ AND ONE SEND AT A TIME. Rasterising the door takes long enough for a
+         second tap to land while the share sheet is opening — and the second
+         tap ran the whole handler again, so a customer who double-tapped got
+         the sheet, and then had the page navigated to wa.me out from under it.
+         The flag is on the element rather than in a closure so both buttons
+         and every listener see the same one. */
+      if (el.dataset.sending === '1') return;
+      el.dataset.sending = '1';
       let how = 'unavailable';
       try { how = await sendDoor(state); } catch { /* fall through to the link */ }
+      finally { el.dataset.sending = '0'; }
       if (how === 'sent' || how === 'dismissed') return;
       /* The share could not happen, so the order still has to. `location`
          rather than `window.open`: the raster took us out of the click's
@@ -323,7 +339,18 @@ function init() {
      The sheet is a document rather than an interface: nothing on it responds
      to anything, so rebuilding it on every change would be work for a page
      nobody is clicking. */
-  if (document.documentElement.classList.contains('is-sheet')) buildSheet();
+  if (document.documentElement.classList.contains('is-sheet')) {
+    buildSheet();
+    /* ⚠ AND THE NOTICE FOLLOWS IT ONTO THE PAGE. The sheet hides `.strip`, so
+       a link the rules had to repair — a retired colour, an impossible
+       combination — printed a door nobody chose with nothing saying so. Read
+       off the strip rather than re-derived, so there is one sentence. */
+    const strip = $('#notice'), slot = $('#sheet-notice');
+    if (slot && strip && !strip.hidden && strip.textContent.trim()) {
+      slot.textContent = strip.textContent.trim();
+      slot.hidden = false;
+    }
+  }
 
   /* A shared link is a door somebody chose deliberately. Open the first
      category it disagrees with the default about — and the section that
@@ -382,7 +409,7 @@ function arrive(differs) {
  * ⚠ THE DOORS ARE DRAWN AS THEY SCROLL INTO VIEW AND UNDRAWN AS THEY LEAVE.
  * This is the whole engineering content of the feature. One door is 379
  * elements on the default and 860 on a sidelight; thirty at once is upwards of
- * fifteen thousand nodes built inside a click handler, on a phone — the same
+ * 10,113 elements built inside a click handler, on a phone — the same
  * cost the outside review measured as 315 ms for ONE door at 6x CPU throttle.
  * An `IntersectionObserver` with a screen of margin keeps six to ten alive at
  * a time, and the count stops depending on how many doors Peretz has built.
@@ -402,8 +429,15 @@ function buildWorks() {
 
   const draw = tile => {
     if (tile.dataset.drawn === '1') return;
+    const i = Number(tile.dataset.i);
+    /* ⚠ `copyOf`, NOT `render` STRAIGHT IN. Every door `render()` emits carries
+       the same fifty-eight ids, and an SVG `url(#leafFill)` resolves to the
+       FIRST element with that id IN THE DOCUMENT — so a grid of doors paints
+       every tile with the FIRST tile's gradients: thirty colours, one colour
+       on screen. Shipped that way and found by review. See `copyOf` in
+       js/renderer.js. */
     tile.querySelector('.work__art').innerHTML =
-      render({ ...DEFAULTS, ...WORKS[Number(tile.dataset.i)].state });
+      copyOf(render({ ...DEFAULTS, ...WORKS[i].state }), `w${i}`);
     tile.dataset.drawn = '1';
   };
   const undraw = tile => {
@@ -449,7 +483,14 @@ function buildWorks() {
   if (typeof IntersectionObserver === 'function') {
     worksObserver = new IntersectionObserver(entries => {
       for (const e of entries) (e.isIntersecting ? draw : undraw)(e.target);
-    }, { root: $('#works'), rootMargin: '400px 0px' });
+      /* ⚠ THE SCROLLER, NOT THE DIALOG. `root` was `#works`, and `#works` does
+         not scroll — `.works__grid` inside it carries the `max-block-size` and
+         the `overflow-y: auto`. An observer whose root is not the element that
+         actually scrolls measures against a box that never moves, so the
+         400 px of pre-draw margin bought nothing: tiles arrived undrawn and
+         were filled in only once they were already on screen, which is the
+         one moment the work is visible as a stutter. */
+    }, { root: $('#works-grid'), rootMargin: '400px 0px' });
     grid.querySelectorAll('.work').forEach(t => worksObserver.observe(t));
   } else {
     grid.querySelectorAll('.work').forEach(draw);
@@ -498,9 +539,6 @@ function buildSheet() {
   if (!host) return;
 
   const sz = SIZES[state.size] || SIZES.standard;
-  /* The side panel is part of the opening, so the ordered width is the leaf
-     plus it — a workshop reading 950 for a דלת וחצי builds the wrong hole. */
-  const totalW = sz.w + (sz.side || 0);
 
   const rows = specRows(state).map(r =>
     `<div class="sheet__row"><span class="sheet__k">${r.label}</span>`
@@ -508,20 +546,47 @@ function buildSheet() {
     + (r.hex ? `<span class="sheet__chip" style="--chip:${r.hex}"></span>` : '')
     + '</div>').join('');
 
+  /* ⚠ THE TWO GRIP NOTES, which this sheet shipped without. `gripAddendum` is
+     what tells Peretz that a pull bar has to be drilled ACROSS the leaf rather
+     than upright, and that the customer moved the handle on purpose. Both
+     reached him in the WhatsApp and neither was on the sheet he would take to
+     the workshop — the same door, two readers, disagreeing. Same function, so
+     they cannot drift. */
+  const grip = gripAddendum(state);
+
   host.innerHTML = `
     <header class="sheet__top">
       <div>
-        <div class="sheet__brand">דלתות מגן</div>
+        ${/* ⚠ THE SHEET NEEDS ITS OWN HEADING. `.is-sheet` hides `.layout`,
+              which is where the page's only <h1> lives, so the printed
+              document had no heading at all — and a screen reader opening a
+              shared sheet URL got a page with nothing to navigate by. */''}
+        <h1 class="sheet__brand">דלתות מגן</h1>
         <div class="sheet__sub">ראשון לציון · ${PHONE_DISPLAY}</div>
       </div>
-      <div class="sheet__code">קוד: <b>${encodeCode(state)}</b></div>
+      ${/* ⚠ `direction: ltr` BELONGS ON THE CODE, NOT ON THE ROW. It was on
+            the whole element, so the Hebrew label came out after the digits:
+            the sheet printed `DM-P4040481 :קוד`. The code itself is Latin and
+            must stay LTR; the label around it is Hebrew and must not. */''}
+      <div class="sheet__code">קוד: <b dir="ltr">${encodeCode(state)}</b></div>
     </header>
 
     <div class="sheet__body">
       <figure class="sheet__art">
-        ${render(state)}
+        ${/* Namespaced: the hidden stage still holds a door whose ids are
+              first in the document. See `copyOf` in js/renderer.js. */''}
+        ${copyOf(render(state), 'sheet')}
         <figcaption class="sheet__dims">
-          ${totalW} × ${sz.h} מ״מ · ${sz.he}${sz.side ? ` (כנף ${sz.w} + ${sz.side})` : ''}
+          ${/* ⚠ NO DERIVED TOTAL. This printed `sz.w + sz.side` as "the
+                ordered width" — a second width arithmetic, and one that
+                disagrees with the drawing beside it: the renderer lays a
+                sidelight out as ONE opening holding two leaves separated by a
+                22 mm mullion and rebated 50 each side, which comes to 1,322,
+                not the 1,350 this line printed. Nobody has confirmed which
+                number Peretz orders by, so the sheet stops inventing one and
+                prints what the catalogue actually holds. ASK-PERETZ.md §12. */''}
+          ${sz.w} × ${sz.h} מ״מ · ${sz.he}${sz.side ? ` · חלון צד ${sz.side} מ״מ` : ''}
+          <small>מידות קטלוג — הפתח נמדד באתר הלקוח</small>
         </figcaption>
       </figure>
 
@@ -531,6 +596,9 @@ function buildSheet() {
           <span class="sheet__k">כיוון</span>
           <span class="sheet__v">${handingWords(state)}</span>
         </div>
+        ${grip.map(g => '<div class="sheet__row sheet__row--wide">'
+          + '<span class="sheet__k">ידית</span>'
+          + `<span class="sheet__v">${g}</span></div>`).join('')}
         <div class="sheet__row sheet__row--wide">
           <span class="sheet__k">מחיר משוער</span>
           <span class="sheet__v"><b>${formatAgorot(priceAgorot(state))}</b>
@@ -539,7 +607,17 @@ function buildSheet() {
       </div>
     </div>
 
-    <footer class="sheet__foot">${PRICE_CAVEAT}</footer>`;
+    <footer class="sheet__foot">
+      ${PRICE_CAVEAT}
+      ${/* ⚠ THE SHEET HID THE TWO STRIPS THAT SAY THE PRICE IS INVENTED AND
+            THE DOOR WAS SUBSTITUTED. `.is-sheet` hides `.strip`, so a sheet
+            built from a placeholder catalogue printed a confident number with
+            no warning, and a link the rules had to repair printed a door
+            nobody chose with no notice. Both belong on a document somebody
+            orders from more than they belong on the screen. */''}
+      ${PLACEHOLDER ? '<b class="sheet__warn">גרסת פיתוח — המחירים כאן הם דוגמה בלבד.</b>' : ''}
+      <span class="sheet__note" id="sheet-notice" hidden></span>
+    </footer>`;
 }
 
 function buildPanel() {
@@ -1550,6 +1628,20 @@ function fitStage() {
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);
     root.setProperty('--stage-w', `${Math.round(wrap.width)}px`);
+    /* ⚠ AND HOW FAR THE WRAP'S FOOT IS FROM THE VIEWPORT'S, which is the whole
+       reason the band needs a third number. `position: fixed` with
+       `inset-block-end: 0` anchors to the VIEWPORT bottom — and above 1100 the
+       layout's last grid row ends exactly there, and that row is
+       `.stage__bar`. So the four trust claims were painted straight over
+       "הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם.": measured at 1280x800 the two
+       boxes were identical (y 759.7-800, left 360, width 560), and at 1100 the
+       band wrapped to two rows and climbed 27 px up into the drawing as well.
+       `REALISM2.md` §B5 asked for `absolute` inside the wrap and got `fixed`
+       against the viewport, which is a different box.
+       Published off the same rect as the two above, on the same re-fit, so the
+       band's box and the measured box stay one box. */
+    root.setProperty('--stage-b',
+      `${Math.max(0, Math.round(window.innerHeight - wrap.bottom))}px`);
   }
 }
 
@@ -1648,6 +1740,15 @@ function fail(err) {
   console.error('[dlatot-magen] the configurator could not start:', err);
   try {
     degrade();
+    /* ⚠ AND THE LABEL COMES BACK DOWN WITH THE HREF. `is-live` is what
+       licenses the buttons to say `שלחו את הדלת בוואטסאפ`, and `paint()` sets
+       it as soon as there is a real door to send. A throw AFTER that point —
+       a later paint, a drag, a repair — left the class on while these three
+       lines pointed the href back at "the page didn't load for me, so I have
+       no code to send". Label and href said opposite things again, which is
+       the exact bug the resting-state rule in css/app.css was written to end.
+       They move together or the pact is not a pact. */
+    document.documentElement.classList.remove('is-live');
     document.querySelectorAll('[data-wa]').forEach(el => {
       el.href = fallbackWhatsappUrl();
       el.removeAttribute('target');   // a blocked popup on a broken page is a

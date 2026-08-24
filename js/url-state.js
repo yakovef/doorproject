@@ -149,7 +149,15 @@ export function fromQuery(search) {
      deliberately — see the note where they used to be read — but "a parameter
      we retired" and "a parameter that was never ours" are different facts, and
      until they were two lists the exemption covered both. */
-  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'd', 's', 'h', 'gp', 'code', 'bare']);
+  /* ⚠ `sheet` BELONGS HERE AND WAS MISSED THE DAY IT WAS ADDED. `bare` is on
+     this list for exactly the same reason: both are OUR rendering switches
+     rather than the customer's choices. An unlisted key raises
+     `option-unknown`, so every order-sheet URL opened with a red strip saying
+     a choice could not be read — above a document in which every choice had
+     been read perfectly. A new switch joins this list the same day it is
+     invented, like everything added to the bare-mode hide list. */
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'd', 's', 'h', 'gp',
+                           'code', 'bare', 'sheet']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
      so a link carrying one opens as itself. */

@@ -26,17 +26,25 @@ facts a fresh context needs. Detail lives in the section it belongs to.
 - **The 40 KB byte gate is retired and `npm run latency` replaces it.**
   REALISM.md G6 asked that a door's SVG stay under 40,000 bytes, and it was
   measuring a quantity nobody pays: the string is built in memory and assigned
-  to `innerHTML`, so it never crosses a network — and **12,075 of the default
-  door's 41,971 bytes are XML comments**, 29%, because the renderer explains
+  to `innerHTML`, so it never crosses a network — and **13,959 of the default
+  door's 43,714 bytes are XML comments**, 32%, because the renderer explains
   itself to whoever opens the inspector. A byte gate is largely a gate on how
-  much the drawing documents itself, and 61% of doors already failed it.
+  much the drawing documents itself, and **39,473 of 42,090 buildable designs —
+  94% — are past 40,000 bytes** (61% before this round's room).
   What a customer feels is the DOM rebuilt under their thumb. Measured at 6×
-  CPU throttle on a 390×844 phone: **default 66 ms / 378 elements, sidelight
-  with ironwork 142 ms / 867, and the heaviest door the catalogue can build is
-  2,139 elements** — found by sweeping every size × window × grille × detail
-  rather than by guessing, and it turns out to be a strip light with quatrefoil
-  ironwork on a leaf-and-a-half, not the door anyone would have picked. Gate at
-  600 ms, with the arithmetic behind that number in `tools/latency.mjs`.
+  CPU throttle on a 390×844 phone: **default 66 ms / 379 elements, sidelight
+  with ironwork 142 ms / 868, and the heaviest door the catalogue can build is
+  2,231 elements** — found by sweeping every axis rather than by guessing, and
+  it turns out to be a strip light with quatrefoil ironwork on a
+  leaf-and-a-half carrying a Shiran bar and an Almog swan-neck, not the door
+  anyone would have picked. Gate at 600 ms, with the arithmetic in
+  `tools/latency.mjs`.
+  ⚠ **Every one of those figures was written down wrong first**, and the shape
+  of the error is worth more than the numbers: the first sweep held the
+  HARDWARE fixed and found 2,139, and the byte counts were measured before the
+  same round's later commits added comments to the renderer. A number written
+  into prose is stale the moment the thing it describes is edited — which is
+  the argument for a gate that MEASURES over a paragraph that remembers.
   ⚠ **That measurement settled an open question rather than opening one.** An
   outside review proposed hoisting the palette to CSS variables so a colour tap
   repaints incrementally. At 66–142 ms for the two doors measurable here the
@@ -96,7 +104,7 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   would need sixty-four entries. `tools/collide.mjs` needs no strip for the
   floor reflection — a `<use>` builds a shadow tree that `querySelectorAll`
   does not enter, and the sweep was re-run over all 1,490 designs to be sure.
-  And the room cost **+6,571 bytes and +44 elements** on every door against a
+  And the room cost **+8,314 bytes and +44 elements** on every door against a
   budget of ~1,400 bytes, which is over — and which the byte gate above was
   retired for measuring in the first place.
 
@@ -121,7 +129,7 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   four of them. ⚠ **Our drawings, not the photographs**: those are 63 MB in
   `research/` and PLAN.md §8.1 is the promise that three files are the whole
   site. ⚠ **Drawn as they scroll into view and UNDRAWN as they leave** — thirty
-  doors at once is upwards of fifteen thousand nodes inside a click handler;
+  doors at once is 10,113 elements built inside a click handler;
   clearing on exit matters as much as drawing on entry, or the grid just
   accumulates. ⚠ **No prices in the file**: the page has one statement of what
   a door costs and it is `priceAgorot` on the state being shown.
@@ -134,7 +142,7 @@ facts a fresh context needs. Detail lives in the section it belongs to.
 
 - **⚠ AN ASSERTION WAS COUNTING PROSE.** The ironwork group asked
   `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
-  document. About 29% of that document is XML comments, so the moment a comment
+  document. About 32% of that document is XML comments, so the moment a comment
   mentioned the attribute by name every door in the catalogue gained two
   phantom panes and twenty-five assertions failed, none of them about anything
   that had moved. Now `/\sdata-pane="/`, which is what the sentence beside it

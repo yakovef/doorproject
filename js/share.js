@@ -57,8 +57,22 @@ export const PRICE_CAVEAT   = 'מחיר משוער. המחיר הסופי נקב
  * account name, or the custom domain later — the page's own URL is right, and
  * that is what goes.
  */
+/**
+ * Is this page at an address worth sending, and a context a canvas will work
+ * in? One question, two callers, one answer.
+ *
+ * ⚠ IT WAS WRITTEN OUT TWICE. `shareUrl` had it inline and `canSharePicture`
+ * copied the same regex, under a comment claiming they "both read it from one
+ * place" — which is CLAUDE.md §5 committed together with a note asserting the
+ * opposite. They test the same fact for related reasons: over `file://` the
+ * page's own URL is a path on the customer's disk (below), and a canvas raster
+ * of an SVG throws SecurityError. Whoever next relaxes this for `blob:` or a
+ * local dev server must not have to find both.
+ */
+export const isServed = () => /^https?:$/.test(window.location.protocol);
+
 export function shareUrl(state) {
-  if (!/^https?:$/.test(window.location.protocol)) return null;
+  if (!isServed()) return null;
   return window.location.href.split(/[?#]/)[0] + toQuery(state);
 }
 
@@ -172,7 +186,12 @@ export const GRIP_ILLUSTRATIVE = 'להמחשה — נקבע בהתקנה';
  * furniture in a finish, and if he says so it becomes `LOCKSETS[].finish` and
  * comes back through this same helper. It does not come back as a guess.
  */
-function gripAddendum(state) {
+/* Exported so the A4 order sheet can carry the same two notes the message
+   does. It shipped without them, which meant a bar Peretz has to drill
+   HORIZONTALLY, and a handle the customer deliberately moved, both reached
+   him in the WhatsApp and vanished from the sheet he would actually take to
+   the workshop — the two readers of one door disagreeing again. */
+export function gripAddendum(state) {
   const { flat, shifted } = gripDeparture(state);
   return [
     /* TWO FACTS, and they are not the same KIND of fact.
@@ -288,8 +307,10 @@ export const fallbackWhatsappUrl = () =>
  *
  * 1. HTTPS ONLY. Canvas raster of an SVG over `file://` throws SecurityError —
  *    REDESIGN.md found that during the raster-renderer evaluation, and it is
- *    the same condition `shareUrl` already tests for, so both read it from one
- *    place. Off http(s) the button stays exactly the `wa.me` link it is today.
+ *    the same condition `shareUrl` tests for. `isServed()` is that one place;
+ *    when this comment was written it said so about a regex that had been
+ *    copied, which is the defect it was claiming not to have. Off http(s) the
+ *    button stays exactly the `wa.me` link it is today.
  * 2. THE SVG NEEDS AN EXPLICIT SIZE. `render()` emits `viewBox` and no
  *    `width`/`height`, which is right for a page that fits it to a stage — and
  *    an `<img>` given an SVG with no intrinsic size falls back to 300x150 and
@@ -304,7 +325,7 @@ export const fallbackWhatsappUrl = () =>
  *    a wall that is already correct.
  */
 export const canSharePicture = () =>
-  /^https?:$/.test(window.location.protocol)
+  isServed()
   && typeof navigator !== 'undefined'
   && typeof navigator.share === 'function'
   && typeof navigator.canShare === 'function';

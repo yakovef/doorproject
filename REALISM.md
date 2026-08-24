@@ -289,14 +289,15 @@ The byte half was measuring a quantity nobody pays. Two readings retired it:
   the drawing is not one of them; an outside review measured the worst door at
   17.7 KB brotli, which is what a byte gate would be for if anything were
   sending it.
-- **The gate was counting the comments.** The default door is 41,971 bytes of
-  which **12,075 are XML comments** — 29% — because the renderer explains
+- **The gate was counting the comments.** The default door is 43,714 bytes of
+  which **13,959 are XML comments** — 32% — because the renderer explains
   itself to whoever opens the element inspector, like every other file here. A
   byte gate is therefore in large part a gate on how much the drawing
-  documents itself, and 61% of buildable doors already failed it.
+  documents itself. Swept over all 42,090 buildable designs, **39,473 — 94% —
+  are past 40,000 bytes**; before this round's room it was 61%.
 
 What a customer feels is the DOM being rebuilt under their thumb — 378
-elements on the default door, 867 on a sidelight, 2,139 on the heaviest the
+elements on the default door, 868 on a sidelight, 2,231 on the heaviest the
 catalogue can build, every one of them replaced on every tap. `npm run latency`
 measures that at 6× CPU throttle on a 390×844 phone and gates on 600 ms; the
 reasoning behind that number, and why it is deliberately not fitted to today's

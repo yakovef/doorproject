@@ -12,16 +12,23 @@
  *    is what a byte gate would be for if there were one to apply it to.
  *
  * 2. THE GATE WAS COUNTING THE COMMENTS. Measured on this checkout: the
- *    default door is 41,971 bytes of which **12,075 are XML comments** — 29% —
+ *    default door is **43,714 bytes of which 13,959 are XML comments — 32%** —
  *    because this drawing explains itself to whoever opens the element
  *    inspector, the same way every other file here does. A gate on bytes is
  *    therefore, in large part, a gate on how much the renderer documents
- *    itself, and 61% of buildable doors already failed it.
+ *    itself. Swept over all 42,090 buildable designs, **39,473 of them — 94% —
+ *    are past 40,000 bytes**; before this round's room it was 61%.
+ *    ⚠ Those figures were 41,971 / 12,075 / 29% / 61% when this file was
+ *    written, and they were stale within the hour: the same round's later
+ *    commits added comments to the renderer. A number written into prose goes
+ *    stale the moment the thing it describes is edited, which is the argument
+ *    for a gate that MEASURES rather than a paragraph that remembers.
  *
  * What a customer actually feels is the DOM being rebuilt under their thumb.
- * 379 elements on the default door, 860 on a sidelight, and every one of them
- * replaced on every tap. So this measures that, on a throttled CPU, and the
- * number it prints is the number the project defends.
+ * 379 elements on the default door, 868 on a sidelight, 2,231 on the heaviest
+ * the catalogue can build — and every one of them replaced on every tap. So
+ * this measures that, on a throttled CPU, and the number it prints is the
+ * number the project defends.
  *
  * ── what is measured, exactly ───────────────────────────────────────
  * `performance.now()` either side of a swatch click, with a forced layout read
@@ -57,16 +64,19 @@ const DOORS = [
   { name: 'default', q: '' },
   { name: 'sidelight + ironwork',
     q: '?c=rb-6219d&w=rect&g=iron&n=none&k=cylinder&d=panel&s=sidelight&h=right-in' },
-  /* ⚠ THE HEAVIEST DOOR THE CATALOGUE CAN BUILD, AND IT WAS FOUND BY SEARCH,
-     NOT BY TASTE. My first guess for "the worst one" was a leaf-and-a-half
-     with a tall light and etched circles — 440 elements. Sweeping every
-     size x window x grille x detail through `repair` and counting the emitted
-     elements says the real answer is a strip light with quatrefoil ironwork on
-     a leaf-and-a-half: 2,139 elements, five times heavier, and it matches the
-     2,130 an outside review measured independently. A gate set on a door
-     somebody thought looked complicated is a gate on the wrong door. */
-  { name: 'half leaf + strip + quatrefoil (heaviest)',
-    q: '?c=rb-0097d&w=strip&g=quatrefoil&n=none&k=digital&d=panel&s=half&h=right-in' },
+  /* ⚠ THE HEAVIEST DOOR THE CATALOGUE CAN BUILD, FOUND BY SEARCH AND THEN
+     FOUND AGAIN BY A WIDER ONE. My first guess was a leaf-and-a-half with a
+     tall light and etched circles — 440 elements, nowhere near. A sweep of
+     size x window x grille x detail said 2,139 and named a strip light with
+     quatrefoil ironwork on a leaf-and-a-half.
+     That sweep held the HARDWARE fixed, which is the same class of mistake one
+     level down: the pull bar and the lockset draw geometry too. Sweeping all
+     six axes over all 42,090 buildable designs gives **2,231 elements**, on
+     the same door carrying a Shiran bar and an Almog swan-neck. A gate set on
+     a door somebody thought looked complicated is a gate on the wrong door —
+     and so is one set by a sweep that forgot an axis. */
+  { name: 'half + strip + quatrefoil + shiran (heaviest)',
+    q: '?c=rb-0097d&w=strip&g=quatrefoil&n=shiran&k=almog&d=panel&s=half&h=right-in' },
 ];
 
 /**
@@ -75,15 +85,15 @@ const DOORS = [
  * 100 ms is the long-standing threshold for an interaction feeling immediate;
  * past about 200 ms a tap reads as a wait. The readings that set this number:
  *
- *   default            378 elements      67 ms   measured here
- *   sidelight + iron   867 elements   136-155   measured here
- *   heaviest door    2,139 elements   ~315-370   an outside review, at 6x
+ *   default            379 elements      67 ms   measured here
+ *   sidelight + iron   868 elements   136-155   measured here
+ *   heaviest door    2,231 elements   ~315-370   an outside review, at 6x
  *
  * The heaviest door cannot be measured in THIS container — Chromium dies on
  * it, five relaunches running, which is the same fragility `tools/browser.mjs`
  * exists for — so its figure is the review's, and it lines up with a straight
- * extrapolation from the two above (867 elements at ~145 ms scales to about
- * 350 for 2,139).
+ * extrapolation from the two above (868 elements at ~145 ms scales to about
+ * 370 for 2,231).
  *
  * 400 would have been too tight: the review's own p90 for that door is 370, so
  * a gate at 400 would fire on ordinary variance in the door it is meant to
@@ -151,9 +161,20 @@ function measure(d) {
       return p.evaluate(n => {
         const chips = [...document.querySelectorAll('.swatch')];
         if (chips.length < 3) throw new Error('no colour swatches to tap');
+        /* ⚠ THE TAP HAS TO HAVE DONE SOMETHING, or this measures a broken page
+           and calls it fast. `guard()` in app.js catches a throw from a click
+           handler and hands it to `fail()`, so a configurator whose every tap
+           dies comes back to this loop instantly — and instantly is what this
+           tool is looking for. A gate that gets FASTER the more broken the
+           page is, is not a gate. The code under the price is the cheapest
+           whole-state witness on the page: it is `encodeCode(state)`, so it
+           moves if and only if the door did. */
+        const codeNow = () => (document.querySelector('#code') || {}).textContent;
         const times = [];
+        let changes = 0;
         for (let i = 0; i < n; i++) {
           const chip = chips[(i + 1) % chips.length];
+          const before = codeNow();
           const t0 = performance.now();
           chip.click();
           /* Force style and layout inside the window. Without this the click
@@ -161,6 +182,11 @@ function measure(d) {
              is waiting for, and the number is a fiction. */
           void document.body.offsetHeight;
           times.push(performance.now() - t0);
+          if (codeNow() !== before) changes++;
+        }
+        if (changes !== n) {
+          throw new Error(`only ${changes} of ${n} taps changed the door — the page `
+                        + 'is not repainting, so there is nothing here to time');
         }
         times.sort((a, b) => a - b);
         return {
@@ -174,7 +200,12 @@ function measure(d) {
 console.log(deathNote(pool));
 await pool.close();
 
-console.log(`\n  worst measured ${Math.round(worst)} ms against a ${GATE_MS} ms gate`);
+/* ⚠ No "worst measured 0 ms" when nothing was measured. A zero there reads as
+   the fastest possible page rather than as the absence of a reading, which is
+   the same confusion the per-door `?` line exists to prevent. */
+console.log(unmeasured === DOORS.length
+  ? `\n  nothing measured, against a ${GATE_MS} ms gate`
+  : `\n  worst measured ${Math.round(worst)} ms against a ${GATE_MS} ms gate`);
 if (bad) {
   console.log(`\n✗ ${bad} door(s) past the gate\n`);
 } else if (unmeasured === DOORS.length) {

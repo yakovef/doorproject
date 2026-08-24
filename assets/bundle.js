@@ -916,6 +916,10 @@
     }
     return out;
   }
+  function copyOf(svg, key) {
+    const suffix = `-${String(key).replace(/[^A-Za-z0-9_-]/g, "")}`;
+    return svg.replace(/<!--[\s\S]*?-->/g, "").replace(/(\sid=")([^"]+)(")/g, (_, a, id, z) => a + id + suffix + z).replace(/url\(#([^)]+)\)/g, (_, id) => `url(#${id}${suffix})`).replace(/(\shref=")#([^"]+)(")/g, (_, a, id, z) => `${a}#${id}${suffix}${z}`);
+  }
   function render(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const colour = byId(COLOURS, state2.colour);
@@ -1654,6 +1658,14 @@
       <stop offset="0.35" stop-color="#000" stop-opacity="0.10"/>
       <stop offset="1"    stop-color="#000" stop-opacity="0.34"/>
     </linearGradient>
+    <!-- ⚠ cy="0" IS THE TOP OF THE ELLIPSE'S OWN BOX, and the ellipse has to
+         be positioned so that top IS THE LAMP. It was centred ON the lamp with
+         a radius reaching the floor, which puts the box's top a whole radius
+         ABOVE the fitting — so the bright core of the cone sat 1,587 mm over
+         the lamp and the plaster was dimmest exactly where the light is. The
+         ellipse below spans lamp-to-floor instead, so offset 0 lands on the
+         fitting and the wash falls away downward, which is what a downlight
+         does. -->
     <radialGradient id="sconceGlow" cx="0.5" cy="0" r="1">
       <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.30"/>
       <stop offset="0.4" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
@@ -1701,8 +1713,8 @@
                     fill="url(#sconceBody)"/>
               <rect x="${sx - 30}" y="${sy + 146}" width="60" height="8" rx="4"
                     fill="${LIGHT.warm}" opacity="0.55"/>
-              <ellipse cx="${sx}" cy="${sy + 150}" rx="290" ry="${baseY - sy - 150}"
-                       fill="url(#sconceGlow)"/>`;
+              <ellipse cx="${sx}" cy="${(sy + 150 + baseY) / 2}" rx="290"
+                       ry="${(baseY - sy - 150) / 2}" fill="url(#sconceGlow)"/>`;
     }).join("")}
 
     <!-- ── the alcove: the wall steps forward around the door ───────
@@ -1716,11 +1728,21 @@
           fill="url(#alcNear)"/>
     <path d="M ${alcX1} ${alcY0} L ${casX1} ${casY0} V ${baseY} H ${alcX1} Z"
           fill="url(#alcFar)"/>
-    <!-- The light catch along the recess's own outer edge, the same 0.16 white
-         the casing takes where it meets the plaster. -->
-    <path d="M ${alcX0} ${alcY0} H ${alcX1}" fill="none"
-          stroke="#fff" stroke-opacity="0.16" stroke-width="2"
-          vector-effect="non-scaling-stroke"/>
+    <!-- ⚠ THERE WAS A WHITE CATCH LINE ALONG THE RECESS'S HEAD HERE, AND IT
+         WAS DRAWN WHERE NOTHING CAN SEE IT. alcY0 is casY0 - ALC_HEAD =
+         110 - 300 = -190, i.e. 190 units ABOVE the natural viewBox — and
+         fitStage only ever WIDENS the crop, so the visible y range is 0..h at
+         every size and every stage shape. Measured across all six sizes at
+         four stage aspect ratios: the head is out of frame in twenty-four
+         cases out of twenty-four. The line cost bytes on every door and
+         painted nothing, and the comment above it claimed it was a light
+         catch a viewer could see.
+         The recess reads through its two returns and the sliver of soffit
+         that does show below y=0 — which is how a doorway photographed from
+         two metres reads as well, with its lintel out of frame. Deleted
+         rather than moved: the only visible fold left is the vertical one at
+         each side, and a white line ruled down THAT is the drawn arris this
+         file has already removed twice. -->
 
     <!-- Where the wall meets the floor. See floorFall: this is the ruled
          line that used to be here, replaced by the change of value a fold
@@ -4233,7 +4255,21 @@ ${body}
     const p = new URLSearchParams(search);
     const state2 = { ...DEFAULTS };
     let notice = null;
-    const KNOWN = /* @__PURE__ */ new Set(["v", "c", "w", "g", "n", "k", "d", "s", "h", "gp", "code", "bare"]);
+    const KNOWN = /* @__PURE__ */ new Set([
+      "v",
+      "c",
+      "w",
+      "g",
+      "n",
+      "k",
+      "d",
+      "s",
+      "h",
+      "gp",
+      "code",
+      "bare",
+      "sheet"
+    ]);
     const RETIRED = /* @__PURE__ */ new Set(["f", "a", "z", "i"]);
     for (const key of p.keys()) {
       if (!KNOWN.has(key) && !RETIRED.has(key)) notice = notice || "option-unknown";
@@ -4380,8 +4416,9 @@ ${body}
   var PHONE_TEL = "+972532197466";
   var PRICE_INCLUDES = "כולל דלת, התקנה מלאה ומע״מ";
   var PRICE_CAVEAT = "מחיר משוער. המחיר הסופי נקבע לאחר מדידה.";
+  var isServed = () => /^https?:$/.test(window.location.protocol);
   function shareUrl(state2) {
-    if (!/^https?:$/.test(window.location.protocol)) return null;
+    if (!isServed()) return null;
     return window.location.href.split(/[?#]/)[0] + toQuery(state2);
   }
   function gripDeparture(state2) {
@@ -4452,7 +4489,7 @@ ${body}
   var whatsappUrl = (state2) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2))}`;
   var FALLBACK_TEXT = "שלום, ניסיתי לבנות דלת באתר והעמוד לא נטען אצלי, אז אין לי קוד לשלוח. אפשר לחזור אליי ולעזור לי לבחור דלת?";
   var fallbackWhatsappUrl = () => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(FALLBACK_TEXT)}`;
-  var canSharePicture = () => /^https?:$/.test(window.location.protocol) && typeof navigator !== "undefined" && typeof navigator.share === "function" && typeof navigator.canShare === "function";
+  var canSharePicture = () => isServed() && typeof navigator !== "undefined" && typeof navigator.share === "function" && typeof navigator.canShare === "function";
   async function doorPng(state2, width = 1e3) {
     const svg = render(state2);
     const box = /viewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(svg);
@@ -4682,11 +4719,16 @@ ${body}
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.addEventListener("click", async (ev) => {
         if (!canSharePicture()) return;
+        if (ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
         ev.preventDefault();
+        if (el.dataset.sending === "1") return;
+        el.dataset.sending = "1";
         let how = "unavailable";
         try {
           how = await sendDoor(state);
         } catch {
+        } finally {
+          el.dataset.sending = "0";
         }
         if (how === "sent" || how === "dismissed") return;
         window.location.href = el.href;
@@ -4714,7 +4756,14 @@ ${body}
       ).observe($(".send"));
     }
     paint();
-    if (document.documentElement.classList.contains("is-sheet")) buildSheet();
+    if (document.documentElement.classList.contains("is-sheet")) {
+      buildSheet();
+      const strip = $("#notice"), slot = $("#sheet-notice");
+      if (slot && strip && !strip.hidden && strip.textContent.trim()) {
+        slot.textContent = strip.textContent.trim();
+        slot.hidden = false;
+      }
+    }
     const differs = GROUPS.find((g) => state[g.key] !== DEFAULTS[g.key]);
     arrive(differs);
     if (typeof window.matchMedia === "function") {
@@ -4741,7 +4790,8 @@ ${body}
     if (!grid || grid.childElementCount) return;
     const draw = (tile) => {
       if (tile.dataset.drawn === "1") return;
-      tile.querySelector(".work__art").innerHTML = render({ ...DEFAULTS, ...WORKS[Number(tile.dataset.i)].state });
+      const i = Number(tile.dataset.i);
+      tile.querySelector(".work__art").innerHTML = copyOf(render({ ...DEFAULTS, ...WORKS[i].state }), `w${i}`);
       tile.dataset.drawn = "1";
     };
     const undraw = (tile) => {
@@ -4767,7 +4817,7 @@ ${body}
     if (typeof IntersectionObserver === "function") {
       worksObserver = new IntersectionObserver((entries) => {
         for (const e of entries) (e.isIntersecting ? draw : undraw)(e.target);
-      }, { root: $("#works"), rootMargin: "400px 0px" });
+      }, { root: $("#works-grid"), rootMargin: "400px 0px" });
       grid.querySelectorAll(".work").forEach((t) => worksObserver.observe(t));
     } else {
       grid.querySelectorAll(".work").forEach(draw);
@@ -4788,22 +4838,45 @@ ${body}
     const host = $("#sheet");
     if (!host) return;
     const sz = SIZES[state.size] || SIZES.standard;
-    const totalW = sz.w + (sz.side || 0);
     const rows = specRows(state).map((r) => `<div class="sheet__row"><span class="sheet__k">${r.label}</span><span class="sheet__v">${r.value}</span>` + (r.hex ? `<span class="sheet__chip" style="--chip:${r.hex}"></span>` : "") + "</div>").join("");
+    const grip = gripAddendum(state);
     host.innerHTML = `
     <header class="sheet__top">
       <div>
-        <div class="sheet__brand">דלתות מגן</div>
+        ${/* ⚠ THE SHEET NEEDS ITS OWN HEADING. `.is-sheet` hides `.layout`,
+        which is where the page's only <h1> lives, so the printed
+        document had no heading at all — and a screen reader opening a
+        shared sheet URL got a page with nothing to navigate by. */
+    ""}
+        <h1 class="sheet__brand">דלתות מגן</h1>
         <div class="sheet__sub">ראשון לציון · ${PHONE_DISPLAY}</div>
       </div>
-      <div class="sheet__code">קוד: <b>${encodeCode(state)}</b></div>
+      ${/* ⚠ `direction: ltr` BELONGS ON THE CODE, NOT ON THE ROW. It was on
+        the whole element, so the Hebrew label came out after the digits:
+        the sheet printed `DM-P4040481 :קוד`. The code itself is Latin and
+        must stay LTR; the label around it is Hebrew and must not. */
+    ""}
+      <div class="sheet__code">קוד: <b dir="ltr">${encodeCode(state)}</b></div>
     </header>
 
     <div class="sheet__body">
       <figure class="sheet__art">
-        ${render(state)}
+        ${/* Namespaced: the hidden stage still holds a door whose ids are
+        first in the document. See `copyOf` in js/renderer.js. */
+    ""}
+        ${copyOf(render(state), "sheet")}
         <figcaption class="sheet__dims">
-          ${totalW} × ${sz.h} מ״מ · ${sz.he}${sz.side ? ` (כנף ${sz.w} + ${sz.side})` : ""}
+          ${/* ⚠ NO DERIVED TOTAL. This printed `sz.w + sz.side` as "the
+        ordered width" — a second width arithmetic, and one that
+        disagrees with the drawing beside it: the renderer lays a
+        sidelight out as ONE opening holding two leaves separated by a
+        22 mm mullion and rebated 50 each side, which comes to 1,322,
+        not the 1,350 this line printed. Nobody has confirmed which
+        number Peretz orders by, so the sheet stops inventing one and
+        prints what the catalogue actually holds. ASK-PERETZ.md §12. */
+    ""}
+          ${sz.w} × ${sz.h} מ״מ · ${sz.he}${sz.side ? ` · חלון צד ${sz.side} מ״מ` : ""}
+          <small>מידות קטלוג — הפתח נמדד באתר הלקוח</small>
         </figcaption>
       </figure>
 
@@ -4813,6 +4886,7 @@ ${body}
           <span class="sheet__k">כיוון</span>
           <span class="sheet__v">${handingWords(state)}</span>
         </div>
+        ${grip.map((g) => `<div class="sheet__row sheet__row--wide"><span class="sheet__k">ידית</span><span class="sheet__v">${g}</span></div>`).join("")}
         <div class="sheet__row sheet__row--wide">
           <span class="sheet__k">מחיר משוער</span>
           <span class="sheet__v"><b>${formatAgorot(priceAgorot(state))}</b>
@@ -4821,7 +4895,18 @@ ${body}
       </div>
     </div>
 
-    <footer class="sheet__foot">${PRICE_CAVEAT}</footer>`;
+    <footer class="sheet__foot">
+      ${PRICE_CAVEAT}
+      ${/* ⚠ THE SHEET HID THE TWO STRIPS THAT SAY THE PRICE IS INVENTED AND
+        THE DOOR WAS SUBSTITUTED. `.is-sheet` hides `.strip`, so a sheet
+        built from a placeholder catalogue printed a confident number with
+        no warning, and a link the rules had to repair printed a door
+        nobody chose with no notice. Both belong on a document somebody
+        orders from more than they belong on the screen. */
+    ""}
+      ${PLACEHOLDER2 ? '<b class="sheet__warn">גרסת פיתוח — המחירים כאן הם דוגמה בלבד.</b>' : ""}
+      <span class="sheet__note" id="sheet-notice" hidden></span>
+    </footer>`;
   }
   function buildPanel() {
     const wrap = $("#choices");
@@ -5381,6 +5466,10 @@ ${body}
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);
+      root.setProperty(
+        "--stage-b",
+        `${Math.max(0, Math.round(window.innerHeight - wrap.bottom))}px`
+      );
     }
   }
   var liveTimer = null;
@@ -5421,6 +5510,7 @@ ${body}
     console.error("[dlatot-magen] the configurator could not start:", err);
     try {
       degrade();
+      document.documentElement.classList.remove("is-live");
       document.querySelectorAll("[data-wa]").forEach((el) => {
         el.href = fallbackWhatsappUrl();
         el.removeAttribute("target");

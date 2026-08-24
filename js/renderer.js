@@ -577,6 +577,46 @@ function topLevelElements(markup) {
   return out;
 }
 
+/**
+ * A second copy of a door, safe to put in the same document as the first.
+ *
+ * ── the defect this exists for, which shipped and was caught by a review ──
+ * `render()` emits FIXED ids — `leafFill`, `keyWash`, `retNear`, `casingFace`,
+ * `soffit`, `mould-t`, `glass`, `vignette` and fifty more — and every fill in
+ * the drawing is `fill="url(#leafFill)"`. That is exactly right while there is
+ * one door on the page, which was true for the whole life of this file.
+ *
+ * Then the gallery put thirty doors in one document. Measured: any two doors
+ * share ALL 58 ids, and an SVG `url(#x)` resolves to the FIRST element with
+ * that id in the document — so every tile in the gallery painted itself with
+ * the first tile's gradients. Thirty different colours, one colour on screen.
+ * It is CLAUDE.md §5 in an unfamiliar costume: the id is a name computed in
+ * one place and consumed in another, and nothing said the name had to be
+ * unique per document because for years there was only ever one.
+ *
+ * ⚠ THE STAGE'S COPY IS NOT NAMESPACED, deliberately. `tools/collide.mjs`,
+ * `npm run profile`, `npm run glass`, `fitStage` and half the audit select
+ * `#leaf`, `#frame`, `#hardware` and `#leaf rect` on the page. Renaming those
+ * would break every instrument to fix a problem the stage does not have — it
+ * is one door, and it is first in the document. Only the EXTRA copies move.
+ *
+ * ⚠ AND THE COMMENTS GO WITH THEM. 29% of a rendered door is XML comments
+ * explaining the drawing to whoever opens the inspector; a 132 px thumbnail
+ * has nobody reading it, and ten live tiles would carry 120 KB of prose. It
+ * also makes the rewrite below safe: with the comments gone, every `id="` and
+ * every `url(#` left in the string is real markup.
+ *
+ * `render(state)` itself is untouched and stays the one source of the drawing.
+ */
+export function copyOf(svg, key) {
+  const suffix = `-${String(key).replace(/[^A-Za-z0-9_-]/g, '')}`;
+  return svg
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/(\sid=")([^"]+)(")/g, (_, a, id, z) => a + id + suffix + z)
+    .replace(/url\(#([^)]+)\)/g, (_, id) => `url(#${id}${suffix})`)
+    .replace(/(\shref=")#([^"]+)(")/g, (_, a, id, z) => `${a}#${id}${suffix}${z}`);
+}
+
 export function render(state) {
   const size    = SIZES[state.size] || SIZES.standard;
   const colour  = byId(COLOURS, state.colour);
@@ -1432,6 +1472,14 @@ export function render(state) {
       <stop offset="0.35" stop-color="#000" stop-opacity="0.10"/>
       <stop offset="1"    stop-color="#000" stop-opacity="0.34"/>
     </linearGradient>
+    <!-- ⚠ cy="0" IS THE TOP OF THE ELLIPSE'S OWN BOX, and the ellipse has to
+         be positioned so that top IS THE LAMP. It was centred ON the lamp with
+         a radius reaching the floor, which puts the box's top a whole radius
+         ABOVE the fitting — so the bright core of the cone sat 1,587 mm over
+         the lamp and the plaster was dimmest exactly where the light is. The
+         ellipse below spans lamp-to-floor instead, so offset 0 lands on the
+         fitting and the wash falls away downward, which is what a downlight
+         does. -->
     <radialGradient id="sconceGlow" cx="0.5" cy="0" r="1">
       <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.30"/>
       <stop offset="0.4" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
@@ -1480,8 +1528,8 @@ export function render(state) {
                     fill="url(#sconceBody)"/>
               <rect x="${sx - 30}" y="${sy + 146}" width="60" height="8" rx="4"
                     fill="${LIGHT.warm}" opacity="0.55"/>
-              <ellipse cx="${sx}" cy="${sy + 150}" rx="290" ry="${baseY - sy - 150}"
-                       fill="url(#sconceGlow)"/>`;
+              <ellipse cx="${sx}" cy="${(sy + 150 + baseY) / 2}" rx="290"
+                       ry="${(baseY - sy - 150) / 2}" fill="url(#sconceGlow)"/>`;
     }).join('')}
 
     <!-- ── the alcove: the wall steps forward around the door ───────
@@ -1495,11 +1543,21 @@ export function render(state) {
           fill="url(#alcNear)"/>
     <path d="M ${alcX1} ${alcY0} L ${casX1} ${casY0} V ${baseY} H ${alcX1} Z"
           fill="url(#alcFar)"/>
-    <!-- The light catch along the recess's own outer edge, the same 0.16 white
-         the casing takes where it meets the plaster. -->
-    <path d="M ${alcX0} ${alcY0} H ${alcX1}" fill="none"
-          stroke="#fff" stroke-opacity="0.16" stroke-width="2"
-          vector-effect="non-scaling-stroke"/>
+    <!-- ⚠ THERE WAS A WHITE CATCH LINE ALONG THE RECESS'S HEAD HERE, AND IT
+         WAS DRAWN WHERE NOTHING CAN SEE IT. alcY0 is casY0 - ALC_HEAD =
+         110 - 300 = -190, i.e. 190 units ABOVE the natural viewBox — and
+         fitStage only ever WIDENS the crop, so the visible y range is 0..h at
+         every size and every stage shape. Measured across all six sizes at
+         four stage aspect ratios: the head is out of frame in twenty-four
+         cases out of twenty-four. The line cost bytes on every door and
+         painted nothing, and the comment above it claimed it was a light
+         catch a viewer could see.
+         The recess reads through its two returns and the sliver of soffit
+         that does show below y=0 — which is how a doorway photographed from
+         two metres reads as well, with its lintel out of frame. Deleted
+         rather than moved: the only visible fold left is the vertical one at
+         each side, and a white line ruled down THAT is the drawn arris this
+         file has already removed twice. -->
 
     <!-- Where the wall meets the floor. See floorFall: this is the ruled
          line that used to be here, replaced by the change of value a fold

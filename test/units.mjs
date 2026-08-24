@@ -2048,10 +2048,22 @@ group('a finish is named on the fitting that has one, and nowhere else');
    than a stale bundle, because the next person to open d003 sees the old
    threshold beside the photograph and may "fix" something already fixed.
 
-   Each generating tool stamps `screenshots/.stamps.json` with a hash of what
-   the DRAWING is: `js/renderer.js` and `js/catalog.js`. Not of the tool, so a
-   comment in a harness does not cost three minutes of regeneration; of the
-   drawing, because that is what a sheet is a picture of.
+   ⚠ THIS PARAGRAPH DESCRIBED THE OLD RULE AND OUTLIVED IT BY TWO ROUNDS. It
+   said the stamp hashes "`js/renderer.js` and `js/catalog.js`. Not of the
+   tool, so a comment in a harness does not cost three minutes of
+   regeneration." Both halves are now false, and each was changed for a
+   measured reason recorded elsewhere:
+
+   - The stamp hashes the PAGE — `assets/bundle.js`, `css/app.css`,
+     `index.html` — because `recreate`, `corpus` and `against` photograph
+     `index.html?bare=1`, so the stylesheet and the markup are their inputs too
+     and were unhashed.
+   - It hashes the TOOL as well, because changing which door a sheet draws was
+     invisible to a hash of the drawing — which is exactly how a set of
+     mirrored recreations passed. A comment in a harness does now cost a
+     regeneration, and that is the cheaper of the two mistakes.
+
+   `DEPS_FOR` in `tools/fresh.mjs` is the list, and it is the only list.
 
    Fix with `npm run sheets`. */
 group('the comparison sheets are pictures of THIS drawing');
@@ -2132,16 +2144,78 @@ group('every door in the gallery is one the site can actually build');
   }
 }
 
-group('the opening is spelled out so it cannot be read the wrong way round');
+group('the drawn keyhole is on the side the PHOTOGRAPH puts it');
 {
-  /* ⚠ THIS IS THE ASSERTION THE OLD BUG WOULD HAVE FAILED. `HANDINGS[].hinge`
-     was the other way round until 23.8.2026 and every order named the mirror
-     of the door on screen. Nothing caught it, because every check compared our
-     drawing to our drawing.
-     So this does not read `hinge` and agree with it. It asks WHERE THE KEYHOLE
-     IS DRAWN — the lockset's own x against the leaf's centre — and requires
-     the sentence to name that side. A test that read the field would have
-     agreed with the bug. */
+  /* ⚠ THIS IS THE ASSERTION THAT ACTUALLY FAILS ON THE OLD BUG, AND THE ONE
+     BELOW IT DOES NOT. That is worth writing down, because the one below was
+     committed under a comment claiming it did.
+
+     The old bug was `HANDINGS[].hinge` being the other way round: for months
+     every order named the mirror of the door on screen. A check that renders a
+     door and asks where the keyhole is drawn CANNOT catch it, because the
+     drawing reads `hinge` too — flip the field and the sentence and the
+     picture move together, and the check passes in both worlds. Verified by
+     flipping it and re-running: 4 passed, 0 failed, before and after.
+     Every check in this repo compared our drawing to our drawing. That is the
+     whole reason the bug lived.
+
+     So this one leaves the catalogue entirely. `js/works.js` carries, per real
+     door, the handing DERIVED FROM THAT DOOR'S PHOTOGRAPH — `tools/corpus.mjs`
+     maps the measured `handle.x` to a name, and that mapping does not go
+     through `hinge`. So the chain is:
+
+       handle.x (measured off a photograph)  →  handing name  →  hinge  →  the
+       side the renderer draws the keyhole on
+
+     and the two ends are independent. Flip `hinge` and the drawn side moves
+     while `handle.x` does not: the test goes red on 30 real doors at once. */
+  const dir = 'research/works/data2';
+  let checked = 0;
+  for (const w of WORKS) {
+    const path = `${dir}/${w.id}.json`;
+    if (!existsSync(path)) continue;
+    const rec = JSON.parse(readFileSync(path, 'utf8'));
+    if (!rec.handle || rec.handle.x == null) continue;
+
+    const st = { ...DEFAULTS, ...w.state };
+    const svg = render(st);
+    const leaf = /<g id="leaf" data-x="([\d.-]+)" data-w="([\d.]+)"/.exec(svg);
+    const lock = /data-hw="lockset"[^>]*?\sdata-cx="([\d.-]+)"/.exec(svg);
+    if (!leaf || !lock) continue;
+    checked++;
+
+    const drawn = Number(lock[1]) > Number(leaf[1]) + Number(leaf[2]) / 2 ? 'right' : 'left';
+    /* The hardware sits on the OPENING edge, away from the hinge, in the
+       photograph as in the drawing. `handle.x` is a fraction of the leaf's
+       width, so past the middle is the right-hand side of the door as
+       photographed — which is to say, from outside. */
+    const measured = rec.handle.x > 0.5 ? 'right' : 'left';
+    ok(drawn === measured,
+       `${w.id}: the photograph puts the hardware on the ${measured} (handle.x = `
+     + `${rec.handle.x}) and we draw the keyhole on the ${drawn} — the site is `
+     + 'building the mirror of this door');
+
+    const words = handingWords(st);
+    ok(words.includes(`צילינדר בצד ${measured === 'right' ? 'ימין' : 'שמאל'}`),
+       `${w.id}: the order says "${words}" about a door whose hardware was `
+     + `measured on the ${measured}`);
+  }
+  ok(checked >= 25,
+     `only ${checked} measured doors were checked against their photographs — `
+   + 'this group is the one anchor outside our own drawing and it has gone thin');
+  console.log(`  (${checked} real doors, each against its own photograph's handle.x)`);
+}
+
+group('and the opening is spelled out, so it cannot be read the wrong way round');
+{
+  /* ⚠ THIS ONE IS CIRCULAR AND IS KEPT ANYWAY, WITH ITS LIMITS NAMED. It
+     checks that the SENTENCE agrees with the PICTURE — both of which read
+     `HANDINGS[].hinge`, so it cannot catch that field being wrong. What it
+     does catch is the sentence and the picture drifting apart, which is a
+     different and real failure: `handingWords` could be edited, or the
+     renderer's lever direction could be, and then the order and the drawing
+     would say opposite things about the same door.
+     The group above is the one anchored outside our own drawing. */
   for (const h of HANDINGS) {
     const st = { ...base, handing: h.id, lockset: 'plate', handle: 'none' };
     const svg = render(st);

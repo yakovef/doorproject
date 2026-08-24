@@ -858,6 +858,132 @@ for (const v of VIEWS) {
     };
   });
 
+  /* ── THE TWO SURFACES THIS AUDIT COULD NOT SEE ────────────────────
+     The gallery and the order sheet shipped with nothing in this file driving
+     either of them, so the audit printed "no faults" about a round that added
+     two whole screens. The first thing it finds is the reason it exists.
+
+     ⚠ EVERY DOOR ON A PAGE NEEDS ITS OWN SVG IDS. `render()` emits fixed ones
+     — `leafFill`, `keyWash`, `retNear` and fifty-five more — and `url(#x)`
+     resolves to the FIRST element with that id in the document. That is
+     correct for a page with one door and silently wrong for a grid of thirty:
+     the gallery shipped painting every tile in the first tile's colour, and
+     nothing here could have noticed. This is the check that would have. */
+  {
+    console.log('\nthe gallery, and the order sheet');
+    const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+    await pg.goto(URL);
+    await pg.waitForTimeout(600);
+    await pg.evaluate(() => document.querySelector('#works-btn').click());
+    await pg.waitForTimeout(900);
+
+    const gal = await pg.evaluate(() => {
+      const dlg = document.querySelector('#works');
+      const tiles = [...document.querySelectorAll('.work')];
+      const drawn = tiles.filter(t => t.querySelector('svg'));
+      /* Collect the ids of every drawn tile and count the ones that appear in
+         more than one. Any repeat means a tile is painting with another
+         tile's gradients. */
+      const seen = new Map();
+      for (const t of drawn) {
+        for (const el of t.querySelectorAll('[id]')) {
+          seen.set(el.id, (seen.get(el.id) || 0) + 1);
+        }
+      }
+      const shared = [...seen.entries()].filter(([, n]) => n > 1);
+      /* And every reference must resolve INSIDE its own tile. */
+      let dangling = 0;
+      for (const t of drawn) {
+        const ids = new Set([...t.querySelectorAll('[id]')].map(e => e.id));
+        for (const el of t.querySelectorAll('*')) {
+          for (const a of el.attributes) {
+            const m = /^url\(#(.+)\)$/.exec(a.value);
+            if (m && !ids.has(m[1])) dangling++;
+          }
+        }
+      }
+      const small = tiles.filter(t => {
+        const r = t.getBoundingClientRect();
+        return r.width && r.height && (r.width < 44 || r.height < 44);
+      }).length;
+      return {
+        open: dlg && dlg.open, tiles: tiles.length, drawn: drawn.length,
+        shared: shared.length, sharedSample: shared.slice(0, 4).map(([k]) => k),
+        dangling, small,
+        unnamed: tiles.filter(t => !(t.getAttribute('aria-label') || '').trim()).length,
+      };
+    });
+
+    if (!gal.open) fault('gallery', 'the gallery button does not open the dialog');
+    if (!gal.tiles) fault('gallery', 'the gallery has no doors in it');
+    if (!gal.drawn) fault('gallery', 'no door in the gallery was drawn');
+    if (gal.shared) {
+      fault('gallery', `${gal.shared} SVG id(s) are shared between gallery tiles `
+                     + `(${gal.sharedSample.join(', ')}) — every tile after the first `
+                     + 'paints with the first one\'s gradients');
+    }
+    if (gal.dangling) {
+      fault('gallery', `${gal.dangling} url(#…) reference(s) in the gallery point outside `
+                     + 'their own tile');
+    }
+    if (gal.small) fault('gallery', `${gal.small} gallery tile(s) under 44px`);
+    if (gal.unnamed) fault('gallery', `${gal.unnamed} gallery tile(s) have no accessible name`);
+    if (!gal.shared && !gal.dangling && gal.drawn) {
+      console.log(`  ${gal.drawn} of ${gal.tiles} doors drawn, each with its own ids`);
+    }
+
+    /* Escape has to close it. `showModal` gives that for free — which is the
+       argument for using it — so this is really asking whether it is still a
+       modal dialog rather than a div wearing one. */
+    await pg.keyboard.press('Escape');
+    await pg.waitForTimeout(200);
+    if (await pg.evaluate(() => document.querySelector('#works').open)) {
+      fault('gallery', 'Escape does not close the gallery');
+    }
+    await pg.close();
+
+    const sheetPg = await b.newPage({ viewport: { width: 794, height: 1123 } });
+    await sheetPg.goto(`${URL}?sheet=1&c=rb-6219d&w=rect&g=iron&n=idan`
+                     + '&k=cylinder&d=panel&s=sidelight&h=left-in');
+    await sheetPg.waitForTimeout(700);
+    const sheet = await sheetPg.evaluate(() => {
+      const box = document.querySelector('#sheet');
+      const svgs = box ? box.querySelectorAll('svg') : [];
+      const ids = new Set(), dupes = [];
+      for (const el of document.querySelectorAll('[id]')) {
+        if (ids.has(el.id)) dupes.push(el.id); else ids.add(el.id);
+      }
+      const notice = document.querySelector('#notice');
+      return {
+        drawn: svgs.length,
+        h1: document.querySelectorAll('h1').length,
+        text: box ? box.textContent : '',
+        dupes: dupes.length,
+        configuratorVisible: [...document.querySelectorAll('.layout, .dock, .bar')]
+          .filter(e => getComputedStyle(e).display !== 'none').length,
+        noticeShowing: notice && !notice.hidden,
+      };
+    });
+    if (!sheet.drawn) fault('sheet', '?sheet=1 draws no door');
+    if (sheet.h1 !== 1) fault('sheet', `the order sheet has ${sheet.h1} <h1> — a printed `
+                                     + 'document with no heading is one nobody can navigate');
+    if (sheet.dupes) fault('sheet', `${sheet.dupes} duplicated id(s) on the sheet page`);
+    if (sheet.configuratorVisible) {
+      fault('sheet', `${sheet.configuratorVisible} configurator element(s) still showing on `
+                   + 'the order sheet');
+    }
+    if (!/DM-/.test(sheet.text)) fault('sheet', 'the order sheet carries no design code');
+    if (!/מבחוץ/.test(sheet.text)) {
+      fault('sheet', 'the order sheet does not say which side you are standing on — the '
+                   + 'ambiguity that had this site building mirrored doors');
+    }
+    if (sheet.noticeShowing) {
+      fault('sheet', 'the unknown-parameter strip is up on a legitimate ?sheet=1 URL');
+    }
+    if (!faults) console.log('  the order sheet prints a door, a code and an unambiguous opening');
+    await sheetPg.close();
+  }
+
   const routes = [
     ['happy', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
         await pg.goto(URL); await pg.waitForTimeout(700); return pg; }],

@@ -295,9 +295,25 @@ body {
 @media (min-width: 1100px) {
   .trust {
     position: fixed;
-    inset-block-end: 0;
+    /* ⚠ THE STAGE'S FOOT, NOT THE VIEWPORT'S. `inset-block-end: 0` put the
+       band on the viewport bottom — which above 1100 px is exactly where
+       `.stage__bar` ends, so the four claims printed straight over the
+       "הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם." note. Measured at 1280x800 the
+       two boxes were identical: y 759.7-800, left 360, width 560. At 1100 the
+       band also wrapped to two rows and climbed 27 px up into the drawing.
+       `REALISM2.md` §B5 asked for `absolute` INSIDE the wrap; this shipped as
+       `fixed` against the viewport, which is a different box. `--stage-b` is
+       published off the same rect as the two lines below, on the same re-fit.
+       ⚠ AND THE WIDTH FALLBACK IS `0`, NOT `100%`. Before the bundle runs — or
+       if it never runs — the variables are unset, and a 100% fallback laid the
+       band right across the choices card and the send card too. There is
+       nothing sensible to guess: until the stage has been measured the band
+       does not show, which is what it did at this width for the whole life of
+       the page before this round. */
+    inset-block-end: var(--stage-b, 0px);
     left: var(--stage-l, 0px);
-    inline-size: var(--stage-w, 100%);
+    inline-size: var(--stage-w, 0px);
+    overflow: hidden;
     z-index: 2;
     justify-content: center; gap: 4px 24px;
     padding: 10px 16px 12px;
@@ -997,10 +1013,20 @@ body {
 .works-open__n { font-size: .74rem; color: var(--accent-ink); white-space: nowrap; }
 
 .works {
+  /* ⚠ ONE HEIGHT, NAMED. The dialog's cap and the grid's cap inside it are the
+     SAME quantity minus the head — and they were written as `88dvh` in one
+     rule and `calc(88dvh - 118px)` in another, so changing the dialog's height
+     silently left the grid sized for the old one. CLAUDE.md §5. The 118 is the
+     head and lede above the grid; it is still hand-derived, and it is now the
+     only hand-derived number of the two. */
+  --works-h: 88dvh;
   inline-size: min(1000px, 94vw);
-  max-block-size: 88dvh;
+  max-block-size: var(--works-h);
   padding: 0;
-  border: 0; border-radius: var(--r-card);
+  /* A hairline even in forced colours: every other floating surface on this
+     page has one, and without it the dialog has no edge against its own
+     backdrop when the author colours are thrown away. */
+  border: 1px solid transparent; border-radius: var(--r-card);
   /* Its own surface, re-declared: anything inside that has to match what is
      BEHIND it reads `--surface`, and this is a white card over a dim
      backdrop rather than the page's paper. */
@@ -1029,11 +1055,15 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
   gap: 12px;
-  padding: 0 18px 18px;
+  /* ⚠ TOP PADDING, because this box scrolls and `:focus-visible` draws its ring
+     2 px OUTSIDE the button. With `padding: 0 18px 18px` the ring on every
+     tile in the first row was clipped away by the scroll container's own edge
+     — the whole top row of a keyboard walk looked unfocused. */
+  padding: 4px 18px 18px;
   /* This box is the scroll container, so it is also the observer's root — see
      `buildWorks`. A door is drawn when it comes within a screen of here and
      thrown away again when it leaves. */
-  max-block-size: calc(88dvh - 118px);
+  max-block-size: calc(var(--works-h) - 118px);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -1452,9 +1482,16 @@ html.is-live .wa__off { display: none; }
   gap: 16px; padding-block-end: 8px;
   border-block-end: 2px solid var(--ink);
 }
-.sheet__brand { font-weight: 700; font-size: 1.25rem; }
+/* An <h1>, because `.is-sheet` hides `.layout` and with it the page's only
+   heading — the printed document had none at all. Sized here rather than
+   inherited, so it does not arrive at the browser's 2em default. */
+.sheet__brand { margin: 0; font-weight: 700; font-size: 1.25rem; line-height: 1.2; }
 .sheet__sub { font-size: .78rem; color: var(--ink-2); }
-.sheet__code { font-family: var(--mono); font-size: .9rem; direction: ltr; }
+/* ⚠ `direction: ltr` MOVED ONTO THE CODE ITSELF. On the whole row it reordered
+   the Hebrew label around the Latin digits, so the sheet printed
+   `DM-P4040481 :קוד` — label, colon and all, on the wrong side. The code is
+   Latin and must not mirror; the word in front of it is Hebrew and must. */
+.sheet__code { font-family: var(--mono); font-size: .9rem; }
 .sheet__code b { font-size: 1.05rem; }
 
 .sheet__body {
@@ -1470,12 +1507,26 @@ html.is-live .wa__off { display: none; }
    sent to is a sheet nobody checks before ordering from it. */
 @media (max-width: 700px) {
   .sheet__body { grid-template-columns: minmax(0, 1fr); gap: 6mm; }
-  .sheet__art svg { max-block-size: 60vh; }
 }
 .sheet__art { margin: 0; }
 .sheet__art svg {
   inline-size: 100%; block-size: auto; max-block-size: 150mm;
   display: block; direction: ltr;         /* never mirrors — PLAN.md §6.1 */
+}
+/* ⚠ AFTER the rule it overrides, not before it — THE THIRD TIME THIS FILE HAS
+   BEEN BITTEN BY EXACTLY THIS. A media query adds no specificity, so a
+   `.sheet__art svg` inside one that sits ABOVE the base `.sheet__art svg`
+   loses to it at every width. That is how the phone cap shipped dead: computed
+   `max-block-size` read `150mm` (566.9 px) rather than the `60vh` (506.4 px on
+   a 390x844 phone) it was written for, so the elevation ran 60 px taller than
+   intended and pushed the handing row and the price further below the fold —
+   on a sheet whose own note says it has to be proof-readable on the device it
+   was sent to. Its sibling in the same block, `.sheet__body`, worked, because
+   ITS base rule comes earlier; that is why the miss read as nearly-right.
+   The other two occurrences are recorded at `position: sticky` and at the
+   stage's height. Search this file for "AFTER the rule it overrides". */
+@media (max-width: 700px) {
+  .sheet__art svg { max-block-size: 60vh; }
 }
 .sheet__dims {
   margin-block-start: 4px; text-align: center;
@@ -1496,6 +1547,12 @@ html.is-live .wa__off { display: none; }
   background: var(--chip); border: 1px solid rgb(0 0 0 / .28);
   align-self: center;
 }
+/* The two warnings the screen carries in `.strip` and the sheet used to hide:
+   that the price is a placeholder, and that the rules had to change the door
+   on the way in. Both matter more on a document somebody orders from than on
+   a screen they are still playing with. */
+.sheet__warn { display: block; margin-block-start: 4px; color: var(--warn); }
+.sheet__note { display: block; margin-block-start: 4px; color: var(--warn); }
 .sheet__foot {
   padding-block-start: 6px; border-block-start: 1px solid var(--rule);
   font-size: .76rem; color: var(--ink-2);
