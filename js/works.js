@@ -40,7 +40,7 @@ export const WORKS = [
   { id: 'd099', state: { colour: 'rb-7126d', detail: 'panel', window: 'rect', grille: 'scroll', handle: 'none', lockset: 'coral', size: 'standard', handing: 'right-in' } },
   { id: 'd106', state: { colour: 'rb-7080d', detail: 'panel', window: 'rect', grille: 'circles', handle: 'none', lockset: 'plate', size: 'standard', handing: 'left-in' } },
   { id: 'd108', state: { colour: 'rb-7080d', detail: 'panel', window: 'rect', grille: 'iron', handle: 'none', lockset: 'plate', size: 'standard', handing: 'right-in' } },
-  { id: 'd113', state: { colour: 'rb-7080d', detail: 'plain', window: 'strip', grille: 'grid', handle: 'ella', lockset: 'digital', size: 'standard', handing: 'right-in' } },
+  { id: 'd113', state: { colour: 'rb-7080d', detail: 'plain', window: 'strip', grille: 'grid', handle: 'barblack', lockset: 'digital', size: 'standard', handing: 'right-in' } },
   { id: 'd116', state: { colour: 'rb-7080d', detail: 'panel', window: 'rect', grille: 'scroll', handle: 'none', lockset: 'coral', size: 'standard', handing: 'right-in' } },
   { id: 'd122', state: { colour: 'rb-7240d', detail: 'panel', window: 'rect', grille: 'grid', handle: 'idan', lockset: 'cylinder', size: 'standard', handing: 'right-in' } },
   { id: 'd125', state: { colour: 'rb-9001d', detail: 'plain', window: 'strip', grille: 'reeded', handle: 'ron', lockset: 'cylinder', size: 'standard', handing: 'left-in' } },

@@ -272,6 +272,22 @@ export const HANDLES = [
      bars differing mainly in their fixings. */
   { id: 'blade',   he: 'להב שטוח', en: 'Flat blade', len: 1000, w: 62,
     style: 'bar', bar: 'blade', pull: true },
+
+  /* ⚠ BLACK, AND THAT IS A PROPERTY OF THE PRODUCT — the same argument that
+     kept Shiran's brass on Shiran's own row after the finish group was
+     withdrawn. Peretz does not sell this bar in a choice of finishes; he sells
+     a black bar.
+     Measured off the door in `research/newdoor/`: the median of every dark
+     pixel across its four photographs is #2A2627 to #36322E, warmth (r−b) of
+     2 to 8 — neutral. Our brass runs r−b above 40, which is why the same
+     photographs read as antique bronze until somebody sampled them, and why
+     the correction came from outside: "there is no bronze in the picture".
+     800 x 20 on that door — a slim tube, shorter than anything else in the
+     range, which is what leaves the leaf's ornament room to be seen.
+     `finish: 'black'` reaches the lock furniture too, through
+     `effectiveFinish`: on this door the keyway escutcheon is the same black. */
+  { id: 'barblack', he: 'מוט שחור', en: 'Black tube bar', len: 800, w: 20,
+    style: 'bar', bar: 'ron', pull: true, finish: 'black' },
 ];
 
 /**
@@ -500,6 +516,20 @@ export const GRILLES = [
      the glass is mostly a mirror of the street, with faint vertical flutes
      showing where the reflection is distorted across the middle third. So it
      is reeded and it is barely reeded. Left here, and named in ASK-PERETZ. */
+  /* Overlapping rings with a four-comma rosette in every diagonal gap and a
+     pair at every crossing — the field on the door in `research/newdoor/`.
+     Ironwork, not an etched film: see the long note in `grillePaths`, and
+     `circles` two lines up, which is the etched cousin and stays.
+     ⚠ `newdoor` IS NOT A CORPUS ID AND THAT IS THE POINT. Every other entry
+     here cites `research/works/doors/dNNN.jpeg`, the numbered set scraped from
+     Peretz's works page; this one was photographed off the workshop floor and
+     lives in `research/newdoor/`. Two assertions check that every priced
+     grille cites SOMETHING and that everything cited EXISTS, and the second
+     one now knows both roots — generalised rather than relaxed, because a
+     priced option with no photograph behind it is exactly how `lattice`,
+     `bars` and `bars-light` once reached a customer. */
+  { id: 'rings',   he: 'טבעות ותלתלים', en: 'Scrolled ring lattice',
+    doors: ['newdoor'] },
   { id: 'reeded',  he: 'זכוכית מחורצת',  en: 'Reeded',          glass: true,
     doors: ['d122', 'd125'] },
 ];
@@ -621,6 +651,54 @@ export const DETAILS = [
   { id: 'stripsv', he: 'פסים אנכיים',   en: 'Vertical strips', panel: false, groove: false, strips: 4, vertical: true },
   { id: 'stripsv6', he: 'שישה פסים אנכיים', en: 'Six vertical strips',
     panel: false, groove: false, strips: 6, vertical: true },
+
+  /* ── THE CLASSICAL SET ─────────────────────────────────────────────
+     A whole composition rather than one feature: a projecting cornice over a
+     frieze with an oval boss, the window, a corbelled shelf carrying a
+     horizontal turned pull, the raised panel, and a plinth. Measured off a
+     door Peretz installed and photographed in `research/newdoor/`, brought in
+     at his child's request — *"the whole windows and panels and the horizontal
+     pull bar are one set... so add this option with the panels and windows."*
+
+     ⚠ THIS IS THE GAP CLAUDE.md §9 HAS BEEN CARRYING. It reads: "d080 is a
+     full classical composition — cornice, pilasters, plinth — and we have no
+     vocabulary for it." We have one now, and it is deliberately ONE OPTION
+     rather than an axis of parts: the pieces are proportioned to each other
+     and to the openings between them, and letting a customer put a cornice
+     with no plinth would offer doors nobody builds.
+
+     ⚠ THE HORIZONTAL PULL IS PART OF THE SET, NOT OF THE HARDWARE. That is
+     how it was described and it is also what makes the model work: the door
+     carries this pull AND a long vertical bar, and `state.handle` holds one
+     grip. Drawing the set's own pull as part of the FACE leaves the hardware
+     axis free for the bar, which is the choice a customer actually makes.
+     `grab: true` is what says so; nothing else in the catalogue has it.
+
+     `panel: true` — it has a raised panel, so it prices and repairs as a
+     panelled face. No `top` and no `panels`, so `hasUpperPanel` is false: the
+     composition is BUILT round a window and must not be refused beside one. */
+  /* ⚠ `winRect` — THE SET OWNS ITS OWN OPENING, and that is not a liberty, it
+     is the product. Measured off the photographs: 326 mm down a standard leaf,
+     781 tall, 356 wide, against the catalogue rectangle's 185 / 902 / 357. The
+     width is the same to a millimetre; what differs is that the cornice and
+     frieze take the top of the door, so the glass starts lower and is shorter.
+     Drawn at the catalogue's position the frieze and the glass share 60 mm of
+     leaf and the ornament runs straight through the opening — which is what
+     the first render beside the photograph showed.
+     `apertureLayout` reads it, so the drawing and every rule that clears the
+     glass move together. Millimetres, like every other rect in this file. */
+  /* ⚠ CITES `newdoor` AND NOT THE FIVE DOORS ASK-PERETZ §4 NAMES. d101, d103,
+     d108, d112 and d129 all carry a composition of this family, and the
+     question about them predates this option by two rounds — but not one of
+     them was measured for it, and theirs put a LETTERPLATE in the plinth block
+     where this one puts a moulded oval. A `doors` list is a claim about where
+     the numbers came from, not about which doors look alike; the numbers came
+     from one door, photographed off the workshop floor into
+     `research/newdoor/`. Whether those five are the same product is a question
+     for Peretz and it is asked. */
+  { id: 'classic', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false,
+    classic: true, grab: true, needsWindow: true, doors: ['newdoor'],
+    winRect: { w: 356, h: 781, top: 326 } },
 ];
 
 /**

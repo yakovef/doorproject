@@ -280,14 +280,26 @@ a door.*
 
 d101 · d103 · d108 · d112 · d129
 
-*Five doors carry a whole composition the site has no way to express: an
+*Five doors carry a whole composition the site had no way to express: an
 entablature over the light, a moulded plinth block under it with its own
 cornice and base, and the letterplate set into that block. Beside them our
-luxury tier is a plain rectangle of moulding, which is the right drawing for
-the other thirty-six glazed doors and the wrong one for these five.
-Not added: it is a substantial drawing and, more to the point, a product
-question. If it is a fixed model rather than an option, it belongs in a
-different place than a tile.*
+luxury tier was a plain rectangle of moulding — the right drawing for the other
+thirty-six glazed doors and the wrong one for these five.*
+
+*⚠ **THE DRAWING HALF OF THIS IS DONE. THE PRODUCT QUESTION IS NOT, AND IT IS
+THE HALF THAT MATTERED.** `classic` — סט קלאסי — is in the range as of 24.8,
+built from five photographs of a door installed that week
+(`research/newdoor/`): cornice, frieze, corbelled shelf with its own turned
+pull, panel and plinth, with its own smaller light so the glass clears the
+frieze. So "we do not draw this at all" is no longer true.
+What is still open is exactly what this question asked and §14 now asks with a
+price attached: **is it a fixed model or an option?** We have made it an option
+— one tile in עיצוב חזית at ₪1,680 — and if it is really a model, that is the
+wrong place for it and the wrong shape of price. And the five doors above are
+not obviously the same product as the one we measured: theirs carry a
+LETTERPLATE in the plinth block where ours carries a moulded oval, so they may
+be a variant, a predecessor, or a different maker's set. Worth putting the six
+pictures side by side in front of him.*
 
 > **"14 עיצובי חלון — אילו מהם אתה באמת מזמין, ומה התוספת על כל אחד?"**
 
@@ -409,9 +421,12 @@ exists to remove.*
 > **"בשתי דלתות שלך ידית המשיכה ארוכה מכל מה שיש באתר — 0.73 ו-0.86 מגובה
 > הדלת, ואצלנו הכי ארוכה 0.61. איזו ידית זו?"**
 
-*The perimeter groove is priced at ₪260 — one notch above the single vertical
-groove at ₪240, since it is four scribed lines rather than one. Invented like
-every other number in `js/catalog.js`, and flagged here rather than quietly.*
+*⚠ THE PERIMETER GROOVE NO LONGER EXISTS AND THIS QUESTION IS WITHDRAWN. Both
+milled grooves — חריץ אנכי and the perimeter one — were taken out of עיצוב חזית
+on the owner's son's instruction, and their ids now alias onto פאנל תחתון so old
+links still open a real door. Asking Peretz to price an option the site cannot
+build is the one thing this file exists to prevent; the sentence stays only so
+that nobody re-derives the ₪260 from a git history.*
 
 *The long bars are d072 (0.861 of leaf height) and d087 (0.726). Ours run 0.45
 to 0.61, so both of those doors are drawn with a bar noticeably shorter than
@@ -606,6 +621,56 @@ five-second answers and none of them blocks launch.*
 
 ---
 
+## 14. שלוש אפשרויות חדשות מהדלת האחרונה — כמה כל אחת עולה? ⚠ חוסם מחיר
+
+הבן שלח חמש תמונות של דלת שהתקנת, וביקש שנדע לצייר בדיוק אותה. עכשיו האתר יודע,
+ושלוש אפשרויות חדשות נכנסו לקטלוג. **המחירים שלמטה מומצאים**, כמו כל מספר
+בקובץ `js/prices.js`, וצריך את שלך.
+
+> **"הסט הקלאסי — כרכוב, אפריז, מדף עם קונסולות והידית שלו, פאנל ובסיס מעוצב,
+> הכול כמקשה אחת. כמה זה מוסיף על דלת חלקה?"**
+
+*מתומחר אצלנו ₪1,680. זה הניחוש הגדול ביותר בכל הקובץ: שש חתיכות מורכבות
+והתקנה, מול ₪380 לפאנל בודד. אם הסט נמכר בכמה גדלים או בכמה רמות גימור, זאת
+בעצם יותר משורה אחת במחירון ונשמח לדעת.*
+
+> **"הסורג עם הטבעות והתלתלים שבתמונה — הוא בקטלוג הרגיל שלך או הזמנה מיוחדת?
+> וכמה הוא עולה מול סורג רשת פשוט?"**
+
+*מתומחר ₪540 מול ₪300 לרשת. שדה צפוף הרבה יותר — טבעת כל 174 מ״מ עם רוזטה בכל
+מרווח — ולכן יותר ברזל ויותר עבודה, אבל היחס הוא ניחוש.*
+
+> **"מוט המשיכה השחור — 800 מ״מ, צינור דק. יש לו שם או מק״ט? ומה המחיר?"**
+
+*מתומחר ₪300. זה גם קצר מכל מוט אחר ברשימה שלנו, וזה מה שמשאיר לעיצוב של הדלת
+מקום להיראות — אבל בלי שם שאפשר לכתוב על הזמנה, הוא "מוט שחור" ותו לא.*
+
+> **"ויש לך מוטות שחורים ארוכים. ב־d072 המוט הוא 0.86 מגובה הדלת וב־d087 0.73,
+> ושניהם שחורים בתמונה. גם אלה מוצרים שאתה מזמין? מה השם והאורך?"**
+
+*זה חור אמיתי בקטלוג ולא רק שאלה. המוט השחור היחיד אצלנו הוא 800 מ״מ, ולכן
+כשהגלריה מנסה לצייר את d072 היא בוחרת בין הצבע הנכון באורך שגוי לבין האורך
+הנכון בצבע שגוי. הכלי שמתאים דלת אמיתית לדגם מציג עכשיו את ההחלפה במפורש בכל
+שורה, אבל אף בחירה שם לא תהיה נכונה עד שיהיה מוט שחור ארוך ברשימה. קשור ל־§5,
+ששאלה על אותם שני מוטות מכיוון אחר.*
+
+<details>
+<summary>ועוד שתיים קטנות שהתמונות פתחו</summary>
+
+**הצילינדר על הדלת הזאת שחור.** בכל שאר התמונות שמדדנו הוא כרום — גם על דלתות
+עם ידיות פליז, שם הוא בולט כחלק נפרד. עכשיו הציור מצייר צילינדר שחור כשהידית
+שחורה וכרום אחרת. אם אתה מזמין את הצילינדר בגימור של הידית תמיד, נגיד את זה
+פעם אחת ונגמור; אם זאת בחירה לפי דלת, זאת שאלה ללקוח וצריך שורה בקטלוג. קשור
+ל־§2b1, שעדיין פתוחה.
+
+**הזכוכית בסט הקלאסי היא 356 על 781 מ״מ**, קטנה מהחלון המלבני הרגיל שלנו
+(357 על 902) — היא חייבת להתקצר כדי לפנות מקום לאפריז מעליה ולמדף מתחתיה. אצלנו
+זה קבוע בקוד. אם בפועל אתה עושה את הזכוכית לפי מידת הדלת, נשנה.
+
+</details>
+
+---
+
 ## What I need back, minimally, to flip `PLACEHOLDER` to `false`
 
 | | Question | Blocks |
@@ -622,6 +687,7 @@ five-second answers and none of them blocks launch.*
 | 11 | second CTA · the nav · the trust sublines | three items of the second mockup |
 | 12 | opening or leaf · one opening or two | the dimensions on the A4 order sheet |
 | ~~13~~ | ~~a door with no lock furniture~~ | ✅ **answered 24.8.2026 — no.** The option is withdrawn; the bare door opens with a cylinder. See §13 |
+| 14 | the classical set · the ring grille · the black bar | three prices, and a name for the bar |
 
 1 and 5 were the two that stop launch on their own. **1 is answered and fixed**,
 so **5 — a starting price per size band — is now the only thing standing between

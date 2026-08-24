@@ -65,6 +65,8 @@
        row on the customer's screen. */
     mesh: 240,
     // זכוכית מעוצבת
+    rings: 540,
+    // טבעות ותלתלים  — dense forged field, more bar than a plain grid
     reeded: 280
     // זכוכית מחורצת
   };
@@ -91,8 +93,16 @@
     // אחד עשר פסים
     stripsv: 440,
     // פסים אנכיים     — four bands
-    stripsv6: 540
+    stripsv6: 540,
     // שישה פסים אנכיים
+    /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
+       and plinth, all as one. Priced well above a single panel because it is
+       six applied pieces and a fitting, not one. ⚠ A guess like every figure in
+       this file — and a bigger one than most, because it is a product Peretz
+       makes and we have never priced. Worth asking him about in the same breath
+       as ASK-PERETZ §5. */
+    classic: 1680
+    // סט קלאסי
   };
   var HANDLE = {
     none: 0,
@@ -113,8 +123,10 @@
     // מאחז אופקי
     channel: 400,
     // ידית שקועה
-    blade: 440
+    blade: 440,
     // להב שטוח
+    barblack: 300
+    // מוט שחור
   };
   var LOCKSET = {
     coral: 0,
@@ -364,6 +376,30 @@
       style: "bar",
       bar: "blade",
       pull: true
+    },
+    /* ⚠ BLACK, AND THAT IS A PROPERTY OF THE PRODUCT — the same argument that
+       kept Shiran's brass on Shiran's own row after the finish group was
+       withdrawn. Peretz does not sell this bar in a choice of finishes; he sells
+       a black bar.
+       Measured off the door in `research/newdoor/`: the median of every dark
+       pixel across its four photographs is #2A2627 to #36322E, warmth (r−b) of
+       2 to 8 — neutral. Our brass runs r−b above 40, which is why the same
+       photographs read as antique bronze until somebody sampled them, and why
+       the correction came from outside: "there is no bronze in the picture".
+       800 x 20 on that door — a slim tube, shorter than anything else in the
+       range, which is what leaves the leaf's ornament room to be seen.
+       `finish: 'black'` reaches the lock furniture too, through
+       `effectiveFinish`: on this door the keyway escutcheon is the same black. */
+    {
+      id: "barblack",
+      he: "מוט שחור",
+      en: "Black tube bar",
+      len: 800,
+      w: 20,
+      style: "bar",
+      bar: "ron",
+      pull: true,
+      finish: "black"
     }
   ];
   var LOCKSETS = [
@@ -544,6 +580,24 @@
        the glass is mostly a mirror of the street, with faint vertical flutes
        showing where the reflection is distorted across the middle third. So it
        is reeded and it is barely reeded. Left here, and named in ASK-PERETZ. */
+    /* Overlapping rings with a four-comma rosette in every diagonal gap and a
+       pair at every crossing — the field on the door in `research/newdoor/`.
+       Ironwork, not an etched film: see the long note in `grillePaths`, and
+       `circles` two lines up, which is the etched cousin and stays.
+       ⚠ `newdoor` IS NOT A CORPUS ID AND THAT IS THE POINT. Every other entry
+       here cites `research/works/doors/dNNN.jpeg`, the numbered set scraped from
+       Peretz's works page; this one was photographed off the workshop floor and
+       lives in `research/newdoor/`. Two assertions check that every priced
+       grille cites SOMETHING and that everything cited EXISTS, and the second
+       one now knows both roots — generalised rather than relaxed, because a
+       priced option with no photograph behind it is exactly how `lattice`,
+       `bars` and `bars-light` once reached a customer. */
+    {
+      id: "rings",
+      he: "טבעות ותלתלים",
+      en: "Scrolled ring lattice",
+      doors: ["newdoor"]
+    },
     {
       id: "reeded",
       he: "זכוכית מחורצת",
@@ -670,6 +724,62 @@
       groove: false,
       strips: 6,
       vertical: true
+    },
+    /* ── THE CLASSICAL SET ─────────────────────────────────────────────
+         A whole composition rather than one feature: a projecting cornice over a
+         frieze with an oval boss, the window, a corbelled shelf carrying a
+         horizontal turned pull, the raised panel, and a plinth. Measured off a
+         door Peretz installed and photographed in `research/newdoor/`, brought in
+         at his child's request — *"the whole windows and panels and the horizontal
+         pull bar are one set... so add this option with the panels and windows."*
+    
+         ⚠ THIS IS THE GAP CLAUDE.md §9 HAS BEEN CARRYING. It reads: "d080 is a
+         full classical composition — cornice, pilasters, plinth — and we have no
+         vocabulary for it." We have one now, and it is deliberately ONE OPTION
+         rather than an axis of parts: the pieces are proportioned to each other
+         and to the openings between them, and letting a customer put a cornice
+         with no plinth would offer doors nobody builds.
+    
+         ⚠ THE HORIZONTAL PULL IS PART OF THE SET, NOT OF THE HARDWARE. That is
+         how it was described and it is also what makes the model work: the door
+         carries this pull AND a long vertical bar, and `state.handle` holds one
+         grip. Drawing the set's own pull as part of the FACE leaves the hardware
+         axis free for the bar, which is the choice a customer actually makes.
+         `grab: true` is what says so; nothing else in the catalogue has it.
+    
+         `panel: true` — it has a raised panel, so it prices and repairs as a
+         panelled face. No `top` and no `panels`, so `hasUpperPanel` is false: the
+         composition is BUILT round a window and must not be refused beside one. */
+    /* ⚠ `winRect` — THE SET OWNS ITS OWN OPENING, and that is not a liberty, it
+       is the product. Measured off the photographs: 326 mm down a standard leaf,
+       781 tall, 356 wide, against the catalogue rectangle's 185 / 902 / 357. The
+       width is the same to a millimetre; what differs is that the cornice and
+       frieze take the top of the door, so the glass starts lower and is shorter.
+       Drawn at the catalogue's position the frieze and the glass share 60 mm of
+       leaf and the ornament runs straight through the opening — which is what
+       the first render beside the photograph showed.
+       `apertureLayout` reads it, so the drawing and every rule that clears the
+       glass move together. Millimetres, like every other rect in this file. */
+    /* ⚠ CITES `newdoor` AND NOT THE FIVE DOORS ASK-PERETZ §4 NAMES. d101, d103,
+       d108, d112 and d129 all carry a composition of this family, and the
+       question about them predates this option by two rounds — but not one of
+       them was measured for it, and theirs put a LETTERPLATE in the plinth block
+       where this one puts a moulded oval. A `doors` list is a claim about where
+       the numbers came from, not about which doors look alike; the numbers came
+       from one door, photographed off the workshop floor into
+       `research/newdoor/`. Whether those five are the same product is a question
+       for Peretz and it is asked. */
+    {
+      id: "classic",
+      he: "סט קלאסי",
+      en: "Classical set",
+      panel: true,
+      groove: false,
+      classic: true,
+      grab: true,
+      needsWindow: true,
+      doors: ["newdoor"],
+      winRect: { w: 356, h: 781, top: 326 }
     }
   ];
   var FINISHES = [
@@ -1203,7 +1313,7 @@
     const hingeX = hingeOnLeft ? mainX : mainX1;
     const leverDir = hingeOnLeft ? -1 : 1;
     const centreX = mainX + leafW / 2;
-    const openings = apertureLayout(win, leafW);
+    const openings = apertureLayout(win, leafW, detail);
     const winBottom = openings.length ? y0 + Math.max(...openings.map((o) => o.top + o.h)) : y0;
     const winSpan = openings.length ? {
       x: mainX + Math.min(...openings.map((o) => o.x)),
@@ -1530,12 +1640,32 @@
     <!-- The euro cylinder is a separate chromed part pressed into the
          escutcheon. On a brass rosette it reads markedly cooler and brighter
          than the plate around it, which is the giveaway that it is a
-         different component rather than a moulded feature. -->
+         different component rather than a moulded feature.
+         ⚠ EXCEPT ON A BLACK DOOR, WHERE IT IS BLACK, and this is one
+         measurement against another rather than a preference. The chrome above
+         is read off Peretz's own photographs of brass-furnitured doors, and it
+         stands. The file research/newdoor/keyhole.jpg is a close-up of the
+         other case at 4000 px: a black stepped rose with a BLACK cylinder
+         ring inside it, the only bright thing in the whole fitting being the
+         sliver of the key pin.
+         Painting chrome there put a nickel plug in the middle of the one door
+         this whole set was drawn from.
+         Only black is special-cased. Passing every stop through scaleTone
+         would have turned the cylinder brass on a brass door, which is the
+         thing the paragraph above says it is not. -->
+    ${finish.id === "black" ? `
+    <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="#5A5D60"/>
+      <stop offset="0.4" stop-color="#333639"/>
+      <stop offset="1"   stop-color="#1A1C1E"/>
+    </linearGradient>
+    <linearGradient id="euroRim"><stop offset="0" stop-color="#232527"/></linearGradient>` : `
     <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="#E8ECEE"/>
       <stop offset="0.4" stop-color="#B9BFC4"/>
       <stop offset="1"   stop-color="#7C8288"/>
     </linearGradient>
+    <linearGradient id="euroRim"><stop offset="0" stop-color="#8E9398"/></linearGradient>`}
 
     <!-- ── PULL-BAR CROSS-SECTIONS ────────────────────────────────────
          TWO SECTIONS, NOT FIVE. Twenty-one bar-carrying doors, measured
@@ -1959,6 +2089,21 @@
       <stop offset="0.14" stop-color="${LIGHT.warm}" stop-opacity="0.038"/>
       <stop offset="0.34" stop-color="${LIGHT.warm}" stop-opacity="0"/>
     </linearGradient>
+    <!-- ⚠ BLACK IRONMONGERY, AND IT IS MEASURED. The new door's bar, its
+         turned pull and its keyway escutcheon are all one dark neutral: the
+         median of every dark pixel across its four photographs is #2A2627 to
+         #36322E, warmth (r−b) 2 to 8. Our brass runs r−b above 40, which is
+         why the photographs read as bronze until somebody measured them.
+         A cylinder, not a flat bar: dark at both edges, one narrow specular a
+         third across, and a bounce along the far side. -->
+    <linearGradient id="blackRod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#171615"/>
+      <stop offset="0.20" stop-color="#4A4744"/>
+      <stop offset="0.34" stop-color="#6E6A65"/>
+      <stop offset="0.55" stop-color="#302E2C"/>
+      <stop offset="0.86" stop-color="#191817"/>
+      <stop offset="1"    stop-color="#3A3835"/>
+    </linearGradient>
     <linearGradient id="lampGlow" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.42"/>
       <stop offset="0.20" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
@@ -2268,7 +2413,16 @@
 
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? appliedFrame(
+    ${/* ⚠ THE CLASSICAL SET IS ITS OWN COMPOSITION AND TAKES OVER THE FACE.
+        Every other entry in DETAILS is one feature laid on a leaf, so they
+        all go through `appliedFrame` or `metalStrips` and compose freely.
+        This one is a whole arrangement whose pieces are proportioned to each
+        other and to the window between them — a cornice sized to a frieze
+        sized to a shelf — so it draws itself, and `appliedFrame` is skipped
+        rather than asked to place a panel inside it. See CLASSIC_ROWS. */
+    ""}
+    ${detail.classic ? classicSet(mainX, y0, leafW, leafH, paint2, pale, tone) : ""}
+    ${detail.panel && !detail.classic ? appliedFrame(
       mainX,
       y0,
       leafW,
@@ -2556,7 +2710,11 @@ ${body}
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const detail = byId(DETAILS, state2.detail);
-    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW);
+    const openings = apertureLayout(
+      byId(WINDOWS, state2.window),
+      leafW,
+      byId(DETAILS, state2.detail)
+    );
     const out = openings.map((o) => ({
       kind: "window",
       x: o.x - MOULD_BAND,
@@ -2564,6 +2722,27 @@ ${body}
       w: o.w + MOULD_BAND * 2,
       h: o.h + MOULD_BAND * 2
     }));
+    if (detail.classic) {
+      for (const [row, col] of [
+        ["cornice", "cornice"],
+        ["frieze", "frieze"],
+        ["shelf", "shelf"],
+        ["band", "shelf"],
+        ["panel", "panel"],
+        ["plinth", "plinth"]
+      ]) {
+        const [t, b] = CLASSIC_ROWS[row], [x0, x1] = CLASSIC_COLS[col];
+        out.push({
+          kind: row === "panel" ? "panel" : "moulding",
+          x: leafW * x0,
+          y: leafH * t,
+          w: leafW * (x1 - x0),
+          h: leafH * (b - t),
+          band: MOULD_BAND
+        });
+      }
+      return out;
+    }
     if (detail.panel) {
       const inset = openings.length ? Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND) : leafW * PANEL_INSET;
       const winBottom = openings.length ? Math.max(...openings.map((o) => o.top + o.h)) : 0;
@@ -2587,7 +2766,11 @@ ${body}
     const detail = byId(DETAILS, state2.detail);
     if (!detail.panel) return true;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    const openings = apertureLayout(byId(WINDOWS, state2.window), leafW);
+    const openings = apertureLayout(
+      byId(WINDOWS, state2.window),
+      leafW,
+      byId(DETAILS, state2.detail)
+    );
     if (!openings.length) return true;
     const winBottom = Math.max(...openings.map((o) => o.top + o.h));
     const GLASS_STOPS_BY = 0.62;
@@ -2712,7 +2895,7 @@ ${body}
       }
       for (const ob of obstacles) {
         if (footHits(f, ob)) {
-          return bad(ob.kind === "window" ? "הרגליים על מסגרת החלון" : "הרגליים על מסגרת הפאנל");
+          return bad(ob.kind === "window" ? "הרגליים על מסגרת החלון" : ob.kind === "moulding" ? "הרגליים על עיצוב החזית" : "הרגליים על מסגרת הפאנל");
         }
       }
     }
@@ -2750,7 +2933,11 @@ ${body}
         return bad("הידית נוגעת במנעול");
       }
     }
-    for (const o of apertureLayout(byId(WINDOWS, state2.window), leafW)) {
+    for (const o of apertureLayout(
+      byId(WINDOWS, state2.window),
+      leafW,
+      byId(DETAILS, state2.detail)
+    )) {
       if (cgx0 < o.x + o.w && cgx1 > o.x && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
         return bad("הידית חוצה את החלון");
       }
@@ -3148,9 +3335,10 @@ ${body}
   }
   var MOUNT_REACH = 121;
   var HW_STILE = MOUNT_REACH + LOCK_CLEAR;
-  var apertureLayout = memo(function apertureLayout2(win, leafW) {
+  var apertureLayout = memo(function apertureLayout2(win, leafW, detail) {
     const rows = /* @__PURE__ */ new Map();
-    for (const r of win.rects || []) {
+    const rects = detail && detail.winRect && (win.rects || []).length ? [detail.winRect] : win.rects || [];
+    for (const r of rects) {
       const k = `${r.top}|${r.h}`;
       if (!rows.has(k)) rows.set(k, []);
       rows.get(k).push(r);
@@ -3172,7 +3360,7 @@ ${body}
       out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
     }
     return out;
-  }, (win, leafW) => `${win.id}|${leafW}`);
+  }, (win, leafW, detail) => `${win.id}|${leafW}|${detail ? detail.id : "-"}`);
   function aperture({
     x,
     y,
@@ -3325,6 +3513,57 @@ ${body}
       return pts;
     };
     const poly = (pts, cont) => pts.map(([px, py], i) => `${i ? "L" : cont ? "L" : "M"} ${n2(px)} ${n2(py)}`).join(" ");
+    if (kind === "rings") {
+      const PX = w / 2;
+      const PY = PX * (440 / 512);
+      const R = PX * 0.955 / 2;
+      const sw = Math.max(1.1, PX * (4.7 / 174));
+      const nx = 2, ny = Math.max(2, Math.round(h / PY));
+      const ox = x + (w - nx * PX) / 2, oy = y + (h - ny * PY) / 2;
+      const cxOf = (i) => ox + (i + 0.5) * PX, cyOf = (j) => oy + (j + 0.5) * PY;
+      let d = "";
+      for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
+        const cx = cxOf(i), cy = cyOf(j);
+        d += `M ${n2(cx - R)} ${n2(cy)} a ${n2(R)} ${n2(R)} 0 1 0 ${n2(R * 2)} 0
+            a ${n2(R)} ${n2(R)} 0 1 0 ${n2(-R * 2)} 0 `;
+      }
+      const EYE_X = 0.09, EYE_Y = 0.09, TAIL_X = 0.21, TAIL_Y = 0.21, TURNS = 1.05;
+      let cur = "";
+      for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
+        const gx = cxOf(i) + PX / 2, gy = cyOf(j) + PY / 2;
+        for (const ux of [-1, 1]) for (const uy of [-1, 1]) {
+          cur += poly(curl(
+            gx + ux * PX * EYE_X,
+            gy + uy * PY * EYE_Y,
+            gx + ux * PX * TAIL_X,
+            gy + uy * PY * TAIL_Y,
+            TURNS,
+            ux * uy > 0 ? -1 : 1
+          )) + " ";
+        }
+      }
+      const CROSS = 0.52;
+      const crossPair = (mx, my, ax, ay) => {
+        const px = -ay, py = ax;
+        let s = "";
+        for (const k of [-1, 1]) {
+          s += poly(curl(
+            mx + (px * k * EYE_X + ax * EYE_X) * PX * CROSS,
+            my + (py * k * EYE_Y + ay * EYE_Y) * PY * CROSS,
+            mx + px * k * PX * TAIL_X * CROSS,
+            my + py * k * PY * TAIL_Y * CROSS,
+            TURNS,
+            k > 0 ? 1 : -1
+          )) + " ";
+        }
+        return s;
+      };
+      for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
+        cur += crossPair(cxOf(i) + PX / 2, cyOf(j), 1, 0);
+        cur += crossPair(cxOf(i), cyOf(j) + PY / 2, 0, 1);
+      }
+      return ink(d, sw) + ink(cur, sw * 1.55);
+    }
     if (kind === "grid") {
       const cols = w / h >= 0.75 ? 4 : w / h >= 0.38 ? 3 : 2;
       const rows = Math.max(2, Math.min(6, Math.round(cols * h / (w * 1.75))));
@@ -3520,6 +3759,303 @@ ${body}
     }
     return "";
   }
+  var CLASSIC_ROWS = {
+    cornice: [0.04, 0.068],
+    // the projecting cap, widest thing on the door
+    frieze: [0.074, 0.148],
+    // bead border, oval boss, two round bosses
+    shelf: [0.557, 0.591],
+    // the corbelled shelf's own cap
+    band: [0.597, 0.659],
+    // its face, carrying the horizontal pull
+    panel: [0.665, 0.886],
+    // the raised panel
+    plinth: [0.892, 0.968]
+    // bead border and an oval boss again
+  };
+  var CLASSIC_COLS = {
+    cornice: [0.183, 0.817],
+    frieze: [0.215, 0.785],
+    shelf: [0.202, 0.804],
+    panel: [0.228, 0.772],
+    plinth: [0.202, 0.804]
+  };
+  var CLASSIC_GLASS = { top: 0.159, bot: 0.54, x0: 0.293, x1: 0.712 };
+  function classicCap(x, y, w, h, paint2) {
+    const n = (v) => Number(v.toFixed(1));
+    const s1 = w * 0.03, s2 = w * 0.016;
+    return `
+    <rect x="${n(x)}" y="${n(y + h)}" width="${n(w)}" height="${n(h * 0.7)}"
+          fill="#000" opacity="0.22" filter="url(#hwShadow)"/>
+    <rect x="${n(x + s1 + s2)}" y="${n(y + h * 0.62)}" width="${n(w - (s1 + s2) * 2)}"
+          height="${n(h * 0.38)}" fill="${darken(paint2, 0.1)}"/>
+    <rect x="${n(x + s1)}" y="${n(y + h * 0.34)}" width="${n(w - s1 * 2)}"
+          height="${n(h * 0.3)}" fill="${lighten(paint2, 0.04)}"/>
+    <rect x="${n(x + s1)}" y="${n(y + h * 0.58)}" width="${n(w - s1 * 2)}"
+          height="${n(h * 0.07)}" fill="#000" opacity="0.16"/>
+    <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h * 0.36)}"
+          fill="${lighten(paint2, 0.11)}"/>
+    <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h * 0.13)}"
+          fill="${lighten(paint2, 0.24)}"/>
+    <rect x="${n(x)}" y="${n(y + h * 0.3)}" width="${n(w)}" height="${n(h * 0.07)}"
+          fill="#000" opacity="0.20"/>`;
+  }
+  function beadRun(x, y, w, r, paint2, vertical = false) {
+    const n = (v) => Number(v.toFixed(1));
+    const span = w;
+    const pitch = r * 2.42;
+    const count = Math.max(2, Math.round(span / pitch));
+    const step2 = span / count;
+    let out = vertical ? "" : `
+    <rect x="${n(x)}" y="${n(y - r * 1.5)}" width="${n(span)}" height="${n(r * 0.36)}"
+          fill="${lighten(paint2, 0.18)}"/>
+    <rect x="${n(x)}" y="${n(y + r * 1.2)}" width="${n(span)}" height="${n(r * 0.34)}"
+          fill="${darken(paint2, 0.14)}"/>`;
+    for (let i = 0; i < count; i++) {
+      const c = (i + 0.5) * step2;
+      const cx = vertical ? x : x + c, cy = vertical ? y + c : y;
+      out += `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}" fill="${lighten(paint2, 0.13)}"/><circle cx="${n(cx - r * 0.22)}" cy="${n(cy - r * 0.26)}" r="${n(r * 0.42)}"
+                    fill="${lighten(paint2, 0.3)}"/>`;
+    }
+    return out;
+  }
+  function classicBoss(cx, cy, rx, ry, paint2) {
+    const n = (v) => Number(v.toFixed(1));
+    return `
+    <ellipse cx="${n(cx)}" cy="${n(cy + ry * 0.18)}" rx="${n(rx)}" ry="${n(ry)}"
+             fill="${darken(paint2, 0.13)}"/>
+    <ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(rx)}" ry="${n(ry)}"
+             fill="${lighten(paint2, 0.05)}"/>
+    <ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(rx * 0.68)}" ry="${n(ry * 0.62)}"
+             fill="${darken(paint2, 0.07)}"/>
+    <ellipse cx="${n(cx - rx * 0.1)}" cy="${n(cy - ry * 0.16)}" rx="${n(rx * 0.44)}"
+             ry="${n(ry * 0.36)}" fill="${lighten(paint2, 0.16)}"/>`;
+  }
+  function classicCorbel(x, y, w, h, paint2, flip = false) {
+    const n = (v) => Number(v.toFixed(1));
+    const flutes = 4;
+    const foot = h * 0.13;
+    const body = h - foot;
+    const taper = w * 0.16;
+    const s = flip ? -1 : 1;
+    const ox = flip ? x + w : x;
+    const edge = (t) => ox + s * (t * (w - taper * t));
+    let out = `<path d="M ${n(ox)} ${n(y)} L ${n(edge(1))} ${n(y)}
+                      L ${n(edge(1) - s * taper)} ${n(y + body)}
+                      Q ${n(edge(1) - s * taper)} ${n(y + h)} ${n(ox)} ${n(y + h)} Z"
+                   fill="${lighten(paint2, 0.09)}"/>`;
+    for (let i = 0; i < flutes; i++) {
+      const t0 = (i + 0.18) / flutes, t1 = (i + 0.82) / flutes;
+      const gx0 = edge(t0), gx1 = edge(t1);
+      const bx0 = gx0 - s * taper * t0, bx1 = gx1 - s * taper * t1;
+      out += `<path d="M ${n(gx0)} ${n(y)} L ${n(gx1)} ${n(y)}
+                     L ${n(bx1)} ${n(y + body)} L ${n(bx0)} ${n(y + body)} Z"
+                  fill="${darken(paint2, 0.14)}"/><path d="M ${n(gx1)} ${n(y)} L ${n(gx1 + s * (gx1 - gx0) * 0.22)} ${n(y)}
+                     L ${n(bx1 + s * (bx1 - bx0) * 0.22)} ${n(y + body)}
+                     L ${n(bx1)} ${n(y + body)} Z"
+                  fill="${lighten(paint2, 0.22)}"/>`;
+    }
+    out += `<path d="M ${n(ox)} ${n(y + body)} L ${n(edge(1) - s * taper)} ${n(y + body)}
+                   Q ${n(edge(1) - s * taper)} ${n(y + h)} ${n(ox)} ${n(y + h)} Z"
+                fill="${lighten(paint2, 0.16)}"/><path d="M ${n(ox)} ${n(y + h - foot * 0.34)}
+                   L ${n(edge(1) - s * taper * 1.1)} ${n(y + h - foot * 0.62)}
+                   Q ${n(edge(1) - s * taper * 1.1)} ${n(y + h)} ${n(ox)} ${n(y + h)} Z"
+                fill="#000" opacity="0.17"/>`;
+    return out;
+  }
+  function classicBand(x, y, w, h, paint2, pale, leaf, key, ends, middle) {
+    const n = (v) => Number(v.toFixed(1));
+    const th = h * 0.8, ty = y + (h - th) / 2;
+    const band = MOULD_BAND * 0.42;
+    const piece = (a, b, i) => moulding(x + w * a, ty, w * (b - a), th, band, paint2, pale, leaf, `${key}${i}`);
+    let out = piece(0.29, 0.71, 1);
+    for (const [a, b, i] of [[0.1, 0.28, 0], [0.72, 0.9, 2]]) {
+      if (ends === "tablet") {
+        out += piece(a, b, i);
+        continue;
+      }
+      const bx = x + w * a, bw = w * (b - a);
+      for (let f = 0; f < 3; f++) {
+        const fx = bx + bw * (0.18 + f * 0.24), fw = bw * 0.13;
+        out += `<rect x="${n(fx)}" y="${n(ty + th * 0.12)}" width="${n(fw)}"
+                    height="${n(th * 0.76)}" rx="${n(fw * 0.5)}"
+                    fill="${darken(paint2, 0.13)}"/><rect x="${n(fx + fw)}" y="${n(ty + th * 0.12)}" width="${n(fw * 0.3)}"
+                    height="${n(th * 0.76)}" rx="${n(fw * 0.15)}"
+                    fill="${lighten(paint2, 0.2)}"/>`;
+      }
+    }
+    if (middle === "oval") {
+      const cx = x + w / 2, cy = y + h / 2;
+      out += classicBoss(cx, cy, leaf.w * 0.033, leaf.h * 89e-4, paint2);
+      for (const d of [-1, 1]) {
+        out += classicBoss(
+          cx + d * leaf.w * 0.1,
+          cy,
+          leaf.w * 72e-4,
+          leaf.w * 72e-4,
+          paint2
+        );
+      }
+    }
+    return out;
+  }
+  function classicSet(lx, ly, lw, lh, paint2, pale, tone) {
+    const R = CLASSIC_ROWS, C = CLASSIC_COLS;
+    const Y = (f) => ly + lh * f;
+    const X = (f) => lx + lw * f;
+    const leaf = { x: lx, y: ly, w: lw, h: lh };
+    const band = MOULD_BAND * 0.72;
+    const out = [];
+    const [fz0, fz1] = R.frieze, [fx0, fx1] = C.frieze;
+    const fzH = (fz1 - fz0) * lh, beadR = lw * 5e-3;
+    out.push(moulding(
+      X(fx0),
+      Y(fz0),
+      (fx1 - fx0) * lw,
+      fzH,
+      band,
+      paint2,
+      pale,
+      leaf,
+      "cfz"
+    ));
+    out.push(beadRun(
+      X(fx0) + lw * 0.04,
+      Y(fz0) + fzH * 0.2,
+      (fx1 - fx0) * lw - lw * 0.08,
+      beadR,
+      paint2
+    ));
+    out.push(classicBand(
+      X(fx0) + lw * 0.03,
+      Y(fz0) + fzH * 0.34,
+      (fx1 - fx0) * lw - lw * 0.06,
+      fzH * 0.56,
+      paint2,
+      pale,
+      leaf,
+      "cfb",
+      "flute",
+      "oval"
+    ));
+    const [cn0, cn1] = R.cornice, [cx0, cx1] = C.cornice;
+    out.push(classicCap(X(cx0), Y(cn0), (cx1 - cx0) * lw, (cn1 - cn0) * lh, paint2));
+    for (const [cbx, flip] of [[cx0, false], [cx1 - lw * 0.055 / lw, true]]) {
+      out.push(classicCorbel(
+        X(cx0) + (flip ? (cx1 - cx0) * lw - lw * 0.055 : 0),
+        Y(cn1),
+        lw * 0.055,
+        (fz1 - cn1) * lh,
+        paint2,
+        flip
+      ));
+    }
+    const [sh0, sh1] = R.shelf, [bd0, bd1] = R.band, [sx0, sx1] = C.shelf;
+    out.push(moulding(
+      X(sx0) + lw * 0.055,
+      Y(bd0),
+      (sx1 - sx0) * lw - lw * 0.11,
+      (bd1 - bd0) * lh,
+      band * 0.8,
+      paint2,
+      pale,
+      leaf,
+      "cbd"
+    ));
+    out.push(classicBand(
+      X(sx0) + lw * 0.055,
+      Y(bd0),
+      (sx1 - sx0) * lw - lw * 0.11,
+      (bd1 - bd0) * lh,
+      paint2,
+      pale,
+      leaf,
+      "cbt",
+      "tablet",
+      "plain"
+    ));
+    out.push(classicCap(X(sx0), Y(sh0), (sx1 - sx0) * lw, (sh1 - sh0) * lh, paint2));
+    out.push(classicCorbel(X(sx0), Y(sh1), lw * 0.055, (bd1 - sh1) * lh, paint2, false));
+    out.push(classicCorbel(X(sx1) - lw * 0.055, Y(sh1), lw * 0.055, (bd1 - sh1) * lh, paint2, true));
+    out.push(classicPull(X(0.5), Y((bd0 + bd1) / 2), lw * 0.33, lh * 0.028, tone));
+    const [pn0, pn1] = R.panel, [px0, px1] = C.panel;
+    out.push(`<g data-detail="panel" data-panels="1" data-top="${Y(pn0).toFixed(1)}">` + moulding(
+      X(px0),
+      Y(pn0),
+      (px1 - px0) * lw,
+      (pn1 - pn0) * lh,
+      MOULD_BAND,
+      paint2,
+      pale,
+      leaf,
+      "cpn"
+    ) + `</g>`);
+    const [pl0, pl1] = R.plinth, [lx0, lx1] = C.plinth;
+    const plH = (pl1 - pl0) * lh;
+    out.push(moulding(
+      X(lx0),
+      Y(pl0),
+      (lx1 - lx0) * lw,
+      plH,
+      band,
+      paint2,
+      pale,
+      leaf,
+      "cpl"
+    ));
+    out.push(classicBand(
+      X(lx0) + lw * 0.03,
+      Y(pl0) + plH * 0.12,
+      (lx1 - lx0) * lw - lw * 0.06,
+      plH * 0.56,
+      paint2,
+      pale,
+      leaf,
+      "cpb",
+      "flute",
+      "oval"
+    ));
+    out.push(beadRun(
+      X(lx0) + lw * 0.04,
+      Y(pl0) + plH * 0.8,
+      (lx1 - lx0) * lw - lw * 0.08,
+      beadR,
+      paint2
+    ));
+    out.push(classicCap(X(lx0), Y(pl1), (lx1 - lx0) * lw, lh * 0.016, paint2));
+    return `<g data-detail="classic">${out.join("")}</g>`;
+  }
+  function classicPull(cx, cy, len, thick, tone) {
+    const n = (v) => Number(v.toFixed(1));
+    const x0 = cx - len / 2;
+    const at = (t) => x0 + len * t;
+    const rod = thick * 0.3;
+    const ball = rod * 1.47;
+    const shade = `<rect x="${n(at(0.1))}" y="${n(cy + rod * 0.9)}" width="${n(len * 0.8)}"
+                       height="${n(rod * 1.3)}" rx="${n(rod * 0.65)}"
+                       fill="#000" opacity="0.22" filter="url(#hwShadow)"/>`;
+    return `
+    ${shade}
+    <rect x="${n(at(0.16))}" y="${n(cy - rod)}" width="${n(len * 0.68)}"
+          height="${n(rod * 2)}" rx="${n(rod)}" fill="url(#blackRod)"/>
+    ${[0.16, 0.84].map((t) => `
+      <circle cx="${n(at(t))}" cy="${n(cy)}" r="${n(ball)}" fill="url(#blackRod)"/>
+      <circle cx="${n(at(t) - ball * 0.3)}" cy="${n(cy - ball * 0.34)}"
+              r="${n(ball * 0.3)}" fill="#fff" opacity="0.18"/>`).join("")}
+    ${/* the turned neck, knop and cap beyond each ball, where it bolts down */
+    ""}
+    ${/* neck, knop, cap — spaced so the knop clears the ball. At 0.045 with a
+        ball of 0.44 thick they overlapped completely and the two ends of the
+        pull each came out as one flattened blob. */
+    ""}
+    ${[[0.02, 1], [0.98, -1]].map(([t, d]) => `
+      <rect x="${n(Math.min(at(t), at(t + d * 0.11)))}" y="${n(cy - rod * 0.4)}"
+            width="${n(len * 0.11)}" height="${n(rod * 0.8)}" fill="url(#blackRod)"/>
+      <circle cx="${n(at(t + d * 0.03))}" cy="${n(cy)}" r="${n(ball * 0.58)}"
+              fill="url(#blackRod)"/>
+      <circle cx="${n(at(t))}" cy="${n(cy)}" r="${n(ball * 0.34)}"
+              fill="url(#blackRod)"/>`).join("")}`;
+  }
   function handleFootprint(handle, leafH, panelled = false) {
     switch (handle.style) {
       case "none":
@@ -3606,7 +4142,7 @@ ${body}
     if (!win.rects.length) return Infinity;
     const leafW = size.w - REBATE * 2;
     const hingeOnLeft = byId(HANDINGS, state2.handing).hinge === "left";
-    const u = apertureLayout(win, leafW).map((o) => hingeOnLeft ? leafW - (o.x + o.w) : o.x);
+    const u = apertureLayout(win, leafW, byId(DETAILS, state2.detail)).map((o) => hingeOnLeft ? leafW - (o.x + o.w) : o.x);
     return Math.min(...u) - MOULD_BAND - lockBackset(byId(HANDLES, state2.handle), byId(LOCKSETS, state2.lockset));
   }
   function gripClashesLockset(state2) {
@@ -4227,7 +4763,7 @@ ${body}
                a 11 11 0 1 1 22 0
                l 3.2 26 a 4 4 0 0 1 -4 4.4
                h -20.4 a 4 4 0 0 1 -4 -4.4 Z"
-            fill="#8E9398"/>
+            fill="url(#euroRim)"/>
       <path d="M ${kx - 10} ${ky - 15}
                a 10 10 0 1 1 20 0
                l 3 25 a 3.4 3.4 0 0 1 -3.4 3.7
@@ -4442,7 +4978,18 @@ ${body}
     const panelAt = (top, bot) => `<rect x="${inset}" y="${H * top}"
         width="${W - inset * 2}" height="${H * (bot - top)}"
         fill="none" stroke="currentColor" stroke-width="36"/>`;
-    const panels = !detail.panel ? "" : panelRows(detail).map(([t, b]) => panelAt(t, b)).join("");
+    const panels = detail.classic ? [
+      `<rect x="${W * CLASSIC_GLASS.x0}" y="${H * CLASSIC_GLASS.top}"
+              width="${W * (CLASSIC_GLASS.x1 - CLASSIC_GLASS.x0)}"
+              height="${H * (CLASSIC_GLASS.bot - CLASSIC_GLASS.top)}"
+              fill="none" stroke="currentColor" stroke-width="36"/>`,
+      ...[["shelf", "shelf"], ["panel", "panel"], ["plinth", "plinth"]].map(([r, c]) => {
+        const [t, b] = CLASSIC_ROWS[r], [x0, x1] = CLASSIC_COLS[c] || CLASSIC_COLS.shelf;
+        return `<rect x="${W * x0}" y="${H * t}" width="${W * (x1 - x0)}"
+                       height="${H * (b - t)}" fill="none" stroke="currentColor"
+                       stroke-width="36"/>`;
+      })
+    ].join("") : !detail.panel ? "" : panelRows(detail).map(([t, b]) => panelAt(t, b)).join("");
     const n = detail.strips || 0;
     const RHYTHM = [0.94, 0.7, 0.61, 0.91, 0.59, 0.68, 0.91];
     const strips = detail.vertical ? Array.from({ length: n }, (_, i) => {
@@ -4508,6 +5055,16 @@ ${body}
       }
     }
     for (const d of DETAILS) {
+      if (d.needsWindow && state2.window !== "rect") {
+        out.detail[d.id] = out.detail[d.id] || "הסט הקלאסי דורש חלון מלבני";
+      }
+    }
+    if (byId(DETAILS, state2.detail).needsWindow) {
+      for (const w of WINDOWS) if (w.id !== "rect") {
+        out.window[w.id] = out.window[w.id] || "הסט הקלאסי מגיע עם חלון מלבני משלו";
+      }
+    }
+    for (const d of DETAILS) {
       if (onLeaf && isLineWork(d)) out.detail[d.id] = "לא משלבים קווי מתכת עם חלון";
       if (isLineWork(d) && d.panel) out.detail[d.id] = "לא משלבים קווי מתכת עם פאנל";
     }
@@ -4565,7 +5122,9 @@ ${body}
     gripGone: "הסרנו את ידית המשיכה — אין לה מקום כאן",
     locksetSwapped: "החלפנו את המנעול — אין לו מקום ליד המאחז",
     gripMoved: "הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה",
-    gripHome: "הידית הוסרה, ואיתה המיקום שבחרתם לה"
+    gripHome: "הידית הוסרה, ואיתה המיקום שבחרתם לה",
+    setWindow: "התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו",
+    setGone: "הסרנו את הסט הקלאסי — הוא דורש חלון מלבני"
   };
   function repair(state2, intent = null) {
     let s = { ...state2 };
@@ -4578,6 +5137,15 @@ ${body}
     if (intent !== "window" && !isGlazed(s) && s.grille !== "none") {
       s.window = "rect";
       change("window", SAID.windowAdded);
+    }
+    if (byId(DETAILS, s.detail).needsWindow && s.window !== "rect") {
+      if (intent === "window") {
+        s.detail = "plain";
+        change("detail", SAID.setGone);
+      } else {
+        s.window = "rect";
+        change("window", SAID.setWindow);
+      }
     }
     const lined = isLineWork(byId(DETAILS, s.detail));
     if (leafGlazed(s) && lined) {
@@ -5040,7 +5608,7 @@ ${body}
     { id: "d099", state: { colour: "rb-7126d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
     { id: "d106", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
     { id: "d108", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "iron", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
-    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "ella", lockset: "digital", size: "standard", handing: "right-in" } },
+    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "barblack", lockset: "digital", size: "standard", handing: "right-in" } },
     { id: "d116", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
     { id: "d122", state: { colour: "rb-7240d", detail: "panel", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in" } },
     { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "reeded", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in" } },

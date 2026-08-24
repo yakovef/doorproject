@@ -182,6 +182,21 @@ export function conflicts(state) {
     }
   }
 
+  /* The classical set and its own light — the other half of the repair above.
+     Reported from both sides, because the customer may have picked either
+     first: every window that is not the rectangle is refused while the set is
+     on, and the set is refused while the window is not the rectangle. */
+  for (const d of DETAILS) {
+    if (d.needsWindow && state.window !== 'rect') {
+      out.detail[d.id] = out.detail[d.id] || 'הסט הקלאסי דורש חלון מלבני';
+    }
+  }
+  if (byId(DETAILS, state.detail).needsWindow) {
+    for (const w of WINDOWS) if (w.id !== 'rect') {
+      out.window[w.id] = out.window[w.id] || 'הסט הקלאסי מגיע עם חלון מלבני משלו';
+    }
+  }
+
   /* OBSERVED: ruled line work never shares a leaf with glazing, and never
      with a moulded panel. Both directions are reported, so whichever tile the
      customer is looking at explains itself. */
@@ -402,6 +417,8 @@ const SAID = {
   locksetSwapped:'החלפנו את המנעול — אין לו מקום ליד המאחז',
   gripMoved:     'הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה',
   gripHome:      'הידית הוסרה, ואיתה המיקום שבחרתם לה',
+  setWindow:     'התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו',
+  setGone:       'הסרנו את הסט הקלאסי — הוא דורש חלון מלבני',
 };
 
 /**
@@ -438,6 +455,22 @@ export function repair(state, intent = null) {
   if (intent !== 'window' && !isGlazed(s) && s.grille !== 'none') {
     s.window = 'rect';
     change('window', SAID.windowAdded);
+  }
+
+  /* ⚠ THE CLASSICAL SET BRINGS ITS OWN LIGHT, and it is a particular one.
+     `apertureLayout` substitutes `detail.winRect` for whatever the window
+     option would have drawn — 356 x 781 at 326 from the head, so that the
+     glass clears the frieze above it and the shelf below — which means that
+     choosing the set with the צוהר אנכי would have quietly drawn a rectangle
+     while the tile, the price and the order all said a slot. A substitution
+     nobody can see is the same bug as a price for a panel that is not drawn.
+     So the pairing is repaired rather than allowed: the set implies the
+     rectangle, and asking for a different opening puts the face back to
+     plain. Keyed off `needsWindow` rather than the id, so a second set added
+     later is covered without anybody remembering to come back here. */
+  if (byId(DETAILS, s.detail).needsWindow && s.window !== 'rect') {
+    if (intent === 'window') { s.detail = 'plain'; change('detail', SAID.setGone); }
+    else { s.window = 'rect'; change('window', SAID.setWindow); }
   }
 
   const lined = isLineWork(byId(DETAILS, s.detail));

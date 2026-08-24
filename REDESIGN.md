@@ -726,6 +726,19 @@ of it can regress the app.
 - **Free ± centimetre size steppers.** The short code packs size as an index.
 - **Deleting the visible `DM-` code.** It is how an order is taken down a phone.
 - **A progress stepper that claims completion.** No such state exists (§4).
+- **Re-cutting `MOULD`, the moulding cross-section, off one door.** Beside
+  `research/newdoor/` — the classical-set door photographed straight off the
+  workshop floor — our panel surround reads as four or five thin engraved
+  lines where the real one is a single broad lit ogee with one quirk. That is
+  a real difference and it is recorded here rather than tuned away, for two
+  reasons. `MOULD` is sixteen stops measured off d048 and shared by every
+  panelled door in the range, so re-cutting it to match one photograph trades
+  thirty doors for one; and half of what looks wrong is the LIGHT, which in
+  that photograph comes from the opposite side because the door is lying flat
+  on the ground and a door lying flat has no "up". The honest version of this
+  work is a second measured section from a second door, both fitted, and a
+  rule for which one a given face uses — not an eyeballed adjustment. See
+  CLAUDE.md §6.
 
 ---
 

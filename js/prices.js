@@ -108,6 +108,7 @@ export const GRILLE = {
      different supplier. Priced together here only because they are the same
      row on the customer's screen. */
   mesh:         240, // זכוכית מעוצבת
+  rings:        540, // טבעות ותלתלים  — dense forged field, more bar than a plain grid
   reeded:       280, // זכוכית מחורצת
 };
 
@@ -145,6 +146,13 @@ export const DETAIL = {
   strips:    640,    // אחד עשר פסים
   stripsv:   440,    // פסים אנכיים     — four bands
   stripsv6:  540,    // שישה פסים אנכיים
+  /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
+     and plinth, all as one. Priced well above a single panel because it is
+     six applied pieces and a fitting, not one. ⚠ A guess like every figure in
+     this file — and a bigger one than most, because it is a product Peretz
+     makes and we have never priced. Worth asking him about in the same breath
+     as ASK-PERETZ §5. */
+  classic:   1680,   // סט קלאסי
 };
 
 /* ── the pull handle ──────────────────────────────────────────────────── */
@@ -159,6 +167,7 @@ export const HANDLE = {
   grab:    180,      // מאחז אופקי
   channel: 400,      // ידית שקועה
   blade:   440,      // להב שטוח
+  barblack: 300,     // מוט שחור
 };
 
 /* ── the lock and the lever ───────────────────────────────────────────── */

@@ -143,22 +143,22 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **3,704,418 assertions passing, 0 failed**, no framework, plain
-  node. It was 5.68M before the 24.8 interface round; the catalogue lists
-  changed length and the combinatorial sweeps are the product of those lengths,
-  so the total moves with the range — twice in one day, as the window list was
-  cut and then the bare lockset withdrawn. ⚠ A FALL IN THIS NUMBER IS NOT
-  EVIDENCE OF ANYTHING. It is not a coverage metric — read the failure count.
-- `npm run collide` — clean over **1,224 buildable designs**, real `getBBox`
-  geometry from a browser, `all` and `boxes`, including the whole hardware
-  rework of 24.8 and `faceObstacles` agreeing with the drawing everywhere. It
-  was 1,568 before the window list was cut from four shapes to two: same
-  arithmetic as the assertion count above.
+- `npm test` — **4,377,785 assertions passing, 0 failed**, no framework, plain
+  node. It was 3.70M before the classical set and 5.68M before the 24.8
+  interface round; the catalogue lists change length and the combinatorial
+  sweeps are the product of those lengths, so the total moves with the range in
+  both directions. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF ANYTHING. It is
+  not a coverage metric — read the failure count.
+- `npm run collide` — clean over **1,258 buildable designs**, real `getBBox`
+  geometry from a browser, `all` and `boxes`, with `faceObstacles` agreeing
+  with the drawing everywhere — including the classical set's cornice, frieze
+  and shelf, which it had to be taught about before it could.
 - `npm run audit`, `npm run recreate`, `npm run sheets` — all clean **on a
   healthy container**, which is not every container. See "Red, and known"
   directly below before believing either state. `npm run profile` is NOT
   in this list — see the same section for why.
-- The drawing recreates all 30 measured doors; the order carries the full
+- The drawing recreates all 30 measured doors, plus the classical-set door in
+  `research/newdoor/` that Peretz installed on 24.8; the order carries the full
   specification, a picture, an unambiguous opening direction, a price and a
   code.
 
@@ -477,6 +477,26 @@ outside it`.
 across the panel's stile. Settled by an edge-gradient ruler over the
 photographs: real panel edges sit at 0.21–0.39 of leaf width.
 
+**One face does not go through `appliedFrame` at all: `classic`, the סט
+קלאסי.** `classicSet` draws it whole — cornice, frieze, corbelled shelf with
+its own turned pull, panel, plinth — because those pieces are proportioned to
+each other rather than to the leaf, and `CLASSIC_ROWS` / `CLASSIC_COLS` /
+`CLASSIC_GLASS` are the tables measured off `research/newdoor/`. Three things
+about it are load-bearing and easy to undo by accident:
+
+- **It supplies its own opening.** `apertureLayout(win, leafW, detail)`
+  substitutes `detail.winRect` (356 x 781 at 326 from the head) for whatever
+  the window option would have drawn, so the glass clears the frieze above it
+  and the shelf below. `repair` forces `window: 'rect'` off `needsWindow`, so
+  the substitution can never be invisible.
+- **Its panel is tagged `data-detail="panel"` with a `data-top`, inside the
+  set's group.** Three assertions read that markup to ask whether the panel a
+  customer is charged for is a panel that is drawn, and one of them goes DEAD
+  rather than failing when `data-top` is missing.
+- **`classicBand` is the composition that appears three times** — frieze,
+  shelf, plinth — with `tablet`/`flute` ends and a `plain`/`oval` middle. It
+  was three copies before anybody put the three close-ups side by side.
+
 ### The glass
 Clear glazing is a quiet diagonal gradient plus a soft sheen, and this is the
 one place where a measurement was taken, acted on, and then **deliberately
@@ -563,7 +583,7 @@ sheet. A right-hinged door is a physical fact.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Fourteen so far. None of them threw.
+**Things that vanish rather than break.** Fifteen so far. None of them threw.
 All of them looked like a working page.
 
 1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
@@ -638,6 +658,26 @@ customer, or by a browser console — while `npm test` was green.
     door's photograph**, a fact no amount of editing our own model can move.
     60 passed / 0 failed as shipped; **0 passed / 60 failed with the bug
     restored.**
+
+**15 is 14's cousin, and one of the three checks involved defended itself.**
+
+15. **AN ASSERTION THAT SELECTS ON MARKUP A NEW OBJECT DOES NOT EMIT.** Three
+    checks ask whether the panel a customer is charged for is a panel that is
+    drawn, and all three find it by `data-detail="panel"` in the SVG. The
+    classical set draws a panel and charges ₪1,680 for it, and wrapped
+    everything it drew in `data-detail="classic"` — so on 297 combinations two
+    of the three reported a face with no panel on it, which is a loud failure
+    and was fixed in minutes.
+    The third asks a different question — does any moulding cross the glazing
+    — and it needs `data-top` off that same group. With the group missing it
+    had nothing to compare and **would simply have stopped asking**, on every
+    door the new face appears on, for as long as the face exists. It did not,
+    because whoever wrote it put `ok(m, 'the panel group no longer reports
+    data-top, so this check is dead')` above the comparison. That one line is
+    the whole difference between a check that fails and a check that quietly
+    retires. ⚠ **When an assertion locates its subject by a selector, assert
+    that the selector found something** — the day it stops matching is the day
+    you most need to hear about it.
 
 **Tests catch wrong output easily and absent output almost never**, unless
 someone goes looking on purpose. So every feature ships with an assertion that
@@ -740,7 +780,7 @@ under test. `--disable-gpu` made it *worse*.
   photographs, and halving their resolution to suit a sick container is fitting
   the instrument to the room.
 
-### Three rules about instruments, each learned the hard way
+### Four rules about instruments, each learned the hard way
 
 **Tools must ask the page, not assume.** Four of them have held constants that
 silently stopped being true: a `0.735` leaf-height ratio, a viewBox origin
@@ -756,6 +796,18 @@ the design code to change on every tap.
 
 **A test anchored in our own output cannot catch our own model being wrong.**
 See §5, item 14. This is the subtlest failure in the file and the most recent.
+
+**⚠ AN INSTRUMENT THAT WRITES SOURCE HAS TO BE RE-READ EVERY TIME THE
+CATALOGUE GROWS.** `npm run corpus` fits each of Peretz's 30 real doors to a
+state and writes `js/works.js` — the gallery on his own front page. Its
+`handleOf` matched a pull bar on length and width, and printed the record's
+FINISH in a note beside the result: correct and free for as long as every bar
+in the range was steel. Adding `barblack` (800 x 20, against Ron's 900 x 18)
+made it win on geometry for four doors whose own records say "steel" and
+"polished chrome", and the next `npm run sheets` quietly rewrote the gallery to
+show them with black bars. Nothing failed; the diff on `js/works.js` was the
+only sign. The finish is a filter now, not a comment. **When you add a
+catalogue entry, diff what the fitters write.**
 
 A contact sheet triages; it does not measure. When a number matters, put a
 scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
@@ -855,6 +907,19 @@ complete and its findings live here:
   mid-taupe the second mockup uses, which five measured leaves also want.
   A question for Peretz, **never a colour to invent**: an id is a wire format.
 
+### Wanted next, and named so it is not forgotten
+
+- **A recreate case for the classical-set door.** `research/newdoor/` is
+  committed and the catalogue cites it, but `npm run recreate` still only knows
+  the thirty numbered doors, so nothing in the repo re-checks the new one
+  against its photograph — the comparison that built it was a scratch harness
+  and scratch harnesses are gitignored. What it needs is a record with the two
+  fields the tool refuses to work without: `leaf` (the leaf's box in the
+  photograph) and `handle.x` (which must be measured, never typed — the tool
+  throws rather than guess it). Everything else about that door is already
+  written down. Until then the classical set is the one face in the range whose
+  fidelity is asserted by nobody.
+
 ### Not started
 CI, deploy to `design.dlatotmagen.co.il`, prerendering the default door into
 `index.html`, English and Russian.
@@ -905,6 +970,143 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **A door Peretz installed while this was being written, recreated from five
+  photographs — and the recreation loop found five defects that needed no
+  photograph to see.** The files are in `research/newdoor/`. Asked for from
+  outside: *"analize how it looks and make it possible to make this exact one
+  in our app. then try and remake it in our app, and try to find differences,
+  if you find then fix them. repeat the process until you can't find
+  differences."* Six rounds of photograph-beside-ours. The four answers that
+  settled what the door IS, in their words: the lock is **on the left**
+  (`right-in`); *"the whole windows and panels and the horizontal pull bar are
+  one set, the color, the other pull bar and all the other things are not a
+  part of the set"*; the green is **ירוק מרווה** (`rb-6219d`); and *"there is
+  no bronze in the Picture"*.
+  - **`classic` — סט קלאסי, a whole face in one option.** Cornice, frieze,
+    corbelled shelf with its own turned pull, panel and plinth, drawn by
+    `classicSet` rather than through `appliedFrame` because its pieces are
+    proportioned to each other and not to the leaf. `CLASSIC_ROWS`,
+    `CLASSIC_COLS` and `CLASSIC_GLASS` are the measured tables. Thirteenth of
+    sixteen `DETAILS` slots, appended, so no `VERSION` bump.
+  - **⚠ IT BRINGS ITS OWN LIGHT, and that is why `apertureLayout` changed
+    shape.** The catalogue rectangle is 357 x 902 at 185 from the head; the set
+    needs 356 x 781 at 326, or the glass runs into the frieze above it and the
+    shelf below. `apertureLayout(win, leafW, detail)` substitutes
+    `detail.winRect` — the detail threaded through rather than the rect
+    overridden at the call site, which would have been §5. Five callers
+    updated. And the pairing is *repaired*, not allowed: choosing the set with
+    the צוהר אנכי would have quietly drawn a rectangle while the tile, the
+    price and the order all said a slot. `repair` keys off `needsWindow`;
+    `conflicts` reports it from both sides.
+  - **`rings` — טבעות ותלתלים, and the eye got the pattern wrong four times.**
+    It reads as tangent circles, as an ogee lattice, as a stagger and as a
+    checkerboard depending which corner of the photograph you look at, and
+    three of those reached the code before the measurement did. What settled
+    it: a **2-D autocorrelation** of the pane's dark mask (repeat 512 x 440
+    px); a **median stack** of every whole repeat — median, not mean, because a
+    reflection sits on one cell and a median throws it away where a mean smears
+    it over all of them; a **Hough vote** for the radius, 245 px; and then the
+    candidate lattice **drawn back over the photograph in red**. That last step
+    killed both surviving readings in one look and cost twenty lines. ⚠ Draw
+    the answer over the evidence.
+    What it is: one ring per 174 x 151 mm cell, 2.05 across the 356 mm light,
+    radius 83 mm — 0.955 of the pitch across so they nearly touch, 1.10 along
+    so they overlap, which is where the pointed crossings come from. A
+    four-comma rosette in every diagonal gap and a smaller pair at every
+    crossing. Drawn with `ink`, the three-pass forged vocabulary, because it is
+    bar standing in front of glass. `circles` beside it is the etched cousin
+    and stays.
+  - **`barblack` — a slim 800 x 20 black tube, and the bronze was mine.** The
+    photographs read as antique bronze; the median of every dark pixel across
+    all four files is #2A2627 to #36322E, warmth (r−b) 2 to 8. Neutral. Our
+    brass runs r−b above 40. The correction came from outside before the
+    measurement was taken.
+  - **The euro cylinder goes black on a black door.** It was a hardcoded
+    chrome — `#8E9398` and `url(#euroSteel)` — on every door in the range. The
+    chrome is measured and stands: on a brass rosette the cylinder really does
+    read cooler and brighter. `research/newdoor/keyhole.jpg` is the other case
+    at 4000 px: a black stepped rose with a BLACK cylinder inside it, the only
+    bright thing being the sliver of the key pin. Only black is special-cased;
+    passing the stops through `scaleTone` would have turned the cylinder brass
+    on a brass door, which is the thing the first measurement says it is not.
+  - **`classicBand` — §5, caught by putting three close-ups side by side.**
+    The frieze, the shelf band and the plinth are ONE composition on this door,
+    not three: a raised block at each end, a wide tablet between them. The
+    plinth is the frieze upside down, bead course and all. Written three times,
+    it is written once now with two flags (`tablet`/`flute`, `plain`/`oval`).
+  - **Five defects the loop found, none of which needed a photograph:**
+    - **A translucent grey box across the middle of the door.** `classicPull`
+      drew a backplate 3.2 of its own thickness tall on a band 0.062 of the
+      leaf tall, so it stood proud top and bottom. The band and its tablets ARE
+      the backplate. Gone, and the `classicPlate` gradient with it.
+    - **The pull was a dumbbell.** Balls at 2.0 of the rod against a measured
+      1.47, and the finials pitched so close that each end merged into one
+      flattened blob.
+    - **The corbel's flutes ran the wrong way.** Rebuilt twice from the same
+      photograph — three overlapping bars that came out as one pale blob, then
+      four horizontal dashes. What is under each end of that shelf is a bracket
+      with four VERTICAL grooves, tapering in as it drops.
+    - **⚠ THE SET'S PANEL WAS INVISIBLE TO THE THREE ASSERTIONS THAT EXIST TO
+      CATCH EXACTLY THIS.** All three read the markup for `data-detail="panel"`
+      and one of them for `data-top` besides, and the set wrapped everything in
+      `data-detail="classic"`. 297 combinations reported a face with no panel
+      on it while the price list took ₪1,680 for one, and the glazing-overlap
+      check went DEAD rather than failing — it says so in its own message when
+      the attribute goes missing, which is the only reason it was noticed. The
+      panel is tagged as a panel, with its top, inside the set's group now.
+      This is the second time a new face has hidden a priced panel from those
+      checks. Read them before adding a third.
+    - **The set's tile drew פאנל תחתון.** `panelRows` sends anything without
+      `panels` or `top` to the lone lower rectangle, so two names and two
+      prices had one picture — the assertion that every tile draws its own
+      markup caught it. The glyph now reads the set's own tables.
+  - **⚠ ADDING ONE HANDLE REPAINTED FOUR OF PERETZ'S REAL DOORS, and only the
+    diff said so.** `npm run corpus` fits every measured door to a state and
+    writes `js/works.js`, the gallery on the front page. `handleOf` matched
+    bars on length and width and printed the record's finish in a note — free,
+    while every bar in the range was steel. `barblack` at 800 x 20 beat Ron's
+    900 x 18 on geometry for d043, d063, d078 and d125, whose records say
+    "steel", "polished chrome", "steel", "steel". The next `npm run sheets`
+    rewrote the gallery to show four black bars on doors that do not have
+    them. Nothing failed; the diff on one source file was the only sign.
+    ⚠ **And the first fix — a hard veto on the wrong finish — was worse than
+    the bug.** It put the one black bar we sell, 800 mm, on d072, whose bar
+    measures 0.861 of the leaf: a stub where the photograph has a bar the
+    height of a man. Peretz fits long black bars and the range has none, which
+    is a hole in the CATALOGUE and not something a fitter can paper over. The
+    finish is a weighted term now, 0.10 — about what a fifth of the leaf's
+    height of length error costs — wide enough to keep steel bars off steel
+    doors (the swap that started this was worth 0.017) and narrow enough that
+    a 0.47 length error still loses to a wrong colour. Every trade is printed
+    per door with the finish asked for and the finish given. Net effect on the
+    gallery: **one** door moves, d113, from a BRASS Ella to the black bar its
+    own record describes — right colour, 15% short, and the brass had been
+    repainting that whole door's metal gold. ASK-PERETZ §14 now asks for the
+    long black bar by name; §7 carries the general rule.
+  - **The evidence check learned a second root, and was not weakened to do
+    it.** Every priced grille must cite a door and everything cited must exist
+    on disk; `rings` was read from a door that is real but not in the numbered
+    corpus. Both assertions resolve ids through one `evidenceFile` helper that
+    knows `research/works/doors/dNNN.jpeg` and `research/<name>/full.jpg`, and
+    both still demand the file be there. Deleting the citation instead would
+    have left a priced option with no evidence, which is how `lattice`, `bars`
+    and `bars-light` once reached a customer.
+  - **Two things deliberately NOT changed, both because one photograph is not
+    a measurement (§6):**
+    - **The glass tone.** Ours is a cool blue-grey; this door's pane is a warm
+      pale one. The gradient is measured across ten glazed doors and the cool
+      cast is deliberate — a pane reflects sky. This door was photographed
+      LYING FLAT outdoors, reflecting a bamboo screen and warm ground. The
+      warmth is the photograph, not the glass.
+    - **The `moulding` cross-section.** Beside the photograph our panel reads
+      as several thin engraved lines where the real one is a single broad lit
+      ogee, and the light falls on the opposite side. The light half is the
+      same artefact — a door lying flat has no "up" — and the section is
+      measured and shared by every panelled door in the range.
+  - **ASK-PERETZ §14** carries the three new prices and the one name we cannot
+    invent: what he calls the black bar on a purchase order. §5's withdrawn
+    perimeter-groove question was struck at the same time — it was still asking
+    him to price an option the site stopped building two rounds ago.
 - **Four follow-ups from a screenshot, and two of them were rules refusing
   what the geometry allows.**
   - **The grab bar could not be placed on any glazed leaf, and the rule saying

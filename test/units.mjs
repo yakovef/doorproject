@@ -738,6 +738,23 @@ group('the grip clears the lockset');
    decoration. `npm run corpus` reads them to know which grille each measured
    door carries, so a typo'd id there is a door recreated as the wrong thing,
    silently. */
+/* ⚠ TWO EVIDENCE ROOTS NOW, AND THE CHECK IS THE SAME CHECK. Every citation
+   still has to resolve to a file that exists on disk — that is the whole point
+   of this group and it has not moved. What changed is that there is a second
+   kind of record: `research/works/doors/dNNN.jpeg` is the numbered corpus
+   scraped from Peretz's works page, and `research/<name>/full.jpg` is a door
+   photographed straight off the workshop floor and sent to us. The ring
+   grille was read from the second kind.
+   Resolved through ONE function used by both groups below, because they ask
+   the same question from opposite sides and a second copy of the rule is how
+   they would come apart — §5. Adding a root here is deliberate and cheap;
+   dropping the existsSync is not, and would leave the catalogue free to cite
+   a photograph nobody has. */
+const evidenceFile = id =>
+    /^d\d{3}$/.test(id)          ? `research/works/doors/${id}.jpeg`
+  : /^[a-z][a-z0-9]{3,15}$/.test(id) ? `research/${id}/full.jpg`
+  : null;
+
 group('every door named as evidence has a photograph behind it');
 {
   let named = 0;
@@ -750,9 +767,10 @@ group('every door named as evidence has a photograph behind it');
          `${name}.${o.id}.doors should be a non-empty list, got ${JSON.stringify(o.doors)}`);
       for (const id of o.doors) {
         named++;
-        ok(/^d\d{3}$/.test(id), `${name}.${o.id} names "${id}", which is not a door id`);
-        ok(existsSync(`research/works/doors/${id}.jpeg`),
-           `${name}.${o.id} cites ${id} and research/works/doors/${id}.jpeg does not exist`);
+        const file = evidenceFile(id);
+        ok(file, `${name}.${o.id} names "${id}", which is not a door id`);
+        ok(file && existsSync(file),
+           `${name}.${o.id} cites ${id} and ${file} does not exist`);
       }
     }
   }
@@ -907,8 +925,8 @@ group('every grille names the doors it was read from');
     ok(Array.isArray(g.doors) && g.doors.length > 0,
        `grille ${g.id} names no door it was read from: it is a priced option with no evidence`);
     for (const d of g.doors || []) {
-      ok(/^d\d{3}$/.test(d),
-         `grille ${g.id} cites "${d}", which is not a corpus record id`);
+      ok(evidenceFile(d),
+         `grille ${g.id} cites "${d}", which names no evidence root`);
     }
   }
 }

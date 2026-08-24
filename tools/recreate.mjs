@@ -97,9 +97,17 @@ const CASES = [
     gap: `the bar is 0.32 of leaf height; our shortest is ${shortestBar}` },
   { id: 'd087', label: 'designed 8000 - smart lock, long bar',
     q: 'c=rb-9005d&w=none&g=none&n=shahar&k=digital&d=panel2&s=standard',
-    gap: `the bar is 0.73 of leaf height (our longest is ${longestBar}) and BLACK, which we no `
-       + `longer offer; its moulding measures 0.070 of leaf width against our ${ours}, `
-       + 'so ours is now the heavier of the two' },
+    /* ⚠ THE COLOUR HALF OF THIS GAP CLOSED AND THE LENGTH HALF DID NOT. It
+       used to read "BLACK, which we no longer offer"; `barblack` is in the
+       range now — but at 800 mm it is our SHORTEST bar, and this door's is
+       0.73 of the leaf. So the black is buyable and the long black is not,
+       which is why `handleOf` in corpus.mjs weighs the trade instead of
+       vetoing one side of it, and why ASK-PERETZ §14 asks for the long one by
+       name. */
+    gap: `the bar is 0.73 of leaf height and our longest is ${longestBar}; it is BLACK, `
+       + 'and our only black bar is the 800 mm tube — the shortest in the range, '
+       + `so no entry is right in both. Its moulding measures 0.070 of leaf width `
+       + `against our ${ours}, so ours is the heavier of the two` },
 
   /* The four glazed ones. Their windows and grilles were re-derived from the
      measured rects and the works page after the window/grille rebuild, and
@@ -125,8 +133,17 @@ const CASES = [
     gap: 'its plate is brass in the photograph, and the finish is withdrawn, so '
        + 'ours is nickel' },
   { id: 'd113', label: 'luxury 9500 - smart lock, glazed slot',
-    q: 'c=rb-9001d&w=strip&g=grid-light&n=idan&k=digital&d=plain&s=standard',
-    gap: 'the bar and the lock body are black in the photograph; ours are nickel' },
+    /* ⚠ `n=barblack`, AND IT USED TO SAY `idan` WITH A GAP NOTE ABOUT COLOUR.
+       Both halves went stale in the same edit: the black bar exists now, and
+       `npm run corpus` — which fits this door from its own record rather than
+       from a hand-typed query — moved it here by itself. Two statements of
+       what one door is, and this was the one that did not move; the note under
+       it went on saying "ours are nickel" about a bar that is no longer
+       nickel. What is left of the gap is length, not colour. */
+    q: 'c=rb-9001d&w=strip&g=grid-light&n=barblack&k=digital&d=plain&s=standard',
+    gap: 'the bar measures 0.54 of leaf height and our black one is 0.39, the '
+       + 'shortest in the range; the lock body is black in the photograph and '
+       + 'ours follows the bar now, so that half of this gap has closed' },
   { id: 'd122', label: 'luxury 13900 - sidelight, reeded behind a grid',
     /* `k=coral` here too, and it was doing more damage: a lever leaves a bar
        nowhere to go on a glazed leaf, so `repair` silently dropped the Idan

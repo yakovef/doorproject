@@ -30,7 +30,7 @@
 | d099 | ₪7500 | `?v=12&c=rb-7126d&w=rect&g=scroll&n=none&k=coral&d=panel&s=standard&h=right-in` |
 | d106 | ₪8500 | `?v=12&c=rb-7080d&w=rect&g=circles&n=none&k=plate&d=panel&s=standard&h=left-in` |
 | d108 | ₪8800 | `?v=12&c=rb-7080d&w=rect&g=iron&n=none&k=plate&d=panel&s=standard&h=right-in` |
-| d113 | ₪9500 | `?v=12&c=rb-7080d&w=strip&g=grid&n=ella&k=digital&d=plain&s=standard&h=right-in` |
+| d113 | ₪9500 | `?v=12&c=rb-7080d&w=strip&g=grid&n=barblack&k=digital&d=plain&s=standard&h=right-in` |
 | d116 | ₪13900 | `?v=12&c=rb-7080d&w=rect&g=scroll&n=none&k=coral&d=panel&s=standard&h=right-in` |
 | d122 | ₪13900 | `?v=12&c=rb-7240d&w=rect&g=grid&n=idan&k=cylinder&d=panel&s=standard&h=right-in` |
 | d125 | ₪14900 | `?v=12&c=rb-9001d&w=strip&g=reeded&n=ron&k=cylinder&d=plain&s=standard&h=left-in` |

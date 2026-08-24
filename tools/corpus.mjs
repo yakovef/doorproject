@@ -210,16 +210,51 @@ function handleOf(rec) {
   const h = rec.handle;
   if (!h || h.type !== 'pull-bar') return { id: 'none', residual: 0, note: h ? h.type : 'none' };
   if (h.orientation === 'horizontal') return { id: 'grab', residual: 0, note: 'horizontal bow' };
+
+  /* ⚠ THE FINISH IS A FILTER, AND IT USED TO BE A COMMENT. This matched on
+     length and width alone and printed the record's finish in the note, which
+     cost nothing for as long as every bar in the range was steel. The moment
+     `barblack` was added — 800 x 20 against Ron's 900 x 18 — it won on
+     geometry for d043, d063, d078 and d125 and painted a BLACK bar on four of
+     Peretz's real doors whose own records say "steel" and "polished chrome",
+     three of them in the gallery on the front page. The record was right there
+     in `h.finish` and nothing was reading it.
+     A filter rather than a term in the distance, because a finish is not
+     nearly-right: a black bar on a chrome door is wrong at any length. If the
+     filter empties — a bronze bar, say, which the range has none of — it falls
+     back to the whole list and says so, because refusing to name a fitting at
+     all would take a real door out of the gallery. */
+  const family = f => /black|שחור/.test(String(f || '')) ? 'black'
+                    : /brass|bronze|gold|פליז/.test(String(f || '')) ? 'brass' : 'steel';
+  const want = family(h.finish);
+  /* ⚠ A TERM, NOT A VETO, AND THE REASON IS THAT THE RANGE CANNOT ALWAYS WIN.
+     A veto was the first fix and it was worse than the bug: it put the ONE
+     black bar we sell — 800 mm — on d072, whose bar measures 0.861 of the leaf
+     (about 1,765 mm), so the gallery showed a stub where the photograph has a
+     bar the height of a man. Peretz has long black bars and we do not stock
+     one, which is a hole in the CATALOGUE (ASK-PERETZ §5 and §14) and not
+     something a fitter can paper over.
+     So the finish costs 0.10 — about what being a fifth of the leaf's height
+     wrong in length costs — and the trade is made in the open, per door. It is
+     wide enough to keep steel bars off steel doors (the swap that started
+     this was worth 0.017) and narrow enough that a 0.47 length error still
+     loses to a wrong colour. Every choice is printed in the table below with
+     both the finish asked for and the finish given, so a bad trade is visible
+     rather than buried. */
+  const FINISH_COST = 0.10;
   let best = null, bestD = Infinity;
   for (const n of HANDLES) {
     if (n.style !== 'bar') continue;
-    const d = Math.hypot((n.len / LEAF_H - h.len_h) * 1.0, (n.w / LEAF_W - h.w_w) * 4.0);
+    const d = Math.hypot((n.len / LEAF_H - h.len_h) * 1.0, (n.w / LEAF_W - h.w_w) * 4.0)
+            + (family(n.finish) === want ? 0 : FINISH_COST);
     if (d < bestD) { bestD = d; best = n; }
   }
+  const gave = family(best.finish);
   return { id: best.id, residual: bestD,
     note: `bar ${h.len_h.toFixed(3)}L x ${h.w_w.toFixed(3)}W of leaf -> `
         + `${best.he} ${(best.len / LEAF_H).toFixed(3)}x${(best.w / LEAF_W).toFixed(3)}`
-        + (h.finish && h.finish !== 'steel' && h.finish !== 'chrome' ? `  [${h.finish} in the photograph]` : '') };
+        + `  [${h.finish || 'finish unrecorded'}`
+        + (gave === want ? '' : ` -> ${gave}, nothing nearer in that finish`) + ']' };
 }
 
 /** The lock furniture. `kind` is free text in the records, so it is matched on
