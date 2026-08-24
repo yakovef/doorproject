@@ -23,6 +23,103 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-24 11:04 UTC — run 28: `npm run profile` is red, and it is not the drawing
+
+**Looked at:** four new human commits since run 27 — `5c679e0` (fourteen
+outside reports, the scene anchored, the alcove removed), `65e3e5b` (the undo
+button's height, measured by the audit), `9b30b20` (grab-bar placement rule
+and keyhole position), `a554a4d` (the threshold as one path, the sconces
+reaching the door). Fast-forwarded cleanly. Built, opened the site at 390×844
+and 1440×900, clicked all four sections — the room, the reflection and the
+new threshold all look right. Container was healthy; ran the full suite.
+
+**Instruments:** test ✓ (3,704,418) · audit ✓ (no faults) · collide ✓
+(`all` / `boxes`) · recreate ✓ (three known catalogue gaps, unchanged) ·
+**profile ✗ (2 faults, dark band only)**.
+
+**Changed:** nothing shipped. `js/`, `css/`, `assets/bundle.js` and
+`index.html` are byte-identical to `a554a4d`.
+
+**`npm run profile` came up red on the dark band, on two of its three checks —
+the two-panel shading-rate check and the moulding-bead check — and I spent
+this run finding out why rather than either silencing it or guessing at a
+fix.** Bisected across all four commits: the FALLOFF check (nine rows against
+the corpus median, the one the file's own docstring calls "the one number the
+leaf's whole lighting model is built on") passes cleanly at every commit,
+worst row 0.070/0.090 against a 0.09 tolerance. Only the two RATIO checks
+broke, and both broke at the same commit, `5c679e0` — the scene-anchoring
+round — and did not move again in the three commits after it.
+
+**Screenshot of the failing state (dark, two panels, an Idan bar): no visible
+defect.** No bulge, no flat panel, both mouldings read the same depth to the
+eye. So before touching anything I went looking for the mechanism rather than
+the symptom.
+
+**Ablation, not guesswork — CLAUDE.md §6's rule.** I rendered the exact
+failing state (`colour: rb-0097d, detail: panel2, handle: idan`) at both
+commits and diffed the raw SVG: every gradient definition — `leafFill`,
+`keyWash`, `bloom`, `mould-t/b/l/r` — is byte-identical before and after.
+`PANEL_ROWS.pair` is untouched, `[[0.07,0.58],[0.66,0.92]]`. What moved is the
+leaf's own ABSOLUTE position in the scene: `x=178,y=304` before,
+`x=364,y=604` after — the room-anchoring rework the commit itself describes.
+Raw single-pixel luminance at the four sample points shifted by only 2-4 out
+of 255 (~1.5%), which a `log()`-based rate over an already near-flat lower
+panel amplifies into a large ratio swing — exactly the numerical fragility
+this same file's docstring already names for the check ABOVE this one
+("a point sample… lands on the quirk or on the paint's own mottle depending on
+rounding. The peak is stable" — which is why FALLOFF samples a band and these
+two checks sample one pixel).
+
+I tested every plausible cause by turning it off and re-measuring, at both
+commits, holding everything else fixed:
+- **the new sconce-on-door wash** (`lampOnDoorL/R`) — zero effect, identical
+  numbers with and without it (it decays to nothing by 0.34 of the CASING
+  width and never reaches x=0.42 of the LEAF)
+- **the floor reflection** (`<use href="#door">`, opacity 0.13, blurred) —
+  zero effect with it fully suppressed
+- **the pull bar** (`handle: 'idan'` vs `'none'`) — byte-identical numbers
+  either way; the bar and its shadow do not cross the sample column
+- **the leaf's own grain/drift texture** (`grainTex`, `drift` — a repeating
+  180-unit pattern and a turbulence filter, both painted with
+  `patternUnits="userSpaceOnUse"`, i.e. in the SVG's ABSOLUTE coordinate
+  space, not the leaf's local one) — **this was it.** Disabling both at
+  `a554a4d` moves the ratio from 0.484 (fail) to **0.701 (pass)**; disabling
+  both at `3564a5c` gives 0.933. The two states converge to close, both-passing
+  values the moment the texture stops being sampled.
+
+**So the mechanism is real and specific: the leaf's paint texture is anchored
+to the SVG's absolute coordinate space, and the room rework moved the leaf
+186×300 units within that space — landing the SAME leaf-relative sample point
+on a different phase of the SAME repeating pattern.** Visually meaningless (a
+"whisper of fine grain" over a few percent of a panel), numerically enough to
+flip a fragile single-pixel ratio.
+
+**Left alone deliberately, and why.** Two things I did NOT do, both on
+purpose:
+1. **Did not touch the drawing.** No photograph or measurement says the panel
+   is wrong; the screenshot and the FALLOFF check both say it is not. Changing
+   a gradient or a coordinate to chase this ratio would be exactly the
+   mistake §6 already lists three times over — fitting the drawing to an
+   instrument reading instead of to what the corpus shows.
+2. **Did not harden `tools/profile.mjs` this run.** The fix that fits the
+   established precedent (the FALLOFF check already moved from a point probe
+   to a band average for this exact reason) is real, but making the panel-rate
+   and bead checks robust to a 180-unit texture period needs a wide enough
+   sample that it doesn't cross into the mitre or the neighbouring panel —
+   a 7×7 pixel average I tried moved the after-state ratio from 0.484 to only
+   0.532, still short of the 0.6 floor, so a correct fix needs real tuning and
+   a falsification pass (break the symmetry on purpose, confirm it still
+   fails), not a rushed patch at the end of an already-long investigation.
+
+**This is red, understood, and left for the next run to harden properly —
+not silenced, not guessed at, not stamped over.** No shipped file moved this
+run, so there is nothing to push that changes the live site; committing only
+this log entry.
+
+**Commit:** see below.
+
+---
+
 ## 2026-08-24 07:17 UTC — run 27: fourteen grille tiles shared one id apiece, and the pixels hid it
 
 **Looked at:** two new human commits since run 26 — `29e5c0b` (a six-lens

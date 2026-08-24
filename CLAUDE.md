@@ -154,9 +154,10 @@ door" means in every other sentence in this file.
   rework of 24.8 and `faceObstacles` agreeing with the drawing everywhere. It
   was 1,568 before the window list was cut from four shapes to two: same
   arithmetic as the assertion count above.
-- `npm run audit`, `npm run profile`, `npm run recreate`, `npm run sheets` —
-  all clean **on a healthy container**, which is not every container. See
-  "Red, and known" directly below before believing either state.
+- `npm run audit`, `npm run recreate`, `npm run sheets` — all clean **on a
+  healthy container**, which is not every container. See "Red, and known"
+  directly below before believing either state. `npm run profile` is NOT
+  in this list — see the same section for why.
 - The drawing recreates all 30 measured doors; the order carries the full
   specification, a picture, an unambiguous opening direction, a price and a
   code.
@@ -175,7 +176,23 @@ with those four red is right, and it still stands for the days it degrades.
 **As of the 24.8 interface round the container was healthy and everything is
 green** — `npm test` **3,704,418 / 0**, `npm run sheets` completed all four
 families, `npm run audit` clean at all seven viewports, `npm run collide` clean
-over 1,224 designs. One thing is still red and it is measured below.
+over 1,224 designs. Two things are red and both are measured below.
+
+- **`npm run profile` red on the dark band, two of its three checks — and it is
+  not the drawing.** The panel-rate and moulding-bead checks (not the primary
+  FALLOFF one, which passes cleanly) both broke at the room-anchoring commit
+  and stayed broken through the three after it. Screenshot of the failing
+  state shows no defect; the leaf's own texture (`grainTex`/`drift`) is
+  painted in the SVG's ABSOLUTE coordinate space rather than the leaf's local
+  one, and the room rework moved the leaf 186×300 units within that space — so
+  the same leaf-relative sample point now lands on a different phase of the
+  same repeating pattern. Proven by ablation (`AGENT-LOG.md`, run 28):
+  disabling the texture moves the ratio from 0.484 (fail) to 0.701 (pass) on
+  the current tree, and to a close 0.933 on the tree before the room rework.
+  **Not fixed yet** — the honest fix is to harden the two checks' sampling
+  the way FALLOFF's own docstring already explains doing once for the same
+  reason, and that needs a wide-enough neighbourhood average verified not to
+  mask a real asymmetry, which is more than a five-hour run should rush.
 
 What to know for the days it degrades:
 
