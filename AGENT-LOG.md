@@ -23,6 +23,105 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-24 16:11 UTC — run 29: the classical set's frame and its window agree in the rules and disagree in the sweep, and both readers turn out to be asking the wrong question
+
+**Looked at:** one substantial human commit since run 28 — the classical set
+(`classic`), the ring-and-scroll lattice (`rings`) and a black tube bar
+(`barblack`), built against five new photographs in `research/newdoor/`.
+Fast-forwarded cleanly. Built (no diff), opened the site at 390×844 and
+1440×900, clicked through all four sections, then built the exact new
+combination through the real UI (window → rect, detail → classic, grille →
+rings, handle → barblack) rather than trusting a query string — price, spec
+line and drawing all agreed, and the picture matches the composition the
+commit describes: cornice, frieze, corbelled shelf with its own pull, panel,
+plinth, all correctly clear of the ring-lattice window between them.
+
+**Instruments:** test ✓ (4,377,785) · audit ✓ (no faults) · collide `boxes` ✓
+· recreate ✓ (known catalogue gaps only, unchanged) · sheets current (no
+staleness failures) · **collide `all` ✗ (2 findings, both new, both in the
+classical set's obstacle description)** · **profile ✗ (unchanged from run 28,
+re-confirmed byte-identical: dark ratio 0.48 / 1.083, same root cause already
+documented, not re-investigated).**
+
+**Changed:** nothing. Both `collide -- all` findings are real, but neither is
+a customer-visible defect — I traced each to a specific, narrow mechanism and
+am documenting rather than patching three files (renderer markup plus two
+separate `collide.mjs` checks) without the verification that deserves.
+
+**1. "20 obstacles the rules believe in and the drawing does not."**
+`faceObstacles` declares six rectangles for `detail.classic` — window,
+cornice, frieze, shelf+band, panel, plinth — off `CLASSIC_ROWS`/
+`CLASSIC_COLS`, the SAME constants `classicSet()` draws from, so the two
+cannot disagree about position (unlike the ordinary "second description"
+family in CLAUDE.md §5, this one shares its source). The gap is narrower:
+`collide.mjs`'s drift-check reader (`tools/collide.mjs` around line 339-361)
+only knows how to find two kinds of obstacle in the rendered markup —
+`[data-pane]` for `window` and `[data-detail="panel"]` for `panel`. It was
+never taught to look for the `kind: 'moulding'` rectangles `faceObstacles`
+started emitting for cornice/frieze/shelf/plinth, so those four can never be
+independently confirmed against the drawing — not because they drifted, but
+because the reader was never extended when the kind was added.
+
+**2. `footHits`'s ring-with-a-hollow-middle model is applied to four pieces
+that are not panels.** `faceObstacles` sets `band: MOULD_BAND` on ALL SIX
+classic rows, including the four `moulding`-kind ones — and `band` is what
+tells `footHits` to treat a rectangle as a FRAME with a walkable flat field
+inside it, which is exactly right for a raised panel (that flat field is
+where a bar's foot is supposed to stand, per the photograph-verified rule
+already in this file) and is not obviously right for a cornice, a frieze, or
+the corbelled shelf, none of which have a legitimate empty middle — the
+shelf+band rectangle (512×209 mm) is fully occupied by `classicBand`'s tablet
+motif and the set's own `classicPull`. Whether this actually lets a
+buildable, reachable customer state place a foot in that computed "hollow" —
+I did not confirm either way. It needs tracing through `gripHome`'s actual
+reachable positions for this detail, not an assumption.
+
+**3. The reported "classic x pane" collision (4 designs, 496×921 mm,
+`idan+cylinder/rect/{standard,wide}/{right,left}-in/classic`) is a bounding-
+box artefact, not hardware crossing glass.** Read the pair name literally —
+it is not `idan x pane` (the hardware-vs-glass exception in `collide.mjs`
+already skips those, correctly, per its own comment on why a bar may cross an
+architrave). It is the OUTER `<g data-detail="classic">` wrapper against the
+window. `CLASSIC_ROWS` puts the cornice/frieze entirely above the window
+(ending at 0.148, window starts at 0.159) and the shelf entirely below it
+(starting at 0.557, window ends at 0.540) — verified off the constants
+directly, no rendering needed. Nothing in the composition actually touches
+the glass. But `classicSet()` returns all of it as ONE group, and
+`drawnBox()`'s generic `getBBox()`-over-children walk unions cornice-to-
+plinth into a single rectangle that necessarily spans the window's row too,
+since the window sits in the gap between them. The hits-sweep has no way to
+tell "this composite's members don't cover its own bounding box" from "this
+object is genuinely there" — the same class of box-vs-paint gap CLAUDE.md §8
+already names for shadows and clip paths, in a place nobody had reason to
+look until a detail was built from more than one disjoint piece.
+
+**Left alone deliberately, and why.** All three are real gaps in what the
+instruments can currently prove, not proven defects in what the customer
+sees — I checked the composition visually and through the real UI and it is
+correct. Fixing #1 and #3 correctly means tagging `classicSet()`'s individual
+pieces distinctly (cornice/frieze/shelf/plinth) so both the drift-check and
+the hits-sweep read pieces instead of the composite, which also makes #3
+disappear as a side effect since the pieces themselves would stop
+bounding-box-overlapping the window. Fixing #2 needs the reachability trace
+first — patching `footHits` or the `band` field without knowing whether
+anything can actually reach that gap risks a change with no test behind it
+either way. All three belong in one pass, not three rushed edits at the end
+of an already-long investigation, and AGENT.md's own five "never"s make
+patching a rule I have not fully verified the wrong trade against pushing
+red once more.
+
+**Also corrected:** CLAUDE.md §0c's own "Green" list claimed
+`npm run collide` was clean over both `all` and `boxes`, "including the
+classical set's cornice, frieze and shelf, which it had to be taught about
+before it could." Re-ran `collide -- all` twice, on a clean tree, to be sure
+before touching the claim — it is reproducibly red, exactly the two findings
+above. Corrected in the same commit, per CLAUDE.md's own instruction to fix
+what is already there when found wrong, not just add to it.
+
+**Commit:** see below.
+
+---
+
 ## 2026-08-24 11:04 UTC — run 28: `npm run profile` is red, and it is not the drawing
 
 **Looked at:** four new human commits since run 27 — `5c679e0` (fourteen

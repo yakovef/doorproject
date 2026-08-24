@@ -149,10 +149,11 @@ door" means in every other sentence in this file.
   sweeps are the product of those lengths, so the total moves with the range in
   both directions. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF ANYTHING. It is
   not a coverage metric — read the failure count.
-- `npm run collide` — clean over **1,258 buildable designs**, real `getBBox`
-  geometry from a browser, `all` and `boxes`, with `faceObstacles` agreeing
-  with the drawing everywhere — including the classical set's cornice, frieze
-  and shelf, which it had to be taught about before it could.
+- `npm run collide -- boxes` — clean, over **1,346 buildable designs**, real
+  `getBBox` geometry from a browser. ⚠ `-- all` is NOT clean — see "Red, and
+  known": this line previously claimed it was, verified false by re-running it
+  on 24.8 (run 29). Check both flags yourself; do not trust a "clean" claim
+  about `collide` that does not say which of the two it means.
 - `npm run audit`, `npm run recreate`, `npm run sheets` — all clean **on a
   healthy container**, which is not every container. See "Red, and known"
   directly below before believing either state. `npm run profile` is NOT
@@ -173,10 +174,11 @@ in `AGENT-LOG.md`) and went fully green. **Treat container health as something
 to establish each run.** `AGENT.md` has the one circumstance in which pushing
 with those four red is right, and it still stands for the days it degrades.
 
-**As of the 24.8 interface round the container was healthy and everything is
-green** — `npm test` **3,704,418 / 0**, `npm run sheets` completed all four
-families, `npm run audit` clean at all seven viewports, `npm run collide` clean
-over 1,224 designs. Two things are red and both are measured below.
+**As of the classical-set round the container was healthy** — `npm test`
+**4,377,785 / 0**, `npm run audit` clean, `npm run collide -- boxes` clean,
+`npm run recreate` clean (known catalogue gaps only), sheets current. Two
+things are red and both are measured below; neither is new drawing damage —
+both are instrument gaps found and traced, not yet closed.
 
 - **`npm run profile` red on the dark band, two of its three checks — and it is
   not the drawing.** The panel-rate and moulding-bead checks (not the primary
@@ -193,6 +195,28 @@ over 1,224 designs. Two things are red and both are measured below.
   the way FALLOFF's own docstring already explains doing once for the same
   reason, and that needs a wide-enough neighbourhood average verified not to
   mask a real asymmetry, which is more than a five-hour run should rush.
+- **`npm run collide -- all` red on the classical set, two findings — and
+  neither is the drawing either.** `faceObstacles` describes the set's cornice,
+  frieze, shelf and plinth as `moulding`-kind obstacles off the same
+  `CLASSIC_ROWS`/`CLASSIC_COLS` constants `classicSet()` draws from, so the
+  two cannot disagree about POSITION. What's actually red: `collide.mjs`'s
+  drift-check reader was never taught to look for the `moulding` kind (it only
+  knows `window` and `panel`), so those four rectangles can never be
+  independently confirmed against the drawing — a reader gap, not a drift.
+  And the reported "classic x pane" 496×921 mm hit on four designs is the
+  OUTER `<g data-detail="classic">` wrapper's bounding box (cornice-to-plinth)
+  unavoidably spanning the window's row in the gap between the pieces, even
+  though nothing in the composition actually touches the glass — verified off
+  the row constants directly (cornice/frieze end at 0.148, shelf starts at
+  0.557, the window is 0.159–0.540). A third, unconfirmed thing: `footHits`'s
+  "ring with a walkable flat middle" treatment — right for a raised panel — is
+  applied to all six classic rows including the four that are not panels and
+  may have no legitimate flat middle at all; whether any reachable customer
+  state can actually place a foot there was not traced. See `AGENT-LOG.md`
+  run 29 for the full reasoning. **Not fixed** — the honest fix tags
+  `classicSet()`'s individual pieces so both checks read them instead of the
+  composite, which needs verifying against all three findings at once rather
+  than three separate rushed edits.
 
 What to know for the days it degrades:
 
