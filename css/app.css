@@ -519,12 +519,23 @@ body {
   .stage { block-size: auto; flex: 1 1 auto; min-block-size: 0; }
 }
 
-/* Light doors would vanish on a light ground, so the stage sinks a shade. */
-/* Set on `.layout`, not on `.stage-wrap`. The grip bar is a SIBLING of the
-   stage now rather than a child, and it paints itself with `--wall` so that
-   there is no seam between the door and the choices — on the stage the
-   variable would not reach it, and a light door got a bar half a shade off. */
-.layout[data-light="true"] { --wall: #E4E0D7; --floor: #D6D2C8; }
+/* ⚠ `.layout[data-light="true"] { --wall: #E4E0D7; --floor: #D6D2C8 }` WAS
+   HERE, AND IT IS GONE. It sank the wall and the floor a shade behind a pale
+   door so a white leaf would not vanish into a white room.
+   Reported from outside: *"there are some colors that the surrounding changes
+   color. the backround and the things around the door needs no change no
+   matter what."* The whole job of this screen is comparing colours, and a
+   ground that shifts under the swatch makes every comparison a lie — cream on
+   a light wall and cream on a darkened wall are two different colours to the
+   eye and neither is the colour of the door. It is the reason a paint shop
+   paints its walls one flat grey.
+   The silhouette of a pale door is the DRAWING's problem, and the drawing
+   already solves it: a painted frame, the reveal ramping in black at falling
+   alpha, and the casing's shadow on the plaster. Those hold on any colour,
+   because they describe the object rather than the backdrop.
+   See the matching note in app.js, where the attribute stopped being copied
+   onto `.layout`. The SVG still carries its own `data-light`, which the
+   moulding reads; that is a fact about the paint and it stays. */
 
 .door-svg {
   /* Fills the stage rather than sitting fitted inside it. The door itself is
@@ -1343,6 +1354,22 @@ html.is-live .wa__off { display: none; }
   min-block-size: 44px; font-weight: 400; font-size: .88rem;
 }
 .btn--ghost:hover { border-color: var(--ink-2); }
+
+/* Undo, under the door. Narrower than a ghost button in the send panel because
+   it sits in the strip below the stage and that strip's height comes out of
+   the drawing: every pixel here is a pixel of door on a phone. It keeps the
+   44 px floor the audit measures every tap target against — the padding gives
+   way, the height does not. */
+.btn--undo {
+  align-self: center;
+  padding-inline: 14px; font-size: .82rem;
+  background: var(--paper, #fff);
+}
+.btn__ico {
+  inline-size: 16px; block-size: 16px; flex: 0 0 auto;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
 
 .send__alt {
   display: flex; align-items: center; justify-content: space-between;

@@ -51,7 +51,7 @@
  * state the interface would not let you build.
  */
 
-import { byId, DETAILS, GRILLES, HANDLES, isGlazed, leafGlazed, LOCKSETS, WINDOWS }
+import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, LOCKSETS, WINDOWS }
   from './catalog.js';
 import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
          gripPlacement, nearestGrip, panelFits } from './renderer.js';
@@ -165,7 +165,7 @@ export function conflicts(state) {
      Read off `panels` rather than the id, so a third panelled face added later
      is covered without anybody remembering to come back here. */
   if (onLeaf) {
-    for (const d of DETAILS) if (d.panels === 2) {
+    for (const d of DETAILS) if (hasUpperPanel(d)) {
       out.detail[d.id] = 'החלון תופס את מקומו של הפאנל העליון';
     }
     /* And a TALL light leaves no room for the lone one either. Same rule as
@@ -428,10 +428,10 @@ export function repair(state, intent = null) {
     else { s.detail = 'plain'; change('detail', SAID.noPanelRoom); }
   }
 
-  if (leafGlazed(s) && byId(DETAILS, s.detail).panels === 2) {
+  if (leafGlazed(s) && hasUpperPanel(byId(DETAILS, s.detail))) {
     if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
     else {
-      const one = DETAILS.find(d => d.panel && d.panels !== 2);
+      const one = DETAILS.find(d => d.panel && !hasUpperPanel(d));
       if (one) { s.detail = one.id; change('detail', SAID.onePanel); }
     }
   }
@@ -494,7 +494,14 @@ export function repair(state, intent = null) {
      longer be turned comes back upright — otherwise a stale `gp=` in a URL
      would carry a rotation the leaf cannot take. */
   if (s.grip) {
-    if (byId(HANDLES, s.handle).style === 'none') {
+    /* ⚠ A GRIP CUT INTO THE LEAF DROPS ITS POSITION HERE TOO, not only in
+       `gripAt`. The drawing already ignores `gp=` for the recessed channel —
+       but a design that CARRIES a position it will never honour is the same
+       shape of lie as the retired `f=` parameter, and `toQuery` would write it
+       straight back out for the next person who opens the link. Dropped, and
+       said out loud, because the customer may well have dragged the previous
+       grip before choosing this one. */
+    if (byId(HANDLES, s.handle).style === 'none' || byId(HANDLES, s.handle).fixed) {
       s.grip = null;
       change('grip', SAID.gripHome);
     } else {

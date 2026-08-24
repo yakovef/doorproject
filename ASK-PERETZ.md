@@ -572,6 +572,35 @@ five-second answers and none of them blocks launch.*
 
 ---
 
+## 13. דלת בלי ידית ומנעול — מוכרים כזאת בכלל? ⚠ שאלה אחת, משפט אחד
+
+**השאלה, בקצרה: אתה מוכן למכור דלת מוכנה בלי ידית ובלי צילינדר — שהלקוח יביא
+משלו — ואם כן, כמה זה עולה לעומת דלת עם צילינדר?**
+
+זהו. אם התשובה "לא, תמיד עם צילינדר" — גם זה בסדר גמור, ואנחנו נסדר את זה
+בצד שלנו.
+
+<details>
+<summary>למה זה עלה עכשיו</summary>
+
+האתר נפתח עכשיו על דלת חלקה לגמרי — בלי חלון, בלי פאנל, בלי ידית ובלי חור
+מנעול — והלקוח מוסיף דברים משם. זאת בקשה מפורשת, והיא נכונה: ככה כל דבר שרואים
+על הדלת הוא משהו שהלקוח בחר, ולא משהו שהיה שם מלכתחילה.
+
+אבל זה אומר שיש עכשיו אפשרות בקטלוג ששמה "ללא ידית ומנעול", והיא מגיעה גם
+להזמנה שנשלחת אליך. אנחנו לא רוצים שתקבל הזמנה שאתה צריך להתקשר בגללה — זה
+בדיוק מה שהאתר קיים כדי למנוע.
+
+**מה שיקרה לפי התשובה:**
+
+- *"כן, מוכרים"* → נשאיר את האפשרות ונרשום את המחיר.
+- *"לא"* → נשאיר את הדלת החלקה כנקודת פתיחה על המסך, אבל האתר לא ייתן לשלוח
+  הזמנה בלי לבחור מנעול, ויבקש מהלקוח לבחור אחד לפני השליחה.
+
+</details>
+
+---
+
 ## What I need back, minimally, to flip `PLACEHOLDER` to `false`
 
 | | Question | Blocks |
@@ -587,6 +616,7 @@ five-second answers and none of them blocks launch.*
 | 9 | warranty term · metallic range · made-in-Israel | three of the four foot badges |
 | 11 | second CTA · the nav · the trust sublines | three items of the second mockup |
 | 12 | opening or leaf · one opening or two | the dimensions on the A4 order sheet |
+| 13 | does he sell a door with no lock furniture at all | whether the bare default can be ORDERED, not whether it can be shown |
 
 1 and 5 were the two that stop launch on their own. **1 is answered and fixed**,
 so **5 — a starting price per size band — is now the only thing standing between

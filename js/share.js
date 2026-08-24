@@ -35,6 +35,32 @@ export const PRICE_INCLUDES = 'כולל דלת, התקנה מלאה ומע״מ';
 export const PRICE_CAVEAT   = 'מחיר משוער. המחיר הסופי נקבע לאחר מדידה.';
 
 /**
+ * THE DRAWING IS A DRAWING, and the site now says so in words.
+ *
+ * Asked for from outside: *"add a warning that this app just draws the door
+ * but it will probably look slightly different when installed."*
+ *
+ * The page already carried "הדמיה להמחשה" under the stage — an illustration,
+ * for demonstration — which is true and is not the thing a customer needs to
+ * hear. What they are looking at is a parametric drawing under one fixed
+ * light: the colour is a real Rav Bariach code but the sheen is ours, the
+ * hardware is drawn from photographs of the product rather than of their door,
+ * and the light in their doorway is not the light in here. It will be
+ * recognisably the door they chose. It will not be this picture pixel for
+ * pixel, and saying so before they order costs nothing.
+ *
+ * ⚠ AND IT GOES IN THE ORDER, not only on the screen — which is why it is a
+ * constant in this file rather than a string in `index.html`. `PRICE_CAVEAT`
+ * was four Hebrew literals in three files before it was one export, and the
+ * one place it turned out to be missing was the message. The moment a customer
+ * most needs to have read this sentence is when the door arrives, and what
+ * they have then is the WhatsApp message, not the page.
+ */
+export const DRAWING_CAVEAT =
+  'הציור באתר הוא הדמיה ממוחשבת — הדלת שתיוצר עשויה להיראות מעט שונה בגוון, '
+  + 'בברק ובפרטי הידיות.';
+
+/**
  * The address to send Peretz, or `null` when this page has none worth sending.
  *
  * ⚠ THE STARRED ROUTE IN README.md HAS NO PUBLIC ADDRESS. §2 tells the
@@ -243,6 +269,11 @@ export function message(state) {
        written here for the reason `GRIP_ILLUSTRATIVE` is: it was four Hebrew
        literals in three files for one promise. */
     PRICE_CAVEAT,
+    /* ⚠ AND THE DRAWING'S OWN CAVEAT, for the same reason and one step
+       further. The price caveat protects the number; this protects the
+       PICTURE, which is the part of this message a customer will hold up
+       against the door when it arrives. See DRAWING_CAVEAT. */
+    DRAWING_CAVEAT,
     `קוד: ${encodeCode(state)}`,
     /* The link matters more than anything above it: Peretz taps it and sees
        exactly what the customer saw. He decodes nothing. It is dropped, not

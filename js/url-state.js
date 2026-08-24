@@ -67,21 +67,56 @@ import { repair } from './rules.js';
    in words that the handle was moved and points at the link for the
    millimetres. Carrying it in the code as well would have grown the code a
    character to duplicate what the order already says. */
-export const VERSION = 11;
+/* 12: TWO LISTS WERE RE-CUT, SO EVERY INDEX AFTER THE CUT MEANS SOMETHING ELSE.
+   WINDOWS lost `tallwin` and `broad`, and DETAILS lost both milled grooves and
+   gained four panel and strip counts — all at the owner's son's request; the
+   reasoning sits with each list in `catalog.js`. Ids alias, so every LINK ever
+   written still opens a door. The short code cannot be rescued that way: it
+   packs the INDEX, and index 3 in WINDOWS used to be חלון גבוה and is now off
+   the end of the list. A version-11 code read under this layout is a different
+   door, so it is refused with a notice instead.
+   ⚠ Free today for the same reason 11 was, and it is worth restating because
+   it will not be true for long: the site is noindex, undeployed, and not one
+   code has ever been given to a customer. The moment one has, a bump costs
+   somebody a piece of paper with a door on it. */
+export const VERSION = 12;
 
+/**
+ * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
+ *
+ * ⚠ THIS CHANGED, AND IT CHANGED ON PURPOSE. It used to arrive as a finished
+ * door — a rectangular window, an Idan pull bar, a cylinder — which is a good
+ * showroom photograph and the wrong first move for a configurator. Asked for
+ * from outside: *"i want that when you open up the app for the first time, you
+ * just see a door with nothing, no handle even no keyhole, and then you add
+ * things to that."*
+ *
+ * What that buys, beyond taste. Every option group now starts at its own
+ * "none", so every mark on the leaf is one the customer put there and can see
+ * themselves putting there; and `nowLabel` in app.js — the navigator's summary
+ * of each section — starts out describing a plain door rather than describing
+ * choices nobody made. The old default also quietly meant that a customer who
+ * changed nothing sent Peretz an order for a bar and a window they had never
+ * looked at.
+ *
+ * ⚠ AND IT HAS TO STAY BUILDABLE. There is an assertion that `repair(DEFAULTS)`
+ * changes nothing, and it has caught a bad default twice — once when the
+ * lockset was a lever the corpus refuses beside a bar, and once when a window
+ * left the panel nowhere to go. A bare door passes it trivially today, which
+ * means the assertion is doing less work than it used to; that is a reason to
+ * keep it, not to relax it.
+ *
+ * ⚠ `lockset: 'none'` IS AN OPEN BUSINESS QUESTION, not just a UI state. See
+ * ASK-PERETZ.md §13 — whether he will quote a door with no lock furniture at
+ * all. Until that is answered the order names it in words, so nothing goes to
+ * the workshop as a silence.
+ */
 export const DEFAULTS = {
   colour:  'rb-0097d',
-  window:  'rect',
+  window:  'none',
   grille:  'none',
-  handle:  'idan',
-  /* CYLINDER, not the lever it was. The default door carries a pull bar, and
-     of the ten installed doors that carry one, eight have exactly this beside
-     it and not one has a lever — so the old default was a door the rules now
-     refuse, and the DEFAULTS-is-buildable assertion caught it the moment the
-     rule landed. Second time that assertion has earned its keep in two
-     commits, which is a fair argument for writing tests about the boring
-     starting state and not only about the interesting edges. */
-  lockset: 'cylinder',
+  handle:  'none',
+  lockset: 'none',
   detail:  'plain',
   size:    'standard',
   handing: 'right-in',

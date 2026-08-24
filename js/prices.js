@@ -71,13 +71,16 @@ export const SIZE = {
   sidelight: 4295,   // עם חלון צד   — one leaf and a fixed light
 };
 
-/* ── the opening ─────────────────────────────────────────────────────── */
+/* ── the opening ─────────────────────────────────────────────────────
+   ⚠ TWO SHAPES, DOWN FROM FOUR. `tallwin` (חלון גבוה) and `broad` (חלון רחב)
+   are withdrawn — see WINDOWS in catalog.js. Their keys are gone from here
+   too, because `catalog.js` refuses a price with no option as hard as it
+   refuses an option with no price, and a stranded number in a price list is a
+   number somebody will one day quote. */
 export const WINDOW = {
   none:    0,        // ללא חלון
   strip:   580,      // צוהר אנכי
   rect:    620,      // חלון מלבני
-  tallwin: 880,      // חלון גבוה
-  broad:   920,      // חלון רחב
 };
 
 /* ── what is in the opening ───────────────────────────────────────────
@@ -108,16 +111,40 @@ export const GRILLE = {
   reeded:       280, // זכוכית מחורצת
 };
 
-/* ── the face ─────────────────────────────────────────────────────────── */
+/* ── the face ─────────────────────────────────────────────────────────
+   ⚠ THE STRIPS ARE PRICED BY COUNT, AND THAT IS THE WHOLE SHAPE OF THIS BLOCK.
+   Asked for from outside: *"my father can put as many stripes and however the
+   client wants... the more stripes, the more it costs."*
+
+   So they are not one "metal strips" fee any more. Each band is a length of
+   stock, cut, polished and fixed, so the figures below are a fitting charge
+   plus a per-band rate — written out as plain totals rather than as arithmetic,
+   because this file has exactly one job and it is to be readable out loud to
+   somebody who is not a programmer. The shape used here:
+
+       horizontal   200 + 40 per band     3 -> 320   11 -> 640
+       vertical     240 + 50 per band     4 -> 440    6 -> 540
+
+   Vertical bands are fewer and longer, which is why their rate is higher and
+   their base is too. Both curves are invented, like everything else in this
+   file, and the point of writing the shape down is that Peretz can correct the
+   RATE in one sentence instead of correcting seven totals.
+
+   ⚠ `groove` and `perimeter` are gone — the two milled grooves, withdrawn.
+   Their keys go with them: `catalog.js` refuses a price with no option. */
 export const DETAIL = {
   plain:     0,      // חלק
   panel:     380,    // פאנל תחתון
-  groove:    240,    // חריץ אנכי
-  strips:    440,    // פסי מתכת      — eleven bands
-  strips3:   320,    // שלושה פסים
   panel2:    520,    // שני פאנלים
-  stripsv:   440,    // פסים אנכיים   — four bands
-  perimeter: 260,    // חריץ היקפי
+  panelTop:  380,    // פאנל עליון      — one rectangle, same as the lower one
+  panel3:    660,    // שלושה פאנלים
+  strips3:   320,    // שלושה פסים
+  strips5:   400,    // חמישה פסים
+  strips7:   480,    // שבעה פסים
+  strips9:   560,    // תשעה פסים
+  strips:    640,    // אחד עשר פסים
+  stripsv:   440,    // פסים אנכיים     — four bands
+  stripsv6:  540,    // שישה פסים אנכיים
 };
 
 /* ── the pull handle ──────────────────────────────────────────────────── */
@@ -145,6 +172,12 @@ export const LOCKSET = {
   knobplate: 220,    // כדור על אורך
   digital:   1450,   // מנעול חכם     — by far the largest single add-on
   square:    120,    // ריבועי
+  /* The door as it first appears: no lever, no knob, no keyway. It is the
+     DEFAULT, so this figure is subtracted from nothing — it is the price of
+     the door with the furniture left off. ⚠ Whether Peretz sells one that way
+     at all is ASK-PERETZ.md §13, unanswered; if the answer is no, this becomes
+     a rule rather than a price. */
+  none:      0,      // ללא ידית ומנעול
 };
 
 /* ── colour ───────────────────────────────────────────────────────────

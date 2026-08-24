@@ -31,15 +31,15 @@ import {
   byId, colourCode, COLOURS, DETAILS,
   GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
-import { deltaLabel, formatAgorot, priceAgorot } from './price.js';
+import { formatAgorot, priceAgorot, priceLabel, priceParts } from './price.js';
 import {
-  describe, detailGlyph, gripAt, gripCanRotate, gripHome,
+  describe, detailGlyph, gripAt, gripCanRotate, gripHome, gripIsFixed,
   gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
   copyOf, render, sizeGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
-import { canSharePicture, copyMessage, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE,
+import { canSharePicture, copyMessage, DRAWING_CAVEAT, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE,
          gripAddendum, gripDeparture, PHONE_DISPLAY, PHONE_TEL, PRICE_CAVEAT,
          PRICE_INCLUDES, sendDoor, whatsappUrl } from './share.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
@@ -48,7 +48,6 @@ import { WORKS } from './works.js';
 const $ = sel => document.querySelector(sel);
 
 let state = { ...DEFAULTS };
-let urlTimer = null;
 
 /**
  * The categories, in the order a customer decides them.
@@ -87,8 +86,10 @@ const GROUPS = [
     /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was
        the reason the narrow door read "כלול" and then took ₪100 off: it is a
        difference from a FIXED baseline, clamped at zero by the label. Prices
-       come from `tileSurcharge` now, which asks `priceAgorot` what tapping
-       actually does, so no group needs its own idea of what a price is. */
+       come from `tilePrice` now, which reads this size's own entry out of
+       `priceParts` — so the size tiles show what each door costs rather than
+       what it costs relative to a door nobody is looking at, and no group
+       needs its own idea of what a price is. */
     glyph: sizeGlyph,
     hint: 'נמדוד אצלכם במדויק — בחינם.' },
 
@@ -253,6 +254,11 @@ function init() {
     placeGrip({ ...now, rot: now.rot === 90 ? 0 : 90 }, true);
   });
   $('#grip-home').addEventListener('click', () => set({ ...state, grip: null }));
+  $('#undo-btn').addEventListener('click', undo);
+  /* Written in from `share.js`, not typed into index.html — one promise,
+     one wording, and the order carries the same sentence. See
+     DRAWING_CAVEAT. */
+  $('#draw-caveat').textContent = DRAWING_CAVEAT;
   $('#save-btn').addEventListener('click', saveCurrent);
   $('#works-close').addEventListener('click', closeWorks);
 
@@ -755,22 +761,36 @@ function buildPanel() {
 }
 
 /**
- * What tapping this option does to the total, in agorot.
+ * WHAT THIS OPTION COSTS, in agorot. Not what tapping it would do to the total.
  *
- * The only honest answer to the number printed on a tile, because it is
- * computed the same way the figure the customer is watching is computed —
- * `priceAgorot`, through `repair`, on the state they actually have. A label
- * derived from `o.delta` alone cannot express a charge that depends on another
- * axis, and ironwork's does: it is sold by the panel, and the window and the
- * size decide how many panels there are.
+ * ⚠ THIS USED TO BE `tileSurcharge`, and it printed a DELTA:
+ * `priceAgorot(after) - priceAgorot(state)`, the jump. Reported from outside:
+ * *"the price of the thing needs to be written on the thing not the jump in
+ * the price if i choose this option."*
  *
- * Negative is real and is shown: the narrow door is ₪100 CHEAPER than
- * standard, and its tile used to read "כלול" and then take ₪100 off.
+ * Three things were wrong with the jump, and only the third is obvious:
+ *  - On the option you already have it printed "כלול". A ₪620 wrought-iron
+ *    grille announced itself as included, on the very door you had bought it
+ *    for.
+ *  - It changed under you. Tap the sidelight and every grille tile silently
+ *    doubled, because ironwork is sold per panel — correct arithmetic, and
+ *    unreadable as a price list.
+ *  - It is not a property of the option at all, so two customers looking at
+ *    the same tile saw different numbers and neither was the price.
+ *
+ * The cost comes from `priceParts`, which is the same arithmetic `priceAgorot`
+ * sums — see the note there for why it is not `o.delta`.
+ *
+ * Still asked through `repair`, and that still matters: a grille's cost
+ * depends on how many panes the door ends up with, so the honest figure is the
+ * one for the door you would actually get. The chosen key is forced back
+ * afterwards, because a repair may bounce a blocked option straight back to
+ * where it was and the tile would then quote the price of the option the
+ * customer already has instead of the one under their finger.
  */
-function tileSurcharge(g, o, state) {
-  if (state[g.key] === o.id) return 0;
-  const after = repair({ ...state, [g.key]: o.id }).state;
-  return priceAgorot(after) - priceAgorot(state);
+function tilePrice(g, o, state) {
+  const after = { ...repair({ ...state, [g.key]: o.id }).state, [g.key]: o.id };
+  return priceParts(after)[g.key];
 }
 
 /** Repaint every option's price label against the door as it stands. */
@@ -781,18 +801,18 @@ function repriceOptions(state) {
     for (const b of host.querySelectorAll('[data-id]')) {
       const o = g.list().find(x => x.id === b.dataset.id);
       if (!o) continue;
-      const label = deltaLabel(tileSurcharge(g, o, state));
+      const label = priceLabel(tilePrice(g, o, state));
       const meta = b.querySelector('.tile__meta');
       if (meta) { meta.textContent = label; continue; }
       /* Swatches hide their meta by CSS, so the accessible name is where a
-         surcharge would actually reach somebody. Every colour is ₪0 today;
+         price would actually reach somebody. Every colour is ₪0 today;
          the day one is not, this is already right. */
       const sw = b.querySelector('.swatch__meta');
       if (sw) {
         sw.textContent = `${colourCode(o)} · ${label}`;
-        b.title = `${o.he} · ${colourCode(o)}${label === deltaLabel(0) ? '' : ` · ${label}`}`;
+        b.title = `${o.he} · ${colourCode(o)}${label === priceLabel(0) ? '' : ` · ${label}`}`;
         b.setAttribute('aria-label', `${o.he}, ${colourCode(o)}`
-                       + (label === deltaLabel(0) ? '' : `, ${label}`));
+                       + (label === priceLabel(0) ? '' : `, ${label}`));
       }
     }
   }
@@ -821,7 +841,7 @@ function buildOptions(g, host) {
       b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
         <span class="swatch__name">${o.he}</span>
-        <span class="swatch__meta">${colourCode(o)} · ${deltaLabel(tileSurcharge(g, o, state))}</span>`;
+        <span class="swatch__meta">${colourCode(o)} · ${priceLabel(tilePrice(g, o, state))}</span>`;
     } else if (g.kind === 'pill') {
       b.className = 'pill';
       b.textContent = o.he;
@@ -830,7 +850,7 @@ function buildOptions(g, host) {
       b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
         <span class="tile__name">${o.he}</span>
-        <span class="tile__meta">${deltaLabel(tileSurcharge(g, o, state))}</span>
+        <span class="tile__meta">${priceLabel(tilePrice(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
     }
     b.addEventListener('click', () => choose(g, o.id));
@@ -1069,7 +1089,76 @@ function choose(g, id) {
   if (said.length) toast(said[0]);
 }
 
+/**
+ * ── UNDO ──────────────────────────────────────────────────────────────
+ *
+ * Asked for from outside, in three words: *"add an undo button."*
+ *
+ * A stack of previous states, and `set` pushes onto it. It is worth being
+ * exact about WHY a stack rather than a single "previous", because the obvious
+ * one-step version is wrong here in a way that only shows up in use: `repair`
+ * can change three axes from one tap — choose a window and the panel goes, the
+ * ironwork goes with it and the handle moves for the moulding — so a customer
+ * who taps twice and regrets both taps needs two undos, not one. Reported
+ * defects of exactly that shape are all over §0b: a tap that quietly took
+ * ₪1,540 off a door in four repairs, with four toasts overwriting each other.
+ *
+ * ⚠ IT STORES WHOLE STATES, NOT EDITS. A design is eight strings and a grip
+ * position — smaller than the toast text — so an inverse-operation log would
+ * be code that can disagree with `repair` for no saving whatever. CLAUDE.md §5
+ * is a list of what happens when one quantity is computed twice; an undo built
+ * out of inverses is that, for the whole state.
+ *
+ * ⚠ AND `undo()` GOES THROUGH `set`, so the URL, the price, the code and the
+ * drawing all follow the way they do for any other change. An undo that
+ * restored the drawing and left the link on the previous door would be the
+ * silent-data-loss failure CLAUDE.md §0 calls the worst this site can produce.
+ *
+ * The cap is generous and exists only so a long session cannot grow the array
+ * without bound; nobody is expected to reach it.
+ */
+const HISTORY_MAX = 100;
+const history_ = [];
+
+/** Is there anything to go back to? Read by `armUndo`. */
+const canUndo = () => history_.length > 0;
+
+function undo() {
+  const prev = history_.pop();
+  if (!prev) return;
+  /* ⚠ NOT `set`, WHICH WOULD PUSH THIS ONTO THE STACK AND UNDO NOTHING. Going
+     back is not a change to record; it is the removal of one. Straight to the
+     same three things `set` does, minus the push. */
+  state = prev;
+  guard(paint)();
+  scheduleUrl();
+  toast('הצעד האחרון בוטל');
+}
+
+/** The URL write, debounced — shared by `set` and `undo`. It was inline in
+    `set`, and `undo` needs the identical behaviour: a step back that did not
+    rewrite the address would leave the link describing the door the customer
+    just cancelled. */
+let urlTimer = null;
+function scheduleUrl() {
+  clearTimeout(urlTimer);
+  urlTimer = setTimeout(() => {
+    try {
+      history.replaceState(null, '', toQuery(state));
+    } catch { /* history is a nicety, never a dependency */ }
+  }, 300);
+}
+
 function set(next) {
+  /* ⚠ ONLY WHEN SOMETHING ACTUALLY MOVED. `set` is called on every repaint
+     path, including ones that hand back the state they were given — arriving
+     at a size that repairs to itself, or a drag that lands the grip exactly
+     where it already was. Pushing those would fill the stack with steps that
+     undo nothing, and the button would need three presses to do one thing. */
+  if (JSON.stringify(next) !== JSON.stringify(state)) {
+    history_.push(state);
+    if (history_.length > HISTORY_MAX) history_.shift();
+  }
   state = next;
   /* `guard` — see the bottom of this file. A throw out of `paint()` mid-click
      is the same defect one click in: `render()` throws BEFORE the `innerHTML`
@@ -1080,12 +1169,7 @@ function set(next) {
 
   // Debounced: WebKit throws above ~100 history writes per 30s, and clicking
   // through swatches reaches that easily (PLAN.md §8.2).
-  clearTimeout(urlTimer);
-  urlTimer = setTimeout(() => {
-    try {
-      history.replaceState(null, '', toQuery(state));
-    } catch { /* history is a nicety, never a dependency */ }
-  }, 300);
+  scheduleUrl();
 }
 
 /**
@@ -1169,12 +1253,28 @@ function paint() {
   const size = SIZES[state.size] || SIZES.standard;
 
   $('#stage').innerHTML = render(state);
-  /* On `.layout`, not on `.stage-wrap`: the grip bar is a sibling of the stage
-     now and paints itself with the same `--wall`, so the variable has to be
-     set somewhere that reaches both or a light door gets a bar half a shade
-     off the room behind it. */
-  $('.layout').dataset.light =
-    String($('#stage').querySelector('svg').dataset.light === 'true');
+  /* ⚠ THE ROOM DOES NOT CHANGE COLOUR WITH THE DOOR ANY MORE.
+     There was a line here copying the drawing's `data-light` onto `.layout`,
+     and a rule in app.css — `.layout[data-light="true"] { --wall: #E4E0D7;
+     --floor: #D6D2C8 }` — that sank the wall and the floor a shade behind a
+     pale door so it would not vanish into them.
+     Reported from outside: *"there are some colors that the surrounding
+     changes color. the backround and the things around the door needs no
+     change no matter what."* And they are right, for a reason worth writing
+     down: this is a configurator, and the ONE thing a customer is doing on
+     this screen is comparing colours. A ground that moves under the swatch
+     makes every comparison a lie — cream against a light wall and cream
+     against a darkened wall are two different colours to the eye, and neither
+     is the colour of the door. The room has to be a constant for the same
+     reason a paint shop paints its walls grey.
+     What was being solved is real: a white door on a white wall has no
+     silhouette. That is answered where it belongs, in the drawing — the frame
+     is painted, the reveal ramps in black at falling alpha, and the casing
+     throws a shadow onto the plaster. Those work on any colour, because they
+     describe the object rather than the backdrop.
+     `data-light` is STILL EMITTED on the svg. The drawing itself reads it for
+     the moulding's light, and the attribute is a fact about the paint. It is
+     the copy onto the page's chrome that is gone. */
   fitStage();
 
   /* Written to EVERY element that claims to show it, not to one id. There are
@@ -1265,6 +1365,10 @@ function paint() {
   document.documentElement.classList.add('is-live');
   announce(describe(state));
   armGrip();
+  /* Shown only once there is a step to take back. In `paint` rather than in
+     `set`, because `undo` itself has to update it too — pop the last step and
+     the button must go away — and `paint` is the one path both of them run. */
+  $('#undo-btn').hidden = !canUndo();
 }
 
 /* ── moving the handle ────────────────────────────────────────────
@@ -1308,8 +1412,13 @@ const swallowTouch = ev => ev.preventDefault();
 function armGrip() {
   const bar = $('#grip-bar');
   const g = $('#stage svg [data-hw="handle"]');
-  bar.hidden = !g;
-  if (!g) return;
+  /* ⚠ AND NOT EVERY GRIP THAT IS DRAWN CAN BE MOVED. The recessed channel is
+     cut into the leaf rather than bolted to it, so there is nothing here to
+     arm: no drag, no arrow keys, no controls in the wall. See its catalogue
+     entry — `gripAt` and `repair` refuse the position as well, because this
+     one is a fact about the product and not a preference of the page. */
+  bar.hidden = !g || gripIsFixed(state);
+  if (!g || gripIsFixed(state)) return;
 
   g.classList.add('grip-live');
   g.setAttribute('tabindex', '0');
@@ -1323,10 +1432,21 @@ function armGrip() {
   g.addEventListener('touchstart', swallowTouch, { passive: false });
   g.addEventListener('touchmove', swallowTouch, { passive: false });
 
+  /* ⚠ HIDDEN, NOT DISABLED, AND THAT IS THE OPPOSITE OF THE RULE NEXT DOOR.
+     The option tiles use `aria-disabled` and stay clickable on purpose, so a
+     customer who wants a combination the door cannot take is told WHY instead
+     of finding a dead control. That is right for a choice about the door.
+     This is not a choice about the door. Turning a grip on its side is a thing
+     you can do to SOME grips — five of the seven bars are longer than a
+     standard leaf is wide — and on the rest the button has nothing to say
+     except that it does not apply. A greyed control that never becomes
+     available on this door is furniture: it takes a tap to discover, it takes
+     up the width the two live controls want, and its explanation is about the
+     button rather than about the door.
+     Asked for from outside: *"if a pull handle cant be rotated then dont show
+     the rotate button."* `#grip-home` beside it already works this way. */
   const rot = $('#grip-rot');
-  const can = gripCanRotate(state);
-  rot.setAttribute('aria-disabled', String(!can));
-  rot.title = can ? '' : 'הידית הזו ארוכה מרוחב הדלת — אי אפשר להניח אותה לרוחב';
+  rot.hidden = !gripCanRotate(state);
   /* Moved, and saying so. The position is not part of the order — it is not in
      the code and not in the WhatsApp message, at the owner's son's instruction
      — so a customer who has dragged the handle somewhere is told, plainly,
@@ -1580,14 +1700,29 @@ function fitStage() {
   const svg = stage.querySelector('svg');
   if (!svg) return;
 
+  /* ⚠ FOUR NUMBERS NOW, AND THE FIRST TWO ARE NEW. `data-fit-*` is the FIXED
+     scene — the same rectangle whatever door is drawn — while the SVG's own
+     `viewBox` is tight around this particular door. Cropping to the fixed
+     scene is the whole of "the room stands still while the door changes size":
+     the scale comes out a constant, so a wide door draws wider and a tall one
+     taller, instead of everything being rescaled until every door filled the
+     stage identically.
+     This read `(w - vw) / 2`, which assumed the box began at the origin. That
+     was true while there was one box and it started at 0 0. Centring a crop on
+     `w / 2` when the rect starts at `x` puts the door off centre by exactly
+     `x`, and CLAUDE.md §7 already records a tool bitten by assuming a viewBox
+     origin was zero. */
+  const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
   const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
   const box = stage.getBoundingClientRect();
-  if (!(w > 0 && h > 0 && box.width > 0 && box.height > 0)) return;
+  if (!(w > 0 && h > 0 && Number.isFinite(fx) && Number.isFinite(fy)
+        && box.width > 0 && box.height > 0)) return;
 
   const scale = Math.min(box.width / w, box.height / h);
   const vw = box.width / scale, vh = box.height / scale;
   svg.setAttribute('viewBox',
-    `${((w - vw) / 2).toFixed(1)} ${((h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+    `${(fx + (w - vw) / 2).toFixed(1)} ${(fy + (h - vh) / 2).toFixed(1)} `
+    + `${vw.toFixed(1)} ${vh.toFixed(1)}`);
   /* The crop just changed, so the scale did, so the touch target is the wrong
      size. A rotated phone is the case that matters. */
   sizeHitPad();

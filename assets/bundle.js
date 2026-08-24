@@ -30,12 +30,8 @@
     // ללא חלון
     strip: 580,
     // צוהר אנכי
-    rect: 620,
+    rect: 620
     // חלון מלבני
-    tallwin: 880,
-    // חלון גבוה
-    broad: 920
-    // חלון רחב
   };
   var GRILLE = {
     none: 0,
@@ -77,18 +73,26 @@
     // חלק
     panel: 380,
     // פאנל תחתון
-    groove: 240,
-    // חריץ אנכי
-    strips: 440,
-    // פסי מתכת      — eleven bands
-    strips3: 320,
-    // שלושה פסים
     panel2: 520,
     // שני פאנלים
+    panelTop: 380,
+    // פאנל עליון      — one rectangle, same as the lower one
+    panel3: 660,
+    // שלושה פאנלים
+    strips3: 320,
+    // שלושה פסים
+    strips5: 400,
+    // חמישה פסים
+    strips7: 480,
+    // שבעה פסים
+    strips9: 560,
+    // תשעה פסים
+    strips: 640,
+    // אחד עשר פסים
     stripsv: 440,
-    // פסים אנכיים   — four bands
-    perimeter: 260
-    // חריץ היקפי
+    // פסים אנכיים     — four bands
+    stripsv6: 540
+    // שישה פסים אנכיים
   };
   var HANDLE = {
     none: 0,
@@ -129,8 +133,15 @@
     // כדור על אורך
     digital: 1450,
     // מנעול חכם     — by far the largest single add-on
-    square: 120
+    square: 120,
     // ריבועי
+    /* The door as it first appears: no lever, no knob, no keyway. It is the
+       DEFAULT, so this figure is subtracted from nothing — it is the price of
+       the door with the furniture left off. ⚠ Whether Peretz sells one that way
+       at all is ASK-PERETZ.md §13, unanswered; if the answer is no, this becomes
+       a rule rather than a price. */
+    none: 0
+    // ללא ידית ומנעול
   };
   var COLOUR = {
     "rb-9005d": 0,
@@ -206,27 +217,32 @@
       doors: ["d113", "d125"],
       rects: [{ w: 272, h: 1415, top: 205 }]
     },
+    /* ⚠ TWO SHAPES, DOWN FROM FOUR. `tallwin` (חלון גבוה) and `broad` (חלון רחב)
+         are withdrawn at the owner's son's request: *"in the חלון section, i want
+         there only to be the normal חלון מלבני and the צוהר אנכי."*
+    
+         They were real doors — d097 and d128 carry the tall light, d092 and d106
+         the wide one — so this is a decision about the RANGE, not a correction to
+         a mistake. Both ids alias here, onto the rectangle: it is the shape they
+         are nearest to, and the one that leaves room for a panel below.
+    
+         ⚠ AND THE SECOND HALF OF THE SAME INSTRUCTION IS A RULE, NOT A DELETION:
+         *"the panel can only work with the normal window, the other one doesnt
+         give enough space, so just make it impossible."* The corpus had already
+         said so and nobody had drawn the line — of the ten glazed doors, the seven
+         with a panel below the glass all have openings 0.36 to 0.61 of leaf
+         height, and the three tallest (d125 at 0.76, d128 at 0.78, d113 at 0.62)
+         carry no panel at all. The slot is 1415 mm on a 2050 leaf: 0.69, past
+         every one of the seven. `rules.js` refuses the pairing now; before, it
+         was left to `appliedFrame` returning an empty string while the price went
+         on charging ₪380 for a panel nobody could see. */
     {
       id: "rect",
       he: "חלון מלבני",
       en: "Rectangular",
-      aliases: ["square", "duo"],
+      aliases: ["square", "duo", "tallwin", "broad"],
       doors: ["d108", "d099", "d122", "d116"],
       rects: [{ w: 357, h: 902, top: 185 }]
-    },
-    {
-      id: "tallwin",
-      he: "חלון גבוה",
-      en: "Tall light",
-      doors: ["d097", "d128"],
-      rects: [{ w: 357, h: 1415, top: 174 }]
-    },
-    {
-      id: "broad",
-      he: "חלון רחב",
-      en: "Wide light",
-      doors: ["d092", "d106"],
-      rects: [{ w: 425, h: 1025, top: 158 }]
     }
   ];
   var HANDLES = [
@@ -312,7 +328,23 @@
       aliases: ["dee"]
     },
     /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
-       runs nearly the whole leaf and it is twice as wide as we drew it. */
+         runs nearly the whole leaf and it is twice as wide as we drew it.
+    
+         ⚠ `fixed` — THIS IS THE ONE GRIP IN THE RANGE THAT CANNOT BE MOVED.
+         Every other entry here is an object BOLTED to the face: a fitter marks it,
+         drills it, and puts it where the customer asked, so the customer may put
+         it there on screen. A recessed channel is not bolted on, it is CUT — a
+         void pressed into the leaf when the leaf is made, running 0.906 of its
+         height. There is no version of this door with the recess 200 mm to the
+         left, so offering to drag it offers something nobody can build, and a
+         configurator that lets you specify an impossible door is the one failure
+         PLAN.md §0 says the site must not produce.
+         Asked for from outside in exactly those terms: *"another thing ידית שקועה
+         cant be moved, it stays in the normal spot."*
+         Read by `gripAt` (which hands back home whatever the link says), by
+         `armGrip` (which does not arm the drag) and by `repair` (which drops a
+         stale position out of a shared link). One flag, three readers, because a
+         rule enforced only in the interface is a rule a link walks past. */
     {
       id: "channel",
       he: "ידית שקועה",
@@ -321,7 +353,8 @@
       w: 85,
       inset: 0.3,
       style: "channel",
-      pull: true
+      pull: true,
+      fixed: true
     },
     /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
        the tubes: a wide rectangular ribbon standing off the leaf, catching the
@@ -417,6 +450,45 @@
       style: "square",
       lever: true,
       lock: true
+    },
+    /* ── THE DOOR YOU ARRIVE ON ─────────────────────────────────────────
+         A leaf with no lock furniture on it at all — no lever, no knob, no
+         keyway. Asked for from outside: *"i want that when you open up the app for
+         the first time, you just see a door with nothing, no handle even no
+         keyhole, and then you add things to that."* It is the DEFAULT lockset now,
+         so the first paint is a bare leaf and everything on the door is something
+         the customer put there.
+    
+         ⚠ AND IT IS A REAL PRODUCT DECISION, NOT A UI TRICK, WHICH IS WHY IT IS
+         HERE AND NOT A NULL. `state.lockset` is packed into the short code and
+         printed in the order; a door with no lock furniture has to be a thing the
+         catalogue can NAME, or the message goes out with a silence in it and
+         Peretz has to telephone — the one failure PLAN.md §0 forbids. So it says
+         what it means, in the order and on the tile: the door comes prepped and
+         the furniture is not part of it.
+         ⚠ Whether Peretz actually sells a door that way is ASK-PERETZ §13 and it
+         is NOT yet answered. If the answer is no, this entry loses its price and
+         gains a rule refusing it at send time; the id stays either way.
+    
+         ⚠ NO `lock` FLAG, AND THAT WAS TEMPTING AND WRONG. `lock: true` means the
+         fitting carries the cylinder on its OWN backplate, so `render` should not
+         draw a separate escutcheon beside it — and setting it here would suppress
+         that escutcheon, which is the behaviour wanted. It would also be a lie in
+         the data: this fitting does not carry a cylinder, it is the absence of
+         one, and `data-carries-lock="true"` on a door with no lock would be read
+         by the next person as "the keyway is on the plate". `style: 'none'` is
+         what suppresses the art, `render` asks for that style by name, and the
+         test asserts ZERO keyways here where it asserts one everywhere else.
+         `gripPlacement` reads the same style to skip the clearance check, so there
+         is no invisible box on the stile for a grip to be refused by either.
+         ⚠ APPENDED. LOCKSETS is packed as an INDEX (4 bits, 9 entries of 16), so
+         adding at the END renumbers nothing. Anywhere else in this list and every
+         code ever read down the telephone would decode into a different door. */
+    {
+      id: "none",
+      he: "ללא ידית ומנעול",
+      en: "No lock furniture",
+      style: "none"
     }
   ];
   var GRILLES = [
@@ -509,50 +581,118 @@
   ];
   var DETAILS = [
     { id: "plain", he: "חלק", en: "Plain", panel: false, groove: false },
+    /* ── PANELS ───────────────────────────────────────────────────────
+         A panel on these doors is a strip of moulding laid on the face in a
+         rectangle; the face inside it is the same plane and the same paint as the
+         face outside. See MOULD in renderer.js — getting that wrong is what made
+         one read as "bulging".
+    
+         `panels` is HOW MANY and `top` says the topmost one sits in the upper half
+         of the leaf, where glazing would otherwise go. Both are read by
+         `hasUpperPanel`, which is the one question the rules and the drawing ask:
+         can this face carry a window as well? */
     /* `both` — panel AND groove on one leaf — is retired. Counted across the 31
        hand-measured installations, ruled line work and a moulded panel share a
        leaf on exactly ZERO of them: eleven doors carry line work, ten carry a
        panel, and no door carries both. It was a combination we invented and
-       priced at ₪540. Its id resolves here so a link written when it existed
-       still opens a door — the panel, which is the more visible half. */
-    { id: "panel", he: "פאנל תחתון", en: "Lower panel", panel: true, groove: false, aliases: ["both"] },
-    { id: "groove", he: "חריץ אנכי", en: "Vertical groove", panel: false, groove: true },
-    /* The designed tier's signature, and we had it backwards. Of the seven
-       measured doors with line work on the face, only two are milled grooves;
-       four are APPLIED metal strips — polished stainless, brushed steel, pale
-       brass — reading 1.1 to 2x BRIGHTER than the paint, not darker. Drawing
-       those as a recessed shadow is the single easiest way to render this tier
-       wrong. Counts observed: 3, 7 and 11 strips. */
-    { id: "strips", he: "פסי מתכת", en: "Metal strips", panel: false, groove: false, strips: 11 },
-    { id: "strips3", he: "שלושה פסים", en: "Three strips", panel: false, groove: false, strips: 3 },
-    /* The classic two-panel face — tall upper, short lower — which d048 carries
-       and a single bottom-quarter panel cannot describe. Solid leaves only. */
-    { id: "panel2", he: "שני פאנלים", en: "Two panels", panel: true, groove: false, panels: 2 },
-    /* The strips run BOTH ways and we drew one. `strips` and `strips3` are
-       horizontal — d078's eleven bands settled that in an earlier round — but
-       five doors (d034 d037 d038 d040 d043) run them up the leaf instead, and a
-       customer picking "metal strips" for one of those got the other axis with
-       no warning. Vertical strips are fewer and longer: three or four, in the
-       half of the leaf away from the lock. */
-    { id: "stripsv", he: "פסים אנכיים", en: "Vertical strips", panel: false, groove: false, strips: 4, vertical: true },
-    /* A groove scribed round the leaf, a hand's breadth in from every edge —
-       d004 at 0.023 of the leaf's width and d031 at 0.021, so the inset here is
-       their mean. On both of them it is the ONLY thing on the face, and the
-       catalogue had nothing remotely like it: all the other line work runs
-       across the leaf or up it, so `npm run corpus` derived both doors as three
-       horizontal metal strips and stood them beside photographs of a plain leaf
-       with a rectangle scribed round it.
-       ⚠ APPENDED, deliberately. `DETAILS` is indexed by position in the short
-       code, so inserting anywhere else would renumber every entry after it and
-       cost a VERSION bump; adding at the END leaves every existing index alone.
-       The field is four bits — sixteen — and this is the eighth. */
+       priced at ₪540.
+       ⚠ AND `groove` AND `perimeter` RESOLVE HERE TOO — the two milled grooves,
+       withdrawn at the owner's son's request: *"in the עיצוב חזית category there
+       are two things that i would like you to delete"*, naming the two entries
+       whose Hebrew begins with חריץ. A groove is the only thing this list ever
+       offered that is CUT rather than APPLIED, and the corpus was never
+       enthusiastic: of the seven measured doors with line work on the face, two
+       are milled and four are applied strips.
+       They alias onto the lower panel rather than onto `plain`, because an alias
+       should substitute for a decision, not delete it. */
     {
-      id: "perimeter",
-      he: "חריץ היקפי",
-      en: "Perimeter groove",
+      id: "panel",
+      he: "פאנל תחתון",
+      en: "Lower panel",
+      panel: true,
+      groove: false,
+      aliases: ["both", "groove", "perimeter"]
+    },
+    /* The classic two-rectangle face — tall upper, short lower — which d048
+       carries and a single bottom-quarter panel cannot describe. */
+    {
+      id: "panel2",
+      he: "שני פאנלים",
+      en: "Two panels",
+      panel: true,
+      groove: false,
+      panels: 2,
+      top: true
+    },
+    /* ⚠ THE UPPER RECTANGLE ALONE. Asked for from outside: *"add an option of
+       only the top panel"*. Every panelled option in this list used to put
+       something at the FOOT of the leaf, so a face with a single high panel and
+       a bare plinth below it was not expressible. */
+    {
+      id: "panelTop",
+      he: "פאנל עליון",
+      en: "Upper panel",
+      panel: true,
+      groove: false,
+      panels: 1,
+      top: true
+    },
+    /* ⚠ AND THREE. Asked for as *"an option of three panels, its the 2 panels,
+       and another one in the middle"* — so it is the pair's envelope, 0.07 to
+       0.92 of the leaf, with the same 0.08 gap, split three ways instead of two.
+       The rows themselves are in PANEL_ROWS beside the pair they are derived
+       from, not here: this file says WHAT a door can be and the renderer says
+       where the metal goes. */
+    {
+      id: "panel3",
+      he: "שלושה פאנלים",
+      en: "Three panels",
+      panel: true,
+      groove: false,
+      panels: 3,
+      top: true
+    },
+    /* ── APPLIED STRIPS ───────────────────────────────────────────────
+         The designed tier's signature, and we had it backwards at first. Of the
+         seven measured doors with line work on the face, only two are milled
+         grooves; four are APPLIED metal strips — polished stainless, brushed
+         steel, pale brass — reading 1.1 to 2x BRIGHTER than the paint, not darker.
+         Drawing those as a recessed shadow is the single easiest way to render
+         this tier wrong. Counts observed in the corpus: 3, 7 and 11.
+    
+         ⚠ THE RANGE IS NOT THE CORPUS, AND THAT IS THE POINT OF THIS BLOCK.
+         Reported from outside: *"my father can put as many stripes and however the
+         client wants, so put a couple of more designs with stripes, the more
+         stripes, the more it costs."* So the three counts the photographs happen
+         to contain are a sample of what has been built, not a price list — the
+         product is "strips, this many". Five counts horizontal, two vertical, each
+         priced by its own count in js/prices.js rather than by a flat DETAIL fee.
+         ⚠ If Peretz wants a count that is not here, the answer is another row in
+         this list and another line in `prices.js`, appended at the END. It is not
+         a number the customer types: every option has to be a thing the short code
+         can name and the order can print. */
+    { id: "strips3", he: "שלושה פסים", en: "Three strips", panel: false, groove: false, strips: 3 },
+    { id: "strips5", he: "חמישה פסים", en: "Five strips", panel: false, groove: false, strips: 5 },
+    { id: "strips7", he: "שבעה פסים", en: "Seven strips", panel: false, groove: false, strips: 7 },
+    { id: "strips9", he: "תשעה פסים", en: "Nine strips", panel: false, groove: false, strips: 9 },
+    /* Eleven is d078's own count, and it keeps the id `strips` it has always
+       had — the plain name for what used to be the only strip option. */
+    { id: "strips", he: "אחד עשר פסים", en: "Eleven strips", panel: false, groove: false, strips: 11 },
+    /* The strips run BOTH ways and we drew one. The counts above are horizontal
+       — d078's eleven bands settled that in an earlier round — but five doors
+       (d034 d037 d038 d040 d043) run them up the leaf instead, and a customer
+       picking "metal strips" for one of those got the other axis with no
+       warning. Vertical strips are fewer and longer: three or four, in the half
+       of the leaf away from the lock. */
+    { id: "stripsv", he: "פסים אנכיים", en: "Vertical strips", panel: false, groove: false, strips: 4, vertical: true },
+    {
+      id: "stripsv6",
+      he: "שישה פסים אנכיים",
+      en: "Six vertical strips",
       panel: false,
       groove: false,
-      perimeter: 0.022
+      strips: 6,
+      vertical: true
     }
   ];
   var FINISHES = [
@@ -567,6 +707,7 @@
   }
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
   var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
+  var hasUpperPanel = (detail) => !!detail.top || detail.panels >= 2;
   var SIDE_OPENING_MIN = 370;
   function glazedPanels(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
@@ -635,13 +776,43 @@
   priceInto("lockset", LOCKSETS, LOCKSET, "delta");
 
   // js/price.js
-  function priceAgorot(state2) {
+  function priceParts(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
-    const colour = byId(COLOURS, state2.colour);
-    const win = byId(WINDOWS, state2.window);
-    const grille = byId(GRILLES, state2.grille);
-    let total = size.base + colour.delta + win.delta + byId(HANDLES, state2.handle).delta + byId(LOCKSETS, state2.lockset).delta + byId(DETAILS, state2.detail).delta;
-    total += grille.delta * paneCount(state2);
+    return {
+      size: size.base,
+      colour: byId(COLOURS, state2.colour).delta,
+      window: byId(WINDOWS, state2.window).delta,
+      detail: byId(DETAILS, state2.detail).delta,
+      handle: byId(HANDLES, state2.handle).delta,
+      lockset: byId(LOCKSETS, state2.lockset).delta,
+      /* A grille needs a window to sit in — and so does worked glass, which is
+         in the same list now. Neither can be charged on a solid door: the
+         configurator must never take money for something the drawing does not
+         show and Peretz cannot fit.
+         ⚠ ASKED OF `paneCount`, NOT of the leaf's own window. This read
+         `win.rects.length` and that is a different question on the one size
+         where the two come apart: a sidelight door carries 400 mm of glass
+         BESIDE the leaf, so the rules allow a grille, the drawing puts it in
+         that panel, and the price found no window on the leaf and charged
+         nothing. All fourteen grilles were free there — ₪620 of wrought iron
+         given away — and every other reader of "is there glass here" had had the
+         right answer for two rounds.
+         ⚠ AND PER PANEL. This read `if (isGlazed(state)) total += grille.delta`
+         — a BOOLEAN — and ironwork is sold by the panel. A sidelight door with a
+         window in its leaf gets two wrought-iron panels (the drawing cuts 282
+         <path> against 150) and was charged for one: about ₪620 given away on
+         every such order, and the same on a דלת וחצי, whose second leaf mirrors
+         the first's window and takes the first's grille with it.
+         Commit 2781180 fixed the QUESTION and never added the COUNT, which is
+         how the give-away outlived the commit written about it. `paneCount` is
+         the one enumeration; the drawing calls `aperture()` once per entry in
+         the same list, so the figure and the picture cannot disagree. */
+      grille: byId(GRILLES, state2.grille).delta * paneCount(state2)
+    };
+  }
+  function priceAgorot(state2) {
+    let total = 0;
+    for (const part of Object.values(priceParts(state2))) total += part;
     return Math.ceil(total / 500) * 500;
   }
   var fmt = new Intl.NumberFormat("he-IL", {
@@ -653,9 +824,9 @@
     // max-below-min throws a RangeError.
   });
   var formatAgorot = (a) => fmt.format(a / 100);
-  function deltaLabel(agorot2, lang = "he") {
+  function priceLabel(agorot2, lang = "he") {
     if (!agorot2) return { he: "כלול", en: "Included", ru: "Включено" }[lang];
-    return (agorot2 < 0 ? "−" : "+") + fmt.format(Math.abs(agorot2) / 100);
+    return fmt.format(agorot2 / 100);
   }
 
   // js/spec.js
@@ -835,12 +1006,9 @@
   var RET_HEAD = 148;
   var MULLION = 22;
   var REBATE = 50;
-  var ALC_SIDE = 160;
-  var ALC_HEAD = 300;
   var EDGE = 38;
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
-  var LOCK_BACKSET = 60;
   var LOCK_BACKSET_GRIP = 49;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
@@ -850,9 +1018,8 @@
   var MOULD_BAND = 70;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
-  var GRAB = { fromTop: 0.59, len: 0.33, ratio: 1 / 15 };
-  var THRESHOLD = 42;
-  var SILL_METAL = "#87857F";
+  var GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15 };
+  var GRAB_D = GRAB.len * GRAB.ratio;
   var PLATE = {
     w: 90,
     // 0.095 W
@@ -871,6 +1038,21 @@
   };
   var PAD = { x: 70, top: 110, bottom: 300 };
   var SCENE = 8e3;
+  var SCENE_MAX = (() => {
+    let openW = 0, leafH = 0;
+    for (const s of Object.values(SIZES)) {
+      const lw = s.w - REBATE * 2;
+      const sw = s.side ? s.side - REBATE : 0;
+      openW = Math.max(openW, lw + (sw ? sw + MULLION : 0));
+      leafH = Math.max(leafH, s.h - REBATE);
+    }
+    return { openW, leafH };
+  })();
+  var MID_X = PAD.x + CASING + RETURN + SCENE_MAX.openW / 2;
+  var FLOOR_RUN = RETURN;
+  var BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
+  var STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
+  var SCONCE_OUT = SCENE_MAX.openW / 2 + RETURN + CASING + 280;
   var xmlAttr = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   function usedDefs(defs, body) {
     const blocks = topLevelElements(defs);
@@ -934,26 +1116,27 @@
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
-    const x0 = PAD.x + CASING + RETURN;
+    const floorY = BASE_Y - FLOOR_RUN;
+    const y0 = floorY - leafH;
+    const x0 = MID_X - totalW / 2;
     const x1 = x0 + totalW;
-    const y0 = PAD.top + CASING + RET_HEAD;
-    const floorY = y0 + leafH;
     const view = {
-      w: x1 + RETURN + CASING + PAD.x,
-      h: floorY + THRESHOLD + PAD.bottom
+      x: x0 - RETURN - CASING - PAD.x,
+      y: y0 - RET_HEAD - CASING - PAD.top,
+      w: totalW + (RETURN + CASING + PAD.x) * 2,
+      h: leafH + FLOOR_RUN + RET_HEAD + CASING + PAD.top + PAD.bottom
     };
     const y = (aff) => floorY - aff;
+    const farX = STAGE_BOX.x - SCENE, farW = STAGE_BOX.w + SCENE * 2;
+    const farY = STAGE_BOX.y - SCENE, farH = STAGE_BOX.h + SCENE * 2;
     const revX0 = x0 - RETURN;
     const revX1 = x1 + RETURN;
     const revY0 = y0 - RET_HEAD;
     const casX0 = revX0 - CASING;
     const casX1 = revX1 + CASING;
     const casY0 = revY0 - CASING;
-    const baseY = floorY + THRESHOLD;
+    const baseY = BASE_Y;
     const openW = totalW + RETURN * 2;
-    const alcX0 = casX0 - ALC_SIDE;
-    const alcX1 = casX1 + ALC_SIDE;
-    const alcY0 = casY0 - ALC_HEAD;
     const hingeOnLeft = handing.hinge === "left";
     const mainX = sideW && !hingeOnLeft ? x0 + sideW + MULLION : x0;
     const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
@@ -1491,11 +1674,16 @@
     <!-- In user space, not bounding-box units: the rect it paints now reaches
          far past the drawing so the wall can fill the screen, and a
          bounding-box vignette would have stretched with it until it did
-         nothing. Anchored on the door instead, so however wide the window is,
-         the falloff stays centred on the thing being looked at. -->
+         nothing.
+         ⚠ Anchored on the FIXED SCENE, not on this door's own box. It used to
+         read view.w / 2, so the falloff's centre and its radius both moved
+         when the customer chose a different size — the one thing the room is
+         now built not to do. STAGE_BOX is the same rectangle for every door in
+         the range, which is exactly what a light in a room is. -->
     <radialGradient id="vignette" gradientUnits="userSpaceOnUse"
-                    cx="${Math.round(view.w / 2)}" cy="${Math.round(view.h * 0.44)}"
-                    r="${Math.round(Math.max(view.w, view.h) * 0.62)}">
+                    cx="${Math.round(STAGE_BOX.x + STAGE_BOX.w / 2)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.44)}"
+                    r="${Math.round(Math.max(STAGE_BOX.w, STAGE_BOX.h) * 0.62)}">
       <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
       <stop offset="1"    stop-color="#000" stop-opacity="${LIGHT.vignette}"/>
     </radialGradient>
@@ -1584,20 +1772,28 @@
          statement of what the room is made of, and it is the same rule the
          frame's own arris follows: a fold between two lit surfaces is a
          change of VALUE, not a colour of its own. -->
-    <linearGradient id="alcSoffit" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.055"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.135"/>
-    </linearGradient>
-    <!-- The two returns shade at different rates, which is what a 90° turn in
-         light coming from one side actually does — and it is the only thing
-         left saying which side the key is on once the planes are neutral. -->
-    <linearGradient id="alcNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.045"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.105"/>
-    </linearGradient>
-    <linearGradient id="alcFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.020"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.060"/>
+    <!-- ⚠ alcSoffit, alcNear and alcFar were here — the alcove's three shaded
+         planes. Deleted with it; see the note where ALC_SIDE was defined. Left
+         in place they would have been pruned by usedDefs and cost nothing,
+         which is exactly why a dead def is worth deleting: the next person to
+         read this block would have gone looking for the recess they
+         describe. -->
+
+    <!-- The floor inside the opening, and the KEY IS ABOVE AND IN FRONT, so
+         this plane is the most shaded thing in the picture: it is floor, under
+         a door, inside a reveal, with the leaf itself between it and the light.
+         First cut ran 0.28 to 0.07 and came out the BRIGHTEST band at the foot
+         of the door — a lit step under a dark leaf, which is the one reading
+         that destroys the depth this plane exists to give. Measured off the
+         render: the strip sat at luminance 205 against 188 for the open floor
+         a hand's width in front of it. It has to be darker than the floor it
+         runs into, not lighter, or the eye puts it in front.
+         Darkest hard against the leaf, where the door shades its own
+         threshold, lifting towards the open floor at the wall line. -->
+    <linearGradient id="retFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.46"/>
+      <stop offset="0.55" stop-color="#000" stop-opacity="0.30"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.17"/>
     </linearGradient>
 
     <!-- ⚠ THIS REPLACES A RULED LINE, and that is the whole point of it.
@@ -1632,8 +1828,8 @@
       <stop offset="1"    stop-color="#000"/>
     </linearGradient>
     <mask id="floorFade" maskUnits="userSpaceOnUse"
-          x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="900">
-      <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="900"
+          x="${farX}" y="${baseY}" width="${farW}" height="900">
+      <rect x="${farX}" y="${baseY}" width="${farW}" height="900"
             fill="url(#floorFadeG)"/>
     </mask>
     <filter id="floorBlur" x="-8%" y="-8%" width="116%" height="116%">
@@ -1687,26 +1883,30 @@
          exact symptom and had no route that produced it. The page survives
          losing its stylesheet in every other respect — the phone link and both
          WhatsApp links still work — so the room should survive it too. -->
-    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-          height="${baseY + SCENE}" fill="var(--wall, #F5F3EF)"/>
-    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}"
-          height="${view.h - baseY + SCENE}" fill="var(--floor, #E6E2DA)"/>
+    <rect x="${farX}" y="${farY}" width="${farW}"
+          height="${baseY - farY}" fill="var(--wall, #F5F3EF)"/>
+    <rect x="${farX}" y="${baseY}" width="${farW}"
+          height="${farY + farH - baseY}" fill="var(--floor, #E6E2DA)"/>
     <!-- Tiled rather than one filtered rect. A feTurbulence over a surface
          this size is a large offscreen buffer for a 7% texture; the pattern
          stitches, so it costs one tile. -->
-    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-          height="${view.h + SCENE * 2}"
+    <rect x="${farX}" y="${farY}" width="${farW}" height="${farH}"
           fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
 
     <!-- ── the sconces, and their light on the plaster ──────────────
-         Painted BEFORE the alcove, so the recess's own shading sits on top of
-         the cone rather than being washed out by it — a light thrown across a
-         wall does not brighten the inside of a recess it is beside.
+         ⚠ STOOD OFF THE FIXED SCENE, not off this door's casing. They used to
+         hang 320 mm outside the alcove's outer edge, alcX0 and alcX1 —
+         so a sidelight door pushed both wall lights 190 mm further apart and
+         a narrow one drew them in. Two lamps that move when you change the
+         door are the same fault the anchored scene exists to remove, and the
+         alcove they were measured from is gone. Placed midway between the
+         casing of the WIDEST door in the range and the edge of the scene, so
+         they never crowd a wide door and never drift.
          pointer-events is left alone: these are inside #backdrop, which
          nothing on the page reaches for, and only the vignette ever had to
          disclaim them because it covers the handle. -->
-    ${[alcX0 - 320, alcX1 + 320].map((sx) => {
-      const sy = casY0 + (baseY - casY0) * 0.24;
+    ${[MID_X - SCONCE_OUT, MID_X + SCONCE_OUT].map((sx) => {
+      const sy = STAGE_BOX.y + (baseY - STAGE_BOX.y) * 0.24;
       return `<rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
                     fill="var(--wall, #F5F3EF)"/>
               <rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
@@ -1717,46 +1917,42 @@
                        ry="${(baseY - sy - 150) / 2}" fill="url(#sconceGlow)"/>`;
     }).join("")}
 
-    <!-- ── the alcove: the wall steps forward around the door ───────
-         Three mitred trapezoids from the recess's outer rectangle back to the
-         casing, exactly as #frame turns from the casing back to the leaf.
-         No fill of their own — the wall rect above is already the right
-         colour, and these only say how much light each plane catches. -->
-    <path d="M ${alcX0} ${alcY0} H ${alcX1} L ${casX1} ${casY0} H ${casX0} Z"
-          fill="url(#alcSoffit)"/>
-    <path d="M ${alcX0} ${alcY0} L ${casX0} ${casY0} V ${baseY} H ${alcX0} Z"
-          fill="url(#alcNear)"/>
-    <path d="M ${alcX1} ${alcY0} L ${casX1} ${casY0} V ${baseY} H ${alcX1} Z"
-          fill="url(#alcFar)"/>
-    <!-- ⚠ THERE WAS A WHITE CATCH LINE ALONG THE RECESS'S HEAD HERE, AND IT
-         WAS DRAWN WHERE NOTHING CAN SEE IT. alcY0 is casY0 - ALC_HEAD =
-         110 - 300 = -190, i.e. 190 units ABOVE the natural viewBox — and
-         fitStage only ever WIDENS the crop, so the visible y range is 0..h at
-         every size and every stage shape. Measured across all six sizes at
-         four stage aspect ratios: the head is out of frame in twenty-four
-         cases out of twenty-four. The line cost bytes on every door and
-         painted nothing, and the comment above it claimed it was a light
-         catch a viewer could see.
-         The recess reads through its two returns and the sliver of soffit
-         that does show below y=0 — which is how a doorway photographed from
-         two metres reads as well, with its lintel out of frame. Deleted
-         rather than moved: the only visible fold left is the vertical one at
-         each side, and a white line ruled down THAT is the drawn arris this
-         file has already removed twice. -->
+    <!-- ⚠ THE ALCOVE WAS DRAWN HERE — three mitred trapezoids stepping the
+         wall forward around the casing — AND IT IS GONE. See the long note
+         where ALC_SIDE and ALC_HEAD used to be defined: it was reported from
+         outside as "a gray box that frames it", which is what a shaded plane
+         seen dead square-on becomes, and its own docstring already recorded
+         that its two depths were the only ones in this file not taken off a
+         photograph. -->
 
     <!-- Where the wall meets the floor. See floorFall: this is the ruled
          line that used to be here, replaced by the change of value a fold
          between two lit surfaces actually makes. -->
-    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="1100"
+    <rect x="${farX}" y="${baseY}" width="${farW}" height="1100"
           fill="url(#floorFall)"/>
   </g>
 
-  <!-- ── cast shadow: soft pool plus a hard contact line ──────── -->
+  <!-- ── cast shadow: the soft pool the whole assembly throws ─────
+       ⚠ THE HARD CONTACT LINE THAT USED TO BE HERE IS GONE, and taking it out
+       is half of removing the line at the foot of the door. It ruled black at
+       0.42, thirteen units tall, across the casing's full width at the wall's
+       floor line. That was right while the leaf stopped at that same line: one
+       object, one place where it touches the ground.
+       It is not one line any more. The leaf stands FLOOR_RUN behind the wall,
+       so there are two candidate lines 62 units apart, and drawing both gave
+       the foot of every door a pair of parallel dark rules — the complaint
+       that started this, doubled. Measured off the render at 4x: the leaf's
+       own foot, then a bright strip, then a band at luminance 122 against 163
+       for the floor five pixels below it.
+       So the door touches the ground in ONE place, which is where the leaf is,
+       and that shadow is drawn inside #frame on top of the floor return it
+       falls on. Here the casing's own meeting with the floor is carried by
+       value alone: retFloor ends at 0.17 of black and floorFall starts at
+       0.20, so the two planes meet within three hundredths and no line is
+       needed to say where. -->
   <g id="shadow">
     <ellipse cx="${(x0 + x1) / 2}" cy="${baseY + 40}"
              rx="${totalW * 0.6}" ry="34" fill="#000" opacity="0.18" filter="url(#softShadow)"/>
-    <rect x="${casX0}" y="${baseY - 3}" width="${openW + CASING * 2}" height="13"
-          fill="#000" opacity="0.42" filter="url(#contact)"/>
   </g>
 
   <!-- ⚠ EVERYTHING THE FLOOR REFLECTS IS INSIDE THIS GROUP, and nothing else
@@ -1795,8 +1991,42 @@
          actually projects to. It used to be three rectangles stacked in the
          hope that a line drawn on top would suggest the corner. -->
     <path d="M ${revX0} ${revY0} H ${revX1} L ${x1} ${y0} H ${x0} Z" fill="url(#soffit)"/>
-    <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${baseY} H ${revX0} Z" fill="url(#retNear)"/>
-    <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${baseY} H ${revX1} Z" fill="url(#retFar)"/>
+    <!-- ⚠ THE JAMBS NOW MITRE INTO THE FLOOR, not into a butt joint at the
+         bottom edge of the picture. They used to run straight down to the
+         wall's floor line, which was right while the leaf also stopped there.
+         It does not: the leaf is FLOOR_RUN further back, so the jamb return's
+         inner edge stops at the leaf's foot and its outer edge carries on to
+         the wall's line, and the diagonal between them is the same real mitre
+         the head has. Butt joints at this corner are what put a hard line
+         across the top of each jamb the last time (see CASING). -->
+    <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${floorY} L ${revX0} ${baseY} Z"
+          fill="url(#retNear)"/>
+    <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${floorY} L ${revX1} ${baseY} Z"
+          fill="url(#retFar)"/>
+    <!-- ── THE FLOOR INSIDE THE OPENING ────────────────────────────
+         The fourth plane of the reveal, and the one that used to be a ribbed
+         aluminium bar. It is FLOOR, so it takes the floor's own colour from
+         the same variable the backdrop uses — and then one black overlay says
+         how much light it catches, which is the rule every plane in this
+         drawing obeys (CLAUDE.md §4). Darkest against the leaf, where the door
+         shades its own threshold, lifting to the open floor at the wall line.
+         Mitred to both jambs by construction: its two top corners are the
+         jambs' leaf-foot corners and its two bottom corners are their
+         wall-line corners, so the four planes share four edges and no line is
+         drawn to suggest a corner. -->
+    <path d="M ${x0} ${floorY} H ${x1} L ${revX1} ${baseY} H ${revX0} Z"
+          fill="var(--floor, #E6E2DA)"/>
+    <path d="M ${x0} ${floorY} H ${x1} L ${revX1} ${baseY} H ${revX0} Z"
+          fill="url(#retFloor)"/>
+    <!-- ⚠ AND THE CONTACT SHADOW WHERE THE LEAF ACTUALLY TOUCHES THE GROUND.
+         #shadow draws one at the WALL's floor line and #shadow is painted
+         BEFORE #frame, so the plane above covers it: the leaf came to rest on
+         a clean bright strip with no shadow under it at all, which reads as a
+         door floating a centimetre off the floor. This is the same object
+         #shadow draws, at the line the leaf is actually on, on top of the
+         plane it falls on. -->
+    <rect x="${x0}" y="${floorY - 3}" width="${totalW}" height="12"
+          fill="#000" opacity="0.5" filter="url(#contact)"/>
 
     <!-- NO DRAWN ARRIS WHERE THE CASING TURNS INTO THE RETURN. There were two
          — one down each jamb, the paint darkened 0.55, at full opacity on a
@@ -1824,26 +2054,12 @@
     <g id="reveal">${reveal}</g>
   </g>
 
-  <!-- ── threshold ────────────────────────────────────────────── -->
-  <g id="threshold">
-    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
-          height="${THRESHOLD}" fill="${SILL_METAL}"/>
-    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
-          height="4" fill="#fff" opacity="0.18"/>
-    <!-- Ribbed, because every sill in the photographs is: an extruded
-         aluminium threshold with four or five flutes running its length,
-         each catching a line of light. One flat bar reads as a painted
-         step. -->
-    ${Array.from({ length: 4 }, (_, i) => {
-      const ry = floorY + 7 + i * ((THRESHOLD - 9) / 4);
-      return `<rect x="${x0 - RETURN + 4}" y="${ry}"
-                    width="${totalW + RETURN + RETURN - 8}" height="2"
-                    fill="#000" opacity="0.30"/>
-              <rect x="${x0 - RETURN + 4}" y="${ry + 2}"
-                    width="${totalW + RETURN + RETURN - 8}" height="1.4"
-                    fill="#fff" opacity="0.22"/>`;
-    }).join("")}
-  </g>
+  <!-- ⚠ #threshold WAS HERE — a 42 mm aluminium bar with four black flutes and
+       four white catches ruled along it, full width, at the height a viewer's
+       eye lands. It is gone; the frame's floor return above does the work.
+       The measurement that settled it is written out where THRESHOLD used to
+       be defined: fourteen of the thirty measured records have no sill at all,
+       and the sixteen that do run a median 0.0175 of leaf height. -->
 
   ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${/* A SIDELIGHT is glass by definition — that is the whole product, and
        four doors in the corpus have one (d117 d122 d123 d128). It does not
@@ -1879,7 +2095,7 @@
         grille,
         key: "s",
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
-      }) + (detail.panel ? appliedFrame(sideX, y0, sideW, leafH, paint2, pale, top + tall, false, 0, "s") : "");
+      }) + (detail.panel ? appliedFrame(sideX, y0, sideW, leafH, paint2, pale, top + tall, null, 0, "s") : "");
     })() : win.rects[0] && sideW > 320 ? aperture({
       x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
       y: y0 + win.rects[0].top,
@@ -1905,7 +2121,7 @@
       paint2,
       pale,
       winBottom,
-      detail.panels === 2,
+      hasUpperPanel(detail) ? panelRows(detail) : null,
       0,
       "m",
       openings.length ? Math.min(...openings.map((o) => o.x)) - MOULD_BAND : null
@@ -1955,8 +2171,13 @@
       panelled && place.rot !== 90,
       place.rot
     )}
-    ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
-    ${lockset.lock ? "" : cylinder(lockX, y(CYLINDER_AFF))}
+    ${locksetArt(lockset, lockX, y(lockAff(lockset)), leverDir)}
+    ${/* No separate escutcheon when the fitting carries its own cylinder —
+        and none either when there is no lock furniture at all, which is the
+        door the page opens on. Asked of the STYLE rather than of a `lock`
+        flag on the bare entry: see its note in catalog.js for why giving it
+        one would have been a lie in the data that happened to draw right. */
+    ""}${lockset.lock || lockset.style === "none" ? "" : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   </g><!-- /#door -->
@@ -2001,14 +2222,15 @@
        drawn last and covers the whole scene, so without this it swallowed
        every pointer event on the stage — the handle could not be picked up at
        all, and nothing in the console said why. -->
-  <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-        height="${view.h + SCENE * 2}" fill="url(#vignette)" pointer-events="none"/>
+  <rect x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+        fill="url(#vignette)" pointer-events="none"/>
 `;
     return `
-<svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
+<svg viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint2)}"
-     data-fit-w="${view.w}" data-fit-h="${view.h}"
+     data-fit-x="${STAGE_BOX.x}" data-fit-y="${STAGE_BOX.y}"
+     data-fit-w="${STAGE_BOX.w}" data-fit-h="${STAGE_BOX.h}"
      aria-label="${xmlAttr(describe(state2))}" xmlns="http://www.w3.org/2000/svg">
   <defs>${usedDefs(defs, body)}</defs>
 ${body}
@@ -2086,16 +2308,23 @@ ${body}
   }
   var PANEL_INSET = 0.23;
   var PANEL_INSET_MAX = 0.39;
-  var PANEL_ROWS = { pair: [[0.07, 0.58], [0.66, 0.92]], lone: [0.68, 0.9] };
+  var PANEL_ROWS = {
+    pair: [[0.07, 0.58], [0.66, 0.92]],
+    trio: [[0.07, 0.37], [0.45, 0.68], [0.76, 0.92]],
+    top: [[0.07, 0.58]],
+    lone: [0.68, 0.9]
+  };
+  var panelRows = (detail) => detail.panels >= 3 ? PANEL_ROWS.trio : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
   function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m", alignTo = null) {
     const band = MOULD_BAND;
     const inset = alignTo != null ? Math.max(0, alignTo) : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
     const x = lx + inset, w = lw - inset * 2;
     const leaf = { x: lx, y: ly, w: lw, h: lh };
     const rect = (t, b, n) => moulding(x, ly + lh * t, w, lh * (b - t), band, paint2, pale, leaf, `p${key}${n}`);
-    if (upper && winBottom <= ly + 1) {
-      return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * PANEL_ROWS.pair[0][0]).toFixed(1)}"
-               data-band="${band.toFixed(1)}">${PANEL_ROWS.pair.map(([t, bt], n) => rect(t, bt, n)).join("")}</g>`;
+    if (upper && upper.length && winBottom <= ly + 1) {
+      return `<g data-detail="panel" data-panels="${upper.length}"
+               data-top="${(ly + lh * upper[0][0]).toFixed(1)}"
+               data-band="${band.toFixed(1)}">${upper.map(([t, bt], n) => rect(t, bt, n)).join("")}</g>`;
     }
     const top = Math.max(ly + lh * PANEL_ROWS.lone[0], winBottom + lw * 0.08);
     const bottom = ly + lh * PANEL_ROWS.lone[1];
@@ -2145,7 +2374,7 @@ ${body}
     if (detail.panel) {
       const inset = openings.length ? Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND) : leafW * PANEL_INSET;
       const winBottom = openings.length ? Math.max(...openings.map((o) => o.top + o.h)) : 0;
-      const rows = detail.panels === 2 && !openings.length ? PANEL_ROWS.pair : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
+      const rows = hasUpperPanel(detail) && !openings.length ? panelRows(detail) : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
       for (const [t, b] of rows) {
         const r = {
           kind: "panel",
@@ -2168,6 +2397,8 @@ ${body}
     const openings = apertureLayout(byId(WINDOWS, state2.window), leafW);
     if (!openings.length) return true;
     const winBottom = Math.max(...openings.map((o) => o.top + o.h));
+    const GLASS_STOPS_BY = 0.62;
+    if (winBottom > leafH * GLASS_STOPS_BY) return false;
     const top = Math.max(leafH * PANEL_ROWS.lone[0], winBottom + leafW * 0.08);
     const bottom = leafH * PANEL_ROWS.lone[1];
     const inset = Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND);
@@ -2196,7 +2427,8 @@ ${body}
     const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
     const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
     const homeY = handle.style === "grab" ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
-    const raw0 = { x: backset + standoff, y: homeY, rot: 0 };
+    const homeX = handle.style === "grab" ? (leafW - GRAB.len) / 2 : backset + standoff;
+    const raw0 = { x: homeX, y: homeY, rot: 0 };
     if (gripPlacement(state2, raw0).ok) return raw0;
     const upright = nearestGrip(state2, raw0);
     if (gripPlacement(state2, upright).ok && Math.abs(upright.y - raw0.y) <= HOME_REACH) return upright;
@@ -2219,10 +2451,11 @@ ${body}
     const long = handleFootprint(handle, leafH).vy * 2;
     return long > 0 && long <= leafW - EDGE_FLAT * 2;
   }
+  var gripIsFixed = (state2) => !!byId(HANDLES, state2.handle).fixed;
   function gripAt(state2) {
     const home = gripHome(state2);
     const g = state2.grip;
-    if (!g) return home;
+    if (!g || byId(HANDLES, state2.handle).fixed) return home;
     const rot = g.rot === 90 && gripCanRotate(state2) ? 90 : 0;
     return { x: g.x, y: g.y, rot };
   }
@@ -2259,16 +2492,26 @@ ${body}
     const feet = gripFeet(state2, p);
     const obstacles = faceObstacles(state2);
     const bad = (why) => ({ ...p, ok: false, why });
-    const half = handleFootprint(handle, leafH, gripPanelled(state2, p)).vy;
+    const foot = handleFootprint(handle, leafH, gripPanelled(state2, p));
+    const half = foot.vy;
     const cx = hingeLeftOf(state2) ? leafW - p.x : p.x;
     const lo = p.rot === 90 ? cx - half : p.y - half;
     const hi = p.rot === 90 ? cx + half : p.y + half;
     const span = p.rot === 90 ? leafW : leafH;
     if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad("הידית חורגת מהדלת");
+    const gx0 = p.rot === 90 ? p.x - foot.vy : p.x - foot.out;
+    const gx1 = p.rot === 90 ? p.x + foot.vy : p.x + foot.in;
+    if (gx0 < EDGE_FLAT || gx1 > leafW - EDGE_FLAT) {
+      return bad("הידית חורגת מהדלת");
+    }
+    const cgx0 = hingeLeftOf(state2) ? leafW - gx1 : gx0;
+    const cgx1 = hingeLeftOf(state2) ? leafW - gx0 : gx1;
     if (p.y < leafH * 0.18 || p.y > leafH * 0.82) {
       return bad("הידית גבוהה או נמוכה מדי לשימוש");
     }
-    if (p.rot === 0 && p.x > leafW * 0.55) return bad("ידית משיכה לא מותקנת בצד הצירים");
+    if (p.rot === 0 && handle.style !== "grab" && p.x > leafW * 0.55) {
+      return bad("ידית משיכה לא מותקנת בצד הצירים");
+    }
     for (const f of feet) {
       if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT || f.y - f.r < EDGE_FLAT || f.y + f.r > leafH - EDGE_FLAT) {
         return bad("הידית חורגת מהדלת");
@@ -2285,19 +2528,25 @@ ${body}
     const backset = lockBackset(handle, lockset);
     const lockX = hingeOnLeft ? leafW - backset : backset;
     const grip = handleFootprint(handle, leafH);
-    const gw = p.rot === 90 ? grip.vy : Math.max(grip.out, grip.in);
     const gh = p.rot === 90 ? Math.max(grip.out, grip.in) : grip.vy;
-    const locks = [{ y: leafH - HANDLE_AFF, inward: lock.in, vy: lock.vy }];
-    if (!lockset.lock) {
+    const locks = lockset.style === "none" ? [] : [{ y: leafH - lockAff(lockset), inward: lock.in, vy: lock.vy }];
+    if (locks.length && !lockset.lock) {
       locks.push({ y: leafH - CYLINDER_AFF, inward: LOCK_R, vy: LOCK_R });
     }
+    const lockOut = handleFootprint(lockset, leafH).out;
     for (const L of locks) {
       const meet = Math.abs(p.y - L.y) < gh + L.vy + LOCK_CLEAR;
-      const clear = Math.max(L.inward + gw + LOCK_CLEAR, leafW * BAR_GAP_MIN);
-      if (meet && Math.abs(cx - lockX) < clear) return bad("הידית נוגעת במנעול");
+      if (!meet) continue;
+      const lo0 = backset - lockOut, lo1 = backset + L.inward;
+      if (gx0 < lo1 + LOCK_CLEAR && gx1 > lo0 - LOCK_CLEAR) {
+        return bad("הידית נוגעת במנעול");
+      }
+      if (Math.abs(p.x - backset) < leafW * BAR_GAP_MIN) {
+        return bad("הידית נוגעת במנעול");
+      }
     }
     for (const o of apertureLayout(byId(WINDOWS, state2.window), leafW)) {
-      if (Math.abs(cx - (o.x + o.w / 2)) < gw + o.w / 2 && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
+      if (cgx0 < o.x + o.w && cgx1 > o.x && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
         return bad("הידית חוצה את החלון");
       }
     }
@@ -3083,8 +3332,20 @@ ${body}
          other fitting, and its default height is set in `gripHome` instead. It
          had one while the drawing pinned it to the mid rail whatever the rules
          said, which is the same fact that stopped it being draggable. */
+      /* ⚠ ASYMMETRIC ABOUT ITS AXIS, AND THE AXIS IS THE OUTBOARD TIP.
+         This read `{ out: 26, in: 320 }` — 320 being the bow's whole length on a
+         standard leaf, because the drawing centred the bar on the LEAF and the
+         axis it was handed landed near the outboard end of it by accident. Two
+         things were wrong with that. The number was hardcoded for one leaf width
+         while the bar was 0.33 W (see GRAB, where `len` is millimetres now); and
+         `gripPlacement` took `Math.max(out, in)` as a symmetric half-width, so
+         it demanded 320 mm of clearance on the LOCK side of a bar that extends
+         away from the lock — which is how the grab bar ended up with no legal
+         position at all on a standard leaf carrying a lever.
+         The bow now starts at its axis and runs GRAB.len inboard, and this says
+         exactly that. `npm run collide -- boxes` checks it against the art. */
       case "grab":
-        return { out: 26, in: 320, vy: 26 };
+        return { out: 4, in: GRAB.len + 10, vy: 26 };
       /* ⚠ `vy` IS A REACH FROM THE AXIS, not half a height, and for these four
          the two are not the same number. `cy` is the LEVER SPINDLE and it sits
          0.30 down a backplate, so the plate hangs 0.70 of its height below the
@@ -3150,14 +3411,11 @@ ${body}
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const lock = handleFootprint(byId(LOCKSETS, state2.lockset), leafH);
     const clearOf = lockBackset(handle, byId(LOCKSETS, state2.lockset)) + lock.in + LOCK_CLEAR;
-    const GRAB_MIN = 180;
-    return leafW - 45 - clearOf < GRAB_MIN;
+    return leafW - EDGE_FLAT - clearOf < GRAB.len;
   }
   function lockBackset(handle, lockset) {
-    const grip = handleFootprint(handle, 2e3);
-    const base = grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
     const out = lockset ? handleFootprint(lockset, 2e3).out : 0;
-    return Math.max(base, out + 10);
+    return Math.max(LOCK_BACKSET_GRIP, out + 10);
   }
   var GRIP_ART = {
     none: () => "",
@@ -3177,7 +3435,13 @@ ${body}
     square: (h, g) => squarePlates(g.cx, g.cy, g.dir),
     /* Cylinder only: the escutcheon IS the lockset. Eight of the ten doors that
        carry a pull bar have exactly this beside it and nothing more. */
-    cylinder: (h, g) => cylinder(g.cx, g.cy, true)
+    cylinder: (h, g) => cylinder(g.cx, g.cy, true),
+    /* Nothing at all — the bare leaf the page now opens on. It still goes
+       through `locksetArt`, so the door keeps a `data-hw="lockset"` group with a
+       zero footprint: `npm run collide` and the audit both enumerate that
+       attribute, and a fitting that vanishes from the DOM entirely reads to them
+       as a page that failed to draw rather than as a door with no lock. */
+    none: () => ""
   };
   function gripArt(handle, cx, cy, leafH, dir, paint2, centreX, leafW, y0, panelled, rot = 0) {
     const draw = GRIP_ART[handle.style];
@@ -3206,6 +3470,7 @@ ${body}
              data-out="${box.out}" data-in="${box.in}"
              data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
   }
+  var lockAff = (lockset) => lockset.style === "cylinder" ? CYLINDER_AFF : HANDLE_AFF;
   function locksetArt(lockset, cx, cy, dir) {
     const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
     const foot = handleFootprint(lockset, 0);
@@ -3242,16 +3507,10 @@ ${body}
     </g>`;
   }
   function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
-    const half = leafW * GRAB.len / 2;
-    const D = leafW * GRAB.len * GRAB.ratio;
+    const D = GRAB_D;
     const by = cy;
-    const span = half - D * 0.9;
-    const centredNear = centreX - dir * span;
-    const near = dir > 0 ? Math.max(centredNear, cx) : Math.min(centredNear, cx);
-    const hingeStop = centreX + dir * (leafW / 2 - 45);
-    const far = dir > 0 ? Math.min(near + 2 * span, hingeStop) : Math.max(near - 2 * span, hingeStop);
-    const x0 = Math.min(near, far) - D * 0.9, x1 = Math.max(near, far) + D * 0.9;
-    const L = x1 - x0;
+    const x0 = dir > 0 ? cx : cx - GRAB.len;
+    const L = GRAB.len;
     const P = (f) => x0 + L * f;
     const n1 = (v) => v.toFixed(1);
     const rod = (a, b, hh, rx, fill) => `
@@ -3978,7 +4237,7 @@ ${body}
     const panelAt = (top, bot) => `<rect x="${inset}" y="${H * top}"
         width="${W - inset * 2}" height="${H * (bot - top)}"
         fill="none" stroke="currentColor" stroke-width="36"/>`;
-    const panels = !detail.panel ? "" : detail.panels === 2 ? panelAt(0.07, 0.57) + panelAt(0.67, 0.91) : panelAt(0.67, 0.91);
+    const panels = !detail.panel ? "" : panelRows(detail).map(([t, b]) => panelAt(t, b)).join("");
     const n = detail.strips || 0;
     const RHYTHM = [0.94, 0.7, 0.61, 0.91, 0.59, 0.68, 0.91];
     const strips = detail.vertical ? Array.from({ length: n }, (_, i) => {
@@ -4033,7 +4292,7 @@ ${body}
       for (const g of GRILLES) if (g.id !== "none") out.grille[g.id] = "דורש חלון";
     }
     if (onLeaf) {
-      for (const d of DETAILS) if (d.panels === 2) {
+      for (const d of DETAILS) if (hasUpperPanel(d)) {
         out.detail[d.id] = "החלון תופס את מקומו של הפאנל העליון";
       }
       for (const d of DETAILS) {
@@ -4135,12 +4394,12 @@ ${body}
         change("detail", SAID.noPanelRoom);
       }
     }
-    if (leafGlazed(s) && byId(DETAILS, s.detail).panels === 2) {
+    if (leafGlazed(s) && hasUpperPanel(byId(DETAILS, s.detail))) {
       if (intent === "detail") {
         s.window = "none";
         change("window", SAID.windowGone);
       } else {
-        const one = DETAILS.find((d) => d.panel && d.panels !== 2);
+        const one = DETAILS.find((d) => d.panel && !hasUpperPanel(d));
         if (one) {
           s.detail = one.id;
           change("detail", SAID.onePanel);
@@ -4194,7 +4453,7 @@ ${body}
       }
     }
     if (s.grip) {
-      if (byId(HANDLES, s.handle).style === "none") {
+      if (byId(HANDLES, s.handle).style === "none" || byId(HANDLES, s.handle).fixed) {
         s.grip = null;
         change("grip", SAID.gripHome);
       } else {
@@ -4217,20 +4476,13 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 11;
+  var VERSION = 12;
   var DEFAULTS = {
     colour: "rb-0097d",
-    window: "rect",
+    window: "none",
     grille: "none",
-    handle: "idan",
-    /* CYLINDER, not the lever it was. The default door carries a pull bar, and
-       of the ten installed doors that carry one, eight have exactly this beside
-       it and not one has a lever — so the old default was a door the rules now
-       refuse, and the DEFAULTS-is-buildable assertion caught it the moment the
-       rule landed. Second time that assertion has earned its keep in two
-       commits, which is a fair argument for writing tests about the boring
-       starting state and not only about the interesting edges. */
-    lockset: "cylinder",
+    handle: "none",
+    lockset: "none",
     detail: "plain",
     size: "standard",
     handing: "right-in"
@@ -4417,6 +4669,7 @@ ${body}
   var PHONE_TEL = "+972532197466";
   var PRICE_INCLUDES = "כולל דלת, התקנה מלאה ומע״מ";
   var PRICE_CAVEAT = "מחיר משוער. המחיר הסופי נקבע לאחר מדידה.";
+  var DRAWING_CAVEAT = "הציור באתר הוא הדמיה ממוחשבת — הדלת שתיוצר עשויה להיראות מעט שונה בגוון, בברק ובפרטי הידיות.";
   var isServed = () => /^https?:$/.test(window.location.protocol);
   function shareUrl(state2) {
     if (!isServed()) return null;
@@ -4480,6 +4733,11 @@ ${body}
          written here for the reason `GRIP_ILLUSTRATIVE` is: it was four Hebrew
          literals in three files for one promise. */
       PRICE_CAVEAT,
+      /* ⚠ AND THE DRAWING'S OWN CAVEAT, for the same reason and one step
+         further. The price caveat protects the number; this protects the
+         PICTURE, which is the part of this message a customer will hold up
+         against the door when it arrives. See DRAWING_CAVEAT. */
+      DRAWING_CAVEAT,
       `קוד: ${encodeCode(state2)}`,
       /* The link matters more than anything above it: Peretz taps it and sees
          exactly what the customer saw. He decodes nothing. It is dropped, not
@@ -4563,32 +4821,31 @@ ${body}
     { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
     { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "left-in" } },
     { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "right-in" } },
-    { id: "d034", state: { colour: "rb-0096d", detail: "groove", window: "none", grille: "none", handle: "nitzan", lockset: "cylinder", size: "standard", handing: "right-in" } },
+    { id: "d034", state: { colour: "rb-0096d", detail: "panel", window: "none", grille: "none", handle: "nitzan", lockset: "cylinder", size: "standard", handing: "right-in" } },
     { id: "d038", state: { colour: "rb-7110d", detail: "stripsv", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
     { id: "d043", state: { colour: "rb-7126d", detail: "stripsv", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
     { id: "d048", state: { colour: "rb-5103d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
     { id: "d051", state: { colour: "rb-7240d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
     { id: "d063", state: { colour: "rb-7240d", detail: "strips3", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
     { id: "d064", state: { colour: "rb-7110d", detail: "strips", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
-    { id: "d072", state: { colour: "rb-0096d", detail: "groove", window: "none", grille: "none", handle: "shahar", lockset: "cylinder", size: "standard", handing: "left-in" } },
+    { id: "d072", state: { colour: "rb-0096d", detail: "panel", window: "none", grille: "none", handle: "shahar", lockset: "cylinder", size: "standard", handing: "left-in" } },
     { id: "d078", state: { colour: "rb-7110d", detail: "strips", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
     { id: "d087", state: { colour: "rb-7021d", detail: "panel", window: "none", grille: "none", handle: "shahar", lockset: "digital", size: "standard", handing: "right-in" } },
-    { id: "d092", state: { colour: "rb-6219d", detail: "panel", window: "broad", grille: "iron", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in" } },
-    { id: "d097", state: { colour: "rb-7080d", detail: "panel", window: "tallwin", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
+    { id: "d092", state: { colour: "rb-6219d", detail: "panel", window: "rect", grille: "iron", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in" } },
+    { id: "d097", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
     { id: "d099", state: { colour: "rb-7126d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
-    { id: "d106", state: { colour: "rb-7080d", detail: "panel", window: "broad", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
+    { id: "d106", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
     { id: "d108", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "iron", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
     { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "ella", lockset: "digital", size: "standard", handing: "right-in" } },
     { id: "d116", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
     { id: "d122", state: { colour: "rb-7240d", detail: "panel", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in" } },
     { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "reeded", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in" } },
-    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "tallwin", grille: "iron", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in" } }
+    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "iron", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in" } }
   ];
 
   // js/app.js
   var $ = (sel) => document.querySelector(sel);
   var state = { ...DEFAULTS };
-  var urlTimer = null;
   var GROUPS = [
     /* `label` and `meta` used to sit here and nothing read either of them; `meta`
        also spelled the chart code "RAL", which it is not — see `colourCode`. */
@@ -4644,8 +4901,10 @@ ${body}
       /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was
          the reason the narrow door read "כלול" and then took ₪100 off: it is a
          difference from a FIXED baseline, clamped at zero by the label. Prices
-         come from `tileSurcharge` now, which asks `priceAgorot` what tapping
-         actually does, so no group needs its own idea of what a price is. */
+         come from `tilePrice` now, which reads this size's own entry out of
+         `priceParts` — so the size tiles show what each door costs rather than
+         what it costs relative to a door nobody is looking at, and no group
+         needs its own idea of what a price is. */
       glyph: sizeGlyph,
       hint: "נמדוד אצלכם במדויק — בחינם."
     },
@@ -4715,6 +4974,8 @@ ${body}
       placeGrip({ ...now, rot: now.rot === 90 ? 0 : 90 }, true);
     });
     $("#grip-home").addEventListener("click", () => set({ ...state, grip: null }));
+    $("#undo-btn").addEventListener("click", undo);
+    $("#draw-caveat").textContent = DRAWING_CAVEAT;
     $("#save-btn").addEventListener("click", saveCurrent);
     $("#works-close").addEventListener("click", closeWorks);
     document.querySelectorAll("[data-wa]").forEach((el) => {
@@ -4981,10 +5242,9 @@ ${body}
       }
     }
   }
-  function tileSurcharge(g, o, state2) {
-    if (state2[g.key] === o.id) return 0;
-    const after = repair({ ...state2, [g.key]: o.id }).state;
-    return priceAgorot(after) - priceAgorot(state2);
+  function tilePrice(g, o, state2) {
+    const after = { ...repair({ ...state2, [g.key]: o.id }).state, [g.key]: o.id };
+    return priceParts(after)[g.key];
   }
   function repriceOptions(state2) {
     for (const g of GROUPS) {
@@ -4993,7 +5253,7 @@ ${body}
       for (const b of host.querySelectorAll("[data-id]")) {
         const o = g.list().find((x) => x.id === b.dataset.id);
         if (!o) continue;
-        const label = deltaLabel(tileSurcharge(g, o, state2));
+        const label = priceLabel(tilePrice(g, o, state2));
         const meta = b.querySelector(".tile__meta");
         if (meta) {
           meta.textContent = label;
@@ -5002,8 +5262,8 @@ ${body}
         const sw = b.querySelector(".swatch__meta");
         if (sw) {
           sw.textContent = `${colourCode(o)} · ${label}`;
-          b.title = `${o.he} · ${colourCode(o)}${label === deltaLabel(0) ? "" : ` · ${label}`}`;
-          b.setAttribute("aria-label", `${o.he}, ${colourCode(o)}` + (label === deltaLabel(0) ? "" : `, ${label}`));
+          b.title = `${o.he} · ${colourCode(o)}${label === priceLabel(0) ? "" : ` · ${label}`}`;
+          b.setAttribute("aria-label", `${o.he}, ${colourCode(o)}` + (label === priceLabel(0) ? "" : `, ${label}`));
         }
       }
     }
@@ -5024,7 +5284,7 @@ ${body}
         b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
         <span class="swatch__name">${o.he}</span>
-        <span class="swatch__meta">${colourCode(o)} · ${deltaLabel(tileSurcharge(g, o, state))}</span>`;
+        <span class="swatch__meta">${colourCode(o)} · ${priceLabel(tilePrice(g, o, state))}</span>`;
       } else if (g.kind === "pill") {
         b.className = "pill";
         b.textContent = o.he;
@@ -5033,7 +5293,7 @@ ${body}
         b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
         <span class="tile__name">${o.he}</span>
-        <span class="tile__meta">${deltaLabel(tileSurcharge(g, o, state))}</span>
+        <span class="tile__meta">${priceLabel(tilePrice(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
       }
       b.addEventListener("click", () => choose(g, o.id));
@@ -5189,9 +5449,19 @@ ${body}
     set(fixed);
     if (said.length) toast(said[0]);
   }
-  function set(next) {
-    state = next;
+  var HISTORY_MAX = 100;
+  var history_ = [];
+  var canUndo = () => history_.length > 0;
+  function undo() {
+    const prev = history_.pop();
+    if (!prev) return;
+    state = prev;
     guard(paint)();
+    scheduleUrl();
+    toast("הצעד האחרון בוטל");
+  }
+  var urlTimer = null;
+  function scheduleUrl() {
     clearTimeout(urlTimer);
     urlTimer = setTimeout(() => {
       try {
@@ -5199,6 +5469,15 @@ ${body}
       } catch {
       }
     }, 300);
+  }
+  function set(next) {
+    if (JSON.stringify(next) !== JSON.stringify(state)) {
+      history_.push(state);
+      if (history_.length > HISTORY_MAX) history_.shift();
+    }
+    state = next;
+    guard(paint)();
+    scheduleUrl();
   }
   function keyboardGrid(wrap) {
     wrap.addEventListener("keydown", (e) => {
@@ -5238,7 +5517,6 @@ ${body}
     const handing = byId(HANDINGS, state.handing);
     const size = SIZES[state.size] || SIZES.standard;
     $("#stage").innerHTML = render(state);
-    $(".layout").dataset.light = String($("#stage").querySelector("svg").dataset.light === "true");
     fitStage();
     const money = formatAgorot(priceAgorot(state));
     document.querySelectorAll("[data-price]").forEach((el) => {
@@ -5276,14 +5554,15 @@ ${body}
     document.documentElement.classList.add("is-live");
     announce(describe(state));
     armGrip();
+    $("#undo-btn").hidden = !canUndo();
   }
   var dragging = null;
   var swallowTouch = (ev) => ev.preventDefault();
   function armGrip() {
     const bar = $("#grip-bar");
     const g = $('#stage svg [data-hw="handle"]');
-    bar.hidden = !g;
-    if (!g) return;
+    bar.hidden = !g || gripIsFixed(state);
+    if (!g || gripIsFixed(state)) return;
     g.classList.add("grip-live");
     g.setAttribute("tabindex", "0");
     g.setAttribute("role", "button");
@@ -5293,9 +5572,7 @@ ${body}
     g.addEventListener("touchstart", swallowTouch, { passive: false });
     g.addEventListener("touchmove", swallowTouch, { passive: false });
     const rot = $("#grip-rot");
-    const can = gripCanRotate(state);
-    rot.setAttribute("aria-disabled", String(!can));
-    rot.title = can ? "" : "הידית הזו ארוכה מרוחב הדלת — אי אפשר להניח אותה לרוחב";
+    rot.hidden = !gripCanRotate(state);
     sizeHitPad();
     const { moved } = gripDeparture(state);
     $("#grip-home").hidden = !moved;
@@ -5446,14 +5723,15 @@ ${body}
     const stage = $("#stage");
     const svg = stage.querySelector("svg");
     if (!svg) return;
+    const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
     const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
     const box = stage.getBoundingClientRect();
-    if (!(w > 0 && h > 0 && box.width > 0 && box.height > 0)) return;
+    if (!(w > 0 && h > 0 && Number.isFinite(fx) && Number.isFinite(fy) && box.width > 0 && box.height > 0)) return;
     const scale = Math.min(box.width / w, box.height / h);
     const vw = box.width / scale, vh = box.height / scale;
     svg.setAttribute(
       "viewBox",
-      `${((w - vw) / 2).toFixed(1)} ${((h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
+      `${(fx + (w - vw) / 2).toFixed(1)} ${(fy + (h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
     );
     sizeHitPad();
     const frame = svg.querySelector("#frame");

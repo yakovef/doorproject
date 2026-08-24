@@ -631,13 +631,22 @@ group('the grip clears the lockset');
          escutcheon as its own art — that is the entire product — so counting
          every escutcheon on the door called it a door with two keyways. The
          drawing marks which one it is; ask for the unowned ones. */
+      /* ⚠ AND ZERO IS A REAL ANSWER NOW, ON EXACTLY ONE FITTING. The bare
+         lockset — the door the page opens on — has no lever, no knob and no
+         keyway, so "exactly one keyway" is false for it and was false 60 times
+         the moment it was added. The fix is NOT to relax this to "at most
+         one": that would stop it catching the defect it exists for, which is a
+         door that quietly loses its keyway. The expected COUNT comes from the
+         catalogue instead, so the assertion now also proves the bare door
+         draws no stray escutcheon — strictly more than it checked before. */
+      const wantKeys = kn.style === 'none' ? 0 : 1;
       const carries = /data-carries-lock="true"/.test(svg);
       const escutcheons = [...svg.matchAll(/data-hw="lock"(?! data-owner)/g)].length;
       ok(carries === !!kn.lock, `data-carries-lock disagrees with the catalogue (${label})`);
-      ok(escutcheons === (carries ? 0 : 1),
-         `expected ${carries ? 0 : 1} separate escutcheon, found ${escutcheons} (${label})`);
-      ok([...svg.matchAll(/data-hw="keyway"/g)].length === 1,
-         `the street face needs exactly one keyway (${label})`);
+      ok(escutcheons === (carries ? 0 : wantKeys),
+         `expected ${carries ? 0 : wantKeys} separate escutcheon, found ${escutcheons} (${label})`);
+      ok([...svg.matchAll(/data-hw="keyway"/g)].length === wantKeys,
+         `the street face needs ${wantKeys} keyway (${label})`);
 
       // The lockset is always drawn, and always on the leaf.
       const lock = {
@@ -696,7 +705,16 @@ group('the grip clears the lockset');
            and the same one AGENT.md says to ask out loud before writing a rule
            of this shape: are these two things at the same height? */
         const sameHeight = Math.abs(grip.y - lock.y) < grip.vy + lock.vy;
-        if (grip.vy > 200 && sameHeight) {
+        /* ⚠ AND ONLY WHERE THERE IS A LOCKSET TO BE CLEAR OF. The bare
+           lockset — no lever, no knob, no keyway, the door the page opens on —
+           has a footprint of zero at the backset, and `lockBackset` still
+           returns a number for it because it has to return something. So this
+           measured the distance from a bar to a fitting that is not on the
+           door and called 0.066 too tight. The 0.090-0.185 band is measured
+           across ten doors that CARRY BOTH; where one of the two is absent it
+           is not describing anything, which is the same sentence the
+           same-height guard above already makes about the other axis. */
+        if (grip.vy > 200 && sameHeight && kn.style !== 'none') {
           const axis = Math.abs(grip.x - lock.x) / leaf.w;
           ok(axis >= 0.088,
              `bar and lockset only ${axis.toFixed(3)} of leaf width apart — tighter `
@@ -1162,10 +1180,17 @@ group('a handle on a frame is refused, and told why');
 group('the handle position rides in the link and not in the code');
 {
   /* A position the door can actually take, so that what is being tested is
-     the round trip and not `repair` doing its job on the way in. */
-  const spot = { ...gripHome(DEFAULTS), y: gripHome(DEFAULTS).y - 100 };
-  ok(gripPlacement(DEFAULTS, spot).ok, 'the fixture position should be buildable');
-  const moved = { ...DEFAULTS, grip: spot };
+     the round trip and not `repair` doing its job on the way in.
+     ⚠ AND ON A DOOR THAT HAS A GRIP TO POSITION. The fixture was `DEFAULTS`,
+     and DEFAULTS is a bare door now — no window, no grip, no lock furniture —
+     so `repair` correctly dropped the position on the way back in and this
+     read as the round trip losing it. A test of "does `gp=` survive the link"
+     has to be run on a door where `gp=` means something; the assertion is
+     unchanged. */
+  const draggable = { ...DEFAULTS, handle: 'idan' };
+  const spot = { ...gripHome(draggable), y: gripHome(draggable).y - 100 };
+  ok(gripPlacement(draggable, spot).ok, 'the fixture position should be buildable');
+  const moved = { ...draggable, grip: spot };
   const q = toQuery(moved);
   ok(q.includes('gp='), `the link should carry the position, got ${q}`);
   const back = fromQuery(q);
@@ -1180,11 +1205,19 @@ group('the handle position rides in the link and not in the code');
      builds to. Carrying it would also have cost a VERSION bump and every code
      written so far. If that decision is ever reversed, this line fails and
      says where to look. */
-  ok(encodeCode(moved) === encodeCode(DEFAULTS),
+  /* ⚠ AGAINST `draggable`, NOT `DEFAULTS` — the same door WITHOUT the
+     position, which is the only comparison that says what this claims. It read
+     `encodeCode(DEFAULTS)` while the fixture WAS the default door; the default
+     is a bare leaf now and `moved` differs from it by the handle as well, so
+     the codes differed for a reason that has nothing to do with the position
+     and the assertion would have been "fixed" by weakening it. */
+  ok(encodeCode(moved) === encodeCode(draggable),
      'the short code must NOT carry the handle position');
 
-  /* A link with the handle somewhere impossible opens on a real door. */
-  const wild = fromQuery(toQuery({ ...DEFAULTS, grip: { x: 300, y: 300, rot: 0 } }));
+  /* A link with the handle somewhere impossible opens on a real door. Also on
+     `draggable`: a position on a door with no grip is dropped by `repair`
+     before this can test anything, which is correct and is not this test. */
+  const wild = fromQuery(toQuery({ ...draggable, grip: { x: 300, y: 300, rot: 0 } }));
   ok(gripPlacement(wild.state).ok, 'a link with an impossible handle position must be repaired');
 
   /* And rotation only survives where it fits. */
@@ -1228,13 +1261,20 @@ group('leaf and a half');
 for (const h of HANDINGS) {
   // Hinges are drawn on the inside face only, as the works photographs show.
   const svg = render({ ...base, size: 'half', handing: h.id });
-  const total = Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]);
+  /* ⚠ THE viewBox NO LONGER STARTS AT THE ORIGIN. This read `viewBox="0 0 …"`
+     and took group 1 as the width; the drawing is anchored to a fixed floor
+     and centre line now, so a door's own box begins wherever that door begins
+     and only the widest sizes start at 0. The regex matched nothing and the
+     line threw on `[1]` of null — which is at least loud. Read all four
+     numbers and use the two that are wanted. */
+  const [vx, , vw] = /viewBox="([-\d.]+) ([-\d.]+) ([\d.]+) ([\d.]+)"/.exec(svg)
+    .slice(1).map(Number);
   const hingeXs = [...svg.matchAll(/data-hw="hinge" data-cx="([\d.]+)"/g)].map(m => Number(m[1]));
   /* Hinges are an inside-face detail and that face is gone, so there are none
      to find. What still matters is that nothing is drawn AT the mullion. */
   ok(hingeXs.length === 0, `hinges should no longer be drawn for ${h.id}`);
   // Hinges belong on an outer edge of the opening, never at the mullion.
-  const nearEdge = hingeXs.every(x => x < total * 0.30 || x > total * 0.70);
+  const nearEdge = hingeXs.every(x => x < vx + vw * 0.30 || x > vx + vw * 0.70);
   ok(nearEdge, `hinges sit at the mullion instead of the frame (${h.id}): ${hingeXs}`);
 }
 

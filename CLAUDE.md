@@ -136,36 +136,66 @@ written rather than rewritten, but do not add more.
 
 **The site works and is not launched.** Every price on it is invented.
 
+⚠ **The page opens on a BARE DOOR** — no window, no face design, no grip, no
+lock furniture — and everything on the leaf is something the customer put
+there. That is recent and deliberate (§0b), and it changes what "the default
+door" means in every other sentence in this file.
+
 ### Green
 
-- `npm test` — **5,676,741 assertions passing**, no framework, plain node.
-- `npm run audit`, `npm run collide` (`all` / `boxes`), `npm run profile`,
-  `npm run recreate`, `npm run latency` — all clean. `npm run sheets`
-  completed and all four screenshot families are current.
-- `npm run collide` — clean over 1,568 buildable designs, real `getBBox`
-  geometry from a browser.
-- `npm run latency` — 80 ms on the default door, 164 ms on a sidelight with
-  ironwork, 410 ms on the heaviest buildable door, at 6× CPU throttle on a
-  390×844 phone, against a 600 ms gate.
+- `npm test` — **about 4.0M assertions passing**, no framework, plain node. It
+  was 5.68M before the 24.8 interface round; the catalogue lists changed length
+  and the combinatorial sweeps are the product of those lengths, so the total
+  moves with the range. ⚠ A FALL IN THIS NUMBER IS NOT EVIDENCE OF ANYTHING.
+  It is not a coverage metric — read the failure count.
+- `npm run collide` — clean over **1,224 buildable designs**, real `getBBox`
+  geometry from a browser, `all` and `boxes`, including the whole hardware
+  rework of 24.8 and `faceObstacles` agreeing with the drawing everywhere. It
+  was 1,568 before the window list was cut from four shapes to two: same
+  arithmetic as the assertion count above.
+- `npm run audit`, `npm run profile`, `npm run recreate`, `npm run sheets` —
+  all clean **on a healthy container**, which is not every container. See
+  "Red, and known" directly below before believing either state.
 - The drawing recreates all 30 measured doors; the order carries the full
   specification, a picture, an unambiguous opening direction, a price and a
   code.
 
-⚠ **The "Red, and known" section that used to sit here was itself going
-stale.** It said `npm test` reports 4 failures and `npm run audit` /
-`npm run sheets` cannot run, as a standing fact about the container. That was
-true when it was written and is not a property of this repository — it is a
-property of whichever container happens to be running it, and it recovers the
-moment a healthy one runs `npm run sheets`. Two runs since have found a clean
-container and gone fully green (24.8.2026, runs 26 and 27 in `AGENT-LOG.md`).
-Treat container health as something to CHECK each run, not something to
-assume from this file — see `AGENT.md`'s note on the one circumstance in which
-pushing with those four red is right, which still stands for the day this
-degrades again.
+### Red, and known — ⚠ AND CHECK IT, DO NOT READ IT
+
+The previous version of this section stated as standing fact that `npm test`
+reports 4 failures and that `npm run audit` and `npm run sheets` cannot run.
+That is not a property of this repository. It is a property of whichever
+container happens to be running it, and it recovers the moment a healthy one
+runs `npm run sheets` — two agent runs did exactly that on 24.8 (runs 26 and 27
+in `AGENT-LOG.md`) and went fully green. **Treat container health as something
+to establish each run.** `AGENT.md` has the one circumstance in which pushing
+with those four red is right, and it still stands for the days it degrades.
+
+As of the 24.8 interface round, on a container that IS degraded:
+
+- **`npm test` reports 4 failures: the four screenshot families are stale.**
+  True and correct — the page changed and the committed pictures were made from
+  an older one. **Never silence them**, and never stamp a sheet by hand.
+  ⚠ `js/works.js` can go stale the same way and is NOT one of the four:
+  `node tools/corpus.mjs --quiet` regenerates it with no browser at all. See
+  `AGENT.md`.
+- **`npm run latency` red on the heaviest door — and it is the container.**
+  706 ms against the 600 ms gate on `half + strip + quatrefoil + shiran`,
+  2,195 elements.
+  ⚠ ATTRIBUTED RATHER THAN ASSUMED, and the method is the point. The same tool
+  was run against the PREVIOUS COMMIT — `git archive HEAD` into a temp tree,
+  built there, same browser, same minute — and measured **701 ms on the same
+  door**. Within noise, both past the gate, so the change under test is not the
+  cause. The agent's run 27, on a healthy container two commits earlier,
+  measured that door at **410 ms**; this tree draws 35 FEWER elements on it.
+  **Do not tune the drawing against a red timing gate without doing this
+  comparison first.** If it is still red on a healthy container, the heaviest
+  door genuinely needs work and the incremental repaint in §9 is what to
+  revisit.
 
 ### Blocked on a human
 
-`ASK-PERETZ.md` holds twelve numbered questions. Two things to know:
+`ASK-PERETZ.md` holds thirteen numbered questions. Two things to know:
 
 - **ASK-PERETZ §1, the ימין/שמאל convention, is ANSWERED** (23.8.2026) — and the answer
   showed the site had it backwards, so every order it had ever produced named
@@ -205,7 +235,7 @@ three-files promise and adds a second renderer.
   nearest real one.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   the option ORDER or the bit layout requires a `VERSION` bump in
-  `js/url-state.js` (currently **11**), so an old code is *refused with a
+  `js/url-state.js` (currently **12**), so an old code is *refused with a
   notice* rather than decoded into a different door. **Appending to the end of
   a list costs no bump. Changing a property — not the id, not the order —
   costs no bump.**
@@ -249,19 +279,19 @@ that promise is load-bearing: no fourth file, no webfont, no CDN.
 
 ```
 index.html          the page: stage, choices panel, send panel, gallery, sheet
-css/app.css         RTL-first, logical properties throughout        ~1,600 lines
-js/catalog.js       every option. THE WIRE FORMAT. Read its header.    839
-js/prices.js        all 70 prices, plain shekels, one screen            160
-js/renderer.js      the door. Pure: render(state) -> SVG string.      5,714
-js/url-state.js     state <-> URL, and the short code (BigInt)          523
-js/rules.js         what cannot go with what, and repair()              527
-js/price.js         agorot only                                          79
+css/app.css         RTL-first, logical properties throughout         1,623 lines
+js/catalog.js       every option. THE WIRE FORMAT. Read its header.    964
+js/prices.js        every price, plain shekels, one screen              193
+js/renderer.js      the door. Pure: render(state) -> SVG string.      6,170
+js/url-state.js     state <-> URL, and the short code (BigInt)          558
+js/rules.js         what cannot go with what, and repair()              534
+js/price.js         agorot only. priceParts is the ONE breakdown        137
 js/spec.js          THE door, as rows. One statement, four readers      207
-js/share.js         the WhatsApp message — this is the product          417
+js/share.js         the WhatsApp message — this is the product          448
 js/colour.js        darken / lighten / scaleTone / contrast              81
-js/app.js           wiring, the cabinet, the gallery, the sheet       1,808
+js/app.js           wiring, the cabinet, the gallery, the sheet, undo 1,943
 js/works.js         30 real doors, GENERATED by npm run corpus           48
-test/units.mjs      5.67M assertions, no framework                    2,253
+test/units.mjs      ~4.0M assertions, no framework                   2,285
 tools/*.mjs         measurement instruments, not scripts (§7)
 research/works/     129 photographs, 31 measured records (30 usable)
                     INVENTORY.md — every fitting in the corpus
@@ -299,29 +329,54 @@ state are byte-identical, and a test asserts it.
 ### The scene, and the room
 `SCENE = 8000` units past the drawing in every direction (measured: 4200 left
 bare page on a landscape phone, 15000 was picked on no evidence and reverted).
-`fitStage()` in `app.js` widens the viewBox to the exact shape of the stage —
-it only ever WIDENS, so the visible y range is always `0..h`. **Bare mode
-(`?bare=1`) skips this**, because the measurement harnesses want the drawing's
-own frame.
+### ⚠ THE SCENE IS ANCHORED, AND THE DOOR MOVES INSIDE IT
+**`BASE_Y` and `MID_X` are constants.** Every door stands on the same floor
+line and is centred on the same axis, so choosing a taller one raises its head
+and choosing a wider one grows it about its middle — the wall, the floor, the
+sconces and the vignette do not move at all. Measured on six sizes at 390x844:
+frame width 109.8 → 171.9 px, frame height 275.6 → 311.3, and the leaf's foot,
+the sconce and the floor line **identical to a tenth of a pixel on every one**.
 
-The door stands in a room, added in `REALISM2.md` stage D: an **alcove** (three
-mitred trapezoids stepping the wall forward, built from the primitive the frame
-already proved), a **floor** that falls away from a skirting shadow instead of
-meeting a ruled line, two **sconces**, and the door **reflected in the floor**
-as a `<use>` of `<g id="door">`.
+It was laid out from the top-left corner before, so the floor moved DOWN for a
+tall door and the picture's box grew with the door — which `fitStage` then
+scaled back, making every size come out the same drawn width.
 
-⚠ Three things about the room that were wrong once:
+**`render` therefore emits TWO boxes** and they are not the same box:
+- `viewBox` is tight around THIS door. Bare mode and every measurement harness
+  get it, and that is deliberate — framing a narrow door inside the
+  tall-and-wide scene would hand `npm run profile` a third fewer pixels to
+  measure and read as a change in the drawing (§8 has that bruise already).
+- `data-fit-x/y/w/h` is `STAGE_BOX`, the fixed scene, identical for every door.
+  `fitStage()` crops to it, so the on-screen scale is a constant. It only ever
+  WIDENS that rect to the stage's shape. **Bare mode skips `fitStage`.**
+
+The door stands in a room from `REALISM2.md` stage D: a **floor** that falls
+away from a skirting shadow instead of meeting a ruled line, two **sconces**,
+and the door **reflected in the floor** as a `<use>` of `<g id="door">`. There
+is no alcove — see below.
+
+⚠ Four things about the room that were wrong once:
 - **Every plane is a black or white overlay, never a colour.** The wall and
-  floor are `var(--wall)`/`var(--floor)` so `.layout[data-light]` can sink the
-  whole room behind a pale door; literal hexes would not move with them.
+  floor are `var(--wall)`/`var(--floor)`; literal hexes would not move with
+  them. (Nothing sinks them any more — see the next point — but the rule holds
+  for the theme and for the print sheet.)
+- **The room does not change colour with the door.** `.layout[data-light]` sank
+  the wall and floor a shade behind a pale leaf, and it is gone: the one job of
+  this screen is comparing colours, and a ground that shifts under the swatch
+  makes every comparison a lie. A pale door's silhouette is the drawing's
+  problem and the drawing solves it — painted frame, black reveal ramp, cast
+  shadow.
 - **The reflection's mask is on an untransformed wrapper**, not on the flipped
   `<use>`. `maskUnits="userSpaceOnUse"` resolves in the referencing element's
   own space *including its transform*, so the band came out mirrored above the
   floor and the reflection was masked away entirely. A mask that hides
   everything and a feature never drawn are the same picture.
-- **The alcove's head is off-screen at every size** (`alcY0` is −190 and the
-  crop starts at 0 — measured, 24 cases out of 24). A white catch line was
-  drawn along it and could never be seen. Deleted.
+- **THE ALCOVE IS GONE.** It was three mitred trapezoids stepping the wall
+  forward around the casing, and it was reported from outside as *"a gray box
+  that frames it"* — which is what a shaded plane seen dead square-on becomes.
+  Its own docstring had already recorded that `ALC_SIDE` and `ALC_HEAD` were
+  the only depths in the file not taken off a photograph. Do not rebuild it
+  without one.
 
 ### The light
 `LIGHT` in `renderer.js`. Key is high and ~30° left of camera; lit is warm,
@@ -596,10 +651,10 @@ something was tuned by eye against nothing and landed on "slightly better".
 
 | tool | what it answers |
 |---|---|
-| `npm test` | 5.67M string-level assertions: price, code, link, rules, drawing |
+| `npm test` | ~4.0M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
 | `npm run audit` | the real page at seven viewports plus seven failure routes — every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
-| `npm run collide` | real `getBBox()` from a browser over 1,490 designs. No declared number anywhere in the loop |
+| `npm run collide` | real `getBBox()` from a browser over 1,224 designs. No declared number anywhere in the loop |
 | `npm run fuzz` | random combinations, then click-walks in a real browser |
 | `npm run profile` | the leaf's VERTICAL fall, against the medians `FALLOFF` was fitted to |
 | `npm run mottle` | slow horizontal unevenness of the paint |
@@ -717,7 +772,9 @@ grips and locksets he orders (§2), which colours he stocks and which cost extra
 permission to use the photographs (§7), width bands per size (§8), the warranty
 term (§9), three questions from the second mockup (§11), and which dimension he
 orders by (§12) — the last one blocking only the dimensions printed on the A4
-order sheet.
+order sheet — and **whether he sells a door with no lock furniture at all
+(§13)**, which decides only whether the bare door the page now OPENS on can
+also be ORDERED, not whether it can be shown.
 
 ### Wanted, not built, and each has a reason
 - **`REALISM2.md` stage E** — the leaf's grain and the moulding's quirk. Needs
@@ -727,9 +784,13 @@ order sheet.
 - **`REALISM2.md` stage F** — the ≥1280 overlay layout. Needs twelve
   viewport × size measurements at 1280 and 1680, which a degraded container
   cannot take. §6 of that file: *the overlay yields, not the controls.*
-- **Incremental colour repaint** — declined on the measurement (66–142 ms), and
-  it would put a second way of producing the drawing beside `render(state)`.
-  Revisit only if `npm run latency` goes red.
+- **Incremental colour repaint** — declined on the measurement (66–142 ms on a
+  healthy container), and it would put a second way of producing the drawing
+  beside `render(state)`. The condition for revisiting was "if `npm run
+  latency` goes red", and **it is red today — but on the previous commit too,
+  by 5 ms, so it is the container and not the drawing** (§0c has the
+  attribution). Re-measure on a healthy container before treating that
+  condition as met.
 
 ### From the corpus, recorded rather than built
 Carried over from `ROUND5.md`, which has been deleted now that its plan is
@@ -796,6 +857,110 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **Fourteen things reported from outside, in one round — and the biggest of
+  them was that the room moved when the door did.** Every item below arrived as
+  a sentence from the person building this for their father, looking at the
+  page as a customer; §0a says to take those literally, and every one of them
+  was real.
+
+  **The drawing.**
+  - **The scene is ANCHORED now: `BASE_Y` and `MID_X` in `renderer.js`.** Every
+    coordinate used to be laid out from the top-left of the picture, so the
+    head of the opening was nailed to the top and *the floor moved down* when
+    you chose a taller door — and the picture's own box grew with the door, so
+    `fitStage` scaled it all back again. Measured before: a 1100 mm door and an
+    800 mm door came out within a few pixels of the same drawn width. Measured
+    after, on six sizes at 390x844: frame width 109.8 → 127.6 → 145.5 → 171.9,
+    frame height 275.6 → 311.3 on the tall door, and **the leaf's foot, the
+    sconce and the floor line identical to a tenth of a pixel on all six.**
+    `render` emits TWO boxes for this — `viewBox` tight around the door for the
+    bare-mode harnesses, `data-fit-*` the fixed scene for `fitStage` — because
+    framing every door in the tall-and-wide scene would have cost `npm run
+    profile` a third of its pixels on a narrow door (§8 has that bruise
+    already).
+  - **The alcove is gone** — reported as *"a gray box that frames it"*, which
+    is what a shaded plane seen dead square-on becomes. Its own docstring had
+    already recorded that its two depths were the only ones in the file not
+    taken off a photograph.
+  - **No sill at the foot of the door, and the frame grew a fourth return.**
+    `frame.threshold.present` across the thirty records: **16 yes, 14 no**, and
+    where present a median 0.0175 of leaf height against the 0.0205 we drew —
+    as a ribbed bar with eight lines ruled along it. The leaf now runs to the
+    floor `FLOOR_RUN` behind the wall plane, mitred into both jambs, with one
+    contact shadow where it actually touches. The hard contact line at the
+    wall's floor line went with it: two parallel rules 62 mm apart was the
+    original complaint, doubled.
+  - **The keyhole does not move.** `lockBackset` no longer reads the grip, and
+    the keyway-only lockset is drawn at `CYLINDER_AFF` like every other keyway
+    instead of at lever height — it used to jump 116 mm up the door. Choosing
+    between 49 mm and 60 mm for the single backset was NOT obvious: the pooled
+    median over all thirty records is 0.0695 (59 mm), and setting it to 60 cost
+    22 buildable combinations, including a wide door where picking a Coral
+    lever silently removed the customer's Idan bar. The interface lost to the
+    door; the measurement is written out in full at `lockBackset`.
+
+  **The hardware.**
+  - **The grab bar's drawing and its hitbox are the same object at last.**
+    `grabHandle` re-centred the bow on the leaf whatever x it was handed, and
+    silently shortened it against a hinge stop, while every rule reasoned about
+    the x. On a standard leaf with a lever the hinge-side rule refused anything
+    past 467 mm and the lockset rule — budgeting the bow's whole 320 mm as if
+    it stood on both sides of its axis — refused anything nearer than 562.
+    **No overlap: the bar had no legal position at all**, which is exactly what
+    was reported. `GRAB.len` is millimetres now rather than a fraction of leaf
+    width, the bow is drawn from its axis, the hinge-side rule exempts it, and
+    the lockset and glazing checks are interval overlaps instead of a symmetric
+    half-width. Placeable positions across the sweep: **66,628 → 82,203**, and
+    **zero** change in what any other grip can do (5,940 combinations swept
+    against the previous tree).
+  - **The recessed channel cannot be dragged** — it is cut into the leaf, not
+    bolted to it. One `fixed` flag, three readers: `gripAt`, `armGrip`, and
+    `repair`, because a rule only the page enforces is one a link walks past.
+  - **The rotate button is hidden, not greyed, when a grip cannot turn.**
+
+  **The catalogue — and `VERSION` is 12.**
+  - **עיצוב חזית re-cut.** Both milled grooves withdrawn (aliased onto the lower
+    panel); **panel counts 1, 2 and 3** added; **strips priced by count** —
+    3, 5, 7, 9, 11 horizontal and 4, 6 vertical, because *"my father can put as
+    many stripes as the client wants, the more stripes the more it costs"*.
+    `PANEL_ROWS` gained `trio` and `top`, both derived from the measured pair
+    rather than invented beside it.
+  - **`hasUpperPanel` in catalog.js.** `panels === 2` was written out in SIX
+    places and would have been wrong in all six the moment a third panelled
+    face existed. One of those six carried a comment asking for exactly this.
+  - **Windows down to two**, חלון מלבני and צוהר אנכי, and **a panel now needs
+    the rectangle**: `panelFits` refuses glazing past 0.62 of leaf height,
+    which is where Peretz's own doors stop having room (seven with panels run
+    to 0.36-0.61; the three past it carry none). The slot is 0.79.
+  - **A `none` lockset**, and `DEFAULTS` is a bare door: no window, no grip, no
+    lock furniture. Whether Peretz will quote one is **ASK-PERETZ §13**, open.
+  - `VERSION` 11 → 12 because two lists were re-cut and the code packs indices.
+    Free today, as 11 was, and for the last time: nothing is deployed and no
+    code has ever reached a customer.
+
+  **And one thing this round did NOT cause, checked rather than assumed.**
+  `npm run latency` is red on the heaviest door — 706 ms against a 600 ms gate.
+  The same tool run against the PREVIOUS commit (`git archive HEAD` into a temp
+  tree, built there, same browser, same minute) measured **701 ms on the same
+  door**. It is the container, and the 66/142 figures this file had been
+  quoting were taken on a healthier one. Recorded in §0c with the method,
+  because the tempting thing to do with a red timing gate is tune the drawing
+  against it. The default door did get lighter: 378 elements to 159.
+
+  **The page.**
+  - **Tiles print what a thing COSTS, not the jump.** `priceParts` in price.js
+    is the one breakdown and `priceAgorot` sums it. The delta was wrong three
+    ways: it read "כלול" on the ₪620 grille you already had, it doubled under
+    you when you chose a sidelight, and it was never a property of the option.
+  - **An undo button**, under the door where the thing it changes is, hidden
+    until there is a step to take back. A stack, not a single previous state —
+    `repair` can change three axes from one tap.
+  - **The room does not change colour with the door.** `.layout[data-light]` is
+    gone: the one job of this screen is comparing colours and a ground that
+    shifts under the swatch makes every comparison a lie.
+  - **`DRAWING_CAVEAT`** — the page and the WhatsApp order both say the drawing
+    is a drawing and the installed door will differ slightly.
 
 - **Fourteen grille tiles collided on their own ids, and it was invisible
   because the pixels came out right by luck.** `grilleGlyph` draws every

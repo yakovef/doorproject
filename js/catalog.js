@@ -148,16 +148,29 @@ export const WINDOWS = [
   { id: 'strip',  he: 'צוהר אנכי',      en: 'Vertical slot',
     doors: ['d113', 'd125'],
     rects: [{ w: 272, h: 1415, top: 205 }] },
+  /* ⚠ TWO SHAPES, DOWN FROM FOUR. `tallwin` (חלון גבוה) and `broad` (חלון רחב)
+     are withdrawn at the owner's son's request: *"in the חלון section, i want
+     there only to be the normal חלון מלבני and the צוהר אנכי."*
+
+     They were real doors — d097 and d128 carry the tall light, d092 and d106
+     the wide one — so this is a decision about the RANGE, not a correction to
+     a mistake. Both ids alias here, onto the rectangle: it is the shape they
+     are nearest to, and the one that leaves room for a panel below.
+
+     ⚠ AND THE SECOND HALF OF THE SAME INSTRUCTION IS A RULE, NOT A DELETION:
+     *"the panel can only work with the normal window, the other one doesnt
+     give enough space, so just make it impossible."* The corpus had already
+     said so and nobody had drawn the line — of the ten glazed doors, the seven
+     with a panel below the glass all have openings 0.36 to 0.61 of leaf
+     height, and the three tallest (d125 at 0.76, d128 at 0.78, d113 at 0.62)
+     carry no panel at all. The slot is 1415 mm on a 2050 leaf: 0.69, past
+     every one of the seven. `rules.js` refuses the pairing now; before, it
+     was left to `appliedFrame` returning an empty string while the price went
+     on charging ₪380 for a panel nobody could see. */
   { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular',
-    aliases: ['square', 'duo'],
+    aliases: ['square', 'duo', 'tallwin', 'broad'],
     doors: ['d108', 'd099', 'd122', 'd116'],
     rects: [{ w: 357, h: 902, top: 185 }] },
-  { id: 'tallwin',he: 'חלון גבוה',      en: 'Tall light',
-    doors: ['d097', 'd128'],
-    rects: [{ w: 357, h: 1415, top: 174 }] },
-  { id: 'broad',  he: 'חלון רחב',       en: 'Wide light',
-    doors: ['d092', 'd106'],
-    rects: [{ w: 425, h: 1025, top: 158 }] },
 ];
 
 /**
@@ -231,9 +244,25 @@ export const HANDLES = [
   { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', len: 0, style: 'grab',
     aliases: ['dee'] },
   /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
-     runs nearly the whole leaf and it is twice as wide as we drew it. */
+     runs nearly the whole leaf and it is twice as wide as we drew it.
+
+     ⚠ `fixed` — THIS IS THE ONE GRIP IN THE RANGE THAT CANNOT BE MOVED.
+     Every other entry here is an object BOLTED to the face: a fitter marks it,
+     drills it, and puts it where the customer asked, so the customer may put
+     it there on screen. A recessed channel is not bolted on, it is CUT — a
+     void pressed into the leaf when the leaf is made, running 0.906 of its
+     height. There is no version of this door with the recess 200 mm to the
+     left, so offering to drag it offers something nobody can build, and a
+     configurator that lets you specify an impossible door is the one failure
+     PLAN.md §0 says the site must not produce.
+     Asked for from outside in exactly those terms: *"another thing ידית שקועה
+     cant be moved, it stays in the normal spot."*
+     Read by `gripAt` (which hands back home whatever the link says), by
+     `armGrip` (which does not arm the drag) and by `repair` (which drops a
+     stale position out of a shared link). One flag, three readers, because a
+     rule enforced only in the interface is a rule a link walks past. */
   { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
-    len: 1780, w: 85, inset: 0.30, style: 'channel', pull: true },
+    len: 1780, w: 85, inset: 0.30, style: 'channel', pull: true, fixed: true },
 
   /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
      the tubes: a wide rectangular ribbon standing off the leaf, catching the
@@ -319,6 +348,42 @@ export const LOCKSETS = [
      of the plates, 22 x 22 mm into them, on every square-backplate door. */
   { id: 'square', he: 'ריבועי', en: 'Square backplates',
     style: 'square', lever: true, lock: true },
+
+  /* ── THE DOOR YOU ARRIVE ON ─────────────────────────────────────────
+     A leaf with no lock furniture on it at all — no lever, no knob, no
+     keyway. Asked for from outside: *"i want that when you open up the app for
+     the first time, you just see a door with nothing, no handle even no
+     keyhole, and then you add things to that."* It is the DEFAULT lockset now,
+     so the first paint is a bare leaf and everything on the door is something
+     the customer put there.
+
+     ⚠ AND IT IS A REAL PRODUCT DECISION, NOT A UI TRICK, WHICH IS WHY IT IS
+     HERE AND NOT A NULL. `state.lockset` is packed into the short code and
+     printed in the order; a door with no lock furniture has to be a thing the
+     catalogue can NAME, or the message goes out with a silence in it and
+     Peretz has to telephone — the one failure PLAN.md §0 forbids. So it says
+     what it means, in the order and on the tile: the door comes prepped and
+     the furniture is not part of it.
+     ⚠ Whether Peretz actually sells a door that way is ASK-PERETZ §13 and it
+     is NOT yet answered. If the answer is no, this entry loses its price and
+     gains a rule refusing it at send time; the id stays either way.
+
+     ⚠ NO `lock` FLAG, AND THAT WAS TEMPTING AND WRONG. `lock: true` means the
+     fitting carries the cylinder on its OWN backplate, so `render` should not
+     draw a separate escutcheon beside it — and setting it here would suppress
+     that escutcheon, which is the behaviour wanted. It would also be a lie in
+     the data: this fitting does not carry a cylinder, it is the absence of
+     one, and `data-carries-lock="true"` on a door with no lock would be read
+     by the next person as "the keyway is on the plate". `style: 'none'` is
+     what suppresses the art, `render` asks for that style by name, and the
+     test asserts ZERO keyways here where it asserts one everywhere else.
+     `gripPlacement` reads the same style to skip the clearance check, so there
+     is no invisible box on the stile for a grip to be refused by either.
+     ⚠ APPENDED. LOCKSETS is packed as an INDEX (4 bits, 9 entries of 16), so
+     adding at the END renumbers nothing. Anywhere else in this list and every
+     code ever read down the telephone would decode into a different door. */
+  { id: 'none', he: 'ללא ידית ומנעול', en: 'No lock furniture',
+    style: 'none' },
 ];
 
 /* ── WITHDRAWN: the glass as its own choice ──────────────────────────
@@ -493,45 +558,87 @@ export const HANDINGS = [
  */
 export const DETAILS = [
   { id: 'plain',  he: 'חלק',            en: 'Plain',              panel: false, groove: false },
+
+  /* ── PANELS ───────────────────────────────────────────────────────
+     A panel on these doors is a strip of moulding laid on the face in a
+     rectangle; the face inside it is the same plane and the same paint as the
+     face outside. See MOULD in renderer.js — getting that wrong is what made
+     one read as "bulging".
+
+     `panels` is HOW MANY and `top` says the topmost one sits in the upper half
+     of the leaf, where glazing would otherwise go. Both are read by
+     `hasUpperPanel`, which is the one question the rules and the drawing ask:
+     can this face carry a window as well? */
   /* `both` — panel AND groove on one leaf — is retired. Counted across the 31
      hand-measured installations, ruled line work and a moulded panel share a
      leaf on exactly ZERO of them: eleven doors carry line work, ten carry a
      panel, and no door carries both. It was a combination we invented and
-     priced at ₪540. Its id resolves here so a link written when it existed
-     still opens a door — the panel, which is the more visible half. */
-  { id: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    panel: true,  groove: false, aliases: ['both'] },
-  { id: 'groove', he: 'חריץ אנכי',      en: 'Vertical groove',panel: false, groove: true  },
-  /* The designed tier's signature, and we had it backwards. Of the seven
-     measured doors with line work on the face, only two are milled grooves;
-     four are APPLIED metal strips — polished stainless, brushed steel, pale
-     brass — reading 1.1 to 2x BRIGHTER than the paint, not darker. Drawing
-     those as a recessed shadow is the single easiest way to render this tier
-     wrong. Counts observed: 3, 7 and 11 strips. */
-  { id: 'strips', he: 'פסי מתכת',       en: 'Metal strips',   panel: false, groove: false, strips: 11 },
+     priced at ₪540.
+     ⚠ AND `groove` AND `perimeter` RESOLVE HERE TOO — the two milled grooves,
+     withdrawn at the owner's son's request: *"in the עיצוב חזית category there
+     are two things that i would like you to delete"*, naming the two entries
+     whose Hebrew begins with חריץ. A groove is the only thing this list ever
+     offered that is CUT rather than APPLIED, and the corpus was never
+     enthusiastic: of the seven measured doors with line work on the face, two
+     are milled and four are applied strips.
+     They alias onto the lower panel rather than onto `plain`, because an alias
+     should substitute for a decision, not delete it. */
+  { id: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    panel: true,  groove: false,
+    aliases: ['both', 'groove', 'perimeter'] },
+  /* The classic two-rectangle face — tall upper, short lower — which d048
+     carries and a single bottom-quarter panel cannot describe. */
+  { id: 'panel2', he: 'שני פאנלים',     en: 'Two panels',     panel: true,  groove: false,
+    panels: 2, top: true },
+  /* ⚠ THE UPPER RECTANGLE ALONE. Asked for from outside: *"add an option of
+     only the top panel"*. Every panelled option in this list used to put
+     something at the FOOT of the leaf, so a face with a single high panel and
+     a bare plinth below it was not expressible. */
+  { id: 'panelTop', he: 'פאנל עליון',   en: 'Upper panel',    panel: true,  groove: false,
+    panels: 1, top: true },
+  /* ⚠ AND THREE. Asked for as *"an option of three panels, its the 2 panels,
+     and another one in the middle"* — so it is the pair's envelope, 0.07 to
+     0.92 of the leaf, with the same 0.08 gap, split three ways instead of two.
+     The rows themselves are in PANEL_ROWS beside the pair they are derived
+     from, not here: this file says WHAT a door can be and the renderer says
+     where the metal goes. */
+  { id: 'panel3', he: 'שלושה פאנלים',   en: 'Three panels',   panel: true,  groove: false,
+    panels: 3, top: true },
+
+  /* ── APPLIED STRIPS ───────────────────────────────────────────────
+     The designed tier's signature, and we had it backwards at first. Of the
+     seven measured doors with line work on the face, only two are milled
+     grooves; four are APPLIED metal strips — polished stainless, brushed
+     steel, pale brass — reading 1.1 to 2x BRIGHTER than the paint, not darker.
+     Drawing those as a recessed shadow is the single easiest way to render
+     this tier wrong. Counts observed in the corpus: 3, 7 and 11.
+
+     ⚠ THE RANGE IS NOT THE CORPUS, AND THAT IS THE POINT OF THIS BLOCK.
+     Reported from outside: *"my father can put as many stripes and however the
+     client wants, so put a couple of more designs with stripes, the more
+     stripes, the more it costs."* So the three counts the photographs happen
+     to contain are a sample of what has been built, not a price list — the
+     product is "strips, this many". Five counts horizontal, two vertical, each
+     priced by its own count in js/prices.js rather than by a flat DETAIL fee.
+     ⚠ If Peretz wants a count that is not here, the answer is another row in
+     this list and another line in `prices.js`, appended at the END. It is not
+     a number the customer types: every option has to be a thing the short code
+     can name and the order can print. */
   { id: 'strips3',he: 'שלושה פסים',     en: 'Three strips',   panel: false, groove: false, strips: 3 },
-  /* The classic two-panel face — tall upper, short lower — which d048 carries
-     and a single bottom-quarter panel cannot describe. Solid leaves only. */
-  { id: 'panel2', he: 'שני פאנלים',     en: 'Two panels',     panel: true,  groove: false, panels: 2 },
-  /* The strips run BOTH ways and we drew one. `strips` and `strips3` are
-     horizontal — d078's eleven bands settled that in an earlier round — but
-     five doors (d034 d037 d038 d040 d043) run them up the leaf instead, and a
-     customer picking "metal strips" for one of those got the other axis with
-     no warning. Vertical strips are fewer and longer: three or four, in the
-     half of the leaf away from the lock. */
+  { id: 'strips5',he: 'חמישה פסים',     en: 'Five strips',    panel: false, groove: false, strips: 5 },
+  { id: 'strips7',he: 'שבעה פסים',      en: 'Seven strips',   panel: false, groove: false, strips: 7 },
+  { id: 'strips9',he: 'תשעה פסים',      en: 'Nine strips',    panel: false, groove: false, strips: 9 },
+  /* Eleven is d078's own count, and it keeps the id `strips` it has always
+     had — the plain name for what used to be the only strip option. */
+  { id: 'strips', he: 'אחד עשר פסים',   en: 'Eleven strips',  panel: false, groove: false, strips: 11 },
+  /* The strips run BOTH ways and we drew one. The counts above are horizontal
+     — d078's eleven bands settled that in an earlier round — but five doors
+     (d034 d037 d038 d040 d043) run them up the leaf instead, and a customer
+     picking "metal strips" for one of those got the other axis with no
+     warning. Vertical strips are fewer and longer: three or four, in the half
+     of the leaf away from the lock. */
   { id: 'stripsv', he: 'פסים אנכיים',   en: 'Vertical strips', panel: false, groove: false, strips: 4, vertical: true },
-  /* A groove scribed round the leaf, a hand's breadth in from every edge —
-     d004 at 0.023 of the leaf's width and d031 at 0.021, so the inset here is
-     their mean. On both of them it is the ONLY thing on the face, and the
-     catalogue had nothing remotely like it: all the other line work runs
-     across the leaf or up it, so `npm run corpus` derived both doors as three
-     horizontal metal strips and stood them beside photographs of a plain leaf
-     with a rectangle scribed round it.
-     ⚠ APPENDED, deliberately. `DETAILS` is indexed by position in the short
-     code, so inserting anywhere else would renumber every entry after it and
-     cost a VERSION bump; adding at the END leaves every existing index alone.
-     The field is four bits — sixteen — and this is the eighth. */
-  { id: 'perimeter', he: 'חריץ היקפי',  en: 'Perimeter groove',
-    panel: false, groove: false, perimeter: 0.022 },
+  { id: 'stripsv6', he: 'שישה פסים אנכיים', en: 'Six vertical strips',
+    panel: false, groove: false, strips: 6, vertical: true },
 ];
 
 /**
@@ -660,6 +767,24 @@ export const byId = (list, id) =>
  * will change one of them. It was computed in three.
  */
 export const leafGlazed = state => byId(WINDOWS, state.window).rects.length > 0;
+
+/**
+ * Does this face put a panel in the UPPER half of the leaf?
+ *
+ * The one question the rules and the drawing both ask about a panelled face,
+ * because the upper half is where glazing goes: a door cannot have both.
+ *
+ * ⚠ IT USED TO BE WRITTEN OUT AS `d.panels === 2`, IN SIX PLACES. That was
+ * true while `panel2` was the only face with anything up there — and it stopped
+ * being true the moment `panelTop` and `panel3` were added, in six places at
+ * once, silently, with the symptom being a window drawn straight through a
+ * moulding. A predicate with a name is what stops the seventh from being
+ * missed; the comment beside one of those six even said so, asking for it to
+ * be read off `panels` "so a third panelled face added later is covered
+ * without anybody remembering to come back here". It was read off `panels`
+ * being exactly 2, which is the one form of that test that does not scale.
+ */
+export const hasUpperPanel = detail => !!detail.top || detail.panels >= 2;
 
 /**
  * The narrowest side OPENING that can carry a copy of the leaf's window, in

@@ -16,7 +16,8 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES,
+         hasUpperPanel, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
@@ -262,34 +263,32 @@ const RET_HEAD = 148;  // the soffit — the deepest of the three, and by a lot
 const MULLION  = 22;
 export const REBATE = 50;   // frame rebate: how far the leaf sits inside the opening
 
-/* ── THE ALCOVE: A SECOND, OUTER OPENING ────────────────────────────
-   The wall steps forward around the door, so the casing sits at the back of a
-   shallow recess rather than flat against a plane of plaster that runs to the
-   edge of the screen. It is the single change that makes the drawing read as
-   a PLACE rather than as a door on a background (`REALISM2.md` §D1).
+/* ── THE ALCOVE IS GONE, AND ITS OWN DOCSTRING SAID WHY IT WOULD BE ──────
+   `ALC_SIDE = 160` and `ALC_HEAD = 300` stood here: a second, outer opening
+   stepping the wall forward around the casing, three more mitred trapezoids
+   shading the returns of a shallow recess. `REALISM2.md` §D1 asked for it and
+   it was built in stage D.
 
-   Built from the primitive the frame already proved: three mitred trapezoids,
-   an outer rectangle at the wall face turning back to an inner one. The inner
-   rectangle here is the casing's own outer edge, so the two openings are the
-   same construction at two depths and their mitres agree by geometry.
+   Reported from outside, looking at the page: *"around the door there is like
+   a gray box that frames it"*. That is exactly what it was. The two returns
+   shade to 0.105 and 0.060 of black over a cream wall, so on screen the recess
+   reads not as depth but as a grey rectangle ruled round the door — flat,
+   because a plane you see edge-on at this scale has no perspective to give it
+   away, and the drawing is dead square-on by rule (CLAUDE.md §4).
 
-   ⚠ THESE NUMBERS ARE PROPORTION, NOT MEASUREMENT, AND THAT IS SAID OUT LOUD.
-   Every other depth in this file — CASING 46, RETURN 62, RET_HEAD 148 — came
-   off a photograph. Nothing in research/ shows the wall around one of these
-   doors from far enough back to measure a recess, so these are chosen to sit
-   in the same ratio the frame's own planes do (a soffit roughly twice the
-   jamb return) at a scale that reads at a glance. If a photograph ever shows
-   one, it wins: REALISM.md §6.
+   ⚠ AND ITS OWN COMMENT ADMITTED THE EVIDENCE WAS MISSING. It said, in as
+   many words: *"THESE NUMBERS ARE PROPORTION, NOT MEASUREMENT... Nothing in
+   research/ shows the wall around one of these doors from far enough back to
+   measure a recess."* Every other depth in this file — CASING 46, RETURN 62,
+   RET_HEAD 148 — came off a photograph; these two were picked to look right.
+   REALISM.md §6 governs, and it says a thing tuned by eye against nothing
+   loses to a photograph. There is no photograph, so it loses to nothing at
+   all: the wall is a wall.
 
-   The alcove's outer edge falls OUTSIDE the natural viewBox — `casX0` is
-   exactly `PAD.x`, so a 160 mm return starts 90 mm to the left of the drawing's
-   own box. That is deliberate and harmless: `fitStage` widens the viewBox to
-   the stage's shape and always ends up far wider than the natural one, so on
-   the page the whole recess shows. In `?bare=1` — the harness, which keeps the
-   natural box — the outer edge is clipped, and the harness is looking at the
-   LEAF, which is 178 mm further in. */
-const ALC_SIDE = 160;  // the recess's return, each side, at the wall face
-const ALC_HEAD = 300;  // its soffit — the plane you look up into, so deeper
+   What carries the depth instead is what always did — the frame's three
+   returns, which ARE measured, plus the cast shadow the casing throws onto the
+   plaster. Those say the door is set back from the wall without asserting a
+   room nobody photographed. */
 
 /* The reveal profile, read outward from the leaf. Every works photograph has
    these three bands and the renderer had none of them: it went straight from
@@ -430,29 +429,62 @@ const BAR_GAP_MIN = 0.090;
    `len` is 0.33 of leaf width, measured tip to tip across six doors: d051
    0.371, d062 0.375, d067 0.308, d068 0.321, d070 0.306. It was 0.30, the
    bottom of that range. The 1:15 slenderness was already right. */
-const GRAB = { fromTop: 0.59, len: 0.33, ratio: 1 / 15 };
-const THRESHOLD    = 42;   // a real sill is a chunky extrusion, ~0.02 H, not a strip
-/**
- * The sill's own colour, and it is NOT the door's.
- *
- * It was `darken(paint, 0.30)` — a dark version of whatever the leaf is
- * painted — and the photographs say a threshold is a bare aluminium extrusion
- * with a tone of its own. Measured on the twelve metal sills in the records,
- * as `frame.threshold.tone x colour.lum`:
- *
- *   leaf lum   43  56  86 101 104 118 166 172 175 185
- *   sill lum  150  76 180 136 155 160  99 100 131  43
- *
- * Scattered, and flat: the sill does not track the leaf. Median 131 of 255,
- * and the ratio to the leaf runs from 0.23 on a white door to 3.47 on a dark
- * one — which is the same statement read the other way round.
- *
- * `darken(paint, 0.30)` gave a black door a sill at luminance 18 where the
- * corpus says 130, so the brightest object at the foot of the drawing was
- * missing from every dark door we make — and most of them are dark.
- * Neutral, faintly warm, and left alone by the paint.
- */
-const SILL_METAL   = '#87857F';   // luminance 133
+/* ⚠ `len` IS MILLIMETRES NOW, NOT A FRACTION OF LEAF WIDTH, and that is what
+   makes this fitting checkable at all.
+   It was 0.33 W. The six measured doors — 0.371 0.375 0.308 0.321 0.306 — are
+   all standard-width leaves, so a fraction and a constant fit that data
+   equally well, and 0.33 x 850 IS 280. But `handleFootprint` is handed the
+   leaf's HEIGHT and not its width, so the box the placement rules budget for
+   the bow had to be a hardcoded 320 — right on a standard leaf, 50 mm out on a
+   narrow one and 50 the other way on a wide one. A footprint that is a
+   constant for an object that is not is CLAUDE.md §5 item 10 exactly: the
+   rules were checking a box the drawing had stopped drawing.
+   And a grab bar is a manufactured product. Peretz buys a 280 mm bar; he does
+   not buy a third of a door. The constant is the truer model as well as the
+   checkable one. */
+const GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15 };
+/* Where the bow's metal actually starts and stops, measured out from the
+   grip's axis, which is its OUTBOARD tip. `grabHandle` draws exactly this and
+   `handleFootprint` reports exactly this — one statement, two readers. */
+const GRAB_D = GRAB.len * GRAB.ratio;      // the shaft's diameter, 18.7 mm
+
+/* ── THERE IS NO SILL DRAWN AT THE FOOT OF THE DOOR, AND THAT IS MEASURED ──
+   `THRESHOLD = 42` used to stand here — a 42 mm extrusion drawn as a bright
+   aluminium bar with four black flutes and four white catches ruled along it,
+   full width, at the exact height a viewer's eye lands. Reported from outside
+   as a horizontal line across the bottom of the door that the photographs do
+   not have.
+
+   They do not. `frame.threshold.present` across the thirty measured records:
+
+     present  16   d003 d004 d012 d015 d026 d029 d030 d034
+                   d043 d048 d063 d064 d072 d087 d099 d106
+     absent   14   d016 d022 d031 d038 d051 d078 d092 d097
+                   d108 d113 d116 d122 d125 d128
+
+   Not even half, and the records for the absent ones say the same thing in
+   fourteen different hands: "the leaf closes onto a 4 px dark line and then
+   straight onto the stone floor tiles" (d113), "a 2 px black gap, then a raw
+   grey screed strip" (d116), "only a 3 px dark line between" (d128).
+
+   And where one IS present it is nothing like what we drew. `h_h`, its height
+   as a fraction of leaf height: 0.006 0.006 0.006 0.007 0.012 0.014 0.015
+   0.016 0.019 0.019 0.027 0.028 0.035 0.036 0.038 0.050. Median 0.0175 — on a
+   2050 mm leaf, 36 mm — but the SHAPE is a flat strip, and eight of the
+   sixteen are under 0.016. We drew the 87th percentile of a feature that is
+   absent from half the corpus, and then ruled eight lines along it.
+
+   So the leaf now runs to the floor and the frame's own returns carry the
+   depth, exactly as they do at the jambs. `baseY` is `floorY`: the foot of the
+   leaf and the line of the floor are one line, which is what a door standing
+   on the ground looks like. The frame is nearer the viewer than the leaf and
+   says so through the same three trapezoids it uses at the head, so the recess
+   reads at the foot without a single ruled line. CLAUDE.md §4: a fold between
+   two lit surfaces is a change of VALUE, not a line.
+
+   ⚠ Do not put a strip back without a photograph. That is REALISM.md §6, and
+   this is the fourth thing in this file that was drawn as ink where the
+   corpus has a change of value. */
 
 /* The backplate that carries lever and cylinder together — the fitting on
    three of the four doors we could measure. Waisted, not a plain stadium:
@@ -502,6 +534,81 @@ const PAD = { x: 70, top: 110, bottom: 300 };
    and this repo photographs the page as part of its test suite. Pick the
    smallest number the measurement supports. */
 const SCENE = 8000;
+
+/* ── THE ROOM STANDS STILL WHILE THE DOOR CHANGES SIZE ──────────────────
+   Reported from outside, and it is the clearest statement of the fault in the
+   whole log: *"the door doesnt need at all times to take all of the frame, i
+   dont want the frame to change when i am changing door size, the things that
+   are near the door dont get moved, only the door changes size."*
+
+   What it was doing. Every coordinate below used to be laid out from the top
+   left corner of the drawing — `x0 = PAD.x + CASING + RETURN`, `y0 = PAD.top +
+   CASING + RET_HEAD`, and then `floorY = y0 + leafH`. So the head of the
+   opening was nailed to the top of the picture and THE FLOOR MOVED DOWN when
+   you chose a taller door, which is upside down: a door grows towards the
+   lintel, not into the ground. And the picture's own box grew with the door,
+   so `fitStage` — which scales that box to the stage — scaled everything back
+   down again. Measured on the three widths: a 1100 mm door and an 800 mm door
+   came out within a few pixels of the same drawn width, and the wall, the
+   floor line and the sconces slid about instead.
+
+   Two numbers fix it, and both are constants rather than functions of the
+   door:
+
+     BASE_Y   where the floor is. Every door stands on it.
+     MID_X    the centre line of the opening. Every door is centred on it.
+
+   They are computed from the LARGEST door the catalogue can make, so the fixed
+   scene is big enough to hold any of them with the same air around it — which
+   is why a standard door no longer fills the frame, and should not. The tall
+   door is the one that fills it.
+
+   ⚠ THE NATURAL viewBox STAYS TIGHT TO THE DOOR, and that is deliberate. Bare
+   mode (`?bare=1`) is the measurement harness, and `npm run profile` samples
+   PIXELS off a rendered leaf: framing every door inside the tall-and-wide
+   scene would hand a narrow door a third fewer pixels to measure and read as a
+   change in the drawing. CLAUDE.md §8 has this exact bruise already — a
+   headline left off the bare-mode hide list cost a false 5.2% regression for
+   the same reason. So `render` emits BOTH boxes: `viewBox` is the door's own
+   tight box, and `data-fit-*` is the fixed scene `fitStage` crops to. */
+const SCENE_MAX = (() => {
+  let openW = 0, leafH = 0;
+  for (const s of Object.values(SIZES)) {
+    const lw = s.w - REBATE * 2;
+    const sw = s.side ? s.side - REBATE : 0;
+    openW = Math.max(openW, lw + (sw ? sw + MULLION : 0));
+    leafH = Math.max(leafH, s.h - REBATE);
+  }
+  return { openW, leafH };
+})();
+/* Laid out so the fixed scene starts at (0, 0), which keeps every number in
+   the drawing positive and the `data-fit-*` rect trivial to read. */
+const MID_X  = PAD.x + CASING + RETURN + SCENE_MAX.openW / 2;
+/* THE FOURTH RETURN — the floor inside the opening.
+   The frame turns back from the wall at the two jambs and at the head, and it
+   does the same thing at the foot: the leaf stands `RETURN` deep behind the
+   plaster, so the floor runs back from the wall line to the leaf's foot and
+   you are looking down at that strip. Drawing it is what makes the door read
+   as set INTO the wall at its base rather than pasted onto it, and it is what
+   replaces the ribbed sill — the fourth trapezoid of a construction that
+   already had three, rather than a new object with a new tone.
+   The frame's own depth, not a fourth invented number: RET_HEAD is 148 because
+   the head was measured off photographs, and no photograph in research/ shows
+   the floor inside one of these openings. Where there is no measurement, the
+   thing the frame is actually made of wins. */
+const FLOOR_RUN = RETURN;
+const BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
+/** The crop the page fits to: the same rectangle for every door in the range. */
+const STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
+/* How far out from the centre line each wall light stands. Derived, so it
+   cannot drift from the door: the casing of the WIDEST door in the range, plus
+   280 mm of plaster. That keeps the old spacing — the lamps used to sit 480 mm
+   outside a standard door's casing — while making it one number for every
+   size instead of a function of the door beside them. It falls outside
+   STAGE_BOX, as it always has: the lamps show because `fitStage` widens the
+   crop to the stage, and in bare mode they are cropped away, which is what the
+   measurement harnesses want. */
+const SCONCE_OUT = SCENE_MAX.openW / 2 + RETURN + CASING + 280;
 
 /**
  * One value, escaped for an XML attribute.
@@ -645,17 +752,35 @@ export function render(state) {
   const sideW = size.side ? size.side - REBATE : 0;
   const totalW = leafW + (sideW ? sideW + MULLION : 0);
 
-  // Left edge of the leaf opening; returns and casing sit outside it.
-  const x0 = PAD.x + CASING + RETURN;
-  const x1 = x0 + totalW;
-  const y0 = PAD.top + CASING + RET_HEAD;
-  const floorY = y0 + leafH;
+  /* ANCHORED TO THE FLOOR AND TO THE CENTRE LINE, never to the corner of the
+     picture — see SCENE_MAX above. The floor does not move and the opening
+     does not slide sideways, so choosing a taller door raises its head and
+     choosing a wider one grows it about its own middle, which is what happens
+     to a doorway. */
+  const floorY = BASE_Y - FLOOR_RUN;       // where the LEAF meets the ground
+  const y0     = floorY - leafH;           // ...so the head rises for a tall door
+  const x0     = MID_X - totalW / 2;       // left edge of the leaf opening
+  const x1     = x0 + totalW;
 
+  /* THE DOOR'S OWN TIGHT BOX, which is what a harness in bare mode gets, and
+     what `usedDefs` and the backdrop measure their overspill from. The page
+     never sees it: `fitStage` reads `data-fit-*` and crops to STAGE_BOX. */
   const view = {
-    w: x1 + RETURN + CASING + PAD.x,
-    h: floorY + THRESHOLD + PAD.bottom,
+    x: x0 - RETURN - CASING - PAD.x,
+    y: y0 - RET_HEAD - CASING - PAD.top,
+    w: totalW + (RETURN + CASING + PAD.x) * 2,
+    h: leafH + FLOOR_RUN + RET_HEAD + CASING + PAD.top + PAD.bottom,
   };
   const y = aff => floorY - aff;
+
+  /* THE BACKDROP IS ONE RECTANGLE FOR EVERY DOOR IN THE RANGE. It used to be
+     painted from `-SCENE` to `view.w + SCENE`, i.e. off the door's own box, so
+     a wider door moved the wall's right-hand edge 250 mm further out. Nothing
+     could see it — SCENE is 8000 — but the whole point of the anchored scene
+     is that the room is not a function of the door, and a quantity that has no
+     business varying should not be written as if it might. */
+  const farX = STAGE_BOX.x - SCENE, farW = STAGE_BOX.w + SCENE * 2;
+  const farY = STAGE_BOX.y - SCENE, farH = STAGE_BOX.h + SCENE * 2;
 
   /* The frame, named once. Every plane of the opening is one of these lines,
      and having them as names rather than as arithmetic repeated eleven times
@@ -666,11 +791,11 @@ export function render(state) {
   const casX0 = revX0 - CASING;         // the casing's outer edge, left
   const casX1 = revX1 + CASING;         //   "                     right
   const casY0 = revY0 - CASING;         //   "                     top
-  const baseY = floorY + THRESHOLD;     // where every vertical meets the floor
+  /* Where the WALL meets the floor. The leaf meets it `FLOOR_RUN` further
+     back, at `floorY`, which is the whole of the depth cue at the door's foot
+     now that the sill is gone. See the long note where THRESHOLD was defined. */
+  const baseY = BASE_Y;
   const openW = totalW + RETURN * 2;    // the opening, wall face to wall face
-  const alcX0 = casX0 - ALC_SIDE;       // the recess at the wall face, left
-  const alcX1 = casX1 + ALC_SIDE;       //   "                          right
-  const alcY0 = casY0 - ALC_HEAD;       //   "                          head
 
   const hingeOnLeft = handing.hinge === 'left';
 
@@ -1305,11 +1430,16 @@ export function render(state) {
     <!-- In user space, not bounding-box units: the rect it paints now reaches
          far past the drawing so the wall can fill the screen, and a
          bounding-box vignette would have stretched with it until it did
-         nothing. Anchored on the door instead, so however wide the window is,
-         the falloff stays centred on the thing being looked at. -->
+         nothing.
+         ⚠ Anchored on the FIXED SCENE, not on this door's own box. It used to
+         read view.w / 2, so the falloff's centre and its radius both moved
+         when the customer chose a different size — the one thing the room is
+         now built not to do. STAGE_BOX is the same rectangle for every door in
+         the range, which is exactly what a light in a room is. -->
     <radialGradient id="vignette" gradientUnits="userSpaceOnUse"
-                    cx="${Math.round(view.w / 2)}" cy="${Math.round(view.h * 0.44)}"
-                    r="${Math.round(Math.max(view.w, view.h) * 0.62)}">
+                    cx="${Math.round(STAGE_BOX.x + STAGE_BOX.w / 2)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.44)}"
+                    r="${Math.round(Math.max(STAGE_BOX.w, STAGE_BOX.h) * 0.62)}">
       <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
       <stop offset="1"    stop-color="#000" stop-opacity="${LIGHT.vignette}"/>
     </radialGradient>
@@ -1398,20 +1528,28 @@ export function render(state) {
          statement of what the room is made of, and it is the same rule the
          frame's own arris follows: a fold between two lit surfaces is a
          change of VALUE, not a colour of its own. -->
-    <linearGradient id="alcSoffit" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.055"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.135"/>
-    </linearGradient>
-    <!-- The two returns shade at different rates, which is what a 90° turn in
-         light coming from one side actually does — and it is the only thing
-         left saying which side the key is on once the planes are neutral. -->
-    <linearGradient id="alcNear" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.045"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.105"/>
-    </linearGradient>
-    <linearGradient id="alcFar" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.020"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.060"/>
+    <!-- ⚠ alcSoffit, alcNear and alcFar were here — the alcove's three shaded
+         planes. Deleted with it; see the note where ALC_SIDE was defined. Left
+         in place they would have been pruned by usedDefs and cost nothing,
+         which is exactly why a dead def is worth deleting: the next person to
+         read this block would have gone looking for the recess they
+         describe. -->
+
+    <!-- The floor inside the opening, and the KEY IS ABOVE AND IN FRONT, so
+         this plane is the most shaded thing in the picture: it is floor, under
+         a door, inside a reveal, with the leaf itself between it and the light.
+         First cut ran 0.28 to 0.07 and came out the BRIGHTEST band at the foot
+         of the door — a lit step under a dark leaf, which is the one reading
+         that destroys the depth this plane exists to give. Measured off the
+         render: the strip sat at luminance 205 against 188 for the open floor
+         a hand's width in front of it. It has to be darker than the floor it
+         runs into, not lighter, or the eye puts it in front.
+         Darkest hard against the leaf, where the door shades its own
+         threshold, lifting towards the open floor at the wall line. -->
+    <linearGradient id="retFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.46"/>
+      <stop offset="0.55" stop-color="#000" stop-opacity="0.30"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.17"/>
     </linearGradient>
 
     <!-- ⚠ THIS REPLACES A RULED LINE, and that is the whole point of it.
@@ -1446,8 +1584,8 @@ export function render(state) {
       <stop offset="1"    stop-color="#000"/>
     </linearGradient>
     <mask id="floorFade" maskUnits="userSpaceOnUse"
-          x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="900">
-      <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="900"
+          x="${farX}" y="${baseY}" width="${farW}" height="900">
+      <rect x="${farX}" y="${baseY}" width="${farW}" height="900"
             fill="url(#floorFadeG)"/>
     </mask>
     <filter id="floorBlur" x="-8%" y="-8%" width="116%" height="116%">
@@ -1502,26 +1640,34 @@ export function render(state) {
          exact symptom and had no route that produced it. The page survives
          losing its stylesheet in every other respect — the phone link and both
          WhatsApp links still work — so the room should survive it too. -->
-    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-          height="${baseY + SCENE}" fill="var(--wall, #F5F3EF)"/>
-    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}"
-          height="${view.h - baseY + SCENE}" fill="var(--floor, #E6E2DA)"/>
+    <rect x="${farX}" y="${farY}" width="${farW}"
+          height="${baseY - farY}" fill="var(--wall, #F5F3EF)"/>
+    <rect x="${farX}" y="${baseY}" width="${farW}"
+          height="${farY + farH - baseY}" fill="var(--floor, #E6E2DA)"/>
     <!-- Tiled rather than one filtered rect. A feTurbulence over a surface
          this size is a large offscreen buffer for a 7% texture; the pattern
          stitches, so it costs one tile. -->
-    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-          height="${view.h + SCENE * 2}"
+    <rect x="${farX}" y="${farY}" width="${farW}" height="${farH}"
           fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
 
     <!-- ── the sconces, and their light on the plaster ──────────────
-         Painted BEFORE the alcove, so the recess's own shading sits on top of
-         the cone rather than being washed out by it — a light thrown across a
-         wall does not brighten the inside of a recess it is beside.
+         ⚠ STOOD OFF THE FIXED SCENE, not off this door's casing. They used to
+         hang 320 mm outside the alcove's outer edge, alcX0 and alcX1 —
+         so a sidelight door pushed both wall lights 190 mm further apart and
+         a narrow one drew them in. Two lamps that move when you change the
+         door are the same fault the anchored scene exists to remove, and the
+         alcove they were measured from is gone. Placed midway between the
+         casing of the WIDEST door in the range and the edge of the scene, so
+         they never crowd a wide door and never drift.
          pointer-events is left alone: these are inside #backdrop, which
          nothing on the page reaches for, and only the vignette ever had to
          disclaim them because it covers the handle. -->
-    ${[alcX0 - 320, alcX1 + 320].map(sx => {
-      const sy = casY0 + (baseY - casY0) * 0.24;   // about a third up the wall
+    ${[MID_X - SCONCE_OUT, MID_X + SCONCE_OUT].map(sx => {
+      /* ⚠ And their HEIGHT is off the scene too, not off `casY0`. A tall door
+         lifts its own casing 300 mm, and with `casY0` in this line both lamps
+         rose with it — the wall fittings climbing the wall because the door
+         beside them got taller. About a third up from the floor, always. */
+      const sy = STAGE_BOX.y + (baseY - STAGE_BOX.y) * 0.24;
       return `<rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
                     fill="var(--wall, #F5F3EF)"/>
               <rect x="${sx - 30}" y="${sy}" width="60" height="150" rx="6"
@@ -1532,46 +1678,42 @@ export function render(state) {
                        ry="${(baseY - sy - 150) / 2}" fill="url(#sconceGlow)"/>`;
     }).join('')}
 
-    <!-- ── the alcove: the wall steps forward around the door ───────
-         Three mitred trapezoids from the recess's outer rectangle back to the
-         casing, exactly as #frame turns from the casing back to the leaf.
-         No fill of their own — the wall rect above is already the right
-         colour, and these only say how much light each plane catches. -->
-    <path d="M ${alcX0} ${alcY0} H ${alcX1} L ${casX1} ${casY0} H ${casX0} Z"
-          fill="url(#alcSoffit)"/>
-    <path d="M ${alcX0} ${alcY0} L ${casX0} ${casY0} V ${baseY} H ${alcX0} Z"
-          fill="url(#alcNear)"/>
-    <path d="M ${alcX1} ${alcY0} L ${casX1} ${casY0} V ${baseY} H ${alcX1} Z"
-          fill="url(#alcFar)"/>
-    <!-- ⚠ THERE WAS A WHITE CATCH LINE ALONG THE RECESS'S HEAD HERE, AND IT
-         WAS DRAWN WHERE NOTHING CAN SEE IT. alcY0 is casY0 - ALC_HEAD =
-         110 - 300 = -190, i.e. 190 units ABOVE the natural viewBox — and
-         fitStage only ever WIDENS the crop, so the visible y range is 0..h at
-         every size and every stage shape. Measured across all six sizes at
-         four stage aspect ratios: the head is out of frame in twenty-four
-         cases out of twenty-four. The line cost bytes on every door and
-         painted nothing, and the comment above it claimed it was a light
-         catch a viewer could see.
-         The recess reads through its two returns and the sliver of soffit
-         that does show below y=0 — which is how a doorway photographed from
-         two metres reads as well, with its lintel out of frame. Deleted
-         rather than moved: the only visible fold left is the vertical one at
-         each side, and a white line ruled down THAT is the drawn arris this
-         file has already removed twice. -->
+    <!-- ⚠ THE ALCOVE WAS DRAWN HERE — three mitred trapezoids stepping the
+         wall forward around the casing — AND IT IS GONE. See the long note
+         where ALC_SIDE and ALC_HEAD used to be defined: it was reported from
+         outside as "a gray box that frames it", which is what a shaded plane
+         seen dead square-on becomes, and its own docstring already recorded
+         that its two depths were the only ones in this file not taken off a
+         photograph. -->
 
     <!-- Where the wall meets the floor. See floorFall: this is the ruled
          line that used to be here, replaced by the change of value a fold
          between two lit surfaces actually makes. -->
-    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}" height="1100"
+    <rect x="${farX}" y="${baseY}" width="${farW}" height="1100"
           fill="url(#floorFall)"/>
   </g>
 
-  <!-- ── cast shadow: soft pool plus a hard contact line ──────── -->
+  <!-- ── cast shadow: the soft pool the whole assembly throws ─────
+       ⚠ THE HARD CONTACT LINE THAT USED TO BE HERE IS GONE, and taking it out
+       is half of removing the line at the foot of the door. It ruled black at
+       0.42, thirteen units tall, across the casing's full width at the wall's
+       floor line. That was right while the leaf stopped at that same line: one
+       object, one place where it touches the ground.
+       It is not one line any more. The leaf stands FLOOR_RUN behind the wall,
+       so there are two candidate lines 62 units apart, and drawing both gave
+       the foot of every door a pair of parallel dark rules — the complaint
+       that started this, doubled. Measured off the render at 4x: the leaf's
+       own foot, then a bright strip, then a band at luminance 122 against 163
+       for the floor five pixels below it.
+       So the door touches the ground in ONE place, which is where the leaf is,
+       and that shadow is drawn inside #frame on top of the floor return it
+       falls on. Here the casing's own meeting with the floor is carried by
+       value alone: retFloor ends at 0.17 of black and floorFall starts at
+       0.20, so the two planes meet within three hundredths and no line is
+       needed to say where. -->
   <g id="shadow">
     <ellipse cx="${(x0 + x1) / 2}" cy="${baseY + 40}"
              rx="${totalW * 0.6}" ry="34" fill="#000" opacity="0.18" filter="url(#softShadow)"/>
-    <rect x="${casX0}" y="${baseY - 3}" width="${openW + CASING * 2}" height="13"
-          fill="#000" opacity="0.42" filter="url(#contact)"/>
   </g>
 
   <!-- ⚠ EVERYTHING THE FLOOR REFLECTS IS INSIDE THIS GROUP, and nothing else
@@ -1610,8 +1752,42 @@ export function render(state) {
          actually projects to. It used to be three rectangles stacked in the
          hope that a line drawn on top would suggest the corner. -->
     <path d="M ${revX0} ${revY0} H ${revX1} L ${x1} ${y0} H ${x0} Z" fill="url(#soffit)"/>
-    <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${baseY} H ${revX0} Z" fill="url(#retNear)"/>
-    <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${baseY} H ${revX1} Z" fill="url(#retFar)"/>
+    <!-- ⚠ THE JAMBS NOW MITRE INTO THE FLOOR, not into a butt joint at the
+         bottom edge of the picture. They used to run straight down to the
+         wall's floor line, which was right while the leaf also stopped there.
+         It does not: the leaf is FLOOR_RUN further back, so the jamb return's
+         inner edge stops at the leaf's foot and its outer edge carries on to
+         the wall's line, and the diagonal between them is the same real mitre
+         the head has. Butt joints at this corner are what put a hard line
+         across the top of each jamb the last time (see CASING). -->
+    <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${floorY} L ${revX0} ${baseY} Z"
+          fill="url(#retNear)"/>
+    <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${floorY} L ${revX1} ${baseY} Z"
+          fill="url(#retFar)"/>
+    <!-- ── THE FLOOR INSIDE THE OPENING ────────────────────────────
+         The fourth plane of the reveal, and the one that used to be a ribbed
+         aluminium bar. It is FLOOR, so it takes the floor's own colour from
+         the same variable the backdrop uses — and then one black overlay says
+         how much light it catches, which is the rule every plane in this
+         drawing obeys (CLAUDE.md §4). Darkest against the leaf, where the door
+         shades its own threshold, lifting to the open floor at the wall line.
+         Mitred to both jambs by construction: its two top corners are the
+         jambs' leaf-foot corners and its two bottom corners are their
+         wall-line corners, so the four planes share four edges and no line is
+         drawn to suggest a corner. -->
+    <path d="M ${x0} ${floorY} H ${x1} L ${revX1} ${baseY} H ${revX0} Z"
+          fill="var(--floor, #E6E2DA)"/>
+    <path d="M ${x0} ${floorY} H ${x1} L ${revX1} ${baseY} H ${revX0} Z"
+          fill="url(#retFloor)"/>
+    <!-- ⚠ AND THE CONTACT SHADOW WHERE THE LEAF ACTUALLY TOUCHES THE GROUND.
+         #shadow draws one at the WALL's floor line and #shadow is painted
+         BEFORE #frame, so the plane above covers it: the leaf came to rest on
+         a clean bright strip with no shadow under it at all, which reads as a
+         door floating a centimetre off the floor. This is the same object
+         #shadow draws, at the line the leaf is actually on, on top of the
+         plane it falls on. -->
+    <rect x="${x0}" y="${floorY - 3}" width="${totalW}" height="12"
+          fill="#000" opacity="0.5" filter="url(#contact)"/>
 
     <!-- NO DRAWN ARRIS WHERE THE CASING TURNS INTO THE RETURN. There were two
          — one down each jamb, the paint darkened 0.55, at full opacity on a
@@ -1639,26 +1815,12 @@ export function render(state) {
     <g id="reveal">${reveal}</g>
   </g>
 
-  <!-- ── threshold ────────────────────────────────────────────── -->
-  <g id="threshold">
-    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
-          height="${THRESHOLD}" fill="${SILL_METAL}"/>
-    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
-          height="4" fill="#fff" opacity="0.18"/>
-    <!-- Ribbed, because every sill in the photographs is: an extruded
-         aluminium threshold with four or five flutes running its length,
-         each catching a line of light. One flat bar reads as a painted
-         step. -->
-    ${Array.from({ length: 4 }, (_, i) => {
-      const ry = floorY + 7 + i * ((THRESHOLD - 9) / 4);
-      return `<rect x="${x0 - RETURN + 4}" y="${ry}"
-                    width="${totalW + RETURN + RETURN - 8}" height="2"
-                    fill="#000" opacity="0.30"/>
-              <rect x="${x0 - RETURN + 4}" y="${ry + 2}"
-                    width="${totalW + RETURN + RETURN - 8}" height="1.4"
-                    fill="#fff" opacity="0.22"/>`;
-    }).join('')}
-  </g>
+  <!-- ⚠ #threshold WAS HERE — a 42 mm aluminium bar with four black flutes and
+       four white catches ruled along it, full width, at the height a viewer's
+       eye lands. It is gone; the frame's floor return above does the work.
+       The measurement that settled it is written out where THRESHOLD used to
+       be defined: fourteen of the thirty measured records have no sill at all,
+       and the sixteen that do run a median 0.0175 of leaf height. -->
 
   ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${
       /* A SIDELIGHT is glass by definition — that is the whole product, and
@@ -1690,7 +1852,7 @@ export function render(state) {
                               paint, edge, grille, key: 's',
                               leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
               + (detail.panel
-                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, false, 0, 's')
+                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, null, 0, 's')
                   : '');
           })()
       : win.rects[0] && sideW > 320
@@ -1707,7 +1869,7 @@ export function render(state) {
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
     ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
-        detail.panels === 2, 0, 'm',
+        hasUpperPanel(detail) ? panelRows(detail) : null, 0, 'm',
         openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null) : ''}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint, detail.perimeter) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
@@ -1729,8 +1891,13 @@ export function render(state) {
   <g id="hardware">
     ${gripArt(handle, handleX, handleY, leafH, leverDir, paint,
               centreX, leafW, y0, panelled && place.rot !== 90, place.rot)}
-    ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
-    ${lockset.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
+    ${locksetArt(lockset, lockX, y(lockAff(lockset)), leverDir)}
+    ${/* No separate escutcheon when the fitting carries its own cylinder —
+          and none either when there is no lock furniture at all, which is the
+          door the page opens on. Asked of the STYLE rather than of a `lock`
+          flag on the bare entry: see its note in catalog.js for why giving it
+          one would have been a lie in the data that happened to draw right. */''
+      }${lockset.lock || lockset.style === 'none' ? '' : cylinder(lockX, y(CYLINDER_AFF))}
   </g>
 
   </g><!-- /#door -->
@@ -1775,15 +1942,30 @@ export function render(state) {
        drawn last and covers the whole scene, so without this it swallowed
        every pointer event on the stage — the handle could not be picked up at
        all, and nothing in the console said why. -->
-  <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-        height="${view.h + SCENE * 2}" fill="url(#vignette)" pointer-events="none"/>
+  <rect x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+        fill="url(#vignette)" pointer-events="none"/>
 `;
 
+  /* ⚠ TWO BOXES, AND THEY ARE NOT THE SAME BOX.
+
+     `viewBox` is the door's OWN box, tight around this door with PAD of air —
+     which is what `?bare=1` and every measurement harness gets, and why a
+     narrow door still fills the frame there and keeps its pixels.
+
+     `data-fit-*` is STAGE_BOX, the fixed scene, identical for every door in
+     the range. `fitStage` in app.js crops to it, so on the page the scale is a
+     constant: the wall, the floor line and the sconces hold still and only the
+     door changes size. Four numbers rather than two, because the fixed scene's
+     origin is not this door's origin — a wide door and a narrow one have
+     different `viewBox` x, and centring the crop on `w / 2` (which is what
+     fitStage did while there was only one box) would have re-introduced the
+     drift from the other end. */
   return `
-<svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
+<svg viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint)}"
-     data-fit-w="${view.w}" data-fit-h="${view.h}"
+     data-fit-x="${STAGE_BOX.x}" data-fit-y="${STAGE_BOX.y}"
+     data-fit-w="${STAGE_BOX.w}" data-fit-h="${STAGE_BOX.h}"
      aria-label="${xmlAttr(describe(state))}" xmlns="http://www.w3.org/2000/svg">
   <defs>${usedDefs(defs, body)}</defs>
 ${body}
@@ -2068,7 +2250,41 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
    the drawing below and `faceObstacles`, which has to know where a moulding is
    without rendering one. Written down twice they would drift, and the thing
    that would drift is where a customer may stand a handle. */
-const PANEL_ROWS = { pair: [[0.07, 0.58], [0.66, 0.92]], lone: [0.68, 0.90] };
+/**
+ * Where a panelled face puts its rectangles, as fractions of leaf height.
+ *
+ * `pair` is measured off d048 and is the classic: a tall upper over a short
+ * lower, 0.08 of gap between them, the whole composition running 0.07 to 0.92.
+ *
+ * `trio` AND `top` ARE DERIVED FROM `pair`, NOT INVENTED BESIDE IT. Asked for
+ * from outside as "an option of three panels, its the 2 panels, and another
+ * one in the middle" and "an option of only the top panel" — so both keep the
+ * pair's envelope and the pair's gap, and only the division changes. The
+ * trio's heights run 0.30, 0.23, 0.16: the same tall-to-short fall the pair
+ * has, one step longer. Nothing here is a new measurement and it should not
+ * become one without a photograph (REALISM.md §6).
+ */
+const PANEL_ROWS = {
+  pair: [[0.07, 0.58], [0.66, 0.92]],
+  trio: [[0.07, 0.37], [0.45, 0.68], [0.76, 0.92]],
+  top:  [[0.07, 0.58]],
+  lone: [0.68, 0.90],
+};
+
+/**
+ * The rows THIS face wants — one statement, read by the drawing, by the
+ * obstacle list a grip is placed against, and by the catalogue glyph.
+ *
+ * All three used to name PANEL_ROWS.pair directly, guarded by `panels === 2`.
+ * That is right while there is exactly one multi-panel face and wrong in three
+ * places at once the moment there are three of them. See `hasUpperPanel` in
+ * catalog.js for the same lesson from the other side.
+ */
+const panelRows = detail =>
+  detail.panels >= 3 ? PANEL_ROWS.trio
+  : detail.panels === 2 ? PANEL_ROWS.pair
+  : detail.top ? PANEL_ROWS.top
+  : [PANEL_ROWS.lone];
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm',
                       alignTo = null) {
   const band = MOULD_BAND;     // the same stock that goes round a pane
@@ -2095,13 +2311,21 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
   const rect = (t, b, n) =>
     moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `p${key}${n}`);
 
-  /* The classic two-rectangle face, which is what nearly every designed door
-     in the gallery carries. Only on a solid leaf: with glazing above there is
-     nowhere for the upper one. */
-  if (upper && winBottom <= ly + 1) {
-    return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * PANEL_ROWS.pair[0][0]).toFixed(1)}"
+  /* ANY FACE WITH A PANEL IN THE UPPER HALF: the classic pair, the three-panel
+     face, or the upper rectangle on its own. Only on a solid leaf — with
+     glazing above there is nowhere for the top one, which is why `upper` is
+     `hasUpperPanel(detail)` at the call site and why `rules.js` refuses the
+     pairing before it ever gets here.
+     ⚠ `upper` IS THE ROWS NOW, not a boolean. It was `true` meaning "draw the
+     pair", and `data-panels="2"` was written out as a literal beside it — so a
+     three-panel door would have drawn two panels and then labelled itself
+     correctly, which is the worst of both. The count comes off the array it
+     actually drew. */
+  if (upper && upper.length && winBottom <= ly + 1) {
+    return `<g data-detail="panel" data-panels="${upper.length}"
+               data-top="${(ly + lh * upper[0][0]).toFixed(1)}"
                data-band="${band.toFixed(1)}">${
-      PANEL_ROWS.pair.map(([t, bt], n) => rect(t, bt, n)).join('')}</g>`;
+      upper.map(([t, bt], n) => rect(t, bt, n)).join('')}</g>`;
   }
 
   const top = Math.max(ly + lh * PANEL_ROWS.lone[0], winBottom + lw * 0.08);
@@ -2224,8 +2448,12 @@ export const faceObstacles = memo(function faceObstacles(state) {
       ? Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND)
       : leafW * PANEL_INSET;
     const winBottom = openings.length ? Math.max(...openings.map(o => o.top + o.h)) : 0;
-    const rows = detail.panels === 2 && !openings.length
-      ? PANEL_ROWS.pair
+    /* `hasUpperPanel`, not `panels === 2` — see its docstring in catalog.js.
+       The rows themselves come from `panelRows`, which is the one statement of
+       where a panelled face puts its metal; this used to name PANEL_ROWS.pair
+       directly and would have drawn a two-panel door for a three-panel one. */
+    const rows = hasUpperPanel(detail) && !openings.length
+      ? panelRows(detail)
       : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
     for (const [t, b] of rows) {
       const r = { kind: 'panel', x: inset, y: leafH * t,
@@ -2264,6 +2492,25 @@ export function panelFits(state) {
   const openings = apertureLayout(byId(WINDOWS, state.window), leafW);
   if (!openings.length) return true;
   const winBottom = Math.max(...openings.map(o => o.top + o.h));
+  /* ⚠ THE GLASS HAS TO STOP HIGH ENOUGH, AND "not literally zero" IS NOT HIGH
+     ENOUGH. The two lines below ask whether `moulding` would draw ANYTHING —
+     whether the rectangle left over is bigger than the stock that goes round
+     it — and that is a drawing question, not a door question. Under the
+     vertical slot it says yes to a panel 157 mm tall where the lone panel's
+     own row is 451: a sliver of moulding jammed against the sill, drawn,
+     charged ₪380 for, and not a panel.
+     Reported from outside: *"the panel can only work with the normal window,
+     the other one doesnt give enough space, so just make it impossible."*
+     The corpus had already drawn the line and nobody had read it off. Of the
+     ten glazed doors, the SEVEN with a panel below the glass have openings
+     running to 0.36-0.61 of leaf height, and the THREE that run past that —
+     d113 at 0.62, d125 at 0.76, d128 at 0.78 — carry no panel at all. So 0.62
+     is not a tolerance picked to exclude the slot; it is where Peretz's own
+     doors stop having room, and the slot (0.79) is well past it.
+     ⚠ Stated as a FRACTION of leaf height, so a tall door gets the same
+     judgement as a standard one rather than a different one for free. */
+  const GLASS_STOPS_BY = 0.62;
+  if (winBottom > leafH * GLASS_STOPS_BY) return false;
   const top = Math.max(leafH * PANEL_ROWS.lone[0], winBottom + leafW * 0.08);
   const bottom = leafH * PANEL_ROWS.lone[1];
   const inset = Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND);
@@ -2327,7 +2574,18 @@ function gripHomeUncached(state) {
      d062, d067, d068, d070 and d077 is 0.59 of leaf height. It used to be a
      constant inside the drawing, which is why the bar could not be dragged. */
   const homeY = handle.style === 'grab' ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
-  const raw0 = { x: backset + standoff, y: homeY, rot: 0 };
+  /* ⚠ AND THE BOW'S OWN DEFAULT X, which used to be the drawing's business.
+     `grabHandle` centred it on the leaf no matter what it was handed; now it
+     draws where it is told, so the centring has to happen HERE, where a
+     default belongs. Every installed grab bar in the corpus is centred, so
+     that is what a customer who touches nothing gets — and unlike before, the
+     rules and the drawing now agree that that is where it is.
+     The axis is the bow's outboard tip and it runs GRAB.len inboard, so
+     centred on a leaf means half the leftover on each side. */
+  const homeX = handle.style === 'grab'
+    ? (leafW - GRAB.len) / 2
+    : backset + standoff;
+  const raw0 = { x: homeX, y: homeY, rot: 0 };
   /* AND IT HAS TO BE A PLACE THE GRIP CAN ACTUALLY STAND.
      The arithmetic above is a good guess and not a proof: it works in x, where
      it was derived, and says nothing about y. `barHalf` shortens a bar on a
@@ -2425,11 +2683,19 @@ export function gripCanRotate(state) {
   return long > 0 && long <= leafW - EDGE_FLAT * 2;
 }
 
+/** Is this grip cut into the leaf rather than bolted onto it? */
+export const gripIsFixed = state => !!byId(HANDLES, state.handle).fixed;
+
 /** The grip's position for this design: the customer's, or its home. */
 export function gripAt(state) {
   const home = gripHome(state);
   const g = state.grip;
-  if (!g) return home;
+  /* ⚠ A FIXED GRIP HAS ONE POSITION AND IT IS NOT NEGOTIABLE. The recessed
+     channel is cut into the leaf, not screwed to it; see its catalogue entry.
+     Answered HERE rather than only in the interface, because the position also
+     arrives down a link as `gp=` — and a rule that only the page enforces is a
+     rule a shared link walks straight past (CLAUDE.md §3, rules.js). */
+  if (!g || byId(HANDLES, state.handle).fixed) return home;
   const rot = g.rot === 90 && gripCanRotate(state) ? 90 : 0;
   return { x: g.x, y: g.y, rot };
 }
@@ -2530,12 +2796,40 @@ export function gripPlacement(state, place = null) {
      both standoffs were comfortably on the leaf and the bar between them was
      not. The feet are inboard of the ends by design — that is what `fix.t`
      is — so they can never answer this question. */
-  const half = handleFootprint(handle, leafH, gripPanelled(state, p)).vy;
+  const foot = handleFootprint(handle, leafH, gripPanelled(state, p));
+  const half = foot.vy;
   const cx = hingeLeftOf(state) ? leafW - p.x : p.x;
   const lo = p.rot === 90 ? cx - half : p.y - half;
   const hi = p.rot === 90 ? cx + half : p.y + half;
   const span = p.rot === 90 ? leafW : leafH;
   if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad('הידית חורגת מהדלת');
+
+  /* ⚠ AND THE OTHER AXIS, WHICH NOTHING WAS CHECKING AT ALL.
+     The block above measures the grip along its LONG axis — down the leaf when
+     it stands up, across when it lies down — and that is all it measures. The
+     short axis was left to the feet loop below, which works for a bar (its
+     bosses are the widest thing on it) and does not work for anything whose
+     footprint is not symmetric about its own axis. The horizontal bow is the
+     case: it has no feet we can place at all, `gripFeet` returns [] for it by
+     design, and it reaches GRAB.len inboard of the point it is drawn from. So
+     nothing in this function knew whether it was on the door, and the drawing
+     silently shortened it against a hinge stop rather than saying so.
+     Written in `p.x` — inboard from the CLOSING edge — because that is the
+     axis `out` and `in` are named for, and the leaf runs 0..leafW in it too.
+     A grip lying down is symmetric about its axis by construction, so its
+     extent is its half length either way. */
+  const gx0 = p.rot === 90 ? p.x - foot.vy : p.x - foot.out;
+  const gx1 = p.rot === 90 ? p.x + foot.vy : p.x + foot.in;
+  if (gx0 < EDGE_FLAT || gx1 > leafW - EDGE_FLAT) {
+    return bad('הידית חורגת מהדלת');
+  }
+  /* The same interval read from the leaf's LEFT edge, which is the space the
+     aperture layout and the feet are written in. Two coordinate systems for
+     one leaf is not ideal, but they are both already here and the conversion
+     is one line; deriving it from `gx0`/`gx1` rather than repeating the
+     footprint arithmetic is what keeps them from drifting apart. */
+  const cgx0 = hingeLeftOf(state) ? leafW - gx1 : gx0;
+  const cgx1 = hingeLeftOf(state) ? leafW - gx0 : gx1;
 
   /* AND AT A HEIGHT SOMEBODY COULD REACH.
      Measured, from the ten installed doors carrying a pull bar: the bar's
@@ -2572,7 +2866,20 @@ export function gripPlacement(state, place = null) {
      0.55 and not 0.50: on a narrow leaf a blade grip beside an Almog
      swan-neck has to stand 355 mm in, which is past the middle of a 700 mm
      leaf, and refusing that pairing outright is not this rule's business. */
-  if (p.rot === 0 && p.x > leafW * 0.55) return bad('ידית משיכה לא מותקנת בצד הצירים');
+  /* ⚠ AND NOT THE HORIZONTAL BOW, which is not a vertical pull and never was.
+     This rule is about where you put a bar you HAUL ON: past the centre line
+     there is no leverage, and no installation in the corpus has one there.
+     The grab bar is the other thing entirely — a bow you steady yourself with,
+     lying across the leaf, centred on it in every one of the nine installed
+     examples. Its `x` is its outboard TIP, so "past 0.55 of the leaf" is where
+     a centred 280 mm bow's tip sits on a narrow leaf as a matter of course.
+     Applied to it, this rule refused the bar's own home position — and,
+     together with the lockset clearance below, left it with no legal x at all
+     on a standard leaf with a lever. Its horizontal extent is checked by the
+     whole-object rule above now, which is the honest question to ask of it. */
+  if (p.rot === 0 && handle.style !== 'grab' && p.x > leafW * 0.55) {
+    return bad('ידית משיכה לא מותקנת בצד הצירים');
+  }
 
   for (const f of feet) {
     if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT
@@ -2596,7 +2903,6 @@ export function gripPlacement(state, place = null) {
   const backset = lockBackset(handle, lockset);
   const lockX = hingeOnLeft ? leafW - backset : backset;
   const grip = handleFootprint(handle, leafH);
-  const gw = p.rot === 90 ? grip.vy : Math.max(grip.out, grip.in);
   const gh = p.rot === 90 ? Math.max(grip.out, grip.in) : grip.vy;
   /* The same arithmetic `gripStandoff` places the grip with, asked as a
      question — so the position it chooses is by definition one this accepts.
@@ -2612,8 +2918,20 @@ export function gripPlacement(state, place = null) {
      end shoe against that cylinder. It is `data-hw="lock"` in the drawing, so
      `npm run collide` would have said so too, on a leaf size the sweep did not
      happen to visit — which is why WIDE is in that sweep now. */
-  const locks = [{ y: leafH - HANDLE_AFF, inward: lock.in, vy: lock.vy }];
-  if (!lockset.lock) {
+  /* ⚠ `lockAff`, not HANDLE_AFF. The keyway-only lockset is drawn 116 mm lower
+     than a lever is, and this line said it was at lever height — so on those
+     doors the rule was clearing a box that is not where the object is. That is
+     CLAUDE.md §5's whole family: one quantity, two places, and the one nobody
+     is looking at goes stale. It reads the same function the drawing does. */
+  /* ⚠ A LEAF WITH NO LOCK FURNITURE HAS NOTHING HERE TO CLEAR, and the empty
+     list is the honest way to say so. Left as a zero-size box at the backset
+     it would still bind through `BAR_GAP_MIN` below — 76 mm of clearance
+     demanded around an object that is not on the door — and the customer would
+     be refused a grip position for touching nothing. The bare door is the one
+     the page opens on, so this is the commonest state there is. */
+  const locks = lockset.style === 'none' ? []
+    : [{ y: leafH - lockAff(lockset), inward: lock.in, vy: lock.vy }];
+  if (locks.length && !lockset.lock) {
     locks.push({ y: leafH - CYLINDER_AFF, inward: LOCK_R, vy: LOCK_R });
   }
   /* LOCK_CLEAR of air VERTICALLY as well as across. Without it a grip laid
@@ -2629,10 +2947,50 @@ export function gripPlacement(state, place = null) {
      0.090 on the closest of the ten installed doors that carry both.
      Only where the two are at the same HEIGHT. A bar dropped to the foot of
      the door has no argument with a lever 800 mm above it. */
+  /* ⚠ AND ACROSS THE DOOR IT IS AN OVERLAP OF TWO INTERVALS, NOT A DISTANCE
+     BETWEEN TWO CENTRES.
+     This used to compare `Math.abs(cx - lockX)` against `L.inward + gw +
+     LOCK_CLEAR`, where `gw` was `Math.max(grip.out, grip.in)` — the grip's
+     widest reach in EITHER direction, applied as though it stood on both sides
+     of its own axis. The comment above already admits the sin ("a symmetric
+     box around an asymmetric footprint") and it was only half-fixed: the
+     asymmetry was put into the footprint and never read back out here.
+     For a lever, out 40 and in 152, the error is a lenient 112 mm nobody
+     noticed. For the horizontal bow, which reaches 290 mm inboard and 4 mm
+     outboard, it demanded 290 mm of clearance on the side the bar is not on —
+     so on a standard leaf with a lever the bar had to stand past x = 562 while
+     the hinge-side rule refused anything past 467. No overlap, and every
+     position the customer tried came up red. Reported as *"the מאחז אופקי
+     doesnt want to be placed at places that are normal"*.
+     Both objects are now written as intervals inboard from the closing edge,
+     the way both are actually drawn, and they clash when the intervals
+     overlap. The floor at BAR_GAP_MIN of the leaf's width stays — that is the
+     tightest gap anyone actually installs, measured on the ten doors carrying
+     both — but it is applied as a gap between the two BOXES rather than
+     between their centres, which is the quantity it was measured as. */
+  const lockOut = handleFootprint(lockset, leafH).out;
   for (const L of locks) {
     const meet = Math.abs(p.y - L.y) < gh + L.vy + LOCK_CLEAR;
-    const clear = Math.max(L.inward + gw + LOCK_CLEAR, leafW * BAR_GAP_MIN);
-    if (meet && Math.abs(cx - lockX) < clear) return bad('הידית נוגעת במנעול');
+    if (!meet) continue;
+    /* Both in closing-edge coordinates: the lock's own box, and the grip's. */
+    const lo0 = backset - lockOut, lo1 = backset + L.inward;
+    if (gx0 < lo1 + LOCK_CLEAR && gx1 > lo0 - LOCK_CLEAR) {
+      return bad('הידית נוגעת במנעול');
+    }
+    /* ⚠ AND BAR_GAP_MIN IS AXIS TO AXIS, NOT BOX TO BOX. Folding it into the
+       overlap test above as a wider gap looked tidier and refused 602 designs
+       that `gripStandoff` had just placed — including the DEFAULT Idan bar on
+       a standard leaf, whose home is at exactly 185 mm from the lock axis and
+       whose boxes are exactly LOCK_CLEAR apart, because that is the number
+       `gripStandoff` solved for. Two different quantities: LOCK_CLEAR is air
+       between two drawn objects, BAR_GAP_MIN is how close a fitter puts the
+       two CENTRES, measured at 0.090 of leaf width on the closest of the ten
+       installed doors carrying both. `gripStandoff` floors the axis distance
+       and this asks the same question, so the position it chooses is by
+       construction one this accepts — which is the property that broke. */
+    if (Math.abs(p.x - backset) < leafW * BAR_GAP_MIN) {
+      return bad('הידית נוגעת במנעול');
+    }
   }
 
   /* AND THE SHAFT DOES NOT CROSS THE GLASS.
@@ -2646,8 +3004,12 @@ export function gripPlacement(state, place = null) {
      8 mm proud while the bar is 50 mm off the door on its standoffs. That is
      the same depth argument that lets a bar cross a moulded panel on d087 and
      d122, and it is why this reads `o` rather than the obstacle list. */
+  /* ⚠ AN INTERVAL OVERLAP HERE TOO, for the same reason as the lockset above:
+     this asked `Math.abs(cx - paneCentre) < gw + o.w / 2` with `gw` the grip's
+     widest reach in either direction, which puts the horizontal bow's 290 mm
+     on BOTH sides of its axis and refuses panes it is nowhere near. */
   for (const o of apertureLayout(byId(WINDOWS, state.window), leafW)) {
-    if (Math.abs(cx - (o.x + o.w / 2)) < gw + o.w / 2
+    if (cgx0 < o.x + o.w && cgx1 > o.x
         && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
       return bad('הידית חוצה את החלון');
     }
@@ -4140,7 +4502,19 @@ function handleFootprint(handle, leafH, panelled = false) {
        other fitting, and its default height is set in `gripHome` instead. It
        had one while the drawing pinned it to the mid rail whatever the rules
        said, which is the same fact that stopped it being draggable. */
-    case 'grab':    return { out: 26, in: 320, vy: 26 };
+    /* ⚠ ASYMMETRIC ABOUT ITS AXIS, AND THE AXIS IS THE OUTBOARD TIP.
+       This read `{ out: 26, in: 320 }` — 320 being the bow's whole length on a
+       standard leaf, because the drawing centred the bar on the LEAF and the
+       axis it was handed landed near the outboard end of it by accident. Two
+       things were wrong with that. The number was hardcoded for one leaf width
+       while the bar was 0.33 W (see GRAB, where `len` is millimetres now); and
+       `gripPlacement` took `Math.max(out, in)` as a symmetric half-width, so
+       it demanded 320 mm of clearance on the LOCK side of a bar that extends
+       away from the lock — which is how the grab bar ended up with no legal
+       position at all on a standard leaf carrying a lever.
+       The bow now starts at its axis and runs GRAB.len inboard, and this says
+       exactly that. `npm run collide -- boxes` checks it against the art. */
+    case 'grab':    return { out: 4, in: GRAB.len + 10, vy: 26 };
     /* ⚠ `vy` IS A REACH FROM THE AXIS, not half a height, and for these four
        the two are not the same number. `cy` is the LEVER SPINDLE and it sits
        0.30 down a backplate, so the plate hangs 0.70 of its height below the
@@ -4322,9 +4696,15 @@ export function gripClashesLockset(state) {
      hinge edge to put a bar in?
 
      Both measured inboard from the closing edge. */
+  /* ⚠ AND THE BOW DOES NOT GIVE UP LENGTH ANY MORE, so the question is not
+     "is there room for a bar of some usable length" but "is there room for
+     THE bar". `grabHandle` used to shorten itself against a hinge stop when
+     clearing the lock pushed its far post past the stile — silently, and
+     without telling `handleFootprint`, which went on reporting the full
+     length. GRAB.len is a product Peretz buys, not a variable, so the drawing
+     draws all of it and this refuses the pairing when it will not fit. */
   const clearOf = lockBackset(handle, byId(LOCKSETS, state.lockset)) + lock.in + LOCK_CLEAR;
-  const GRAB_MIN = 180;                       // a bow shorter than this is not a grab bar
-  return leafW - 45 - clearOf < GRAB_MIN;
+  return leafW - EDGE_FLAT - clearOf < GRAB.len;
 }
 
 /**
@@ -4335,14 +4715,50 @@ export function gripClashesLockset(state) {
  * so the tests can assert the two positions rather than infer them.
  */
 export function lockBackset(handle, lockset) {
-  const grip = handleFootprint(handle, 2000);
-  const base = grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
+  /* ⚠ ONE BACKSET FOR EVERY DOOR. THE GRIP NO LONGER MOVES IT.
+     This read `grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP :
+     LOCK_BACKSET` — 49 mm where a bar shares the stile, 60 where it does not.
+     Both are real: a fitter DOES set the lock further out to make room for a
+     bar, measured at 0.057 of leaf width against 0.070.
+
+     It is still the wrong thing for a configurator to do with them. Reported
+     from outside: *"the keyhole always stays at the same place, it doesnt move
+     a pixel, even if the main handle changes. because now, it changes place
+     slightly if i change the main handle."* Tapping between two grips slid the
+     keyhole 11 mm across the door — a third thing moving that the customer had
+     not touched, on the one fitting they are most likely to be staring at.
+
+     WHICH ONE, and this was not the obvious answer. Measured over all thirty
+     records with a lock position, as `min(x, 1-x)` of leaf width:
+
+       0.046 0.053 0.053 0.055 0.055 0.055 0.055 0.060 0.061 0.063
+       0.065 0.065 0.065 0.069 0.069 0.070 0.070 0.071 0.079 0.079
+       0.080 0.081 0.085 0.090 0.094 0.099 0.130 0.146 0.151 0.182
+
+     Pooled median 0.0695 — 59 mm on an 850 leaf, which is LOCK_BACKSET almost
+     exactly. So the data says 60 and I set it to 60, and then swept the range:
+     22 grip x lockset x size combinations that had been buildable stopped
+     being buildable, because the bar moves inboard with the lock and its feet
+     land on the window moulding 11 mm sooner. `repair` resolves those by
+     REMOVING THE PULL HANDLE. Among them: a wide door with the default window,
+     an Idan bar and a Coral lever — pick the lever, lose the bar, with a
+     notice explaining a collision the customer cannot see.
+
+     49 costs 11 mm on a door with no grip, which is 1.3% of a leaf's width and
+     sits inside the measured spread with seven doors below it. 60 costs a
+     mainstream door its handle. The interface loses to the door.
+
+     `handle` stays in the signature: every caller passes it, the tests assert
+     through it, and the day this drawing has an installation note to render,
+     the other measurement is one line away. */
   /* ...but never so close to the closing edge that the fitting hangs off it.
      The Cadoor knob reaches 78 mm outboard and the knob-on-backplate 53, both
-     more than the 49 mm backset a door with a grip uses, so both projected
-     past the leaf's edge. Measured, not assumed: `npm run collide -- boxes`. */
+     more than the backset, so both projected past the leaf's edge. Measured,
+     not assumed: `npm run collide -- boxes`. This one DOES depend on the
+     lockset and must: it is the fitting's own width, not a fitter's
+     preference, and a knob drawn half off the leaf is not a smaller error. */
   const out = lockset ? handleFootprint(lockset, 2000).out : 0;
-  return Math.max(base, out + 10);
+  return Math.max(LOCK_BACKSET_GRIP, out + 10);
 }
 
 /**
@@ -4373,6 +4789,12 @@ const LOCK_ART = {
   /* Cylinder only: the escutcheon IS the lockset. Eight of the ten doors that
      carry a pull bar have exactly this beside it and nothing more. */
   cylinder: (h, g) => cylinder(g.cx, g.cy, true),
+  /* Nothing at all — the bare leaf the page now opens on. It still goes
+     through `locksetArt`, so the door keeps a `data-hw="lockset"` group with a
+     zero footprint: `npm run collide` and the audit both enumerate that
+     attribute, and a fitting that vanishes from the DOM entirely reads to them
+     as a page that failed to draw rather than as a door with no lock. */
+  none: () => '',
 };
 
 function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled, rot = 0) {
@@ -4450,6 +4872,29 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
              data-out="${box.out}" data-in="${box.in}"
              data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
 }
+
+/**
+ * How high off the floor this lock furniture hangs.
+ *
+ * ⚠ IT IS NOT ONE HEIGHT, AND TREATING IT AS ONE MOVED THE KEYHOLE.
+ * Everything with a spindle in it hangs at HANDLE_AFF, because that is where a
+ * hand goes and every measurement in the corpus agrees. `cylinder` has no
+ * spindle: it is the keyway escutcheon and nothing else, the commonest lock
+ * furniture in the whole corpus, and the keyway on every OTHER door in the
+ * range is drawn 116 mm lower at CYLINDER_AFF — by the line directly below the
+ * one that calls this.
+ *
+ * So choosing "keyhole only" used to lift the keyhole 116 mm up the door.
+ * Reported from outside: *"if i choose just the keyhole than it moves up a
+ * lot, and that we cant have happening."* One keyway, one height, whether it
+ * arrives as the lockset or beside it.
+ *
+ * Asked here rather than at the call site so that `data-cy` on the drawn group
+ * — which `npm run collide` and the placement rules both read — is the height
+ * the thing is actually drawn at. A second copy of this decision at the call
+ * site is CLAUDE.md §5 items 10-13 exactly.
+ */
+const lockAff = lockset => lockset.style === 'cylinder' ? CYLINDER_AFF : HANDLE_AFF;
 
 function locksetArt(lockset, cx, cy, dir) {
   const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
@@ -4532,8 +4977,7 @@ function channelHandle(cx, cy, len, leafH, paint) {
  * centred window and `gripFeet` declines to model its feet at all.
  */
 function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
-  const half = (leafW * GRAB.len) / 2;
-  const D = leafW * GRAB.len * GRAB.ratio;          // the shaft's diameter
+  const D = GRAB_D;                                 // the shaft's diameter
   /* ⚠ WHERE IT WAS PUT, not a constant. This read `y0 + leafH * GRAB.fromTop`
      and ignored `cy` altogether, so the one grip a customer is most likely to
      want to move was the one grip that could not move: dragging it wrote a new
@@ -4544,30 +4988,35 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
      after that this draws wherever the handle actually is. */
   const by = cy;                                    // below the lever, mid rail
 
-  /* CENTRED ON THE LEAF, as every installed grab bar is — but pushed toward
-     the hinge when the lock furniture needs the room.
-     `cx` is where `gripStandoff` placed this grip, and by construction that is
-     already at least `lock.in + out + LOCK_CLEAR` from the lock's axis, so it
-     is a position the bar's near end can safely take. Whichever of the two is
-     FURTHER inboard wins: the centred one on a door with a small escutcheon,
-     the standoff on a door with an Almog swan-neck reaching 220 mm across.
+  /* ⚠ AND NOW WHERE IT WAS PUT IN X AS WELL. THIS IS THE FIX FOR THE BUG THE
+     BOW HAS CARRIED SINCE IT WAS DRAWN.
 
-     This is what the withdrawn pull-bar-versus-lever rule used to hide. The
-     vertical bars all move with `gripStandoff`; the bar did not, because it is
-     the one grip centred on the leaf rather than hung off the stile — so it
-     was the single pairing still refused after the rule went. */
-  const span = half - D * 0.9;                      // centre to post centre
-  const centredNear = centreX - dir * span;
-  const near = dir > 0 ? Math.max(centredNear, cx) : Math.min(centredNear, cx);
-  /* ...and never off the hinge edge. If clearing the lock would push the far
-     post past the stile, the bar gives up length rather than position: a short
-     grab bar is a grab bar, one hanging off the door is not. */
-  const hingeStop = centreX + dir * (leafW / 2 - 45);
-  const far = dir > 0 ? Math.min(near + 2 * span, hingeStop)
-                      : Math.max(near - 2 * span, hingeStop);
+     There used to be forty lines here that put the bar back in the middle of
+     the leaf whatever x it was handed — `centredNear = centreX - dir * span`,
+     then `Math.max(centredNear, cx)` — and then, if clearing the lock pushed
+     the far post past the stile, silently SHORTENED it against a `hingeStop`.
+     Both of those are the drawing overruling the position it was given, and
+     nothing downstream knew: `gripPlacement`, `gripFeet` and `handleFootprint`
+     all reason about `cx`, so on every door where the centred position won,
+     the rules were checking a bar 30-50 mm away from the one on screen, of a
+     length they had no way to learn.
 
-  const x0 = Math.min(near, far) - D * 0.9, x1 = Math.max(near, far) + D * 0.9;
-  const L = x1 - x0;
+     Reported from outside as *"the מאחז אופקי doesnt want to be placed at
+     places that are normal"*, and the arithmetic says why it could not be:
+     on a standard leaf with a lever the hinge-side rule refused anything past
+     x = 467 while the lockset rule, budgeting the bow's whole 320 mm as if it
+     stood on both sides of its axis, refused anything nearer than x = 562.
+     Two rules, no overlap, and the drawing quietly drawing something a third
+     rule had already declared impossible.
+
+     So: the grip's axis is the bow's OUTBOARD TIP, it runs GRAB.len inboard
+     from there, and it is drawn there. Being centred on the leaf is what
+     `gripHome` hands back as the DEFAULT — which is what the corpus actually
+     shows, every installed one of them centred — and after that it is the
+     customer's. `centreX`, `leafW` and `y0` are still taken so that the
+     GRIP_ART table stays one shape for every fitting. */
+  const x0 = dir > 0 ? cx : cx - GRAB.len;
+  const L = GRAB.len;
   const P = f => x0 + L * f;                        // along the bar, tip to tip
   const n1 = v => v.toFixed(1);
   const rod = (a, b, hh, rx, fill) => `
@@ -5695,9 +6144,16 @@ export function detailGlyph(detail) {
 
   // appliedFrame: the measured rectangles — a tall upper over a short lower,
   // or the lower one alone when a window takes the top of the leaf
+  /* ⚠ OFF `panelRows`, WHICH IS WHAT THE DOOR DRAWS. This was two hand-written
+     pairs of fractions guarded by `panels === 2`, so the three-panel face and
+     the upper-panel face would both have shown the lone bottom rectangle —
+     three names, two pictures, which is CLAUDE.md §5 item 5 verbatim (nine
+     handle tiles drew the same picture). There is an assertion that every
+     option tile draws its own markup; this keeps it honest by construction
+     rather than by passing. The glyph's rows are inset a hair from the door's,
+     because a tile is 44 px and the outermost moulding would touch its edge. */
   const panels = !detail.panel ? ''
-    : detail.panels === 2 ? panelAt(0.07, 0.57) + panelAt(0.67, 0.91)
-    : panelAt(0.67, 0.91);
+    : panelRows(detail).map(([t, b]) => panelAt(t, b)).join('');
 
   /* metalStrips, both axes. Horizontal: inset a tenth each side, evenly spaced
      0.09–0.91. Vertical: fewer, longer, grouped in one third of the leaf —
