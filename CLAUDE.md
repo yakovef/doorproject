@@ -6,7 +6,9 @@ most valuable — the mistakes that have already been made here, so they are not
 made a third time.
 
 `PLAN.md` is the product plan. `REALISM.md` is the drawing's measurement log
-and the forward plan. `ASK-PERETZ.md` is everything blocked on a human.
+and the forward plan. `RENDER.md` is what the drawing COSTS — element count
+and tap latency, not appearance — and what to change about it. `ASK-PERETZ.md`
+is everything blocked on a human.
 
 **`AGENT.md` is the brief for the recurring agent** that wakes up every five
 hours, forms its own opinion about the site and pushes straight to the live

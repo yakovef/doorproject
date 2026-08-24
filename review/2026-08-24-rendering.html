@@ -198,9 +198,13 @@ td.good { color:var(--ok); font-weight:600; }
 </p>
 
 <p>
-  And the budget is going almost entirely to one thing. <strong>The wrought-iron grille is 1,752
-  of the worst door's 2,175 elements — 81%.</strong> The whole rest of the door — leaf, frame,
-  mouldings, threshold, hardware, shadows, glass — is 423.
+  And the budget is going almost entirely to one thing. <strong>The <code>quatrefoil</code>
+  grille — a column of medallions repeated down the leaf, not the plainer <code>iron</code>
+  option — is 1,752 of the worst door's 2,175 elements: 81%.</strong> The whole rest of the door
+  — leaf, frame, mouldings, threshold, hardware, shadows, glass — is 423. <code>iron</code> is
+  cheap already: <code>grillePaths</code>' own comment calls it "ONE composition, not a
+  repeating pattern" — five bars, a six-link chain, two end caps, none of it scaling with leaf
+  size.
 </p>
 
 <h2>The techniques</h2>
@@ -222,13 +226,24 @@ td.good { color:var(--ok); font-weight:600; }
     <div class="tech__cell"><b>Fit</b>Aimed straight at the 81%</div>
   </div>
   <p class="tech__note">
-    <strong>33× cheaper at identical visual density</strong>, and it strands nothing:
-    <code>collide.mjs</code> interrogates <code>[data-hw]</code>, <code>[data-mount]</code>,
-    <code>[data-pane]</code> and <code>[data-detail]</code> — it never asks an individual grille
-    member for its box. The repo already adopted this reasoning twice, for
-    <code>grainTex</code> and <code>wallTex</code>. <em>Scope limit:</em> only the genuinely
-    periodic families tile — grid, mesh, rings, flutes, quatrefoil, the border. The tree, the
-    scrolls and the arch's crossing arcs are one-off compositions and must stay explicit.
+    <strong>33× cheaper at identical visual density</strong>, and it strands nothing — verified
+    by reading <code>collide.mjs</code> directly: it queries only
+    <code>[data-hw]</code>, <code>[data-mount]</code>, <code>[data-pane]</code>,
+    <code>[data-detail]</code>, <code>[data-relight]</code> and <code>[data-hitpad]</code>, and
+    <code>rules.js</code> only ever asks whether a grille exists, never its shape — neither reads
+    an individual grille member's box.
+  </p>
+  <p class="tech__note" style="border-top:0;padding-top:0">
+    <em>Corrected after reading <code>js/renderer.js</code> line by line:</em> not every grille
+    family is a target. <code>mesh</code> (etched glass) already ships as a
+    <code>&lt;pattern&gt;</code> — its own comment says why: "twelve by fifty-odd cells drawn one
+    at a time is thousands of elements... this is a texture." <code>grid</code>, <code>scroll</code>,
+    <code>deco</code> and <code>arch</code> are already cheap: a handful of lines or one or two
+    hand-placed motifs, none of it scaling with leaf size. <code>iron</code> is explicitly
+    documented in the code as "ONE composition, not a repeating pattern." The one real target in
+    the applied-ironwork family is <code>quatrefoil</code> — a column of <code>n</code> medallions
+    whose count grows with leaf height, each one costing roughly thirty elements. That is the
+    family behind the 81% figure above, and the only one this technique needs to touch.
   </p>
 </div>
 
