@@ -23,6 +23,89 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-24 21:00 UTC — run 30: `npm run profile` fixed — the check was sampling paint texture it was never meant to see, and it is falsifiable now
+
+**Looked at:** four new human commits since run 29 — a photo-crop correction
+(`e2cb53d`, the classical set's measurements had been read off the whole
+rotated photograph rather than a cropped leaf), five more doors put through
+the recreation loop (`7d8d239`), **the exact fix to run 29's `collide -- all`
+finding** (`4631d8a` — see below), and the three-panel face corrected from a
+derived guess to what three photographs actually show (`8f1d7be`). Fast-
+forwarded cleanly. Built (no diff), opened the site at 390×844 and 1440×900,
+clicked through all four sections, then rendered the corrected three-panel
+face and the classical set directly through `?bare=1` query states and looked
+at both — the three-panel face now shows a tall upper panel, a short handle
+plate at hand height with the turned pull across it, and a medium lower
+panel, matching the commit's description; the classical set's shelf and
+casing no longer show any sign of the overlap the fix describes.
+
+**Instruments:** test ✓ (5,158,800) · audit ✓ (no faults) · collide ✓ on
+**both** `all` (1,358 designs) and `boxes` — confirming the human's fix from
+run 29's finding · recreate ✓ (known catalogue gaps only, unchanged) · sheets
+current · **profile ✗ at the start of the run, then fixed** (see below).
+
+**Run 29's `collide -- all` diagnosis was picked up and fixed exactly as
+laid out**, one commit later: `classicSet()`'s individual pieces are tagged
+now (`data-detail="moulding" data-piece="…"`, the outer wrapper carries
+`data-set` instead, which neither reader selects on), closing both the
+false "classic x pane" overlap and the "obstacles the rules believe in and
+the drawing does not" gap. The fix also found two REAL faults the moment the
+instrument could see the pieces — a band declared at the shelf's width while
+the drawing had narrowed it and hung the brackets outside, and the window's
+casing sharing stock with the shelf's corona for 61 mm — neither of which
+this agent could have found, since neither instrument could see the pieces
+well enough to compare them. Confirmed clean by direct re-run, not by
+trusting the commit message: `collide -- all` now reports `faceObstacles
+agrees with the drawing everywhere` and `nothing overlaps anything it should
+not` over 1,358 designs.
+
+**`npm run profile` fixed this run — three runs of documentation (28, 29,
+this one) turned into one small, verified change.** The diagnosis from run 28
+held: `grainTex`/`drift` paint in the SVG's ABSOLUTE coordinate space, so a
+leaf-relative sample point lands on a different phase of the same fixed
+texture depending on where the leaf sits in the scene, which is not what
+either failing check (panel-rate, moulding-bead) is meant to be measuring —
+`npm run mottle` is the dedicated instrument for paint texture, and already
+divides falloff out for exactly this separation. Fixed with one line in
+`tools/profile.mjs`'s shared `draw()` helper: strip
+`[filter="url(#drift)"], [fill="url(#grainTex)"]` from the DOM before every
+screenshot. Numbers, before → after:
+
+    FALLOFF (dark)      worst row 0.070 → 0.056     (tightened, not shifted)
+    panel rate (dark)   ratio 0.48 ✗ → 0.70 ✓        (gate is 0.6–1.6)
+    moulding bead (dark) ratio 1.083 ✗ → 1.019 ✓     (gate is ±3%)
+
+**Verified both directions before trusting it, not just that the numbers
+moved the right way.** FALLOFF tightening rather than moving is the signal
+that noise came out and nothing else changed. Then falsified: temporarily
+dropped `keyWash` from the moulding's own `data-relight` wash — reproducing,
+on purpose, the exact historical bug `profile.mjs`'s own docstring already
+describes (a bead reading an absolute tone instead of tracking the leaf's
+fall) — and the texture-stripped bead check still failed correctly on both
+bands, 1.336 dark and 1.038 light. Reverted immediately; `js/renderer.js` is
+byte-identical to what was pulled, confirmed via `git status`. A check that
+cannot be broken on purpose after being hardened is not hardened, it is
+blind, and I would rather find that out myself than leave it for whoever
+looks next.
+
+**Left alone deliberately:** the third, unconfirmed thing run 29 and the
+human's fix both flagged — whether `footHits`'s "ring with a walkable flat
+middle" treatment, applied to all six classical rows, ever lets a reachable
+customer state place a foot in a spot that's visually occupied (the shelf's
+tablet motif, the set's own pull) — is still open. Tracing `gripHome`'s
+actual reachable positions for `detail: 'classic'` is a different piece of
+work from either fix in this entry and I did not start it this run.
+
+**Also corrected:** `CLAUDE.md` §0c's "Green" list and "Red, and known"
+section both still said `npm run profile` was excluded/red; struck through
+per the section's own established pattern (kept, not deleted, because the
+diagnosis is the useful part) and moved into Green. Test count refreshed to
+5,158,800 throughout.
+
+**Commit:** see below.
+
+---
+
 ## 2026-08-24 16:11 UTC — run 29: the classical set's frame and its window agree in the rules and disagree in the sweep, and both readers turn out to be asking the wrong question
 
 **Looked at:** one substantial human commit since run 28 — the classical set

@@ -143,21 +143,19 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **4,377,785 assertions passing, 0 failed**, no framework, plain
+- `npm test` — **5,158,800 assertions passing, 0 failed**, no framework, plain
   node. It was 3.70M before the classical set and 5.68M before the 24.8
   interface round; the catalogue lists change length and the combinatorial
   sweeps are the product of those lengths, so the total moves with the range in
   both directions. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF ANYTHING. It is
   not a coverage metric — read the failure count.
-- `npm run collide -- boxes` — clean, over **1,346 buildable designs**, real
-  `getBBox` geometry from a browser. ⚠ `-- all` is NOT clean — see "Red, and
-  known": this line previously claimed it was, verified false by re-running it
-  on 24.8 (run 29). Check both flags yourself; do not trust a "clean" claim
-  about `collide` that does not say which of the two it means.
-- `npm run audit`, `npm run recreate`, `npm run sheets` — all clean **on a
-  healthy container**, which is not every container. See "Red, and known"
-  directly below before believing either state. `npm run profile` is NOT
-  in this list — see the same section for why.
+- `npm run collide` — clean on **both** `all` and `boxes`, over **1,358
+  buildable designs**, real `getBBox` geometry from a browser. Check both
+  flags yourself; a "clean" claim about `collide` that does not say which of
+  the two it means has been wrong before (see "Red, and known").
+- `npm run audit`, `npm run recreate`, `npm run profile`, `npm run sheets` —
+  all clean **on a healthy container**, which is not every container. See
+  "Red, and known" directly below before believing any of it.
 - The drawing recreates all 30 measured doors, plus the classical-set door in
   `research/newdoor/` that Peretz installed on 24.8; the order carries the full
   specification, a picture, an unambiguous opening direction, a price and a
@@ -174,29 +172,36 @@ in `AGENT-LOG.md`) and went fully green. **Treat container health as something
 to establish each run.** `AGENT.md` has the one circumstance in which pushing
 with those four red is right, and it still stands for the days it degrades.
 
-**As of the classical-set round the container was healthy** — `npm test`
-**4,377,785 / 0**, `npm run audit` clean, `npm run collide -- boxes` clean,
-`npm run recreate` clean (known catalogue gaps only), sheets current. **And
-`npm run collide -- all` is clean now too**, for the first time — see below;
-that entry is struck through rather than deleted because the diagnosis in it
-is the useful part. One thing is still red, it is measured below, and it is
-not drawing damage: an instrument gap found and traced, not yet closed.
+**As of run 30 the container was healthy and both known reds are cleared** —
+`npm test` **5,158,800 / 0**, `npm run audit` clean, `npm run collide` clean
+on `all` (1,358 designs) and `boxes`, `npm run recreate` clean (known
+catalogue gaps only), sheets current, and `npm run profile` clean — all
+struck through below rather than deleted, because the diagnosis in each is
+the useful part and the pattern (an instrument blind to something, not the
+drawing being wrong) has now repeated twice in two rounds.
 
-- **`npm run profile` red on the dark band, two of its three checks — and it is
-  not the drawing.** The panel-rate and moulding-bead checks (not the primary
-  FALLOFF one, which passes cleanly) both broke at the room-anchoring commit
-  and stayed broken through the three after it. Screenshot of the failing
-  state shows no defect; the leaf's own texture (`grainTex`/`drift`) is
-  painted in the SVG's ABSOLUTE coordinate space rather than the leaf's local
-  one, and the room rework moved the leaf 186×300 units within that space — so
-  the same leaf-relative sample point now lands on a different phase of the
-  same repeating pattern. Proven by ablation (`AGENT-LOG.md`, run 28):
-  disabling the texture moves the ratio from 0.484 (fail) to 0.701 (pass) on
-  the current tree, and to a close 0.933 on the tree before the room rework.
-  **Not fixed yet** — the honest fix is to harden the two checks' sampling
-  the way FALLOFF's own docstring already explains doing once for the same
-  reason, and that needs a wide-enough neighbourhood average verified not to
-  mask a real asymmetry, which is more than a five-hour run should rush.
+- ~~**`npm run profile` red on the dark band, two of its three checks**~~ ✅
+  **fixed in run 30, and it never was the drawing.** `grainTex`/`drift` are
+  painted `patternUnits="userSpaceOnUse"` — the SVG's ABSOLUTE coordinate
+  space, not the leaf's own local one — so a leaf-relative sample point lands
+  on whichever phase of that fixed pattern the leaf's absolute position
+  happens to put it on, and the leaf's absolute position is not what these
+  two checks are about: `npm run mottle` is the instrument for paint
+  unevenness, and it already divides falloff OUT for exactly this reason.
+  `tools/profile.mjs` now strips `[filter="url(#drift)"], [fill="url(#grainTex)"]`
+  from every render before sampling — one line in the shared `draw()` helper,
+  so all three checks measure the SHADING MODEL and not paint texture, which
+  is what the file's own docstring already claimed they did.
+  ⚠ **Verified both ways before trusting it.** FALLOFF tightened rather than
+  moved (worst row 0.070→0.056 dark, 0.090→0.090 light — still comfortably
+  inside tolerance), and both failing ratios cleared with room to spare: panel
+  rate 0.48→0.70 (needs 0.6–1.6), bead 1.083→1.019 (needs ±3%). Then
+  falsified: temporarily dropped `keyWash` from the moulding's own relight —
+  reproducing exactly the historical "bead reads a flat, absolute tone instead
+  of tracking the leaf's fall" bug this file's own docstring describes — and
+  the bead check correctly failed on BOTH bands (dark 1.336, light 1.038),
+  restored byte-identical after. A hardened check that cannot still be broken
+  on purpose is not hardened, it is blinded, and this one is the former.
 - ~~**`npm run collide -- all` red on the classical set**~~ ✅ **fixed in the
   round after run 29 diagnosed it, and the diagnosis was right on all three
   counts.** Both symptoms were TAGGING and one was a real drawing fault:
@@ -1001,6 +1006,36 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **`npm run profile` measures the shading model again, not the paint texture
+  it was never meant to.** Red since the room-anchoring round (§0c, "Red, and
+  known" — struck through, not deleted) on two of its three checks: the
+  panel-rate check and the moulding-bead check, both point-samples at a fixed
+  leaf-relative fraction. `grainTex` and `drift` are `patternUnits=
+  "userSpaceOnUse"`/a `feTurbulence` filter, both painted in the SVG's
+  ABSOLUTE coordinate space rather than the leaf's own, so when the leaf's
+  absolute position in the scene moved 186×300 units, the same leaf-relative
+  sample point landed on a different phase of the same repeating noise —
+  nothing about the PAINT or the SHADING changed, only where in a fixed
+  texture field the leaf happened to sit. `npm run mottle` is the dedicated
+  instrument for paint unevenness and already divides falloff out for exactly
+  this separation of concerns; `profile.mjs` had no equivalent exclusion.
+  Fixed with one line in the shared `draw()` helper — `[filter="url(#drift)"],
+  [fill="url(#grainTex)"]` removed from the DOM before every screenshot —
+  rather than touching the drawing, because REALISM.md §6 governs and a
+  texture phase is not a measured photograph value.
+  ⚠ **Verified both directions, not just that the numbers moved the right
+  way.** FALLOFF tightened (0.070→0.056 worst row, dark) rather than shifting,
+  confirming the fix removes noise rather than changing what is measured; the
+  two failing ratios cleared with margin (panel rate 0.48→0.70 against a
+  0.6–1.6 gate, bead 1.083→1.019 against ±3%). Then FALSIFIED: temporarily
+  dropped `keyWash` from the moulding's own relight, reproducing the exact
+  historical bug this file's docstring already describes — a bead reading an
+  absolute tone instead of tracking the leaf's fall — and the (now
+  texture-stripped) bead check still failed on both bands, 1.336 dark and
+  1.038 light. Reverted, `js/renderer.js` restored byte-identical. A hardened
+  check that cannot be broken on purpose is not hardened, it is blind, and
+  proving the difference is what the falsification is for.
 
 - **Three photographs of the three-panel face, two of the classical set, and a
   standing instruction to look at the striped doors.** Sent in as *"i dont like

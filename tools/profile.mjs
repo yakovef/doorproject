@@ -57,8 +57,32 @@ const p = await b.newPage({ viewport: { width: 700, height: 1200 }, deviceScaleF
 await p.goto(`file://${process.cwd()}/index.html?bare=1`);
 await p.waitForFunction(() => typeof window.__render === 'function');
 
+/* ⚠ THE LEAF'S PAINT TEXTURE IS A CONFOUND HERE, NOT THE SUBJECT.
+   `grainTex` and `drift` are `patternUnits="userSpaceOnUse"` / a `feTurbulence`
+   filter — both painted in the SVG's ABSOLUTE coordinate space, not the
+   leaf's own local one. A leaf-relative sample point therefore lands on
+   whatever phase of that fixed pattern the leaf's absolute position happens
+   to put it on, and the leaf's absolute position is not this file's subject —
+   `npm run mottle` is the instrument for paint unevenness, explicitly
+   dividing OUT the vertical falloff this file measures so the two do not ask
+   the same question twice.
+   This bit while: a scene-anchoring commit moved the leaf 186x300 units
+   within that fixed space with nothing about the PAINT or the SHADING MODEL
+   changing, and the panel-rate and moulding-bead checks below went from
+   passing to failing on numbers that never should have depended on where in
+   the scene the door happens to sit. Traced by ablation (AGENT-LOG.md, runs
+   28-29): disabling grainTex/drift moved the failing ratio from 0.484 to
+   0.701, and the tree from before the room rework from 1.020 to 0.933 —
+   both within tolerance once the confound is gone, and close to each other
+   for the first time.
+   Stripped here rather than in the drawing: nothing about the PAINT is wrong
+   and REALISM.md §6 governs — a texture phase is not a measured photograph
+   value, so there is nothing to re-measure and nothing to fix by eye. */
 const draw = st => p.evaluate(s => {
   document.getElementById('stage').innerHTML = window.__render(s);
+  const svg = document.querySelector('#stage svg');
+  for (const el of svg.querySelectorAll(
+    '[filter="url(#drift)"], [fill="url(#grainTex)"]')) el.remove();
 }, st);
 
 /** Leaf-relative points, carried into screen space through the SVG's own CTM. */
