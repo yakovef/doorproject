@@ -18,6 +18,13 @@
 
 ---
 
+> **`DESIGN-LEVEL.md` is the north-star for the LOOK.** It calibrates the
+> stages below against ten premium product sites (BMW, Rivian, Heart, Atoms…),
+> and carries the three owner decisions this plan now assumes: a webfont online
+> with a system fallback (Assistant), the soft/warm showroom aesthetic, and
+> chrome + the room in scope. Where its numbers are sharper than this file's,
+> it governs the look and this file governs the order and the instruments.
+
 ## 0. The intent, in one paragraph
 
 The door should look **installed** — standing in a quiet, warm entrance a

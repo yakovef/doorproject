@@ -21,6 +21,27 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **`DESIGN-LEVEL.md` — the north-star for the LOOK, calibrated against ten
+  premium product sites.** The owner supplied two batches of style references
+  (dev-tool SaaS, then premium product brands: BMW, Rivian, Heart Aerospace,
+  Atoms, Moving Parts) and asked for a plan to reach their level. The finding:
+  the *interface* can reach BMW/Rivian polish — it is restraint, which is free
+  — but the door is a live SVG drawing and will read as an excellent
+  illustration, never a photograph (`REALISM.md` §3's ceiling), so the level is
+  reached by the ROOM (Stage D) and the chrome, not by faking a photo. Three
+  owner decisions are now assumed by the plans: **a webfont online with a system
+  fallback** (Assistant, a light geometric Hebrew — keeps the README's
+  `file://` three-files promise because the font is an enhancement, never a
+  dependency), **the soft/warm showroom aesthetic** (not the austere BMW/Heart
+  0px-flat look — its restraint taken, its coldness refused), and **chrome + the
+  room** in scope. The file carries the target token palette (warm ink `#1C1A17`
+  not black, `--accent-ink #8A6A3B` at 4.99:1 for accent-as-text, a soft-card
+  shadow, a radius scale) and a type scale whose headline is weight **300** at
+  clamp(34–56px) against today's **weight 600 at clamp(17–22px)** — the single
+  biggest gap, measured in `css/app.css:363`. It calibrates `REALISM2.md`'s
+  stages rather than replacing them; Atoms' champagne `#c8ad86` is noted as
+  nearly our own `--accent #B08D57`, a real brand already using our accent's
+  restraint.
 - **`REALISM2.md` — the plan for the second mockup, written and not yet
   built.** A full-page render arrived from outside; `MOCKUP2.md` is the
   *reading* (what it asks, what it costs, the nine items refused with their
