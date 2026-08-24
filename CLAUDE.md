@@ -143,11 +143,11 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **about 4.0M assertions passing**, no framework, plain node. It
-  was 5.68M before the 24.8 interface round; the catalogue lists changed length
-  and the combinatorial sweeps are the product of those lengths, so the total
-  moves with the range. ⚠ A FALL IN THIS NUMBER IS NOT EVIDENCE OF ANYTHING.
-  It is not a coverage metric — read the failure count.
+- `npm test` — **3,988,350 assertions passing, 0 failed**, no framework, plain
+  node. It was 5.68M before the 24.8 interface round; the catalogue lists
+  changed length and the combinatorial sweeps are the product of those lengths,
+  so the total moves with the range. ⚠ A FALL IN THIS NUMBER IS NOT EVIDENCE OF
+  ANYTHING. It is not a coverage metric — read the failure count.
 - `npm run collide` — clean over **1,224 buildable designs**, real `getBBox`
   geometry from a browser, `all` and `boxes`, including the whole hardware
   rework of 24.8 and `faceObstacles` agreeing with the drawing everywhere. It
@@ -171,13 +171,19 @@ in `AGENT-LOG.md`) and went fully green. **Treat container health as something
 to establish each run.** `AGENT.md` has the one circumstance in which pushing
 with those four red is right, and it still stands for the days it degrades.
 
-As of the 24.8 interface round, on a container that IS degraded:
+**As of the 24.8 interface round the container was healthy and everything is
+green** — `npm test` 3,988,350 / 0, `npm run sheets` completed, `npm run audit`
+clean at all seven viewports, `npm run collide` clean. One thing is still red
+and it is measured below.
 
-- **`npm test` reports 4 failures: the four screenshot families are stale.**
-  True and correct — the page changed and the committed pictures were made from
-  an older one. **Never silence them**, and never stamp a sheet by hand.
+What to know for the days it degrades:
+
+- **When the four screenshot families go stale**, that is true and correct and
+  must never be silenced or stamped by hand.
   ⚠ `js/works.js` can go stale the same way and is NOT one of the four:
-  `node tools/corpus.mjs --quiet` regenerates it with no browser at all. See
+  `node tools/corpus.mjs --quiet` regenerates it with no browser at all. It
+  goes stale whenever the CATALOGUE changes, because each gallery door's state
+  is derived from its own record against the current option lists. See
   `AGENT.md`.
 - **`npm run latency` red on the heaviest door — and it is the container.**
   706 ms against the 600 ms gate on `half + strip + quatrefoil + shiran`,
@@ -938,6 +944,22 @@ how it got there. Detail lives in the section it belongs to.
   - `VERSION` 11 → 12 because two lists were re-cut and the code packs indices.
     Free today, as 11 was, and for the last time: nothing is deployed and no
     code has ever reached a customer.
+
+  **The container turned out healthy, so everything was regenerated and the
+  round finishes fully green:** `npm test` 3,988,350 / 0, `npm run sheets`
+  completed all four families, `npm run audit` clean at all seven viewports,
+  `npm run collide` clean over 1,224 designs.
+  ⚠ **`npm run audit` earned its keep twice in one run.** It caught the
+  `tablet` screenshot naming a door the new panel rule refuses — the shot's own
+  guard, working — and then it caught the UNDO BUTTON SHRINKING THE DOOR: above
+  1100 px `.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so a
+  control appearing in the strip below takes its height out of the drawing. The
+  leaf differed from a fresh load of its own identical link by **23,021
+  pixels**. That is the same fault that put the grip controls in the wall, and
+  `--grip-strip` is reserved unconditionally for exactly this reason; the undo
+  button reserves its box the same way now (`visibility`, not `hidden`, so it
+  still leaves the tab order). Nothing in `npm test` could have seen it: it is
+  a layout fact, and the string-level suite has no layout.
 
   **And one thing this round did NOT cause, checked rather than assumed.**
   `npm run latency` is red on the heaviest door — 706 ms against a 600 ms gate.

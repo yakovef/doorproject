@@ -5554,7 +5554,7 @@ ${body}
     document.documentElement.classList.add("is-live");
     announce(describe(state));
     armGrip();
-    $("#undo-btn").hidden = !canUndo();
+    $("#undo-btn").classList.toggle("is-off", !canUndo());
   }
   var dragging = null;
   var swallowTouch = (ev) => ev.preventDefault();

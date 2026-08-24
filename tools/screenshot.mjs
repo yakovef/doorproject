@@ -88,8 +88,17 @@ const SHOTS = [
     q: '?c=rb-6219d&w=rect&g=reeded&n=idan&k=cylinder&d=plain&s=sidelight&h=right-in' },
   { name: 'halfleaf', w: 1280, h: 720,
     q: '?c=rb-9001d&w=rect&g=quatrefoil&n=none&k=sapir&d=plain&s=half&h=left-in' },
+  /* ⚠ `d=plain`, AND IT USED TO BE `d=panel`. A vertical slot with a panel
+     under it is refused now — the glass runs to 0.79 of leaf height and the
+     seven corpus doors with a panel below glazing all stop by 0.61, so
+     `panelFits` says no (see WINDOWS in catalog.js). This shot's query was
+     therefore naming a door the site will not draw, and the guard below caught
+     it on the first run after the rule landed: "the query arrives repaired
+     (combination-fixed) — this shot is not the door it names".
+     Only the impossible axis moved. The shot is still what it was for: a tall
+     leaf with a slot and scroll ironwork at a tablet viewport. */
   { name: 'tablet',   w: 834,  h: 1112, full: true,
-    q: '?c=rb-2030d&w=strip&g=scroll&n=none&k=knobplate&d=panel&s=tall&h=left-in' },
+    q: '?c=rb-2030d&w=strip&g=scroll&n=none&k=knobplate&d=plain&s=tall&h=left-in' },
 ];
 
 /**

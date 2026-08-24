@@ -1367,8 +1367,11 @@ function paint() {
   armGrip();
   /* Shown only once there is a step to take back. In `paint` rather than in
      `set`, because `undo` itself has to update it too — pop the last step and
-     the button must go away — and `paint` is the one path both of them run. */
-  $('#undo-btn').hidden = !canUndo();
+     the button must go away — and `paint` is the one path both of them run.
+     ⚠ A CLASS, NOT `hidden`. The button has to keep its box or the strip under
+     the door changes height and the door is redrawn smaller; `npm run audit`
+     measured that at 23,021 pixels. See index.html and `.btn--undo.is-off`. */
+  $('#undo-btn').classList.toggle('is-off', !canUndo());
 }
 
 /* ── moving the handle ────────────────────────────────────────────

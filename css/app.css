@@ -1365,6 +1365,12 @@ html.is-live .wa__off { display: none; }
   padding-inline: 14px; font-size: .82rem;
   background: var(--paper, #fff);
 }
+/* ⚠ `visibility`, NOT `display` OR the `hidden` ATTRIBUTE. The button holds
+   its box when it is not showing, so the strip below the door never changes
+   height — see the long note in index.html for the 23,021 pixels that cost.
+   `visibility: hidden` also removes it from the tab order and the
+   accessibility tree, which is the half of `hidden` that was worth keeping. */
+.btn--undo.is-off { visibility: hidden; }
 .btn__ico {
   inline-size: 16px; block-size: 16px; flex: 0 0 auto;
   fill: none; stroke: currentColor; stroke-width: 1.8;
