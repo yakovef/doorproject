@@ -21,6 +21,29 @@ it, that log is where to look.
 Newest first. **Every change gets a line here**, so this file alone carries the
 facts a fresh context needs. Detail lives in the section it belongs to.
 
+- **`GUIDED-FLOW.md` — Stage G, the step-by-step build, written not built.**
+  The owner's idea: start from nothing and assemble a door one question at a
+  time so a customer is not overwhelmed by sixty options at once, with an
+  animation between steps and jump-buttons to change anything. Taken, under one
+  non-negotiable rule — **it guides, it never gates**: a valid, real-priced door
+  and the WhatsApp button exist at EVERY step, the full panel is one tap away
+  ("עריכה מלאה"), and JS-off falls back to today's all-visible page. It is a
+  presenter over the existing `state` — no URL/short-code change, no `VERSION`
+  bump, no sheet regeneration, `renderer.js`/`rules.js`/`price.js`/`share.js`
+  untouched. ⚠ **The animation is the highest-risk item in any of these plans**
+  and its engineering turns on one insight: `paint()` does a full redraw
+  (`app.js:750`), so a *general* "animate what changed" would need a diff
+  engine — but the guided flow KNOWS what each step changed ("step 3 is the
+  window"), and the renderer already tags groups (`[data-pane]`, `[data-hw]`,
+  `[data-detail]`), so the guide redraws and plays a WAAPI enter animation on
+  just the fresh group. One gesture per change (paint washes, window opens,
+  handle slides), reveal flourish at the end. State is truth and animation is
+  decoration: every `paint()` cancels any in-flight animation and draws the door
+  final-and-correct first, so a fast click never strands it half-open;
+  `prefers-reduced-motion` cuts all of it (already honoured at `app.css:808,
+  1081`). Staged G(1) flow → G(2) element-by-element → G(3) reveal, each
+  independently shippable; the audit asserts send-exists-at-every-step as its
+  load-bearing check.
 - **`DESIGN-LEVEL.md` — the north-star for the LOOK, calibrated against ten
   premium product sites.** The owner supplied two batches of style references
   (dev-tool SaaS, then premium product brands: BMW, Rivian, Heart Aerospace,

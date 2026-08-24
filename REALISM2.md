@@ -18,6 +18,14 @@
 
 ---
 
+> **`GUIDED-FLOW.md` is Stage G** — the step-by-step build experience: the app
+> starts from a plain slab and the customer assembles a door one question at a
+> time, each step animating the new feature onto the drawing (element by
+> element, the guide knowing what changed so no diff engine is needed), ending
+> in a reveal. A layer over the always-live door — it guides, never gates: send
+> exists at every step, JS-off falls back to today's page, no `VERSION` bump.
+> Recommended overall order: A → B → C → G(1) → D → G(2) → G(3).
+
 > **`DESIGN-LEVEL.md` is the north-star for the LOOK.** It calibrates the
 > stages below against ten premium product sites (BMW, Rivian, Heart, Atoms…),
 > and carries the three owner decisions this plan now assumes: a webfont online
