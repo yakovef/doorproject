@@ -1030,8 +1030,8 @@
   var FLOOR_RUN = RETURN;
   var BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
   var STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
-  var SCONCE_OUT = SCENE_MAX.openW / 2 + RETURN + CASING + 280;
-  var LAMP = { w: 96, h: 250 };
+  var LAMP = { w: 110, h: 300 };
+  var SCONCE_OUT = MID_X + LAMP.w / 2 + 36;
   var LAMP_DARK = "#3A3733";
   function wallLamp(sx, sy, baseY) {
     const { w, h } = LAMP;
@@ -1082,11 +1082,19 @@
       <rect x="${n(x0 - proud)}" y="${n(rimY)}" width="${n(w + proud * 2)}"
             height="${n(capH)}" rx="${n(capH * 0.45)}" fill="url(#lampCap)"/>
 
+      <!-- The fitting lit by its own lamp: warm at both open ends, nothing
+           across the waist. See lampGlow — a sconce that is switched on is
+           brightest on its OWN metal nearest the aperture, and without this
+           the barrel reads as a dark shape that happens to have a bright dot
+           at each end. -->
+      <rect x="${n(x0)}" y="${n(sy + capH * 0.5)}" width="${n(w)}"
+            height="${n(h - capH)}" rx="${n(w * 0.16)}" fill="url(#lampGlow)"/>
+
       <!-- The specular down the key side. One narrow band at a quarter width,
            which is where a cylinder's highlight sits under a 30° key. -->
       <rect x="${n(x0 + w * 0.17)}" y="${n(sy + h * 0.14)}" width="${n(w * 0.11)}"
             height="${n(h * 0.7)}" rx="${n(w * 0.055)}"
-            fill="#fff" opacity="0.20"/>
+            fill="#fff" opacity="0.26"/>
 
       <!-- THE LIT APERTURE, which is the whole point and was an 8 mm strip.
            The lamp is open top and bottom — an up-and-down sconce, which is
@@ -1839,9 +1847,9 @@
          Darkest hard against the leaf, where the door shades its own
          threshold, lifting towards the open floor at the wall line. -->
     <linearGradient id="retFloor" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.46"/>
-      <stop offset="0.55" stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="1"    stop-color="#000" stop-opacity="0.17"/>
+      <stop offset="0"    stop-color="#000" stop-opacity="0.33"/>
+      <stop offset="0.55" stop-color="#000" stop-opacity="0.13"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0"/>
     </linearGradient>
 
     <!-- ⚠ THIS REPLACES A RULED LINE, and that is the whole point of it.
@@ -1870,14 +1878,14 @@
          mask's own url(#floorFadeG) keeps the gradient inside it. The
          the no-dangling-url()  assertion is what proves that actually happened. -->
     <linearGradient id="floorFadeG" gradientUnits="userSpaceOnUse"
-                    x1="0" y1="${baseY}" x2="0" y2="${baseY + 900}">
+                    x1="0" y1="${floorY}" x2="0" y2="${floorY + 900}">
       <stop offset="0"    stop-color="#fff"/>
       <stop offset="0.55" stop-color="#4a4a4a"/>
       <stop offset="1"    stop-color="#000"/>
     </linearGradient>
     <mask id="floorFade" maskUnits="userSpaceOnUse"
-          x="${farX}" y="${baseY}" width="${farW}" height="900">
-      <rect x="${farX}" y="${baseY}" width="${farW}" height="900"
+          x="${farX}" y="${floorY}" width="${farW}" height="900">
+      <rect x="${farX}" y="${floorY}" width="${farW}" height="900"
             fill="url(#floorFadeG)"/>
     </mask>
     <filter id="floorBlur" x="-8%" y="-8%" width="116%" height="116%">
@@ -1908,20 +1916,55 @@
          the fitting a translucent smudge of the plaster behind it. The lamp is
          an object; see LAMP_DARK. -->
     <linearGradient id="lampBody" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#22201D"/>
-      <stop offset="0.26" stop-color="#5A554E"/>
-      <stop offset="0.62" stop-color="#312E2A"/>
-      <stop offset="0.88" stop-color="#201E1B"/>
-      <stop offset="1"    stop-color="#413C36"/>
+      <stop offset="0"    stop-color="#191713"/>
+      <stop offset="0.10" stop-color="#3E3931"/>
+      <stop offset="0.24" stop-color="#9A8E7B"/>
+      <stop offset="0.38" stop-color="#5E574B"/>
+      <stop offset="0.66" stop-color="#2B2823"/>
+      <stop offset="0.88" stop-color="#1C1A17"/>
+      <stop offset="1"    stop-color="#4F473C"/>
     </linearGradient>
     <!-- Cast top and foot rim: the same metal a shade lighter, because a
          machined band catches the key across its whole face where the barrel
          only catches it along one line. -->
     <linearGradient id="lampCap" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#2A2724"/>
-      <stop offset="0.28" stop-color="#6B655C"/>
-      <stop offset="0.70" stop-color="#3B3833"/>
-      <stop offset="1"    stop-color="#4A443D"/>
+      <stop offset="0"    stop-color="#302C27"/>
+      <stop offset="0.26" stop-color="#B8AA92"/>
+      <stop offset="0.52" stop-color="#6A6255"/>
+      <stop offset="0.80" stop-color="#332F2A"/>
+      <stop offset="1"    stop-color="#655C4E"/>
+    </linearGradient>
+    <!-- ⚠ THE FITTING IS LIT BY ITS OWN LAMP, and that is most of what makes a
+         sconce read as switched ON rather than as a dark shape on a wall. The
+         metal nearest each aperture picks up the warm light spilling past it;
+         the middle of the barrel does not. Vertical, warm, and zero across the
+         waist — a top-and-bottom glow, which is the shape an open-ended
+         fitting actually produces. -->
+    <!-- ⚠ THE LIGHT THE SCONCES PUT ON THE DOOR. Peaks at the casing's outer
+         edge — the part nearest the lamp — and is gone by a third of the way
+         across, because a source 900 mm to the side of a 1,200 mm opening
+         cannot reach its far stile. Two of them, one per side, so a door
+         between two lamps is lit from both and brightest at its edges, which
+         is the shape that reads as a thing standing in a room.
+         0.085 at the peak: enough to see at the reveal, where it lands on the
+         casing's own dark paint beside a bright wall, and not enough to lift
+         the leaf's midfield where every measured number lives. -->
+    <linearGradient id="lampOnDoorL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.085"/>
+      <stop offset="0.14" stop-color="${LIGHT.warm}" stop-opacity="0.038"/>
+      <stop offset="0.34" stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lampOnDoorR" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.085"/>
+      <stop offset="0.14" stop-color="${LIGHT.warm}" stop-opacity="0.038"/>
+      <stop offset="0.34" stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lampGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.42"/>
+      <stop offset="0.20" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
+      <stop offset="0.50" stop-color="${LIGHT.warm}" stop-opacity="0"/>
+      <stop offset="0.80" stop-color="${LIGHT.warm}" stop-opacity="0.13"/>
+      <stop offset="1"    stop-color="${LIGHT.warm}" stop-opacity="0.50"/>
     </linearGradient>
     <!-- The short wash UP the wall. Weaker and tighter than the downward one:
          the fitting's upper aperture is smaller and there is no floor above it
@@ -1962,8 +2005,28 @@
          WhatsApp links still work — so the room should survive it too. -->
     <rect x="${farX}" y="${farY}" width="${farW}"
           height="${baseY - farY}" fill="var(--wall, #F5F3EF)"/>
-    <rect x="${farX}" y="${baseY}" width="${farW}"
-          height="${farY + farH - baseY}" fill="var(--floor, #E6E2DA)"/>
+    ${/* ⚠ THE FLOOR IS ONE SURFACE, AND IT IS NOW ONE PATH. Reported from
+        outside: *"the area where the door meets the ground is a different
+        color than the floor, although it supposed to be the same material
+        and surface."*
+        It was two objects — this rect from `baseY` down, and a trapezoid
+        inside `#frame` for the strip between the leaf's foot and the wall
+        line. Being inside `#frame` put that strip AFTER `#shadow` in paint
+        order, so the door's own cast shadow pooled on the floor in front of
+        the threshold and was masked off the threshold itself. Measured at
+        4x: 159 immediately above the wall line against 124 immediately
+        below. A 35-point step, straight across the picture, exactly where
+        the eye is told two materials meet.
+        One path fixes it for good rather than by tuning two gradients to
+        agree: the floor's real silhouette is everything below `baseY` PLUS
+        the strip that runs back under the door, so that is the shape it is
+        drawn as. Everything the floor gets — its colour, `floorFall`, the
+        cast shadow, the reflection — now lands on all of it because there is
+        no longer an "it" and a "the other one". */
+    ""}
+    <path d="M ${farX} ${baseY} H ${revX0} L ${x0} ${floorY} H ${x1}
+             L ${revX1} ${baseY} H ${farX + farW} V ${farY + farH} H ${farX} Z"
+          fill="var(--floor, #E6E2DA)"/>
     <!-- Tiled rather than one filtered rect. A feTurbulence over a surface
          this size is a large offscreen buffer for a 7% texture; the pattern
          stitches, so it costs one tile. -->
@@ -2001,7 +2064,8 @@
     <!-- Where the wall meets the floor. See floorFall: this is the ruled
          line that used to be here, replaced by the change of value a fold
          between two lit surfaces actually makes. -->
-    <rect x="${farX}" y="${baseY}" width="${farW}" height="1100"
+    <path d="M ${farX} ${baseY} H ${revX0} L ${x0} ${floorY} H ${x1}
+             L ${revX1} ${baseY} H ${farX + farW} V ${baseY + 1100} H ${farX} Z"
           fill="url(#floorFall)"/>
   </g>
 
@@ -2087,8 +2151,26 @@
          jambs' leaf-foot corners and its two bottom corners are their
          wall-line corners, so the four planes share four edges and no line is
          drawn to suggest a corner. -->
-    <path d="M ${x0} ${floorY} H ${x1} L ${revX1} ${baseY} H ${revX0} Z"
-          fill="var(--floor, #E6E2DA)"/>
+    ${/* ⚠ THREE COATS, AND THE MIDDLE ONE IS WHY. Reported from outside: *"the
+              area where the door meets the ground is a different color than the
+              floor, although it supposed to be the same material and surface."*
+    
+              It was two coats — the floor's colour, then `retFloor` running 0.46
+              down to 0.17 of black. The floor BEYOND the wall line is the same
+              colour under `floorFall`, which begins at 0.20. So the two planes met
+              at 0.17 against 0.20 and the seam was three hundredths of black wide
+              — small, and enough, because it is a straight line a metre long with
+              a different surface on each side of it.
+    
+              `floorFall` is painted on the recess as well now, and it is
+              `userSpaceOnUse` from `baseY` downward, so above that line it clamps
+              to its first stop: the recess gets exactly the 0.20 the open floor
+              starts at. Then `retFloor` — the door's own shadow on its threshold —
+              is laid over that and FALLS TO ZERO at `baseY`. At the join the two
+              planes are therefore the same three numbers by construction rather
+              than by two gradients agreeing to within a rounding error, and there
+              is no value for a seam to be made of. */
+    ""}
     <path d="M ${x0} ${floorY} H ${x1} L ${revX1} ${baseY} H ${revX0} Z"
           fill="url(#retFloor)"/>
     <!-- ⚠ AND THE CONTACT SHADOW WHERE THE LEAF ACTUALLY TOUCHES THE GROUND.
@@ -2259,6 +2341,38 @@
     ""}${lockset.lock ? "" : cylinder(keyX, y(CYLINDER_AFF))}
   </g>
 
+  <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
+       Asked for from outside: *"make light that also slightly affects the
+       door, and it will help buy the 3d effect."* Right — two lamps throwing
+       light onto a wall and stopping dead at the casing is the one thing in
+       the picture that says the door was pasted on.
+
+       ⚠ AND CLAUDE.md §3 CARRIES A STANDING REFUSAL AGAINST EXACTLY THIS, so
+       it is worth being precise about what is and is not being overturned.
+       The refusal was: do not let two symmetric wall lights re-tune the leaf's
+       ONE-key model — FALLOFF's nine-row medians, MOULD_SIDE's per-side gain,
+       keyWash, the warm/cool split — because there is no door in research/
+       photographed between two sconces to fit them against. That reasoning
+       stands and nothing here touches any of those numbers.
+
+       What this adds is a THIN WARM OVERLAY, painted last, over the finished
+       door: a gradient from each side, peaking at the outer edge of the casing
+       and reaching zero by a third of the way in. It is light landing on an
+       object, which is what LIGHT.warm is for and what keyWash already does
+       vertically. npm run profile measures the leaf VERTICAL fall and this
+       is horizontal and symmetric, so it should not move that reading — which
+       is a prediction, and the commit records what the tool actually said.
+
+       Inside #door on purpose: the floor reflects the door, so it must reflect
+       the lit door. pointer-events off — this is light, and the vignette's own
+       note records what happens when light is allowed to swallow the handle. -->
+  <rect data-room="lamp-wash" x="${casX0}" y="${casY0}"
+        width="${casX1 - casX0}" height="${baseY - casY0}"
+        fill="url(#lampOnDoorL)" pointer-events="none"/>
+  <rect data-room="lamp-wash" x="${casX0}" y="${casY0}"
+        width="${casX1 - casX0}" height="${baseY - casY0}"
+        fill="url(#lampOnDoorR)" pointer-events="none"/>
+
   </g><!-- /#door -->
 
   <!-- ── the door, mirrored in the floor ──────────────────────────
@@ -2293,7 +2407,7 @@
        An untransformed wrapper carries the parent's user space, so the band is
        the floor band — said once, in the coordinates everything else uses. -->
   <g mask="url(#floorFade)" aria-hidden="true" pointer-events="none">
-    <use href="#door" transform="translate(0 ${2 * baseY}) scale(1 -1)"
+    <use href="#door" transform="translate(0 ${2 * floorY}) scale(1 -1)"
          opacity="0.13" filter="url(#floorBlur)"/>
   </g>
 

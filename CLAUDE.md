@@ -143,7 +143,7 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **3,704,013 assertions passing, 0 failed**, no framework, plain
+- `npm test` — **3,704,418 assertions passing, 0 failed**, no framework, plain
   node. It was 5.68M before the 24.8 interface round; the catalogue lists
   changed length and the combinatorial sweeps are the product of those lengths,
   so the total moves with the range — twice in one day, as the window list was
@@ -173,7 +173,7 @@ to establish each run.** `AGENT.md` has the one circumstance in which pushing
 with those four red is right, and it still stands for the days it degrades.
 
 **As of the 24.8 interface round the container was healthy and everything is
-green** — `npm test` **3,704,013 / 0**, `npm run sheets` completed all four
+green** — `npm test` **3,704,418 / 0**, `npm run sheets` completed all four
 families, `npm run audit` clean at all seven viewports, `npm run collide` clean
 over 1,224 designs. One thing is still red and it is measured below.
 
@@ -390,12 +390,35 @@ is no alcove — see below.
 shadow is cool. `FALLOFF` holds the vertical falloff, retargeted on the median
 of thirty measured doors, split light/dark.
 
-⚠ **The sconces' light stops at the wall, and that is a refusal.** Two
-symmetric wall lights imply two symmetric keys, and `FALLOFF`, `MOULD_SIDE`,
-`keyWash`, `bloom` and the warm/cool split all hang off there being one. No
-door in `research/` is photographed between two sconces, so re-fitting a
-corpus-measured model to match a picture would be tuning by eye against
-nothing. The wall may flatter; the leaf keeps its instruments.
+⚠ **The sconces' light REACHES THE DOOR — but not one number of the leaf's
+model moved, and that distinction is the whole of this paragraph.**
+
+The refusal that stood here was: two symmetric wall lights imply two symmetric
+keys, and `FALLOFF`, `MOULD_SIDE`, `keyWash`, `bloom` and the warm/cool split
+all hang off there being ONE. No door in `research/` is photographed between
+two sconces, so re-fitting a corpus-measured model to match a picture would be
+tuning by eye against nothing. **All of that still holds. Do not touch those
+numbers for the sake of the lamps.**
+
+What was refused along with it, and should not have been, is light LANDING on
+the door — asked for from outside as *"make light that also slightly affects
+the door, and it will help buy the 3d effect."* Two lamps throwing light on a
+wall and stopping dead at the casing is the one thing left saying the door was
+pasted on. So there is a thin warm overlay, painted last, over the finished
+door: `lampOnDoorL` / `lampOnDoorR`, peaking at the casing's outer edge and
+zero by a third of the way in. Measured **+15/255 at the casing, 0 at the
+leaf's midline** — it lands where the lamps are and nowhere near the midfield
+every fitted number lives in.
+
+⚠ **AND IT WAS PUT TO THE INSTRUMENTS BEFORE IT WAS BELIEVED**, which is the
+part to copy. `npm run profile` did not move: the wash is horizontal and the
+profile is vertical, which was a prediction stated in the code before the run.
+`npm run mottle` DID — 0.0133 → 0.0194 on the plain leaf, a 46% rise in a
+figure about PAINT caused entirely by a lamp. The wash carries
+`data-room="lamp-wash"` and `mottle` strips it before sampling, restoring
+0.0133 exactly. An instrument that reports paint plus lighting under the name
+"mottle" is §7's subject, and the next person tuning `drift` would have been
+compensating for a sconce.
 
 ### The frame
 - `CASING = 46` — the flat face against the wall. **One plane, one gradient.**
@@ -664,7 +687,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm run collide` | real `getBBox()` from a browser over 1,224 designs. No declared number anywhere in the loop |
 | `npm run fuzz` | random combinations, then click-walks in a real browser |
 | `npm run profile` | the leaf's VERTICAL fall, against the medians `FALLOFF` was fitted to |
-| `npm run mottle` | slow horizontal unevenness of the paint |
+| `npm run mottle` | slow horizontal unevenness of the PAINT. ⚠ It strips `[data-room="lamp-wash"]` first — the sconces' wash is horizontal too, and it moved this figure 46% without a drop of paint changing |
 | `npm run glass` | what is inside the pane, band by band, against the corpus |
 | `npm run recreate` | ten measured photographs beside our render, leaf heights matched |
 | `npm run corpus` | all 30 measured doors rebuilt from their own records; writes `js/works.js` and `screenshots/corpus-links.md` |
@@ -929,6 +952,65 @@ how it got there. Detail lives in the section it belongs to.
     0.30 and bleached its top two thirds, leaving a dark band at the foot that
     read as a join in the metal. Caught on a 3× crop, which is the only way
     that kind of fault shows.
+
+- **The threshold was a different material from the floor, and the lamps were
+  silhouettes.** Both reported from outside, both true, and both turned out to
+  be about the same thing: an object drawn in the right place with the wrong
+  membership.
+
+  **THE FLOOR IS ONE PATH NOW.** *"the area where the door meets the ground is a
+  different color than the floor, although it supposed to be the same material
+  and surface."* It was two objects — a rect from `baseY` down, and a trapezoid
+  inside `#frame` for the strip running back under the door. Being inside
+  `#frame` put that strip AFTER `#shadow` in paint order, so the door's own cast
+  shadow pooled on the floor in FRONT of the threshold and was masked off the
+  threshold itself. Measured at 4x down the centre line: **159 immediately above
+  the wall line against 124 immediately below** — a 35-point step straight
+  across the picture, exactly where the eye is told two materials meet.
+  Two gradients were tuned to agree first and it did not hold, because the
+  reflection and the cast pool were on one side only. The floor's real
+  silhouette is everything below `baseY` PLUS the strip under the door, so that
+  is the shape it is drawn as: one path, one colour, one `floorFall`, one cast
+  shadow, one reflection. Profile after: 118 → 124 → 129 → 134 → 141 → 147,
+  monotone through the join with no step to find.
+  The reflection's mirror plane moved with it, from `baseY` to `floorY` — the
+  leaf stands on the floor at `floorY`, so that is the line it is mirrored in.
+
+  **THE LAMPS.** *"make the lamps on the sides look 3d and make light that also
+  slightly affects the door."*
+  - The modelling was there and unreadable: every value in the body gradient
+    sat between #20 and #5A, and at 96 mm the fitting came out **ten pixels
+    across** on a 410 px stage. Both had to change — widening the range on a
+    10 px object only makes a stripier silhouette. 110 x 300 now, with a real
+    specular (#9A8E7B), and `lampGlow` lighting the fitting's OWN metal at both
+    open ends, which is most of what says a sconce is switched on.
+  - ⚠ **`SCONCE_OUT` IS A CONSTRAINT, NOT A LOOK.** `fitStage` crops to
+    STAGE_BOX widened to the stage's shape, so on a proportionally narrower
+    stage the crop is exactly STAGE_BOX and the lamps fall outside it. Fine —
+    what is not fine is landing ACROSS that edge. Measured at seven viewports,
+    1100x800 and 1280x900 each drew **half a lamp** against the frame. It is
+    pinned just outside STAGE_BOX by half the fitting plus air, so every
+    viewport shows a whole lamp or no lamp. Re-measured at all seven: six whole,
+    one out of frame, none bisected. It cannot go INSIDE the box — a sidelight's
+    casing reaches 719 of the 789 available.
+
+  **AND THE LIGHT REACHES THE DOOR, WHICH §3 HAD REFUSED.** The refusal was
+  narrow and it still stands: do not let two symmetric wall lights re-tune the
+  leaf's one-key model — `FALLOFF`, `MOULD_SIDE`, `keyWash`, the warm/cool
+  split — against a corpus that contains no door photographed between two
+  sconces. None of those numbers moved. What was added is a thin warm overlay
+  painted last, peaking at the casing's outer edge and gone by a third of the
+  way in: measured **+15/255 at the casing, +12 at 8% in, 0 at the leaf's
+  midline.**
+  ⚠ **AND IT WAS MEASURED AGAINST THE INSTRUMENTS BEFORE BEING BELIEVED.**
+  `npm run profile` unmoved (the wash is horizontal, the profile is vertical —
+  that was the prediction and it held; the two panel faults it reports are
+  identical on the previous commit, and one improved 1.107 → 1.083).
+  `npm run mottle` **DID** move, 0.0133 → 0.0194 on the plain leaf, a 46% rise
+  in a figure about PAINT caused entirely by a lamp. The wash carries
+  `data-room="lamp-wash"` and `mottle` strips it before sampling, so the tool
+  measures the thing it is named after again — §7's whole subject. Reading
+  restored to 0.0133 exactly.
 
 - **Fourteen things reported from outside, in one round — and the biggest of
   them was that the room moved when the door did.** Every item below arrived as

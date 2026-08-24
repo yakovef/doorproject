@@ -72,6 +72,22 @@ if (process.argv[2]) {
     await pg.goto(`file://${process.cwd()}/index.html?bare=1&${q}`);
     await pg.waitForTimeout(400);
     const clip = await pg.evaluate(() => {
+      /* ⚠ THE ROOM'S LIGHT COMES OFF BEFORE THE PAINT IS MEASURED.
+         This tool is named for the leaf's own slow unevenness — its drift —
+         and CLAUDE.md §6 records the round where that number went stale and
+         described a leaf we had stopped drawing. The sconces now throw a warm
+         wash across the door (`data-room="lamp-wash"`), which is a horizontal
+         gradient on the leaf and therefore lands squarely in what this
+         samples: measured, it moved the plain leaf from 0.0133 to 0.0194, a
+         46% rise in a figure about paint caused entirely by a lamp.
+         Both numbers are far under the photographs' 0.089 and 0.155, so
+         nothing was WRONG — but the next person to tune `drift` against this
+         would have been tuning the paint to compensate for the lighting, and
+         §7 is a list of instruments that stopped measuring the thing they are
+         named after. Removed here rather than never drawn, because on the page
+         the light is real and the door should have it. */
+      document.querySelectorAll('#stage svg [data-room="lamp-wash"]')
+        .forEach(el => el.remove());
       const r = document.querySelector('#stage svg #leaf rect').getBoundingClientRect();
       return { x: Math.round(r.x), y: Math.round(r.y),
                width: Math.round(r.width), height: Math.round(r.height) };
