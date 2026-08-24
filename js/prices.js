@@ -99,8 +99,11 @@ export const GRILLE = {
   iron:         620, // ברזל מחושל
   'iron-light': 620, // ברזל מחושל בהיר
   quatrefoil:   520, // מדליוני פרח
+  'quatrefoil-light': 520, // מדליוני פרח בהיר
   arch:         380, // קשת
+  'arch-light': 380, // קשת בהירה
   deco:         420, // קווים גיאומטריים
+  'deco-light': 420, // קווים גיאומטריים בהירים
   circles:      300, // עיגולים שזורים
   vine:         340, // גפן
   tree:         340, // עץ

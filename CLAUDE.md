@@ -994,6 +994,45 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **Five more doors put through the same loop, and the most complicated ones
+  in the corpus turned out to be the same product as the new one.** d101, d103,
+  d112 and d129 all carry the classical set — cornice, frieze block with an
+  oval, glazed light, corbelled shelf with a turned pull, panel, plinth — and
+  d104 carries the quatrefoil column, the pattern with exactly one door of
+  evidence behind it. All five recreate recognisably; `tools/_door.mjs` is the
+  harness, photograph beside our render at matched leaf height.
+  - **⚠ THE ANSWER TO ASK-PERETZ §4, ARRIVED AT BY DRAWING IT.** That question
+    has been open for three rounds: *"five doors carry a whole composition the
+    site has no way to express — is it a fixed model or an option?"* The
+    composition half is now settled — it is the set we built from
+    `research/newdoor/`, and it fits all four of those doors at their own
+    proportions. What is still Peretz's to answer is whether it is a MODEL or
+    an option, which is the half a drawing cannot decide.
+  - **⚠ THE CATALOGUE CONTRADICTED ITS OWN QUESTION SHEET, and recreating d104
+    is what caught it.** ASK-PERETZ §4 lists the ironwork and says, in his
+    words, *"וכל אחד מהם גם בגוון הדלת ולא רק בשחור"* — every pattern in the
+    door's colour as well as in black. The catalogue offered that on three
+    patterns of six: `grid`, `scroll` and `iron` had `-light` twins and
+    `quatrefoil`, `arch` and `deco` did not. Nobody could see it from inside
+    the code, because the list looks complete until you ask which doors it is
+    read from: **d104 is the only door `quatrefoil` exists for, and its column
+    is painted white.** We were drawing the sole evidence door for that pattern
+    in the wrong colour with no way to correct it. Three twins appended — no
+    `VERSION` bump, the ids in the wild keep their indices — and d104 recreates
+    properly for the first time.
+  - **Recorded, not changed: the set is not one size.** Our set scales with the
+    leaf, so a taller door gets a taller cornice. The four real ones suggest
+    otherwise — d112's frieze and plinth have no flutes at all where the new
+    door's do, and every one of the four has a slimmer shelf than ours. That is
+    product variation across a range we have one measured example of, and
+    guessing at it from photographs at four different angles would be inventing
+    a rule. ASK-PERETZ §14 asks him instead.
+  - **`tools/_door.mjs` needs the leaf box given to it for these five.**
+    `findLeaf` scores all five below 0.25 confidence and its box for d101 comes
+    out at an aspect of 0.714 against a door's 0.415 — which is the finder
+    working exactly as its own docstring says it does, and the aspect check is
+    what makes that visible in one line instead of after an hour of comparing
+    the wrong rectangle.
 - **A door Peretz installed while this was being written, recreated from five
   photographs — and the recreation loop found five defects that needed no
   photograph to see.** The files are in `research/newdoor/`. Asked for from

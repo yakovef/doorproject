@@ -286,6 +286,19 @@ cornice and base, and the letterplate set into that block. Beside them our
 luxury tier was a plain rectangle of moulding — the right drawing for the other
 thirty-six glazed doors and the wrong one for these five.*
 
+*⚠ **AND THE FIVE ARE THE SAME PRODUCT — WE DREW THEM TO FIND OUT.** d101,
+d103, d112 and d129 were each recreated with the `classic` set beside their own
+photographs, and all four come out recognisable: same cornice over a frieze
+block with an oval, same glazed light, same corbelled shelf carrying a turned
+pull, same panel, same plinth. So this is one product in several sizes, and the
+question below is now only about how you SELL it.*
+
+*Two differences worth a sentence when you ask, because they are variations and
+not our mistakes: **d112's frieze and plinth have no flutes** where the door in
+`research/newdoor/` has three at each end, and **all four have a slimmer shelf**
+than the one we drew. We have one measured example and four photographs at four
+angles, so we have not guessed at a rule.*
+
 *⚠ **THE DRAWING HALF OF THIS IS DONE. THE PRODUCT QUESTION IS NOT, AND IT IS
 THE HALF THAT MATTERED.** `classic` — סט קלאסי — is in the range as of 24.8,
 built from five photographs of a door installed that week
@@ -653,6 +666,13 @@ five-second answers and none of them blocks launch.*
 הנכון בצבע שגוי. הכלי שמתאים דלת אמיתית לדגם מציג עכשיו את ההחלפה במפורש בכל
 שורה, אבל אף בחירה שם לא תהיה נכונה עד שיהיה מוט שחור ארוך ברשימה. קשור ל־§5,
 ששאלה על אותם שני מוטות מכיוון אחר.*
+
+> **"הסט הקלאסי — אתה עושה אותו גם בלי החריצים בקצוות? וכמה מדפים שונים יש?"**
+
+*ב־d112 האפריז והבסיס חלקים לגמרי, ובדלת החדשה יש שלושה חריצים בכל קצה. וגם
+המדף עצמו: בכל ארבע הדלתות שבדקנו הוא דק יותר מזה שציירנו. יש לנו מדידה אחת
+וארבע תמונות מזוויות שונות, אז לא ניחשנו — אבל אם אלה שתי גרסאות של אותו סט,
+זאת שורה בקטלוג ולא שינוי בציור.*
 
 <details>
 <summary>ועוד שתיים קטנות שהתמונות פתחו</summary>

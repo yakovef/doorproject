@@ -496,7 +496,17 @@ export const GRILLES = [
   { id: 'iron',    he: 'ברזל מחושל',     en: 'Wrought iron',
     doors: ['d090', 'd092', 'd101', 'd103', 'd108', 'd112', 'd119', 'd124', 'd128', 'd129'] },
   { id: 'iron-light',   he: 'ברזל מחושל בהיר', en: 'Wrought iron, door colour', light: true },
-  /* The three that appear exactly once, kept at his instruction. */
+  /* The three that appear exactly once, kept at his instruction.
+     ⚠ AND ALL THREE NOW HAVE A `-light` TWIN, which they should have had from
+     the start. The site's own question sheet says of the ironwork, in as many
+     words, *"וכל אחד מהם גם בגוון הדלת ולא רק בשחור"* — every one of them in
+     the door's colour and not only in black — and the catalogue offered that
+     choice on three patterns out of six. It was not an oversight anybody could
+     see from inside: it took recreating d104 to notice, because d104 is the
+     ONE door `quatrefoil` is read from and its column is painted white. We
+     were drawing the only evidence door for that pattern in the wrong colour,
+     with no option to correct it.
+     Appended to the end of the list, so no `VERSION` bump. */
   { id: 'quatrefoil',   he: 'מדליוני פרח',     en: 'Quatrefoil column',
     doors: ['d104'] },
   { id: 'arch',    he: 'קשת',            en: 'Arch',            doors: ['d121'] },
@@ -530,6 +540,14 @@ export const GRILLES = [
      `bars` and `bars-light` once reached a customer. */
   { id: 'rings',   he: 'טבעות ותלתלים', en: 'Scrolled ring lattice',
     doors: ['newdoor'] },
+  /* The three missing `-light` twins, appended so the ids already in the wild
+     keep their indices. `light` is the same one switch it has always been: the
+     same ironwork, painted the door's colour instead of black. */
+  { id: 'quatrefoil-light', he: 'מדליוני פרח בהיר',
+    en: 'Quatrefoil column, door colour', light: true },
+  { id: 'arch-light', he: 'קשת בהירה', en: 'Arch, door colour', light: true },
+  { id: 'deco-light', he: 'קווים גיאומטריים בהירים',
+    en: 'Art-deco lines, door colour', light: true },
   { id: 'reeded',  he: 'זכוכית מחורצת',  en: 'Reeded',          glass: true,
     doors: ['d122', 'd125'] },
 ];
