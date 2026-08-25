@@ -64,7 +64,7 @@ reasoning above. `CLAUDE.md` §9's re-basing item, which is real, scoped
 future work and not something to start speculatively at the tail of a
 confirmation run.
 
-**Commit:** none.
+**Commit:** `c64d2a9`
 
 ---
 
