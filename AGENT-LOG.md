@@ -47,7 +47,7 @@ at the page. The `footHits`/classical-set reachability question from run 30
 is still open and still not started; it needs a dedicated pass, not a few
 spare minutes at the end of a green run.
 
-**Commit:** none.
+**Commit:** `30dcf19`
 
 ---
 
