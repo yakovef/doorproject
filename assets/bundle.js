@@ -4211,6 +4211,7 @@ ${body}
     // width 0.555
   };
   var CLASSIC_GLASS = byId(DETAILS, "classic").winFrac;
+  var CLASSIC_CORBEL = { w: 0.07, gap: 6e-3 };
   var CLASSIC_BAND = 59;
   var CLASSIC_BAND_FOOT = 9;
   function classicLight(leafW, leafH) {
@@ -4239,7 +4240,27 @@ ${body}
       { piece: "cornice", kind: "moulding", ...of("cornice", ...C.cornice) },
       { piece: "frieze", kind: "moulding", ...of("frieze", ...C.frieze) },
       { piece: "shelf", kind: "moulding", ...of("shelf", ...C.shelf) },
-      { piece: "band", kind: "moulding", ...of("band", 0.21, 0.79) },
+      { piece: "band", kind: "moulding", ...of("band", ...C.band) },
+      /* ⚠ THE BRACKETS ARE TWO PIECES, AND THEY USED TO BE PART OF THE BAND —
+         the band's span was widened to 0.210-0.790 so that it covered them,
+         because an obstacle is what is on the door and a pull bar put through a
+         corbel is through a corbel. That was true and it forced the DRAWING
+         order: everything in one group meant the brackets were painted before
+         the shelf, so the shelf's cast shadow fell across them and they came out
+         as two pale smudges where the photograph has them lit and crisp. A
+         corbel stands PROUD of the band and carries the shelf; it is not in the
+         shelf's shadow.
+         Naming them separately costs nothing the wide band bought — the same
+         leaf is still covered, by three rectangles instead of one — and it lets
+         `classicSet` draw them last. */
+      ...[0, 1].map((r) => ({
+        piece: r ? "corbelR" : "corbelL",
+        kind: "moulding",
+        x: leafW * (r ? C.band[1] + CLASSIC_CORBEL.gap : C.band[0] - CLASSIC_CORBEL.gap - CLASSIC_CORBEL.w),
+        y: leafH * R.shelf[1],
+        w: leafW * CLASSIC_CORBEL.w,
+        h: leafH * (R.band[1] - R.shelf[1])
+      })),
       { piece: "panel", kind: "panel", ...of("panel", ...C.panel) },
       { piece: "plinth", kind: "moulding", ...of("plinth", ...C.plinth) },
       { piece: "foot", kind: "moulding", ...of("foot", ...C.plinth) },
@@ -4364,8 +4385,9 @@ ${body}
   function classicCorbel(x, y, w, h, paint2, flip = false) {
     const n = (v) => Number(v.toFixed(1));
     const s = flip ? -1 : 1, ox = flip ? x + w : x;
-    const REEDS = 4, face = w * 0.74;
-    const pitch = face / REEDS, amp = pitch * 0.62;
+    const REEDS = 4;
+    const pitch = w / REEDS;
+    const BOW = w * 0.07;
     const at = (t) => ox + s * t;
     let out = `
     ${/* ⚠ `data-face`: the bracket is part of the BAND piece, and the band's
@@ -4376,22 +4398,23 @@ ${body}
         arriving from the tagging rather than from the geometry. */
     ""}
     <path data-face d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
-             L ${n(ox)} ${n(y + h)} Z" fill="${paint2}"/>
-    <path d="M ${n(at(face))} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
-             L ${n(at(face))} ${n(y + h)} Z" fill="${lighten(paint2, 0.05)}"/>`;
+             L ${n(ox)} ${n(y + h)} Z" fill="${paint2}"/>`;
     for (let i = 0; i < REEDS; i++) {
-      const cx = (i + 0.5) * pitch;
-      const d = `M ${n(at(cx + amp * 0.25))} ${n(y)}
-               C ${n(at(cx + amp * 0.25))} ${n(y + h * 0.22)}
-                 ${n(at(cx - amp * 0.55))} ${n(y + h * 0.34)}
-                 ${n(at(cx - amp * 0.55))} ${n(y + h * 0.56)}
-               C ${n(at(cx - amp * 0.55))} ${n(y + h * 0.8)}
-                 ${n(at(cx + amp * 0.1))} ${n(y + h * 0.86)}
-                 ${n(at(cx + amp * 0.1))} ${n(y + h)}`;
+      const top = (i + 0.5) * pitch;
+      const bot = top * 0.58;
+      const waist = (top + bot) / 2 - BOW;
+      const foot = y + h * (0.86 + 0.14 * i / (REEDS - 1));
+      const d = `M ${n(at(top))} ${n(y)}
+               C ${n(at(top))} ${n(y + h * 0.18)}
+                 ${n(at(waist))} ${n(y + h * 0.32)}
+                 ${n(at(waist))} ${n(y + h * 0.58)}
+               C ${n(at(waist))} ${n(y + h * 0.78)}
+                 ${n(at(bot))} ${n(y + h * 0.88)}
+                 ${n(at(bot))} ${n(foot)}`;
       const stroke = (wd, col, dx, op = 1) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${n(wd)}"
              stroke-linecap="round" stroke-opacity="${op}"
              transform="translate(${n(dx)} 0)"/>`;
-      out += stroke(pitch * 1, darken(paint2, 0.3), s * pitch * 0.16) + stroke(pitch * 0.84, paint2, 0) + stroke(pitch * 0.26, lighten(paint2, 0.2), -s * pitch * 0.17, 0.8);
+      out += stroke(pitch * 1.14, darken(paint2, 0.34), s * pitch * 0.22) + stroke(pitch * 0.98, paint2, 0) + stroke(pitch * 0.3, lighten(paint2, 0.22), -s * pitch * 0.2, 0.85);
     }
     out += `<path d="M ${n(ox)} ${n(y + h - h * 0.1)} L ${n(at(w))} ${n(y + h - h * 0.16)}
                    L ${n(at(w))} ${n(y + h)} L ${n(ox)} ${n(y + h)} Z"
@@ -4514,7 +4537,6 @@ ${body}
       ) + classicCap(...at(P.cornice), paint2, "cn")
     );
     const faceX = X(C.band[0]), faceW = (C.band[1] - C.band[0]) * lw;
-    const cbW = lw * 0.07, cbGap = lw * 6e-3;
     piece(
       "band",
       block(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh) + inBand(
@@ -4525,16 +4547,16 @@ ${body}
         "cbt",
         "tablet",
         "plain"
-      ) + [false, true].map((flip) => classicCorbel(
-        flip ? X(C.band[1]) + cbGap : X(C.band[0]) - cbGap - cbW,
-        Y(R.shelf[1]),
-        cbW,
-        (R.band[1] - R.shelf[1]) * lh,
-        paint2,
-        flip
-      )).join("")
+      )
     );
     piece("shelf", classicCap(...at(P.shelf), paint2, "sh", false, 0.51));
+    for (const r of [0, 1]) {
+      const q = P[r ? "corbelR" : "corbelL"];
+      piece(
+        r ? "corbelR" : "corbelL",
+        classicCorbel(lx + q.x, ly + q.y, q.w, q.h, paint2, !!r)
+      );
+    }
     out.push(classicPull(X(0.5), Y((R.band[0] + R.band[1]) / 2), lw * 0.33, lh * 0.028, tone));
     const pn = at(P.panel);
     out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">` + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint2, pale, leaf, "cpn", "ogee") + `</g>`);

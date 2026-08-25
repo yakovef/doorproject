@@ -172,13 +172,44 @@ in `AGENT-LOG.md`) and went fully green. **Treat container health as something
 to establish each run.** `AGENT.md` has the one circumstance in which pushing
 with those four red is right, and it still stands for the days it degrades.
 
-**As of run 30 the container was healthy and both known reds are cleared** —
-`npm test` **5,158,800 / 0**, `npm run audit` clean, `npm run collide` clean
-on `all` (1,358 designs) and `boxes`, `npm run recreate` clean (known
-catalogue gaps only), sheets current, and `npm run profile` clean — all
-struck through below rather than deleted, because the diagnosis in each is
-the useful part and the pattern (an instrument blind to something, not the
-drawing being wrong) has now repeated twice in two rounds.
+**As of 25.8 the container is healthy** — `npm test` **5,235,784 / 0**,
+`npm run audit` clean at seven viewports, `npm run collide` clean on `all`
+(1,398 designs) and `boxes`, `npm run recreate` clean (known catalogue gaps
+only), `npm run latency` 450 ms against a 600 ms gate, sheets current. The
+container reds below are struck through rather than deleted, because the
+diagnosis in each is the useful part and the pattern (an instrument blind to
+something, not the drawing being wrong) has repeated twice.
+
+⚠ **ONE LIVE RED, AND IT IS UNDERSTOOD: `npm run profile`, one row of four.**
+`dark reed  lower/upper 1.044` against a 1.03 gate. It is not a bulge, the
+gate has not been widened, and the drawing has not been tuned to fit it. The
+derivation is written out at length in `tools/profile.mjs`; the short form:
+
+- `keyWash` and `bloom` are warm overlays at an opacity that varies with
+  height, so a composite is `B(1-a) + Wa` — AFFINE, not multiplicative. Two
+  surfaces whose base tones differ by a factor t come out differing by less
+  than t wherever `a` is large, and `a` is largest near the key. So the upper
+  panel's bead reads flatter against its face than the lower one's on a
+  drawing where both mouldings are identical. That is contrast compressed near
+  the lamp, which is a photograph behaving normally.
+- The REEDED section's beads run 1.02 to 1.16 of the field — the quirks carry
+  that moulding, not the beads — so on near-black paint the whole quantity is
+  3.6% at the head and 8.1% at the foot, and the ratio of two numbers that
+  small is mostly the lamp. The OGEE rows, same machinery, same relight, read
+  1.019 and 1.006.
+- Three attempts at a quantity the wash cancels out of — the face on the
+  stile, the face straddling the run, the run's own tone-1.00 end samples —
+  all came back varying 3.5% to 4.8% between the panels, so the compositing
+  has a term that derivation does not. **Re-basing that measure is the named
+  next step**; see §9.
+- ⚠ AND THE GATE STILL FINDS ITS FAULT. Backing the relight out with both
+  sections in place reads 1.508 / 1.083 / 1.462 / 1.071 — all four red — so
+  the margin between "correct" and "the bug this was written for" is intact.
+
+⚠ **And it was DEAD before this round, silently.** The gradient ids gained a
+profile segment (`mould-reed-t`) and the selector asked for `url(#mould-t)`
+exactly, so it matched nothing, measured nothing, printed `upper NaN% lower
+NaN%` and exited GREEN. It now fails loudly when it cannot find its subject.
 
 - ~~**`npm run profile` red on the dark band, two of its three checks**~~ ✅
   **fixed in run 30, and it never was the drawing.** `grainTex`/`drift` are
@@ -1002,6 +1033,24 @@ complete and its findings live here:
   written down. Until then the classical set is the one face in the range whose
   fidelity is asserted by nobody.
 
+- **Re-base `npm run profile`'s bead check on a quantity the light cancels out
+  of.** It compares the bead against the face beside it and asks that the ratio
+  be the same on both panels, and under this drawing's own light it cannot be:
+  `keyWash` and `bloom` are warm overlays, so the composite is affine and
+  contrast is compressed wherever the lamp is strong. The check only ever
+  passed because it was calibrated on a section with a bright bead; the reeded
+  section's beads are 1.02 to 1.16 of the field and the ratio of two numbers
+  that small is mostly the lamp. It reads 1.044 on the dark reeded row against
+  a 1.03 gate and that row is red today. What is wanted is a figure the
+  wash divides out of — three surfaces of known base tone at the same place
+  should give one, `(bead - quirk) / (face - quirk)` being the obvious form —
+  but three attempts at the third surface all still varied 3.5% to 4.8%
+  between the panels, so the compositing has a term the derivation is missing.
+  ⚠ **The gate is not to be widened to close this.** Backing the relight out
+  reads 1.508 / 1.083 / 1.462 / 1.071, so it still separates correct from the
+  bug it was written for by a wide margin; what it does not do is separate
+  correct from correct.
+
 ### Not started
 CI, deploy to `design.dlatotmagen.co.il`, prerendering the default door into
 `index.html`, English and Russian.
@@ -1177,6 +1226,44 @@ how it got there. Detail lives in the section it belongs to.
     carry the profile now. It matches on the suffix, so a third section costs
     it nothing; asked for the old id it found no runs and reported every
     panelled door as an obstacle the drawing does not have.
+  - **The corbels are two pieces of their own, and they are drawn AFTER the
+    shelf.** Fifth rebuild, and this time the path was nearly right and the
+    fault was elsewhere. Two things: the rolls were struck at fractions of a
+    pitch computed off 0.74 of the bracket, so they came out thin with bare
+    paint between them and the pair read as two COMBS hanging off the shelf —
+    in the photograph four rolls fill the bracket edge to edge and what
+    separates them is a dark valley, not a gap. And they CONVERGE: the tops
+    span 0.06 to 0.94 of the width and the feet only 0.00 to 0.55, which is
+    what makes the bracket a wedge carrying the shelf rather than a fringe.
+    ⚠ The rest of it was the DRAW ORDER. Inside the band's group they went down
+    before the shelf, so the shelf's cast shadow — 0.80 of its own height,
+    blurred — lay across them and they came out as two grey smudges. A corbel
+    stands proud of the band and carries the shelf; the one thing it is not in
+    is the shelf's shadow. They are `corbelL` and `corbelR` in `classicPieces`
+    now, the band goes back to its own 0.286–0.714, and the same leaf is still
+    covered by three rectangles instead of one.
+  - **⚠ `npm run profile` WAS DEAD AND IS NOW RED, and both halves of that are
+    this round's doing.** The gradient ids gained a profile segment, its
+    selector asked for `url(#mould-t)` exactly, and it matched nothing:
+    `upper NaN% lower NaN%`, `Math.abs(NaN - 1) > 0.03` is false, exit 0. It
+    fails loudly when it cannot find its subject now, and it visits both
+    sections instead of one. Alive, it reports `dark reed 1.044` against a 1.03
+    gate — which is NOT a bulge and is written out at length in
+    `tools/profile.mjs` and in §0c: the drawing's washes are warm overlays, so
+    a composite is affine and contrast is compressed near the lamp, and the
+    reeded section's bead is small enough that the ratio of two heights is
+    mostly the lamp. The gate is not widened and the drawing is not tuned;
+    backing the relight out still reads 1.508 / 1.083 / 1.462 / 1.071, so it
+    has not stopped finding the fault it exists for. Re-basing the measure is
+    named in §9.
+  - **NOT CHANGED: `CLASSIC_GLASS`, and it took an overlay to leave it alone.**
+    A line scan across the light's left casing put the glass edge at 0.255 of
+    the leaf against the table's 0.289 — 44 mm, on both sides, which would have
+    been a real fault. Drawn back over the photograph in red it took one look:
+    the table's lines sit on the glass edges and the scan's sit well inside the
+    pane. What the scan found at 0.255 was the outermost ring of the IRONWORK,
+    not the rebate. Third time the fourth instrument has overturned a
+    derivative on this door (§7); the ruled read stands.
 - **Three photographs of the three-panel face, two of the classical set, and a
   standing instruction to look at the striped doors.** Sent in as *"i dont like
   how the 3 panels look, so there is 3 images of how it needs to look… also

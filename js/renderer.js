@@ -5365,6 +5365,13 @@ const CLASSIC_GLASS = byId(DETAILS, 'classic').winFrac;
    at 0.155, which leaves 0.029 — 59 mm on a 2,050 leaf. At 70 the casing runs
    into the frieze above it and 61 mm into the shelf below, and the shelf is
    what closes this light at the bottom in the first place. */
+/* The bracket under each end of the shelf, as fractions of the leaf's WIDTH.
+   Read off the ruled photograph; the crop at `classicCorbel` agrees to within
+   half a centimetre from a rougher instrument. Stated here because
+   `classicPieces` declares them and `classicSet` draws them, and those two
+   disagreeing about where a bracket is is exactly what `npm run collide`
+   exists to catch. */
+const CLASSIC_CORBEL = { w: 0.070, gap: 0.006 };
 export const CLASSIC_BAND = 59;
 /* And at the FOOT of that light there is barely any casing at all, because the
    SHELF is what closes it: 0.5545 to 0.559 of the leaf, nine millimetres. Drawn
@@ -5430,7 +5437,26 @@ export function classicPieces(leafW, leafH, glazed = true) {
     { piece: 'cornice', kind: 'moulding', ...of('cornice', ...C.cornice) },
     { piece: 'frieze',  kind: 'moulding', ...of('frieze',  ...C.frieze)  },
     { piece: 'shelf',   kind: 'moulding', ...of('shelf',   ...C.shelf)   },
-    { piece: 'band',    kind: 'moulding', ...of('band',    0.210, 0.790) },
+    { piece: 'band',    kind: 'moulding', ...of('band',    ...C.band)     },
+    /* ⚠ THE BRACKETS ARE TWO PIECES, AND THEY USED TO BE PART OF THE BAND —
+       the band's span was widened to 0.210-0.790 so that it covered them,
+       because an obstacle is what is on the door and a pull bar put through a
+       corbel is through a corbel. That was true and it forced the DRAWING
+       order: everything in one group meant the brackets were painted before
+       the shelf, so the shelf's cast shadow fell across them and they came out
+       as two pale smudges where the photograph has them lit and crisp. A
+       corbel stands PROUD of the band and carries the shelf; it is not in the
+       shelf's shadow.
+       Naming them separately costs nothing the wide band bought — the same
+       leaf is still covered, by three rectangles instead of one — and it lets
+       `classicSet` draw them last. */
+    ...[0, 1].map(r => ({
+      piece: r ? 'corbelR' : 'corbelL', kind: 'moulding',
+      x: leafW * (r ? C.band[1] + CLASSIC_CORBEL.gap
+                    : C.band[0] - CLASSIC_CORBEL.gap - CLASSIC_CORBEL.w),
+      y: leafH * R.shelf[1], w: leafW * CLASSIC_CORBEL.w,
+      h: leafH * (R.band[1] - R.shelf[1]),
+    })),
     { piece: 'panel',   kind: 'panel',    ...of('panel',   ...C.panel)   },
     { piece: 'plinth',  kind: 'moulding', ...of('plinth',  ...C.plinth)  },
     { piece: 'foot',    kind: 'moulding', ...of('foot',    ...C.plinth)  },
@@ -5636,12 +5662,35 @@ function classicFlutes(x, y, w, h, paint, count = 3) {
  *     and not an SVG attribute, so it mirrored about x = 0       → a wedge
  *     that flew off the side of the door
  *
- * What is actually there, at 2.4x on the photograph: FIVE CONVEX REEDS side by
- * side, each following a shallow S — bulging out at the top, waisting towards
- * the middle, bulging again at the foot — lit along their crowns and dark in
- * the grooves between, with a plain return on the inner side where the bracket
- * meets the band. Convex, not sunk: they catch the light in a line down the
- * middle of each reed, which a groove cannot do.
+ * What is actually there, read off `/tmp/photo-leaf.png` cropped to
+ * x 0.13-0.30 and y 0.570-0.700 of the leaf and blown up: FOUR CONVEX ROLLS
+ * side by side, each following a shallow S — square-cut under the shelf,
+ * swinging outward to a waist a little past halfway, and ending in a ROUNDED
+ * TIP. Lit along their crowns, dark in the valleys between.
+ *
+ * ⚠ FIFTH REBUILD, AND THE FAULT WAS THE WEIGHT, NOT THE PATH. The version
+ * before this had the S right and drew it as three superimposed strokes whose
+ * widths were fractions of a pitch computed off 0.74 of the bracket — so the
+ * rolls came out thin, separated by bare paint, and the pair read as two
+ * COMBS hanging under the shelf rather than as brackets carrying it. In the
+ * photograph the rolls TOUCH: four of them fill the bracket edge to edge, and
+ * what separates them is a dark valley, not a gap.
+ *
+ * Three things besides the weight, all measured on that crop:
+ *   the feet are STAGGERED — the roll against the band reaches lowest and the
+ *     outermost stops about a seventh of the height short, so the foot reads
+ *     as a diagonal rather than as a ruled line
+ *   the tips are round. A square-cut roll reads as a cut-off stick
+ *   and the BOX was left alone. The crop reads the bracket as 0.075 of the
+ *     leaf wide and 0.608 to 0.663 down it, against the 0.070 wide and 0.600
+ *     to 0.670 it is drawn at — agreement to within half a centimetre from a
+ *     rougher instrument than the ruled read those came from, so there is
+ *     nothing here to correct (REALISM §6). The stagger lands the outer tip at
+ *     0.660 and the inner at 0.670, which is the measured foot anyway.
+ *     ⚠ Widening it WOULD cost more than itself: `classicPieces` declares the
+ *     band spanning 0.210 to 0.790 SO THAT it covers these brackets, and at
+ *     0.075 the outer edge lands at 0.205 — outside the obstacle the rules
+ *     believe in, which `npm run collide` would report and be right to.
  *
  * Mirroring is arithmetic, never a transform: `s` is the sign and `ox` the
  * outer edge, and the two brackets are the same numbers with one flipped.
@@ -5649,8 +5698,14 @@ function classicFlutes(x, y, w, h, paint, count = 3) {
 function classicCorbel(x, y, w, h, paint, flip = false) {
   const n = v => Number(v.toFixed(1));
   const s = flip ? -1 : 1, ox = flip ? x + w : x;
-  const REEDS = 4, face = w * 0.74;              // the rest is the plain return
-  const pitch = face / REEDS, amp = pitch * 0.62;
+  /* ⚠ THE ROLLS FILL THE BRACKET. `face = w * 0.74` left a quarter of it as a
+     plain return that nothing in the photograph has, and it made every roll a
+     quarter narrower than it should be — which is most of why they read as
+     lines. `t` runs from the OUTER edge inward, so `t = 0` is the edge away
+     from the band on both hands. */
+  const REEDS = 4;
+  const pitch = w / REEDS;
+  const BOW = w * 0.07;          // how far the S swings outward at the waist
   const at = t => ox + s * t;
 
   /* the bracket's body, so the reeds have something to sit on */
@@ -5662,27 +5717,38 @@ function classicCorbel(x, y, w, h, paint, flip = false) {
           centimetres a side — which is the drift that check exists to find,
           arriving from the tagging rather than from the geometry. */''}
     <path data-face d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
-             L ${n(ox)} ${n(y + h)} Z" fill="${paint}"/>
-    <path d="M ${n(at(face))} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
-             L ${n(at(face))} ${n(y + h)} Z" fill="${lighten(paint, 0.05)}"/>`;
+             L ${n(ox)} ${n(y + h)} Z" fill="${paint}"/>`;
 
+  /* Outermost first, so each roll's own shadow is laid down before the roll
+     inboard of it covers the near half of it — which is what makes four
+     touching cylinders read as four and not as one lumpy slab. */
   for (let i = 0; i < REEDS; i++) {
-    const cx = (i + 0.5) * pitch;
-    /* the S: out at the head, in at the waist, out again at the foot */
-    const d = `M ${n(at(cx + amp * 0.25))} ${n(y)}
-               C ${n(at(cx + amp * 0.25))} ${n(y + h * 0.22)}
-                 ${n(at(cx - amp * 0.55))} ${n(y + h * 0.34)}
-                 ${n(at(cx - amp * 0.55))} ${n(y + h * 0.56)}
-               C ${n(at(cx - amp * 0.55))} ${n(y + h * 0.80)}
-                 ${n(at(cx + amp * 0.10))} ${n(y + h * 0.86)}
-                 ${n(at(cx + amp * 0.10))} ${n(y + h)}`;
+    /* ⚠ THE ROLLS CONVERGE, and drawn parallel they are a comb. In the
+       photograph they are spread right across the bracket's top, square under
+       the shelf, and they gather towards the OUTER bottom corner: the top
+       spans about 0.06 to 0.94 of the width and the foot only 0.00 to 0.55, so
+       each roll ends at a little over half the offset it started at. That
+       convergence is the whole silhouette — it is what makes the bracket a
+       wedge carrying the shelf rather than a fringe hanging off it. */
+    const top = (i + 0.5) * pitch;
+    const bot = top * 0.58;
+    const waist = (top + bot) / 2 - BOW;
+    const foot = y + h * (0.86 + 0.14 * i / (REEDS - 1));
+    const d = `M ${n(at(top))} ${n(y)}
+               C ${n(at(top))} ${n(y + h * 0.18)}
+                 ${n(at(waist))} ${n(y + h * 0.32)}
+                 ${n(at(waist))} ${n(y + h * 0.58)}
+               C ${n(at(waist))} ${n(y + h * 0.78)}
+                 ${n(at(bot))} ${n(y + h * 0.88)}
+                 ${n(at(bot))} ${n(foot)}`;
     const stroke = (wd, col, dx, op = 1) =>
       `<path d="${d}" fill="none" stroke="${col}" stroke-width="${n(wd)}"
              stroke-linecap="round" stroke-opacity="${op}"
              transform="translate(${n(dx)} 0)"/>`;
-    out += stroke(pitch * 1.00, darken(paint, 0.30), s * pitch * 0.16)
-         + stroke(pitch * 0.84, paint, 0)
-         + stroke(pitch * 0.26, lighten(paint, 0.20), -s * pitch * 0.17, 0.80);
+    /* the valley on the inboard side, then the roll, then its lit crown */
+    out += stroke(pitch * 1.14, darken(paint, 0.34), s * pitch * 0.22)
+         + stroke(pitch * 0.98, paint, 0)
+         + stroke(pitch * 0.30, lighten(paint, 0.22), -s * pitch * 0.20, 0.85);
   }
   /* the shadow the whole bracket throws where it meets the leaf */
   out += `<path d="M ${n(ox)} ${n(y + h - h * 0.10)} L ${n(at(w))} ${n(y + h - h * 0.16)}
@@ -5858,15 +5924,23 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
      0.210 to 0.790 so that it covers the brackets as well: an obstacle is what
      is on the door, not what the joinery calls one piece. */
   const faceX = X(C.band[0]), faceW = (C.band[1] - C.band[0]) * lw;
-  const cbW = lw * 0.070, cbGap = lw * 0.006;
   piece('band',
     block(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh)
     + inBand(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh,
-             'cbt', 'tablet', 'plain')
-    + [false, true].map(flip => classicCorbel(
-        flip ? X(C.band[1]) + cbGap : X(C.band[0]) - cbGap - cbW,
-        Y(R.shelf[1]), cbW, (R.band[1] - R.shelf[1]) * lh, paint, flip)).join(''));
+             'cbt', 'tablet', 'plain'));
   piece('shelf', classicCap(...at(P.shelf), paint, 'sh', false, 0.51));
+  /* ⚠ AFTER THE SHELF, and that is the whole reason the brackets are pieces of
+     their own. Drawn inside the band's group they went down first, so the
+     shelf's cast shadow — 0.80 of its own height, blurred — lay across them
+     and the pair read as two grey smudges. The photograph has them lit: a
+     corbel stands proud of the band and CARRIES the shelf, so the one thing it
+     is not in is the shelf's shadow. Off `classicPieces`, like everything
+     else, so the rules and the drawing cannot disagree about where they are. */
+  for (const r of [0, 1]) {
+    const q = P[r ? 'corbelR' : 'corbelL'];
+    piece(r ? 'corbelR' : 'corbelL',
+          classicCorbel(lx + q.x, ly + q.y, q.w, q.h, paint, !!r));
+  }
   /* THE SET'S OWN PULL. Part of the face, not of the hardware axis — see the
      catalogue entry: this door carries it AND a long vertical bar, and
      `state.handle` holds one grip. */
