@@ -75,8 +75,7 @@ understood and by design unfixed, since run 28.
 already names the re-basing work and it is not something a five-hour
 check-in should attempt without doing that derivation itself.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** 5be000b
 
 ---
 
