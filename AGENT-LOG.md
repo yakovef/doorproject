@@ -23,6 +23,35 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-25 00:48 UTC — run 31: nothing worth changing
+
+**Looked at:** no new commits since run 30's push — local and origin were
+already at the same sha. Built (no diff), opened the site at 390×844 and
+1440×900, clicked through all four sections, then exercised window → rect,
+handle → idan, detail → panel3, colour → black in sequence through the real
+UI: no console errors, price and spec line stayed consistent, and selecting
+the three-panel face correctly stepped the window back to "none" (a panel
+and a window in the upper half cannot coexist, and `repair()` did its job
+silently and correctly).
+
+**Instruments:** test ✓ (5,158,800) · audit ✓ (no faults) · profile ✓ ·
+collide ✓ (`all`, 1,358 designs / `boxes`) · recreate ✓ (known catalogue
+gaps only, unchanged). All six green, all confirmed by direct re-run, none
+of it inherited from a commit message.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — there is nothing red and nothing I
+found looking at the page that deserved changing. The one still-open item
+from run 30 (whether `footHits`'s ring treatment on the classical set's
+non-panel rows can ever place a foot somewhere visually occupied) is real
+work for a dedicated pass, not something to start at the tail end of a
+green run with nothing prompting it.
+
+**Commit:** none.
+
+---
+
 ## 2026-08-24 21:00 UTC — run 30: `npm run profile` fixed — the check was sampling paint texture it was never meant to see, and it is falsifiable now
 
 **Looked at:** four new human commits since run 29 — a photo-crop correction
