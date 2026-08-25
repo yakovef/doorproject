@@ -227,9 +227,23 @@ drawing being wrong) has now repeated twice in two rounds.
     the shelf is what closes the light. At 70 all round, the casing and the
     shelf's corona were two pieces of joinery drawn through each other for 61
     mm. `CLASSIC_BAND` and `CLASSIC_BAND_FOOT`, read by the drawing and by the
-    obstacle alike. ⚠ The third, unconfirmed thing run 29 raised — `footHits`
-    treating all the classic rows as rings with a walkable middle — is still
-    unconfirmed and still worth tracing.
+    obstacle alike. ⚠ **The third thing run 29 raised — `footHits` treating
+    every classic row as a ring with a walkable middle — is TRACED NOW (run
+    33), and it is not a defect.** Swept every handle, both glazed states and
+    every size against every moulding-kind piece `faceObstacles` declares.
+    Two things open a hollow, and both are right: the solid variant's `light`
+    piece — the panel that stands where the glass would be on the unglazed
+    door — is genuinely a raised panel (a moulded frame round a flat field,
+    the peephole and knocker it would have carried are a withdrawn group and
+    nothing draws there), so a walkable middle is correct, the same rule
+    every other panelled door already follows. The only other opening is a
+    4–6.5 mm sliver in the `band` piece on the TALL size with the three
+    narrowest bars — smaller than the foot's own diameter, below anything a
+    customer or a photograph could distinguish. Every solid `moulding` piece
+    (cornice, frieze, shelf, plinth, foot) stays fully solid on every size and
+    every handle, because none of them is tall enough for `band: MOULD_BAND`
+    to open a hole at any real foot radius. No code changed — there was
+    nothing to fix.
 
 What to know for the days it degrades:
 

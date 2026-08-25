@@ -23,6 +23,73 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-25 10:51 UTC — run 33: the last open question about the classical set is traced, and it was not a bug
+
+**Looked at:** no new commits since run 32's push. Built (no diff), opened
+the site at 390×844 and 1440×900 — unchanged from the last two runs. With
+three quiet runs behind me and one concrete, real, already-identified open
+item on the books (not manufactured work), I spent this run closing it
+rather than writing a fourth identical "nothing worth changing" entry.
+
+**The open item:** since run 30, `faceObstacles` sets `band: MOULD_BAND`
+uniformly on all six classical-set obstacle pieces, but `footHits`'s
+ring-with-a-walkable-middle treatment (right for a raised panel, where the
+flat field inside the frame is exactly where a bar's foot belongs) was only
+ever verified for the `panel` piece. Whether it could open a walkable hollow
+in one of the five `moulding`-kind pieces — cornice, frieze, shelf, band,
+plinth — where none should exist, letting a customer's dragged handle rest
+somewhere visually occupied (the shelf's tablet motif, the set's own turned
+pull), was flagged and never traced.
+
+**Traced by direct computation, not by reasoning about it.** Wrote a script
+against the real `gripFeet`/`classicPieces`/`MOULD_BAND` exports — every
+`HANDLES` entry that has feet, every `SIZES` band, both the glazed and solid
+variant — and evaluated `footHits`'s own hollow-interior arithmetic
+(`ob.h > 2·(ob.band + f.r)` and the same for width) against every piece.
+Two things open a hole, and both are correct:
+
+- **The solid variant's `light` piece** — the panel substituted for the glass
+  when the customer picks the unglazed set — opens a real, large hollow
+  (up to 356×659 mm on `wide`). It should: that piece is a genuine raised
+  panel, a moulded frame round a flat field, and its own catalogue comment
+  says as much ("a big raised panel with a peephole and a ring knocker" —
+  and the peephole/knocker are a withdrawn group, so nothing is actually
+  drawn there to be sat on). This is the SAME rule every other panelled door
+  in the range already follows.
+- **The `band` piece on the `tall` size only**, with the three narrowest bars
+  (Ella, Ron, `barblack`, foot radius 9–10 mm) — a 4.5–6.5 mm sliver, smaller
+  than the foot's own diameter. Mathematically a hole; nothing a customer or
+  a photograph could ever tell apart from solid.
+
+**Every genuinely solid piece — cornice, frieze, shelf, plinth, foot — stays
+fully solid on every size, every handle, both glazed states.** None of them
+is tall enough for `MOULD_BAND` (70 mm) to open a hole at any real foot
+radius (9–42 mm across every grip in the catalogue, `shiran` widest). The
+tallest of them, `band` at 143.5 mm on a standard leaf, needs a piece over
+2·(70+r) ≈ 160–184 mm tall before a hole opens, and never reaches it outside
+the `tall` sliver above.
+
+**Changed:** nothing shipped — only `CLAUDE.md`, closing the note run 29 and
+the human's fix both left open. No renderer or rules change, because nothing
+needed fixing: `band: MOULD_BAND` on the moulding-kind pieces is imprecise
+by name but provably inert everywhere it matters, and the one place it is
+NOT inert (the `light` piece) is correct to have a hollow.
+
+**Instruments:** test ✓ (5,158,800) · audit ✓ (no faults) · profile ✓ ·
+collide ✓ (`all`, 1,358 designs / `boxes`) · recreate ✓ (known catalogue
+gaps only). All confirmed green before this investigation and unaffected by
+it, since nothing shipped moved.
+
+**Left alone deliberately:** the `band: MOULD_BAND` field itself. Renaming
+it or splitting it per-piece would be a real cleanup, but it changes no
+behaviour anywhere I could find, and AGENT.md's own standing note applies —
+a change made because it looks tidier, with no defect behind it, is not
+one to make.
+
+**Commit:** see below.
+
+---
+
 ## 2026-08-25 05:48 UTC — run 32: nothing worth changing
 
 **Looked at:** no new commits since run 31's push — local and origin already
