@@ -48,7 +48,7 @@ non-panel rows can ever place a foot somewhere visually occupied) is real
 work for a dedicated pass, not something to start at the tail end of a
 green run with nothing prompting it.
 
-**Commit:** none.
+**Commit:** `42f2e3c`
 
 ---
 
