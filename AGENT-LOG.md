@@ -23,6 +23,34 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-25 05:48 UTC — run 32: nothing worth changing
+
+**Looked at:** no new commits since run 31's push — local and origin already
+matched. Built (no diff), opened the site at 390×844 and 1440×900, then
+opened the real in-page gallery (`#works-btn`, "התחילו מדלת שכבר התקנו") for
+the first time in a few runs rather than repeating the same click sequence —
+all 30 measured doors render distinctly, no console errors, no id collisions
+visible. My first attempt clicked the header's "דגמים" nav link instead,
+which points at the external `dlatotmagen.co.il/works` and correctly fails
+to load over `file://` — that is expected (site not deployed, `PLAN.md` §9)
+and my own test's mistake, not a site defect; re-tested against the actual
+in-page trigger and it works.
+
+**Instruments:** test ✓ (5,158,800) · audit ✓ (no faults) · profile ✓ ·
+collide ✓ (`all`, 1,358 designs / `boxes`) · recreate ✓ (known catalogue
+gaps only). All six green, all confirmed by direct re-run.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — nothing red, nothing found looking
+at the page. The `footHits`/classical-set reachability question from run 30
+is still open and still not started; it needs a dedicated pass, not a few
+spare minutes at the end of a green run.
+
+**Commit:** none.
+
+---
+
 ## 2026-08-25 00:48 UTC — run 31: nothing worth changing
 
 **Looked at:** no new commits since run 30's push — local and origin were
