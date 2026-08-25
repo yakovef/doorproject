@@ -586,6 +586,26 @@ export const HANDINGS = [
  * photographs actually win — a door with a moulded panel reads as a
  * manufactured product; a bare rectangle reads as a drawing.
  */
+/**
+ * ── THE FACE LIST HAS TWO HALVES, AND THE PANEL SAYS SO ──────────────
+ *
+ * Asked for from outside: *"there are too much stripes right now, so in the
+ * עיצוב חזית category have 2 sub categories, a panel and a stripes one."* True
+ * — the list went from fourteen tiles to twenty when the ogee panels and the
+ * four missing stripe compositions arrived, and twelve of those twenty are
+ * stripes.
+ *
+ * ⚠ A LABEL ON EACH OPTION, NOT A RE-CUT OF THE LIST. The short code packs
+ * DETAILS' INDEX, so moving `classic` up beside the panels — where it belongs,
+ * being a panelled composition rather than a striped one — would cost a
+ * `VERSION` bump and refuse every code already written. `sub` says which half
+ * an option is in and `buildOptions` groups by it, so the ORDER on the screen
+ * and the order in this array are now two different things and only one of
+ * them is a wire format. Anything with no `sub` — `plain` — is drawn first,
+ * with no heading over it.
+ */
+export const DETAIL_SUBS = [['panel', 'פאנלים'], ['strips', 'פסים']];
+
 export const DETAILS = [
   { id: 'plain',  he: 'חלק',            en: 'Plain',              panel: false, groove: false },
 
@@ -613,17 +633,17 @@ export const DETAILS = [
      are milled and four are applied strips.
      They alias onto the lower panel rather than onto `plain`, because an alias
      should substitute for a decision, not delete it. */
-  { id: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    panel: true,  groove: false,
+  { id: 'panel', sub: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    panel: true,  groove: false,
     aliases: ['both', 'groove', 'perimeter'] },
   /* The classic two-rectangle face — tall upper, short lower — which d048
      carries and a single bottom-quarter panel cannot describe. */
-  { id: 'panel2', he: 'שני פאנלים',     en: 'Two panels',     panel: true,  groove: false,
+  { id: 'panel2', sub: 'panel', he: 'שני פאנלים',     en: 'Two panels',     panel: true,  groove: false,
     panels: 2, top: true },
   /* ⚠ THE UPPER RECTANGLE ALONE. Asked for from outside: *"add an option of
      only the top panel"*. Every panelled option in this list used to put
      something at the FOOT of the leaf, so a face with a single high panel and
      a bare plinth below it was not expressible. */
-  { id: 'panelTop', he: 'פאנל עליון',   en: 'Upper panel',    panel: true,  groove: false,
+  { id: 'panelTop', sub: 'panel', he: 'פאנל עליון',   en: 'Upper panel',    panel: true,  groove: false,
     panels: 1, top: true },
   /* ⚠ AND THREE. Asked for as *"an option of three panels, its the 2 panels,
      and another one in the middle"* — so it is the pair's envelope, 0.07 to
@@ -641,7 +661,7 @@ export const DETAILS = [
      door. See PANEL_ROWS in renderer.js for the rows and the ±0.03 on them.
      The name stays "three panels" because that is what it was asked for as and
      what a customer counts; the plate is the third. */
-  { id: 'panel3', he: 'שלושה פאנלים',   en: 'Three panels',   panel: true,  groove: false,
+  { id: 'panel3', sub: 'panel', he: 'שלושה פאנלים',   en: 'Three panels',   panel: true,  groove: false,
     panels: 3, top: true, grab: true },
 
   /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
@@ -672,9 +692,9 @@ export const DETAILS = [
      ⚠ AND THE SECTION GOES ROUND THE GLASS TOO. `mouldOf` is asked once and
      answers for the panel and for the architrave together, because every
      corpus door with a window over a panel cases both in the same section. */
-  { id: 'panelo', he: 'פאנל תחתון קלאסי', en: 'Lower panel, ogee',
+  { id: 'panelo', sub: 'panel', he: 'פאנל תחתון קלאסי', en: 'Lower panel, ogee',
     panel: true, groove: false, profile: 'ogee', doors: ['d050', 'd053'] },
-  { id: 'panel2o', he: 'שני פאנלים קלאסיים', en: 'Two panels, ogee',
+  { id: 'panel2o', sub: 'panel', he: 'שני פאנלים קלאסיים', en: 'Two panels, ogee',
     panel: true, groove: false, panels: 2, top: true, profile: 'ogee',
     doors: ['d051', 'd061', 'd067', 'd077'] },
 
@@ -723,10 +743,10 @@ export const DETAILS = [
      STRIP_ROWS in the renderer, rather than fitted from a span formula that
      would have put them at 0.23 and 0.77. It is the commonest striped door in
      the corpus and it had no tile. */
-  { id: 'strips2', he: 'שני פסים אחידים', en: 'Two strips, even',
+  { id: 'strips2', sub: 'strips', he: 'שני פסים אחידים', en: 'Two strips, even',
     panel: false, groove: false, strips: 2, even: true, rows: 'pair',
     doors: ['d035', 'd036', 'd049'] },
-  { id: 'strips4', he: 'ארבעה פסים אחידים', en: 'Four strips, even',
+  { id: 'strips4', sub: 'strips', he: 'ארבעה פסים אחידים', en: 'Four strips, even',
     panel: false, groove: false, strips: 4, even: true, rows: 'quad',
     doors: ['d056', 'd063'] },
   /* ⚠ EIGHT FINE LINES IN A BAND, NOT EIGHT SPREAD OVER THE DOOR. d081 puts
@@ -737,21 +757,21 @@ export const DETAILS = [
      the hinge edge; d081's is the one measured because its band runs the full
      width and the reading is clean. Nothing else in the list can express it:
      eight strips spread evenly is a barcode, and this is a band. */
-  { id: 'stripsband', he: 'פסים צפופים',  en: 'Banded strips',
+  { id: 'stripsband', sub: 'strips', he: 'פסים צפופים',  en: 'Banded strips',
     panel: false, groove: false, strips: 8, even: true, rows: 'band',
     doors: ['d081'] },
 
-  { id: 'strips3',he: 'שלושה פסים מדורגים', en: 'Three strips, ragged',
+  { id: 'strips3', sub: 'strips',he: 'שלושה פסים מדורגים', en: 'Three strips, ragged',
     panel: false, groove: false, strips: 3 },
-  { id: 'strips5',he: 'חמישה פסים מדורגים', en: 'Five strips, ragged',
+  { id: 'strips5', sub: 'strips',he: 'חמישה פסים מדורגים', en: 'Five strips, ragged',
     panel: false, groove: false, strips: 5 },
-  { id: 'strips7',he: 'שבעה פסים מדורגים',  en: 'Seven strips, ragged',
+  { id: 'strips7', sub: 'strips',he: 'שבעה פסים מדורגים',  en: 'Seven strips, ragged',
     panel: false, groove: false, strips: 7, doors: ['d044', 'd064'] },
-  { id: 'strips9',he: 'תשעה פסים מדורגים',  en: 'Nine strips, ragged',
+  { id: 'strips9', sub: 'strips',he: 'תשעה פסים מדורגים',  en: 'Nine strips, ragged',
     panel: false, groove: false, strips: 9 },
   /* Eleven is d078's own count, and it keeps the id `strips` it has always
      had — the plain name for what used to be the only strip option. */
-  { id: 'strips', he: 'אחד עשר פסים מדורגים', en: 'Eleven strips, ragged',
+  { id: 'strips', sub: 'strips', he: 'אחד עשר פסים מדורגים', en: 'Eleven strips, ragged',
     panel: false, groove: false, strips: 11, doors: ['d078'] },
   /* The strips run BOTH ways and we drew one. The counts above are horizontal
      — d078's eleven bands settled that in an earlier round — but five doors
@@ -763,12 +783,12 @@ export const DETAILS = [
      and d043 all carry three; d040 and d046 carry four; nothing carries six.
      The list offered four and six. The fan itself is measured on d038 and
      d043 — see `metalStrips` — and applies at any count. */
-  { id: 'stripsv3', he: 'שלושה פסים אנכיים', en: 'Three vertical strips',
+  { id: 'stripsv3', sub: 'strips', he: 'שלושה פסים אנכיים', en: 'Three vertical strips',
     panel: false, groove: false, strips: 3, vertical: true,
     doors: ['d037', 'd038', 'd043'] },
-  { id: 'stripsv', he: 'פסים אנכיים',   en: 'Vertical strips', panel: false, groove: false,
+  { id: 'stripsv', sub: 'strips', he: 'פסים אנכיים',   en: 'Vertical strips', panel: false, groove: false,
     strips: 4, vertical: true, doors: ['d040', 'd046'] },
-  { id: 'stripsv6', he: 'שישה פסים אנכיים', en: 'Six vertical strips',
+  { id: 'stripsv6', sub: 'strips', he: 'שישה פסים אנכיים', en: 'Six vertical strips',
     panel: false, groove: false, strips: 6, vertical: true },
   /* ⚠ THE CROSS, AND THE INVENTORY HAS CALLED IT MISSING FOR THREE ROUNDS.
      `research/works/INVENTORY.md` lists it under the face designs as *"Cross
@@ -781,7 +801,7 @@ export const DETAILS = [
      price read it the same way the other stripe options are read. See
      `metalStrips` for the measurements and for why the vertical is a strip
      here and the pull bar on three of the four real doors. */
-  { id: 'stripsx', he: 'פס אנכי חוצה',  en: 'Crossed strips',
+  { id: 'stripsx', sub: 'strips', he: 'פס אנכי חוצה',  en: 'Crossed strips',
     panel: false, groove: false, strips: 5, cross: true, doors: ['d047', 'd074'] },
 
   /* ── THE CLASSICAL SET ─────────────────────────────────────────────
@@ -841,7 +861,7 @@ export const DETAILS = [
      from one door, photographed off the workshop floor into
      `research/newdoor/`. Whether those five are the same product is a question
      for Peretz and it is asked. */
-  { id: 'classic', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false,
+  { id: 'classic', sub: 'panel', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false,
     classic: true, grab: true, rectOnly: true, doors: ['newdoor'],
     /* The set's own mouldings are drawn by `classicSet` and are the ogee by
        construction — that section was measured on this very door. This field
@@ -849,7 +869,13 @@ export const DETAILS = [
        `aperture` like any other opening and which would otherwise have come
        out reeded on the one door that certainly is not. */
     profile: 'ogee',
-    winFrac: { x0: 0.289, x1: 0.711, top: 0.155, bot: 0.5545 } },
+    /* ⚠ THE ROWS ARE SCALED BY 3698/3730 with CLASSIC_ROWS — the crop the set
+       was measured from was 0.86% short, see the note there. The COLUMNS are
+       left alone: an edge-find on the rectified leaf puts the pane at 0.291 to
+       0.706 against these 0.289 and 0.711, which is 0.007 and inside the
+       instrument's own error, and drawing them back over the photograph in red
+       put them on the glass twice. */
+    winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.550 } },
 ];
 
 /**

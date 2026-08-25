@@ -1070,6 +1070,23 @@ export function render(state) {
 
   const pale = isLight(paint);
 
+  /* The glazing, built once and PLACED once — either before the face design or
+     after it, never both. See the note at the two call sites in the markup:
+     the classical set is a whole composition applied over the light's
+     architrave, and every other face is one feature laid on a leaf beside it. */
+  const glazing = `
+  <g id="glazing">
+    ${openings.map((o, i) => aperture({
+      band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
+      bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
+      x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
+      splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
+      paint, edge, grille, key: 'm' + i, profile: mouldOf(detail),
+      leaf: { x: mainX, y: y0, w: leafW, h: leafH },
+    })).join('')}
+  </g>`;
+
+
   /* The leaf's own perimeter ramps, distinct from the frame's shadow gap and
      easy to omit: the face itself darkens towards its edges over 0.04-0.06 W,
      and over 0.065 H at the foot. Measured on the anthracite stairwell door. */
@@ -2183,6 +2200,26 @@ export function render(state) {
   <!-- ── main leaf ────────────────────────────────────────────── -->
   <g id="leaf" data-x="${mainX}" data-w="${leafW}">${leaf(mainX, leafW)}</g>
 
+  ${/* ⚠ THE GLAZING GOES FIRST WHEN THE FACE IS A WHOLE COMPOSITION, and the
+        reason is joinery. Reported from outside: *"if i add a window it goes
+        on the overlaps the set."* It was literally true. `#glazing` is drawn
+        after `#detail`, so the light's architrave painted over the set — its
+        top run is 59 mm of lit ramp ending at 0.1262 of the leaf where the
+        frieze's block ends at 0.126, and 0.2 mm of contact plus the mitre
+        stroke and the antialiasing is enough for a bright band to eat the
+        frieze's bottom edge. The same happens at the foot against the shelf.
+        Nobody reported it on a SOLID set because there the panel that stands
+        in the light's place is drawn by `classicSet` itself, before the
+        cornice — "so the head's shadow falls on it" — so the frieze covers it
+        and the join reads clean. Glazed, the two halves of the same
+        composition were being drawn in opposite orders.
+        On the real door the architrave is fitted round the light and THEN the
+        ornament is applied over the face, so the set going last is what the
+        joinery does. Only for the set: on an ordinary panelled leaf the panel
+        is aligned to the window and drawn after it, and swapping those would
+        let a panel paint over the glass. */''}
+  ${detail.classic ? glazing : ''}
+
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
     ${/* ⚠ THE CLASSICAL SET IS ITS OWN COMPOSITION AND TAKES OVER THE FACE.
@@ -2218,17 +2255,7 @@ export function render(state) {
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail, tone, hingeOnLeft) : ''}
   </g>
 
-  <!-- ── glazing ──────────────────────────────────────────────── -->
-  <g id="glazing">
-    ${openings.map((o, i) => aperture({
-      band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
-      bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
-      x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
-      splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
-      paint, edge, grille, key: 'm' + i, profile: mouldOf(detail),
-      leaf: { x: mainX, y: y0, w: leafW, h: leafH },
-    })).join('')}
-  </g>
+  ${detail.classic ? '' : glazing}
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
@@ -2471,18 +2498,48 @@ const MOULDS = {
     [0.46, 0.86], [0.52, 1.12], [0.60, 0.62], [0.70, 1.10],
     [0.79, 0.36], [0.87, 0.70], [0.94, 0.96], [1.00, 1.00],
   ],
-  /* `research/newdoor/` at 4000 px, `tools/_section.mjs` across the panel's
-     left run. Two zones and nothing else:
+  /* ⚠ RE-READ ON d050, WHICH IS THE DOOR THAT WAS POINTED AT. This was the
+     `research/newdoor/` section — one deep hollow through the middle and one
+     broad lit round — and it was reported from outside as *"i dont like how
+     the פאנל קלאסי look"* with four photographs attached. Three of the four
+     are in the corpus: image 1 is d050, image 2 is d111, image 4 is d127. d050
+     is the one worth measuring — flat on, even light, plain paint, no
+     ironwork, and it is the panel the complaint is about.
 
-        1.00  the leaf's own face
-        0.68  ONE deep quirk, a third of the way in
-        1.16  ONE broad lit face, the ogee's top
-        1.00  the field, which is the same paint again  */
+     `tools/_msect.mjs d050 0.212 0.308 0.13 0.29 20`, the moulding 46 px wide,
+     median down 16% of the leaf's height so a peephole or a highlight on one
+     row is thrown away:
+
+        1.01 1.01 1.01 | 0.94 0.91 0.84 | 1.02 1.01 1.00 1.01 1.01 1.01 1.01
+        1.00 1.01 1.00 | 0.92 | 0.99 0.99 1.03
+
+     That is not an ogee at all. It is ONE NARROW GROOVE near the outer edge,
+     a LONG FLAT across the middle at the paint's own tone, and a SECOND,
+     shallower groove near the inner edge. Half the band is flat. The old table
+     put a hollow through the middle of that flat and a bright round where the
+     inner groove is, which is why it read as a soft bulge rather than as a
+     scribed frame.
+
+     ⚠ THE DEPTHS ARE UN-COMPRESSED, and that is arithmetic rather than taste.
+     d050 is a near-white door and `mouldGradients` already scales relief by
+     0.34 on pale paint, so a table storing the measured 0.84 would draw 0.95
+     there — half the groove the photograph has. Each measured departure from
+     1.00 is divided by that 0.34 before it is stored, so the PALE rendering
+     comes back out at the measured figure. The factor is the corpus's own:
+     REALISM §7.4b measures cream d076 at a 0.22 departure where navy d048 is
+     at 0.73, a ratio of 0.30.
+
+     ⚠ ONE DOOR, and said out loud. d077, d061 and d111 carry the same family
+     and none of them can confirm it — d077 and d061 are so bright the whole
+     moulding sits inside 0.95 to 1.00, and d111's and d127's leaf boxes in
+     `leaf.json` are fallbacks (the file says which), so a fraction of them is
+     not a fraction of the door. If a darker door of this family is ever
+     measured properly, this is the table to check. */
   ogee: [
-    [0.00, 1.00], [0.10, 0.94], [0.20, 0.86], [0.30, 0.71],
-    [0.36, 0.68], [0.44, 0.82], [0.52, 0.93], [0.60, 1.14],
-    [0.70, 1.16], [0.78, 1.06], [0.86, 1.12], [0.94, 1.05],
-    [1.00, 1.00],
+    [0.00, 1.00], [0.11, 1.00], [0.16, 0.82], [0.21, 0.74],
+    [0.26, 0.53], [0.32, 1.06], [0.42, 1.00], [0.53, 1.03],
+    [0.68, 1.00], [0.79, 1.00], [0.84, 0.76], [0.89, 0.97],
+    [0.95, 0.97], [1.00, 1.00],
   ],
 };
 /* Endpoints stay at exactly 1.00 in BOTH: a moulding meets the same flat face
@@ -2740,14 +2797,45 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  *
  * They are all one composition and it is not three panels at all:
  *
- *     a TALL upper panel, 0.375 of the leaf
- *     a SHORT plate, 0.09 — and the pull bar is bolted across it
- *     a MEDIUM lower panel, 0.30
+ *     a TALL upper panel
+ *     a plate — and the pull bar is bolted across it
+ *     a MEDIUM lower panel
  *
- * The middle rectangle is a HANDLE PLATE. That is why it is short, why it sits
- * at hand height rather than at a third of the way down, and why deriving it
- * from the pair could never have produced it: the pair's proportions are about
- * how a panelled door is divided, and this one's are about where a hand goes.
+ * The middle rectangle is a HANDLE PLATE. That is why it sits at hand height
+ * rather than at a third of the way down, and why deriving it from the pair
+ * could never have produced it: the pair's proportions are about how a
+ * panelled door is divided, and this one's are about where a hand goes.
+ *
+ * ⚠ AND THE ROWS ARE OFF THE CORPUS NOW, NOT OFF THOSE THREE SNAPSHOTS. The
+ * first measured version put the composition too high and the plate too short
+ * — upper 0.055-0.430, plate 0.455-0.545, lower 0.575-0.875 — and it was
+ * reported back as *"the 3 panel option looks bad, so look at doors with 3
+ * panels and make the panel proportions look like the real thing."* The corpus
+ * has three of them, found by going back through all 129: **d067, d068 and
+ * d077**, each a tall upper over a plate carrying a turned pull over a lower
+ * panel. (d065, d070 and d087 are the same door WITHOUT the plate — the pull
+ * bolted to bare face — which is worth knowing: the plate is optional on a
+ * real door and here it is what `panel3` is.)
+ *
+ * Read by luminance derivative down the leaf's centre on d077, which is the
+ * only one of the three shot square-on, and off a ruled grid on d068; d067 is
+ * quoted but not used, because its crop's aspect comes out at 0.535 against a
+ * door's 0.415, so a fraction of that picture is not a fraction of the leaf —
+ * the same trap CLASSIC_ROWS fell into twice.
+ *
+ *              upper          plate          lower
+ *     d068   0.077-0.542   0.568-0.645   0.684-0.929
+ *     d077   0.100-0.511   0.525-0.677   0.689-0.912
+ *     mean   0.089-0.527   0.547-0.661   0.687-0.921
+ *
+ * Two things fall out. The plate is 0.114 of the leaf and not 0.09 — half
+ * again as tall — and the whole composition sits some 0.05 LOWER than it was
+ * drawn, so the pull was riding about 100 mm high. And the trio's upper and
+ * lower rectangles land within 0.02 of `pair`'s own 0.07-0.58 and 0.66-0.92,
+ * which is the sanity check this table never had: the three-panel door IS the
+ * two-panel door with a plate let in between, once the plate is the right
+ * height. The reasoning that was wrong before was the ENVELOPE — splitting the
+ * pair's span three ways — not the family resemblance.
  *
  * ⚠ AND THE TRIO'S PANELS ARE WIDER. `PANEL_INSET` is 0.23 and measured, but
  * measured on the one- and two-panel doors; on all three of these photographs
@@ -2759,7 +2847,7 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  */
 const PANEL_ROWS = {
   pair: [[0.07, 0.58], [0.66, 0.92]],
-  trio: [[0.055, 0.430], [0.455, 0.545], [0.575, 0.875]],
+  trio: [[0.089, 0.527], [0.547, 0.661], [0.687, 0.921]],
   top:  [[0.07, 0.58]],
   lone: [0.68, 0.90],
 };
@@ -5324,31 +5412,72 @@ const CLASSIC_ROWS = {
      rather than off a luminance derivative alone — the derivative finds every
      edge including the plastic sheeting over the top of this door, and the
      first version of this table mistook two of those for the cornice. */
-  cornice: [0.029, 0.057],   // corona and the cavetto under it, as one cap
-  beads:   [0.060, 0.072],   // the bead course, in its own recess
-  frieze:  [0.076, 0.126],   // the raised block: flutes, tablet, oval
-  shelf:   [0.559, 0.600],   // the shelf's own corona and hollow
-  band:    [0.600, 0.670],   // its face, carrying the horizontal pull
-  panel:   [0.681, 0.918],   // the raised panel
-  plinth:  [0.924, 0.953],   // the frieze upside down
-  pbeads:  [0.957, 0.971],   // its bead course, UNDER the block
-  foot:    [0.971, 1.000],   // and the splayed ogee down to the floor
+  /* ⚠ AND A THIRD TIME, FOR A THIRD REASON — but this one is 0.86% and the
+     two before it were five per cent. `tools/_upright2.mjs` replaces the
+     rectangular crop with a RECTIFIED one: the door lies on the ground about
+     two degrees off level and further from the camera at its foot than at its
+     head, so its outline in the photograph is a trapezoid 1626 px across at
+     the head and 1558 at the foot, and no rectangle is both. The box in use
+     came out 3698 px long against the real 3730, so every row read off it was
+     3730/3698 = 1.0086 too large. Each figure below is the ruled read divided
+     by that. `foot` still ends at 1.000, because the foot piece ends at the
+     leaf's foot by construction — what the old crop did was stop 0.86% short
+     of it.
+     Re-read on the rectified picture, the ruler agrees with these to within
+     0.01 everywhere, which is its own reading error at this scale — so the
+     rows were never the problem. The COLUMNS were: see CLASSIC_COLS. */
+  /* ⚠ THE HEAD IS CONTIGUOUS. These three used to leave 0.003 and 0.004 of
+     bare leaf between them — six and eight millimetres — and at door scale
+     that reads as three pieces floating one above another where the
+     photograph has corona, dentils and block stacked hard against each other
+     as one assembly. The gaps were never measured; they are what is left over
+     when three edges are each read to the nearest 0.001 and nothing checks
+     that they meet. `cornice` now runs down to the bead course and the bead
+     course down to the block. */
+  cornice: [0.029, 0.059],   // corona and the cavetto under it, as one cap
+  beads:   [0.059, 0.075],   // the bead course, in its own recess
+  frieze:  [0.075, 0.125],   // the raised block: flutes, tablet, oval
+  shelf:   [0.554, 0.595],   // the shelf's own corona and hollow
+  band:    [0.595, 0.664],   // its face, carrying the horizontal pull
+  panel:   [0.675, 0.910],   // the raised panel
+  plinth:  [0.916, 0.945],   // the frieze upside down
+  pbeads:  [0.949, 0.963],   // its bead course, UNDER the block
+  foot:    [0.963, 1.000],   // and the splayed ogee down to the floor
 };
-/* Fractions of leaf WIDTH.
-   ⚠ WIDTHS, CENTRED — not the left and right edges as measured. The
-   photograph is a phone shot of a two-metre door and its right-hand features
-   read four to five per cent low against its left-hand ones: the cornice
-   measures 0.181 to 0.828 (centre 0.505) while the shelf below it measures
-   0.123 to 0.798 (centre 0.460), and no real door has its shelf shifted 4.5%
-   off its cornice. The distortion cancels in the WIDTH and does not cancel in
-   the position, so the widths are what is kept and the middle is the middle. */
+/* Fractions of leaf WIDTH, centred: the middle is the middle.
+   ⚠ FOUR OF THESE SIX WERE WRONG, AND THE CAUSE WAS THE CROP AGAIN. The old
+   note here said the photograph's right-hand features "read four to five per
+   cent low against its left-hand ones" and kept only the widths on the
+   argument that the distortion cancels in a width. It does not — the door is
+   photographed at an angle AND tapering, so a rectangular crop shears it, and
+   a sheared picture gets a piece's width wrong by however far down the door it
+   sits. That is exactly the pattern: the shelf and the band, which sit at the
+   middle of the leaf, came out right; the cornice and frieze at the head and
+   the panel and plinth at the foot came out narrow.
+   `tools/_upright2.mjs` rectifies the leaf from its four measured corners, and
+   these are ruled off THAT — a 0.025 grid over the head, the shelf, the panel
+   and the plinth in turn.
+
+               was            now        moved
+     cornice   0.647          0.710      +63 mm on an 850 leaf
+     frieze    0.545          0.588      +43
+     shelf     0.649          0.648      confirmed
+     band      0.429          0.428      confirmed
+     panel     0.516          0.540      +24
+     plinth    0.555          0.588      +33
+
+   ⚠ AND THE FRIEZE AND THE PLINTH COME OUT IDENTICAL, which is the check this
+   table never had. `classicBand` is built on the claim that the plinth IS the
+   frieze upside down — same block, same flutes, same oval, same bead course —
+   and it was drawn 33 mm wider than the frieze while claiming it. Two
+   independent ruler reads now put both at 0.588. */
 const CLASSIC_COLS = {
-  cornice: [0.177, 0.823],   // width 0.647
-  frieze:  [0.228, 0.772],   // width 0.545
-  shelf:   [0.176, 0.824],   // width 0.649 — the widest thing on the door
-  band:    [0.286, 0.714],   // width 0.429 — the face BETWEEN the two brackets
-  panel:   [0.242, 0.758],   // width 0.516
-  plinth:  [0.223, 0.777],   // width 0.555
+  cornice: [0.145, 0.855],   // width 0.710 — the widest thing on the door
+  frieze:  [0.206, 0.794],   // width 0.588
+  shelf:   [0.176, 0.824],   // width 0.648
+  band:    [0.286, 0.714],   // width 0.428 — the face BETWEEN the two brackets
+  panel:   [0.230, 0.770],   // width 0.540
+  plinth:  [0.206, 0.794],   // width 0.588 — the frieze, upside down
 };
 /* The window the set is built around. 0.155 to 0.5545 of the leaf's height and
    0.422 of its width, which on our 850 x 2050 leaf is 359 x 819 at 318 from
@@ -5547,18 +5676,32 @@ function classicCap(x, y, w, h, paint, key = 'c', flare = false, coronaF = 0.68)
           height="${n(h * 0.80)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
     <path data-face d="${hollow}" fill="url(#${id})"/>
     ${/* the corona: a lit top face, then a hard drip line under its front */''}
-    ${/* ⚠ THE ENDS ARE MITRED BACK, and a square end is the tell of a plank.
-          The photograph's corona is cut at 45 degrees at both returns, so the
-          slab reads as a length of moulding stopped against the leaf rather
-          than as a board that ran out. One trapezoid instead of a rect. */''}
+    ${/* ⚠ THE ENDS SWEEP, THEY ARE NOT CUT. A square end is the tell of a
+          plank and a 45-degree mitre — which is what this was — is the tell of
+          a drawing that knew that and stopped there. On the rectified
+          photograph each end of the corona turns down in a quarter-round
+          RETURN: the slab runs out to its full width at the top and the
+          underside curves back in, so the end reads as a moulding stopped
+          against the leaf and rounded off, not as a board sawn at an angle.
+          Two curves instead of two straight edges, and they are what make the
+          cornice read as the widest, softest thing on the door. */''}
     ${flare ? '' : `
-      <path data-face d="M ${n(x)} ${n(y)} H ${n(x + w)} L ${n(x + w - back)} ${n(y + corona)}
-               H ${n(x + back)} Z" fill="${lighten(paint, 0.15)}"/>
+      <path data-face d="M ${n(x)} ${n(y)} H ${n(x + w)}
+               C ${n(x + w)} ${n(y + corona * 0.52)} ${n(x + w - back * 0.45)} ${n(y + corona)}
+                 ${n(x + w - back)} ${n(y + corona)}
+               H ${n(x + back)}
+               C ${n(x + back * 0.45)} ${n(y + corona)} ${n(x)} ${n(y + corona * 0.52)}
+                 ${n(x)} ${n(y)} Z" fill="${lighten(paint, 0.15)}"/>
       <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(lip)}"
             fill="${lighten(paint, 0.34)}"/>
-      <path d="M ${n(x + back * 0.4)} ${n(y + corona - h * 0.055)}
-               H ${n(x + w - back * 0.4)} L ${n(x + w - back)} ${n(y + corona)}
-               H ${n(x + back)} Z" fill="#000" opacity="0.38"/>`}
+      <path d="M ${n(x + back * 0.3)} ${n(y + corona - h * 0.055)}
+               H ${n(x + w - back * 0.3)}
+               C ${n(x + w - back * 0.45)} ${n(y + corona)} ${n(x + w - back * 0.6)} ${n(y + corona)}
+                 ${n(x + w - back)} ${n(y + corona)}
+               H ${n(x + back)}
+               C ${n(x + back * 0.6)} ${n(y + corona)} ${n(x + back * 0.45)} ${n(y + corona)}
+                 ${n(x + back * 0.3)} ${n(y + corona - h * 0.055)} Z"
+            fill="#000" opacity="0.38"/>`}
     ${flare ? `
       <rect data-face x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}"
             height="${n(corona)}" fill="${lighten(paint, 0.08)}"/>
@@ -5907,9 +6050,18 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
   if (!glazed) piece('light', moulding(...at(P.light), CLASSIC_BAND, paint, pale, leaf, 'clt',
                                        'ogee'));
   piece('cornice',
-    beadRun(X(C.cornice[0]) + lw * 0.036, Y((R.beads[0] + R.beads[1]) / 2),
-            (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072, beadR, paint)
-    + classicCap(...at(P.cornice), paint, 'cn'));
+    /* ⚠ THE DENTILS SPAN THE FRIEZE, NOT THE CORNICE. They were the cornice's
+       width less 0.036 a side, which was a way of saying "a bit narrower than
+       the corona" without measuring it. On the rectified photograph the row
+       runs 0.195 to 0.785 — the frieze block's own span, to within 0.01 — and
+       it sits hard under the cap rather than floating in the middle of its
+       row, so the head reads as one assembly. */
+    beadRun(X(C.frieze[0]), Y(R.beads[0] + (R.beads[1] - R.beads[0]) * 0.42),
+            (C.frieze[1] - C.frieze[0]) * lw, beadR, paint)
+    /* 0.77, not the default 0.68. Ruled on the rectified leaf: the corona is
+       0.0215 of the leaf's height and the cavetto under it 0.007, so the slab
+       takes rather more than three quarters of the cap and not two. */
+    + classicCap(...at(P.cornice), paint, 'cn', false, 0.77));
 
   /* ── THE SHELF: its own corona, two brackets, and the band they carry ──
      ⚠ THE BAND'S FACE IS NARROWER THAN THE SHELF, and it was drawn the same

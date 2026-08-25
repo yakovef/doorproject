@@ -664,6 +664,7 @@
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "right" },
     { id: "left-in", he: "שמאל, פנימה", en: "Left, inward", hinge: "left" }
   ];
+  var DETAIL_SUBS = [["panel", "פאנלים"], ["strips", "פסים"]];
   var DETAILS = [
     { id: "plain", he: "חלק", en: "Plain", panel: false, groove: false },
     /* ── PANELS ───────────────────────────────────────────────────────
@@ -692,6 +693,7 @@
        should substitute for a decision, not delete it. */
     {
       id: "panel",
+      sub: "panel",
       he: "פאנל תחתון",
       en: "Lower panel",
       panel: true,
@@ -702,6 +704,7 @@
        carries and a single bottom-quarter panel cannot describe. */
     {
       id: "panel2",
+      sub: "panel",
       he: "שני פאנלים",
       en: "Two panels",
       panel: true,
@@ -715,6 +718,7 @@
        a bare plinth below it was not expressible. */
     {
       id: "panelTop",
+      sub: "panel",
       he: "פאנל עליון",
       en: "Upper panel",
       panel: true,
@@ -740,6 +744,7 @@
        what a customer counts; the plate is the third. */
     {
       id: "panel3",
+      sub: "panel",
       he: "שלושה פאנלים",
       en: "Three panels",
       panel: true,
@@ -778,6 +783,7 @@
          corpus door with a window over a panel cases both in the same section. */
     {
       id: "panelo",
+      sub: "panel",
       he: "פאנל תחתון קלאסי",
       en: "Lower panel, ogee",
       panel: true,
@@ -787,6 +793,7 @@
     },
     {
       id: "panel2o",
+      sub: "panel",
       he: "שני פאנלים קלאסיים",
       en: "Two panels, ogee",
       panel: true,
@@ -843,6 +850,7 @@
          the corpus and it had no tile. */
     {
       id: "strips2",
+      sub: "strips",
       he: "שני פסים אחידים",
       en: "Two strips, even",
       panel: false,
@@ -854,6 +862,7 @@
     },
     {
       id: "strips4",
+      sub: "strips",
       he: "ארבעה פסים אחידים",
       en: "Four strips, even",
       panel: false,
@@ -873,6 +882,7 @@
        eight strips spread evenly is a barcode, and this is a band. */
     {
       id: "stripsband",
+      sub: "strips",
       he: "פסים צפופים",
       en: "Banded strips",
       panel: false,
@@ -884,6 +894,7 @@
     },
     {
       id: "strips3",
+      sub: "strips",
       he: "שלושה פסים מדורגים",
       en: "Three strips, ragged",
       panel: false,
@@ -892,6 +903,7 @@
     },
     {
       id: "strips5",
+      sub: "strips",
       he: "חמישה פסים מדורגים",
       en: "Five strips, ragged",
       panel: false,
@@ -900,6 +912,7 @@
     },
     {
       id: "strips7",
+      sub: "strips",
       he: "שבעה פסים מדורגים",
       en: "Seven strips, ragged",
       panel: false,
@@ -909,6 +922,7 @@
     },
     {
       id: "strips9",
+      sub: "strips",
       he: "תשעה פסים מדורגים",
       en: "Nine strips, ragged",
       panel: false,
@@ -919,6 +933,7 @@
        had — the plain name for what used to be the only strip option. */
     {
       id: "strips",
+      sub: "strips",
       he: "אחד עשר פסים מדורגים",
       en: "Eleven strips, ragged",
       panel: false,
@@ -938,6 +953,7 @@
        d043 — see `metalStrips` — and applies at any count. */
     {
       id: "stripsv3",
+      sub: "strips",
       he: "שלושה פסים אנכיים",
       en: "Three vertical strips",
       panel: false,
@@ -948,6 +964,7 @@
     },
     {
       id: "stripsv",
+      sub: "strips",
       he: "פסים אנכיים",
       en: "Vertical strips",
       panel: false,
@@ -958,6 +975,7 @@
     },
     {
       id: "stripsv6",
+      sub: "strips",
       he: "שישה פסים אנכיים",
       en: "Six vertical strips",
       panel: false,
@@ -978,6 +996,7 @@
        here and the pull bar on three of the four real doors. */
     {
       id: "stripsx",
+      sub: "strips",
       he: "פס אנכי חוצה",
       en: "Crossed strips",
       panel: false,
@@ -1045,6 +1064,7 @@
        for Peretz and it is asked. */
     {
       id: "classic",
+      sub: "panel",
       he: "סט קלאסי",
       en: "Classical set",
       panel: true,
@@ -1059,7 +1079,13 @@
          `aperture` like any other opening and which would otherwise have come
          out reeded on the one door that certainly is not. */
       profile: "ogee",
-      winFrac: { x0: 0.289, x1: 0.711, top: 0.155, bot: 0.5545 }
+      /* ⚠ THE ROWS ARE SCALED BY 3698/3730 with CLASSIC_ROWS — the crop the set
+         was measured from was 0.86% short, see the note there. The COLUMNS are
+         left alone: an edge-find on the rectified leaf puts the pane at 0.291 to
+         0.706 against these 0.289 and 0.711, which is 0.007 and inside the
+         instrument's own error, and drawing them back over the photograph in red
+         put them on the glass twice. */
+      winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.55 }
     }
   ];
   var FINISHES = [
@@ -1611,6 +1637,24 @@
     const LEAF_FOOT = darken(paint2, 0.05);
     const LEAF_FALL = leafFallOf(LEAF_TOP, LEAF_FOOT);
     const pale = isLight(paint2);
+    const glazing = `
+  <g id="glazing">
+    ${openings.map((o, i) => aperture({
+      band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
+      bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
+      x: mainX + o.x,
+      y: y0 + o.top,
+      w: o.w,
+      h: o.h,
+      splits: o.splits.map((sp) => ({ x: mainX + sp.x, w: sp.w })),
+      paint: paint2,
+      edge,
+      grille,
+      key: "m" + i,
+      profile: mouldOf(detail),
+      leaf: { x: mainX, y: y0, w: leafW, h: leafH }
+    })).join("")}
+  </g>`;
     const AO_SIDE = Math.round(leafW * 0.14);
     const AO_FOOT = Math.round(leafH * 0.065);
     const leaf = (lx, lw) => `
@@ -2714,6 +2758,27 @@
   <!-- ── main leaf ────────────────────────────────────────────── -->
   <g id="leaf" data-x="${mainX}" data-w="${leafW}">${leaf(mainX, leafW)}</g>
 
+  ${/* ⚠ THE GLAZING GOES FIRST WHEN THE FACE IS A WHOLE COMPOSITION, and the
+        reason is joinery. Reported from outside: *"if i add a window it goes
+        on the overlaps the set."* It was literally true. `#glazing` is drawn
+        after `#detail`, so the light's architrave painted over the set — its
+        top run is 59 mm of lit ramp ending at 0.1262 of the leaf where the
+        frieze's block ends at 0.126, and 0.2 mm of contact plus the mitre
+        stroke and the antialiasing is enough for a bright band to eat the
+        frieze's bottom edge. The same happens at the foot against the shelf.
+        Nobody reported it on a SOLID set because there the panel that stands
+        in the light's place is drawn by `classicSet` itself, before the
+        cornice — "so the head's shadow falls on it" — so the frieze covers it
+        and the join reads clean. Glazed, the two halves of the same
+        composition were being drawn in opposite orders.
+        On the real door the architrave is fitted round the light and THEN the
+        ornament is applied over the face, so the set going last is what the
+        joinery does. Only for the set: on an ordinary panelled leaf the panel
+        is aligned to the window and drawn after it, and swapping those would
+        let a panel paint over the glass. */
+    ""}
+  ${detail.classic ? glazing : ""}
+
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
     ${/* ⚠ THE CLASSICAL SET IS ITS OWN COMPOSITION AND TAKES OVER THE FACE.
@@ -2760,24 +2825,7 @@
     ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail, tone, hingeOnLeft) : ""}
   </g>
 
-  <!-- ── glazing ──────────────────────────────────────────────── -->
-  <g id="glazing">
-    ${openings.map((o, i) => aperture({
-      band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
-      bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
-      x: mainX + o.x,
-      y: y0 + o.top,
-      w: o.w,
-      h: o.h,
-      splits: o.splits.map((sp) => ({ x: mainX + sp.x, w: sp.w })),
-      paint: paint2,
-      edge,
-      grille,
-      key: "m" + i,
-      profile: mouldOf(detail),
-      leaf: { x: mainX, y: y0, w: leafW, h: leafH }
-    })).join("")}
-  </g>
+  ${detail.classic ? "" : glazing}
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
@@ -2939,26 +2987,57 @@ ${body}
       [0.94, 0.96],
       [1, 1]
     ],
-    /* `research/newdoor/` at 4000 px, `tools/_section.mjs` across the panel's
-         left run. Two zones and nothing else:
+    /* ⚠ RE-READ ON d050, WHICH IS THE DOOR THAT WAS POINTED AT. This was the
+         `research/newdoor/` section — one deep hollow through the middle and one
+         broad lit round — and it was reported from outside as *"i dont like how
+         the פאנל קלאסי look"* with four photographs attached. Three of the four
+         are in the corpus: image 1 is d050, image 2 is d111, image 4 is d127. d050
+         is the one worth measuring — flat on, even light, plain paint, no
+         ironwork, and it is the panel the complaint is about.
     
-            1.00  the leaf's own face
-            0.68  ONE deep quirk, a third of the way in
-            1.16  ONE broad lit face, the ogee's top
-            1.00  the field, which is the same paint again  */
+         `tools/_msect.mjs d050 0.212 0.308 0.13 0.29 20`, the moulding 46 px wide,
+         median down 16% of the leaf's height so a peephole or a highlight on one
+         row is thrown away:
+    
+            1.01 1.01 1.01 | 0.94 0.91 0.84 | 1.02 1.01 1.00 1.01 1.01 1.01 1.01
+            1.00 1.01 1.00 | 0.92 | 0.99 0.99 1.03
+    
+         That is not an ogee at all. It is ONE NARROW GROOVE near the outer edge,
+         a LONG FLAT across the middle at the paint's own tone, and a SECOND,
+         shallower groove near the inner edge. Half the band is flat. The old table
+         put a hollow through the middle of that flat and a bright round where the
+         inner groove is, which is why it read as a soft bulge rather than as a
+         scribed frame.
+    
+         ⚠ THE DEPTHS ARE UN-COMPRESSED, and that is arithmetic rather than taste.
+         d050 is a near-white door and `mouldGradients` already scales relief by
+         0.34 on pale paint, so a table storing the measured 0.84 would draw 0.95
+         there — half the groove the photograph has. Each measured departure from
+         1.00 is divided by that 0.34 before it is stored, so the PALE rendering
+         comes back out at the measured figure. The factor is the corpus's own:
+         REALISM §7.4b measures cream d076 at a 0.22 departure where navy d048 is
+         at 0.73, a ratio of 0.30.
+    
+         ⚠ ONE DOOR, and said out loud. d077, d061 and d111 carry the same family
+         and none of them can confirm it — d077 and d061 are so bright the whole
+         moulding sits inside 0.95 to 1.00, and d111's and d127's leaf boxes in
+         `leaf.json` are fallbacks (the file says which), so a fraction of them is
+         not a fraction of the door. If a darker door of this family is ever
+         measured properly, this is the table to check. */
     ogee: [
       [0, 1],
-      [0.1, 0.94],
-      [0.2, 0.86],
-      [0.3, 0.71],
-      [0.36, 0.68],
-      [0.44, 0.82],
-      [0.52, 0.93],
-      [0.6, 1.14],
-      [0.7, 1.16],
-      [0.78, 1.06],
-      [0.86, 1.12],
-      [0.94, 1.05],
+      [0.11, 1],
+      [0.16, 0.82],
+      [0.21, 0.74],
+      [0.26, 0.53],
+      [0.32, 1.06],
+      [0.42, 1],
+      [0.53, 1.03],
+      [0.68, 1],
+      [0.79, 1],
+      [0.84, 0.76],
+      [0.89, 0.97],
+      [0.95, 0.97],
       [1, 1]
     ]
   };
@@ -3009,7 +3088,7 @@ ${body}
   var PANEL_INSET_MAX = 0.39;
   var PANEL_ROWS = {
     pair: [[0.07, 0.58], [0.66, 0.92]],
-    trio: [[0.055, 0.43], [0.455, 0.545], [0.575, 0.875]],
+    trio: [[0.089, 0.527], [0.547, 0.661], [0.687, 0.921]],
     top: [[0.07, 0.58]],
     lone: [0.68, 0.9]
   };
@@ -4177,38 +4256,60 @@ ${body}
        rather than off a luminance derivative alone — the derivative finds every
        edge including the plastic sheeting over the top of this door, and the
        first version of this table mistook two of those for the cornice. */
-    cornice: [0.029, 0.057],
+    /* ⚠ AND A THIRD TIME, FOR A THIRD REASON — but this one is 0.86% and the
+       two before it were five per cent. `tools/_upright2.mjs` replaces the
+       rectangular crop with a RECTIFIED one: the door lies on the ground about
+       two degrees off level and further from the camera at its foot than at its
+       head, so its outline in the photograph is a trapezoid 1626 px across at
+       the head and 1558 at the foot, and no rectangle is both. The box in use
+       came out 3698 px long against the real 3730, so every row read off it was
+       3730/3698 = 1.0086 too large. Each figure below is the ruled read divided
+       by that. `foot` still ends at 1.000, because the foot piece ends at the
+       leaf's foot by construction — what the old crop did was stop 0.86% short
+       of it.
+       Re-read on the rectified picture, the ruler agrees with these to within
+       0.01 everywhere, which is its own reading error at this scale — so the
+       rows were never the problem. The COLUMNS were: see CLASSIC_COLS. */
+    /* ⚠ THE HEAD IS CONTIGUOUS. These three used to leave 0.003 and 0.004 of
+       bare leaf between them — six and eight millimetres — and at door scale
+       that reads as three pieces floating one above another where the
+       photograph has corona, dentils and block stacked hard against each other
+       as one assembly. The gaps were never measured; they are what is left over
+       when three edges are each read to the nearest 0.001 and nothing checks
+       that they meet. `cornice` now runs down to the bead course and the bead
+       course down to the block. */
+    cornice: [0.029, 0.059],
     // corona and the cavetto under it, as one cap
-    beads: [0.06, 0.072],
+    beads: [0.059, 0.075],
     // the bead course, in its own recess
-    frieze: [0.076, 0.126],
+    frieze: [0.075, 0.125],
     // the raised block: flutes, tablet, oval
-    shelf: [0.559, 0.6],
+    shelf: [0.554, 0.595],
     // the shelf's own corona and hollow
-    band: [0.6, 0.67],
+    band: [0.595, 0.664],
     // its face, carrying the horizontal pull
-    panel: [0.681, 0.918],
+    panel: [0.675, 0.91],
     // the raised panel
-    plinth: [0.924, 0.953],
+    plinth: [0.916, 0.945],
     // the frieze upside down
-    pbeads: [0.957, 0.971],
+    pbeads: [0.949, 0.963],
     // its bead course, UNDER the block
-    foot: [0.971, 1]
+    foot: [0.963, 1]
     // and the splayed ogee down to the floor
   };
   var CLASSIC_COLS = {
-    cornice: [0.177, 0.823],
-    // width 0.647
-    frieze: [0.228, 0.772],
-    // width 0.545
+    cornice: [0.145, 0.855],
+    // width 0.710 — the widest thing on the door
+    frieze: [0.206, 0.794],
+    // width 0.588
     shelf: [0.176, 0.824],
-    // width 0.649 — the widest thing on the door
+    // width 0.648
     band: [0.286, 0.714],
-    // width 0.429 — the face BETWEEN the two brackets
-    panel: [0.242, 0.758],
-    // width 0.516
-    plinth: [0.223, 0.777]
-    // width 0.555
+    // width 0.428 — the face BETWEEN the two brackets
+    panel: [0.23, 0.77],
+    // width 0.540
+    plinth: [0.206, 0.794]
+    // width 0.588 — the frieze, upside down
   };
   var CLASSIC_GLASS = byId(DETAILS, "classic").winFrac;
   var CLASSIC_CORBEL = { w: 0.07, gap: 6e-3 };
@@ -4324,19 +4425,33 @@ ${body}
     <path data-face d="${hollow}" fill="url(#${id})"/>
     ${/* the corona: a lit top face, then a hard drip line under its front */
     ""}
-    ${/* ⚠ THE ENDS ARE MITRED BACK, and a square end is the tell of a plank.
-        The photograph's corona is cut at 45 degrees at both returns, so the
-        slab reads as a length of moulding stopped against the leaf rather
-        than as a board that ran out. One trapezoid instead of a rect. */
+    ${/* ⚠ THE ENDS SWEEP, THEY ARE NOT CUT. A square end is the tell of a
+        plank and a 45-degree mitre — which is what this was — is the tell of
+        a drawing that knew that and stopped there. On the rectified
+        photograph each end of the corona turns down in a quarter-round
+        RETURN: the slab runs out to its full width at the top and the
+        underside curves back in, so the end reads as a moulding stopped
+        against the leaf and rounded off, not as a board sawn at an angle.
+        Two curves instead of two straight edges, and they are what make the
+        cornice read as the widest, softest thing on the door. */
     ""}
     ${flare ? "" : `
-      <path data-face d="M ${n(x)} ${n(y)} H ${n(x + w)} L ${n(x + w - back)} ${n(y + corona)}
-               H ${n(x + back)} Z" fill="${lighten(paint2, 0.15)}"/>
+      <path data-face d="M ${n(x)} ${n(y)} H ${n(x + w)}
+               C ${n(x + w)} ${n(y + corona * 0.52)} ${n(x + w - back * 0.45)} ${n(y + corona)}
+                 ${n(x + w - back)} ${n(y + corona)}
+               H ${n(x + back)}
+               C ${n(x + back * 0.45)} ${n(y + corona)} ${n(x)} ${n(y + corona * 0.52)}
+                 ${n(x)} ${n(y)} Z" fill="${lighten(paint2, 0.15)}"/>
       <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(lip)}"
             fill="${lighten(paint2, 0.34)}"/>
-      <path d="M ${n(x + back * 0.4)} ${n(y + corona - h * 0.055)}
-               H ${n(x + w - back * 0.4)} L ${n(x + w - back)} ${n(y + corona)}
-               H ${n(x + back)} Z" fill="#000" opacity="0.38"/>`}
+      <path d="M ${n(x + back * 0.3)} ${n(y + corona - h * 0.055)}
+               H ${n(x + w - back * 0.3)}
+               C ${n(x + w - back * 0.45)} ${n(y + corona)} ${n(x + w - back * 0.6)} ${n(y + corona)}
+                 ${n(x + w - back)} ${n(y + corona)}
+               H ${n(x + back)}
+               C ${n(x + back * 0.6)} ${n(y + corona)} ${n(x + back * 0.45)} ${n(y + corona)}
+                 ${n(x + back * 0.3)} ${n(y + corona - h * 0.055)} Z"
+            fill="#000" opacity="0.38"/>`}
     ${flare ? `
       <rect data-face x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}"
             height="${n(corona)}" fill="${lighten(paint2, 0.08)}"/>
@@ -4528,13 +4643,19 @@ ${body}
     ));
     piece(
       "cornice",
+      /* ⚠ THE DENTILS SPAN THE FRIEZE, NOT THE CORNICE. They were the cornice's
+         width less 0.036 a side, which was a way of saying "a bit narrower than
+         the corona" without measuring it. On the rectified photograph the row
+         runs 0.195 to 0.785 — the frieze block's own span, to within 0.01 — and
+         it sits hard under the cap rather than floating in the middle of its
+         row, so the head reads as one assembly. */
       beadRun(
-        X(C.cornice[0]) + lw * 0.036,
-        Y((R.beads[0] + R.beads[1]) / 2),
-        (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072,
+        X(C.frieze[0]),
+        Y(R.beads[0] + (R.beads[1] - R.beads[0]) * 0.42),
+        (C.frieze[1] - C.frieze[0]) * lw,
         beadR,
         paint2
-      ) + classicCap(...at(P.cornice), paint2, "cn")
+      ) + classicCap(...at(P.cornice), paint2, "cn", false, 0.77)
     );
     const faceX = X(C.band[0]), faceW = (C.band[1] - C.band[0]) * lw;
     piece(
@@ -6183,7 +6304,8 @@ ${body}
       in: "look",
       kind: "tile",
       list: () => DETAILS,
-      glyph: detailGlyph
+      glyph: detailGlyph,
+      subs: DETAIL_SUBS
     },
     {
       key: "window",
@@ -6599,32 +6721,45 @@ ${body}
     host.setAttribute("role", "radiogroup");
     host.setAttribute("aria-label", g.title);
     host.className = "field__opts " + { swatch: "swatches", pill: "pills", tile: "tiles", sq: "tiles tiles--sq", hw: "tiles tiles--hw" }[g.kind];
-    for (const o of g.list()) {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.dataset.id = o.id;
-      b.setAttribute("role", "radio");
-      if (g.kind === "swatch") {
-        b.className = "swatch";
-        b.title = `${o.he} · ${colourCode(o)}`;
-        b.setAttribute("aria-label", `${o.he}, ${colourCode(o)}`);
-        b.innerHTML = `
+    const groups = g.subs ? [
+      [null, g.list().filter((o) => !o.sub)],
+      ...g.subs.map(([k, label]) => [label, g.list().filter((o) => o.sub === k)])
+    ] : [[null, g.list()]];
+    for (const [label, items] of groups) {
+      if (label && items.length) {
+        const h = document.createElement("div");
+        h.className = "opts__sub";
+        h.setAttribute("aria-hidden", "true");
+        h.textContent = label;
+        host.appendChild(h);
+      }
+      for (const o of items) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.dataset.id = o.id;
+        b.setAttribute("role", "radio");
+        if (g.kind === "swatch") {
+          b.className = "swatch";
+          b.title = `${o.he} · ${colourCode(o)}`;
+          b.setAttribute("aria-label", `${o.he}, ${colourCode(o)}`);
+          b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
         <span class="swatch__name">${o.he}</span>
         <span class="swatch__meta">${colourCode(o)} · ${priceLabel(tilePrice(g, o, state))}</span>`;
-      } else if (g.kind === "pill") {
-        b.className = "pill";
-        b.textContent = o.he;
-      } else {
-        b.className = "tile";
-        b.innerHTML = `
+        } else if (g.kind === "pill") {
+          b.className = "pill";
+          b.textContent = o.he;
+        } else {
+          b.className = "tile";
+          b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
         <span class="tile__name">${o.he}</span>
         <span class="tile__meta">${priceLabel(tilePrice(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
+        }
+        b.addEventListener("click", () => choose(g, o.id));
+        host.appendChild(b);
       }
-      b.addEventListener("click", () => choose(g, o.id));
-      host.appendChild(b);
     }
     keyboardGrid(host);
   }

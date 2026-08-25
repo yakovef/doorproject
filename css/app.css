@@ -1178,6 +1178,18 @@ body {
 }
 .tiles--sq { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); }
 
+/* A heading INSIDE the tile grid, splitting a long list into halves — the face
+   designs are panels and stripes and there are twenty of them. `1 / -1` so it
+   takes a whole row whatever the column count settles at; without it the
+   heading becomes a grid cell and the tiles flow round it. */
+.opts__sub {
+  grid-column: 1 / -1;
+  margin-block: 6px 0;
+  font-size: .74rem; font-weight: 600; letter-spacing: .04em;
+  color: var(--ink-2);
+}
+.opts__sub:first-child { margin-block-start: 0; }
+
 .tile {
   appearance: none; -webkit-appearance: none;
   background: none; padding: 10px 8px 12px;

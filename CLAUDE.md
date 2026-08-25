@@ -143,7 +143,7 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **5,235,796 assertions passing, 0 failed**, no framework, plain
+- `npm test` — **5,234,178 assertions passing, 0 failed**, no framework, plain
   node. It was 3.70M before the classical set and 5.68M before the 24.8
   interface round; the catalogue lists change length and the combinatorial
   sweeps are the product of those lengths, so the total moves with the range in
@@ -550,13 +550,25 @@ not one, and which a face uses is a catalogue choice:
 | | what it looks like | doors | tiles |
 |---|---|---|---|
 | **`reed`** | three to five fine beads, hard dark quirks between them, low relief, sharp mitres | d042 d048 d058 d062 d065 d068 d070 d087 d091 d094 d099 d116 d122 | `panel` `panel2` `panelTop` `panel3`, and every face with no `profile` |
-| **`ogee`** | ONE broad soft curve standing well proud, a small bead at its inner edge, a real cast shadow | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | `panelo` `panel2o` `classic` |
+| **`ogee`** | one narrow GROOVE near the outer edge, a LONG FLAT at the paint's own tone across half the band, a shallower groove near the inner edge — a scribed frame | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | `panelo` `panel2o` `classic` |
 
 Thirteen doors against eleven, so neither is "the" moulding — and a round that
 re-measured the one table off a door of the OTHER family drew the ogee round
 every panel in the range. It was reported from outside as the panels not
 looking good. Sort them by opening one panel CORNER per door at high
 magnification; a whole-door contact sheet will not separate them.
+
+⚠ **The ogee table itself has been measured twice and the first reading was
+also of the wrong door.** It came off `research/newdoor/` — the classical set —
+and the family it describes is d050's, which is the door the complaint came
+with. Re-read on d050 it is not an ogee at all: a groove, a long flat, a
+groove. Depths are stored UN-COMPRESSED, divided by the 0.34 `mouldGradients`
+applies to pale paint, because d050 is near-white and storing the measured
+figure would have drawn half the groove.
+
+⚠ **A DOOR OF THIS FAMILY IN A DARK PAINT WOULD SETTLE IT AND WE HAVE NONE.**
+d077 and d061 are so bright the whole moulding sits inside 0.95–1.00; d111 and
+d127 have fallback leaf boxes. One door is what this table stands on.
 
 `mouldOf(detail)` is the one answer, and it answers for the panel **and** for
 the architrave round the glass together, because every corpus door carrying a
@@ -587,7 +599,7 @@ about it are load-bearing and easy to undo by accident:
 
 - **It supplies its own opening, as FRACTIONS.**
   `apertureLayout(win, leafW, detail, leafH)` substitutes `detail.winFrac`
-  (0.289–0.711 across, 0.155–0.5545 down: 359 x 819 at 318 on a standard leaf)
+  (0.289–0.711 across, 0.154–0.550 down: 359 x 812 at 316 on a standard leaf)
   for whatever the window option would have drawn, so the glass clears the
   frieze above it and the shelf below. `repair` forces `window: 'rect'` off
   `rectOnly`, so the substitution can never be invisible.
@@ -602,6 +614,17 @@ about it are load-bearing and easy to undo by accident:
   band. Computed twice, they drifted apart the moment the leaf stopped being
   850 x 2050, and it was reported as *"when i put on a window the panel
   changes, it supposed to be the same size."*
+- **The glazing is drawn BEFORE the set and after every other face.** The set
+  is a composition applied over the light's architrave; on every other door the
+  panel is aligned to the window and goes on after it. Drawn in one order for
+  both, the architrave's top run painted over the frieze's bottom edge — see
+  the change log for 25.8. `render` builds the glazing once and places it at
+  one of two points.
+- **⚠ THE MEASUREMENTS COME OFF A RECTIFIED CROP, `tools/_upright2.mjs`.** The
+  door in that photograph lies two degrees off level and tapers, so an
+  axis-aligned rectangle shears it and the shear grows down the leaf. That is
+  why the pieces at the head and the foot were drawn narrow and the two in the
+  middle were right. Do not measure this door off `_upright.mjs`.
 - **Its panel is tagged `data-detail="panel"` with a `data-top`, inside the
   set's group.** Three assertions read that markup to ask whether the panel a
   customer is charged for is a panel that is drawn, and one of them goes DEAD
@@ -893,7 +916,7 @@ under test. `--disable-gpu` made it *worse*.
   photographs, and halving their resolution to suit a sick container is fitting
   the instrument to the room.
 
-### Four rules about instruments, each learned the hard way
+### Five rules about instruments, each learned the hard way
 
 **Tools must ask the page, not assume.** Four of them have held constants that
 silently stopped being true: a `0.735` leaf-height ratio, a viewBox origin
@@ -921,6 +944,18 @@ made it win on geometry for four doors whose own records say "steel" and
 show them with black bars. Nothing failed; the diff on `js/works.js` was the
 only sign. The finish is a filter now, not a comment. **When you add a
 catalogue entry, diff what the fitters write.**
+
+**⚠ A RATIO CATCHES ONE ERROR, NEVER TWO.** The aspect check — "a door is not
+a square; if the crop's aspect matches the model's, the crop is the door" —
+caught two wrong leaf boxes on `research/newdoor/` and then passed a third. The
+door lies two degrees off level and tapers towards its foot, so its outline is
+a trapezoid and no axis-aligned rectangle is it; the box in use was 3% narrow
+AND 1% short, the aspect came out 0.416 against a door's 0.415, and the two
+errors cancelled. Every COLUMN fraction on that door was wrong by a shear that
+grew down the leaf — the pieces at the head and the foot came out narrow and
+the two in the middle came out right, which is the signature. `_upright2.mjs`
+rectifies from four measured corners instead. **When a check is a ratio, ask
+what pair of errors would cancel in it.**
 
 A contact sheet triages; it does not measure. When a number matters, put a
 scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
@@ -1131,6 +1166,118 @@ how it got there. Detail lives in the section it belongs to.
   check that cannot be broken on purpose is not hardened, it is blind, and
   proving the difference is what the falsification is for.
 
+- **Four photographs of doors he has built, and the classical panel put back
+  through the loop — plus the leaf box on the set's own photograph turning out
+  to be skewed.** Sent in as *"i love the normal panels, but i dont like how
+  the פאנל קלאסי look, so study them once more from these images… once again
+  try and find differences with the classic set that we have and perfect it
+  until there are no differences, and also if i add a window it goes on the
+  overlaps the set. also there are too much stripes right now, so in the עיצוב
+  חזית category have 2 sub categories, a panel and a stripes one. also the 3
+  panel option looks bad, so look at doors with 3 panels and make the panel
+  proportions look like the real thing."*
+  - **⚠ A WINDOW REALLY DID PAINT OVER THE SET, and the words were literal.**
+    `#glazing` is drawn after `#detail`, so the light's architrave went down on
+    top of the composition: its top run is 59 mm of lit ramp ending at 0.1262
+    of the leaf where the frieze's block ends at 0.126, and 0.2 mm of contact
+    plus a mitre stroke and antialiasing is enough for a bright band to eat the
+    frieze's bottom edge. Nobody had seen it on a SOLID set because there the
+    panel standing in the light's place is drawn by `classicSet` itself, before
+    the cornice — so the frieze covers it and the join reads clean. The two
+    halves of one composition were being drawn in opposite orders.
+    The glazing is built once and PLACED once now, before the face design when
+    the face is the set and after it otherwise. On the real door the architrave
+    is fitted round the light and the ornament is applied over the face, so the
+    set going last is what the joinery does.
+  - **⚠ THE OGEE SECTION WAS AN OGEE AND IT IS NOT ONE.** Three of the four
+    photographs are in the corpus — image 1 is **d050**, image 2 d111, image 4
+    d127 — and d050 is flat on, evenly lit, plain paint, no ironwork. Measured
+    across its moulding at 46 px, median down a sixth of the leaf: one narrow
+    GROOVE near the outer edge (floor 0.84), a LONG FLAT at the paint's own
+    tone across more than half the band, and a second, shallower groove near
+    the inner edge. Half the band is flat. The `research/newdoor/` table put a
+    hollow through the middle of that flat and a bright round where the inner
+    groove is — which is why it read as a soft bulge rather than as a scribed
+    frame.
+    The stored depths are the measured ones divided by 0.34, because
+    `mouldGradients` already compresses relief on pale paint and d050 is a
+    near-white door; the factor is the corpus's own (REALISM §7.4b measures a
+    0.22 departure on cream against 0.73 on navy). Said out loud in the table:
+    it is ONE door. d077 and d061 are so bright the whole moulding sits inside
+    0.95–1.00, and d111's and d127's leaf boxes are fallbacks.
+  - **⚠ `panel3` WAS 0.05 OF THE LEAF TOO HIGH AND ITS PLATE HALF A CENTIMETRE
+    TOO SHORT, and the corpus had the answer all along.** Going back through
+    all 129, three doors carry the composition — **d067, d068 and d077**, a
+    tall upper over a plate carrying a turned pull over a lower panel; d065,
+    d070 and d087 are the same door without the plate, the pull bolted to bare
+    face. Read by luminance derivative down d077's centre (the only one square
+    on) and off a ruled grid on d068; d067 quoted but not used, its crop's
+    aspect being 0.535 against a door's 0.415.
+    Upper 0.089–0.527, plate 0.547–0.661, lower 0.687–0.921 — against
+    0.055–0.430, 0.455–0.545, 0.575–0.875. The plate is 0.114 of the leaf and
+    not 0.09, and the pull was riding about 100 mm high.
+    ⚠ And the sanity check this table never had: the trio's upper and lower now
+    land within 0.02 of `pair`'s own rows. The three-panel door IS the
+    two-panel door with a plate let in between — the reasoning that was wrong
+    was the ENVELOPE, splitting the pair's span three ways, not the family
+    resemblance.
+  - **⚠ THE LEAF BOX ON `research/newdoor/full.jpg` WAS SKEWED, AND THAT IS THE
+    THIRD TIME THIS DOOR HAS DONE IT.** The door lies on the ground about two
+    degrees off level and further from the camera at its foot than at its head,
+    so its outline in the photograph is a TRAPEZOID — 1626 px across at the
+    head, 1558 at the foot — and `tools/_upright.mjs` cuts an axis-aligned
+    rectangle. No rectangle is both. The box in use came out 1537 wide and
+    3698 long against a real 1592 mean and 3730, so every column fraction
+    carried a few per cent of error PLUS a shear that grew down the door.
+    ⚠ The aspect check that caught the last two failed here: 0.416 against a
+    door's 0.415, because the crop was 3% narrow AND 1% short and the two
+    errors cancelled in the ratio. A ratio can only ever catch one error at a
+    time.
+    `tools/_upright2.mjs` rectifies the leaf bilinearly from its four measured
+    corners. The corners come off two ruled crops of the raw file — the only
+    way to see an edge two degrees off level.
+  - **What the rectified picture then said.** The ROWS were fine: every one
+    agrees with the old table to within 0.01, which is the ruler's own error,
+    and they are simply scaled by 3698/3730 to remove the 0.86% the short crop
+    added. The COLUMNS were not, and the pattern is exactly what a shear
+    predicts — the shelf and the band at the middle of the leaf came out right
+    and the pieces at the two ends came out narrow:
+
+    | | was | now |
+    |---|---|---|
+    | cornice | 0.647 | **0.710** (+63 mm) |
+    | frieze | 0.545 | **0.588** (+43) |
+    | shelf | 0.649 | 0.648 — confirmed |
+    | band | 0.429 | 0.428 — confirmed |
+    | panel | 0.516 | **0.540** (+24) |
+    | plinth | 0.555 | **0.588** (+33) |
+
+    ⚠ And the frieze and the plinth come out IDENTICAL, which is the check that
+    table never had: `classicBand` is built on the claim that the plinth is the
+    frieze upside down, and it was drawing it 33 mm wider while claiming it.
+  - **The cornice's ends sweep now, and the head is contiguous.** A square end
+    is the tell of a plank and a 45-degree mitre — which is what it was — is
+    the tell of a drawing that knew that and stopped there; on the rectified
+    photograph each end of the corona turns down in a quarter-round return. The
+    corona also takes 0.77 of its cap and not 0.68, ruled. And the three head
+    pieces used to leave 0.003 and 0.004 of BARE LEAF between them — six and
+    eight millimetres, never measured, just what is left over when three edges
+    are each read to the nearest thousandth and nothing checks that they meet.
+    At door scale that reads as three pieces floating. The dentil course spans
+    the FRIEZE now rather than "the cornice less 0.036 a side", which was a way
+    of saying "a bit narrower" without measuring it.
+  - **עיצוב חזית has two halves.** Twelve of its twenty tiles are stripes. `sub`
+    labels each option and `buildOptions` groups by it — ⚠ a LABEL, not a
+    re-cut of the list, because the short code packs DETAILS' index and moving
+    `classic` up beside the panels would have cost another `VERSION` bump. The
+    order on the screen and the order in the array are now two different things
+    and only one of them is a wire format.
+  - **NOT CHANGED: the glass.** An edge-find on the rectified leaf puts the
+    pane at 0.291–0.706 against the table's 0.289–0.711 — 0.007, inside the
+    instrument's own error — and drawing the two candidates back over the
+    photograph in red had already settled it once. Its ROWS take the same
+    0.86% scale as everything else, so the light and the ornament cannot drift
+    apart.
 - **The panels come in two mouldings, the strips in two compositions, and the
   classical set's opening changes size when you put a window in it.** Three
   faults in one message: *"wehn i put on a window the panel changes, it

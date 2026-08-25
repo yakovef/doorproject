@@ -701,6 +701,23 @@ one panel CORNER per door at high magnification. A whole-door contact sheet
 will not do it — at that size both read as "a moulded rectangle" — which is
 exactly why a table built from contact sheets had them as one product.
 
+**⚠ AND THE SAME MISTAKE WAS THEN MADE ON THE SECOND TABLE.** The ogee section
+was read off `research/newdoor/` — the classical set — and the family it is
+supposed to describe is d050's. Re-read on d050 it is not an ogee: one narrow
+GROOVE near the outer edge, a LONG FLAT at the paint's own tone across more
+than half the band, and a shallower groove near the inner edge. A scribed
+frame, not a curve. It was reported from outside as *"i dont like how the
+פאנל קלאסי look"*, with four photographs, three of which turned out to be
+corpus doors we already had at full resolution.
+
+**One thing that fell out and is worth reusing.** d050 is a near-white door, so
+what the photograph shows is the COMPRESSED profile — `mouldGradients` scales
+relief by 0.34 on pale paint. The table stores each measured departure from
+1.00 divided by that factor, so the pale rendering comes back out at the
+measured figure. Inverting the drawing's own compression is how a pale door can
+be used to measure a section at all; the alternative is to only ever measure
+dark doors, and this family has none in the corpus.
+
 Geometry, from the same three doors as fractions of the leaf: rectangles inset
 0.18 each side, upper 0.07 to 0.57, lower 0.67 to 0.91.
 

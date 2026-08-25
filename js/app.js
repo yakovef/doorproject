@@ -28,7 +28,7 @@
  */
 
 import {
-  byId, colourCode, COLOURS, DETAILS,
+  byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
   GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
 import { formatAgorot, priceAgorot, priceLabel, priceParts } from './price.js';
@@ -68,7 +68,7 @@ const GROUPS = [
   { key: 'colour', title: 'צבע', in: 'look', kind: 'swatch', list: () => COLOURS },
 
   { key: 'detail', title: 'עיצוב החזית', in: 'look', kind: 'tile', list: () => DETAILS,
-    glyph: detailGlyph },
+    glyph: detailGlyph, subs: DETAIL_SUBS },
 
   { key: 'window', title: 'חלון', in: 'glass', kind: 'tile', list: () => WINDOWS,
     glyph: windowGlyph },
@@ -824,7 +824,28 @@ function buildOptions(g, host) {
   host.className = 'field__opts '
     + { swatch: 'swatches', pill: 'pills', tile: 'tiles', sq: 'tiles tiles--sq', hw: 'tiles tiles--hw' }[g.kind];
 
-  for (const o of g.list()) {
+  /* ⚠ THE SCREEN'S ORDER AND THE LIST'S ORDER ARE TWO DIFFERENT THINGS.
+     `sub` groups a long list into halves — see DETAIL_SUBS in catalog.js — and
+     it is applied HERE rather than by re-cutting the array, because the short
+     code packs that array's INDEX and a reorder would refuse every code
+     already written. Options with no `sub` come first and carry no heading.
+     The headings are `aria-hidden`: this is one radiogroup with one answer,
+     and inserting real headings into it would announce two groups where the
+     customer makes one choice. Each tile already carries its own name. */
+  const groups = g.subs
+    ? [[null, g.list().filter(o => !o.sub)],
+       ...g.subs.map(([k, label]) => [label, g.list().filter(o => o.sub === k)])]
+    : [[null, g.list()]];
+
+  for (const [label, items] of groups) {
+  if (label && items.length) {
+    const h = document.createElement('div');
+    h.className = 'opts__sub';
+    h.setAttribute('aria-hidden', 'true');
+    h.textContent = label;
+    host.appendChild(h);
+  }
+  for (const o of items) {
     const b = document.createElement('button');
     b.type = 'button';
     b.dataset.id = o.id;
@@ -855,6 +876,7 @@ function buildOptions(g, host) {
     }
     b.addEventListener('click', () => choose(g, o.id));
     host.appendChild(b);
+  }
   }
   keyboardGrid(host);
 }
