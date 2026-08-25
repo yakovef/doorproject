@@ -79,7 +79,22 @@ import { repair } from './rules.js';
    it will not be true for long: the site is noindex, undeployed, and not one
    code has ever been given to a customer. The moment one has, a bump costs
    somebody a piece of paper with a door on it. */
-export const VERSION = 12;
+/* 13: THE FIELD WIDTHS MOVED. DETAILS has outgrown four bits — it went from
+   fourteen entries to twenty when the two ogee panels and the four missing
+   stripe compositions arrived — so `detail` is five bits now, and `window`
+   pays for it by dropping from four to three. The payload is still 36 bits and
+   the code is still eight characters, which matters: the alternative was to
+   take the bit out of the four the CHECK NIBBLE occupies, and that check is
+   why one-character typos stopped decoding into different doors.
+   Nothing moved because a list was re-cut this time — every id above index 4
+   simply sits at a different index under a different width, which is the same
+   kind of break and gets the same treatment: a version-12 code is refused with
+   a notice rather than read as another door.
+   ⚠ Still free, and this is the third bump to say so. The site is noindex,
+   undeployed, and not one code has been given to a customer. `window` has five
+   spare values and `detail` twelve after this; the next list to watch is
+   `size` at two, which ASK-PERETZ §8 expects Peretz to replace wholesale. */
+export const VERSION = 13;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -427,8 +442,15 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    a comment whose whole job is to make somebody think about the budget.
    If `size` needs widening, `detail`, `handle` and `lockset` can each give a
    bit back and the payload stays at 36. */
-export const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4,
-                      grille: 5, handle: 4, lockset: 4, detail: 4 };
+/* ⚠ `detail` IS FIVE BITS AND `window` IS THREE, and they moved together on
+   purpose. DETAILS reached twenty entries — four over its old ceiling, which
+   would have stored the twentieth as the FIRST and built a plain door from a
+   code that reads perfectly. WINDOWS is three of sixteen and has been since it
+   was cut to two shapes and none, so it is the one field with a bit to spare
+   that is not the check nibble's or the colour list's. Payload unchanged at
+   36; code unchanged at eight characters. */
+export const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 3,
+                      grille: 5, handle: 4, lockset: 4, detail: 5 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */

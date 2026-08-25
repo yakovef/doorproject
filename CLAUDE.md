@@ -143,13 +143,13 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **5,158,800 assertions passing, 0 failed**, no framework, plain
+- `npm test` — **5,235,796 assertions passing, 0 failed**, no framework, plain
   node. It was 3.70M before the classical set and 5.68M before the 24.8
   interface round; the catalogue lists change length and the combinatorial
   sweeps are the product of those lengths, so the total moves with the range in
   both directions. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF ANYTHING. It is
   not a coverage metric — read the failure count.
-- `npm run collide` — clean on **both** `all` and `boxes`, over **1,358
+- `npm run collide` — clean on **both** `all` and `boxes`, over **1,398
   buildable designs**, real `getBBox` geometry from a browser. Check both
   flags yourself; a "clean" claim about `collide` that does not say which of
   the two it means has been wrong before (see "Red, and known").
@@ -310,7 +310,7 @@ three-files promise and adds a second renderer.
   nearest real one.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   the option ORDER or the bit layout requires a `VERSION` bump in
-  `js/url-state.js` (currently **12**), so an old code is *refused with a
+  `js/url-state.js` (currently **13**), so an old code is *refused with a
   notice* rather than decoded into a different door. **Appending to the end of
   a list costs no bump. Changing a property — not the id, not the order —
   costs no bump.**
@@ -513,10 +513,29 @@ door too squat.
 wide laid on the face in a rectangle, and **the face inside the rectangle is the
 same plane, the same paint and the same texture as the face outside it.**
 
-`MOULD` is the measured cross-section off d048, sixteen stops, carried as a
-gradient across four mitred trapezoids — one per side, because each run sits at
-a different angle to the key. `MOULD_SIDE` holds the per-side gain, and it
-scales the moulding's **relief** — never its absolute tone. The gain used to
+**⚠ AND THERE ARE TWO OF THEM.** `MOULDS` holds two measured cross-sections,
+not one, and which a face uses is a catalogue choice:
+
+| | what it looks like | doors | tiles |
+|---|---|---|---|
+| **`reed`** | three to five fine beads, hard dark quirks between them, low relief, sharp mitres | d042 d048 d058 d062 d065 d068 d070 d087 d091 d094 d099 d116 d122 | `panel` `panel2` `panelTop` `panel3`, and every face with no `profile` |
+| **`ogee`** | ONE broad soft curve standing well proud, a small bead at its inner edge, a real cast shadow | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | `panelo` `panel2o` `classic` |
+
+Thirteen doors against eleven, so neither is "the" moulding — and a round that
+re-measured the one table off a door of the OTHER family drew the ogee round
+every panel in the range. It was reported from outside as the panels not
+looking good. Sort them by opening one panel CORNER per door at high
+magnification; a whole-door contact sheet will not separate them.
+
+`mouldOf(detail)` is the one answer, and it answers for the panel **and** for
+the architrave round the glass together, because every corpus door carrying a
+window over a panel cases both in the same section.
+
+Each table is carried as a gradient across four mitred trapezoids — one per
+side, because each run sits at a different angle to the key. The ids carry the
+profile: `mould-reed-t`, `mould-ogee-l`. `MOULD_SIDE` holds the per-side gain,
+shared by both, and it scales the moulding's **relief** — never its absolute
+tone. The gain used to
 multiply the whole run including its endpoints, so the top run's edges came out
 1.10× the paint and the bottom's 0.87×: a light rim above and a dark rim below,
 which is exactly how one shades a raised panel. It was reported from outside as
@@ -535,11 +554,23 @@ each other rather than to the leaf, and `CLASSIC_ROWS` / `CLASSIC_COLS` /
 `CLASSIC_GLASS` are the tables measured off `research/newdoor/`. Three things
 about it are load-bearing and easy to undo by accident:
 
-- **It supplies its own opening.** `apertureLayout(win, leafW, detail)`
-  substitutes `detail.winRect` (360 x 819 at 318 from the head) for whatever
-  the window option would have drawn, so the glass clears the frieze above it
-  and the shelf below. `repair` forces `window: 'rect'` off `needsWindow`, so
-  the substitution can never be invisible.
+- **It supplies its own opening, as FRACTIONS.**
+  `apertureLayout(win, leafW, detail, leafH)` substitutes `detail.winFrac`
+  (0.289–0.711 across, 0.155–0.5545 down: 359 x 819 at 318 on a standard leaf)
+  for whatever the window option would have drawn, so the glass clears the
+  frieze above it and the shelf below. `repair` forces `window: 'rect'` off
+  `rectOnly`, so the substitution can never be invisible.
+  ⚠ **Fractions, not millimetres, and `leafH` is threaded through for them.**
+  Every other piece of that composition is a fraction of the leaf; written in
+  millimetres the light stayed one size while the ornament round it grew with
+  the door — 62 mm narrower than its own timber panel on the WIDE leaf, and
+  46 mm into the frieze on the TALL one.
+- **Glazed and solid are ONE rectangle.** `classicLight` asks
+  `apertureLayout` for the hole and adds the casing round it; `classicPieces`
+  hands that to the solid variant and `aperture` cases the glass in the same
+  band. Computed twice, they drifted apart the moment the leaf stopped being
+  850 x 2050, and it was reported as *"when i put on a window the panel
+  changes, it supposed to be the same size."*
 - **Its panel is tagged `data-detail="panel"` with a `data-top`, inside the
   set's group.** Three assertions read that markup to ask whether the panel a
   customer is charged for is a panel that is drawn, and one of them goes DEAD
@@ -1051,6 +1082,101 @@ how it got there. Detail lives in the section it belongs to.
   check that cannot be broken on purpose is not hardened, it is blind, and
   proving the difference is what the falsification is for.
 
+- **The panels come in two mouldings, the strips in two compositions, and the
+  classical set's opening changes size when you put a window in it.** Three
+  faults in one message: *"wehn i put on a window the panel changes, it
+  supposed to be the same size… i want you to remake how the panels look
+  because they dont look good, so take a couple of images and see the
+  differences between our panels and the real ones, if you notice that they are
+  2 types of panels then make it a choice in the app… look through all the
+  images with stripes out of the 129 that you have in the repo, and add those
+  stripe options."*
+  - **⚠ THE SET'S OPENING IS ONE RECTANGLE NOW, AND IT WAS TWO.** The glazed
+    variant's outline came from `aperture`, casing the light in `CLASSIC_BAND`
+    off the catalogue's `winRect` in MILLIMETRES; the solid one was computed
+    separately in `classicPieces` off `CLASSIC_COLS.panel` in FRACTIONS. Both
+    readings are defensible off their own photograph and only one can be true
+    of one door, so toggling the window moved the outline 19 mm out at the
+    sides and 59 mm down at the head — and worse on any leaf that is not
+    850 x 2050, because one statement scaled with the door and the other did
+    not: 62 mm of width on the WIDE leaf, and on the TALL leaf the casing
+    climbed 46 mm into the frieze.
+    Fixed at both ends. `winFrac` replaces `winRect` on the catalogue entry —
+    fractions of the leaf, like every other piece of that composition — and
+    `apertureLayout` takes `leafH` so it can turn them into millimetres for
+    whatever leaf it is handed. `classicLight` then asks THAT function for the
+    hole and only adds the casing round it, so the narrow leaf's clamp applies
+    to both variants or to neither. Measured across all six sizes: identical to
+    zero on every one, where it had been out on four.
+  - **⚠ THERE ARE TWO MOULDINGS IN THIS RANGE AND WE DREW ONE — and last
+    round's "re-measurement" is how that happened.** `MOULD` was sixteen stops
+    off d048; it was replaced by thirteen stops with a single hollow, re-read
+    at 4000 px off `research/newdoor/`. Both readings are correct. They are
+    readings of DIFFERENT DOORS, and the second drew the classical set's broad
+    ogee round every panel in the range. Sorted by opening one panel CORNER per
+    door at high magnification, which separates them at a glance where a
+    whole-door contact sheet does not:
+    **reeded** — three to five fine beads with hard dark quirks between them,
+    low relief, sharply mitred: d042 d048 d058 d062 d065 d068 d070 d087 d091
+    d094 d099 d116 d122, thirteen doors.
+    **ogee** — one broad soft curve standing well proud with a small bead at
+    its inner edge and a real cast shadow: d041 d050 d051 d053 d061 d067 d077
+    d103 d112 d129 and `research/newdoor/`, eleven.
+    Near enough even, so neither is "the" moulding. `MOULDS` holds both, the
+    d048 table confirmed independently before it went back (`tools/_msect.mjs`
+    across d062: four quirks and four beads, the same alternation at lower
+    magnification — a phone photograph merges adjacent quirks, it does not
+    invent them). `panelo` and `panel2o` are the ogee twins of `panel` and
+    `panel2`; they differ in NOTHING but `profile`.
+    ⚠ NOT a new axis, deliberately: a "which moulding" group would have cost a
+    field in the short code, and the payload's only spare bit comes out of the
+    check nibble or out of the colour list Peretz may replace wholesale. Two
+    tiles instead, and the tile draws the difference — a question a picture
+    answers better than a word does.
+    ⚠ And `mouldOf` answers ONCE for the panel and the architrave together,
+    because every corpus door with a window over a panel cases both in the same
+    section. A reeded panel under an ogee architrave is not a door anybody has
+    built.
+  - **⚠ THE COMMONER STRIPE COMPOSITION WAS THE ONE WE COULD NOT DRAW.** All
+    129 photographs opened as contact sheets of leaf crops, then the thirty
+    striped ones measured band by band with `tools/_strips.mjs`. There are two
+    families: **even** — equal, full width, evenly spaced, on d033 d035 d036
+    d039 d049 d056 d059 d066 d081, NINE doors — and **ragged**, anchored at the
+    hinge stile with free ends of different lengths, on d044 d045 d064 d073
+    d078, five. `metalStrips` drew only the ragged one, at every count, so nine
+    doors of the corpus had no tile at all.
+    Four new options, each measured: `strips2` (the pair at 0.43 and 0.61 —
+    ⚠ NOT `strips3` minus one, it is a pair about the LOCK'S HEIGHT and the
+    ragged span formula would have put them at 0.23 and 0.77), `strips4` off
+    d063, `stripsband` — eight fine lines at a spacing of 0.028 repeated seven
+    times, a fifth of the leaf, off d081 — and `stripsv3`, because three is the
+    corpus's own vertical count (d037 d038 d043) and the list offered four and
+    six while nothing carries six. The five ragged counts keep their ids and
+    say "מדורגים" in Hebrew, so a customer choosing between three strips and
+    four is not silently choosing between two different designs.
+  - **`metalStrips` takes the DETAIL, not five flags off it.** Every new
+    composition had been adding another positional boolean the one call site
+    had to remember to pass; `even` and `rows` would have been the fifth and
+    sixth. The catalogue entry IS the description of the composition.
+  - **⚠ `npm run corpus` was deriving the wrong strip count, and had been
+    before the list grew.** Its matcher hard-coded `stripsv` for anything
+    vertical and `strips3` or `strips` for anything horizontal — a second
+    statement of what the range contains, inside the one tool whose job is to
+    say how far the range is from the photographs. d064's SEVEN bands were
+    derived as ELEVEN with the residual dutifully printed while `strips7` sat
+    unused. It asks the catalogue for the nearest count now, and four doors in
+    the gallery — d038 d043 d063 d064 — went from a residual to an exact fit.
+  - **VERSION 13: `detail` is five bits and `window` is three.** DETAILS went
+    from fourteen entries to twenty, four past its old ceiling, where the
+    twentieth would have encoded as index 0 — the customer picks the new
+    option, reads the code down the telephone, and Peretz builds a plain door
+    from a code that reads perfectly. WINDOWS is three of sixteen, so it is the
+    one field with a bit to spare that is not the check nibble's. Payload still
+    36 bits, code still eight characters.
+  - **`collide.mjs`'s panel reader matched `mould-t` exactly** and the ids
+    carry the profile now. It matches on the suffix, so a third section costs
+    it nothing; asked for the old id it found no runs and reported every
+    panelled door as an obstacle the drawing does not have.
 - **Three photographs of the three-panel face, two of the classical set, and a
   standing instruction to look at the striped doors.** Sent in as *"i dont like
   how the 3 panels look, so there is 3 images of how it needs to look… also
@@ -1086,9 +1212,10 @@ how it got there. Detail lives in the section it belongs to.
     `rectOnly` replaces it: the set still refuses the צוהר אנכי, because it
     substitutes its own rectangle for whatever the window option would have
     drawn and a substitution nobody can see is the same bug as a price for a
-    panel that is not drawn. The solid panel takes the LOWER panel's columns,
-    not the glass's — on the photograph the two rectangles are the same width
-    where the light is much narrower than either.
+    panel that is not drawn. ⚠ The solid panel took the LOWER panel's columns
+    at first, on a reading of the solid photograph that made the upper
+    rectangle as wide as the lower one; that was superseded within the round —
+    see "the set's opening is one rectangle" above.
   - **`stripsx` — the cross, MISSING in the inventory for three rounds.** Four
     of the corpus's fifteen striped doors carry it, the largest stripe pattern
     we could not draw. ⚠ On three of the four the vertical member is the PULL
@@ -1491,7 +1618,7 @@ how it got there. Detail lives in the section it belongs to.
     `repair`, because a rule only the page enforces is one a link walks past.
   - **The rotate button is hidden, not greyed, when a grip cannot turn.**
 
-  **The catalogue — and `VERSION` is 12.**
+  **The catalogue — and `VERSION` went to 12.**
   - **עיצוב חזית re-cut.** Both milled grooves withdrawn (aliased onto the lower
     panel); **panel counts 1, 2 and 3** added; **strips priced by count** —
     3, 5, 7, 9, 11 horizontal and 4, 6 vertical, because *"my father can put as

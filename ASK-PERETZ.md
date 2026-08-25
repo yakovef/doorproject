@@ -695,6 +695,28 @@ five-second answers and none of them blocks launch.*
 הגרסאות עולות אותו דבר, ₪1,680 — אבל זכוכית עם סורג היא לא אותו חומר כמו פאנל
 עץ, אז סביר שיש הפרש.*
 
+> **"יש לך שני סוגי מסגרת לפאנל, ולא ידענו. באחת יש שלושה־ארבעה חריצים דקים
+> וצמודים, ובשנייה עיקול אחד רחב ובולט. שתיהן שלך? ואותו מחיר?"**
+
+*זאת השאלה הכי חשובה מבין החדשות, כי היא לא על מחיר אלא על מה קיים. פתחנו פינה
+אחת של פאנל בכל דלת בהגדלה גבוהה, וזה נחתך לשתי משפחות: **מדורגת** — d042 d048
+d058 d062 d065 d068 d070 d087 d091 d094 d099 d116 d122, שלוש עשרה דלתות —
+ו**קלאסית** — d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 והדלת החדשה,
+אחת עשרה. כמעט חצי־חצי, ולכן אף אחת מהן איננה "המסגרת". שתיהן בקטלוג עכשיו
+כשתי אריחים, באותו מחיר — ₪380 לפאנל תחתון בשתיהן — אבל מסגרת רחבה ועמוקה יותר
+היא יותר חומר ויותר עבודה, אז סביר שזה לא באמת אותו מחיר. וגם: אם אחת מהן היא
+בעצם ספק אחר או פרופיל שהפסקת להזמין, נמחק אותה.*
+
+> **"פסים אופקיים — יש לך שתי צורות. באחת כל הפסים באותו אורך ומרווחים שווים,
+> ובשנייה הם מתחילים מאותו צד ונגמרים כל אחד במקום אחר. שתיהן שלך?"**
+
+*מדדנו את כל שלושים הדלתות עם פסים. **אחידים**: d033 d035 d036 d039 d049 d056
+d059 d066 d081 — תשע. **מדורגים**: d044 d045 d064 d073 d078 — חמש. ציירנו רק
+את המדורגים, בכל הספירות, אז תשע דלתות שלך לא היו ניתנות לבנייה באתר בכלל.
+עכשיו יש שלושה אריחים חדשים לאחידים (שניים, ארבעה, ולהקה צפופה של שמונה
+כמו ב־d081) ואחד לשלושה פסים אנכיים, שגם הוא היה חסר. מחירים: ₪280 / ₪360 /
+₪520 / ₪390, על אותו בסיס של ₪200 ועוד ₪40 לפס.*
+
 <details>
 <summary>ועוד שתיים קטנות שהתמונות פתחו</summary>
 
@@ -728,7 +750,7 @@ five-second answers and none of them blocks launch.*
 | 11 | second CTA · the nav · the trust sublines | three items of the second mockup |
 | 12 | opening or leaf · one opening or two | the dimensions on the A4 order sheet |
 | ~~13~~ | ~~a door with no lock furniture~~ | ✅ **answered 24.8.2026 — no.** The option is withdrawn; the bare door opens with a cylinder. See §13 |
-| 14 | the classical set · the ring grille · the black bar | three prices, and a name for the bar |
+| 14 | the classical set · the ring grille · the black bar · **two panel mouldings** · **two stripe compositions** | six prices, a name for the bar, and a yes/no on whether both mouldings are his |
 
 1 and 5 were the two that stop launch on their own. **1 is answered and fixed**,
 so **5 — a starting price per size band — is now the only thing standing between

@@ -377,7 +377,15 @@ const drift = await p.evaluate(rows => {
          "panel" covering the whole leaf, including the flat gap between them
          where a bar's foot is perfectly welcome. Each panel is its top run
          paired with its bottom one, in document order. */
-      const runs = o => [...el.querySelectorAll(`path[fill="url(#mould-${o})"]`)].map(e => e.getBBox());
+      /* ⚠ ANY SECTION, NOT ONE. The gradient ids carry the profile now —
+         `mould-reed-t`, `mould-ogee-t` — because the range has two measured
+         mouldings and a panel can be drawn in either. Matched on the SUFFIX,
+         so a third section costs this reader nothing; asked for `mould-t`
+         exactly, it found no runs at all and reported every panelled door as
+         "the rules believe in a panel and the drawing does not". */
+      const runs = o => [...el.querySelectorAll(`path[fill$="-${o})"]`)]
+        .filter(e => e.getAttribute('fill').startsWith('url(#mould-'))
+        .map(e => e.getBBox());
       const tops = runs('t'), bots = runs('b');
       tops.forEach((t, i) => {
         const bt = bots[i];

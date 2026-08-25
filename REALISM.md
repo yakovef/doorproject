@@ -680,6 +680,27 @@ the same object. It had been three stacked bevels around a step lightened by
 0.03, which lifted it into a second, paler colour — the panel's mistake,
 committed twice.
 
+**⚠ AND THERE ARE TWO SECTIONS, WHICH TOOK TWO MORE ROUNDS TO SEE.** Everything
+above is measured and everything above is about ONE of them. The d048 profile
+is the **reeded** moulding — three to five fine beads with hard dark quirks
+between them — and it is on thirteen doors. Eleven others (d041 d050 d051 d053
+d061 d067 d077 d103 d112 d129, and the classical-set door in
+`research/newdoor/`) carry a completely different thing: ONE broad soft ogee
+standing well proud, a small bead at its inner edge, and a real cast shadow.
+
+The failure this caused is worth recording because it is §6 obeyed and still
+getting the wrong answer. A round re-measured "the" cross-section at 4000 px
+off `research/newdoor/` — properly, with a normalised line scan — got two zones
+where the old table had seven reversals, concluded the old table was noise, and
+replaced it. The new reading was right about its own door and drew that door's
+moulding round every panel in the range.
+
+**Compare against a photograph is not enough on its own; it has to be a
+photograph of the thing you are changing.** What separates the two families is
+one panel CORNER per door at high magnification. A whole-door contact sheet
+will not do it — at that size both read as "a moulded rectangle" — which is
+exactly why a table built from contact sheets had them as one product.
+
 Geometry, from the same three doors as fractions of the leaf: rectangles inset
 0.18 each side, upper 0.07 to 0.57, lower 0.67 to 0.91.
 

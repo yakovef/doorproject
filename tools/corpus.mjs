@@ -324,18 +324,26 @@ function detailOf(rec) {
                note: `a groove round the leaf's perimeter at ${g[0].inset} inset — `
                    + 'the catalogue has no perimeter option at all' };
     }
+    /* ⚠ THE NEAREST COUNT THE CATALOGUE ACTUALLY OFFERS, asked OF the
+       catalogue. This was two hard-coded ids per axis — `stripsv` for anything
+       vertical, `strips3` or `strips` for anything horizontal — which is a
+       second statement of what the range contains, inside the one tool whose
+       job is to say how far the range is from the photographs. It was already
+       wrong before the list grew: d064's SEVEN bands were derived as ELEVEN
+       and the residual of 0.36 was dutifully printed while `strips7` sat
+       unused in the list. Ties fall to list order, which puts the even
+       compositions before the ragged ones. */
     const vertical = g.filter(x => x.orientation === 'vertical').length >= g.length / 2;
-    if (vertical) {
-      /* Vertical line work: `stripsv` is four, `groove` is one. */
-      const want = count >= 2 ? 'stripsv' : 'groove';
-      const have = byId(DETAILS, want).strips || 1;
-      return { id: want, residual: Math.abs(have - count) / Math.max(have, count),
-               note: `${count} vertical -> ${byId(DETAILS, want).he} (${have})` };
+    const cands = DETAILS.filter(d => d.strips && !d.cross && !!d.vertical === vertical);
+    if (!cands.length || count < 2) {
+      return { id: 'plain', residual: 1,
+               note: `${count} ${vertical ? 'vertical' : 'horizontal'} line(s) — the `
+                   + 'catalogue has nothing that sparse; the milled grooves were withdrawn' };
     }
-    const want = count >= 7 ? 'strips' : 'strips3';
-    const have = byId(DETAILS, want).strips;
-    return { id: want, residual: Math.abs(have - count) / Math.max(have, count),
-             note: `${count} horizontal -> ${byId(DETAILS, want).he} (${have})` };
+    const want = cands.reduce((a, b) =>
+      Math.abs(b.strips - count) < Math.abs(a.strips - count) ? b : a);
+    return { id: want.id, residual: Math.abs(want.strips - count) / Math.max(want.strips, count),
+             note: `${count} ${vertical ? 'vertical' : 'horizontal'} -> ${want.he} (${want.strips})` };
   }
   return { id: 'plain', residual: 0, note: 'plain face' };
 }

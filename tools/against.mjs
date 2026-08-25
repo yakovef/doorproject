@@ -105,6 +105,7 @@ await assertFreshBundle();
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const page = await b.newPage({ viewport: { width: 700, height: 1100 }, deviceScaleFactor: 2 });
 const leafW = SIZES.standard.w - REBATE * 2;
+const leafH = SIZES.standard.h - REBATE;
 
 /** Our own drawing of one option, cropped the same way the photographs are. */
 async function ours(q, clip) {
@@ -155,7 +156,7 @@ for (const g of GRILLES) {
      fine; the sheet was comparing a rectangular light against a tall one and
      the difference is the sheet's, not the door's. */
   const win = byId(WINDOWS, WINDOW_SIZE[g.id.replace(/-light$/, '')] || 'tallwin');
-  const [op] = apertureLayout(win, leafW);
+  const [op] = apertureLayout(win, leafW, null, leafH);
   const img = await ours(`c=rb-9302d&w=${win.id}&g=${g.id}&n=none&k=coral&d=plain&s=standard&h=right-in`,
     (leaf, k) => ({ x: leaf.x + op.x * k - op.w * k * 0.2, y: leaf.y + op.top * k - op.w * k * 0.2,
                     width: op.w * k * 1.4, height: op.h * k + op.w * k * 0.4 }));

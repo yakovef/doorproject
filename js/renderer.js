@@ -1003,7 +1003,7 @@ export function render(state) {
      ironmongery is bolted to. Everything downstream reads THESE and not the
      catalogue's rectangles, or the drawing and the rules disagree about where
      the glass is. Leaf-local, so add mainX to reach stage space. */
-  const openings = apertureLayout(win, leafW, detail);
+  const openings = apertureLayout(win, leafW, detail, leafH);
 
   /* The glazing envelope, so moulded detail and the grip can be kept clear of
      it. Declared before the grip is placed, because the grip now reads it. */
@@ -2165,17 +2165,18 @@ export function render(state) {
             const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
             const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
             return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
-                              paint, edge, grille, key: 's',
+                              paint, edge, grille, key: 's', profile: mouldOf(detail),
                               leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
               + (detail.panel
-                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, null, 0, 's')
+                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, null, 0, 's',
+                                 null, PANEL_INSET, mouldOf(detail))
                   : '');
           })()
       : win.rects[0] && sideW > 320
         ? aperture({ x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
                      y: y0 + win.rects[0].top,
                      w: Math.min(win.rects[0].w, sideW - 240), h: win.rects[0].h,
-                     paint, edge, grille, key: 's',
+                     paint, edge, grille, key: 's', profile: mouldOf(detail),
                      leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
         : ''}</g>` : ''}
 
@@ -2198,7 +2199,7 @@ export function render(state) {
         ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
             hasUpperPanel(detail) ? panelRows(detail) : null, 0, 'm',
             openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null,
-            panelInset(detail))
+            panelInset(detail), mouldOf(detail))
         : ''}
     ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND IT COMES WITH THE
           HANDLE. All three photographs of this face carry the same turned pull
@@ -2214,8 +2215,7 @@ export function render(state) {
         : ''}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint, detail.perimeter) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
-    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone,
-                                  detail.vertical, hingeOnLeft, detail.cross) : ''}
+    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail, tone, hingeOnLeft) : ''}
   </g>
 
   <!-- ── glazing ──────────────────────────────────────────────── -->
@@ -2225,7 +2225,7 @@ export function render(state) {
       bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
       x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
       splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
-      paint, edge, grille, key: 'm' + i,
+      paint, edge, grille, key: 'm' + i, profile: mouldOf(detail),
       leaf: { x: mainX, y: y0, w: leafW, h: leafH },
     })).join('')}
   </g>
@@ -2420,34 +2420,95 @@ function bevel(x, y, w, h, d, paint, raised = true) {
    Fat lines turn it into a black picture frame painted on. What the photograph
    actually shows is a sculpted ramp WITH fine quirks cut into it — mass and
    detail, and the mass is the half that was missing. */
-const MOULD = [
-  /* ⚠ RE-MEASURED, AND IT WENT FROM SEVEN REVERSALS TO TWO. The first section
-     had sixteen stops swinging between 0.34 and 1.14 — seven light/dark
-     alternations across a 70 mm band — and at drawing scale that is not a
-     moulding, it is hatching. Every recreation round described the same
-     symptom in different words: "four or five thin engraved lines where the
-     real one is one broad lit face". It was read off a low-resolution crop
-     where the noise WAS the signal.
-     Re-read with `tools/_section.mjs` across the panel's left run on the
-     4000 px photograph in `research/newdoor/`, luminance normalised by the
-     flat paint either side of it. What is actually there, outer edge inward:
+/**
+ * ⚠ TWO SECTIONS, BECAUSE THE RANGE HAS TWO MOULDINGS — and finding that out
+ * is what the last round's "re-measurement" actually was.
+ *
+ * There was one table here. It was read off d048 as sixteen stops swinging
+ * between 0.34 and 1.16, then replaced by thirteen stops with a single hollow,
+ * re-read at 4000 px off `research/newdoor/`. Both readings are correct. They
+ * are readings of DIFFERENT DOORS, and putting the second over the first drew
+ * the classical set's broad ogee round every panel in the range — which is
+ * what *"i want you to remake how the panels look because they dont look
+ * good"* was about.
+ *
+ * Sorted by opening one panel corner per door at high magnification, which
+ * separates them at a glance where a whole-door contact sheet does not:
+ *
+ *   REEDED   three to five fine beads with hard dark quirks between them, low
+ *            relief, sharply mitred. d042 d048 d058 d062 d065 d068 d070 d087
+ *            d091 d094 d099 d116 d122 — thirteen doors.
+ *   OGEE     ONE broad soft curve standing well proud, a small bead at its
+ *            inner edge, a real cast shadow. d041 d050 d051 d053 d061 d067
+ *            d077 d103 d112 d129 and the set in `research/newdoor/` — eleven.
+ *
+ * Near enough evenly split, which is why neither can be "the" moulding, and
+ * why the choice is in the catalogue rather than here: `panel` and `panel2`
+ * are reeded, `panelo` and `panel2o` are the ogee, and the classical set is
+ * the ogee by construction.
+ *
+ * `at` runs from the band's OUTER edge to its inner one; `tone` is how much
+ * light that point returns compared with the field. Both are carried as
+ * gradients rather than as drawn lines, because the two failures either side
+ * are both easy to reach: fine lines alone leave the band flat and the
+ * moulding reads as an outline etched into the door, and fat lines turn it
+ * into a black picture frame painted on.
+ */
+const MOULDS = {
+  /* d048, sixteen stops: a line scanned through the band at 1 px steps, every
+     sample divided by the flat field beside it, smoothed and resampled.
+     Five quirks at 0.44 0.34 0.52 0.62 0.36 with a bead between each pair.
+     ⚠ CONFIRMED INDEPENDENTLY BEFORE IT WAS PUT BACK, because it had been
+     deleted once as "noise read as signal". `tools/_msect.mjs` across d062's
+     upper panel, median down 22% of the leaf's height so a reflection on one
+     row is thrown away: 0.83 0.48 0.81 0.94 0.67 0.98 0.77 0.73 0.89 0.74
+     0.61 0.84 — four quirks and four beads, the same alternation at a lower
+     magnification. A phone photograph of a 2 m door merges adjacent quirks;
+     it does not invent them. */
+  reed: [
+    [0.00, 1.00], [0.07, 0.72], [0.10, 0.44], [0.15, 1.14],
+    [0.19, 0.34], [0.25, 1.02], [0.30, 0.52], [0.38, 1.05],
+    [0.46, 0.86], [0.52, 1.12], [0.60, 0.62], [0.70, 1.10],
+    [0.79, 0.36], [0.87, 0.70], [0.94, 0.96], [1.00, 1.00],
+  ],
+  /* `research/newdoor/` at 4000 px, `tools/_section.mjs` across the panel's
+     left run. Two zones and nothing else:
 
         1.00  the leaf's own face
         0.68  ONE deep quirk, a third of the way in
         1.16  ONE broad lit face, the ogee's top
-        1.00  the field, which is the same paint again
+        1.00  the field, which is the same paint again  */
+  ogee: [
+    [0.00, 1.00], [0.10, 0.94], [0.20, 0.86], [0.30, 0.71],
+    [0.36, 0.68], [0.44, 0.82], [0.52, 0.93], [0.60, 1.14],
+    [0.70, 1.16], [0.78, 1.06], [0.86, 1.12], [0.94, 1.05],
+    [1.00, 1.00],
+  ],
+};
+/* Endpoints stay at exactly 1.00 in BOTH: a moulding meets the same flat face
+   on both sides, and anything else shades the field like a raised panel — see
+   the note on MOULD_SIDE below. `npm test` asserts it rather than trusting
+   whoever edits the tables next. */
+export const MOULD_PROFILES = Object.keys(MOULDS);
+/* The one every drawing gets unless it asks for the other. Reeded, by two
+   doors and by the fact that it is what a plain glazed leaf's surround is on
+   every door in the corpus that has one. */
+const MOULD_DEFAULT = 'reed';
 
-     Two zones. A real ovolo has a hollow and a round and nothing else, and
-     that is what the photograph shows at every scale you care to look at.
-     Endpoints stay at exactly 1.00: a moulding meets the same flat face on
-     both sides, and anything else shades the field like a raised panel — see
-     the note on MOULD_SIDE below, which is the same mistake caught earlier
-     from the other end. */
-  [0.00, 1.00], [0.10, 0.94], [0.20, 0.86], [0.30, 0.71],
-  [0.36, 0.68], [0.44, 0.82], [0.52, 0.93], [0.60, 1.14],
-  [0.70, 1.16], [0.78, 1.06], [0.86, 1.12], [0.94, 1.05],
-  [1.00, 1.00],
-];
+/**
+ * WHICH SECTION A FACE DESIGN IS MOULDED IN — asked once, here, and answered
+ * for the panel AND for the surround round the glass.
+ *
+ * ⚠ ONE ANSWER FOR BOTH, because the doors are built that way. Every corpus
+ * door carrying a window over a panel — d090 d091 d092 d094 d097 d099 d102
+ * d105 d106 d116 d122 — cases the light in the same section it moulds the
+ * panel in. A door with a reeded panel under an ogee architrave is not a door
+ * anybody has built, and offering it would be inventing a product.
+ * A face with no `profile` — `plain`, and every strip design — takes the
+ * default, which is what a glazed leaf with no panel gets.
+ */
+const mouldOf = detail =>
+  (detail && MOULDS[detail.profile] ? detail.profile : MOULD_DEFAULT);
 
 
 /* One gain per side, applied to the moulding's RELIEF — how deep its quirks
@@ -2480,14 +2541,19 @@ const MOULD_SIDE = { top: 0.95, left: 1.01, right: 1.04, bottom: 1.07 };
  * door's own paint and its own texture show straight through, which is the
  * point.
  */
-function moulding(x, y, w, h, band, paint, pale, leaf = null, key = '') {
+function moulding(x, y, w, h, band, paint, pale, leaf = null, key = '',
+                  profile = MOULD_DEFAULT) {
   if (w <= band * 2.2 || h <= band * 2.2) return '';
 
   /* Four mitred trapezoids, each filled with the measured cross-section as a
      gradient running perpendicular to its own run. That is the whole moulding:
      mass and quirks in one fill, four paths for the rectangle instead of the
-     hundred and seventy-six a stop-per-stroke version would have taken. */
-  const side = (d, o) => `<path d="${d}" fill="url(#mould-${o})"/>`;
+     hundred and seventy-six a stop-per-stroke version would have taken.
+     ⚠ WHICH SECTION IS AN ARGUMENT, not a constant — see MOULDS. An unknown
+     name would silently draw no fill at all, so it falls back rather than
+     producing an invisible moulding. */
+  const p = MOULDS[profile] ? profile : MOULD_DEFAULT;
+  const side = (d, o) => `<path d="${d}" fill="url(#mould-${p}-${o})"/>`;
   const b = band;
   const runs = [
     [`M ${x} ${y} H ${x + w} L ${x + w - b} ${y + b} H ${x + b} Z`, 't'],
@@ -2579,17 +2645,21 @@ function mouldGradients(paint, pale) {
   /* The gain multiplies the DEVIATION from the paint, so tone 1.00 stays the
      paint whatever the gain is, and both edges of every run meet the face
      without a step. */
-  const stops = lift => MOULD.map(([at, tone]) =>
+  const stops = (p, lift) => MOULDS[p].map(([at, tone]) =>
     `<stop offset="${at}" stop-color="${scaleTone(paint, 1 + (tone - 1) * relief * lift)}"/>`).join('');
   /* Outer edge first in every case, so one measured profile serves all four:
      the top run reads downward, the bottom run upward, and the two verticals
      inward from their own side of the rectangle. */
-  const g = (id, x1, y1, x2, y2, lift) =>
-    `<linearGradient id="mould-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(lift)}</linearGradient>`;
-  return g('t', 0, 0, 0, 1, MOULD_SIDE.top)
-       + g('b', 0, 1, 0, 0, MOULD_SIDE.bottom)
-       + g('l', 0, 0, 1, 0, MOULD_SIDE.left)
-       + g('r', 1, 0, 0, 0, MOULD_SIDE.right);
+  const g = (p, id, x1, y1, x2, y2, lift) =>
+    `<linearGradient id="mould-${p}-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(p, lift)}</linearGradient>`;
+  /* Both profiles, always emitted — `usedDefs` walks the body for `url(#…)`
+     and drops whichever the door does not point at, so a reeded door carries
+     four gradients exactly as it did when there was only one section. */
+  return MOULD_PROFILES.map(p =>
+      g(p, 't', 0, 0, 0, 1, MOULD_SIDE.top)
+    + g(p, 'b', 0, 1, 0, 0, MOULD_SIDE.bottom)
+    + g(p, 'l', 0, 0, 1, 0, MOULD_SIDE.left)
+    + g(p, 'r', 1, 0, 0, 0, MOULD_SIDE.right)).join('');
 }
 
 /**
@@ -2715,7 +2785,7 @@ const panelRows = detail =>
 const panelInset = detail =>
   (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm',
-                      alignTo = null, inset0 = PANEL_INSET) {
+                      alignTo = null, inset0 = PANEL_INSET, profile = MOULD_DEFAULT) {
   const band = MOULD_BAND;     // the same stock that goes round a pane
   /* THE PANEL LINES UP WITH THE WINDOW ABOVE IT.
      Reported from the outside — "make the size of windows and plates the same
@@ -2740,7 +2810,8 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
      `a` an aperture prefixes with. */
   const leaf = { x: lx, y: ly, w: lw, h: lh };
   const rect = (t, b, n) =>
-    moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `p${key}${n}`);
+    moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `p${key}${n}`,
+             profile);
 
   /* ANY FACE WITH A PANEL IN THE UPPER HALF: the classic pair, the three-panel
      face, or the upper rectangle on its own. Only on a solid leaf — with
@@ -2761,7 +2832,8 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
 
   const top = Math.max(ly + lh * PANEL_ROWS.lone[0], winBottom + lw * 0.08);
   const bottom = ly + lh * PANEL_ROWS.lone[1];
-  const art = moulding(x, top, w, bottom - top, band, paint, pale, leaf, `p${key}0`);
+  const art = moulding(x, top, w, bottom - top, band, paint, pale, leaf, `p${key}0`,
+                       profile);
   /* `data-top` so a test can ask where the moulding starts instead of parsing
      the first path out of the markup. It did that until this rewrite, and the
      assertion it was protecting — that mouldings never cross the glazing —
@@ -2863,7 +2935,7 @@ export const faceObstacles = memo(function faceObstacles(state) {
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const detail = byId(DETAILS, state.detail);
   const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
-                                  byId(DETAILS, state.detail));
+                                  byId(DETAILS, state.detail), leafH);
   /* ⚠ THE SAME BAND THE DRAWING CASES IT IN. This said MOULD_BAND flat, and
      for the classical set the drawing now says 59: an obstacle eleven
      millimetres bigger than the thing it describes is the §5 shape again. */
@@ -2953,7 +3025,7 @@ export function panelFits(state) {
   if (!detail.panel) return true;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
-                                  byId(DETAILS, state.detail));
+                                  byId(DETAILS, state.detail), leafH);
   if (!openings.length) return true;
   const winBottom = Math.max(...openings.map(o => o.top + o.h));
   /* ⚠ THE GLASS HAS TO STOP HIGH ENOUGH, AND "not literally zero" IS NOT HIGH
@@ -3503,7 +3575,7 @@ export function gripPlacement(state, place = null) {
      widest reach in either direction, which puts the horizontal bow's 290 mm
      on BOTH sides of its axis and refuses panes it is nowhere near. */
   for (const o of apertureLayout(byId(WINDOWS, state.window), leafW,
-                                 byId(DETAILS, state.detail))) {
+                                 byId(DETAILS, state.detail), leafH)) {
     if (cgx0 < o.x + o.w && cgx1 > o.x
         && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
       return bad('הידית חוצה את החלון');
@@ -3620,7 +3692,69 @@ export function nearestGrip(state, want) {
  * top-left arris, a body, and its own drop shadow onto the paint below-right,
  * because a thing standing proud of a surface has to cast something.
  */
-function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft, cross = false) {
+/**
+ * WHERE AN EVEN COMPOSITION'S BANDS GO, MEASURED RATHER THAN FITTED.
+ *
+ * ⚠ THESE ARE NOT A SPAN FORMULA WITH A COUNT IN IT, and the pair is why. The
+ * ragged family below spreads over `0.458 + 0.044n` of the leaf, fitted on
+ * d063, d064 and d078; run at two bands that puts them at 0.23 and 0.77, and
+ * every two-band door in the corpus puts them at 0.43 and 0.61 — a pair about
+ * the lock's height, half the leaf apart from what a formula would say. So
+ * each even composition is a list of its own measured rows.
+ *
+ * Read with `tools/_strips.mjs`: rows whose median tone departs from the
+ * paint's own vertical falloff, grouped into bands, each band's ends found by
+ * walking the row outward while the departure holds.
+ *
+ *   pair   d035 0.426 0.609 (ruler-read)   d036 0.486 0.640   d049 0.380 0.590
+ *   quad   d063 0.199 0.402 0.611 0.808 — even to within 0.006; d056 agrees
+ *   band   d081 0.492 … 0.687, spacing 0.028 repeated seven times
+ */
+const STRIP_ROWS = {
+  pair: [0.430, 0.613],
+  quad: [0.199, 0.402, 0.611, 0.808],
+  band: [0.492, 0.521, 0.547, 0.576, 0.604, 0.631, 0.660, 0.687],
+};
+/* How much of the leaf an even band spans. d035 measures 0.83 and 0.85 of the
+   leaf's width; d036, d059 and d066 all read at or past the 0.90 the scan
+   window allows, so they are full width and the true figure is above 0.90.
+   0.88, centred, which is inside every one of those. */
+const STRIP_EVEN_W = 0.88;
+
+/**
+ * ⚠ THE DETAIL ITSELF, NOT FIVE FLAGS OFF IT. This took `count`, `vertical`,
+ * `hingeOnLeft` and `cross` as separate arguments, and each new composition
+ * added another positional boolean that the one call site had to remember to
+ * pass. `even` and `rows` would have been the fifth and sixth. The catalogue
+ * entry IS the description of the composition; hand it over whole.
+ */
+function metalStrips(lx, ly, lw, lh, detail, tone, hingeOnLeft) {
+  const { strips: count, vertical, cross, even, rows } = detail;
+
+  /* ── EVEN, FULL WIDTH ────────────────────────────────────────────
+     Nine doors of the corpus and no tile until now: d033 d035 d036 d039 d049
+     d056 d059 d066 d081. Equal bands, equal width, at the measured rows above
+     — which is the whole difference from the ragged family further down, and
+     the reason it needed its own tiles rather than a wider RHYTHM. */
+  if (even) {
+    const t = Math.max(8, Math.round(lh * 0.008));
+    const w = Math.round(lw * STRIP_EVEN_W);
+    const x = Math.round(lx + (lw - w) / 2);
+    const at = STRIP_ROWS[rows] || STRIP_ROWS.quad;
+    const out = at.map(f => {
+      const y = Math.round(ly + lh * f - t / 2);
+      return `
+        <rect x="${x + 3}" y="${y + 3}" width="${w}" height="${t}" fill="#000" opacity="0.22"/>
+        <rect x="${x}" y="${y}" width="${w}" height="${t}" fill="${tone[2]}"/>
+        <rect x="${x}" y="${y}" width="${w}" height="${Math.max(2, t * 0.34)}"
+              fill="${tone[0]}"/>
+        <rect x="${x}" y="${y + t - Math.max(2, t * 0.24)}" width="${w}"
+              height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`;
+    });
+    return `<g data-detail="strips" data-count="${at.length}" data-axis="horizontal"
+               data-even="${rows}">${out.join('')}</g>`;
+  }
+
   /* ── THE CROSS ───────────────────────────────────────────────────
      One long vertical member with short horizontals crossing it, grouped in
      the half of the leaf away from the lock. Four doors carry it — d035, d047,
@@ -4319,11 +4453,20 @@ const HW_STILE = MOUNT_REACH + LOCK_CLEAR;
  * there is still one answer to where the glass is.
  * The memo key carries it. A key that leaves an input out is a wrong answer
  * cached — see `homeKey`.
+ *
+ * ⚠ AND `leafH` IS AN INPUT FOR THE SAME REASON. The set's own opening is
+ * declared as FRACTIONS of the leaf, because everything else about that
+ * composition is — see `winFrac` in the catalogue. A rect in millimetres needs
+ * no leaf height and the catalogue's three shapes still do not use it; the
+ * set's does, and without it the light stayed one size while the ornament
+ * round it grew with the door.
  */
-export const apertureLayout = memo(function apertureLayout(win, leafW, detail) {
+export const apertureLayout = memo(function apertureLayout(win, leafW, detail, leafH = 0) {
   const rows = new Map();
-  const rects = detail && detail.winRect && (win.rects || []).length
-    ? [detail.winRect] : (win.rects || []);
+  const F = detail && detail.winFrac;
+  const rects = F && (win.rects || []).length
+    ? [{ w: leafW * (F.x1 - F.x0), h: leafH * (F.bot - F.top), top: leafH * F.top }]
+    : (win.rects || []);
   for (const r of rects) {
     const k = `${r.top}|${r.h}`;
     if (!rows.has(k)) rows.set(k, []);
@@ -4347,11 +4490,13 @@ export const apertureLayout = memo(function apertureLayout(win, leafW, detail) {
     out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
   }
   return out;
-}, (win, leafW, detail) => `${win.id}|${leafW}|${detail ? detail.id : '-'}`);
+}, (win, leafW, detail, leafH = 0) =>
+     `${win.id}|${leafW}|${detail ? detail.id : '-'}|${leafH}`);
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
-                    splits = [], band = MOULD_BAND, bandFoot = band }) {
+                    splits = [], band = MOULD_BAND, bandFoot = band,
+                    profile = MOULD_DEFAULT }) {
   /* WORKED GLASS IS A GRILLE NOW. The pattern in the pane and the ironwork
      over it were two choices and are one, so the same option decides both:
      `glass: true` in the catalogue means it is etched into the glass, and
@@ -4398,7 +4543,7 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
   return `
     <g data-pane="${key}" data-glass="${grille.glass ? grille.id : 'clear'}">
       ${moulding(x - M, y - M, w + M * 2, h + M + MF, M, paint, isLight(paint),
-                 leaf, `a${key}`)}
+                 leaf, `a${key}`, profile)}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
            edge before the pane turns the other way -->
       ${bevel(x, y, w, h, 8, paint, false)}
@@ -5206,9 +5351,15 @@ const CLASSIC_COLS = {
   plinth:  [0.223, 0.777],   // width 0.555
 };
 /* The window the set is built around. 0.155 to 0.5545 of the leaf's height and
-   0.423 of its width, which on our 850 x 2050 leaf is 360 x 819 at 318 from
-   the head — close to the catalogue's own `rect` and not the same as it. */
-const CLASSIC_GLASS = { top: 0.155, bot: 0.5545, x0: 0.289, x1: 0.711 };
+   0.422 of its width, which on our 850 x 2050 leaf is 359 x 819 at 318 from
+   the head — close to the catalogue's own `rect` and not the same as it.
+   ⚠ READ OFF THE CATALOGUE, not written twice. It lived here as four numbers
+   and in `catalog.js` as a rect in millimetres, and the two answers drifted
+   apart the moment the leaf stopped being 850 x 2050: the drawing's solid
+   panel scaled with the door and `apertureLayout`'s glass did not. Same
+   fractions, one statement, and `apertureLayout` turns them into millimetres
+   for whatever leaf it is handed. */
+const CLASSIC_GLASS = byId(DETAILS, 'classic').winFrac;
 /* The stock the SET's light is cased in, and it is not the range's 70 mm.
    Ruler-read: the frieze block ends at 0.126 of the leaf and the glass starts
    at 0.155, which leaves 0.029 — 59 mm on a 2,050 leaf. At 70 the casing runs
@@ -5251,13 +5402,30 @@ export const CLASSIC_BAND_FOOT = 9;
  * 0.790, and a pull bar put through a corbel is through a corbel. An obstacle
  * is what is ON the door, not what the joinery drawing calls one piece.
  */
+/**
+ * THE SET'S OPENING WITH ITS CASING ROUND IT — the rectangle that holds glass
+ * on the glazed variant and timber on the solid one.
+ *
+ * ⚠ THROUGH `apertureLayout`, NOT OFF THE FRACTIONS. Multiplying `winFrac` by
+ * the leaf here would agree with the glazed variant on five sizes out of six
+ * and disagree on the narrow leaf, where `apertureLayout` pulls the opening in
+ * so the architrave does not eat the stile the ironmongery is bolted to. One
+ * function answers where the hole is; this only adds the casing round it.
+ */
+function classicLight(leafW, leafH) {
+  const [o] = apertureLayout(byId(WINDOWS, 'rect'), leafW,
+                             byId(DETAILS, 'classic'), leafH);
+  return { x: o.x - CLASSIC_BAND, y: o.top - CLASSIC_BAND,
+           w: o.w + CLASSIC_BAND * 2,
+           h: o.h + CLASSIC_BAND + CLASSIC_BAND_FOOT };
+}
+
 export function classicPieces(leafW, leafH, glazed = true) {
   const R = CLASSIC_ROWS, C = CLASSIC_COLS;
   const of = (row, x0, x1) => ({
     x: leafW * x0, y: leafH * R[row][0],
     w: leafW * (x1 - x0), h: leafH * (R[row][1] - R[row][0]),
   });
-  const G = CLASSIC_GLASS;
   return [
     { piece: 'cornice', kind: 'moulding', ...of('cornice', ...C.cornice) },
     { piece: 'frieze',  kind: 'moulding', ...of('frieze',  ...C.frieze)  },
@@ -5277,16 +5445,23 @@ export function classicPieces(leafW, leafH, glazed = true) {
        charges for the SET, and the set's own composition is not a second panel
        the customer bought. The lower panel is still the one thing tagged
        `data-detail="panel"`, and still the one thing the price is about. */
+    /* ⚠ THE CASING'S RECTANGLE, NOT A RECTANGLE OF ITS OWN — and this was
+       reported from outside: *"when i put on a window the panel changes, it
+       supposed to be the same size."* It was true and it was two rectangles.
+       The glazed variant's outline is drawn by `aperture`, which cases the
+       light in CLASSIC_BAND all round and CLASSIC_BAND_FOOT under it; the
+       solid one was written here off `C.panel`, on a reading of the solid
+       photograph that made the upper rectangle as wide as the lower one. Both
+       readings can be defended off their own photograph and only one of them
+       can be true of one door, so toggling the window moved the outline 19 mm
+       out at the sides and 59 mm down at the head.
+       ONE opening, two fills: the same hole in the leaf, holding glass behind
+       a casing or holding timber. And it is not computed here from the
+       fractions either — `classicLight` asks `apertureLayout`, the same
+       function the glazed variant asks, so the narrow leaf's clamp applies to
+       both or to neither. */
     ...(glazed ? [] : [{ piece: 'light', kind: 'moulding',
-      /* ⚠ THE PANEL'S COLUMNS, NOT THE GLASS'S. On the solid door the upper
-         rectangle and the lower one are the same width — 250 to 545 and 245 to
-         550 of the same photograph — where the LIGHT on the glazed one is much
-         narrower than either. Sized to the glass it came out as a tall slot
-         with a wide margin either side, which is a window drawn in timber
-         rather than a panel. The rows stay the light's, so the two variants
-         are the same composition with the glass swapped for timber. */
-      x: leafW * C.panel[0], y: leafH * G.top,
-      w: leafW * (C.panel[1] - C.panel[0]), h: leafH * (G.bot - G.top) }]),
+                        ...classicLight(leafW, leafH) }]),
   ];
 }
 
@@ -5660,7 +5835,11 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
      for glass. The set is the same composition either way; only the material
      in that rectangle changes. Drawn before the cornice so the head's shadow
      falls on it. */
-  if (!glazed) piece('light', moulding(...at(P.light), MOULD_BAND, paint, pale, leaf, 'clt'));
+  /* CLASSIC_BAND, not MOULD_BAND — the set's own casing stock. `P.light` is
+     the casing's OUTER rectangle, so at 59 the moulding's inner edge lands
+     exactly on the glass line the glazed variant cuts. */
+  if (!glazed) piece('light', moulding(...at(P.light), CLASSIC_BAND, paint, pale, leaf, 'clt',
+                                       'ogee'));
   piece('cornice',
     beadRun(X(C.cornice[0]) + lw * 0.036, Y((R.beads[0] + R.beads[1]) / 2),
             (C.cornice[1] - C.cornice[0]) * lw - lw * 0.072, beadR, paint)
@@ -5705,7 +5884,7 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
      and the photograph's panel surround is a broad ogee, not a band. */
   const pn = at(P.panel);
   out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">`
-    + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn')
+    + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn', 'ogee')
     + `</g>`);
 
   /* ── THE PLINTH: the frieze upside down, then the splayed foot ──
@@ -5926,14 +6105,14 @@ export function glassClearance(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const win = byId(WINDOWS, state.window);
   if (!win.rects.length) return Infinity;
-  const leafW = size.w - REBATE * 2;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const hingeOnLeft = byId(HANDINGS, state.handing).hinge === 'left';
   /* Nearest glass edge to the closing edge, as a distance inboard from it.
      Read off the same layout the drawing uses, not off the catalogue's
      rectangles: on a narrow leaf the opening is cut narrower than the
      catalogue asks, and a rule measuring the uncut figure would refuse
      combinations that fit. */
-  const u = apertureLayout(win, leafW, byId(DETAILS, state.detail)).map(o =>
+  const u = apertureLayout(win, leafW, byId(DETAILS, state.detail), leafH).map(o =>
     hingeOnLeft ? leafW - (o.x + o.w) : o.x);
   /* To the MOULDING's outer edge, not to the glass: a fitting that stops at
      the pane still runs across the raised surround. */
@@ -7228,7 +7407,7 @@ export function windowGlyph(win) {
      matters: two rectangles in the catalogue, ONE opening with a mullion on
      the door, and a tile showing two separate lights would be advertising a
      door we stopped drawing. */
-  const rects = apertureLayout(win, W - 100).map(o => {
+  const rects = apertureLayout(win, W - 100, null, H - REBATE).map(o => {
     const x = 50 + o.x;
     return `<rect x="${x}" y="${o.top}" width="${o.w}" height="${o.h}"
                   fill="#7C8891" stroke="#3A3D40" stroke-width="26"/>`
@@ -7467,9 +7646,17 @@ export function detailGlyph(detail) {
   const W = 950, H = 2100, pad = 40;
   const inset = 105;
 
-  const panelAt = (top, bot) => `<rect x="${inset}" y="${H * top}"
-        width="${W - inset * 2}" height="${H * (bot - top)}"
-        fill="none" stroke="currentColor" stroke-width="36"/>`;
+  /* ⚠ THE TILE HAS TO SAY WHICH SECTION, because that is the ONLY difference
+     between פאנל תחתון and פאנל תחתון קלאסי: same rows, same inset, same
+     price. Two concentric lines for the reeded one — which is what three to
+     five beads read as at 44 px — and one heavier line for the ogee. Without
+     it the two tiles are the same picture, which is exactly what the assertion
+     `every option tile draws its own picture` exists to catch. */
+  const reeded = mouldOf(detail) === 'reed';
+  const panelAt = (top, bot) => (reeded ? [0, 46] : [0]).map(g =>
+    `<rect x="${inset + g}" y="${H * top + g}"
+           width="${W - inset * 2 - g * 2}" height="${H * (bot - top) - g * 2}"
+           fill="none" stroke="currentColor" stroke-width="${reeded ? 20 : 40}"/>`).join('');
 
   // appliedFrame: the measured rectangles — a tall upper over a short lower,
   // or the lower one alone when a window takes the top of the leaf
@@ -7517,7 +7704,15 @@ export function detailGlyph(detail) {
      draws five bands and is then indistinguishable from חמישה פסים — two
      names, two prices, one picture, which is the defect `every option tile
      draws its own picture` exists to catch. Same fractions the door uses. */
-  const strips = detail.cross
+  /* ⚠ AND THE EVEN COMPOSITIONS NEED THEIR OWN PICTURE TOO. Sent through the
+     ragged branch, `strips4` would draw four bands of four different lengths —
+     a picture of the option beside it rather than of itself. Off STRIP_ROWS,
+     which is what the door draws. */
+  const strips = detail.even
+    ? (STRIP_ROWS[detail.rows] || STRIP_ROWS.quad).map(f =>
+        `<rect x="${W * (1 - STRIP_EVEN_W) / 2}" y="${H * f - 14}"
+               width="${W * STRIP_EVEN_W}" height="28" fill="currentColor"/>`).join('')
+    : detail.cross
     ? [`<rect x="${W * 0.309 - 11}" y="${H * 0.155}" width="22"
               height="${H * (0.864 - 0.155)}" fill="currentColor"/>`,
        ...[0.420, 0.448, 0.578, 0.606].map(y =>

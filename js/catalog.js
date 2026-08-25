@@ -644,6 +644,40 @@ export const DETAILS = [
   { id: 'panel3', he: 'שלושה פאנלים',   en: 'Three panels',   panel: true,  groove: false,
     panels: 3, top: true, grab: true },
 
+  /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
+     ⚠ THERE ARE TWO MOULDINGS IN THIS RANGE AND WE DREW ONE. Asked for from
+     outside: *"if you notice that they are 2 types of panels then make it a
+     choice in the app."* There are, and it is not a matter of taste — one
+     panel corner per door at high magnification separates them at a glance:
+
+       REEDED  three to five fine beads with hard dark quirks between them,
+               low relief, sharply mitred. d042 d048 d058 d062 d065 d068 d070
+               d087 d091 d094 d099 d116 d122 — thirteen doors.
+       OGEE    ONE broad soft curve standing well proud, a small bead at its
+               inner edge, a real cast shadow. d041 d050 d051 d053 d061 d067
+               d077 d103 d112 d129 and `research/newdoor/` — eleven.
+
+     Both sections are measured and both are in `MOULDS` in the renderer. The
+     entries above are the reeded ones; these two are the ogee, and they differ
+     in NOTHING ELSE — same rows, same inset, same price. `profile` is the only
+     field between them.
+
+     ⚠ NOT A NEW AXIS, deliberately. A separate "which moulding" group would
+     have cost a field in the short code, and the payload has no spare bit that
+     does not come out of the check nibble or out of the colour list Peretz may
+     yet replace wholesale (ASK-PERETZ §8). It also asks the customer a
+     question in words — "stepped or classical?" — that a tile answers in a
+     picture. Two more tiles, no new question.
+
+     ⚠ AND THE SECTION GOES ROUND THE GLASS TOO. `mouldOf` is asked once and
+     answers for the panel and for the architrave together, because every
+     corpus door with a window over a panel cases both in the same section. */
+  { id: 'panelo', he: 'פאנל תחתון קלאסי', en: 'Lower panel, ogee',
+    panel: true, groove: false, profile: 'ogee', doors: ['d050', 'd053'] },
+  { id: 'panel2o', he: 'שני פאנלים קלאסיים', en: 'Two panels, ogee',
+    panel: true, groove: false, panels: 2, top: true, profile: 'ogee',
+    doors: ['d051', 'd061', 'd067', 'd077'] },
+
   /* ── APPLIED STRIPS ───────────────────────────────────────────────
      The designed tier's signature, and we had it backwards at first. Of the
      seven measured doors with line work on the face, only two are milled
@@ -663,20 +697,77 @@ export const DETAILS = [
      this list and another line in `prices.js`, appended at the END. It is not
      a number the customer types: every option has to be a thing the short code
      can name and the order can print. */
-  { id: 'strips3',he: 'שלושה פסים',     en: 'Three strips',   panel: false, groove: false, strips: 3 },
-  { id: 'strips5',he: 'חמישה פסים',     en: 'Five strips',    panel: false, groove: false, strips: 5 },
-  { id: 'strips7',he: 'שבעה פסים',      en: 'Seven strips',   panel: false, groove: false, strips: 7 },
-  { id: 'strips9',he: 'תשעה פסים',      en: 'Nine strips',    panel: false, groove: false, strips: 9 },
+  /* ── AND THE STRIPS COME IN TWO COMPOSITIONS, NOT ONE ─────────────
+     ⚠ THE COMMONER OF THE TWO WAS THE ONE WE COULD NOT DRAW. Asked for from
+     outside: *"look through all the images with stripes out of the 129 that
+     you have in the repo, and add those stripe options."* Done properly this
+     time — every one of the 129 opened as a contact sheet of leaf crops, then
+     the thirty striped ones measured band by band with `tools/_strips.mjs`.
+
+       EVEN     equal, full width, evenly spaced. d033 d035 d036 d039 d049
+                d056 d059 d066 d081 — NINE doors.
+       RAGGED   anchored at the hinge stile with free ends of different
+                lengths, tight at the head and foot and open across the middle.
+                d044 d045 d064 d073 d078 — five.
+
+     `metalStrips` drew only the ragged one, at every count, so nine doors of
+     the corpus had no tile at all. The five counts already here keep the
+     ragged composition they were measured as; the three below are the even
+     one, and their Hebrew says which is which so a customer picking between
+     "three strips" and "four strips" is not silently picking between two
+     different designs.
+
+     ⚠ AND `strips2` IS NOT `strips3` MINUS ONE. Two strips is a PAIR about the
+     lock's height — 0.43 and 0.61 of the leaf on all three doors that carry it
+     — where three or more spread across the face. The rows are measured, in
+     STRIP_ROWS in the renderer, rather than fitted from a span formula that
+     would have put them at 0.23 and 0.77. It is the commonest striped door in
+     the corpus and it had no tile. */
+  { id: 'strips2', he: 'שני פסים אחידים', en: 'Two strips, even',
+    panel: false, groove: false, strips: 2, even: true, rows: 'pair',
+    doors: ['d035', 'd036', 'd049'] },
+  { id: 'strips4', he: 'ארבעה פסים אחידים', en: 'Four strips, even',
+    panel: false, groove: false, strips: 4, even: true, rows: 'quad',
+    doors: ['d056', 'd063'] },
+  /* ⚠ EIGHT FINE LINES IN A BAND, NOT EIGHT SPREAD OVER THE DOOR. d081 puts
+     them at 0.492 0.521 0.547 0.576 0.604 0.631 0.660 0.687 — a spacing of
+     0.028 repeated seven times, which is far too regular to be a detection
+     artefact — so the whole composition occupies a fifth of the leaf and sits
+     just below its middle. d073 does the same thing with six, half width, from
+     the hinge edge; d081's is the one measured because its band runs the full
+     width and the reading is clean. Nothing else in the list can express it:
+     eight strips spread evenly is a barcode, and this is a band. */
+  { id: 'stripsband', he: 'פסים צפופים',  en: 'Banded strips',
+    panel: false, groove: false, strips: 8, even: true, rows: 'band',
+    doors: ['d081'] },
+
+  { id: 'strips3',he: 'שלושה פסים מדורגים', en: 'Three strips, ragged',
+    panel: false, groove: false, strips: 3 },
+  { id: 'strips5',he: 'חמישה פסים מדורגים', en: 'Five strips, ragged',
+    panel: false, groove: false, strips: 5 },
+  { id: 'strips7',he: 'שבעה פסים מדורגים',  en: 'Seven strips, ragged',
+    panel: false, groove: false, strips: 7, doors: ['d044', 'd064'] },
+  { id: 'strips9',he: 'תשעה פסים מדורגים',  en: 'Nine strips, ragged',
+    panel: false, groove: false, strips: 9 },
   /* Eleven is d078's own count, and it keeps the id `strips` it has always
      had — the plain name for what used to be the only strip option. */
-  { id: 'strips', he: 'אחד עשר פסים',   en: 'Eleven strips',  panel: false, groove: false, strips: 11 },
+  { id: 'strips', he: 'אחד עשר פסים מדורגים', en: 'Eleven strips, ragged',
+    panel: false, groove: false, strips: 11, doors: ['d078'] },
   /* The strips run BOTH ways and we drew one. The counts above are horizontal
      — d078's eleven bands settled that in an earlier round — but five doors
      (d034 d037 d038 d040 d043) run them up the leaf instead, and a customer
      picking "metal strips" for one of those got the other axis with no
      warning. Vertical strips are fewer and longer: three or four, in the half
      of the leaf away from the lock. */
-  { id: 'stripsv', he: 'פסים אנכיים',   en: 'Vertical strips', panel: false, groove: false, strips: 4, vertical: true },
+  /* ⚠ THREE IS THE CORPUS'S OWN COUNT AND IT WAS THE ONE MISSING. d037, d038
+     and d043 all carry three; d040 and d046 carry four; nothing carries six.
+     The list offered four and six. The fan itself is measured on d038 and
+     d043 — see `metalStrips` — and applies at any count. */
+  { id: 'stripsv3', he: 'שלושה פסים אנכיים', en: 'Three vertical strips',
+    panel: false, groove: false, strips: 3, vertical: true,
+    doors: ['d037', 'd038', 'd043'] },
+  { id: 'stripsv', he: 'פסים אנכיים',   en: 'Vertical strips', panel: false, groove: false,
+    strips: 4, vertical: true, doors: ['d040', 'd046'] },
   { id: 'stripsv6', he: 'שישה פסים אנכיים', en: 'Six vertical strips',
     panel: false, groove: false, strips: 6, vertical: true },
   /* ⚠ THE CROSS, AND THE INVENTORY HAS CALLED IT MISSING FOR THREE ROUNDS.
@@ -718,16 +809,29 @@ export const DETAILS = [
      `panel: true` — it has a raised panel, so it prices and repairs as a
      panelled face. No `top` and no `panels`, so `hasUpperPanel` is false: the
      composition is BUILT round a window and must not be refused beside one. */
-  /* ⚠ `winRect` — THE SET OWNS ITS OWN OPENING, and that is not a liberty, it
-     is the product. Measured off the photographs: 326 mm down a standard leaf,
-     781 tall, 356 wide, against the catalogue rectangle's 185 / 902 / 357. The
-     width is the same to a millimetre; what differs is that the cornice and
-     frieze take the top of the door, so the glass starts lower and is shorter.
-     Drawn at the catalogue's position the frieze and the glass share 60 mm of
-     leaf and the ornament runs straight through the opening — which is what
-     the first render beside the photograph showed.
+  /* ⚠ `winFrac` — THE SET OWNS ITS OWN OPENING, and that is not a liberty, it
+     is the product. Measured off the photographs: on a standard leaf 356 wide,
+     781 tall and 326 down, against the catalogue rectangle's 357 / 902 / 185.
+     The width is the same to a millimetre; what differs is that the cornice
+     and frieze take the top of the door, so the glass starts lower and is
+     shorter. Drawn at the catalogue's position the frieze and the glass share
+     60 mm of leaf and the ornament runs straight through the opening — which
+     is what the first render beside the photograph showed.
      `apertureLayout` reads it, so the drawing and every rule that clears the
-     glass move together. Millimetres, like every other rect in this file. */
+     glass move together.
+
+     ⚠ FRACTIONS OF THE LEAF — the one opening in this file that is not
+     millimetres, and it has to be. Every other piece of the set is a fraction:
+     cornice at 0.029 of the leaf's height, frieze at 0.126, shelf at 0.559.
+     Written in millimetres the light stayed 356 x 781 while the composition
+     round it grew with the door, so on the WIDE leaf the glass came out 62 mm
+     narrower than the timber panel that replaces it, and on the TALL leaf its
+     casing climbed 46 mm into the frieze. Reported from outside as one
+     symptom: *"when i put on a window the panel changes, it supposed to be the
+     same size."* A composition proportioned to itself has to scale as one
+     thing.
+     These four numbers are the renderer's `CLASSIC_GLASS`; it reads them from
+     here, so there is no second copy of them. */
   /* ⚠ CITES `newdoor` AND NOT THE FIVE DOORS ASK-PERETZ §4 NAMES. d101, d103,
      d108, d112 and d129 all carry a composition of this family, and the
      question about them predates this option by two rounds — but not one of
@@ -739,7 +843,13 @@ export const DETAILS = [
      for Peretz and it is asked. */
   { id: 'classic', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false,
     classic: true, grab: true, rectOnly: true, doors: ['newdoor'],
-    winRect: { w: 360, h: 819, top: 318 } },
+    /* The set's own mouldings are drawn by `classicSet` and are the ogee by
+       construction — that section was measured on this very door. This field
+       says so for the ARCHITRAVE round its light, which `render` cases through
+       `aperture` like any other opening and which would otherwise have come
+       out reeded on the one door that certainly is not. */
+    profile: 'ogee',
+    winFrac: { x0: 0.289, x1: 0.711, top: 0.155, bot: 0.5545 } },
 ];
 
 /**

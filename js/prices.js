@@ -142,11 +142,25 @@ export const DETAIL = {
   panel2:    520,    // שני פאנלים
   panelTop:  380,    // פאנל עליון      — one rectangle, same as the lower one
   panel3:    660,    // שלושה פאנלים
-  strips3:   320,    // שלושה פסים
-  strips5:   400,    // חמישה פסים
-  strips7:   480,    // שבעה פסים
-  strips9:   560,    // תשעה פסים
-  strips:    640,    // אחד עשר פסים
+  /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and that is a placeholder
+     standing in for a question rather than a finding. They are the same
+     rectangles in a different section of stock — see the two `MOULDS` in the
+     renderer — and a broader, deeper moulding is more timber and more work, so
+     the real answer is probably not "the same". Asked in ASK-PERETZ §14. */
+  panelo:    380,    // פאנל תחתון קלאסי
+  panel2o:   520,    // שני פאנלים קלאסיים
+  /* The even compositions, on the same 200 + 40 per band as the ragged ones:
+     it is the same stock and the same fixing, cut square instead of to
+     length. `stripsband` is eight bands in a hand's breadth of leaf. */
+  strips2:   280,    // שני פסים אחידים
+  strips4:   360,    // ארבעה פסים אחידים
+  stripsband: 520,   // פסים צפופים      — eight bands
+  strips3:   320,    // שלושה פסים מדורגים
+  strips5:   400,    // חמישה פסים מדורגים
+  strips7:   480,    // שבעה פסים מדורגים
+  strips9:   560,    // תשעה פסים מדורגים
+  strips:    640,    // אחד עשר פסים מדורגים
+  stripsv3:  390,    // שלושה פסים אנכיים
   stripsv:   440,    // פסים אנכיים     — four bands
   stripsv6:  540,    // שישה פסים אנכיים
   stripsx:   460,    // פס אנכי חוצה    — one long member and four short ones

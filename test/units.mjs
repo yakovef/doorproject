@@ -470,8 +470,15 @@ group('detail and finish');
      must stay the door's own paint: the whole finding behind this rewrite is
      that the face inside the rectangle and the face outside it are one
      surface, so anything that FILLS the interior is the old bug returning. */
-  for (const c of [COLOURS[0], COLOURS[10], COLOURS[16]]) {
-    const svg = render({ ...base, colour: c.id, detail: 'panel2' });
+  /* ⚠ BOTH SECTIONS. The range has two mouldings — reeded on `panel2`, the
+     broad ogee on `panel2o` — and this group was written when there was one.
+     A check that only ever visits the default would have let the second table
+     ship with three sides drawn, or with no gradients emitted at all. */
+  for (const [c, d] of [[COLOURS[0], 'panel2'], [COLOURS[10], 'panel2'],
+                        [COLOURS[16], 'panel2'], [COLOURS[0], 'panel2o'],
+                        [COLOURS[16], 'panel2o']]) {
+    const svg = render({ ...base, colour: c.id, detail: d });
+    const prof = d.endsWith('o') ? 'ogee' : 'reed';
     /* The panel group only. Sliced to the end of the document it swallowed the
        hardware drawn after it, and the first thing it found was the nickel on
        a lever — a false alarm that would have hidden a real one.
@@ -486,12 +493,17 @@ group('detail and finish');
     const clean = svg.replace(/<g data-relight="moulding"[\s\S]*?<\/g>/g, '');
     const from = clean.indexOf('data-detail="panel"');
     const block = clean.slice(from, clean.indexOf('</g>', from));
-    ok(block.includes('mould-r'), `the panel block on ${c.id} was cut short — this check is dead`);
-    const sides = [...block.matchAll(/fill="url\(#mould-([tblr])\)"/g)].map(m => m[1]);
-    ok(new Set(sides).size === 4, `moulding on ${c.id} draws ${new Set(sides).size} of its 4 sides`);
+    ok(block.includes(`mould-${prof}-r`),
+       `the panel block on ${c.id} ${d} was cut short — this check is dead`);
+    const sides = [...block.matchAll(new RegExp(`fill="url\\(#mould-${prof}-([tblr])\\)"`, 'g'))]
+      .map(m => m[1]);
+    ok(new Set(sides).size === 4,
+       `${prof} moulding on ${c.id} draws ${new Set(sides).size} of its 4 sides`);
 
-    const grads = [...svg.matchAll(/<linearGradient id="mould-[tblr]"[\s\S]*?<\/linearGradient>/g)];
-    ok(grads.length === 4, `expected 4 moulding gradients on ${c.id}, got ${grads.length}`);
+    const grads = [...svg.matchAll(
+      new RegExp(`<linearGradient id="mould-${prof}-[tblr]"[\\s\\S]*?</linearGradient>`, 'g'))];
+    ok(grads.length === 4,
+       `expected 4 ${prof} moulding gradients on ${c.id}, got ${grads.length}`);
     /* The four runs must differ — but NOT at their end stops, which are the
        paint on every side by construction now, because a moulding meets the
        same flat face at both edges. This used to read the first stop, which
@@ -499,13 +511,14 @@ group('detail and finish');
        the face correctly turned that assertion into a false alarm. What has to
        differ is the RELIEF between the edges, so compare the runs whole. */
     const bodies = grads.map(g => g[0]);
-    ok(new Set(bodies).size === 4, `every side of the moulding on ${c.id} takes the same light`);
+    ok(new Set(bodies).size === 4,
+       `every side of the ${prof} moulding on ${c.id} takes the same light`);
 
     const filled = [...block.matchAll(/<(?:rect|path)[^>]*fill="(?!url\(#mould|none)([^"]+)"/g)]
       .map(m => m[1]).filter(v => v !== '#000');
     ok(filled.length === 0,
-      `the moulding on ${c.id} fills its interior with ${filled[0]} — the face inside ` +
-      `the rectangle is the same plane and the same paint as the face outside it`);
+      `the ${prof} moulding on ${c.id} fills its interior with ${filled[0]} — the face ` +
+      `inside the rectangle is the same plane and the same paint as the face outside it`);
   }
 }
 
@@ -1472,19 +1485,23 @@ for (const size of Object.keys(SIZES)) {
    `npm run profile` measures the rendered rim against the rendered face beside
    it, on both panels. This assertion is now only the arithmetic half. */
 group('the face inside a moulding is the face outside it');
-for (const c of COLOURS) {
+/* ⚠ AND OVER BOTH SECTIONS. `MOULDS` holds two measured cross-sections now and
+   the rule is a rule about mouldings, not about one of them: the endpoints of
+   the ogee table have to meet the face exactly as the reeded one's do, or the
+   ogee panels ship with the rim this whole group exists to forbid. */
+for (const c of COLOURS) for (const [d, prof] of [['panel2', 'reed'], ['panel2o', 'ogee']]) {
   const svg = render({ ...base, colour: c.id, handle: 'none', lockset: 'coral',
-                       detail: 'panel2', window: 'none' });
+                       detail: d, window: 'none' });
   const head = lighten(c.hex, 0.04).toLowerCase();
   for (const side of ['t', 'b', 'l', 'r']) {
-    const g = new RegExp(`<linearGradient id="mould-${side}"[\\s\\S]*?</linearGradient>`).exec(svg);
-    ok(g, `no mould-${side} gradient on ${c.id} — this check is dead`);
+    const g = new RegExp(`<linearGradient id="mould-${prof}-${side}"[\\s\\S]*?</linearGradient>`).exec(svg);
+    ok(g, `no mould-${prof}-${side} gradient on ${c.id} — this check is dead`);
     if (!g) continue;
     const stops = [...g[0].matchAll(/offset="([\d.]+)"\s+stop-color="([^"]+)"/g)];
-    ok(stops.length > 2, `mould-${side} on ${c.id} has ${stops.length} stops`);
+    ok(stops.length > 2, `mould-${prof}-${side} on ${c.id} has ${stops.length} stops`);
     for (const [label, st] of [['outer', stops[0]], ['inner', stops[stops.length - 1]]]) {
       ok(st[2].toLowerCase() === head,
-        `mould-${side}'s ${label} edge on ${c.id} is ${st[2]}, not the leaf's own `
+        `mould-${prof}-${side}'s ${label} edge on ${c.id} is ${st[2]}, not the leaf's own `
       + `head colour ${head} — a moulding meets the same face on both sides, and a `
       + 'rim that differs from it draws a raised panel where there is none');
     }

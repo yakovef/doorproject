@@ -117,21 +117,43 @@ Six doors, and on every one it is the most prominent thing about the door.
 
 ## 5. Face patterns
 
+*(⚠ RE-READ FROM THE PHOTOGRAPHS, not from this table's own earlier rows. All
+129 opened as contact sheets of leaf crops, then the thirty striped doors
+measured band by band with `tools/_strips.mjs` — rows whose median tone departs
+from the paint's own falloff, each band's ends found by walking the row. The
+finding is that "horizontal strips" was two designs and the commoner of the two
+had no tile.)*
+
 | pattern | doors | verdict |
 |---|---|---|
-| Applied metal strips, **horizontal** | d039 d044 d045 d064 d066 d073 d074 d081 d086 d036 | **have** — `strips` (11) and `strips3` (3) |
-| Applied metal strips, **vertical** | d034 d037 d038 d040 d043 | **have** — `stripsv` (4) and `stripsv6` (6). It was MISSING when this table was written, and the note then said so twice over: I had the axis the wrong way round on the first pass and asserted we drew vertical only, when `metalStrips()` drew horizontal |
+| Applied strips, horizontal, **EVEN — equal, full width, evenly spaced** | d033 d035 d036 d039 d049 d056 d059 d066 d081 | **have, new** — `strips2` `strips4` `stripsband`. NINE doors, and until now every horizontal tile drew the ragged composition instead |
+| Applied strips, horizontal, **RAGGED — anchored at the hinge stile, free ends of different lengths** | d044 d045 d064 d073 d078 | **have** — `strips3` `strips5` `strips7` `strips9` `strips` (11), all now labelled מדורגים so the two families are distinguishable on the tile |
+| Applied metal strips, **vertical** | d034 d037 d038 d040 d043 | **have** — `stripsv3` (3), `stripsv` (4), `stripsv6` (6). ⚠ Three is the corpus's own count — d037 d038 d043 — and the list offered only four and six, while NOTHING in the corpus carries six |
 | **Cross composition** — one long vertical crossed by horizontals | d035 d047 d066 d074 | **have** — `stripsx`, ruler-read off d047. ⚠ On three of the four the vertical member is the PULL BAR, not a strip; the option draws d047's version, where it is a strip of its own, and a customer who wants d035's puts a bar on a striped door |
 | **Staggered strips** — different lengths, offset | d043 d044 d045 | **have** — the fan is in `metalStrips` for both axes: the horizontals follow a measured rhythm of lengths and the verticals climb from a common foot |
-| Moulded panel, one | d042 d053 d058 d061 d069 d071 | **have** — `panel` |
-| Moulded panels, two | d048 d051 d065 d067 d077 d087 d103 | **have** — `panel2` |
+| Moulded panel, one | d042 d053 d058 d061 d069 d071 | **have** — `panel` (reeded) and `panelo` (ogee) |
+| Moulded panels, two | d048 d051 d065 d067 d077 d087 d103 | **have** — `panel2` (reeded) and `panel2o` (ogee) |
+| **⚠ AND THE MOULDING ITSELF IS TWO PRODUCTS.** Reeded — three to five fine beads with hard dark quirks between them | d042 d048 d058 d062 d065 d068 d070 d087 d091 d094 d099 d116 d122 | **have** — the default section |
+| Ogee — ONE broad soft curve standing well proud, small bead at its inner edge, real cast shadow | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | **have** — `profile: 'ogee'`. Thirteen doors against eleven, so neither is "the" moulding. Open one panel CORNER per door at high magnification; a whole-door sheet will not separate them |
 | **Full classical composition** — cornice over the light, pilasters, plinth | d080 d103 d112 d129 d076 | **have** — `classic`, built from `research/newdoor/` and checked against d101 d103 d112 d129. Glazed or solid: a photograph of the same set with a raised panel where the glass goes settled that it is one product in two variants |
 | **Arched raised panel** | d071 | **MISSING** |
 
 **Finding: the strips run both ways** — ten doors horizontal, five vertical —
 and we draw only horizontal. The catalogue calls the option "metal strips"
 without saying which way, so a customer picking it for a d037-style door gets
-the other axis with no warning.
+the other axis with no warning. *(Closed: both axes are drawn.)*
+
+**Finding: `strips2` is not `strips3` minus one.** Two bands is a PAIR about
+the lock's height — 0.43 and 0.61 of the leaf on d035, d036 and d049 — where
+three or more spread across the face. The ragged family's span formula, fitted
+on d063, d064 and d078, would have put them at 0.23 and 0.77: half the leaf
+away from where every two-band door in the corpus actually has them. It is the
+commonest striped door here and it had no tile at all.
+
+**Finding: `npm run corpus` was deriving the wrong count**, and had been before
+the list grew — d064's SEVEN bands came out as ELEVEN because the matcher
+hard-coded two ids per axis instead of asking the catalogue. Four doors in the
+gallery moved from a residual to an exact fit when it was fixed.
 
 *(This row was written backwards the first time, from memory of a commit
 message rather than from the code. Both corrections in this file came from
