@@ -86,7 +86,7 @@ behaviour anywhere I could find, and AGENT.md's own standing note applies —
 a change made because it looks tidier, with no defect behind it, is not
 one to make.
 
-**Commit:** see below.
+**Commit:** `6681e10`
 
 ---
 
