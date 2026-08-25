@@ -23,6 +23,51 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-25 15:50 UTC — run 34: nothing worth changing — pulled two solid human commits, everything confirmed exactly as reported
+
+**Looked at:** two new human commits — `cc846cd` (a real VERSION 13 wire-
+format bump: `DETAILS` reached twenty and a twentieth entry would have
+encoded silently as index 0; the two glazed/solid opening readings for the
+classical set unified from two independently-drifting descriptions to one;
+a second moulding profile, ogee, added as `panelo`/`panel2o` twins rather
+than a new axis; four new stripe options off the corpus's actual EVEN
+family, which nothing had drawn before) and `ece4c24` (the classical set's
+corbels rebuilt a fifth time — they were being drawn INSIDE the shelf's own
+cast shadow, reading as grey smudges, and the fix is draw-order plus a wider
+roll pitch; `npm run profile` had gone silently green on NaN after the
+moulding split changed a gradient id it selects on, now fixed to fail loudly
+on a missing subject). Fast-forwarded cleanly. Built (no diff), opened the
+site at 390×844 and 1440×900, then rendered the solid classical variant and
+the `panel2o` ogee twin directly — both correct, the corbels read as crisp
+lit brackets rather than smudges, and the ogee moulding is visibly the
+broader single curve the commit describes against the reeded original.
+
+**Instruments:** test ✓ (5,235,784, matches the commit's own count exactly)
+· audit ✓ (no faults) · collide ✓ (`all`, 1,398 designs, matches exactly /
+`boxes`) · recreate ✓ (known catalogue gaps only, unchanged) · **profile ✗,
+exactly the one row the human's own commit documents** — `dark reed
+lower/upper 1.044` against a 1.03 gate, reproduced digit-for-digit. Read
+their reasoning in full before treating this as anything to act on: three
+independent attempts at re-deriving the quantity the compositing wash
+cancels out of all still showed a 3.5–4.8% gap between panels, they
+explicitly declined to widen the gate or tune the drawing to fit it, and the
+re-basing work is named in `CLAUDE.md` §9 for whoever picks it up. Not mine
+to second-guess without doing that work myself, and not what a quiet
+five-hour check-in is for.
+
+**Changed:** nothing. Everything I measured matches what was already pushed
+and documented; there was nothing new to find and nothing red that isn't
+already accounted for by name.
+
+**Left alone deliberately:** the profile gate, per the human's own explicit
+reasoning above. `CLAUDE.md` §9's re-basing item, which is real, scoped
+future work and not something to start speculatively at the tail of a
+confirmation run.
+
+**Commit:** none.
+
+---
+
 ## 2026-08-25 10:51 UTC — run 33: the last open question about the classical set is traced, and it was not a bug
 
 **Looked at:** no new commits since run 32's push. Built (no diff), opened
