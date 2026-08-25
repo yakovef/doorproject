@@ -23,6 +23,63 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-25 20:51 UTC — run 35: nothing worth changing — pulled two more human commits, both re-verified in full
+
+**Looked at:** two new human commits — `c401564` (VERSION 13's `classic`
+composition re-measured: the glazing layer was painting over the frieze's
+lower edge on any classical door with a window, fixed by draw order; the
+`ogee` moulding table in the previous round was measured off a photograph
+that turned out to be shot at a skew, corrected via a four-corner bilinear
+rectification of the source image before re-reading the profile; the
+three-panel face (`panel3`) re-measured a second time; a `sub` field added
+to catalogue entries as a display-grouping label, kept separate from wire-
+format array order) and `f76b4c7` (vertical stripes split into two families
+the same way the horizontal ones already were, `stripsvl3`/`stripsvl4`
+added off the corpus's own "fanned" doors whose width had never actually
+been measured before this round; `npm run corpus`'s tie-breaking logic
+fixed; `panel3` re-measured a third time, this time off a flat catalogue
+elevation rather than an angled photograph). Fast-forwarded cleanly, no
+conflicts. Built (no diff — the human's bundle was already fresh). Opened
+the site at 390×844 and 1440×900 — both render correctly, all four sections
+present, price and code showing, nothing displaced. Rendered the classical
+set with a rectangular window and a ring-lattice grille directly: no bright
+band eating into the frieze any more, confirming the layer-order fix by eye
+as well as by the commit's own reasoning. Rendered `panel3` with an Idan bar
+directly: tall upper panel, short handle-plate with its turned pull, medium
+lower panel — evenly margined, well-proportioned, no defect visible.
+
+**Instruments:** test ✓ (5,257,643 / 0, up from run 34's 5,235,784 — the new
+stripe options and the `sub` field both add design-space and assertions, so
+a higher count here is expected and is not itself evidence of anything, per
+CLAUDE.md §0c) · profile ✓ except the one already-known red — `dark reed
+lower/upper 1.044` against a 1.03 gate, reproduced to the digit, alongside
+confirmation the ogee rows are healthy (`dark ogee 1.006`, `light ogee
+1.000`) exactly as the first commit's own message reported · collide ✓ on
+both `all` (1,410 designs, faceObstacles agrees with the drawing everywhere,
+nothing overlaps) and `boxes` (every fitting fits inside its declared
+footprint; MOUNT_REACH 111 against the constant's 121) · recreate ✓ (only
+the already-documented catalogue gaps — brass/nickel finish, bar lengths
+outside our range, the d122 grid-vs-reeded either/or — nothing new) · audit
+✓ (all seven viewports clean, all four failure routes clean, the gallery
+and order sheet both clean). The second commit's own message reported only
+`test` and `audit`; `collide` and `recreate` needed independent verification
+this run rather than being assumed from that silence, and both came back
+clean.
+
+**Changed:** nothing. Two thorough, well-documented human rounds landed
+back to back and every number I re-measured matched what was already
+claimed and pushed. Nothing red beyond the one finding that has stood,
+understood and by design unfixed, since run 28.
+
+**Left alone deliberately:** the `dark reed` profile red — CLAUDE.md §9
+already names the re-basing work and it is not something a five-hour
+check-in should attempt without doing that derivation itself.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-25 15:50 UTC — run 34: nothing worth changing — pulled two solid human commits, everything confirmed exactly as reported
 
 **Looked at:** two new human commits — `cc846cd` (a real VERSION 13 wire-
