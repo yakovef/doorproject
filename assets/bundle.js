@@ -115,8 +115,17 @@
     // תשעה פסים מדורגים
     strips: 640,
     // אחד עשר פסים מדורגים
+    /* The LONG vertical bands run 0.85 of the leaf where the fanned ones average
+       about 0.6, so they are more stock per band: 240 + 60 rather than 240 + 50.
+       Both curves are invented like everything else in this file; the point of
+       writing the shape down is that Peretz can correct the RATE in a sentence
+       instead of correcting four totals. */
+    stripsvl3: 420,
+    // שלושה פסים אנכיים ארוכים
+    stripsvl4: 480,
+    // ארבעה פסים אנכיים ארוכים
     stripsv3: 390,
-    // שלושה פסים אנכיים
+    // שלושה פסים אנכיים מדורגים
     stripsv: 440,
     // פסים אנכיים     — four bands
     stripsv6: 540,
@@ -947,37 +956,76 @@
        picking "metal strips" for one of those got the other axis with no
        warning. Vertical strips are fewer and longer: three or four, in the half
        of the leaf away from the lock. */
-    /* ⚠ THREE IS THE CORPUS'S OWN COUNT AND IT WAS THE ONE MISSING. d037, d038
-       and d043 all carry three; d040 and d046 carry four; nothing carries six.
-       The list offered four and six. The fan itself is measured on d038 and
-       d043 — see `metalStrips` — and applies at any count. */
+    /* ── AND THE VERTICAL STRIPS ARE TWO COMPOSITIONS TOO ─────────────
+         ⚠ SAME SPLIT AS THE HORIZONTALS, FOUND THE SAME WAY AND ONE ROUND LATER.
+         Two photographs came in with *"add this stripe option"* and both are
+         corpus doors — **d037** and **d046** — carrying something the list could
+         not draw: thin strips TIGHTLY GROUPED and running very nearly the whole
+         height of the leaf. Measured on d037, whose leaf box comes out at exactly
+         a door's 0.415 aspect: three strips at 0.256, 0.329 and 0.402 of the leaf
+         from the hinge edge — a pitch of 0.073 — running 0.098 to about 0.94.
+    
+         The FANNED family below is a different design and it is measured too: on
+         d038 the three run 0.372-0.656, 0.126-0.693 and 0.071-0.905, lengths of
+         0.28, 0.57 and 0.83, spread over a third of the leaf's width. Nobody would
+         mistake one for the other on the door, and the list drew only the fan — at
+         every count — so d037, d040 and d046 had no tile.
+    
+         The Hebrew says which is which, like the horizontals' אחידים / מדורגים. */
     {
-      id: "stripsv3",
+      id: "stripsvl3",
       sub: "strips",
-      he: "שלושה פסים אנכיים",
-      en: "Three vertical strips",
+      he: "שלושה פסים אנכיים ארוכים",
+      en: "Three long vertical strips",
       panel: false,
       groove: false,
       strips: 3,
       vertical: true,
-      doors: ["d037", "d038", "d043"]
+      long: true,
+      doors: ["d037"]
     },
     {
-      id: "stripsv",
+      id: "stripsvl4",
       sub: "strips",
-      he: "פסים אנכיים",
-      en: "Vertical strips",
+      he: "ארבעה פסים אנכיים ארוכים",
+      en: "Four long vertical strips",
       panel: false,
       groove: false,
       strips: 4,
       vertical: true,
+      long: true,
       doors: ["d040", "d046"]
+    },
+    /* ⚠ THREE IS THE CORPUS'S OWN COUNT AND IT WAS THE ONE MISSING. d038 and
+       d043 carry three fanned; nothing carries six. The list offered four and
+       six. The fan itself is measured on d038 and d043 — see `metalStrips` — and
+       applies at any count. */
+    {
+      id: "stripsv3",
+      sub: "strips",
+      he: "שלושה פסים אנכיים מדורגים",
+      en: "Three vertical strips, fanned",
+      panel: false,
+      groove: false,
+      strips: 3,
+      vertical: true,
+      doors: ["d038", "d043"]
+    },
+    {
+      id: "stripsv",
+      sub: "strips",
+      he: "ארבעה פסים אנכיים מדורגים",
+      en: "Vertical strips, fanned",
+      panel: false,
+      groove: false,
+      strips: 4,
+      vertical: true
     },
     {
       id: "stripsv6",
       sub: "strips",
-      he: "שישה פסים אנכיים",
-      en: "Six vertical strips",
+      he: "שישה פסים אנכיים מדורגים",
+      en: "Six vertical strips, fanned",
       panel: false,
       groove: false,
       strips: 6,
@@ -3088,7 +3136,7 @@ ${body}
   var PANEL_INSET_MAX = 0.39;
   var PANEL_ROWS = {
     pair: [[0.07, 0.58], [0.66, 0.92]],
-    trio: [[0.089, 0.527], [0.547, 0.661], [0.687, 0.921]],
+    trio: [[0.061, 0.455], [0.48, 0.586], [0.607, 0.944]],
     top: [[0.07, 0.58]],
     lone: [0.68, 0.9]
   };
@@ -3428,6 +3476,8 @@ ${body}
     band: [0.492, 0.521, 0.547, 0.576, 0.604, 0.631, 0.66, 0.687]
   };
   var STRIP_EVEN_W = 0.88;
+  var STRIP_V = { pitch: 0.073, mid: 0.33 };
+  var stripVAt = (i, count) => STRIP_V.mid - (count - 1) * STRIP_V.pitch / 2 + i * STRIP_V.pitch;
   function metalStrips(lx, ly, lw, lh, detail, tone, hingeOnLeft) {
     const { strips: count, vertical, cross, even, rows } = detail;
     if (even) {
@@ -3469,17 +3519,38 @@ ${body}
       }
       return `<g data-detail="strips" data-count="5" data-axis="cross">${out2.join("")}</g>`;
     }
+    if (vertical && detail.long) {
+      const t2 = Math.max(5, Math.round(lw * 0.013));
+      const TOP = 0.098, FOOT_OUT = 0.945, FOOT_IN = 0.915;
+      const out2 = [];
+      for (let i = 0; i < count; i++) {
+        const f = stripVAt(i, count);
+        const x = Math.round((hingeOnLeft ? lx + lw * f : lx + lw * (1 - f)) - t2 / 2);
+        const inward = count > 1 ? i / (count - 1) : 0.5;
+        const top2 = ly + lh * TOP;
+        const bot2 = ly + lh * (FOOT_OUT + (FOOT_IN - FOOT_OUT) * inward);
+        const h = bot2 - top2;
+        out2.push(`
+        <rect x="${x + 3}" y="${(top2 + 3).toFixed(1)}" width="${t2}" height="${h.toFixed(1)}"
+              fill="#000" opacity="0.22"/>
+        <rect x="${x}" y="${top2.toFixed(1)}" width="${t2}" height="${h.toFixed(1)}" fill="${tone[2]}"/>
+        <rect x="${x}" y="${top2.toFixed(1)}" width="${Math.max(2, t2 * 0.34)}" height="${h.toFixed(1)}"
+              fill="${tone[0]}"/>
+        <rect x="${x + t2 - Math.max(2, t2 * 0.24)}" y="${top2.toFixed(1)}"
+              width="${Math.max(2, t2 * 0.24)}" height="${h.toFixed(1)}" fill="${tone[4]}"/>`);
+      }
+      return `<g data-detail="strips" data-count="${count}" data-axis="vertical"
+               data-long="1">${out2.join("")}</g>`;
+    }
     if (vertical) {
       const t2 = Math.max(8, Math.round(lw * 0.018));
-      const bandW = lw * 0.34;
-      const band0 = hingeOnLeft ? lx + lw * 0.1 : lx + lw * 0.56;
-      const gap = count > 1 ? bandW / (count - 1) : 0;
       const FOOT = 0.778;
       const HEAD_IN = 0.39, HEAD_OUT = 0.05;
       const out2 = [];
       for (let i = 0; i < count; i++) {
-        const x = Math.round(count > 1 ? band0 + gap * i : band0 + bandW / 2);
-        const inward = count > 1 ? hingeOnLeft ? i / (count - 1) : 1 - i / (count - 1) : 0.5;
+        const f = stripVAt(i, count);
+        const x = Math.round((hingeOnLeft ? lx + lw * f : lx + lw * (1 - f)) - t2 / 2);
+        const inward = count > 1 ? i / (count - 1) : 0.5;
         const top2 = ly + lh * (HEAD_OUT + (HEAD_IN - HEAD_OUT) * inward);
         const bot2 = ly + lh * FOOT;
         const h = bot2 - top2;
@@ -5668,8 +5739,14 @@ ${body}
               height="${H * (0.864 - 0.155)}" fill="currentColor"/>`,
       ...[0.42, 0.448, 0.578, 0.606].map((y) => `<rect x="${W * 0.167}" y="${H * y - 9}" width="${W * (0.556 - 0.167)}"
                 height="18" fill="currentColor"/>`)
-    ].join("") : detail.vertical ? Array.from({ length: n }, (_, i) => {
-      const x = W * (0.1 + (n > 1 ? i * 0.34 / (n - 1) : 0.17));
+    ].join("") : detail.vertical && detail.long ? Array.from({ length: n }, (_, i) => {
+      const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
+      const top = H * 0.098;
+      const bot = H * (0.945 + (0.915 - 0.945) * (n > 1 ? i / (n - 1) : 0.5));
+      return `<rect x="${x - 8}" y="${top}" width="16" height="${bot - top}"
+                      fill="currentColor"/>`;
+    }).join("") : detail.vertical ? Array.from({ length: n }, (_, i) => {
+      const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
       const top = H * (0.05 + 0.34 * (n > 1 ? i / (n - 1) : 0.5));
       return `<rect x="${x - 9}" y="${top}" width="18" height="${H * 0.778 - top}"
                       fill="currentColor"/>`;

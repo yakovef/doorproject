@@ -160,7 +160,14 @@ export const DETAIL = {
   strips7:   480,    // שבעה פסים מדורגים
   strips9:   560,    // תשעה פסים מדורגים
   strips:    640,    // אחד עשר פסים מדורגים
-  stripsv3:  390,    // שלושה פסים אנכיים
+  /* The LONG vertical bands run 0.85 of the leaf where the fanned ones average
+     about 0.6, so they are more stock per band: 240 + 60 rather than 240 + 50.
+     Both curves are invented like everything else in this file; the point of
+     writing the shape down is that Peretz can correct the RATE in a sentence
+     instead of correcting four totals. */
+  stripsvl3: 420,    // שלושה פסים אנכיים ארוכים
+  stripsvl4: 480,    // ארבעה פסים אנכיים ארוכים
+  stripsv3:  390,    // שלושה פסים אנכיים מדורגים
   stripsv:   440,    // פסים אנכיים     — four bands
   stripsv6:  540,    // שישה פסים אנכיים
   stripsx:   460,    // פס אנכי חוצה    — one long member and four short ones

@@ -717,6 +717,15 @@ d059 d066 d081 — תשע. **מדורגים**: d044 d045 d064 d073 d078 — חמ
 כמו ב־d081) ואחד לשלושה פסים אנכיים, שגם הוא היה חסר. מחירים: ₪280 / ₪360 /
 ₪520 / ₪390, על אותו בסיס של ₪200 ועוד ₪40 לפס.*
 
+> **"פסים אנכיים — גם כאן יש לך שתי צורות. באחת כל הפסים באורך דומה ורצים כמעט
+> מלמעלה עד למטה, ובשנייה כל אחד באורך אחר. שתיהן שלך?"**
+
+*אותה שאלה כמו בפסים האופקיים, ואותה תשובה מהתמונות: **ארוכים** — d037 d040
+d046; **מדורגים** — d038 d043. ציירנו רק את המדורגים, בכל הספירות, אז שלוש
+דלתות שלך לא היו ניתנות לבנייה. עכשיו יש שני אריחים חדשים, ₪420 ו־₪480.
+ודבר אחד שמצאנו תוך כדי: בשתי הצורות המרווח בין הפסים זהה — 0.073 מרוחב הדלת,
+בשלוש דלתות שנמדדו בנפרד — כך ששתיהן אותן עמודות ורק האורכים שונים.*
+
 <details>
 <summary>ועוד שתיים קטנות שהתמונות פתחו</summary>
 
@@ -750,7 +759,7 @@ d059 d066 d081 — תשע. **מדורגים**: d044 d045 d064 d073 d078 — חמ
 | 11 | second CTA · the nav · the trust sublines | three items of the second mockup |
 | 12 | opening or leaf · one opening or two | the dimensions on the A4 order sheet |
 | ~~13~~ | ~~a door with no lock furniture~~ | ✅ **answered 24.8.2026 — no.** The option is withdrawn; the bare door opens with a cylinder. See §13 |
-| 14 | the classical set · the ring grille · the black bar · **two panel mouldings** · **two stripe compositions** | six prices, a name for the bar, and a yes/no on whether both mouldings are his |
+| 14 | the classical set · the ring grille · the black bar · **two panel mouldings** · **two horizontal and two vertical stripe compositions** | eight prices, a name for the bar, and a yes/no on whether both mouldings are his |
 
 1 and 5 were the two that stop launch on their own. **1 is answered and fixed**,
 so **5 — a starting price per size band — is now the only thing standing between

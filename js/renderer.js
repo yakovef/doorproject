@@ -2806,7 +2806,35 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  * could never have produced it: the pair's proportions are about how a
  * panelled door is divided, and this one's are about where a hand goes.
  *
- * ⚠ AND THE ROWS ARE OFF THE CORPUS NOW, NOT OFF THOSE THREE SNAPSHOTS. The
+ * ⚠ AND THEN OFF THREE BETTER PHOTOGRAPHS, INCLUDING A CATALOGUE ELEVATION.
+ * The corpus read below was still wrong and it was reported again: *"look at
+ * the proportions of the 3 panel option, make our 3 panel option look like
+ * this"*, with three pictures of the same model. One of them is a flat
+ * catalogue shot — which is **d067's own file**, the door excluded from the
+ * corpus read for having a crop aspect of 0.535. That exclusion was right
+ * about the COLUMNS and wrong about the rows: a horizontal stretch cannot move
+ * a horizontal edge, so a stretched elevation is a perfectly good ruler
+ * vertically, and it is the only square-on one of the three.
+ *
+ *              upper          plate          lower
+ *     d067   0.081-0.441   0.462-0.613   0.634-0.946    (catalogue elevation)
+ *     white  0.036-0.464   0.488-0.583   0.607-0.952
+ *     black  0.067-0.461   0.489-0.562   0.579-0.933
+ *     mean   0.061-0.455   0.480-0.586   0.607-0.944
+ *
+ * Everything moves UP and every rectangle grows. The corpus read had the plate
+ * 0.067 too low and the gaps between the panels twice as wide as they are.
+ *
+ * ⚠ AND THE CHECK THAT SAYS IT IS RIGHT IS THE MARGINS. The top margin comes
+ * out at 0.061 of the leaf's height — 125 mm — the foot margin at 0.056, 115,
+ * and `PANEL_INSETS.trio` is 0.15 of the width, 128. Equal margins all round
+ * is what a panelled door is, and three independent photographs landing on it
+ * is not something a bad reading does. The gaps between the panels are 0.025
+ * and 0.021, about 47 mm, which is the narrow rail the pictures show.
+ *
+ * The corpus read is kept below because the reasoning in it still stands.
+ *
+ * ⚠ THE ROWS WERE OFF THE CORPUS, NOT OFF THOSE THREE SNAPSHOTS. The
  * first measured version put the composition too high and the plate too short
  * — upper 0.055-0.430, plate 0.455-0.545, lower 0.575-0.875 — and it was
  * reported back as *"the 3 panel option looks bad, so look at doors with 3
@@ -2847,7 +2875,7 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  */
 const PANEL_ROWS = {
   pair: [[0.07, 0.58], [0.66, 0.92]],
-  trio: [[0.089, 0.527], [0.547, 0.661], [0.687, 0.921]],
+  trio: [[0.061, 0.455], [0.480, 0.586], [0.607, 0.944]],
   top:  [[0.07, 0.58]],
   lone: [0.68, 0.90],
 };
@@ -3808,6 +3836,35 @@ const STRIP_ROWS = {
    window allows, so they are full width and the true figure is above 0.90.
    0.88, centred, which is inside every one of those. */
 const STRIP_EVEN_W = 0.88;
+/**
+ * WHERE A VERTICAL GROUP SITS, AND IT IS THE SAME FOR BOTH FAMILIES.
+ *
+ * ⚠ THE FANNED SET WAS SPREAD OVER A THIRD OF THE LEAF AND IT IS SPREAD OVER A
+ * SEVENTH. `bandW = lw * 0.34` was never measured; it is what "grouped in the
+ * half of the leaf away from the lock" turns into when nobody puts a ruler on
+ * it. Three doors, two of them from the hand-measured records and one from a
+ * leaf box that checks out at exactly a door's 0.415 aspect, all give the same
+ * pitch to three decimal places:
+ *
+ *     d037  0.256 0.329 0.402      (ruled)
+ *     d038  0.771 0.846 0.917      (record, strips on the lock side)
+ *     d043  0.698 0.771 0.846      (record)
+ *
+ * 0.073 every time. So the two vertical families share their COLUMNS exactly
+ * and differ only in how long the bands are — which is worth knowing, because
+ * it is also why the corpus records cannot tell them apart: a record carries
+ * each line's `x` and not its length.
+ *
+ * The group's CENTRE is the part that really varies — 0.329 on d037 against
+ * 0.156 and 0.228 on the two records, measured from the hinge edge. 0.33 is
+ * d037's, kept because its leaf box is the only one of the three this round
+ * verified, and because d037 is the door the option was asked for from.
+ */
+const STRIP_V = { pitch: 0.073, mid: 0.33 };
+/** Which column strip `i` of `count` stands in, as a fraction of the leaf's
+ *  width FROM THE HINGE EDGE. */
+const stripVAt = (i, count) =>
+  STRIP_V.mid - (count - 1) * STRIP_V.pitch / 2 + i * STRIP_V.pitch;
 
 /**
  * ⚠ THE DETAIL ITSELF, NOT FIVE FLAGS OFF IT. This took `count`, `vertical`,
@@ -3880,6 +3937,54 @@ function metalStrips(lx, ly, lw, lh, detail, tone, hingeOnLeft) {
     return `<g data-detail="strips" data-count="5" data-axis="cross">${out.join('')}</g>`;
   }
 
+  /* ── VERTICAL, LONG AND TIGHT ────────────────────────────────────
+     ⚠ THE OTHER VERTICAL COMPOSITION, and the list drew only the fan. Two
+     photographs came in with *"add this stripe option"* and both are corpus
+     doors: **d037** and **d046**, thin strips grouped into a tenth of the
+     leaf's width and running very nearly its whole height, where the fanned
+     family below spreads over a third of the width and its shortest band is a
+     quarter of the height.
+
+     Measured on d037, whose leaf box comes out at exactly a door's 0.415
+     aspect — which is why it and not d046 or d040 is the one the numbers come
+     from: three strips at 0.256, 0.329 and 0.402 of the leaf from the hinge
+     edge, a pitch of 0.073, tops level at 0.098 and feet staggered from about
+     0.945 on the outermost to 0.915 on the innermost. A column scan puts the
+     pitch at 0.073 on d037, 0.080 on d046 and 0.067 on d040; 0.073 is d037's
+     own and sits between the other two.
+
+     The GROUP is centred rather than anchored: d046's four sit closer to the
+     hinge edge than d037's three, which is what keeping the middle of the
+     group at 0.33 of the leaf does at both counts.
+
+     Thinner than the fanned bands, too — 0.013 of the leaf's width against
+     0.018. Measured 7 to 8 px on d037's 544 px leaf, which is 12 mm. */
+  if (vertical && detail.long) {
+    const t = Math.max(5, Math.round(lw * 0.013));
+    const TOP = 0.098, FOOT_OUT = 0.945, FOOT_IN = 0.915;
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      /* from the HINGE edge, so the group lands on the half of the leaf with
+         nothing else on it whichever way the door is handed */
+      const f = stripVAt(i, count);
+      const x = Math.round((hingeOnLeft ? lx + lw * f : lx + lw * (1 - f)) - t / 2);
+      const inward = count > 1 ? i / (count - 1) : 0.5;
+      const top = ly + lh * TOP;
+      const bot = ly + lh * (FOOT_OUT + (FOOT_IN - FOOT_OUT) * inward);
+      const h = bot - top;
+      out.push(`
+        <rect x="${x + 3}" y="${(top + 3).toFixed(1)}" width="${t}" height="${h.toFixed(1)}"
+              fill="#000" opacity="0.22"/>
+        <rect x="${x}" y="${top.toFixed(1)}" width="${t}" height="${h.toFixed(1)}" fill="${tone[2]}"/>
+        <rect x="${x}" y="${top.toFixed(1)}" width="${Math.max(2, t * 0.34)}" height="${h.toFixed(1)}"
+              fill="${tone[0]}"/>
+        <rect x="${x + t - Math.max(2, t * 0.24)}" y="${top.toFixed(1)}"
+              width="${Math.max(2, t * 0.24)}" height="${h.toFixed(1)}" fill="${tone[4]}"/>`);
+    }
+    return `<g data-detail="strips" data-count="${count}" data-axis="vertical"
+               data-long="1">${out.join('')}</g>`;
+  }
+
   /* ── the other axis ──────────────────────────────────────────────
      Five doors run the strips UP the leaf, not across it: d034 d037 d038 d040
      d043. Fewer of them and longer, grouped in the half of the leaf away from
@@ -3890,11 +3995,6 @@ function metalStrips(lx, ly, lw, lh, detail, tone, hingeOnLeft) {
      stops well short of the head and foot, as every one of the five does. */
   if (vertical) {
     const t = Math.max(8, Math.round(lw * 0.018));
-    /* Away from the lock: the lock is on the closing edge, which is the side
-       opposite the hinges. */
-    const bandW = lw * 0.34;
-    const band0 = hingeOnLeft ? lx + lw * 0.10 : lx + lw * 0.56;
-    const gap = count > 1 ? bandW / (count - 1) : 0;
 
     /* ── THEY ARE NOT THE SAME LENGTH, and that is the design ─────────
        Every one of them ran 0.12 to 0.88 of the leaf, four identical bars in
@@ -3925,11 +4025,15 @@ function metalStrips(lx, ly, lw, lh, detail, tone, hingeOnLeft) {
     const HEAD_IN = 0.39, HEAD_OUT = 0.05;  // innermost and outermost tops
     const out = [];
     for (let i = 0; i < count; i++) {
-      const x = Math.round(count > 1 ? band0 + gap * i : band0 + bandW / 2);
+      /* ⚠ THE SAME COLUMNS THE LONG FAMILY USES — see STRIP_V. These were laid
+         out across `lw * 0.34`, more than twice the measured spread, and the
+         handing was folded into the index so that `inward` had to undo it.
+         `stripVAt` is measured from the hinge edge, so `inward` is just the
+         index and the mirror happens once, in the x. */
+      const f = stripVAt(i, count);
+      const x = Math.round((hingeOnLeft ? lx + lw * f : lx + lw * (1 - f)) - t / 2);
       /* 0 at the leaf's outer (hinge) edge, 1 at the middle of the leaf. */
-      const inward = count > 1
-        ? (hingeOnLeft ? i / (count - 1) : 1 - i / (count - 1))
-        : 0.5;
+      const inward = count > 1 ? i / (count - 1) : 0.5;
       const top = ly + lh * (HEAD_OUT + (HEAD_IN - HEAD_OUT) * inward);
       const bot = ly + lh * FOOT;
       const h = bot - top;
@@ -7944,9 +8048,19 @@ export function detailGlyph(detail) {
        ...[0.420, 0.448, 0.578, 0.606].map(y =>
          `<rect x="${W * 0.167}" y="${H * y - 9}" width="${W * (0.556 - 0.167)}"
                 height="18" fill="currentColor"/>`)].join('')
+    : detail.vertical && detail.long
+    ? Array.from({ length: n }, (_, i) => {
+        /* ⚠ ITS OWN PICTURE. Sent through the fanned branch a long vertical
+           set draws a fan, which is a picture of the option two tiles down. */
+        const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
+        const top = H * 0.098;   // STRIP_V, spelled out: a glyph is 44 px
+        const bot = H * (0.945 + (0.915 - 0.945) * (n > 1 ? i / (n - 1) : 0.5));
+        return `<rect x="${x - 8}" y="${top}" width="16" height="${bot - top}"
+                      fill="currentColor"/>`;
+      }).join('')
     : detail.vertical
     ? Array.from({ length: n }, (_, i) => {
-        const x = W * (0.10 + (n > 1 ? (i * 0.34) / (n - 1) : 0.17));
+        const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
         const top = H * (0.05 + 0.34 * (n > 1 ? i / (n - 1) : 0.5));
         return `<rect x="${x - 9}" y="${top}" width="18" height="${H * 0.778 - top}"
                       fill="currentColor"/>`;

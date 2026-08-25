@@ -143,13 +143,13 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **5,234,178 assertions passing, 0 failed**, no framework, plain
+- `npm test` — **5,257,643 assertions passing, 0 failed**, no framework, plain
   node. It was 3.70M before the classical set and 5.68M before the 24.8
   interface round; the catalogue lists change length and the combinatorial
   sweeps are the product of those lengths, so the total moves with the range in
   both directions. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF ANYTHING. It is
   not a coverage metric — read the failure count.
-- `npm run collide` — clean on **both** `all` and `boxes`, over **1,398
+- `npm run collide` — clean on **both** `all` and `boxes`, over **1,410
   buildable designs**, real `getBBox` geometry from a browser. Check both
   flags yourself; a "clean" claim about `collide` that does not say which of
   the two it means has been wrong before (see "Red, and known").
@@ -1166,6 +1166,54 @@ how it got there. Detail lives in the section it belongs to.
   check that cannot be broken on purpose is not hardened, it is blind, and
   proving the difference is what the falsification is for.
 
+- **Five more photographs: a stripe design the list could not draw, and the
+  three-panel proportions once more.** *"add this strope option, and look at the
+  proportions of the 3 panel option, make our 3 panel option look like this."*
+  Every one of the five turned out to be a corpus door we already had at full
+  resolution — the two striped ones are **d037** and **d046**, and the flat
+  catalogue elevation of the three-panel door is **d067's own file**.
+  - **⚠ THE VERTICAL STRIPS ARE TWO FAMILIES TOO, and the list drew one.** Same
+    split as the horizontals, found the same way and one round later. The
+    photographs show thin bands grouped into a seventh of the leaf's width and
+    running very nearly its whole height; the FANNED family we drew spreads
+    over a third of the width and its shortest band is a quarter of the height.
+    `stripsvl3` and `stripsvl4` are the new ones, measured on d037 — whose leaf
+    box comes out at exactly a door's 0.415 aspect, which is why it and not
+    d046 or d040 is where the numbers come from: three at 0.256, 0.329 and
+    0.402 of the leaf from the hinge edge, tops level at 0.098, feet staggered
+    from 0.945 to 0.915.
+  - **⚠ AND THE FANNED SET WAS SPREAD OVER TWICE ITS MEASURED WIDTH.**
+    `bandW = lw * 0.34` was never measured — it is what "grouped in the half of
+    the leaf away from the lock" turns into when nobody puts a ruler on it.
+    Three doors, one from a verified leaf box and two from the hand-measured
+    records, all give a pitch of **0.073**: d037 0.256/0.329/0.402, d038
+    0.771/0.846/0.917, d043 0.698/0.771/0.846. So the two vertical families
+    share their COLUMNS exactly and differ only in how long the bands are.
+    `STRIP_V` states it once and both branches read it.
+  - **⚠ WHICH MEANS A RECORD CANNOT TELL THEM APART**, because a record carries
+    each line's `x` and not its length — and the moment the long option was
+    added, `npm run corpus` sent d038 and d043, both plainly fanned, to it on a
+    list-order tie. The tie-break is the catalogue's own citation: an option's
+    `doors` list is a claim about which photographs its numbers came from, so
+    if a tied candidate names this door, that is the one it is. Where nothing
+    names it, list order still decides and the note now SAYS the choice was a
+    coin toss instead of printing a clean answer.
+  - **`panel3` again, and this time off a flat elevation.** The corpus read was
+    still wrong. One of the three new pictures is a catalogue shot — d067's own
+    file, the door excluded from the last read for having a crop aspect of
+    0.535. ⚠ That exclusion was right about the COLUMNS and wrong about the
+    rows: a horizontal stretch cannot move a horizontal edge, so a stretched
+    elevation is a perfectly good ruler vertically, and it is the only square-on
+    one of the three.
+    Upper 0.061–0.455, plate 0.480–0.586, lower 0.607–0.944, the mean of three
+    readings — against 0.089–0.527, 0.547–0.661, 0.687–0.921. Everything moves
+    up and every rectangle grows; the plate was 0.067 too low and the gaps
+    twice as wide as they are.
+    ⚠ And the check that says it is right is the MARGINS: top 0.061 of the
+    leaf's height (125 mm), foot 0.056 (115), sides `PANEL_INSETS.trio` 0.15 of
+    the width (128). Equal margins all round is what a panelled door is, and
+    three independent photographs landing on it is not something a bad reading
+    does.
 - **Four photographs of doors he has built, and the classical panel put back
   through the loop — plus the leaf box on the set's own photograph turning out
   to be skewed.** Sent in as *"i love the normal panels, but i dont like how

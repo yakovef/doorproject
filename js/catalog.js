@@ -779,16 +779,41 @@ export const DETAILS = [
      picking "metal strips" for one of those got the other axis with no
      warning. Vertical strips are fewer and longer: three or four, in the half
      of the leaf away from the lock. */
-  /* ⚠ THREE IS THE CORPUS'S OWN COUNT AND IT WAS THE ONE MISSING. d037, d038
-     and d043 all carry three; d040 and d046 carry four; nothing carries six.
-     The list offered four and six. The fan itself is measured on d038 and
-     d043 — see `metalStrips` — and applies at any count. */
-  { id: 'stripsv3', sub: 'strips', he: 'שלושה פסים אנכיים', en: 'Three vertical strips',
+  /* ── AND THE VERTICAL STRIPS ARE TWO COMPOSITIONS TOO ─────────────
+     ⚠ SAME SPLIT AS THE HORIZONTALS, FOUND THE SAME WAY AND ONE ROUND LATER.
+     Two photographs came in with *"add this stripe option"* and both are
+     corpus doors — **d037** and **d046** — carrying something the list could
+     not draw: thin strips TIGHTLY GROUPED and running very nearly the whole
+     height of the leaf. Measured on d037, whose leaf box comes out at exactly
+     a door's 0.415 aspect: three strips at 0.256, 0.329 and 0.402 of the leaf
+     from the hinge edge — a pitch of 0.073 — running 0.098 to about 0.94.
+
+     The FANNED family below is a different design and it is measured too: on
+     d038 the three run 0.372-0.656, 0.126-0.693 and 0.071-0.905, lengths of
+     0.28, 0.57 and 0.83, spread over a third of the leaf's width. Nobody would
+     mistake one for the other on the door, and the list drew only the fan — at
+     every count — so d037, d040 and d046 had no tile.
+
+     The Hebrew says which is which, like the horizontals' אחידים / מדורגים. */
+  { id: 'stripsvl3', sub: 'strips', he: 'שלושה פסים אנכיים ארוכים',
+    en: 'Three long vertical strips', panel: false, groove: false,
+    strips: 3, vertical: true, long: true, doors: ['d037'] },
+  { id: 'stripsvl4', sub: 'strips', he: 'ארבעה פסים אנכיים ארוכים',
+    en: 'Four long vertical strips', panel: false, groove: false,
+    strips: 4, vertical: true, long: true, doors: ['d040', 'd046'] },
+
+  /* ⚠ THREE IS THE CORPUS'S OWN COUNT AND IT WAS THE ONE MISSING. d038 and
+     d043 carry three fanned; nothing carries six. The list offered four and
+     six. The fan itself is measured on d038 and d043 — see `metalStrips` — and
+     applies at any count. */
+  { id: 'stripsv3', sub: 'strips', he: 'שלושה פסים אנכיים מדורגים',
+    en: 'Three vertical strips, fanned',
     panel: false, groove: false, strips: 3, vertical: true,
-    doors: ['d037', 'd038', 'd043'] },
-  { id: 'stripsv', sub: 'strips', he: 'פסים אנכיים',   en: 'Vertical strips', panel: false, groove: false,
-    strips: 4, vertical: true, doors: ['d040', 'd046'] },
-  { id: 'stripsv6', sub: 'strips', he: 'שישה פסים אנכיים', en: 'Six vertical strips',
+    doors: ['d038', 'd043'] },
+  { id: 'stripsv', sub: 'strips', he: 'ארבעה פסים אנכיים מדורגים',
+    en: 'Vertical strips, fanned', panel: false, groove: false,
+    strips: 4, vertical: true },
+  { id: 'stripsv6', sub: 'strips', he: 'שישה פסים אנכיים מדורגים', en: 'Six vertical strips, fanned',
     panel: false, groove: false, strips: 6, vertical: true },
   /* ⚠ THE CROSS, AND THE INVENTORY HAS CALLED IT MISSING FOR THREE ROUNDS.
      `research/works/INVENTORY.md` lists it under the face designs as *"Cross
