@@ -52,8 +52,7 @@ turned up anything worth touching.
 every run since 28 — CLAUDE.md §9 names the re-basing work and a five-hour
 check-in is not the place to attempt it without doing that derivation.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** ea03b72
 
 ---
 
