@@ -1319,6 +1319,84 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE PRICES ARE REAL NOW, AND THE PRICE MODEL CHANGED SHAPE TO HOLD THEM.**
+  On 26.8.2026 Peretz sat down with his son and said the numbers out loud —
+  the conversation `ASK-PERETZ.md` §5 had been waiting nine days for and the
+  one thing standing between this and a launch. **`TRANSFORM.md` is the plan
+  that follows from it and is the forward plan now**; `REALISM2.md` keeps
+  stages E and F inside it and everything else it describes is built.
+  What changed here, in `js/prices.js`: `SIZE` — a starting price per band,
+  invented, `PLACEHOLDER` — is gone, replaced by **`BUILD`**, the six parts of
+  a fitted door (door 1250 · cylinder 200 · lock 200 · mashkof 500 · install
+  700 · measure 300 = **₪3,150**). The reason it is six numbers and not one per
+  band is that a per-band total cannot express what he actually said:
+  *"+25% to the price of the door and mashkof"*. The multiplier lands on **two**
+  of the six and not on the other four — a bigger door is more steel and a
+  bigger frame, not more installation or a second visit to measure — so each
+  size carries a `mult` in `js/catalog.js` beside its width and height, because
+  a multiplier is a property of the size and not money.
+  ⚠ **`priceInto('size', …)` went with it, and its absence needed a guard of
+  its own** or the loudest check in `catalog.js` would have quietly stopped
+  covering the most expensive axis: a size with no `mult` reads `undefined`,
+  `Math.round(x * undefined)` is `NaN`, and NaN reaches the figure on the
+  customer's screen without throwing anywhere on the way.
+  ⚠ **And `priceParts`' keys are no longer `GROUPS[].key` one-for-one.** A size
+  has no price of its own now, so a tile asking this object for its own group
+  by name would print `undefined` on all six size tiles. `tileAgorot` in
+  `js/price.js` is where that translation lives — in the file that owns money,
+  not as a special case at the call site, because the last time arithmetic
+  about money lived in `app.js` it printed +₪620 beside a price that then moved
+  ₪1,240.
+
+- **The price is a button, and it opens a column that adds up.** Asked for from
+  outside in the same conversation: *"if they click on the price it shows what
+  it consists of."* `breakdownRows(state)` renders `priceParts` directly — never
+  a second list that happens to agree — and `npm test` sweeps every buildable
+  door asserting the rows sum to the figure above them.
+  ⚠ **The rounding gets a row of its own (`עיגול`), and it has to.** The total
+  is rounded UP to the nearest ₪5, so the components alone fall short by up to
+  ₪4.99; a customer who adds a column and gets a different answer from the one
+  on screen has been shown in the clearest possible way that the number is made
+  up.
+  ⚠ **AND THE FIRST VERSION SHIPPED THE EXACT BUG THE FEATURE EXISTS TO
+  PREVENT.** Components were rounded to the AGORA, which is what every other
+  rule in this codebase says to do. ₪1,250 × 1.25 is ₪1,562.50, the panel
+  formats with `maximumFractionDigits: 0`, so that row PRINTED ₪1,563 — and
+  the visible column summed to ₪5,111 against a total of ₪5,110. Every
+  assertion was green; it was found by opening the panel and reading it, which
+  is the same instrument that has settled every disagreement in this project.
+  `scaled()` rounds to the whole SHEKEL now, and a new assertion pins that
+  every breakdown row is one.
+  Also: `PRICE_CAVEAT` carries his ~5% (*"the price can change after
+  measurments by ~5%"*) and `PRICE_INCLUDES` names the frame and the lock,
+  because the breakdown beneath it lists both. One sentence, one constant,
+  three readers — a percentage written twice is §5 wearing a figure.
+
+- **The striped doors were re-read, and three of them were filed wrong.**
+  Peretz is dropping the complicated compositions and pricing stripes per
+  stripe, and the test from outside is *more than two different stripe lengths*
+  — a different question from the shape-based survey in
+  `research/works/INVENTORY.md`, which is now §5a/§5b of that file.
+  **d045 and d078 were "ragged" and are even; d066 was "cross" and is even**
+  (its vertical member is the black pull bar, which that file's own note
+  already suspected of three of the four crossed doors). The even family is
+  **eleven doors, not nine**. `RHYTHM` — the ragged family's own table, and
+  written out TWICE in `renderer.js`, which is §5 wearing a constant — holds
+  six distinct values and so fails the test by our own numbers.
+  ⚠ **An automatic pass found almost nothing, and the reason is §8's.** A large
+  share of the striped doors carry a `fallback` leaf box, and d033's `auto` box
+  has aspect **0.640** where a leaf is 0.415 — the tool was measuring the wall.
+  Whole-door crops and a 5% ruled grid settled it, and the grid earned its
+  place twice: d040's and d046's strips look like a fan in the photograph and
+  measure equal to within 2%. That was the light on them, not their length.
+
+- **The container is healthy, so `REALISM2.md` stage F is unblocked.** It was
+  filed as *"blocked on a measurement that cannot be taken here"* because
+  Chromium crashed its renderer at 1280×720 every time under ten launch-flag
+  combinations. Six loads alternating 1280×720 and 1680×1050 on one browser:
+  **6/6 survived, zero crashes.** ⚠ Re-probe rather than trusting this line —
+  container health is a property of the container, not of the repository.
+
 - **`npm run profile` measures the shading model again, not the paint texture
   it was never meant to.** Red since the room-anchoring round (§0c, "Red, and
   known" — struck through, not deleted) on two of its three checks: the

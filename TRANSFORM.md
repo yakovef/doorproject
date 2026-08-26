@@ -23,7 +23,7 @@ green and the work is pushed.
 | # | Phase | State | Landed |
 |---|---|---|---|
 | 0 | Groundwork — the stripe survey, container health, the assumption ledger | ✅ **done** | 26.8 · survey in `INVENTORY.md` §5a/§5b — three doors were filed wrong · container **healthy**, 6/6 at 1280 and 1680, so **stage F is measurable** · baseline `npm test` 5,257,859 / 0 |
-| 1 | The price engine — components, multipliers, the breakdown panel | **not started** | |
+| 1 | The price engine — components, multipliers, the breakdown panel | ✅ **done** | 26.8 · `BUILD` replaces `SIZE`, `mult` on each size, `tileAgorot` + `breakdownRows` · the price is a button and opens a column that adds up · caveat carries ~5% · test **6,036,933 / 0**, audit clean, collide clean (1,258), latency 501/600 |
 | 2 | The catalogue — removals, additions, sizes, one `VERSION` bump | **not started** | |
 | 3 | משקוף — the frame becomes a category | **not started** | |
 | 4 | פרזול — the hardware finish, and the bug Peretz reported | **not started** | |
@@ -377,7 +377,11 @@ appears twice is `CLAUDE.md` §5 instance nineteen waiting to happen.
   `priceParts` rounds to `priceAgorot`, and no part is negative or `NaN`.
 - A hand-worked assertion table: the standard door with nothing on it is
   **exactly ₪3,150**, and `extra` with nothing on it is
-  `1250×1.25 + 200 + 200 + 500×1.25 + 700 + 300 = ₪3,637.50 → ₪3,640`.
+  `1250×1.25 + 200 + 200 + 500×1.25 + 700 + 300 = ₪3,587.50 → ₪3,590`.
+  *(This line first read ₪3,637.50 → ₪3,640, which is wrong by ₪50 — the sum
+  of six numbers, done in prose, in a plan about not doing arithmetic twice.
+  Left visible rather than quietly corrected: it is the exact failure the whole
+  §4 rebuild exists to prevent, and it took writing the assertion to catch it.)*
 - The breakdown opens, closes, is keyboard reachable, and adds up.
 
 ---
@@ -1677,7 +1681,7 @@ in addition to the green light in §16.3, never instead of it.**
 | # | Done when |
 |---|---|
 | 0 | `research/works/INVENTORY.md` names every striped door in the corpus and how many distinct stripe lengths each carries. Container health is recorded in §0's ledger as a yes/no for stage F. |
-| 1 | T1 and T2 pass. The standard door is **exactly ₪3,150**; `extra` with nothing on it is **₪3,640**. The breakdown opens by keyboard, closes, and its rows plus the `עיגול` row equal the figure above them. |
+| 1 | T1 and T2 pass. The standard door is **exactly ₪3,150**; a ×1.25 band with nothing on it is **₪3,590**. The breakdown opens by keyboard, closes, and its rows plus the `עיגול` row equal the figure above them. |
 | 2 | Every retired id opens a real door (T5). `node tools/corpus.mjs --quiet` regenerates `js/works.js` and `npm run corpus` still recreates 30 doors, with substitutions **named in its notes**, not silent. |
 | 3 | T3 passes: the leaf is byte-identically the same size across all four mashkofs, on all five sizes. `npm run frame` on the standard mashkof is unchanged from before the phase — that is the proof nothing else moved. |
 | 4 | T4 passes over all 36 grip × pirzul pairs. `grep -rn effectiveFinish js/` returns **zero**. The `no dangling url()` assertion is green with two gradient sets in play. |

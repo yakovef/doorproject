@@ -7,14 +7,22 @@
  * configurator must not break it.
  */
 
-import { byId, COLOURS, DETAILS, GRILLES, HANDLES, paneCount, LOCKSETS, SIZES, WINDOWS }
-  from './catalog.js';
+import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, paneCount, LOCKSETS,
+         SIZES, WINDOWS } from './catalog.js';
 
 /**
- * The price, BROKEN DOWN — one entry per group in the choices panel.
+ * The price, BROKEN DOWN — the six parts of a fitted door, then one entry per
+ * group in the choices panel.
  *
  * ⚠ THIS EXISTS SO THE FIGURE ON A TILE AND THE FIGURE IN THE TOTAL ARE ONE
  * PIECE OF ARITHMETIC.
+ *
+ * ⚠ AND SINCE 26.8.2026 IT IS ALSO WHAT THE CUSTOMER SEES. Asked for from
+ * outside: *"make that if they click on the price it shows what it consists
+ * of."* The breakdown panel is this function rendered as rows — not a second
+ * list that happens to add up the same way, which is the only version of this
+ * feature worth having. A breakdown that disagrees with the figure above it is
+ * the most embarrassing bug this site could ship.
  *
  * The tiles used to print a DELTA — what tapping this option would do to the
  * total — worked out by repairing a hypothetical state and subtracting.
@@ -28,25 +36,68 @@ import { byId, COLOURS, DETAILS, GRILLES, HANDLES, paneCount, LOCKSETS, SIZES, W
  *
  * So a tile prints what the thing COSTS. The obvious way would be to read
  * `o.delta` at the call site, and that is the trap: two of these are not
- * `o.delta`. The size carries the whole base price, and ironwork is sold PER
- * PANEL, so the window and the size decide what a grille costs. A second copy
- * of that arithmetic in app.js is CLAUDE.md §5 items 10-13 exactly, and the
- * per-panel bug it would reintroduce is one this file has already shipped.
+ * `o.delta`. The size multiplies two of the six components, and ironwork is
+ * sold PER PANEL, so the window and the size decide what a grille costs. A
+ * second copy of that arithmetic in app.js is CLAUDE.md §5 items 10-13
+ * exactly, and the per-panel bug it would reintroduce is one this file has
+ * already shipped.
  *
- * One statement, two readers: `priceAgorot` sums it, `repriceOptions` reads
- * one key out of it. The keys are `GROUPS[].key` in app.js on purpose, so a
- * tile can ask for its own group by name — and a group with no entry here
- * comes back `undefined` and is visible, rather than a quiet zero.
+ * One statement, three readers: `priceAgorot` sums it, `tileAgorot` reads one
+ * key out of it, and the breakdown panel renders it row by row.
+ *
+ * ⚠ THE KEYS ARE NO LONGER `GROUPS[].key` ONE-FOR-ONE, and that changed with
+ * the six components. A tile used to ask this object for its own group by
+ * name and `size` was a key here; it is not any more, because a size does not
+ * have a price — it multiplies two things that do. `tileAgorot` below is where
+ * that translation lives, in the file that owns money, rather than as a
+ * special case at the call site in app.js.
  */
 export function priceParts(state) {
   const size = SIZES[state.size] || SIZES.standard;
+
+  /* ⚠ THE SIZE MULTIPLIES TWO COMPONENTS AND NOT THE OTHER FOUR. Peretz, in
+     his own words: "+25% to the price of the door and mashkof". A bigger door
+     is more steel and a bigger frame; it is not more installation, a longer
+     cylinder, or a second visit to measure — and this is exactly why the six
+     parts are six numbers rather than one per size (see `BUILD` in
+     `js/prices.js`, which was `SIZE` until 26.8.2026).
+
+     ⚠ ROUNDED TO A WHOLE SHEKEL, NOT A WHOLE AGORA, AND THAT IS A BUG FIX.
+     The first version of this rounded to the agora, which is what every other
+     rule in this codebase says to do — and it broke the breakdown the moment
+     anybody looked at it. ₪1,250 × 1.25 is ₪1,562.50; the panel formats every
+     row with `maximumFractionDigits: 0`, so that row PRINTS ₪1,563, and a
+     customer adding the visible column up got ₪5,111 against a total of
+     ₪5,110. A breakdown whose rows do not sum to the figure above them is the
+     one thing this feature must never do, and the half-shekel is where it
+     came from.
+
+     So a component the customer can read is a whole number of shekels. The
+     total still rounds up to the nearest ₪5 on top of that, and the difference
+     still gets its own row — but every row in the column is now exactly the
+     number printed beside it. `npm test` pins it: every breakdown row is a
+     whole shekel, on every buildable door.
+
+     Still ONE rounding of this quantity, at the only place in the project
+     where a multiplier exists. Two would be CLAUDE.md §5 in arithmetic. */
+  const scaled = a => Math.round(a * size.mult / 100) * 100;
+
   /* Nothing here for the finish or the add-ons any more, and the reason is
      the same one in both directions: money and the door move together. The
      finish took up to ₪220 for a decision the owner does not actually offer,
      and the add-ons priced five fittings he does not fit. A surcharge for
      something that will not happen is a hidden cost with a label on it. */
   return {
-    size:    size.base,
+    /* The six parts of a fitted door. Their sum on a standard door with
+       nothing on it is ₪3,150, and `npm test` pins that figure — it is the one
+       number Peretz will check first. */
+    door:     scaled(BUILD_A.door),
+    cylinder: BUILD_A.cylinder,
+    lock:     BUILD_A.lock,
+    mashkof:  scaled(BUILD_A.mashkof),
+    install:  BUILD_A.install,
+    measure:  BUILD_A.measure,
+
     colour:  byId(COLOURS, state.colour).delta,
     window:  byId(WINDOWS, state.window).delta,
     detail:  byId(DETAILS, state.detail).delta,
@@ -88,6 +139,71 @@ export function priceAgorot(state) {
   for (const part of Object.values(priceParts(state))) total += part;
   // Round up to the nearest ₪5 so quoted figures stay tidy.
   return Math.ceil(total / 500) * 500;
+}
+
+/**
+ * WHAT ONE TILE PRINTS, in agorot, for a state that already has that option in
+ * it. `undefined` for a group that costs nothing anywhere — which is visible
+ * rather than a quiet zero.
+ *
+ * ⚠ THE SIZE IS THE SPECIAL CASE AND IT HAS TO BE. Every other group maps onto
+ * one key of `priceParts`, so its tile shows that key. A size does not: it
+ * multiplies the door and the mashkof, so the honest figure on a size tile is
+ * neither "the multiplier" (meaningless to a customer) nor "the door and frame
+ * at that size" (₪1,750 on a standard door, a number that appears nowhere else
+ * and answers no question anybody asked). It is **what the whole door costs at
+ * that size** — which is what a customer comparing סטנדרטית against דלת וחצי
+ * is actually comparing, and it is what the tiles showed before this change,
+ * when `size.base` happened to be exactly that.
+ *
+ * This lives here and not in app.js on purpose. It is arithmetic about money,
+ * and the last time a second copy of arithmetic about money lived in app.js it
+ * printed +₪620 beside a price that then moved ₪1,240.
+ */
+export function tileAgorot(groupKey, state) {
+  if (groupKey === 'size') return priceAgorot(state);
+  const parts = priceParts(state);
+  return Object.prototype.hasOwnProperty.call(parts, groupKey)
+    ? parts[groupKey] : undefined;
+}
+
+/**
+ * THE BREAKDOWN, as rows, in the order Peretz said them.
+ *
+ * Asked for from outside: *"if they click on the price it shows what it
+ * consists of."* He recited the six parts of a standard door in this order, so
+ * this is the order he will read them back in.
+ *
+ * ⚠ THE ROUNDING GETS A ROW OF ITS OWN, and leaving it out was the first
+ * version of this function. `priceAgorot` rounds the total up to the nearest
+ * ₪5 so quoted figures stay tidy — which means the rows can sum to as much as
+ * ₪4.99 less than the figure printed above them. A customer who adds up a
+ * column and gets a different answer from the one on the screen has been
+ * shown, in the clearest possible way, that the number is made up. So the
+ * difference is a line item and it is called what it is.
+ *
+ * Zero rows are dropped: a door with no window does not need a row saying the
+ * window costs nothing. The six components are never dropped, because they are
+ * always there and their absence would be the thing that looks wrong.
+ */
+const ALWAYS = ['door', 'cylinder', 'lock', 'mashkof', 'install', 'measure'];
+
+export function breakdownRows(state) {
+  const parts = priceParts(state);
+  const rows = [];
+  let sum = 0;
+  for (const key of ALWAYS) {
+    rows.push({ key, agorot: parts[key] });
+    sum += parts[key];
+  }
+  for (const [key, agorot] of Object.entries(parts)) {
+    if (ALWAYS.includes(key)) continue;
+    sum += agorot;
+    if (agorot) rows.push({ key, agorot });
+  }
+  const round = priceAgorot(state) - sum;
+  if (round) rows.push({ key: 'round', agorot: round });
+  return rows;
 }
 
 const fmt = new Intl.NumberFormat('he-IL', {

@@ -30,9 +30,23 @@ export const PHONE_E164    = '972532197466';    // wa.me — it wants no '+'
 export const PHONE_TEL     = '+972532197466';   // tel: — RFC 3966 global number
 
 /* One promise, one sentence, one place. The card says these, the dock says
-   them, and until now the message said neither the same way. */
-export const PRICE_INCLUDES = 'כולל דלת, התקנה מלאה ומע״מ';
-export const PRICE_CAVEAT   = 'מחיר משוער. המחיר הסופי נקבע לאחר מדידה.';
+   them, and until now the message said neither the same way.
+
+   ⚠ `PRICE_INCLUDES` NAMES THE FRAME AND THE LOCK NOW, because the price does.
+   The six parts of a fitted door are the door, a cylinder, a lock, a mashkof,
+   installation and the measuring visit — Peretz, 26.8.2026 — and a customer
+   who taps the figure open sees all six. A summary line that says only "דלת,
+   התקנה ומע״מ" over a table listing a ₪500 mashkof reads as a discrepancy.
+
+   ⚠ AND THE 5% IS HIS NUMBER, WRITTEN ONCE. Asked for from outside in those
+   words: *"we need to write that the price can change after measurments by
+   ~5%."* Three places show this sentence — the card, the WhatsApp message and
+   the A4 order sheet — and all three read this constant. A percentage written
+   out twice is CLAUDE.md §5 wearing a figure, and the copy that gets missed is
+   the one a customer holds you to. */
+export const PRICE_INCLUDES = 'כולל דלת, משקוף, מנעול, התקנה ומע״מ';
+export const PRICE_CAVEAT   =
+  'מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.';
 
 /**
  * THE DRAWING IS A DRAWING, and the site now says so in words.

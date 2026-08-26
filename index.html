@@ -12,7 +12,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=124b197a">
+<link rel="stylesheet" href="css/app.css?v=ba37532a">
 </head>
 <body>
 
@@ -313,11 +313,33 @@
   <!-- ── the handoff: the whole point of the site ─────────── -->
   <section class="panel panel--send" aria-label="שליחת הדלת">
     <div class="send">
+      <!-- ⚠ THE FIGURE IS A BUTTON, and a real one rather than a div with a
+           click handler. Asked for from outside: *"make that if they click on
+           the price it shows what it consists of."* A price a customer can
+           interrogate is the difference between a number and a quote — and the
+           moment it is interrogable it has to be reachable by keyboard and
+           announce its own state, which only an element that genuinely is a
+           control does. `aria-expanded` is the honest carrier; the chevron is
+           decoration and says so. -->
       <div class="send__price">
         <span class="send__label">מחיר משוער</span>
-        <strong class="send__figure" id="price" data-price>—</strong>
-        <span class="send__incl">כולל דלת, התקנה מלאה ומע״מ</span>
+        <button class="send__toggle" id="price-toggle" type="button"
+                aria-expanded="false" aria-controls="breakdown">
+          <strong class="send__figure" id="price" data-price>—</strong>
+          <span class="send__chev" aria-hidden="true"></span>
+          <span class="sr-only">פירוט המחיר</span>
+        </button>
+        <span class="send__incl">כולל דלת, משקוף, מנעול, התקנה ומע״מ</span>
       </div>
+
+      <!-- Rendered from `breakdownRows(state)` in js/price.js — the same
+           arithmetic `priceAgorot` sums, never a second list that happens to
+           agree. See the note there for why the ₪5 rounding gets a row of its
+           own: a customer who adds up a column and gets a different answer
+           from the one above it has been shown the number is made up. -->
+      <table class="bd" id="breakdown" hidden>
+        <tbody id="breakdown-body"></tbody>
+      </table>
 
       <!-- ⚠ TWO RENDERINGS OF ONE LIST, and neither is redundant.
            `#spec` is the mockup's table — label, value, swatch — and `#summary`
@@ -346,8 +368,13 @@
         <span class="send__code">קוד: <b id="code">—</b></span>
       </div>
 
+      <!-- ⚠ This sentence is `PRICE_CAVEAT` in js/share.js and `npm test`
+           asserts that this file still contains it word for word. It carries
+           Peretz's ~5% now: "we need to write that the price can change after
+           measurments by ~5%." Change it THERE, and this copy with it in the
+           same edit — the assertion exists because the two drifted once. -->
       <p class="send__fine">
-        מחיר משוער. המחיר הסופי נקבע לאחר מדידה.
+        מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.
         אפשר גם להתקשר — <a href="tel:+972532197466">053-219-7466</a>.
       </p>
     </div>
@@ -485,7 +512,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=3bb4d8fe"></script>
+<script src="assets/bundle.js?v=7e3880b2"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

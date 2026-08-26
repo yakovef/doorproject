@@ -55,21 +55,48 @@ export function agorot(shekels) {
   return a;
 }
 
-/* ── the door itself ──────────────────────────────────────────────────
-   A STARTING price per size band: what that door costs with no window, no
-   ironwork, a plain face and the cheapest hardware. Everything below is added
-   to it.
+/* ── the door itself, as its six parts ────────────────────────────────
+   ⚠ THESE SIX ARE THE DOOR, AND THEY ARE THE FIRST REAL PRICES THIS PROJECT
+   HAS EVER HAD. From Peretz, 26.8.2026 — the conversation ASK-PERETZ.md §5 had
+   been waiting nine days for. Everything else in this file is added to them.
+   Their sum is ₪3,150: what the page shows before the customer has touched
+   anything, and a figure he would actually honour.
 
-   ⚠ THIS IS THE ONE BLOCK THAT STOPS LAUNCH. ASK-PERETZ.md §5. Six numbers,
-   and every price on the site is built on them. */
-export const SIZE = {
-  standard:  3195,   // סטנדרטית
-  narrow:    3095,   // צרה          — cheaper than standard, and the tile says so
-  wide:      3495,   // רחבה
-  tall:      3695,   // גבוהה
-  half:      4495,   // דלת וחצי     — two leaves
-  sidelight: 4295,   // עם חלון צד   — one leaf and a fixed light
+   ⚠ WHY SIX NUMBERS AND NOT ONE PER SIZE. This block used to be `SIZE`, a
+   starting price per band — ₪3,195 standard, ₪3,495 wide, and so on. That
+   shape cannot say what Peretz said:
+
+       extra            +25% to the price of the door and mashkof
+       double extra     +50% to the price of the door and mashkof
+       door and a half   x2  to the price of the door and mashkof
+
+   The multiplier lands on TWO of these six and not on the other four. A bigger
+   door is more steel and a bigger frame; it is not more installation, a longer
+   cylinder, or a second visit to measure. A single per-size total cannot
+   express that without somebody working the arithmetic out by hand for every
+   band and writing the answer down — which is a second statement of a rule,
+   and the shape CLAUDE.md §5 is entirely about.
+
+   So the SIZE carries a MULTIPLIER, in `js/catalog.js` beside its width and
+   height, because a multiplier is a property of the size and not a price. This
+   block carries the money. `priceParts` in `js/price.js` is the one place the
+   two meet. */
+export const BUILD = {
+  door:      1250,   // הדלת עצמה      ⟵ multiplied by the size
+  cylinder:   200,   // צילינדר
+  lock:       200,   // מנעול
+  mashkof:    500,   // משקוף סטנדרטי  ⟵ multiplied by the size
+  install:    700,   // התקנה והובלה
+  measure:    300,   // מדידה וייעוץ
 };
+
+/* Widening the frame. Peretz gave a standard of at most 3 cm on the outside
+   face and 16 cm of return on the inside, and "+250 every side that gets
+   wider" — where a "side" is one of those two DIMENSIONS, not one of the
+   jambs. So a mashkof is ₪500 standard, ₪750 with one widened, ₪1,000 with
+   both. The dimensions themselves live in `MASHKOFS` in `js/catalog.js`,
+   because they are millimetres the renderer draws rather than money. */
+export const MASHKOF_WIDER = 250;
 
 /* ── the opening ─────────────────────────────────────────────────────
    ⚠ TWO SHAPES, DOWN FROM FOUR. `tallwin` (חלון גבוה) and `broad` (חלון רחב)

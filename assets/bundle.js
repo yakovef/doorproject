@@ -11,20 +11,21 @@
     }
     return a;
   }
-  var SIZE = {
-    standard: 3195,
-    // סטנדרטית
-    narrow: 3095,
-    // צרה          — cheaper than standard, and the tile says so
-    wide: 3495,
-    // רחבה
-    tall: 3695,
-    // גבוהה
-    half: 4495,
-    // דלת וחצי     — two leaves
-    sidelight: 4295
-    // עם חלון צד   — one leaf and a fixed light
+  var BUILD = {
+    door: 1250,
+    // הדלת עצמה      ⟵ multiplied by the size
+    cylinder: 200,
+    // צילינדר
+    lock: 200,
+    // מנעול
+    mashkof: 500,
+    // משקוף סטנדרטי  ⟵ multiplied by the size
+    install: 700,
+    // התקנה והובלה
+    measure: 300
+    // מדידה וייעוץ
   };
+  var MASHKOF_WIDER = 250;
   var WINDOW = {
     none: 0,
     // ללא חלון
@@ -208,11 +209,11 @@
   // js/catalog.js
   var PLACEHOLDER2 = PLACEHOLDER;
   var SIZES = {
-    standard: { id: "standard", he: "סטנדרטית", en: "Standard", w: 950, h: 2100 },
-    narrow: { id: "narrow", he: "צרה", en: "Narrow", w: 800, h: 2100 },
-    wide: { id: "wide", he: "רחבה", en: "Wide", w: 1100, h: 2100 },
-    tall: { id: "tall", he: "גבוהה", en: "Tall", w: 950, h: 2400 },
-    half: { id: "half", he: "דלת וחצי", en: "Leaf and half", w: 950, h: 2100, side: 400 },
+    standard: { id: "standard", he: "סטנדרטית", en: "Standard", w: 950, h: 2100, mult: 1 },
+    narrow: { id: "narrow", he: "צרה", en: "Narrow", w: 800, h: 2100, mult: 1 },
+    wide: { id: "wide", he: "רחבה", en: "Wide", w: 1100, h: 2100, mult: 1.25 },
+    tall: { id: "tall", he: "גבוהה", en: "Tall", w: 950, h: 2400, mult: 1.25 },
+    half: { id: "half", he: "דלת וחצי", en: "Leaf and half", w: 950, h: 2100, side: 400, mult: 2 },
     /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
        d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
        narrow one beside it — but the narrow one does not open and is glass, so
@@ -225,7 +226,8 @@
       w: 950,
       h: 2100,
       side: 400,
-      sideGlazed: true
+      sideGlazed: true,
+      mult: 2
     }
   };
   var COLOURS = [
@@ -1208,7 +1210,25 @@
       }
     }
   }
-  priceInto("size", Object.values(SIZES), SIZE, "base");
+  for (const z of Object.values(SIZES)) {
+    if (typeof z.mult !== "number" || !Number.isFinite(z.mult) || z.mult <= 0) {
+      throw new Error(`size "${z.id}" has no usable mult — every size multiplies the door and the mashkof, and a missing one prices as NaN`);
+    }
+  }
+  var BUILD_KEYS = ["door", "cylinder", "lock", "mashkof", "install", "measure"];
+  var BUILD_A = {};
+  for (const k of BUILD_KEYS) {
+    if (!Object.prototype.hasOwnProperty.call(BUILD, k)) {
+      throw new Error(`prices.js BUILD has no "${k}" — the six parts of a fitted door are the price, and a missing one is money given away`);
+    }
+    BUILD_A[k] = agorot(BUILD[k]);
+  }
+  for (const k of Object.keys(BUILD)) {
+    if (!BUILD_KEYS.includes(k)) {
+      throw new Error(`prices.js BUILD carries "${k}", which nothing adds up — a price nobody will ever be charged`);
+    }
+  }
+  var MASHKOF_WIDER_A = agorot(MASHKOF_WIDER);
   priceInto("colour", COLOURS, COLOUR, "delta");
   priceInto("window", WINDOWS, WINDOW, "delta");
   priceInto("grille", GRILLES, GRILLE, "delta");
@@ -1219,8 +1239,17 @@
   // js/price.js
   function priceParts(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
+    const scaled = (a) => Math.round(a * size.mult / 100) * 100;
     return {
-      size: size.base,
+      /* The six parts of a fitted door. Their sum on a standard door with
+         nothing on it is ₪3,150, and `npm test` pins that figure — it is the one
+         number Peretz will check first. */
+      door: scaled(BUILD_A.door),
+      cylinder: BUILD_A.cylinder,
+      lock: BUILD_A.lock,
+      mashkof: scaled(BUILD_A.mashkof),
+      install: BUILD_A.install,
+      measure: BUILD_A.measure,
       colour: byId(COLOURS, state2.colour).delta,
       window: byId(WINDOWS, state2.window).delta,
       detail: byId(DETAILS, state2.detail).delta,
@@ -1255,6 +1284,29 @@
     let total = 0;
     for (const part of Object.values(priceParts(state2))) total += part;
     return Math.ceil(total / 500) * 500;
+  }
+  function tileAgorot(groupKey, state2) {
+    if (groupKey === "size") return priceAgorot(state2);
+    const parts = priceParts(state2);
+    return Object.prototype.hasOwnProperty.call(parts, groupKey) ? parts[groupKey] : void 0;
+  }
+  var ALWAYS = ["door", "cylinder", "lock", "mashkof", "install", "measure"];
+  function breakdownRows(state2) {
+    const parts = priceParts(state2);
+    const rows = [];
+    let sum = 0;
+    for (const key of ALWAYS) {
+      rows.push({ key, agorot: parts[key] });
+      sum += parts[key];
+    }
+    for (const [key, agorot2] of Object.entries(parts)) {
+      if (ALWAYS.includes(key)) continue;
+      sum += agorot2;
+      if (agorot2) rows.push({ key, agorot: agorot2 });
+    }
+    const round = priceAgorot(state2) - sum;
+    if (round) rows.push({ key: "round", agorot: round });
+    return rows;
   }
   var fmt = new Intl.NumberFormat("he-IL", {
     style: "currency",
@@ -6189,8 +6241,8 @@ ${body}
   var PHONE_DISPLAY = "053-219-7466";
   var PHONE_E164 = "972532197466";
   var PHONE_TEL = "+972532197466";
-  var PRICE_INCLUDES = "כולל דלת, התקנה מלאה ומע״מ";
-  var PRICE_CAVEAT = "מחיר משוער. המחיר הסופי נקבע לאחר מדידה.";
+  var PRICE_INCLUDES = "כולל דלת, משקוף, מנעול, התקנה ומע״מ";
+  var PRICE_CAVEAT = "מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.";
   var DRAWING_CAVEAT = "הציור באתר הוא הדמיה ממוחשבת — הדלת שתיוצר עשויה להיראות מעט שונה בגוון, בברק ובפרטי הידיות.";
   var isServed = () => /^https?:$/.test(window.location.protocol);
   function shareUrl(state2) {
@@ -6500,6 +6552,12 @@ ${body}
     $("#undo-btn").addEventListener("click", undo);
     $("#draw-caveat").textContent = DRAWING_CAVEAT;
     $("#save-btn").addEventListener("click", saveCurrent);
+    $("#price-toggle").addEventListener("click", () => {
+      const box = $("#breakdown"), btn = $("#price-toggle");
+      const open2 = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open2));
+      box.hidden = open2;
+    });
     $("#works-close").addEventListener("click", closeWorks);
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.addEventListener("click", async (ev) => {
@@ -6767,7 +6825,28 @@ ${body}
   }
   function tilePrice(g, o, state2) {
     const after = { ...repair({ ...state2, [g.key]: o.id }).state, [g.key]: o.id };
-    return priceParts(after)[g.key];
+    return tileAgorot(g.key, after);
+  }
+  var BREAKDOWN_HE = {
+    door: "הדלת",
+    cylinder: "צילינדר",
+    lock: "מנגנון נעילה",
+    mashkof: "משקוף",
+    install: "התקנה והובלה",
+    measure: "מדידה וייעוץ",
+    colour: "צבע",
+    detail: "עיצוב החזית",
+    window: "חלון",
+    grille: "עיצוב החלון",
+    handle: "ידית משיכה",
+    lockset: "מנעול וידית",
+    round: "עיגול"
+  };
+  function renderBreakdown(state2) {
+    const body = $("#breakdown-body");
+    if (!body) return;
+    const rows = breakdownRows(state2);
+    body.innerHTML = rows.map((r) => `<tr><th scope="row">${BREAKDOWN_HE[r.key] || r.key}</th><td>${formatAgorot(r.agorot)}</td></tr>`).join("") + `<tr class="bd__total"><th scope="row">סה״כ</th><td>${formatAgorot(priceAgorot(state2))}</td></tr>`;
   }
   function repriceOptions(state2) {
     for (const g of GROUPS) {
@@ -7058,6 +7137,7 @@ ${body}
     document.querySelectorAll("[data-price]").forEach((el) => {
       el.textContent = money;
     });
+    renderBreakdown(state);
     markSteps();
     repriceOptions(state);
     $("#code").textContent = encodeCode(state);

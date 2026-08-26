@@ -17,7 +17,8 @@
 //  ALL MONEY IS IN AGOROT (1/100 ₪). Never use floats for money.
 
 import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
-         SIZE as SIZE_PRICE, COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE,
+         BUILD, MASHKOF_WIDER,
+         COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE,
          GRILLE as GRILLE_PRICE, DETAIL as DETAIL_PRICE,
          HANDLE as HANDLE_PRICE, LOCKSET as LOCKSET_PRICE } from './prices.js';
 
@@ -39,20 +40,42 @@ export const PLACEHOLDER = PRICES_ARE_PLACEHOLDER;
  * (PLAN.md §2.1).
  *
  * `side` adds a fixed narrow leaf beside the main one (דלת וחצי).
+ *
+ * ⚠ `mult` IS NEW AND IT REPLACED A PRICE. Each size used to carry a `base` —
+ * the whole installed cost of a door that size — attached from a `SIZE` table
+ * in `js/prices.js`. Peretz gave the real rule on 26.8.2026 and it is not a
+ * per-size total:
+ *
+ *     extra            +25% to the price of the door and mashkof
+ *     double extra     +50% to the price of the door and mashkof
+ *     door and a half   x2  to the price of the door and mashkof
+ *
+ * The multiplier lands on two of the six components of a fitted door and not
+ * on the other four — see `BUILD` in `js/prices.js` for why, and `priceParts`
+ * in `js/price.js` for the one place it is applied. A multiplier is a property
+ * of the size rather than money, so it lives here beside `w` and `h`, and the
+ * money stays in the file whose whole job is to be readable out loud.
+ *
+ * ⚠ THE MULTIPLIERS BELOW ARE MAPPED ONTO THE SIZES AS THEY STAND TODAY, and
+ * the list itself is re-cut in TRANSFORM.md phase 2 to Peretz's four bands
+ * (standard · מוגדלת · מוגדלת במיוחד · דלת וחצי). Until then: `narrow` takes 1
+ * because he has no band below standard, `wide` and `tall` take his +25%, and
+ * `sidelight` takes דלת וחצי's x2 because it is also two openings' worth of
+ * frame — assumption A1 in TRANSFORM.md §18, one number if he says otherwise.
  */
 export const SIZES = {
-  standard: { id: 'standard', he: 'סטנדרטית',  en: 'Standard',      w: 950,  h: 2100 },
-  narrow:   { id: 'narrow',   he: 'צרה',        en: 'Narrow',        w: 800,  h: 2100 },
-  wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide',          w: 1100, h: 2100 },
-  tall:     { id: 'tall',     he: 'גבוהה',      en: 'Tall',          w: 950,  h: 2400 },
-  half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', w: 950,  h: 2100, side: 400 },
+  standard: { id: 'standard', he: 'סטנדרטית',  en: 'Standard',      w: 950,  h: 2100, mult: 1 },
+  narrow:   { id: 'narrow',   he: 'צרה',        en: 'Narrow',        w: 800,  h: 2100, mult: 1 },
+  wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide',          w: 1100, h: 2100, mult: 1.25 },
+  tall:     { id: 'tall',     he: 'גבוהה',      en: 'Tall',          w: 950,  h: 2400, mult: 1.25 },
+  half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', w: 950,  h: 2100, side: 400, mult: 2 },
   /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
      d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
      narrow one beside it — but the narrow one does not open and is glass, so
      it is a different product and a different price. `sideGlazed` is what the
      renderer reads. */
   sidelight: { id: 'sidelight', he: 'עם חלון צד', en: 'With sidelight', w: 950, h: 2100,
-               side: 400, sideGlazed: true },
+               side: 400, sideGlazed: true, mult: 2 },
 };
 
 /**
@@ -1217,7 +1240,44 @@ function priceInto(what, list, table, key) {
   }
 }
 
-priceInto('size',    Object.values(SIZES), SIZE_PRICE,    'base');
+/* ⚠ THERE IS NO `priceInto('size', …)` ANY MORE, and its absence needs a guard
+   of its own or the loudest check in this file quietly stops covering the most
+   expensive axis. A size used to carry a `base` — the whole installed cost —
+   and `priceInto` refused to start if one was missing. It now carries a
+   MULTIPLIER instead (see `SIZES` above), which `priceInto` cannot check
+   because a multiplier is not money and does not live in `prices.js`.
+   A size with no `mult` would read `undefined`, `Math.round(x * undefined)` is
+   `NaN`, and NaN propagates all the way to the figure on the customer's screen
+   without throwing anywhere. So: the same discipline, one list along. */
+for (const z of Object.values(SIZES)) {
+  if (typeof z.mult !== 'number' || !Number.isFinite(z.mult) || z.mult <= 0) {
+    throw new Error(`size "${z.id}" has no usable mult — every size multiplies `
+                  + 'the door and the mashkof, and a missing one prices as NaN');
+  }
+}
+
+/* And the six components, converted here because `agorot()` is the ONE place
+   shekels become integers and this file is where money meets vocabulary.
+   ⚠ The key list is spelled out rather than derived, so that a typo in
+   `BUILD` — or a component quietly dropped — is a hard error at load instead
+   of a door that is ₪500 cheaper than Peretz thinks it is. */
+const BUILD_KEYS = ['door', 'cylinder', 'lock', 'mashkof', 'install', 'measure'];
+export const BUILD_A = {};
+for (const k of BUILD_KEYS) {
+  if (!Object.prototype.hasOwnProperty.call(BUILD, k)) {
+    throw new Error(`prices.js BUILD has no "${k}" — the six parts of a fitted `
+                  + 'door are the price, and a missing one is money given away');
+  }
+  BUILD_A[k] = agorot(BUILD[k]);
+}
+for (const k of Object.keys(BUILD)) {
+  if (!BUILD_KEYS.includes(k)) {
+    throw new Error(`prices.js BUILD carries "${k}", which nothing adds up — `
+                  + 'a price nobody will ever be charged');
+  }
+}
+export const MASHKOF_WIDER_A = agorot(MASHKOF_WIDER);
+
 priceInto('colour',  COLOURS,              COLOUR_PRICE,  'delta');
 priceInto('window',  WINDOWS,              WINDOW_PRICE,  'delta');
 priceInto('grille',  GRILLES,              GRILLE_PRICE,  'delta');

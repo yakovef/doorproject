@@ -4,7 +4,7 @@
  */
 import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, paneCount, SIZES, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
-import { formatAgorot, priceAgorot, shekels } from '../js/price.js';
+import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT, locksetGlyph,
@@ -334,30 +334,51 @@ group('price');
 {
   const P = st => shekels(priceAgorot({ ...base, ...st }));
   /* The baseline door carries an Idan bar AND a Coral lockset now, because a
-     grip and a lock are two things. ₪3,195 is the bare door with a lever and
-     no pull. */
-  ok(P({ handle: 'none' }) === 3195,
-     `a solid anthracite door with a lever and no pull should be ₪3,195, got ${P({ handle: 'none' })}`);
-  ok(P({}) === 3455, `adding the Idan bar should reach ₪3,455, got ${P({})}`);
+     grip and a lock are two things.
+
+     ⚠ ₪3,150 IS THE FIRST REAL PRICE IN THIS FILE. It was ₪3,195 — a figure
+     read off the works page and marked PLACEHOLDER for nine days. Peretz gave
+     the six components on 26.8.2026 and they sum to exactly this: door 1250 +
+     cylinder 200 + lock 200 + mashkof 500 + install 700 + measure 300. It is
+     the number he will check first, so it is pinned exactly. */
+  ok(P({ handle: 'none' }) === 3150,
+     `a solid anthracite door with a lever and no pull should be ₪3,150, got ${P({ handle: 'none' })}`);
+  ok(P({}) === 3410, `adding the Idan bar should reach ₪3,410, got ${P({})}`);
+
+  /* ⚠ THE SIZE MULTIPLIES TWO COMPONENTS AND NOT THE OTHER FOUR — the whole
+     reason `BUILD` is six numbers instead of one per band. A x1.25 door with
+     nothing on it is 1250x1.25 + 200 + 200 + 500x1.25 + 700 + 300 = 3587.50,
+     rounded up to the nearest ₪5.
+     The second assertion is what makes the first one worth having: if somebody
+     ever "simplifies" `priceParts` by scaling the whole total instead, the
+     answer is 3937.50 and this catches it. A test that passes under both the
+     right implementation and the wrong one is not a test.
+     ⚠ And TRANSFORM.md §4.5 specified this sum as ₪3,637.50 — six numbers
+     added by hand, wrong by ₪50, in a plan about not adding numbers by hand.
+     Writing the assertion is what found it. */
+  ok(P({ handle: 'none', size: 'wide' }) === 3590,
+     `a x1.25 band with nothing on it should be ₪3,590, got ${P({ handle: 'none', size: 'wide' })}`);
+  ok(Math.ceil(3150 * 1.25 / 5) * 5 !== 3590,
+     'the x1.25 assertion is worthless if scaling the whole total gives the same answer');
   /* Every colour is delta 0 now: the manufacturer's chart gives codes, not
      prices, and the old per-colour premiums were our invention. */
   for (const c of COLOURS) ok(P({ colour: c.id }) === P({}), `colour ${c.id} must not change the price yet`);
   // A link shared before the chart replaced the list must still open a door.
   ok(P({ colour: 'ral-9005' }) === P({}), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
-  ok(P({ size: 'wide' }) === 3755, 'wide band');
-  ok(P({ window: 'rect' }) === 4075, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
-  ok(P({ window: 'rect', grille: 'scroll' }) === 4535, 'scrollwork grille adds ₪460');
-  ok(P({ detail: 'panel' }) === 3835, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
+  ok(P({ size: 'wide' }) === 3850, 'wide band');
+  ok(P({ window: 'rect' }) === 4030, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
+  ok(P({ window: 'rect', grille: 'scroll' }) === 4490, 'scrollwork grille adds ₪460');
+  ok(P({ detail: 'panel' }) === 3790, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
   /* The finish and the add-ons are withdrawn, so nothing may be charged for
      them — including through a stale link that still names one. */
   ok(P({ finish: 'brass' }) === P({}), 'a withdrawn finish must not add to the price');
   ok(P({ addons: ['peep', 'mail', 'knocker'] }) === P({}),
      'withdrawn add-ons must not add to the price');
   /* The whole point of the split: a pull bar and a backplate on one door. */
-  ok(P({ handle: 'idan', lockset: 'plate' }) === 3515,
-     `Idan with a Rotem backplate should be ₪3,515, got ${P({ handle: 'idan', lockset: 'plate' })}`);
-  ok(P({ handle: 'none', lockset: 'plate' }) === 3255, 'Rotem alone adds ₪60 to the bare door');
+  ok(P({ handle: 'idan', lockset: 'plate' }) === 3470,
+     `Idan with a Rotem backplate should be ₪3,470, got ${P({ handle: 'idan', lockset: 'plate' })}`);
+  ok(P({ handle: 'none', lockset: 'plate' }) === 3210, 'Rotem alone adds ₪60 to the bare door');
   // A retired id must land on its replacement, not on the first entry.
   ok(P({ handle: 'bar-long' }) === P({ handle: 'idan' }), 'alias bar-long should price as idan');
   ok(P({ handle: 'bar-flat' }) === P({ handle: 'shahar' }), 'alias bar-flat should price as shahar');
@@ -368,6 +389,44 @@ group('price');
   for (const g of GRILLES) {
     ok(P({ window: 'none', grille: g.id }) === P({ window: 'none', grille: 'none' }),
        `grille ${g.id} must not add cost to a solid door`);
+  }
+
+  /* ⚠ THE BREAKDOWN MUST ADD UP TO THE FIGURE ABOVE IT, on every door the site
+     can build. A customer can now tap the price open and read the column —
+     asked for from outside — and a column that does not sum to its own total
+     tells them, in the clearest way available, that the number is made up.
+
+     The rounding row is what makes this possible to assert at all: the total
+     is rounded UP to the nearest ₪5, so the components alone are short by up
+     to ₪4.99 and `breakdownRows` carries the difference as a line called
+     עיגול. This checks the rendered rows, not the raw parts, because the rows
+     are what the customer adds up. */
+  for (const st of everyState()) {
+    const shown = priceAgorot(st);
+    const rows = breakdownRows(st);
+    const summed = rows.reduce((t, r) => t + r.agorot, 0);
+    ok(summed === shown,
+       `the breakdown sums to ${summed} where the price says ${shown} `
+       + `— ${Object.values(st).join('/')}`);
+    ok(rows.every(r => Number.isInteger(r.agorot)),
+       `a breakdown row is not an integer number of agorot — ${Object.values(st).join('/')}`);
+    /* ⚠ AND EVERY ROW IS A WHOLE SHEKEL, which is a stronger claim and it is
+       the one that matters. The panel formats with `maximumFractionDigits: 0`,
+       so a row holding ₪1,562.50 PRINTS ₪1,563 — and then the visible column
+       sums to one shekel more than the total above it. That shipped, was found
+       by opening the panel and reading it, and `scaled()` in price.js rounds to
+       the shekel because of it. A column a customer can add up is the entire
+       point of the feature. */
+    ok(rows.every(r => r.agorot % 100 === 0),
+       `a breakdown row is not a whole shekel, so the printed column will not `
+       + `add up — ${Object.values(st).join('/')}`);
+    /* Six components always, however bare the door: their absence is what
+       would look wrong, and a customer paying ₪700 for installation should see
+       the line whether or not they chose anything else. */
+    for (const k of ['door', 'cylinder', 'lock', 'mashkof', 'install', 'measure']) {
+      ok(rows.some(r => r.key === k),
+         `the breakdown dropped "${k}" — ${Object.values(st).join('/')}`);
+    }
   }
 
   for (const st of everyState()) {
@@ -1891,10 +1950,39 @@ group('the page still reaches Peretz with no JavaScript');
    trace, and it also pins the shape of the money itself. */
 group('every option has exactly one price, in whole agorot');
 {
-  const { SIZE, COLOUR, WINDOW, GRILLE, DETAIL, HANDLE, LOCKSET, agorot } =
+  const { BUILD, MASHKOF_WIDER, COLOUR, WINDOW, GRILLE, DETAIL, HANDLE, LOCKSET, agorot } =
     await import('../js/prices.js');
-  const pairs = [['size', Object.values(SIZES), SIZE, 'base'],
-                 ['colour', COLOURS, COLOUR, 'delta'], ['window', WINDOWS, WINDOW, 'delta'],
+
+  /* ⚠ SIZE IS NOT IN THIS SWEEP ANY MORE, and it needs its own check rather
+     than a quiet absence. A size used to carry a `base` — the whole installed
+     cost — out of a `SIZE` table in prices.js. Peretz's rule is a MULTIPLIER on
+     two of the six components instead (see `BUILD`), so there is no per-size
+     price left to pair up. What replaces it: every size must carry a usable
+     `mult`, or `Math.round(x * undefined)` is NaN all the way to the figure on
+     the screen, and nothing throws anywhere on the way. */
+  for (const z of Object.values(SIZES)) {
+    ok(typeof z.mult === 'number' && Number.isFinite(z.mult) && z.mult > 0,
+       `size "${z.id}" carries mult ${z.mult} — it multiplies the door and the `
+       + 'mashkof, and a missing one prices the whole door as NaN');
+  }
+
+  /* The six components of a fitted door. Their sum is the price of a standard
+     door with nothing on it, and it is Peretz's own arithmetic: ₪3,150. */
+  const BUILD_KEYS = ['door', 'cylinder', 'lock', 'mashkof', 'install', 'measure'];
+  for (const k of BUILD_KEYS) {
+    ok(Object.prototype.hasOwnProperty.call(BUILD, k),
+       `prices.js BUILD has no "${k}" — a missing part is money given away`);
+  }
+  for (const k of Object.keys(BUILD)) {
+    ok(BUILD_KEYS.includes(k),
+       `prices.js BUILD carries "${k}", which nothing adds up`);
+  }
+  ok(BUILD_KEYS.reduce((t, k) => t + agorot(BUILD[k]), 0) === 315000,
+     'the six parts of a standard fitted door must sum to ₪3,150 — Peretz, 26.8.2026');
+  ok(Number.isInteger(agorot(MASHKOF_WIDER)) && agorot(MASHKOF_WIDER) > 0,
+     'widening the mashkof must cost a whole positive number of agorot');
+
+  const pairs = [['colour', COLOURS, COLOUR, 'delta'], ['window', WINDOWS, WINDOW, 'delta'],
                  ['grille', GRILLES, GRILLE, 'delta'], ['detail', DETAILS, DETAIL, 'delta'],
                  ['handle', HANDLES, HANDLE, 'delta'], ['lockset', LOCKSETS, LOCKSET, 'delta']];
   for (const [what, list, table, key] of pairs) {

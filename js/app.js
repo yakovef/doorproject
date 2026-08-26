@@ -31,7 +31,8 @@ import {
   byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
   GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
 } from './catalog.js';
-import { formatAgorot, priceAgorot, priceLabel, priceParts } from './price.js';
+import { breakdownRows, formatAgorot, priceAgorot, priceLabel, tileAgorot }
+  from './price.js';
 import {
   describe, detailGlyph, gripAt, gripCanRotate, gripHome, gripIsFixed,
   gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
@@ -260,6 +261,16 @@ function init() {
      DRAWING_CAVEAT. */
   $('#draw-caveat').textContent = DRAWING_CAVEAT;
   $('#save-btn').addEventListener('click', saveCurrent);
+
+  /* The price opens its own breakdown. `hidden` and `aria-expanded` move
+     together — two statements of one fact, kept in one line so they cannot
+     disagree, which is the failure mode every disclosure on this page has. */
+  $('#price-toggle').addEventListener('click', () => {
+    const box = $('#breakdown'), btn = $('#price-toggle');
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    box.hidden = open;
+  });
   $('#works-close').addEventListener('click', closeWorks);
 
   /* ── THE PICTURE GOES WITH THE ORDER ──────────────────────────────
@@ -790,7 +801,63 @@ function buildPanel() {
  */
 function tilePrice(g, o, state) {
   const after = { ...repair({ ...state, [g.key]: o.id }).state, [g.key]: o.id };
-  return priceParts(after)[g.key];
+  /* ⚠ `tileAgorot`, not `priceParts(after)[g.key]`, and the difference is the
+     size. A size no longer has a price of its own — it multiplies the door and
+     the mashkof — so `priceParts` has no `size` key to read and this line
+     would have printed `undefined` on all six size tiles. The translation from
+     "which group is this" to "what number does it print" lives in `price.js`
+     beside the arithmetic, because that is the file that owns money. */
+  return tileAgorot(g.key, after);
+}
+
+/**
+ * WHAT EACH LINE OF THE BREAKDOWN IS CALLED.
+ *
+ * Keyed by `breakdownRows`' key, which is the FIELD — six components plus the
+ * priced groups plus the rounding — and there are thirteen of them, not
+ * sixty-odd options. That distinction is the same one `SPEC_ICONS` had to be
+ * corrected on: a table keyed by the option would need an entry per product
+ * and would silently draw nothing the day a new one arrived.
+ *
+ * ⚠ `lock` AND `lockset` ARE DIFFERENT THINGS AND MUST NOT READ ALIKE. `lock`
+ * is the multi-point mechanism inside every door Peretz sells, ₪200, part of
+ * the standard build. `lockset` is the lever and escutcheon the customer picks.
+ * Calling both of them "מנעול" in one column would make the breakdown look
+ * like it charges twice for the same thing.
+ */
+const BREAKDOWN_HE = {
+  door:     'הדלת',
+  cylinder: 'צילינדר',
+  lock:     'מנגנון נעילה',
+  mashkof:  'משקוף',
+  install:  'התקנה והובלה',
+  measure:  'מדידה וייעוץ',
+  colour:   'צבע',
+  detail:   'עיצוב החזית',
+  window:   'חלון',
+  grille:   'עיצוב החלון',
+  handle:   'ידית משיכה',
+  lockset:  'מנעול וידית',
+  round:    'עיגול',
+};
+
+/**
+ * The breakdown, rendered. One row per entry of `breakdownRows`, and the total
+ * repeated at the foot so the column can be checked without scrolling back up.
+ *
+ * ⚠ NO ARITHMETIC HERE. Every figure comes from `js/price.js`, including the
+ * rounding row. The one thing this function is allowed to do with a number is
+ * format it.
+ */
+function renderBreakdown(state) {
+  const body = $('#breakdown-body');
+  if (!body) return;
+  const rows = breakdownRows(state);
+  body.innerHTML = rows.map(r =>
+      `<tr><th scope="row">${BREAKDOWN_HE[r.key] || r.key}</th>`
+    + `<td>${formatAgorot(r.agorot)}</td></tr>`).join('')
+    + `<tr class="bd__total"><th scope="row">סה״כ</th>`
+    + `<td>${formatAgorot(priceAgorot(state))}</td></tr>`;
 }
 
 /** Repaint every option's price label against the door as it stands. */
@@ -1305,6 +1372,7 @@ function paint() {
      shape CLAUDE.md §5 is about. One statement, however many places show it. */
   const money = formatAgorot(priceAgorot(state));
   document.querySelectorAll('[data-price]').forEach(el => { el.textContent = money; });
+  renderBreakdown(state);
 
   /* ⚠ EVERY GROUP, FROM THE REAL ARITHMETIC. This loop used to run over the
      grille group alone, under a comment ending "Only the grille group needs

@@ -1307,6 +1307,52 @@ body {
 }
 .send__incl { font-size: .78rem; color: var(--ink-2); }
 
+/* ── the price opens ──────────────────────────────────────────────────
+   The figure is a button now (see index.html). It must not LOOK like one: a
+   price with a border round it reads as an action, and the action here is
+   secondary to the number. So the button is bare, and the only affordance is
+   the chevron — plus a real focus ring, because a control nobody can see is
+   still a control somebody has to reach. */
+.send__toggle {
+  display: flex; align-items: baseline; gap: 8px;
+  background: none; border: 0; padding: 0;
+  inline-size: 100%; text-align: start; cursor: pointer;
+  color: inherit; font: inherit;
+  /* A 44px floor without pushing the figure around: the figure is already
+     ~38px tall at 2.2rem/1.1, and 4px of block padding clears the target. */
+  padding-block: 3px;
+}
+.send__toggle:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.send__chev {
+  inline-size: 9px; block-size: 9px; flex: none;
+  border-inline-end: 1.5px solid var(--ink-2);
+  border-block-end:  1.5px solid var(--ink-2);
+  transform: rotate(45deg); transform-origin: 60% 60%;
+  transition: transform .18s var(--ease);
+}
+.send__toggle[aria-expanded="true"] .send__chev { transform: rotate(225deg); }
+
+.bd {
+  inline-size: 100%; border-collapse: collapse;
+  margin-block: 6px 2px;
+  font-size: .82rem;
+}
+.bd th, .bd td {
+  padding-block: 5px; text-align: start; font-weight: 400;
+  border-block-end: 1px solid var(--rule);
+}
+.bd th { color: var(--ink-2); }
+/* Tabular, and end-aligned, so the column can actually be added up by eye —
+   which is the entire reason this table exists. */
+.bd td {
+  text-align: end; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.bd__total th, .bd__total td {
+  font-weight: 600; color: var(--ink); border-block-end: 0;
+  padding-block-start: 7px;
+}
+
 .send__spec {
   margin: 0; padding-block: 8px;
   border-block: 1px solid var(--rule);
