@@ -23,6 +23,40 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-26 00:50 UTC — run 36: nothing worth changing — no new commits, full re-check comes back identical to run 35
+
+**Looked at:** `git fetch` found nothing new since run 35's own push
+(`eb80de9`); no human commits to review this cycle. `AGENT.md` unchanged
+(`git diff HEAD~10 -- AGENT.md` empty). `npm run build` produced no diff, so
+the bundle was already fresh. Opened the site at 390×844 and 1440×900 —
+both render exactly as in run 35: the phone view's sticky dock and
+accordion sections intact, the desktop's four-column layout and open
+sections intact, door/price/code all correct, nothing displaced or broken.
+
+**Instruments:** test ✓ (5,257,643 / 0, byte-identical count to run 35 —
+consistent, since nothing in the catalogue or renderer changed) · audit ✓
+(all seven viewports clean, all failure routes clean) · profile ✓ except
+the one already-known red, reproduced to the digit — `dark reed
+lower/upper 1.044` against a 1.03 gate; ogee rows still healthy (1.006 /
+1.000) · collide ✓ on both `all` (1,410 designs, faceObstacles agrees with
+the drawing everywhere) and `boxes` (every fitting fits its declared
+footprint, MOUNT_REACH 111 against the constant's 121) · recreate ✓ (only
+the same already-documented catalogue gaps — finish, bar length, the
+grid-vs-reeded either/or on d122 — nothing new).
+
+**Changed:** nothing. No new work landed to review, and nothing in a
+second independent look at the running site or a full instrument sweep
+turned up anything worth touching.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning as
+every run since 28 — CLAUDE.md §9 names the re-basing work and a five-hour
+check-in is not the place to attempt it without doing that derivation.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-25 20:51 UTC — run 35: nothing worth changing — pulled two more human commits, both re-verified in full
 
 **Looked at:** two new human commits — `c401564` (VERSION 13's `classic`
