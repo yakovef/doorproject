@@ -22,7 +22,7 @@ green and the work is pushed.
 
 | # | Phase | State | Landed |
 |---|---|---|---|
-| 0 | Groundwork — the stripe survey, container health, the assumption ledger | **not started** | |
+| 0 | Groundwork — the stripe survey, container health, the assumption ledger | ✅ **done** | 26.8 · survey in `INVENTORY.md` §5a/§5b — three doors were filed wrong · container **healthy**, 6/6 at 1280 and 1680, so **stage F is measurable** · baseline `npm test` 5,257,859 / 0 |
 | 1 | The price engine — components, multipliers, the breakdown panel | **not started** | |
 | 2 | The catalogue — removals, additions, sizes, one `VERSION` bump | **not started** | |
 | 3 | משקוף — the frame becomes a category | **not started** | |
@@ -859,19 +859,38 @@ existing survey (recorded in `CLAUDE.md` §3 "the face list as it stands") found
 - **fanned vertical** (many lengths): d038 d043
 - **crossed**: d047 d074 (metal strip) · d035 d066 (the pull bar crossing)
 
-Under D3's test — *at most two distinct lengths* — the **even** and **long**
-families pass and the **stepped**, **fanned** and **crossed** families fail.
-⚠ **Do not take that from this paragraph. Re-measure.** The instruction was
-explicit: *"look once agian at the 129 doors, and look at all of them that have
-stripes and copy the ones that are not complecated."* Two-length compositions
-may exist that the previous survey lumped into "stepped" — and a two-length
-composition passes. Use `tools/triage.mjs` contact sheets and, for anything
-ambiguous, one detail corner at high magnification, which is the instrument
-`CLAUDE.md` §3 records as the only one that separates these families.
+✅ **DONE — 26.8.2026. The result is in `research/works/INVENTORY.md` §5a and
+§5b; read it there, not here.** The headline, because it changes what gets
+built:
 
-Write the survey's result into `research/works/INVENTORY.md` **before** changing
-the catalogue, so the next agent can check the drawing against the finding
-rather than against this plan.
+- **Three doors were filed wrong and all three move INTO the surviving set.**
+  d045 and d078 were "ragged" and are even — d078 is nine full-width strips of
+  one length, d045 is five short ones of one length. d066 was "cross" and is
+  even: its vertical member is the **black pull bar**, not a strip. So the
+  even family is **eleven doors, not nine**, and the ragged family is **three,
+  not five**.
+- **`RHYTHM` is `[0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91]`** — six distinct
+  values, so the ragged family fails the test by our own numbers. It is also
+  written out **twice** in `js/renderer.js`, which is `CLAUDE.md` §5 wearing a
+  constant. Both copies go with the family.
+- **The spacing rule the count model needs:**
+  **pitch = min(0.19, 0.80 / (n − 1)), centred on 0.52 of the leaf.** Two
+  measured constants, no special cases: n=2 gives 0.425/0.615 against a measured
+  0.430/0.613, n=4 gives 0.235…0.805 against a measured 0.199…0.808.
+- ⚠ **And it does not cover the tight band.** d081 is six equal full-width
+  strips at pitch **0.033**, and d045 is five short ones in the same shape.
+  **The count model draws the spread composition only**; the tight band is two
+  doors, recorded and asked about rather than built, because a spread/tight
+  toggle puts a pattern choice back into the control whose whole purpose was to
+  remove one.
+
+⚠ **The automatic pass written for this found almost nothing, and the reason is
+worth carrying forward.** Of the 30 striped doors a large share carry a
+`fallback` leaf box — a generic centre rectangle, not a measurement — and
+d033's `auto` box has aspect **0.640** where a leaf is 0.415. The tool was
+measuring the wall. `CLAUDE.md` §8 already warns about this and it has now cost
+two surveys. **Check `src` before you measure.** What actually settled it was
+whole-door crops at 430×760 and a 5 % ruled grid on anything ambiguous.
 
 ### 9.2 The model
 
@@ -1423,12 +1442,19 @@ lighting is divided out.
 From `REALISM2.md` §6. At **≥1280 only**, the scene runs edge to edge with the
 price and choices cards floating over it.
 
-- ⚠ **It is blocked on a measurement, not on taste.** Chromium in this container
-  crashes its renderer on this page at 1280×720. **Establish container health
-  first** (Phase 0): if the twelve viewport × size measurements — door height
-  with and without a handle differing by 0.0 px, grip buttons ≥ 44 px and clear
-  of the frame, at 1280 and 1680 — cannot be taken, **the overlay yields, not
-  the controls.** Ship flanked at every width and say so in the ledger.
+- ✅ **NO LONGER BLOCKED — measured in Phase 0, 26.8.2026.** `REALISM2.md` §9b
+  filed this as *"blocked on a measurement that cannot be taken here"* because
+  Chromium crashed its renderer on this page at 1280×720 every time, under ten
+  launch-flag combinations. **It does not any more.** Six loads alternating
+  1280×720 and 1680×1050, on one browser, **6/6 survived with zero crashes** —
+  the door measuring 412×453 at 1280 and 812×783 at 1680, 258 elements. The
+  container is healthy and the twelve measurements can be taken.
+  ⚠ **Re-probe before starting the phase rather than trusting this line.**
+  CLAUDE.md §0c is explicit that container health is a property of whichever
+  container is running, not of the repository, and the ceiling drops as a
+  machine ages. If it has degraded by then, §6's own instruction stands: **the
+  overlay yields, not the controls** — ship flanked at every width and say so
+  in the ledger.
 - ⚠ `fitStage()` publishes `--wall` off `.stage-wrap`'s padding box, which is
   wrong the moment a card overlays that very strip. It must measure from the
   card's inner edge. `--grip-strip` stays reserved unconditionally within that
@@ -1688,6 +1714,7 @@ Phase 11 and is the whole of what remains open there.**
 | A12 | `barblack` (מוט שחור) is priced as a bar like the others — he wrote "nickel >100cm" and named no rate for a black one | one entry's `priceKind` |
 | A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | which window carries ₪4,200 and which ₪3,700 |
 | A14 | The reeded and ogee panel mouldings cost the same — he priced "two panels" once and named no families | two numbers, and possibly one whole family |
+| A15 | Evenly spaced stripes SPREAD across the leaf. The tight band (d045, d081 — same length, pitch 0.033) is not buildable | one more control, or one more constant |
 
 ⚠ **A2, A7 and A13 are the three worth asking first.** A2 changes every drawn
 dimension in the range; A7 decides whether two fittings appear on every door;

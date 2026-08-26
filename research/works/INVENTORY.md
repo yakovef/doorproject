@@ -117,12 +117,94 @@ Six doors, and on every one it is the most prominent thing about the door.
 
 ## 5. Face patterns
 
-*(⚠ RE-READ FROM THE PHOTOGRAPHS, not from this table's own earlier rows. All
-129 opened as contact sheets of leaf crops, then the thirty striped doors
-measured band by band with `tools/_strips.mjs` — rows whose median tone departs
-from the paint's own falloff, each band's ends found by walking the row. The
-finding is that "horizontal strips" was two designs and the commoner of the two
-had no tile.)*
+### 5a. ⚠ THE STRIPE SURVEY, RE-READ 26.8.2026 — AND THREE DOORS WERE FILED WRONG
+
+*This supersedes the stripe rows in the table below, which are left in place
+because the corrections are the useful part.*
+
+**Why it was re-read.** The old survey classified by SHAPE — even / ragged /
+long / fanned / cross. The question now is finer: Peretz is dropping the
+complicated compositions and pricing stripes **per stripe**, and the test asked
+for from outside is *more than two distinct stripe lengths in the design*. A
+door filed under "ragged" because its ends look uneven may still pass if the
+unevenness is only two values — or may not be ragged at all.
+
+**How.** Whole-door crops read at 430×760, then a 5 % ruled grid over any door
+whose lengths were not obvious at that scale. ⚠ **Not** off `auto/leaf.json`:
+an automatic pass was written first and it found almost nothing, because of the
+30 striped doors a large share carry a `fallback` leaf box — a generic centre
+rectangle, not a measurement — and d033's `auto` box has aspect **0.640** where
+a leaf is 0.415. The tool was measuring the wall. CLAUDE.md §8 already warns
+about this; it is now the second time it has cost a survey.
+
+**The finding.**
+
+| composition | distinct lengths | doors | verdict |
+|---|---|---|---|
+| **Horizontal, even, spread across the leaf** | **1** | d033(2) d035(2) d036(2) d039(5) d049(2) d056(2) d059(2) d066(5) d078(9) | ✅ keep |
+| **Horizontal, even, tight band** | **1** | d045(5) d081(6) | ✅ keep — but see the pitch problem below |
+| **Vertical, long, equal** | **1** | d037(3) d040(3) d046(3) | ✅ keep |
+| Horizontal, ragged | 4+ | d044 d064 d073 | ✗ drop |
+| Vertical, fanned | 4+ | d038 d043 | ✗ drop |
+| Crossed — a vertical strip AND horizontals | two directions | d047 d074 | ✗ drop |
+
+**Three doors were filed wrong, and all three move INTO the surviving set:**
+
+- **d045 and d078 were "ragged" and are even.** d078 is nine full-width strips
+  of one length spread over the whole leaf; d045 is five short strips of one
+  length in a tight band. Neither has an uneven end.
+- **d066 was "cross" and is even.** Its vertical member is the **black pull
+  bar**, not a strip — which this file's own note already suspected of three of
+  the four crossed doors. Under the bar it is five equal full-width strips.
+
+So **the even family is eleven doors, not nine**, and the ragged family is
+**three, not five**. Every drop is a genuine drop: d044, d064 and d073 step
+through four or more lengths, d038 and d043 fan, and d047 and d074 run both ways
+at once.
+
+⚠ **`RHYTHM` in `js/renderer.js` is `[0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91]`
+— six distinct values.** That is the ragged family stated in our own code, and it
+fails the test by its own numbers. It is also written out **twice**, at two
+places in that file, which is CLAUDE.md §5 wearing a constant. Both copies go
+with the family.
+
+### 5b. The spacing rule the count model needs
+
+Peretz's model is a COUNT, not a pattern, so the drawing has to derive placement
+from a number. Measured:
+
+```
+2 strips   0.430  0.613                              pitch 0.183   (d035 d036 d049)
+4 strips   0.199  0.402  0.611  0.808                pitch 0.203
+9 strips   ~0.10 … ~0.90                             pitch ~0.100  (d078)
+```
+
+One rule reproduces all three:
+
+> **pitch = min(0.19, 0.80 / (n − 1)), centred on 0.52 of the leaf.**
+
+n=2 gives 0.425 / 0.615 against a measured 0.430 / 0.613; n=4 gives 0.235 …
+0.805 against a measured 0.199 … 0.808. Two constants, both measured, no
+special cases.
+
+⚠ **AND IT DOES NOT COVER THE TIGHT BAND.** d081 is **six** equal full-width
+strips at a pitch of **0.033** centred on 0.55 — read off a 5 % grid — and d045
+is five short ones in the same shape. Under the rule above, six strips spread
+across 0.80 of the leaf. So the tight band is a genuinely second composition and
+a count alone cannot choose between them.
+
+**Decision: the count model draws the SPREAD composition only.** It covers nine
+of the eleven even doors; the tight band is recorded here and asked about in
+`ASK-PERETZ.md` rather than built, because adding a spread/tight toggle puts a
+pattern choice back into a control whose whole purpose was to remove one. Two
+doors, named, not silently lost.
+
+*(⚠ The table below is the OLD reading. All 129 were opened as contact sheets of
+leaf crops, then the thirty striped doors measured band by band with
+`tools/_strips.mjs` — rows whose median tone departs from the paint's own
+falloff, each band's ends found by walking the row. Its finding — that
+"horizontal strips" was two designs and the commoner had no tile — was right.
+Its assignment of d045, d066 and d078 was not.)*
 
 | pattern | doors | verdict |
 |---|---|---|
