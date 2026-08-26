@@ -23,6 +23,51 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-26 10:49 UTC — run 38: nothing worth changing — no new commits, and a deeper visual pass turned up nothing either
+
+**Looked at:** `git fetch` found nothing new since run 37's push
+(`3e8045c`). `AGENT.md` unchanged. `npm run build` produced no diff.
+Given three straight runs with nothing new to pull, spent this one looking
+harder rather than just repeating the same phone/desktop shot: rendered
+the standard views (identical to run 37), then six targeted combinations
+exercising the newest catalogue additions together rather than in
+isolation — `stripsvl3`/`stripsvl4` at tall and wide sizes, `panel3` with
+an Idan bar at narrow, `panel2o` (ogee) with a window and Ella pull,
+`classic` solid with a black bar at wide, and `classic` half with a
+rectangular window and ring-lattice grille. All six rendered correctly —
+column pitch and staggered feet on the vertical stripes match the
+documented measurement, the classical set's cornice/frieze/shelf/plinth
+read as a coherent composition with no glazing-over-frieze artifact, no
+overlapping ironwork.
+One combination (`panel3` + a customer-chosen grip) briefly looked like it
+might be a double-handle defect — the panel's own bolted turned pull and a
+separate Idan bar both visible on the same leaf — until `js/renderer.js`
+around line 2241 turned out to document exactly this on purpose: the plate
+pull is part of the FACE (matching all three source photographs, each of
+which shows the same bolted pull), and is deliberately kept independent of
+`state.handle` so a customer can still choose a real grip. Not a defect;
+traced to source before writing it down as one.
+
+**Instruments:** test ✓ (5,257,643 / 0, same count as the last three runs)
+· audit ✓ (all seven viewports clean, all failure routes clean) · profile
+✓ except the one already-known red, reproduced to the digit — `dark reed
+lower/upper 1.044` against a 1.03 gate — ogee rows healthy (1.006 / 1.000)
+· collide ✓ on both `all` (1,410 designs) and `boxes` (every fitting fits
+its declared footprint) · recreate ✓ (same already-documented catalogue
+gaps, nothing new).
+
+**Changed:** nothing. A closer look at combinations of the recent additions
+found nothing wrong beyond a false alarm that resolved on reading the
+renderer's own comment.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning as
+every run since 28.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-26 05:50 UTC — run 37: nothing worth changing — no new commits, full re-check comes back identical to run 36
 
 **Looked at:** `git fetch` found nothing new since run 36's own push
