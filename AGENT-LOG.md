@@ -23,6 +23,34 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-26 15:51 UTC — run 39: nothing worth changing — no new commits, and `npm run shot` run explicitly for the first time in a while
+
+**Looked at:** `git fetch` found nothing new since run 38's push
+(`2475abb`). `AGENT.md` unchanged. `npm run build` produced no diff. Opened
+the site at 390×844 and 1440×900 — identical to run 38's screenshots.
+
+**Instruments:** test ✓ (5,257,643 / 0) · audit ✓ (all seven viewports
+clean, all failure routes clean) · profile ✓ except the one already-known
+red, reproduced to the digit — `dark reed lower/upper 1.044` against a 1.03
+gate — ogee rows healthy (1.006 / 1.000) · collide ✓ on both `all` (1,410
+designs) and `boxes` (every fitting fits its declared footprint) ·
+recreate ✓ (same already-documented catalogue gaps) · **`npm run shot` run
+explicitly this time** (all twelve named sheets — phone, laptop, desktop,
+panel, grey, plate, strips, stripsv, digital, sidelight, halfleaf, tablet —
+report clean, and `git status --short` after the regeneration shows zero
+bytes changed anywhere, confirming the sheets stay exactly what the current
+renderer draws).
+
+**Changed:** nothing. Nothing new to review and nothing wrong found.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning as
+every run since 28.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-26 10:49 UTC — run 38: nothing worth changing — no new commits, and a deeper visual pass turned up nothing either
 
 **Looked at:** `git fetch` found nothing new since run 37's push
