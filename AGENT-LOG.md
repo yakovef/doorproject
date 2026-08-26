@@ -47,8 +47,7 @@ independent instrument sweep found nothing worth touching.
 as every run since 28 — CLAUDE.md §9 names the re-basing work and a
 five-hour check-in should not attempt it without doing that derivation.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** 05d8aca
 
 ---
 
