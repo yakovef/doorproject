@@ -46,8 +46,7 @@ renderer draws).
 **Left alone deliberately:** the `dark reed` profile red, same reasoning as
 every run since 28.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** 9a24f0d
 
 ---
 
