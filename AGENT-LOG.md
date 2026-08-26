@@ -23,6 +23,49 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-26 20:47 UTC — run 40: nothing worth changing — one solid human fix, re-verified and confirmed by eye
+
+**Looked at:** one new human commit, `e2ae3bb` (the classical set's glazed
+light had no casing at its foot: `winFrac.bot` was 0.5545, which turned out
+to be the CASING's outer edge entered as the glass's, not where the pane
+actually stops — a rectified-photograph scan puts the rebate at 0.530.
+`CLASSIC_BAND_FOOT = 9`, a constant that existed only to stop the casing
+running into the shelf, is deleted along with `aperture`'s `bandFoot`
+parameter; the casing is now one uniform 59 mm on all four sides, matching
+the head and both sides exactly. `winFrac.bot` corrected to 0.526 — a
+property value, not an id or list-order change, so no `VERSION` bump, and
+none was taken). Fast-forwarded cleanly. Built (no diff — bundle already
+fresh). Verified the fix directly rather than trusting the commit message
+alone: rendered the classical set with a rectangular window at standard,
+tall and wide sizes — all three now show a clean, uniformly mitred casing
+border on all four sides of the light including the foot, where before
+this fix the pane would have run straight into the shelf with the
+moulding painted over by the glass. Standard phone/desktop views
+unchanged from every prior run.
+
+**Instruments:** test ✓ (5,257,859 / 0, matches the commit's own count
+exactly) · audit ✓ (all seven viewports clean) · profile ✓ except the one
+already-known, unrelated red — `dark reed lower/upper 1.044` — unaffected
+by this fix since it touches a different moulding entirely · collide ✓ on
+both `all` (1,410 designs, matches the commit's own count) and `boxes`
+(every fitting fits its declared footprint) · recreate ✓ (same
+already-documented catalogue gaps, nothing new).
+
+**Changed:** nothing further. The human's fix was thorough, well-verified
+in its own commit message (including a falsification-style note on why
+`collide -- all` could never have caught this — a moulding drawn inside
+its own pane is one group overlapping itself, and the sweep only compares
+pairs of different objects), and my own independent render confirms it
+visually. CLAUDE.md was already updated in the same commit.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning
+as every run since 28 — unrelated to this round's fix.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-26 15:51 UTC — run 39: nothing worth changing — no new commits, and `npm run shot` run explicitly for the first time in a while
 
 **Looked at:** `git fetch` found nothing new since run 38's push
