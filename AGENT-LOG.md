@@ -23,6 +23,35 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-26 05:50 UTC — run 37: nothing worth changing — no new commits, full re-check comes back identical to run 36
+
+**Looked at:** `git fetch` found nothing new since run 36's own push
+(`3f4aeab`). `AGENT.md` unchanged. `npm run build` produced no diff. Opened
+the site at 390×844 and 1440×900 — pixel-for-pixel the same as run 36's
+screenshots: phone dock and accordion intact, desktop four-column layout
+and open sections intact, door/price/code correct.
+
+**Instruments:** test ✓ (5,257,643 / 0, same count as the last two runs) ·
+audit ✓ (all seven viewports clean, all failure routes clean) · profile ✓
+except the one already-known red, reproduced to the digit — `dark reed
+lower/upper 1.044` against a 1.03 gate — ogee rows healthy (1.006 / 1.000)
+· collide ✓ on both `all` (1,410 designs, faceObstacles agrees with the
+drawing everywhere) and `boxes` (every fitting fits its declared
+footprint, MOUNT_REACH 111 against the constant's 121) · recreate ✓ (same
+already-documented catalogue gaps, nothing new).
+
+**Changed:** nothing. No new work landed to review, and a second
+independent instrument sweep found nothing worth touching.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning
+as every run since 28 — CLAUDE.md §9 names the re-basing work and a
+five-hour check-in should not attempt it without doing that derivation.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-26 00:50 UTC — run 36: nothing worth changing — no new commits, full re-check comes back identical to run 35
 
 **Looked at:** `git fetch` found nothing new since run 35's own push
