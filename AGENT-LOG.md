@@ -61,8 +61,7 @@ visually. CLAUDE.md was already updated in the same commit.
 **Left alone deliberately:** the `dark reed` profile red, same reasoning
 as every run since 28 — unrelated to this round's fix.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** 0124130
 
 ---
 
