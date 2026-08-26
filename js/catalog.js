@@ -900,7 +900,7 @@ export const DETAILS = [
        0.706 against these 0.289 and 0.711, which is 0.007 and inside the
        instrument's own error, and drawing them back over the photograph in red
        put them on the glass twice. */
-    winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.550 } },
+    winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 } },
 ];
 
 /**

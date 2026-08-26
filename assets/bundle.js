@@ -1133,7 +1133,7 @@
          0.706 against these 0.289 and 0.711, which is 0.007 and inside the
          instrument's own error, and drawing them back over the photograph in red
          put them on the glass twice. */
-      winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.55 }
+      winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 }
     }
   ];
   var FINISHES = [
@@ -1689,7 +1689,6 @@
   <g id="glazing">
     ${openings.map((o, i) => aperture({
       band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
-      bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
       x: mainX + o.x,
       y: y0 + o.top,
       w: o.w,
@@ -3220,7 +3219,7 @@ ${body}
       leafH
     );
     const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
-    const paneFoot = detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND;
+    const paneFoot = paneBand;
     const out = openings.map((o) => ({
       kind: "window",
       x: o.x - paneBand,
@@ -3936,11 +3935,10 @@ ${body}
     leaf = null,
     splits = [],
     band = MOULD_BAND,
-    bandFoot = band,
     profile = MOULD_DEFAULT
   }) {
     const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint2, key) : null;
-    const M = band, MF = bandFoot;
+    const M = band, MF = band;
     const id = `cl-${key}`;
     return `
     <g data-pane="${key}" data-glass="${grille.glass ? grille.id : "clear"}">
@@ -4385,7 +4383,6 @@ ${body}
   var CLASSIC_GLASS = byId(DETAILS, "classic").winFrac;
   var CLASSIC_CORBEL = { w: 0.07, gap: 6e-3 };
   var CLASSIC_BAND = 59;
-  var CLASSIC_BAND_FOOT = 9;
   function classicLight(leafW, leafH) {
     const [o] = apertureLayout(
       byId(WINDOWS, "rect"),
@@ -4397,7 +4394,7 @@ ${body}
       x: o.x - CLASSIC_BAND,
       y: o.top - CLASSIC_BAND,
       w: o.w + CLASSIC_BAND * 2,
-      h: o.h + CLASSIC_BAND + CLASSIC_BAND_FOOT
+      h: o.h + CLASSIC_BAND * 2
     };
   }
   function classicPieces(leafW, leafH, glazed = true) {
@@ -4451,7 +4448,7 @@ ${body}
          reported from outside: *"when i put on a window the panel changes, it
          supposed to be the same size."* It was true and it was two rectangles.
          The glazed variant's outline is drawn by `aperture`, which cases the
-         light in CLASSIC_BAND all round and CLASSIC_BAND_FOOT under it; the
+         light in CLASSIC_BAND all round; the
          solid one was written here off `C.panel`, on a reading of the solid
          photograph that made the upper rectangle as wide as the lower one. Both
          readings can be defended off their own photograph and only one of them

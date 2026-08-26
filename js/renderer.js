@@ -1078,7 +1078,6 @@ export function render(state) {
   <g id="glazing">
     ${openings.map((o, i) => aperture({
       band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
-      bandFoot: detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND,
       x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
       splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
       paint, edge, grille, key: 'm' + i, profile: mouldOf(detail),
@@ -3056,7 +3055,7 @@ export const faceObstacles = memo(function faceObstacles(state) {
      for the classical set the drawing now says 59: an obstacle eleven
      millimetres bigger than the thing it describes is the §5 shape again. */
   const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
-  const paneFoot = detail.classic ? CLASSIC_BAND_FOOT : MOULD_BAND;
+  const paneFoot = paneBand;
   const out = openings.map(o => ({
     kind: 'window', x: o.x - paneBand, y: o.top - paneBand,
     w: o.w + paneBand * 2, h: o.h + paneBand + paneFoot,
@@ -4687,7 +4686,7 @@ export const apertureLayout = memo(function apertureLayout(win, leafW, detail, l
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
-                    splits = [], band = MOULD_BAND, bandFoot = band,
+                    splits = [], band = MOULD_BAND,
                     profile = MOULD_DEFAULT }) {
   /* WORKED GLASS IS A GRILLE NOW. The pattern in the pane and the ironwork
      over it were two choices and are one, so the same option decides both:
@@ -4730,7 +4729,7 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
      the frieze above and 61 mm into the shelf below. `npm run collide -- all`
      reported that as eight "moulding x pane" overlaps and it was right — two
      pieces of joinery drawn through each other, not an instrument artefact. */
-  const M = band, MF = bandFoot;
+  const M = band, MF = band;
   const id = `cl-${key}`;
   return `
     <g data-pane="${key}" data-glass="${grille.glass ? grille.id : 'clear'}">
@@ -5606,12 +5605,27 @@ const CLASSIC_GLASS = byId(DETAILS, 'classic').winFrac;
    exists to catch. */
 const CLASSIC_CORBEL = { w: 0.070, gap: 0.006 };
 export const CLASSIC_BAND = 59;
-/* And at the FOOT of that light there is barely any casing at all, because the
-   SHELF is what closes it: 0.5545 to 0.559 of the leaf, nine millimetres. Drawn
-   with 59 all round, the casing and the shelf's corona are two pieces of
-   joinery through each other for fifty of them — which `npm run collide -- all`
-   reported, correctly, as an overlap. */
-export const CLASSIC_BAND_FOOT = 9;
+/* ⚠ ALL ROUND, AND THERE WAS A `CLASSIC_BAND_FOOT` OF NINE MILLIMETRES HERE.
+   It said the shelf closes the light so there is barely any casing under it —
+   0.5545 to 0.559 of the leaf — and it was a fudge covering a wrong number one
+   level up. `winFrac.bot` held 0.5545, which is not where the GLASS stops: a
+   scan down the middle of the rectified leaf finds the pane's black rebate at
+   0.530 and the shelf's top at 0.554, with a lit moulded band between them.
+   0.5545 was the CASING's outer edge, entered as the glass's.
+
+   Two things followed from that and both were visible. `moulding()` draws all
+   four of its runs at the same band, so the bottom run — 59 tall in a
+   rectangle only 9 deep below the glass — reached 50 mm UP INTO the pane and
+   the glass was then painted over it, leaving the light with no casing at its
+   foot at all. Reported from outside as *"when i put on the window, on the
+   bottom it ovelaps the panel."*
+
+   The casing is ONE section mitred round the opening, 59 mm on all four sides:
+   the head reads 0.125 to 0.154 of the leaf's height, 59 mm, and the sides
+   0.220 to 0.289 of its width, 59 mm. A uniform 59 puts the glass's foot at
+   0.554 - 0.029 = 0.525, and the direct read of the rebate is 0.530 — nine
+   millimetres apart, which is this instrument's own error at that scale and
+   less than the width of the rebate line itself. One number, four sides. */
 
 /**
  * THE SET'S PIECES AS RECTANGLES, NAMED ONCE.
@@ -5657,7 +5671,7 @@ function classicLight(leafW, leafH) {
                              byId(DETAILS, 'classic'), leafH);
   return { x: o.x - CLASSIC_BAND, y: o.top - CLASSIC_BAND,
            w: o.w + CLASSIC_BAND * 2,
-           h: o.h + CLASSIC_BAND + CLASSIC_BAND_FOOT };
+           h: o.h + CLASSIC_BAND * 2 };
 }
 
 export function classicPieces(leafW, leafH, glazed = true) {
@@ -5708,7 +5722,7 @@ export function classicPieces(leafW, leafH, glazed = true) {
        reported from outside: *"when i put on a window the panel changes, it
        supposed to be the same size."* It was true and it was two rectangles.
        The glazed variant's outline is drawn by `aperture`, which cases the
-       light in CLASSIC_BAND all round and CLASSIC_BAND_FOOT under it; the
+       light in CLASSIC_BAND all round; the
        solid one was written here off `C.panel`, on a reading of the solid
        photograph that made the upper rectangle as wide as the lower one. Both
        readings can be defended off their own photograph and only one of them

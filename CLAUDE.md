@@ -143,7 +143,7 @@ door" means in every other sentence in this file.
 
 ### Green
 
-- `npm test` — **5,257,643 assertions passing, 0 failed**, no framework, plain
+- `npm test` — **5,257,859 assertions passing, 0 failed**, no framework, plain
   node. It was 3.70M before the classical set and 5.68M before the 24.8
   interface round; the catalogue lists change length and the combinatorial
   sweeps are the product of those lengths, so the total moves with the range in
@@ -603,6 +603,10 @@ about it are load-bearing and easy to undo by accident:
   for whatever the window option would have drawn, so the glass clears the
   frieze above it and the shelf below. `repair` forces `window: 'rect'` off
   `rectOnly`, so the substitution can never be invisible.
+  ⚠ **`bot` IS THE GLASS, NOT THE CASING.** It held 0.5545 — the casing's outer
+  edge — and `CLASSIC_BAND_FOOT = 9` existed to absorb the difference. The pane
+  measures 0.530 at its rebate and the casing is one 59 mm section mitred all
+  round, so the glass's foot is 0.526. See the change log for 26.8.
   ⚠ **Fractions, not millimetres, and `leafH` is threaded through for them.**
   Every other piece of that composition is a fraction of the leaf; written in
   millimetres the light stayed one size while the ornament round it grew with
@@ -1166,6 +1170,29 @@ how it got there. Detail lives in the section it belongs to.
   check that cannot be broken on purpose is not hardened, it is blind, and
   proving the difference is what the falsification is for.
 
+- **⚠ THE LIGHT HAD NO CASING AT ITS FOOT, AND A NINE-MILLIMETRE CONSTANT WAS
+  COVERING A WRONG NUMBER ONE LEVEL UP.** Reported as *"when i put on the
+  window, on the bottom it ovelaps the panel, fix the window size."*
+  `winFrac.bot` held 0.5545, and that is not where the GLASS stops. A scan down
+  the middle of the rectified leaf finds the pane's black rebate at **0.530**
+  and the shelf's top at 0.554, with a lit moulded band between them: 0.5545
+  was the CASING's outer edge, entered as the glass's.
+  Two things followed and both were visible. `CLASSIC_BAND_FOOT = 9` existed to
+  stop the casing running into the shelf — the leftover between a glass line
+  that was really the casing line and the shelf — and `moulding()` draws all
+  four of its runs at the same band, so the bottom run, 59 tall in a rectangle
+  only 9 deep, reached **50 mm up into the pane**; the glass was then painted
+  over it and the light came out with no casing under it at all.
+  The casing is ONE section mitred round the opening, 59 mm on all four sides:
+  the head reads 0.125 to 0.154 of the leaf's height and the sides 0.220 to
+  0.289 of its width, both 59. A uniform 59 puts the glass's foot at 0.525
+  against the rebate's direct read of 0.530 — nine millimetres, which is less
+  than the width of the rebate line itself. `CLASSIC_BAND_FOOT` is gone and so
+  is `aperture`'s `bandFoot`; one number, four sides.
+  ⚠ `npm run collide -- all` had been clean through all of this, and correctly:
+  a run of moulding drawn inside the pane is one group overlapping ITSELF, and
+  the sweep compares pairs of different objects. An instrument that cannot see
+  a thing is not evidence the thing is absent.
 - **Five more photographs: a stripe design the list could not draw, and the
   three-panel proportions once more.** *"add this strope option, and look at the
   proportions of the 3 panel option, make our 3 panel option look like this."*
