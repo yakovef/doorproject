@@ -132,7 +132,7 @@ written rather than rewritten, but do not add more.
 
 ---
 
-## 0c. Where it stands today — 24.8.2026
+## 0c. Where it stands today — 26.8.2026
 
 **The site works and is not launched.** Every price on it is invented.
 
@@ -153,9 +153,12 @@ door" means in every other sentence in this file.
   buildable designs**, real `getBBox` geometry from a browser. Check both
   flags yourself; a "clean" claim about `collide` that does not say which of
   the two it means has been wrong before (see "Red, and known").
-- `npm run audit`, `npm run recreate`, `npm run profile`, `npm run sheets` —
+- `npm run audit`, `npm run recreate`, `npm run sheets`, `npm run latency` —
   all clean **on a healthy container**, which is not every container. See
   "Red, and known" directly below before believing any of it.
+- ⚠ `npm run profile` is the ONE exception and it is red on purpose: one row of
+  four, understood, written down, and NOT silenced. Read the next section
+  before touching it.
 - The drawing recreates all 30 measured doors, plus the classical-set door in
   `research/newdoor/` that Peretz installed on 24.8; the order carries the full
   specification, a picture, an unambiguous opening direction, a price and a
@@ -301,7 +304,16 @@ What to know for the days it degrades:
 
 ### Blocked on a human
 
-`ASK-PERETZ.md` holds thirteen numbered questions. Two things to know:
+`ASK-PERETZ.md` holds fourteen numbered questions. §14 is the newest and the
+longest: it collects everything the last four rounds of photographs opened —
+the classical set glazed and solid, the ring grille, the black bar and the long
+black bars, whether the three-panel face always comes with its pull, the
+crossed strips, **whether both panel mouldings are his**, and **whether both
+stripe families (horizontal and vertical) are his**. Eight prices and two
+yes/no questions. The mouldings one is the important one: it is not about a
+price, it is about what exists.
+
+Two more things to know:
 
 - **ASK-PERETZ §1, the ימין/שמאל convention, is ANSWERED** (23.8.2026) — and the answer
   showed the site had it backwards, so every order it had ever produced named
@@ -590,6 +602,65 @@ outside it`.
 across the panel's stile. Settled by an edge-gradient ruler over the
 photographs: real panel edges sit at 0.21–0.39 of leaf width.
 
+### The face list as it stands — 22 options in two halves
+
+`DETAILS` is 22 entries. `sub` puts each in a half and `buildOptions` groups by
+it, so **the order on the screen and the order in the array are two different
+things** — the array's order is a wire format (the short code packs its INDEX)
+and the screen's is not. `plain` has no `sub` and is drawn first with no
+heading over it.
+
+| | count | ids |
+|---|---|---|
+| — | 1 | `plain` |
+| **פאנלים** | 7 | `panel` `panel2` `panelTop` `panel3` `panelo` `panel2o` `classic` |
+| **פסים** | 14 | `strips2` `strips4` `stripsband` `strips3` `strips5` `strips7` `strips9` `strips` `stripsvl3` `stripsvl4` `stripsv3` `stripsv` `stripsv6` `stripsx` |
+
+**Every family below is a MEASURED composition and they are not variations of
+one thing.** The recurring mistake in this file's history is deriving one from
+another — `trio` from `pair`, a stripe count from a span formula — so each is
+its own table with its own doors named.
+
+**Panels.** `PANEL_ROWS` holds `pair`, `trio`, `top` and `lone`;
+`PANEL_INSETS` holds the one inset that is not `PANEL_INSET`.
+
+- `pair` 0.07–0.58 and 0.66–0.92, inset 0.23.
+- `trio` 0.061–0.455, 0.480–0.586, 0.607–0.944, inset 0.15. ⚠ **The middle
+  rectangle is a HANDLE PLATE** and `grab: true` makes the face bring its own
+  turned pull — d067, d068, d077 all carry it; d065, d070 and d087 are the same
+  door WITHOUT the plate. Measured off d067's flat catalogue elevation and two
+  installed shots. The check that says it is right is the MARGINS: 125 mm at
+  the head, 115 at the foot, 128 at the sides — equal all round, which is what
+  a panelled door is.
+- The `…o` twins are the same rectangles in the OGEE section. Nothing else
+  differs, not even the price.
+
+**Horizontal strips — two families, and the commoner one had no tile for
+months.** `STRIP_ROWS` holds the even ones as measured lists, not a formula.
+
+- **even, full width**: nine corpus doors (d033 d035 d036 d039 d049 d056 d059
+  d066 d081). `strips2` is a PAIR about the lock's height at 0.43 and 0.61 —
+  ⚠ not `strips3` minus one; a span formula would put them at 0.23 and 0.77.
+  `strips4` off d063. `stripsband` is eight fine lines at a spacing of 0.028
+  repeated seven times, a fifth of the leaf, off d081.
+- **ragged**: five doors (d044 d045 d064 d073 d078), anchored at the hinge
+  stile with free ends following a measured rhythm, tight at the head and foot
+  and open across the middle. `strips3` `strips5` `strips7` `strips9` `strips`.
+
+**Vertical strips — two families sharing one set of columns.** `STRIP_V` is
+`{ pitch: 0.073, mid: 0.33 }`, measured on three doors independently (d037
+ruled, d038 and d043 from the hand-measured records) and identical to three
+decimals on all three. So the two families are the same columns and differ only
+in the band LENGTHS — ⚠ which is also why a corpus record cannot tell them
+apart, since a record carries each line's `x` and not its length.
+
+- **long**: `stripsvl3` `stripsvl4` — tops level at 0.098, feet staggered
+  0.945 to 0.915, thinner bands (0.013 of the width). d037 d040 d046.
+- **fanned**: `stripsv3` `stripsv` `stripsv6` — each band a different length,
+  tops climbing 0.39 to 0.05 off a common foot at 0.778. d038 d043.
+- `stripsx` is the cross, off d047. ⚠ On three of its four doors the vertical
+  member is the PULL BAR, not a strip.
+
 **One face does not go through `appliedFrame` at all: `classic`, the סט
 קלאסי.** `classicSet` draws it whole — cornice, frieze, corbelled shelf with
 its own turned pull, panel, plinth — because those pieces are proportioned to
@@ -599,7 +670,7 @@ about it are load-bearing and easy to undo by accident:
 
 - **It supplies its own opening, as FRACTIONS.**
   `apertureLayout(win, leafW, detail, leafH)` substitutes `detail.winFrac`
-  (0.289–0.711 across, 0.154–0.550 down: 359 x 812 at 316 on a standard leaf)
+  (0.289–0.711 across, 0.154–0.526 down: 359 x 763 at 316 on a standard leaf)
   for whatever the window option would have drawn, so the glass clears the
   frieze above it and the shelf below. `repair` forces `window: 'rect'` off
   `rectOnly`, so the substitution can never be invisible.
@@ -624,11 +695,40 @@ about it are load-bearing and easy to undo by accident:
   both, the architrave's top run painted over the frieze's bottom edge — see
   the change log for 25.8. `render` builds the glazing once and places it at
   one of two points.
-- **⚠ THE MEASUREMENTS COME OFF A RECTIFIED CROP, `tools/_upright2.mjs`.** The
-  door in that photograph lies two degrees off level and tapers, so an
-  axis-aligned rectangle shears it and the shear grows down the leaf. That is
-  why the pieces at the head and the foot were drawn narrow and the two in the
-  middle were right. Do not measure this door off `_upright.mjs`.
+- **⚠ THE MEASUREMENTS COME OFF A RECTIFIED CROP, AND THE FOUR CORNERS ARE
+  WRITTEN DOWN HERE BECAUSE THE TOOL IS NOT COMMITTED.** The door in
+  `research/newdoor/full.jpg` lies about two degrees off level and is further
+  from the camera at its foot than at its head, so its outline is a TRAPEZOID —
+  1626 px across at the head, 1558 at the foot. An axis-aligned rectangle
+  shears it and the shear grows down the leaf, which is exactly why the pieces
+  at the head and the foot came out narrow and the two in the middle came out
+  right. **Do not measure this door off `_upright.mjs`, and do not cut a
+  rectangle out of it.**
+
+  **`node tools/rectify.mjs`** does it, and it is in the committed toolkit
+  rather than under `tools/_*` on purpose: every one of those tables is a
+  fraction of what it produces, the set will be measured again, and
+  re-deriving a bilinear rectification from a paragraph of prose is forty lines
+  of fiddly code somebody would have to get right under pressure. ⚠ Its output
+  height for this door is PINNED at 3730 — deriving it from the edge lengths
+  gives 3749, and an instrument that produces a slightly different picture from
+  the one the numbers came off is a trap.
+
+  The four corners are also written out here, in `full.jpg`'s own pixels
+  (4000 x 1844), so they survive the file. They were read off two ruled crops
+  of the raw image — the head end at x 0.015–0.20 and the foot at 0.82–0.995,
+  each with a 0.05 grid down it. **Not by eye on the whole frame**: an edge two
+  degrees off level is invisible at full-frame scale and obvious at 5x.
+
+  ```
+  head-top    112,   89       foot-top    3842,  175
+  head-bottom 112, 1715       foot-bottom 3842, 1733
+  ```
+
+  Rectified bilinearly between the two long edges into 1600 x 3730, head at the
+  top and the LOCK side at the left (which is how the app draws a right-in
+  door — the photograph's small-y side is the HINGE side). Everything in
+  `CLASSIC_ROWS`, `CLASSIC_COLS` and `winFrac` is a fraction of THAT.
 - **Its panel is tagged `data-detail="panel"` with a `data-top`, inside the
   set's group.** Three assertions read that markup to ask whether the panel a
   customer is charged for is a panel that is drawn, and one of them goes DEAD
@@ -636,6 +736,33 @@ about it are load-bearing and easy to undo by accident:
 - **`classicBand` is the composition that appears three times** — frieze,
   shelf, plinth — with `tablet`/`flute` ends and a `plain`/`oval` middle. It
   was three copies before anybody put the three close-ups side by side.
+  ⚠ And the frieze and the plinth are the SAME WIDTH, 0.588 of the leaf. That
+  is the check the column table never had: this piece is built on the claim
+  that the plinth is the frieze upside down, and the drawing had it 33 mm wider
+  while claiming it.
+- **⚠ THE CORBELS ARE `corbelL` / `corbelR`, PIECES OF THEIR OWN, AND THEY ARE
+  DRAWN AFTER THE SHELF.** They used to live inside the band's group, which
+  widened the band's declared span to 0.210–0.790 so it covered them — and
+  forced the DRAW ORDER: the brackets went down before the shelf, so the
+  shelf's cast shadow (0.80 of its own height, blurred) lay across them and
+  they came out as two grey smudges. A corbel stands proud of the band and
+  CARRIES the shelf; the one thing it is not in is the shelf's shadow. The band
+  is back to its own 0.286–0.714 and the same leaf is covered by three
+  rectangles instead of one.
+  The bracket itself is four CONVEX ROLLS that fill it edge to edge and
+  CONVERGE — tops spanning 0.06 to 0.94 of its width, feet only 0.00 to 0.55 —
+  which is what makes it a wedge rather than a fringe. Rebuilt five times; the
+  fifth time the path was right and the weight and the order were wrong.
+- **The cornice's ends SWEEP.** A square end is the tell of a plank and a
+  45-degree mitre is the tell of a drawing that knew that and stopped there;
+  each end of the corona turns down in a quarter-round return. The corona takes
+  0.77 of its cap, not 0.68.
+- **The head is CONTIGUOUS.** Cornice, dentil course and frieze block used to
+  leave 0.003 and 0.004 of bare leaf between them — six and eight millimetres,
+  never measured, just what is left when three edges are each read to the
+  nearest thousandth and nothing checks that they meet. At door scale that
+  reads as three pieces floating. The dentils span the FRIEZE, not "the cornice
+  less 0.036 a side".
 
 ### The glass
 Clear glazing is a quiet diagonal gradient plus a soft sheen, and this is the
@@ -723,7 +850,7 @@ sheet. A right-hinged door is a physical fact.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Fifteen so far. None of them threw.
+**Things that vanish rather than break.** Eighteen so far. None of them threw.
 All of them looked like a working page.
 
 1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
@@ -838,6 +965,39 @@ it is **present and distinct**, not only that it is correct:
   must not quietly repair a tile into a different door than the one drawn on it.
 - **the drawn keyhole is on the side the PHOTOGRAPH puts it** — see 14.
 
+16. **ONE OPENING WRITTEN DOWN TWICE, IN DIFFERENT UNITS.** The classical
+    set's light was `winRect` in MILLIMETRES in the catalogue and
+    `CLASSIC_COLS.panel` in FRACTIONS in the renderer — the glazed variant's
+    outline from one, the solid variant's from the other. On a standard leaf
+    they agreed to 1.3 mm and nobody noticed; the moment the leaf stopped being
+    850 x 2050 they diverged by 62 mm on the WIDE door and put the casing 46 mm
+    into the frieze on the TALL one. Reported from outside as *"when i put on a
+    window the panel changes."* ⚠ **A duplicate that agrees on the default case
+    is the worst kind**, because every check runs on the default case.
+    `classicLight` asks `apertureLayout` — the ONE enumeration of where glass
+    goes — and only adds the casing round it.
+
+17. **A CONSTANT INVENTED TO ABSORB A WRONG NUMBER ONE LEVEL UP.**
+    `CLASSIC_BAND_FOOT = 9` said "the shelf closes this light, so there is
+    barely any casing under it", with a comment explaining it as joinery. It
+    was the leftover between a glass line that was really the CASING line and
+    the shelf below. Two visible faults came out of it: `moulding()` draws all
+    four runs at the same band, so a 59 mm bottom run in a 9 mm rectangle
+    reached fifty millimetres up into the pane, and the glass then painted over
+    it — the light had no casing at its foot at all. **When a constant exists
+    only to make two other numbers meet, one of those two is wrong.**
+
+18. **A SECOND STATEMENT OF WHAT THE RANGE CONTAINS, INSIDE THE TOOL THAT
+    MEASURES THE RANGE.** `npm run corpus` fits Peretz's 30 real doors and
+    writes the gallery; its strip matcher hard-coded two ids per axis rather
+    than asking the catalogue. d064's SEVEN bands came out as ELEVEN, with the
+    residual dutifully printed, while `strips7` sat unused in the list. Four
+    gallery doors moved from a residual to an exact fit when it was made to ask.
+    ⚠ And the same tool needed a second fix one round later: a count alone
+    cannot name a composition when two families share their columns, so the
+    tie-break is now the catalogue's own `doors` citation, and where nothing
+    cites the door the note SAYS the choice was a coin toss.
+
 ⚠ **And one assertion was counting PROSE.** The ironwork group asked
 `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
 document. About 32% of a rendered door is XML comments, so the moment a comment
@@ -881,7 +1041,8 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm test` | ~4.0M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
 | `npm run audit` | the real page at seven viewports plus seven failure routes — every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
-| `npm run collide` | real `getBBox()` from a browser over 1,224 designs. No declared number anywhere in the loop |
+| `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop |
+| `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
 | `npm run fuzz` | random combinations, then click-walks in a real browser |
 | `npm run profile` | the leaf's VERTICAL fall, against the medians `FALLOFF` was fitted to |
 | `npm run mottle` | slow horizontal unevenness of the PAINT. ⚠ It strips `[data-room="lamp-wash"]` first — the sconces' wash is horizontal too, and it moved this figure 46% without a drop of paint changing |
@@ -1089,6 +1250,24 @@ complete and its findings live here:
   reads 1.508 / 1.083 / 1.462 / 1.071, so it still separates correct from the
   bug it was written for by a wide margin; what it does not do is separate
   correct from correct.
+
+- **A DARK-PAINTED OGEE DOOR, to confirm the section that eleven doors use.**
+  `MOULDS.ogee` stands on **one** photograph — d050 — and d050 is near-white,
+  so what it shows is the COMPRESSED profile and the stored table is the
+  measured departures divided by the 0.34 `mouldGradients` applies to pale
+  paint. That inversion is the corpus's own factor and it is arithmetic, not
+  taste, but it has never been checked against a dark door of this family
+  because there is not one: d077 and d061 are so bright the whole moulding sits
+  inside 0.95–1.00, and d111 and d127 have fallback leaf boxes. If Peretz sends
+  a photograph of a dark classical-panelled door, that table is the first thing
+  to re-read.
+
+- **The classical set's two remaining differences, recorded rather than
+  guessed at.** Photo beside ours at 4x, after five rounds: (a) our cornice's
+  UNDERSIDE is a flat plank shadow where his has a stepped bed mould, and
+  (b) the `rings` grille reads coarser than the photograph's — fewer, bigger
+  rings. Neither has been measured properly. Everything else on that door now
+  matches within the instrument's error.
 
 ### Not started
 CI, deploy to `design.dlatotmagen.co.il`, prerendering the default door into
@@ -1353,6 +1532,19 @@ how it got there. Detail lives in the section it belongs to.
     photograph in red had already settled it once. Its ROWS take the same
     0.86% scale as everything else, so the light and the ornament cannot drift
     apart.
+- **`tools/rectify.mjs` joins the toolkit, and the four corners it uses are
+  written into §3.** It was `tools/_upright2.mjs`, which `.gitignore` covers —
+  and by then CLAUDE.md was citing it as the instrument every classical-set
+  measurement comes off. The convention is that a scratch harness dies and the
+  READING survives in the docs, and that convention is right for a contact
+  sheet; it is wrong for a de-skew, where the reading IS a forty-line bilinear
+  map somebody would otherwise rewrite under pressure. Both now: the tool is
+  committed AND the corners are in the prose.
+  ⚠ Its output height for `newdoor` is PINNED at 3730 rather than derived from
+  the edge lengths, which would give 3749. Half a per cent taller moves every
+  row fraction by 0.005 at the foot, and an instrument that produces a slightly
+  different picture from the one the numbers came off is a trap.
+
 - **The panels come in two mouldings, the strips in two compositions, and the
   classical set's opening changes size when you put a window in it.** Three
   faults in one message: *"wehn i put on a window the panel changes, it
