@@ -2305,7 +2305,7 @@ export function render(state) {
         : ''}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint, detail.perimeter) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
-    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail, tone, hingeOnLeft) : ''}
+    ${metalStrips(mainX, y0, leafW, leafH, state, tone, hingeOnLeft)}
   </g>
 
   ${detail.classic ? '' : glazing}
@@ -3942,11 +3942,41 @@ export function nearestGrip(state, want) {
  *   quad   d063 0.199 0.402 0.611 0.808 — even to within 0.006; d056 agrees
  *   band   d081 0.492 … 0.687, spacing 0.028 repeated seven times
  */
-const STRIP_ROWS = {
-  pair: [0.430, 0.613],
-  quad: [0.199, 0.402, 0.611, 0.808],
-  band: [0.492, 0.521, 0.547, 0.576, 0.604, 0.631, 0.660, 0.687],
-};
+/**
+ * ⚠ THE ROWS ARE DERIVED FROM THE COUNT NOW, NOT LISTED PER COMPOSITION.
+ * `STRIP_ROWS` held three hand-written arrays — pair, quad, band — one per
+ * tile, and the tiles are gone: Peretz prices per stripe and the customer
+ * picks a number. The measurements above did not go with them; they became the
+ * two constants below, which reproduce every one of those arrays.
+ *
+ *     pitch = min(0.19, 0.80 / (n - 1)), centred on 0.52
+ *
+ *     n=2 -> 0.425 0.615        measured 0.430 0.613   (d035 d036 d049)
+ *     n=4 -> 0.235 … 0.805      measured 0.199 … 0.808 (d063, d056 agreeing)
+ *     n=9 -> 0.120 … 0.920      measured ~0.10 … ~0.90 (d078)
+ *
+ * A cap AND a span, because neither alone works: a fixed pitch puts nine
+ * strips off the bottom of the leaf, and a fixed span puts two of them half a
+ * leaf apart from where every two-band door in the corpus actually has them.
+ */
+const STRIP_H = { pitch: 0.19, span: 0.80, mid: 0.52 };
+
+/**
+ * THE TIGHT BAND — a second composition, and the reason the count needed a
+ * companion toggle.
+ *
+ * d081 is six equal full-width strips at a pitch of 0.033 centred on 0.55, read
+ * off a 5% ruled grid; d045 is five in the same shape crossing a pull bar. A
+ * count alone cannot choose between that and six SPREAD strips, and both are
+ * doors Peretz built. `STRIP_ROWS.band` recorded the same thing as an eight-row
+ * array — 0.492 … 0.687, spacing 0.028 repeated seven times — and this is that
+ * array turned into the rule behind it.
+ *
+ * ⚠ HORIZONTAL ONLY. Nothing in the corpus is a tight VERTICAL group, so the
+ * toggle does not appear on that axis: offering it would be inventing geometry
+ * no photograph supports, which REALISM.md §6 forbids.
+ */
+const STRIP_H_TIGHT = { pitch: 0.033, mid: 0.55 };
 /* How much of the leaf an even band spans. d035 measures 0.83 and 0.85 of the
    leaf's width; d036, d059 and d066 all read at or past the 0.90 the scan
    window allows, so they are full width and the true figure is above 0.90.
@@ -3977,6 +4007,11 @@ const STRIP_EVEN_W = 0.88;
  * verified, and because d037 is the door the option was asked for from.
  */
 const STRIP_V = { pitch: 0.073, mid: 0.33 };
+/* How far a vertical band runs, top and foot as fractions of leaf height.
+   Measured on the long family — d037, d040, d046 — and confirmed on a ruled
+   grid this round: all three run from about 0.09 to about 0.95, equal to
+   within 2%. What looked like a fan in the photographs was the light on them. */
+const STRIP_V_RUN = { top: 0.098, foot: 0.945 };
 /** Which column strip `i` of `count` stands in, as a fraction of the leaf's
  *  width FROM THE HINGE EDGE. */
 const stripVAt = (i, count) =>
@@ -3989,269 +4024,90 @@ const stripVAt = (i, count) =>
  * pass. `even` and `rows` would have been the fifth and sixth. The catalogue
  * entry IS the description of the composition; hand it over whole.
  */
-function metalStrips(lx, ly, lw, lh, detail, tone, hingeOnLeft) {
-  const { strips: count, vertical, cross, even, rows } = detail;
+/**
+ * THE STRIPES — a COUNT and a DIRECTION, drawn from measured constants.
+ *
+ * ⚠ THIS REPLACED FOURTEEN FIXED PATTERNS. Peretz prices stripes per stripe —
+ * *"horizontal each one 150 · vertical each 300 · remove all the complicated
+ * stripe patterns"* — and the test for "complicated", asked for from outside,
+ * is MORE THAN TWO DISTINCT STRIPE LENGTHS in the design. Re-read against all
+ * 129 photographs (research/works/INVENTORY.md §5a): the even and long
+ * families pass, the ragged, fanned and crossed ones fail, and three doors had
+ * been filed wrong — d045 and d078 are even, not ragged, and d066's vertical
+ * member is the black PULL BAR rather than a strip.
+ *
+ * So placement is derived from the number rather than chosen from a list.
+ *
+ * ── the spacing rule, from §5b ───────────────────────────────────────
+ *     2 strips   0.430  0.613                        pitch 0.183
+ *     4 strips   0.199  0.402  0.611  0.808          pitch 0.203
+ *     9 strips   ~0.10 … ~0.90                       pitch ~0.100
+ * One rule reproduces all three: **pitch = min(0.19, 0.80 / (n-1)), centred on
+ * 0.52.** n=2 gives 0.425/0.615 against a measured 0.430/0.613; n=4 gives
+ * 0.235…0.805 against 0.199…0.808. Two constants, no special cases.
+ *
+ * ── and the tight band is a second composition ───────────────────────
+ * d081 is six equal full-width strips at a pitch of **0.033** centred on 0.55,
+ * read off a 5% grid, and d045 is five in the same shape. A count alone cannot
+ * choose between that and six spread strips, so it is a toggle — asked for
+ * from outside once the two doors were shown.
+ * ⚠ TIGHT IS HORIZONTAL ONLY. There is no tight VERTICAL door anywhere in the
+ * corpus, and offering one would be inventing geometry no photograph supports
+ * — REALISM.md §6. The control hides itself on the vertical axis.
+ *
+ * ── the verticals ────────────────────────────────────────────────────
+ * `STRIP_V.pitch` is 0.073 of leaf WIDTH, measured on three doors separately
+ * and agreeing to three decimals, and the long family runs 0.098 to 0.945 of
+ * the leaf's height. Both survive unchanged: they were already a count at a
+ * fixed pitch, which is what this whole rewrite turns the horizontals into.
+ */
+function metalStrips(lx, ly, lw, lh, state, tone, hingeOnLeft) {
+  const { stripeDir: dir, stripeCount: n, stripeTight: tight } = state;
+  if (dir === 'none' || !n) return '';
 
-  /* ── EVEN, FULL WIDTH ────────────────────────────────────────────
-     Nine doors of the corpus and no tile until now: d033 d035 d036 d039 d049
-     d056 d059 d066 d081. Equal bands, equal width, at the measured rows above
-     — which is the whole difference from the ragged family further down, and
-     the reason it needed its own tiles rather than a wider RHYTHM. */
-  if (even) {
+  /* One band, drawn the same way whichever axis it is on: a dropped shadow, the
+     body, a lit top edge and a darker under-edge. Four rects, and the two edges
+     are what stop it reading as a printed line. */
+  const band = (x, y, w, h) => `
+        <rect x="${(x + 3).toFixed(1)}" y="${(y + 3).toFixed(1)}" width="${w.toFixed(1)}"
+              height="${h.toFixed(1)}" fill="#000" opacity="0.22"/>
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
+              height="${h.toFixed(1)}" fill="${tone[2]}"/>
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
+              height="${Math.max(2, (w > h ? h : w) * 0.34).toFixed(1)}" fill="${tone[0]}"/>`;
+
+  if (dir === 'h') {
     const t = Math.max(8, Math.round(lh * 0.008));
     const w = Math.round(lw * STRIP_EVEN_W);
     const x = Math.round(lx + (lw - w) / 2);
-    const at = STRIP_ROWS[rows] || STRIP_ROWS.quad;
-    const out = at.map(f => {
-      const y = Math.round(ly + lh * f - t / 2);
-      return `
-        <rect x="${x + 3}" y="${y + 3}" width="${w}" height="${t}" fill="#000" opacity="0.22"/>
-        <rect x="${x}" y="${y}" width="${w}" height="${t}" fill="${tone[2]}"/>
-        <rect x="${x}" y="${y}" width="${w}" height="${Math.max(2, t * 0.34)}"
-              fill="${tone[0]}"/>
-        <rect x="${x}" y="${y + t - Math.max(2, t * 0.24)}" width="${w}"
-              height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`;
-    });
-    return `<g data-detail="strips" data-count="${at.length}" data-axis="horizontal"
-               data-even="${rows}">${out.join('')}</g>`;
-  }
-
-  /* ── THE CROSS ───────────────────────────────────────────────────
-     One long vertical member with short horizontals crossing it, grouped in
-     the half of the leaf away from the lock. Four doors carry it — d035, d047,
-     d066, d074 — and the inventory has listed it as MISSING for three rounds.
-     ⚠ ON THREE OF THE FOUR THE VERTICAL IS THE PULL BAR, not a strip. d035 is
-     the clearest: two horizontals at 0.426 and 0.609 of the leaf running very
-     nearly its full width, and the only vertical thing they cross is the
-     handle. So this option draws the version that does NOT depend on the
-     hardware — d047's, where the vertical is a strip of its own — and a
-     customer who wants d035's gets it by putting a bar on a striped door,
-     which the drawing already allows.
-     Ruler-read off d047: the vertical at 0.309 of the leaf's width from the
-     hinge side, 0.155 to 0.864 of its height; the horizontals in TWO PAIRS at
-     0.420/0.448 and 0.578/0.606, each running 0.167 to 0.556. The pairing is
-     the character of it — evenly spaced they read as a ladder. */
-  if (cross) {
-    const tv = Math.max(8, Math.round(lw * 0.018));
-    const th = Math.max(6, Math.round(lh * 0.007));
-    const X = f => lx + lw * (hingeOnLeft ? f : 1 - f);
-    const vx = Math.round(X(0.309)) - tv / 2;
-    const bar = (x, y, w, h, lit) => `
-      <rect x="${(x + 3).toFixed(1)}" y="${(y + 3).toFixed(1)}" width="${w.toFixed(1)}"
-            height="${h.toFixed(1)}" fill="#000" opacity="0.22"/>
-      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
-            height="${h.toFixed(1)}" fill="${tone[2]}"/>
-      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}"
-            width="${(lit === 'v' ? Math.max(2, w * 0.34) : w).toFixed(1)}"
-            height="${(lit === 'v' ? h : Math.max(2, h * 0.34)).toFixed(1)}"
-            fill="${tone[0]}"/>`;
-    const out = [bar(vx, ly + lh * 0.155, tv, lh * (0.864 - 0.155), 'v')];
-    for (const y of [0.420, 0.448, 0.578, 0.606]) {
-      const a = X(0.167), b = X(0.556);
-      out.push(bar(Math.min(a, b), ly + lh * y, Math.abs(b - a), th, 'h'));
-    }
-    return `<g data-detail="strips" data-count="5" data-axis="cross">${out.join('')}</g>`;
-  }
-
-  /* ── VERTICAL, LONG AND TIGHT ────────────────────────────────────
-     ⚠ THE OTHER VERTICAL COMPOSITION, and the list drew only the fan. Two
-     photographs came in with *"add this stripe option"* and both are corpus
-     doors: **d037** and **d046**, thin strips grouped into a tenth of the
-     leaf's width and running very nearly its whole height, where the fanned
-     family below spreads over a third of the width and its shortest band is a
-     quarter of the height.
-
-     Measured on d037, whose leaf box comes out at exactly a door's 0.415
-     aspect — which is why it and not d046 or d040 is the one the numbers come
-     from: three strips at 0.256, 0.329 and 0.402 of the leaf from the hinge
-     edge, a pitch of 0.073, tops level at 0.098 and feet staggered from about
-     0.945 on the outermost to 0.915 on the innermost. A column scan puts the
-     pitch at 0.073 on d037, 0.080 on d046 and 0.067 on d040; 0.073 is d037's
-     own and sits between the other two.
-
-     The GROUP is centred rather than anchored: d046's four sit closer to the
-     hinge edge than d037's three, which is what keeping the middle of the
-     group at 0.33 of the leaf does at both counts.
-
-     Thinner than the fanned bands, too — 0.013 of the leaf's width against
-     0.018. Measured 7 to 8 px on d037's 544 px leaf, which is 12 mm. */
-  if (vertical && detail.long) {
-    const t = Math.max(5, Math.round(lw * 0.013));
-    const TOP = 0.098, FOOT_OUT = 0.945, FOOT_IN = 0.915;
+    const { pitch, mid } = tight ? STRIP_H_TIGHT : {
+      pitch: Math.min(STRIP_H.pitch, STRIP_H.span / Math.max(1, n - 1)),
+      mid: STRIP_H.mid,
+    };
+    const top = mid - (n - 1) * pitch / 2;
     const out = [];
-    for (let i = 0; i < count; i++) {
-      /* from the HINGE edge, so the group lands on the half of the leaf with
-         nothing else on it whichever way the door is handed */
-      const f = stripVAt(i, count);
-      const x = Math.round((hingeOnLeft ? lx + lw * f : lx + lw * (1 - f)) - t / 2);
-      const inward = count > 1 ? i / (count - 1) : 0.5;
-      const top = ly + lh * TOP;
-      const bot = ly + lh * (FOOT_OUT + (FOOT_IN - FOOT_OUT) * inward);
-      const h = bot - top;
-      out.push(`
-        <rect x="${x + 3}" y="${(top + 3).toFixed(1)}" width="${t}" height="${h.toFixed(1)}"
-              fill="#000" opacity="0.22"/>
-        <rect x="${x}" y="${top.toFixed(1)}" width="${t}" height="${h.toFixed(1)}" fill="${tone[2]}"/>
-        <rect x="${x}" y="${top.toFixed(1)}" width="${Math.max(2, t * 0.34)}" height="${h.toFixed(1)}"
-              fill="${tone[0]}"/>
-        <rect x="${x + t - Math.max(2, t * 0.24)}" y="${top.toFixed(1)}"
-              width="${Math.max(2, t * 0.24)}" height="${h.toFixed(1)}" fill="${tone[4]}"/>`);
+    for (let i = 0; i < n; i++) {
+      out.push(band(x, ly + lh * (top + i * pitch) - t / 2, w, t));
     }
-    return `<g data-detail="strips" data-count="${count}" data-axis="vertical"
-               data-long="1">${out.join('')}</g>`;
+    return `<g data-detail="strips" data-count="${n}" data-axis="horizontal"
+               data-tight="${tight ? 1 : 0}">${out.join('')}</g>`;
   }
 
-  /* ── the other axis ──────────────────────────────────────────────
-     Five doors run the strips UP the leaf, not across it: d034 d037 d038 d040
-     d043. Fewer of them and longer, grouped in the half of the leaf away from
-     the lock, because that is the half with nothing else on it.
-     Two things change besides the rotation. The lit arris moves from the top
-     edge to the LEFT edge, since the key is high and to the left and a
-     vertical strip presents its side to it rather than its top. And the run
-     stops well short of the head and foot, as every one of the five does. */
-  if (vertical) {
-    const t = Math.max(8, Math.round(lw * 0.018));
-
-    /* ── THEY ARE NOT THE SAME LENGTH, and that is the design ─────────
-       Every one of them ran 0.12 to 0.88 of the leaf, four identical bars in
-       a row, and not one door in the corpus looks like that. d037, d040, d043
-       and d038 all FAN: each successive line reaches higher than the last, so
-       the group reads as a composition rather than as a fence.
-
-       Measured — each line's own top and bottom found by walking its column
-       until the tone stops departing from the paint beside it:
-
-         d038  0.372-0.656   0.126-0.693   0.071-0.905
-         d043  0.405-0.831   0.166-0.816   0.037-0.767
-
-       Two things are common to both and neither was drawn. The TOPS climb
-       monotonically outward — 0.372, 0.126, 0.071 and 0.405, 0.166, 0.037 —
-       and the BOTTOMS stay roughly level, mean 0.778 over the six. So the fan
-       opens upward from a common foot, and the line nearest the leaf's outer
-       edge is the long one: the shortest is 0.28-0.43 of the leaf and the
-       longest 0.73-0.83, better than twice its length.
-
-       ORDERED BY DISTANCE FROM THE OUTER EDGE, not by index, because the band
-       is laid out from the hinge side and `i` therefore counts inward on one
-       handing and outward on the other. Drawn off the index the fan would have
-       been correct on right-hand doors and mirrored on left-hand ones — the
-       same handing trap that made half the recreations compare mirrored
-       doors. */
-    const FOOT = 0.778;                     // mean of the six measured bottoms
-    const HEAD_IN = 0.39, HEAD_OUT = 0.05;  // innermost and outermost tops
-    const out = [];
-    for (let i = 0; i < count; i++) {
-      /* ⚠ THE SAME COLUMNS THE LONG FAMILY USES — see STRIP_V. These were laid
-         out across `lw * 0.34`, more than twice the measured spread, and the
-         handing was folded into the index so that `inward` had to undo it.
-         `stripVAt` is measured from the hinge edge, so `inward` is just the
-         index and the mirror happens once, in the x. */
-      const f = stripVAt(i, count);
-      const x = Math.round((hingeOnLeft ? lx + lw * f : lx + lw * (1 - f)) - t / 2);
-      /* 0 at the leaf's outer (hinge) edge, 1 at the middle of the leaf. */
-      const inward = count > 1 ? i / (count - 1) : 0.5;
-      const top = ly + lh * (HEAD_OUT + (HEAD_IN - HEAD_OUT) * inward);
-      const bot = ly + lh * FOOT;
-      const h = bot - top;
-      out.push(`
-        <rect x="${x + 3}" y="${(top + 3).toFixed(1)}" width="${t}" height="${h.toFixed(1)}"
-              fill="#000" opacity="0.22"/>
-        <rect x="${x}" y="${top.toFixed(1)}" width="${t}" height="${h.toFixed(1)}" fill="${tone[2]}"/>
-        <rect x="${x}" y="${top.toFixed(1)}" width="${Math.max(2, t * 0.34)}" height="${h.toFixed(1)}"
-              fill="${tone[0]}"/>
-        <rect x="${x + t - Math.max(2, t * 0.24)}" y="${top.toFixed(1)}"
-              width="${Math.max(2, t * 0.24)}" height="${h.toFixed(1)}" fill="${tone[4]}"/>`);
-    }
-    return `<g data-detail="strips" data-count="${count}" data-axis="vertical">${out.join('')}</g>`;
-  }
-  /* HORIZONTAL. I drew them vertical first, from the tier summary's phrase
-     "ruled line work", and d078 settles it at a glance: eleven bands running
-     across the leaf, not up it. They also run nearly the full width — inset
-     about a tenth each side — rather than sitting in a central band.
-     Spacing is graduated, from the eleven measured positions -- see below. */
-  const t = Math.max(8, Math.round(lh * 0.008));    // strip thickness
-  /* Span and spacing both re-read off d078, whose eleven strips are recorded
-     one by one in research/works/data2/d078.json:
-       0.021 0.076 0.156 0.235 0.342 0.485 0.626 0.730 0.810 0.889 0.944
-     Two things follow. They run almost the whole height -- 0.02 to 0.94, not
-     the 0.09 to 0.91 drawn here. And they are GRADUATED: tight at the head and
-     foot, open across the middle. The gaps are .055 .080 .079 .107 .143 .141
-     .104 .080 .079 .055, a symmetric fan. Evenly spaced they read as a
-     barcode; graduated they read as a design, which is what the tier is
-     selling.
-     Normalised, those eleven positions sit within 0.023 of
-     0.6*smoothstep(u) + 0.4*u -- which is where the expression comes from. It
-     is a fit to eleven measurements, not a curve picked because it looked
-     about right. The comment that used to sit here said the real one is
-     graduated and called it "a refinement worth having only once the
-     orientation is right". The orientation has been right for two rounds. */
-  /* ── HOW FAR THE RUN REACHES, AND HOW EVENLY ──────────────────────
-     Both were read off d078 alone and both are functions of the COUNT, which
-     is visible the moment a second and third door are measured:
-
-       count 4   d063   0.199 0.402 0.611 0.808              span 0.609
-       count 7   d064   0.084 0.270 0.322 0.501 0.671 0.720 0.893   span 0.809
-       count 11  d078   0.021 0.076 0.156 ... 0.889 0.944     span 0.923
-
-     A few bands sit in the middle of the leaf; many of them reach nearly the
-     whole height. Fitted, span = 0.458 + 0.044n, which lands within 0.043 of
-     all three.
-     And the GRADUATION — tight at the head and foot, open across the middle —
-     is real at eleven and absent at four: d063's are evenly spaced to within
-     0.006. So the smoothstep is blended in with the count rather than applied
-     flat, which is what put three strips at 0.02, 0.50 and 0.94 of the leaf,
-     one on the top rail and one on the bottom.
-     The old constants were 0.02 and 0.94 for every count, which is d078's span
-     given to a door with three lines on it. */
-  const span = Math.min(0.95, 0.458 + 0.044 * count);
-  const top = ly + lh * (0.5 - span / 2), bot = ly + lh * (0.5 + span / 2);
-  const graded = Math.max(0, Math.min(1, (count - 4) / 7));
-  const spread = u => {
-    const s = 0.6 * (u * u * (3 - 2 * u)) + 0.4 * u;
-    return u + (s - u) * graded;
-  };
-
-  /* ── AND THEY ARE NOT ALL THE SAME WIDTH EITHER ───────────────────
-     Same fault as the vertical run above, on the other axis: eleven identical
-     bars from 0.09 to 0.91 of the leaf, and no door in the corpus does that.
-     Measured, each band's own left and right edge found by walking its row:
-
-       d064  starts 0.020 0.020 0.020 0.022 0.031 0.033 0.035
-             ends   0.963 0.719 0.625 0.934 0.618 0.708 0.947
-       d063  widths 0.626 0.530 0.519 0.684
-       d078  widths 0.629 0.843 0.642 0.223 0.492 0.194 0.364 0.264 ...
-
-     d064 is the clean case and it says two things. Every band starts at the
-     SAME EDGE — 0.020 to 0.035, which is the hinge stile, the half with
-     nothing else on it — and every band ends somewhere different. d078's top
-     three do the same thing mirrored (0.963, 0.959, 0.957 against its own
-     hinge edge, the door being handed the other way).
-
-     So: anchored at the hinge edge, free ends following d064's own rhythm,
-     cycled for any count. It is one door's composition rather than a law, and
-     that is the honest description of it — but it is one door's composition
-     against SEVEN IDENTICAL BARS, which is nobody's.
-
-     ⚠ The rhythm must not be random. A drawing that changes between two
-     renders of the same design is a drawing a customer cannot share. */
-  const RHYTHM = [0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91];
-  const anchor = hingeOnLeft ? lx + lw * 0.03 : lx + lw * 0.97;
+  /* Vertical: the measured pitch, the measured run, centred on the measured
+     column. `stripVAt` is the same helper the fanned family used — the columns
+     were always shared and only the lengths differed, which is what made the
+     fanned one droppable without losing the geometry. */
+  const t = Math.max(8, Math.round(lw * 0.013));
+  const y0 = ly + lh * STRIP_V_RUN.top;
+  const y1 = ly + lh * STRIP_V_RUN.foot;
   const out = [];
-  for (let i = 0; i < count; i++) {
-    const cy = count > 1 ? top + (bot - top) * spread(i / (count - 1)) : ly + lh / 2;
-    const y = Math.round(cy - t / 2);
-    const wide = Math.round(lw * RHYTHM[i % RHYTHM.length]);
-    const x0s = hingeOnLeft ? anchor : anchor - wide;
-    out.push(`
-      <rect x="${x0s + 3}" y="${y + 3}" width="${wide}" height="${t}"
-            fill="#000" opacity="0.22"/>
-      <rect x="${x0s}" y="${y}" width="${wide}" height="${t}" fill="${tone[2]}"/>
-      <rect x="${x0s}" y="${y}" width="${wide}" height="${Math.max(2, t * 0.34)}"
-            fill="${tone[0]}"/>
-      <rect x="${x0s}" y="${y + t - Math.max(2, t * 0.24)}" width="${wide}"
-            height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`);
+  for (let i = 0; i < n; i++) {
+    const f = stripVAt(i, n);
+    const cx = lx + lw * (hingeOnLeft ? f : 1 - f);
+    out.push(band(cx - t / 2, y0, t, y1 - y0));
   }
-  return `<g data-detail="strips" data-count="${count}" data-axis="horizontal">${out.join('')}</g>`;
+  return `<g data-detail="strips" data-count="${n}" data-axis="vertical"
+             data-tight="0">${out.join('')}</g>`;
 }
 
 /**

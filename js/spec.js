@@ -163,13 +163,21 @@ export function specRows(state) {
     rows.push({ key: 'speciallock', label: 'מנעול מיוחד', id: xl.id, value: xl.he });
   }
   if (dt.id !== 'plain') {
-    /* ⚠ THE COUNT, because the drawing has one and the order did not. Eleven
-       bands and four bands both arrived as "פסי מתכת" / "פסים אנכיים", while
-       the sibling option DOES name its count — so a tradesman reading
-       "שלושה פסים" and "פסי מתכת" on one list will not read the second as
-       eleven. `dt.strips` is the same number `metalStrips()` draws. */
-    const n = dt.strips ? ` (${dt.strips})` : '';
-    rows.push({ key: 'detail', label: 'עיצוב', id: dt.id, value: `${dt.he}${n}` });
+    rows.push({ key: 'detail', label: 'עיצוב', id: dt.id, value: dt.he });
+  }
+  /* ⚠ THE COUNT AND THE DIRECTION, because Peretz is paid per stripe. Eleven
+     bands and four bands used to arrive as one phrase — "פסי מתכת" — and the
+     count went in for that reason. It matters more now: the count IS the
+     price, ₪150 a stripe horizontal and ₪300 vertical, so an order that does
+     not carry it is an order he cannot total.
+     The arrangement is named too. Six spread across the leaf and six in a
+     tight band are the same number of stripes and two different doors — d078
+     against d081 — and the drawing distinguishes them, so the words must. */
+  if (state.stripeDir !== 'none' && state.stripeCount) {
+    const dir = state.stripeDir === 'h' ? 'אופקיים' : 'אנכיים';
+    const how = state.stripeTight ? ' · צפופים' : '';
+    rows.push({ key: 'stripes', label: 'פסים', id: `${state.stripeDir}${state.stripeCount}`,
+                value: `${state.stripeCount} ${dir}${how}` });
   }
   rows.push({ key: 'size', label: 'מידה', id: state.size, value: sz.he });
   /* ⚠ ALWAYS NAMED, even when it is the standard one — unlike the extra lock

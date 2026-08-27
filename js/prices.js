@@ -212,28 +212,6 @@ export const DETAIL = {
      matters more than the price. TRANSFORM.md §18, assumption A14. */
   panelo:    725,    // פאנל תחתון קלאסי
   panel2o:   1450,   // שני פאנלים קלאסיים
-  /* The even compositions, on the same 200 + 40 per band as the ragged ones:
-     it is the same stock and the same fixing, cut square instead of to
-     length. `stripsband` is eight bands in a hand's breadth of leaf. */
-  strips2:   280,    // שני פסים אחידים
-  strips4:   360,    // ארבעה פסים אחידים
-  stripsband: 520,   // פסים צפופים      — eight bands
-  strips3:   320,    // שלושה פסים מדורגים
-  strips5:   400,    // חמישה פסים מדורגים
-  strips7:   480,    // שבעה פסים מדורגים
-  strips9:   560,    // תשעה פסים מדורגים
-  strips:    640,    // אחד עשר פסים מדורגים
-  /* The LONG vertical bands run 0.85 of the leaf where the fanned ones average
-     about 0.6, so they are more stock per band: 240 + 60 rather than 240 + 50.
-     Both curves are invented like everything else in this file; the point of
-     writing the shape down is that Peretz can correct the RATE in a sentence
-     instead of correcting four totals. */
-  stripsvl3: 420,    // שלושה פסים אנכיים ארוכים
-  stripsvl4: 480,    // ארבעה פסים אנכיים ארוכים
-  stripsv3:  390,    // שלושה פסים אנכיים מדורגים
-  stripsv:   440,    // פסים אנכיים     — four bands
-  stripsv6:  540,    // שישה פסים אנכיים
-  stripsx:   460,    // פס אנכי חוצה    — one long member and four short ones
   /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
      and plinth, all as one. Peretz's "greek set +2700", and it removes the
      pull handle. */
@@ -261,6 +239,29 @@ export const DETAIL = {
  * two different prices. One entry, one id, no `VERSION` cost, and the two
  * descriptions of that door cannot diverge because there is only one.
  */
+/**
+ * THE STRIPES — priced per stripe, which is what Peretz actually said.
+ *
+ * *"stripes: horizontal each one 150 · vertical each 300 · (remove all the
+ * complicated stripe patterns)."*
+ *
+ * ⚠ THIS REPLACED FOURTEEN NAMED TOTALS. The old block held one figure per
+ * composition — ₪280 for two even bands, ₪640 for eleven ragged ones — under a
+ * comment explaining the invented curve behind them (200 + 40 a band, 240 + 50
+ * for verticals). Every one of those numbers was ours. His is two rates and no
+ * base at all, so a stripe costs the same whether it is the first or the
+ * eleventh, and the app charges `count x rate`.
+ *
+ * A vertical band is twice a horizontal one because it is roughly twice the
+ * stock: the long family runs 0.85 of the leaf's height where a horizontal
+ * band crosses 0.88 of its width, and the leaf is two and a half times taller
+ * than it is wide.
+ */
+export const STRIPE = {
+  h: 150,            // פס אופקי, לכל פס
+  v: 300,            // פס אנכי, לכל פס
+};
+
 export const DETAIL_GLAZED = {
   classic: 1000,     // 3700 + 1000 = 4700, which is what he said
 };

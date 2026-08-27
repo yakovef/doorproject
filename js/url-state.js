@@ -9,7 +9,8 @@
  */
 
 import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_LENS, LOCKSETS,
-         MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+         MASHKOFS, packStripes, PIRZUL, SIZES, SPECIAL_LOCKS, STRIPE_MAX,
+         STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
 /* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
@@ -154,17 +155,30 @@ import { repair } from './rules.js';
    20 cm past it — so a bar is a model AND a length, and the length reaches the
    code as a three-bit index into eight fixed values.
 
-   ⚠ THE CODE IS TEN CHARACTERS AT THIS VERSION AND THAT IS TRANSIENT.
-   Payload 42 plus the four-bit floor rounds to 50. It could be held at nine by
-   cutting `handing` to one bit — it has exactly two entries — but that leaves
-   the one field in the layout with NO headroom at all, and the version-16
-   overflow is a fresh reminder of what a field at its ceiling costs.
-   The bit is coming back on its own: TRANSFORM.md phase 6 removes the fourteen
-   stripe entries from `DETAILS`, which takes that field from 5 bits to 3. Two
-   bits back, payload 40, and the code returns to nine characters without
-   anything being squeezed. Taking a bit from `handing` now and giving it back
-   then would be churn in a wire format to save one character for one phase. */
-export const VERSION = 17;
+   ⚠ THE CODE IS TEN CHARACTERS AT THIS VERSION. Payload 42 plus the four-bit
+   floor rounds to 50. It could be held at nine by cutting `handing` to one bit
+   — it has exactly two entries — but that leaves the one field in the layout
+   with NO headroom at all, and the version-16 overflow is a fresh reminder of
+   what a field at its ceiling costs.
+   ⚠ AND THIS NOTE USED TO PROMISE IT WOULD COME BACK TO NINE, on the grounds
+   that phase 6 takes `detail` from 5 bits to 3 when the fourteen stripe
+   entries leave it. It does — and phase 6 also adds a five-bit `stripes`
+   field, which the promise forgot. Net +3, not −2. The arithmetic is left
+   visible because a plan's prediction being wrong is worth more on the record
+   than tidied away, and because it is the same mistake in miniature as the
+   check-nibble one: counting what a change gives back without counting what it
+   takes. */
+/* ── 18 · the stripes become a count, 27.8.2026 ───────────────────────
+   Fourteen fixed compositions leave `DETAILS` and are replaced by a direction,
+   a number and a tight/spread toggle, packed as ONE ordinal — see
+   `packStripes`. Peretz prices per stripe, so a pattern list could not express
+   what he sells; and the test for which compositions survive ("more than two
+   distinct stripe lengths") is recorded in research/works/INVENTORY.md §5a.
+   ⚠ A LINK OR CODE CARRYING A RETIRED STRIPE ID STILL OPENS A REAL DOOR, and
+   it needs a migration rather than an alias: `strips9` was an id in one list
+   and is now a (direction, count) pair in three fields, which the alias
+   mechanism — id to id, inside one list — cannot express. See `STRIPE_LEGACY`. */
+export const VERSION = 18;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -221,6 +235,9 @@ export const DEFAULTS = {
      default would override all of them silently. The length is opt-in, and a
      door nobody has touched draws exactly what it always drew. */
   handleLen: 0,
+  stripeDir: 'none',
+  stripeCount: 0,
+  stripeTight: false,
   detail:  'plain',
   size:    'standard',
   handing: 'right-in',
@@ -247,6 +264,11 @@ export function toQuery(state) {
      something it never meant. */
   p.set('pz', state.pirzul);
   p.set('hl', String(state.handleLen));
+  /* ⚠ ONE PARAMETER FOR THREE PROPERTIES, the same ordinal the code packs.
+     Three separate parameters could carry `sd=h&sc=0` or `sd=none&sc=7` — a
+     link that means nothing and that every reader downstream would have to
+     guard against. One value cannot hold a contradiction. */
+  p.set('sp', String(packStripes(state)));
   p.set('d', state.detail);
   p.set('s', state.size);
   p.set('h', state.handing);
@@ -305,7 +327,8 @@ export function fromQuery(search) {
      a choice could not be read — above a document in which every choice had
      been read perfectly. A new switch joins this list the same day it is
      invented, like everything added to the bare-mode hide list. */
-  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hl', 'd', 's', 'h', 'gp',
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hl', 'sp',
+                           'd', 's', 'h', 'gp',
                            'code', 'bare', 'sheet']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -378,7 +401,18 @@ export function fromQuery(search) {
       if (handleRaisedIt) notice = beforeHandle;
     }
   }
-  take('detail', 'd', DETAILS);
+  /* ⚠ A RETIRED STRIPE ID IS A MIGRATION, NOT AN ALIAS, and this is the second
+     one in this file (the first is `n=` for the lockset list). `strips9` was
+     one id in `DETAILS`; it is now a direction, a count and a toggle across
+     three state fields, and `aliases` maps id to id INSIDE one list — it
+     cannot express that. Without this, every link and code written before
+     today that carried a striped door would land on `DETAILS[0]` and open a
+     plain one, silently, which is precisely what `fromQuery` exists never to
+     do. Run BEFORE `take('detail', …)`, so the retired id is consumed rather
+     than reported as unknown. */
+  const legacy = STRIPE_LEGACY[p.get('d')];
+  if (legacy) { Object.assign(state, legacy); state.detail = 'plain'; }
+  else take('detail', 'd', DETAILS);
   take('handing', 'h', HANDINGS);
   take('speciallock', 'x', SPECIAL_LOCKS);
   take('mashkof', 'm', MASHKOFS);
@@ -389,6 +423,13 @@ export function fromQuery(search) {
      notice rather than clamped silently, because a customer whose 140 cm bar
      quietly became 100 cm has been given a different door without being told —
      which is the whole reason `fromQuery` never substitutes in silence. */
+  const rawStripes = p.get('sp');
+  if (rawStripes != null) {
+    const v = Number(rawStripes);
+    if (Number.isInteger(v) && v >= 0 && v < STRIPE_SLOTS) Object.assign(state, unpackStripes(v));
+    else notice = notice || 'option-unknown';
+  }
+
   const rawLen = p.get('hl');
   if (rawLen != null) {
     const v = Number(rawLen);
@@ -572,8 +613,9 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    telephone (REDESIGN.md §1.5: 38.4% of single-character typos used to decode
    to a different valid door); it is never the thing that gives way. */
 export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
-                      grille: 4, handle: 4, lockset: 3, detail: 5,
-                      speciallock: 2, mashkof: 2, pirzul: 2, handleLen: 4 };
+                      grille: 4, handle: 4, lockset: 3, detail: 3,
+                      speciallock: 2, mashkof: 2, pirzul: 2, handleLen: 4,
+                      stripes: 5 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */
@@ -684,6 +726,7 @@ export function encodeCode(state) {
        eight lengths need three. This is also why the lengths are a fixed list
        rather than a free number — see `HANDLE_LENS`. */
     [Math.max(0, HANDLE_LENS.indexOf(state.handleLen)), BITS.handleLen],
+    [packStripes(state), BITS.stripes],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -748,6 +791,7 @@ export function decodeCode(code) {
   const mashkof = MASHKOFS[read(BITS.mashkof)];
   const pirzul  = PIRZUL[read(BITS.pirzul)];
   const hLen    = HANDLE_LENS[read(BITS.handleLen)];
+  const sp      = read(BITS.stripes);
   /* ⚠ `hLen === undefined`, NOT `!hLen`. Zero is a VALID value — it is the
      "as the model comes" default and the commonest length in the range — and
      `!0` is true, so a truthiness guard refused every code for an untouched
@@ -760,6 +804,6 @@ export function decodeCode(code) {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
     speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
-    handleLen: hLen,
+    handleLen: hLen, ...unpackStripes(sp),
   };
 }

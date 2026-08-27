@@ -61,10 +61,15 @@ import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
  *  carry one are solid — so the OBSERVED rule below, that ruled line work
  *  never shares a leaf with glazing, has nothing to say against it and
  *  everything to say for it. */
-export const isLineWork = detail => !!(detail.strips || detail.groove || detail.perimeter);
+/* ⚠ READS THE STATE, NOT THE DETAIL. Line work used to be a property of a
+   `DETAILS` entry — fourteen stripe options each carrying `strips: n`. The
+   stripes are a count on the state now, so "does this door have line work on
+   its face" is a question about the door rather than about the face option. */
+export const isLineWork = state =>
+  !!(state && state.stripeDir && state.stripeDir !== 'none' && state.stripeCount);
 
 /** Does this detail put ANYTHING on the face — moulding or line work alike? */
-export const faceWorked = detail => !!detail.panel || isLineWork(detail);
+export const faceWorked = state => !!byId(DETAILS, state.detail).panel || isLineWork(state);
 
 /**
  * Two different questions, and conflating them broke the sidelight the first
@@ -130,10 +135,15 @@ export function fallbackLockset(state) {
 export function conflicts(state) {
   const glazed = isGlazed(state);
   const onLeaf = leafGlazed(state);
-  const lined = isLineWork(byId(DETAILS, state.detail));
+  const lined = isLineWork(state);
 
   const out = { window: {}, grille: {}, detail: {}, handle: {},
-                lockset: {}, size: {}, colour: {}, handing: {} };
+                lockset: {}, size: {}, colour: {}, handing: {},
+                /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
+                   longer options with ids. Every other key here is
+                   `{ optionId: reason }`; this one is either null or the one
+                   reason the stripe controls cannot be used on this door. */
+                stripes: null };
   const grip = byId(HANDLES, state.handle);
 
   /* The finish rule that used to live here is gone with the group it gated.
@@ -204,15 +214,41 @@ export function conflicts(state) {
     }
   }
 
-  /* OBSERVED: ruled line work never shares a leaf with glazing, and never
-     with a moulded panel. Both directions are reported, so whichever tile the
-     customer is looking at explains itself. */
-  for (const d of DETAILS) {
-    if (onLeaf && isLineWork(d)) out.detail[d.id] = 'לא משלבים קווי מתכת עם חלון';
-    if (isLineWork(d) && d.panel) out.detail[d.id] = 'לא משלבים קווי מתכת עם פאנל';
-  }
+  /* OBSERVED: ruled line work never shares a leaf with glazing, and never with
+     a moulded panel. Both directions are reported, so whichever control the
+     customer is looking at explains itself.
+     ⚠ THE PANEL HALF IS ASSUMPTION A11 AND THE GLAZING HALF IS THE CORPUS. No
+     door in the 129 photographs carries both a panel and stripes, and Peretz
+     priced them as separate lines — which is weak evidence that they combine,
+     not strong evidence that they do not. The cost of being wrong is one rule.
+     The real reason it holds today is that the DRAWING has no measured answer
+     for where a stripe goes on a panelled leaf, and inventing one would put
+     geometry on screen no photograph supports (REALISM.md §6). */
+  if (onLeaf) out.stripes = 'לא משלבים פסי מתכת עם חלון';
+  else if (byId(DETAILS, state.detail).panel) out.stripes = 'לא משלבים פסי מתכת עם פאנל';
   if (lined) {
     for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = 'לא משלבים חלון עם קווי מתכת';
+    for (const d of DETAILS) if (d.panel) out.detail[d.id] = 'לא משלבים פאנל עם פסי מתכת';
+  }
+
+  /* PERETZ: "square +3700 (needs to aways have a panel at the bottom)". The
+     square light leaves the bottom half of the leaf bare and he fills it, so a
+     plain face is not a door he builds with that window. Reported on the FACE
+     rather than on the window, because the window is what the customer chose
+     and the face is what has to move. */
+  if (state.window === 'rect') {
+    out.detail.plain = out.detail.plain || 'חלון מרובע מגיע תמיד עם פאנל בתחתית';
+  }
+
+  /* PERETZ: "3 panel +1900 (remove the handle)" and the same for the greek
+     set. The middle panel of the three IS a grab plate carrying its own turned
+     pull, and the classical set has its own pull on the shelf — so a second
+     one is not an option he offers. ASK-PERETZ §14 asked whether the three
+     panels always come with their pull; this is that answered. */
+  if (byId(DETAILS, state.detail).ownPull) {
+    for (const h of HANDLES) {
+      if (h.style !== 'none') out.handle[h.id] = 'הפאנל האמצעי מגיע עם המאחז שלו';
+    }
   }
 
   /* WITHDRAWN: pull bar x lever. This was the strongest OBSERVED rule in the
@@ -426,6 +462,8 @@ const SAID = {
   gripHome:      'הידית הוסרה, ואיתה המיקום שבחרתם לה',
   setWindow:     'התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו',
   setGone:       'הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי',
+  needPanel:     'הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד',
+  ownPull:       'הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו',
 };
 
 /**
@@ -481,14 +519,49 @@ export function repair(state, intent = null) {
     else { s.window = 'rect'; change('window', SAID.setWindow); }
   }
 
-  const lined = isLineWork(byId(DETAILS, s.detail));
+  const lined = isLineWork(s);
+
+  /* Stripes and a panel want the same face. */
+  if (lined && byId(DETAILS, s.detail).panel) {
+    if (intent === 'detail') {
+      s.stripeDir = 'none'; s.stripeCount = 0; change('stripes', SAID.lineWorkGone);
+    } else { s.detail = 'plain'; change('detail', SAID.setGone); }
+  }
 
   if (leafGlazed(s) && lined) {
     /* Whichever the customer just asked for wins; the other yields. Without
        an intent — a link — the WINDOW wins, because glass is the more
        expensive and more visible of the two to lose silently. */
+    if (intent === 'stripes') { s.window = 'none'; change('window', SAID.windowGone); }
+    else { s.stripeDir = 'none'; s.stripeCount = 0; change('stripes', SAID.lineWorkGone); }
+  }
+
+  /* ⚠ A THIRD ORDERING CONSTRAINT, AND IT WAS LEARNED THE SAME WAY AS THE
+     OTHER TWO — by a link arriving unbuildable. This file already records that
+     glazing repairs run BEFORE line-work repairs and that the no-glass-no-
+     grille cleanup runs LAST. Add: **the face repairs run AFTER the line-work
+     repairs**, because line work can CLEAR the face.
+     The failure: a link with a square window and eleven stripes. The stripes
+     were removed (a window beats line work on a link), which left a plain
+     face — and the "a square light always has a panel under it" repair had
+     already run, against the face as it was BEFORE the stripes went. The link
+     arrived with a rect window over a plain face, which `conflicts` refuses.
+     Repair must be idempotent and must always LAND somewhere buildable; a
+     repair that reads a value another repair is about to change is neither. */
+
+  /* PERETZ: "square +3700 (needs to aways have a panel at the bottom)". If the
+     customer asked for the window, the face gains a panel; if they asked for a
+     plain face, the window yields. */
+  if (s.window === 'rect' && s.detail === 'plain') {
     if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
-    else { s.detail = 'plain'; change('detail', SAID.lineWorkGone); }
+    else { s.detail = 'panel'; change('detail', SAID.needPanel); }
+  }
+
+  /* PERETZ: "3 panel +1900 (remove the handle)", and the same for the greek
+     set — both carry their own pull. */
+  if (byId(DETAILS, s.detail).ownPull && byId(HANDLES, s.handle).style !== 'none') {
+    if (intent === 'handle') { s.detail = 'plain'; change('detail', SAID.setGone); }
+    else { s.handle = 'none'; change('handle', SAID.ownPull); }
   }
 
   /* Two panels and a window want the same half of the leaf, and the window

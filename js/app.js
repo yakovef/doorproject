@@ -30,9 +30,9 @@
 import {
   byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
   GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, LOCKSETS, MASHKOFS,
-  PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, WINDOWS,
+  PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
-import { breakdownRows, formatAgorot, priceAgorot, priceLabel, tileAgorot }
+import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
   from './price.js';
 import {
   describe, detailGlyph, gripAt, gripCanRotate, gripHome, gripIsFixed,
@@ -986,6 +986,84 @@ function buildOptions(g, host) {
   }
   keyboardGrid(host);
   if (g.key === 'handle') buildLengthStepper(host);
+  if (g.key === 'detail') buildStripes(host);
+}
+
+/**
+ * THE STRIPES — a direction, a number, and how they are arranged.
+ *
+ * ⚠ THIS REPLACED FOURTEEN TILES. Peretz prices per stripe — ₪150 horizontal,
+ * ₪300 vertical — so a grid of named compositions could not express what he
+ * sells, and he asked for the complicated ones removed. What survives the test
+ * ("more than two distinct stripe lengths") is recorded in
+ * `research/works/INVENTORY.md` §5a; what is left is a count.
+ *
+ * Three controls, and the third only when it means something:
+ *   - direction — none / horizontal / vertical, as pills
+ *   - how many  — a stepper, capped by what the leaf holds
+ *   - tight     — a toggle, HORIZONTAL ONLY, because nothing in the 129
+ *                 photographs is a tight vertical group and offering one would
+ *                 be inventing geometry (REALISM.md §6)
+ *
+ * ⚠ AND IT SAYS WHY WHEN IT CANNOT BE USED. `conflicts(state).stripes` is a
+ * SENTENCE rather than a map of blocked ids, because there are no ids left to
+ * block. A control that is simply dead tells the customer nothing; one that
+ * says "לא משלבים פסי מתכת עם חלון" tells them what to change.
+ */
+function buildStripes(host) {
+  const old = host.querySelector('.stripes');
+  if (old) old.remove();
+  const why = conflicts(state).stripes;
+  const dir = state.stripeDir, n = state.stripeCount;
+  const max = dir === 'v' ? STRIPE_MAX.v : (state.stripeTight ? STRIPE_MAX.hTight : STRIPE_MAX.h);
+
+  const box = document.createElement('div');
+  box.className = 'stripes';
+  box.innerHTML = `
+    <span class="stripes__label" id="stripes-l">פסי מתכת</span>
+    ${why ? `<p class="stripes__why">${why}</p>` : `
+    <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
+      ${[['none', 'ללא'], ['h', 'אופקיים'], ['v', 'אנכיים']].map(([id, he]) => `
+        <button type="button" class="pill${dir === id ? ' is-on' : ''}"
+                data-dir="${id}" aria-pressed="${dir === id}">${he}</button>`).join('')}
+    </div>
+    ${dir === 'none' ? '' : `
+      <div class="blen__row">
+        <button type="button" class="blen__b" data-n="-1" aria-label="פחות פסים"
+                ${n <= 1 ? 'disabled' : ''}>−</button>
+        <output class="blen__v" aria-labelledby="stripes-l">${n} פסים</output>
+        <button type="button" class="blen__b" data-n="1" aria-label="עוד פסים"
+                ${n >= max ? 'disabled' : ''}>+</button>
+      </div>
+      ${dir === 'h' ? `
+        <button type="button" class="pill stripes__tight${state.stripeTight ? ' is-on' : ''}"
+                data-tight="1" aria-pressed="${state.stripeTight}">צפופים</button>` : ''}
+      <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`}
+    `}`;
+
+  for (const b of box.querySelectorAll('[data-dir]')) {
+    b.addEventListener('click', () => {
+      const d = b.dataset.dir;
+      set(repair({ ...state, stripeDir: d,
+                   stripeCount: d === 'none' ? 0 : Math.max(1, state.stripeCount || 2),
+                   stripeTight: d === 'v' ? false : state.stripeTight }, 'stripes').state);
+    });
+  }
+  for (const b of box.querySelectorAll('[data-n]')) {
+    b.addEventListener('click', () => {
+      const next = state.stripeCount + Number(b.dataset.n);
+      if (next < 1 || next > max) return;
+      set({ ...state, stripeCount: next });
+    });
+  }
+  const t = box.querySelector('[data-tight]');
+  if (t) t.addEventListener('click', () => set({ ...state,
+    stripeTight: !state.stripeTight,
+    /* A tight band tops out lower than a spread one — eight against eleven —
+       so turning it on has to bring an over-long count with it rather than
+       leaving a state the packer cannot encode. */
+    stripeCount: Math.min(state.stripeCount, state.stripeTight ? STRIPE_MAX.h : STRIPE_MAX.hTight) }));
+  host.appendChild(box);
 }
 
 /**

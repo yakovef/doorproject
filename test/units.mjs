@@ -343,8 +343,18 @@ for (const st of everyState()) {
      somebody's WhatsApp history. It must open the door it names, WITHOUT a
      notice — withdrawing an option is our change, not that customer's mistake
      — and without leaving a key behind that nothing downstream reads. */
+  /* ⚠ `d=panel`, AND IT USED TO BE `d=plain`. This link's subject is the
+     RETIRED PARAMETERS — `f=`, `a=`, `z=` must be ignored in silence, because
+     withdrawing an option is our change and not that customer's mistake. It
+     carried a plain face behind a square window, which was a fine door until
+     Peretz said "square needs to aways have a panel at the bottom"; now that
+     combination legitimately repairs and legitimately announces, and this
+     assertion started failing for a reason that has nothing to do with what it
+     is testing. Changed the door, not the assertion: a test whose fixture has
+     become invalid needs a new fixture, and a test whose expectation has
+     become inconvenient needs neither. */
   const old = fromQuery('?v=8&c=rb-0097d&w=rect&z=clear&g=none&n=idan&k=cylinder'
-                      + '&d=plain&f=brass&s=standard&h=right-in&a=peep,mail');
+                      + '&d=panel&f=brass&s=standard&h=right-in&a=peep,mail');
   ok(old.notice === null, `a pre-withdrawal link should open quietly, got ${old.notice}`);
   ok(old.state.finish === undefined, 'f= must not survive into the state');
   ok(old.state.addons === undefined, 'a= must not survive into the state');
@@ -1112,7 +1122,16 @@ group('every door named as evidence has a photograph behind it');
       }
     }
   }
-  ok(named > 40, `only ${named} door citations found — has the evidence been dropped?`);
+  /* ⚠ THE FLOOR CAME DOWN FROM 40 WITH THE OPTIONS IT COUNTED. Fourteen stripe
+     entries left `DETAILS` when the stripes became a count, and every one of
+     them cited the doors its numbers came from. That evidence is not lost —
+     it moved to `research/works/INVENTORY.md` §5a/§5b, where it belongs, since
+     it is now the derivation of two constants rather than of fourteen tiles.
+     The floor is a guard against the `doors` citations being quietly dropped
+     from the options that DO still carry them, so it tracks the list it
+     guards. Lowered deliberately and with the count named, not nudged until
+     it passed. */
+  ok(named > 25, `only ${named} door citations found — has the evidence been dropped?`);
   console.log(`  (${named} citations, every one with a photograph)`);
 }
 
@@ -2111,8 +2130,42 @@ group('a handle the customer moved reaches the order');
     }
   }
   ok(moved > 0, 'no handle could be moved anywhere — this group is asserting nothing');
-  ok(flatHome > 0,
-     'no door has a rotated home position — the 88-door case is not being exercised');
+  /* ⚠ NO PRODUCT HAS A ROTATED HOME ANY MORE, so this is exercised on purpose
+     rather than by accident. `flat` means the bar lies ACROSS the leaf, and
+     the message must add "מותקנת לרוחב הדלת" when it does — a fact about the
+     door that Peretz builds to. It used to arise on its own from the Shiran,
+     whose home position was rotated; Peretz withdrew the Shiran on 26.8.2026
+     and with it the only grip that came that way.
+     The old assertion was `flatHome > 0` — a guard that the case was being
+     reached — and it now fails for a true reason: the case is not reached by
+     any DEFAULT door. The property is unchanged and still worth asserting, so
+     it is asserted on a door explicitly rotated, which is how a customer
+     reaches it: they press סובבו. Weakening it to "0 is fine" would have been
+     the wrong repair; making the coverage deliberate is the right one. */
+  ok(flatHome === 0,
+     `${flatHome} doors have a rotated HOME position — no product should, since `
+   + 'the Shiran was withdrawn. If one was added, restore the sweep above');
+  {
+    let rotated = 0;
+    /* ⚠ AT 60 cm, because a bar only lies across a leaf it is shorter than.
+       `gripCanRotate` hides the control for any bar longer than the leaf is
+       wide, and every bar in the range is over a metre as it comes — so at
+       their default lengths not one of them can be turned, which is what the
+       audit's drag step also had to be taught. Since phase 5 the customer can
+       shorten a bar, and that is how they reach this. */
+    for (const h of HANDLES) {
+      const st = { ...base, handle: h.id, handleLen: 600 };
+      if (!gripCanRotate(st)) continue;
+      const turned = { ...st, grip: { ...gripHome(st), rot: 90 } };
+      const dep = gripDeparture(turned);
+      if (!dep.flat) continue;
+      rotated++;
+      ok(message(turned).includes('מותקנת לרוחב הדלת'),
+         `${h.id} lies across the leaf and the order never says so`);
+    }
+    ok(rotated > 0,
+       'no grip could be rotated at all — the across-the-leaf line is untested');
+  }
   console.log(`  (${still} untouched doors silent, ${moved} moves named, `
             + `${flatHome} lying down at home)`);
 

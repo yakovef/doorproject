@@ -53,11 +53,11 @@ const SHOTS = [
        `broad` is the widest opening, which is where the panel below has least
        room and the architrave least stile — the shot to look at first when
        something has moved. */
-    q: '?c=rb-6459d&w=broad&g=grid&n=none&k=coral&d=panel&s=standard&h=right-in' },
+    q: '?c=rb-6459d&w=rect&g=grid&n=none&k=coral&d=panel&s=standard&h=right-in' },
   { name: 'panel',    w: 1280, h: 720,
     /* The Almog swan-neck reaches 220 mm inboard — the deepest fitting we sell
        — so it is the one that leaves a bar least room beside a light. */
-    q: '?c=rb-rb09d&w=tallwin&g=iron&n=none&k=almog&d=plain&s=standard&h=right-in' },
+    q: '?c=rb-rb09d&w=strip&g=grid&n=none&k=sapir&d=plain&s=standard&h=right-in' },
   { name: 'grey',     w: 1280, h: 720,
     /* Worked GLASS rather than ironwork: the rings are etched in the pane, so
        nothing here casts a shadow or takes a highlight. */
@@ -70,11 +70,11 @@ const SHOTS = [
        shot that was hiding it. */
     q: '?c=rb-9016d&w=none&g=none&n=none&k=plate&d=panel2&s=standard&h=right-in' },
   { name: 'strips',   w: 1280, h: 720,
-    q: '?c=rb-0097d&w=none&g=none&n=shiran&k=cadoor&d=strips&s=standard&h=right-in' },
+    q: '?c=rb-0097d&w=none&g=none&n=idan&k=cadoor&sp=11&s=standard&h=right-in' },
   /* Round five: the two new axes and the new hardware, each on a door that
      shows it plainly. */
   { name: 'stripsv',  w: 1280, h: 720,
-    q: '?c=rb-7322d&w=none&g=none&n=blade&k=square&d=stripsv&s=standard&h=right-in' },
+    q: '?c=rb-7322d&w=none&g=none&n=shahar&k=square&sp=22&s=standard&h=right-in' },
   { name: 'digital',  w: 1280, h: 720,
     q: '?c=rb-9302d&w=none&g=none&n=idan&k=digital&d=plain&s=standard&h=left-in' },
   { name: 'sidelight', w: 1280, h: 720,
@@ -85,9 +85,9 @@ const SHOTS = [
        the stile once glass has the middle of the leaf, so this is the cylinder
        eight of the ten installed bar doors carry. d122, the real sidelight
        door, is one of them. */
-    q: '?c=rb-6219d&w=rect&g=reeded&n=idan&k=cylinder&d=plain&s=sidelight&h=right-in' },
+    q: '?c=rb-6219d&w=rect&g=mesh&n=idan&k=cylinder&d=panel&s=sidelight&h=right-in' },
   { name: 'halfleaf', w: 1280, h: 720,
-    q: '?c=rb-9001d&w=rect&g=quatrefoil&n=none&k=sapir&d=plain&s=half&h=left-in' },
+    q: '?c=rb-9001d&w=rect&g=scroll&n=none&k=sapir&d=panel&s=half&h=left-in' },
   /* ⚠ `d=plain`, AND IT USED TO BE `d=panel`. A vertical slot with a panel
      under it is refused now — the glass runs to 0.79 of leaf height and the
      seven corpus doors with a panel below glazing all stop by 0.61, so

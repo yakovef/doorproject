@@ -98,47 +98,17 @@
     // פאנל תחתון קלאסי
     panel2o: 1450,
     // שני פאנלים קלאסיים
-    /* The even compositions, on the same 200 + 40 per band as the ragged ones:
-       it is the same stock and the same fixing, cut square instead of to
-       length. `stripsband` is eight bands in a hand's breadth of leaf. */
-    strips2: 280,
-    // שני פסים אחידים
-    strips4: 360,
-    // ארבעה פסים אחידים
-    stripsband: 520,
-    // פסים צפופים      — eight bands
-    strips3: 320,
-    // שלושה פסים מדורגים
-    strips5: 400,
-    // חמישה פסים מדורגים
-    strips7: 480,
-    // שבעה פסים מדורגים
-    strips9: 560,
-    // תשעה פסים מדורגים
-    strips: 640,
-    // אחד עשר פסים מדורגים
-    /* The LONG vertical bands run 0.85 of the leaf where the fanned ones average
-       about 0.6, so they are more stock per band: 240 + 60 rather than 240 + 50.
-       Both curves are invented like everything else in this file; the point of
-       writing the shape down is that Peretz can correct the RATE in a sentence
-       instead of correcting four totals. */
-    stripsvl3: 420,
-    // שלושה פסים אנכיים ארוכים
-    stripsvl4: 480,
-    // ארבעה פסים אנכיים ארוכים
-    stripsv3: 390,
-    // שלושה פסים אנכיים מדורגים
-    stripsv: 440,
-    // פסים אנכיים     — four bands
-    stripsv6: 540,
-    // שישה פסים אנכיים
-    stripsx: 460,
-    // פס אנכי חוצה    — one long member and four short ones
     /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
        and plinth, all as one. Peretz's "greek set +2700", and it removes the
        pull handle. */
     classic: 2700
     // סט יווני
+  };
+  var STRIPE = {
+    h: 150,
+    // פס אופקי, לכל פס
+    v: 300
+    // פס אנכי, לכל פס
   };
   var DETAIL_GLAZED = {
     classic: 1e3
@@ -773,7 +743,7 @@
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "right" },
     { id: "left-in", he: "שמאל, פנימה", en: "Left, inward", hinge: "left" }
   ];
-  var DETAIL_SUBS = [["panel", "פאנלים"], ["strips", "פסים"]];
+  var DETAIL_SUBS = [["panel", "פאנלים"]];
   var DETAILS = [
     { id: "plain", he: "חלק", en: "Plain", panel: false, groove: false },
     /* ── PANELS ───────────────────────────────────────────────────────
@@ -851,6 +821,11 @@
        door. See PANEL_ROWS in renderer.js for the rows and the ±0.03 on them.
        The name stays "three panels" because that is what it was asked for as and
        what a customer counts; the plate is the third. */
+    /* ⚠ `ownPull` — PERETZ: "3 panel +1900 (remove the handle)". The middle
+       panel of the three IS a grab plate and it comes with its own turned pull;
+       ASK-PERETZ §14 asked whether it always does, and this is that answered.
+       A second pull handle is not something he fits, so `js/rules.js` removes
+       one rather than drawing two. */
     {
       id: "panel3",
       sub: "panel",
@@ -858,6 +833,7 @@
       en: "Three panels",
       panel: true,
       groove: false,
+      ownPull: true,
       panels: 3,
       top: true,
       grab: true
@@ -957,30 +933,6 @@
          STRIP_ROWS in the renderer, rather than fitted from a span formula that
          would have put them at 0.23 and 0.77. It is the commonest striped door in
          the corpus and it had no tile. */
-    {
-      id: "strips2",
-      sub: "strips",
-      he: "שני פסים אחידים",
-      en: "Two strips, even",
-      panel: false,
-      groove: false,
-      strips: 2,
-      even: true,
-      rows: "pair",
-      doors: ["d035", "d036", "d049"]
-    },
-    {
-      id: "strips4",
-      sub: "strips",
-      he: "ארבעה פסים אחידים",
-      en: "Four strips, even",
-      panel: false,
-      groove: false,
-      strips: 4,
-      even: true,
-      rows: "quad",
-      doors: ["d056", "d063"]
-    },
     /* ⚠ EIGHT FINE LINES IN A BAND, NOT EIGHT SPREAD OVER THE DOOR. d081 puts
        them at 0.492 0.521 0.547 0.576 0.604 0.631 0.660 0.687 — a spacing of
        0.028 repeated seven times, which is far too regular to be a detection
@@ -989,67 +941,8 @@
        the hinge edge; d081's is the one measured because its band runs the full
        width and the reading is clean. Nothing else in the list can express it:
        eight strips spread evenly is a barcode, and this is a band. */
-    {
-      id: "stripsband",
-      sub: "strips",
-      he: "פסים צפופים",
-      en: "Banded strips",
-      panel: false,
-      groove: false,
-      strips: 8,
-      even: true,
-      rows: "band",
-      doors: ["d081"]
-    },
-    {
-      id: "strips3",
-      sub: "strips",
-      he: "שלושה פסים מדורגים",
-      en: "Three strips, ragged",
-      panel: false,
-      groove: false,
-      strips: 3
-    },
-    {
-      id: "strips5",
-      sub: "strips",
-      he: "חמישה פסים מדורגים",
-      en: "Five strips, ragged",
-      panel: false,
-      groove: false,
-      strips: 5
-    },
-    {
-      id: "strips7",
-      sub: "strips",
-      he: "שבעה פסים מדורגים",
-      en: "Seven strips, ragged",
-      panel: false,
-      groove: false,
-      strips: 7,
-      doors: ["d044", "d064"]
-    },
-    {
-      id: "strips9",
-      sub: "strips",
-      he: "תשעה פסים מדורגים",
-      en: "Nine strips, ragged",
-      panel: false,
-      groove: false,
-      strips: 9
-    },
     /* Eleven is d078's own count, and it keeps the id `strips` it has always
        had — the plain name for what used to be the only strip option. */
-    {
-      id: "strips",
-      sub: "strips",
-      he: "אחד עשר פסים מדורגים",
-      en: "Eleven strips, ragged",
-      panel: false,
-      groove: false,
-      strips: 11,
-      doors: ["d078"]
-    },
     /* The strips run BOTH ways and we drew one. The counts above are horizontal
        — d078's eleven bands settled that in an earlier round — but five doors
        (d034 d037 d038 d040 d043) run them up the leaf instead, and a customer
@@ -1072,65 +965,10 @@
          every count — so d037, d040 and d046 had no tile.
     
          The Hebrew says which is which, like the horizontals' אחידים / מדורגים. */
-    {
-      id: "stripsvl3",
-      sub: "strips",
-      he: "שלושה פסים אנכיים ארוכים",
-      en: "Three long vertical strips",
-      panel: false,
-      groove: false,
-      strips: 3,
-      vertical: true,
-      long: true,
-      doors: ["d037"]
-    },
-    {
-      id: "stripsvl4",
-      sub: "strips",
-      he: "ארבעה פסים אנכיים ארוכים",
-      en: "Four long vertical strips",
-      panel: false,
-      groove: false,
-      strips: 4,
-      vertical: true,
-      long: true,
-      doors: ["d040", "d046"]
-    },
     /* ⚠ THREE IS THE CORPUS'S OWN COUNT AND IT WAS THE ONE MISSING. d038 and
        d043 carry three fanned; nothing carries six. The list offered four and
        six. The fan itself is measured on d038 and d043 — see `metalStrips` — and
        applies at any count. */
-    {
-      id: "stripsv3",
-      sub: "strips",
-      he: "שלושה פסים אנכיים מדורגים",
-      en: "Three vertical strips, fanned",
-      panel: false,
-      groove: false,
-      strips: 3,
-      vertical: true,
-      doors: ["d038", "d043"]
-    },
-    {
-      id: "stripsv",
-      sub: "strips",
-      he: "ארבעה פסים אנכיים מדורגים",
-      en: "Vertical strips, fanned",
-      panel: false,
-      groove: false,
-      strips: 4,
-      vertical: true
-    },
-    {
-      id: "stripsv6",
-      sub: "strips",
-      he: "שישה פסים אנכיים מדורגים",
-      en: "Six vertical strips, fanned",
-      panel: false,
-      groove: false,
-      strips: 6,
-      vertical: true
-    },
     /* ⚠ THE CROSS, AND THE INVENTORY HAS CALLED IT MISSING FOR THREE ROUNDS.
        `research/works/INVENTORY.md` lists it under the face designs as *"Cross
        composition — one long vertical crossed by horizontals: d035 d047 d066
@@ -1142,17 +980,6 @@
        price read it the same way the other stripe options are read. See
        `metalStrips` for the measurements and for why the vertical is a strip
        here and the pull bar on three of the four real doors. */
-    {
-      id: "stripsx",
-      sub: "strips",
-      he: "פס אנכי חוצה",
-      en: "Crossed strips",
-      panel: false,
-      groove: false,
-      strips: 5,
-      cross: true,
-      doors: ["d047", "d074"]
-    },
     /* ── THE CLASSICAL SET ─────────────────────────────────────────────
          A whole composition rather than one feature: a projecting cornice over a
          frieze with an oval boss, the window, a corbelled shelf carrying a
@@ -1210,6 +1037,8 @@
        from one door, photographed off the workshop floor into
        `research/newdoor/`. Whether those five are the same product is a question
        for Peretz and it is asked. */
+    /* `ownPull` — the set carries a turned pull on its own corbelled shelf.
+       Peretz: "greek set + 2700 (remove the handle)". */
     {
       id: "classic",
       sub: "panel",
@@ -1217,6 +1046,7 @@
       en: "Classical set",
       panel: true,
       groove: false,
+      ownPull: true,
       classic: true,
       grab: true,
       rectOnly: true,
@@ -1342,6 +1172,42 @@
     }
   }
   var MASHKOF_WIDER_A = agorot(MASHKOF_WIDER);
+  var STRIPE_A = { h: agorot(STRIPE.h), v: agorot(STRIPE.v) };
+  var STRIPE_MAX = { h: 11, hTight: 8, v: 6 };
+  var TIGHT_MIN = 2;
+  function packStripes(st) {
+    const n = st.stripeCount | 0;
+    if (st.stripeDir === "h" && n >= 1) {
+      if (!st.stripeTight) return Math.min(n, STRIPE_MAX.h);
+      return 11 + Math.min(Math.max(n, TIGHT_MIN), STRIPE_MAX.hTight) - 1;
+    }
+    if (st.stripeDir === "v" && n >= 1) return 18 + Math.min(n, STRIPE_MAX.v);
+    return 0;
+  }
+  function unpackStripes(v) {
+    if (v >= 1 && v <= 11) return { stripeDir: "h", stripeCount: v, stripeTight: false };
+    if (v >= 12 && v <= 18) return { stripeDir: "h", stripeCount: v - 10, stripeTight: true };
+    if (v >= 19 && v <= 24) return { stripeDir: "v", stripeCount: v - 18, stripeTight: false };
+    return { stripeDir: "none", stripeCount: 0, stripeTight: false };
+  }
+  var STRIPE_SLOTS = 25;
+  var STRIPE_LEGACY = {
+    strips2: { stripeDir: "h", stripeCount: 2, stripeTight: false },
+    strips4: { stripeDir: "h", stripeCount: 4, stripeTight: false },
+    stripsband: { stripeDir: "h", stripeCount: 8, stripeTight: true },
+    strips3: { stripeDir: "h", stripeCount: 3, stripeTight: false },
+    strips5: { stripeDir: "h", stripeCount: 5, stripeTight: false },
+    strips7: { stripeDir: "h", stripeCount: 7, stripeTight: false },
+    strips9: { stripeDir: "h", stripeCount: 9, stripeTight: false },
+    strips: { stripeDir: "h", stripeCount: 11, stripeTight: false },
+    stripsvl3: { stripeDir: "v", stripeCount: 3, stripeTight: false },
+    stripsvl4: { stripeDir: "v", stripeCount: 4, stripeTight: false },
+    stripsv3: { stripeDir: "v", stripeCount: 3, stripeTight: false },
+    stripsv: { stripeDir: "v", stripeCount: 4, stripeTight: false },
+    stripsv6: { stripeDir: "v", stripeCount: 6, stripeTight: false },
+    stripsx: { stripeDir: "v", stripeCount: 1, stripeTight: false }
+  };
+  var stripePrice = (st) => st.stripeDir === "none" ? 0 : (STRIPE_A[st.stripeDir] || 0) * (st.stripeCount | 0);
   var HANDLE_RATE_A = { ...HANDLE_RATE, per: agorot(HANDLE_RATE.per) };
   for (const h of HANDLES) h.priceKind = h.style === "bar" ? "bar" : "flat";
   priceInto("colour", COLOURS, COLOUR, "delta");
@@ -1408,6 +1274,8 @@
          beside the leaf, and "does this door have glass in it" is the question
          both prices actually turn on. */
       detail: glazedDetail(state2),
+      /* Per stripe, at his rate — ₪150 horizontal, ₪300 vertical, no base. */
+      stripes: stripePrice(state2),
       handle: handlePrice(state2),
       lockset: byId(LOCKSETS, state2.lockset).delta,
       speciallock: byId(SPECIAL_LOCKS, state2.speciallock).delta,
@@ -1537,8 +1405,17 @@
       rows.push({ key: "speciallock", label: "מנעול מיוחד", id: xl.id, value: xl.he });
     }
     if (dt.id !== "plain") {
-      const n = dt.strips ? ` (${dt.strips})` : "";
-      rows.push({ key: "detail", label: "עיצוב", id: dt.id, value: `${dt.he}${n}` });
+      rows.push({ key: "detail", label: "עיצוב", id: dt.id, value: dt.he });
+    }
+    if (state2.stripeDir !== "none" && state2.stripeCount) {
+      const dir = state2.stripeDir === "h" ? "אופקיים" : "אנכיים";
+      const how = state2.stripeTight ? " · צפופים" : "";
+      rows.push({
+        key: "stripes",
+        label: "פסים",
+        id: `${state2.stripeDir}${state2.stripeCount}`,
+        value: `${state2.stripeCount} ${dir}${how}`
+      });
     }
     rows.push({ key: "size", label: "מידה", id: state2.size, value: sz.he });
     rows.push({ key: "mashkof", label: "משקוף", id: mk.id, value: mk.he });
@@ -3101,7 +2978,7 @@
     ))(panelRows(detail)) : ""}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint2, detail.perimeter) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
-    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail, tone, hingeOnLeft) : ""}
+    ${metalStrips(mainX, y0, leafW, leafH, state2, tone, hingeOnLeft)}
   </g>
 
   ${detail.classic ? "" : glazing}
@@ -3734,127 +3611,49 @@ ${body}
     }
     return best;
   }
-  var STRIP_ROWS = {
-    pair: [0.43, 0.613],
-    quad: [0.199, 0.402, 0.611, 0.808],
-    band: [0.492, 0.521, 0.547, 0.576, 0.604, 0.631, 0.66, 0.687]
-  };
+  var STRIP_H = { pitch: 0.19, span: 0.8, mid: 0.52 };
+  var STRIP_H_TIGHT = { pitch: 0.033, mid: 0.55 };
   var STRIP_EVEN_W = 0.88;
   var STRIP_V = { pitch: 0.073, mid: 0.33 };
+  var STRIP_V_RUN = { top: 0.098, foot: 0.945 };
   var stripVAt = (i, count) => STRIP_V.mid - (count - 1) * STRIP_V.pitch / 2 + i * STRIP_V.pitch;
-  function metalStrips(lx, ly, lw, lh, detail, tone, hingeOnLeft) {
-    const { strips: count, vertical, cross, even, rows } = detail;
-    if (even) {
+  function metalStrips(lx, ly, lw, lh, state2, tone, hingeOnLeft) {
+    const { stripeDir: dir, stripeCount: n, stripeTight: tight } = state2;
+    if (dir === "none" || !n) return "";
+    const band = (x, y, w, h) => `
+        <rect x="${(x + 3).toFixed(1)}" y="${(y + 3).toFixed(1)}" width="${w.toFixed(1)}"
+              height="${h.toFixed(1)}" fill="#000" opacity="0.22"/>
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
+              height="${h.toFixed(1)}" fill="${tone[2]}"/>
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
+              height="${Math.max(2, (w > h ? h : w) * 0.34).toFixed(1)}" fill="${tone[0]}"/>`;
+    if (dir === "h") {
       const t2 = Math.max(8, Math.round(lh * 8e-3));
       const w = Math.round(lw * STRIP_EVEN_W);
       const x = Math.round(lx + (lw - w) / 2);
-      const at = STRIP_ROWS[rows] || STRIP_ROWS.quad;
-      const out2 = at.map((f) => {
-        const y = Math.round(ly + lh * f - t2 / 2);
-        return `
-        <rect x="${x + 3}" y="${y + 3}" width="${w}" height="${t2}" fill="#000" opacity="0.22"/>
-        <rect x="${x}" y="${y}" width="${w}" height="${t2}" fill="${tone[2]}"/>
-        <rect x="${x}" y="${y}" width="${w}" height="${Math.max(2, t2 * 0.34)}"
-              fill="${tone[0]}"/>
-        <rect x="${x}" y="${y + t2 - Math.max(2, t2 * 0.24)}" width="${w}"
-              height="${Math.max(2, t2 * 0.24)}" fill="${tone[4]}"/>`;
-      });
-      return `<g data-detail="strips" data-count="${at.length}" data-axis="horizontal"
-               data-even="${rows}">${out2.join("")}</g>`;
-    }
-    if (cross) {
-      const tv = Math.max(8, Math.round(lw * 0.018));
-      const th = Math.max(6, Math.round(lh * 7e-3));
-      const X = (f) => lx + lw * (hingeOnLeft ? f : 1 - f);
-      const vx = Math.round(X(0.309)) - tv / 2;
-      const bar = (x, y, w, h, lit) => `
-      <rect x="${(x + 3).toFixed(1)}" y="${(y + 3).toFixed(1)}" width="${w.toFixed(1)}"
-            height="${h.toFixed(1)}" fill="#000" opacity="0.22"/>
-      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
-            height="${h.toFixed(1)}" fill="${tone[2]}"/>
-      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}"
-            width="${(lit === "v" ? Math.max(2, w * 0.34) : w).toFixed(1)}"
-            height="${(lit === "v" ? h : Math.max(2, h * 0.34)).toFixed(1)}"
-            fill="${tone[0]}"/>`;
-      const out2 = [bar(vx, ly + lh * 0.155, tv, lh * (0.864 - 0.155), "v")];
-      for (const y of [0.42, 0.448, 0.578, 0.606]) {
-        const a = X(0.167), b = X(0.556);
-        out2.push(bar(Math.min(a, b), ly + lh * y, Math.abs(b - a), th, "h"));
-      }
-      return `<g data-detail="strips" data-count="5" data-axis="cross">${out2.join("")}</g>`;
-    }
-    if (vertical && detail.long) {
-      const t2 = Math.max(5, Math.round(lw * 0.013));
-      const TOP = 0.098, FOOT_OUT = 0.945, FOOT_IN = 0.915;
+      const { pitch, mid } = tight ? STRIP_H_TIGHT : {
+        pitch: Math.min(STRIP_H.pitch, STRIP_H.span / Math.max(1, n - 1)),
+        mid: STRIP_H.mid
+      };
+      const top = mid - (n - 1) * pitch / 2;
       const out2 = [];
-      for (let i = 0; i < count; i++) {
-        const f = stripVAt(i, count);
-        const x = Math.round((hingeOnLeft ? lx + lw * f : lx + lw * (1 - f)) - t2 / 2);
-        const inward = count > 1 ? i / (count - 1) : 0.5;
-        const top2 = ly + lh * TOP;
-        const bot2 = ly + lh * (FOOT_OUT + (FOOT_IN - FOOT_OUT) * inward);
-        const h = bot2 - top2;
-        out2.push(`
-        <rect x="${x + 3}" y="${(top2 + 3).toFixed(1)}" width="${t2}" height="${h.toFixed(1)}"
-              fill="#000" opacity="0.22"/>
-        <rect x="${x}" y="${top2.toFixed(1)}" width="${t2}" height="${h.toFixed(1)}" fill="${tone[2]}"/>
-        <rect x="${x}" y="${top2.toFixed(1)}" width="${Math.max(2, t2 * 0.34)}" height="${h.toFixed(1)}"
-              fill="${tone[0]}"/>
-        <rect x="${x + t2 - Math.max(2, t2 * 0.24)}" y="${top2.toFixed(1)}"
-              width="${Math.max(2, t2 * 0.24)}" height="${h.toFixed(1)}" fill="${tone[4]}"/>`);
+      for (let i = 0; i < n; i++) {
+        out2.push(band(x, ly + lh * (top + i * pitch) - t2 / 2, w, t2));
       }
-      return `<g data-detail="strips" data-count="${count}" data-axis="vertical"
-               data-long="1">${out2.join("")}</g>`;
+      return `<g data-detail="strips" data-count="${n}" data-axis="horizontal"
+               data-tight="${tight ? 1 : 0}">${out2.join("")}</g>`;
     }
-    if (vertical) {
-      const t2 = Math.max(8, Math.round(lw * 0.018));
-      const FOOT = 0.778;
-      const HEAD_IN = 0.39, HEAD_OUT = 0.05;
-      const out2 = [];
-      for (let i = 0; i < count; i++) {
-        const f = stripVAt(i, count);
-        const x = Math.round((hingeOnLeft ? lx + lw * f : lx + lw * (1 - f)) - t2 / 2);
-        const inward = count > 1 ? i / (count - 1) : 0.5;
-        const top2 = ly + lh * (HEAD_OUT + (HEAD_IN - HEAD_OUT) * inward);
-        const bot2 = ly + lh * FOOT;
-        const h = bot2 - top2;
-        out2.push(`
-        <rect x="${x + 3}" y="${(top2 + 3).toFixed(1)}" width="${t2}" height="${h.toFixed(1)}"
-              fill="#000" opacity="0.22"/>
-        <rect x="${x}" y="${top2.toFixed(1)}" width="${t2}" height="${h.toFixed(1)}" fill="${tone[2]}"/>
-        <rect x="${x}" y="${top2.toFixed(1)}" width="${Math.max(2, t2 * 0.34)}" height="${h.toFixed(1)}"
-              fill="${tone[0]}"/>
-        <rect x="${x + t2 - Math.max(2, t2 * 0.24)}" y="${top2.toFixed(1)}"
-              width="${Math.max(2, t2 * 0.24)}" height="${h.toFixed(1)}" fill="${tone[4]}"/>`);
-      }
-      return `<g data-detail="strips" data-count="${count}" data-axis="vertical">${out2.join("")}</g>`;
-    }
-    const t = Math.max(8, Math.round(lh * 8e-3));
-    const span = Math.min(0.95, 0.458 + 0.044 * count);
-    const top = ly + lh * (0.5 - span / 2), bot = ly + lh * (0.5 + span / 2);
-    const graded = Math.max(0, Math.min(1, (count - 4) / 7));
-    const spread = (u) => {
-      const s = 0.6 * (u * u * (3 - 2 * u)) + 0.4 * u;
-      return u + (s - u) * graded;
-    };
-    const RHYTHM = [0.94, 0.7, 0.61, 0.91, 0.59, 0.68, 0.91];
-    const anchor = hingeOnLeft ? lx + lw * 0.03 : lx + lw * 0.97;
+    const t = Math.max(8, Math.round(lw * 0.013));
+    const y0 = ly + lh * STRIP_V_RUN.top;
+    const y1 = ly + lh * STRIP_V_RUN.foot;
     const out = [];
-    for (let i = 0; i < count; i++) {
-      const cy = count > 1 ? top + (bot - top) * spread(i / (count - 1)) : ly + lh / 2;
-      const y = Math.round(cy - t / 2);
-      const wide = Math.round(lw * RHYTHM[i % RHYTHM.length]);
-      const x0s = hingeOnLeft ? anchor : anchor - wide;
-      out.push(`
-      <rect x="${x0s + 3}" y="${y + 3}" width="${wide}" height="${t}"
-            fill="#000" opacity="0.22"/>
-      <rect x="${x0s}" y="${y}" width="${wide}" height="${t}" fill="${tone[2]}"/>
-      <rect x="${x0s}" y="${y}" width="${wide}" height="${Math.max(2, t * 0.34)}"
-            fill="${tone[0]}"/>
-      <rect x="${x0s}" y="${y + t - Math.max(2, t * 0.24)}" width="${wide}"
-            height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`);
+    for (let i = 0; i < n; i++) {
+      const f = stripVAt(i, n);
+      const cx = lx + lw * (hingeOnLeft ? f : 1 - f);
+      out.push(band(cx - t / 2, y0, t, y1 - y0));
     }
-    return `<g data-detail="strips" data-count="${count}" data-axis="horizontal">${out.join("")}</g>`;
+    return `<g data-detail="strips" data-count="${n}" data-axis="vertical"
+             data-tight="0">${out.join("")}</g>`;
   }
   function edgeGroove(lx, ly, lw, lh, paint2, inset) {
     const m = Math.round(lw * inset);
@@ -6092,8 +5891,8 @@ ${body}
   }
 
   // js/rules.js
-  var isLineWork = (detail) => !!(detail.strips || detail.groove || detail.perimeter);
-  var faceWorked = (detail) => !!detail.panel || isLineWork(detail);
+  var isLineWork = (state2) => !!(state2 && state2.stripeDir && state2.stripeDir !== "none" && state2.stripeCount);
+  var faceWorked = (state2) => !!byId(DETAILS, state2.detail).panel || isLineWork(state2);
   var locksetFits = (state2, id) => !gripClashesLockset({ ...state2, lockset: id });
   function fallbackLockset(state2) {
     if (locksetFits(state2, "cylinder")) return "cylinder";
@@ -6103,7 +5902,7 @@ ${body}
   function conflicts(state2) {
     const glazed = isGlazed(state2);
     const onLeaf = leafGlazed(state2);
-    const lined = isLineWork(byId(DETAILS, state2.detail));
+    const lined = isLineWork(state2);
     const out = {
       window: {},
       grille: {},
@@ -6112,7 +5911,12 @@ ${body}
       lockset: {},
       size: {},
       colour: {},
-      handing: {}
+      handing: {},
+      /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
+         longer options with ids. Every other key here is
+         `{ optionId: reason }`; this one is either null or the one
+         reason the stripe controls cannot be used on this door. */
+      stripes: null
     };
     const grip = byId(HANDLES, state2.handle);
     if (!glazed) {
@@ -6139,12 +5943,19 @@ ${body}
         out.window[w.id] = out.window[w.id] || "הסט הקלאסי מגיע עם חלון מלבני משלו";
       }
     }
-    for (const d of DETAILS) {
-      if (onLeaf && isLineWork(d)) out.detail[d.id] = "לא משלבים קווי מתכת עם חלון";
-      if (isLineWork(d) && d.panel) out.detail[d.id] = "לא משלבים קווי מתכת עם פאנל";
-    }
+    if (onLeaf) out.stripes = "לא משלבים פסי מתכת עם חלון";
+    else if (byId(DETAILS, state2.detail).panel) out.stripes = "לא משלבים פסי מתכת עם פאנל";
     if (lined) {
       for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = "לא משלבים חלון עם קווי מתכת";
+      for (const d of DETAILS) if (d.panel) out.detail[d.id] = "לא משלבים פאנל עם פסי מתכת";
+    }
+    if (state2.window === "rect") {
+      out.detail.plain = out.detail.plain || "חלון מרובע מגיע תמיד עם פאנל בתחתית";
+    }
+    if (byId(DETAILS, state2.detail).ownPull) {
+      for (const h of HANDLES) {
+        if (h.style !== "none") out.handle[h.id] = "הפאנל האמצעי מגיע עם המאחז שלו";
+      }
     }
     const CHANNEL = HANDLES.find((h) => h.style === "channel");
     if (CHANNEL) {
@@ -6199,7 +6010,9 @@ ${body}
     gripMoved: "הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה",
     gripHome: "הידית הוסרה, ואיתה המיקום שבחרתם לה",
     setWindow: "התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו",
-    setGone: "הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי"
+    setGone: "הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי",
+    needPanel: "הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד",
+    ownPull: "הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו"
   };
   function repair(state2, intent = null) {
     let s = { ...state2 };
@@ -6222,14 +6035,43 @@ ${body}
         change("window", SAID.setWindow);
       }
     }
-    const lined = isLineWork(byId(DETAILS, s.detail));
+    const lined = isLineWork(s);
+    if (lined && byId(DETAILS, s.detail).panel) {
+      if (intent === "detail") {
+        s.stripeDir = "none";
+        s.stripeCount = 0;
+        change("stripes", SAID.lineWorkGone);
+      } else {
+        s.detail = "plain";
+        change("detail", SAID.setGone);
+      }
+    }
     if (leafGlazed(s) && lined) {
+      if (intent === "stripes") {
+        s.window = "none";
+        change("window", SAID.windowGone);
+      } else {
+        s.stripeDir = "none";
+        s.stripeCount = 0;
+        change("stripes", SAID.lineWorkGone);
+      }
+    }
+    if (s.window === "rect" && s.detail === "plain") {
       if (intent === "detail") {
         s.window = "none";
         change("window", SAID.windowGone);
       } else {
+        s.detail = "panel";
+        change("detail", SAID.needPanel);
+      }
+    }
+    if (byId(DETAILS, s.detail).ownPull && byId(HANDLES, s.handle).style !== "none") {
+      if (intent === "handle") {
         s.detail = "plain";
-        change("detail", SAID.lineWorkGone);
+        change("detail", SAID.setGone);
+      } else {
+        s.handle = "none";
+        change("handle", SAID.ownPull);
       }
     }
     if (leafGlazed(s) && byId(DETAILS, s.detail).panel && !panelFits(s)) {
@@ -6323,7 +6165,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 17;
+  var VERSION = 18;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "none",
@@ -6342,6 +6184,9 @@ ${body}
        default would override all of them silently. The length is opt-in, and a
        door nobody has touched draws exactly what it always drew. */
     handleLen: 0,
+    stripeDir: "none",
+    stripeCount: 0,
+    stripeTight: false,
     detail: "plain",
     size: "standard",
     handing: "right-in"
@@ -6358,6 +6203,7 @@ ${body}
     p.set("m", state2.mashkof);
     p.set("pz", state2.pirzul);
     p.set("hl", String(state2.handleLen));
+    p.set("sp", String(packStripes(state2)));
     p.set("d", state2.detail);
     p.set("s", state2.size);
     p.set("h", state2.handing);
@@ -6382,6 +6228,7 @@ ${body}
       "m",
       "pz",
       "hl",
+      "sp",
       "d",
       "s",
       "h",
@@ -6423,11 +6270,21 @@ ${body}
         if (handleRaisedIt) notice = beforeHandle;
       }
     }
-    take("detail", "d", DETAILS);
+    const legacy = STRIPE_LEGACY[p.get("d")];
+    if (legacy) {
+      Object.assign(state2, legacy);
+      state2.detail = "plain";
+    } else take("detail", "d", DETAILS);
     take("handing", "h", HANDINGS);
     take("speciallock", "x", SPECIAL_LOCKS);
     take("mashkof", "m", MASHKOFS);
     take("pirzul", "pz", PIRZUL2);
+    const rawStripes = p.get("sp");
+    if (rawStripes != null) {
+      const v = Number(rawStripes);
+      if (Number.isInteger(v) && v >= 0 && v < STRIPE_SLOTS) Object.assign(state2, unpackStripes(v));
+      else notice = notice || "option-unknown";
+    }
     const rawLen = p.get("hl");
     if (rawLen != null) {
       const v = Number(rawLen);
@@ -6462,11 +6319,12 @@ ${body}
     grille: 4,
     handle: 4,
     lockset: 3,
-    detail: 5,
+    detail: 3,
     speciallock: 2,
     mashkof: 2,
     pirzul: 2,
-    handleLen: 4
+    handleLen: 4,
+    stripes: 5
   };
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   var CHECK_MIN = 4;
@@ -6502,7 +6360,8 @@ ${body}
       /* The INDEX, not the millimetres: 2000 mm would need eleven bits and the
          eight lengths need three. This is also why the lengths are a fixed list
          rather than a free number — see `HANDLE_LENS`. */
-      [Math.max(0, HANDLE_LENS.indexOf(state2.handleLen)), BITS.handleLen]
+      [Math.max(0, HANDLE_LENS.indexOf(state2.handleLen)), BITS.handleLen],
+      [packStripes(state2), BITS.stripes]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -6545,6 +6404,7 @@ ${body}
     const mashkof = MASHKOFS[read(BITS.mashkof)];
     const pirzul = PIRZUL2[read(BITS.pirzul)];
     const hLen = HANDLE_LENS[read(BITS.handleLen)];
+    const sp = read(BITS.stripes);
     if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0) return null;
     return {
       colour: colour.id,
@@ -6558,7 +6418,8 @@ ${body}
       speciallock: special.id,
       mashkof: mashkof.id,
       pirzul: pirzul.id,
-      handleLen: hLen
+      handleLen: hLen,
+      ...unpackStripes(sp)
     };
   }
 
@@ -6710,36 +6571,36 @@ ${body}
 
   // js/works.js
   var WORKS = [
-    { id: "d003", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
-    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
-    { id: "d012", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
-    { id: "d015", state: { colour: "rb-9005d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
-    { id: "d016", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
-    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
-    { id: "d026", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
-    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
-    { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "left-in" } },
-    { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "right-in" } },
-    { id: "d034", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", lockset: "cylinder", size: "standard", handing: "right-in" } },
-    { id: "d038", state: { colour: "rb-7110d", detail: "stripsv3", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
-    { id: "d043", state: { colour: "rb-7126d", detail: "stripsv3", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
-    { id: "d048", state: { colour: "rb-5103d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
-    { id: "d051", state: { colour: "rb-7240d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
-    { id: "d063", state: { colour: "rb-7240d", detail: "strips4", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
-    { id: "d064", state: { colour: "rb-7110d", detail: "strips7", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
-    { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "shahar", lockset: "cylinder", size: "standard", handing: "left-in" } },
-    { id: "d078", state: { colour: "rb-7110d", detail: "strips", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
-    { id: "d087", state: { colour: "rb-7021d", detail: "panel", window: "none", grille: "none", handle: "shahar", lockset: "digital", size: "standard", handing: "right-in" } },
-    { id: "d092", state: { colour: "rb-6219d", detail: "panel", window: "rect", grille: "none", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in" } },
-    { id: "d097", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
-    { id: "d099", state: { colour: "rb-7126d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
-    { id: "d106", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
-    { id: "d108", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
-    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "barblack", lockset: "digital", size: "standard", handing: "right-in" } },
-    { id: "d116", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
-    { id: "d122", state: { colour: "rb-7240d", detail: "panel", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in" } },
-    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in" } },
-    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in" } }
+    { id: "d003", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d012", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d015", state: { colour: "rb-9005d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d016", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d026", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d034", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
+    { id: "d038", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
+    { id: "d043", state: { colour: "rb-7126d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
+    { id: "d048", state: { colour: "rb-5103d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d051", state: { colour: "rb-7240d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d063", state: { colour: "rb-7240d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 4, stripeTight: false } },
+    { id: "d064", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 7, stripeTight: false } },
+    { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "shahar", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
+    { id: "d078", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 11, stripeTight: false } },
+    { id: "d087", state: { colour: "rb-7021d", detail: "panel", window: "none", grille: "none", handle: "shahar", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d092", state: { colour: "rb-6219d", detail: "panel", window: "rect", grille: "none", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d097", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d099", state: { colour: "rb-7126d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d106", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d108", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "barblack", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d116", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d122", state: { colour: "rb-7240d", detail: "panel", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
   ];
 
   // js/app.js
@@ -7294,6 +7155,65 @@ ${body}
     }
     keyboardGrid(host);
     if (g.key === "handle") buildLengthStepper(host);
+    if (g.key === "detail") buildStripes(host);
+  }
+  function buildStripes(host) {
+    const old = host.querySelector(".stripes");
+    if (old) old.remove();
+    const why = conflicts(state).stripes;
+    const dir = state.stripeDir, n = state.stripeCount;
+    const max = dir === "v" ? STRIPE_MAX.v : state.stripeTight ? STRIPE_MAX.hTight : STRIPE_MAX.h;
+    const box = document.createElement("div");
+    box.className = "stripes";
+    box.innerHTML = `
+    <span class="stripes__label" id="stripes-l">פסי מתכת</span>
+    ${why ? `<p class="stripes__why">${why}</p>` : `
+    <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
+      ${[["none", "ללא"], ["h", "אופקיים"], ["v", "אנכיים"]].map(([id, he]) => `
+        <button type="button" class="pill${dir === id ? " is-on" : ""}"
+                data-dir="${id}" aria-pressed="${dir === id}">${he}</button>`).join("")}
+    </div>
+    ${dir === "none" ? "" : `
+      <div class="blen__row">
+        <button type="button" class="blen__b" data-n="-1" aria-label="פחות פסים"
+                ${n <= 1 ? "disabled" : ""}>−</button>
+        <output class="blen__v" aria-labelledby="stripes-l">${n} פסים</output>
+        <button type="button" class="blen__b" data-n="1" aria-label="עוד פסים"
+                ${n >= max ? "disabled" : ""}>+</button>
+      </div>
+      ${dir === "h" ? `
+        <button type="button" class="pill stripes__tight${state.stripeTight ? " is-on" : ""}"
+                data-tight="1" aria-pressed="${state.stripeTight}">צפופים</button>` : ""}
+      <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`}
+    `}`;
+    for (const b of box.querySelectorAll("[data-dir]")) {
+      b.addEventListener("click", () => {
+        const d = b.dataset.dir;
+        set(repair({
+          ...state,
+          stripeDir: d,
+          stripeCount: d === "none" ? 0 : Math.max(1, state.stripeCount || 2),
+          stripeTight: d === "v" ? false : state.stripeTight
+        }, "stripes").state);
+      });
+    }
+    for (const b of box.querySelectorAll("[data-n]")) {
+      b.addEventListener("click", () => {
+        const next = state.stripeCount + Number(b.dataset.n);
+        if (next < 1 || next > max) return;
+        set({ ...state, stripeCount: next });
+      });
+    }
+    const t = box.querySelector("[data-tight]");
+    if (t) t.addEventListener("click", () => set({
+      ...state,
+      stripeTight: !state.stripeTight,
+      /* A tight band tops out lower than a spread one — eight against eleven —
+         so turning it on has to bring an over-long count with it rather than
+         leaving a state the packer cannot encode. */
+      stripeCount: Math.min(state.stripeCount, state.stripeTight ? STRIPE_MAX.h : STRIPE_MAX.hTight)
+    }));
+    host.appendChild(box);
   }
   function buildLengthStepper(host) {
     const hd = byId(HANDLES, state.handle);

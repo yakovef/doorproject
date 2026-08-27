@@ -9,7 +9,8 @@
 
 import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
          handleLength, HANDLE_RATE_A, MASHKOF_WIDER_A, MASHKOFS, paneCount,
-         LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+         LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, stripePrice,
+         WINDOWS } from './catalog.js';
 
 /**
  * What WIDENING the frame costs, before the size multiplier.
@@ -162,6 +163,8 @@ export function priceParts(state) {
        beside the leaf, and "does this door have glass in it" is the question
        both prices actually turn on. */
     detail:  glazedDetail(state),
+    /* Per stripe, at his rate — ₪150 horizontal, ₪300 vertical, no base. */
+    stripes: stripePrice(state),
     handle:  handlePrice(state),
     lockset: byId(LOCKSETS, state.lockset).delta,
     speciallock: byId(SPECIAL_LOCKS, state.speciallock).delta,

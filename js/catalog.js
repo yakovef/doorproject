@@ -20,7 +20,7 @@ import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          BUILD, MASHKOF_WIDER,
          COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE, PIRZUL as PIRZUL_PRICE,
          GRILLE as GRILLE_PRICE, DETAIL as DETAIL_PRICE, DETAIL_GLAZED,
-         HANDLE as HANDLE_PRICE, HANDLE_RATE, LOCKSET as LOCKSET_PRICE,
+         HANDLE as HANDLE_PRICE, HANDLE_RATE, LOCKSET as LOCKSET_PRICE, STRIPE,
          SPECIAL_LOCK as SPECIAL_LOCK_PRICE } from './prices.js';
 
 /* Re-exported so nothing else has to know the flag moved. It belongs beside
@@ -814,7 +814,12 @@ export const HANDINGS = [
  * them is a wire format. Anything with no `sub` — `plain` — is drawn first,
  * with no heading over it.
  */
-export const DETAIL_SUBS = [['panel', 'פאנלים'], ['strips', 'פסים']];
+/* ⚠ ONE SUB-GROUP NOW, NOT TWO. `strips` held fourteen tiles and holds none:
+   the stripes are a count, drawn by their own control under the panel tiles
+   rather than as options in this list. The heading survives in the interface;
+   what is gone is the idea that a stripe composition is a thing you pick off
+   a grid. */
+export const DETAIL_SUBS = [['panel', 'פאנלים']];
 
 export const DETAILS = [
   { id: 'plain',  he: 'חלק',            en: 'Plain',              panel: false, groove: false },
@@ -871,7 +876,12 @@ export const DETAILS = [
      door. See PANEL_ROWS in renderer.js for the rows and the ±0.03 on them.
      The name stays "three panels" because that is what it was asked for as and
      what a customer counts; the plate is the third. */
-  { id: 'panel3', sub: 'panel', he: 'שלושה פאנלים',   en: 'Three panels',   panel: true,  groove: false,
+  /* ⚠ `ownPull` — PERETZ: "3 panel +1900 (remove the handle)". The middle
+     panel of the three IS a grab plate and it comes with its own turned pull;
+     ASK-PERETZ §14 asked whether it always does, and this is that answered.
+     A second pull handle is not something he fits, so `js/rules.js` removes
+     one rather than drawing two. */
+  { id: 'panel3', sub: 'panel', he: 'שלושה פאנלים',   en: 'Three panels',   panel: true,  groove: false, ownPull: true,
     panels: 3, top: true, grab: true },
 
   /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
@@ -953,12 +963,6 @@ export const DETAILS = [
      STRIP_ROWS in the renderer, rather than fitted from a span formula that
      would have put them at 0.23 and 0.77. It is the commonest striped door in
      the corpus and it had no tile. */
-  { id: 'strips2', sub: 'strips', he: 'שני פסים אחידים', en: 'Two strips, even',
-    panel: false, groove: false, strips: 2, even: true, rows: 'pair',
-    doors: ['d035', 'd036', 'd049'] },
-  { id: 'strips4', sub: 'strips', he: 'ארבעה פסים אחידים', en: 'Four strips, even',
-    panel: false, groove: false, strips: 4, even: true, rows: 'quad',
-    doors: ['d056', 'd063'] },
   /* ⚠ EIGHT FINE LINES IN A BAND, NOT EIGHT SPREAD OVER THE DOOR. d081 puts
      them at 0.492 0.521 0.547 0.576 0.604 0.631 0.660 0.687 — a spacing of
      0.028 repeated seven times, which is far too regular to be a detection
@@ -967,22 +971,9 @@ export const DETAILS = [
      the hinge edge; d081's is the one measured because its band runs the full
      width and the reading is clean. Nothing else in the list can express it:
      eight strips spread evenly is a barcode, and this is a band. */
-  { id: 'stripsband', sub: 'strips', he: 'פסים צפופים',  en: 'Banded strips',
-    panel: false, groove: false, strips: 8, even: true, rows: 'band',
-    doors: ['d081'] },
 
-  { id: 'strips3', sub: 'strips',he: 'שלושה פסים מדורגים', en: 'Three strips, ragged',
-    panel: false, groove: false, strips: 3 },
-  { id: 'strips5', sub: 'strips',he: 'חמישה פסים מדורגים', en: 'Five strips, ragged',
-    panel: false, groove: false, strips: 5 },
-  { id: 'strips7', sub: 'strips',he: 'שבעה פסים מדורגים',  en: 'Seven strips, ragged',
-    panel: false, groove: false, strips: 7, doors: ['d044', 'd064'] },
-  { id: 'strips9', sub: 'strips',he: 'תשעה פסים מדורגים',  en: 'Nine strips, ragged',
-    panel: false, groove: false, strips: 9 },
   /* Eleven is d078's own count, and it keeps the id `strips` it has always
      had — the plain name for what used to be the only strip option. */
-  { id: 'strips', sub: 'strips', he: 'אחד עשר פסים מדורגים', en: 'Eleven strips, ragged',
-    panel: false, groove: false, strips: 11, doors: ['d078'] },
   /* The strips run BOTH ways and we drew one. The counts above are horizontal
      — d078's eleven bands settled that in an earlier round — but five doors
      (d034 d037 d038 d040 d043) run them up the leaf instead, and a customer
@@ -1005,26 +996,11 @@ export const DETAILS = [
      every count — so d037, d040 and d046 had no tile.
 
      The Hebrew says which is which, like the horizontals' אחידים / מדורגים. */
-  { id: 'stripsvl3', sub: 'strips', he: 'שלושה פסים אנכיים ארוכים',
-    en: 'Three long vertical strips', panel: false, groove: false,
-    strips: 3, vertical: true, long: true, doors: ['d037'] },
-  { id: 'stripsvl4', sub: 'strips', he: 'ארבעה פסים אנכיים ארוכים',
-    en: 'Four long vertical strips', panel: false, groove: false,
-    strips: 4, vertical: true, long: true, doors: ['d040', 'd046'] },
 
   /* ⚠ THREE IS THE CORPUS'S OWN COUNT AND IT WAS THE ONE MISSING. d038 and
      d043 carry three fanned; nothing carries six. The list offered four and
      six. The fan itself is measured on d038 and d043 — see `metalStrips` — and
      applies at any count. */
-  { id: 'stripsv3', sub: 'strips', he: 'שלושה פסים אנכיים מדורגים',
-    en: 'Three vertical strips, fanned',
-    panel: false, groove: false, strips: 3, vertical: true,
-    doors: ['d038', 'd043'] },
-  { id: 'stripsv', sub: 'strips', he: 'ארבעה פסים אנכיים מדורגים',
-    en: 'Vertical strips, fanned', panel: false, groove: false,
-    strips: 4, vertical: true },
-  { id: 'stripsv6', sub: 'strips', he: 'שישה פסים אנכיים מדורגים', en: 'Six vertical strips, fanned',
-    panel: false, groove: false, strips: 6, vertical: true },
   /* ⚠ THE CROSS, AND THE INVENTORY HAS CALLED IT MISSING FOR THREE ROUNDS.
      `research/works/INVENTORY.md` lists it under the face designs as *"Cross
      composition — one long vertical crossed by horizontals: d035 d047 d066
@@ -1036,8 +1012,6 @@ export const DETAILS = [
      price read it the same way the other stripe options are read. See
      `metalStrips` for the measurements and for why the vertical is a strip
      here and the pull bar on three of the four real doors. */
-  { id: 'stripsx', sub: 'strips', he: 'פס אנכי חוצה',  en: 'Crossed strips',
-    panel: false, groove: false, strips: 5, cross: true, doors: ['d047', 'd074'] },
 
   /* ── THE CLASSICAL SET ─────────────────────────────────────────────
      A whole composition rather than one feature: a projecting cornice over a
@@ -1096,7 +1070,9 @@ export const DETAILS = [
      from one door, photographed off the workshop floor into
      `research/newdoor/`. Whether those five are the same product is a question
      for Peretz and it is asked. */
-  { id: 'classic', sub: 'panel', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false,
+  /* `ownPull` — the set carries a turned pull on its own corbelled shelf.
+     Peretz: "greek set + 2700 (remove the handle)". */
+  { id: 'classic', sub: 'panel', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false, ownPull: true,
     classic: true, grab: true, rectOnly: true, doors: ['newdoor'],
     /* The set's own mouldings are drawn by `classicSet` and are the ogee by
        construction — that section was measured on this very door. This field
@@ -1530,6 +1506,101 @@ for (const k of Object.keys(BUILD)) {
   }
 }
 export const MASHKOF_WIDER_A = agorot(MASHKOF_WIDER);
+export const STRIPE_A = { h: agorot(STRIPE.h), v: agorot(STRIPE.v) };
+
+/**
+ * ── THE STRIPES, AS A COUNT ───────────────────────────────────────────
+ *
+ * Three properties of the state — `stripeDir`, `stripeCount`, `stripeTight` —
+ * and ONE field in the short code.
+ *
+ * ⚠ THEY PACK TOGETHER RATHER THAN SEPARATELY, and that is not thrift. Three
+ * independent fields can hold `dir: 'h', count: 0` and `dir: 'none', count: 7`
+ * and `dir: 'v', tight: true` — states that mean nothing, that every reader
+ * then has to guard against, and that a shared link can carry. Packed as one
+ * ordinal the impossible states are unrepresentable, which is the same
+ * principle as D3's "one direction at a time is enforced by the data shape".
+ *
+ *     0        no stripes
+ *     1..11    horizontal, spread, that many
+ *     12..18   horizontal, tight band, 2..8
+ *     19..24   vertical, 1..6
+ *
+ * ⚠ NO TIGHT VERTICAL. Nothing in the 129 photographs is a tight vertical
+ * group — the tight band is d045 and d081, both horizontal — so the toggle
+ * does not exist on that axis. Offering it would be inventing geometry no
+ * photograph supports (REALISM.md §6), and the packing refuses to encode it.
+ *
+ * ⚠ THE MAXIMA ARE THE CORPUS'S, NOT ARBITRARY. Eleven horizontal is d078's
+ * nine plus headroom; six vertical is the widest the measured 0.073 pitch fits
+ * across a leaf before the group reaches the stiles. Peretz says a customer
+ * can have as many as they like, and the honest limit is what the door holds.
+ */
+export const STRIPE_MAX = { h: 11, hTight: 8, v: 6 };
+const TIGHT_MIN = 2;
+
+export function packStripes(st) {
+  const n = st.stripeCount | 0;
+  if (st.stripeDir === 'h' && n >= 1) {
+    if (!st.stripeTight) return Math.min(n, STRIPE_MAX.h);
+    return 11 + Math.min(Math.max(n, TIGHT_MIN), STRIPE_MAX.hTight) - 1;
+  }
+  if (st.stripeDir === 'v' && n >= 1) return 18 + Math.min(n, STRIPE_MAX.v);
+  return 0;
+}
+
+export function unpackStripes(v) {
+  if (v >= 1 && v <= 11)  return { stripeDir: 'h', stripeCount: v, stripeTight: false };
+  if (v >= 12 && v <= 18) return { stripeDir: 'h', stripeCount: v - 10, stripeTight: true };
+  if (v >= 19 && v <= 24) return { stripeDir: 'v', stripeCount: v - 18, stripeTight: false };
+  return { stripeDir: 'none', stripeCount: 0, stripeTight: false };
+}
+export const STRIPE_SLOTS = 25;
+
+/**
+ * ⚠ THE FOURTEEN RETIRED STRIPE IDS, AND WHY THEY NEED A MIGRATION RATHER THAN
+ * AN ALIAS.
+ *
+ * `aliases` maps one id onto another id INSIDE ONE LIST, and that is the whole
+ * of what it can do. `strips9` was a `DETAILS` id and is now a direction, a
+ * count and a toggle across three state fields — there is no id to point it
+ * at. Left to the alias mechanism, every link and every `DM-` code written
+ * before today that carried a striped door would land on `DETAILS[0]` and open
+ * a PLAIN one, with nothing on screen saying so. That is the silent
+ * substitution `fromQuery` exists never to make.
+ *
+ * The counts below are each option's own former count, and the arrangement is
+ * what the survey (research/works/INVENTORY.md §5a) says that composition
+ * actually was:
+ *   - the even families keep their count and become spread stripes
+ *   - `stripsband` was d081's tight band, so it comes back tight
+ *   - the RAGGED and FANNED families are withdrawn compositions; they migrate
+ *     to the same COUNT, spread, which is the nearest thing still buildable
+ *   - `stripsx` was one long vertical crossed by four horizontals — two
+ *     directions, which the model refuses on purpose — so it lands on the
+ *     vertical member alone, the part of it that survives.
+ */
+export const STRIPE_LEGACY = {
+  strips2:    { stripeDir: 'h', stripeCount: 2,  stripeTight: false },
+  strips4:    { stripeDir: 'h', stripeCount: 4,  stripeTight: false },
+  stripsband: { stripeDir: 'h', stripeCount: 8,  stripeTight: true  },
+  strips3:    { stripeDir: 'h', stripeCount: 3,  stripeTight: false },
+  strips5:    { stripeDir: 'h', stripeCount: 5,  stripeTight: false },
+  strips7:    { stripeDir: 'h', stripeCount: 7,  stripeTight: false },
+  strips9:    { stripeDir: 'h', stripeCount: 9,  stripeTight: false },
+  strips:     { stripeDir: 'h', stripeCount: 11, stripeTight: false },
+  stripsvl3:  { stripeDir: 'v', stripeCount: 3,  stripeTight: false },
+  stripsvl4:  { stripeDir: 'v', stripeCount: 4,  stripeTight: false },
+  stripsv3:   { stripeDir: 'v', stripeCount: 3,  stripeTight: false },
+  stripsv:    { stripeDir: 'v', stripeCount: 4,  stripeTight: false },
+  stripsv6:   { stripeDir: 'v', stripeCount: 6,  stripeTight: false },
+  stripsx:    { stripeDir: 'v', stripeCount: 1,  stripeTight: false },
+};
+
+/** What the stripes cost: his rate, times how many. No base, because he named
+ *  none — a stripe costs the same whether it is the first or the eleventh. */
+export const stripePrice = st =>
+  st.stripeDir === 'none' ? 0 : (STRIPE_A[st.stripeDir] || 0) * (st.stripeCount | 0);
 export const HANDLE_RATE_A = { ...HANDLE_RATE, per: agorot(HANDLE_RATE.per) };
 
 /* ⚠ WHICH GRIPS ARE PRICED BY LENGTH. Tagged from `style` rather than listed

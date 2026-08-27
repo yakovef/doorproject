@@ -40,7 +40,7 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { canvas, blit, load, rect, save, text } from './imglib.mjs';
-import { COLOURS, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS, byId }
+import { COLOURS, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, STRIPE_MAX, WINDOWS, byId }
   from '../js/catalog.js';
 import { toRgb } from '../js/colour.js';
 import { REBATE } from '../js/renderer.js';
@@ -312,58 +312,50 @@ function detailOf(rec) {
        doors — a recreation that looks nothing like its photograph, from a
        measurement that was correct about what it saw and wrong about what it
        meant. Anything below 0.95 of the leaf is the foot, not a design. */
-    const raw = d.grooves;
-    const g = raw.filter(x => !(x.orientation === 'horizontal' && x.y > 0.95));
-    if (!g.length) {
-      return { id: 'plain', residual: 0,
-               note: `the only line recorded is the weather bar at y=${raw[0].y}` };
-    }
-    const count = g.reduce((a, x) => a + (x.count || 1), 0);
-    if (g.every(x => x.orientation === 'perimeter')) {
-      return { id: 'plain', residual: 1,
-               note: `a groove round the leaf's perimeter at ${g[0].inset} inset — `
-                   + 'the catalogue has no perimeter option at all' };
-    }
-    /* ⚠ THE NEAREST COUNT THE CATALOGUE ACTUALLY OFFERS, asked OF the
-       catalogue. This was two hard-coded ids per axis — `stripsv` for anything
-       vertical, `strips3` or `strips` for anything horizontal — which is a
-       second statement of what the range contains, inside the one tool whose
-       job is to say how far the range is from the photographs. It was already
-       wrong before the list grew: d064's SEVEN bands were derived as ELEVEN
-       and the residual of 0.36 was dutifully printed while `strips7` sat
-       unused in the list.
-
-       ⚠ AND A COUNT IS NOT ENOUGH TO NAME A COMPOSITION. The vertical strips
-       come in two families — long and near-equal, or fanned — and they share
-       their COLUMNS exactly, so a record, which carries each line's `x` and
-       not its length, cannot tell them apart. Ties used to fall to list order,
-       which sent d038 and d043, both fanned, to the long option the moment it
-       was added. The tie-break is the catalogue's own citation: an option's
-       `doors` list is a claim about which photographs its numbers came from,
-       and if this door is named on one of the tied candidates, that is the one
-       it is. Where nothing names it, list order still decides and the note
-       says which count matched, so a reader can see the choice was a coin
-       toss. */
-    const vertical = g.filter(x => x.orientation === 'vertical').length >= g.length / 2;
-    const cands = DETAILS.filter(d => d.strips && !d.cross && !!d.vertical === vertical);
-    if (!cands.length || count < 2) {
-      return { id: 'plain', residual: 1,
-               note: `${count} ${vertical ? 'vertical' : 'horizontal'} line(s) — the `
-                   + 'catalogue has nothing that sparse; the milled grooves were withdrawn' };
-    }
-    const near = c => Math.abs(c.strips - count);
-    const best = Math.min(...cands.map(near));
-    const tied = cands.filter(c => near(c) === best);
-    const want = tied.find(c => (c.doors || []).includes(rec.id)) || tied[0];
-    const cited = tied.length > 1 && (want.doors || []).includes(rec.id);
-    return { id: want.id, residual: Math.abs(want.strips - count) / Math.max(want.strips, count),
-             note: `${count} ${vertical ? 'vertical' : 'horizontal'} -> ${want.he} (${want.strips})`
-                 + (tied.length > 1
-                     ? cited ? ' — tied on count, and this option cites this door'
-                             : ` — tied on count with ${tied.length - 1} other(s), none citing `
-                               + 'this door; list order decided' : '') };
   }
+  /* ⚠ LINE WORK IS NOT A FACE OPTION ANY MORE, so this function stops here.
+     It used to fall through into a hundred lines that matched a groove pattern
+     against fourteen `DETAILS` entries; the stripes are a count on the state
+     now, and `stripesOf` below answers that question instead. What this one
+     still owns is the MOULDED PANEL, which is genuinely one of eight ids. */
   return { id: 'plain', residual: 0, note: 'plain face' };
+}
+
+/**
+ * THE STRIPES A RECORD SHOWS — a direction and a number, which is all the app
+ * stores now and all a record was ever able to say.
+ *
+ * ⚠ THIS USED TO PICK ONE OF FOURTEEN NAMED COMPOSITIONS, and it could not do
+ * it honestly. The two vertical families share their COLUMNS exactly — the
+ * measured pitch is 0.073 for both — and a record carries each line's `x` and
+ * not its LENGTH, so nothing in the data distinguishes a long group from a
+ * fanned one. Ties fell to list order, which sent d038 and d043, both fanned,
+ * to the long option the moment it was added; a citation tie-break was written
+ * to patch that.
+ * All of it is gone, because the catalogue no longer holds compositions.
+ * Peretz prices per stripe, the app stores a direction and a count, and a
+ * record carries exactly those two things. The matcher reports what it counted.
+ *
+ * ⚠ The ragged and fanned families are WITHDRAWN compositions, so a door that
+ * carried one is drawn with its stripes spread. That is a real difference from
+ * the photograph and the note says so, the same way the grille substitutions
+ * do — a tool that silently redraws a door as something else is worse than one
+ * that refuses.
+ */
+function stripesOf(rec) {
+  const g = (rec.detail && rec.detail.grooves) || [];
+  const count = g.reduce((t, x) => t + (x.count || 1), 0);
+  if (!g.length || count < 1) {
+    return { stripeDir: 'none', stripeCount: 0, residual: 0, note: 'no line work' };
+  }
+  const vertical = g.filter(x => x.orientation === 'vertical').length >= g.length / 2;
+  const dir = vertical ? 'v' : 'h';
+  const cap = vertical ? STRIPE_MAX.v : STRIPE_MAX.h;
+  const n = Math.min(count, cap);
+  return { stripeDir: dir, stripeCount: n, stripeTight: false,
+           residual: Math.abs(n - count) / Math.max(n, count),
+           note: `${count} ${vertical ? 'vertical' : 'horizontal'} -> ${n} ${dir}`
+               + (n !== count ? ` — capped at the ${cap} the leaf holds` : '') };
 }
 
 /**
@@ -414,10 +406,13 @@ for (const id of ids) {
     handle: handleOf(rec),
     lockset: locksetOf(rec),
     detail: detailOf(rec),
+    stripes: stripesOf(rec),
   };
   const want = {
     colour: parts.colour.id, window: parts.window.id, grille: parts.grille.id,
     handle: parts.handle.id, lockset: parts.lockset.id, detail: parts.detail.id,
+    stripeDir: parts.stripes.stripeDir, stripeCount: parts.stripes.stripeCount,
+    stripeTight: !!parts.stripes.stripeTight,
     size: 'standard', handing: handingOf(rec),
   };
   /* THE RULES GET THE LAST WORD, and what they change is the finding.
@@ -521,11 +516,19 @@ for (const [k, n] of [...fin].sort((a, b) => b[1] - a[1])) console.log(`  ${H(k,
    drift from each other — and `test/units.mjs` compares them, which is what
    catches one of them being regenerated without the other. */
 {
-  const FIELDS = ['colour', 'detail', 'window', 'grille',
-                  'handle', 'lockset', 'size', 'handing'];
+  /* ⚠ EVERY FIELD A DOOR CARRIES, AND TWO OF THEM ARE NOT STRINGS. The list
+     used to be eight ids and every one was quoted; `stripeCount` is a number
+     and `stripeTight` a boolean, so quoting them would have written
+     `stripeCount: '3'` — which `toQuery` stringifies identically and
+     `packStripes` reads as NaN. `npm test` compares this file against the
+     markdown table query for query and would have caught it, which is exactly
+     why that comparison exists. */
+  const FIELDS = ['colour', 'detail', 'window', 'grille', 'handle', 'lockset',
+                  'size', 'handing', 'stripeDir', 'stripeCount', 'stripeTight'];
+  const lit = v => typeof v === 'string' ? `'${v}'` : String(v);
   const body = rows.map(r =>
     `  { id: '${r.id}', state: { `
-    + FIELDS.map(k => `${k}: '${r.state[k]}'`).join(', ')
+    + FIELDS.map(k => `${k}: ${lit(r.state[k])}`).join(', ')
     + ' } },');
   const out = [
     '/**',

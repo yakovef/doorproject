@@ -596,7 +596,11 @@ for (const v of VIEWS) {
        decision, not a bug — recorded in CLAUDE.md rather than worked around —
        and this step now runs on a door where the button genuinely exists. */
     await p.goto(`file://${process.cwd()}/index.html`
-               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=plain&s=wide&h=right-in');
+               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=panel&s=wide&h=right-in'
+               /* ⚠ `d=panel`: a square light always takes a bottom panel now
+                  (Peretz), so `d=plain` here arrives REPAIRED — and this step
+                  compares the screen after a drag against a fresh load of its
+                  own link, which is a comparison a repaired arrival muddies. */);
     await p.waitForTimeout(350);
     await p.click('#grip-rot');
     await p.waitForTimeout(300);

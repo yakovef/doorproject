@@ -1384,6 +1384,21 @@ body {
   min-inline-size: 5.5ch; text-align: center;
 }
 
+/* The stripe controls, under the panel tiles. Same visual family as the bar's
+   length stepper — they are the two places on the page where a number is
+   chosen rather than a picture. */
+.stripes { grid-column: 1 / -1; margin-block-start: 12px; display: grid; gap: 8px; }
+.stripes__label {
+  font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.stripes__dirs { display: flex; gap: 6px; flex-wrap: wrap; }
+.stripes__tight { justify-self: start; }
+.stripes__cost { font-size: .78rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+/* The reason, when the door cannot take stripes. Not a disabled control: a
+   dead button tells a customer nothing, a sentence tells them what to change. */
+.stripes__why { margin: 0; font-size: .78rem; color: var(--ink-2); }
+
 .send__spec {
   margin: 0; padding-block: 8px;
   border-block: 1px solid var(--rule);

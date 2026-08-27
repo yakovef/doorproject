@@ -1319,6 +1319,41 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE STRIPES ARE A COUNT, AND FOURTEEN TILES ARE GONE.** Peretz prices per
+  stripe — ₪150 horizontal, ₪300 vertical — and asked for the complicated
+  compositions removed; the test, from outside, is *more than two distinct
+  stripe lengths*. `DETAILS` is eight panel entries now, and the face carries
+  `stripeDir` · `stripeCount` · `stripeTight`.
+  ⚠ **They pack as ONE ordinal, not three fields.** Three fields can hold
+  `dir:'h', count:0` and `dir:'none', count:7` — states that mean nothing, that
+  every reader must guard against, and that a shared link can carry. One value
+  cannot hold a contradiction. `packStripes`/`unpackStripes` in `catalog.js`.
+  ⚠ **The tight band is a real second composition**, asked for from outside
+  once the two doors were shown: d081 is six equal strips at pitch **0.033**
+  centred 0.55, d045 five in the same shape. Spread is
+  `pitch = min(0.19, 0.80/(n−1))` centred 0.52 — two constants reproducing
+  every measured array. **HORIZONTAL ONLY**: nothing in the corpus is a tight
+  vertical group.
+  ⚠ **A RETIRED STRIPE ID NEEDS A MIGRATION, NOT AN ALIAS.** `aliases` maps id
+  → id inside one list; `strips9` was one id and is now three state fields.
+  Left to the alias mechanism every pre-existing striped link would have opened
+  a PLAIN door in silence. `STRIPE_LEGACY` + a branch in `fromQuery`, beside
+  the `n=` lockset migration.
+  ⚠ **`RHYTHM` is gone from `renderer.js`, both copies.**
+
+- **Two rules Peretz gave, and a third ordering constraint they exposed.**
+  *"square (needs to aways have a panel at the bottom)"* and *"3 panel /
+  greek set (remove the handle)"* — the latter answers `ASK-PERETZ.md` §14's
+  question about whether the three-panel face always comes with its pull.
+  ⚠ **THE FACE REPAIRS RUN AFTER THE LINE-WORK REPAIRS**, and this is the third
+  documented ordering constraint in `js/rules.js` alongside "glazing before
+  line work" and "no-glass-no-grille last". Found by a link arriving
+  unbuildable: a square window with eleven stripes lost the stripes (a window
+  beats line work on a link), leaving a plain face — and the "square needs a
+  panel" repair had already run against the face as it was BEFORE. A repair
+  that reads a value another repair is about to change is neither idempotent
+  nor guaranteed to land somewhere buildable.
+
 - **A pull bar is a MODEL AND A LENGTH.** Peretz: *"each handle can be in
   different length · handle<100 500 · nickel>100cm every 20cm +150shekel."*
   `handleLength(state)` in `js/catalog.js` is the ONE definition — the drawing,
