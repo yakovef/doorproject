@@ -7,8 +7,31 @@
  * configurator must not break it.
  */
 
-import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed, paneCount,
-         LOCKSETS, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
+         MASHKOF_WIDER_A, MASHKOFS, paneCount, LOCKSETS, SIZES, SPECIAL_LOCKS,
+         WINDOWS } from './catalog.js';
+
+/**
+ * What WIDENING the frame costs, before the size multiplier.
+ *
+ * Peretz: "+250 every side that gets wider", where a "side" is one of the two
+ * dimensions he had just named — the outside face and the inside return — and
+ * not one of the three jambs. Settled from outside. So this is ₪0, ₪250 or
+ * ₪500, read off the two flags the catalogue entry carries rather than off its
+ * millimetres: the flags are what Peretz is pricing, and the millimetres are
+ * what the renderer draws. Deriving one from the other would tie his price
+ * list to our drawing.
+ */
+function mashkofExtras(state) {
+  const mk = byId(MASHKOFS, state.mashkof);
+  return (mk.wideOut ? MASHKOF_WIDER_A : 0) + (mk.wideIn ? MASHKOF_WIDER_A : 0);
+}
+
+/** What the face costs, which for one entry depends on whether it has glass. */
+function glazedDetail(state) {
+  const d = byId(DETAILS, state.detail);
+  return (d.deltaGlazed != null && isGlazed(state)) ? d.deltaGlazed : d.delta;
+}
 
 /**
  * The price, BROKEN DOWN — the six parts of a fitted door, then one entry per
@@ -52,12 +75,6 @@ import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed, paneCount,
  * that translation lives, in the file that owns money, rather than as a
  * special case at the call site in app.js.
  */
-/** What the face costs, which for one entry depends on whether it has glass. */
-function glazedDetail(state) {
-  const d = byId(DETAILS, state.detail);
-  return (d.deltaGlazed != null && isGlazed(state)) ? d.deltaGlazed : d.delta;
-}
-
 export function priceParts(state) {
   const size = SIZES[state.size] || SIZES.standard;
 
@@ -100,7 +117,14 @@ export function priceParts(state) {
     door:     scaled(BUILD_A.door),
     cylinder: BUILD_A.cylinder,
     lock:     BUILD_A.lock,
-    mashkof:  scaled(BUILD_A.mashkof),
+    /* ⚠ THE SIZE MULTIPLIES THE MASHKOF'S TOTAL, INCLUDING ITS WIDTH EXTRAS,
+       and that is a reading of "+25% to the price of the door and mashkof"
+       rather than a quotation. The price of the mashkof is whatever the
+       mashkof costs — ₪500, ₪750 or ₪1,000 — and a bigger door needs more
+       length of whatever section it is. The alternative reading (multiply the
+       ₪500 base, add the extras flat) differs by ₪125 at most and is one
+       expression away. TRANSFORM.md §18, assumption A3. */
+    mashkof:  scaled(BUILD_A.mashkof + mashkofExtras(state)),
     install:  BUILD_A.install,
     measure:  BUILD_A.measure,
 

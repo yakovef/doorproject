@@ -25,7 +25,7 @@ green and the work is pushed.
 | 0 | Groundwork — the stripe survey, container health, the assumption ledger | ✅ **done** | 26.8 · survey in `INVENTORY.md` §5a/§5b — three doors were filed wrong · container **healthy**, 6/6 at 1280 and 1680, so **stage F is measurable** · baseline `npm test` 5,257,859 / 0 |
 | 1 | The price engine — components, multipliers, the breakdown panel | ✅ **done** | 26.8 · `BUILD` replaces `SIZE`, `mult` on each size, `tileAgorot` + `breakdownRows` · the price is a button and opens a column that adds up · caveat carries ~5% · test **6,036,933 / 0**, audit clean, collide clean (1,258), latency 501/600 |
 | 2 | The catalogue — removals, additions, sizes, one `VERSION` bump | ✅ **done** | 27.8 · 7 options withdrawn & aliased · windows ×6 · grilles almost all free · `SPECIAL_LOCKS` axis drawn & priced · classical set has two prices · size bands printed · `VERSION 14`, code still 8 chars · test **5,392,984 / 0**, audit clean, collide clean, latency in gate |
-| 3 | משקוף — the frame becomes a category | **not started** | |
+| 3 | משקוף — the frame becomes a category | ✅ **done** | 27.8 · 4 options, drawn and priced ₪500–₪1,000 · frame grows OUTWARD from a fixed opening · **T3 green: 28 size × frame pairs, leaf identical** · crop anchored on `MASHKOF_MAX` · `VERSION 15`, still 8 chars · test **6,513,540 / 0**, all gates clean |
 | 4 | פרזול — the hardware finish, and the bug Peretz reported | **not started** | |
 | 5 | Handle length — a pull bar is a length, not a model | **not started** | |
 | 6 | Stripes — a count in one direction, not fourteen patterns | **not started** | |

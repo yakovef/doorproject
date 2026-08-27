@@ -8,8 +8,8 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES,
-         SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, MASHKOFS,
+         SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
 /* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
@@ -115,7 +115,33 @@ import { repair } from './rules.js';
    LAYOUT moves means an old code decodes into a different door with nothing
    flagging it, which is the precise failure this number exists to prevent.
    Bumps are free while nothing is deployed. Silence is not. */
-export const VERSION = 14;
+/* ── 15 · the mashkof becomes a choice, 27.8.2026 ─────────────────────
+   Asked for by name from outside. The frame was always drawn and never
+   choosable; it is now four options and ₪500–₪1,000 of a ₪3,150 door.
+
+   ⚠ AND THE CODE IS *STILL* EIGHT CHARACTERS, for the second version running.
+   `mashkof` needs two bits and the seven withdrawals of version 14 handed back
+   exactly two: `grille` is 14 entries and had 5 bits, `lockset` is 8 and had 4.
+   Payload stays at 36, so `PAD_BITS` stays at 4 and the check nibble keeps its
+   width.
+
+   ⚠ THIS IS THE FIRST BUMP WITH NO SLACK LEFT. `lockset` is 8 of 8 and
+   `grille` 14 of 16 — so the next product added to either needs a re-cut
+   rather than a free append, and there is nowhere obvious left to take a bit
+   from. `detail` has twelve spare values and `colour` fifteen; those are where
+   the next bit comes from. The assertion that catches this is
+   `list.length <= 2 ** BITS[f]`, which is why it is not optional.
+
+   ⚠ AND THE FIRST DRAFT OF THIS BUMP GOT IT WRONG IN A WAY WORTH RECORDING.
+   It left `grille` and `lockset` as they were, took the payload to 38, and the
+   code stayed eight characters — which looked like a free win. It was not:
+   `TOTAL_BITS` rounds the payload UP to a whole character, so 38 leaves
+   `PAD_BITS` at **2**, and `checkNibble` returns four. Decoding failed outright
+   rather than silently, which is the good version of this mistake — but had it
+   returned a 2-bit check instead, the chance of a single-character typo
+   surviving would have gone from 1-in-16 to 1-in-4 with nothing on screen to
+   say so. The check nibble is never what gives way to make room. */
+export const VERSION = 15;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -165,6 +191,7 @@ export const DEFAULTS = {
      worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
      becomes the first entry in the list. */
   speciallock: 'nospecial',
+  mashkof: 'mk-std',
   detail:  'plain',
   size:    'standard',
   handing: 'right-in',
@@ -182,6 +209,7 @@ export function toQuery(state) {
   p.set('n', state.handle);
   p.set('k', state.lockset);
   p.set('x', state.speciallock);
+  p.set('m', state.mashkof);
   p.set('d', state.detail);
   p.set('s', state.size);
   p.set('h', state.handing);
@@ -240,7 +268,7 @@ export function fromQuery(search) {
      a choice could not be read — above a document in which every choice had
      been read perfectly. A new switch joins this list the same day it is
      invented, like everything added to the bare-mode hide list. */
-  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'd', 's', 'h', 'gp',
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'd', 's', 'h', 'gp',
                            'code', 'bare', 'sheet']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -316,6 +344,7 @@ export function fromQuery(search) {
   take('detail', 'd', DETAILS);
   take('handing', 'h', HANDINGS);
   take('speciallock', 'x', SPECIAL_LOCKS);
+  take('mashkof', 'm', MASHKOFS);
 
   const rawSize = p.get('s');
   if (rawSize != null) {
@@ -493,8 +522,8 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    telephone (REDESIGN.md §1.5: 38.4% of single-character typos used to decode
    to a different valid door); it is never the thing that gives way. */
 export const BITS = { version: 4, colour: 5, size: 3, handing: 2, window: 2,
-                      grille: 5, handle: 4, lockset: 4, detail: 5,
-                      speciallock: 2 };
+                      grille: 4, handle: 4, lockset: 3, detail: 5,
+                      speciallock: 2, mashkof: 2 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */
@@ -563,6 +592,7 @@ export function encodeCode(state) {
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
     [Math.max(0, SPECIAL_LOCKS.findIndex(x => x.id === state.speciallock)),
      BITS.speciallock],
+    [Math.max(0, MASHKOFS.findIndex(m => m.id === state.mashkof)), BITS.mashkof],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -624,12 +654,13 @@ export function decodeCode(code) {
   const lockset = LOCKSETS[read(BITS.lockset)];
   const detail  = DETAILS[read(BITS.detail)];
   const special = SPECIAL_LOCKS[read(BITS.speciallock)];
+  const mashkof = MASHKOFS[read(BITS.mashkof)];
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail || !special) return null;
+      || !detail || !special || !mashkof) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
-    speciallock: special.id,
+    speciallock: special.id, mashkof: mashkof.id,
   };
 }

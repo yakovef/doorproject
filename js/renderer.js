@@ -17,7 +17,8 @@
  */
 
 import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES,
-         hasUpperPanel, LOCKSETS, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+         hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, SIZES, SPECIAL_LOCKS,
+         WINDOWS } from './catalog.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
@@ -918,6 +919,13 @@ export function render(state) {
   const handle  = byId(HANDLES, state.handle);
   const lockset = byId(LOCKSETS, state.lockset);
   const special = byId(SPECIAL_LOCKS, state.speciallock);
+  /* ⚠ THE FRAME IS A CHOICE NOW, and it grows OUTWARD from a fixed opening.
+     `x0`, `y0`, `MID_X` and `BASE_Y` are all still computed from the standard
+     CASING / RETURN / RET_HEAD, so the leaf does not move by a pixel when the
+     customer picks a wider frame — `npm test` sweeps that on every size. What
+     changes is where the casing's outer edge and the reveal's inner edge fall,
+     which is what a wider frame actually is. */
+  const mk = byId(MASHKOFS, state.mashkof);
   const detail  = byId(DETAILS, state.detail);
   /* The finish is the handle's own or brushed nickel; it stopped being a
      customer choice when the group was withdrawn. Shiran is an antique brass
@@ -951,11 +959,16 @@ export function render(state) {
   /* THE DOOR'S OWN TIGHT BOX, which is what a harness in bare mode gets, and
      what `usedDefs` and the backdrop measure their overspill from. The page
      never sees it: `fitStage` reads `data-fit-*` and crops to STAGE_BOX. */
+  /* ⚠ ANCHORED ON THE WIDEST FRAME IN THE RANGE, NOT ON THIS DOOR'S. Computed
+     per state, a wider mashkof would grow this box, `fitStage` would scale the
+     whole drawing down to fit it, and the LEAF would appear to shrink when the
+     customer changed something that does not touch the leaf. That is the fault
+     reported from outside about the classical set. See `MASHKOF_MAX`. */
   const view = {
-    x: x0 - RETURN - CASING - PAD.x,
-    y: y0 - RET_HEAD - CASING - PAD.top,
-    w: totalW + (RETURN + CASING + PAD.x) * 2,
-    h: leafH + FLOOR_RUN + RET_HEAD + CASING + PAD.top + PAD.bottom,
+    x: x0 - MASHKOF_MAX.in - MASHKOF_MAX.out - PAD.x,
+    y: y0 - MASHKOF_MAX.head - MASHKOF_MAX.out - PAD.top,
+    w: totalW + (MASHKOF_MAX.in + MASHKOF_MAX.out + PAD.x) * 2,
+    h: leafH + FLOOR_RUN + MASHKOF_MAX.head + MASHKOF_MAX.out + PAD.top + PAD.bottom,
   };
   const y = aff => floorY - aff;
 
@@ -971,17 +984,17 @@ export function render(state) {
   /* The frame, named once. Every plane of the opening is one of these lines,
      and having them as names rather than as arithmetic repeated eleven times
      is what makes the corner mitres below possible to read. */
-  const revX0 = x0 - RETURN;            // the opening at the wall face, left
-  const revX1 = x1 + RETURN;            //   "                          right
-  const revY0 = y0 - RET_HEAD;          //   "                          head
-  const casX0 = revX0 - CASING;         // the casing's outer edge, left
-  const casX1 = revX1 + CASING;         //   "                     right
-  const casY0 = revY0 - CASING;         //   "                     top
+  const revX0 = x0 - mk.in;             // the opening at the wall face, left
+  const revX1 = x1 + mk.in;             //   "                          right
+  const revY0 = y0 - mk.head;           //   "                          head
+  const casX0 = revX0 - mk.out;         // the casing's outer edge, left
+  const casX1 = revX1 + mk.out;         //   "                     right
+  const casY0 = revY0 - mk.out;         //   "                     top
   /* Where the WALL meets the floor. The leaf meets it `FLOOR_RUN` further
      back, at `floorY`, which is the whole of the depth cue at the door's foot
      now that the sill is gone. See the long note where THRESHOLD was defined. */
   const baseY = BASE_Y;
-  const openW = totalW + RETURN * 2;    // the opening, wall face to wall face
+  const openW = totalW + mk.in * 2;     // the opening, wall face to wall face
 
   const hingeOnLeft = handing.hinge === 'left';
 
@@ -8031,6 +8044,43 @@ export function handleGlyph(handle) {
 
 /** Lock furniture shares the drawing; only the list it is chosen from differs. */
 export const locksetGlyph = handleGlyph;
+
+/**
+ * THE MASHKOF, drawn as what a joiner would show you: the frame in section,
+ * looking down on the head of the opening from above.
+ *
+ * ⚠ THE ONE PLACE IN THIS FILE THAT IS NOT SQUARE-ON, AND IT IS NOT A DOOR.
+ * `CLAUDE.md` §4's square-on discipline governs the DRAWING — leaf, frame,
+ * mouldings and hardware all share one viewpoint because anything implying a
+ * second one reads as an error. A catalogue glyph is not in that picture; it
+ * is a diagram beside it, and the two dimensions Peretz prices — the face on
+ * the wall and the return into it — are precisely the two a square-on
+ * elevation cannot show at once. Drawing them any other way would give the
+ * customer four tiles that differ by two pixels of outline.
+ *
+ * Wall hatched, frame solid, leaf a thin slab at the back. The two dimensions
+ * are the two that change, and they change by the real ratio.
+ */
+export function mashkofGlyph(mk) {
+  const W = 200, H = 150;
+  const sc = 0.62;                        // mm to glyph units
+  const out = mk.out * sc, dep = mk.in * sc;
+  const wallY = 30, frameY = wallY;
+  return `<svg viewBox="0 0 ${W} ${H}" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">
+      <!-- the wall, cut -->
+      <rect x="0" y="${wallY}" width="${W}" height="26" opacity=".16"/>
+      <!-- the frame's face on the wall, and its return into the opening -->
+      <rect x="${W / 2 - out}" y="${frameY - 9}" width="${out * 2}" height="9"/>
+      <rect x="${W / 2 - 7}" y="${frameY}" width="14" height="${dep}"/>
+      <!-- the leaf, at the back of the return -->
+      <rect x="${W / 2 - 46}" y="${frameY + dep}" width="92" height="11" opacity=".72"/>
+      <!-- the two dimensions, as ticks -->
+      <rect x="${W / 2 - out}" y="${frameY - 20}" width="${out * 2}" height="2.5" opacity=".55"/>
+      <rect x="${W / 2 + 16}" y="${frameY}" width="2.5" height="${dep}" opacity=".55"/>
+    </g>
+  </svg>`;
+}
 
 /**
  * The extra lock — none, a safe lock, a keypad.

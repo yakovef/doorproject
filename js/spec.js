@@ -44,7 +44,7 @@
 
 import {
   byId, colourCode, COLOURS, declaredFinish, DETAILS, glazedPanels, GRILLES, grillePlacement,
-  HANDINGS, HANDLES, isGlazed, LOCKSETS, SIZES, SPECIAL_LOCKS, WINDOWS,
+  HANDINGS, HANDLES, isGlazed, LOCKSETS, MASHKOFS, SIZES, SPECIAL_LOCKS, WINDOWS,
 } from './catalog.js';
 
 /**
@@ -67,6 +67,7 @@ export function specRows(state) {
   const hd = byId(HANDLES, state.handle);
   const lk = byId(LOCKSETS, state.lockset);
   const xl = byId(SPECIAL_LOCKS, state.speciallock);
+  const mk = byId(MASHKOFS, state.mashkof);
   const dt = byId(DETAILS, state.detail);
   const sz = SIZES[state.size] || SIZES.standard;
   const hn = byId(HANDINGS, state.handing);
@@ -159,6 +160,11 @@ export function specRows(state) {
     rows.push({ key: 'detail', label: 'עיצוב', id: dt.id, value: `${dt.he}${n}` });
   }
   rows.push({ key: 'size', label: 'מידה', id: state.size, value: sz.he });
+  /* ⚠ ALWAYS NAMED, even when it is the standard one — unlike the extra lock
+     above, which is named only when there is one. A door always has a frame
+     and Peretz always charges for it, so "משקוף: סטנדרטי" is a line on the
+     order rather than noise: its absence would read as "no frame quoted". */
+  rows.push({ key: 'mashkof', label: 'משקוף', id: mk.id, value: mk.he });
   rows.push({ key: 'handing', label: 'פתיחה', id: hn.id, value: hn.he });
   return rows;
 }

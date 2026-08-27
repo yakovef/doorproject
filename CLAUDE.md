@@ -1319,6 +1319,35 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ משקוף IS A CATEGORY NOW — the frame the door closes onto.** Asked for by
+  name from outside. It was always drawn and never choosable, and it is
+  ₪500–₪1,000 of a ₪3,150 door: four options (`MASHKOFS`), two independent
+  dimensions, both visible. "Every side that gets wider" means the two WIDTHS
+  he had just named — the outside face and the inside return — not the three
+  jambs; settled from outside.
+  ⚠ **THE FRAME GROWS OUTWARD FROM A FIXED OPENING, and that is the whole
+  design.** `x0`, `y0`, `MID_X` and `BASE_Y` are still computed from the
+  standard CASING/RETURN/RET_HEAD, so the leaf does not move by a unit when the
+  customer picks a wider frame. And the door's own tight box is anchored on
+  `MASHKOF_MAX` — the widest frame in the range — rather than on this door's:
+  computed per state, a wider frame would grow the box, `fitStage` would scale
+  everything down to fit, and the LEAF WOULD APPEAR TO SHRINK. That is the
+  fault reported from outside about the classical set, wearing a different
+  mechanism.
+  **The assertion was written before the category was built**, not after: 28
+  size × frame pairs, leaf rect identical to the unit, plus the same again on
+  `data-fit-w`. It reads the emitted markup, because the constants agreeing
+  proves nothing about what was drawn.
+  ⚠ **The millimetres are ours, not his, and the distinction matters.** His
+  3 cm and 16 cm describe the frame SECTION a joiner orders; `mk-std` is
+  exactly the three constants measured off the works photographs, so a standard
+  door draws byte-identically to before. Replacing 46 with 30 because he said
+  "3 cm" would swap a measured number for one describing something else.
+  ⚠ **The tile is the one drawing in the project that is not square-on**, and
+  deliberately: it is a section through the head, because the two dimensions
+  Peretz prices are precisely the two a square-on elevation cannot show at
+  once. A catalogue glyph is a diagram beside the picture, not in it.
+
 - **The catalogue meets Peretz's real range, and seven options left it.**
   Withdrawn on his say-so and every id aliased onto the nearest survivor, so
   no link ever opens on nothing: **ברזל מחושל** and its light twin → `grid`,

@@ -469,6 +469,69 @@ export const LOCKSETS = [
  * apart; merging them because both are electronic would lose a product and
  * misprice the other by ₪1,800.
  */
+/**
+ * THE MASHKOF — the frame the door closes onto, and a category the customer
+ * has never been able to choose.
+ *
+ * Asked for by name from outside, 26.8.2026, and priced by Peretz in the same
+ * conversation: *"mashkof: standard (outside width max 3cm, inside width max
+ * 16cm) 500 · extra - every side thats gets wider +250."*
+ *
+ * ⚠ "EVERY SIDE" MEANS THE TWO WIDTHS, NOT THE THREE JAMBS. Settled from
+ * outside: the sentence before it names exactly two dimensions — the outside
+ * face that shows on the wall, and the inside return into the opening — and a
+ * "side" is one of those. So a mashkof is ₪500, ₪750 or ₪1,000, and the
+ * customer has two independent things to change, both of which they can see.
+ *
+ * ⚠ AND THE MILLIMETRES BELOW ARE OURS, NOT HIS, WHICH NEEDS SAYING CAREFULLY.
+ * Peretz's 3 cm and 16 cm describe the frame SECTION a joiner orders. The
+ * numbers here are what the drawing shows SQUARE-ON, and they are not the same
+ * quantity: most of a 16 cm return is inside the wall and invisible from the
+ * street. `mk-std` is therefore exactly the three constants this renderer has
+ * always used — CASING 46, RETURN 62, RET_HEAD 148, every one of them measured
+ * off the works photographs — so the standard door is drawn byte-identically
+ * to how it was before this category existed. Replacing 46 with 30 because he
+ * said "3 cm" would be swapping a measured number for one that describes
+ * something else, which is REALISM.md §6's whole subject.
+ *
+ * What the wider options do is SCALE the measured standard by roughly 1.8, so
+ * the difference is unmistakable at door scale without the frame becoming the
+ * loudest thing in the picture. Assumption A6 in TRANSFORM.md §18: he gave the
+ * standard maxima and the surcharge, not the upgraded section.
+ *
+ * `head` is the soffit and it moves with `in`, because they are one piece of
+ * frame — it is deeper than the jambs (148 against 62) only because a standing
+ * viewer looks up into it, which is a fact about the viewpoint and not about
+ * the section.
+ */
+export const MASHKOFS = [
+  { id: 'mk-std',  he: 'סטנדרטי',   en: 'Standard',    out: 46, in:  62, head: 148 },
+  { id: 'mk-out',  he: 'חזית רחבה', en: 'Wide face',   out: 82, in:  62, head: 148, wideOut: true },
+  { id: 'mk-in',   he: 'עומק מוגדל', en: 'Deep return', out: 46, in: 112, head: 198, wideIn: true },
+  { id: 'mk-both', he: 'רחב ועמוק', en: 'Wide and deep', out: 82, in: 112, head: 198,
+    wideOut: true, wideIn: true },
+];
+
+/**
+ * ⚠ THE WIDEST FRAME IN THE RANGE, AND THE CROP IS ANCHORED ON IT.
+ *
+ * The door's own tight box in `render()` is computed from this rather than
+ * from the mashkof the customer chose. If it were computed per state, picking
+ * a wider frame would grow the box, `fitStage` would scale the whole door down
+ * to fit, and THE LEAF WOULD APPEAR TO SHRINK when the customer changed
+ * something that does not touch it. That is exactly the fault reported from
+ * outside about the classical set — *"when i put on a window the panel
+ * changes, it supposed to be the same size"* — and it is the reason
+ * `SCENE_MAX` already exists for the backdrop: a quantity that has no business
+ * varying should not be written as if it might.
+ *
+ * The cost is a few millimetres of extra wall around a standard door, in a
+ * scene that already runs 8000 units past the drawing in every direction.
+ */
+export const MASHKOF_MAX = MASHKOFS.reduce((m, k) => ({
+  out: Math.max(m.out, k.out), in: Math.max(m.in, k.in), head: Math.max(m.head, k.head),
+}), { out: 0, in: 0, head: 0 });
+
 export const SPECIAL_LOCKS = [
   { id: 'nospecial', he: 'ללא',   en: 'None' },
   { id: 'kasefet',   he: 'כספת',  en: 'Safe lock' },

@@ -597,6 +597,26 @@
        could have meant. No VERSION bump: it was the LAST entry, so removing it
        renumbers nothing. */
   ];
+  var MASHKOFS = [
+    { id: "mk-std", he: "סטנדרטי", en: "Standard", out: 46, in: 62, head: 148 },
+    { id: "mk-out", he: "חזית רחבה", en: "Wide face", out: 82, in: 62, head: 148, wideOut: true },
+    { id: "mk-in", he: "עומק מוגדל", en: "Deep return", out: 46, in: 112, head: 198, wideIn: true },
+    {
+      id: "mk-both",
+      he: "רחב ועמוק",
+      en: "Wide and deep",
+      out: 82,
+      in: 112,
+      head: 198,
+      wideOut: true,
+      wideIn: true
+    }
+  ];
+  var MASHKOF_MAX = MASHKOFS.reduce((m, k) => ({
+    out: Math.max(m.out, k.out),
+    in: Math.max(m.in, k.in),
+    head: Math.max(m.head, k.head)
+  }), { out: 0, in: 0, head: 0 });
   var SPECIAL_LOCKS = [
     { id: "nospecial", he: "ללא", en: "None" },
     { id: "kasefet", he: "כספת", en: "Safe lock" },
@@ -1305,6 +1325,10 @@
   }
 
   // js/price.js
+  function mashkofExtras(state2) {
+    const mk = byId(MASHKOFS, state2.mashkof);
+    return (mk.wideOut ? MASHKOF_WIDER_A : 0) + (mk.wideIn ? MASHKOF_WIDER_A : 0);
+  }
   function glazedDetail(state2) {
     const d = byId(DETAILS, state2.detail);
     return d.deltaGlazed != null && isGlazed(state2) ? d.deltaGlazed : d.delta;
@@ -1319,7 +1343,14 @@
       door: scaled(BUILD_A.door),
       cylinder: BUILD_A.cylinder,
       lock: BUILD_A.lock,
-      mashkof: scaled(BUILD_A.mashkof),
+      /* ⚠ THE SIZE MULTIPLIES THE MASHKOF'S TOTAL, INCLUDING ITS WIDTH EXTRAS,
+         and that is a reading of "+25% to the price of the door and mashkof"
+         rather than a quotation. The price of the mashkof is whatever the
+         mashkof costs — ₪500, ₪750 or ₪1,000 — and a bigger door needs more
+         length of whatever section it is. The alternative reading (multiply the
+         ₪500 base, add the extras flat) differs by ₪125 at most and is one
+         expression away. TRANSFORM.md §18, assumption A3. */
+      mashkof: scaled(BUILD_A.mashkof + mashkofExtras(state2)),
       install: BUILD_A.install,
       measure: BUILD_A.measure,
       colour: byId(COLOURS, state2.colour).delta,
@@ -1413,6 +1444,7 @@
     const hd = byId(HANDLES, state2.handle);
     const lk = byId(LOCKSETS, state2.lockset);
     const xl = byId(SPECIAL_LOCKS, state2.speciallock);
+    const mk = byId(MASHKOFS, state2.mashkof);
     const dt = byId(DETAILS, state2.detail);
     const sz = SIZES[state2.size] || SIZES.standard;
     const hn = byId(HANDINGS, state2.handing);
@@ -1464,6 +1496,7 @@
       rows.push({ key: "detail", label: "עיצוב", id: dt.id, value: `${dt.he}${n}` });
     }
     rows.push({ key: "size", label: "מידה", id: state2.size, value: sz.he });
+    rows.push({ key: "mashkof", label: "משקוף", id: mk.id, value: mk.he });
     rows.push({ key: "handing", label: "פתיחה", id: hn.id, value: hn.he });
     return rows;
   }
@@ -1770,6 +1803,7 @@
     const handle = byId(HANDLES, state2.handle);
     const lockset = byId(LOCKSETS, state2.lockset);
     const special = byId(SPECIAL_LOCKS, state2.speciallock);
+    const mk = byId(MASHKOFS, state2.mashkof);
     const detail = byId(DETAILS, state2.detail);
     const finish = effectiveFinish(state2);
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
@@ -1781,22 +1815,22 @@
     const x0 = MID_X - totalW / 2;
     const x1 = x0 + totalW;
     const view = {
-      x: x0 - RETURN - CASING - PAD.x,
-      y: y0 - RET_HEAD - CASING - PAD.top,
-      w: totalW + (RETURN + CASING + PAD.x) * 2,
-      h: leafH + FLOOR_RUN + RET_HEAD + CASING + PAD.top + PAD.bottom
+      x: x0 - MASHKOF_MAX.in - MASHKOF_MAX.out - PAD.x,
+      y: y0 - MASHKOF_MAX.head - MASHKOF_MAX.out - PAD.top,
+      w: totalW + (MASHKOF_MAX.in + MASHKOF_MAX.out + PAD.x) * 2,
+      h: leafH + FLOOR_RUN + MASHKOF_MAX.head + MASHKOF_MAX.out + PAD.top + PAD.bottom
     };
     const y = (aff) => floorY - aff;
     const farX = STAGE_BOX.x - SCENE, farW = STAGE_BOX.w + SCENE * 2;
     const farY = STAGE_BOX.y - SCENE, farH = STAGE_BOX.h + SCENE * 2;
-    const revX0 = x0 - RETURN;
-    const revX1 = x1 + RETURN;
-    const revY0 = y0 - RET_HEAD;
-    const casX0 = revX0 - CASING;
-    const casX1 = revX1 + CASING;
-    const casY0 = revY0 - CASING;
+    const revX0 = x0 - mk.in;
+    const revX1 = x1 + mk.in;
+    const revY0 = y0 - mk.head;
+    const casX0 = revX0 - mk.out;
+    const casX1 = revX1 + mk.out;
+    const casY0 = revY0 - mk.out;
     const baseY = BASE_Y;
-    const openW = totalW + RETURN * 2;
+    const openW = totalW + mk.in * 2;
     const hingeOnLeft = handing.hinge === "left";
     const mainX = sideW && !hingeOnLeft ? x0 + sideW + MULLION : x0;
     const sideX = hingeOnLeft ? x0 + leafW + MULLION : x0;
@@ -5882,6 +5916,26 @@ ${body}
   </svg>`;
   }
   var locksetGlyph = handleGlyph;
+  function mashkofGlyph(mk) {
+    const W = 200, H = 150;
+    const sc = 0.62;
+    const out = mk.out * sc, dep = mk.in * sc;
+    const wallY = 30, frameY = wallY;
+    return `<svg viewBox="0 0 ${W} ${H}" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">
+      <!-- the wall, cut -->
+      <rect x="0" y="${wallY}" width="${W}" height="26" opacity=".16"/>
+      <!-- the frame's face on the wall, and its return into the opening -->
+      <rect x="${W / 2 - out}" y="${frameY - 9}" width="${out * 2}" height="9"/>
+      <rect x="${W / 2 - 7}" y="${frameY}" width="14" height="${dep}"/>
+      <!-- the leaf, at the back of the return -->
+      <rect x="${W / 2 - 46}" y="${frameY + dep}" width="92" height="11" opacity=".72"/>
+      <!-- the two dimensions, as ticks -->
+      <rect x="${W / 2 - out}" y="${frameY - 20}" width="${out * 2}" height="2.5" opacity=".55"/>
+      <rect x="${W / 2 + 16}" y="${frameY}" width="2.5" height="${dep}" opacity=".55"/>
+    </g>
+  </svg>`;
+  }
   function specialLockGlyph(x) {
     const art = {
       nospecial: `
@@ -6193,7 +6247,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 14;
+  var VERSION = 15;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "none",
@@ -6205,6 +6259,7 @@ ${body}
        worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
        becomes the first entry in the list. */
     speciallock: "nospecial",
+    mashkof: "mk-std",
     detail: "plain",
     size: "standard",
     handing: "right-in"
@@ -6218,6 +6273,7 @@ ${body}
     p.set("n", state2.handle);
     p.set("k", state2.lockset);
     p.set("x", state2.speciallock);
+    p.set("m", state2.mashkof);
     p.set("d", state2.detail);
     p.set("s", state2.size);
     p.set("h", state2.handing);
@@ -6239,6 +6295,7 @@ ${body}
       "n",
       "k",
       "x",
+      "m",
       "d",
       "s",
       "h",
@@ -6283,6 +6340,7 @@ ${body}
     take("detail", "d", DETAILS);
     take("handing", "h", HANDINGS);
     take("speciallock", "x", SPECIAL_LOCKS);
+    take("mashkof", "m", MASHKOFS);
     const rawSize = p.get("s");
     if (rawSize != null) {
       if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state2.size = rawSize;
@@ -6308,11 +6366,12 @@ ${body}
     size: 3,
     handing: 2,
     window: 2,
-    grille: 5,
+    grille: 4,
     handle: 4,
-    lockset: 4,
+    lockset: 3,
     detail: 5,
-    speciallock: 2
+    speciallock: 2,
+    mashkof: 2
   };
   var TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
@@ -6341,7 +6400,8 @@ ${body}
       [
         Math.max(0, SPECIAL_LOCKS.findIndex((x) => x.id === state2.speciallock)),
         BITS.speciallock
-      ]
+      ],
+      [Math.max(0, MASHKOFS.findIndex((m) => m.id === state2.mashkof)), BITS.mashkof]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -6381,7 +6441,8 @@ ${body}
     const lockset = LOCKSETS[read(BITS.lockset)];
     const detail = DETAILS[read(BITS.detail)];
     const special = SPECIAL_LOCKS[read(BITS.speciallock)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special) return null;
+    const mashkof = MASHKOFS[read(BITS.mashkof)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof) return null;
     return {
       colour: colour.id,
       size,
@@ -6391,7 +6452,8 @@ ${body}
       handle: handle.id,
       lockset: lockset.id,
       detail: detail.id,
-      speciallock: special.id
+      speciallock: special.id,
+      mashkof: mashkof.id
     };
   }
 
@@ -6655,6 +6717,20 @@ ${body}
          needs its own idea of what a price is. */
       glyph: sizeGlyph,
       hint: "נמדוד אצלכם במדויק — בחינם."
+    },
+    /* ⚠ THE FRAME, ASKED FOR BY NAME FROM OUTSIDE. It was always drawn and never
+       choosable, and it is ₪500 to ₪1,000 of a ₪3,150 door — too much money to
+       leave as a fact about the picture. It sits in `fit` beside the size and the
+       opening direction because all three are facts about the HOLE IN THE WALL
+       rather than about the door, which is the one thing a fitter asks first. */
+    {
+      key: "mashkof",
+      title: "משקוף",
+      in: "fit",
+      kind: "hw",
+      list: () => MASHKOFS,
+      glyph: mashkofGlyph,
+      hint: "המסגרת שהדלת נסגרת עליה. נמדוד את הקיר אצלכם."
     },
     {
       key: "handing",

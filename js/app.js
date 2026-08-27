@@ -29,14 +29,15 @@
 
 import {
   byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
-  GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, SPECIAL_LOCKS, WINDOWS,
+  GRILLES, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, PLACEHOLDER, SIZES,
+  SPECIAL_LOCKS, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, tileAgorot }
   from './price.js';
 import {
   describe, detailGlyph, gripAt, gripCanRotate, gripHome, gripIsFixed,
   gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
-  copyOf, render, sizeGlyph, specialLockGlyph, windowGlyph,
+  copyOf, mashkofGlyph, render, sizeGlyph, specialLockGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
@@ -103,6 +104,15 @@ const GROUPS = [
        needs its own idea of what a price is. */
     glyph: sizeGlyph,
     hint: 'נמדוד אצלכם במדויק — בחינם.' },
+
+  /* ⚠ THE FRAME, ASKED FOR BY NAME FROM OUTSIDE. It was always drawn and never
+     choosable, and it is ₪500 to ₪1,000 of a ₪3,150 door — too much money to
+     leave as a fact about the picture. It sits in `fit` beside the size and the
+     opening direction because all three are facts about the HOLE IN THE WALL
+     rather than about the door, which is the one thing a fitter asks first. */
+  { key: 'mashkof', title: 'משקוף', in: 'fit', kind: 'hw', list: () => MASHKOFS,
+    glyph: mashkofGlyph,
+    hint: 'המסגרת שהדלת נסגרת עליה. נמדוד את הקיר אצלכם.' },
 
   { key: 'handing', title: 'כיוון פתיחה', in: 'fit', kind: 'pill', list: () => HANDINGS,
     hint: 'לא בטוחים? נבדוק יחד במדידה.' },

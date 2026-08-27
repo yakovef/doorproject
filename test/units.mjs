@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, paneCount, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
@@ -29,12 +29,13 @@ const ALPHABET_TEST = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
                handle: 'idan', lockset: 'coral', speciallock: 'nospecial',
-               detail: 'plain', size: 'standard', handing: 'right-in' };
+               mashkof: 'mk-std', detail: 'plain', size: 'standard',
+               handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
-              'lockset', 'speciallock', 'detail'];
+              'lockset', 'speciallock', 'mashkof', 'detail'];
 
 /* The code's length is derived, never typed. It was written as {8} and the
    day the layout grew to nine characters that produced 280 failures saying
@@ -77,12 +78,15 @@ function* everyState() {
          missing from the stem encodes as `undefined`, which
          `Math.max(0, indexOf(undefined))` masks to index 0 in silence. */
       const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
-                     detail: 'plain', speciallock: 'nospecial' };
+                     detail: 'plain', speciallock: 'nospecial', mashkof: 'mk-std' };
       const out = [];
       for (const n of HANDLES) out.push({ ...stem, handle: n.id, lockset: 'coral' });
       for (const k of LOCKSETS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: k.id });
       for (const x of SPECIAL_LOCKS.slice(1)) {
         out.push({ ...stem, handle: 'idan', lockset: 'coral', speciallock: x.id });
+      }
+      for (const m of MASHKOFS.slice(1)) {
+        out.push({ ...stem, handle: 'idan', lockset: 'coral', mashkof: m.id });
       }
       for (const st of out) if (buildable(st)) yield st;
     }
@@ -337,6 +341,55 @@ for (const st of everyState()) {
      'a pre-withdrawal link must still open the door it names');
   ok(!toQuery(base).includes('f=') && !toQuery(base).includes('a='),
      'the url must not carry the withdrawn fields');
+}
+
+/* ── THE FRAME MOVES AND THE LEAF DOES NOT ─────────────────────────
+   ⚠ THIS IS THE ASSERTION THE WHOLE MASHKOF CATEGORY DEPENDS ON, and it was
+   written BEFORE the category was built rather than after.
+
+   The fault it exists for has already happened twice on this door. Reported
+   from outside about the classical set: *"wehn i put on a window the panel
+   changes, it supposed to be the same size."* The cause both times was one
+   quantity stated in two places and drifting — and a frame whose width feeds
+   the leaf's origin is precisely that shape of mistake waiting to happen.
+   `x0`, `y0`, `MID_X` and `BASE_Y` are all computed from the STANDARD casing
+   and return; a wider mashkof grows OUTWARD from a fixed opening.
+
+   Asserted on the drawn markup rather than on the constants, because the
+   constants agreeing proves nothing about what was emitted. */
+group('the leaf does not move when the frame does');
+{
+  const leafBox = svg => {
+    const m = svg.match(/<g id="leaf"[\s\S]*?<rect[^>]*?x="([-\d.]+)"[^>]*?y="([-\d.]+)"[^>]*?width="([\d.]+)"[^>]*?height="([\d.]+)"/);
+    return m && { x: +m[1], y: +m[2], w: +m[3], h: +m[4] };
+  };
+  let checked = 0;
+  for (const size of sizeKeys) {
+    const ref = leafBox(render({ ...base, size, mashkof: 'mk-std' }));
+    ok(ref, `no leaf rect found on a ${size} door — this check is asserting nothing`);
+    for (const m of MASHKOFS) {
+      const got = leafBox(render({ ...base, size, mashkof: m.id }));
+      ok(got && got.x === ref.x && got.y === ref.y
+             && got.w === ref.w && got.h === ref.h,
+         `${size}/${m.id}: the leaf is ${JSON.stringify(got)} where the standard `
+       + `frame draws it at ${JSON.stringify(ref)} — a frame changed the door`);
+      checked++;
+    }
+  }
+  /* And the crop too: if the door's own box grew with the frame, `fitStage`
+     would scale everything down and the leaf would APPEAR to shrink even
+     though its millimetres never moved. That is the same complaint wearing a
+     different mechanism, so it gets its own line. */
+  for (const size of sizeKeys) {
+    const fit = svg => (svg.match(/data-fit-w="([\d.]+)"/) || [])[1];
+    const ref = fit(render({ ...base, size, mashkof: 'mk-std' }));
+    for (const m of MASHKOFS) {
+      ok(fit(render({ ...base, size, mashkof: m.id })) === ref,
+         `${size}/${m.id}: the drawing's own box changed width with the frame, `
+       + 'so the whole door would be scaled to fit and the leaf would look smaller');
+    }
+  }
+  console.log(`  (${checked} size x frame pairs, leaf identical in every one)`);
 }
 
 // ── 3. Price ──────────────────────────────────────────────────────
