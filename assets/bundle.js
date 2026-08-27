@@ -1522,8 +1522,8 @@
       low: 0.17,
       foot: 0.19,
       head: 0.02,
-      grain: 0.16,
-      drift: 0.13,
+      grain: 0.25,
+      drift: 0.203,
       bloom: 0.05
     },
     light: {
@@ -1532,8 +1532,8 @@
       low: 0.09,
       foot: 0.1,
       head: 0.02,
-      grain: 0.09,
-      drift: 0.09,
+      grain: 0.141,
+      drift: 0.141,
       bloom: 0.75
     }
   };

@@ -1887,3 +1887,39 @@ html.is-live .wa__off { display: none; }
 /* The cheapest thing that makes a page feel like a product on a phone. */
 .tile, .swatch, .pill { transition: transform .09s var(--ease); }
 .tile:active, .swatch:active, .pill:active { transform: scale(.97); }
+
+/* ── ≥1280 · THE DOOR TAKES THE EMPTY COLUMN ─────────────────────────
+   `REALISM2.md` stage F. The mockup runs the drawing full bleed with the
+   price and choices cards FLOATING over it, and this is not that — read on.
+
+   What the flow changed underneath it: `.panel--send` now lives inside the
+   summary STEP, so the third column stands empty at every step but the last.
+   That is the same fault stage F was written for, measured at 1536x1024 as
+   "the choices column is 918 px tall and its content ends at 304 — 614 px of
+   blank", arriving from the other direction. The door takes it.
+
+   ⚠ WHY NOT THE FLOATING OVERLAY, WHICH IS WHAT THE MOCKUP DRAWS. §6 of that
+   file makes the overlay conditional on twelve viewport x size measurements,
+   and its own last paragraph is the instruction for when they will not settle:
+   THE OVERLAY YIELDS, NOT THE CONTROLS. The condition is not the container any
+   more — that is healthy, 6/6 at 1280 and 1680 — it is that the overlay was
+   specified against a three-column CABINET that no longer exists, and its one
+   hard requirement is re-deriving `--wall` from the floating card's inner edge
+   because the grip controls stand in that strip. Spanning the track needs none
+   of that: the stage's padding box is still the wall, `fitStage` still
+   measures the box the bar sits in, and the house rule that the published
+   number and the box are the same box by construction is untouched.
+   Recorded rather than quietly skipped. A door that is 360 px wider is most of
+   what the overlay was for; the rest is a composition, and it deserves a fresh
+   look rather than the tail of a long session. */
+@media (min-width: 1280px) {
+  .layout { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr) 0; }
+  .stage-wrap { grid-column: 2 / span 2; }
+  .stage__bar { grid-column: 2 / span 2; }
+  /* The send card is inside the summary step now, so column 3 has nothing to
+     hold. Zeroed rather than removed from the template: `.panel--send` is
+     still addressed by `grid-column: 3` above, and a rule pointing at a track
+     that does not exist is the kind of silence this stylesheet has paid for. */
+  .panel--send { display: none; }
+  .sect--sum .panel--send { display: block; border: 0; }
+}

@@ -162,9 +162,9 @@ export const LIGHT = {
    instead of the end of a fall. Whatever happens down there must read as the
    shadow continuing, never as an event. */
 const FALLOFF = {
-  dark:  { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.16, drift: 0.13,
+  dark:  { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.250, drift: 0.203,
            bloom: 0.05 },
-  light: { peak: 0.10, mid: 0.05, low: 0.09, foot: 0.10, head: 0.02, grain: 0.09, drift: 0.09,
+  light: { peak: 0.10, mid: 0.05, low: 0.09, foot: 0.10, head: 0.02, grain: 0.141, drift: 0.141,
            bloom: 0.75 },
 };
 

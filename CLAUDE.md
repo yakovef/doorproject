@@ -1319,6 +1319,35 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **The leaf's grain went up two measured steps, and the response is
+  SUB-LINEAR — which is the finding, not the number.** `grain` and `drift` up
+  56% moved `npm run mottle` from 0.0132 to 0.0168; ×1.95 on the constants
+  moved it only ×1.47. Reaching the corpus (0.089–0.155, honestly ~0.042 after
+  `REDESIGN.md` §2.3 divides out the scene) would need constants five or six
+  times the measured ones, which is no longer raising a measurement — it is
+  chasing a number that is mostly somebody else's sunlight. Stopped at two
+  steps, judged by eye against d016 and d048 per REALISM.md §6, and the
+  non-proportionality written down rather than tuned around.
+  ⚠ **`npm run profile` is fully GREEN and I cannot say why.** The dark-reed
+  row read 1.044 against a 1.03 gate on 26.8 and reads 0.999 now. It is NOT the
+  grain: reverting the grain and re-running gives byte-identical numbers, which
+  is the `drift`/`grainTex` strip working exactly as designed. Something in
+  phases 1–8 closed it. **An unexplained green deserves the suspicion of an
+  unexplained red** — that is this file's §5 in one line — so it is recorded as
+  open rather than claimed as a win.
+
+- **⚠ THE DOOR IS 340 px WIDER ON A DESKTOP, and stage F is NOT the mockup's
+  overlay.** The flow moved `.panel--send` into the summary step, so the third
+  column stood empty at every step but the last — the same fault
+  `REALISM2.md` §6 was written for, arriving from the other direction. At
+  ≥1280 the stage spans it: 412→752 px at 1280, 812→1152 at 1680.
+  What is NOT built is the floating composition, and the reason is not the
+  container (healthy, 6/6). It is that the overlay was specified against a
+  three-column CABINET that no longer exists, and its one hard requirement is
+  re-deriving `--wall` from a floating card's inner edge because the grip
+  controls stand in that strip. Spanning the track needs none of that. §6's own
+  last paragraph is the instruction: **the overlay yields, not the controls.**
+
 - **The page moves now, and the rule that made it safe shipped first.**
   ⚠ **`.is-bare` KILLS EVERY ANIMATION**, and it is asserted in `npm run audit`
   rather than trusted. `?bare=1` is what `sheets`, `recreate`, `corpus`,

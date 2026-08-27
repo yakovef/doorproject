@@ -31,7 +31,7 @@ green and the work is pushed.
 | 6 | Stripes — a count in one direction, not fourteen patterns | ✅ **done** | 27.8 · 14 tiles → direction + count + **tight/spread toggle** · packed as ONE ordinal so impossible states cannot exist · all 14 retired ids MIGRATE (an alias cannot express id→3 fields) · panels: rect needs a bottom panel, panel3/classic drop the pull · third repair-ordering constraint found · `VERSION 18`, code 10 chars · test **5,401,525 / 0** |
 | 7 | The guided flow — one question at a time | ✅ **done** | 27.8 · 8 steps + a quote page, one live at every width · accordion deleted (6 functions) · navigator sticky and scrolling · audit's arrival/keyboard/reach checks all restated · **latency 501 → 123 ms** · test **5,401,525 / 0**, audit clean at 7 viewports |
 | 8 | Motion — the door assembles, and every change is animated | ✅ **done** | 27.8 · door assembles on load (Peretz's "start with nothing", satisfied in time) · colour cross-fades, never interpolates hue · parts fit, keyed off `data-changed` so no diffing and no second render path · **bare mode + reduced motion measured at 0 animations, asserted in the audit** · latency 123 ms |
-| 9 | The look — leaf texture (E), full-bleed desktop (F), mockup leftovers | **not started** | |
+| 9 | The look — leaf texture (E), full-bleed desktop (F), mockup leftovers | ✅ **done, with F scoped down and said so** | 27.8 · grain +56% in two measured steps, mottle 0.0132 → 0.0168, judged against d016/d048 · ⚠ response is SUB-LINEAR, recorded · door **340 px wider** at 1280 and 1680 · the floating overlay is NOT built and §12.2 says why |
 | 10 | Hebrew · English · Russian | **not started** | |
 | 11 | The final sweep — docs, assertions, green light | **not started** | |
 
