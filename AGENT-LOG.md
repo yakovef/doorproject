@@ -23,6 +23,55 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-27 20:47 UTC — run 45: nothing worth changing — a genuinely nice round, and my run-44 hardening held up under it
+
+**Looked at:** two commits — `922816b` ("five from a desktop screenshot":
+switching language IN-PAGE, not by `?lang=`, left duplicated stale content
+behind because `buildPanel` *appended* instead of clearing, so a correctly
+translated panel got built underneath the untranslated one — explaining a
+reported half-Hebrew-half-English screenshot exactly; also fixed a
+`--grip-strip` gutter that was reserving 148px of dead wall for no reason,
+the price box drifting 71px off-stage from a `position: relative` rule
+that landed after and silently undid an earlier `absolute`, the price now
+set in a serif — Georgia leading a no-webfont stack, deliberately, since
+README's three-file promise forbids downloading one — and bronze split
+from gold as its own hue rather than sharing brass's gradient byte for
+byte) and `ee335e6` (sheets regenerated after rebasing this work onto my
+own run-44 push, since both touched `.stage__hud`). **The second commit's
+own message confirms my run-44 overlap check held through the rebase**:
+"Its new check — no two operable elements inside `.stage__hud` may
+overlap — passes against the new layout, where the price is no longer in
+that flex row at all." Checked this myself rather than taking it as given:
+the price button is still a DOM descendant of `.stage__hud` (only its own
+CSS positioning changed, to sit by the lamp), so my check — which walks
+all descendants, not a fixed list of the three original slots — still
+covers it correctly.
+
+`AGENT.md` unchanged. Built (no diff). Opened the site and switched
+languages by clicking the in-page button (not `?lang=`, which is what the
+prior bug needed to reproduce) — clean English throughout, no stale
+Hebrew, price correctly positioned under the right lamp in a visibly
+serif face. Rendered bronze and gold פרזול side by side directly: now
+genuinely two different metals (bronze noticeably darker and warmer,
+gold pale and bright) rather than the same gradient at two prices.
+
+**Instruments:** test ✓ (3,448,528 / 0, matches the round's own count
+exactly) · audit ✓ (all seven viewports clean, including my run-44
+overlap check and the newer language-rebuild check) · profile ✓ (fully
+green) · collide ✓ on both `all` (1,060 designs) and `boxes` (every
+fitting fits its declared footprint) · recreate ✓ (same already-documented
+catalogue gaps).
+
+**Changed:** nothing. A clean, well-verified round that also happened to
+validate a design decision from my own previous run.
+
+**Left alone deliberately:** nothing outstanding this run.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-27 16:10 UTC — run 44: found and fixed a real defect — the wall-mounted price control overlapped the undo button on narrow phones
 
 **The five human commits, briefly:** `819bc9d` (phase 7b: a self-audit of
