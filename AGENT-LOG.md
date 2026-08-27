@@ -110,8 +110,7 @@ mutual-overlap check), and the sheets/stamps the CSS change touched.
 **Left alone deliberately:** nothing this round — the fix is complete and
 verified both ways.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** f7ab9de
 
 ---
 
