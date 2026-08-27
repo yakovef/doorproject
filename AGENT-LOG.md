@@ -118,8 +118,7 @@ green" question — genuinely not mine to solve this run, and the human round
 was explicit that it remains unresolved rather than guessing at an
 explanation to close the ticket.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** 5180e7c
 
 ---
 
