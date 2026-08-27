@@ -574,7 +574,7 @@ export const LOCKSETS = [
 export const PIRZUL = [
   { id: 'pz-nickel', he: 'ניקל',   en: 'Nickel', ru: 'Никель', tone: 'steel' },
   { id: 'pz-black',  he: 'שחור',   en: 'Black', ru: 'Чёрный',  tone: 'black' },
-  { id: 'pz-bronze', he: 'ברונזה', en: 'Bronze', ru: 'Бронза', tone: 'brass' },
+  { id: 'pz-bronze', he: 'ברונזה', en: 'Bronze', ru: 'Бронза', tone: 'bronze' },
   { id: 'pz-gold',   he: 'זהב',    en: 'Gold', ru: 'Золото',   tone: 'brass' },
 ];
 

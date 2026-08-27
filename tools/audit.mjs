@@ -1429,7 +1429,7 @@ for (const v of VIEWS) {
   await pg.waitForTimeout(400);
   const before = await pg.evaluate(() => document.querySelector('#code')?.textContent);
   await pg.evaluate(() => [...document.querySelectorAll('.lang')]
-    .find(b => b.lang === 'ru')?.click());
+    .find(b => b.lang === 'en')?.click());
   await pg.waitForTimeout(400);
   const after = await pg.evaluate(() => ({
     code: document.querySelector('#code')?.textContent,
@@ -1440,7 +1440,44 @@ for (const v of VIEWS) {
     fault('languages', `switching language changed the DOOR: the code went ${before} -> `
       + `${after.code}. Changing language must keep what the customer built`);
   }
-  if (after.dir !== 'ltr') fault('languages', 'clicking Русский did not flip <html dir>');
+
+  /* ⚠ NOT ONE HEBREW WORD SURVIVES A SWITCH TO ENGLISH, AND NOTHING IS
+     BUILT TWICE. Both were reported from one screenshot: *"when i change
+     the language it doesnt change the language on all the text"* and *"at
+     the bottom of the screen the categories get repeated, and the 30 doors
+     button too."* One cause — `buildPanel` APPENDED instead of clearing, so
+     a correctly translated panel was built underneath the stale one and
+     everything visible was the copy that had never been rebuilt.
+     Counting the duplicates alone would not have caught it: the page was
+     translated, twice, and showed the wrong one. So both halves are
+     asserted, and the Hebrew sweep covers the strings written by SCRIPT
+     rather than by `data-t` — the illustration note came from
+     `js/share.js` and was the last one left behind. */
+  const HEBREW = /[\u0590-\u05FF]/;
+  const rebuilt = await pg.evaluate(() => ({
+    navs: document.querySelectorAll('.steps').length,
+    openers: document.querySelectorAll('.works-open').length,
+    sends: document.querySelectorAll('.panel--send').length,
+    text: [...document.querySelectorAll(
+      '#choices .tile__name, #choices .field__title, #choices .sect__title,'
+      + ' #choices .sect__q, #choices .field__hint, #choices .sect__back,'
+      + ' .stage__note, .trust span, .send__lead')].map(e => e.textContent).join(' '),
+  }));
+  for (const [what, n] of [['navigators', rebuilt.navs], ['gallery openers', rebuilt.openers],
+                           ['send cards', rebuilt.sends]]) {
+    if (n !== 1) {
+      fault('languages', `${n} ${what} on the page after switching language — `
+        + 'the panel is being built again instead of rebuilt, and the customer is '
+        + 'looking at whichever copy came first');
+    }
+  }
+  if (HEBREW.test(rebuilt.text)) {
+    fault('languages', 'Hebrew survives on the English page: "'
+      + (rebuilt.text.match(/[^\s]*[\u0590-\u05FF][^\s]*/g) || []).slice(0, 3).join(' ')
+      + '" — a string that is written once at boot and never again');
+  }
+
+  if (after.dir !== 'ltr') fault('languages', 'clicking English did not flip <html dir>');
   if (after.live !== 1) fault('languages', `after switching, ${after.live} steps are live, want 1`);
   if (!faults) console.log('    the interface mirrors, the door does not, and the door survives the switch');
   await pg.close();

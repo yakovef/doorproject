@@ -41,6 +41,25 @@ const FINISH_TONES = {
   steel: ['#E4E7E9', '#C6CBCF', '#9FA5AA', '#80868B', '#99A0A5', '#6A7075', '#F7F9FA'],
   black: ['#5E6165', '#3D4043', '#26282B', '#171819', '#313437', '#0F1011', '#8A8E93'],
   brass: ['#EFE5CE', '#D9CBA6', '#BCAD86', '#9C8F6C', '#C7BA9B', '#7C7154', '#FDF6E2'],
+  /* ⚠ BRONZE IS ITS OWN METAL, AND IT USED TO BORROW BRASS. Reported from
+     outside: *"the bronze and the gold pirzul look the same."* They were the
+     same — `pz-bronze` and `pz-gold` both carried `tone: 'brass'`, so the two
+     rendered byte-identically and the ₪400 between them bought no pixel.
+
+     What separates them is not brightness alone, it is HUE. Brass and gold are
+     yellow: the ramp above runs 44–46° with the saturation falling as it
+     darkens. Bronze is a copper alloy — redder, browner, and markedly darker,
+     around 28–30°, with shadows that go almost to a burnt umber rather than to
+     olive. Set beside each other the gold reads as polished and the bronze as
+     an aged casting, which is what the two products are.
+
+     Same seven-stop shape as its neighbours: highlight, three descending
+     bodies, a lighter return, the darkest core, and the specular. `scaleTone`
+     maps a measured bar profile onto whichever of these is chosen, so the
+     shape has to match or a pull bar recoloured into bronze loses its
+     modelling. Gold is untouched — asked for explicitly: "keep the gold as
+     is." */
+  bronze: ['#D8B389', '#B98C5D', '#96683C', '#6F4A28', '#A97B4E', '#4A301A', '#F0D6B4'],
 };
 
 
@@ -731,6 +750,15 @@ function wallLamp(sx, sy, baseY) {
   const capH = h * 0.055;                 // the cast top, slightly proud
   const rimY = sy + h - capH;             // and its twin at the foot
   const proud = w * 0.08;                 // how far both stand out from the body
+  /* ⚠ TAGGED SO THE PAGE CAN MEASURE IT. `fitStage` reads this box to place the
+     price on the wall beneath the right-hand lamp — asked for in those words —
+     and the alternative was a hard-coded percentage of the stage that would go
+     silently wrong the day `SCONCE_OUT` moves. The group wraps the washes as
+     well as the fitting, on purpose: the light IS part of where the lamp is,
+     ⚠ AND IT WRAPS THE FITTING ONLY, NOT ITS LIGHT. Wrapping the washes as
+     well measured 785 px down a 794 px stage — the downward glow runs to the
+     floor, so "below the lamp" came out as "on the skirting". The metal is
+     what a person means by the lamp. */
   return `
       <!-- ⚠ BOTH WASHES ARE PAINTED FIRST, ON THE WALL, BEHIND THE FITTING.
            They were after it, and the upward one is a warm ellipse wide enough
@@ -748,6 +776,7 @@ function wallLamp(sx, sy, baseY) {
       <ellipse cx="${n(sx)}" cy="${n(sy + capH - h * 0.8)}" rx="${n(w * 1.9)}"
                ry="${n(h * 0.8)}" fill="url(#lampUp)"/>
 
+    <g data-room="sconce">
       <!-- The shadow the fitting throws on the plaster: down and to the right,
            because the key is high and to the left. Soft, and only just there —
            an exterior wall in daylight, not a studio. -->
@@ -796,7 +825,7 @@ function wallLamp(sx, sy, baseY) {
                ry="${n(capH * 0.42)}" fill="${LIGHT.warm}" opacity="0.92"/>
       <ellipse cx="${n(sx)}" cy="${n(sy + capH * 0.5)}" rx="${n(w * 0.34)}"
                ry="${n(capH * 0.36)}" fill="${LIGHT.warm}" opacity="0.55"/>
-
+    </g>
 `;
 }
 

@@ -172,6 +172,31 @@ hold keys: `SAID` in `rules.js`, `GROUPS`/`SECTIONS` in `app.js`,
 `priceIncludes`/`priceCaveat` in `share.js` (functions, not constants).
 Nothing throws when this is wrong. The page looks entirely correct.
 
+### ⚠ `buildPanel` EMPTIES THE PANEL FIRST, AND IT DID NOT USED TO
+
+It APPENDED, which was harmless for exactly as long as it ran once — and then
+the language picker started calling it again. Two reports off one screenshot,
+one cause: *"when i change the language it doesnt change the language on all
+the text"* and *"at the bottom of the screen the categories get repeated."*
+A correctly translated panel was being built UNDERNEATH the stale one, and
+everything visible was the copy that had never been rebuilt. Tile names stayed
+Hebrew while their prices turned English, because `repriceOptions` rewrites
+`.tile__meta` on the live DOM and the names were never touched.
+
+⚠ **And the send card is rescued before the clear** — `goStep` MOVES
+`.panel--send` into the summary step, which is a child of the panel, so
+emptying it would delete markup `index.html` owns and nothing rebuilds.
+
+`npm run audit` asserts all three symptoms now — one navigator, one gallery
+opener, one send card, and not one Hebrew character left after switching to
+English. Falsified: putting the append back gives all three faults.
+
+⚠ **A string written by SCRIPT rather than by `data-t` is the one that gets
+left behind.** The illustration note comes from `js/share.js` so the page and
+the WhatsApp message cannot state one promise two ways — and `init` wrote it
+once at boot, so it stayed Hebrew for ever. It is in `translateStatic` now,
+which is the function whose whole job is making the chrome match the language.
+
 ### The chrome moved onto the wall — 27.8.2026
 
 The page has no header and no dock. Three controls stand in the wall around

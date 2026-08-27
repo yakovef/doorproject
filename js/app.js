@@ -357,6 +357,16 @@ function translateStatic(root = document) {
      text — but the tab only updates from `document.title`, so say it twice on
      purpose. */
   document.title = T('doc.title');
+
+  /* ⚠ AND THE TWO SENTENCES THAT COME FROM `js/share.js`, not from markup.
+     They have no `data-t` to be found by the loop above, because they are
+     written by script so that the page and the WhatsApp message cannot state
+     one promise in two wordings. That made them the last Hebrew left on an
+     English page: `init` wrote them once at boot and a language switch never
+     came back. Written HERE rather than in `init`, so the one function whose
+     job is "make the chrome match the language" does all of it. */
+  const caveat = root.querySelector?.('#draw-caveat');
+  if (caveat) caveat.textContent = drawingCaveat();
 }
 
 /**
@@ -425,10 +435,6 @@ function init() {
   $('#grip-home').addEventListener('click', () => set({ ...state, grip: null }));
   $('#undo-btn').addEventListener('click', undo);
   $('#redo-btn').addEventListener('click', redo);
-  /* Written in from `share.js`, not typed into index.html — one promise,
-     one wording, and the order carries the same sentence. See
-     DRAWING_CAVEAT. */
-  $('#draw-caveat').textContent = drawingCaveat();
   $('#save-btn').addEventListener('click', saveCurrent);
 
   /* The price opens its own breakdown. `hidden` and `aria-expanded` move
@@ -855,6 +861,28 @@ function buildSheet() {
 
 function buildPanel() {
   const wrap = $('#choices');
+
+  /* ⚠ EMPTY IT FIRST. This function APPENDED, which was harmless for as long
+     as it ran exactly once — and then the language picker started calling it
+     again. Reported from outside as two separate faults that are one bug:
+     *"when i change the language it doesnt change the language on all the
+     text"* and *"at the bottom of the screen the categories get repeated, and
+     the 30 doors button too."*
+
+     A second, correctly-translated panel was being built UNDERNEATH the first.
+     Everything the customer could see was the stale copy — so the tile names
+     stayed Hebrew while their prices turned English, because `repriceOptions`
+     rewrites `.tile__meta` on the live DOM and the names were never rebuilt.
+     Two symptoms, one missing line.
+
+     ⚠ AND THE SEND CARD IS RESCUED BEFORE THE CLEAR. `goStep` MOVES
+     `.panel--send` into the summary step, which is a child of this element —
+     so emptying the panel would delete markup that `index.html` owns and
+     nothing rebuilds. It goes back to the layout and `goStep` re-adopts it on
+     the next call. */
+  const send = document.querySelector('.panel--send');
+  if (send && wrap.contains(send)) $('.layout').appendChild(send);
+  wrap.replaceChildren();
 
   /* The first offer the panel makes, above the navigator: somewhere to start
      that is not a list of sixty options. */
@@ -2398,6 +2426,25 @@ function fitStage() {
        same re-fit, so it cannot disagree with the door it is placed around. */
     $('.stage-wrap').style.setProperty(
       '--stage-top', `${Math.max(0, Math.round(box.y - wrap.y))}px`);
+
+    /* ⚠ WHERE THE RIGHT-HAND LAMP IS, so the price can hang under it — asked
+       for in those words. Measured off the drawing rather than written as a
+       percentage of the stage: the sconces are placed from `MID_X ±
+       SCONCE_OUT` and a third down the scene, and a hard-coded fraction here
+       would go quietly wrong the day either moves.
+       ⚠ PHYSICALLY RIGHT, NOT LOGICALLY. `sort` by `x` and take the last, so
+       it is the same lamp in Hebrew as in English — the drawing does not
+       mirror (see the note over `svg { direction: ltr }`) and neither may
+       anything pinned to a feature of it. */
+    const lamps = [...document.querySelectorAll('.door-svg [data-room="sconce"]')]
+      .map(el => el.getBoundingClientRect())
+      .sort((a2, b2) => a2.x - b2.x);
+    const lamp = lamps[lamps.length - 1];
+    if (lamp && lamp.width) {
+      const st = $('.stage-wrap').style;
+      st.setProperty('--lamp-cx', `${Math.round(lamp.x + lamp.width / 2 - wrap.x)}px`);
+      st.setProperty('--lamp-b',  `${Math.round(lamp.bottom - wrap.y)}px`);
+    }
 
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);

@@ -1183,7 +1183,7 @@
   var PIRZUL2 = [
     { id: "pz-nickel", he: "ניקל", en: "Nickel", ru: "Никель", tone: "steel" },
     { id: "pz-black", he: "שחור", en: "Black", ru: "Чёрный", tone: "black" },
-    { id: "pz-bronze", he: "ברונזה", en: "Bronze", ru: "Бронза", tone: "brass" },
+    { id: "pz-bronze", he: "ברונזה", en: "Bronze", ru: "Бронза", tone: "bronze" },
     { id: "pz-gold", he: "זהב", en: "Gold", ru: "Золото", tone: "brass" }
   ];
   var MASHKOFS = [
@@ -2109,7 +2109,26 @@
   var FINISH_TONES = {
     steel: ["#E4E7E9", "#C6CBCF", "#9FA5AA", "#80868B", "#99A0A5", "#6A7075", "#F7F9FA"],
     black: ["#5E6165", "#3D4043", "#26282B", "#171819", "#313437", "#0F1011", "#8A8E93"],
-    brass: ["#EFE5CE", "#D9CBA6", "#BCAD86", "#9C8F6C", "#C7BA9B", "#7C7154", "#FDF6E2"]
+    brass: ["#EFE5CE", "#D9CBA6", "#BCAD86", "#9C8F6C", "#C7BA9B", "#7C7154", "#FDF6E2"],
+    /* ⚠ BRONZE IS ITS OWN METAL, AND IT USED TO BORROW BRASS. Reported from
+         outside: *"the bronze and the gold pirzul look the same."* They were the
+         same — `pz-bronze` and `pz-gold` both carried `tone: 'brass'`, so the two
+         rendered byte-identically and the ₪400 between them bought no pixel.
+    
+         What separates them is not brightness alone, it is HUE. Brass and gold are
+         yellow: the ramp above runs 44–46° with the saturation falling as it
+         darkens. Bronze is a copper alloy — redder, browner, and markedly darker,
+         around 28–30°, with shadows that go almost to a burnt umber rather than to
+         olive. Set beside each other the gold reads as polished and the bronze as
+         an aged casting, which is what the two products are.
+    
+         Same seven-stop shape as its neighbours: highlight, three descending
+         bodies, a lighter return, the darkest core, and the specular. `scaleTone`
+         maps a measured bar profile onto whichever of these is chosen, so the
+         shape has to match or a pull bar recoloured into bronze loses its
+         modelling. Gold is untouched — asked for explicitly: "keep the gold as
+         is." */
+    bronze: ["#D8B389", "#B98C5D", "#96683C", "#6F4A28", "#A97B4E", "#4A301A", "#F0D6B4"]
   };
   function inFinish(hex, tone) {
     if (tone === FINISH_TONES.steel) return hex;
@@ -2241,6 +2260,7 @@
       <ellipse cx="${n(sx)}" cy="${n(sy + capH - h * 0.8)}" rx="${n(w * 1.9)}"
                ry="${n(h * 0.8)}" fill="url(#lampUp)"/>
 
+    <g data-room="sconce">
       <!-- The shadow the fitting throws on the plaster: down and to the right,
            because the key is high and to the left. Soft, and only just there —
            an exterior wall in daylight, not a studio. -->
@@ -2289,7 +2309,7 @@
                ry="${n(capH * 0.42)}" fill="${LIGHT.warm}" opacity="0.92"/>
       <ellipse cx="${n(sx)}" cy="${n(sy + capH * 0.5)}" rx="${n(w * 0.34)}"
                ry="${n(capH * 0.36)}" fill="${LIGHT.warm}" opacity="0.55"/>
-
+    </g>
 `;
   }
   var xmlAttr = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
@@ -7492,6 +7512,8 @@ ${body}
       }
     }
     document.title = T("doc.title");
+    const caveat = root.querySelector?.("#draw-caveat");
+    if (caveat) caveat.textContent = drawingCaveat();
   }
   function buildLangs() {
     const host = $("#langs");
@@ -7537,7 +7559,6 @@ ${body}
     $("#grip-home").addEventListener("click", () => set({ ...state, grip: null }));
     $("#undo-btn").addEventListener("click", undo);
     $("#redo-btn").addEventListener("click", redo);
-    $("#draw-caveat").textContent = drawingCaveat();
     $("#save-btn").addEventListener("click", saveCurrent);
     $("#price-toggle").addEventListener("click", () => {
       const box = $("#breakdown"), btn = $("#price-toggle");
@@ -7728,6 +7749,9 @@ ${body}
   }
   function buildPanel() {
     const wrap = $("#choices");
+    const send = document.querySelector(".panel--send");
+    if (send && wrap.contains(send)) $(".layout").appendChild(send);
+    wrap.replaceChildren();
     const opener = document.createElement("button");
     opener.type = "button";
     opener.className = "works-open";
@@ -8475,6 +8499,13 @@ ${body}
         "--stage-top",
         `${Math.max(0, Math.round(box.y - wrap.y))}px`
       );
+      const lamps = [...document.querySelectorAll('.door-svg [data-room="sconce"]')].map((el) => el.getBoundingClientRect()).sort((a2, b2) => a2.x - b2.x);
+      const lamp = lamps[lamps.length - 1];
+      if (lamp && lamp.width) {
+        const st = $(".stage-wrap").style;
+        st.setProperty("--lamp-cx", `${Math.round(lamp.x + lamp.width / 2 - wrap.x)}px`);
+        st.setProperty("--lamp-b", `${Math.round(lamp.bottom - wrap.y)}px`);
+      }
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);

@@ -90,6 +90,18 @@
 
   --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
   --sans: "Segoe UI", "Arial Hebrew", Arial, system-ui, sans-serif;
+  /* ⚠ THE PRICE'S OWN FACE, AND IT DOWNLOADS NOTHING. Asked for from outside:
+     *"pick a creative font for the price, something that reads rich."*
+     A webfont is the obvious answer and the one thing this page may not do —
+     `README.md` promises three files that open from a folder with no server,
+     and a font is a fourth file and a network request.
+     What reads rich without one is a high-contrast SERIF, which every system
+     already has: thin hairlines against thick stems is the whole visual
+     signature of money set in type, and it is the opposite of the interface
+     sans around it. Georgia leads because its figures are generous and it is
+     on every Windows and Mac; Charter and the iOS/Android serifs follow. */
+  --serif: Georgia, "Charter", "Iowan Old Style", "Times New Roman",
+           "Noto Serif Hebrew", "Frank Ruehl CLM", serif;
 
   --ease: cubic-bezier(.33, 1, .68, 1);
 }
@@ -606,8 +618,23 @@ svg { direction: ltr; }
        `.grip-bar` is absolutely positioned against this element, and an
        absolutely positioned box is laid out against the PADDING box — so its
        `inset-inline-start` measures from the outer edge and the bar lands
-       inside the reserved strip rather than beyond it. */
-    padding-inline-start: var(--grip-strip);
+       inside the reserved strip rather than beyond it.
+
+       ⚠ AND THE PADDING IS GONE, 27.8.2026. Reported from outside: *"on the
+       right side continue the background, dont have a white stripe there."*
+       That stripe was this — 148 px of `.stage-wrap` showing its own surface
+       beside the drawing, on the RIGHT in Hebrew and the LEFT in English,
+       because it is a logical inset. It read as a seam in the room.
+
+       The reason for reserving it survives and is met a different way: the
+       controls overlay the wall now, on their own pill, exactly as the three
+       in `.stage__hud` above them do. What the reservation was protecting
+       against — the door RESIZING when it gains a handle — cannot happen
+       either way, because `.grip-bar` is absolute and takes no space in the
+       flow. The padding was buying clear wall, not a stable door, and a pill
+       buys legibility over any wall there is.
+       `--grip-strip` stays: it is still what gives the bar a sane width in the
+       1100–1240 band where the drawn wall is narrow. */
   }
   :root { --grip-strip: 148px; }
 }
@@ -807,6 +834,22 @@ svg { direction: ltr; }
 .stage__hud .langs, .stage__hud .steps-back { flex-wrap: nowrap; }
 .stage__hud .lang { white-space: nowrap; }
 
+/* ⚠ THE PRICE HANGS UNDER THE RIGHT-HAND LAMP, not in the row with the other
+   two. Asked for from outside: *"make it so that the price would be on the
+   right side below the lamps."*
+   `--lamp-cx` and `--lamp-b` are published by `fitStage` off the SCONCE'S OWN
+   BOX — see the note there for why a percentage of the stage would have been
+   the wrong instrument. `left`, not `inset-inline-start`: this is pinned to a
+   feature of the DRAWING, and the drawing does not mirror when the interface
+   does. In Hebrew the interface flips and the lamp, and the price under it,
+   stay exactly where they are. */
+.hud__slot--price {
+  position: absolute;
+  inset-block-start: calc(var(--lamp-b, 30%) + 18px);
+  left: var(--lamp-cx, 76%);
+  transform: translateX(-50%);
+}
+
 /* On the wall the price is the biggest thing on the page after the door, and
    it is a button — see the note in index.html. */
 .hud__slot--price .send__label { font-size: .7rem; letter-spacing: .1em; }
@@ -847,8 +890,15 @@ svg { direction: ltr; }
    the height does not. */
 .hud__slot--price .send__toggle { min-block-size: 44px; display: inline-flex;
                                   align-items: center; gap: 4px; }
-.hud__slot--price .send__figure { font-size: 1.35rem; }
-@media (min-width: 1100px) { .hud__slot--price .send__figure { font-size: 1.6rem; } }
+.hud__slot--price .send__figure {
+  font: 400 1.5rem/1.05 var(--serif);
+  letter-spacing: .005em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+@media (min-width: 1100px) { .hud__slot--price .send__figure { font-size: 1.9rem; } }
+.hud__slot--price .send__label {
+  font-variant: small-caps; letter-spacing: .16em; opacity: .8;
+}
 .hud__slot--price .bd {
   position: absolute; inset-inline: 0; inset-block-start: 100%;
   margin-block-start: 6px;
@@ -856,7 +906,15 @@ svg { direction: ltr; }
   padding: 10px 12px; box-shadow: 0 8px 26px rgb(0 0 0 / .12);
   max-block-size: 46vh; overflow-y: auto;
 }
-.hud__slot--price { position: relative; }
+/* ⚠ `position: relative` WAS HERE AND IT UNDID THE LINE ABOVE. It was added to
+   anchor the breakdown popover, and it sits LATER in the file than the
+   `position: absolute` that hangs this slot under the lamp — so the cascade
+   took the last one and the price stayed in the flex row, 71 px past the edge
+   of the stage and over the choices panel. Measured, not spotted: x=1131 in a
+   1060-wide stage.
+   Nothing is needed here at all. An absolutely positioned box is already a
+   containing block for its own absolute children, so the breakdown anchors to
+   it either way. */
 
 /* The language buttons lose their pill chrome up here — on a wall they are
    text, not a toolbar. */
@@ -884,6 +942,11 @@ svg { direction: ltr; }
   z-index: 2;
   display: flex; flex-direction: column; align-items: stretch; gap: 8px;
   text-align: center;
+  /* Its own ground, like `.hud__slot` — the wall runs under it now. */
+  background: var(--paper);
+  border-radius: var(--r-card, 14px);
+  padding: 8px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05);
 }
 .grip-bar__hint {
   font-size: .72rem; color: var(--ink-2);
