@@ -23,6 +23,76 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-27 00:48 UTC — run 41: nothing worth changing — Peretz gave real prices, and a large multi-phase rebuild landed (TRANSFORM.md phases 0–2)
+
+**The headline:** Peretz sat down with his son on 26.8 and gave the real
+prices — the launch blocker `ASK-PERETZ.md` §5 had been waiting on since
+23.8. `TRANSFORM.md` is the resulting nine-phase plan (a fresh document,
+committed, meant to survive a compact — its own §0.1 explicitly names me:
+*"A recurring agent pushes to this same branch every few hours. Fetch and
+rebase before every push."*). Phases 0–2 are done; phases 3–11 are
+`not started` per the plan's own status table and are NOT mine to pick up
+— this is clearly one continuous human/Claude working session's project,
+not routine maintenance, and my brief is instrument upkeep, not feature
+work of this scale.
+
+**Looked at:** five new commits — `5279fa8` (CLAUDE.md brought current,
+`tools/_upright2.mjs` promoted to a committed `tools/rectify.mjs`),
+`4d1e98a` (TRANSFORM.md phase 0: the plan itself, four rounds of
+self-criticism folded in before landing), `92cf2de` (phase 0: the striped-
+door corpus re-surveyed by an actual test — "more than two stripe lengths"
+— rather than by shape; three doors reclassified), `b4719b7` (phase 1: the
+price model changes from a flat per-size delta to a six-component `BUILD`
+bill, because Peretz's own multipliers land on only two of six components;
+`priceInto('size', …)`'s guard removed and replaced with `tileAgorot`; a
+rounding-order bug caught and fixed before it shipped — components were
+rounding to the agora and printing a breakdown that summed to one shekel
+off the displayed total), and `e2a358d` (phase 2: seven options withdrawn
+and aliased onto survivors per CLAUDE.md's wire-format rule, `SPECIAL_LOCKS`
+added as a new priced-and-drawn axis, size bands now print their range on
+the tile, **`VERSION` bumped to 14** — genuinely needed, since `DETAILS`,
+colour and window bit-widths all moved, and correctly done in the same
+commit as the layout change rather than deferred). Fast-forwarded cleanly,
+no conflicts. `AGENT.md` unchanged. Built (no diff).
+
+Looked hard at this one rather than skimming the commit messages: opened
+the site at phone and desktop widths (both correct, price now ₪3,150),
+clicked the price open to see the breakdown panel (six rows — דלת 1,250,
+צילינדר 200, מנגנון נעילה 200, משקוף 500, התקנה והובלה 700, מדידה וייעוץ
+300 — summing to 3,150 exactly, matching the commit's own arithmetic),
+and loaded a withdrawn id (`n=shiran`) directly by URL to confirm the
+alias resolves silently. My own harness's presence-check on the notice
+element gave a false positive at first (it detects the notice `<p>` by
+DOM presence, not by its `hidden` attribute, and that element is always
+in the DOM) — the screenshot settles it: no visible notice, and the door
+draws with the aliased Idan bar exactly as CLAUDE.md's aliasing rule
+requires.
+
+**Instruments:** test ✓ (5,392,984 / 0, matches phase 2's own count
+exactly) · audit ✓ (all seven viewports clean) · profile ✓ except the one
+already-known, unrelated red — `dark reed 1.044` — untouched by this
+round · collide ✓ on both `all` (1,074 designs — down from 1,410, exactly
+what withdrawing seven options should do) and `boxes` (every remaining
+fitting fits its declared footprint; the grip listing correctly no longer
+shows shiran/almog/blade, which are gone) · recreate ✓ (same
+already-documented catalogue gaps, nothing new).
+
+**Changed:** nothing beyond this log entry. `PLACEHOLDER` in
+`js/prices.js` is still `true` and correctly so — the file's own comments
+say several blocks (pull-bar length pricing, the strip rate curves) are
+still provisional pending later TRANSFORM phases, so the flag is not yet
+supposed to flip.
+
+**Left alone deliberately:** all of TRANSFORM.md phases 3–11 — this is an
+active, planned, multi-session piece of work with its own status ledger,
+not a gap for a five-hour maintenance run to fill. The `dark reed` profile
+red, same reasoning as every run since 28.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-26 20:47 UTC — run 40: nothing worth changing — one solid human fix, re-verified and confirmed by eye
 
 **Looked at:** one new human commit, `e2ae3bb` (the classical set's glazed
