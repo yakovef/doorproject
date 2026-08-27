@@ -2221,9 +2221,19 @@ group('the page still reaches Peretz with no JavaScript');
   ok(!/href="#"/.test(html),
      'a send button ships with href="#": with no JavaScript it is a dead control '
    + 'on the one thing the whole site exists to get pressed');
+  /* ⚠ DERIVED FROM THE MARKUP, NOT A COUNT SOMEBODY REMEMBERED. This read
+     `>= 2` because there were two send buttons — the card's and the phone
+     dock's — and the dock was deleted on 27.8.2026, so a hard 2 would now be
+     asserting the return of a thing the owner asked to remove.
+     What the check is FOR survives whole: every element that offers to send
+     the door must carry a working `wa.me` href, so a page with no JavaScript
+     still reaches Peretz. Count the buttons, then require that many hrefs. */
+  const senders = (html.match(/class="[^"]*btn--wa[^"]*"/g) || []).length;
   const built = (html.match(/href="(https:\/\/wa\.me\/[^"]*)"/g) || []);
-  ok(built.length >= 2,
-     `index.html carries ${built.length} wa.me hrefs; both send buttons need one`);
+  ok(senders >= 1, 'index.html has no send button at all');
+  ok(built.length >= senders,
+     `index.html has ${senders} send button(s) and ${built.length} wa.me href(s) — `
+   + 'one of them is dead without JavaScript');
   for (const h of built) {
     ok(h === `href="${href}"`,
        `index.html carries a wa.me href that fallbackWhatsappUrl() does not build:\n`
@@ -2250,9 +2260,14 @@ group('the page still reaches Peretz with no JavaScript');
      right. This is the single route that survives every failure route in this
      file, which is the reason index.html calls it "the only route left that
      needs nothing from us". */
+  /* ⚠ TWO, NOT THREE, SINCE THE BRAND BAR WAS DELETED ON 27.8.2026. What is
+     left is the one in the cannot-load strip — the route that survives every
+     failure this file simulates — and the one in the send card's fine print.
+     The number is stated here rather than derived because each of those two
+     is a DIFFERENT promise, and losing either is a different bug. */
   const tels = html.match(/href="tel:[^"]*"/g) || [];
-  ok(tels.length >= 3, `index.html carries ${tels.length} tel: links; the header, the `
-                     + 'down strip and the fine print each need one');
+  ok(tels.length >= 2, `index.html carries ${tels.length} tel: links; the down strip and `
+                     + 'the send card fine print each need one');
   for (const t of tels) {
     ok(t.startsWith('href="tel:+'),
        `${t} is not an RFC 3966 global number — without the leading + a dialler `

@@ -171,6 +171,28 @@ hold keys: `SAID` in `rules.js`, `GROUPS`/`SECTIONS` in `app.js`,
 `priceIncludes`/`priceCaveat` in `share.js` (functions, not constants).
 Nothing throws when this is wrong. The page looks entirely correct.
 
+### The chrome moved onto the wall — 27.8.2026
+
+The page has no header and no dock. Three controls stand in the wall around
+the door — languages, price, undo/redo — asked for with three circles drawn on
+a screenshot, and the WhatsApp button appears only on the summary step.
+
+⚠ **`.stage__hud` IS ABSOLUTE AND MUST STAY ABSOLUTE.** Above 1100 px
+`.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so anything in
+the FLOW up there takes its height out of the DRAWING. That is why the grip
+controls live in the wall, why `--grip-strip` is reserved when empty, and why a
+control that merely *appeared* in `.stage__bar` once cost the leaf 23,021
+pixels. The same rule now has a third occupant.
+
+⚠ **AND IT ANCHORS TO `--stage-top`, NOT TO ZERO.** The wrap opens with the
+page's `<h1>`, so `inset-block-start: 0` puts these on the heading rather than
+on the wall. `fitStage` publishes the offset off the same two rects it already
+reads. They cannot be children of `.stage` itself: `paint` rewrites
+`#stage.innerHTML` on every change and would delete them.
+
+**The price is stated once now.** It was the send card and the phone dock, with
+an audit check that the two agreed; there is one reading to make.
+
 ### The round from a real phone — 27.8.2026
 
 Ten items, reported off a live page on an Android. Four were bugs nobody's

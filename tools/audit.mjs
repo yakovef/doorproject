@@ -311,7 +311,7 @@ for (const v of VIEWS) {
     document.querySelectorAll('.sect').forEach(b => { b.hidden = false; });
   });
   /* DERIVED, not listed. This asked a hand-kept set of classes —
-     [role="radio"], .btn, .bar__phone, .field__head, .sect__head — and the
+     [role="radio"], .btn, .iconbtn, .lang, .field__head — and the
      rotate button in the grip bar is on none of them, so it sat at 34px for
      three rounds with the check green beside it. Same staleness the group list
      above was already rewritten to avoid: a list of what to measure stops
@@ -1121,7 +1121,7 @@ for (const v of VIEWS) {
         h1: document.querySelectorAll('h1').length,
         text: box ? box.textContent : '',
         dupes: dupes.length,
-        configuratorVisible: [...document.querySelectorAll('.layout, .dock, .bar')]
+        configuratorVisible: [...document.querySelectorAll('.layout, .steps, .stage__hud')]
           .filter(e => getComputedStyle(e).display !== 'none').length,
         noticeShowing: notice && !notice.hidden,
       };

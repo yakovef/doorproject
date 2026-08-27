@@ -7576,15 +7576,6 @@ ${body}
     } else {
       window.addEventListener("resize", fitStage);
     }
-    if (typeof IntersectionObserver === "function") {
-      const dock = $(".dock");
-      new IntersectionObserver(
-        ([e]) => {
-          dock.hidden = e.isIntersecting;
-        },
-        { threshold: 0.35 }
-      ).observe($(".send"));
-    }
     paint();
     if (document.documentElement.classList.contains("is-sheet")) {
       $(".layout")?.remove();
@@ -8480,6 +8471,10 @@ ${body}
         Math.min(f.x - wrap.x, wrap.x + wrap.width - (f.x + f.width))
       );
       $(".stage-wrap").style.setProperty("--wall-gap", `${Math.round(wall)}px`);
+      $(".stage-wrap").style.setProperty(
+        "--stage-top",
+        `${Math.max(0, Math.round(box.y - wrap.y))}px`
+      );
       const root = document.documentElement.style;
       root.setProperty("--stage-l", `${Math.round(wrap.x)}px`);
       root.setProperty("--stage-w", `${Math.round(wrap.width)}px`);
@@ -8560,8 +8555,12 @@ ${body}
   } catch {
   }
   document.addEventListener("DOMContentLoaded", guard(() => {
-    $("#phone-link").href = `tel:${PHONE_TEL}`;
-    $("#phone-link [data-phone-text]").textContent = PHONE_DISPLAY;
+    for (const a of document.querySelectorAll('a[href^="tel:"]')) {
+      a.href = `tel:${PHONE_TEL}`;
+    }
+    for (const el of document.querySelectorAll("[data-phone-text]")) {
+      el.textContent = PHONE_DISPLAY;
+    }
     init();
   }));
 })();

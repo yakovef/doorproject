@@ -13,84 +13,31 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=78c2ab06">
+<link rel="stylesheet" href="css/app.css?v=92c20c79">
 </head>
 <body>
 
-<header class="bar">
-  <!-- ⚠ THE MARK IS THE FAVICON, INLINE. The four shapes below — beige field,
-       slate leaf, pale light, handle dot — are the same four in the data URI
-       in the <head>, at the same coordinates. Drawing a second logo would give
-       the tab and the header two ideas of what the brand mark is, and the one
-       that went stale would be whichever nobody looked at. No new artwork. -->
-  <a class="brand" href="https://dlatotmagen.co.il">
-    <svg class="brand__mark" viewBox="0 0 32 32" width="34" height="34" aria-hidden="true">
-      <rect x="0.5" y="0.5" width="31" height="31" rx="3" fill="#EFEDE8" stroke="#D6D3CB"/>
-      <rect x="7" y="4" width="18" height="26" rx="1.5" fill="#4A5C6A"/>
-      <rect x="10" y="8" width="12" height="9" rx="1" fill="#BFD0DA"/>
-      <circle cx="12" cy="22" r="1.4" fill="#E8E4DC"/>
-    </svg>
-    <span class="brand__text">
-      <span class="brand__name" data-t="brand.name">דלתות מגן</span>
-      <span class="brand__sub" data-t="brand.sub">בונים דלת</span>
-    </span>
-  </a>
+<!-- ⚠ THE HEADER IS GONE, DELETED 27.8.2026 ON THE OWNER'S SON'S WORD:
+     *"remove entirely the section that is the purple thing"*, drawn round the
+     whole brand bar on a phone screenshot.
 
-  <!-- ⚠ EVERY LINK GOES SOMEWHERE THAT EXISTS. The mockup draws
-       דגמים / עיצוב אישי / צור קשר as three pages; two of them are not built
-       and `PLAN.md` §9 still lists /works and /about as unwritten. A nav item
-       that goes nowhere is worse than no nav item, so דגמים points at the real
-       works gallery on the main site — the trust layer PLAN.md §4 leans on —
-       and צור קשר at the telephone, which is the one channel that always
-       works. עיצוב אישי is this page and says so with `aria-current`, rather
-       than being a link to where you already are. -->
-  <nav class="nav" aria-label="ניווט ראשי" data-ta="aria-label=nav.label">
-    <a class="nav__a" href="https://dlatotmagen.co.il/works" data-t="nav.works">דגמים</a>
-    <span class="nav__a is-here" aria-current="page" data-t="nav.custom">עיצוב אישי</span>
-    <a class="nav__a" href="tel:+972532197466" data-t="nav.contact">צור קשר</a>
-  </nav>
+     It held five things and each was answered rather than dropped:
+       · the language buttons  -> the wall beside the door (`.stage__hud`)
+       · the brand name        -> gone. It is the tab's title, the footer's
+                                  first word and the order sheet's letterhead;
+                                  on a 390 px screen it was 124 px of a row
+                                  that could not fit the language it was
+                                  crowding out.
+       · the telephone         -> the send card's fine print and the
+                                  cannot-load strip, where it already was
+       · `דגמים / עיצוב אישי / צור קשר` -> was `display: none` below 1100 px
+                                  and had been for every phone that ever
+                                  loaded this page
+       · my saved designs      -> the send card, beside `שמירת העיצוב`, which
+                                  is where saving happens
 
-  <!-- ⚠ THE LANGUAGE PICKER IS THREE BUTTONS, NOT A `<select>`, AND IT NAMES
-       EACH LANGUAGE IN ITSELF. A customer who cannot read the page cannot
-       read a control labelled "שפה" either, so the way out has to be legible
-       to somebody who is lost: `עברית` `English` `Русский`, each written in
-       its own script, visible without opening anything. Three options is
-       exactly the count where a row of buttons beats a menu.
-       Built by `js/app.js` so the labels and the current-language state come
-       from one place; empty here so a page whose bundle never loads shows a
-       Hebrew page and no dead control. -->
-  <div class="langs" id="langs" role="group" aria-label="שפה"
-       data-ta="aria-label=nav.lang"></div>
+     What is left at the top of a phone is the step navigator and the door. -->
 
-  <div class="bar__end">
-    <!-- The icons are `aria-hidden` and the text beside them is untouched, so
-         the accessible name of each control is exactly what it was. Both keep
-         their 44 px floors: an icon inside a flex box grows the box, never
-         the reverse. -->
-    <a class="bar__phone" id="phone-link" href="tel:+972532197466">
-      <svg class="bar__ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-        <path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"
-              d="M6.2 3.5 8.6 3.5 10 7.2 8.1 8.8a11 11 0 0 0 5.4 5.4l1.6-1.9 3.7 1.4v2.4c0 1-.8 1.9-1.9 1.9A14.9 14.9 0 0 1 4.3 5.4c0-1 .9-1.9 1.9-1.9Z"/>
-      </svg>
-      <!-- ⚠ THE NUMBER IS IN A SPAN OF ITS OWN, and it has to be. `app.js`
-           writes `PHONE_DISPLAY` here on load, so that the digits and the
-           `tel:` href cannot drift from `share.js` — and it used to write
-           `textContent` on the LINK, which replaces everything inside it.
-           The moment the handset icon was added beside the number, that one
-           line would have deleted it on every load. -->
-      <span data-phone-text>053-219-7466</span>
-    </a>
-    <!-- The saved designs live in this browser and nowhere else; see app.js. -->
-    <button class="bar__saved" id="saved-btn" type="button" hidden
-            aria-expanded="false" aria-controls="saved">
-      <svg class="bar__ico" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-        <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"
-              d="M6.5 3.5h11v17l-5.5-4-5.5 4Z"/>
-      </svg>
-      <span data-t="saved.mine">העיצוב שלי</span> <span class="bar__count" data-saved-count>0</span>
-    </button>
-  </div>
-</header>
 
 <!-- ⚠ THE SAVED LIST IS THIS BROWSER'S AND NOBODY ELSE'S. It is `localStorage`
      — nothing leaves the machine, nothing reaches us, and it survives nothing
@@ -98,10 +45,7 @@
      stay exactly where they were: they are the things a customer can actually
      SEND, and this is only a convenience for holding two doors side by side
      before choosing one. -->
-<div class="saved" id="saved" hidden>
-  <p class="saved__none" data-saved-empty data-t="saved.none">עדיין לא שמרתם עיצוב.</p>
-  <ul class="saved__list" data-saved-list></ul>
-</div>
+
 
 <!-- ── THIRTY DOORS HE ACTUALLY BUILT ──────────────────────────────────
      A customer arrives at a default door and about sixty options with no
@@ -192,8 +136,8 @@
      telephone number is why it holds at all. -->
 <noscript id="down-css"><style>
   #down[hidden] { display: block !important; }
-  #choices, .stage, .grip-bar, .stage__bar, .dock__price,
-  .send__price, .send__spec, .send__lead, .send__alt { display: none; }
+  #choices, .stage, .grip-bar, .stage__bar, .stage__hud,
+  .send__spec, .send__lead, .send__alt { display: none; }
   /* The label swap used to be repeated here. It is the RESTING state in
      app.css now — the page is honest before JavaScript and `paint()` upgrades
      it with `is-live` — so this block no longer has to say it. */
@@ -224,6 +168,66 @@
     </h1>
     <div class="stage" id="stage"></div>
 
+    <!-- ⚠ THE WALL IS THE CHROME NOW. Asked for from outside with three
+         circles drawn on the wall of a screenshot — top right, top centre,
+         top left — and one instruction: *"in this 3 spots I want you to put
+         the language toggle, the price and the undo buttons."*
+
+         ABSOLUTE, like `.grip-bar` below it and for the identical reason:
+         above 1100 px `.stage-wrap` is a flex column and `.stage` is
+         `flex: 1 1 auto`, so anything in the FLOW here takes its height out
+         of the door. The grip controls were moved into the wall for that and
+         `--grip-strip` is reserved unconditionally for it. This row never
+         changes height, but it must not be in the flow either.
+
+         It clears `.grip-bar` by sitting at the top while that is centred at
+         50% — the two share the wall and never the same band of it. -->
+    <div class="stage__hud">
+      <div class="hud__slot hud__slot--start" id="langs" role="group"
+           aria-label="שפה" data-ta="aria-label=nav.lang"></div>
+
+      <!-- ⚠ THE PRICE MOVED HERE WHOLE, breakdown and all, and there is still
+           exactly ONE of it. It used to be stated twice — the send card and
+           the phone dock — with an audit check that the two agreed; the dock
+           is gone and the card's copy came with it, so that check now has
+           one reading to make. Tapping it still opens the column it is made
+           of, which is what was asked for on 26.8. -->
+      <div class="hud__slot hud__slot--price">
+        <span class="send__label" data-t="price.est">מחיר משוער</span>
+        <button class="send__toggle" id="price-toggle" type="button"
+                aria-expanded="false" aria-controls="breakdown">
+          <strong class="send__figure" id="price" data-price>—</strong>
+          <span class="send__chev" aria-hidden="true"></span>
+          <span class="sr-only" data-t="price.breakdown">פירוט המחיר</span>
+        </button>
+        <div class="bd" id="breakdown" hidden>
+          <table class="bd__t"><tbody id="breakdown-body"></tbody></table>
+        </div>
+      </div>
+
+      <div class="hud__slot hud__slot--end">
+        <div class="steps-back" role="group" aria-label="ביטול וחזרה"
+             data-ta="aria-label=undo.group">
+          <button type="button" class="iconbtn" id="undo-btn" disabled
+                  aria-label="ביטול השינוי האחרון" title="ביטול השינוי האחרון"
+                  data-ta="aria-label=undo,title=undo">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
+              <path d="M4.2 9.2h10.3a5 5 0 0 1 0 10h-5.5"/>
+              <path d="M8 5.2 4 9.2l4 4"/>
+            </svg>
+          </button>
+          <button type="button" class="iconbtn" id="redo-btn" disabled
+                  aria-label="החזרת השינוי" title="החזרת השינוי"
+                  data-ta="aria-label=redo,title=redo">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
+              <path d="M19.8 9.2H9.5a5 5 0 0 0 0 10H15"/>
+              <path d="M16 5.2l4 4-4 4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- ⚠ INSIDE the stage and OUT OF FLOW, and both halves of that matter.
          It sat under the door in the page's flow, and it is `hidden` until the
          door has a pull handle — so choosing one made the row appear, and on
@@ -245,7 +249,7 @@
            comparison) assumes that. So the mockup's hand icon is welcome and
            its sentence is not. -->
       <span class="grip-bar__hint">
-        <svg class="grip-bar__ico" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="grip-saved__ico" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M9.4 11.2V5.6a1.4 1.4 0 0 1 2.8 0v5"/>
           <path d="M12.2 10.4V9a1.4 1.4 0 0 1 2.8 0v1.6"/>
           <path d="M15 10.8v-.6a1.4 1.4 0 0 1 2.8 0v5.2a4.6 4.6 0 0 1-4.6 4.6h-1.4c-1.6 0-2.8-.8-3.6-2l-2.4-3.8a1.4 1.4 0 0 1 2.2-1.7l1.4 1.6"/>
@@ -268,69 +272,17 @@
        while the grip buttons cannot: a row that appears and disappears beside
        a flexible stage resizes the door. -->
   <div class="stage__bar">
-    <!-- ⚠ UNDO LIVES UNDER THE DOOR, not in the send panel beside save and
-         copy. Those two are things you do WITH a finished design; this is a
-         thing you do TO the one on screen, and a control belongs next to what
-         it changes. Below 1100 px the stage is sticky, so a button here stays
-         reachable while the customer is eight colours down the list — which is
-         exactly when a mis-tap happens and exactly when having to scroll back
-         up to find the undo would be the annoying part.
-         ⚠ AND IT RESERVES ITS SPACE WHETHER OR NOT IT IS SHOWING — `is-off`
-         is `visibility: hidden`, NOT the `hidden` attribute.
-         It shipped as `hidden` for about an hour and `npm run audit` caught
-         what that costs: above 1100 px `.stage-wrap` is a flex column and
-         `.stage` is `flex: 1 1 auto`, so a control appearing in this bar takes
-         its height OUT OF THE DOOR. Measured — the leaf differed from a fresh
-         load of its own identical link by 23,021 pixels, because the door was
-         drawn smaller the moment there was a step to undo.
-         THE DOOR SHRINKING WHEN THE PAGE GAINS A CONTROL is the exact fault
-         that put the grip buttons in the wall, and `--grip-strip` is reserved
-         unconditionally for the same reason — see the long note on
-         `.stage-wrap` in app.css. `visibility` keeps the box and still takes
-         the button out of the tab order and the accessibility tree, so it is
-         not furniture a keyboard finds.
-         `#grip-home` beside the handle CAN use `hidden`: it lives in the wall,
-         where nothing is competing with the door for height. -->
-    <!-- ⚠ TWO ICONS, NO WORDS, AND ALWAYS THERE. Asked for from outside:
-         *"i wanna see the reverse last change button at all times, so put her
-         near the door, and don't have it as a button with text, just put the
-         symbol of back, and also add a forward button."*
-         The name is not lost, it moved to `aria-label` and `title`: a screen
-         reader and a hover still get the sentence, and the strip under the
-         door gets two 44 px circles instead of a paragraph. They sit here,
-         directly beneath the leaf, because that is where the change they undo
-         just happened. -->
-    <div class="steps-back" role="group" aria-label="ביטול וחזרה"
-         data-ta="aria-label=undo.group">
-      <button type="button" class="iconbtn" id="undo-btn" disabled
-              aria-label="ביטול השינוי האחרון" title="ביטול השינוי האחרון"
-              data-ta="aria-label=undo,title=undo">
-        <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
-          <path d="M4.2 9.2h10.3a5 5 0 0 1 0 10h-5.5"/>
-          <path d="M8 5.2 4 9.2l4 4"/>
-        </svg>
-      </button>
-      <button type="button" class="iconbtn" id="redo-btn" disabled
-              aria-label="החזרת השינוי" title="החזרת השינוי"
-              data-ta="aria-label=redo,title=redo">
-        <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
-          <path d="M19.8 9.2H9.5a5 5 0 0 0 0 10H15"/>
-          <path d="M16 5.2l4 4-4 4"/>
-        </svg>
-      </button>
-    </div>
-    <!-- ⚠ THE WARNING SAYS WHAT IT MEANS NOW. It read "הדמיה להמחשה. הדלת
-         נמדדת ומותקנת אצלכם." — an illustration, and we measure on site —
-         which is true and does not tell a customer the thing they need to
-         know. Asked for from outside: *"add a warning that this app just draws
-         the door but it will probably look slightly different when
-         installed."*
-         The sentence comes from `DRAWING_CAVEAT` in share.js and is written in
-         by app.js rather than typed here, because it goes into the WhatsApp
-         order as well and one promise gets one wording. `PRICE_CAVEAT` was
-         four Hebrew literals in three files before it was one export, and the
-         file it was missing from was the one that mattered. -->
-    <p class="stage__note" id="draw-caveat"></p>
+    <!-- ⚠ THE UNDO PAIR MOVED TO THE WALL — `.stage__hud`, above the leaf.
+         It stood here, under the door, and the owner's son drew a circle on
+         the top-left of the wall instead. Three of them: languages, price,
+         undo. One control, one place.
+         What is left in this bar is the illustration note, which never
+         changes height — and that is the whole rule for this element. Above
+         1100 px `.stage-wrap` is a flex column and `.stage` is
+         `flex: 1 1 auto`, so anything that APPEARS here takes its height out
+         of the door. Measured once at 23,021 pixels of drawing, on a leaf
+         that shrank the moment there was a step to undo. -->
+<p class="stage__note" id="draw-caveat"></p>
   </div>
 
   <!-- ── choices ──────────────────────────────────────────────────
@@ -350,33 +302,14 @@
   <!-- ── the handoff: the whole point of the site ─────────── -->
   <section class="panel panel--send" aria-label="שליחת הדלת" data-ta="aria-label=send.label">
     <div class="send">
-      <!-- ⚠ THE FIGURE IS A BUTTON, and a real one rather than a div with a
-           click handler. Asked for from outside: *"make that if they click on
-           the price it shows what it consists of."* A price a customer can
-           interrogate is the difference between a number and a quote — and the
-           moment it is interrogable it has to be reachable by keyboard and
-           announce its own state, which only an element that genuinely is a
-           control does. `aria-expanded` is the honest carrier; the chevron is
-           decoration and says so. -->
-      <div class="send__price">
-        <span class="send__label" data-t="price.est">מחיר משוער</span>
-        <button class="send__toggle" id="price-toggle" type="button"
-                aria-expanded="false" aria-controls="breakdown">
-          <strong class="send__figure" id="price" data-price>—</strong>
-          <span class="send__chev" aria-hidden="true"></span>
-          <span class="sr-only" data-t="price.breakdown">פירוט המחיר</span>
-        </button>
-        <span class="send__incl" data-t="price.includes">כולל דלת, משקוף, מנעול, התקנה ומע״מ</span>
-      </div>
-
-      <!-- Rendered from `breakdownRows(state)` in js/price.js — the same
-           arithmetic `priceAgorot` sums, never a second list that happens to
-           agree. See the note there for why the ₪5 rounding gets a row of its
-           own: a customer who adds up a column and gets a different answer
-           from the one above it has been shown the number is made up. -->
-      <table class="bd" id="breakdown" hidden>
-        <tbody id="breakdown-body"></tbody>
-      </table>
+      <!-- ⚠ THE PRICE ITSELF IS NOT HERE ANY MORE — it is on the wall above
+           the door, in `.stage__hud`, tappable, with the breakdown under it.
+           Asked for from outside with a circle drawn on a screenshot.
+           What stays is the SENTENCE that says what the figure covers. It
+           belongs to the quote rather than to the readout: on the wall it
+           would be a line of small print across a drawing, and this card is
+           where a customer checks what they are buying. -->
+      <p class="send__incl" data-t="price.includes">כולל דלת, משקוף, מנעול, התקנה ומע״מ</p>
 
       <!-- ⚠ TWO RENDERINGS OF ONE LIST, and neither is redundant.
            `#spec` is the mockup's table — label, value, swatch — and `#summary`
@@ -402,7 +335,19 @@
       <div class="send__alt">
         <button class="btn btn--ghost" id="copy-btn" type="button" data-t="send.copy">העתקת הפרטים</button>
         <button class="btn btn--ghost" id="save-btn" type="button" data-t="send.save">שמירת העיצוב</button>
+        <button class="saved__btn" id="saved-btn" type="button" hidden
+              aria-expanded="false" aria-controls="saved">
+        <svg class="saved__ico" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"
+                d="M6.5 3.5h11v17l-5.5-4-5.5 4Z"/>
+        </svg>
+        <span data-t="saved.mine">העיצוב שלי</span> <span class="saved__n" data-saved-count>0</span>
+    </button>
         <span class="send__code"><span data-t="send.code">קוד:</span> <b id="code">—</b></span>
+      <div class="saved" id="saved" hidden>
+      <p class="saved__none" data-saved-empty data-t="saved.none">עדיין לא שמרתם עיצוב.</p>
+      <ul class="saved__list" data-saved-list></ul>
+</div>
       </div>
 
       <!-- ⚠ This sentence is `PRICE_CAVEAT` in js/share.js and `npm test`
@@ -424,35 +369,15 @@
   </section>
 </main>
 
-<!-- ── the dock ─────────────────────────────────────────────────
-     A phone shows the door, then the choices, then the price — and measured on
-     a 390x844 screen the price sits 1,796 px down and the WhatsApp button
-     1,991. So a customer picking a colour cannot see what it costs, and the
-     one button the whole site exists to get them to is two screens away the
-     entire time they are deciding.
-
-     This is that price and that button, pinned to the foot of the screen on a
-     phone and absent on desktop, where the send panel is already beside the
-     door. It shows the same number from the same statement: `paint` writes to
-     every `[data-price]` and every `[data-wa]`, so the dock and the card
-     cannot drift apart.
-
-     The card stays as it is. It carries the spec line to proof-read, the code
-     to read down a telephone, the copy button and the fine print — none of
-     which belongs in a 64 px bar. -->
-<div class="dock" aria-hidden="false">
-  <div class="dock__price">
-    <span class="dock__label" data-t="price.est">מחיר משוער</span>
-    <strong class="dock__figure" data-price>—</strong>
-  </div>
-  <a class="btn btn--wa dock__send" href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F" target="_blank" rel="noopener" data-wa>
-    <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
-      <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
-    </svg>
-    <span class="wa__on" data-t="send.waOnShort">שלחו בוואטסאפ</span>
-    <span class="wa__off" data-t="send.waOffShort">שלחו הודעה</span>
-  </a>
-</div>
+<!-- ⚠ THE DOCK IS GONE, 27.8.2026: *"remove the WhatsApp from the screen, it
+     will only be available at the end."* It was a bar fixed across the foot of
+     every phone screen carrying the price and a green send button, on all nine
+     steps — offering to send a door on the screen where you are still choosing
+     its colour.
+     The price moved to the wall above the leaf, where it is now stated ONCE.
+     Sending belongs to the summary, the step whose whole job is "you have
+     built it, now send it", and the send card lives inside that step now
+     rather than beside it at all times. -->
 
 <!-- ⚠ FOUR CLAIMS MADE ON PERETZ'S BEHALF, and all four were confirmed from
      outside before they were written. The warranty deliberately does NOT say
@@ -549,7 +474,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=50d96b18"></script>
+<script src="assets/bundle.js?v=474e8d8d"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

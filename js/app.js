@@ -504,20 +504,10 @@ function init() {
     window.addEventListener('resize', fitStage);
   }
 
-  /* THE DOCK STANDS DOWN when the real send card is on screen. The dock exists
-     because on a phone the price and the WhatsApp button are two screens below
-     wherever the customer is choosing; once they have scrolled to the card
-     itself, both are right there and a fixed bar showing the same number over
-     the top of it is just the same offer made twice.
-     `hidden` rather than a class, so it is out of the accessibility tree too —
-     two buttons saying "send in WhatsApp" is worse for a screen reader than
-     for anyone.
-     Guarded, and it degrades to a dock that is simply always there. */
-  if (typeof IntersectionObserver === 'function') {
-    const dock = $('.dock');
-    new IntersectionObserver(([e]) => { dock.hidden = e.isIntersecting; },
-                             { threshold: 0.35 }).observe($('.send'));
-  }
+  /* The dock's `IntersectionObserver` was here — it hid a fixed price-and-send
+     bar once the real card came into view. Both are gone: the price is on the
+     wall and the card is inside the summary step, so there is nothing to
+     duplicate and nothing to stand down. */
 
   paint();
 
@@ -2398,6 +2388,17 @@ function fitStage() {
        Physical `left`/`width`, not logical: this is a box placed at measured
        viewport coordinates, and `getBoundingClientRect().x` is measured from
        the left edge in both writing directions. */
+    /* ⚠ WHERE THE DRAWING STARTS INSIDE THE WRAP, for `.stage__hud`. The three
+       controls on the wall — languages, price, undo — are absolute against
+       `.stage-wrap`, and the wrap opens with the page's `<h1>`, so
+       `inset-block-start: 0` put them on top of the heading rather than on the
+       wall. They cannot be children of `.stage` itself: `paint` writes
+       `#stage.innerHTML` on every change and would delete them.
+       Measured off the same two rects this function has already read, on the
+       same re-fit, so it cannot disagree with the door it is placed around. */
+    $('.stage-wrap').style.setProperty(
+      '--stage-top', `${Math.max(0, Math.round(box.y - wrap.y))}px`);
+
     const root = document.documentElement.style;
     root.setProperty('--stage-l', `${Math.round(wrap.x)}px`);
     root.setProperty('--stage-w', `${Math.round(wrap.width)}px`);
@@ -2573,9 +2574,20 @@ window.__up = 1;
 try { clearTimeout(window.__downTimer); } catch { /* no timer, nothing to do */ }
 
 document.addEventListener('DOMContentLoaded', guard(() => {
-  $('#phone-link').href = `tel:${PHONE_TEL}`;   // RFC 3966 — not the wa.me form
-  /* The SPAN, not the link: the link also holds an icon, and `textContent` on
-     a parent replaces every child it has. See the note in index.html. */
-  $('#phone-link [data-phone-text]').textContent = PHONE_DISPLAY;
+  /* ⚠ EVERY `tel:` ON THE PAGE, not the header's one. `#phone-link` lived in
+     the brand bar and the brand bar is deleted; the number survives in the
+     send card's fine print and in the cannot-load strip, and BOTH have to
+     carry the same digits and the same RFC 3966 href as `js/share.js`. Written
+     by selector rather than by id so a fourth place cannot be added without
+     inheriting it — the old single-id write was one element's worth of a
+     promise the whole page makes. */
+  for (const a of document.querySelectorAll('a[href^="tel:"]')) {
+    a.href = `tel:${PHONE_TEL}`;
+  }
+  /* The SPAN, not the link: a link may also hold an icon, and `textContent` on
+     a parent replaces every child it has. */
+  for (const el of document.querySelectorAll('[data-phone-text]')) {
+    el.textContent = PHONE_DISPLAY;
+  }
   init();
 }));

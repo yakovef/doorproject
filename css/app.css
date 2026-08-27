@@ -143,35 +143,7 @@ body {
   body { block-size: 100dvh; overflow: hidden; }
 }
 
-/* ── header ───────────────────────────────────────────────── */
 
-.bar {
-  flex: 0 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px;
-  padding: 12px 16px;
-  border-block-end: 1px solid var(--rule);
-  background: var(--paper);
-}
-
-/* Its two lines of text come to 43px, one short of the minimum, which is the
-   kind of miss only a measurement finds. */
-.brand { text-decoration: none; color: inherit; display: flex; align-items: center;
-         gap: 10px; min-block-size: 44px; }
-.brand__mark { flex: 0 0 auto; border-radius: 6px; }
-.brand__text { display: grid; align-content: center; }
-.brand__name { font-weight: 700; font-size: 1.05rem; letter-spacing: .01em; }
-.brand__sub {
-  font-size: .7rem; letter-spacing: .14em; color: var(--ink-2);
-}
-.bar__phone {
-  font-family: var(--mono); font-size: .9rem;
-  color: var(--ink);
-  text-decoration: none;
-  display: inline-flex; align-items: center; gap: 6px;
-  min-block-size: 44px; padding-inline: 6px;
-  direction: ltr;
-}
 /* ⚠ THE UNDERLINE IS ON THE NUMBER, NOT ON THE LINK BOX — and it moved here
    the day the handset icon arrived. `text-decoration` set on an element is
    painted across every inline descendant of it, so with the rule on
@@ -180,14 +152,7 @@ body {
    original reason too: the box grows to a 44 px thumb — it was a 104x24 target
    on one of the two actions the whole site exists to produce — and an
    underline on a 44 px box floats well below the digits it belongs to. */
-.bar__phone > span {
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-.bar__ico { flex: 0 0 auto; }
-.bar__phone .bar__ico { color: var(--ink-2); }
+.saved__ico { flex: 0 0 auto; }
 
 /* ── nav, saved, trust ────────────────────────────────────── */
 
@@ -215,7 +180,6 @@ body {
    leaf in Hebrew, English and Russian. Do not delete that check. */
 svg { direction: ltr; }
 
-.nav { display: flex; gap: 2px; }
 
 /* ── the step's disclosure — TRANSFORM.md §10.4 ──────────────────────
    Closed by default and quiet enough to ignore. ⚠ The 44 px touch floor
@@ -359,7 +323,7 @@ svg { direction: ltr; }
     position: absolute; inline-size: 1px; block-size: 1px;
     overflow: hidden; clip-path: inset(50%); white-space: nowrap;
   }
-  .bar__ico { inline-size: 19px; block-size: 19px; }
+  .saved__ico { inline-size: 19px; block-size: 19px; }
 }
 
 /* ⚠ 320 px IS A REAL PHONE AND THE HEADER DOES NOT FIT IT ON THE DEFAULTS.
@@ -371,28 +335,19 @@ svg { direction: ltr; }
 @media (max-width: 400px) {
   .bar { gap: 8px; padding-inline: 12px; }
 }
-.nav__a {
-  display: inline-flex; align-items: center;
-  min-block-size: 44px; padding-inline: 10px;
-  font-size: .86rem; color: var(--ink-2); text-decoration: none;
-  border-block-end: 2px solid transparent;
-}
-.nav__a:hover { color: var(--ink); }
-.nav__a.is-here { color: var(--ink); font-weight: 600; border-block-end-color: var(--ink); }
 /* A phone has no room for three more words above the door, and every one of
    them is reachable another way — the works link is at the foot of the send
    card and the telephone is right here in the header. */
 @media (max-width: 1099px) { .nav { display: none; } }
 
-.bar__end { display: flex; align-items: center; gap: 8px; }
-.bar__saved {
+.saved__btn {
   appearance: none; background: var(--ink); color: #fff;
   border: 0; border-radius: var(--r-pill);
   min-block-size: 44px; padding-inline: 14px;
   font: 600 .82rem var(--sans); cursor: pointer;
   display: inline-flex; align-items: center; gap: 6px;
 }
-.bar__count {
+.saved__n {
   background: rgb(255 255 255 / .22); border-radius: var(--r-pill);
   padding: 1px 7px; font-variant-numeric: tabular-nums;
 }
@@ -567,7 +522,13 @@ svg { direction: ltr; }
 
 @media (min-width: 1100px) {
   .layout {
-    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) minmax(300px, 360px);
+    /* ⚠ TWO COLUMNS, NOT THREE. The third was `.panel--send`, and `goStep`
+       has always MOVED that card into the summary step rather than leaving a
+       copy beside the flow — so the track it reserved stood empty on eight
+       steps out of nine and 360 px of a laptop went to nothing. With the dock
+       gone (27.8.2026) the card is the only send affordance there is, and it
+       belongs to the step whose job is sending. The door gets the width. */
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
     /* Two rows: the door takes the height that is going and the note sits
        under it, both inside column 2.
        ⚠ ONLY CONSTANT THINGS MAY LIVE IN ROW 2. It is `auto`, so whatever is
@@ -774,6 +735,90 @@ svg { direction: ltr; }
    Vertically centred on the inline-start edge — the right, in RTL, which is
    the side he circled. `inset-inline` rather than `left`, so an English build
    puts them on the other side without a second rule. */
+/* ── THE WALL IS THE CHROME ──────────────────────────────────────────
+   Three things stand on the wall above the door: the language buttons, the
+   price, and undo/redo. Asked for with three circles drawn on a screenshot.
+
+   ⚠ ABSOLUTE, LIKE `.grip-bar`, AND FOR THE SAME MEASURED REASON. Above
+   1100 px `.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so
+   anything in the FLOW up here takes its height out of the DOOR. That is why
+   the grip controls stand in the wall and why `--grip-strip` is reserved even
+   when empty; a row of chrome in the flow would cost the drawing ~60 px at
+   every desktop size.
+
+   ⚠ AND IT DOES NOT COVER THE LEAF. `pointer-events: none` on the strip with
+   `auto` back on the three slots, so the middle of the row — which passes over
+   the door's head on a narrow screen — never eats a drag aimed at the handle.
+   The grip bar is centred at 50%; this sits at the top. They share the wall
+   and never the same band of it. */
+.stage__hud {
+  position: absolute;
+  /* ⚠ THE TOP OF THE DRAWING, NOT OF THE WRAP. The wrap opens with the page's
+     `<h1>`, so a plain `0` put these three controls on top of the heading
+     instead of on the wall. `--stage-top` is published by `fitStage` off the
+     same two rects it already reads. The fallback is for the instant before
+     the first paint, and for a page whose bundle never arrives. */
+  inset-block-start: var(--stage-top, 0px);
+  inset-inline: 8px;
+  z-index: 4;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  padding-block-start: 6px;
+  pointer-events: none;
+}
+/* ⚠ EACH SLOT CARRIES ITS OWN GROUND. The wall is nearly the same colour as
+   the paper, so on a wide screen these three read as if they were painted on
+   it — which is what was drawn. On a 390 px phone the door is tall and the
+   band of wall above its head is only ~165 px, so the price lands ON the
+   lintel: dark text on a dark frame. A surface behind each slot costs nothing
+   where there is wall and rescues it where there is door. */
+.hud__slot {
+  pointer-events: auto; min-inline-size: 0;
+  background: var(--paper);
+  border-radius: var(--r-pill, 999px);
+  padding: 2px 10px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+}
+.hud__slot--price { text-align: center; display: grid; justify-items: center; gap: 1px; }
+/* ⚠ NOT CAPPED TO `--wall-gap`, AND THAT WAS THE FIRST TRY. Capping the two
+   side slots to the measured gap beside the DOOR is the right instinct for
+   `.grip-bar`, which hangs at mid-height where the door really is in the way.
+   Up here it is wrong: this row sits in the band ABOVE the door's head, where
+   the full width of the stage is wall. On a 390 px phone the gap is ~90 px, so
+   the cap wrapped `English` and `Русский` onto two lines and the pill grew
+   down over the leaf — the exact thing the cap was meant to prevent.
+   The flex row's own `space-between` is what keeps the three apart, and
+   `nowrap` is what stops any of them growing downward instead of sideways. */
+.hud__slot--end { display: flex; justify-content: flex-end; }
+.hud__slot--start, .hud__slot--end { flex: 0 0 auto; }
+.stage__hud .langs, .stage__hud .steps-back { flex-wrap: nowrap; }
+.stage__hud .lang { white-space: nowrap; }
+
+/* On the wall the price is the biggest thing on the page after the door, and
+   it is a button — see the note in index.html. */
+.hud__slot--price .send__label { font-size: .7rem; letter-spacing: .1em; }
+/* ⚠ 44 px, LIKE EVERYTHING ELSE THAT CAN BE TAPPED. On the send card this
+   button inherited its height from a taller stack of text; on the wall it is
+   a figure and a chevron and nothing else, and `npm run audit` measured it at
+   88x30 on a phone and 101x34 on a laptop — under the floor at all seven
+   viewports the moment it moved. The floor is a floor: the padding gives way,
+   the height does not. */
+.hud__slot--price .send__toggle { min-block-size: 44px; display: inline-flex;
+                                  align-items: center; gap: 4px; }
+.hud__slot--price .send__figure { font-size: 1.35rem; }
+@media (min-width: 1100px) { .hud__slot--price .send__figure { font-size: 1.6rem; } }
+.hud__slot--price .bd {
+  position: absolute; inset-inline: 0; inset-block-start: 100%;
+  margin-block-start: 6px;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r-card, 10px);
+  padding: 10px 12px; box-shadow: 0 8px 26px rgb(0 0 0 / .12);
+  max-block-size: 46vh; overflow-y: auto;
+}
+.hud__slot--price { position: relative; }
+
+/* The language buttons lose their pill chrome up here — on a wall they are
+   text, not a toolbar. */
+.stage__hud .langs { justify-content: flex-start; }
+
 .grip-bar {
   position: absolute;
   /* `--wall-gap` is the measured gap between the stage's edge and the door's
@@ -1037,7 +1082,10 @@ svg { direction: ltr; }
     margin-block-end: 0;
     box-shadow: 0 1px 0 var(--rule);
   }
-  .bar { padding-block-start: var(--steps-h); }
+  /* ⚠ THE PADDING MOVED TO `body` BECAUSE THE BAR IT WAS ON IS DELETED.
+     Something has to reserve the fixed strip's height or the first thing in
+     the document sits under it. */
+  body { padding-block-start: var(--steps-h); }
   /* The door pins UNDER the navigator rather than behind it. */
   .stage-wrap { inset-block-start: var(--steps-h); }
   /* Jumping to a step must not land its heading under the fixed strip. */
@@ -1139,11 +1187,9 @@ svg { direction: ltr; }
 }
 .sect__head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 
-/* Clearance for the navigator's jump. `.dock` is `position: fixed` and 78 px
-   tall, and `scrollIntoView` cannot see the padding the BODY carries for it —
-   so a heading scrolled to `start` came to rest under the green bar, 77–97% of
-   it hidden, while holding focus. The dock's height is declared here, so the
-   allowance belongs here too. */
+/* Clearance for the navigator's jump. The fixed step strip is what a
+   heading can land behind now — the dock that used to cover the foot of
+   the screen is gone. */
 @media (max-width: 1099px) {
   .sect__head { scroll-margin-block: 8px calc(78px + 12px + env(safe-area-inset-bottom, 0px)); }
 }
@@ -1656,7 +1702,7 @@ svg { direction: ltr; }
   font: inherit; font-weight: 600;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   min-block-size: 52px; padding: 12px 18px;
-  /* ⚠ A PILL, LIKE EVERY OTHER BUTTON ON THE PAGE. `.bar__saved`,
+  /* ⚠ A PILL, LIKE EVERY OTHER BUTTON ON THE PAGE. `.saved__btn`,
      `.saved__open`, `.grip-bar__btn` and `.steps__step` were all already
      999px, so the square corners left the site's PRIMARY call to action as
      the one button shaped unlike the rest of them. This is the shape changing
@@ -1729,53 +1775,16 @@ html.is-live .wa__off { display: none; }
 .proof { margin: 0; font-size: .85rem; color: var(--ink-2); }
 .proof a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: .25em; }
 
-/* ── the dock ─────────────────────────────────────────────────
-   The price and the send button, pinned to the foot of a phone.
-
-   Measured before it existed, on a 390x844 screen with the first category
-   opened the way a person opens it: the first colour swatch sat at y=827, the
-   price at 1,796 and the WhatsApp button at 1,991. So for the whole time a
-   customer is choosing, the number they care about and the button this site
-   exists to get them to are both two screens away — and picking a colour
-   appears to do nothing at all.
-
-   Phone only. Above 1100px the send panel is already a column beside the door
-   and a second copy of it would be noise. */
-.dock {
-  position: fixed; inset-block-end: 0; inset-inline: 0;
-  z-index: 40;
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 14px;
-  /* Plus the home indicator on an iPhone, which would otherwise sit on top of
-     the button. `viewport-fit=cover` is already set in the head. */
-  padding-block-end: calc(10px + env(safe-area-inset-bottom, 0px));
-  background: var(--paper-up);
-  border-block-start: 1px solid var(--rule);
-  box-shadow: 0 -6px 18px rgba(23, 23, 21, .06);
-}
 /* Contents centred inside a readable measure rather than stretched edge to
    edge. On a 390 px phone the two fill the bar anyway; on an 834 px tablet,
    left to itself, the button became a green slab most of the screen wide with
    the price marooned at one end. */
-.dock > * { flex: 0 0 auto; }
-.dock { justify-content: center; }
-.dock__price { display: flex; flex-direction: column; line-height: 1.15; }
-.dock__label { font-size: .68rem; color: var(--ink-2); }
-.dock__figure { font-size: 1.2rem; font-weight: 700; white-space: nowrap; }
-.dock__send {
-  flex: 1 1 auto; max-inline-size: 22rem;
-  min-block-size: 46px; padding: 10px 14px; font-size: .95rem;
-}
 
-/* The page has to end above the dock, or the last thing on it — the link to
-   his real work — sits underneath a bar and can be neither read nor tapped. */
 @media (max-width: 1099px) {
   body { padding-block-end: 78px; }
 }
 @media (min-width: 1100px) {
-  .dock { display: none; }
 }
-.is-bare .dock { display: none; }
 
 /* ── toast ────────────────────────────────────────────────── */
 
@@ -1838,7 +1847,7 @@ html.is-live .wa__off { display: none; }
    rule that hides everything and then un-hides three things is two rules that
    have to agree. */
 .is-sheet .bar, .is-sheet .saved, .is-sheet .strip, .is-sheet .layout,
-.is-sheet .dock, .is-sheet .trust, .is-sheet .toast, .is-sheet .works,
+.is-sheet .is-sheet .trust, .is-sheet .toast, .is-sheet .works,
 .is-sheet .works-open { display: none !important; }
 .is-sheet .sheet { display: block; }
 
@@ -2101,7 +2110,7 @@ html.is-live .wa__off { display: none; }
    count-up numbers by name, and there is a harder reason: for ~400 ms the page
    would display a number that is not the price of anything, on a site whose
    entire promise is that the figure on screen is real. It settles instead. */
-.send__figure, .dock__figure { transition: opacity .16s var(--ease); }
+.send__figure { transition: opacity .16s var(--ease); }
 
 .bd { animation: fitPart .24s var(--ease) both; }
 
