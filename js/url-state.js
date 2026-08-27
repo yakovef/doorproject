@@ -326,10 +326,21 @@ export function fromQuery(search) {
      `option-unknown`, so every order-sheet URL opened with a red strip saying
      a choice could not be read — above a document in which every choice had
      been read perfectly. A new switch joins this list the same day it is
-     invented, like everything added to the bare-mode hide list. */
+     invented, like everything added to the bare-mode hide list.
+
+     ⚠ `lang` IS THE THIRD TIME, and the paragraph above predicted it. It was
+     added in the same hour the languages were built and missed here, so every
+     `?lang=en` load opened with a red strip reading "some options in that link
+     are unavailable — showing the closest match" over a door in which nothing
+     was unavailable and nothing had been changed. Found by opening the page
+     and looking at it; no assertion had an opinion, because from the outside a
+     notice is just a notice.
+     It is OURS and not the customer's choice, like `bare` and `sheet` — a
+     language is a fact about the reader, which is also why it is not in the
+     short code (see `js/copy.js`). */
   const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hl', 'sp',
                            'd', 's', 'h', 'gp',
-                           'code', 'bare', 'sheet']);
+                           'code', 'bare', 'sheet', 'lang']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
      so a link carrying one opens as itself. */

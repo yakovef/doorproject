@@ -191,7 +191,77 @@ body {
 
 /* ── nav, saved, trust ────────────────────────────────────── */
 
+/* ═══════════════════════════════════════════════════════════════════
+   ⚠ THE INTERFACE MIRRORS. THE DOOR DOES NOT. — PLAN.md §6.1
+   ═══════════════════════════════════════════════════════════════════
+   Hebrew sets `dir="rtl"` on `<html>` and every logical property in this
+   file flips with it, which is the entire point of using them. A DRAWING
+   must not flip. A right-hinged door is a physical fact about an object
+   somebody will hang in a wall: if the picture mirrors with the stylesheet,
+   the site shows one hinge side and Peretz builds the other, and the
+   customer finds out when it arrives. `ASK-PERETZ.md` §1 records that this
+   project already shipped the mirror of this bug once — the handing
+   convention was backwards for months — and that every instrument called
+   it green while it was wrong, because a mirrored door is a perfectly
+   plausible door.
+
+   Every `<svg>` on this page is a drawing in real millimetres: the stage,
+   the sixty option thumbnails, the gallery, the A4 sheet, the picture that
+   goes into WhatsApp. None of them contains a `<text>` element — checked,
+   and the reason this can be one blanket rule rather than five selectors
+   that somebody will add a sixth beside and forget.
+
+   `npm run audit` asserts the cylinder comes out on the same side of the
+   leaf in Hebrew, English and Russian. Do not delete that check. */
+svg { direction: ltr; }
+
 .nav { display: flex; gap: 2px; }
+
+/* ── the language picker ─────────────────────────────────────────────
+   Three buttons rather than a menu, each written in its own script, so a
+   customer who cannot read the rest of the page can still see the way out
+   without opening anything. It sits in the header beside the nav — and
+   unlike the nav it SURVIVES THE PHONE BREAKPOINT, because `.nav`'s three
+   words are all reachable elsewhere (the works link is at the foot of the
+   send card, the telephone is in the header) and a language is not. */
+/* ⚠ `min-inline-size: 0` AND `overflow-x: auto` ARE THE GUARANTEE; the font
+   size below is only the reason it never has to use them. A flex item's
+   default `min-width: auto` refuses to shrink below its content, so a control
+   holding words PUSHES the header wider and takes the whole page sideways
+   with it — which is what happened, and which is also exactly how the
+   navigator circles did it one screen further down. These two lines mean this
+   control can never do that again, whatever a fourth language is called. */
+.langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
+.lang {
+  appearance: none; background: none; border: 0;
+  min-block-size: 44px; padding-inline: 8px;
+  font: 500 .8rem var(--sans); color: var(--ink-3, var(--ink-2));
+  cursor: pointer; border-radius: var(--r-pill);
+  border-block-end: 2px solid transparent;
+}
+.lang:hover { color: var(--ink); }
+.lang.is-on { color: var(--ink); font-weight: 600; border-block-end-color: var(--ink); }
+/* ⚠ ON THE SMALLEST PHONE THE CURRENT LANGUAGE'S OWN BUTTON GOES, and that
+   is the one thing on this control that can be spared. Three buttons are
+   150 px; measured at 320x640 the header came to 359 and the whole page
+   scrolled sideways by 39 px on every one of 81 designs — the same failure
+   the navigator circles produced at 390 px, from the same cause, one screen
+   further down.
+
+   Everything else in the header is load-bearing at that width: the brand, the
+   telephone, the saved count. The button you are least likely to press is the
+   one for the language you are already reading — the page in front of you is
+   the label. What stays is the way OUT, which is what this control is for,
+   and both remaining buttons keep their full name in their own script rather
+   than shrinking to initials nobody who is lost can decode.
+
+   Two buttons come to ~100 px, so the header fits with room. All of them stay
+   44 px tall and tappable. `npm run audit` measures sideways scroll at 320 px
+   on every design, which is what caught this. */
+@media (max-width: 400px) {
+  .lang { padding-inline: 4px; font-size: .74rem; }
+  .lang.is-on { display: none; }
+}
 .nav__a {
   display: inline-flex; align-items: center;
   min-block-size: 44px; padding-inline: 10px;
@@ -1132,7 +1202,7 @@ body {
 }
 /* The drawing never mirrors with the interface, here as on the stage: a
    right-hinged door is a physical fact. PLAN.md §6.1 */
-.work__art svg { inline-size: 100%; block-size: 100%; display: block; direction: ltr; }
+.work__art svg { inline-size: 100%; block-size: 100%; display: block; }
 .work__meta { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
 .work__name {
   font-size: .74rem; color: var(--ink-2);
@@ -1676,10 +1746,20 @@ html.is-live .wa__off { display: none; }
 @media (max-width: 700px) {
   .sheet__body { grid-template-columns: minmax(0, 1fr); gap: 6mm; }
 }
+/* ⚠ THE HEBREW GLOSS, SHOWN ONLY ON A SHEET BUILT IN ANOTHER LANGUAGE.
+   `dir="rtl"` on the element itself rather than a rule here, because a
+   Hebrew line inside an LTR sheet has to lay itself out right-to-left and
+   nothing else on that page does. Quiet enough to be a footnote and legible
+   enough to order from: this is the line Peretz reads. */
+.sheet__he {
+  display: block; direction: rtl; text-align: start;
+  font-size: .74rem; color: var(--ink-2); margin-block-start: 1px;
+}
+
 .sheet__art { margin: 0; }
 .sheet__art svg {
   inline-size: 100%; block-size: auto; max-block-size: 150mm;
-  display: block; direction: ltr;         /* never mirrors — PLAN.md §6.1 */
+  display: block;
 }
 /* ⚠ AFTER the rule it overrides, not before it — THE THIRD TIME THIS FILE HAS
    BEEN BITTEN BY EXACTLY THIS. A media query adds no specificity, so a
@@ -1701,14 +1781,29 @@ html.is-live .wa__off { display: none; }
   font-family: var(--mono); font-size: .8rem; color: var(--ink-2);
 }
 .sheet__spec { display: grid; gap: 0; }
+/* ⚠ THE LABEL COLUMN HAS TO SURVIVE A LANGUAGE THAT COMPOUNDS. It was a flat
+   `7.5em`, sized by eye against Hebrew, where every label on this sheet is one
+   short word — `משקוף`, `פרזול`, `פתיחה`. Russian writes the same field as
+   `Дополнительный замок`: one word longer than the whole column and with no
+   space in it to break at, so it did not wrap, it OVERFLOWED — the label ran
+   straight over its own value and the sheet read `Дополнительныйефовый замок`.
+   The price row did the same over `₪10,825`.
+   Sized to the longest label the three languages actually produce —
+   `Дополнительный` — rather than to a guess, and `break-word` kept as the
+   backstop for whatever the fourth language turns out to be. Measured on the
+   rendered A4 sheet: the value column keeps 218 px, and the longest value
+   Hebrew or Russian puts in it wraps to two lines at most. */
 .sheet__row {
-  display: grid; grid-template-columns: 7.5em minmax(0, 1fr) auto;
+  display: grid; grid-template-columns: 10.4em minmax(0, 1fr) auto;
   align-items: baseline; gap: 8px;
   padding: 6px 0; border-block-end: 1px solid var(--rule);
   font-size: .88rem;
 }
-.sheet__row--wide { grid-template-columns: 7.5em minmax(0, 1fr); }
-.sheet__k { font-weight: 600; color: var(--ink-2); }
+.sheet__row--wide { grid-template-columns: 10.4em minmax(0, 1fr); }
+.sheet__k {
+  font-weight: 600; color: var(--ink-2);
+  min-inline-size: 0; overflow-wrap: break-word; hyphens: auto;
+}
 .sheet__v small { display: block; font-size: .74rem; color: var(--ink-2); }
 .sheet__chip {
   inline-size: 16px; block-size: 16px; border-radius: var(--r-chip);

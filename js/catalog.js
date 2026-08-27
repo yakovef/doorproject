@@ -16,6 +16,7 @@
 //
 //  ALL MONEY IS IN AGOROT (1/100 ₪). Never use floats for money.
 
+import { andJoin, L, T } from './copy.js';
 import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          BUILD, MASHKOF_WIDER,
          COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE, PIRZUL as PIRZUL_PRICE,
@@ -106,23 +107,23 @@ export const REBATE = 50;
  * confident guess a customer measures against.
  */
 export const SIZES = {
-  standard: { id: 'standard', he: 'סטנדרטית',  en: 'Standard',      w: 950,  h: 2100, mult: 1,
-              band: 'עד 98 × 203 ס״מ' },
-  narrow:   { id: 'narrow',   he: 'צרה',        en: 'Narrow',        w: 800,  h: 2100, mult: 1,
-              band: 'עד 98 × 203 ס״מ' },
-  wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide',          w: 1100, h: 2100, mult: 1.25,
-              band: 'עד 120 × 240 ס״מ' },
-  tall:     { id: 'tall',     he: 'גבוהה',      en: 'Tall',          w: 950,  h: 2400, mult: 1.25,
-              band: 'עד 120 × 240 ס״מ' },
-  half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', w: 950,  h: 2100, side: 400, mult: 2,
-              band: 'שתי כנפיים' },
+  standard: { id: 'standard', he: 'סטנדרטית',  en: 'Standard', ru: 'Стандартная',      w: 950,  h: 2100, mult: 1,
+              band: { he: 'עד 98 × 203 ס״מ', en: 'up to 98 × 203 cm', ru: 'до 98 × 203 см' } },
+  narrow:   { id: 'narrow',   he: 'צרה',        en: 'Narrow', ru: 'Узкая',        w: 800,  h: 2100, mult: 1,
+              band: { he: 'עד 98 × 203 ס״מ', en: 'up to 98 × 203 cm', ru: 'до 98 × 203 см' } },
+  wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide', ru: 'Широкая',          w: 1100, h: 2100, mult: 1.25,
+              band: { he: 'עד 120 × 240 ס״מ', en: 'up to 120 × 240 cm', ru: 'до 120 × 240 см' } },
+  tall:     { id: 'tall',     he: 'גבוהה',      en: 'Tall', ru: 'Высокая',          w: 950,  h: 2400, mult: 1.25,
+              band: { he: 'עד 120 × 240 ס״מ', en: 'up to 120 × 240 cm', ru: 'до 120 × 240 см' } },
+  half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', ru: 'Полуторная', w: 950,  h: 2100, side: 400, mult: 2,
+              band: { he: 'שתי כנפיים', en: 'Two leaves', ru: 'Две створки' } },
   /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
      d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
      narrow one beside it — but the narrow one does not open and is glass, so
      it is a different product and a different price. `sideGlazed` is what the
      renderer reads. */
-  sidelight: { id: 'sidelight', he: 'עם חלון צד', en: 'With sidelight', w: 950, h: 2100,
-               side: 400, sideGlazed: true, mult: 2, band: 'כנף וחלון צד' },
+  sidelight: { id: 'sidelight', he: 'עם חלון צד', en: 'With sidelight', ru: 'С боковым окном', w: 950, h: 2100,
+               side: 400, sideGlazed: true, mult: 2, band: { he: 'כנף וחלון צד', en: 'Leaf and sidelight', ru: 'Створка и боковое окно' } },
   /* ⚠ APPENDED, AND THAT IS WHY IT IS LAST. Peretz's "double extra
      (door>120x240)" at +50%. `encodeCode` packs the INDEX of this list, so a
      new entry at the END leaves every existing index where it was and costs no
@@ -130,8 +131,8 @@ export const SIZES = {
      where it belongs visually — would have moved `half` and `sidelight` by one
      and quietly repointed every code ever written. The choices panel can
      order tiles however it likes; this list is a wire format. */
-  xl: { id: 'xl', he: 'רחבה וגבוהה', en: 'Extra large', w: 1200, h: 2400, mult: 1.5,
-        band: 'מעל 120 × 240 ס״מ' },
+  xl: { id: 'xl', he: 'רחבה וגבוהה', en: 'Extra large', ru: 'Широкая и высокая', w: 1200, h: 2400, mult: 1.5,
+        band: { he: 'מעל 120 × 240 ס״מ', en: 'over 120 × 240 cm', ru: 'свыше 120 × 240 см' } },
 };
 
 /**
@@ -163,27 +164,27 @@ export const SIZES = {
  */
 export const COLOURS = [
   /* dark */
-  { id: 'rb-9005d', ral: '9005D', hex: '#1D1A18', he: 'שחור',           en: 'Black',          aliases: ['ral-9005'] },
-  { id: 'rb-7021d', ral: '7021D', hex: '#2D2D2B', he: 'אפור פחם',       en: 'Charcoal' },
-  { id: 'rb-5103d', ral: '5103D', hex: '#3D3F54', he: 'כחול לילה',      en: 'Night blue',     aliases: ['ral-5011'] },
-  { id: 'rb-7126d', ral: '7126D', hex: '#453F3F', he: 'חום-אפור כהה',   en: 'Dark umber',     aliases: ['ral-7022'] },
-  { id: 'rb-0097d', ral: '0097D', hex: '#4B4952', he: 'אפור אנתרציט',   en: 'Anthracite',     aliases: ['ral-7016', 'ral-7024'] },
-  { id: 'rb-6459d', ral: '6459D', hex: '#4F6454', he: 'ירוק בקבוק',     en: 'Bottle green',   aliases: ['ral-6009'] },
-  { id: 'rb-rb09d', ral: 'RB09D', hex: '#55412F', he: 'חום',            en: 'Brown',          aliases: ['ral-8017', 'ral-3005'] },
-  { id: 'rb-7110d', ral: '7110D', hex: '#565357', he: 'אפור כהה',       en: 'Dark grey',      aliases: ['ral-8019'] },
+  { id: 'rb-9005d', ral: '9005D', hex: '#1D1A18', he: 'שחור',           en: 'Black', ru: 'Чёрный',          aliases: ['ral-9005'] },
+  { id: 'rb-7021d', ral: '7021D', hex: '#2D2D2B', he: 'אפור פחם',       en: 'Charcoal', ru: 'Угольно-серый' },
+  { id: 'rb-5103d', ral: '5103D', hex: '#3D3F54', he: 'כחול לילה',      en: 'Night blue', ru: 'Ночной синий',     aliases: ['ral-5011'] },
+  { id: 'rb-7126d', ral: '7126D', hex: '#453F3F', he: 'חום-אפור כהה',   en: 'Dark umber', ru: 'Тёмная умбра',     aliases: ['ral-7022'] },
+  { id: 'rb-0097d', ral: '0097D', hex: '#4B4952', he: 'אפור אנתרציט',   en: 'Anthracite', ru: 'Антрацит',     aliases: ['ral-7016', 'ral-7024'] },
+  { id: 'rb-6459d', ral: '6459D', hex: '#4F6454', he: 'ירוק בקבוק',     en: 'Bottle green', ru: 'Бутылочно-зелёный',   aliases: ['ral-6009'] },
+  { id: 'rb-rb09d', ral: 'RB09D', hex: '#55412F', he: 'חום',            en: 'Brown', ru: 'Коричневый',          aliases: ['ral-8017', 'ral-3005'] },
+  { id: 'rb-7110d', ral: '7110D', hex: '#565357', he: 'אפור כהה',       en: 'Dark grey', ru: 'Тёмно-серый',      aliases: ['ral-8019'] },
 
   /* mid */
-  { id: 'rb-7322d', ral: '7322D', hex: '#61697A', he: 'כחול פלדה',      en: 'Steel blue' },
-  { id: 'rb-6219d', ral: '6219D', hex: '#7A8272', he: 'ירוק מרווה',     en: 'Sage green',     aliases: ['ral-7036', 'ral-7033'] },
-  { id: 'rb-0096d', ral: '0096D', hex: '#86868A', he: 'אפור בינוני',    en: 'Mid grey',       aliases: ['ral-7046'] },
-  { id: 'rb-7240d', ral: '7240D', hex: '#A1928A', he: 'טאופ',           en: 'Taupe',          aliases: ['ral-1035'] },
-  { id: 'rb-2030d', ral: '2030D', hex: '#BF9367', he: 'קרמל',           en: 'Caramel' },
+  { id: 'rb-7322d', ral: '7322D', hex: '#61697A', he: 'כחול פלדה',      en: 'Steel blue', ru: 'Стальной синий' },
+  { id: 'rb-6219d', ral: '6219D', hex: '#7A8272', he: 'ירוק מרווה',     en: 'Sage green', ru: 'Шалфейный',     aliases: ['ral-7036', 'ral-7033'] },
+  { id: 'rb-0096d', ral: '0096D', hex: '#86868A', he: 'אפור בינוני',    en: 'Mid grey', ru: 'Средне-серый',       aliases: ['ral-7046'] },
+  { id: 'rb-7240d', ral: '7240D', hex: '#A1928A', he: 'טאופ',           en: 'Taupe', ru: 'Тёмно-бежевый',          aliases: ['ral-1035'] },
+  { id: 'rb-2030d', ral: '2030D', hex: '#BF9367', he: 'קרמל',           en: 'Caramel', ru: 'Карамель' },
 
   /* light */
-  { id: 'rb-7080d', ral: '7080D', hex: '#B7B4B2', he: 'אפור בהיר',      en: 'Light grey',     aliases: ['ral-7040'] },
-  { id: 'rb-9001d', ral: '9001D', hex: '#DDCDBD', he: 'שמנת',           en: 'Cream',          aliases: ['ral-1013', 'ral-7035'] },
-  { id: 'rb-9302d', ral: '9302D', hex: '#ECEBE7', he: 'לבן שבור',       en: 'Off-white' },
-  { id: 'rb-9016d', ral: '9016D', hex: '#F1F0EA', he: 'לבן',            en: 'White',          aliases: ['ral-9016'] },
+  { id: 'rb-7080d', ral: '7080D', hex: '#B7B4B2', he: 'אפור בהיר',      en: 'Light grey', ru: 'Светло-серый',     aliases: ['ral-7040'] },
+  { id: 'rb-9001d', ral: '9001D', hex: '#DDCDBD', he: 'שמנת',           en: 'Cream', ru: 'Кремовый',          aliases: ['ral-1013', 'ral-7035'] },
+  { id: 'rb-9302d', ral: '9302D', hex: '#ECEBE7', he: 'לבן שבור',       en: 'Off-white', ru: 'Молочно-белый' },
+  { id: 'rb-9016d', ral: '9016D', hex: '#F1F0EA', he: 'לבן',            en: 'White', ru: 'Белый',          aliases: ['ral-9016'] },
 ];
 
 /**
@@ -223,8 +224,8 @@ export const COLOURS = [
  * puts the glass high on the leaf where the photographs put it.
  */
 export const WINDOWS = [
-  { id: 'none',   he: 'ללא חלון',       en: 'Solid',             rects: [] },
-  { id: 'strip',  he: 'צוהר אנכי',      en: 'Vertical slot',
+  { id: 'none',   he: 'ללא חלון',       en: 'Solid', ru: 'Без окна',             rects: [] },
+  { id: 'strip',  he: 'צוהר אנכי',      en: 'Vertical slot', ru: 'Вертикальное окно',
     doors: ['d113', 'd125'],
     rects: [{ w: 272, h: 1415, top: 205 }] },
   /* ⚠ TWO SHAPES, DOWN FROM FOUR. `tallwin` (חלון גבוה) and `broad` (חלון רחב)
@@ -246,7 +247,7 @@ export const WINDOWS = [
      every one of the seven. `rules.js` refuses the pairing now; before, it
      was left to `appliedFrame` returning an empty string while the price went
      on charging ₪380 for a panel nobody could see. */
-  { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular',
+  { id: 'rect',   he: 'חלון מלבני',     en: 'Rectangular', ru: 'Прямоугольное окно',
     aliases: ['square', 'duo', 'tallwin', 'broad'],
     doors: ['d108', 'd099', 'd122', 'd116'],
     rects: [{ w: 357, h: 902, top: 185 }] },
@@ -288,7 +289,7 @@ export const WINDOWS = [
  * pull bar" is not.
  */
 export const HANDLES = [
-  { id: 'none',    he: 'ללא ידית משיכה', en: 'No pull', len: 0, style: 'none' },
+  { id: 'none',    he: 'ללא ידית משיכה', en: 'No pull', ru: 'Без ручки-скобы', len: 0, style: 'none' },
 
   /* Pull bars. `bar` selects the section and the tone profile; see BARS in the
      renderer.
@@ -303,19 +304,19 @@ export const HANDLES = [
      and neither figure was even its own arithmetic: 900/34 is 26.5 and 900/16
      is 56. A number nobody could reproduce from the line above it.
      The measured widths, on an 850 x 2050 leaf: */
-  { id: 'idan',    he: 'עידן',  en: 'Idan',   len: 1050, w: 32, style: 'bar', bar: 'idan', pull: true,
+  { id: 'idan',    he: 'עידן',  en: 'Idan', ru: 'Идан',   len: 1050, w: 32, style: 'bar', bar: 'idan', pull: true,
     aliases: ['bar-long', 'luna', 'shiran'] },
   /* Brass, and the catalogue never said so: with no `finish` of its own
      `gripFinish` fell through to steel and the bar the inventory calls
      brass rendered silver on every door. d072, d074 and d082 are gold rods at
      0.017-0.024 of leaf width — half what we drew. */
-  { id: 'ella',    he: 'אלה',   en: 'Ella',   len: 1000, w: 20, style: 'bar', bar: 'ella', pull: true,
+  { id: 'ella',    he: 'אלה',   en: 'Ella', ru: 'Эла',   len: 1000, w: 20, style: 'bar', bar: 'ella', pull: true,
     finish: 'brass' },
-  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', len: 1000, w: 44, style: 'bar', bar: 'nitzan', pull: true,
+  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', ru: 'Ницан', len: 1000, w: 44, style: 'bar', bar: 'nitzan', pull: true,
     aliases: ['bar-short'] },
-  { id: 'shahar',  he: 'שחר',   en: 'Shahar', len: 1230, w: 40, style: 'bar', bar: 'shahar', pull: true,
+  { id: 'shahar',  he: 'שחר',   en: 'Shahar', ru: 'Шахар', len: 1230, w: 40, style: 'bar', bar: 'shahar', pull: true,
     aliases: ['bar-flat', 'blade'] },
-  { id: 'ron',     he: 'רון',   en: 'Ron',    len: 900,  w: 18, style: 'bar', bar: 'ron', pull: true },
+  { id: 'ron',     he: 'רון',   en: 'Ron', ru: 'Рон',    len: 900,  w: 18, style: 'bar', bar: 'ron', pull: true },
 
   /* The ornate pull, the horizontal bow, and the recess. */
   /* ⚠ `shiran` IS WITHDRAWN, and this closes a question rather than dropping a
@@ -324,7 +325,7 @@ export const HANDLES = [
      range drawn from nothing, and the note there says in as many words "it is
      the one grip whose picture we cannot check". Peretz, 26.8.2026: "there is
      no: שירן, להב שטוח." The id resolves to `idan`. */
-  { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', len: 0, style: 'grab',
+  { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', ru: 'Горизонтальная скоба', len: 0, style: 'grab',
     aliases: ['dee'] },
   /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
      runs nearly the whole leaf and it is twice as wide as we drew it.
@@ -344,7 +345,7 @@ export const HANDLES = [
      `armGrip` (which does not arm the drag) and by `repair` (which drops a
      stale position out of a shared link). One flag, three readers, because a
      rule enforced only in the interface is a rule a link walks past. */
-  { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel',
+  { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel', ru: 'Врезная ручка',
     len: 1780, w: 85, inset: 0.30, style: 'channel', pull: true, fixed: true },
 
   /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
@@ -371,7 +372,7 @@ export const HANDLES = [
      range, which is what leaves the leaf's ornament room to be seen.
      `finish: 'black'` reaches the lock furniture too, through
      `gripFinish`: on this door the keyway escutcheon is the same black. */
-  { id: 'barblack', he: 'מוט שחור', en: 'Black tube bar', len: 800, w: 20,
+  { id: 'barblack', he: 'מוט שחור', en: 'Black tube bar', ru: 'Чёрная трубчатая скоба', len: 800, w: 20,
     style: 'bar', bar: 'ron', pull: true, finish: 'black' },
 ];
 
@@ -391,7 +392,7 @@ export const HANDLES = [
  * a link written when it existed still opens a door.
  */
 export const LOCKSETS = [
-  { id: 'coral',   he: 'קורל',  en: 'Coral',      style: 'lever', aliases: ['lever'], lever: true },
+  { id: 'coral',   he: 'קורל',  en: 'Coral', ru: 'Корал',      style: 'lever', aliases: ['lever'], lever: true },
 
   /* Cylinder only: a keyway escutcheon and nothing else.
      This is the commonest lock furniture in the whole corpus on the doors that
@@ -402,7 +403,7 @@ export const LOCKSETS = [
      face needs a keyway and nothing more. A lever there would be redundant,
      and it is also physically in the way, which is what the configurator was
      drawing. */
-  { id: 'cylinder', he: 'צילינדר בלבד', en: 'Cylinder only', style: 'cylinder', lock: true,
+  { id: 'cylinder', he: 'צילינדר בלבד', en: 'Cylinder only', ru: 'Только цилиндр', style: 'cylinder', lock: true,
     aliases: ['none'] },
   /* `longplate` is retired one commit after it was added, and the reason is
      worth keeping. It went in because six doors on the hardware contact sheet
@@ -417,16 +418,16 @@ export const LOCKSETS = [
      contact sheet triages, it does not measure; and an automatic span that
      comes back equal to its own search window twice is telling you to draw the
      thing with a scale over it instead of tuning the detector a third time. */
-  { id: 'plate',   he: 'רותם',  en: 'Rotem',   style: 'plate', lock: true, lever: true,
+  { id: 'plate',   he: 'רותם',  en: 'Rotem', ru: 'Ротем',   style: 'plate', lock: true, lever: true,
     aliases: ['longplate'] },
-  { id: 'cadoor',  he: 'כדור',   en: 'Cadoor',  style: 'cadoor' },
-  { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  style: 'sapir', aliases: ['almog'] },
+  { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', ru: 'Шаровая',  style: 'cadoor' },
+  { id: 'sapir',   he: 'ספיר',   en: 'Sapir', ru: 'Сапир',  style: 'sapir', aliases: ['almog'] },
   /* ⚠ `almog` IS WITHDRAWN — Peretz, 26.8.2026: "there is no: אלמוג". It
      resolves to `sapir`, the nearest lever left in the range. */
   /* Knob on a long backplate — the bronze fitting on d092, named three times
      across the luxury tier. A different object from a knob on a rose: the
      plate carries the keyway too, so it locks like the Rotem backplate. */
-  { id: 'knobplate', he: 'כדור על אורך', en: 'Knob on backplate',
+  { id: 'knobplate', he: 'כדור על אורך', en: 'Knob on backplate', ru: 'Шар на планке',
     style: 'knobplate', lock: true },
 
   /* ── added in round five, from the hardware contact sheets ──────────
@@ -440,7 +441,7 @@ export const LOCKSETS = [
      keypads. d087's is a slim black body with two small reader icons and a
      round thumb-turn — no buttons at all — and the twelve-button grid drawn
      first was invented from the English word. */
-  { id: 'digital', he: 'מנעול חכם', en: 'Smart lock',
+  { id: 'digital', he: 'מנעול חכם', en: 'Smart lock', ru: 'Умный замок',
     style: 'digital', lock: true },
 
   /* Two square backplates stacked, lever on the upper — four doors (d032 d037
@@ -449,7 +450,7 @@ export const LOCKSETS = [
   /* `lock: true` — the LOWER square carries the cylinder, which is what d032
      and d037 show. Without it a separate round escutcheon was drawn on top
      of the plates, 22 x 22 mm into them, on every square-backplate door. */
-  { id: 'square', he: 'ריבועי', en: 'Square backplates',
+  { id: 'square', he: 'ריבועי', en: 'Square backplates', ru: 'Квадратные накладки',
     style: 'square', lever: true, lock: true },
 
   /* ⚠ THERE WAS A `none` LOCKSET HERE — no lever, no knob, no keyway — and it
@@ -545,17 +546,17 @@ export const LOCKSETS = [
  * says bronze reads differently, it is one ramp.
  */
 export const PIRZUL = [
-  { id: 'pz-nickel', he: 'ניקל',   en: 'Nickel', tone: 'steel' },
-  { id: 'pz-black',  he: 'שחור',   en: 'Black',  tone: 'black' },
-  { id: 'pz-bronze', he: 'ברונזה', en: 'Bronze', tone: 'brass' },
-  { id: 'pz-gold',   he: 'זהב',    en: 'Gold',   tone: 'brass' },
+  { id: 'pz-nickel', he: 'ניקל',   en: 'Nickel', ru: 'Никель', tone: 'steel' },
+  { id: 'pz-black',  he: 'שחור',   en: 'Black', ru: 'Чёрный',  tone: 'black' },
+  { id: 'pz-bronze', he: 'ברונזה', en: 'Bronze', ru: 'Бронза', tone: 'brass' },
+  { id: 'pz-gold',   he: 'זהב',    en: 'Gold', ru: 'Золото',   tone: 'brass' },
 ];
 
 export const MASHKOFS = [
-  { id: 'mk-std',  he: 'סטנדרטי',   en: 'Standard',    out: 46, in:  62, head: 148 },
-  { id: 'mk-out',  he: 'חזית רחבה', en: 'Wide face',   out: 82, in:  62, head: 148, wideOut: true },
-  { id: 'mk-in',   he: 'עומק מוגדל', en: 'Deep return', out: 46, in: 112, head: 198, wideIn: true },
-  { id: 'mk-both', he: 'רחב ועמוק', en: 'Wide and deep', out: 82, in: 112, head: 198,
+  { id: 'mk-std',  he: 'סטנדרטי',   en: 'Standard', ru: 'Стандартная',    out: 46, in:  62, head: 148 },
+  { id: 'mk-out',  he: 'חזית רחבה', en: 'Wide face', ru: 'Широкий фасад',   out: 82, in:  62, head: 148, wideOut: true },
+  { id: 'mk-in',   he: 'עומק מוגדל', en: 'Deep return', ru: 'Увеличенная глубина', out: 46, in: 112, head: 198, wideIn: true },
+  { id: 'mk-both', he: 'רחב ועמוק', en: 'Wide and deep', ru: 'Широкая и глубокая', out: 82, in: 112, head: 198,
     wideOut: true, wideIn: true },
 ];
 
@@ -580,9 +581,9 @@ export const MASHKOF_MAX = MASHKOFS.reduce((m, k) => ({
 }), { out: 0, in: 0, head: 0 });
 
 export const SPECIAL_LOCKS = [
-  { id: 'nospecial', he: 'ללא',   en: 'None' },
-  { id: 'kasefet',   he: 'כספת',  en: 'Safe lock' },
-  { id: 'kodan',     he: 'קודן',  en: 'Keypad' },
+  { id: 'nospecial', he: 'ללא',   en: 'None', ru: 'Нет' },
+  { id: 'kasefet',   he: 'כספת',  en: 'Safe lock', ru: 'Сейфовый замок' },
+  { id: 'kodan',     he: 'קודן',  en: 'Keypad', ru: 'Кодовый замок' },
 ];
 
 /* ── WITHDRAWN: the glass as its own choice ──────────────────────────
@@ -684,16 +685,16 @@ export const SPECIAL_LOCKS = [
  * rather than for that.
  */
 export const GRILLES = [
-  { id: 'none',    he: 'ללא סורג',       en: 'None',
+  { id: 'none',    he: 'ללא סורג',       en: 'None', ru: 'Без решётки',
     doors: ['d094', 'd115'] },
-  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid',     aliases: ['bars', 'iron'],
+  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid', ru: 'Решётка-сетка',     aliases: ['bars', 'iron'],
     doors: ['d091', 'd100', 'd107', 'd110', 'd113', 'd117', 'd122'] },
-  { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', light: true,
+  { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', ru: 'Решётка-сетка в цвет двери', light: true,
     aliases: ['bars-light', 'iron-light'] },
-  { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls',
+  { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls', ru: 'Кованая решётка',
     aliases: ['quatrefoil'],
     doors: ['d089', 'd093', 'd095', 'd097', 'd099', 'd102', 'd116'] },
-  { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Grid with scrolls, door colour', light: true,
+  { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Grid with scrolls, door colour', ru: 'Кованая решётка в цвет двери', light: true,
     aliases: ['quatrefoil-light'] },
   /* ⚠ `iron` AND `iron-light` ARE WITHDRAWN — Peretz, 26.8.2026: "there is no
      זכוכית מחורצת, ברזל מחושל, מדליוני פרח". They were the heavy ornamental
@@ -720,16 +721,16 @@ export const GRILLES = [
   /* ⚠ `quatrefoil` AND `quatrefoil-light` ARE WITHDRAWN — Peretz named
      מדליוני פרח among the three he does not sell. One measured door (d104)
      carried it. Both ids resolve to `scroll`, the nearest surviving pattern. */
-  { id: 'arch',    he: 'קשת',            en: 'Arch',            doors: ['d121'] },
-  { id: 'deco',    he: 'קווים גיאומטריים', en: 'Art-deco lines', doors: ['d123'] },
+  { id: 'arch',    he: 'קשת',            en: 'Arch', ru: 'Арка',            doors: ['d121'] },
+  { id: 'deco',    he: 'קווים גיאומטריים', en: 'Art-deco lines', ru: 'Геометрические линии', doors: ['d123'] },
   /* Worked GLASS. In the pane, not on it. */
-  { id: 'circles', he: 'עיגולים שזורים', en: 'Interlocking rings', glass: true,
+  { id: 'circles', he: 'עיגולים שזורים', en: 'Interlocking rings', ru: 'Переплетённые кольца', glass: true,
     doors: ['d106'] },
-  { id: 'vine',    he: 'גפן',            en: 'Grape and vine',  glass: true,
+  { id: 'vine',    he: 'גפן',            en: 'Grape and vine', ru: 'Виноградная лоза',  glass: true,
     doors: ['d109', 'd111'] },
-  { id: 'tree',    he: 'עץ',             en: 'Tree',            glass: true,
+  { id: 'tree',    he: 'עץ',             en: 'Tree', ru: 'Дерево',            glass: true,
     doors: ['d114'] },
-  { id: 'mesh',    he: 'זכוכית מעוצבת',  en: 'Etched mesh',     glass: true,
+  { id: 'mesh',    he: 'זכוכית מעוצבת',  en: 'Etched mesh', ru: 'Матовое стекло с рисунком',     glass: true,
     aliases: ['lattice', 'reeded'],
     doors: ['d102', 'd105', 'd116', 'd127'] },
   /* ⚠ d125 was in TWO of the prose lists — under `reeded` and under "nothing
@@ -750,14 +751,14 @@ export const GRILLES = [
      one now knows both roots — generalised rather than relaxed, because a
      priced option with no photograph behind it is exactly how `lattice`,
      `bars` and `bars-light` once reached a customer. */
-  { id: 'rings',   he: 'טבעות ותלתלים', en: 'Scrolled ring lattice',
+  { id: 'rings',   he: 'טבעות ותלתלים', en: 'Scrolled ring lattice', ru: 'Кольца и завитки',
     doors: ['newdoor'] },
   /* The three missing `-light` twins, appended so the ids already in the wild
      keep their indices. `light` is the same one switch it has always been: the
      same ironwork, painted the door's colour instead of black. */
-  { id: 'arch-light', he: 'קשת בהירה', en: 'Arch, door colour', light: true },
+  { id: 'arch-light', he: 'קשת בהירה', en: 'Arch, door colour', ru: 'Арка в цвет двери', light: true },
   { id: 'deco-light', he: 'קווים גיאומטריים בהירים',
-    en: 'Art-deco lines, door colour', light: true },
+    en: 'Art-deco lines, door colour', ru: 'Геометрические линии в цвет двери', light: true },
   /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
      resolves to `mesh`, the other worked glass. */
 ];
@@ -787,8 +788,8 @@ export const GRILLES = [
  * bump. Changing what they mean does not.
  */
 export const HANDINGS = [
-  { id: 'right-in', he: 'ימין, פנימה', en: 'Right, inward', hinge: 'right' },
-  { id: 'left-in',  he: 'שמאל, פנימה', en: 'Left, inward',  hinge: 'left'  },
+  { id: 'right-in', he: 'ימין, פנימה', en: 'Right, inward', ru: 'Правая, внутрь', hinge: 'right' },
+  { id: 'left-in',  he: 'שמאל, פנימה', en: 'Left, inward', ru: 'Левая, внутрь',  hinge: 'left'  },
 ];
 
 /**
@@ -819,10 +820,10 @@ export const HANDINGS = [
    rather than as options in this list. The heading survives in the interface;
    what is gone is the idea that a stripe composition is a thing you pick off
    a grid. */
-export const DETAIL_SUBS = [['panel', 'פאנלים']];
+export const DETAIL_SUBS = [['panel', 'g.panels']];
 
 export const DETAILS = [
-  { id: 'plain',  he: 'חלק',            en: 'Plain',              panel: false, groove: false },
+  { id: 'plain',  he: 'חלק',            en: 'Plain', ru: 'Гладкая',              panel: false, groove: false },
 
   /* ── PANELS ───────────────────────────────────────────────────────
      A panel on these doors is a strip of moulding laid on the face in a
@@ -848,17 +849,17 @@ export const DETAILS = [
      are milled and four are applied strips.
      They alias onto the lower panel rather than onto `plain`, because an alias
      should substitute for a decision, not delete it. */
-  { id: 'panel', sub: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel',    panel: true,  groove: false,
+  { id: 'panel', sub: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel', ru: 'Нижняя панель',    panel: true,  groove: false,
     aliases: ['both', 'groove', 'perimeter'] },
   /* The classic two-rectangle face — tall upper, short lower — which d048
      carries and a single bottom-quarter panel cannot describe. */
-  { id: 'panel2', sub: 'panel', he: 'שני פאנלים',     en: 'Two panels',     panel: true,  groove: false,
+  { id: 'panel2', sub: 'panel', he: 'שני פאנלים',     en: 'Two panels', ru: 'Две панели',     panel: true,  groove: false,
     panels: 2, top: true },
   /* ⚠ THE UPPER RECTANGLE ALONE. Asked for from outside: *"add an option of
      only the top panel"*. Every panelled option in this list used to put
      something at the FOOT of the leaf, so a face with a single high panel and
      a bare plinth below it was not expressible. */
-  { id: 'panelTop', sub: 'panel', he: 'פאנל עליון',   en: 'Upper panel',    panel: true,  groove: false,
+  { id: 'panelTop', sub: 'panel', he: 'פאנל עליון',   en: 'Upper panel', ru: 'Верхняя панель',    panel: true,  groove: false,
     panels: 1, top: true },
   /* ⚠ AND THREE. Asked for as *"an option of three panels, its the 2 panels,
      and another one in the middle"* — so it is the pair's envelope, 0.07 to
@@ -881,7 +882,7 @@ export const DETAILS = [
      ASK-PERETZ §14 asked whether it always does, and this is that answered.
      A second pull handle is not something he fits, so `js/rules.js` removes
      one rather than drawing two. */
-  { id: 'panel3', sub: 'panel', he: 'שלושה פאנלים',   en: 'Three panels',   panel: true,  groove: false, ownPull: true,
+  { id: 'panel3', sub: 'panel', he: 'שלושה פאנלים',   en: 'Three panels', ru: 'Три панели',   panel: true,  groove: false, ownPull: true,
     panels: 3, top: true, grab: true },
 
   /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
@@ -912,9 +913,9 @@ export const DETAILS = [
      ⚠ AND THE SECTION GOES ROUND THE GLASS TOO. `mouldOf` is asked once and
      answers for the panel and for the architrave together, because every
      corpus door with a window over a panel cases both in the same section. */
-  { id: 'panelo', sub: 'panel', he: 'פאנל תחתון קלאסי', en: 'Lower panel, ogee',
+  { id: 'panelo', sub: 'panel', he: 'פאנל תחתון קלאסי', en: 'Lower panel, ogee', ru: 'Нижняя панель, классика',
     panel: true, groove: false, profile: 'ogee', doors: ['d050', 'd053'] },
-  { id: 'panel2o', sub: 'panel', he: 'שני פאנלים קלאסיים', en: 'Two panels, ogee',
+  { id: 'panel2o', sub: 'panel', he: 'שני פאנלים קלאסיים', en: 'Two panels, ogee', ru: 'Две панели, классика',
     panel: true, groove: false, panels: 2, top: true, profile: 'ogee',
     doors: ['d051', 'd061', 'd067', 'd077'] },
 
@@ -1072,7 +1073,7 @@ export const DETAILS = [
      for Peretz and it is asked. */
   /* `ownPull` — the set carries a turned pull on its own corbelled shelf.
      Peretz: "greek set + 2700 (remove the handle)". */
-  { id: 'classic', sub: 'panel', he: 'סט קלאסי',      en: 'Classical set',  panel: true,  groove: false, ownPull: true,
+  { id: 'classic', sub: 'panel', he: 'סט קלאסי',      en: 'Classical set', ru: 'Классический комплект',  panel: true,  groove: false, ownPull: true,
     classic: true, grab: true, rectOnly: true, doors: ['newdoor'],
     /* The set's own mouldings are drawn by `classicSet` and are the ogee by
        construction — that section was measured on this very door. This field
@@ -1108,9 +1109,9 @@ export const DETAILS = [
  * and it should resolve rather than error.
  */
 export const FINISHES = [
-  { id: 'steel', he: 'ניקל מוברש', en: 'Brushed nickel' },
-  { id: 'black', he: 'שחור מט',    en: 'Matte black' },
-  { id: 'brass', he: 'פליז',       en: 'Brass' },
+  { id: 'steel', he: 'ניקל מוברש', en: 'Brushed nickel', ru: 'Матовый никель' },
+  { id: 'black', he: 'שחור מט',    en: 'Matte black', ru: 'Матовый чёрный' },
+  { id: 'brass', he: 'פליז',       en: 'Brass', ru: 'Латунь' },
 ];
 
 /**
@@ -1154,7 +1155,7 @@ export const declaredFinish = o => !o || !o.finish ? null
  * customer never chose and nobody manufactures. One helper, so the five
  * readers cannot drift apart again.
  */
-export const colourCode = c => `רב בריח ${c.ral}`;
+export const colourCode = c => `${T('brand.ravbariach')} ${c.ral}`;
 
 /**
  * The single tone THE DRAWING paints metal in.
@@ -1340,12 +1341,19 @@ export const SIDE_OPENING_MIN = 370;
  * conditions and the price had no equivalent of either.
  *
  * Each entry carries three names, because three readers need different ones:
- *   `he`    the panel as a subject   — "חלון הצד"
- *   `inHe`  the panel as a location  — "בחלון הצד"
- *   `isHe`  what the panel IS
+ *   `name`  the panel as a subject   — "חלון הצד"
+ *   `at`    the panel as a location  — "בחלון הצד"
+ *   `is`    what the panel IS
  * Stored rather than derived: Hebrew prefixing eats the definite article
  * (ב + החלון -> בחלון), and a rule for that is a rule that will be wrong for
- * the fourth panel somebody adds.
+ * the fourth panel somebody adds. Russian declines the same phrase into the
+ * prepositional case for `at` — "боковое окно" becomes "в боковом окне" — so
+ * the same argument holds a second time, in a second language.
+ *
+ * ⚠ EACH OF THE THREE IS A `{he,en,ru}` TRIPLE read through `L()`, not a
+ * string. `is` on the leaf is the WINDOW'S OWN ENTRY, which already carries
+ * all three names, so the leaf's glazing can never be described by a word
+ * the window list does not use.
  */
 export function glazedPanels(state) {
   const size = SIZES[state.size] || SIZES.standard;
@@ -1356,7 +1364,9 @@ export function glazedPanels(state) {
   const out = [];
   if (rows) {
     out.push({ id: 'leaf', panes: rows,
-               he: 'כנף הדלת', inHe: 'בכנף הדלת', isHe: win.he });
+               name: { he: 'כנף הדלת',  en: 'Door leaf',    ru: 'Створка двери' },
+               at:   { he: 'בכנף הדלת', en: 'in the leaf',  ru: 'в створке двери' },
+               is:   win });
   }
   /* A sidelight is glass BY DEFINITION — that is the whole product, and four
      doors in the corpus have one (d117 d122 d123 d128). It does not take the
@@ -1371,7 +1381,9 @@ export function glazedPanels(state) {
      day somebody adds a narrow one, the two answers still agree. */
   if (size.sideGlazed && size.side > SIDE_OPENING_MIN) {
     out.push({ id: 'side', panes: 1,
-               he: 'חלון הצד', inHe: 'בחלון הצד', isHe: 'זיגוג קבוע' });
+               name: { he: 'חלון הצד',  en: 'Sidelight',        ru: 'Боковое окно' },
+               at:   { he: 'בחלון הצד', en: 'in the sidelight', ru: 'в боковом окне' },
+               is:   { he: 'זיגוג קבוע', en: 'Fixed glazing',   ru: 'Глухое остекление' } });
   } else if (rows && size.side > SIDE_OPENING_MIN) {
     /* ⚠ NOT "חלון זהה". The דלת וחצי side leaf does NOT get an identical
        window: the renderer clamps its aperture to `min(rects[0].w, sideW-240)`,
@@ -1382,7 +1394,10 @@ export function glazedPanels(state) {
        narrow matching light, and whether it is even a full panel of ironwork
        at 110 mm is a question for Peretz: ASK-PERETZ.md §4b. */
     out.push({ id: 'side', panes: 1,
-               he: 'הכנף הצדדית', inHe: 'בכנף הצדדית', isHe: 'חלון צר תואם' });
+               name: { he: 'הכנף הצדדית',  en: 'Side leaf',        ru: 'Боковая створка' },
+               at:   { he: 'בכנף הצדדית', en: 'in the side leaf', ru: 'в боковой створке' },
+               is:   { he: 'חלון צר תואם', en: 'Matching narrow light',
+                       ru: 'Узкое окно в тон' } });
   }
   return out;
 }
@@ -1416,14 +1431,18 @@ export const paneCount = state =>
 export function grillePlacement(state) {
   const panels = glazedPanels(state);
   const n = paneCount(state);
-  const count = n > 1 ? ` (${n} יחידות)` : '';
+  const count = n > 1 ? ` (${T('row.units', n)})` : '';
   /* No glass at all: there is no grille to place, and joining an empty list
      produced a bare " — " dangling off the end of the line. A door with no
      window can still carry a `grille` in its state — `repair` clears it, but
      this function must not depend on that having happened yet. */
   if (!panels.length) return '';
   if (panels.length === 1 && panels[0].id === 'leaf') return count;
-  return ` — ${panels.map(p => p.inHe).join(' ו')}` + count;
+  /* ⚠ THE JOINING WORD IS PART OF THE LANGUAGE, NOT PART OF THE SENTENCE.
+     Hebrew prefixes it to the second item with no space — `בכנף הדלת ובחלון
+     הצד` — where English and Russian want a space on both sides. `andJoin`
+     holds all three. */
+  return ` — ${andJoin(panels.map(p => L(p.at)))}` + count;
 }
 
 /* Derived from the enumeration above rather than restating it, so "is there

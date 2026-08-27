@@ -3,16 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>בונים דלת — דלתות מגן</title>
+<title data-t="doc.title">בונים דלת — דלתות מגן</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
+<meta name="description" data-ta="content=doc.desc"
+      content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
 <!-- A door, as a data URI. There was no icon and no favicon.ico, so every load
      took a 404 for one and the tab showed a blank page. Inline because the
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=63aef806">
+<link rel="stylesheet" href="css/app.css?v=b49ffa29">
 </head>
 <body>
 
@@ -30,8 +31,8 @@
       <circle cx="12" cy="22" r="1.4" fill="#E8E4DC"/>
     </svg>
     <span class="brand__text">
-      <span class="brand__name">דלתות מגן</span>
-      <span class="brand__sub">בונים דלת</span>
+      <span class="brand__name" data-t="brand.name">דלתות מגן</span>
+      <span class="brand__sub" data-t="brand.sub">בונים דלת</span>
     </span>
   </a>
 
@@ -43,11 +44,23 @@
        and צור קשר at the telephone, which is the one channel that always
        works. עיצוב אישי is this page and says so with `aria-current`, rather
        than being a link to where you already are. -->
-  <nav class="nav" aria-label="ניווט ראשי">
-    <a class="nav__a" href="https://dlatotmagen.co.il/works">דגמים</a>
-    <span class="nav__a is-here" aria-current="page">עיצוב אישי</span>
-    <a class="nav__a" href="tel:+972532197466">צור קשר</a>
+  <nav class="nav" aria-label="ניווט ראשי" data-ta="aria-label=nav.label">
+    <a class="nav__a" href="https://dlatotmagen.co.il/works" data-t="nav.works">דגמים</a>
+    <span class="nav__a is-here" aria-current="page" data-t="nav.custom">עיצוב אישי</span>
+    <a class="nav__a" href="tel:+972532197466" data-t="nav.contact">צור קשר</a>
   </nav>
+
+  <!-- ⚠ THE LANGUAGE PICKER IS THREE BUTTONS, NOT A `<select>`, AND IT NAMES
+       EACH LANGUAGE IN ITSELF. A customer who cannot read the page cannot
+       read a control labelled "שפה" either, so the way out has to be legible
+       to somebody who is lost: `עברית` `English` `Русский`, each written in
+       its own script, visible without opening anything. Three options is
+       exactly the count where a row of buttons beats a menu.
+       Built by `js/app.js` so the labels and the current-language state come
+       from one place; empty here so a page whose bundle never loads shows a
+       Hebrew page and no dead control. -->
+  <div class="langs" id="langs" role="group" aria-label="שפה"
+       data-ta="aria-label=nav.lang"></div>
 
   <div class="bar__end">
     <!-- The icons are `aria-hidden` and the text beside them is untouched, so
@@ -74,7 +87,7 @@
         <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"
               d="M6.5 3.5h11v17l-5.5-4-5.5 4Z"/>
       </svg>
-      העיצוב שלי <span class="bar__count" data-saved-count>0</span>
+      <span data-t="saved.mine">העיצוב שלי</span> <span class="bar__count" data-saved-count>0</span>
     </button>
   </div>
 </header>
@@ -86,7 +99,7 @@
      SEND, and this is only a convenience for holding two doors side by side
      before choosing one. -->
 <div class="saved" id="saved" hidden>
-  <p class="saved__none" data-saved-empty>עדיין לא שמרתם עיצוב.</p>
+  <p class="saved__none" data-saved-empty data-t="saved.none">עדיין לא שמרתם עיצוב.</p>
   <ul class="saved__list" data-saved-list></ul>
 </div>
 
@@ -111,15 +124,17 @@
      own hand-measured record. Nothing in it is typed. -->
 <dialog class="works" id="works" aria-labelledby="works-h">
   <div class="works__head">
-    <h2 class="works__h" id="works-h">דלתות שכבר התקנו</h2>
-    <button class="works__x" id="works-close" type="button" aria-label="סגירת הגלריה">✕</button>
+    <h2 class="works__h" id="works-h" data-t="works.h">דלתות שכבר התקנו</h2>
+    <button class="works__x" id="works-close" type="button"
+            aria-label="סגירת הגלריה" data-ta="aria-label=works.close">✕</button>
   </div>
-  <p class="works__lede">בחרו דלת קרובה למה שרציתם — ומשם תשנו כל פרט.</p>
+  <p class="works__lede" data-t="works.lede">בחרו דלת קרובה למה שרציתם — ומשם תשנו כל פרט.</p>
   <div class="works__grid" id="works-grid"></div>
 </dialog>
 
 <p class="strip" id="placeholder-note" hidden>
-  <strong>גרסת פיתוח.</strong> הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.
+  <strong data-t="strip.dev.b">גרסת פיתוח.</strong>
+  <span data-t="strip.dev">הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.</span>
 </p>
 <p class="strip strip--warn" id="notice" hidden></p>
 
@@ -142,9 +157,9 @@
      end of an RTL sentence takes the neutral punctuation with it and the stop
      lands on the wrong side of the number. -->
 <p class="strip strip--warn" id="down" role="alert" hidden>
-  <strong>הדלת לא נטענת בדפדפן הזה.</strong>
-  אפשר לשלוח לנו הודעה בוואטסאפ, או להתקשר אלינו למספר
-  <a href="tel:+972532197466">053-219-7466</a> ונעזור לכם לבחור דלת.
+  <strong data-t="down.h">הדלת לא נטענת בדפדפן הזה.</strong>
+  <span data-t="down.p">אפשר לשלוח לנו הודעה בוואטסאפ, או להתקשר אלינו למספר</span>
+  <a href="tel:+972532197466">053-219-7466</a> <span data-t="down.p2">ונעזור לכם לבחור דלת.</span>
 </p>
 
 <!-- ⚠ ONE COPY OF THE DEGRADED STYLESHEET, WITH TWO WAYS IN.
@@ -204,8 +219,8 @@
          `body` is `100dvh` with `overflow: hidden` and `.layout` is `flex: 1`,
          so a heading beside the layout takes its height straight out of the
          door at every desktop size. Inside, the stage flexes around it. -->
-    <h1 class="stage__h1" id="stage-h">בנו את הדלת שלכם
-      <span class="stage__lede">בחרו את הפרטים ותראו את השינוי בזמן אמת</span>
+    <h1 class="stage__h1" id="stage-h"><span data-t="stage.h1">בנו את הדלת שלכם</span>
+      <span class="stage__lede" data-t="stage.lede">בחרו את הפרטים ותראו את השינוי בזמן אמת</span>
     </h1>
     <div class="stage" id="stage"></div>
 
@@ -235,10 +250,10 @@
           <path d="M12.2 10.4V9a1.4 1.4 0 0 1 2.8 0v1.6"/>
           <path d="M15 10.8v-.6a1.4 1.4 0 0 1 2.8 0v5.2a4.6 4.6 0 0 1-4.6 4.6h-1.4c-1.6 0-2.8-.8-3.6-2l-2.4-3.8a1.4 1.4 0 0 1 2.2-1.7l1.4 1.6"/>
         </svg>
-        גררו את הידית למקום שתרצו
+        <span data-t="grip.drag">גררו את הידית למקום שתרצו</span>
       </span>
-      <button type="button" class="grip-bar__btn" id="grip-rot">סובבו</button>
-      <button type="button" class="grip-bar__btn" id="grip-home">למקום המקורי</button>
+      <button type="button" class="grip-bar__btn" id="grip-rot" data-t="grip.rotate">סובבו</button>
+      <button type="button" class="grip-bar__btn" id="grip-home" data-t="grip.home">למקום המקורי</button>
     </div>
   </section>
 
@@ -281,7 +296,7 @@
         <path d="M4.2 9.2h10.3a5 5 0 0 1 0 10h-5.5"/>
         <path d="M8 5.2 4 9.2l4 4"/>
       </svg>
-      ביטול השינוי האחרון
+      <span data-t="undo">ביטול השינוי האחרון</span>
     </button>
     <!-- ⚠ THE WARNING SAYS WHAT IT MEANS NOW. It read "הדמיה להמחשה. הדלת
          נמדדת ומותקנת אצלכם." — an illustration, and we measure on site —
@@ -308,10 +323,11 @@
        Built from the GROUPS table in app.js rather than written out here, so
        that adding a category is one line in one place. The two added this
        round, glazing and add-ons, were exactly that. -->
-  <section class="panel panel--choose" id="choices" aria-label="התאמת הדלת"></section>
+  <section class="panel panel--choose" id="choices"
+         aria-label="התאמת הדלת" data-ta="aria-label=choices.label"></section>
 
   <!-- ── the handoff: the whole point of the site ─────────── -->
-  <section class="panel panel--send" aria-label="שליחת הדלת">
+  <section class="panel panel--send" aria-label="שליחת הדלת" data-ta="aria-label=send.label">
     <div class="send">
       <!-- ⚠ THE FIGURE IS A BUTTON, and a real one rather than a div with a
            click handler. Asked for from outside: *"make that if they click on
@@ -322,14 +338,14 @@
            control does. `aria-expanded` is the honest carrier; the chevron is
            decoration and says so. -->
       <div class="send__price">
-        <span class="send__label">מחיר משוער</span>
+        <span class="send__label" data-t="price.est">מחיר משוער</span>
         <button class="send__toggle" id="price-toggle" type="button"
                 aria-expanded="false" aria-controls="breakdown">
           <strong class="send__figure" id="price" data-price>—</strong>
           <span class="send__chev" aria-hidden="true"></span>
-          <span class="sr-only">פירוט המחיר</span>
+          <span class="sr-only" data-t="price.breakdown">פירוט המחיר</span>
         </button>
-        <span class="send__incl">כולל דלת, משקוף, מנעול, התקנה ומע״מ</span>
+        <span class="send__incl" data-t="price.includes">כולל דלת, משקוף, מנעול, התקנה ומע״מ</span>
       </div>
 
       <!-- Rendered from `breakdownRows(state)` in js/price.js — the same
@@ -352,20 +368,20 @@
       <div class="spec" id="spec" aria-hidden="true"></div>
       <p class="send__spec sr-only" id="summary"></p>
 
-      <p class="send__lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
+      <p class="send__lead" data-t="send.lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
 
       <a class="btn btn--wa" id="wa-btn" href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F" target="_blank" rel="noopener" data-wa>
         <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
           <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
         </svg>
-        <span class="wa__on">שלחו את הדלת בוואטסאפ</span>
-        <span class="wa__off">שלחו לנו הודעה בוואטסאפ</span>
+        <span class="wa__on" data-t="send.waOn">שלחו את הדלת בוואטסאפ</span>
+        <span class="wa__off" data-t="send.waOff">שלחו לנו הודעה בוואטסאפ</span>
       </a>
 
       <div class="send__alt">
-        <button class="btn btn--ghost" id="copy-btn" type="button">העתקת הפרטים</button>
-        <button class="btn btn--ghost" id="save-btn" type="button">שמירת העיצוב</button>
-        <span class="send__code">קוד: <b id="code">—</b></span>
+        <button class="btn btn--ghost" id="copy-btn" type="button" data-t="send.copy">העתקת הפרטים</button>
+        <button class="btn btn--ghost" id="save-btn" type="button" data-t="send.save">שמירת העיצוב</button>
+        <span class="send__code"><span data-t="send.code">קוד:</span> <b id="code">—</b></span>
       </div>
 
       <!-- ⚠ This sentence is `PRICE_CAVEAT` in js/share.js and `npm test`
@@ -374,14 +390,14 @@
            measurments by ~5%." Change it THERE, and this copy with it in the
            same edit — the assertion exists because the two drifted once. -->
       <p class="send__fine">
-        מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.
-        אפשר גם להתקשר — <a href="tel:+972532197466">053-219-7466</a>.
+        <span data-t="price.caveat">מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.</span>
+        <span data-t="send.callToo">אפשר גם להתקשר —</span> <a href="tel:+972532197466">053-219-7466</a>.
       </p>
     </div>
 
     <p class="proof">
-      רוצים לראות דלתות אמיתיות שהתקנו?
-      <a href="https://dlatotmagen.co.il/works">העבודות שלנו →</a>
+      <span data-t="send.seeReal">רוצים לראות דלתות אמיתיות שהתקנו?</span>
+      <a href="https://dlatotmagen.co.il/works" data-t="send.ourWorks">העבודות שלנו →</a>
     </p>
 
   </section>
@@ -405,15 +421,15 @@
      which belongs in a 64 px bar. -->
 <div class="dock" aria-hidden="false">
   <div class="dock__price">
-    <span class="dock__label">מחיר משוער</span>
+    <span class="dock__label" data-t="price.est">מחיר משוער</span>
     <strong class="dock__figure" data-price>—</strong>
   </div>
   <a class="btn btn--wa dock__send" href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F" target="_blank" rel="noopener" data-wa>
     <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
       <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
     </svg>
-    <span class="wa__on">שלחו בוואטסאפ</span>
-    <span class="wa__off">שלחו הודעה</span>
+    <span class="wa__on" data-t="send.waOnShort">שלחו בוואטסאפ</span>
+    <span class="wa__off" data-t="send.waOffShort">שלחו הודעה</span>
   </a>
 </div>
 
@@ -435,27 +451,27 @@
      measured box and the desktop rule places the band inside it with
      `position: fixed`, which costs the door zero pixels. One measurement, one
      publisher, and the box the band sits in is the box that was measured. -->
-<footer class="trust" aria-label="למה אנחנו">
+<footer class="trust" aria-label="למה אנחנו" data-ta="aria-label=trust.label">
   <span class="trust__i">
     <svg class="trust__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 3.2 4.8 6v5.4c0 4.4 3 8.4 7.2 9.4 4.2-1 7.2-5 7.2-9.4V6Z"/>
       <path d="m8.8 11.9 2.3 2.3 4.1-4.4"/>
-    </svg>אחריות</span>
+    </svg><span data-t="trust.warranty">אחריות</span></span>
   <span class="trust__i">
     <svg class="trust__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M3.6 20.4V9.9L12 3.6l8.4 6.3v10.5"/>
       <path d="M9.2 20.4V12h5.6v8.4"/>
-    </svg>התקנה מקצועית</span>
+    </svg><span data-t="trust.fitting">התקנה מקצועית</span></span>
   <span class="trust__i">
     <svg class="trust__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 3.4a8.6 8.6 0 1 0 0 17.2 8.6 8.6 0 0 0 0-17.2Z"/>
       <path d="M3.6 9.4h16.8M3.6 14.6h16.8M12 3.4c2.2 2.4 3.3 5.4 3.3 8.6s-1.1 6.2-3.3 8.6c-2.2-2.4-3.3-5.4-3.3-8.6S9.8 5.8 12 3.4Z"/>
-    </svg>ייצור כחול לבן</span>
+    </svg><span data-t="trust.made">ייצור כחול לבן</span></span>
   <span class="trust__i">
     <svg class="trust__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 11.4a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4Z"/>
       <path d="M4.8 20.4c0-3.6 3.2-6.2 7.2-6.2s7.2 2.6 7.2 6.2"/>
-    </svg>שירות אישי וליווי</span>
+    </svg><span data-t="trust.service">שירות אישי וליווי</span></span>
 </footer>
 
 <!-- ── THE ORDER AS A DOCUMENT ─────────────────────────────────────────
@@ -470,7 +486,7 @@
      stylesheet and a layout over three functions that were finished. A
      `sheet.html` would be a fourth file to copy and a fourth file to forget,
      which is the argument that put the favicon inline (PLAN.md §8.1). -->
-<section class="sheet" id="sheet" aria-label="דף הזמנה"></section>
+<section class="sheet" id="sheet" aria-label="דף הזמנה" data-ta="aria-label=sheet.label"></section>
 
 <!-- `role="status"` is an implicit polite live region. Without it the toast was
      visible-only: a repair took the customer's window away, #live announced the
@@ -512,7 +528,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=be21c86e"></script>
+<script src="assets/bundle.js?v=eb688f37"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

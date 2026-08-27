@@ -32,7 +32,7 @@ green and the work is pushed.
 | 7 | The guided flow — one question at a time | ✅ **done** | 27.8 · 8 steps + a quote page, one live at every width · accordion deleted (6 functions) · navigator sticky and scrolling · audit's arrival/keyboard/reach checks all restated · **latency 501 → 123 ms** · test **5,401,525 / 0**, audit clean at 7 viewports |
 | 8 | Motion — the door assembles, and every change is animated | ✅ **done** | 27.8 · door assembles on load (Peretz's "start with nothing", satisfied in time) · colour cross-fades, never interpolates hue · parts fit, keyed off `data-changed` so no diffing and no second render path · **bare mode + reduced motion measured at 0 animations, asserted in the audit** · latency 123 ms |
 | 9 | The look — leaf texture (E), full-bleed desktop (F), mockup leftovers | ✅ **done, with F scoped down and said so** | 27.8 · grain +56% in two measured steps, mottle 0.0132 → 0.0168, judged against d016/d048 · ⚠ response is SUB-LINEAR, recorded · door **340 px wider** at 1280 and 1680 · the floating overlay is NOT built and §12.2 says why |
-| 10 | Hebrew · English · Russian | ⏳ **THE ONE PHASE NOT DONE** — see §13. Every string is still Hebrew in markup. Read `PLAN.md` §6.1's hinge trap FIRST: when the interface mirrors, the door must not. |
+| 10 | Hebrew · English · Russian | ✅ **done** | 27.8 · `js/copy.js`, 216 keys × 3 + 85 catalogue entries × 3 · `?lang=` → localStorage → `navigator` → he · THE HINGE HOLDS: the SVG is byte-identical in all three, asserted in `npm test` and measured in `npm run audit` · **the WhatsApp order stays Hebrew and now names the customer's language** · three top-level tables that would have shipped frozen (`SAID`, `GROUPS`/`SECTIONS`, `PRICE_*`) hold keys |
 | 11 | The final sweep — docs, assertions, green light | ✅ **done** | 27.8 · `PLACEHOLDER = false` (the flag KEPT, the strip gone) · ASK-PERETZ **776 → 89 lines** · README's three false claims corrected · one pointer line on each superseded plan · CLAUDE.md §0c rewritten |
 
 ### 0.1 If you are resuming this after a compact
@@ -1556,6 +1556,11 @@ a saving.
 
 ## 13. PHASE 10 — HEBREW · ENGLISH · RUSSIAN
 
+> ✅ **BUILT, 27.8.2026.** What follows is the specification; what was
+> actually done differs from it in four places, and each is recorded at the
+> end of this section under **AS BUILT**. Read that too.
+
+
 From `PLAN.md` §6, never built.
 
 - **`js/copy.js`** — every user-visible string keyed, three values each. No
@@ -1583,6 +1588,53 @@ From `PLAN.md` §6, never built.
   is on the same side in all three.
 - Digits are identical across all three scripts in the system stack, so prices
   never change shape.
+
+### AS BUILT — the four departures, and two bugs found by looking
+
+1. **The markup KEPT its Hebrew.** The spec above says "no string is ever
+   written in markup again" and that is not what shipped. Every element in
+   `index.html` carries `data-t="key"` AND the Hebrew text, and
+   `translateStatic()` reconciles them on boot. The rule's purpose — no string
+   exists in only one language — is met by the key; what the rule could not
+   ask for is a BLANK page when the bundle fails, and this page has a tested,
+   shipped no-JS path (the down-strip, `FALLBACK_TEXT`, a whole degraded
+   stylesheet). A customer whose JavaScript failed gets a working Hebrew page
+   rather than a frame of empty spans. `npm test` walks every `data-t` and
+   asserts the shipped Hebrew IS `copy.js`'s Hebrew, which is a stronger
+   guarantee than the two hand-picked sentences it replaced.
+
+2. **The WhatsApp order is always Hebrew, and now says which language the
+   customer used.** Not in the spec at all, and it is the part of this phase
+   that changes what Peretz can do. `PLAN.md` §0 asks for an order he can act
+   on without a clarifying question; an order in Russian is a question. So
+   `specLines` forces Hebrew — asserted — and one Hebrew line at the top names
+   the page language, dropped when it is Hebrew so it is never noise.
+
+3. **The A4 sheet is BILINGUAL.** It is the one document with two readers: the
+   customer proof-reads it (`css/app.css` says so where it caps the drawing on
+   a phone) and Peretz orders from it. Picking either loses the other, so it
+   prints the customer's language with the Hebrew under each value — two calls
+   of `specRows`, not a second row-builder.
+
+4. **`describe()`'s English branch was DELETED, not translated.** It was a
+   hand-written second row-renderer four fields wide, on a door with twelve
+   axes, and its own comment admitted nothing called it. `describeSentence`
+   speaks all three languages now, so the second statement of the naming rule
+   goes rather than being carried forward in triplicate.
+
+⚠ **AND THREE TOP-LEVEL TABLES WOULD HAVE SHIPPED FROZEN.** `T()` inside an
+object literal resolves ONCE, at import, before `setLang` has run — so
+`SAID` in `rules.js`, `GROUPS`/`SECTIONS` in `app.js` and `share.js`'s two
+exported sentences would each have been permanently Hebrew on an English page,
+with nothing thrown and nothing failing. They hold keys, or are functions.
+This is the single most repeatable trap in the phase and it is noted at all
+three sites.
+
+⚠ **TWO BUGS WERE FOUND BY OPENING THE PAGE, NOT BY AN ASSERTION**, and both
+are in `CLAUDE.md` §5 as 19 and 20: the price changing shape between languages
+under a comment promising it could not, and `?sheet=1` throwing two uncaught
+errors on every load because the audit drove that route without listening to
+it. Neither is a translation bug. Both were reachable only by looking.
 
 ---
 

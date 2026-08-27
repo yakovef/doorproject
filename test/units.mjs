@@ -4,6 +4,7 @@
  */
 import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
+import { L, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
@@ -13,7 +14,7 @@ import {
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { conflicts, repair } from '../js/rules.js';
-import { describeSentence, handingWords, specRows, summaryLine } from '../js/spec.js';
+import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
 
@@ -2240,18 +2241,222 @@ group('the page still reaches Peretz with no JavaScript');
   ok(tels.every(t => t === `href="tel:${PHONE_TEL}"`),
      'a tel: href in index.html is not the number js/share.js exports');
 
-  /* ⚠ ONE PROMISE, ONE WORDING. The card says these and the order says these,
-     and the order used to say neither the same way — it carried "כולל התקנה
-     ומע״מ" and no estimate caveat at all, so the one line the customer is told
-     three times was the line Peretz never saw. They are exported from
-     `share.js` the way `GRIP_ILLUSTRATIVE` and `FALLBACK_TEXT` are; this is
-     what stops the markup's copy drifting away from them again. */
-  const { PRICE_INCLUDES, PRICE_CAVEAT } = await import('../js/share.js');
-  ok(html.includes(PRICE_INCLUDES),
-     `index.html no longer contains PRICE_INCLUDES ("${PRICE_INCLUDES}") — the card `
-   + 'and the order are describing the same price in two different sentences');
-  ok(html.includes(PRICE_CAVEAT),
-     `index.html no longer contains PRICE_CAVEAT ("${PRICE_CAVEAT}")`);
+  /* ⚠ ONE PROMISE, ONE WORDING — GENERALISED, AND STRONGER THAN WHAT IT
+     REPLACES. This used to import `PRICE_INCLUDES` and `PRICE_CAVEAT` from
+     `share.js` and assert the markup contained those two sentences, because
+     the order once carried "כולל התקנה ומע״מ" with no estimate caveat at all
+     and the one line the customer is told three times was the line Peretz
+     never saw.
+     Both are copy keys now, and so are the other forty-odd strings in
+     `index.html`. `checkStaticCopy` below asserts EVERY `data-t` element's
+     shipped Hebrew equals `T(key)` in Hebrew — the same guarantee, over the
+     whole page rather than over two sentences somebody remembered. */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THREE LANGUAGES.
+   ═══════════════════════════════════════════════════════════════════ */
+async function checkLanguages() {
+  group('languages');
+  const copy = await import('../js/copy.js');
+  const { message } = await import('../js/share.js');
+  const { L, LANGS, T, UI, counted, plural, withLang } = copy;
+  const IDS = LANGS.map(l => l.id);
+
+  /* ── every string exists in all three ─────────────────────────── */
+  for (const [key, row] of Object.entries(UI)) {
+    ok(Array.isArray(row) && row.length === 3,
+       `UI['${key}'] is not a three-element [he, en, ru] array`);
+    IDS.forEach((id, i) => ok(typeof row[i] === 'string' && row[i].trim(),
+       `UI['${key}'] has no ${id} — an untranslated string must fail here, not `
+     + 'show Hebrew inside an English page'));
+  }
+
+  /* ⚠ A PLACEHOLDER DROPPED IN TRANSLATION LOSES A NUMBER. `T('len.cm', 90)`
+     renders "90 cm"; a Russian row written without the `{0}` renders "см" and
+     the customer is shown a handle with no length. Silent, and only in the
+     language nobody here proof-reads. */
+  for (const [key, row] of Object.entries(UI)) {
+    const slots = new Set([...row[0].matchAll(/\{(\d+)\}/g)].map(m => m[1]));
+    for (let i = 1; i < 3; i++) {
+      const mine = new Set([...row[i].matchAll(/\{(\d+)\}/g)].map(m => m[1]));
+      ok(slots.size === mine.size && [...slots].every(x => mine.has(x)),
+         `UI['${key}'] ${IDS[i]} does not carry the same {n} placeholders as he `
+       + `— a number would go missing: "${row[i]}"`);
+    }
+  }
+
+  /* ── every catalogue name exists in all three ─────────────────── */
+  const lists = { COLOURS, WINDOWS, HANDLES, LOCKSETS, PIRZUL, MASHKOFS,
+                  SPECIAL_LOCKS, GRILLES, HANDINGS, DETAILS, FINISHES,
+                  SIZES: Object.values(SIZES) };
+  for (const [name, list] of Object.entries(lists))
+    for (const o of list)
+      for (const id of IDS)
+        ok(typeof o[id] === 'string' && o[id].trim(),
+           `${name} entry '${o.id}' has no ${id} name`);
+  for (const z of Object.values(SIZES))
+    for (const id of IDS)
+      ok(z.band && z.band[id], `SIZES.${z.id}.band has no ${id}`);
+
+  /* ── Russian counts ───────────────────────────────────────────── */
+  const RU = { 1: 'полоса', 2: 'полосы', 4: 'полосы', 5: 'полос', 11: 'полос',
+               14: 'полос', 21: 'полоса', 22: 'полосы', 25: 'полос' };
+  withLang('ru', () => {
+    for (const [n, want] of Object.entries(RU))
+      ok(plural(Number(n), 'stripes.noun') === want,
+         `plural(${n}) in Russian is "${plural(Number(n), 'stripes.noun')}", want "${want}" `
+       + '— 11 is not 1 and 21 is');
+    ok(counted(3, 'stripes.noun') === '3 полосы', 'counted() does not join the count to its noun');
+  });
+  withLang('he', () => ok(plural(1, 'stripes.noun') === 'פס' && plural(3, 'stripes.noun') === 'פסים',
+     'Hebrew plural is wrong'));
+  withLang('en', () => ok(plural(1, 'stripes.noun') === 'strip' && plural(2, 'stripes.noun') === 'strips',
+     'English plural is wrong'));
+
+  /* ── which language a stranger arrives in ─────────────────────
+     ⚠ ENGLISH IS NEVER CHOSEN FOR ANYBODY, and that is the decision this
+     block defends. `en-US` is the world's factory default and a very large
+     share of phones sold in Israel report it while their owner reads only
+     Hebrew; acting on it would open an English page for a big fraction of a
+     Hebrew business's actual customers. Nobody's browser says Russian by
+     accident, so that one IS acted on. See `js/copy.js`. */
+  const nav = tags => ({ languages: tags });
+  const cases = [
+    ['?lang=ru', null, 'ru', 'an explicit ?lang= must win'],
+    ['?lang=xx', nav(['he']), 'he', 'an unknown ?lang= must not be honoured'],
+    ['', nav(['en-US', 'en']), 'he', 'a browser saying en-US gets HEBREW — see above'],
+    ['', nav(['en-GB']), 'he', 'no dialect of English is auto-selected'],
+    ['', nav(['ru-RU']), 'ru', 'a browser saying Russian was set to Russian on purpose'],
+    ['', nav(['en-US', 'ru']), 'ru', 'English is skipped over, not treated as a match'],
+    ['', nav(['he-IL']), 'he', 'Hebrew stays Hebrew'],
+    ['', nav(['iw']), 'he', 'the retired ISO code for Hebrew still means Hebrew'],
+    ['', nav(['fr-FR']), 'he', 'a language we do not have falls back to Hebrew'],
+    ['', nav([]), 'he', 'a browser that names nothing gets Hebrew'],
+    ['', null, 'he', 'no navigator at all must not throw'],
+  ];
+  for (const [search, n, want, why] of cases) {
+    const got = copy.pickLang(search, n);
+    ok(got === want, `pickLang("${search}", ${JSON.stringify(n)}) = ${got}, want ${want} — ${why}`);
+  }
+
+  /* ═══ A PRICE HAS ONE SHAPE ══════════════════════════════════════
+     ⚠ THIS IS THE BUG THIS BLOCK EXISTS FOR, AND IT SHIPPED. `formatAgorot`
+     was `Intl.NumberFormat('he-IL', {style:'currency'})` under a comment
+     promising the figure could never change shape between languages, because
+     the LOCALE was pinned. It changed anyway: `Intl` wraps the shekel in
+     U+200F RIGHT-TO-LEFT MARKs, and the bidi algorithm then places the symbol
+     at paint time by the direction of the paragraph. `₪ 3,150` in Hebrew and
+     `3,150₪` on the English page — the same door, two prices, decided by a
+     stylesheet. Found by opening the page and looking at a size tile.
+
+     Asserted at the cause rather than at the symptom: a formatted price
+     contains NO bidi control characters at all, so there is nothing for the
+     algorithm to act on. `npm run audit` measures the glyphs' real left-to-
+     right order in all three languages, which is the symptom. */
+  const BIDI = /[\u200E\u200F\u061C\u202A-\u202E\u2066-\u2069]/;
+  for (const a of [0, 15000, 315000, -5000, 490000]) {
+    ok(!BIDI.test(formatAgorot(a)),
+       `formatAgorot(${a}) = ${JSON.stringify(formatAgorot(a))} carries a bidi control `
+     + 'character — the shekel sign will move to the other side of the digits on an '
+     + 'LTR page, and the same door will show two different prices');
+    ok(formatAgorot(a).indexOf('\u20AA') === (a < 0 ? 1 : 0),
+       `formatAgorot(${a}) does not open with the shekel sign: ${formatAgorot(a)}`);
+  }
+  for (const id of ['en', 'ru'])
+    ok(withLang(id, () => formatAgorot(315000)) === withLang('he', () => formatAgorot(315000)),
+       `the price string differs between ${id} and Hebrew`);
+
+  /* ═══ THE HINGE TRAP — PLAN.md §6.1 ═══════════════════════════════
+     ⚠ THE INTERFACE MIRRORS AND THE DOOR MUST NOT. Hebrew puts `dir="rtl"`
+     on `<html>`; a drawing that flipped with it would show one hinge side
+     while Peretz built the other, and the customer would find out when the
+     door arrived. This project has already shipped the mirror of this bug
+     once (ASK-PERETZ.md §1) and every instrument called it green, because a
+     mirrored door is a perfectly plausible door.
+
+     Asserted at the strongest level available to a string test: the SVG is
+     BYTE-IDENTICAL in all three languages except for its `aria-label`, which
+     is the one thing in it that is words. Not "the cylinder is on the right"
+     — that would pass a drawing which had mirrored twice, or which had moved
+     something else. `npm run audit` measures the rendered geometry in a real
+     browser as well; this catches it in half a second on every commit. */
+  const strip = svg => svg.replace(/aria-label="[^"]*"/, 'aria-label=""');
+  for (const door of [base, { ...base, handing: 'left-in', window: 'rect', detail: 'panel' }]) {
+    const he = withLang('he', () => strip(render(door)));
+    for (const id of ['en', 'ru'])
+      ok(withLang(id, () => strip(render(door))) === he,
+         `the drawing is not byte-identical in ${id} — SOMETHING IN THE DOOR MOVED `
+       + 'WITH THE LANGUAGE. See PLAN.md §6.1: the hinge is a fact about a physical '
+       + 'object and must never depend on which language the page is in');
+  }
+  /* And the accessible name DOES change, or the door is silent to a screen
+     reader in two of the three languages. The check above would pass a
+     `describe()` that had been frozen in Hebrew. */
+  for (const id of ['en', 'ru'])
+    ok(withLang(id, () => render(base)) !== withLang('he', () => render(base)),
+       `the drawing's accessible name is identical in ${id} and Hebrew — describe() is frozen`);
+
+  /* ═══ THE ORDER IS ALWAYS HEBREW ══════════════════════════════════
+     PLAN.md §0: an order Peretz can act on without a clarifying question.
+     He reads Hebrew. Every other reader on the page follows the customer;
+     this one does not, and that has to be asserted rather than remembered. */
+  const heLines = withLang('he', () => specLines(base)).join('\n');
+  for (const id of ['en', 'ru'])
+    ok(withLang(id, () => specLines(base)).join('\n') === heLines,
+       `specLines() came out in ${id} — the WhatsApp order would reach Peretz in a `
+     + 'language he would have to translate before he could price it');
+  for (const id of ['en', 'ru'])
+    ok(!/[A-Za-z\u0400-\u04FF]{4,}/.test(withLang(id, () => message(base))
+         .replace(/https?:\/\/\S+/g, '').replace(/DM-\S+/g, '')),
+       `message() in ${id} carries Latin or Cyrillic words outside its link and code`);
+
+  /* ⚠ AND THE CUSTOMER'S LANGUAGE IS REPORTED, because he is about to ring
+     them back and nothing else in the message says which language to use. */
+  ok(!withLang('he', () => message(base)).includes('בעמוד'),
+     'the Hebrew order carries a note about the page language — noise on every order');
+  for (const id of ['en', 'ru'])
+    ok(withLang(id, () => message(base)).includes(copy.CUSTOMER_LANG_NOTE[id]),
+       `an order built in ${id} does not tell Peretz which language to answer in`);
+
+  /* ── the markup and the copy cannot drift ─────────────────────── */
+  checkStaticCopy(copy);
+}
+
+/**
+ * Every `data-t` in `index.html` names a key that exists, and the Hebrew the
+ * markup ships with is the Hebrew `copy.js` holds.
+ *
+ * ⚠ THE MARKUP KEEPS ITS HEBREW ON PURPOSE — see `translateStatic` in
+ * `js/app.js`. It is the no-JS fallback, and this page has a tested one. That
+ * makes every one of these strings a second copy, which is exactly the
+ * situation CLAUDE.md §5 says somebody will change one half of. This is what
+ * stops them.
+ */
+function checkStaticCopy({ T, UI, withLang }) {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const seen = [];
+  for (const m of html.matchAll(/data-t="([^"]+)"[^>]*>([^<]*)</g)) seen.push([m[1], m[2].trim()]);
+  /* `<title data-t=…>` and the attribute form are matched separately: one has
+     its text before the attribute, the other has no text at all. */
+  for (const m of html.matchAll(/<title data-t="([^"]+)">([^<]*)</g)) seen.push([m[1], m[2].trim()]);
+  for (const m of html.matchAll(/data-ta="([^"]+)"/g))
+    for (const pair of m[1].split(','))
+      seen.push([pair.split('=')[1].trim(), null]);
+
+  ok(seen.length > 35,
+     `only ${seen.length} translated strings found in index.html — the markup scan `
+   + 'is matching nothing, which would make every assertion below vacuous');
+
+  withLang('he', () => {
+    for (const [key, text] of seen) {
+      ok(UI[key], `index.html names data-t="${key}" and js/copy.js has no such key`);
+      if (text !== null && UI[key])
+        ok(text === T(key),
+           `index.html ships "${text}" for '${key}' and copy.js holds "${T(key)}" — the `
+         + 'no-JS fallback and the translated page would say different things');
+    }
+  });
 }
 
 /* ⚠ TWO RESOLVERS, ONE ORDER. `byId` in the catalogue tries ids first and
@@ -2425,9 +2630,16 @@ group('ironwork is counted, and the drawing agrees with the bill');
       const line = message(st).split('\n').find(l => l.startsWith('סורג'));
       ok(line && line.includes(`(${n} יחידות)`),
          `${size}/${w.id}: charged for ${n} panels and the message says "${line}"`);
+      /* ⚠ `panel.at`, AND EXPLICITLY IN HEBREW. The field was `inHe` when
+         there was only one language to be in; it is a `{he,en,ru}` triple
+         now. `message()` is Hebrew whatever the customer chose (see
+         `specLines`), so the Hebrew is what this line has to contain — asking
+         for `L(panel.at)` in the ambient language would pass by accident
+         today and fail the first time a test above it switches language. */
       for (const panel of glazedPanels(st)) {
-        ok(line.includes(panel.inHe),
-           `${size}/${w.id}: ironwork goes ${panel.inHe} and the message never says so`);
+        const at = withLang('he', () => L(panel.at));
+        ok(line.includes(at),
+           `${size}/${w.id}: ironwork goes ${at} and the message never says so`);
       }
     }
   }
@@ -2744,6 +2956,8 @@ group('and the opening is spelled out, so it cannot be read the wrong way round'
      !== handingWords({ ...base, handing: 'right-in' }),
      'both handings produce the same sentence');
 }
+
+await checkLanguages();
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

@@ -42,9 +42,10 @@ import {
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
-import { canSharePicture, copyMessage, DRAWING_CAVEAT, fallbackWhatsappUrl, GRIP_ILLUSTRATIVE,
-         gripAddendum, gripDeparture, PHONE_DISPLAY, PHONE_TEL, PRICE_CAVEAT,
-         PRICE_INCLUDES, sendDoor, whatsappUrl } from './share.js';
+import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl, gripIllustrative,
+         gripAddendum, gripDeparture, PHONE_DISPLAY, PHONE_TEL, priceCaveat,
+         priceIncludes, sendDoor, whatsappUrl } from './share.js';
+import { counted, L, LANGS, lang, pickLang, setLang, T, withLang } from './copy.js';
 import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
 import { WORKS } from './works.js';
 
@@ -65,25 +66,34 @@ let state = { ...DEFAULTS };
  * were withdrawn at the owner's instruction — they are not things his
  * customers order — and everything that made them work went with them.
  */
+/* ⚠ EVERY `title` AND `hint` BELOW IS A COPY KEY, NOT A SENTENCE — and so is
+   every `title`/`sub`/`lede` in `SECTIONS`. This array is a module-level
+   constant: written as `T('g.colour')` its values would be resolved ONCE, at
+   import, before `setLang` has read the customer's language, and the whole
+   interface would be frozen in whichever language the bundle happened to load
+   in. Nothing would throw. The page would look right. `js/rules.js` carries
+   the same note over `SAID`, because it is the same trap and this file walked
+   into it twice. The readers call `T()` at render time — `markSteps`,
+   `buildSection`, `buildGroup`. */
 const GROUPS = [
   /* `label` and `meta` used to sit here and nothing read either of them; `meta`
      also spelled the chart code "RAL", which it is not — see `colourCode`. */
-  { key: 'colour', title: 'צבע', in: 'colour', kind: 'swatch', list: () => COLOURS },
+  { key: 'colour', title: 'g.colour', in: 'colour', kind: 'swatch', list: () => COLOURS },
 
-  { key: 'detail', title: 'עיצוב החזית', in: 'face', kind: 'tile', list: () => DETAILS,
+  { key: 'detail', title: 'g.detail', in: 'face', kind: 'tile', list: () => DETAILS,
     glyph: detailGlyph, subs: DETAIL_SUBS },
 
-  { key: 'window', title: 'חלון', in: 'glass', kind: 'tile', list: () => WINDOWS,
+  { key: 'window', title: 'g.window', in: 'glass', kind: 'tile', list: () => WINDOWS,
     glyph: windowGlyph },
 
-  { key: 'grille', title: 'עיצוב החלון', in: 'glass', kind: 'sq', list: () => GRILLES,
+  { key: 'grille', title: 'g.grille', in: 'glass', kind: 'sq', list: () => GRILLES,
     glyph: grilleGlyph },
 
-  { key: 'handle', title: 'ידית משיכה', in: 'grip', kind: 'hw', list: () => HANDLES,
-    glyph: handleGlyph, hint: 'הידית האנכית. אפשר גם בלעדיה.' },
+  { key: 'handle', title: 'g.handle', in: 'grip', kind: 'hw', list: () => HANDLES,
+    glyph: handleGlyph, hint: 'g.handle.h' },
 
-  { key: 'lockset', title: 'מנעול וידית', in: 'lock', kind: 'hw', list: () => LOCKSETS,
-    glyph: locksetGlyph, hint: 'הידית שמסובבים והצילינדר. יש בכל דלת.' },
+  { key: 'lockset', title: 'g.lockset', in: 'lock', kind: 'hw', list: () => LOCKSETS,
+    glyph: locksetGlyph, hint: 'g.lockset.h' },
 
   /* ⚠ A NEW AXIS, AND ITS OWN GROUP RATHER THAN TWO MORE LOCKSET TILES.
      A lockset is the furniture on the outside face and there is exactly one of
@@ -91,19 +101,19 @@ const GROUPS = [
      lever, a smart lock and a keypad at once and Peretz prices all three
      independently. Putting them in `LOCKSETS` would have made three products
      mutually exclusive that are not. */
-  { key: 'speciallock', title: 'מנעול מיוחד', in: 'lock', kind: 'hw',
+  { key: 'speciallock', title: 'g.speciallock', in: 'lock', kind: 'hw',
     list: () => SPECIAL_LOCKS, glyph: specialLockGlyph,
-    hint: 'נעילה נוספת מעבר למנעול הרגיל.' },
+    hint: 'g.speciallock.h' },
 
   /* ⚠ THE FINISH OF THE LOCK FURNITURE, AND NOT OF THE PULL HANDLE. Peretz was
      explicit that פרזול recolours the ידית, the צירים, the עינית and the
      סגר ביטחון and NOT the pull handle or the stripes — which is also the bug
      he reported in the same sentence. A pull bar's finish is a fact about that
      product (Ella is brass); this is a choice, and it is ₪0 to ₪900. */
-  { key: 'pirzul', title: 'פרזול', in: 'pz', kind: 'hw', list: () => PIRZUL,
-    glyph: pirzulGlyph, hint: 'הגוון של הידית, הצירים והעינית.' },
+  { key: 'pirzul', title: 'g.pirzul', in: 'pz', kind: 'hw', list: () => PIRZUL,
+    glyph: pirzulGlyph, hint: 'g.pirzul.h' },
 
-  { key: 'size', title: 'מידה', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
+  { key: 'size', title: 'g.size', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
     /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was
        the reason the narrow door read "כלול" and then took ₪100 off: it is a
        difference from a FIXED baseline, clamped at zero by the label. Prices
@@ -112,19 +122,19 @@ const GROUPS = [
        what it costs relative to a door nobody is looking at, and no group
        needs its own idea of what a price is. */
     glyph: sizeGlyph,
-    hint: 'נמדוד אצלכם במדויק — בחינם.' },
+    hint: 'g.size.h' },
 
   /* ⚠ THE FRAME, ASKED FOR BY NAME FROM OUTSIDE. It was always drawn and never
      choosable, and it is ₪500 to ₪1,000 of a ₪3,150 door — too much money to
      leave as a fact about the picture. It sits in `fit` beside the size and the
      opening direction because all three are facts about the HOLE IN THE WALL
      rather than about the door, which is the one thing a fitter asks first. */
-  { key: 'mashkof', title: 'משקוף', in: 'mk', kind: 'hw', list: () => MASHKOFS,
+  { key: 'mashkof', title: 'g.mashkof', in: 'mk', kind: 'hw', list: () => MASHKOFS,
     glyph: mashkofGlyph,
-    hint: 'המסגרת שהדלת נסגרת עליה. נמדוד את הקיר אצלכם.' },
+    hint: 'g.mashkof.h' },
 
-  { key: 'handing', title: 'כיוון פתיחה', in: 'fit', kind: 'pill', list: () => HANDINGS,
-    hint: 'לא בטוחים? נבדוק יחד במדידה.' },
+  { key: 'handing', title: 'g.handing', in: 'fit', kind: 'pill', list: () => HANDINGS,
+    hint: 'g.handing.h' },
 ];
 
 /**
@@ -165,23 +175,14 @@ const GROUPS = [
    BANDS stay empty — `ASK-PERETZ.md` §8: overlapping bands make a customer
    choose wrong and feel certain about it. */
 const SECTIONS = [
-  { key: 'fit',    title: 'מבנה הדלת',  sub: 'גודל הדלת וכיוון הפתיחה',
-    lede: 'הגודל והצד שאליו הדלת נפתחת. נמדוד אצלכם במדויק, בחינם.' },
-  { key: 'mk',     title: 'משקוף',       sub: 'המסגרת שהדלת נסגרת עליה',
-    lede: 'המשקוף הוא המסגרת שהדלת נסגרת עליה. רוחב או עומק גדולים יותר '
-        + 'מתאימים לקירות עבים, ועולים יותר.' },
-  { key: 'colour', title: 'צבע',         sub: 'גוון הדלת',
-    lede: 'צבע בתנור, מלוח הגוונים של היצרן. כל הגוונים באותו מחיר.' },
-  { key: 'face',   title: 'עיצוב החזית', sub: 'פאנלים או פסי מתכת',
-    lede: 'מה יש על פני הדלת — פאנלים מוגבהים, או פסי מתכת. אפשר גם חלק לגמרי.' },
-  { key: 'glass',  title: 'חלון',        sub: 'חלון ועיצוב הזכוכית',
-    lede: 'חלון בכנף, ומה נמצא בתוכו — סורג או זכוכית מעוצבת.' },
-  { key: 'grip',   title: 'ידית משיכה',  sub: 'הידית האנכית ואורכה',
-    lede: 'הידית שמושכים בה. אפשר גם בלעדיה, והאורך נתון לבחירתכם.' },
-  { key: 'lock',   title: 'מנעול',       sub: 'הידית המסתובבת ונעילה נוספת',
-    lede: 'הידית שמסובבים והצילינדר — יש בכל דלת. אפשר להוסיף כספת או קודן.' },
-  { key: 'pz',     title: 'פרזול',       sub: 'גוון הידית והצירים',
-    lede: 'הגוון של הידית, הצירים והעינית. לא משנה את גוון ידית המשיכה.' },
+  { key: 'fit',    title: 'step.fit.t',    sub: 'step.fit.s',    lede: 'step.fit.l' },
+  { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l' },
+  { key: 'colour', title: 'step.colour.t', sub: 'step.colour.s', lede: 'step.colour.l' },
+  { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l' },
+  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l' },
+  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l' },
+  { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l' },
+  { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l' },
 ];
 
 /**
@@ -196,7 +197,7 @@ const SECTIONS = [
  * everything else in this file that walks the list would have to special-case
  * it. The navigator appends it by hand for the same reason.
  */
-const SUMMARY = { key: 'sum', title: 'סיכום', sub: 'הדלת שלכם, והמחיר' };
+const SUMMARY = { key: 'sum', title: 'step.sum.t', sub: 'step.sum.s', lede: 'step.sum.l' };
 
 /**
  * One line glyph per section, for the navigator's circles.
@@ -306,9 +307,88 @@ const specIcon = key => (Object.prototype.hasOwnProperty.call(SPEC_ICON, key)
 const groupsIn = key => GROUPS.filter(g => g.in === key);
 const sectionOf = key => (GROUPS.find(g => g.key === key) || {}).in;
 
+// ── language ──────────────────────────────────────────────────────
+
+/**
+ * Translate the markup that `index.html` ships with.
+ *
+ * ⚠ THE HEBREW STAYS IN THE MARKUP AND `PLAN.md` §6 SAID IT SHOULD NOT
+ * ("no string is ever written in markup"). That rule exists so no string has
+ * only one language, and `data-t` satisfies it — every one of these elements
+ * names its key, and `npm test` walks them and fails on a key `UI` does not
+ * have. What the rule cannot ask for is an EMPTY page when the bundle does
+ * not load, and this page has a tested, shipped no-JS path: the down-strip,
+ * `FALLBACK_TEXT`, and a whole degraded stylesheet built for exactly that
+ * case. A customer whose JavaScript failed gets a Hebrew page that works
+ * rather than a frame of blank spans.
+ *
+ * So: Hebrew in the markup is the FALLBACK, the key beside it is the truth,
+ * and this function reconciles them the moment the bundle runs.
+ *
+ *   data-t="key"                → the element's text
+ *   data-ta="aria-label=key"    → an attribute; comma-separated for several
+ */
+function translateStatic(root = document) {
+  for (const el of root.querySelectorAll('[data-t]')) el.textContent = T(el.dataset.t);
+  for (const el of root.querySelectorAll('[data-ta]')) {
+    for (const pair of el.dataset.ta.split(',')) {
+      const [attr, key] = pair.split('=');
+      if (attr && key) el.setAttribute(attr.trim(), T(key.trim()));
+    }
+  }
+  /* `<title data-t>` is handled by the loop above — it is an element with
+     text — but the tab only updates from `document.title`, so say it twice on
+     purpose. */
+  document.title = T('doc.title');
+}
+
+/**
+ * The three buttons, each naming its language in its own script.
+ *
+ * ⚠ CHANGING LANGUAGE REBUILDS THE PANEL AND REPAINTS — it does not reload.
+ * A reload would work and would be worse: it throws away the door. Every
+ * string on this page is produced by a function that reads `T()`/`L()` at
+ * call time (that is the whole reason `GROUPS`, `SECTIONS` and `SAID` hold
+ * keys rather than sentences), so a rebuild is enough and the customer keeps
+ * the door they were halfway through building.
+ */
+function buildLangs() {
+  const host = $('#langs');
+  if (!host) return;
+  host.replaceChildren(...LANGS.map(l => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'lang' + (l.id === lang() ? ' is-on' : '');
+    b.lang = l.id;
+    b.textContent = l.name;
+    b.setAttribute('aria-pressed', String(l.id === lang()));
+    b.addEventListener('click', () => {
+      if (l.id === lang()) return;
+      setLang(l.id);
+      const live = liveStep;
+      translateStatic();
+      buildLangs();
+      buildPanel();
+      goStep(live);
+      paint();
+    });
+    return b;
+  }));
+}
+
 // ── boot ──────────────────────────────────────────────────────────
 
 function init() {
+  /* ⚠ FIRST, BEFORE ANYTHING READS A STRING. `fromQuery` repairs an
+     unbuildable link and produces a sentence saying what it did; `buildPanel`
+     writes every heading. Both call `T()`. Resolving the language after them
+     would show the first customer of every session one Hebrew toast on an
+     English page — and it would be intermittent, because it only happens on
+     links that need repairing. */
+  setLang(pickLang(window.location.search));
+  translateStatic();
+  buildLangs();
+
   const { state: parsed, notice, said } = fromQuery(window.location.search);
   state = parsed;
 
@@ -319,7 +399,7 @@ function init() {
   $('#copy-btn').addEventListener('click', onCopy);
   $('#grip-rot').addEventListener('click', () => {
     if (!gripCanRotate(state)) {
-      toast('הידית הזו ארוכה מרוחב הדלת — אפשר לסובב רק ידית שנכנסת בין המזוזות');
+      toast(T('grip.tooLong'));
       return;
     }
     const now = gripAt(state);
@@ -330,7 +410,7 @@ function init() {
   /* Written in from `share.js`, not typed into index.html — one promise,
      one wording, and the order carries the same sentence. See
      DRAWING_CAVEAT. */
-  $('#draw-caveat').textContent = DRAWING_CAVEAT;
+  $('#draw-caveat').textContent = drawingCaveat();
   $('#save-btn').addEventListener('click', saveCurrent);
 
   /* The price opens its own breakdown. `hidden` and `aria-expanded` move
@@ -441,7 +521,14 @@ function init() {
        paint (a screen reader with CSS disabled, a "save as" copy). Nothing
        past this point reads `.layout` in sheet mode: `paint()` above already
        built it once and nothing rebuilds it, since the sheet does not
-       respond to clicks. */
+       respond to clicks.
+
+       ⚠ THAT LAST SENTENCE WAS FALSE AND COST TWO UNCAUGHT ERRORS ON EVERY
+       SHEET LOAD. `goStep`, which `init` calls after this, and the
+       `ResizeObserver` registered above it both reach `fitStage`, which read
+       `$('#stage').querySelector` — and the stage is inside `.layout`.
+       `fitStage` returns early on a missing stage now, and the audit's sheet
+       route watches for `pageerror`, which is what would have caught it. */
     $('.layout')?.remove();
     buildSheet();
     /* ⚠ AND THE NOTICE FOLLOWS IT ONTO THE PAGE. The sheet hides `.strip`, so
@@ -469,9 +556,22 @@ function init() {
      link is not designing a door, they are LOOKING at one — Peretz most of
      all. The flow is behind the summary's own "ערכו את הדלת" button.
      A bare load starts at step 01, which is where a customer starts. */
-  const shared = GROUPS.some(g => state[g.key] !== DEFAULTS[g.key])
-              || state.stripeDir !== DEFAULTS.stripeDir;
-  goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
+  /* ⚠ AND NOT AT ALL ON THE SHEET, WHICH IS THE ROOT OF THE TWO UNCAUGHT
+     ERRORS THAT ROUTE HAS BEEN THROWING. The sheet removed `.layout` a few
+     lines above — deliberately, so the printed page has one `<h1>` — and
+     `goStep` then walked into a flow that is no longer in the document:
+     `fitStage` read `$('#stage').querySelector`, `paint` set
+     `$('#stage').innerHTML`.
+     The guard belongs HERE rather than as a null check in each of them. A
+     sheet is a DOCUMENT: it has no steps, nothing on it responds to anything,
+     and "which step is the customer on" is not a question it has. Guarding the
+     callers one at a time would answer that question with `null` four times
+     over and leave the fifth for whoever adds it. */
+  if (!document.documentElement.classList.contains('is-sheet')) {
+    const shared = GROUPS.some(g => state[g.key] !== DEFAULTS[g.key])
+                || state.stripeDir !== DEFAULTS.stripeDir;
+    goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
+  }
 
   /* ⚠ M1: THE DOOR ASSEMBLES, ONCE. `is-arriving` is on `<html>` for one
      animation's length and then removed, so nothing else in the session
@@ -553,7 +653,7 @@ function buildWorks() {
     b.setAttribute('aria-label', describe(st));
     b.innerHTML = '<span class="work__art" aria-hidden="true"></span>'
       + '<span class="work__meta">'
-      + `<span class="work__name">${byId(COLOURS, st.colour).he}</span>`
+      + `<span class="work__name">${L(byId(COLOURS, st.colour))}</span>`
       + `<span class="work__price">${formatAgorot(priceAgorot(st))}</span>`
       + '</span>';
     /* ⚠ THE PRICE IS COMPUTED, NOT CARRIED. `js/works.js` deliberately holds no
@@ -569,7 +669,7 @@ function buildWorks() {
          one. */
       set({ ...DEFAULTS, ...w.state, grip: null });
       closeWorks();
-      toast('טענו את הדלת. אפשר לשנות כל פרט.');
+      toast(T('saved.loaded'));
     });
     grid.appendChild(b);
   }
@@ -634,9 +734,28 @@ function buildSheet() {
 
   const sz = SIZES[state.size] || SIZES.standard;
 
-  const rows = specRows(state).map(r =>
+  /* ⚠ THE SHEET IS THE ONE DOCUMENT WITH TWO READERS, AND IT CARRIES BOTH
+     LANGUAGES. Everything else on this page follows the customer and the
+     WhatsApp message is always Hebrew (see `specLines`), because each has one
+     audience. This has two, and the arguments pull opposite ways:
+
+       — the CUSTOMER proof-reads it. `css/app.css` says so where it caps the
+         drawing on a phone: "a sheet that cannot be proof-read on the device
+         it was sent to is a sheet nobody checks before ordering from it".
+       — PERETZ ORDERS FROM IT. `PLAN.md` §0: without a clarifying question.
+         A sheet reading "Кованая решётка · Полуторная" is a phone call.
+
+     Picking one reader loses the other, so it prints the customer's language
+     and, under each value, the Hebrew. Two calls of one pure function rather
+     than a second row-builder — `specRows` is the only statement of what is
+     in a door and it stays that way. Skipped entirely when the customer is
+     already reading Hebrew, so the ordinary sheet is unchanged. */
+  const he = lang() === 'he' ? null : withLang('he', () => specRows(state));
+  const rows = specRows(state).map((r, i) =>
     `<div class="sheet__row"><span class="sheet__k">${r.label}</span>`
-    + `<span class="sheet__v">${r.value}</span>`
+    + `<span class="sheet__v">${r.value}`
+    + (he ? `<small class="sheet__he" dir="rtl">${he[i].label}: ${he[i].value}</small>` : '')
+    + '</span>'
     + (r.hex ? `<span class="sheet__chip" style="--chip:${r.hex}"></span>` : '')
     + '</div>').join('');
 
@@ -655,14 +774,14 @@ function buildSheet() {
               which is where the page's only <h1> lives, so the printed
               document had no heading at all — and a screen reader opening a
               shared sheet URL got a page with nothing to navigate by. */''}
-        <h1 class="sheet__brand">דלתות מגן</h1>
-        <div class="sheet__sub">ראשון לציון · ${PHONE_DISPLAY}</div>
+        <h1 class="sheet__brand">${T('brand.name')}</h1>
+        <div class="sheet__sub">${T('brand.city')} · ${PHONE_DISPLAY}</div>
       </div>
       ${/* ⚠ `direction: ltr` BELONGS ON THE CODE, NOT ON THE ROW. It was on
             the whole element, so the Hebrew label came out after the digits:
             the sheet printed `DM-P4040481 :קוד`. The code itself is Latin and
             must stay LTR; the label around it is Hebrew and must not. */''}
-      <div class="sheet__code">קוד: <b dir="ltr">${encodeCode(state)}</b></div>
+      <div class="sheet__code">${T('send.code')} <b dir="ltr">${encodeCode(state)}</b></div>
     </header>
 
     <div class="sheet__body">
@@ -679,37 +798,49 @@ function buildSheet() {
                 not the 1,350 this line printed. Nobody has confirmed which
                 number Peretz orders by, so the sheet stops inventing one and
                 prints what the catalogue actually holds. ASK-PERETZ.md §12. */''}
-          ${sz.w} × ${sz.h} מ״מ · ${sz.he}${sz.side ? ` · חלון צד ${sz.side} מ״מ` : ''}
-          <small>מידות קטלוג — הפתח נמדד באתר הלקוח</small>
+          ${sz.w} × ${sz.h} ${T('unit.mm')} · ${L(sz)}${sz.side ? ` · ${T('sheet.sidelight', sz.side)}` : ''}
+          <small>${T('sheet.dims')}</small>
         </figcaption>
       </figure>
 
       <div class="sheet__spec">
         ${rows}
         <div class="sheet__row sheet__row--wide">
-          <span class="sheet__k">כיוון</span>
-          <span class="sheet__v">${handingWords(state)}</span>
+          <span class="sheet__k">${T('sheet.handing')}</span>
+          <span class="sheet__v">${handingWords(state)}${he
+            ? `<small class="sheet__he" dir="rtl">${withLang('he', () => handingWords(state))}</small>`
+            : ''}</span>
         </div>
-        ${grip.map(g => '<div class="sheet__row sheet__row--wide">'
-          + '<span class="sheet__k">ידית</span>'
-          + `<span class="sheet__v">${g}</span></div>`).join('')}
+        ${/* The grip notes are Peretz's instructions — drill across the leaf,
+              the customer moved it on purpose — so the Hebrew is the one that
+              matters and the customer's language is the gloss. Same shape as
+              the rows above, computed the same way. */''}
+        ${(() => {
+          const gripHe = he ? withLang('he', () => gripAddendum(state)) : null;
+          return grip.map((g, i) => '<div class="sheet__row sheet__row--wide">'
+            + `<span class="sheet__k">${T('sheet.grip')}</span>`
+            + `<span class="sheet__v">${g}`
+            + (gripHe ? `<small class="sheet__he" dir="rtl">${gripHe[i]}</small>` : '')
+            + '</span></div>').join('');
+        })()}
         <div class="sheet__row sheet__row--wide">
-          <span class="sheet__k">מחיר משוער</span>
+          <span class="sheet__k">${T('price.est')}</span>
           <span class="sheet__v"><b>${formatAgorot(priceAgorot(state))}</b>
-            <small>${PRICE_INCLUDES}</small></span>
+            <small>${priceIncludes()}</small>${he
+              ? `<small class="sheet__he" dir="rtl">${withLang('he', priceIncludes)}</small>` : ''}</span>
         </div>
       </div>
     </div>
 
     <footer class="sheet__foot">
-      ${PRICE_CAVEAT}
+      ${priceCaveat()}${he ? `<span class="sheet__he" dir="rtl">${withLang('he', priceCaveat)}</span>` : ''}
       ${/* ⚠ THE SHEET HID THE TWO STRIPS THAT SAY THE PRICE IS INVENTED AND
             THE DOOR WAS SUBSTITUTED. `.is-sheet` hides `.strip`, so a sheet
             built from a placeholder catalogue printed a confident number with
             no warning, and a link the rules had to repair printed a door
             nobody chose with no notice. Both belong on a document somebody
             orders from more than they belong on the screen. */''}
-      ${PLACEHOLDER ? '<b class="sheet__warn">גרסת פיתוח — המחירים כאן הם דוגמה בלבד.</b>' : ''}
+      ${PLACEHOLDER ? `<b class="sheet__warn">${T('sheet.dev')}</b>` : ''}
       <span class="sheet__note" id="sheet-notice" hidden></span>
     </footer>`;
 }
@@ -723,8 +854,8 @@ function buildPanel() {
   opener.type = 'button';
   opener.className = 'works-open';
   opener.id = 'works-btn';
-  opener.innerHTML = '<span class="works-open__t">התחילו מדלת שכבר התקנו</span>'
-    + `<span class="works-open__n">${WORKS.length} דלתות אמיתיות</span>`;
+  opener.innerHTML = `<span class="works-open__t">${T('works.open')}</span>`
+    + `<span class="works-open__n">${T('works.count', WORKS.length)}</span>`;
   opener.addEventListener('click', openWorks);
   wrap.appendChild(opener);
 
@@ -756,7 +887,7 @@ function buildPanel() {
      being the summary; tap any of them at any time. */
   const nav = document.createElement('nav');
   nav.className = 'steps';
-  nav.setAttribute('aria-label', 'מעבר בין שלבי הבחירה');
+  nav.setAttribute('aria-label', T('nav.steps'));
   for (const sec of [...SECTIONS, SUMMARY]) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -764,11 +895,11 @@ function buildPanel() {
     b.dataset.step = sec.key;
     b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`
                 + `<span class="steps__l"><span class="steps__n" aria-hidden="true"></span>`
-                + `<span class="steps__t">${sec.title}</span></span>`;
+                + `<span class="steps__t">${T(sec.title)}</span></span>`;
     /* ⚠ THE NAME, EXPLICITLY. Below 1100 px `.steps__t` is `display: none` and
        the number comes from `.steps__n::before`, which is `aria-hidden` — so
        without this the button measures `{role: "button", name: ""}`. */
-    b.setAttribute('aria-label', sec.title);
+    b.setAttribute('aria-label', T(sec.title));
     b.addEventListener('click', () => goStep(sec.key));
     nav.appendChild(b);
   }
@@ -795,8 +926,8 @@ function buildPanel() {
     box.hidden = true;
     box.innerHTML = `
       <p class="sect__where"><span data-step-n></span></p>
-      <h2 class="sect__title" id="sect-head-${sec.key}" tabindex="-1">${sec.title}</h2>
-      ${sec.lede ? `<p class="sect__lede">${sec.lede}</p>` : ''}
+      <h2 class="sect__title" id="sect-head-${sec.key}" tabindex="-1">${T(sec.title)}</h2>
+      ${sec.lede ? `<p class="sect__lede">${T(sec.lede)}</p>` : ''}
       <div class="sect__body" id="sect-body-${sec.key}"></div>`;
     wrap.appendChild(box);
 
@@ -809,10 +940,10 @@ function buildPanel() {
          nothing folds — and a `<button>` that toggles nothing is a control
          that lies to a screen reader about being interactive. */
       field.innerHTML = `
-        <h3 class="field__title" id="head-${g.key}">${g.title}</h3>
+        <h3 class="field__title" id="head-${g.key}">${T(g.title)}</h3>
         <div class="field__body" id="body-${g.key}">
           <div class="field__opts"></div>
-          ${g.hint ? `<p class="field__hint">${g.hint}</p>` : ''}
+          ${g.hint ? `<p class="field__hint">${T(g.hint)}</p>` : ''}
           <p class="field__note" data-note hidden></p>
         </div>`;
       body.appendChild(field);
@@ -823,8 +954,8 @@ function buildPanel() {
     const foot = document.createElement('div');
     foot.className = 'sect__foot';
     foot.innerHTML = `
-      <button type="button" class="btn btn--ghost sect__back">‹ הקודם</button>
-      <button type="button" class="btn sect__next">הבא ›</button>`;
+      <button type="button" class="btn btn--ghost sect__back">${T('nav.back')}</button>
+      <button type="button" class="btn sect__next">${T('nav.next')}</button>`;
     foot.querySelector('.sect__back').addEventListener('click', () => stepBy(-1));
     foot.querySelector('.sect__next').addEventListener('click', () => stepBy(1));
     box.appendChild(foot);
@@ -844,11 +975,11 @@ function buildPanel() {
   sum.hidden = true;
   sum.innerHTML = `
     <p class="sect__where"><span data-step-n></span></p>
-    <h2 class="sect__title" id="sect-head-sum" tabindex="-1">${SUMMARY.title}</h2>
-    <p class="sect__lede">בדקו שהכול נכון, ושלחו לנו את הדלת.</p>
+    <h2 class="sect__title" id="sect-head-sum" tabindex="-1">${T(SUMMARY.title)}</h2>
+    <p class="sect__lede">${T(SUMMARY.lede)}</p>
     <div class="sect__body" id="sum-slot"></div>
     <div class="sect__foot">
-      <button type="button" class="btn btn--ghost sect__back">‹ הקודם</button>
+      <button type="button" class="btn btn--ghost sect__back">${T('nav.back')}</button>
     </div>`;
   sum.querySelector('.sect__back').addEventListener('click', () => stepBy(-1));
   wrap.appendChild(sum);
@@ -908,20 +1039,12 @@ function tilePrice(g, o, state) {
  * Calling both of them "מנעול" in one column would make the breakdown look
  * like it charges twice for the same thing.
  */
-const BREAKDOWN_HE = {
-  door:     'הדלת',
-  cylinder: 'צילינדר',
-  lock:     'מנגנון נעילה',
-  mashkof:  'משקוף',
-  install:  'התקנה והובלה',
-  measure:  'מדידה וייעוץ',
-  colour:   'צבע',
-  detail:   'עיצוב החזית',
-  window:   'חלון',
-  grille:   'עיצוב החלון',
-  handle:   'ידית משיכה',
-  lockset:  'מנעול וידית',
-  round:    'עיגול',
+const BREAKDOWN_KEY = {
+  door: 'bd.door', cylinder: 'bd.cylinder', lock: 'bd.lock', mashkof: 'bd.mashkof',
+  install: 'bd.install', measure: 'bd.measure', colour: 'bd.colour',
+  detail: 'bd.detail', window: 'bd.window', grille: 'bd.grille',
+  handle: 'bd.handle', lockset: 'bd.lockset', speciallock: 'bd.speciallock',
+  pirzul: 'bd.pirzul', stripes: 'bd.stripes', round: 'bd.round',
 };
 
 /**
@@ -937,9 +1060,9 @@ function renderBreakdown(state) {
   if (!body) return;
   const rows = breakdownRows(state);
   body.innerHTML = rows.map(r =>
-      `<tr><th scope="row">${BREAKDOWN_HE[r.key] || r.key}</th>`
+      `<tr><th scope="row">${BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key}</th>`
     + `<td>${formatAgorot(r.agorot)}</td></tr>`).join('')
-    + `<tr class="bd__total"><th scope="row">סה״כ</th>`
+    + `<tr class="bd__total"><th scope="row">${T('price.total')}</th>`
     + `<td>${formatAgorot(priceAgorot(state))}</td></tr>`;
 }
 
@@ -960,8 +1083,8 @@ function repriceOptions(state) {
       const sw = b.querySelector('.swatch__meta');
       if (sw) {
         sw.textContent = `${colourCode(o)} · ${label}`;
-        b.title = `${o.he} · ${colourCode(o)}${label === priceLabel(0) ? '' : ` · ${label}`}`;
-        b.setAttribute('aria-label', `${o.he}, ${colourCode(o)}`
+        b.title = `${L(o)} · ${colourCode(o)}${label === priceLabel(0) ? '' : ` · ${label}`}`;
+        b.setAttribute('aria-label', `${L(o)}, ${colourCode(o)}`
                        + (label === priceLabel(0) ? '' : `, ${label}`));
       }
     }
@@ -970,7 +1093,7 @@ function repriceOptions(state) {
 
 function buildOptions(g, host) {
   host.setAttribute('role', 'radiogroup');
-  host.setAttribute('aria-label', g.title);
+  host.setAttribute('aria-label', T(g.title));
   host.className = 'field__opts '
     + { swatch: 'swatches', pill: 'pills', tile: 'tiles', sq: 'tiles tiles--sq', hw: 'tiles tiles--hw' }[g.kind];
 
@@ -984,7 +1107,7 @@ function buildOptions(g, host) {
      customer makes one choice. Each tile already carries its own name. */
   const groups = g.subs
     ? [[null, g.list().filter(o => !o.sub)],
-       ...g.subs.map(([k, label]) => [label, g.list().filter(o => o.sub === k)])]
+       ...g.subs.map(([k, key]) => [T(key), g.list().filter(o => o.sub === k)])]
     : [[null, g.list()]];
 
   for (const [label, items] of groups) {
@@ -1007,20 +1130,20 @@ function buildOptions(g, host) {
          accessible name and the tooltip still carry both. A circle with no
          name is a colour a blind customer cannot choose, and Peretz orders by
          the number on the manufacturer's sheet. */
-      b.title = `${o.he} · ${colourCode(o)}`;
-      b.setAttribute('aria-label', `${o.he}, ${colourCode(o)}`);
+      b.title = `${L(o)} · ${colourCode(o)}`;
+      b.setAttribute('aria-label', `${L(o)}, ${colourCode(o)}`);
       b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
-        <span class="swatch__name">${o.he}</span>
+        <span class="swatch__name">${L(o)}</span>
         <span class="swatch__meta">${colourCode(o)} · ${priceLabel(tilePrice(g, o, state))}</span>`;
     } else if (g.kind === 'pill') {
       b.className = 'pill';
-      b.textContent = o.he;
+      b.textContent = L(o);
     } else {
       b.className = 'tile';
       b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
-        <span class="tile__name">${o.he}</span>
+        <span class="tile__name">${L(o)}</span>
         ${/* ⚠ THE BAND EACH SIZE SERVES, AND IT HAS BEEN OWED SINCE 23.8.
              `ASK-PERETZ.md` §8: "the size tiles are meant to print the band each
              one serves, so a customer with an odd opening can tell which tile is
@@ -1030,7 +1153,7 @@ function buildOptions(g, host) {
              Peretz gave the real bands on 26.8 and this is that line.
              Read off `o.band`, so any option that grows one gets it for free
              and no group needs a special case. */''
-        }${o.band ? `<span class="tile__band">${o.band}</span>` : ''}
+        }${o.band ? `<span class="tile__band">${L(o.band)}</span>` : ''}
         <span class="tile__meta">${priceLabel(tilePrice(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
     }
@@ -1074,24 +1197,29 @@ function buildStripes(host) {
   const box = document.createElement('div');
   box.className = 'stripes';
   box.innerHTML = `
-    <span class="stripes__label" id="stripes-l">פסי מתכת</span>
+    <span class="stripes__label" id="stripes-l">${T('stripes.label')}</span>
     ${why ? `<p class="stripes__why">${why}</p>` : `
     <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
-      ${[['none', 'ללא'], ['h', 'אופקיים'], ['v', 'אנכיים']].map(([id, he]) => `
+      ${[['none', 'stripes.none'], ['h', 'stripes.h'], ['v', 'stripes.v']].map(([id, k]) => `
         <button type="button" class="pill${dir === id ? ' is-on' : ''}"
-                data-dir="${id}" aria-pressed="${dir === id}">${he}</button>`).join('')}
+                data-dir="${id}" aria-pressed="${dir === id}">${T(k)}</button>`).join('')}
     </div>
     ${dir === 'none' ? '' : `
       <div class="blen__row">
-        <button type="button" class="blen__b" data-n="-1" aria-label="פחות פסים"
+        <button type="button" class="blen__b" data-n="-1" aria-label="${T('stripes.fewer')}"
                 ${n <= 1 ? 'disabled' : ''}>−</button>
-        <output class="blen__v" aria-labelledby="stripes-l">${n} פסים</output>
-        <button type="button" class="blen__b" data-n="1" aria-label="עוד פסים"
+        ${/* ⚠ THROUGH `counted`, NOT `${n} ${T('stripes.noun')}`. Russian has
+              three plural forms — 1 полоса, 3 полосы, 5 полос — and 21 takes
+              the singular again while 11 does not. A count pasted beside a
+              fixed noun is right in Hebrew, right in English, and wrong in
+              Russian four times out of ten. */''}
+        <output class="blen__v" aria-labelledby="stripes-l">${counted(n, 'stripes.noun')}</output>
+        <button type="button" class="blen__b" data-n="1" aria-label="${T('stripes.more')}"
                 ${n >= max ? 'disabled' : ''}>+</button>
       </div>
       ${dir === 'h' ? `
         <button type="button" class="pill stripes__tight${state.stripeTight ? ' is-on' : ''}"
-                data-tight="1" aria-pressed="${state.stripeTight}">צפופים</button>` : ''}
+                data-tight="1" aria-pressed="${state.stripeTight}">${T('stripes.tight')}</button>` : ''}
       <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`}
     `}`;
 
@@ -1153,11 +1281,11 @@ function buildLengthStepper(host) {
   const box = document.createElement('div');
   box.className = 'blen';
   box.innerHTML = `
-    <span class="blen__label" id="blen-l">אורך הידית</span>
+    <span class="blen__label" id="blen-l">${T('len.label')}</span>
     <div class="blen__row">
-      <button type="button" class="blen__b" data-step="-1" aria-label="לקצר את הידית">−</button>
-      <output class="blen__v" aria-labelledby="blen-l">${Math.round(now / 10)} ס״מ</output>
-      <button type="button" class="blen__b" data-step="1" aria-label="להאריך את הידית">+</button>
+      <button type="button" class="blen__b" data-step="-1" aria-label="${T('len.shorter')}">−</button>
+      <output class="blen__v" aria-labelledby="blen-l">${T('len.cm', Math.round(now / 10))}</output>
+      <button type="button" class="blen__b" data-step="1" aria-label="${T('len.longer')}">+</button>
     </div>`;
   for (const b of box.querySelectorAll('.blen__b')) {
     const dir = Number(b.dataset.step);
@@ -1294,8 +1422,8 @@ function saveCurrent() {
   const q = toQuery(state);
   const list = savedRead().filter(x => x !== q);
   list.unshift(q);
-  if (!savedWrite(list)) { toast('הדפדפן הזה לא מאפשר לשמור עיצובים'); return; }
-  toast('העיצוב נשמר בדפדפן הזה');
+  if (!savedWrite(list)) { toast(T('saved.no')); return; }
+  toast(T('saved.ok'));
   paintSaved();
 }
 
@@ -1339,7 +1467,7 @@ function paintSaved() {
     const drop = document.createElement('button');
     drop.type = 'button';
     drop.className = 'saved__drop';
-    drop.setAttribute('aria-label', `הסרת ${label}`);
+    drop.setAttribute('aria-label', T('saved.remove', label));
     drop.textContent = '×';
     drop.addEventListener('click', () => {
       savedWrite(savedRead().filter(x => x !== q));
@@ -1369,7 +1497,7 @@ function markSteps() {
        a contents page is not chapter nine. */
     const where = document.querySelector(`.sect[data-section="${k}"] [data-step-n]`);
     if (where) {
-      where.textContent = k === SUMMARY.key ? SUMMARY.sub
+      where.textContent = k === SUMMARY.key ? T(SUMMARY.sub)
         : `${String(i + 1).padStart(2, '0')} ⁄ ${String(SECTIONS.length).padStart(2, '0')}`;
     }
   }
@@ -1378,7 +1506,7 @@ function markSteps() {
   for (const b of document.querySelectorAll('.sect__back')) b.disabled = i <= 0;
   for (const b of document.querySelectorAll('.sect__next')) {
     b.disabled = i >= keys.length - 1;
-    b.textContent = i === keys.length - 2 ? 'לסיכום ›' : 'הבא ›';
+    b.textContent = T(i === keys.length - 2 ? 'nav.toSummary' : 'nav.next');
   }
 }
 
@@ -1460,7 +1588,7 @@ function undo() {
   state = prev;
   guard(paint)();
   scheduleUrl();
-  toast('הצעד האחרון בוטל');
+  toast(T('undo.done'));
 }
 
 /** The URL write, debounced — shared by `set` and `undo`. It was inline in
@@ -1600,7 +1728,7 @@ function columnCount(wrap, items) {
 function nowLabel(g) {
   const list = g.list();
   const hit = list.find(o => o.id === state[g.key]) || list[0];
-  return hit ? hit.he : '';
+  return hit ? L(hit) : '';
 }
 
 /**
@@ -1805,7 +1933,7 @@ function armGrip() {
   g.classList.add('grip-live');
   g.setAttribute('tabindex', '0');
   g.setAttribute('role', 'button');
-  g.setAttribute('aria-label', 'מיקום הידית. גררו, או הזיזו עם מקשי החיצים');
+  g.setAttribute('aria-label', T('grip.aria'));
   g.addEventListener('pointerdown', onGripDown);
   g.addEventListener('keydown', onGripKey);
   /* Non-passive, so `preventDefault` is allowed to mean something. Chrome
@@ -1847,8 +1975,8 @@ function armGrip() {
   const { moved } = gripDeparture(state);
   $('#grip-home').hidden = !moved;
   $('.grip-bar__hint').textContent = moved
-    ? `מיקום הידית ${GRIP_ILLUSTRATIVE}`
-    : 'גררו את הידית למקום שתרצו';
+    ? T('grip.ariaAt', gripIllustrative())
+    : T('grip.drag');
 }
 
 /**
@@ -2005,7 +2133,7 @@ function placeGrip(want, saySo) {
      cannot be made. */
   if (!gripPlacement(state, at).ok) at = gripHome(state);
   set({ ...state, grip: at });
-  if (!fit.ok && saySo) toast(fit.why + ' — הזזנו למקום הקרוב שאפשר');
+  if (!fit.ok && saySo) toast(T('notice.moved', fit.why));
   const g = $('#stage svg [data-hw="handle"]');
   if (g) g.focus({ preventScroll: true });
 }
@@ -2078,7 +2206,22 @@ function fitStage() {
      the hardware, none of which the surrounding room touches. */
   if (document.documentElement.classList.contains('is-bare')) return;
 
+  /* ⚠ THERE MAY BE NO STAGE. The sheet route REMOVES `.layout` — see the
+     block in `init` — and the stage goes with it, so both this function's
+     callers reach it holding nothing: `goStep`, which `init` runs after the
+     removal, and the `ResizeObserver` registered before it.
+
+     It threw. Twice, uncaught, on every load of `?sheet=1`, in every language,
+     from before this phase — and the comment over the removal says in as many
+     words "nothing past this point reads `.layout` in sheet mode", which is
+     the claim that was wrong. No instrument said so: the audit drives the
+     sheet route but did not listen for `pageerror` on it, so the page threw
+     into a silence. Found by opening the sheet to check a translation.
+
+     A document with no stage in it does not need the stage cropped, so this
+     is the whole fix. `npm run audit` now fails on an uncaught error there. */
   const stage = $('#stage');
+  if (!stage) return;
   const svg = stage.querySelector('svg');
   if (!svg) return;
 
@@ -2189,7 +2332,7 @@ function announce(text) {
 
 async function onCopy() {
   const ok = await copyMessage(state);
-  toast(ok ? 'הפרטים הועתקו — הדביקו בהודעה לפרץ' : 'ההעתקה נכשלה, נסו לשלוח בוואטסאפ');
+  toast(T(ok ? 'copy.ok' : 'copy.fail'));
 }
 
 let toastTimer = null;
@@ -2225,9 +2368,9 @@ function toast(text) {
 function showNotice(kind, said) {
   const el = $('#notice');
   const generic = {
-    'code-unknown': 'הקוד לא זוהה — מציגים דלת ברירת מחדל.',
-    'combination-fixed': 'השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר.',
-  }[kind] || 'חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.';
+    'code-unknown': T('notice.code'),
+    'combination-fixed': T('notice.fixed'),
+  }[kind] || T('notice.some');
   el.textContent = kind === 'combination-fixed' && said && said.length
     ? said.join(' · ') + '.'
     : generic;

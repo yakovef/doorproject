@@ -13,6 +13,7 @@
 import { byId, HANDLES } from './catalog.js';
 import { formatAgorot, priceAgorot } from './price.js';
 import { gripAt, gripHome, render } from './renderer.js';
+import { CUSTOMER_LANG_NOTE, lang, T, withLang } from './copy.js';
 import { handingWords, specLines } from './spec.js';
 import { encodeCode, toQuery } from './url-state.js';
 
@@ -44,9 +45,19 @@ export const PHONE_TEL     = '+972532197466';   // tel: — RFC 3966 global numb
    the A4 order sheet — and all three read this constant. A percentage written
    out twice is CLAUDE.md §5 wearing a figure, and the copy that gets missed is
    the one a customer holds you to. */
-export const PRICE_INCLUDES = 'כולל דלת, משקוף, מנעול, התקנה ומע״מ';
-export const PRICE_CAVEAT   =
-  'מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.';
+/* ⚠ FUNCTIONS, NOT CONSTANTS, AND THAT IS NOT A STYLE CHOICE. Both sentences
+   are shown to the CUSTOMER on the card and in the dock — so they follow the
+   language they chose — and both are sent to PERETZ in the WhatsApp, which is
+   always Hebrew. A `const` here would be evaluated once at import, before
+   `setLang` has run, and would then be that language everywhere for the life
+   of the page: the English card would carry Hebrew, or worse, a language
+   switch would leave the two readers disagreeing about a promise with a
+   percentage in it.
+   Written once is preserved and moves up a level: the sentence itself lives in
+   `js/copy.js` under one key, which is the file whose entire job is being the
+   one place. */
+export const priceIncludes = () => T('price.includes');
+export const priceCaveat   = () => T('price.caveat');
 
 /**
  * THE DRAWING IS A DRAWING, and the site now says so in words.
@@ -70,9 +81,7 @@ export const PRICE_CAVEAT   =
  * most needs to have read this sentence is when the door arrives, and what
  * they have then is the WhatsApp message, not the page.
  */
-export const DRAWING_CAVEAT =
-  'הציור באתר הוא הדמיה ממוחשבת — הדלת שתיוצר עשויה להיראות מעט שונה בגוון, '
-  + 'בברק ובפרטי הידיות.';
+export const drawingCaveat = () => T('illustration');
 
 /**
  * The address to send Peretz, or `null` when this page has none worth sending.
@@ -191,7 +200,7 @@ export function gripDeparture(state) {
  * the fix whose whole thesis is that a second hand-written copy is how the
  * first one came to be wrong.
  */
-export const GRIP_ILLUSTRATIVE = 'להמחשה — נקבע בהתקנה';
+export const gripIllustrative = () => T('grip.illustrative');
 
 /**
  * The grip, and its finish ON THE LINE THAT NAMES THE THING THAT HAS ONE.
@@ -249,16 +258,34 @@ export function gripAddendum(state) {
        specification and that the final spot is set on site — which is exactly
        why it is an ADDENDUM here and not a row in the spec. The stage says the
        same thing under the door, in the same words, from `GRIP_ILLUSTRATIVE`. */
-    ...(flat ? ['הערה: ידית המשיכה מותקנת לרוחב הדלת'] : []),
-    ...(shifted ? [`מיקום הידית: הזזתי אותה ממקומה הרגיל. ${GRIP_ILLUSTRATIVE}, `
-                   + 'והמיקום המדויק בקישור.'] : []),
+    ...(flat ? [T('addendum.flat')] : []),
+    ...(shifted ? [T('addendum.shifted', gripIllustrative())] : []),
   ];
 }
 
-/** The message Peretz receives. */
+/**
+ * The message Peretz receives.
+ *
+ * ⚠ ALWAYS HEBREW, WHATEVER LANGUAGE THE CUSTOMER BUILT THE DOOR IN, and this
+ * is the one place in the project where the interface language is deliberately
+ * ignored. `PLAN.md` §0: the product is an order Peretz can act on without a
+ * clarifying question. An order that reaches him reading "Кованая решётка в
+ * цвет двери · Полуторная" is a question — he has to translate it before he
+ * can price it, and that phone call is the thing this whole project exists to
+ * remove. Every other reader on the page follows the customer.
+ *
+ * ⚠ AND THE CUSTOMER'S LANGUAGE IS NOT DISCARDED, IT IS REPORTED. He is about
+ * to ring them back. Which language to do that in is a fact he needs and
+ * cannot get from anywhere else in this message, so it is one Hebrew line at
+ * the top — see `CUSTOMER_LANG_NOTE`. Dropped when they built it in Hebrew,
+ * because a line saying "the customer used the Hebrew page" on every single
+ * order is noise, and noise is how the useful lines stop being read.
+ */
 export function message(state) {
-  return [
+  const spoke = CUSTOMER_LANG_NOTE[lang()];
+  return withLang('he', () => [
     'שלום, בחרתי דלת באתר:',
+    ...(spoke ? [spoke] : []),
     '',
     /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door
        itself, and so did `#summary`, and so did `describe()`, and the three
@@ -276,24 +303,24 @@ export function message(state) {
        there is nothing left to ask. */
     handingWords(state),
     ...gripAddendum(state),
-    `מחיר באתר: ${formatAgorot(priceAgorot(state))} — ${PRICE_INCLUDES}`,
+    `מחיר באתר: ${formatAgorot(priceAgorot(state))} — ${priceIncludes()}`,
     /* The caveat the CARD states twice and the dock a third time, and which
        the order used to leave out entirely — so the one line the customer was
        most carefully told was the one Peretz never saw. Exported rather than
        written here for the reason `GRIP_ILLUSTRATIVE` is: it was four Hebrew
        literals in three files for one promise. */
-    PRICE_CAVEAT,
+    priceCaveat(),
     /* ⚠ AND THE DRAWING'S OWN CAVEAT, for the same reason and one step
        further. The price caveat protects the number; this protects the
        PICTURE, which is the part of this message a customer will hold up
        against the door when it arrives. See DRAWING_CAVEAT. */
-    DRAWING_CAVEAT,
+    drawingCaveat(),
     `קוד: ${encodeCode(state)}`,
     /* The link matters more than anything above it: Peretz taps it and sees
        exactly what the customer saw. He decodes nothing. It is dropped, not
        faked, when this page has no address worth tapping — see `shareUrl`. */
     ...(shareUrl(state) ? ['', `לצפייה: ${shareUrl(state)}`] : []),
-  ].join('\n');
+  ].join('\n'));
 }
 
 /** One tap: opens WhatsApp with the message already written, addressed to Peretz. */
@@ -329,6 +356,13 @@ export const whatsappUrl = state =>
  * with no JavaScript running), and `test/units.mjs` asserts the two are
  * byte-identical, the same way the `?v=` stamps are asserted current.
  */
+/* ⚠ HEBREW, AND NOT IN `js/copy.js` WITH EVERYTHING ELSE. Two reasons, and
+   either alone would be enough. It is a message TO PERETZ, like the order
+   above it. And it is the string the page shows when NO JAVASCRIPT HAS RUN —
+   which is the whole point of the down-strip — so there is no language to
+   have chosen and nothing to translate it with. The words a customer READS
+   beside it are translated, through `data-t`, because those only ever appear
+   when the bundle did load; the payload they send is not. */
 export const FALLBACK_TEXT =
   'שלום, ניסיתי לבנות דלת באתר והעמוד לא נטען אצלי, אז אין לי קוד לשלוח. '
 + 'אפשר לחזור אליי ולעזור לי לבחור דלת?';

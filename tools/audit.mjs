@@ -21,6 +21,7 @@ import { crashed } from './browser.mjs';
 import { load } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
+import { setLang } from '../js/copy.js';
 import { specRows, summaryLine } from '../js/spec.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
@@ -106,6 +107,18 @@ for (const v of VIEWS) {
   await p.goto('file://' + process.cwd() + '/index.html');
   await p.waitForTimeout(400);
   console.log(`\n${v.name}  ${v.w}x${v.h}`);
+
+  /* ⚠ COMPARE LIKE WITH LIKE. Everything below checks the RENDERED page
+     against `specRows`/`summaryLine` called here in Node, and those two now
+     answer in whatever language is current — which in Node is Hebrew and in
+     the page is whatever `pickLang` decided from this container's Chromium.
+     Headless Chromium reports `en-US`, and for one build that produced 1,187
+     faults reading "#spec has drifted off js/spec.js" about a page that
+     agreed with `js/spec.js` perfectly, in English.
+     Read off the page rather than pinned to a constant here: a hard-coded
+     `he` would make this instrument stop testing the thing it exists to test
+     the day the default changes. */
+  setLang(await p.evaluate(() => document.documentElement.lang) || 'he', null);
 
   /* The cabinet: on first paint the customer must see the four SECTIONS and
      nothing else — no category headings and no options. That is the whole
@@ -1023,9 +1036,42 @@ for (const v of VIEWS) {
     await pg.close();
 
     const sheetPg = await b.newPage({ viewport: { width: 794, height: 1123 } });
+    /* ⚠ THIS ROUTE DID NOT LISTEN, AND THE PAGE WAS THROWING. Every other
+       route in this file collects `pageerror`; the sheet did not, and
+       `fitStage` had been raising two uncaught TypeErrors on every load of
+       the document Peretz orders from — for long enough that nobody knows
+       when it started. A route that drives a page without listening to it
+       reports "the sheet is fine" about a page that is on fire. */
+    const sheetErrs = [];
+    sheetPg.on('pageerror', e => sheetErrs.push(String(e)));
+    sheetPg.on('console', m => { if (m.type() === 'error') sheetErrs.push(m.text()); });
     await sheetPg.goto(`${URL}?sheet=1&c=rb-6219d&w=rect&g=iron&n=idan`
                      + '&k=cylinder&d=panel&s=sidelight&h=left-in');
     await sheetPg.waitForTimeout(700);
+    if (sheetErrs.length) {
+      fault('sheet', `${sheetErrs.length} uncaught error(s) building the order sheet: `
+                   + sheetErrs.slice(0, 2).join(' · '));
+    }
+
+    /* ⚠ AND THE SHEET IN A LANGUAGE PERETZ DOES NOT READ STILL CARRIES THE
+       HEBREW. This is the one document on the site with two readers — the
+       customer proof-reads it, Peretz orders from it — so it prints both.
+       See `buildSheet`. */
+    const ruPg = await b.newPage({ viewport: { width: 794, height: 1123 } });
+    await ruPg.goto(`${URL}?sheet=1&lang=ru&c=rb-6219d&w=rect&g=iron&n=idan`
+                  + '&k=cylinder&d=panel&s=sidelight&h=left-in');
+    await ruPg.waitForTimeout(600);
+    const ru = await ruPg.evaluate(() => ({
+      cyrillic: /[\u0400-\u04FF]/.test(document.querySelector('#sheet')?.textContent || ''),
+      hebrewGlosses: document.querySelectorAll('#sheet .sheet__he').length,
+      hebrew: /[\u0590-\u05FF]/.test(document.querySelector('#sheet')?.textContent || ''),
+    }));
+    if (!ru.cyrillic) fault('sheet', 'a Russian order sheet has no Russian on it — the customer cannot proof-read it');
+    if (!ru.hebrew || ru.hebrewGlosses < 8) {
+      fault('sheet', `a Russian order sheet carries ${ru.hebrewGlosses} Hebrew lines — Peretz `
+                   + 'orders from this document and cannot read it');
+    }
+    await ruPg.close();
     const sheet = await sheetPg.evaluate(() => {
       const box = document.querySelector('#sheet');
       const svgs = box ? box.querySelectorAll('svg') : [];
@@ -1146,6 +1192,132 @@ for (const v of VIEWS) {
     await pg.close();
   }
   if (!faults) console.log('  a page that cannot start says so, and still reaches Peretz');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE HINGE TRAP — PLAN.md §6.1, and the one check this phase exists for.
+   ═══════════════════════════════════════════════════════════════════
+   Hebrew sets `dir="rtl"` on `<html>`; English and Russian set `ltr`. Every
+   logical property in the stylesheet mirrors with it, which is what they are
+   for. THE DOOR MUST NOT. A right-hinged door is a physical fact about an
+   object somebody hangs in a wall, and a drawing that flipped with the
+   stylesheet would show one hinge side while Peretz built the other.
+
+   `npm test` asserts the SVG STRING is byte-identical across the three; this
+   asserts the RENDERED GEOMETRY is, which is the thing a stylesheet can move
+   and a string cannot see. `transform: scaleX(-1)` on any ancestor, a
+   `direction` that reached the SVG, an absolutely-positioned overlay that
+   flipped its inset — none of those change one byte of `render()` and all of
+   them put the cylinder on the wrong side of the leaf.
+
+   Measured against the LEAF'S OWN CENTRE rather than the viewport, so a
+   layout that legitimately moves the whole stage does not read as a mirrored
+   door. */
+{
+  console.log('\n  languages');
+  const pg = await b.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+  const read = () => pg.evaluate(() => {
+    const leaf = document.querySelector('.door-svg #leaf');
+    const lock = document.querySelector('.door-svg [data-hw="lockset"]');
+    if (!leaf || !lock) return null;
+    const l = leaf.getBoundingClientRect(), k = lock.getBoundingClientRect();
+    return {
+      dir: document.documentElement.dir,
+      lang: document.documentElement.lang,
+      /* -1 .. +1 across the leaf. Sign is the whole answer. */
+      side: ((k.left + k.width / 2) - (l.left + l.width / 2)) / (l.width / 2),
+      h1: document.querySelector('.stage__h1 [data-t]')?.textContent?.trim(),
+      /* Glyphs in the order a human's eye meets them, not in string order. */
+      priceGlyphs: (() => {
+        const t = document.querySelector('#price')?.firstChild;
+        if (!t || t.nodeType !== 3) return null;
+        const r = document.createRange(), out = [];
+        for (let i = 0; i < t.length; i++) {
+          r.setStart(t, i); r.setEnd(t, i + 1);
+          const box = r.getBoundingClientRect();
+          if (box.width) out.push([box.left, t.data[i]]);
+        }
+        return out.sort((a, b2) => a[0] - b2[0]).map(m => m[1]).join('');
+      })(),
+      langBtns: document.querySelectorAll('.lang').length,
+    };
+  });
+
+  const seen = {};
+  for (const id of ['he', 'en', 'ru']) {
+    /* ⚠ `k=coral` IS NOT DECORATION. The page opens on a BARE door — no lock
+       furniture at all, which is what Peretz asked for — so `[data-hw=
+       "lockset"]` does not exist on arrival and the mirror check would have
+       measured nothing and reported "no door", passing quietly for as long as
+       nobody read the message. The one part of the drawing that names a side
+       has to be on the door before you can ask which side it is on. */
+    await pg.goto('file://' + process.cwd() + `/index.html?lang=${id}&k=coral`);
+    await pg.waitForTimeout(400);
+    seen[id] = await read();
+    if (!seen[id]) { fault('languages', `${id}: no door on the page to measure`); continue; }
+    if (seen[id].lang !== id) fault('languages', `?lang=${id} left <html lang> at "${seen[id].lang}"`);
+    const wantDir = id === 'he' ? 'rtl' : 'ltr';
+    if (seen[id].dir !== wantDir) fault('languages', `${id}: <html dir> is "${seen[id].dir}", want "${wantDir}"`);
+    if (seen[id].langBtns !== 3) fault('languages', `${id}: ${seen[id].langBtns} language buttons, want 3`);
+  }
+
+  if (seen.he && seen.en && seen.ru) {
+    for (const id of ['en', 'ru']) {
+      const drift = Math.abs(seen[id].side - seen.he.side);
+      if (Math.sign(seen[id].side) !== Math.sign(seen.he.side)) {
+        fault('languages', `THE DOOR MIRRORED IN ${id}. The cylinder is at `
+          + `${seen[id].side.toFixed(3)} across the leaf and at ${seen.he.side.toFixed(3)} in `
+          + 'Hebrew — opposite sides. This is PLAN.md §6.1: the interface mirrors and the '
+          + 'door must not, or the site shows one hinge side and Peretz builds the other');
+      } else if (drift > 0.02) {
+        fault('languages', `${id}: the cylinder sits ${drift.toFixed(3)} of a half-leaf away `
+          + 'from where Hebrew puts it — the door is not mirrored but it has moved');
+      }
+    }
+    /* ⚠ AND THE PRICE HAS ONE SHAPE. `Intl`'s `he-IL` currency format wraps
+       the shekel in U+200F marks, so the bidi algorithm moved the symbol to
+       the far side of the digits on the English page — `3,150₪` against
+       Hebrew's `₪ 3,150`, one door and two prices, and the string is
+       identical in both. Only a rendered page can see this, which is why it
+       is measured here in GLYPHS SORTED BY THEIR REAL x POSITION rather than
+       compared as text. */
+    for (const id of ['en', 'ru']) {
+      if (seen[id].priceGlyphs !== seen.he.priceGlyphs) {
+        fault('languages', `the price READS "${seen[id].priceGlyphs}" in ${id} and `
+          + `"${seen.he.priceGlyphs}" in Hebrew — the same figure is being painted in two `
+          + 'shapes, and the customer screenshots one while Peretz reads the other');
+      }
+    }
+
+    /* And the words DID change, or nothing was translated and the check above
+       is measuring the same page three times. */
+    if (seen.he.h1 === seen.en.h1) {
+      fault('languages', 'the stage heading is identical in Hebrew and English — nothing was '
+        + 'translated, which would make the mirror check above vacuous');
+    }
+  }
+
+  /* Switching in the page, rather than by URL: the same rebuild path a
+     customer takes, and the one that keeps their half-built door. */
+  await pg.goto('file://' + process.cwd() + '/index.html?lang=he&c=rb-9016d');
+  await pg.waitForTimeout(400);
+  const before = await pg.evaluate(() => document.querySelector('#code')?.textContent);
+  await pg.evaluate(() => [...document.querySelectorAll('.lang')]
+    .find(b => b.lang === 'ru')?.click());
+  await pg.waitForTimeout(400);
+  const after = await pg.evaluate(() => ({
+    code: document.querySelector('#code')?.textContent,
+    dir: document.documentElement.dir,
+    live: document.querySelectorAll('.sect:not([hidden])').length,
+  }));
+  if (after.code !== before) {
+    fault('languages', `switching language changed the DOOR: the code went ${before} -> `
+      + `${after.code}. Changing language must keep what the customer built`);
+  }
+  if (after.dir !== 'ltr') fault('languages', 'clicking Русский did not flip <html dir>');
+  if (after.live !== 1) fault('languages', `after switching, ${after.live} steps are live, want 1`);
+  if (!faults) console.log('    the interface mirrors, the door does not, and the door survives the switch');
+  await pg.close();
 }
 
 await b.close();

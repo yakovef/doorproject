@@ -142,19 +142,47 @@ want to see that its finished."*
 
 **The page is a FLOW, not a cabinet.** Eight steps and a quote page, one live at
 every width. A standard door with nothing on it is **₪3,150**, and tapping the
-figure opens the column it is made of.
+figure opens the column it is made of. **In Hebrew, English or Russian** — and
+the order that reaches Peretz is Hebrew whichever one the customer used.
+
+### Three languages, and the one rule inside them
+
+Hebrew, English, Russian; `js/copy.js`; `?lang=` → `localStorage` →
+`navigator.languages` → Hebrew.
+
+⚠ **THE INTERFACE MIRRORS AND THE DOOR MUST NOT** — `PLAN.md` §6.1. Hebrew
+puts `dir="rtl"` on `<html>` and every logical property flips with it. A
+drawing that flipped too would show one hinge side while Peretz built the
+other. `svg { direction: ltr; }` is the whole guard, stated once in
+`css/app.css`; `npm test` asserts the SVG string is byte-identical in all
+three, and `npm run audit` measures the cylinder's real position against the
+leaf's centre in a browser. Neither check is optional.
+
+⚠ **THE WHATSAPP ORDER IS ALWAYS HEBREW.** Every other reader follows the
+customer; this one does not, because Peretz is its reader and `PLAN.md` §0
+asks for an order he can act on without a clarifying question. It now carries
+one Hebrew line naming the language the customer built in, so he knows how to
+ring back.
+
+⚠ **A TOP-LEVEL CONSTANT MUST HOLD A KEY, NEVER A SENTENCE.** `T()` in an
+object literal is resolved once, at import, before the language is known —
+so it freezes. Three tables in this repo would have shipped that way and now
+hold keys: `SAID` in `rules.js`, `GROUPS`/`SECTIONS` in `app.js`,
+`priceIncludes`/`priceCaveat` in `share.js` (functions, not constants).
+Nothing throws when this is wrong. The page looks entirely correct.
 
 ### Green
 
-- `npm test` — **5,401,525 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+- `npm test` — **5,403,239 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
   ANYTHING; it is the product of the catalogue's list lengths, and this round
   cut fourteen stripe options out of `DETAILS` and added four axes. Read the
   failure count.
 - `npm run audit` — clean at all seven `VIEWS`, including the restated arrival
   check (exactly one step live at every width), a walk over every navigator
-  circle, the keyboard walk, and the bare-mode motion kill.
+  circle, the keyboard walk, the bare-mode motion kill, and the language route
+  (three languages, the mirror check, and the door surviving a switch).
 - `npm run collide` — clean on `all` and `boxes`.
-- `npm run latency` — **123 ms** against a 600 ms gate, down from 501: one step
+- `npm run latency` — **132 ms** against a 600 ms gate, down from 501: one step
   in the DOM instead of the whole cabinet.
 - `npm run profile` — **all four rows green.** See below; this is not
   straightforwardly good news.
@@ -194,11 +222,8 @@ stocked, so almost every bar costs ₪650 rather than ₪500.
 
 ### What is NOT built, and why
 
-- **Hebrew · English · Russian.** `TRANSFORM.md` phase 10, the one phase of
-  twelve not done. Every string is still Hebrew in markup. `PLAN.md` §6.1's
-  hinge trap is the thing to read before starting: **when the interface
-  mirrors, the door must not.**
-- **Deployment.** On instruction.
+- **Deployment.** On instruction. This is now the only thing on this list
+  that is a feature rather than a decision.
 - **The mockup's floating overlay.** `TRANSFORM.md` §12.2 — scoped down to the
   door taking the empty column, and said so.
 
@@ -728,7 +753,7 @@ sheet. A right-hinged door is a physical fact.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Eighteen so far. None of them threw.
+**Things that vanish rather than break.** Twenty so far. None of them threw.
 All of them looked like a working page.
 
 1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
@@ -875,6 +900,35 @@ it is **present and distinct**, not only that it is correct:
     cannot name a composition when two families share their columns, so the
     tie-break is now the catalogue's own `doors` citation, and where nothing
     cites the door the note SAYS the choice was a coin toss.
+
+19. **A COMMENT PROMISING WHAT THE CODE DID NOT DO — TWICE IN ONE HOUR, AND
+    BOTH WERE FOUND BY LOOKING AT THE PAGE.**
+    `formatAgorot` sat under a paragraph explaining that the price could never
+    change shape between languages, because the LOCALE was pinned to `he-IL`.
+    It changed anyway. `Intl` wraps the shekel in U+200F marks and the bidi
+    algorithm places the symbol at PAINT time by the direction of the
+    paragraph: `₪ 3,150` in Hebrew, `3,150₪` on the English page, one string,
+    two shapes, decided by a stylesheet. A pinned locale fixes FORMATTING and
+    says nothing about REORDERING. The figure is assembled by hand now and
+    `Intl` is asked only to group the digits.
+    ⚠ And the fix was chosen by MEASURING five candidate strings' glyph
+    positions in both directions in a browser, not by reasoning about bidi.
+    Reasoning about bidi is how the first version got written.
+
+20. **A ROUTE THE AUDIT DROVE WITHOUT LISTENING TO.** `?sheet=1` — the A4
+    document Peretz orders from — threw two uncaught `TypeError`s on every
+    load, in every language, for an unknown number of commits. `.is-sheet`
+    REMOVES `.layout` so the printed page has one `<h1>`; `goStep` then ran
+    over a flow that is no longer in the document and `fitStage`/`paint`
+    reached for `$('#stage')`. The comment above the removal said "nothing
+    past this point reads `.layout` in sheet mode" — that sentence was the
+    bug. Every other route in `tools/audit.mjs` collects `pageerror`; this one
+    did not, so it reported the sheet as fine about a page that was on fire.
+    ⚠ The fix is ONE guard, in `init`: a sheet is a document and has no steps,
+    so the flow does not start. Null-checking `fitStage`, then `paint`, then
+    the next caller, answers "which step is the customer on" with `null` four
+    times and leaves the fifth for whoever adds it.
+    Found while opening the sheet to check a translation.
 
 ⚠ **And one assertion was counting PROSE.** The ironwork group asked
 `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted

@@ -51,6 +51,7 @@
  * state the interface would not let you build.
  */
 
+import { T } from './copy.js';
 import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, LOCKSETS, WINDOWS }
   from './catalog.js';
 import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
@@ -152,7 +153,7 @@ export function conflicts(state) {
 
   /* Ironwork and worked glass alike need a window to be in. */
   if (!glazed) {
-    for (const g of GRILLES) if (g.id !== 'none') out.grille[g.id] = 'דורש חלון';
+    for (const g of GRILLES) if (g.id !== 'none') out.grille[g.id] = T('why.needsWindow');
   }
 
   /* A WINDOW TAKES THE UPPER PANEL'S PLACE.
@@ -176,7 +177,7 @@ export function conflicts(state) {
      is covered without anybody remembering to come back here. */
   if (onLeaf) {
     for (const d of DETAILS) if (hasUpperPanel(d)) {
-      out.detail[d.id] = 'החלון תופס את מקומו של הפאנל העליון';
+      out.detail[d.id] = T('why.winTakesTop');
     }
     /* And a TALL light leaves no room for the lone one either. Same rule as
        above, one step further: `appliedFrame` draws nothing at all when the
@@ -187,7 +188,7 @@ export function conflicts(state) {
     for (const d of DETAILS) {
       if (!d.panel || out.detail[d.id]) continue;
       if (!panelFits({ ...state, detail: d.id })) {
-        out.detail[d.id] = 'אין מקום לפאנל מתחת לחלון';
+        out.detail[d.id] = T('why.noRoomBelow');
       }
     }
   }
@@ -205,12 +206,12 @@ export function conflicts(state) {
      first. */
   for (const d of DETAILS) {
     if (d.rectOnly && state.window !== 'rect' && state.window !== 'none') {
-      out.detail[d.id] = out.detail[d.id] || 'הסט הקלאסי לא משתלב עם צוהר אנכי';
+      out.detail[d.id] = out.detail[d.id] || T('why.setNoSlot');
     }
   }
   if (byId(DETAILS, state.detail).rectOnly) {
     for (const w of WINDOWS) if (w.id !== 'rect' && w.id !== 'none') {
-      out.window[w.id] = out.window[w.id] || 'הסט הקלאסי מגיע עם חלון מלבני משלו';
+      out.window[w.id] = out.window[w.id] || T('why.setOwnWindow');
     }
   }
 
@@ -224,11 +225,11 @@ export function conflicts(state) {
      The real reason it holds today is that the DRAWING has no measured answer
      for where a stripe goes on a panelled leaf, and inventing one would put
      geometry on screen no photograph supports (REALISM.md §6). */
-  if (onLeaf) out.stripes = 'לא משלבים פסי מתכת עם חלון';
-  else if (byId(DETAILS, state.detail).panel) out.stripes = 'לא משלבים פסי מתכת עם פאנל';
+  if (onLeaf) out.stripes = T('why.stripesWindow');
+  else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
   if (lined) {
-    for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = 'לא משלבים חלון עם קווי מתכת';
-    for (const d of DETAILS) if (d.panel) out.detail[d.id] = 'לא משלבים פאנל עם פסי מתכת';
+    for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = T('why.windowStripes');
+    for (const d of DETAILS) if (d.panel) out.detail[d.id] = T('why.panelStripes');
   }
 
   /* PERETZ: "square +3700 (needs to aways have a panel at the bottom)". The
@@ -237,7 +238,7 @@ export function conflicts(state) {
      rather than on the window, because the window is what the customer chose
      and the face is what has to move. */
   if (state.window === 'rect') {
-    out.detail.plain = out.detail.plain || 'חלון מרובע מגיע תמיד עם פאנל בתחתית';
+    out.detail.plain = out.detail.plain || T('why.rectNeedsPanel');
   }
 
   /* PERETZ: "3 panel +1900 (remove the handle)" and the same for the greek
@@ -247,7 +248,7 @@ export function conflicts(state) {
      panels always come with their pull; this is that answered. */
   if (byId(DETAILS, state.detail).ownPull) {
     for (const h of HANDLES) {
-      if (h.style !== 'none') out.handle[h.id] = 'הפאנל האמצעי מגיע עם המאחז שלו';
+      if (h.style !== 'none') out.handle[h.id] = T('why.panelOwnPull');
     }
   }
 
@@ -292,14 +293,14 @@ export function conflicts(state) {
   const CHANNEL = HANDLES.find(h => h.style === 'channel');
   if (CHANNEL) {
     if (onLeaf || faceWorked(byId(DETAILS, state.detail))) {
-      out.handle[CHANNEL.id] = 'ידית שקועה דורשת דלת חלקה';
+      out.handle[CHANNEL.id] = T('why.channelPlain');
     }
     if (grip.style === 'channel') {
       for (const w of WINDOWS) if (w.rects.length) {
-        out.window[w.id] = out.window[w.id] || 'לא משתלב עם ידית שקועה';
+        out.window[w.id] = out.window[w.id] || T('why.notWithChannel');
       }
       for (const d of DETAILS) if (faceWorked(d)) {
-        out.detail[d.id] = out.detail[d.id] || 'לא משתלב עם ידית שקועה';
+        out.detail[d.id] = out.detail[d.id] || T('why.notWithChannel');
       }
     }
   }
@@ -324,7 +325,7 @@ export function conflicts(state) {
   for (const h of HANDLES) {
     if (h.style === 'none' || out.handle[h.id]) continue;
     if (!gripFitsAnywhere({ ...state, handle: h.id, grip: null })) {
-      out.handle[h.id] = 'אין מקום לידית הזו על הדלת';
+      out.handle[h.id] = T('why.noRoomHandle');
     }
   }
 
@@ -344,7 +345,7 @@ export function conflicts(state) {
     for (const w of WINDOWS) {
       if (out.window[w.id]) continue;
       if (!gripFitsAnywhere({ ...state, window: w.id, grip: null })) {
-        out.window[w.id] = 'אין מקום לידית שבחרתם עם החלון הזה';
+        out.window[w.id] = T('why.noRoomWithWindow');
       }
     }
   }
@@ -386,12 +387,12 @@ export function conflicts(state) {
      narrow leaf — the bow is centred and does not move out of the way. */
   for (const k of LOCKSETS) {
     if (gripClashesLockset({ ...state, lockset: k.id })) {
-      out.lockset[k.id] = out.lockset[k.id] || 'אין מקום בין המאחז למנעול';
+      out.lockset[k.id] = out.lockset[k.id] || T('why.noRoomGripLock');
     }
   }
   for (const h of HANDLES) {
     if (gripClashesLockset({ ...state, handle: h.id })) {
-      out.handle[h.id] = out.handle[h.id] || 'אין מקום בין המאחז למנעול';
+      out.handle[h.id] = out.handle[h.id] || T('why.noRoomGripLock');
     }
   }
 
@@ -444,26 +445,39 @@ export function isBlocked(state, group, id) {
 }
 
 /**
- * Human-readable Hebrew for each repair, named by WHAT WAS DONE rather than by
- * which group moved. `repair` picks the sentence at the moment it makes the
- * change, which is the only place that knows why.
+ * One COPY KEY per repair, named by WHAT WAS DONE rather than by which group
+ * moved. `repair` picks it at the moment it makes the change, which is the
+ * only place that knows why.
+ *
+ * ⚠ KEYS, NOT SENTENCES, AND THAT IS THE WHOLE POINT OF THIS NOTE. This table
+ * is a module-level object literal: its values are evaluated ONCE, when the
+ * bundle is first imported, which happens before `setLang` has read the
+ * customer's language. Fifteen `T(...)` calls here would have frozen every
+ * repair message in whatever language the module loaded in — Hebrew, always,
+ * on an English page — and nothing would have thrown, nothing would have
+ * failed a build, and the page would have looked entirely correct until a
+ * customer chose a grille on a solid door.
+ *
+ * `change` calls `T` instead, at the instant of the repair, which is also the
+ * instant before the toast. The same trap waits in any other top-level
+ * constant that wants a translated string in it: hold the key.
  */
 const SAID = {
-  windowAdded:   'הוספנו חלון — הסורג והזכוכית צריכים אותו',
-  windowGone:    'הסרנו את החלון',
-  lineWorkGone:  'הסרנו את קווי המתכת — לא משלבים אותם עם חלון',
-  onePanel:      'עברנו לפאנל אחד — החלון תופס את מקומו של העליון',
-  noPanelRoom:   'הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום',
-  faceCleared:   'החלקנו את הדלת — ידית שקועה דורשת פנים חלקות',
-  grilleGone:    'הסרנו את הסורג — אין חלון',
-  gripGone:      'הסרנו את ידית המשיכה — אין לה מקום כאן',
-  locksetSwapped:'החלפנו את המנעול — אין לו מקום ליד המאחז',
-  gripMoved:     'הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה',
-  gripHome:      'הידית הוסרה, ואיתה המיקום שבחרתם לה',
-  setWindow:     'התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו',
-  setGone:       'הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי',
-  needPanel:     'הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד',
-  ownPull:       'הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו',
+  windowAdded:   'fix.windowAdded',
+  windowGone:    'fix.windowGone',
+  lineWorkGone:  'fix.lineWorkGone',
+  onePanel:      'fix.onePanel',
+  noPanelRoom:   'fix.noPanelRoom',
+  faceCleared:   'fix.faceCleared',
+  grilleGone:    'fix.grilleGone',
+  gripGone:      'fix.gripGone',
+  locksetSwapped:'fix.locksetSwapped',
+  gripMoved:     'fix.gripMoved',
+  gripHome:      'fix.gripHome',
+  setWindow:     'fix.setWindow',
+  setGone:       'fix.setGone',
+  needPanel:     'fix.needPanel',
+  ownPull:       'fix.ownPull',
 };
 
 /**
@@ -492,7 +506,7 @@ export function repair(state, intent = null) {
      already says that a toast naming the wrong culprit is worse than no toast
      at all; this is the shape that keeps producing them. */
   const said = [];
-  const change = (group, why) => { changed.push(group); said.push(why); };
+  const change = (group, key) => { changed.push(group); said.push(T(key)); };
 
   /* Asking for a grille or worked glass on a solid door means asking for a
      window. Fix that first, and only if it was not the window itself that was

@@ -1,4 +1,516 @@
 (() => {
+  // js/copy.js
+  var LANGS = [
+    { id: "he", name: "עברית", dir: "rtl", locale: "he-IL" },
+    { id: "en", name: "English", dir: "ltr", locale: "en-IL" },
+    { id: "ru", name: "Русский", dir: "ltr", locale: "ru-RU" }
+  ];
+  var LANG_IDS = LANGS.map((l) => l.id);
+  var INDEX = Object.fromEntries(LANGS.map((l, i) => [l.id, i]));
+  var STORE_KEY = "dm-lang";
+  var current = "he";
+  var lang = () => current;
+  function pickLang(search = "", nav = typeof navigator === "undefined" ? null : navigator) {
+    const asked = new URLSearchParams(search).get("lang");
+    if (asked && INDEX[asked] !== void 0) return asked;
+    try {
+      const kept = globalThis.localStorage?.getItem(STORE_KEY);
+      if (kept && INDEX[kept] !== void 0) return kept;
+    } catch {
+    }
+    const tags = (nav?.languages?.length ? nav.languages : [nav?.language]).filter(Boolean);
+    for (const tag of tags) {
+      const base = String(tag).toLowerCase().split("-")[0];
+      if (base === "iw") return "he";
+      if (base === "en") continue;
+      if (INDEX[base] !== void 0) return base;
+    }
+    return "he";
+  }
+  function setLang(id, doc = globalThis.document) {
+    if (INDEX[id] === void 0) return false;
+    current = id;
+    try {
+      globalThis.localStorage?.setItem(STORE_KEY, id);
+    } catch {
+    }
+    if (doc?.documentElement) {
+      doc.documentElement.lang = id;
+      doc.documentElement.dir = LANGS[INDEX[id]].dir;
+    }
+    return true;
+  }
+  var withLang = (id, fn) => {
+    const was = current;
+    try {
+      current = INDEX[id] === void 0 ? was : id;
+      return fn();
+    } finally {
+      current = was;
+    }
+  };
+  var L = (o, id = current) => o && (o[id] ?? o.he) || "";
+  function T(key, ...args) {
+    const row = UI[key];
+    if (!row) return key;
+    const s = row[INDEX[current]] ?? row[0] ?? key;
+    return args.length ? s.replace(/\{(\d+)\}/g, (m, i) => args[i] ?? m) : s;
+  }
+  function plural(n, key) {
+    const forms = T(key).split("|");
+    if (current !== "ru") return forms[Math.abs(n) === 1 ? 0 : forms.length - 1];
+    const mod10 = Math.abs(n) % 10, mod100 = Math.abs(n) % 100;
+    if (mod10 === 1 && mod100 !== 11) return forms[0];
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return forms[1] ?? forms[0];
+    return forms[2] ?? forms[forms.length - 1];
+  }
+  var counted = (n, key) => `${n} ${plural(n, key)}`;
+  var AND_JOIN = { he: " ו", en: " and ", ru: " и " };
+  var andJoin = (list) => list.join(AND_JOIN[current] ?? AND_JOIN.he);
+  var UI = {
+    /* ── the shell ────────────────────────────────────────────────── */
+    "doc.title": ["בונים דלת — דלתות מגן", "Build a door — Magen Doors", "Собери дверь — Magen Doors"],
+    "doc.desc": [
+      "בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.",
+      "Design your steel entrance door — colour, size, frame and hardware. Full price, fitting and VAT included.",
+      "Подберите входную дверь — цвет, размер, коробку и фурнитуру. Полная цена с установкой и НДС."
+    ],
+    "brand.name": ["דלתות מגן", "Magen Doors", "Magen Doors"],
+    "brand.sub": ["בונים דלת", "Build a door", "Собери дверь"],
+    "brand.ravbariach": ["רב בריח", "Rav Bariach", "Рав Бариах"],
+    "brand.city": ["ראשון לציון", "Rishon LeZion", "Ришон-ле-Цион"],
+    "nav.label": ["ניווט ראשי", "Main navigation", "Главное меню"],
+    "nav.works": ["דגמים", "Our doors", "Наши двери"],
+    "nav.custom": ["עיצוב אישי", "Design your own", "Свой дизайн"],
+    "nav.contact": ["צור קשר", "Contact", "Контакты"],
+    "nav.lang": ["שפה", "Language", "Язык"],
+    /* ── the stage ────────────────────────────────────────────────── */
+    "stage.h1": ["בנו את הדלת שלכם", "Build your door", "Соберите свою дверь"],
+    "stage.lede": [
+      "בחרו את הפרטים ותראו את השינוי בזמן אמת",
+      "Choose the details and watch the door change",
+      "Выбирайте детали и смотрите, как меняется дверь"
+    ],
+    "stage.label": ["הדלת שלכם", "Your door", "Ваша дверь"],
+    "grip.drag": [
+      "גררו את הידית למקום שתרצו",
+      "Drag the handle where you want it",
+      "Перетащите ручку туда, где она вам нужна"
+    ],
+    "grip.rotate": ["סובבו", "Rotate", "Повернуть"],
+    "grip.home": ["למקום המקורי", "Put it back", "Вернуть на место"],
+    "grip.aria": [
+      "מיקום הידית. גררו, או הזיזו עם מקשי החיצים",
+      "Handle position. Drag it, or move it with the arrow keys",
+      "Положение ручки. Перетащите или сдвиньте стрелками"
+    ],
+    "grip.ariaAt": ["מיקום הידית {0}", "Handle position {0}", "Положение ручки {0}"],
+    "grip.tooLong": [
+      "הידית הזו ארוכה מרוחב הדלת — אפשר לסובב רק ידית שנכנסת בין המזוזות",
+      "This handle is longer than the door is wide — only a handle that fits between the jambs can be turned",
+      "Эта ручка длиннее ширины двери — повернуть можно только ту, что помещается между косяками"
+    ],
+    "undo": ["ביטול השינוי האחרון", "Undo the last change", "Отменить последнее изменение"],
+    "undo.done": ["הצעד האחרון בוטל", "Last step undone", "Последний шаг отменён"],
+    /* ── the flow: the eight steps ────────────────────────────────── */
+    "step.fit.t": ["מבנה הדלת", "The door itself", "Сама дверь"],
+    "step.fit.s": ["גודל הדלת וכיוון הפתיחה", "Size and opening direction", "Размер и сторона открывания"],
+    "step.fit.l": [
+      "הגודל והצד שאליו הדלת נפתחת. נמדוד אצלכם במדויק, בחינם.",
+      "How big it is and which way it opens. We measure on site, free of charge.",
+      "Размер и сторона открывания. Замер на месте — бесплатно."
+    ],
+    "step.mk.t": ["משקוף", "The frame", "Коробка"],
+    "step.mk.s": ["המסגרת שהדלת נסגרת עליה", "The frame the door closes against", "Рама, к которой прилегает дверь"],
+    "step.mk.l": [
+      "המשקוף הוא המסגרת שהדלת נסגרת עליה. רוחב או עומק גדולים יותר מתאימים לקירות עבים, ועולים יותר.",
+      "The frame is what the door closes against. A wider face or a deeper return suits a thicker wall, and costs more.",
+      "Коробка — это рама, к которой прилегает дверь. Более широкий фасад или большая глубина нужны для толстых стен и стоят дороже."
+    ],
+    "step.colour.t": ["צבע", "Colour", "Цвет"],
+    "step.colour.s": ["גוון הדלת", "The shade of the door", "Оттенок двери"],
+    "step.colour.l": [
+      "צבע בתנור, מלוח הגוונים של היצרן. כל הגוונים באותו מחיר.",
+      "Oven-baked, from the manufacturer’s chart. Every shade is the same price.",
+      "Порошковая окраска по палитре производителя. Все оттенки — по одной цене."
+    ],
+    "step.face.t": ["עיצוב החזית", "The face", "Полотно"],
+    "step.face.s": ["פאנלים או פסי מתכת", "Panels or metal strips", "Панели или металлические полосы"],
+    "step.face.l": [
+      "מה יש על פני הדלת — פאנלים מוגבהים, או פסי מתכת. אפשר גם חלק לגמרי.",
+      "What sits on the front of the door — raised panels, or metal strips. Perfectly plain is a choice too.",
+      "Что находится на лицевой стороне — накладные панели или металлические полосы. Можно оставить гладкой."
+    ],
+    "step.glass.t": ["חלון", "Glazing", "Окно"],
+    "step.glass.s": ["חלון ועיצוב הזכוכית", "A window, and what goes in it", "Окно и его оформление"],
+    "step.glass.l": [
+      "חלון בכנף, ומה נמצא בתוכו — סורג או זכוכית מעוצבת.",
+      "A window in the leaf, and what fills it — a grille, or worked glass.",
+      "Окно в полотне и его наполнение — решётка или художественное стекло."
+    ],
+    "step.grip.t": ["ידית משיכה", "The pull handle", "Ручка-скоба"],
+    "step.grip.s": ["הידית האנכית ואורכה", "The upright bar and its length", "Вертикальная скоба и её длина"],
+    "step.grip.l": [
+      "הידית שמושכים בה. אפשר גם בלעדיה, והאורך נתון לבחירתכם.",
+      "The bar you pull on. You can go without one, and the length is yours to choose.",
+      "Скоба, за которую тянут дверь. Можно обойтись без неё, длину выбираете вы."
+    ],
+    "step.lock.t": ["מנעול", "The lock", "Замок"],
+    "step.lock.s": ["הידית המסתובבת ונעילה נוספת", "The lever, and any extra lock", "Нажимная ручка и дополнительный замок"],
+    "step.lock.l": [
+      "הידית שמסובבים והצילינדר — יש בכל דלת. אפשר להוסיף כספת או קודן.",
+      "The lever and the cylinder — every door has them. A safe lock or a keypad can be added.",
+      "Нажимная ручка и цилиндр — есть в каждой двери. Можно добавить сейфовый или кодовый замок."
+    ],
+    "step.pz.t": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
+    "step.pz.s": ["גוון הידית והצירים", "The tone of the lever and the hinges", "Оттенок ручки и петель"],
+    "step.pz.l": [
+      "הגוון של הידית, הצירים והעינית. לא משנה את גוון ידית המשיכה.",
+      "The tone of the lever, the hinges and the viewer. It does not change the pull handle.",
+      "Оттенок нажимной ручки, петель и глазка. На ручку-скобу не влияет."
+    ],
+    "step.sum.t": ["סיכום", "Your door", "Итог"],
+    "step.sum.s": ["הדלת שלכם, והמחיר", "The door you built, and the price", "Собранная дверь и цена"],
+    "step.sum.l": [
+      "בדקו שהכול נכון, ושלחו לנו את הדלת.",
+      "Check it over, then send it to us.",
+      "Проверьте всё и отправьте нам."
+    ],
+    "nav.steps": ["מעבר בין שלבי הבחירה", "Move between the steps", "Переход между шагами"],
+    "nav.back": ["‹ הקודם", "‹ Back", "‹ Назад"],
+    "nav.next": ["הבא ›", "Next ›", "Далее ›"],
+    "nav.toSummary": ["לסיכום ›", "To the summary ›", "К итогу ›"],
+    "nav.stepOf": ["{0} ⁄ {1}", "{0} ⁄ {1}", "{0} ⁄ {1}"],
+    /* ── the groups inside the steps ──────────────────────────────── */
+    "g.colour": ["צבע", "Colour", "Цвет"],
+    "g.detail": ["עיצוב החזית", "The face", "Полотно"],
+    "g.window": ["חלון", "Window", "Окно"],
+    "g.grille": ["עיצוב החלון", "Inside the window", "Наполнение окна"],
+    "g.handle": ["ידית משיכה", "Pull handle", "Ручка-скоба"],
+    "g.handle.h": [
+      "הידית האנכית. אפשר גם בלעדיה.",
+      "The upright bar. Going without one is fine.",
+      "Вертикальная скоба. Можно и без неё."
+    ],
+    "g.lockset": ["מנעול וידית", "Lever and cylinder", "Ручка и цилиндр"],
+    "g.lockset.h": [
+      "הידית שמסובבים והצילינדר. יש בכל דלת.",
+      "The lever you turn and the cylinder. Every door has them.",
+      "Нажимная ручка и цилиндр. Есть в каждой двери."
+    ],
+    "g.speciallock": ["מנעול מיוחד", "Extra lock", "Дополнительный замок"],
+    "g.speciallock.h": [
+      "נעילה נוספת מעבר למנעול הרגיל.",
+      "A second lock beside the ordinary one.",
+      "Второй замок в дополнение к основному."
+    ],
+    "g.pirzul": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
+    "g.pirzul.h": [
+      "הגוון של הידית, הצירים והעינית.",
+      "The tone of the lever, the hinges and the viewer.",
+      "Оттенок ручки, петель и глазка."
+    ],
+    "g.size": ["מידה", "Size", "Размер"],
+    "g.size.h": [
+      "נמדוד אצלכם במדויק — בחינם.",
+      "We measure on site, exactly, free of charge.",
+      "Точный замер у вас — бесплатно."
+    ],
+    "g.mashkof": ["משקוף", "Frame", "Коробка"],
+    "g.mashkof.h": [
+      "המסגרת שהדלת נסגרת עליה. נמדוד את הקיר אצלכם.",
+      "The frame the door closes against. We measure your wall on site.",
+      "Рама, к которой прилегает дверь. Толщину стены замерим на месте."
+    ],
+    "g.handing": ["כיוון פתיחה", "Opening direction", "Сторона открывания"],
+    "g.handing.h": [
+      "לא בטוחים? נבדוק יחד במדידה.",
+      "Not sure? We will check it together at the measure.",
+      "Не уверены? Уточним вместе при замере."
+    ],
+    "g.panels": ["פאנלים", "Panels", "Панели"],
+    /* ── the strip counter ────────────────────────────────────────── */
+    "stripes.label": ["פסי מתכת", "Metal strips", "Металлические полосы"],
+    "stripes.none": ["ללא", "None", "Без полос"],
+    "stripes.h": ["אופקיים", "Horizontal", "Горизонтальные"],
+    "stripes.v": ["אנכיים", "Vertical", "Вертикальные"],
+    "stripes.tight": ["צפופים", "Close together", "Плотно"],
+    "stripes.noun": ["פס|פסים", "strip|strips", "полоса|полосы|полос"],
+    "stripes.fewer": ["פחות פסים", "Fewer strips", "Меньше полос"],
+    "stripes.more": ["עוד פסים", "More strips", "Больше полос"],
+    /* ── the handle-length stepper ────────────────────────────────── */
+    "len.label": ["אורך הידית", "Handle length", "Длина ручки"],
+    "len.asIs": ["כפי שהדגם מגיע", "As the model comes", "Как в модели"],
+    "len.cm": ["{0} ס״מ", "{0} cm", "{0} см"],
+    "len.shorter": ["לקצר את הידית", "Shorten the handle", "Укоротить ручку"],
+    "len.longer": ["להאריך את הידית", "Lengthen the handle", "Удлинить ручку"],
+    /* ── the price ────────────────────────────────────────────────── */
+    "price.est": ["מחיר משוער", "Estimated price", "Ориентировочная цена"],
+    "price.breakdown": ["פירוט המחיר", "What the price is made of", "Из чего складывается цена"],
+    "price.total": ["סה״כ", "Total", "Итого"],
+    "price.included": ["כלול", "Included", "Включено"],
+    "bd.door": ["הדלת", "The door", "Дверь"],
+    "bd.cylinder": ["צילינדר", "Cylinder", "Цилиндр"],
+    "bd.lock": ["מנגנון נעילה", "Locking mechanism", "Механизм запирания"],
+    "bd.mashkof": ["משקוף", "Frame", "Коробка"],
+    "bd.install": ["התקנה והובלה", "Fitting and delivery", "Установка и доставка"],
+    "bd.measure": ["מדידה וייעוץ", "Measuring and advice", "Замер и консультация"],
+    "bd.colour": ["צבע", "Colour", "Цвет"],
+    "bd.detail": ["עיצוב החזית", "The face", "Полотно"],
+    "bd.window": ["חלון", "Window", "Окно"],
+    "bd.grille": ["עיצוב החלון", "Inside the window", "Наполнение окна"],
+    "bd.handle": ["ידית משיכה", "Pull handle", "Ручка-скоба"],
+    "bd.lockset": ["מנעול וידית", "Lever and cylinder", "Ручка и цилиндр"],
+    "bd.speciallock": ["מנעול מיוחד", "Extra lock", "Дополнительный замок"],
+    "bd.pirzul": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
+    "bd.stripes": ["פסי מתכת", "Metal strips", "Металлические полосы"],
+    "bd.round": ["עיגול", "Rounding", "Округление"],
+    /* ── sending it ───────────────────────────────────────────────── */
+    "send.label": ["שליחת הדלת", "Send your door", "Отправка двери"],
+    "send.lead": [
+      "בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.",
+      "Happy with it? Send it over and we will come back with an exact quote.",
+      "Готовы? Отправьте нам дверь, и мы вернёмся с точным предложением."
+    ],
+    "send.waOn": ["שלחו את הדלת בוואטסאפ", "Send the door on WhatsApp", "Отправить дверь в WhatsApp"],
+    "send.waOff": ["שלחו לנו הודעה בוואטסאפ", "Message us on WhatsApp", "Написать нам в WhatsApp"],
+    "send.waOnShort": ["שלחו בוואטסאפ", "Send on WhatsApp", "Отправить в WhatsApp"],
+    "send.waOffShort": ["שלחו הודעה", "Message us", "Написать нам"],
+    "send.copy": ["העתקת הפרטים", "Copy the details", "Скопировать данные"],
+    "send.save": ["שמירת העיצוב", "Save this design", "Сохранить дизайн"],
+    "send.code": ["קוד:", "Code:", "Код:"],
+    "send.callToo": ["אפשר גם להתקשר —", "Or call us —", "Или позвоните —"],
+    "send.seeReal": [
+      "רוצים לראות דלתות אמיתיות שהתקנו?",
+      "Want to see doors we have actually fitted?",
+      "Хотите посмотреть двери, которые мы уже установили?"
+    ],
+    "send.ourWorks": ["העבודות שלנו →", "Our work →", "Наши работы →"],
+    "copy.ok": [
+      "הפרטים הועתקו — הדביקו בהודעה לפרץ",
+      "Copied — paste it into a message to Peretz",
+      "Скопировано — вставьте в сообщение Перецу"
+    ],
+    "copy.fail": [
+      "ההעתקה נכשלה, נסו לשלוח בוואטסאפ",
+      "Copying failed — try WhatsApp instead",
+      "Не удалось скопировать — попробуйте WhatsApp"
+    ],
+    /* ── saved designs ────────────────────────────────────────────── */
+    "saved.mine": ["העיצוב שלי", "My designs", "Мои дизайны"],
+    "saved.none": ["עדיין לא שמרתם עיצוב.", "You have not saved a design yet.", "Вы ещё не сохранили ни одного дизайна."],
+    "saved.ok": ["העיצוב נשמר בדפדפן הזה", "Saved in this browser", "Сохранено в этом браузере"],
+    "saved.no": [
+      "הדפדפן הזה לא מאפשר לשמור עיצובים",
+      "This browser will not let us save designs",
+      "Этот браузер не позволяет сохранять дизайны"
+    ],
+    "saved.remove": ["הסרת {0}", "Remove {0}", "Удалить {0}"],
+    "saved.loaded": [
+      "טענו את הדלת. אפשר לשנות כל פרט.",
+      "Door loaded. Change anything you like.",
+      "Дверь загружена. Меняйте что угодно."
+    ],
+    /* ── the gallery ──────────────────────────────────────────────── */
+    "works.h": ["דלתות שכבר התקנו", "Doors we have fitted", "Установленные нами двери"],
+    "works.close": ["סגירת הגלריה", "Close the gallery", "Закрыть галерею"],
+    "works.lede": [
+      "בחרו דלת קרובה למה שרציתם — ומשם תשנו כל פרט.",
+      "Start from one close to what you had in mind, then change every detail.",
+      "Начните с двери, похожей на задуманную, — а дальше меняйте любую деталь."
+    ],
+    "works.open": ["התחילו מדלת שכבר התקנו", "Start from a door we have fitted", "Начните с уже установленной двери"],
+    "works.count": ["{0} דלתות אמיתיות", "{0} real doors", "{0} реальных дверей"],
+    /* ── the print sheet ──────────────────────────────────────────── */
+    "sheet.label": ["דף הזמנה", "Order sheet", "Бланк заказа"],
+    "sheet.dims": [
+      "מידות קטלוג — הפתח נמדד באתר הלקוח",
+      "Catalogue sizes — the opening is measured on site",
+      "Каталожные размеры — проём замеряется на месте"
+    ],
+    "sheet.sidelight": ["חלון צד {0} מ״מ", "sidelight {0} mm", "боковое окно {0} мм"],
+    "unit.mm": ["מ״מ", "mm", "мм"],
+    "sheet.handing": ["כיוון", "Handing", "Открывание"],
+    "sheet.grip": ["ידית", "Handle", "Ручка"],
+    "sheet.dev": [
+      "גרסת פיתוח — המחירים כאן הם דוגמה בלבד.",
+      "Development build — these prices are examples only.",
+      "Тестовая версия — цены здесь только для примера."
+    ],
+    /* ── the strips and the notices ───────────────────────────────── */
+    "strip.dev.b": ["גרסת פיתוח.", "Development build.", "Тестовая версия."],
+    "strip.dev": [
+      "הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.",
+      "The colours and prices here are examples, not final.",
+      "Цвета и цены здесь — примеры, не окончательные."
+    ],
+    "notice.code": [
+      "הקוד לא זוהה — מציגים דלת ברירת מחדל.",
+      "We did not recognise that code — showing a default door.",
+      "Код не распознан — показываем дверь по умолчанию."
+    ],
+    "notice.fixed": [
+      "השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר.",
+      "That combination cannot be built — we have adjusted it to the closest door.",
+      "Такое сочетание изготовить нельзя — мы подобрали ближайший вариант."
+    ],
+    "notice.some": [
+      "חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.",
+      "Some options in that link are unavailable — showing the closest match.",
+      "Некоторые параметры из ссылки недоступны — показываем ближайшее."
+    ],
+    "notice.moved": [
+      "{0} — הזזנו למקום הקרוב שאפשר",
+      "{0} — moved it to the nearest place that works",
+      "{0} — сдвинули в ближайшее подходящее место"
+    ],
+    /* ── why a tile is greyed out, and what a repair just did ─────────
+       ⚠ THESE ARE THE STRINGS A CUSTOMER READS AT THE MOMENT SOMETHING
+       REFUSES THEM, which makes them the ones a bad translation costs the
+       most. `js/rules.js` holds only the KEYS — see the note over `SAID`
+       there for why a table of sentences would have shipped frozen in
+       Hebrew. */
+    "why.needsWindow": ["דורש חלון", "Needs a window", "Нужно окно"],
+    "why.winTakesTop": ["החלון תופס את מקומו של הפאנל העליון", "The window takes the upper panel’s place", "Окно занимает место верхней панели"],
+    "why.noRoomBelow": ["אין מקום לפאנל מתחת לחלון", "No room for a panel below the window", "Под окном нет места для панели"],
+    "why.setNoSlot": ["הסט הקלאסי לא משתלב עם צוהר אנכי", "The classical set does not go with a vertical slot", "Классический комплект не сочетается с вертикальным окном"],
+    "why.setOwnWindow": ["הסט הקלאסי מגיע עם חלון מלבני משלו", "The classical set comes with a rectangular window of its own", "У классического комплекта своё прямоугольное окно"],
+    "why.stripesWindow": ["לא משלבים פסי מתכת עם חלון", "Metal strips do not go with a window", "Металлические полосы не сочетаются с окном"],
+    "why.stripesPanel": ["לא משלבים פסי מתכת עם פאנל", "Metal strips do not go with a panel", "Металлические полосы не сочетаются с панелью"],
+    "why.windowStripes": ["לא משלבים חלון עם קווי מתכת", "A window does not go with metal strips", "Окно не сочетается с металлическими полосами"],
+    "why.panelStripes": ["לא משלבים פאנל עם פסי מתכת", "A panel does not go with metal strips", "Панель не сочетается с металлическими полосами"],
+    "why.rectNeedsPanel": ["חלון מרובע מגיע תמיד עם פאנל בתחתית", "A rectangular window always comes with a panel below", "Прямоугольное окно всегда идёт с нижней панелью"],
+    "why.panelOwnPull": ["הפאנל האמצעי מגיע עם המאחז שלו", "The middle panel comes with its own grip", "У средней панели своя скоба"],
+    "why.channelPlain": ["ידית שקועה דורשת דלת חלקה", "A recessed channel needs a plain face", "Врезная ручка требует гладкого полотна"],
+    "why.notWithChannel": ["לא משתלב עם ידית שקועה", "Does not go with a recessed channel", "Не сочетается с врезной ручкой"],
+    "why.noRoomHandle": ["אין מקום לידית הזו על הדלת", "No room for this handle on the door", "На двери нет места для этой ручки"],
+    "why.noRoomWithWindow": ["אין מקום לידית שבחרתם עם החלון הזה", "No room for the handle you chose with this window", "С этим окном нет места для выбранной ручки"],
+    "why.noRoomGripLock": ["אין מקום בין המאחז למנעול", "No room between the grip and the lock", "Между скобой и замком нет места"],
+    "fix.windowAdded": ["הוספנו חלון — הסורג והזכוכית צריכים אותו", "We added a window — the grille and the glass need one", "Мы добавили окно — решётке и стеклу оно необходимо"],
+    "fix.windowGone": ["הסרנו את החלון", "We removed the window", "Мы убрали окно"],
+    "fix.lineWorkGone": ["הסרנו את קווי המתכת — לא משלבים אותם עם חלון", "We removed the metal strips — they do not go with a window", "Мы убрали металлические полосы — с окном они не сочетаются"],
+    "fix.onePanel": ["עברנו לפאנל אחד — החלון תופס את מקומו של העליון", "We moved to one panel — the window takes the upper one’s place", "Оставили одну панель — окно занимает место верхней"],
+    "fix.noPanelRoom": ["הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום", "We removed the panel — the tall window leaves no room for it", "Мы убрали панель — высокому окну не хватает места"],
+    "fix.faceCleared": ["החלקנו את הדלת — ידית שקועה דורשת פנים חלקות", "We smoothed the face — a recessed channel needs it plain", "Мы сделали полотно гладким — врезная ручка этого требует"],
+    "fix.grilleGone": ["הסרנו את הסורג — אין חלון", "We removed the grille — there is no window", "Мы убрали решётку — окна нет"],
+    "fix.gripGone": ["הסרנו את ידית המשיכה — אין לה מקום כאן", "We removed the pull handle — there is no room for it here", "Мы убрали ручку-скобу — для неё здесь нет места"],
+    "fix.locksetSwapped": ["החלפנו את המנעול — אין לו מקום ליד המאחז", "We swapped the lockset — there is no room for it beside the grip", "Мы заменили замок — рядом со скобой ему нет места"],
+    "fix.gripMoved": ["הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה", "We moved the handle — where you put it no longer works", "Мы сдвинули ручку — на выбранном месте она больше не подходит"],
+    "fix.gripHome": ["הידית הוסרה, ואיתה המיקום שבחרתם לה", "The handle is gone, and with it the place you chose for it", "Ручка убрана, а вместе с ней и выбранное для неё место"],
+    "fix.setWindow": ["התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו", "We adjusted the window — the classical set comes with a rectangular one of its own", "Мы изменили окно — у классического комплекта своё прямоугольное"],
+    "fix.setGone": ["הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי", "We removed the classical set — it does not go with a vertical slot", "Мы убрали классический комплект — он не сочетается с вертикальным окном"],
+    "fix.needPanel": ["הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד", "We added a panel below — a rectangular window always comes with one", "Мы добавили нижнюю панель — прямоугольное окно всегда идёт с ней"],
+    "fix.ownPull": ["הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו", "We removed the pull handle — the middle panel comes with its own grip", "Мы убрали ручку-скобу — у средней панели своя"],
+    "why.gripOffDoor": ["הידית חורגת מהדלת", "The handle runs off the door", "Ручка выходит за пределы двери"],
+    "why.gripReach": [
+      "הידית גבוהה או נמוכה מדי לשימוש",
+      "Too high or too low to use comfortably",
+      "Слишком высоко или слишком низко"
+    ],
+    "why.gripHingeSide": [
+      "ידית משיכה לא מותקנת בצד הצירים",
+      "A pull handle is not fitted on the hinge side",
+      "Ручку-скобу не ставят со стороны петель"
+    ],
+    "why.feetOnWindow": [
+      "הרגליים על מסגרת החלון",
+      "The fixings land on the window frame",
+      "Крепления попадают на раму окна"
+    ],
+    "why.feetOnFace": [
+      "הרגליים על עיצוב החזית",
+      "The fixings land on the face detail",
+      "Крепления попадают на декор полотна"
+    ],
+    "why.feetOnPanel": [
+      "הרגליים על מסגרת הפאנל",
+      "The fixings land on the panel moulding",
+      "Крепления попадают на обрамление панели"
+    ],
+    "why.gripTouchesLock": ["הידית נוגעת במנעול", "The handle touches the lock", "Ручка задевает замок"],
+    "why.gripCrossesWindow": ["הידית חוצה את החלון", "The handle crosses the window", "Ручка пересекает окно"],
+    /* ── the no-JS fallback and the footer ────────────────────────── */
+    "down.h": [
+      "הדלת לא נטענת בדפדפן הזה.",
+      "The door will not load in this browser.",
+      "Дверь не загружается в этом браузере."
+    ],
+    "down.p": [
+      "אפשר לשלוח לנו הודעה בוואטסאפ, או להתקשר אלינו למספר",
+      "You can message us on WhatsApp, or call us on",
+      "Напишите нам в WhatsApp или позвоните по номеру"
+    ],
+    "down.p2": [
+      "ונעזור לכם לבחור דלת.",
+      "and we will help you choose a door.",
+      "и мы поможем вам выбрать дверь."
+    ],
+    "trust.label": ["למה אנחנו", "Why us", "Почему мы"],
+    "trust.warranty": ["אחריות", "Warranty", "Гарантия"],
+    "trust.fitting": ["התקנה מקצועית", "Professional fitting", "Профессиональная установка"],
+    "trust.made": ["ייצור כחול לבן", "Made in Israel", "Израильское производство"],
+    "trust.service": ["שירות אישי וליווי", "Personal service, start to finish", "Личное сопровождение"],
+    "choices.label": ["התאמת הדלת", "Configure the door", "Настройка двери"],
+    /* ── the sentences that also travel to Peretz ─────────────────── */
+    "price.includes": [
+      "כולל דלת, משקוף, מנעול, התקנה ומע״מ",
+      "Door, frame, lock, fitting and VAT included",
+      "Включает дверь, коробку, замок, установку и НДС"
+    ],
+    "price.caveat": [
+      "מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.",
+      "An estimate. The final price is set after measuring on site, and may change by about 5%.",
+      "Ориентировочная цена. Окончательная определяется после замера и может измениться примерно на 5%."
+    ],
+    "illustration": [
+      "הציור באתר הוא הדמיה ממוחשבת — הדלת שתיוצר עשויה להיראות מעט שונה בגוון, בברק ובפרטי הידיות.",
+      "The drawing is a computer illustration — the door as built may differ slightly in shade, sheen and handle detail.",
+      "Изображение — компьютерная визуализация. Готовая дверь может немного отличаться по оттенку, блеску и деталям ручек."
+    ],
+    "addendum.flat": [
+      "הערה: ידית המשיכה מותקנת לרוחב הדלת",
+      "Note: the pull handle is fitted across the door",
+      "Примечание: ручка-скоба ставится поперёк двери"
+    ],
+    "addendum.shifted": [
+      "מיקום הידית: הזזתי אותה ממקומה הרגיל. {0}, והמיקום המדויק בקישור.",
+      "Handle position: I moved it from where it normally sits. {0}, and the exact spot is in the link.",
+      "Положение ручки: я сдвинул её с обычного места. {0}, точная позиция — по ссылке."
+    ],
+    "grip.illustrative": ["להמחשה — נקבע בהתקנה", "illustrative — set at fitting", "ориентировочно — уточняется при установке"],
+    /* ── the order sheet's row names ──────────────────────────────── */
+    "row.colour": ["צבע", "Colour", "Цвет"],
+    "row.window": ["חלון", "Window", "Окно"],
+    "row.glazing": ["זיגוג", "Glazing", "Остекление"],
+    "row.grille": ["סורג", "Grille", "Решётка"],
+    "row.glass": ["זכוכית", "Glass", "Стекло"],
+    "row.handle": ["ידית משיכה", "Pull handle", "Ручка-скоба"],
+    "row.lockset": ["מנעול וידית", "Lever and cylinder", "Ручка и цилиндр"],
+    "row.speciallock": ["מנעול מיוחד", "Extra lock", "Дополнительный замок"],
+    "row.detail": ["עיצוב", "Face", "Полотно"],
+    "row.stripes": ["פסים", "Strips", "Полосы"],
+    "row.size": ["מידה", "Size", "Размер"],
+    "row.mashkof": ["משקוף", "Frame", "Коробка"],
+    "row.pirzul": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
+    "row.handing": ["פתיחה", "Handing", "Открывание"],
+    "row.units": ["{0} יחידות", "{0} units", "{0} шт."],
+    "row.dirTight": ["{0} · צפופים", "{0} · close together", "{0} · плотно"],
+    /* ── handing, spelled out so it cannot be misread ─────────────── */
+    "hand.left": ["שמאל", "left", "слева"],
+    "hand.right": ["ימין", "right", "справа"],
+    "hand.words": [
+      "ציר בצד {0}, צילינדר בצד {1} — במבט מבחוץ",
+      "Hinges on the {0}, cylinder on the {1} — seen from outside",
+      "Петли {0}, цилиндр {1} — вид снаружи"
+    ],
+    "spec.summary": ["דלת כניסה פלדה, {0}.", "Steel entrance door, {0}.", "Стальная входная дверь, {0}."]
+  };
+  var CUSTOMER_LANG_NOTE = {
+    he: null,
+    en: "הלקוח בנה את הדלת בעמוד באנגלית.",
+    ru: "הלקוח בנה את הדלת בעמוד ברוסית."
+  };
+
   // js/prices.js
   var PLACEHOLDER = false;
   function agorot(shekels) {
@@ -199,47 +711,52 @@
       id: "standard",
       he: "סטנדרטית",
       en: "Standard",
+      ru: "Стандартная",
       w: 950,
       h: 2100,
       mult: 1,
-      band: "עד 98 × 203 ס״מ"
+      band: { he: "עד 98 × 203 ס״מ", en: "up to 98 × 203 cm", ru: "до 98 × 203 см" }
     },
     narrow: {
       id: "narrow",
       he: "צרה",
       en: "Narrow",
+      ru: "Узкая",
       w: 800,
       h: 2100,
       mult: 1,
-      band: "עד 98 × 203 ס״מ"
+      band: { he: "עד 98 × 203 ס״מ", en: "up to 98 × 203 cm", ru: "до 98 × 203 см" }
     },
     wide: {
       id: "wide",
       he: "רחבה",
       en: "Wide",
+      ru: "Широкая",
       w: 1100,
       h: 2100,
       mult: 1.25,
-      band: "עד 120 × 240 ס״מ"
+      band: { he: "עד 120 × 240 ס״מ", en: "up to 120 × 240 cm", ru: "до 120 × 240 см" }
     },
     tall: {
       id: "tall",
       he: "גבוהה",
       en: "Tall",
+      ru: "Высокая",
       w: 950,
       h: 2400,
       mult: 1.25,
-      band: "עד 120 × 240 ס״מ"
+      band: { he: "עד 120 × 240 ס״מ", en: "up to 120 × 240 cm", ru: "до 120 × 240 см" }
     },
     half: {
       id: "half",
       he: "דלת וחצי",
       en: "Leaf and half",
+      ru: "Полуторная",
       w: 950,
       h: 2100,
       side: 400,
       mult: 2,
-      band: "שתי כנפיים"
+      band: { he: "שתי כנפיים", en: "Two leaves", ru: "Две створки" }
     },
     /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
        d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
@@ -250,12 +767,13 @@
       id: "sidelight",
       he: "עם חלון צד",
       en: "With sidelight",
+      ru: "С боковым окном",
       w: 950,
       h: 2100,
       side: 400,
       sideGlazed: true,
       mult: 2,
-      band: "כנף וחלון צד"
+      band: { he: "כנף וחלון צד", en: "Leaf and sidelight", ru: "Створка и боковое окно" }
     },
     /* ⚠ APPENDED, AND THAT IS WHY IT IS LAST. Peretz's "double extra
        (door>120x240)" at +50%. `encodeCode` packs the INDEX of this list, so a
@@ -268,40 +786,42 @@
       id: "xl",
       he: "רחבה וגבוהה",
       en: "Extra large",
+      ru: "Широкая и высокая",
       w: 1200,
       h: 2400,
       mult: 1.5,
-      band: "מעל 120 × 240 ס״מ"
+      band: { he: "מעל 120 × 240 ס״מ", en: "over 120 × 240 cm", ru: "свыше 120 × 240 см" }
     }
   };
   var COLOURS = [
     /* dark */
-    { id: "rb-9005d", ral: "9005D", hex: "#1D1A18", he: "שחור", en: "Black", aliases: ["ral-9005"] },
-    { id: "rb-7021d", ral: "7021D", hex: "#2D2D2B", he: "אפור פחם", en: "Charcoal" },
-    { id: "rb-5103d", ral: "5103D", hex: "#3D3F54", he: "כחול לילה", en: "Night blue", aliases: ["ral-5011"] },
-    { id: "rb-7126d", ral: "7126D", hex: "#453F3F", he: "חום-אפור כהה", en: "Dark umber", aliases: ["ral-7022"] },
-    { id: "rb-0097d", ral: "0097D", hex: "#4B4952", he: "אפור אנתרציט", en: "Anthracite", aliases: ["ral-7016", "ral-7024"] },
-    { id: "rb-6459d", ral: "6459D", hex: "#4F6454", he: "ירוק בקבוק", en: "Bottle green", aliases: ["ral-6009"] },
-    { id: "rb-rb09d", ral: "RB09D", hex: "#55412F", he: "חום", en: "Brown", aliases: ["ral-8017", "ral-3005"] },
-    { id: "rb-7110d", ral: "7110D", hex: "#565357", he: "אפור כהה", en: "Dark grey", aliases: ["ral-8019"] },
+    { id: "rb-9005d", ral: "9005D", hex: "#1D1A18", he: "שחור", en: "Black", ru: "Чёрный", aliases: ["ral-9005"] },
+    { id: "rb-7021d", ral: "7021D", hex: "#2D2D2B", he: "אפור פחם", en: "Charcoal", ru: "Угольно-серый" },
+    { id: "rb-5103d", ral: "5103D", hex: "#3D3F54", he: "כחול לילה", en: "Night blue", ru: "Ночной синий", aliases: ["ral-5011"] },
+    { id: "rb-7126d", ral: "7126D", hex: "#453F3F", he: "חום-אפור כהה", en: "Dark umber", ru: "Тёмная умбра", aliases: ["ral-7022"] },
+    { id: "rb-0097d", ral: "0097D", hex: "#4B4952", he: "אפור אנתרציט", en: "Anthracite", ru: "Антрацит", aliases: ["ral-7016", "ral-7024"] },
+    { id: "rb-6459d", ral: "6459D", hex: "#4F6454", he: "ירוק בקבוק", en: "Bottle green", ru: "Бутылочно-зелёный", aliases: ["ral-6009"] },
+    { id: "rb-rb09d", ral: "RB09D", hex: "#55412F", he: "חום", en: "Brown", ru: "Коричневый", aliases: ["ral-8017", "ral-3005"] },
+    { id: "rb-7110d", ral: "7110D", hex: "#565357", he: "אפור כהה", en: "Dark grey", ru: "Тёмно-серый", aliases: ["ral-8019"] },
     /* mid */
-    { id: "rb-7322d", ral: "7322D", hex: "#61697A", he: "כחול פלדה", en: "Steel blue" },
-    { id: "rb-6219d", ral: "6219D", hex: "#7A8272", he: "ירוק מרווה", en: "Sage green", aliases: ["ral-7036", "ral-7033"] },
-    { id: "rb-0096d", ral: "0096D", hex: "#86868A", he: "אפור בינוני", en: "Mid grey", aliases: ["ral-7046"] },
-    { id: "rb-7240d", ral: "7240D", hex: "#A1928A", he: "טאופ", en: "Taupe", aliases: ["ral-1035"] },
-    { id: "rb-2030d", ral: "2030D", hex: "#BF9367", he: "קרמל", en: "Caramel" },
+    { id: "rb-7322d", ral: "7322D", hex: "#61697A", he: "כחול פלדה", en: "Steel blue", ru: "Стальной синий" },
+    { id: "rb-6219d", ral: "6219D", hex: "#7A8272", he: "ירוק מרווה", en: "Sage green", ru: "Шалфейный", aliases: ["ral-7036", "ral-7033"] },
+    { id: "rb-0096d", ral: "0096D", hex: "#86868A", he: "אפור בינוני", en: "Mid grey", ru: "Средне-серый", aliases: ["ral-7046"] },
+    { id: "rb-7240d", ral: "7240D", hex: "#A1928A", he: "טאופ", en: "Taupe", ru: "Тёмно-бежевый", aliases: ["ral-1035"] },
+    { id: "rb-2030d", ral: "2030D", hex: "#BF9367", he: "קרמל", en: "Caramel", ru: "Карамель" },
     /* light */
-    { id: "rb-7080d", ral: "7080D", hex: "#B7B4B2", he: "אפור בהיר", en: "Light grey", aliases: ["ral-7040"] },
-    { id: "rb-9001d", ral: "9001D", hex: "#DDCDBD", he: "שמנת", en: "Cream", aliases: ["ral-1013", "ral-7035"] },
-    { id: "rb-9302d", ral: "9302D", hex: "#ECEBE7", he: "לבן שבור", en: "Off-white" },
-    { id: "rb-9016d", ral: "9016D", hex: "#F1F0EA", he: "לבן", en: "White", aliases: ["ral-9016"] }
+    { id: "rb-7080d", ral: "7080D", hex: "#B7B4B2", he: "אפור בהיר", en: "Light grey", ru: "Светло-серый", aliases: ["ral-7040"] },
+    { id: "rb-9001d", ral: "9001D", hex: "#DDCDBD", he: "שמנת", en: "Cream", ru: "Кремовый", aliases: ["ral-1013", "ral-7035"] },
+    { id: "rb-9302d", ral: "9302D", hex: "#ECEBE7", he: "לבן שבור", en: "Off-white", ru: "Молочно-белый" },
+    { id: "rb-9016d", ral: "9016D", hex: "#F1F0EA", he: "לבן", en: "White", ru: "Белый", aliases: ["ral-9016"] }
   ];
   var WINDOWS = [
-    { id: "none", he: "ללא חלון", en: "Solid", rects: [] },
+    { id: "none", he: "ללא חלון", en: "Solid", ru: "Без окна", rects: [] },
     {
       id: "strip",
       he: "צוהר אנכי",
       en: "Vertical slot",
+      ru: "Вертикальное окно",
       doors: ["d113", "d125"],
       rects: [{ w: 272, h: 1415, top: 205 }]
     },
@@ -328,13 +848,14 @@
       id: "rect",
       he: "חלון מלבני",
       en: "Rectangular",
+      ru: "Прямоугольное окно",
       aliases: ["square", "duo", "tallwin", "broad"],
       doors: ["d108", "d099", "d122", "d116"],
       rects: [{ w: 357, h: 902, top: 185 }]
     }
   ];
   var HANDLES = [
-    { id: "none", he: "ללא ידית משיכה", en: "No pull", len: 0, style: "none" },
+    { id: "none", he: "ללא ידית משיכה", en: "No pull", ru: "Без ручки-скобы", len: 0, style: "none" },
     /* Pull bars. `bar` selects the section and the tone profile; see BARS in the
        renderer.
        ⚠ THE WIDTHS WERE THE THING THAT WAS WRONG. Read against the leaf on
@@ -352,6 +873,7 @@
       id: "idan",
       he: "עידן",
       en: "Idan",
+      ru: "Идан",
       len: 1050,
       w: 32,
       style: "bar",
@@ -367,6 +889,7 @@
       id: "ella",
       he: "אלה",
       en: "Ella",
+      ru: "Эла",
       len: 1e3,
       w: 20,
       style: "bar",
@@ -378,6 +901,7 @@
       id: "nitzan",
       he: "ניצן",
       en: "Nitzan",
+      ru: "Ницан",
       len: 1e3,
       w: 44,
       style: "bar",
@@ -389,6 +913,7 @@
       id: "shahar",
       he: "שחר",
       en: "Shahar",
+      ru: "Шахар",
       len: 1230,
       w: 40,
       style: "bar",
@@ -396,7 +921,7 @@
       pull: true,
       aliases: ["bar-flat", "blade"]
     },
-    { id: "ron", he: "רון", en: "Ron", len: 900, w: 18, style: "bar", bar: "ron", pull: true },
+    { id: "ron", he: "רון", en: "Ron", ru: "Рон", len: 900, w: 18, style: "bar", bar: "ron", pull: true },
     /* The ornate pull, the horizontal bow, and the recess. */
     /* ⚠ `shiran` IS WITHDRAWN, and this closes a question rather than dropping a
        product. ASK-PERETZ §2 has been asking since 23.8 whether he orders it at
@@ -408,6 +933,7 @@
       id: "grab",
       he: "מאחז אופקי",
       en: "Grab bar",
+      ru: "Горизонтальная скоба",
       len: 0,
       style: "grab",
       aliases: ["dee"]
@@ -434,6 +960,7 @@
       id: "channel",
       he: "ידית שקועה",
       en: "Recessed channel",
+      ru: "Врезная ручка",
       len: 1780,
       w: 85,
       inset: 0.3,
@@ -468,6 +995,7 @@
       id: "barblack",
       he: "מוט שחור",
       en: "Black tube bar",
+      ru: "Чёрная трубчатая скоба",
       len: 800,
       w: 20,
       style: "bar",
@@ -477,7 +1005,7 @@
     }
   ];
   var LOCKSETS = [
-    { id: "coral", he: "קורל", en: "Coral", style: "lever", aliases: ["lever"], lever: true },
+    { id: "coral", he: "קורל", en: "Coral", ru: "Корал", style: "lever", aliases: ["lever"], lever: true },
     /* Cylinder only: a keyway escutcheon and nothing else.
        This is the commonest lock furniture in the whole corpus on the doors that
        matter most, and it was not offered. Of the TEN doors carrying a pull bar,
@@ -491,6 +1019,7 @@
       id: "cylinder",
       he: "צילינדר בלבד",
       en: "Cylinder only",
+      ru: "Только цилиндр",
       style: "cylinder",
       lock: true,
       aliases: ["none"]
@@ -512,13 +1041,14 @@
       id: "plate",
       he: "רותם",
       en: "Rotem",
+      ru: "Ротем",
       style: "plate",
       lock: true,
       lever: true,
       aliases: ["longplate"]
     },
-    { id: "cadoor", he: "כדור", en: "Cadoor", style: "cadoor" },
-    { id: "sapir", he: "ספיר", en: "Sapir", style: "sapir", aliases: ["almog"] },
+    { id: "cadoor", he: "כדור", en: "Cadoor", ru: "Шаровая", style: "cadoor" },
+    { id: "sapir", he: "ספיר", en: "Sapir", ru: "Сапир", style: "sapir", aliases: ["almog"] },
     /* ⚠ `almog` IS WITHDRAWN — Peretz, 26.8.2026: "there is no: אלמוג". It
        resolves to `sapir`, the nearest lever left in the range. */
     /* Knob on a long backplate — the bronze fitting on d092, named three times
@@ -528,6 +1058,7 @@
       id: "knobplate",
       he: "כדור על אורך",
       en: "Knob on backplate",
+      ru: "Шар на планке",
       style: "knobplate",
       lock: true
     },
@@ -545,6 +1076,7 @@
       id: "digital",
       he: "מנעול חכם",
       en: "Smart lock",
+      ru: "Умный замок",
       style: "digital",
       lock: true
     },
@@ -558,6 +1090,7 @@
       id: "square",
       he: "ריבועי",
       en: "Square backplates",
+      ru: "Квадратные накладки",
       style: "square",
       lever: true,
       lock: true
@@ -580,19 +1113,20 @@
        renumbers nothing. */
   ];
   var PIRZUL2 = [
-    { id: "pz-nickel", he: "ניקל", en: "Nickel", tone: "steel" },
-    { id: "pz-black", he: "שחור", en: "Black", tone: "black" },
-    { id: "pz-bronze", he: "ברונזה", en: "Bronze", tone: "brass" },
-    { id: "pz-gold", he: "זהב", en: "Gold", tone: "brass" }
+    { id: "pz-nickel", he: "ניקל", en: "Nickel", ru: "Никель", tone: "steel" },
+    { id: "pz-black", he: "שחור", en: "Black", ru: "Чёрный", tone: "black" },
+    { id: "pz-bronze", he: "ברונזה", en: "Bronze", ru: "Бронза", tone: "brass" },
+    { id: "pz-gold", he: "זהב", en: "Gold", ru: "Золото", tone: "brass" }
   ];
   var MASHKOFS = [
-    { id: "mk-std", he: "סטנדרטי", en: "Standard", out: 46, in: 62, head: 148 },
-    { id: "mk-out", he: "חזית רחבה", en: "Wide face", out: 82, in: 62, head: 148, wideOut: true },
-    { id: "mk-in", he: "עומק מוגדל", en: "Deep return", out: 46, in: 112, head: 198, wideIn: true },
+    { id: "mk-std", he: "סטנדרטי", en: "Standard", ru: "Стандартная", out: 46, in: 62, head: 148 },
+    { id: "mk-out", he: "חזית רחבה", en: "Wide face", ru: "Широкий фасад", out: 82, in: 62, head: 148, wideOut: true },
+    { id: "mk-in", he: "עומק מוגדל", en: "Deep return", ru: "Увеличенная глубина", out: 46, in: 112, head: 198, wideIn: true },
     {
       id: "mk-both",
       he: "רחב ועמוק",
       en: "Wide and deep",
+      ru: "Широкая и глубокая",
       out: 82,
       in: 112,
       head: 198,
@@ -606,21 +1140,23 @@
     head: Math.max(m.head, k.head)
   }), { out: 0, in: 0, head: 0 });
   var SPECIAL_LOCKS = [
-    { id: "nospecial", he: "ללא", en: "None" },
-    { id: "kasefet", he: "כספת", en: "Safe lock" },
-    { id: "kodan", he: "קודן", en: "Keypad" }
+    { id: "nospecial", he: "ללא", en: "None", ru: "Нет" },
+    { id: "kasefet", he: "כספת", en: "Safe lock", ru: "Сейфовый замок" },
+    { id: "kodan", he: "קודן", en: "Keypad", ru: "Кодовый замок" }
   ];
   var GRILLES = [
     {
       id: "none",
       he: "ללא סורג",
       en: "None",
+      ru: "Без решётки",
       doors: ["d094", "d115"]
     },
     {
       id: "grid",
       he: "סורג רשת",
       en: "Square grid",
+      ru: "Решётка-сетка",
       aliases: ["bars", "iron"],
       doors: ["d091", "d100", "d107", "d110", "d113", "d117", "d122"]
     },
@@ -628,6 +1164,7 @@
       id: "grid-light",
       he: "סורג רשת בהיר",
       en: "Square grid, door colour",
+      ru: "Решётка-сетка в цвет двери",
       light: true,
       aliases: ["bars-light", "iron-light"]
     },
@@ -635,6 +1172,7 @@
       id: "scroll",
       he: "סורג מעוצב",
       en: "Grid with scrolls",
+      ru: "Кованая решётка",
       aliases: ["quatrefoil"],
       doors: ["d089", "d093", "d095", "d097", "d099", "d102", "d116"]
     },
@@ -642,6 +1180,7 @@
       id: "scroll-light",
       he: "סורג מעוצב בהיר",
       en: "Grid with scrolls, door colour",
+      ru: "Кованая решётка в цвет двери",
       light: true,
       aliases: ["quatrefoil-light"]
     },
@@ -670,13 +1209,14 @@
     /* ⚠ `quatrefoil` AND `quatrefoil-light` ARE WITHDRAWN — Peretz named
        מדליוני פרח among the three he does not sell. One measured door (d104)
        carried it. Both ids resolve to `scroll`, the nearest surviving pattern. */
-    { id: "arch", he: "קשת", en: "Arch", doors: ["d121"] },
-    { id: "deco", he: "קווים גיאומטריים", en: "Art-deco lines", doors: ["d123"] },
+    { id: "arch", he: "קשת", en: "Arch", ru: "Арка", doors: ["d121"] },
+    { id: "deco", he: "קווים גיאומטריים", en: "Art-deco lines", ru: "Геометрические линии", doors: ["d123"] },
     /* Worked GLASS. In the pane, not on it. */
     {
       id: "circles",
       he: "עיגולים שזורים",
       en: "Interlocking rings",
+      ru: "Переплетённые кольца",
       glass: true,
       doors: ["d106"]
     },
@@ -684,6 +1224,7 @@
       id: "vine",
       he: "גפן",
       en: "Grape and vine",
+      ru: "Виноградная лоза",
       glass: true,
       doors: ["d109", "d111"]
     },
@@ -691,6 +1232,7 @@
       id: "tree",
       he: "עץ",
       en: "Tree",
+      ru: "Дерево",
       glass: true,
       doors: ["d114"]
     },
@@ -698,6 +1240,7 @@
       id: "mesh",
       he: "זכוכית מעוצבת",
       en: "Etched mesh",
+      ru: "Матовое стекло с рисунком",
       glass: true,
       aliases: ["lattice", "reeded"],
       doors: ["d102", "d105", "d116", "d127"]
@@ -724,28 +1267,30 @@
       id: "rings",
       he: "טבעות ותלתלים",
       en: "Scrolled ring lattice",
+      ru: "Кольца и завитки",
       doors: ["newdoor"]
     },
     /* The three missing `-light` twins, appended so the ids already in the wild
        keep their indices. `light` is the same one switch it has always been: the
        same ironwork, painted the door's colour instead of black. */
-    { id: "arch-light", he: "קשת בהירה", en: "Arch, door colour", light: true },
+    { id: "arch-light", he: "קשת בהירה", en: "Arch, door colour", ru: "Арка в цвет двери", light: true },
     {
       id: "deco-light",
       he: "קווים גיאומטריים בהירים",
       en: "Art-deco lines, door colour",
+      ru: "Геометрические линии в цвет двери",
       light: true
     }
     /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
        resolves to `mesh`, the other worked glass. */
   ];
   var HANDINGS = [
-    { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "right" },
-    { id: "left-in", he: "שמאל, פנימה", en: "Left, inward", hinge: "left" }
+    { id: "right-in", he: "ימין, פנימה", en: "Right, inward", ru: "Правая, внутрь", hinge: "right" },
+    { id: "left-in", he: "שמאל, פנימה", en: "Left, inward", ru: "Левая, внутрь", hinge: "left" }
   ];
-  var DETAIL_SUBS = [["panel", "פאנלים"]];
+  var DETAIL_SUBS = [["panel", "g.panels"]];
   var DETAILS = [
-    { id: "plain", he: "חלק", en: "Plain", panel: false, groove: false },
+    { id: "plain", he: "חלק", en: "Plain", ru: "Гладкая", panel: false, groove: false },
     /* ── PANELS ───────────────────────────────────────────────────────
          A panel on these doors is a strip of moulding laid on the face in a
          rectangle; the face inside it is the same plane and the same paint as the
@@ -775,6 +1320,7 @@
       sub: "panel",
       he: "פאנל תחתון",
       en: "Lower panel",
+      ru: "Нижняя панель",
       panel: true,
       groove: false,
       aliases: ["both", "groove", "perimeter"]
@@ -786,6 +1332,7 @@
       sub: "panel",
       he: "שני פאנלים",
       en: "Two panels",
+      ru: "Две панели",
       panel: true,
       groove: false,
       panels: 2,
@@ -800,6 +1347,7 @@
       sub: "panel",
       he: "פאנל עליון",
       en: "Upper panel",
+      ru: "Верхняя панель",
       panel: true,
       groove: false,
       panels: 1,
@@ -831,6 +1379,7 @@
       sub: "panel",
       he: "שלושה פאנלים",
       en: "Three panels",
+      ru: "Три панели",
       panel: true,
       groove: false,
       ownPull: true,
@@ -871,6 +1420,7 @@
       sub: "panel",
       he: "פאנל תחתון קלאסי",
       en: "Lower panel, ogee",
+      ru: "Нижняя панель, классика",
       panel: true,
       groove: false,
       profile: "ogee",
@@ -881,6 +1431,7 @@
       sub: "panel",
       he: "שני פאנלים קלאסיים",
       en: "Two panels, ogee",
+      ru: "Две панели, классика",
       panel: true,
       groove: false,
       panels: 2,
@@ -1044,6 +1595,7 @@
       sub: "panel",
       he: "סט קלאסי",
       en: "Classical set",
+      ru: "Классический комплект",
       panel: true,
       groove: false,
       ownPull: true,
@@ -1067,12 +1619,12 @@
     }
   ];
   var FINISHES = [
-    { id: "steel", he: "ניקל מוברש", en: "Brushed nickel" },
-    { id: "black", he: "שחור מט", en: "Matte black" },
-    { id: "brass", he: "פליז", en: "Brass" }
+    { id: "steel", he: "ניקל מוברש", en: "Brushed nickel", ru: "Матовый никель" },
+    { id: "black", he: "שחור מט", en: "Matte black", ru: "Матовый чёрный" },
+    { id: "brass", he: "פליז", en: "Brass", ru: "Латунь" }
   ];
   var declaredFinish = (o) => !o || !o.finish ? null : FINISHES.find((f) => f.id === o.finish || (f.aliases || []).includes(o.finish)) || null;
-  var colourCode = (c) => `רב בריח ${c.ral}`;
+  var colourCode = (c) => `${T("brand.ravbariach")} ${c.ral}`;
   var HANDLE_LENS = [0, 600, 800, 1e3, 1200, 1400, 1600, 1800, 2e3];
   function handleLength(state2) {
     const h = byId(HANDLES, state2.handle);
@@ -1104,26 +1656,30 @@
       out.push({
         id: "leaf",
         panes: rows,
-        he: "כנף הדלת",
-        inHe: "בכנף הדלת",
-        isHe: win.he
+        name: { he: "כנף הדלת", en: "Door leaf", ru: "Створка двери" },
+        at: { he: "בכנף הדלת", en: "in the leaf", ru: "в створке двери" },
+        is: win
       });
     }
     if (size.sideGlazed && size.side > SIDE_OPENING_MIN) {
       out.push({
         id: "side",
         panes: 1,
-        he: "חלון הצד",
-        inHe: "בחלון הצד",
-        isHe: "זיגוג קבוע"
+        name: { he: "חלון הצד", en: "Sidelight", ru: "Боковое окно" },
+        at: { he: "בחלון הצד", en: "in the sidelight", ru: "в боковом окне" },
+        is: { he: "זיגוג קבוע", en: "Fixed glazing", ru: "Глухое остекление" }
       });
     } else if (rows && size.side > SIDE_OPENING_MIN) {
       out.push({
         id: "side",
         panes: 1,
-        he: "הכנף הצדדית",
-        inHe: "בכנף הצדדית",
-        isHe: "חלון צר תואם"
+        name: { he: "הכנף הצדדית", en: "Side leaf", ru: "Боковая створка" },
+        at: { he: "בכנף הצדדית", en: "in the side leaf", ru: "в боковой створке" },
+        is: {
+          he: "חלון צר תואם",
+          en: "Matching narrow light",
+          ru: "Узкое окно в тон"
+        }
       });
     }
     return out;
@@ -1132,10 +1688,10 @@
   function grillePlacement(state2) {
     const panels = glazedPanels(state2);
     const n = paneCount(state2);
-    const count = n > 1 ? ` (${n} יחידות)` : "";
+    const count = n > 1 ? ` (${T("row.units", n)})` : "";
     if (!panels.length) return "";
     if (panels.length === 1 && panels[0].id === "leaf") return count;
-    return ` — ${panels.map((p) => p.inHe).join(" ו")}` + count;
+    return ` — ${andJoin(panels.map((p) => L(p.at)))}` + count;
   }
   var isGlazed = (state2) => paneCount(state2) > 0;
   function priceInto(what, list, table, key) {
@@ -1333,18 +1889,17 @@
     if (round) rows.push({ key: "round", agorot: round });
     return rows;
   }
+  var SHEKEL = "₪";
   var fmt = new Intl.NumberFormat("he-IL", {
-    style: "currency",
-    currency: "ILS",
+    style: "decimal",
     minimumFractionDigits: 0,
-    // REQUIRED: currency defaults to 2, and
+    // REQUIRED: max-below-min throws a RangeError.
     maximumFractionDigits: 0
-    // max-below-min throws a RangeError.
   });
-  var formatAgorot = (a) => fmt.format(a / 100);
-  function priceLabel(agorot2, lang = "he") {
-    if (!agorot2) return { he: "כלול", en: "Included", ru: "Включено" }[lang];
-    return fmt.format(agorot2 / 100);
+  var formatAgorot = (a) => (a < 0 ? "−" : "") + SHEKEL + fmt.format(Math.abs(a) / 100);
+  function priceLabel(agorot2) {
+    if (!agorot2) return T("price.included");
+    return formatAgorot(agorot2);
   }
 
   // js/spec.js
@@ -1371,21 +1926,21 @@
          a fact asserted in the order that the customer never chose and no
          supplier can fill. `colourCode` is in the catalogue so the five readers
          of this string cannot drift apart again. */
-      { key: "colour", label: "צבע", id: c.id, hex: c.hex, value: `${c.he} (${colourCode(c)})` },
-      { key: "window", label: "חלון", id: w.id, value: w.he }
+      { key: "colour", label: T("row.colour"), id: c.id, hex: c.hex, value: `${L(c)} (${colourCode(c)})` },
+      { key: "window", label: T("row.window"), id: w.id, value: L(w) }
     ];
     const panels = glazedPanels(state2);
     if (panels.length > 1) {
       rows.push({
         key: "glazing",
-        label: "זיגוג",
+        label: T("row.glazing"),
         id: w.id,
-        value: panels.map((p) => `${p.he}: ${p.isHe}`).join(" · ")
+        value: panels.map((p) => `${L(p.name)}: ${L(p.is)}`).join(" · ")
       });
     }
     if (isGlazed(state2) && g.id !== "none") {
-      const label = g.glass ? "זכוכית" : "סורג";
-      const name = g.he.startsWith(label + " ") ? g.he.slice(label.length + 1) : g.he;
+      const label = T(g.glass ? "row.glass" : "row.grille");
+      const name = dropPrefix(L(g), label);
       rows.push({
         key: "grille",
         label,
@@ -1393,45 +1948,49 @@
         value: `${name}${grillePlacement(state2)}`
       });
     }
-    const barLen = hd.priceKind === "bar" ? ` · ${Math.round(handleLength(state2) / 10)} ס״מ` : "";
+    const barLen = hd.priceKind === "bar" ? ` · ${T("len.cm", Math.round(handleLength(state2) / 10))}` : "";
     rows.push({
       key: "handle",
-      label: "ידית משיכה",
+      label: T("row.handle"),
       id: hd.id,
-      value: `${hd.he}${fin ? ` · ${fin.he}` : ""}${barLen}`
+      value: `${L(hd)}${fin ? ` · ${L(fin)}` : ""}${barLen}`
     });
-    rows.push({ key: "lockset", label: "מנעול וידית", id: lk.id, value: lk.he });
+    rows.push({ key: "lockset", label: T("row.lockset"), id: lk.id, value: L(lk) });
     if (xl.id !== "nospecial") {
-      rows.push({ key: "speciallock", label: "מנעול מיוחד", id: xl.id, value: xl.he });
+      rows.push({ key: "speciallock", label: T("row.speciallock"), id: xl.id, value: L(xl) });
     }
     if (dt.id !== "plain") {
-      rows.push({ key: "detail", label: "עיצוב", id: dt.id, value: dt.he });
+      rows.push({ key: "detail", label: T("row.detail"), id: dt.id, value: L(dt) });
     }
     if (state2.stripeDir !== "none" && state2.stripeCount) {
-      const dir = state2.stripeDir === "h" ? "אופקיים" : "אנכיים";
-      const how = state2.stripeTight ? " · צפופים" : "";
+      const dir = T(state2.stripeDir === "h" ? "stripes.h" : "stripes.v");
       rows.push({
         key: "stripes",
-        label: "פסים",
+        label: T("row.stripes"),
         id: `${state2.stripeDir}${state2.stripeCount}`,
-        value: `${state2.stripeCount} ${dir}${how}`
+        value: `${state2.stripeCount} ${state2.stripeTight ? T("row.dirTight", dir) : dir}`
       });
     }
-    rows.push({ key: "size", label: "מידה", id: state2.size, value: sz.he });
-    rows.push({ key: "mashkof", label: "משקוף", id: mk.id, value: mk.he });
-    rows.push({ key: "pirzul", label: "פרזול", id: pz.id, value: pz.he });
-    rows.push({ key: "handing", label: "פתיחה", id: hn.id, value: hn.he });
+    rows.push({ key: "size", label: T("row.size"), id: state2.size, value: L(sz) });
+    rows.push({ key: "mashkof", label: T("row.mashkof"), id: mk.id, value: L(mk) });
+    rows.push({ key: "pirzul", label: T("row.pirzul"), id: pz.id, value: L(pz) });
+    rows.push({ key: "handing", label: T("row.handing"), id: hn.id, value: L(hn) });
     return rows;
   }
   function handingWords(state2) {
     const hn = byId(HANDINGS, state2.handing);
-    const hinge = hn.hinge === "left" ? "שמאל" : "ימין";
-    const lock = hn.hinge === "left" ? "ימין" : "שמאל";
-    return `ציר בצד ${hinge}, צילינדר בצד ${lock} — במבט מבחוץ`;
+    const hinge = T(hn.hinge === "left" ? "hand.left" : "hand.right");
+    const lock = T(hn.hinge === "left" ? "hand.right" : "hand.left");
+    return T("hand.words", hinge, lock);
   }
-  var specLines = (state2) => specRows(state2).map((r) => `${r.label}: ${r.value}`);
+  var specLines = (state2) => withLang("he", () => specRows(state2).map((r) => `${r.label}: ${r.value}`));
+  function dropPrefix(name, label) {
+    if (!label || !name.startsWith(label)) return name;
+    const next = name[label.length];
+    return next === " " || next === "-" || next === "‑" ? name.slice(label.length + 1) : name;
+  }
   var summaryLine = (state2) => specRows(state2).map((r) => r.value).join(" · ");
-  var describeSentence = (state2) => `דלת כניסה פלדה, ${specRows(state2).map((r) => r.value).join(", ")}.`;
+  var describeSentence = (state2) => T("spec.summary", specRows(state2).map((r) => r.value).join(", "));
 
   // js/colour.js
   var clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
@@ -3508,27 +4067,27 @@ ${body}
     const lo = p.rot === 90 ? cx - half : p.y - half;
     const hi = p.rot === 90 ? cx + half : p.y + half;
     const span = p.rot === 90 ? leafW : leafH;
-    if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad("הידית חורגת מהדלת");
+    if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad(T("why.gripOffDoor"));
     const gx0 = p.rot === 90 ? p.x - foot.vy : p.x - foot.out;
     const gx1 = p.rot === 90 ? p.x + foot.vy : p.x + foot.in;
     if (gx0 < EDGE_FLAT || gx1 > leafW - EDGE_FLAT) {
-      return bad("הידית חורגת מהדלת");
+      return bad(T("why.gripOffDoor"));
     }
     const cgx0 = hingeLeftOf(state2) ? leafW - gx1 : gx0;
     const cgx1 = hingeLeftOf(state2) ? leafW - gx0 : gx1;
     if (p.y < leafH * 0.18 || p.y > leafH * 0.82) {
-      return bad("הידית גבוהה או נמוכה מדי לשימוש");
+      return bad(T("why.gripReach"));
     }
     if (p.rot === 0 && handle.style !== "grab" && p.x > leafW * 0.55) {
-      return bad("ידית משיכה לא מותקנת בצד הצירים");
+      return bad(T("why.gripHingeSide"));
     }
     for (const f of feet) {
       if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT || f.y - f.r < EDGE_FLAT || f.y + f.r > leafH - EDGE_FLAT) {
-        return bad("הידית חורגת מהדלת");
+        return bad(T("why.gripOffDoor"));
       }
       for (const ob of obstacles) {
         if (footHits(f, ob)) {
-          return bad(ob.kind === "window" ? "הרגליים על מסגרת החלון" : ob.kind === "moulding" ? "הרגליים על עיצוב החזית" : "הרגליים על מסגרת הפאנל");
+          return bad(ob.kind === "window" ? T("why.feetOnWindow") : ob.kind === "moulding" ? T("why.feetOnFace") : T("why.feetOnPanel"));
         }
       }
     }
@@ -3555,15 +4114,15 @@ ${body}
         vy: LOCK_R
       });
     }
-    for (const L of locks) {
-      const meet = Math.abs(p.y - L.y) < gh + L.vy + LOCK_CLEAR;
+    for (const L2 of locks) {
+      const meet = Math.abs(p.y - L2.y) < gh + L2.vy + LOCK_CLEAR;
       if (!meet) continue;
-      const lo0 = L.x - L.out, lo1 = L.x + L.inward;
+      const lo0 = L2.x - L2.out, lo1 = L2.x + L2.inward;
       if (gx0 < lo1 + LOCK_CLEAR && gx1 > lo0 - LOCK_CLEAR) {
-        return bad("הידית נוגעת במנעול");
+        return bad(T("why.gripTouchesLock"));
       }
-      if (Math.abs(p.x - L.x) < leafW * BAR_GAP_MIN) {
-        return bad("הידית נוגעת במנעול");
+      if (Math.abs(p.x - L2.x) < leafW * BAR_GAP_MIN) {
+        return bad(T("why.gripTouchesLock"));
       }
     }
     for (const o of apertureLayout(
@@ -3573,7 +4132,7 @@ ${body}
       leafH
     )) {
       if (cgx0 < o.x + o.w && cgx1 > o.x && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
-        return bad("הידית חוצה את החלון");
+        return bad(T("why.gripCrossesWindow"));
       }
     }
     return at;
@@ -3793,10 +4352,10 @@ ${body}
           out += str(`M ${n2(stemX(t))} ${n2(ay - r)} Q ${n2((stemX(t) + ax) / 2)} ${n2(ay - r * 1.8)}
                     ${n2(ax)} ${n2(ay - r * 1.1)}`, THIN);
         } else {
-          const L = w * 0.34 * LSZ[i % LSZ.length], H2 = L * 0.82;
+          const L2 = w * 0.34 * LSZ[i % LSZ.length], H2 = L2 * 0.82;
           const a = LROT[i % LROT.length] * side * Math.PI / 180;
           const pt = (u, v) => {
-            const px = u * L * 0.5, py = v * H2 * 0.5;
+            const px = u * L2 * 0.5, py = v * H2 * 0.5;
             return [
               n2(ax + px * Math.cos(a) - py * Math.sin(a)),
               n2(ay + px * Math.sin(a) + py * Math.cos(a))
@@ -3865,10 +4424,10 @@ ${body}
         for (let i = 0; i < pts.length; i++) {
           const p0 = pts[Math.max(0, i - 1)], p1 = pts[Math.min(pts.length - 1, i + 1)];
           const dx = p1[0] - p0[0], dy = p1[1] - p0[1];
-          const L = Math.hypot(dx, dy) || 1;
+          const L2 = Math.hypot(dx, dy) || 1;
           const r = hw(pts[i][2]);
-          left.push([pts[i][0] - dy / L * r, pts[i][1] + dx / L * r]);
-          right.push([pts[i][0] + dy / L * r, pts[i][1] - dx / L * r]);
+          left.push([pts[i][0] - dy / L2 * r, pts[i][1] + dx / L2 * r]);
+          right.push([pts[i][0] + dy / L2 * r, pts[i][1] - dx / L2 * r]);
         }
         return "M " + left.map((p) => `${n2(p[0])} ${n2(p[1])}`).join(" L ") + " L " + right.reverse().map((p) => `${n2(p[0])} ${n2(p[1])}`).join(" L ") + " Z";
       };
@@ -5052,14 +5611,14 @@ ${body}
     const D = GRAB_D;
     const by = cy;
     const x0 = dir > 0 ? cx : cx - GRAB.len;
-    const L = GRAB.len;
-    const P = (f) => x0 + L * f;
+    const L2 = GRAB.len;
+    const P = (f) => x0 + L2 * f;
     const n1 = (v) => v.toFixed(1);
     const rod = (a, b, hh, rx, fill) => `
       <rect x="${n1(P(a))}" y="${n1(by - hh)}" width="${n1(P(b) - P(a))}"
             height="${n1(hh * 2)}" rx="${n1(rx)}" fill="${fill}"/>`;
     const POST = [0.175, 0.825];
-    const drew = { x: x0, y: by - D * 0.85, w: L, h: D * 1.7 };
+    const drew = { x: x0, y: by - D * 0.85, w: L2, h: D * 1.7 };
     const svg = `
     <g>
       <g data-hw="grab">
@@ -5134,8 +5693,8 @@ ${body}
     const spec = BARS[handle.bar] || BARS.idan;
     const half = barHalf(handle.len, leafH, panelled);
     const w = handle.w || 30, r = w * spec.rx;
-    const top = cy - half, bot = cy + half, L = half * 2;
-    const at = (t) => top + L * t;
+    const top = cy - half, bot = cy + half, L2 = half * 2;
+    const at = (t) => top + L2 * t;
     const feet = spec.fix.t.map((t) => `
       <ellipse cx="${(cx + w * 0.55).toFixed(1)}" cy="${(at(t) + w * 0.45).toFixed(1)}"
                rx="${(w * 0.7).toFixed(1)}" ry="${(w * 0.7).toFixed(1)}"
@@ -5143,14 +5702,14 @@ ${body}
     return `
     <g>
       <rect x="${(cx - w / 2 + w * 0.55).toFixed(1)}" y="${(top + w * 0.45).toFixed(1)}"
-            width="${w}" height="${L}" rx="${r}"
+            width="${w}" height="${L2}" rx="${r}"
             fill="#000" opacity="0.32" filter="url(#hwShadow)"/>
       ${feet}
-      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${L}" rx="${r}"
+      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${L2}" rx="${r}"
             fill="url(#${spec.tone})"/>
       <!-- and the fall down its length, which every bar here was missing: our
            five were flat greys top to bottom on a leaf that is not. -->
-      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${L}" rx="${r}"
+      <rect x="${cx - w / 2}" y="${top}" width="${w}" height="${L2}" rx="${r}"
             fill="url(#barFall)"/>
     </g>`;
   }
@@ -5220,30 +5779,30 @@ ${body}
   }
   function almogLever(cx, cy, dir) {
     const R = 39, D = R * 2;
-    const L = D * 2.8;
+    const L2 = D * 2.8;
     const rake = Math.tan(14.8 * Math.PI / 180);
     const at = (t) => cx + dir * t;
     const mid = (t) => cy + D * 0.269 - rake * t;
-    const halfT = (t) => D * (0.211 + 0.057 * (t / L)) / 2;
+    const halfT = (t) => D * (0.211 + 0.057 * (t / L2)) / 2;
     const pt = (t, s) => `${at(t)} ${mid(t) + s * halfT(t)}`;
     return `
     <g>
-      <path d="M ${pt(6, -1)} L ${pt(L - 22, -1)} Q ${pt(L, -0.4)} ${pt(L - 16, 1)}
+      <path d="M ${pt(6, -1)} L ${pt(L2 - 22, -1)} Q ${pt(L2, -0.4)} ${pt(L2 - 16, 1)}
                L ${pt(6, 1)} Z"
             transform="translate(${dir * 7} 11)" fill="#000" opacity="0.30"
             filter="url(#hwShadow)"/>
       ${disc(cx, cy, R)}
       <!-- the neck leaves the rose tangentially at the lower quarter: on this
            handle the collar and the blade are one swept surface -->
-      <path d="M ${pt(0, -1.15)} L ${pt(L - 24, -1)}
-               Q ${pt(L + 2, -0.35)} ${pt(L + 2, 0.35)}
-               Q ${pt(L + 2, 1)} ${pt(L - 24, 1)}
+      <path d="M ${pt(0, -1.15)} L ${pt(L2 - 24, -1)}
+               Q ${pt(L2 + 2, -0.35)} ${pt(L2 + 2, 0.35)}
+               Q ${pt(L2 + 2, 1)} ${pt(L2 - 24, 1)}
                L ${pt(0, 1.15)} Z"
             fill="url(#bronzeBlade)"/>
-      <path d="M ${pt(10, -0.78)} L ${pt(L - 30, -0.7)} L ${pt(L - 30, -0.34)}
+      <path d="M ${pt(10, -0.78)} L ${pt(L2 - 30, -0.7)} L ${pt(L2 - 30, -0.34)}
                L ${pt(10, -0.42)} Z"
             fill="#fff" opacity="0.34"/>
-      <path d="M ${pt(10, 0.52)} L ${pt(L - 26, 0.6)} L ${pt(L - 26, 0.95)}
+      <path d="M ${pt(10, 0.52)} L ${pt(L2 - 26, 0.6)} L ${pt(L2 - 26, 0.95)}
                L ${pt(10, 0.95)} Z"
             fill="#000" opacity="0.34"/>
     </g>`;
@@ -5464,22 +6023,22 @@ ${body}
       ${brushing(cx, cy, r * 0.16, r * 0.62)}
     </g>`;
   function lever(cx, cy, dir) {
-    const L = LEVER_REACH;
+    const L2 = LEVER_REACH;
     const at = (t) => cx + dir * t;
     return `
     <g data-kind="lever">
-      <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
-               Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
-               Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}
+      <path d="M ${at(12)} ${cy - 7} L ${at(L2 - 16)} ${cy - 3}
+               Q ${at(L2 + 4)} ${cy - 3} ${at(L2 + 4)} ${cy + 9}
+               Q ${at(L2 + 4)} ${cy + 21} ${at(L2 - 16)} ${cy + 21}
                L ${at(12)} ${cy + 24} Z"
             fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
 
       <!-- Body: broad at the neck, tapering slightly, rounded at the tip.
            A pointed tip reads as a blade; real levers are capped. -->
       <path d="M ${at(0)} ${cy - 20}
-               L ${at(L - 20)} ${cy - 14}
-               Q ${at(L)} ${cy - 14} ${at(L)} ${cy - 1}
-               Q ${at(L)} ${cy + 12} ${at(L - 20)} ${cy + 12}
+               L ${at(L2 - 20)} ${cy - 14}
+               Q ${at(L2)} ${cy - 14} ${at(L2)} ${cy - 1}
+               Q ${at(L2)} ${cy + 12} ${at(L2 - 20)} ${cy + 12}
                L ${at(0)} ${cy + 20} Z"
             fill="url(#nickel)"/>
 
@@ -5488,22 +6047,22 @@ ${body}
            frame), a mid band under it, and a body that goes nearly as dark as
            the paint underneath. A smooth gradient down the whole section is
            what makes rendered hardware look like grey plastic. -->
-      <path d="M ${at(14)} ${cy - 17} L ${at(L - 20)} ${cy - 12}
-               Q ${at(L - 6)} ${cy - 12} ${at(L - 6)} ${cy - 9}
+      <path d="M ${at(14)} ${cy - 17} L ${at(L2 - 20)} ${cy - 12}
+               Q ${at(L2 - 6)} ${cy - 12} ${at(L2 - 6)} ${cy - 9}
                L ${at(14)} ${cy - 13} Z"
             fill="#fff" opacity="0.92"/>
-      <path d="M ${at(16)} ${cy - 12} L ${at(L - 14)} ${cy - 8}
-               L ${at(L - 14)} ${cy - 3} L ${at(16)} ${cy - 6} Z"
+      <path d="M ${at(16)} ${cy - 12} L ${at(L2 - 14)} ${cy - 8}
+               L ${at(L2 - 14)} ${cy - 3} L ${at(16)} ${cy - 6} Z"
             fill="#fff" opacity="0.26"/>
       <!-- rolled underside, turned away from the key and nearly in shadow -->
-      <path d="M ${at(16)} ${cy + 3} L ${at(L - 16)} ${cy + 2}
-               L ${at(L - 16)} ${cy + 11} L ${at(16)} ${cy + 16} Z"
+      <path d="M ${at(16)} ${cy + 3} L ${at(L2 - 16)} ${cy + 2}
+               L ${at(L2 - 16)} ${cy + 11} L ${at(16)} ${cy + 16} Z"
             fill="#000" opacity="0.44"/>
       <!-- the tip turns out of the key and picks up the darker surround -->
-      <path d="M ${at(L - 26)} ${cy - 11} L ${at(L - 4)} ${cy - 10}
-               Q ${at(L)} ${cy - 9} ${at(L)} ${cy - 1}
-               Q ${at(L)} ${cy + 9} ${at(L - 14)} ${cy + 9}
-               L ${at(L - 26)} ${cy + 8} Z"
+      <path d="M ${at(L2 - 26)} ${cy - 11} L ${at(L2 - 4)} ${cy - 10}
+               Q ${at(L2)} ${cy - 9} ${at(L2)} ${cy - 1}
+               Q ${at(L2)} ${cy + 9} ${at(L2 - 14)} ${cy + 9}
+               L ${at(L2 - 26)} ${cy + 8} Z"
             fill="#000" opacity="0.16"/>
 
       ${disc(cx, cy, LEVER_ROSETTE)}
@@ -5583,13 +6142,8 @@ ${body}
       <circle cx="${cx + R * 0.5}" cy="${cy + R * 0.46}" r="2.4" fill="#fff" opacity="0.18"/>
     </g>`;
   };
-  function describe(state2, lang = "he") {
-    if (lang === "he") return describeSentence(state2);
-    const c = byId(COLOURS, state2.colour);
-    const w = byId(WINDOWS, state2.window);
-    const s2 = SIZES[state2.size] || SIZES.standard;
-    const h = byId(HANDINGS, state2.handing);
-    return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s2.en}, ${h.en}`;
+  function describe(state2) {
+    return describeSentence(state2);
   }
   function windowGlyph(win) {
     const W = 950, H = 2100, pad = 40;
@@ -5719,10 +6273,10 @@ ${body}
        constant diameter, two posts set INBOARD at 0.175 and 0.825 of the length,
        and beyond each of them a stem, a ring and a turned terminal bead. */
     grab: () => {
-      const L = 560, D = L / 15, y = 0;
-      const P = (f) => -L / 2 + L * f;
+      const L2 = 560, D = L2 / 15, y = 0;
+      const P = (f) => -L2 / 2 + L2 * f;
       const rod = (a, b, hh, r) => `<rect x="${P(a)}" y="${y - hh}" width="${P(b) - P(a)}" height="${hh * 2}" rx="${r}"/>`;
-      return { box: [-L / 2 - 6, -D * 1.1, L / 2 + 6, D * 1.1], art: `
+      return { box: [-L2 / 2 - 6, -D * 1.1, L2 / 2 + 6, D * 1.1], art: `
     ${rod(0, 0.032, D * 0.22, D * 0.11)}${rod(0.968, 1, D * 0.22, D * 0.11)}
     ${rod(0.03, 0.078, D * 0.55, D * 0.5)}${rod(0.922, 0.97, D * 0.55, D * 0.5)}
     ${rod(0.075, 0.155, D * 0.3, D * 0.15)}${rod(0.845, 0.925, D * 0.3, D * 0.15)}
@@ -5920,107 +6474,107 @@ ${body}
     };
     const grip = byId(HANDLES, state2.handle);
     if (!glazed) {
-      for (const g of GRILLES) if (g.id !== "none") out.grille[g.id] = "דורש חלון";
+      for (const g of GRILLES) if (g.id !== "none") out.grille[g.id] = T("why.needsWindow");
     }
     if (onLeaf) {
       for (const d of DETAILS) if (hasUpperPanel(d)) {
-        out.detail[d.id] = "החלון תופס את מקומו של הפאנל העליון";
+        out.detail[d.id] = T("why.winTakesTop");
       }
       for (const d of DETAILS) {
         if (!d.panel || out.detail[d.id]) continue;
         if (!panelFits({ ...state2, detail: d.id })) {
-          out.detail[d.id] = "אין מקום לפאנל מתחת לחלון";
+          out.detail[d.id] = T("why.noRoomBelow");
         }
       }
     }
     for (const d of DETAILS) {
       if (d.rectOnly && state2.window !== "rect" && state2.window !== "none") {
-        out.detail[d.id] = out.detail[d.id] || "הסט הקלאסי לא משתלב עם צוהר אנכי";
+        out.detail[d.id] = out.detail[d.id] || T("why.setNoSlot");
       }
     }
     if (byId(DETAILS, state2.detail).rectOnly) {
       for (const w of WINDOWS) if (w.id !== "rect" && w.id !== "none") {
-        out.window[w.id] = out.window[w.id] || "הסט הקלאסי מגיע עם חלון מלבני משלו";
+        out.window[w.id] = out.window[w.id] || T("why.setOwnWindow");
       }
     }
-    if (onLeaf) out.stripes = "לא משלבים פסי מתכת עם חלון";
-    else if (byId(DETAILS, state2.detail).panel) out.stripes = "לא משלבים פסי מתכת עם פאנל";
+    if (onLeaf) out.stripes = T("why.stripesWindow");
+    else if (byId(DETAILS, state2.detail).panel) out.stripes = T("why.stripesPanel");
     if (lined) {
-      for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = "לא משלבים חלון עם קווי מתכת";
-      for (const d of DETAILS) if (d.panel) out.detail[d.id] = "לא משלבים פאנל עם פסי מתכת";
+      for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = T("why.windowStripes");
+      for (const d of DETAILS) if (d.panel) out.detail[d.id] = T("why.panelStripes");
     }
     if (state2.window === "rect") {
-      out.detail.plain = out.detail.plain || "חלון מרובע מגיע תמיד עם פאנל בתחתית";
+      out.detail.plain = out.detail.plain || T("why.rectNeedsPanel");
     }
     if (byId(DETAILS, state2.detail).ownPull) {
       for (const h of HANDLES) {
-        if (h.style !== "none") out.handle[h.id] = "הפאנל האמצעי מגיע עם המאחז שלו";
+        if (h.style !== "none") out.handle[h.id] = T("why.panelOwnPull");
       }
     }
     const CHANNEL = HANDLES.find((h) => h.style === "channel");
     if (CHANNEL) {
       if (onLeaf || faceWorked(byId(DETAILS, state2.detail))) {
-        out.handle[CHANNEL.id] = "ידית שקועה דורשת דלת חלקה";
+        out.handle[CHANNEL.id] = T("why.channelPlain");
       }
       if (grip.style === "channel") {
         for (const w of WINDOWS) if (w.rects.length) {
-          out.window[w.id] = out.window[w.id] || "לא משתלב עם ידית שקועה";
+          out.window[w.id] = out.window[w.id] || T("why.notWithChannel");
         }
         for (const d of DETAILS) if (faceWorked(d)) {
-          out.detail[d.id] = out.detail[d.id] || "לא משתלב עם ידית שקועה";
+          out.detail[d.id] = out.detail[d.id] || T("why.notWithChannel");
         }
       }
     }
     for (const h of HANDLES) {
       if (h.style === "none" || out.handle[h.id]) continue;
       if (!gripFitsAnywhere({ ...state2, handle: h.id, grip: null })) {
-        out.handle[h.id] = "אין מקום לידית הזו על הדלת";
+        out.handle[h.id] = T("why.noRoomHandle");
       }
     }
     if (grip.style !== "none") {
       for (const w of WINDOWS) {
         if (out.window[w.id]) continue;
         if (!gripFitsAnywhere({ ...state2, window: w.id, grip: null })) {
-          out.window[w.id] = "אין מקום לידית שבחרתם עם החלון הזה";
+          out.window[w.id] = T("why.noRoomWithWindow");
         }
       }
     }
     for (const k of LOCKSETS) {
       if (gripClashesLockset({ ...state2, lockset: k.id })) {
-        out.lockset[k.id] = out.lockset[k.id] || "אין מקום בין המאחז למנעול";
+        out.lockset[k.id] = out.lockset[k.id] || T("why.noRoomGripLock");
       }
     }
     for (const h of HANDLES) {
       if (gripClashesLockset({ ...state2, handle: h.id })) {
-        out.handle[h.id] = out.handle[h.id] || "אין מקום בין המאחז למנעול";
+        out.handle[h.id] = out.handle[h.id] || T("why.noRoomGripLock");
       }
     }
     return out;
   }
   var SAID = {
-    windowAdded: "הוספנו חלון — הסורג והזכוכית צריכים אותו",
-    windowGone: "הסרנו את החלון",
-    lineWorkGone: "הסרנו את קווי המתכת — לא משלבים אותם עם חלון",
-    onePanel: "עברנו לפאנל אחד — החלון תופס את מקומו של העליון",
-    noPanelRoom: "הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום",
-    faceCleared: "החלקנו את הדלת — ידית שקועה דורשת פנים חלקות",
-    grilleGone: "הסרנו את הסורג — אין חלון",
-    gripGone: "הסרנו את ידית המשיכה — אין לה מקום כאן",
-    locksetSwapped: "החלפנו את המנעול — אין לו מקום ליד המאחז",
-    gripMoved: "הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה",
-    gripHome: "הידית הוסרה, ואיתה המיקום שבחרתם לה",
-    setWindow: "התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו",
-    setGone: "הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי",
-    needPanel: "הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד",
-    ownPull: "הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו"
+    windowAdded: "fix.windowAdded",
+    windowGone: "fix.windowGone",
+    lineWorkGone: "fix.lineWorkGone",
+    onePanel: "fix.onePanel",
+    noPanelRoom: "fix.noPanelRoom",
+    faceCleared: "fix.faceCleared",
+    grilleGone: "fix.grilleGone",
+    gripGone: "fix.gripGone",
+    locksetSwapped: "fix.locksetSwapped",
+    gripMoved: "fix.gripMoved",
+    gripHome: "fix.gripHome",
+    setWindow: "fix.setWindow",
+    setGone: "fix.setGone",
+    needPanel: "fix.needPanel",
+    ownPull: "fix.ownPull"
   };
   function repair(state2, intent = null) {
     let s = { ...state2 };
     const changed = [];
     const said = [];
-    const change = (group, why) => {
+    const change = (group, key) => {
       changed.push(group);
-      said.push(why);
+      said.push(T(key));
     };
     if (intent !== "window" && !isGlazed(s) && s.grille !== "none") {
       s.window = "rect";
@@ -6235,7 +6789,8 @@ ${body}
       "gp",
       "code",
       "bare",
-      "sheet"
+      "sheet",
+      "lang"
     ]);
     const RETIRED = /* @__PURE__ */ new Set(["f", "a", "z", "i"]);
     for (const key of p.keys()) {
@@ -6427,9 +6982,9 @@ ${body}
   var PHONE_DISPLAY = "053-219-7466";
   var PHONE_E164 = "972532197466";
   var PHONE_TEL = "+972532197466";
-  var PRICE_INCLUDES = "כולל דלת, משקוף, מנעול, התקנה ומע״מ";
-  var PRICE_CAVEAT = "מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.";
-  var DRAWING_CAVEAT = "הציור באתר הוא הדמיה ממוחשבת — הדלת שתיוצר עשויה להיראות מעט שונה בגוון, בברק ובפרטי הידיות.";
+  var priceIncludes = () => T("price.includes");
+  var priceCaveat = () => T("price.caveat");
+  var drawingCaveat = () => T("illustration");
   var isServed = () => /^https?:$/.test(window.location.protocol);
   function shareUrl(state2) {
     if (!isServed()) return null;
@@ -6443,7 +6998,7 @@ ${body}
     const shifted = now.x !== home.x || now.y !== home.y;
     return { flat: now.rot === 90, shifted, moved: shifted || now.rot !== home.rot };
   }
-  var GRIP_ILLUSTRATIVE = "להמחשה — נקבע בהתקנה";
+  var gripIllustrative = () => T("grip.illustrative");
   function gripAddendum(state2) {
     const { flat, shifted } = gripDeparture(state2);
     return [
@@ -6462,13 +7017,15 @@ ${body}
              specification and that the final spot is set on site — which is exactly
              why it is an ADDENDUM here and not a row in the spec. The stage says the
              same thing under the door, in the same words, from `GRIP_ILLUSTRATIVE`. */
-      ...flat ? ["הערה: ידית המשיכה מותקנת לרוחב הדלת"] : [],
-      ...shifted ? [`מיקום הידית: הזזתי אותה ממקומה הרגיל. ${GRIP_ILLUSTRATIVE}, והמיקום המדויק בקישור.`] : []
+      ...flat ? [T("addendum.flat")] : [],
+      ...shifted ? [T("addendum.shifted", gripIllustrative())] : []
     ];
   }
   function message(state2) {
-    return [
+    const spoke = CUSTOMER_LANG_NOTE[lang()];
+    return withLang("he", () => [
       "שלום, בחרתי דלת באתר:",
+      ...spoke ? [spoke] : [],
       "",
       /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door
          itself, and so did `#summary`, and so did `describe()`, and the three
@@ -6486,24 +7043,24 @@ ${body}
          there is nothing left to ask. */
       handingWords(state2),
       ...gripAddendum(state2),
-      `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — ${PRICE_INCLUDES}`,
+      `מחיר באתר: ${formatAgorot(priceAgorot(state2))} — ${priceIncludes()}`,
       /* The caveat the CARD states twice and the dock a third time, and which
          the order used to leave out entirely — so the one line the customer was
          most carefully told was the one Peretz never saw. Exported rather than
          written here for the reason `GRIP_ILLUSTRATIVE` is: it was four Hebrew
          literals in three files for one promise. */
-      PRICE_CAVEAT,
+      priceCaveat(),
       /* ⚠ AND THE DRAWING'S OWN CAVEAT, for the same reason and one step
          further. The price caveat protects the number; this protects the
          PICTURE, which is the part of this message a customer will hold up
          against the door when it arrives. See DRAWING_CAVEAT. */
-      DRAWING_CAVEAT,
+      drawingCaveat(),
       `קוד: ${encodeCode(state2)}`,
       /* The link matters more than anything above it: Peretz taps it and sees
          exactly what the customer saw. He decodes nothing. It is dropped, not
          faked, when this page has no address worth tapping — see `shareUrl`. */
       ...shareUrl(state2) ? ["", `לצפייה: ${shareUrl(state2)}`] : []
-    ].join("\n");
+    ].join("\n"));
   }
   var whatsappUrl = (state2) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2))}`;
   var FALLBACK_TEXT = "שלום, ניסיתי לבנות דלת באתר והעמוד לא נטען אצלי, אז אין לי קוד לשלוח. אפשר לחזור אליי ולעזור לי לבחור דלת?";
@@ -6609,10 +7166,10 @@ ${body}
   var GROUPS = [
     /* `label` and `meta` used to sit here and nothing read either of them; `meta`
        also spelled the chart code "RAL", which it is not — see `colourCode`. */
-    { key: "colour", title: "צבע", in: "colour", kind: "swatch", list: () => COLOURS },
+    { key: "colour", title: "g.colour", in: "colour", kind: "swatch", list: () => COLOURS },
     {
       key: "detail",
-      title: "עיצוב החזית",
+      title: "g.detail",
       in: "face",
       kind: "tile",
       list: () => DETAILS,
@@ -6621,7 +7178,7 @@ ${body}
     },
     {
       key: "window",
-      title: "חלון",
+      title: "g.window",
       in: "glass",
       kind: "tile",
       list: () => WINDOWS,
@@ -6629,7 +7186,7 @@ ${body}
     },
     {
       key: "grille",
-      title: "עיצוב החלון",
+      title: "g.grille",
       in: "glass",
       kind: "sq",
       list: () => GRILLES,
@@ -6637,21 +7194,21 @@ ${body}
     },
     {
       key: "handle",
-      title: "ידית משיכה",
+      title: "g.handle",
       in: "grip",
       kind: "hw",
       list: () => HANDLES,
       glyph: handleGlyph,
-      hint: "הידית האנכית. אפשר גם בלעדיה."
+      hint: "g.handle.h"
     },
     {
       key: "lockset",
-      title: "מנעול וידית",
+      title: "g.lockset",
       in: "lock",
       kind: "hw",
       list: () => LOCKSETS,
       glyph: locksetGlyph,
-      hint: "הידית שמסובבים והצילינדר. יש בכל דלת."
+      hint: "g.lockset.h"
     },
     /* ⚠ A NEW AXIS, AND ITS OWN GROUP RATHER THAN TWO MORE LOCKSET TILES.
        A lockset is the furniture on the outside face and there is exactly one of
@@ -6661,12 +7218,12 @@ ${body}
        mutually exclusive that are not. */
     {
       key: "speciallock",
-      title: "מנעול מיוחד",
+      title: "g.speciallock",
       in: "lock",
       kind: "hw",
       list: () => SPECIAL_LOCKS,
       glyph: specialLockGlyph,
-      hint: "נעילה נוספת מעבר למנעול הרגיל."
+      hint: "g.speciallock.h"
     },
     /* ⚠ THE FINISH OF THE LOCK FURNITURE, AND NOT OF THE PULL HANDLE. Peretz was
        explicit that פרזול recolours the ידית, the צירים, the עינית and the
@@ -6675,16 +7232,16 @@ ${body}
        product (Ella is brass); this is a choice, and it is ₪0 to ₪900. */
     {
       key: "pirzul",
-      title: "פרזול",
+      title: "g.pirzul",
       in: "pz",
       kind: "hw",
       list: () => PIRZUL2,
       glyph: pirzulGlyph,
-      hint: "הגוון של הידית, הצירים והעינית."
+      hint: "g.pirzul.h"
     },
     {
       key: "size",
-      title: "מידה",
+      title: "g.size",
       in: "fit",
       kind: "tile",
       list: () => Object.values(SIZES),
@@ -6696,7 +7253,7 @@ ${body}
          what it costs relative to a door nobody is looking at, and no group
          needs its own idea of what a price is. */
       glyph: sizeGlyph,
-      hint: "נמדוד אצלכם במדויק — בחינם."
+      hint: "g.size.h"
     },
     /* ⚠ THE FRAME, ASKED FOR BY NAME FROM OUTSIDE. It was always drawn and never
        choosable, and it is ₪500 to ₪1,000 of a ₪3,150 door — too much money to
@@ -6705,73 +7262,33 @@ ${body}
        rather than about the door, which is the one thing a fitter asks first. */
     {
       key: "mashkof",
-      title: "משקוף",
+      title: "g.mashkof",
       in: "mk",
       kind: "hw",
       list: () => MASHKOFS,
       glyph: mashkofGlyph,
-      hint: "המסגרת שהדלת נסגרת עליה. נמדוד את הקיר אצלכם."
+      hint: "g.mashkof.h"
     },
     {
       key: "handing",
-      title: "כיוון פתיחה",
+      title: "g.handing",
       in: "fit",
       kind: "pill",
       list: () => HANDINGS,
-      hint: "לא בטוחים? נבדוק יחד במדידה."
+      hint: "g.handing.h"
     }
   ];
   var SECTIONS = [
-    {
-      key: "fit",
-      title: "מבנה הדלת",
-      sub: "גודל הדלת וכיוון הפתיחה",
-      lede: "הגודל והצד שאליו הדלת נפתחת. נמדוד אצלכם במדויק, בחינם."
-    },
-    {
-      key: "mk",
-      title: "משקוף",
-      sub: "המסגרת שהדלת נסגרת עליה",
-      lede: "המשקוף הוא המסגרת שהדלת נסגרת עליה. רוחב או עומק גדולים יותר מתאימים לקירות עבים, ועולים יותר."
-    },
-    {
-      key: "colour",
-      title: "צבע",
-      sub: "גוון הדלת",
-      lede: "צבע בתנור, מלוח הגוונים של היצרן. כל הגוונים באותו מחיר."
-    },
-    {
-      key: "face",
-      title: "עיצוב החזית",
-      sub: "פאנלים או פסי מתכת",
-      lede: "מה יש על פני הדלת — פאנלים מוגבהים, או פסי מתכת. אפשר גם חלק לגמרי."
-    },
-    {
-      key: "glass",
-      title: "חלון",
-      sub: "חלון ועיצוב הזכוכית",
-      lede: "חלון בכנף, ומה נמצא בתוכו — סורג או זכוכית מעוצבת."
-    },
-    {
-      key: "grip",
-      title: "ידית משיכה",
-      sub: "הידית האנכית ואורכה",
-      lede: "הידית שמושכים בה. אפשר גם בלעדיה, והאורך נתון לבחירתכם."
-    },
-    {
-      key: "lock",
-      title: "מנעול",
-      sub: "הידית המסתובבת ונעילה נוספת",
-      lede: "הידית שמסובבים והצילינדר — יש בכל דלת. אפשר להוסיף כספת או קודן."
-    },
-    {
-      key: "pz",
-      title: "פרזול",
-      sub: "גוון הידית והצירים",
-      lede: "הגוון של הידית, הצירים והעינית. לא משנה את גוון ידית המשיכה."
-    }
+    { key: "fit", title: "step.fit.t", sub: "step.fit.s", lede: "step.fit.l" },
+    { key: "mk", title: "step.mk.t", sub: "step.mk.s", lede: "step.mk.l" },
+    { key: "colour", title: "step.colour.t", sub: "step.colour.s", lede: "step.colour.l" },
+    { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l" },
+    { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l" },
+    { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l" },
+    { key: "lock", title: "step.lock.t", sub: "step.lock.s", lede: "step.lock.l" },
+    { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l" }
   ];
-  var SUMMARY = { key: "sum", title: "סיכום", sub: "הדלת שלכם, והמחיר" };
+  var SUMMARY = { key: "sum", title: "step.sum.t", sub: "step.sum.s", lede: "step.sum.l" };
   var SECTION_ICON = {
     /* a leaf and its frame, with a handle dot */
     fit: '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.2 3.6v16.8"/><path d="M15.4 12.4a.55.55 0 1 0 0-1.1.55.55 0 0 0 0 1.1Z"/>',
@@ -6811,7 +7328,43 @@ ${body}
   };
   var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
   var groupsIn = (key) => GROUPS.filter((g) => g.in === key);
+  function translateStatic(root = document) {
+    for (const el of root.querySelectorAll("[data-t]")) el.textContent = T(el.dataset.t);
+    for (const el of root.querySelectorAll("[data-ta]")) {
+      for (const pair of el.dataset.ta.split(",")) {
+        const [attr, key] = pair.split("=");
+        if (attr && key) el.setAttribute(attr.trim(), T(key.trim()));
+      }
+    }
+    document.title = T("doc.title");
+  }
+  function buildLangs() {
+    const host = $("#langs");
+    if (!host) return;
+    host.replaceChildren(...LANGS.map((l) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "lang" + (l.id === lang() ? " is-on" : "");
+      b.lang = l.id;
+      b.textContent = l.name;
+      b.setAttribute("aria-pressed", String(l.id === lang()));
+      b.addEventListener("click", () => {
+        if (l.id === lang()) return;
+        setLang(l.id);
+        const live = liveStep;
+        translateStatic();
+        buildLangs();
+        buildPanel();
+        goStep(live);
+        paint();
+      });
+      return b;
+    }));
+  }
   function init() {
+    setLang(pickLang(window.location.search));
+    translateStatic();
+    buildLangs();
     const { state: parsed, notice, said } = fromQuery(window.location.search);
     state = parsed;
     buildPanel();
@@ -6820,7 +7373,7 @@ ${body}
     $("#copy-btn").addEventListener("click", onCopy);
     $("#grip-rot").addEventListener("click", () => {
       if (!gripCanRotate(state)) {
-        toast("הידית הזו ארוכה מרוחב הדלת — אפשר לסובב רק ידית שנכנסת בין המזוזות");
+        toast(T("grip.tooLong"));
         return;
       }
       const now = gripAt(state);
@@ -6828,7 +7381,7 @@ ${body}
     });
     $("#grip-home").addEventListener("click", () => set({ ...state, grip: null }));
     $("#undo-btn").addEventListener("click", undo);
-    $("#draw-caveat").textContent = DRAWING_CAVEAT;
+    $("#draw-caveat").textContent = drawingCaveat();
     $("#save-btn").addEventListener("click", saveCurrent);
     $("#price-toggle").addEventListener("click", () => {
       const box = $("#breakdown"), btn = $("#price-toggle");
@@ -6886,8 +7439,10 @@ ${body}
         slot.hidden = false;
       }
     }
-    const shared = GROUPS.some((g) => state[g.key] !== DEFAULTS[g.key]) || state.stripeDir !== DEFAULTS.stripeDir;
-    goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
+    if (!document.documentElement.classList.contains("is-sheet")) {
+      const shared = GROUPS.some((g) => state[g.key] !== DEFAULTS[g.key]) || state.stripeDir !== DEFAULTS.stripeDir;
+      goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
+    }
     document.documentElement.classList.add("is-arriving");
     setTimeout(() => document.documentElement.classList.remove("is-arriving"), 1e3);
   }
@@ -6913,11 +7468,11 @@ ${body}
       b.className = "work";
       b.dataset.i = String(i);
       b.setAttribute("aria-label", describe(st));
-      b.innerHTML = `<span class="work__art" aria-hidden="true"></span><span class="work__meta"><span class="work__name">${byId(COLOURS, st.colour).he}</span><span class="work__price">${formatAgorot(priceAgorot(st))}</span></span>`;
+      b.innerHTML = `<span class="work__art" aria-hidden="true"></span><span class="work__meta"><span class="work__name">${L(byId(COLOURS, st.colour))}</span><span class="work__price">${formatAgorot(priceAgorot(st))}</span></span>`;
       b.addEventListener("click", () => {
         set({ ...DEFAULTS, ...w.state, grip: null });
         closeWorks();
-        toast("טענו את הדלת. אפשר לשנות כל פרט.");
+        toast(T("saved.loaded"));
       });
       grid.appendChild(b);
     }
@@ -6945,7 +7500,8 @@ ${body}
     const host = $("#sheet");
     if (!host) return;
     const sz = SIZES[state.size] || SIZES.standard;
-    const rows = specRows(state).map((r) => `<div class="sheet__row"><span class="sheet__k">${r.label}</span><span class="sheet__v">${r.value}</span>` + (r.hex ? `<span class="sheet__chip" style="--chip:${r.hex}"></span>` : "") + "</div>").join("");
+    const he = lang() === "he" ? null : withLang("he", () => specRows(state));
+    const rows = specRows(state).map((r, i) => `<div class="sheet__row"><span class="sheet__k">${r.label}</span><span class="sheet__v">${r.value}` + (he ? `<small class="sheet__he" dir="rtl">${he[i].label}: ${he[i].value}</small>` : "") + "</span>" + (r.hex ? `<span class="sheet__chip" style="--chip:${r.hex}"></span>` : "") + "</div>").join("");
     const grip = gripAddendum(state);
     host.innerHTML = `
     <header class="sheet__top">
@@ -6955,15 +7511,15 @@ ${body}
         document had no heading at all — and a screen reader opening a
         shared sheet URL got a page with nothing to navigate by. */
     ""}
-        <h1 class="sheet__brand">דלתות מגן</h1>
-        <div class="sheet__sub">ראשון לציון · ${PHONE_DISPLAY}</div>
+        <h1 class="sheet__brand">${T("brand.name")}</h1>
+        <div class="sheet__sub">${T("brand.city")} · ${PHONE_DISPLAY}</div>
       </div>
       ${/* ⚠ `direction: ltr` BELONGS ON THE CODE, NOT ON THE ROW. It was on
         the whole element, so the Hebrew label came out after the digits:
         the sheet printed `DM-P4040481 :קוד`. The code itself is Latin and
         must stay LTR; the label around it is Hebrew and must not. */
     ""}
-      <div class="sheet__code">קוד: <b dir="ltr">${encodeCode(state)}</b></div>
+      <div class="sheet__code">${T("send.code")} <b dir="ltr">${encodeCode(state)}</b></div>
     </header>
 
     <div class="sheet__body">
@@ -6982,28 +7538,36 @@ ${body}
         number Peretz orders by, so the sheet stops inventing one and
         prints what the catalogue actually holds. ASK-PERETZ.md §12. */
     ""}
-          ${sz.w} × ${sz.h} מ״מ · ${sz.he}${sz.side ? ` · חלון צד ${sz.side} מ״מ` : ""}
-          <small>מידות קטלוג — הפתח נמדד באתר הלקוח</small>
+          ${sz.w} × ${sz.h} ${T("unit.mm")} · ${L(sz)}${sz.side ? ` · ${T("sheet.sidelight", sz.side)}` : ""}
+          <small>${T("sheet.dims")}</small>
         </figcaption>
       </figure>
 
       <div class="sheet__spec">
         ${rows}
         <div class="sheet__row sheet__row--wide">
-          <span class="sheet__k">כיוון</span>
-          <span class="sheet__v">${handingWords(state)}</span>
+          <span class="sheet__k">${T("sheet.handing")}</span>
+          <span class="sheet__v">${handingWords(state)}${he ? `<small class="sheet__he" dir="rtl">${withLang("he", () => handingWords(state))}</small>` : ""}</span>
         </div>
-        ${grip.map((g) => `<div class="sheet__row sheet__row--wide"><span class="sheet__k">ידית</span><span class="sheet__v">${g}</span></div>`).join("")}
+        ${/* The grip notes are Peretz's instructions — drill across the leaf,
+        the customer moved it on purpose — so the Hebrew is the one that
+        matters and the customer's language is the gloss. Same shape as
+        the rows above, computed the same way. */
+    ""}
+        ${(() => {
+      const gripHe = he ? withLang("he", () => gripAddendum(state)) : null;
+      return grip.map((g, i) => `<div class="sheet__row sheet__row--wide"><span class="sheet__k">${T("sheet.grip")}</span><span class="sheet__v">${g}` + (gripHe ? `<small class="sheet__he" dir="rtl">${gripHe[i]}</small>` : "") + "</span></div>").join("");
+    })()}
         <div class="sheet__row sheet__row--wide">
-          <span class="sheet__k">מחיר משוער</span>
+          <span class="sheet__k">${T("price.est")}</span>
           <span class="sheet__v"><b>${formatAgorot(priceAgorot(state))}</b>
-            <small>${PRICE_INCLUDES}</small></span>
+            <small>${priceIncludes()}</small>${he ? `<small class="sheet__he" dir="rtl">${withLang("he", priceIncludes)}</small>` : ""}</span>
         </div>
       </div>
     </div>
 
     <footer class="sheet__foot">
-      ${PRICE_CAVEAT}
+      ${priceCaveat()}${he ? `<span class="sheet__he" dir="rtl">${withLang("he", priceCaveat)}</span>` : ""}
       ${/* ⚠ THE SHEET HID THE TWO STRIPS THAT SAY THE PRICE IS INVENTED AND
         THE DOOR WAS SUBSTITUTED. `.is-sheet` hides `.strip`, so a sheet
         built from a placeholder catalogue printed a confident number with
@@ -7011,7 +7575,7 @@ ${body}
         nobody chose with no notice. Both belong on a document somebody
         orders from more than they belong on the screen. */
     ""}
-      ${PLACEHOLDER2 ? '<b class="sheet__warn">גרסת פיתוח — המחירים כאן הם דוגמה בלבד.</b>' : ""}
+      ${PLACEHOLDER2 ? `<b class="sheet__warn">${T("sheet.dev")}</b>` : ""}
       <span class="sheet__note" id="sheet-notice" hidden></span>
     </footer>`;
   }
@@ -7021,19 +7585,19 @@ ${body}
     opener.type = "button";
     opener.className = "works-open";
     opener.id = "works-btn";
-    opener.innerHTML = `<span class="works-open__t">התחילו מדלת שכבר התקנו</span><span class="works-open__n">${WORKS.length} דלתות אמיתיות</span>`;
+    opener.innerHTML = `<span class="works-open__t">${T("works.open")}</span><span class="works-open__n">${T("works.count", WORKS.length)}</span>`;
     opener.addEventListener("click", openWorks);
     wrap.appendChild(opener);
     const nav = document.createElement("nav");
     nav.className = "steps";
-    nav.setAttribute("aria-label", "מעבר בין שלבי הבחירה");
+    nav.setAttribute("aria-label", T("nav.steps"));
     for (const sec of [...SECTIONS, SUMMARY]) {
       const b = document.createElement("button");
       b.type = "button";
       b.className = "steps__step";
       b.dataset.step = sec.key;
-      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span><span class="steps__l"><span class="steps__n" aria-hidden="true"></span><span class="steps__t">${sec.title}</span></span>`;
-      b.setAttribute("aria-label", sec.title);
+      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span><span class="steps__l"><span class="steps__n" aria-hidden="true"></span><span class="steps__t">${T(sec.title)}</span></span>`;
+      b.setAttribute("aria-label", T(sec.title));
       b.addEventListener("click", () => goStep(sec.key));
       nav.appendChild(b);
     }
@@ -7045,8 +7609,8 @@ ${body}
       box.hidden = true;
       box.innerHTML = `
       <p class="sect__where"><span data-step-n></span></p>
-      <h2 class="sect__title" id="sect-head-${sec.key}" tabindex="-1">${sec.title}</h2>
-      ${sec.lede ? `<p class="sect__lede">${sec.lede}</p>` : ""}
+      <h2 class="sect__title" id="sect-head-${sec.key}" tabindex="-1">${T(sec.title)}</h2>
+      ${sec.lede ? `<p class="sect__lede">${T(sec.lede)}</p>` : ""}
       <div class="sect__body" id="sect-body-${sec.key}"></div>`;
       wrap.appendChild(box);
       const body = box.querySelector(".sect__body");
@@ -7055,10 +7619,10 @@ ${body}
         field.className = "field";
         field.dataset.group = g.key;
         field.innerHTML = `
-        <h3 class="field__title" id="head-${g.key}">${g.title}</h3>
+        <h3 class="field__title" id="head-${g.key}">${T(g.title)}</h3>
         <div class="field__body" id="body-${g.key}">
           <div class="field__opts"></div>
-          ${g.hint ? `<p class="field__hint">${g.hint}</p>` : ""}
+          ${g.hint ? `<p class="field__hint">${T(g.hint)}</p>` : ""}
           <p class="field__note" data-note hidden></p>
         </div>`;
         body.appendChild(field);
@@ -7067,8 +7631,8 @@ ${body}
       const foot = document.createElement("div");
       foot.className = "sect__foot";
       foot.innerHTML = `
-      <button type="button" class="btn btn--ghost sect__back">‹ הקודם</button>
-      <button type="button" class="btn sect__next">הבא ›</button>`;
+      <button type="button" class="btn btn--ghost sect__back">${T("nav.back")}</button>
+      <button type="button" class="btn sect__next">${T("nav.next")}</button>`;
       foot.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
       foot.querySelector(".sect__next").addEventListener("click", () => stepBy(1));
       box.appendChild(foot);
@@ -7079,11 +7643,11 @@ ${body}
     sum.hidden = true;
     sum.innerHTML = `
     <p class="sect__where"><span data-step-n></span></p>
-    <h2 class="sect__title" id="sect-head-sum" tabindex="-1">${SUMMARY.title}</h2>
-    <p class="sect__lede">בדקו שהכול נכון, ושלחו לנו את הדלת.</p>
+    <h2 class="sect__title" id="sect-head-sum" tabindex="-1">${T(SUMMARY.title)}</h2>
+    <p class="sect__lede">${T(SUMMARY.lede)}</p>
     <div class="sect__body" id="sum-slot"></div>
     <div class="sect__foot">
-      <button type="button" class="btn btn--ghost sect__back">‹ הקודם</button>
+      <button type="button" class="btn btn--ghost sect__back">${T("nav.back")}</button>
     </div>`;
     sum.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
     wrap.appendChild(sum);
@@ -7092,26 +7656,29 @@ ${body}
     const after = { ...repair({ ...state2, [g.key]: o.id }).state, [g.key]: o.id };
     return tileAgorot(g.key, after);
   }
-  var BREAKDOWN_HE = {
-    door: "הדלת",
-    cylinder: "צילינדר",
-    lock: "מנגנון נעילה",
-    mashkof: "משקוף",
-    install: "התקנה והובלה",
-    measure: "מדידה וייעוץ",
-    colour: "צבע",
-    detail: "עיצוב החזית",
-    window: "חלון",
-    grille: "עיצוב החלון",
-    handle: "ידית משיכה",
-    lockset: "מנעול וידית",
-    round: "עיגול"
+  var BREAKDOWN_KEY = {
+    door: "bd.door",
+    cylinder: "bd.cylinder",
+    lock: "bd.lock",
+    mashkof: "bd.mashkof",
+    install: "bd.install",
+    measure: "bd.measure",
+    colour: "bd.colour",
+    detail: "bd.detail",
+    window: "bd.window",
+    grille: "bd.grille",
+    handle: "bd.handle",
+    lockset: "bd.lockset",
+    speciallock: "bd.speciallock",
+    pirzul: "bd.pirzul",
+    stripes: "bd.stripes",
+    round: "bd.round"
   };
   function renderBreakdown(state2) {
     const body = $("#breakdown-body");
     if (!body) return;
     const rows = breakdownRows(state2);
-    body.innerHTML = rows.map((r) => `<tr><th scope="row">${BREAKDOWN_HE[r.key] || r.key}</th><td>${formatAgorot(r.agorot)}</td></tr>`).join("") + `<tr class="bd__total"><th scope="row">סה״כ</th><td>${formatAgorot(priceAgorot(state2))}</td></tr>`;
+    body.innerHTML = rows.map((r) => `<tr><th scope="row">${BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key}</th><td>${formatAgorot(r.agorot)}</td></tr>`).join("") + `<tr class="bd__total"><th scope="row">${T("price.total")}</th><td>${formatAgorot(priceAgorot(state2))}</td></tr>`;
   }
   function repriceOptions(state2) {
     for (const g of GROUPS) {
@@ -7129,19 +7696,19 @@ ${body}
         const sw = b.querySelector(".swatch__meta");
         if (sw) {
           sw.textContent = `${colourCode(o)} · ${label}`;
-          b.title = `${o.he} · ${colourCode(o)}${label === priceLabel(0) ? "" : ` · ${label}`}`;
-          b.setAttribute("aria-label", `${o.he}, ${colourCode(o)}` + (label === priceLabel(0) ? "" : `, ${label}`));
+          b.title = `${L(o)} · ${colourCode(o)}${label === priceLabel(0) ? "" : ` · ${label}`}`;
+          b.setAttribute("aria-label", `${L(o)}, ${colourCode(o)}` + (label === priceLabel(0) ? "" : `, ${label}`));
         }
       }
     }
   }
   function buildOptions(g, host) {
     host.setAttribute("role", "radiogroup");
-    host.setAttribute("aria-label", g.title);
+    host.setAttribute("aria-label", T(g.title));
     host.className = "field__opts " + { swatch: "swatches", pill: "pills", tile: "tiles", sq: "tiles tiles--sq", hw: "tiles tiles--hw" }[g.kind];
     const groups = g.subs ? [
       [null, g.list().filter((o) => !o.sub)],
-      ...g.subs.map(([k, label]) => [label, g.list().filter((o) => o.sub === k)])
+      ...g.subs.map(([k, key]) => [T(key), g.list().filter((o) => o.sub === k)])
     ] : [[null, g.list()]];
     for (const [label, items] of groups) {
       if (label && items.length) {
@@ -7158,20 +7725,20 @@ ${body}
         b.setAttribute("role", "radio");
         if (g.kind === "swatch") {
           b.className = "swatch";
-          b.title = `${o.he} · ${colourCode(o)}`;
-          b.setAttribute("aria-label", `${o.he}, ${colourCode(o)}`);
+          b.title = `${L(o)} · ${colourCode(o)}`;
+          b.setAttribute("aria-label", `${L(o)}, ${colourCode(o)}`);
           b.innerHTML = `
         <span class="swatch__chip" style="--chip:${o.hex}"></span>
-        <span class="swatch__name">${o.he}</span>
+        <span class="swatch__name">${L(o)}</span>
         <span class="swatch__meta">${colourCode(o)} · ${priceLabel(tilePrice(g, o, state))}</span>`;
         } else if (g.kind === "pill") {
           b.className = "pill";
-          b.textContent = o.he;
+          b.textContent = L(o);
         } else {
           b.className = "tile";
           b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
-        <span class="tile__name">${o.he}</span>
+        <span class="tile__name">${L(o)}</span>
         ${/* ⚠ THE BAND EACH SIZE SERVES, AND IT HAS BEEN OWED SINCE 23.8.
              `ASK-PERETZ.md` §8: "the size tiles are meant to print the band each
              one serves, so a customer with an odd opening can tell which tile is
@@ -7181,7 +7748,7 @@ ${body}
              Peretz gave the real bands on 26.8 and this is that line.
              Read off `o.band`, so any option that grows one gets it for free
              and no group needs a special case. */
-          ""}${o.band ? `<span class="tile__band">${o.band}</span>` : ""}
+          ""}${o.band ? `<span class="tile__band">${L(o.band)}</span>` : ""}
         <span class="tile__meta">${priceLabel(tilePrice(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
         }
@@ -7202,24 +7769,30 @@ ${body}
     const box = document.createElement("div");
     box.className = "stripes";
     box.innerHTML = `
-    <span class="stripes__label" id="stripes-l">פסי מתכת</span>
+    <span class="stripes__label" id="stripes-l">${T("stripes.label")}</span>
     ${why ? `<p class="stripes__why">${why}</p>` : `
     <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
-      ${[["none", "ללא"], ["h", "אופקיים"], ["v", "אנכיים"]].map(([id, he]) => `
+      ${[["none", "stripes.none"], ["h", "stripes.h"], ["v", "stripes.v"]].map(([id, k]) => `
         <button type="button" class="pill${dir === id ? " is-on" : ""}"
-                data-dir="${id}" aria-pressed="${dir === id}">${he}</button>`).join("")}
+                data-dir="${id}" aria-pressed="${dir === id}">${T(k)}</button>`).join("")}
     </div>
     ${dir === "none" ? "" : `
       <div class="blen__row">
-        <button type="button" class="blen__b" data-n="-1" aria-label="פחות פסים"
+        <button type="button" class="blen__b" data-n="-1" aria-label="${T("stripes.fewer")}"
                 ${n <= 1 ? "disabled" : ""}>−</button>
-        <output class="blen__v" aria-labelledby="stripes-l">${n} פסים</output>
-        <button type="button" class="blen__b" data-n="1" aria-label="עוד פסים"
+        ${/* ⚠ THROUGH `counted`, NOT `${n} ${T('stripes.noun')}`. Russian has
+        three plural forms — 1 полоса, 3 полосы, 5 полос — and 21 takes
+        the singular again while 11 does not. A count pasted beside a
+        fixed noun is right in Hebrew, right in English, and wrong in
+        Russian four times out of ten. */
+    ""}
+        <output class="blen__v" aria-labelledby="stripes-l">${counted(n, "stripes.noun")}</output>
+        <button type="button" class="blen__b" data-n="1" aria-label="${T("stripes.more")}"
                 ${n >= max ? "disabled" : ""}>+</button>
       </div>
       ${dir === "h" ? `
         <button type="button" class="pill stripes__tight${state.stripeTight ? " is-on" : ""}"
-                data-tight="1" aria-pressed="${state.stripeTight}">צפופים</button>` : ""}
+                data-tight="1" aria-pressed="${state.stripeTight}">${T("stripes.tight")}</button>` : ""}
       <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`}
     `}`;
     for (const b of box.querySelectorAll("[data-dir]")) {
@@ -7261,11 +7834,11 @@ ${body}
     const box = document.createElement("div");
     box.className = "blen";
     box.innerHTML = `
-    <span class="blen__label" id="blen-l">אורך הידית</span>
+    <span class="blen__label" id="blen-l">${T("len.label")}</span>
     <div class="blen__row">
-      <button type="button" class="blen__b" data-step="-1" aria-label="לקצר את הידית">−</button>
-      <output class="blen__v" aria-labelledby="blen-l">${Math.round(now / 10)} ס״מ</output>
-      <button type="button" class="blen__b" data-step="1" aria-label="להאריך את הידית">+</button>
+      <button type="button" class="blen__b" data-step="-1" aria-label="${T("len.shorter")}">−</button>
+      <output class="blen__v" aria-labelledby="blen-l">${T("len.cm", Math.round(now / 10))}</output>
+      <button type="button" class="blen__b" data-step="1" aria-label="${T("len.longer")}">+</button>
     </div>`;
     for (const b of box.querySelectorAll(".blen__b")) {
       const dir = Number(b.dataset.step);
@@ -7337,10 +7910,10 @@ ${body}
     const list = savedRead().filter((x) => x !== q);
     list.unshift(q);
     if (!savedWrite(list)) {
-      toast("הדפדפן הזה לא מאפשר לשמור עיצובים");
+      toast(T("saved.no"));
       return;
     }
-    toast("העיצוב נשמר בדפדפן הזה");
+    toast(T("saved.ok"));
     paintSaved();
   }
   function paintSaved() {
@@ -7381,7 +7954,7 @@ ${body}
       const drop = document.createElement("button");
       drop.type = "button";
       drop.className = "saved__drop";
-      drop.setAttribute("aria-label", `הסרת ${label}`);
+      drop.setAttribute("aria-label", T("saved.remove", label));
       drop.textContent = "×";
       drop.addEventListener("click", () => {
         savedWrite(savedRead().filter((x) => x !== q));
@@ -7403,14 +7976,14 @@ ${body}
       }
       const where = document.querySelector(`.sect[data-section="${k}"] [data-step-n]`);
       if (where) {
-        where.textContent = k === SUMMARY.key ? SUMMARY.sub : `${String(i2 + 1).padStart(2, "0")} ⁄ ${String(SECTIONS.length).padStart(2, "0")}`;
+        where.textContent = k === SUMMARY.key ? T(SUMMARY.sub) : `${String(i2 + 1).padStart(2, "0")} ⁄ ${String(SECTIONS.length).padStart(2, "0")}`;
       }
     }
     const i = keys.indexOf(liveStep);
     for (const b of document.querySelectorAll(".sect__back")) b.disabled = i <= 0;
     for (const b of document.querySelectorAll(".sect__next")) {
       b.disabled = i >= keys.length - 1;
-      b.textContent = i === keys.length - 2 ? "לסיכום ›" : "הבא ›";
+      b.textContent = T(i === keys.length - 2 ? "nav.toSummary" : "nav.next");
     }
   }
   function choose(g, id) {
@@ -7427,7 +8000,7 @@ ${body}
     state = prev;
     guard(paint)();
     scheduleUrl();
-    toast("הצעד האחרון בוטל");
+    toast(T("undo.done"));
   }
   var urlTimer = null;
   function scheduleUrl() {
@@ -7536,7 +8109,7 @@ ${body}
     g.classList.add("grip-live");
     g.setAttribute("tabindex", "0");
     g.setAttribute("role", "button");
-    g.setAttribute("aria-label", "מיקום הידית. גררו, או הזיזו עם מקשי החיצים");
+    g.setAttribute("aria-label", T("grip.aria"));
     g.addEventListener("pointerdown", onGripDown);
     g.addEventListener("keydown", onGripKey);
     g.addEventListener("touchstart", swallowTouch, { passive: false });
@@ -7546,7 +8119,7 @@ ${body}
     sizeHitPad();
     const { moved } = gripDeparture(state);
     $("#grip-home").hidden = !moved;
-    $(".grip-bar__hint").textContent = moved ? `מיקום הידית ${GRIP_ILLUSTRATIVE}` : "גררו את הידית למקום שתרצו";
+    $(".grip-bar__hint").textContent = moved ? T("grip.ariaAt", gripIllustrative()) : T("grip.drag");
   }
   var TOUCH_TARGET = 44;
   function sizeHitPad() {
@@ -7649,7 +8222,7 @@ ${body}
     let at = fit.ok ? want : nearestGrip(state, want);
     if (!gripPlacement(state, at).ok) at = gripHome(state);
     set({ ...state, grip: at });
-    if (!fit.ok && saySo) toast(fit.why + " — הזזנו למקום הקרוב שאפשר");
+    if (!fit.ok && saySo) toast(T("notice.moved", fit.why));
     const g = $('#stage svg [data-hw="handle"]');
     if (g) g.focus({ preventScroll: true });
   }
@@ -7691,6 +8264,7 @@ ${body}
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
     const stage = $("#stage");
+    if (!stage) return;
     const svg = stage.querySelector("svg");
     if (!svg) return;
     const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
@@ -7731,7 +8305,7 @@ ${body}
   }
   async function onCopy() {
     const ok = await copyMessage(state);
-    toast(ok ? "הפרטים הועתקו — הדביקו בהודעה לפרץ" : "ההעתקה נכשלה, נסו לשלוח בוואטסאפ");
+    toast(T(ok ? "copy.ok" : "copy.fail"));
   }
   var toastTimer = null;
   function toast(text) {
@@ -7747,9 +8321,9 @@ ${body}
   function showNotice(kind, said) {
     const el = $("#notice");
     const generic = {
-      "code-unknown": "הקוד לא זוהה — מציגים דלת ברירת מחדל.",
-      "combination-fixed": "השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר."
-    }[kind] || "חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.";
+      "code-unknown": T("notice.code"),
+      "combination-fixed": T("notice.fixed")
+    }[kind] || T("notice.some");
     el.textContent = kind === "combination-fixed" && said && said.length ? said.join(" · ") + "." : generic;
     el.hidden = false;
   }

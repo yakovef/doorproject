@@ -19,6 +19,7 @@
 import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
          handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, PIRZUL,
          REBATE, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+import { T } from './copy.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
@@ -3587,7 +3588,7 @@ export function gripPlacement(state, place = null) {
   const lo = p.rot === 90 ? cx - half : p.y - half;
   const hi = p.rot === 90 ? cx + half : p.y + half;
   const span = p.rot === 90 ? leafW : leafH;
-  if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad('הידית חורגת מהדלת');
+  if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad(T('why.gripOffDoor'));
 
   /* ⚠ AND THE OTHER AXIS, WHICH NOTHING WAS CHECKING AT ALL.
      The block above measures the grip along its LONG axis — down the leaf when
@@ -3606,7 +3607,7 @@ export function gripPlacement(state, place = null) {
   const gx0 = p.rot === 90 ? p.x - foot.vy : p.x - foot.out;
   const gx1 = p.rot === 90 ? p.x + foot.vy : p.x + foot.in;
   if (gx0 < EDGE_FLAT || gx1 > leafW - EDGE_FLAT) {
-    return bad('הידית חורגת מהדלת');
+    return bad(T('why.gripOffDoor'));
   }
   /* The same interval read from the leaf's LEFT edge, which is the space the
      aperture layout and the feet are written in. Two coordinate systems for
@@ -3636,7 +3637,7 @@ export function gripPlacement(state, place = null) {
      this says. It is the SHORT grips this frees, which are exactly the ones
      worth dragging: the grab bar, and Shiran. */
   if (p.y < leafH * 0.18 || p.y > leafH * 0.82) {
-    return bad('הידית גבוהה או נמוכה מדי לשימוש');
+    return bad(T('why.gripReach'));
   }
 
   /* AND NOT ON THE HINGE SIDE. A pull standing upright past the leaf's centre
@@ -3663,13 +3664,13 @@ export function gripPlacement(state, place = null) {
      on a standard leaf with a lever. Its horizontal extent is checked by the
      whole-object rule above now, which is the honest question to ask of it. */
   if (p.rot === 0 && handle.style !== 'grab' && p.x > leafW * 0.55) {
-    return bad('ידית משיכה לא מותקנת בצד הצירים');
+    return bad(T('why.gripHingeSide'));
   }
 
   for (const f of feet) {
     if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT
         || f.y - f.r < EDGE_FLAT || f.y + f.r > leafH - EDGE_FLAT) {
-      return bad('הידית חורגת מהדלת');
+      return bad(T('why.gripOffDoor'));
     }
     for (const ob of obstacles) {
       if (footHits(f, ob)) {
@@ -3678,9 +3679,9 @@ export function gripPlacement(state, place = null) {
            they are not the panel, and a customer told "the feet are on the
            panel's frame" while the bar is across the SHELF is being told
            where to look and looking at the wrong thing. */
-        return bad(ob.kind === 'window'   ? 'הרגליים על מסגרת החלון'
-                 : ob.kind === 'moulding' ? 'הרגליים על עיצוב החזית'
-                                          : 'הרגליים על מסגרת הפאנל');
+        return bad(ob.kind === 'window'   ? T('why.feetOnWindow')
+                 : ob.kind === 'moulding' ? T('why.feetOnFace')
+                                          : T('why.feetOnPanel'));
       }
     }
   }
@@ -3773,7 +3774,7 @@ export function gripPlacement(state, place = null) {
        grip's. `L.x`, not `backset` — see the note where `locks` is built. */
     const lo0 = L.x - L.out, lo1 = L.x + L.inward;
     if (gx0 < lo1 + LOCK_CLEAR && gx1 > lo0 - LOCK_CLEAR) {
-      return bad('הידית נוגעת במנעול');
+      return bad(T('why.gripTouchesLock'));
     }
     /* ⚠ AND BAR_GAP_MIN IS AXIS TO AXIS, NOT BOX TO BOX. Folding it into the
        overlap test above as a wider gap looked tidier and refused 602 designs
@@ -3787,7 +3788,7 @@ export function gripPlacement(state, place = null) {
        and this asks the same question, so the position it chooses is by
        construction one this accepts — which is the property that broke. */
     if (Math.abs(p.x - L.x) < leafW * BAR_GAP_MIN) {
-      return bad('הידית נוגעת במנעול');
+      return bad(T('why.gripTouchesLock'));
     }
   }
 
@@ -3810,7 +3811,7 @@ export function gripPlacement(state, place = null) {
                                  byId(DETAILS, state.detail), leafH)) {
     if (cgx0 < o.x + o.w && cgx1 > o.x
         && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
-      return bad('הידית חוצה את החלון');
+      return bad(T('why.gripCrossesWindow'));
     }
   }
 
@@ -7692,7 +7693,7 @@ const cylinder = (cx, cy, owned = false) => {
 };
 
 /** Plain-language description, used as the SVG's accessible name. */
-export function describe(state, lang = 'he') {
+export function describe(state) {
   /* ⚠ THE ROWS, from `js/spec.js`. This function assembled the door itself and
      was the LAST of four readers to be corrected, which is exactly what made
      it dangerous: it is the one description nobody sighted ever sees. It went
@@ -7703,16 +7704,20 @@ export function describe(state, lang = 'he') {
      `spec.js` imports the catalogue and nothing else, so this import does not
      make a cycle — see the note there about why the grip's position is
      deliberately not a row. */
-  if (lang === 'he') return describeSentence(state);
-  /* English is a stub and has been: `describe(state, 'en')` is called by
-     nothing, and `PLAN.md` §6's `content/copy.json` — every user-visible
-     string keyed, three values each — is unbuilt. Left as it was rather than
-     given a second row-renderer nobody reads. */
-  const c = byId(COLOURS, state.colour);
-  const w = byId(WINDOWS, state.window);
-  const s2 = SIZES[state.size] || SIZES.standard;
-  const h = byId(HANDINGS, state.handing);
-  return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s2.en}, ${h.en}`;
+  /* ⚠ THE `lang` PARAMETER AND ITS ENGLISH BRANCH ARE GONE, and deleting
+     them is the point rather than a tidy-up. This function used to fork: the
+     Hebrew arm called `describeSentence`, and the English arm was a
+     hand-written second row-renderer, four fields wide, that named the
+     colour, the window, the size and the handing and knew nothing about the
+     frame, the extra lock, the hardware finish, the strips or the glazing.
+     Its own comment said why — "`PLAN.md` §6's `content/copy.json` is
+     unbuilt" — and admitted `describe(state, 'en')` was called by nothing,
+     which is the only reason a description that had drifted six axes behind
+     the door never showed up as a bug.
+     It is built now. One reader, one row list, three languages, and the
+     second copy of the naming rule that CLAUDE.md §5 warns about is deleted
+     rather than translated. */
+  return describeSentence(state);
 }
 
 /* ─── Option thumbnails, from the same geometry the stage uses ──── */

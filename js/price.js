@@ -7,6 +7,7 @@
  * configurator must not break it.
  */
 
+import { T } from './copy.js';
 import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
          handleLength, HANDLE_RATE_A, MASHKOF_WIDER_A, MASHKOFS, paneCount,
          LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, stripePrice,
@@ -272,14 +273,57 @@ export function breakdownRows(state) {
   return rows;
 }
 
+/**
+ * ⚠ PINNED TO `he-IL` IN ALL THREE LANGUAGES, DELIBERATELY.
+ *
+ * `ru-RU` would render the same figure as `3 150 ₪` — symbol trailing, a
+ * narrow no-break space for the thousands — and `en-IL` as `₪3,150`. Both are
+ * correct localisations and both are the wrong answer here, for one reason:
+ * this number is SHOWN to the customer and SENT to Peretz, and the message he
+ * receives is always Hebrew (see `js/share.js`). A Russian customer would
+ * screenshot `3 150 ₪` and Peretz would read `₪3,150` off the same order.
+ * Prices are the one thing on this page that must be byte-identical between
+ * its two readers.
+ *
+ * It is also what `PLAN.md` §6 chose on other grounds — "digits are identical
+ * across all three, so prices never change shape" — and what every price tag
+ * in Israel looks like regardless of who is reading it.
+ *
+ * ⚠ AND PINNING THE LOCALE WAS NOT ENOUGH. That is the whole reason this is
+ * assembled by hand instead of taken from `format()`.
+ *
+ * `Intl` emits the shekel with BIDI CONTROL CHARACTERS around it — U+200F
+ * RIGHT-TO-LEFT MARK — and the Unicode bidirectional algorithm then places
+ * the symbol at PAINT time according to the direction of the paragraph it
+ * lands in. Measured in Chromium, the one string `he-IL` produces for 3150:
+ *
+ *     in an rtl page   ₪ 3,150
+ *     in an ltr page   3,150₪
+ *
+ * The same price, two shapes, decided by the stylesheet. Found by opening the
+ * English page and looking at a size tile, three paragraphs after this comment
+ * had already been written promising it could not happen — a pinned locale
+ * fixes the FORMATTING and does nothing about the REORDERING.
+ *
+ * Also measured, in the same run: `'₪3,150'` written by hand, with no control
+ * characters in it, renders as `₪3,150` in both directions. The shekel sign
+ * is a European Terminator and binds to the digits after it either way. So
+ * the symbol is prepended here and `Intl` is asked only for what it is
+ * actually good at — grouping the digits.
+ */
+const SHEKEL = '\u20AA';
 const fmt = new Intl.NumberFormat('he-IL', {
-  style: 'currency',
-  currency: 'ILS',
-  minimumFractionDigits: 0,  // REQUIRED: currency defaults to 2, and
-  maximumFractionDigits: 0,  // max-below-min throws a RangeError.
+  style: 'decimal',
+  minimumFractionDigits: 0,  // REQUIRED: max-below-min throws a RangeError.
+  maximumFractionDigits: 0,
 });
 
-export const formatAgorot = a => fmt.format(a / 100);
+/**
+ * ⚠ THE MINUS GOES OUTSIDE THE SYMBOL, and it is not decoration: the
+ * breakdown's rounding row is negative on most doors. `−₪50`, not `₪−50`.
+ */
+export const formatAgorot = a =>
+  (a < 0 ? '\u2212' : '') + SHEKEL + fmt.format(Math.abs(a) / 100);
 export const shekels = a => Math.round(a / 100);
 
 /**
@@ -293,9 +337,9 @@ export const shekels = a => Math.round(a / 100);
  * is for a delta, and `fmt` renders one correctly if it ever arrives; nothing
  * in the catalogue produces one today.
  */
-export function priceLabel(agorot, lang = 'he') {
-  if (!agorot) return { he: 'כלול', en: 'Included', ru: 'Включено' }[lang];
-  return fmt.format(agorot / 100);
+export function priceLabel(agorot) {
+  if (!agorot) return T('price.included');
+  return formatAgorot(agorot);
 }
 
 /**
@@ -313,7 +357,7 @@ export function priceLabel(agorot, lang = 'he') {
  * off when it was tapped. A price that moves in a direction the label never
  * mentioned is the same defect as one that moves further than it said.
  */
-export function deltaLabel(agorot, lang = 'he') {
-  if (!agorot) return { he: 'כלול', en: 'Included', ru: 'Включено' }[lang];
-  return (agorot < 0 ? '−' : '+') + fmt.format(Math.abs(agorot) / 100);
+export function deltaLabel(agorot) {
+  if (!agorot) return T('price.included');
+  return (agorot < 0 ? '\u2212' : '+') + SHEKEL + fmt.format(Math.abs(agorot) / 100);
 }
