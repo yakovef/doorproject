@@ -681,7 +681,7 @@
        (remove the handle)". Two panels, three panels and the classical set are
        his. A SINGLE panel is not on his list and cannot simply be deleted —
        `rect` requires a bottom panel, so one must stay buildable — so it is
-       priced at half of two. TRANSFORM.md §18, assumption A8, and it is the only
+       priced at half of two. `CLAUDE.md` §9, assumption A8, and it is the only
        face price in the range with no source behind it. */
     panel: 725,
     // פאנל תחתון      — A8, half of two
@@ -699,7 +699,7 @@
        rectangles in a different section of stock — see the two `MOULDS` in the
        renderer — and a broader, deeper moulding is more timber and more work.
        ASK-PERETZ §14 asks whether both are even his, which is the question that
-       matters more than the price. TRANSFORM.md §18, assumption A14. */
+       matters more than the price. `CLAUDE.md` §9, assumption A14. */
     panelo: 725,
     // פאנל תחתון קלאסי
     panel2o: 1450,

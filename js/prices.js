@@ -46,7 +46,7 @@
  * it teaches a reader to discount the true ones beside it.
  *
  * ⚠ WHAT IS STILL A GUESS IS NAMED, NOT HIDDEN. Fifteen readings and
- * assumptions are listed in `TRANSFORM.md` §18 and carried into
+ * assumptions are listed in `CLAUDE.md` §9 and carried into
  * `ASK-PERETZ.md` — a single bottom panel at half of two, the sidelight
  * multiplier, whether "tall" is our צוהר or our מלבני. Each is one edit. None
  * of them is the shape of the price list, which is what this flag was about.
@@ -126,7 +126,7 @@ export const MASHKOF_WIDER = 250;
    this file was within an order of magnitude of it.
    ⚠ `strip` is his "tall" and `rect` his "square" — a reading, not a
    quotation, resting on the shape of two Hebrew names. It is ₪500 on the
-   majority of glazed orders if it is the wrong way round. TRANSFORM.md §18,
+   majority of glazed orders if it is the wrong way round. `CLAUDE.md` §9,
    assumption A13, and it is the cheapest question on that list to get wrong
    expensively. */
 export const WINDOW = {
@@ -161,7 +161,7 @@ export const WINDOW = {
    מחושל — but he named three things to remove and this was not one of them,
    and removing a fourth on the grounds that it resembles one of the three is
    the kind of inference that loses a product nobody meant to lose.
-   TRANSFORM.md §18, assumption A4. */
+   `CLAUDE.md` §9, assumption A4. */
 export const GRILLE = {
   none:         0,   // ללא סורג
   grid:         0,   // סורג רשת
@@ -215,7 +215,7 @@ export const DETAIL = {
      (remove the handle)". Two panels, three panels and the classical set are
      his. A SINGLE panel is not on his list and cannot simply be deleted —
      `rect` requires a bottom panel, so one must stay buildable — so it is
-     priced at half of two. TRANSFORM.md §18, assumption A8, and it is the only
+     priced at half of two. `CLAUDE.md` §9, assumption A8, and it is the only
      face price in the range with no source behind it. */
   panel:     725,    // פאנל תחתון      — A8, half of two
   /* `panelTop` (פאנל עליון) is WITHDRAWN, 27.8.2026: a lone UPPER panel is
@@ -230,7 +230,7 @@ export const DETAIL = {
      rectangles in a different section of stock — see the two `MOULDS` in the
      renderer — and a broader, deeper moulding is more timber and more work.
      ASK-PERETZ §14 asks whether both are even his, which is the question that
-     matters more than the price. TRANSFORM.md §18, assumption A14. */
+     matters more than the price. `CLAUDE.md` §9, assumption A14. */
   panelo:    725,    // פאנל תחתון קלאסי
   panel2o:   1450,   // שני פאנלים קלאסיים
   /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
@@ -332,7 +332,7 @@ export const HANDLE = {
    cannot buy 10 cm of extra bar, so 110 cm is one step over and not half of
    one. `Math.floor` is equally defensible arithmetic and gives a different,
    wrong, answer — which is why it is written down. If Peretz sells by exact
-   length this is one word. TRANSFORM.md §18, assumption A9. */
+   length this is one word. `CLAUDE.md` §9, assumption A9. */
 export const HANDLE_RATE = { over: 1000, step: 200, per: 150 };  // mm, mm, ₪
 
 /* ── the lock and the lever ───────────────────────────────────────────
@@ -347,7 +347,7 @@ export const HANDLE_RATE = { over: 1000, step: 200, per: 150 };  // mm, mm, ₪
    ⚠ `knobplate` (כדור על אורך) TAKES THE "CIRCLE" RATE. It is a ball on a long
    backplate — a circle by the only reading of his word that fits the range, and
    the plate is what carries the keyway rather than a second product.
-   TRANSFORM.md §18, assumption A5.
+   `CLAUDE.md` §9, assumption A5.
 
    ⚠ `digital` (מנעול חכם) AND `kodan` ARE DIFFERENT PRODUCTS and are priced an
    order apart, ₪2,700 against ₪900. He listed them under different headings.

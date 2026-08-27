@@ -116,9 +116,10 @@ because they change how you should work:
   literally — every one of them was real, and several were invisible to every
   instrument in the repo.
 - **They bring in outside reviews on their own branches** and expect them read
-  and acted on, not summarised. `MOCKUP2.md`, `REALISM2.md` and
-  `review/2026-08-23-review.html` all arrived that way. Read the branch, do the
-  work, and say plainly which of its recommendations you are declining and why.
+  and acted on, not summarised. Two mockup reads and
+  `review/2026-08-23-review.html` all arrived that way; the two plans they
+  became were executed and deleted on 27.8.2026. Read the branch, do the work,
+  and say plainly which of its recommendations you are declining and why.
 - **They want momentum.** *"you can do a couple of things at the same time to
   speed things up."* Run the long browser jobs in the background and keep
   working; do not sit and wait on a three-minute suite.
@@ -242,7 +243,7 @@ agent found two gaps by checking the CODE instead of its own notes:
 
 Neither was visible from the outside. Both are closed. The lesson is the one
 §5 keeps teaching in a new costume: **check the artefact, not the record of
-the artefact.** `TRANSFORM.md` §16.1's fifteen named assertions are the list to
+the artefact.** The fifteen named assertions in §7 are the list to
 walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
@@ -284,7 +285,7 @@ It is healthy today — 6/6 loads at 1280 and 1680, zero crashes — which is wh
 `ASK-PERETZ.md` is **89 lines now, not 776**, and that is the change that
 matters most about it: nobody answers a 500-line document between jobs, and
 that is why it went nine days unanswered. What is left is fifteen assumptions
-(`TRANSFORM.md` §18), of which one is expensive:
+(`CLAUDE.md` §9), of which one is expensive:
 
 ⚠ **A13 — which of our two windows is his "tall".** ₪500 on the majority of
 glazed orders, resting on nothing but the shape of two Hebrew names.
@@ -301,23 +302,17 @@ stocked, so almost every bar costs ₪650 rather than ₪500.
 - **The mockup's floating overlay.** `TRANSFORM.md` §12.2 — scoped down to the
   door taking the empty column, and said so.
 
-### The plan on the table
+### There is no plan on the table
 
-`REALISM2.md` is the current forward plan, answering the second mockup read in
-`MOCKUP2.md`. **Stages A–D are built** (tokens, chrome, structure-first, the
-room). **E and F are not**, and §9b of that file says exactly why — E needs a
-photograph open beside it, F needs twelve viewport measurements that a degraded
-container cannot take. Neither is a matter of taste and neither should be
-started without reading that section.
+⚠ **And that is the state, not an omission.** `TRANSFORM.md` was the last one —
+twelve phases, all executed — and it was deleted with the five before it on
+27.8.2026. What still governs is in §10; the assumption ledger is in §9; the
+fifteen assertions the last plan owed are in §7.
 
-`review/2026-08-23-review.html` was an outside review; its six ideas are all
-resolved and you do not need to open it. Gallery (built), picture in the
-WhatsApp message (built), print sheet (built), latency gate (built, replacing
-the 40 KB byte gate); the Peretz form declined because they will sit with him
-in person, and the edge-function `og:image` declined because it breaks the
-three-files promise and adds a second renderer.
-
----
+The work since has come from the owner's son reading the live site on his phone
+and saying what is wrong with it. That is a better source than a plan: every
+round of it has found something no instrument in this repo had an opinion
+about. Take those reports literally.
 
 ## 1. Standing constraints — do not violate
 
@@ -1059,6 +1054,22 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm run shot` | the whole page at twelve sizes and designs |
 | `npm run sheets` | regenerates all four screenshot families after a change |
 
+### The fifteen named assertions
+
+⚠ **Moved here from `TRANSFORM.md` §16.1 when that plan was deleted, 27.8.2026.**
+Each exists because something can fail SILENTLY. **Walking this list means
+grepping for each one, not remembering it** — asked whether the plan had been
+carried out, the agent that wrote it found three of these missing or half-done
+by checking the code instead of its own notes.
+
+| # | assertion | protects |
+
+⚠ **And two of them were found missing by exactly that walk.** T11 was asserted
+for the bare-load half and not the shared-link half — the half Peretz uses every
+time. T15 did not exist at all: nine `<details>` explainers, described by the
+plan as "the single biggest thing the old cabinet could not do", and four of
+eleven groups had no hint either. Both shipped green on every instrument.
+
 ### ⚠ Chromium dies in some containers, and it is not your code
 
 Headless Chromium here kills its own renderer under raster pressure at no fixed
@@ -1194,14 +1205,46 @@ order sheet — and **whether he sells a door with no lock furniture at all
 (§13)**, which decides only whether the bare door the page now OPENS on can
 also be ORDERED, not whether it can be shown.
 
+### The assumption ledger — every number with no source
+
+⚠ **Moved here from `CLAUDE.md` §9 when that plan was deleted, 27.8.2026.**
+These are decisions taken because the owner was away and no step could wait on
+them. Each is a single edit if Peretz says otherwise. `ASK-PERETZ.md` carries
+the same list in Hebrew, shorter, for him to answer.
+
+| # | assumption | if wrong |
+|---|---|---|
+| A1 | ~~`sidelight` is priced ×2~~ — **settled 27.8**: the size is withdrawn | — |
+| A2 | `98 × 203` is the OPENING, not the leaf | every size's drawn dimensions |
+| A3 | The size multiplier applies to the mashkof's total *including* its width extras | one expression in `priceParts` |
+| A4 | `rings` survives — he named three grilles to remove and this was not one | one alias |
+| A5 | `knobplate` is a "circle" at +₪200 | one number |
+| A6 | The widened mashkof is 60 mm outside / 300 mm inside | two numbers in `MASHKOFS` |
+| A7 | The peephole and security latch are standard on every door | whether they are drawn |
+| A8 | A single bottom panel is ₪725, half of two | one number |
+| A9 | `Math.ceil` on the handle's 20 cm steps — you cannot buy 10 cm of bar | one word |
+| A10 | Colours are all included; he priced none of them | seventeen numbers |
+| A11 | Panels and stripes are mutually exclusive — no door carries both | one rule in `js/rules.js` |
+| A12 | `barblack` (מוט שחור) is priced as a bar like the others — he wrote "nickel >100cm" and named no rate for a black one | one entry's `priceKind` |
+| A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | **which window carries ₪4,200 and which ₪3,700** |
+| A14 | The reeded and ogee panel mouldings cost the same — he priced "two panels" once and named no families | two numbers, and possibly one whole family |
+| A15 | ~~The tight band is not buildable~~ — **settled 27.8**: it is a toggle | — |
+
+⚠ **A2, A7 and A13 are the three worth asking first.** A2 changes every drawn
+dimension in the range; A7 decides whether two fittings appear on every door;
+**A13 is ₪500 on a majority of glazed orders and rests on nothing but the shape
+of two Hebrew names.** If "tall" and "square" are the other way round, every
+glazed quote is wrong. One photograph or one sentence settles it, and it is the
+cheapest question here to get wrong expensively.
+
+⚠ **And one instruction is contradicted by three of his own doors** — see §5's
+note on the single panel, and `ASK-PERETZ.md` §2.
+
 ### Wanted, not built, and each has a reason
-- **`REALISM2.md` stage E** — the leaf's grain and the moulding's quirk. Needs
-  a photograph open beside it and `npm run mottle`; `npm run profile` is
-  explicitly NOT the gate, because 28–30 of 30 real doors fail its tolerance
-  and our leaf passes only by being smoother than any real door.
-- **`REALISM2.md` stage F** — the ≥1280 overlay layout. Needs twelve
-  viewport × size measurements at 1280 and 1680, which a degraded container
-  cannot take. §6 of that file: *the overlay yields, not the controls.*
+- **The leaf's grain and the full-bleed desktop** were the two things this list
+  carried longest — both BUILT on 26.8 (`FALLOFF` grain/drift, and the stage
+  taking columns 2–3 above 1280). They are named here only because a reader of
+  the old change log will meet them as open.
 - **Incremental colour repaint** — declined on the measurement (66–142 ms on a
   healthy container), and it would put a second way of producing the drawing
   beside `render(state)`. The condition for revisiting was "if `npm run
@@ -1298,6 +1341,35 @@ about the site and pushes to the same branch. `AGENT-LOG.md` is what it did,
 including the runs where it changed nothing. If something changed and no human
 asked for it, that log is where to look. **Fetch and rebase before you push** —
 it will have moved the branch under you.
+
+### ⚠ SIX PLANS WERE DELETED ON 27.8.2026, AND THE CODE STILL CITES THEM
+
+`PLAN.md`, `REDESIGN.md`, `MOCKUP2.md`, `REALISM.md`, `REALISM2.md` and
+`TRANSFORM.md` were written, executed to the last item, and removed at the
+owner's request — 13,000 lines of plan for a site whose plans were all carried
+out. **Roughly 120 comments in `js/`, `tools/` and `test/` still cite them by
+section**, and those citations were deliberately left alone.
+
+That is not an oversight. Each one is provenance for a fact stated in the
+comment beside it — *"REDESIGN.md §1.5: 38.4% of single-character typos used to
+decode as a different valid door"* — and the measurement is right there. Editing
+120 comments to strip the pointer would delete the one thing that says where a
+number came from, which is the opposite of tidying.
+
+**To read any of them: `git show HEAD~1:PLAN.md`**, or `git log -- REALISM.md`.
+They are in the history, whole, at the commit before this one.
+
+What still GOVERNS was pulled out of them first, and it is the two rules below
+plus three more:
+
+- **Ids are a permanent public wire format** (`PLAN.md` §8.2) — never rename
+  one; keep old ids as aliases for ever. Restated at the top of `js/catalog.js`,
+  which is where it can actually be obeyed.
+- **An unknown URL parameter gets a visible notice, never a silent fallback**
+  (`PLAN.md` §8.2). `js/url-state.js` owns it.
+- **The interface may mirror; the door must not** (`PLAN.md` §6.1) — the hinge
+  trap, restated in full under "Three languages" in §0c, in `js/copy.js` and
+  above `svg { direction: ltr }` in `css/app.css`.
 
 The rule that governs the drawing, from `REALISM.md` §6:
 
