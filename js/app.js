@@ -29,14 +29,14 @@
 
 import {
   byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
-  GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, WINDOWS,
+  GRILLES, HANDINGS, HANDLES, LOCKSETS, PLACEHOLDER, SIZES, SPECIAL_LOCKS, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, tileAgorot }
   from './price.js';
 import {
   describe, detailGlyph, gripAt, gripCanRotate, gripHome, gripIsFixed,
   gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
-  copyOf, render, sizeGlyph, windowGlyph,
+  copyOf, render, sizeGlyph, specialLockGlyph, windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
@@ -82,6 +82,16 @@ const GROUPS = [
 
   { key: 'lockset', title: 'מנעול וידית', in: 'hw', kind: 'hw', list: () => LOCKSETS,
     glyph: locksetGlyph, hint: 'הידית שמסובבים והצילינדר. יש בכל דלת.' },
+
+  /* ⚠ A NEW AXIS, AND ITS OWN GROUP RATHER THAN TWO MORE LOCKSET TILES.
+     A lockset is the furniture on the outside face and there is exactly one of
+     it; a כספת or a קודן is a lock fitted BESIDE it, so a door can carry a
+     lever, a smart lock and a keypad at once and Peretz prices all three
+     independently. Putting them in `LOCKSETS` would have made three products
+     mutually exclusive that are not. */
+  { key: 'speciallock', title: 'מנעול מיוחד', in: 'hw', kind: 'hw',
+    list: () => SPECIAL_LOCKS, glyph: specialLockGlyph,
+    hint: 'נעילה נוספת מעבר למנעול הרגיל.' },
 
   { key: 'size', title: 'מידה', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
     /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was
@@ -938,6 +948,16 @@ function buildOptions(g, host) {
       b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
         <span class="tile__name">${o.he}</span>
+        ${/* ⚠ THE BAND EACH SIZE SERVES, AND IT HAS BEEN OWED SINCE 23.8.
+             `ASK-PERETZ.md` §8: "the size tiles are meant to print the band each
+             one serves, so a customer with an odd opening can tell which tile is
+             theirs instead of guessing or telephoning." It refused to invent the
+             ranges — one arrived from outside as an example and could not be
+             right, because it swallowed צרה — so the tiles showed only a name.
+             Peretz gave the real bands on 26.8 and this is that line.
+             Read off `o.band`, so any option that grows one gets it for free
+             and no group needs a special case. */''
+        }${o.band ? `<span class="tile__band">${o.band}</span>` : ''}
         <span class="tile__meta">${priceLabel(tilePrice(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
     }

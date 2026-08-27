@@ -24,7 +24,7 @@ green and the work is pushed.
 |---|---|---|---|
 | 0 | Groundwork — the stripe survey, container health, the assumption ledger | ✅ **done** | 26.8 · survey in `INVENTORY.md` §5a/§5b — three doors were filed wrong · container **healthy**, 6/6 at 1280 and 1680, so **stage F is measurable** · baseline `npm test` 5,257,859 / 0 |
 | 1 | The price engine — components, multipliers, the breakdown panel | ✅ **done** | 26.8 · `BUILD` replaces `SIZE`, `mult` on each size, `tileAgorot` + `breakdownRows` · the price is a button and opens a column that adds up · caveat carries ~5% · test **6,036,933 / 0**, audit clean, collide clean (1,258), latency 501/600 |
-| 2 | The catalogue — removals, additions, sizes, one `VERSION` bump | **not started** | |
+| 2 | The catalogue — removals, additions, sizes, one `VERSION` bump | ✅ **done** | 27.8 · 7 options withdrawn & aliased · windows ×6 · grilles almost all free · `SPECIAL_LOCKS` axis drawn & priced · classical set has two prices · size bands printed · `VERSION 14`, code still 8 chars · test **5,392,984 / 0**, audit clean, collide clean, latency in gate |
 | 3 | משקוף — the frame becomes a category | **not started** | |
 | 4 | פרזול — the hardware finish, and the bug Peretz reported | **not started** | |
 | 5 | Handle length — a pull bar is a length, not a model | **not started** | |
@@ -400,17 +400,41 @@ nearest surviving one so an old link still opens a real door.
 Peretz's four bands do not map onto our six sizes. His are *price* bands with
 dimensions; ours are *structures*. Both facts have to survive.
 
-| new id | Hebrew | band | mult | note |
+⚠ **THIS SECTION WAS REWRITTEN DURING PHASE 2, AND THE FIRST VERSION WOULD HAVE
+DONE REAL DAMAGE.** It proposed collapsing our six sizes onto Peretz's four
+bands — `standard` / `extra` / `xextra` / `half` — with `wide` and `tall`
+aliased onto one `extra`, and the drawn openings moved to the top of each band.
+Two things are wrong with that, and the second is serious:
+
+1. **`wide` and `tall` are different DOORS, not two names for one price.** A
+   customer with a 220 cm opening and a customer with a 115 cm opening pay the
+   same +25%, and they are not looking at the same door. Collapsing them costs
+   the customer the picture of their own door to save a row in a table.
+2. ⚠ **Moving `standard` to 980 × 2030 breaks the measured leaf aspect.** The
+   opening minus the rebate is the leaf, and 950 × 2100 gives 850 × 2050 =
+   **0.415** — the constant this whole project measures against, the one
+   `rectify.mjs` prints and every leaf-box check uses. 980 × 2030 gives 0.444.
+   That is changing a measured number to match a purchasing band, which is
+   exactly what `REALISM.md` §6 forbids.
+
+**What Peretz actually gave is a PRICE band, and a price band and a structure
+are different things.** Several structures can share one band. So:
+
+| id | Hebrew | printed band | mult | change |
 |---|---|---|---|---|
-| `standard` | סטנדרטית | עד 98 × 203 ס״מ | 1 | unchanged id |
-| `extra` | מוגדלת | עד 120 × 240 ס״מ | 1.25 | **new** |
-| `xextra` | מוגדלת במיוחד | מעל 120 × 240 ס״מ | 1.5 | **new** |
-| `half` | דלת וחצי | שתי כנפיים | 2 | unchanged id |
+| `standard` | סטנדרטית | עד 98 × 203 ס״מ | 1 | band line is new |
+| `narrow` | צרה | עד 98 × 203 ס״מ | 1 | **kept** — a narrow door is inside his standard band |
+| `wide` | רחבה | עד 120 × 240 ס״מ | 1.25 | |
+| `tall` | גבוהה | עד 120 × 240 ס״מ | 1.25 | |
+| `xl` | רחבה וגבוהה | מעל 120 × 240 ס״מ | 1.5 | **new, appended** |
+| `half` | דלת וחצי | שתי כנפיים | 2 | |
 | `sidelight` | עם חלון צד | כנף וחלון קבוע | 2 | ⚠ assumption A1 |
 
-**Aliases** — `narrow → standard`, `wide → extra`, `tall → extra`. All three
-were real drawn structures; `narrow` was ₪100 *below* standard and Peretz has no
-band below standard, so it goes.
+**Nothing is renamed, nothing is retired, and one id is APPENDED — so the sizes
+cost no `VERSION` bump at all.** `narrow` stays because Peretz has no band below
+standard, which makes a narrow door a standard-band door that happens to be
+narrow; retiring it would have removed a real structure to express a price
+change that does not need it.
 
 ⚠ **`sidelight` is not in Peretz's list and is kept anyway.** Four doors in the
 corpus have one (d117 d122 d123 d128), the renderer draws it, and dropping a
@@ -418,13 +442,13 @@ product he demonstrably installs because he forgot to price it would be worse
 than pricing it by the nearest rule. It takes `half`'s ×2 because it is also two
 openings' worth of frame. **Assumption A1, §18.**
 
-⚠ **The drawn dimensions change.** `standard` is `950 × 2100` today and Peretz's
-standard tops out at `203 cm`. Set the drawn openings to the top of each band —
-`standard 980×2030`, `extra 1200×2400`, `xextra 1300×2500` — so the tile's
-printed band and the drawing agree. Whether 98×203 is the OPENING or the LEAF is
-unknown (`ASK-PERETZ.md` §12 has been asking which he orders by since 23.8);
-treated as the opening, consistent with every other number in `SIZES`.
-**Assumption A2.**
+⚠ **The drawn dimensions do NOT change** — see (2) above. The band is a label
+on the tile, which is what `ASK-PERETZ.md` §8 has been asking for since 23.8:
+*"the size tiles are meant to print the band each one serves, so a customer with
+an odd opening can tell which tile is theirs instead of guessing."* It refused
+to invent those ranges. They have arrived. Whether 98 × 203 is the opening or
+the leaf is still open (**A2**) and the tile says ס״מ without saying which,
+which is the honest thing to print until he answers.
 
 ### 5.2 Windows
 
@@ -558,7 +582,19 @@ characters at `VERSION = 13`. Phases 2–6 add four fields (`mashkof`,
 `DETAILS` to a count, and re-cut `SIZES`, `WINDOWS`, `GRILLES`, `HANDLES`,
 `LOCKSETS`, `DETAILS`.
 
-**Bump once, at the end of Phase 6, to `VERSION = 14.`** Not per phase.
+⚠ **THIS SECTION SAID "BUMP ONCE, AT THE END OF PHASE 6" AND IT WAS WRONG.
+Bump whenever the layout moves.** The argument below is sound as far as it goes
+— five bumps issue five refusals for codes that never existed — and it misses
+the thing the number is for. A `VERSION` that stays still while the LAYOUT moves
+means an old code decodes into a **different door** with nothing anywhere
+flagging it. That is the precise failure this field exists to prevent, and
+`REDESIGN.md` §1.5 measured what it costs when the check is weak: 38.4% of
+single-character typos used to decode to a different valid door. Bumps are free
+while nothing is deployed; silence is not.
+
+**Phase 2 bumped to `VERSION = 14`.** Phases 5 and 6 move the layout again and
+will bump again. The original reasoning is left below rather than deleted,
+because the correction is the useful part.
 
 - The rule (`CLAUDE.md` §1) is that a change to option ORDER or bit layout needs
   a bump so an old code is *refused with a notice* rather than decoded into a

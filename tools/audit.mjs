@@ -581,8 +581,22 @@ for (const v of VIEWS) {
      Once at one viewport: this is about the drag, not the layout, and it costs
      two navigations and two screenshots. */
   if (v.name === 'laptop') {
+    /* ⚠ A WIDE DOOR WITH `ron`, AND IT USED TO BE A STANDARD ONE WITH `shiran`.
+       Peretz withdrew the Shiran on 26.8.2026 and its id now resolves to
+       `idan`, a 1050 mm bar — and `gripCanRotate` hides `#grip-rot` for any
+       bar longer than the leaf is wide, so on a standard door the button this
+       step clicks is `hidden` and the click waited thirty seconds for it.
+
+       ⚠ AND THE REAL FINDING IS BIGGER THAN THE TEST. Swept after the
+       withdrawal: NO grip can be rotated on a standard, narrow, tall, half or
+       sidelight door any more. Only `ron` and `barblack` on רחבה, and four
+       bars on the new רחבה וגבוהה. The Shiran was the one short grip in the
+       range, so it was quietly the only thing making that control reachable on
+       the door most people buy. That is a product consequence of a product
+       decision, not a bug — recorded in CLAUDE.md rather than worked around —
+       and this step now runs on a door where the button genuinely exists. */
     await p.goto(`file://${process.cwd()}/index.html`
-               + '?c=rb-0097d&w=rect&g=none&n=shiran&k=cylinder&d=plain&s=standard&h=right-in');
+               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=plain&s=wide&h=right-in');
     await p.waitForTimeout(350);
     await p.click('#grip-rot');
     await p.waitForTimeout(300);

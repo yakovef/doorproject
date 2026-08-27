@@ -1319,6 +1319,67 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **The catalogue meets Peretz's real range, and seven options left it.**
+  Withdrawn on his say-so and every id aliased onto the nearest survivor, so
+  no link ever opens on nothing: **ברזל מחושל** and its light twin → `grid`,
+  **מדליוני פרח** and its twin → `scroll`, **זכוכית מחורצת** → `mesh`,
+  **שירן** → `idan`, **להב שטוח** → `shahar`, **אלמוג** → `sapir`.
+  Two of those close open questions rather than dropping products: `shiran` is
+  what `ASK-PERETZ.md` §2 has been asking about since 23.8 (it appears on none
+  of the 128 photographs and was the one grip drawn from nothing), and the
+  three grilles answer §4.
+  ⚠ **And one withdrawal disagrees with ten of his own doors.** `iron` was the
+  commonest thing in the luxury band by our count — d090 d092 d101 d103 d108
+  d112 d119 d124 d128 d129 — so he has most likely stopped ordering it rather
+  than never having fitted it. `npm run corpus` still draws those ten and names
+  the substitution in its notes rather than silently swapping.
+
+- **⚠ NO GRIP CAN BE ROTATED ON A STANDARD DOOR ANY MORE, and that is a
+  consequence of a product decision rather than a bug.** `gripCanRotate` hides
+  the control for any bar longer than the leaf is wide. The Shiran was the one
+  SHORT grip in the range, so it was quietly the only thing making `#grip-rot`
+  reachable on the door most people buy; with it withdrawn the sweep says only
+  `ron` and `barblack` rotate on רחבה, and four bars on the new רחבה וגבוהה.
+  `npm run audit`'s drag step used to run on `shiran` + `standard` and waited
+  thirty seconds for a `hidden` button; it runs on `ron` + `wide` now. If this
+  matters commercially it is a question for Peretz — is there a short pull he
+  sells? — and not something to work around in the interface.
+
+- **Two new things a customer can buy.** `SPECIAL_LOCKS` (כספת ₪700 · קודן
+  ₪900) is a whole axis that did not exist: neither is a lockset, so a door can
+  carry a lever, a smart lock AND a keypad, and merging them into `LOCKSETS`
+  would have made three products mutually exclusive that are not.
+  ⚠ `kodan` and `digital` are DIFFERENT products priced an order apart (₪900
+  against ₪2,700) and he listed them under different headings.
+  ⚠ Both are DRAWN, and that is not decoration: a configurator that takes money
+  for something the drawing does not show is a hidden cost with a label on it,
+  and `npm run collide` cannot sweep an obstacle the drawing does not emit.
+  Their geometry is conventional rather than measured — there is no photograph
+  of either in the corpus — and the renderer says so where it draws them.
+
+- **The classical set has two prices, and that is Peretz's third window.**
+  He gave `greek set 2700`, `square 3700`, `square with greek 4700`, which look
+  like three products and are two: 3700 + 1000 = 4700, so the set costs ₪1,000
+  on a door already paying for its glass and ₪2,700 on one that is not.
+  ⚠ The first draft of the plan made "square with greek" a third WINDOW id.
+  That would have added to a public wire format for a door the catalogue can
+  already express, and let a customer build the same physical door two ways at
+  two prices. One entry, `delta` and `deltaGlazed`, no `VERSION` cost.
+
+- **The size tiles print their band at last** — `עד 98 × 203 ס״מ` and the rest.
+  `ASK-PERETZ.md` §8 has been asking for those ranges since 23.8 and refusing
+  to invent them; they arrived on 26.8.
+  ⚠ **The drawn dimensions did NOT move to match.** Setting `standard` to the
+  top of its band (980 × 2030) gives a leaf of 0.444 where **0.415** is the
+  aspect measured across thirty photographs and used by every leaf-box check in
+  the repo. A price band is not a drawing spec, and moving a measured number to
+  match one is what REALISM.md §6 exists to forbid.
+  ⚠ And `wide` and `tall` were NOT merged into one "extra" tile even though
+  they share his +25%. They are different doors; a price band and a structure
+  are different things, and several structures can share one band. One id was
+  appended (`xl`, his "double extra") and nothing renamed — so the size list
+  cost no bump of its own.
+
 - **⚠ THE PRICES ARE REAL NOW, AND THE PRICE MODEL CHANGED SHAPE TO HOLD THEM.**
   On 26.8.2026 Peretz sat down with his son and said the numbers out loud —
   the conversation `ASK-PERETZ.md` §5 had been waiting nine days for and the

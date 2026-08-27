@@ -7,8 +7,8 @@
  * configurator must not break it.
  */
 
-import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, paneCount, LOCKSETS,
-         SIZES, WINDOWS } from './catalog.js';
+import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed, paneCount,
+         LOCKSETS, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 
 /**
  * The price, BROKEN DOWN — the six parts of a fitted door, then one entry per
@@ -52,6 +52,12 @@ import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, paneCount, LOCKSETS,
  * that translation lives, in the file that owns money, rather than as a
  * special case at the call site in app.js.
  */
+/** What the face costs, which for one entry depends on whether it has glass. */
+function glazedDetail(state) {
+  const d = byId(DETAILS, state.detail);
+  return (d.deltaGlazed != null && isGlazed(state)) ? d.deltaGlazed : d.delta;
+}
+
 export function priceParts(state) {
   const size = SIZES[state.size] || SIZES.standard;
 
@@ -100,9 +106,20 @@ export function priceParts(state) {
 
     colour:  byId(COLOURS, state.colour).delta,
     window:  byId(WINDOWS, state.window).delta,
-    detail:  byId(DETAILS, state.detail).delta,
+    /* ⚠ ONE FACE IN THE RANGE HAS TWO PRICES, and it is the classical set.
+       Peretz gave three figures — the set solid ₪2,700, a square light ₪3,700,
+       and "square with greek" ₪4,700 — which describe TWO products, not three:
+       3700 + 1000 = 4700, so the set costs ₪1,000 on a door that is already
+       paying for its glass. `deltaGlazed` is that second price, attached in
+       catalog.js beside the first.
+       Asked of `isGlazed`, not of `state.window`, for the same reason the
+       grille below is asked of `paneCount`: a sidelight door carries glass
+       beside the leaf, and "does this door have glass in it" is the question
+       both prices actually turn on. */
+    detail:  glazedDetail(state),
     handle:  byId(HANDLES, state.handle).delta,
     lockset: byId(LOCKSETS, state.lockset).delta,
+    speciallock: byId(SPECIAL_LOCKS, state.speciallock).delta,
     /* A grille needs a window to sit in — and so does worked glass, which is
        in the same list now. Neither can be charged on a solid door: the
        configurator must never take money for something the drawing does not

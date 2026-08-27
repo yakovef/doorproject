@@ -104,10 +104,20 @@ export const MASHKOF_WIDER = 250;
    too, because `catalog.js` refuses a price with no option as hard as it
    refuses an option with no price, and a stranded number in a price list is a
    number somebody will one day quote. */
+/* ⚠ PERETZ'S OWN NUMBERS, 26.8.2026, AND THEY ARE SIX TIMES WHAT WE GUESSED.
+   The invented figures here were ₪580 and ₪620 — a window read as a modest
+   surcharge. His are ₪4,200 and ₪3,700, which is more than the door. Glass in
+   an armoured leaf is a different product from a hole in one, and nothing in
+   this file was within an order of magnitude of it.
+   ⚠ `strip` is his "tall" and `rect` his "square" — a reading, not a
+   quotation, resting on the shape of two Hebrew names. It is ₪500 on the
+   majority of glazed orders if it is the wrong way round. TRANSFORM.md §18,
+   assumption A13, and it is the cheapest question on that list to get wrong
+   expensively. */
 export const WINDOW = {
   none:    0,        // ללא חלון
-  strip:   580,      // צוהר אנכי
-  rect:    620,      // חלון מלבני
+  strip:   4200,     // צוהר גבוה   — his "tall"
+  rect:    3700,     // חלון מרובע  — his "square". Requires a bottom panel.
 };
 
 /* ── what is in the opening ───────────────────────────────────────────
@@ -117,29 +127,46 @@ export const WINDOW = {
    ⚠ And the `-light` pairs are the same ironwork in a paler finish, so they
    carry the same number. If Peretz prices them differently, they stop being
    pairs. ASK-PERETZ.md §4b. */
+/* ⚠ ALMOST ALL OF THEM ARE INCLUDED, WHICH NOTHING HERE GUESSED. Peretz:
+   *"design: almost all of them in the price · laser hard ones: +700 (עיגולים
+   שזורים, גפן, עץ)."* Every figure below was invented, and the shape of the
+   invention was wrong as well as the numbers: we had eleven different prices
+   spread from ₪240 to ₪620, and the real list is two prices — nothing, and
+   ₪700 for the three that are laser-cut.
+
+   ⚠ THREE ARE WITHDRAWN, on his say-so: *"there is no: זכוכית מחורצת, ברזל
+   מחושל, מדליוני פרח."* Their keys go with them, because `catalog.js` refuses
+   a price with no option as hard as it refuses an option with no price, and a
+   stranded number in a price list is a number somebody will one day quote.
+   Their ids stay alive as `aliases` in the catalogue so a link written before
+   today still opens a real door.
+
+   ⚠ `rings` SURVIVES, and it is a judgement rather than an instruction. It is
+   the densest forged field in the range and it looks like a cousin of ברזל
+   מחושל — but he named three things to remove and this was not one of them,
+   and removing a fourth on the grounds that it resembles one of the three is
+   the kind of inference that loses a product nobody meant to lose.
+   TRANSFORM.md §18, assumption A4. */
 export const GRILLE = {
   none:         0,   // ללא סורג
-  grid:         300, // סורג רשת
-  'grid-light': 300, // סורג רשת בהיר
-  scroll:       460, // סורג מעוצב
-  'scroll-light': 460, // סורג מעוצב בהיר
-  iron:         620, // ברזל מחושל
-  'iron-light': 620, // ברזל מחושל בהיר
-  quatrefoil:   520, // מדליוני פרח
-  'quatrefoil-light': 520, // מדליוני פרח בהיר
-  arch:         380, // קשת
-  'arch-light': 380, // קשת בהירה
-  deco:         420, // קווים גיאומטריים
-  'deco-light': 420, // קווים גיאומטריים בהירים
-  circles:      300, // עיגולים שזורים
-  vine:         340, // גפן
-  tree:         340, // עץ
+  grid:         0,   // סורג רשת
+  'grid-light': 0,   // סורג רשת בהיר
+  scroll:       0,   // סורג מעוצב
+  'scroll-light': 0, // סורג מעוצב בהיר
+  arch:         0,   // קשת
+  'arch-light': 0,   // קשת בהירה
+  deco:         0,   // קווים גיאומטריים
+  'deco-light': 0,   // קווים גיאומטריים בהירים
+  /* The three laser-cut ones. "laser hard ones" — more machine time, and the
+     only three in the range that are cut rather than bent. */
+  circles:      700, // עיגולים שזורים
+  vine:         700, // גפן
+  tree:         700, // עץ
   /* Worked GLASS rather than ironwork — etched into the pane, bought from a
      different supplier. Priced together here only because they are the same
      row on the customer's screen. */
-  mesh:         240, // זכוכית מעוצבת
-  rings:        540, // טבעות ותלתלים  — dense forged field, more bar than a plain grid
-  reeded:       280, // זכוכית מחורצת
+  mesh:         0,   // זכוכית מעוצבת
+  rings:        0,   // טבעות ותלתלים — see the note above about why it stays
 };
 
 /* ── the face ─────────────────────────────────────────────────────────
@@ -165,17 +192,26 @@ export const GRILLE = {
    Their keys go with them: `catalog.js` refuses a price with no option. */
 export const DETAIL = {
   plain:     0,      // חלק
-  panel:     380,    // פאנל תחתון
-  panel2:    520,    // שני פאנלים
-  panelTop:  380,    // פאנל עליון      — one rectangle, same as the lower one
-  panel3:    660,    // שלושה פאנלים
-  /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and that is a placeholder
-     standing in for a question rather than a finding. They are the same
+  /* ⚠ PERETZ PRICED THREE FACES AND THIS LIST HAS EIGHT. His words: "panels:
+     2 panels +1450 · 3 panel +1900 (remove the handle) · greek set +2700
+     (remove the handle)". Two panels, three panels and the classical set are
+     his. A SINGLE panel is not on his list and cannot simply be deleted —
+     `rect` requires a bottom panel, so one must stay buildable — so it is
+     priced at half of two. TRANSFORM.md §18, assumption A8, and it is the only
+     face price in the range with no source behind it. */
+  panel:     725,    // פאנל תחתון      — A8, half of two
+  panelTop:  725,    // פאנל עליון      — A8, one rectangle, same as the lower one
+  panel2:    1450,   // שני פאנלים      — Peretz
+  panel3:    1900,   // שלושה פאנלים    — Peretz. Removes the pull handle.
+  /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and Peretz's list does
+     not settle it either way: he priced "two panels" once and named no
+     families at all, because a customer buys "two panels". They are the same
      rectangles in a different section of stock — see the two `MOULDS` in the
-     renderer — and a broader, deeper moulding is more timber and more work, so
-     the real answer is probably not "the same". Asked in ASK-PERETZ §14. */
-  panelo:    380,    // פאנל תחתון קלאסי
-  panel2o:   520,    // שני פאנלים קלאסיים
+     renderer — and a broader, deeper moulding is more timber and more work.
+     ASK-PERETZ §14 asks whether both are even his, which is the question that
+     matters more than the price. TRANSFORM.md §18, assumption A14. */
+  panelo:    725,    // פאנל תחתון קלאסי
+  panel2o:   1450,   // שני פאנלים קלאסיים
   /* The even compositions, on the same 200 + 40 per band as the ragged ones:
      it is the same stock and the same fixing, cut square instead of to
      length. `stripsband` is eight bands in a hand's breadth of leaf. */
@@ -199,40 +235,99 @@ export const DETAIL = {
   stripsv6:  540,    // שישה פסים אנכיים
   stripsx:   460,    // פס אנכי חוצה    — one long member and four short ones
   /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
-     and plinth, all as one. Priced well above a single panel because it is
-     six applied pieces and a fitting, not one. ⚠ A guess like every figure in
-     this file — and a bigger one than most, because it is a product Peretz
-     makes and we have never priced. Worth asking him about in the same breath
-     as ASK-PERETZ §5. */
-  classic:   1680,   // סט קלאסי
+     and plinth, all as one. Peretz's "greek set +2700", and it removes the
+     pull handle. */
+  classic:   2700,   // סט יווני
 };
 
-/* ── the pull handle ──────────────────────────────────────────────────── */
+/**
+ * ⚠ THE CLASSICAL SET COSTS LESS ON A DOOR THAT IS ALREADY PAYING FOR GLASS,
+ * and this number is the whole of Peretz's third window price.
+ *
+ * He gave three figures that look like three products and are two:
+ *
+ *     greek set, no window        2700     the set, solid
+ *     square window, no set       3700     a plain square light
+ *     "square with greek"         4700     the set, glazed
+ *
+ * So `3700 + x = 4700` and the set is **₪1,000 on a glazed door**. The
+ * catalogue already carries both variants of `classic` — solid, with a moulded
+ * panel where the glass would go, and glazed — so this is one entry with two
+ * prices rather than a third window id.
+ *
+ * ⚠ THAT MATTERS MORE THAN IT LOOKS. Making "square with greek" a WINDOW would
+ * add an id to a public wire format for a door the catalogue can already
+ * express, and it would let a customer build the same physical door two ways at
+ * two different prices. One entry, one id, no `VERSION` cost, and the two
+ * descriptions of that door cannot diverge because there is only one.
+ */
+export const DETAIL_GLAZED = {
+  classic: 1000,     // 3700 + 1000 = 4700, which is what he said
+};
+
+/* ── the pull handle ───────────────────────────────────────────────────
+   ⚠ TWO ARE WITHDRAWN: *"there is no: שירן, להב שטוח."* `shiran` is the one
+   ASK-PERETZ §2 has been asking about since 23.8 — it appears on NONE of the
+   128 photographs and was drawn from nothing — so this is that question
+   answered. Both ids stay alive as `aliases` in the catalogue.
+
+   ⚠ AND THESE FIGURES ARE PROVISIONAL, in a way the rest of this file is not.
+   Peretz prices a pull bar BY LENGTH — *"handle<100 - 500 · nickel>100cm -
+   every 20cm +150shekel · each handle can be in different length"* — and a
+   length is not a property this catalogue has yet. It arrives in TRANSFORM.md
+   phase 5, along with a rate table that replaces most of this block. Until
+   then every bar is priced at his under-100 cm figure, which is right for a
+   bar at its default length and wrong for a longer one. The two he DID price
+   flat are already correct below. */
 export const HANDLE = {
   none:    0,        // ללא ידית משיכה
-  idan:    260,      // עידן
-  ella:    380,      // אלה
-  nitzan:  300,      // ניצן
-  shahar:  340,      // שחר
-  ron:     280,      // רון
-  shiran:  520,      // שירן
-  grab:    180,      // מאחז אופקי
-  channel: 400,      // ידית שקועה
-  blade:   440,      // להב שטוח
-  barblack: 300,     // מוט שחור
+  idan:    500,      // עידן
+  ella:    500,      // אלה
+  nitzan:  500,      // ניצן
+  shahar:  500,      // שחר
+  ron:     500,      // רון
+  barblack: 500,     // מוט שחור      — A12: he named no rate for a black one
+  grab:    300,      // מאחז אופקי    — Peretz, flat
+  channel: 1700,     // ידית שקועה    — Peretz, flat
 };
 
-/* ── the lock and the lever ───────────────────────────────────────────── */
+/* ── the lock and the lever ───────────────────────────────────────────
+   ⚠ MOST OF THEM ARE INCLUDED. Peretz: *"main handles: there is no אלמוג · all
+   of them in the price · squares +300 · circles +200 · smart +2700."* Every
+   figure here was invented and every one was wrong in the same direction: we
+   charged ₪60 to ₪220 for fittings he throws in, and ₪1,450 for a smart lock
+   that costs ₪2,700.
+
+   ⚠ `almog` IS WITHDRAWN and its id survives as an alias in the catalogue.
+
+   ⚠ `knobplate` (כדור על אורך) TAKES THE "CIRCLE" RATE. It is a ball on a long
+   backplate — a circle by the only reading of his word that fits the range, and
+   the plate is what carries the keyway rather than a second product.
+   TRANSFORM.md §18, assumption A5.
+
+   ⚠ `digital` (מנעול חכם) AND `kodan` ARE DIFFERENT PRODUCTS and are priced an
+   order apart, ₪2,700 against ₪900. He listed them under different headings.
+   `kodan` is in `SPECIAL_LOCK` below, and they may be bought together. */
 export const LOCKSET = {
   coral:     0,      // קורל          — the one included as standard
   cylinder:  0,      // צילינדר בלבד
-  plate:     60,     // רותם
-  cadoor:    40,     // כדור
-  sapir:     100,    // ספיר
-  almog:     160,    // אלמוג
-  knobplate: 220,    // כדור על אורך
-  digital:   1450,   // מנעול חכם     — by far the largest single add-on
-  square:    120,    // ריבועי
+  plate:     0,      // רותם
+  sapir:     0,      // ספיר
+  cadoor:    200,    // כדור          — a circle
+  knobplate: 200,    // כדור על אורך  — a circle, A5
+  square:    300,    // ריבועי        — squares
+  digital:   2700,   // מנעול חכם     — by far the largest single add-on
+};
+
+/* ── the extra lock ───────────────────────────────────────────────────
+   ⚠ A WHOLE AXIS THAT DID NOT EXIST. Peretz: *"special lock: kasefet +700 ·
+   kodan +900."* Neither is a lever — they are locks fitted BESIDE the lock
+   furniture, so they are their own choice and can be bought with any lockset,
+   including the smart one. */
+export const SPECIAL_LOCK = {
+  nospecial: 0,      // ללא
+  kasefet:   700,    // כספת
+  kodan:     900,    // קודן
 };
 
 /* ── colour ───────────────────────────────────────────────────────────

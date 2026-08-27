@@ -29,73 +29,74 @@
   var WINDOW = {
     none: 0,
     // ללא חלון
-    strip: 580,
-    // צוהר אנכי
-    rect: 620
-    // חלון מלבני
+    strip: 4200,
+    // צוהר גבוה   — his "tall"
+    rect: 3700
+    // חלון מרובע  — his "square". Requires a bottom panel.
   };
   var GRILLE = {
     none: 0,
     // ללא סורג
-    grid: 300,
+    grid: 0,
     // סורג רשת
-    "grid-light": 300,
+    "grid-light": 0,
     // סורג רשת בהיר
-    scroll: 460,
+    scroll: 0,
     // סורג מעוצב
-    "scroll-light": 460,
+    "scroll-light": 0,
     // סורג מעוצב בהיר
-    iron: 620,
-    // ברזל מחושל
-    "iron-light": 620,
-    // ברזל מחושל בהיר
-    quatrefoil: 520,
-    // מדליוני פרח
-    "quatrefoil-light": 520,
-    // מדליוני פרח בהיר
-    arch: 380,
+    arch: 0,
     // קשת
-    "arch-light": 380,
+    "arch-light": 0,
     // קשת בהירה
-    deco: 420,
+    deco: 0,
     // קווים גיאומטריים
-    "deco-light": 420,
+    "deco-light": 0,
     // קווים גיאומטריים בהירים
-    circles: 300,
+    /* The three laser-cut ones. "laser hard ones" — more machine time, and the
+       only three in the range that are cut rather than bent. */
+    circles: 700,
     // עיגולים שזורים
-    vine: 340,
+    vine: 700,
     // גפן
-    tree: 340,
+    tree: 700,
     // עץ
     /* Worked GLASS rather than ironwork — etched into the pane, bought from a
        different supplier. Priced together here only because they are the same
        row on the customer's screen. */
-    mesh: 240,
+    mesh: 0,
     // זכוכית מעוצבת
-    rings: 540,
-    // טבעות ותלתלים  — dense forged field, more bar than a plain grid
-    reeded: 280
-    // זכוכית מחורצת
+    rings: 0
+    // טבעות ותלתלים — see the note above about why it stays
   };
   var DETAIL = {
     plain: 0,
     // חלק
-    panel: 380,
-    // פאנל תחתון
-    panel2: 520,
-    // שני פאנלים
-    panelTop: 380,
-    // פאנל עליון      — one rectangle, same as the lower one
-    panel3: 660,
-    // שלושה פאנלים
-    /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and that is a placeholder
-       standing in for a question rather than a finding. They are the same
+    /* ⚠ PERETZ PRICED THREE FACES AND THIS LIST HAS EIGHT. His words: "panels:
+       2 panels +1450 · 3 panel +1900 (remove the handle) · greek set +2700
+       (remove the handle)". Two panels, three panels and the classical set are
+       his. A SINGLE panel is not on his list and cannot simply be deleted —
+       `rect` requires a bottom panel, so one must stay buildable — so it is
+       priced at half of two. TRANSFORM.md §18, assumption A8, and it is the only
+       face price in the range with no source behind it. */
+    panel: 725,
+    // פאנל תחתון      — A8, half of two
+    panelTop: 725,
+    // פאנל עליון      — A8, one rectangle, same as the lower one
+    panel2: 1450,
+    // שני פאנלים      — Peretz
+    panel3: 1900,
+    // שלושה פאנלים    — Peretz. Removes the pull handle.
+    /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and Peretz's list does
+       not settle it either way: he priced "two panels" once and named no
+       families at all, because a customer buys "two panels". They are the same
        rectangles in a different section of stock — see the two `MOULDS` in the
-       renderer — and a broader, deeper moulding is more timber and more work, so
-       the real answer is probably not "the same". Asked in ASK-PERETZ §14. */
-    panelo: 380,
+       renderer — and a broader, deeper moulding is more timber and more work.
+       ASK-PERETZ §14 asks whether both are even his, which is the question that
+       matters more than the price. TRANSFORM.md §18, assumption A14. */
+    panelo: 725,
     // פאנל תחתון קלאסי
-    panel2o: 520,
+    panel2o: 1450,
     // שני פאנלים קלאסיים
     /* The even compositions, on the same 200 + 40 per band as the ragged ones:
        it is the same stock and the same fixing, cut square instead of to
@@ -134,57 +135,60 @@
     stripsx: 460,
     // פס אנכי חוצה    — one long member and four short ones
     /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
-       and plinth, all as one. Priced well above a single panel because it is
-       six applied pieces and a fitting, not one. ⚠ A guess like every figure in
-       this file — and a bigger one than most, because it is a product Peretz
-       makes and we have never priced. Worth asking him about in the same breath
-       as ASK-PERETZ §5. */
-    classic: 1680
-    // סט קלאסי
+       and plinth, all as one. Peretz's "greek set +2700", and it removes the
+       pull handle. */
+    classic: 2700
+    // סט יווני
+  };
+  var DETAIL_GLAZED = {
+    classic: 1e3
+    // 3700 + 1000 = 4700, which is what he said
   };
   var HANDLE = {
     none: 0,
     // ללא ידית משיכה
-    idan: 260,
+    idan: 500,
     // עידן
-    ella: 380,
+    ella: 500,
     // אלה
-    nitzan: 300,
+    nitzan: 500,
     // ניצן
-    shahar: 340,
+    shahar: 500,
     // שחר
-    ron: 280,
+    ron: 500,
     // רון
-    shiran: 520,
-    // שירן
-    grab: 180,
-    // מאחז אופקי
-    channel: 400,
-    // ידית שקועה
-    blade: 440,
-    // להב שטוח
-    barblack: 300
-    // מוט שחור
+    barblack: 500,
+    // מוט שחור      — A12: he named no rate for a black one
+    grab: 300,
+    // מאחז אופקי    — Peretz, flat
+    channel: 1700
+    // ידית שקועה    — Peretz, flat
   };
   var LOCKSET = {
     coral: 0,
     // קורל          — the one included as standard
     cylinder: 0,
     // צילינדר בלבד
-    plate: 60,
+    plate: 0,
     // רותם
-    cadoor: 40,
-    // כדור
-    sapir: 100,
+    sapir: 0,
     // ספיר
-    almog: 160,
-    // אלמוג
-    knobplate: 220,
-    // כדור על אורך
-    digital: 1450,
+    cadoor: 200,
+    // כדור          — a circle
+    knobplate: 200,
+    // כדור על אורך  — a circle, A5
+    square: 300,
+    // ריבועי        — squares
+    digital: 2700
     // מנעול חכם     — by far the largest single add-on
-    square: 120
-    // ריבועי
+  };
+  var SPECIAL_LOCK = {
+    nospecial: 0,
+    // ללא
+    kasefet: 700,
+    // כספת
+    kodan: 900
+    // קודן
   };
   var COLOUR = {
     "rb-9005d": 0,
@@ -209,11 +213,52 @@
   // js/catalog.js
   var PLACEHOLDER2 = PLACEHOLDER;
   var SIZES = {
-    standard: { id: "standard", he: "סטנדרטית", en: "Standard", w: 950, h: 2100, mult: 1 },
-    narrow: { id: "narrow", he: "צרה", en: "Narrow", w: 800, h: 2100, mult: 1 },
-    wide: { id: "wide", he: "רחבה", en: "Wide", w: 1100, h: 2100, mult: 1.25 },
-    tall: { id: "tall", he: "גבוהה", en: "Tall", w: 950, h: 2400, mult: 1.25 },
-    half: { id: "half", he: "דלת וחצי", en: "Leaf and half", w: 950, h: 2100, side: 400, mult: 2 },
+    standard: {
+      id: "standard",
+      he: "סטנדרטית",
+      en: "Standard",
+      w: 950,
+      h: 2100,
+      mult: 1,
+      band: "עד 98 × 203 ס״מ"
+    },
+    narrow: {
+      id: "narrow",
+      he: "צרה",
+      en: "Narrow",
+      w: 800,
+      h: 2100,
+      mult: 1,
+      band: "עד 98 × 203 ס״מ"
+    },
+    wide: {
+      id: "wide",
+      he: "רחבה",
+      en: "Wide",
+      w: 1100,
+      h: 2100,
+      mult: 1.25,
+      band: "עד 120 × 240 ס״מ"
+    },
+    tall: {
+      id: "tall",
+      he: "גבוהה",
+      en: "Tall",
+      w: 950,
+      h: 2400,
+      mult: 1.25,
+      band: "עד 120 × 240 ס״מ"
+    },
+    half: {
+      id: "half",
+      he: "דלת וחצי",
+      en: "Leaf and half",
+      w: 950,
+      h: 2100,
+      side: 400,
+      mult: 2,
+      band: "שתי כנפיים"
+    },
     /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
        d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
        narrow one beside it — but the narrow one does not open and is glass, so
@@ -227,7 +272,24 @@
       h: 2100,
       side: 400,
       sideGlazed: true,
-      mult: 2
+      mult: 2,
+      band: "כנף וחלון צד"
+    },
+    /* ⚠ APPENDED, AND THAT IS WHY IT IS LAST. Peretz's "double extra
+       (door>120x240)" at +50%. `encodeCode` packs the INDEX of this list, so a
+       new entry at the END leaves every existing index where it was and costs no
+       `VERSION` bump; inserting it in size order — between `tall` and `half`,
+       where it belongs visually — would have moved `half` and `sidelight` by one
+       and quietly repointed every code ever written. The choices panel can
+       order tiles however it likes; this list is a wire format. */
+    xl: {
+      id: "xl",
+      he: "רחבה וגבוהה",
+      en: "Extra large",
+      w: 1200,
+      h: 2400,
+      mult: 1.5,
+      band: "מעל 120 × 240 ס״מ"
     }
   };
   var COLOURS = [
@@ -313,7 +375,7 @@
       style: "bar",
       bar: "idan",
       pull: true,
-      aliases: ["bar-long", "luna"]
+      aliases: ["bar-long", "luna", "shiran"]
     },
     /* Brass, and the catalogue never said so: with no `finish` of its own
        `effectiveFinish` fell through to steel and the bar the inventory calls
@@ -350,19 +412,16 @@
       style: "bar",
       bar: "shahar",
       pull: true,
-      aliases: ["bar-flat"]
+      aliases: ["bar-flat", "blade"]
     },
     { id: "ron", he: "רון", en: "Ron", len: 900, w: 18, style: "bar", bar: "ron", pull: true },
     /* The ornate pull, the horizontal bow, and the recess. */
-    {
-      id: "shiran",
-      he: "שירן",
-      en: "Shiran",
-      len: 0,
-      style: "shiran",
-      pull: true,
-      finish: "brass"
-    },
+    /* ⚠ `shiran` IS WITHDRAWN, and this closes a question rather than dropping a
+       product. ASK-PERETZ §2 has been asking since 23.8 whether he orders it at
+       all — it appears on NONE of the 128 photographs, it was the one grip in the
+       range drawn from nothing, and the note there says in as many words "it is
+       the one grip whose picture we cannot check". Peretz, 26.8.2026: "there is
+       no: שירן, להב שטוח." The id resolves to `idan`. */
     {
       id: "grab",
       he: "מאחז אופקי",
@@ -406,16 +465,10 @@
        section is the most visible thing about a pull bar at door scale, and the
        corpus has three of them — round, square and this — where we modelled five
        bars differing mainly in their fixings. */
-    {
-      id: "blade",
-      he: "להב שטוח",
-      en: "Flat blade",
-      len: 1e3,
-      w: 62,
-      style: "bar",
-      bar: "blade",
-      pull: true
-    },
+    /* ⚠ `blade` IS WITHDRAWN — the second of the two Peretz named. Three doors
+       carried it (d034 d073 d104) and its section really is unmistakable beside
+       the tubes, so this is a product leaving the range rather than a drawing
+       being wrong. The id resolves to `shahar`, the widest flat bar left. */
     /* ⚠ BLACK, AND THAT IS A PROPERTY OF THE PRODUCT — the same argument that
        kept Shiran's brass on Shiran's own row after the finish group was
        withdrawn. Peretz does not sell this bar in a choice of finishes; he sells
@@ -483,8 +536,9 @@
       aliases: ["longplate"]
     },
     { id: "cadoor", he: "כדור", en: "Cadoor", style: "cadoor" },
-    { id: "sapir", he: "ספיר", en: "Sapir", style: "sapir" },
-    { id: "almog", he: "אלמוג", en: "Almog", style: "almog", lever: true },
+    { id: "sapir", he: "ספיר", en: "Sapir", style: "sapir", aliases: ["almog"] },
+    /* ⚠ `almog` IS WITHDRAWN — Peretz, 26.8.2026: "there is no: אלמוג". It
+       resolves to `sapir`, the nearest lever left in the range. */
     /* Knob on a long backplate — the bronze fitting on d092, named three times
        across the luxury tier. A different object from a knob on a rose: the
        plate carries the keyway too, so it locks like the Rotem backplate. */
@@ -543,6 +597,11 @@
        could have meant. No VERSION bump: it was the LAST entry, so removing it
        renumbers nothing. */
   ];
+  var SPECIAL_LOCKS = [
+    { id: "nospecial", he: "ללא", en: "None" },
+    { id: "kasefet", he: "כספת", en: "Safe lock" },
+    { id: "kodan", he: "קודן", en: "Keypad" }
+  ];
   var GRILLES = [
     {
       id: "none",
@@ -554,26 +613,41 @@
       id: "grid",
       he: "סורג רשת",
       en: "Square grid",
-      aliases: ["bars"],
+      aliases: ["bars", "iron"],
       doors: ["d091", "d100", "d107", "d110", "d113", "d117", "d122"]
     },
-    { id: "grid-light", he: "סורג רשת בהיר", en: "Square grid, door colour", light: true, aliases: ["bars-light"] },
+    {
+      id: "grid-light",
+      he: "סורג רשת בהיר",
+      en: "Square grid, door colour",
+      light: true,
+      aliases: ["bars-light", "iron-light"]
+    },
     {
       id: "scroll",
       he: "סורג מעוצב",
       en: "Grid with scrolls",
+      aliases: ["quatrefoil"],
       doors: ["d089", "d093", "d095", "d097", "d099", "d102", "d116"]
     },
-    { id: "scroll-light", he: "סורג מעוצב בהיר", en: "Grid with scrolls, door colour", light: true },
-    /* The heavy ornamental ironwork: bars with scrolled crowns and centres, no
-       grid behind it. The commonest thing in the luxury band. */
     {
-      id: "iron",
-      he: "ברזל מחושל",
-      en: "Wrought iron",
-      doors: ["d090", "d092", "d101", "d103", "d108", "d112", "d119", "d124", "d128", "d129"]
+      id: "scroll-light",
+      he: "סורג מעוצב בהיר",
+      en: "Grid with scrolls, door colour",
+      light: true,
+      aliases: ["quatrefoil-light"]
     },
-    { id: "iron-light", he: "ברזל מחושל בהיר", en: "Wrought iron, door colour", light: true },
+    /* ⚠ `iron` AND `iron-light` ARE WITHDRAWN — Peretz, 26.8.2026: "there is no
+       זכוכית מחורצת, ברזל מחושל, מדליוני פרח". They were the heavy ornamental
+       ironwork, bars with scrolled crowns and centres, and the commonest thing
+       in the luxury band by our own count: TEN measured doors carry it.
+       ⚠ THAT DISAGREEMENT IS WORTH KNOWING AND IS NOT OURS TO RESOLVE. Ten of
+       his own installed doors are drawn with a grille he says he does not sell,
+       which most likely means he has stopped ordering it rather than never
+       having fitted it. The ids resolve to `grid`, the nearest thing still in
+       the range, so an old link opens a real door and `npm run corpus` still
+       draws those ten — with the substitution named in its own notes rather
+       than silently. Recorded in ASK-PERETZ. */
     /* The three that appear exactly once, kept at his instruction.
        ⚠ AND ALL THREE NOW HAVE A `-light` TWIN, which they should have had from
        the start. The site's own question sheet says of the ironwork, in as many
@@ -585,12 +659,9 @@
        were drawing the only evidence door for that pattern in the wrong colour,
        with no option to correct it.
        Appended to the end of the list, so no `VERSION` bump. */
-    {
-      id: "quatrefoil",
-      he: "מדליוני פרח",
-      en: "Quatrefoil column",
-      doors: ["d104"]
-    },
+    /* ⚠ `quatrefoil` AND `quatrefoil-light` ARE WITHDRAWN — Peretz named
+       מדליוני פרח among the three he does not sell. One measured door (d104)
+       carried it. Both ids resolve to `scroll`, the nearest surviving pattern. */
     { id: "arch", he: "קשת", en: "Arch", doors: ["d121"] },
     { id: "deco", he: "קווים גיאומטריים", en: "Art-deco lines", doors: ["d123"] },
     /* Worked GLASS. In the pane, not on it. */
@@ -620,7 +691,7 @@
       he: "זכוכית מעוצבת",
       en: "Etched mesh",
       glass: true,
-      aliases: ["lattice"],
+      aliases: ["lattice", "reeded"],
       doors: ["d102", "d105", "d116", "d127"]
     },
     /* ⚠ d125 was in TWO of the prose lists — under `reeded` and under "nothing
@@ -650,26 +721,15 @@
     /* The three missing `-light` twins, appended so the ids already in the wild
        keep their indices. `light` is the same one switch it has always been: the
        same ironwork, painted the door's colour instead of black. */
-    {
-      id: "quatrefoil-light",
-      he: "מדליוני פרח בהיר",
-      en: "Quatrefoil column, door colour",
-      light: true
-    },
     { id: "arch-light", he: "קשת בהירה", en: "Arch, door colour", light: true },
     {
       id: "deco-light",
       he: "קווים גיאומטריים בהירים",
       en: "Art-deco lines, door colour",
       light: true
-    },
-    {
-      id: "reeded",
-      he: "זכוכית מחורצת",
-      en: "Reeded",
-      glass: true,
-      doors: ["d122", "d125"]
     }
+    /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
+       resolves to `mesh`, the other worked glass. */
   ];
   var HANDINGS = [
     { id: "right-in", he: "ימין, פנימה", en: "Right, inward", hinge: "right" },
@@ -1235,8 +1295,20 @@
   priceInto("detail", DETAILS, DETAIL, "delta");
   priceInto("handle", HANDLES, HANDLE, "delta");
   priceInto("lockset", LOCKSETS, LOCKSET, "delta");
+  priceInto("special lock", SPECIAL_LOCKS, SPECIAL_LOCK, "delta");
+  for (const [id, shekels] of Object.entries(DETAIL_GLAZED)) {
+    const o = DETAILS.find((d) => d.id === id);
+    if (!o) {
+      throw new Error(`prices.js DETAIL_GLAZED prices "${id}", which is not a face in the catalogue`);
+    }
+    o.deltaGlazed = agorot(shekels);
+  }
 
   // js/price.js
+  function glazedDetail(state2) {
+    const d = byId(DETAILS, state2.detail);
+    return d.deltaGlazed != null && isGlazed(state2) ? d.deltaGlazed : d.delta;
+  }
   function priceParts(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const scaled = (a) => Math.round(a * size.mult / 100) * 100;
@@ -1252,9 +1324,20 @@
       measure: BUILD_A.measure,
       colour: byId(COLOURS, state2.colour).delta,
       window: byId(WINDOWS, state2.window).delta,
-      detail: byId(DETAILS, state2.detail).delta,
+      /* ⚠ ONE FACE IN THE RANGE HAS TWO PRICES, and it is the classical set.
+         Peretz gave three figures — the set solid ₪2,700, a square light ₪3,700,
+         and "square with greek" ₪4,700 — which describe TWO products, not three:
+         3700 + 1000 = 4700, so the set costs ₪1,000 on a door that is already
+         paying for its glass. `deltaGlazed` is that second price, attached in
+         catalog.js beside the first.
+         Asked of `isGlazed`, not of `state.window`, for the same reason the
+         grille below is asked of `paneCount`: a sidelight door carries glass
+         beside the leaf, and "does this door have glass in it" is the question
+         both prices actually turn on. */
+      detail: glazedDetail(state2),
       handle: byId(HANDLES, state2.handle).delta,
       lockset: byId(LOCKSETS, state2.lockset).delta,
+      speciallock: byId(SPECIAL_LOCKS, state2.speciallock).delta,
       /* A grille needs a window to sit in — and so does worked glass, which is
          in the same list now. Neither can be charged on a solid door: the
          configurator must never take money for something the drawing does not
@@ -1329,6 +1412,7 @@
     const g = byId(GRILLES, state2.grille);
     const hd = byId(HANDLES, state2.handle);
     const lk = byId(LOCKSETS, state2.lockset);
+    const xl = byId(SPECIAL_LOCKS, state2.speciallock);
     const dt = byId(DETAILS, state2.detail);
     const sz = SIZES[state2.size] || SIZES.standard;
     const hn = byId(HANDINGS, state2.handing);
@@ -1372,6 +1456,9 @@
       value: `${hd.he}${fin ? ` · ${fin.he}` : ""}`
     });
     rows.push({ key: "lockset", label: "מנעול וידית", id: lk.id, value: lk.he });
+    if (xl.id !== "nospecial") {
+      rows.push({ key: "speciallock", label: "מנעול מיוחד", id: xl.id, value: xl.he });
+    }
     if (dt.id !== "plain") {
       const n = dt.strips ? ` (${dt.strips})` : "";
       rows.push({ key: "detail", label: "עיצוב", id: dt.id, value: `${dt.he}${n}` });
@@ -1502,6 +1589,7 @@
   var EDGE = 38;
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
+  var SPECIAL_AFF = CYLINDER_AFF - 250;
   var LOCK_BACKSET_GRIP = 49;
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
@@ -1681,6 +1769,7 @@
     const grille = byId(GRILLES, state2.grille);
     const handle = byId(HANDLES, state2.handle);
     const lockset = byId(LOCKSETS, state2.lockset);
+    const special = byId(SPECIAL_LOCKS, state2.speciallock);
     const detail = byId(DETAILS, state2.detail);
     const finish = effectiveFinish(state2);
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
@@ -2954,6 +3043,14 @@
         second round the keyhole has had to be nailed down, and the first
         fix only caught the grip. */
     ""}${lockset.lock ? "" : cylinder(keyX, y(CYLINDER_AFF))}
+    ${/* ⚠ THE EXTRA LOCK IS DRAWN, AND THAT IS NOT DECORATION. A כספת is ₪700
+        and a קודן is ₪900, and a configurator that takes money for something
+        the drawing does not show is a hidden cost with a label on it — the
+        same argument that withdrew the add-ons and the finish axis. It also
+        has to be here for `npm run collide` to sweep it: an obstacle the
+        rules believe in and the drawing does not is a fault this file has
+        had four times. */
+    ""}${specialLockArt(special, keyX, y(SPECIAL_AFF), leverDir)}
   </g>
 
   <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
@@ -3370,6 +3467,30 @@ ${body}
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const long = handleFootprint(handle, leafH).vy * 2;
     return long > 0 && long <= leafW - EDGE_FLAT * 2;
+  }
+  function specialLockArt(special, cx, cy, dir) {
+    if (!special || special.id === "nospecial") return "";
+    const W = 62, keypadH = 96;
+    const x = cx + dir * 0;
+    if (special.id === "kasefet") {
+      return `
+    <g data-hw="lock" data-owner="speciallock" data-kind="kasefet">
+      <rect x="${x - W / 2}" y="${cy - W / 2}" width="${W}" height="${W}" rx="7"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
+      <circle cx="${x}" cy="${cy}" r="${W * 0.27}" fill="none"
+              stroke="#000" stroke-opacity=".38" stroke-width="4"/>
+      <circle cx="${x}" cy="${cy}" r="4.5" fill="#000" fill-opacity=".42"/>
+    </g>`;
+    }
+    return `
+    <g data-hw="lock" data-owner="speciallock" data-kind="kodan">
+      <rect x="${x - W / 2}" y="${cy - keypadH / 2}" width="${W}" height="${keypadH}" rx="10"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
+      <rect x="${x - W / 2 + 8}" y="${cy - keypadH / 2 + 9}" width="${W - 16}" height="18" rx="3"
+            fill="#000" fill-opacity=".30"/>
+      ${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<circle cx="${x - 15 + c * 15}" cy="${cy - 2 + r * 16}" r="4.2"
+                 fill="#000" fill-opacity=".26"/>`).join("")).join("")}
+    </g>`;
   }
   var gripIsFixed = (state2) => !!byId(HANDLES, state2.handle).fixed;
   function gripAt(state2) {
@@ -5761,6 +5882,28 @@ ${body}
   </svg>`;
   }
   var locksetGlyph = handleGlyph;
+  function specialLockGlyph(x) {
+    const art = {
+      nospecial: `
+    <rect x="-52" y="-70" width="104" height="140" rx="6" opacity=".18"/>
+    <path d="M-22 0h44" stroke="currentColor" stroke-width="7" fill="none" opacity=".55"/>`,
+      kasefet: `
+    <rect x="-56" y="-64" width="112" height="128" rx="9"/>
+    <rect x="-42" y="-50" width="84" height="100" rx="5" fill="#fff" opacity=".92"/>
+    <circle cx="6" cy="0" r="24" fill="none" stroke="currentColor" stroke-width="8"/>
+    <circle cx="6" cy="0" r="7"/>
+    <path d="M6 -24v-9M6 24v9M-18 0h-9M30 0h9" stroke="currentColor"
+          stroke-width="6" fill="none"/>
+    <rect x="-36" y="-6" width="9" height="12" rx="2"/>`,
+      kodan: `
+    <rect x="-46" y="-72" width="92" height="144" rx="14"/>
+    <rect x="-34" y="-58" width="68" height="26" rx="4" fill="#fff" opacity=".92"/>
+    ${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<circle cx="${-22 + c * 22}" cy="${-14 + r * 24}" r="7" fill="#fff" opacity=".92"/>`).join("")).join("")}`
+    }[x.id] || "";
+    return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+  }
   function detailGlyph(detail) {
     const W = 950, H = 2100, pad = 40;
     const inset = 105;
@@ -6050,13 +6193,18 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 13;
+  var VERSION = 14;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "none",
     grille: "none",
     handle: "none",
     lockset: "cylinder",
+    /* ⚠ EVERY NEW FIELD NEEDS A DEFAULT HERE THE DAY IT IS INVENTED. A state
+       missing a key encodes as `undefined`, which `BigInt()` throws on — or
+       worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
+       becomes the first entry in the list. */
+    speciallock: "nospecial",
     detail: "plain",
     size: "standard",
     handing: "right-in"
@@ -6069,6 +6217,7 @@ ${body}
     p.set("g", state2.grille);
     p.set("n", state2.handle);
     p.set("k", state2.lockset);
+    p.set("x", state2.speciallock);
     p.set("d", state2.detail);
     p.set("s", state2.size);
     p.set("h", state2.handing);
@@ -6089,6 +6238,7 @@ ${body}
       "g",
       "n",
       "k",
+      "x",
       "d",
       "s",
       "h",
@@ -6132,6 +6282,7 @@ ${body}
     }
     take("detail", "d", DETAILS);
     take("handing", "h", HANDINGS);
+    take("speciallock", "x", SPECIAL_LOCKS);
     const rawSize = p.get("s");
     if (rawSize != null) {
       if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state2.size = rawSize;
@@ -6153,14 +6304,15 @@ ${body}
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   var BITS = {
     version: 4,
-    colour: 6,
+    colour: 5,
     size: 3,
     handing: 2,
-    window: 3,
+    window: 2,
     grille: 5,
     handle: 4,
     lockset: 4,
-    detail: 5
+    detail: 5,
+    speciallock: 2
   };
   var TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
@@ -6185,7 +6337,11 @@ ${body}
       [Math.max(0, GRILLES.findIndex((g) => g.id === state2.grille)), BITS.grille],
       [Math.max(0, HANDLES.findIndex((n) => n.id === state2.handle)), BITS.handle],
       [Math.max(0, LOCKSETS.findIndex((k) => k.id === state2.lockset)), BITS.lockset],
-      [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail]
+      [Math.max(0, DETAILS.findIndex((d) => d.id === state2.detail)), BITS.detail],
+      [
+        Math.max(0, SPECIAL_LOCKS.findIndex((x) => x.id === state2.speciallock)),
+        BITS.speciallock
+      ]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -6224,7 +6380,8 @@ ${body}
     const handle = HANDLES[read(BITS.handle)];
     const lockset = LOCKSETS[read(BITS.lockset)];
     const detail = DETAILS[read(BITS.detail)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail) return null;
+    const special = SPECIAL_LOCKS[read(BITS.speciallock)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special) return null;
     return {
       colour: colour.id,
       size,
@@ -6233,7 +6390,8 @@ ${body}
       grille: grille.id,
       handle: handle.id,
       lockset: lockset.id,
-      detail: detail.id
+      detail: detail.id,
+      speciallock: special.id
     };
   }
 
@@ -6405,16 +6563,16 @@ ${body}
     { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "shahar", lockset: "cylinder", size: "standard", handing: "left-in" } },
     { id: "d078", state: { colour: "rb-7110d", detail: "strips", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in" } },
     { id: "d087", state: { colour: "rb-7021d", detail: "panel", window: "none", grille: "none", handle: "shahar", lockset: "digital", size: "standard", handing: "right-in" } },
-    { id: "d092", state: { colour: "rb-6219d", detail: "panel", window: "rect", grille: "iron", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in" } },
+    { id: "d092", state: { colour: "rb-6219d", detail: "panel", window: "rect", grille: "none", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in" } },
     { id: "d097", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in" } },
     { id: "d099", state: { colour: "rb-7126d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
     { id: "d106", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in" } },
-    { id: "d108", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "iron", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
+    { id: "d108", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in" } },
     { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "barblack", lockset: "digital", size: "standard", handing: "right-in" } },
     { id: "d116", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in" } },
     { id: "d122", state: { colour: "rb-7240d", detail: "panel", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in" } },
-    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "reeded", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in" } },
-    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "iron", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in" } }
+    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in" } },
+    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in" } }
   ];
 
   // js/app.js
@@ -6466,6 +6624,21 @@ ${body}
       list: () => LOCKSETS,
       glyph: locksetGlyph,
       hint: "הידית שמסובבים והצילינדר. יש בכל דלת."
+    },
+    /* ⚠ A NEW AXIS, AND ITS OWN GROUP RATHER THAN TWO MORE LOCKSET TILES.
+       A lockset is the furniture on the outside face and there is exactly one of
+       it; a כספת or a קודן is a lock fitted BESIDE it, so a door can carry a
+       lever, a smart lock and a keypad at once and Peretz prices all three
+       independently. Putting them in `LOCKSETS` would have made three products
+       mutually exclusive that are not. */
+    {
+      key: "speciallock",
+      title: "מנעול מיוחד",
+      in: "hw",
+      kind: "hw",
+      list: () => SPECIAL_LOCKS,
+      glyph: specialLockGlyph,
+      hint: "נעילה נוספת מעבר למנעול הרגיל."
     },
     {
       key: "size",
@@ -6907,6 +7080,16 @@ ${body}
           b.innerHTML = `
         <span class="tile__art">${g.glyph(o)}</span>
         <span class="tile__name">${o.he}</span>
+        ${/* ⚠ THE BAND EACH SIZE SERVES, AND IT HAS BEEN OWED SINCE 23.8.
+             `ASK-PERETZ.md` §8: "the size tiles are meant to print the band each
+             one serves, so a customer with an odd opening can tell which tile is
+             theirs instead of guessing or telephoning." It refused to invent the
+             ranges — one arrived from outside as an example and could not be
+             right, because it swallowed צרה — so the tiles showed only a name.
+             Peretz gave the real bands on 26.8 and this is that line.
+             Read off `o.band`, so any option that grows one gets it for free
+             and no group needs a special case. */
+          ""}${o.band ? `<span class="tile__band">${o.band}</span>` : ""}
         <span class="tile__meta">${priceLabel(tilePrice(g, o, state))}</span>
         <span class="tile__why" hidden></span>`;
         }

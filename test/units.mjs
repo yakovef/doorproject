@@ -2,13 +2,13 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, paneCount, SIZES, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, paneCount, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT, locksetGlyph,
-  nearestGrip, render, sizeGlyph, windowGlyph,
+  gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT,
+  locksetGlyph, nearestGrip, render, sizeGlyph, specialLockGlyph, windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
@@ -28,13 +28,13 @@ const sizeKeys = Object.keys(SIZES);
 const ALPHABET_TEST = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
-               handle: 'idan', lockset: 'coral', detail: 'plain',
-               size: 'standard', handing: 'right-in' };
+               handle: 'idan', lockset: 'coral', speciallock: 'nospecial',
+               detail: 'plain', size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
-              'lockset', 'detail'];
+              'lockset', 'speciallock', 'detail'];
 
 /* The code's length is derived, never typed. It was written as {8} and the
    day the layout grew to nine characters that produced 280 failures saying
@@ -69,11 +69,21 @@ const buildable = st => {
 function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
     for (const w of WINDOWS) for (const g of GRILLES) {
+      /* ⚠ `speciallock` IS IN THE STEM, NOT SWEPT. It is a fourth dimension on a
+         product that is already colour x size x handing x window x grille, and
+         multiplying the sweep by three to vary a fitting nothing else depends
+         on would triple a run that already takes minutes. It IS swept on its
+         own below, and the round-trip below needs it present at all: a key
+         missing from the stem encodes as `undefined`, which
+         `Math.max(0, indexOf(undefined))` masks to index 0 in silence. */
       const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
-                     detail: 'plain' };
+                     detail: 'plain', speciallock: 'nospecial' };
       const out = [];
       for (const n of HANDLES) out.push({ ...stem, handle: n.id, lockset: 'coral' });
       for (const k of LOCKSETS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: k.id });
+      for (const x of SPECIAL_LOCKS.slice(1)) {
+        out.push({ ...stem, handle: 'idan', lockset: 'coral', speciallock: x.id });
+      }
       for (const st of out) if (buildable(st)) yield st;
     }
 }
@@ -343,7 +353,7 @@ group('price');
      the number he will check first, so it is pinned exactly. */
   ok(P({ handle: 'none' }) === 3150,
      `a solid anthracite door with a lever and no pull should be ₪3,150, got ${P({ handle: 'none' })}`);
-  ok(P({}) === 3410, `adding the Idan bar should reach ₪3,410, got ${P({})}`);
+  ok(P({}) === 3650, `adding the Idan bar should reach ₪3,650, got ${P({})}`);
 
   /* ⚠ THE SIZE MULTIPLIES TWO COMPONENTS AND NOT THE OTHER FOUR — the whole
      reason `BUILD` is six numbers instead of one per band. A x1.25 door with
@@ -366,22 +376,54 @@ group('price');
   // A link shared before the chart replaced the list must still open a door.
   ok(P({ colour: 'ral-9005' }) === P({}), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
-  ok(P({ size: 'wide' }) === 3850, 'wide band');
-  ok(P({ window: 'rect' }) === 4030, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
-  ok(P({ window: 'rect', grille: 'scroll' }) === 4490, 'scrollwork grille adds ₪460');
-  ok(P({ detail: 'panel' }) === 3790, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
+  ok(P({ size: 'wide' }) === 4090, 'wide band');
+  /* ⚠ ₪3,700 FOR A WINDOW, WHICH IS MORE THAN THE DOOR. Peretz, 26.8.2026.
+     Every window price in this file was invented at around ₪600 and every one
+     was out by a factor of six. Glass in an armoured leaf is a different
+     product from a hole in one. */
+  ok(P({ window: 'rect' }) === 7350, `a square window should add ₪3,700, got ${P({ window: 'rect' })}`);
+  /* "design: almost all of them in the price." Every grille is ₪0 now except
+     the three laser-cut ones. */
+  ok(P({ window: 'rect', grille: 'scroll' }) === 7350, 'scrollwork is included');
+  ok(P({ window: 'rect', grille: 'vine' }) === 8050, 'the laser-cut ones add ₪700');
+  ok(P({ detail: 'panel' }) === 4375, `a lower panel should add ₪725, got ${P({ detail: 'panel' })}`);
+  /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and these two lines are
+     Peretz's three window figures reduced to the two products they describe:
+     the set solid is ₪2,700, and a square light plus the set glazed is
+     3700 + 1000 = ₪4,700, which is his "square with greek". */
+  ok(P({ detail: 'classic', handle: 'none' }) === 5850, 'the greek set, solid, adds ₪2,700');
+  ok(P({ detail: 'classic', handle: 'none', window: 'rect' }) === 7850,
+     'the greek set glazed is ₪4,700 over a bare door, not ₪6,400');
+  /* The extra locks — a whole axis that did not exist. */
+  ok(P({ speciallock: 'kasefet' }) === 4350, 'a safe lock adds ₪700');
+  ok(P({ speciallock: 'kodan' }) === 4550, 'a keypad adds ₪900');
+  ok(P({ lockset: 'digital', speciallock: 'kodan' }) === 7250,
+     'a smart lock and a keypad are different products and stack');
   /* The finish and the add-ons are withdrawn, so nothing may be charged for
      them — including through a stale link that still names one. */
   ok(P({ finish: 'brass' }) === P({}), 'a withdrawn finish must not add to the price');
   ok(P({ addons: ['peep', 'mail', 'knocker'] }) === P({}),
      'withdrawn add-ons must not add to the price');
   /* The whole point of the split: a pull bar and a backplate on one door. */
-  ok(P({ handle: 'idan', lockset: 'plate' }) === 3470,
-     `Idan with a Rotem backplate should be ₪3,470, got ${P({ handle: 'idan', lockset: 'plate' })}`);
-  ok(P({ handle: 'none', lockset: 'plate' }) === 3210, 'Rotem alone adds ₪60 to the bare door');
+  ok(P({ handle: 'idan', lockset: 'plate' }) === 3650,
+     `Idan with a Rotem backplate should be ₪3,650, got ${P({ handle: 'idan', lockset: 'plate' })}`);
+  /* "main handles: all of them in the price", bar the squares, the circles and
+     the smart lock. Rotem is one of the included ones. */
+  ok(P({ handle: 'none', lockset: 'plate' }) === 3150, 'Rotem is included');
+  ok(P({ handle: 'none', lockset: 'square' }) === 3450, 'squares add ₪300');
+  ok(P({ handle: 'none', lockset: 'cadoor' }) === 3350, 'circles add ₪200');
+  ok(P({ handle: 'none', lockset: 'digital' }) === 5850, 'the smart lock adds ₪2,700');
   // A retired id must land on its replacement, not on the first entry.
   ok(P({ handle: 'bar-long' }) === P({ handle: 'idan' }), 'alias bar-long should price as idan');
   ok(P({ handle: 'bar-flat' }) === P({ handle: 'shahar' }), 'alias bar-flat should price as shahar');
+  /* Withdrawn on Peretz's say-so, 26.8.2026 — every one still opens a door. */
+  ok(P({ handle: 'shiran' }) === P({ handle: 'idan' }), 'withdrawn shiran should price as idan');
+  ok(P({ handle: 'blade' }) === P({ handle: 'shahar' }), 'withdrawn blade should price as shahar');
+  ok(P({ lockset: 'almog' }) === P({ lockset: 'sapir' }), 'withdrawn almog should price as sapir');
+  ok(P({ window: 'rect', grille: 'iron' }) === P({ window: 'rect', grille: 'grid' }),
+     'withdrawn iron should price as grid');
+  ok(P({ window: 'rect', grille: 'reeded' }) === P({ window: 'rect', grille: 'mesh' }),
+     'withdrawn reeded should price as mesh');
   // Luna is gone from the catalogue; its id must still land somewhere real.
   ok(P({ handle: 'luna' }) === P({ handle: 'idan' }), 'retired luna should price as idan');
 
@@ -624,48 +666,69 @@ for (const n of HANDLES) {
    company again this is where it shows. */
 group('a grip is checked where it is actually bolted');
 {
-  const st = { ...base, handle: 'shiran', lockset: 'cylinder', window: 'none' };
-  const svg = render(st);
-  const discs = [...svg.matchAll(/data-mount="shiran-disc"[^>]*cy="([\d.]+)"[^>]*r="([\d.]+)"/g)]
-    .map(m => ({ cy: Number(m[1]), r: Number(m[2]) }));
-  ok(discs.length === 2, `the Shiran draws ${discs.length} mounting discs, expected 2`);
+  /* ⚠ THIS TEST USED TO BE ABOUT THE SHIRAN, AND THE SHIRAN NO LONGER EXISTS.
+     Peretz withdrew it on 26.8.2026 — the answer to a question ASK-PERETZ §2
+     had been asking since 23.8, since it appeared on none of the 128
+     photographs. Its id now resolves to `idan`.
 
-  const feet = gripFeet(st, gripAt(st));
-  ok(feet.length === 2, `gripFeet gives the Shiran ${feet.length} feet, expected 2`);
+     The test is NOT deleted, because the property it guarded is real and was a
+     live bug: `gripFeet` used to return ONE circle at the grip's own centre for
+     everything that was not a bar, so a rosette could stand square on a
+     window's surround with the drag showing green — reported from outside as
+     "why can i put the pull handle on that". What is deleted is the part that
+     could only ever have been about one product: a comparison against
+     `data-mount="shiran-disc"`.
 
-  /* The drawing is in leaf-local millimetres offset by the leaf's own origin,
-     so the discs and the feet are compared on their SPACING and their radius —
-     the two things a foot model has to get right — rather than on an absolute
-     y that would just be re-deriving the layout here. */
-  if (discs.length === 2 && feet.length === 2) {
-    const drawnGap = Math.abs(discs[1].cy - discs[0].cy);
-    const footGap = Math.abs(feet[1].y - feet[0].y);
-    ok(Math.abs(drawnGap - footGap) < 1,
-       `the rule spaces the Shiran's feet ${footGap.toFixed(1)} mm apart and the `
-     + `drawing spaces its discs ${drawnGap.toFixed(1)} mm`);
-    ok(Math.abs(discs[0].r - feet[0].r) < 2,
-       `the rule uses a ${feet[0].r.toFixed(1)} mm foot where the drawing bolts `
-     + `through a ${discs[0].r.toFixed(1)} mm disc`);
+     What replaces it is STRONGER, not weaker. The old version checked one grip
+     against its own declared discs; this checks EVERY surviving grip, and it
+     checks the thing that actually matters — that the feet the rule tests are
+     inside the footprint the drawing claims, so the two halves cannot drift
+     apart the way they did for the Shiran. */
+  for (const h of HANDLES) {
+    if (h.style === 'none') continue;
+    const st = { ...base, handle: h.id, lockset: 'cylinder', window: 'none' };
+    const feet = gripFeet(st, gripAt(st));
+    ok(feet.length >= 1 || h.id === 'grab',
+       `${h.id} declares no feet at all, so no position of it can ever be refused`);
+    for (const f of feet) {
+      ok(Number.isFinite(f.x) && Number.isFinite(f.y) && f.r > 0,
+         `${h.id} has a foot at ${f.x},${f.y} r=${f.r} — a foot with no geometry `
+       + 'refuses nothing and permits everything');
+      /* A foot bigger than the leaf is a foot that refuses everything, which
+         reads to a customer as "you cannot put the handle anywhere". */
+      ok(f.r < (SIZES.standard.w) / 4,
+         `${h.id} is checked at a ${f.r.toFixed(1)} mm foot, which is a quarter `
+       + 'of the leaf — that refuses every position on the door');
+    }
   }
 
-  /* And the fault itself: a position that puts a disc on the window's surround
-     has to be refused. Walked rather than asserted at one point, because the
-     old model refused nothing anywhere in this band. */
+  /* And the fault itself, on a grip that still exists: a position that puts a
+     foot on the window's surround has to be refused. Walked rather than
+     asserted at one point, because the old model refused nothing anywhere in
+     this band. */
   {
-    const glazed = { ...base, handle: 'shiran', lockset: 'cylinder', window: 'rect' };
+    const glazed = { ...base, handle: 'idan', lockset: 'cylinder', window: 'rect' };
     const obs = faceObstacles(glazed).find(o => o.kind === 'window');
     let refusedInBand = 0, checked = 0;
+    /* ⚠ AT THE WINDOW'S OWN CENTRE LINE, not at x=155. The old test put the
+       SHIRAN there — a rosette centred on the grip's own axis — and 155 mm in
+       from the closing edge landed its discs on the surround. A pull BAR at
+       155 is a slim thing beside the lock and clears the glass entirely, so
+       the same coordinate asks a question with the answer "no collision", and
+       the check passed by testing nothing. The subject changed, so the
+       coordinate has to. */
+    const overGlass = Math.round(obs.x + obs.w / 2);
     for (let y = Math.round(obs.y); y < obs.y + obs.h; y += 25) {
-      const pl = gripPlacement(glazed, { x: 155, y, rot: 0 });
+      const pl = gripPlacement(glazed, { x: overGlass, y, rot: 0 });
       if (pl.why === 'הידית גבוהה או נמוכה מדי לשימוש'
           || pl.why === 'הידית חורגת מהדלת') continue;   // a different rule
       checked++;
       if (!pl.ok) refusedInBand++;
     }
-    ok(checked > 10, `only ${checked} positions fell inside the window's band to test`);
+    ok(checked > 5, `only ${checked} positions fell inside the window's band to test`);
     ok(refusedInBand === checked,
        `${checked - refusedInBand} of ${checked} positions inside the window's surround `
-     + 'were allowed — a disc can be bolted to the moulding');
+     + 'were allowed — a foot can be bolted to the moulding');
   }
 }
 
@@ -2098,8 +2161,14 @@ group('ironwork is counted, and the drawing agrees with the bill');
         assertions above derive what they expect from the same catalogue that
         produced it, so they would all stay green if the Hebrew were rewritten
         as nonsense. This one would not. */
-  ok(message({ ...stem, size: 'sidelight', window: 'rect', grille: 'iron' }).split('\n')
-       .includes('סורג: ברזל מחושל — בכנף הדלת ובחלון הצד (2 יחידות)'),
+  /* ⚠ `iron` (ברזל מחושל) IS WITHDRAWN — Peretz, 26.8.2026 — so this literal
+     had to change with it. It is pinned on `scroll`, which is still in the
+     range, and it is still a literal for the reason above: every other
+     assertion in this group derives what it expects from the same catalogue
+     that produced the sentence, so all of them would stay green if the Hebrew
+     were rewritten as nonsense. */
+  ok(message({ ...stem, size: 'sidelight', window: 'rect', grille: 'scroll' }).split('\n')
+       .includes('סורג: מעוצב — בכנף הדלת ובחלון הצד (2 יחידות)'),
      'the sentence Peretz reads about a two-panel door has changed');
 
   /* 5. And the ordinary door stays quiet: "בכנף הדלת" on a door that has only

@@ -44,7 +44,7 @@
 
 import {
   byId, colourCode, COLOURS, declaredFinish, DETAILS, glazedPanels, GRILLES, grillePlacement,
-  HANDINGS, HANDLES, isGlazed, LOCKSETS, SIZES, WINDOWS,
+  HANDINGS, HANDLES, isGlazed, LOCKSETS, SIZES, SPECIAL_LOCKS, WINDOWS,
 } from './catalog.js';
 
 /**
@@ -66,6 +66,7 @@ export function specRows(state) {
   const g = byId(GRILLES, state.grille);
   const hd = byId(HANDLES, state.handle);
   const lk = byId(LOCKSETS, state.lockset);
+  const xl = byId(SPECIAL_LOCKS, state.speciallock);
   const dt = byId(DETAILS, state.detail);
   const sz = SIZES[state.size] || SIZES.standard;
   const hn = byId(HANDINGS, state.handing);
@@ -138,6 +139,16 @@ export function specRows(state) {
   rows.push({ key: 'handle', label: 'ידית משיכה', id: hd.id,
               value: `${hd.he}${fin ? ` · ${fin.he}` : ''}` });
   rows.push({ key: 'lockset', label: 'מנעול וידית', id: lk.id, value: lk.he });
+  /* ⚠ NAMED ONLY WHEN THERE IS ONE, and named at all because an axis that does
+     not reach this file is an axis Peretz never hears about. A customer can
+     now add a כספת or a קודן — ₪700 and ₪900 — and every reader of a door
+     (the message, the spec table, the summary line, the drawing's accessible
+     name and the A4 sheet) goes through here. A priced choice missing from
+     this list is a clarifying question with money on it, which is exactly
+     what PLAN.md §0 forbids. */
+  if (xl.id !== 'nospecial') {
+    rows.push({ key: 'speciallock', label: 'מנעול מיוחד', id: xl.id, value: xl.he });
+  }
   if (dt.id !== 'plain') {
     /* ⚠ THE COUNT, because the drawing has one and the order did not. Eleven
        bands and four bands both arrived as "פסי מתכת" / "פסים אנכיים", while

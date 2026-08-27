@@ -1353,6 +1353,14 @@ body {
   padding-block-start: 7px;
 }
 
+/* The size band, under the name and above the price. Small and quiet: it is a
+   fact a customer checks once against a tape measure, not something to read on
+   every tile. Tabular so the two figures line up down a column of tiles. */
+.tile__band {
+  font-size: .66rem; color: var(--ink-2); line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
 .send__spec {
   margin: 0; padding-block: 8px;
   border-block: 1px solid var(--rule);

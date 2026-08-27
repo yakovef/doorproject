@@ -19,8 +19,9 @@
 import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          BUILD, MASHKOF_WIDER,
          COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE,
-         GRILLE as GRILLE_PRICE, DETAIL as DETAIL_PRICE,
-         HANDLE as HANDLE_PRICE, LOCKSET as LOCKSET_PRICE } from './prices.js';
+         GRILLE as GRILLE_PRICE, DETAIL as DETAIL_PRICE, DETAIL_GLAZED,
+         HANDLE as HANDLE_PRICE, LOCKSET as LOCKSET_PRICE,
+         SPECIAL_LOCK as SPECIAL_LOCK_PRICE } from './prices.js';
 
 /* Re-exported so nothing else has to know the flag moved. It belongs beside
    the figures it describes — flipping it is the last edit of the evening the
@@ -56,26 +57,62 @@ export const PLACEHOLDER = PRICES_ARE_PLACEHOLDER;
  * of the size rather than money, so it lives here beside `w` and `h`, and the
  * money stays in the file whose whole job is to be readable out loud.
  *
- * ⚠ THE MULTIPLIERS BELOW ARE MAPPED ONTO THE SIZES AS THEY STAND TODAY, and
- * the list itself is re-cut in TRANSFORM.md phase 2 to Peretz's four bands
- * (standard · מוגדלת · מוגדלת במיוחד · דלת וחצי). Until then: `narrow` takes 1
- * because he has no band below standard, `wide` and `tall` take his +25%, and
- * `sidelight` takes דלת וחצי's x2 because it is also two openings' worth of
- * frame — assumption A1 in TRANSFORM.md §18, one number if he says otherwise.
+ * ⚠ A PRICE BAND AND A STRUCTURE ARE DIFFERENT THINGS, and several structures
+ * share one band. Peretz named four bands — standard, +25%, +50%, x2 — and it
+ * is tempting to make the list four rows. It must not be:
+ *
+ *   - `wide` and `tall` both take his +25% and they are not the same DOOR. A
+ *     customer with a 220 cm opening and one with a 115 cm opening pay the same
+ *     surcharge and are looking at different things. Merging them would cost
+ *     the customer the picture of their own door to save a row in a table.
+ *   - `narrow` stays at x1: he has no band BELOW standard, which makes a narrow
+ *     door a standard-band door that happens to be narrow.
+ *
+ * So one id is APPENDED (`xl`, his "double extra") and nothing is renamed or
+ * retired — which is why the size list costs no `VERSION` bump.
+ *
+ * ⚠ `band` IS A LABEL, NOT A DIMENSION, and `w`/`h` deliberately do not move to
+ * match it. `ASK-PERETZ.md` §8 has been asking since 23.8 for the width each
+ * tile serves, so a customer with a tape measure can tell which one is theirs,
+ * and it refused to invent the numbers. They have arrived. But setting the
+ * drawn opening to the top of each band would put `standard` at 980 x 2030,
+ * whose leaf is 880 x 1980 = **0.444** — and 0.415 is the aspect measured
+ * across thirty photographs, printed by `rectify.mjs`, and used by every
+ * leaf-box check in the repo. Moving a measured number to match a purchasing
+ * band is what REALISM.md §6 exists to forbid.
+ *
+ * ⚠ And the band says ס״מ without saying whether it is the OPENING or the LEAF,
+ * because nobody knows: `ASK-PERETZ.md` §12 asks which he orders by and it is
+ * still open (assumption A2). Printing the honest ambiguity beats printing a
+ * confident guess a customer measures against.
  */
 export const SIZES = {
-  standard: { id: 'standard', he: 'סטנדרטית',  en: 'Standard',      w: 950,  h: 2100, mult: 1 },
-  narrow:   { id: 'narrow',   he: 'צרה',        en: 'Narrow',        w: 800,  h: 2100, mult: 1 },
-  wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide',          w: 1100, h: 2100, mult: 1.25 },
-  tall:     { id: 'tall',     he: 'גבוהה',      en: 'Tall',          w: 950,  h: 2400, mult: 1.25 },
-  half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', w: 950,  h: 2100, side: 400, mult: 2 },
+  standard: { id: 'standard', he: 'סטנדרטית',  en: 'Standard',      w: 950,  h: 2100, mult: 1,
+              band: 'עד 98 × 203 ס״מ' },
+  narrow:   { id: 'narrow',   he: 'צרה',        en: 'Narrow',        w: 800,  h: 2100, mult: 1,
+              band: 'עד 98 × 203 ס״מ' },
+  wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide',          w: 1100, h: 2100, mult: 1.25,
+              band: 'עד 120 × 240 ס״מ' },
+  tall:     { id: 'tall',     he: 'גבוהה',      en: 'Tall',          w: 950,  h: 2400, mult: 1.25,
+              band: 'עד 120 × 240 ס״מ' },
+  half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', w: 950,  h: 2100, side: 400, mult: 2,
+              band: 'שתי כנפיים' },
   /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
      d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
      narrow one beside it — but the narrow one does not open and is glass, so
      it is a different product and a different price. `sideGlazed` is what the
      renderer reads. */
   sidelight: { id: 'sidelight', he: 'עם חלון צד', en: 'With sidelight', w: 950, h: 2100,
-               side: 400, sideGlazed: true, mult: 2 },
+               side: 400, sideGlazed: true, mult: 2, band: 'כנף וחלון צד' },
+  /* ⚠ APPENDED, AND THAT IS WHY IT IS LAST. Peretz's "double extra
+     (door>120x240)" at +50%. `encodeCode` packs the INDEX of this list, so a
+     new entry at the END leaves every existing index where it was and costs no
+     `VERSION` bump; inserting it in size order — between `tall` and `half`,
+     where it belongs visually — would have moved `half` and `sidelight` by one
+     and quietly repointed every code ever written. The choices panel can
+     order tiles however it likes; this list is a wire format. */
+  xl: { id: 'xl', he: 'רחבה וגבוהה', en: 'Extra large', w: 1200, h: 2400, mult: 1.5,
+        band: 'מעל 120 × 240 ס״מ' },
 };
 
 /**
@@ -248,7 +285,7 @@ export const HANDLES = [
      is 56. A number nobody could reproduce from the line above it.
      The measured widths, on an 850 x 2050 leaf: */
   { id: 'idan',    he: 'עידן',  en: 'Idan',   len: 1050, w: 32, style: 'bar', bar: 'idan', pull: true,
-    aliases: ['bar-long', 'luna'] },
+    aliases: ['bar-long', 'luna', 'shiran'] },
   /* Brass, and the catalogue never said so: with no `finish` of its own
      `effectiveFinish` fell through to steel and the bar the inventory calls
      brass rendered silver on every door. d072, d074 and d082 are gold rods at
@@ -258,12 +295,16 @@ export const HANDLES = [
   { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', len: 1000, w: 44, style: 'bar', bar: 'nitzan', pull: true,
     aliases: ['bar-short'] },
   { id: 'shahar',  he: 'שחר',   en: 'Shahar', len: 1230, w: 40, style: 'bar', bar: 'shahar', pull: true,
-    aliases: ['bar-flat'] },
+    aliases: ['bar-flat', 'blade'] },
   { id: 'ron',     he: 'רון',   en: 'Ron',    len: 900,  w: 18, style: 'bar', bar: 'ron', pull: true },
 
   /* The ornate pull, the horizontal bow, and the recess. */
-  { id: 'shiran',  he: 'שירן',   en: 'Shiran', len: 0, style: 'shiran', pull: true,
-    finish: 'brass' },
+  /* ⚠ `shiran` IS WITHDRAWN, and this closes a question rather than dropping a
+     product. ASK-PERETZ §2 has been asking since 23.8 whether he orders it at
+     all — it appears on NONE of the 128 photographs, it was the one grip in the
+     range drawn from nothing, and the note there says in as many words "it is
+     the one grip whose picture we cannot check". Peretz, 26.8.2026: "there is
+     no: שירן, להב שטוח." The id resolves to `idan`. */
   { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', len: 0, style: 'grab',
     aliases: ['dee'] },
   /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
@@ -293,8 +334,10 @@ export const HANDLES = [
      section is the most visible thing about a pull bar at door scale, and the
      corpus has three of them — round, square and this — where we modelled five
      bars differing mainly in their fixings. */
-  { id: 'blade',   he: 'להב שטוח', en: 'Flat blade', len: 1000, w: 62,
-    style: 'bar', bar: 'blade', pull: true },
+  /* ⚠ `blade` IS WITHDRAWN — the second of the two Peretz named. Three doors
+     carried it (d034 d073 d104) and its section really is unmistakable beside
+     the tubes, so this is a product leaving the range rather than a drawing
+     being wrong. The id resolves to `shahar`, the widest flat bar left. */
 
   /* ⚠ BLACK, AND THAT IS A PROPERTY OF THE PRODUCT — the same argument that
      kept Shiran's brass on Shiran's own row after the finish group was
@@ -358,8 +401,9 @@ export const LOCKSETS = [
   { id: 'plate',   he: 'רותם',  en: 'Rotem',   style: 'plate', lock: true, lever: true,
     aliases: ['longplate'] },
   { id: 'cadoor',  he: 'כדור',   en: 'Cadoor',  style: 'cadoor' },
-  { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  style: 'sapir' },
-  { id: 'almog',   he: 'אלמוג',  en: 'Almog',  style: 'almog', lever: true },
+  { id: 'sapir',   he: 'ספיר',   en: 'Sapir',  style: 'sapir', aliases: ['almog'] },
+  /* ⚠ `almog` IS WITHDRAWN — Peretz, 26.8.2026: "there is no: אלמוג". It
+     resolves to `sapir`, the nearest lever left in the range. */
   /* Knob on a long backplate — the bronze fitting on d092, named three times
      across the luxury tier. A different object from a knob on a rose: the
      plate carries the keyway too, so it locks like the Rotem backplate. */
@@ -405,6 +449,30 @@ export const LOCKSETS = [
      Its id aliases onto the cylinder, which is the smallest real thing it
      could have meant. No VERSION bump: it was the LAST entry, so removing it
      renumbers nothing. */
+];
+
+/**
+ * THE EXTRA LOCK — a whole axis that did not exist until 26.8.2026.
+ *
+ * Peretz: *"special lock: kasefet +700 · kodan +900."*
+ *
+ * ⚠ NEITHER OF THESE IS A LOCKSET, and that is why they are a separate list
+ * rather than two more rows above. A lockset is the furniture on the outside
+ * face — the thing you turn and the keyway — and there is exactly one of it.
+ * These are locks fitted BESIDE it, so a door can carry a lever, a smart lock
+ * AND a keypad, and Peretz prices all three independently.
+ *
+ * ⚠ `kodan` AND `digital` ARE DIFFERENT PRODUCTS. `digital` (מנעול חכם, ₪2,700)
+ * is a lockset — it IS the keyway, which is why nothing else is drawn beside
+ * it. `kodan` (₪900) is a numeric keypad added to a door that still has its
+ * own lock. He listed them under different headings and priced them an order
+ * apart; merging them because both are electronic would lose a product and
+ * misprice the other by ₪1,800.
+ */
+export const SPECIAL_LOCKS = [
+  { id: 'nospecial', he: 'ללא',   en: 'None' },
+  { id: 'kasefet',   he: 'כספת',  en: 'Safe lock' },
+  { id: 'kodan',     he: 'קודן',  en: 'Keypad' },
 ];
 
 /* ── WITHDRAWN: the glass as its own choice ──────────────────────────
@@ -508,17 +576,26 @@ export const LOCKSETS = [
 export const GRILLES = [
   { id: 'none',    he: 'ללא סורג',       en: 'None',
     doors: ['d094', 'd115'] },
-  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid',     aliases: ['bars'],
+  { id: 'grid',    he: 'סורג רשת',       en: 'Square grid',     aliases: ['bars', 'iron'],
     doors: ['d091', 'd100', 'd107', 'd110', 'd113', 'd117', 'd122'] },
-  { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', light: true, aliases: ['bars-light'] },
+  { id: 'grid-light',   he: 'סורג רשת בהיר',   en: 'Square grid, door colour', light: true,
+    aliases: ['bars-light', 'iron-light'] },
   { id: 'scroll',  he: 'סורג מעוצב',     en: 'Grid with scrolls',
+    aliases: ['quatrefoil'],
     doors: ['d089', 'd093', 'd095', 'd097', 'd099', 'd102', 'd116'] },
-  { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Grid with scrolls, door colour', light: true },
-  /* The heavy ornamental ironwork: bars with scrolled crowns and centres, no
-     grid behind it. The commonest thing in the luxury band. */
-  { id: 'iron',    he: 'ברזל מחושל',     en: 'Wrought iron',
-    doors: ['d090', 'd092', 'd101', 'd103', 'd108', 'd112', 'd119', 'd124', 'd128', 'd129'] },
-  { id: 'iron-light',   he: 'ברזל מחושל בהיר', en: 'Wrought iron, door colour', light: true },
+  { id: 'scroll-light', he: 'סורג מעוצב בהיר', en: 'Grid with scrolls, door colour', light: true,
+    aliases: ['quatrefoil-light'] },
+  /* ⚠ `iron` AND `iron-light` ARE WITHDRAWN — Peretz, 26.8.2026: "there is no
+     זכוכית מחורצת, ברזל מחושל, מדליוני פרח". They were the heavy ornamental
+     ironwork, bars with scrolled crowns and centres, and the commonest thing
+     in the luxury band by our own count: TEN measured doors carry it.
+     ⚠ THAT DISAGREEMENT IS WORTH KNOWING AND IS NOT OURS TO RESOLVE. Ten of
+     his own installed doors are drawn with a grille he says he does not sell,
+     which most likely means he has stopped ordering it rather than never
+     having fitted it. The ids resolve to `grid`, the nearest thing still in
+     the range, so an old link opens a real door and `npm run corpus` still
+     draws those ten — with the substitution named in its own notes rather
+     than silently. Recorded in ASK-PERETZ. */
   /* The three that appear exactly once, kept at his instruction.
      ⚠ AND ALL THREE NOW HAVE A `-light` TWIN, which they should have had from
      the start. The site's own question sheet says of the ironwork, in as many
@@ -530,8 +607,9 @@ export const GRILLES = [
      were drawing the only evidence door for that pattern in the wrong colour,
      with no option to correct it.
      Appended to the end of the list, so no `VERSION` bump. */
-  { id: 'quatrefoil',   he: 'מדליוני פרח',     en: 'Quatrefoil column',
-    doors: ['d104'] },
+  /* ⚠ `quatrefoil` AND `quatrefoil-light` ARE WITHDRAWN — Peretz named
+     מדליוני פרח among the three he does not sell. One measured door (d104)
+     carried it. Both ids resolve to `scroll`, the nearest surviving pattern. */
   { id: 'arch',    he: 'קשת',            en: 'Arch',            doors: ['d121'] },
   { id: 'deco',    he: 'קווים גיאומטריים', en: 'Art-deco lines', doors: ['d123'] },
   /* Worked GLASS. In the pane, not on it. */
@@ -541,7 +619,8 @@ export const GRILLES = [
     doors: ['d109', 'd111'] },
   { id: 'tree',    he: 'עץ',             en: 'Tree',            glass: true,
     doors: ['d114'] },
-  { id: 'mesh',    he: 'זכוכית מעוצבת',  en: 'Etched mesh',     glass: true, aliases: ['lattice'],
+  { id: 'mesh',    he: 'זכוכית מעוצבת',  en: 'Etched mesh',     glass: true,
+    aliases: ['lattice', 'reeded'],
     doors: ['d102', 'd105', 'd116', 'd127'] },
   /* ⚠ d125 was in TWO of the prose lists — under `reeded` and under "nothing
      at all" — and turning the prose into data is what made the contradiction
@@ -566,13 +645,11 @@ export const GRILLES = [
   /* The three missing `-light` twins, appended so the ids already in the wild
      keep their indices. `light` is the same one switch it has always been: the
      same ironwork, painted the door's colour instead of black. */
-  { id: 'quatrefoil-light', he: 'מדליוני פרח בהיר',
-    en: 'Quatrefoil column, door colour', light: true },
   { id: 'arch-light', he: 'קשת בהירה', en: 'Arch, door colour', light: true },
   { id: 'deco-light', he: 'קווים גיאומטריים בהירים',
     en: 'Art-deco lines, door colour', light: true },
-  { id: 'reeded',  he: 'זכוכית מחורצת',  en: 'Reeded',          glass: true,
-    doors: ['d122', 'd125'] },
+  /* ⚠ `reeded` IS WITHDRAWN — זכוכית מחורצת, the third of the three. It
+     resolves to `mesh`, the other worked glass. */
 ];
 
 /**
@@ -1284,3 +1361,21 @@ priceInto('grille',  GRILLES,              GRILLE_PRICE,  'delta');
 priceInto('detail',  DETAILS,              DETAIL_PRICE,  'delta');
 priceInto('handle',  HANDLES,              HANDLE_PRICE,  'delta');
 priceInto('lockset', LOCKSETS,             LOCKSET_PRICE, 'delta');
+priceInto('special lock', SPECIAL_LOCKS,    SPECIAL_LOCK_PRICE, 'delta');
+
+/* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and this is the only place
+   in the catalogue where an option has two prices. See `DETAIL_GLAZED` in
+   prices.js for Peretz's three figures and why they describe two products:
+   ₪2,700 solid, ₪1,000 on a door already paying ₪3,700 for its window, which
+   is his "square with greek +4700".
+   Attached with the same refuse-rather-than-default discipline as everything
+   else here: a `DETAIL_GLAZED` key naming a face that does not exist is a
+   price nobody will be charged, and it throws. */
+for (const [id, shekels] of Object.entries(DETAIL_GLAZED)) {
+  const o = DETAILS.find(d => d.id === id);
+  if (!o) {
+    throw new Error(`prices.js DETAIL_GLAZED prices "${id}", which is not a face `
+                  + 'in the catalogue');
+  }
+  o.deltaGlazed = agorot(shekels);
+}

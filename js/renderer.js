@@ -17,7 +17,7 @@
  */
 
 import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES,
-         hasUpperPanel, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+         hasUpperPanel, LOCKSETS, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
@@ -323,6 +323,12 @@ const EDGE  = 38;      // 0.045 W — the ramp, not a band
 const HANDLE_AFF   = 1020;  // 0.486 H — the steadiest number in the whole set
 const CYLINDER_AFF = 904;   // 0.1225 W below the lever, on the same axis
 const PEEPHOLE_AFF = 1600;  // 0.762 H
+/* The extra lock sits BELOW the cylinder on the same axis, where a second
+   keyway or a keypad goes on a door that already has its lock at waist height.
+   Far enough down (250 mm) that its body clears the cylinder's escutcheon on
+   every lockset in the range, and high enough to stay well inside the lock
+   stile rather than running into the plinth of a panelled face. */
+const SPECIAL_AFF  = CYLINDER_AFF - 250;
 const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
 /* Hinge heights, 0.144 / 0.504 / 0.857 H, kept as a note rather than as code.
    These doors open inwards, so from the street the hinges are hidden in the
@@ -911,6 +917,7 @@ export function render(state) {
   const grille  = byId(GRILLES, state.grille);
   const handle  = byId(HANDLES, state.handle);
   const lockset = byId(LOCKSETS, state.lockset);
+  const special = byId(SPECIAL_LOCKS, state.speciallock);
   const detail  = byId(DETAILS, state.detail);
   /* The finish is the handle's own or brushed nickel; it stopped being a
      customer choice when the group was withdrawn. Shiran is an antique brass
@@ -2273,6 +2280,14 @@ export function render(state) {
              second round the keyhole has had to be nailed down, and the first
              fix only caught the grip. */''
       }${lockset.lock ? '' : cylinder(keyX, y(CYLINDER_AFF))}
+    ${/* ⚠ THE EXTRA LOCK IS DRAWN, AND THAT IS NOT DECORATION. A כספת is ₪700
+          and a קודן is ₪900, and a configurator that takes money for something
+          the drawing does not show is a hidden cost with a label on it — the
+          same argument that withdrew the add-ons and the finish axis. It also
+          has to be here for `npm run collide` to sweep it: an obstacle the
+          rules believe in and the drawing does not is a fault this file has
+          had four times. */''
+      }${specialLockArt(special, keyX, y(SPECIAL_AFF), leverDir)}
   </g>
 
   <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
@@ -3349,6 +3364,47 @@ export function gripCanRotate(state) {
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const long = handleFootprint(handle, leafH).vy * 2;
   return long > 0 && long <= leafW - EDGE_FLAT * 2;
+}
+
+/**
+ * THE EXTRA LOCK ON THE LEAF — a safe lock or a keypad, below the cylinder.
+ *
+ * Small, deliberately: both are utilitarian fittings that sit under the lock
+ * on a real door, and drawing them large would make a ₪700 option the loudest
+ * thing on a ₪3,150 door. Measured against nothing — there is no photograph of
+ * either in the corpus, because neither existed in the catalogue until Peretz
+ * named them — so the geometry is honest about being conventional rather than
+ * measured: a euro-cylinder-width body for the safe lock, a keypad two
+ * cylinders tall. If a photograph of one arrives, REALISM.md §6 governs and
+ * this is re-read against it.
+ *
+ * `data-hw="lock"` so `npm run collide` sweeps it with the rest of the lock
+ * furniture, and `data-kind` so the sweep can name it when it does collide.
+ */
+function specialLockArt(special, cx, cy, dir) {
+  if (!special || special.id === 'nospecial') return '';
+  const W = 62, keypadH = 96;
+  const x = cx + dir * 0;          // on the cylinder's own axis
+  if (special.id === 'kasefet') {
+    return `
+    <g data-hw="lock" data-owner="speciallock" data-kind="kasefet">
+      <rect x="${x - W / 2}" y="${cy - W / 2}" width="${W}" height="${W}" rx="7"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
+      <circle cx="${x}" cy="${cy}" r="${W * 0.27}" fill="none"
+              stroke="#000" stroke-opacity=".38" stroke-width="4"/>
+      <circle cx="${x}" cy="${cy}" r="4.5" fill="#000" fill-opacity=".42"/>
+    </g>`;
+  }
+  return `
+    <g data-hw="lock" data-owner="speciallock" data-kind="kodan">
+      <rect x="${x - W / 2}" y="${cy - keypadH / 2}" width="${W}" height="${keypadH}" rx="10"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
+      <rect x="${x - W / 2 + 8}" y="${cy - keypadH / 2 + 9}" width="${W - 16}" height="18" rx="3"
+            fill="#000" fill-opacity=".30"/>
+      ${[0, 1, 2].map(r => [0, 1, 2].map(c =>
+        `<circle cx="${x - 15 + c * 15}" cy="${cy - 2 + r * 16}" r="4.2"
+                 fill="#000" fill-opacity=".26"/>`).join('')).join('')}
+    </g>`;
 }
 
 /** Is this grip cut into the leaf rather than bolted onto it? */
@@ -7975,6 +8031,45 @@ export function handleGlyph(handle) {
 
 /** Lock furniture shares the drawing; only the list it is chosen from differs. */
 export const locksetGlyph = handleGlyph;
+
+/**
+ * The extra lock — none, a safe lock, a keypad.
+ *
+ * ⚠ THREE GLYPHS THAT CANNOT BE MISTAKEN FOR EACH OTHER, which is the standing
+ * rule for this file: `npm test` compares the markup of every option tile
+ * against every other, and it exists because nine handles once shared one
+ * picture under nine names and nine prices.
+ *
+ * Drawn in the same 3:4 window and the same `currentColor` as the hardware
+ * tiles beside them, so the row reads as one family:
+ *   `nospecial` — the plain leaf edge, nothing on it
+ *   `kasefet`   — a safe: a square body with a round dial and a spindle
+ *   `kodan`     — a keypad: a rounded body over a grid of nine buttons
+ */
+export function specialLockGlyph(x) {
+  const art = {
+    nospecial: `
+    <rect x="-52" y="-70" width="104" height="140" rx="6" opacity=".18"/>
+    <path d="M-22 0h44" stroke="currentColor" stroke-width="7" fill="none" opacity=".55"/>`,
+    kasefet: `
+    <rect x="-56" y="-64" width="112" height="128" rx="9"/>
+    <rect x="-42" y="-50" width="84" height="100" rx="5" fill="#fff" opacity=".92"/>
+    <circle cx="6" cy="0" r="24" fill="none" stroke="currentColor" stroke-width="8"/>
+    <circle cx="6" cy="0" r="7"/>
+    <path d="M6 -24v-9M6 24v9M-18 0h-9M30 0h9" stroke="currentColor"
+          stroke-width="6" fill="none"/>
+    <rect x="-36" y="-6" width="9" height="12" rx="2"/>`,
+    kodan: `
+    <rect x="-46" y="-72" width="92" height="144" rx="14"/>
+    <rect x="-34" y="-58" width="68" height="26" rx="4" fill="#fff" opacity=".92"/>
+    ${[0, 1, 2].map(r => [0, 1, 2].map(c =>
+      `<circle cx="${-22 + c * 22}" cy="${-14 + r * 24}" r="7" fill="#fff" opacity=".92"/>`)
+      .join('')).join('')}`,
+  }[x.id] || '';
+  return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+}
 
 /**
  * Detail glyph: where the panel, groove and applied strips sit on the leaf.

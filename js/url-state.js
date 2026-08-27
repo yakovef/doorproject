@@ -8,7 +8,8 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES,
+         SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
 /* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
@@ -93,8 +94,28 @@ import { repair } from './rules.js';
    ⚠ Still free, and this is the third bump to say so. The site is noindex,
    undeployed, and not one code has been given to a customer. `window` has five
    spare values and `detail` twelve after this; the next list to watch is
-   `size` at two, which ASK-PERETZ §8 expects Peretz to replace wholesale. */
-export const VERSION = 13;
+   `size` at two, which ASK-PERETZ §8 expects Peretz to replace wholesale.
+
+   ── 14 · the catalogue meets Peretz's real range, 26.8.2026 ───────────
+   `speciallock` is a new field (כספת · קודן); seven options were withdrawn on
+   his say-so (ברזל מחושל and its light twin, מדליוני פרח and its twin,
+   זכוכית מחורצת, שירן, להב שטוח, אלמוג); and one size was appended. Every
+   withdrawal shifts the indexes of everything after it in its list, which is
+   exactly the break a version exists to refuse.
+
+   ⚠ AND THE CODE IS STILL EIGHT CHARACTERS. Two over-wide fields paid for the
+   new one — see `BITS` — so the payload is still 36 and the check nibble keeps
+   its full four bits. A longer code would have been the easy answer and a
+   worse one: the code's whole purpose is being read aloud on a telephone.
+
+   ⚠ THE PLAN SAID TO BUMP ONCE AT THE END OF THE CATALOGUE WORK, AND THAT WAS
+   WRONG. TRANSFORM.md §5.7 argued for a single bump across phases 2 to 6, on
+   the grounds that five bumps issue five refusals for codes that never
+   existed. True, and beside the point: a VERSION that stays still while the
+   LAYOUT moves means an old code decodes into a different door with nothing
+   flagging it, which is the precise failure this number exists to prevent.
+   Bumps are free while nothing is deployed. Silence is not. */
+export const VERSION = 14;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -139,6 +160,11 @@ export const DEFAULTS = {
   grille:  'none',
   handle:  'none',
   lockset: 'cylinder',
+  /* ⚠ EVERY NEW FIELD NEEDS A DEFAULT HERE THE DAY IT IS INVENTED. A state
+     missing a key encodes as `undefined`, which `BigInt()` throws on — or
+     worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
+     becomes the first entry in the list. */
+  speciallock: 'nospecial',
   detail:  'plain',
   size:    'standard',
   handing: 'right-in',
@@ -155,6 +181,7 @@ export function toQuery(state) {
   p.set('g', state.grille);
   p.set('n', state.handle);
   p.set('k', state.lockset);
+  p.set('x', state.speciallock);
   p.set('d', state.detail);
   p.set('s', state.size);
   p.set('h', state.handing);
@@ -213,7 +240,7 @@ export function fromQuery(search) {
      a choice could not be read — above a document in which every choice had
      been read perfectly. A new switch joins this list the same day it is
      invented, like everything added to the bare-mode hide list. */
-  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'd', 's', 'h', 'gp',
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'd', 's', 'h', 'gp',
                            'code', 'bare', 'sheet']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -288,6 +315,7 @@ export function fromQuery(search) {
   }
   take('detail', 'd', DETAILS);
   take('handing', 'h', HANDINGS);
+  take('speciallock', 'x', SPECIAL_LOCKS);
 
   const rawSize = p.get('s');
   if (rawSize != null) {
@@ -449,8 +477,24 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    was cut to two shapes and none, so it is the one field with a bit to spare
    that is not the check nibble's or the colour list's. Payload unchanged at
    36; code unchanged at eight characters. */
-export const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 3,
-                      grille: 5, handle: 4, lockset: 4, detail: 5 };
+/* ⚠ RE-CUT FOR `speciallock`, AND THE CODE IS STILL EIGHT CHARACTERS.
+   A new field needs bits and the obvious answer is a longer code. It is not
+   needed here: two fields were carrying more width than their lists have ever
+   used, and tightening them pays for the new one exactly.
+
+     colour   6 -> 5    17 entries, and 5 bits holds 32
+     window   3 -> 2     3 entries, and it has been 3 since the list was cut
+
+   Payload stays at 36, so `PAD_BITS` stays at 4 and the CRC nibble keeps its
+   full width. ⚠ THAT IS THE POINT OF DOING IT THIS WAY. Letting the payload
+   fall to 34 would round the total to 35 and leave the check ONE bit — turning
+   a 1-in-16 chance of a typo slipping through into 1-in-2, silently, as a side
+   effect of tidying. The check nibble is what makes a code safe to read down a
+   telephone (REDESIGN.md §1.5: 38.4% of single-character typos used to decode
+   to a different valid door); it is never the thing that gives way. */
+export const BITS = { version: 4, colour: 5, size: 3, handing: 2, window: 2,
+                      grille: 5, handle: 4, lockset: 4, detail: 5,
+                      speciallock: 2 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */
@@ -517,6 +561,8 @@ export function encodeCode(state) {
     [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
     [Math.max(0, LOCKSETS.findIndex(k => k.id === state.lockset)), BITS.lockset],
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
+    [Math.max(0, SPECIAL_LOCKS.findIndex(x => x.id === state.speciallock)),
+     BITS.speciallock],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -577,11 +623,13 @@ export function decodeCode(code) {
   const handle  = HANDLES[read(BITS.handle)];
   const lockset = LOCKSETS[read(BITS.lockset)];
   const detail  = DETAILS[read(BITS.detail)];
+  const special = SPECIAL_LOCKS[read(BITS.speciallock)];
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail) return null;
+      || !detail || !special) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
+    speciallock: special.id,
   };
 }
