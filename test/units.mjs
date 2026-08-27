@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { STRIPE_LEGACY, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { L, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
@@ -638,6 +638,30 @@ group('price');
      'withdrawn iron should price as grid');
   ok(P({ window: 'rect', grille: 'reeded' }) === P({ window: 'rect', grille: 'mesh' }),
      'withdrawn reeded should price as mesh');
+  /* ⚠ THE FOURTEEN RETIRED STRIPE IDS — T5's second half, and the half that
+     was not asserted anywhere. Phase 6 turned fourteen named stripe patterns
+     into a direction and a count, and every one of those names is a `d=` in
+     links customers have already sent Peretz. They are not aliases of a
+     surviving DETAIL — there is nothing left in `DETAILS` for them to point
+     at — so they migrate to `(stripeDir, stripeCount, stripeTight)` in
+     `fromQuery`, which is a code path nothing else exercises.
+     Asserted against `STRIPE_LEGACY` itself rather than against a table
+     written out here: a second copy of fourteen rows is CLAUDE.md §5's exact
+     shape, and the failure it produces is a link that opens the wrong door
+     while both tables look right. */
+  for (const [id, want] of Object.entries(STRIPE_LEGACY)) {
+    const { state: got } = fromQuery(`?v=${VERSION}&d=${id}`);
+    ok(got.stripeDir === want.stripeDir && got.stripeCount === want.stripeCount
+       && got.stripeTight === want.stripeTight,
+       `?d=${id} — a link already in the wild — opened `
+     + `${got.stripeDir}/${got.stripeCount}${got.stripeTight ? '/tight' : ''} and `
+     + `STRIPE_LEGACY says ${want.stripeDir}/${want.stripeCount}`
+     + `${want.stripeTight ? '/tight' : ''}`);
+    ok(buildable(repair(got).state),
+       `?d=${id} migrates to a door the rules refuse`);
+    ok(stripePrice(got) > 0, `?d=${id} migrated to a door with no stripes on it`);
+  }
+
   // Luna is gone from the catalogue; its id must still land somewhere real.
   ok(P({ handle: 'luna' }) === P({ handle: 'idan' }), 'retired luna should price as idan');
 

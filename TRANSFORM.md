@@ -1693,7 +1693,7 @@ Every one of these exists because something in this plan can fail silently.
 | T2 | The standard door with nothing on it is exactly ₪3,150 | §1 — the one number Peretz will check |
 | T3 | `leafW`/`leafH` identical across all four mashkofs, every size | §6.2 — the fault the user reported on the classical set |
 | T4 | For every grip × pirzul pair, the lever's fill carries the PIRZUL tone | §7.3 — and the existing test asserts the mirror, so it would agree with the bug |
-| T5 | Every retired id resolves to a buildable door, including the stripe → (dir,count) migration | §9.2 |
+| T5 | Every retired id resolves to a buildable door, including the stripe → (dir,count) migration | §9.2 — ⚠ the handle/lockset/grille half was asserted in phase 2; **the stripe half was not, and was added 27.8**. Fourteen `d=` ids already in links customers have sent, migrating through a code path nothing else exercises. Falsified: 1 failure with a count changed, 0 with it restored |
 | T6 | `handleLen` never exceeds the leaf; `repair()` pulls a stale one from a link | §8.2 |
 | T7 | `ok(list.length <= 2 ** BITS[f])` extended to every NEW field | §5.7 — a 17th entry encodes as index 0 in silence |
 | T8 | The cylinder is on the same side in he, en and ru | §13 — the hinge trap |
