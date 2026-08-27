@@ -23,6 +23,106 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-27 10:48 UTC — run 43: nothing worth changing — TRANSFORM.md is complete. All twelve phases landed; the site is launch-ready
+
+**The headline:** six more commits landed phases 6–11, and `TRANSFORM.md` §0's
+status table now reads **`✅ done`** on every row, 0 through 11. This is the
+whole plan, finished: `PLACEHOLDER = false`, the "גרסת פיתוח" development strip
+is gone from the page, real prices are what a customer sees, and
+`ASK-PERETZ.md` went from 776 lines to 89. This is not a routine round to
+skim — read the six commit messages in full before touching anything, which
+is what I did before running a single instrument.
+
+**Phases 6–11, briefly:**
+- **6 — stripes become a count.** Fourteen named patterns collapsed to a
+  direction + count + tight/spread toggle, packed as one ordinal so an
+  impossible state (`dir:'h', count:0`) cannot exist. Fourteen retired ids
+  MIGRATE via a new mechanism (`STRIPE_LEGACY` — an alias cannot express one
+  id becoming three fields) rather than silently opening a plain door.
+  `VERSION 18`.
+- **7 — the cabinet becomes an 8-step guided flow + a quote page.** Six
+  accordion functions deleted outright rather than left dead. A shared link
+  opens at the summary, not step 1. `npm run latency` dropped 501→123 ms.
+- **8 — motion.** The kill-switch for `?bare=1`/reduced-motion shipped
+  *before* the first keyframe, measured at 0 animations under both. No
+  second render path — `stampChange` keys CSS entry animations off which
+  state field moved, since `render(state)` stays pure and byte-identical.
+- **9 — leaf texture + full-bleed desktop.** Grain raised two measured steps
+  (sub-linear response, honestly written down rather than chased further).
+  **The historical `dark reed 1.044` moulding-bead red went fully green
+  here, and the human round says plainly "I cannot say why."** See below —
+  I can now partly clarify this, but not resolve the actual mystery.
+- **10 — Hebrew/English/Russian.** The load-bearing rule: `svg { direction:
+  ltr }`, one line, asserted as a byte-identical-SVG-across-languages test.
+  The WhatsApp order always stays Hebrew (Peretz is its reader) and now
+  names the customer's language. Three real bugs found by opening the page
+  rather than by an assertion — a price rendering as two different strings
+  depending on bidi paint order, `?sheet=1` throwing on every load in every
+  language from *before* this phase, and `?lang=` itself tripping the
+  unknown-option notice.
+- **11 — the final sweep.** `PLACEHOLDER = false`. The flag itself stays
+  (for the next unpriced product), only the strip goes. `ASK-PERETZ.md`
+  776→89 lines, every answered question deleted rather than struck through.
+
+**⚠ On the "profile is green and nobody knows why" note (CLAUDE.md §0c and
+the phase-9 change-log entry):** I read this carefully because I fixed a
+profile.mjs problem myself in run 42, and wanted to know if this was the
+same thing before assuming either way. **It is not.** CLAUDE.md's note is
+specifically and only about the *moulding-bead* check (`dark reed`,
+1.044→0.999) — a check I never touched. My run 42 fix was to a *different*
+check in the same file (the panel *shading-rate* check, which phase 3's
+mashkof-anchoring change had broken by shrinking the leaf's on-screen
+resolution enough to expose an already-marginal sample point 17mm from the
+Idan bar's edge). Both checks live in `tools/profile.mjs`; both went red
+and green again within the same few days; they are unrelated events. The
+bead check's own mystery is real and still open — I did not solve it and
+am not claiming to. Left CLAUDE.md's text untouched since it is accurate as
+written; noting the distinction here so a future reader of both logs does
+not conflate the two.
+
+**Looked at:** `AGENT.md` unchanged. Built (no diff). Opened the site at
+phone and desktop (arrival animation settled, ₪3,150 default door, real
+size-band prices with no development banner anywhere — confirms
+`PLACEHOLDER = false` visually, not just by reading the source). Clicked
+into step 2 (משקוף) on desktop — navigator shows `08/02`, four mashkof
+tiles with real prices ₪500–₪1,000, standard pre-selected. Loaded the page
+in English and Russian — layout correctly mirrors to LTR for English
+(logo/nav/language-switcher order all flip), Cyrillic renders correctly in
+Russian, and **the door drawing itself is pixel-identical in all three** —
+exactly phase 10's central promise, checked by eye rather than trusted from
+the commit message. Loaded a hand-typed query-string combination directly
+(not a real shared link) and saw the `combination-fixed` notice fire —
+traced this to `url-state.js`'s own logic (any `repair()` change fires a
+notice, not only an unrecognised option) rather than assuming it was a bug;
+correct, expected behaviour for an unnatural test combination, not
+something to chase further.
+
+**Instruments:** test ✓ (5,403,239 / 0, matches phase 10's own count
+exactly) · audit ✓ (all seven viewports clean, **plus a new "languages"
+check** — the door survives a language switch without mirroring) · profile
+✓✓ (genuinely fully green on all rows — both the historical bead mystery
+and my own run-42 shading-rate fix hold up under phase 9's grain increase)
+· collide ✓ on both `all` (970 designs, down from 1,074 — consistent with
+phase 6 consolidating fourteen stripe ids into three packed fields) and
+`boxes` (every fitting fits its declared footprint) · recreate ✓ (same
+already-documented catalogue gaps, nothing new).
+
+**Changed:** nothing. A genuinely enormous, thoroughly self-documented,
+correctly-verified round — every phase's own "Green:" line matches what I
+independently reproduced, wire-format bumps were taken exactly when needed
+and not when they weren't, and the one open mystery (the bead check) is
+honestly reported as still open rather than quietly claimed.
+
+**Left alone deliberately:** the moulding-bead check's own "why did this go
+green" question — genuinely not mine to solve this run, and the human round
+was explicit that it remains unresolved rather than guessing at an
+explanation to close the ticket.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-27 06:01 UTC — run 42: found and fixed a real instrument regression in `npm run profile`, caused (indirectly and legitimately) by TRANSFORM phase 3
 
 **Looked at:** three more human commits landed phases 3–5 of `TRANSFORM.md` —
