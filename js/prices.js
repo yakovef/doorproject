@@ -330,6 +330,18 @@ export const SPECIAL_LOCK = {
   kodan:     900,    // קודן
 };
 
+/* ── פרזול — the finish of the lock furniture ─────────────────────────
+   Peretz: "pirzul: color: black +300, bronze +500, gold +900". It changes the
+   ידית, the צירים, the עינית and the סגר ביטחון — and explicitly NOT the
+   stripes or the pull handle, which is the bug he reported in the same
+   breath. See PIRZUL in catalog.js. */
+export const PIRZUL = {
+  'pz-nickel': 0,    // ניקל   — the one included as standard
+  'pz-black':  300,  // שחור
+  'pz-bronze': 500,  // ברונזה
+  'pz-gold':   900,  // זהב
+};
+
 /* ── colour ───────────────────────────────────────────────────────────
    Every colour is included today. ⚠ Peretz may well charge for some of them —
    metallics and wood-look finishes usually cost more — and ASK-PERETZ.md §3

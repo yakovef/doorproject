@@ -198,7 +198,7 @@ export const GRIP_ILLUSTRATIVE = 'להמחשה — נקבע בהתקנה';
  *
  * ⚠ THIS IS WHERE A BRASS LOCKSET THAT DOES NOT EXIST CAME FROM. The finish
  * used to be appended to the LOCKSET line, and the value appended was
- * `effectiveFinish` — the GRIP's finish, which is what the renderer paints all
+ * `gripFinish` — the GRIP's finish, which is what the renderer paints all
  * the metal in. So `handle=ella, lockset=coral` sent Peretz
  * "מנעול וידית: קורל · פליז": an instruction to order brass Coral lever
  * furniture. Coral is a nickel lever. Ella is a brass PULL BAR, and the brass

@@ -18,7 +18,7 @@
 
 import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          BUILD, MASHKOF_WIDER,
-         COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE,
+         COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE, PIRZUL as PIRZUL_PRICE,
          GRILLE as GRILLE_PRICE, DETAIL as DETAIL_PRICE, DETAIL_GLAZED,
          HANDLE as HANDLE_PRICE, LOCKSET as LOCKSET_PRICE,
          SPECIAL_LOCK as SPECIAL_LOCK_PRICE } from './prices.js';
@@ -287,7 +287,7 @@ export const HANDLES = [
   { id: 'idan',    he: 'עידן',  en: 'Idan',   len: 1050, w: 32, style: 'bar', bar: 'idan', pull: true,
     aliases: ['bar-long', 'luna', 'shiran'] },
   /* Brass, and the catalogue never said so: with no `finish` of its own
-     `effectiveFinish` fell through to steel and the bar the inventory calls
+     `gripFinish` fell through to steel and the bar the inventory calls
      brass rendered silver on every door. d072, d074 and d082 are gold rods at
      0.017-0.024 of leaf width — half what we drew. */
   { id: 'ella',    he: 'אלה',   en: 'Ella',   len: 1000, w: 20, style: 'bar', bar: 'ella', pull: true,
@@ -351,7 +351,7 @@ export const HANDLES = [
      800 x 20 on that door — a slim tube, shorter than anything else in the
      range, which is what leaves the leaf's ornament room to be seen.
      `finish: 'black'` reaches the lock furniture too, through
-     `effectiveFinish`: on this door the keyway escutcheon is the same black. */
+     `gripFinish`: on this door the keyway escutcheon is the same black. */
   { id: 'barblack', he: 'מוט שחור', en: 'Black tube bar', len: 800, w: 20,
     style: 'bar', bar: 'ron', pull: true, finish: 'black' },
 ];
@@ -504,6 +504,34 @@ export const LOCKSETS = [
  * viewer looks up into it, which is a fact about the viewpoint and not about
  * the section.
  */
+/**
+ * פרזול — THE FINISH OF THE LOCK FURNITURE, and a category that did not exist.
+ *
+ * Peretz, 26.8.2026: *"pirzul: color: black +300, bronze +500, gold +900 ·
+ * pirzul changes the color of the: ידית, צירים, עינית, סגר ביטחון · it doesnt
+ * change the color of the stripes or the pull handles."*
+ *
+ * ⚠ A FINISH AXIS EXISTED ONCE AND WAS WITHDRAWN. THIS IS NOT THAT AXIS.
+ * The old one was the PULL HANDLE's finish, priced at ₪220 for a decision the
+ * owner said his customers do not make, and its URL parameter `f=` is retired
+ * forever (CLAUDE.md §1). This one is the LOCK FURNITURE's finish, priced by
+ * Peretz himself in three steps, and it governs a different set of objects —
+ * he was explicit that it does NOT touch the pull handle. New parameter: `pz=`.
+ *
+ * `tone` names an entry in the renderer's `FINISH_TONES`, which is where the
+ * measured metal ramps live. Bronze borrows the brass ramp: the corpus has
+ * three bronze fittings (d128's escutcheon at RGB 96,81,72 among them) and
+ * they sit inside the brass family's range rather than needing a fourth ramp
+ * measured from three photographs. Recorded rather than hidden — if Peretz
+ * says bronze reads differently, it is one ramp.
+ */
+export const PIRZUL = [
+  { id: 'pz-nickel', he: 'ניקל',   en: 'Nickel', tone: 'steel' },
+  { id: 'pz-black',  he: 'שחור',   en: 'Black',  tone: 'black' },
+  { id: 'pz-bronze', he: 'ברונזה', en: 'Bronze', tone: 'brass' },
+  { id: 'pz-gold',   he: 'זהב',    en: 'Gold',   tone: 'brass' },
+];
+
 export const MASHKOFS = [
   { id: 'mk-std',  he: 'סטנדרטי',   en: 'Standard',    out: 46, in:  62, head: 148 },
   { id: 'mk-out',  he: 'חזית רחבה', en: 'Wide face',   out: 82, in:  62, head: 148, wideOut: true },
@@ -1152,7 +1180,7 @@ export const colourCode = c => `רב בריח ${c.ral}`;
  * recorded in `REDESIGN.md` rather than papered over — a brass Ella still
  * paints the Coral lever beside it gold.
  */
-export function effectiveFinish(state) {
+export function gripFinish(state) {
   /* Stated once, through `declaredFinish`, so the two cannot drift: the paint
      is whatever the grip declares, and brushed nickel only where it declares
      nothing. Spelled out a second time as `byId(FINISHES, …finish || 'steel')`
@@ -1425,6 +1453,7 @@ priceInto('detail',  DETAILS,              DETAIL_PRICE,  'delta');
 priceInto('handle',  HANDLES,              HANDLE_PRICE,  'delta');
 priceInto('lockset', LOCKSETS,             LOCKSET_PRICE, 'delta');
 priceInto('special lock', SPECIAL_LOCKS,    SPECIAL_LOCK_PRICE, 'delta');
+priceInto('pirzul',  PIRZUL,               PIRZUL_PRICE,  'delta');
 
 /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and this is the only place
    in the catalogue where an option has two prices. See `DETAIL_GLAZED` in

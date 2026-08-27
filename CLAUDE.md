@@ -1319,6 +1319,52 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE PULL HANDLE NO LONGER RECOLOURS THE LOCK FURNITURE — the bug Peretz
+  reported in his own words.** *"some pull handles change the color of the
+  handle and the keyhole, fix it."* The renderer built ONE set of metal
+  gradients per door out of `effectiveFinish` — the GRIP's finish — so the
+  brass Ella painted the Coral lever and the keyway beside it gold.
+  `REDESIGN.md` §1.1 fixed the half that reached the MESSAGE and left the
+  drawing disagreeing on purpose (`ASK-PERETZ.md` §2b1), because nobody had
+  confirmed which way round it should be. Two of his own photographs already
+  said the finishes are independent — d072 gold bar / near-black escutcheon,
+  d128 chrome tube / bronze escutcheon.
+  Now there are two metals on a door: `tone` is the grip's own and paints the
+  bar, `hwTone` is the customer's **פרזול** and paints the lever, the rose, the
+  backplate, the keyway and the extra lock. `effectiveFinish` is **`gripFinish`**
+  — the function was right and its NAME was the lie.
+  ⚠ **The test that existed asserted the mirror of this** and would have agreed
+  with the bug: it checked that a brass grip made the finish helper say brass,
+  true before and after. The new one reads the EMITTED GRADIENT over all 36
+  grip × pirzul pairs. Same trap as `ASK-PERETZ.md` §1's handing.
+  ⚠ **פרזול is not the withdrawn finish axis coming back.** That one was the
+  PULL HANDLE's, priced at ₪220 for a decision the owner says his customers do
+  not make, and `f=` is retired forever. This is the lock furniture's, priced
+  by Peretz in three steps. New parameter `pz=`.
+  ⚠ **The hinges follow it in the ORDER and nowhere else**, because they are
+  not drawn — these doors open inwards, so from the street they are hidden in
+  the rebate. That is why the פרזול spec row is printed even when it is the
+  default nickel: it is the only place the order says what colour they are.
+
+- **⚠ TWO FAULTS IN THE SHORT CODE, BOTH FOUND BY BUMPING INTO THEM.**
+  1. **The check nibble was a REMAINDER, not a floor.** `TOTAL_BITS` was
+     `ceil(payload/5)*5`, so the check got whatever was left over — 4 bits at
+     payload 36 and **2** at payload 38. Adding one two-bit field silently
+     halves the typo protection with nothing in the arithmetic to say so. It
+     caught two consecutive bumps; both times the temptation was to shave the
+     check to make the sum come out. It is a FLOOR now: `CHECK_MIN` is reserved
+     BEFORE the rounding, so the code gets longer when it must — which is the
+     correct thing to give way. `REDESIGN.md` §1.5: with no check, 38.4% of
+     single-character typos decoded to a different valid door.
+  2. **`VERSION` itself could overflow, and nothing was checking.** The field
+     was 4 bits; **version 16 does not fit in 4 bits**, so it encoded as 0,
+     decode compared 0 against 16, and every code the app produced was refused.
+     It failed loudly, which is luck — a VERSION wrapping onto a number this app
+     had once USED would have read an old layout as a new one. Five bits now,
+     and `npm test` asserts both that it fits and that it has four spare.
+  **The code is nine characters** as of version 16 — `DM-` and nine, in two
+  groups read aloud.
+
 - **⚠ משקוף IS A CATEGORY NOW — the frame the door closes onto.** Asked for by
   name from outside. It was always drawn and never choosable, and it is
   ₪500–₪1,000 of a ₪3,150 door: four options (`MASHKOFS`), two independent

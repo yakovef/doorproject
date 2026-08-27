@@ -29,7 +29,7 @@
 
 import {
   byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
-  GRILLES, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, PLACEHOLDER, SIZES,
+  GRILLES, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, PIRZUL, PLACEHOLDER, SIZES,
   SPECIAL_LOCKS, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, tileAgorot }
@@ -37,7 +37,8 @@ import { breakdownRows, formatAgorot, priceAgorot, priceLabel, tileAgorot }
 import {
   describe, detailGlyph, gripAt, gripCanRotate, gripHome, gripIsFixed,
   gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
-  copyOf, mashkofGlyph, render, sizeGlyph, specialLockGlyph, windowGlyph,
+  copyOf, mashkofGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph,
+  windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
@@ -93,6 +94,14 @@ const GROUPS = [
   { key: 'speciallock', title: 'מנעול מיוחד', in: 'hw', kind: 'hw',
     list: () => SPECIAL_LOCKS, glyph: specialLockGlyph,
     hint: 'נעילה נוספת מעבר למנעול הרגיל.' },
+
+  /* ⚠ THE FINISH OF THE LOCK FURNITURE, AND NOT OF THE PULL HANDLE. Peretz was
+     explicit that פרזול recolours the ידית, the צירים, the עינית and the
+     סגר ביטחון and NOT the pull handle or the stripes — which is also the bug
+     he reported in the same sentence. A pull bar's finish is a fact about that
+     product (Ella is brass); this is a choice, and it is ₪0 to ₪900. */
+  { key: 'pirzul', title: 'פרזול', in: 'hw', kind: 'hw', list: () => PIRZUL,
+    glyph: pirzulGlyph, hint: 'הגוון של הידית, הצירים והעינית.' },
 
   { key: 'size', title: 'מידה', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
     /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was

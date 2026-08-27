@@ -16,9 +16,9 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES,
-         hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, SIZES, SPECIAL_LOCKS,
-         WINDOWS } from './catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
+         hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, PIRZUL, SIZES,
+         SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
@@ -931,8 +931,28 @@ export function render(state) {
      customer choice when the group was withdrawn. Shiran is an antique brass
      casting and says so on its catalogue entry, which is where a fact about a
      product belongs. */
-  const finish  = effectiveFinish(state);
+  /* ⚠ TWO METALS ON ONE DOOR, AND THAT IS THE WHOLE OF PHASE 4.
+     Reported by Peretz in his own words, 26.8.2026: *"some pull handles change
+     the color of the handle and the keyhole, fix it."*
+
+     He is right and the defect is old. This renderer built ONE set of metal
+     gradients per door out of `gripFinish` — the PULL BAR's finish — so
+     choosing the brass Ella painted the Coral lever and the keyway beside it
+     gold. `REDESIGN.md` §1.1 fixed the half of it that reached the MESSAGE and
+     left the drawing disagreeing on purpose, recorded in `ASK-PERETZ.md` §2b1,
+     because nobody had confirmed which way round it should be. Two of his own
+     photographs said the two finishes are independent — d072 has a gold bar
+     beside a near-black escutcheon, d128 a chrome tube beside a bronze one —
+     and now he has said so.
+
+     So: `tone` is the GRIP's own metal and paints the bar and nothing else.
+     `hwTone` is the customer's פרזול and paints the lock furniture, the
+     keyway, and the extra lock. A pull handle's finish is a fact about that
+     product (Ella is brass); the lock furniture's is a choice, and it is
+     ₪0–₪900. */
+  const finish  = gripFinish(state);
   const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
+  const hwTone  = FINISH_TONES[byId(PIRZUL, state.pirzul).tone] || FINISH_TONES.steel;
 
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
@@ -1413,16 +1433,27 @@ export function render(state) {
       <stop offset="1"    stop-color="${darken(paint, pale ? 0.13 : 0.19)}"/>
     </linearGradient>
 
-    <!-- Brushed nickel, lit from upper-left. The bright band sits off-centre
-         and there is a second, weaker return near the far edge — that double
-         highlight is what separates metal from grey plastic. -->
+    <!-- Lit from upper-left. The bright band sits off-centre and there is a
+         second, weaker return near the far edge — that double highlight is
+         what separates metal from grey plastic.
+         WARNING: hwTone, NOT tone. Everything filled with this gradient is
+         LOCK FURNITURE — the lever, its collar, the backplate, the rose, the
+         keyway escutcheon and the extra lock — and its finish is the
+         customer's פרזול. The other one, tone, is the pull bar's own metal and
+         is used only by the bar profiles below. The id keeps the name nickel
+         because it is a wire format inside the emitted SVG that usedDefs and
+         four tools match on; what it MEANS is "the lock furniture's metal",
+         and nickel is merely its default.
+         (No backticks in this comment on purpose: it sits inside the one big
+         template literal, and a backtick here terminates it — CLAUDE.md §1b,
+         four builds.) -->
     <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"    stop-color="${tone[0]}"/>
-      <stop offset="0.16" stop-color="${tone[1]}"/>
-      <stop offset="0.38" stop-color="${tone[2]}"/>
-      <stop offset="0.60" stop-color="${tone[3]}"/>
-      <stop offset="0.80" stop-color="${tone[4]}"/>
-      <stop offset="1"    stop-color="${tone[5]}"/>
+      <stop offset="0"    stop-color="${hwTone[0]}"/>
+      <stop offset="0.16" stop-color="${hwTone[1]}"/>
+      <stop offset="0.38" stop-color="${hwTone[2]}"/>
+      <stop offset="0.60" stop-color="${hwTone[3]}"/>
+      <stop offset="0.80" stop-color="${hwTone[4]}"/>
+      <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
     <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${tone[1]}"/>
@@ -1505,7 +1536,7 @@ export function render(state) {
     </linearGradient>
     <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
          drew them silver, because ella carried no finish key of its own and
-         effectiveFinish fell through to steel. -->
+         gripFinish fell through to steel. -->
     <linearGradient id="barGold" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"    stop-color="#6B5230"/>
       <stop offset="0.07" stop-color="#95733F"/>
@@ -8044,6 +8075,33 @@ export function handleGlyph(handle) {
 
 /** Lock furniture shares the drawing; only the list it is chosen from differs. */
 export const locksetGlyph = handleGlyph;
+
+/**
+ * פרזול — the finish, drawn as the thing it recolours.
+ *
+ * A lever on its rose, in the metal itself, because a customer choosing a
+ * finish is choosing what the handle will look like and a bare swatch of
+ * colour would not say that. The ramp is the same `FINISH_TONES` the door
+ * uses, so the tile and the drawing cannot disagree about what "ברונזה" is.
+ */
+export function pirzulGlyph(pz) {
+  const t = FINISH_TONES[pz.tone] || FINISH_TONES.steel;
+  return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
+    <defs>
+      <linearGradient id="pzg-${pz.id}" x1="0.1" y1="0" x2="0.9" y2="1">
+        <stop offset="0" stop-color="${t[0]}"/><stop offset="0.38" stop-color="${t[2]}"/>
+        <stop offset="0.7" stop-color="${t[3]}"/><stop offset="1" stop-color="${t[5]}"/>
+      </linearGradient>
+    </defs>
+    <circle cx="0" cy="-26" r="30" fill="url(#pzg-${pz.id})"
+            stroke="#000" stroke-opacity=".18"/>
+    <path d="M -4 -40 L 46 -34 Q 54 -32 54 -25 Q 54 -18 46 -17 L -4 -12 Z"
+          fill="url(#pzg-${pz.id})" stroke="#000" stroke-opacity=".18"/>
+    <circle cx="0" cy="42" r="19" fill="url(#pzg-${pz.id})"
+            stroke="#000" stroke-opacity=".18"/>
+    <rect x="-4.5" y="36" width="9" height="13" rx="2" fill="#000" fill-opacity=".5"/>
+  </svg>`;
+}
 
 /**
  * THE MASHKOF, drawn as what a joiner would show you: the frame in section,

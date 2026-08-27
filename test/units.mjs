@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
@@ -29,13 +29,13 @@ const ALPHABET_TEST = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
                handle: 'idan', lockset: 'coral', speciallock: 'nospecial',
-               mashkof: 'mk-std', detail: 'plain', size: 'standard',
-               handing: 'right-in' };
+               mashkof: 'mk-std', pirzul: 'pz-nickel', detail: 'plain',
+               size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
-              'lockset', 'speciallock', 'mashkof', 'detail'];
+              'lockset', 'speciallock', 'mashkof', 'pirzul', 'detail'];
 
 /* The code's length is derived, never typed. It was written as {8} and the
    day the layout grew to nine characters that produced 280 failures saying
@@ -78,7 +78,8 @@ function* everyState() {
          missing from the stem encodes as `undefined`, which
          `Math.max(0, indexOf(undefined))` masks to index 0 in silence. */
       const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
-                     detail: 'plain', speciallock: 'nospecial', mashkof: 'mk-std' };
+                     detail: 'plain', speciallock: 'nospecial', mashkof: 'mk-std',
+                     pirzul: 'pz-nickel' };
       const out = [];
       for (const n of HANDLES) out.push({ ...stem, handle: n.id, lockset: 'coral' });
       for (const k of LOCKSETS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: k.id });
@@ -87,6 +88,9 @@ function* everyState() {
       }
       for (const m of MASHKOFS.slice(1)) {
         out.push({ ...stem, handle: 'idan', lockset: 'coral', mashkof: m.id });
+      }
+      for (const z of PIRZUL.slice(1)) {
+        out.push({ ...stem, handle: 'idan', lockset: 'coral', pirzul: z.id });
       }
       for (const st of out) if (buildable(st)) yield st;
     }
@@ -390,6 +394,58 @@ group('the leaf does not move when the frame does');
     }
   }
   console.log(`  (${checked} size x frame pairs, leaf identical in every one)`);
+}
+
+/* ── TWO METALS ON ONE DOOR ────────────────────────────────────────
+   ⚠ THE BUG PERETZ REPORTED, PINNED. In his own words, 26.8.2026: *"some pull
+   handles change the color of the handle and the keyhole, fix it."*
+
+   The renderer built ONE set of metal gradients per door out of the PULL BAR's
+   finish, so choosing the brass Ella painted the Coral lever and the keyway
+   beside it gold. REDESIGN.md §1.1 fixed the half that reached the MESSAGE and
+   left the drawing disagreeing on purpose (ASK-PERETZ §2b1), because nobody had
+   confirmed which way round it should be. Two of his own photographs said the
+   finishes are independent — d072 gold bar / near-black escutcheon, d128 chrome
+   tube / bronze escutcheon — and now he has said so.
+
+   ⚠ AND THE TEST THAT EXISTED ASSERTED THE MIRROR OF THIS. It checked that a
+   brass grip made `gripFinish` say brass, which was true both before and after
+   the fix — it would have agreed with the bug. That is the same trap
+   ASK-PERETZ §1 records for handing, where every instrument called a mirrored
+   door green. So this one reads the EMITTED GRADIENT, on every pair. */
+group('the pull handle does not recolour the lock furniture');
+{
+  const stops = svg => {
+    const m = svg.match(/<linearGradient id="nickel"[\s\S]*?<\/linearGradient>/);
+    return m && [...m[0].matchAll(/stop-color="(#[0-9A-Fa-f]{6})"/g)].map(x => x[1]).join(',');
+  };
+  /* One reading per pirzul, taken with a grip that declares no finish of its
+     own, so it is the pirzul and nothing else that produced it. */
+  const want = {};
+  for (const z of PIRZUL) {
+    want[z.id] = stops(render({ ...base, handle: 'idan', lockset: 'coral', pirzul: z.id }));
+    ok(want[z.id], `no #nickel gradient on a ${z.id} door — this check is asserting nothing`);
+  }
+  ok(new Set([want['pz-nickel'], want['pz-black'], want['pz-bronze']]).size === 3,
+     'three pirzul finishes produced fewer than three different metals');
+
+  let pairs = 0;
+  for (const h of HANDLES) {
+    for (const z of PIRZUL) {
+      const svg = render({ ...base, handle: h.id, lockset: 'coral', pirzul: z.id });
+      ok(stops(svg) === want[z.id],
+         `${h.id} + ${z.id}: the lock furniture's metal changed with the PULL `
+       + 'HANDLE — this is the bug Peretz reported, back again');
+      pairs++;
+    }
+  }
+  /* And the other half: the grip's own finish must still reach the grip. Ella
+     is brass because the PRODUCT is brass, and that is a fact about her rather
+     than a choice — withdrawing it would be over-correcting the bug. */
+  const ella = render({ ...base, handle: 'ella', lockset: 'coral', pirzul: 'pz-nickel' });
+  const idan = render({ ...base, handle: 'idan', lockset: 'coral', pirzul: 'pz-nickel' });
+  ok(ella !== idan, 'the brass Ella and the nickel Idan draw the same door');
+  console.log(`  (${pairs} grip x pirzul pairs, lock furniture unmoved by every grip)`);
 }
 
 // ── 3. Price ──────────────────────────────────────────────────────
@@ -1429,20 +1485,20 @@ group('the handle position rides in the link and not in the code');
    every other grip is brushed nickel. If that stops reaching the metal, the
    message goes out naming a door we did not draw, exactly as before.
 
-   `effectiveFinish` is asserted alongside the drawing, because agreeing with
+   `gripFinish` is asserted alongside the drawing, because agreeing with
    itself is the whole job of that function. */
 group('the finish reaches every piece of metal');
 {
   const brassGrip = HANDLES.find(h => h.finish === 'brass');
   ok(brassGrip, 'no grip declares its own finish any more — this group is dead');
   if (brassGrip) {
-    ok(effectiveFinish({ ...base, handle: brassGrip.id }).id === 'brass',
+    ok(gripFinish({ ...base, handle: brassGrip.id }).id === 'brass',
        `${brassGrip.id} should be built in brass`);
-    ok(effectiveFinish({ ...base, handle: 'idan' }).id === 'steel',
+    ok(gripFinish({ ...base, handle: 'idan' }).id === 'steel',
        'a grip with no declared finish should be brushed nickel');
     /* A withdrawn choice must not come back through a stale link: the door is
        whatever its grip says, whatever `finish` a URL still carries. */
-    ok(effectiveFinish({ ...base, handle: 'idan', finish: 'black' }).id === 'steel',
+    ok(gripFinish({ ...base, handle: 'idan', finish: 'black' }).id === 'steel',
        'a stale f= resurrected the withdrawn finish');
     const mid = st => /--hw-mid:([^;"]+)/.exec(render(st))[1];
     ok(mid({ ...base, handle: brassGrip.id }) !== mid({ ...base, handle: 'idan' }),
@@ -1818,7 +1874,7 @@ group('every option the customer pays for is named in the message');
 }
 
 /* ⚠ A FINISH IS A FACT ABOUT A PRODUCT, AND IT MUST APPEAR ON THAT PRODUCT.
-   `share.js` printed `effectiveFinish` — the GRIP's finish — on the LOCKSET
+   `share.js` printed `gripFinish` — the GRIP's finish — on the LOCKSET
    line, so `ella + coral` ordered a brass Coral. Coral is a nickel lever; no
    such product is made. 18 of 90 grip x lockset pairs went out that way, and
    `describe()` — the accessible name — said the same thing, and the on-screen
@@ -2126,6 +2182,26 @@ group('every option has exactly one price, in whole agorot');
   }
   ok(agorot(3195) === 319500 && agorot(0) === 0 && agorot(12.34) === 1234,
      'agorot() does not convert shekels correctly');
+
+  /* ⚠ THE VERSION FIELD CAN OVERFLOW AND NOTHING WAS CHECKING IT. `version`
+     was four bits; version 16 does not fit in four bits, so it encoded as 0,
+     decode compared 0 against 16, and EVERY code the app produced was refused.
+     It failed loudly, which is luck: a VERSION that wrapped onto a number this
+     app had once used would have read an old layout as a new one and handed
+     Peretz a different door.
+     The sweep below asserts `list.length <= 2 ** BITS[f]` for every option
+     list and never covered this, because the version is not a list. */
+  {
+    const { BITS: B, VERSION: V } = await import('../js/url-state.js');
+    ok(V < 2 ** B.version,
+       `VERSION ${V} does not fit in ${B.version} bits — it encodes as `
+     + `${V % (2 ** B.version)} and every code the app produces is refused`);
+    /* And leave room to bump: a field with no headroom is one release from
+       this exact failure, and the symptom is total rather than partial. */
+    ok(V <= 2 ** B.version - 4,
+       `VERSION ${V} is within 4 of its ${B.version}-bit ceiling — widen the `
+     + 'field before the next bump, not during it');
+  }
 }
 
 group('no catalogue list reuses a name as both an id and an alias');

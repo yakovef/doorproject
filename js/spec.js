@@ -44,7 +44,8 @@
 
 import {
   byId, colourCode, COLOURS, declaredFinish, DETAILS, glazedPanels, GRILLES, grillePlacement,
-  HANDINGS, HANDLES, isGlazed, LOCKSETS, MASHKOFS, SIZES, SPECIAL_LOCKS, WINDOWS,
+  HANDINGS, HANDLES, isGlazed, LOCKSETS, MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS,
+  WINDOWS,
 } from './catalog.js';
 
 /**
@@ -68,6 +69,7 @@ export function specRows(state) {
   const lk = byId(LOCKSETS, state.lockset);
   const xl = byId(SPECIAL_LOCKS, state.speciallock);
   const mk = byId(MASHKOFS, state.mashkof);
+  const pz = byId(PIRZUL, state.pirzul);
   const dt = byId(DETAILS, state.detail);
   const sz = SIZES[state.size] || SIZES.standard;
   const hn = byId(HANDINGS, state.handing);
@@ -165,6 +167,14 @@ export function specRows(state) {
      and Peretz always charges for it, so "משקוף: סטנדרטי" is a line on the
      order rather than noise: its absence would read as "no frame quoted". */
   rows.push({ key: 'mashkof', label: 'משקוף', id: mk.id, value: mk.he });
+  /* ⚠ ALWAYS NAMED, INCLUDING NICKEL. Peretz recolours four things with this —
+     the lever, the hinges, the peephole and the security latch — and the
+     hinges are the reason it cannot be dropped when it is the default: they
+     are not drawn (these doors open inwards, so from the street they are
+     hidden in the rebate) and this row is the ONLY place the order says what
+     colour they are. A fact the drawing cannot carry has to be carried by the
+     words. */
+  rows.push({ key: 'pirzul', label: 'פרזול', id: pz.id, value: pz.he });
   rows.push({ key: 'handing', label: 'פתיחה', id: hn.id, value: hn.he });
   return rows;
 }

@@ -8,8 +8,8 @@
  */
 
 import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
-         MASHKOF_WIDER_A, MASHKOFS, paneCount, LOCKSETS, SIZES, SPECIAL_LOCKS,
-         WINDOWS } from './catalog.js';
+         MASHKOF_WIDER_A, MASHKOFS, paneCount, LOCKSETS, PIRZUL, SIZES,
+         SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 
 /**
  * What WIDENING the frame costs, before the size multiplier.
@@ -144,6 +144,7 @@ export function priceParts(state) {
     handle:  byId(HANDLES, state.handle).delta,
     lockset: byId(LOCKSETS, state.lockset).delta,
     speciallock: byId(SPECIAL_LOCKS, state.speciallock).delta,
+    pirzul:  byId(PIRZUL, state.pirzul).delta,
     /* A grille needs a window to sit in — and so does worked glass, which is
        in the same list now. Neither can be charged on a solid door: the
        configurator must never take money for something the drawing does not

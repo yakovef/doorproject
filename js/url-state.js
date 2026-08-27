@@ -9,7 +9,7 @@
  */
 
 import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, MASHKOFS,
-         SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+         PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
 /* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
@@ -141,7 +141,15 @@ import { repair } from './rules.js';
    returned a 2-bit check instead, the chance of a single-character typo
    surviving would have gone from 1-in-16 to 1-in-4 with nothing on screen to
    say so. The check nibble is never what gives way to make room. */
-export const VERSION = 15;
+/* ── 16 · פרזול, 27.8.2026 ────────────────────────────────────────────
+   The lock furniture's finish becomes a choice: ניקל · שחור · ברונזה · זהב,
+   ₪0 to ₪900. Two bits, and there was no slack left after version 15 — so the
+   code goes to NINE characters. Payload 38 rounds to 40, leaving the check
+   nibble its full four bits; the alternative was taking a bit off the check,
+   which is never what gives way. `DM-` and nine, read aloud in two groups.
+   ⚠ `pz=`, never `f=`. The retired parameter belonged to the PULL HANDLE's
+   finish and reusing it would make an old link mean something it never did. */
+export const VERSION = 16;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -192,6 +200,7 @@ export const DEFAULTS = {
      becomes the first entry in the list. */
   speciallock: 'nospecial',
   mashkof: 'mk-std',
+  pirzul:  'pz-nickel',
   detail:  'plain',
   size:    'standard',
   handing: 'right-in',
@@ -210,6 +219,13 @@ export function toQuery(state) {
   p.set('k', state.lockset);
   p.set('x', state.speciallock);
   p.set('m', state.mashkof);
+  /* ⚠ `pz`, NEVER `f`. A finish axis existed once and `f=` is retired forever
+     (CLAUDE.md §1) — that one was the PULL HANDLE's finish, withdrawn because
+     the owner said his customers do not choose it. This is the LOCK
+     FURNITURE's, priced by Peretz in three steps, and it governs a different
+     set of objects. Reusing the parameter would make an old link mean
+     something it never meant. */
+  p.set('pz', state.pirzul);
   p.set('d', state.detail);
   p.set('s', state.size);
   p.set('h', state.handing);
@@ -268,7 +284,7 @@ export function fromQuery(search) {
      a choice could not be read — above a document in which every choice had
      been read perfectly. A new switch joins this list the same day it is
      invented, like everything added to the bare-mode hide list. */
-  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'd', 's', 'h', 'gp',
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'd', 's', 'h', 'gp',
                            'code', 'bare', 'sheet']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -345,6 +361,7 @@ export function fromQuery(search) {
   take('handing', 'h', HANDINGS);
   take('speciallock', 'x', SPECIAL_LOCKS);
   take('mashkof', 'm', MASHKOFS);
+  take('pirzul', 'pz', PIRZUL);
 
   const rawSize = p.get('s');
   if (rawSize != null) {
@@ -521,17 +538,53 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    effect of tidying. The check nibble is what makes a code safe to read down a
    telephone (REDESIGN.md §1.5: 38.4% of single-character typos used to decode
    to a different valid door); it is never the thing that gives way. */
-export const BITS = { version: 4, colour: 5, size: 3, handing: 2, window: 2,
+export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
                       grille: 4, handle: 4, lockset: 3, detail: 5,
-                      speciallock: 2, mashkof: 2 };
+                      speciallock: 2, mashkof: 2, pirzul: 2 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */
-const TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
 const PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
-/* ⚠ NO LONGER PADDING. These four bits carry the check nibble; the name is
-   kept because the width is still "whatever rounds the payload up to a whole
-   character", and if a field is ever widened this is what shrinks. */
+
+/**
+ * ⚠ THE CHECK IS RESERVED BEFORE THE ROUNDING, NOT AFTER IT — and this line is
+ * the fix for a trap that caught two consecutive version bumps.
+ *
+ * It used to be `ceil(payload / 5) * 5`, with the check nibble taking whatever
+ * was left over. That reads as thrift and behaves as a hazard: the leftover is
+ * `-payload mod 5`, so it is 4 bits at payload 36 and **2** at payload 38. Add
+ * one two-bit field to a comfortable layout and the typo check silently halves
+ * its own strength, with nothing in the arithmetic to say so.
+ *
+ * It happened twice. Version 15 took the payload to 38 and decoding failed
+ * outright, which is the lucky version — `checkNibble` returns four bits and
+ * the stored field was two, so they could never match. Version 16 walked into
+ * the identical wall one field later. Both times the temptation was to shave a
+ * bit off the check to make the sum come out.
+ *
+ * So the check is a FLOOR, not a remainder: reserve `CHECK_MIN` first, then
+ * round the whole thing up to a character boundary. The code gets longer when
+ * it must, which is the correct thing to give way — a customer reads a code
+ * down a telephone once, and a wrong door is forever. `REDESIGN.md` §1.5
+ * measured the stakes: with no check at all, 38.4% of single-character typos
+ * decoded to a different valid door.
+ */
+/* ⚠ AND THE VERSION FIELD CAN OVERFLOW TOO, WHICH NOTHING WAS CHECKING.
+   `version` was four bits, and version 16 does not fit in four bits: it
+   encoded as 0, decode read 0, compared it against 16 and refused every code
+   the app produced. Every code. It failed loudly, which is luck rather than
+   design — a `VERSION` that wrapped onto a number this app had once USED would
+   have decoded an old layout as a new one.
+
+   The assertion that catches a list outgrowing its field is
+   `list.length <= 2 ** BITS[f]`, and it never covered this one because the
+   version is not a list. It is five bits now (31 versions), and `npm test`
+   asserts VERSION fits — the same guard, on the one field that had none. */
+const CHECK_MIN = 4;
+const TOTAL_BITS = Math.ceil((PAYLOAD_BITS + CHECK_MIN) / 5) * 5;
+/* Whatever is left after the payload — at least `CHECK_MIN`, often more. The
+   CRC written into it is four bits wide, so any spare high bits are always
+   zero and a corruption that sets one is caught for free. */
 const PAD_BITS = TOTAL_BITS - PAYLOAD_BITS;
 
 /**
@@ -593,6 +646,7 @@ export function encodeCode(state) {
     [Math.max(0, SPECIAL_LOCKS.findIndex(x => x.id === state.speciallock)),
      BITS.speciallock],
     [Math.max(0, MASHKOFS.findIndex(m => m.id === state.mashkof)), BITS.mashkof],
+    [Math.max(0, PIRZUL.findIndex(z => z.id === state.pirzul)), BITS.pirzul],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -655,12 +709,13 @@ export function decodeCode(code) {
   const detail  = DETAILS[read(BITS.detail)];
   const special = SPECIAL_LOCKS[read(BITS.speciallock)];
   const mashkof = MASHKOFS[read(BITS.mashkof)];
+  const pirzul  = PIRZUL[read(BITS.pirzul)];
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail || !special || !mashkof) return null;
+      || !detail || !special || !mashkof || !pirzul) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
-    speciallock: special.id, mashkof: mashkof.id,
+    speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
   };
 }

@@ -190,6 +190,16 @@
     kodan: 900
     // קודן
   };
+  var PIRZUL = {
+    "pz-nickel": 0,
+    // ניקל   — the one included as standard
+    "pz-black": 300,
+    // שחור
+    "pz-bronze": 500,
+    // ברונזה
+    "pz-gold": 900
+    // זהב
+  };
   var COLOUR = {
     "rb-9005d": 0,
     "rb-7021d": 0,
@@ -378,7 +388,7 @@
       aliases: ["bar-long", "luna", "shiran"]
     },
     /* Brass, and the catalogue never said so: with no `finish` of its own
-       `effectiveFinish` fell through to steel and the bar the inventory calls
+       `gripFinish` fell through to steel and the bar the inventory calls
        brass rendered silver on every door. d072, d074 and d082 are gold rods at
        0.017-0.024 of leaf width — half what we drew. */
     {
@@ -481,7 +491,7 @@
        800 x 20 on that door — a slim tube, shorter than anything else in the
        range, which is what leaves the leaf's ornament room to be seen.
        `finish: 'black'` reaches the lock furniture too, through
-       `effectiveFinish`: on this door the keyway escutcheon is the same black. */
+       `gripFinish`: on this door the keyway escutcheon is the same black. */
     {
       id: "barblack",
       he: "מוט שחור",
@@ -596,6 +606,12 @@
        Its id aliases onto the cylinder, which is the smallest real thing it
        could have meant. No VERSION bump: it was the LAST entry, so removing it
        renumbers nothing. */
+  ];
+  var PIRZUL2 = [
+    { id: "pz-nickel", he: "ניקל", en: "Nickel", tone: "steel" },
+    { id: "pz-black", he: "שחור", en: "Black", tone: "black" },
+    { id: "pz-bronze", he: "ברונזה", en: "Bronze", tone: "brass" },
+    { id: "pz-gold", he: "זהב", en: "Gold", tone: "brass" }
   ];
   var MASHKOFS = [
     { id: "mk-std", he: "סטנדרטי", en: "Standard", out: 46, in: 62, head: 148 },
@@ -1225,7 +1241,7 @@
   ];
   var declaredFinish = (o) => !o || !o.finish ? null : FINISHES.find((f) => f.id === o.finish || (f.aliases || []).includes(o.finish)) || null;
   var colourCode = (c) => `רב בריח ${c.ral}`;
-  function effectiveFinish(state2) {
+  function gripFinish(state2) {
     return declaredFinish(byId(HANDLES, state2.handle)) || byId(FINISHES, "steel");
   }
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
@@ -1316,6 +1332,7 @@
   priceInto("handle", HANDLES, HANDLE, "delta");
   priceInto("lockset", LOCKSETS, LOCKSET, "delta");
   priceInto("special lock", SPECIAL_LOCKS, SPECIAL_LOCK, "delta");
+  priceInto("pirzul", PIRZUL2, PIRZUL, "delta");
   for (const [id, shekels] of Object.entries(DETAIL_GLAZED)) {
     const o = DETAILS.find((d) => d.id === id);
     if (!o) {
@@ -1369,6 +1386,7 @@
       handle: byId(HANDLES, state2.handle).delta,
       lockset: byId(LOCKSETS, state2.lockset).delta,
       speciallock: byId(SPECIAL_LOCKS, state2.speciallock).delta,
+      pirzul: byId(PIRZUL2, state2.pirzul).delta,
       /* A grille needs a window to sit in — and so does worked glass, which is
          in the same list now. Neither can be charged on a solid door: the
          configurator must never take money for something the drawing does not
@@ -1445,6 +1463,7 @@
     const lk = byId(LOCKSETS, state2.lockset);
     const xl = byId(SPECIAL_LOCKS, state2.speciallock);
     const mk = byId(MASHKOFS, state2.mashkof);
+    const pz = byId(PIRZUL2, state2.pirzul);
     const dt = byId(DETAILS, state2.detail);
     const sz = SIZES[state2.size] || SIZES.standard;
     const hn = byId(HANDINGS, state2.handing);
@@ -1497,6 +1516,7 @@
     }
     rows.push({ key: "size", label: "מידה", id: state2.size, value: sz.he });
     rows.push({ key: "mashkof", label: "משקוף", id: mk.id, value: mk.he });
+    rows.push({ key: "pirzul", label: "פרזול", id: pz.id, value: pz.he });
     rows.push({ key: "handing", label: "פתיחה", id: hn.id, value: hn.he });
     return rows;
   }
@@ -1805,8 +1825,9 @@
     const special = byId(SPECIAL_LOCKS, state2.speciallock);
     const mk = byId(MASHKOFS, state2.mashkof);
     const detail = byId(DETAILS, state2.detail);
-    const finish = effectiveFinish(state2);
+    const finish = gripFinish(state2);
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
+    const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
@@ -2152,16 +2173,27 @@
       <stop offset="1"    stop-color="${darken(paint2, pale ? 0.13 : 0.19)}"/>
     </linearGradient>
 
-    <!-- Brushed nickel, lit from upper-left. The bright band sits off-centre
-         and there is a second, weaker return near the far edge — that double
-         highlight is what separates metal from grey plastic. -->
+    <!-- Lit from upper-left. The bright band sits off-centre and there is a
+         second, weaker return near the far edge — that double highlight is
+         what separates metal from grey plastic.
+         WARNING: hwTone, NOT tone. Everything filled with this gradient is
+         LOCK FURNITURE — the lever, its collar, the backplate, the rose, the
+         keyway escutcheon and the extra lock — and its finish is the
+         customer's פרזול. The other one, tone, is the pull bar's own metal and
+         is used only by the bar profiles below. The id keeps the name nickel
+         because it is a wire format inside the emitted SVG that usedDefs and
+         four tools match on; what it MEANS is "the lock furniture's metal",
+         and nickel is merely its default.
+         (No backticks in this comment on purpose: it sits inside the one big
+         template literal, and a backtick here terminates it — CLAUDE.md §1b,
+         four builds.) -->
     <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"    stop-color="${tone[0]}"/>
-      <stop offset="0.16" stop-color="${tone[1]}"/>
-      <stop offset="0.38" stop-color="${tone[2]}"/>
-      <stop offset="0.60" stop-color="${tone[3]}"/>
-      <stop offset="0.80" stop-color="${tone[4]}"/>
-      <stop offset="1"    stop-color="${tone[5]}"/>
+      <stop offset="0"    stop-color="${hwTone[0]}"/>
+      <stop offset="0.16" stop-color="${hwTone[1]}"/>
+      <stop offset="0.38" stop-color="${hwTone[2]}"/>
+      <stop offset="0.60" stop-color="${hwTone[3]}"/>
+      <stop offset="0.80" stop-color="${hwTone[4]}"/>
+      <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
     <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${tone[1]}"/>
@@ -2244,7 +2276,7 @@
     </linearGradient>
     <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
          drew them silver, because ella carried no finish key of its own and
-         effectiveFinish fell through to steel. -->
+         gripFinish fell through to steel. -->
     <linearGradient id="barGold" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"    stop-color="#6B5230"/>
       <stop offset="0.07" stop-color="#95733F"/>
@@ -5916,6 +5948,24 @@ ${body}
   </svg>`;
   }
   var locksetGlyph = handleGlyph;
+  function pirzulGlyph(pz) {
+    const t = FINISH_TONES[pz.tone] || FINISH_TONES.steel;
+    return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
+    <defs>
+      <linearGradient id="pzg-${pz.id}" x1="0.1" y1="0" x2="0.9" y2="1">
+        <stop offset="0" stop-color="${t[0]}"/><stop offset="0.38" stop-color="${t[2]}"/>
+        <stop offset="0.7" stop-color="${t[3]}"/><stop offset="1" stop-color="${t[5]}"/>
+      </linearGradient>
+    </defs>
+    <circle cx="0" cy="-26" r="30" fill="url(#pzg-${pz.id})"
+            stroke="#000" stroke-opacity=".18"/>
+    <path d="M -4 -40 L 46 -34 Q 54 -32 54 -25 Q 54 -18 46 -17 L -4 -12 Z"
+          fill="url(#pzg-${pz.id})" stroke="#000" stroke-opacity=".18"/>
+    <circle cx="0" cy="42" r="19" fill="url(#pzg-${pz.id})"
+            stroke="#000" stroke-opacity=".18"/>
+    <rect x="-4.5" y="36" width="9" height="13" rx="2" fill="#000" fill-opacity=".5"/>
+  </svg>`;
+  }
   function mashkofGlyph(mk) {
     const W = 200, H = 150;
     const sc = 0.62;
@@ -6247,7 +6297,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 15;
+  var VERSION = 16;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "none",
@@ -6260,6 +6310,7 @@ ${body}
        becomes the first entry in the list. */
     speciallock: "nospecial",
     mashkof: "mk-std",
+    pirzul: "pz-nickel",
     detail: "plain",
     size: "standard",
     handing: "right-in"
@@ -6274,6 +6325,7 @@ ${body}
     p.set("k", state2.lockset);
     p.set("x", state2.speciallock);
     p.set("m", state2.mashkof);
+    p.set("pz", state2.pirzul);
     p.set("d", state2.detail);
     p.set("s", state2.size);
     p.set("h", state2.handing);
@@ -6296,6 +6348,7 @@ ${body}
       "k",
       "x",
       "m",
+      "pz",
       "d",
       "s",
       "h",
@@ -6341,6 +6394,7 @@ ${body}
     take("handing", "h", HANDINGS);
     take("speciallock", "x", SPECIAL_LOCKS);
     take("mashkof", "m", MASHKOFS);
+    take("pirzul", "pz", PIRZUL2);
     const rawSize = p.get("s");
     if (rawSize != null) {
       if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state2.size = rawSize;
@@ -6361,7 +6415,7 @@ ${body}
   }
   var ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   var BITS = {
-    version: 4,
+    version: 5,
     colour: 5,
     size: 3,
     handing: 2,
@@ -6371,10 +6425,12 @@ ${body}
     lockset: 3,
     detail: 5,
     speciallock: 2,
-    mashkof: 2
+    mashkof: 2,
+    pirzul: 2
   };
-  var TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
+  var CHECK_MIN = 4;
+  var TOTAL_BITS = Math.ceil((PAYLOAD_BITS + CHECK_MIN) / 5) * 5;
   var PAD_BITS = TOTAL_BITS - PAYLOAD_BITS;
   var checkNibble = (payload) => {
     let r = 15;
@@ -6401,7 +6457,8 @@ ${body}
         Math.max(0, SPECIAL_LOCKS.findIndex((x) => x.id === state2.speciallock)),
         BITS.speciallock
       ],
-      [Math.max(0, MASHKOFS.findIndex((m) => m.id === state2.mashkof)), BITS.mashkof]
+      [Math.max(0, MASHKOFS.findIndex((m) => m.id === state2.mashkof)), BITS.mashkof],
+      [Math.max(0, PIRZUL2.findIndex((z) => z.id === state2.pirzul)), BITS.pirzul]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -6442,7 +6499,8 @@ ${body}
     const detail = DETAILS[read(BITS.detail)];
     const special = SPECIAL_LOCKS[read(BITS.speciallock)];
     const mashkof = MASHKOFS[read(BITS.mashkof)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof) return null;
+    const pirzul = PIRZUL2[read(BITS.pirzul)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul) return null;
     return {
       colour: colour.id,
       size,
@@ -6453,7 +6511,8 @@ ${body}
       lockset: lockset.id,
       detail: detail.id,
       speciallock: special.id,
-      mashkof: mashkof.id
+      mashkof: mashkof.id,
+      pirzul: pirzul.id
     };
   }
 
@@ -6701,6 +6760,20 @@ ${body}
       list: () => SPECIAL_LOCKS,
       glyph: specialLockGlyph,
       hint: "נעילה נוספת מעבר למנעול הרגיל."
+    },
+    /* ⚠ THE FINISH OF THE LOCK FURNITURE, AND NOT OF THE PULL HANDLE. Peretz was
+       explicit that פרזול recolours the ידית, the צירים, the עינית and the
+       סגר ביטחון and NOT the pull handle or the stripes — which is also the bug
+       he reported in the same sentence. A pull bar's finish is a fact about that
+       product (Ella is brass); this is a choice, and it is ₪0 to ₪900. */
+    {
+      key: "pirzul",
+      title: "פרזול",
+      in: "hw",
+      kind: "hw",
+      list: () => PIRZUL2,
+      glyph: pirzulGlyph,
+      hint: "הגוון של הידית, הצירים והעינית."
     },
     {
       key: "size",
