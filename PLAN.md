@@ -1,5 +1,10 @@
 # דלתות מגן — Door Configurator · Build Plan (Revision C)
 
+> ⚠ **הקדמה, 27.8.2026: `TRANSFORM.md` היא התוכנית שרצה עכשיו.** §0 (העבודה
+> האחת), §5.2 (אגורות שלמות, "כלול" ולא "₪0"), §6.1 (מלכודת הראי של הצירים)
+> ו‑§8 (ids הם פורמט ציבורי) עומדים כפי שהם. §2, §5, §10 ו‑§12 — מודל המוצר,
+> מודל המחיר, השלבים והשאלות הפתוחות — נענו על ידי פרץ ב‑26.8 והוחלפו.
+
 > A configurator for **דלתות מגן**, Rishon LeZion. A customer designs an armored
 > steel entrance door — colour, window, size — sees the **full installed price**,
 > and sends it to Peretz in one tap.

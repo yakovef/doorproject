@@ -31,17 +31,32 @@
  */
 
 /**
- * ⚠ TRUE UNTIL PERETZ HAS ANSWERED. Every figure below is invented — a
- * plausible shape for a price list, not a price list. While this is `true` the
- * page shows the "גרסת פיתוח" strip saying so, and nobody can mistake a
- * placeholder for a quote.
+ * ── FALSE SINCE 27.8.2026, AND THAT IS THE POINT OF THIS WHOLE ROUND ──
  *
- * Flip it to `false` in the same sitting that fills in the numbers, and the
- * strip disappears by itself. It is here rather than in `catalog.js` so that
- * the flag and the figures it describes are one edit, in one file, on one
- * screen. ASK-PERETZ.md §5 is the question that ends this.
+ * This was `true` for the entire life of the project. Every figure in this
+ * file was invented — a plausible shape for a price list, not a price list —
+ * and while the flag stood the page carried a strip saying so, in as many
+ * words: *"הצבעים והמחירים כאן הם דוגמה בלבד."*
+ *
+ * On 26.8.2026 Peretz sat down with his son and said the real numbers out
+ * loud. Every figure below now traces to something he said, and the ±5% after
+ * measurement is in `PRICE_CAVEAT` where a customer and Peretz both see it. A
+ * strip claiming the prices are examples would, from this commit, be a false
+ * statement on the page — and a false disclaimer is worse than none, because
+ * it teaches a reader to discount the true ones beside it.
+ *
+ * ⚠ WHAT IS STILL A GUESS IS NAMED, NOT HIDDEN. Fifteen readings and
+ * assumptions are listed in `TRANSFORM.md` §18 and carried into
+ * `ASK-PERETZ.md` — a single bottom panel at half of two, the sidelight
+ * multiplier, whether "tall" is our צוהר or our מלבני. Each is one edit. None
+ * of them is the shape of the price list, which is what this flag was about.
+ *
+ * ⚠ AND THE FLAG STAYS. It is not deleted along with the strip: the next time
+ * a price in here has no source — a new product, a rate nobody has confirmed —
+ * this is how the page says so, and re-deriving the mechanism under pressure
+ * is how it ends up not being said at all.
  */
-export const PLACEHOLDER = true;
+export const PLACEHOLDER = false;
 
 /** Shekels → agorot. The ONE conversion; see the note on floats above. */
 export function agorot(shekels) {

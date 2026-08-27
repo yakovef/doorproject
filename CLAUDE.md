@@ -132,197 +132,75 @@ written rather than rewritten, but do not add more.
 
 ---
 
-## 0c. Where it stands today — 26.8.2026
+## 0c. Where it stands today — 27.8.2026
 
-**The site works and is not launched.** Every price on it is invented.
+**⚠ THE PRICES ARE REAL AND THE SITE IS NOT DEPLOYED — deliberately.** Peretz
+gave the numbers on 26.8.2026; `PLACEHOLDER` is `false` and the "גרסת פיתוח"
+strip is gone, because a disclaimer saying the prices are examples would now be
+a false statement on the page. Not deployed on instruction: *"dont deploy it, i
+want to see that its finished."*
 
-⚠ **The page opens on a BARE DOOR** — no window, no face design, no grip, no
-lock furniture — and everything on the leaf is something the customer put
-there. That is recent and deliberate (§0b), and it changes what "the default
-door" means in every other sentence in this file.
+**The page is a FLOW, not a cabinet.** Eight steps and a quote page, one live at
+every width. A standard door with nothing on it is **₪3,150**, and tapping the
+figure opens the column it is made of.
 
 ### Green
 
-- `npm test` — **5,257,859 assertions passing, 0 failed**, no framework, plain
-  node. It was 3.70M before the classical set and 5.68M before the 24.8
-  interface round; the catalogue lists change length and the combinatorial
-  sweeps are the product of those lengths, so the total moves with the range in
-  both directions. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF ANYTHING. It is
-  not a coverage metric — read the failure count.
-- `npm run collide` — clean on **both** `all` and `boxes`, over **1,410
-  buildable designs**, real `getBBox` geometry from a browser. Check both
-  flags yourself; a "clean" claim about `collide` that does not say which of
-  the two it means has been wrong before (see "Red, and known").
-- `npm run audit`, `npm run recreate`, `npm run sheets`, `npm run latency` —
-  all clean **on a healthy container**, which is not every container. See
-  "Red, and known" directly below before believing any of it.
-- ⚠ `npm run profile` is the ONE exception and it is red on purpose: one row of
-  four, understood, written down, and NOT silenced. Read the next section
-  before touching it.
-- The drawing recreates all 30 measured doors, plus the classical-set door in
-  `research/newdoor/` that Peretz installed on 24.8; the order carries the full
-  specification, a picture, an unambiguous opening direction, a price and a
-  code.
+- `npm test` — **5,401,525 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+  ANYTHING; it is the product of the catalogue's list lengths, and this round
+  cut fourteen stripe options out of `DETAILS` and added four axes. Read the
+  failure count.
+- `npm run audit` — clean at all seven `VIEWS`, including the restated arrival
+  check (exactly one step live at every width), a walk over every navigator
+  circle, the keyboard walk, and the bare-mode motion kill.
+- `npm run collide` — clean on `all` and `boxes`.
+- `npm run latency` — **123 ms** against a 600 ms gate, down from 501: one step
+  in the DOM instead of the whole cabinet.
+- `npm run profile` — **all four rows green.** See below; this is not
+  straightforwardly good news.
+- `npm run sheets` — current, and the bare families come back byte-identical on
+  every commit that does not touch the drawing, which is the proof motion did
+  not leak into it.
 
-### Red, and known — ⚠ AND CHECK IT, DO NOT READ IT
+### Red, and known
 
-The previous version of this section stated as standing fact that `npm test`
-reports 4 failures and that `npm run audit` and `npm run sheets` cannot run.
-That is not a property of this repository. It is a property of whichever
-container happens to be running it, and it recovers the moment a healthy one
-runs `npm run sheets` — two agent runs did exactly that on 24.8 (runs 26 and 27
-in `AGENT-LOG.md`) and went fully green. **Treat container health as something
-to establish each run.** `AGENT.md` has the one circumstance in which pushing
-with those four red is right, and it still stands for the days it degrades.
+⚠ **`npm run profile` IS GREEN AND NOBODY KNOWS WHY.** The dark-reed row read
+`1.044` against a 1.03 gate on 26.8 and reads `0.999` now. It is NOT the grain
+change in phase 9: reverting the grain and re-running gives byte-identical
+numbers, which is the `drift`/`grainTex` strip working as designed. Something
+in phases 1–8 closed it and the cause has not been established.
+**An unexplained green deserves the suspicion of an unexplained red.** §5 of
+this file is eighteen instances of things that vanished rather than broke, and
+every one of them looked like a working page. Do not treat this as settled.
 
-**As of 25.8 the container is healthy** — `npm test` **5,235,784 / 0**,
-`npm run audit` clean at seven viewports, `npm run collide` clean on `all`
-(1,398 designs) and `boxes`, `npm run recreate` clean (known catalogue gaps
-only), `npm run latency` 450 ms against a 600 ms gate, sheets current. The
-container reds below are struck through rather than deleted, because the
-diagnosis in each is the useful part and the pattern (an instrument blind to
-something, not the drawing being wrong) has repeated twice.
-
-⚠ **ONE LIVE RED, AND IT IS UNDERSTOOD: `npm run profile`, one row of four.**
-`dark reed  lower/upper 1.044` against a 1.03 gate. It is not a bulge, the
-gate has not been widened, and the drawing has not been tuned to fit it. The
-derivation is written out at length in `tools/profile.mjs`; the short form:
-
-- `keyWash` and `bloom` are warm overlays at an opacity that varies with
-  height, so a composite is `B(1-a) + Wa` — AFFINE, not multiplicative. Two
-  surfaces whose base tones differ by a factor t come out differing by less
-  than t wherever `a` is large, and `a` is largest near the key. So the upper
-  panel's bead reads flatter against its face than the lower one's on a
-  drawing where both mouldings are identical. That is contrast compressed near
-  the lamp, which is a photograph behaving normally.
-- The REEDED section's beads run 1.02 to 1.16 of the field — the quirks carry
-  that moulding, not the beads — so on near-black paint the whole quantity is
-  3.6% at the head and 8.1% at the foot, and the ratio of two numbers that
-  small is mostly the lamp. The OGEE rows, same machinery, same relight, read
-  1.019 and 1.006.
-- Three attempts at a quantity the wash cancels out of — the face on the
-  stile, the face straddling the run, the run's own tone-1.00 end samples —
-  all came back varying 3.5% to 4.8% between the panels, so the compositing
-  has a term that derivation does not. **Re-basing that measure is the named
-  next step**; see §9.
-- ⚠ AND THE GATE STILL FINDS ITS FAULT. Backing the relight out with both
-  sections in place reads 1.508 / 1.083 / 1.462 / 1.071 — all four red — so
-  the margin between "correct" and "the bug this was written for" is intact.
-
-⚠ **And it was DEAD before this round, silently.** The gradient ids gained a
-profile segment (`mould-reed-t`) and the selector asked for `url(#mould-t)`
-exactly, so it matched nothing, measured nothing, printed `upper NaN% lower
-NaN%` and exited GREEN. It now fails loudly when it cannot find its subject.
-
-- ~~**`npm run profile` red on the dark band, two of its three checks**~~ ✅
-  **fixed in run 30, and it never was the drawing.** `grainTex`/`drift` are
-  painted `patternUnits="userSpaceOnUse"` — the SVG's ABSOLUTE coordinate
-  space, not the leaf's own local one — so a leaf-relative sample point lands
-  on whichever phase of that fixed pattern the leaf's absolute position
-  happens to put it on, and the leaf's absolute position is not what these
-  two checks are about: `npm run mottle` is the instrument for paint
-  unevenness, and it already divides falloff OUT for exactly this reason.
-  `tools/profile.mjs` now strips `[filter="url(#drift)"], [fill="url(#grainTex)"]`
-  from every render before sampling — one line in the shared `draw()` helper,
-  so all three checks measure the SHADING MODEL and not paint texture, which
-  is what the file's own docstring already claimed they did.
-  ⚠ **Verified both ways before trusting it.** FALLOFF tightened rather than
-  moved (worst row 0.070→0.056 dark, 0.090→0.090 light — still comfortably
-  inside tolerance), and both failing ratios cleared with room to spare: panel
-  rate 0.48→0.70 (needs 0.6–1.6), bead 1.083→1.019 (needs ±3%). Then
-  falsified: temporarily dropped `keyWash` from the moulding's own relight —
-  reproducing exactly the historical "bead reads a flat, absolute tone instead
-  of tracking the leaf's fall" bug this file's own docstring describes — and
-  the bead check correctly failed on BOTH bands (dark 1.336, light 1.038),
-  restored byte-identical after. A hardened check that cannot still be broken
-  on purpose is not hardened, it is blinded, and this one is the former.
-- ~~**`npm run collide -- all` red on the classical set**~~ ✅ **fixed in the
-  round after run 29 diagnosed it, and the diagnosis was right on all three
-  counts.** Both symptoms were TAGGING and one was a real drawing fault:
-  - `classicSet` returned one `<g data-detail="classic">`, whose bounding box
-    runs cornice to plinth and crosses the window's row in the gap between the
-    pieces — four "classic x pane" overlaps where nothing comes near the glass.
-    Each piece is in its own `<g data-detail="moulding" data-piece="…">` now and
-    the wrapper carries `data-set` instead, which neither reader selects on.
-  - the drift reader knew `window` and `panel` and had no third kind, so five
-    drawn rectangles could never be confirmed — twenty obstacles "the rules
-    believe in and the drawing does not", every one of them on the door. It
-    reads `[data-detail="moulding"]` now, measuring the union of the shapes
-    marked `data-face` — the block's own face, the cap's corona and hollow, the
-    bracket's body — so it measures ink and not a claim.
-  - and once it could see them it found a REAL fault immediately: the rules
-    declared the band at the shelf's width while the drawing had narrowed the
-    face and hung the brackets outside it. `classicPieces` is one table now,
-    drawn from and declared from, and the band's span covers its brackets
-    because a pull bar through a corbel is through a corbel.
-  - **the last four overlaps were the drawing being wrong.** The set's light was
-    cased in the range's 70 mm stock like every other opening; the set's own
-    rows leave 59 between the frieze and the glass and NINE at the foot, where
-    the shelf is what closes the light. At 70 all round, the casing and the
-    shelf's corona were two pieces of joinery drawn through each other for 61
-    mm. `CLASSIC_BAND` and `CLASSIC_BAND_FOOT`, read by the drawing and by the
-    obstacle alike. ⚠ **The third thing run 29 raised — `footHits` treating
-    every classic row as a ring with a walkable middle — is TRACED NOW (run
-    33), and it is not a defect.** Swept every handle, both glazed states and
-    every size against every moulding-kind piece `faceObstacles` declares.
-    Two things open a hollow, and both are right: the solid variant's `light`
-    piece — the panel that stands where the glass would be on the unglazed
-    door — is genuinely a raised panel (a moulded frame round a flat field,
-    the peephole and knocker it would have carried are a withdrawn group and
-    nothing draws there), so a walkable middle is correct, the same rule
-    every other panelled door already follows. The only other opening is a
-    4–6.5 mm sliver in the `band` piece on the TALL size with the three
-    narrowest bars — smaller than the foot's own diameter, below anything a
-    customer or a photograph could distinguish. Every solid `moulding` piece
-    (cornice, frieze, shelf, plinth, foot) stays fully solid on every size and
-    every handle, because none of them is tall enough for `band: MOULD_BAND`
-    to open a hole at any real foot radius. No code changed — there was
-    nothing to fix.
-
-What to know for the days it degrades:
-
-- **When the four screenshot families go stale**, that is true and correct and
-  must never be silenced or stamped by hand.
-  ⚠ `js/works.js` can go stale the same way and is NOT one of the four:
-  `node tools/corpus.mjs --quiet` regenerates it with no browser at all. It
-  goes stale whenever the CATALOGUE changes, because each gallery door's state
-  is derived from its own record against the current option lists. See
-  `AGENT.md`.
-- **`npm run latency` red on the heaviest door — and it is the container.**
-  706 ms against the 600 ms gate on `half + strip + quatrefoil + shiran`,
-  2,195 elements.
-  ⚠ ATTRIBUTED RATHER THAN ASSUMED, and the method is the point. The same tool
-  was run against the PREVIOUS COMMIT — `git archive HEAD` into a temp tree,
-  built there, same browser, same minute — and measured **701 ms on the same
-  door**. Within noise, both past the gate, so the change under test is not the
-  cause. The agent's run 27, on a healthy container two commits earlier,
-  measured that door at **410 ms**; this tree draws 35 FEWER elements on it.
-  **Do not tune the drawing against a red timing gate without doing this
-  comparison first.** If it is still red on a healthy container, the heaviest
-  door genuinely needs work and the incremental repaint in §9 is what to
-  revisit.
+⚠ **Container health is a property of the container, not of this repository.**
+It is healthy today — 6/6 loads at 1280 and 1680, zero crashes — which is why
+`REALISM2.md` stage F stopped being blocked. Establish it each run.
 
 ### Blocked on a human
 
-`ASK-PERETZ.md` holds fourteen numbered questions. §14 is the newest and the
-longest: it collects everything the last four rounds of photographs opened —
-the classical set glazed and solid, the ring grille, the black bar and the long
-black bars, whether the three-panel face always comes with its pull, the
-crossed strips, **whether both panel mouldings are his**, and **whether both
-stripe families (horizontal and vertical) are his**. Eight prices and two
-yes/no questions. The mouldings one is the important one: it is not about a
-price, it is about what exists.
+`ASK-PERETZ.md` is **89 lines now, not 776**, and that is the change that
+matters most about it: nobody answers a 500-line document between jobs, and
+that is why it went nine days unanswered. What is left is fifteen assumptions
+(`TRANSFORM.md` §18), of which one is expensive:
 
-Two more things to know:
+⚠ **A13 — which of our two windows is his "tall".** ₪500 on the majority of
+glazed orders, resting on nothing but the shape of two Hebrew names.
 
-- **ASK-PERETZ §1, the ימין/שמאל convention, is ANSWERED** (23.8.2026) — and the answer
-  showed the site had it backwards, so every order it had ever produced named
-  the mirror of the door on the customer's screen. Fixed. Do not reopen it; do
-  read it, because it is the clearest example in the project of a fault that
-  every instrument called green.
-- **ASK-PERETZ §5, a starting price per size band, is the only thing standing
-  between this and a real launch.** Everything else on the list costs a feature, not the
-  launch.
+And two places where he contradicted his own doors, recorded rather than
+resolved: he says there is no ברזל מחושל and it is on **ten** of his installed
+doors; and almost every bar in the range is over his one-metre threshold as
+stocked, so almost every bar costs ₪650 rather than ₪500.
+
+### What is NOT built, and why
+
+- **Hebrew · English · Russian.** `TRANSFORM.md` phase 10, the one phase of
+  twelve not done. Every string is still Hebrew in markup. `PLAN.md` §6.1's
+  hinge trap is the thing to read before starting: **when the interface
+  mirrors, the door must not.**
+- **Deployment.** On instruction.
+- **The mockup's floating overlay.** `TRANSFORM.md` §12.2 — scoped down to the
+  door taking the empty column, and said so.
 
 ### The plan on the table
 

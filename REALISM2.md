@@ -1,5 +1,10 @@
 # REALISM2 — the scene, the finish pass, and the order to do it in
 
+> ⚠ **הקדמה, 27.8.2026: A–D נבנו, E נבנה ב‑TRANSFORM phase 9, ו‑F הוקטן
+> בכוונה** — הדלת מקבלת את העמודה הריקה ב‑1280 ומעלה, אבל הכרטיסים לא צפים
+> על הרקע. `TRANSFORM.md` §12.2 מסביר למה, ו‑§7 (פרוטוקול האור הירוק) אומץ
+> כמו שהוא.
+
 > `REALISM.md` made the DOOR believable, and its §6 — *compare against a
 > photograph, every time* — stays the governing rule of everything below. This
 > file is the next plan: make the PLACE believable and the PAGE finished. It

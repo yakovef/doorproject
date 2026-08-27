@@ -1,6 +1,6 @@
 (() => {
   // js/prices.js
-  var PLACEHOLDER = true;
+  var PLACEHOLDER = false;
   function agorot(shekels) {
     if (typeof shekels !== "number" || !Number.isFinite(shekels)) {
       throw new Error(`price must be a number, got ${JSON.stringify(shekels)}`);

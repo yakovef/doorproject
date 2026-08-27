@@ -1,5 +1,8 @@
 # The second mockup, read against the shipped page
 
+> ⚠ **הקדמה, 27.8.2026:** §4 — תשע הסירובים — עדיין מחייב. התוכנית שרצה
+> עכשיו היא `TRANSFORM.md`, ו‑§12 שלה ממשיכה מכאן.
+
 A picture arrived from outside — a 1536×1024 render of what the page should
 look like — with the instruction: *describe in detail how to change the app to
 make it look like that, the lighting, the things around the door, the UI, the

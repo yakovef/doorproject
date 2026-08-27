@@ -1,5 +1,9 @@
 # The plan, second reading
 
+> ⚠ **הקדמה, 27.8.2026:** כל §5 נבנה. §2 (המכשירים משקרים) עדיין נכון,
+> ובמיוחד האזהרה ש‑`npm run profile` לא יכול לשמש שער למרקם הצבע.
+> התוכנית שרצה עכשיו היא `TRANSFORM.md`.
+
 > A mockup arrived from outside with one instruction — *make the app look like
 > this more* — and the first version of this file answered it as a look plan:
 > five stages of card, stepper, table, badges.

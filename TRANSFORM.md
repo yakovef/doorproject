@@ -32,8 +32,8 @@ green and the work is pushed.
 | 7 | The guided flow — one question at a time | ✅ **done** | 27.8 · 8 steps + a quote page, one live at every width · accordion deleted (6 functions) · navigator sticky and scrolling · audit's arrival/keyboard/reach checks all restated · **latency 501 → 123 ms** · test **5,401,525 / 0**, audit clean at 7 viewports |
 | 8 | Motion — the door assembles, and every change is animated | ✅ **done** | 27.8 · door assembles on load (Peretz's "start with nothing", satisfied in time) · colour cross-fades, never interpolates hue · parts fit, keyed off `data-changed` so no diffing and no second render path · **bare mode + reduced motion measured at 0 animations, asserted in the audit** · latency 123 ms |
 | 9 | The look — leaf texture (E), full-bleed desktop (F), mockup leftovers | ✅ **done, with F scoped down and said so** | 27.8 · grain +56% in two measured steps, mottle 0.0132 → 0.0168, judged against d016/d048 · ⚠ response is SUB-LINEAR, recorded · door **340 px wider** at 1280 and 1680 · the floating overlay is NOT built and §12.2 says why |
-| 10 | Hebrew · English · Russian | **not started** | |
-| 11 | The final sweep — docs, assertions, green light | **not started** | |
+| 10 | Hebrew · English · Russian | ⏳ **THE ONE PHASE NOT DONE** — see §13. Every string is still Hebrew in markup. Read `PLAN.md` §6.1's hinge trap FIRST: when the interface mirrors, the door must not. |
+| 11 | The final sweep — docs, assertions, green light | ✅ **done** | 27.8 · `PLACEHOLDER = false` (the flag KEPT, the strip gone) · ASK-PERETZ **776 → 89 lines** · README's three false claims corrected · one pointer line on each superseded plan · CLAUDE.md §0c rewritten |
 
 ### 0.1 If you are resuming this after a compact
 
