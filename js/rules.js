@@ -175,6 +175,26 @@ export function conflicts(state) {
      are selected would overstate a change the customer will barely notice.
      Read off `panels` rather than the id, so a third panelled face added later
      is covered without anybody remembering to come back here. */
+  /* ⚠ A LONE PANEL ON A SOLID DOOR IS NOT REFUSED, AND THAT IS THE SECOND
+     TIME THIS RANGE HAS CONTRADICTED WHAT WE WERE TOLD ABOUT IT.
+
+     Asked for from outside: *"remove the single panel options, the only
+     instance when on a door is only one panel is when there is a window and a
+     panel at the bottom."* This first shipped as a conflict — `panel` and
+     `panelo` blocked whenever the leaf had no glass — and `npm test` refused
+     it, naming three doors: d048, d051 and d087 are Peretz's OWN installed
+     doors, hand-measured off his own photographs, each a solid leaf carrying a
+     single lower panel. The instruction is contradicted by three of the thirty
+     doors it was given about, exactly the way "there is no ברזל מחושל" is
+     contradicted by ten of them (`ASK-PERETZ.md` §2).
+
+     So the two are split. It is not a CHOICE — `js/app.js` leaves both out of
+     the tile list on a solid door, which is what was actually asked for, and
+     the customer cannot reach one. It is still a STATE, so the gallery draws
+     his three real doors as they were built and an old link opens as itself,
+     with no notice and no repair moving it. A rule here would have done
+     neither: it would have re-fitted three photographs to a door he did not
+     build, in the one part of the site whose whole job is being true. */
   if (onLeaf) {
     for (const d of DETAILS) if (hasUpperPanel(d)) {
       out.detail[d.id] = T('why.winTakesTop');
@@ -594,7 +614,16 @@ export function repair(state, intent = null) {
   if (leafGlazed(s) && hasUpperPanel(byId(DETAILS, s.detail))) {
     if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
     else {
-      const one = DETAILS.find(d => d.panel && !hasUpperPanel(d));
+      /* ⚠ THE SAME MOULDING, not just the same count. `panelo` is the ogee
+         single and `panel` the plain one; a customer on two CLASSICAL panels
+         who adds a window was dropped onto the plain single, quietly changing
+         the profile of the moulding they had picked on purpose. It matters
+         more now: since 27.8 those two singles are the only way to reach one
+         panel at all, so this is the only thing that puts them on a door. */
+      const cur = byId(DETAILS, s.detail);
+      const singles = DETAILS.filter(d => d.panel && !hasUpperPanel(d));
+      const one = singles.find(d => (d.profile || null) === (cur.profile || null))
+               || singles[0];
       if (one) { s.detail = one.id; change('detail', SAID.onePanel); }
     }
   }

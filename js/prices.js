@@ -180,7 +180,10 @@ export const GRILLE = {
   /* Worked GLASS rather than ironwork — etched into the pane, bought from a
      different supplier. Priced together here only because they are the same
      row on the customer's screen. */
-  mesh:         0,   // זכוכית מעוצבת
+  /* `mesh` (זכוכית מעוצבת) is WITHDRAWN, 27.8.2026, at the owner's request.
+     Its key goes with it — `catalog.js` asserts every priced key names a
+     live entry — and its ids resolve to `rings`, the surviving worked
+     glass at the same money. */
   rings:        0,   // טבעות ותלתלים — see the note above about why it stays
 };
 
@@ -215,7 +218,10 @@ export const DETAIL = {
      priced at half of two. TRANSFORM.md §18, assumption A8, and it is the only
      face price in the range with no source behind it. */
   panel:     725,    // פאנל תחתון      — A8, half of two
-  panelTop:  725,    // פאנל עליון      — A8, one rectangle, same as the lower one
+  /* `panelTop` (פאנל עליון) is WITHDRAWN, 27.8.2026: a lone UPPER panel is
+     one of the single-panel faces the owner removed, and unlike the lower one
+     it has no glazed form to survive as — a window takes that half of the
+     leaf. Its id resolves to `panel2`. */
   panel2:    1450,   // שני פאנלים      — Peretz
   panel3:    1900,   // שלושה פאנלים    — Peretz. Removes the pull handle.
   /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and Peretz's list does

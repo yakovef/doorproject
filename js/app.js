@@ -29,7 +29,7 @@
 
 import {
   byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
-  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, LOCKSETS, MASHKOFS,
+  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, leafGlazed, LOCKSETS, MASHKOFS,
   PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
@@ -81,7 +81,22 @@ const GROUPS = [
   { key: 'colour', title: 'g.colour', in: 'colour', kind: 'swatch', list: () => COLOURS,
     hint: 'g.colour.h' },
 
-  { key: 'detail', title: 'g.detail', in: 'face', kind: 'tile', list: () => DETAILS,
+  /* ⚠ `glazedOnly` FACES ARE NOT OFFERED ON A SOLID DOOR — a LISTING rule,
+     not a buildability one. Asked for from outside: *"remove the single panel
+     options, the only instance when on a door is only one panel is when there
+     is a window and a panel at the bottom."*
+     `js/rules.js` deliberately does NOT refuse them: three of Peretz's own
+     measured doors are solid leaves with one panel, so refusing would re-fit
+     three photographs in the gallery to a door he never built. See the long
+     note there. Not offered, still reachable — which is precisely the
+     difference between a catalogue and a constraint.
+     ⚠ AND THE CURRENT VALUE IS ALWAYS LISTED. Arriving from the gallery on
+     d048 — solid, one panel — with that tile filtered out would show a group
+     in which nothing is selected, and the first tap anywhere in it would throw
+     the customer's face away without saying so. */
+  { key: 'detail', title: 'g.detail', in: 'face', kind: 'tile',
+    list: () => DETAILS.filter(d =>
+      !d.glazedOnly || leafGlazed(state) || d.id === state.detail),
     glyph: detailGlyph, subs: DETAIL_SUBS, hint: 'g.detail.h' },
 
   { key: 'window', title: 'g.window', in: 'glass', kind: 'tile', list: () => WINDOWS,
@@ -409,6 +424,7 @@ function init() {
   });
   $('#grip-home').addEventListener('click', () => set({ ...state, grip: null }));
   $('#undo-btn').addEventListener('click', undo);
+  $('#redo-btn').addEventListener('click', redo);
   /* Written in from `share.js`, not typed into index.html — one promise,
      one wording, and the order carries the same sentence. See
      DRAWING_CAVEAT. */
@@ -1619,8 +1635,22 @@ function choose(g, id) {
 const HISTORY_MAX = 100;
 const history_ = [];
 
-/** Is there anything to go back to? Read by `armUndo`. */
+/**
+ * AND FORWARD AGAIN. Asked for from outside: *"i wanna see the reverse last
+ * change button at all times... and also add a forward button."*
+ *
+ * ⚠ THE REDO STACK IS CLEARED BY ANY NEW CHANGE, and that is not a detail.
+ * Undo three steps, then pick a different colour, and the three doors you
+ * walked back through are no longer on any path forward — keeping them would
+ * offer a "redo" that jumps to a door built from choices the customer has
+ * since replaced. Every editor works this way and the reason is the same.
+ * Cleared in `set`, which is the one place a new change happens.
+ */
+const future_ = [];
+
+/** Is there anything to go back to, or forward to? Read by `armUndo`. */
 const canUndo = () => history_.length > 0;
+const canRedo = () => future_.length > 0;
 
 function undo() {
   const prev = history_.pop();
@@ -1628,10 +1658,25 @@ function undo() {
   /* ⚠ NOT `set`, WHICH WOULD PUSH THIS ONTO THE STACK AND UNDO NOTHING. Going
      back is not a change to record; it is the removal of one. Straight to the
      same three things `set` does, minus the push. */
+  future_.push(state);
   state = prev;
   guard(paint)();
   scheduleUrl();
   toast(T('undo.done'));
+}
+
+function redo() {
+  const next = future_.pop();
+  if (!next) return;
+  /* Symmetrical with `undo`: the door we are leaving goes onto the BACK stack
+     so the two buttons stay each other's inverse however often they are
+     pressed. Not through `set`, for the same reason — `set` would clear the
+     future we are walking through. */
+  history_.push(state);
+  state = next;
+  guard(paint)();
+  scheduleUrl();
+  toast(T('redo.done'));
 }
 
 /** The URL write, debounced — shared by `set` and `undo`. It was inline in
@@ -1695,6 +1740,8 @@ function set(next) {
      where it already was. Pushing those would fill the stack with steps that
      undo nothing, and the button would need three presses to do one thing. */
   if (JSON.stringify(next) !== JSON.stringify(state)) {
+    /* ⚠ A NEW CHANGE ENDS THE FUTURE — see the note over `future_`. */
+    future_.length = 0;
     history_.push(state);
     if (history_.length > HISTORY_MAX) history_.shift();
   }
@@ -1915,13 +1962,21 @@ function paint() {
   document.documentElement.classList.add('is-live');
   announce(describe(state));
   armGrip();
-  /* Shown only once there is a step to take back. In `paint` rather than in
-     `set`, because `undo` itself has to update it too — pop the last step and
-     the button must go away — and `paint` is the one path both of them run.
-     ⚠ A CLASS, NOT `hidden`. The button has to keep its box or the strip under
-     the door changes height and the door is redrawn smaller; `npm run audit`
-     measured that at 23,021 pixels. See index.html and `.btn--undo.is-off`. */
-  $('#undo-btn').classList.toggle('is-off', !canUndo());
+  /* ⚠ ALWAYS ON THE PAGE NOW, AND `disabled` RATHER THAN HIDDEN. Asked for
+     from outside: *"i wanna see the reverse last change button at all times."*
+     It used to appear only once there was a step to take back, which is the
+     behaviour that hides a control exactly while somebody is learning the page
+     exists to be experimented with — you find out you can go back only after
+     you have already done something you regret.
+     `disabled` is right here where `aria-disabled` is right on an option tile:
+     an option that refuses says WHY and stays clickable, because the reason is
+     the useful part. "Nothing to undo yet" has no reason to give.
+     ⚠ The box is kept either way — that was already true through `is-off` and
+     matters more now that there are two: the strip under the door must not
+     change height, or the door is redrawn smaller. `npm run audit` measured
+     that at 23,021 pixels. */
+  $('#undo-btn').disabled = !canUndo();
+  $('#redo-btn').disabled = !canRedo();
 }
 
 /* ── moving the handle ────────────────────────────────────────────

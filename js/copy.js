@@ -263,6 +263,9 @@ export const UI = {
                        'This handle is longer than the door is wide — only a handle that fits between the jambs can be turned',
                        'Эта ручка длиннее ширины двери — повернуть можно только ту, что помещается между косяками'],
   'undo':             ['ביטול השינוי האחרון', 'Undo the last change', 'Отменить последнее изменение'],
+  'undo.group':       ['ביטול וחזרה', 'Undo and redo', 'Отменить и вернуть'],
+  'redo':             ['החזרת השינוי', 'Redo the change', 'Вернуть изменение'],
+  'redo.done':        ['החזרנו את השינוי', 'Change restored', 'Изменение возвращено'],
   'undo.done':        ['הצעד האחרון בוטל', 'Last step undone', 'Последний шаг отменён'],
 
   /* ── the flow: the eight steps ────────────────────────────────── */

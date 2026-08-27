@@ -2703,8 +2703,15 @@ group('ironwork is counted, and the drawing agrees with the bill');
      assertion in this group derives what it expects from the same catalogue
      that produced the sentence, so all of them would stay green if the Hebrew
      were rewritten as nonsense. */
-  ok(message({ ...stem, size: 'sidelight', window: 'rect', grille: 'scroll' }).split('\n')
-       .includes('סורג: מעוצב — בכנף הדלת ובחלון הצד (2 יחידות)'),
+  /* ⚠ `half`, AND IT USED TO BE `sidelight`. That size was withdrawn on
+     27.8.2026 — *"remove the double door with window, that is just an option
+     if you choose a double door and then a window"* — which is the owner
+     describing this exact door: a דלת וחצי with a window in it. The fixture
+     moves to the size that survived and the sentence moves with it, naming
+     the side LEAF rather than the side LIGHT. Still pinned as a literal, for
+     the reason above. */
+  ok(message({ ...stem, size: 'half', window: 'rect', grille: 'scroll' }).split('\n')
+       .includes('סורג: מעוצב — בכנף הדלת ובכנף הצדדית (2 יחידות)'),
      'the sentence Peretz reads about a two-panel door has changed');
 
   /* 5. And the ordinary door stays quiet: "בכנף הדלת" on a door that has only

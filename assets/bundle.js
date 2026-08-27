@@ -111,6 +111,9 @@
       "Эта ручка длиннее ширины двери — повернуть можно только ту, что помещается между косяками"
     ],
     "undo": ["ביטול השינוי האחרון", "Undo the last change", "Отменить последнее изменение"],
+    "undo.group": ["ביטול וחזרה", "Undo and redo", "Отменить и вернуть"],
+    "redo": ["החזרת השינוי", "Redo the change", "Вернуть изменение"],
+    "redo.done": ["החזרנו את השינוי", "Change restored", "Изменение возвращено"],
     "undo.done": ["הצעד האחרון בוטל", "Last step undone", "Последний шаг отменён"],
     /* ── the flow: the eight steps ────────────────────────────────── */
     "step.fit.t": ["מבנה הדלת", "The door itself", "Сама дверь"],
@@ -663,8 +666,10 @@
     /* Worked GLASS rather than ironwork — etched into the pane, bought from a
        different supplier. Priced together here only because they are the same
        row on the customer's screen. */
-    mesh: 0,
-    // זכוכית מעוצבת
+    /* `mesh` (זכוכית מעוצבת) is WITHDRAWN, 27.8.2026, at the owner's request.
+       Its key goes with it — `catalog.js` asserts every priced key names a
+       live entry — and its ids resolve to `rings`, the surviving worked
+       glass at the same money. */
     rings: 0
     // טבעות ותלתלים — see the note above about why it stays
   };
@@ -680,8 +685,10 @@
        face price in the range with no source behind it. */
     panel: 725,
     // פאנל תחתון      — A8, half of two
-    panelTop: 725,
-    // פאנל עליון      — A8, one rectangle, same as the lower one
+    /* `panelTop` (פאנל עליון) is WITHDRAWN, 27.8.2026: a lone UPPER panel is
+       one of the single-panel faces the owner removed, and unlike the lower one
+       it has no glazed form to survive as — a window takes that half of the
+       leaf. Its id resolves to `panel2`. */
     panel2: 1450,
     // שני פאנלים      — Peretz
     panel3: 1900,
@@ -804,16 +811,6 @@
       mult: 1,
       band: { he: "עד 98 × 203 ס״מ", en: "up to 98 × 203 cm", ru: "до 98 × 203 см" }
     },
-    narrow: {
-      id: "narrow",
-      he: "צרה",
-      en: "Narrow",
-      ru: "Узкая",
-      w: 800,
-      h: 2100,
-      mult: 1,
-      band: { he: "עד 98 × 203 ס״מ", en: "up to 98 × 203 cm", ru: "до 98 × 203 см" }
-    },
     wide: {
       id: "wide",
       he: "רחבה",
@@ -845,23 +842,6 @@
       mult: 2,
       band: { he: "שתי כנפיים", en: "Two leaves", ru: "Две створки" }
     },
-    /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
-       d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
-       narrow one beside it — but the narrow one does not open and is glass, so
-       it is a different product and a different price. `sideGlazed` is what the
-       renderer reads. */
-    sidelight: {
-      id: "sidelight",
-      he: "עם חלון צד",
-      en: "With sidelight",
-      ru: "С боковым окном",
-      w: 950,
-      h: 2100,
-      side: 400,
-      sideGlazed: true,
-      mult: 2,
-      band: { he: "כנף וחלון צד", en: "Leaf and sidelight", ru: "Створка и боковое окно" }
-    },
     /* ⚠ APPENDED, AND THAT IS WHY IT IS LAST. Peretz's "double extra
        (door>120x240)" at +50%. `encodeCode` packs the INDEX of this list, so a
        new entry at the END leaves every existing index where it was and costs no
@@ -880,6 +860,7 @@
       band: { he: "מעל 120 × 240 ס״מ", en: "over 120 × 240 cm", ru: "свыше 120 × 240 см" }
     }
   };
+  var SIZE_ALIAS = { narrow: "standard", sidelight: "half" };
   var COLOURS = [
     /* dark */
     { id: "rb-9005d", ral: "9005D", hex: "#1D1A18", he: "שחור", en: "Black", ru: "Чёрный", aliases: ["ral-9005"] },
@@ -1323,15 +1304,6 @@
       glass: true,
       doors: ["d114"]
     },
-    {
-      id: "mesh",
-      he: "זכוכית מעוצבת",
-      en: "Etched mesh",
-      ru: "Матовое стекло с рисунком",
-      glass: true,
-      aliases: ["lattice", "reeded"],
-      doors: ["d102", "d105", "d116", "d127"]
-    },
     /* ⚠ d125 was in TWO of the prose lists — under `reeded` and under "nothing
        at all" — and turning the prose into data is what made the contradiction
        visible. A crop of its pane at 5x settles it as far as a photograph can:
@@ -1350,11 +1322,18 @@
        one now knows both roots — generalised rather than relaxed, because a
        priced option with no photograph behind it is exactly how `lattice`,
        `bars` and `bars-light` once reached a customer. */
+    /* ⚠ `mesh` IS WITHDRAWN — *"remove the זכוכית מעוצבת option"*, 27.8.2026 —
+       and its ids come here. `lattice` and `reeded` already resolved to it, so
+       three retired names now land on this one: it is the surviving worked-glass
+       field at the same price, and a link naming any of them opens a door with
+       worked glass in it rather than a bare pane. */
     {
       id: "rings",
       he: "טבעות ותלתלים",
       en: "Scrolled ring lattice",
       ru: "Кольца и завитки",
+      glass: true,
+      aliases: ["mesh", "lattice", "reeded"],
       doors: ["newdoor"]
     },
     /* The three missing `-light` twins, appended so the ids already in the wild
@@ -1402,24 +1381,34 @@
        are milled and four are applied strips.
        They alias onto the lower panel rather than onto `plain`, because an alias
        should substitute for a decision, not delete it. */
+    /* ⚠ GLAZED ONLY — not a tile on a solid door. See `glazedOnly` below. */
     {
       id: "panel",
       sub: "panel",
       he: "פאנל תחתון",
       en: "Lower panel",
       ru: "Нижняя панель",
+      glazedOnly: true,
       panel: true,
       groove: false,
       aliases: ["both", "groove", "perimeter"]
     },
     /* The classic two-rectangle face — tall upper, short lower — which d048
        carries and a single bottom-quarter panel cannot describe. */
+    /* ⚠ `panelTop` RESOLVES HERE. A lone UPPER panel is withdrawn, 27.8.2026:
+       *"remove the single panel options, the only instance when on a door is
+       only one panel is when there is a window and a panel at the bottom."*
+       An upper panel alone has no glazed form either — the window takes that
+       half of the leaf — so unlike `panel` and `panelo` below it does not
+       survive as a repair target and its id comes here, to the panelled face
+       nearest it. */
     {
       id: "panel2",
       sub: "panel",
       he: "שני פאנלים",
       en: "Two panels",
       ru: "Две панели",
+      aliases: ["panelTop"],
       panel: true,
       groove: false,
       panels: 2,
@@ -1429,17 +1418,6 @@
        only the top panel"*. Every panelled option in this list used to put
        something at the FOOT of the leaf, so a face with a single high panel and
        a bare plinth below it was not expressible. */
-    {
-      id: "panelTop",
-      sub: "panel",
-      he: "פאנל עליון",
-      en: "Upper panel",
-      ru: "Верхняя панель",
-      panel: true,
-      groove: false,
-      panels: 1,
-      top: true
-    },
     /* ⚠ AND THREE. Asked for as *"an option of three panels, its the 2 panels,
        and another one in the middle"* — so it is the pair's envelope, 0.07 to
        0.92 of the leaf, with the same 0.08 gap, split three ways instead of two.
@@ -1502,12 +1480,14 @@
          ⚠ AND THE SECTION GOES ROUND THE GLASS TOO. `mouldOf` is asked once and
          answers for the panel and for the architrave together, because every
          corpus door with a window over a panel cases both in the same section. */
+    /* ⚠ GLAZED ONLY — not a tile on a solid door. See `glazedOnly` below. */
     {
       id: "panelo",
       sub: "panel",
       he: "פאנל תחתון קלאסי",
       en: "Lower panel, ogee",
       ru: "Нижняя панель, классика",
+      glazedOnly: true,
       panel: true,
       groove: false,
       profile: "ogee",
@@ -2191,7 +2171,6 @@
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
   var SPECIAL_AFF = CYLINDER_AFF - 250;
-  var LOCK_BACKSET_GRIP = 49;
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
@@ -2376,6 +2355,7 @@
     const finish = gripFinish(state2);
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
+    const hwBlack = byId(PIRZUL2, state2.pirzul).tone === "black";
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
@@ -2743,7 +2723,38 @@
       <stop offset="0.80" stop-color="${hwTone[4]}"/>
       <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
+    <!-- WARNING: hwTone, AND IT USED TO BE tone. Every one of this gradient's
+         users is LOCK FURNITURE - plateHandle's rose, knobPlate, cadoorKnob,
+         sapirKnob - so it was painting the lever and the knob with the PULL
+         BAR's metal. Reported from outside in one sentence: "pirzul changes
+         the color of the main handle not the pull handle in any way." The
+         paragraph above tone has said that since phase 4; these two gradients
+         were the half of it that never moved, because the nickel gradient was
+         fixed by name and its neighbours were not. -->
     <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="${hwTone[1]}"/>
+      <stop offset="0.5" stop-color="${hwTone[3]}"/>
+      <stop offset="1"   stop-color="${hwTone[5]}"/>
+    </linearGradient>
+
+    <!-- WARNING: THE GRIP'S OWN PAIR, AND WHY THERE HAS TO BE A SECOND SET.
+         One gradient cannot serve two masters: grabHandle is a PULL HANDLE
+         and takes tone, everything else that reached for these is lock
+         furniture and takes hwTone. While there was one set, whichever metal
+         it held was wrong for one family - and it was wrong for BOTH at once,
+         since grabHandle filled its rods from the nickel gradient (the
+         hardware finish) while the levers filled from nickelSoft (the bar's).
+         Named for the OWNER rather than for the metal, so the next drawing
+         added has to answer "whose is this?" before it can pick one. -->
+    <linearGradient id="gripHard" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="${tone[0]}"/>
+      <stop offset="0.16" stop-color="${tone[1]}"/>
+      <stop offset="0.38" stop-color="${tone[2]}"/>
+      <stop offset="0.60" stop-color="${tone[3]}"/>
+      <stop offset="0.80" stop-color="${tone[4]}"/>
+      <stop offset="1"    stop-color="${tone[5]}"/>
+    </linearGradient>
+    <linearGradient id="gripSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${tone[1]}"/>
       <stop offset="0.5" stop-color="${tone[3]}"/>
       <stop offset="1"   stop-color="${tone[5]}"/>
@@ -2752,15 +2763,18 @@
     <!-- Chrome mirrors an unlit room: bright rim, banded face, and a middle
          that is DARKER than the door behind it. Filling a backplate with
          light grey is the classic rendered-hardware tell. -->
+    <!-- WARNING: hwTone HERE TOO, and this is the plainest of the three: its
+         own comment says "filling a BACKPLATE", and a backplate is the
+         lever's plate. Three users, all lock furniture. -->
     <linearGradient id="plateFace" x1="0" y1="0" x2="1" y2="0.22">
-      <stop offset="0"    stop-color="${tone[2]}"/>
-      <stop offset="0.16" stop-color="${tone[4]}"/>
-      <stop offset="0.36" stop-color="${tone[5]}"/>
-      <stop offset="0.50" stop-color="${tone[3]}"/>
-      <stop offset="0.64" stop-color="${tone[1]}"/>
-      <stop offset="0.78" stop-color="${tone[2]}"/>
-      <stop offset="0.92" stop-color="${tone[4]}"/>
-      <stop offset="1"    stop-color="${tone[5]}"/>
+      <stop offset="0"    stop-color="${hwTone[2]}"/>
+      <stop offset="0.16" stop-color="${hwTone[4]}"/>
+      <stop offset="0.36" stop-color="${hwTone[5]}"/>
+      <stop offset="0.50" stop-color="${hwTone[3]}"/>
+      <stop offset="0.64" stop-color="${hwTone[1]}"/>
+      <stop offset="0.78" stop-color="${hwTone[2]}"/>
+      <stop offset="0.92" stop-color="${hwTone[4]}"/>
+      <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
 
     <!-- The euro cylinder is a separate chromed part pressed into the
@@ -2779,7 +2793,17 @@
          Only black is special-cased. Passing every stop through scaleTone
          would have turned the cylinder brass on a brass door, which is the
          thing the paragraph above says it is not. -->
-    ${finish.id === "black" ? `
+    ${/* ⚠ `hwBlack`, AND IT USED TO BE `finish.id === 'black'` — the PULL
+        BAR's finish. Reported from outside: *"the מוט שחור option changes
+        the keyhole color to black."* It did, exactly: `barblack` declares
+        `finish: 'black'`, and the black cylinder measured off
+        research/newdoor/keyhole.jpg was gated on that instead of on the
+        פרזול. Choosing a black pull bar blackened the keyway of a nickel
+        lockset — a fitting the customer had not touched and is not paying
+        for. The measurement below is unchanged and still right; only the
+        question it answers has moved to the axis that owns the cylinder. */
+    ""}
+    ${hwBlack ? `
     <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="#5A5D60"/>
       <stop offset="0.4" stop-color="#333639"/>
@@ -5549,8 +5573,20 @@ ${body}
         return { out: 47, in: 119, vy: 170 };
       case "almog":
         return { out: 42, in: 220, vy: 42 };
+      /* ⚠ `out` WAS 78 AND THE DRAWING REACHES 41. Reported from outside as
+         *"you can also see that this circle handle is off place"*, and it was:
+         `lockBackset` returns `max(KEYWAY_BACKSET, out + 10)`, so a declared 78
+         put the ball's axis at 88 while the keyhole below it stayed pinned at
+         63 — the knob and the cylinder it turns, 25 mm out of line, on a door
+         where they go into the same mortice lock case and physically cannot be.
+         41 is what `npm run collide -- boxes` measures off the art; 78 was
+         never measured. With it corrected the clamp yields `max(63, 51) = 63`
+         and the ball lands on the keyway's own axis.
+         ⚠ AND THE BALL SITS ON NO ROSE ON PURPOSE — that is the whole product
+         difference between `cadoor` (כדור) and `knobplate` (כדור על אורך), the
+         one with the backplate. Do not "fix" that by adding one. */
       case "cadoor":
-        return { out: 78, in: 41, vy: 48 };
+        return { out: 41, in: 41, vy: 48 };
       case "sapir":
         return { out: 36, in: 74, vy: 43 };
       case "knobplate":
@@ -5604,7 +5640,7 @@ ${body}
   function lockBackset(handle, lockset) {
     if (lockset && lockset.lock) return KEYWAY_BACKSET;
     const out = lockset ? handleFootprint(lockset, 2e3).out : 0;
-    return Math.max(LOCK_BACKSET_GRIP, out + 10);
+    return Math.max(KEYWAY_BACKSET, out + 10);
   }
   var GRIP_ART = {
     none: () => "",
@@ -5724,20 +5760,20 @@ ${body}
              ball, so all that shows is a ring of it — and that ring is the
              whole of the standoff anyone is allowed to draw. -->
         ${POST.map((t) => `
-        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#nickelSoft)"/>
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#gripSoft)"/>
         <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.10"/>`).join("")}
 
         <!-- Outboard stems, visibly thinner than the shaft; then the terminal
              beads, which is what every one of these doors ends in. -->
-        ${rod(0.075, 0.155, D * 0.3, D * 0.15, "url(#nickel)")}
-        ${rod(0.845, 0.925, D * 0.3, D * 0.15, "url(#nickel)")}
-        ${rod(0.03, 0.078, D * 0.55, D * 0.5, "url(#nickel)")}
-        ${rod(0.922, 0.97, D * 0.55, D * 0.5, "url(#nickel)")}
-        ${rod(0, 0.032, D * 0.22, D * 0.11, "url(#nickel)")}
-        ${rod(0.968, 1, D * 0.22, D * 0.11, "url(#nickel)")}
+        ${rod(0.075, 0.155, D * 0.3, D * 0.15, "url(#gripHard)")}
+        ${rod(0.845, 0.925, D * 0.3, D * 0.15, "url(#gripHard)")}
+        ${rod(0.03, 0.078, D * 0.55, D * 0.5, "url(#gripHard)")}
+        ${rod(0.922, 0.97, D * 0.55, D * 0.5, "url(#gripHard)")}
+        ${rod(0, 0.032, D * 0.22, D * 0.11, "url(#gripHard)")}
+        ${rod(0.968, 1, D * 0.22, D * 0.11, "url(#gripHard)")}
         <!-- the flat rings just outboard of each ball -->
-        ${rod(0.106, 0.124, D * 0.6, D * 0.1, "url(#nickelSoft)")}
-        ${rod(0.876, 0.894, D * 0.6, D * 0.1, "url(#nickelSoft)")}
+        ${rod(0.106, 0.124, D * 0.6, D * 0.1, "url(#gripSoft)")}
+        ${rod(0.876, 0.894, D * 0.6, D * 0.1, "url(#gripSoft)")}
 
         <!-- The shaft: constant diameter, and the tone runs ACROSS it. A dark
              line at the top, a narrow specular at a third down, a broad dark
@@ -5745,13 +5781,13 @@ ${body}
              was one flat white ribbon, which is why it looked unlit. -->
         ${rod(0.2, 0.8, D / 2, D * 0.16, "url(#grabRod)")}
         <!-- step collars where the shaft meets each ball -->
-        ${rod(0.203, 0.228, D * 0.575, D * 0.2, "url(#nickelSoft)")}
-        ${rod(0.772, 0.797, D * 0.575, D * 0.2, "url(#nickelSoft)")}
+        ${rod(0.203, 0.228, D * 0.575, D * 0.2, "url(#gripSoft)")}
+        ${rod(0.772, 0.797, D * 0.575, D * 0.2, "url(#gripSoft)")}
 
         <!-- the post balls, turned and standing in front of their roses -->
         ${POST.map((t) => `
         <ellipse cx="${n1(P(t))}" cy="${n1(by)}" rx="${n1(D * 0.675)}" ry="${n1(D * 0.725)}"
-                 fill="url(#nickel)"/>
+                 fill="url(#gripHard)"/>
         <ellipse cx="${n1(P(t) - D * 0.16)}" cy="${n1(by - D * 0.26)}" rx="${n1(D * 0.34)}"
                  ry="${n1(D * 0.17)}" fill="#fff" opacity="0.32"/>`).join("")}
       </g>
@@ -6729,7 +6765,9 @@ ${body}
         s.window = "none";
         change("window", SAID.windowGone);
       } else {
-        const one = DETAILS.find((d) => d.panel && !hasUpperPanel(d));
+        const cur = byId(DETAILS, s.detail);
+        const singles = DETAILS.filter((d) => d.panel && !hasUpperPanel(d));
+        const one = singles.find((d) => (d.profile || null) === (cur.profile || null)) || singles[0];
         if (one) {
           s.detail = one.id;
           change("detail", SAID.onePanel);
@@ -6806,7 +6844,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 18;
+  var VERSION = 19;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "none",
@@ -6935,7 +6973,8 @@ ${body}
     }
     const rawSize = p.get("s");
     if (rawSize != null) {
-      if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state2.size = rawSize;
+      const asSize = SIZE_ALIAS[rawSize] || rawSize;
+      if (Object.prototype.hasOwnProperty.call(SIZES, asSize)) state2.size = asSize;
       else notice = "option-unknown";
     }
     const rawGrip = p.get("gp");
@@ -7261,12 +7300,25 @@ ${body}
       list: () => COLOURS,
       hint: "g.colour.h"
     },
+    /* ⚠ `glazedOnly` FACES ARE NOT OFFERED ON A SOLID DOOR — a LISTING rule,
+       not a buildability one. Asked for from outside: *"remove the single panel
+       options, the only instance when on a door is only one panel is when there
+       is a window and a panel at the bottom."*
+       `js/rules.js` deliberately does NOT refuse them: three of Peretz's own
+       measured doors are solid leaves with one panel, so refusing would re-fit
+       three photographs in the gallery to a door he never built. See the long
+       note there. Not offered, still reachable — which is precisely the
+       difference between a catalogue and a constraint.
+       ⚠ AND THE CURRENT VALUE IS ALWAYS LISTED. Arriving from the gallery on
+       d048 — solid, one panel — with that tile filtered out would show a group
+       in which nothing is selected, and the first tap anywhere in it would throw
+       the customer's face away without saying so. */
     {
       key: "detail",
       title: "g.detail",
       in: "face",
       kind: "tile",
-      list: () => DETAILS,
+      list: () => DETAILS.filter((d) => !d.glazedOnly || leafGlazed(state) || d.id === state.detail),
       glyph: detailGlyph,
       subs: DETAIL_SUBS,
       hint: "g.detail.h"
@@ -7484,6 +7536,7 @@ ${body}
     });
     $("#grip-home").addEventListener("click", () => set({ ...state, grip: null }));
     $("#undo-btn").addEventListener("click", undo);
+    $("#redo-btn").addEventListener("click", redo);
     $("#draw-caveat").textContent = drawingCaveat();
     $("#save-btn").addEventListener("click", saveCurrent);
     $("#price-toggle").addEventListener("click", () => {
@@ -8119,14 +8172,26 @@ ${body}
   }
   var HISTORY_MAX = 100;
   var history_ = [];
+  var future_ = [];
   var canUndo = () => history_.length > 0;
+  var canRedo = () => future_.length > 0;
   function undo() {
     const prev = history_.pop();
     if (!prev) return;
+    future_.push(state);
     state = prev;
     guard(paint)();
     scheduleUrl();
     toast(T("undo.done"));
+  }
+  function redo() {
+    const next = future_.pop();
+    if (!next) return;
+    history_.push(state);
+    state = next;
+    guard(paint)();
+    scheduleUrl();
+    toast(T("redo.done"));
   }
   var urlTimer = null;
   function scheduleUrl() {
@@ -8150,6 +8215,7 @@ ${body}
   function set(next) {
     const before = state;
     if (JSON.stringify(next) !== JSON.stringify(state)) {
+      future_.length = 0;
       history_.push(state);
       if (history_.length > HISTORY_MAX) history_.shift();
     }
@@ -8223,7 +8289,8 @@ ${body}
     document.documentElement.classList.add("is-live");
     announce(describe(state));
     armGrip();
-    $("#undo-btn").classList.toggle("is-off", !canUndo());
+    $("#undo-btn").disabled = !canUndo();
+    $("#redo-btn").disabled = !canRedo();
   }
   var dragging = null;
   var swallowTouch = (ev) => ev.preventDefault();

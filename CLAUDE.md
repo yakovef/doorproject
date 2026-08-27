@@ -171,6 +171,39 @@ hold keys: `SAID` in `rules.js`, `GROUPS`/`SECTIONS` in `app.js`,
 `priceIncludes`/`priceCaveat` in `share.js` (functions, not constants).
 Nothing throws when this is wrong. The page looks entirely correct.
 
+### The round from a real phone — 27.8.2026
+
+Ten items, reported off a live page on an Android. Four were bugs nobody's
+instrument had an opinion about, and three of those were ONE bug: the metal
+gradients were shared between the pull handle and the lock furniture, so each
+was painted with the other's finish.
+
+- ⚠ **`#nickel` was the פרזול and a pull handle used it; `#nickelSoft` and
+  `#plateFace` were the bar's and every lever used them.** One gradient cannot
+  serve two owners. There are two sets now, named for WHOSE metal they are —
+  `gripHard`/`gripSoft` against `nickel`/`nickelSoft`/`plateFace` — so the next
+  drawing added has to answer "whose is this?" before it can pick a fill.
+- ⚠ **The euro cylinder's black variant was gated on `gripFinish`.** Choosing
+  the black pull bar blackened the keyway of a nickel lockset. It follows the
+  pirzul now.
+- ⚠ **`cadoor` declared `out: 78` and the drawing reaches 41.** `lockBackset`
+  returns `max(…, out + 10)`, so the ball sat at backset 88 while its keyhole
+  stayed pinned at 63 — a knob and the cylinder it turns, 25 mm out of line, on
+  a door where both go into one mortice lock case. `npm run collide -- boxes`
+  had the true number all along.
+- **The loose-escutcheon family now sits on the keyway's axis too**, floor
+  raised from `LOCK_BACKSET_GRIP` to `KEYWAY_BACKSET`. Measured cost: 8 designs
+  of 2,688 lose a pull handle to a collision, 0.3%.
+
+⚠ **AND A CATALOGUE INSTRUCTION WAS CONTRADICTED BY THREE OF HIS OWN DOORS.**
+*"The only instance when on a door is only one panel is when there is a window
+and a panel at the bottom."* d048, d051 and d087 are solid leaves with a single
+lower panel, hand-measured off his photographs. Enforcing it as a RULE made
+`npm test` re-fit three real doors in the gallery. So it is a LISTING rule
+instead — `js/app.js` leaves those faces out of the tiles, `js/rules.js`
+refuses nothing — and the contradiction is in `ASK-PERETZ.md` §2 beside the
+ברזל מחושל one. **A catalogue is not a constraint.**
+
 ### ⚠ A LEDGER IS NOT EVIDENCE
 
 Every phase of `TRANSFORM.md` was marked done by the same agent that did it,

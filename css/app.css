@@ -261,6 +261,27 @@ svg { direction: ltr; }
    with it — which is what happened, and which is also exactly how the
    navigator circles did it one screen further down. These two lines mean this
    control can never do that again, whatever a fourth language is called. */
+/* ── undo / redo, under the door ─────────────────────────────────────
+   Two circles, no words. `disabled` rather than hidden, and the row keeps its
+   height either way: anything that appears in the strip under the leaf takes
+   its height out of the door above — measured at 23,021 pixels the one time
+   it was allowed to. */
+.steps-back { display: flex; gap: 6px; align-items: center; }
+.iconbtn {
+  appearance: none; background: none; cursor: pointer;
+  inline-size: 44px; block-size: 44px; padding: 0;
+  display: inline-grid; place-items: center;
+  border: 1px solid var(--rule); border-radius: 50%;
+  color: var(--ink-2);
+}
+.iconbtn:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-3, var(--ink-2)); }
+.iconbtn:disabled { opacity: .32; cursor: default; }
+.iconbtn .btn__ico {
+  inline-size: 19px; block-size: 19px;
+  fill: none; stroke: currentColor; stroke-width: 1.9;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
 .langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
 .lang {
   appearance: none; background: none; border: 0;
@@ -288,9 +309,67 @@ svg { direction: ltr; }
    Two buttons come to ~100 px, so the header fits with room. All of them stay
    44 px tall and tappable. `npm run audit` measures sideways scroll at 320 px
    on every design, which is what caught this. */
-@media (max-width: 400px) {
-  .lang { padding-inline: 4px; font-size: .74rem; }
+/* ⚠ THE BREAKPOINT IS THE NAV'S, NOT AN ARBITRARY 400. It was `max-width:
+   400px`, which is one phone wide: reported from a 412 px Android as *"on the
+   top you can see that i need to scroll to view the full name of the
+   language"* — three buttons plus the brand plus the telephone overflowed, the
+   row scrolled, and `Русский` was cut in half.
+   Tied to 1099 now, the width at which `.nav`'s three words are already
+   hidden, so the rule reads as one statement: on a phone the header carries
+   the brand, the way OUT of the language you are in, and the telephone. */
+@media (max-width: 1099px) {
+  .lang { padding-inline: 6px; font-size: .78rem; }
   .lang.is-on { display: none; }
+  /* ⚠ AND IT IS THE ITEM THAT DOES NOT GIVE. Measured at 390 px with the
+     current-language button already dropped, the header's four children came
+     to exactly the viewport and flexbox took the shortfall out of the widest
+     shrinkable one — `.langs`, 113 px of content in 99 px of box, so `Русский`
+     was still cut in half and still scrolled. Which is what was reported; the
+     earlier fix stopped the PAGE scrolling sideways and left the control
+     scrolling inside itself, one layer down.
+     The brand gives instead. It is the one thing up here that loses nothing by
+     being 14 px narrower — `דלתות מגן` is also the tab title, the footer and
+     the sheet's letterhead — where a language button that cannot be read is a
+     customer who cannot get out of a language they do not speak. */
+  .langs { flex: 0 0 auto; overflow-x: visible; }
+  /* ⚠ AND NOTHING ELSE UP HERE MAY WRAP OR ELLIPSIS EITHER. Making `.langs`
+     rigid moved the shortfall onto its neighbours, and both broke in ways that
+     looked worse than the problem: the brand ellipsised to `דלתות...` and the
+     telephone wrapped to `053-219-` over `7466`. A truncated business name and
+     a number split across two lines are not a saving.
+     So the SUBTITLE goes instead. `בונים דלת` is the page's own `<h1>` twelve
+     pixels below and the browser tab's title above; it is the only thing in
+     this header that is said three times. Dropping it on a phone frees the
+     row without shortening one word anybody needs. */
+  .brand__sub { display: none; }
+  .brand__name, .bar__phone { white-space: nowrap; }
+  /* ⚠ AND THE TELEPHONE KEEPS ITS HANDSET AND LOSES ITS DIGITS. Even without
+     the subtitle the header ran 32 px over 390: brand 124 + languages 113 +
+     telephone 137 does not fit, and one of the three had to give a whole word
+     rather than a few pixels.
+     The number is the one that is said elsewhere — twice, in the send card
+     (`אפשר גם להתקשר`) and in the strip that appears when the page cannot
+     load, which is the moment it matters most. The business NAME is said
+     nowhere else up here, and a language button nobody can read is the fault
+     being fixed. So the digits go and the tap target does not: the handset is
+     still a 44 px `tel:` link, still labelled, and the `data-phone-text` span
+     `app.js` writes into is still in the DOM and still written. */
+  .bar__phone { flex: 0 0 auto; min-inline-size: 44px; justify-content: center; }
+  .bar__phone [data-phone-text] {
+    position: absolute; inline-size: 1px; block-size: 1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .bar__ico { inline-size: 19px; block-size: 19px; }
+}
+
+/* ⚠ 320 px IS A REAL PHONE AND THE HEADER DOES NOT FIT IT ON THE DEFAULTS.
+   `npm run audit` measured 9 px of sideways scroll on every one of 73 designs
+   at `phone-s`: the brand, two language buttons and the handset come to 281 px
+   and the row's own `gap: 16` and `padding-inline: 16` take the rest.
+   Nothing is dropped here — the gap gives way instead, which is the one part
+   of the row that is spacing rather than content. */
+@media (max-width: 400px) {
+  .bar { gap: 8px; padding-inline: 12px; }
 }
 .nav__a {
   display: inline-flex; align-items: center;
@@ -929,6 +1008,40 @@ svg { direction: ltr; }
   inset-block-start: 0;
   z-index: 3;
   background: var(--surface);
+}
+
+/* ⚠ ON A PHONE IT IS FIXED, NOT STICKY, AND THAT IS THE WHOLE POINT.
+   Reported from outside: *"on the phone i want the steps to be on the top no
+   matter what, right now it starts at the bottom and getting to the top and
+   then slides to the top, and there are this in between."*
+
+   Measured at 390x844 before this rule, the navigator's top edge by scroll
+   position: 687, 487, 187, 0. Sticky pins an element at the top of the
+   SCROLLPORT only once the scroll has carried it there, and this one starts
+   below a sticky stage — so it spent the whole middle of that journey drifting
+   ACROSS the door, which is the "in between" and is exactly what the first
+   screenshot shows.
+
+   Fixed from the first paint instead. `.bar` is pushed down by its height so
+   the brand, the language buttons and the telephone are not covered at rest;
+   everything else scrolls underneath. `--steps-h` is one number in two places
+   and it is here, not measured in script: a JavaScript-published height would
+   make the page's top depend on the bundle having run. */
+@media (max-width: 1099px) {
+  :root { --steps-h: 84px; }
+  .steps {
+    position: fixed;
+    inset-block-start: 0; inset-inline: 0;
+    z-index: 6;
+    padding-inline: 14px;
+    margin-block-end: 0;
+    box-shadow: 0 1px 0 var(--rule);
+  }
+  .bar { padding-block-start: var(--steps-h); }
+  /* The door pins UNDER the navigator rather than behind it. */
+  .stage-wrap { inset-block-start: var(--steps-h); }
+  /* Jumping to a step must not land its heading under the fixed strip. */
+  .sect__title { scroll-margin-block-start: calc(var(--steps-h) + 8px); }
 }
 /* The connector, drawn once behind the row rather than as a border on each
    circle — four separate half-lines would leave a seam wherever the flex
@@ -1590,22 +1703,11 @@ html.is-live .wa__off { display: none; }
 }
 .btn--ghost:hover { border-color: var(--ink-2); }
 
-/* Undo, under the door. Narrower than a ghost button in the send panel because
-   it sits in the strip below the stage and that strip's height comes out of
-   the drawing: every pixel here is a pixel of door on a phone. It keeps the
-   44 px floor the audit measures every tap target against — the padding gives
-   way, the height does not. */
-.btn--undo {
-  align-self: center;
-  padding-inline: 14px; font-size: .82rem;
-  background: var(--paper, #fff);
-}
-/* ⚠ `visibility`, NOT `display` OR the `hidden` ATTRIBUTE. The button holds
-   its box when it is not showing, so the strip below the door never changes
-   height — see the long note in index.html for the 23,021 pixels that cost.
-   `visibility: hidden` also removes it from the tab order and the
-   accessibility tree, which is the half of `hidden` that was worth keeping. */
-.btn--undo.is-off { visibility: hidden; }
+/* `.btn--undo` and its `is-off` twin are GONE. Undo is two icon circles now —
+   `.iconbtn`, defined up beside the language picker — always on the page and
+   `disabled` when there is nothing to take back, so the strip below the door
+   holds one height for ever instead of two. The 23,021-pixel lesson that made
+   `is-off` necessary is what keeps them both mounted. */
 .btn__ico {
   inline-size: 16px; block-size: 16px; flex: 0 0 auto;
   fill: none; stroke: currentColor; stroke-width: 1.8;

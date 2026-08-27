@@ -106,10 +106,28 @@ export const REBATE = 50;
  * still open (assumption A2). Printing the honest ambiguity beats printing a
  * confident guess a customer measures against.
  */
+/**
+ * ⚠ `narrow` AND `sidelight` ARE WITHDRAWN, 27.8.2026, and both on the owner's
+ * word rather than on a measurement.
+ *
+ *   `narrow`     — *"remove the narrow door option, it is very rare my dad
+ *                  said."* It was 800 mm against the standard 950 at the same
+ *                  price, so it bought a customer nothing but a decision.
+ *
+ *   `sidelight`  — *"remove the double door with window, that is just an
+ *                  option if you choose a double door and then a window."*
+ *                  He is describing the product correctly: a דלת וחצי with a
+ *                  window in it IS this, reached by two choices the customer
+ *                  already has, and the catalogue was selling the combination
+ *                  a third time as its own size.
+ *
+ * ⚠ THEIR IDS LIVE ON IN `SIZE_ALIAS`. `encodeCode` packs the INDEX of this
+ * object, so deleting two entries repoints every index after them — which is
+ * what `VERSION` is for and why it moves in the same commit. The `?s=` form
+ * is not an index, and links carrying `s=narrow` are already in the wild.
+ */
 export const SIZES = {
   standard: { id: 'standard', he: 'סטנדרטית',  en: 'Standard', ru: 'Стандартная',      w: 950,  h: 2100, mult: 1,
-              band: { he: 'עד 98 × 203 ס״מ', en: 'up to 98 × 203 cm', ru: 'до 98 × 203 см' } },
-  narrow:   { id: 'narrow',   he: 'צרה',        en: 'Narrow', ru: 'Узкая',        w: 800,  h: 2100, mult: 1,
               band: { he: 'עד 98 × 203 ס״מ', en: 'up to 98 × 203 cm', ru: 'до 98 × 203 см' } },
   wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide', ru: 'Широкая',          w: 1100, h: 2100, mult: 1.25,
               band: { he: 'עד 120 × 240 ס״מ', en: 'up to 120 × 240 cm', ru: 'до 120 × 240 см' } },
@@ -117,13 +135,6 @@ export const SIZES = {
               band: { he: 'עד 120 × 240 ס״מ', en: 'up to 120 × 240 cm', ru: 'до 120 × 240 см' } },
   half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', ru: 'Полуторная', w: 950,  h: 2100, side: 400, mult: 2,
               band: { he: 'שתי כנפיים', en: 'Two leaves', ru: 'Две створки' } },
-  /* A fixed glazed panel beside the leaf, four in the corpus (d117 d122 d123
-     d128). Structurally the same as דלת וחצי — one opening, a main leaf and a
-     narrow one beside it — but the narrow one does not open and is glass, so
-     it is a different product and a different price. `sideGlazed` is what the
-     renderer reads. */
-  sidelight: { id: 'sidelight', he: 'עם חלון צד', en: 'With sidelight', ru: 'С боковым окном', w: 950, h: 2100,
-               side: 400, sideGlazed: true, mult: 2, band: { he: 'כנף וחלון צד', en: 'Leaf and sidelight', ru: 'Створка и боковое окно' } },
   /* ⚠ APPENDED, AND THAT IS WHY IT IS LAST. Peretz's "double extra
      (door>120x240)" at +50%. `encodeCode` packs the INDEX of this list, so a
      new entry at the END leaves every existing index where it was and costs no
@@ -134,6 +145,21 @@ export const SIZES = {
   xl: { id: 'xl', he: 'רחבה וגבוהה', en: 'Extra large', ru: 'Широкая и высокая', w: 1200, h: 2400, mult: 1.5,
         band: { he: 'מעל 120 × 240 ס״מ', en: 'over 120 × 240 cm', ru: 'свыше 120 × 240 см' } },
 };
+
+/**
+ * Where a withdrawn size sends a link that still names it.
+ *
+ * `narrow` was the standard door 150 mm narrower at the same money, so
+ * `standard` is not an approximation, it is the same purchase. `sidelight`
+ * becomes `half` — the owner's own description of what it always was — and
+ * the customer keeps the window they chose beside it, which is the other half
+ * of the product.
+ *
+ * ⚠ NOT AN `aliases` ARRAY, because `SIZES` is a plain OBJECT and `byId` only
+ * walks lists. Kept as its own map rather than bolted onto the entries so the
+ * lookup cannot accidentally resolve a live id to itself.
+ */
+export const SIZE_ALIAS = { narrow: 'standard', sidelight: 'half' };
 
 /**
  * Colours — the manufacturer's own catalogue, sampled from the Rav Bariach
@@ -730,9 +756,6 @@ export const GRILLES = [
     doors: ['d109', 'd111'] },
   { id: 'tree',    he: 'עץ',             en: 'Tree', ru: 'Дерево',            glass: true,
     doors: ['d114'] },
-  { id: 'mesh',    he: 'זכוכית מעוצבת',  en: 'Etched mesh', ru: 'Матовое стекло с рисунком',     glass: true,
-    aliases: ['lattice', 'reeded'],
-    doors: ['d102', 'd105', 'd116', 'd127'] },
   /* ⚠ d125 was in TWO of the prose lists — under `reeded` and under "nothing
      at all" — and turning the prose into data is what made the contradiction
      visible. A crop of its pane at 5x settles it as far as a photograph can:
@@ -751,7 +774,13 @@ export const GRILLES = [
      one now knows both roots — generalised rather than relaxed, because a
      priced option with no photograph behind it is exactly how `lattice`,
      `bars` and `bars-light` once reached a customer. */
+  /* ⚠ `mesh` IS WITHDRAWN — *"remove the זכוכית מעוצבת option"*, 27.8.2026 —
+     and its ids come here. `lattice` and `reeded` already resolved to it, so
+     three retired names now land on this one: it is the surviving worked-glass
+     field at the same price, and a link naming any of them opens a door with
+     worked glass in it rather than a bare pane. */
   { id: 'rings',   he: 'טבעות ותלתלים', en: 'Scrolled ring lattice', ru: 'Кольца и завитки',
+    glass: true, aliases: ['mesh', 'lattice', 'reeded'],
     doors: ['newdoor'] },
   /* The three missing `-light` twins, appended so the ids already in the wild
      keep their indices. `light` is the same one switch it has always been: the
@@ -849,18 +878,26 @@ export const DETAILS = [
      are milled and four are applied strips.
      They alias onto the lower panel rather than onto `plain`, because an alias
      should substitute for a decision, not delete it. */
-  { id: 'panel', sub: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel', ru: 'Нижняя панель',    panel: true,  groove: false,
+  /* ⚠ GLAZED ONLY — not a tile on a solid door. See `glazedOnly` below. */
+  { id: 'panel', sub: 'panel',  he: 'פאנל תחתון',     en: 'Lower panel', ru: 'Нижняя панель',
+    glazedOnly: true, panel: true,  groove: false,
     aliases: ['both', 'groove', 'perimeter'] },
   /* The classic two-rectangle face — tall upper, short lower — which d048
      carries and a single bottom-quarter panel cannot describe. */
-  { id: 'panel2', sub: 'panel', he: 'שני פאנלים',     en: 'Two panels', ru: 'Две панели',     panel: true,  groove: false,
+  /* ⚠ `panelTop` RESOLVES HERE. A lone UPPER panel is withdrawn, 27.8.2026:
+     *"remove the single panel options, the only instance when on a door is
+     only one panel is when there is a window and a panel at the bottom."*
+     An upper panel alone has no glazed form either — the window takes that
+     half of the leaf — so unlike `panel` and `panelo` below it does not
+     survive as a repair target and its id comes here, to the panelled face
+     nearest it. */
+  { id: 'panel2', sub: 'panel', he: 'שני פאנלים',     en: 'Two panels', ru: 'Две панели',
+    aliases: ['panelTop'], panel: true,  groove: false,
     panels: 2, top: true },
   /* ⚠ THE UPPER RECTANGLE ALONE. Asked for from outside: *"add an option of
      only the top panel"*. Every panelled option in this list used to put
      something at the FOOT of the leaf, so a face with a single high panel and
      a bare plinth below it was not expressible. */
-  { id: 'panelTop', sub: 'panel', he: 'פאנל עליון',   en: 'Upper panel', ru: 'Верхняя панель',    panel: true,  groove: false,
-    panels: 1, top: true },
   /* ⚠ AND THREE. Asked for as *"an option of three panels, its the 2 panels,
      and another one in the middle"* — so it is the pair's envelope, 0.07 to
      0.92 of the leaf, with the same 0.08 gap, split three ways instead of two.
@@ -913,7 +950,9 @@ export const DETAILS = [
      ⚠ AND THE SECTION GOES ROUND THE GLASS TOO. `mouldOf` is asked once and
      answers for the panel and for the architrave together, because every
      corpus door with a window over a panel cases both in the same section. */
+  /* ⚠ GLAZED ONLY — not a tile on a solid door. See `glazedOnly` below. */
   { id: 'panelo', sub: 'panel', he: 'פאנל תחתון קלאסי', en: 'Lower panel, ogee', ru: 'Нижняя панель, классика',
+    glazedOnly: true,
     panel: true, groove: false, profile: 'ogee', doors: ['d050', 'd053'] },
   { id: 'panel2o', sub: 'panel', he: 'שני פאנלים קלאסיים', en: 'Two panels, ogee', ru: 'Две панели, классика',
     panel: true, groove: false, panels: 2, top: true, profile: 'ogee',

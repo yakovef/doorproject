@@ -21,6 +21,7 @@ import { crashed } from './browser.mjs';
 import { load } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
+import { SIZES } from '../js/catalog.js';
 import { setLang } from '../js/copy.js';
 import { specRows, summaryLine } from '../js/spec.js';
 
@@ -872,7 +873,9 @@ for (const v of VIEWS) {
       return p.$eval('#leaf rect', e => Math.round(e.getBoundingClientRect().height));
     };
     const stem = 'c=rb-0097d&w=none&g=none&k=cylinder&d=plain&h=right-in';
-    for (const size of ['standard', 'sidelight']) {
+    /* `sidelight` was withdrawn 27.8.2026; `half` is the two-leaf door that
+       survived and is what this check was really about. */
+    for (const size of ['standard', 'half']) {
       const bare = await leafHeight(`${stem}&s=${size}&n=none`);
       const held = await leafHeight(`${stem}&s=${size}&n=shiran`);
       if (bare !== held) {
@@ -881,7 +884,11 @@ for (const v of VIEWS) {
       }
     }
 
-    for (const size of ['standard', 'narrow', 'wide', 'tall', 'half', 'sidelight']) {
+    /* Every size there is — read off `SIZES` rather than listed, so a
+       withdrawal cannot leave this sweep quietly testing a door that no
+       longer exists. `narrow` and `sidelight` left on 27.8.2026 and this
+       line was the only place still naming them. */
+    for (const size of Object.keys(SIZES)) {
       await p.goto(`file://${process.cwd()}/index.html?${stem}&s=${size}&n=shiran`);
       await p.waitForTimeout(350);
       const m = await p.evaluate(() => {

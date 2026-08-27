@@ -9,7 +9,7 @@
  */
 
 import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_LENS, LOCKSETS,
-         MASHKOFS, packStripes, PIRZUL, SIZES, SPECIAL_LOCKS, STRIPE_MAX,
+         MASHKOFS, packStripes, PIRZUL, SIZE_ALIAS, SIZES, SPECIAL_LOCKS, STRIPE_MAX,
          STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
@@ -178,7 +178,15 @@ import { repair } from './rules.js';
    it needs a migration rather than an alias: `strips9` was an id in one list
    and is now a (direction, count) pair in three fields, which the alias
    mechanism — id to id, inside one list — cannot express. See `STRIPE_LEGACY`. */
-export const VERSION = 18;
+/* ⚠ 19: TWO SIZES, ONE GRILLE AND ONE FACE WERE WITHDRAWN ON 27.8.2026, and
+   three of the four are INDEXED lists. `narrow` and `sidelight` left `SIZES`,
+   `mesh` left `GRILLES`, `panelTop` left `DETAILS` — so every index after each
+   of them moved, and a v18 code decoded against v19 lists would open a
+   different door at a different price in perfect silence. That is what this
+   number is for.
+   The `?...=` query form is not indexed and keeps working: the withdrawn ids
+   resolve through `aliases` (grille, face) and `SIZE_ALIAS` (size). */
+export const VERSION = 19;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -471,7 +479,15 @@ export function fromQuery(search) {
        the bundle targets es2020 and nothing in it currently raises the browser
        floor above that. A one-line guard is not worth costing somebody their
        door. */
-    if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state.size = rawSize;
+    /* ⚠ `SIZE_ALIAS` FIRST. `SIZES` is a plain object, so it has no `aliases`
+       array and `byId` never sees it — a withdrawn size would otherwise fall
+       through to `option-unknown` and open the default door under a red strip,
+       on links that are already in the wild. `narrow` and `sidelight` were
+       withdrawn on 27.8.2026; see the note over `SIZES`.
+       A resolved alias is OUR withdrawal, not the customer's mistake, so it
+       raises no notice — the same reasoning as `RETIRED` above. */
+    const asSize = SIZE_ALIAS[rawSize] || rawSize;
+    if (Object.prototype.hasOwnProperty.call(SIZES, asSize)) state.size = asSize;
     else notice = 'option-unknown';
   }
 

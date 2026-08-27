@@ -957,6 +957,10 @@ export function render(state) {
   const finish  = gripFinish(state);
   const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
   const hwTone  = FINISH_TONES[byId(PIRZUL, state.pirzul).tone] || FINISH_TONES.steel;
+  /* Is the LOCK FURNITURE black? The euro cylinder is special-cased on it —
+     see the note over `euroSteel`. Asked of the pirzul entry's `tone` rather
+     than of its id, so `pz-black` and any later black share one answer. */
+  const hwBlack = byId(PIRZUL, state.pirzul).tone === 'black';
 
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
@@ -1459,7 +1463,38 @@ export function render(state) {
       <stop offset="0.80" stop-color="${hwTone[4]}"/>
       <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
+    <!-- WARNING: hwTone, AND IT USED TO BE tone. Every one of this gradient's
+         users is LOCK FURNITURE - plateHandle's rose, knobPlate, cadoorKnob,
+         sapirKnob - so it was painting the lever and the knob with the PULL
+         BAR's metal. Reported from outside in one sentence: "pirzul changes
+         the color of the main handle not the pull handle in any way." The
+         paragraph above tone has said that since phase 4; these two gradients
+         were the half of it that never moved, because the nickel gradient was
+         fixed by name and its neighbours were not. -->
     <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="${hwTone[1]}"/>
+      <stop offset="0.5" stop-color="${hwTone[3]}"/>
+      <stop offset="1"   stop-color="${hwTone[5]}"/>
+    </linearGradient>
+
+    <!-- WARNING: THE GRIP'S OWN PAIR, AND WHY THERE HAS TO BE A SECOND SET.
+         One gradient cannot serve two masters: grabHandle is a PULL HANDLE
+         and takes tone, everything else that reached for these is lock
+         furniture and takes hwTone. While there was one set, whichever metal
+         it held was wrong for one family - and it was wrong for BOTH at once,
+         since grabHandle filled its rods from the nickel gradient (the
+         hardware finish) while the levers filled from nickelSoft (the bar's).
+         Named for the OWNER rather than for the metal, so the next drawing
+         added has to answer "whose is this?" before it can pick one. -->
+    <linearGradient id="gripHard" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="${tone[0]}"/>
+      <stop offset="0.16" stop-color="${tone[1]}"/>
+      <stop offset="0.38" stop-color="${tone[2]}"/>
+      <stop offset="0.60" stop-color="${tone[3]}"/>
+      <stop offset="0.80" stop-color="${tone[4]}"/>
+      <stop offset="1"    stop-color="${tone[5]}"/>
+    </linearGradient>
+    <linearGradient id="gripSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${tone[1]}"/>
       <stop offset="0.5" stop-color="${tone[3]}"/>
       <stop offset="1"   stop-color="${tone[5]}"/>
@@ -1468,15 +1503,18 @@ export function render(state) {
     <!-- Chrome mirrors an unlit room: bright rim, banded face, and a middle
          that is DARKER than the door behind it. Filling a backplate with
          light grey is the classic rendered-hardware tell. -->
+    <!-- WARNING: hwTone HERE TOO, and this is the plainest of the three: its
+         own comment says "filling a BACKPLATE", and a backplate is the
+         lever's plate. Three users, all lock furniture. -->
     <linearGradient id="plateFace" x1="0" y1="0" x2="1" y2="0.22">
-      <stop offset="0"    stop-color="${tone[2]}"/>
-      <stop offset="0.16" stop-color="${tone[4]}"/>
-      <stop offset="0.36" stop-color="${tone[5]}"/>
-      <stop offset="0.50" stop-color="${tone[3]}"/>
-      <stop offset="0.64" stop-color="${tone[1]}"/>
-      <stop offset="0.78" stop-color="${tone[2]}"/>
-      <stop offset="0.92" stop-color="${tone[4]}"/>
-      <stop offset="1"    stop-color="${tone[5]}"/>
+      <stop offset="0"    stop-color="${hwTone[2]}"/>
+      <stop offset="0.16" stop-color="${hwTone[4]}"/>
+      <stop offset="0.36" stop-color="${hwTone[5]}"/>
+      <stop offset="0.50" stop-color="${hwTone[3]}"/>
+      <stop offset="0.64" stop-color="${hwTone[1]}"/>
+      <stop offset="0.78" stop-color="${hwTone[2]}"/>
+      <stop offset="0.92" stop-color="${hwTone[4]}"/>
+      <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
 
     <!-- The euro cylinder is a separate chromed part pressed into the
@@ -1495,7 +1533,16 @@ export function render(state) {
          Only black is special-cased. Passing every stop through scaleTone
          would have turned the cylinder brass on a brass door, which is the
          thing the paragraph above says it is not. -->
-    ${finish.id === 'black' ? `
+    ${/* ⚠ `hwBlack`, AND IT USED TO BE `finish.id === 'black'` — the PULL
+          BAR's finish. Reported from outside: *"the מוט שחור option changes
+          the keyhole color to black."* It did, exactly: `barblack` declares
+          `finish: 'black'`, and the black cylinder measured off
+          research/newdoor/keyhole.jpg was gated on that instead of on the
+          פרזול. Choosing a black pull bar blackened the keyway of a nickel
+          lockset — a fitting the customer had not touched and is not paying
+          for. The measurement below is unchanged and still right; only the
+          question it answers has moved to the axis that owns the cylinder. */''}
+    ${hwBlack ? `
     <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="#5A5D60"/>
       <stop offset="0.4" stop-color="#333639"/>
@@ -6335,7 +6382,19 @@ function handleFootprint(handle, leafH, panelled = false) {
     case 'lever':   return { out: 40, in: 152, vy: 51 };
     case 'plate':   return { out: 47, in: 119, vy: 170 };
     case 'almog':   return { out: 42, in: 220, vy: 42 };
-    case 'cadoor':  return { out: 78, in: 41, vy: 48 };
+    /* ⚠ `out` WAS 78 AND THE DRAWING REACHES 41. Reported from outside as
+       *"you can also see that this circle handle is off place"*, and it was:
+       `lockBackset` returns `max(KEYWAY_BACKSET, out + 10)`, so a declared 78
+       put the ball's axis at 88 while the keyhole below it stayed pinned at
+       63 — the knob and the cylinder it turns, 25 mm out of line, on a door
+       where they go into the same mortice lock case and physically cannot be.
+       41 is what `npm run collide -- boxes` measures off the art; 78 was
+       never measured. With it corrected the clamp yields `max(63, 51) = 63`
+       and the ball lands on the keyway's own axis.
+       ⚠ AND THE BALL SITS ON NO ROSE ON PURPOSE — that is the whole product
+       difference between `cadoor` (כדור) and `knobplate` (כדור על אורך), the
+       one with the backplate. Do not "fix" that by adding one. */
+    case 'cadoor':  return { out: 41, in: 41, vy: 48 };
     case 'sapir':   return { out: 36, in: 74, vy: 43 };
     case 'knobplate': return { out: 53, in: 48, vy: 198 };
     case 'cylinder': return { out: LOCK_R + 8, in: LOCK_R + 8, vy: LOCK_R + 8 };
@@ -6570,12 +6629,30 @@ export function lockBackset(handle, lockset) {
      nothing else — the cylinder cannot be placed independently of the thing it
      is set into. KEYWAY_BACKSET is derived from exactly those so that none of
      them overhangs the closing edge there. Everything else has its keyway
-     drawn as a SEPARATE escutcheon at KEYWAY_BACKSET whatever this returns, so
-     this is free to move a wide knob out of trouble without taking the
-     keyhole with it. */
+     drawn as a SEPARATE escutcheon at KEYWAY_BACKSET whatever this returns.
+
+     ⚠ AND THE LOOSE FAMILY SITS THERE TOO NOW — the floor below the clamp is
+     `KEYWAY_BACKSET`, not `LOCK_BACKSET_GRIP`. This paragraph used to end
+     "...so this is free to move a wide knob out of trouble without taking the
+     keyhole with it", and that is right about the DRAWING and wrong about the
+     DOOR. Reported from outside: *"you can also see that this circle handle is
+     off place."*
+
+     It was. cadoor, sapir and coral drifted to `max(49, out + 10)` while
+     their keyway stayed pinned at 63. A knob's spindle and the cylinder below
+     it go into the SAME mortice lock case — one steel box, bored once — so
+     they cannot have two backsets. On a lever the offset hid behind a big
+     rosette; on the Cadoor ball it put two discs of nearly the same size
+     25 mm out of line, which is exactly what got noticed.
+
+     ⚠ MEASURED, AND IT COSTS 8 DESIGNS. Every grip x lockset x size x window
+     x handing: 714 of 2,688 lost their pull handle to a collision before,
+     722 after — 0.3%. The note above weighed 49 against 60 and kept 49
+     because 60 "costs a mainstream door its handle". 63 costs eight
+     combinations and buys a drawing that could be built. */
   if (lockset && lockset.lock) return KEYWAY_BACKSET;
   const out = lockset ? handleFootprint(lockset, 2000).out : 0;
-  return Math.max(LOCK_BACKSET_GRIP, out + 10);
+  return Math.max(KEYWAY_BACKSET, out + 10);
 }
 
 /**
@@ -6875,20 +6952,20 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
              ball, so all that shows is a ring of it — and that ring is the
              whole of the standoff anyone is allowed to draw. -->
         ${POST.map(t => `
-        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#nickelSoft)"/>
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#gripSoft)"/>
         <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.10"/>`).join('')}
 
         <!-- Outboard stems, visibly thinner than the shaft; then the terminal
              beads, which is what every one of these doors ends in. -->
-        ${rod(0.075, 0.155, D * 0.30, D * 0.15, 'url(#nickel)')}
-        ${rod(0.845, 0.925, D * 0.30, D * 0.15, 'url(#nickel)')}
-        ${rod(0.030, 0.078, D * 0.55, D * 0.5, 'url(#nickel)')}
-        ${rod(0.922, 0.970, D * 0.55, D * 0.5, 'url(#nickel)')}
-        ${rod(0.000, 0.032, D * 0.22, D * 0.11, 'url(#nickel)')}
-        ${rod(0.968, 1.000, D * 0.22, D * 0.11, 'url(#nickel)')}
+        ${rod(0.075, 0.155, D * 0.30, D * 0.15, 'url(#gripHard)')}
+        ${rod(0.845, 0.925, D * 0.30, D * 0.15, 'url(#gripHard)')}
+        ${rod(0.030, 0.078, D * 0.55, D * 0.5, 'url(#gripHard)')}
+        ${rod(0.922, 0.970, D * 0.55, D * 0.5, 'url(#gripHard)')}
+        ${rod(0.000, 0.032, D * 0.22, D * 0.11, 'url(#gripHard)')}
+        ${rod(0.968, 1.000, D * 0.22, D * 0.11, 'url(#gripHard)')}
         <!-- the flat rings just outboard of each ball -->
-        ${rod(0.106, 0.124, D * 0.60, D * 0.10, 'url(#nickelSoft)')}
-        ${rod(0.876, 0.894, D * 0.60, D * 0.10, 'url(#nickelSoft)')}
+        ${rod(0.106, 0.124, D * 0.60, D * 0.10, 'url(#gripSoft)')}
+        ${rod(0.876, 0.894, D * 0.60, D * 0.10, 'url(#gripSoft)')}
 
         <!-- The shaft: constant diameter, and the tone runs ACROSS it. A dark
              line at the top, a narrow specular at a third down, a broad dark
@@ -6896,13 +6973,13 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
              was one flat white ribbon, which is why it looked unlit. -->
         ${rod(0.20, 0.80, D / 2, D * 0.16, 'url(#grabRod)')}
         <!-- step collars where the shaft meets each ball -->
-        ${rod(0.203, 0.228, D * 0.575, D * 0.2, 'url(#nickelSoft)')}
-        ${rod(0.772, 0.797, D * 0.575, D * 0.2, 'url(#nickelSoft)')}
+        ${rod(0.203, 0.228, D * 0.575, D * 0.2, 'url(#gripSoft)')}
+        ${rod(0.772, 0.797, D * 0.575, D * 0.2, 'url(#gripSoft)')}
 
         <!-- the post balls, turned and standing in front of their roses -->
         ${POST.map(t => `
         <ellipse cx="${n1(P(t))}" cy="${n1(by)}" rx="${n1(D * 0.675)}" ry="${n1(D * 0.725)}"
-                 fill="url(#nickel)"/>
+                 fill="url(#gripHard)"/>
         <ellipse cx="${n1(P(t) - D * 0.16)}" cy="${n1(by - D * 0.26)}" rx="${n1(D * 0.34)}"
                  ry="${n1(D * 0.17)}" fill="#fff" opacity="0.32"/>`).join('')}
       </g>
