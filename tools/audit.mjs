@@ -112,11 +112,11 @@ for (const v of VIEWS) {
      change, so it is asserted rather than assumed; a regression here looks
      like a working page. */
   const shut = await p.evaluate(() => ({
-    sections: document.querySelectorAll('.sect__head').length,
-    openSections: [...document.querySelectorAll('.sect__body')].filter(b => !b.hidden).length,
-    open: [...document.querySelectorAll('.field__body')].filter(b => !b.hidden).length,
-    visibleHeads: [...document.querySelectorAll('.field__head')]
-      .filter(e => e.getBoundingClientRect().height > 0).length,
+    steps: document.querySelectorAll('.sect').length,
+    live: [...document.querySelectorAll('.sect')].filter(b => !b.hidden).length,
+    liveKey: (document.querySelector('.sect:not([hidden])') || {}).dataset?.section,
+    nav: document.querySelectorAll('.steps__step').length,
+    current: document.querySelectorAll('.steps__step[aria-current]').length,
     visibleOptions: [...document.querySelectorAll('[role="radio"]')]
       .filter(e => e.getBoundingClientRect().height > 0).length,
   }));
@@ -143,52 +143,67 @@ for (const v of VIEWS) {
     fault(v.name, `the drawing's backdrop computes to ${ground.fill} — the wall is unpainted`);
   }
 
-  if (!shut.sections) fault(v.name, 'no sections rendered');
-  if (shut.sections > 4) fault(v.name, `${shut.sections} top-level sections — the fold is meant to be short`);
+  if (!shut.steps) fault(v.name, 'no steps rendered');
 
-  /* ⚠ THE ARRIVAL STATE IS DIFFERENT ON THE TWO DEVICES, AND BOTH ARE
-     ASSERTED. This used to be one rule — nothing open, anywhere — which was
-     right while the page had one behaviour.
-     A PHONE keeps it, and the reason is measured: the panel used to render
-     every option in every group on first paint and put the WhatsApp button
-     eight screens down; all four open on a 390 px screen puts it back about
-     two, and the button is the entire purpose of the site.
-     A DESKTOP opens all four, from the mockup, and because the column is
-     918 px tall with 304 px of content in it — 614 px of empty card, made
-     more legible rather than less by drawing a border round it.
-     Stated per viewport, so neither can regress into the other's behaviour.
-     `wide` here is the same 1100 px breakpoint `css/app.css` uses; naming it
-     twice is the drift this file has been bitten by before, so it is derived
-     from the viewport under test rather than listed. */
-  const wide = v.w >= 1100;
-  if (wide) {
-    if (shut.openSections !== 4) {
-      fault(v.name, `${shut.openSections} of 4 sections open on load — a desktop `
-                  + 'arrives with the whole panel showing');
-    }
-    if (!shut.visibleHeads) fault(v.name, 'no category rows visible on a desktop load');
-  } else {
-    if (shut.openSections) fault(v.name, `${shut.openSections} sections already open on load`);
-    if (shut.visibleHeads) fault(v.name, `${shut.visibleHeads} category rows visible before a section was opened`);
+  /* ⚠ THE ARRIVAL STATE IS NOW THE SAME AT EVERY WIDTH, AND THAT IS THE POINT.
+     This used to be two rules — a phone arrived with every fold SHUT and a
+     desktop with all four OPEN — and each was measured: the panel once put the
+     WhatsApp button eight screens down a phone, and a desktop column 918 px
+     tall held 304 px of content, so 614 px of it was empty card.
+     A flow has one shape. Exactly one step is live, at 320 px and at 1680, and
+     the navigator says which. There is no per-device arrival to get wrong and
+     no 1100 px crossing to reshape on — which is a whole class of fault
+     (`REDESIGN.md` §1.8, and the fold sticking in the other device's mode)
+     that stops existing rather than getting another assertion.
+     ⚠ AND THE OPTIONS ARE MEANT TO BE VISIBLE. The old rule was "nothing open,
+     anywhere", which is exactly backwards for a flow: a step whose controls
+     are hidden is a step asking a question the customer cannot answer. What
+     must NOT be visible is every step at once, and `live === 1` is that. */
+  if (shut.live !== 1) {
+    fault(v.name, `${shut.live} steps visible at once — exactly one should be live`);
   }
-  if (shut.open) fault(v.name, `${shut.open} categories already open on load`);
-  if (shut.visibleOptions) fault(v.name, `${shut.visibleOptions} options visible before anything was opened`);
+  if (shut.liveKey !== 'fit') {
+    fault(v.name, `a bare load starts on "${shut.liveKey}" — it should start at step 01`);
+  }
+  if (shut.nav !== shut.steps) {
+    fault(v.name, `${shut.nav} navigator circles for ${shut.steps} steps`);
+  }
+  if (shut.current !== 1) {
+    fault(v.name, `${shut.current} navigator circles marked current — exactly one should be`);
+  }
+  if (!shut.visibleOptions) {
+    fault(v.name, 'the live step shows no options at all — its question cannot be answered');
+  }
 
-  /* AND ON A DESKTOP, CLICKING ONE HEADING MUST NOT SHUT THE OTHERS. That is
-     not hypothetical: `toggleSection` passed `null` to `openSection`, which
-     set `on = sec.key === key` for every section, so the first click on any
-     heading closed all four the moment they could all be open. */
-  if (wide) {
-    await p.click('.sect__head');
-    await p.waitForTimeout(200);
-    const after = await p.evaluate(() =>
-      [...document.querySelectorAll('.sect__body')].filter(b => !b.hidden).length);
-    if (after !== 3) {
-      fault(v.name, `closing one section left ${after} of the other 3 open — `
-                  + 'one heading is shutting the whole panel');
+  /* ⚠ EVERY STEP MUST BE REACHABLE FROM THE NAVIGATOR AT ANY TIME, and this
+     replaced "clicking one heading must not shut the others" — a check written
+     because `toggleSection` passed `null` to `openSection`, which set
+     `on = sec.key === key` for every section and shut all four on the first
+     click. There are no headings to shut now.
+     What matters instead is that the flow is not a one-way road: a customer
+     who wants to change the colour must not walk through six steps to reach
+     it. Walked rather than asserted at one point, because a navigator that
+     works for the first circle and not the seventh is the fault this is for. */
+  {
+    const keys = await p.evaluate(() =>
+      [...document.querySelectorAll('.steps__step')].map(b => b.dataset.step));
+    for (const k of keys) {
+      /* Back to the top before each jump. The navigator is sticky, so a
+         customer never loses it — but Playwright scrolls its target into view
+         and the DOCK is fixed over the bottom 78 px, so a circle that happens
+         to land there is reported as intercepted. Scrolling first asks the
+         question this check is actually about (does the circle open its step)
+         rather than the one about where the browser chose to put it. */
+      await p.evaluate(() => window.scrollTo(0, 0));
+      await p.waitForTimeout(40);
+      await p.click(`.steps__step[data-step="${k}"]`);
+      await p.waitForTimeout(90);
+      const now = await p.evaluate(() =>
+        (document.querySelector('.sect:not([hidden])') || {}).dataset?.section);
+      if (now !== k) fault(v.name, `the navigator's "${k}" circle opened "${now}"`);
     }
-    await p.click('.sect__head');          // put it back for the walk below
-    await p.waitForTimeout(200);
+    await p.click('.steps__step');          // back to step 01 for the walk below
+    await p.waitForTimeout(120);
   }
 
   /* WHAT IS HIDDEN MUST ACTUALLY BE GONE.
@@ -209,8 +224,11 @@ for (const v of VIEWS) {
   /* Tap targets, measured with every body OPEN at BOTH levels — a hidden
      element has no size, so measuring them closed would pass everything by
      measuring nothing. */
+  /* ⚠ EVERY STEP UNHIDDEN, because a hidden element has no size and measuring
+     tap targets on eight hidden steps would pass everything by measuring
+     nothing. This used to unhide the two fold levels; there is one now. */
   await p.evaluate(() => {
-    document.querySelectorAll('.sect__body,.field__body').forEach(b => { b.hidden = false; });
+    document.querySelectorAll('.sect').forEach(b => { b.hidden = false; });
   });
   /* DERIVED, not listed. This asked a hand-kept set of classes —
      [role="radio"], .btn, .bar__phone, .field__head, .sect__head — and the
@@ -236,6 +254,19 @@ for (const v of VIEWS) {
     return out;
   });
   small.forEach(s => fault(v.name, `tap target under 44px: ${s}`));
+
+  /* ⚠ AND PUT THEM BACK. Unhiding all nine steps to measure them leaves the
+     panel nine steps tall, and the very next check asserts that the PAGE does
+     not scroll above 1100 — which it then does, at all four desktop viewports,
+     because the audit made it. The old version unhid the two fold levels
+     inside a panel that scrolls internally and got away with it; nine whole
+     steps is a different quantity. An instrument that changes the thing it is
+     about to measure is worse than no instrument. */
+  await p.evaluate(() => {
+    const live = document.querySelector('.steps__step[aria-current]');
+    const key = live && live.dataset.step;
+    document.querySelectorAll('.sect').forEach(b => { b.hidden = b.dataset.section !== key; });
+  });
 
   /* ⚠ NOTHING IN THIS FILE EVER SCROLLED THE PAGE, and that is how the stage
      came to be un-pinned at every width without a single instrument noticing.
@@ -276,23 +307,19 @@ for (const v of VIEWS) {
   const seen = new Map();
   for (const { key, section } of await groupsOn(p)) {
     const g = `.field[data-group="${key}"]`;
-    /* Open it the way a person does, both levels, section first. Clicking an
-       option inside a closed category would still work through the DOM and
-       would prove nothing about whether anyone can reach it — and with the
-       cabinet two deep, "can anyone reach it" is the question. */
-    await p.$eval(`.sect[data-section="${section}"] .sect__head`, el => {
-      if (el.getAttribute('aria-expanded') !== 'true') el.click();
-    });
-    await p.waitForTimeout(60);
-    if (!await p.$eval(`.sect[data-section="${section}"] .sect__body`, el => !el.hidden)) {
-      fault(v.name, `section ${section} would not open`); continue;
-    }
-    await p.$eval(`${g} .field__head`, el => {
-      if (el.getAttribute('aria-expanded') !== 'true') el.click();
-    });
-    await p.waitForTimeout(60);
-    const opened = await p.$eval(`${g} .field__body`, el => !el.hidden);
-    if (!opened) { fault(v.name, `${key} would not open`); continue; }
+    /* Reach it the way a person does: go to its STEP. Clicking an option on a
+       hidden step would still work through the DOM and would prove nothing
+       about whether anyone can get to it — and "can anyone reach it" is the
+       question this walk exists to ask.
+       ⚠ ONE LEVEL NOW, NOT TWO. It used to open the section and then the
+       category inside it, because the cabinet was two deep. A step holds one
+       or two groups and shows them both. */
+    await p.click(`.steps__step[data-step="${section}"]`);
+    await p.waitForTimeout(70);
+    const onStep = await p.$eval(`.sect[data-section="${section}"]`, el => !el.hidden);
+    if (!onStep) { fault(v.name, `step ${section} would not open`); continue; }
+    const opened = await p.$eval(`${g}`, el => el.getBoundingClientRect().height > 0);
+    if (!opened) { fault(v.name, `${key} is on step ${section} and not visible`); continue; }
 
     const ids = await p.$$eval(`${g} [role="radio"]`, els => els.map(e => e.dataset.id));
     if (!ids.length) { fault(v.name, `${key} rendered no options`); continue; }
@@ -656,57 +683,49 @@ for (const v of VIEWS) {
     await p.goto('file://' + process.cwd() + '/index.html');
     await p.waitForTimeout(300);
 
-    /* Tab until a section head has focus rather than counting presses — the
-       header's links come first and there is no reason for this check to know
-       how many of them there are. */
+    /* ⚠ TAB TO A NAVIGATOR CIRCLE, NOT TO A SECTION HEADING. The headings are
+       `<h2>`s now: nothing folds, so a `<button>` that toggles nothing would
+       be a control lying to a screen reader about being interactive. What a
+       keyboard user tabs to instead is the navigator, which is where the
+       page's own structure lives.
+       Tab until one has focus rather than counting presses — the header's
+       links come first and there is no reason for this check to know how many
+       of them there are. */
     let head = null;
     for (let i = 0; i < 20 && !head; i++) {
       await p.keyboard.press('Tab');
       head = await p.evaluate(() => {
         const a = document.activeElement;
-        return a && a.classList && a.classList.contains('sect__head') ? a.id : null;
+        return a && a.classList && a.classList.contains('steps__step') ? a.dataset.step : null;
       });
     }
-    if (!head) fault(v.name, 'no section heading can be reached with Tab');
+    if (!head) fault(v.name, 'no navigator circle can be reached with Tab');
     else {
-      /* ⚠ ENTER TOGGLES, and which direction that is depends on the device:
-         a desktop arrives with all four sections open, so Enter CLOSES the
-         first one. This used to assert "Enter opens it", which was true while
-         the page had one behaviour and inverts under the other — so it asks
-         the state, flips it, and checks it flipped. Strictly stronger than
-         the one-directional version it replaces, and it works at every
-         viewport without knowing the breakpoint. */
-      const wasOpen = await p.evaluate(id =>
-        document.getElementById(id).getAttribute('aria-expanded') === 'true', head);
+      /* ⚠ ENTER GOES TO THAT STEP, and this replaced "Enter toggles a section",
+         which itself replaced "Enter opens it" when the desktop started
+         arriving with all four open. A flow has no toggle: pressing Enter on a
+         circle takes you there, and the assertion is that the live step
+         becomes the one the circle names. One direction, no device dependency,
+         and no breakpoint to know about. */
       await p.keyboard.press('Enter');
-      await p.waitForTimeout(150);
-      const nowOpen = await p.evaluate(id =>
-        document.getElementById(id).getAttribute('aria-expanded') === 'true', head);
-      if (nowOpen === wasOpen) {
-        fault(v.name, `Enter on a section heading did not toggle it `
-                    + `(it was ${wasOpen ? 'open' : 'shut'} and still is)`);
-      }
-      /* Leave it OPEN for the rest of the walk, whichever way it just went. */
-      if (!nowOpen) { await p.keyboard.press('Enter'); await p.waitForTimeout(150); }
-
-      await p.keyboard.press('Tab');
-      await p.waitForTimeout(80);
-      if (!await p.evaluate(() => document.activeElement.classList.contains('field__head'))) {
-        fault(v.name, 'Tab from an open section does not reach a category');
+      await p.waitForTimeout(180);
+      const live = await p.evaluate(() =>
+        (document.querySelector('.sect:not([hidden])') || {}).dataset?.section);
+      if (live !== head) {
+        fault(v.name, `Enter on the "${head}" navigator circle opened "${live}"`);
       }
 
-      await p.keyboard.press('Enter');
-      await p.waitForTimeout(150);
-      if (!await p.evaluate(() => !!document.querySelector('.field__body:not([hidden])'))) {
-        fault(v.name, 'Enter on a category heading does not open it');
+      /* And from there, Tab must reach the options on that step — with no fold
+         in between, which is the whole ergonomic point of the change. */
+      let hops = 0, first = null;
+      while (hops++ < 24 && !first) {
+        await p.keyboard.press('Tab');
+        await p.waitForTimeout(30);
+        first = await p.evaluate(() =>
+          document.activeElement.getAttribute('role') === 'radio'
+            ? document.activeElement.dataset.id : null);
       }
-
-      await p.keyboard.press('Tab');
-      await p.waitForTimeout(80);
-      const first = await p.evaluate(() =>
-        document.activeElement.getAttribute('role') === 'radio'
-          ? document.activeElement.dataset.id : null);
-      if (!first) fault(v.name, 'Tab from an open category does not reach an option');
+      if (!first) fault(v.name, 'Tab from a navigator circle does not reach an option');
       else {
         const codeBefore = await p.$eval('#code', e => e.textContent);
         await p.keyboard.press('ArrowLeft');

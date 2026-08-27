@@ -150,11 +150,19 @@ function measure(d) {
       /* Open the colour group: on a phone the panel arrives folded, and a
          swatch inside a closed section has no box to click. */
       await p.evaluate(() => {
-        document.querySelector('.steps__step[data-step="look"]').click();
+        /* ⚠ `colour`, NOT `look`, AND NO SECOND FOLD TO OPEN. The four folded
+           sections became eight flow steps: `look` held the colour and the
+           face, and the colour has a step of its own now. And a step shows
+           its groups outright, so the `.field__head` click below — which
+           opened the category inside the section — has nothing to open and
+           does not exist. This measures a TAP ON A SWATCH, so the setup has
+           to leave a swatch on screen; when it silently did not, the tool
+           reported "not one door could be measured" rather than a wrong
+           number, which is the right way for a broken instrument to fail. */
+        document.querySelector('.steps__step[data-step="colour"]').click();
       });
       await p.waitForTimeout(200);
       await p.evaluate(() => {
-        document.querySelector('.field[data-group="colour"] .field__head').click();
       });
       await p.waitForTimeout(200);
 

@@ -6609,11 +6609,11 @@ ${body}
   var GROUPS = [
     /* `label` and `meta` used to sit here and nothing read either of them; `meta`
        also spelled the chart code "RAL", which it is not — see `colourCode`. */
-    { key: "colour", title: "צבע", in: "look", kind: "swatch", list: () => COLOURS },
+    { key: "colour", title: "צבע", in: "colour", kind: "swatch", list: () => COLOURS },
     {
       key: "detail",
       title: "עיצוב החזית",
-      in: "look",
+      in: "face",
       kind: "tile",
       list: () => DETAILS,
       glyph: detailGlyph,
@@ -6638,7 +6638,7 @@ ${body}
     {
       key: "handle",
       title: "ידית משיכה",
-      in: "hw",
+      in: "grip",
       kind: "hw",
       list: () => HANDLES,
       glyph: handleGlyph,
@@ -6647,7 +6647,7 @@ ${body}
     {
       key: "lockset",
       title: "מנעול וידית",
-      in: "hw",
+      in: "lock",
       kind: "hw",
       list: () => LOCKSETS,
       glyph: locksetGlyph,
@@ -6662,7 +6662,7 @@ ${body}
     {
       key: "speciallock",
       title: "מנעול מיוחד",
-      in: "hw",
+      in: "lock",
       kind: "hw",
       list: () => SPECIAL_LOCKS,
       glyph: specialLockGlyph,
@@ -6676,7 +6676,7 @@ ${body}
     {
       key: "pirzul",
       title: "פרזול",
-      in: "hw",
+      in: "pz",
       kind: "hw",
       list: () => PIRZUL2,
       glyph: pirzulGlyph,
@@ -6706,7 +6706,7 @@ ${body}
     {
       key: "mashkof",
       title: "משקוף",
-      in: "fit",
+      in: "mk",
       kind: "hw",
       list: () => MASHKOFS,
       glyph: mashkofGlyph,
@@ -6722,26 +6722,75 @@ ${body}
     }
   ];
   var SECTIONS = [
-    { key: "fit", title: "מבנה הדלת", sub: "גודל הדלת וכיוון הפתיחה" },
-    { key: "look", title: "מראה הדלת", sub: "צבע ועיצוב החזית" },
-    /* The sub names the categories INSIDE the section, and this one outlived
-       them: it promised "חלון, זכוכית, סורג" — three choices — after the glazing
-       axis was deleted and the grille list absorbed the etched-glass patterns,
-       leaving two. It advertised a question the page no longer asks, in the one
-       caption whose whole job is to say what is behind the fold, on the section
-       whose commit was called "One question about the window".
-       These are the two category titles verbatim, the way `hw` below carries
-       its own. Hand-kept prose beside a generated list is a drift point: if a
-       row moves in or out of GROUPS, this line has to move with it — and so
-       does the sub, in the same edit. */
-    { key: "glass", title: "חלון וזכוכית", sub: "חלון, עיצוב החלון" },
-    { key: "hw", title: "ידיות ומנעול", sub: "ידית משיכה, מנעול" }
+    {
+      key: "fit",
+      title: "מבנה הדלת",
+      sub: "גודל הדלת וכיוון הפתיחה",
+      lede: "הגודל והצד שאליו הדלת נפתחת. נמדוד אצלכם במדויק, בחינם."
+    },
+    {
+      key: "mk",
+      title: "משקוף",
+      sub: "המסגרת שהדלת נסגרת עליה",
+      lede: "המשקוף הוא המסגרת שהדלת נסגרת עליה. רוחב או עומק גדולים יותר מתאימים לקירות עבים, ועולים יותר."
+    },
+    {
+      key: "colour",
+      title: "צבע",
+      sub: "גוון הדלת",
+      lede: "צבע בתנור, מלוח הגוונים של היצרן. כל הגוונים באותו מחיר."
+    },
+    {
+      key: "face",
+      title: "עיצוב החזית",
+      sub: "פאנלים או פסי מתכת",
+      lede: "מה יש על פני הדלת — פאנלים מוגבהים, או פסי מתכת. אפשר גם חלק לגמרי."
+    },
+    {
+      key: "glass",
+      title: "חלון",
+      sub: "חלון ועיצוב הזכוכית",
+      lede: "חלון בכנף, ומה נמצא בתוכו — סורג או זכוכית מעוצבת."
+    },
+    {
+      key: "grip",
+      title: "ידית משיכה",
+      sub: "הידית האנכית ואורכה",
+      lede: "הידית שמושכים בה. אפשר גם בלעדיה, והאורך נתון לבחירתכם."
+    },
+    {
+      key: "lock",
+      title: "מנעול",
+      sub: "הידית המסתובבת ונעילה נוספת",
+      lede: "הידית שמסובבים והצילינדר — יש בכל דלת. אפשר להוסיף כספת או קודן."
+    },
+    {
+      key: "pz",
+      title: "פרזול",
+      sub: "גוון הידית והצירים",
+      lede: "הגוון של הידית, הצירים והעינית. לא משנה את גוון ידית המשיכה."
+    }
   ];
+  var SUMMARY = { key: "sum", title: "סיכום", sub: "הדלת שלכם, והמחיר" };
   var SECTION_ICON = {
+    /* a leaf and its frame, with a handle dot */
     fit: '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.2 3.6v16.8"/><path d="M15.4 12.4a.55.55 0 1 0 0-1.1.55.55 0 0 0 0 1.1Z"/>',
-    look: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
+    /* the frame in section: a wall, a face on it, a return into it */
+    mk: '<path d="M3 9.4h18"/><path d="M9.2 4.6h5.6"/><path d="M12 4.6v14.8"/><path d="M6.4 19.4h11.2"/>',
+    /* a paint drop */
+    colour: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
+    /* a panelled face */
+    face: '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.4 6.6h7.2v4.4H8.4Z"/><path d="M8.4 13.6h7.2v3.8H8.4Z"/>',
+    /* a glazed light with muntins */
     glass: '<path d="M4 4.6h16v11.6H4Z"/><path d="M12 4.6v11.6M4 10.4h16"/><path d="M7 19.4h10"/>',
-    hw: '<path d="M4.6 12h9.8"/><path d="M14.4 8.6h3.2v6.8h-3.2Z"/><path d="M18.4 12h1"/>'
+    /* a vertical pull bar on its standoffs */
+    grip: '<path d="M12 4.4v15.2"/><path d="M12 6.6h3.4M12 17.4h3.4"/>',
+    /* a lever on a rose, over a keyway */
+    lock: '<path d="M4.6 12h9.8"/><path d="M14.4 8.6h3.2v6.8h-3.2Z"/><path d="M18.4 12h1"/>',
+    /* a ring of finish */
+    pz: '<path d="M12 4.6a7.4 7.4 0 1 0 0 14.8 7.4 7.4 0 0 0 0-14.8Z"/><path d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Z"/>',
+    /* a page with a line of figures on it */
+    sum: '<path d="M6 3.6h12v16.8H6Z"/><path d="M9 8h6M9 11.6h6M9 15.2h3.4"/>'
   };
   function sectionIcon(key) {
     if (!Object.prototype.hasOwnProperty.call(SECTION_ICON, key)) {
@@ -6783,9 +6832,9 @@ ${body}
     $("#save-btn").addEventListener("click", saveCurrent);
     $("#price-toggle").addEventListener("click", () => {
       const box = $("#breakdown"), btn = $("#price-toggle");
-      const open2 = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", String(!open2));
-      box.hidden = open2;
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      box.hidden = open;
     });
     $("#works-close").addEventListener("click", closeWorks);
     document.querySelectorAll("[data-wa]").forEach((el) => {
@@ -6837,25 +6886,8 @@ ${body}
         slot.hidden = false;
       }
     }
-    const differs = GROUPS.find((g) => state[g.key] !== DEFAULTS[g.key]);
-    arrive(differs);
-    if (typeof window.matchMedia === "function") {
-      const wide = window.matchMedia("(min-width: 1100px)");
-      const onCross = () => arrive(GROUPS.find((g) => state[g.key] !== DEFAULTS[g.key]));
-      if (typeof wide.addEventListener === "function") wide.addEventListener("change", guard(onCross));
-      else if (typeof wide.addListener === "function") wide.addListener(guard(onCross));
-    }
-  }
-  function arrive(differs) {
-    if (soloSections()) {
-      if (differs) {
-        openSection(differs.in);
-        open(differs.key);
-      } else closeAllSections();
-    } else {
-      openAllSections();
-      if (differs) open(differs.key);
-    }
+    const shared = GROUPS.some((g) => state[g.key] !== DEFAULTS[g.key]) || state.stripeDir !== DEFAULTS.stripeDir;
+    goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
   }
   var worksObserver = null;
   function buildWorks() {
@@ -6992,21 +7024,15 @@ ${body}
     wrap.appendChild(opener);
     const nav = document.createElement("nav");
     nav.className = "steps";
-    nav.setAttribute("aria-label", "מעבר בין חלקי הבחירה");
-    for (const sec of SECTIONS) {
+    nav.setAttribute("aria-label", "מעבר בין שלבי הבחירה");
+    for (const sec of [...SECTIONS, SUMMARY]) {
       const b = document.createElement("button");
       b.type = "button";
       b.className = "steps__step";
       b.dataset.step = sec.key;
       b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span><span class="steps__l"><span class="steps__n" aria-hidden="true"></span><span class="steps__t">${sec.title}</span></span>`;
       b.setAttribute("aria-label", sec.title);
-      b.addEventListener("click", () => {
-        if ($(`#sect-head-${sec.key}`).getAttribute("aria-expanded") !== "true") {
-          openSection(sec.key);
-        }
-        $(`#sect-head-${sec.key}`).scrollIntoView({ block: "start" });
-        $(`#sect-head-${sec.key}`).focus();
-      });
+      b.addEventListener("click", () => goStep(sec.key));
       nav.appendChild(b);
     }
     wrap.appendChild(nav);
@@ -7014,43 +7040,51 @@ ${body}
       const box = document.createElement("section");
       box.className = "sect";
       box.dataset.section = sec.key;
+      box.hidden = true;
       box.innerHTML = `
-      <button class="sect__head" type="button" aria-expanded="false"
-              id="sect-head-${sec.key}" aria-controls="sect-body-${sec.key}">
-        <span class="sect__text">
-          <span class="sect__title">${sec.title}</span>
-          <span class="sect__sub">${sec.sub}</span>
-        </span>
-        <span class="sect__now" data-sect-now></span>
-        <span class="field__chev" aria-hidden="true"></span>
-      </button>
-      <div class="sect__body" id="sect-body-${sec.key}" role="region"
-           aria-labelledby="sect-head-${sec.key}" hidden></div>`;
+      <p class="sect__where"><span data-step-n></span></p>
+      <h2 class="sect__title" id="sect-head-${sec.key}" tabindex="-1">${sec.title}</h2>
+      ${sec.lede ? `<p class="sect__lede">${sec.lede}</p>` : ""}
+      <div class="sect__body" id="sect-body-${sec.key}"></div>`;
       wrap.appendChild(box);
-      box.querySelector(".sect__head").addEventListener("click", () => toggleSection(sec.key));
       const body = box.querySelector(".sect__body");
       for (const g of groupsIn(sec.key)) {
         const field = document.createElement("div");
         field.className = "field";
         field.dataset.group = g.key;
         field.innerHTML = `
-        <button class="field__head" type="button" aria-expanded="false"
-                id="head-${g.key}" aria-controls="body-${g.key}">
-          <span class="field__title">${g.title}</span>
-          <span class="field__now" data-now></span>
-          <span class="field__chev" aria-hidden="true"></span>
-        </button>
-        <div class="field__body" id="body-${g.key}" role="region"
-             aria-labelledby="head-${g.key}" hidden>
+        <h3 class="field__title" id="head-${g.key}">${g.title}</h3>
+        <div class="field__body" id="body-${g.key}">
           <div class="field__opts"></div>
           ${g.hint ? `<p class="field__hint">${g.hint}</p>` : ""}
           <p class="field__note" data-note hidden></p>
         </div>`;
         body.appendChild(field);
-        field.querySelector(".field__head").addEventListener("click", () => toggle(g.key));
         buildOptions(g, field.querySelector(".field__opts"));
       }
+      const foot = document.createElement("div");
+      foot.className = "sect__foot";
+      foot.innerHTML = `
+      <button type="button" class="btn btn--ghost sect__back">‹ הקודם</button>
+      <button type="button" class="btn sect__next">הבא ›</button>`;
+      foot.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
+      foot.querySelector(".sect__next").addEventListener("click", () => stepBy(1));
+      box.appendChild(foot);
     }
+    const sum = document.createElement("section");
+    sum.className = "sect sect--sum";
+    sum.dataset.section = SUMMARY.key;
+    sum.hidden = true;
+    sum.innerHTML = `
+    <p class="sect__where"><span data-step-n></span></p>
+    <h2 class="sect__title" id="sect-head-sum" tabindex="-1">${SUMMARY.title}</h2>
+    <p class="sect__lede">בדקו שהכול נכון, ושלחו לנו את הדלת.</p>
+    <div class="sect__body" id="sum-slot"></div>
+    <div class="sect__foot">
+      <button type="button" class="btn btn--ghost sect__back">‹ הקודם</button>
+    </div>`;
+    sum.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
+    wrap.appendChild(sum);
   }
   function tilePrice(g, o, state2) {
     const after = { ...repair({ ...state2, [g.key]: o.id }).state, [g.key]: o.id };
@@ -7243,21 +7277,39 @@ ${body}
     }
     host.appendChild(box);
   }
-  var soloSections = () => !window.matchMedia("(min-width: 1100px)").matches;
-  function openSection(key) {
-    const solo = soloSections();
-    for (const sec of SECTIONS) {
-      const head = $(`#sect-head-${sec.key}`), body = $(`#sect-body-${sec.key}`);
-      const on = sec.key === key ? true : solo ? false : head.getAttribute("aria-expanded") === "true";
-      head.setAttribute("aria-expanded", String(on));
-      body.hidden = !on;
-      head.closest(".sect").classList.toggle("is-open", on);
-      if (!on) {
-        for (const g of groupsIn(sec.key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
+  var liveStep = SECTIONS[0].key;
+  var STEP_KEYS = () => [...SECTIONS.map((x) => x.key), SUMMARY.key];
+  function goStep(key, focus = true) {
+    if (!STEP_KEYS().includes(key)) return;
+    liveStep = key;
+    for (const k of STEP_KEYS()) {
+      const box = document.querySelector(`.sect[data-section="${k}"]`);
+      if (box) {
+        box.hidden = k !== key;
+        box.classList.toggle("is-live", k === key);
       }
     }
+    const slot = $("#sum-slot"), send = document.querySelector(".panel--send");
+    if (slot && send && send.parentElement !== slot) slot.appendChild(send);
     markSteps();
+    if (focus) {
+      const h = $(`#sect-head-${key}`);
+      if (h) {
+        const wide = typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
+        const panel = h.closest(".panel--choose");
+        if (wide && panel) panel.scrollTop = Math.max(0, h.offsetTop - panel.offsetTop - 8);
+        else h.scrollIntoView({ block: "start" });
+        h.focus({ preventScroll: true });
+      }
+    }
     fitStage();
+    paint();
+  }
+  function stepBy(d) {
+    const keys = STEP_KEYS();
+    const i = keys.indexOf(liveStep) + d;
+    if (i < 0 || i >= keys.length) return;
+    goStep(keys[i]);
   }
   var SAVED_KEY = "dm.saved.v1";
   var SAVED_MAX = 6;
@@ -7309,16 +7361,16 @@ ${body}
     box.replaceChildren(...list.map((q) => {
       const li = document.createElement("li");
       li.className = "saved__row";
-      const open2 = document.createElement("button");
-      open2.type = "button";
-      open2.className = "saved__open";
+      const open = document.createElement("button");
+      open.type = "button";
+      open.className = "saved__open";
       let label = q;
       try {
         label = summaryLine(fromQuery(q).state);
       } catch {
       }
-      open2.textContent = label;
-      open2.addEventListener("click", () => {
+      open.textContent = label;
+      open.addEventListener("click", () => {
         const { state: st } = fromQuery(q);
         set(st);
         $("#saved").hidden = true;
@@ -7333,58 +7385,31 @@ ${body}
         savedWrite(savedRead().filter((x) => x !== q));
         paintSaved();
       });
-      li.append(open2, drop);
+      li.append(open, drop);
       return li;
     }));
   }
   function markSteps() {
-    for (const sec of SECTIONS) {
-      const b = document.querySelector(`.steps__step[data-step="${sec.key}"]`);
-      const head = $(`#sect-head-${sec.key}`);
-      if (!b || !head) continue;
-      const on = head.getAttribute("aria-expanded") === "true";
-      b.classList.toggle("is-on", on);
-      if (on) b.setAttribute("aria-current", "true");
-      else b.removeAttribute("aria-current");
+    const keys = STEP_KEYS();
+    for (const [i2, k] of keys.entries()) {
+      const b = document.querySelector(`.steps__step[data-step="${k}"]`);
+      if (b) {
+        const on = k === liveStep;
+        b.classList.toggle("is-on", on);
+        if (on) b.setAttribute("aria-current", "step");
+        else b.removeAttribute("aria-current");
+      }
+      const where = document.querySelector(`.sect[data-section="${k}"] [data-step-n]`);
+      if (where) {
+        where.textContent = k === SUMMARY.key ? SUMMARY.sub : `${String(i2 + 1).padStart(2, "0")} ⁄ ${String(SECTIONS.length).padStart(2, "0")}`;
+      }
     }
-  }
-  function closeSection(key) {
-    const head = $(`#sect-head-${key}`), body = $(`#sect-body-${key}`);
-    head.setAttribute("aria-expanded", "false");
-    body.hidden = true;
-    head.closest(".sect").classList.remove("is-open");
-    for (const g of groupsIn(key)) if ($(`#head-${g.key}`)) closeGroup(g.key);
-    markSteps();
-    fitStage();
-  }
-  function openAllSections() {
-    for (const sec of SECTIONS) openSection(sec.key);
-  }
-  function closeAllSections() {
-    for (const sec of SECTIONS) closeSection(sec.key);
-  }
-  function closeGroup(key) {
-    $(`#head-${key}`).setAttribute("aria-expanded", "false");
-    $(`#body-${key}`).hidden = true;
-    $(`#head-${key}`).closest(".field").classList.remove("is-open");
-  }
-  function open(key) {
-    for (const g of GROUPS) {
-      const on = g.key === key;
-      const head = $(`#head-${g.key}`), body = $(`#body-${g.key}`);
-      head.setAttribute("aria-expanded", String(on));
-      body.hidden = !on;
-      head.closest(".field").classList.toggle("is-open", on);
+    const i = keys.indexOf(liveStep);
+    for (const b of document.querySelectorAll(".sect__back")) b.disabled = i <= 0;
+    for (const b of document.querySelectorAll(".sect__next")) {
+      b.disabled = i >= keys.length - 1;
+      b.textContent = i === keys.length - 2 ? "לסיכום ›" : "הבא ›";
     }
-    fitStage();
-  }
-  function toggleSection(key) {
-    const open2 = $(`#sect-head-${key}`).getAttribute("aria-expanded") === "true";
-    if (open2) closeSection(key);
-    else openSection(key);
-  }
-  function toggle(key) {
-    open($(`#head-${key}`).getAttribute("aria-expanded") === "true" ? null : key);
   }
   function choose(g, id) {
     const { state: fixed, said } = repair({ ...state, [g.key]: id }, g.key);
@@ -7446,14 +7471,6 @@ ${body}
     const n = items.findIndex((el) => el.getBoundingClientRect().top > top + 1);
     return n === -1 ? items.length : n;
   }
-  function nowLabel(g) {
-    const list = g.list();
-    const hit = list.find((o) => o.id === state[g.key]) || list[0];
-    return hit ? hit.he : "";
-  }
-  function sectionLabel(sec) {
-    return groupsIn(sec.key).map(nowLabel).filter(Boolean).join(" · ");
-  }
   function paint() {
     const colour = byId(COLOURS, state.colour);
     const handing = byId(HANDINGS, state.handing);
@@ -7482,14 +7499,11 @@ ${body}
       }));
     }
     const blocked = conflicts(state);
-    for (const g of GROUPS) {
-      const field = $(`.field[data-group="${g.key}"]`);
-      field.querySelector("[data-now]").textContent = nowLabel(g);
-      markGroup(g, blocked[g.key] || {});
-    }
-    for (const sec of SECTIONS) {
-      $(`.sect[data-section="${sec.key}"] [data-sect-now]`).textContent = sectionLabel(sec);
-    }
+    for (const g of GROUPS) markGroup(g, blocked[g.key] || {});
+    const faceOpts = document.querySelector('.field[data-group="detail"] .field__opts');
+    if (faceOpts) buildStripes(faceOpts);
+    const gripOpts = document.querySelector('.field[data-group="handle"] .field__opts');
+    if (gripOpts) buildLengthStepper(gripOpts);
     const wa = whatsappUrl(state);
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.href = wa;

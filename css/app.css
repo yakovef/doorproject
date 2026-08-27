@@ -791,6 +791,15 @@ body {
    `list[0]`, so all four sections carry a value on first paint and any
    state-derived indicator reads 4/4 before the customer has touched anything.
    Measured, and written down in REDESIGN.md §4. */
+/* ⚠ NINE CIRCLES WHERE THERE WERE FOUR, AND THEY MUST SCROLL RATHER THAN PUSH.
+   Measured the moment the flow landed: the row overflowed a 390 px phone by
+   54 px and took the whole PAGE sideways with it — every one of the audit's
+   option clicks reported "page scrolls sideways by 54px", which is the one
+   thing CLAUDE.md §8's `minmax(0, 1fr)` note is about in a different costume.
+   `overflow-x: auto` on the row confines it; `min-inline-size: 0` is what
+   actually lets a flex item shrink below its content, and without it the rule
+   above does nothing. Scroll-snap so a flick lands on a circle rather than
+   between two. */
 .steps {
   position: relative;
   display: flex; gap: 4px;
@@ -798,6 +807,28 @@ body {
   border-block-end: 1px solid var(--rule);
   margin-block-end: 4px;
   counter-reset: step;
+  min-inline-size: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: inline proximity;
+  overscroll-behavior-inline: contain;
+}
+.steps::-webkit-scrollbar { display: none; }
+.steps__step { scroll-snap-align: center; }
+
+/* ⚠ AND IT STICKS TO THE TOP OF THE PANEL, which four folded sections never
+   needed and nine steps do. Found by the audit: after jumping to a late step
+   the page scrolls, the navigator goes off the top, and the only way back to
+   step 01 is to scroll up hunting for it — Playwright reported the dock
+   intercepting the click, which is the same fault seen from below.
+   A flow's table of contents has to be reachable from anywhere in the flow,
+   or it is not navigation. `--surface` behind it so the step's content does
+   not show through as it passes underneath. */
+.steps {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 3;
+  background: var(--surface);
 }
 /* The connector, drawn once behind the row rather than as a border on each
    circle — four separate half-lines would leave a seam wherever the flex

@@ -1319,6 +1319,48 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE CABINET IS GONE. THE PAGE IS A FLOW.** Eight steps and a quote page,
+  exactly one live at every width. `TRANSFORM.md` §10.0 has the argument; the
+  short form is that a fold asks a question about the INTERFACE before it asks
+  anything about a door, it has nowhere to explain what a משקוף is, and it gets
+  worse with every category — of which this round added three.
+  `liveStep` is presentation: not in `state`, not in the URL, not in the code,
+  not in `js/spec.js`. Which step somebody is looking at is a fact about their
+  afternoon.
+  ⚠ **Six functions were DELETED, not left unreferenced** — `closeSection`,
+  `openAllSections`, `closeAllSections`, `closeGroup`, `open`, `toggle` — along
+  with `soloSections` and the 1100 px `matchMedia` listener. Every one was
+  correct and several were hard-won. A flow has one shape at every width, so
+  there is no "which is open", no per-device arrival, and no crossing to
+  reshape on. Dead code that still reads as load-bearing is what a future
+  reader wires back up.
+  ⚠ **A SHARED LINK OPENS AT THE SUMMARY**, not at step 01: somebody following
+  one is looking at a door, not designing it — Peretz most of all.
+  ⚠ **The navigator is STICKY and scrolls sideways.** Nine circles overflowed a
+  390 px phone by 54 px and took the whole page with it; and after jumping to a
+  late step the only way back to step 01 was to hunt for the row. A flow's
+  table of contents must be reachable from anywhere in the flow.
+  ⚠ **`goStep` scrolls the PANEL above 1100 and the PAGE below it.** Above 1100
+  the page is one screen with `overflow: hidden` and the columns scroll inside
+  it, so `scrollIntoView` dragged the document to y=600 at all four desktop
+  viewports. Below it the dock is `fixed` over the bottom 78 px, so `nearest`
+  counts "behind the green bar" as in view.
+  **`npm run latency` went from 501 ms to 123 ms** — one step in the DOM
+  instead of the whole cabinet.
+
+- **Four instruments were restated for the flow, none weakened.** The audit's
+  arrival check asked "how many folds are open", a question the page no longer
+  has; it asks "exactly one step live, at every width" instead — which retires
+  a whole class of fault rather than re-asserting it. The desktop
+  one-heading-must-not-shut-the-others check became a walk over every navigator
+  circle. The keyboard walk lost a level. And `npm run latency` was silently
+  clicking a fold that no longer exists — it reported "not one door could be
+  measured" rather than a wrong number, which is the right way for a broken
+  instrument to fail.
+  ⚠ **And the audit was inflating the page it measured**: it unhides every step
+  to measure tap targets and never put them back, so the next check found the
+  page scrollable above 1100 — because the audit had made it so.
+
 - **⚠ THE STRIPES ARE A COUNT, AND FOURTEEN TILES ARE GONE.** Peretz prices per
   stripe — ₪150 horizontal, ₪300 vertical — and asked for the complicated
   compositions removed; the test, from outside, is *more than two distinct
