@@ -20,7 +20,7 @@ import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          BUILD, MASHKOF_WIDER,
          COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE, PIRZUL as PIRZUL_PRICE,
          GRILLE as GRILLE_PRICE, DETAIL as DETAIL_PRICE, DETAIL_GLAZED,
-         HANDLE as HANDLE_PRICE, LOCKSET as LOCKSET_PRICE,
+         HANDLE as HANDLE_PRICE, HANDLE_RATE, LOCKSET as LOCKSET_PRICE,
          SPECIAL_LOCK as SPECIAL_LOCK_PRICE } from './prices.js';
 
 /* Re-exported so nothing else has to know the flag moved. It belongs beside
@@ -34,6 +34,25 @@ export const PLACEHOLDER = PRICES_ARE_PLACEHOLDER;
    sitting beside prices that already contain the tax is a trap: the first
    person to reach for it adds 18% to a number that already has it. The rate
    belongs with the prices Peretz confirms — see ASK-PERETZ.md. */
+
+/**
+ * HOW FAR THE LEAF SITS INSIDE THE OPENING.
+ *
+ * ⚠ THIS MOVED HERE FROM THE RENDERER, and a note further down this file used
+ * to explain why it could not: *"the catalogue must not import the renderer —
+ * moving `REBATE` here instead would rewrite the imports of six tools to buy
+ * nothing."* That was true when it was written and it is not now. `SIZES` is
+ * the OPENING and the leaf is the opening less this, so the moment the
+ * catalogue had to answer "how long a pull bar will this door take?" —
+ * `handleLength`, which clamps a customer's chosen length against the leaf —
+ * it needed the leaf, and the alternative was a second `50` sitting in this
+ * file under a comment promising to stay in step with the first.
+ *
+ * It is a dimension of the PRODUCT, like `SIZES` itself, and it belongs beside
+ * them. The renderer re-exports it, so every tool that imports it from there
+ * still works: it was two tools, not six.
+ */
+export const REBATE = 50;
 
 /**
  * Size bands. NOT a measurement the customer types — Peretz measures on site.
@@ -1180,6 +1199,72 @@ export const colourCode = c => `רב בריח ${c.ral}`;
  * recorded in `REDESIGN.md` rather than papered over — a brass Ella still
  * paints the Coral lever beside it gold.
  */
+/**
+ * HOW LONG THE PULL BAR IS, on this door — the ONE definition, read by the
+ * drawing, the rules, the price, the order and the stepper.
+ *
+ * Peretz, 26.8.2026: *"each handle can be in different length · handle<100 500
+ * · nickel>100cm every 20cm +150shekel."* Until then a pull bar was a MODEL
+ * with a fixed length; it is a model AND a length now, and the length is what
+ * he charges for.
+ *
+ * ⚠ THE STEP IS 20 cm BECAUSE THE PRICE STEPS IN 20 cm. A control finer than
+ * the price is a control that lies: a slider offering 137 cm would take the
+ * customer's ₪150 at 120 and again at 140 with nothing on screen explaining
+ * the jump. So the length is an index into `HANDLE_LENS`, which is also what
+ * lets it pack into the short code as four bits instead of a millimetre count.
+ *
+ * ⚠ AND IT IS CLAMPED BY THE LEAF, here rather than at the call sites. A
+ * 200 cm bar on a 203 cm door is not a door, and a configurator that lets you
+ * specify an impossible one is the failure PLAN.md §0 exists to prevent. The
+ * clamp lives with the definition so the drawing, the rules and the price
+ * cannot disagree about how long the bar actually is — which is exactly how
+ * `MOULD` and `winRect` went wrong in earlier rounds.
+ *
+ * Flat-priced grips (`grab`, `channel`) keep their own catalogue length and
+ * ignore this entirely: a recessed channel is CUT when the leaf is made, and a
+ * horizontal bow is one product Peretz buys.
+ */
+/**
+ * ⚠ `0` MEANS "AS THE MODEL COMES", AND IT IS THE DEFAULT. Every bar in the
+ * catalogue has a length measured off the photographs — Idan 1050, Shahar
+ * 1230, Ron 900 — and those are the lengths thirty recreations are checked
+ * against. A single global default would have overridden all of them: pick Ron
+ * and get a 1000 mm bar where the photograph shows 900, on every door in the
+ * gallery, silently.
+ * So the length is opt-IN. Until the customer touches the stepper the bar is
+ * the product Peretz stocks; after they touch it, it is the length they asked
+ * for. The 0 costs one bit in the short code and buys back every measured
+ * drawing unchanged.
+ */
+export const HANDLE_LENS = [0, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000];
+
+export function handleLength(state) {
+  const h = byId(HANDLES, state.handle);
+  if (h.priceKind !== 'bar') return h.len;
+  const want = (state.handleLen && HANDLE_LENS.includes(state.handleLen))
+    ? state.handleLen : h.len;
+  /* The leaf, minus a hand's breadth top and bottom so the bar never runs into
+     the rails. `SIZES` is the opening; the leaf is it less the rebate. */
+  const leafH = (SIZES[state.size] || SIZES.standard).h - REBATE;
+  const cap = HANDLE_LENS.filter(v => v <= leafH - 240);
+  const room = cap.length ? cap[cap.length - 1] : HANDLE_LENS[0];
+  return Math.min(want, room);
+}
+
+/**
+ * Every length this door has room for — what the stepper steps through.
+ * ⚠ The 0 is dropped: it is a state, not a length a customer picks off a
+ * stepper, and offering "as it comes" between 60 cm and 80 cm would read as a
+ * gap in the scale. The bar starts at its model length and the stepper moves
+ * from the nearest real value.
+ */
+export const handleLensFor = state => {
+  const leafH = (SIZES[state.size] || SIZES.standard).h - REBATE;
+  const fits = HANDLE_LENS.filter(v => v > 0 && v <= leafH - 240);
+  return fits.length ? fits : [HANDLE_LENS[1]];
+};
+
 export function gripFinish(state) {
   /* Stated once, through `declaredFinish`, so the two cannot drift: the paint
      is whatever the grip declares, and brushed nickel only where it declares
@@ -1250,10 +1335,10 @@ export const hasUpperPanel = detail => !!detail.top || detail.panels >= 2;
  * because this number decides HOW MANY PANELS EXIST and panels are charged
  * for now.
  *
- * Stated as an OPENING width on purpose. The equivalent leaf-width test would
- * need `REBATE`, which lives in the renderer, and the catalogue must not
- * import the renderer — moving `REBATE` here instead would rewrite the imports
- * of six tools to buy nothing.
+ * Stated as an OPENING width on purpose — which is now a convenience rather
+ * than a necessity: `REBATE` moved into this file when `handleLength` needed
+ * the leaf (see its note at the top). Left as an opening width because that is
+ * what `SIZES` declares and converting buys nothing.
  */
 export const SIDE_OPENING_MIN = 370;
 
@@ -1445,6 +1530,13 @@ for (const k of Object.keys(BUILD)) {
   }
 }
 export const MASHKOF_WIDER_A = agorot(MASHKOF_WIDER);
+export const HANDLE_RATE_A = { ...HANDLE_RATE, per: agorot(HANDLE_RATE.per) };
+
+/* ⚠ WHICH GRIPS ARE PRICED BY LENGTH. Tagged from `style` rather than listed
+   by id, so a bar added tomorrow is priced correctly without anybody
+   remembering to add it to a second list — which is how `corpus.mjs` came to
+   hold its own stale copy of the strip counts. */
+for (const h of HANDLES) h.priceKind = h.style === 'bar' ? 'bar' : 'flat';
 
 priceInto('colour',  COLOURS,              COLOUR_PRICE,  'delta');
 priceInto('window',  WINDOWS,              WINDOW_PRICE,  'delta');

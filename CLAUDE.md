@@ -1319,6 +1319,32 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **A pull bar is a MODEL AND A LENGTH.** Peretz: *"each handle can be in
+  different length · handle<100 500 · nickel>100cm every 20cm +150shekel."*
+  `handleLength(state)` in `js/catalog.js` is the ONE definition — the drawing,
+  the price, the rules, the order and the stepper all read it — and it CLAMPS
+  against the leaf, because a 200 cm bar on a 203 cm door is not a door.
+  ⚠ **`gripOf(state)` substitutes the length once.** Five things read
+  `handle.len`; threading `state.handleLen` to each would be five chances to
+  miss one, and the symptom is a door drawn at a length nobody is charged for.
+  ⚠ **`handleLen: 0` means "as the model comes", and that default matters.**
+  Every bar has a length measured off the photographs — Idan 1050, Shahar
+  1230, Ron 900 — and thirty recreations are checked against them. A single
+  global default would have overridden all of them silently. The length is
+  opt-in; a door nobody has touched draws exactly what it always drew.
+  ⚠ **A STEPPER, NOT A SLIDER**, and 20 cm because the price steps in 20 cm. A
+  control finer than the price is a control that lies.
+  ⚠ **Idan costs ₪650, not ₪500** — it is 105 cm as it comes, one step over
+  Peretz's metre. Every bar in the range except Ron is over a metre as stocked.
+  ⚠ **`REBATE` moved from the renderer to the catalogue.** A note in
+  `catalog.js` used to explain why it could not — "the catalogue must not
+  import the renderer" — and that was true until the catalogue had to answer
+  "how long a bar will this door take?". It is a dimension of the product; the
+  renderer re-exports it, and it was two tools that imported it, not six.
+  ⚠ **`hLen === undefined`, never `!hLen`,** in the decoder: zero is a valid
+  value and the commonest one, so a truthiness guard refused every code for an
+  untouched door.
+
 - **⚠ THE PULL HANDLE NO LONGER RECOLOURS THE LOCK FURNITURE — the bug Peretz
   reported in his own words.** *"some pull handles change the color of the
   handle and the keyhole, fix it."* The renderer built ONE set of metal

@@ -29,8 +29,8 @@
 
 import {
   byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
-  GRILLES, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, PIRZUL, PLACEHOLDER, SIZES,
-  SPECIAL_LOCKS, WINDOWS,
+  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, LOCKSETS, MASHKOFS,
+  PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, tileAgorot }
   from './price.js';
@@ -985,6 +985,59 @@ function buildOptions(g, host) {
   }
   }
   keyboardGrid(host);
+  if (g.key === 'handle') buildLengthStepper(host);
+}
+
+/**
+ * HOW LONG THE BAR IS — a stepper, appended under the pull-handle tiles.
+ *
+ * ⚠ A STEPPER AND NOT A SLIDER, BECAUSE THE PRICE STEPS. Peretz charges ₪150
+ * for every 20 cm past a metre, so a control offering 137 cm would take that
+ * ₪150 at 120 and again at 140 with nothing on screen to explain either jump.
+ * A control finer than the price is a control that lies. The eight values are
+ * `HANDLE_LENS`, which is also what lets the length pack into the short code
+ * as three bits instead of a millimetre count.
+ *
+ * ⚠ HIDDEN, NOT DISABLED, for the two flat-priced grips. A recessed channel is
+ * CUT when the leaf is made and a horizontal bow is one product Peretz buys —
+ * neither has a length to sell — and a greyed-out control for a property a
+ * product does not have is noise rather than information. `aria-disabled` is
+ * for an option that COULD be chosen and cannot be right now; this is not that.
+ *
+ * ⚠ AND THE LIST IS WHAT THE LEAF WILL TAKE. `handleLensFor` drops any length
+ * that would not fit the door, so a customer cannot ask for a 200 cm bar on a
+ * 203 cm leaf. A configurator that accepts an impossible door is the one
+ * failure PLAN.md §0 exists to prevent — and the clamp lives in the catalogue
+ * beside the price and the drawing, not here, so all three agree.
+ */
+function buildLengthStepper(host) {
+  const hd = byId(HANDLES, state.handle);
+  const old = host.querySelector('.blen');
+  if (old) old.remove();
+  if (hd.priceKind !== 'bar') return;
+
+  const lens = handleLensFor(state);
+  const now  = handleLength(state);
+  const box = document.createElement('div');
+  box.className = 'blen';
+  box.innerHTML = `
+    <span class="blen__label" id="blen-l">אורך הידית</span>
+    <div class="blen__row">
+      <button type="button" class="blen__b" data-step="-1" aria-label="לקצר את הידית">−</button>
+      <output class="blen__v" aria-labelledby="blen-l">${Math.round(now / 10)} ס״מ</output>
+      <button type="button" class="blen__b" data-step="1" aria-label="להאריך את הידית">+</button>
+    </div>`;
+  for (const b of box.querySelectorAll('.blen__b')) {
+    const dir = Number(b.dataset.step);
+    const i = lens.indexOf(now);
+    b.disabled = i + dir < 0 || i + dir >= lens.length;
+    b.addEventListener('click', () => {
+      const j = lens.indexOf(handleLength(state)) + dir;
+      if (j < 0 || j >= lens.length) return;
+      set({ ...state, handleLen: lens[j] });
+    });
+  }
+  host.appendChild(box);
 }
 
 /**

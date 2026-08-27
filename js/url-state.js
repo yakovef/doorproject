@@ -8,8 +8,8 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, MASHKOFS,
-         PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_LENS, LOCKSETS,
+         MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
 /* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
@@ -149,7 +149,22 @@ import { repair } from './rules.js';
    which is never what gives way. `DM-` and nine, read aloud in two groups.
    ⚠ `pz=`, never `f=`. The retired parameter belonged to the PULL HANDLE's
    finish and reusing it would make an old link mean something it never did. */
-export const VERSION = 16;
+/* ── 17 · a pull bar is a length, 27.8.2026 ───────────────────────────
+   Peretz prices a bar by how long it is — ₪500 under a metre, ₪150 for every
+   20 cm past it — so a bar is a model AND a length, and the length reaches the
+   code as a three-bit index into eight fixed values.
+
+   ⚠ THE CODE IS TEN CHARACTERS AT THIS VERSION AND THAT IS TRANSIENT.
+   Payload 42 plus the four-bit floor rounds to 50. It could be held at nine by
+   cutting `handing` to one bit — it has exactly two entries — but that leaves
+   the one field in the layout with NO headroom at all, and the version-16
+   overflow is a fresh reminder of what a field at its ceiling costs.
+   The bit is coming back on its own: TRANSFORM.md phase 6 removes the fourteen
+   stripe entries from `DETAILS`, which takes that field from 5 bits to 3. Two
+   bits back, payload 40, and the code returns to nine characters without
+   anything being squeezed. Taking a bit from `handing` now and giving it back
+   then would be churn in a wire format to save one character for one phase. */
+export const VERSION = 17;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -201,6 +216,11 @@ export const DEFAULTS = {
   speciallock: 'nospecial',
   mashkof: 'mk-std',
   pirzul:  'pz-nickel',
+  /* ⚠ 0 = "as the model comes". Every bar has a length measured off the
+     photographs and thirty recreations are checked against them; a global
+     default would override all of them silently. The length is opt-in, and a
+     door nobody has touched draws exactly what it always drew. */
+  handleLen: 0,
   detail:  'plain',
   size:    'standard',
   handing: 'right-in',
@@ -226,6 +246,7 @@ export function toQuery(state) {
      set of objects. Reusing the parameter would make an old link mean
      something it never meant. */
   p.set('pz', state.pirzul);
+  p.set('hl', String(state.handleLen));
   p.set('d', state.detail);
   p.set('s', state.size);
   p.set('h', state.handing);
@@ -284,7 +305,7 @@ export function fromQuery(search) {
      a choice could not be read — above a document in which every choice had
      been read perfectly. A new switch joins this list the same day it is
      invented, like everything added to the bare-mode hide list. */
-  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'd', 's', 'h', 'gp',
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hl', 'd', 's', 'h', 'gp',
                            'code', 'bare', 'sheet']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -362,6 +383,18 @@ export function fromQuery(search) {
   take('speciallock', 'x', SPECIAL_LOCKS);
   take('mashkof', 'm', MASHKOFS);
   take('pirzul', 'pz', PIRZUL);
+  /* ⚠ A NUMBER, SO `take` CANNOT DO IT — `take` resolves an id against a list
+     and reports an unknown one. A length is neither: it is one of eight
+     values, and anything else is a link we cannot read. Refused with the same
+     notice rather than clamped silently, because a customer whose 140 cm bar
+     quietly became 100 cm has been given a different door without being told —
+     which is the whole reason `fromQuery` never substitutes in silence. */
+  const rawLen = p.get('hl');
+  if (rawLen != null) {
+    const v = Number(rawLen);
+    if (HANDLE_LENS.includes(v)) state.handleLen = v;
+    else notice = notice || 'option-unknown';
+  }
 
   const rawSize = p.get('s');
   if (rawSize != null) {
@@ -540,7 +573,7 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    to a different valid door); it is never the thing that gives way. */
 export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
                       grille: 4, handle: 4, lockset: 3, detail: 5,
-                      speciallock: 2, mashkof: 2, pirzul: 2 };
+                      speciallock: 2, mashkof: 2, pirzul: 2, handleLen: 4 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */
@@ -647,6 +680,10 @@ export function encodeCode(state) {
      BITS.speciallock],
     [Math.max(0, MASHKOFS.findIndex(m => m.id === state.mashkof)), BITS.mashkof],
     [Math.max(0, PIRZUL.findIndex(z => z.id === state.pirzul)), BITS.pirzul],
+    /* The INDEX, not the millimetres: 2000 mm would need eleven bits and the
+       eight lengths need three. This is also why the lengths are a fixed list
+       rather than a free number — see `HANDLE_LENS`. */
+    [Math.max(0, HANDLE_LENS.indexOf(state.handleLen)), BITS.handleLen],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -710,12 +747,19 @@ export function decodeCode(code) {
   const special = SPECIAL_LOCKS[read(BITS.speciallock)];
   const mashkof = MASHKOFS[read(BITS.mashkof)];
   const pirzul  = PIRZUL[read(BITS.pirzul)];
+  const hLen    = HANDLE_LENS[read(BITS.handleLen)];
+  /* ⚠ `hLen === undefined`, NOT `!hLen`. Zero is a VALID value — it is the
+     "as the model comes" default and the commonest length in the range — and
+     `!0` is true, so a truthiness guard refused every code for an untouched
+     door. Every other field here is an object, where falsy really does mean
+     "not found"; this one is a number and needed its own test. */
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail || !special || !mashkof || !pirzul) return null;
+      || !detail || !special || !mashkof || !pirzul || hLen === undefined) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
     speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
+    handleLen: hLen,
   };
 }

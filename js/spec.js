@@ -44,8 +44,8 @@
 
 import {
   byId, colourCode, COLOURS, declaredFinish, DETAILS, glazedPanels, GRILLES, grillePlacement,
-  HANDINGS, HANDLES, isGlazed, LOCKSETS, MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS,
-  WINDOWS,
+  handleLength, HANDINGS, HANDLES, isGlazed, LOCKSETS, MASHKOFS, PIRZUL, SIZES,
+  SPECIAL_LOCKS, WINDOWS,
 } from './catalog.js';
 
 /**
@@ -139,8 +139,18 @@ export function specRows(state) {
      And the rule this exclusion cited — a fact that is not true of the door is
      absent — was not being applied to `חלון: ללא חלון` two rows above, which
      is emitted unconditionally. A chosen "no" is a fact about the door. */
+  /* ⚠ THE LENGTH IS IN THE ORDER, because Peretz charges for it. A bar is a
+     model AND a length now — "each handle can be in different length", ₪150
+     for every 20 cm past a metre — and two doors with the same bar at
+     different lengths are two different purchase orders at two prices. An
+     order that names only "עידן" makes him ring the customer to ask, which is
+     the one thing PLAN.md §0 forbids.
+     Read from `handleLength`, not from `state.handleLen`: the chosen length is
+     clamped by the leaf, and what belongs in the order is the bar he will
+     actually cut. Flat-priced grips have no length to name. */
+  const barLen = hd.priceKind === 'bar' ? ` · ${Math.round(handleLength(state) / 10)} ס״מ` : '';
   rows.push({ key: 'handle', label: 'ידית משיכה', id: hd.id,
-              value: `${hd.he}${fin ? ` · ${fin.he}` : ''}` });
+              value: `${hd.he}${fin ? ` · ${fin.he}` : ''}${barLen}` });
   rows.push({ key: 'lockset', label: 'מנעול וידית', id: lk.id, value: lk.he });
   /* ⚠ NAMED ONLY WHEN THERE IS ONE, and named at all because an axis that does
      not reach this file is an axis Peretz never hears about. A customer can

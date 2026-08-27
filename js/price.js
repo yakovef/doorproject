@@ -8,8 +8,8 @@
  */
 
 import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
-         MASHKOF_WIDER_A, MASHKOFS, paneCount, LOCKSETS, PIRZUL, SIZES,
-         SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+         handleLength, HANDLE_RATE_A, MASHKOF_WIDER_A, MASHKOFS, paneCount,
+         LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 
 /**
  * What WIDENING the frame costs, before the size multiplier.
@@ -25,6 +25,27 @@ import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
 function mashkofExtras(state) {
   const mk = byId(MASHKOFS, state.mashkof);
   return (mk.wideOut ? MASHKOF_WIDER_A : 0) + (mk.wideIn ? MASHKOF_WIDER_A : 0);
+}
+
+/**
+ * WHAT THE PULL BAR COSTS, which is a floor plus its length.
+ *
+ * Peretz: *"handle<100 - 500 · nickel>100cm - every 20cm +150shekel."* The two
+ * flat-priced grips — the horizontal bow and the recessed channel — keep their
+ * own number and never reach the rate; a channel is cut into the leaf when it
+ * is made, so there is no length to sell.
+ *
+ * ⚠ ASKED OF `handleLength`, NOT OF `state.handleLen`. The chosen length is
+ * clamped by the leaf — a 200 cm bar on a 203 cm door is not a door — and the
+ * customer must be charged for the bar they will actually get. Reading the raw
+ * field here would quote a metre of bar the drawing refuses to draw, which is
+ * the same class of fault as charging for a grille on a solid door.
+ */
+function handlePrice(state) {
+  const h = byId(HANDLES, state.handle);
+  if (h.priceKind !== 'bar') return h.delta;
+  const over = Math.max(0, handleLength(state) - HANDLE_RATE_A.over);
+  return h.delta + Math.ceil(over / HANDLE_RATE_A.step) * HANDLE_RATE_A.per;
 }
 
 /** What the face costs, which for one entry depends on whether it has glass. */
@@ -141,7 +162,7 @@ export function priceParts(state) {
        beside the leaf, and "does this door have glass in it" is the question
        both prices actually turn on. */
     detail:  glazedDetail(state),
-    handle:  byId(HANDLES, state.handle).delta,
+    handle:  handlePrice(state),
     lockset: byId(LOCKSETS, state.lockset).delta,
     speciallock: byId(SPECIAL_LOCKS, state.speciallock).delta,
     pirzul:  byId(PIRZUL, state.pirzul).delta,

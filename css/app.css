@@ -1361,6 +1361,29 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* The bar's length, under its tiles. Reads as one control rather than three
+   buttons: label above, minus / value / plus in a row, the value tabular so it
+   does not jog as it changes. 44px on both buttons — the touch floor is a
+   floor, and this is the newest control on the page. */
+.blen { grid-column: 1 / -1; margin-block-start: 10px; }
+.blen__label {
+  display: block; font-size: .68rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-2); margin-block-end: 5px;
+}
+.blen__row { display: flex; align-items: center; gap: 10px; }
+.blen__b {
+  inline-size: 44px; block-size: 44px; flex: none;
+  border: 1px solid var(--rule); border-radius: var(--r-pill);
+  background: var(--surface); color: var(--ink);
+  font-size: 1.1rem; line-height: 1; cursor: pointer;
+}
+.blen__b:disabled { opacity: .35; cursor: default; }
+.blen__b:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+.blen__v {
+  font-variant-numeric: tabular-nums; font-size: .95rem;
+  min-inline-size: 5.5ch; text-align: center;
+}
+
 .send__spec {
   margin: 0; padding-block: 8px;
   border-block: 1px solid var(--rule);

@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
@@ -29,13 +29,13 @@ const ALPHABET_TEST = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
                handle: 'idan', lockset: 'coral', speciallock: 'nospecial',
-               mashkof: 'mk-std', pirzul: 'pz-nickel', detail: 'plain',
-               size: 'standard', handing: 'right-in' };
+               mashkof: 'mk-std', pirzul: 'pz-nickel', handleLen: 0,
+               detail: 'plain', size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
-              'lockset', 'speciallock', 'mashkof', 'pirzul', 'detail'];
+              'lockset', 'speciallock', 'mashkof', 'pirzul', 'handleLen', 'detail'];
 
 /* The code's length is derived, never typed. It was written as {8} and the
    day the layout grew to nine characters that produced 280 failures saying
@@ -79,7 +79,7 @@ function* everyState() {
          `Math.max(0, indexOf(undefined))` masks to index 0 in silence. */
       const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
                      detail: 'plain', speciallock: 'nospecial', mashkof: 'mk-std',
-                     pirzul: 'pz-nickel' };
+                     pirzul: 'pz-nickel', handleLen: 0 };
       const out = [];
       for (const n of HANDLES) out.push({ ...stem, handle: n.id, lockset: 'coral' });
       for (const k of LOCKSETS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: k.id });
@@ -91,6 +91,13 @@ function* everyState() {
       }
       for (const z of PIRZUL.slice(1)) {
         out.push({ ...stem, handle: 'idan', lockset: 'coral', pirzul: z.id });
+      }
+      /* Skip the stem's own length: the HANDLES loop above already emits
+         idan/coral at it, and pushing it again is not a code collision, it is
+         the same door twice. */
+      for (const L of HANDLE_LENS) {
+        if (L === stem.handleLen) continue;
+        out.push({ ...stem, handle: 'idan', lockset: 'coral', handleLen: L });
       }
       for (const st of out) if (buildable(st)) yield st;
     }
@@ -448,6 +455,88 @@ group('the pull handle does not recolour the lock furniture');
   console.log(`  (${pairs} grip x pirzul pairs, lock furniture unmoved by every grip)`);
 }
 
+/* ── A BAR IS A LENGTH, AND THE LENGTH IS REAL ─────────────────────
+   Peretz: "each handle can be in different length · handle<100 500 ·
+   nickel>100cm every 20cm +150shekel". Three things have to hold together or
+   the customer is charged for a bar they will not get. */
+group('a pull bar is a length');
+{
+  /* 1. THE PRICE IS HIS RULE, EXACTLY. Worked by hand rather than derived from
+        the same expression the code uses, which would agree with any bug. */
+  const P = st => shekels(priceAgorot({ ...base, ...st }));
+  /* ⚠ ON THE TALLEST DOOR, so the clamp does not mask the rate. A 200 cm bar
+     does not fit a standard leaf — 205 cm less a hand's breadth at each end —
+     so `handleLength` shortens it to 180 and the price follows, correctly.
+     Asserting the rate on a door that clamps would have been asserting the
+     clamp twice and the rate never. */
+  const big = { size: 'xl' };
+  const bare = P({ ...big, handle: 'none' });
+  for (const [len, add] of [[600, 500], [800, 500], [1000, 500], [1200, 650],
+                            [1400, 800], [1600, 950], [1800, 1100], [2000, 1250]]) {
+    ok(P({ ...big, handle: 'idan', handleLen: len }) === bare + add,
+       `a ${len / 10} cm bar should add ₪${add}, got `
+     + `₪${P({ ...big, handle: 'idan', handleLen: len }) - bare}`);
+  }
+  /* The two flat ones never reach the rate: a channel is CUT into the leaf. */
+  for (const L of HANDLE_LENS) {
+    ok(P({ ...big, handle: 'grab', handleLen: L }) === bare + 300,
+       'the horizontal bow is flat-priced and must ignore the length');
+    ok(P({ ...big, handle: 'channel', handleLen: L }) === bare + 1700,
+       'the recessed channel is flat-priced and must ignore the length');
+  }
+
+  /* 2. THE LEAF CLAMPS IT, on every size. A 200 cm bar on a 203 cm door is not
+        a door, and a configurator that accepts an impossible one is the single
+        failure PLAN.md §0 exists to prevent. */
+  let clamped = 0;
+  for (const size of sizeKeys) {
+    const leafH = SIZES[size].h - 50;                     // REBATE
+    for (const L of HANDLE_LENS) {
+      const got = handleLength({ ...base, size, handle: 'idan', handleLen: L });
+      ok(got <= leafH - 240,
+         `${size}: a ${L / 10} cm bar came back as ${got / 10} cm on a leaf of `
+       + `${leafH / 10} cm — it would run into the rails`);
+      /* ⚠ 0 IS "AS THE MODEL COMES" AND COMES BACK AS THE MODEL'S OWN LENGTH,
+         which is 1050 for Idan and is deliberately NOT one of the eight
+         steps — the catalogue lengths are measured off photographs and the
+         steps are Peretz's price ladder. Two different things, and the first
+         version of this assertion confused them. */
+      if (L === 0) ok(got === byId(HANDLES, 'idan').len,
+                      `${size}: "as it comes" gave ${got}, not Idan's own 1050`);
+      else ok(HANDLE_LENS.includes(got),
+              `${size}/${L}: clamped to ${got}, not a real length`);
+      if (L !== 0 && got !== L) clamped++;
+    }
+    ok(handleLensFor({ ...base, size }).length >= 1,
+       `${size} offers no bar length at all`);
+  }
+  ok(clamped > 0, 'no size clamps any length — this check is asserting nothing');
+
+  /* 3. AND THE PRICE FOLLOWS THE CLAMP, not the request. Charging for the bar
+        the customer asked for when the drawing shows a shorter one is the same
+        class of fault as charging for a grille on a solid door. */
+  for (const size of sizeKeys) {
+    for (const L of HANDLE_LENS) {
+      const st = { ...base, size, handle: 'idan', handleLen: L };
+      const real = handleLength(st);
+      ok(priceAgorot(st) === priceAgorot({ ...st, handleLen: real }),
+         `${size}: asked for ${L / 10} cm, drawn at ${real / 10} cm, and the two `
+       + 'price differently — the customer is charged for a bar they will not get');
+    }
+  }
+
+  /* 4. AND THE ORDER SAYS SO. Two doors with the same bar at different lengths
+        are two purchase orders at two prices; an order naming only "עידן"
+        makes Peretz ring the customer, which is what §0 forbids. */
+  const line = st => specRows({ ...base, ...st }).find(r => r.key === 'handle').value;
+  ok(line({ handle: 'idan', handleLen: 1400 }).includes('140 ס״מ'),
+     `the order does not name the bar's length: "${line({ handle: 'idan', handleLen: 1400 })}"`);
+  ok(line({ handle: 'idan', handleLen: 1400 }) !== line({ handle: 'idan', handleLen: 1000 }),
+     'two lengths of one bar produce the same order line');
+  ok(!/ס״מ/.test(line({ handle: 'channel' })),
+     'the recessed channel has no length to sell and must not claim one');
+}
+
 // ── 3. Price ──────────────────────────────────────────────────────
 group('price');
 {
@@ -462,7 +551,12 @@ group('price');
      the number he will check first, so it is pinned exactly. */
   ok(P({ handle: 'none' }) === 3150,
      `a solid anthracite door with a lever and no pull should be ₪3,150, got ${P({ handle: 'none' })}`);
-  ok(P({}) === 3650, `adding the Idan bar should reach ₪3,650, got ${P({})}`);
+  /* ⚠ ₪650 FOR THE IDAN, NOT ₪500, AND THAT IS PERETZ'S RULE WORKING. His
+     floor is ₪500 for a bar "under 100"; the Idan measures 1050 mm off the
+     photographs, so it is one 20 cm step over and costs ₪650. Every bar in
+     the range except Ron is over a metre as it comes. */
+  ok(P({}) === 3800, `adding the Idan bar should reach ₪3,800, got ${P({})}`);
+  ok(P({ handle: 'ron' }) === 3650, 'Ron is 90 cm as it comes and takes the floor price');
 
   /* ⚠ THE SIZE MULTIPLIES TWO COMPONENTS AND NOT THE OTHER FOUR — the whole
      reason `BUILD` is six numbers instead of one per band. A x1.25 door with
@@ -485,17 +579,17 @@ group('price');
   // A link shared before the chart replaced the list must still open a door.
   ok(P({ colour: 'ral-9005' }) === P({}), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
-  ok(P({ size: 'wide' }) === 4090, 'wide band');
+  ok(P({ size: 'wide' }) === 4240, 'wide band');
   /* ⚠ ₪3,700 FOR A WINDOW, WHICH IS MORE THAN THE DOOR. Peretz, 26.8.2026.
      Every window price in this file was invented at around ₪600 and every one
      was out by a factor of six. Glass in an armoured leaf is a different
      product from a hole in one. */
-  ok(P({ window: 'rect' }) === 7350, `a square window should add ₪3,700, got ${P({ window: 'rect' })}`);
+  ok(P({ window: 'rect' }) === 7500, `a square window should add ₪3,700, got ${P({ window: 'rect' })}`);
   /* "design: almost all of them in the price." Every grille is ₪0 now except
      the three laser-cut ones. */
-  ok(P({ window: 'rect', grille: 'scroll' }) === 7350, 'scrollwork is included');
-  ok(P({ window: 'rect', grille: 'vine' }) === 8050, 'the laser-cut ones add ₪700');
-  ok(P({ detail: 'panel' }) === 4375, `a lower panel should add ₪725, got ${P({ detail: 'panel' })}`);
+  ok(P({ window: 'rect', grille: 'scroll' }) === 7500, 'scrollwork is included');
+  ok(P({ window: 'rect', grille: 'vine' }) === 8200, 'the laser-cut ones add ₪700');
+  ok(P({ detail: 'panel' }) === 4525, `a lower panel should add ₪725, got ${P({ detail: 'panel' })}`);
   /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and these two lines are
      Peretz's three window figures reduced to the two products they describe:
      the set solid is ₪2,700, and a square light plus the set glazed is
@@ -504,9 +598,9 @@ group('price');
   ok(P({ detail: 'classic', handle: 'none', window: 'rect' }) === 7850,
      'the greek set glazed is ₪4,700 over a bare door, not ₪6,400');
   /* The extra locks — a whole axis that did not exist. */
-  ok(P({ speciallock: 'kasefet' }) === 4350, 'a safe lock adds ₪700');
-  ok(P({ speciallock: 'kodan' }) === 4550, 'a keypad adds ₪900');
-  ok(P({ lockset: 'digital', speciallock: 'kodan' }) === 7250,
+  ok(P({ speciallock: 'kasefet' }) === 4500, 'a safe lock adds ₪700');
+  ok(P({ speciallock: 'kodan' }) === 4700, 'a keypad adds ₪900');
+  ok(P({ lockset: 'digital', speciallock: 'kodan' }) === 7400,
      'a smart lock and a keypad are different products and stack');
   /* The finish and the add-ons are withdrawn, so nothing may be charged for
      them — including through a stale link that still names one. */
@@ -514,8 +608,8 @@ group('price');
   ok(P({ addons: ['peep', 'mail', 'knocker'] }) === P({}),
      'withdrawn add-ons must not add to the price');
   /* The whole point of the split: a pull bar and a backplate on one door. */
-  ok(P({ handle: 'idan', lockset: 'plate' }) === 3650,
-     `Idan with a Rotem backplate should be ₪3,650, got ${P({ handle: 'idan', lockset: 'plate' })}`);
+  ok(P({ handle: 'idan', lockset: 'plate' }) === 3800,
+     `Idan with a Rotem backplate should be ₪3,800, got ${P({ handle: 'idan', lockset: 'plate' })}`);
   /* "main handles: all of them in the price", bar the squares, the circles and
      the smart lock. Rotem is one of the included ones. */
   ok(P({ handle: 'none', lockset: 'plate' }) === 3150, 'Rotem is included');

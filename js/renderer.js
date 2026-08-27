@@ -17,8 +17,8 @@
  */
 
 import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
-         hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, PIRZUL, SIZES,
-         SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+         handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, PIRZUL,
+         REBATE, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
@@ -262,7 +262,10 @@ const RET_HEAD = 148;  // the soffit — the deepest of the three, and by a lot
    pair the leaves almost touch. 46 mm drew a wide lit band that read as a
    structural mullion the door does not have. */
 const MULLION  = 22;
-export const REBATE = 50;   // frame rebate: how far the leaf sits inside the opening
+/* Re-exported, not redefined: it lives in `js/catalog.js` beside `SIZES`,
+   because it is a dimension of the product and the catalogue needs it to clamp
+   a pull bar's length against the leaf. Two tools import it from here. */
+export { REBATE } from './catalog.js';
 
 /* ── THE ALCOVE IS GONE, AND ITS OWN DOCSTRING SAID WHY IT WOULD BE ──────
    `ALC_SIDE = 160` and `ALC_HEAD = 300` stood here: a second, outer opening
@@ -916,7 +919,7 @@ export function render(state) {
   const handing = byId(HANDINGS, state.handing);
   const win     = byId(WINDOWS, state.window);
   const grille  = byId(GRILLES, state.grille);
-  const handle  = byId(HANDLES, state.handle);
+  const handle  = gripOf(state);
   const lockset = byId(LOCKSETS, state.lockset);
   const special = byId(SPECIAL_LOCKS, state.speciallock);
   /* ⚠ THE FRAME IS A CHOICE NOW, and it grows OUTWARD from a fixed opening.
@@ -3270,7 +3273,7 @@ export function gripHome(state) {
 
 function gripHomeUncached(state) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   const lockset = byId(LOCKSETS, state.lockset);
   const detail = byId(DETAILS, state.detail);
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -3400,7 +3403,7 @@ export const gripFitsAnywhere = memo(
  */
 export function gripCanRotate(state) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   /* Nothing to turn, and one that is already lying down: the horizontal bow is
      drawn from the leaf's centre outwards and standing it up is a different
      object, not a rotation. */
@@ -3451,8 +3454,22 @@ function specialLockArt(special, cx, cy, dir) {
     </g>`;
 }
 
+/**
+ * THE GRIP THIS DOOR ACTUALLY HAS — the catalogue entry with the customer's
+ * chosen length substituted for the model's fixed one.
+ *
+ * ⚠ ONE SUBSTITUTION, NOT SIX. `handle.len` is read by `barHalf`, by
+ * `channelHandle`, by `handleFootprint`, by `gripFeet` and by the bar's own
+ * drawing — five readers of one quantity. Threading `state.handleLen` to each
+ * of them would be five chances to miss one, and the symptom of missing one is
+ * a door drawn at a length nobody is charged for, or charged for a length
+ * nobody sees. So the length is resolved ONCE, here, and every reader
+ * downstream gets a handle whose `len` is already true.
+ */
+const gripOf = state => ({ ...byId(HANDLES, state.handle), len: handleLength(state) });
+
 /** Is this grip cut into the leaf rather than bolted onto it? */
-export const gripIsFixed = state => !!byId(HANDLES, state.handle).fixed;
+export const gripIsFixed = state => !!gripOf(state).fixed;
 
 /** The grip's position for this design: the customer's, or its home. */
 export function gripAt(state) {
@@ -3463,7 +3480,7 @@ export function gripAt(state) {
      Answered HERE rather than only in the interface, because the position also
      arrives down a link as `gp=` — and a rule that only the page enforces is a
      rule a shared link walks straight past (CLAUDE.md §3, rules.js). */
-  if (!g || byId(HANDLES, state.handle).fixed) return home;
+  if (!g || gripOf(state).fixed) return home;
   const rot = g.rot === 90 && gripCanRotate(state) ? 90 : 0;
   return { x: g.x, y: g.y, rot };
 }
@@ -3478,7 +3495,7 @@ export function gripAt(state) {
  */
 export function gripFeet(state, place = null) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   if (handle.style === 'none') return [];
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const p = place || gripAt(state);
@@ -3549,7 +3566,7 @@ export function gripFeet(state, place = null) {
  */
 export function gripPlacement(state, place = null) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   const p = place || gripAt(state);
   const at = { ...p, ok: true, why: null };
   if (handle.style === 'none') return at;
@@ -6561,7 +6578,7 @@ export function glassClearance(state) {
   /* To the MOULDING's outer edge, not to the glass: a fitting that stops at
      the pane still runs across the raised surround. */
   return Math.min(...u) - MOULD_BAND
-       - lockBackset(byId(HANDLES, state.handle), byId(LOCKSETS, state.lockset));
+       - lockBackset(gripOf(state), byId(LOCKSETS, state.lockset));
 }
 
 /**
@@ -6576,7 +6593,7 @@ export function glassClearance(state) {
  */
 export function gripClashesGlass(state) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const grip = handleFootprint(handle, leafH);
   if (!grip.vy && !grip.out) return false;
@@ -6617,7 +6634,7 @@ export function gripClashesGlass(state) {
  */
 export function gripClashesLockset(state) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   if (handle.style !== 'grab') return false;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const lock = handleFootprint(byId(LOCKSETS, state.lockset), leafH);

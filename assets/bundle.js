@@ -148,7 +148,7 @@
     none: 0,
     // ללא ידית משיכה
     idan: 500,
-    // עידן
+    // עידן          — the floor; see HANDLE_RATE
     ella: 500,
     // אלה
     nitzan: 500,
@@ -160,10 +160,11 @@
     barblack: 500,
     // מוט שחור      — A12: he named no rate for a black one
     grab: 300,
-    // מאחז אופקי    — Peretz, flat
+    // מאחז אופקי    — Peretz, flat, no length choice
     channel: 1700
-    // ידית שקועה    — Peretz, flat
+    // ידית שקועה    — Peretz, flat, and it is CUT not bolted
   };
+  var HANDLE_RATE = { over: 1e3, step: 200, per: 150 };
   var LOCKSET = {
     coral: 0,
     // קורל          — the one included as standard
@@ -222,6 +223,7 @@
 
   // js/catalog.js
   var PLACEHOLDER2 = PLACEHOLDER;
+  var REBATE = 50;
   var SIZES = {
     standard: {
       id: "standard",
@@ -1241,6 +1243,21 @@
   ];
   var declaredFinish = (o) => !o || !o.finish ? null : FINISHES.find((f) => f.id === o.finish || (f.aliases || []).includes(o.finish)) || null;
   var colourCode = (c) => `רב בריח ${c.ral}`;
+  var HANDLE_LENS = [0, 600, 800, 1e3, 1200, 1400, 1600, 1800, 2e3];
+  function handleLength(state2) {
+    const h = byId(HANDLES, state2.handle);
+    if (h.priceKind !== "bar") return h.len;
+    const want = state2.handleLen && HANDLE_LENS.includes(state2.handleLen) ? state2.handleLen : h.len;
+    const leafH = (SIZES[state2.size] || SIZES.standard).h - REBATE;
+    const cap = HANDLE_LENS.filter((v) => v <= leafH - 240);
+    const room = cap.length ? cap[cap.length - 1] : HANDLE_LENS[0];
+    return Math.min(want, room);
+  }
+  var handleLensFor = (state2) => {
+    const leafH = (SIZES[state2.size] || SIZES.standard).h - REBATE;
+    const fits = HANDLE_LENS.filter((v) => v > 0 && v <= leafH - 240);
+    return fits.length ? fits : [HANDLE_LENS[1]];
+  };
   function gripFinish(state2) {
     return declaredFinish(byId(HANDLES, state2.handle)) || byId(FINISHES, "steel");
   }
@@ -1325,6 +1342,8 @@
     }
   }
   var MASHKOF_WIDER_A = agorot(MASHKOF_WIDER);
+  var HANDLE_RATE_A = { ...HANDLE_RATE, per: agorot(HANDLE_RATE.per) };
+  for (const h of HANDLES) h.priceKind = h.style === "bar" ? "bar" : "flat";
   priceInto("colour", COLOURS, COLOUR, "delta");
   priceInto("window", WINDOWS, WINDOW, "delta");
   priceInto("grille", GRILLES, GRILLE, "delta");
@@ -1345,6 +1364,12 @@
   function mashkofExtras(state2) {
     const mk = byId(MASHKOFS, state2.mashkof);
     return (mk.wideOut ? MASHKOF_WIDER_A : 0) + (mk.wideIn ? MASHKOF_WIDER_A : 0);
+  }
+  function handlePrice(state2) {
+    const h = byId(HANDLES, state2.handle);
+    if (h.priceKind !== "bar") return h.delta;
+    const over = Math.max(0, handleLength(state2) - HANDLE_RATE_A.over);
+    return h.delta + Math.ceil(over / HANDLE_RATE_A.step) * HANDLE_RATE_A.per;
   }
   function glazedDetail(state2) {
     const d = byId(DETAILS, state2.detail);
@@ -1383,7 +1408,7 @@
          beside the leaf, and "does this door have glass in it" is the question
          both prices actually turn on. */
       detail: glazedDetail(state2),
-      handle: byId(HANDLES, state2.handle).delta,
+      handle: handlePrice(state2),
       lockset: byId(LOCKSETS, state2.lockset).delta,
       speciallock: byId(SPECIAL_LOCKS, state2.speciallock).delta,
       pirzul: byId(PIRZUL2, state2.pirzul).delta,
@@ -1500,11 +1525,12 @@
         value: `${name}${grillePlacement(state2)}`
       });
     }
+    const barLen = hd.priceKind === "bar" ? ` · ${Math.round(handleLength(state2) / 10)} ס״מ` : "";
     rows.push({
       key: "handle",
       label: "ידית משיכה",
       id: hd.id,
-      value: `${hd.he}${fin ? ` · ${fin.he}` : ""}`
+      value: `${hd.he}${fin ? ` · ${fin.he}` : ""}${barLen}`
     });
     rows.push({ key: "lockset", label: "מנעול וידית", id: lk.id, value: lk.he });
     if (xl.id !== "nospecial") {
@@ -1638,7 +1664,6 @@
   var RETURN = 62;
   var RET_HEAD = 148;
   var MULLION = 22;
-  var REBATE = 50;
   var EDGE = 38;
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
@@ -1820,7 +1845,7 @@
     const handing = byId(HANDINGS, state2.handing);
     const win = byId(WINDOWS, state2.window);
     const grille = byId(GRILLES, state2.grille);
-    const handle = byId(HANDLES, state2.handle);
+    const handle = gripOf(state2);
     const lockset = byId(LOCKSETS, state2.lockset);
     const special = byId(SPECIAL_LOCKS, state2.speciallock);
     const mk = byId(MASHKOFS, state2.mashkof);
@@ -3499,7 +3524,7 @@ ${body}
   }
   function gripHomeUncached(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
-    const handle = byId(HANDLES, state2.handle);
+    const handle = gripOf(state2);
     const lockset = byId(LOCKSETS, state2.lockset);
     const detail = byId(DETAILS, state2.detail);
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -3528,7 +3553,7 @@ ${body}
   );
   function gripCanRotate(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
-    const handle = byId(HANDLES, state2.handle);
+    const handle = gripOf(state2);
     if (handle.style === "none" || handle.style === "grab") return false;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const long = handleFootprint(handle, leafH).vy * 2;
@@ -3558,17 +3583,18 @@ ${body}
                  fill="#000" fill-opacity=".26"/>`).join("")).join("")}
     </g>`;
   }
-  var gripIsFixed = (state2) => !!byId(HANDLES, state2.handle).fixed;
+  var gripOf = (state2) => ({ ...byId(HANDLES, state2.handle), len: handleLength(state2) });
+  var gripIsFixed = (state2) => !!gripOf(state2).fixed;
   function gripAt(state2) {
     const home = gripHome(state2);
     const g = state2.grip;
-    if (!g || byId(HANDLES, state2.handle).fixed) return home;
+    if (!g || gripOf(state2).fixed) return home;
     const rot = g.rot === 90 && gripCanRotate(state2) ? 90 : 0;
     return { x: g.x, y: g.y, rot };
   }
   function gripFeet(state2, place = null) {
     const size = SIZES[state2.size] || SIZES.standard;
-    const handle = byId(HANDLES, state2.handle);
+    const handle = gripOf(state2);
     if (handle.style === "none") return [];
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const p = place || gripAt(state2);
@@ -3591,7 +3617,7 @@ ${body}
   }
   function gripPlacement(state2, place = null) {
     const size = SIZES[state2.size] || SIZES.standard;
-    const handle = byId(HANDLES, state2.handle);
+    const handle = gripOf(state2);
     const p = place || gripAt(state2);
     const at = { ...p, ok: true, why: null };
     if (handle.style === "none") return at;
@@ -5119,11 +5145,11 @@ ${body}
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const hingeOnLeft = byId(HANDINGS, state2.handing).hinge === "left";
     const u = apertureLayout(win, leafW, byId(DETAILS, state2.detail), leafH).map((o) => hingeOnLeft ? leafW - (o.x + o.w) : o.x);
-    return Math.min(...u) - MOULD_BAND - lockBackset(byId(HANDLES, state2.handle), byId(LOCKSETS, state2.lockset));
+    return Math.min(...u) - MOULD_BAND - lockBackset(gripOf(state2), byId(LOCKSETS, state2.lockset));
   }
   function gripClashesLockset(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
-    const handle = byId(HANDLES, state2.handle);
+    const handle = gripOf(state2);
     if (handle.style !== "grab") return false;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const lock = handleFootprint(byId(LOCKSETS, state2.lockset), leafH);
@@ -6297,7 +6323,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 16;
+  var VERSION = 17;
   var DEFAULTS = {
     colour: "rb-0097d",
     window: "none",
@@ -6311,6 +6337,11 @@ ${body}
     speciallock: "nospecial",
     mashkof: "mk-std",
     pirzul: "pz-nickel",
+    /* ⚠ 0 = "as the model comes". Every bar has a length measured off the
+       photographs and thirty recreations are checked against them; a global
+       default would override all of them silently. The length is opt-in, and a
+       door nobody has touched draws exactly what it always drew. */
+    handleLen: 0,
     detail: "plain",
     size: "standard",
     handing: "right-in"
@@ -6326,6 +6357,7 @@ ${body}
     p.set("x", state2.speciallock);
     p.set("m", state2.mashkof);
     p.set("pz", state2.pirzul);
+    p.set("hl", String(state2.handleLen));
     p.set("d", state2.detail);
     p.set("s", state2.size);
     p.set("h", state2.handing);
@@ -6349,6 +6381,7 @@ ${body}
       "x",
       "m",
       "pz",
+      "hl",
       "d",
       "s",
       "h",
@@ -6395,6 +6428,12 @@ ${body}
     take("speciallock", "x", SPECIAL_LOCKS);
     take("mashkof", "m", MASHKOFS);
     take("pirzul", "pz", PIRZUL2);
+    const rawLen = p.get("hl");
+    if (rawLen != null) {
+      const v = Number(rawLen);
+      if (HANDLE_LENS.includes(v)) state2.handleLen = v;
+      else notice = notice || "option-unknown";
+    }
     const rawSize = p.get("s");
     if (rawSize != null) {
       if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state2.size = rawSize;
@@ -6426,7 +6465,8 @@ ${body}
     detail: 5,
     speciallock: 2,
     mashkof: 2,
-    pirzul: 2
+    pirzul: 2,
+    handleLen: 4
   };
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   var CHECK_MIN = 4;
@@ -6458,7 +6498,11 @@ ${body}
         BITS.speciallock
       ],
       [Math.max(0, MASHKOFS.findIndex((m) => m.id === state2.mashkof)), BITS.mashkof],
-      [Math.max(0, PIRZUL2.findIndex((z) => z.id === state2.pirzul)), BITS.pirzul]
+      [Math.max(0, PIRZUL2.findIndex((z) => z.id === state2.pirzul)), BITS.pirzul],
+      /* The INDEX, not the millimetres: 2000 mm would need eleven bits and the
+         eight lengths need three. This is also why the lengths are a fixed list
+         rather than a free number — see `HANDLE_LENS`. */
+      [Math.max(0, HANDLE_LENS.indexOf(state2.handleLen)), BITS.handleLen]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -6500,7 +6544,8 @@ ${body}
     const special = SPECIAL_LOCKS[read(BITS.speciallock)];
     const mashkof = MASHKOFS[read(BITS.mashkof)];
     const pirzul = PIRZUL2[read(BITS.pirzul)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul) return null;
+    const hLen = HANDLE_LENS[read(BITS.handleLen)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0) return null;
     return {
       colour: colour.id,
       size,
@@ -6512,7 +6557,8 @@ ${body}
       detail: detail.id,
       speciallock: special.id,
       mashkof: mashkof.id,
-      pirzul: pirzul.id
+      pirzul: pirzul.id,
+      handleLen: hLen
     };
   }
 
@@ -7247,6 +7293,35 @@ ${body}
       }
     }
     keyboardGrid(host);
+    if (g.key === "handle") buildLengthStepper(host);
+  }
+  function buildLengthStepper(host) {
+    const hd = byId(HANDLES, state.handle);
+    const old = host.querySelector(".blen");
+    if (old) old.remove();
+    if (hd.priceKind !== "bar") return;
+    const lens = handleLensFor(state);
+    const now = handleLength(state);
+    const box = document.createElement("div");
+    box.className = "blen";
+    box.innerHTML = `
+    <span class="blen__label" id="blen-l">אורך הידית</span>
+    <div class="blen__row">
+      <button type="button" class="blen__b" data-step="-1" aria-label="לקצר את הידית">−</button>
+      <output class="blen__v" aria-labelledby="blen-l">${Math.round(now / 10)} ס״מ</output>
+      <button type="button" class="blen__b" data-step="1" aria-label="להאריך את הידית">+</button>
+    </div>`;
+    for (const b of box.querySelectorAll(".blen__b")) {
+      const dir = Number(b.dataset.step);
+      const i = lens.indexOf(now);
+      b.disabled = i + dir < 0 || i + dir >= lens.length;
+      b.addEventListener("click", () => {
+        const j = lens.indexOf(handleLength(state)) + dir;
+        if (j < 0 || j >= lens.length) return;
+        set({ ...state, handleLen: lens[j] });
+      });
+    }
+    host.appendChild(box);
   }
   var soloSections = () => !window.matchMedia("(min-width: 1100px)").matches;
   function openSection(key) {

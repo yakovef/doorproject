@@ -279,17 +279,39 @@ export const DETAIL_GLAZED = {
    then every bar is priced at his under-100 cm figure, which is right for a
    bar at its default length and wrong for a longer one. The two he DID price
    flat are already correct below. */
+/* ⚠ A PULL BAR IS PRICED BY LENGTH, so these are not per-model prices any
+   more and this table is two shapes at once. Peretz: *"handle<100 - 500 ·
+   nickel>100cm - every 20cm +150shekel · each handle can be in different
+   length · the horizontal 300 · shkua 1700."*
+
+   The two FLAT ones keep a number here, because they genuinely have one: a
+   recessed channel is cut when the leaf is made and a horizontal bow is one
+   product he buys. Every BAR reads `HANDLE_RATE` below instead — its entry
+   here is the ₪500 floor, which is what a bar at or under 100 cm costs, and
+   the rate adds to it.
+
+   ⚠ `catalog.js` still requires every id to appear exactly once. That guard is
+   the reason it is safe to keep money in one file and vocabulary in another,
+   and it is not relaxed for this: a bar's floor price is still a price. */
 export const HANDLE = {
   none:    0,        // ללא ידית משיכה
-  idan:    500,      // עידן
+  idan:    500,      // עידן          — the floor; see HANDLE_RATE
   ella:    500,      // אלה
   nitzan:  500,      // ניצן
   shahar:  500,      // שחר
   ron:     500,      // רון
   barblack: 500,     // מוט שחור      — A12: he named no rate for a black one
-  grab:    300,      // מאחז אופקי    — Peretz, flat
-  channel: 1700,     // ידית שקועה    — Peretz, flat
+  grab:    300,      // מאחז אופקי    — Peretz, flat, no length choice
+  channel: 1700,     // ידית שקועה    — Peretz, flat, and it is CUT not bolted
 };
+
+/* What length costs, on a bar. ₪150 for every 20 cm past the first metre.
+   ⚠ CEILING, NOT ROUNDING, and it is a choice rather than arithmetic: you
+   cannot buy 10 cm of extra bar, so 110 cm is one step over and not half of
+   one. `Math.floor` is equally defensible arithmetic and gives a different,
+   wrong, answer — which is why it is written down. If Peretz sells by exact
+   length this is one word. TRANSFORM.md §18, assumption A9. */
+export const HANDLE_RATE = { over: 1000, step: 200, per: 150 };  // mm, mm, ₪
 
 /* ── the lock and the lever ───────────────────────────────────────────
    ⚠ MOST OF THEM ARE INCLUDED. Peretz: *"main handles: there is no אלמוג · all
