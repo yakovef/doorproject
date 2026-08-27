@@ -101,8 +101,7 @@ the catalogue, the price, or the wire format changed.
 **Left alone deliberately:** TRANSFORM.md phases 6–11, same reasoning as
 run 41 — active, planned, multi-session work with its own ledger.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** 82dd48b
 
 ---
 
