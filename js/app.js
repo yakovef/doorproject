@@ -78,16 +78,17 @@ let state = { ...DEFAULTS };
 const GROUPS = [
   /* `label` and `meta` used to sit here and nothing read either of them; `meta`
      also spelled the chart code "RAL", which it is not — see `colourCode`. */
-  { key: 'colour', title: 'g.colour', in: 'colour', kind: 'swatch', list: () => COLOURS },
+  { key: 'colour', title: 'g.colour', in: 'colour', kind: 'swatch', list: () => COLOURS,
+    hint: 'g.colour.h' },
 
   { key: 'detail', title: 'g.detail', in: 'face', kind: 'tile', list: () => DETAILS,
-    glyph: detailGlyph, subs: DETAIL_SUBS },
+    glyph: detailGlyph, subs: DETAIL_SUBS, hint: 'g.detail.h' },
 
   { key: 'window', title: 'g.window', in: 'glass', kind: 'tile', list: () => WINDOWS,
-    glyph: windowGlyph },
+    glyph: windowGlyph, hint: 'g.window.h' },
 
   { key: 'grille', title: 'g.grille', in: 'glass', kind: 'sq', list: () => GRILLES,
-    glyph: grilleGlyph },
+    glyph: grilleGlyph, hint: 'g.grille.h' },
 
   { key: 'handle', title: 'g.handle', in: 'grip', kind: 'hw', list: () => HANDLES,
     glyph: handleGlyph, hint: 'g.handle.h' },
@@ -175,14 +176,14 @@ const GROUPS = [
    BANDS stay empty — `ASK-PERETZ.md` §8: overlapping bands make a customer
    choose wrong and feel certain about it. */
 const SECTIONS = [
-  { key: 'fit',    title: 'step.fit.t',    sub: 'step.fit.s',    lede: 'step.fit.l' },
-  { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l' },
-  { key: 'colour', title: 'step.colour.t', sub: 'step.colour.s', lede: 'step.colour.l' },
-  { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l' },
-  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l' },
-  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l' },
-  { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l' },
-  { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l' },
+  { key: 'fit',    title: 'step.fit.t',    sub: 'step.fit.s',    lede: 'step.fit.l', exp: 'exp.fit' },
+  { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk' },
+  { key: 'colour', title: 'step.colour.t', sub: 'step.colour.s', lede: 'step.colour.l', exp: 'exp.colour' },
+  { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face' },
+  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass' },
+  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip' },
+  { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock' },
+  { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz' },
 ];
 
 /**
@@ -197,7 +198,8 @@ const SECTIONS = [
  * everything else in this file that walks the list would have to special-case
  * it. The navigator appends it by hand for the same reason.
  */
-const SUMMARY = { key: 'sum', title: 'step.sum.t', sub: 'step.sum.s', lede: 'step.sum.l' };
+const SUMMARY = { key: 'sum', title: 'step.sum.t', sub: 'step.sum.s', lede: 'step.sum.l',
+                  exp: 'exp.sum' };
 
 /**
  * One line glyph per section, for the navigator's circles.
@@ -950,6 +952,30 @@ function buildPanel() {
       buildOptions(g, field.querySelector('.field__opts'));
     }
 
+    /* ⚠ THE DISCLOSURE — §10.4's sixth part, and the one the flow is FOR.
+       A fold heading in the old cabinet had room for a name and nothing else,
+       so this app never explained anything to anybody. A step has a whole
+       screen and can afford a paragraph — closed, so it costs a customer who
+       knows what a משקוף is exactly nothing, and open, so it rescues one who
+       does not.
+
+       ⚠ NOT ONE NEW CLAIM ON PERETZ'S BEHALF. Every sentence in `exp.*.a`
+       restates a figure he gave, a rule in `js/rules.js` or a dimension in
+       `js/catalog.js` — see the note over those keys in `js/copy.js`. This is
+       the friendliest surface on the site and therefore the easiest place to
+       promise something nobody has agreed to.
+
+       A real `<details>`, not a scripted div: it opens with no JavaScript, it
+       is in the accessibility tree as a disclosure, and browser find-in-page
+       reaches inside a closed one. */
+    if (sec.exp) {
+      const d = document.createElement('details');
+      d.className = 'sect__exp';
+      d.innerHTML = `<summary class="sect__q">${T(sec.exp + '.q')}</summary>`
+                  + `<p class="sect__a">${T(sec.exp + '.a')}</p>`;
+      body.appendChild(d);
+    }
+
     /* The foot: where you are in the money, and the way on. */
     const foot = document.createElement('div');
     foot.className = 'sect__foot';
@@ -978,9 +1004,26 @@ function buildPanel() {
     <h2 class="sect__title" id="sect-head-sum" tabindex="-1">${T(SUMMARY.title)}</h2>
     <p class="sect__lede">${T(SUMMARY.lede)}</p>
     <div class="sect__body" id="sum-slot"></div>
+    ${/* ⚠ THE NINTH EXPLAINER, AND THE ONE THAT EARNS ITS PLACE MOST. This
+          step is where a customer stops and wonders what they are about to
+          set off — and the honest answer is nothing irreversible: the message
+          opens in THEIR WhatsApp, the measure is free and already in the
+          price, and the figure can still move ~5% after it. Every one of
+          those is already stated somewhere in this repository (PRICE_CAVEAT,
+          `js/prices.js`'s `measure`, `js/share.js`'s message); none of them
+          was ever said to the customer at the moment they matter.
+          It sits INSIDE the body, above the foot, so the send buttons stay
+          the last thing on the card. */''}
     <div class="sect__foot">
       <button type="button" class="btn btn--ghost sect__back">${T('nav.back')}</button>
     </div>`;
+  if (SUMMARY.exp) {
+    const d = document.createElement('details');
+    d.className = 'sect__exp';
+    d.innerHTML = `<summary class="sect__q">${T(SUMMARY.exp + '.q')}</summary>`
+                + `<p class="sect__a">${T(SUMMARY.exp + '.a')}</p>`;
+    sum.querySelector('.sect__body').appendChild(d);
+  }
   sum.querySelector('.sect__back').addEventListener('click', () => stepBy(-1));
   wrap.appendChild(sum);
 }

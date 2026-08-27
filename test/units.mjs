@@ -2314,6 +2314,30 @@ async function checkLanguages() {
   withLang('en', () => ok(plural(1, 'stripes.noun') === 'strip' && plural(2, 'stripes.noun') === 'strips',
      'English plural is wrong'));
 
+  /* ── T15, the copy half ───────────────────────────────────────
+     `npm run audit` counts the nine `<details>` on the page and refuses an
+     empty one. It counts them in ONE language — whichever this container's
+     Chromium picked — so a Russian explainer left as a stub would sail past
+     it. Every step's question and answer, in all three, asserted here.
+
+     ⚠ THE LENGTH FLOOR IS THE POINT. A key that exists is not an explainer;
+     `'—'` would satisfy every other check in this file. §10.4 asks for a
+     paragraph that rescues somebody who does not know what a משקוף is, and
+     the cheapest way to fake that is a sentence fragment in the language
+     nobody here proof-reads by eye. */
+  for (const step of ['fit', 'mk', 'colour', 'face', 'glass', 'grip', 'lock', 'pz', 'sum']) {
+    for (const part of ['q', 'a']) {
+      const row = UI[`exp.${step}.${part}`];
+      ok(row, `step '${step}' has no exp.${step}.${part} — TRANSFORM.md §10.4 asks every `
+            + 'step to answer "what is this?", and the cabinet could not');
+      if (!row) continue;
+      const floor = part === 'q' ? 8 : 120;
+      IDS.forEach((id, i) => ok((row[i] || '').trim().length >= floor,
+        `exp.${step}.${part} in ${id} is ${(row[i] || '').trim().length} characters, want `
+      + `${floor}+ — a stub is not an explainer`));
+    }
+  }
+
   /* ── which language a stranger arrives in ─────────────────────
      ⚠ ENGLISH IS NEVER CHOSEN FOR ANYBODY, and that is the decision this
      block defends. `en-US` is the world's factory default and a very large

@@ -215,6 +215,35 @@ for (const v of VIEWS) {
   if (shut.liveKey !== 'fit') {
     fault(v.name, `a bare load starts on "${shut.liveKey}" — it should start at step 01`);
   }
+
+  /* ⚠ T15 — EVERY STEP EXPLAINS ITSELF. TRANSFORM.md §10.4's sixth part, and
+     §10.4 calls it "the single biggest thing the old cabinet could not do": a
+     fold heading had room for a name and nothing else, so the app never
+     explained anything. Eight steps, eight disclosures, each closed on
+     arrival — an explainer that starts open is not an explainer, it is a wall
+     of text between the customer and the tiles.
+     And every group carries its one line of plain Hebrew. Both halves are
+     asserted because both shipped missing once: four of eleven groups had no
+     `hint` and there was no `<details>` anywhere in the project. */
+  const explains = await p.evaluate(() => ({
+    steps: document.querySelectorAll('.sect[data-section]').length,
+    exps: document.querySelectorAll('.sect .sect__exp').length,
+    open: document.querySelectorAll('.sect .sect__exp[open]').length,
+    empty: [...document.querySelectorAll('.sect .sect__a')]
+      .filter(e => (e.textContent || '').trim().length < 40).length,
+    fields: document.querySelectorAll('.field[data-group]').length,
+    hinted: document.querySelectorAll('.field[data-group] .field__hint').length,
+  }));
+  if (explains.exps !== explains.steps) {
+    fault(v.name, `${explains.steps} steps and ${explains.exps} explainers — a step that `
+                + 'cannot answer "what is this?" is the cabinet again with wider margins');
+  }
+  if (explains.open) fault(v.name, `${explains.open} explainer(s) start open`);
+  if (explains.empty) fault(v.name, `${explains.empty} explainer(s) are empty or a stub`);
+  if (explains.hinted !== explains.fields) {
+    fault(v.name, `${explains.fields} groups and ${explains.hinted} hints — a group with `
+                + 'no line of plain language under its title explains nothing');
+  }
   if (shut.nav !== shut.steps) {
     fault(v.name, `${shut.nav} navigator circles for ${shut.steps} steps`);
   }
@@ -1192,6 +1221,64 @@ for (const v of VIEWS) {
     await pg.close();
   }
   if (!faults) console.log('  a page that cannot start says so, and still reaches Peretz');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   T11 — A LINK IS A DOOR TO LOOK AT, NOT A FORM TO FILL IN.
+   ═══════════════════════════════════════════════════════════════════
+   TRANSFORM.md §10.5. Somebody following a shared link is not designing a
+   door, they are LOOKING at one — Peretz most of all, who opens these off
+   WhatsApp to price them. Landing him on `01 ⁄ 08 · מבנה הדלת` with a size
+   picker makes him hunt for the door he was sent. A bare load is the opposite
+   and must start at step 01, which is asserted at every viewport above.
+
+   Both halves matter and only the bare half was checked. Asserted for the
+   full query AND for `?d=CODE` typed on its own, because they are two
+   different paths into `fromQuery` and the short code is the one Peretz reads
+   down the telephone. */
+{
+  console.log('\n  a shared link arrives at the quote page');
+  /* ⚠ ITS OWN NAME, NOT `URL`. The `URL` this file uses elsewhere is scoped to
+     the failure-routes block above, and `URL` is ALSO a global — the WHATWG
+     class. Reaching for it out of scope does not throw; it silently yields
+     `function URL() { [native code] }` and every navigation below would go to
+     a nonsense path and quietly fail to be the check it claims to be. */
+  const HOME = `file://${process.cwd()}/index.html`;
+  const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+  const arrivals = [
+    ['a full query', '?v=18&c=rb-9016d&w=rect&d=panel&k=coral&s=wide&h=left-in'],
+    ['a short code', null],
+    ['a bare load',  ''],
+  ];
+  for (const [what, q] of arrivals) {
+    let query = q;
+    if (query === null) {
+      /* Read the code off a built door rather than typing one: a literal here
+         would go stale the next time VERSION moves, and it would go stale
+         SILENTLY — an unreadable code lands on the default door, at step 01,
+         which is exactly the failure this check is looking for. */
+      await pg.goto(`${HOME}?v=18&c=rb-9016d&w=rect&d=panel&k=coral&s=wide&h=left-in`);
+      await pg.waitForTimeout(400);
+      const code = await pg.evaluate(() => document.querySelector('#code')?.textContent);
+      query = `?d=${code}`;
+    }
+    await pg.goto(HOME + query);
+    await pg.waitForTimeout(500);
+    const at = await pg.evaluate(() => ({
+      live: (document.querySelector('.sect:not([hidden])') || {}).dataset?.section,
+      notice: !document.querySelector('#notice')?.hidden,
+    }));
+    const want = query === '' ? 'fit' : 'sum';
+    if (at.live !== want) {
+      fault('arrival', `${what} lands on step "${at.live}", want "${want}" — ${
+        want === 'sum'
+          ? 'somebody following a link is looking at a door, not building one'
+          : 'a customer starting fresh belongs at step 01'}`);
+    }
+    if (at.notice) fault('arrival', `${what} raised a notice on a door that is buildable`);
+  }
+  if (!faults) console.log('    a link opens the door; a bare load opens step 01');
+  await pg.close();
 }
 
 /* ═══════════════════════════════════════════════════════════════════

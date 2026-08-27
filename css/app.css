@@ -217,6 +217,36 @@ svg { direction: ltr; }
 
 .nav { display: flex; gap: 2px; }
 
+/* ── the step's disclosure — TRANSFORM.md §10.4 ──────────────────────
+   Closed by default and quiet enough to ignore. ⚠ The 44 px touch floor
+   applies to a `<summary>` like anything else: it is the control that opens
+   it, and the audit measures every interactive element in the flow. The
+   marker is drawn rather than left to the browser's triangle, which is a
+   different glyph and a different size in every engine. */
+.sect__exp { margin-block-start: 14px; border-block-start: 1px solid var(--rule); }
+.sect__q {
+  display: flex; align-items: center; gap: 8px;
+  min-block-size: 44px; padding-block: 10px;
+  font: 500 .86rem var(--sans); color: var(--ink-2);
+  cursor: pointer; list-style: none;
+}
+.sect__q::-webkit-details-marker { display: none; }
+.sect__q::before {
+  content: ""; inline-size: 18px; block-size: 18px; flex: none;
+  border: 1px solid currentColor; border-radius: 50%;
+  background: no-repeat center / 3px 9px
+    linear-gradient(currentColor, currentColor);
+}
+.sect__q::after {
+  content: "⌄"; margin-inline-start: auto; transition: transform .2s var(--ease);
+}
+.sect__exp[open] .sect__q::after { transform: rotate(180deg); }
+.sect__exp[open] .sect__q { color: var(--ink); }
+.sect__a {
+  margin: 0 0 12px; padding-inline-start: 26px;
+  font-size: .84rem; line-height: 1.62; color: var(--ink-2);
+}
+
 /* ── the language picker ─────────────────────────────────────────────
    Three buttons rather than a menu, each written in its own script, so a
    customer who cannot read the rest of the page can still see the way out

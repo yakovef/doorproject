@@ -229,6 +229,93 @@
       "Не уверены? Уточним вместе при замере."
     ],
     "g.panels": ["פאנלים", "Panels", "Панели"],
+    "g.colour.h": [
+      "הקוד שליד כל גוון הוא הקוד של היצרן.",
+      "The code beside each shade is the manufacturer’s own.",
+      "Код рядом с каждым оттенком — код производителя."
+    ],
+    "g.detail.h": [
+      "לא משלבים פאנלים עם פסי מתכת על אותה דלת.",
+      "Panels and metal strips do not go on the same door.",
+      "Панели и металлические полосы не сочетаются на одной двери."
+    ],
+    "g.window.h": [
+      "חלון מרובע מגיע תמיד עם פאנל בתחתית.",
+      "A rectangular window always comes with a panel below it.",
+      "Прямоугольное окно всегда идёт с нижней панелью."
+    ],
+    "g.grille.h": [
+      "מה שנמצא בתוך הזכוכית. נספר לפי מספר הפתחים.",
+      "What fills the glass. Counted per opening.",
+      "Наполнение стекла. Считается по числу проёмов."
+    ],
+    /* ── the step explainers — §10.4's `<details>` ─────────────────────
+       ⚠ NOT ONE NEW CLAIM ON PERETZ'S BEHALF. Every sentence below restates
+       something this repository already knows: a figure he gave on 26.8, a rule
+       in `js/rules.js`, a dimension in `js/catalog.js`, or a fact about the
+       drawing. That rule is what has refused the warranty term, the trust
+       sublines and the "made in Israel" badge for nine days now, and a friendly
+       explainer is exactly the place it would get broken by accident. If you
+       want to add a sentence here and cannot point at the file it comes from,
+       it belongs in `ASK-PERETZ.md` instead. */
+    "exp.fit.q": ["מה המידה שלי?", "Which size is mine?", "Какой размер мой?"],
+    "exp.fit.a": [
+      "המידה נקבעת לפי הפתח שבקיר, ואנחנו מודדים אותו אצלכם בחינם. עד 98 × 203 ס״מ זה המחיר הבסיסי; דלת רחבה או גבוהה יותר מוסיפה 25%, ומעל 120 × 240 ס״מ — 50%. דלת וחצי היא שתי כנפיים ומחירה כפול. כיוון הפתיחה נמדד תמיד במבט מבחוץ — הצד שבו נמצאים הצירים.",
+      "The size follows the opening in your wall, and we measure it on site, free. Up to 98 × 203 cm is the base price; wider or taller adds 25%, and over 120 × 240 cm adds 50%. A leaf and a half is two leaves and costs double. Handing is always read from OUTSIDE — the side the hinges are on.",
+      "Размер определяется проёмом в стене, и мы замеряем его у вас бесплатно. До 98 × 203 см — базовая цена; шире или выше — плюс 25%, свыше 120 × 240 см — плюс 50%. Полуторная дверь — это две створки, и стоит вдвое. Сторона открывания всегда считается СНАРУЖИ — по стороне петель."
+    ],
+    "exp.mk.q": ["מה זה משקוף?", "What is the frame?", "Что такое коробка?"],
+    "exp.mk.a": [
+      "המשקוף הוא המסגרת שמותקנת בקיר, והדלת נסגרת עליה. המשקוף הסטנדרטי מתאים לקיר רגיל. אם החזית שנראית מבחוץ צריכה להיות רחבה יותר, או שהקיר עבה והמשקוף צריך להיכנס עמוק יותר פנימה — כל צד שמתרחב מוסיף 250 ₪. את הקיר נמדוד אצלכם.",
+      "The frame is what is fitted into the wall and what the door closes against. The standard frame suits an ordinary wall. If the face seen from outside has to be wider, or the wall is thick and the frame has to reach further in, each side that widens adds ₪250. We measure the wall on site.",
+      "Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. Стандартная подходит для обычной стены. Если фасад снаружи должен быть шире или стена толстая и коробка должна уходить глубже, каждая расширенная сторона добавляет ₪250. Стену замерим на месте."
+    ],
+    "exp.colour.q": ["איך נראה הצבע במציאות?", "How does the colour look in reality?", "Как цвет выглядит вживую?"],
+    "exp.colour.a": [
+      "הצבע נצרב בתנור, מלוח הגוונים של היצרן, והקוד שליד כל שם הוא הקוד שלו. כל הגוונים עולים אותו דבר, כך שהבחירה היא בטעם בלבד. הציור באתר הוא הדמיה — הגוון שיֵצא מהתנור עשוי להיראות מעט שונה, ובעיקר בברק.",
+      "The colour is oven-baked from the manufacturer’s chart, and the code beside each name is theirs. Every shade costs the same, so the choice is purely taste. The drawing here is an illustration — the shade that comes out of the oven may look slightly different, in sheen most of all.",
+      "Цвет наносится порошком и запекается, по палитре производителя; код рядом с названием — его. Все оттенки стоят одинаково, так что выбор — дело вкуса. Изображение здесь — визуализация: готовый оттенок может немного отличаться, прежде всего по блеску."
+    ],
+    "exp.face.q": ["פאנלים או פסים — מה ההבדל?", "Panels or strips — what is the difference?", "Панели или полосы — в чём разница?"],
+    "exp.face.a": [
+      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — 150 ₪ לפס אופקי ו‑300 ₪ לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון. שלושה פאנלים והסט הקלאסי מגיעים עם מאחז משלהם, ולכן אין בהם ידית משיכה נפרדת.",
+      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — ₪150 a horizontal strip and ₪300 a vertical one. Panels and strips do not go on the same door, and neither goes with a window. Three panels and the classical set come with a grip of their own, so they take no separate pull handle.",
+      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: ₪150 за горизонтальную и ₪300 за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном. Три панели и классический комплект идут со своей скобой, поэтому отдельная ручка к ним не ставится."
+    ],
+    "exp.glass.q": ["מה נכנס לתוך החלון?", "What goes inside the window?", "Что ставится в окно?"],
+    "exp.glass.a": [
+      "יש שני חלונות: צוהר אנכי צר לאורך הדלת, וחלון מלבני. חלון מלבני מגיע תמיד עם פאנל בתחתית. מה שנמצא בתוך הזכוכית — סורג מברזל או זכוכית מעוצבת — נבחר בנפרד. בדלת וחצי ובדלת עם חלון צד יש שני פתחים מזוגגים, והסורג מותקן בשניהם ומתומחר לפי מספרם.",
+      "There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. What fills the glass — wrought iron, or worked glass — is chosen separately. A leaf and a half, and a door with a sidelight, have TWO glazed openings; the ironwork goes in both and is priced per opening.",
+      "Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Наполнение стекла — кованая решётка или художественное стекло — выбирается отдельно. У полуторной двери и двери с боковым окном ДВА остеклённых проёма: решётка ставится в оба и считается по их числу."
+    ],
+    "exp.grip.q": ["איזה אורך לבחור?", "What length should I choose?", "Какую длину выбрать?"],
+    "exp.grip.a": [
+      "ידית המשיכה היא המוט שמושכים בו כדי לפתוח. אפשר לבחור את אורכו: עד מטר במחיר הדגם, וכל 20 ס״מ מעבר לכך מוסיפים 150 ₪. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר גם בלי ידית משיכה בכלל. המאחז האופקי והידית השקועה מותקנים לרוחב הדלת ואין להם בחירת אורך.",
+      "The pull handle is the bar you pull to open the door. The length is yours: up to a metre at the model’s price, and every 20 cm past that adds ₪150. It is capped by the height of the leaf, so a short door cannot take a bar that would not fit. Going without one is a choice too. The grab bar and the recessed channel are fitted across the door and have no length to choose.",
+      "Ручка-скоба — это то, за что тянут дверь. Длину выбираете вы: до метра — по цене модели, каждые 20 см сверх того добавляют ₪150. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Можно обойтись и без неё. Горизонтальная скоба и врезная ручка ставятся поперёк двери, и длина у них не выбирается."
+    ],
+    "exp.lock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
+    "exp.lock.a": [
+      "בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת (700 ₪) וקודן (900 ₪) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
+      "As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock (₪700) and a keypad (₪900) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.",
+      "Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый (₪700) и кодовый (₪900) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек."
+    ],
+    "exp.pz.q": ["מה הפרזול משנה?", "What does the hardware finish change?", "На что влияет отделка фурнитуры?"],
+    "exp.pz.a": [
+      "את הגוון של הידית שמסובבים, הצירים, העינית וסגר הביטחון. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את פסי המתכת. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
+      "The tone of the lever you turn, the hinges, the peephole and the security latch. It does NOT change the pull handle — that is its own product and comes in its own finish — and it does not change the metal strips. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
+      "Оттенок нажимной ручки, петель, глазка и предохранительной защёлки. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет металлические полосы. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
+    ],
+    "exp.sum.q": [
+      "מה קורה אחרי שאני שולח?",
+      "What happens after I send it?",
+      "Что будет после отправки?"
+    ],
+    "exp.sum.a": [
+      "ההודעה נפתחת בוואטסאפ שלכם עם הדלת שבחרתם, הקוד שלה וקישור שפרץ לוחץ עליו ורואה בדיוק את מה שאתם רואים עכשיו. משם נקבע מועד למדידה אצלכם — היא בחינם וכלולה במחיר. אחרי המדידה המחיר נסגר סופית, והוא עשוי להשתנות בכ‑5% לכאן או לכאן. שום דבר לא מוזמן עד שתאשרו.",
+      "The message opens in your own WhatsApp with the door you built, its code, and a link Peretz taps to see exactly what you are seeing now. From there we arrange a measure at your home — it is free and already in the price. After measuring the price is settled, and it may move by about 5% either way. Nothing is ordered until you say so.",
+      "Сообщение откроется в вашем WhatsApp с собранной дверью, её кодом и ссылкой, по которой Перец увидит ровно то, что видите вы. Дальше договоримся о замере у вас — он бесплатный и уже входит в цену. После замера цена фиксируется и может измениться примерно на 5% в любую сторону. Ничего не заказывается, пока вы не подтвердите."
+    ],
     /* ── the strip counter ────────────────────────────────────────── */
     "stripes.label": ["פסי מתכת", "Metal strips", "Металлические полосы"],
     "stripes.none": ["ללא", "None", "Без полос"],
@@ -7166,7 +7253,14 @@ ${body}
   var GROUPS = [
     /* `label` and `meta` used to sit here and nothing read either of them; `meta`
        also spelled the chart code "RAL", which it is not — see `colourCode`. */
-    { key: "colour", title: "g.colour", in: "colour", kind: "swatch", list: () => COLOURS },
+    {
+      key: "colour",
+      title: "g.colour",
+      in: "colour",
+      kind: "swatch",
+      list: () => COLOURS,
+      hint: "g.colour.h"
+    },
     {
       key: "detail",
       title: "g.detail",
@@ -7174,7 +7268,8 @@ ${body}
       kind: "tile",
       list: () => DETAILS,
       glyph: detailGlyph,
-      subs: DETAIL_SUBS
+      subs: DETAIL_SUBS,
+      hint: "g.detail.h"
     },
     {
       key: "window",
@@ -7182,7 +7277,8 @@ ${body}
       in: "glass",
       kind: "tile",
       list: () => WINDOWS,
-      glyph: windowGlyph
+      glyph: windowGlyph,
+      hint: "g.window.h"
     },
     {
       key: "grille",
@@ -7190,7 +7286,8 @@ ${body}
       in: "glass",
       kind: "sq",
       list: () => GRILLES,
-      glyph: grilleGlyph
+      glyph: grilleGlyph,
+      hint: "g.grille.h"
     },
     {
       key: "handle",
@@ -7279,16 +7376,22 @@ ${body}
     }
   ];
   var SECTIONS = [
-    { key: "fit", title: "step.fit.t", sub: "step.fit.s", lede: "step.fit.l" },
-    { key: "mk", title: "step.mk.t", sub: "step.mk.s", lede: "step.mk.l" },
-    { key: "colour", title: "step.colour.t", sub: "step.colour.s", lede: "step.colour.l" },
-    { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l" },
-    { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l" },
-    { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l" },
-    { key: "lock", title: "step.lock.t", sub: "step.lock.s", lede: "step.lock.l" },
-    { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l" }
+    { key: "fit", title: "step.fit.t", sub: "step.fit.s", lede: "step.fit.l", exp: "exp.fit" },
+    { key: "mk", title: "step.mk.t", sub: "step.mk.s", lede: "step.mk.l", exp: "exp.mk" },
+    { key: "colour", title: "step.colour.t", sub: "step.colour.s", lede: "step.colour.l", exp: "exp.colour" },
+    { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l", exp: "exp.face" },
+    { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l", exp: "exp.glass" },
+    { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
+    { key: "lock", title: "step.lock.t", sub: "step.lock.s", lede: "step.lock.l", exp: "exp.lock" },
+    { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l", exp: "exp.pz" }
   ];
-  var SUMMARY = { key: "sum", title: "step.sum.t", sub: "step.sum.s", lede: "step.sum.l" };
+  var SUMMARY = {
+    key: "sum",
+    title: "step.sum.t",
+    sub: "step.sum.s",
+    lede: "step.sum.l",
+    exp: "exp.sum"
+  };
   var SECTION_ICON = {
     /* a leaf and its frame, with a handle dot */
     fit: '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.2 3.6v16.8"/><path d="M15.4 12.4a.55.55 0 1 0 0-1.1.55.55 0 0 0 0 1.1Z"/>',
@@ -7628,6 +7731,12 @@ ${body}
         body.appendChild(field);
         buildOptions(g, field.querySelector(".field__opts"));
       }
+      if (sec.exp) {
+        const d = document.createElement("details");
+        d.className = "sect__exp";
+        d.innerHTML = `<summary class="sect__q">${T(sec.exp + ".q")}</summary><p class="sect__a">${T(sec.exp + ".a")}</p>`;
+        body.appendChild(d);
+      }
       const foot = document.createElement("div");
       foot.className = "sect__foot";
       foot.innerHTML = `
@@ -7646,9 +7755,26 @@ ${body}
     <h2 class="sect__title" id="sect-head-sum" tabindex="-1">${T(SUMMARY.title)}</h2>
     <p class="sect__lede">${T(SUMMARY.lede)}</p>
     <div class="sect__body" id="sum-slot"></div>
+    ${/* ⚠ THE NINTH EXPLAINER, AND THE ONE THAT EARNS ITS PLACE MOST. This
+        step is where a customer stops and wonders what they are about to
+        set off — and the honest answer is nothing irreversible: the message
+        opens in THEIR WhatsApp, the measure is free and already in the
+        price, and the figure can still move ~5% after it. Every one of
+        those is already stated somewhere in this repository (PRICE_CAVEAT,
+        `js/prices.js`'s `measure`, `js/share.js`'s message); none of them
+        was ever said to the customer at the moment they matter.
+        It sits INSIDE the body, above the foot, so the send buttons stay
+        the last thing on the card. */
+    ""}
     <div class="sect__foot">
       <button type="button" class="btn btn--ghost sect__back">${T("nav.back")}</button>
     </div>`;
+    if (SUMMARY.exp) {
+      const d = document.createElement("details");
+      d.className = "sect__exp";
+      d.innerHTML = `<summary class="sect__q">${T(SUMMARY.exp + ".q")}</summary><p class="sect__a">${T(SUMMARY.exp + ".a")}</p>`;
+      sum.querySelector(".sect__body").appendChild(d);
+    }
     sum.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
     wrap.appendChild(sum);
   }

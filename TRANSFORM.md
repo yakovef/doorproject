@@ -29,6 +29,7 @@ green and the work is pushed.
 | 4 | פרזול — the hardware finish, and the bug Peretz reported | ✅ **done** | 27.8 · 4 finishes ₪0–₪900 · **the pull handle no longer recolours the lock furniture** · `effectiveFinish` → `gripFinish` · **36 grip × pirzul pairs pinned** · found + fixed: the check nibble was being squeezed by rounding, and `VERSION` itself could overflow · `VERSION 16`, code now 9 chars · test **7,744,236 / 0** |
 | 5 | Handle length — a pull bar is a length, not a model | ✅ **done** | 27.8 · `handleLength` is the ONE definition, clamped by the leaf · 20 cm stepper matching the price ladder · `0` = as the model comes, so every measured drawing survives · length in the ORDER · `REBATE` moved to the catalogue · `VERSION 17`, code 10 chars (phase 6 returns it to 9) · test **9,893,954 / 0**, all gates clean |
 | 6 | Stripes — a count in one direction, not fourteen patterns | ✅ **done** | 27.8 · 14 tiles → direction + count + **tight/spread toggle** · packed as ONE ordinal so impossible states cannot exist · all 14 retired ids MIGRATE (an alias cannot express id→3 fields) · panels: rect needs a bottom panel, panel3/classic drop the pull · third repair-ordering constraint found · `VERSION 18`, code 10 chars · test **5,401,525 / 0** |
+| 7b | §10.4's step explainers — the part of phase 7 that was skipped | ✅ **done** | 27.8 · nine `<details>`, one per step · four missing group hints written · T11 and T15 asserted · found by auditing the plan against the code rather than against the ledger |
 | 7 | The guided flow — one question at a time | ✅ **done** | 27.8 · 8 steps + a quote page, one live at every width · accordion deleted (6 functions) · navigator sticky and scrolling · audit's arrival/keyboard/reach checks all restated · **latency 501 → 123 ms** · test **5,401,525 / 0**, audit clean at 7 viewports |
 | 8 | Motion — the door assembles, and every change is animated | ✅ **done** | 27.8 · door assembles on load (Peretz's "start with nothing", satisfied in time) · colour cross-fades, never interpolates hue · parts fit, keyed off `data-changed` so no diffing and no second render path · **bare mode + reduced motion measured at 0 animations, asserted in the audit** · latency 123 ms |
 | 9 | The look — leaf texture (E), full-bleed desktop (F), mockup leftovers | ✅ **done, with F scoped down and said so** | 27.8 · grain +56% in two measured steps, mottle 0.0132 → 0.0168, judged against d016/d048 · ⚠ response is SUB-LINEAR, recorded · door **340 px wider** at 1280 and 1680 · the floating overlay is NOT built and §12.2 says why |
@@ -1698,11 +1699,11 @@ Every one of these exists because something in this plan can fail silently.
 | T8 | The cylinder is on the same side in he, en and ru | §13 — the hinge trap |
 | T9 | The page is fully usable under `prefers-reduced-motion: reduce` | §11 |
 | T10 | `window: rect` cannot be chosen without a bottom panel | §5.2 |
-| T11 | `?d=CODE` and a full query both land on the quote page, not step 01 | §10.5 |
+| T11 | `?d=CODE` and a full query both land on the quote page, not step 01 | §10.5 — ⚠ **shipped half-done in phase 7 and closed 27.8.** The bare-load half was asserted at every viewport; the shared-link half, which is the half Peretz uses, was not asserted at all |
 | T12 | Two renders of one state stay byte-identical **with the two stacked leaf rects in place** | §11.2 |
 | T13 | Under `.is-bare`, `getComputedStyle` reports `animation-name: none` on every animated element | §11.4 — the sheets go non-deterministic otherwise |
 | T14 | Every interactive control in the flow measures ≥ 44 px on both axes, at all seven `VIEWS` | §12.4 — the grip controls were 22 px for two rounds |
-| T15 | Every group in `GROUPS` has a `hint`, and every step has a `<details>` explainer | §10.4 — the flow's whole advantage over the cabinet |
+| T15 | Every group in `GROUPS` has a `hint`, and every step has a `<details>` explainer | §10.4 — ⚠ **NOT BUILT IN PHASE 7; built 27.8.** Four of eleven groups had no hint and there was no `<details>` anywhere in the project. §10.4 calls this "the single biggest thing the old cabinet could not do", and it was the one part of the step template that got skipped |
 
 ### 16.2 Instruments that must be extended, not just re-run
 

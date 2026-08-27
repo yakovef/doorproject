@@ -171,6 +171,25 @@ hold keys: `SAID` in `rules.js`, `GROUPS`/`SECTIONS` in `app.js`,
 `priceIncludes`/`priceCaveat` in `share.js` (functions, not constants).
 Nothing throws when this is wrong. The page looks entirely correct.
 
+### ⚠ A LEDGER IS NOT EVIDENCE
+
+Every phase of `TRANSFORM.md` was marked done by the same agent that did it,
+and asked afterwards whether the plan had actually been carried out, that
+agent found two gaps by checking the CODE instead of its own notes:
+
+- **§10.4's step explainers did not exist.** Nine `<details>` disclosures, one
+  per step, described by the plan as *"the single biggest thing the old
+  cabinet could not do"* — and four of eleven groups had no `hint` either.
+  Phase 7 shipped, was green on every instrument, and looked complete.
+- **T11 was asserted for half of what it says.** A bare load landing on step 01
+  was checked at all seven viewports; a shared link landing on the quote page —
+  the half Peretz uses, every time — was checked nowhere.
+
+Neither was visible from the outside. Both are closed. The lesson is the one
+§5 keeps teaching in a new costume: **check the artefact, not the record of
+the artefact.** `TRANSFORM.md` §16.1's fifteen named assertions are the list to
+walk, and walking it means grepping for each one, not remembering it.
+
 ### Green
 
 - `npm test` — **5,403,239 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
