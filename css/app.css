@@ -1762,3 +1762,128 @@ html.is-live .wa__off { display: none; }
   inline-size: auto; block-size: auto;
   max-inline-size: 100%; max-block-size: 100dvh;
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   MOTION
+   ══════════════════════════════════════════════════════════════════════
+
+   ⚠ READ THE KILL SWITCH FIRST. It is at the TOP of this block on purpose:
+   `?bare=1` is what `npm run sheets`, `recreate`, `corpus`, `against`,
+   `profile` and `collide` photograph, and an animation running during a
+   screenshot makes all 110 committed sheets NON-DETERMINISTIC — the same
+   commit producing a different image every run, every photograph comparison
+   drifting, and the byte-identical check that proves the leaf did not move
+   failing at random. This rule shipped in the same commit as the first
+   animation, not after it.
+
+   THE ONE IDEA: the DOOR is a physical object being assembled; the INTERFACE
+   is paper. The door moves at 260–420 ms with weight; the interface at
+   120–200 ms and is barely noticed. If they move at the same speed the whole
+   page reads as one flat surface and the illusion thirty photographs paid for
+   is spent for nothing.
+
+   ⚠ NO BOUNCE, ANYWHERE. A steel door that boings is a cartoon, and
+   `PLAN.md` §7's generic-tells checklist exists to stop exactly this. */
+
+.is-bare *,
+.is-bare *::before,
+.is-bare *::after {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Slower to leave, longer to settle, no overshoot. `--ease` (fast out, no
+   bounce) stays the interface's; this is the door's. */
+:root { --ease-fit: cubic-bezier(.2, .7, .3, 1); }
+
+/* ── M1 · the door assembles on load ─────────────────────────────────
+   Peretz: "the start door needs to be with nothing, only the door, no mashkof
+   no keyhole, just hole." This satisfies that sentence LITERALLY, IN TIME,
+   without inventing an un-orderable state: the first frame is a bare leaf, and
+   the frame and the fittings arrive over 900 ms. `ASK-PERETZ.md` §13 settled
+   that a door without a cylinder cannot be ORDERED; nothing here disagrees —
+   the state underneath is a real door throughout.
+   Once, on first paint, which is why it is a class the script removes. */
+.is-arriving #frame     { animation: fitPart .42s var(--ease-fit) .22s both; }
+.is-arriving #hardware  { animation: fitPart .36s var(--ease-fit) .52s both; }
+@keyframes fitPart { from { opacity: 0; transform: translateY(-6px); } }
+
+/* ── M2 · the colour cross-fades ─────────────────────────────────────
+   `PLAN.md` §7, decided long ago and never built: NEVER INTERPOLATE HUE. A CSS
+   colour transition on a fill passes through the midpoint of two hues, so
+   anthracite → sage goes through mud and reads as a rendering bug. The leaf is
+   simply faded in over the outgoing paint, which never leaves the palette
+   because there is nothing between two opacities. */
+#stage[data-changed="colour"] #leaf { animation: paintOn .32s var(--ease-fit) both; }
+@keyframes paintOn { from { opacity: 0; } }
+
+/* ── M3, M5, M6, M7 · the parts are FITTED ───────────────────────────
+   Each keyed off the field that owns it, so changing the colour does not
+   re-animate the panel. See `stampChange` in js/app.js for why the stamp
+   exists and why diffing the drawing was refused. */
+#stage[data-changed="detail"] [data-detail],
+#stage[data-changed="stripeCount"] [data-detail="strips"],
+#stage[data-changed="stripeDir"] [data-detail="strips"],
+#stage[data-changed="stripeTight"] [data-detail="strips"] {
+  animation: fitPart .30s var(--ease-fit) both;
+}
+#stage[data-changed="window"] #glazing,
+#stage[data-changed="grille"] #glazing { animation: openUp .36s var(--ease-fit) both; }
+@keyframes openUp { from { opacity: 0; transform: scaleY(.94); } }
+
+#stage[data-changed="handle"] [data-hw="handle"],
+#stage[data-changed="handleLen"] [data-hw="handle"] {
+  animation: offerUp .28s var(--ease-fit) both;
+}
+@keyframes offerUp { from { opacity: 0; transform: translateX(6px); } }
+
+/* Four fittings change together, and the point is that they change TOGETHER —
+   instantly, nobody sees that they moved as one. */
+#stage[data-changed="pirzul"] [data-hw="lock"],
+#stage[data-changed="lockset"] [data-hw="lock"],
+#stage[data-changed="speciallock"] [data-hw="lock"] {
+  animation: replate .30s var(--ease-fit) both;
+}
+@keyframes replate { from { opacity: 0; } }
+
+/* The frame is its own choice now, so it gets its own arrival. */
+#stage[data-changed="mashkof"] #frame { animation: fitPart .32s var(--ease-fit) both; }
+
+/* ── M8 · the step transition ────────────────────────────────────────
+   Direction is the whole information: a flow whose steps cross-fade has no
+   forward and no back. ⚠ LOGICAL, not left/right — the interface mirrors and
+   the direction of travel has to mirror with it. */
+.sect.is-live { animation: stepIn .18s var(--ease) both; }
+@keyframes stepIn { from { opacity: 0; transform: translateX(12px); } }
+[dir="rtl"] .sect.is-live { animation-name: stepInRtl; }
+@keyframes stepInRtl { from { opacity: 0; transform: translateX(-12px); } }
+
+/* ── M9, M10, M11, M12, M13 · the interface ──────────────────────────
+   Quick, light, and mostly unnoticed. */
+.steps__c { transition: border-color .2s var(--ease), background .2s var(--ease); }
+
+/* ⚠ THE PRICE DOES NOT COUNT UP. `PLAN.md` §7's generic-tells checklist bans
+   count-up numbers by name, and there is a harder reason: for ~400 ms the page
+   would display a number that is not the price of anything, on a site whose
+   entire promise is that the figure on screen is real. It settles instead. */
+.send__figure, .dock__figure { transition: opacity .16s var(--ease); }
+
+.bd { animation: fitPart .24s var(--ease) both; }
+
+/* ⚠ THE TOAST MUST NOT SWALLOW THE SEND BUTTON. It sat over the dock at
+   z-index 50 with pointer-events auto and killed the site's one call to action
+   for four seconds at a time. Animating it is not permitted to re-open that. */
+.toast { animation: toastUp .2s var(--ease) both; pointer-events: none; }
+@keyframes toastUp { from { opacity: 0; transform: translateY(8px); } }
+
+/* The cheapest thing that makes a page feel like a product on a phone. */
+.tile, .swatch, .pill { transition: transform .09s var(--ease); }
+.tile:active, .swatch:active, .pill:active { transform: scale(.97); }

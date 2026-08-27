@@ -6888,6 +6888,8 @@ ${body}
     }
     const shared = GROUPS.some((g) => state[g.key] !== DEFAULTS[g.key]) || state.stripeDir !== DEFAULTS.stripeDir;
     goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
+    document.documentElement.classList.add("is-arriving");
+    setTimeout(() => document.documentElement.classList.remove("is-arriving"), 1e3);
   }
   var worksObserver = null;
   function buildWorks() {
@@ -7437,12 +7439,23 @@ ${body}
       }
     }, 300);
   }
+  function stampChange(before, after) {
+    const stage = $("#stage");
+    if (!stage) return;
+    const moved = Object.keys(after).find((k) => before[k] !== after[k] && k !== "grip");
+    stage.removeAttribute("data-changed");
+    if (!moved) return;
+    void stage.offsetWidth;
+    stage.setAttribute("data-changed", moved);
+  }
   function set(next) {
+    const before = state;
     if (JSON.stringify(next) !== JSON.stringify(state)) {
       history_.push(state);
       if (history_.length > HISTORY_MAX) history_.shift();
     }
     state = next;
+    stampChange(before, next);
     guard(paint)();
     scheduleUrl();
   }

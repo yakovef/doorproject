@@ -1319,6 +1319,37 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **The page moves now, and the rule that made it safe shipped first.**
+  ⚠ **`.is-bare` KILLS EVERY ANIMATION**, and it is asserted in `npm run audit`
+  rather than trusted. `?bare=1` is what `sheets`, `recreate`, `corpus`,
+  `against`, `profile` and `collide` photograph; one animation running during a
+  screenshot makes all 110 committed sheets NON-DETERMINISTIC. Measured: 5
+  elements animate normally, **0** under `?bare=1`, **0** under
+  `prefers-reduced-motion`.
+  ⚠ **`stampChange` is what makes the drawing animate without a second render
+  path.** `render(state)` is pure and `paint()` swaps innerHTML, so EVERY
+  element is new on every change — a CSS entry animation keyed off the markup
+  would re-animate the panel, the window and the bar every time somebody
+  nudged the colour. Diffing the drawing would mean `render` knowing the
+  previous state, which is the argument that killed the 3D renderer and the
+  incremental repaint. But `app.js` already holds both states, so it stamps the
+  STAGE with the field that moved and the stylesheet animates only that field's
+  parts.
+  **The door assembles on load** (M1) — Peretz's *"start with nothing, only the
+  door"* satisfied literally, in time, without inventing an un-orderable state.
+  Once, via a class removed on a timer rather than `animationend`, which never
+  fires when the animation is disabled.
+  **The colour CROSS-FADES and never interpolates hue** — `PLAN.md` §7,
+  decided long ago and never built until now. Anthracite → sage through a
+  colour transition goes via mud and reads as a rendering bug.
+  ⚠ Refused, and listed so they are not proposed again: the price counting up
+  (banned by name, and for ~400 ms it would show a number that is not the price
+  of anything), a rotating door (no second view; square-on is load-bearing),
+  parallax on the room (the scene is anchored on purpose).
+  ⚠ And the audit's drag comparison had to learn to wait 1100 ms: it was
+  screenshotting a fresh load mid-assembly and reporting 928 pixels of
+  difference as "something is on the door that the link does not carry".
+
 - **⚠ THE CABINET IS GONE. THE PAGE IS A FLOW.** Eight steps and a quote page,
   exactly one live at every width. `TRANSFORM.md` §10.0 has the argument; the
   short form is that a fold asks a question about the INTERFACE before it asks

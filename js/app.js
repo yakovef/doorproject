@@ -473,6 +473,16 @@ function init() {
               || state.stripeDir !== DEFAULTS.stripeDir;
   goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
 
+  /* ⚠ M1: THE DOOR ASSEMBLES, ONCE. `is-arriving` is on `<html>` for one
+     animation's length and then removed, so nothing else in the session
+     re-triggers it — a door that reassembles itself every time somebody picks
+     a colour would be a fault, not a flourish.
+     Removed on a timer rather than on `animationend`, because the animation
+     does not run at all under `prefers-reduced-motion` or in bare mode, and an
+     `animationend` that never fires would leave the class on for ever. */
+  document.documentElement.classList.add('is-arriving');
+  setTimeout(() => document.documentElement.classList.remove('is-arriving'), 1000);
+
   /* ⚠ THE 1100 px CROSSING NO LONGER RESHAPES ANYTHING, and the listener that
      did is gone with the fold. It existed because the accordion arrived in one
      shape on a phone (all shut) and another on a desktop (all open), and
@@ -1467,7 +1477,47 @@ function scheduleUrl() {
   }, 300);
 }
 
+/**
+ * ⚠ WHAT THE CUSTOMER JUST CHANGED — the ONE thing that makes the drawing's
+ * motion possible without a second render path.
+ *
+ * `render(state)` is pure and `paint()` swaps `#stage`'s innerHTML, so EVERY
+ * element in the drawing is new on every change. A CSS entry animation keyed
+ * off the markup alone would therefore re-animate the panel, the window, the
+ * bar and the lock furniture every time somebody nudged the colour — which is
+ * noise, not motion.
+ *
+ * The obvious repair is to diff the old drawing against the new one, and that
+ * is exactly what must not happen: it means `render` knowing what the previous
+ * state was, which is a second way of producing the drawing standing beside
+ * the first. That argument killed the 3D renderer (`REDESIGN.md` §3.3) and the
+ * incremental repaint (`CLAUDE.md` §9), and it is not weaker here.
+ *
+ * But `app.js` already knows what changed — it is holding the old state and
+ * the new one. So it stamps the STAGE with the field that moved, for one
+ * frame, and the stylesheet animates only the parts that field owns. No
+ * diffing, no second render, and `render(state)` stays byte-identical for one
+ * state, which a test asserts.
+ */
+function stampChange(before, after) {
+  const stage = $('#stage');
+  if (!stage) return;
+  const moved = Object.keys(after).find(k => before[k] !== after[k]
+    /* `grip` is an object; a drag changes it constantly and has its own
+       feedback already. Comparing it by identity here would stamp on every
+       pointer move. */
+    && k !== 'grip');
+  stage.removeAttribute('data-changed');
+  if (!moved) return;
+  /* Force a reflow so the attribute counts as newly set even when the same
+     field changes twice running — otherwise a second tap on the colour row
+     re-uses the old attribute value and the animation does not restart. */
+  void stage.offsetWidth;
+  stage.setAttribute('data-changed', moved);
+}
+
 function set(next) {
+  const before = state;
   /* ⚠ ONLY WHEN SOMETHING ACTUALLY MOVED. `set` is called on every repaint
      path, including ones that hand back the state they were given — arriving
      at a size that repairs to itself, or a drag that lands the grip exactly
@@ -1478,6 +1528,7 @@ function set(next) {
     if (history_.length > HISTORY_MAX) history_.shift();
   }
   state = next;
+  stampChange(before, next);
   /* `guard` — see the bottom of this file. A throw out of `paint()` mid-click
      is the same defect one click in: `render()` throws BEFORE the `innerHTML`
      assignment, so the stage keeps the PREVIOUS door while the price, the code

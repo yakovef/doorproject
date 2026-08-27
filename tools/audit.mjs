@@ -145,6 +145,43 @@ for (const v of VIEWS) {
 
   if (!shut.steps) fault(v.name, 'no steps rendered');
 
+  /* ⚠ MOTION MUST BE DEAD IN BARE MODE, AND THIS IS WHY IT IS ASSERTED HERE
+     RATHER THAN TRUSTED. `?bare=1` is what `npm run sheets`, `recreate`,
+     `corpus`, `against`, `profile` and `collide` photograph. One animation
+     running during a screenshot makes all 110 committed sheets
+     NON-DETERMINISTIC: the same commit produces a different image every run,
+     every comparison against a photograph drifts, and the byte-identical check
+     that proves the leaf did not move fails at random.
+     Measured on the COMPUTED style, not on the presence of the rule — a
+     stylesheet that says the right thing and loses to specificity is the
+     failure this exists for. And measured with a real duration, because
+     `prefers-reduced-motion` zeroes the duration and keeps the NAME. */
+  {
+    const running = () => [...document.querySelectorAll('*')].filter(e => {
+      const c = getComputedStyle(e);
+      return c.animationName && c.animationName !== 'none'
+          && (parseFloat(c.animationDuration) || 0) > 0.01;
+    }).length;
+    const bare = await p.evaluate(`(${running})()`, undefined).catch(() => null);
+    if (bare === null) fault(v.name, 'could not measure animations on the live page');
+    else if (!bare) fault(v.name, 'nothing on the page animates at all — the motion is not wired');
+
+    /* Same page, `?bare=1`, then back — `browser.use()` hands out one page per
+       call and this check is inside that borrow, so a second page is not ours
+       to open. Navigating and returning is also the truer test: it is the same
+       document the sheets photograph. */
+    await p.goto('file://' + process.cwd() + '/index.html?bare=1');
+    await p.waitForSelector('#stage svg');
+    const inBare = await p.evaluate(`(${running})()`);
+    if (inBare) {
+      fault(v.name, `${inBare} elements still animate under ?bare=1 — every committed `
+                  + 'sheet becomes non-deterministic');
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(1100);      // let the arrival animation finish
+  }
+
   /* ⚠ THE ARRIVAL STATE IS NOW THE SAME AT EVERY WIDTH, AND THAT IS THE POINT.
      This used to be two rules — a phone arrived with every fold SHUT and a
      desktop with all four OPEN — and each was measured: the panel once put the
@@ -649,7 +686,13 @@ for (const v of VIEWS) {
     const url = p.url();
     await p.screenshot({ path: '/tmp/audit-dragged.png', clip: leaf });
     await p.goto(url);
-    await p.waitForTimeout(500);
+    /* ⚠ 1100 ms, NOT 500. A fresh load runs the arrival animation — the door
+       assembles over 900 ms — and a screenshot taken at 500 catches the frame
+       and the fittings mid-fade, which this check then reports as "something is
+       on the door that the link does not carry". It said 928 pixels the first
+       time motion landed. The comparison is about what the DOOR is, not about
+       when the browser got round to drawing it. */
+    await p.waitForTimeout(1100);
     await p.screenshot({ path: '/tmp/audit-fresh.png', clip: leaf });
 
     const A = load('/tmp/audit-dragged.png'), B = load('/tmp/audit-fresh.png');
