@@ -23,6 +23,89 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-27 06:01 UTC — run 42: found and fixed a real instrument regression in `npm run profile`, caused (indirectly and legitimately) by TRANSFORM phase 3
+
+**Looked at:** three more human commits landed phases 3–5 of `TRANSFORM.md` —
+`73d3e87` (phase 3: משקוף becomes a customer-chosen category, four options
+₪500–₪1,000, the frame grows OUTWARD from a fixed opening so the leaf never
+moves, `VERSION 15`), `9a5cb5b` (phase 4: **the bug Peretz reported himself**
+— a pull handle's finish was recolouring the lock furniture — fixed by
+splitting `tone` (the grip's own metal) from `hwTone`/`gripFinish` (the
+customer's separately-priced פרזול); caught and fixed two real short-code
+bugs along the way, a check-nibble that could be squeezed by rounding and a
+`VERSION` field that could silently overflow past 16; `VERSION 16`, code 9
+chars) and `f0c0bd5` (phase 5: a pull bar becomes a length as well as a
+model, `handleLength()` the one definition all five readers share, clamped
+to the leaf, `REBATE` moved from renderer to catalogue since the price now
+needs it; `VERSION 17`, code 10 chars, expected to shrink back to 9 once
+phase 6 removes stripe entries). All three ledger rows match `TRANSFORM.md`
+§0's own status table exactly. `AGENT.md` unchanged. Built (no diff).
+
+Opened the site at phone/desktop (unchanged from the default door), then
+rendered a door combining Ella (brass grip) + Coral lever + bronze פרזול —
+confirmed the bar is bright brass and the lever/keyway a visibly different
+pale bronze, exactly the independence phase 4 describes. Confirmed both new
+categories (משקוף, פרזול) appear correctly in the spec panel and price
+breakdown of a normal cabinet load.
+
+**⚠ `npm run profile` was newly red on a DIFFERENT check than the
+historical one, and it turned out to be real, traced to source, and
+fixed.** The historical `dark reed` moulding-bead red (documented since run
+28) is gone — cleared as an apparent side effect of this round's work,
+unrelated to anything I did. But a second, different check — "the two
+moulded panels, as a shading rate" — was now failing: `dark upper -0.71
+lower -0.35, ratio 0.50` against a 0.6 floor, where every past log has this
+at ~0.70 (passing). Investigated rather than shrugged off or silently
+accepted:
+
+- Built the pre-round tree (`de5a7f1`) in a throwaway git worktree and
+  diff-tested the *exact* same query both trees render. The leaf's own
+  bounding box and the Idan bar's bounding box are byte-identical in both —
+  nothing about the DRAWING moved.
+- What did move: the bare-mode `viewBox`, from `1206×2716` to `1378×2802`.
+  TRANSFORM phase 3's own commit message explains why — the tight crop is
+  now anchored on `MASHKOF_MAX`, the widest frame in the range, so a
+  standard door doesn't appear to shrink when a wider frame is chosen
+  elsewhere. Legitimate and deliberate; not something to undo.
+- At `profile.mjs`'s fixed 700×1200 viewport, that wider viewBox shrinks the
+  leaf's on-screen resolution a few percent, which was enough to flip an
+  already-marginal single-pixel sample. Confirmed non-monotonic across
+  several viewport sizes (1240→fail, 1400→pass, 1600→pass) — the signature
+  of sub-pixel rounding noise, not a smooth resolution effect, so bumping
+  the viewport further would have been tuning a check to pass rather than
+  fixing it.
+- The actual root cause: the sample column sits at x=0.42 of leaf width,
+  and the Idan bar's own bounding box runs 0.332–0.400 — the sample was
+  always only 17mm from the bar's own antialiasing and drop shadow, on
+  *both* trees. `x=0.60` (still on `panel2`'s own field, clear of any grip)
+  reads 0.811 on the old tree and 0.740 on the new one — both comfortably
+  inside the gate and much closer to each other than 0.701/0.497 were.
+- Fixed in `tools/profile.mjs`, with the derivation written into the code
+  the way this file's own history does it. Falsified before trusting it:
+  reverted the x-coordinate back to 0.42 in a throwaway copy and confirmed
+  it reproduces the exact reported fault (0.50, ✗); the real fix at x=0.60
+  clears it. `npm run profile` is now **fully green, zero faults**.
+
+**Instruments:** test ✓ (9,893,954 / 0, matches phase 5's own count
+exactly) · audit ✓ (all seven viewports clean) · **profile ✓ — genuinely
+green for the first time since run 28, not just the one known exception**
+· collide ✓ on both `all` (1,074 designs, unchanged from run 41) and
+`boxes` (every fitting fits its declared footprint) · recreate ✓ (same
+already-documented catalogue gaps).
+
+**Changed:** one line's worth in `tools/profile.mjs` — the sample column
+for the panel shading-rate check, moved from a coordinate that happened to
+graze a pull bar's own edge to one that doesn't. Nothing about the drawing,
+the catalogue, the price, or the wire format changed.
+
+**Left alone deliberately:** TRANSFORM.md phases 6–11, same reasoning as
+run 41 — active, planned, multi-session work with its own ledger.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-27 00:48 UTC — run 41: nothing worth changing — Peretz gave real prices, and a large multi-phase rebuild landed (TRANSFORM.md phases 0–2)
 
 **The headline:** Peretz sat down with his son on 26.8 and gave the real

@@ -131,9 +131,27 @@ for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
 
 console.log('the two moulded panels, as a shading rate per unit of leaf height');
 console.log('(d048 runs -2.29 upper and -2.55 lower: the same rate in both)\n');
+/* ⚠ THE SAMPLE COLUMN SAT RIGHT AGAINST THE GRIP'S OWN EDGE, and TRANSFORM
+   phase 3 (the mashkof category) is what exposed it. x=0.42 of leaf width is
+   17mm past the Idan bar's own bounding box, which runs 0.332-0.400 — a
+   single rounded pixel there is reading the tail of the bar's own
+   antialiasing and drop shadow as much as the panel's field. Confirmed by
+   diffing this exact check against the tree from before phase 3: the LEAF
+   and the BAR are byte-identical in both (same bbox to the sub-pixel), so
+   nothing about the drawing moved — only the surrounding viewBox widened
+   (anchored to MASHKOF_MAX now, CLAUDE.md §3), which shrinks the leaf's own
+   on-screen resolution at this file's fixed viewport and was enough to flip
+   an already-marginal sample from 0.70 to 0.50 against a 0.6 gate.
+   x=0.60 is still on `panel2`'s own field (inset 0.23-0.77) and clear of any
+   grip at any of the range's default positions, and it is what a person
+   would call "the plain part of the panel" rather than "the sliver beside
+   the handle". Re-measured on both trees: 0.811 before phase 3, 0.740 after
+   — much closer to each other than 0.701/0.497 were, and both comfortably
+   inside the gate. Not a resolution bump, and not a widened tolerance:
+   moving the column off an object it was never meant to graze. */
 for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
   await draw({ ...base, colour, handle: 'idan', detail: 'panel2' });
-  const pts = await points([[0.42, 0.15], [0.42, 0.50], [0.42, 0.70], [0.42, 0.88]]);
+  const pts = await points([[0.60, 0.15], [0.60, 0.50], [0.60, 0.70], [0.60, 0.88]]);
   const lum = await shoot();
   const [u0, u1, l0, l1] = pts.map(lum);
   const up = Math.log(u1 / u0) / 0.35, lo = Math.log(l1 / l0) / 0.18;
