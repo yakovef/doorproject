@@ -335,6 +335,38 @@ for (const v of VIEWS) {
   });
   small.forEach(s => fault(v.name, `tap target under 44px: ${s}`));
 
+  /* ⚠ SIZE IS NOT THE ONLY WAY TWO CONTROLS FAIL A CUSTOMER. The undo/redo
+     pair, the price and the language pair sit on `.stage__hud`, each with its
+     own `flex: 0 0 auto` or `min-inline-size` floor, and nothing before this
+     asked whether those floors leave them room to coexist. At 320-353px they
+     did not: the price pill's own box overlapped the undo button's by up to
+     33px, invisible to the check above because both elements individually
+     measured ≥44px on their own. Found by looking at a screenshot, not by an
+     assertion — which is the failure mode this exists to close.
+     DERIVED, same discipline as `small` above: every pair of operable
+     elements inside `.stage__hud`, not a named list of the three slots, so a
+     fourth control added later is covered without anyone remembering to. */
+  const hudOverlaps = await p.evaluate(() => {
+    const hud = document.querySelector('.stage__hud');
+    if (!hud) return [];
+    const els = [...hud.querySelectorAll(
+      'button, a[href], input, select, [role="radio"], [role="button"]')]
+      .map(el => ({ el, r: el.getBoundingClientRect() }))
+      .filter(({ r }) => r.width && r.height);
+    const out = [];
+    for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) {
+      const a = els[i].r, b = els[j].r;
+      const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+      const oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+      if (ox > 0 && oy > 0) {
+        const name = el => String(el.className || '').split(' ')[0] || el.tagName.toLowerCase();
+        out.push(`${name(els[i].el)} x ${name(els[j].el)}: ${Math.round(ox)}x${Math.round(oy)}px`);
+      }
+    }
+    return out;
+  });
+  hudOverlaps.forEach(o => fault(v.name, `wall controls overlap: ${o}`));
+
   /* ⚠ AND PUT THEM BACK. Unhiding all nine steps to measure them leaves the
      panel nine steps tall, and the very next check asserts that the PAGE does
      not scroll above 1100 — which it then does, at all four desktop viewports,

@@ -778,7 +778,21 @@ svg { direction: ltr; }
   padding: 2px 10px;
   box-shadow: 0 1px 2px rgb(0 0 0 / .05);
 }
-.hud__slot--price { text-align: center; display: grid; justify-items: center; gap: 1px; }
+.hud__slot--price { text-align: center; display: grid; justify-items: center; gap: 1px;
+                     /* ⚠ CLAUDE.md §8: "minmax(0, 1fr), never a bare 1fr or an
+                        implicit auto track". This grid had neither — its one
+                        implicit column defaulted to `auto`, which sizes to the
+                        widest item's own content and does not shrink below it,
+                        so `.send__toggle` (`inline-size: 100%` of that column)
+                        stayed at its full ~84px content width no matter how far
+                        the outer flex layout had already shrunk this slot's own
+                        box. At 320-353px that overflow ran the price pill
+                        straight into the undo/redo circles beside it — a real,
+                        visible overlap `npm run audit`'s tap-target-size check
+                        does not catch, because both elements individually
+                        measured ≥44px; nothing checks that neighbours don't
+                        collide. Reported nowhere yet, found by looking. */
+                     grid-template-columns: minmax(0, 1fr); }
 /* ⚠ NOT CAPPED TO `--wall-gap`, AND THAT WAS THE FIRST TRY. Capping the two
    side slots to the measured gap beside the DOOR is the right instinct for
    `.grip-bar`, which hangs at mid-height where the door really is in the way.
@@ -796,6 +810,35 @@ svg { direction: ltr; }
 /* On the wall the price is the biggest thing on the page after the door, and
    it is a button — see the note in index.html. */
 .hud__slot--price .send__label { font-size: .7rem; letter-spacing: .1em; }
+/* ⚠ THE GRID TRACK FIX ABOVE ONLY LETS THE SLOT SHRINK — the button inside it
+   still has to actually shrink to fit, and a grid/flex item's default
+   `min-width: auto` refuses to go below its own content's width regardless of
+   how narrow its track is. Without a `min-inline-size` on the button the slot
+   narrows and the button overflows it anyway, unchanged.
+   ⚠ AND `0` IS THE WRONG NUMBER, NOT JUST A PERMISSIVE ONE. The first version
+   of this fix used 0 and it worked — the overlap was gone — but `npm run
+   audit` caught what a screenshot could not: the button's own box had shrunk
+   to 23px wide at 320px. The currency figure still rendered, because text
+   overflow is visible by default and nothing clipped it, so it LOOKED fixed
+   and the actual tap target was half the legal floor. 44px, the same floor
+   every other control on this page keeps. */
+.hud__slot--price .send__toggle { min-inline-size: 44px; }
+/* ⚠ BELOW THE POINT WHERE THE TWO FIXES ABOVE ARE STILL NOT ENOUGH ROOM.
+   Measured directly: the undo/redo pair and the language pair are both
+   `flex: 0 0 auto` (never shrink, by design — see above), so on a screen
+   narrow enough that their combined width plus the price pill's own
+   min-content width exceeds the stage, something has to give, and it cannot
+   be the two tap-target pairs. The crossover is ~353px (measured: -8.3px
+   overlap at 345, +1.8px clear at 355); 359px is the breakpoint with a small
+   margin. `מחיר משוער` is the caption, not the fact — the customer needs the
+   FIGURE, and it is what stays. Dropping the caption and giving the figure a
+   touch less room recovers legibility without any wrap: the alternative,
+   tested first, was letting the caption wrap to two lines, which grew the
+   whole row's height and still left the number's own box too narrow. */
+@media (max-width: 359px) {
+  .hud__slot--price .send__label { display: none; }
+  .hud__slot--price .send__figure { font-size: 1.15rem; }
+}
 /* ⚠ 44 px, LIKE EVERYTHING ELSE THAT CAN BE TAPPED. On the send card this
    button inherited its height from a taller stack of text; on the wall it is
    a figure and a chevron and nothing else, and `npm run audit` measured it at

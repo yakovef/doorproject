@@ -23,6 +23,98 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-27 16:10 UTC — run 44: found and fixed a real defect — the wall-mounted price control overlapped the undo button on narrow phones
+
+**The five human commits, briefly:** `819bc9d` (phase 7b: a self-audit of
+TRANSFORM.md's own "done" claims found the step `<details>` explainers were
+never built and the shared-link-lands-on-summary check only covered half its
+own claim — both fixed, plus a new CLAUDE.md rule: "a ledger is not
+evidence"). `af79220` (asserted the one migration path — stripe ids →
+packed direction/count fields — that had never actually been tested;
+falsified before trusting it by deliberately breaking `strips4`'s count and
+confirming the assertion catches it). `6dc7a74` ("ten fixes from a real
+phone" — the long-standing bug Peretz reported himself, a pull handle's
+finish recolouring the lock furniture, turned out to be the SAME root cause
+as two other reports; `VERSION` 18→19 for three genuinely-indexed
+withdrawals). `adb4175` (the header and phone dock are deleted outright;
+undo/redo, the price, and the language picker now sit directly on the wall
+around the door in three slots — `.stage__hud`). `a8a33d1` (all six
+planning documents, including `TRANSFORM.md` itself, deleted now that every
+phase in all of them shipped — 13,107 lines of markdown down to 8,087,
+their still-live content moved into `CLAUDE.md` first; **AGENT.md and
+AGENT-LOG.md explicitly named as "not mine to delete"**).
+
+**Looked at:** `AGENT.md` unchanged. Built (no diff). Opened the site at
+several phone widths and immediately noticed something worth checking
+closely: at 320px (`phone-s`, one of the seven audit viewports) the new
+wall-mounted price pill visually overlapped the undo button, with the
+"₪3,150" digits partially obscured. Investigated rather than assumed —
+measured actual bounding boxes in a real browser rather than trusting the
+screenshot: `.send__toggle` (the price button) and the undo `.iconbtn`
+overlapped by 33×26px at 320px, shrinking to roughly 13px of horizontal
+overlap at 340px and clearing entirely by 355–360px. Traced to source: `.hud__slot--price` is `display: grid` with no
+explicit `grid-template-columns`, so its one implicit column sizes to
+`auto` (its widest child's own content) and does not shrink — and
+`.send__toggle { inline-size: 100% }` of that column stayed at its full
+~84px content width regardless of how far the outer flex row had already
+shrunk the slot's own box. This is CLAUDE.md §8's own documented house
+rule, stated for exactly this class of bug ("`minmax(0, 1fr)`, never a bare
+`1fr` or an implicit `auto` track, on any grid containing the stage") —
+just not applied to this new grid, added in the same commit that deleted
+the header.
+
+**Fixed, in two rounds, because the first version of the fix was itself
+a defect the audit caught:**
+1. `.hud__slot--price { grid-template-columns: minmax(0, 1fr); }` plus
+   `.hud__slot--price .send__toggle { min-inline-size: 0; }` closed the
+   overlap — verified across 320–412px, and pixel-identical at ≥375px where
+   there was already room (no regression). But `npm run audit` then failed
+   with `tap target under 44px: send__toggle:price-toggle 23x44` — the
+   button's own box had shrunk to 23px wide at 320px. The currency figure
+   still rendered because overflow is visible by default and nothing
+   clipped it, so it *looked* fixed while the actual clickable area was
+   half the legal floor. A screenshot could not have caught this; the
+   audit's own tap-target check did.
+2. Corrected `min-inline-size` from `0` to `44px` (the same floor every
+   other control on the page keeps), and at the narrow range where even
+   that plus the grid fix still isn't enough room (crossover measured at
+   ~353px: −8.3px at 345px, +1.8px at 355px), added
+   `@media (max-width: 359px)`: hide the "מחיר משוער" caption and drop the
+   figure to 1.15rem. The caption is supplementary; the number is what the
+   customer needs, and it stays legible and un-wrapped.
+
+**Hardened the instrument that should have caught this and didn't.**
+`npm run audit`'s tap-target check asks whether each control is ≥44px on
+its own; nothing asked whether two adjacent controls' boxes intersect. Both
+elements here individually passed that check the whole time. Added a
+second, DERIVED check (same discipline as the existing one — every operable
+element inside `.stage__hud`, not a named list of the three slots) that
+flags any pairwise bounding-box overlap. **Falsified before trusting it**:
+reverted the CSS fix in a stash, rebuilt, and confirmed the new check fires
+with the *exact* measured defect (`send__toggle x iconbtn: 33x26px`);
+restored the fix and confirmed it passes clean.
+
+**Instruments:** test ✓ (3,448,528 / 0, matches the human round's own count
+exactly) · audit ✓ (all seven viewports clean, including the new overlap
+check, plus the new "shared link arrives at the quote page" and "languages"
+routes) · profile ✓ (fully green, CSS-only change, unaffected) · collide ✓
+on both `all` (1,060 designs) and `boxes` (every fitting fits its declared
+footprint) · recreate ✓ (same already-documented catalogue gaps) ·
+`npm run sheets` regenerated after the CSS change and confirmed fresh by
+`npm test`'s own staleness assertion.
+
+**Changed:** `css/app.css` (the grid-track and tap-target fix, with the
+derivation written into the comments), `tools/audit.mjs` (the new
+mutual-overlap check), and the sheets/stamps the CSS change touched.
+
+**Left alone deliberately:** nothing this round — the fix is complete and
+verified both ways.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-27 10:48 UTC — run 43: nothing worth changing — TRANSFORM.md is complete. All twelve phases landed; the site is launch-ready
 
 **The headline:** six more commits landed phases 6–11, and `TRANSFORM.md` §0's
