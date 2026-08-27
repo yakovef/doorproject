@@ -88,8 +88,7 @@ active, planned, multi-session piece of work with its own status ledger,
 not a gap for a five-hour maintenance run to fill. The `dark reed` profile
 red, same reasoning as every run since 28.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** e8c779e
 
 ---
 
