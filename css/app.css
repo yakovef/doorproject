@@ -1147,9 +1147,15 @@ svg { direction: ltr; }
   background: var(--ink); color: var(--paper); border-color: var(--ink);
 }
 .quote__next:disabled { display: none; }
-/* Above 1100 the card has a sticky foot of its own and the wall is not a place
-   for a verb. */
-@media (min-width: 1100px) { .quote__next { display: none; } }
+/* ⚠ THE "not above 1100" HALF OF THIS RULE IS NOT HERE, AND THAT IS THE POINT.
+   It was, and it lost: `.btn { display: flex }` is defined eight hundred lines
+   FURTHER DOWN this file at the same specificity, and a media query adds none.
+   CLAUDE.md §8 states it in as many words and this is the fifth time the file
+   has been bitten by it — the sticky stage, the stage's height, the order
+   sheet's phone cap, the deleted dock's body padding, and now this. Measured
+   the way the others were: the button was on screen at 1440x900, in the wall,
+   under the send, in a full-page screenshot taken for another reason.
+   The override lives beside `.btn`, after it. Search for `quote__next`. */
 
 /* ⚠ BELOW 360 px THE CAPTION GOES AND THE FIGURE STAYS. Measured on the old
    wall pill and still true here: `מחיר משוער` is the caption, the figure is
@@ -2302,6 +2308,10 @@ html.is-live .wa__off { display: none; }
 }
 .btn--ghost:hover { border-color: var(--ink-2); }
 
+/* ⚠ AND HERE IS THE OTHER HALF, AFTER `.btn`, WHERE IT WINS. Above 1100 the
+   card has a sticky foot of its own and the wall is not a place for a verb. */
+@media (min-width: 1100px) { .quote__next { display: none; } }
+
 /* ── THE FOOT OF A STEP: the way on, and the way back ────────────────
    ⚠ `.sect__foot` HAD NO RULES, so two buttons that carry a customer through
    nine screens were stacked in source order at browser defaults, and the
@@ -2336,6 +2346,16 @@ html.is-live .wa__off { display: none; }
   border-color: var(--rule); cursor: default;
 }
 .sect__back:disabled { opacity: .45; cursor: default; }
+
+/* ⚠ AND THE ONE IN THE QUOTE BAR DOES NOT TAKE THE ROOM, which the one in the
+   flow does. Same class, two homes, and the line above — `.sect__next { flex:
+   1 1 auto }` — reaches both at equal specificity, so whichever is written
+   LATER wins. Measured before this line existed: at 1099x800 the bar's way on
+   came out **836 px wide**, eating the slack that the price and the send were
+   spaced by. In the flow it should fill the row; in a bar of three it is one
+   of three. Written here rather than up with the rest of `.quote__next` for
+   exactly the reason the display rule is here: after, not before. */
+.quote__next { flex: 0 0 auto; }
 
 /* ⚠ AND ON A DESKTOP THE FOOT IS PINNED TO THE BOTTOM OF THE CARD, because it
    was falling off the bottom of the screen. Measured at 1440x900 on the
