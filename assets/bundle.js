@@ -8132,6 +8132,7 @@ ${body}
     host.appendChild(box);
   }
   var liveStep = SECTIONS[0].key;
+  var revealed = false;
   var STEP_KEYS = () => [...SECTIONS.map((x) => x.key), SUMMARY.key];
   function goStep(key, focus = true) {
     if (!STEP_KEYS().includes(key)) return;
@@ -8146,6 +8147,12 @@ ${body}
     const slot = $("#sum-slot"), send = document.querySelector(".panel--send");
     if (slot && send && send.parentElement !== slot) slot.appendChild(send);
     markSteps();
+    if (key === SUMMARY.key && !revealed && focus) {
+      revealed = true;
+      const root = document.documentElement;
+      root.classList.add("is-reveal");
+      setTimeout(() => root.classList.remove("is-reveal"), 1e3);
+    }
     if (focus) {
       const h = $(`#sect-head-${key}`);
       if (h) {

@@ -1457,6 +1457,10 @@ function buildLengthStepper(host) {
  * door is what gets sent to Peretz.
  */
 let liveStep = SECTIONS[0].key;
+/** Has the customer already watched the door settle? See the note in `goStep`.
+ *  Presentation, like `liveStep`: not in `state`, not in the URL, not in the
+ *  code, and reset by nothing but a reload. */
+let revealed = false;
 const STEP_KEYS = () => [...SECTIONS.map(x => x.key), SUMMARY.key];
 
 function goStep(key, focus = true) {
@@ -1474,6 +1478,38 @@ function goStep(key, focus = true) {
   if (slot && send && send.parentElement !== slot) slot.appendChild(send);
 
   markSteps();
+
+  /* ── THE REVEAL, AND THE LATCH THAT MAKES IT A MOMENT ────────────────
+     `GUIDED-FLOW.md` §3.4: reaching the end is the one place this page is
+     allowed a flourish. The animation is in the stylesheet (`.is-reveal`);
+     what is here is the decision that it happens ONCE.
+
+     ⚠ A flourish that replays every time somebody edits a choice and walks
+     back to the summary is not a flourish, it is a tic — and a customer
+     comparing two grilles crosses this step repeatedly. The latch is a plain
+     boolean in this module: it is not `state`, not the URL and not the code,
+     for exactly the reason `liveStep` is none of those. Whether somebody has
+     already seen the door settle is a fact about their afternoon.
+
+     ⚠ AND IT IS REMOVED ON A TIMER, NOT ON `animationend`. Under
+     `prefers-reduced-motion` and under `.is-bare` the stylesheet cuts every
+     animation to nothing, so `animationend` may never fire and the class would
+     stay on the document for ever — the same trap the arrival animation
+     documented, and the same answer.
+
+     ⚠ AND IT IS GATED ON `focus`, WHICH IS THE ONLY SIGNAL THERE IS FOR "the
+     customer went there". `init` places the first step with `focus = false` —
+     and a SHARED LINK opens straight at the summary, so without this Peretz
+     would get a flourish every time he opened a customer's door, over the top
+     of the arrival animation that is already running. A reveal is for the
+     person who built the thing. */
+  if (key === SUMMARY.key && !revealed && focus) {
+    revealed = true;
+    const root = document.documentElement;
+    root.classList.add('is-reveal');
+    setTimeout(() => root.classList.remove('is-reveal'), 1000);
+  }
+
   if (focus) {
     const h = $(`#sect-head-${key}`);
     /* ⚠ WHICH THING SCROLLS DEPENDS ON THE WIDTH, and getting it wrong is a

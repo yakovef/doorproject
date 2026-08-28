@@ -2369,14 +2369,14 @@ html.is-live .wa__off { display: none; }
   }
 }
 
-/* ── reduced motion ───────────────────────────────────────── */
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition-duration: .01ms !important;
-    animation-duration: .01ms !important;
-  }
-}
+/* ── reduced motion ───────────────────────────────────────────
+   ⚠ THE RULE IS STATED ONCE, AT THE FOOT OF THIS FILE, AND IT USED TO BE
+   STATED TWICE. There were two `prefers-reduced-motion` blocks — this one at
+   .01ms and another eight hundred lines down at .001ms — and the second won,
+   which is to say the first was decoration. Two statements of one rule is the
+   §5 shape, and in a kill switch it is worse than usual: somebody reading THIS
+   one would have believed they had seen the whole of it. Search for
+   `prefers-reduced-motion`. */
 
 /* ── forced colours: this UI is hairlines, so guard it ────── */
 
@@ -2589,11 +2589,24 @@ html.is-live .wa__off { display: none; }
   animation: none !important;
   transition: none !important;
 }
+/* ⚠ AND `animation-delay`, WHICH WAS MISSING AND HID THE SEND BUTTON.
+   `revealSend` carries a 180 ms delay and `both`, so under reduce the DURATION
+   collapsed to nothing and the DELAY did not — leaving the green button at
+   `opacity: 0` for a fifth of a second, on the one screen whose whole job is
+   sending, for exactly the customer who asked the browser to stop moving
+   things. Measured: `document.getAnimations()` reported one animation still
+   "running" under reduce, and it was that one, sitting in its delay phase.
+   Fixing `revealSend` alone would have left the trap armed for the next
+   delayed animation anybody writes, so the kill switch takes the delay too.
+   Same addition on `.is-bare` above, and for the same reason: a screenshot
+   taken during a delay is a screenshot of a hidden element. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .001ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: .001ms !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
 }
@@ -2659,14 +2672,75 @@ html.is-live .wa__off { display: none; }
    Direction is the whole information: a flow whose steps cross-fade has no
    forward and no back. ⚠ LOGICAL, not left/right — the interface mirrors and
    the direction of travel has to mirror with it. */
-.sect.is-live { animation: stepIn .18s var(--ease) both; }
-@keyframes stepIn { from { opacity: 0; transform: translateX(12px); } }
+.sect.is-live { animation: stepIn .22s var(--ease) both; }
+@keyframes stepIn { from { opacity: 0; transform: translateX(14px); } }
 [dir="rtl"] .sect.is-live { animation-name: stepInRtl; }
-@keyframes stepInRtl { from { opacity: 0; transform: translateX(-12px); } }
+@keyframes stepInRtl { from { opacity: 0; transform: translateX(-14px); } }
 
 /* ── M9, M10, M11, M12, M13 · the interface ──────────────────────────
    Quick, light, and mostly unnoticed. */
-.steps__c { transition: border-color .2s var(--ease), background .2s var(--ease); }
+.steps__c {
+  transition: border-color .2s var(--ease), background .2s var(--ease),
+              transform .2s var(--ease);
+}
+/* The current circle stands a hair proud of the row — 4% is under two pixels
+   on a 44 px disc, which is exactly enough to find at a glance and not enough
+   to notice as an animation. */
+.steps__step.is-on .steps__c { transform: scale(1.04); }
+
+/* ── THE TILE CONFIRMS THE PICK BEFORE THE DOOR DOES ─────────────────
+   A tap on a tile has two answers: the ring, which is instant, and the door,
+   which takes a redraw. The badge is what makes the first one feel deliberate
+   rather than accidental — it arrives with a small overshoot, the way a
+   physical switch does, and it is over in 180 ms.
+   `transform` and `opacity` only, on a 18 px pseudo-element that already
+   carries `pointer-events: none`. */
+.tile.is-selected::after { animation: badgePop .18s var(--ease) both; }
+@keyframes badgePop {
+  from { opacity: 0; transform: scale(.4); }
+  60%  { opacity: 1; transform: scale(1.12); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.tile { transition: border-color .14s var(--ease), box-shadow .14s var(--ease); }
+
+/* ── M14 · THE REVEAL, ONCE, ON REACHING THE END ─────────────────────
+   `GUIDED-FLOW.md` §3.4 asks for a flourish when the last step commits: a
+   light sweep, the sconces brightening, a breath on the whole door, and the
+   price counting up.
+
+   What is built is the BREATH and nothing else, and the three omissions are
+   each a decision rather than a shortfall:
+   · the price count-up is banned by name and would show, for ~400 ms, a number
+     that is not the price of anything;
+   · the light sweep would be a white band travelling over the WALL as well as
+     the leaf, because the stage is one box — a shimmer, which is the visual
+     grammar of "still loading";
+   · the sconces cannot brighten on `transform`/`opacity` alone (a `filter`
+     would do it, at the cost of a compositor layer on the largest element on
+     the page), and the performance budget for this round says transform and
+     opacity only.
+
+   What is left is the thing the moment actually needs: the door leans in by
+   1.5% and settles. It is a CSS transform on the `<svg>` and never a viewBox
+   change — `fitStage` owns the viewBox and would fight it, which
+   `GUIDED-FLOW.md` §3.5 predicted before either existed.
+
+   ⚠ ONCE. The class is set the first time the summary becomes live and never
+   again — a flourish that replays every time somebody edits a choice and comes
+   back is not a flourish, it is a tic. `js/app.js` holds the latch. */
+.is-reveal #stage .door-svg { animation: revealBreath .9s var(--ease-fit) both; }
+@keyframes revealBreath {
+  from { transform: scale(1); }
+  40%  { transform: scale(1.015); }
+  to   { transform: scale(1); }
+}
+/* And the green button arrives rather than appearing: the one control the
+   whole page exists to produce, given a beat of its own at the one moment it
+   is the answer. */
+.is-reveal .btn--wa { animation: revealSend .5s var(--ease-fit) .18s both; }
+@keyframes revealSend {
+  from { opacity: 0; transform: translateY(8px) scale(.98); }
+}
 
 /* ⚠ THE PRICE DOES NOT COUNT UP. `PLAN.md` §7's generic-tells checklist bans
    count-up numbers by name, and there is a harder reason: for ~400 ms the page

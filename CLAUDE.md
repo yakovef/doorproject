@@ -1465,6 +1465,42 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ `prefers-reduced-motion` WAS HIDING THE SEND BUTTON FOR 180 ms, AND THE
+  CHECK THAT WATCHES MOTION COULD NOT SEE IT.** The reveal's `revealSend`
+  carries an `animation-delay` and `both`; the reduced-motion block zeroed the
+  DURATION and not the DELAY, so the green button sat at `opacity: 0` for a
+  fifth of a second — on the one screen whose whole job is sending, for exactly
+  the customer who asked the browser to stop moving things.
+  ⚠ **The existing assertion reads `animationDuration` from the computed
+  style**, and under reduce that is zero, so an animation waiting in its delay
+  looks harmless. Only `document.getAnimations()` reports it, because it counts
+  a delay phase as RUNNING, which it is. There are two checks now and the
+  second is emulated rather than assumed: a page opened with
+  `reducedMotion: reduce`, driven to the summary, asked what is still going.
+  ⚠ **And the kill switch takes `animation-delay` and `transition-delay` now**,
+  not just the durations — fixing `revealSend` alone would have left the trap
+  armed for the next delayed animation anybody writes.
+  ⚠ **The rule was also stated TWICE**, at .01ms and at .001ms eight hundred
+  lines apart, and the second won — so the first was decoration and a reader
+  who found it would have believed they had seen the whole thing. One now.
+
+- **The reveal, and it happens once.** Reaching the summary by navigating —
+  never on arrival, so a shared link opened by Peretz does not flourish at him
+  — leans the door in by 1.5% and settles it, and brings the green button up
+  behind it. 900 ms, then dead still. A CSS transform on the `<svg>` and never
+  a viewBox change: `fitStage` owns the viewBox and would fight it.
+  ⚠ **Three parts of `GUIDED-FLOW.md` §3.4 are deliberately not built** and the
+  reasons are in the stylesheet beside the keyframes: the price count-up (banned
+  by name, and it would show a number that is not a price), the light sweep (the
+  stage is one box, so a white band travels over the WALL too and reads as a
+  loading shimmer), and the sconces brightening (it needs a `filter`, which is
+  neither transform nor opacity and costs a compositor layer on the largest
+  element on the page).
+  **Measured at 390×844 under 4× CPU throttling**: scrolling over the sticky
+  stage, worst frame 16.8 ms and **zero frames over 20 ms**; a step change has
+  one 83 ms frame, which is `paint()` rebuilding the SVG and not the animation
+  (`npm run latency` puts that at 158 ms against a 600 ms gate at 6×).
+
 - **⚠ `FIT_BOX` IS NOT `STAGE_BOX`, AND THE DOOR IS 6% BIGGER FOR IT.** The
   crop the page fits to used to be the scene itself, padding and all. Measured:
   the crop is HEIGHT-driven at every viewport this app has — stage aspect 1.33

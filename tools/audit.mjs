@@ -196,6 +196,52 @@ for (const v of VIEWS) {
     await p.waitForTimeout(1100);      // let the arrival animation finish
   }
 
+  /* ── AND NOTHING IS LEFT WAITING IN A DELAY ──────────────────────────
+     ⚠ THE COMPUTED-STYLE CHECK ABOVE CANNOT SEE THIS ONE, AND THAT IS WHY
+     THERE ARE TWO. It reads `animationDuration`, and under
+     `prefers-reduced-motion` the duration collapses to nothing — so an
+     animation sitting in its `animation-delay`, with `both` holding its
+     element at the FROM keyframe, reads as harmless and is not.
+
+     Measured, on the commit that added the reveal: `revealSend` carries a
+     180 ms delay, the reduced-motion block zeroed the duration and not the
+     delay, and the green send button was therefore held at `opacity: 0` for a
+     fifth of a second — on the one screen whose whole job is sending, for
+     exactly the customer who asked the browser to stop moving things.
+     `getAnimations()` is the only thing that reports it, because it counts an
+     animation in its delay phase as RUNNING, which it is.
+
+     Emulated rather than assumed: a page opened with `reducedMotion: reduce`,
+     driven to the summary — the step that has the most motion on it — and then
+     asked what is still going. The answer has to be nothing. */
+  {
+    /* ⚠ THE SAME PAGE, NOT A SECOND ONE. `b.newPage()` hands out a page that
+       OWNS its context, so `p.context().newPage()` throws
+       "Please use browser.newContext()" — which it did, at the first viewport,
+       on the first run. Emulating the media query on the page already borrowed
+       is also the truer test: same document, same stylesheet, same everything
+       but the one preference under test. Put back afterwards, because every
+       check below this one runs on the same page. */
+    await p.emulateMedia({ reducedMotion: 'reduce' });
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(600);
+    await p.click('.steps__step[data-step="sum"]');
+    await p.waitForTimeout(90);
+    const still = await p.evaluate(() => document.getAnimations()
+      .filter(a => a.playState === 'running')
+      .map(a => a.animationName || 'a transition'));
+    if (still.length) {
+      fault(v.name, `prefers-reduced-motion: ${still.length} animation(s) still `
+        + `running — ${still.join(', ')}. A delay is motion too, and an element `
+        + 'held at its FROM keyframe is an element nobody can see');
+    }
+    await p.emulateMedia({ reducedMotion: 'no-preference' });
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(1100);
+  }
+
   /* ⚠ THE ARRIVAL STATE IS NOW THE SAME AT EVERY WIDTH, AND THAT IS THE POINT.
      This used to be two rules — a phone arrived with every fold SHUT and a
      desktop with all four OPEN — and each was measured: the panel once put the
