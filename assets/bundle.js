@@ -2233,6 +2233,13 @@
   var FLOOR_RUN = RETURN;
   var BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
   var STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
+  var FIT_TRIM = { top: 40, bottom: 130 };
+  var FIT_BOX = {
+    x: STAGE_BOX.x,
+    y: STAGE_BOX.y + FIT_TRIM.top,
+    w: STAGE_BOX.w,
+    h: STAGE_BOX.h - FIT_TRIM.top - FIT_TRIM.bottom
+  };
   var LAMP = { w: 110, h: 300 };
   var SCONCE_OUT = MID_X + LAMP.w / 2 + 36;
   var LAMP_DARK = "#3A3733";
@@ -3027,6 +3034,46 @@
       <stop offset="1" stop-color="#CFE0EA" stop-opacity="0"/>
     </linearGradient>
 
+    <!-- ── THE POOL, AND THE ROOM'S OWN FALLOFF ─────────────────────
+         REALISM2.md D-a, and the two of them are one idea: the scene was lit
+         evenly from edge to edge, so the eye had no reason to go to the door.
+         A warm pool centred a little above the door's middle and a deeper
+         falloff at the corners give it one. This is the whole of what
+         DESIGN-LEVEL calls the room doing the work the crop cannot — the frame
+         is landscape and a door is portrait, so the leaf can never fill it
+         (measured: 31% of the width even with zero margin), and what makes it
+         the hero is staging rather than size.
+
+         ⚠ BOTH ARE PAINTED INSIDE #backdrop, WHICH IS TO SAY UNDER THE DOOR,
+         AND THAT IS THE WHOLE DESIGN. The existing #vignette is painted last
+         and covers everything including the leaf; deepening THAT would have
+         darkened the leaf's corners, and npm run profile — the drift alarm
+         on the leaf's vertical fall — measures exactly that. A radial centred
+         at 0.44 of the scene darkens a leaf's head and foot more than its
+         middle, which is a change in the vertical fall by definition. So the
+         room gets its own pair, the door is drawn over them, and the leaf's
+         own numbers cannot move. Predicted before the run, then checked.
+
+         ⚠ The pool is WARM LIGHT ON PLASTER, not a tint on the room. It is
+         constant for every door, so it cannot do what .layout[data-light]
+         did — shift the ground under the swatch a customer is comparing. Its
+         centre is the scene's, never this door's. -->
+    <radialGradient id="roomPool" gradientUnits="userSpaceOnUse"
+                    cx="${Math.round(MID_X)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.4)}"
+                    r="${Math.round(STAGE_BOX.h * 0.52)}">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.20"/>
+      <stop offset="0.52" stop-color="${LIGHT.warm}" stop-opacity="0.075"/>
+      <stop offset="1"    stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="roomFall" gradientUnits="userSpaceOnUse"
+                    cx="${Math.round(MID_X)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.44)}"
+                    r="${Math.round(Math.max(STAGE_BOX.w, STAGE_BOX.h) * 0.58)}">
+      <stop offset="0.40" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.11"/>
+    </radialGradient>
+
     <!-- In user space, not bounding-box units: the rect it paints now reaches
          far past the drawing so the wall can fill the screen, and a
          bounding-box vignette would have stretched with it until it did
@@ -3354,6 +3401,18 @@
          stitches, so it costs one tile. -->
     <rect x="${farX}" y="${farY}" width="${farW}" height="${farH}"
           fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
+
+    <!-- The pool first, then the falloff over it: light lands on the plaster
+         and the corners of the room fall away from it. Both cover wall AND
+         floor in one rect each, because they are one light and the floor is
+         not a different room. pointer-events: none for the same reason the
+         vignette disclaims them — this is light, and light is not something a
+         drag can catch. See the defs above for why they are here and not up
+         with #vignette, which is painted over the door. -->
+    <rect data-room="pool" x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+          fill="url(#roomPool)" pointer-events="none"/>
+    <rect data-room="pool" x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+          fill="url(#roomFall)" pointer-events="none"/>
 
     <!-- ── the sconces, and their light on the plaster ──────────────
          ⚠ STOOD OFF THE FIXED SCENE, not off this door's casing. They used to
@@ -3792,8 +3851,8 @@
 <svg viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint2)}"
-     data-fit-x="${STAGE_BOX.x}" data-fit-y="${STAGE_BOX.y}"
-     data-fit-w="${STAGE_BOX.w}" data-fit-h="${STAGE_BOX.h}"
+     data-fit-x="${FIT_BOX.x}" data-fit-y="${FIT_BOX.y}"
+     data-fit-w="${FIT_BOX.w}" data-fit-h="${FIT_BOX.h}"
      aria-label="${xmlAttr(describe(state2))}" xmlns="http://www.w3.org/2000/svg">
   <defs>${usedDefs(defs, body)}</defs>
 ${body}

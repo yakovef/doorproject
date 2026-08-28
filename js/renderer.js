@@ -188,6 +188,42 @@ const FALLOFF = {
            bloom: 0.75 },
 };
 
+/* ── ⚠ THERE IS NO `satin` HERE, AND IT WAS BUILT TWICE BEFORE BEING CUT ──
+   REALISM2.md stage E asks for "a broad, soft vertical specular highlight down
+   the leaf" and calls it the single biggest "is it a flat rectangle" fix. It
+   was built — a horizontal gradient across the leaf, so the band it draws runs
+   vertically — in two shapes, and both are gone. The measurements, in order:
+
+     shape            mottle (plain)   profile, dark reed        dark ogee
+     none (shipped)   0.0181           +1.2% / +1.1%  r 0.999    -0.9% / -0.4%
+     peak at 0.46     0.0275           -1.5% / -3.8%  r 0.977    -3.5% / -5.2%
+     plateau 0.40-58  0.0182           -3.2% / -6.5%  r 0.966 ✗  -5.2% / -7.9%
+
+   Three reasons it is cut rather than tuned further, and the third is the one
+   that decides it.
+
+   1. NO PHOTOGRAPH ASKS FOR IT. The corpus's own horizontal profile is a rise
+      of about 3% from left to right across the leaf — the note under `drift`
+      records it, and it is why `drift` was halved after ours fell 12% the
+      other way. A specular band is not what these doors do; a very slight
+      lean is, and the drawing already has it.
+   2. IT MOVES THE MOULDING'S OWN READING. `npm run profile` compares a bead
+      against the face beside it, and the first shape swung the dark rows by
+      2.7 points on a quantity whose whole range is about 5. The second failed
+      the gate outright. A surface treatment that changes what the modelling
+      instrument reads is not a surface treatment.
+   3. AND I CANNOT EXPLAIN WHY THE RATIO MOVED AT ALL. Both panels of a `pair`
+      sit at the same inset, so a purely HORIZONTAL overlay should cancel out
+      of an upper-against-lower ratio exactly. It did not, twice, in opposite
+      directions. That is an instrument reading I do not understand, and this
+      file's standing rule is that an unexplained reading is not something to
+      tune around — see the note in §0c about `profile` being green for reasons
+      nobody has established, and the whole of CLAUDE.md §5.
+
+   What the leaf is actually short of is MOTTLE, not specular: 0.0181 against
+   an honestly-corrected corpus figure near 0.042. That is a `drift` question
+   with a photograph behind it, and it is the one to reopen — not this. */
+
 /* `bloom` is the pendant bulb's reflection, and it is a MEASURED OBJECT ON A
    WHITE DOOR. Its own comment always said "on dark paint it barely registers,
    which is also what the photographs show" — and it was scaled by `fall.peak`,
@@ -663,8 +699,42 @@ const MID_X  = PAD.x + CASING + RETURN + SCENE_MAX.openW / 2;
    thing the frame is actually made of wins. */
 const FLOOR_RUN = RETURN;
 const BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
-/** The crop the page fits to: the same rectangle for every door in the range. */
+/** The SCENE: the same rectangle for every door in the range. The vignette is
+ *  centred on it and the backdrop is painted from it, so it is the room's own
+ *  extent and it does not move. */
 const STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
+
+/**
+ * ── THE CROP THE PAGE FITS TO, WHICH IS NOT THE SCENE ─────────────────
+ *
+ * ⚠ THE DOOR WAS 21.1% OF THE DESKTOP FRAME AND MOST OF THE REST WAS EMPTY
+ * WALL, and the arithmetic says why. The crop is HEIGHT-driven at every
+ * viewport this app has — measured, stage aspect 1.33 against the scene's
+ * 0.536 — so `fitStage` scales to fit the scene's HEIGHT and whatever width
+ * that leaves is overspill. Vertical padding is therefore exactly what is
+ * costing the door its size, and horizontal padding costs nothing.
+ *
+ * ⚠ AND IT CANNOT BE TAKEN OUT OF `PAD`, which was the first attempt. `PAD`
+ * feeds the natural `viewBox` as well as this box — so trimming it would move
+ * all 110 committed sheets and destroy the "bare families byte-identical"
+ * proof, which is not a run to re-do but the proof itself. These are two
+ * different quantities: air around the DRAWING for a measurement crop, and air
+ * around the SCENE for the page's staging. Separated, this changes the four
+ * `data-fit-*` attributes and not one pixel of any bare render.
+ *
+ * The numbers: 40 off the top leaves 70 units of wall above the TALLEST door's
+ * casing (a standard door keeps 370, because the scene is sized on the tall
+ * one and every door stands on the same floor). 130 off the bottom leaves 180
+ * units of floor below the threshold, about 50 px on a 900 px-high desktop
+ * stage. Net scale +6.0%.
+ */
+const FIT_TRIM = { top: 40, bottom: 130 };
+const FIT_BOX = {
+  x: STAGE_BOX.x,
+  y: STAGE_BOX.y + FIT_TRIM.top,
+  w: STAGE_BOX.w,
+  h: STAGE_BOX.h - FIT_TRIM.top - FIT_TRIM.bottom,
+};
 
 
 /**
@@ -1775,6 +1845,46 @@ export function render(state) {
       <stop offset="1" stop-color="#CFE0EA" stop-opacity="0"/>
     </linearGradient>
 
+    <!-- ── THE POOL, AND THE ROOM'S OWN FALLOFF ─────────────────────
+         REALISM2.md D-a, and the two of them are one idea: the scene was lit
+         evenly from edge to edge, so the eye had no reason to go to the door.
+         A warm pool centred a little above the door's middle and a deeper
+         falloff at the corners give it one. This is the whole of what
+         DESIGN-LEVEL calls the room doing the work the crop cannot — the frame
+         is landscape and a door is portrait, so the leaf can never fill it
+         (measured: 31% of the width even with zero margin), and what makes it
+         the hero is staging rather than size.
+
+         ⚠ BOTH ARE PAINTED INSIDE #backdrop, WHICH IS TO SAY UNDER THE DOOR,
+         AND THAT IS THE WHOLE DESIGN. The existing #vignette is painted last
+         and covers everything including the leaf; deepening THAT would have
+         darkened the leaf's corners, and npm run profile — the drift alarm
+         on the leaf's vertical fall — measures exactly that. A radial centred
+         at 0.44 of the scene darkens a leaf's head and foot more than its
+         middle, which is a change in the vertical fall by definition. So the
+         room gets its own pair, the door is drawn over them, and the leaf's
+         own numbers cannot move. Predicted before the run, then checked.
+
+         ⚠ The pool is WARM LIGHT ON PLASTER, not a tint on the room. It is
+         constant for every door, so it cannot do what .layout[data-light]
+         did — shift the ground under the swatch a customer is comparing. Its
+         centre is the scene's, never this door's. -->
+    <radialGradient id="roomPool" gradientUnits="userSpaceOnUse"
+                    cx="${Math.round(MID_X)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.40)}"
+                    r="${Math.round(STAGE_BOX.h * 0.52)}">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.20"/>
+      <stop offset="0.52" stop-color="${LIGHT.warm}" stop-opacity="0.075"/>
+      <stop offset="1"    stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="roomFall" gradientUnits="userSpaceOnUse"
+                    cx="${Math.round(MID_X)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.44)}"
+                    r="${Math.round(Math.max(STAGE_BOX.w, STAGE_BOX.h) * 0.58)}">
+      <stop offset="0.40" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.11"/>
+    </radialGradient>
+
     <!-- In user space, not bounding-box units: the rect it paints now reaches
          far past the drawing so the wall can fill the screen, and a
          bounding-box vignette would have stretched with it until it did
@@ -2103,6 +2213,18 @@ export function render(state) {
          stitches, so it costs one tile. -->
     <rect x="${farX}" y="${farY}" width="${farW}" height="${farH}"
           fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
+
+    <!-- The pool first, then the falloff over it: light lands on the plaster
+         and the corners of the room fall away from it. Both cover wall AND
+         floor in one rect each, because they are one light and the floor is
+         not a different room. pointer-events: none for the same reason the
+         vignette disclaims them — this is light, and light is not something a
+         drag can catch. See the defs above for why they are here and not up
+         with #vignette, which is painted over the door. -->
+    <rect data-room="pool" x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+          fill="url(#roomPool)" pointer-events="none"/>
+    <rect data-room="pool" x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+          fill="url(#roomFall)" pointer-events="none"/>
 
     <!-- ── the sconces, and their light on the plaster ──────────────
          ⚠ STOOD OFF THE FIXED SCENE, not off this door's casing. They used to
@@ -2498,20 +2620,24 @@ export function render(state) {
      which is what `?bare=1` and every measurement harness gets, and why a
      narrow door still fills the frame there and keeps its pixels.
 
-     `data-fit-*` is STAGE_BOX, the fixed scene, identical for every door in
-     the range. `fitStage` in app.js crops to it, so on the page the scale is a
-     constant: the wall, the floor line and the sconces hold still and only the
-     door changes size. Four numbers rather than two, because the fixed scene's
+     `data-fit-*` is FIT_BOX — the fixed scene, trimmed of the vertical padding
+     the page does not need — identical for every door in the range.
+     `fitStage` in app.js crops to it, so on the page the scale is a constant:
+     the wall, the floor line and the sconces hold still and only the door
+     changes size. Four numbers rather than two, because the fixed scene's
      origin is not this door's origin — a wide door and a narrow one have
      different `viewBox` x, and centring the crop on `w / 2` (which is what
      fitStage did while there was only one box) would have re-introduced the
-     drift from the other end. */
+     drift from the other end.
+     ⚠ FIT_BOX and STAGE_BOX are deliberately not the same rectangle; see the
+     note where FIT_BOX is defined for why trimming `PAD` instead would have
+     moved every committed sheet. */
   return `
 <svg viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint)}"
-     data-fit-x="${STAGE_BOX.x}" data-fit-y="${STAGE_BOX.y}"
-     data-fit-w="${STAGE_BOX.w}" data-fit-h="${STAGE_BOX.h}"
+     data-fit-x="${FIT_BOX.x}" data-fit-y="${FIT_BOX.y}"
+     data-fit-w="${FIT_BOX.w}" data-fit-h="${FIT_BOX.h}"
      aria-label="${xmlAttr(describe(state))}" xmlns="http://www.w3.org/2000/svg">
   <defs>${usedDefs(defs, body)}</defs>
 ${body}

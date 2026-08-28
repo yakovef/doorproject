@@ -1465,6 +1465,84 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ `FIT_BOX` IS NOT `STAGE_BOX`, AND THE DOOR IS 6% BIGGER FOR IT.** The
+  crop the page fits to used to be the scene itself, padding and all. Measured:
+  the crop is HEIGHT-driven at every viewport this app has — stage aspect 1.33
+  against the scene's 0.536 — so `fitStage` scales to fit the scene's HEIGHT
+  and whatever width that leaves is overspill. **Vertical padding is exactly
+  what was costing the door its size, and horizontal padding costs nothing.**
+  40 units off the top and 130 off the bottom: leaf 20.3% → 21.6% of the
+  desktop frame and 28.2% → 29.9% of a phone's, and 68% → 72% of the stage's
+  height at both.
+  ⚠ **It could NOT be taken out of `PAD`, which was the first attempt.** `PAD`
+  feeds the natural `viewBox` as well, so trimming it would have moved all 110
+  committed sheets — and that is not a regeneration to redo, it is the
+  "bare families byte-identical" PROOF. They are two different quantities: air
+  around the DRAWING for a measurement crop, air around the SCENE for the
+  page's staging. Separated, this changes four attributes and no pixels.
+  ⚠ **And the ceiling on this is arithmetic, not effort.** A door is 850×2050
+  and a desktop stage is 1060×794; fit the whole door in that frame and the
+  leaf cannot exceed 31% of the width even with zero margin. Cropping its head
+  or its foot is forbidden — a configurator exists so somebody can judge
+  proportions. So "make the door the hero" is a lighting problem, not a
+  cropping one, which is what the next entry is.
+
+- **The room has a warm pool and a falloff now, and they are painted UNDER THE
+  DOOR — which is the whole design, not a detail.** `REALISM2.md` D-a. The
+  scene was lit evenly edge to edge, so nothing told the eye where to go.
+  ⚠ **Deepening the existing `#vignette` was the obvious way and it is wrong.**
+  That one is painted LAST and covers the leaf, and it is a radial centred at
+  0.44 of the scene — so deepening it darkens a leaf's head and foot more than
+  its middle, which is a change in the vertical fall BY DEFINITION, and the
+  vertical fall is what `npm run profile` exists to watch. The room therefore
+  has its own pair inside `#backdrop`, the door is drawn over them, and the
+  leaf cannot move.
+  **Predicted in the code before the run, then checked: `npm run mottle`
+  0.0181 / 0.1069 and every `npm run profile` row identical to the digit,
+  before and after.**
+  ⚠ The pool is warm LIGHT ON PLASTER and its centre is the SCENE's, never this
+  door's — so it cannot do what `.layout[data-light]` did and shift the ground
+  under the swatch a customer is comparing.
+  Cost: 1,468 bytes on the default door, 42,423 → 43,891. The 40 KB gate is
+  retired (see below) and `npm run latency` replaced it; the figure is here
+  because the brief asked for it.
+
+- **⚠ THE SATIN SHEEN WAS BUILT TWICE AND CUT BOTH TIMES, AND THE TABLE IS THE
+  POINT.** `REALISM2.md` stage E calls a broad vertical specular "the single
+  biggest *is it a flat rectangle* fix", and it is the one item of this round's
+  brief that is refused.
+
+  | shape | mottle plain | profile dark reed | dark ogee |
+  |---|---|---|---|
+  | none | 0.0181 | +1.2% / +1.1% · r 0.999 ✓ | −0.9% / −0.4% |
+  | peak at 0.46 | 0.0275 | −1.5% / −3.8% · r 0.977 ✓ | −3.5% / −5.2% |
+  | plateau | 0.0182 | −3.2% / −6.5% · **r 0.966 ✗** | −5.2% / −7.9% |
+
+  1. **No photograph asks for it.** The corpus's horizontal profile is a ~3%
+     rise left to right — the note under `drift` records it, and it is why
+     `drift` was halved after ours fell 12% the other way.
+  2. **It moves the moulding's own reading**: 2.7 points of swing on a quantity
+     whose whole range is about 5, and the second shape failed the gate.
+  3. ⚠ **And I cannot explain why the RATIO moved at all.** Both panels of a
+     `pair` sit at the same inset, so a purely HORIZONTAL overlay should cancel
+     exactly out of an upper-against-lower ratio. It did not, twice, in
+     opposite directions. **An instrument reading nobody can explain is not one
+     to tune around** — the same rule this file applies to `profile` being
+     green for reasons nobody has established.
+
+  Reverted to the digit. What the leaf is actually short of is MOTTLE — 0.0181
+  against an honestly-corrected corpus figure near 0.042 — which is a `drift`
+  question with a photograph behind it, and it is the one to reopen. The whole
+  argument is written into `renderer.js` beside `FALLOFF`, where the next
+  person to have this idea will meet it.
+
+- **`REALISM2.md` D-c — the keyhole as real hardware — IS ALREADY BUILT**, and
+  saying so is the point rather than building it twice. That plan describes a
+  flat grey dot; what is in `cylinder()` is a domed escutcheon with its own
+  cast ellipse, a recessed euro cylinder with separate rim and body ramps, two
+  arc highlights on the plug, a key slot and two speculars. It was fixed after
+  the plan was written. Reconciled, not re-done.
+
 - **⚠ THE FLOW'S FOUR NEW ELEMENTS HAD NO STYLES AT ALL, AND NOBODY NOTICED FOR
   A ROUND.** `.sect__where`, `.sect__title`, `.sect__lede` and `.sect__foot`
   arrived with the flow; the stylesheet kept the accordion's `.sect__head`,
