@@ -51,8 +51,7 @@ languages with no page errors.
 
 **Left alone deliberately:** nothing outstanding.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** c1dea75
 
 ---
 
