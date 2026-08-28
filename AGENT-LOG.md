@@ -23,6 +23,26 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-28 05:46 UTC — run 47: nothing worth changing — no new commits, full re-check comes back identical to run 46
+
+**Looked at:** `git fetch` found nothing new since run 46's push
+(`16a3aa0`). `AGENT.md` unchanged. `npm run build` produced no diff.
+Opened the site at phone/desktop — pixel-identical to run 46.
+
+**Instruments:** test ✓ (3,448,528 / 0, unchanged) · audit ✓ (all seven
+viewports clean) · profile ✓ (fully green) · collide ✓ on both `all`
+(1,060 designs) and `boxes` · recreate ✓ (same already-documented
+catalogue gaps).
+
+**Changed:** nothing. No new work to review and nothing new found.
+
+**Left alone deliberately:** nothing outstanding.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-28 00:47 UTC — run 46: nothing worth changing — no new commits, deeper probe of rarer combinations found nothing
 
 **Looked at:** `git fetch` found nothing new since run 45's push
