@@ -51,8 +51,7 @@ option combinations found nothing wrong.
 
 **Left alone deliberately:** nothing outstanding this run.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** 4084bda
 
 ---
 
