@@ -246,13 +246,28 @@ const SUMMARY = { key: 'sum', title: 'step.sum.t', sub: 'step.sum.s', lede: 'ste
    drawing an empty circle, which is how this list stays complete: adding a
    step without a glyph takes the page down at boot instead of shipping nine
    circles one of which is blank. It did exactly that when the flow landed. */
+/* ⚠ FIVE OF THESE WERE REDRAWN BECAUSE THEY FAILED THE STRANGER TEST — cover
+   the label, look at the mark at 21 px, and say what it means. `fit` was a
+   rectangle with a full-height line down it and a dot, which is a FRIDGE.
+   `mk` was a horizontal rule crossed by a vertical one, which is a plus sign.
+   `grip` was a line with two nubs, which is a stick. `lock` was a line, a box
+   and a dash. `pz` was two concentric circles, which is the international mark
+   for a colour swatch and this step is about METAL.
+   The four that survived — `colour`, `face`, `glass`, `sum` — are a paint
+   drop, a panelled door, a glazed light and a document, and a stranger names
+   all four. */
 const SECTION_ICON = {
-  /* a leaf and its frame, with a handle dot */
-  fit:    '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.2 3.6v16.8"/>'
-        + '<path d="M15.4 12.4a.55.55 0 1 0 0-1.1.55.55 0 0 0 0 1.1Z"/>',
-  /* the frame in section: a wall, a face on it, a return into it */
-  mk:     '<path d="M3 9.4h18"/><path d="M9.2 4.6h5.6"/><path d="M12 4.6v14.8"/>'
-        + '<path d="M6.4 19.4h11.2"/>',
+  /* THE OPENING AND HOW BIG IT IS: a door with a dimension arrow under it.
+     The step is size and handing, and a plain door outline cannot say "how
+     big"; a measuring arrow can, and it is the mark every joiner's drawing
+     uses for exactly this. */
+  fit:    '<path d="M6 3.4h12v13.2H6Z"/><path d="M15 10.2h.01"/>'
+        + '<path d="M4.4 20.2h15.2"/><path d="m6.6 18.4-2.2 1.8 2.2 1.8"/>'
+        + '<path d="m17.4 18.4 2.2 1.8-2.2 1.8"/>',
+  /* THE FRAME: the casing outside, the opening inside, drawn as one section
+     through the head. Two nested rectangles say "a frame round a hole"; a
+     cross says nothing. */
+  mk:     '<path d="M3.2 4.6h17.6v14.8H3.2Z"/><path d="M7.4 8.8h9.2v10.6H7.4Z"/>',
   /* a paint drop */
   colour: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
   /* a panelled face */
@@ -261,14 +276,23 @@ const SECTION_ICON = {
   /* a glazed light with muntins */
   glass:  '<path d="M4 4.6h16v11.6H4Z"/><path d="M12 4.6v11.6M4 10.4h16"/>'
         + '<path d="M7 19.4h10"/>',
-  /* a vertical pull bar on its standoffs */
-  grip:   '<path d="M12 4.4v15.2"/><path d="M12 6.6h3.4M12 17.4h3.4"/>',
-  /* a lever on a rose, over a keyway */
-  lock:   '<path d="M4.6 12h9.8"/><path d="M14.4 8.6h3.2v6.8h-3.2Z"/>'
-        + '<path d="M18.4 12h1"/>',
-  /* a ring of finish */
-  pz:     '<path d="M12 4.6a7.4 7.4 0 1 0 0 14.8 7.4 7.4 0 0 0 0-14.8Z"/>'
-        + '<path d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Z"/>',
+  /* THE PULL BAR: the leaf's edge on the left, the bar standing off it on two
+     brackets. The bar has to be beside something for the standoffs to read as
+     standoffs — on its own it was a line with two ticks. */
+  grip:   '<path d="M4.4 3.6h5v16.8h-5"/><path d="M15.8 5.2v13.6"/>'
+        + '<path d="M9.4 8h6.4M9.4 16h6.4"/>',
+  /* THE LOCK: a keyhole. A round case over a tapered slot is the one mark on
+     this page a stranger names without being told, and the step it heads is
+     the lock furniture. */
+  lock:   '<path d="M12 4.4a7.4 7.4 0 0 0-7.4 7.4v7.8h14.8v-7.8A7.4 7.4 0 0 0 12 4.4Z"/>'
+        + '<path d="M12 9.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>'
+        + '<path d="m11 13.2-.8 3.6h3.6l-.8-3.6"/>',
+  /* THE FINISH: a lever handle, with a highlight along its shank saying the
+     choice is which METAL. Two concentric circles read as a paint swatch, and
+     this is the one step whose subject is not colour but material. */
+  pz:     '<path d="M14.6 12a2.6 2.6 0 1 0-5.2 0 2.6 2.6 0 0 0 5.2 0Z"/>'
+        + '<path d="M14.6 12h4.8a1.8 1.8 0 0 1 0 3.6"/>'
+        + '<path d="M9.4 12H4.6"/><path d="M6.8 8.6h2.4"/>',
   /* a page with a line of figures on it */
   sum:    '<path d="M6 3.6h12v16.8H6Z"/><path d="M9 8h6M9 11.6h6M9 15.2h3.4"/>',
 };
@@ -315,6 +339,24 @@ const SPEC_ICON = {
   size:    '<path d="M4.4 4.4v15.2M19.6 4.4v15.2"/><path d="M4.4 12h15.2"/>'
          + '<path d="m7.4 9.4-3 2.6 3 2.6M16.6 9.4l3 2.6-3 2.6"/>',
   handing: '<path d="M6 3.8h12v16.4H6Z"/><path d="m14.6 8.6 3.4 3.4-3.4 3.4"/>',
+  /* ⚠ FOUR ROWS HAD NO MARK, AND THE GAP WAS VISIBLE. `specRows` can return
+     twelve keys and this table held nine, so the DEFAULT door — eight rows —
+     showed six icons and two empty slots, and a fully configured one showed
+     eight and four. The comment above says a missing mark is "deliberately not
+     an error, the label carries it", and that is true of a rare row; it is not
+     true of `mashkof` and `pirzul`, which are on EVERY door. A column of marks
+     with holes in it reads as a loading state.
+     Drawn to match their own step's circle rather than invented afresh: the
+     frame is the same nested pair, the פרזול the same lever. One idea, one
+     mark, wherever it appears. */
+  mashkof: '<path d="M3.4 5h17.2v14H3.4Z"/><path d="M7.4 9h9.2v10H7.4Z"/>',
+  pirzul:  '<path d="M14.4 12a2.4 2.4 0 1 0-4.8 0 2.4 2.4 0 0 0 4.8 0Z"/>'
+         + '<path d="M14.4 12h4.6a1.7 1.7 0 0 1 0 3.4"/><path d="M9.6 12H5"/>',
+  stripes: '<path d="M4.6 7.4h14.8M4.6 12h14.8M4.6 16.6h14.8"/>',
+  /* a keypad — the one thing a כספת and a קודן have in common on the face */
+  speciallock: '<path d="M5.6 4.2h12.8v15.6H5.6Z"/>'
+             + '<path d="M9.2 8.4h.01M12 8.4h.01M14.8 8.4h.01'
+             + 'M9.2 12h.01M12 12h.01M14.8 12h.01M9.2 15.6h.01M12 15.6h.01"/>',
 };
 
 const specIcon = key => (Object.prototype.hasOwnProperty.call(SPEC_ICON, key)

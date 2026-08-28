@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=bcd4c1c8">
+<link rel="stylesheet" href="css/app.css?v=1eaa742d">
 
 <!-- ⚠ THE ONE THING THIS PAGE LOADS FROM ANYWHERE ELSE, AND IT IS AN
      ENHANCEMENT, NEVER A DEPENDENCY.
@@ -296,7 +296,14 @@
            comparison) assumes that. So the mockup's hand icon is welcome and
            its sentence is not. -->
       <span class="grip-bar__hint">
-        <svg class="grip-saved__ico" viewBox="0 0 24 24" aria-hidden="true">
+        <!-- ⚠ `grip-bar__ico`, AND IT SAID `grip-saved__ico`. No rule in the
+             stylesheet has ever matched that name, so this hand had no
+             `fill: none` and no stroke — it rendered as a solid black blob
+             rather than as a line drawing. Invisible for as long as it was,
+             because the grip bar is hidden until a door has a pull handle to
+             drag. A class nobody styles is the CSS spelling of a dangling
+             `url(#id)`: nothing throws, nothing is drawn right. -->
+        <svg class="grip-bar__ico" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M9.4 11.2V5.6a1.4 1.4 0 0 1 2.8 0v5"/>
           <path d="M12.2 10.4V9a1.4 1.4 0 0 1 2.8 0v1.6"/>
           <path d="M15 10.8v-.6a1.4 1.4 0 0 1 2.8 0v5.2a4.6 4.6 0 0 1-4.6 4.6h-1.4c-1.6 0-2.8-.8-3.6-2l-2.4-3.8a1.4 1.4 0 0 1 2.2-1.7l1.4 1.6"/>
@@ -572,7 +579,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=bd9be344"></script>
+<script src="assets/bundle.js?v=ceb0edca"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

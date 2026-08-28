@@ -189,6 +189,34 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* ══════════════════════════════════════════════════════════════════════
+   ONE ICON FAMILY
+   ══════════════════════════════════════════════════════════════════════
+
+   ⚠ THERE WERE FIVE STROKE WEIGHTS AND FOUR SIZES. Measured: `.spec__ico` 1.4
+   at 17 px, `.steps__g` 1.5 at 21, `.trust__ico` 1.6 at 16, `.btn__ico` 1.8 at
+   16, `.iconbtn .btn__ico` 1.9 at 19, `.saved__ico` 1.9 at 14. Every one was a
+   reasonable choice on its own and no two of them belong to the same family,
+   which is what "the icons don't match" actually means when you go and look.
+
+   ⚠ AND A CONSTANT `stroke-width` DOES NOT GIVE A CONSTANT STROKE. Every glyph
+   is drawn on a 24-unit grid and rendered at 14–22 px, so a width of 1.5 comes
+   out at 1.5 × size/24 — 0.9 px on the bookmark and 1.4 px on a rail circle.
+   Matching the NUMBERS would still not have matched the WEIGHTS.
+   `vector-effect: non-scaling-stroke` is the one declaration that fixes it:
+   the stroke is laid down in device units after the transform, so 1.5 is 1.5
+   px at every size. One weight, everywhere, by construction.
+
+   ⚠ It goes on the drawn elements, not on the `<svg>` — `vector-effect` is not
+   an inherited property — hence the descendant selector. */
+.steps__g, .spec__ico, .trust__ico, .btn__ico, .saved__ico, .grip-bar__ico {
+  fill: none; stroke: currentColor;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  flex: 0 0 auto;
+}
+.steps__g *, .spec__ico *, .trust__ico *, .btn__ico *, .saved__ico *,
+.grip-bar__ico * { vector-effect: non-scaling-stroke; }
+
 /* THE `hidden` ATTRIBUTE HAS TO WIN.
    It is only `display: none` in the browser's own stylesheet, so ANY author
    rule that sets `display` on the same element beats it — and the page leans
@@ -346,11 +374,7 @@ svg { direction: ltr; }
   border-color: transparent; background: none;
   color: var(--ink-3);
 }
-.iconbtn .btn__ico {
-  inline-size: 19px; block-size: 19px;
-  fill: none; stroke: currentColor; stroke-width: 1.9;
-  stroke-linecap: round; stroke-linejoin: round;
-}
+.iconbtn .btn__ico { inline-size: 20px; block-size: 20px; }
 
 .langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
 .lang {
@@ -516,8 +540,7 @@ svg { direction: ltr; }
 }
 .trust__i { display: inline-flex; align-items: center; gap: 6px; }
 .trust__ico {
-  inline-size: 16px; block-size: 16px; flex: 0 0 auto;
-  fill: none; stroke: currentColor; stroke-width: 1.6;
+  inline-size: 18px; block-size: 18px;
   stroke-linecap: round; stroke-linejoin: round;
   opacity: .8;
 }
@@ -1173,11 +1196,7 @@ svg { direction: ltr; }
   line-height: 1.35;
   display: grid; justify-items: center; gap: 3px;
 }
-.grip-bar__ico {
-  inline-size: 22px; block-size: 22px;
-  fill: none; stroke: currentColor; stroke-width: 1.5;
-  stroke-linecap: round; stroke-linejoin: round;
-}
+.grip-bar__ico { inline-size: 20px; block-size: 20px; }
 /* 44px, like every other target on the page. It was 34 — a standalone control
    on the phone, ten pixels under the minimum this project holds itself to, and
    the audit never said so because its tap-target check enumerated a list of
@@ -1311,8 +1330,7 @@ svg { direction: ltr; }
   font-size: .82rem;
 }
 .spec__ico {
-  inline-size: 17px; block-size: 17px;
-  fill: none; stroke: var(--ink-2); stroke-width: 1.4;
+  inline-size: 18px; block-size: 18px; stroke: var(--ink-2);
   stroke-linecap: round; stroke-linejoin: round;
   opacity: .85;
 }
@@ -1534,11 +1552,7 @@ svg { direction: ltr; }
   color: var(--ink-2);
   transition: border-color .12s var(--ease), color .12s var(--ease);
 }
-.steps__g {
-  inline-size: 21px; block-size: 21px;
-  fill: none; stroke: currentColor; stroke-width: 1.5;
-  stroke-linecap: round; stroke-linejoin: round;
-}
+.steps__g { inline-size: 21px; block-size: 21px; }
 /* ⚠ `.steps__l`, `.steps__n` AND `.steps__t` ARE GONE — the number under each
    circle and the title beside it. Both were measured out, not tidied away:
    the number said the same thing as the `NN ⁄ 08` the live step already
@@ -1987,12 +2001,38 @@ svg { direction: ltr; }
 
 .tile__name { font-size: .78rem; line-height: 1.2; }
 .tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }
-.tile__why  { font-family: var(--mono); font-size: .6rem; color: var(--warn); }
+/* ⚠ ONE LINE, AND NOT RED. `דורש חלון` was `--warn` at three wrapped lines,
+   which did two things to a grid of tiles: it made the reason the LOUDEST
+   colour on a page whose accent is tan, and it doubled the height of the tiles
+   carrying it — so a row of five stood at five different heights and the grid
+   read as broken rather than as calm.
+   A blocked tile is not an error. It is a tile whose turn has not come, and it
+   is still clickable: tapping it repairs the conflict rather than refusing.
+   So the reason is stated the way a caption is — one line, ellipsised, in the
+   secondary ink — and the ROW keeps its shape. */
+.tile__why {
+  font-family: var(--mono); font-size: .6rem; color: var(--ink-2);
+  inline-size: 100%;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 /* Unavailable, but never `disabled`: still focusable, still clickable, and it
-   says why. Clicking repairs the conflict rather than refusing. */
-.tile.is-blocked { opacity: .55; }
+   says why. Clicking repairs the conflict rather than refusing.
+   ⚠ `.7`, NOT `.55`. At 55% a blocked tile's own artwork was fainter than the
+   hairline round it, so a grid where half the options are blocked — the grille
+   list on a solid door, which is what a customer meets on step 05 — read as a
+   page still loading. It has to look unavailable, not absent. */
+.tile.is-blocked { opacity: .7; }
 .tile.is-blocked .tile__meta { display: none; }
+
+/* ⚠ AND EVERY TILE IN A ROW IS THE SAME HEIGHT, BY CONSTRUCTION RATHER THAN BY
+   LUCK. The grid stretches its items, so a row is as tall as its tallest tile
+   and the SHORT ones were the ragged part: a tile with a one-word name sat
+   with its artwork floating in the middle of a box sized by a three-word
+   neighbour. `align-content: start` inside each tile pins the artwork to the
+   top, so the pictures line up across the row whatever the words below do —
+   which is the only alignment a customer comparing sixteen grilles is using. */
+.tile { align-content: start; }
 
 /* ── pills ────────────────────────────────────────────────── */
 
@@ -2269,8 +2309,7 @@ html.is-live .wa__off { display: none; }
    holds one height for ever instead of two. The 23,021-pixel lesson that made
    `is-off` necessary is what keeps them both mounted. */
 .btn__ico {
-  inline-size: 16px; block-size: 16px; flex: 0 0 auto;
-  fill: none; stroke: currentColor; stroke-width: 1.8;
+  inline-size: 18px; block-size: 18px;
   stroke-linecap: round; stroke-linejoin: round;
 }
 
