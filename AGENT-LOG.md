@@ -23,6 +23,39 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-28 10:46 UTC — run 48: nothing worth changing — no new commits, checked the A4 order sheet directly this time
+
+**Looked at:** `git fetch` found nothing new since run 47's push
+(`5395ad7`). `AGENT.md` unchanged. `npm run build` produced no diff. Given
+several quiet runs in a row, looked at something not checked visually in a
+while: `?sheet=1`, the A4 order sheet, which phase 10 made bilingual and
+had previously thrown two uncaught errors on every load before that phase
+(CLAUDE.md §5 #20). Loaded it in both English (`?sheet=1&lang=en&…`) and
+Hebrew, with `pageerror` listened for explicitly — none fired on either.
+The English sheet prints bilingual, each label/value with the Hebrew
+underneath in a smaller weight, exactly as phase 10 describes; the Hebrew
+sheet prints once, correctly not duplicating Hebrew under Hebrew. Both
+show the handing-disambiguation sentence in full ("Hinges on the right,
+cylinder on the left — seen from outside" / ציר בצד ימין, צילינדר בצד
+שמאל — במבט מבחוץ) — the exact sentence CLAUDE.md flags as the fix for
+the historic mirrored-door bug. Price and code both correct and matching.
+Standard phone/desktop views unchanged from run 47.
+
+**Instruments:** test ✓ (3,448,528 / 0, unchanged) · audit ✓ (all seven
+viewports clean) · profile ✓ (fully green) · collide ✓ on both `all`
+(1,060 designs) and `boxes` · recreate ✓ (same already-documented
+catalogue gaps).
+
+**Changed:** nothing. The order sheet route checked clean in both
+languages with no page errors.
+
+**Left alone deliberately:** nothing outstanding.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-28 05:46 UTC — run 47: nothing worth changing — no new commits, full re-check comes back identical to run 46
 
 **Looked at:** `git fetch` found nothing new since run 46's push
