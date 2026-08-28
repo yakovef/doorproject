@@ -1450,8 +1450,17 @@ function goStep(key, focus = true) {
       const wide = typeof window.matchMedia === 'function'
         && window.matchMedia('(min-width: 1100px)').matches;
       const panel = h.closest('.panel--choose');
-      if (wide && panel) panel.scrollTop = Math.max(0, h.offsetTop - panel.offsetTop - 8);
-      else h.scrollIntoView({ block: 'start' });
+      if (wide && panel) panel.scrollTop = Math.max(0, h.offsetTop - panel.offsetTop - 26);
+      /* ⚠ THE STEP CARD SCROLLS, NOT THE HEADING, and the difference is one
+         line of eyebrow. Bringing the `<h2>` to the top of what is visible puts
+         everything ABOVE it behind the sticky door — which is the `NN ⁄ 08`,
+         invisible on every jump from the moment that eyebrow got a style. The
+         `.sect` box starts at the eyebrow and carries the scroll margin that
+         clears the door. Focus still lands on the heading below, because that
+         is what announces the step to a screen reader.
+         Above 1100 the same 26 px of slack is subtracted from the panel's own
+         scrollTop, for the same reason and against the same element. */
+      else (h.closest('.sect') || h).scrollIntoView({ block: 'start' });
       /* `preventScroll`: the focus is what makes the step announce itself to a
          screen reader, and it must not undo the scroll just chosen. */
       h.focus({ preventScroll: true });

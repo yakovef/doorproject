@@ -8066,8 +8066,8 @@ ${body}
       if (h) {
         const wide = typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
         const panel = h.closest(".panel--choose");
-        if (wide && panel) panel.scrollTop = Math.max(0, h.offsetTop - panel.offsetTop - 8);
-        else h.scrollIntoView({ block: "start" });
+        if (wide && panel) panel.scrollTop = Math.max(0, h.offsetTop - panel.offsetTop - 26);
+        else (h.closest(".sect") || h).scrollIntoView({ block: "start" });
         h.focus({ preventScroll: true });
       }
     }

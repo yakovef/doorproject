@@ -1465,6 +1465,112 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE FLOW'S FOUR NEW ELEMENTS HAD NO STYLES AT ALL, AND NOBODY NOTICED FOR
+  A ROUND.** `.sect__where`, `.sect__title`, `.sect__lede` and `.sect__foot`
+  arrived with the flow; the stylesheet kept the accordion's `.sect__head`,
+  `.sect__sub` and `.sect__now` — all three of which the flow deleted — and
+  never gained the four that replaced them. So the eyebrow, the question, its
+  explanation and the two buttons that carry a customer through nine screens
+  rendered at browser defaults, and `.sect__next` — `class="btn sect__next"`, a
+  `.btn` with no modifier — had a transparent background AND a transparent
+  border. **The primary action of every step was invisible chrome with a word
+  in it.** Nothing failed; the surface the whole flow happens on simply had no
+  typography. It is a card of type now, and the `.btn` with nothing to fill it
+  is a solid ink pill.
+  ⚠ **And it is allowed to be a primary**, which is worth stating: the page has
+  exactly one other, the green send, and the summary step has no `.sect__next`
+  at all — so the two are never in front of a customer at once.
+  ⚠ **The foot is STICKY above 1100 px.** It was falling off the bottom of the
+  screen: the card scrolls in its own column and the buttons are the last thing
+  in it, so at 1440×900 the way out of the window step was below the fold. And
+  the card's own 28 px of bottom padding had to move INTO the foot, or a row of
+  tiles scrolled through the gap underneath the pinned bar.
+
+- **⚠ THE WALL CHROME'S PILL WAS SITTING ON THE DOOR AT 320 px.** Two white
+  notches bitten out of the top corners of the casing, found by zooming a
+  screenshot rather than by any instrument. Measured against `#frame`:
+  **253 px² and 154 px²** of overlap at 320×568, 1 and 0 at 390, 0 on a
+  desktop. It is the pill's BOX and not its contents — the slot runs to y=116
+  and the frame's head starts at y=105, while the words and glyphs inside stop
+  at y≈92. The ground was added when the PRICE was up there and landed on a
+  dark lintel; the price left for the quote bar, so there was nothing left for
+  it to rescue and a real thing for it to spoil. It goes below 1100 px.
+  ⚠ **Capping the slots to `--wall-gap` is still refused**, with the receipt
+  already in this file: tried, reverted, because at 390 the gap is ~90 px, the
+  cap wrapped `Русский` onto two lines and the pill grew DOWN over the leaf.
+  ⚠ **And a disabled `.iconbtn` no longer draws its ring.** `opacity: .32` on a
+  44 px bordered disc still leaves a 44 px bordered disc, and both of them are
+  disabled on arrival — the loudest thing in that corner, meaning nothing. The
+  glyph stays, the box stays 44 px, the ring goes.
+
+- **⚠ DEFINING `--ink-3` WOULD HAVE MADE THE LANGUAGE BUTTONS UNREADABLE.**
+  `.lang` said `color: var(--ink-3, var(--ink-2))` and the token did not exist,
+  so the fallback was doing the whole job at 4.75:1. Adding `--ink-3: #9A968E`
+  — three hundred lines away, in a commit about type — silently drops that to
+  **2.52:1** on the one control a customer who cannot read the rest of the page
+  needs to find. Caught by grepping every `--ink-3` the moment the token was
+  added, which is the habit rather than the luck.
+  ⚠ **A `var(--x, fallback)` is a lie about which value is in force.** It reads
+  as "prefer x" and behaves as "whatever x becomes, one day, in another file".
+  The two remaining uses are decorative borders and now name the token
+  outright; anything that is READ names its colour.
+
+- **The type is a scale now, and the headline is a headline.** `<h1>` was
+  `clamp(17px, 2.2vw, 22px)` at **weight 600** — measured, and that is not a
+  display line, it is a large label, which is most of why the page read as an
+  internal tool. It is weight 300 at `clamp(26px, 3.4vw, 44px)` with -0.022em.
+  ⚠ **Capped at 44 and not DESIGN-LEVEL's 52, because the heading is INSIDE
+  `.stage-wrap`** and every pixel it takes comes out of a stage that is
+  `flex: 1 1 auto`. Measured at 52: the stage went 794 → 753 px and the leaf's
+  share of the frame 21.1% → 20.0%. A display headline that shrinks the product
+  is the wrong trade on the one page whose product is the point.
+  ⚠ **And on a phone it is `.sr-only`.** 86 px of the most expensive strip on
+  the page, a hard seam across the top of the room, and a sentence a customer
+  arriving from a WhatsApp link already knows. `.sr-only` and not
+  `display: none`: `.stage-wrap` names it in `aria-labelledby`, so hiding it
+  from the tree would unlabel the region and leave the page with no `<h1>` —
+  the exact fault the mockup was pointing at when it was made visible.
+  **The phone's door grew 9% on the strength of it** (leaf 25.9% → 28.2% of the
+  frame) and the question gained room at the same time: 330 px of it visible on
+  arrival against 291 before.
+
+- **Assistant loads from Google Fonts, and the FALLBACK is tuned to Assistant.**
+  The usual advice is the other way round and it cannot be done — the fallback
+  is Segoe UI on Windows, Arial Hebrew on a Mac, something else on Android, and
+  one set of overrides cannot match three faces. So a second `@font-face`
+  wraps a local font and stretches it onto Assistant's metrics, and the stack
+  puts it directly behind Assistant: the page lays out at Assistant's metrics
+  from the first frame whether or not Assistant ever arrives.
+  ⚠ **Measured, in `tools/_font/measure.mjs`, against the real woff2.** Per
+  100 px Assistant's ascent is 102 and descent 29 against Arial's 91 and 21,
+  and it is NARROWER — 1591 units of Hebrew against 1840. Hence `size-adjust:
+  89.05%` and `ascent-override: 114.55%`. On a real paragraph the swap moves
+  the inline run **2.0 px** and the line box and the wrap count **0**; without
+  the face it was 8.2 px and a whole line.
+  ⚠ **It never blocks the first paint** — `media="print"` + `onload` — and it
+  is **only requested over `http(s)`**. It was a plain `<link>` first, and
+  `npm run audit` caught the cost inside one run: every `file://` load fired a
+  request that cannot resolve and Chromium logged `net::ERR_CONNECTION_RESET`
+  **four times per page**. The audit counts a console error as a fault, which
+  is right, and it waits for `load`, so the run went from ~15 minutes to 24.
+  Teaching the audit to ignore that class of error was the obvious fix and the
+  wrong one — **an instrument taught to ignore a kind of error will ignore the
+  real one.** Not making the request is the right one, and it makes the
+  README's promise literally true again: opened from a folder, this page makes
+  no network request at all.
+  So every `file://` load — every screenshot, every audit route, and Peretz's
+  own laptop — renders the fallback, and the OFFLINE path is the one that is
+  continuously verified.
+  ⚠ **Chromium in this container cannot reach Google Fonts** (`ERR_CONNECTION_RESET`
+  through the proxy's TLS interception; `curl` can). So no instrument here sees
+  the online face, and the metric numbers were taken against downloaded woff2
+  files instead. Stated rather than glossed.
+  ⚠ **The price keeps its system serif.** Asked for by hand — *"something that
+  reads rich"* — and that instruction is newer than the plan that wanted the
+  figure in a light sans. It also costs nothing to load, which matters more now
+  that the page has one network request: the figure is the first thing a
+  customer looks at and may not be the thing waiting on a CDN.
+
 - **⚠ THE BARE-MODE SCREENSHOTS WERE NOT BARE, AND THEY ARE THE PICTURES THIS
   PROJECT JUDGES THE DRAWING BY.** `.is-bare`'s hide list never gained
   `.stage__hud` when the chrome moved onto the wall on 27.8 — so every
