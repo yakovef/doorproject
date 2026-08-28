@@ -23,6 +23,81 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-28 20:49 UTC — run 50: nothing worth changing — a major, exceptionally self-critical visual-design round, fully verified
+
+**The headline:** seven commits, a look-and-feel pass on the guided flow —
+the largest single-session visual round since the flow itself was built,
+and one of the most carefully measured. Every commit states what it found,
+what it fixed, and — unusually and valuably — **what it tried and cut**
+(a satin-sheen leaf effect, tried twice, reverted twice, with the exact
+before/after `mottle`/`profile` numbers and an honest "I cannot explain
+why the ratio moved" left in the renderer for whoever revisits it). A
+`review/2026-08-28-before-after.png` screenshot artifact was committed
+for Peretz and the person who requested this round.
+
+**What actually changed, briefly:** (1) `7197ca5` — WhatsApp send was only
+reachable from 3 of 27 step×viewport combinations; now 27 of 27, via one
+new `.quote` element (wall-mounted on desktop, a bottom bar on phone).
+Also found and fixed: the bare-mode screenshot hide-list never gained
+`.stage__hud` when the chrome moved onto the wall two rounds ago, so every
+committed comparison sheet since had the price/undo/language row painted
+across the top of the photograph comparison — CLAUDE.md §8's own rule,
+broken on the commit that restated it. (2) `bea18ec` — the flow's own
+elements (`.sect__title` etc.) had never received any typographic rules at
+all and rendered at browser defaults; the primary "next" button was
+invisible (transparent-on-transparent); a local font-metric override was
+added for the webfont so layout doesn't shift when it loads, requested
+only over http(s) so `file://` makes zero network requests, preserving
+README's three-file promise. (3) `cee74ae` — icon stroke weights
+unified via `vector-effect: non-scaling-stroke` (five different weights
+before), five glyphs that failed a "cover the label, name the icon" test
+redrawn, four spec rows that had silently had no icon at all given one.
+(4) `cd44ad6` — the one change that touches the **renderer**: the bare-mode
+crop box changed from padding the whole scene to padding only what the
+crop actually needs, growing the drawn door ~6% (desktop) / ~15% (phone)
+of the frame with zero leaf-geometry change — verified via `mottle` and
+`profile` reading byte-identical before/after; a warm light pool added to
+the room, deliberately NOT by deepening the existing vignette (which sits
+over the leaf and would have altered the vertical falloff `profile`
+watches) but as a new layer under the door in `#backdrop`. (5) `71f8279`
+— a reduced-motion bug where `animation-delay` (not just duration) held
+the send button invisible for 180ms even under `prefers-reduced-motion`,
+found by a NEW check using `document.getAnimations()` since the existing
+one only read `animationDuration`; falsified before trusting it. (6)
+`bfebba2` — walked the flow as a first-time customer (their own words:
+"none of it came from an instrument") and found the way-to-continue button
+was below the fold on every phone step, fixed via the new bottom quote
+bar. (7) `cacbac8` — the summary/before-after writeup.
+
+**Looked at:** `AGENT.md` unchanged. Built (no diff). Opened the site at
+phone, phone-s and desktop, plus a mid-flow step and the summary reached
+by direct load — all match the commits' own description exactly: bigger
+door, warm lit room, consistent icon weights, bottom bar with price+send+
+way-on on phone with no overlap, large light-weight headline. No defects
+found in the visual pass.
+
+**Instruments:** test ✓ (3,448,747 / 0, matches the round's own count
+exactly) · audit ✓ (all seven viewports clean) · profile ✓ (fully green —
+confirms the round's own claim that `mottle`/`profile` are byte-identical
+despite the crop and lighting changes) · collide ✓ on both `all` (1,060
+designs) and `boxes` · recreate ✓ (same already-documented catalogue
+gaps).
+
+**Changed:** nothing. An exceptionally thorough round — measured before
+and after on every claim, falsified its own new checks, and reported a
+failed experiment (the satin sheen) as honestly as a successful one.
+
+**Left alone deliberately:** the satin-sheen leaf effect and the
+still-unexplained `mottle`/`profile` ratio swing under it — the round's
+own commit already reverted it and left the reasoning in `renderer.js`
+for whoever picks it up next; not mine to second-guess without doing that
+measurement work myself.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-28 15:46 UTC — run 49: nothing worth changing — no new commits, full re-check comes back identical to run 48
 
 **Looked at:** `git fetch` found nothing new since run 48's push
