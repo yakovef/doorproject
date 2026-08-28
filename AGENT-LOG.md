@@ -93,8 +93,7 @@ own commit already reverted it and left the reasoning in `renderer.js`
 for whoever picks it up next; not mine to second-guess without doing that
 measurement work myself.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry
-lands, per the established two-commit pattern)
+**Commit:** 689a5e9
 
 ---
 
