@@ -490,6 +490,16 @@ function init() {
   });
   $('#works-close').addEventListener('click', closeWorks);
 
+  /* ⚠ THE QUOTE BAR'S WAY ON IS WIRED ONCE, HERE, AND NOT IN `buildPanel`.
+     Every other `.sect__next` is built with its step and gets its listener in
+     the same breath; this one lives in `index.html`, outside `#choices`, and
+     survives the language picker emptying the panel — so a listener attached
+     inside `buildPanel` would be added again on every rebuild and the button
+     would advance two steps after one language switch, four after two. Once,
+     at boot, on an element nothing rebuilds. */
+  const barNext = document.querySelector('.quote__next');
+  if (barNext) barNext.addEventListener('click', () => stepBy(1));
+
   /* ── THE PICTURE GOES WITH THE ORDER ──────────────────────────────
      Both send buttons keep their `wa.me` href and keep it correct — that is
      what works with no JavaScript, on a desktop, over `file://`, and in every
@@ -1696,6 +1706,17 @@ function markSteps() {
      compositor transform, so this costs no layout. */
   const nav = document.querySelector('.steps');
   if (nav) nav.style.setProperty('--fill', keys.length > 1 ? at / (keys.length - 1) : 0);
+
+  /* ⚠ WHICH STEP IS LIVE, ON THE PANEL, FOR THE STYLESHEET. The gallery opener
+     sits above the navigator, so on a phone — where the navigator is fixed at
+     the top and the panel is the whole scrolling half — it is the first thing
+     between the door and the question, on all nine steps. It is a good offer
+     ("start from a door we already built") and it is only an offer at the
+     START; by step 05 the customer has started, and it is a third object in
+     front of the thing they were asked. CSS cannot ask "is the live step the
+     first one", so it is told. Above 1100 there is room and it stays. */
+  const panel = document.querySelector('.panel--choose');
+  if (panel) panel.dataset.live = liveStep;
 
   /* ⚠ AND THE LIVE CIRCLE IS SCROLLED INTO VIEW. The row is nine 44 px circles
      and it does not fit 320 px, 390 px or a 310 px desktop column — measured

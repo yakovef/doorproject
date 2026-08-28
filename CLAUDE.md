@@ -1465,6 +1465,43 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE WAY ON WAS BELOW THE FOLD ON EVERY PHONE STEP, AND ONLY WALKING THE
+  GUIDE FOUND IT.** Driven the way a first-time customer does it — forward,
+  with the button, never with the rail — `.sect__foot` was off screen on all
+  eight question steps at 390 px and at 320 px. A customer landed on a step,
+  chose something, and had to scroll past the rest of the options and an
+  explainer to find out how to continue. The rail advances too; a first-timer
+  does not know that.
+  The way on is in the quote bar below 1100 px now, so the phone's bottom bar
+  is **the price, the send and the way on** — which is not clutter, it is the
+  three things a guided flow has to keep within a thumb's reach. It carries
+  `sect__next`, so `markSteps` gives it the same label and disabled state as
+  the one in the flow without knowing it exists; on the summary it is disabled,
+  and a disabled way-on is HIDDEN rather than greyed.
+  ⚠ Its listener is attached once at boot, not in `buildPanel` — that function
+  runs again on every language switch, and a listener added there would have
+  made the button advance two steps after one switch and four after two.
+  ⚠ **`npm run audit`'s own walk could not have found this**: it clicks the
+  RAIL, which is the reachable-from-anywhere check, and a rail click never asks
+  whether the forward button is on screen. Two different questions.
+
+- **Two more found by the same walk, and both were three pixels wide.**
+  `.lang` had `min-block-size: 44px` and no `min-inline-size`, so on the
+  English page — where `עברית` is the shortest of the three labels — the button
+  measured **41 × 44**, on the one control a customer who cannot read the page
+  needs to find. And the step heading was drawing the BROWSER's focus outline
+  after a tap: `goStep` focuses it because that is what announces the step to a
+  screen reader, and a programmatic focus can bring the UA ring with it — a
+  hard black box round the biggest line on the page. `:focus-visible` now, so
+  the ring stays for the keyboard and goes for the thumb.
+
+- **The gallery opener shows on the first step only, below 1100 px.** It sits
+  above the navigator, so on a phone it was the first thing between the door
+  and the question on all nine steps. It is an offer about where to START.
+  `markSteps` publishes `data-live` on the panel because CSS cannot ask which
+  step is live; unset — a page whose bundle never ran — SHOWS it, which is
+  right, because there is no flow then either.
+
 - **⚠ `prefers-reduced-motion` WAS HIDING THE SEND BUTTON FOR 180 ms, AND THE
   CHECK THAT WATCHES MOTION COULD NOT SEE IT.** The reveal's `revealSend`
   carries an `animation-delay` and `both`; the reduced-motion block zeroed the

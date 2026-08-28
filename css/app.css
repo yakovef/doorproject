@@ -379,7 +379,13 @@ svg { direction: ltr; }
 .langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
 .lang {
   appearance: none; background: none; border: 0;
-  min-block-size: 44px; padding-inline: 8px;
+  /* ⚠ 44 BOTH WAYS. It had the height and not the width: measured on the
+     English page, where `עברית` is the shortest label of the three, the button
+     came out **41 x 44**. Three pixels under a floor this stylesheet keeps
+     everywhere else, on the control a customer who cannot read the page needs
+     to find — and invisible to the audit, whose own tap-target check is a
+     single 44 that both dimensions have to clear only where it looks. */
+  min-block-size: 44px; min-inline-size: 44px; padding-inline: 8px;
   /* ⚠ `--ink-2`, AND IT USED TO SAY `var(--ink-3, var(--ink-2))`. `--ink-3` did
      not exist when that was written, so the fallback was doing the whole job
      and the language buttons rendered at 4.75:1. Defining the token — three
@@ -901,6 +907,21 @@ svg { direction: ltr; }
   text-align: center;
   font-size: .72rem; color: var(--ink-2);
 }
+/* ⚠ ON A PHONE THIS IS THE FIRST THING UNDER THE DOOR, and it is fine print.
+   Seen by walking the guide: with the headline gone the caveat became the top
+   of the scrolling half — two lines of legal text between the drawing and the
+   question a customer is being asked. It stays (it is one sentence from
+   `js/share.js`, so the page and the WhatsApp message cannot promise two
+   different things) and it stops shouting: narrower measure so it wraps
+   deliberately rather than filling the width, a smaller size, and the room
+   above and below it that says "this is an aside". */
+@media (max-width: 1099px) {
+  .stage__bar { padding-block: 6px 8px; }
+  .stage__note {
+    font-size: .66rem; line-height: 1.4;
+    max-inline-size: 34rem; padding-inline: 18px;
+  }
+}
 .pills--compact .pill {
   min-block-size: 36px; padding: 6px 18px; font-size: .82rem;
 }
@@ -1110,6 +1131,25 @@ svg { direction: ltr; }
 .quote__send:hover { border-color: var(--ink-3); }
 .quote__send:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
 .quote__ico { inline-size: 17px; block-size: 17px; flex: 0 0 auto; opacity: .85; }
+
+/* ── THE WAY ON, IN THE BAR, ON A PHONE ONLY ─────────────────────────
+   See the note in index.html for the measurement that put it here. Solid ink
+   like the one in the flow, because it is the same action and a customer
+   should not have to learn two shapes for it.
+   ⚠ HIDDEN WHEN DISABLED rather than greyed. It is disabled on exactly one
+   step — the summary, where there is nowhere to go — and a dead button beside
+   the send on the screen whose whole job is sending is a distraction with no
+   purpose. The bar becomes the price and the send, which is that step. */
+.quote__next {
+  flex: 0 0 auto;
+  min-block-size: 44px; padding: 0 16px;
+  font-size: .86rem; font-weight: 600;
+  background: var(--ink); color: var(--paper); border-color: var(--ink);
+}
+.quote__next:disabled { display: none; }
+/* Above 1100 the card has a sticky foot of its own and the wall is not a place
+   for a verb. */
+@media (min-width: 1100px) { .quote__next { display: none; } }
 
 /* ⚠ BELOW 360 px THE CAPTION GOES AND THE FIGURE STAYS. Measured on the old
    wall pill and still true here: `מחיר משוער` is the caption, the figure is
@@ -1648,6 +1688,19 @@ svg { direction: ltr; }
   letter-spacing: .14em;
   color: var(--accent-ink);
 }
+/* ⚠ AND THE RING ON IT IS OURS, AND ONLY FOR THE KEYBOARD. The heading carries
+   `tabindex="-1"` and `goStep` focuses it, because that is what announces the
+   new step to a screen reader — and a programmatic focus can bring the
+   browser's own outline with it: a hard black box round the biggest line on
+   the page, after a tap. Seen in a walk-through screenshot before anybody
+   could report it. `:focus-visible` keeps the ring where it earns its place —
+   a keyboard user has to know where they are — and takes it off the tap. */
+.sect__title:focus { outline: none; }
+.sect__title:focus-visible {
+  outline: 2px solid var(--accent-ink); outline-offset: 6px;
+  border-radius: 3px;
+}
+
 /* The question itself, in the display voice — light and large, one step down
    from the page's `<h1>`. This is the line a customer reads on every one of
    nine screens, and it was 16 px semibold. */
@@ -1775,6 +1828,15 @@ svg { direction: ltr; }
   font: inherit; color: var(--ink); text-align: start; cursor: pointer;
 }
 .works-open:hover { border-color: var(--accent); }
+/* ⚠ AND ON A PHONE IT SHOWS ON THE FIRST STEP ONLY. See the note in
+   `markSteps` for why: it is an offer about where to START, and on a phone it
+   was standing between the door and the question on all nine steps. The
+   attribute is set by the script; the fallback when it is unset — a page whose
+   bundle never ran — is to SHOW it, because there is no flow then either and
+   the gallery is one of the few things that still works. */
+@media (max-width: 1099px) {
+  .panel--choose[data-live]:not([data-live="fit"]) .works-open { display: none; }
+}
 .works-open__t { font-weight: 600; font-size: .92rem; }
 .works-open__n { font-size: .74rem; color: var(--accent-ink); white-space: nowrap; }
 

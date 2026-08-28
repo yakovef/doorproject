@@ -7652,6 +7652,8 @@ ${body}
       box.hidden = open;
     });
     $("#works-close").addEventListener("click", closeWorks);
+    const barNext = document.querySelector(".quote__next");
+    if (barNext) barNext.addEventListener("click", () => stepBy(1));
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.addEventListener("click", async (ev) => {
         if (!canSharePicture()) return;
@@ -8269,6 +8271,8 @@ ${body}
     }
     const nav = document.querySelector(".steps");
     if (nav) nav.style.setProperty("--fill", keys.length > 1 ? at / (keys.length - 1) : 0);
+    const panel = document.querySelector(".panel--choose");
+    if (panel) panel.dataset.live = liveStep;
     const live = document.querySelector(".steps__step.is-on");
     if (live && typeof live.scrollIntoView === "function") {
       live.scrollIntoView({ inline: "nearest", block: "nearest" });
