@@ -929,12 +929,25 @@ function buildPanel() {
     b.type = 'button';
     b.className = 'steps__step';
     b.dataset.step = sec.key;
-    b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`
-                + `<span class="steps__l"><span class="steps__n" aria-hidden="true"></span>`
-                + `<span class="steps__t">${T(sec.title)}</span></span>`;
-    /* ⚠ THE NAME, EXPLICITLY. Below 1100 px `.steps__t` is `display: none` and
-       the number comes from `.steps__n::before`, which is `aria-hidden` — so
-       without this the button measures `{role: "button", name: ""}`. */
+    /* ⚠ THE CIRCLE IS THE WHOLE BUTTON NOW — no number under it, no title
+       beside it. Both were measured out rather than dropped for tidiness:
+
+       · The NUMBER was `.steps__n::before`, a CSS counter, and it is the same
+         fact as the `NN ⁄ 08` the live step already prints above its own
+         heading. Two statements of where you are, and the one under the
+         circles cost 24 px of a 390 px phone's most expensive strip.
+       · The TITLE only ever showed above 1100 px, where nine of them do not
+         fit a 310 px column: measured `scrollWidth` 429 against a 310 px box,
+         so what a desktop customer actually saw was nine truncated words. The
+         name is on the button and the live step's `<h2>` says it in full.
+
+       What is left is nine 44 px icon circles that mean "which question", and
+       the row is legible at every width for the first time. */
+    b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`;
+    /* ⚠ THE NAME, EXPLICITLY, AND NOW IT IS THE ONLY ONE. There is no text
+       inside this button at all, so without this line it measures
+       `{role: "button", name: ""}` at every width rather than only below
+       1100 px. */
     b.setAttribute('aria-label', T(sec.title));
     b.addEventListener('click', () => goStep(sec.key));
     nav.appendChild(b);
@@ -1558,11 +1571,20 @@ function paintSaved() {
 /** Which sections are open, on the navigator. */
 function markSteps() {
   const keys = STEP_KEYS();
+  const at = keys.indexOf(liveStep);
   for (const [i, k] of keys.entries()) {
     const b = document.querySelector(`.steps__step[data-step="${k}"]`);
     if (b) {
       const on = k === liveStep;
       b.classList.toggle('is-on', on);
+      /* ⚠ `is-done` MEANS "BEHIND YOU", NOT "FINISHED", and the distinction is
+         the whole reason this row is allowed to have a fill at all. Every step
+         carries a valid value from the first paint — `nowLabel` falls back to
+         `list[0]` — so a mark meaning COMPLETE would read 9/9 on arrival, which
+         is the dishonesty this navigator has refused since it was four circles.
+         Ordinal position is a fact about the page, like `NN ⁄ 08`, and it is
+         safe to draw. It fills only behind; it never runs ahead. */
+      b.classList.toggle('is-done', at >= 0 && i < at);
       if (on) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
     }
     /* ⚠ `NN ⁄ 08` IS A PAGE NUMBER, NOT A PROGRESS BAR, and the wording is
@@ -1578,6 +1600,32 @@ function markSteps() {
         : `${String(i + 1).padStart(2, '0')} ⁄ ${String(SECTIONS.length).padStart(2, '0')}`;
     }
   }
+  /* ⚠ THE HAIRLINE FILLS BEHIND YOU, AS A FRACTION, AND IT IS SET HERE RATHER
+     THAN COUNTED IN CSS. `.steps::after` is one rule scaled on the inline axis,
+     so it mirrors correctly in LTR for free — a fill drawn per-circle would
+     leave a seam at every flex gap, which is why the connector under it is one
+     rule and not nine borders.
+     Zero on step 01 and 1 at the summary. A `scaleX` on a hairline is a
+     compositor transform, so this costs no layout. */
+  const nav = document.querySelector('.steps');
+  if (nav) nav.style.setProperty('--fill', keys.length > 1 ? at / (keys.length - 1) : 0);
+
+  /* ⚠ AND THE LIVE CIRCLE IS SCROLLED INTO VIEW. The row is nine 44 px circles
+     and it does not fit 320 px, 390 px or a 310 px desktop column — measured
+     `scrollWidth` 456 against 390, 429 against 310 — so it scrolls, and a
+     navigator whose current position is off its own edge is not a navigator.
+     `nearest`, so a circle already on screen does not jog the row on every
+     paint; `inline` only, so it can never scroll the PAGE (this row is fixed
+     at the top of a phone and sticky in the card, and a block-axis scroll here
+     was how the heading used to end up behind the door).
+     ⚠ Guarded: `scrollIntoView` on a detached or displayless element throws in
+     no browser, but the element is absent in `?sheet=1` where the flow is not
+     built at all — CLAUDE.md §5.20 is what happens when that is assumed. */
+  const live = document.querySelector('.steps__step.is-on');
+  if (live && typeof live.scrollIntoView === 'function') {
+    live.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  }
+
   /* The way on and the way back, disabled at the ends rather than wrapping. */
   const i = keys.indexOf(liveStep);
   for (const b of document.querySelectorAll('.sect__back')) b.disabled = i <= 0;
@@ -2463,6 +2511,41 @@ function fitStage() {
        band's box and the measured box stay one box. */
     root.setProperty('--stage-b',
       `${Math.max(0, Math.round(window.innerHeight - wrap.bottom))}px`);
+
+    /* ⚠ HOW TALL THE STICKY BLOCK AT THE TOP OF A PHONE ACTUALLY IS, and
+       nothing was measuring it. Below 1100 px the navigator is FIXED at the
+       top and `.stage-wrap` is STICKY directly under it, so the top ~490 px
+       of the scrollport is permanently occupied — and `.sect__title` carried
+       `scroll-margin-block-start: calc(var(--steps-h) + 8px)`, which clears
+       the navigator and nothing else.
+
+       Measured before the fix: tapping any circle on the rail landed the
+       step's own heading **388 px behind the door** at 390x844 and 323 px at
+       320x568. So the answer to "what did I just choose?" was the door and a
+       half-cut tile, on every step, and the customer had to scroll UP to find
+       the question they had just asked for. Nothing in `npm test` or
+       `npm run audit` had an opinion about it — a scroll offset is neither a
+       string nor an overflow.
+
+       It has to be MEASURED rather than declared, because the wrap's height is
+       the heading plus the drawing plus the caveat line and every one of those
+       moves with the viewport and the language. Same rect this function has
+       already read, same re-fit, so the number and the box it describes cannot
+       drift apart. On the root, because `.sect__title` is not a descendant of
+       the wrap; and it is only USED below 1100 px, where the wrap is sticky —
+       above it the wrap is a column beside the panel and the CSS ignores this. */
+    root.setProperty('--sticky-h', `${Math.max(0, Math.round(wrap.height))}px`);
+  }
+
+  /* ⚠ AND HOW TALL THE QUOTE BAR IS, so the page can end above it rather than
+     underneath it. Outside the `#frame` guard on purpose: the bar exists and
+     has a height whether or not the drawing came up, and a page whose door
+     failed to render still must not hide its own last option behind the one
+     control that can reach Peretz. */
+  const q = document.querySelector('.quote');
+  if (q) {
+    document.documentElement.style.setProperty(
+      '--quote-h', `${Math.round(q.getBoundingClientRect().height)}px`);
   }
 }
 

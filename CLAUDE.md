@@ -197,11 +197,19 @@ the WhatsApp message cannot state one promise two ways — and `init` wrote it
 once at boot, so it stayed Hebrew for ever. It is in `translateStatic` now,
 which is the function whose whole job is making the chrome match the language.
 
-### The chrome moved onto the wall — 27.8.2026
+### The chrome moved onto the wall — 27.8.2026, amended 28.8
 
-The page has no header and no dock. Three controls stand in the wall around
-the door — languages, price, undo/redo — asked for with three circles drawn on
-a screenshot, and the WhatsApp button appears only on the summary step.
+The page has no header. Two controls stand in the wall around the door —
+languages and undo/redo — asked for with circles drawn on a screenshot.
+
+⚠ **THE THIRD, THE PRICE, IS NOW `.quote` AND IT MOVES WITH THE VIEWPORT**, and
+so does a quiet send beside it: the wall under the right-hand lamp on a
+desktop, a slim bar at the foot of a phone. The wall placement is the one that
+was asked for and it only works where there IS wall — at 390 px the plaster
+beside the leaf is ~140 px and the pill landed on the door. Same instruction,
+two widths, two answers. See the change log for 28.8, including which half of
+*"remove the WhatsApp from the screen"* still stands (the green bar) and which
+was reversed (a send must exist on every step, `PLAN.md` §0).
 
 ⚠ **`.stage__hud` IS ABSOLUTE AND MUST STAY ABSOLUTE.** Above 1100 px
 `.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so anything in
@@ -216,8 +224,12 @@ on the wall. `fitStage` publishes the offset off the same two rects it already
 reads. They cannot be children of `.stage` itself: `paint` rewrites
 `#stage.innerHTML` on every change and would delete them.
 
-**The price is stated once now.** It was the send card and the phone dock, with
-an audit check that the two agreed; there is one reading to make.
+**The price is stated once, and it still is.** It was the send card and the
+phone dock, with an audit check that the two agreed; `.quote` moved the whole
+readout — label, figure, chevron and breakdown — rather than copying it, so
+there is still one reading to make. **The SEND is now stated twice** (the quiet
+one and the summary's green one) and that pair has its own assertion: same
+href, every step, every viewport.
 
 ### The round from a real phone — 27.8.2026
 
@@ -1087,7 +1099,30 @@ grepping for each one, not remembering it** — asked whether the plan had been
 carried out, the agent that wrote it found three of these missing or half-done
 by checking the code instead of its own notes.
 
+⚠ **AND THE TABLE UNDER THIS HEADING WAS EMPTY FOR A DAY.** When
+`TRANSFORM.md` was deleted on 27.8 the header row was copied across and the
+fifteen rows were not — so the paragraph above said "this is the list to walk"
+and there was no list. Recovered from `git show a8a33d1^:TRANSFORM.md` §16.1 on
+28.8. A section that instructs the reader to walk a list is the one place an
+empty list cannot be noticed by reading, only by trying to obey it.
+
 | # | assertion | protects |
+|---|---|---|
+| T1 | Sum of the breakdown rows === the displayed total, every buildable design | a breakdown that does not add up |
+| T2 | The standard door with nothing on it is exactly ₪3,150 | the one number Peretz will check |
+| T3 | `leafW`/`leafH` identical across all four mashkofs, every size | the fault reported on the classical set |
+| T4 | For every grip × pirzul pair, the lever's fill carries the PIRZUL tone | the existing test asserted the MIRROR of this and would have agreed with the bug |
+| T5 | Every retired id resolves to a buildable door, including the stripe → (dir, count) migration | fourteen `d=` ids already in links customers have sent |
+| T6 | `handleLen` never exceeds the leaf; `repair()` pulls a stale one from a link | a 200 cm bar on a 203 cm door |
+| T7 | `list.length <= 2 ** BITS[f]` for every NEW field | a 17th entry encoding as index 0, in silence |
+| T8 | The cylinder is on the same side in he, en and ru | the hinge trap |
+| T9 | The page is fully usable under `prefers-reduced-motion: reduce` | — |
+| T10 | `window: rect` cannot be chosen without a bottom panel | Peretz's own rule |
+| T11 | `?d=CODE` **and** a full query both land on the quote page, not step 01 | ⚠ shipped half-done and closed 27.8 — the shared-link half is the half Peretz uses |
+| T12 | Two renders of one state stay byte-identical with the two stacked leaf rects in place | purity |
+| T13 | Under `.is-bare`, `getComputedStyle` reports `animation-name: none` on every animated element | the 110 sheets go non-deterministic otherwise |
+| T14 | Every interactive control in the flow measures ≥ 44 px on both axes, at all seven `VIEWS` | the grip controls were 22 px for two rounds |
+| T15 | Every group in `GROUPS` has a `hint`, and every step has a `<details>` explainer | ⚠ NOT BUILT in its own phase; built 27.8 |
 
 ⚠ **And two of them were found missing by exactly that walk.** T11 was asserted
 for the bare-load half and not the shared-link half — the half Peretz uses every
@@ -1345,7 +1380,15 @@ complete and its findings live here:
 
 ### Not started
 CI, deploy to `design.dlatotmagen.co.il`, prerendering the default door into
-`index.html`, English and Russian.
+`index.html`.
+
+⚠ **`English and Russian` STOOD IN THIS LIST AFTER THEY SHIPPED.** Both landed
+on 27.8 with `js/copy.js`, three hundred keys and an audit route, and this line
+still filed them as unbuilt the next day. It is the exact fault the paragraph
+below the list was written about — *"a finished feature filed under 'not
+started' is worse than no list at all"* — and it went one round before anybody
+noticed, which is how long it takes for an unattended agent to build a thing
+twice. Corrected 28.8.
 
 ⚠ The mobile sticky CTA used to sit in that list and **it ships** — `.dock`,
 fixed at the bottom below 1100 px. It stayed listed as unbuilt long enough that
@@ -1421,6 +1464,68 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE BARE-MODE SCREENSHOTS WERE NOT BARE, AND THEY ARE THE PICTURES THIS
+  PROJECT JUDGES THE DRAWING BY.** `.is-bare`'s hide list never gained
+  `.stage__hud` when the chrome moved onto the wall on 27.8 — so every
+  `corpus-*`, `recreate-*` and `against-*` sheet committed since has carried
+  the undo button, `Русский`, `מחיר משוער` and **₪3,150 painted across the top
+  of our render**, beside the photograph it is there to be compared against.
+  Measured: 35,726 differing pixels on `corpus-00` in a band at y 29–125, and
+  they all go the moment the hide list is right.
+  ⚠ §8 states that rule in as many words — *"anything added to the page joins
+  the bare-mode hide list the same day"* — and it was broken **on the day it
+  was restated**, by the change that restated it. The rule was not forgotten;
+  it was written and not applied, which is a different failure and a harder one
+  to catch. It survived a full green run of every instrument, because no
+  instrument looks at what is IN a sheet — only at whether the sheet is stale.
+  Found while diffing a regeneration that should have been byte-identical and
+  was not. **When sheets move on a commit that could not have moved them, do
+  not stamp them: find out what did.**
+
+- **The send is on every step again, quietly — and the price came off the
+  door.** Both halves are one new element, `.quote`, and it has two placements:
+  a slim bar at the foot of a phone, and the wall under the right-hand lamp on
+  a desktop, which is where the owner's son drew a circle for the price.
+  ⚠ **THIS REVERSES PART OF THE 27.8 INSTRUCTION AND THE REVERSAL IS NARROW.**
+  *"Remove the WhatsApp from the screen, it will only be available at the
+  end"* removed a full-width GREEN BAR offering to send a door somebody was
+  still colouring, and that is still gone: the one green button on the site is
+  the summary's. What is on every step now is a line of ink on paper beside the
+  price. What forced it is older than both — `PLAN.md` §0, a customer must be
+  able to hand Peretz an order at any moment. **Measured before the change: a
+  `[data-wa]` was in the DOM at every step and on screen at exactly one, so 24
+  of 27 step × viewport pairs had no send at all.** After: 0 of 27.
+  ⚠ **The price was NOT buried** — 27 of 27, visible everywhere, because it had
+  moved onto the wall the day before. A brief written one revision earlier said
+  otherwise and the measurement corrected it. It moved anyway, for a different
+  reason: on a 390 px phone the wall beside the leaf is ~140 px and the pill
+  landed ON the leaf; at 320 px it landed on it every time.
+  ⚠ **Two send buttons is CLAUDE.md §5's oldest shape**, so `npm run audit` now
+  asserts on every step at every viewport that at least one is on screen, that
+  every `[data-wa]` carries the IDENTICAL href, and that the price is readable.
+  The audit's own `wa:` field read `#wa-btn` by id — §5.8 exactly — and reads
+  the whole set now.
+  ⚠ **A hard-coded `padding-block-end: 78px` from the deleted dock was still in
+  the stylesheet, in a second `@media (max-width: 1099px)` block further down
+  the file**, and it would have beaten the measured reservation silently. §8's
+  "a media query adds no specificity" for the fourth time.
+  ⚠ **And the quote bar's send survives the degraded stylesheet on purpose.**
+  `#choices` is hidden there and `goStep` MOVES `.panel--send` inside it — so a
+  page that boots, moves the card and only then throws had, until now, no send
+  button at all. Same shape as §5.20's `?sheet=1`: a guard written for the
+  state at boot, applied to a page that has moved on.
+
+- **The step heading stopped hiding behind the door on a phone.**
+  `.sect__title`'s `scroll-margin-block-start` cleared the fixed navigator and
+  nothing else — but `.stage-wrap` is STICKY directly below it, so tapping any
+  circle on the rail landed the question **388 px behind the drawing** at
+  390×844 and 323 px at 320×568. What the customer saw after choosing "window"
+  was the door and a half-cut tile, on every step, and they had to scroll UP to
+  find the question they had just asked for. `fitStage` publishes `--sticky-h`
+  off the rect it already reads; the heading now clears the door by 13–14 px.
+  Neither `npm test` nor `npm run audit` had an opinion: a scroll offset is
+  neither a string nor an overflow.
 
 - **The leaf's grain went up two measured steps, and the response is
   SUB-LINEAR — which is the finding, not the number.** `grain` and `drift` up

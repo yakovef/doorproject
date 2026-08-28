@@ -281,6 +281,62 @@ for (const v of VIEWS) {
       const now = await p.evaluate(() =>
         (document.querySelector('.sect:not([hidden])') || {}).dataset?.section);
       if (now !== k) fault(v.name, `the navigator's "${k}" circle opened "${now}"`);
+
+      /* ── SEND AND PRICE EXIST ON THIS STEP, AND ON THIS SCREEN ────────
+         `PLAN.md` §0: the product is an order Peretz can act on. A guided flow
+         may sequence the questions; it may not put the answer out of reach.
+
+         Measured before this check existed, on 28.8.2026: a `[data-wa]` was in
+         the DOM at every step and VISIBLE at exactly one — the summary — so
+         **24 of 27 step x viewport pairs had no send at all**. The price was
+         fine at 27 of 27, which is worth writing down because the brief that
+         sent me looking said it was buried too; it had moved onto the wall the
+         day before and the brief was one revision stale.
+
+         ⚠ IN THE DOM IS NOT ON THE SCREEN. `checkVisibility` answers the CSS
+         question and the rect answers the geometry one; a control below the
+         fold or behind a fixed bar is unreachable however much `display` it
+         has, and this file has confused the two before.
+
+         ⚠ AND EVERY COPY MUST CARRY THE SAME HREF. There are two send links
+         now — the quiet one in the quote bar and the green one on the summary
+         card — and two elements each holding their own idea of which door to
+         send is CLAUDE.md §5's oldest shape. §5.8 is the version that bit:
+         *"an assertion has to name the object, not the document."* One writer
+         paints them both (`querySelectorAll('[data-wa]')` in `paint`), and
+         this is the check that says so. The day somebody reaches for
+         `getElementById` again, the other button goes stale and a customer
+         sends Peretz a door they never built — silently. */
+      const reach = await p.evaluate(() => {
+        const on = el => {
+          const r = el.getBoundingClientRect();
+          const shown = typeof el.checkVisibility === 'function'
+            ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : true;
+          return shown && r.width > 0 && r.height > 0
+            && r.bottom > 0 && r.right > 0
+            && r.top < innerHeight && r.left < innerWidth;
+        };
+        const was = [...document.querySelectorAll('[data-wa]')];
+        const price = document.querySelector('[data-price]');
+        return {
+          waTotal: was.length,
+          waSeen: was.filter(on).length,
+          hrefs: [...new Set(was.map(a => a.getAttribute('href') || ''))],
+          priceSeen: !!price && on(price),
+          priceText: price ? price.textContent.trim() : '',
+        };
+      });
+      if (!reach.waSeen) {
+        fault(v.name, `step "${k}": ${reach.waTotal} send button(s) in the DOM and `
+          + 'NONE on screen — the customer cannot hand Peretz this door');
+      }
+      if (reach.hrefs.length > 1) {
+        fault(v.name, `step "${k}": the ${reach.waTotal} send buttons point at `
+          + `${reach.hrefs.length} DIFFERENT doors — one of them is lying`);
+      }
+      if (!reach.priceSeen || !reach.priceText || reach.priceText === '—') {
+        fault(v.name, `step "${k}": no price on screen (read "${reach.priceText}")`);
+      }
     }
     await p.click('.steps__step');          // back to step 01 for the walk below
     await p.waitForTimeout(120);
@@ -463,7 +519,16 @@ for (const v of VIEWS) {
              shape CLAUDE.md §5 is about. */
           prices: [...document.querySelectorAll('[data-price]')].map(e => e.textContent),
           code: document.getElementById('code').textContent,
-          wa: document.getElementById('wa-btn').getAttribute('href'),
+          /* ⚠ EVERY SEND BUTTON, NOT `#wa-btn`. This named one element by id,
+             which was harmless while there was one — and the day a second
+             `[data-wa]` arrived it would have gone on measuring the old button
+             and reported the page clean while the new one pointed at a door
+             nobody chose. That is CLAUDE.md §5.8 exactly: *"an assertion has to
+             name the object, not the document."* `was` is the whole set; the
+             comparison below reads `was[0]` for the "did the link change with
+             the door" question and the set's size for the "do they agree" one,
+             so neither can be answered about a button that is not on the page. */
+          was: [...document.querySelectorAll('[data-wa]')].map(a => a.getAttribute('href')),
           summary: document.getElementById('summary').textContent,
           /* The OTHER sink. `#summary` is one line under the price; `#spec` is
              the table a desktop customer actually proof-reads, row by row. */
@@ -486,7 +551,19 @@ for (const v of VIEWS) {
       }
       if (!/\d/.test(s.price)) fault(v.name, `${key}=${id}: price reads "${s.price}"`);
       if (!CODE.test(s.code)) fault(v.name, `${key}=${id}: code reads "${s.code}"`);
-      if (!s.wa || !s.wa.startsWith('https://')) fault(v.name, `${key}=${id}: WhatsApp link is "${s.wa}"`);
+      /* Every send button on the page, and they must agree — see the note on
+         `was` above, and CLAUDE.md §5.8. A page with two send buttons pointing
+         at two different doors passes every check written about one of them. */
+      if (!s.was.length) fault(v.name, `${key}=${id}: there is no send button at all`);
+      for (const href of s.was) {
+        if (!href || !href.startsWith('https://')) {
+          fault(v.name, `${key}=${id}: WhatsApp link is "${href}"`);
+        }
+      }
+      if (new Set(s.was).size > 1) {
+        fault(v.name, `${key}=${id}: ${s.was.length} send buttons point at `
+          + `${new Set(s.was).size} different doors`);
+      }
       if (!s.summary.trim()) fault(v.name, `${key}=${id}: the spec line is empty`);
       /* ⚠ AND IT MUST BE THE ROWS, not a fourth assembly of them. `npm test`
          proves `summaryLine(state)` is the rows; only a browser can prove that

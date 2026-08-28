@@ -88,6 +88,16 @@
      record of what happens when a quantity like that lives in two. */
   --grip-strip: 0px;
 
+  /* ⚠ THE TOUCH FLOOR, AS A TOKEN, BECAUSE IT IS NOW A QUANTITY IN TWO PLACES.
+     44 px is written into a dozen rules in this file and that was fine while
+     each was independent — a button is 44 because a thumb is. It stopped being
+     fine when the navigator's ROW had to be tall enough to hold its own
+     circle: two numbers that must agree or the circle is squashed, which is
+     exactly the shape CLAUDE.md §5 is about. The circle and the row that holds
+     it read the same token; the standalone buttons keep their literal 44,
+     because they are answering the thumb, not each other. */
+  --tap: 44px;
+
   --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
   --sans: "Segoe UI", "Arial Hebrew", Arial, system-ui, sans-serif;
   /* ⚠ THE PRICE'S OWN FACE, AND IT DOWNLOADS NOTHING. Asked for from outside:
@@ -805,21 +815,6 @@ svg { direction: ltr; }
   padding: 2px 10px;
   box-shadow: 0 1px 2px rgb(0 0 0 / .05);
 }
-.hud__slot--price { text-align: center; display: grid; justify-items: center; gap: 1px;
-                     /* ⚠ CLAUDE.md §8: "minmax(0, 1fr), never a bare 1fr or an
-                        implicit auto track". This grid had neither — its one
-                        implicit column defaulted to `auto`, which sizes to the
-                        widest item's own content and does not shrink below it,
-                        so `.send__toggle` (`inline-size: 100%` of that column)
-                        stayed at its full ~84px content width no matter how far
-                        the outer flex layout had already shrunk this slot's own
-                        box. At 320-353px that overflow ran the price pill
-                        straight into the undo/redo circles beside it — a real,
-                        visible overlap `npm run audit`'s tap-target-size check
-                        does not catch, because both elements individually
-                        measured ≥44px; nothing checks that neighbours don't
-                        collide. Reported nowhere yet, found by looking. */
-                     grid-template-columns: minmax(0, 1fr); }
 /* ⚠ NOT CAPPED TO `--wall-gap`, AND THAT WAS THE FIRST TRY. Capping the two
    side slots to the measured gap beside the DOOR is the right instinct for
    `.grip-bar`, which hangs at mid-height where the door really is in the way.
@@ -834,91 +829,153 @@ svg { direction: ltr; }
 .stage__hud .langs, .stage__hud .steps-back { flex-wrap: nowrap; }
 .stage__hud .lang { white-space: nowrap; }
 
-/* ⚠ THE PRICE HANGS UNDER THE RIGHT-HAND LAMP, not in the row with the other
-   two. Asked for from outside: *"make it so that the price would be on the
-   right side below the lamps."*
-   `--lamp-cx` and `--lamp-b` are published by `fitStage` off the SCONCE'S OWN
-   BOX — see the note there for why a percentage of the stage would have been
-   the wrong instrument. `left`, not `inset-inline-start`: this is pinned to a
-   feature of the DRAWING, and the drawing does not mirror when the interface
-   does. In Hebrew the interface flips and the lamp, and the price under it,
-   stay exactly where they are. */
-.hud__slot--price {
-  position: absolute;
-  inset-block-start: calc(var(--lamp-b, 30%) + 18px);
-  left: var(--lamp-cx, 76%);
-  transform: translateX(-50%);
-}
-
-/* On the wall the price is the biggest thing on the page after the door, and
-   it is a button — see the note in index.html. */
-.hud__slot--price .send__label { font-size: .7rem; letter-spacing: .1em; }
-/* ⚠ THE GRID TRACK FIX ABOVE ONLY LETS THE SLOT SHRINK — the button inside it
-   still has to actually shrink to fit, and a grid/flex item's default
-   `min-width: auto` refuses to go below its own content's width regardless of
-   how narrow its track is. Without a `min-inline-size` on the button the slot
-   narrows and the button overflows it anyway, unchanged.
-   ⚠ AND `0` IS THE WRONG NUMBER, NOT JUST A PERMISSIVE ONE. The first version
-   of this fix used 0 and it worked — the overlap was gone — but `npm run
-   audit` caught what a screenshot could not: the button's own box had shrunk
-   to 23px wide at 320px. The currency figure still rendered, because text
-   overflow is visible by default and nothing clipped it, so it LOOKED fixed
-   and the actual tap target was half the legal floor. 44px, the same floor
-   every other control on this page keeps. */
-.hud__slot--price .send__toggle { min-inline-size: 44px; }
-/* ⚠ BELOW THE POINT WHERE THE TWO FIXES ABOVE ARE STILL NOT ENOUGH ROOM.
-   Measured directly: the undo/redo pair and the language pair are both
-   `flex: 0 0 auto` (never shrink, by design — see above), so on a screen
-   narrow enough that their combined width plus the price pill's own
-   min-content width exceeds the stage, something has to give, and it cannot
-   be the two tap-target pairs. The crossover is ~353px (measured: -8.3px
-   overlap at 345, +1.8px clear at 355); 359px is the breakpoint with a small
-   margin. `מחיר משוער` is the caption, not the fact — the customer needs the
-   FIGURE, and it is what stays. Dropping the caption and giving the figure a
-   touch less room recovers legibility without any wrap: the alternative,
-   tested first, was letting the caption wrap to two lines, which grew the
-   whole row's height and still left the number's own box too narrow. */
-@media (max-width: 359px) {
-  .hud__slot--price .send__label { display: none; }
-  .hud__slot--price .send__figure { font-size: 1.15rem; }
-}
-/* ⚠ 44 px, LIKE EVERYTHING ELSE THAT CAN BE TAPPED. On the send card this
-   button inherited its height from a taller stack of text; on the wall it is
-   a figure and a chevron and nothing else, and `npm run audit` measured it at
-   88x30 on a phone and 101x34 on a laptop — under the floor at all seven
-   viewports the moment it moved. The floor is a floor: the padding gives way,
-   the height does not. */
-.hud__slot--price .send__toggle { min-block-size: 44px; display: inline-flex;
-                                  align-items: center; gap: 4px; }
-.hud__slot--price .send__figure {
-  font: 400 1.5rem/1.05 var(--serif);
-  letter-spacing: .005em;
-  font-variant-numeric: lining-nums tabular-nums;
-}
-@media (min-width: 1100px) { .hud__slot--price .send__figure { font-size: 1.9rem; } }
-.hud__slot--price .send__label {
-  font-variant: small-caps; letter-spacing: .16em; opacity: .8;
-}
-.hud__slot--price .bd {
-  position: absolute; inset-inline: 0; inset-block-start: 100%;
-  margin-block-start: 6px;
-  background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r-card, 10px);
-  padding: 10px 12px; box-shadow: 0 8px 26px rgb(0 0 0 / .12);
-  max-block-size: 46vh; overflow-y: auto;
-}
-/* ⚠ `position: relative` WAS HERE AND IT UNDID THE LINE ABOVE. It was added to
-   anchor the breakdown popover, and it sits LATER in the file than the
-   `position: absolute` that hangs this slot under the lamp — so the cascade
-   took the last one and the price stayed in the flex row, 71 px past the edge
-   of the stage and over the choices panel. Measured, not spotted: x=1131 in a
-   1060-wide stage.
-   Nothing is needed here at all. An absolutely positioned box is already a
-   containing block for its own absolute children, so the breakdown anchors to
-   it either way. */
-
 /* The language buttons lose their pill chrome up here — on a wall they are
    text, not a toolbar. */
 .stage__hud .langs { justify-content: flex-start; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE QUOTE BAR — what it costs, and the way to send it
+   ══════════════════════════════════════════════════════════════════════
+
+   ⚠ ONE ELEMENT, TWO PLACEMENTS. Written phone-first, because the phone is
+   where nearly every customer arrives and because the desktop placement is
+   the override that has to come LAST — CLAUDE.md §8: a media query adds no
+   specificity, and this file has been bitten three times by a rule inside one
+   sitting above the base rule it means to beat.
+
+   ⚠ AND STILL EXACTLY ONE PRICE ON THE PAGE. It moved WHOLE — label, figure,
+   chevron and breakdown — and `#price` is still the only `[data-price]` the
+   configurator paints. The audit's "every copy agrees" check therefore still
+   has one reading to make, which is the state CLAUDE.md §0c records. */
+.quote {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 6;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  /* The notch, the home indicator, and the 8 px this bar wants anyway. */
+  padding: 7px 14px calc(7px + env(safe-area-inset-bottom, 0px));
+  background: var(--paper-up);
+  /* Anything inside that has to match what is BEHIND it reads `--surface`,
+     and this bar is not the page's ground — see the note on the token. */
+  --surface: var(--paper-up);
+  border-block-start: 1px solid var(--rule);
+  box-shadow: 0 -6px 22px rgb(23 23 21 / .06);
+}
+.quote__price {
+  position: relative;
+  display: grid; gap: 0;
+  /* CLAUDE.md §8: never a bare `auto` track. An implicit column sizes to its
+     widest item and refuses to shrink, which is how the old wall pill grew
+     into the undo/redo circles at 320-353 px. */
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  min-inline-size: 0;
+}
+.quote__price .send__label {
+  font-size: .64rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-2); line-height: 1.2;
+}
+/* ⚠ 44 px, LIKE EVERYTHING ELSE THAT CAN BE TAPPED, and 44 px WIDE as well as
+   tall. An earlier version let this shrink to `min-inline-size: 0` and the
+   figure still rendered — text overflow is visible by default — so it LOOKED
+   fixed while the real tap target was 23 px. The floor is a floor: the
+   padding gives way, the box does not. */
+.quote__price .send__toggle {
+  min-block-size: 44px; min-inline-size: 44px;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 0;
+}
+.quote__price .send__figure {
+  font: 400 1.45rem/1.05 var(--serif);
+  letter-spacing: .005em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+/* ⚠ THE BREAKDOWN OPENS UPWARD DOWN HERE. It is pinned to the foot of the
+   screen, so a popover hanging off the bottom of its own button is a popover
+   nobody can read. `inset-block-end: 100%` is the same rule the other way up,
+   and it is inside the base (phone) block on purpose — the wall placement
+   below turns it back over. */
+.quote .bd {
+  position: absolute; inset-inline-start: 0; inset-block-end: 100%;
+  inline-size: max-content; max-inline-size: min(22rem, 86vw);
+  margin-block-end: 10px;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: var(--r-card, 10px);
+  padding: 10px 12px; box-shadow: 0 8px 26px rgb(0 0 0 / .12);
+  max-block-size: 46vh; overflow-y: auto;
+  z-index: 1;
+}
+/* ⚠ QUIET. This is the part of the 27.8 instruction that survives: what was
+   removed was a full-width GREEN bar offering to send a half-built door, and
+   nothing here is green. It is a line of ink on paper with a hairline round
+   it — present on every step, loud on none. The one green button on the site
+   is still the summary's. */
+.quote__send {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 7px;
+  min-block-size: 44px; padding: 0 14px;
+  border: 1px solid var(--rule); border-radius: var(--r-pill, 999px);
+  background: var(--surface, #fff);
+  color: var(--ink); text-decoration: none;
+  font-size: .84rem; font-weight: 500; white-space: nowrap;
+}
+.quote__send:hover { border-color: var(--ink-3, var(--ink-2)); }
+.quote__send:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.quote__ico { inline-size: 17px; block-size: 17px; flex: 0 0 auto; opacity: .85; }
+
+/* ⚠ BELOW 360 px THE CAPTION GOES AND THE FIGURE STAYS. Measured on the old
+   wall pill and still true here: `מחיר משוער` is the caption, the figure is
+   the fact, and a caption that wraps to two lines grows the bar's height on
+   the screen with the least of it. */
+@media (max-width: 359px) {
+  .quote { padding-inline: 10px; gap: 8px; }
+  .quote__price .send__label { display: none; }
+  .quote__price .send__figure { font-size: 1.25rem; }
+  .quote__send { padding: 0 11px; font-size: .8rem; }
+}
+
+/* ── ≥1100 px · THE BAR GOES BACK ON THE WALL ────────────────────────
+   Asked for from outside, with a circle drawn on a DESKTOP screenshot:
+   *"make it so that the price would be on the right side below the lamps."*
+   `--lamp-cx` and `--lamp-b` are published by `fitStage` off the SCONCE'S OWN
+   BOX — a percentage of the stage would have been the wrong instrument.
+   `left`, not `inset-inline-start`: this is pinned to a feature of the
+   DRAWING, and the drawing does not mirror when the interface does. In Hebrew
+   the interface flips and the lamp, and the price under it, stay put. */
+@media (min-width: 1100px) {
+  .quote {
+    position: absolute;
+    inset-block-start: calc(var(--lamp-b, 30%) + 18px);
+    inset-block-end: auto;
+    inset-inline: auto;
+    left: var(--lamp-cx, 76%);
+    transform: translateX(-50%);
+    flex-direction: column; align-items: center; gap: 7px;
+    padding: 5px 16px 9px;
+    background: var(--paper);
+    --surface: var(--paper);
+    border: 0;
+    border-radius: var(--r-card, 16px);
+    box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+  }
+  .quote__price { justify-items: center; }
+  .quote__price .send__label { font-size: .66rem; letter-spacing: .16em; }
+  .quote__price .send__figure { font-size: 1.9rem; }
+  /* Back the right way up: there is a whole wall below it here. */
+  .quote .bd {
+    inset-block-end: auto; inset-block-start: 100%;
+    inset-inline-start: 50%; transform: translateX(-50%);
+    margin-block-end: 0; margin-block-start: 8px;
+  }
+  /* ⚠ 44 px HERE TOO. The first draft said 36 — small enough to sit quietly
+     under the price on a wall with room to spare — and `npm run audit` failed
+     it at all four desktop viewports within a minute: `quote__send 136x36`.
+     The floor is a floor, and it does not soften because the control is meant
+     to be quiet. Quiet is a matter of colour and weight, not of size. */
+  .quote__send { font-size: .8rem; min-block-size: 44px; padding: 0 14px; }
+}
 
 .grip-bar {
   position: absolute;
@@ -1132,15 +1189,29 @@ svg { direction: ltr; }
    between two. */
 .steps {
   position: relative;
-  display: flex; gap: 4px;
-  padding: 6px 0 14px;
+  display: flex; gap: 4px; align-items: center;
+  padding: 8px 0 9px;
   border-block-end: 1px solid var(--rule);
   margin-block-end: 4px;
-  counter-reset: step;
   min-inline-size: 0;
+  /* ⚠ AND A MINIMUM HEIGHT, BECAUSE `overflow-x: auto` COLLAPSED IT TO NOTHING.
+     Measured on desktop before this line: `.steps` came out **21 px** tall and
+     each 44 px circle inside it **44 x 23** — half-moons across the top of the
+     card, and the 44 px touch floor broken on the one viewport nobody had
+     measured it at.
+     The cause is a spec rule, not a typo: `overflow-x: auto` with
+     `overflow-y: visible` computes `overflow-y: auto`, so this row is a scroll
+     container in BOTH axes — and a scroll container's automatic minimum size in
+     the block axis is ZERO. As a grid item in an auto-sized row it therefore
+     contributed no content height at all, and the flex column inside each step
+     shrank the circle to fit what was left.
+     Two lines fix it and both are needed: a floor here, and `flex: 0 0 auto` on
+     the circle so it can never be the thing that gives. */
+  min-block-size: calc(var(--tap) + 17px);
   overflow-x: auto;
   scrollbar-width: none;
   scroll-snap-type: inline proximity;
+  scroll-padding-inline: 14px;
   overscroll-behavior-inline: contain;
 }
 .steps::-webkit-scrollbar { display: none; }
@@ -1179,7 +1250,14 @@ svg { direction: ltr; }
    and it is here, not measured in script: a JavaScript-published height would
    make the page's top depend on the bundle having run. */
 @media (max-width: 1099px) {
-  :root { --steps-h: 84px; }
+  /* ⚠ 62, DOWN FROM 84. The row lost the number line under each circle, and
+     this is the number that has to follow it — it reserves the fixed strip's
+     height on `body` and pins `.stage-wrap` under it, so leaving it at 84
+     would have opened a 22 px band of nothing between the navigator and the
+     door. It is deliberately NOT measured in script: a JavaScript-published
+     height would make the top of the page depend on the bundle having run.
+     8 px above the circle, 9 below, 1 for the rule = 62. */
+  :root { --steps-h: 62px; }
   .steps {
     position: fixed;
     inset-block-start: 0; inset-inline: 0;
@@ -1190,12 +1268,29 @@ svg { direction: ltr; }
   }
   /* ⚠ THE PADDING MOVED TO `body` BECAUSE THE BAR IT WAS ON IS DELETED.
      Something has to reserve the fixed strip's height or the first thing in
-     the document sits under it. */
-  body { padding-block-start: var(--steps-h); }
+     the document sits under it. And now something has to reserve the quote
+     bar's at the other end, or the last option on every step — and the whole
+     foot of the summary card — sits behind it. `--quote-h` is measured and
+     published by `fitStage`; the fallback is for the instant before the first
+     paint and for a page whose bundle never arrives, and it is deliberately a
+     little generous rather than a little short. */
+  body {
+    padding-block-start: var(--steps-h);
+    padding-block-end: calc(var(--quote-h, 62px) + env(safe-area-inset-bottom, 0px));
+  }
   /* The door pins UNDER the navigator rather than behind it. */
   .stage-wrap { inset-block-start: var(--steps-h); }
-  /* Jumping to a step must not land its heading under the fixed strip. */
-  .sect__title { scroll-margin-block-start: calc(var(--steps-h) + 8px); }
+  /* ⚠ AND CLEAR THE DOOR, NOT ONLY THE NAVIGATOR. This said
+     `calc(var(--steps-h) + 8px)`, which clears the fixed strip at the top and
+     stops there — but `.stage-wrap` is STICKY immediately below that strip, so
+     the heading a customer had just asked for landed 388 px behind the drawing
+     at 390x844 (323 at 320x568). Measured, on every step, on every jump.
+     `--sticky-h` is the wrap's own measured height, published by `fitStage` off
+     the same rect it already reads. The fallback is what the old rule did, so a
+     page whose bundle never arrives is no worse than it was. */
+  .sect__title {
+    scroll-margin-block-start: calc(var(--steps-h) + var(--sticky-h, 0px) + 14px);
+  }
 }
 /* The connector, drawn once behind the row rather than as a border on each
    circle — four separate half-lines would leave a seam wherever the flex
@@ -1205,22 +1300,44 @@ svg { direction: ltr; }
   content: '';
   position: absolute; z-index: 0;
   inset-inline: 12%;
-  inset-block-start: calc(6px + 22px);       /* the circles' own centre line */
+  inset-block-start: calc(8px + 22px);       /* the circles' own centre line */
   block-size: 1px; background: var(--rule);
 }
+/* ⚠ AND THE SAME LINE AGAIN IN ACCENT, SCALED TO WHERE YOU ARE. `--fill` is
+   set by `markSteps` — 0 on step 01, 1 at the summary — and it is an ORDINAL
+   fraction, not a completion one: this row has refused to claim progress since
+   it was four circles, because every step carries a value from the first paint
+   and anything derived from `state` reads 9/9 on arrival.
+   `transform-origin: left` in a logical world would be wrong, so the origin is
+   set per direction below — a `scaleX` is a physical transform and the row
+   reads right-to-left in Hebrew. */
+.steps::after {
+  content: '';
+  position: absolute; z-index: 0;
+  inset-inline: 12%;
+  inset-block-start: calc(8px + 22px);
+  block-size: 1px; background: var(--accent);
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left center;
+  transition: transform .26s linear;
+}
+[dir="rtl"] .steps::after { transform-origin: right center; }
 .steps__step {
-  counter-increment: step;
   position: relative; z-index: 1;
-  flex: 1 1 0; min-inline-size: 44px;
-  display: inline-flex; flex-direction: column; align-items: center; gap: 5px;
-  min-block-size: 44px;            /* the floor this file enforces everywhere */
+  flex: 1 1 0; min-inline-size: var(--tap);
+  display: inline-flex; align-items: center; justify-content: center;
+  min-block-size: var(--tap);
   padding: 0 2px;
   background: none; border: 0;
-  font: 500 .72rem/1.2 var(--sans); color: var(--ink-2);
-  cursor: pointer; text-align: center;
+  cursor: pointer;
 }
 .steps__c {
-  inline-size: 44px; block-size: 44px;       /* 44, not the mockup's 40 — a floor is a floor */
+  inline-size: var(--tap); block-size: var(--tap);
+  /* ⚠ NEVER THE THING THAT GIVES. Without this the circle is a flex item with
+     the default `flex-shrink: 1`, and when the row was collapsing (see the
+     note on `.steps` above) it was the circle that absorbed the whole
+     shortfall: 44 x 23 on every desktop viewport. */
+  flex: 0 0 auto;
   display: grid; place-items: center;
   border: 1px solid var(--rule); border-radius: 50%;
   /* ⚠ `--surface`, so the circle punches a hole in the connector behind it on
@@ -1236,33 +1353,22 @@ svg { direction: ltr; }
   fill: none; stroke: currentColor; stroke-width: 1.5;
   stroke-linecap: round; stroke-linejoin: round;
 }
-.steps__l { display: inline-flex; align-items: baseline; gap: 5px; }
-.steps__n::before {
-  content: counter(step, decimal-leading-zero);
-  font: 600 10px/1 var(--mono); letter-spacing: .06em; color: var(--accent-ink);
-}
+/* ⚠ `.steps__l`, `.steps__n` AND `.steps__t` ARE GONE — the number under each
+   circle and the title beside it. Both were measured out, not tidied away:
+   the number said the same thing as the `NN ⁄ 08` the live step already
+   prints, for 24 px of a phone's most expensive strip; and the title only ever
+   showed above 1100 px, where nine of them do not fit a 310 px column
+   (measured `scrollWidth` 429), so a desktop customer read nine truncated
+   words. The button's accessible name is set in `app.js` and is now its only
+   text — see the note there. */
 .steps__step:hover .steps__c { border-color: var(--ink-2); color: var(--ink); }
-.steps__step.is-on { color: var(--ink); }
+/* Behind you: the circle picks up the accent hairline the fill is drawing
+   through it, so the row reads as a path rather than as nine equal buttons. */
+.steps__step.is-done .steps__c { border-color: var(--accent); color: var(--ink-2); }
 .steps__step.is-on .steps__c {
   border-color: var(--accent); color: var(--accent-ink);
   background: var(--paper-up);
   box-shadow: 0 0 0 3px rgb(176 141 87 / .18);
-}
-/* ⚠ 44 px BOTH WAYS. Below 1100 the title is hidden and only the counter
-   shows, which made these buttons 31 px wide against the 44 px floor this
-   stylesheet honours everywhere else — and the audit waved them through
-   because its own width floor was 30, one pixel under what they measured.
-   The title is hidden for a real layout reason and stays hidden; the button
-   keeps the size a thumb needs. The accessible NAME is set in app.js, since
-   `display: none` takes the only text out of the accessibility tree. */
-@media (max-width: 1099px) {
-  .steps__t { display: none; }
-  /* The circle is already 44 px both ways, so hiding the title costs the
-     button nothing — which is what the note above was about when the button
-     WAS its label and measured 31 px wide with the title gone. The accessible
-     NAME is still set explicitly in app.js, because `display: none` takes the
-     only text out of the accessibility tree. */
-  .steps__step { min-inline-size: 44px; }
 }
 
 .panel--choose { counter-reset: sect; }
@@ -1881,16 +1987,15 @@ html.is-live .wa__off { display: none; }
 .proof { margin: 0; font-size: .85rem; color: var(--ink-2); }
 .proof a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: .25em; }
 
-/* Contents centred inside a readable measure rather than stretched edge to
-   edge. On a 390 px phone the two fill the bar anyway; on an 834 px tablet,
-   left to itself, the button became a green slab most of the screen wide with
-   the price marooned at one end. */
-
-@media (max-width: 1099px) {
-  body { padding-block-end: 78px; }
-}
-@media (min-width: 1100px) {
-}
+/* ⚠ A HARD-CODED `padding-block-end: 78px` STOOD HERE, LEFT OVER FROM THE
+   DELETED DOCK, AND IT WOULD HAVE BEATEN THE MEASURED ONE. Two `body` rules in
+   two `@media (max-width: 1099px)` blocks, same specificity, and this one is
+   further down the file — so the cascade would have taken 78 px and quietly
+   ignored `--quote-h`. That is CLAUDE.md §8's "a media query adds no
+   specificity" for the fourth time in this stylesheet, and this time it was
+   already sitting in the file waiting.
+   The reservation lives with the fixed strips it reserves for, up beside
+   `--steps-h`. Nothing is needed here. */
 
 /* ── toast ────────────────────────────────────────────────── */
 
@@ -1912,11 +2017,15 @@ html.is-live .wa__off { display: none; }
      It is a message, not a control — nothing in it is ever clicked. */
   pointer-events: none;
 }
-/* And lifted clear of the dock rather than laid over it, so the price and the
-   button stay readable while it is up. 78px is the dock's own reserved
-   height, declared below. */
+/* And lifted clear of the quote bar rather than laid over it, so the price and
+   the send stay readable while it is up. ⚠ It said `78px` — the deleted dock's
+   height, hand-written here and hand-written again in a `body` rule that no
+   longer exists. Measured now, off the same `--quote-h` the page reserves with,
+   so the toast's clearance and the bar's height are one number. */
 @media (max-width: 1099px) {
-  .toast { inset-block-end: calc(78px + 12px + env(safe-area-inset-bottom, 0px)); }
+  .toast {
+    inset-block-end: calc(var(--quote-h, 62px) + 12px + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* ── reduced motion ───────────────────────────────────────── */
@@ -1955,6 +2064,12 @@ html.is-live .wa__off { display: none; }
 .is-sheet .bar, .is-sheet .saved, .is-sheet .strip, .is-sheet .layout,
 .is-sheet .is-sheet .trust, .is-sheet .toast, .is-sheet .works,
 .is-sheet .works-open { display: none !important; }
+/* ⚠ The quote bar is a child of `.stage-wrap`, which is inside `.layout` — so
+   `.is-sheet .layout` already takes it. Named anyway, because the line above
+   is a hand-kept list and the next element added to the page may not be
+   inside `.layout`; a printed order sheet with a fixed WhatsApp bar across the
+   foot of every page is the kind of thing nobody notices until it is on paper. */
+.is-sheet .quote { display: none !important; }
 .is-sheet .sheet { display: block; }
 
 .sheet {
@@ -2093,7 +2208,7 @@ html.is-live .wa__off { display: none; }
    it. Anything added to the stage wrap belongs here the same day. */
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
 .is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
-.is-bare .grip-bar { display: none; }
+.is-bare .grip-bar, .is-bare .stage__hud, .is-bare .quote { display: none; }
 .is-bare .layout { display: block; block-size: 100dvh; }
 .is-bare .stage-wrap { block-size: 100dvh; padding: 0; border: 0; }
 /* Natural framing, not the full-bleed room: app.js leaves the viewBox alone

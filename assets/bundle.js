@@ -7767,7 +7767,7 @@ ${body}
       b.type = "button";
       b.className = "steps__step";
       b.dataset.step = sec.key;
-      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span><span class="steps__l"><span class="steps__n" aria-hidden="true"></span><span class="steps__t">${T(sec.title)}</span></span>`;
+      b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`;
       b.setAttribute("aria-label", T(sec.title));
       b.addEventListener("click", () => goStep(sec.key));
       nav.appendChild(b);
@@ -8160,11 +8160,13 @@ ${body}
   }
   function markSteps() {
     const keys = STEP_KEYS();
+    const at = keys.indexOf(liveStep);
     for (const [i2, k] of keys.entries()) {
       const b = document.querySelector(`.steps__step[data-step="${k}"]`);
       if (b) {
         const on = k === liveStep;
         b.classList.toggle("is-on", on);
+        b.classList.toggle("is-done", at >= 0 && i2 < at);
         if (on) b.setAttribute("aria-current", "step");
         else b.removeAttribute("aria-current");
       }
@@ -8172,6 +8174,12 @@ ${body}
       if (where) {
         where.textContent = k === SUMMARY.key ? T(SUMMARY.sub) : `${String(i2 + 1).padStart(2, "0")} ⁄ ${String(SECTIONS.length).padStart(2, "0")}`;
       }
+    }
+    const nav = document.querySelector(".steps");
+    if (nav) nav.style.setProperty("--fill", keys.length > 1 ? at / (keys.length - 1) : 0);
+    const live = document.querySelector(".steps__step.is-on");
+    if (live && typeof live.scrollIntoView === "function") {
+      live.scrollIntoView({ inline: "nearest", block: "nearest" });
     }
     const i = keys.indexOf(liveStep);
     for (const b of document.querySelectorAll(".sect__back")) b.disabled = i <= 0;
@@ -8512,6 +8520,14 @@ ${body}
       root.setProperty(
         "--stage-b",
         `${Math.max(0, Math.round(window.innerHeight - wrap.bottom))}px`
+      );
+      root.setProperty("--sticky-h", `${Math.max(0, Math.round(wrap.height))}px`);
+    }
+    const q = document.querySelector(".quote");
+    if (q) {
+      document.documentElement.style.setProperty(
+        "--quote-h",
+        `${Math.round(q.getBoundingClientRect().height)}px`
       );
     }
   }

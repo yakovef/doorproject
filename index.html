@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=ddd08d02">
+<link rel="stylesheet" href="css/app.css?v=73804a9f">
 </head>
 <body>
 
@@ -138,6 +138,19 @@
   #down[hidden] { display: block !important; }
   #choices, .stage, .grip-bar, .stage__bar, .stage__hud,
   .send__spec, .send__lead, .send__alt { display: none; }
+  /* ⚠ THE QUOTE BAR'S PRICE GOES AND ITS SEND STAYS, and the second half of
+     that is not tidiness — it is the only send button guaranteed to survive.
+     `#choices` is hidden above, and `goStep` MOVES `.panel--send` inside it;
+     so if the app boots, moves the card, and only then throws, `fail()`
+     applies this stylesheet over a page whose one send button is now a child
+     of a hidden element. Measured shape, same family as the `?sheet=1` route
+     in CLAUDE.md §5.20: a guard written for the state at boot, applied to a
+     page that has since moved on. The quote bar is a child of `.stage-wrap`
+     and cannot be moved, so it is the route that holds.
+     The figure goes because it reads `—`, and a price of `—` beside a live
+     send button is the styled-and-inert screen this whole apparatus exists to
+     prevent. */
+  .quote__price { display: none; }
   /* The label swap used to be repeated here. It is the RESTING state in
      app.css now — the page is honest before JavaScript and `paint()` upgrades
      it with `is-live` — so this block no longer has to say it. */
@@ -185,25 +198,6 @@
     <div class="stage__hud">
       <div class="hud__slot hud__slot--start" id="langs" role="group"
            aria-label="שפה" data-ta="aria-label=nav.lang"></div>
-
-      <!-- ⚠ THE PRICE MOVED HERE WHOLE, breakdown and all, and there is still
-           exactly ONE of it. It used to be stated twice — the send card and
-           the phone dock — with an audit check that the two agreed; the dock
-           is gone and the card's copy came with it, so that check now has
-           one reading to make. Tapping it still opens the column it is made
-           of, which is what was asked for on 26.8. -->
-      <div class="hud__slot hud__slot--price">
-        <span class="send__label" data-t="price.est">מחיר משוער</span>
-        <button class="send__toggle" id="price-toggle" type="button"
-                aria-expanded="false" aria-controls="breakdown">
-          <strong class="send__figure" id="price" data-price>—</strong>
-          <span class="send__chev" aria-hidden="true"></span>
-          <span class="sr-only" data-t="price.breakdown">פירוט המחיר</span>
-        </button>
-        <div class="bd" id="breakdown" hidden>
-          <table class="bd__t"><tbody id="breakdown-body"></tbody></table>
-        </div>
-      </div>
 
       <div class="hud__slot hud__slot--end">
         <div class="steps-back" role="group" aria-label="ביטול וחזרה"
@@ -258,6 +252,57 @@
       </span>
       <button type="button" class="grip-bar__btn" id="grip-rot" data-t="grip.rotate">סובבו</button>
       <button type="button" class="grip-bar__btn" id="grip-home" data-t="grip.home">למקום המקורי</button>
+    </div>
+
+    <!-- ── THE QUOTE BAR — what it costs, and how to send it ──────────────
+         ⚠ ONE ELEMENT, TWO PLACEMENTS, AND STILL EXACTLY ONE PRICE. Above
+         1100 px it stands in the wall under the right-hand lamp, which is
+         where the owner's son drew a circle and asked for the price to go.
+         Below 1100 px it is a slim bar pinned to the foot of the screen,
+         because the wall on a 390 px phone is ~140 px of plaster and the pill
+         landed ON the leaf — measured, and at 320 px it landed on it every
+         time. One instruction, two widths, two honest answers.
+
+         ⚠ AND THE SEND LIVES HERE NOW, ON EVERY STEP. That reverses part of
+         an instruction from 27.8 — *"remove the WhatsApp from the screen, it
+         will only be available at the end"* — and the reversal is deliberate
+         and narrow. What was removed was a full-width GREEN BAR across every
+         phone screen, offering to send a door somebody was still colouring;
+         that is still gone. What is here is a quiet line of text beside the
+         price. The green primary is still the summary's and only the
+         summary's. The rule it satisfies is older than both:
+         `PLAN.md` §0 — a customer must be able to hand Peretz an order at any
+         moment, and a wizard that buries the send behind eight screens is the
+         single worst change this site could make.
+
+         ⚠ IT IS IN THE MARKUP, NOT BUILT BY SCRIPT, so a page whose bundle
+         never arrives keeps a second route to the shop rather than losing
+         one. Its href is the same "the page did not load for me" message the
+         send card rests on, and `paint()` upgrades BOTH the moment there is a
+         real door — one writer over `[data-wa]`, never an id. -->
+    <div class="quote" id="quote">
+      <div class="quote__price">
+        <span class="send__label" data-t="price.est">מחיר משוער</span>
+        <button class="send__toggle" id="price-toggle" type="button"
+                aria-expanded="false" aria-controls="breakdown">
+          <strong class="send__figure" id="price" data-price>—</strong>
+          <span class="send__chev" aria-hidden="true"></span>
+          <span class="sr-only" data-t="price.breakdown">פירוט המחיר</span>
+        </button>
+        <div class="bd" id="breakdown" hidden>
+          <table class="bd__t"><tbody id="breakdown-body"></tbody></table>
+        </div>
+      </div>
+
+      <a class="quote__send" id="quote-wa"
+         href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F"
+         target="_blank" rel="noopener" data-wa>
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="quote__ico">
+          <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
+        </svg>
+        <span class="wa__on" data-t="send.waOnShort">שלחו בוואטסאפ</span>
+        <span class="wa__off" data-t="send.waOffShort">שלחו הודעה</span>
+      </a>
     </div>
   </section>
 
@@ -474,7 +519,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=081665cb"></script>
+<script src="assets/bundle.js?v=15703802"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a
