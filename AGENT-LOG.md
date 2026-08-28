@@ -23,6 +23,39 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-28 00:47 UTC — run 46: nothing worth changing — no new commits, deeper probe of rarer combinations found nothing
+
+**Looked at:** `git fetch` found nothing new since run 45's push
+(`37ac29d`). `AGENT.md` unchanged. `npm run build` produced no diff.
+Opened the site at phone/desktop (unchanged from run 45). Given the site
+is now feature-complete, spent this run probing combinations further from
+the default than usual rather than repeating the same shot: a leaf-and-half
+(sidelight double door) with the grid grille, coral lever and bronze
+פרזול — both leaves' windows, the divider strip, and the bronze-toned
+handle all rendered correctly; and the classical set at the largest size
+(`xl`) with a keypad (`SPECIAL_LOCKS` — קודן), which drew as its own
+distinct device beside the pull bar and lever, coherent and correctly
+priced. Also zoomed into the phone-width price pill after a full-page
+screenshot made it look like it was sitting over the door's edge — a
+closer crop showed it correctly clear on the wall by the lamp, matching
+run 45's fix; the full-page screenshot's scale was just misleading.
+
+**Instruments:** test ✓ (3,448,528 / 0, unchanged from run 45) · audit ✓
+(all seven viewports clean, including my run-44 overlap check and the
+newer language/shared-link checks) · profile ✓ (fully green) · collide ✓
+on both `all` (1,060 designs) and `boxes` (every fitting fits its
+declared footprint) · recreate ✓ (same already-documented catalogue gaps).
+
+**Changed:** nothing. No new work to review and the deeper probe of rarer
+option combinations found nothing wrong.
+
+**Left alone deliberately:** nothing outstanding this run.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry
+lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-27 20:47 UTC — run 45: nothing worth changing — a genuinely nice round, and my run-44 hardening held up under it
 
 **Looked at:** two commits — `922816b` ("five from a desktop screenshot":
