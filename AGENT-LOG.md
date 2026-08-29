@@ -23,6 +23,88 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-29 20:40 UTC — run 55: nothing worth changing — a defect I found was fixed under me by the primary session, and I verified their fix rather than duplicate it
+
+**Looked at:** `git fetch` pulled two human commits since run 54 —
+`31c1bd6` (CLAUDE.md brought back into line with the code, docs only) and
+`949570d` ("The room is a photograph now, and the door is still the
+drawing" — a large, carefully-measured feature: the scene behind the door
+is now `assets/room.webp`, a real photograph, composited as a CSS
+background; the door/frame/shadows stay the live SVG on top; bare mode,
+the gallery and the A4 sheet keep the drawn room untouched by
+construction). Read both in full, rebuilt, and walked the live page:
+desktop/phone/wide on arrival (the photographed plaster wall, stone
+floor, potted olive and two lit sconces all render correctly, colours
+read well against the warm wall, contact shadow looks right), confirmed
+`?bare=1` still shows the pure flat drawn room untouched, zero console
+errors on any route.
+
+**Found a real, reproducible defect while running the instrument suite:**
+`npm run audit`'s new "the photographed floor is the floor the door
+stands on" check (added in `949570d`) failed at exactly two of seven
+viewports — cusp (1100×800, 4.2 px) and wide (1680×950, 4.7 px) against
+its own 4 px gate. Confirmed deterministic across three repeated runs
+before investigating (CLAUDE.md §6). Traced it to the check's own
+edge-finder locking onto an object other than the true wall/floor line —
+confirmed with an annotated screenshot showing the door's own
+`data-base-y` sitting inside a dark band a few pixels above where the
+step-finder answered. Wrote and verified a fix (a minimum-luminance
+detector in place of the windowed step comparison) that agreed with
+`data-base-y` to 0.5–1.7 px at all seven viewports, falsified both ways
+(reverting reproduced the exact original failures; perturbing
+`PHOTO.floor` by 0.01 still made the new detector fire hard), and
+committed it locally.
+
+**Then a race:** `git fetch` before the final push found two more human
+commits already on origin — `5cf99c8` and `215d8ea` — pushed while I was
+mid-investigation. `5cf99c8` fixes a genuinely different defect (at 320 px
+every guided-flow step showed a question with no visible option to answer
+it — a real, well-measured fix, unrelated to the floor line) **and**
+independently fixes the exact same floor-line check I had just fixed,
+with a different and more complete diagnosis: the true cause was the
+trust band's scrim, whose gradient is deliberately built to start AT the
+floor line, occluding it from the sample column at those two viewports
+specifically. Their fix hides the chrome (`.trust`, `.stage__hud`,
+`.quote`, `.hint`, `.grip-bar`, `.toast`) with `visibility: hidden` before
+the screenshot is taken — the same "take the occluding object out of the
+frame" principle `?bare=1` already applies to the drawing — and keeps the
+original step-finder unchanged. Their own figures (0.3–1.7 px across all
+seven) are tighter than what my algorithmic fix achieved (0.5–1.7 px),
+which is itself evidence their diagnosis was the more complete one; my
+"groove overshoot" theory was a real but secondary effect, not the
+dominant cause.
+
+**Rather than push a redundant, conflicting fix for the same bug**, I
+reset my two local commits off (`git reset --hard
+origin/claude/door-builder-website-plan-rgg7gu` — both were unpushed, so
+nothing public was disturbed) and independently re-verified the human's
+fix from a clean checkout rather than trusting the commit message: full
+instrument run confirms `npm run audit` reports the floor line agreeing
+to 0.3–1.7 px at every viewport (matching their claimed figures exactly)
+and no faults anywhere else.
+
+**Instruments:** test ✓ (3,448,982 passed, 0 failed — matches the human
+round's own count) · audit ✓ (all seven viewports clean, including the
+floor-line check now at 0.3–1.7 px everywhere) · profile ✓ (both FALLOFF
+bands within tolerance, byte-identical to before this round — confirms
+bare mode is untouched by the photo feature) · collide -- all ✓ (1,060
+designs) · collide -- boxes ✓ (MOUNT_REACH 121 covers the deepest fitting
+at 111) · recreate ✓ (same ten long-documented catalogue gaps, nothing
+new).
+
+**Changed:** nothing — my own fix for the floor-line check was correct
+but is superseded by the primary session's own, more complete fix for the
+same defect, verified independently rather than assumed.
+
+**Left alone deliberately:** `PHOTO.floor`, `PHOTO.aspect` and the photo
+placement feature — the calibration was never the problem, on either
+diagnosis. The three items reserved for Peretz (hardware finish, the
+three missing Rav Bariach colours, every price) were not touched.
+
+**Commit:** none (nothing to add beyond this log entry — see below)
+
+---
+
 ## 2026-08-29 15:40 UTC — run 54: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 53 (`1e63d15` still
