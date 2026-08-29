@@ -63,8 +63,7 @@ run. The three items still open (hardware finish, the three gallery colours
 missing from the chart, every price) remain Peretz's, per ASK-PERETZ.md,
 and were not touched.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** 1b38df6
 
 ---
 
