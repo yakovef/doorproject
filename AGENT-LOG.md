@@ -101,7 +101,8 @@ placement feature — the calibration was never the problem, on either
 diagnosis. The three items reserved for Peretz (hardware finish, the
 three missing Rav Bariach colours, every price) were not touched.
 
-**Commit:** none (nothing to add beyond this log entry — see below)
+**Commit:** 30897eb (log only — the code fix is the primary session's own
+`5cf99c8`/`215d8ea`, verified rather than duplicated)
 
 ---
 
