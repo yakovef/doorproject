@@ -23,6 +23,37 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-29 15:40 UTC — run 54: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 53 (`1e63d15` still
+the tip on both sides). `npm run build` produced no diff. Walked the live
+page in Chromium at 1440×900: navigated to the lock (מנעול) category via
+its nav circle, confirmed all seven lockset tiles render distinctly with
+correct prices (cylinder-only free, Coral/Rotem/Sapir free, Kadur/Kadur-al-
+orech ₪200, etc.), picked one, and exercised the undo control — no console
+errors on any step. Also confirmed the summary/quote page (reached
+incidentally while probing nav-circle indices) still shows the full spec
+table and the "בחרתם דלת?" send prompt correctly.
+
+**Instruments:** test ✓ (3,448,747 passed, 0 failed — identical to runs
+51–53) · audit ✓ (all seven viewports clean, no faults) · profile ✓ (both
+FALLOFF bands within tolerance; the moulding-bead check still green at
+0.999 lower/upper) · collide -- all ✓ (1,060 designs, faceObstacles agrees
+with the drawing everywhere) · collide -- boxes ✓ (every fitting inside
+its own declared box; MOUNT_REACH 121 covers the deepest bolted fitting at
+111) · recreate ✓ (same ten long-documented catalogue gaps, nothing new).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run. The
+three items reserved for Peretz (hardware finish, the three missing Rav
+Bariach colours, every price) were not touched.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-29 10:40 UTC — run 53: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 52 (`973daa7` still
