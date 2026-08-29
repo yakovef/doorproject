@@ -133,7 +133,7 @@ written rather than rewritten, but do not add more.
 
 ---
 
-## 0c. Where it stands today — 27.8.2026
+## 0c. Where it stands today — 28.8.2026
 
 **⚠ THE PRICES ARE REAL AND THE SITE IS NOT DEPLOYED — deliberately.** Peretz
 gave the numbers on 26.8.2026; `PLACEHOLDER` is `false` and the "גרסת פיתוח"
@@ -285,22 +285,27 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **5,403,239 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
-  ANYTHING; it is the product of the catalogue's list lengths, and this round
-  cut fourteen stripe options out of `DETAILS` and added four axes. Read the
-  failure count.
-- `npm run audit` — clean at all seven `VIEWS`, including the restated arrival
-  check (exactly one step live at every width), a walk over every navigator
-  circle, the keyboard walk, the bare-mode motion kill, and the language route
-  (three languages, the mirror check, and the door surviving a switch).
+- `npm test` — **3,448,747 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+  ANYTHING; it is the product of the catalogue's list lengths. Read the failure
+  count. (This line said **5,403,239** for two rounds after the stripe rework
+  cut fourteen `DETAILS` entries — a number in prose describing a thing that
+  had already moved, which is §6's standing complaint about this file.)
+- `npm run audit` — clean at all seven `VIEWS`, including the arrival check
+  (exactly one step live at every width), a walk over every navigator circle
+  that now also asserts **a visible send and a readable price on every step**
+  and that every `[data-wa]` carries the identical href, the keyboard walk, the
+  bare-mode motion kill, the **`prefers-reduced-motion` route** (nothing left
+  running, delays included), and the language route.
 - `npm run collide` — clean on `all` and `boxes`.
-- `npm run latency` — **132 ms** against a 600 ms gate, down from 501: one step
-  in the DOM instead of the whole cabinet.
+- `npm run latency` — **158 ms** against a 600 ms gate.
 - `npm run profile` — **all four rows green.** See below; this is not
   straightforwardly good news.
-- `npm run sheets` — current, and the bare families come back byte-identical on
+- `npm run mottle` — plain leaf **0.0181**, panels 0.1069.
+- `npm run sheets` — current. The bare families come back byte-identical on
   every commit that does not touch the drawing, which is the proof motion did
-  not leak into it.
+  not leak into it — and ⚠ **when they move on a commit that could not have
+  moved them, find out what did** rather than stamping them. That is how the
+  chrome painted across all 110 of them was found (§0b, 28.8).
 
 ### Red, and known
 
@@ -346,10 +351,25 @@ twelve phases, all executed — and it was deleted with the five before it on
 27.8.2026. What still governs is in §10; the assumption ledger is in §9; the
 fifteen assertions the last plan owed are in §7.
 
-The work since has come from the owner's son reading the live site on his phone
-and saying what is wrong with it. That is a better source than a plan: every
-round of it has found something no instrument in this repo had an opinion
-about. Take those reports literally.
+The work since has come from two places, and both beat a plan.
+
+**The owner's son reading the live site on his phone and saying what is wrong
+with it.** Every round of it has found something no instrument in this repo had
+an opinion about. Take those reports literally.
+
+**And walking the page as a customer would.** The design round of 28.8 was
+briefed from outside and its single most valuable half hour was not the brief:
+it was `tools/_final.mjs` driving the guide forward with the BUTTON, one step at
+a time, at four widths — which found that the way on was below the fold on every
+question step on every phone. ⚠ `npm run audit` could not have found it, because
+its walk clicks the RAIL: that check asks "can every step be reached from
+anywhere", and a rail click never asks whether the forward button is on screen.
+**Two different questions, and only one of them had ever been put.**
+The brief also brought four planning documents that live only on
+`claude/app-design-mockup-review-qt00n6` — `DESIGN-LEVEL.md`, `GUIDED-FLOW.md`,
+`REALISM2.md`, `MOCKUP2.md`. They were read, reconciled against what had already
+shipped, and executed as a delta; they are NOT on this branch and should not be
+copied here. `git show origin/claude/app-design-mockup-review-qt00n6:<file>`.
 
 ## 1. Standing constraints — do not violate
 
@@ -362,17 +382,27 @@ about. Take those reports literally.
   nearest real one.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   the option ORDER or the bit layout requires a `VERSION` bump in
-  `js/url-state.js` (currently **13**), so an old code is *refused with a
+  `js/url-state.js` (**19** as of 28.8), so an old code is *refused with a
   notice* rather than decoded into a different door. **Appending to the end of
   a list costs no bump. Changing a property — not the id, not the order —
   costs no bump.**
+  ⚠ This line said **13** through six bumps. A version number written into
+  prose is a number that goes stale the first time somebody obeys the rule
+  around it, so **read `js/url-state.js` and do not trust this figure** — it is
+  here for orientation, not for arithmetic.
 - **Retired URL parameters `f`, `a`, `z`, `i` must never be reused**, and
   `fromQuery` ignores them without a notice: withdrawing an option is our
   change, not that customer's mistake.
 - **All money is in agorot (integers).** Never floats.
-- **Every price is `PLACEHOLDER = true`** until Peretz answers. `js/prices.js`
-  holds all 70 in one screen; flipping the flag is the last edit of that
-  evening, in that same file.
+- **⚠ THE PRICES ARE REAL. `PLACEHOLDER` IS `false`.** This rule used to read
+  "every price is `PLACEHOLDER = true` until Peretz answers"; he answered on
+  26.8, the flag was flipped, and the "גרסת פיתוח" strip came down — and this
+  line went on saying the opposite for two days, in the section of this file
+  whose whole job is telling the next reader what they may not do. §0c has said
+  the true thing all along, which is worse rather than better: **one file
+  contradicting itself is how a rule gets obeyed backwards.**
+  `js/prices.js` still holds all 70 in one screen, in plain shekels, and it is
+  still the only place a shekel figure may be written.
 - **Never change a measured number by eye.** Re-measure against a photograph.
   `REALISM.md` §6 is the governing rule of the whole drawing.
 - **Never delete a test or weaken an assertion to make a change pass.**
@@ -405,20 +435,24 @@ on his own laptop (`PLAN.md` §3, §8.1). **Three files are the whole site**, an
 that promise is load-bearing: no fourth file, no webfont, no CDN.
 
 ```
-index.html          the page: stage, choices panel, send panel, gallery, sheet
-css/app.css         RTL-first, logical properties throughout         1,623 lines
-js/catalog.js       every option. THE WIRE FORMAT. Read its header.    964
-js/prices.js        every price, plain shekels, one screen              193
-js/renderer.js      the door. Pure: render(state) -> SVG string.      6,170
-js/url-state.js     state <-> URL, and the short code (BigInt)          558
-js/rules.js         what cannot go with what, and repair()              534
-js/price.js         agorot only. priceParts is the ONE breakdown        137
-js/spec.js          THE door, as rows. One statement, four readers      207
-js/share.js         the WhatsApp message — this is the product          448
+index.html          the page: stage, quote bar, choices, send, gallery,
+                    sheet                                              616 lines
+css/app.css         RTL-first, logical properties throughout         2,879
+js/catalog.js       every option. THE WIRE FORMAT. Read its header.  1,694
+js/prices.js        every price, plain shekels, one screen              399
+js/renderer.js      the door. Pure: render(state) -> SVG string.      8,418
+js/url-state.js     state <-> URL, and the short code (BigInt)          836
+js/rules.js         what cannot go with what, and repair()              726
+js/price.js         agorot only. priceParts is the ONE breakdown        363
+js/spec.js          THE door, as rows. One statement, four readers      285
+js/share.js         the WhatsApp message — this is the product          496
+js/copy.js          every user-visible string, in three languages.
+                    ZERO IMPORTS on purpose — it sits under every
+                    other module, so nothing it needs can be a cycle    661
 js/colour.js        darken / lighten / scaleTone / contrast              81
-js/app.js           wiring, the cabinet, the gallery, the sheet, undo 1,943
+js/app.js           wiring, the flow, the gallery, the sheet, undo    2,831
 js/works.js         30 real doors, GENERATED by npm run corpus           48
-test/units.mjs      ~4.0M assertions, no framework                   2,285
+test/units.mjs      ~3.4M assertions, no framework                   3,033
 tools/*.mjs         measurement instruments, not scripts (§7)
 research/works/     129 photographs, 31 measured records (30 usable)
                     INVENTORY.md — every fitting in the corpus
@@ -469,18 +503,48 @@ tall door and the picture's box grew with the door — which `fitStage` then
 scaled back, making every size come out the same drawn width.
 
 **`render` therefore emits TWO boxes** and they are not the same box:
-- `viewBox` is tight around THIS door. Bare mode and every measurement harness
-  get it, and that is deliberate — framing a narrow door inside the
-  tall-and-wide scene would hand `npm run profile` a third fewer pixels to
-  measure and read as a change in the drawing (§8 has that bruise already).
-- `data-fit-x/y/w/h` is `STAGE_BOX`, the fixed scene, identical for every door.
-  `fitStage()` crops to it, so the on-screen scale is a constant. It only ever
-  WIDENS that rect to the stage's shape. **Bare mode skips `fitStage`.**
+- `viewBox` is tight around THIS door, with `PAD` of air. Bare mode and every
+  measurement harness get it, and that is deliberate — framing a narrow door
+  inside the tall-and-wide scene would hand `npm run profile` a third fewer
+  pixels to measure and read as a change in the drawing (§8 has that bruise).
+- `data-fit-x/y/w/h` is **`FIT_BOX`**, the fixed scene trimmed of the vertical
+  padding the page does not need, identical for every door. `fitStage()` crops
+  to it, so the on-screen scale is a constant. It only ever WIDENS that rect to
+  the stage's shape. **Bare mode skips `fitStage`.**
+
+⚠ **AND THERE IS A THIRD RECTANGLE, `STAGE_BOX`, WHICH IS THE ROOM ITSELF.**
+The backdrop is painted from it, the vignette is centred on it and the sconces
+are stood off it — so it is the scene's own extent and it does not move.
+`FIT_BOX` is `STAGE_BOX` less `FIT_TRIM` (40 off the top, 130 off the bottom).
+The two were one rectangle until 28.8, and separating them is what let the door
+grow 6% on screen without moving a single pixel of any bare render: the crop is
+height-driven at every viewport this app has — measured, stage aspect 1.33
+against the scene's 0.536 — so vertical padding is exactly what costs the door
+its size and horizontal padding costs nothing.
+⚠ **The trim could NOT come out of `PAD`**, which was the first attempt: `PAD`
+feeds the natural `viewBox` too, so trimming it moves all 110 committed sheets,
+and that is not a regeneration to redo — it is the "bare families
+byte-identical" proof itself.
+⚠ **And the ceiling on this is arithmetic, not effort.** A door is 850×2050 and
+a desktop stage is 1060×794: fit the whole door in that frame and the leaf
+cannot pass 31% of the width even with zero margin, and cropping its head or
+its foot is forbidden — a configurator exists so somebody can judge
+proportions. Making the door the hero is therefore a LIGHTING problem.
 
 The door stands in a room from `REALISM2.md` stage D: a **floor** that falls
 away from a skirting shadow instead of meeting a ruled line, two **sconces**,
 and the door **reflected in the floor** as a `<use>` of `<g id="door">`. There
 is no alcove — see below.
+
+⚠ **The room has its own light, and it is painted UNDER the door.** A warm pool
+centred a little above the door's middle (`#roomPool`) and a falloff at the
+corners (`#roomFall`), both inside `#backdrop`. Deepening the existing
+`#vignette` instead would have been wrong: that one is painted LAST and covers
+the leaf, and it is a radial centred at 0.44 of the scene, so deepening it
+darkens a leaf's head and foot more than its middle — a change in the vertical
+fall by definition, and the vertical fall is what `npm run profile` watches.
+Predicted in the code before the run, then checked: `mottle` and every
+`profile` row identical to the digit, before and after.
 
 ⚠ Four things about the room that were wrong once:
 - **Every plane is a black or white overlay, never a colour.** The wall and
@@ -1076,8 +1140,8 @@ something was tuned by eye against nothing and landed on "slightly better".
 
 | tool | what it answers |
 |---|---|
-| `npm test` | ~4.0M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at seven viewports plus seven failure routes — every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven |
+| `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
+| `npm run audit` | the real page at seven viewports plus the failure routes — every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, and a `prefers-reduced-motion` route that asserts nothing is left running (delays included — see §0b, 28.8) |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1305,13 +1369,27 @@ note on the single panel, and `ASK-PERETZ.md` §2.
   carried longest — both BUILT on 26.8 (`FALLOFF` grain/drift, and the stage
   taking columns 2–3 above 1280). They are named here only because a reader of
   the old change log will meet them as open.
-- **Incremental colour repaint** — declined on the measurement (66–142 ms on a
-  healthy container), and it would put a second way of producing the drawing
-  beside `render(state)`. The condition for revisiting was "if `npm run
-  latency` goes red", and **it is red today — but on the previous commit too,
-  by 5 ms, so it is the container and not the drawing** (§0c has the
-  attribution). Re-measure on a healthy container before treating that
-  condition as met.
+- **Incremental colour repaint** — declined on the measurement, and it would
+  put a second way of producing the drawing beside `render(state)`. The
+  condition for revisiting was "if `npm run latency` goes red".
+  ⚠ **It is not red, and this entry said it was.** The line above used to read
+  "it is red today — but on the previous commit too, by 5 ms, so it is the
+  container"; measured on 28.8 the worst door answers a tap in **158 ms against
+  a 600 ms gate**, which is a quarter of the budget. The container was sick
+  that day and the sentence outlived it. The condition is not met.
+
+- **A satin sheen on the leaf** — asked for by `REALISM2.md` stage E and by the
+  design brief of 28.8, BUILT TWICE and cut both times. The table is in §0b and
+  the whole argument sits in `renderer.js` beside `FALLOFF`, where the next
+  person to have the idea will meet it. The short version: no photograph asks
+  for it (the corpus rises ~3% left to right, it does not carry a band), it
+  swung `npm run profile`'s dark rows by 2.7 points and then failed the gate,
+  and nobody can explain why a purely HORIZONTAL overlay moved an
+  upper-against-lower RATIO at all.
+  ⚠ **What the leaf is actually short of is MOTTLE**, not specular: 0.0181
+  against an honestly-corrected corpus figure near 0.042. That is a `drift`
+  question with a photograph behind it, and it is the best next piece of
+  drawing work in the repository.
 
 ### From the corpus, recorded rather than built
 Carried over from `ROUND5.md`, which has been deleted now that its plan is
@@ -1390,10 +1468,14 @@ started' is worse than no list at all"* — and it went one round before anybody
 noticed, which is how long it takes for an unattended agent to build a thing
 twice. Corrected 28.8.
 
-⚠ The mobile sticky CTA used to sit in that list and **it ships** — `.dock`,
-fixed at the bottom below 1100 px. It stayed listed as unbuilt long enough that
-an unattended agent could have built it twice. **A finished feature filed under
-"not started" is worse than no list at all.**
+⚠ The mobile sticky CTA used to sit in that list and **it ships** — though not
+under the name this paragraph gave it. `.dock` was deleted on 27.8 and the
+thing that does the job now is `.quote`, the price-and-send bar: pinned to the
+foot of the screen below 1100 px, standing in the wall under the right-hand
+lamp above it. Third correction to one paragraph, which is the point of it:
+**a finished feature filed under "not started" is worse than no list at all**,
+and a feature described by the name of the element that used to implement it is
+the same fault one level down.
 
 ---
 
