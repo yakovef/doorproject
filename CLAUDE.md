@@ -1606,6 +1606,23 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **The photograph costs the scroll nothing, and that was worth measuring
+  rather than hoping.** The stage is STICKY on a phone and now carries an 82 KB
+  background image — a large raster re-composited under the door on every
+  frame is exactly the shape of change that turns a smooth scroll janky, and
+  `GUIDED-FLOW.md` §3's *"60 fps at 4× CPU throttle"* is a stated gate.
+  Same measurement as 28.8, same conditions, `tools/_perf.mjs`:
+
+  | | median | p95 | worst | frames > 20 ms |
+  |---|---|---|---|---|
+  | 390×844 | 16.7 ms | 17.4 | 18.0 | **0** of 79 |
+  | 320×568 | 16.7 ms | 17.7 | 21.2 | 1 of 79 |
+
+  Unchanged from the drawn room (16.8 ms worst, 0 over 20). The one frame at
+  320 is a single sample and is reported rather than rounded away.
+  `npm run latency` moved 158 → 180 ms against a 600 ms gate, which is the
+  background paint and is a quarter of the budget.
+
 - **⚠ AT 320 PX NO STEP SHOWED AN ANSWER, AND NOTHING IN THIS REPOSITORY WAS
   ASKING.** A guided flow whose live step shows no options is not guided.
   `npm run audit` proved every step was REACHABLE (its walk clicks the rail)
