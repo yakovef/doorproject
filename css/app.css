@@ -727,6 +727,34 @@ svg { direction: ltr; }
   .panel { overflow-y: auto; block-size: 100%; }
 }
 
+/* ⚠ AND THE SCROLLBAR IS THE PLATFORM'S UNTIL IT IS ASKED NOT TO BE.
+   Reported off a Windows screenshot and invisible in this container: headless
+   Chromium here gives an overlay bar 2 px wide, Windows gives the classic
+   ~17 px one with arrow buttons at both ends — a hard grey stripe with a
+   scrollbar thumb in it, rammed down the inside edge of a card that is
+   supposed to be floating paper, splitting the page beside the photograph.
+   Same class of thing as the Assistant fallback: the platform default is what
+   most people actually see, and this container is the one place that never
+   shows it.
+   `thin` with the page's own hairline as the thumb; the track is transparent
+   so the card's own surface runs behind it. `::-webkit-scrollbar` for the
+   engines that ignore the standard properties, with the same two colours. */
+.panel, .works, .saved__list, .bd, #choices {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+.panel::-webkit-scrollbar, .works::-webkit-scrollbar,
+.saved__list::-webkit-scrollbar, .bd::-webkit-scrollbar,
+#choices::-webkit-scrollbar { inline-size: 8px; block-size: 8px; }
+.panel::-webkit-scrollbar-track, .works::-webkit-scrollbar-track,
+.saved__list::-webkit-scrollbar-track, .bd::-webkit-scrollbar-track,
+#choices::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb, .works::-webkit-scrollbar-thumb,
+.saved__list::-webkit-scrollbar-thumb, .bd::-webkit-scrollbar-thumb,
+#choices::-webkit-scrollbar-thumb {
+  background: var(--rule); border-radius: 999px;
+}
+
 /* ── stage ────────────────────────────────────────────────── */
 
 .stage-wrap {
@@ -941,6 +969,19 @@ svg { direction: ltr; }
    sconce brighten. With `<link rel="preload">` in the head the picture is
    usually decoded before the first paint anyway, so the case being animated is
    the rare one. */
+/* ⚠ AND THE PICTURE GETS AN EDGE, above 1100 where there is a header band over
+   it. The page's paper and the photograph's plaster are within a few points of
+   each other, so the top of the room arrived as an accidental tonal step —
+   reported off a 1920 screenshot as the headline band and the picture running
+   into one another. A hairline says the picture starts here on purpose, which
+   is also the honest thing for a rendering to say.
+   Only where there IS something above it: below 1100 the `<h1>` is `.sr-only`
+   and the stage's neighbour is the navigator, which already carries its own
+   `border-block-end`. Two rules stacked would be a two-pixel bar. */
+@media (min-width: 1100px) {
+  .is-photo .stage { border-block-start: 1px solid var(--rule); }
+}
+
 /* ⚠ The drawn room goes only once the photograph is up, and this selector is
    the whole of it: `#backdrop` is the group holding the wall, the floor, its
    texture, the warm pool, the falloff, both sconces and the skirting shadow.
@@ -1556,6 +1597,26 @@ svg { direction: ltr; }
   scroll-snap-type: inline proximity;
   scroll-padding-inline: 14px;
   overscroll-behavior-inline: contain;
+  /* ⚠ IT ALWAYS SCROLLS, AND NOTHING SAID SO. Reported off a 1920 screenshot:
+     the row of circles is cut at the edge with no sign there is more of it.
+     Measured in the choices card at that width — 310 px of room against
+     424 px of circles, so **3 of 9 are off the end** — and the row cannot
+     simply be made to fit: nine circles at the 44 px tap floor (T14) need
+     428 px and the card is capped at 360.
+     So the row fades at both ends instead. It is a permanent fade rather than
+     one switched on by a class, because the overflow is permanent: nine
+     circles exceed the rail at EVERY viewport this app has, from 320 px
+     (320 available) to 1680 (360). A conditional class would be a second
+     statement of a fact that is simply always true.
+     `scrollbar-width: none` above is why it needs one at all — the row hides
+     its scrollbar so the door is not framed by a grey stripe, and hiding the
+     affordance is what left nothing. */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 18px,
+                    #000 calc(100% - 18px), transparent 100%);
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 18px,
+                    #000 calc(100% - 18px), transparent 100%);
 }
 .steps::-webkit-scrollbar { display: none; }
 .steps__step { scroll-snap-align: center; }

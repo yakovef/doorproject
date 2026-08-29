@@ -52,6 +52,16 @@ const VIEWS = [
   { name: 'narrow-d', w: 1152, h: 800 },
   { name: 'laptop',   w: 1280, h: 720 },
   { name: 'wide',     w: 1680, h: 950 },
+  /* ⚠ AN EIGHTH, AND IT IS HERE BECAUSE A FAULT GOT PAST THE SEVEN. A
+     1920×918 laptop — a very ordinary machine, and the one the owner's son
+     actually opened the page on — makes the stage 1540×783, an aspect of
+     1.95 against `wide`'s 1.60. The photographed room's sconces were cropped
+     clean off the top of it and the price card had climbed out of the picture
+     onto the language buttons, and every one of the seven viewports above was
+     green. The widest of them clipped the same sconce by TWO PIXELS and
+     passed. A viewport list that stops before the screens people own is a
+     list that reports on a page nobody has. */
+  { name: 'wide-short', w: 1920, h: 918 },
 ];
 
 /* Read off the page rather than listed here. The list was hand-kept and it had
@@ -1534,7 +1544,7 @@ for (const v of VIEWS) {
       const baseY = Number(svg.dataset.baseY);
       if (!Number.isFinite(baseY)) return { noBase: true };
       return { x: r.x, y: r.y, w: r.width, h: r.height,
-               wallX: fr.x - r.x + fr.width + (r.width - (fr.x - r.x + fr.width)) * 0.5,
+               frL: fr.x - r.x, frR: fr.x - r.x + fr.width, frW: fr.width,
                drawn: (baseY - vb[1]) * (r.height / vb[3]) };
     });
     if (!g) { fault(v.name, 'photo-mode did not come up, so the calibration cannot be read'); await pg.close(); continue; }
@@ -1561,17 +1571,45 @@ for (const v of VIEWS) {
       clip: { x: g.x, y: g.y, width: g.w, height: g.h } });
     const im = load('/tmp/audit-floor.png');
     const at = (x, y) => lum(im.d, ((y | 0) * im.w + (x | 0)) * 4);
-    let best = -1, bestY = -1;
-    for (let y = Math.round(im.h * 0.80); y < im.h - 6; y++) {
-      let a = 0, c = 0;
-      for (let k = 1; k <= 4; k++) { a += at(g.wallX, y - k); c += at(g.wallX, y + k); }
-      const d = Math.abs(a - c) / 4;
-      if (d > best) { best = d; bestY = y; }
+    /* ⚠ SAMPLED BESIDE THE DOOR, WITHIN ONE DOOR-WIDTH — and the first version
+       took ONE column halfway out to the edge of the stage, which is the third
+       time tonight this check measured the wrong object.
+       It reported the floor 38.7 px out at 1680 and 16.8 at 1920×918, both on
+       the wide crop, and the page was right: `tools/_bd2.mjs` re-measured both
+       SHIPPED assets and got exactly the constants the code holds — 83.87% and
+       87.93%, residual 1.2 px over 231 and 336 agreeing columns. What differs
+       is that the wide crop shows far more dappled floor, and a single column
+       out near the edge lands in it and finds a foliage edge.
+       The constant was measured in the picture's CENTRE HALF for precisely
+       that reason, so the check now looks where the constant came from: the
+       band of floor immediately either side of the casing, a door-width wide,
+       per-column argmax, median of what agrees. Measured across both rooms and
+       all eight viewports it reads −0.5 to +1.3 px.
+       ⚠ THE TOLERANCE DID NOT MOVE. It is 4 px, as it was when the check was
+       written; what changed is where the instrument points. Widening a gate to
+       fit a reading is how a real misalignment would have got through. */
+    const cols = [];
+    for (let x = Math.round(g.frR + 16); x < Math.min(im.w - 6, g.frR + 16 + g.frW); x += 3) cols.push(x);
+    for (let x = Math.max(6, Math.round(g.frL - 16 - g.frW)); x < g.frL - 16; x += 3) cols.push(x);
+    const ys = [];
+    for (const x of cols) {
+      let s = -1, sy = -1;
+      for (let y = Math.round(im.h * 0.80); y < im.h - 6; y++) {
+        let a = 0, c = 0;
+        for (let k = 1; k <= 4; k++) { a += at(x, y - k); c += at(x, y + k); }
+        const d = Math.abs(a - c) / 4;
+        if (d > s) { s = d; sy = y; }
+      }
+      if (s > 5) ys.push(sy);
     }
+    ys.sort((a, c) => a - c);
+    const bestY = ys.length ? ys[ys.length >> 1] : -1;
+    const best = ys.length;                 // how many columns found a step at all
     const delta = bestY - g.drawn;
-    if (best < 5) {
-      fault(v.name, `no wall/floor step found in the photograph (strongest ${best.toFixed(1)}/255) `
-                  + '— the room is not where the page thinks it is');
+    if (best < 8) {
+      fault(v.name, `only ${best} column(s) beside the door found a wall/floor step `
+                  + '— the room is not where the page thinks it is, or this check has '
+                  + 'stopped being able to see the floor');
     } else if (Math.abs(delta) > TOL) {
       fault(v.name, `the photographed floor is ${delta.toFixed(1)} px from the drawn one `
                   + `(tolerance ${TOL}) — the door is standing above or below the ground`);
@@ -1580,6 +1618,116 @@ for (const v of VIEWS) {
     }
     await pg.close();
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE ROOM KEEPS ITS LAMPS, AND THE PRICE STAYS IN THE PICTURE.
+   ═══════════════════════════════════════════════════════════════════
+   Reported from outside off a 1920×918 screenshot, in four words: *the room
+   has no lamps.* Both faults in it were one fault. The portrait crop is scaled
+   by WIDTH to cover a wide stage, which makes it 2053 px tall inside a 783 px
+   hole; everything above the pinned floor line climbs out of the top, the
+   sconces went with it (measured: the band sat at y −173 to −52), and the
+   price card — which hangs off `--lamp-b` — faithfully followed its lamp out
+   of the stage and landed on the language buttons, 6,288 px² of overlap.
+
+   ⚠ THE CHECK THAT LET IT THROUGH TESTED ONE AXIS. The spike asked whether the
+   sconces were far enough apart HORIZONTALLY for the widest door to clear
+   them, decided the portrait was the better crop on that basis, and never
+   asked where they were vertically. So this asks for the whole rectangle, on
+   both counts, in pixels off the rendered page:
+
+     · the right-hand sconce is wholly inside the stage, with a lamp's height
+       of wall above it — a fitting jammed against the top edge reads as
+       cropped whether or not it is, which is the criterion `pickRoom` uses
+     · the price card is inside the stage and touches no part of the chrome
+       standing on the wall beside it
+
+   ⚠ AND IT KNOWS WHICH ROOM IS UP. Two crops ship and `js/app.js` chooses by
+   measuring; a check that assumed one of them would be asserting about a
+   picture that is not on screen — which is how the original went wrong. It
+   reads the file out of the computed `background-image` and takes that room's
+   own constants. */
+{
+  console.log('\nthe room keeps its lamps, and the price stays in the picture');
+  /* Fractions of each ORIGINAL, measured in `tools/_bd2.mjs`. The same numbers
+     are in `js/app.js`'s ROOMS — deliberately, because an instrument that
+     borrows the implementation's own table cannot notice the table changing,
+     and CLAUDE.md §7 says so in as many words. */
+  const ROOMS = {
+    'room.webp':      { floor: 1214.5 / 1448, lampTop: 573 / 1448, lampBot: 659 / 1448, lampCx: 450 / 1086 },
+    'room-wide.webp': { floor: 827.4 / 941,   lampTop: 326 / 941,  lampBot: 402 / 941,  lampCx: 452.5 / 1672 },
+  };
+  const PAGE = 'file://' + process.cwd() + '/index.html';
+  for (const v of VIEWS) {
+    if (skipped.includes(v.name)) continue;
+    const pg = await b.newPage({ viewport: { width: v.w, height: v.h } });
+    await pg.goto(PAGE);
+    await pg.waitForTimeout(1300);
+    const r = await pg.evaluate(() => {
+      const st = document.querySelector('#stage');
+      if (!st) return { none: true };
+      const cs = getComputedStyle(st), box = st.getBoundingClientRect();
+      const file = (cs.backgroundImage.match(/([a-z0-9-]+\.webp)/) || [])[1] || null;
+      const q = document.querySelector('.quote');
+      const qFixed = q && getComputedStyle(q).position === 'fixed';
+      const qr = q ? q.getBoundingClientRect() : null;
+      const ov = (a, c) => (a && c)
+        ? Math.max(0, Math.min(a.right, c.right) - Math.max(a.left, c.left))
+        * Math.max(0, Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top)) : 0;
+      const hud = [...document.querySelectorAll('.stage__hud .hud__slot')]
+        .map(e => e.getBoundingClientRect());
+      return {
+        photo: document.documentElement.classList.contains('is-photo'),
+        file,
+        w: parseFloat(cs.backgroundSize),
+        h: parseFloat(cs.backgroundSize.split(' ')[1]),
+        top: parseFloat(cs.backgroundPositionY),
+        boxW: box.width, boxH: box.height, boxT: box.top, boxB: box.bottom,
+        qFixed, qTop: qr ? qr.top : null, qBot: qr ? qr.bottom : null,
+        hudOverlap: Math.round(hud.reduce((s, x) => s + ov(qr, x), 0)),
+        hudCount: hud.length,
+      };
+    });
+    await pg.close();
+    if (r.none || !r.photo) { fault(v.name, 'photo-mode did not come up, so the room cannot be checked'); continue; }
+    const room = ROOMS[r.file];
+    /* ⚠ §5.15 — a file this check does not know about is a check that has
+       stopped asking, not a page that is fine. */
+    if (!room) {
+      fault(v.name, `the stage is showing "${r.file}", which this check has no `
+        + 'constants for — a room was added or renamed and nothing here noticed');
+      continue;
+    }
+    const lampTop = r.top + room.lampTop * r.h;
+    const lampBot = r.top + room.lampBot * r.h;
+    const lampH = lampBot - lampTop;
+    const lampX = r.boxW / 2 + room.lampCx * r.w;
+    if (lampTop < lampH) {
+      fault(v.name, `the room's sconces are at y ${lampTop.toFixed(0)}..${lampBot.toFixed(0)} `
+        + `of a ${r.boxH.toFixed(0)} px stage — less than their own height of wall above them, `
+        + 'so they read as cropped. The room is the wrong crop for this shape');
+    } else if (lampBot > r.boxH || lampX + r.w * 0.02 > r.boxW) {
+      fault(v.name, `the room's sconces fall outside the stage (y ${lampTop.toFixed(0)}..`
+        + `${lampBot.toFixed(0)}, x ${lampX.toFixed(0)} of ${r.boxW.toFixed(0)})`);
+    }
+    /* The quote bar is FIXED at the foot of the screen below 1100 and hung on
+       the wall above it. Only the wall placement can leave the picture. */
+    if (!r.qFixed) {
+      if (r.qTop < r.boxT - 1 || r.qBot > r.boxB + 1) {
+        fault(v.name, `the price card is outside the stage (${Math.round(r.boxT - r.qTop)} px above `
+          + 'its top) — it is anchored to a lamp and the lamp left the frame');
+      }
+      if (!r.hudCount) {
+        fault(v.name, 'no .hud__slot on the wall — the overlap check has nothing to compare against');
+      } else if (r.hudOverlap > 0) {
+        fault(v.name, `the price card covers ${r.hudOverlap} px² of the wall chrome `
+          + '(the language buttons, or undo/redo)');
+      }
+    }
+    if (!faults) { /* keep the log quiet on a clean run */ }
+  }
+  if (!faults) console.log('  every stage: lamps whole, price card inside the picture, chrome clear');
 }
 
 /* ═══════════════════════════════════════════════════════════════════

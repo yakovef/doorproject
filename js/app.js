@@ -2480,36 +2480,121 @@ function markGroup(g, blocked) {
  */
 
 /**
- * ── THE PHOTOGRAPHED ROOM ─────────────────────────────────────────────────
+ * ── THE PHOTOGRAPHED ROOM, IN TWO CROPS ───────────────────────────────────
  *
- * Four numbers about `assets/room.webp`, all measured off the original in
- * `tools/_bd2.mjs` and every one of them a fraction, so re-encoding or
- * re-scaling the file cannot invalidate them. `npm run backdrop` produces the
- * file; this describes it.
+ * The owner supplied the same entrance framed 3:4 and 16:9, and both ship.
+ * Every number here is a FRACTION of the original, measured in
+ * `tools/_bd2.mjs`, so re-encoding or re-scaling a file cannot invalidate one.
+ * `npm run backdrop` produces the files; this table describes them, and
+ * `pickRoom` below chooses between them by measuring rather than by a
+ * breakpoint.
  *
- *   floor   the wall/floor junction, down from the top. y = 1214.5 of 1448.
- *           Found as the strongest horizontal luminance step across the centre
- *           half of the picture: tilt -0.21°, residual 1.21 px over 229
- *           columns, which is what "square-on" looks like as a number.
- *   aspect  1086 / 1448. ⚠ Load-bearing: 0.75 is narrower than the stage's
- *           crop at every viewport this app has (1.00 on a phone through 1.42
- *           at 1680), so `cover` always scales this picture by WIDTH — which
- *           is what puts its two sconces at a constant 10% and 90% of the
- *           stage whatever the screen, and what keeps the widest buildable
- *           door clear of them by 47 px even at 320.
- *   lampCx  the right-hand sconce's centre, from the picture's own centre:
- *           (992.5 - 542.5) / 1086.
- *   lampBot its foot, down from the top: 659 / 1448.
+ *   floor    the wall/floor junction, down from the top. Found as the
+ *            strongest horizontal luminance step across the centre half:
+ *            tilt -0.21° / -0.224°, residual 1.2 / 1.3 px. That is what
+ *            "square-on" looks like as a number.
+ *   aspect   width / height of the original.
+ *   lampCx   the right-hand sconce's centre, out from the picture's centre.
+ *   lampTop
+ *   lampBot  the sconce body's head and foot, down from the top.
  *
- * ⚠ THE LAST TWO EXIST BECAUSE THE PRICE HANGS UNDER A LAMP. `--lamp-cx` and
- * `--lamp-b` were measured off the DRAWN sconce, which photo-mode hides — and
- * `display: none` gives an all-zero rect, so the guard below would simply have
- * skipped and left the pill under a lamp nobody can see, at whatever value the
- * last fit happened to leave. A control placed against a feature of the room
- * has to be placed against the room that is actually on screen.
+ * ⚠ `lampCx`/`lampBot` EXIST BECAUSE THE PRICE HANGS UNDER A LAMP, and
+ * `lampTop` exists because the first version of this did not have it. A
+ * control placed against a feature of the room has to be placed against the
+ * room that is actually on screen — and the room has to actually be on screen.
+ *
+ * ⚠ **THE PORTRAIT ALONE WAS WRONG AND IT SHIPPED.** Its 0.75 aspect is
+ * narrower than every stage crop, so `cover` scales it by WIDTH — which is
+ * what holds its sconces at a constant 10% and 90% of the stage on a phone,
+ * and is exactly what ruins it on a wide desktop: covering a 1.95 stage makes
+ * a 783 px hole out of a 2053 px picture and everything above the pinned floor
+ * line climbs out of the top. Reported from outside off a 1920×918 laptop —
+ * *the room has no lamps* — and measured: the sconce band sat at y −173 to
+ * −52. Half-cut from 1680 up. The check that let it through tested the
+ * sconces' HORIZONTAL position only.
  */
-const PHOTO = { floor: 1214.5 / 1448, aspect: 1086 / 1448,
-                lampCx: 450 / 1086, lampBot: 659 / 1448 };
+const ROOMS = [
+  { id: 'tall', el: 'room-src',
+    floor: 1214.5 / 1448, aspect: 1086 / 1448,
+    lampCx: 450 / 1086, lampTop: 573 / 1448, lampBot: 659 / 1448 },
+  { id: 'wide', el: 'room-wide-src',
+    floor: 827.4 / 941, aspect: 1672 / 941,
+    lampCx: 452.5 / 1672, lampTop: 326 / 941, lampBot: 402 / 941 },
+];
+
+/**
+ * Where a room lands on a given stage: covering it, with its own floor line on
+ * the line the door stands on.
+ *
+ * Three lower bounds on the height and the largest wins — tall enough that the
+ * top edge reaches y=0 with the floor pinned, tall enough that the bottom edge
+ * reaches the foot, wide enough to reach both sides. Solved every re-fit
+ * rather than written as a `background-size` keyword, because `cover` scales
+ * about the CENTRE and this has to scale about the floor line.
+ */
+function placeRoom(room, boxW, boxH, yBase) {
+  const h = Math.max(yBase / room.floor,
+                     (boxH - yBase) / (1 - room.floor),
+                     boxW / room.aspect);
+  const w = h * room.aspect;
+  const top = yBase - room.floor * h;
+  return { room, w, h, top,
+           lampX: boxW / 2 + room.lampCx * w,
+           lampTop: top + room.lampTop * h,
+           lampBot: top + room.lampBot * h };
+}
+
+/**
+ * ⚠ WHICH ROOM, DECIDED BY MEASURING BOTH — NOT BY A BREAKPOINT.
+ *
+ * A media query would be a second statement of a fact this function already
+ * computes, in a language that cannot see the stage; that is CLAUDE.md §5.10
+ * and it is how the wide-screen fault got in. So: place both, and take one
+ * whose sconces are wholly inside the stage with a little room to spare.
+ *
+ * The portrait is preferred when both qualify — it is the phone's room, and
+ * nearly every visitor arrives on a phone (§0). If NEITHER qualifies (a phone
+ * held sideways makes the stage 3.7 wide, and no crop of this room survives
+ * that) the one whose lamps are least far out wins, so the answer degrades
+ * instead of flipping to nonsense.
+ */
+function pickRoom(boxW, boxH, yBase) {
+  const MARGIN = 6;                       // px of lamp that must be showing
+  const scored = ROOMS.map(r => {
+    const p = placeRoom(r, boxW, boxH, yBase);
+    /* How far outside the stage the sconce is, on whichever edge is worst.
+       ⚠ EVERY TERM IS IN STAGE PIXELS AND COMES OFF `p`, NOT OFF `p.room`.
+       The first version asked `p.lampCx` — a FRACTION, and a field of the room
+       rather than of the placement — so the horizontal term was `undefined`,
+       the whole expression was NaN, `NaN <= 0` was false for both rooms, and
+       the sort left them in declaration order: it silently returned the
+       portrait at every size, which is the bug it was written to fix, wearing
+       the fix's own clothes. `lampX` is the same quantity already resolved to
+       pixels, and half the lamp's own width is 2% of the picture. */
+    const half = p.w * 0.02;
+    /* ⚠ AND IT NEEDS ITS OWN HEIGHT OF WALL ABOVE IT, not merely a positive
+       coordinate. Measured at 1280x720 with the portrait: the sconces landed
+       at y 19..90 of a 585 px stage — in frame by every arithmetic test and
+       reading, to an eye, as two fittings jammed under a ceiling. A wall light
+       with less wall above it than the light is tall looks cropped whether or
+       not it is, so that is the test: one lamp-height of plaster over it. */
+    const lampH = p.lampBot - p.lampTop;
+    const off = Math.max(0,
+      lampH - p.lampTop,                          // too close to the top, or off it
+      p.lampBot - (boxH - MARGIN),                // off the bottom
+      (p.lampX + half) - (boxW - MARGIN),         // off the near edge
+      MARGIN - ((boxW - p.lampX) - half));        // off the far edge
+    return { ...p, off };
+  });
+  /* ⚠ AND A NaN CANNOT PASS FOR AN ANSWER. `Math.max` swallows one without a
+     word and every comparison against it is false, which is how the mistake
+     above produced a plausible wrong room instead of a failure. A room whose
+     score is not a number is not a candidate. */
+  const usable = scored.filter(s => Number.isFinite(s.off));
+  if (!usable.length) return ROOMS[0];
+  return (usable.find(s => s.off <= 0)
+          || usable.slice().sort((a, b) => a.off - b.off)[0]).room;
+}
 
 /**
  * Swap the drawn room for the photograph, once, if and only if the file
@@ -2530,24 +2615,45 @@ const PHOTO = { floor: 1214.5 / 1448, aspect: 1086 / 1448,
  * else's hallway is not information. Both are checked before the request is
  * made rather than before the class is added, so neither pays for the file.
  *
- * The URL comes from `#room-src` — see the long comment on that tag in
- * `index.html`. It is `link.href`, already resolved against the document, so
- * this works from `file://` as well as from a server.
+ * The URLs come from the two `<link>` tags in `index.html` — see the long
+ * comment there. `link.href` is already resolved against the document, so this
+ * works from `file://` as well as from a server.
+ *
+ * ⚠ ONE FILE IS FETCHED, NOT TWO. `pickRoom` needs only the constants and the
+ * stage's box to choose, so the choice is made before anything is downloaded.
+ * `liveRoom` remembers which arrived; `fitStage` re-runs the choice on every
+ * re-fit and calls back in here if the answer changed — which is what makes
+ * dragging a window across the crossover work rather than leaving the wrong
+ * crop stretched over the stage.
  */
+let liveRoom = null;
+
 function armRoom() {
   const root = document.documentElement;
   if (root.classList.contains('is-bare') || root.classList.contains('is-sheet')) return;
-  const link = document.getElementById('room-src');
+  const stage = $('#stage');
+  const svg = stage && stage.querySelector('svg');
+  if (!stage || !svg) return;
+  const box = stage.getBoundingClientRect();
+  const fy = Number(svg.dataset.fitY), fh = Number(svg.dataset.fitH);
+  const fw = Number(svg.dataset.fitW), baseY = Number(svg.dataset.baseY);
+  if (!(box.width > 0 && box.height > 0 && fh > 0 && Number.isFinite(baseY))) return;
+  const scale = Math.min(box.width / fw, box.height / fh);
+  const want = pickRoom(box.width, box.height, (baseY - fy) * scale);
+  if (want === liveRoom) return;
+  const link = document.getElementById(want.el);
   if (!link || !link.href) return;
+  const href = link.href;
   const img = new Image();
   img.addEventListener('load', () => {
-    const stage = $('#stage');
-    if (!stage) return;
-    stage.style.backgroundImage = `url("${link.href}")`;
+    const st = $('#stage');
+    if (!st) return;
+    st.style.backgroundImage = `url("${href}")`;
+    liveRoom = want;
     root.classList.add('is-photo');
-    fitStage();                 // the placement needs the class to be on
+    fitStage();                 // the placement needs the class and the room
   });
-  img.src = link.href;
+  img.src = href;
 }
 
 function fitStage() {
@@ -2591,6 +2697,10 @@ function fitStage() {
   const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
   const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
   const box = stage.getBoundingClientRect();
+  /* Read once, used twice: by the lamp clamp below and by `--quote-h` at the
+     end. See the note at the clamp. */
+  const quoteEl = document.querySelector('.quote');
+  const quoteH = quoteEl ? quoteEl.getBoundingClientRect().height : 0;
   if (!(w > 0 && h > 0 && Number.isFinite(fx) && Number.isFinite(fy)
         && box.width > 0 && box.height > 0)) return;
 
@@ -2636,25 +2746,41 @@ function fitStage() {
       '--floor-b', `${Math.max(0, Math.round(box.height - (baseY - fy) * scale))}px`);
   }
   if (document.documentElement.classList.contains('is-photo')
-      && Number.isFinite(baseY)) {
+      && Number.isFinite(baseY) && liveRoom) {
     const yBase = (baseY - fy) * scale;
-    const ph = Math.max(yBase / PHOTO.floor,
-                        (box.height - yBase) / (1 - PHOTO.floor),
-                        box.width / PHOTO.aspect);
-    const pw = ph * PHOTO.aspect;
-    const top = yBase - PHOTO.floor * ph;
+    /* ⚠ AND THE CHOICE IS RE-RUN, NOT ASSUMED. A window dragged wider crosses
+       from one crop to the other; without this the old one stays stretched
+       over the stage and its lamps climb out of the top, which is the fault
+       this whole pair exists to fix. `armRoom` returns immediately when the
+       answer has not changed, so this costs a comparison. */
+    const want = pickRoom(box.width, box.height, yBase);
+    if (want !== liveRoom) { armRoom(); return; }
+
+    const p = placeRoom(liveRoom, box.width, box.height, yBase);
     const ss = stage.style;
-    ss.setProperty('--photo-w', `${pw.toFixed(1)}px`);
-    ss.setProperty('--photo-h', `${ph.toFixed(1)}px`);
-    ss.setProperty('--photo-y', `${top.toFixed(1)}px`);
+    ss.setProperty('--photo-w', `${p.w.toFixed(1)}px`);
+    ss.setProperty('--photo-h', `${p.h.toFixed(1)}px`);
+    ss.setProperty('--photo-y', `${p.top.toFixed(1)}px`);
     /* The pill that hangs under the right-hand lamp now has a different lamp
-       to hang under — see the note on PHOTO. Same rects, same re-fit. */
+       to hang under — see the note on ROOMS. Same rects, same re-fit.
+       ⚠ AND IT IS CLAMPED INTO THE STAGE. Reported from outside off a
+       1920×918 laptop: the price card was sitting ON the language buttons —
+       6,288 px² of overlap — and 33 px ABOVE the top of the stage, out on the
+       header band. The lamp had climbed out of the frame and the card
+       faithfully followed it. A control anchored to a feature of the picture
+       must not leave the picture when the feature does: the anchor is held
+       inside the stage with room for the card itself, so the worst case is a
+       card sitting a little low rather than a card on the chrome. */
     const wrapR = $('.stage-wrap').getBoundingClientRect();
+    /* ⚠ THE BAR'S HEIGHT IS READ ONCE PER FIT, NOT TWICE. The clamp needs it
+       and so does `--quote-h` at the foot of this function, and asking the
+       layout for the same box twice in one pass is both a wasted forced
+       reflow and the "one quantity, two measurements" smell §5 is a list of.
+       `npm run latency` went 180 -> 219 ms when the second read went in. */
+    const lampB = Math.min(Math.max(p.lampBot, quoteH + 8), box.height - 8);
     const st = $('.stage-wrap').style;
-    st.setProperty('--lamp-cx',
-      `${Math.round(box.x - wrapR.x + box.width / 2 + PHOTO.lampCx * pw)}px`);
-    st.setProperty('--lamp-b',
-      `${Math.round(box.y - wrapR.y + top + PHOTO.lampBot * ph)}px`);
+    st.setProperty('--lamp-cx', `${Math.round(box.x - wrapR.x + p.lampX)}px`);
+    st.setProperty('--lamp-b', `${Math.round(box.y - wrapR.y + lampB)}px`);
   }
 
   /* HOW MUCH WALL THERE IS BESIDE THE DOOR, in css pixels, published for the
@@ -2792,10 +2918,8 @@ function fitStage() {
      has a height whether or not the drawing came up, and a page whose door
      failed to render still must not hide its own last option behind the one
      control that can reach Peretz. */
-  const q = document.querySelector('.quote');
-  if (q) {
-    document.documentElement.style.setProperty(
-      '--quote-h', `${Math.round(q.getBoundingClientRect().height)}px`);
+  if (quoteEl) {
+    document.documentElement.style.setProperty('--quote-h', `${Math.round(quoteH)}px`);
   }
 }
 

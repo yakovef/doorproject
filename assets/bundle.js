@@ -8631,26 +8631,93 @@ ${body}
       note.textContent = anyBlocked ? first : "";
     }
   }
-  var PHOTO = {
-    floor: 1214.5 / 1448,
-    aspect: 1086 / 1448,
-    lampCx: 450 / 1086,
-    lampBot: 659 / 1448
-  };
+  var ROOMS = [
+    {
+      id: "tall",
+      el: "room-src",
+      floor: 1214.5 / 1448,
+      aspect: 1086 / 1448,
+      lampCx: 450 / 1086,
+      lampTop: 573 / 1448,
+      lampBot: 659 / 1448
+    },
+    {
+      id: "wide",
+      el: "room-wide-src",
+      floor: 827.4 / 941,
+      aspect: 1672 / 941,
+      lampCx: 452.5 / 1672,
+      lampTop: 326 / 941,
+      lampBot: 402 / 941
+    }
+  ];
+  function placeRoom(room, boxW, boxH, yBase) {
+    const h = Math.max(
+      yBase / room.floor,
+      (boxH - yBase) / (1 - room.floor),
+      boxW / room.aspect
+    );
+    const w = h * room.aspect;
+    const top = yBase - room.floor * h;
+    return {
+      room,
+      w,
+      h,
+      top,
+      lampX: boxW / 2 + room.lampCx * w,
+      lampTop: top + room.lampTop * h,
+      lampBot: top + room.lampBot * h
+    };
+  }
+  function pickRoom(boxW, boxH, yBase) {
+    const MARGIN = 6;
+    const scored = ROOMS.map((r) => {
+      const p = placeRoom(r, boxW, boxH, yBase);
+      const half = p.w * 0.02;
+      const lampH = p.lampBot - p.lampTop;
+      const off = Math.max(
+        0,
+        lampH - p.lampTop,
+        // too close to the top, or off it
+        p.lampBot - (boxH - MARGIN),
+        // off the bottom
+        p.lampX + half - (boxW - MARGIN),
+        // off the near edge
+        MARGIN - (boxW - p.lampX - half)
+      );
+      return { ...p, off };
+    });
+    const usable = scored.filter((s) => Number.isFinite(s.off));
+    if (!usable.length) return ROOMS[0];
+    return (usable.find((s) => s.off <= 0) || usable.slice().sort((a, b) => a.off - b.off)[0]).room;
+  }
+  var liveRoom = null;
   function armRoom() {
     const root = document.documentElement;
     if (root.classList.contains("is-bare") || root.classList.contains("is-sheet")) return;
-    const link = document.getElementById("room-src");
+    const stage = $("#stage");
+    const svg = stage && stage.querySelector("svg");
+    if (!stage || !svg) return;
+    const box = stage.getBoundingClientRect();
+    const fy = Number(svg.dataset.fitY), fh = Number(svg.dataset.fitH);
+    const fw = Number(svg.dataset.fitW), baseY = Number(svg.dataset.baseY);
+    if (!(box.width > 0 && box.height > 0 && fh > 0 && Number.isFinite(baseY))) return;
+    const scale = Math.min(box.width / fw, box.height / fh);
+    const want = pickRoom(box.width, box.height, (baseY - fy) * scale);
+    if (want === liveRoom) return;
+    const link = document.getElementById(want.el);
     if (!link || !link.href) return;
+    const href = link.href;
     const img = new Image();
     img.addEventListener("load", () => {
-      const stage = $("#stage");
-      if (!stage) return;
-      stage.style.backgroundImage = `url("${link.href}")`;
+      const st = $("#stage");
+      if (!st) return;
+      st.style.backgroundImage = `url("${href}")`;
+      liveRoom = want;
       root.classList.add("is-photo");
       fitStage();
     });
-    img.src = link.href;
+    img.src = href;
   }
   function fitStage() {
     if (document.documentElement.classList.contains("is-bare")) return;
@@ -8661,6 +8728,8 @@ ${body}
     const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
     const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
     const box = stage.getBoundingClientRect();
+    const quoteEl = document.querySelector(".quote");
+    const quoteH = quoteEl ? quoteEl.getBoundingClientRect().height : 0;
     if (!(w > 0 && h > 0 && Number.isFinite(fx) && Number.isFinite(fy) && box.width > 0 && box.height > 0)) return;
     const scale = Math.min(box.width / w, box.height / h);
     const vw = box.width / scale, vh = box.height / scale;
@@ -8676,29 +8745,23 @@ ${body}
         `${Math.max(0, Math.round(box.height - (baseY - fy) * scale))}px`
       );
     }
-    if (document.documentElement.classList.contains("is-photo") && Number.isFinite(baseY)) {
+    if (document.documentElement.classList.contains("is-photo") && Number.isFinite(baseY) && liveRoom) {
       const yBase = (baseY - fy) * scale;
-      const ph = Math.max(
-        yBase / PHOTO.floor,
-        (box.height - yBase) / (1 - PHOTO.floor),
-        box.width / PHOTO.aspect
-      );
-      const pw = ph * PHOTO.aspect;
-      const top = yBase - PHOTO.floor * ph;
+      const want = pickRoom(box.width, box.height, yBase);
+      if (want !== liveRoom) {
+        armRoom();
+        return;
+      }
+      const p = placeRoom(liveRoom, box.width, box.height, yBase);
       const ss = stage.style;
-      ss.setProperty("--photo-w", `${pw.toFixed(1)}px`);
-      ss.setProperty("--photo-h", `${ph.toFixed(1)}px`);
-      ss.setProperty("--photo-y", `${top.toFixed(1)}px`);
+      ss.setProperty("--photo-w", `${p.w.toFixed(1)}px`);
+      ss.setProperty("--photo-h", `${p.h.toFixed(1)}px`);
+      ss.setProperty("--photo-y", `${p.top.toFixed(1)}px`);
       const wrapR = $(".stage-wrap").getBoundingClientRect();
+      const lampB = Math.min(Math.max(p.lampBot, quoteH + 8), box.height - 8);
       const st = $(".stage-wrap").style;
-      st.setProperty(
-        "--lamp-cx",
-        `${Math.round(box.x - wrapR.x + box.width / 2 + PHOTO.lampCx * pw)}px`
-      );
-      st.setProperty(
-        "--lamp-b",
-        `${Math.round(box.y - wrapR.y + top + PHOTO.lampBot * ph)}px`
-      );
+      st.setProperty("--lamp-cx", `${Math.round(box.x - wrapR.x + p.lampX)}px`);
+      st.setProperty("--lamp-b", `${Math.round(box.y - wrapR.y + lampB)}px`);
     }
     const frame = svg.querySelector("#frame");
     if (frame) {
@@ -8729,12 +8792,8 @@ ${body}
       );
       root.setProperty("--sticky-h", `${Math.max(0, Math.round(wrap.height))}px`);
     }
-    const q = document.querySelector(".quote");
-    if (q) {
-      document.documentElement.style.setProperty(
-        "--quote-h",
-        `${Math.round(q.getBoundingClientRect().height)}px`
-      );
+    if (quoteEl) {
+      document.documentElement.style.setProperty("--quote-h", `${Math.round(quoteH)}px`);
     }
   }
   var liveTimer = null;
