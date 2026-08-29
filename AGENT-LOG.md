@@ -23,6 +23,41 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-29 05:40 UTC — run 52: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 51 (`6f9117c` still
+the tip on both sides). `npm run build` produced no diff. Walked the live
+page in Chromium via Playwright: phone (390×844) and desktop (1440×900) on
+arrival, a full forward walk through all nine steps on a phone to the
+summary/quote page, and the works gallery (`#works-btn`, not the selector I
+first guessed — corrected the harness, not the site) showing 30 real doors
+with their own prices and a working close button. Zero console errors on
+every route. Nothing looked wrong: same arrival state as run 51, same wall
+controls, no overlap, no stale copy.
+
+**Instruments:** test ✓ (3,448,747 passed, 0 failed — identical count to
+run 51, as expected with nothing touching the catalogue) · audit ✓ (all
+seven viewports clean, no faults — gallery/order-sheet, no-JS/inert-page,
+shared-link-to-quote, and language/mirror checks all pass) · profile ✓
+(both FALLOFF bands within tolerance; the moulding-bead check — "dark
+reed" — still green at 0.999 lower/upper) · collide -- all ✓ (1,060
+designs, faceObstacles agrees with the drawing everywhere) · collide --
+boxes ✓ (every fitting inside its own declared box; MOUNT_REACH 121 still
+covers the deepest bolted fitting at 111) · recreate ✓ (same ten
+long-documented catalogue gaps — brass/withdrawn finish, missing Rav
+Bariach colours, bar lengths, grid/reeded-glass exclusivity — nothing new).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run. The
+three items reserved for Peretz (hardware finish, the three missing Rav
+Bariach colours, every price) were not touched.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-29 00:40 UTC — run 51: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 50 (`fb76369` is still
