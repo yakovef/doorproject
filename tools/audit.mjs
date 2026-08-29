@@ -383,6 +383,73 @@ for (const v of VIEWS) {
       if (!reach.priceSeen || !reach.priceText || reach.priceText === '—') {
         fault(v.name, `step "${k}": no price on screen (read "${reach.priceText}")`);
       }
+
+      /* ── AND THE ANSWER IS ON SCREEN WITH THE QUESTION ────────────────
+         ⚠ A GUIDED FLOW WHOSE LIVE STEP SHOWS NO OPTIONS IS NOT GUIDED, and
+         nothing in this repository was asking. `npm run audit` proved a step
+         was REACHABLE (the walk clicks the rail) and that its send and its
+         price were on screen; it never asked whether the thing the step is FOR
+         had made it above the fold.
+
+         Measured the day this was written, at 320x568: rail 62 + stage 318 +
+         eyebrow/title/lede ~160 + quote bar 62 = 602 of a 568 px screen, so on
+         **every one of the eight question steps** a customer saw a door, a
+         question, and nothing to answer it with. At 390 there was room for
+         three rows of swatches, which is why looking at a phone had not found
+         it — 390 is the phone people test on and 320 is the one they own.
+
+         ⚠ This is the same shape as the way-on being below the fold (§0b,
+         28.8): the audit could reach everything and had never asked what was
+         VISIBLE. Two different questions again.
+
+         One control is the bar, not all of them: a grid that needs scrolling
+         is normal, a grid with nothing showing is not. The summary has no
+         options and is excluded by name rather than by counting zero, so the
+         day it grows some this check starts covering it. */
+      if (k !== 'sum') {
+        const answers = await p.evaluate(() => {
+          const live = document.querySelector('.sect.is-live');
+          if (!live) return { live: false };
+          const opts = [...live.querySelectorAll(
+            '.tile, .swatch, input[type="range"], select, .field button')];
+          /* ⚠ THE FOLD IS NOT `innerHeight`, AND THE FIRST VERSION OF THIS
+             CHECK BELIEVED IT WAS. The quote bar is FIXED over the bottom of a
+             phone — 67 px at 320 — so a tile that ends behind it is exactly as
+             unreachable as one below the screen. Measuring against the viewport
+             reported the worst step as "1 px short" where the truth was 68.
+             The send/price check above already says this in its own comment
+             ("a control below the fold or behind a fixed bar is unreachable")
+             and then measures against `innerHeight` anyway; this one asks the
+             bar where it actually is. */
+          const q = document.querySelector('.quote');
+          const fold = (q && getComputedStyle(q).position === 'fixed')
+            ? q.getBoundingClientRect().top : innerHeight;
+          /* And 24 px, not one: a control needs about half a thumb showing to
+             be a control. A 1 px sliver of a tile is not an answer on screen. */
+          const on = el => {
+            const r = el.getBoundingClientRect();
+            const shown = typeof el.checkVisibility === 'function'
+              ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : true;
+            return shown && r.width > 0
+              && Math.min(r.bottom, fold) - Math.max(r.top, 0) >= 24;
+          };
+          return { live: true, total: opts.length, seen: opts.filter(on).length };
+        });
+        /* ⚠ §5.15 — assert the selector found something. A step with no
+           matching control at all is this check quietly retiring, not a step
+           that happens to be fine. */
+        if (!answers.live) {
+          fault(v.name, `step "${k}": no .sect.is-live in the document — the `
+            + 'check for "can you answer the question" has nothing to look at');
+        } else if (!answers.total) {
+          fault(v.name, `step "${k}": the live step contains no option control `
+            + 'the selector recognises — either the step is empty or this '
+            + 'check has stopped matching the markup');
+        } else if (!answers.seen) {
+          fault(v.name, `step "${k}": ${answers.total} options and NONE on `
+            + 'screen — a customer sees the question and nothing to answer it with');
+        }
+      }
     }
     await p.click('.steps__step');          // back to step 01 for the walk below
     await p.waitForTimeout(120);
@@ -1472,6 +1539,24 @@ for (const v of VIEWS) {
     });
     if (!g) { fault(v.name, 'photo-mode did not come up, so the calibration cannot be read'); await pg.close(); continue; }
     if (g.noBase) { fault(v.name, 'the drawing publishes no data-base-y — the page cannot place the room'); await pg.close(); continue; }
+    /* ⚠ THE CHROME COMES OFF BEFORE THE PHOTOGRAPH IS MEASURED, and the first
+       version of this check did not do that and failed about the wrong object
+       — for the second time in one evening. The trust band's scrim was built
+       to start exactly AT the floor line, so its own gradient edge sits a few
+       pixels below the skirting it is aligned to, and this detector locked
+       onto the scrim instead: 4.2 px at `cusp` and 4.7 px at `wide` against a
+       4 px gate, with the error growing in proportion to the stage, which is
+       the signature of measuring a thing that scales rather than a thing that
+       is fixed.
+       This is not teaching the instrument to ignore a kind of fault. It is
+       taking an occluding object out of the frame before photographing what is
+       behind it, which is exactly what `?bare=1` does for the drawing.
+       `visibility`, not `display`, so nothing reflows and the stage keeps the
+       size the rest of this block already measured. */
+    await pg.addStyleTag({ content:
+      '.trust, .stage__hud, .quote, .hint, .grip-bar, .toast '
+      + '{ visibility: hidden !important; }' });
+    await pg.waitForTimeout(60);
     await pg.screenshot({ path: '/tmp/audit-floor.png',
       clip: { x: g.x, y: g.y, width: g.w, height: g.h } });
     const im = load('/tmp/audit-floor.png');

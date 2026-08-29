@@ -1494,6 +1494,27 @@ complete and its findings live here:
   rings. Neither has been measured properly. Everything else on that door now
   matches within the instrument's error.
 
+- **⚠ AT 320×568 THE FIRST STEP ARRIVES WITH ITS ANSWERS 78 px BELOW THE
+  FOLD**, and every other step at every other viewport is fine. Measured on
+  arrival, before any interaction: the fold — the top of the fixed quote bar —
+  is at 501, and the first size tile's top is at 555. At 375×667 it is 27 px;
+  at 390×844 it is comfortable.
+  Why step 01 and not the rest: `goStep` scrolls ~50 px on every step change
+  and the boot call does not, and step 01 is also the only step carrying the
+  gallery opener. 29.8 spent 98 px on this (68 from the stage, 30 from the
+  type) and 16 more on the opener; what is left would have to come out of the
+  door, which is already down to 250 px on a 568 px screen.
+  ⚠ **Scrolling on arrival was considered and is not the answer.** The section
+  carries `scroll-margin-block-start` sized to clear the sticky stage, so
+  `scrollIntoView` lands the QUESTION at the top and gains exactly the 50 px
+  the other steps get — 28 short. Putting the tiles in view means scrolling
+  past the question, which is worse than scrolling to reach them.
+  What would actually close it: the illustration note (45 px) not standing
+  between the door and the question on a phone, or the size tiles not being
+  131 px tall. The first is an honesty commitment (§0b, "say plainly that the
+  drawing is an illustration") and is not to be quietly relocated without
+  asking; the second is a real piece of design work.
+
 ### Not started
 CI, deploy to `design.dlatotmagen.co.il`, prerendering the default door into
 `index.html`.
@@ -1584,6 +1605,85 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ AT 320 PX NO STEP SHOWED AN ANSWER, AND NOTHING IN THIS REPOSITORY WAS
+  ASKING.** A guided flow whose live step shows no options is not guided.
+  `npm run audit` proved every step was REACHABLE (its walk clicks the rail)
+  and that the send and the price were on screen; it had never asked whether
+  the thing the step is FOR had made it above the fold. Measured at 320×568:
+  rail 62 + stage 318 + eyebrow/question/explanation ~160 + quote bar 67 = 607
+  of a 568 px screen, on **all eight question steps**. At 390 there was room
+  for three rows of swatches, which is exactly why looking at a phone had not
+  found it — 390 is the phone people test on and 320 is the one they own.
+  ⚠ **AND THE FOLD IS NOT `innerHeight`.** The quote bar is FIXED over the
+  bottom 67 px, so a tile that ends behind it is as unreachable as one below
+  the screen. Measuring against the viewport reported the worst step as **1 px**
+  short where the truth was **68**. The send/price check above it has said this
+  in its own comment since 28.8 — *"a control below the fold or behind a fixed
+  bar is unreachable"* — and measures against `innerHeight` anyway.
+  Fixed by about 114 px — 79 from the stage (56vh → 42vh) and 35 from the
+  type — at short PORTRAIT viewports only (`max-height: 700px`, so a 390×844
+  phone pays nothing and a tablet held sideways is excluded). The door is
+  **239 px tall on a 568 px screen**, down from 318: the memo's rule 4 in one
+  number, *the door may shrink to make the answer visible.*
+  ⚠ **One case is still short and it is written down rather than rounded off.**
+  On ARRIVAL at 320 — step 01, before any interaction — the first size tile is
+  **78 px** below the fold (27 at 375×667, comfortable at 390). Every other
+  step passes because `goStep` scrolls ~50 px and step 01 does not. Step 01 is
+  also the only step carrying the gallery opener. Full accounting in the
+  stylesheet beside the fix.
+
+- **⚠ AND THE RUSSIAN PAGE FAILED A STEP THE OTHER TWO PASSED — BY ONE PIXEL.**
+  Walking the guide in all three languages at 320 found משקוף with no answer on
+  screen in Russian only: its explanation runs to FOUR lines there (93 px)
+  against three in Hebrew and English (70), and 23 px is exactly what it was
+  short by. **Hebrew and English were passing that same step by 1 px**, which
+  is not a pass, it is a coincidence waiting for a copy edit.
+  Fixed by 2vh more off the short-screen stage and the explanation at .86rem
+  there — the only type SIZE this round touches, and it shortens nobody's copy:
+  every word survives in all three languages and the `<details>` explainer is
+  untouched.
+  ⚠ **Two languages agreeing is not a measurement**, and this is the second
+  1-pixel margin found in one evening (the other was the landscape backdrop
+  leaving one pixel of a lamp on a 390 px screen). **Where a number comes out
+  at 0 or 1, go and find the third case.**
+
+- **The gallery opener is a pill on a phone, not a card.** It was a 56 px box
+  with a filled ground and a full border, standing between the door and the
+  question on the one step it appears on — reading as something to DO, when the
+  question underneath it is the thing to do. A hairline pill at the 44 px tap
+  floor, which is a floor, so that is as short as it may legally be. Worth
+  16 px of the 94, and the rest of the arrival gap is above.
+
+- **⚠ THE CHOICES CARD IS NOT PURE WHITE ANY MORE, AND THE ROOM IS WHY.**
+  Measured at 1440, 1280 and 1680 with `tools/_bright.mjs`: the photographed
+  wall's 99th percentile is **237** and a `#fff` card is **255**. The loudest
+  thing on the page was a 360×860 rectangle of screen-white beside a warm room,
+  which is the exact inverse of DESIGN-LEVEL §1.2.
+  ⚠ **The fix is temperature, not brightness.** Going all the way to
+  `--paper-up` (243) costs the card's dividers a tenth of their contrast —
+  `--rule` is 1.496:1 on white and 1.350 on paper-up, and this file records
+  that white figure as the reason a card keeps its internal structure. #FDFBF7
+  is 251: four points of brightness, all of the warmth, `--rule` at 1.447 and
+  `--ink-2` at 5.37:1.
+
+- **The one-accent discipline is asserted now, and DESIGN-LEVEL §5 named it a
+  year of rounds ago.** *"An audit assertion that no element outside the fixed
+  accent set paints `--accent`, so the discipline can't erode commit by
+  commit."* It is in `npm test` rather than the audit because it is a question
+  about the stylesheet, not about a browser: it walks every `var(--accent)` in
+  `css/app.css`, attributes each to its selector, and checks it against seven
+  allowed places — the navigator's ordinal line, the ring on the live step, the
+  ring on a done step, the grip's focus ring, and three hover states.
+  ⚠ **A list that goes stale is the POINT here**, which is the opposite of
+  every other list in this repo: it fails the day somebody spends the accent
+  somewhere new, and the message says so — add it with a reason, or do not add
+  it. It also asserts every named selector still MATCHES (§5.15), so a rename
+  cannot retire the check in silence, and that `--accent` still fails 4.5:1 on
+  white while `--accent-ink` still passes — the two swapping roles is the
+  failure this pair of tokens exists to prevent.
+  **Falsified**: `.toast { color: var(--accent) }` added on purpose, the check
+  fired naming `.toast`, and it was taken back out.
 
 - **⚠ THE ROOM IS A PHOTOGRAPH NOW, AND THE DOOR IS STILL THE DRAWING.**
   `PHOTOREAL.md` on the review branch, spiked and built 29.8.2026. The owner

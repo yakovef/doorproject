@@ -1919,6 +1919,12 @@ group('a new build reaches a browser that has been here before');
   for (const [asset, re] of [
     ['css/app.css', /href="css\/app\.css(\?v=([0-9a-f]+))?"/],
     ['assets/bundle.js', /src="assets\/bundle\.js(\?v=([0-9a-f]+))?"/],
+    /* The photographed room. It is the one file a browser can be missing and
+       still get the whole site — but a CACHED WRONG one is a different fault
+       from a missing one, and the wrong one is exactly what a stamp exists to
+       prevent: `npm run backdrop` re-grades the picture and the floor-line
+       calibration is tuned to the version that produced it. */
+    ['assets/room.webp', /id="room-src" href="assets\/room\.webp(\?v=([0-9a-f]+))?"/],
   ]) {
     const m = re.exec(html);
     ok(m, `index.html no longer references ${asset} — this check is dead`);
@@ -1931,6 +1937,81 @@ group('a new build reaches a browser that has been here before');
        + 'run npm run build before committing, or the stamp is a lie');
     }
   }
+}
+
+/* ── ONE ACCENT, RATIONED, AND THE LIST IS THE POINT ──────────────────
+   `DESIGN-LEVEL.md` §1.3 and §5. The whole visual argument of this page is
+   *"the product is the only colour"* — the door is warm and saturated and
+   everything else recedes, so one tan accent is spent only where it means
+   "this one is chosen". §5 asked for an assertion that no element outside a
+   fixed set paints it, *"so the discipline can't erode commit by commit"*, and
+   nobody built it. It is the cheapest of all the checks that document names
+   and it guards the property the other six exist to produce.
+
+   ⚠ A LIST GOES STALE IN SILENCE, AND THIS ONE IS SUPPOSED TO. Every other
+   list in this repository is a bug waiting to happen (`usedDefs` is derived
+   for exactly that reason); this one is a GATE. It fails the day somebody
+   spends the accent somewhere new, and the failure is the conversation: if the
+   new use belongs, it goes in the list with a line saying why, and if it does
+   not, the check has done its job. So the message says that rather than just
+   reporting a count.
+
+   ⚠ And it asserts the selectors it names still MATCH something — §5.15. A
+   renamed class would otherwise retire this check quietly, on the day the
+   stylesheet is being reorganised, which is the day it is most needed. */
+group('the accent is spent only where it means "this one is chosen"');
+{
+  const css = readFileSync('css/app.css', 'utf8');
+  /* selector → why this one is allowed to carry the accent.
+     Seven places, and every one of them means the same thing: THIS ONE. */
+  const ALLOWED = [
+    ['.steps::after',        'the ordinal line under the navigator, scaled to where you are'],
+    ['.steps__step.is-on',   'the ring on the step you are looking at'],
+    ['.steps__step.is-done', 'the ring on a step you have already answered'],
+    ['[data-chrome="focus"]','the focus ring on the draggable grip'],
+    ['.works-open',          'the gallery opener, on hover only'],
+    ['.work',                'one gallery door, on hover only'],
+    ['.proof a',             'the underline on the proof link'],
+  ];
+  /* Every `var(--accent)` in the file, with the selector block it sits in.
+     ⚠ The `@supports` blocks matter: two of the seven have a `color-mix`
+     version and a plain fallback, and a parser that treats the `@supports`
+     line as the selector would attribute the fallback to the at-rule and
+     report a use nobody can find. So an at-rule opening a block does not
+     replace the current selector; only a real selector does. */
+  const uses = [];
+  let sel = '';
+  for (const raw of css.split('\n')) {
+    const line = raw.trim();
+    const m = /^([.#:\[a-zA-Z][^{}]*)\{/.exec(line);
+    if (m && !line.startsWith('@')) sel = m[1].trim();
+    if (/var\(--accent\)/.test(line)) uses.push(sel);
+  }
+  ok(uses.length > 0,
+     'no element in css/app.css paints var(--accent) at all — either the accent '
+   + 'has been renamed or this check has stopped matching the stylesheet');
+  for (const [needle, why] of ALLOWED) {
+    ok(css.includes(needle),
+       `the accent allowlist names "${needle}" (${why}) and css/app.css no longer `
+     + 'contains it — the list has gone stale and this check is measuring nothing');
+  }
+  for (const u of uses) {
+    ok(ALLOWED.some(([needle]) => u.includes(needle)),
+       `"${u}" paints var(--accent), and it is not one of the ${ALLOWED.length} places `
+     + 'the accent is allowed to appear (DESIGN-LEVEL §1.3: rings, borders and '
+     + 'selected state, never anything else). If it belongs there, add it to '
+     + 'ALLOWED in this test with a line saying what it means; if it does not, '
+     + 'this check has just stopped the accent eroding into decoration.');
+  }
+  /* ⚠ AND THE ACCENT IS NEVER READ. `#B08D57` measures 3.09:1 on white — fine
+     for a 2 px ring, a failure for text. `--accent-ink` exists for anything a
+     customer has to read, and this asserts the two have not swapped roles. */
+  ok(contrast('#B08D57', '#FFFFFF') < 4.5,
+     'var(--accent) now passes 4.5:1 on white, which means it has been changed — '
+   + 'the whole reason --accent-ink exists is that the accent does not');
+  ok(contrast('#7E6134', '#FFFFFF') >= 4.5,
+     'var(--accent-ink) no longer measures 4.5:1 on white, and it is the token '
+   + 'every readable accent uses');
 }
 
 /* ── 12. THE MESSAGE ──────────────────────────────────────────────────

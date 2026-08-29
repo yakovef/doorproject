@@ -1432,10 +1432,26 @@ svg { direction: ltr; }
    `1fr`. So `audit.mjs`'s "the door keeps its size" assertion is untouched by
    construction rather than by luck.
    `--surface` is re-declared because the card IS a different surface; see the
-   note at the top of this file about the seventeen beige haloes. */
+   note at the top of this file about the seventeen beige haloes.
+
+   ⚠ AND IT IS NOT PURE WHITE ANY MORE, BECAUSE THE ROOM IS A PHOTOGRAPH.
+   Measured at 1440, 1280 and 1680 with `tools/_bright.mjs`: the photographed
+   wall's 99th percentile is **237** and a `#fff` card is **255**, so the
+   loudest thing on the page was a 360x860 rectangle of screen-white standing
+   beside a warm room — and DESIGN-LEVEL §1.2's whole argument is that the
+   product is the only thing allowed to pull the eye.
+   ⚠ THE FIX IS TEMPERATURE, NOT BRIGHTNESS, and the numbers say why. Dropping
+   all the way to `--paper-up` (243) costs the card's internal dividers a tenth
+   of their contrast — `--rule` measures 1.496:1 on white and 1.350 on
+   paper-up, and CLAUDE.md records that white figure as exactly the reason a
+   card keeps its structure. #FDFBF7 is 251: four points of brightness, all of
+   the warmth, `--rule` holding at 1.447 and `--ink-2` at 5.37:1. The card
+   stops reading as SCREEN and starts reading as PAPER, which was the real
+   complaint — every other surface on this page is warm and this was the one
+   neutral. */
 @media (min-width: 1100px) {
   .panel--choose {
-    --surface: #fff;
+    --surface: #FDFBF7;
     background: var(--surface);
     border: 1px solid var(--rule);
     border-inline-start: 1px solid var(--rule);
@@ -1825,6 +1841,70 @@ svg { direction: ltr; }
   color: var(--ink-2);
   max-inline-size: 42ch;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ⚠ A GUIDED FLOW WHOSE LIVE STEP SHOWS NO OPTIONS IS NOT GUIDED.
+   ═══════════════════════════════════════════════════════════════════
+   Measured at 320x568, on ALL EIGHT question steps: the first tile's top sat
+   68 px below the fold — 92 px on משקוף, whose explanation runs to four lines.
+   A customer saw a door, a question, and nothing to answer it with. At 390
+   every step passes, which is exactly why looking at a phone had not found it:
+   390 is the phone people test on and 320 is the one they own.
+
+   ⚠ AND THE FOLD IS NOT `innerHeight`. The quote bar is FIXED over the bottom
+   67 px, so a tile that ends behind it is as unreachable as one below the
+   screen. Measuring against the viewport said "1 px short" where the truth was
+   68 — the first version of the new audit check made exactly that mistake and
+   was corrected before it was believed.
+
+   The budget at 320x568, all of it measured rather than assumed:
+
+     rail            62      fixed
+     stage          318      56vh
+     eyebrow         24      13.8 + 10 margin
+     question        35      25.3 + 10
+     explanation     69      46.6 + 22   (69.9 + 22 on משקוף)
+     field header    23
+     quote bar       67      fixed
+     ------------------------------------
+                    598 of 568, before a single tile
+
+   So about 114 px has to come from somewhere, and the memo's rule 4 says
+   where: *the door may shrink to make the answer visible; it may not be
+   cropped and it may not lose its room.* 79 px from the stage (56vh → 42vh)
+   and 35 from the type, and the door is still 239 px tall on a 568 px screen.
+
+   ⚠ AND THE MARGIN MATTERS AS MUCH AS THE FIX. A first pass landed Hebrew and
+   English one pixel clear on משקוף and left RUSSIAN 23 px short, because that
+   step's explanation runs to four lines there and three in the other two. Two
+   languages agreeing by a pixel is not a measurement — see the last line here
+   for where the extra came from.
+
+   ⚠ SCOPED BY HEIGHT AND ORIENTATION, NOT BY WIDTH. A 390x844 phone has room
+   and must not pay for this; a 320x568 one has none. `orientation: portrait`
+   keeps a tablet held sideways out of it — 1024x700 matches both the width and
+   the height test and has plenty of room.
+
+   ⚠ AFTER the rules it overrides, all four of them (`.stage`'s two blocks
+   above, and `.sect__where` / `.sect__title` / `.sect__lede` directly above).
+   §8, five times in this file and twice by me. */
+@media (max-width: 1099px) and (max-height: 700px) and (orientation: portrait) {
+  .stage { block-size: clamp(36vh, 100vw, 42vh); }
+  .sect__where { margin-block-end: 3px; }
+  .sect__title { margin-block-end: 4px; }
+  /* ⚠ AND SMALLER, WHICH IS THE ONE PLACE THIS ROUND TOUCHES TYPE SIZE — the
+     RUSSIAN page is why. Measured at 320 on משקוף: the explanation runs to
+     three lines in Hebrew and English (70 px) and FOUR in Russian (93 px), and
+     23 px is exactly the amount by which the Russian page failed a check the
+     other two passed. Worse, they passed it by ONE pixel, which is not a pass,
+     it is a coincidence waiting for a copy edit.
+     A secondary explanation at 13.8 px on a 320 px screen is ordinary
+     typography; a question a customer cannot answer is not. Note what this
+     does NOT do: it does not shorten anybody's copy — every word survives, in
+     all three languages, and the `<details>` explainer under it is untouched. */
+  .sect__lede  { margin-block-end: 10px; font-size: .86rem; }
+  .field__body { padding-block: 2px 14px; }
+}
 /* What is inside, for a customer who does not yet know which of the four
    holds the thing they came to change. */
 /* WRAPS, where the line below it truncates — and the difference is the whole
@@ -1942,6 +2022,24 @@ svg { direction: ltr; }
    the gallery is one of the few things that still works. */
 @media (max-width: 1099px) {
   .panel--choose[data-live]:not([data-live="fit"]) .works-open { display: none; }
+  /* ⚠ AND ON THE STEP WHERE IT DOES SHOW IT IS A PILL, NOT A CARD. Accounted
+     for pixel by pixel at 320x568, on arrival, on step 01: rail 62 + door 239 +
+     illustration note 45 + panel padding 20 + **this box 56** + gaps 12 + the
+     question block 105 puts the first size tile at y=571 with the fold — the
+     top of the fixed quote bar — at 501. It is the only step with this box on
+     it, and it is the only step at 320 that arrives with no answer in view.
+     A card with a filled ground, a full border and 56 px of height reads as
+     something to DO; this is an offer about where to start, and the question
+     underneath it is the thing to do. Now it is a hairline pill at the 44 px
+     tap floor — which is a floor, so this is as short as it may legally be.
+     ⚠ 16 px is all that buys, and it does not close the gap: see CLAUDE.md's
+     open list for the arrival measurement and what closing it would cost. */
+  .works-open {
+    min-block-size: var(--tap); margin-block-end: 8px;
+    padding: 4px 14px; border-radius: var(--r-pill);
+    background: none;
+  }
+  .works-open__t { font-weight: 500; font-size: .86rem; }
 }
 .works-open__t { font-weight: 600; font-size: .92rem; }
 .works-open__n { font-size: .74rem; color: var(--accent-ink); white-space: nowrap; }
