@@ -23,6 +23,39 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-29 10:40 UTC — run 53: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 52 (`973daa7` still
+the tip on both sides). `npm run build` produced no diff. Walked the live
+page in Chromium: desktop (1440×900) on arrival, and this run varied what
+was probed — switched the language to English and to Russian on a phone
+(390×844) and screenshotted both. Both translate fully (labels, size
+tiles, the price/send bar, the navigator's tooltip text) with the correct
+LTR mirroring of the interface chrome while the door drawing itself stays
+unmirrored (hinge/knob position identical across all three languages) —
+the exact rule CLAUDE.md calls out repeatedly as the site's most expensive
+historical bug. Zero console errors on any of the three language loads.
+
+**Instruments:** test ✓ (3,448,747 passed, 0 failed — identical to runs 51
+and 52) · audit ✓ (all seven viewports clean, including the language/mirror
+check) · profile ✓ (both FALLOFF bands within tolerance; the moulding-bead
+check still green at 0.999 lower/upper) · collide -- all ✓ (1,060 designs,
+faceObstacles agrees with the drawing everywhere) · collide -- boxes ✓
+(every fitting inside its own declared box; MOUNT_REACH 121 covers the
+deepest bolted fitting at 111) · recreate ✓ (same ten long-documented
+catalogue gaps, nothing new).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run. The
+three items reserved for Peretz (hardware finish, the three missing Rav
+Bariach colours, every price) were not touched.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-29 05:40 UTC — run 52: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 51 (`6f9117c` still
