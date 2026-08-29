@@ -649,6 +649,13 @@ function init() {
   document.documentElement.classList.add('is-arriving');
   setTimeout(() => document.documentElement.classList.remove('is-arriving'), 1000);
 
+  /* ⚠ THE ROOM IS ASKED FOR LAST, AND THE PAGE IS ALREADY FINISHED WITHOUT IT.
+     Everything above has run: the drawing is up, the price is right, both send
+     buttons work. `armRoom` only ever swaps a background in, and only if the
+     file arrives — so the slow case and the failed case are the same case, and
+     it is the page as it shipped before there was a photograph. */
+  armRoom();
+
   /* ⚠ THE 1100 px CROSSING NO LONGER RESHAPES ANYTHING, and the listener that
      did is gone with the fold. It existed because the accordion arrived in one
      shape on a phone (all shut) and another on a desktop (all open), and
@@ -2471,6 +2478,78 @@ function markGroup(g, blocked) {
  * have chosen this same scale — but the crop now falls on wall and floor
  * instead of on nothing.
  */
+
+/**
+ * ── THE PHOTOGRAPHED ROOM ─────────────────────────────────────────────────
+ *
+ * Four numbers about `assets/room.webp`, all measured off the original in
+ * `tools/_bd2.mjs` and every one of them a fraction, so re-encoding or
+ * re-scaling the file cannot invalidate them. `npm run backdrop` produces the
+ * file; this describes it.
+ *
+ *   floor   the wall/floor junction, down from the top. y = 1214.5 of 1448.
+ *           Found as the strongest horizontal luminance step across the centre
+ *           half of the picture: tilt -0.21°, residual 1.21 px over 229
+ *           columns, which is what "square-on" looks like as a number.
+ *   aspect  1086 / 1448. ⚠ Load-bearing: 0.75 is narrower than the stage's
+ *           crop at every viewport this app has (1.00 on a phone through 1.42
+ *           at 1680), so `cover` always scales this picture by WIDTH — which
+ *           is what puts its two sconces at a constant 10% and 90% of the
+ *           stage whatever the screen, and what keeps the widest buildable
+ *           door clear of them by 47 px even at 320.
+ *   lampCx  the right-hand sconce's centre, from the picture's own centre:
+ *           (992.5 - 542.5) / 1086.
+ *   lampBot its foot, down from the top: 659 / 1448.
+ *
+ * ⚠ THE LAST TWO EXIST BECAUSE THE PRICE HANGS UNDER A LAMP. `--lamp-cx` and
+ * `--lamp-b` were measured off the DRAWN sconce, which photo-mode hides — and
+ * `display: none` gives an all-zero rect, so the guard below would simply have
+ * skipped and left the pill under a lamp nobody can see, at whatever value the
+ * last fit happened to leave. A control placed against a feature of the room
+ * has to be placed against the room that is actually on screen.
+ */
+const PHOTO = { floor: 1214.5 / 1448, aspect: 1086 / 1448,
+                lampCx: 450 / 1086, lampBot: 659 / 1448 };
+
+/**
+ * Swap the drawn room for the photograph, once, if and only if the file
+ * actually arrives.
+ *
+ * ⚠ THE ORDER HERE IS THE FALLBACK. `.is-photo` is added in the image's own
+ * `load` handler and nowhere else, so a missing file, a blocked request, a
+ * corrupt asset or a browser that cannot decode WebP all land in exactly one
+ * place: the class is never added, the SVG's `#backdrop` is never hidden, and
+ * the visitor gets the drawn room — which is the page as it shipped
+ * yesterday, complete and correct. PHOTOREAL.md §1: the page can never look
+ * broken. There is no `onerror` branch because there is nothing to do in it.
+ *
+ * ⚠ NOT IN BARE MODE, AND NOT ON THE SHEET. `?bare=1` is what `recreate`,
+ * `corpus`, `against`, `profile` and `collide` photograph, and the whole
+ * architecture of this feature is that those keep reading a pure drawing;
+ * `?sheet=1` is an A4 document Peretz prints, where a photograph of somebody
+ * else's hallway is not information. Both are checked before the request is
+ * made rather than before the class is added, so neither pays for the file.
+ *
+ * The URL comes from `#room-src` — see the long comment on that tag in
+ * `index.html`. It is `link.href`, already resolved against the document, so
+ * this works from `file://` as well as from a server.
+ */
+function armRoom() {
+  const root = document.documentElement;
+  if (root.classList.contains('is-bare') || root.classList.contains('is-sheet')) return;
+  const link = document.getElementById('room-src');
+  if (!link || !link.href) return;
+  const img = new Image();
+  img.addEventListener('load', () => {
+    const stage = $('#stage');
+    if (!stage) return;
+    stage.style.backgroundImage = `url("${link.href}")`;
+    root.classList.add('is-photo');
+    fitStage();                 // the placement needs the class to be on
+  });
+  img.src = link.href;
+}
+
 function fitStage() {
   /* Bare mode is the measurement harness (tools/frame.mjs, recreate.mjs and
      friends), and a harness wants the drawing's own frame: the door filling
@@ -2523,6 +2602,60 @@ function fitStage() {
   /* The crop just changed, so the scale did, so the touch target is the wrong
      size. A rotated phone is the case that matters. */
   sizeHitPad();
+
+  /* ── WHERE THE PHOTOGRAPH GOES ────────────────────────────────────
+     Two things have to be true at once and neither is negotiable: the
+     picture's own wall/floor junction must land on the line the door stands
+     on, and the picture must cover the stage — a strip of bare page at one
+     edge would be worse than no photograph at all.
+
+     `baseY` is read off the drawing (`data-base-y`), not retyped here: the
+     scene is the renderer's to define, and the note over that attribute
+     records what a second copy of the number would look like when it went
+     wrong. Three lower bounds on the height, and the largest wins:
+
+       yBase / floor            tall enough that the top edge reaches y=0
+       (h - yBase) / (1-floor)  tall enough that the bottom edge reaches the foot
+       w / aspect               wide enough to reach both sides
+
+     Solved every re-fit rather than written as a background-size keyword,
+     because `cover` scales about the CENTRE and this has to scale about the
+     floor line. Published as three lengths; the stylesheet owns which
+     properties they become. */
+  const baseY = Number(svg.dataset.baseY);
+  /* ⚠ HOW DEEP THE FLOOR IS, published whether or not there is a photograph.
+     The strip of ground in front of the threshold is the only part of the
+     scene that is not wall, and it is where the trust band stands. Measured
+     rather than assumed to be a fraction: it happens to be a constant 5.97% of
+     the stage today, because the crop is height-driven at every viewport this
+     app has — but "happens to be" is how a number goes wrong the first time
+     somebody changes `FIT_TRIM`, and `js/renderer.js` owns that number, not
+     the stylesheet. */
+  if (Number.isFinite(baseY)) {
+    document.documentElement.style.setProperty(
+      '--floor-b', `${Math.max(0, Math.round(box.height - (baseY - fy) * scale))}px`);
+  }
+  if (document.documentElement.classList.contains('is-photo')
+      && Number.isFinite(baseY)) {
+    const yBase = (baseY - fy) * scale;
+    const ph = Math.max(yBase / PHOTO.floor,
+                        (box.height - yBase) / (1 - PHOTO.floor),
+                        box.width / PHOTO.aspect);
+    const pw = ph * PHOTO.aspect;
+    const top = yBase - PHOTO.floor * ph;
+    const ss = stage.style;
+    ss.setProperty('--photo-w', `${pw.toFixed(1)}px`);
+    ss.setProperty('--photo-h', `${ph.toFixed(1)}px`);
+    ss.setProperty('--photo-y', `${top.toFixed(1)}px`);
+    /* The pill that hangs under the right-hand lamp now has a different lamp
+       to hang under — see the note on PHOTO. Same rects, same re-fit. */
+    const wrapR = $('.stage-wrap').getBoundingClientRect();
+    const st = $('.stage-wrap').style;
+    st.setProperty('--lamp-cx',
+      `${Math.round(box.x - wrapR.x + box.width / 2 + PHOTO.lampCx * pw)}px`);
+    st.setProperty('--lamp-b',
+      `${Math.round(box.y - wrapR.y + top + PHOTO.lampBot * ph)}px`);
+  }
 
   /* HOW MUCH WALL THERE IS BESIDE THE DOOR, in css pixels, published for the
      grip controls to stand in.
@@ -2591,10 +2724,19 @@ function fitStage() {
        ⚠ PHYSICALLY RIGHT, NOT LOGICALLY. `sort` by `x` and take the last, so
        it is the same lamp in Hebrew as in English — the drawing does not
        mirror (see the note over `svg { direction: ltr }`) and neither may
-       anything pinned to a feature of it. */
-    const lamps = [...document.querySelectorAll('.door-svg [data-room="sconce"]')]
-      .map(el => el.getBoundingClientRect())
-      .sort((a2, b2) => a2.x - b2.x);
+       anything pinned to a feature of it.
+       ⚠ AND IN PHOTO-MODE THE LAMP IS IN THE PHOTOGRAPH, so this block is
+       skipped and the block above places the pill instead. Written as an
+       explicit test and not left to the fact that a `display: none` element
+       reports a zero-width rect: that IS what happens, so the guard below
+       would have skipped anyway and the pill would have kept whatever value
+       the previous fit left on it — correct today, and silently wrong the day
+       somebody hides the backdrop a different way. Two rooms, two lamps, one
+       decision, stated once. */
+    const lamps = document.documentElement.classList.contains('is-photo') ? []
+      : [...document.querySelectorAll('.door-svg [data-room="sconce"]')]
+        .map(el => el.getBoundingClientRect())
+        .sort((a2, b2) => a2.x - b2.x);
     const lamp = lamps[lamps.length - 1];
     if (lamp && lamp.width) {
       const st = $('.stage-wrap').style;

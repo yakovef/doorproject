@@ -1975,6 +1975,24 @@ export function render(state) {
       <feGaussianBlur stdDeviation="10"/>
     </filter>
 
+    <!-- The two blurs the photographed room needs, and only it. Sigma 45 is
+         the pot's measured penumbra in the backdrop carried into the scene's
+         own units — 3.41% of the picture's width, which is 97 units on a
+         phone and 134 on a desktop, against a 10-90% transition of 2.56 sigma.
+         Sigma 9 is the contact term, which stays tight because ambient
+         occlusion is sharp under any light. Both are referenced by shapes that
+         sit at zero opacity until .is-photo raises them, so usedDefs keeps
+         them and no bare render is changed by a pixel.
+         (No backticks in this comment: CLAUDE.md §1b, and this is the eighth
+         build it has cost. node --check caught it in two seconds because it
+         was run BEFORE npm run build, which is the other half of that rule.) -->
+    <filter id="seamPool" x="-60%" y="-400%" width="220%" height="900%">
+      <feGaussianBlur stdDeviation="45"/>
+    </filter>
+    <filter id="seamContact" x="-40%" y="-500%" width="180%" height="1100%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+
     <!-- ── THE ROOM ──────────────────────────────────────────────────
          ⚠ EVERY ONE OF THESE IS A BLACK OR WHITE OVERLAY, NOT A COLOUR.
          The wall and floor are painted with the CSS variables --wall and
@@ -2282,6 +2300,42 @@ export function render(state) {
   <g id="shadow">
     <ellipse cx="${(x0 + x1) / 2}" cy="${baseY + 40}"
              rx="${totalW * 0.6}" ry="34" fill="#000" opacity="0.18" filter="url(#softShadow)"/>
+    ${/* ── THE SEAM SHAPES: DRAWN ALWAYS, PAINTING NOTHING UNTIL THE
+          PHOTOGRAPH IS THERE ─────────────────────────────────────────────
+          `PHOTOREAL.md` §2.2 — "the shadow is the glue". The drawn room's
+          floor is `--floor` at #E6E2DA and the photographed one is a warm
+          stone near #CAB7A6, half a stop darker; one soft ellipse at 0.18 that
+          reads correctly on the first lands on the second as nothing at all,
+          and the door floats. Measured in the spike: with the photograph
+          behind it and this group unchanged, the foot of the door had no
+          contact at any viewport.
+
+          Two terms, because real contact is two things. A TIGHT band right at
+          the leaf's foot — ambient occlusion, where no light reaches at all,
+          and always sharp whatever the light. A WIDE pool at the room's own
+          softness, whose blur is the pot's measured penumbra in the backdrop:
+          37 px of a 1086 px-wide photograph, 3.41% of its width, and the
+          photograph is scaled to the stage's width, so in the scene's own
+          units that is 97 units on a phone and 134 on a desktop. `softShadow`
+          is sigma 30, giving a 10-90% transition of 77 — a third too sharp at
+          the phone end and half too sharp at the desktop end.
+
+          ⚠ THEY ARE EMITTED ON EVERY DOOR AND `opacity="0"` IS WHY THAT IS
+          SAFE. An element at zero opacity paints no pixel, so all 110
+          committed bare sheets come back byte-identical — checked, not
+          assumed — while `.is-photo` in the stylesheet is free to turn them
+          up. The alternative was a second argument to `render`, which would
+          have put presentation into the one function in this repository whose
+          purity is asserted (T12), and a second SVG for the page to keep in
+          step with the one every instrument reads. The photo-mode seam lives
+          entirely in CSS for the same reason the backdrop does: instruments
+          must go on seeing a pure drawing. */''}
+    <ellipse data-seam="pool" cx="${(x0 + x1) / 2}" cy="${baseY + 26}"
+             rx="${totalW * 0.56}" ry="46" fill="#000" opacity="0"
+             filter="url(#seamPool)"/>
+    <rect data-seam="contact" x="${x0 - EDGE}" y="${baseY - 12}"
+          width="${(x1 - x0) + EDGE * 2}" height="30" fill="#000" opacity="0"
+          filter="url(#seamContact)"/>
   </g>
 
   <!-- ⚠ EVERYTHING THE FLOOR REFLECTS IS INSIDE THIS GROUP, and nothing else
@@ -2297,7 +2351,8 @@ export function render(state) {
     <!-- The casing stands a few millimetres proud of the plaster, so it drops
          a short shadow down and right of itself. Small, but it is the
          difference between a frame fixed INTO a wall and one printed onto it. -->
-    <path d="M ${casX0} ${casY0} H ${casX1} V ${baseY} H ${casX0} Z"
+    <path data-seam="casing"
+          d="M ${casX0} ${casY0} H ${casX1} V ${baseY} H ${casX0} Z"
           transform="translate(7 11)" fill="#000" opacity="0.22"
           filter="url(#frameShadow)"/>
 
@@ -2631,13 +2686,24 @@ export function render(state) {
      drift from the other end.
      ⚠ FIT_BOX and STAGE_BOX are deliberately not the same rectangle; see the
      note where FIT_BOX is defined for why trimming `PAD` instead would have
-     moved every committed sheet. */
+     moved every committed sheet.
+
+     `data-base-y` is the third number the page needs and the only one it could
+     not already read: the floor line. Every door in the range stands on it, it
+     is a constant of the SCENE and not of this door, and `fitStage` maps it to
+     a pixel so the photographed room's own wall/floor junction can be landed on
+     top of it. Published as an attribute for the same reason the fit box is —
+     the drawing is the authority on where its floor is, and a page that
+     retyped the figure would be CLAUDE.md §5.10's shape with the symptom
+     "the door floats a few pixels above the photographed floor", which is
+     exactly the kind of thing nobody reports. */
   return `
 <svg viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint)}"
      data-fit-x="${FIT_BOX.x}" data-fit-y="${FIT_BOX.y}"
      data-fit-w="${FIT_BOX.w}" data-fit-h="${FIT_BOX.h}"
+     data-base-y="${BASE_Y}"
      aria-label="${xmlAttr(describe(state))}" xmlns="http://www.w3.org/2000/svg">
   <defs>${usedDefs(defs, body)}</defs>
 ${body}

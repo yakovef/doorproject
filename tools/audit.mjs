@@ -18,7 +18,7 @@
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
 import { crashed } from './browser.mjs';
-import { load } from './imglib.mjs';
+import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
 import { SIZES } from '../js/catalog.js';
@@ -1358,6 +1358,22 @@ for (const v of VIEWS) {
     ['bundle-stalls', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
         await pg.route('**/bundle.js*', () => { /* deliberately never settles */ });
         await pg.goto(URL, { waitUntil: 'commit' }); await pg.waitForTimeout(5200); return pg; }],
+    /* ⚠ AN EIGHTH: THE PHOTOGRAPHED ROOM NOT ARRIVING. `assets/room.webp` is
+       the fourth file this site has, and the first one it does not need.
+       PHOTOREAL.md §1 makes that a requirement rather than a hope — the drawn
+       wall, floor and sconces stay in the SVG and are the automatic fallback —
+       so this joins the routes that must come up NORMAL. What is specific to
+       it is asserted below the loop: `.is-photo` never goes on, and the drawn
+       `#backdrop` is still painting.
+       ⚠ It produces one console error and that is the route working, not a
+       nuisance: it BLOCKS the file, so a failed load is the condition under
+       test. `pageerror` is still fatal here; only the aborted request is
+       expected, and it is expected by URL rather than by kind — see the note
+       over the font tag in index.html for why an instrument taught to ignore a
+       CLASS of error will one day ignore the real one. */
+    ['no-photo', async () => { const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+        await pg.route('**/room.webp*', r => r.abort());
+        await pg.goto(URL); await pg.waitForTimeout(1000); return pg; }],
   ];
 
   console.log('\nthe page cannot come up styled and inert');
@@ -1369,9 +1385,11 @@ for (const v of VIEWS) {
                 + 'the page looks finished and is not');
     }
     if (r.dead) fault(name, `${r.dead} send button(s) do not point at wa.me`);
-    /* `css-404` joins the two routes that must come up NORMAL: losing the
-       stylesheet costs the page its looks and nothing else. */
-    if (name === 'happy' || name === 'no-storage' || name === 'css-404') {
+    /* `css-404` and `no-photo` join the routes that must come up NORMAL:
+       losing the stylesheet costs the page its looks and nothing else, and
+       losing the photograph costs it the staging and nothing else. */
+    if (name === 'happy' || name === 'no-storage' || name === 'css-404'
+        || name === 'no-photo') {
       if (r.down) fault(name, 'the "cannot load" strip is showing on a working page');
       if (!r.promising) fault(name, 'a working page does not offer to send the door');
     } else {
@@ -1380,9 +1398,103 @@ for (const v of VIEWS) {
         fault(name, 'the button still promises to send a door there is no door for');
       }
     }
+    /* ⚠ AND THE SPECIFIC THING ABOUT `no-photo`: the drawn room takes over.
+       The route above only asks whether the page is usable; this asks whether
+       the FALLBACK actually happened. Without it the route would pass on a
+       page whose stage was a blank rectangle where the room should be, because
+       a blank rectangle has a working price and a working send button.
+       Both halves are asserted: `.is-photo` must NOT be on (nothing hides the
+       backdrop) and `#backdrop` must be painting (it is really there). */
+    if (name === 'no-photo') {
+      const f = await pg.evaluate(() => {
+        const bd = document.querySelector('#stage #backdrop');
+        return { on: document.documentElement.classList.contains('is-photo'),
+                 has: !!bd, shown: bd ? getComputedStyle(bd).display !== 'none' : false };
+      });
+      if (f.on) fault(name, 'is-photo went on with no photograph to show');
+      if (!f.has) fault(name, 'the drawn room is not in the document at all');
+      else if (!f.shown) fault(name, 'the drawn room is hidden and there is no photograph — '
+                                   + 'the stage is empty');
+    }
     await pg.close();
   }
   if (!faults) console.log('  a page that cannot start says so, and still reaches Peretz');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE PHOTOGRAPH'S FLOOR LINE IS THE DRAWING'S FLOOR LINE.
+   ═══════════════════════════════════════════════════════════════════
+   PHOTOREAL.md §3: *"The photo's wall/floor junction must coincide with the
+   SVG's baseY at every viewport. One constant, measured once per backdrop,
+   asserted in the audit (the drawn shadow must land ON the photo floor, not
+   above/below it)."*
+
+   ⚠ MEASURED IN PIXELS, NOT IN THE CONSTANTS THAT PRODUCED THEM. The obvious
+   check compares the number `fitStage` computed against the number `PHOTO`
+   holds, and it would pass with the picture upside down: two readings of one
+   arithmetic is CLAUDE.md §5's whole subject. So this screenshots the stage,
+   finds the strongest horizontal luminance step in the bottom fifth of a
+   column of WALL well clear of the door, and compares that with where the
+   drawing says its floor is.
+
+   ⚠ The column has to dodge the chrome as well as the door. Written first
+   without the "bottom fifth" bound, it found the price pill's edge at 1100 px
+   and reported the floor line 239 px out — a check failing about the wrong
+   object is a check nobody will trust twice.
+
+   Falsifiable: change `PHOTO.floor` in app.js by 0.01 and this fires at every
+   viewport (14 px at a 1440 desktop against a 4 px tolerance). */
+{
+  console.log('\nthe photographed floor is the floor the door stands on');
+  const TOL = 4;                     // px. The measured spread is 0.3–1.7.
+  /* ⚠ ITS OWN NAME, for the reason spelled out under T11 below: the `URL` the
+     failure-routes block uses is scoped to that block, and reaching for it out
+     of scope does not throw — it silently yields the WHATWG `URL` class. */
+  const PAGE = 'file://' + process.cwd() + '/index.html';
+  for (const v of VIEWS) {
+    if (skipped.includes(v.name)) continue;
+    const pg = await b.newPage({ viewport: { width: v.w, height: v.h }, deviceScaleFactor: 1 });
+    await pg.goto(PAGE);
+    await pg.waitForTimeout(1100);
+    const g = await pg.evaluate(() => {
+      if (!document.documentElement.classList.contains('is-photo')) return null;
+      const st = document.querySelector('#stage');
+      const svg = st && st.querySelector('svg');
+      if (!svg) return null;
+      const r = st.getBoundingClientRect();
+      const fr = st.querySelector('#frame').getBoundingClientRect();
+      const vb = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+      const baseY = Number(svg.dataset.baseY);
+      if (!Number.isFinite(baseY)) return { noBase: true };
+      return { x: r.x, y: r.y, w: r.width, h: r.height,
+               wallX: fr.x - r.x + fr.width + (r.width - (fr.x - r.x + fr.width)) * 0.5,
+               drawn: (baseY - vb[1]) * (r.height / vb[3]) };
+    });
+    if (!g) { fault(v.name, 'photo-mode did not come up, so the calibration cannot be read'); await pg.close(); continue; }
+    if (g.noBase) { fault(v.name, 'the drawing publishes no data-base-y — the page cannot place the room'); await pg.close(); continue; }
+    await pg.screenshot({ path: '/tmp/audit-floor.png',
+      clip: { x: g.x, y: g.y, width: g.w, height: g.h } });
+    const im = load('/tmp/audit-floor.png');
+    const at = (x, y) => lum(im.d, ((y | 0) * im.w + (x | 0)) * 4);
+    let best = -1, bestY = -1;
+    for (let y = Math.round(im.h * 0.80); y < im.h - 6; y++) {
+      let a = 0, c = 0;
+      for (let k = 1; k <= 4; k++) { a += at(g.wallX, y - k); c += at(g.wallX, y + k); }
+      const d = Math.abs(a - c) / 4;
+      if (d > best) { best = d; bestY = y; }
+    }
+    const delta = bestY - g.drawn;
+    if (best < 5) {
+      fault(v.name, `no wall/floor step found in the photograph (strongest ${best.toFixed(1)}/255) `
+                  + '— the room is not where the page thinks it is');
+    } else if (Math.abs(delta) > TOL) {
+      fault(v.name, `the photographed floor is ${delta.toFixed(1)} px from the drawn one `
+                  + `(tolerance ${TOL}) — the door is standing above or below the ground`);
+    } else {
+      console.log(`  ${v.name.padEnd(14)} floor line agrees to ${Math.abs(delta).toFixed(1)} px`);
+    }
+    await pg.close();
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

@@ -22,3 +22,13 @@ tools/_*
 # by (research/works/auto/), and both of those are committed.
 screenshots/sheet-*.png
 screenshots/leaf-check.png
+
+# The backdrop pipeline's intermediates. `research/backdrops/attached-*.webp`
+# are the owner's originals and ARE committed — they are the source the shipped
+# `assets/room.webp` is a pure function of. The PNGs beside them are just what
+# a container with no image library has to decode through, 1.4 MB each, and
+# `npm run backdrop` makes them again from nothing.
+research/backdrops/*.png
+research/backdrops/_*
+research/backdrops/g2-*
+research/backdrops/graded-*

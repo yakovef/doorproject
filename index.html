@@ -13,7 +13,30 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=4b4ced97">
+<link rel="stylesheet" href="css/app.css?v=71f76249">
+
+<!-- ⚠ THE FOURTH FILE, AND THE README'S "THREE FILES" SENTENCE MOVED WITH IT.
+     `assets/room.webp` is the photographed entrance the door now stands in.
+     The owner accepted a fourth asset for it explicitly (PHOTOREAL.md, the
+     header): 82 KB, one request, and the page is fully drawn and usable before
+     it arrives — the SVG's own wall, floor and sconces are the fallback, and
+     they are what a visitor sees for as long as this file is missing, blocked
+     or still in flight. Nothing about the layout depends on it.
+
+     ⚠ THIS TAG IS THE ONLY PLACE THE FILENAME IS WRITTEN, and that is the
+     whole reason it is a tag and not a `url()` in the stylesheet. The
+     stylesheet needs the picture and `js/app.js` needs to know when it has
+     arrived — two consumers, and a URL written twice is CLAUDE.md §5's oldest
+     shape with a cache stamp attached: the symptom is a second download of the
+     same 82 KB and nothing visibly wrong at all. So `index.html` owns the URL,
+     `tools/build.mjs` stamps it beside the other two, `js/app.js` reads
+     `#room-src`'s resolved `href` and swaps the picture in when it reports
+     itself decoded, and `css/app.css` owns the placement and never names a
+     file.
+
+     `as="image"` starts the fetch in the head, in parallel with the bundle, so
+     on a real connection the room is usually there for the first paint. -->
+<link rel="preload" as="image" id="room-src" href="assets/room.webp?v=99dcfd43">
 
 <!-- ⚠ THE ONE THING THIS PAGE LOADS FROM ANYWHERE ELSE, AND IT IS AN
      ENHANCEMENT, NEVER A DEPENDENCY.
@@ -598,7 +621,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=08a5e4c1"></script>
+<script src="assets/bundle.js?v=331ba578"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

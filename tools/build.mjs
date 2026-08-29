@@ -74,6 +74,12 @@ function stampHtml() {
   const refs = [
     [/(href=")(css\/app\.css)(\?v=[0-9a-f]+)?(")/, 'css/app.css'],
     [/(src=")(assets\/bundle\.js)(\?v=[0-9a-f]+)?(")/, 'assets/bundle.js'],
+    /* The photographed room. It is referenced from ONE place — the
+       `<link rel="preload" id="room-src">` in the head — because the
+       stylesheet and `js/app.js` both need it and a filename written twice is
+       a second download of the same 82 KB with nothing visibly wrong. See the
+       comment above that tag. */
+    [/(href=")(assets\/room\.webp)(\?v=[0-9a-f]+)?(")/, 'assets/room.webp'],
   ];
   for (const [re, path] of refs) {
     if (!re.test(html)) throw new Error(`index.html no longer references ${path}`);

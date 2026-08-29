@@ -607,6 +607,36 @@ svg { direction: ltr; }
     pointer-events: none;
   }
   .trust__ico { opacity: .7; }
+
+  /* ⚠ AND OVER A PHOTOGRAPH IT NEEDS A GROUND, WHICH IT NEVER NEEDED OVER A
+     DRAWING. Four claims in ink laid straight on a photographed stone floor
+     read as writing ON THE FLOOR rather than as chrome over a picture, and
+     that is most of the difference between a product shot and a caption.
+     Contrast was never the problem — `--ink` measures 13.9:1 on the drawn
+     floor and 11.6 on the photographed one — the problem is that a photograph
+     has depth and the words were standing inside it.
+     A scrim answers both: the room dissolves into the page at the very bottom
+     instead of stopping at a ruled edge, and the words come to rest on paper.
+     Only where there IS a photograph; over the drawn floor, which is already
+     the page's own colour, the same gradient is a smudge. */
+  .is-photo .trust {
+    /* ⚠ EXACTLY THE FLOOR STRIP, AND NOT A PIXEL HIGHER. The first version was
+       `padding-block-start: 30px` and a gradient over whatever height that
+       produced — 60 px at 1440, which reached 14 px ABOVE the floor line and
+       washed out the foot of the door, the contact shadow and the threshold:
+       the three things that had just been built to make it stand on the
+       ground. `--floor-b` is the ground in front of the threshold in pixels,
+       published by `fitStage` off the same rect and the drawing's own
+       `data-base-y`, so the scrim's top edge IS the wall/floor junction — an
+       edge that is really in the picture rather than a number that looked
+       about right. */
+    block-size: var(--floor-b, 46px);
+    padding-block: 0 6px;
+    align-items: flex-end;
+    background: linear-gradient(to top, var(--paper) 0%,
+                                        var(--paper) 30%,
+                                        transparent 100%);
+  }
 }
 
 /* ── strips ───────────────────────────────────────────────── */
@@ -870,6 +900,76 @@ svg { direction: ltr; }
    See the matching note in app.js, where the attribute stopped being copied
    onto `.layout`. The SVG still carries its own `data-light`, which the
    moulding reads; that is a fact about the paint and it stays. */
+
+/* ── PHOTO-MODE: THE ROOM BECOMES A PHOTOGRAPH ────────────────────────────
+ *
+ * `PHOTOREAL.md` §1. The door stays the live SVG and the room behind it
+ * becomes `assets/room.webp`, composited as a CSS background on the stage —
+ * NOT as an `<image>` inside the drawing. That choice is the whole feature:
+ *
+ *   · every instrument reads the SVG, and `?bare=1` goes on photographing a
+ *     pure drawing with no change of any kind. `recreate`, `corpus`,
+ *     `against`, `profile`, `collide` and `mottle` cannot tell this shipped;
+ *   · `render(state)` stays pure and byte-stable, so T12 still holds;
+ *   · and the drawn wall, floor and sconces stay in the SVG as the automatic
+ *     fallback. `armRoom` in app.js adds `.is-photo` inside the image's own
+ *     `load` handler, so a missing file, a blocked request or a browser that
+ *     cannot decode WebP all end at the same place — the drawn room, which is
+ *     the page exactly as it shipped before the photograph existed.
+ *
+ * ⚠ THE STYLESHEET NEVER NAMES THE FILE. `index.html`'s `#room-src` owns the
+ * URL and `js/app.js` sets `background-image` from it, so the cache stamp is
+ * written in one place. What is here is the PLACEMENT, and it is driven by
+ * three lengths `fitStage` publishes from the same rects it already reads —
+ * because the picture has to be scaled about its own FLOOR LINE and `cover`
+ * scales about the centre. */
+.is-photo .stage {
+  background-repeat: no-repeat;
+  /* The fallbacks are `100% auto`, which is a valid pair that covers the
+     width — `cover` cannot be one half of the two-value form, and an invalid
+     `background-size` drops the whole declaration and tiles the picture at its
+     natural size. `fitStage` always sets all three before the class goes on,
+     so these are for the impossible case only, and they are still a picture. */
+  background-size: var(--photo-w, 100%) var(--photo-h, auto);
+  background-position: 50% var(--photo-y, 0);
+}
+/* ⚠ NO FADE-IN, AND THAT IS DELIBERATE. The obvious flourish is to cross-fade
+   the room as it arrives, and the only element that could carry it is `.stage`
+   — which contains the DOOR, so fading it fades the product, and animating
+   opacity on the largest element on the page buys a compositor layer for it.
+   `GUIDED-FLOW.md` §3 rules out exactly this trade for the light sweep and the
+   sconce brighten. With `<link rel="preload">` in the head the picture is
+   usually decoded before the first paint anyway, so the case being animated is
+   the rare one. */
+/* ⚠ The drawn room goes only once the photograph is up, and this selector is
+   the whole of it: `#backdrop` is the group holding the wall, the floor, its
+   texture, the warm pool, the falloff, both sconces and the skirting shadow.
+   Scoped to `.stage`, so the thirty doors in the gallery and the order sheet
+   keep their drawn room — a tile 120 px wide has no business carrying an
+   82 KB photograph of a hallway, and the sheet is a document. */
+.is-photo .stage #backdrop { display: none; }
+
+/* ── THE SEAM ─────────────────────────────────────────────────────────────
+ * `PHOTOREAL.md` §2.2: "the shadow is the glue". The shapes are in the drawing
+ * at zero opacity on every door (see `#shadow` in renderer.js for why that is
+ * the safe way to do it); these three rules are the only thing that turns them
+ * up, and they exist only where there is a photograph for them to sit on. */
+.is-photo .stage [data-seam="pool"]    { opacity: .30; }
+.is-photo .stage [data-seam="contact"] { opacity: .58; }
+/* The casing stands proud of the plaster and drops a shadow onto it. On the
+   drawn wall 0.22 was enough — the wall was #F5F3EF and almost anything showed
+   on it. On the photograph's warmer, darker plaster the same shadow reads as
+   nothing, and the door's outer edge becomes a hard vector line against soft
+   grain, which at 2x is the most visible tell left in the composite. It also
+   does a second job the drawn room never needed: it is what keeps a WHITE
+   door's silhouette off a wall it nearly matches. */
+.is-photo .stage [data-seam="casing"] { opacity: .34; }
+
+/* The floor in the photograph is polished porcelain; the one it replaces was
+   matte paper. `render` masks the reflection to about 900 mm of floor and
+   fades it out, and that shape is right for both — what changes is how much
+   of the door the surface throws back. */
+.is-photo .stage g[mask] use { opacity: .2; }
 
 .door-svg {
   /* Fills the stage rather than sitting fitted inside it. The door itself is

@@ -25,7 +25,8 @@
     "fuzz": "node tools/fuzz.mjs",
     "corpus": "node tools/corpus.mjs",
     "sheets": "npm run shot && npm run recreate && npm run corpus && npm run against",
-    "latency": "node tools/latency.mjs"
+    "latency": "node tools/latency.mjs",
+    "backdrop": "node tools/backdrop.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
