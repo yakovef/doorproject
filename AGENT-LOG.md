@@ -23,6 +23,51 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-29 00:40 UTC — run 51: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 50 (`fb76369` is still
+the tip on both sides, clean fast-forward, nothing to pull). Re-read
+`AGENT.md`'s five nevers and skimmed the newest `AGENT-LOG.md` entries so as
+not to duplicate run 50's just-verified work. `npm run build` produced no
+diff (bundle already matched source). Walked the live page in Chromium via
+Playwright: phone (390×844) on arrival, desktop (1440×900) on arrival, a
+phone screenshot after jumping into the colour category (step 03), a full
+forward walk through all nine steps on a phone using the `.sect__next`
+buttons landing cleanly on the summary/quote page (spec rows, code, price,
+send button all present and correct, zero console errors), and the A4
+`?sheet=1` order sheet at 900×1200 (code, colour, handing sentence, price
+and breakdown line all rendering correctly, zero console errors). Nothing
+looked wrong at any of these — the wall-mounted `.stage__hud` controls,
+the `.quote` price/send element, and the language switcher all sit where
+run 50 put them, with no overlap and no stale copy.
+
+**Instruments:** test ✓ (3,448,747 passed, 0 failed — same count as run 50,
+consistent since nothing touched the catalogue) · audit ✓ (all seven
+viewports clean, no faults, including the gallery/order-sheet route, the
+no-JS/inert-page route, the shared-link-arrives-at-quote check, and the
+language/mirror check) · profile ✓ (leaf fall within tolerance on both
+bands; the historically-flaky moulding-bead check — "dark reed" — is still
+green at 0.999 lower/upper, holding since run 42's fix) · collide -- all ✓
+(1,060 designs, `faceObstacles` agrees with the drawing everywhere, nothing
+overlaps anything it should not) · collide -- boxes ✓ (every fitting inside
+its own declared box; MOUNT_REACH 121 still covers the deepest bolted
+fitting at 111) · recreate ✓ (all ten catalogue gaps are the same
+long-documented ones — brass vs. withdrawn finish, missing Rav Bariach
+colours, bar lengths outside the range, the grid/reeded-glass exclusivity —
+nothing new).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — there was no defect to fix this
+run. The three items still open (hardware finish, the three gallery colours
+missing from the chart, every price) remain Peretz's, per ASK-PERETZ.md,
+and were not touched.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-28 20:49 UTC — run 50: nothing worth changing — a major, exceptionally self-critical visual-design round, fully verified
 
 **The headline:** seven commits, a look-and-feel pass on the guided flow —
