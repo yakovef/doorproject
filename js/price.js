@@ -8,7 +8,8 @@
  */
 
 import { T } from './copy.js';
-import { BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
+import { BELLS, BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
+         PEEPHOLES,
          handleLength, HANDLE_RATE_A, MASHKOF_WIDER_A, MASHKOFS, paneCount,
          LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, stripePrice,
          WINDOWS } from './catalog.js';
@@ -198,6 +199,12 @@ export function priceParts(state) {
     lockset: byId(LOCKSETS, state.lockset).delta,
     speciallock: byId(SPECIAL_LOCKS, state.speciallock).delta,
     pirzul:  byId(PIRZUL, state.pirzul).delta,
+    /* Peretz, 30.8.2026. The bell is ₪300 and the peephole is included — a
+       zero row is dropped by `breakdownRows`, so the עינית costs the column
+       nothing and still reaches the ORDER through `js/spec.js`, which is where
+       Peretz needs to see it. */
+    bell:    byId(BELLS, state.bell).delta,
+    peephole: byId(PEEPHOLES, state.peephole).delta,
     /* A grille needs a window to sit in — and so does worked glass, which is
        in the same list now. Neither can be charged on a solid door: the
        configurator must never take money for something the drawing does not

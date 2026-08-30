@@ -22,7 +22,8 @@ import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE, PIRZUL as PIRZUL_PRICE,
          GRILLE as GRILLE_PRICE, DETAIL as DETAIL_PRICE, DETAIL_GLAZED,
          HANDLE as HANDLE_PRICE, HANDLE_RATE, LOCKSET as LOCKSET_PRICE, STRIPE,
-         SPECIAL_LOCK as SPECIAL_LOCK_PRICE } from './prices.js';
+         SPECIAL_LOCK as SPECIAL_LOCK_PRICE,
+         BELL as BELL_PRICE, PEEPHOLE as PEEPHOLE_PRICE } from './prices.js';
 
 /* Re-exported so nothing else has to know the flag moved. It belongs beside
    the figures it describes — flipping it is the last edit of the evening the
@@ -1734,6 +1735,8 @@ priceInto('handle',  HANDLES,              HANDLE_PRICE,  'delta');
 priceInto('lockset', LOCKSETS,             LOCKSET_PRICE, 'delta');
 priceInto('special lock', SPECIAL_LOCKS,    SPECIAL_LOCK_PRICE, 'delta');
 priceInto('pirzul',  PIRZUL,               PIRZUL_PRICE,  'delta');
+priceInto('bell',    BELLS,                BELL_PRICE,    'delta');
+priceInto('peephole', PEEPHOLES,           PEEPHOLE_PRICE, 'delta');
 
 /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and this is the only place
    in the catalogue where an option has two prices. See `DETAIL_GLAZED` in

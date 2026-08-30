@@ -74,8 +74,9 @@ export function agorot(shekels) {
    ⚠ THESE SIX ARE THE DOOR, AND THEY ARE THE FIRST REAL PRICES THIS PROJECT
    HAS EVER HAD. From Peretz, 26.8.2026 — the conversation ASK-PERETZ.md §5 had
    been waiting nine days for. Everything else in this file is added to them.
-   Their sum is ₪3,150: what the page shows before the customer has touched
-   anything, and a figure he would actually honour.
+   Their sum is ₪3,195: what the page shows before the customer has touched
+   anything, and a figure he would actually honour. (₪3,150 until 30.8.2026 —
+   see the note on `door` below, which is where the ₪45 went.)
 
    ⚠ WHY SIX NUMBERS AND NOT ONE PER SIZE. This block used to be `SIZE`, a
    starting price per band — ₪3,195 standard, ₪3,495 wide, and so on. That
@@ -385,6 +386,27 @@ export const SPECIAL_LOCK = {
   nospecial: 0,      // ללא
   kasefet:   700,    // כספת
   kodan:     900,    // קודן
+};
+
+/* ── the two fittings on the face ─────────────────────────────────────
+   Peretz, 30.8.2026: *"the bell on the doors is 300"* and *"add עינית"*.
+
+   ⚠ THE עינית IS ₪0 AND THAT IS NOT A PLACEHOLDER. He named no price for it,
+   and `CLAUDE.md` §9 assumption A7 has said since long before this round that
+   the peephole is standard on every door — his own פרזול note lists עינית
+   among the things the finish recolours, which is a door he assumes has one.
+   So the tile says כלול, which is the assumption this project already holds,
+   printed where a customer can see it rather than hidden in a ledger.
+   `ASK-PERETZ.md` asks the question that IS open: is it included, and may a
+   customer decline it? If the answer is a number, it is this line. */
+export const BELL = {
+  nobell: 0,         // ללא
+  bell:   300,       // פעמון — Peretz, 30.8.2026
+};
+
+export const PEEPHOLE = {
+  nopeep: 0,         // ללא
+  peep:   0,         // עינית — included; see the note above and A7
 };
 
 /* ── פרזול — the finish of the lock furniture ─────────────────────────

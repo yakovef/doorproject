@@ -56,7 +56,7 @@ import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, L
          STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
-         gripPlacement, nearestGrip, panelFits } from './renderer.js';
+         gripPlacement, nearestGrip, panelFits, peepholeFits } from './renderer.js';
 
 /** Does this detail put ruled line work on the face?
  *  `perimeter` counts: it is a groove like any other, and both doors that
@@ -141,6 +141,15 @@ export function conflicts(state) {
 
   const out = { window: {}, grille: {}, detail: {}, handle: {},
                 lockset: {}, size: {}, colour: {}, handing: {},
+                /* ⚠ THE עינית IS BLOCKED BY GEOMETRY, NOT BY A LIST. Both
+                   window shapes this catalogue sells are centred on the leaf
+                   and both reach viewer height, so on a glazed door the
+                   fitting has nowhere to be — `peepholeFits` computes that
+                   from the same `apertureLayout` the drawing calls, so the
+                   tile and the picture cannot disagree. The bell needs no such
+                   entry: it stands on the hinge stile and a 426-design sweep
+                   with real getBBox found it clear of everything. */
+                peephole: {}, bell: {},
                 /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
                    longer options with ids. Every other key here is
                    `{ optionId: reason }`; this one is either null or the one
@@ -246,6 +255,7 @@ export function conflicts(state) {
      The real reason it holds today is that the DRAWING has no measured answer
      for where a stripe goes on a panelled leaf, and inventing one would put
      geometry on screen no photograph supports (REALISM.md §6). */
+  if (!peepholeFits(state)) out.peephole.peep = T('why.peepWindow');
   if (onLeaf) out.stripes = T('why.stripesWindow');
   else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
   if (lined) {
@@ -498,6 +508,8 @@ const SAID = {
   setWindow:     'fix.setWindow',
   setGone:       'fix.setGone',
   needPanel:     'fix.needPanel',
+  peepGone:      'fix.peepGone',
+  peepWindow:    'fix.peepWindow',
   ownPull:       'fix.ownPull',
   stripesCapped: 'fix.stripesCapped',
 };
@@ -588,6 +600,17 @@ export function repair(state, intent = null) {
   if (s.stripeDir === 'v' && (s.stripeCount | 0) > STRIPE_MAX.v) {
     s.stripeCount = STRIPE_MAX.v;
     change('stripes', SAID.stripesCapped);
+  }
+
+  /* ⚠ THE עינית AND THE GLASS WANT THE SAME PIECE OF LEAF, and the trade is
+     the same two-sided one every other pair here gets: whichever the customer
+     just clicked wins. Without an intent — a link — the WINDOW stays, because
+     glass is the more expensive and the more visible of the two to lose
+     silently, which is the identical argument the line-work repair below
+     makes. */
+  if (s.peephole === 'peep' && !peepholeFits(s)) {
+    if (intent === 'peephole') { s.window = 'none'; change('window', SAID.windowGone); }
+    else { s.peephole = 'nopeep'; change('peephole', SAID.peepGone); }
   }
 
   const lined = isLineWork(s);

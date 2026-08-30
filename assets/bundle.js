@@ -208,10 +208,22 @@
       "Второй замок в дополнение к основному."
     ],
     "g.pirzul": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
+    "g.bell": ["פעמון", "Doorbell", "Звонок"],
+    "g.peephole": ["עינית", "Peephole", "Глазок"],
     "g.pirzul.h": [
       "הגוון של הידית, הצירים והעינית.",
       "The tone of the lever, the hinges and the viewer.",
       "Оттенок ручки, петель и глазка."
+    ],
+    "g.bell.h": [
+      "לחצן פעמון על הדלת עצמה.",
+      "A bell push on the door itself.",
+      "Кнопка звонка на самой двери."
+    ],
+    "g.peephole.h": [
+      "עינית לראות מי בחוץ. כלולה במחיר.",
+      "A viewer, to see who is outside. Included in the price.",
+      "Глазок, чтобы видеть, кто снаружи. Входит в цену."
     ],
     "g.size": ["מידה", "Size", "Размер"],
     "g.size.h": [
@@ -422,17 +434,29 @@
     "unit.mm": ["מ״מ", "mm", "мм"],
     "sheet.handing": ["כיוון", "Handing", "Открывание"],
     "sheet.grip": ["ידית", "Handle", "Ручка"],
+    /* ⚠ REWORDED 30.8.2026, AND THE FLAG THAT SHOWS IT IS STILL `false`.
+       These two strings said the prices were "examples only", which was true for
+       the whole life of the project and stopped being true on 26.8 when Peretz
+       said the real numbers — the strip came down then and the words were left
+       as they were. That is fine while nobody sees them and wrong the moment
+       somebody flips the flag back, which is exactly what `PLACEHOLDER` exists
+       for: *"the next time a price in here has no source — a new product, a rate
+       nobody has confirmed — this is how the page says so."*
+       A page carrying real prices under a banner calling them examples teaches a
+       reader to discount the true ones beside it. So the sentence now says the
+       thing the flag will actually mean: SOME figures are unconfirmed, not all
+       of them are invented. */
     "sheet.dev": [
-      "גרסת פיתוח — המחירים כאן הם דוגמה בלבד.",
-      "Development build — these prices are examples only.",
-      "Тестовая версия — цены здесь только для примера."
+      "גרסת פיתוח — חלק מהמחירים כאן עדיין לא אושרו.",
+      "Development build — some prices here are not confirmed yet.",
+      "Тестовая версия — часть цен ещё не подтверждена."
     ],
     /* ── the strips and the notices ───────────────────────────────── */
     "strip.dev.b": ["גרסת פיתוח.", "Development build.", "Тестовая версия."],
     "strip.dev": [
-      "הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.",
-      "The colours and prices here are examples, not final.",
-      "Цвета и цены здесь — примеры, не окончательные."
+      "חלק מהמחירים כאן עדיין לא אושרו על ידי פרץ.",
+      "Some prices here have not been confirmed by Peretz yet.",
+      "Часть цен здесь ещё не подтверждена Перецем."
     ],
     "notice.code": [
       "הקוד לא זוהה — מציגים דלת ברירת מחדל.",
@@ -497,7 +521,13 @@
        a translated string cannot interpolate at import time (see SAID in
        rules.js) — and `npm test` asserts all three sentences still name the cap
        they describe, so the number and the rule cannot drift apart. */
+    "fix.peepGone": ["הסרנו את העינית — החלון תופס בדיוק את מקומה", "We removed the peephole — the window sits exactly where it goes", "Мы убрали глазок — окно занимает как раз его место"],
     "fix.stripesCapped": ["פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת", "Vertical stripes cap at 6 — more than that will not fit across the door", "Вертикальных полос максимум 6 — больше по ширине двери не помещается"],
+    "why.peepWindow": [
+      "החלון תופס את מקום העינית",
+      "The window sits where the peephole goes",
+      "Окно занимает место глазка"
+    ],
     "why.gripOffDoor": ["הידית חורגת מהדלת", "The handle runs off the door", "Ручка выходит за пределы двери"],
     "why.gripReach": [
       "הידית גבוהה או נמוכה מדי לשימוש",
@@ -584,6 +614,8 @@
     "row.handle": ["ידית משיכה", "Pull handle", "Ручка-скоба"],
     "row.lockset": ["מנעול וידית", "Lever and cylinder", "Ручка и цилиндр"],
     "row.speciallock": ["מנעול מיוחד", "Extra lock", "Дополнительный замок"],
+    "row.bell": ["פעמון", "Doorbell", "Звонок"],
+    "row.peephole": ["עינית", "Peephole", "Глазок"],
     "row.detail": ["עיצוב", "Face", "Полотно"],
     "row.stripes": ["פסים", "Strips", "Полосы"],
     "row.size": ["מידה", "Size", "Размер"],
@@ -778,6 +810,18 @@
     // כספת
     kodan: 900
     // קודן
+  };
+  var BELL = {
+    nobell: 0,
+    // ללא
+    bell: 300
+    // פעמון — Peretz, 30.8.2026
+  };
+  var PEEPHOLE = {
+    nopeep: 0,
+    // ללא
+    peep: 0
+    // עינית — included; see the note above and A7
   };
   var PIRZUL = {
     "pz-nickel": 0,
@@ -1228,6 +1272,14 @@
     { id: "nospecial", he: "ללא", en: "None", ru: "Нет" },
     { id: "kasefet", he: "כספת", en: "Safe lock", ru: "Сейфовый замок" },
     { id: "kodan", he: "קודן", en: "Keypad", ru: "Кодовый замок" }
+  ];
+  var BELLS = [
+    { id: "nobell", he: "ללא", en: "None", ru: "Нет" },
+    { id: "bell", he: "פעמון", en: "Doorbell", ru: "Звонок" }
+  ];
+  var PEEPHOLES = [
+    { id: "nopeep", he: "ללא", en: "None", ru: "Нет" },
+    { id: "peep", he: "עינית", en: "Peephole", ru: "Глазок" }
   ];
   var GRILLES = [
     {
@@ -1858,6 +1910,8 @@
   priceInto("lockset", LOCKSETS, LOCKSET, "delta");
   priceInto("special lock", SPECIAL_LOCKS, SPECIAL_LOCK, "delta");
   priceInto("pirzul", PIRZUL2, PIRZUL, "delta");
+  priceInto("bell", BELLS, BELL, "delta");
+  priceInto("peephole", PEEPHOLES, PEEPHOLE, "delta");
   for (const [id, shekels] of Object.entries(DETAIL_GLAZED)) {
     const o = DETAILS.find((d) => d.id === id);
     if (!o) {
@@ -1920,6 +1974,12 @@
       lockset: byId(LOCKSETS, state2.lockset).delta,
       speciallock: byId(SPECIAL_LOCKS, state2.speciallock).delta,
       pirzul: byId(PIRZUL2, state2.pirzul).delta,
+      /* Peretz, 30.8.2026. The bell is ₪300 and the peephole is included — a
+         zero row is dropped by `breakdownRows`, so the עינית costs the column
+         nothing and still reaches the ORDER through `js/spec.js`, which is where
+         Peretz needs to see it. */
+      bell: byId(BELLS, state2.bell).delta,
+      peephole: byId(PEEPHOLES, state2.peephole).delta,
       /* A grille needs a window to sit in — and so does worked glass, which is
          in the same list now. Neither can be charged on a solid door: the
          configurator must never take money for something the drawing does not
@@ -1994,6 +2054,8 @@
     const hd = byId(HANDLES, state2.handle);
     const lk = byId(LOCKSETS, state2.lockset);
     const xl = byId(SPECIAL_LOCKS, state2.speciallock);
+    const bl = byId(BELLS, state2.bell);
+    const ep = byId(PEEPHOLES, state2.peephole);
     const mk = byId(MASHKOFS, state2.mashkof);
     const pz = byId(PIRZUL2, state2.pirzul);
     const dt = byId(DETAILS, state2.detail);
@@ -2042,6 +2104,12 @@
     rows.push({ key: "lockset", label: T("row.lockset"), id: lk.id, value: L(lk) });
     if (xl.id !== "nospecial") {
       rows.push({ key: "speciallock", label: T("row.speciallock"), id: xl.id, value: L(xl) });
+    }
+    if (bl.id !== "nobell") {
+      rows.push({ key: "bell", label: T("row.bell"), id: bl.id, value: L(bl) });
+    }
+    if (ep.id !== "nopeep") {
+      rows.push({ key: "peephole", label: T("row.peephole"), id: ep.id, value: L(ep) });
     }
     if (dt.id !== "plain") {
       rows.push({ key: "detail", label: T("row.detail"), id: dt.id, value: L(dt) });
@@ -2153,14 +2221,41 @@
              specular. On a fitting the size of a keypad the highlight is most of
              what anybody sees, so a near-colourless highlight IS the "too white".
     
-         Every VALUE is unchanged — the modelling, which is what separates metal
-         from grey plastic, is not what he complained about. Hue goes to 47.5 and
-         saturation rises where the measurement says it collapsed:
+         ⚠ AND THAT FIRST CORRECTION WAS NOT ENOUGH, BECAUSE THE REPOSITORY
+         ALREADY HELD A SECOND MEASUREMENT AND NOBODY HAD PUT THE TWO SIDE BY SIDE.
+         `barGold` — the Ella pull bar's own gradient, read off the manufacturer's
+         product photograph and trusted by this file for rounds — runs **hue 36.7,
+         saturation 41-84% (median 58%)**. The corrected ramp above ran hue 47.4 at
+         saturation 26%. The same metal, in one file, more than twice apart.
     
-             highlight   41.8 / 13.8%  ->  47.5 / 20.1%
-             body        43.5 / 23.5%  ->  47.1 / 25.8%
-             specular    44.4 / 10.7%  ->  48.0 / 13.8%   */
-    brass: ["#EFE5BF", "#D9CDA1", "#BCB084", "#9C9169", "#C7BD95", "#7C7351", "#FDF6DA"],
+         It was found by asking why `screenshots/against-ella.png` came back
+         BYTE-IDENTICAL after the brass moved. The answer is that the bar has its
+         own absolute gradient and never reads this ramp — which is correct, and is
+         the separation this file made on purpose so that one gradient never has
+         two owners. What it exposed is that the two had drifted: a customer can
+         put a brass Ella bar and a gold פרזול lever on ONE door and see two
+         different metals, and that is almost certainly the "too white".
+    
+         Which one governs. `barGold` is a product photograph, lit to show the
+         metal; the reading above is a fitting on a door in a dim hallway, and the
+         patch it was measured from necessarily contains some of the pale door
+         behind it, which pulls saturation down. §4 already settles the general
+         case — *"photographs are honest about one door at one hour; the most
+         photographically faithful choice is often wrong at drawing scale"* — and
+         the specific case is settled harder: whatever brass is, it cannot be two
+         things on one door.
+    
+         So the ramp is FITTED TO THE BAR. Hue 37, saturation interpolated onto the
+         bar's own saturation-against-value curve, every VALUE unchanged so the
+         modelling `scaleTone` depends on is untouched. The `lit return` stop comes
+         out `#C79E5C`, which is one of the bar's own measured stops exactly — the
+         interpolation landing on a measured value rather than between two.
+    
+             stop        26.8 ramp      first pass      fitted to the bar
+             highlight   41.8 / 13.8%   47.5 / 20.1%    37 / 43%
+             body        43.5 / 23.5%   47.1 / 25.8%    37 / 49%
+             specular    44.4 / 10.7%   48.0 / 13.8%    37 / 41%   */
+    brass: ["#EFC889", "#D9B06F", "#BC924E", "#9C783F", "#C79E5C", "#7C6032", "#FDD596"],
     /* ⚠ BRONZE IS ITS OWN METAL, AND IT USED TO BORROW BRASS. Reported from
          outside: *"the bronze and the gold pirzul look the same."* They were the
          same — `pz-bronze` and `pz-gold` both carried `tone: 'brass'`, so the two
@@ -2240,7 +2335,10 @@
   var EDGE = 38;
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
+  var PEEPHOLE_AFF = 1600;
   var SPECIAL_AFF = 1430;
+  var BELL_BACKSET = 90;
+  var PEEPHOLE_R = 15;
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
@@ -3891,6 +3989,25 @@
         rules believe in and the drawing does not is a fault this file has
         had four times. */
     ""}${specialLockArt(special, keyX, y(SPECIAL_AFF), leverDir)}
+    ${/* ⚠ THE עינית AND THE פעמון, ADDED 30.8.2026 ON PERETZ'S WORD, and drawn
+              here for the same reason the extra lock is: the drawing shows what
+              the price charges. A ₪300 bell nobody can see is a hidden cost with a
+              label on it, and a עינית that is "included" and invisible is a
+              promise with nothing behind it.
+    
+              ⚠ THE PEEPHOLE IS CENTRED ON THE LEAF AND THE BELL IS ON THE HINGE
+              STILE, and the two placements have completely different standing.
+              The peephole's is measured — two doors put it within 40 mm of the
+              leaf's centre line, on opposite sides. The bell's is a choice, made
+              because the hinge stile is the one band of leaf that is clear of the
+              lever, the cylinder, the extra lock and the pull handle at every
+              size, so a fitting nobody has photographed for us cannot collide with
+              anything. Both are explained where they are drawn. */
+    ""}${state2.peephole === "peep" ? peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ""}
+    ${state2.bell === "bell" ? bellPush(
+      hingeOnLeft ? mainX + BELL_BACKSET : mainX + leafW - BELL_BACKSET,
+      y(SPECIAL_AFF)
+    ) : ""}
   </g>
 
   <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
@@ -4241,6 +4358,20 @@ ${body}
     }
     return out;
   }, (st) => `${st.size}|${st.detail}|${st.window}`);
+  function peepholeFits(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const openings = apertureLayout(
+      byId(WINDOWS, state2.window),
+      leafW,
+      byId(DETAILS, state2.detail),
+      leafH
+    );
+    if (!openings.length) return true;
+    const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
+    const R = PEEPHOLE_R + 8;
+    return !openings.some((o) => cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
+  }
   function panelFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const detail = byId(DETAILS, state2.detail);
@@ -6455,6 +6586,42 @@ ${body}
         <rect x="-2" y="-8" width="4" height="1.6" fill="#6B7075" opacity="0.8"/>
         <rect x="-2" y="-4" width="3" height="1.4" fill="#6B7075" opacity="0.7"/>
       </g>`;
+  var peephole = (cx, cy) => {
+    const R = PEEPHOLE_R;
+    return `
+    <g data-hw="peephole" data-owner="peephole" data-kind="peephole"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+      <ellipse cx="${cx}" cy="${cy + R * 0.18}" rx="${(R * 0.95).toFixed(1)}"
+               ry="${(R * 0.88).toFixed(1)}" fill="#000" opacity="0.18"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
+              stroke="#000" stroke-opacity=".26"/>
+      ${/* the glass inside the ring — dark, because behind it is an unlit hall,
+        which is the same reasoning the obscured glazing is drawn on */
+    ""}<circle cx="${cx}" cy="${cy}" r="${(R * 0.52).toFixed(1)}"
+               fill="#000" fill-opacity=".58"/>
+      <circle cx="${(cx - R * 0.18).toFixed(1)}" cy="${(cy - R * 0.2).toFixed(1)}"
+              r="${(R * 0.2).toFixed(1)}" fill="#fff" fill-opacity=".30"/>
+    </g>`;
+  };
+  var bellPush = (cx, cy) => {
+    const R = 32.5;
+    return `
+    <g data-hw="bell" data-owner="bell" data-kind="bell"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+      <ellipse cx="${cx}" cy="${cy + R * 0.14}" rx="${(R * 0.96).toFixed(1)}"
+               ry="${(R * 0.9).toFixed(1)}" fill="#000" opacity="0.20"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
+              stroke="#000" stroke-opacity=".26"/>
+      <circle cx="${cx}" cy="${cy}" r="${(R * 0.66).toFixed(1)}"
+              fill="#000" fill-opacity=".10"/>
+      ${/* the button itself, proud of the bezel */
+    ""}<circle cx="${cx}" cy="${(cy + 1.5).toFixed(1)}" r="${(R * 0.5).toFixed(1)}"
+               fill="#000" fill-opacity=".16"/>
+      <circle cx="${cx}" cy="${cy}" r="${(R * 0.5).toFixed(1)}" fill="url(#lockUnit)"/>
+      <circle cx="${(cx - R * 0.16).toFixed(1)}" cy="${(cy - R * 0.18).toFixed(1)}"
+              r="${(R * 0.22).toFixed(1)}" fill="#fff" fill-opacity=".26"/>
+    </g>`;
+  };
   var cylinder = (cx, cy, owned = false) => {
     const R = LOCK_R;
     const kx = cx, ky = cy + 2;
@@ -6724,6 +6891,35 @@ ${body}
     </g>
   </svg>`;
   }
+  function bellGlyph(x) {
+    const art = {
+      nobell: `
+    <circle cx="0" cy="0" r="46" fill="none" stroke="currentColor" stroke-width="7" opacity=".3"/>
+    <path d="M-30 30 L30 -30" stroke="currentColor" stroke-width="7" opacity=".45"/>`,
+      bell: `
+    <circle cx="0" cy="0" r="52"/>
+    <circle cx="0" cy="0" r="40" fill="#fff" opacity=".92"/>
+    <circle cx="0" cy="0" r="26"/>`
+    }[x.id] || "";
+    return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+  }
+  function peepholeGlyph(x) {
+    const art = {
+      nopeep: `
+    <circle cx="0" cy="0" r="30" fill="none" stroke="currentColor" stroke-width="7" opacity=".3"/>
+    <circle cx="0" cy="0" r="46" fill="none" stroke="currentColor" stroke-width="4" opacity=".22"/>
+    <path d="M-32 32 L32 -32" stroke="currentColor" stroke-width="7" opacity=".45"/>`,
+      peep: `
+    <circle cx="0" cy="0" r="40"/>
+    <circle cx="0" cy="0" r="21" fill="#fff" opacity=".92"/>
+    <circle cx="-7" cy="-8" r="8" opacity=".55"/>`
+    }[x.id] || "";
+    return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+  }
   function specialLockGlyph(x) {
     const art = {
       nospecial: `
@@ -6837,6 +7033,16 @@ ${body}
       size: {},
       colour: {},
       handing: {},
+      /* ⚠ THE עינית IS BLOCKED BY GEOMETRY, NOT BY A LIST. Both
+         window shapes this catalogue sells are centred on the leaf
+         and both reach viewer height, so on a glazed door the
+         fitting has nowhere to be — `peepholeFits` computes that
+         from the same `apertureLayout` the drawing calls, so the
+         tile and the picture cannot disagree. The bell needs no such
+         entry: it stands on the hinge stile and a 426-design sweep
+         with real getBBox found it clear of everything. */
+      peephole: {},
+      bell: {},
       /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
          longer options with ids. Every other key here is
          `{ optionId: reason }`; this one is either null or the one
@@ -6868,6 +7074,7 @@ ${body}
         out.window[w.id] = out.window[w.id] || T("why.setOwnWindow");
       }
     }
+    if (!peepholeFits(state2)) out.peephole.peep = T("why.peepWindow");
     if (onLeaf) out.stripes = T("why.stripesWindow");
     else if (byId(DETAILS, state2.detail).panel) out.stripes = T("why.stripesPanel");
     if (lined) {
@@ -6937,6 +7144,8 @@ ${body}
     setWindow: "fix.setWindow",
     setGone: "fix.setGone",
     needPanel: "fix.needPanel",
+    peepGone: "fix.peepGone",
+    peepWindow: "fix.peepWindow",
     ownPull: "fix.ownPull",
     stripesCapped: "fix.stripesCapped"
   };
@@ -6964,6 +7173,15 @@ ${body}
     if (s.stripeDir === "v" && (s.stripeCount | 0) > STRIPE_MAX.v) {
       s.stripeCount = STRIPE_MAX.v;
       change("stripes", SAID.stripesCapped);
+    }
+    if (s.peephole === "peep" && !peepholeFits(s)) {
+      if (intent === "peephole") {
+        s.window = "none";
+        change("window", SAID.windowGone);
+      } else {
+        s.peephole = "nopeep";
+        change("peephole", SAID.peepGone);
+      }
     }
     const lined = isLineWork(s);
     if (lined && byId(DETAILS, s.detail).panel) {
@@ -7097,7 +7315,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 19;
+  var VERSION = 20;
   var DEFAULTS = {
     /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
        Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
@@ -7124,6 +7342,17 @@ ${body}
        worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
        becomes the first entry in the list. */
     speciallock: "nospecial",
+    /* ⚠ THE DOOR OPENS WITH NEITHER, INCLUDING THE ONE THAT IS FREE. The עינית
+       costs nothing (assumption A7 says it is standard), so putting it on the
+       opening door would cost the customer nothing either — and it would still
+       be wrong. This block's whole rule is that every mark on the leaf is one
+       the customer put there and can see themselves putting there, and a fitting
+       that appears without being chosen is a fitting nobody can un-choose
+       without first noticing it. The Rotem is on the door because Peretz said
+       every door has one; he has not said that about the עינית, he said "add
+       it". */
+    bell: "nobell",
+    peephole: "nopeep",
     mashkof: "mk-std",
     pirzul: "pz-nickel",
     /* ⚠ 0 = "as the model comes". Every bar has a length measured off the
@@ -7149,6 +7378,8 @@ ${body}
     p.set("x", state2.speciallock);
     p.set("m", state2.mashkof);
     p.set("pz", state2.pirzul);
+    p.set("bl", state2.bell);
+    p.set("ey", state2.peephole);
     p.set("hl", String(state2.handleLen));
     p.set("sp", String(packStripes(state2)));
     p.set("d", state2.detail);
@@ -7180,6 +7411,8 @@ ${body}
       "s",
       "h",
       "gp",
+      "bl",
+      "ey",
       "code",
       "bare",
       "sheet",
@@ -7227,6 +7460,8 @@ ${body}
     take("speciallock", "x", SPECIAL_LOCKS);
     take("mashkof", "m", MASHKOFS);
     take("pirzul", "pz", PIRZUL2);
+    take("bell", "bl", BELLS);
+    take("peephole", "ey", PEEPHOLES);
     const rawStripes = p.get("sp");
     if (rawStripes != null) {
       const v = Number(rawStripes);
@@ -7273,7 +7508,9 @@ ${body}
     mashkof: 2,
     pirzul: 2,
     handleLen: 4,
-    stripes: 5
+    stripes: 5,
+    bell: 1,
+    peephole: 1
   };
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   var CHECK_MIN = 4;
@@ -7310,7 +7547,9 @@ ${body}
          eight lengths need three. This is also why the lengths are a fixed list
          rather than a free number — see `HANDLE_LENS`. */
       [Math.max(0, HANDLE_LENS.indexOf(state2.handleLen)), BITS.handleLen],
-      [packStripes(state2), BITS.stripes]
+      [packStripes(state2), BITS.stripes],
+      [Math.max(0, BELLS.findIndex((x) => x.id === state2.bell)), BITS.bell],
+      [Math.max(0, PEEPHOLES.findIndex((x) => x.id === state2.peephole)), BITS.peephole]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -7354,7 +7593,9 @@ ${body}
     const pirzul = PIRZUL2[read(BITS.pirzul)];
     const hLen = HANDLE_LENS[read(BITS.handleLen)];
     const sp = read(BITS.stripes);
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0) return null;
+    const bell = BELLS[read(BITS.bell)];
+    const peep = PEEPHOLES[read(BITS.peephole)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep) return null;
     return {
       colour: colour.id,
       size,
@@ -7367,6 +7608,8 @@ ${body}
       speciallock: special.id,
       mashkof: mashkof.id,
       pirzul: pirzul.id,
+      bell: bell.id,
+      peephole: peep.id,
       handleLen: hLen,
       ...unpackStripes(sp)
     };
@@ -7655,6 +7898,33 @@ ${body}
       list: () => PIRZUL2,
       glyph: pirzulGlyph,
       hint: "g.pirzul.h"
+    },
+    /* ⚠ THE פעמון AND THE עינית, 30.8.2026, AND THEY SIT ON THE פרזול STEP.
+       Peretz asked for both by name. Neither is a lock and neither is a grip, so
+       they do not belong on `lock` or `grip` — and neither is worth a tenth step
+       of its own, because a step with one yes/no question in it is a page turn
+       for a checkbox. `pz` is the step that already asks "and what else is on
+       the door", and it is where a customer who has just chosen the finish of
+       the ironmongery is looking.
+       ⚠ Their ORDER here decides the order on the screen, and the bell is first
+       because it is the one that costs money. */
+    {
+      key: "bell",
+      title: "g.bell",
+      in: "pz",
+      kind: "hw",
+      list: () => BELLS,
+      glyph: bellGlyph,
+      hint: "g.bell.h"
+    },
+    {
+      key: "peephole",
+      title: "g.peephole",
+      in: "pz",
+      kind: "hw",
+      list: () => PEEPHOLES,
+      glyph: peepholeGlyph,
+      hint: "g.peephole.h"
     },
     {
       key: "size",

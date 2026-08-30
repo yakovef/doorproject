@@ -2,14 +2,15 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { BELLS, PEEPHOLES, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { L, T, withLang } from '../js/copy.js';
-import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
+import { breakdownRows, formatAgorot, priceAgorot, shekels, tileAgorot } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT,
-  locksetGlyph, nearestGrip, render, sizeGlyph, specialLockGlyph, windowGlyph,
+  locksetGlyph, nearestGrip, peepholeFits, render, sizeGlyph, specialLockGlyph,
+  windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
@@ -38,13 +39,45 @@ const ALPHABET_TEST = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
    one of the included three. */
 const base = { colour: 'rb-7126d', window: 'none', grille: 'none',
                handle: 'idan', lockset: 'coral', speciallock: 'nospecial',
+               /* ⚠ ADDED 30.8.2026 WITH THE FIELDS THEMSELVES, and leaving
+                  them out failed exactly the way `DEFAULTS` warns a missing
+                  key does: `toQuery` wrote `bl=undefined`, `fromQuery` did not
+                  recognise it, and 1,900 round-trip assertions reported "an
+                  unexpected notice" about a door that was fine. Loud, which is
+                  the design — but the lesson is that this fixture is a second
+                  statement of DEFAULTS and there is an assertion below that
+                  every key of one is a key of the other. */
+               bell: 'nobell', peephole: 'nopeep',
+               /* ⚠ AND THESE THREE WERE ALREADY MISSING BEFORE TODAY. The
+                  guard below found them on its first run: this fixture has
+                  never carried the stripe fields, and it worked only because
+                  `isLineWork` reads `undefined` as falsy and gets the right
+                  answer by accident. A fixture that is right by accident is
+                  the thing that stops being right. */
+               stripeDir: 'none', stripeCount: 0, stripeTight: false,
                mashkof: 'mk-std', pirzul: 'pz-nickel', handleLen: 0,
                detail: 'plain', size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
-              'lockset', 'speciallock', 'mashkof', 'pirzul', 'handleLen', 'detail'];
+              'lockset', 'speciallock', 'bell', 'peephole', 'mashkof', 'pirzul',
+              'handleLen', 'detail'];
+
+/* ⚠ THE GUARD THAT WOULD HAVE CAUGHT TWO STALE FIXTURES, AND IT COST NOTHING.
+   `base` and `everyState`'s stem are both descriptions of "a door" written by
+   hand, which makes them second statements of `DEFAULTS` — and on 30.8.2026
+   two new fields landed and neither gained them. The symptom was 1,900
+   assertions failing with `bl=undefined` and "did not round-trip", none of
+   which named the actual fault.
+   Both spread `DEFAULTS` now. This asserts they still cover it, so a fixture
+   that drifts fails with a sentence saying which key is missing rather than
+   with two thousand about something else. */
+for (const k of Object.keys(DEFAULTS)) {
+  ok(Object.prototype.hasOwnProperty.call(base, k),
+     `the price fixture has no "${k}" — a key missing from a fixture encodes as `
+     + 'index 0 in silence, which is what DEFAULTS warns about');
+}
 
 /* The code's length is derived, never typed. It was written as {8} and the
    day the layout grew to nine characters that produced 280 failures saying
@@ -86,7 +119,16 @@ function* everyState() {
          own below, and the round-trip below needs it present at all: a key
          missing from the stem encodes as `undefined`, which
          `Math.max(0, indexOf(undefined))` masks to index 0 in silence. */
-      const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
+      /* ⚠ SPREAD FROM `DEFAULTS`, AND IT USED TO BE TYPED OUT. The comment
+         above says exactly what a missing key does, and then two new fields
+         arrived on 30.8.2026 and this object did not gain them — 1,900 codes
+         "did not round-trip" about a layout that was fine. A hand-kept copy of
+         a list of keys is a second statement of that list (§5.10), and this
+         file had TWO of them: this stem and the `base` fixture at the top.
+         Both derive now, and there is an assertion below that they still carry
+         every key `DEFAULTS` does, so the next field cannot do it again. */
+      const stem = { ...DEFAULTS,
+                     colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
                      detail: 'plain', speciallock: 'nospecial', mashkof: 'mk-std',
                      pirzul: 'pz-nickel', handleLen: 0 };
       const out = [];
@@ -2008,6 +2050,139 @@ group('rules: nothing unbuildable can be reached');
   }
 
   console.log(`  (${n} designs repaired and re-checked)`);
+}
+
+
+// ── 8c. The פעמון and the עינית, added on Peretz's word 30.8.2026 ──
+/* ⚠ THE TRIANGLE, ASSERTED PIECE BY PIECE. The house rule for a new priced
+   option is that the drawing shows it, the price charges it and the message
+   names it — and the way that rule fails is never all three at once. It fails
+   as a grille id matching no branch in `grillePaths` (§5.1), or a finish
+   charging ₪220 and moving no pixel (§5.7), or an axis missing from
+   `js/spec.js` so Peretz never hears about it. So each corner is its own
+   assertion and each one names its object.
+
+   ⚠ AND THE עינית IS THE HARDER OF THE TWO TO GET RIGHT, because it is ₪0.
+   Every "does this option do anything" check in this file is written around a
+   price moving, and a free option passes all of them by doing nothing. The
+   checks below ask about the DRAWING and the ORDER instead. */
+group('the doorbell and the peephole');
+{
+  const solid = { ...base, window: 'none', detail: 'plain' };
+  const has = (st, kind) => new RegExp(`data-kind="${kind}"`).test(render(st));
+
+  /* ── the drawing ── */
+  ok(!has(solid, 'bell') && !has(solid, 'peephole'),
+     'a door with neither chosen must draw neither');
+  ok(has({ ...solid, bell: 'bell' }, 'bell'), 'choosing the פעמון must draw one');
+  ok(has({ ...solid, peephole: 'peep' }, 'peephole'), 'choosing the עינית must draw one');
+  /* ⚠ AND THEY MUST BE DIFFERENT PICTURES. Two discs is exactly the shape of
+     §5 item 5 — nine handle tiles that drew one glyph — and both of these are
+     a circle inside a circle. */
+  const bellArt = /<g[^>]*data-kind="bell"[^>]*>([\s\S]*?)<\/g>/
+    .exec(render({ ...solid, bell: 'bell' }))[1];
+  const peepArt = /<g[^>]*data-kind="peephole"[^>]*>([\s\S]*?)<\/g>/
+    .exec(render({ ...solid, peephole: 'peep' }))[1];
+  ok(bellArt.replace(/[\d.-]+/g, '') !== peepArt.replace(/[\d.-]+/g, '')
+     || bellArt !== peepArt,
+     'the bell and the peephole draw the same picture');
+  /* The bell is on the HINGE stile and the peephole is CENTRED — the two
+     placements have different standing and the drawing has to keep them
+     apart. Read off the markup rather than recomputed here, so this cannot
+     agree with a second copy of the arithmetic (§5.10). */
+  for (const h of ['right-in', 'left-in']) {
+    const svg = render({ ...solid, handing: h, bell: 'bell', peephole: 'peep' });
+    const cx = k => Number(new RegExp(`data-kind="${k}"[^>]*data-cx="([\\d.-]+)"`).exec(svg)[1]);
+    const key = Number(/data-kind="cylinder"[^>]*data-cx="([\d.-]+)"/.exec(svg)[1]);
+    const mid = cx('peephole');
+    ok(Math.abs(cx('bell') - key) > Math.abs(mid - key),
+       `on ${h} the bell must stand further from the lock than the leaf's centre line`);
+  }
+
+  /* ── the price ── */
+  const P = st => shekels(priceAgorot({ ...base, ...st }));
+  ok(P({ bell: 'bell' }) - P({}) === 300, `the פעמון must add ₪300, got ${P({ bell: 'bell' }) - P({})}`);
+  ok(P({ peephole: 'peep' }) - P({}) === 0, 'the עינית is included — see A7 and prices.js');
+  ok(tileAgorot('bell', { ...base, bell: 'bell' }) === 30000, 'the bell tile must print ₪300');
+  ok(tileAgorot('peephole', { ...base, peephole: 'peep' }) === 0,
+     'the peephole tile must print a zero, which the label renders as כלול');
+
+  /* ── the order ── */
+  /* ⚠ BOTH REACH PERETZ, INCLUDING THE FREE ONE. "Included" is still a thing
+     he has to fit, and a row that appears only when money moves would tell him
+     about the bell and leave him guessing about the עינית. */
+  for (const [field, id, word] of [['bell', 'bell', 'פעמון'], ['peephole', 'peep', 'עינית']]) {
+    const rows = specRows({ ...solid, [field]: id });
+    ok(rows.some(r => r.key === field && r.id === id),
+       `the ${field} must appear in specRows — an axis that does not reach spec.js is one Peretz never hears about`);
+    const msg = withLang('he', () => specLines({ ...solid, [field]: id }).join('\n'));
+    ok(msg.includes(word), `the order must name the ${field} in Hebrew: expected "${word}"`);
+    /* And it must NOT be there when it was not chosen. */
+    ok(!specRows(solid).some(r => r.key === field), `a door without a ${field} must not carry its row`);
+  }
+
+  /* ── the wire format ── */
+  for (const b of BELLS) for (const e of PEEPHOLES) {
+    const st = repair({ ...solid, bell: b.id, peephole: e.id }).state;
+    const q = fromQuery(toQuery(st)).state;
+    ok(q.bell === st.bell && q.peephole === st.peephole,
+       `a link lost ${b.id}/${e.id}: got ${q.bell}/${q.peephole}`);
+    const c = decodeCode(encodeCode(st));
+    ok(c && c.bell === st.bell && c.peephole === st.peephole,
+       `a code lost ${b.id}/${e.id}: got ${c && c.bell}/${c && c.peephole}`);
+  }
+  /* ⚠ AND THE OLD CODES MUST BE REFUSED, NOT RE-READ. Two new fields shift
+     every bit after them; a v19 code decoded under v20 is a different door.
+     That is the whole reason `VERSION` moved, so it is asserted rather than
+     assumed. Built by hand from the v19 layout: same alphabet, one version
+     short. */
+  ok(VERSION === 20, `VERSION must be 20 for the bell and the peephole, got ${VERSION}`);
+  ok(decodeCode('DM-K400040000') === null,
+     'a version-19 code must be refused outright, never decoded under the new layout');
+
+  /* ── the parameters, which are NEW and must stay new ── */
+  /* `a=` and `f=` are retired FOREVER (CLAUDE.md §1) and the five add-on ids
+     travelled under `a=`. A link still carrying one must open its own door in
+     silence — not be re-read as a bell. */
+  const stale = fromQuery('?v=20&a=peep,mail,knocker');
+  ok(stale.notice !== 'option-unknown', 'a retired a= must not raise a notice');
+  ok(stale.state.peephole === 'nopeep' && stale.state.bell === 'nobell',
+     'a retired a=peep must NOT be re-read as the new peephole');
+  ok(toQuery({ ...solid, bell: 'bell' }).includes('bl=bell'), 'the bell rides in bl=');
+  ok(toQuery({ ...solid, peephole: 'peep' }).includes('ey=peep'), 'the peephole rides in ey=');
+  ok(!/[?&]a=/.test(toQuery({ ...solid, bell: 'bell', peephole: 'peep' })),
+     'nothing may be written into the retired a=');
+
+  /* ── the rule ── */
+  /* ⚠ GEOMETRIC, AND FALSIFIED: both window shapes this catalogue sells are
+     centred and reach viewer height, so a peephole at its measured position
+     has nowhere to be. `tools/_newhw.mjs` swept 426 designs with real getBBox
+     and found the overlap on all 140 glazed ones and nothing else. */
+  for (const w of WINDOWS) {
+    const glazed = w.id !== 'none';
+    ok(peepholeFits({ ...base, window: w.id, detail: glazed ? 'panel' : 'plain' }) === !glazed,
+       `peepholeFits must be ${!glazed} for window "${w.id}"`);
+  }
+  {
+    const { state: fixed, changed } =
+      repair({ ...base, window: 'rect', detail: 'panel', peephole: 'peep' });
+    ok(fixed.peephole === 'nopeep' && changed.includes('peephole'),
+       'a link with a peephole and a window must lose the peephole, and say so');
+    /* And the other way: clicking the peephole ON a glazed door takes the
+       glass, because whichever the customer just clicked wins. */
+    const { state: chosen } =
+      repair({ ...base, window: 'rect', detail: 'panel', peephole: 'peep' }, 'peephole');
+    ok(chosen.peephole === 'peep' && chosen.window === 'none',
+       'clicking the peephole must take the window, not be refused');
+  }
+  /* The BELL has no such rule, and that is a finding rather than an omission:
+     the same sweep found it clear of glass, mouldings, stripes and every
+     fitting, at every size and both handings. */
+  for (const w of WINDOWS) {
+    ok(!conflicts({ ...base, window: w.id, detail: w.id === 'none' ? 'plain' : 'panel' })
+        .bell.bell,
+       `the bell must not be blocked on window "${w.id}"`);
+  }
 }
 
 // ── 8a. A grip is a grip; only the lockset is lock furniture ──────

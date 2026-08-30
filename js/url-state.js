@@ -8,9 +8,9 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_LENS, LOCKSETS,
-         MASHKOFS, packStripes, PIRZUL, SIZE_ALIAS, SIZES, SPECIAL_LOCKS, STRIPE_MAX,
-         STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
+import { BELLS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_LENS, LOCKSETS,
+         MASHKOFS, packStripes, PEEPHOLES, PIRZUL, SIZE_ALIAS, SIZES, SPECIAL_LOCKS,
+         STRIPE_MAX, STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
 /* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
@@ -186,7 +186,22 @@ import { repair } from './rules.js';
    number is for.
    The `?...=` query form is not indexed and keeps working: the withdrawn ids
    resolve through `aliases` (grille, face) and `SIZE_ALIAS` (size). */
-export const VERSION = 19;
+/* ⚠ 20: THE פעמון AND THE עינית ARE TWO NEW FIELDS, 30.8.2026. Peretz asked
+   for both by name. Two new one-bit fields is a BIT-LAYOUT change, which is
+   the one thing an alias can never rescue: a v19 code read against a v20
+   layout would shift every field after the insertion point and open a
+   different door at a different price, in silence. So every code written
+   before today is refused with a notice instead — which is what this number
+   exists to do, and the reason the work order calls the bump a ritual rather
+   than a chore.
+   ⚠ AND THE CODE IS ELEVEN CHARACTERS NOW, NOT TEN. The payload goes 46 -> 48
+   and `TOTAL_BITS` reserves the check nibble BEFORE rounding, so it lands on
+   55 rather than shaving the check. That is the correct thing to give way: a
+   customer reads a code down the telephone once, and a wrong door is forever.
+   The `?...=` query form is not indexed and is unaffected — a link written
+   yesterday opens today with no bell and no peephole, which is the door it
+   described. */
+export const VERSION = 20;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -260,6 +275,17 @@ export const DEFAULTS = {
      worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
      becomes the first entry in the list. */
   speciallock: 'nospecial',
+  /* ⚠ THE DOOR OPENS WITH NEITHER, INCLUDING THE ONE THAT IS FREE. The עינית
+     costs nothing (assumption A7 says it is standard), so putting it on the
+     opening door would cost the customer nothing either — and it would still
+     be wrong. This block's whole rule is that every mark on the leaf is one
+     the customer put there and can see themselves putting there, and a fitting
+     that appears without being chosen is a fitting nobody can un-choose
+     without first noticing it. The Rotem is on the door because Peretz said
+     every door has one; he has not said that about the עינית, he said "add
+     it". */
+  bell: 'nobell',
+  peephole: 'nopeep',
   mashkof: 'mk-std',
   pirzul:  'pz-nickel',
   /* ⚠ 0 = "as the model comes". Every bar has a length measured off the
@@ -295,6 +321,15 @@ export function toQuery(state) {
      set of objects. Reusing the parameter would make an old link mean
      something it never meant. */
   p.set('pz', state.pirzul);
+  /* ⚠ `bl` AND `ey`, NEVER `a`. There was a multi-select of five accessories
+     once — peephole, letterplate, knocker, closer, nameplate — packed into a
+     bitmask under `a=`, withdrawn on the owner's word, and `a=` is retired
+     FOREVER (CLAUDE.md §1). Somebody's WhatsApp history still holds
+     `?a=peep,mail`; it must open the door it always opened rather than being
+     re-read as something new, so `fromQuery` goes on ignoring it in silence
+     and these two are their own parameters. */
+  p.set('bl', state.bell);
+  p.set('ey', state.peephole);
   p.set('hl', String(state.handleLen));
   /* ⚠ ONE PARAMETER FOR THREE PROPERTIES, the same ordinal the code packs.
      Three separate parameters could carry `sd=h&sc=0` or `sd=none&sc=7` — a
@@ -371,7 +406,7 @@ export function fromQuery(search) {
      language is a fact about the reader, which is also why it is not in the
      short code (see `js/copy.js`). */
   const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hl', 'sp',
-                           'd', 's', 'h', 'gp',
+                           'd', 's', 'h', 'gp', 'bl', 'ey',
                            'code', 'bare', 'sheet', 'lang']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
@@ -460,6 +495,8 @@ export function fromQuery(search) {
   take('speciallock', 'x', SPECIAL_LOCKS);
   take('mashkof', 'm', MASHKOFS);
   take('pirzul', 'pz', PIRZUL);
+  take('bell', 'bl', BELLS);
+  take('peephole', 'ey', PEEPHOLES);
   /* ⚠ A NUMBER, SO `take` CANNOT DO IT — `take` resolves an id against a list
      and reports an unknown one. A length is neither: it is one of eight
      values, and anything else is a link we cannot read. Refused with the same
@@ -663,10 +700,26 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    effect of tidying. The check nibble is what makes a code safe to read down a
    telephone (REDESIGN.md §1.5: 38.4% of single-character typos used to decode
    to a different valid door); it is never the thing that gives way. */
+/* ⚠ `bell` AND `peephole` ARE ONE BIT EACH, ADDED 30.8.2026, AND THE PAYLOAD
+   IS 48. Two two-entry lists need one bit apiece and there is nothing to
+   tighten this time: measured, every other field is at its minimum width bar
+   `handing`, which holds two of four on purpose (the two outward-opening hands
+   fill it exactly). So the code grows, which is what `TOTAL_BITS` is built to
+   let it do.
+
+   ⚠ AND THE COMMENTS ABOVE SAID "PAYLOAD 36" AND "EIGHT CHARACTERS" FOR AN
+   UNKNOWN NUMBER OF ROUNDS. Measured on the committed tree before this change:
+   the payload was **46** and the code was **TEN** characters. Two numbers
+   written into prose about a thing that had moved four times underneath them,
+   which is §6's standing complaint about this repository — and worse here than
+   most, because the paragraphs they sit in are the ones somebody reads when
+   deciding whether a new field will fit. Neither figure is restated as a
+   constant here: `PAYLOAD_BITS` and `CODE_LEN` are both derived, and the test
+   file computes the code's length rather than typing it. */
 export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
                       grille: 4, handle: 4, lockset: 3, detail: 3,
                       speciallock: 2, mashkof: 2, pirzul: 2, handleLen: 4,
-                      stripes: 5 };
+                      stripes: 5, bell: 1, peephole: 1 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */
@@ -778,6 +831,8 @@ export function encodeCode(state) {
        rather than a free number — see `HANDLE_LENS`. */
     [Math.max(0, HANDLE_LENS.indexOf(state.handleLen)), BITS.handleLen],
     [packStripes(state), BITS.stripes],
+    [Math.max(0, BELLS.findIndex(x => x.id === state.bell)), BITS.bell],
+    [Math.max(0, PEEPHOLES.findIndex(x => x.id === state.peephole)), BITS.peephole],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -843,18 +898,22 @@ export function decodeCode(code) {
   const pirzul  = PIRZUL[read(BITS.pirzul)];
   const hLen    = HANDLE_LENS[read(BITS.handleLen)];
   const sp      = read(BITS.stripes);
+  const bell    = BELLS[read(BITS.bell)];
+  const peep    = PEEPHOLES[read(BITS.peephole)];
   /* ⚠ `hLen === undefined`, NOT `!hLen`. Zero is a VALID value — it is the
      "as the model comes" default and the commonest length in the range — and
      `!0` is true, so a truthiness guard refused every code for an untouched
      door. Every other field here is an object, where falsy really does mean
      "not found"; this one is a number and needed its own test. */
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail || !special || !mashkof || !pirzul || hLen === undefined) return null;
+      || !detail || !special || !mashkof || !pirzul || hLen === undefined
+      || !bell || !peep) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
     speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
+    bell: bell.id, peephole: peep.id,
     handleLen: hLen, ...unpackStripes(sp),
   };
 }

@@ -336,8 +336,15 @@ export const UI = {
   'g.speciallock.h':  ['נעילה נוספת מעבר למנעול הרגיל.', 'A second lock beside the ordinary one.',
                        'Второй замок в дополнение к основному.'],
   'g.pirzul':         ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
+  'g.bell':           ['פעמון', 'Doorbell', 'Звонок'],
+  'g.peephole':       ['עינית', 'Peephole', 'Глазок'],
   'g.pirzul.h':       ['הגוון של הידית, הצירים והעינית.', 'The tone of the lever, the hinges and the viewer.',
                        'Оттенок ручки, петель и глазка.'],
+  'g.bell.h':         ['לחצן פעמון על הדלת עצמה.', 'A bell push on the door itself.',
+                       'Кнопка звонка на самой двери.'],
+  'g.peephole.h':     ['עינית לראות מי בחוץ. כלולה במחיר.',
+                       'A viewer, to see who is outside. Included in the price.',
+                       'Глазок, чтобы видеть, кто снаружи. Входит в цену.'],
   'g.size':           ['מידה', 'Size', 'Размер'],
   'g.size.h':         ['נמדוד אצלכם במדויק — בחינם.', 'We measure on site, exactly, free of charge.',
                        'Точный замер у вас — бесплатно.'],
@@ -509,14 +516,27 @@ export const UI = {
   'unit.mm':          ['מ״מ', 'mm', 'мм'],
   'sheet.handing':    ['כיוון', 'Handing', 'Открывание'],
   'sheet.grip':       ['ידית', 'Handle', 'Ручка'],
-  'sheet.dev':        ['גרסת פיתוח — המחירים כאן הם דוגמה בלבד.', 'Development build — these prices are examples only.',
-                       'Тестовая версия — цены здесь только для примера.'],
+  /* ⚠ REWORDED 30.8.2026, AND THE FLAG THAT SHOWS IT IS STILL `false`.
+     These two strings said the prices were "examples only", which was true for
+     the whole life of the project and stopped being true on 26.8 when Peretz
+     said the real numbers — the strip came down then and the words were left
+     as they were. That is fine while nobody sees them and wrong the moment
+     somebody flips the flag back, which is exactly what `PLACEHOLDER` exists
+     for: *"the next time a price in here has no source — a new product, a rate
+     nobody has confirmed — this is how the page says so."*
+     A page carrying real prices under a banner calling them examples teaches a
+     reader to discount the true ones beside it. So the sentence now says the
+     thing the flag will actually mean: SOME figures are unconfirmed, not all
+     of them are invented. */
+  'sheet.dev':        ['גרסת פיתוח — חלק מהמחירים כאן עדיין לא אושרו.',
+                       'Development build — some prices here are not confirmed yet.',
+                       'Тестовая версия — часть цен ещё не подтверждена.'],
 
   /* ── the strips and the notices ───────────────────────────────── */
   'strip.dev.b':      ['גרסת פיתוח.', 'Development build.', 'Тестовая версия.'],
-  'strip.dev':        ['הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.',
-                       'The colours and prices here are examples, not final.',
-                       'Цвета и цены здесь — примеры, не окончательные.'],
+  'strip.dev':        ['חלק מהמחירים כאן עדיין לא אושרו על ידי פרץ.',
+                       'Some prices here have not been confirmed by Peretz yet.',
+                       'Часть цен здесь ещё не подтверждена Перецем.'],
   'notice.code':      ['הקוד לא זוהה — מציגים דלת ברירת מחדל.', 'We did not recognise that code — showing a default door.',
                        'Код не распознан — показываем дверь по умолчанию.'],
   'notice.fixed':     ['השילוב בקישור לא ניתן לייצור — התאמנו אותו לדלת הקרובה ביותר.',
@@ -571,8 +591,11 @@ export const UI = {
      a translated string cannot interpolate at import time (see SAID in
      rules.js) — and `npm test` asserts all three sentences still name the cap
      they describe, so the number and the rule cannot drift apart. */
+  'fix.peepGone':        ['הסרנו את העינית — החלון תופס בדיוק את מקומה', 'We removed the peephole — the window sits exactly where it goes', 'Мы убрали глазок — окно занимает как раз его место'],
   'fix.stripesCapped':   ['פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת', 'Vertical stripes cap at 6 — more than that will not fit across the door', 'Вертикальных полос максимум 6 — больше по ширине двери не помещается'],
 
+  'why.peepWindow':   ['החלון תופס את מקום העינית', 'The window sits where the peephole goes',
+                       'Окно занимает место глазка'],
   'why.gripOffDoor':  ['הידית חורגת מהדלת', 'The handle runs off the door', 'Ручка выходит за пределы двери'],
   'why.gripReach':    ['הידית גבוהה או נמוכה מדי לשימוש', 'Too high or too low to use comfortably',
                        'Слишком высоко или слишком низко'],
@@ -629,6 +652,8 @@ export const UI = {
   'row.handle':       ['ידית משיכה', 'Pull handle', 'Ручка-скоба'],
   'row.lockset':      ['מנעול וידית', 'Lever and cylinder', 'Ручка и цилиндр'],
   'row.speciallock':  ['מנעול מיוחד', 'Extra lock', 'Дополнительный замок'],
+  'row.bell':         ['פעמון', 'Doorbell', 'Звонок'],
+  'row.peephole':     ['עינית', 'Peephole', 'Глазок'],
   'row.detail':       ['עיצוב', 'Face', 'Полотно'],
   'row.stripes':      ['פסים', 'Strips', 'Полосы'],
   'row.size':         ['מידה', 'Size', 'Размер'],

@@ -133,7 +133,7 @@ written rather than rewritten, but do not add more.
 
 ---
 
-## 0c. Where it stands today — 29.8.2026
+## 0c. Where it stands today — 30.8.2026
 
 **⚠ THE PRICES ARE REAL AND THE SITE IS NOT DEPLOYED — deliberately.** Peretz
 gave the numbers on 26.8.2026; `PLACEHOLDER` is `false` and the "גרסת פיתוח"
@@ -142,7 +142,7 @@ a false statement on the page. Not deployed on instruction: *"dont deploy it, i
 want to see that its finished."*
 
 **The page is a FLOW, not a cabinet.** Eight steps and a quote page, one live at
-every width. A standard door with nothing on it is **₪3,150**, and tapping the
+every width. A standard door with nothing on it is **₪3,195**, and tapping the
 figure opens the column it is made of. **In Hebrew, English or Russian** — and
 the order that reaches Peretz is Hebrew whichever one the customer used.
 
@@ -285,19 +285,21 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **3,448,747 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+- `npm test` — **3,617,766 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
   ANYTHING; it is the product of the catalogue's list lengths. Read the failure
   count. (This line said **5,403,239** for two rounds after the stripe rework
   cut fourteen `DETAILS` entries — a number in prose describing a thing that
   had already moved, which is §6's standing complaint about this file.)
 - `npm run audit` — clean at all eight `VIEWS`, including the arrival check
-  (exactly one step live at every width), a walk over every navigator circle
-  that now also asserts **a visible send and a readable price on every step**
-  and that every `[data-wa]` carries the identical href, the keyboard walk, the
-  bare-mode motion kill, the **`prefers-reduced-motion` route** (nothing left
-  running, delays included), and the language route.
-- `npm run collide` — clean on `all` and `boxes`.
-- `npm run latency` — **158 ms** against a 600 ms gate.
+  (exactly one step live at every width), **the whole question order** read off
+  the rendered navigator, a walk over every navigator circle that also asserts
+  **a visible send and a readable price on every step** and that every
+  `[data-wa]` carries the identical href, the keyboard walk, the bare-mode
+  motion kill, the **`prefers-reduced-motion` route** (nothing left running,
+  delays included), and the language route.
+- `npm run collide` — clean on `all` and `boxes`, at the extra lock's new
+  eye-level height.
+- `npm run latency` — **226 ms** against a 600 ms gate (135 on the default door; the worst is the sidelight with ironwork, 522 elements).
 - `npm run profile` — **all four rows green.** See below; this is not
   straightforwardly good news.
 - `npm run mottle` — plain leaf **0.0181**, panels 0.1069.
@@ -310,6 +312,24 @@ walk, and walking it means grepping for each one, not remembering it.
   the door regenerated all four families, the `shot` family moved (it
   photographs the page) and **all 52 bare sheets came back byte-identical** —
   which is the whole architecture of photo-mode, checked rather than asserted.
+  ⚠ **On 30.8 the drawing changed more than on any day this year and the 52
+  BARE SHEETS STILL CAME BACK BYTE-IDENTICAL.** Two fittings redrawn and moved
+  400 mm, the brass ramp refitted, two new fittings added, the default colour
+  moved — and `corpus`, `recreate` and `against` did not shift a pixel. That is
+  not luck and it is the strongest single statement about this work order's
+  blast radius: those 52 sheets are Peretz's own thirty doors and our option
+  range, and not one of them carries a bell, a peephole, an extra lock, a gold
+  פרזול or the default colour. Only the 12 `shot` sheets moved, because they
+  photograph the PAGE — which has a new opening colour, the Rotem, and its
+  steps in a new order — along with `corpus-links.md`, whose every query now
+  carries `v=20`, `bl=` and `ey=`.
+  ⚠ The proof was nearly missed, and how it was nearly missed is the lesson:
+  `against-ella.png` coming back identical looked WRONG (the brass had moved),
+  and chasing it found that the Ella bar has its own absolute gradient and
+  never reads the פרזול ramp — correct by design, and the thing that exposed
+  the two brasses drifting apart. **A sheet that does not move when you think
+  it should is worth the same half hour as one that moves when it should
+  not.**
 
 ### Red, and known
 
@@ -328,7 +348,7 @@ It is healthy today — 6/6 loads at 1280 and 1680, zero crashes — which is wh
 
 ### Blocked on a human
 
-`ASK-PERETZ.md` is **89 lines now, not 776**, and that is the change that
+`ASK-PERETZ.md` is **160 lines now, not 776**, and that is the change that
 matters most about it: nobody answers a 500-line document between jobs, and
 that is why it went nine days unanswered. What is left is fifteen assumptions
 (`CLAUDE.md` §9), of which one is expensive:
@@ -386,7 +406,7 @@ copied here. `git show origin/claude/app-design-mockup-review-qt00n6:<file>`.
   nearest real one.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   the option ORDER or the bit layout requires a `VERSION` bump in
-  `js/url-state.js` (**19** as of 28.8), so an old code is *refused with a
+  `js/url-state.js` (**20** as of 30.8), so an old code is *refused with a
   notice* rather than decoded into a different door. **Appending to the end of
   a list costs no bump. Changing a property — not the id, not the order —
   costs no bump.**
@@ -462,23 +482,23 @@ What is actually true, and what the promise has become:
 index.html          the page: stage, quote bar, choices, send, gallery,
                     sheet                                              650 lines
 css/app.css         RTL-first, logical properties throughout         3,138
-js/catalog.js       every option. THE WIRE FORMAT. Read its header.  1,694
-js/prices.js        every price, plain shekels, one screen              399
-js/renderer.js      the door. Pure: render(state) -> SVG string.      8,484
-js/url-state.js     state <-> URL, and the short code (BigInt)          836
-js/rules.js         what cannot go with what, and repair()              726
-js/price.js         agorot only. priceParts is the ONE breakdown        363
-js/spec.js          THE door, as rows. One statement, four readers      285
+js/catalog.js       every option. THE WIRE FORMAT. Read its header.  1,760
+js/prices.js        every price, plain shekels, one screen              453
+js/renderer.js      the door. Pure: render(state) -> SVG string.      8,920
+js/url-state.js     state <-> URL, and the short code (BigInt)          919
+js/rules.js         what cannot go with what, and repair()              786
+js/price.js         agorot only. priceParts is the ONE breakdown        398
+js/spec.js          THE door, as rows. One statement, four readers      302
 js/share.js         the WhatsApp message — this is the product          496
 js/copy.js          every user-visible string, in three languages.
                     ZERO IMPORTS on purpose — it sits under every
-                    other module, so nothing it needs can be a cycle    661
+                    other module, so nothing it needs can be a cycle    693
 js/colour.js        darken / lighten / scaleTone / contrast              81
-js/app.js           wiring, the flow, the gallery, the sheet, undo    3,092
+js/app.js           wiring, the flow, the gallery, the sheet, undo    3,139
 js/works.js         30 real doors, GENERATED by npm run corpus           48
 assets/room.webp    the photographed room, tall crop. Staging         82 KB
 assets/room-wide.webp  the same room, wide crop. One is fetched         78 KB
-test/units.mjs      ~3.4M assertions, no framework                   3,114
+test/units.mjs      ~3.6M assertions, no framework                   3,555
 tools/*.mjs         measurement instruments, not scripts (§7)
 research/backdrops/ the owner's two originals, and the source the
                     shipped asset is regenerated from
@@ -897,6 +917,14 @@ Four sections — **מבנה הדלת, מראה הדלת, חלון וזכוכי�
 opening onto categories, each onto options. One open at a time on a phone; all
 four open on a desktop.
 
+⚠ **AND THE HARDWARE COMES BEFORE THE FACE SINCE 30.8.2026** — Peretz,
+*"handles before the panels"*. The flow is fit · mk · colour · **grip · lock ·
+pz** · face · glass · sum. `face` and `glass` stay adjacent because a panel and
+a window compete for the same half of the leaf and `repair` trades between
+them. It cost nothing in the wire format for the same reason the reorder below
+did, and `npm run audit` now asserts the WHOLE sequence off the rendered
+navigator — which nothing in this repository was doing before.
+
 ⚠ **מבנה הדלת is section 01 and used to be 04.** It is the thing a customer has
 an opinion about before arriving and the thing that changes the drawing most.
 The reorder cost nothing in the wire format — section keys appear in the DOM as
@@ -926,6 +954,13 @@ refuse the sale.
 ### Hardware — two groups
 - **`HANDLES` = the grip** (what you pull), optional.
 - **`LOCKSETS` = the lock furniture** (what you turn, and the keyway), always.
+- **`SPECIAL_LOCKS`** = a second lock beside the first, at **eye level** since
+  30.8 — `SPECIAL_AFF` 1430, redrawn off four photographs Peretz sent.
+- **`BELLS` and `PEEPHOLES`** = two yes/no fittings on the face, added 30.8.
+  Two LISTS rather than one multi-select: the withdrawn add-ons were a bitmask
+  under the retired `a=`, and what is coming back is two ordinary groups with
+  tiles, glyphs, price rows and spec lines for free. New parameters `bl=`
+  and `ey=`.
 
 They were one list, which made "Idan bar + Rotem backplate" — a combination
 Peretz installs constantly — unreachable.
@@ -965,7 +1000,7 @@ sheet. A right-hinged door is a physical fact.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Twenty so far. None of them threw.
+**Things that vanish rather than break.** Twenty-two so far. None of them threw.
 All of them looked like a working page.
 
 1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
@@ -1142,6 +1177,42 @@ it is **present and distinct**, not only that it is correct:
     times and leaves the fifth for whoever adds it.
     Found while opening the sheet to check a translation.
 
+21. **A RULE ENFORCED AT THE BOUNDARY AND NOT IN THE STATE — SO TWO OF ITS
+    THREE READERS WERE RIGHT.** The vertical stripe cap is six. `packStripes`
+    has clamped to it since the day it was written, so a shared LINK and a DM-
+    CODE have always carried six. The LIVE STATE kept whatever the customer
+    had, and the drawing and the price read the live state — so a customer who
+    turned eleven horizontal stripes sideways saw eleven columns and was
+    charged for eleven, while the link they sent said six.
+    ⚠ **This is 10–13's family with the copies in an unusual order, and it is
+    harder to see than any of them.** In those, two computations of one number
+    drifted and BOTH were visible. Here one place enforced the rule correctly,
+    and it happened to be the place nothing looks at while using the page. A
+    quantity that is right in the wire format and wrong on the screen produces
+    a link that does not describe the door the customer is looking at, which is
+    §0's worst failure with the arrow pointing the other way.
+    The clamp is in `repair()` now — the one function a click, a link and a
+    decoded code all pass through. `packStripes` keeps its own `Math.min`,
+    because a wire format must never emit a value it cannot read back; it is
+    simply no longer the only thing standing between a customer and eleven
+    columns.
+
+22. **AN ASSERTION THAT COMPARED MARKUP WHEN THE COLOUR LIVED IN A REFERENCED
+    GRADIENT.** Written to prove that the פרזול no longer recolours the extra
+    lock, it pulled each fitting's group out of the SVG and compared the two
+    strings under nickel and under gold. A fitting is painted
+    `fill="url(#nickel)"`: it is the GRADIENT that moves, and the group's
+    markup is byte-identical either way. Every special-lock check passed — and
+    would have passed identically with the bug still in.
+    ⚠ It was caught by its own PAIR. The block also asserts the thing that must
+    still be true — *"the פרזול must STILL recolour the lock furniture it was
+    bought for"* — and that one went red, about a lever whose colour does
+    change. **Write the assertion that must stay true beside the one that must
+    become true**; a check that only ever looks for absence cannot tell absence
+    from a blind instrument.
+    The comparison resolves the reference now: find which gradients a group
+    paints with, then compare THOSE gradients' stops.
+
 ⚠ **And one assertion was counting PROSE.** The ironwork group asked
 `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
 document. About 32% of a rendered door is XML comments, so the moment a comment
@@ -1183,7 +1254,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1216,7 +1287,7 @@ empty list cannot be noticed by reading, only by trying to obey it.
 | # | assertion | protects |
 |---|---|---|
 | T1 | Sum of the breakdown rows === the displayed total, every buildable design | a breakdown that does not add up |
-| T2 | The standard door with nothing on it is exactly ₪3,150 | the one number Peretz will check |
+| T2 | The standard door with nothing on it is exactly ₪3,195, and all five size bands match Peretz's own figures | the one number Peretz will check |
 | T3 | `leafW`/`leafH` identical across all four mashkofs, every size | the fault reported on the classical set |
 | T4 | For every grip × pirzul pair, the lever's fill carries the PIRZUL tone | the existing test asserted the MIRROR of this and would have agreed with the bug |
 | T5 | Every retired id resolves to a buildable door, including the stripe → (dir, count) migration | fourteen `d=` ids already in links customers have sent |
@@ -1306,6 +1377,16 @@ the two in the middle came out right, which is the signature. `_upright2.mjs`
 rectifies from four measured corners instead. **When a check is a ratio, ask
 what pair of errors would cancel in it.**
 
+**⚠ AND A WARNING PRINTED IN THE FILE YOU COPY FROM IS STILL A WARNING YOU CAN
+WALK PAST.** `collide.mjs` says, in as many words, *"the relight rects are the
+whole leaf; strip them first, or every pane measures as the door."* A scratch
+sweep written on 30.8 by copying that file's shape did not strip them, and
+reported the new bell push colliding with glass on 140 designs while standing
+on the hinge stile 120 mm from a window that begins at 245. **Five instruments
+in this repository have now measured the wrong object**, and this is the first
+one that had the answer in front of it. The tell was the same as always: a
+result that is confidently wrong about something you can check by hand.
+
 A contact sheet triages; it does not measure. When a number matters, put a
 scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
 
@@ -1387,10 +1468,10 @@ the same list in Hebrew, shorter, for him to answer.
 | A4 | `rings` survives — he named three grilles to remove and this was not one | one alias |
 | A5 | `knobplate` is a "circle" at +₪200 | one number |
 | A6 | The widened mashkof is 60 mm outside / 300 mm inside | two numbers in `MASHKOFS` |
-| A7 | The peephole and security latch are standard on every door | whether they are drawn |
+| A7 | The peephole and security latch are standard on every door — **the עינית is now a CHOICE priced at ₪0 on the strength of this**, so it is louder than it was | one number in `prices.js`, and whether the tile says כלול |
 | A8 | A single bottom panel is ₪725, half of two | one number |
 | A9 | `Math.ceil` on the handle's 20 cm steps — you cannot buy 10 cm of bar | one word |
-| A10 | Colours are all included; he priced none of them | seventeen numbers |
+| A10 | ~~Colours are all included~~ — **settled 30.8**: three included, fourteen at +₪200 | — |
 | A11 | Panels and stripes are mutually exclusive — no door carries both | one rule in `js/rules.js` |
 | A12 | `barblack` (מוט שחור) is priced as a bar like the others — he wrote "nickel >100cm" and named no rate for a black one | one entry's `priceKind` |
 | A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | **which window carries ₪4,200 and which ₪3,700** |
@@ -1480,6 +1561,14 @@ complete and its findings live here:
   reads 1.508 / 1.083 / 1.462 / 1.071, so it still separates correct from the
   bug it was written for by a wide margin; what it does not do is separate
   correct from correct.
+
+- **A PHOTOGRAPH OF THE פעמון, AND WHERE PERETZ FITS IT.** It is the one
+  fitting in the range drawn without one — 65 mm from a published product
+  spec, the round bezel and raised button conventional, standing on the hinge
+  stile because that is the band of leaf nothing else can reach. Four places
+  were looked at and all came back empty; the list is in `renderer.js` beside
+  `bellPush`. `ASK-PERETZ.md` §0f asks for the picture and for the position,
+  and the position is the answer that matters more.
 
 - **A DARK-PAINTED OGEE DOOR, to confirm the section that eleven doors use.**
   `MOULDS.ogee` stands on **one** photograph — d050 — and d050 is near-white,
@@ -1610,6 +1699,268 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ A WORK ORDER FROM PERETZ, 30.8.2026 — ELEVEN ITEMS, AND TWO OF HIS LINES
+  MEANT SOMETHING OTHER THAN THEY LOOKED LIKE.** He reviewed the app and gave
+  notes, with four photographs of installed doors. They are in
+  `research/handles/peretz-1..4.webp`, and he named which is which.
+
+  **"door - 1295" is not a separate product.** It looked like the leaf on its
+  own, without frame or installation, and it is the DOOR COMPONENT of the
+  six-part build: 1295 + 200 + 200 + 500 + 700 + 300 = **3195 exactly**, which
+  is the standard door he named in the same breath. `BUILD.door` moved 1250 →
+  1295 and the standard door is ₪3,195.
+
+  **⚠ AND THE SIZE MULTIPLIER NOW LANDS ON ALL SIX PARTS, NOT TWO — WHICH IS
+  PROVEN RATHER THAN CHOSEN.** On 26.8 he said "+25% to the price of the door
+  and mashkof"; on 30.8, "the all its all +25% = 3995". The first is
+  arithmetically impossible against his own figures: reaching 3995 from 3195 by
+  scaling a subset needs that subset to be worth 3200, and the whole door is
+  3195. Under the new rule all six of his bands come out exactly, using the ₪5
+  rounding `priceAgorot` already did:
+
+  | band | ×  | raw | rounded | he said |
+  |---|---|---|---|---|
+  | standard | 1 | 3195 | 3195 | 3195 |
+  | +25% | 1.25 | 3993.75 | **3995** | 3995 |
+  | +50% | 1.5 | 4792.50 | **4795** | 4795 |
+  | double | 2 | 6390 | 6390 | 6390 |
+  | double +25% | 2.5 | 7987.50 | **7990** | 7990 |
+  | double +50% | 3 | 9585 | 9585 | 9585 |
+
+  The last two have no size tile — one multi-leaf size exists, not three — and
+  they are asserted as arithmetic because six figures agreeing is what makes
+  the rule certain rather than plausible.
+  ⚠ **The multiplier lands on the BASE and not the options**, and that part IS
+  a reading: every figure he gave is a bare door. Sweeping the options in would
+  add ₪1,050 to a glazed +25% door on nobody's authority. `ASK-PERETZ.md` §0b.
+
+  **Colour is priced, and the DEFAULT COLOUR HAD TO MOVE WITH IT.** 9016T,
+  9001T and 7126D are in the price; the other fourteen are +₪200 — which
+  retires assumption **A10**. Two of his three codes carry a `T` where our
+  chart carries `D`; the suffix is the finish and the number is the colour, and
+  there is exactly one 9016 and one 9001 in our seventeen, so this is matching
+  on the number rather than the forbidden "nearest colour" guess.
+  ⚠ The old default `rb-0097d` is one of the fourteen, so the page would have
+  opened on a door carrying a ₪200 option nobody chose and printed ₪3,395 where
+  he says ₪3,195. `rb-7126d` is the one of his three that keeps the picture:
+  **dE 7.3** in CIELAB against the anthracite, where the cream is 53.9 and the
+  white 63.8.
+
+  **Also landed:** the starting door carries the Rotem (`plate`) instead of a
+  bare keyway, on his word; Sapir is ₪350, the one lever "all of them in the
+  price" does not cover; and the three hardware steps moved in FRONT of the
+  face step — section keys unchanged, so no link, code or saved design moves,
+  and the 01–08 follow by themselves because they are a CSS counter.
+
+- **⚠ ELEVEN STRIPES TURNED SIDEWAYS WERE STILL ELEVEN, AND THE WIRE FORMAT WAS
+  RIGHT ALL ALONG.** Peretz: *"when i change the placing of the stripes to
+  vertical instead of horizontal, even if there are 11 stripes it puts 11
+  vertical stripes, and that cant be happening."* `STRIPE_MAX` is
+  `{ h: 11, hTight: 8, v: 6 }` and the six is the corpus's own 0.073 pitch
+  reaching the stiles.
+
+  ⚠ **THE REASON IT SURVIVED IS THE INTERESTING PART.** `packStripes` has
+  always clamped, so a shared link and a DM- code have always carried six. Only
+  the LIVE state kept the eleven — and the drawing and the price read the live
+  state. **A quantity correct in two of its three readers is the hardest kind
+  to see**, and it is §5.10 with the copies in an unusual order. The clamp is
+  in `repair` now, which a click, a link and a decoded code all pass through.
+  Falsified by removing it: five counts fail, the h11→v→h round trip
+  resurrects the eleven, and the link/state comparison prints *"state 7,
+  link 6"*, which is the divergence itself.
+
+- **⚠ THE קודן WAS DRAWN AS THE WRONG PRODUCT, NOT MERELY THE WRONG SHAPE.** It
+  was a digital keypad — a display bar over a 3×3 grid of nine buttons — and
+  what is on the door is a MECHANICAL push-button lock: a pill body, ten
+  buttons in two columns of five, a turn knob filling the bottom third. The
+  catalogue already sells the digital one separately at ₪2,700; the ₪900 one
+  was drawn as it.
+
+  | | now | was |
+  |---|---|---|
+  | קודן | 60 × 154 mm, aspect 0.39 | 62 × 96, aspect 0.65 |
+  | כספת | 50 × 68 mm, aspect 0.74 | 62 × 62, aspect 1.00 |
+
+  ⚠ **ASPECT IS NOT READ OFF A PHOTOGRAPH DIRECTLY.** A leaf in a phone
+  snapshot is not at the model's aspect. Each dimension is a fraction of the
+  leaf's OWN matching axis, so a lens that stretches one cannot leak into the
+  other. Done that way peretz-1's leaf reads 0.485 against the model's 0.415 —
+  not distortion: that door is a WIDE one, and at leafW 1000 the fitting's
+  aspect comes out 0.396 against 0.392 measured in pixels. Outside
+  corroboration, which this kind of number needs most: a Codelocks CL200 is
+  57 × 168 mm.
+
+  ⚠ **AND `research/works/INVENTORY.md` HAS A WRONG LABEL THAT PERETZ'S OWN
+  WORDS CORRECT.** It lists d028's *"small white unit high on the leaf"* as an
+  intercom or bell — the only bell candidate in 129 photographs. d028 is the
+  same door as peretz-2 (same drill on the floor, same timestamp) and the unit
+  is the מנעול כספת. It is also a fourth measurement of that fitting.
+
+- **⚠ AND THEY GO AT EYE LEVEL: `SPECIAL_AFF` 654 → 1430.** Knee height, on the
+  reasoning that a second keyway goes below the first. Derived twice, because
+  one reading off a phone snapshot is not a measurement — and the size of the
+  error is visible rather than guessed at, since each photograph also contains
+  the LEVER, which the corpus fixes at 1020. The four read it at 990, 894, 843
+  and 834.
+  1. peretz-1 is the only door showing the keypad AND the peephole, 170 mm
+     apart on the leaf's own scale. Anchored on `PEEPHOLE_AFF`: **1430**.
+  2. Across all four the fitting sits 0.169–0.198 of leaf height above the
+     lever; correcting each door by its own lever error gives a mean of 1459.
+
+  1430 taken, because it rests on two fittings a hand's breadth apart in one
+  frame rather than on a linear correction applied to a nonlinear distortion.
+  ⚠ The BACKSET was checked rather than assumed and did not move: all four put
+  the fitting on the cylinder's own axis, 45–82 mm off the closing edge against
+  `KEYWAY_BACKSET`'s 63. `npm run collide` clean over 1,012 designs at the new
+  height.
+
+- **⚠ THE FINISH RULE NEEDED A PRECEDENCE DECIDED, AND MY FIRST ASSERTION FOR
+  IT COULD NOT HAVE CAUGHT THE BUG.** Two sentences from Peretz, each
+  satisfiable alone: *"the אלה and מוט שחור are changing the color of the
+  stripes"* and *"pirzul doesnt affect the additional lock, but it does affect
+  the stripes"* — the second reversing his 26.8 *"it doesnt change the color of
+  the stripes"*.
+
+  Together they rule out both simple answers. Always-the-grip means the pirzul
+  never reaches the stripes; always-the-pirzul means a brass אלה beside the
+  standard nickel draws steel stripes. So **an explicit choice beats an implied
+  one**: the pirzul is a finish paid for, a grip's tone is a fact about the
+  product. Both sentences come out true.
+
+  The extra lock stops following the pirzul. Both fittings were filled with
+  `url(#nickel)`, which IS the pirzul's gradient. They get `#lockUnit` — a
+  third owner, constant, because a bought-in unit arrives in the finish it
+  ships in.
+
+  ⚠ **THE ASSERTION COMPARED MARKUP, AND THE COLOUR LIVES IN THE GRADIENT.** A
+  fitting is painted `fill="url(#nickel)"` and it is the GRADIENT that moves,
+  so the lever's markup is byte-identical under nickel and gold — and so was
+  the keypad's while it still borrowed that gradient. Every special-lock check
+  passed and would have passed just as happily with the bug in. §5 item 14
+  exactly. What went red was the PAIRING check — *"the pirzul must STILL
+  recolour the lock furniture"* — which is the whole reason it was written.
+  The comparison resolves the reference and compares stops now.
+
+- **⚠ "GOLD IS TOO WHITE", AND A MEDIAN SAID THE WRONG THING ABOUT IT.**
+  Measured against peretz-4, a door carrying a complete set of polished brass
+  photographed installed. `tools/_brass.mjs`.
+
+  A median-to-median comparison reported the ramp 23 points too BRIGHT, which
+  is not a finding: a designed ramp runs highlight to core on purpose and a
+  patch of photograph is mostly mid-tone. Cut at matching brightness
+  percentiles, the mid-tones agree and two things do not — the hue is 3–5°
+  short at EVERY brightness, and the photograph holds saturation 16–26% into
+  its brightest pixels where the ramp collapsed to 13.8% and 10.7%. On a
+  fitting the size of a keypad the highlight is most of what anybody sees, so a
+  near-colourless highlight IS the "too white".
+
+  ⚠ **AND THAT CORRECTION WAS NOT ENOUGH, BECAUSE THIS REPOSITORY ALREADY HELD
+  A SECOND MEASUREMENT OF BRASS AND NOBODY HAD PUT THE TWO SIDE BY SIDE.**
+  `barGold` — the Ella pull bar's own gradient, read off the manufacturer's
+  product photograph and trusted here for rounds — runs **hue 36.7,
+  saturation 41–84%, median 58%**. The corrected ramp ran hue 47.4 at 26%. The
+  same metal, in one file, more than twice apart — and a customer can put a
+  brass Ella bar and a gold פרזול lever on ONE door.
+
+  ⚠ **IT WAS FOUND BY ASKING WHY A SHEET DID *NOT* MOVE.** §0c's rule is *"when
+  they move on a commit that could not have moved them, find out what did"*;
+  this is its mirror. `screenshots/against-ella.png` came back byte-identical
+  after the brass changed. The answer turned out to be correct — the bar has an
+  absolute gradient and never reads this ramp, which is the separation this
+  file made on purpose so one gradient never has two owners — but chasing it
+  exposed the drift.
+
+  Which one governs: `barGold` is a product photograph lit to show the metal;
+  the reading above is a fitting on a door in a dim hallway, and the patch it
+  came from necessarily contains some of the pale door behind it, which pulls
+  saturation down. §4 settles the general case — *"the most photographically
+  faithful choice is often wrong at drawing scale"* — and the specific one is
+  settled harder: whatever brass is, it cannot be two things on one door.
+
+  So the ramp is FITTED TO THE BAR: hue 37, saturation interpolated onto the
+  bar's own saturation-against-value curve, every VALUE unchanged.
+
+  | stop | 26.8 ramp | first pass | fitted to the bar |
+  |---|---|---|---|
+  | highlight | 41.8° / 13.8% | 47.5° / 20.1% | **37° / 43%** |
+  | body | 43.5° / 23.5% | 47.1° / 25.8% | **37° / 49%** |
+  | specular | 44.4° / 10.7% | 48.0° / 13.8% | **37° / 41%** |
+
+  The `lit return` stop comes out `#C79E5C`, which is one of the bar's own
+  measured stops exactly — an interpolation landing ON a measurement rather
+  than between two. Every VALUE unchanged; the modelling is not what he
+  complained about. This reverses *"keep the gold as is"* from an earlier
+  round, on his own word.
+
+- **⚠ THE פעמון AND THE עינית ARE TWO NEW FIELDS, AND THE CODE IS ELEVEN
+  CHARACTERS. `VERSION` 19 → 20.** Peretz asked for both by name. Two one-bit
+  fields is a bit-layout change, which no alias can rescue, so every code
+  written under 19 is refused with a notice.
+  ⚠ **New parameters `bl=` and `ey=`, never `a=`.** There was a multi-select of
+  five accessories under `a=` once, withdrawn on the owner's word, and `a=` is
+  retired forever. A link still carrying `?a=peep,mail` opens the door it
+  always opened, and there is an assertion that it is NOT re-read as the new
+  peephole.
+  ⚠ **The id `peep` is reused and that is safe**: what made those ids a wire
+  format was the parameter carrying them, and that parameter is ignored
+  outright. It is also the same physical object coming back.
+
+  **The עינית is ₪0 because it is already included, which is not a guess.**
+  Assumption **A7** has said since before this round that the peephole is
+  standard on every door, and his own פרזול note lists עינית among what the
+  finish recolours. So the tile says כלול — the assumption this project already
+  holds, printed where a customer can see it. What "add עינית" changes is that
+  it was neither DRAWN nor LISTED.
+  ⚠ `PEEPHOLE_R` was **30 and is 15**, and it was a radius all along: nothing
+  drew it, so nobody had to decide whether 30 meant across or from the centre.
+  Measured on d028, a peephole is **30 mm ACROSS**.
+  ⚠ **A GEOMETRIC rule, not an observed one.** `render()` once suppressed the
+  peephole whenever the leaf was glazed, and INVENTORY.md records that rule as
+  wrong — glazed corpus doors carry peepholes. What is true is narrower and is
+  about THIS catalogue: both window shapes we sell are centred and both reach
+  viewer height, so on our two glazed doors a peephole at its measured position
+  has nowhere to be. `peepholeFits` computes it from the same `apertureLayout`
+  the drawing calls.
+
+- **⚠ THE פעמון IS THE ONE FITTING IN THIS ROUND WITH NO PHOTOGRAPH BEHIND IT,
+  AND IT SAYS SO WHERE IT IS DRAWN.** Looked at and came back empty: his four
+  photographs, INVENTORY.md's one candidate (a כספת), d028's wall push (too
+  oblique to measure), and the web, which this container's egress proxy blocks
+  for every image host. So **65 mm** is sourced — published dimensions for real
+  bell pushes run 57, 65 and 78 mm, and 65 is the middle and the exact figure
+  of the one given in centimetres — and the round bezel with a raised centre
+  button is convention. It stands on the HINGE stile, which is a choice: it is
+  the one band of leaf clear of the lever, the cylinder, the extra lock and the
+  pull handle at every size, so a fitting nobody has photographed for us cannot
+  collide with anything. `tools/_newhw.mjs` swept 426 designs with real
+  `getBBox` and confirms it. REALISM.md §6 governs the moment a photograph
+  arrives; `ASK-PERETZ.md` §0f asks for one and asks where he fits it.
+
+- **⚠ AND MY OWN SWEEP MADE THE MISTAKE `collide.mjs` PRINTS A WARNING ABOUT.**
+  The first run of `tools/_newhw.mjs` reported the bell colliding with glass on
+  140 designs while standing on the hinge stile 120 mm from a window that
+  starts at 245. It had not stripped the `[data-relight]` rects, which are the
+  whole leaf — *"strip them first, or every pane measures as the door"*, in the
+  file it was copied from. **Five instruments in this repository have now
+  measured the wrong object**, and this one had the warning in front of it.
+
+- **⚠ THREE HAND-KEPT COPIES OF `DEFAULTS`, AND TWO WENT STALE THE SAME DAY.**
+  Adding the two fields turned 1,900 assertions red with `bl=undefined` and
+  "did not round-trip" — none of which named the fault. `test/units.mjs` held a
+  `base` fixture and an `everyState` stem, both hand-typed lists of every key a
+  door has, and `everyState`'s own comment said exactly what a missing key
+  does. Both spread `DEFAULTS` now, and there is an assertion that they cover
+  it. ⚠ **The guard found three more on its first run**: `base` has never
+  carried the stripe fields and worked only because `isLineWork` reads
+  `undefined` as falsy and got the right answer by accident.
+
+- **The "prices are examples only" strip is reworded, and its flag is still
+  `false`.** Those words were true for the life of the project and stopped
+  being true on 26.8; the strip came down and the sentence was left as it was.
+  Harmless while nobody sees it and wrong the moment somebody flips the flag,
+  which is what `PLACEHOLDER` exists for. It now says SOME figures are
+  unconfirmed rather than that all of them are invented.
 
 - **⚠ "THE ROOM HAS NO LAMPS" — REPORTED OFF A 1920×918 LAPTOP, AND IT WAS TWO
   FAULTS WITH ONE CAUSE.** The portrait crop is scaled by WIDTH to cover a wide

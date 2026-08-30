@@ -67,14 +67,41 @@ const FINISH_TONES = {
          specular. On a fitting the size of a keypad the highlight is most of
          what anybody sees, so a near-colourless highlight IS the "too white".
 
-     Every VALUE is unchanged — the modelling, which is what separates metal
-     from grey plastic, is not what he complained about. Hue goes to 47.5 and
-     saturation rises where the measurement says it collapsed:
+     ⚠ AND THAT FIRST CORRECTION WAS NOT ENOUGH, BECAUSE THE REPOSITORY
+     ALREADY HELD A SECOND MEASUREMENT AND NOBODY HAD PUT THE TWO SIDE BY SIDE.
+     `barGold` — the Ella pull bar's own gradient, read off the manufacturer's
+     product photograph and trusted by this file for rounds — runs **hue 36.7,
+     saturation 41-84% (median 58%)**. The corrected ramp above ran hue 47.4 at
+     saturation 26%. The same metal, in one file, more than twice apart.
 
-         highlight   41.8 / 13.8%  ->  47.5 / 20.1%
-         body        43.5 / 23.5%  ->  47.1 / 25.8%
-         specular    44.4 / 10.7%  ->  48.0 / 13.8%   */
-  brass: ['#EFE5BF', '#D9CDA1', '#BCB084', '#9C9169', '#C7BD95', '#7C7351', '#FDF6DA'],
+     It was found by asking why `screenshots/against-ella.png` came back
+     BYTE-IDENTICAL after the brass moved. The answer is that the bar has its
+     own absolute gradient and never reads this ramp — which is correct, and is
+     the separation this file made on purpose so that one gradient never has
+     two owners. What it exposed is that the two had drifted: a customer can
+     put a brass Ella bar and a gold פרזול lever on ONE door and see two
+     different metals, and that is almost certainly the "too white".
+
+     Which one governs. `barGold` is a product photograph, lit to show the
+     metal; the reading above is a fitting on a door in a dim hallway, and the
+     patch it was measured from necessarily contains some of the pale door
+     behind it, which pulls saturation down. §4 already settles the general
+     case — *"photographs are honest about one door at one hour; the most
+     photographically faithful choice is often wrong at drawing scale"* — and
+     the specific case is settled harder: whatever brass is, it cannot be two
+     things on one door.
+
+     So the ramp is FITTED TO THE BAR. Hue 37, saturation interpolated onto the
+     bar's own saturation-against-value curve, every VALUE unchanged so the
+     modelling `scaleTone` depends on is untouched. The `lit return` stop comes
+     out `#C79E5C`, which is one of the bar's own measured stops exactly — the
+     interpolation landing on a measured value rather than between two.
+
+         stop        26.8 ramp      first pass      fitted to the bar
+         highlight   41.8 / 13.8%   47.5 / 20.1%    37 / 43%
+         body        43.5 / 23.5%   47.1 / 25.8%    37 / 49%
+         specular    44.4 / 10.7%   48.0 / 13.8%    37 / 41%   */
+  brass: ['#EFC889', '#D9B06F', '#BC924E', '#9C783F', '#C79E5C', '#7C6032', '#FDD596'],
   /* ⚠ BRONZE IS ITS OWN METAL, AND IT USED TO BORROW BRASS. Reported from
      outside: *"the bronze and the gold pirzul look the same."* They were the
      same — `pz-bronze` and `pz-gold` both carried `tone: 'brass'`, so the two
@@ -453,7 +480,20 @@ const PEEPHOLE_AFF = 1600;  // 0.762 H
  * horizontal placement was already right and only the height was wrong.
  */
 const SPECIAL_AFF  = 1430;
-const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
+/* How far in from the HINGE edge the bell push stands. A 65 mm button needs
+   its own radius plus the reveal's 38 mm ramp before it is clear of the edge;
+   90 mm gives it 25 mm of paint either side on the narrowest leaf we make and
+   puts it visually on the stile rather than crowding the frame. */
+const BELL_BACKSET = 90;
+/* ⚠ 15, AND IT WAS 30, AND IT WAS A RADIUS ALL ALONG. The old comment called
+   this the "outer halo" and nothing drew it, so nobody had to decide whether
+   30 meant across or from the centre. Measured on d028 — the same door as
+   peretz-2 and the clearest viewer in the range — a peephole is 30 mm ACROSS:
+   21 x 20.3 px against a leaf 569 px wide and 1377 px tall, which is 31.4 mm
+   on one axis and 30.2 on the other. Real door viewers are a 14-16 mm barrel
+   inside a 22-35 mm trim ring, so 30 mm is the ring and the reading lands mid
+   range. This is the radius, and `peephole()` is what draws it. */
+const PEEPHOLE_R   = 15;    // 30 mm across, measured on d028
 /* Hinge heights, 0.144 / 0.504 / 0.857 H, kept as a note rather than as code.
    These doors open inwards, so from the street the hinges are hidden in the
    rebate: every outside photograph on the works page shows a leaf with none on
@@ -2697,6 +2737,25 @@ export function render(state) {
           rules believe in and the drawing does not is a fault this file has
           had four times. */''
       }${specialLockArt(special, keyX, y(SPECIAL_AFF), leverDir)}
+    ${/* ⚠ THE עינית AND THE פעמון, ADDED 30.8.2026 ON PERETZ'S WORD, and drawn
+          here for the same reason the extra lock is: the drawing shows what
+          the price charges. A ₪300 bell nobody can see is a hidden cost with a
+          label on it, and a עינית that is "included" and invisible is a
+          promise with nothing behind it.
+
+          ⚠ THE PEEPHOLE IS CENTRED ON THE LEAF AND THE BELL IS ON THE HINGE
+          STILE, and the two placements have completely different standing.
+          The peephole's is measured — two doors put it within 40 mm of the
+          leaf's centre line, on opposite sides. The bell's is a choice, made
+          because the hinge stile is the one band of leaf that is clear of the
+          lever, the cylinder, the extra lock and the pull handle at every
+          size, so a fitting nobody has photographed for us cannot collide with
+          anything. Both are explained where they are drawn. */''
+      }${state.peephole === 'peep' ? peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ''}
+    ${state.bell === 'bell'
+        ? bellPush(hingeOnLeft ? mainX + BELL_BACKSET : mainX + leafW - BELL_BACKSET,
+                   y(SPECIAL_AFF))
+        : ''}
   </g>
 
   <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
@@ -3573,6 +3632,49 @@ export const faceObstacles = memo(function faceObstacles(state) {
  * Asked of the same numbers `appliedFrame` draws with, so it cannot drift from
  * what actually appears.
  */
+/**
+ * CAN A עינית BE FITTED ON THIS LEAF?
+ *
+ * ⚠ GEOMETRIC, NOT OBSERVED, AND THE DISTINCTION MATTERS HERE. `js/rules.js`
+ * keeps the two kinds apart because they carry different weight: an OBSERVED
+ * rule says "Peretz does not build this" and a GEOMETRIC one says "this does
+ * not fit". This is the second, and it is computed from the same
+ * `apertureLayout` the drawing calls, so it cannot drift away from the picture
+ * the way a listed rule would.
+ *
+ * ⚠ AND THE OBSERVED VERSION WOULD HAVE BEEN WRONG. `render()` once suppressed
+ * the peephole whenever `win.rects.length` was non-zero, and
+ * `research/works/INVENTORY.md` records that rule as a FINDING against the
+ * code: glazed doors in the corpus do carry peepholes, and d076 carries one on
+ * a solid leaf above a knocker. So "a glazed door has no peephole" is not true
+ * of Peretz's doors and must not be written down as if it were.
+ *
+ * What IS true is narrower and is about this catalogue: both window shapes we
+ * sell are centred on the leaf and both reach the height a viewer goes at, so
+ * on OUR two glazed doors a peephole at its measured position has nowhere to
+ * be. Measured rather than reasoned — `tools/_newhw.mjs` swept 426 designs
+ * with real `getBBox` and found the overlap on all 140 glazed ones and on
+ * nothing else. A door with a small high window off to one side would pass
+ * this; we do not make one.
+ *
+ * The clearance is the fitting's own radius plus a little, so the rule moves
+ * by itself if either the peephole or a window is ever re-measured.
+ */
+export function peepholeFits(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const openings = apertureLayout(byId(WINDOWS, state.window),
+                                  leafW, byId(DETAILS, state.detail), leafH);
+  if (!openings.length) return true;
+  /* The fitting, in the leaf's own coordinates: centred across, and
+     `PEEPHOLE_AFF` up from the floor, which is `leafH - PEEPHOLE_AFF` down
+     from the leaf's head. */
+  const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
+  const R = PEEPHOLE_R + 8;                       // its radius plus a bead of paint
+  return !openings.some(o =>
+    cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
+}
+
 export function panelFits(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const detail = byId(DETAILS, state.detail);
@@ -8128,6 +8230,114 @@ const keyway = (kx, ky, s = 1) => `
       </g>`;
 
 /**
+ * ── THE עינית, AND IT IS MEASURED ─────────────────────────────────────
+ *
+ * Peretz, 30.8.2026: *"add עינית."* It was never drawn. `render()` once had a
+ * peephole gated on `win.rects.length === 0`, and `research/works/INVENTORY.md`
+ * records that rule as wrong — d076 carries one on a solid leaf above a
+ * knocker, and glazed doors in the corpus carry them too. Nothing has been
+ * drawn since, so this is the fitting arriving as a CHOICE rather than as a
+ * rule about when to show it.
+ *
+ * ⚠ 30 mm ACROSS, AND `PEEPHOLE_R` WAS WRONG BY A FACTOR OF TWO. That constant
+ * is 30 and is documented as the "outer halo" — read as a RADIUS it draws a
+ * 60 mm boss. Measured on d028, which is the same door as peretz-2 and the
+ * clearest peephole in the range: 21 x 20.3 px, against a leaf 569 px wide and
+ * 1377 px tall. As a fraction of each matching axis that is 31.4 mm across and
+ * 30.2 mm down on a standard leaf — round, and 30 mm.
+ *
+ * Real door viewers run a 14-16 mm barrel inside a 22-35 mm trim ring, so 30 mm
+ * is the ring and the measurement lands in the middle of the range.
+ *
+ * ⚠ CENTRED ON THE LEAF, WHICH IS TWO DOORS AGREEING. d028 puts it 38 mm off
+ * the leaf's centre line and peretz-1 puts it 25 mm off, on opposite sides —
+ * which is a fitter's eye, not an offset. `PEEPHOLE_AFF` (1600, 0.762 H) is
+ * untouched: it is a corpus figure over thirty doors, and the four snapshots
+ * here read a mean of 1482 with the same downward compression that reads the
+ * LEVER 13-18% low, so they do not beat it.
+ */
+const peephole = (cx, cy) => {
+  const R = PEEPHOLE_R;          // one statement of it; see the constant
+  return `
+    <g data-hw="peephole" data-owner="peephole" data-kind="peephole"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+      <ellipse cx="${cx}" cy="${cy + R * 0.18}" rx="${(R * 0.95).toFixed(1)}"
+               ry="${(R * 0.88).toFixed(1)}" fill="#000" opacity="0.18"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
+              stroke="#000" stroke-opacity=".26"/>
+      ${/* the glass inside the ring — dark, because behind it is an unlit hall,
+            which is the same reasoning the obscured glazing is drawn on */''
+       }<circle cx="${cx}" cy="${cy}" r="${(R * 0.52).toFixed(1)}"
+               fill="#000" fill-opacity=".58"/>
+      <circle cx="${(cx - R * 0.18).toFixed(1)}" cy="${(cy - R * 0.20).toFixed(1)}"
+              r="${(R * 0.20).toFixed(1)}" fill="#fff" fill-opacity=".30"/>
+    </g>`;
+};
+
+/**
+ * ── THE פעמון ─────────────────────────────────────────────────────────
+ *
+ * Peretz, 30.8.2026: *"the bell on the doors is 300, take images of it and add
+ * it."*
+ *
+ * ⚠ AND THIS IS THE ONE FITTING IN THIS ROUND WITH NO PHOTOGRAPH BEHIND IT.
+ * That is said out loud because the rest of this file is measured and the
+ * reader has to be able to tell which is which — it is the same warning the
+ * ALCOVE carried before it was deleted for being the only depth in the file
+ * not taken off a picture.
+ *
+ * What was looked at, and came back empty:
+ *   · the four photographs Peretz sent — no bell on any of them;
+ *   · `research/works/INVENTORY.md`, whose one candidate is d028's *"small
+ *     white unit high on the leaf"*, described there as an intercom or bell.
+ *     It is the מנעול כספת. Peretz named it himself in these very notes, and
+ *     the same fitting appears on peretz-3 and peretz-4;
+ *   · d028's own wall carries a real bell push, and it is photographed at too
+ *     oblique an angle to measure anything from.
+ *   · the web, which this container's egress proxy blocks for every image host.
+ *
+ * ⚠ SO ONE NUMBER IS SOURCED AND THE REST IS CONVENTION, AND THE SPLIT IS
+ * WRITTEN DOWN. Published dimensions for real bell pushes run 57 mm (a 2-1/4"
+ * round brass push), 65 mm (a 6.5 x 6.5 cm antique brass push) and 78 mm.
+ * **65 mm** is the middle of that range and the exact figure of the one whose
+ * dimensions were given in centimetres. The rest — a round bezel with a raised
+ * centre button — is what every bell push in that range is, and it is the
+ * least there is to get wrong: the קודן was drawn wrong because a keypad has
+ * structure to invent, and a disc inside a disc has none.
+ *
+ * REALISM.md §6 governs the moment a photograph arrives. `ASK-PERETZ.md` asks
+ * for one, and asks the question that actually matters more than the drawing:
+ * WHERE he fits it.
+ *
+ * ⚠ ON THE HINGE STILE, AND THAT IS A CHOICE RATHER THAN A MEASUREMENT. The
+ * leaf is the only surface this drawing owns square-on, and the hinge stile is
+ * the only band of it that is clear of the lever, the cylinder, the extra lock
+ * and the pull handle at every size in the range — so a bell there can never
+ * collide with anything, at any combination, which is the property that
+ * matters most for a fitting nobody has photographed for us. Same eye-level
+ * height as the extra lock, on the other side of the door.
+ */
+const bellPush = (cx, cy) => {
+  const R = 32.5;                                // 65 mm across; see above
+  return `
+    <g data-hw="bell" data-owner="bell" data-kind="bell"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+      <ellipse cx="${cx}" cy="${cy + R * 0.14}" rx="${(R * 0.96).toFixed(1)}"
+               ry="${(R * 0.90).toFixed(1)}" fill="#000" opacity="0.20"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
+              stroke="#000" stroke-opacity=".26"/>
+      <circle cx="${cx}" cy="${cy}" r="${(R * 0.66).toFixed(1)}"
+              fill="#000" fill-opacity=".10"/>
+      ${/* the button itself, proud of the bezel */''
+       }<circle cx="${cx}" cy="${(cy + 1.5).toFixed(1)}" r="${(R * 0.50).toFixed(1)}"
+               fill="#000" fill-opacity=".16"/>
+      <circle cx="${cx}" cy="${cy}" r="${(R * 0.50).toFixed(1)}" fill="url(#lockUnit)"/>
+      <circle cx="${(cx - R * 0.16).toFixed(1)}" cy="${(cy - R * 0.18).toFixed(1)}"
+              r="${(R * 0.22).toFixed(1)}" fill="#fff" fill-opacity=".26"/>
+    </g>`;
+};
+
+/**
  * The lock: a turned brushed-nickel escutcheon with a euro cylinder.
  * Modelled on the supplied hardware photograph — stepped concentric rings,
  * circular brushing, a recessed euro profile, and a keyway that is a real
@@ -8531,6 +8741,48 @@ export function mashkofGlyph(mk) {
  *   `kasefet`   — a safe: a square body with a round dial and a spindle
  *   `kodan`     — a keypad: a rounded body over a grid of nine buttons
  */
+/**
+ * ⚠ THE TILES FOR THE פעמון AND THE עינית, AND THEY DRAW THE SAME OBJECTS THE
+ * LEAF DOES. A tile showing one fitting while the door draws another is §5
+ * items 5 and 6, and the "every option tile draws its own picture" assertion
+ * cannot catch it — all that one asks is whether two TILES differ.
+ *
+ * The two "none" tiles have to differ from each other as well, which is why
+ * one is a struck circle and the other a struck ring: they are two different
+ * questions being declined, and an identical picture on both would be the
+ * exact fault that check exists for.
+ */
+export function bellGlyph(x) {
+  const art = {
+    nobell: `
+    <circle cx="0" cy="0" r="46" fill="none" stroke="currentColor" stroke-width="7" opacity=".3"/>
+    <path d="M-30 30 L30 -30" stroke="currentColor" stroke-width="7" opacity=".45"/>`,
+    bell: `
+    <circle cx="0" cy="0" r="52"/>
+    <circle cx="0" cy="0" r="40" fill="#fff" opacity=".92"/>
+    <circle cx="0" cy="0" r="26"/>`,
+  }[x.id] || '';
+  return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+}
+
+export function peepholeGlyph(x) {
+  const art = {
+    nopeep: `
+    <circle cx="0" cy="0" r="30" fill="none" stroke="currentColor" stroke-width="7" opacity=".3"/>
+    <circle cx="0" cy="0" r="46" fill="none" stroke="currentColor" stroke-width="4" opacity=".22"/>
+    <path d="M-32 32 L32 -32" stroke="currentColor" stroke-width="7" opacity=".45"/>`,
+    peep: `
+    <circle cx="0" cy="0" r="40"/>
+    <circle cx="0" cy="0" r="21" fill="#fff" opacity=".92"/>
+    <circle cx="-7" cy="-8" r="8" opacity=".55"/>`,
+  }[x.id] || '';
+  return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+}
+
 export function specialLockGlyph(x) {
   const art = {
     nospecial: `

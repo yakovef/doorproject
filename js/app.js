@@ -28,16 +28,17 @@
  */
 
 import {
-  byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
+  BELLS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
   GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, leafGlazed, LOCKSETS, MASHKOFS,
-  PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS,
+  PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
   from './price.js';
 import {
   describe, detailGlyph, gripAt, gripCanRotate, gripHome, gripIsFixed,
   gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
-  copyOf, mashkofGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph,
+  bellGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
+  specialLockGlyph,
   windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
@@ -128,6 +129,20 @@ const GROUPS = [
      product (Ella is brass); this is a choice, and it is ₪0 to ₪900. */
   { key: 'pirzul', title: 'g.pirzul', in: 'pz', kind: 'hw', list: () => PIRZUL,
     glyph: pirzulGlyph, hint: 'g.pirzul.h' },
+
+  /* ⚠ THE פעמון AND THE עינית, 30.8.2026, AND THEY SIT ON THE פרזול STEP.
+     Peretz asked for both by name. Neither is a lock and neither is a grip, so
+     they do not belong on `lock` or `grip` — and neither is worth a tenth step
+     of its own, because a step with one yes/no question in it is a page turn
+     for a checkbox. `pz` is the step that already asks "and what else is on
+     the door", and it is where a customer who has just chosen the finish of
+     the ironmongery is looking.
+     ⚠ Their ORDER here decides the order on the screen, and the bell is first
+     because it is the one that costs money. */
+  { key: 'bell', title: 'g.bell', in: 'pz', kind: 'hw', list: () => BELLS,
+    glyph: bellGlyph, hint: 'g.bell.h' },
+  { key: 'peephole', title: 'g.peephole', in: 'pz', kind: 'hw', list: () => PEEPHOLES,
+    glyph: peepholeGlyph, hint: 'g.peephole.h' },
 
   { key: 'size', title: 'g.size', in: 'fit', kind: 'tile', list: () => Object.values(SIZES),
     /* `delta: z => z.base - SIZES.standard.base` used to live here, and it was

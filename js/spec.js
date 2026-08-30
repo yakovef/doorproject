@@ -46,7 +46,7 @@ import { L, T, withLang } from './copy.js';
 import {
   byId, colourCode, COLOURS, declaredFinish, DETAILS, glazedPanels, GRILLES, grillePlacement,
   handleLength, HANDINGS, HANDLES, isGlazed, LOCKSETS, MASHKOFS, PIRZUL, SIZES,
-  SPECIAL_LOCKS, WINDOWS,
+  SPECIAL_LOCKS, WINDOWS, BELLS, PEEPHOLES,
 } from './catalog.js';
 
 /**
@@ -69,6 +69,8 @@ export function specRows(state) {
   const hd = byId(HANDLES, state.handle);
   const lk = byId(LOCKSETS, state.lockset);
   const xl = byId(SPECIAL_LOCKS, state.speciallock);
+  const bl = byId(BELLS, state.bell);
+  const ep = byId(PEEPHOLES, state.peephole);
   const mk = byId(MASHKOFS, state.mashkof);
   const pz = byId(PIRZUL, state.pirzul);
   const dt = byId(DETAILS, state.detail);
@@ -163,6 +165,21 @@ export function specRows(state) {
      what PLAN.md §0 forbids. */
   if (xl.id !== 'nospecial') {
     rows.push({ key: 'speciallock', label: T('row.speciallock'), id: xl.id, value: L(xl) });
+  }
+  /* ⚠ THE פעמון AND THE עינית, 30.8.2026, AND THE SAME ARGUMENT AS THE LINE
+     ABOVE: an axis that does not reach this file is an axis Peretz never hears
+     about. The bell is ₪300 and the peephole is included — and BOTH are named
+     here, because "included" is a thing he still has to fit. A row that
+     appears only when it costs money would tell him about the bell and leave
+     him to guess about the עינית, which is a clarifying question with a hole
+     in it rather than money.
+     Only when CHOSEN, like every optional row here: a door with no bell needs
+     no line saying so. */
+  if (bl.id !== 'nobell') {
+    rows.push({ key: 'bell', label: T('row.bell'), id: bl.id, value: L(bl) });
+  }
+  if (ep.id !== 'nopeep') {
+    rows.push({ key: 'peephole', label: T('row.peephole'), id: ep.id, value: L(ep) });
   }
   if (dt.id !== 'plain') {
     rows.push({ key: 'detail', label: T('row.detail'), id: dt.id, value: L(dt) });
