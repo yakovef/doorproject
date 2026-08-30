@@ -16,7 +16,10 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
+         handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, PIRZUL,
+         REBATE, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+import { T } from './copy.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
@@ -37,7 +40,87 @@ import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex,
 const FINISH_TONES = {
   steel: ['#E4E7E9', '#C6CBCF', '#9FA5AA', '#80868B', '#99A0A5', '#6A7075', '#F7F9FA'],
   black: ['#5E6165', '#3D4043', '#26282B', '#171819', '#313437', '#0F1011', '#8A8E93'],
-  brass: ['#EFE5CE', '#D9CBA6', '#BCAD86', '#9C8F6C', '#C7BA9B', '#7C7154', '#FDF6E2'],
+  /* ⚠ WARMED 30.8.2026, AND THE FILE SAID "KEEP THE GOLD AS IS" UNTIL THEN.
+     That instruction is in the bronze note below and it was right when it was
+     given — bronze had to stop looking like gold, and moving gold to do it
+     would have been solving the wrong half. Peretz has now looked at gold on
+     its own: *"in the pirzul gold is too white, add yellow."*
+
+     Measured rather than nudged, against peretz-4 — a door carrying a complete
+     set of polished brass, photographed installed. `tools/_brass.mjs`. Three
+     patches (knocker, pull handle, lever and backplate):
+
+         hue        the photograph 46.6 / 48.5 / 46.6      this ramp 43.5
+         saturation 20.5% / 27.7% / 33.6%                  this ramp 28.7%
+
+     ⚠ SO IT IS NOT A DESATURATED METAL, AND A MEDIAN WOULD HAVE SAID IT WAS.
+     Comparing the ramp's median to a patch's median also reported the ramp 23
+     points too BRIGHT, which is not a finding — a designed ramp runs highlight
+     to core on purpose and a patch of photograph is mostly mid-tone. Cut at
+     matching brightness percentiles instead, the mid-tones agree closely and
+     two things do not:
+
+       · the hue is 3-5 degrees short at EVERY brightness. That is the "add
+         yellow", literally, and it is the whole ramp rather than one stop.
+       · the photograph holds saturation 16-26% into its brightest pixels,
+         where this ramp collapsed to 13.8% at the highlight and 10.7% at the
+         specular. On a fitting the size of a keypad the highlight is most of
+         what anybody sees, so a near-colourless highlight IS the "too white".
+
+     ⚠ AND THAT FIRST CORRECTION WAS NOT ENOUGH, BECAUSE THE REPOSITORY
+     ALREADY HELD A SECOND MEASUREMENT AND NOBODY HAD PUT THE TWO SIDE BY SIDE.
+     `barGold` — the Ella pull bar's own gradient, read off the manufacturer's
+     product photograph and trusted by this file for rounds — runs **hue 36.7,
+     saturation 41-84% (median 58%)**. The corrected ramp above ran hue 47.4 at
+     saturation 26%. The same metal, in one file, more than twice apart.
+
+     It was found by asking why `screenshots/against-ella.png` came back
+     BYTE-IDENTICAL after the brass moved. The answer is that the bar has its
+     own absolute gradient and never reads this ramp — which is correct, and is
+     the separation this file made on purpose so that one gradient never has
+     two owners. What it exposed is that the two had drifted: a customer can
+     put a brass Ella bar and a gold פרזול lever on ONE door and see two
+     different metals, and that is almost certainly the "too white".
+
+     Which one governs. `barGold` is a product photograph, lit to show the
+     metal; the reading above is a fitting on a door in a dim hallway, and the
+     patch it was measured from necessarily contains some of the pale door
+     behind it, which pulls saturation down. §4 already settles the general
+     case — *"photographs are honest about one door at one hour; the most
+     photographically faithful choice is often wrong at drawing scale"* — and
+     the specific case is settled harder: whatever brass is, it cannot be two
+     things on one door.
+
+     So the ramp is FITTED TO THE BAR. Hue 37, saturation interpolated onto the
+     bar's own saturation-against-value curve, every VALUE unchanged so the
+     modelling `scaleTone` depends on is untouched. The `lit return` stop comes
+     out `#C79E5C`, which is one of the bar's own measured stops exactly — the
+     interpolation landing on a measured value rather than between two.
+
+         stop        26.8 ramp      first pass      fitted to the bar
+         highlight   41.8 / 13.8%   47.5 / 20.1%    37 / 43%
+         body        43.5 / 23.5%   47.1 / 25.8%    37 / 49%
+         specular    44.4 / 10.7%   48.0 / 13.8%    37 / 41%   */
+  brass: ['#EFC889', '#D9B06F', '#BC924E', '#9C783F', '#C79E5C', '#7C6032', '#FDD596'],
+  /* ⚠ BRONZE IS ITS OWN METAL, AND IT USED TO BORROW BRASS. Reported from
+     outside: *"the bronze and the gold pirzul look the same."* They were the
+     same — `pz-bronze` and `pz-gold` both carried `tone: 'brass'`, so the two
+     rendered byte-identically and the ₪400 between them bought no pixel.
+
+     What separates them is not brightness alone, it is HUE. Brass and gold are
+     yellow: the ramp above runs 44–46° with the saturation falling as it
+     darkens. Bronze is a copper alloy — redder, browner, and markedly darker,
+     around 28–30°, with shadows that go almost to a burnt umber rather than to
+     olive. Set beside each other the gold reads as polished and the bronze as
+     an aged casting, which is what the two products are.
+
+     Same seven-stop shape as its neighbours: highlight, three descending
+     bodies, a lighter return, the darkest core, and the specular. `scaleTone`
+     maps a measured bar profile onto whichever of these is chosen, so the
+     shape has to match or a pull bar recoloured into bronze loses its
+     modelling. Gold is untouched — asked for explicitly: "keep the gold as
+     is." */
+  bronze: ['#D8B389', '#B98C5D', '#96683C', '#6F4A28', '#A97B4E', '#4A301A', '#F0D6B4'],
 };
 
 
@@ -160,11 +243,47 @@ export const LIGHT = {
    instead of the end of a fall. Whatever happens down there must read as the
    shadow continuing, never as an event. */
 const FALLOFF = {
-  dark:  { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.16, drift: 0.13,
+  dark:  { peak: 0.16, mid: 0.08, low: 0.17, foot: 0.19, head: 0.02, grain: 0.250, drift: 0.203,
            bloom: 0.05 },
-  light: { peak: 0.10, mid: 0.05, low: 0.09, foot: 0.10, head: 0.02, grain: 0.09, drift: 0.09,
+  light: { peak: 0.10, mid: 0.05, low: 0.09, foot: 0.10, head: 0.02, grain: 0.141, drift: 0.141,
            bloom: 0.75 },
 };
+
+/* ── ⚠ THERE IS NO `satin` HERE, AND IT WAS BUILT TWICE BEFORE BEING CUT ──
+   REALISM2.md stage E asks for "a broad, soft vertical specular highlight down
+   the leaf" and calls it the single biggest "is it a flat rectangle" fix. It
+   was built — a horizontal gradient across the leaf, so the band it draws runs
+   vertically — in two shapes, and both are gone. The measurements, in order:
+
+     shape            mottle (plain)   profile, dark reed        dark ogee
+     none (shipped)   0.0181           +1.2% / +1.1%  r 0.999    -0.9% / -0.4%
+     peak at 0.46     0.0275           -1.5% / -3.8%  r 0.977    -3.5% / -5.2%
+     plateau 0.40-58  0.0182           -3.2% / -6.5%  r 0.966 ✗  -5.2% / -7.9%
+
+   Three reasons it is cut rather than tuned further, and the third is the one
+   that decides it.
+
+   1. NO PHOTOGRAPH ASKS FOR IT. The corpus's own horizontal profile is a rise
+      of about 3% from left to right across the leaf — the note under `drift`
+      records it, and it is why `drift` was halved after ours fell 12% the
+      other way. A specular band is not what these doors do; a very slight
+      lean is, and the drawing already has it.
+   2. IT MOVES THE MOULDING'S OWN READING. `npm run profile` compares a bead
+      against the face beside it, and the first shape swung the dark rows by
+      2.7 points on a quantity whose whole range is about 5. The second failed
+      the gate outright. A surface treatment that changes what the modelling
+      instrument reads is not a surface treatment.
+   3. AND I CANNOT EXPLAIN WHY THE RATIO MOVED AT ALL. Both panels of a `pair`
+      sit at the same inset, so a purely HORIZONTAL overlay should cancel out
+      of an upper-against-lower ratio exactly. It did not, twice, in opposite
+      directions. That is an instrument reading I do not understand, and this
+      file's standing rule is that an unexplained reading is not something to
+      tune around — see the note in §0c about `profile` being green for reasons
+      nobody has established, and the whole of CLAUDE.md §5.
+
+   What the leaf is actually short of is MOTTLE, not specular: 0.0181 against
+   an honestly-corrected corpus figure near 0.042. That is a `drift` question
+   with a photograph behind it, and it is the one to reopen — not this. */
 
 /* `bloom` is the pendant bulb's reflection, and it is a MEASURED OBJECT ON A
    WHITE DOOR. Its own comment always said "on dark paint it barely registers,
@@ -260,7 +379,37 @@ const RET_HEAD = 148;  // the soffit — the deepest of the three, and by a lot
    pair the leaves almost touch. 46 mm drew a wide lit band that read as a
    structural mullion the door does not have. */
 const MULLION  = 22;
-export const REBATE = 50;   // frame rebate: how far the leaf sits inside the opening
+/* Re-exported, not redefined: it lives in `js/catalog.js` beside `SIZES`,
+   because it is a dimension of the product and the catalogue needs it to clamp
+   a pull bar's length against the leaf. Two tools import it from here. */
+export { REBATE } from './catalog.js';
+
+/* ── THE ALCOVE IS GONE, AND ITS OWN DOCSTRING SAID WHY IT WOULD BE ──────
+   `ALC_SIDE = 160` and `ALC_HEAD = 300` stood here: a second, outer opening
+   stepping the wall forward around the casing, three more mitred trapezoids
+   shading the returns of a shallow recess. `REALISM2.md` §D1 asked for it and
+   it was built in stage D.
+
+   Reported from outside, looking at the page: *"around the door there is like
+   a gray box that frames it"*. That is exactly what it was. The two returns
+   shade to 0.105 and 0.060 of black over a cream wall, so on screen the recess
+   reads not as depth but as a grey rectangle ruled round the door — flat,
+   because a plane you see edge-on at this scale has no perspective to give it
+   away, and the drawing is dead square-on by rule (CLAUDE.md §4).
+
+   ⚠ AND ITS OWN COMMENT ADMITTED THE EVIDENCE WAS MISSING. It said, in as
+   many words: *"THESE NUMBERS ARE PROPORTION, NOT MEASUREMENT... Nothing in
+   research/ shows the wall around one of these doors from far enough back to
+   measure a recess."* Every other depth in this file — CASING 46, RETURN 62,
+   RET_HEAD 148 — came off a photograph; these two were picked to look right.
+   REALISM.md §6 governs, and it says a thing tuned by eye against nothing
+   loses to a photograph. There is no photograph, so it loses to nothing at
+   all: the wall is a wall.
+
+   What carries the depth instead is what always did — the frame's three
+   returns, which ARE measured, plus the cast shadow the casing throws onto the
+   plaster. Those say the door is set back from the wall without asserting a
+   room nobody photographed. */
 
 /* The reveal profile, read outward from the leaf. Every works photograph has
    these three bands and the renderer had none of them: it went straight from
@@ -295,7 +444,56 @@ const EDGE  = 38;      // 0.045 W — the ramp, not a band
 const HANDLE_AFF   = 1020;  // 0.486 H — the steadiest number in the whole set
 const CYLINDER_AFF = 904;   // 0.1225 W below the lever, on the same axis
 const PEEPHOLE_AFF = 1600;  // 0.762 H
-const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
+/**
+ * ⚠ THE EXTRA LOCK IS AT EYE LEVEL, AND IT WAS AT KNEE HEIGHT.
+ *
+ * This was `CYLINDER_AFF - 250` = **654 mm**, on the reasoning that a second
+ * keyway goes below the first. Peretz, 30.8.2026, with four photographs: they
+ * mount at the TOP of the door, around eye level, not down beside the main
+ * keyhole. `research/handles/peretz-1..4.webp`.
+ *
+ * ⚠ DERIVED TWICE, BECAUSE ONE READING OFF A PHONE SNAPSHOT IS NOT A
+ * MEASUREMENT. Every one of these four is shot from below, which foreshortens
+ * the top of the leaf — and the size of that error is visible rather than
+ * guessed at, because each photograph also contains the LEVER, whose height
+ * this file already knows from thirty corpus doors (`HANDLE_AFF`, 1020). The
+ * four read the lever at 990, 894, 843 and 834: the first is honest, the other
+ * three are compressed by 13-18%.
+ *
+ *   1. peretz-1 is the only door showing the keypad AND the peephole, and they
+ *      are 170 mm apart on the leaf's own scale — a short span, so almost no
+ *      differential foreshortening. Anchored on `PEEPHOLE_AFF`: 1600 - 170
+ *      = **1430**.
+ *
+ *   2. Across all four, the fitting sits 0.169-0.198 of leaf height above the
+ *      lever (mean 0.186 = 381 mm raw). Correcting each door by its own lever
+ *      error gives 388, 450, 492, 424 — mean 439, so 1020 + 439 = **1459**.
+ *
+ * 1430 and 1459, on a 2050 mm leaf. The first is taken, because it rests on
+ * two fittings a hand's breadth apart in one frame rather than on a linear
+ * correction applied to a nonlinear distortion. The 29 mm between them is 1.4%
+ * of the leaf and below what anyone can see.
+ *
+ * ⚠ THE BACKSET DID NOT MOVE, AND THAT WAS CHECKED RATHER THAN ASSUMED. All
+ * four put the fitting on the lock stile, on the cylinder's own axis; measured
+ * off the closing edge they run 45-82 mm against `KEYWAY_BACKSET`'s 63. So the
+ * horizontal placement was already right and only the height was wrong.
+ */
+const SPECIAL_AFF  = 1430;
+/* How far in from the HINGE edge the bell push stands. A 65 mm button needs
+   its own radius plus the reveal's 38 mm ramp before it is clear of the edge;
+   90 mm gives it 25 mm of paint either side on the narrowest leaf we make and
+   puts it visually on the stile rather than crowding the frame. */
+const BELL_BACKSET = 90;
+/* ⚠ 15, AND IT WAS 30, AND IT WAS A RADIUS ALL ALONG. The old comment called
+   this the "outer halo" and nothing drew it, so nobody had to decide whether
+   30 meant across or from the centre. Measured on d028 — the same door as
+   peretz-2 and the clearest viewer in the range — a peephole is 30 mm ACROSS:
+   21 x 20.3 px against a leaf 569 px wide and 1377 px tall, which is 31.4 mm
+   on one axis and 30.2 on the other. Real door viewers are a 14-16 mm barrel
+   inside a 22-35 mm trim ring, so 30 mm is the ring and the reading lands mid
+   range. This is the radius, and `peephole()` is what draws it. */
+const PEEPHOLE_R   = 15;    // 30 mm across, measured on d028
 /* Hinge heights, 0.144 / 0.504 / 0.857 H, kept as a note rather than as code.
    These doors open inwards, so from the street the hinges are hidden in the
    rebate: every outside photograph on the works page shows a leaf with none on
@@ -318,6 +516,41 @@ const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
  */
 const LOCK_BACKSET = 60;    // 0.070 W — the measured median, no grip present
 const LOCK_BACKSET_GRIP = 49;  // 0.057 W — where it goes when a bar shares the stile
+
+/**
+ * ⚠ WHERE THE KEYHOLE IS. ONE NUMBER, EVERY DOOR, NO EXCEPTIONS.
+ *
+ * Reported from outside twice. The first round stopped the GRIP moving it; the
+ * second: *"the keyhole still moves left and right a little bit if I change
+ * some handles."* Right again, and from the other side — `lockBackset` returns
+ * `max(base, out + 10)` so that a wide knob cannot hang off the leaf, and that
+ * made the keyway a function of the LOCK FURNITURE: coral 50, sapir 49, almog
+ * 52, square 51, plate 57, knobplate 63, cadoor 88. A 39 mm spread on the one
+ * object a customer stares at.
+ *
+ * THE KEYWAY IS ITS OWN OBJECT AND IT DOES NOT HAVE TO DODGE ANYTHING. It is
+ * drawn at CYLINDER_AFF, 116 mm below the lever, so a knob 78 mm wide at hand
+ * height is not competing with it for space. Only the FURNITURE needs to move
+ * out; the keyhole can stand still, and now does.
+ *
+ * ⚠ 63 IS DERIVED, NOT PICKED. It is the largest `out + 10` among the four
+ * locksets that carry the cylinder ON THEIR OWN BACKPLATE — plate 57,
+ * knobplate 63, square 51, digital 38 — because on those the keyway is part of
+ * the plate and cannot be placed independently of it. Any smaller and a
+ * knob-on-backplate hangs off the closing edge; any larger and every door's
+ * lock sits further in than it needs to. So the plate family sits AT the
+ * keyway backset and the loose-escutcheon family has its keyway drawn there
+ * regardless of where its lever went.
+ *
+ * ⚠ AND IT IS A BETTER NUMBER THAN THE ONE IT REPLACES, which is a pleasant
+ * accident and worth recording so nobody "corrects" it back. 63/850 is 0.0741
+ * of leaf width; the pooled median over the thirty measured records is 0.0695.
+ * The 49 that was here is 0.057 — the low end. Measured cost: 732 of 3,600
+ * grip x lockset x size x handing x window combinations have no grip home,
+ * against 694 at 49. (88, which would have let ONE constant serve the
+ * furniture as well, costs 880 — which is why the furniture keeps its own.)
+ */
+const KEYWAY_BACKSET = 63;
 /* Both discs came down about a fifth after d016: side by side with the
    photograph our rose and escutcheon were plainly oversized, reading as
    commercial ironmongery on a domestic door. The ratio between them (1.08)
@@ -401,29 +634,62 @@ const BAR_GAP_MIN = 0.090;
    `len` is 0.33 of leaf width, measured tip to tip across six doors: d051
    0.371, d062 0.375, d067 0.308, d068 0.321, d070 0.306. It was 0.30, the
    bottom of that range. The 1:15 slenderness was already right. */
-const GRAB = { fromTop: 0.59, len: 0.33, ratio: 1 / 15 };
-const THRESHOLD    = 42;   // a real sill is a chunky extrusion, ~0.02 H, not a strip
-/**
- * The sill's own colour, and it is NOT the door's.
- *
- * It was `darken(paint, 0.30)` — a dark version of whatever the leaf is
- * painted — and the photographs say a threshold is a bare aluminium extrusion
- * with a tone of its own. Measured on the twelve metal sills in the records,
- * as `frame.threshold.tone x colour.lum`:
- *
- *   leaf lum   43  56  86 101 104 118 166 172 175 185
- *   sill lum  150  76 180 136 155 160  99 100 131  43
- *
- * Scattered, and flat: the sill does not track the leaf. Median 131 of 255,
- * and the ratio to the leaf runs from 0.23 on a white door to 3.47 on a dark
- * one — which is the same statement read the other way round.
- *
- * `darken(paint, 0.30)` gave a black door a sill at luminance 18 where the
- * corpus says 130, so the brightest object at the foot of the drawing was
- * missing from every dark door we make — and most of them are dark.
- * Neutral, faintly warm, and left alone by the paint.
- */
-const SILL_METAL   = '#87857F';   // luminance 133
+/* ⚠ `len` IS MILLIMETRES NOW, NOT A FRACTION OF LEAF WIDTH, and that is what
+   makes this fitting checkable at all.
+   It was 0.33 W. The six measured doors — 0.371 0.375 0.308 0.321 0.306 — are
+   all standard-width leaves, so a fraction and a constant fit that data
+   equally well, and 0.33 x 850 IS 280. But `handleFootprint` is handed the
+   leaf's HEIGHT and not its width, so the box the placement rules budget for
+   the bow had to be a hardcoded 320 — right on a standard leaf, 50 mm out on a
+   narrow one and 50 the other way on a wide one. A footprint that is a
+   constant for an object that is not is CLAUDE.md §5 item 10 exactly: the
+   rules were checking a box the drawing had stopped drawing.
+   And a grab bar is a manufactured product. Peretz buys a 280 mm bar; he does
+   not buy a third of a door. The constant is the truer model as well as the
+   checkable one. */
+const GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15 };
+/* Where the bow's metal actually starts and stops, measured out from the
+   grip's axis, which is its OUTBOARD tip. `grabHandle` draws exactly this and
+   `handleFootprint` reports exactly this — one statement, two readers. */
+const GRAB_D = GRAB.len * GRAB.ratio;      // the shaft's diameter, 18.7 mm
+
+/* ── THERE IS NO SILL DRAWN AT THE FOOT OF THE DOOR, AND THAT IS MEASURED ──
+   `THRESHOLD = 42` used to stand here — a 42 mm extrusion drawn as a bright
+   aluminium bar with four black flutes and four white catches ruled along it,
+   full width, at the exact height a viewer's eye lands. Reported from outside
+   as a horizontal line across the bottom of the door that the photographs do
+   not have.
+
+   They do not. `frame.threshold.present` across the thirty measured records:
+
+     present  16   d003 d004 d012 d015 d026 d029 d030 d034
+                   d043 d048 d063 d064 d072 d087 d099 d106
+     absent   14   d016 d022 d031 d038 d051 d078 d092 d097
+                   d108 d113 d116 d122 d125 d128
+
+   Not even half, and the records for the absent ones say the same thing in
+   fourteen different hands: "the leaf closes onto a 4 px dark line and then
+   straight onto the stone floor tiles" (d113), "a 2 px black gap, then a raw
+   grey screed strip" (d116), "only a 3 px dark line between" (d128).
+
+   And where one IS present it is nothing like what we drew. `h_h`, its height
+   as a fraction of leaf height: 0.006 0.006 0.006 0.007 0.012 0.014 0.015
+   0.016 0.019 0.019 0.027 0.028 0.035 0.036 0.038 0.050. Median 0.0175 — on a
+   2050 mm leaf, 36 mm — but the SHAPE is a flat strip, and eight of the
+   sixteen are under 0.016. We drew the 87th percentile of a feature that is
+   absent from half the corpus, and then ruled eight lines along it.
+
+   So the leaf now runs to the floor and the frame's own returns carry the
+   depth, exactly as they do at the jambs. `baseY` is `floorY`: the foot of the
+   leaf and the line of the floor are one line, which is what a door standing
+   on the ground looks like. The frame is nearer the viewer than the leaf and
+   says so through the same three trapezoids it uses at the head, so the recess
+   reads at the foot without a single ruled line. CLAUDE.md §4: a fold between
+   two lit surfaces is a change of VALUE, not a line.
+
+   ⚠ Do not put a strip back without a photograph. That is REALISM.md §6, and
+   this is the fourth thing in this file that was drawn as ink where the
+   corpus has a change of value. */
 
 /* The backplate that carries lever and cylinder together — the fitting on
    three of the four doors we could measure. Waisted, not a plain stadium:
@@ -473,6 +739,269 @@ const PAD = { x: 70, top: 110, bottom: 300 };
    and this repo photographs the page as part of its test suite. Pick the
    smallest number the measurement supports. */
 const SCENE = 8000;
+
+/* ── THE ROOM STANDS STILL WHILE THE DOOR CHANGES SIZE ──────────────────
+   Reported from outside, and it is the clearest statement of the fault in the
+   whole log: *"the door doesnt need at all times to take all of the frame, i
+   dont want the frame to change when i am changing door size, the things that
+   are near the door dont get moved, only the door changes size."*
+
+   What it was doing. Every coordinate below used to be laid out from the top
+   left corner of the drawing — `x0 = PAD.x + CASING + RETURN`, `y0 = PAD.top +
+   CASING + RET_HEAD`, and then `floorY = y0 + leafH`. So the head of the
+   opening was nailed to the top of the picture and THE FLOOR MOVED DOWN when
+   you chose a taller door, which is upside down: a door grows towards the
+   lintel, not into the ground. And the picture's own box grew with the door,
+   so `fitStage` — which scales that box to the stage — scaled everything back
+   down again. Measured on the three widths: a 1100 mm door and an 800 mm door
+   came out within a few pixels of the same drawn width, and the wall, the
+   floor line and the sconces slid about instead.
+
+   Two numbers fix it, and both are constants rather than functions of the
+   door:
+
+     BASE_Y   where the floor is. Every door stands on it.
+     MID_X    the centre line of the opening. Every door is centred on it.
+
+   They are computed from the LARGEST door the catalogue can make, so the fixed
+   scene is big enough to hold any of them with the same air around it — which
+   is why a standard door no longer fills the frame, and should not. The tall
+   door is the one that fills it.
+
+   ⚠ THE NATURAL viewBox STAYS TIGHT TO THE DOOR, and that is deliberate. Bare
+   mode (`?bare=1`) is the measurement harness, and `npm run profile` samples
+   PIXELS off a rendered leaf: framing every door inside the tall-and-wide
+   scene would hand a narrow door a third fewer pixels to measure and read as a
+   change in the drawing. CLAUDE.md §8 has this exact bruise already — a
+   headline left off the bare-mode hide list cost a false 5.2% regression for
+   the same reason. So `render` emits BOTH boxes: `viewBox` is the door's own
+   tight box, and `data-fit-*` is the fixed scene `fitStage` crops to. */
+const SCENE_MAX = (() => {
+  let openW = 0, leafH = 0;
+  for (const s of Object.values(SIZES)) {
+    const lw = s.w - REBATE * 2;
+    const sw = s.side ? s.side - REBATE : 0;
+    openW = Math.max(openW, lw + (sw ? sw + MULLION : 0));
+    leafH = Math.max(leafH, s.h - REBATE);
+  }
+  return { openW, leafH };
+})();
+/* Laid out so the fixed scene starts at (0, 0), which keeps every number in
+   the drawing positive and the `data-fit-*` rect trivial to read. */
+const MID_X  = PAD.x + CASING + RETURN + SCENE_MAX.openW / 2;
+/* THE FOURTH RETURN — the floor inside the opening.
+   The frame turns back from the wall at the two jambs and at the head, and it
+   does the same thing at the foot: the leaf stands `RETURN` deep behind the
+   plaster, so the floor runs back from the wall line to the leaf's foot and
+   you are looking down at that strip. Drawing it is what makes the door read
+   as set INTO the wall at its base rather than pasted onto it, and it is what
+   replaces the ribbed sill — the fourth trapezoid of a construction that
+   already had three, rather than a new object with a new tone.
+   The frame's own depth, not a fourth invented number: RET_HEAD is 148 because
+   the head was measured off photographs, and no photograph in research/ shows
+   the floor inside one of these openings. Where there is no measurement, the
+   thing the frame is actually made of wins. */
+const FLOOR_RUN = RETURN;
+const BASE_Y = PAD.top + CASING + RET_HEAD + SCENE_MAX.leafH + FLOOR_RUN;
+/** The SCENE: the same rectangle for every door in the range. The vignette is
+ *  centred on it and the backdrop is painted from it, so it is the room's own
+ *  extent and it does not move. */
+const STAGE_BOX = { x: 0, y: 0, w: MID_X * 2, h: BASE_Y + PAD.bottom };
+
+/**
+ * ── THE CROP THE PAGE FITS TO, WHICH IS NOT THE SCENE ─────────────────
+ *
+ * ⚠ THE DOOR WAS 21.1% OF THE DESKTOP FRAME AND MOST OF THE REST WAS EMPTY
+ * WALL, and the arithmetic says why. The crop is HEIGHT-driven at every
+ * viewport this app has — measured, stage aspect 1.33 against the scene's
+ * 0.536 — so `fitStage` scales to fit the scene's HEIGHT and whatever width
+ * that leaves is overspill. Vertical padding is therefore exactly what is
+ * costing the door its size, and horizontal padding costs nothing.
+ *
+ * ⚠ AND IT CANNOT BE TAKEN OUT OF `PAD`, which was the first attempt. `PAD`
+ * feeds the natural `viewBox` as well as this box — so trimming it would move
+ * all 110 committed sheets and destroy the "bare families byte-identical"
+ * proof, which is not a run to re-do but the proof itself. These are two
+ * different quantities: air around the DRAWING for a measurement crop, and air
+ * around the SCENE for the page's staging. Separated, this changes the four
+ * `data-fit-*` attributes and not one pixel of any bare render.
+ *
+ * The numbers: 40 off the top leaves 70 units of wall above the TALLEST door's
+ * casing (a standard door keeps 370, because the scene is sized on the tall
+ * one and every door stands on the same floor). 130 off the bottom leaves 180
+ * units of floor below the threshold, about 50 px on a 900 px-high desktop
+ * stage. Net scale +6.0%.
+ */
+const FIT_TRIM = { top: 40, bottom: 130 };
+const FIT_BOX = {
+  x: STAGE_BOX.x,
+  y: STAGE_BOX.y + FIT_TRIM.top,
+  w: STAGE_BOX.w,
+  h: STAGE_BOX.h - FIT_TRIM.top - FIT_TRIM.bottom,
+};
+
+
+/**
+ * ── THE WALL LAMPS ────────────────────────────────────────────────────
+ * Reported from outside: *"make the two things outside the door on either
+ * side, lamps and complete them."* They were a 60 x 150 rounded rectangle with
+ * a shading gradient and an 8 mm warm strip at the foot — enough to place a
+ * light source, not enough to be a light. At door scale that is a grey pill on
+ * the plaster, and "the two things" is exactly how it read.
+ *
+ * ⚠ THE LAMP IS AN OBJECT, NOT A PLANE OF THE ROOM, so it gets a material of
+ * its own rather than a black overlay on the wall. That rule (CLAUDE.md §4,
+ * "every plane is a black or white overlay") is about the wall, the floor and
+ * the returns — surfaces whose colour IS the room's colour and which have to
+ * move with it. A bronze fitting screwed to that wall is a thing standing in
+ * front of it, and painting it in wall-minus-alpha would make it a hole rather
+ * than a lamp.
+ *
+ * ⚠ AND IT IS LIT BY THE SAME KEY AS EVERYTHING ELSE — high and about 30° left
+ * of camera, per LIGHT. So the body is brightest a quarter of the way in from
+ * its left edge, the right edge is the darkest thing on it, and the cast
+ * shadow falls down and to the RIGHT. Getting that backwards on a small object
+ * is invisible one at a time and obvious when there are two of them
+ * symmetrically placed, which is the case here.
+ *
+ * 96 x 250 mm, which is an ordinary exterior sconce beside a 950 mm door. The
+ * old 60 x 150 was small for a real fitting as well as illegible.
+ */
+/* ⚠ 110 x 300, UP FROM 96 x 250, AND THE REASON IS THE SCREEN AND NOT THE WALL.
+   Both are plausible for an exterior sconce beside a 950 mm door. But the whole
+   scene is fitted into a stage about 410 px wide, so 96 mm of wall came out
+   TEN PIXELS across — and no amount of modelling reads across ten pixels. It
+   was reported as flat, and measured as flat: every value in the body gradient
+   sat between #20 and #5A, a 58-point range on a near-white wall, which is a
+   silhouette however carefully it is shaded.
+   The fitting is bigger and the range is wider (see `lampBody`). Both were
+   needed: widening the values on a 10 px object just makes a stripier
+   silhouette. */
+const LAMP = { w: 110, h: 300 };
+
+/**
+ * How far out from the centre line each wall light stands.
+ *
+ * ⚠ THE CONSTRAINT IS NOT "how much plaster looks right" — IT IS THAT A LAMP
+ * MUST NEVER BE CUT IN HALF BY THE EDGE OF THE STAGE.
+ *
+ * `fitStage` crops to STAGE_BOX expanded to the stage's shape, so on a stage
+ * WIDER in proportion than the scene the crop is wider than 2 x MID_X and the
+ * lamps show; on a NARROWER one the crop is exactly STAGE_BOX and they do not.
+ * Both are fine. What is not fine is landing across that boundary, which is
+ * what 999 did: measured at seven viewports, `1100x800` and `1280x900` each
+ * drew half a lamp against the edge of the picture, and half a lamp reads as a
+ * rendering fault rather than as a room continuing past the frame.
+ *
+ * So it is pinned just OUTSIDE STAGE_BOX's own edge by half the fitting plus a
+ * little air. Below that boundary the whole lamp is out of frame and the wall
+ * simply runs to the edge; above it the whole lamp is in frame with plaster on
+ * both sides. There is no width at which a fraction of one shows.
+ *
+ * ⚠ It cannot go INSIDE STAGE_BOX. The scene is only as wide as the widest
+ * door plus PAD, so the casing of a sidelight reaches 719 of the 789 available
+ * — a lamp inside the box would be drawn on top of it.
+ */
+const SCONCE_OUT = MID_X + LAMP.w / 2 + 36;
+/* Dark bronze — the commonest finish on an exterior fitting, and the one that
+   reads against pale plaster at any door colour. Literal, because this is the
+   lamp's own material and not a shade of the room; see the note above. */
+const LAMP_DARK = '#3A3733';
+
+/**
+ * One wall light, drawn from its top-left. `sy` is the top of the body.
+ *
+ * Written as a function rather than inline in the room's template for the
+ * reason `bevel` and `moulding` are: it is eleven elements with a value
+ * structure, and eleven elements inside a nested template literal is where
+ * this file has historically gone wrong (see §1b — a backtick in a comment
+ * inside the big string stops the whole drawing parsing).
+ */
+function wallLamp(sx, sy, baseY) {
+  const { w, h } = LAMP;
+  const n = v => Number(v.toFixed(1));
+  const x0 = sx - w / 2;
+  const capH = h * 0.055;                 // the cast top, slightly proud
+  const rimY = sy + h - capH;             // and its twin at the foot
+  const proud = w * 0.08;                 // how far both stand out from the body
+  /* ⚠ TAGGED SO THE PAGE CAN MEASURE IT. `fitStage` reads this box to place the
+     price on the wall beneath the right-hand lamp — asked for in those words —
+     and the alternative was a hard-coded percentage of the stage that would go
+     silently wrong the day `SCONCE_OUT` moves. The group wraps the washes as
+     well as the fitting, on purpose: the light IS part of where the lamp is,
+     ⚠ AND IT WRAPS THE FITTING ONLY, NOT ITS LIGHT. Wrapping the washes as
+     well measured 785 px down a 794 px stage — the downward glow runs to the
+     floor, so "below the lamp" came out as "on the skirting". The metal is
+     what a person means by the lamp. */
+  return `
+      <!-- ⚠ BOTH WASHES ARE PAINTED FIRST, ON THE WALL, BEHIND THE FITTING.
+           They were after it, and the upward one is a warm ellipse wide enough
+           to cover the lamp — so it lay ACROSS the body at 0.30 and bleached
+           its top two thirds, leaving a dark band at the foot that read as a
+           join in the metal. Light thrown at a wall lands on the wall; the
+           thing throwing it is in front of that. Caught by looking at a 3x
+           crop, which is the only way this kind of fault ever shows.
+
+           Down to the floor, and a shorter one up the wall, because a fitting
+           open at both ends throws both ways — and the upward one is most of
+           what makes it read as a LAMP rather than as a bright dot. -->
+      <ellipse cx="${n(sx)}" cy="${n((rimY + capH + baseY) / 2)}" rx="${n(w * 3.0)}"
+               ry="${n((baseY - rimY - capH) / 2)}" fill="url(#sconceGlow)"/>
+      <ellipse cx="${n(sx)}" cy="${n(sy + capH - h * 0.8)}" rx="${n(w * 1.9)}"
+               ry="${n(h * 0.8)}" fill="url(#lampUp)"/>
+
+    <g data-room="sconce">
+      <!-- The shadow the fitting throws on the plaster: down and to the right,
+           because the key is high and to the left. Soft, and only just there —
+           an exterior wall in daylight, not a studio. -->
+      <rect x="${n(x0 + proud * 1.4)}" y="${n(sy + capH)}" width="${n(w)}"
+            height="${n(h)}" rx="${n(w * 0.18)}" fill="#000" opacity="0.16"
+            filter="url(#softShadow)"/>
+
+      <!-- Backplate: the part actually screwed to the wall. Narrower than the
+           body and a shade darker, so the body reads as standing off it. -->
+      <rect x="${n(sx - w * 0.30)}" y="${n(sy - h * 0.02)}" width="${n(w * 0.60)}"
+            height="${n(h * 1.04)}" rx="${n(w * 0.10)}" fill="${LAMP_DARK}"/>
+
+      <!-- The body, and the one gradient that says which way the light comes
+           from. Everything else on the lamp is a band or a highlight. -->
+      <rect x="${n(x0)}" y="${n(sy + capH * 0.5)}" width="${n(w)}"
+            height="${n(h - capH)}" rx="${n(w * 0.16)}" fill="url(#lampBody)"/>
+
+      <!-- Cast top and foot rim, standing proud of the body on both sides.
+           These are what stop it reading as a pill: a real fitting is made of
+           parts, and the joints between them catch the light. -->
+      <rect x="${n(x0 - proud)}" y="${n(sy)}" width="${n(w + proud * 2)}"
+            height="${n(capH)}" rx="${n(capH * 0.45)}" fill="url(#lampCap)"/>
+      <rect x="${n(x0 - proud)}" y="${n(rimY)}" width="${n(w + proud * 2)}"
+            height="${n(capH)}" rx="${n(capH * 0.45)}" fill="url(#lampCap)"/>
+
+      <!-- The fitting lit by its own lamp: warm at both open ends, nothing
+           across the waist. See lampGlow — a sconce that is switched on is
+           brightest on its OWN metal nearest the aperture, and without this
+           the barrel reads as a dark shape that happens to have a bright dot
+           at each end. -->
+      <rect x="${n(x0)}" y="${n(sy + capH * 0.5)}" width="${n(w)}"
+            height="${n(h - capH)}" rx="${n(w * 0.16)}" fill="url(#lampGlow)"/>
+
+      <!-- The specular down the key side. One narrow band at a quarter width,
+           which is where a cylinder's highlight sits under a 30° key. -->
+      <rect x="${n(x0 + w * 0.17)}" y="${n(sy + h * 0.14)}" width="${n(w * 0.11)}"
+            height="${n(h * 0.70)}" rx="${n(w * 0.055)}"
+            fill="#fff" opacity="0.26"/>
+
+      <!-- THE LIT APERTURE, which is the whole point and was an 8 mm strip.
+           The lamp is open top and bottom — an up-and-down sconce, which is
+           what goes beside a front door — so there is a glowing mouth at each
+           end and the brighter one is the bottom, where the fitting throws its
+           working light. -->
+      <ellipse cx="${n(sx)}" cy="${n(rimY + capH * 0.5)}" rx="${n(w * 0.40)}"
+               ry="${n(capH * 0.42)}" fill="${LIGHT.warm}" opacity="0.92"/>
+      <ellipse cx="${n(sx)}" cy="${n(sy + capH * 0.5)}" rx="${n(w * 0.34)}"
+               ry="${n(capH * 0.36)}" fill="${LIGHT.warm}" opacity="0.55"/>
+    </g>
+`;
+}
 
 /**
  * One value, escaped for an XML attribute.
@@ -548,21 +1077,122 @@ function topLevelElements(markup) {
   return out;
 }
 
+/**
+ * A second copy of a door, safe to put in the same document as the first.
+ *
+ * ── the defect this exists for, which shipped and was caught by a review ──
+ * `render()` emits FIXED ids — `leafFill`, `keyWash`, `retNear`, `casingFace`,
+ * `soffit`, `mould-t`, `glass`, `vignette` and fifty more — and every fill in
+ * the drawing is `fill="url(#leafFill)"`. That is exactly right while there is
+ * one door on the page, which was true for the whole life of this file.
+ *
+ * Then the gallery put thirty doors in one document. Measured: any two doors
+ * share ALL 58 ids, and an SVG `url(#x)` resolves to the FIRST element with
+ * that id in the document — so every tile in the gallery painted itself with
+ * the first tile's gradients. Thirty different colours, one colour on screen.
+ * It is CLAUDE.md §5 in an unfamiliar costume: the id is a name computed in
+ * one place and consumed in another, and nothing said the name had to be
+ * unique per document because for years there was only ever one.
+ *
+ * ⚠ THE STAGE'S COPY IS NOT NAMESPACED, deliberately. `tools/collide.mjs`,
+ * `npm run profile`, `npm run glass`, `fitStage` and half the audit select
+ * `#leaf`, `#frame`, `#hardware` and `#leaf rect` on the page. Renaming those
+ * would break every instrument to fix a problem the stage does not have — it
+ * is one door, and it is first in the document. Only the EXTRA copies move.
+ *
+ * ⚠ AND THE COMMENTS GO WITH THEM. 29% of a rendered door is XML comments
+ * explaining the drawing to whoever opens the inspector; a 132 px thumbnail
+ * has nobody reading it, and ten live tiles would carry 120 KB of prose. It
+ * also makes the rewrite below safe: with the comments gone, every `id="` and
+ * every `url(#` left in the string is real markup.
+ *
+ * `render(state)` itself is untouched and stays the one source of the drawing.
+ */
+export function copyOf(svg, key) {
+  const suffix = `-${String(key).replace(/[^A-Za-z0-9_-]/g, '')}`;
+  return svg
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/(\sid=")([^"]+)(")/g, (_, a, id, z) => a + id + suffix + z)
+    .replace(/url\(#([^)]+)\)/g, (_, id) => `url(#${id}${suffix})`)
+    .replace(/(\shref=")#([^"]+)(")/g, (_, a, id, z) => `${a}#${id}${suffix}${z}`);
+}
+
 export function render(state) {
   const size    = SIZES[state.size] || SIZES.standard;
   const colour  = byId(COLOURS, state.colour);
   const handing = byId(HANDINGS, state.handing);
   const win     = byId(WINDOWS, state.window);
   const grille  = byId(GRILLES, state.grille);
-  const handle  = byId(HANDLES, state.handle);
+  const handle  = gripOf(state);
   const lockset = byId(LOCKSETS, state.lockset);
+  const special = byId(SPECIAL_LOCKS, state.speciallock);
+  /* ⚠ THE FRAME IS A CHOICE NOW, and it grows OUTWARD from a fixed opening.
+     `x0`, `y0`, `MID_X` and `BASE_Y` are all still computed from the standard
+     CASING / RETURN / RET_HEAD, so the leaf does not move by a pixel when the
+     customer picks a wider frame — `npm test` sweeps that on every size. What
+     changes is where the casing's outer edge and the reveal's inner edge fall,
+     which is what a wider frame actually is. */
+  const mk = byId(MASHKOFS, state.mashkof);
   const detail  = byId(DETAILS, state.detail);
   /* The finish is the handle's own or brushed nickel; it stopped being a
      customer choice when the group was withdrawn. Shiran is an antique brass
      casting and says so on its catalogue entry, which is where a fact about a
      product belongs. */
-  const finish  = effectiveFinish(state);
+  /* ⚠ TWO METALS ON ONE DOOR, AND THAT IS THE WHOLE OF PHASE 4.
+     Reported by Peretz in his own words, 26.8.2026: *"some pull handles change
+     the color of the handle and the keyhole, fix it."*
+
+     He is right and the defect is old. This renderer built ONE set of metal
+     gradients per door out of `gripFinish` — the PULL BAR's finish — so
+     choosing the brass Ella painted the Coral lever and the keyway beside it
+     gold. `REDESIGN.md` §1.1 fixed the half of it that reached the MESSAGE and
+     left the drawing disagreeing on purpose, recorded in `ASK-PERETZ.md` §2b1,
+     because nobody had confirmed which way round it should be. Two of his own
+     photographs said the two finishes are independent — d072 has a gold bar
+     beside a near-black escutcheon, d128 a chrome tube beside a bronze one —
+     and now he has said so.
+
+     So: `tone` is the GRIP's own metal and paints the bar and nothing else.
+     `hwTone` is the customer's פרזול and paints the lock furniture, the
+     keyway, and the extra lock. A pull handle's finish is a fact about that
+     product (Ella is brass); the lock furniture's is a choice, and it is
+     ₪0–₪900. */
+  const finish  = gripFinish(state);
   const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
+  const hwTone  = FINISH_TONES[byId(PIRZUL, state.pirzul).tone] || FINISH_TONES.steel;
+  /* Is the LOCK FURNITURE black? The euro cylinder is special-cased on it —
+     see the note over `euroSteel`. Asked of the pirzul entry's `tone` rather
+     than of its id, so `pz-black` and any later black share one answer. */
+  const hwBlack = byId(PIRZUL, state.pirzul).tone === 'black';
+
+  /* ⚠ THE STRIPES FOLLOW THE FINISH, AND WHICH FINISH TOOK DECIDING.
+     Peretz gave two sentences on 30.8.2026 and each one alone is satisfiable:
+
+       *"the אלה and מוט שחור are changing the color of the stripes"*
+       *"pirzul doesnt affect the additional lock, but it does affect the
+        stripes"*
+
+     ⚠ AND THE SECOND REVERSES WHAT HE SAID ON 26.8 — *"it doesnt change the
+     color of the stripes or the pull handles."* The pull-handle half of that
+     still stands; the stripes half does not.
+
+     Taken together they rule out both simple answers. Stripes always following
+     the GRIP means the pirzul does not reach them, against the second
+     sentence. Stripes always following the PIRZUL means a brass אלה beside the
+     standard nickel pirzul draws steel stripes, against the first.
+
+     So: an EXPLICIT choice beats an IMPLIED one. The pirzul is a finish the
+     customer picked on purpose and paid ₪0–₪900 for; a grip's tone is a fact
+     about the product (Ella is brass because Ella is brass). When the pirzul
+     is the standard nickel the customer has expressed no preference, and the
+     stripes take their cue from the ironmongery that is actually on the door.
+     Both of his sentences come out true.
+
+     ⚠ IT IS A THIRD READER OF `FINISH_TONES` AND NOT A THIRD TABLE. The trim
+     on the leaf is the same stock as the bar; giving it a ramp of its own is
+     how the pull handle and the lock furniture came to be painted with each
+     other's metal (see the note above). */
+  const stripeTone = byId(PIRZUL, state.pirzul).tone === 'steel' ? tone : hwTone;
 
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
@@ -576,29 +1206,55 @@ export function render(state) {
   const sideW = size.side ? size.side - REBATE : 0;
   const totalW = leafW + (sideW ? sideW + MULLION : 0);
 
-  // Left edge of the leaf opening; returns and casing sit outside it.
-  const x0 = PAD.x + CASING + RETURN;
-  const x1 = x0 + totalW;
-  const y0 = PAD.top + CASING + RET_HEAD;
-  const floorY = y0 + leafH;
+  /* ANCHORED TO THE FLOOR AND TO THE CENTRE LINE, never to the corner of the
+     picture — see SCENE_MAX above. The floor does not move and the opening
+     does not slide sideways, so choosing a taller door raises its head and
+     choosing a wider one grows it about its own middle, which is what happens
+     to a doorway. */
+  const floorY = BASE_Y - FLOOR_RUN;       // where the LEAF meets the ground
+  const y0     = floorY - leafH;           // ...so the head rises for a tall door
+  const x0     = MID_X - totalW / 2;       // left edge of the leaf opening
+  const x1     = x0 + totalW;
 
+  /* THE DOOR'S OWN TIGHT BOX, which is what a harness in bare mode gets, and
+     what `usedDefs` and the backdrop measure their overspill from. The page
+     never sees it: `fitStage` reads `data-fit-*` and crops to STAGE_BOX. */
+  /* ⚠ ANCHORED ON THE WIDEST FRAME IN THE RANGE, NOT ON THIS DOOR'S. Computed
+     per state, a wider mashkof would grow this box, `fitStage` would scale the
+     whole drawing down to fit it, and the LEAF would appear to shrink when the
+     customer changed something that does not touch the leaf. That is the fault
+     reported from outside about the classical set. See `MASHKOF_MAX`. */
   const view = {
-    w: x1 + RETURN + CASING + PAD.x,
-    h: floorY + THRESHOLD + PAD.bottom,
+    x: x0 - MASHKOF_MAX.in - MASHKOF_MAX.out - PAD.x,
+    y: y0 - MASHKOF_MAX.head - MASHKOF_MAX.out - PAD.top,
+    w: totalW + (MASHKOF_MAX.in + MASHKOF_MAX.out + PAD.x) * 2,
+    h: leafH + FLOOR_RUN + MASHKOF_MAX.head + MASHKOF_MAX.out + PAD.top + PAD.bottom,
   };
   const y = aff => floorY - aff;
+
+  /* THE BACKDROP IS ONE RECTANGLE FOR EVERY DOOR IN THE RANGE. It used to be
+     painted from `-SCENE` to `view.w + SCENE`, i.e. off the door's own box, so
+     a wider door moved the wall's right-hand edge 250 mm further out. Nothing
+     could see it — SCENE is 8000 — but the whole point of the anchored scene
+     is that the room is not a function of the door, and a quantity that has no
+     business varying should not be written as if it might. */
+  const farX = STAGE_BOX.x - SCENE, farW = STAGE_BOX.w + SCENE * 2;
+  const farY = STAGE_BOX.y - SCENE, farH = STAGE_BOX.h + SCENE * 2;
 
   /* The frame, named once. Every plane of the opening is one of these lines,
      and having them as names rather than as arithmetic repeated eleven times
      is what makes the corner mitres below possible to read. */
-  const revX0 = x0 - RETURN;            // the opening at the wall face, left
-  const revX1 = x1 + RETURN;            //   "                          right
-  const revY0 = y0 - RET_HEAD;          //   "                          head
-  const casX0 = revX0 - CASING;         // the casing's outer edge, left
-  const casX1 = revX1 + CASING;         //   "                     right
-  const casY0 = revY0 - CASING;         //   "                     top
-  const baseY = floorY + THRESHOLD;     // where every vertical meets the floor
-  const openW = totalW + RETURN * 2;    // the opening, wall face to wall face
+  const revX0 = x0 - mk.in;             // the opening at the wall face, left
+  const revX1 = x1 + mk.in;             //   "                          right
+  const revY0 = y0 - mk.head;           //   "                          head
+  const casX0 = revX0 - mk.out;         // the casing's outer edge, left
+  const casX1 = revX1 + mk.out;         //   "                     right
+  const casY0 = revY0 - mk.out;         //   "                     top
+  /* Where the WALL meets the floor. The leaf meets it `FLOOR_RUN` further
+     back, at `floorY`, which is the whole of the depth cue at the door's foot
+     now that the sill is gone. See the long note where THRESHOLD was defined. */
+  const baseY = BASE_Y;
+  const openW = totalW + mk.in * 2;     // the opening, wall face to wall face
 
   const hingeOnLeft = handing.hinge === 'left';
 
@@ -615,6 +1271,8 @@ export function render(state) {
      against 0.070) because the fitter is making room for it. */
   const backset = lockBackset(handle, lockset);
   const lockX   = hingeOnLeft ? mainX1 - backset : mainX + backset;
+  /* The keyhole's own axis. One number for every door in the range. */
+  const keyX    = hingeOnLeft ? mainX1 - KEYWAY_BACKSET : mainX + KEYWAY_BACKSET;
   const inward  = hingeOnLeft ? -1 : 1;
   const hingeX  = hingeOnLeft ? mainX : mainX1;
   const leverDir = hingeOnLeft ? -1 : 1;
@@ -625,7 +1283,7 @@ export function render(state) {
      ironmongery is bolted to. Everything downstream reads THESE and not the
      catalogue's rectangles, or the drawing and the rules disagree about where
      the glass is. Leaf-local, so add mainX to reach stage space. */
-  const openings = apertureLayout(win, leafW);
+  const openings = apertureLayout(win, leafW, detail, leafH);
 
   /* The glazing envelope, so moulded detail and the grip can be kept clear of
      it. Declared before the grip is placed, because the grip now reads it. */
@@ -691,6 +1349,22 @@ export function render(state) {
   const LEAF_FALL = leafFallOf(LEAF_TOP, LEAF_FOOT);
 
   const pale = isLight(paint);
+
+  /* The glazing, built once and PLACED once — either before the face design or
+     after it, never both. See the note at the two call sites in the markup:
+     the classical set is a whole composition applied over the light's
+     architrave, and every other face is one feature laid on a leaf beside it. */
+  const glazing = `
+  <g id="glazing">
+    ${openings.map((o, i) => aperture({
+      band: detail.classic ? CLASSIC_BAND : MOULD_BAND,
+      x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
+      splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
+      paint, edge, grille, key: 'm' + i, profile: mouldOf(detail),
+      leaf: { x: mainX, y: y0, w: leafW, h: leafH },
+    })).join('')}
+  </g>`;
+
 
   /* The leaf's own perimeter ramps, distinct from the frame's shadow gap and
      easy to omit: the face itself darkens towards its edges over 0.04-0.06 W,
@@ -999,10 +1673,67 @@ export function render(state) {
       <stop offset="1"    stop-color="${darken(paint, pale ? 0.13 : 0.19)}"/>
     </linearGradient>
 
-    <!-- Brushed nickel, lit from upper-left. The bright band sits off-centre
-         and there is a second, weaker return near the far edge — that double
-         highlight is what separates metal from grey plastic. -->
+    <!-- Lit from upper-left. The bright band sits off-centre and there is a
+         second, weaker return near the far edge — that double highlight is
+         what separates metal from grey plastic.
+         WARNING: hwTone, NOT tone. Everything filled with this gradient is
+         LOCK FURNITURE — the lever, its collar, the backplate, the rose, the
+         keyway escutcheon and the extra lock — and its finish is the
+         customer's פרזול. The other one, tone, is the pull bar's own metal and
+         is used only by the bar profiles below. The id keeps the name nickel
+         because it is a wire format inside the emitted SVG that usedDefs and
+         four tools match on; what it MEANS is "the lock furniture's metal",
+         and nickel is merely its default.
+         (No backticks in this comment on purpose: it sits inside the one big
+         template literal, and a backtick here terminates it — CLAUDE.md §1b,
+         four builds.) -->
+    <!-- THE BOUGHT-IN UNIT'S OWN STEEL. A third owner, and it exists because
+         one gradient cannot have two masters: nickel is the PIRZUL's and
+         gripHard is the BAR's, and the extra lock used to borrow the first.
+         Peretz, 30.8.2026: "pirzul doesnt affect the additional lock." A
+         kodan and a kasefet arrive in the finish the manufacturer ships them
+         in, and no choice on this page changes it - so this ramp is a
+         CONSTANT, not a function of state, which is the whole point. -->
+    <linearGradient id="lockUnit" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="${FINISH_TONES.steel[0]}"/>
+      <stop offset="0.16" stop-color="${FINISH_TONES.steel[1]}"/>
+      <stop offset="0.38" stop-color="${FINISH_TONES.steel[2]}"/>
+      <stop offset="0.60" stop-color="${FINISH_TONES.steel[3]}"/>
+      <stop offset="0.80" stop-color="${FINISH_TONES.steel[4]}"/>
+      <stop offset="1"    stop-color="${FINISH_TONES.steel[5]}"/>
+    </linearGradient>
     <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="${hwTone[0]}"/>
+      <stop offset="0.16" stop-color="${hwTone[1]}"/>
+      <stop offset="0.38" stop-color="${hwTone[2]}"/>
+      <stop offset="0.60" stop-color="${hwTone[3]}"/>
+      <stop offset="0.80" stop-color="${hwTone[4]}"/>
+      <stop offset="1"    stop-color="${hwTone[5]}"/>
+    </linearGradient>
+    <!-- WARNING: hwTone, AND IT USED TO BE tone. Every one of this gradient's
+         users is LOCK FURNITURE - plateHandle's rose, knobPlate, cadoorKnob,
+         sapirKnob - so it was painting the lever and the knob with the PULL
+         BAR's metal. Reported from outside in one sentence: "pirzul changes
+         the color of the main handle not the pull handle in any way." The
+         paragraph above tone has said that since phase 4; these two gradients
+         were the half of it that never moved, because the nickel gradient was
+         fixed by name and its neighbours were not. -->
+    <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="${hwTone[1]}"/>
+      <stop offset="0.5" stop-color="${hwTone[3]}"/>
+      <stop offset="1"   stop-color="${hwTone[5]}"/>
+    </linearGradient>
+
+    <!-- WARNING: THE GRIP'S OWN PAIR, AND WHY THERE HAS TO BE A SECOND SET.
+         One gradient cannot serve two masters: grabHandle is a PULL HANDLE
+         and takes tone, everything else that reached for these is lock
+         furniture and takes hwTone. While there was one set, whichever metal
+         it held was wrong for one family - and it was wrong for BOTH at once,
+         since grabHandle filled its rods from the nickel gradient (the
+         hardware finish) while the levers filled from nickelSoft (the bar's).
+         Named for the OWNER rather than for the metal, so the next drawing
+         added has to answer "whose is this?" before it can pick one. -->
+    <linearGradient id="gripHard" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"    stop-color="${tone[0]}"/>
       <stop offset="0.16" stop-color="${tone[1]}"/>
       <stop offset="0.38" stop-color="${tone[2]}"/>
@@ -1010,7 +1741,7 @@ export function render(state) {
       <stop offset="0.80" stop-color="${tone[4]}"/>
       <stop offset="1"    stop-color="${tone[5]}"/>
     </linearGradient>
-    <linearGradient id="nickelSoft" x1="0.1" y1="0" x2="0.9" y2="1">
+    <linearGradient id="gripSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${tone[1]}"/>
       <stop offset="0.5" stop-color="${tone[3]}"/>
       <stop offset="1"   stop-color="${tone[5]}"/>
@@ -1019,26 +1750,58 @@ export function render(state) {
     <!-- Chrome mirrors an unlit room: bright rim, banded face, and a middle
          that is DARKER than the door behind it. Filling a backplate with
          light grey is the classic rendered-hardware tell. -->
+    <!-- WARNING: hwTone HERE TOO, and this is the plainest of the three: its
+         own comment says "filling a BACKPLATE", and a backplate is the
+         lever's plate. Three users, all lock furniture. -->
     <linearGradient id="plateFace" x1="0" y1="0" x2="1" y2="0.22">
-      <stop offset="0"    stop-color="${tone[2]}"/>
-      <stop offset="0.16" stop-color="${tone[4]}"/>
-      <stop offset="0.36" stop-color="${tone[5]}"/>
-      <stop offset="0.50" stop-color="${tone[3]}"/>
-      <stop offset="0.64" stop-color="${tone[1]}"/>
-      <stop offset="0.78" stop-color="${tone[2]}"/>
-      <stop offset="0.92" stop-color="${tone[4]}"/>
-      <stop offset="1"    stop-color="${tone[5]}"/>
+      <stop offset="0"    stop-color="${hwTone[2]}"/>
+      <stop offset="0.16" stop-color="${hwTone[4]}"/>
+      <stop offset="0.36" stop-color="${hwTone[5]}"/>
+      <stop offset="0.50" stop-color="${hwTone[3]}"/>
+      <stop offset="0.64" stop-color="${hwTone[1]}"/>
+      <stop offset="0.78" stop-color="${hwTone[2]}"/>
+      <stop offset="0.92" stop-color="${hwTone[4]}"/>
+      <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
 
     <!-- The euro cylinder is a separate chromed part pressed into the
          escutcheon. On a brass rosette it reads markedly cooler and brighter
          than the plate around it, which is the giveaway that it is a
-         different component rather than a moulded feature. -->
+         different component rather than a moulded feature.
+         ⚠ EXCEPT ON A BLACK DOOR, WHERE IT IS BLACK, and this is one
+         measurement against another rather than a preference. The chrome above
+         is read off Peretz's own photographs of brass-furnitured doors, and it
+         stands. The file research/newdoor/keyhole.jpg is a close-up of the
+         other case at 4000 px: a black stepped rose with a BLACK cylinder
+         ring inside it, the only bright thing in the whole fitting being the
+         sliver of the key pin.
+         Painting chrome there put a nickel plug in the middle of the one door
+         this whole set was drawn from.
+         Only black is special-cased. Passing every stop through scaleTone
+         would have turned the cylinder brass on a brass door, which is the
+         thing the paragraph above says it is not. -->
+    ${/* ⚠ `hwBlack`, AND IT USED TO BE `finish.id === 'black'` — the PULL
+          BAR's finish. Reported from outside: *"the מוט שחור option changes
+          the keyhole color to black."* It did, exactly: `barblack` declares
+          `finish: 'black'`, and the black cylinder measured off
+          research/newdoor/keyhole.jpg was gated on that instead of on the
+          פרזול. Choosing a black pull bar blackened the keyway of a nickel
+          lockset — a fitting the customer had not touched and is not paying
+          for. The measurement below is unchanged and still right; only the
+          question it answers has moved to the axis that owns the cylinder. */''}
+    ${hwBlack ? `
+    <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="#5A5D60"/>
+      <stop offset="0.4" stop-color="#333639"/>
+      <stop offset="1"   stop-color="#1A1C1E"/>
+    </linearGradient>
+    <linearGradient id="euroRim"><stop offset="0" stop-color="#232527"/></linearGradient>` : `
     <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="#E8ECEE"/>
       <stop offset="0.4" stop-color="#B9BFC4"/>
       <stop offset="1"   stop-color="#7C8288"/>
     </linearGradient>
+    <linearGradient id="euroRim"><stop offset="0" stop-color="#8E9398"/></linearGradient>`}
 
     <!-- ── PULL-BAR CROSS-SECTIONS ────────────────────────────────────
          TWO SECTIONS, NOT FIVE. Twenty-one bar-carrying doors, measured
@@ -1071,7 +1834,7 @@ export function render(state) {
     </linearGradient>
     <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
          drew them silver, because ella carried no finish key of its own and
-         effectiveFinish fell through to steel. -->
+         gripFinish fell through to steel. -->
     <linearGradient id="barGold" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"    stop-color="#6B5230"/>
       <stop offset="0.07" stop-color="#95733F"/>
@@ -1230,14 +1993,59 @@ export function render(state) {
       <stop offset="1" stop-color="#CFE0EA" stop-opacity="0"/>
     </linearGradient>
 
+    <!-- ── THE POOL, AND THE ROOM'S OWN FALLOFF ─────────────────────
+         REALISM2.md D-a, and the two of them are one idea: the scene was lit
+         evenly from edge to edge, so the eye had no reason to go to the door.
+         A warm pool centred a little above the door's middle and a deeper
+         falloff at the corners give it one. This is the whole of what
+         DESIGN-LEVEL calls the room doing the work the crop cannot — the frame
+         is landscape and a door is portrait, so the leaf can never fill it
+         (measured: 31% of the width even with zero margin), and what makes it
+         the hero is staging rather than size.
+
+         ⚠ BOTH ARE PAINTED INSIDE #backdrop, WHICH IS TO SAY UNDER THE DOOR,
+         AND THAT IS THE WHOLE DESIGN. The existing #vignette is painted last
+         and covers everything including the leaf; deepening THAT would have
+         darkened the leaf's corners, and npm run profile — the drift alarm
+         on the leaf's vertical fall — measures exactly that. A radial centred
+         at 0.44 of the scene darkens a leaf's head and foot more than its
+         middle, which is a change in the vertical fall by definition. So the
+         room gets its own pair, the door is drawn over them, and the leaf's
+         own numbers cannot move. Predicted before the run, then checked.
+
+         ⚠ The pool is WARM LIGHT ON PLASTER, not a tint on the room. It is
+         constant for every door, so it cannot do what .layout[data-light]
+         did — shift the ground under the swatch a customer is comparing. Its
+         centre is the scene's, never this door's. -->
+    <radialGradient id="roomPool" gradientUnits="userSpaceOnUse"
+                    cx="${Math.round(MID_X)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.40)}"
+                    r="${Math.round(STAGE_BOX.h * 0.52)}">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.20"/>
+      <stop offset="0.52" stop-color="${LIGHT.warm}" stop-opacity="0.075"/>
+      <stop offset="1"    stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="roomFall" gradientUnits="userSpaceOnUse"
+                    cx="${Math.round(MID_X)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.44)}"
+                    r="${Math.round(Math.max(STAGE_BOX.w, STAGE_BOX.h) * 0.58)}">
+      <stop offset="0.40" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0.11"/>
+    </radialGradient>
+
     <!-- In user space, not bounding-box units: the rect it paints now reaches
          far past the drawing so the wall can fill the screen, and a
          bounding-box vignette would have stretched with it until it did
-         nothing. Anchored on the door instead, so however wide the window is,
-         the falloff stays centred on the thing being looked at. -->
+         nothing.
+         ⚠ Anchored on the FIXED SCENE, not on this door's own box. It used to
+         read view.w / 2, so the falloff's centre and its radius both moved
+         when the customer chose a different size — the one thing the room is
+         now built not to do. STAGE_BOX is the same rectangle for every door in
+         the range, which is exactly what a light in a room is. -->
     <radialGradient id="vignette" gradientUnits="userSpaceOnUse"
-                    cx="${Math.round(view.w / 2)}" cy="${Math.round(view.h * 0.44)}"
-                    r="${Math.round(Math.max(view.w, view.h) * 0.62)}">
+                    cx="${Math.round(STAGE_BOX.x + STAGE_BOX.w / 2)}"
+                    cy="${Math.round(STAGE_BOX.y + STAGE_BOX.h * 0.44)}"
+                    r="${Math.round(Math.max(STAGE_BOX.w, STAGE_BOX.h) * 0.62)}">
       <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
       <stop offset="1"    stop-color="#000" stop-opacity="${LIGHT.vignette}"/>
     </radialGradient>
@@ -1314,6 +2122,218 @@ export function render(state) {
     <filter id="frameShadow" x="-15%" y="-15%" width="130%" height="130%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
+
+    <!-- The two blurs the photographed room needs, and only it. Sigma 45 is
+         the pot's measured penumbra in the backdrop carried into the scene's
+         own units — 3.41% of the picture's width, which is 97 units on a
+         phone and 134 on a desktop, against a 10-90% transition of 2.56 sigma.
+         Sigma 9 is the contact term, which stays tight because ambient
+         occlusion is sharp under any light. Both are referenced by shapes that
+         sit at zero opacity until .is-photo raises them, so usedDefs keeps
+         them and no bare render is changed by a pixel.
+         (No backticks in this comment: CLAUDE.md §1b, and this is the eighth
+         build it has cost. node --check caught it in two seconds because it
+         was run BEFORE npm run build, which is the other half of that rule.) -->
+    <filter id="seamPool" x="-60%" y="-400%" width="220%" height="900%">
+      <feGaussianBlur stdDeviation="45"/>
+    </filter>
+    <filter id="seamContact" x="-40%" y="-500%" width="180%" height="1100%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+
+    <!-- ── THE ROOM ──────────────────────────────────────────────────
+         ⚠ EVERY ONE OF THESE IS A BLACK OR WHITE OVERLAY, NOT A COLOUR.
+         The wall and floor are painted with the CSS variables --wall and
+         --floor so that .layout[data-light] can sink the whole room a shade
+         behind a pale door — and a gradient built here out of literal hexes
+         would not move with them, so a light door would get a correctly-sunk
+         wall with a recess still shaded for the old one. Modelling the planes
+         as value changes over whatever colour the page has chosen keeps one
+         statement of what the room is made of, and it is the same rule the
+         frame's own arris follows: a fold between two lit surfaces is a
+         change of VALUE, not a colour of its own. -->
+    <!-- ⚠ alcSoffit, alcNear and alcFar were here — the alcove's three shaded
+         planes. Deleted with it; see the note where ALC_SIDE was defined. Left
+         in place they would have been pruned by usedDefs and cost nothing,
+         which is exactly why a dead def is worth deleting: the next person to
+         read this block would have gone looking for the recess they
+         describe. -->
+
+    <!-- The floor inside the opening, and the KEY IS ABOVE AND IN FRONT, so
+         this plane is the most shaded thing in the picture: it is floor, under
+         a door, inside a reveal, with the leaf itself between it and the light.
+         First cut ran 0.28 to 0.07 and came out the BRIGHTEST band at the foot
+         of the door — a lit step under a dark leaf, which is the one reading
+         that destroys the depth this plane exists to give. Measured off the
+         render: the strip sat at luminance 205 against 188 for the open floor
+         a hand's width in front of it. It has to be darker than the floor it
+         runs into, not lighter, or the eye puts it in front.
+         Darkest hard against the leaf, where the door shades its own
+         threshold, lifting towards the open floor at the wall line. -->
+    <linearGradient id="retFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.33"/>
+      <stop offset="0.55" stop-color="#000" stop-opacity="0.13"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- ⚠ THIS REPLACES A RULED LINE, and that is the whole point of it.
+         Where the wall met the floor there was a 2 px non-scaling stroke of
+         black at 0.16 — the third time this drawing has drawn a fold as ink.
+         The other two are already recorded above: the black arris down each
+         jamb, reported from outside and circled, and edgeTop's full-width
+         rectangle. A skirting shadow is a change of value that falls off over
+         about a hand's width and then keeps going, much fainter, as the floor
+         recedes. Two effects, one gradient: steep to 18%, then a long tail. -->
+    <linearGradient id="floorFall" gradientUnits="userSpaceOnUse"
+                    x1="0" y1="${baseY}" x2="0" y2="${baseY + 1100}">
+      <stop offset="0"    stop-color="#000" stop-opacity="0.20"/>
+      <stop offset="0.06" stop-color="#000" stop-opacity="0.075"/>
+      <stop offset="0.18" stop-color="#000" stop-opacity="0.038"/>
+      <stop offset="1"    stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- ── THE REFLECTION ───────────────────────────────────────────
+         The door, mirrored in the floor, as a a use element of the group that draws
+         it. A a use element is a REFERENCE: about two hundred bytes on every door
+         rather than a second copy of one that reaches 70 KB. Same argument
+         that took the worst door from 374,160 bytes to 284,353.
+         usedDefs prunes to what the markup points at, and it resolves
+         transitively — so mask="url(#floorFade)" keeps the mask, and the
+         mask's own url(#floorFadeG) keeps the gradient inside it. The
+         the no-dangling-url()  assertion is what proves that actually happened. -->
+    <linearGradient id="floorFadeG" gradientUnits="userSpaceOnUse"
+                    x1="0" y1="${floorY}" x2="0" y2="${floorY + 900}">
+      <stop offset="0"    stop-color="#fff"/>
+      <stop offset="0.55" stop-color="#4a4a4a"/>
+      <stop offset="1"    stop-color="#000"/>
+    </linearGradient>
+    <mask id="floorFade" maskUnits="userSpaceOnUse"
+          x="${farX}" y="${floorY}" width="${farW}" height="900">
+      <rect x="${farX}" y="${floorY}" width="${farW}" height="900"
+            fill="url(#floorFadeG)"/>
+    </mask>
+    <filter id="floorBlur" x="-8%" y="-8%" width="116%" height="116%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+
+    <!-- ── THE SCONCES ──────────────────────────────────────────────
+         ⚠ THEIR LIGHT STOPS AT THE WALL, and that is a refusal rather than an
+         oversight. LIGHT says ONE key, high and about 30° left of camera,
+         and that single fact is load-bearing for more of this drawing than
+         anything else in it: FALLOFF's nine-row medians fitted across thirty
+         photographs, MOULD_SIDE's per-side relief gain, keyWash, bloom, and
+         the warm/cool split that CLAUDE.md §4 records as the first absence
+         that read as plastic. Two symmetric wall lights say the scene has two
+         keys placed symmetrically, and re-fitting a corpus-measured model to
+         match them would be tuning by eye against nothing — there is no door
+         in research/ photographed between two sconces. REALISM.md §6.
+         So the wall may flatter and the leaf keeps its instruments, and the
+         disagreement is written down here instead of hidden. -->
+    <!-- The lamp's body, and the ONE gradient that says where the light is:
+         darkest at the shadow edge, brightest a quarter in from the key side,
+         falling again to a rim-lit far edge. That last stop is what makes a
+         cylinder read as round rather than as a flat tab — a cylinder under a
+         single key has a dark core and a faint bounce on the away side, and
+         leaving the bounce out is the commonest way to draw a pipe as a
+         rectangle.
+         ⚠ Its predecessor was black-on-wall at 0.28 / 0.10 / 0.34, which made
+         the fitting a translucent smudge of the plaster behind it. The lamp is
+         an object; see LAMP_DARK. -->
+    <linearGradient id="lampBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#191713"/>
+      <stop offset="0.10" stop-color="#3E3931"/>
+      <stop offset="0.24" stop-color="#9A8E7B"/>
+      <stop offset="0.38" stop-color="#5E574B"/>
+      <stop offset="0.66" stop-color="#2B2823"/>
+      <stop offset="0.88" stop-color="#1C1A17"/>
+      <stop offset="1"    stop-color="#4F473C"/>
+    </linearGradient>
+    <!-- Cast top and foot rim: the same metal a shade lighter, because a
+         machined band catches the key across its whole face where the barrel
+         only catches it along one line. -->
+    <linearGradient id="lampCap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#302C27"/>
+      <stop offset="0.26" stop-color="#B8AA92"/>
+      <stop offset="0.52" stop-color="#6A6255"/>
+      <stop offset="0.80" stop-color="#332F2A"/>
+      <stop offset="1"    stop-color="#655C4E"/>
+    </linearGradient>
+    <!-- ⚠ THE FITTING IS LIT BY ITS OWN LAMP, and that is most of what makes a
+         sconce read as switched ON rather than as a dark shape on a wall. The
+         metal nearest each aperture picks up the warm light spilling past it;
+         the middle of the barrel does not. Vertical, warm, and zero across the
+         waist — a top-and-bottom glow, which is the shape an open-ended
+         fitting actually produces. -->
+    <!-- ⚠ THE LIGHT THE SCONCES PUT ON THE DOOR. Peaks at the casing's outer
+         edge — the part nearest the lamp — and is gone by a third of the way
+         across, because a source 900 mm to the side of a 1,200 mm opening
+         cannot reach its far stile. Two of them, one per side, so a door
+         between two lamps is lit from both and brightest at its edges, which
+         is the shape that reads as a thing standing in a room.
+         0.085 at the peak: enough to see at the reveal, where it lands on the
+         casing's own dark paint beside a bright wall, and not enough to lift
+         the leaf's midfield where every measured number lives. -->
+    <linearGradient id="lampOnDoorL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.085"/>
+      <stop offset="0.14" stop-color="${LIGHT.warm}" stop-opacity="0.038"/>
+      <stop offset="0.34" stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lampOnDoorR" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.085"/>
+      <stop offset="0.14" stop-color="${LIGHT.warm}" stop-opacity="0.038"/>
+      <stop offset="0.34" stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </linearGradient>
+    <!-- THE TURNED PULL'S ROD. A cylinder, not a flat bar: dark at both edges,
+         one narrow specular a third across, and a bounce along the far side.
+         ⚠ WRITTEN IN THE DOOR'S OWN TONE RAMP, not in absolute hexes, and the
+         three-panel photographs are why. The six stops were measured off
+         research/newdoor, whose every fitting is black — median dark pixel
+         #2A2627 to #36322E, warmth (r−b) 2 to 8, which is why those files read
+         as bronze until somebody sampled them. That is the DOOR's finish, not
+         this fitting's: the same turned pull is POLISHED on all three of the
+         three-panel doors and black on the classical one, because on each it
+         matches the rest of the ironmongery.
+         ⚠ AND inFinish COULD NOT FIX IT, WHICH IS WORTH KNOWING. That helper
+         converts a profile measured on STEEL into another finish, so steel is
+         its identity — feed it a profile measured on BLACK and a steel door
+         gets the black back unchanged. The cure is not a second converter but
+         to stop writing the profile in one finish's numbers at all: the shape
+         below is the same six-step cylinder expressed as indices into
+         FINISH_TONES, so it lands within a couple of values of the measurement
+         on a black door and follows every other finish by construction.
+         Same defect as CLAUDE.md §5 item 8, on a different object. -->
+    <linearGradient id="blackRod" x1="0" y1="0" x2="0" y2="1">
+      ${[[0, 5], [0.20, 1], [0.34, 0], [0.55, 4], [0.86, 3], [1, 4]]
+        .map(([at, k]) => `<stop offset="${at}" stop-color="${tone[k]}"/>`).join('')}
+    </linearGradient>
+    <linearGradient id="lampGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="${LIGHT.warm}" stop-opacity="0.42"/>
+      <stop offset="0.20" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
+      <stop offset="0.50" stop-color="${LIGHT.warm}" stop-opacity="0"/>
+      <stop offset="0.80" stop-color="${LIGHT.warm}" stop-opacity="0.13"/>
+      <stop offset="1"    stop-color="${LIGHT.warm}" stop-opacity="0.50"/>
+    </linearGradient>
+    <!-- The short wash UP the wall. Weaker and tighter than the downward one:
+         the fitting's upper aperture is smaller and there is no floor above it
+         to bounce off. -->
+    <radialGradient id="lampUp" cx="0.5" cy="1" r="1">
+      <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.30"/>
+      <stop offset="0.5" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
+      <stop offset="1"   stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
+    <!-- ⚠ cy="0" IS THE TOP OF THE ELLIPSE'S OWN BOX, and the ellipse has to
+         be positioned so that top IS THE LAMP. It was centred ON the lamp with
+         a radius reaching the floor, which puts the box's top a whole radius
+         ABOVE the fitting — so the bright core of the cone sat 1,587 mm over
+         the lamp and the plaster was dimmest exactly where the light is. The
+         ellipse below spans lamp-to-floor instead, so offset 0 lands on the
+         fitting and the wash falls away downward, which is what a downlight
+         does. -->
+    <radialGradient id="sconceGlow" cx="0.5" cy="0" r="1">
+      <stop offset="0"   stop-color="${LIGHT.warm}" stop-opacity="0.30"/>
+      <stop offset="0.4" stop-color="${LIGHT.warm}" stop-opacity="0.10"/>
+      <stop offset="1"   stop-color="${LIGHT.warm}" stop-opacity="0"/>
+    </radialGradient>
 `;
 
   const body = `
@@ -1331,35 +2351,156 @@ export function render(state) {
          exact symptom and had no route that produced it. The page survives
          losing its stylesheet in every other respect — the phone link and both
          WhatsApp links still work — so the room should survive it too. -->
-    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-          height="${baseY + SCENE}" fill="var(--wall, #F5F3EF)"/>
-    <rect x="${-SCENE}" y="${baseY}" width="${view.w + SCENE * 2}"
-          height="${view.h - baseY + SCENE}" fill="var(--floor, #E6E2DA)"/>
+    <rect x="${farX}" y="${farY}" width="${farW}"
+          height="${baseY - farY}" fill="var(--wall, #F5F3EF)"/>
+    ${/* ⚠ THE FLOOR IS ONE SURFACE, AND IT IS NOW ONE PATH. Reported from
+          outside: *"the area where the door meets the ground is a different
+          color than the floor, although it supposed to be the same material
+          and surface."*
+          It was two objects — this rect from `baseY` down, and a trapezoid
+          inside `#frame` for the strip between the leaf's foot and the wall
+          line. Being inside `#frame` put that strip AFTER `#shadow` in paint
+          order, so the door's own cast shadow pooled on the floor in front of
+          the threshold and was masked off the threshold itself. Measured at
+          4x: 159 immediately above the wall line against 124 immediately
+          below. A 35-point step, straight across the picture, exactly where
+          the eye is told two materials meet.
+          One path fixes it for good rather than by tuning two gradients to
+          agree: the floor's real silhouette is everything below `baseY` PLUS
+          the strip that runs back under the door, so that is the shape it is
+          drawn as. Everything the floor gets — its colour, `floorFall`, the
+          cast shadow, the reflection — now lands on all of it because there is
+          no longer an "it" and a "the other one". */''}
+    <path d="M ${farX} ${baseY} H ${revX0} L ${x0} ${floorY} H ${x1}
+             L ${revX1} ${baseY} H ${farX + farW} V ${farY + farH} H ${farX} Z"
+          fill="var(--floor, #E6E2DA)"/>
     <!-- Tiled rather than one filtered rect. A feTurbulence over a surface
          this size is a large offscreen buffer for a 7% texture; the pattern
          stitches, so it costs one tile. -->
-    <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-          height="${view.h + SCENE * 2}"
+    <rect x="${farX}" y="${farY}" width="${farW}" height="${farH}"
           fill="url(#wallTex)" opacity="0.07" style="mix-blend-mode:multiply"/>
-    <line x1="${-SCENE}" y1="${baseY}" x2="${view.w + SCENE}" y2="${baseY}"
-          stroke="#000" stroke-opacity="0.16" stroke-width="2"
-          vector-effect="non-scaling-stroke"/>
+
+    <!-- The pool first, then the falloff over it: light lands on the plaster
+         and the corners of the room fall away from it. Both cover wall AND
+         floor in one rect each, because they are one light and the floor is
+         not a different room. pointer-events: none for the same reason the
+         vignette disclaims them — this is light, and light is not something a
+         drag can catch. See the defs above for why they are here and not up
+         with #vignette, which is painted over the door. -->
+    <rect data-room="pool" x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+          fill="url(#roomPool)" pointer-events="none"/>
+    <rect data-room="pool" x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+          fill="url(#roomFall)" pointer-events="none"/>
+
+    <!-- ── the sconces, and their light on the plaster ──────────────
+         ⚠ STOOD OFF THE FIXED SCENE, not off this door's casing. They used to
+         hang 320 mm outside the alcove's outer edge, alcX0 and alcX1 —
+         so a sidelight door pushed both wall lights 190 mm further apart and
+         a narrow one drew them in. Two lamps that move when you change the
+         door are the same fault the anchored scene exists to remove, and the
+         alcove they were measured from is gone. Placed midway between the
+         casing of the WIDEST door in the range and the edge of the scene, so
+         they never crowd a wide door and never drift.
+         pointer-events is left alone: these are inside #backdrop, which
+         nothing on the page reaches for, and only the vignette ever had to
+         disclaim them because it covers the handle. -->
+    ${[MID_X - SCONCE_OUT, MID_X + SCONCE_OUT].map(sx =>
+      /* ⚠ And their HEIGHT is off the scene too, not off `casY0`. A tall door
+         lifts its own casing 300 mm, and with `casY0` in this line both lamps
+         rose with it — the wall fittings climbing the wall because the door
+         beside them got taller. About a third up from the floor, always. */
+      wallLamp(sx, STAGE_BOX.y + (baseY - STAGE_BOX.y) * 0.24, baseY)).join('')}
+
+    <!-- ⚠ THE ALCOVE WAS DRAWN HERE — three mitred trapezoids stepping the
+         wall forward around the casing — AND IT IS GONE. See the long note
+         where ALC_SIDE and ALC_HEAD used to be defined: it was reported from
+         outside as "a gray box that frames it", which is what a shaded plane
+         seen dead square-on becomes, and its own docstring already recorded
+         that its two depths were the only ones in this file not taken off a
+         photograph. -->
+
+    <!-- Where the wall meets the floor. See floorFall: this is the ruled
+         line that used to be here, replaced by the change of value a fold
+         between two lit surfaces actually makes. -->
+    <path d="M ${farX} ${baseY} H ${revX0} L ${x0} ${floorY} H ${x1}
+             L ${revX1} ${baseY} H ${farX + farW} V ${baseY + 1100} H ${farX} Z"
+          fill="url(#floorFall)"/>
   </g>
 
-  <!-- ── cast shadow: soft pool plus a hard contact line ──────── -->
+  <!-- ── cast shadow: the soft pool the whole assembly throws ─────
+       ⚠ THE HARD CONTACT LINE THAT USED TO BE HERE IS GONE, and taking it out
+       is half of removing the line at the foot of the door. It ruled black at
+       0.42, thirteen units tall, across the casing's full width at the wall's
+       floor line. That was right while the leaf stopped at that same line: one
+       object, one place where it touches the ground.
+       It is not one line any more. The leaf stands FLOOR_RUN behind the wall,
+       so there are two candidate lines 62 units apart, and drawing both gave
+       the foot of every door a pair of parallel dark rules — the complaint
+       that started this, doubled. Measured off the render at 4x: the leaf's
+       own foot, then a bright strip, then a band at luminance 122 against 163
+       for the floor five pixels below it.
+       So the door touches the ground in ONE place, which is where the leaf is,
+       and that shadow is drawn inside #frame on top of the floor return it
+       falls on. Here the casing's own meeting with the floor is carried by
+       value alone: retFloor ends at 0.17 of black and floorFall starts at
+       0.20, so the two planes meet within three hundredths and no line is
+       needed to say where. -->
   <g id="shadow">
     <ellipse cx="${(x0 + x1) / 2}" cy="${baseY + 40}"
              rx="${totalW * 0.6}" ry="34" fill="#000" opacity="0.18" filter="url(#softShadow)"/>
-    <rect x="${casX0}" y="${baseY - 3}" width="${openW + CASING * 2}" height="13"
-          fill="#000" opacity="0.42" filter="url(#contact)"/>
+    ${/* ── THE SEAM SHAPES: DRAWN ALWAYS, PAINTING NOTHING UNTIL THE
+          PHOTOGRAPH IS THERE ─────────────────────────────────────────────
+          `PHOTOREAL.md` §2.2 — "the shadow is the glue". The drawn room's
+          floor is `--floor` at #E6E2DA and the photographed one is a warm
+          stone near #CAB7A6, half a stop darker; one soft ellipse at 0.18 that
+          reads correctly on the first lands on the second as nothing at all,
+          and the door floats. Measured in the spike: with the photograph
+          behind it and this group unchanged, the foot of the door had no
+          contact at any viewport.
+
+          Two terms, because real contact is two things. A TIGHT band right at
+          the leaf's foot — ambient occlusion, where no light reaches at all,
+          and always sharp whatever the light. A WIDE pool at the room's own
+          softness, whose blur is the pot's measured penumbra in the backdrop:
+          37 px of a 1086 px-wide photograph, 3.41% of its width, and the
+          photograph is scaled to the stage's width, so in the scene's own
+          units that is 97 units on a phone and 134 on a desktop. `softShadow`
+          is sigma 30, giving a 10-90% transition of 77 — a third too sharp at
+          the phone end and half too sharp at the desktop end.
+
+          ⚠ THEY ARE EMITTED ON EVERY DOOR AND `opacity="0"` IS WHY THAT IS
+          SAFE. An element at zero opacity paints no pixel, so all 110
+          committed bare sheets come back byte-identical — checked, not
+          assumed — while `.is-photo` in the stylesheet is free to turn them
+          up. The alternative was a second argument to `render`, which would
+          have put presentation into the one function in this repository whose
+          purity is asserted (T12), and a second SVG for the page to keep in
+          step with the one every instrument reads. The photo-mode seam lives
+          entirely in CSS for the same reason the backdrop does: instruments
+          must go on seeing a pure drawing. */''}
+    <ellipse data-seam="pool" cx="${(x0 + x1) / 2}" cy="${baseY + 26}"
+             rx="${totalW * 0.56}" ry="46" fill="#000" opacity="0"
+             filter="url(#seamPool)"/>
+    <rect data-seam="contact" x="${x0 - EDGE}" y="${baseY - 12}"
+          width="${(x1 - x0) + EDGE * 2}" height="30" fill="#000" opacity="0"
+          filter="url(#seamContact)"/>
   </g>
+
+  <!-- ⚠ EVERYTHING THE FLOOR REFLECTS IS INSIDE THIS GROUP, and nothing else
+       is. #backdrop and #shadow stay outside it: a wall does not appear
+       upside down in the floor in front of it, and a cast shadow reflected is
+       a second shadow nobody cast. What is in here is the object standing in
+       the room — frame, threshold, both leaves, the moulding, the glass and
+       the hardware — which is exactly the list that ends at #hardware. -->
+  <g id="door">
 
   <!-- ── frame: casing face, then the return faces you see into ── -->
   <g id="frame">
     <!-- The casing stands a few millimetres proud of the plaster, so it drops
          a short shadow down and right of itself. Small, but it is the
          difference between a frame fixed INTO a wall and one printed onto it. -->
-    <path d="M ${casX0} ${casY0} H ${casX1} V ${baseY} H ${casX0} Z"
+    <path data-seam="casing"
+          d="M ${casX0} ${casY0} H ${casX1} V ${baseY} H ${casX0} Z"
           transform="translate(7 11)" fill="#000" opacity="0.22"
           filter="url(#frameShadow)"/>
 
@@ -1382,8 +2523,59 @@ export function render(state) {
          actually projects to. It used to be three rectangles stacked in the
          hope that a line drawn on top would suggest the corner. -->
     <path d="M ${revX0} ${revY0} H ${revX1} L ${x1} ${y0} H ${x0} Z" fill="url(#soffit)"/>
-    <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${baseY} H ${revX0} Z" fill="url(#retNear)"/>
-    <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${baseY} H ${revX1} Z" fill="url(#retFar)"/>
+    <!-- ⚠ THE JAMBS NOW MITRE INTO THE FLOOR, not into a butt joint at the
+         bottom edge of the picture. They used to run straight down to the
+         wall's floor line, which was right while the leaf also stopped there.
+         It does not: the leaf is FLOOR_RUN further back, so the jamb return's
+         inner edge stops at the leaf's foot and its outer edge carries on to
+         the wall's line, and the diagonal between them is the same real mitre
+         the head has. Butt joints at this corner are what put a hard line
+         across the top of each jamb the last time (see CASING). -->
+    <path d="M ${revX0} ${revY0} L ${x0} ${y0} V ${floorY} L ${revX0} ${baseY} Z"
+          fill="url(#retNear)"/>
+    <path d="M ${revX1} ${revY0} L ${x1} ${y0} V ${floorY} L ${revX1} ${baseY} Z"
+          fill="url(#retFar)"/>
+    <!-- ── THE FLOOR INSIDE THE OPENING ────────────────────────────
+         The fourth plane of the reveal, and the one that used to be a ribbed
+         aluminium bar. It is FLOOR, so it takes the floor's own colour from
+         the same variable the backdrop uses — and then one black overlay says
+         how much light it catches, which is the rule every plane in this
+         drawing obeys (CLAUDE.md §4). Darkest against the leaf, where the door
+         shades its own threshold, lifting to the open floor at the wall line.
+         Mitred to both jambs by construction: its two top corners are the
+         jambs' leaf-foot corners and its two bottom corners are their
+         wall-line corners, so the four planes share four edges and no line is
+         drawn to suggest a corner. -->
+    ${/* ⚠ THREE COATS, AND THE MIDDLE ONE IS WHY. Reported from outside: *"the
+          area where the door meets the ground is a different color than the
+          floor, although it supposed to be the same material and surface."*
+
+          It was two coats — the floor's colour, then `retFloor` running 0.46
+          down to 0.17 of black. The floor BEYOND the wall line is the same
+          colour under `floorFall`, which begins at 0.20. So the two planes met
+          at 0.17 against 0.20 and the seam was three hundredths of black wide
+          — small, and enough, because it is a straight line a metre long with
+          a different surface on each side of it.
+
+          `floorFall` is painted on the recess as well now, and it is
+          `userSpaceOnUse` from `baseY` downward, so above that line it clamps
+          to its first stop: the recess gets exactly the 0.20 the open floor
+          starts at. Then `retFloor` — the door's own shadow on its threshold —
+          is laid over that and FALLS TO ZERO at `baseY`. At the join the two
+          planes are therefore the same three numbers by construction rather
+          than by two gradients agreeing to within a rounding error, and there
+          is no value for a seam to be made of. */''}
+    <path d="M ${x0} ${floorY} H ${x1} L ${revX1} ${baseY} H ${revX0} Z"
+          fill="url(#retFloor)"/>
+    <!-- ⚠ AND THE CONTACT SHADOW WHERE THE LEAF ACTUALLY TOUCHES THE GROUND.
+         #shadow draws one at the WALL's floor line and #shadow is painted
+         BEFORE #frame, so the plane above covers it: the leaf came to rest on
+         a clean bright strip with no shadow under it at all, which reads as a
+         door floating a centimetre off the floor. This is the same object
+         #shadow draws, at the line the leaf is actually on, on top of the
+         plane it falls on. -->
+    <rect x="${x0}" y="${floorY - 3}" width="${totalW}" height="12"
+          fill="#000" opacity="0.5" filter="url(#contact)"/>
 
     <!-- NO DRAWN ARRIS WHERE THE CASING TURNS INTO THE RETURN. There were two
          — one down each jamb, the paint darkened 0.55, at full opacity on a
@@ -1411,26 +2603,12 @@ export function render(state) {
     <g id="reveal">${reveal}</g>
   </g>
 
-  <!-- ── threshold ────────────────────────────────────────────── -->
-  <g id="threshold">
-    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
-          height="${THRESHOLD}" fill="${SILL_METAL}"/>
-    <rect x="${x0 - RETURN}" y="${floorY}" width="${totalW + RETURN + RETURN}"
-          height="4" fill="#fff" opacity="0.18"/>
-    <!-- Ribbed, because every sill in the photographs is: an extruded
-         aluminium threshold with four or five flutes running its length,
-         each catching a line of light. One flat bar reads as a painted
-         step. -->
-    ${Array.from({ length: 4 }, (_, i) => {
-      const ry = floorY + 7 + i * ((THRESHOLD - 9) / 4);
-      return `<rect x="${x0 - RETURN + 4}" y="${ry}"
-                    width="${totalW + RETURN + RETURN - 8}" height="2"
-                    fill="#000" opacity="0.30"/>
-              <rect x="${x0 - RETURN + 4}" y="${ry + 2}"
-                    width="${totalW + RETURN + RETURN - 8}" height="1.4"
-                    fill="#fff" opacity="0.22"/>`;
-    }).join('')}
-  </g>
+  <!-- ⚠ #threshold WAS HERE — a 42 mm aluminium bar with four black flutes and
+       four white catches ruled along it, full width, at the height a viewer's
+       eye lands. It is gone; the frame's floor return above does the work.
+       The measurement that settled it is written out where THRESHOLD used to
+       be defined: fourteen of the thirty measured records have no sill at all,
+       and the sixteen that do run a median 0.0175 of leaf height. -->
 
   ${sideW ? `<g id="side-leaf" data-glazed="${!!size.sideGlazed}">${leaf(sideX, sideW)}${
       /* A SIDELIGHT is glass by definition — that is the whole product, and
@@ -1459,65 +2637,240 @@ export function render(state) {
             const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
             const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
             return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
-                              paint, edge, grille, key: 's',
+                              paint, edge, grille, key: 's', profile: mouldOf(detail),
                               leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
               + (detail.panel
-                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, false, 0, 's')
+                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, null, 0, 's',
+                                 null, PANEL_INSET, mouldOf(detail))
                   : '');
           })()
       : win.rects[0] && sideW > 320
         ? aperture({ x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
                      y: y0 + win.rects[0].top,
                      w: Math.min(win.rects[0].w, sideW - 240), h: win.rects[0].h,
-                     paint, edge, grille, key: 's',
+                     paint, edge, grille, key: 's', profile: mouldOf(detail),
                      leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
         : ''}</g>` : ''}
 
   <!-- ── main leaf ────────────────────────────────────────────── -->
   <g id="leaf" data-x="${mainX}" data-w="${leafW}">${leaf(mainX, leafW)}</g>
 
+  ${/* ⚠ THE GLAZING GOES FIRST WHEN THE FACE IS A WHOLE COMPOSITION, and the
+        reason is joinery. Reported from outside: *"if i add a window it goes
+        on the overlaps the set."* It was literally true. `#glazing` is drawn
+        after `#detail`, so the light's architrave painted over the set — its
+        top run is 59 mm of lit ramp ending at 0.1262 of the leaf where the
+        frieze's block ends at 0.126, and 0.2 mm of contact plus the mitre
+        stroke and the antialiasing is enough for a bright band to eat the
+        frieze's bottom edge. The same happens at the foot against the shelf.
+        Nobody reported it on a SOLID set because there the panel that stands
+        in the light's place is drawn by `classicSet` itself, before the
+        cornice — "so the head's shadow falls on it" — so the frieze covers it
+        and the join reads clean. Glazed, the two halves of the same
+        composition were being drawn in opposite orders.
+        On the real door the architrave is fitted round the light and THEN the
+        ornament is applied over the face, so the set going last is what the
+        joinery does. Only for the set: on an ordinary panelled leaf the panel
+        is aligned to the window and drawn after it, and swapping those would
+        let a panel paint over the glass. */''}
+  ${detail.classic ? glazing : ''}
+
   <!-- ── moulded detail, kept clear of the glazing ────────────── -->
   <g id="detail">
-    ${detail.panel ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
-        detail.panels === 2, 0, 'm',
-        openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null) : ''}
+    ${/* ⚠ THE CLASSICAL SET IS ITS OWN COMPOSITION AND TAKES OVER THE FACE.
+          Every other entry in DETAILS is one feature laid on a leaf, so they
+          all go through `appliedFrame` or `metalStrips` and compose freely.
+          This one is a whole arrangement whose pieces are proportioned to each
+          other and to the window between them — a cornice sized to a frieze
+          sized to a shelf — so it draws itself, and `appliedFrame` is skipped
+          rather than asked to place a panel inside it. See CLASSIC_ROWS. */''}
+    ${detail.classic
+        ? classicSet(mainX, y0, leafW, leafH, paint, pale, tone, openings.length > 0)
+        : ''}
+    ${detail.panel && !detail.classic
+        ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
+            hasUpperPanel(detail) ? panelRows(detail) : null, 0, 'm',
+            openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null,
+            panelInset(detail), mouldOf(detail))
+        : ''}
+    ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND IT COMES WITH THE
+          HANDLE. All three photographs of this face carry the same turned pull
+          bolted across that plate — the same fitting the classical set has on
+          its shelf — which is what the plate is for and why it is short. Drawn
+          as part of the FACE, like the set's, so `state.handle` stays free for
+          whatever else the customer wants: `grab: true` on the catalogue entry
+          is the flag, and it is now on two faces rather than one. */''}
+    ${detail.grab && !detail.classic && hasUpperPanel(detail)
+        ? (rows => classicPull(mainX + leafW / 2,
+                               y0 + leafH * (rows[1][0] + rows[1][1]) / 2,
+                               leafW * 0.33, leafH * 0.028, tone))(panelRows(detail))
+        : ''}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint, detail.perimeter) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
-    ${detail.strips ? metalStrips(mainX, y0, leafW, leafH, detail.strips, tone,
-                                  detail.vertical, hingeOnLeft) : ''}
+    ${metalStrips(mainX, y0, leafW, leafH, state, stripeTone, hingeOnLeft)}
   </g>
 
-  <!-- ── glazing ──────────────────────────────────────────────── -->
-  <g id="glazing">
-    ${openings.map((o, i) => aperture({
-      x: mainX + o.x, y: y0 + o.top, w: o.w, h: o.h,
-      splits: o.splits.map(sp => ({ x: mainX + sp.x, w: sp.w })),
-      paint, edge, grille, key: 'm' + i,
-      leaf: { x: mainX, y: y0, w: leafW, h: leafH },
-    })).join('')}
-  </g>
+  ${detail.classic ? '' : glazing}
 
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
     ${gripArt(handle, handleX, handleY, leafH, leverDir, paint,
               centreX, leafW, y0, panelled && place.rot !== 90, place.rot)}
-    ${locksetArt(lockset, lockX, y(HANDLE_AFF), leverDir)}
-    ${lockset.lock ? '' : cylinder(lockX, y(CYLINDER_AFF))}
+    ${locksetArt(lockset, lockX, y(lockAff(lockset)), leverDir)}
+    ${/* No separate escutcheon when the fitting carries its own cylinder —
+          and none either when there is no lock furniture at all, which is the
+          door the page opens on. Asked of the STYLE rather than of a `lock`
+          flag on the bare entry: see its note in catalog.js for why giving it
+          one would have been a lie in the data that happened to draw right. */''
+      }${/* ⚠ `keyX`, NOT `lockX`. The separate escutcheon is its own object and
+             it stands still; the lever or knob above it may have had to move
+             out to keep off the leaf's edge, and that is the furniture's
+             business, not the keyhole's. See KEYWAY_BACKSET — this is the
+             second round the keyhole has had to be nailed down, and the first
+             fix only caught the grip. */''
+      }${lockset.lock ? '' : cylinder(keyX, y(CYLINDER_AFF))}
+    ${/* ⚠ THE EXTRA LOCK IS DRAWN, AND THAT IS NOT DECORATION. A כספת is ₪700
+          and a קודן is ₪900, and a configurator that takes money for something
+          the drawing does not show is a hidden cost with a label on it — the
+          same argument that withdrew the add-ons and the finish axis. It also
+          has to be here for `npm run collide` to sweep it: an obstacle the
+          rules believe in and the drawing does not is a fault this file has
+          had four times. */''
+      }${specialLockArt(special, keyX, y(SPECIAL_AFF), leverDir)}
+    ${/* ⚠ THE עינית AND THE פעמון, ADDED 30.8.2026 ON PERETZ'S WORD, and drawn
+          here for the same reason the extra lock is: the drawing shows what
+          the price charges. A ₪300 bell nobody can see is a hidden cost with a
+          label on it, and a עינית that is "included" and invisible is a
+          promise with nothing behind it.
+
+          ⚠ THE PEEPHOLE IS CENTRED ON THE LEAF AND THE BELL IS ON THE HINGE
+          STILE, and the two placements have completely different standing.
+          The peephole's is measured — two doors put it within 40 mm of the
+          leaf's centre line, on opposite sides. The bell's is a choice, made
+          because the hinge stile is the one band of leaf that is clear of the
+          lever, the cylinder, the extra lock and the pull handle at every
+          size, so a fitting nobody has photographed for us cannot collide with
+          anything. Both are explained where they are drawn. */''
+      }${state.peephole === 'peep' ? peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ''}
+    ${state.bell === 'bell'
+        ? bellPush(hingeOnLeft ? mainX + BELL_BACKSET : mainX + leafW - BELL_BACKSET,
+                   y(SPECIAL_AFF))
+        : ''}
+  </g>
+
+  <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
+       Asked for from outside: *"make light that also slightly affects the
+       door, and it will help buy the 3d effect."* Right — two lamps throwing
+       light onto a wall and stopping dead at the casing is the one thing in
+       the picture that says the door was pasted on.
+
+       ⚠ AND CLAUDE.md §3 CARRIES A STANDING REFUSAL AGAINST EXACTLY THIS, so
+       it is worth being precise about what is and is not being overturned.
+       The refusal was: do not let two symmetric wall lights re-tune the leaf's
+       ONE-key model — FALLOFF's nine-row medians, MOULD_SIDE's per-side gain,
+       keyWash, the warm/cool split — because there is no door in research/
+       photographed between two sconces to fit them against. That reasoning
+       stands and nothing here touches any of those numbers.
+
+       What this adds is a THIN WARM OVERLAY, painted last, over the finished
+       door: a gradient from each side, peaking at the outer edge of the casing
+       and reaching zero by a third of the way in. It is light landing on an
+       object, which is what LIGHT.warm is for and what keyWash already does
+       vertically. npm run profile measures the leaf VERTICAL fall and this
+       is horizontal and symmetric, so it should not move that reading — which
+       is a prediction, and the commit records what the tool actually said.
+
+       Inside #door on purpose: the floor reflects the door, so it must reflect
+       the lit door. pointer-events off — this is light, and the vignette's own
+       note records what happens when light is allowed to swallow the handle. -->
+  <rect data-room="lamp-wash" x="${casX0}" y="${casY0}"
+        width="${casX1 - casX0}" height="${baseY - casY0}"
+        fill="url(#lampOnDoorL)" pointer-events="none"/>
+  <rect data-room="lamp-wash" x="${casX0}" y="${casY0}"
+        width="${casX1 - casX0}" height="${baseY - casY0}"
+        fill="url(#lampOnDoorR)" pointer-events="none"/>
+
+  </g><!-- /#door -->
+
+  <!-- ── the door, mirrored in the floor ──────────────────────────
+       The highest value per byte in the whole room: a polished entrance floor
+       throws the door back at you, and ours was matte to the point of reading
+       as paper. ~200 bytes, because a a use element points at #door rather than
+       drawing it again.
+
+       ⚠ IT IS NOT IN THE ACCESSIBILITY TREE AND IT IS NOT IN ANY MEASUREMENT.
+       a use element builds a shadow tree, which querySelectorAll does not enter —
+       so tools/collide.mjs's sweep over [data-hw], [data-pane] and
+       [data-detail], npm run profile's #leaf rect and npm run glass's
+       [data-pane] rect all see exactly what they saw before, one copy each.
+       That was worth checking rather than assuming: REALISM2.md §D3 calls a
+       strip in collide.mjs a required change, and it is not one — the sweep
+       was re-run over all 1,490 designs to be sure. aria-hidden because the
+       element carries no name and a reflection is not a fact about the door.
+
+       0.13 alpha, blurred, and masked to nothing over about 900 mm of floor —
+       past which a real reflection has lost to the surface's own scatter. -->
+  <!-- ⚠ THE MASK IS ON THE GROUP AND THE FLIP IS ON THE CHILD, and putting
+       both on one element drew nothing at all. maskUnits="userSpaceOnUse"
+       resolves the mask's own x/y/width/height in the user space of the
+       element referencing it — which INCLUDES that element's own transform. So
+       with the mask on the flipped use, the band written at y = baseY..+900
+       came out mirrored to baseY-900..baseY: a window over the DOOR rather
+       than over the floor, and the reflection was masked away completely.
+       Caught by looking at a screenshot. Nothing asserted it, and nothing
+       could have: a mask that hides everything and a feature that was never
+       drawn are the same picture, which is why REALISM.md §6 says to compare
+       against something real every time.
+       An untransformed wrapper carries the parent's user space, so the band is
+       the floor band — said once, in the coordinates everything else uses. -->
+  <g mask="url(#floorFade)" aria-hidden="true" pointer-events="none">
+    <use href="#door" transform="translate(0 ${2 * floorY}) scale(1 -1)"
+         opacity="0.13" filter="url(#floorBlur)"/>
   </g>
 
   <!-- The vignette is LIGHT, and light is not something you can touch. It is
        drawn last and covers the whole scene, so without this it swallowed
        every pointer event on the stage — the handle could not be picked up at
        all, and nothing in the console said why. -->
-  <rect x="${-SCENE}" y="${-SCENE}" width="${view.w + SCENE * 2}"
-        height="${view.h + SCENE * 2}" fill="url(#vignette)" pointer-events="none"/>
+  <rect x="${farX}" y="${farY}" width="${farW}" height="${farH}"
+        fill="url(#vignette)" pointer-events="none"/>
 `;
 
+  /* ⚠ TWO BOXES, AND THEY ARE NOT THE SAME BOX.
+
+     `viewBox` is the door's OWN box, tight around this door with PAD of air —
+     which is what `?bare=1` and every measurement harness gets, and why a
+     narrow door still fills the frame there and keeps its pixels.
+
+     `data-fit-*` is FIT_BOX — the fixed scene, trimmed of the vertical padding
+     the page does not need — identical for every door in the range.
+     `fitStage` in app.js crops to it, so on the page the scale is a constant:
+     the wall, the floor line and the sconces hold still and only the door
+     changes size. Four numbers rather than two, because the fixed scene's
+     origin is not this door's origin — a wide door and a narrow one have
+     different `viewBox` x, and centring the crop on `w / 2` (which is what
+     fitStage did while there was only one box) would have re-introduced the
+     drift from the other end.
+     ⚠ FIT_BOX and STAGE_BOX are deliberately not the same rectangle; see the
+     note where FIT_BOX is defined for why trimming `PAD` instead would have
+     moved every committed sheet.
+
+     `data-base-y` is the third number the page needs and the only one it could
+     not already read: the floor line. Every door in the range stands on it, it
+     is a constant of the SCENE and not of this door, and `fitStage` maps it to
+     a pixel so the photographed room's own wall/floor junction can be landed on
+     top of it. Published as an attribute for the same reason the fit box is —
+     the drawing is the authority on where its floor is, and a page that
+     retyped the figure would be CLAUDE.md §5.10's shape with the symptom
+     "the door floats a few pixels above the photographed floor", which is
+     exactly the kind of thing nobody reports. */
   return `
-<svg viewBox="0 0 ${view.w} ${view.h}" role="img" class="door-svg"
+<svg viewBox="${view.x} ${view.y} ${view.w} ${view.h}" role="img" class="door-svg"
      style="--hw-mid:${tone[3]}"
      data-light="${isLight(paint)}"
-     data-fit-w="${view.w}" data-fit-h="${view.h}"
+     data-fit-x="${FIT_BOX.x}" data-fit-y="${FIT_BOX.y}"
+     data-fit-w="${FIT_BOX.w}" data-fit-h="${FIT_BOX.h}"
+     data-base-y="${BASE_Y}"
      aria-label="${xmlAttr(describe(state))}" xmlns="http://www.w3.org/2000/svg">
   <defs>${usedDefs(defs, body)}</defs>
 ${body}
@@ -1591,12 +2944,126 @@ function bevel(x, y, w, h, d, paint, raised = true) {
    Fat lines turn it into a black picture frame painted on. What the photograph
    actually shows is a sculpted ramp WITH fine quirks cut into it — mass and
    detail, and the mass is the half that was missing. */
-const MOULD = [
-  [0.00, 1.00], [0.07, 0.72], [0.10, 0.44], [0.15, 1.14],
-  [0.19, 0.34], [0.25, 1.02], [0.30, 0.52], [0.38, 1.05],
-  [0.46, 0.86], [0.52, 1.12], [0.60, 0.62], [0.70, 1.10],
-  [0.79, 0.36], [0.87, 0.70], [0.94, 0.96], [1.00, 1.00],
-];
+/**
+ * ⚠ TWO SECTIONS, BECAUSE THE RANGE HAS TWO MOULDINGS — and finding that out
+ * is what the last round's "re-measurement" actually was.
+ *
+ * There was one table here. It was read off d048 as sixteen stops swinging
+ * between 0.34 and 1.16, then replaced by thirteen stops with a single hollow,
+ * re-read at 4000 px off `research/newdoor/`. Both readings are correct. They
+ * are readings of DIFFERENT DOORS, and putting the second over the first drew
+ * the classical set's broad ogee round every panel in the range — which is
+ * what *"i want you to remake how the panels look because they dont look
+ * good"* was about.
+ *
+ * Sorted by opening one panel corner per door at high magnification, which
+ * separates them at a glance where a whole-door contact sheet does not:
+ *
+ *   REEDED   three to five fine beads with hard dark quirks between them, low
+ *            relief, sharply mitred. d042 d048 d058 d062 d065 d068 d070 d087
+ *            d091 d094 d099 d116 d122 — thirteen doors.
+ *   OGEE     ONE broad soft curve standing well proud, a small bead at its
+ *            inner edge, a real cast shadow. d041 d050 d051 d053 d061 d067
+ *            d077 d103 d112 d129 and the set in `research/newdoor/` — eleven.
+ *
+ * Near enough evenly split, which is why neither can be "the" moulding, and
+ * why the choice is in the catalogue rather than here: `panel` and `panel2`
+ * are reeded, `panelo` and `panel2o` are the ogee, and the classical set is
+ * the ogee by construction.
+ *
+ * `at` runs from the band's OUTER edge to its inner one; `tone` is how much
+ * light that point returns compared with the field. Both are carried as
+ * gradients rather than as drawn lines, because the two failures either side
+ * are both easy to reach: fine lines alone leave the band flat and the
+ * moulding reads as an outline etched into the door, and fat lines turn it
+ * into a black picture frame painted on.
+ */
+const MOULDS = {
+  /* d048, sixteen stops: a line scanned through the band at 1 px steps, every
+     sample divided by the flat field beside it, smoothed and resampled.
+     Five quirks at 0.44 0.34 0.52 0.62 0.36 with a bead between each pair.
+     ⚠ CONFIRMED INDEPENDENTLY BEFORE IT WAS PUT BACK, because it had been
+     deleted once as "noise read as signal". `tools/_msect.mjs` across d062's
+     upper panel, median down 22% of the leaf's height so a reflection on one
+     row is thrown away: 0.83 0.48 0.81 0.94 0.67 0.98 0.77 0.73 0.89 0.74
+     0.61 0.84 — four quirks and four beads, the same alternation at a lower
+     magnification. A phone photograph of a 2 m door merges adjacent quirks;
+     it does not invent them. */
+  reed: [
+    [0.00, 1.00], [0.07, 0.72], [0.10, 0.44], [0.15, 1.14],
+    [0.19, 0.34], [0.25, 1.02], [0.30, 0.52], [0.38, 1.05],
+    [0.46, 0.86], [0.52, 1.12], [0.60, 0.62], [0.70, 1.10],
+    [0.79, 0.36], [0.87, 0.70], [0.94, 0.96], [1.00, 1.00],
+  ],
+  /* ⚠ RE-READ ON d050, WHICH IS THE DOOR THAT WAS POINTED AT. This was the
+     `research/newdoor/` section — one deep hollow through the middle and one
+     broad lit round — and it was reported from outside as *"i dont like how
+     the פאנל קלאסי look"* with four photographs attached. Three of the four
+     are in the corpus: image 1 is d050, image 2 is d111, image 4 is d127. d050
+     is the one worth measuring — flat on, even light, plain paint, no
+     ironwork, and it is the panel the complaint is about.
+
+     `tools/_msect.mjs d050 0.212 0.308 0.13 0.29 20`, the moulding 46 px wide,
+     median down 16% of the leaf's height so a peephole or a highlight on one
+     row is thrown away:
+
+        1.01 1.01 1.01 | 0.94 0.91 0.84 | 1.02 1.01 1.00 1.01 1.01 1.01 1.01
+        1.00 1.01 1.00 | 0.92 | 0.99 0.99 1.03
+
+     That is not an ogee at all. It is ONE NARROW GROOVE near the outer edge,
+     a LONG FLAT across the middle at the paint's own tone, and a SECOND,
+     shallower groove near the inner edge. Half the band is flat. The old table
+     put a hollow through the middle of that flat and a bright round where the
+     inner groove is, which is why it read as a soft bulge rather than as a
+     scribed frame.
+
+     ⚠ THE DEPTHS ARE UN-COMPRESSED, and that is arithmetic rather than taste.
+     d050 is a near-white door and `mouldGradients` already scales relief by
+     0.34 on pale paint, so a table storing the measured 0.84 would draw 0.95
+     there — half the groove the photograph has. Each measured departure from
+     1.00 is divided by that 0.34 before it is stored, so the PALE rendering
+     comes back out at the measured figure. The factor is the corpus's own:
+     REALISM §7.4b measures cream d076 at a 0.22 departure where navy d048 is
+     at 0.73, a ratio of 0.30.
+
+     ⚠ ONE DOOR, and said out loud. d077, d061 and d111 carry the same family
+     and none of them can confirm it — d077 and d061 are so bright the whole
+     moulding sits inside 0.95 to 1.00, and d111's and d127's leaf boxes in
+     `leaf.json` are fallbacks (the file says which), so a fraction of them is
+     not a fraction of the door. If a darker door of this family is ever
+     measured properly, this is the table to check. */
+  ogee: [
+    [0.00, 1.00], [0.11, 1.00], [0.16, 0.82], [0.21, 0.74],
+    [0.26, 0.53], [0.32, 1.06], [0.42, 1.00], [0.53, 1.03],
+    [0.68, 1.00], [0.79, 1.00], [0.84, 0.76], [0.89, 0.97],
+    [0.95, 0.97], [1.00, 1.00],
+  ],
+};
+/* Endpoints stay at exactly 1.00 in BOTH: a moulding meets the same flat face
+   on both sides, and anything else shades the field like a raised panel — see
+   the note on MOULD_SIDE below. `npm test` asserts it rather than trusting
+   whoever edits the tables next. */
+export const MOULD_PROFILES = Object.keys(MOULDS);
+/* The one every drawing gets unless it asks for the other. Reeded, by two
+   doors and by the fact that it is what a plain glazed leaf's surround is on
+   every door in the corpus that has one. */
+const MOULD_DEFAULT = 'reed';
+
+/**
+ * WHICH SECTION A FACE DESIGN IS MOULDED IN — asked once, here, and answered
+ * for the panel AND for the surround round the glass.
+ *
+ * ⚠ ONE ANSWER FOR BOTH, because the doors are built that way. Every corpus
+ * door carrying a window over a panel — d090 d091 d092 d094 d097 d099 d102
+ * d105 d106 d116 d122 — cases the light in the same section it moulds the
+ * panel in. A door with a reeded panel under an ogee architrave is not a door
+ * anybody has built, and offering it would be inventing a product.
+ * A face with no `profile` — `plain`, and every strip design — takes the
+ * default, which is what a glazed leaf with no panel gets.
+ */
+const mouldOf = detail =>
+  (detail && MOULDS[detail.profile] ? detail.profile : MOULD_DEFAULT);
+
 
 /* One gain per side, applied to the moulding's RELIEF — how deep its quirks
    cut — and never to its absolute tone. Key is high and left, so every run of
@@ -1628,14 +3095,19 @@ const MOULD_SIDE = { top: 0.95, left: 1.01, right: 1.04, bottom: 1.07 };
  * door's own paint and its own texture show straight through, which is the
  * point.
  */
-function moulding(x, y, w, h, band, paint, pale, leaf = null, key = '') {
+function moulding(x, y, w, h, band, paint, pale, leaf = null, key = '',
+                  profile = MOULD_DEFAULT) {
   if (w <= band * 2.2 || h <= band * 2.2) return '';
 
   /* Four mitred trapezoids, each filled with the measured cross-section as a
      gradient running perpendicular to its own run. That is the whole moulding:
      mass and quirks in one fill, four paths for the rectangle instead of the
-     hundred and seventy-six a stop-per-stroke version would have taken. */
-  const side = (d, o) => `<path d="${d}" fill="url(#mould-${o})"/>`;
+     hundred and seventy-six a stop-per-stroke version would have taken.
+     ⚠ WHICH SECTION IS AN ARGUMENT, not a constant — see MOULDS. An unknown
+     name would silently draw no fill at all, so it falls back rather than
+     producing an invisible moulding. */
+  const p = MOULDS[profile] ? profile : MOULD_DEFAULT;
+  const side = (d, o) => `<path d="${d}" fill="url(#mould-${p}-${o})"/>`;
   const b = band;
   const runs = [
     [`M ${x} ${y} H ${x + w} L ${x + w - b} ${y + b} H ${x + b} Z`, 't'],
@@ -1727,17 +3199,21 @@ function mouldGradients(paint, pale) {
   /* The gain multiplies the DEVIATION from the paint, so tone 1.00 stays the
      paint whatever the gain is, and both edges of every run meet the face
      without a step. */
-  const stops = lift => MOULD.map(([at, tone]) =>
+  const stops = (p, lift) => MOULDS[p].map(([at, tone]) =>
     `<stop offset="${at}" stop-color="${scaleTone(paint, 1 + (tone - 1) * relief * lift)}"/>`).join('');
   /* Outer edge first in every case, so one measured profile serves all four:
      the top run reads downward, the bottom run upward, and the two verticals
      inward from their own side of the rectangle. */
-  const g = (id, x1, y1, x2, y2, lift) =>
-    `<linearGradient id="mould-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(lift)}</linearGradient>`;
-  return g('t', 0, 0, 0, 1, MOULD_SIDE.top)
-       + g('b', 0, 1, 0, 0, MOULD_SIDE.bottom)
-       + g('l', 0, 0, 1, 0, MOULD_SIDE.left)
-       + g('r', 1, 0, 0, 0, MOULD_SIDE.right);
+  const g = (p, id, x1, y1, x2, y2, lift) =>
+    `<linearGradient id="mould-${p}-${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops(p, lift)}</linearGradient>`;
+  /* Both profiles, always emitted — `usedDefs` walks the body for `url(#…)`
+     and drops whichever the door does not point at, so a reeded door carries
+     four gradients exactly as it did when there was only one section. */
+  return MOULD_PROFILES.map(p =>
+      g(p, 't', 0, 0, 0, 1, MOULD_SIDE.top)
+    + g(p, 'b', 0, 1, 0, 0, MOULD_SIDE.bottom)
+    + g(p, 'l', 0, 0, 1, 0, MOULD_SIDE.left)
+    + g(p, 'r', 1, 0, 0, 0, MOULD_SIDE.right)).join('');
 }
 
 /**
@@ -1802,9 +3278,127 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
    the drawing below and `faceObstacles`, which has to know where a moulding is
    without rendering one. Written down twice they would drift, and the thing
    that would drift is where a customer may stand a handle. */
-const PANEL_ROWS = { pair: [[0.07, 0.58], [0.66, 0.92]], lone: [0.68, 0.90] };
+/**
+ * Where a panelled face puts its rectangles, as fractions of leaf height.
+ *
+ * `pair` is measured off d048 and is the classic: a tall upper over a short
+ * lower, 0.08 of gap between them, the whole composition running 0.07 to 0.92.
+ *
+ * ⚠ `trio` IS MEASURED NOW, AND IT IS NOT THE PAIR WITH A PANEL INSERTED.
+ * It used to be derived from `pair` — three rectangles falling 0.30, 0.23,
+ * 0.16, on the reasoning that "three panels" meant the pair plus one more —
+ * and the note here said so and asked that it not become a measurement without
+ * a photograph. Three arrived: a black door installed, the same door as a
+ * catalogue shot, and a white one, all sent in with *"i dont like how the 3
+ * panels look, so there is 3 images of how it needs to look."*
+ *
+ * They are all one composition and it is not three panels at all:
+ *
+ *     a TALL upper panel
+ *     a plate — and the pull bar is bolted across it
+ *     a MEDIUM lower panel
+ *
+ * The middle rectangle is a HANDLE PLATE. That is why it sits at hand height
+ * rather than at a third of the way down, and why deriving it from the pair
+ * could never have produced it: the pair's proportions are about how a
+ * panelled door is divided, and this one's are about where a hand goes.
+ *
+ * ⚠ AND THEN OFF THREE BETTER PHOTOGRAPHS, INCLUDING A CATALOGUE ELEVATION.
+ * The corpus read below was still wrong and it was reported again: *"look at
+ * the proportions of the 3 panel option, make our 3 panel option look like
+ * this"*, with three pictures of the same model. One of them is a flat
+ * catalogue shot — which is **d067's own file**, the door excluded from the
+ * corpus read for having a crop aspect of 0.535. That exclusion was right
+ * about the COLUMNS and wrong about the rows: a horizontal stretch cannot move
+ * a horizontal edge, so a stretched elevation is a perfectly good ruler
+ * vertically, and it is the only square-on one of the three.
+ *
+ *              upper          plate          lower
+ *     d067   0.081-0.441   0.462-0.613   0.634-0.946    (catalogue elevation)
+ *     white  0.036-0.464   0.488-0.583   0.607-0.952
+ *     black  0.067-0.461   0.489-0.562   0.579-0.933
+ *     mean   0.061-0.455   0.480-0.586   0.607-0.944
+ *
+ * Everything moves UP and every rectangle grows. The corpus read had the plate
+ * 0.067 too low and the gaps between the panels twice as wide as they are.
+ *
+ * ⚠ AND THE CHECK THAT SAYS IT IS RIGHT IS THE MARGINS. The top margin comes
+ * out at 0.061 of the leaf's height — 125 mm — the foot margin at 0.056, 115,
+ * and `PANEL_INSETS.trio` is 0.15 of the width, 128. Equal margins all round
+ * is what a panelled door is, and three independent photographs landing on it
+ * is not something a bad reading does. The gaps between the panels are 0.025
+ * and 0.021, about 47 mm, which is the narrow rail the pictures show.
+ *
+ * The corpus read is kept below because the reasoning in it still stands.
+ *
+ * ⚠ THE ROWS WERE OFF THE CORPUS, NOT OFF THOSE THREE SNAPSHOTS. The
+ * first measured version put the composition too high and the plate too short
+ * — upper 0.055-0.430, plate 0.455-0.545, lower 0.575-0.875 — and it was
+ * reported back as *"the 3 panel option looks bad, so look at doors with 3
+ * panels and make the panel proportions look like the real thing."* The corpus
+ * has three of them, found by going back through all 129: **d067, d068 and
+ * d077**, each a tall upper over a plate carrying a turned pull over a lower
+ * panel. (d065, d070 and d087 are the same door WITHOUT the plate — the pull
+ * bolted to bare face — which is worth knowing: the plate is optional on a
+ * real door and here it is what `panel3` is.)
+ *
+ * Read by luminance derivative down the leaf's centre on d077, which is the
+ * only one of the three shot square-on, and off a ruled grid on d068; d067 is
+ * quoted but not used, because its crop's aspect comes out at 0.535 against a
+ * door's 0.415, so a fraction of that picture is not a fraction of the leaf —
+ * the same trap CLASSIC_ROWS fell into twice.
+ *
+ *              upper          plate          lower
+ *     d068   0.077-0.542   0.568-0.645   0.684-0.929
+ *     d077   0.100-0.511   0.525-0.677   0.689-0.912
+ *     mean   0.089-0.527   0.547-0.661   0.687-0.921
+ *
+ * Two things fall out. The plate is 0.114 of the leaf and not 0.09 — half
+ * again as tall — and the whole composition sits some 0.05 LOWER than it was
+ * drawn, so the pull was riding about 100 mm high. And the trio's upper and
+ * lower rectangles land within 0.02 of `pair`'s own 0.07-0.58 and 0.66-0.92,
+ * which is the sanity check this table never had: the three-panel door IS the
+ * two-panel door with a plate let in between, once the plate is the right
+ * height. The reasoning that was wrong before was the ENVELOPE — splitting the
+ * pair's span three ways — not the family resemblance.
+ *
+ * ⚠ AND THE TRIO'S PANELS ARE WIDER. `PANEL_INSET` is 0.23 and measured, but
+ * measured on the one- and two-panel doors; on all three of these photographs
+ * the panels run to about 0.15 of the leaf from each edge. Read off the
+ * catalogue shot, which is the only one of the three square-on: 0.131 and
+ * 0.133. The other two agree to within four hundredths, which is as much as an
+ * angled snapshot can be asked for — so the figure is 0.15 and the honest
+ * error on it is ±0.03, stated here rather than implied by three decimals.
+ */
+const PANEL_ROWS = {
+  pair: [[0.07, 0.58], [0.66, 0.92]],
+  trio: [[0.061, 0.455], [0.480, 0.586], [0.607, 0.944]],
+  top:  [[0.07, 0.58]],
+  lone: [0.68, 0.90],
+};
+/* How far a panelled face keeps its rectangles from the leaf's edges. One per
+   composition, because they are different products: see the note above. */
+const PANEL_INSETS = { trio: 0.15 };
+
+/**
+ * The rows THIS face wants — one statement, read by the drawing, by the
+ * obstacle list a grip is placed against, and by the catalogue glyph.
+ *
+ * All three used to name PANEL_ROWS.pair directly, guarded by `panels === 2`.
+ * That is right while there is exactly one multi-panel face and wrong in three
+ * places at once the moment there are three of them. See `hasUpperPanel` in
+ * catalog.js for the same lesson from the other side.
+ */
+const panelRows = detail =>
+  detail.panels >= 3 ? PANEL_ROWS.trio
+  : detail.panels === 2 ? PANEL_ROWS.pair
+  : detail.top ? PANEL_ROWS.top
+  : [PANEL_ROWS.lone];
+/** And the inset that goes with them — same shape, same three readers. */
+const panelInset = detail =>
+  (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
 function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0, key = 'm',
-                      alignTo = null) {
+                      alignTo = null, inset0 = PANEL_INSET, profile = MOULD_DEFAULT) {
   const band = MOULD_BAND;     // the same stock that goes round a pane
   /* THE PANEL LINES UP WITH THE WINDOW ABOVE IT.
      Reported from the outside — "make the size of windows and plates the same
@@ -1814,10 +3408,12 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
      were 0.589 and 0.540, two different widths on one door, which is the same
      defect as the two moulding weights and just as visible.
      So on a glazed leaf the panel takes the opening's own outer edges. On a
-     solid one there is nothing to line up with and PANEL_INSET stands. */
+     solid one there is nothing to line up with and the composition's own inset
+     stands — `inset0`, which is PANEL_INSET for every face but the trio; see
+     the note on PANEL_INSETS. */
   const inset = alignTo != null
     ? Math.max(0, alignTo)
-    : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * PANEL_INSET, clearTo));
+    : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * inset0, clearTo));
   const x = lx + inset, w = lw - inset * 2;
   /* The leaf's own rectangle, carried down to `moulding` so the panel can be
      lit by the same wash as the face around it. `key` keeps the clip-path ids
@@ -1827,20 +3423,30 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
      `a` an aperture prefixes with. */
   const leaf = { x: lx, y: ly, w: lw, h: lh };
   const rect = (t, b, n) =>
-    moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `p${key}${n}`);
+    moulding(x, ly + lh * t, w, lh * (b - t), band, paint, pale, leaf, `p${key}${n}`,
+             profile);
 
-  /* The classic two-rectangle face, which is what nearly every designed door
-     in the gallery carries. Only on a solid leaf: with glazing above there is
-     nowhere for the upper one. */
-  if (upper && winBottom <= ly + 1) {
-    return `<g data-detail="panel" data-panels="2" data-top="${(ly + lh * PANEL_ROWS.pair[0][0]).toFixed(1)}"
+  /* ANY FACE WITH A PANEL IN THE UPPER HALF: the classic pair, the three-panel
+     face, or the upper rectangle on its own. Only on a solid leaf — with
+     glazing above there is nowhere for the top one, which is why `upper` is
+     `hasUpperPanel(detail)` at the call site and why `rules.js` refuses the
+     pairing before it ever gets here.
+     ⚠ `upper` IS THE ROWS NOW, not a boolean. It was `true` meaning "draw the
+     pair", and `data-panels="2"` was written out as a literal beside it — so a
+     three-panel door would have drawn two panels and then labelled itself
+     correctly, which is the worst of both. The count comes off the array it
+     actually drew. */
+  if (upper && upper.length && winBottom <= ly + 1) {
+    return `<g data-detail="panel" data-panels="${upper.length}"
+               data-top="${(ly + lh * upper[0][0]).toFixed(1)}"
                data-band="${band.toFixed(1)}">${
-      PANEL_ROWS.pair.map(([t, bt], n) => rect(t, bt, n)).join('')}</g>`;
+      upper.map(([t, bt], n) => rect(t, bt, n)).join('')}</g>`;
   }
 
   const top = Math.max(ly + lh * PANEL_ROWS.lone[0], winBottom + lw * 0.08);
   const bottom = ly + lh * PANEL_ROWS.lone[1];
-  const art = moulding(x, top, w, bottom - top, band, paint, pale, leaf, `p${key}0`);
+  const art = moulding(x, top, w, bottom - top, band, paint, pale, leaf, `p${key}0`,
+                       profile);
   /* `data-top` so a test can ask where the moulding starts instead of parsing
      the first path out of the markup. It did that until this rewrite, and the
      assertion it was protecting — that mouldings never cross the glazing —
@@ -1941,11 +3547,43 @@ export const faceObstacles = memo(function faceObstacles(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const detail = byId(DETAILS, state.detail);
-  const openings = apertureLayout(byId(WINDOWS, state.window), leafW);
+  const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
+                                  byId(DETAILS, state.detail), leafH);
+  /* ⚠ THE SAME BAND THE DRAWING CASES IT IN. This said MOULD_BAND flat, and
+     for the classical set the drawing now says 59: an obstacle eleven
+     millimetres bigger than the thing it describes is the §5 shape again. */
+  const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
+  const paneFoot = paneBand;
   const out = openings.map(o => ({
-    kind: 'window', x: o.x - MOULD_BAND, y: o.top - MOULD_BAND,
-    w: o.w + MOULD_BAND * 2, h: o.h + MOULD_BAND * 2,
+    kind: 'window', x: o.x - paneBand, y: o.top - paneBand,
+    w: o.w + paneBand * 2, h: o.h + paneBand + paneFoot,
   }));
+
+  /* ⚠ THE CLASSICAL SET IS NOT A PANELLED FACE PLUS A WINDOW, and asking the
+     panel arithmetic below about it gives four wrong answers at once.
+     It has `panel: true`, so before this branch existed the code fell through
+     and produced ONE obstacle from `PANEL_ROWS.lone` — 0.68 to 0.90 of the
+     leaf against the set's own 0.665 to 0.886, and an inset of 0.224 against
+     0.228. Fifteen millimetres out in three places, which is the same drift
+     the comment below this one is about, arriving from a new direction.
+     And the three misses are worse than the near-miss: the CORNICE, the
+     FRIEZE and the corbelled SHELF are not panels, `panel` does not describe
+     them, and nothing here knew they were on the door at all — so `npm run
+     collide` would happily stand a pull bar through the middle of the shelf.
+     Read off the set's own tables, like everything else about it. */
+  if (detail.classic) {
+    /* ⚠ OFF `classicPieces`, THE SAME TABLE `classicSet` DRAWS FROM. It used
+       to be a second list written here, and that is the §5 shape exactly: the
+       band's columns had already drifted — the rules said the shelf's span,
+       the drawing had narrowed the face to 0.286-0.714 and hung the brackets
+       outside it. Nothing caught that, because `collide.mjs`'s drift reader
+       had no way to see a moulding at all. Both ends of that are fixed
+       together or neither is worth fixing. */
+    for (const q of classicPieces(leafW, leafH, openings.length > 0)) {
+      out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND });
+    }
+    return out;
+  }
 
   if (detail.panel) {
     /* The SAME inset `appliedFrame` draws with — the opening's outer edge on a
@@ -1956,10 +3594,14 @@ export const faceObstacles = memo(function faceObstacles(state) {
        this, and this is the second description drifting. */
     const inset = openings.length
       ? Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND)
-      : leafW * PANEL_INSET;
+      : leafW * panelInset(detail);
     const winBottom = openings.length ? Math.max(...openings.map(o => o.top + o.h)) : 0;
-    const rows = detail.panels === 2 && !openings.length
-      ? PANEL_ROWS.pair
+    /* `hasUpperPanel`, not `panels === 2` — see its docstring in catalog.js.
+       The rows themselves come from `panelRows`, which is the one statement of
+       where a panelled face puts its metal; this used to name PANEL_ROWS.pair
+       directly and would have drawn a two-panel door for a three-panel one. */
+    const rows = hasUpperPanel(detail) && !openings.length
+      ? panelRows(detail)
       : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
     for (const [t, b] of rows) {
       const r = { kind: 'panel', x: inset, y: leafH * t,
@@ -1990,14 +3632,77 @@ export const faceObstacles = memo(function faceObstacles(state) {
  * Asked of the same numbers `appliedFrame` draws with, so it cannot drift from
  * what actually appears.
  */
+/**
+ * CAN A עינית BE FITTED ON THIS LEAF?
+ *
+ * ⚠ GEOMETRIC, NOT OBSERVED, AND THE DISTINCTION MATTERS HERE. `js/rules.js`
+ * keeps the two kinds apart because they carry different weight: an OBSERVED
+ * rule says "Peretz does not build this" and a GEOMETRIC one says "this does
+ * not fit". This is the second, and it is computed from the same
+ * `apertureLayout` the drawing calls, so it cannot drift away from the picture
+ * the way a listed rule would.
+ *
+ * ⚠ AND THE OBSERVED VERSION WOULD HAVE BEEN WRONG. `render()` once suppressed
+ * the peephole whenever `win.rects.length` was non-zero, and
+ * `research/works/INVENTORY.md` records that rule as a FINDING against the
+ * code: glazed doors in the corpus do carry peepholes, and d076 carries one on
+ * a solid leaf above a knocker. So "a glazed door has no peephole" is not true
+ * of Peretz's doors and must not be written down as if it were.
+ *
+ * What IS true is narrower and is about this catalogue: both window shapes we
+ * sell are centred on the leaf and both reach the height a viewer goes at, so
+ * on OUR two glazed doors a peephole at its measured position has nowhere to
+ * be. Measured rather than reasoned — `tools/_newhw.mjs` swept 426 designs
+ * with real `getBBox` and found the overlap on all 140 glazed ones and on
+ * nothing else. A door with a small high window off to one side would pass
+ * this; we do not make one.
+ *
+ * The clearance is the fitting's own radius plus a little, so the rule moves
+ * by itself if either the peephole or a window is ever re-measured.
+ */
+export function peepholeFits(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const openings = apertureLayout(byId(WINDOWS, state.window),
+                                  leafW, byId(DETAILS, state.detail), leafH);
+  if (!openings.length) return true;
+  /* The fitting, in the leaf's own coordinates: centred across, and
+     `PEEPHOLE_AFF` up from the floor, which is `leafH - PEEPHOLE_AFF` down
+     from the leaf's head. */
+  const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
+  const R = PEEPHOLE_R + 8;                       // its radius plus a bead of paint
+  return !openings.some(o =>
+    cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
+}
+
 export function panelFits(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const detail = byId(DETAILS, state.detail);
   if (!detail.panel) return true;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  const openings = apertureLayout(byId(WINDOWS, state.window), leafW);
+  const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
+                                  byId(DETAILS, state.detail), leafH);
   if (!openings.length) return true;
   const winBottom = Math.max(...openings.map(o => o.top + o.h));
+  /* ⚠ THE GLASS HAS TO STOP HIGH ENOUGH, AND "not literally zero" IS NOT HIGH
+     ENOUGH. The two lines below ask whether `moulding` would draw ANYTHING —
+     whether the rectangle left over is bigger than the stock that goes round
+     it — and that is a drawing question, not a door question. Under the
+     vertical slot it says yes to a panel 157 mm tall where the lone panel's
+     own row is 451: a sliver of moulding jammed against the sill, drawn,
+     charged ₪380 for, and not a panel.
+     Reported from outside: *"the panel can only work with the normal window,
+     the other one doesnt give enough space, so just make it impossible."*
+     The corpus had already drawn the line and nobody had read it off. Of the
+     ten glazed doors, the SEVEN with a panel below the glass have openings
+     running to 0.36-0.61 of leaf height, and the THREE that run past that —
+     d113 at 0.62, d125 at 0.76, d128 at 0.78 — carry no panel at all. So 0.62
+     is not a tolerance picked to exclude the slot; it is where Peretz's own
+     doors stop having room, and the slot (0.79) is well past it.
+     ⚠ Stated as a FRACTION of leaf height, so a tall door gets the same
+     judgement as a standard one rather than a different one for free. */
+  const GLASS_STOPS_BY = 0.62;
+  if (winBottom > leafH * GLASS_STOPS_BY) return false;
   const top = Math.max(leafH * PANEL_ROWS.lone[0], winBottom + leafW * 0.08);
   const bottom = leafH * PANEL_ROWS.lone[1];
   const inset = Math.max(0, Math.min(...openings.map(o => o.x)) - MOULD_BAND);
@@ -2047,7 +3752,7 @@ export function gripHome(state) {
 
 function gripHomeUncached(state) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   const lockset = byId(LOCKSETS, state.lockset);
   const detail = byId(DETAILS, state.detail);
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -2061,7 +3766,21 @@ function gripHomeUncached(state) {
      d062, d067, d068, d070 and d077 is 0.59 of leaf height. It used to be a
      constant inside the drawing, which is why the bar could not be dragged. */
   const homeY = handle.style === 'grab' ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
-  const raw0 = { x: backset + standoff, y: homeY, rot: 0 };
+  /* ⚠ AND THE BOW'S OWN DEFAULT X, which used to be the drawing's business.
+     `grabHandle` centred it on the leaf no matter what it was handed; now it
+     draws where it is told, so the centring has to happen HERE, where a
+     default belongs. Every installed grab bar in the corpus is centred, so
+     that is what a customer who touches nothing gets — and unlike before, the
+     rules and the drawing now agree that that is where it is.
+     The axis is the bow's outboard tip and it runs GRAB.len inboard, so
+     centred on a leaf means half the leftover on each side. */
+  const homeX = handle.style === 'grab'
+    ? (leafW - GRAB.len) / 2
+    : backset + standoff;
+  const raw0 = { x: homeX, y: homeY, rot: 0 };
+  /* The height a hand reaches on THIS leaf — the one yardstick every
+     HOME_REACH test below is measured against. See the note further down. */
+  const reachY = leafH - HANDLE_AFF;
   /* AND IT HAS TO BE A PLACE THE GRIP CAN ACTUALLY STAND.
      The arithmetic above is a good guess and not a proof: it works in x, where
      it was derived, and says nothing about y. `barHalf` shortens a bar on a
@@ -2084,10 +3803,24 @@ function gripHomeUncached(state) {
      A default is not a choice. `HOME_REACH` is how far this is willing to
      move a handle nobody has touched; past it the door is refused, which is
      what it did before the band opened. Drags are unaffected — they come
-     through `gripPlacement` with a position the customer picked. */
+     through `gripPlacement` with a position the customer picked.
+
+     ⚠ MEASURED FROM HAND HEIGHT, NOT FROM THIS GRIP'S OWN NOMINAL. These three
+     comparisons read `raw0.y`, which is the same thing for every grip except
+     one: the horizontal bow's nominal is `GRAB.fromTop` (0.59 of the leaf),
+     180 mm below where a hand goes. Beside a 1,415 mm vertical slot the bow
+     has nowhere to stand but under it, and 500 mm from ITS nominal reached
+     y = 1,646 — 0.80 of the leaf, about 400 mm off the floor. A knee rail.
+     `npm test` said so in five places the moment the blanket refusal came out,
+     and it was measuring against hand height while this measured against the
+     grip's own; two yardsticks for one question, which is §5 in miniature.
+     One yardstick now, and it is the one the assertion uses. The effect is
+     confined to the grab bar — for every other grip `raw0.y` IS this — and
+     what it buys is that a door with no reachable place for a bow REFUSES it,
+     through `gripFitsAnywhere`, with a reason on the tile. */
   const upright = nearestGrip(state, raw0);
   if (gripPlacement(state, upright).ok
-      && Math.abs(upright.y - raw0.y) <= HOME_REACH) return upright;
+      && Math.abs(upright.y - reachY) <= HOME_REACH) return upright;
 
   /* AND IF IT WILL NOT STAND UP ANYWHERE, LAY IT DOWN.
      Asked for from the outside: "if there is a window, and the pull handle
@@ -2104,7 +3837,7 @@ function gripHomeUncached(state) {
     const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
     const laid = gripPlacement(state, flat).ok ? flat : nearestGrip(state, flat);
     if (gripPlacement(state, laid).ok
-        && Math.abs(laid.y - flat.y) <= HOME_REACH) return laid;
+        && Math.abs(laid.y - reachY) <= HOME_REACH) return laid;
   }
   /* Nothing within reach of hand height, standing or lying down. Hand back the
      ideal — which is refused, or we would have returned it at the top — so
@@ -2112,7 +3845,7 @@ function gripHomeUncached(state) {
      as it did while the placement band was the only limit. The alternative is
      a door that opens with its handle at knee height and nobody choosing it. */
   return gripPlacement(state, upright).ok
-      && Math.abs(upright.y - raw0.y) <= HOME_REACH ? upright : raw0;
+      && Math.abs(upright.y - reachY) <= HOME_REACH ? upright : raw0;
 }
 
 /**
@@ -2149,7 +3882,7 @@ export const gripFitsAnywhere = memo(
  */
 export function gripCanRotate(state) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   /* Nothing to turn, and one that is already lying down: the horizontal bow is
      drawn from the leaf's centre outwards and standing it up is a different
      object, not a rotation. */
@@ -2159,11 +3892,167 @@ export function gripCanRotate(state) {
   return long > 0 && long <= leafW - EDGE_FLAT * 2;
 }
 
+/**
+ * THE EXTRA LOCK ON THE LEAF — a safe lock or a keypad, AT EYE LEVEL.
+ *
+ * ⚠ REDRAWN AND MOVED ON 30.8.2026, OFF FOUR PHOTOGRAPHS PERETZ SENT. The
+ * paragraph that stood here said the geometry was "honest about being
+ * conventional rather than measured" and that REALISM.md §6 would govern if a
+ * photograph ever arrived. Four arrived. They are in `research/handles/` as
+ * `peretz-1..4.webp`, and Peretz named which is which: *"kodan is the frey
+ * dorr with panels and horizontal pull handle, the others are the מנעול
+ * כספת."*
+ *
+ * ── WHAT THE PHOTOGRAPHS SAY THEY LOOK LIKE ──────────────────────────
+ *
+ * The invented drawings were wrong about both fittings, and in the KODAN's
+ * case wrong about what the product IS. It was drawn as a digital keypad — a
+ * display bar over a 3x3 grid of nine buttons, 62 x 96, aspect 0.65. What is
+ * on the door is a MECHANICAL push-button lock: a tall pill body with TEN
+ * buttons in two columns of five, and a large turn knob filling the bottom
+ * third. Nothing about it is digital and it is nearly twice as tall as it was
+ * drawn.
+ *
+ *     KODAN    60 x 154 mm    aspect 0.39   (was 62 x 96, aspect 0.65)
+ *     KASEFET  50 x  68 mm    aspect 0.74   (was 62 x  62, aspect 1.00)
+ *
+ * ⚠ AND THE ASPECT IS NOT READ OFF THE PHOTOGRAPH DIRECTLY, because a leaf in
+ * a phone snapshot is not at the model's aspect. Each dimension is a fraction
+ * of the leaf's OWN matching dimension — height against leaf height, width
+ * against leaf width — so a lens that stretches one axis cannot leak into the
+ * other. Done that way, peretz-1's leaf reads 0.485 where the model says
+ * 0.415, which is not distortion: that door is a WIDE one, and at leafW 1000
+ * the fitting's own aspect comes out 0.396 against 0.392 measured in pixels.
+ * Two routes, agreeing to 1%.
+ *
+ * Corroboration from outside the repository, which is the check this kind of
+ * number most needs: a Codelocks CL200 mechanical keypad is 57 x 168 mm. The
+ * measurement is 60 x 154.
+ *
+ * The KASEFET is an upright plate with a small corner radius, four screws one
+ * at each corner, and a single horizontal slot across the middle. Its height
+ * was read on two different doors — peretz-3 and peretz-4, a brass one and a
+ * dark one — and came out 67 mm and 68 mm. That agreement is why the height is
+ * trusted and the width (45 and 55) is given as the mean.
+ *
+ * ── AND THEY GO AT EYE LEVEL, WHICH IS THE BIGGER CHANGE ──────────────
+ *
+ * Peretz: they mount at the TOP of the door, not down beside the main keyhole.
+ * `SPECIAL_AFF` was **654 mm** — knee height — and is **1430 mm**. See the
+ * constant for the two independent derivations that agree to 30 mm.
+ *
+ * ── AND NEITHER TAKES THE פרזול ───────────────────────────────────────
+ *
+ * Peretz, same notes: *"pirzul doesnt affect the additional lock."* Both were
+ * filled with `url(#nickel)`, which is the PIRZUL's gradient — so choosing
+ * gold turned the keypad and the safe lock gold along with everything else. He
+ * is describing the product: these are bought-in units in whatever finish the
+ * manufacturer ships, and the finish a customer pays for covers the ידית, the
+ * צירים, the עינית and the סגר ביטחון.
+ *
+ * ⚠ THEY GET THEIR OWN GRADIENT RATHER THAN A HARD-CODED HEX, and the reason
+ * is this file's own history: `#nickel` once served a pull handle and a lever
+ * at the same time, and each was painted with the other's metal. The fix was
+ * to name every ramp for WHOSE metal it is. `#lockUnit` is a third owner — the
+ * bought-in unit's own steel — so the next fitting added here has to answer
+ * "whose metal is this?" before it can pick a fill.
+ *
+ * `data-hw="lock"` so `npm run collide` sweeps it with the rest of the lock
+ * furniture, and `data-kind` so the sweep can name it when it does collide.
+ */
+function specialLockArt(special, cx, cy, dir) {
+  if (!special || special.id === 'nospecial') return '';
+  const x = cx + dir * 0;          // on the cylinder's own axis
+
+  if (special.id === 'kasefet') {
+    /* 50 x 68, measured. The corner radius is small — this is a pressed plate,
+       not a moulded body — and the four screws are the thing that identifies
+       it at a glance on all three doors that carry one. */
+    const W = 50, H = 68, r = 5;
+    const l = x - W / 2, t = cy - H / 2;
+    const screw = (sx, sy) => `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="2.6"
+              fill="#000" fill-opacity=".34"/>`;
+    return `
+    <g data-hw="lock" data-owner="speciallock" data-kind="kasefet">
+      <rect x="${(l + 2).toFixed(1)}" y="${(t + 3).toFixed(1)}" width="${W}" height="${H}"
+            rx="${r}" fill="#000" opacity=".20"/>
+      <rect x="${l.toFixed(1)}" y="${t.toFixed(1)}" width="${W}" height="${H}" rx="${r}"
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+      ${/* The keyway: one horizontal slot across the middle. On peretz-3 it is
+            a clean letterbox; on peretz-4 the same slot with a shallow nick at
+            its centre. Drawn as the slot, because that is what both share. */''
+       }<rect x="${(x - W * 0.30).toFixed(1)}" y="${(cy - 3).toFixed(1)}"
+            width="${(W * 0.60).toFixed(1)}" height="6" rx="2.5"
+            fill="#000" fill-opacity=".62"/>
+      ${screw(l + 8, t + 8)}${screw(l + W - 8, t + 8)}
+      ${screw(l + 8, t + H - 8)}${screw(l + W - 8, t + H - 8)}
+    </g>`;
+  }
+
+  /* THE KODAN — a mechanical push-button lock. 60 x 154, a stadium body,
+     ten buttons in two columns of five over the upper 62%, and the turn knob
+     filling the bottom third. */
+  const W = 60, H = 154;
+  const l = x - W / 2, t = cy - H / 2;
+  const colX = [x - W * 0.19, x + W * 0.19];
+  const row0 = t + H * 0.115, rowStep = H * 0.088;
+  const knobCy = t + H * 0.795, knobRy = H * 0.115, knobRx = W * 0.36;
+  return `
+    <g data-hw="lock" data-owner="speciallock" data-kind="kodan">
+      <rect x="${(l + 2).toFixed(1)}" y="${(t + 3).toFixed(1)}" width="${W}" height="${H}"
+            rx="${W / 2}" fill="#000" opacity=".20"/>
+      <rect x="${l.toFixed(1)}" y="${t.toFixed(1)}" width="${W}" height="${H}" rx="${W / 2}"
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+      ${/* Ten buttons, two columns of five. The old drawing had nine in a 3x3
+            grid under a display bar, which is a DIGITAL keypad — a different
+            product, and one this catalogue already sells separately as
+            `digital` at ₪2,700. Drawing the ₪900 one as the ₪2,700 one is the
+            same class of fault as a price for a panel that is not drawn. */''
+       }${[0, 1, 2, 3, 4].map(r => colX.map(bx => `
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep).toFixed(1)}" r="${(W * 0.115).toFixed(1)}"
+                fill="#000" fill-opacity=".07"/>
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep - 1).toFixed(1)}" r="${(W * 0.095).toFixed(1)}"
+                fill="#fff" fill-opacity=".26"/>
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep + 1).toFixed(1)}" r="${(W * 0.075).toFixed(1)}"
+                fill="#000" fill-opacity=".16"/>`).join('')).join('')}
+      ${/* The turn knob: a rounded slab across the foot, proud of the body. */''
+       }<ellipse cx="${x.toFixed(1)}" cy="${(knobCy + 2).toFixed(1)}"
+                 rx="${knobRx.toFixed(1)}" ry="${knobRy.toFixed(1)}" fill="#000" fill-opacity=".22"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${knobCy.toFixed(1)}"
+               rx="${knobRx.toFixed(1)}" ry="${knobRy.toFixed(1)}" fill="url(#lockUnit)"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${(knobCy - knobRy * 0.30).toFixed(1)}"
+               rx="${(knobRx * 0.72).toFixed(1)}" ry="${(knobRy * 0.42).toFixed(1)}"
+               fill="#fff" fill-opacity=".22"/>
+    </g>`;
+}
+
+/**
+ * THE GRIP THIS DOOR ACTUALLY HAS — the catalogue entry with the customer's
+ * chosen length substituted for the model's fixed one.
+ *
+ * ⚠ ONE SUBSTITUTION, NOT SIX. `handle.len` is read by `barHalf`, by
+ * `channelHandle`, by `handleFootprint`, by `gripFeet` and by the bar's own
+ * drawing — five readers of one quantity. Threading `state.handleLen` to each
+ * of them would be five chances to miss one, and the symptom of missing one is
+ * a door drawn at a length nobody is charged for, or charged for a length
+ * nobody sees. So the length is resolved ONCE, here, and every reader
+ * downstream gets a handle whose `len` is already true.
+ */
+const gripOf = state => ({ ...byId(HANDLES, state.handle), len: handleLength(state) });
+
+/** Is this grip cut into the leaf rather than bolted onto it? */
+export const gripIsFixed = state => !!gripOf(state).fixed;
+
 /** The grip's position for this design: the customer's, or its home. */
 export function gripAt(state) {
   const home = gripHome(state);
   const g = state.grip;
-  if (!g) return home;
+  /* ⚠ A FIXED GRIP HAS ONE POSITION AND IT IS NOT NEGOTIABLE. The recessed
+     channel is cut into the leaf, not screwed to it; see its catalogue entry.
+     Answered HERE rather than only in the interface, because the position also
+     arrives down a link as `gp=` — and a rule that only the page enforces is a
+     rule a shared link walks straight past (CLAUDE.md §3, rules.js). */
+  if (!g || gripOf(state).fixed) return home;
   const rot = g.rot === 90 && gripCanRotate(state) ? 90 : 0;
   return { x: g.x, y: g.y, rot };
 }
@@ -2178,7 +4067,7 @@ export function gripAt(state) {
  */
 export function gripFeet(state, place = null) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   if (handle.style === 'none') return [];
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const p = place || gripAt(state);
@@ -2249,7 +4138,7 @@ export function gripFeet(state, place = null) {
  */
 export function gripPlacement(state, place = null) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   const p = place || gripAt(state);
   const at = { ...p, ok: true, why: null };
   if (handle.style === 'none') return at;
@@ -2264,12 +4153,40 @@ export function gripPlacement(state, place = null) {
      both standoffs were comfortably on the leaf and the bar between them was
      not. The feet are inboard of the ends by design — that is what `fix.t`
      is — so they can never answer this question. */
-  const half = handleFootprint(handle, leafH, gripPanelled(state, p)).vy;
+  const foot = handleFootprint(handle, leafH, gripPanelled(state, p));
+  const half = foot.vy;
   const cx = hingeLeftOf(state) ? leafW - p.x : p.x;
   const lo = p.rot === 90 ? cx - half : p.y - half;
   const hi = p.rot === 90 ? cx + half : p.y + half;
   const span = p.rot === 90 ? leafW : leafH;
-  if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad('הידית חורגת מהדלת');
+  if (lo < EDGE_FLAT || hi > span - EDGE_FLAT) return bad(T('why.gripOffDoor'));
+
+  /* ⚠ AND THE OTHER AXIS, WHICH NOTHING WAS CHECKING AT ALL.
+     The block above measures the grip along its LONG axis — down the leaf when
+     it stands up, across when it lies down — and that is all it measures. The
+     short axis was left to the feet loop below, which works for a bar (its
+     bosses are the widest thing on it) and does not work for anything whose
+     footprint is not symmetric about its own axis. The horizontal bow is the
+     case: it has no feet we can place at all, `gripFeet` returns [] for it by
+     design, and it reaches GRAB.len inboard of the point it is drawn from. So
+     nothing in this function knew whether it was on the door, and the drawing
+     silently shortened it against a hinge stop rather than saying so.
+     Written in `p.x` — inboard from the CLOSING edge — because that is the
+     axis `out` and `in` are named for, and the leaf runs 0..leafW in it too.
+     A grip lying down is symmetric about its axis by construction, so its
+     extent is its half length either way. */
+  const gx0 = p.rot === 90 ? p.x - foot.vy : p.x - foot.out;
+  const gx1 = p.rot === 90 ? p.x + foot.vy : p.x + foot.in;
+  if (gx0 < EDGE_FLAT || gx1 > leafW - EDGE_FLAT) {
+    return bad(T('why.gripOffDoor'));
+  }
+  /* The same interval read from the leaf's LEFT edge, which is the space the
+     aperture layout and the feet are written in. Two coordinate systems for
+     one leaf is not ideal, but they are both already here and the conversion
+     is one line; deriving it from `gx0`/`gx1` rather than repeating the
+     footprint arithmetic is what keeps them from drifting apart. */
+  const cgx0 = hingeLeftOf(state) ? leafW - gx1 : gx0;
+  const cgx1 = hingeLeftOf(state) ? leafW - gx0 : gx1;
 
   /* AND AT A HEIGHT SOMEBODY COULD REACH.
      Measured, from the ten installed doors carrying a pull bar: the bar's
@@ -2291,7 +4208,7 @@ export function gripPlacement(state, place = null) {
      this says. It is the SHORT grips this frees, which are exactly the ones
      worth dragging: the grab bar, and Shiran. */
   if (p.y < leafH * 0.18 || p.y > leafH * 0.82) {
-    return bad('הידית גבוהה או נמוכה מדי לשימוש');
+    return bad(T('why.gripReach'));
   }
 
   /* AND NOT ON THE HINGE SIDE. A pull standing upright past the leaf's centre
@@ -2306,17 +4223,36 @@ export function gripPlacement(state, place = null) {
      0.55 and not 0.50: on a narrow leaf a blade grip beside an Almog
      swan-neck has to stand 355 mm in, which is past the middle of a 700 mm
      leaf, and refusing that pairing outright is not this rule's business. */
-  if (p.rot === 0 && p.x > leafW * 0.55) return bad('ידית משיכה לא מותקנת בצד הצירים');
+  /* ⚠ AND NOT THE HORIZONTAL BOW, which is not a vertical pull and never was.
+     This rule is about where you put a bar you HAUL ON: past the centre line
+     there is no leverage, and no installation in the corpus has one there.
+     The grab bar is the other thing entirely — a bow you steady yourself with,
+     lying across the leaf, centred on it in every one of the nine installed
+     examples. Its `x` is its outboard TIP, so "past 0.55 of the leaf" is where
+     a centred 280 mm bow's tip sits on a narrow leaf as a matter of course.
+     Applied to it, this rule refused the bar's own home position — and,
+     together with the lockset clearance below, left it with no legal x at all
+     on a standard leaf with a lever. Its horizontal extent is checked by the
+     whole-object rule above now, which is the honest question to ask of it. */
+  if (p.rot === 0 && handle.style !== 'grab' && p.x > leafW * 0.55) {
+    return bad(T('why.gripHingeSide'));
+  }
 
   for (const f of feet) {
     if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT
         || f.y - f.r < EDGE_FLAT || f.y + f.r > leafH - EDGE_FLAT) {
-      return bad('הידית חורגת מהדלת');
+      return bad(T('why.gripOffDoor'));
     }
     for (const ob of obstacles) {
       if (footHits(f, ob)) {
-        return bad(ob.kind === 'window' ? 'הרגליים על מסגרת החלון'
-                                        : 'הרגליים על מסגרת הפאנל');
+        /* Three kinds now, and the third had been reading as the second:
+           the classical set's cornice, frieze and shelf are mouldings but
+           they are not the panel, and a customer told "the feet are on the
+           panel's frame" while the bar is across the SHELF is being told
+           where to look and looking at the wrong thing. */
+        return bad(ob.kind === 'window'   ? T('why.feetOnWindow')
+                 : ob.kind === 'moulding' ? T('why.feetOnFace')
+                                          : T('why.feetOnPanel'));
       }
     }
   }
@@ -2330,7 +4266,6 @@ export function gripPlacement(state, place = null) {
   const backset = lockBackset(handle, lockset);
   const lockX = hingeOnLeft ? leafW - backset : backset;
   const grip = handleFootprint(handle, leafH);
-  const gw = p.rot === 90 ? grip.vy : Math.max(grip.out, grip.in);
   const gh = p.rot === 90 ? Math.max(grip.out, grip.in) : grip.vy;
   /* The same arithmetic `gripStandoff` places the grip with, asked as a
      question — so the position it chooses is by definition one this accepts.
@@ -2346,9 +4281,28 @@ export function gripPlacement(state, place = null) {
      end shoe against that cylinder. It is `data-hw="lock"` in the drawing, so
      `npm run collide` would have said so too, on a leaf size the sweep did not
      happen to visit — which is why WIDE is in that sweep now. */
-  const locks = [{ y: leafH - HANDLE_AFF, inward: lock.in, vy: lock.vy }];
+  /* ⚠ `lockAff`, not HANDLE_AFF. The keyway-only lockset is drawn 116 mm lower
+     than a lever is, and this line said it was at lever height — so on those
+     doors the rule was clearing a box that is not where the object is. That is
+     CLAUDE.md §5's whole family: one quantity, two places, and the one nobody
+     is looking at goes stale. It reads the same function the drawing does. */
+  /* ⚠ A LEAF WITH NO LOCK FURNITURE HAS NOTHING HERE TO CLEAR, and the empty
+     list is the honest way to say so. Left as a zero-size box at the backset
+     it would still bind through `BAR_GAP_MIN` below — 76 mm of clearance
+     demanded around an object that is not on the door — and the customer would
+     be refused a grip position for touching nothing. The bare door is the one
+     the page opens on, so this is the commonest state there is. */
+  /* ⚠ EACH LOCK OBJECT CARRIES ITS OWN `x`, because they no longer share one.
+     The furniture sits at `backset` and the separate escutcheon at
+     KEYWAY_BACKSET — up to 25 mm apart on a Cadoor — so a single `backset` for
+     both would have this rule clearing a keyhole that is somewhere else. That
+     is CLAUDE.md §5's whole family and it would have been introduced by the
+     very change that fixed the keyhole. */
+  const locks = [{ x: backset, y: leafH - lockAff(lockset), out: lock.out,
+                   inward: lock.in, vy: lock.vy }];
   if (!lockset.lock) {
-    locks.push({ y: leafH - CYLINDER_AFF, inward: LOCK_R, vy: LOCK_R });
+    locks.push({ x: KEYWAY_BACKSET, y: leafH - CYLINDER_AFF,
+                 out: LOCK_R, inward: LOCK_R, vy: LOCK_R });
   }
   /* LOCK_CLEAR of air VERTICALLY as well as across. Without it a grip laid
      down came to rest exactly touching the lockset's box — the search walks it
@@ -2363,10 +4317,50 @@ export function gripPlacement(state, place = null) {
      0.090 on the closest of the ten installed doors that carry both.
      Only where the two are at the same HEIGHT. A bar dropped to the foot of
      the door has no argument with a lever 800 mm above it. */
+  /* ⚠ AND ACROSS THE DOOR IT IS AN OVERLAP OF TWO INTERVALS, NOT A DISTANCE
+     BETWEEN TWO CENTRES.
+     This used to compare `Math.abs(cx - lockX)` against `L.inward + gw +
+     LOCK_CLEAR`, where `gw` was `Math.max(grip.out, grip.in)` — the grip's
+     widest reach in EITHER direction, applied as though it stood on both sides
+     of its own axis. The comment above already admits the sin ("a symmetric
+     box around an asymmetric footprint") and it was only half-fixed: the
+     asymmetry was put into the footprint and never read back out here.
+     For a lever, out 40 and in 152, the error is a lenient 112 mm nobody
+     noticed. For the horizontal bow, which reaches 290 mm inboard and 4 mm
+     outboard, it demanded 290 mm of clearance on the side the bar is not on —
+     so on a standard leaf with a lever the bar had to stand past x = 562 while
+     the hinge-side rule refused anything past 467. No overlap, and every
+     position the customer tried came up red. Reported as *"the מאחז אופקי
+     doesnt want to be placed at places that are normal"*.
+     Both objects are now written as intervals inboard from the closing edge,
+     the way both are actually drawn, and they clash when the intervals
+     overlap. The floor at BAR_GAP_MIN of the leaf's width stays — that is the
+     tightest gap anyone actually installs, measured on the ten doors carrying
+     both — but it is applied as a gap between the two BOXES rather than
+     between their centres, which is the quantity it was measured as. */
   for (const L of locks) {
     const meet = Math.abs(p.y - L.y) < gh + L.vy + LOCK_CLEAR;
-    const clear = Math.max(L.inward + gw + LOCK_CLEAR, leafW * BAR_GAP_MIN);
-    if (meet && Math.abs(cx - lockX) < clear) return bad('הידית נוגעת במנעול');
+    if (!meet) continue;
+    /* Both in closing-edge coordinates: this lock object's box, and the
+       grip's. `L.x`, not `backset` — see the note where `locks` is built. */
+    const lo0 = L.x - L.out, lo1 = L.x + L.inward;
+    if (gx0 < lo1 + LOCK_CLEAR && gx1 > lo0 - LOCK_CLEAR) {
+      return bad(T('why.gripTouchesLock'));
+    }
+    /* ⚠ AND BAR_GAP_MIN IS AXIS TO AXIS, NOT BOX TO BOX. Folding it into the
+       overlap test above as a wider gap looked tidier and refused 602 designs
+       that `gripStandoff` had just placed — including the DEFAULT Idan bar on
+       a standard leaf, whose home is at exactly 185 mm from the lock axis and
+       whose boxes are exactly LOCK_CLEAR apart, because that is the number
+       `gripStandoff` solved for. Two different quantities: LOCK_CLEAR is air
+       between two drawn objects, BAR_GAP_MIN is how close a fitter puts the
+       two CENTRES, measured at 0.090 of leaf width on the closest of the ten
+       installed doors carrying both. `gripStandoff` floors the axis distance
+       and this asks the same question, so the position it chooses is by
+       construction one this accepts — which is the property that broke. */
+    if (Math.abs(p.x - L.x) < leafW * BAR_GAP_MIN) {
+      return bad(T('why.gripTouchesLock'));
+    }
   }
 
   /* AND THE SHAFT DOES NOT CROSS THE GLASS.
@@ -2380,10 +4374,15 @@ export function gripPlacement(state, place = null) {
      8 mm proud while the bar is 50 mm off the door on its standoffs. That is
      the same depth argument that lets a bar cross a moulded panel on d087 and
      d122, and it is why this reads `o` rather than the obstacle list. */
-  for (const o of apertureLayout(byId(WINDOWS, state.window), leafW)) {
-    if (Math.abs(cx - (o.x + o.w / 2)) < gw + o.w / 2
+  /* ⚠ AN INTERVAL OVERLAP HERE TOO, for the same reason as the lockset above:
+     this asked `Math.abs(cx - paneCentre) < gw + o.w / 2` with `gw` the grip's
+     widest reach in either direction, which puts the horizontal bow's 290 mm
+     on BOTH sides of its axis and refuses panes it is nowhere near. */
+  for (const o of apertureLayout(byId(WINDOWS, state.window), leafW,
+                                 byId(DETAILS, state.detail), leafH)) {
+    if (cgx0 < o.x + o.w && cgx1 > o.x
         && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
-      return bad('הידית חוצה את החלון');
+      return bad(T('why.gripCrossesWindow'));
     }
   }
 
@@ -2497,159 +4496,190 @@ export function nearestGrip(state, want) {
  * top-left arris, a body, and its own drop shadow onto the paint below-right,
  * because a thing standing proud of a surface has to cast something.
  */
-function metalStrips(lx, ly, lw, lh, count, tone, vertical, hingeOnLeft) {
-  /* ── the other axis ──────────────────────────────────────────────
-     Five doors run the strips UP the leaf, not across it: d034 d037 d038 d040
-     d043. Fewer of them and longer, grouped in the half of the leaf away from
-     the lock, because that is the half with nothing else on it.
-     Two things change besides the rotation. The lit arris moves from the top
-     edge to the LEFT edge, since the key is high and to the left and a
-     vertical strip presents its side to it rather than its top. And the run
-     stops well short of the head and foot, as every one of the five does. */
-  if (vertical) {
-    const t = Math.max(8, Math.round(lw * 0.018));
-    /* Away from the lock: the lock is on the closing edge, which is the side
-       opposite the hinges. */
-    const bandW = lw * 0.34;
-    const band0 = hingeOnLeft ? lx + lw * 0.10 : lx + lw * 0.56;
-    const gap = count > 1 ? bandW / (count - 1) : 0;
+/**
+ * WHERE AN EVEN COMPOSITION'S BANDS GO, MEASURED RATHER THAN FITTED.
+ *
+ * ⚠ THESE ARE NOT A SPAN FORMULA WITH A COUNT IN IT, and the pair is why. The
+ * ragged family below spreads over `0.458 + 0.044n` of the leaf, fitted on
+ * d063, d064 and d078; run at two bands that puts them at 0.23 and 0.77, and
+ * every two-band door in the corpus puts them at 0.43 and 0.61 — a pair about
+ * the lock's height, half the leaf apart from what a formula would say. So
+ * each even composition is a list of its own measured rows.
+ *
+ * Read with `tools/_strips.mjs`: rows whose median tone departs from the
+ * paint's own vertical falloff, grouped into bands, each band's ends found by
+ * walking the row outward while the departure holds.
+ *
+ *   pair   d035 0.426 0.609 (ruler-read)   d036 0.486 0.640   d049 0.380 0.590
+ *   quad   d063 0.199 0.402 0.611 0.808 — even to within 0.006; d056 agrees
+ *   band   d081 0.492 … 0.687, spacing 0.028 repeated seven times
+ */
+/**
+ * ⚠ THE ROWS ARE DERIVED FROM THE COUNT NOW, NOT LISTED PER COMPOSITION.
+ * `STRIP_ROWS` held three hand-written arrays — pair, quad, band — one per
+ * tile, and the tiles are gone: Peretz prices per stripe and the customer
+ * picks a number. The measurements above did not go with them; they became the
+ * two constants below, which reproduce every one of those arrays.
+ *
+ *     pitch = min(0.19, 0.80 / (n - 1)), centred on 0.52
+ *
+ *     n=2 -> 0.425 0.615        measured 0.430 0.613   (d035 d036 d049)
+ *     n=4 -> 0.235 … 0.805      measured 0.199 … 0.808 (d063, d056 agreeing)
+ *     n=9 -> 0.120 … 0.920      measured ~0.10 … ~0.90 (d078)
+ *
+ * A cap AND a span, because neither alone works: a fixed pitch puts nine
+ * strips off the bottom of the leaf, and a fixed span puts two of them half a
+ * leaf apart from where every two-band door in the corpus actually has them.
+ */
+const STRIP_H = { pitch: 0.19, span: 0.80, mid: 0.52 };
 
-    /* ── THEY ARE NOT THE SAME LENGTH, and that is the design ─────────
-       Every one of them ran 0.12 to 0.88 of the leaf, four identical bars in
-       a row, and not one door in the corpus looks like that. d037, d040, d043
-       and d038 all FAN: each successive line reaches higher than the last, so
-       the group reads as a composition rather than as a fence.
+/**
+ * THE TIGHT BAND — a second composition, and the reason the count needed a
+ * companion toggle.
+ *
+ * d081 is six equal full-width strips at a pitch of 0.033 centred on 0.55, read
+ * off a 5% ruled grid; d045 is five in the same shape crossing a pull bar. A
+ * count alone cannot choose between that and six SPREAD strips, and both are
+ * doors Peretz built. `STRIP_ROWS.band` recorded the same thing as an eight-row
+ * array — 0.492 … 0.687, spacing 0.028 repeated seven times — and this is that
+ * array turned into the rule behind it.
+ *
+ * ⚠ HORIZONTAL ONLY. Nothing in the corpus is a tight VERTICAL group, so the
+ * toggle does not appear on that axis: offering it would be inventing geometry
+ * no photograph supports, which REALISM.md §6 forbids.
+ */
+const STRIP_H_TIGHT = { pitch: 0.033, mid: 0.55 };
+/* How much of the leaf an even band spans. d035 measures 0.83 and 0.85 of the
+   leaf's width; d036, d059 and d066 all read at or past the 0.90 the scan
+   window allows, so they are full width and the true figure is above 0.90.
+   0.88, centred, which is inside every one of those. */
+const STRIP_EVEN_W = 0.88;
+/**
+ * WHERE A VERTICAL GROUP SITS, AND IT IS THE SAME FOR BOTH FAMILIES.
+ *
+ * ⚠ THE FANNED SET WAS SPREAD OVER A THIRD OF THE LEAF AND IT IS SPREAD OVER A
+ * SEVENTH. `bandW = lw * 0.34` was never measured; it is what "grouped in the
+ * half of the leaf away from the lock" turns into when nobody puts a ruler on
+ * it. Three doors, two of them from the hand-measured records and one from a
+ * leaf box that checks out at exactly a door's 0.415 aspect, all give the same
+ * pitch to three decimal places:
+ *
+ *     d037  0.256 0.329 0.402      (ruled)
+ *     d038  0.771 0.846 0.917      (record, strips on the lock side)
+ *     d043  0.698 0.771 0.846      (record)
+ *
+ * 0.073 every time. So the two vertical families share their COLUMNS exactly
+ * and differ only in how long the bands are — which is worth knowing, because
+ * it is also why the corpus records cannot tell them apart: a record carries
+ * each line's `x` and not its length.
+ *
+ * The group's CENTRE is the part that really varies — 0.329 on d037 against
+ * 0.156 and 0.228 on the two records, measured from the hinge edge. 0.33 is
+ * d037's, kept because its leaf box is the only one of the three this round
+ * verified, and because d037 is the door the option was asked for from.
+ */
+const STRIP_V = { pitch: 0.073, mid: 0.33 };
+/* How far a vertical band runs, top and foot as fractions of leaf height.
+   Measured on the long family — d037, d040, d046 — and confirmed on a ruled
+   grid this round: all three run from about 0.09 to about 0.95, equal to
+   within 2%. What looked like a fan in the photographs was the light on them. */
+const STRIP_V_RUN = { top: 0.098, foot: 0.945 };
+/** Which column strip `i` of `count` stands in, as a fraction of the leaf's
+ *  width FROM THE HINGE EDGE. */
+const stripVAt = (i, count) =>
+  STRIP_V.mid - (count - 1) * STRIP_V.pitch / 2 + i * STRIP_V.pitch;
 
-       Measured — each line's own top and bottom found by walking its column
-       until the tone stops departing from the paint beside it:
+/**
+ * ⚠ THE DETAIL ITSELF, NOT FIVE FLAGS OFF IT. This took `count`, `vertical`,
+ * `hingeOnLeft` and `cross` as separate arguments, and each new composition
+ * added another positional boolean that the one call site had to remember to
+ * pass. `even` and `rows` would have been the fifth and sixth. The catalogue
+ * entry IS the description of the composition; hand it over whole.
+ */
+/**
+ * THE STRIPES — a COUNT and a DIRECTION, drawn from measured constants.
+ *
+ * ⚠ THIS REPLACED FOURTEEN FIXED PATTERNS. Peretz prices stripes per stripe —
+ * *"horizontal each one 150 · vertical each 300 · remove all the complicated
+ * stripe patterns"* — and the test for "complicated", asked for from outside,
+ * is MORE THAN TWO DISTINCT STRIPE LENGTHS in the design. Re-read against all
+ * 129 photographs (research/works/INVENTORY.md §5a): the even and long
+ * families pass, the ragged, fanned and crossed ones fail, and three doors had
+ * been filed wrong — d045 and d078 are even, not ragged, and d066's vertical
+ * member is the black PULL BAR rather than a strip.
+ *
+ * So placement is derived from the number rather than chosen from a list.
+ *
+ * ── the spacing rule, from §5b ───────────────────────────────────────
+ *     2 strips   0.430  0.613                        pitch 0.183
+ *     4 strips   0.199  0.402  0.611  0.808          pitch 0.203
+ *     9 strips   ~0.10 … ~0.90                       pitch ~0.100
+ * One rule reproduces all three: **pitch = min(0.19, 0.80 / (n-1)), centred on
+ * 0.52.** n=2 gives 0.425/0.615 against a measured 0.430/0.613; n=4 gives
+ * 0.235…0.805 against 0.199…0.808. Two constants, no special cases.
+ *
+ * ── and the tight band is a second composition ───────────────────────
+ * d081 is six equal full-width strips at a pitch of **0.033** centred on 0.55,
+ * read off a 5% grid, and d045 is five in the same shape. A count alone cannot
+ * choose between that and six spread strips, so it is a toggle — asked for
+ * from outside once the two doors were shown.
+ * ⚠ TIGHT IS HORIZONTAL ONLY. There is no tight VERTICAL door anywhere in the
+ * corpus, and offering one would be inventing geometry no photograph supports
+ * — REALISM.md §6. The control hides itself on the vertical axis.
+ *
+ * ── the verticals ────────────────────────────────────────────────────
+ * `STRIP_V.pitch` is 0.073 of leaf WIDTH, measured on three doors separately
+ * and agreeing to three decimals, and the long family runs 0.098 to 0.945 of
+ * the leaf's height. Both survive unchanged: they were already a count at a
+ * fixed pitch, which is what this whole rewrite turns the horizontals into.
+ */
+function metalStrips(lx, ly, lw, lh, state, tone, hingeOnLeft) {
+  const { stripeDir: dir, stripeCount: n, stripeTight: tight } = state;
+  if (dir === 'none' || !n) return '';
 
-         d038  0.372-0.656   0.126-0.693   0.071-0.905
-         d043  0.405-0.831   0.166-0.816   0.037-0.767
+  /* One band, drawn the same way whichever axis it is on: a dropped shadow, the
+     body, a lit top edge and a darker under-edge. Four rects, and the two edges
+     are what stop it reading as a printed line. */
+  const band = (x, y, w, h) => `
+        <rect x="${(x + 3).toFixed(1)}" y="${(y + 3).toFixed(1)}" width="${w.toFixed(1)}"
+              height="${h.toFixed(1)}" fill="#000" opacity="0.22"/>
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
+              height="${h.toFixed(1)}" fill="${tone[2]}"/>
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}"
+              height="${Math.max(2, (w > h ? h : w) * 0.34).toFixed(1)}" fill="${tone[0]}"/>`;
 
-       Two things are common to both and neither was drawn. The TOPS climb
-       monotonically outward — 0.372, 0.126, 0.071 and 0.405, 0.166, 0.037 —
-       and the BOTTOMS stay roughly level, mean 0.778 over the six. So the fan
-       opens upward from a common foot, and the line nearest the leaf's outer
-       edge is the long one: the shortest is 0.28-0.43 of the leaf and the
-       longest 0.73-0.83, better than twice its length.
-
-       ORDERED BY DISTANCE FROM THE OUTER EDGE, not by index, because the band
-       is laid out from the hinge side and `i` therefore counts inward on one
-       handing and outward on the other. Drawn off the index the fan would have
-       been correct on right-hand doors and mirrored on left-hand ones — the
-       same handing trap that made half the recreations compare mirrored
-       doors. */
-    const FOOT = 0.778;                     // mean of the six measured bottoms
-    const HEAD_IN = 0.39, HEAD_OUT = 0.05;  // innermost and outermost tops
+  if (dir === 'h') {
+    const t = Math.max(8, Math.round(lh * 0.008));
+    const w = Math.round(lw * STRIP_EVEN_W);
+    const x = Math.round(lx + (lw - w) / 2);
+    const { pitch, mid } = tight ? STRIP_H_TIGHT : {
+      pitch: Math.min(STRIP_H.pitch, STRIP_H.span / Math.max(1, n - 1)),
+      mid: STRIP_H.mid,
+    };
+    const top = mid - (n - 1) * pitch / 2;
     const out = [];
-    for (let i = 0; i < count; i++) {
-      const x = Math.round(count > 1 ? band0 + gap * i : band0 + bandW / 2);
-      /* 0 at the leaf's outer (hinge) edge, 1 at the middle of the leaf. */
-      const inward = count > 1
-        ? (hingeOnLeft ? i / (count - 1) : 1 - i / (count - 1))
-        : 0.5;
-      const top = ly + lh * (HEAD_OUT + (HEAD_IN - HEAD_OUT) * inward);
-      const bot = ly + lh * FOOT;
-      const h = bot - top;
-      out.push(`
-        <rect x="${x + 3}" y="${(top + 3).toFixed(1)}" width="${t}" height="${h.toFixed(1)}"
-              fill="#000" opacity="0.22"/>
-        <rect x="${x}" y="${top.toFixed(1)}" width="${t}" height="${h.toFixed(1)}" fill="${tone[2]}"/>
-        <rect x="${x}" y="${top.toFixed(1)}" width="${Math.max(2, t * 0.34)}" height="${h.toFixed(1)}"
-              fill="${tone[0]}"/>
-        <rect x="${x + t - Math.max(2, t * 0.24)}" y="${top.toFixed(1)}"
-              width="${Math.max(2, t * 0.24)}" height="${h.toFixed(1)}" fill="${tone[4]}"/>`);
+    for (let i = 0; i < n; i++) {
+      out.push(band(x, ly + lh * (top + i * pitch) - t / 2, w, t));
     }
-    return `<g data-detail="strips" data-count="${count}" data-axis="vertical">${out.join('')}</g>`;
+    return `<g data-detail="strips" data-count="${n}" data-axis="horizontal"
+               data-tight="${tight ? 1 : 0}">${out.join('')}</g>`;
   }
-  /* HORIZONTAL. I drew them vertical first, from the tier summary's phrase
-     "ruled line work", and d078 settles it at a glance: eleven bands running
-     across the leaf, not up it. They also run nearly the full width — inset
-     about a tenth each side — rather than sitting in a central band.
-     Spacing is graduated, from the eleven measured positions -- see below. */
-  const t = Math.max(8, Math.round(lh * 0.008));    // strip thickness
-  /* Span and spacing both re-read off d078, whose eleven strips are recorded
-     one by one in research/works/data2/d078.json:
-       0.021 0.076 0.156 0.235 0.342 0.485 0.626 0.730 0.810 0.889 0.944
-     Two things follow. They run almost the whole height -- 0.02 to 0.94, not
-     the 0.09 to 0.91 drawn here. And they are GRADUATED: tight at the head and
-     foot, open across the middle. The gaps are .055 .080 .079 .107 .143 .141
-     .104 .080 .079 .055, a symmetric fan. Evenly spaced they read as a
-     barcode; graduated they read as a design, which is what the tier is
-     selling.
-     Normalised, those eleven positions sit within 0.023 of
-     0.6*smoothstep(u) + 0.4*u -- which is where the expression comes from. It
-     is a fit to eleven measurements, not a curve picked because it looked
-     about right. The comment that used to sit here said the real one is
-     graduated and called it "a refinement worth having only once the
-     orientation is right". The orientation has been right for two rounds. */
-  /* ── HOW FAR THE RUN REACHES, AND HOW EVENLY ──────────────────────
-     Both were read off d078 alone and both are functions of the COUNT, which
-     is visible the moment a second and third door are measured:
 
-       count 4   d063   0.199 0.402 0.611 0.808              span 0.609
-       count 7   d064   0.084 0.270 0.322 0.501 0.671 0.720 0.893   span 0.809
-       count 11  d078   0.021 0.076 0.156 ... 0.889 0.944     span 0.923
-
-     A few bands sit in the middle of the leaf; many of them reach nearly the
-     whole height. Fitted, span = 0.458 + 0.044n, which lands within 0.043 of
-     all three.
-     And the GRADUATION — tight at the head and foot, open across the middle —
-     is real at eleven and absent at four: d063's are evenly spaced to within
-     0.006. So the smoothstep is blended in with the count rather than applied
-     flat, which is what put three strips at 0.02, 0.50 and 0.94 of the leaf,
-     one on the top rail and one on the bottom.
-     The old constants were 0.02 and 0.94 for every count, which is d078's span
-     given to a door with three lines on it. */
-  const span = Math.min(0.95, 0.458 + 0.044 * count);
-  const top = ly + lh * (0.5 - span / 2), bot = ly + lh * (0.5 + span / 2);
-  const graded = Math.max(0, Math.min(1, (count - 4) / 7));
-  const spread = u => {
-    const s = 0.6 * (u * u * (3 - 2 * u)) + 0.4 * u;
-    return u + (s - u) * graded;
-  };
-
-  /* ── AND THEY ARE NOT ALL THE SAME WIDTH EITHER ───────────────────
-     Same fault as the vertical run above, on the other axis: eleven identical
-     bars from 0.09 to 0.91 of the leaf, and no door in the corpus does that.
-     Measured, each band's own left and right edge found by walking its row:
-
-       d064  starts 0.020 0.020 0.020 0.022 0.031 0.033 0.035
-             ends   0.963 0.719 0.625 0.934 0.618 0.708 0.947
-       d063  widths 0.626 0.530 0.519 0.684
-       d078  widths 0.629 0.843 0.642 0.223 0.492 0.194 0.364 0.264 ...
-
-     d064 is the clean case and it says two things. Every band starts at the
-     SAME EDGE — 0.020 to 0.035, which is the hinge stile, the half with
-     nothing else on it — and every band ends somewhere different. d078's top
-     three do the same thing mirrored (0.963, 0.959, 0.957 against its own
-     hinge edge, the door being handed the other way).
-
-     So: anchored at the hinge edge, free ends following d064's own rhythm,
-     cycled for any count. It is one door's composition rather than a law, and
-     that is the honest description of it — but it is one door's composition
-     against SEVEN IDENTICAL BARS, which is nobody's.
-
-     ⚠ The rhythm must not be random. A drawing that changes between two
-     renders of the same design is a drawing a customer cannot share. */
-  const RHYTHM = [0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91];
-  const anchor = hingeOnLeft ? lx + lw * 0.03 : lx + lw * 0.97;
+  /* Vertical: the measured pitch, the measured run, centred on the measured
+     column. `stripVAt` is the same helper the fanned family used — the columns
+     were always shared and only the lengths differed, which is what made the
+     fanned one droppable without losing the geometry. */
+  const t = Math.max(8, Math.round(lw * 0.013));
+  const y0 = ly + lh * STRIP_V_RUN.top;
+  const y1 = ly + lh * STRIP_V_RUN.foot;
   const out = [];
-  for (let i = 0; i < count; i++) {
-    const cy = count > 1 ? top + (bot - top) * spread(i / (count - 1)) : ly + lh / 2;
-    const y = Math.round(cy - t / 2);
-    const wide = Math.round(lw * RHYTHM[i % RHYTHM.length]);
-    const x0s = hingeOnLeft ? anchor : anchor - wide;
-    out.push(`
-      <rect x="${x0s + 3}" y="${y + 3}" width="${wide}" height="${t}"
-            fill="#000" opacity="0.22"/>
-      <rect x="${x0s}" y="${y}" width="${wide}" height="${t}" fill="${tone[2]}"/>
-      <rect x="${x0s}" y="${y}" width="${wide}" height="${Math.max(2, t * 0.34)}"
-            fill="${tone[0]}"/>
-      <rect x="${x0s}" y="${y + t - Math.max(2, t * 0.24)}" width="${wide}"
-            height="${Math.max(2, t * 0.24)}" fill="${tone[4]}"/>`);
+  for (let i = 0; i < n; i++) {
+    const f = stripVAt(i, n);
+    const cx = lx + lw * (hingeOnLeft ? f : 1 - f);
+    out.push(band(cx - t / 2, y0, t, y1 - y0));
   }
-  return `<g data-detail="strips" data-count="${count}" data-axis="horizontal">${out.join('')}</g>`;
+  return `<g data-detail="strips" data-count="${n}" data-axis="vertical"
+             data-tight="0">${out.join('')}</g>`;
 }
 
 /**
@@ -3140,9 +5170,40 @@ const HW_STILE = MOUNT_REACH + LOCK_CLEAR;
  * `glassClearance` can ask the same question without knowing where the leaf
  * was drawn.
  */
-export const apertureLayout = memo(function apertureLayout(win, leafW) {
+/**
+ * Where the glass actually goes. ONE enumeration — the drawing, the placement
+ * rules, `panelFits`, `glassClearance` and the catalogue glyph all read it.
+ *
+ * ⚠ `detail` IS AN INPUT BECAUSE A FACE DESIGN CAN OWN ITS OWN WINDOW.
+ * The classical set is a composition, not a feature: a cornice over a frieze
+ * over the glass over a corbelled shelf over a panel over a plinth, each sized
+ * to the next. Its window is 326 mm down a standard leaf and 781 tall; the
+ * catalogue's rectangle is 185 down and 902 tall, and drawn there the frieze
+ * and the glass occupy the same 60 mm of door. Measured on the first render
+ * beside the photograph, and unmissable — the ornament went straight through
+ * the opening.
+ * The alternative was to override the rectangle at the call site in `render`,
+ * which is the CLAUDE.md §5 trap in its purest form: the drawing would move
+ * the glass and `gripPlacement`, `panelFits` and `glassClearance` would all go
+ * on clearing the old one. Threading it through the one function instead means
+ * there is still one answer to where the glass is.
+ * The memo key carries it. A key that leaves an input out is a wrong answer
+ * cached — see `homeKey`.
+ *
+ * ⚠ AND `leafH` IS AN INPUT FOR THE SAME REASON. The set's own opening is
+ * declared as FRACTIONS of the leaf, because everything else about that
+ * composition is — see `winFrac` in the catalogue. A rect in millimetres needs
+ * no leaf height and the catalogue's three shapes still do not use it; the
+ * set's does, and without it the light stayed one size while the ornament
+ * round it grew with the door.
+ */
+export const apertureLayout = memo(function apertureLayout(win, leafW, detail, leafH = 0) {
   const rows = new Map();
-  for (const r of win.rects || []) {
+  const F = detail && detail.winFrac;
+  const rects = F && (win.rects || []).length
+    ? [{ w: leafW * (F.x1 - F.x0), h: leafH * (F.bot - F.top), top: leafH * F.top }]
+    : (win.rects || []);
+  for (const r of rects) {
     const k = `${r.top}|${r.h}`;
     if (!rows.has(k)) rows.set(k, []);
     rows.get(k).push(r);
@@ -3165,11 +5226,13 @@ export const apertureLayout = memo(function apertureLayout(win, leafW) {
     out.push({ x: at(lo), w: at(hi) - at(lo), top: sorted[0].top, h: sorted[0].h, splits });
   }
   return out;
-}, (win, leafW) => `${win.id}|${leafW}`);
+}, (win, leafW, detail, leafH = 0) =>
+     `${win.id}|${leafW}|${detail ? detail.id : '-'}|${leafH}`);
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
 function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
-                    splits = [] }) {
+                    splits = [], band = MOULD_BAND,
+                    profile = MOULD_DEFAULT }) {
   /* WORKED GLASS IS A GRILLE NOW. The pattern in the pane and the ironwork
      over it were two choices and are one, so the same option decides both:
      `glass: true` in the catalogue means it is etched into the glass, and
@@ -3204,12 +5267,19 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
      under it is what "the inside of it is bulging out" was; leaving the
      surround exempt would have been the same defect, waiting for a door with a
      window low enough to show it. */
-  const M = MOULD_BAND;
+  /* ⚠ THE BAND IS A PARAMETER NOW, and the classical set is why. Every other
+     opening in the range is cased in the same 70 mm stock the panels use. The
+     set is not: its light is closed at the bottom by the SHELF, and its rows
+     leave 59 mm between the frieze and the glass, so a 70 mm casing runs into
+     the frieze above and 61 mm into the shelf below. `npm run collide -- all`
+     reported that as eight "moulding x pane" overlaps and it was right — two
+     pieces of joinery drawn through each other, not an instrument artefact. */
+  const M = band, MF = band;
   const id = `cl-${key}`;
   return `
     <g data-pane="${key}" data-glass="${grille.glass ? grille.id : 'clear'}">
-      ${moulding(x - M, y - M, w + M * 2, h + M * 2, M, paint, isLight(paint),
-                 leaf, `a${key}`)}
+      ${moulding(x - M, y - M, w + M * 2, h + M + MF, M, paint, isLight(paint),
+                 leaf, `a${key}`, profile)}
       <!-- inner rebate: the glass is set back behind the moulding, so the last
            edge before the pane turns the other way -->
       ${bevel(x, y, w, h, 8, paint, false)}
@@ -3322,8 +5392,19 @@ function grillePaths(kind, x, y, w, h, tint) {
   /* The `-light` variants share their base pattern and differ only in colour,
      so strip the suffix before dispatching. Without this they matched no
      branch at all and drew an empty pane — a grille the customer paid for,
-     silently missing. */
-  kind = String(kind).replace(/-light$/, '');
+     silently missing.
+     ⚠ AND THE RAW NAME IS KEPT FOR THE ID, NOT THE STRIPPED ONE. Two tiles
+     that dispatch to the same branch still draw two SEPARATE `<path id>`
+     elements — `grid` and `grid-light` do not share one master — so stripping
+     before computing `uid` below made every light/dark pair emit the exact
+     same id with the exact same `d` a second time. Harmless by luck (the
+     browser resolves both tiles' `<use>` to whichever copy is first in the
+     document, and the two copies are identical), but still literally invalid
+     markup, and `npm run audit`'s duplicate-id sweep is right to say so —
+     the check that exists for the genuinely cross-kind version of this fault
+     is not wrong just because these two happen to agree. */
+  const idKind = String(kind);
+  kind = idKind.replace(/-light$/, '');
   const body = tint || '#232527';
   const gleam = tint ? '#fff' : '#8A8F94';
 
@@ -3340,8 +5421,8 @@ function grillePaths(kind, x, y, w, h, tint) {
      path data written again** — 840 long `d=` attributes, only 344 distinct,
      2.44x each. 61% of buildable doors exceeded REALISM.md's own 40 KB gate.
 
-     A `<use>` is a reference, and stroke paint is an INHERITED property, so the
-     three paints can hang off three `<use>` elements while the geometry is
+     A a use element is a reference, and stroke paint is an INHERITED property, so the
+     three paints can hang off three a use element elements while the geometry is
      written once. `fill="none"` stays on the path itself, where a presentation
      attribute beats inheritance, so the master never paints.
 
@@ -3352,10 +5433,30 @@ function grillePaths(kind, x, y, w, h, tint) {
      every render differ from the last. A door can carry two panes (a leaf and
      a sidelight), so the pane's rounded origin is what keeps them apart.
 
+     ⚠ AND KIND HAS TO BE PART OF IT TOO — geometry alone collides the moment
+     two DIFFERENT grilles share an origin, which every tile glyph does:
+     `grilleGlyph` calls this with `x=0, y=0` for every one of the fourteen
+     options, so all of them computed the same `k0_0_0`, `k0_0_1`… regardless
+     of what they drew. Measured on the live choices panel, no query string
+     involved: **130 `k`-prefixed ids, 31 unique** — nine tiles (grid, scroll,
+     iron, quatrefoil, arch…) genuinely sharing `id="k0_0_0"` with nine
+     different `d` attributes. Per the SVG spec an id resolves to the FIRST
+     matching element in the whole DOCUMENT, not per `<svg>` root — the same
+     mechanism `copyOf` exists to fix for the gallery, one level down: there
+     the id was the same because there was one door for years, here it is the
+     same because every glyph is drawn at the same fake origin.
+     ⚠ AND `idKind`, NOT THE STRIPPED `kind` — see the note above this
+     function's first line. Keying off the stripped name got every
+     cross-kind collision but traded it for 41 same-kind ones, `grid` against
+     its own `grid-light`, harmless in pixels and still invalid markup.
+     `npm run audit`'s sweep does not know "harmless" from "genuine"; it counts
+     `[id]` and it is right to. Confirmed clean after: 130 kids in, 130 unique
+     out.
+
      ⚠ `usedDefs` walks `href="#…"` transitively, but only ever resolves ids it
      finds in the DEFS block. These live in the body, so the pruner skips them
      and cannot mistake one for an unreachable gradient. */
-  const uid = `k${Math.round(x)}_${Math.round(y)}`;
+  const uid = `k${idKind}_${Math.round(x)}_${Math.round(y)}`;
   let seq = 0;
   const master = new Map();
   const ref = d => {
@@ -3410,7 +5511,7 @@ function grillePaths(kind, x, y, w, h, tint) {
   /* ⚠ `solid` DELIBERATELY KEEPS ITS TWO COPIES, and the reason is the master.
      A stroke master carries `fill="none"` so that it never paints on its own
      while sitting in the body — and a presentation attribute on the referenced
-     element beats anything inherited through a `<use>`, so a filled `<use>` of
+     element beats anything inherited through a a use element, so a filled a use element of
      that same master would paint nothing at all. Giving `solid` its own
      unfilled master would mean the masters could no longer live in the body,
      which means collecting them and prepending a `<defs>` — and `grillePaths`
@@ -3475,6 +5576,126 @@ function grillePaths(kind, x, y, w, h, tint) {
      PAINTED variant, so `grid` (dark) has no photograph behind it. It stays,
      because `light` is one axis over the whole list and collapsing the pair
      would leave two prices on one picture. It is a question for Peretz. */
+  /* ── סורג טבעות — THE RING LATTICE ──────────────────────────────────
+     The door in `research/newdoor/` — the one Peretz installed while this was
+     being written, and the first in the range to carry this panel.
+
+     ⚠ EVERY NUMBER BELOW WAS MEASURED, NOT CHOSEN, and the three throwaway
+     harnesses that measured it are worth naming because the eye got this wrong
+     four times running — it reads as tangent circles, as an ogee lattice, as a
+     stagger and as a checkerboard depending on which corner of the photograph
+     you happen to be looking at, and I believed three of those in turn:
+
+       a 2-D AUTOCORRELATION of the pane's dark mask, which returns the repeat
+         vectors whatever the eye thinks:  512 x 440 photo px
+       a MEDIAN STACK of every whole repeat — a median, not a mean, because a
+         reflection sits on one cell only and a median throws it away where a
+         mean smears it over all of them
+       a HOUGH VOTE for the ring radius, which found 245 px, and then the
+         candidate lattice drawn back over the photograph in red to check it
+
+     That last step is the one that mattered. Both of the readings I had talked
+     myself into — four small rings across the light, and a checkerboard of
+     filled and empty interstices — died the moment the circles were drawn on
+     top of the photograph, and neither would have died without it. It costs
+     twenty lines. Draw the answer over the evidence.
+
+       repeat / ring pitch   512 x 440 photo px  =  174 x 151 mm
+       rings across the      356 mm light        =  2.05
+       ring radius           245 px              =   83 mm  (166 diameter)
+       bar                                       =    4.7 mm
+
+     So: 0.955 of the pitch across, which is a whisker off TANGENT, and 1.10 of
+     the pitch along it, so the rings OVERLAP top to bottom. That is where the
+     pointed leaf-shaped crossings come from, and getting the two ratios the
+     same would lose them.
+
+     ⚠ THE CURLS SIT IN THE DIAGONAL GAPS, FOUR AT A TIME. Where two rings
+     merely cross there is nothing but the crossing; it is the concave diamond
+     between four rings that carries the ornament, and it carries a rosette of
+     four commas, each hooking inwards to a stopped eye with a horn left
+     pointing out at the corner. Because that gap lattice has the same pitch as
+     the rings, the whole pane repeats at 512 x 440 and not at some multiple of
+     it — which is the cross-check that this reading is the right one.
+
+     ⚠ AND THE COMMAS ARE HEAVIER THAN THE RINGS. On the door they are forged
+     scroll ends, wide at the shoulder and drawn to a point; here they are the
+     same stroke at 1.5x, which is the cheapest thing that keeps them reading
+     as ornament rather than as more of the same wire.
+
+     ⚠ IT IS IRONWORK, NOT ETCHED GLASS, AND THAT IS WHY `circles` COULD NOT BE
+     REUSED. `circles` draws one flat stroke on purpose — its own comment says
+     "this is etched glass, not a forged member" — and it has `glass: true` in
+     the catalogue, so it prices and reads as a treatment of the pane. What the
+     photograph shows is black bar standing in front of the glass, with a
+     shadow on one side and a lit edge on the other. Same geometry family,
+     different object. */
+  if (kind === 'rings') {
+    /* ⚠ THE LATTICE IS SQUARE AND THE RINGS ARE TANGENT, and the elaborate
+       thing that stood here before — a rectangular cell 0.955 of the pitch
+       across and 1.10 along, with a rosette in the diagonal gaps AND a smaller
+       pair at every crossing — was built on a pane measurement taken off a
+       crop that was not the pane. Re-measured against `tools/_upright.mjs`'s
+       leaf crop, at matched scale beside our own render:
+
+         ring pitch      240 px of a 676 px pane  =  0.355 of the light
+         ring diameter   240 px                   =  THE SAME, so tangent
+         across          676 / 240                =  2.8 rings
+         down            1516 / 240                =  6.3 rows
+
+       Square, tangent, 2.8 across. The overlap I thought I could see was the
+       COMMAS bridging the tangency points, which is what they are for.
+       ⚠ And there is no separate ornament at the crossings. Four commas per
+       diagonal gap and nothing else; the extra pairs put a chain of ornament
+       down every column of the pane and turned an airy grille into a mesh. */
+    const ACROSS = 2.8;
+    const PX = w / ACROSS, R = PX / 2;
+    const sw = Math.max(1.1, PX * 0.038);   // 9 px of a 240 px pitch
+    const nx = Math.ceil(ACROSS), ny = Math.ceil(h / PX);
+    const ox = x + (w - nx * PX) / 2, oy = y + (h - ny * PX) / 2;
+    const cxOf = i => ox + (i + 0.5) * PX, cyOf = j => oy + (j + 0.5) * PX;
+
+    let d = '';
+    for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
+      const cx = cxOf(i), cy = cyOf(j);
+      d += `M ${n2(cx - R)} ${n2(cy)} a ${n2(R)} ${n2(R)} 0 1 0 ${n2(R * 2)} 0
+            a ${n2(R)} ${n2(R)} 0 1 0 ${n2(-R * 2)} 0 `;
+    }
+
+    /* THE MOUSTACHES, AND THEY SIT AT THE TANGENCIES — not in the diagonal
+       gaps, which is where two rebuilds of this branch put them and is why
+       both came out as a mesh. Beside the photograph at matched scale the
+       structure is plain: every point where two rings touch carries a PAIR of
+       commas, one belonging to each ring, tails meeting at a cusp on the
+       tangency and eyes swung out to either side. Four tangencies to a ring,
+       each shared with a neighbour, so two commas per ring per axis and
+       nothing at all in the concave squares between four rings — those stay
+       open, and that openness is half of what the pane looks like.
+       `curl` takes the EYE first and the free end second, so each comma is
+       written from its eye back to the cusp it grows out of. */
+    const EYE_P = 0.190, EYE_A = 0.090, CUSP = 0.050, TURNS = 0.68;
+    let cur = '';
+    const pair = (mx, my, ax, ay) => {
+      const px = -ay, py = ax;
+      /* ⚠ TWO COMMAS, NOT FOUR. Drawn on both sides of the tangency they
+         closed into a four-lobed clover at every crossing and the pane came
+         out as a field of flowers. The photograph has one moustache per
+         tangency: two commas, mirrored about the ring-to-ring axis, tails
+         meeting at a cusp on the tangency point and eyes swung out. */
+      for (const k of [-1, 1]) {
+        cur += poly(curl(mx + (px * k * EYE_P - ax * EYE_A) * PX,
+                         my + (py * k * EYE_P - ay * EYE_A) * PX,
+                         mx + ax * CUSP * PX, my + ay * CUSP * PX,
+                         TURNS, k > 0 ? 1 : -1)) + ' ';
+      }
+    };
+    for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
+      pair(cxOf(i) + PX / 2, cyOf(j), 1, 0);      // between side neighbours
+      pair(cxOf(i), cyOf(j) + PX / 2, 0, 1);      // and stacked ones
+    }
+    return ink(d, sw) + ink(cur, sw * 1.30);
+  }
+
   if (kind === 'grid') {
     /* ⚠ 0.38, not 0.40, and the two hundredths matter. d091 and d122 are the
        two doors that carry three columns and four rows, and both are
@@ -3804,6 +6025,823 @@ function grillePaths(kind, x, y, w, h, tint) {
   return '';
 }
 
+/* ── THE CLASSICAL SET ──────────────────────────────────────────────────
+ *
+ * ⚠ EVERY ROW HERE IS MEASURED, and the door it is measured from is in
+ * `research/newdoor/`. It was photographed lying flat, so the photograph's X
+ * axis is the door's HEIGHT — which is why the ornament reads as three
+ * vertical strips in the raw files and as three horizontal bands once it is
+ * turned upright. Getting that backwards would have produced a door with a
+ * pull bar across its middle.
+ *
+ * Read off the upright photograph by the luminance derivative down the leaf's
+ * centre (`tools/_rows.mjs` in the round that built this): every moulding is a
+ * light/dark pair across a horizontal edge, so the derivative finds them all,
+ * and finds them in the paint's own colour — which a colour test cannot,
+ * because the ornament is painted the same green as the leaf.
+ *
+ * Fractions of leaf HEIGHT, top down:
+ */
+const CLASSIC_ROWS = {
+  /* ⚠ THIS TABLE HAS BEEN WRONG TWICE, AND BOTH TIMES FOR THE SAME REASON: the
+     picture the fractions were read off was not the leaf.
+     `/tmp/photo-upright.png` was the whole rotated photograph with the door
+     inside it and background all round, so a fraction of THAT picture is not a
+     fraction of the door — every row came out 2 to 5 per cent low, which is a
+     centimetre and a half at the ends of a real door and is exactly why three
+     separate readings disagreed with each other.
+     `tools/_upright.mjs` now cuts the leaf out of `research/newdoor/full.jpg`
+     by a box stated once, and the check that it is the right box is free: the
+     crop comes out 1537 x 3698, an aspect of 0.416, against our own leaf's
+     0.415. A door is not a square; if the crop's aspect matches the model's,
+     the crop is the door.
+     Everything below is then read off THAT with a ruler drawn on it
+     (`tools/_ruler.mjs`, a red line every 0.05 and an orange tick every 0.01)
+     rather than off a luminance derivative alone — the derivative finds every
+     edge including the plastic sheeting over the top of this door, and the
+     first version of this table mistook two of those for the cornice. */
+  /* ⚠ AND A THIRD TIME, FOR A THIRD REASON — but this one is 0.86% and the
+     two before it were five per cent. `tools/_upright2.mjs` replaces the
+     rectangular crop with a RECTIFIED one: the door lies on the ground about
+     two degrees off level and further from the camera at its foot than at its
+     head, so its outline in the photograph is a trapezoid 1626 px across at
+     the head and 1558 at the foot, and no rectangle is both. The box in use
+     came out 3698 px long against the real 3730, so every row read off it was
+     3730/3698 = 1.0086 too large. Each figure below is the ruled read divided
+     by that. `foot` still ends at 1.000, because the foot piece ends at the
+     leaf's foot by construction — what the old crop did was stop 0.86% short
+     of it.
+     Re-read on the rectified picture, the ruler agrees with these to within
+     0.01 everywhere, which is its own reading error at this scale — so the
+     rows were never the problem. The COLUMNS were: see CLASSIC_COLS. */
+  /* ⚠ THE HEAD IS CONTIGUOUS. These three used to leave 0.003 and 0.004 of
+     bare leaf between them — six and eight millimetres — and at door scale
+     that reads as three pieces floating one above another where the
+     photograph has corona, dentils and block stacked hard against each other
+     as one assembly. The gaps were never measured; they are what is left over
+     when three edges are each read to the nearest 0.001 and nothing checks
+     that they meet. `cornice` now runs down to the bead course and the bead
+     course down to the block. */
+  cornice: [0.029, 0.059],   // corona and the cavetto under it, as one cap
+  beads:   [0.059, 0.075],   // the bead course, in its own recess
+  frieze:  [0.075, 0.125],   // the raised block: flutes, tablet, oval
+  shelf:   [0.554, 0.595],   // the shelf's own corona and hollow
+  band:    [0.595, 0.664],   // its face, carrying the horizontal pull
+  panel:   [0.675, 0.910],   // the raised panel
+  plinth:  [0.916, 0.945],   // the frieze upside down
+  pbeads:  [0.949, 0.963],   // its bead course, UNDER the block
+  foot:    [0.963, 1.000],   // and the splayed ogee down to the floor
+};
+/* Fractions of leaf WIDTH, centred: the middle is the middle.
+   ⚠ FOUR OF THESE SIX WERE WRONG, AND THE CAUSE WAS THE CROP AGAIN. The old
+   note here said the photograph's right-hand features "read four to five per
+   cent low against its left-hand ones" and kept only the widths on the
+   argument that the distortion cancels in a width. It does not — the door is
+   photographed at an angle AND tapering, so a rectangular crop shears it, and
+   a sheared picture gets a piece's width wrong by however far down the door it
+   sits. That is exactly the pattern: the shelf and the band, which sit at the
+   middle of the leaf, came out right; the cornice and frieze at the head and
+   the panel and plinth at the foot came out narrow.
+   `tools/_upright2.mjs` rectifies the leaf from its four measured corners, and
+   these are ruled off THAT — a 0.025 grid over the head, the shelf, the panel
+   and the plinth in turn.
+
+               was            now        moved
+     cornice   0.647          0.710      +63 mm on an 850 leaf
+     frieze    0.545          0.588      +43
+     shelf     0.649          0.648      confirmed
+     band      0.429          0.428      confirmed
+     panel     0.516          0.540      +24
+     plinth    0.555          0.588      +33
+
+   ⚠ AND THE FRIEZE AND THE PLINTH COME OUT IDENTICAL, which is the check this
+   table never had. `classicBand` is built on the claim that the plinth IS the
+   frieze upside down — same block, same flutes, same oval, same bead course —
+   and it was drawn 33 mm wider than the frieze while claiming it. Two
+   independent ruler reads now put both at 0.588. */
+const CLASSIC_COLS = {
+  cornice: [0.145, 0.855],   // width 0.710 — the widest thing on the door
+  frieze:  [0.206, 0.794],   // width 0.588
+  shelf:   [0.176, 0.824],   // width 0.648
+  band:    [0.286, 0.714],   // width 0.428 — the face BETWEEN the two brackets
+  panel:   [0.230, 0.770],   // width 0.540
+  plinth:  [0.206, 0.794],   // width 0.588 — the frieze, upside down
+};
+/* The window the set is built around. 0.155 to 0.5545 of the leaf's height and
+   0.422 of its width, which on our 850 x 2050 leaf is 359 x 819 at 318 from
+   the head — close to the catalogue's own `rect` and not the same as it.
+   ⚠ READ OFF THE CATALOGUE, not written twice. It lived here as four numbers
+   and in `catalog.js` as a rect in millimetres, and the two answers drifted
+   apart the moment the leaf stopped being 850 x 2050: the drawing's solid
+   panel scaled with the door and `apertureLayout`'s glass did not. Same
+   fractions, one statement, and `apertureLayout` turns them into millimetres
+   for whatever leaf it is handed. */
+const CLASSIC_GLASS = byId(DETAILS, 'classic').winFrac;
+/* The stock the SET's light is cased in, and it is not the range's 70 mm.
+   Ruler-read: the frieze block ends at 0.126 of the leaf and the glass starts
+   at 0.155, which leaves 0.029 — 59 mm on a 2,050 leaf. At 70 the casing runs
+   into the frieze above it and 61 mm into the shelf below, and the shelf is
+   what closes this light at the bottom in the first place. */
+/* The bracket under each end of the shelf, as fractions of the leaf's WIDTH.
+   Read off the ruled photograph; the crop at `classicCorbel` agrees to within
+   half a centimetre from a rougher instrument. Stated here because
+   `classicPieces` declares them and `classicSet` draws them, and those two
+   disagreeing about where a bracket is is exactly what `npm run collide`
+   exists to catch. */
+const CLASSIC_CORBEL = { w: 0.070, gap: 0.006 };
+export const CLASSIC_BAND = 59;
+/* ⚠ ALL ROUND, AND THERE WAS A `CLASSIC_BAND_FOOT` OF NINE MILLIMETRES HERE.
+   It said the shelf closes the light so there is barely any casing under it —
+   0.5545 to 0.559 of the leaf — and it was a fudge covering a wrong number one
+   level up. `winFrac.bot` held 0.5545, which is not where the GLASS stops: a
+   scan down the middle of the rectified leaf finds the pane's black rebate at
+   0.530 and the shelf's top at 0.554, with a lit moulded band between them.
+   0.5545 was the CASING's outer edge, entered as the glass's.
+
+   Two things followed from that and both were visible. `moulding()` draws all
+   four of its runs at the same band, so the bottom run — 59 tall in a
+   rectangle only 9 deep below the glass — reached 50 mm UP INTO the pane and
+   the glass was then painted over it, leaving the light with no casing at its
+   foot at all. Reported from outside as *"when i put on the window, on the
+   bottom it ovelaps the panel."*
+
+   The casing is ONE section mitred round the opening, 59 mm on all four sides:
+   the head reads 0.125 to 0.154 of the leaf's height, 59 mm, and the sides
+   0.220 to 0.289 of its width, 59 mm. A uniform 59 puts the glass's foot at
+   0.554 - 0.029 = 0.525, and the direct read of the rebate is 0.530 — nine
+   millimetres apart, which is this instrument's own error at that scale and
+   less than the width of the rebate line itself. One number, four sides. */
+
+/**
+ * THE SET'S PIECES AS RECTANGLES, NAMED ONCE.
+ *
+ * ⚠ THIS EXISTS BECAUSE `npm run collide -- all` COULD NOT CHECK THE SET, and
+ * the diagnosis is not mine — the recurring agent traced it in run 29 and left
+ * the fix for whoever owned the drawing, which by then was this round. Two
+ * separate things were wrong and both were about TAGGING rather than geometry:
+ *
+ *   the sweep saw one composite. `classicSet` returned everything inside a
+ *     single `<g data-detail="classic">`, whose bounding box runs cornice to
+ *     plinth and therefore crosses the window's row in the gap between the
+ *     pieces. Four designs were reported as "classic x pane" overlaps where
+ *     nothing in the composition comes near the glass.
+ *   the drift reader saw nothing. It knows how to find a `window` and a
+ *     `panel` in the markup and there was no third thing to find, so the five
+ *     moulding rectangles `faceObstacles` declares could never be confirmed
+ *     against the drawing — 20 obstacles "the rules believe in and the drawing
+ *     does not", every one of them actually drawn.
+ *
+ * So the pieces are named here, `classicSet` draws them from this table and
+ * tags each one, and `faceObstacles` declares them from the same table. The
+ * two cannot disagree about position — which is what that check is for, and
+ * it can now do its job instead of reporting a tagging artefact.
+ *
+ * ⚠ THE BAND'S SPAN INCLUDES ITS BRACKETS. The face between the corbels is
+ * 0.286 to 0.714 of the leaf, but the corbels hang outside it to 0.210 and
+ * 0.790, and a pull bar put through a corbel is through a corbel. An obstacle
+ * is what is ON the door, not what the joinery drawing calls one piece.
+ */
+/**
+ * THE SET'S OPENING WITH ITS CASING ROUND IT — the rectangle that holds glass
+ * on the glazed variant and timber on the solid one.
+ *
+ * ⚠ THROUGH `apertureLayout`, NOT OFF THE FRACTIONS. Multiplying `winFrac` by
+ * the leaf here would agree with the glazed variant on five sizes out of six
+ * and disagree on the narrow leaf, where `apertureLayout` pulls the opening in
+ * so the architrave does not eat the stile the ironmongery is bolted to. One
+ * function answers where the hole is; this only adds the casing round it.
+ */
+function classicLight(leafW, leafH) {
+  const [o] = apertureLayout(byId(WINDOWS, 'rect'), leafW,
+                             byId(DETAILS, 'classic'), leafH);
+  return { x: o.x - CLASSIC_BAND, y: o.top - CLASSIC_BAND,
+           w: o.w + CLASSIC_BAND * 2,
+           h: o.h + CLASSIC_BAND * 2 };
+}
+
+export function classicPieces(leafW, leafH, glazed = true) {
+  const R = CLASSIC_ROWS, C = CLASSIC_COLS;
+  const of = (row, x0, x1) => ({
+    x: leafW * x0, y: leafH * R[row][0],
+    w: leafW * (x1 - x0), h: leafH * (R[row][1] - R[row][0]),
+  });
+  return [
+    { piece: 'cornice', kind: 'moulding', ...of('cornice', ...C.cornice) },
+    { piece: 'frieze',  kind: 'moulding', ...of('frieze',  ...C.frieze)  },
+    { piece: 'shelf',   kind: 'moulding', ...of('shelf',   ...C.shelf)   },
+    { piece: 'band',    kind: 'moulding', ...of('band',    ...C.band)     },
+    /* ⚠ THE BRACKETS ARE TWO PIECES, AND THEY USED TO BE PART OF THE BAND —
+       the band's span was widened to 0.210-0.790 so that it covered them,
+       because an obstacle is what is on the door and a pull bar put through a
+       corbel is through a corbel. That was true and it forced the DRAWING
+       order: everything in one group meant the brackets were painted before
+       the shelf, so the shelf's cast shadow fell across them and they came out
+       as two pale smudges where the photograph has them lit and crisp. A
+       corbel stands PROUD of the band and carries the shelf; it is not in the
+       shelf's shadow.
+       Naming them separately costs nothing the wide band bought — the same
+       leaf is still covered, by three rectangles instead of one — and it lets
+       `classicSet` draw them last. */
+    ...[0, 1].map(r => ({
+      piece: r ? 'corbelR' : 'corbelL', kind: 'moulding',
+      x: leafW * (r ? C.band[1] + CLASSIC_CORBEL.gap
+                    : C.band[0] - CLASSIC_CORBEL.gap - CLASSIC_CORBEL.w),
+      y: leafH * R.shelf[1], w: leafW * CLASSIC_CORBEL.w,
+      h: leafH * (R.band[1] - R.shelf[1]),
+    })),
+    { piece: 'panel',   kind: 'panel',    ...of('panel',   ...C.panel)   },
+    { piece: 'plinth',  kind: 'moulding', ...of('plinth',  ...C.plinth)  },
+    { piece: 'foot',    kind: 'moulding', ...of('foot',    ...C.plinth)  },
+    /* ⚠ AND A PANEL WHERE THE LIGHT WOULD BE, WHEN THERE IS NO LIGHT. The set
+       was built round a window and `needsWindow` forced one; a photograph of
+       the same set SOLID — cornice, frieze, a big raised panel with a peephole
+       and a ring knocker, shelf, panel, plinth — says that is one variant of
+       two, not the product. It takes the light's own rectangle so the two
+       variants are the same composition with the glass swapped for timber,
+       which is what the door shows.
+       It is a `moulding` piece and not a `panel` one, deliberately: the price
+       charges for the SET, and the set's own composition is not a second panel
+       the customer bought. The lower panel is still the one thing tagged
+       `data-detail="panel"`, and still the one thing the price is about. */
+    /* ⚠ THE CASING'S RECTANGLE, NOT A RECTANGLE OF ITS OWN — and this was
+       reported from outside: *"when i put on a window the panel changes, it
+       supposed to be the same size."* It was true and it was two rectangles.
+       The glazed variant's outline is drawn by `aperture`, which cases the
+       light in CLASSIC_BAND all round; the
+       solid one was written here off `C.panel`, on a reading of the solid
+       photograph that made the upper rectangle as wide as the lower one. Both
+       readings can be defended off their own photograph and only one of them
+       can be true of one door, so toggling the window moved the outline 19 mm
+       out at the sides and 59 mm down at the head.
+       ONE opening, two fills: the same hole in the leaf, holding glass behind
+       a casing or holding timber. And it is not computed here from the
+       fractions either — `classicLight` asks `apertureLayout`, the same
+       function the glazed variant asks, so the narrow leaf's clamp applies to
+       both or to neither. */
+    ...(glazed ? [] : [{ piece: 'light', kind: 'moulding',
+                        ...classicLight(leafW, leafH) }]),
+  ];
+}
+
+/**
+ * A PROJECTING ENTABLATURE: corona, cavetto, and the shadow it throws.
+ *
+ * ⚠ THE FIRST TWO VERSIONS WERE PLANKS, and beside the photograph that is
+ * exactly what they looked like — a ruler laid on the door. Three stepped
+ * rectangles is not a cornice either: it reads as three rulers.
+ *
+ * What makes a cornice a cornice is that it stands OFF the face, so light
+ * strikes its top and nothing strikes underneath. Two surfaces do all the
+ * work:
+ *
+ *   the CORONA   a flat slab, its top face the brightest thing in the drawing
+ *                and its front edge cut by a hard dark drip line
+ *   the CAVETTO  a hollow sweeping back and down from the drip to the wall —
+ *                DARK where the corona overhangs it, lightening towards the
+ *                bottom where it catches bounce off the door
+ *
+ * plus a soft shadow thrown on the leaf below. That is the whole illusion, and
+ * it is three shapes rather than the six the first version used.
+ *
+ * `flare` turns it upside down for the foot of the plinth: there the hollow
+ * splays OUT as it descends and the wide edge is at the bottom.
+ */
+function classicCap(x, y, w, h, paint, key = 'c', flare = false, coronaF = 0.68) {
+  const n = v => Number(v.toFixed(1));
+  const back = w * 0.030;            // how far the hollow returns to the wall
+  const corona = h * (flare ? 0.20 : coronaF);   // ruler-read per cap, see classicSet
+  const lip = h * 0.10;              // the bright fillet on the corona's top
+  const id = `cav-${key}`;
+
+  /* The hollow, as one path. Written from the wide edge to the narrow one so
+     the same four points serve both orientations. */
+  const wide = flare
+    ? [x, y + h, x + w, y + h]                       // splays out at the foot
+    : [x, y + corona, x + w, y + corona];            // overhangs at the head
+  const narrow = flare
+    ? [x + back, y, x + w - back, y]
+    : [x + back, y + h, x + w - back, y + h];
+  const hollow = `M ${n(wide[0])} ${n(wide[1])}
+      C ${n(wide[0] + back * 0.2)} ${n((wide[1] + narrow[1]) / 2)}
+        ${n(narrow[0])} ${n((wide[1] + narrow[1]) / 2)} ${n(narrow[0])} ${n(narrow[1])}
+      H ${n(narrow[2])}
+      C ${n(narrow[2])} ${n((wide[3] + narrow[3]) / 2)}
+        ${n(wide[2] - back * 0.2)} ${n((wide[3] + narrow[3]) / 2)} ${n(wide[2])} ${n(wide[3])} Z`;
+
+  return `
+    <linearGradient id="${id}" x1="0" y1="${flare ? 1 : 0}" x2="0" y2="${flare ? 0 : 1}">
+      <stop offset="0"    stop-color="${darken(paint, 0.34)}"/>
+      <stop offset="0.55" stop-color="${darken(paint, 0.14)}"/>
+      <stop offset="1"    stop-color="${lighten(paint, 0.06)}"/>
+    </linearGradient>
+    ${/* the shadow the whole thing throws on the leaf */''}
+    <rect x="${n(x)}" y="${n(flare ? y - h * 0.2 : y + h)}" width="${n(w)}"
+          height="${n(h * 0.80)}" fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
+    <path data-face d="${hollow}" fill="url(#${id})"/>
+    ${/* the corona: a lit top face, then a hard drip line under its front */''}
+    ${/* ⚠ THE ENDS SWEEP, THEY ARE NOT CUT. A square end is the tell of a
+          plank and a 45-degree mitre — which is what this was — is the tell of
+          a drawing that knew that and stopped there. On the rectified
+          photograph each end of the corona turns down in a quarter-round
+          RETURN: the slab runs out to its full width at the top and the
+          underside curves back in, so the end reads as a moulding stopped
+          against the leaf and rounded off, not as a board sawn at an angle.
+          Two curves instead of two straight edges, and they are what make the
+          cornice read as the widest, softest thing on the door. */''}
+    ${flare ? '' : `
+      <path data-face d="M ${n(x)} ${n(y)} H ${n(x + w)}
+               C ${n(x + w)} ${n(y + corona * 0.52)} ${n(x + w - back * 0.45)} ${n(y + corona)}
+                 ${n(x + w - back)} ${n(y + corona)}
+               H ${n(x + back)}
+               C ${n(x + back * 0.45)} ${n(y + corona)} ${n(x)} ${n(y + corona * 0.52)}
+                 ${n(x)} ${n(y)} Z" fill="${lighten(paint, 0.15)}"/>
+      <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(lip)}"
+            fill="${lighten(paint, 0.34)}"/>
+      <path d="M ${n(x + back * 0.3)} ${n(y + corona - h * 0.055)}
+               H ${n(x + w - back * 0.3)}
+               C ${n(x + w - back * 0.45)} ${n(y + corona)} ${n(x + w - back * 0.6)} ${n(y + corona)}
+                 ${n(x + w - back)} ${n(y + corona)}
+               H ${n(x + back)}
+               C ${n(x + back * 0.6)} ${n(y + corona)} ${n(x + back * 0.45)} ${n(y + corona)}
+                 ${n(x + back * 0.3)} ${n(y + corona - h * 0.055)} Z"
+            fill="#000" opacity="0.38"/>`}
+    ${flare ? `
+      <rect data-face x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}"
+            height="${n(corona)}" fill="${lighten(paint, 0.08)}"/>
+      <rect x="${n(x)}" y="${n(y + h - corona)}" width="${n(w)}" height="${n(h * 0.04)}"
+            fill="${lighten(paint, 0.22)}"/>` : ''}`;
+}
+
+/**
+ * A BEAD-AND-REEL COURSE: hemispheres in a sunk channel, nearly touching.
+ *
+ * ⚠ THE CHANNEL IS HALF OF IT. Drawn as circles on the leaf's own paint the
+ * run reads as a string of pearls glued to a flat door, because nothing says
+ * the beads are set into anything. The photograph shows them in a recess with
+ * a dark line above and a lit fillet below, and it is that pair — not the
+ * beads — that makes the course read as carved.
+ *
+ * Pitch is 2.42 diameters, measured at the plinth: bead 0.0046 of the leaf's
+ * width on a 0.0112 pitch. The count comes from the run's own length so a wide
+ * door gets more beads rather than bigger ones, which is what stock does.
+ */
+function beadRun(x, y, w, r, paint, vertical = false) {
+  const n = v => Number(v.toFixed(1));
+  const pitch = r * 2.42;
+  const count = Math.max(2, Math.round(w / pitch));
+  const step = w / count;
+  let out = vertical ? '' : `
+    <rect x="${n(x)}" y="${n(y - r * 1.7)}" width="${n(w)}" height="${n(r * 3.4)}"
+          fill="${darken(paint, 0.07)}"/>
+    <rect x="${n(x)}" y="${n(y - r * 1.7)}" width="${n(w)}" height="${n(r * 0.45)}"
+          fill="${darken(paint, 0.22)}"/>
+    <rect x="${n(x)}" y="${n(y + r * 1.25)}" width="${n(w)}" height="${n(r * 0.45)}"
+          fill="${lighten(paint, 0.22)}"/>`;
+  for (let i = 0; i < count; i++) {
+    const c = (i + 0.5) * step;
+    const cx = vertical ? x : x + c, cy = vertical ? y + c : y;
+    out += `<circle cx="${n(cx + r * 0.12)}" cy="${n(cy + r * 0.16)}" r="${n(r)}"
+                    fill="${darken(paint, 0.22)}"/>`
+         + `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}" fill="${lighten(paint, 0.10)}"/>`
+         + `<circle cx="${n(cx - r * 0.26)}" cy="${n(cy - r * 0.30)}" r="${n(r * 0.40)}"
+                    fill="${lighten(paint, 0.34)}"/>`;
+  }
+  return out;
+}
+
+/**
+ * The oval cartouche at the middle of the frieze and of the plinth: a raised
+ * RING with a flat field inside it, not a soft blob.
+ *
+ * ⚠ AND IT IS HALF THE SIZE IT WAS. Ruler-read off the photograph at 0.072 of
+ * the leaf's width by 0.0167 of its height, against the 0.15 x 0.038 the first
+ * version drew — twice over in both directions, which is what turned a small
+ * moulded oval into a dinner plate.
+ */
+function classicBoss(cx, cy, rx, ry, paint) {
+  const n = v => Number(v.toFixed(1));
+  const ov = (sx, sy, f) =>
+    `<ellipse cx="${n(cx)}" cy="${n(cy + sy)}" rx="${n(rx * sx)}" ry="${n(ry * sx)}" fill="${f}"/>`;
+  return ov(1.06,  ry * 0.28, darken(paint, 0.26))        // the shadow it sits in
+       + ov(1.00, -ry * 0.14,  lighten(paint, 0.30))      // the rim, lit from above
+       + ov(1.00,  ry * 0.10,  darken(paint, 0.06))       // and shaded below
+       + ov(0.94,  0,          lighten(paint, 0.08))      // the ring's own face
+       + ov(0.62,  ry * 0.10,  darken(paint, 0.22))       // the hollow inside it
+       + ov(0.58,  0,          darken(paint, 0.04));
+}
+
+/**
+ * FLUTES: rounded-end grooves cut INTO a face, and that is the whole point.
+ *
+ * The first version drew raised bars with a lit edge, which is the same
+ * geometry inverted — and inverted is what it looked like beside the
+ * photograph, three light sticks where the door has three shadows. A groove is
+ * dark on the side the light comes from and lit on the far side; a bar is the
+ * other way round. One sign flip, and it is the difference between carved and
+ * stuck-on.
+ */
+function classicFlutes(x, y, w, h, paint, count = 3) {
+  const n = v => Number(v.toFixed(1));
+  const pitch = w / count, gw = pitch * 0.42, r = gw / 2;
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    const gx = x + (i + 0.5) * pitch - r;
+    out += `<rect x="${n(gx)}" y="${n(y)}" width="${n(gw)}" height="${n(h)}"
+                  rx="${n(r)}" fill="${darken(paint, 0.16)}"/>`
+         + `<rect x="${n(gx + gw * 0.55)}" y="${n(y)}" width="${n(gw * 0.45)}"
+                  height="${n(h)}" rx="${n(r * 0.9)}" fill="${lighten(paint, 0.16)}"/>`
+         + `<rect x="${n(gx)}" y="${n(y)}" width="${n(gw * 0.30)}" height="${n(h)}"
+                  rx="${n(r * 0.6)}" fill="${darken(paint, 0.26)}"/>`;
+  }
+  return out;
+}
+
+/**
+ * A corbel — the bracket under each end of the shelf.
+ *
+ * ⚠ REBUILT FOUR TIMES FROM ONE PHOTOGRAPH, and each failure is worth keeping
+ * because each was a different way of not looking:
+ *   three rounded bars stepped 0.13 h apart covered one another → a pale blob
+ *   four ribs stepped further apart                             → a stack of dashes
+ *   vertical grooves in a tapering face                         → a comb
+ *   the flipped copy mirrored with `transform-origin`, which is a CSS property
+ *     and not an SVG attribute, so it mirrored about x = 0       → a wedge
+ *     that flew off the side of the door
+ *
+ * What is actually there, read off `/tmp/photo-leaf.png` cropped to
+ * x 0.13-0.30 and y 0.570-0.700 of the leaf and blown up: FOUR CONVEX ROLLS
+ * side by side, each following a shallow S — square-cut under the shelf,
+ * swinging outward to a waist a little past halfway, and ending in a ROUNDED
+ * TIP. Lit along their crowns, dark in the valleys between.
+ *
+ * ⚠ FIFTH REBUILD, AND THE FAULT WAS THE WEIGHT, NOT THE PATH. The version
+ * before this had the S right and drew it as three superimposed strokes whose
+ * widths were fractions of a pitch computed off 0.74 of the bracket — so the
+ * rolls came out thin, separated by bare paint, and the pair read as two
+ * COMBS hanging under the shelf rather than as brackets carrying it. In the
+ * photograph the rolls TOUCH: four of them fill the bracket edge to edge, and
+ * what separates them is a dark valley, not a gap.
+ *
+ * Three things besides the weight, all measured on that crop:
+ *   the feet are STAGGERED — the roll against the band reaches lowest and the
+ *     outermost stops about a seventh of the height short, so the foot reads
+ *     as a diagonal rather than as a ruled line
+ *   the tips are round. A square-cut roll reads as a cut-off stick
+ *   and the BOX was left alone. The crop reads the bracket as 0.075 of the
+ *     leaf wide and 0.608 to 0.663 down it, against the 0.070 wide and 0.600
+ *     to 0.670 it is drawn at — agreement to within half a centimetre from a
+ *     rougher instrument than the ruled read those came from, so there is
+ *     nothing here to correct (REALISM §6). The stagger lands the outer tip at
+ *     0.660 and the inner at 0.670, which is the measured foot anyway.
+ *     ⚠ Widening it WOULD cost more than itself: `classicPieces` declares the
+ *     band spanning 0.210 to 0.790 SO THAT it covers these brackets, and at
+ *     0.075 the outer edge lands at 0.205 — outside the obstacle the rules
+ *     believe in, which `npm run collide` would report and be right to.
+ *
+ * Mirroring is arithmetic, never a transform: `s` is the sign and `ox` the
+ * outer edge, and the two brackets are the same numbers with one flipped.
+ */
+function classicCorbel(x, y, w, h, paint, flip = false) {
+  const n = v => Number(v.toFixed(1));
+  const s = flip ? -1 : 1, ox = flip ? x + w : x;
+  /* ⚠ THE ROLLS FILL THE BRACKET. `face = w * 0.74` left a quarter of it as a
+     plain return that nothing in the photograph has, and it made every roll a
+     quarter narrower than it should be — which is most of why they read as
+     lines. `t` runs from the OUTER edge inward, so `t = 0` is the edge away
+     from the band on both hands. */
+  const REEDS = 4;
+  const pitch = w / REEDS;
+  const BOW = w * 0.07;          // how far the S swings outward at the waist
+  const at = t => ox + s * t;
+
+  /* the bracket's body, so the reeds have something to sit on */
+  let out = `
+    ${/* ⚠ `data-face`: the bracket is part of the BAND piece, and the band's
+          declared span reaches out to cover it. Without this mark the drift
+          reader measured the face between the brackets and the rules declared
+          the face plus the brackets, and the two disagreed by seven
+          centimetres a side — which is the drift that check exists to find,
+          arriving from the tagging rather than from the geometry. */''}
+    <path data-face d="M ${n(ox)} ${n(y)} L ${n(at(w))} ${n(y)} L ${n(at(w))} ${n(y + h)}
+             L ${n(ox)} ${n(y + h)} Z" fill="${paint}"/>`;
+
+  /* Outermost first, so each roll's own shadow is laid down before the roll
+     inboard of it covers the near half of it — which is what makes four
+     touching cylinders read as four and not as one lumpy slab. */
+  for (let i = 0; i < REEDS; i++) {
+    /* ⚠ THE ROLLS CONVERGE, and drawn parallel they are a comb. In the
+       photograph they are spread right across the bracket's top, square under
+       the shelf, and they gather towards the OUTER bottom corner: the top
+       spans about 0.06 to 0.94 of the width and the foot only 0.00 to 0.55, so
+       each roll ends at a little over half the offset it started at. That
+       convergence is the whole silhouette — it is what makes the bracket a
+       wedge carrying the shelf rather than a fringe hanging off it. */
+    const top = (i + 0.5) * pitch;
+    const bot = top * 0.58;
+    const waist = (top + bot) / 2 - BOW;
+    const foot = y + h * (0.86 + 0.14 * i / (REEDS - 1));
+    const d = `M ${n(at(top))} ${n(y)}
+               C ${n(at(top))} ${n(y + h * 0.18)}
+                 ${n(at(waist))} ${n(y + h * 0.32)}
+                 ${n(at(waist))} ${n(y + h * 0.58)}
+               C ${n(at(waist))} ${n(y + h * 0.78)}
+                 ${n(at(bot))} ${n(y + h * 0.88)}
+                 ${n(at(bot))} ${n(foot)}`;
+    const stroke = (wd, col, dx, op = 1) =>
+      `<path d="${d}" fill="none" stroke="${col}" stroke-width="${n(wd)}"
+             stroke-linecap="round" stroke-opacity="${op}"
+             transform="translate(${n(dx)} 0)"/>`;
+    /* the valley on the inboard side, then the roll, then its lit crown */
+    out += stroke(pitch * 1.14, darken(paint, 0.34), s * pitch * 0.22)
+         + stroke(pitch * 0.98, paint, 0)
+         + stroke(pitch * 0.30, lighten(paint, 0.22), -s * pitch * 0.20, 0.85);
+  }
+  /* the shadow the whole bracket throws where it meets the leaf */
+  out += `<path d="M ${n(ox)} ${n(y + h - h * 0.10)} L ${n(at(w))} ${n(y + h - h * 0.16)}
+                   L ${n(at(w))} ${n(y + h)} L ${n(ox)} ${n(y + h)} Z"
+                fill="#000" opacity="0.14"/>`;
+  return out;
+}
+
+/**
+ * THE BAND THAT APPEARS THREE TIMES — the frieze under the cornice, the band
+ * under the shelf, and the block above the plinth. One composition on this
+ * door, not three: a raised end at each side and a wide tablet between them.
+ * It took a close-up of all three side by side to see that they are the same
+ * piece of joinery turned upside down.
+ *
+ *   ends   'tablet' — a plain sunk square, which the shelf carries and which
+ *                     the pull's finials bolt through
+ *          'flute'  — three grooves, which the frieze and the plinth carry
+ *   middle 'plain'  — the shelf, because the pull goes there
+ *          'oval'   — an oval cartouche with a round boss either side
+ *
+ * ⚠ THE COLUMN TABLE IS RULER-READ AND IT MOVED. It was 0.10/0.28, 0.29/0.71,
+ * 0.72/0.90 of the band's inner width, invented from a low-resolution crop; on
+ * the ruled picture the flutes occupy 0.10 to 0.19 and the tablet 0.225 to
+ * 0.778, so the ends were nearly twice as wide as they should be and the
+ * tablet a fifth too narrow. That is why the oval looked cramped between them.
+ */
+function classicBand(x, y, w, h, paint, pale, leaf, key, ends, middle) {
+  const n = v => Number(v.toFixed(1));
+  const th = h * 0.74, ty = y + (h - th) / 2;
+  const END = [[0.10, 0.19], [0.81, 0.90]], MID = [0.225, 0.778];
+
+  /* The sunk field the whole composition sits in: one shadow line at the top
+     and one lit fillet at the bottom, which is what a rebate looks like. */
+  let out = `
+    <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}"
+          fill="${darken(paint, 0.07)}"/>
+    <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h * 0.06)}"
+          fill="#000" opacity="0.16"/>
+    <rect x="${n(x)}" y="${n(y + h * 0.94)}" width="${n(w)}" height="${n(h * 0.06)}"
+          fill="${lighten(paint, 0.20)}"/>`;
+
+  /* THE TABLET: a raised slab with a lit top edge and a shadow under it, and a
+     fine stipple across its face. The stipple is what the photograph has and
+     what our flat fill did not — at this scale it is most of the difference
+     between "a rectangle" and "a cast panel". */
+  const slab = (a, b, texture) => {
+    const sx = x + w * a, sw = w * (b - a);
+    return `
+      <rect x="${n(sx)}" y="${n(ty + th * 0.06)}" width="${n(sw)}" height="${n(th)}"
+            fill="#000" opacity="0.16"/>
+      <rect x="${n(sx)}" y="${n(ty)}" width="${n(sw)}" height="${n(th)}"
+            fill="${lighten(paint, 0.04)}"/>
+      <rect x="${n(sx)}" y="${n(ty)}" width="${n(sw)}" height="${n(th * 0.10)}"
+            fill="${lighten(paint, 0.20)}"/>
+      ${/* ⚠ OVERLAY, NOT A FILL. `url(#grain)` painted straight on at 0.55 put
+            an opaque grey noise over the tablet and turned a green cast panel
+            into a slab of concrete — the filter's output is grey, so painting
+            it IS painting grey. Blended at a fifth it modulates the paint
+            underneath instead, which is what orange-peel does to a colour. */''}
+      ${texture ? `<rect x="${n(sx)}" y="${n(ty)}" width="${n(sw)}" height="${n(th)}"
+            fill="url(#grainTex)" opacity="0.22"
+            style="mix-blend-mode:overlay"/>` : ''}
+      <rect x="${n(sx)}" y="${n(ty)}" width="${n(sw)}" height="${n(th)}" fill="none"
+            stroke="${darken(paint, 0.18)}" stroke-width="1.2"
+            vector-effect="non-scaling-stroke"/>`;
+  };
+
+  out += slab(MID[0], MID[1], true);
+  for (const [a, b] of END) {
+    if (ends === 'tablet') { out += slab(a, b, false); continue; }
+    out += classicFlutes(x + w * a, ty + th * 0.12, w * (b - a), th * 0.76, paint, 3);
+  }
+  if (middle === 'oval') {
+    const cx = x + w / 2, cy = y + h / 2;
+    out += classicBoss(cx, cy, leaf.w * 0.036, leaf.h * 0.0084, paint);
+    for (const d of [-1, 1]) {
+      out += classicBoss(cx + d * leaf.w * 0.088, cy,
+                         leaf.w * 0.0073, leaf.w * 0.0073, paint);
+    }
+  }
+  return out;
+}
+
+/**
+ * The whole set. Draws itself rather than going through `appliedFrame`,
+ * because its pieces are proportioned to each other — see the dispatch note
+ * in `render`.
+ */
+/* ⚠ NO `openings` PARAMETER, unlike `appliedFrame` beside it. The set does not
+   place itself around whatever glazing it finds — it OWNS the opening, through
+   `detail.winRect`, so the rows below already know where the glass is. It was
+   taking one and never reading it. */
+function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
+  const n = v => Number(v.toFixed(1));
+  const R = CLASSIC_ROWS, C = CLASSIC_COLS;
+  const Y = f => ly + lh * f;
+  const X = f => lx + lw * f;
+  const leaf = { x: lx, y: ly, w: lw, h: lh };
+  const out = [];
+  /* ⚠ EACH PIECE IN ITS OWN TAGGED GROUP, not one composite. See
+     `classicPieces` for why: an outer `<g data-detail="classic">` has a
+     bounding box running cornice to plinth, and `npm run collide -- all` read
+     that as the set overlapping the glass on four designs while nothing in it
+     comes near the glass. `data-face` marks the shape that DEFINES a piece —
+     the block's own face, the cap's corona and hollow — so the drift reader
+     measures ink rather than a claim, and the shadows and the brackets stay
+     inside the group where the sweep can still see them. */
+  const P = Object.fromEntries(classicPieces(lw, lh, glazed).map(q => [q.piece, q]));
+  const piece = (name, art) =>
+    out.push(`<g data-detail="moulding" data-piece="${name}">${art}</g>`);
+
+  /* A block standing PROUD of the leaf: lit along its top and left, shadowed
+     along its bottom and right, over a soft cast shadow. Four rectangles.
+     ⚠ This replaces `moulding()` for the set's three bands, and deliberately.
+     `MOULD` is a measured section and it is right for a PANEL — but run round
+     a band a twentieth of the leaf tall it puts every one of its stops into
+     nine millimetres, and the eye reads that as engraving rather than as a
+     piece of timber laid on. The photograph's bands have one edge each side
+     and nothing between. */
+  const block = (bx, by, bw, bh) => {
+    const e = Math.max(1.5, lw * 0.006);
+    return `
+      <rect x="${n(bx)}" y="${n(by + e)}" width="${n(bw)}" height="${n(bh)}"
+            fill="#000" opacity="0.18" filter="url(#hwShadow)"/>
+      <rect data-face x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(bh)}"
+            fill="${paint}"/>
+      <rect x="${n(bx)}" y="${n(by)}" width="${n(bw)}" height="${n(e)}"
+            fill="${lighten(paint, 0.22)}"/>
+      <rect x="${n(bx)}" y="${n(by)}" width="${n(e)}" height="${n(bh)}"
+            fill="${lighten(paint, 0.14)}"/>
+      <rect x="${n(bx)}" y="${n(by + bh - e)}" width="${n(bw)}" height="${n(e)}"
+            fill="${darken(paint, 0.22)}"/>
+      <rect x="${n(bx + bw - e)}" y="${n(by)}" width="${n(e)}" height="${n(bh)}"
+            fill="${darken(paint, 0.14)}"/>`;
+  };
+  const beadR = lw * 0.0046;                      // measured at the plinth
+  const inBand = (bx, by, bw, bh, key, ends, mid) =>
+    classicBand(bx + lw * 0.018, by + bh * 0.14, bw - lw * 0.036, bh * 0.72,
+                paint, pale, leaf, key, ends, mid);
+
+  /* ── THE HEAD: a frieze block, a bead course, the cornice over both ──
+     ⚠ NO CORBELS UP HERE. The first version hung a fluted bracket off each end
+     of the cornice by analogy with the shelf. The ruled photograph has a plain
+     moulded return there and nothing else; the brackets belong to the shelf
+     alone, which is what makes the shelf read as a shelf. */
+  const at = q => [lx + q.x, ly + q.y, q.w, q.h];
+  piece('frieze', block(...at(P.frieze)) + inBand(...at(P.frieze), 'cfb', 'flute', 'oval'));
+  /* ⚠ AND WHERE THE LIGHT WOULD BE, A PANEL — when the customer has not asked
+     for glass. The set is the same composition either way; only the material
+     in that rectangle changes. Drawn before the cornice so the head's shadow
+     falls on it. */
+  /* CLASSIC_BAND, not MOULD_BAND — the set's own casing stock. `P.light` is
+     the casing's OUTER rectangle, so at 59 the moulding's inner edge lands
+     exactly on the glass line the glazed variant cuts. */
+  if (!glazed) piece('light', moulding(...at(P.light), CLASSIC_BAND, paint, pale, leaf, 'clt',
+                                       'ogee'));
+  piece('cornice',
+    /* ⚠ THE DENTILS SPAN THE FRIEZE, NOT THE CORNICE. They were the cornice's
+       width less 0.036 a side, which was a way of saying "a bit narrower than
+       the corona" without measuring it. On the rectified photograph the row
+       runs 0.195 to 0.785 — the frieze block's own span, to within 0.01 — and
+       it sits hard under the cap rather than floating in the middle of its
+       row, so the head reads as one assembly. */
+    beadRun(X(C.frieze[0]), Y(R.beads[0] + (R.beads[1] - R.beads[0]) * 0.42),
+            (C.frieze[1] - C.frieze[0]) * lw, beadR, paint)
+    /* 0.77, not the default 0.68. Ruled on the rectified leaf: the corona is
+       0.0215 of the leaf's height and the cavetto under it 0.007, so the slab
+       takes rather more than three quarters of the cap and not two. */
+    + classicCap(...at(P.cornice), paint, 'cn', false, 0.77));
+
+  /* ── THE SHELF: its own corona, two brackets, and the band they carry ──
+     ⚠ THE BAND'S FACE IS NARROWER THAN THE SHELF, and it was drawn the same
+     width. Ruler-read: the slab spans 0.649 of the leaf and the face under it
+     only 0.429, because the two brackets take the ends. Drawn full width, the
+     brackets sat ON the band instead of beside it and read as striped
+     rectangles stuck to the door.
+     ⚠ AND THE BRACKETS HANG OFF THE BAND, not off the slab's corners — placed
+     there they left four centimetres of bare leaf between each bracket and the
+     face it is supposed to be carrying. On the door the corbel's inner edge
+     touches the band, 0.219 against 0.225 of the leaf. The `band` PIECE spans
+     0.210 to 0.790 so that it covers the brackets as well: an obstacle is what
+     is on the door, not what the joinery calls one piece. */
+  const faceX = X(C.band[0]), faceW = (C.band[1] - C.band[0]) * lw;
+  piece('band',
+    block(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh)
+    + inBand(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh,
+             'cbt', 'tablet', 'plain'));
+  piece('shelf', classicCap(...at(P.shelf), paint, 'sh', false, 0.51));
+  /* ⚠ AFTER THE SHELF, and that is the whole reason the brackets are pieces of
+     their own. Drawn inside the band's group they went down first, so the
+     shelf's cast shadow — 0.80 of its own height, blurred — lay across them
+     and the pair read as two grey smudges. The photograph has them lit: a
+     corbel stands proud of the band and CARRIES the shelf, so the one thing it
+     is not in is the shelf's shadow. Off `classicPieces`, like everything
+     else, so the rules and the drawing cannot disagree about where they are. */
+  for (const r of [0, 1]) {
+    const q = P[r ? 'corbelR' : 'corbelL'];
+    piece(r ? 'corbelR' : 'corbelL',
+          classicCorbel(lx + q.x, ly + q.y, q.w, q.h, paint, !!r));
+  }
+  /* THE SET'S OWN PULL. Part of the face, not of the hardware axis — see the
+     catalogue entry: this door carries it AND a long vertical bar, and
+     `state.handle` holds one grip. */
+  out.push(classicPull(X(0.5), Y((R.band[0] + R.band[1]) / 2), lw * 0.33, lh * 0.028, tone));
+
+  /* ── the panel ──────────────────────────────────────────────────
+     ⚠ TAGGED `data-detail="panel"`, AND THAT IS LOAD-BEARING. Three assertions
+     read the markup rather than the catalogue to ask whether the panel a
+     customer is charged for is a panel that is drawn — and the set charges for
+     one and draws one. Wrapping it in the set's own name hid it from all
+     three, and 297 combinations reported a face with no panel while the price
+     list took ₪1,680. `data-top` is there for the same reason: the third check
+     goes DEAD rather than failing without it.
+     This one keeps `moulding()`. A panel is what that section was measured on,
+     and the photograph's panel surround is a broad ogee, not a band. */
+  const pn = at(P.panel);
+  out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">`
+    + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn', 'ogee')
+    + `</g>`);
+
+  /* ── THE PLINTH: the frieze upside down, then the splayed foot ──
+     Stacked in that order — block, bead course UNDER it, ogee to the floor.
+     The first version had the beads on top and no block at all: a string of
+     dots above a bare rectangle, which is neither piece. */
+  piece('plinth',
+    block(...at(P.plinth)) + inBand(...at(P.plinth), 'cpb', 'flute', 'oval')
+    + beadRun(X(C.plinth[0]) - lw * 0.006, Y((R.pbeads[0] + R.pbeads[1]) / 2),
+              (C.plinth[1] - C.plinth[0]) * lw + lw * 0.012, beadR, paint));
+  piece('foot', classicCap(...at(P.foot), paint, 'ft', true));
+
+  /* ⚠ `data-set`, NOT `data-detail`, on the wrapper. Both of `collide.mjs`'s
+     readers select on `[data-detail]`, and a group carrying the whole
+     composition answers with a bounding box that runs cornice to plinth. */
+  return `<g data-set="classic">${out.join('')}</g>`;
+}
+
+/**
+ * The turned pull that comes with the set: a shaft with a ball and a finial at
+ * each end, on a textured backplate with square corner blocks.
+ *
+ * ⚠ IT IS BLACK, AND THAT WAS A CORRECTION. Read off the photographs it looks
+ * like antique bronze — and the measurement says otherwise: the median of
+ * every dark pixel across all four files is #2A2627 to #36322E, warmth (r−b)
+ * of 2 to 8. Neutral. Brass in this drawing runs r−b above 40. What made it
+ * look warm is the light the door was photographed in, and it was reported
+ * from outside before the measurement was taken: "there is no bronze in the
+ * picture".
+ */
+function classicPull(cx, cy, len, thick, tone) {
+  const n = v => Number(v.toFixed(1));
+  const x0 = cx - len / 2;
+  const at = t => x0 + len * t;
+  /* ⚠ NO BACKPLATE. There was one — a pale rounded rectangle at 1.16 of the
+     pull's length and 3.2 of its thickness — and because the band it sat on is
+     only 0.062 of the leaf tall, it stood proud of the band top and bottom and
+     read as a translucent grey box laid over the middle of the door. The band
+     moulding and its three tablets ARE the backplate; the fitting bolts
+     through them. Nothing goes behind the rod.
+     ⚠ AND THE BALLS ARE 1.47 OF THE ROD, measured ball-to-rod off the close-up
+     of the shelf. They were 2.0, which is a dumbbell and looked like one. */
+  const rod = thick * 0.30;
+  const ball = rod * 1.47;
+  const shade = `<rect x="${n(at(0.10))}" y="${n(cy + rod * 0.9)}" width="${n(len * 0.80)}"
+                       height="${n(rod * 1.3)}" rx="${n(rod * 0.65)}"
+                       fill="#000" opacity="0.22" filter="url(#hwShadow)"/>`;
+  return `
+    ${shade}
+    <rect x="${n(at(0.16))}" y="${n(cy - rod)}" width="${n(len * 0.68)}"
+          height="${n(rod * 2)}" rx="${n(rod)}" fill="url(#blackRod)"/>
+    ${[0.16, 0.84].map(t => `
+      <circle cx="${n(at(t))}" cy="${n(cy)}" r="${n(ball)}" fill="url(#blackRod)"/>
+      <circle cx="${n(at(t) - ball * 0.30)}" cy="${n(cy - ball * 0.34)}"
+              r="${n(ball * 0.30)}" fill="#fff" opacity="0.18"/>`).join('')}
+    ${/* the turned neck, knop and cap beyond each ball, where it bolts down */''}
+    ${/* neck, knop, cap — spaced so the knop clears the ball. At 0.045 with a
+          ball of 0.44 thick they overlapped completely and the two ends of the
+          pull each came out as one flattened blob. */''}
+    ${[[0.02, 1], [0.98, -1]].map(([t, d]) => `
+      <rect x="${n(Math.min(at(t), at(t + d * 0.11)))}" y="${n(cy - rod * 0.40)}"
+            width="${n(len * 0.11)}" height="${n(rod * 0.80)}" fill="url(#blackRod)"/>
+      <circle cx="${n(at(t + d * 0.030))}" cy="${n(cy)}" r="${n(ball * 0.58)}"
+              fill="url(#blackRod)"/>
+      <circle cx="${n(at(t))}" cy="${n(cy)}" r="${n(ball * 0.34)}"
+              fill="url(#blackRod)"/>`).join('')}`;
+}
+
 /* ── hardware ───────────────────────────────────────────────────── */
 
 /**
@@ -3843,7 +6881,19 @@ function handleFootprint(handle, leafH, panelled = false) {
        other fitting, and its default height is set in `gripHome` instead. It
        had one while the drawing pinned it to the mid rail whatever the rules
        said, which is the same fact that stopped it being draggable. */
-    case 'grab':    return { out: 26, in: 320, vy: 26 };
+    /* ⚠ ASYMMETRIC ABOUT ITS AXIS, AND THE AXIS IS THE OUTBOARD TIP.
+       This read `{ out: 26, in: 320 }` — 320 being the bow's whole length on a
+       standard leaf, because the drawing centred the bar on the LEAF and the
+       axis it was handed landed near the outboard end of it by accident. Two
+       things were wrong with that. The number was hardcoded for one leaf width
+       while the bar was 0.33 W (see GRAB, where `len` is millimetres now); and
+       `gripPlacement` took `Math.max(out, in)` as a symmetric half-width, so
+       it demanded 320 mm of clearance on the LOCK side of a bar that extends
+       away from the lock — which is how the grab bar ended up with no legal
+       position at all on a standard leaf carrying a lever.
+       The bow now starts at its axis and runs GRAB.len inboard, and this says
+       exactly that. `npm run collide -- boxes` checks it against the art. */
+    case 'grab':    return { out: 4, in: GRAB.len + 10, vy: 26 };
     /* ⚠ `vy` IS A REACH FROM THE AXIS, not half a height, and for these four
        the two are not the same number. `cy` is the LEVER SPINDLE and it sits
        0.30 down a backplate, so the plate hangs 0.70 of its height below the
@@ -3856,7 +6906,19 @@ function handleFootprint(handle, leafH, panelled = false) {
     case 'lever':   return { out: 40, in: 152, vy: 51 };
     case 'plate':   return { out: 47, in: 119, vy: 170 };
     case 'almog':   return { out: 42, in: 220, vy: 42 };
-    case 'cadoor':  return { out: 78, in: 41, vy: 48 };
+    /* ⚠ `out` WAS 78 AND THE DRAWING REACHES 41. Reported from outside as
+       *"you can also see that this circle handle is off place"*, and it was:
+       `lockBackset` returns `max(KEYWAY_BACKSET, out + 10)`, so a declared 78
+       put the ball's axis at 88 while the keyhole below it stayed pinned at
+       63 — the knob and the cylinder it turns, 25 mm out of line, on a door
+       where they go into the same mortice lock case and physically cannot be.
+       41 is what `npm run collide -- boxes` measures off the art; 78 was
+       never measured. With it corrected the clamp yields `max(63, 51) = 63`
+       and the ball lands on the keyway's own axis.
+       ⚠ AND THE BALL SITS ON NO ROSE ON PURPOSE — that is the whole product
+       difference between `cadoor` (כדור) and `knobplate` (כדור על אורך), the
+       one with the backplate. Do not "fix" that by adding one. */
+    case 'cadoor':  return { out: 41, in: 41, vy: 48 };
     case 'sapir':   return { out: 36, in: 74, vy: 43 };
     case 'knobplate': return { out: 53, in: 48, vy: 198 };
     case 'cylinder': return { out: LOCK_R + 8, in: LOCK_R + 8, vy: LOCK_R + 8 };
@@ -3944,19 +7006,19 @@ export function glassClearance(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const win = byId(WINDOWS, state.window);
   if (!win.rects.length) return Infinity;
-  const leafW = size.w - REBATE * 2;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const hingeOnLeft = byId(HANDINGS, state.handing).hinge === 'left';
   /* Nearest glass edge to the closing edge, as a distance inboard from it.
      Read off the same layout the drawing uses, not off the catalogue's
      rectangles: on a narrow leaf the opening is cut narrower than the
      catalogue asks, and a rule measuring the uncut figure would refuse
      combinations that fit. */
-  const u = apertureLayout(win, leafW).map(o =>
+  const u = apertureLayout(win, leafW, byId(DETAILS, state.detail), leafH).map(o =>
     hingeOnLeft ? leafW - (o.x + o.w) : o.x);
   /* To the MOULDING's outer edge, not to the glass: a fitting that stops at
      the pane still runs across the raised surround. */
   return Math.min(...u) - MOULD_BAND
-       - lockBackset(byId(HANDLES, state.handle), byId(LOCKSETS, state.lockset));
+       - lockBackset(gripOf(state), byId(LOCKSETS, state.lockset));
 }
 
 /**
@@ -3971,7 +7033,7 @@ export function glassClearance(state) {
  */
 export function gripClashesGlass(state) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const grip = handleFootprint(handle, leafH);
   if (!grip.vy && !grip.out) return false;
@@ -4012,7 +7074,7 @@ export function gripClashesGlass(state) {
  */
 export function gripClashesLockset(state) {
   const size = SIZES[state.size] || SIZES.standard;
-  const handle = byId(HANDLES, state.handle);
+  const handle = gripOf(state);
   if (handle.style !== 'grab') return false;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const lock = handleFootprint(byId(LOCKSETS, state.lockset), leafH);
@@ -4025,9 +7087,15 @@ export function gripClashesLockset(state) {
      hinge edge to put a bar in?
 
      Both measured inboard from the closing edge. */
+  /* ⚠ AND THE BOW DOES NOT GIVE UP LENGTH ANY MORE, so the question is not
+     "is there room for a bar of some usable length" but "is there room for
+     THE bar". `grabHandle` used to shorten itself against a hinge stop when
+     clearing the lock pushed its far post past the stile — silently, and
+     without telling `handleFootprint`, which went on reporting the full
+     length. GRAB.len is a product Peretz buys, not a variable, so the drawing
+     draws all of it and this refuses the pairing when it will not fit. */
   const clearOf = lockBackset(handle, byId(LOCKSETS, state.lockset)) + lock.in + LOCK_CLEAR;
-  const GRAB_MIN = 180;                       // a bow shorter than this is not a grab bar
-  return leafW - 45 - clearOf < GRAB_MIN;
+  return leafW - EDGE_FLAT - clearOf < GRAB.len;
 }
 
 /**
@@ -4038,15 +7106,88 @@ export function gripClashesLockset(state) {
  * so the tests can assert the two positions rather than infer them.
  */
 export function lockBackset(handle, lockset) {
-  const grip = handleFootprint(handle, 2000);
-  const base = grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP : LOCK_BACKSET;
+  /* ⚠ ONE BACKSET FOR EVERY DOOR. THE GRIP NO LONGER MOVES IT.
+     This read `grip.vy > 200 || handle.inset ? LOCK_BACKSET_GRIP :
+     LOCK_BACKSET` — 49 mm where a bar shares the stile, 60 where it does not.
+     Both are real: a fitter DOES set the lock further out to make room for a
+     bar, measured at 0.057 of leaf width against 0.070.
+
+     It is still the wrong thing for a configurator to do with them. Reported
+     from outside: *"the keyhole always stays at the same place, it doesnt move
+     a pixel, even if the main handle changes. because now, it changes place
+     slightly if i change the main handle."* Tapping between two grips slid the
+     keyhole 11 mm across the door — a third thing moving that the customer had
+     not touched, on the one fitting they are most likely to be staring at.
+
+     WHICH ONE, and this was not the obvious answer. Measured over all thirty
+     records with a lock position, as `min(x, 1-x)` of leaf width:
+
+       0.046 0.053 0.053 0.055 0.055 0.055 0.055 0.060 0.061 0.063
+       0.065 0.065 0.065 0.069 0.069 0.070 0.070 0.071 0.079 0.079
+       0.080 0.081 0.085 0.090 0.094 0.099 0.130 0.146 0.151 0.182
+
+     Pooled median 0.0695 — 59 mm on an 850 leaf, which is LOCK_BACKSET almost
+     exactly. So the data says 60 and I set it to 60, and then swept the range:
+     22 grip x lockset x size combinations that had been buildable stopped
+     being buildable, because the bar moves inboard with the lock and its feet
+     land on the window moulding 11 mm sooner. `repair` resolves those by
+     REMOVING THE PULL HANDLE. Among them: a wide door with the default window,
+     an Idan bar and a Coral lever — pick the lever, lose the bar, with a
+     notice explaining a collision the customer cannot see.
+
+     49 costs 11 mm on a door with no grip, which is 1.3% of a leaf's width and
+     sits inside the measured spread with seven doors below it. 60 costs a
+     mainstream door its handle. The interface loses to the door.
+
+     `handle` stays in the signature: every caller passes it, the tests assert
+     through it, and the day this drawing has an installation note to render,
+     the other measurement is one line away. */
   /* ...but never so close to the closing edge that the fitting hangs off it.
      The Cadoor knob reaches 78 mm outboard and the knob-on-backplate 53, both
-     more than the 49 mm backset a door with a grip uses, so both projected
-     past the leaf's edge. Measured, not assumed: `npm run collide -- boxes`. */
+     more than the backset, so both projected past the leaf's edge. Measured,
+     not assumed: `npm run collide -- boxes`. This one DOES depend on the
+     lockset and must: it is the fitting's own width, not a fitter's
+     preference, and a knob drawn half off the leaf is not a smaller error. */
+  /* ⚠ A FITTING THAT CARRIES THE KEYWAY SITS WHERE THE KEYWAY SITS. On the
+     plate family — and on the cylinder-only escutcheon, which IS a keyway and
+     nothing else — the cylinder cannot be placed independently of the thing it
+     is set into. KEYWAY_BACKSET is derived from exactly those so that none of
+     them overhangs the closing edge there. Everything else has its keyway
+     drawn as a SEPARATE escutcheon at KEYWAY_BACKSET whatever this returns.
+
+     ⚠ AND THE LOOSE FAMILY SITS THERE TOO NOW — the floor below the clamp is
+     `KEYWAY_BACKSET`, not `LOCK_BACKSET_GRIP`. This paragraph used to end
+     "...so this is free to move a wide knob out of trouble without taking the
+     keyhole with it", and that is right about the DRAWING and wrong about the
+     DOOR. Reported from outside: *"you can also see that this circle handle is
+     off place."*
+
+     It was. cadoor, sapir and coral drifted to `max(49, out + 10)` while
+     their keyway stayed pinned at 63. A knob's spindle and the cylinder below
+     it go into the SAME mortice lock case — one steel box, bored once — so
+     they cannot have two backsets. On a lever the offset hid behind a big
+     rosette; on the Cadoor ball it put two discs of nearly the same size
+     25 mm out of line, which is exactly what got noticed.
+
+     ⚠ MEASURED, AND IT COSTS 8 DESIGNS. Every grip x lockset x size x window
+     x handing: 714 of 2,688 lost their pull handle to a collision before,
+     722 after — 0.3%. The note above weighed 49 against 60 and kept 49
+     because 60 "costs a mainstream door its handle". 63 costs eight
+     combinations and buys a drawing that could be built. */
+  if (lockset && lockset.lock) return KEYWAY_BACKSET;
   const out = lockset ? handleFootprint(lockset, 2000).out : 0;
-  return Math.max(base, out + 10);
+  return Math.max(KEYWAY_BACKSET, out + 10);
 }
+
+/**
+ * Where the KEYHOLE is drawn, leaf-local, inboard from the closing edge.
+ *
+ * A constant, deliberately — see KEYWAY_BACKSET. Exported as a function anyway
+ * so the drawing, the placement rules and the tests reach it by one name: the
+ * day a size band needs its own figure, this is the single line that changes
+ * rather than four call sites agreeing by luck.
+ */
+export const keywayBackset = () => KEYWAY_BACKSET;
 
 /**
  * One entry per style. Each takes the catalogue entry and a context object, so
@@ -4076,6 +7217,11 @@ const LOCK_ART = {
   /* Cylinder only: the escutcheon IS the lockset. Eight of the ten doors that
      carry a pull bar have exactly this beside it and nothing more. */
   cylinder: (h, g) => cylinder(g.cx, g.cy, true),
+  /* ⚠ `none: () => ''` WAS HERE, for a lockset that no longer exists. Every
+     door has a keyway — see the note where the bare lockset was withdrawn in
+     catalog.js. Removed rather than left as a harmless dead branch: an entry
+     in this table is a claim that the catalogue can produce that style, and
+     the next person reading it would go looking for the option. */
 };
 
 function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled, rot = 0) {
@@ -4153,6 +7299,29 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
              data-out="${box.out}" data-in="${box.in}"
              data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
 }
+
+/**
+ * How high off the floor this lock furniture hangs.
+ *
+ * ⚠ IT IS NOT ONE HEIGHT, AND TREATING IT AS ONE MOVED THE KEYHOLE.
+ * Everything with a spindle in it hangs at HANDLE_AFF, because that is where a
+ * hand goes and every measurement in the corpus agrees. `cylinder` has no
+ * spindle: it is the keyway escutcheon and nothing else, the commonest lock
+ * furniture in the whole corpus, and the keyway on every OTHER door in the
+ * range is drawn 116 mm lower at CYLINDER_AFF — by the line directly below the
+ * one that calls this.
+ *
+ * So choosing "keyhole only" used to lift the keyhole 116 mm up the door.
+ * Reported from outside: *"if i choose just the keyhole than it moves up a
+ * lot, and that we cant have happening."* One keyway, one height, whether it
+ * arrives as the lockset or beside it.
+ *
+ * Asked here rather than at the call site so that `data-cy` on the drawn group
+ * — which `npm run collide` and the placement rules both read — is the height
+ * the thing is actually drawn at. A second copy of this decision at the call
+ * site is CLAUDE.md §5 items 10-13 exactly.
+ */
+const lockAff = lockset => lockset.style === 'cylinder' ? CYLINDER_AFF : HANDLE_AFF;
 
 function locksetArt(lockset, cx, cy, dir) {
   const draw = LOCK_ART[lockset.style] || LOCK_ART.lever;
@@ -4235,8 +7404,7 @@ function channelHandle(cx, cy, len, leafH, paint) {
  * centred window and `gripFeet` declines to model its feet at all.
  */
 function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
-  const half = (leafW * GRAB.len) / 2;
-  const D = leafW * GRAB.len * GRAB.ratio;          // the shaft's diameter
+  const D = GRAB_D;                                 // the shaft's diameter
   /* ⚠ WHERE IT WAS PUT, not a constant. This read `y0 + leafH * GRAB.fromTop`
      and ignored `cy` altogether, so the one grip a customer is most likely to
      want to move was the one grip that could not move: dragging it wrote a new
@@ -4247,30 +7415,35 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
      after that this draws wherever the handle actually is. */
   const by = cy;                                    // below the lever, mid rail
 
-  /* CENTRED ON THE LEAF, as every installed grab bar is — but pushed toward
-     the hinge when the lock furniture needs the room.
-     `cx` is where `gripStandoff` placed this grip, and by construction that is
-     already at least `lock.in + out + LOCK_CLEAR` from the lock's axis, so it
-     is a position the bar's near end can safely take. Whichever of the two is
-     FURTHER inboard wins: the centred one on a door with a small escutcheon,
-     the standoff on a door with an Almog swan-neck reaching 220 mm across.
+  /* ⚠ AND NOW WHERE IT WAS PUT IN X AS WELL. THIS IS THE FIX FOR THE BUG THE
+     BOW HAS CARRIED SINCE IT WAS DRAWN.
 
-     This is what the withdrawn pull-bar-versus-lever rule used to hide. The
-     vertical bars all move with `gripStandoff`; the bar did not, because it is
-     the one grip centred on the leaf rather than hung off the stile — so it
-     was the single pairing still refused after the rule went. */
-  const span = half - D * 0.9;                      // centre to post centre
-  const centredNear = centreX - dir * span;
-  const near = dir > 0 ? Math.max(centredNear, cx) : Math.min(centredNear, cx);
-  /* ...and never off the hinge edge. If clearing the lock would push the far
-     post past the stile, the bar gives up length rather than position: a short
-     grab bar is a grab bar, one hanging off the door is not. */
-  const hingeStop = centreX + dir * (leafW / 2 - 45);
-  const far = dir > 0 ? Math.min(near + 2 * span, hingeStop)
-                      : Math.max(near - 2 * span, hingeStop);
+     There used to be forty lines here that put the bar back in the middle of
+     the leaf whatever x it was handed — `centredNear = centreX - dir * span`,
+     then `Math.max(centredNear, cx)` — and then, if clearing the lock pushed
+     the far post past the stile, silently SHORTENED it against a `hingeStop`.
+     Both of those are the drawing overruling the position it was given, and
+     nothing downstream knew: `gripPlacement`, `gripFeet` and `handleFootprint`
+     all reason about `cx`, so on every door where the centred position won,
+     the rules were checking a bar 30-50 mm away from the one on screen, of a
+     length they had no way to learn.
 
-  const x0 = Math.min(near, far) - D * 0.9, x1 = Math.max(near, far) + D * 0.9;
-  const L = x1 - x0;
+     Reported from outside as *"the מאחז אופקי doesnt want to be placed at
+     places that are normal"*, and the arithmetic says why it could not be:
+     on a standard leaf with a lever the hinge-side rule refused anything past
+     x = 467 while the lockset rule, budgeting the bow's whole 320 mm as if it
+     stood on both sides of its axis, refused anything nearer than x = 562.
+     Two rules, no overlap, and the drawing quietly drawing something a third
+     rule had already declared impossible.
+
+     So: the grip's axis is the bow's OUTBOARD TIP, it runs GRAB.len inboard
+     from there, and it is drawn there. Being centred on the leaf is what
+     `gripHome` hands back as the DEFAULT — which is what the corpus actually
+     shows, every installed one of them centred — and after that it is the
+     customer's. `centreX`, `leafW` and `y0` are still taken so that the
+     GRIP_ART table stays one shape for every fitting. */
+  const x0 = dir > 0 ? cx : cx - GRAB.len;
+  const L = GRAB.len;
   const P = f => x0 + L * f;                        // along the bar, tip to tip
   const n1 = v => v.toFixed(1);
   const rod = (a, b, hh, rx, fill) => `
@@ -4303,20 +7476,20 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
              ball, so all that shows is a ring of it — and that ring is the
              whole of the standoff anyone is allowed to draw. -->
         ${POST.map(t => `
-        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#nickelSoft)"/>
+        <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="url(#gripSoft)"/>
         <circle cx="${n1(P(t))}" cy="${n1(by)}" r="${n1(D * 0.9)}" fill="#000" opacity="0.10"/>`).join('')}
 
         <!-- Outboard stems, visibly thinner than the shaft; then the terminal
              beads, which is what every one of these doors ends in. -->
-        ${rod(0.075, 0.155, D * 0.30, D * 0.15, 'url(#nickel)')}
-        ${rod(0.845, 0.925, D * 0.30, D * 0.15, 'url(#nickel)')}
-        ${rod(0.030, 0.078, D * 0.55, D * 0.5, 'url(#nickel)')}
-        ${rod(0.922, 0.970, D * 0.55, D * 0.5, 'url(#nickel)')}
-        ${rod(0.000, 0.032, D * 0.22, D * 0.11, 'url(#nickel)')}
-        ${rod(0.968, 1.000, D * 0.22, D * 0.11, 'url(#nickel)')}
+        ${rod(0.075, 0.155, D * 0.30, D * 0.15, 'url(#gripHard)')}
+        ${rod(0.845, 0.925, D * 0.30, D * 0.15, 'url(#gripHard)')}
+        ${rod(0.030, 0.078, D * 0.55, D * 0.5, 'url(#gripHard)')}
+        ${rod(0.922, 0.970, D * 0.55, D * 0.5, 'url(#gripHard)')}
+        ${rod(0.000, 0.032, D * 0.22, D * 0.11, 'url(#gripHard)')}
+        ${rod(0.968, 1.000, D * 0.22, D * 0.11, 'url(#gripHard)')}
         <!-- the flat rings just outboard of each ball -->
-        ${rod(0.106, 0.124, D * 0.60, D * 0.10, 'url(#nickelSoft)')}
-        ${rod(0.876, 0.894, D * 0.60, D * 0.10, 'url(#nickelSoft)')}
+        ${rod(0.106, 0.124, D * 0.60, D * 0.10, 'url(#gripSoft)')}
+        ${rod(0.876, 0.894, D * 0.60, D * 0.10, 'url(#gripSoft)')}
 
         <!-- The shaft: constant diameter, and the tone runs ACROSS it. A dark
              line at the top, a narrow specular at a third down, a broad dark
@@ -4324,13 +7497,13 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
              was one flat white ribbon, which is why it looked unlit. -->
         ${rod(0.20, 0.80, D / 2, D * 0.16, 'url(#grabRod)')}
         <!-- step collars where the shaft meets each ball -->
-        ${rod(0.203, 0.228, D * 0.575, D * 0.2, 'url(#nickelSoft)')}
-        ${rod(0.772, 0.797, D * 0.575, D * 0.2, 'url(#nickelSoft)')}
+        ${rod(0.203, 0.228, D * 0.575, D * 0.2, 'url(#gripSoft)')}
+        ${rod(0.772, 0.797, D * 0.575, D * 0.2, 'url(#gripSoft)')}
 
         <!-- the post balls, turned and standing in front of their roses -->
         ${POST.map(t => `
         <ellipse cx="${n1(P(t))}" cy="${n1(by)}" rx="${n1(D * 0.675)}" ry="${n1(D * 0.725)}"
-                 fill="url(#nickel)"/>
+                 fill="url(#gripHard)"/>
         <ellipse cx="${n1(P(t) - D * 0.16)}" cy="${n1(by - D * 0.26)}" rx="${n1(D * 0.34)}"
                  ry="${n1(D * 0.17)}" fill="#fff" opacity="0.32"/>`).join('')}
       </g>
@@ -5057,6 +8230,114 @@ const keyway = (kx, ky, s = 1) => `
       </g>`;
 
 /**
+ * ── THE עינית, AND IT IS MEASURED ─────────────────────────────────────
+ *
+ * Peretz, 30.8.2026: *"add עינית."* It was never drawn. `render()` once had a
+ * peephole gated on `win.rects.length === 0`, and `research/works/INVENTORY.md`
+ * records that rule as wrong — d076 carries one on a solid leaf above a
+ * knocker, and glazed doors in the corpus carry them too. Nothing has been
+ * drawn since, so this is the fitting arriving as a CHOICE rather than as a
+ * rule about when to show it.
+ *
+ * ⚠ 30 mm ACROSS, AND `PEEPHOLE_R` WAS WRONG BY A FACTOR OF TWO. That constant
+ * is 30 and is documented as the "outer halo" — read as a RADIUS it draws a
+ * 60 mm boss. Measured on d028, which is the same door as peretz-2 and the
+ * clearest peephole in the range: 21 x 20.3 px, against a leaf 569 px wide and
+ * 1377 px tall. As a fraction of each matching axis that is 31.4 mm across and
+ * 30.2 mm down on a standard leaf — round, and 30 mm.
+ *
+ * Real door viewers run a 14-16 mm barrel inside a 22-35 mm trim ring, so 30 mm
+ * is the ring and the measurement lands in the middle of the range.
+ *
+ * ⚠ CENTRED ON THE LEAF, WHICH IS TWO DOORS AGREEING. d028 puts it 38 mm off
+ * the leaf's centre line and peretz-1 puts it 25 mm off, on opposite sides —
+ * which is a fitter's eye, not an offset. `PEEPHOLE_AFF` (1600, 0.762 H) is
+ * untouched: it is a corpus figure over thirty doors, and the four snapshots
+ * here read a mean of 1482 with the same downward compression that reads the
+ * LEVER 13-18% low, so they do not beat it.
+ */
+const peephole = (cx, cy) => {
+  const R = PEEPHOLE_R;          // one statement of it; see the constant
+  return `
+    <g data-hw="peephole" data-owner="peephole" data-kind="peephole"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+      <ellipse cx="${cx}" cy="${cy + R * 0.18}" rx="${(R * 0.95).toFixed(1)}"
+               ry="${(R * 0.88).toFixed(1)}" fill="#000" opacity="0.18"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
+              stroke="#000" stroke-opacity=".26"/>
+      ${/* the glass inside the ring — dark, because behind it is an unlit hall,
+            which is the same reasoning the obscured glazing is drawn on */''
+       }<circle cx="${cx}" cy="${cy}" r="${(R * 0.52).toFixed(1)}"
+               fill="#000" fill-opacity=".58"/>
+      <circle cx="${(cx - R * 0.18).toFixed(1)}" cy="${(cy - R * 0.20).toFixed(1)}"
+              r="${(R * 0.20).toFixed(1)}" fill="#fff" fill-opacity=".30"/>
+    </g>`;
+};
+
+/**
+ * ── THE פעמון ─────────────────────────────────────────────────────────
+ *
+ * Peretz, 30.8.2026: *"the bell on the doors is 300, take images of it and add
+ * it."*
+ *
+ * ⚠ AND THIS IS THE ONE FITTING IN THIS ROUND WITH NO PHOTOGRAPH BEHIND IT.
+ * That is said out loud because the rest of this file is measured and the
+ * reader has to be able to tell which is which — it is the same warning the
+ * ALCOVE carried before it was deleted for being the only depth in the file
+ * not taken off a picture.
+ *
+ * What was looked at, and came back empty:
+ *   · the four photographs Peretz sent — no bell on any of them;
+ *   · `research/works/INVENTORY.md`, whose one candidate is d028's *"small
+ *     white unit high on the leaf"*, described there as an intercom or bell.
+ *     It is the מנעול כספת. Peretz named it himself in these very notes, and
+ *     the same fitting appears on peretz-3 and peretz-4;
+ *   · d028's own wall carries a real bell push, and it is photographed at too
+ *     oblique an angle to measure anything from.
+ *   · the web, which this container's egress proxy blocks for every image host.
+ *
+ * ⚠ SO ONE NUMBER IS SOURCED AND THE REST IS CONVENTION, AND THE SPLIT IS
+ * WRITTEN DOWN. Published dimensions for real bell pushes run 57 mm (a 2-1/4"
+ * round brass push), 65 mm (a 6.5 x 6.5 cm antique brass push) and 78 mm.
+ * **65 mm** is the middle of that range and the exact figure of the one whose
+ * dimensions were given in centimetres. The rest — a round bezel with a raised
+ * centre button — is what every bell push in that range is, and it is the
+ * least there is to get wrong: the קודן was drawn wrong because a keypad has
+ * structure to invent, and a disc inside a disc has none.
+ *
+ * REALISM.md §6 governs the moment a photograph arrives. `ASK-PERETZ.md` asks
+ * for one, and asks the question that actually matters more than the drawing:
+ * WHERE he fits it.
+ *
+ * ⚠ ON THE HINGE STILE, AND THAT IS A CHOICE RATHER THAN A MEASUREMENT. The
+ * leaf is the only surface this drawing owns square-on, and the hinge stile is
+ * the only band of it that is clear of the lever, the cylinder, the extra lock
+ * and the pull handle at every size in the range — so a bell there can never
+ * collide with anything, at any combination, which is the property that
+ * matters most for a fitting nobody has photographed for us. Same eye-level
+ * height as the extra lock, on the other side of the door.
+ */
+const bellPush = (cx, cy) => {
+  const R = 32.5;                                // 65 mm across; see above
+  return `
+    <g data-hw="bell" data-owner="bell" data-kind="bell"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+      <ellipse cx="${cx}" cy="${cy + R * 0.14}" rx="${(R * 0.96).toFixed(1)}"
+               ry="${(R * 0.90).toFixed(1)}" fill="#000" opacity="0.20"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
+              stroke="#000" stroke-opacity=".26"/>
+      <circle cx="${cx}" cy="${cy}" r="${(R * 0.66).toFixed(1)}"
+              fill="#000" fill-opacity=".10"/>
+      ${/* the button itself, proud of the bezel */''
+       }<circle cx="${cx}" cy="${(cy + 1.5).toFixed(1)}" r="${(R * 0.50).toFixed(1)}"
+               fill="#000" fill-opacity=".16"/>
+      <circle cx="${cx}" cy="${cy}" r="${(R * 0.50).toFixed(1)}" fill="url(#lockUnit)"/>
+      <circle cx="${(cx - R * 0.16).toFixed(1)}" cy="${(cy - R * 0.18).toFixed(1)}"
+              r="${(R * 0.22).toFixed(1)}" fill="#fff" fill-opacity=".26"/>
+    </g>`;
+};
+
+/**
  * The lock: a turned brushed-nickel escutcheon with a euro cylinder.
  * Modelled on the supplied hardware photograph — stepped concentric rings,
  * circular brushing, a recessed euro profile, and a keyway that is a real
@@ -5100,7 +8381,7 @@ const cylinder = (cx, cy, owned = false) => {
                a 11 11 0 1 1 22 0
                l 3.2 26 a 4 4 0 0 1 -4 4.4
                h -20.4 a 4 4 0 0 1 -4 -4.4 Z"
-            fill="#8E9398"/>
+            fill="url(#euroRim)"/>
       <path d="M ${kx - 10} ${ky - 15}
                a 10 10 0 1 1 20 0
                l 3 25 a 3.4 3.4 0 0 1 -3.4 3.7
@@ -5121,7 +8402,7 @@ const cylinder = (cx, cy, owned = false) => {
 };
 
 /** Plain-language description, used as the SVG's accessible name. */
-export function describe(state, lang = 'he') {
+export function describe(state) {
   /* ⚠ THE ROWS, from `js/spec.js`. This function assembled the door itself and
      was the LAST of four readers to be corrected, which is exactly what made
      it dangerous: it is the one description nobody sighted ever sees. It went
@@ -5132,16 +8413,20 @@ export function describe(state, lang = 'he') {
      `spec.js` imports the catalogue and nothing else, so this import does not
      make a cycle — see the note there about why the grip's position is
      deliberately not a row. */
-  if (lang === 'he') return describeSentence(state);
-  /* English is a stub and has been: `describe(state, 'en')` is called by
-     nothing, and `PLAN.md` §6's `content/copy.json` — every user-visible
-     string keyed, three values each — is unbuilt. Left as it was rather than
-     given a second row-renderer nobody reads. */
-  const c = byId(COLOURS, state.colour);
-  const w = byId(WINDOWS, state.window);
-  const s2 = SIZES[state.size] || SIZES.standard;
-  const h = byId(HANDINGS, state.handing);
-  return `Steel entrance door, ${c.en} (RAL ${c.ral}), ${w.en}, ${s2.en}, ${h.en}`;
+  /* ⚠ THE `lang` PARAMETER AND ITS ENGLISH BRANCH ARE GONE, and deleting
+     them is the point rather than a tidy-up. This function used to fork: the
+     Hebrew arm called `describeSentence`, and the English arm was a
+     hand-written second row-renderer, four fields wide, that named the
+     colour, the window, the size and the handing and knew nothing about the
+     frame, the extra lock, the hardware finish, the strips or the glazing.
+     Its own comment said why — "`PLAN.md` §6's `content/copy.json` is
+     unbuilt" — and admitted `describe(state, 'en')` was called by nothing,
+     which is the only reason a description that had drifted six axes behind
+     the door never showed up as a bug.
+     It is built now. One reader, one row list, three languages, and the
+     second copy of the naming rule that CLAUDE.md §5 warns about is deleted
+     rather than translated. */
+  return describeSentence(state);
 }
 
 /* ─── Option thumbnails, from the same geometry the stage uses ──── */
@@ -5153,7 +8438,7 @@ export function windowGlyph(win) {
      matters: two rectangles in the catalogue, ONE opening with a mullion on
      the door, and a tile showing two separate lights would be advertising a
      door we stopped drawing. */
-  const rects = apertureLayout(win, W - 100).map(o => {
+  const rects = apertureLayout(win, W - 100, null, H - REBATE).map(o => {
     const x = 50 + o.x;
     return `<rect x="${x}" y="${o.top}" width="${o.w}" height="${o.h}"
                   fill="#7C8891" stroke="#3A3D40" stroke-width="26"/>`
@@ -5379,6 +8664,161 @@ export function handleGlyph(handle) {
 export const locksetGlyph = handleGlyph;
 
 /**
+ * פרזול — the finish, drawn as the thing it recolours.
+ *
+ * A lever on its rose, in the metal itself, because a customer choosing a
+ * finish is choosing what the handle will look like and a bare swatch of
+ * colour would not say that. The ramp is the same `FINISH_TONES` the door
+ * uses, so the tile and the drawing cannot disagree about what "ברונזה" is.
+ */
+export function pirzulGlyph(pz) {
+  const t = FINISH_TONES[pz.tone] || FINISH_TONES.steel;
+  return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
+    <defs>
+      <linearGradient id="pzg-${pz.id}" x1="0.1" y1="0" x2="0.9" y2="1">
+        <stop offset="0" stop-color="${t[0]}"/><stop offset="0.38" stop-color="${t[2]}"/>
+        <stop offset="0.7" stop-color="${t[3]}"/><stop offset="1" stop-color="${t[5]}"/>
+      </linearGradient>
+    </defs>
+    <circle cx="0" cy="-26" r="30" fill="url(#pzg-${pz.id})"
+            stroke="#000" stroke-opacity=".18"/>
+    <path d="M -4 -40 L 46 -34 Q 54 -32 54 -25 Q 54 -18 46 -17 L -4 -12 Z"
+          fill="url(#pzg-${pz.id})" stroke="#000" stroke-opacity=".18"/>
+    <circle cx="0" cy="42" r="19" fill="url(#pzg-${pz.id})"
+            stroke="#000" stroke-opacity=".18"/>
+    <rect x="-4.5" y="36" width="9" height="13" rx="2" fill="#000" fill-opacity=".5"/>
+  </svg>`;
+}
+
+/**
+ * THE MASHKOF, drawn as what a joiner would show you: the frame in section,
+ * looking down on the head of the opening from above.
+ *
+ * ⚠ THE ONE PLACE IN THIS FILE THAT IS NOT SQUARE-ON, AND IT IS NOT A DOOR.
+ * `CLAUDE.md` §4's square-on discipline governs the DRAWING — leaf, frame,
+ * mouldings and hardware all share one viewpoint because anything implying a
+ * second one reads as an error. A catalogue glyph is not in that picture; it
+ * is a diagram beside it, and the two dimensions Peretz prices — the face on
+ * the wall and the return into it — are precisely the two a square-on
+ * elevation cannot show at once. Drawing them any other way would give the
+ * customer four tiles that differ by two pixels of outline.
+ *
+ * Wall hatched, frame solid, leaf a thin slab at the back. The two dimensions
+ * are the two that change, and they change by the real ratio.
+ */
+export function mashkofGlyph(mk) {
+  const W = 200, H = 150;
+  const sc = 0.62;                        // mm to glyph units
+  const out = mk.out * sc, dep = mk.in * sc;
+  const wallY = 30, frameY = wallY;
+  return `<svg viewBox="0 0 ${W} ${H}" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">
+      <!-- the wall, cut -->
+      <rect x="0" y="${wallY}" width="${W}" height="26" opacity=".16"/>
+      <!-- the frame's face on the wall, and its return into the opening -->
+      <rect x="${W / 2 - out}" y="${frameY - 9}" width="${out * 2}" height="9"/>
+      <rect x="${W / 2 - 7}" y="${frameY}" width="14" height="${dep}"/>
+      <!-- the leaf, at the back of the return -->
+      <rect x="${W / 2 - 46}" y="${frameY + dep}" width="92" height="11" opacity=".72"/>
+      <!-- the two dimensions, as ticks -->
+      <rect x="${W / 2 - out}" y="${frameY - 20}" width="${out * 2}" height="2.5" opacity=".55"/>
+      <rect x="${W / 2 + 16}" y="${frameY}" width="2.5" height="${dep}" opacity=".55"/>
+    </g>
+  </svg>`;
+}
+
+/**
+ * The extra lock — none, a safe lock, a keypad.
+ *
+ * ⚠ THREE GLYPHS THAT CANNOT BE MISTAKEN FOR EACH OTHER, which is the standing
+ * rule for this file: `npm test` compares the markup of every option tile
+ * against every other, and it exists because nine handles once shared one
+ * picture under nine names and nine prices.
+ *
+ * Drawn in the same 3:4 window and the same `currentColor` as the hardware
+ * tiles beside them, so the row reads as one family:
+ *   `nospecial` — the plain leaf edge, nothing on it
+ *   `kasefet`   — a safe: a square body with a round dial and a spindle
+ *   `kodan`     — a keypad: a rounded body over a grid of nine buttons
+ */
+/**
+ * ⚠ THE TILES FOR THE פעמון AND THE עינית, AND THEY DRAW THE SAME OBJECTS THE
+ * LEAF DOES. A tile showing one fitting while the door draws another is §5
+ * items 5 and 6, and the "every option tile draws its own picture" assertion
+ * cannot catch it — all that one asks is whether two TILES differ.
+ *
+ * The two "none" tiles have to differ from each other as well, which is why
+ * one is a struck circle and the other a struck ring: they are two different
+ * questions being declined, and an identical picture on both would be the
+ * exact fault that check exists for.
+ */
+export function bellGlyph(x) {
+  const art = {
+    nobell: `
+    <circle cx="0" cy="0" r="46" fill="none" stroke="currentColor" stroke-width="7" opacity=".3"/>
+    <path d="M-30 30 L30 -30" stroke="currentColor" stroke-width="7" opacity=".45"/>`,
+    bell: `
+    <circle cx="0" cy="0" r="52"/>
+    <circle cx="0" cy="0" r="40" fill="#fff" opacity=".92"/>
+    <circle cx="0" cy="0" r="26"/>`,
+  }[x.id] || '';
+  return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+}
+
+export function peepholeGlyph(x) {
+  const art = {
+    nopeep: `
+    <circle cx="0" cy="0" r="30" fill="none" stroke="currentColor" stroke-width="7" opacity=".3"/>
+    <circle cx="0" cy="0" r="46" fill="none" stroke="currentColor" stroke-width="4" opacity=".22"/>
+    <path d="M-32 32 L32 -32" stroke="currentColor" stroke-width="7" opacity=".45"/>`,
+    peep: `
+    <circle cx="0" cy="0" r="40"/>
+    <circle cx="0" cy="0" r="21" fill="#fff" opacity=".92"/>
+    <circle cx="-7" cy="-8" r="8" opacity=".55"/>`,
+  }[x.id] || '';
+  return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+}
+
+export function specialLockGlyph(x) {
+  const art = {
+    nospecial: `
+    <rect x="-52" y="-70" width="104" height="140" rx="6" opacity=".18"/>
+    <path d="M-22 0h44" stroke="currentColor" stroke-width="7" fill="none" opacity=".55"/>`,
+    /* ⚠ BOTH REDRAWN 30.8.2026 TO MATCH THE PHOTOGRAPHS, AND THE TILE HAD TO
+       MOVE WITH THE DOOR. A tile showing one fitting while the leaf draws
+       another is §5 items 5 and 6 - nine handles that shared one picture, and
+       three faces that showed a cheaper option's - and the assertion "every
+       option tile draws its own picture" cannot catch it, because all that one
+       asks is whether two TILES differ from each other.
+       Proportions are the drawing's own: kasefet 50 x 68 (0.74), kodan
+       60 x 154 (0.39). See specialLockArt for where those come from. */
+    kasefet: `
+    <rect x="-45" y="-61" width="90" height="122" rx="9"/>
+    <rect x="-34" y="-46" width="68" height="92" rx="5" fill="#fff" opacity=".92"/>
+    ${/* the slot */''}<rect x="-20" y="-6" width="40" height="12" rx="5"/>
+    ${/* four screws, one at each corner - what identifies it at a glance */''
+     }${[[-23, -35], [23, -35], [-23, 35], [23, 35]]
+        .map(([sx, sy]) => `<circle cx="${sx}" cy="${sy}" r="5"/>`).join('')}`,
+    kodan: `
+    <rect x="-36" y="-91" width="72" height="182" rx="36"/>
+    <rect x="-27" y="-82" width="54" height="164" rx="27" fill="#fff" opacity=".92"/>
+    ${/* ten buttons in two columns of five - NOT the nine-button digital grid
+          this used to draw, which is a different product at three times the
+          price and is already sold separately as `digital` */''
+     }${[0, 1, 2, 3, 4].map(r => [-13, 13].map(bx =>
+        `<circle cx="${bx}" cy="${-70 + r * 27}" r="8"/>`).join('')).join('')}
+    ${/* the turn knob */''}<ellipse cx="0" cy="54" rx="21" ry="20"/>`,
+  }[x.id] || '';
+  return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
+    <g fill="currentColor">${art}</g>
+  </svg>`;
+}
+
+/**
  * Detail glyph: where the panel, groove and applied strips sit on the leaf.
  *
  * It knew `panel` and `groove` and nothing else, so the three details added
@@ -5392,15 +8832,46 @@ export function detailGlyph(detail) {
   const W = 950, H = 2100, pad = 40;
   const inset = 105;
 
-  const panelAt = (top, bot) => `<rect x="${inset}" y="${H * top}"
-        width="${W - inset * 2}" height="${H * (bot - top)}"
-        fill="none" stroke="currentColor" stroke-width="36"/>`;
+  /* ⚠ THE TILE HAS TO SAY WHICH SECTION, because that is the ONLY difference
+     between פאנל תחתון and פאנל תחתון קלאסי: same rows, same inset, same
+     price. Two concentric lines for the reeded one — which is what three to
+     five beads read as at 44 px — and one heavier line for the ogee. Without
+     it the two tiles are the same picture, which is exactly what the assertion
+     `every option tile draws its own picture` exists to catch. */
+  const reeded = mouldOf(detail) === 'reed';
+  const panelAt = (top, bot) => (reeded ? [0, 46] : [0]).map(g =>
+    `<rect x="${inset + g}" y="${H * top + g}"
+           width="${W - inset * 2 - g * 2}" height="${H * (bot - top) - g * 2}"
+           fill="none" stroke="currentColor" stroke-width="${reeded ? 20 : 40}"/>`).join('');
 
   // appliedFrame: the measured rectangles — a tall upper over a short lower,
   // or the lower one alone when a window takes the top of the leaf
-  const panels = !detail.panel ? ''
-    : detail.panels === 2 ? panelAt(0.07, 0.57) + panelAt(0.67, 0.91)
-    : panelAt(0.67, 0.91);
+  /* ⚠ OFF `panelRows`, WHICH IS WHAT THE DOOR DRAWS. This was two hand-written
+     pairs of fractions guarded by `panels === 2`, so the three-panel face and
+     the upper-panel face would both have shown the lone bottom rectangle —
+     three names, two pictures, which is CLAUDE.md §5 item 5 verbatim (nine
+     handle tiles drew the same picture). There is an assertion that every
+     option tile draws its own markup; this keeps it honest by construction
+     rather than by passing. The glyph's rows are inset a hair from the door's,
+     because a tile is 44 px and the outermost moulding would touch its edge. */
+  /* ⚠ THE CLASSICAL SET NEEDS ITS OWN TILE. `panelRows` sends it to the lone
+     lower rectangle, which is exactly what פאנל תחתון draws — two names, two
+     prices, one picture, and the assertion that every tile draws its own
+     markup said so. Its skeleton is read off the set's OWN tables so the tile
+     cannot drift from the door: the light, the shelf, the panel, the plinth. */
+  const panels = detail.classic
+    ? [`<rect x="${W * CLASSIC_GLASS.x0}" y="${H * CLASSIC_GLASS.top}"
+              width="${W * (CLASSIC_GLASS.x1 - CLASSIC_GLASS.x0)}"
+              height="${H * (CLASSIC_GLASS.bot - CLASSIC_GLASS.top)}"
+              fill="none" stroke="currentColor" stroke-width="36"/>`,
+       ...[['shelf', 'shelf'], ['panel', 'panel'], ['plinth', 'plinth']].map(([r, c]) => {
+         const [t, b] = CLASSIC_ROWS[r], [x0, x1] = CLASSIC_COLS[c] || CLASSIC_COLS.shelf;
+         return `<rect x="${W * x0}" y="${H * t}" width="${W * (x1 - x0)}"
+                       height="${H * (b - t)}" fill="none" stroke="currentColor"
+                       stroke-width="36"/>`;
+       })].join('')
+    : !detail.panel ? ''
+    : panelRows(detail).map(([t, b]) => panelAt(t, b)).join('');
 
   /* metalStrips, both axes. Horizontal: inset a tenth each side, evenly spaced
      0.09–0.91. Vertical: fewer, longer, grouped in one third of the leaf —
@@ -5415,9 +8886,37 @@ export function detailGlyph(detail) {
      one edge with free ends following the measured rhythm. */
   const n = detail.strips || 0;
   const RHYTHM = [0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91];
-  const strips = detail.vertical
+  /* ⚠ THE CROSS NEEDS ITS OWN TILE. Sent through the horizontal branch it
+     draws five bands and is then indistinguishable from חמישה פסים — two
+     names, two prices, one picture, which is the defect `every option tile
+     draws its own picture` exists to catch. Same fractions the door uses. */
+  /* ⚠ AND THE EVEN COMPOSITIONS NEED THEIR OWN PICTURE TOO. Sent through the
+     ragged branch, `strips4` would draw four bands of four different lengths —
+     a picture of the option beside it rather than of itself. Off STRIP_ROWS,
+     which is what the door draws. */
+  const strips = detail.even
+    ? (STRIP_ROWS[detail.rows] || STRIP_ROWS.quad).map(f =>
+        `<rect x="${W * (1 - STRIP_EVEN_W) / 2}" y="${H * f - 14}"
+               width="${W * STRIP_EVEN_W}" height="28" fill="currentColor"/>`).join('')
+    : detail.cross
+    ? [`<rect x="${W * 0.309 - 11}" y="${H * 0.155}" width="22"
+              height="${H * (0.864 - 0.155)}" fill="currentColor"/>`,
+       ...[0.420, 0.448, 0.578, 0.606].map(y =>
+         `<rect x="${W * 0.167}" y="${H * y - 9}" width="${W * (0.556 - 0.167)}"
+                height="18" fill="currentColor"/>`)].join('')
+    : detail.vertical && detail.long
     ? Array.from({ length: n }, (_, i) => {
-        const x = W * (0.10 + (n > 1 ? (i * 0.34) / (n - 1) : 0.17));
+        /* ⚠ ITS OWN PICTURE. Sent through the fanned branch a long vertical
+           set draws a fan, which is a picture of the option two tiles down. */
+        const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
+        const top = H * 0.098;   // STRIP_V, spelled out: a glyph is 44 px
+        const bot = H * (0.945 + (0.915 - 0.945) * (n > 1 ? i / (n - 1) : 0.5));
+        return `<rect x="${x - 8}" y="${top}" width="16" height="${bot - top}"
+                      fill="currentColor"/>`;
+      }).join('')
+    : detail.vertical
+    ? Array.from({ length: n }, (_, i) => {
+        const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
         const top = H * (0.05 + 0.34 * (n > 1 ? i / (n - 1) : 0.5));
         return `<rect x="${x - 9}" y="${top}" width="18" height="${H * 0.778 - top}"
                       fill="currentColor"/>`;

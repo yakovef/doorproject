@@ -51,20 +51,27 @@
  * state the interface would not let you build.
  */
 
-import { byId, DETAILS, GRILLES, HANDLES, isGlazed, leafGlazed, LOCKSETS, WINDOWS }
+import { T } from './copy.js';
+import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, LOCKSETS,
+         STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
-         gripPlacement, nearestGrip, panelFits } from './renderer.js';
+         gripPlacement, nearestGrip, panelFits, peepholeFits } from './renderer.js';
 
 /** Does this detail put ruled line work on the face?
  *  `perimeter` counts: it is a groove like any other, and both doors that
  *  carry one are solid — so the OBSERVED rule below, that ruled line work
  *  never shares a leaf with glazing, has nothing to say against it and
  *  everything to say for it. */
-export const isLineWork = detail => !!(detail.strips || detail.groove || detail.perimeter);
+/* ⚠ READS THE STATE, NOT THE DETAIL. Line work used to be a property of a
+   `DETAILS` entry — fourteen stripe options each carrying `strips: n`. The
+   stripes are a count on the state now, so "does this door have line work on
+   its face" is a question about the door rather than about the face option. */
+export const isLineWork = state =>
+  !!(state && state.stripeDir && state.stripeDir !== 'none' && state.stripeCount);
 
 /** Does this detail put ANYTHING on the face — moulding or line work alike? */
-export const faceWorked = detail => !!detail.panel || isLineWork(detail);
+export const faceWorked = state => !!byId(DETAILS, state.detail).panel || isLineWork(state);
 
 /**
  * Two different questions, and conflating them broke the sidelight the first
@@ -130,10 +137,24 @@ export function fallbackLockset(state) {
 export function conflicts(state) {
   const glazed = isGlazed(state);
   const onLeaf = leafGlazed(state);
-  const lined = isLineWork(byId(DETAILS, state.detail));
+  const lined = isLineWork(state);
 
   const out = { window: {}, grille: {}, detail: {}, handle: {},
-                lockset: {}, size: {}, colour: {}, handing: {} };
+                lockset: {}, size: {}, colour: {}, handing: {},
+                /* ⚠ THE עינית IS BLOCKED BY GEOMETRY, NOT BY A LIST. Both
+                   window shapes this catalogue sells are centred on the leaf
+                   and both reach viewer height, so on a glazed door the
+                   fitting has nowhere to be — `peepholeFits` computes that
+                   from the same `apertureLayout` the drawing calls, so the
+                   tile and the picture cannot disagree. The bell needs no such
+                   entry: it stands on the hinge stile and a 426-design sweep
+                   with real getBBox found it clear of everything. */
+                peephole: {}, bell: {},
+                /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
+                   longer options with ids. Every other key here is
+                   `{ optionId: reason }`; this one is either null or the one
+                   reason the stripe controls cannot be used on this door. */
+                stripes: null };
   const grip = byId(HANDLES, state.handle);
 
   /* The finish rule that used to live here is gone with the group it gated.
@@ -142,7 +163,7 @@ export function conflicts(state) {
 
   /* Ironwork and worked glass alike need a window to be in. */
   if (!glazed) {
-    for (const g of GRILLES) if (g.id !== 'none') out.grille[g.id] = 'דורש חלון';
+    for (const g of GRILLES) if (g.id !== 'none') out.grille[g.id] = T('why.needsWindow');
   }
 
   /* A WINDOW TAKES THE UPPER PANEL'S PLACE.
@@ -164,9 +185,29 @@ export function conflicts(state) {
      are selected would overstate a change the customer will barely notice.
      Read off `panels` rather than the id, so a third panelled face added later
      is covered without anybody remembering to come back here. */
+  /* ⚠ A LONE PANEL ON A SOLID DOOR IS NOT REFUSED, AND THAT IS THE SECOND
+     TIME THIS RANGE HAS CONTRADICTED WHAT WE WERE TOLD ABOUT IT.
+
+     Asked for from outside: *"remove the single panel options, the only
+     instance when on a door is only one panel is when there is a window and a
+     panel at the bottom."* This first shipped as a conflict — `panel` and
+     `panelo` blocked whenever the leaf had no glass — and `npm test` refused
+     it, naming three doors: d048, d051 and d087 are Peretz's OWN installed
+     doors, hand-measured off his own photographs, each a solid leaf carrying a
+     single lower panel. The instruction is contradicted by three of the thirty
+     doors it was given about, exactly the way "there is no ברזל מחושל" is
+     contradicted by ten of them (`ASK-PERETZ.md` §2).
+
+     So the two are split. It is not a CHOICE — `js/app.js` leaves both out of
+     the tile list on a solid door, which is what was actually asked for, and
+     the customer cannot reach one. It is still a STATE, so the gallery draws
+     his three real doors as they were built and an old link opens as itself,
+     with no notice and no repair moving it. A rule here would have done
+     neither: it would have re-fitted three photographs to a door he did not
+     build, in the one part of the site whose whole job is being true. */
   if (onLeaf) {
-    for (const d of DETAILS) if (d.panels === 2) {
-      out.detail[d.id] = 'החלון תופס את מקומו של הפאנל העליון';
+    for (const d of DETAILS) if (hasUpperPanel(d)) {
+      out.detail[d.id] = T('why.winTakesTop');
     }
     /* And a TALL light leaves no room for the lone one either. Same rule as
        above, one step further: `appliedFrame` draws nothing at all when the
@@ -177,20 +218,69 @@ export function conflicts(state) {
     for (const d of DETAILS) {
       if (!d.panel || out.detail[d.id]) continue;
       if (!panelFits({ ...state, detail: d.id })) {
-        out.detail[d.id] = 'אין מקום לפאנל מתחת לחלון';
+        out.detail[d.id] = T('why.noRoomBelow');
       }
     }
   }
 
-  /* OBSERVED: ruled line work never shares a leaf with glazing, and never
-     with a moulded panel. Both directions are reported, so whichever tile the
-     customer is looking at explains itself. */
+  /* The classical set and its own light — the other half of the repair below.
+     ⚠ IT NO LONGER NEEDS A WINDOW, IT ONLY REFUSES THE WRONG ONE. `needsWindow`
+     forced the rectangle, and a photograph of the same set built SOLID — the
+     glass swapped for a raised panel with a peephole and a ring knocker, every
+     other piece identical — says that is one of two variants and not a fault.
+     What the set genuinely cannot take is the צוהר אנכי: it substitutes its own
+     356 x 819 rectangle for whatever the window option would have drawn, so
+     choosing the slot would put a rectangle on the door while the tile, the
+     price and the order all said a slot. `rectOnly`, not `needsWindow`, and
+     reported from both sides because the customer may have picked either
+     first. */
   for (const d of DETAILS) {
-    if (onLeaf && isLineWork(d)) out.detail[d.id] = 'לא משלבים קווי מתכת עם חלון';
-    if (isLineWork(d) && d.panel) out.detail[d.id] = 'לא משלבים קווי מתכת עם פאנל';
+    if (d.rectOnly && state.window !== 'rect' && state.window !== 'none') {
+      out.detail[d.id] = out.detail[d.id] || T('why.setNoSlot');
+    }
   }
+  if (byId(DETAILS, state.detail).rectOnly) {
+    for (const w of WINDOWS) if (w.id !== 'rect' && w.id !== 'none') {
+      out.window[w.id] = out.window[w.id] || T('why.setOwnWindow');
+    }
+  }
+
+  /* OBSERVED: ruled line work never shares a leaf with glazing, and never with
+     a moulded panel. Both directions are reported, so whichever control the
+     customer is looking at explains itself.
+     ⚠ THE PANEL HALF IS ASSUMPTION A11 AND THE GLAZING HALF IS THE CORPUS. No
+     door in the 129 photographs carries both a panel and stripes, and Peretz
+     priced them as separate lines — which is weak evidence that they combine,
+     not strong evidence that they do not. The cost of being wrong is one rule.
+     The real reason it holds today is that the DRAWING has no measured answer
+     for where a stripe goes on a panelled leaf, and inventing one would put
+     geometry on screen no photograph supports (REALISM.md §6). */
+  if (!peepholeFits(state)) out.peephole.peep = T('why.peepWindow');
+  if (onLeaf) out.stripes = T('why.stripesWindow');
+  else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
   if (lined) {
-    for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = 'לא משלבים חלון עם קווי מתכת';
+    for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = T('why.windowStripes');
+    for (const d of DETAILS) if (d.panel) out.detail[d.id] = T('why.panelStripes');
+  }
+
+  /* PERETZ: "square +3700 (needs to aways have a panel at the bottom)". The
+     square light leaves the bottom half of the leaf bare and he fills it, so a
+     plain face is not a door he builds with that window. Reported on the FACE
+     rather than on the window, because the window is what the customer chose
+     and the face is what has to move. */
+  if (state.window === 'rect') {
+    out.detail.plain = out.detail.plain || T('why.rectNeedsPanel');
+  }
+
+  /* PERETZ: "3 panel +1900 (remove the handle)" and the same for the greek
+     set. The middle panel of the three IS a grab plate carrying its own turned
+     pull, and the classical set has its own pull on the shelf — so a second
+     one is not an option he offers. ASK-PERETZ §14 asked whether the three
+     panels always come with their pull; this is that answered. */
+  if (byId(DETAILS, state.detail).ownPull) {
+    for (const h of HANDLES) {
+      if (h.style !== 'none') out.handle[h.id] = T('why.panelOwnPull');
+    }
   }
 
   /* WITHDRAWN: pull bar x lever. This was the strongest OBSERVED rule in the
@@ -234,14 +324,14 @@ export function conflicts(state) {
   const CHANNEL = HANDLES.find(h => h.style === 'channel');
   if (CHANNEL) {
     if (onLeaf || faceWorked(byId(DETAILS, state.detail))) {
-      out.handle[CHANNEL.id] = 'ידית שקועה דורשת דלת חלקה';
+      out.handle[CHANNEL.id] = T('why.channelPlain');
     }
     if (grip.style === 'channel') {
       for (const w of WINDOWS) if (w.rects.length) {
-        out.window[w.id] = out.window[w.id] || 'לא משתלב עם ידית שקועה';
+        out.window[w.id] = out.window[w.id] || T('why.notWithChannel');
       }
       for (const d of DETAILS) if (faceWorked(d)) {
-        out.detail[d.id] = out.detail[d.id] || 'לא משתלב עם ידית שקועה';
+        out.detail[d.id] = out.detail[d.id] || T('why.notWithChannel');
       }
     }
   }
@@ -266,7 +356,28 @@ export function conflicts(state) {
   for (const h of HANDLES) {
     if (h.style === 'none' || out.handle[h.id]) continue;
     if (!gripFitsAnywhere({ ...state, handle: h.id, grip: null })) {
-      out.handle[h.id] = 'אין מקום לידית הזו על הדלת';
+      out.handle[h.id] = T('why.noRoomHandle');
+    }
+  }
+
+  /* ⚠ AND THE SAME QUESTION FROM THE WINDOW'S SIDE, because the customer may
+     have picked either one first.
+     The withdrawn `acrossCentre` rule did grey the windows when a grab bar was
+     chosen, and dropping it without this would have left one direction told
+     and the other silent: pick the vertical slot with a bow already on the
+     door and `repair` takes the bow away, correctly and with a notice, but
+     with nothing on the tile beforehand to say it was going to.
+     Asked of `gripFitsAnywhere` rather than of a band, so it generalises to
+     every grip and cannot drift from the drawing — and so it is one question
+     with two readers rather than two rules that must agree. Memoised on the
+     six fields a placement depends on, which is what makes asking it of every
+     window as well as every grip affordable. */
+  if (grip.style !== 'none') {
+    for (const w of WINDOWS) {
+      if (out.window[w.id]) continue;
+      if (!gripFitsAnywhere({ ...state, window: w.id, grip: null })) {
+        out.window[w.id] = T('why.noRoomWithWindow');
+      }
     }
   }
 
@@ -307,12 +418,12 @@ export function conflicts(state) {
      narrow leaf — the bow is centred and does not move out of the way. */
   for (const k of LOCKSETS) {
     if (gripClashesLockset({ ...state, lockset: k.id })) {
-      out.lockset[k.id] = out.lockset[k.id] || 'אין מקום בין המאחז למנעול';
+      out.lockset[k.id] = out.lockset[k.id] || T('why.noRoomGripLock');
     }
   }
   for (const h of HANDLES) {
     if (gripClashesLockset({ ...state, handle: h.id })) {
-      out.handle[h.id] = out.handle[h.id] || 'אין מקום בין המאחז למנעול';
+      out.handle[h.id] = out.handle[h.id] || T('why.noRoomGripLock');
     }
   }
 
@@ -326,20 +437,34 @@ export function conflicts(state) {
      A loop that cannot fire is worse than no loop, because it reads as a live
      rule. */
 
-  /* GEOMETRIC: the horizontal grab bar is centred on the LEAF, not on the
-     stile, so it runs straight across a centred window. Every one of the nine
-     installed grab bars is on a solid or panelled leaf. */
-  const bandTop = 0.42, bandBot = 0.60;              // the bar's own height band
-  const acrossCentre = win => win.rects.some(r =>
-    r.top / 2050 < bandBot && (r.top + r.h) / 2050 > bandTop
-    && Math.abs(r.dx || 0) < r.w / 2 + 60);
-  if (acrossCentre(byId(WINDOWS, state.window))) {
-    const grab = HANDLES.find(h => h.style === 'grab');
-    if (grab) out.handle[grab.id] = 'המאחז חוצה את החלון';
-  }
-  if (byId(HANDLES, state.handle).style === 'grab') {
-    for (const w of WINDOWS) if (acrossCentre(w)) out.window[w.id] = 'המאחז חוצה את החלון';
-  }
+  /* ⚠ A BLANKET REFUSAL OF THE GRAB BAR ON ANY GLAZED LEAF WAS HERE, AND ITS
+     STATED PREMISE IS NO LONGER TRUE.
+
+     It read: "the horizontal grab bar is centred on the LEAF, not on the
+     stile, so it runs straight across a centred window", and refused the bar
+     against a hardcoded band — `r.top / 2050 < 0.60 && (r.top + r.h) / 2050 >
+     0.42`. That was a fair description of a bar pinned to the leaf's centre at
+     a fixed height, which is what it was when this was written.
+
+     It is not pinned any more. `grabHandle` draws it where it is placed, and
+     `gripPlacement` asks the real question — the bow's interval against each
+     aperture's, at the height it is actually at. Reported from outside with a
+     screenshot: *"there is space for the מאחז אופקי but I can't place it."*
+     Measured across every size and window: the bar has a legal home on ALL
+     eighteen combinations, with 686 legal positions on a standard leaf with
+     the rectangle and 909 on a wide one. This rule was refusing every one.
+
+     ⚠ AND IT WAS A SECOND ANSWER TO A QUESTION ALREADY ASKED. Twenty lines up,
+     `conflicts` runs `gripFitsAnywhere` over every grip — the honest version,
+     computed from the drawing's own geometry — so a grab bar that genuinely
+     has nowhere to go is refused there, by the same code that refuses every
+     other grip, and told the same way. Two answers, and the cruder one won.
+     CLAUDE.md §5 all over: a quantity computed in two places.
+
+     The hardcoded 2050 is worth one more line, because it is the tell. A leaf
+     is 2050 mm only on four of the six size bands; on a tall door this rule
+     was measuring fractions of the wrong door. A rule that cannot see the door
+     it is judging is not a rule about that door. */
 
   return out;
 }
@@ -351,22 +476,42 @@ export function isBlocked(state, group, id) {
 }
 
 /**
- * Human-readable Hebrew for each repair, named by WHAT WAS DONE rather than by
- * which group moved. `repair` picks the sentence at the moment it makes the
- * change, which is the only place that knows why.
+ * One COPY KEY per repair, named by WHAT WAS DONE rather than by which group
+ * moved. `repair` picks it at the moment it makes the change, which is the
+ * only place that knows why.
+ *
+ * ⚠ KEYS, NOT SENTENCES, AND THAT IS THE WHOLE POINT OF THIS NOTE. This table
+ * is a module-level object literal: its values are evaluated ONCE, when the
+ * bundle is first imported, which happens before `setLang` has read the
+ * customer's language. Fifteen `T(...)` calls here would have frozen every
+ * repair message in whatever language the module loaded in — Hebrew, always,
+ * on an English page — and nothing would have thrown, nothing would have
+ * failed a build, and the page would have looked entirely correct until a
+ * customer chose a grille on a solid door.
+ *
+ * `change` calls `T` instead, at the instant of the repair, which is also the
+ * instant before the toast. The same trap waits in any other top-level
+ * constant that wants a translated string in it: hold the key.
  */
 const SAID = {
-  windowAdded:   'הוספנו חלון — הסורג והזכוכית צריכים אותו',
-  windowGone:    'הסרנו את החלון',
-  lineWorkGone:  'הסרנו את קווי המתכת — לא משלבים אותם עם חלון',
-  onePanel:      'עברנו לפאנל אחד — החלון תופס את מקומו של העליון',
-  noPanelRoom:   'הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום',
-  faceCleared:   'החלקנו את הדלת — ידית שקועה דורשת פנים חלקות',
-  grilleGone:    'הסרנו את הסורג — אין חלון',
-  gripGone:      'הסרנו את ידית המשיכה — אין לה מקום כאן',
-  locksetSwapped:'החלפנו את המנעול — אין לו מקום ליד המאחז',
-  gripMoved:     'הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה',
-  gripHome:      'הידית הוסרה, ואיתה המיקום שבחרתם לה',
+  windowAdded:   'fix.windowAdded',
+  windowGone:    'fix.windowGone',
+  lineWorkGone:  'fix.lineWorkGone',
+  onePanel:      'fix.onePanel',
+  noPanelRoom:   'fix.noPanelRoom',
+  faceCleared:   'fix.faceCleared',
+  grilleGone:    'fix.grilleGone',
+  gripGone:      'fix.gripGone',
+  locksetSwapped:'fix.locksetSwapped',
+  gripMoved:     'fix.gripMoved',
+  gripHome:      'fix.gripHome',
+  setWindow:     'fix.setWindow',
+  setGone:       'fix.setGone',
+  needPanel:     'fix.needPanel',
+  peepGone:      'fix.peepGone',
+  peepWindow:    'fix.peepWindow',
+  ownPull:       'fix.ownPull',
+  stripesCapped: 'fix.stripesCapped',
 };
 
 /**
@@ -395,7 +540,7 @@ export function repair(state, intent = null) {
      already says that a toast naming the wrong culprit is worse than no toast
      at all; this is the shape that keeps producing them. */
   const said = [];
-  const change = (group, why) => { changed.push(group); said.push(why); };
+  const change = (group, key) => { changed.push(group); said.push(T(key)); };
 
   /* Asking for a grille or worked glass on a solid door means asking for a
      window. Fix that first, and only if it was not the window itself that was
@@ -405,14 +550,112 @@ export function repair(state, intent = null) {
     change('window', SAID.windowAdded);
   }
 
-  const lined = isLineWork(byId(DETAILS, s.detail));
+  /* ⚠ THE CLASSICAL SET BRINGS ITS OWN LIGHT, and it is a particular one.
+     `apertureLayout` substitutes `detail.winRect` for whatever the window
+     option would have drawn — 360 x 819 at 318 from the head, so that the
+     glass clears the frieze above it and the shelf below — which means that
+     choosing the set with the צוהר אנכי would have quietly drawn a rectangle
+     while the tile, the price and the order all said a slot. A substitution
+     nobody can see is the same bug as a price for a panel that is not drawn.
+     ⚠ BUT `none` IS FINE, and it used to be forced to the rectangle. The set
+     is built solid as well as glazed — same cornice, same frieze, same shelf,
+     a raised panel where the glass goes — so the only pairing to repair is the
+     slot. Keyed off `rectOnly` rather than the id, so a second set added later
+     is covered without anybody remembering to come back here. */
+  if (byId(DETAILS, s.detail).rectOnly && s.window !== 'rect' && s.window !== 'none') {
+    if (intent === 'window') { s.detail = 'plain'; change('detail', SAID.setGone); }
+    else { s.window = 'rect'; change('window', SAID.setWindow); }
+  }
+
+  /* ⚠ ELEVEN STRIPES TURNED SIDEWAYS ARE STILL SIX. Reported by Peretz,
+     30.8.2026: *"when i change the placing of the stripes to vertical instead
+     of horizontal, even if there are 11 stripes it puts 11 vertical stripes,
+     and that cant be happening."*
+
+     The maxima are not the same on the two axes and never have been —
+     `STRIPE_MAX` is `{ h: 11, hTight: 8, v: 6 }`, and the six is the corpus's
+     own 0.073 pitch reaching the stiles, not a preference. Turning the group
+     sideways carried the count across unchanged and drew eleven columns into a
+     leaf that holds six.
+
+     ⚠ AND THE CODE AND THE LINK WERE ALREADY RIGHT, WHICH IS WHY THIS SURVIVED.
+     `packStripes` clamps — `18 + Math.min(n, STRIPE_MAX.v)` — so a shared link
+     and a DM- code have always carried six. Only the LIVE state kept the
+     eleven, and the drawing and the price read the live state. A quantity
+     correct in two of its three readers is the hardest kind to see, and it is
+     CLAUDE.md §5.10 with the copies in an unusual order.
+
+     So the clamp goes HERE, in `repair`, which every one of the three goes
+     through: a click, a link and a decoded code cannot now disagree about how
+     many stripes this door has. `packStripes` keeps its own `Math.min` — it is
+     a wire format and must never emit a value it cannot read back — but it is
+     no longer the only thing standing between a customer and eleven columns.
+
+     ⚠ AND GOING BACK TO HORIZONTAL MUST NOT INVENT STRIPES. It does not,
+     because the clamp overwrites the count rather than remembering the old one:
+     eleven horizontal → six vertical → six horizontal. Restoring the eleven
+     would mean carrying a shadow count no reader can see, which is the same
+     shape of hidden state the packing was designed to make unrepresentable.
+     There is an assertion on exactly that round trip. */
+  if (s.stripeDir === 'v' && (s.stripeCount | 0) > STRIPE_MAX.v) {
+    s.stripeCount = STRIPE_MAX.v;
+    change('stripes', SAID.stripesCapped);
+  }
+
+  /* ⚠ THE עינית AND THE GLASS WANT THE SAME PIECE OF LEAF, and the trade is
+     the same two-sided one every other pair here gets: whichever the customer
+     just clicked wins. Without an intent — a link — the WINDOW stays, because
+     glass is the more expensive and the more visible of the two to lose
+     silently, which is the identical argument the line-work repair below
+     makes. */
+  if (s.peephole === 'peep' && !peepholeFits(s)) {
+    if (intent === 'peephole') { s.window = 'none'; change('window', SAID.windowGone); }
+    else { s.peephole = 'nopeep'; change('peephole', SAID.peepGone); }
+  }
+
+  const lined = isLineWork(s);
+
+  /* Stripes and a panel want the same face. */
+  if (lined && byId(DETAILS, s.detail).panel) {
+    if (intent === 'detail') {
+      s.stripeDir = 'none'; s.stripeCount = 0; change('stripes', SAID.lineWorkGone);
+    } else { s.detail = 'plain'; change('detail', SAID.setGone); }
+  }
 
   if (leafGlazed(s) && lined) {
     /* Whichever the customer just asked for wins; the other yields. Without
        an intent — a link — the WINDOW wins, because glass is the more
        expensive and more visible of the two to lose silently. */
+    if (intent === 'stripes') { s.window = 'none'; change('window', SAID.windowGone); }
+    else { s.stripeDir = 'none'; s.stripeCount = 0; change('stripes', SAID.lineWorkGone); }
+  }
+
+  /* ⚠ A THIRD ORDERING CONSTRAINT, AND IT WAS LEARNED THE SAME WAY AS THE
+     OTHER TWO — by a link arriving unbuildable. This file already records that
+     glazing repairs run BEFORE line-work repairs and that the no-glass-no-
+     grille cleanup runs LAST. Add: **the face repairs run AFTER the line-work
+     repairs**, because line work can CLEAR the face.
+     The failure: a link with a square window and eleven stripes. The stripes
+     were removed (a window beats line work on a link), which left a plain
+     face — and the "a square light always has a panel under it" repair had
+     already run, against the face as it was BEFORE the stripes went. The link
+     arrived with a rect window over a plain face, which `conflicts` refuses.
+     Repair must be idempotent and must always LAND somewhere buildable; a
+     repair that reads a value another repair is about to change is neither. */
+
+  /* PERETZ: "square +3700 (needs to aways have a panel at the bottom)". If the
+     customer asked for the window, the face gains a panel; if they asked for a
+     plain face, the window yields. */
+  if (s.window === 'rect' && s.detail === 'plain') {
     if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
-    else { s.detail = 'plain'; change('detail', SAID.lineWorkGone); }
+    else { s.detail = 'panel'; change('detail', SAID.needPanel); }
+  }
+
+  /* PERETZ: "3 panel +1900 (remove the handle)", and the same for the greek
+     set — both carry their own pull. */
+  if (byId(DETAILS, s.detail).ownPull && byId(HANDLES, s.handle).style !== 'none') {
+    if (intent === 'handle') { s.detail = 'plain'; change('detail', SAID.setGone); }
+    else { s.handle = 'none'; change('handle', SAID.ownPull); }
   }
 
   /* Two panels and a window want the same half of the leaf, and the window
@@ -428,10 +671,19 @@ export function repair(state, intent = null) {
     else { s.detail = 'plain'; change('detail', SAID.noPanelRoom); }
   }
 
-  if (leafGlazed(s) && byId(DETAILS, s.detail).panels === 2) {
+  if (leafGlazed(s) && hasUpperPanel(byId(DETAILS, s.detail))) {
     if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
     else {
-      const one = DETAILS.find(d => d.panel && d.panels !== 2);
+      /* ⚠ THE SAME MOULDING, not just the same count. `panelo` is the ogee
+         single and `panel` the plain one; a customer on two CLASSICAL panels
+         who adds a window was dropped onto the plain single, quietly changing
+         the profile of the moulding they had picked on purpose. It matters
+         more now: since 27.8 those two singles are the only way to reach one
+         panel at all, so this is the only thing that puts them on a door. */
+      const cur = byId(DETAILS, s.detail);
+      const singles = DETAILS.filter(d => d.panel && !hasUpperPanel(d));
+      const one = singles.find(d => (d.profile || null) === (cur.profile || null))
+               || singles[0];
       if (one) { s.detail = one.id; change('detail', SAID.onePanel); }
     }
   }
@@ -494,7 +746,14 @@ export function repair(state, intent = null) {
      longer be turned comes back upright — otherwise a stale `gp=` in a URL
      would carry a rotation the leaf cannot take. */
   if (s.grip) {
-    if (byId(HANDLES, s.handle).style === 'none') {
+    /* ⚠ A GRIP CUT INTO THE LEAF DROPS ITS POSITION HERE TOO, not only in
+       `gripAt`. The drawing already ignores `gp=` for the recessed channel —
+       but a design that CARRIES a position it will never honour is the same
+       shape of lie as the retired `f=` parameter, and `toQuery` would write it
+       straight back out for the next person who opens the link. Dropped, and
+       said out loud, because the customer may well have dragged the previous
+       grip before choosing this one. */
+    if (byId(HANDLES, s.handle).style === 'none' || byId(HANDLES, s.handle).fixed) {
       s.grip = null;
       change('grip', SAID.gripHome);
     } else {

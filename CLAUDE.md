@@ -1,25 +1,4068 @@
 # CLAUDE.md — how this project works, and what it cost to learn
 
-Read this first. It is the accumulated state of the work: what the thing is,
-the rules that must not be broken, the model the drawing is built on, and —
-most valuable — the mistakes that have already been made here, so they are not
-made a third time.
+**Read this first, all of it, before touching anything.** It is the accumulated
+state of the work: what the thing is, who it is for, where it stands today, the
+rules that must not be broken, the model the drawing is built on, and — most
+valuable — the mistakes already made here, so they are not made a third time.
 
-`PLAN.md` is the product plan. `REALISM.md` is the drawing's measurement log
-and the forward plan. `ASK-PERETZ.md` is everything blocked on a human.
+## How to read this file
 
-**`AGENT.md` is the brief for the recurring agent** that wakes up every five
-hours, forms its own opinion about the site and pushes straight to the live
-branch. `AGENT-LOG.md` is what it did — newest first, including the runs where
-it changed nothing. If something in the drawing changed and no human asked for
-it, that log is where to look.
+The sections are in reading order, but they keep the numbers the rest of the
+repo cites — thirty-seven comments across `js/`, `tools/` and `test/` point at
+`CLAUDE.md §5` and friends, so the numbering is a wire format of its own.
+
+| | |
+|---|---|
+| §0 · §0a · §0c | orientation: what this is, who you are working for, where it stands **today**. Nobody should skip these |
+| §1 · §1b | what you may never do, and the one syntax trap |
+| §2 | the codebase, file by file |
+| §3 · §4 | the drawing's model and the rules it obeys |
+| **§5** | **the failure mode that keeps recurring.** If you read one section twice, this one |
+| §6 · §7 | how to measure, and the instruments that do it |
+| §8 | things that will bite |
+| §9 · §10 | what is still open, and how to work here |
+| §0b | the change log — **at the bottom**, an archive, newest first. Not for reading end to end |
+
+## ⚠ THIS FILE HAS TO BE KEPT CURRENT, AND THAT IS A STANDING INSTRUCTION
+
+Every change gets a line in §0b **the same day**, and anything in §0–§10 that
+the change makes false gets corrected in the same commit. This is not tidiness.
+It is a direct request from the person you are working for, and the reason they
+gave is exact:
+
+> *"write a summary of every change in the claude.md and if needed then in the
+> agent.md so that i can do `/compact` whenever i can without you losing
+> significant facts."*
+
+They compact the conversation often. When they do, **this file is the only
+memory that survives.** A fact that is here is a fact the next agent has; a
+fact that is only in the chat is gone. So:
+
+- New behaviour, a new instrument, a withdrawn option, a number that moved →
+  §0b, same commit.
+- A defect found and fixed → §0b **and** §5 if it is a new *shape* of defect.
+- A question answered by a human → `ASK-PERETZ.md`, struck through, with the
+  quote, plus a §0b line.
+- Anything you learn about how this project is run, or about the person running
+  it → §0a.
+
+⚠ **And correct what is already here when you find it wrong.** This file has
+carried a stale number for months more than once (see §6), and every time, the
+number was doing damage while it sat there. A documentation fix is not a chore
+you do afterwards; it is part of the change.
 
 ---
 
-## 0b. Change log — the short version
+## 0. What this is, and its one job
+
+A door configurator for **דלתות מגן** (Dlatot Magen), a steel entrance-door
+business in Rishon LeZion. It is a single static page: a customer builds a door
+on screen and sends it to the shop.
+
+**Its one job (`PLAN.md` §0):** a customer picks a door and hands Peretz an
+order he can act on **without a single clarifying question** — normally by
+tapping a WhatsApp button, sometimes by reading a short code down the phone.
+
+Every decision follows from that. **Silent data loss on a shared link, or an
+option that means one thing on screen and another in the message, is the worst
+failure this site can produce.** It is worse than a crash, because a crash is
+visible and this is not. The whole of §5 is about that.
+
+It is in Hebrew, right-to-left, and nearly every visitor arrives on a phone.
+
+---
+
+## 0a. The people you are working for
+
+### Peretz — the owner
+
+He builds and installs the doors. He is not a software person and he does not
+read markdown files in a git repository; `ASK-PERETZ.md` grew to 500+ lines
+waiting for answers, and the one question that ever got answered was asked as a
+single sentence in a chat. **If you need something from Peretz, write one
+short question, not a document.**
+
+He has made several decisions from outside that are settled and must not be
+re-litigated. They are marked as such where they appear — the green send
+button, the withdrawal of the add-ons and the handle-finish choice, the plain
+window pane, the grip controls standing in the wall. Where the corpus disagrees
+with one of his decisions, the disagreement is recorded rather than acted on.
+
+### The person you actually talk to — his child
+
+They are building this for their father. They are the one who writes to you,
+reviews the result, and decides what happens next. Some things worth knowing,
+because they change how you should work:
+
+- **They answer business questions immediately and definitively when they know
+  the answer.** The ימין/שמאל handing convention — the oldest and most
+  expensive open question in the project — was settled in one sentence the
+  moment it was put to them plainly, and it revealed that the site had the
+  convention backwards. **Ask. Do not build a form, a survey or a page to
+  collect an answer somebody will give you in a line of chat.**
+- **They will not bother Peretz with something they can answer themselves**, and
+  they will tell you which is which. Respect that split.
+- **Their plan is sequenced, and it is: perfect the interface first, then sit
+  with Peretz once and take all the prices and lengths in a single pass.** In
+  their words: *"my plan for now is to perfect the app and then sit with my dad
+  and he will give me all the prices and lengths. so for now, we perfect the
+  ui, and make it easy to change the prices."* That is why `js/prices.js`
+  exists — all 70 numbers on one screen in plain shekels — and why you must
+  never let the placeholder prices block interface work.
+- **They look at the app the way a customer does, and they report what they
+  see.** A large share of the best findings in §0b came from them in one line:
+  *"the hit box shows as huge"*, a bar drawn on a moulding, two panels that
+  disagreed, lines left behind after a drag. Take those reports seriously and
+  literally — every one of them was real, and several were invisible to every
+  instrument in the repo.
+- **They bring in outside reviews on their own branches** and expect them read
+  and acted on, not summarised. Two mockup reads and
+  `review/2026-08-23-review.html` all arrived that way; the two plans they
+  became were executed and deleted on 27.8.2026. Read the branch, do the work,
+  and say plainly which of its recommendations you are declining and why.
+- **They want momentum.** *"you can do a couple of things at the same time to
+  speed things up."* Run the long browser jobs in the background and keep
+  working; do not sit and wait on a three-minute suite.
+- **They ask short questions and want short answers first**, with the reasoning
+  after. *"what are you doing right now, short answer."*
+
+⚠ **Their pronouns have not been stated, so this file says *they*.** Older
+entries in §0b and in the other documents say "the owner's son", which is the
+term the project has used since before that was noticed; those are left as
+written rather than rewritten, but do not add more.
+
+---
+
+## 0c. Where it stands today — 30.8.2026
+
+**⚠ THE PRICES ARE REAL AND THE SITE IS NOT DEPLOYED — deliberately.** Peretz
+gave the numbers on 26.8.2026; `PLACEHOLDER` is `false` and the "גרסת פיתוח"
+strip is gone, because a disclaimer saying the prices are examples would now be
+a false statement on the page. Not deployed on instruction: *"dont deploy it, i
+want to see that its finished."*
+
+**The page is a FLOW, not a cabinet.** Eight steps and a quote page, one live at
+every width. A standard door with nothing on it is **₪3,195**, and tapping the
+figure opens the column it is made of. **In Hebrew, English or Russian** — and
+the order that reaches Peretz is Hebrew whichever one the customer used.
+
+### Three languages, and the one rule inside them
+
+Hebrew, English, Russian; `js/copy.js`; `?lang=` → `localStorage` →
+`navigator.languages` → Hebrew.
+
+⚠ **THE INTERFACE MIRRORS AND THE DOOR MUST NOT** — `PLAN.md` §6.1. Hebrew
+puts `dir="rtl"` on `<html>` and every logical property flips with it. A
+drawing that flipped too would show one hinge side while Peretz built the
+other. `svg { direction: ltr; }` is the whole guard, stated once in
+`css/app.css`; `npm test` asserts the SVG string is byte-identical in all
+three, and `npm run audit` measures the cylinder's real position against the
+leaf's centre in a browser. Neither check is optional.
+
+⚠ **THE WHATSAPP ORDER IS ALWAYS HEBREW.** Every other reader follows the
+customer; this one does not, because Peretz is its reader and `PLAN.md` §0
+asks for an order he can act on without a clarifying question. It now carries
+one Hebrew line naming the language the customer built in, so he knows how to
+ring back.
+
+⚠ **A TOP-LEVEL CONSTANT MUST HOLD A KEY, NEVER A SENTENCE.** `T()` in an
+object literal is resolved once, at import, before the language is known —
+so it freezes. Three tables in this repo would have shipped that way and now
+hold keys: `SAID` in `rules.js`, `GROUPS`/`SECTIONS` in `app.js`,
+`priceIncludes`/`priceCaveat` in `share.js` (functions, not constants).
+Nothing throws when this is wrong. The page looks entirely correct.
+
+### ⚠ `buildPanel` EMPTIES THE PANEL FIRST, AND IT DID NOT USED TO
+
+It APPENDED, which was harmless for exactly as long as it ran once — and then
+the language picker started calling it again. Two reports off one screenshot,
+one cause: *"when i change the language it doesnt change the language on all
+the text"* and *"at the bottom of the screen the categories get repeated."*
+A correctly translated panel was being built UNDERNEATH the stale one, and
+everything visible was the copy that had never been rebuilt. Tile names stayed
+Hebrew while their prices turned English, because `repriceOptions` rewrites
+`.tile__meta` on the live DOM and the names were never touched.
+
+⚠ **And the send card is rescued before the clear** — `goStep` MOVES
+`.panel--send` into the summary step, which is a child of the panel, so
+emptying it would delete markup `index.html` owns and nothing rebuilds.
+
+`npm run audit` asserts all three symptoms now — one navigator, one gallery
+opener, one send card, and not one Hebrew character left after switching to
+English. Falsified: putting the append back gives all three faults.
+
+⚠ **A string written by SCRIPT rather than by `data-t` is the one that gets
+left behind.** The illustration note comes from `js/share.js` so the page and
+the WhatsApp message cannot state one promise two ways — and `init` wrote it
+once at boot, so it stayed Hebrew for ever. It is in `translateStatic` now,
+which is the function whose whole job is making the chrome match the language.
+
+### The chrome moved onto the wall — 27.8.2026, amended 28.8
+
+The page has no header. Two controls stand in the wall around the door —
+languages and undo/redo — asked for with circles drawn on a screenshot.
+
+⚠ **THE THIRD, THE PRICE, IS NOW `.quote` AND IT MOVES WITH THE VIEWPORT**, and
+so does a quiet send beside it: the wall under the right-hand lamp on a
+desktop, a slim bar at the foot of a phone. The wall placement is the one that
+was asked for and it only works where there IS wall — at 390 px the plaster
+beside the leaf is ~140 px and the pill landed on the door. Same instruction,
+two widths, two answers. See the change log for 28.8, including which half of
+*"remove the WhatsApp from the screen"* still stands (the green bar) and which
+was reversed (a send must exist on every step, `PLAN.md` §0).
+
+⚠ **`.stage__hud` IS ABSOLUTE AND MUST STAY ABSOLUTE.** Above 1100 px
+`.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so anything in
+the FLOW up there takes its height out of the DRAWING. That is why the grip
+controls live in the wall, why `--grip-strip` is reserved when empty, and why a
+control that merely *appeared* in `.stage__bar` once cost the leaf 23,021
+pixels. The same rule now has a third occupant.
+
+⚠ **AND IT ANCHORS TO `--stage-top`, NOT TO ZERO.** The wrap opens with the
+page's `<h1>`, so `inset-block-start: 0` puts these on the heading rather than
+on the wall. `fitStage` publishes the offset off the same two rects it already
+reads. They cannot be children of `.stage` itself: `paint` rewrites
+`#stage.innerHTML` on every change and would delete them.
+
+**The price is stated once, and it still is.** It was the send card and the
+phone dock, with an audit check that the two agreed; `.quote` moved the whole
+readout — label, figure, chevron and breakdown — rather than copying it, so
+there is still one reading to make. **The SEND is now stated twice** (the quiet
+one and the summary's green one) and that pair has its own assertion: same
+href, every step, every viewport.
+
+### The round from a real phone — 27.8.2026
+
+Ten items, reported off a live page on an Android. Four were bugs nobody's
+instrument had an opinion about, and three of those were ONE bug: the metal
+gradients were shared between the pull handle and the lock furniture, so each
+was painted with the other's finish.
+
+- ⚠ **`#nickel` was the פרזול and a pull handle used it; `#nickelSoft` and
+  `#plateFace` were the bar's and every lever used them.** One gradient cannot
+  serve two owners. There are two sets now, named for WHOSE metal they are —
+  `gripHard`/`gripSoft` against `nickel`/`nickelSoft`/`plateFace` — so the next
+  drawing added has to answer "whose is this?" before it can pick a fill.
+- ⚠ **The euro cylinder's black variant was gated on `gripFinish`.** Choosing
+  the black pull bar blackened the keyway of a nickel lockset. It follows the
+  pirzul now.
+- ⚠ **`cadoor` declared `out: 78` and the drawing reaches 41.** `lockBackset`
+  returns `max(…, out + 10)`, so the ball sat at backset 88 while its keyhole
+  stayed pinned at 63 — a knob and the cylinder it turns, 25 mm out of line, on
+  a door where both go into one mortice lock case. `npm run collide -- boxes`
+  had the true number all along.
+- **The loose-escutcheon family now sits on the keyway's axis too**, floor
+  raised from `LOCK_BACKSET_GRIP` to `KEYWAY_BACKSET`. Measured cost: 8 designs
+  of 2,688 lose a pull handle to a collision, 0.3%.
+
+⚠ **AND A CATALOGUE INSTRUCTION WAS CONTRADICTED BY THREE OF HIS OWN DOORS.**
+*"The only instance when on a door is only one panel is when there is a window
+and a panel at the bottom."* d048, d051 and d087 are solid leaves with a single
+lower panel, hand-measured off his photographs. Enforcing it as a RULE made
+`npm test` re-fit three real doors in the gallery. So it is a LISTING rule
+instead — `js/app.js` leaves those faces out of the tiles, `js/rules.js`
+refuses nothing — and the contradiction is in `ASK-PERETZ.md` §2 beside the
+ברזל מחושל one. **A catalogue is not a constraint.**
+
+### ⚠ A LEDGER IS NOT EVIDENCE
+
+Every phase of `TRANSFORM.md` was marked done by the same agent that did it,
+and asked afterwards whether the plan had actually been carried out, that
+agent found two gaps by checking the CODE instead of its own notes:
+
+- **§10.4's step explainers did not exist.** Nine `<details>` disclosures, one
+  per step, described by the plan as *"the single biggest thing the old
+  cabinet could not do"* — and four of eleven groups had no `hint` either.
+  Phase 7 shipped, was green on every instrument, and looked complete.
+- **T11 was asserted for half of what it says.** A bare load landing on step 01
+  was checked at all seven viewports; a shared link landing on the quote page —
+  the half Peretz uses, every time — was checked nowhere.
+
+Neither was visible from the outside. Both are closed. The lesson is the one
+§5 keeps teaching in a new costume: **check the artefact, not the record of
+the artefact.** The fifteen named assertions in §7 are the list to
+walk, and walking it means grepping for each one, not remembering it.
+
+### Green
+
+- `npm test` — **3,617,766 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+  ANYTHING; it is the product of the catalogue's list lengths. Read the failure
+  count. (This line said **5,403,239** for two rounds after the stripe rework
+  cut fourteen `DETAILS` entries — a number in prose describing a thing that
+  had already moved, which is §6's standing complaint about this file.)
+- `npm run audit` — clean at all eight `VIEWS`, including the arrival check
+  (exactly one step live at every width), **the whole question order** read off
+  the rendered navigator, a walk over every navigator circle that also asserts
+  **a visible send and a readable price on every step** and that every
+  `[data-wa]` carries the identical href, the keyboard walk, the bare-mode
+  motion kill, the **`prefers-reduced-motion` route** (nothing left running,
+  delays included), and the language route.
+- `npm run collide` — clean on `all` and `boxes`, at the extra lock's new
+  eye-level height.
+- `npm run latency` — **226 ms** against a 600 ms gate (135 on the default door; the worst is the sidelight with ironwork, 522 elements).
+- `npm run profile` — **all four rows green.** See below; this is not
+  straightforwardly good news.
+- `npm run mottle` — plain leaf **0.0181**, panels 0.1069.
+- `npm run sheets` — current. The bare families come back byte-identical on
+  every commit that does not touch the drawing, which is the proof motion did
+  not leak into it — and ⚠ **when they move on a commit that could not have
+  moved them, find out what did** rather than stamping them. That is how the
+  chrome painted across all 110 of them was found (§0b, 28.8).
+  On 29.8 that proof did a second job: the commit that put a PHOTOGRAPH behind
+  the door regenerated all four families, the `shot` family moved (it
+  photographs the page) and **all 52 bare sheets came back byte-identical** —
+  which is the whole architecture of photo-mode, checked rather than asserted.
+  ⚠ **On 30.8 the drawing changed more than on any day this year and the 52
+  BARE SHEETS STILL CAME BACK BYTE-IDENTICAL.** Two fittings redrawn and moved
+  400 mm, the brass ramp refitted, two new fittings added, the default colour
+  moved — and `corpus`, `recreate` and `against` did not shift a pixel. That is
+  not luck and it is the strongest single statement about this work order's
+  blast radius: those 52 sheets are Peretz's own thirty doors and our option
+  range, and not one of them carries a bell, a peephole, an extra lock, a gold
+  פרזול or the default colour. Only the 12 `shot` sheets moved, because they
+  photograph the PAGE — which has a new opening colour, the Rotem, and its
+  steps in a new order — along with `corpus-links.md`, whose every query now
+  carries `v=20`, `bl=` and `ey=`.
+  ⚠ The proof was nearly missed, and how it was nearly missed is the lesson:
+  `against-ella.png` coming back identical looked WRONG (the brass had moved),
+  and chasing it found that the Ella bar has its own absolute gradient and
+  never reads the פרזול ramp — correct by design, and the thing that exposed
+  the two brasses drifting apart. **A sheet that does not move when you think
+  it should is worth the same half hour as one that moves when it should
+  not.**
+
+### Red, and known
+
+⚠ **`npm run profile` IS GREEN AND NOBODY KNOWS WHY.** The dark-reed row read
+`1.044` against a 1.03 gate on 26.8 and reads `0.999` now. It is NOT the grain
+change in phase 9: reverting the grain and re-running gives byte-identical
+numbers, which is the `drift`/`grainTex` strip working as designed. Something
+in phases 1–8 closed it and the cause has not been established.
+**An unexplained green deserves the suspicion of an unexplained red.** §5 of
+this file is eighteen instances of things that vanished rather than broke, and
+every one of them looked like a working page. Do not treat this as settled.
+
+⚠ **Container health is a property of the container, not of this repository.**
+It is healthy today — 6/6 loads at 1280 and 1680, zero crashes — which is why
+`REALISM2.md` stage F stopped being blocked. Establish it each run.
+
+### Blocked on a human
+
+`ASK-PERETZ.md` is **160 lines now, not 776**, and that is the change that
+matters most about it: nobody answers a 500-line document between jobs, and
+that is why it went nine days unanswered. What is left is fifteen assumptions
+(`CLAUDE.md` §9), of which one is expensive:
+
+⚠ **A13 — which of our two windows is his "tall".** ₪500 on the majority of
+glazed orders, resting on nothing but the shape of two Hebrew names.
+
+And two places where he contradicted his own doors, recorded rather than
+resolved: he says there is no ברזל מחושל and it is on **ten** of his installed
+doors; and almost every bar in the range is over his one-metre threshold as
+stocked, so almost every bar costs ₪650 rather than ₪500.
+
+### What is NOT built, and why
+
+- **Deployment.** On instruction. This is now the only thing on this list
+  that is a feature rather than a decision.
+- **The mockup's floating overlay.** `TRANSFORM.md` §12.2 — scoped down to the
+  door taking the empty column, and said so.
+
+### There is no plan on the table
+
+⚠ **And that is the state, not an omission.** `TRANSFORM.md` was the last one —
+twelve phases, all executed — and it was deleted with the five before it on
+27.8.2026. What still governs is in §10; the assumption ledger is in §9; the
+fifteen assertions the last plan owed are in §7.
+
+The work since has come from two places, and both beat a plan.
+
+**The owner's son reading the live site on his phone and saying what is wrong
+with it.** Every round of it has found something no instrument in this repo had
+an opinion about. Take those reports literally.
+
+**And walking the page as a customer would.** The design round of 28.8 was
+briefed from outside and its single most valuable half hour was not the brief:
+it was `tools/_final.mjs` driving the guide forward with the BUTTON, one step at
+a time, at four widths — which found that the way on was below the fold on every
+question step on every phone. ⚠ `npm run audit` could not have found it, because
+its walk clicks the RAIL: that check asks "can every step be reached from
+anywhere", and a rail click never asks whether the forward button is on screen.
+**Two different questions, and only one of them had ever been put.**
+The brief also brought four planning documents that live only on
+`claude/app-design-mockup-review-qt00n6` — `DESIGN-LEVEL.md`, `GUIDED-FLOW.md`,
+`REALISM2.md`, `MOCKUP2.md`. They were read, reconciled against what had already
+shipped, and executed as a delta; they are NOT on this branch and should not be
+copied here. `git show origin/claude/app-design-mockup-review-qt00n6:<file>`.
+
+## 1. Standing constraints — do not violate
+
+- **Branch:** develop on `claude/door-builder-website-plan-rgg7gu`. **Never**
+  push to another branch without explicit permission.
+- **Never open a pull request** unless explicitly asked.
+- **Ids in `js/catalog.js` are a public wire format.** They travel inside links
+  and WhatsApp messages Peretz may open months later. Never rename an id; keep
+  every superseded id in `aliases`. To retire an option, alias its id onto the
+  nearest real one.
+- **The short code stores INDICES**, which no alias can rescue. Any change to
+  the option ORDER or the bit layout requires a `VERSION` bump in
+  `js/url-state.js` (**20** as of 30.8), so an old code is *refused with a
+  notice* rather than decoded into a different door. **Appending to the end of
+  a list costs no bump. Changing a property — not the id, not the order —
+  costs no bump.**
+  ⚠ This line said **13** through six bumps. A version number written into
+  prose is a number that goes stale the first time somebody obeys the rule
+  around it, so **read `js/url-state.js` and do not trust this figure** — it is
+  here for orientation, not for arithmetic.
+- **Retired URL parameters `f`, `a`, `z`, `i` must never be reused**, and
+  `fromQuery` ignores them without a notice: withdrawing an option is our
+  change, not that customer's mistake.
+- **All money is in agorot (integers).** Never floats.
+- **⚠ THE PRICES ARE REAL. `PLACEHOLDER` IS `false`.** This rule used to read
+  "every price is `PLACEHOLDER = true` until Peretz answers"; he answered on
+  26.8, the flag was flipped, and the "גרסת פיתוח" strip came down — and this
+  line went on saying the opposite for two days, in the section of this file
+  whose whole job is telling the next reader what they may not do. §0c has said
+  the true thing all along, which is worse rather than better: **one file
+  contradicting itself is how a rule gets obeyed backwards.**
+  `js/prices.js` still holds all 70 in one screen, in plain shekels, and it is
+  still the only place a shekel figure may be written.
+- **Never change a measured number by eye.** Re-measure against a photograph.
+  `REALISM.md` §6 is the governing rule of the whole drawing.
+- **Never delete a test or weaken an assertion to make a change pass.**
+- Never disable TLS verification or unset `HTTPS_PROXY`.
+- `git push -u origin <branch>`; on network failure retry four times with
+  exponential backoff.
+
+---
+
+## 1b. One gotcha that has cost four builds
+**Never put a backtick in a comment inside `renderer.js`'s SVG template
+literals.** The whole drawing is one big template string, so `` `like this` ``
+in a prose comment terminates it and the file stops parsing. It reads as
+`SyntaxError: Unexpected identifier` pointing at an innocent word.
+`node --check js/renderer.js` catches it instantly — and `npm run build` will
+happily leave the previous bundle in place if you have silenced its output,
+which is how it survives to be noticed later.
+
+⚠ And when you fix one, fix **only** the backticks inside the template. A
+global search-and-replace across the file once stripped them out of two
+legitimate JS comments elsewhere, which had to be put back.
+
+---
+
+## 2. The shape of the codebase
+
+Buildless static site. Plain HTML/CSS/ES modules; `tools/build.mjs` bundles to
+one classic IIFE so `index.html` works from `file://` — Peretz opens the folder
+on his own laptop (`PLAN.md` §3, §8.1).
+
+⚠ **THIS SAID "THREE FILES ARE THE WHOLE SITE… no fourth file, no webfont, no
+CDN", AND ALL THREE CLAUSES ARE NOW FALSE.** The webfont shipped on 28.8 and
+this sentence was not corrected then, which is the fault §6 keeps complaining
+about; the fourth file shipped on 29.8 with the owner's explicit agreement.
+What is actually true, and what the promise has become:
+
+- **Three files are the SITE**: `index.html`, `css/app.css`,
+  `assets/bundle.js`. Double-click and it works, offline, from a folder.
+- **`assets/room.webp` and `assets/room-wide.webp`** (82 and 78 KB) are the
+  photographed room, in two crops of the same entrance. **They are the files
+  you can delete, and only ONE is ever downloaded** — `pickRoom` measures the
+  stage and chooses. Without them the page is complete and correct and the door
+  stands in the drawn room the SVG has always contained. Nothing says a file is
+  missing, because nothing is.
+- **Assistant** comes from Google Fonts, is requested only over `http(s)`, and
+  never blocks a paint. Over `file://` — every screenshot, every audit route,
+  Peretz's laptop — it is never asked for at all, and the metric-matched
+  fallback lays the page out at Assistant's own metrics regardless.
+
+823 KB on disk, about 288 KB over the wire (one of the two rooms).
+
+```
+index.html          the page: stage, quote bar, choices, send, gallery,
+                    sheet                                              650 lines
+css/app.css         RTL-first, logical properties throughout         3,138
+js/catalog.js       every option. THE WIRE FORMAT. Read its header.  1,760
+js/prices.js        every price, plain shekels, one screen              453
+js/renderer.js      the door. Pure: render(state) -> SVG string.      8,920
+js/url-state.js     state <-> URL, and the short code (BigInt)          919
+js/rules.js         what cannot go with what, and repair()              786
+js/price.js         agorot only. priceParts is the ONE breakdown        398
+js/spec.js          THE door, as rows. One statement, four readers      302
+js/share.js         the WhatsApp message — this is the product          496
+js/copy.js          every user-visible string, in three languages.
+                    ZERO IMPORTS on purpose — it sits under every
+                    other module, so nothing it needs can be a cycle    693
+js/colour.js        darken / lighten / scaleTone / contrast              81
+js/app.js           wiring, the flow, the gallery, the sheet, undo    3,139
+js/works.js         30 real doors, GENERATED by npm run corpus           48
+assets/room.webp    the photographed room, tall crop. Staging         82 KB
+assets/room-wide.webp  the same room, wide crop. One is fetched         78 KB
+test/units.mjs      ~3.6M assertions, no framework                   3,555
+tools/*.mjs         measurement instruments, not scripts (§7)
+research/backdrops/ the owner's two originals, and the source the
+                    shipped asset is regenerated from
+research/works/     129 photographs, 31 measured records (30 usable)
+                    INVENTORY.md — every fitting in the corpus
+```
+
+**Commands:** `build` `dev` `test` `audit` `latency` `collide` `fuzz` `profile`
+`glass` `mottle` `measure` `frame` `hardware` `recreate` `corpus` `against`
+`shot` `sheets` `backdrop` `leaf` `triage` `ask` `compare`
+
+`npm test` is string-level and cannot see layout, CSS or event wiring.
+`npm run audit` opens the real page and drives it. **Both are needed and
+neither substitutes for the other** — §5 is a list of what happens when only
+one of them looks.
+
+### Two files that carry more weight than their size
+
+- **`js/spec.js`** — the door as a list of rows. It exists because four places
+  described a door four ways and disagreed, and the disagreement charged a
+  customer ₪620 for ironwork the accessible name said was not there. The
+  message, the spec table, the one-line summary, the drawing's `aria-label` and
+  now the A4 sheet all read it. **Never assemble a description of a door
+  anywhere else.**
+- **`js/works.js`** — generated by `npm run corpus` from the measured records.
+  Nothing in it is typed, because handing was typed on eight recreations once
+  and was wrong on four of them. It carries no prices: the page has exactly one
+  statement of what a door costs, and it is `priceAgorot` on the state shown.
+
+---
+
+## 3. The drawing's model
+
+Authored in **real millimetres**. `render(state)` is pure — two renders of one
+state are byte-identical, and a test asserts it.
+
+### The scene, and the room
+`SCENE = 8000` units past the drawing in every direction (measured: 4200 left
+bare page on a landscape phone, 15000 was picked on no evidence and reverted).
+### ⚠ THE SCENE IS ANCHORED, AND THE DOOR MOVES INSIDE IT
+**`BASE_Y` and `MID_X` are constants.** Every door stands on the same floor
+line and is centred on the same axis, so choosing a taller one raises its head
+and choosing a wider one grows it about its middle — the wall, the floor, the
+sconces and the vignette do not move at all. Measured on six sizes at 390x844:
+frame width 109.8 → 171.9 px, frame height 275.6 → 311.3, and the leaf's foot,
+the sconce and the floor line **identical to a tenth of a pixel on every one**.
+
+It was laid out from the top-left corner before, so the floor moved DOWN for a
+tall door and the picture's box grew with the door — which `fitStage` then
+scaled back, making every size come out the same drawn width.
+
+**`render` therefore emits TWO boxes** and they are not the same box:
+- `viewBox` is tight around THIS door, with `PAD` of air. Bare mode and every
+  measurement harness get it, and that is deliberate — framing a narrow door
+  inside the tall-and-wide scene would hand `npm run profile` a third fewer
+  pixels to measure and read as a change in the drawing (§8 has that bruise).
+- `data-fit-x/y/w/h` is **`FIT_BOX`**, the fixed scene trimmed of the vertical
+  padding the page does not need, identical for every door. `fitStage()` crops
+  to it, so the on-screen scale is a constant. It only ever WIDENS that rect to
+  the stage's shape. **Bare mode skips `fitStage`.**
+
+⚠ **AND THERE IS A THIRD RECTANGLE, `STAGE_BOX`, WHICH IS THE ROOM ITSELF.**
+The backdrop is painted from it, the vignette is centred on it and the sconces
+are stood off it — so it is the scene's own extent and it does not move.
+`FIT_BOX` is `STAGE_BOX` less `FIT_TRIM` (40 off the top, 130 off the bottom).
+The two were one rectangle until 28.8, and separating them is what let the door
+grow 6% on screen without moving a single pixel of any bare render: the crop is
+height-driven at every viewport this app has — measured, stage aspect 1.33
+against the scene's 0.536 — so vertical padding is exactly what costs the door
+its size and horizontal padding costs nothing.
+⚠ **The trim could NOT come out of `PAD`**, which was the first attempt: `PAD`
+feeds the natural `viewBox` too, so trimming it moves all 110 committed sheets,
+and that is not a regeneration to redo — it is the "bare families
+byte-identical" proof itself.
+⚠ **And the ceiling on this is arithmetic, not effort.** A door is 850×2050 and
+a desktop stage is 1060×794: fit the whole door in that frame and the leaf
+cannot pass 31% of the width even with zero margin, and cropping its head or
+its foot is forbidden — a configurator exists so somebody can judge
+proportions. Making the door the hero is therefore a LIGHTING problem.
+
+The door stands in a room from `REALISM2.md` stage D: a **floor** that falls
+away from a skirting shadow instead of meeting a ruled line, two **sconces**,
+and the door **reflected in the floor** as a `<use>` of `<g id="door">`. There
+is no alcove — see below.
+
+⚠ **AND ON THE PAGE THAT ROOM IS COVERED BY A PHOTOGRAPH — but only on the
+page.** `assets/room.webp` or `assets/room-wide.webp` — two crops of one
+entrance, chosen at runtime by `pickRoom` measuring which one keeps its
+sconces in the stage — is a CSS background on `.stage`; `.is-photo` hides
+`#backdrop` and nothing else. So the drawn room above is still exactly what
+`?bare=1` renders, what every instrument measures, what the gallery's thirty
+tiles and the A4 sheet show, and what a visitor gets if the file does not
+arrive. Proof rather than claim: the commit that shipped the photograph
+regenerated all four sheet families and the **52 bare sheets came back
+byte-identical**. The seam moves that DO belong to the photograph — a tight
+contact shadow, a wider pool, a stronger casing shadow — are emitted on every
+door at `opacity="0"` and raised only by `.is-photo`, so they cost the drawing
+nothing and cost `render` no second argument. See §0b, 29.8.
+
+⚠ **The room has its own light, and it is painted UNDER the door.** A warm pool
+centred a little above the door's middle (`#roomPool`) and a falloff at the
+corners (`#roomFall`), both inside `#backdrop`. Deepening the existing
+`#vignette` instead would have been wrong: that one is painted LAST and covers
+the leaf, and it is a radial centred at 0.44 of the scene, so deepening it
+darkens a leaf's head and foot more than its middle — a change in the vertical
+fall by definition, and the vertical fall is what `npm run profile` watches.
+Predicted in the code before the run, then checked: `mottle` and every
+`profile` row identical to the digit, before and after.
+
+⚠ Four things about the room that were wrong once:
+- **Every plane is a black or white overlay, never a colour.** The wall and
+  floor are `var(--wall)`/`var(--floor)`; literal hexes would not move with
+  them. (Nothing sinks them any more — see the next point — but the rule holds
+  for the theme and for the print sheet.)
+- **The room does not change colour with the door.** `.layout[data-light]` sank
+  the wall and floor a shade behind a pale leaf, and it is gone: the one job of
+  this screen is comparing colours, and a ground that shifts under the swatch
+  makes every comparison a lie. A pale door's silhouette is the drawing's
+  problem and the drawing solves it — painted frame, black reveal ramp, cast
+  shadow.
+- **The reflection's mask is on an untransformed wrapper**, not on the flipped
+  `<use>`. `maskUnits="userSpaceOnUse"` resolves in the referencing element's
+  own space *including its transform*, so the band came out mirrored above the
+  floor and the reflection was masked away entirely. A mask that hides
+  everything and a feature never drawn are the same picture.
+- **THE ALCOVE IS GONE.** It was three mitred trapezoids stepping the wall
+  forward around the casing, and it was reported from outside as *"a gray box
+  that frames it"* — which is what a shaded plane seen dead square-on becomes.
+  Its own docstring had already recorded that `ALC_SIDE` and `ALC_HEAD` were
+  the only depths in the file not taken off a photograph. Do not rebuild it
+  without one.
+
+### The light
+`LIGHT` in `renderer.js`. Key is high and ~30° left of camera; lit is warm,
+shadow is cool. `FALLOFF` holds the vertical falloff, retargeted on the median
+of thirty measured doors, split light/dark.
+
+⚠ **The sconces' light REACHES THE DOOR — but not one number of the leaf's
+model moved, and that distinction is the whole of this paragraph.**
+
+The refusal that stood here was: two symmetric wall lights imply two symmetric
+keys, and `FALLOFF`, `MOULD_SIDE`, `keyWash`, `bloom` and the warm/cool split
+all hang off there being ONE. No door in `research/` is photographed between
+two sconces, so re-fitting a corpus-measured model to match a picture would be
+tuning by eye against nothing. **All of that still holds. Do not touch those
+numbers for the sake of the lamps.**
+
+What was refused along with it, and should not have been, is light LANDING on
+the door — asked for from outside as *"make light that also slightly affects
+the door, and it will help buy the 3d effect."* Two lamps throwing light on a
+wall and stopping dead at the casing is the one thing left saying the door was
+pasted on. So there is a thin warm overlay, painted last, over the finished
+door: `lampOnDoorL` / `lampOnDoorR`, peaking at the casing's outer edge and
+zero by a third of the way in. Measured **+15/255 at the casing, 0 at the
+leaf's midline** — it lands where the lamps are and nowhere near the midfield
+every fitted number lives in.
+
+⚠ **AND IT WAS PUT TO THE INSTRUMENTS BEFORE IT WAS BELIEVED**, which is the
+part to copy. `npm run profile` did not move: the wash is horizontal and the
+profile is vertical, which was a prediction stated in the code before the run.
+`npm run mottle` DID — 0.0133 → 0.0194 on the plain leaf, a 46% rise in a
+figure about PAINT caused entirely by a lamp. The wash carries
+`data-room="lamp-wash"` and `mottle` strips it before sampling, restoring
+0.0133 exactly. An instrument that reports paint plus lighting under the name
+"mottle" is §7's subject, and the next person tuning `drift` would have been
+compensating for a sconce.
+
+### The frame
+- `CASING = 46` — the flat face against the wall. **One plane, one gradient.**
+  It was three separately-toned rectangles butted at the corners, and the butt
+  joint showed as a hard line across the top of each jamb.
+- `RETURN = 62` — **both** jamb returns, equal. They were 78/46, an off-axis
+  view nothing else in the drawing agreed with.
+- `RET_HEAD = 148` — the soffit, deepest of the three.
+- The three planes of the opening are **trapezoids**, so the mitres are real
+  geometry rather than a line drawn on top hoping to suggest a corner.
+- `EDGE = 38` — the reveal, three ramps perpendicular to their own edges, in
+  black at falling alpha so it multiplies the surface underneath.
+- **No drawn arris.** A fold between two lit surfaces is a change of VALUE, not
+  a line. This has been got wrong three times: the jamb arris, `edgeTop`'s
+  full-width rectangle, and the wall-to-floor rule.
+
+### The leaf
+`leafW = size.w - REBATE*2`, `leafH = size.h - REBATE`. **`SIZES` gives the
+structural opening, not the leaf**; drawing them as the same thing made every
+door too squat.
+
+### Applied mouldings — the "designed" face
+**A panel on these doors is not a panel.** It is a strip of moulding 60–90 mm
+wide laid on the face in a rectangle, and **the face inside the rectangle is the
+same plane, the same paint and the same texture as the face outside it.**
+
+**⚠ AND THERE ARE TWO OF THEM.** `MOULDS` holds two measured cross-sections,
+not one, and which a face uses is a catalogue choice:
+
+| | what it looks like | doors | tiles |
+|---|---|---|---|
+| **`reed`** | three to five fine beads, hard dark quirks between them, low relief, sharp mitres | d042 d048 d058 d062 d065 d068 d070 d087 d091 d094 d099 d116 d122 | `panel` `panel2` `panelTop` `panel3`, and every face with no `profile` |
+| **`ogee`** | one narrow GROOVE near the outer edge, a LONG FLAT at the paint's own tone across half the band, a shallower groove near the inner edge — a scribed frame | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | `panelo` `panel2o` `classic` |
+
+Thirteen doors against eleven, so neither is "the" moulding — and a round that
+re-measured the one table off a door of the OTHER family drew the ogee round
+every panel in the range. It was reported from outside as the panels not
+looking good. Sort them by opening one panel CORNER per door at high
+magnification; a whole-door contact sheet will not separate them.
+
+⚠ **The ogee table itself has been measured twice and the first reading was
+also of the wrong door.** It came off `research/newdoor/` — the classical set —
+and the family it describes is d050's, which is the door the complaint came
+with. Re-read on d050 it is not an ogee at all: a groove, a long flat, a
+groove. Depths are stored UN-COMPRESSED, divided by the 0.34 `mouldGradients`
+applies to pale paint, because d050 is near-white and storing the measured
+figure would have drawn half the groove.
+
+⚠ **A DOOR OF THIS FAMILY IN A DARK PAINT WOULD SETTLE IT AND WE HAVE NONE.**
+d077 and d061 are so bright the whole moulding sits inside 0.95–1.00; d111 and
+d127 have fallback leaf boxes. One door is what this table stands on.
+
+`mouldOf(detail)` is the one answer, and it answers for the panel **and** for
+the architrave round the glass together, because every corpus door carrying a
+window over a panel cases both in the same section.
+
+Each table is carried as a gradient across four mitred trapezoids — one per
+side, because each run sits at a different angle to the key. The ids carry the
+profile: `mould-reed-t`, `mould-ogee-l`. `MOULD_SIDE` holds the per-side gain,
+shared by both, and it scales the moulding's **relief** — never its absolute
+tone. The gain used to
+multiply the whole run including its endpoints, so the top run's edges came out
+1.10× the paint and the bottom's 0.87×: a light rim above and a dark rim below,
+which is exactly how one shades a raised panel. It was reported from outside as
+the panel "bulging". Pinned now by `the face inside a moulding is the face
+outside it`.
+
+`PANEL_INSET` is **0.23**. It has been wrong in both directions — 0.18, then
+"corrected" to 0.13 off a contact sheet, both too wide, so a pull bar was drawn
+across the panel's stile. Settled by an edge-gradient ruler over the
+photographs: real panel edges sit at 0.21–0.39 of leaf width.
+
+### The face list as it stands — 22 options in two halves
+
+`DETAILS` is 22 entries. `sub` puts each in a half and `buildOptions` groups by
+it, so **the order on the screen and the order in the array are two different
+things** — the array's order is a wire format (the short code packs its INDEX)
+and the screen's is not. `plain` has no `sub` and is drawn first with no
+heading over it.
+
+| | count | ids |
+|---|---|---|
+| — | 1 | `plain` |
+| **פאנלים** | 7 | `panel` `panel2` `panelTop` `panel3` `panelo` `panel2o` `classic` |
+| **פסים** | 14 | `strips2` `strips4` `stripsband` `strips3` `strips5` `strips7` `strips9` `strips` `stripsvl3` `stripsvl4` `stripsv3` `stripsv` `stripsv6` `stripsx` |
+
+**Every family below is a MEASURED composition and they are not variations of
+one thing.** The recurring mistake in this file's history is deriving one from
+another — `trio` from `pair`, a stripe count from a span formula — so each is
+its own table with its own doors named.
+
+**Panels.** `PANEL_ROWS` holds `pair`, `trio`, `top` and `lone`;
+`PANEL_INSETS` holds the one inset that is not `PANEL_INSET`.
+
+- `pair` 0.07–0.58 and 0.66–0.92, inset 0.23.
+- `trio` 0.061–0.455, 0.480–0.586, 0.607–0.944, inset 0.15. ⚠ **The middle
+  rectangle is a HANDLE PLATE** and `grab: true` makes the face bring its own
+  turned pull — d067, d068, d077 all carry it; d065, d070 and d087 are the same
+  door WITHOUT the plate. Measured off d067's flat catalogue elevation and two
+  installed shots. The check that says it is right is the MARGINS: 125 mm at
+  the head, 115 at the foot, 128 at the sides — equal all round, which is what
+  a panelled door is.
+- The `…o` twins are the same rectangles in the OGEE section. Nothing else
+  differs, not even the price.
+
+**Horizontal strips — two families, and the commoner one had no tile for
+months.** `STRIP_ROWS` holds the even ones as measured lists, not a formula.
+
+- **even, full width**: nine corpus doors (d033 d035 d036 d039 d049 d056 d059
+  d066 d081). `strips2` is a PAIR about the lock's height at 0.43 and 0.61 —
+  ⚠ not `strips3` minus one; a span formula would put them at 0.23 and 0.77.
+  `strips4` off d063. `stripsband` is eight fine lines at a spacing of 0.028
+  repeated seven times, a fifth of the leaf, off d081.
+- **ragged**: five doors (d044 d045 d064 d073 d078), anchored at the hinge
+  stile with free ends following a measured rhythm, tight at the head and foot
+  and open across the middle. `strips3` `strips5` `strips7` `strips9` `strips`.
+
+**Vertical strips — two families sharing one set of columns.** `STRIP_V` is
+`{ pitch: 0.073, mid: 0.33 }`, measured on three doors independently (d037
+ruled, d038 and d043 from the hand-measured records) and identical to three
+decimals on all three. So the two families are the same columns and differ only
+in the band LENGTHS — ⚠ which is also why a corpus record cannot tell them
+apart, since a record carries each line's `x` and not its length.
+
+- **long**: `stripsvl3` `stripsvl4` — tops level at 0.098, feet staggered
+  0.945 to 0.915, thinner bands (0.013 of the width). d037 d040 d046.
+- **fanned**: `stripsv3` `stripsv` `stripsv6` — each band a different length,
+  tops climbing 0.39 to 0.05 off a common foot at 0.778. d038 d043.
+- `stripsx` is the cross, off d047. ⚠ On three of its four doors the vertical
+  member is the PULL BAR, not a strip.
+
+**One face does not go through `appliedFrame` at all: `classic`, the סט
+קלאסי.** `classicSet` draws it whole — cornice, frieze, corbelled shelf with
+its own turned pull, panel, plinth — because those pieces are proportioned to
+each other rather than to the leaf, and `CLASSIC_ROWS` / `CLASSIC_COLS` /
+`CLASSIC_GLASS` are the tables measured off `research/newdoor/`. Three things
+about it are load-bearing and easy to undo by accident:
+
+- **It supplies its own opening, as FRACTIONS.**
+  `apertureLayout(win, leafW, detail, leafH)` substitutes `detail.winFrac`
+  (0.289–0.711 across, 0.154–0.526 down: 359 x 763 at 316 on a standard leaf)
+  for whatever the window option would have drawn, so the glass clears the
+  frieze above it and the shelf below. `repair` forces `window: 'rect'` off
+  `rectOnly`, so the substitution can never be invisible.
+  ⚠ **`bot` IS THE GLASS, NOT THE CASING.** It held 0.5545 — the casing's outer
+  edge — and `CLASSIC_BAND_FOOT = 9` existed to absorb the difference. The pane
+  measures 0.530 at its rebate and the casing is one 59 mm section mitred all
+  round, so the glass's foot is 0.526. See the change log for 26.8.
+  ⚠ **Fractions, not millimetres, and `leafH` is threaded through for them.**
+  Every other piece of that composition is a fraction of the leaf; written in
+  millimetres the light stayed one size while the ornament round it grew with
+  the door — 62 mm narrower than its own timber panel on the WIDE leaf, and
+  46 mm into the frieze on the TALL one.
+- **Glazed and solid are ONE rectangle.** `classicLight` asks
+  `apertureLayout` for the hole and adds the casing round it; `classicPieces`
+  hands that to the solid variant and `aperture` cases the glass in the same
+  band. Computed twice, they drifted apart the moment the leaf stopped being
+  850 x 2050, and it was reported as *"when i put on a window the panel
+  changes, it supposed to be the same size."*
+- **The glazing is drawn BEFORE the set and after every other face.** The set
+  is a composition applied over the light's architrave; on every other door the
+  panel is aligned to the window and goes on after it. Drawn in one order for
+  both, the architrave's top run painted over the frieze's bottom edge — see
+  the change log for 25.8. `render` builds the glazing once and places it at
+  one of two points.
+- **⚠ THE MEASUREMENTS COME OFF A RECTIFIED CROP, AND THE FOUR CORNERS ARE
+  WRITTEN DOWN HERE BECAUSE THE TOOL IS NOT COMMITTED.** The door in
+  `research/newdoor/full.jpg` lies about two degrees off level and is further
+  from the camera at its foot than at its head, so its outline is a TRAPEZOID —
+  1626 px across at the head, 1558 at the foot. An axis-aligned rectangle
+  shears it and the shear grows down the leaf, which is exactly why the pieces
+  at the head and the foot came out narrow and the two in the middle came out
+  right. **Do not measure this door off `_upright.mjs`, and do not cut a
+  rectangle out of it.**
+
+  **`node tools/rectify.mjs`** does it, and it is in the committed toolkit
+  rather than under `tools/_*` on purpose: every one of those tables is a
+  fraction of what it produces, the set will be measured again, and
+  re-deriving a bilinear rectification from a paragraph of prose is forty lines
+  of fiddly code somebody would have to get right under pressure. ⚠ Its output
+  height for this door is PINNED at 3730 — deriving it from the edge lengths
+  gives 3749, and an instrument that produces a slightly different picture from
+  the one the numbers came off is a trap.
+
+  The four corners are also written out here, in `full.jpg`'s own pixels
+  (4000 x 1844), so they survive the file. They were read off two ruled crops
+  of the raw image — the head end at x 0.015–0.20 and the foot at 0.82–0.995,
+  each with a 0.05 grid down it. **Not by eye on the whole frame**: an edge two
+  degrees off level is invisible at full-frame scale and obvious at 5x.
+
+  ```
+  head-top    112,   89       foot-top    3842,  175
+  head-bottom 112, 1715       foot-bottom 3842, 1733
+  ```
+
+  Rectified bilinearly between the two long edges into 1600 x 3730, head at the
+  top and the LOCK side at the left (which is how the app draws a right-in
+  door — the photograph's small-y side is the HINGE side). Everything in
+  `CLASSIC_ROWS`, `CLASSIC_COLS` and `winFrac` is a fraction of THAT.
+- **Its panel is tagged `data-detail="panel"` with a `data-top`, inside the
+  set's group.** Three assertions read that markup to ask whether the panel a
+  customer is charged for is a panel that is drawn, and one of them goes DEAD
+  rather than failing when `data-top` is missing.
+- **`classicBand` is the composition that appears three times** — frieze,
+  shelf, plinth — with `tablet`/`flute` ends and a `plain`/`oval` middle. It
+  was three copies before anybody put the three close-ups side by side.
+  ⚠ And the frieze and the plinth are the SAME WIDTH, 0.588 of the leaf. That
+  is the check the column table never had: this piece is built on the claim
+  that the plinth is the frieze upside down, and the drawing had it 33 mm wider
+  while claiming it.
+- **⚠ THE CORBELS ARE `corbelL` / `corbelR`, PIECES OF THEIR OWN, AND THEY ARE
+  DRAWN AFTER THE SHELF.** They used to live inside the band's group, which
+  widened the band's declared span to 0.210–0.790 so it covered them — and
+  forced the DRAW ORDER: the brackets went down before the shelf, so the
+  shelf's cast shadow (0.80 of its own height, blurred) lay across them and
+  they came out as two grey smudges. A corbel stands proud of the band and
+  CARRIES the shelf; the one thing it is not in is the shelf's shadow. The band
+  is back to its own 0.286–0.714 and the same leaf is covered by three
+  rectangles instead of one.
+  The bracket itself is four CONVEX ROLLS that fill it edge to edge and
+  CONVERGE — tops spanning 0.06 to 0.94 of its width, feet only 0.00 to 0.55 —
+  which is what makes it a wedge rather than a fringe. Rebuilt five times; the
+  fifth time the path was right and the weight and the order were wrong.
+- **The cornice's ends SWEEP.** A square end is the tell of a plank and a
+  45-degree mitre is the tell of a drawing that knew that and stopped there;
+  each end of the corona turns down in a quarter-round return. The corona takes
+  0.77 of its cap, not 0.68.
+- **The head is CONTIGUOUS.** Cornice, dentil course and frieze block used to
+  leave 0.003 and 0.004 of bare leaf between them — six and eight millimetres,
+  never measured, just what is left when three edges are each read to the
+  nearest thousandth and nothing checks that they meet. At door scale that
+  reads as three pieces floating. The dentils span the FRIEZE, not "the cornice
+  less 0.036 a side".
+
+### The glass
+Clear glazing is a quiet diagonal gradient plus a soft sheen, and this is the
+one place where a measurement was taken, acted on, and then **deliberately
+reverted**. `npm run glass` says the corpus runs 1.0–1.35 on spread and a
+gradient runs 0.1, so a drawn street scene was built. It hit the number and
+made every window the busiest thing in the drawing. The owner said the old one
+looked better, and he is right: **a configurator is not a photograph.** The
+tool stays as a description of what a photograph does, not a target.
+
+Obscured and reeded glazing are patterns a customer chose, so they stay
+patterned, and they measure DARKER than the paint — behind them is an unlit
+hall, not a street.
+
+### The cabinet — two levels, structure first
+Four sections — **מבנה הדלת, מראה הדלת, חלון וזכוכית, ידיות ומנעול** — each
+opening onto categories, each onto options. One open at a time on a phone; all
+four open on a desktop.
+
+⚠ **AND THE HARDWARE COMES BEFORE THE FACE SINCE 30.8.2026** — Peretz,
+*"handles before the panels"*. The flow is fit · mk · colour · **grip · lock ·
+pz** · face · glass · sum. `face` and `glass` stay adjacent because a panel and
+a window compete for the same half of the leaf and `repair` trades between
+them. It cost nothing in the wire format for the same reason the reorder below
+did, and `npm run audit` now asserts the WHOLE sequence off the rendered
+navigator — which nothing in this repository was doing before.
+
+⚠ **מבנה הדלת is section 01 and used to be 04.** It is the thing a customer has
+an opinion about before arriving and the thing that changes the drawing most.
+The reorder cost nothing in the wire format — section keys appear in the DOM as
+`data-step` and nowhere in `js/url-state.js` — and the `01`–`04` follow for
+free because they are a CSS counter, which is precisely why they are one.
+
+`SECTIONS` and `GROUPS` in `app.js` are the whole thing. The navigator is a
+**table of contents, never a progress bar**: `nowLabel` falls back to `list[0]`,
+so every section carries a value on first paint and any state-derived indicator
+reads 4/4 before the customer has touched anything.
+
+### Rules — `js/rules.js`
+One table, read by the tiles, by `fromQuery` and by the price. **A rule that
+lives only in the interface is a rule a shared link walks straight past.** Two
+kinds: **observed** (zero of 31 measured doors) and **geometric** (computed
+from the renderer's own numbers, so it cannot drift from the drawing).
+
+`repair()` moves a design to the nearest buildable one and says what changed.
+It must be idempotent and must always LAND somewhere buildable. Two ordering
+constraints, both learned by breaking them: glazing repairs run **before**
+line-work repairs, and the "no glass, so no grille" cleanup runs **last**.
+
+**Every grip works with every lockset** — 90 of 90. The rule refusing a bar
+beside a lever was withdrawn at the owner's request: move the bar, do not
+refuse the sale.
+
+### Hardware — two groups
+- **`HANDLES` = the grip** (what you pull), optional.
+- **`LOCKSETS` = the lock furniture** (what you turn, and the keyway), always.
+- **`SPECIAL_LOCKS`** = a second lock beside the first, at **eye level** since
+  30.8 — `SPECIAL_AFF` 1430, redrawn off four photographs Peretz sent.
+- **`BELLS` and `PEEPHOLES`** = two yes/no fittings on the face, added 30.8.
+  Two LISTS rather than one multi-select: the withdrawn add-ons were a bitmask
+  under the retired `a=`, and what is coming back is two ordinary groups with
+  tiles, glyphs, price rows and spec lines for free. New parameters `bl=`
+  and `ey=`.
+
+They were one list, which made "Idan bar + Rotem backplate" — a combination
+Peretz installs constantly — unreachable.
+
+`handleFootprint()` returns `{ out, in, vy }`, and every number is **measured
+off the drawing** with `npm run collide -- boxes`, never asserted.
+
+---
+
+## 4. Rules the drawing obeys
+
+**The tint rule.** A darkening overlay must be **pure black** (black at alpha
+`a` multiplies every channel by `1−a`, so hue survives) or **the material
+itself**. Any partial *tinted* black both mutes the colour and announces itself
+as a layer. This shipped twice and was reported twice.
+
+**`scaleTone`, not `lighten`, above 1.0.** A measurement arrives as a
+multiplier. `lighten(hex, 0.13)` raises a mid grey 16% and a dark navy 46%, so
+one measured number would mean something different on every colour.
+
+**Square-on discipline.** Leaf, frame, threshold, mouldings and hardware are
+all drawn dead square-on. Anything implying a different viewpoint is the only
+thing in the picture announcing an angle nothing else shares, and it reads as
+an error. This is why the mockup's *drag to rotate* is not built: there is no
+second view, and `handleFootprint`, `collide`'s 24 `getBBox` calls, `profile`
+and every corpus comparison all assume square-on.
+
+**Photographs are honest about one door at one hour.** A configurator has to
+hold for every door at every hour. The most photographically faithful choice is
+often wrong at drawing scale.
+
+**The drawing never mirrors with the interface.** `.door-svg` is pinned
+`direction: ltr` in every context — the stage, the gallery tile and the order
+sheet. A right-hinged door is a physical fact.
+
+---
+
+## 5. The failure mode that keeps recurring
+
+**Things that vanish rather than break.** Twenty-two so far. None of them threw.
+All of them looked like a working page.
+
+1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
+   nothing at all.
+2. `raisedPanel` returned `''` below 300 mm, silently dropping the panel on 84
+   window+panel combinations.
+3. A refactor's regex deleted the `edgeShade` gradient while the rect
+   referencing it stayed. SVG paints nothing for a dangling `url()`, so the
+   leaf-to-frame junction — measured across twenty doors two commits earlier —
+   rendered as **nothing**, and shipped.
+4. `keyLight` had **never** been defined, so every panelled door ever drawn had
+   a flat field where the light should cross it.
+5. Nine of fifteen handle tiles drew the **same picture**: the glyph knew four
+   styles and sent the rest to one `else`. Nine names, nine prices, one picture.
+6. Three detail tiles showed a cheaper option's picture — found the moment the
+   test for #5 existed.
+7. The finish option charged up to ₪220 and changed no pixel for four handles,
+   and the message went out reading "Shiran, matte black" — a door that does
+   not exist.
+8. The same again where the fix for #7 did not reach: the five pull-bar
+   gradients are absolute hexes off product photographs, so **a pull bar
+   ignored the finish entirely**. The test passed because the LEVER beside the
+   bar recoloured. **An assertion has to name the object, not the document.**
+9. `tools/glass.mjs` held our own numbers in a constant with a comment saying
+   "re-measure when the pane changes". The pane was rebuilt and the constant
+   was not.
+
+**10–13 are one sub-family: a quantity computed in two places.** Two
+computations of one number is not redundancy, it is a promise that somebody
+will change one of them. Every instance was reported from outside — by the
+customer, or by a browser console — while `npm test` was green.
+
+10. `handleFootprint` returned what the catalogue **declared** a fitting
+    occupied, and the sweep compared those declarations. The drawing put a
+    lever's blade **through** a pull bar on 862 designs and the sweep passed
+    every one.
+11. `render()` and `glassClearance()` both worked out how far the glass was
+    from the lock — one to the pane's edge, the other to the moulding's, 40 mm
+    apart. The channel crossed the surround on 48 designs while `conflicts()`
+    said the door was fine.
+12. Ten lines below, `render()` derived a centred plate's room itself instead
+    of asking `plateRoom()`, walking inboard **from the lock** rather than the
+    hinge — so every door with no pull handle got `width="-24"`. A negative
+    width is not a small rectangle; the browser logs an error and draws
+    nothing.
+13. **`render()` emits FIXED SVG ids** — `leafFill`, `keyWash`, `retNear`,
+    fifty-eight in all — and `url(#x)` resolves to the FIRST match **in the
+    document**. Correct for the whole life of the file, because there was one
+    door on the page. Then the gallery put thirty in one document and **every
+    tile painted itself in the first tile's colour.** An id is a name computed
+    in one place and consumed in another; nothing said it had to be unique per
+    document because for years there was only ever one. `copyOf()` in
+    `renderer.js` namespaces the extra copies; the stage's copy keeps its plain
+    ids because every instrument selects `#leaf` and `#frame` on the page.
+
+**14 is its own shape, and it is the one to be most afraid of.**
+
+14. **A TEST WRITTEN TO CATCH A BUG, WHICH COULD NOT CATCH THAT BUG.** The
+    ימין/שמאל convention was backwards for months. The fix came with an
+    assertion committed under the heading *"this is the assertion the old bug
+    would have failed"*: it renders a door, finds where the keyhole is drawn,
+    and requires the order's sentence to name that side — reasoning that it
+    therefore never reads `HANDINGS[].hinge`. It does not. **But the drawing
+    reads it too**, so flipping the field moves the picture and the sentence
+    together and the test passes in both worlds. Verified by putting the bug
+    back: 4 passed, 0 failed, before and after.
+    Every check in this repo compared our drawing to our drawing. That is the
+    whole reason the bug lived — and the test written to commemorate it
+    reproduced the pattern exactly.
+    The replacement leaves the catalogue entirely: for each of the 30 real
+    doors it compares the drawn keyhole against `handle.x` **measured off that
+    door's photograph**, a fact no amount of editing our own model can move.
+    60 passed / 0 failed as shipped; **0 passed / 60 failed with the bug
+    restored.**
+
+**15 is 14's cousin, and one of the three checks involved defended itself.**
+
+15. **AN ASSERTION THAT SELECTS ON MARKUP A NEW OBJECT DOES NOT EMIT.** Three
+    checks ask whether the panel a customer is charged for is a panel that is
+    drawn, and all three find it by `data-detail="panel"` in the SVG. The
+    classical set draws a panel and charges ₪1,680 for it, and wrapped
+    everything it drew in `data-detail="classic"` — so on 297 combinations two
+    of the three reported a face with no panel on it, which is a loud failure
+    and was fixed in minutes.
+    The third asks a different question — does any moulding cross the glazing
+    — and it needs `data-top` off that same group. With the group missing it
+    had nothing to compare and **would simply have stopped asking**, on every
+    door the new face appears on, for as long as the face exists. It did not,
+    because whoever wrote it put `ok(m, 'the panel group no longer reports
+    data-top, so this check is dead')` above the comparison. That one line is
+    the whole difference between a check that fails and a check that quietly
+    retires. ⚠ **When an assertion locates its subject by a selector, assert
+    that the selector found something** — the day it stops matching is the day
+    you most need to hear about it.
+
+**Tests catch wrong output easily and absent output almost never**, unless
+someone goes looking on purpose. So every feature ships with an assertion that
+it is **present and distinct**, not only that it is correct:
+
+- `no dangling gradient or filter references` — every `url(#id)` resolves.
+- `every grille draws something`
+- `every option tile draws its own picture` — compares the *markup* of every
+  tile against every other, across all six groups.
+- `a priced option changes the door, and a free one does not` — both directions.
+- `the grip clears the lockset` — every grip × lockset × size × handing × window.
+- `npm run collide` — real `getBBox()`, no declared number in the loop.
+- no negative `width`/`height`/`r`/`rx`/`ry`/`stroke-width` in any render.
+- `the face wash does not tint the paint` — the tint rule.
+- the moulding draws all four sides, they take different light, and nothing
+  fills the interior.
+- **every door in the gallery is one the site can actually build** — the rules
+  must not quietly repair a tile into a different door than the one drawn on it.
+- **the drawn keyhole is on the side the PHOTOGRAPH puts it** — see 14.
+
+16. **ONE OPENING WRITTEN DOWN TWICE, IN DIFFERENT UNITS.** The classical
+    set's light was `winRect` in MILLIMETRES in the catalogue and
+    `CLASSIC_COLS.panel` in FRACTIONS in the renderer — the glazed variant's
+    outline from one, the solid variant's from the other. On a standard leaf
+    they agreed to 1.3 mm and nobody noticed; the moment the leaf stopped being
+    850 x 2050 they diverged by 62 mm on the WIDE door and put the casing 46 mm
+    into the frieze on the TALL one. Reported from outside as *"when i put on a
+    window the panel changes."* ⚠ **A duplicate that agrees on the default case
+    is the worst kind**, because every check runs on the default case.
+    `classicLight` asks `apertureLayout` — the ONE enumeration of where glass
+    goes — and only adds the casing round it.
+
+17. **A CONSTANT INVENTED TO ABSORB A WRONG NUMBER ONE LEVEL UP.**
+    `CLASSIC_BAND_FOOT = 9` said "the shelf closes this light, so there is
+    barely any casing under it", with a comment explaining it as joinery. It
+    was the leftover between a glass line that was really the CASING line and
+    the shelf below. Two visible faults came out of it: `moulding()` draws all
+    four runs at the same band, so a 59 mm bottom run in a 9 mm rectangle
+    reached fifty millimetres up into the pane, and the glass then painted over
+    it — the light had no casing at its foot at all. **When a constant exists
+    only to make two other numbers meet, one of those two is wrong.**
+
+18. **A SECOND STATEMENT OF WHAT THE RANGE CONTAINS, INSIDE THE TOOL THAT
+    MEASURES THE RANGE.** `npm run corpus` fits Peretz's 30 real doors and
+    writes the gallery; its strip matcher hard-coded two ids per axis rather
+    than asking the catalogue. d064's SEVEN bands came out as ELEVEN, with the
+    residual dutifully printed, while `strips7` sat unused in the list. Four
+    gallery doors moved from a residual to an exact fit when it was made to ask.
+    ⚠ And the same tool needed a second fix one round later: a count alone
+    cannot name a composition when two families share their columns, so the
+    tie-break is now the catalogue's own `doors` citation, and where nothing
+    cites the door the note SAYS the choice was a coin toss.
+
+19. **A COMMENT PROMISING WHAT THE CODE DID NOT DO — TWICE IN ONE HOUR, AND
+    BOTH WERE FOUND BY LOOKING AT THE PAGE.**
+    `formatAgorot` sat under a paragraph explaining that the price could never
+    change shape between languages, because the LOCALE was pinned to `he-IL`.
+    It changed anyway. `Intl` wraps the shekel in U+200F marks and the bidi
+    algorithm places the symbol at PAINT time by the direction of the
+    paragraph: `₪ 3,150` in Hebrew, `3,150₪` on the English page, one string,
+    two shapes, decided by a stylesheet. A pinned locale fixes FORMATTING and
+    says nothing about REORDERING. The figure is assembled by hand now and
+    `Intl` is asked only to group the digits.
+    ⚠ And the fix was chosen by MEASURING five candidate strings' glyph
+    positions in both directions in a browser, not by reasoning about bidi.
+    Reasoning about bidi is how the first version got written.
+
+20. **A ROUTE THE AUDIT DROVE WITHOUT LISTENING TO.** `?sheet=1` — the A4
+    document Peretz orders from — threw two uncaught `TypeError`s on every
+    load, in every language, for an unknown number of commits. `.is-sheet`
+    REMOVES `.layout` so the printed page has one `<h1>`; `goStep` then ran
+    over a flow that is no longer in the document and `fitStage`/`paint`
+    reached for `$('#stage')`. The comment above the removal said "nothing
+    past this point reads `.layout` in sheet mode" — that sentence was the
+    bug. Every other route in `tools/audit.mjs` collects `pageerror`; this one
+    did not, so it reported the sheet as fine about a page that was on fire.
+    ⚠ The fix is ONE guard, in `init`: a sheet is a document and has no steps,
+    so the flow does not start. Null-checking `fitStage`, then `paint`, then
+    the next caller, answers "which step is the customer on" with `null` four
+    times and leaves the fifth for whoever adds it.
+    Found while opening the sheet to check a translation.
+
+21. **A RULE ENFORCED AT THE BOUNDARY AND NOT IN THE STATE — SO TWO OF ITS
+    THREE READERS WERE RIGHT.** The vertical stripe cap is six. `packStripes`
+    has clamped to it since the day it was written, so a shared LINK and a DM-
+    CODE have always carried six. The LIVE STATE kept whatever the customer
+    had, and the drawing and the price read the live state — so a customer who
+    turned eleven horizontal stripes sideways saw eleven columns and was
+    charged for eleven, while the link they sent said six.
+    ⚠ **This is 10–13's family with the copies in an unusual order, and it is
+    harder to see than any of them.** In those, two computations of one number
+    drifted and BOTH were visible. Here one place enforced the rule correctly,
+    and it happened to be the place nothing looks at while using the page. A
+    quantity that is right in the wire format and wrong on the screen produces
+    a link that does not describe the door the customer is looking at, which is
+    §0's worst failure with the arrow pointing the other way.
+    The clamp is in `repair()` now — the one function a click, a link and a
+    decoded code all pass through. `packStripes` keeps its own `Math.min`,
+    because a wire format must never emit a value it cannot read back; it is
+    simply no longer the only thing standing between a customer and eleven
+    columns.
+
+22. **AN ASSERTION THAT COMPARED MARKUP WHEN THE COLOUR LIVED IN A REFERENCED
+    GRADIENT.** Written to prove that the פרזול no longer recolours the extra
+    lock, it pulled each fitting's group out of the SVG and compared the two
+    strings under nickel and under gold. A fitting is painted
+    `fill="url(#nickel)"`: it is the GRADIENT that moves, and the group's
+    markup is byte-identical either way. Every special-lock check passed — and
+    would have passed identically with the bug still in.
+    ⚠ It was caught by its own PAIR. The block also asserts the thing that must
+    still be true — *"the פרזול must STILL recolour the lock furniture it was
+    bought for"* — and that one went red, about a lever whose colour does
+    change. **Write the assertion that must stay true beside the one that must
+    become true**; a check that only ever looks for absence cannot tell absence
+    from a blind instrument.
+    The comparison resolves the reference now: find which gradients a group
+    paints with, then compare THOSE gradients' stops.
+
+⚠ **And one assertion was counting PROSE.** The ironwork group asked
+`render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
+document. About 32% of a rendered door is XML comments, so the moment a comment
+mentioned the attribute by name, every door gained two phantom panes and
+twenty-five assertions failed about nothing that had moved. It is
+`/\sdata-pane="/` now. **Prose is not geometry.**
+
+---
+
+## 6. Measure before fixing
+
+Three times the obvious fix would have been wrong:
+
+- Beside a photograph our leaf looked blotchy and the move was to turn the
+  drift down. Measured: photographs 0.089 and 0.155, ours far below both. We
+  have *less* unevenness than a real door, not more.
+  ⚠ **This line said 0.032 long after it stopped being true.** `drift` was
+  halved and the number was not, so the record described a leaf we had stopped
+  drawing. `npm run mottle` renders and measures our own leaf on every run now.
+- The frame returns were "corrected" 3× narrower using the corpus field
+  `reveal` — which is the shadow *gap*, not the returns. Wrong quantity.
+- A rebuild was planned around "frame face lighter than leaf". Corpus median
+  `face_vs_leaf` is 0.99. I had been looking at the wall.
+
+⚠ **And numbers written into prose go stale the moment the thing they describe
+is edited.** Every figure this project published about the room was wrong
+within the hour — the byte counts were measured before later commits added
+comments, and the heaviest-door sweep forgot an axis, which is the same mistake
+one level down from the one it was written to correct. **If a number can be
+got, get it before changing anything, and get it again before writing it down.**
+
+---
+
+## 7. The instruments
+
+These are not scripts, they are measuring devices. Each exists because
+something was tuned by eye against nothing and landed on "slightly better".
+
+| tool | what it answers |
+|---|---|
+| `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
+| `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop |
+| `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
+| `npm run fuzz` | random combinations, then click-walks in a real browser |
+| `npm run profile` | the leaf's VERTICAL fall, against the medians `FALLOFF` was fitted to |
+| `npm run mottle` | slow horizontal unevenness of the PAINT. ⚠ It strips `[data-room="lamp-wash"]` first — the sconces' wash is horizontal too, and it moved this figure 46% without a drop of paint changing |
+| `npm run glass` | what is inside the pane, band by band, against the corpus |
+| `npm run recreate` | ten measured photographs beside our render, leaf heights matched |
+| `npm run corpus` | all 30 measured doors rebuilt from their own records; writes `js/works.js` and `screenshots/corpus-links.md` |
+| `npm run against` | each design and grip beside its own source doors, cropped |
+| `npm run shot` | the whole page at twelve sizes and designs |
+| `npm run sheets` | regenerates all four screenshot families after a change |
+| `npm run backdrop` | rebuilds BOTH rooms in `assets/` from the owner's two originals: grades the wall's median 60% of the way to the drawn room's own rendered wall, re-encodes under the 400 KB budget, and prints what it measured going in and coming out. Committed rather than scratch for `rectify.mjs`'s reason — the shipped asset is a pure function of an original plus one number, and re-deriving that from prose is how a picture comes back slightly different from the one everything else was fitted to |
+
+### The fifteen named assertions
+
+⚠ **Moved here from `TRANSFORM.md` §16.1 when that plan was deleted, 27.8.2026.**
+Each exists because something can fail SILENTLY. **Walking this list means
+grepping for each one, not remembering it** — asked whether the plan had been
+carried out, the agent that wrote it found three of these missing or half-done
+by checking the code instead of its own notes.
+
+⚠ **AND THE TABLE UNDER THIS HEADING WAS EMPTY FOR A DAY.** When
+`TRANSFORM.md` was deleted on 27.8 the header row was copied across and the
+fifteen rows were not — so the paragraph above said "this is the list to walk"
+and there was no list. Recovered from `git show a8a33d1^:TRANSFORM.md` §16.1 on
+28.8. A section that instructs the reader to walk a list is the one place an
+empty list cannot be noticed by reading, only by trying to obey it.
+
+| # | assertion | protects |
+|---|---|---|
+| T1 | Sum of the breakdown rows === the displayed total, every buildable design | a breakdown that does not add up |
+| T2 | The standard door with nothing on it is exactly ₪3,195, and all five size bands match Peretz's own figures | the one number Peretz will check |
+| T3 | `leafW`/`leafH` identical across all four mashkofs, every size | the fault reported on the classical set |
+| T4 | For every grip × pirzul pair, the lever's fill carries the PIRZUL tone | the existing test asserted the MIRROR of this and would have agreed with the bug |
+| T5 | Every retired id resolves to a buildable door, including the stripe → (dir, count) migration | fourteen `d=` ids already in links customers have sent |
+| T6 | `handleLen` never exceeds the leaf; `repair()` pulls a stale one from a link | a 200 cm bar on a 203 cm door |
+| T7 | `list.length <= 2 ** BITS[f]` for every NEW field | a 17th entry encoding as index 0, in silence |
+| T8 | The cylinder is on the same side in he, en and ru | the hinge trap |
+| T9 | The page is fully usable under `prefers-reduced-motion: reduce` | — |
+| T10 | `window: rect` cannot be chosen without a bottom panel | Peretz's own rule |
+| T11 | `?d=CODE` **and** a full query both land on the quote page, not step 01 | ⚠ shipped half-done and closed 27.8 — the shared-link half is the half Peretz uses |
+| T12 | Two renders of one state stay byte-identical with the two stacked leaf rects in place | purity |
+| T13 | Under `.is-bare`, `getComputedStyle` reports `animation-name: none` on every animated element | the 110 sheets go non-deterministic otherwise |
+| T14 | Every interactive control in the flow measures ≥ 44 px on both axes, at all seven `VIEWS` | the grip controls were 22 px for two rounds |
+| T15 | Every group in `GROUPS` has a `hint`, and every step has a `<details>` explainer | ⚠ NOT BUILT in its own phase; built 27.8 |
+
+⚠ **And two of them were found missing by exactly that walk.** T11 was asserted
+for the bare-load half and not the shared-link half — the half Peretz uses every
+time. T15 did not exist at all: nine `<details>` explainers, described by the
+plan as "the single biggest thing the old cabinet could not do", and four of
+eleven groups had no hint either. Both shipped green on every instrument.
+
+### ⚠ Chromium dies in some containers, and it is not your code
+
+Headless Chromium here kills its own renderer under raster pressure at no fixed
+threshold, and **the ceiling falls the longer the container lives**. Measured
+in order across one session: 834×1112 passed early; 1099×720 passed once and
+failed twenty minutes later; **1280×720 never passed** — five consecutive fresh
+browsers, ten launch-flag combinations; and by the end a 620×1000 leaf crop
+would not rasterise at either scale. Even 390×844, reliable all session, went
+down at the end.
+
+Verified against the committed tree, so it is the container and not the change
+under test. `--disable-gpu` made it *worse*.
+
+- `tools/browser.mjs` relaunches a dead browser and retakes the reading,
+  printing every relaunch so a run that needed six does not read as a quiet
+  one. ⚠ **It is not a retry that turns a red check green** — a crashed
+  renderer is the ABSENCE of a measurement, and anything that is not the
+  browser dying is rethrown on the first attempt.
+- `npm run audit` skips a viewport it cannot render, names it, and exits
+  non-zero if it could render none.
+- `npm run latency` reports a door it could not measure rather than passing it.
+- **When `npm run sheets` cannot run, the four staleness assertions stay red
+  and stay true.** Do not stamp them by hand. `AGENT.md` has the procedure.
+- ⚠ Dropping `recreate`/`corpus`/`against` from 2× to 1× would fit through and
+  is **refused**: those three are read to judge the drawing against thirty
+  photographs, and halving their resolution to suit a sick container is fitting
+  the instrument to the room.
+
+### Five rules about instruments, each learned the hard way
+
+**Tools must ask the page, not assume.** Four of them have held constants that
+silently stopped being true: a `0.735` leaf-height ratio, a viewBox origin
+assumed to be zero, crop fractions of the whole picture, and `glass.mjs`
+holding OUR OWN measured numbers so a rebuilt pane was reported as unchanged.
+
+**An instrument that cannot see the thing it is named after is not an
+instrument.** The sheet-staleness check hashed the drawing but not the tool, so
+changing which door a sheet drew was invisible to it. The latency gate passed,
+with flying colours, a page where every tap throws — because a thrown click
+handler returns instantly and instantly is what it rewarded. It now requires
+the design code to change on every tap.
+
+**A test anchored in our own output cannot catch our own model being wrong.**
+See §5, item 14. This is the subtlest failure in the file and the most recent.
+
+**⚠ AN INSTRUMENT THAT WRITES SOURCE HAS TO BE RE-READ EVERY TIME THE
+CATALOGUE GROWS.** `npm run corpus` fits each of Peretz's 30 real doors to a
+state and writes `js/works.js` — the gallery on his own front page. Its
+`handleOf` matched a pull bar on length and width, and printed the record's
+FINISH in a note beside the result: correct and free for as long as every bar
+in the range was steel. Adding `barblack` (800 x 20, against Ron's 900 x 18)
+made it win on geometry for four doors whose own records say "steel" and
+"polished chrome", and the next `npm run sheets` quietly rewrote the gallery to
+show them with black bars. Nothing failed; the diff on `js/works.js` was the
+only sign. The finish is a filter now, not a comment. **When you add a
+catalogue entry, diff what the fitters write.**
+
+**⚠ A RATIO CATCHES ONE ERROR, NEVER TWO.** The aspect check — "a door is not
+a square; if the crop's aspect matches the model's, the crop is the door" —
+caught two wrong leaf boxes on `research/newdoor/` and then passed a third. The
+door lies two degrees off level and tapers towards its foot, so its outline is
+a trapezoid and no axis-aligned rectangle is it; the box in use was 3% narrow
+AND 1% short, the aspect came out 0.416 against a door's 0.415, and the two
+errors cancelled. Every COLUMN fraction on that door was wrong by a shear that
+grew down the leaf — the pieces at the head and the foot came out narrow and
+the two in the middle came out right, which is the signature. `_upright2.mjs`
+rectifies from four measured corners instead. **When a check is a ratio, ask
+what pair of errors would cancel in it.**
+
+**⚠ AND A WARNING PRINTED IN THE FILE YOU COPY FROM IS STILL A WARNING YOU CAN
+WALK PAST.** `collide.mjs` says, in as many words, *"the relight rects are the
+whole leaf; strip them first, or every pane measures as the door."* A scratch
+sweep written on 30.8 by copying that file's shape did not strip them, and
+reported the new bell push colliding with glass on 140 designs while standing
+on the hinge stile 120 mm from a window that begins at 245. **Five instruments
+in this repository have now measured the wrong object**, and this is the first
+one that had the answer in front of it. The tell was the same as always: a
+result that is confidently wrong about something you can check by hand.
+
+A contact sheet triages; it does not measure. When a number matters, put a
+scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
+
+---
+
+## 8. Things that will bite
+
+- **BigInt is required** in `url-state.js`. JS bitwise ops truncate to 32 bits
+  and the code layout is 40. The build targets es2020 for this reason, so
+  `Object.hasOwn` (ES2022) is unavailable — use
+  `Object.prototype.hasOwnProperty.call`.
+- **The short code is an ENCODING, not a hash.** It must decode without a
+  server, because its whole purpose is being read aloud on the telephone.
+- **`fromQuery` never silently substitutes.** An unrecognised option sets a
+  `notice` and the customer is told. ⚠ **Any new rendering switch must join
+  `KNOWN`** beside `bare` and `sheet` the day it is invented — `sheet` was
+  missed, and every order-sheet URL opened under a red strip saying a choice
+  could not be read.
+- **Anything added to the page joins the bare-mode hide list the same day.**
+  `.is-bare` in `app.css`. A headline left off it once cost a false 5.2%
+  regression in `npm run profile`, because bare mode lost 70 px of stage and
+  there were simply fewer pixels to measure in.
+- **`usedDefs()`** prunes the SVG's defs to what the drawing points at. It is
+  derived from the markup, not a list, because a list goes stale in silence and
+  its symptom is a dangling `url()`.
+- **Blocked options are `aria-disabled`, never `disabled`** — still focusable,
+  still clickable, and they say why. Playwright's actionability check refuses
+  them, so the audit uses `el.click()`.
+- **`minmax(0, 1fr)`, never a bare `1fr` or an implicit `auto` track**, on any
+  grid containing the stage. An `auto` track is floored at its content's
+  min-content width, and the loop settles 67 px past a 320 px screen.
+- **A media query adds NO specificity.** A rule inside one that sits ABOVE the
+  base rule it means to override loses at every width. This file has been
+  bitten three times: `position: sticky` on the stage, the stage's height, and
+  the order sheet's phone cap. **Put the override after the rule it overrides.**
+- **`textContent` on a parent replaces every child.** `app.js` writes the phone
+  number so it cannot drift from `share.js`; the moment an icon was added
+  beside it, that one line would have deleted it on every load. It writes to a
+  span now.
+- **A drop shadow is not an object**, and two halves of `collide.mjs` have to
+  agree about that. They asked different questions for three rounds.
+- **`research/works/auto/leaf.json` is a fallback for 41 of 129 doors, and 27
+  of those share ONE box.** `src` says which. A fallback entry is a generic
+  centre rectangle, not a measurement. **Check `src` before you measure.**
+- **A `<use>` builds a shadow tree that `querySelectorAll` does not enter.** So
+  the floor reflection is invisible to `collide`, `profile` and `glass` — which
+  was verified over 1,490 designs rather than assumed, against a plan that
+  insisted a strip was required.
+
+---
+
+## 9. What is still open
+
+### Blocked on a human — `ASK-PERETZ.md`
+⚠ Every number in this paragraph is a section of THAT file, not of this one.
+
+§5, a starting price per size band, is the launch blocker. Also open: which
+grips and locksets he orders (§2), which colours he stocks and which cost extra
+(§3), windows and grille prices (§4), the distance/pricing contradiction (§6),
+permission to use the photographs (§7), width bands per size (§8), the warranty
+term (§9), three questions from the second mockup (§11), and which dimension he
+orders by (§12) — the last one blocking only the dimensions printed on the A4
+order sheet — and **whether he sells a door with no lock furniture at all
+(§13)**, which decides only whether the bare door the page now OPENS on can
+also be ORDERED, not whether it can be shown.
+
+### The assumption ledger — every number with no source
+
+⚠ **Moved here from `CLAUDE.md` §9 when that plan was deleted, 27.8.2026.**
+These are decisions taken because the owner was away and no step could wait on
+them. Each is a single edit if Peretz says otherwise. `ASK-PERETZ.md` carries
+the same list in Hebrew, shorter, for him to answer.
+
+| # | assumption | if wrong |
+|---|---|---|
+| A1 | ~~`sidelight` is priced ×2~~ — **settled 27.8**: the size is withdrawn | — |
+| A2 | `98 × 203` is the OPENING, not the leaf | every size's drawn dimensions |
+| A3 | The size multiplier applies to the mashkof's total *including* its width extras | one expression in `priceParts` |
+| A4 | `rings` survives — he named three grilles to remove and this was not one | one alias |
+| A5 | `knobplate` is a "circle" at +₪200 | one number |
+| A6 | The widened mashkof is 60 mm outside / 300 mm inside | two numbers in `MASHKOFS` |
+| A7 | The peephole and security latch are standard on every door — **the עינית is now a CHOICE priced at ₪0 on the strength of this**, so it is louder than it was | one number in `prices.js`, and whether the tile says כלול |
+| A8 | A single bottom panel is ₪725, half of two | one number |
+| A9 | `Math.ceil` on the handle's 20 cm steps — you cannot buy 10 cm of bar | one word |
+| A10 | ~~Colours are all included~~ — **settled 30.8**: three included, fourteen at +₪200 | — |
+| A11 | Panels and stripes are mutually exclusive — no door carries both | one rule in `js/rules.js` |
+| A12 | `barblack` (מוט שחור) is priced as a bar like the others — he wrote "nickel >100cm" and named no rate for a black one | one entry's `priceKind` |
+| A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | **which window carries ₪4,200 and which ₪3,700** |
+| A14 | The reeded and ogee panel mouldings cost the same — he priced "two panels" once and named no families | two numbers, and possibly one whole family |
+| A15 | ~~The tight band is not buildable~~ — **settled 27.8**: it is a toggle | — |
+
+⚠ **A2, A7 and A13 are the three worth asking first.** A2 changes every drawn
+dimension in the range; A7 decides whether two fittings appear on every door;
+**A13 is ₪500 on a majority of glazed orders and rests on nothing but the shape
+of two Hebrew names.** If "tall" and "square" are the other way round, every
+glazed quote is wrong. One photograph or one sentence settles it, and it is the
+cheapest question here to get wrong expensively.
+
+⚠ **And one instruction is contradicted by three of his own doors** — see §5's
+note on the single panel, and `ASK-PERETZ.md` §2.
+
+### Wanted, not built, and each has a reason
+- **The leaf's grain and the full-bleed desktop** were the two things this list
+  carried longest — both BUILT on 26.8 (`FALLOFF` grain/drift, and the stage
+  taking columns 2–3 above 1280). They are named here only because a reader of
+  the old change log will meet them as open.
+- **Incremental colour repaint** — declined on the measurement, and it would
+  put a second way of producing the drawing beside `render(state)`. The
+  condition for revisiting was "if `npm run latency` goes red".
+  ⚠ **It is not red, and this entry said it was.** The line above used to read
+  "it is red today — but on the previous commit too, by 5 ms, so it is the
+  container"; measured on 28.8 the worst door answers a tap in **158 ms against
+  a 600 ms gate**, which is a quarter of the budget. The container was sick
+  that day and the sentence outlived it. The condition is not met.
+
+- **A satin sheen on the leaf** — asked for by `REALISM2.md` stage E and by the
+  design brief of 28.8, BUILT TWICE and cut both times. The table is in §0b and
+  the whole argument sits in `renderer.js` beside `FALLOFF`, where the next
+  person to have the idea will meet it. The short version: no photograph asks
+  for it (the corpus rises ~3% left to right, it does not carry a band), it
+  swung `npm run profile`'s dark rows by 2.7 points and then failed the gate,
+  and nobody can explain why a purely HORIZONTAL overlay moved an
+  upper-against-lower RATIO at all.
+  ⚠ **What the leaf is actually short of is MOTTLE**, not specular: 0.0181
+  against an honestly-corrected corpus figure near 0.042. That is a `drift`
+  question with a photograph behind it, and it is the best next piece of
+  drawing work in the repository.
+
+### From the corpus, recorded rather than built
+Carried over from `ROUND5.md`, which has been deleted now that its plan is
+complete and its findings live here:
+
+- **d080** is a full classical composition — cornice, pilasters, plinth — and
+  we have no vocabulary for it. **d067** carries three moulded rectangles, not
+  two.
+- **A curved bow pull (d078)**, an **arched raised panel (d071)** and a
+  **transom (d083, d109, d121, d129)** are each one or four doors. Recorded.
+- `grid` sets an ogee motif into the mesh because d097 has one; d097 also has
+  *scrolls inside the grid*, which we draw as two bare S-curves.
+- **Colours the Rav Bariach chart we sample does not contain:** a red door
+  (d095), a mustard one (d127), a cool light grey (d026) — and the warm
+  mid-taupe the second mockup uses, which five measured leaves also want.
+  A question for Peretz, **never a colour to invent**: an id is a wire format.
+
+### Wanted next, and named so it is not forgotten
+
+- **A recreate case for the classical-set door.** `research/newdoor/` is
+  committed and the catalogue cites it, but `npm run recreate` still only knows
+  the thirty numbered doors, so nothing in the repo re-checks the new one
+  against its photograph — the comparison that built it was a scratch harness
+  and scratch harnesses are gitignored. What it needs is a record with the two
+  fields the tool refuses to work without: `leaf` (the leaf's box in the
+  photograph) and `handle.x` (which must be measured, never typed — the tool
+  throws rather than guess it). Everything else about that door is already
+  written down. Until then the classical set is the one face in the range whose
+  fidelity is asserted by nobody.
+
+- **Re-base `npm run profile`'s bead check on a quantity the light cancels out
+  of.** It compares the bead against the face beside it and asks that the ratio
+  be the same on both panels, and under this drawing's own light it cannot be:
+  `keyWash` and `bloom` are warm overlays, so the composite is affine and
+  contrast is compressed wherever the lamp is strong. The check only ever
+  passed because it was calibrated on a section with a bright bead; the reeded
+  section's beads are 1.02 to 1.16 of the field and the ratio of two numbers
+  that small is mostly the lamp. It reads 1.044 on the dark reeded row against
+  a 1.03 gate and that row is red today. What is wanted is a figure the
+  wash divides out of — three surfaces of known base tone at the same place
+  should give one, `(bead - quirk) / (face - quirk)` being the obvious form —
+  but three attempts at the third surface all still varied 3.5% to 4.8%
+  between the panels, so the compositing has a term the derivation is missing.
+  ⚠ **The gate is not to be widened to close this.** Backing the relight out
+  reads 1.508 / 1.083 / 1.462 / 1.071, so it still separates correct from the
+  bug it was written for by a wide margin; what it does not do is separate
+  correct from correct.
+
+- **A PHOTOGRAPH OF THE פעמון, AND WHERE PERETZ FITS IT.** It is the one
+  fitting in the range drawn without one — 65 mm from a published product
+  spec, the round bezel and raised button conventional, standing on the hinge
+  stile because that is the band of leaf nothing else can reach. Four places
+  were looked at and all came back empty; the list is in `renderer.js` beside
+  `bellPush`. `ASK-PERETZ.md` §0f asks for the picture and for the position,
+  and the position is the answer that matters more.
+
+- **A DARK-PAINTED OGEE DOOR, to confirm the section that eleven doors use.**
+  `MOULDS.ogee` stands on **one** photograph — d050 — and d050 is near-white,
+  so what it shows is the COMPRESSED profile and the stored table is the
+  measured departures divided by the 0.34 `mouldGradients` applies to pale
+  paint. That inversion is the corpus's own factor and it is arithmetic, not
+  taste, but it has never been checked against a dark door of this family
+  because there is not one: d077 and d061 are so bright the whole moulding sits
+  inside 0.95–1.00, and d111 and d127 have fallback leaf boxes. If Peretz sends
+  a photograph of a dark classical-panelled door, that table is the first thing
+  to re-read.
+
+- **The classical set's two remaining differences, recorded rather than
+  guessed at.** Photo beside ours at 4x, after five rounds: (a) our cornice's
+  UNDERSIDE is a flat plank shadow where his has a stepped bed mould, and
+  (b) the `rings` grille reads coarser than the photograph's — fewer, bigger
+  rings. Neither has been measured properly. Everything else on that door now
+  matches within the instrument's error.
+
+- **⚠ AT 320×568 THE FIRST STEP ARRIVES WITH ITS ANSWERS 78 px BELOW THE
+  FOLD**, and every other step at every other viewport is fine. Measured on
+  arrival, before any interaction: the fold — the top of the fixed quote bar —
+  is at 501, and the first size tile's top is at 555. At 375×667 it is 27 px;
+  at 390×844 it is comfortable.
+  Why step 01 and not the rest: `goStep` scrolls ~50 px on every step change
+  and the boot call does not, and step 01 is also the only step carrying the
+  gallery opener. 29.8 spent 98 px on this (68 from the stage, 30 from the
+  type) and 16 more on the opener; what is left would have to come out of the
+  door, which is already down to 250 px on a 568 px screen.
+  ⚠ **Scrolling on arrival was considered and is not the answer.** The section
+  carries `scroll-margin-block-start` sized to clear the sticky stage, so
+  `scrollIntoView` lands the QUESTION at the top and gains exactly the 50 px
+  the other steps get — 28 short. Putting the tiles in view means scrolling
+  past the question, which is worse than scrolling to reach them.
+  What would actually close it: the illustration note (45 px) not standing
+  between the door and the question on a phone, or the size tiles not being
+  131 px tall. The first is an honesty commitment (§0b, "say plainly that the
+  drawing is an illustration") and is not to be quietly relocated without
+  asking; the second is a real piece of design work.
+
+### Not started
+CI, deploy to `design.dlatotmagen.co.il`, prerendering the default door into
+`index.html`.
+
+⚠ **`English and Russian` STOOD IN THIS LIST AFTER THEY SHIPPED.** Both landed
+on 27.8 with `js/copy.js`, three hundred keys and an audit route, and this line
+still filed them as unbuilt the next day. It is the exact fault the paragraph
+below the list was written about — *"a finished feature filed under 'not
+started' is worse than no list at all"* — and it went one round before anybody
+noticed, which is how long it takes for an unattended agent to build a thing
+twice. Corrected 28.8.
+
+⚠ The mobile sticky CTA used to sit in that list and **it ships** — though not
+under the name this paragraph gave it. `.dock` was deleted on 27.8 and the
+thing that does the job now is `.quote`, the price-and-send bar: pinned to the
+foot of the screen below 1100 px, standing in the wall under the right-hand
+lamp above it. Third correction to one paragraph, which is the point of it:
+**a finished feature filed under "not started" is worse than no list at all**,
+and a feature described by the name of the element that used to implement it is
+the same fault one level down.
+
+---
+
+## 10. How to work here
+
+Commit messages in this repo explain **why**, at length, and name what was
+wrong before. That is deliberate: most of the value in this history is the
+record of what did not work. Say what you measured, say what you got wrong, and
+say what you decided not to do.
+
+**A recurring agent** (`AGENT.md`) wakes every few hours, forms its own opinion
+about the site and pushes to the same branch. `AGENT-LOG.md` is what it did,
+including the runs where it changed nothing. If something changed and no human
+asked for it, that log is where to look. **Fetch and rebase before you push** —
+it will have moved the branch under you.
+
+### ⚠ SIX PLANS WERE DELETED ON 27.8.2026, AND THE CODE STILL CITES THEM
+
+`PLAN.md`, `REDESIGN.md`, `MOCKUP2.md`, `REALISM.md`, `REALISM2.md` and
+`TRANSFORM.md` were written, executed to the last item, and removed at the
+owner's request — 13,000 lines of plan for a site whose plans were all carried
+out. **Roughly 120 comments in `js/`, `tools/` and `test/` still cite them by
+section**, and those citations were deliberately left alone.
+
+That is not an oversight. Each one is provenance for a fact stated in the
+comment beside it — *"REDESIGN.md §1.5: 38.4% of single-character typos used to
+decode as a different valid door"* — and the measurement is right there. Editing
+120 comments to strip the pointer would delete the one thing that says where a
+number came from, which is the opposite of tidying.
+
+**To read any of them: `git show HEAD~1:PLAN.md`**, or `git log -- REALISM.md`.
+They are in the history, whole, at the commit before this one.
+
+What still GOVERNS was pulled out of them first, and it is the two rules below
+plus three more:
+
+- **Ids are a permanent public wire format** (`PLAN.md` §8.2) — never rename
+  one; keep old ids as aliases for ever. Restated at the top of `js/catalog.js`,
+  which is where it can actually be obeyed.
+- **An unknown URL parameter gets a visible notice, never a silent fallback**
+  (`PLAN.md` §8.2). `js/url-state.js` owns it.
+- **The interface may mirror; the door must not** (`PLAN.md` §6.1) — the hinge
+  trap, restated in full under "Three languages" in §0c, in `js/copy.js` and
+  above `svg { direction: ltr }` in `css/app.css`.
+
+The rule that governs the drawing, from `REALISM.md` §6:
+
+> **Compare against a photograph, every time.**
+
+Every realism pass tuned by eye against nothing landed on "slightly better" and
+stayed there.
+
+And the rule that governs everything else, `PLAN.md` §0:
+
+> **The product is the order Peretz can act on without a clarifying question.**
+
+The last two look-plan readings each found nine ways to build the wrong door
+before they found a colour token. Keep the ratio of attention shaped like that.
+
+---
+
+## 0b. Change log — the archive
 
 Newest first. **Every change gets a line here**, so this file alone carries the
-facts a fresh context needs. Detail lives in the section it belongs to.
+facts a fresh context needs — see the note at the top of this file about why
+that matters and who asked for it.
+
+This section is long and is not meant to be read end to end. The top ten or so
+entries describe the code as it stands; below that it becomes the history of
+how it got there. Detail lives in the section it belongs to.
+
+- **⚠ A WORK ORDER FROM PERETZ, 30.8.2026 — ELEVEN ITEMS, AND TWO OF HIS LINES
+  MEANT SOMETHING OTHER THAN THEY LOOKED LIKE.** He reviewed the app and gave
+  notes, with four photographs of installed doors. They are in
+  `research/handles/peretz-1..4.webp`, and he named which is which.
+
+  **"door - 1295" is not a separate product.** It looked like the leaf on its
+  own, without frame or installation, and it is the DOOR COMPONENT of the
+  six-part build: 1295 + 200 + 200 + 500 + 700 + 300 = **3195 exactly**, which
+  is the standard door he named in the same breath. `BUILD.door` moved 1250 →
+  1295 and the standard door is ₪3,195.
+
+  **⚠ AND THE SIZE MULTIPLIER NOW LANDS ON ALL SIX PARTS, NOT TWO — WHICH IS
+  PROVEN RATHER THAN CHOSEN.** On 26.8 he said "+25% to the price of the door
+  and mashkof"; on 30.8, "the all its all +25% = 3995". The first is
+  arithmetically impossible against his own figures: reaching 3995 from 3195 by
+  scaling a subset needs that subset to be worth 3200, and the whole door is
+  3195. Under the new rule all six of his bands come out exactly, using the ₪5
+  rounding `priceAgorot` already did:
+
+  | band | ×  | raw | rounded | he said |
+  |---|---|---|---|---|
+  | standard | 1 | 3195 | 3195 | 3195 |
+  | +25% | 1.25 | 3993.75 | **3995** | 3995 |
+  | +50% | 1.5 | 4792.50 | **4795** | 4795 |
+  | double | 2 | 6390 | 6390 | 6390 |
+  | double +25% | 2.5 | 7987.50 | **7990** | 7990 |
+  | double +50% | 3 | 9585 | 9585 | 9585 |
+
+  The last two have no size tile — one multi-leaf size exists, not three — and
+  they are asserted as arithmetic because six figures agreeing is what makes
+  the rule certain rather than plausible.
+  ⚠ **The multiplier lands on the BASE and not the options**, and that part IS
+  a reading: every figure he gave is a bare door. Sweeping the options in would
+  add ₪1,050 to a glazed +25% door on nobody's authority. `ASK-PERETZ.md` §0b.
+
+  **Colour is priced, and the DEFAULT COLOUR HAD TO MOVE WITH IT.** 9016T,
+  9001T and 7126D are in the price; the other fourteen are +₪200 — which
+  retires assumption **A10**. Two of his three codes carry a `T` where our
+  chart carries `D`; the suffix is the finish and the number is the colour, and
+  there is exactly one 9016 and one 9001 in our seventeen, so this is matching
+  on the number rather than the forbidden "nearest colour" guess.
+  ⚠ The old default `rb-0097d` is one of the fourteen, so the page would have
+  opened on a door carrying a ₪200 option nobody chose and printed ₪3,395 where
+  he says ₪3,195. `rb-7126d` is the one of his three that keeps the picture:
+  **dE 7.3** in CIELAB against the anthracite, where the cream is 53.9 and the
+  white 63.8.
+
+  **Also landed:** the starting door carries the Rotem (`plate`) instead of a
+  bare keyway, on his word; Sapir is ₪350, the one lever "all of them in the
+  price" does not cover; and the three hardware steps moved in FRONT of the
+  face step — section keys unchanged, so no link, code or saved design moves,
+  and the 01–08 follow by themselves because they are a CSS counter.
+
+- **⚠ ELEVEN STRIPES TURNED SIDEWAYS WERE STILL ELEVEN, AND THE WIRE FORMAT WAS
+  RIGHT ALL ALONG.** Peretz: *"when i change the placing of the stripes to
+  vertical instead of horizontal, even if there are 11 stripes it puts 11
+  vertical stripes, and that cant be happening."* `STRIPE_MAX` is
+  `{ h: 11, hTight: 8, v: 6 }` and the six is the corpus's own 0.073 pitch
+  reaching the stiles.
+
+  ⚠ **THE REASON IT SURVIVED IS THE INTERESTING PART.** `packStripes` has
+  always clamped, so a shared link and a DM- code have always carried six. Only
+  the LIVE state kept the eleven — and the drawing and the price read the live
+  state. **A quantity correct in two of its three readers is the hardest kind
+  to see**, and it is §5.10 with the copies in an unusual order. The clamp is
+  in `repair` now, which a click, a link and a decoded code all pass through.
+  Falsified by removing it: five counts fail, the h11→v→h round trip
+  resurrects the eleven, and the link/state comparison prints *"state 7,
+  link 6"*, which is the divergence itself.
+
+- **⚠ THE קודן WAS DRAWN AS THE WRONG PRODUCT, NOT MERELY THE WRONG SHAPE.** It
+  was a digital keypad — a display bar over a 3×3 grid of nine buttons — and
+  what is on the door is a MECHANICAL push-button lock: a pill body, ten
+  buttons in two columns of five, a turn knob filling the bottom third. The
+  catalogue already sells the digital one separately at ₪2,700; the ₪900 one
+  was drawn as it.
+
+  | | now | was |
+  |---|---|---|
+  | קודן | 60 × 154 mm, aspect 0.39 | 62 × 96, aspect 0.65 |
+  | כספת | 50 × 68 mm, aspect 0.74 | 62 × 62, aspect 1.00 |
+
+  ⚠ **ASPECT IS NOT READ OFF A PHOTOGRAPH DIRECTLY.** A leaf in a phone
+  snapshot is not at the model's aspect. Each dimension is a fraction of the
+  leaf's OWN matching axis, so a lens that stretches one cannot leak into the
+  other. Done that way peretz-1's leaf reads 0.485 against the model's 0.415 —
+  not distortion: that door is a WIDE one, and at leafW 1000 the fitting's
+  aspect comes out 0.396 against 0.392 measured in pixels. Outside
+  corroboration, which this kind of number needs most: a Codelocks CL200 is
+  57 × 168 mm.
+
+  ⚠ **AND `research/works/INVENTORY.md` HAS A WRONG LABEL THAT PERETZ'S OWN
+  WORDS CORRECT.** It lists d028's *"small white unit high on the leaf"* as an
+  intercom or bell — the only bell candidate in 129 photographs. d028 is the
+  same door as peretz-2 (same drill on the floor, same timestamp) and the unit
+  is the מנעול כספת. It is also a fourth measurement of that fitting.
+
+- **⚠ AND THEY GO AT EYE LEVEL: `SPECIAL_AFF` 654 → 1430.** Knee height, on the
+  reasoning that a second keyway goes below the first. Derived twice, because
+  one reading off a phone snapshot is not a measurement — and the size of the
+  error is visible rather than guessed at, since each photograph also contains
+  the LEVER, which the corpus fixes at 1020. The four read it at 990, 894, 843
+  and 834.
+  1. peretz-1 is the only door showing the keypad AND the peephole, 170 mm
+     apart on the leaf's own scale. Anchored on `PEEPHOLE_AFF`: **1430**.
+  2. Across all four the fitting sits 0.169–0.198 of leaf height above the
+     lever; correcting each door by its own lever error gives a mean of 1459.
+
+  1430 taken, because it rests on two fittings a hand's breadth apart in one
+  frame rather than on a linear correction applied to a nonlinear distortion.
+  ⚠ The BACKSET was checked rather than assumed and did not move: all four put
+  the fitting on the cylinder's own axis, 45–82 mm off the closing edge against
+  `KEYWAY_BACKSET`'s 63. `npm run collide` clean over 1,012 designs at the new
+  height.
+
+- **⚠ THE FINISH RULE NEEDED A PRECEDENCE DECIDED, AND MY FIRST ASSERTION FOR
+  IT COULD NOT HAVE CAUGHT THE BUG.** Two sentences from Peretz, each
+  satisfiable alone: *"the אלה and מוט שחור are changing the color of the
+  stripes"* and *"pirzul doesnt affect the additional lock, but it does affect
+  the stripes"* — the second reversing his 26.8 *"it doesnt change the color of
+  the stripes"*.
+
+  Together they rule out both simple answers. Always-the-grip means the pirzul
+  never reaches the stripes; always-the-pirzul means a brass אלה beside the
+  standard nickel draws steel stripes. So **an explicit choice beats an implied
+  one**: the pirzul is a finish paid for, a grip's tone is a fact about the
+  product. Both sentences come out true.
+
+  The extra lock stops following the pirzul. Both fittings were filled with
+  `url(#nickel)`, which IS the pirzul's gradient. They get `#lockUnit` — a
+  third owner, constant, because a bought-in unit arrives in the finish it
+  ships in.
+
+  ⚠ **THE ASSERTION COMPARED MARKUP, AND THE COLOUR LIVES IN THE GRADIENT.** A
+  fitting is painted `fill="url(#nickel)"` and it is the GRADIENT that moves,
+  so the lever's markup is byte-identical under nickel and gold — and so was
+  the keypad's while it still borrowed that gradient. Every special-lock check
+  passed and would have passed just as happily with the bug in. §5 item 14
+  exactly. What went red was the PAIRING check — *"the pirzul must STILL
+  recolour the lock furniture"* — which is the whole reason it was written.
+  The comparison resolves the reference and compares stops now.
+
+- **⚠ "GOLD IS TOO WHITE", AND A MEDIAN SAID THE WRONG THING ABOUT IT.**
+  Measured against peretz-4, a door carrying a complete set of polished brass
+  photographed installed. `tools/_brass.mjs`.
+
+  A median-to-median comparison reported the ramp 23 points too BRIGHT, which
+  is not a finding: a designed ramp runs highlight to core on purpose and a
+  patch of photograph is mostly mid-tone. Cut at matching brightness
+  percentiles, the mid-tones agree and two things do not — the hue is 3–5°
+  short at EVERY brightness, and the photograph holds saturation 16–26% into
+  its brightest pixels where the ramp collapsed to 13.8% and 10.7%. On a
+  fitting the size of a keypad the highlight is most of what anybody sees, so a
+  near-colourless highlight IS the "too white".
+
+  ⚠ **AND THAT CORRECTION WAS NOT ENOUGH, BECAUSE THIS REPOSITORY ALREADY HELD
+  A SECOND MEASUREMENT OF BRASS AND NOBODY HAD PUT THE TWO SIDE BY SIDE.**
+  `barGold` — the Ella pull bar's own gradient, read off the manufacturer's
+  product photograph and trusted here for rounds — runs **hue 36.7,
+  saturation 41–84%, median 58%**. The corrected ramp ran hue 47.4 at 26%. The
+  same metal, in one file, more than twice apart — and a customer can put a
+  brass Ella bar and a gold פרזול lever on ONE door.
+
+  ⚠ **IT WAS FOUND BY ASKING WHY A SHEET DID *NOT* MOVE.** §0c's rule is *"when
+  they move on a commit that could not have moved them, find out what did"*;
+  this is its mirror. `screenshots/against-ella.png` came back byte-identical
+  after the brass changed. The answer turned out to be correct — the bar has an
+  absolute gradient and never reads this ramp, which is the separation this
+  file made on purpose so one gradient never has two owners — but chasing it
+  exposed the drift.
+
+  Which one governs: `barGold` is a product photograph lit to show the metal;
+  the reading above is a fitting on a door in a dim hallway, and the patch it
+  came from necessarily contains some of the pale door behind it, which pulls
+  saturation down. §4 settles the general case — *"the most photographically
+  faithful choice is often wrong at drawing scale"* — and the specific one is
+  settled harder: whatever brass is, it cannot be two things on one door.
+
+  So the ramp is FITTED TO THE BAR: hue 37, saturation interpolated onto the
+  bar's own saturation-against-value curve, every VALUE unchanged.
+
+  | stop | 26.8 ramp | first pass | fitted to the bar |
+  |---|---|---|---|
+  | highlight | 41.8° / 13.8% | 47.5° / 20.1% | **37° / 43%** |
+  | body | 43.5° / 23.5% | 47.1° / 25.8% | **37° / 49%** |
+  | specular | 44.4° / 10.7% | 48.0° / 13.8% | **37° / 41%** |
+
+  The `lit return` stop comes out `#C79E5C`, which is one of the bar's own
+  measured stops exactly — an interpolation landing ON a measurement rather
+  than between two. Every VALUE unchanged; the modelling is not what he
+  complained about. This reverses *"keep the gold as is"* from an earlier
+  round, on his own word.
+
+- **⚠ THE פעמון AND THE עינית ARE TWO NEW FIELDS, AND THE CODE IS ELEVEN
+  CHARACTERS. `VERSION` 19 → 20.** Peretz asked for both by name. Two one-bit
+  fields is a bit-layout change, which no alias can rescue, so every code
+  written under 19 is refused with a notice.
+  ⚠ **New parameters `bl=` and `ey=`, never `a=`.** There was a multi-select of
+  five accessories under `a=` once, withdrawn on the owner's word, and `a=` is
+  retired forever. A link still carrying `?a=peep,mail` opens the door it
+  always opened, and there is an assertion that it is NOT re-read as the new
+  peephole.
+  ⚠ **The id `peep` is reused and that is safe**: what made those ids a wire
+  format was the parameter carrying them, and that parameter is ignored
+  outright. It is also the same physical object coming back.
+
+  **The עינית is ₪0 because it is already included, which is not a guess.**
+  Assumption **A7** has said since before this round that the peephole is
+  standard on every door, and his own פרזול note lists עינית among what the
+  finish recolours. So the tile says כלול — the assumption this project already
+  holds, printed where a customer can see it. What "add עינית" changes is that
+  it was neither DRAWN nor LISTED.
+  ⚠ `PEEPHOLE_R` was **30 and is 15**, and it was a radius all along: nothing
+  drew it, so nobody had to decide whether 30 meant across or from the centre.
+  Measured on d028, a peephole is **30 mm ACROSS**.
+  ⚠ **A GEOMETRIC rule, not an observed one.** `render()` once suppressed the
+  peephole whenever the leaf was glazed, and INVENTORY.md records that rule as
+  wrong — glazed corpus doors carry peepholes. What is true is narrower and is
+  about THIS catalogue: both window shapes we sell are centred and both reach
+  viewer height, so on our two glazed doors a peephole at its measured position
+  has nowhere to be. `peepholeFits` computes it from the same `apertureLayout`
+  the drawing calls.
+
+- **⚠ THE פעמון IS THE ONE FITTING IN THIS ROUND WITH NO PHOTOGRAPH BEHIND IT,
+  AND IT SAYS SO WHERE IT IS DRAWN.** Looked at and came back empty: his four
+  photographs, INVENTORY.md's one candidate (a כספת), d028's wall push (too
+  oblique to measure), and the web, which this container's egress proxy blocks
+  for every image host. So **65 mm** is sourced — published dimensions for real
+  bell pushes run 57, 65 and 78 mm, and 65 is the middle and the exact figure
+  of the one given in centimetres — and the round bezel with a raised centre
+  button is convention. It stands on the HINGE stile, which is a choice: it is
+  the one band of leaf clear of the lever, the cylinder, the extra lock and the
+  pull handle at every size, so a fitting nobody has photographed for us cannot
+  collide with anything. `tools/_newhw.mjs` swept 426 designs with real
+  `getBBox` and confirms it. REALISM.md §6 governs the moment a photograph
+  arrives; `ASK-PERETZ.md` §0f asks for one and asks where he fits it.
+
+- **⚠ AND MY OWN SWEEP MADE THE MISTAKE `collide.mjs` PRINTS A WARNING ABOUT.**
+  The first run of `tools/_newhw.mjs` reported the bell colliding with glass on
+  140 designs while standing on the hinge stile 120 mm from a window that
+  starts at 245. It had not stripped the `[data-relight]` rects, which are the
+  whole leaf — *"strip them first, or every pane measures as the door"*, in the
+  file it was copied from. **Five instruments in this repository have now
+  measured the wrong object**, and this one had the warning in front of it.
+
+- **⚠ THREE HAND-KEPT COPIES OF `DEFAULTS`, AND TWO WENT STALE THE SAME DAY.**
+  Adding the two fields turned 1,900 assertions red with `bl=undefined` and
+  "did not round-trip" — none of which named the fault. `test/units.mjs` held a
+  `base` fixture and an `everyState` stem, both hand-typed lists of every key a
+  door has, and `everyState`'s own comment said exactly what a missing key
+  does. Both spread `DEFAULTS` now, and there is an assertion that they cover
+  it. ⚠ **The guard found three more on its first run**: `base` has never
+  carried the stripe fields and worked only because `isLineWork` reads
+  `undefined` as falsy and got the right answer by accident.
+
+- **The "prices are examples only" strip is reworded, and its flag is still
+  `false`.** Those words were true for the life of the project and stopped
+  being true on 26.8; the strip came down and the sentence was left as it was.
+  Harmless while nobody sees it and wrong the moment somebody flips the flag,
+  which is what `PLACEHOLDER` exists for. It now says SOME figures are
+  unconfirmed rather than that all of them are invented.
+
+- **⚠ "THE ROOM HAS NO LAMPS" — REPORTED OFF A 1920×918 LAPTOP, AND IT WAS TWO
+  FAULTS WITH ONE CAUSE.** The portrait crop is scaled by WIDTH to cover a wide
+  stage, which makes it **2053 px tall inside a 783 px hole**; everything above
+  the pinned floor line climbs out of the top. The sconces went with it —
+  measured, the band sat at **y −173 to −52** — and the price card, which hangs
+  off `--lamp-b`, faithfully followed its lamp out of the picture and landed on
+  the language buttons, **6,288 px² of overlap**, 33 px above the stage.
+
+  | stage aspect | portrait sconce top |
+  |---|---|
+  | 1.386 (1440×900) | +93 whole |
+  | 1.538 (1280×720) | +19 jammed under the top edge |
+  | 1.595 (1680×950) | **−2** |
+  | 1.630 (1920×1080) | −21 |
+  | 1.948 (1920×918) | −173, gone |
+
+  ⚠ **THE CHECK THAT LET IT THROUGH TESTED ONE AXIS.** The spike asked whether
+  the sconces were far enough apart HORIZONTALLY for the widest door to clear
+  them, chose the portrait on that basis, and never asked where they were
+  vertically. And the audit's widest viewport clipped the same sconce **by two
+  pixels and passed** — the fourth one-pixel margin in two days.
+
+  **Both crops ship now**, and `js/app.js` chooses by measuring: `placeRoom`
+  puts each against the real stage and `pickRoom` takes the one whose sconces
+  land inside it. ⚠ The §5.10 objection that kept it to one asset is answered
+  rather than ignored — the stylesheet never names a file and never decides;
+  ONE table holds both rooms with their own constants and the function that
+  places a room also picks it. Only one file is ever fetched, because the
+  choice needs the constants and the stage's box, not the pixels.
+
+  ⚠ **AND "IN FRAME" IS NOT ENOUGH — IT NEEDS A LAMP'S HEIGHT OF WALL ABOVE
+  IT.** At 1280 the portrait put the sconces at y 19..90 of a 585 px stage:
+  inside the frame by every arithmetic test, and to an eye two fittings jammed
+  under a ceiling. A wall light with less wall above it than the light is tall
+  reads as cropped whether or not it is.
+
+  ⚠ **AND MY OWN FIX SHIPPED A NaN, WHICH IS §5 IN ITS PUREST FORM.**
+  `pickRoom` asked `p.lampCx` — a FRACTION, and a field of the *room* rather
+  than of the *placement*, where `lampX` in pixels was sitting right there. The
+  horizontal term was `undefined`, the whole expression was `NaN`, `NaN <= 0`
+  is false for every candidate, and the sort left them in declaration order:
+  **it silently returned the portrait at every size, which is the bug it was
+  written to fix, wearing the fix's clothes.** `Math.max` swallows a NaN
+  without a word. A score that is not a number is not a candidate now, and the
+  fallback is explicit.
+
+  New: `assets/room-wide.webp` (78 KB), a `--lamp-b` clamped inside the stage,
+  an audit block that measures the sconces and the price card in pixels, and an
+  **eighth audit viewport at 1920×918** — the machine the fault was found on.
+  Falsified: forcing the portrait fires the check at laptop, wide and
+  wide-short, and nowhere else.
+
+- **⚠ AND THE FLOOR-LINE CHECK MEASURED THE WRONG OBJECT FOR A THIRD TIME.**
+  With the wide room in, it reported the floor **38.7 px out at 1680** and
+  16.8 at 1920×918 — and the page was right. `tools/_bd2.mjs` re-measured both
+  SHIPPED assets and got exactly the constants the code holds: **83.87% and
+  87.93%, residual 1.2 px** over 231 and 336 agreeing columns. What differs is
+  that the wide crop shows far more dappled floor, and the check took ONE
+  column halfway out to the edge of the stage, where it found a foliage edge.
+  The constant was measured in the picture's centre half for that very reason,
+  so the check now looks where the constant came from — the band of floor
+  either side of the casing, a door-width wide, per-column argmax, median of
+  what agrees. **−0.5 to +1.3 px across both rooms and all eight viewports.**
+  ⚠ **The tolerance did not move.** It is 4 px, as written. Widening a gate to
+  fit a reading is how a real misalignment gets through, and this file is
+  largely a list of that. What changed is where the instrument points.
+  ⚠ Two other detectors were tried and thrown away on the way — a many-column
+  median (pulled up by the same shadows) and a sum of gradients per row (found
+  the plant's shadow band, and the wrong row entirely at 1440, −93 px). **Three
+  detectors giving three answers is the signal to go and get the ground truth**
+  rather than to keep tuning, and re-measuring the shipped assets is what that
+  meant here.
+
+- **`fitStage` read the quote bar's box twice per fit, and it cost 19 ms.** The
+  lamp clamp asked for it and `--quote-h` asked again at the end of the same
+  function — a wasted forced reflow, and the "one quantity, two measurements"
+  smell §5 is a list of. Read once, used twice: `npm run latency` 219 →
+  **200 ms** against a 600 ms gate. (158 before the photograph, 180 with it,
+  200 with two rooms and the rail's mask.)
+
+- **Three things the same screenshot showed, all fixed.** The step rail was cut
+  at the edge with no sign there was more of it — measured, 310 px of room
+  against 424 px of circles, **3 of 9 off the end**, and it cannot be made to
+  fit (nine at the 44 px tap floor need 428 and the card is capped at 360), so
+  it fades at both ends. A permanent fade, not a class: nine circles overflow
+  the rail at **every** viewport this app has, so a conditional would be a
+  second statement of something always true.
+  The panel's scrollbar was the platform's — an overlay 2 px bar in this
+  container and Windows's ~17 px grey stripe with arrow buttons on the machine
+  it was reported from, rammed down the inside edge of a card that is supposed
+  to be floating paper. Thin, with the page's own hairline as the thumb.
+  And the picture got a hairline top edge above 1100, where the paper band and
+  the plaster were within a few points of each other and ran into one another.
+
+- **The photograph costs the scroll nothing, and that was worth measuring
+  rather than hoping.** The stage is STICKY on a phone and now carries an 82 KB
+  background image — a large raster re-composited under the door on every
+  frame is exactly the shape of change that turns a smooth scroll janky, and
+  `GUIDED-FLOW.md` §3's *"60 fps at 4× CPU throttle"* is a stated gate.
+  Same measurement as 28.8, same conditions, `tools/_perf.mjs`:
+
+  | | median | p95 | worst | frames > 20 ms |
+  |---|---|---|---|---|
+  | 390×844 | 16.7 ms | 17.4 | 18.0 | **0** of 79 |
+  | 320×568 | 16.7 ms | 17.7 | 21.2 | 1 of 79 |
+
+  Unchanged from the drawn room (16.8 ms worst, 0 over 20). The one frame at
+  320 is a single sample and is reported rather than rounded away.
+  `npm run latency` moved 158 → 180 ms against a 600 ms gate, which is the
+  background paint and is a quarter of the budget.
+
+- **⚠ AT 320 PX NO STEP SHOWED AN ANSWER, AND NOTHING IN THIS REPOSITORY WAS
+  ASKING.** A guided flow whose live step shows no options is not guided.
+  `npm run audit` proved every step was REACHABLE (its walk clicks the rail)
+  and that the send and the price were on screen; it had never asked whether
+  the thing the step is FOR had made it above the fold. Measured at 320×568:
+  rail 62 + stage 318 + eyebrow/question/explanation ~160 + quote bar 67 = 607
+  of a 568 px screen, on **all eight question steps**. At 390 there was room
+  for three rows of swatches, which is exactly why looking at a phone had not
+  found it — 390 is the phone people test on and 320 is the one they own.
+  ⚠ **AND THE FOLD IS NOT `innerHeight`.** The quote bar is FIXED over the
+  bottom 67 px, so a tile that ends behind it is as unreachable as one below
+  the screen. Measuring against the viewport reported the worst step as **1 px**
+  short where the truth was **68**. The send/price check above it has said this
+  in its own comment since 28.8 — *"a control below the fold or behind a fixed
+  bar is unreachable"* — and measures against `innerHeight` anyway.
+  Fixed by about 114 px — 79 from the stage (56vh → 42vh) and 35 from the
+  type — at short PORTRAIT viewports only (`max-height: 700px`, so a 390×844
+  phone pays nothing and a tablet held sideways is excluded). The door is
+  **239 px tall on a 568 px screen**, down from 318: the memo's rule 4 in one
+  number, *the door may shrink to make the answer visible.*
+  ⚠ **One case is still short and it is written down rather than rounded off.**
+  On ARRIVAL at 320 — step 01, before any interaction — the first size tile is
+  **78 px** below the fold (27 at 375×667, comfortable at 390). Every other
+  step passes because `goStep` scrolls ~50 px and step 01 does not. Step 01 is
+  also the only step carrying the gallery opener. Full accounting in the
+  stylesheet beside the fix.
+
+- **⚠ AND THE RUSSIAN PAGE FAILED A STEP THE OTHER TWO PASSED — BY ONE PIXEL.**
+  Walking the guide in all three languages at 320 found משקוף with no answer on
+  screen in Russian only: its explanation runs to FOUR lines there (93 px)
+  against three in Hebrew and English (70), and 23 px is exactly what it was
+  short by. **Hebrew and English were passing that same step by 1 px**, which
+  is not a pass, it is a coincidence waiting for a copy edit.
+  Fixed by 2vh more off the short-screen stage and the explanation at .86rem
+  there — the only type SIZE this round touches, and it shortens nobody's copy:
+  every word survives in all three languages and the `<details>` explainer is
+  untouched.
+  ⚠ **Two languages agreeing is not a measurement**, and this is the second
+  1-pixel margin found in one evening (the other was the landscape backdrop
+  leaving one pixel of a lamp on a 390 px screen). **Where a number comes out
+  at 0 or 1, go and find the third case.**
+
+- **The gallery opener is a pill on a phone, not a card.** It was a 56 px box
+  with a filled ground and a full border, standing between the door and the
+  question on the one step it appears on — reading as something to DO, when the
+  question underneath it is the thing to do. A hairline pill at the 44 px tap
+  floor, which is a floor, so that is as short as it may legally be. Worth
+  16 px of the 94, and the rest of the arrival gap is above.
+
+- **⚠ THE CHOICES CARD IS NOT PURE WHITE ANY MORE, AND THE ROOM IS WHY.**
+  Measured at 1440, 1280 and 1680 with `tools/_bright.mjs`: the photographed
+  wall's 99th percentile is **237** and a `#fff` card is **255**. The loudest
+  thing on the page was a 360×860 rectangle of screen-white beside a warm room,
+  which is the exact inverse of DESIGN-LEVEL §1.2.
+  ⚠ **The fix is temperature, not brightness.** Going all the way to
+  `--paper-up` (243) costs the card's dividers a tenth of their contrast —
+  `--rule` is 1.496:1 on white and 1.350 on paper-up, and this file records
+  that white figure as the reason a card keeps its internal structure. #FDFBF7
+  is 251: four points of brightness, all of the warmth, `--rule` at 1.447 and
+  `--ink-2` at 5.37:1.
+
+- **The one-accent discipline is asserted now, and DESIGN-LEVEL §5 named it a
+  year of rounds ago.** *"An audit assertion that no element outside the fixed
+  accent set paints `--accent`, so the discipline can't erode commit by
+  commit."* It is in `npm test` rather than the audit because it is a question
+  about the stylesheet, not about a browser: it walks every `var(--accent)` in
+  `css/app.css`, attributes each to its selector, and checks it against seven
+  allowed places — the navigator's ordinal line, the ring on the live step, the
+  ring on a done step, the grip's focus ring, and three hover states.
+  ⚠ **A list that goes stale is the POINT here**, which is the opposite of
+  every other list in this repo: it fails the day somebody spends the accent
+  somewhere new, and the message says so — add it with a reason, or do not add
+  it. It also asserts every named selector still MATCHES (§5.15), so a rename
+  cannot retire the check in silence, and that `--accent` still fails 4.5:1 on
+  white while `--accent-ink` still passes — the two swapping roles is the
+  failure this pair of tokens exists to prevent.
+  **Falsified**: `.toast { color: var(--accent) }` added on purpose, the check
+  fired naming `.toast`, and it was taken back out.
+
+- **⚠ THE ROOM IS A PHOTOGRAPH NOW, AND THE DOOR IS STILL THE DRAWING.**
+  `PHOTOREAL.md` on the review branch, spiked and built 29.8.2026. The owner
+  supplied two AI generations of one entrance — plaster wall, stone floor, a
+  potted olive, two lit cylinder sconces — and the room behind the door is now
+  `assets/room.webp`, composited as a CSS background on the stage. The door,
+  its frame and its shadows stay the live SVG on top.
+  **The whole architecture is one sentence: the photograph is never inside the
+  SVG.** So `?bare=1` goes on photographing a pure drawing, `render(state)`
+  stays pure, and the drawn wall/floor/sconces survive as the automatic
+  fallback — `armRoom` adds `.is-photo` inside the image's own `load` handler
+  and nowhere else, so a missing file, a blocked request or a browser that
+  cannot decode WebP all land in the same place: yesterday's page.
+  ⚠ **The floor line is a calibration and it is asserted in pixels.**
+  `render` publishes `data-base-y`; `fitStage` sizes the picture so its own
+  wall/floor junction lands there and it still covers the stage. Measured
+  agreement, all seven viewports: **0.3 to 1.7 px**, against a 4 px gate.
+  ⚠ **The audit measures the PHOTOGRAPH, not the arithmetic.** The obvious
+  check compares the number `fitStage` computed with the number `PHOTO` holds,
+  and it would pass with the picture upside down. This one screenshots the
+  stage and finds the wall/floor step in the pixels. Its first version searched
+  the whole column and locked onto the price pill at 1100 px, reporting the
+  floor 239 px out — a check failing about the wrong object.
+  ⚠ **One asset, not two, and that is arithmetic.** The portrait original ships
+  because its 0.75 aspect is narrower than the stage crop at every viewport
+  (1.00 through 1.42), so `cover` always scales it by WIDTH and its sconces sit
+  at a constant 10% / 90% of the stage. The landscape one scales by height and
+  on a 390 px phone leaves **one pixel** of the left lamp on screen. Shipping
+  both would also have been §5.10's shape: the placement is computed in JS and
+  the file chosen by a media query, two statements of one fact with nothing to
+  make them agree. The widest buildable door (`half`) clears the photographed
+  sconces by 239 px at 1440 and 47 px at 320.
+  New: `npm run backdrop`, `assets/room.webp` (82 KB), a `no-photo` audit route
+  that must come up NORMAL, and the README's promise moved from three files to
+  four with the fourth named as the one you can delete.
+
+- **⚠ THE ILLUMINANT WENT ON THE PHOTOGRAPH, NOT ON THE DOOR, AND THE SWATCH IS
+  WHY.** `PHOTOREAL.md` §2.4 asks for the door's neutrals to be nudged into the
+  photograph's colour temperature. Built — a `multiply` of #DFD0C3, the photo's
+  white point over the drawn room's, componentwise, which is the physically
+  correct operation and obeys §4's tint rule — and then measured against the
+  catalogue's own hexes:
+
+  | colour | dE, no seam | dE, with the multiply |
+  |---|---|---|
+  | `rb-9016d` לבן | 1.4 | **17.4** — renders #D1C1B2 |
+  | `rb-9001d` קרם | 1.6 | 12.5 |
+  | `rb-7021d` אפור פחם | 12.9 | 9.9 |
+
+  **A customer choosing לבן would be shown beige.** §3 already records
+  `.layout[data-light]` being deleted for shifting the GROUND under the swatch;
+  shifting the swatch itself is worse, and an interpolation weak enough to keep
+  the worst dE under 2.5 is a multiply of #FAF8F6, which is nothing at all.
+  So the grade goes on the picture: `npm run backdrop` carries the wall's
+  median 60% of the way to the drawn room's own rendered wall (#F0EDE7,
+  measured on the page with the pool and the vignette in it, not the `--wall`
+  token).
+  ⚠ **And 0.6 is a measurement, not a taste.** `tools/_leafwall.mjs` measured
+  leaf luminance over wall luminance outside the casing on **47** of Peretz's
+  photographs — a quantity no record in this repository carried: median
+  **0.615** over all of them, **1.072** over the eleven pale leaves. Our pale
+  door renders at 236, so the wall wants 220; MIX 0.6 lands it at 218–220. The
+  dark end confirms it from the other side, 0.33 against a corpus median near
+  0.30. MIX 1.0 bleaches the room to paper; MIX 0.35 leaves a white door
+  floating at 1.13, the top of the measured range.
+
+- **The seam: the shadow is the glue, and it is CSS over shapes that are
+  already there.** Over the drawn floor one soft ellipse at 0.18 was enough;
+  over photographed stone half a stop darker it reads as nothing and the door
+  floats. `#shadow` now also carries a tight contact band and a wide pool whose
+  blur is the pot's own penumbra in the backdrop — 3.41% of the picture's
+  width, which is 97 scene units on a phone and 134 on a desktop against
+  `softShadow`'s 77. Both sit at **`opacity="0"` on every door** and only
+  `.is-photo` raises them, so the bare families come back byte-identical and
+  `render` needs no second argument. The casing's shadow on the wall goes 0.22
+  → 0.34 the same way, and it is also what keeps a WHITE door's silhouette off
+  a wall it nearly matches.
+  ⚠ **No added grain layer.** The spike had one and it is cut: the charcoal
+  leaf's own `grainTex` already reads correctly against the photograph's, and
+  what the PALE leaf is short of is the mottle §9 already names as the best
+  next drawing work (0.0181 against ~0.042). A second grain over the first
+  would be tuning around a measurement instead of taking it.
+
+- **The trust band got a ground, and its top edge is the floor line.** Four
+  claims in ink laid straight on a photographed stone floor read as writing ON
+  the floor. Contrast was never the problem (13.9:1 drawn, 11.6 photographed);
+  depth was. It is a scrim now, and ⚠ **the first version was 30 px of padding
+  and a gradient over whatever that produced — 60 px at 1440, which reached
+  14 px above the floor line and washed out the door's foot, its contact shadow
+  and its threshold: the three things the seam had just been built for.**
+  `fitStage` publishes `--floor-b`, the ground in front of the threshold in
+  pixels, off the drawing's own `data-base-y`; the band is exactly that tall,
+  so the scrim's top edge is an edge that is really in the picture.
+
+- **⚠ THE WAY ON WAS BELOW THE FOLD ON EVERY PHONE STEP, AND ONLY WALKING THE
+  GUIDE FOUND IT.** Driven the way a first-time customer does it — forward,
+  with the button, never with the rail — `.sect__foot` was off screen on all
+  eight question steps at 390 px and at 320 px. A customer landed on a step,
+  chose something, and had to scroll past the rest of the options and an
+  explainer to find out how to continue. The rail advances too; a first-timer
+  does not know that.
+  The way on is in the quote bar below 1100 px now, so the phone's bottom bar
+  is **the price, the send and the way on** — which is not clutter, it is the
+  three things a guided flow has to keep within a thumb's reach. It carries
+  `sect__next`, so `markSteps` gives it the same label and disabled state as
+  the one in the flow without knowing it exists; on the summary it is disabled,
+  and a disabled way-on is HIDDEN rather than greyed.
+  ⚠ Its listener is attached once at boot, not in `buildPanel` — that function
+  runs again on every language switch, and a listener added there would have
+  made the button advance two steps after one switch and four after two.
+  ⚠ **`npm run audit`'s own walk could not have found this**: it clicks the
+  RAIL, which is the reachable-from-anywhere check, and a rail click never asks
+  whether the forward button is on screen. Two different questions.
+
+- **Two more found by the same walk, and both were three pixels wide.**
+  `.lang` had `min-block-size: 44px` and no `min-inline-size`, so on the
+  English page — where `עברית` is the shortest of the three labels — the button
+  measured **41 × 44**, on the one control a customer who cannot read the page
+  needs to find. And the step heading was drawing the BROWSER's focus outline
+  after a tap: `goStep` focuses it because that is what announces the step to a
+  screen reader, and a programmatic focus can bring the UA ring with it — a
+  hard black box round the biggest line on the page. `:focus-visible` now, so
+  the ring stays for the keyboard and goes for the thumb.
+
+- **The gallery opener shows on the first step only, below 1100 px.** It sits
+  above the navigator, so on a phone it was the first thing between the door
+  and the question on all nine steps. It is an offer about where to START.
+  `markSteps` publishes `data-live` on the panel because CSS cannot ask which
+  step is live; unset — a page whose bundle never ran — SHOWS it, which is
+  right, because there is no flow then either.
+
+- **⚠ `prefers-reduced-motion` WAS HIDING THE SEND BUTTON FOR 180 ms, AND THE
+  CHECK THAT WATCHES MOTION COULD NOT SEE IT.** The reveal's `revealSend`
+  carries an `animation-delay` and `both`; the reduced-motion block zeroed the
+  DURATION and not the DELAY, so the green button sat at `opacity: 0` for a
+  fifth of a second — on the one screen whose whole job is sending, for exactly
+  the customer who asked the browser to stop moving things.
+  ⚠ **The existing assertion reads `animationDuration` from the computed
+  style**, and under reduce that is zero, so an animation waiting in its delay
+  looks harmless. Only `document.getAnimations()` reports it, because it counts
+  a delay phase as RUNNING, which it is. There are two checks now and the
+  second is emulated rather than assumed: a page opened with
+  `reducedMotion: reduce`, driven to the summary, asked what is still going.
+  ⚠ **And the kill switch takes `animation-delay` and `transition-delay` now**,
+  not just the durations — fixing `revealSend` alone would have left the trap
+  armed for the next delayed animation anybody writes.
+  ⚠ **The rule was also stated TWICE**, at .01ms and at .001ms eight hundred
+  lines apart, and the second won — so the first was decoration and a reader
+  who found it would have believed they had seen the whole thing. One now.
+
+- **The reveal, and it happens once.** Reaching the summary by navigating —
+  never on arrival, so a shared link opened by Peretz does not flourish at him
+  — leans the door in by 1.5% and settles it, and brings the green button up
+  behind it. 900 ms, then dead still. A CSS transform on the `<svg>` and never
+  a viewBox change: `fitStage` owns the viewBox and would fight it.
+  ⚠ **Three parts of `GUIDED-FLOW.md` §3.4 are deliberately not built** and the
+  reasons are in the stylesheet beside the keyframes: the price count-up (banned
+  by name, and it would show a number that is not a price), the light sweep (the
+  stage is one box, so a white band travels over the WALL too and reads as a
+  loading shimmer), and the sconces brightening (it needs a `filter`, which is
+  neither transform nor opacity and costs a compositor layer on the largest
+  element on the page).
+  **Measured at 390×844 under 4× CPU throttling**: scrolling over the sticky
+  stage, worst frame 16.8 ms and **zero frames over 20 ms**; a step change has
+  one 83 ms frame, which is `paint()` rebuilding the SVG and not the animation
+  (`npm run latency` puts that at 158 ms against a 600 ms gate at 6×).
+
+- **⚠ `FIT_BOX` IS NOT `STAGE_BOX`, AND THE DOOR IS 6% BIGGER FOR IT.** The
+  crop the page fits to used to be the scene itself, padding and all. Measured:
+  the crop is HEIGHT-driven at every viewport this app has — stage aspect 1.33
+  against the scene's 0.536 — so `fitStage` scales to fit the scene's HEIGHT
+  and whatever width that leaves is overspill. **Vertical padding is exactly
+  what was costing the door its size, and horizontal padding costs nothing.**
+  40 units off the top and 130 off the bottom: leaf 20.3% → 21.6% of the
+  desktop frame and 28.2% → 29.9% of a phone's, and 68% → 72% of the stage's
+  height at both.
+  ⚠ **It could NOT be taken out of `PAD`, which was the first attempt.** `PAD`
+  feeds the natural `viewBox` as well, so trimming it would have moved all 110
+  committed sheets — and that is not a regeneration to redo, it is the
+  "bare families byte-identical" PROOF. They are two different quantities: air
+  around the DRAWING for a measurement crop, air around the SCENE for the
+  page's staging. Separated, this changes four attributes and no pixels.
+  ⚠ **And the ceiling on this is arithmetic, not effort.** A door is 850×2050
+  and a desktop stage is 1060×794; fit the whole door in that frame and the
+  leaf cannot exceed 31% of the width even with zero margin. Cropping its head
+  or its foot is forbidden — a configurator exists so somebody can judge
+  proportions. So "make the door the hero" is a lighting problem, not a
+  cropping one, which is what the next entry is.
+
+- **The room has a warm pool and a falloff now, and they are painted UNDER THE
+  DOOR — which is the whole design, not a detail.** `REALISM2.md` D-a. The
+  scene was lit evenly edge to edge, so nothing told the eye where to go.
+  ⚠ **Deepening the existing `#vignette` was the obvious way and it is wrong.**
+  That one is painted LAST and covers the leaf, and it is a radial centred at
+  0.44 of the scene — so deepening it darkens a leaf's head and foot more than
+  its middle, which is a change in the vertical fall BY DEFINITION, and the
+  vertical fall is what `npm run profile` exists to watch. The room therefore
+  has its own pair inside `#backdrop`, the door is drawn over them, and the
+  leaf cannot move.
+  **Predicted in the code before the run, then checked: `npm run mottle`
+  0.0181 / 0.1069 and every `npm run profile` row identical to the digit,
+  before and after.**
+  ⚠ The pool is warm LIGHT ON PLASTER and its centre is the SCENE's, never this
+  door's — so it cannot do what `.layout[data-light]` did and shift the ground
+  under the swatch a customer is comparing.
+  Cost: 1,468 bytes on the default door, 42,423 → 43,891. The 40 KB gate is
+  retired (see below) and `npm run latency` replaced it; the figure is here
+  because the brief asked for it.
+
+- **⚠ THE SATIN SHEEN WAS BUILT TWICE AND CUT BOTH TIMES, AND THE TABLE IS THE
+  POINT.** `REALISM2.md` stage E calls a broad vertical specular "the single
+  biggest *is it a flat rectangle* fix", and it is the one item of this round's
+  brief that is refused.
+
+  | shape | mottle plain | profile dark reed | dark ogee |
+  |---|---|---|---|
+  | none | 0.0181 | +1.2% / +1.1% · r 0.999 ✓ | −0.9% / −0.4% |
+  | peak at 0.46 | 0.0275 | −1.5% / −3.8% · r 0.977 ✓ | −3.5% / −5.2% |
+  | plateau | 0.0182 | −3.2% / −6.5% · **r 0.966 ✗** | −5.2% / −7.9% |
+
+  1. **No photograph asks for it.** The corpus's horizontal profile is a ~3%
+     rise left to right — the note under `drift` records it, and it is why
+     `drift` was halved after ours fell 12% the other way.
+  2. **It moves the moulding's own reading**: 2.7 points of swing on a quantity
+     whose whole range is about 5, and the second shape failed the gate.
+  3. ⚠ **And I cannot explain why the RATIO moved at all.** Both panels of a
+     `pair` sit at the same inset, so a purely HORIZONTAL overlay should cancel
+     exactly out of an upper-against-lower ratio. It did not, twice, in
+     opposite directions. **An instrument reading nobody can explain is not one
+     to tune around** — the same rule this file applies to `profile` being
+     green for reasons nobody has established.
+
+  Reverted to the digit. What the leaf is actually short of is MOTTLE — 0.0181
+  against an honestly-corrected corpus figure near 0.042 — which is a `drift`
+  question with a photograph behind it, and it is the one to reopen. The whole
+  argument is written into `renderer.js` beside `FALLOFF`, where the next
+  person to have this idea will meet it.
+
+- **`REALISM2.md` D-c — the keyhole as real hardware — IS ALREADY BUILT**, and
+  saying so is the point rather than building it twice. That plan describes a
+  flat grey dot; what is in `cylinder()` is a domed escutcheon with its own
+  cast ellipse, a recessed euro cylinder with separate rim and body ramps, two
+  arc highlights on the plug, a key slot and two speculars. It was fixed after
+  the plan was written. Reconciled, not re-done.
+
+- **⚠ THE FLOW'S FOUR NEW ELEMENTS HAD NO STYLES AT ALL, AND NOBODY NOTICED FOR
+  A ROUND.** `.sect__where`, `.sect__title`, `.sect__lede` and `.sect__foot`
+  arrived with the flow; the stylesheet kept the accordion's `.sect__head`,
+  `.sect__sub` and `.sect__now` — all three of which the flow deleted — and
+  never gained the four that replaced them. So the eyebrow, the question, its
+  explanation and the two buttons that carry a customer through nine screens
+  rendered at browser defaults, and `.sect__next` — `class="btn sect__next"`, a
+  `.btn` with no modifier — had a transparent background AND a transparent
+  border. **The primary action of every step was invisible chrome with a word
+  in it.** Nothing failed; the surface the whole flow happens on simply had no
+  typography. It is a card of type now, and the `.btn` with nothing to fill it
+  is a solid ink pill.
+  ⚠ **And it is allowed to be a primary**, which is worth stating: the page has
+  exactly one other, the green send, and the summary step has no `.sect__next`
+  at all — so the two are never in front of a customer at once.
+  ⚠ **The foot is STICKY above 1100 px.** It was falling off the bottom of the
+  screen: the card scrolls in its own column and the buttons are the last thing
+  in it, so at 1440×900 the way out of the window step was below the fold. And
+  the card's own 28 px of bottom padding had to move INTO the foot, or a row of
+  tiles scrolled through the gap underneath the pinned bar.
+
+- **⚠ THE WALL CHROME'S PILL WAS SITTING ON THE DOOR AT 320 px.** Two white
+  notches bitten out of the top corners of the casing, found by zooming a
+  screenshot rather than by any instrument. Measured against `#frame`:
+  **253 px² and 154 px²** of overlap at 320×568, 1 and 0 at 390, 0 on a
+  desktop. It is the pill's BOX and not its contents — the slot runs to y=116
+  and the frame's head starts at y=105, while the words and glyphs inside stop
+  at y≈92. The ground was added when the PRICE was up there and landed on a
+  dark lintel; the price left for the quote bar, so there was nothing left for
+  it to rescue and a real thing for it to spoil. It goes below 1100 px.
+  ⚠ **Capping the slots to `--wall-gap` is still refused**, with the receipt
+  already in this file: tried, reverted, because at 390 the gap is ~90 px, the
+  cap wrapped `Русский` onto two lines and the pill grew DOWN over the leaf.
+  ⚠ **And a disabled `.iconbtn` no longer draws its ring.** `opacity: .32` on a
+  44 px bordered disc still leaves a 44 px bordered disc, and both of them are
+  disabled on arrival — the loudest thing in that corner, meaning nothing. The
+  glyph stays, the box stays 44 px, the ring goes.
+
+- **⚠ DEFINING `--ink-3` WOULD HAVE MADE THE LANGUAGE BUTTONS UNREADABLE.**
+  `.lang` said `color: var(--ink-3, var(--ink-2))` and the token did not exist,
+  so the fallback was doing the whole job at 4.75:1. Adding `--ink-3: #9A968E`
+  — three hundred lines away, in a commit about type — silently drops that to
+  **2.52:1** on the one control a customer who cannot read the rest of the page
+  needs to find. Caught by grepping every `--ink-3` the moment the token was
+  added, which is the habit rather than the luck.
+  ⚠ **A `var(--x, fallback)` is a lie about which value is in force.** It reads
+  as "prefer x" and behaves as "whatever x becomes, one day, in another file".
+  The two remaining uses are decorative borders and now name the token
+  outright; anything that is READ names its colour.
+
+- **The type is a scale now, and the headline is a headline.** `<h1>` was
+  `clamp(17px, 2.2vw, 22px)` at **weight 600** — measured, and that is not a
+  display line, it is a large label, which is most of why the page read as an
+  internal tool. It is weight 300 at `clamp(26px, 3.4vw, 44px)` with -0.022em.
+  ⚠ **Capped at 44 and not DESIGN-LEVEL's 52, because the heading is INSIDE
+  `.stage-wrap`** and every pixel it takes comes out of a stage that is
+  `flex: 1 1 auto`. Measured at 52: the stage went 794 → 753 px and the leaf's
+  share of the frame 21.1% → 20.0%. A display headline that shrinks the product
+  is the wrong trade on the one page whose product is the point.
+  ⚠ **And on a phone it is `.sr-only`.** 86 px of the most expensive strip on
+  the page, a hard seam across the top of the room, and a sentence a customer
+  arriving from a WhatsApp link already knows. `.sr-only` and not
+  `display: none`: `.stage-wrap` names it in `aria-labelledby`, so hiding it
+  from the tree would unlabel the region and leave the page with no `<h1>` —
+  the exact fault the mockup was pointing at when it was made visible.
+  **The phone's door grew 9% on the strength of it** (leaf 25.9% → 28.2% of the
+  frame) and the question gained room at the same time: 330 px of it visible on
+  arrival against 291 before.
+
+- **Assistant loads from Google Fonts, and the FALLBACK is tuned to Assistant.**
+  The usual advice is the other way round and it cannot be done — the fallback
+  is Segoe UI on Windows, Arial Hebrew on a Mac, something else on Android, and
+  one set of overrides cannot match three faces. So a second `@font-face`
+  wraps a local font and stretches it onto Assistant's metrics, and the stack
+  puts it directly behind Assistant: the page lays out at Assistant's metrics
+  from the first frame whether or not Assistant ever arrives.
+  ⚠ **Measured, in `tools/_font/measure.mjs`, against the real woff2.** Per
+  100 px Assistant's ascent is 102 and descent 29 against Arial's 91 and 21,
+  and it is NARROWER — 1591 units of Hebrew against 1840. Hence `size-adjust:
+  89.05%` and `ascent-override: 114.55%`. On a real paragraph the swap moves
+  the inline run **2.0 px** and the line box and the wrap count **0**; without
+  the face it was 8.2 px and a whole line.
+  ⚠ **It never blocks the first paint** — `media="print"` + `onload` — and it
+  is **only requested over `http(s)`**. It was a plain `<link>` first, and
+  `npm run audit` caught the cost inside one run: every `file://` load fired a
+  request that cannot resolve and Chromium logged `net::ERR_CONNECTION_RESET`
+  **four times per page**. The audit counts a console error as a fault, which
+  is right, and it waits for `load`, so the run went from ~15 minutes to 24.
+  Teaching the audit to ignore that class of error was the obvious fix and the
+  wrong one — **an instrument taught to ignore a kind of error will ignore the
+  real one.** Not making the request is the right one, and it makes the
+  README's promise literally true again: opened from a folder, this page makes
+  no network request at all.
+  So every `file://` load — every screenshot, every audit route, and Peretz's
+  own laptop — renders the fallback, and the OFFLINE path is the one that is
+  continuously verified.
+  ⚠ **Chromium in this container cannot reach Google Fonts** (`ERR_CONNECTION_RESET`
+  through the proxy's TLS interception; `curl` can). So no instrument here sees
+  the online face, and the metric numbers were taken against downloaded woff2
+  files instead. Stated rather than glossed.
+  ⚠ **The price keeps its system serif.** Asked for by hand — *"something that
+  reads rich"* — and that instruction is newer than the plan that wanted the
+  figure in a light sans. It also costs nothing to load, which matters more now
+  that the page has one network request: the figure is the first thing a
+  customer looks at and may not be the thing waiting on a CDN.
+
+- **⚠ THE BARE-MODE SCREENSHOTS WERE NOT BARE, AND THEY ARE THE PICTURES THIS
+  PROJECT JUDGES THE DRAWING BY.** `.is-bare`'s hide list never gained
+  `.stage__hud` when the chrome moved onto the wall on 27.8 — so every
+  `corpus-*`, `recreate-*` and `against-*` sheet committed since has carried
+  the undo button, `Русский`, `מחיר משוער` and **₪3,150 painted across the top
+  of our render**, beside the photograph it is there to be compared against.
+  Measured: 35,726 differing pixels on `corpus-00` in a band at y 29–125, and
+  they all go the moment the hide list is right.
+  ⚠ §8 states that rule in as many words — *"anything added to the page joins
+  the bare-mode hide list the same day"* — and it was broken **on the day it
+  was restated**, by the change that restated it. The rule was not forgotten;
+  it was written and not applied, which is a different failure and a harder one
+  to catch. It survived a full green run of every instrument, because no
+  instrument looks at what is IN a sheet — only at whether the sheet is stale.
+  Found while diffing a regeneration that should have been byte-identical and
+  was not. **When sheets move on a commit that could not have moved them, do
+  not stamp them: find out what did.**
+
+- **The send is on every step again, quietly — and the price came off the
+  door.** Both halves are one new element, `.quote`, and it has two placements:
+  a slim bar at the foot of a phone, and the wall under the right-hand lamp on
+  a desktop, which is where the owner's son drew a circle for the price.
+  ⚠ **THIS REVERSES PART OF THE 27.8 INSTRUCTION AND THE REVERSAL IS NARROW.**
+  *"Remove the WhatsApp from the screen, it will only be available at the
+  end"* removed a full-width GREEN BAR offering to send a door somebody was
+  still colouring, and that is still gone: the one green button on the site is
+  the summary's. What is on every step now is a line of ink on paper beside the
+  price. What forced it is older than both — `PLAN.md` §0, a customer must be
+  able to hand Peretz an order at any moment. **Measured before the change: a
+  `[data-wa]` was in the DOM at every step and on screen at exactly one, so 24
+  of 27 step × viewport pairs had no send at all.** After: 0 of 27.
+  ⚠ **The price was NOT buried** — 27 of 27, visible everywhere, because it had
+  moved onto the wall the day before. A brief written one revision earlier said
+  otherwise and the measurement corrected it. It moved anyway, for a different
+  reason: on a 390 px phone the wall beside the leaf is ~140 px and the pill
+  landed ON the leaf; at 320 px it landed on it every time.
+  ⚠ **Two send buttons is CLAUDE.md §5's oldest shape**, so `npm run audit` now
+  asserts on every step at every viewport that at least one is on screen, that
+  every `[data-wa]` carries the IDENTICAL href, and that the price is readable.
+  The audit's own `wa:` field read `#wa-btn` by id — §5.8 exactly — and reads
+  the whole set now.
+  ⚠ **A hard-coded `padding-block-end: 78px` from the deleted dock was still in
+  the stylesheet, in a second `@media (max-width: 1099px)` block further down
+  the file**, and it would have beaten the measured reservation silently. §8's
+  "a media query adds no specificity" for the fourth time.
+  ⚠ **And the quote bar's send survives the degraded stylesheet on purpose.**
+  `#choices` is hidden there and `goStep` MOVES `.panel--send` inside it — so a
+  page that boots, moves the card and only then throws had, until now, no send
+  button at all. Same shape as §5.20's `?sheet=1`: a guard written for the
+  state at boot, applied to a page that has moved on.
+
+- **The step heading stopped hiding behind the door on a phone.**
+  `.sect__title`'s `scroll-margin-block-start` cleared the fixed navigator and
+  nothing else — but `.stage-wrap` is STICKY directly below it, so tapping any
+  circle on the rail landed the question **388 px behind the drawing** at
+  390×844 and 323 px at 320×568. What the customer saw after choosing "window"
+  was the door and a half-cut tile, on every step, and they had to scroll UP to
+  find the question they had just asked for. `fitStage` publishes `--sticky-h`
+  off the rect it already reads; the heading now clears the door by 13–14 px.
+  Neither `npm test` nor `npm run audit` had an opinion: a scroll offset is
+  neither a string nor an overflow.
+
+- **The leaf's grain went up two measured steps, and the response is
+  SUB-LINEAR — which is the finding, not the number.** `grain` and `drift` up
+  56% moved `npm run mottle` from 0.0132 to 0.0168; ×1.95 on the constants
+  moved it only ×1.47. Reaching the corpus (0.089–0.155, honestly ~0.042 after
+  `REDESIGN.md` §2.3 divides out the scene) would need constants five or six
+  times the measured ones, which is no longer raising a measurement — it is
+  chasing a number that is mostly somebody else's sunlight. Stopped at two
+  steps, judged by eye against d016 and d048 per REALISM.md §6, and the
+  non-proportionality written down rather than tuned around.
+  ⚠ **`npm run profile` is fully GREEN and I cannot say why.** The dark-reed
+  row read 1.044 against a 1.03 gate on 26.8 and reads 0.999 now. It is NOT the
+  grain: reverting the grain and re-running gives byte-identical numbers, which
+  is the `drift`/`grainTex` strip working exactly as designed. Something in
+  phases 1–8 closed it. **An unexplained green deserves the suspicion of an
+  unexplained red** — that is this file's §5 in one line — so it is recorded as
+  open rather than claimed as a win.
+
+- **⚠ THE DOOR IS 340 px WIDER ON A DESKTOP, and stage F is NOT the mockup's
+  overlay.** The flow moved `.panel--send` into the summary step, so the third
+  column stood empty at every step but the last — the same fault
+  `REALISM2.md` §6 was written for, arriving from the other direction. At
+  ≥1280 the stage spans it: 412→752 px at 1280, 812→1152 at 1680.
+  What is NOT built is the floating composition, and the reason is not the
+  container (healthy, 6/6). It is that the overlay was specified against a
+  three-column CABINET that no longer exists, and its one hard requirement is
+  re-deriving `--wall` from a floating card's inner edge because the grip
+  controls stand in that strip. Spanning the track needs none of that. §6's own
+  last paragraph is the instruction: **the overlay yields, not the controls.**
+
+- **The page moves now, and the rule that made it safe shipped first.**
+  ⚠ **`.is-bare` KILLS EVERY ANIMATION**, and it is asserted in `npm run audit`
+  rather than trusted. `?bare=1` is what `sheets`, `recreate`, `corpus`,
+  `against`, `profile` and `collide` photograph; one animation running during a
+  screenshot makes all 110 committed sheets NON-DETERMINISTIC. Measured: 5
+  elements animate normally, **0** under `?bare=1`, **0** under
+  `prefers-reduced-motion`.
+  ⚠ **`stampChange` is what makes the drawing animate without a second render
+  path.** `render(state)` is pure and `paint()` swaps innerHTML, so EVERY
+  element is new on every change — a CSS entry animation keyed off the markup
+  would re-animate the panel, the window and the bar every time somebody
+  nudged the colour. Diffing the drawing would mean `render` knowing the
+  previous state, which is the argument that killed the 3D renderer and the
+  incremental repaint. But `app.js` already holds both states, so it stamps the
+  STAGE with the field that moved and the stylesheet animates only that field's
+  parts.
+  **The door assembles on load** (M1) — Peretz's *"start with nothing, only the
+  door"* satisfied literally, in time, without inventing an un-orderable state.
+  Once, via a class removed on a timer rather than `animationend`, which never
+  fires when the animation is disabled.
+  **The colour CROSS-FADES and never interpolates hue** — `PLAN.md` §7,
+  decided long ago and never built until now. Anthracite → sage through a
+  colour transition goes via mud and reads as a rendering bug.
+  ⚠ Refused, and listed so they are not proposed again: the price counting up
+  (banned by name, and for ~400 ms it would show a number that is not the price
+  of anything), a rotating door (no second view; square-on is load-bearing),
+  parallax on the room (the scene is anchored on purpose).
+  ⚠ And the audit's drag comparison had to learn to wait 1100 ms: it was
+  screenshotting a fresh load mid-assembly and reporting 928 pixels of
+  difference as "something is on the door that the link does not carry".
+
+- **⚠ THE CABINET IS GONE. THE PAGE IS A FLOW.** Eight steps and a quote page,
+  exactly one live at every width. `TRANSFORM.md` §10.0 has the argument; the
+  short form is that a fold asks a question about the INTERFACE before it asks
+  anything about a door, it has nowhere to explain what a משקוף is, and it gets
+  worse with every category — of which this round added three.
+  `liveStep` is presentation: not in `state`, not in the URL, not in the code,
+  not in `js/spec.js`. Which step somebody is looking at is a fact about their
+  afternoon.
+  ⚠ **Six functions were DELETED, not left unreferenced** — `closeSection`,
+  `openAllSections`, `closeAllSections`, `closeGroup`, `open`, `toggle` — along
+  with `soloSections` and the 1100 px `matchMedia` listener. Every one was
+  correct and several were hard-won. A flow has one shape at every width, so
+  there is no "which is open", no per-device arrival, and no crossing to
+  reshape on. Dead code that still reads as load-bearing is what a future
+  reader wires back up.
+  ⚠ **A SHARED LINK OPENS AT THE SUMMARY**, not at step 01: somebody following
+  one is looking at a door, not designing it — Peretz most of all.
+  ⚠ **The navigator is STICKY and scrolls sideways.** Nine circles overflowed a
+  390 px phone by 54 px and took the whole page with it; and after jumping to a
+  late step the only way back to step 01 was to hunt for the row. A flow's
+  table of contents must be reachable from anywhere in the flow.
+  ⚠ **`goStep` scrolls the PANEL above 1100 and the PAGE below it.** Above 1100
+  the page is one screen with `overflow: hidden` and the columns scroll inside
+  it, so `scrollIntoView` dragged the document to y=600 at all four desktop
+  viewports. Below it the dock is `fixed` over the bottom 78 px, so `nearest`
+  counts "behind the green bar" as in view.
+  **`npm run latency` went from 501 ms to 123 ms** — one step in the DOM
+  instead of the whole cabinet.
+
+- **Four instruments were restated for the flow, none weakened.** The audit's
+  arrival check asked "how many folds are open", a question the page no longer
+  has; it asks "exactly one step live, at every width" instead — which retires
+  a whole class of fault rather than re-asserting it. The desktop
+  one-heading-must-not-shut-the-others check became a walk over every navigator
+  circle. The keyboard walk lost a level. And `npm run latency` was silently
+  clicking a fold that no longer exists — it reported "not one door could be
+  measured" rather than a wrong number, which is the right way for a broken
+  instrument to fail.
+  ⚠ **And the audit was inflating the page it measured**: it unhides every step
+  to measure tap targets and never put them back, so the next check found the
+  page scrollable above 1100 — because the audit had made it so.
+
+- **⚠ THE STRIPES ARE A COUNT, AND FOURTEEN TILES ARE GONE.** Peretz prices per
+  stripe — ₪150 horizontal, ₪300 vertical — and asked for the complicated
+  compositions removed; the test, from outside, is *more than two distinct
+  stripe lengths*. `DETAILS` is eight panel entries now, and the face carries
+  `stripeDir` · `stripeCount` · `stripeTight`.
+  ⚠ **They pack as ONE ordinal, not three fields.** Three fields can hold
+  `dir:'h', count:0` and `dir:'none', count:7` — states that mean nothing, that
+  every reader must guard against, and that a shared link can carry. One value
+  cannot hold a contradiction. `packStripes`/`unpackStripes` in `catalog.js`.
+  ⚠ **The tight band is a real second composition**, asked for from outside
+  once the two doors were shown: d081 is six equal strips at pitch **0.033**
+  centred 0.55, d045 five in the same shape. Spread is
+  `pitch = min(0.19, 0.80/(n−1))` centred 0.52 — two constants reproducing
+  every measured array. **HORIZONTAL ONLY**: nothing in the corpus is a tight
+  vertical group.
+  ⚠ **A RETIRED STRIPE ID NEEDS A MIGRATION, NOT AN ALIAS.** `aliases` maps id
+  → id inside one list; `strips9` was one id and is now three state fields.
+  Left to the alias mechanism every pre-existing striped link would have opened
+  a PLAIN door in silence. `STRIPE_LEGACY` + a branch in `fromQuery`, beside
+  the `n=` lockset migration.
+  ⚠ **`RHYTHM` is gone from `renderer.js`, both copies.**
+
+- **Two rules Peretz gave, and a third ordering constraint they exposed.**
+  *"square (needs to aways have a panel at the bottom)"* and *"3 panel /
+  greek set (remove the handle)"* — the latter answers `ASK-PERETZ.md` §14's
+  question about whether the three-panel face always comes with its pull.
+  ⚠ **THE FACE REPAIRS RUN AFTER THE LINE-WORK REPAIRS**, and this is the third
+  documented ordering constraint in `js/rules.js` alongside "glazing before
+  line work" and "no-glass-no-grille last". Found by a link arriving
+  unbuildable: a square window with eleven stripes lost the stripes (a window
+  beats line work on a link), leaving a plain face — and the "square needs a
+  panel" repair had already run against the face as it was BEFORE. A repair
+  that reads a value another repair is about to change is neither idempotent
+  nor guaranteed to land somewhere buildable.
+
+- **A pull bar is a MODEL AND A LENGTH.** Peretz: *"each handle can be in
+  different length · handle<100 500 · nickel>100cm every 20cm +150shekel."*
+  `handleLength(state)` in `js/catalog.js` is the ONE definition — the drawing,
+  the price, the rules, the order and the stepper all read it — and it CLAMPS
+  against the leaf, because a 200 cm bar on a 203 cm door is not a door.
+  ⚠ **`gripOf(state)` substitutes the length once.** Five things read
+  `handle.len`; threading `state.handleLen` to each would be five chances to
+  miss one, and the symptom is a door drawn at a length nobody is charged for.
+  ⚠ **`handleLen: 0` means "as the model comes", and that default matters.**
+  Every bar has a length measured off the photographs — Idan 1050, Shahar
+  1230, Ron 900 — and thirty recreations are checked against them. A single
+  global default would have overridden all of them silently. The length is
+  opt-in; a door nobody has touched draws exactly what it always drew.
+  ⚠ **A STEPPER, NOT A SLIDER**, and 20 cm because the price steps in 20 cm. A
+  control finer than the price is a control that lies.
+  ⚠ **Idan costs ₪650, not ₪500** — it is 105 cm as it comes, one step over
+  Peretz's metre. Every bar in the range except Ron is over a metre as stocked.
+  ⚠ **`REBATE` moved from the renderer to the catalogue.** A note in
+  `catalog.js` used to explain why it could not — "the catalogue must not
+  import the renderer" — and that was true until the catalogue had to answer
+  "how long a bar will this door take?". It is a dimension of the product; the
+  renderer re-exports it, and it was two tools that imported it, not six.
+  ⚠ **`hLen === undefined`, never `!hLen`,** in the decoder: zero is a valid
+  value and the commonest one, so a truthiness guard refused every code for an
+  untouched door.
+
+- **⚠ THE PULL HANDLE NO LONGER RECOLOURS THE LOCK FURNITURE — the bug Peretz
+  reported in his own words.** *"some pull handles change the color of the
+  handle and the keyhole, fix it."* The renderer built ONE set of metal
+  gradients per door out of `effectiveFinish` — the GRIP's finish — so the
+  brass Ella painted the Coral lever and the keyway beside it gold.
+  `REDESIGN.md` §1.1 fixed the half that reached the MESSAGE and left the
+  drawing disagreeing on purpose (`ASK-PERETZ.md` §2b1), because nobody had
+  confirmed which way round it should be. Two of his own photographs already
+  said the finishes are independent — d072 gold bar / near-black escutcheon,
+  d128 chrome tube / bronze escutcheon.
+  Now there are two metals on a door: `tone` is the grip's own and paints the
+  bar, `hwTone` is the customer's **פרזול** and paints the lever, the rose, the
+  backplate, the keyway and the extra lock. `effectiveFinish` is **`gripFinish`**
+  — the function was right and its NAME was the lie.
+  ⚠ **The test that existed asserted the mirror of this** and would have agreed
+  with the bug: it checked that a brass grip made the finish helper say brass,
+  true before and after. The new one reads the EMITTED GRADIENT over all 36
+  grip × pirzul pairs. Same trap as `ASK-PERETZ.md` §1's handing.
+  ⚠ **פרזול is not the withdrawn finish axis coming back.** That one was the
+  PULL HANDLE's, priced at ₪220 for a decision the owner says his customers do
+  not make, and `f=` is retired forever. This is the lock furniture's, priced
+  by Peretz in three steps. New parameter `pz=`.
+  ⚠ **The hinges follow it in the ORDER and nowhere else**, because they are
+  not drawn — these doors open inwards, so from the street they are hidden in
+  the rebate. That is why the פרזול spec row is printed even when it is the
+  default nickel: it is the only place the order says what colour they are.
+
+- **⚠ TWO FAULTS IN THE SHORT CODE, BOTH FOUND BY BUMPING INTO THEM.**
+  1. **The check nibble was a REMAINDER, not a floor.** `TOTAL_BITS` was
+     `ceil(payload/5)*5`, so the check got whatever was left over — 4 bits at
+     payload 36 and **2** at payload 38. Adding one two-bit field silently
+     halves the typo protection with nothing in the arithmetic to say so. It
+     caught two consecutive bumps; both times the temptation was to shave the
+     check to make the sum come out. It is a FLOOR now: `CHECK_MIN` is reserved
+     BEFORE the rounding, so the code gets longer when it must — which is the
+     correct thing to give way. `REDESIGN.md` §1.5: with no check, 38.4% of
+     single-character typos decoded to a different valid door.
+  2. **`VERSION` itself could overflow, and nothing was checking.** The field
+     was 4 bits; **version 16 does not fit in 4 bits**, so it encoded as 0,
+     decode compared 0 against 16, and every code the app produced was refused.
+     It failed loudly, which is luck — a VERSION wrapping onto a number this app
+     had once USED would have read an old layout as a new one. Five bits now,
+     and `npm test` asserts both that it fits and that it has four spare.
+  **The code is nine characters** as of version 16 — `DM-` and nine, in two
+  groups read aloud.
+
+- **⚠ משקוף IS A CATEGORY NOW — the frame the door closes onto.** Asked for by
+  name from outside. It was always drawn and never choosable, and it is
+  ₪500–₪1,000 of a ₪3,150 door: four options (`MASHKOFS`), two independent
+  dimensions, both visible. "Every side that gets wider" means the two WIDTHS
+  he had just named — the outside face and the inside return — not the three
+  jambs; settled from outside.
+  ⚠ **THE FRAME GROWS OUTWARD FROM A FIXED OPENING, and that is the whole
+  design.** `x0`, `y0`, `MID_X` and `BASE_Y` are still computed from the
+  standard CASING/RETURN/RET_HEAD, so the leaf does not move by a unit when the
+  customer picks a wider frame. And the door's own tight box is anchored on
+  `MASHKOF_MAX` — the widest frame in the range — rather than on this door's:
+  computed per state, a wider frame would grow the box, `fitStage` would scale
+  everything down to fit, and the LEAF WOULD APPEAR TO SHRINK. That is the
+  fault reported from outside about the classical set, wearing a different
+  mechanism.
+  **The assertion was written before the category was built**, not after: 28
+  size × frame pairs, leaf rect identical to the unit, plus the same again on
+  `data-fit-w`. It reads the emitted markup, because the constants agreeing
+  proves nothing about what was drawn.
+  ⚠ **The millimetres are ours, not his, and the distinction matters.** His
+  3 cm and 16 cm describe the frame SECTION a joiner orders; `mk-std` is
+  exactly the three constants measured off the works photographs, so a standard
+  door draws byte-identically to before. Replacing 46 with 30 because he said
+  "3 cm" would swap a measured number for one describing something else.
+  ⚠ **The tile is the one drawing in the project that is not square-on**, and
+  deliberately: it is a section through the head, because the two dimensions
+  Peretz prices are precisely the two a square-on elevation cannot show at
+  once. A catalogue glyph is a diagram beside the picture, not in it.
+
+- **The catalogue meets Peretz's real range, and seven options left it.**
+  Withdrawn on his say-so and every id aliased onto the nearest survivor, so
+  no link ever opens on nothing: **ברזל מחושל** and its light twin → `grid`,
+  **מדליוני פרח** and its twin → `scroll`, **זכוכית מחורצת** → `mesh`,
+  **שירן** → `idan`, **להב שטוח** → `shahar`, **אלמוג** → `sapir`.
+  Two of those close open questions rather than dropping products: `shiran` is
+  what `ASK-PERETZ.md` §2 has been asking about since 23.8 (it appears on none
+  of the 128 photographs and was the one grip drawn from nothing), and the
+  three grilles answer §4.
+  ⚠ **And one withdrawal disagrees with ten of his own doors.** `iron` was the
+  commonest thing in the luxury band by our count — d090 d092 d101 d103 d108
+  d112 d119 d124 d128 d129 — so he has most likely stopped ordering it rather
+  than never having fitted it. `npm run corpus` still draws those ten and names
+  the substitution in its notes rather than silently swapping.
+
+- **⚠ NO GRIP CAN BE ROTATED ON A STANDARD DOOR ANY MORE, and that is a
+  consequence of a product decision rather than a bug.** `gripCanRotate` hides
+  the control for any bar longer than the leaf is wide. The Shiran was the one
+  SHORT grip in the range, so it was quietly the only thing making `#grip-rot`
+  reachable on the door most people buy; with it withdrawn the sweep says only
+  `ron` and `barblack` rotate on רחבה, and four bars on the new רחבה וגבוהה.
+  `npm run audit`'s drag step used to run on `shiran` + `standard` and waited
+  thirty seconds for a `hidden` button; it runs on `ron` + `wide` now. If this
+  matters commercially it is a question for Peretz — is there a short pull he
+  sells? — and not something to work around in the interface.
+
+- **Two new things a customer can buy.** `SPECIAL_LOCKS` (כספת ₪700 · קודן
+  ₪900) is a whole axis that did not exist: neither is a lockset, so a door can
+  carry a lever, a smart lock AND a keypad, and merging them into `LOCKSETS`
+  would have made three products mutually exclusive that are not.
+  ⚠ `kodan` and `digital` are DIFFERENT products priced an order apart (₪900
+  against ₪2,700) and he listed them under different headings.
+  ⚠ Both are DRAWN, and that is not decoration: a configurator that takes money
+  for something the drawing does not show is a hidden cost with a label on it,
+  and `npm run collide` cannot sweep an obstacle the drawing does not emit.
+  Their geometry is conventional rather than measured — there is no photograph
+  of either in the corpus — and the renderer says so where it draws them.
+
+- **The classical set has two prices, and that is Peretz's third window.**
+  He gave `greek set 2700`, `square 3700`, `square with greek 4700`, which look
+  like three products and are two: 3700 + 1000 = 4700, so the set costs ₪1,000
+  on a door already paying for its glass and ₪2,700 on one that is not.
+  ⚠ The first draft of the plan made "square with greek" a third WINDOW id.
+  That would have added to a public wire format for a door the catalogue can
+  already express, and let a customer build the same physical door two ways at
+  two prices. One entry, `delta` and `deltaGlazed`, no `VERSION` cost.
+
+- **The size tiles print their band at last** — `עד 98 × 203 ס״מ` and the rest.
+  `ASK-PERETZ.md` §8 has been asking for those ranges since 23.8 and refusing
+  to invent them; they arrived on 26.8.
+  ⚠ **The drawn dimensions did NOT move to match.** Setting `standard` to the
+  top of its band (980 × 2030) gives a leaf of 0.444 where **0.415** is the
+  aspect measured across thirty photographs and used by every leaf-box check in
+  the repo. A price band is not a drawing spec, and moving a measured number to
+  match one is what REALISM.md §6 exists to forbid.
+  ⚠ And `wide` and `tall` were NOT merged into one "extra" tile even though
+  they share his +25%. They are different doors; a price band and a structure
+  are different things, and several structures can share one band. One id was
+  appended (`xl`, his "double extra") and nothing renamed — so the size list
+  cost no bump of its own.
+
+- **⚠ THE PRICES ARE REAL NOW, AND THE PRICE MODEL CHANGED SHAPE TO HOLD THEM.**
+  On 26.8.2026 Peretz sat down with his son and said the numbers out loud —
+  the conversation `ASK-PERETZ.md` §5 had been waiting nine days for and the
+  one thing standing between this and a launch. **`TRANSFORM.md` is the plan
+  that follows from it and is the forward plan now**; `REALISM2.md` keeps
+  stages E and F inside it and everything else it describes is built.
+  What changed here, in `js/prices.js`: `SIZE` — a starting price per band,
+  invented, `PLACEHOLDER` — is gone, replaced by **`BUILD`**, the six parts of
+  a fitted door (door 1250 · cylinder 200 · lock 200 · mashkof 500 · install
+  700 · measure 300 = **₪3,150**). The reason it is six numbers and not one per
+  band is that a per-band total cannot express what he actually said:
+  *"+25% to the price of the door and mashkof"*. The multiplier lands on **two**
+  of the six and not on the other four — a bigger door is more steel and a
+  bigger frame, not more installation or a second visit to measure — so each
+  size carries a `mult` in `js/catalog.js` beside its width and height, because
+  a multiplier is a property of the size and not money.
+  ⚠ **`priceInto('size', …)` went with it, and its absence needed a guard of
+  its own** or the loudest check in `catalog.js` would have quietly stopped
+  covering the most expensive axis: a size with no `mult` reads `undefined`,
+  `Math.round(x * undefined)` is `NaN`, and NaN reaches the figure on the
+  customer's screen without throwing anywhere on the way.
+  ⚠ **And `priceParts`' keys are no longer `GROUPS[].key` one-for-one.** A size
+  has no price of its own now, so a tile asking this object for its own group
+  by name would print `undefined` on all six size tiles. `tileAgorot` in
+  `js/price.js` is where that translation lives — in the file that owns money,
+  not as a special case at the call site, because the last time arithmetic
+  about money lived in `app.js` it printed +₪620 beside a price that then moved
+  ₪1,240.
+
+- **The price is a button, and it opens a column that adds up.** Asked for from
+  outside in the same conversation: *"if they click on the price it shows what
+  it consists of."* `breakdownRows(state)` renders `priceParts` directly — never
+  a second list that happens to agree — and `npm test` sweeps every buildable
+  door asserting the rows sum to the figure above them.
+  ⚠ **The rounding gets a row of its own (`עיגול`), and it has to.** The total
+  is rounded UP to the nearest ₪5, so the components alone fall short by up to
+  ₪4.99; a customer who adds a column and gets a different answer from the one
+  on screen has been shown in the clearest possible way that the number is made
+  up.
+  ⚠ **AND THE FIRST VERSION SHIPPED THE EXACT BUG THE FEATURE EXISTS TO
+  PREVENT.** Components were rounded to the AGORA, which is what every other
+  rule in this codebase says to do. ₪1,250 × 1.25 is ₪1,562.50, the panel
+  formats with `maximumFractionDigits: 0`, so that row PRINTED ₪1,563 — and
+  the visible column summed to ₪5,111 against a total of ₪5,110. Every
+  assertion was green; it was found by opening the panel and reading it, which
+  is the same instrument that has settled every disagreement in this project.
+  `scaled()` rounds to the whole SHEKEL now, and a new assertion pins that
+  every breakdown row is one.
+  Also: `PRICE_CAVEAT` carries his ~5% (*"the price can change after
+  measurments by ~5%"*) and `PRICE_INCLUDES` names the frame and the lock,
+  because the breakdown beneath it lists both. One sentence, one constant,
+  three readers — a percentage written twice is §5 wearing a figure.
+
+- **The striped doors were re-read, and three of them were filed wrong.**
+  Peretz is dropping the complicated compositions and pricing stripes per
+  stripe, and the test from outside is *more than two different stripe lengths*
+  — a different question from the shape-based survey in
+  `research/works/INVENTORY.md`, which is now §5a/§5b of that file.
+  **d045 and d078 were "ragged" and are even; d066 was "cross" and is even**
+  (its vertical member is the black pull bar, which that file's own note
+  already suspected of three of the four crossed doors). The even family is
+  **eleven doors, not nine**. `RHYTHM` — the ragged family's own table, and
+  written out TWICE in `renderer.js`, which is §5 wearing a constant — holds
+  six distinct values and so fails the test by our own numbers.
+  ⚠ **An automatic pass found almost nothing, and the reason is §8's.** A large
+  share of the striped doors carry a `fallback` leaf box, and d033's `auto` box
+  has aspect **0.640** where a leaf is 0.415 — the tool was measuring the wall.
+  Whole-door crops and a 5% ruled grid settled it, and the grid earned its
+  place twice: d040's and d046's strips look like a fan in the photograph and
+  measure equal to within 2%. That was the light on them, not their length.
+
+- **The container is healthy, so `REALISM2.md` stage F is unblocked.** It was
+  filed as *"blocked on a measurement that cannot be taken here"* because
+  Chromium crashed its renderer at 1280×720 every time under ten launch-flag
+  combinations. Six loads alternating 1280×720 and 1680×1050 on one browser:
+  **6/6 survived, zero crashes.** ⚠ Re-probe rather than trusting this line —
+  container health is a property of the container, not of the repository.
+
+- **`npm run profile` measures the shading model again, not the paint texture
+  it was never meant to.** Red since the room-anchoring round (§0c, "Red, and
+  known" — struck through, not deleted) on two of its three checks: the
+  panel-rate check and the moulding-bead check, both point-samples at a fixed
+  leaf-relative fraction. `grainTex` and `drift` are `patternUnits=
+  "userSpaceOnUse"`/a `feTurbulence` filter, both painted in the SVG's
+  ABSOLUTE coordinate space rather than the leaf's own, so when the leaf's
+  absolute position in the scene moved 186×300 units, the same leaf-relative
+  sample point landed on a different phase of the same repeating noise —
+  nothing about the PAINT or the SHADING changed, only where in a fixed
+  texture field the leaf happened to sit. `npm run mottle` is the dedicated
+  instrument for paint unevenness and already divides falloff out for exactly
+  this separation of concerns; `profile.mjs` had no equivalent exclusion.
+  Fixed with one line in the shared `draw()` helper — `[filter="url(#drift)"],
+  [fill="url(#grainTex)"]` removed from the DOM before every screenshot —
+  rather than touching the drawing, because REALISM.md §6 governs and a
+  texture phase is not a measured photograph value.
+  ⚠ **Verified both directions, not just that the numbers moved the right
+  way.** FALLOFF tightened (0.070→0.056 worst row, dark) rather than shifting,
+  confirming the fix removes noise rather than changing what is measured; the
+  two failing ratios cleared with margin (panel rate 0.48→0.70 against a
+  0.6–1.6 gate, bead 1.083→1.019 against ±3%). Then FALSIFIED: temporarily
+  dropped `keyWash` from the moulding's own relight, reproducing the exact
+  historical bug this file's docstring already describes — a bead reading an
+  absolute tone instead of tracking the leaf's fall — and the (now
+  texture-stripped) bead check still failed on both bands, 1.336 dark and
+  1.038 light. Reverted, `js/renderer.js` restored byte-identical. A hardened
+  check that cannot be broken on purpose is not hardened, it is blind, and
+  proving the difference is what the falsification is for.
+
+- **⚠ THE LIGHT HAD NO CASING AT ITS FOOT, AND A NINE-MILLIMETRE CONSTANT WAS
+  COVERING A WRONG NUMBER ONE LEVEL UP.** Reported as *"when i put on the
+  window, on the bottom it ovelaps the panel, fix the window size."*
+  `winFrac.bot` held 0.5545, and that is not where the GLASS stops. A scan down
+  the middle of the rectified leaf finds the pane's black rebate at **0.530**
+  and the shelf's top at 0.554, with a lit moulded band between them: 0.5545
+  was the CASING's outer edge, entered as the glass's.
+  Two things followed and both were visible. `CLASSIC_BAND_FOOT = 9` existed to
+  stop the casing running into the shelf — the leftover between a glass line
+  that was really the casing line and the shelf — and `moulding()` draws all
+  four of its runs at the same band, so the bottom run, 59 tall in a rectangle
+  only 9 deep, reached **50 mm up into the pane**; the glass was then painted
+  over it and the light came out with no casing under it at all.
+  The casing is ONE section mitred round the opening, 59 mm on all four sides:
+  the head reads 0.125 to 0.154 of the leaf's height and the sides 0.220 to
+  0.289 of its width, both 59. A uniform 59 puts the glass's foot at 0.525
+  against the rebate's direct read of 0.530 — nine millimetres, which is less
+  than the width of the rebate line itself. `CLASSIC_BAND_FOOT` is gone and so
+  is `aperture`'s `bandFoot`; one number, four sides.
+  ⚠ `npm run collide -- all` had been clean through all of this, and correctly:
+  a run of moulding drawn inside the pane is one group overlapping ITSELF, and
+  the sweep compares pairs of different objects. An instrument that cannot see
+  a thing is not evidence the thing is absent.
+- **Five more photographs: a stripe design the list could not draw, and the
+  three-panel proportions once more.** *"add this strope option, and look at the
+  proportions of the 3 panel option, make our 3 panel option look like this."*
+  Every one of the five turned out to be a corpus door we already had at full
+  resolution — the two striped ones are **d037** and **d046**, and the flat
+  catalogue elevation of the three-panel door is **d067's own file**.
+  - **⚠ THE VERTICAL STRIPS ARE TWO FAMILIES TOO, and the list drew one.** Same
+    split as the horizontals, found the same way and one round later. The
+    photographs show thin bands grouped into a seventh of the leaf's width and
+    running very nearly its whole height; the FANNED family we drew spreads
+    over a third of the width and its shortest band is a quarter of the height.
+    `stripsvl3` and `stripsvl4` are the new ones, measured on d037 — whose leaf
+    box comes out at exactly a door's 0.415 aspect, which is why it and not
+    d046 or d040 is where the numbers come from: three at 0.256, 0.329 and
+    0.402 of the leaf from the hinge edge, tops level at 0.098, feet staggered
+    from 0.945 to 0.915.
+  - **⚠ AND THE FANNED SET WAS SPREAD OVER TWICE ITS MEASURED WIDTH.**
+    `bandW = lw * 0.34` was never measured — it is what "grouped in the half of
+    the leaf away from the lock" turns into when nobody puts a ruler on it.
+    Three doors, one from a verified leaf box and two from the hand-measured
+    records, all give a pitch of **0.073**: d037 0.256/0.329/0.402, d038
+    0.771/0.846/0.917, d043 0.698/0.771/0.846. So the two vertical families
+    share their COLUMNS exactly and differ only in how long the bands are.
+    `STRIP_V` states it once and both branches read it.
+  - **⚠ WHICH MEANS A RECORD CANNOT TELL THEM APART**, because a record carries
+    each line's `x` and not its length — and the moment the long option was
+    added, `npm run corpus` sent d038 and d043, both plainly fanned, to it on a
+    list-order tie. The tie-break is the catalogue's own citation: an option's
+    `doors` list is a claim about which photographs its numbers came from, so
+    if a tied candidate names this door, that is the one it is. Where nothing
+    names it, list order still decides and the note now SAYS the choice was a
+    coin toss instead of printing a clean answer.
+  - **`panel3` again, and this time off a flat elevation.** The corpus read was
+    still wrong. One of the three new pictures is a catalogue shot — d067's own
+    file, the door excluded from the last read for having a crop aspect of
+    0.535. ⚠ That exclusion was right about the COLUMNS and wrong about the
+    rows: a horizontal stretch cannot move a horizontal edge, so a stretched
+    elevation is a perfectly good ruler vertically, and it is the only square-on
+    one of the three.
+    Upper 0.061–0.455, plate 0.480–0.586, lower 0.607–0.944, the mean of three
+    readings — against 0.089–0.527, 0.547–0.661, 0.687–0.921. Everything moves
+    up and every rectangle grows; the plate was 0.067 too low and the gaps
+    twice as wide as they are.
+    ⚠ And the check that says it is right is the MARGINS: top 0.061 of the
+    leaf's height (125 mm), foot 0.056 (115), sides `PANEL_INSETS.trio` 0.15 of
+    the width (128). Equal margins all round is what a panelled door is, and
+    three independent photographs landing on it is not something a bad reading
+    does.
+- **Four photographs of doors he has built, and the classical panel put back
+  through the loop — plus the leaf box on the set's own photograph turning out
+  to be skewed.** Sent in as *"i love the normal panels, but i dont like how
+  the פאנל קלאסי look, so study them once more from these images… once again
+  try and find differences with the classic set that we have and perfect it
+  until there are no differences, and also if i add a window it goes on the
+  overlaps the set. also there are too much stripes right now, so in the עיצוב
+  חזית category have 2 sub categories, a panel and a stripes one. also the 3
+  panel option looks bad, so look at doors with 3 panels and make the panel
+  proportions look like the real thing."*
+  - **⚠ A WINDOW REALLY DID PAINT OVER THE SET, and the words were literal.**
+    `#glazing` is drawn after `#detail`, so the light's architrave went down on
+    top of the composition: its top run is 59 mm of lit ramp ending at 0.1262
+    of the leaf where the frieze's block ends at 0.126, and 0.2 mm of contact
+    plus a mitre stroke and antialiasing is enough for a bright band to eat the
+    frieze's bottom edge. Nobody had seen it on a SOLID set because there the
+    panel standing in the light's place is drawn by `classicSet` itself, before
+    the cornice — so the frieze covers it and the join reads clean. The two
+    halves of one composition were being drawn in opposite orders.
+    The glazing is built once and PLACED once now, before the face design when
+    the face is the set and after it otherwise. On the real door the architrave
+    is fitted round the light and the ornament is applied over the face, so the
+    set going last is what the joinery does.
+  - **⚠ THE OGEE SECTION WAS AN OGEE AND IT IS NOT ONE.** Three of the four
+    photographs are in the corpus — image 1 is **d050**, image 2 d111, image 4
+    d127 — and d050 is flat on, evenly lit, plain paint, no ironwork. Measured
+    across its moulding at 46 px, median down a sixth of the leaf: one narrow
+    GROOVE near the outer edge (floor 0.84), a LONG FLAT at the paint's own
+    tone across more than half the band, and a second, shallower groove near
+    the inner edge. Half the band is flat. The `research/newdoor/` table put a
+    hollow through the middle of that flat and a bright round where the inner
+    groove is — which is why it read as a soft bulge rather than as a scribed
+    frame.
+    The stored depths are the measured ones divided by 0.34, because
+    `mouldGradients` already compresses relief on pale paint and d050 is a
+    near-white door; the factor is the corpus's own (REALISM §7.4b measures a
+    0.22 departure on cream against 0.73 on navy). Said out loud in the table:
+    it is ONE door. d077 and d061 are so bright the whole moulding sits inside
+    0.95–1.00, and d111's and d127's leaf boxes are fallbacks.
+  - **⚠ `panel3` WAS 0.05 OF THE LEAF TOO HIGH AND ITS PLATE HALF A CENTIMETRE
+    TOO SHORT, and the corpus had the answer all along.** Going back through
+    all 129, three doors carry the composition — **d067, d068 and d077**, a
+    tall upper over a plate carrying a turned pull over a lower panel; d065,
+    d070 and d087 are the same door without the plate, the pull bolted to bare
+    face. Read by luminance derivative down d077's centre (the only one square
+    on) and off a ruled grid on d068; d067 quoted but not used, its crop's
+    aspect being 0.535 against a door's 0.415.
+    Upper 0.089–0.527, plate 0.547–0.661, lower 0.687–0.921 — against
+    0.055–0.430, 0.455–0.545, 0.575–0.875. The plate is 0.114 of the leaf and
+    not 0.09, and the pull was riding about 100 mm high.
+    ⚠ And the sanity check this table never had: the trio's upper and lower now
+    land within 0.02 of `pair`'s own rows. The three-panel door IS the
+    two-panel door with a plate let in between — the reasoning that was wrong
+    was the ENVELOPE, splitting the pair's span three ways, not the family
+    resemblance.
+  - **⚠ THE LEAF BOX ON `research/newdoor/full.jpg` WAS SKEWED, AND THAT IS THE
+    THIRD TIME THIS DOOR HAS DONE IT.** The door lies on the ground about two
+    degrees off level and further from the camera at its foot than at its head,
+    so its outline in the photograph is a TRAPEZOID — 1626 px across at the
+    head, 1558 at the foot — and `tools/_upright.mjs` cuts an axis-aligned
+    rectangle. No rectangle is both. The box in use came out 1537 wide and
+    3698 long against a real 1592 mean and 3730, so every column fraction
+    carried a few per cent of error PLUS a shear that grew down the door.
+    ⚠ The aspect check that caught the last two failed here: 0.416 against a
+    door's 0.415, because the crop was 3% narrow AND 1% short and the two
+    errors cancelled in the ratio. A ratio can only ever catch one error at a
+    time.
+    `tools/_upright2.mjs` rectifies the leaf bilinearly from its four measured
+    corners. The corners come off two ruled crops of the raw file — the only
+    way to see an edge two degrees off level.
+  - **What the rectified picture then said.** The ROWS were fine: every one
+    agrees with the old table to within 0.01, which is the ruler's own error,
+    and they are simply scaled by 3698/3730 to remove the 0.86% the short crop
+    added. The COLUMNS were not, and the pattern is exactly what a shear
+    predicts — the shelf and the band at the middle of the leaf came out right
+    and the pieces at the two ends came out narrow:
+
+    | | was | now |
+    |---|---|---|
+    | cornice | 0.647 | **0.710** (+63 mm) |
+    | frieze | 0.545 | **0.588** (+43) |
+    | shelf | 0.649 | 0.648 — confirmed |
+    | band | 0.429 | 0.428 — confirmed |
+    | panel | 0.516 | **0.540** (+24) |
+    | plinth | 0.555 | **0.588** (+33) |
+
+    ⚠ And the frieze and the plinth come out IDENTICAL, which is the check that
+    table never had: `classicBand` is built on the claim that the plinth is the
+    frieze upside down, and it was drawing it 33 mm wider while claiming it.
+  - **The cornice's ends sweep now, and the head is contiguous.** A square end
+    is the tell of a plank and a 45-degree mitre — which is what it was — is
+    the tell of a drawing that knew that and stopped there; on the rectified
+    photograph each end of the corona turns down in a quarter-round return. The
+    corona also takes 0.77 of its cap and not 0.68, ruled. And the three head
+    pieces used to leave 0.003 and 0.004 of BARE LEAF between them — six and
+    eight millimetres, never measured, just what is left over when three edges
+    are each read to the nearest thousandth and nothing checks that they meet.
+    At door scale that reads as three pieces floating. The dentil course spans
+    the FRIEZE now rather than "the cornice less 0.036 a side", which was a way
+    of saying "a bit narrower" without measuring it.
+  - **עיצוב חזית has two halves.** Twelve of its twenty tiles are stripes. `sub`
+    labels each option and `buildOptions` groups by it — ⚠ a LABEL, not a
+    re-cut of the list, because the short code packs DETAILS' index and moving
+    `classic` up beside the panels would have cost another `VERSION` bump. The
+    order on the screen and the order in the array are now two different things
+    and only one of them is a wire format.
+  - **NOT CHANGED: the glass.** An edge-find on the rectified leaf puts the
+    pane at 0.291–0.706 against the table's 0.289–0.711 — 0.007, inside the
+    instrument's own error — and drawing the two candidates back over the
+    photograph in red had already settled it once. Its ROWS take the same
+    0.86% scale as everything else, so the light and the ornament cannot drift
+    apart.
+- **`tools/rectify.mjs` joins the toolkit, and the four corners it uses are
+  written into §3.** It was `tools/_upright2.mjs`, which `.gitignore` covers —
+  and by then CLAUDE.md was citing it as the instrument every classical-set
+  measurement comes off. The convention is that a scratch harness dies and the
+  READING survives in the docs, and that convention is right for a contact
+  sheet; it is wrong for a de-skew, where the reading IS a forty-line bilinear
+  map somebody would otherwise rewrite under pressure. Both now: the tool is
+  committed AND the corners are in the prose.
+  ⚠ Its output height for `newdoor` is PINNED at 3730 rather than derived from
+  the edge lengths, which would give 3749. Half a per cent taller moves every
+  row fraction by 0.005 at the foot, and an instrument that produces a slightly
+  different picture from the one the numbers came off is a trap.
+
+- **The panels come in two mouldings, the strips in two compositions, and the
+  classical set's opening changes size when you put a window in it.** Three
+  faults in one message: *"wehn i put on a window the panel changes, it
+  supposed to be the same size… i want you to remake how the panels look
+  because they dont look good, so take a couple of images and see the
+  differences between our panels and the real ones, if you notice that they are
+  2 types of panels then make it a choice in the app… look through all the
+  images with stripes out of the 129 that you have in the repo, and add those
+  stripe options."*
+  - **⚠ THE SET'S OPENING IS ONE RECTANGLE NOW, AND IT WAS TWO.** The glazed
+    variant's outline came from `aperture`, casing the light in `CLASSIC_BAND`
+    off the catalogue's `winRect` in MILLIMETRES; the solid one was computed
+    separately in `classicPieces` off `CLASSIC_COLS.panel` in FRACTIONS. Both
+    readings are defensible off their own photograph and only one can be true
+    of one door, so toggling the window moved the outline 19 mm out at the
+    sides and 59 mm down at the head — and worse on any leaf that is not
+    850 x 2050, because one statement scaled with the door and the other did
+    not: 62 mm of width on the WIDE leaf, and on the TALL leaf the casing
+    climbed 46 mm into the frieze.
+    Fixed at both ends. `winFrac` replaces `winRect` on the catalogue entry —
+    fractions of the leaf, like every other piece of that composition — and
+    `apertureLayout` takes `leafH` so it can turn them into millimetres for
+    whatever leaf it is handed. `classicLight` then asks THAT function for the
+    hole and only adds the casing round it, so the narrow leaf's clamp applies
+    to both variants or to neither. Measured across all six sizes: identical to
+    zero on every one, where it had been out on four.
+  - **⚠ THERE ARE TWO MOULDINGS IN THIS RANGE AND WE DREW ONE — and last
+    round's "re-measurement" is how that happened.** `MOULD` was sixteen stops
+    off d048; it was replaced by thirteen stops with a single hollow, re-read
+    at 4000 px off `research/newdoor/`. Both readings are correct. They are
+    readings of DIFFERENT DOORS, and the second drew the classical set's broad
+    ogee round every panel in the range. Sorted by opening one panel CORNER per
+    door at high magnification, which separates them at a glance where a
+    whole-door contact sheet does not:
+    **reeded** — three to five fine beads with hard dark quirks between them,
+    low relief, sharply mitred: d042 d048 d058 d062 d065 d068 d070 d087 d091
+    d094 d099 d116 d122, thirteen doors.
+    **ogee** — one broad soft curve standing well proud with a small bead at
+    its inner edge and a real cast shadow: d041 d050 d051 d053 d061 d067 d077
+    d103 d112 d129 and `research/newdoor/`, eleven.
+    Near enough even, so neither is "the" moulding. `MOULDS` holds both, the
+    d048 table confirmed independently before it went back (`tools/_msect.mjs`
+    across d062: four quirks and four beads, the same alternation at lower
+    magnification — a phone photograph merges adjacent quirks, it does not
+    invent them). `panelo` and `panel2o` are the ogee twins of `panel` and
+    `panel2`; they differ in NOTHING but `profile`.
+    ⚠ NOT a new axis, deliberately: a "which moulding" group would have cost a
+    field in the short code, and the payload's only spare bit comes out of the
+    check nibble or out of the colour list Peretz may replace wholesale. Two
+    tiles instead, and the tile draws the difference — a question a picture
+    answers better than a word does.
+    ⚠ And `mouldOf` answers ONCE for the panel and the architrave together,
+    because every corpus door with a window over a panel cases both in the same
+    section. A reeded panel under an ogee architrave is not a door anybody has
+    built.
+  - **⚠ THE COMMONER STRIPE COMPOSITION WAS THE ONE WE COULD NOT DRAW.** All
+    129 photographs opened as contact sheets of leaf crops, then the thirty
+    striped ones measured band by band with `tools/_strips.mjs`. There are two
+    families: **even** — equal, full width, evenly spaced, on d033 d035 d036
+    d039 d049 d056 d059 d066 d081, NINE doors — and **ragged**, anchored at the
+    hinge stile with free ends of different lengths, on d044 d045 d064 d073
+    d078, five. `metalStrips` drew only the ragged one, at every count, so nine
+    doors of the corpus had no tile at all.
+    Four new options, each measured: `strips2` (the pair at 0.43 and 0.61 —
+    ⚠ NOT `strips3` minus one, it is a pair about the LOCK'S HEIGHT and the
+    ragged span formula would have put them at 0.23 and 0.77), `strips4` off
+    d063, `stripsband` — eight fine lines at a spacing of 0.028 repeated seven
+    times, a fifth of the leaf, off d081 — and `stripsv3`, because three is the
+    corpus's own vertical count (d037 d038 d043) and the list offered four and
+    six while nothing carries six. The five ragged counts keep their ids and
+    say "מדורגים" in Hebrew, so a customer choosing between three strips and
+    four is not silently choosing between two different designs.
+  - **`metalStrips` takes the DETAIL, not five flags off it.** Every new
+    composition had been adding another positional boolean the one call site
+    had to remember to pass; `even` and `rows` would have been the fifth and
+    sixth. The catalogue entry IS the description of the composition.
+  - **⚠ `npm run corpus` was deriving the wrong strip count, and had been
+    before the list grew.** Its matcher hard-coded `stripsv` for anything
+    vertical and `strips3` or `strips` for anything horizontal — a second
+    statement of what the range contains, inside the one tool whose job is to
+    say how far the range is from the photographs. d064's SEVEN bands were
+    derived as ELEVEN with the residual dutifully printed while `strips7` sat
+    unused. It asks the catalogue for the nearest count now, and four doors in
+    the gallery — d038 d043 d063 d064 — went from a residual to an exact fit.
+  - **VERSION 13: `detail` is five bits and `window` is three.** DETAILS went
+    from fourteen entries to twenty, four past its old ceiling, where the
+    twentieth would have encoded as index 0 — the customer picks the new
+    option, reads the code down the telephone, and Peretz builds a plain door
+    from a code that reads perfectly. WINDOWS is three of sixteen, so it is the
+    one field with a bit to spare that is not the check nibble's. Payload still
+    36 bits, code still eight characters.
+  - **`collide.mjs`'s panel reader matched `mould-t` exactly** and the ids
+    carry the profile now. It matches on the suffix, so a third section costs
+    it nothing; asked for the old id it found no runs and reported every
+    panelled door as an obstacle the drawing does not have.
+  - **The corbels are two pieces of their own, and they are drawn AFTER the
+    shelf.** Fifth rebuild, and this time the path was nearly right and the
+    fault was elsewhere. Two things: the rolls were struck at fractions of a
+    pitch computed off 0.74 of the bracket, so they came out thin with bare
+    paint between them and the pair read as two COMBS hanging off the shelf —
+    in the photograph four rolls fill the bracket edge to edge and what
+    separates them is a dark valley, not a gap. And they CONVERGE: the tops
+    span 0.06 to 0.94 of the width and the feet only 0.00 to 0.55, which is
+    what makes the bracket a wedge carrying the shelf rather than a fringe.
+    ⚠ The rest of it was the DRAW ORDER. Inside the band's group they went down
+    before the shelf, so the shelf's cast shadow — 0.80 of its own height,
+    blurred — lay across them and they came out as two grey smudges. A corbel
+    stands proud of the band and carries the shelf; the one thing it is not in
+    is the shelf's shadow. They are `corbelL` and `corbelR` in `classicPieces`
+    now, the band goes back to its own 0.286–0.714, and the same leaf is still
+    covered by three rectangles instead of one.
+  - **⚠ `npm run profile` WAS DEAD AND IS NOW RED, and both halves of that are
+    this round's doing.** The gradient ids gained a profile segment, its
+    selector asked for `url(#mould-t)` exactly, and it matched nothing:
+    `upper NaN% lower NaN%`, `Math.abs(NaN - 1) > 0.03` is false, exit 0. It
+    fails loudly when it cannot find its subject now, and it visits both
+    sections instead of one. Alive, it reports `dark reed 1.044` against a 1.03
+    gate — which is NOT a bulge and is written out at length in
+    `tools/profile.mjs` and in §0c: the drawing's washes are warm overlays, so
+    a composite is affine and contrast is compressed near the lamp, and the
+    reeded section's bead is small enough that the ratio of two heights is
+    mostly the lamp. The gate is not widened and the drawing is not tuned;
+    backing the relight out still reads 1.508 / 1.083 / 1.462 / 1.071, so it
+    has not stopped finding the fault it exists for. Re-basing the measure is
+    named in §9.
+  - **NOT CHANGED: `CLASSIC_GLASS`, and it took an overlay to leave it alone.**
+    A line scan across the light's left casing put the glass edge at 0.255 of
+    the leaf against the table's 0.289 — 44 mm, on both sides, which would have
+    been a real fault. Drawn back over the photograph in red it took one look:
+    the table's lines sit on the glass edges and the scan's sit well inside the
+    pane. What the scan found at 0.255 was the outermost ring of the IRONWORK,
+    not the rebate. Third time the fourth instrument has overturned a
+    derivative on this door (§7); the ruled read stands.
+- **Three photographs of the three-panel face, two of the classical set, and a
+  standing instruction to look at the striped doors.** Sent in as *"i dont like
+  how the 3 panels look, so there is 3 images of how it needs to look… also
+  here is another 2 doors with the set that you copied… also look at doors with
+  stripes and add those varients to that category."*
+  - **⚠ THE THREE-PANEL FACE IS NOT THREE PANELS.** `trio` was DERIVED from
+    `pair` — three rectangles falling 0.30, 0.23, 0.16 — and the note beside it
+    said so and asked that it not become a measurement without a photograph.
+    Three arrived, and they are all one composition: a tall upper panel, a
+    SHORT plate at 0.09 of the leaf, and a medium lower one. **The middle
+    rectangle is a handle plate**, with the turned pull bolted across it. That
+    is why it is short, why it sits at hand height rather than a third of the
+    way down, and why deriving it from the pair could never have produced it —
+    the pair's proportions are about how a door is divided and this one's are
+    about where a hand goes. `grab: true` is on two faces now instead of one.
+    The panels are wider too: 0.15 of the leaf from each edge against
+    `PANEL_INSET`'s 0.23, which is measured but measured on the one- and
+    two-panel doors. `panelInset` is the second half of `panelRows` and has the
+    same three readers.
+  - **The turned pull follows the door's finish.** Its six stops were absolute
+    hexes measured off `research/newdoor/`, whose every fitting is black — and
+    the same pull is POLISHED on all three of the three-panel doors. ⚠ AND
+    `inFinish` COULD NOT FIX IT: that helper converts a profile measured on
+    STEEL, so steel is its identity, and a profile measured on BLACK comes back
+    unchanged on a steel door. The cure was not a second converter but to stop
+    writing the profile in any one finish's numbers — the rod is six indices
+    into `FINISH_TONES` now, landing within a couple of values of the
+    measurement on a black door and following every other finish by
+    construction. CLAUDE.md §5 item 8 a second time, on a different object.
+  - **The classical set is built solid as well as glazed.** `needsWindow` forced
+    the rectangle; a photograph of the same set with a raised panel where the
+    glass goes — every other piece identical — says that is one variant of two.
+    `rectOnly` replaces it: the set still refuses the צוהר אנכי, because it
+    substitutes its own rectangle for whatever the window option would have
+    drawn and a substitution nobody can see is the same bug as a price for a
+    panel that is not drawn. ⚠ The solid panel took the LOWER panel's columns
+    at first, on a reading of the solid photograph that made the upper
+    rectangle as wide as the lower one; that was superseded within the round —
+    see "the set's opening is one rectangle" above.
+  - **`stripsx` — the cross, MISSING in the inventory for three rounds.** Four
+    of the corpus's fifteen striped doors carry it, the largest stripe pattern
+    we could not draw. ⚠ On three of the four the vertical member is the PULL
+    BAR and not a strip at all — d035 is two horizontals and a handle — so the
+    option draws d047's version, where the vertical is a strip of its own, and
+    a customer who wants d035's puts a bar on a striped door. Ruler-read off
+    d047: the vertical at 0.309 of the leaf from the hinge side, 0.155 to
+    0.864; the horizontals in TWO PAIRS at 0.420/0.448 and 0.578/0.606. The
+    pairing is the character of it — evenly spaced they read as a ladder.
+  - **`collide.mjs`'s moulding reader learned the set's second kind of piece.**
+    The blocks and caps mark their own face with `data-face`; the panel that
+    stands where the light goes on a solid set is drawn by `moulding()` and its
+    ink is the four mitred runs. Both are shapes actually on the door, neither
+    is a claim, and `-- all` is clean over 1,358 designs.
+  - **`research/works/INVENTORY.md` was three rounds stale** and said MISSING
+    for the vertical strips, the staggered ones, the cross and the whole
+    classical composition. All four are drawn; the table says so now.
+- **`npm run collide -- all` is clean for the first time, and getting there
+  found a real fault the instrument could not previously see.** The recurring
+  agent diagnosed the red in run 29 and left the fix to whoever owned the
+  drawing, which by then was this round. Its reading was right on every count:
+  two of the three symptoms were TAGGING, not geometry — a composite group
+  whose bounding box crossed the window's row, and a drift reader that knew
+  `window` and `panel` and had no third kind, so five drawn rectangles could
+  never be confirmed. `classicPieces` is one table now, drawn from and declared
+  from; each piece is in its own tagged group; the reader unions the shapes
+  marked `data-face`, which are real ink.
+  ⚠ **AND THE MOMENT IT COULD SEE THEM IT FOUND TWO REAL FAULTS.** The rules
+  declared the shelf band at the shelf's full width while the drawing had
+  narrowed the face to 0.429 and hung the brackets outside it — drift that had
+  been sitting there since the band was narrowed, invisible because nothing
+  could read a moulding. And the set's light was cased in the range's 70 mm
+  stock like every other opening, where the set's own measured rows leave 59
+  above the glass and NINE at the foot, because the shelf is what closes that
+  light: at 70 the casing and the shelf's corona were drawn through each other
+  for 61 mm. `CLASSIC_BAND` and `CLASSIC_BAND_FOOT`, read by the drawing and by
+  the obstacle alike.
+  The lesson is the instrument's, not the drawing's: **a check that cannot name
+  a thing cannot check it, and it will report that as the thing being absent
+  rather than as itself being blind.** Twenty obstacles "the rules believe in
+  and the drawing does not" were all on the door.
+- **Five more doors put through the same loop, and the most complicated ones
+  in the corpus turned out to be the same product as the new one.** d101, d103,
+  d112 and d129 all carry the classical set — cornice, frieze block with an
+  oval, glazed light, corbelled shelf with a turned pull, panel, plinth — and
+  d104 carries the quatrefoil column, the pattern with exactly one door of
+  evidence behind it. All five recreate recognisably; `tools/_door.mjs` is the
+  harness, photograph beside our render at matched leaf height.
+  - **⚠ THE ANSWER TO ASK-PERETZ §4, ARRIVED AT BY DRAWING IT.** That question
+    has been open for three rounds: *"five doors carry a whole composition the
+    site has no way to express — is it a fixed model or an option?"* The
+    composition half is now settled — it is the set we built from
+    `research/newdoor/`, and it fits all four of those doors at their own
+    proportions. What is still Peretz's to answer is whether it is a MODEL or
+    an option, which is the half a drawing cannot decide.
+  - **⚠ THE CATALOGUE CONTRADICTED ITS OWN QUESTION SHEET, and recreating d104
+    is what caught it.** ASK-PERETZ §4 lists the ironwork and says, in his
+    words, *"וכל אחד מהם גם בגוון הדלת ולא רק בשחור"* — every pattern in the
+    door's colour as well as in black. The catalogue offered that on three
+    patterns of six: `grid`, `scroll` and `iron` had `-light` twins and
+    `quatrefoil`, `arch` and `deco` did not. Nobody could see it from inside
+    the code, because the list looks complete until you ask which doors it is
+    read from: **d104 is the only door `quatrefoil` exists for, and its column
+    is painted white.** We were drawing the sole evidence door for that pattern
+    in the wrong colour with no way to correct it. Three twins appended — no
+    `VERSION` bump, the ids in the wild keep their indices — and d104 recreates
+    properly for the first time.
+  - **Recorded, not changed: the set is not one size.** Our set scales with the
+    leaf, so a taller door gets a taller cornice. The four real ones suggest
+    otherwise — d112's frieze and plinth have no flutes at all where the new
+    door's do, and every one of the four has a slimmer shelf than ours. That is
+    product variation across a range we have one measured example of, and
+    guessing at it from photographs at four different angles would be inventing
+    a rule. ASK-PERETZ §14 asks him instead.
+  - **`tools/_door.mjs` needs the leaf box given to it for these five.**
+    `findLeaf` scores all five below 0.25 confidence and its box for d101 comes
+    out at an aspect of 0.714 against a door's 0.415 — which is the finder
+    working exactly as its own docstring says it does, and the aspect check is
+    what makes that visible in one line instead of after an hour of comparing
+    the wrong rectangle.
+- **A door Peretz installed while this was being written, recreated from five
+  photographs — and the recreation loop found five defects that needed no
+  photograph to see.** The files are in `research/newdoor/`. Asked for from
+  outside: *"analize how it looks and make it possible to make this exact one
+  in our app. then try and remake it in our app, and try to find differences,
+  if you find then fix them. repeat the process until you can't find
+  differences."* Six rounds of photograph-beside-ours. The four answers that
+  settled what the door IS, in their words: the lock is **on the left**
+  (`right-in`); *"the whole windows and panels and the horizontal pull bar are
+  one set, the color, the other pull bar and all the other things are not a
+  part of the set"*; the green is **ירוק מרווה** (`rb-6219d`); and *"there is
+  no bronze in the Picture"*.
+  - **`classic` — סט קלאסי, a whole face in one option.** Cornice, frieze,
+    corbelled shelf with its own turned pull, panel and plinth, drawn by
+    `classicSet` rather than through `appliedFrame` because its pieces are
+    proportioned to each other and not to the leaf. `CLASSIC_ROWS`,
+    `CLASSIC_COLS` and `CLASSIC_GLASS` are the measured tables. Thirteenth of
+    sixteen `DETAILS` slots, appended, so no `VERSION` bump.
+  - **⚠ IT BRINGS ITS OWN LIGHT, and that is why `apertureLayout` changed
+    shape.** The catalogue rectangle is 357 x 902 at 185 from the head; the set
+    needs 360 x 819 at 318, or the glass runs into the frieze above it and the
+    shelf below. `apertureLayout(win, leafW, detail)` substitutes
+    `detail.winRect` — the detail threaded through rather than the rect
+    overridden at the call site, which would have been §5. Five callers
+    updated. And the pairing is *repaired*, not allowed: choosing the set with
+    the צוהר אנכי would have quietly drawn a rectangle while the tile, the
+    price and the order all said a slot. `repair` keys off `needsWindow`;
+    `conflicts` reports it from both sides.
+  - **`rings` — טבעות ותלתלים, and the eye got the pattern wrong four times.**
+    It reads as tangent circles, as an ogee lattice, as a stagger and as a
+    checkerboard depending which corner of the photograph you look at, and
+    three of those reached the code before the measurement did. What settled
+    it: a **2-D autocorrelation** of the pane's dark mask (repeat 512 x 440
+    px); a **median stack** of every whole repeat — median, not mean, because a
+    reflection sits on one cell and a median throws it away where a mean smears
+    it over all of them; a **Hough vote** for the radius, 245 px; and then the
+    candidate lattice **drawn back over the photograph in red**. That last step
+    killed both surviving readings in one look and cost twenty lines. ⚠ Draw
+    the answer over the evidence.
+    What it is: one ring per 174 x 151 mm cell, 2.05 across the 356 mm light,
+    radius 83 mm — 0.955 of the pitch across so they nearly touch, 1.10 along
+    so they overlap, which is where the pointed crossings come from. A
+    four-comma rosette in every diagonal gap and a smaller pair at every
+    crossing. Drawn with `ink`, the three-pass forged vocabulary, because it is
+    bar standing in front of glass. `circles` beside it is the etched cousin
+    and stays.
+  - **`barblack` — a slim 800 x 20 black tube, and the bronze was mine.** The
+    photographs read as antique bronze; the median of every dark pixel across
+    all four files is #2A2627 to #36322E, warmth (r−b) 2 to 8. Neutral. Our
+    brass runs r−b above 40. The correction came from outside before the
+    measurement was taken.
+  - **The euro cylinder goes black on a black door.** It was a hardcoded
+    chrome — `#8E9398` and `url(#euroSteel)` — on every door in the range. The
+    chrome is measured and stands: on a brass rosette the cylinder really does
+    read cooler and brighter. `research/newdoor/keyhole.jpg` is the other case
+    at 4000 px: a black stepped rose with a BLACK cylinder inside it, the only
+    bright thing being the sliver of the key pin. Only black is special-cased;
+    passing the stops through `scaleTone` would have turned the cylinder brass
+    on a brass door, which is the thing the first measurement says it is not.
+  - **`classicBand` — §5, caught by putting three close-ups side by side.**
+    The frieze, the shelf band and the plinth are ONE composition on this door,
+    not three: a raised block at each end, a wide tablet between them. The
+    plinth is the frieze upside down, bead course and all. Written three times,
+    it is written once now with two flags (`tablet`/`flute`, `plain`/`oval`).
+  - **Five defects the loop found, none of which needed a photograph:**
+    - **A translucent grey box across the middle of the door.** `classicPull`
+      drew a backplate 3.2 of its own thickness tall on a band 0.062 of the
+      leaf tall, so it stood proud top and bottom. The band and its tablets ARE
+      the backplate. Gone, and the `classicPlate` gradient with it.
+    - **The pull was a dumbbell.** Balls at 2.0 of the rod against a measured
+      1.47, and the finials pitched so close that each end merged into one
+      flattened blob.
+    - **The corbel's flutes ran the wrong way.** Rebuilt twice from the same
+      photograph — three overlapping bars that came out as one pale blob, then
+      four horizontal dashes. What is under each end of that shelf is a bracket
+      with four VERTICAL grooves, tapering in as it drops.
+    - **⚠ THE SET'S PANEL WAS INVISIBLE TO THE THREE ASSERTIONS THAT EXIST TO
+      CATCH EXACTLY THIS.** All three read the markup for `data-detail="panel"`
+      and one of them for `data-top` besides, and the set wrapped everything in
+      `data-detail="classic"`. 297 combinations reported a face with no panel
+      on it while the price list took ₪1,680 for one, and the glazing-overlap
+      check went DEAD rather than failing — it says so in its own message when
+      the attribute goes missing, which is the only reason it was noticed. The
+      panel is tagged as a panel, with its top, inside the set's group now.
+      This is the second time a new face has hidden a priced panel from those
+      checks. Read them before adding a third.
+    - **The set's tile drew פאנל תחתון.** `panelRows` sends anything without
+      `panels` or `top` to the lone lower rectangle, so two names and two
+      prices had one picture — the assertion that every tile draws its own
+      markup caught it. The glyph now reads the set's own tables.
+  - **⚠ ADDING ONE HANDLE REPAINTED FOUR OF PERETZ'S REAL DOORS, and only the
+    diff said so.** `npm run corpus` fits every measured door to a state and
+    writes `js/works.js`, the gallery on the front page. `handleOf` matched
+    bars on length and width and printed the record's finish in a note — free,
+    while every bar in the range was steel. `barblack` at 800 x 20 beat Ron's
+    900 x 18 on geometry for d043, d063, d078 and d125, whose records say
+    "steel", "polished chrome", "steel", "steel". The next `npm run sheets`
+    rewrote the gallery to show four black bars on doors that do not have
+    them. Nothing failed; the diff on one source file was the only sign.
+    ⚠ **And the first fix — a hard veto on the wrong finish — was worse than
+    the bug.** It put the one black bar we sell, 800 mm, on d072, whose bar
+    measures 0.861 of the leaf: a stub where the photograph has a bar the
+    height of a man. Peretz fits long black bars and the range has none, which
+    is a hole in the CATALOGUE and not something a fitter can paper over. The
+    finish is a weighted term now, 0.10 — about what a fifth of the leaf's
+    height of length error costs — wide enough to keep steel bars off steel
+    doors (the swap that started this was worth 0.017) and narrow enough that
+    a 0.47 length error still loses to a wrong colour. Every trade is printed
+    per door with the finish asked for and the finish given. Net effect on the
+    gallery: **one** door moves, d113, from a BRASS Ella to the black bar its
+    own record describes — right colour, 15% short, and the brass had been
+    repainting that whole door's metal gold. ASK-PERETZ §14 now asks for the
+    long black bar by name; §7 carries the general rule.
+  - **The evidence check learned a second root, and was not weakened to do
+    it.** Every priced grille must cite a door and everything cited must exist
+    on disk; `rings` was read from a door that is real but not in the numbered
+    corpus. Both assertions resolve ids through one `evidenceFile` helper that
+    knows `research/works/doors/dNNN.jpeg` and `research/<name>/full.jpg`, and
+    both still demand the file be there. Deleting the citation instead would
+    have left a priced option with no evidence, which is how `lattice`, `bars`
+    and `bars-light` once reached a customer.
+  - **Two things deliberately NOT changed, both because one photograph is not
+    a measurement (§6):**
+    - **The glass tone.** Ours is a cool blue-grey; this door's pane is a warm
+      pale one. The gradient is measured across ten glazed doors and the cool
+      cast is deliberate — a pane reflects sky. This door was photographed
+      LYING FLAT outdoors, reflecting a bamboo screen and warm ground. The
+      warmth is the photograph, not the glass.
+    - **The `moulding` cross-section.** Beside the photograph our panel reads
+      as several thin engraved lines where the real one is a single broad lit
+      ogee, and the light falls on the opposite side. The light half is the
+      same artefact — a door lying flat has no "up" — and the section is
+      measured and shared by every panelled door in the range.
+  - **ASK-PERETZ §14** carries the three new prices and the one name we cannot
+    invent: what he calls the black bar on a purchase order. §5's withdrawn
+    perimeter-groove question was struck at the same time — it was still asking
+    him to price an option the site stopped building two rounds ago.
+- **Four follow-ups from a screenshot, and two of them were rules refusing
+  what the geometry allows.**
+  - **The grab bar could not be placed on any glazed leaf, and the rule saying
+    so had had its premise removed the round before.** `conflicts` carried a
+    blanket refusal against a hardcoded band — *"the horizontal grab bar is
+    centred on the LEAF, not on the stile, so it runs straight across a centred
+    window"* — which was a fair description of a bar pinned to the leaf's
+    centre, and that pinning is exactly what the previous round took out.
+    Measured: the bow has a legal home on **all eighteen** size × window
+    combinations, 686 legal positions on a standard leaf with the rectangle.
+    ⚠ AND IT WAS A SECOND ANSWER TO A QUESTION ALREADY ASKED — twenty lines
+    above it, `gripFitsAnywhere` asks the honest version for every grip. Two
+    answers, cruder one wins: §5 again. Its hardcoded `2050` was the tell, a
+    leaf height that is only right on four of the six size bands.
+    ⚠ **AND IT WAS ACCIDENTALLY RIGHT ABOUT ONE CASE**, which `npm test` caught
+    within a minute of the deletion: beside the 1,415 mm VERTICAL SLOT the bow
+    genuinely has nowhere to stand but under it, at 0.80 of the leaf — about
+    400 mm off the floor, a knee rail. Five assertions said so.
+    The cause was two yardsticks for one question. `gripHome` measured its
+    `HOME_REACH` from the grip's OWN nominal height, and the bow's nominal is
+    `GRAB.fromTop`, 0.59 of the leaf — 180 mm below where a hand goes — so 500
+    mm of slack from there reached y = 1,646. The assertion measured from hand
+    height and got 620. One yardstick now (`reachY`, hand height, for every
+    grip), so the slot REFUSES the bow through `gripFitsAnywhere` with a reason
+    on the tile, and the rectangle — the door in the screenshot — allows it.
+    The symmetric block was added at the same time: choosing the slot with a
+    bow already on the door used to be silent until `repair` took the bow away.
+    Same function, two readers, no second rule — and generalising it rather
+    than special-casing the bow turned out to surface exactly the right set.
+    With the DEFAULT cylinder no window is greyed for any grip; windows grey
+    only where a bar is paired with a WIDE LEVER (coral, plate, almog, square),
+    which is a pairing the corpus does not contain — of the ten installed doors
+    carrying a pull bar, eight have a plain cylinder and not one has a lever.
+    Checked against the gallery as well: none of the thirty real doors is
+    repaired by any of this.
+  - **The keyhole still moved — from the LOCKSET this time.** The last round
+    stopped the grip moving it and left `max(base, out + 10)`, which is a
+    function of the lock furniture: coral 50, sapir 49, almog 52, square 51,
+    plate 57, knobplate 63, cadoor 88. **The keyway is its own object and does
+    not have to dodge anything** — it sits 116 mm below the lever, so a wide
+    knob is not competing with it. `KEYWAY_BACKSET = 63` is where every keyhole
+    on every door now is, derived as the largest `out + 10` among the four
+    locksets that carry the cylinder on their own backplate. Verified: 427 on
+    every lockset and every grip. It is also a better number than the 49 it
+    replaces — 0.0741 of leaf width against the corpus median 0.0695. One
+    constant for the furniture as well (88) was measured and rejected: 880
+    combinations lose their grip home against 694.
+  - **`lockset: 'none'` is withdrawn and ASK-PERETZ §13 is ANSWERED.** *"make
+    the door start with just a keyhole. there can't be a door without a
+    keyhole."* Correct, and it should not have needed asking. The page still
+    opens bare of everything a customer ADDS; it opens with the cylinder, which
+    is the commonest lock furniture in the corpus. `n=none` aliases onto it. No
+    VERSION bump — it was the last entry, so nothing renumbered.
+  - **The sconces are lamps now.** They were a 60 × 250 rounded rectangle with
+    a shading gradient and an 8 mm warm strip — enough to place a light source,
+    not enough to be a light, and reported as *"the two things outside the
+    door"*. `wallLamp()` draws a 96 × 250 bronze fitting: backplate, body with
+    a real cylinder gradient, cast top and foot rim standing proud, a specular
+    down the key side, and a lit aperture at each end.
+    ⚠ Both washes are painted BEFORE the fitting. They were after it, and the
+    upward one is wide enough to cover the lamp — so it lay across the body at
+    0.30 and bleached its top two thirds, leaving a dark band at the foot that
+    read as a join in the metal. Caught on a 3× crop, which is the only way
+    that kind of fault shows.
+
+- **The threshold was a different material from the floor, and the lamps were
+  silhouettes.** Both reported from outside, both true, and both turned out to
+  be about the same thing: an object drawn in the right place with the wrong
+  membership.
+
+  **THE FLOOR IS ONE PATH NOW.** *"the area where the door meets the ground is a
+  different color than the floor, although it supposed to be the same material
+  and surface."* It was two objects — a rect from `baseY` down, and a trapezoid
+  inside `#frame` for the strip running back under the door. Being inside
+  `#frame` put that strip AFTER `#shadow` in paint order, so the door's own cast
+  shadow pooled on the floor in FRONT of the threshold and was masked off the
+  threshold itself. Measured at 4x down the centre line: **159 immediately above
+  the wall line against 124 immediately below** — a 35-point step straight
+  across the picture, exactly where the eye is told two materials meet.
+  Two gradients were tuned to agree first and it did not hold, because the
+  reflection and the cast pool were on one side only. The floor's real
+  silhouette is everything below `baseY` PLUS the strip under the door, so that
+  is the shape it is drawn as: one path, one colour, one `floorFall`, one cast
+  shadow, one reflection. Profile after: 118 → 124 → 129 → 134 → 141 → 147,
+  monotone through the join with no step to find.
+  The reflection's mirror plane moved with it, from `baseY` to `floorY` — the
+  leaf stands on the floor at `floorY`, so that is the line it is mirrored in.
+
+  **THE LAMPS.** *"make the lamps on the sides look 3d and make light that also
+  slightly affects the door."*
+  - The modelling was there and unreadable: every value in the body gradient
+    sat between #20 and #5A, and at 96 mm the fitting came out **ten pixels
+    across** on a 410 px stage. Both had to change — widening the range on a
+    10 px object only makes a stripier silhouette. 110 x 300 now, with a real
+    specular (#9A8E7B), and `lampGlow` lighting the fitting's OWN metal at both
+    open ends, which is most of what says a sconce is switched on.
+  - ⚠ **`SCONCE_OUT` IS A CONSTRAINT, NOT A LOOK.** `fitStage` crops to
+    STAGE_BOX widened to the stage's shape, so on a proportionally narrower
+    stage the crop is exactly STAGE_BOX and the lamps fall outside it. Fine —
+    what is not fine is landing ACROSS that edge. Measured at seven viewports,
+    1100x800 and 1280x900 each drew **half a lamp** against the frame. It is
+    pinned just outside STAGE_BOX by half the fitting plus air, so every
+    viewport shows a whole lamp or no lamp. Re-measured at all seven: six whole,
+    one out of frame, none bisected. It cannot go INSIDE the box — a sidelight's
+    casing reaches 719 of the 789 available.
+
+  **AND THE LIGHT REACHES THE DOOR, WHICH §3 HAD REFUSED.** The refusal was
+  narrow and it still stands: do not let two symmetric wall lights re-tune the
+  leaf's one-key model — `FALLOFF`, `MOULD_SIDE`, `keyWash`, the warm/cool
+  split — against a corpus that contains no door photographed between two
+  sconces. None of those numbers moved. What was added is a thin warm overlay
+  painted last, peaking at the casing's outer edge and gone by a third of the
+  way in: measured **+15/255 at the casing, +12 at 8% in, 0 at the leaf's
+  midline.**
+  ⚠ **AND IT WAS MEASURED AGAINST THE INSTRUMENTS BEFORE BEING BELIEVED.**
+  `npm run profile` unmoved (the wash is horizontal, the profile is vertical —
+  that was the prediction and it held; the two panel faults it reports are
+  identical on the previous commit, and one improved 1.107 → 1.083).
+  `npm run mottle` **DID** move, 0.0133 → 0.0194 on the plain leaf, a 46% rise
+  in a figure about PAINT caused entirely by a lamp. The wash carries
+  `data-room="lamp-wash"` and `mottle` strips it before sampling, so the tool
+  measures the thing it is named after again — §7's whole subject. Reading
+  restored to 0.0133 exactly.
+
+- **Fourteen things reported from outside, in one round — and the biggest of
+  them was that the room moved when the door did.** Every item below arrived as
+  a sentence from the person building this for their father, looking at the
+  page as a customer; §0a says to take those literally, and every one of them
+  was real.
+
+  **The drawing.**
+  - **The scene is ANCHORED now: `BASE_Y` and `MID_X` in `renderer.js`.** Every
+    coordinate used to be laid out from the top-left of the picture, so the
+    head of the opening was nailed to the top and *the floor moved down* when
+    you chose a taller door — and the picture's own box grew with the door, so
+    `fitStage` scaled it all back again. Measured before: a 1100 mm door and an
+    800 mm door came out within a few pixels of the same drawn width. Measured
+    after, on six sizes at 390x844: frame width 109.8 → 127.6 → 145.5 → 171.9,
+    frame height 275.6 → 311.3 on the tall door, and **the leaf's foot, the
+    sconce and the floor line identical to a tenth of a pixel on all six.**
+    `render` emits TWO boxes for this — `viewBox` tight around the door for the
+    bare-mode harnesses, `data-fit-*` the fixed scene for `fitStage` — because
+    framing every door in the tall-and-wide scene would have cost `npm run
+    profile` a third of its pixels on a narrow door (§8 has that bruise
+    already).
+  - **The alcove is gone** — reported as *"a gray box that frames it"*, which
+    is what a shaded plane seen dead square-on becomes. Its own docstring had
+    already recorded that its two depths were the only ones in the file not
+    taken off a photograph.
+  - **No sill at the foot of the door, and the frame grew a fourth return.**
+    `frame.threshold.present` across the thirty records: **16 yes, 14 no**, and
+    where present a median 0.0175 of leaf height against the 0.0205 we drew —
+    as a ribbed bar with eight lines ruled along it. The leaf now runs to the
+    floor `FLOOR_RUN` behind the wall plane, mitred into both jambs, with one
+    contact shadow where it actually touches. The hard contact line at the
+    wall's floor line went with it: two parallel rules 62 mm apart was the
+    original complaint, doubled.
+  - **The keyhole does not move.** `lockBackset` no longer reads the grip, and
+    the keyway-only lockset is drawn at `CYLINDER_AFF` like every other keyway
+    instead of at lever height — it used to jump 116 mm up the door. Choosing
+    between 49 mm and 60 mm for the single backset was NOT obvious: the pooled
+    median over all thirty records is 0.0695 (59 mm), and setting it to 60 cost
+    22 buildable combinations, including a wide door where picking a Coral
+    lever silently removed the customer's Idan bar. The interface lost to the
+    door; the measurement is written out in full at `lockBackset`.
+
+  **The hardware.**
+  - **The grab bar's drawing and its hitbox are the same object at last.**
+    `grabHandle` re-centred the bow on the leaf whatever x it was handed, and
+    silently shortened it against a hinge stop, while every rule reasoned about
+    the x. On a standard leaf with a lever the hinge-side rule refused anything
+    past 467 mm and the lockset rule — budgeting the bow's whole 320 mm as if
+    it stood on both sides of its axis — refused anything nearer than 562.
+    **No overlap: the bar had no legal position at all**, which is exactly what
+    was reported. `GRAB.len` is millimetres now rather than a fraction of leaf
+    width, the bow is drawn from its axis, the hinge-side rule exempts it, and
+    the lockset and glazing checks are interval overlaps instead of a symmetric
+    half-width. Placeable positions across the sweep: **66,628 → 82,203**, and
+    **zero** change in what any other grip can do (5,940 combinations swept
+    against the previous tree).
+  - **The recessed channel cannot be dragged** — it is cut into the leaf, not
+    bolted to it. One `fixed` flag, three readers: `gripAt`, `armGrip`, and
+    `repair`, because a rule only the page enforces is one a link walks past.
+  - **The rotate button is hidden, not greyed, when a grip cannot turn.**
+
+  **The catalogue — and `VERSION` went to 12.**
+  - **עיצוב חזית re-cut.** Both milled grooves withdrawn (aliased onto the lower
+    panel); **panel counts 1, 2 and 3** added; **strips priced by count** —
+    3, 5, 7, 9, 11 horizontal and 4, 6 vertical, because *"my father can put as
+    many stripes as the client wants, the more stripes the more it costs"*.
+    `PANEL_ROWS` gained `trio` and `top`, both derived from the measured pair
+    rather than invented beside it.
+  - **`hasUpperPanel` in catalog.js.** `panels === 2` was written out in SIX
+    places and would have been wrong in all six the moment a third panelled
+    face existed. One of those six carried a comment asking for exactly this.
+  - **Windows down to two**, חלון מלבני and צוהר אנכי, and **a panel now needs
+    the rectangle**: `panelFits` refuses glazing past 0.62 of leaf height,
+    which is where Peretz's own doors stop having room (seven with panels run
+    to 0.36-0.61; the three past it carry none). The slot is 0.79.
+  - **A `none` lockset**, and `DEFAULTS` is a bare door: no window, no grip, no
+    lock furniture. Whether Peretz will quote one is **ASK-PERETZ §13**, open.
+  - `VERSION` 11 → 12 because two lists were re-cut and the code packs indices.
+    Free today, as 11 was, and for the last time: nothing is deployed and no
+    code has ever reached a customer.
+
+  **The container turned out healthy, so everything was regenerated and the
+  round finishes fully green:** `npm test` 0 failed, `npm run sheets`
+  completed all four families, `npm run audit` clean at all seven viewports,
+  `npm run collide` clean over 1,224 designs.
+  ⚠ **`npm run audit` earned its keep twice in one run.** It caught the
+  `tablet` screenshot naming a door the new panel rule refuses — the shot's own
+  guard, working — and then it caught the UNDO BUTTON SHRINKING THE DOOR: above
+  1100 px `.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so a
+  control appearing in the strip below takes its height out of the drawing. The
+  leaf differed from a fresh load of its own identical link by **23,021
+  pixels**. That is the same fault that put the grip controls in the wall, and
+  `--grip-strip` is reserved unconditionally for exactly this reason; the undo
+  button reserves its box the same way now (`visibility`, not `hidden`, so it
+  still leaves the tab order). Nothing in `npm test` could have seen it: it is
+  a layout fact, and the string-level suite has no layout.
+
+  **And one thing this round did NOT cause, checked rather than assumed.**
+  `npm run latency` is red on the heaviest door — 706 ms against a 600 ms gate.
+  The same tool run against the PREVIOUS commit (`git archive HEAD` into a temp
+  tree, built there, same browser, same minute) measured **701 ms on the same
+  door**. It is the container, and the 66/142 figures this file had been
+  quoting were taken on a healthier one. Recorded in §0c with the method,
+  because the tempting thing to do with a red timing gate is tune the drawing
+  against it. The default door did get lighter: 378 elements to 159.
+
+  **The page.**
+  - **Tiles print what a thing COSTS, not the jump.** `priceParts` in price.js
+    is the one breakdown and `priceAgorot` sums it. The delta was wrong three
+    ways: it read "כלול" on the ₪620 grille you already had, it doubled under
+    you when you chose a sidelight, and it was never a property of the option.
+  - **An undo button**, under the door where the thing it changes is, hidden
+    until there is a step to take back. A stack, not a single previous state —
+    `repair` can change three axes from one tap.
+  - **The room does not change colour with the door.** `.layout[data-light]` is
+    gone: the one job of this screen is comparing colours and a ground that
+    shifts under the swatch makes every comparison a lie.
+  - **`DRAWING_CAVEAT`** — the page and the WhatsApp order both say the drawing
+    is a drawing and the installed door will differ slightly.
+
+- **Fourteen grille tiles collided on their own ids, and it was invisible
+  because the pixels came out right by luck.** `grilleGlyph` draws every
+  option's preview at a fake origin, `grillePaths(grille.id, 0, 0, S, S, …)`,
+  and the ironwork id generator only keyed off `x, y` — so all of them
+  produced the same sequence, `k0_0_0`, `k0_0_1`… Measured on the live choices
+  panel, no query string involved: **130 `k`-prefixed ids, 31 unique**, nine
+  tiles (grid, scroll, iron, quatrefoil, arch…) genuinely sharing
+  `id="k0_0_0"` with nine different `d` attributes. Per the SVG spec an id
+  resolves to the FIRST matching element in the whole document, not per `<svg>`
+  root — the same mechanism `copyOf` exists to fix for the gallery, one commit
+  earlier in the same round, and CLAUDE.md §5 by name: an id computed in one
+  place and consumed in another, never asked to be unique per document because
+  for years each glyph was the only thing on the page reading it.
+  ⚠ **And it painted correctly anyway, which is why nothing had ever caught
+  it.** Isolated before/after screenshots of the choices panel, with every
+  other change held constant: **0 px differ.** The browser's first-match-wins
+  behaviour happened to land on a `<path>` whichever tile drew first, and nine
+  colliding shapes did not visibly break because most of a grille's outline
+  survives on the other, non-colliding ids — the markup was invalid the whole
+  time and the picture never told anyone. `npm run audit`'s duplicate-id sweep
+  — added for the gallery — caught it on the order sheet as **99 duplicated
+  id(s)**, which is exactly `130 total − 31 unique`: not a sheet-specific
+  fault, the same live bug reached through a different door.
+  `uid` now keys off the grille's own id too. A `-light` variant still shares
+  its base pattern's `d`, and keeping the stripped name there recreated the
+  same fault at 41 remaining collisions — so the id uses the RAW name and
+  `-light` gets its own (byte-duplicate but valid) copy. 130 kids in, 130
+  unique out.
+  ⚠ **And the order sheet had a second, unrelated defect the same audit run
+  caught: two `<h1>`.** `.is-sheet .layout { display: none }` hides the base
+  page's heading visually, but `display: none` does not remove an element from
+  the DOM — so a printed document meant to be navigated by its headings
+  carried one hidden `<h1 id="stage-h">` competing with `buildSheet`'s own
+  `<h1 class="sheet__brand">`. `.layout` is now actually removed from the DOM
+  in sheet mode, not just hidden — nothing past that point in `?sheet=1` reads
+  it, since the sheet does not respond to clicks and never rebuilds.
+  Both verified with a full instrument pass: test ✓ 5,676,741 · audit ✓ (no
+  faults, was 2) · profile ✓ · collide ✓ (`all` / `boxes`) · recreate ✓ ·
+  latency ✓ · sheets regenerated clean. No id, price, code or `VERSION` moved.
+
+- **This file was rewritten for a fresh reader, and `ROUND5.md` was deleted.**
+  The change log had grown to 74% of CLAUDE.md and sat ABOVE everything a new
+  agent needs, so orientation began seventeen hundred lines in. The reading
+  order is now §0 → §10 with the log as an archive at the bottom, and three
+  sections are new: **§0a, who you are working for** — Peretz, and the person
+  who actually writes to you, including how they work and what they have
+  already decided — and **§0c, where it stands today**, which is the section to
+  distrust first because it is the one that goes stale fastest.
+  ⚠ **THE SECTION NUMBERS DID NOT CHANGE, ON PURPOSE.** Thirty-seven comments
+  across `js/`, `tools/` and `test/` cite `CLAUDE.md §5`, `§8`, `§1` and so on;
+  renumbering for a tidier reading order would have broken every one of them
+  silently, which is the same class of fault as a renamed id. §5 is still the
+  failure mode, §8 is still what will bite you. The file is reordered, not
+  renumbered — and the index at the top says so.
+  ⚠ Rewriting a document that is cited from thirty-seven places is a change
+  with a blast radius, and mine nearly went wrong twice: a regex meant for
+  internal references rewrote `REALISM.md §6` to `§7`, and a stray
+  `git checkout` earlier the same session discarded an hour of uncommitted CSS.
+  Both caught, both reapplied. Audit every cross-reference by hand.
+  `ROUND5.md` is gone: its five phases are complete, its instruments carry
+  their own headers, and the findings that were still open — d080's classical
+  composition, d067's three rectangles, the curved bow on d078, d071's arched
+  panel, the transoms, and the red / mustard / cool-grey doors the Rav Bariach
+  chart does not contain — are migrated into §9 rather than lost with it.
+  ⚠ And `ASK-PERETZ.md` gained **§12**, which `js/app.js` had been citing since
+  the order sheet was built and which did not exist: does Peretz order by the
+  opening or by the leaf, and is a door with a side light one opening or two?
+  A dangling citation in a file whose whole job is to be followed.
+
+- **The 40 KB byte gate is retired and `npm run latency` replaces it.**
+  REALISM.md G6 asked that a door's SVG stay under 40,000 bytes, and it was
+  measuring a quantity nobody pays: the string is built in memory and assigned
+  to `innerHTML`, so it never crosses a network — and **13,959 of the default
+  door's 43,714 bytes are XML comments**, 32%, because the renderer explains
+  itself to whoever opens the inspector. A byte gate is largely a gate on how
+  much the drawing documents itself, and **39,473 of 42,090 buildable designs —
+  94% — are past 40,000 bytes** (61% before this round's room).
+  What a customer feels is the DOM rebuilt under their thumb. Measured at 6×
+  CPU throttle on a 390×844 phone: **default 66 ms / 379 elements, sidelight
+  with ironwork 142 ms / 868, and the heaviest door the catalogue can build is
+  2,231 elements** — found by sweeping every axis rather than by guessing, and
+  it turns out to be a strip light with quatrefoil ironwork on a
+  leaf-and-a-half carrying a Shiran bar and an Almog swan-neck, not the door
+  anyone would have picked. Gate at 600 ms, with the arithmetic in
+  `tools/latency.mjs`.
+  ⚠ **Every one of those figures was written down wrong first**, and the shape
+  of the error is worth more than the numbers: the first sweep held the
+  HARDWARE fixed and found 2,139, and the byte counts were measured before the
+  same round's later commits added comments to the renderer. A number written
+  into prose is stale the moment the thing it describes is edited — which is
+  the argument for a gate that MEASURES over a paragraph that remembers.
+  ⚠ **That measurement settled an open question rather than opening one.** An
+  outside review proposed hoisting the palette to CSS variables so a colour tap
+  repaints incrementally. At 66–142 ms for the two doors measurable here the
+  refactor is not justified, and it would put a second way of producing the
+  drawing beside `render(state)` — the shape §5 is about. Not built, on the
+  number. Revisit if the gate goes red.
+
+- **⚠ CHROMIUM DIES IN THIS CONTAINER, AND THE INSTRUMENTS NOW SURVIVE IT.**
+  Headless Chromium here kills its own renderer under raster pressure at no
+  fixed threshold: `npm run shot` died on its second page, `npm run audit` on
+  its sixth viewport, a scratch probe after four. Verified against the
+  COMMITTED tree, so it is the container and not this round's changes — and
+  `--disable-gpu`, `--disable-dev-shm-usage`, `--single-process`,
+  `--num-raster-threads=1` and six other flag sets were each measured and none
+  of them help. `tools/screenshot.mjs` already met this once and its note has
+  the lesson: **the ceiling moves with load, so any constant fitted to it is a
+  guess with an expiry date.** So the tools stop retreating and learn to get
+  back up — `tools/browser.mjs` relaunches the browser and retakes the reading,
+  printing every relaunch so a run that needed six does not read as a quiet
+  one. ⚠ It is not a retry that turns a red check green: a crashed renderer is
+  the ABSENCE of a measurement, and anything that is not the browser dying is
+  rethrown on the first attempt.
+  ⚠ **What it does NOT fix: the raster itself, and THE CEILING FALLS AS THE
+  CONTAINER AGES.** Measured in order over one session: 834×1112 passed early;
+  1099×720 passed once and failed twenty minutes later; **1280×720 never
+  passed** — five consecutive fresh browsers, ten flag sets; and by the end a
+  620×1000 leaf crop would not rasterise at either scale (2× never returned
+  inside a 120-second timeout; 1× failed with
+  `Protocol error (Page.captureScreenshot): Unable to capture screenshot`).
+  Even 390×844, reliable all session, crashed on the last audit run. This is
+  not a width to stay under — it is the rasteriser degrading, and the only
+  cure is a fresh container.
+  So `npm run sheets` and `npm run audit` cannot complete here, and the four
+  sheet families are committed STALE with `npm test` red on exactly those four
+  assertions. They are not weakened and not deleted; they are correct and they
+  are telling the truth. One `npm run sheets` on a healthy container clears
+  them. ⚠ **Dropping `recreate`/`corpus`/`against` from 2× to 1× to squeeze
+  them through was considered and refused**: those three are read to judge the
+  DRAWING against thirty photographs, and halving their resolution to suit a
+  sick container is fitting the instrument to the room — the mistake
+  `tools/screenshot.mjs` has already recorded twice.
+
+- **The second mockup, built: tokens, chrome, structure first, and a room.**
+  `MOCKUP2.md` is the reading and `REALISM2.md` the decision; stages A–D have
+  landed. Radius became a scale (`--r-card` / `--r-tile` / `--r-chip` /
+  `--r-pill`), the accent is spent in its five places, the navigator is four
+  circles that are still a table of contents, the spec rows carry icons keyed
+  off `row.key`, the trust band came back to the desktop, **מבנה הדלת became
+  section 01** with no `VERSION` bump, and the door stands in an alcove with a
+  reflection in the floor. Every ⚠ in those two files saying "do not build this
+  as drawn" was honoured; the plants are cut on the byte ledger as they said.
+  ⚠ **Four of the plan's own numbers were corrected by measuring them.**
+  `--accent-ink` is `#7E6134` and not the proposed `#8A6A3B`, because that
+  colour was chosen against WHITE and the choices card is only white above
+  1100 px — on the paper a phone actually paints it measures 4.27:1 and misses.
+  The spec icons key off `row.key` and not `row.id`, which is the OPTION and
+  would need sixty-four entries. `tools/collide.mjs` needs no strip for the
+  floor reflection — a `<use>` builds a shadow tree that `querySelectorAll`
+  does not enter, and the sweep was re-run over all 1,490 designs to be sure.
+  And the room cost **+8,314 bytes and +44 elements** on every door against a
+  budget of ~1,400 bytes, which is over — and which the byte gate above was
+  retired for measuring in the first place.
+
+- **The order has a picture in it, and the opening is spelled out.**
+  `navigator.share({ files, text })` sends a PNG of the door with the same
+  message; https-only, because a canvas raster over `file://` throws, which is
+  the condition `shareUrl` already tests. Everywhere else the `wa.me` link is
+  untouched — the href is never hollowed out, so the label-and-href pact holds
+  for every route the handler does not cover. ⚠ Three outcomes, not two: a
+  customer who opens the share sheet and closes it must not then have WhatsApp
+  opened for them anyway.
+  And `handingWords()` in `js/spec.js` says **ציר בצד ימין, צילינדר בצד שמאל —
+  במבט מבחוץ** in the order and on the sheet. `פתיחה: שמאל, פנימה` alone is the
+  exact ambiguity that had this site building mirrored doors until 23.8.2026;
+  three facts together cannot be misread. Not in `specRows`, because that row
+  is also the one-line summary a 320 px phone has to fit.
+
+- **The page opens on thirty doors Peretz actually built.** `js/works.js` is
+  generated by `npm run corpus` from the same rows that write
+  `screenshots/corpus-links.md`, so nothing in it is typed — the derivation
+  exists because handing was typed on eight recreations once and was wrong on
+  four of them. ⚠ **Our drawings, not the photographs**: those are 63 MB in
+  `research/` and PLAN.md §8.1 is the promise that three files are the whole
+  site. ⚠ **Drawn as they scroll into view and UNDRAWN as they leave** — thirty
+  doors at once is 10,113 elements built inside a click handler;
+  clearing on exit matters as much as drawing on entry, or the grid just
+  accumulates. ⚠ **No prices in the file**: the page has one statement of what
+  a door costs and it is `priceAgorot` on the state being shown.
+
+- **`index.html?sheet=1&…` is an A4 order sheet.** The elevation with its
+  dimensions, every option as a row, the handing in words, the code and the
+  price — over `decodeCode`, `specRows` and `render`, which were already pure
+  and already exported. No second page and no second renderer: a `sheet.html`
+  would be a fourth file to copy and a fourth file to forget.
+
+- **⚠ AN ASSERTION WAS COUNTING PROSE.** The ironwork group asked
+  `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
+  document. About 32% of that document is XML comments, so the moment a comment
+  mentioned the attribute by name every door in the catalogue gained two
+  phantom panes and twenty-five assertions failed, none of them about anything
+  that had moved. Now `/\sdata-pane="/`, which is what the sentence beside it
+  always meant. **Prose is not geometry** — worth remembering the next time a
+  check greps the drawing for a word.
+
+- **Every price is in `js/prices.js` now — one screen of plain shekels.** The
+  70 numbers were inline in `catalog.js`, one `delta:` at a time, threaded
+  through 780 lines of colour measurements and hardware footprints. To change a
+  price you had to find it. That is fine for a codebase and wrong for the thing
+  this project is actually waiting on: the owner's son sitting down with his
+  father, who says the real figures out loud once. `PLACEHOLDER` moved with
+  them, so flipping it is the last edit of that same evening, in that same file.
+  ⚠ **Splitting money from vocabulary has exactly one failure mode** — a list
+  gains an option, nobody adds a price, `undefined` becomes 0, and the site
+  gives a door away in silence. So `priceInto` at the foot of `catalog.js`
+  THROWS at load on a missing price AND on a price for an option that does not
+  exist, naming the id. The two files cannot drift without the site refusing to
+  start, which is the loudest failure available and the right one for money.
+  Verified behaviour-identical: all **324,000** design prices captured before
+  the move and compared after — **0 differ**.
+
+- **ימין/שמאל IS ANSWERED, AND EVERY ORDER THE SITE PRODUCED WAS MIRRORED.**
+  The owner's son, 23.8.2026: *"at our app we are looking from the outside, so a
+  left door is a keyhole on the right."* One sentence, and it settles both
+  halves of the ambiguity ASK-PERETZ.md §1 had open for nine days — the side
+  AND the viewpoint. Measured before the fix, leaf spanning x 178–1028: a
+  `שמאל` door drew its keyhole at x=238, on the LEFT. Both `hinge` values in
+  `HANDINGS` were the wrong way round, so the door Peretz was told to build was
+  the mirror of the door on the customer's screen. The single item in
+  ASK-PERETZ.md flagged as costing real money, and it was live the whole time.
+  ⚠ **No `VERSION` bump, and know why before you touch this list again:** the
+  short code stores the INDEX of `HANDINGS`. Ids and order are untouched — only
+  a property changed — so every code ever written still decodes to the same
+  entry. REORDERING those two rows would require a bump. Changing what they
+  mean did not.
+  Pinned by a test that asks **where the keyhole is drawn**, across every size ×
+  lockset × handing — deliberately not by reading `HANDINGS[].hinge`, because
+  that field is what was wrong. A test that read it would have agreed with the
+  bug, which is the same trap §5 keeps describing.
+  **What is left before launch is now one question:** a starting price per size
+  band (ASK-PERETZ.md §5). Everything else degrades gracefully.
+
+- **`npm run collide -- boxes` printed a ✗ and then exited green, and the ✗ was
+  three millimetres of shadow.** Two independent faults in one reader, plus the
+  32 stale sheets that had the branch sitting red.
+  ⚠ **`MOUNT_REACH is short by 3 mm` was never true.** The reader took
+  `getBBox()` on each `[data-mount]`, and on a wrapping group that returns the
+  union of its children — including the cast shadow `disc` draws INSIDE the
+  rosette's own group at `cx + 3`. Whole group 124 mm; the metal alone **121,
+  exactly `MOUNT_REACH`**, the difference being the shadow's own x offset to the
+  millimetre. So no measured number moved. It is the third outing of the fault
+  §8 already records by name — *a drop shadow is not an object* — in the one
+  reader in that file never handed `metalBox`, which has skipped `[filter]`
+  since the day it was written.
+  ⚠ **And the first fix hid five of the six fittings.** `metalBox` walks
+  `querySelectorAll`, which finds DESCENDANTS only, so a bare
+  `<circle data-mount="shiran-disc">` returned null and was skipped. Every
+  `data-mount` but the rose is a leaf shape — two backplates, a slab, two
+  plates, the discs — so it measured one of six and called it the deepest.
+  Caught only because the grip line vanished from the output: §5, from inside
+  the instrument that exists to catch §5. It takes the root when the root is a
+  shape now.
+  ⚠ **The gate could not fail.** `if (deepest.reach > MOUNT_REACH)
+  process.exitCode = 1` was followed by an unconditional
+  `process.exitCode = bad ? 1 : 0`, which threw the verdict away one line after
+  it was made — so the command exited GREEN while printing ✗, and the note over
+  `MOUNT_REACH` saying it "fails if it has grown" was false. Falsifiable both
+  ways now: 118 gives exit 1, 121 gives exit 0.
+  ⚠ **32 of 33 sheets were the pre-mockup page.** `1649e9d` stamped all of
+  them; `37fc142` then rewrote `css/app.css` +522, `index.html` +145 and the
+  bundle, regenerated ONE screenshot, and never re-stamped. `phone.png` came
+  back 68 px taller and `laptop.png` 32% different, byte-identical across two
+  regenerations. Not the container ceiling — `npm run sheets` completed here.
 
 - **The door + surroundings design pass — planned, and reconciled with what
   already SHIPPED.** Looking at the live site, the owner asked what the DOOR and
@@ -1640,591 +5683,3 @@ facts a fresh context needs. Detail lives in the section it belongs to.
   right and visibly wrong.
 - **Assets are cache-stamped** (`?v=<hash>`) or a deploy never reaches a
   returning browser.
-
----
-
-## 0. What this is
-
-A door configurator for **דלתות מגן** (Dlatot Magen), Rishon LeZion. The
-owner is **PERETZ** — the user's father.
-
-**Its one job (PLAN.md §0):** a customer picks a door and hands Peretz an
-order he can act on **without a single clarifying question** — normally by
-tapping a WhatsApp button, sometimes by reading a short code down the phone.
-
-Every decision follows from that. Silent data loss on a shared link, or an
-option that means one thing on screen and another in the message, is the worst
-failure this site can produce. It is worse than a crash, because a crash is
-visible.
-
----
-
-## 1. Standing constraints — do not violate
-
-- **Branch:** develop on `claude/door-builder-website-plan-rgg7gu`. **Never**
-  push to another branch without explicit permission.
-- **Never open a pull request** unless explicitly asked.
-- **Ids in `js/catalog.js` are a public wire format.** They travel inside
-  links and WhatsApp messages that Peretz may open months later. Never rename
-  an id; keep every superseded id in `aliases`. To retire an option, alias its
-  id onto the nearest real one.
-- **The short code stores INDICES**, which no alias can rescue. Any change to
-  the option order or the bit layout requires a `VERSION` bump in
-  `js/url-state.js`, so an old code is *refused with a notice* rather than
-  decoded into a different door.
-- **All money is in agorot (integers).** Never floats.
-- Never disable TLS verification or unset `HTTPS_PROXY`.
-- Prices, colours and options are `PLACEHOLDER = true` until Peretz answers.
-
----
-
-## 1b. One gotcha that has cost three builds
-
-**Never put a backtick in a comment inside `renderer.js`'s SVG template
-literals.** The whole drawing is one big template string, so `` `like this` ``
-in a prose comment terminates it and the file stops parsing. It reads as
-`SyntaxError: Unexpected identifier` pointing at an innocent word. Write the
-name plainly instead. `node --check js/renderer.js` catches it instantly —
-and `npm run build` will happily leave the previous bundle in place if you
-have silenced its output, which is how it survives to be noticed later.
-
----
-
-## 2. Shape of the codebase
-
-Buildless static site. Plain HTML/CSS/ES modules; `tools/build.mjs` bundles to
-one classic IIFE so `index.html` works from `file://` — Peretz opens the
-folder on his own laptop (PLAN.md §3, §8.1).
-
-```
-index.html          the page: stage, choices panel, send panel
-css/app.css         RTL-first, logical properties throughout
-js/catalog.js       every option. THE WIRE FORMAT. Read the header.
-js/renderer.js      the door. Pure: render(state) -> SVG string. ~2400 lines.
-js/url-state.js     state <-> URL, and the short code (BigInt, see below)
-js/price.js         agorot only
-js/share.js         the WhatsApp message — this is the product
-js/colour.js        darken / lighten / scaleTone / contrast / silhouette
-js/app.js           wiring; fitStage() widens the viewBox to the stage
-test/units.mjs      ~1.96M assertions, no framework
-tools/*.mjs         measurement instruments, not scripts (see §7)
-research/works/     129 door photographs (one is the logo) + 33 measured records
-                    INVENTORY.md: every fitting in the corpus, and whether we draw it
-```
-
-**Commands:** `npm run build` · `npm test` · `npm run audit` ·
-`npm run shot` · `npm run hardware` · `npm run recreate` · `npm run frame` ·
-`npm run glass` · `npm run mottle` · `npm run measure` · `npm run ask` ·
-`npm run leaf` · `npm run triage` · `npm run profile` · `npm run collide`
-
-`npm test` is string-level. `npm run audit` opens the real page at five
-viewports and clicks every option in every group — everything that lives in
-layout, CSS or event wiring is invisible to the unit tests.
-
----
-
-## 3. The drawing's model
-
-Authored in **real millimetres**. `render(state)` is pure.
-
-### The scene
-The room runs `SCENE = 4200` units past the drawing in every direction, and
-`fitStage()` in app.js widens the viewBox to the exact shape of the stage.
-The door does not move or resize — `meet` would pick the same scale — but the
-crop lands on wall and floor instead of on letterbox. **Bare mode
-(`?bare=1`) skips this**, because the measurement harnesses want the drawing's
-own frame.
-
-### The light
-`LIGHT` in renderer.js. Key is high and ~30° left of camera; lit is warm,
-shadow is cool. `FALLOFF` holds the vertical falloff, retargeted on the median
-of thirty measured doors, split light/dark.
-
-### The frame
-- `CASING = 46` — the flat face against the wall. **One plane, one gradient.**
-  It was three separately-toned rectangles butted at the corners, and the butt
-  joint showed as a hard horizontal line across the top of each jamb.
-- `RETURN = 62` — **both** jamb returns, equal. They were 78/46, an off-axis
-  view that nothing else in the drawing agreed with.
-- `RET_HEAD = 148` — the soffit, deepest of the three.
-- The three planes of the opening are drawn as **trapezoids**, so the corner
-  mitres are real geometry, not a line drawn on top hoping to suggest a corner.
-- `EDGE = 38` — the reveal, three ramps perpendicular to their own edges, in
-  black at falling alpha so it multiplies the surface underneath.
-
-### The leaf
-`leafW = size.w - REBATE*2`, `leafH = size.h - REBATE`. SIZES gives the
-structural **opening**, not the leaf; drawing them as the same thing made every
-door too squat.
-
-### The leaf's vertical fall
-`FALLOFF` was fitted to a nine-row median across thirty doors, written into its
-own comment — and for a long time nothing asked the DRAWING whether it still
-produced those rows. `npm run mottle` divides the vertical fall OUT to measure
-sideways unevenness, and every other instrument looks at one object. So the
-number the whole lighting model rests on had no check on it.
-
-`npm run profile` is that check now, and it earned itself immediately: `bloom`,
-the pendant reflection in the upper third, was scaled by `fall.peak` — which is
-*larger* on dark paint than light — while its own comment said it "barely
-registers on dark paint". It made the top too bright, and because the rows are
-relative to the leaf's own brightest row, the whole lower half read as too
-dark. Worst row 0.163 off the median; now 0.040.
-
-**The symptom was nowhere near the cause.** What got reported was that on a
-two-panel door the LOWER panel looked flat where the upper was modelled. Both
-panels are the same construction and the same paint, so a difference between
-them can only come from the leaf underneath — which was plunging through the
-middle and flattening at the foot, so the upper panel straddled the plunge and
-the lower sat in the dead tail. Nothing was wrong at the bottom.
-
-### Applied mouldings — the "designed" face
-**A panel on these doors is not a panel.** It is a strip of moulding 60–90 mm
-wide laid on the face in a rectangle, and **the face inside the rectangle is
-the same plane, the same paint and the same texture as the face outside it.**
-
-`MOULD` is the measured cross-section off d048, sixteen stops, carried as a
-gradient across four mitred trapezoids — one per side, because each run sits at
-a different angle to the key. `MOULD_SIDE` holds the per-side gain, and it
-scales the moulding's **relief** — never its absolute tone.
-
-That distinction is the whole of a bug worth remembering. `MOULD` begins and
-ends at tone 1.00, the paint exactly, because a moulding meets the same flat
-face on **both** sides. The gain used to multiply the whole run, endpoints
-included, so the top run's edges came out 1.10× the paint and the bottom run's
-0.87×: a light rim above the field and a dark rim below it, which is precisely
-how one shades a raised panel. The drawing was contradicting the paragraph
-above it, and it was reported from the outside as the panel "bulging". Pinned
-now by `the face inside a moulding is the face outside it`, which asserts every
-run's end stops equal the paint, for every colour.
-
-Both ways of getting this wrong were reached on the way: fine lines alone
-leave the band flat and it reads as an outline etched into the door; fat lines
-turn it into a black picture frame painted on. The photograph shows a
-**sculpted ramp with quirks cut into it** — mass *and* detail.
-
-The window surround uses the same primitive. It is the same object.
-
-**The inset has been wrong in both directions.** It started at 0.18, was
-"corrected" to 0.13 by a pass that read six doors off a contact sheet, and both
-make the panel too WIDE — so a pull bar was drawn straight across the panel's
-stile. Settled by an edge-gradient ruler over the photographs, which agrees
-with the hand-measured records and not with 0.13: real panel edges sit at
-**0.21–0.39** of leaf width, and the two doors carrying an upper *and* a lower
-panel are at 0.23. `PANEL_INSET` is 0.23, and it yields further (to a measured
-maximum of 0.39) to leave a flat stile for a pull bar — which is exactly what
-d087, the one door with both, does.
-
-### The glass
-Clear glazing is a quiet diagonal gradient plus a soft sheen, and this is the
-one place where a measurement was taken, acted on, and then **deliberately
-reverted**.
-
-`npm run glass` measures the pane in five bands against the leaf beside it, on
-tone and on *spread* — the contrast INSIDE one band. The corpus runs 1.0 to
-1.35 and a gradient of any kind runs 0.1, so a `paneScene()` was built: a
-drawn street, skyline, building opposite, planting, pavement, in many small
-elements. It hit the number. It also made every window the busiest thing in
-the drawing, and the owner said plainly that the old one looked better. He is
-right, and the reason is worth keeping: **a configurator is not a
-photograph.** Its job is to show a customer their door, and a pane that
-competes with the door for attention is working against that whatever it
-measures. The tool stays as a description of what a photograph does, not as a
-target to hit.
-
-(One finding survives from that attempt and is still true of anything drawn in
-a pane: contrast made of six large blocks scores almost perfectly on spread and
-looks like a De Stijl painting. The metric is satisfied by any high contrast at
-all.)
-
-Obscured and reeded glazing are patterns a customer chose, so they stay
-patterned. They measure 0.18–0.56 of the leaf's tone: DARKER than the paint,
-because behind them is an unlit hall rather than a street. Drawn pale they read
-as white plastic let into the door.
-
-### Withdrawn: add-ons, and the handle finish
-Two groups are gone at the owner's instruction — he does not sell them, so
-offering them priced the door for work that would not happen.
-
-- **Add-ons** (peephole, letterplate, ring knocker, door closer, nameplate) —
-  the only multi-select group there ever was, packed into the short code as a
-  bitmask.
-- **The finish** (brushed nickel, matte black, brass) — now a property of the
-  product rather than a choice. `FINISHES` survives as the tone table the
-  drawing needs, and `effectiveFinish` answers "whatever the grip declares,
-  else nickel": the brass Shiran is the only grip that departs.
-
-Both ids and both URL parameters (`a`, `f`) stay **retired for good**. A link
-in somebody's WhatsApp history still carries them, so `fromQuery` ignores them
-deliberately and without a notice — withdrawing an option is our change, not
-that customer's mistake. Never reuse either letter for anything else. The
-short code's VERSION moved to 9 because the bit layout did.
-
-The corpus disagrees with the finish withdrawal and the disagreement is on
-record: six of the ten recreated doors carry brass or black hardware. That is
-a question for Peretz (ASK-PERETZ.md §2b), not a reason to keep the tiles.
-
-### The cabinet — two levels
-The choices panel opens on **four sections** — מראה הדלת, חלון וזכוכית,
-ידיות ומנעול, מידה ופתיחה — each of which opens onto its own categories, each
-of which opens onto its options. One open at a time at both levels.
-
-It has been flattened twice, in the same direction, for the same reason: a
-customer arriving cold should see a handful of questions they already have
-opinions about, not a parts catalogue. First every option was folded behind its
-category (eleven headings), then the categories were folded behind these four.
-Four is the floor — a section holding one category is a click that reveals a
-click.
-
-`SECTIONS` and `GROUPS` in app.js are the whole thing; a group names its
-section with `in`. `npm run audit` asserts that nothing is open on first paint
-and drives BOTH levels to reach every option, because a category nobody can
-click looks exactly like a working page from anywhere else.
-
-### Rules — `js/rules.js`
-One table, read by the tiles, by `fromQuery` and by the price. A rule that
-lives only in the interface is a rule a shared link walks straight past. Two
-kinds, and the distinction is load-bearing: **observed** (zero of 31 measured
-doors) and **geometric** (computed from the renderer's own numbers, so it
-cannot drift from the drawing).
-
-What it currently refuses, and why:
-
-| refused | kind | evidence |
-| --- | --- | --- |
-| grille or glass treatment with no glass | geometric | nothing to apply it to |
-| line work + glazing, line work + panel | observed | 0 of 31; 11 and 10 separately |
-| grip / lockset that would cross the glazing | geometric | `gripClashesGlass`, `locksetClashesGlass` |
-| grab bar + a centred window | geometric | the bow is centred on the LEAF |
-| a lockset leaving no room for any grab bar at all | geometric | the bow gives up length, then gives up |
-| a window that leaves NO lockset room | geometric | `duo` on the 800 mm leaf reaches to 100 mm of the closing edge |
-
-**Every grip works with every lockset**, on every size — 90 of 90 pairings.
-There WAS an observed rule refusing a pull bar beside a lever (0 of the ten
-installed bar doors has one), and it was withdrawn at the owner's request:
-move the bar, do not refuse the sale. Zero occurrences in a gallery of his
-favourite work is not the same as "cannot be built", and nothing geometric
-stops it — `gripStandoff` floors the gap at `lock.in + grip.out + LOCK_CLEAR`,
-so the bar simply sits further inboard. The overlap that prompted the rule was
-a footprint lying about the lever's reach, fixed separately.
-
-That rule was hiding two things, both now fixed. The horizontal grab bar is the
-one grip centred on the LEAF rather than hung off the stile, so `gripStandoff`
-never moved it — it slides toward the hinge now, and gives up length rather
-than position when the stile runs out. And it drew its OWN lever, left over
-from when "lever + grab bar" was a single product, so a grab bar beside a
-cylinder drew a lever nobody chose.
-
-What it costs is recorded rather than hidden: a bar clearing an Almog swan-neck
-stands 0.30 of the leaf's width in, so the geometric GLASS rules refuse more
-window combinations than before. Those stay — a bar across a pane is a
-different claim from a bar beside a lever.
-
-`repair()` moves a design to the nearest buildable one and says what changed.
-It must be idempotent, and it must always LAND somewhere buildable — asserting
-that, rather than that the result looks right, is what found a grip whose
-finish settled the drawing but never the state, and later a repair that
-answered "become the cylinder" to a door where the cylinder does not fit
-either, over and over.
-
-Two ordering constraints in `repair()`, both learned by breaking them:
-glazing repairs run **before** line-work repairs, because turning a window on
-is what makes line work impossible; and the "no glass, so no grille and no
-obscure glazing" cleanup runs **last**, because three of the repairs below it
-can take the window away and leave a grille behind with nothing to sit in.
-
-### Hardware — two groups
-- **`HANDLES` = the grip** (what you pull): none, idan, ella, nitzan, shahar,
-  ron, shiran, blade, grab, channel.
-- **`LOCKSETS` = the lock furniture** (what you turn, and the keyway): coral,
-  cylinder, plate, cadoor, sapir, almog, knobplate, digital, square.
-
-Every door has a lockset; the grip is optional. They were one list, which made
-"Idan bar + Rotem backplate" — a combination Peretz installs constantly —
-unreachable.
-
-Placement: the lockset owns the stile at `lockBackset()` — 60 mm normally,
-49 mm on a door with a grip (measured: the fitter makes room), and never closer
-to the closing edge than the fitting is wide. The grip stands off inboard by
-`gripStandoff()`, which clears the lockset and dodges the glazing where there
-is room.
-
-`handleFootprint()` returns `{ out, in, vy }` — outboard, inboard, half-height
-— and every one of those numbers is **measured off the drawing** with
-`npm run collide -- boxes`, never asserted. It used to return a symmetric `hx`
-plus a separate `reach` that the clearance check ignored, on the argument that a
-lever sits ~30 mm proud and a bar ~50 mm on standoffs so the blade sweeps
-behind it. True of a real door, false of a picture seen square-on, and it drew
-a lever through a pull bar on 862 designs (§5, item 10).
-
----
-
-## 4. Rules the drawing obeys
-
-**The tint rule.** A darkening overlay must be **pure black** (black at alpha
-`a` multiplies every channel by `1−a`, so hue survives) or **the material
-itself**. Any partial *tinted* black both mutes the colour and announces
-itself as a layer. This shipped twice and was reported twice: a warm near-black
-at the leaf's foot turned every saturated door brown. Pinned by a test.
-
-**`scaleTone`, not `lighten`, above 1.0.** A measurement arrives as a
-multiplier. `lighten(hex, 0.13)` raises a mid grey 16% and a dark navy 46%, so
-one measured number would mean something different on every colour. Below 1.0
-`darken(1−m)` *is* multiplying by m, which is why the shadows in this renderer
-were already right and the highlights were not.
-
-**Square-on discipline.** Leaf, frame, threshold, mouldings and hardware are
-all drawn dead square-on. Anything that implies a different viewpoint — a
-standoff projecting sideways, unequal jamb returns — is the only thing in the
-picture announcing an angle nothing else shares, and it reads as an error.
-
-**Photographs are honest about one door at one hour.** A configurator has to
-hold for every door at every hour. The most photographically faithful choice
-is often wrong at drawing scale: the sunlit far jamb, the black gasket, the
-horizontal light direction were all *correct in the photo* and wrong here.
-
----
-
-## 5. The failure mode that keeps recurring
-
-**Things that vanish rather than break.** Twelve so far:
-
-1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
-   nothing at all.
-2. `raisedPanel` returned `''` below 300 mm, silently dropping the panel on 84
-   window+panel combinations.
-3. A refactor's regex deleted the `edgeShade` gradient while the rect
-   referencing it stayed. SVG paints nothing for a dangling `url()`, so the
-   leaf-to-frame junction — measured across twenty doors two commits earlier —
-   rendered as **nothing**, and shipped.
-4. `keyLight` had **never** been defined, so every panelled door ever drawn had
-   a flat field where the light should cross it.
-5. Nine of fifteen handle tiles drew the **same picture**: the glyph knew four
-   styles and sent the rest to one `else`. Nine names, nine prices, one
-   picture.
-6. Three detail tiles showed a cheaper option's picture — found the moment the
-   test for #5 existed.
-7. The finish option charged up to ₪220 and changed no pixel for four handles,
-   and the message went out reading "Shiran, matte black" — a door that does
-   not exist.
-8. The same thing again, in a place the fix for #7 did not reach: the five
-   pull-bar gradients are absolute hexes measured off product photographs, so
-   **a pull bar ignored the finish entirely**. Matte black gave polished steel,
-   ₪220 was charged, and the drawing changed anyway — because the LEVER beside
-   the bar recoloured — so "a priced option changes the door" passed. The
-   assertion has to name the object, not the document.
-9. `tools/glass.mjs` held our own numbers in a constant with a comment saying
-   "re-measure when the pane changes". The pane was rebuilt and the constant
-   was not, so the tool reported the rebuild as having done nothing.
-
-**10–12 are one sub-family: a quantity computed in two places.** Two
-computations of the same number is not redundancy, it is a promise that
-somebody will change one of them. Every instance below was reported from the
-outside — by the customer, or by a browser console — while `npm test` was green.
-
-10. `handleFootprint` returned what the catalogue **declared** a fitting
-    occupied, and the clearance sweep compared those declarations. The lever's
-    `reach` was deliberately outside the declared footprint, on the argument
-    that a blade sweeps behind a bar on standoffs — true of a real door, false
-    of a picture seen square-on. So the drawing put a lever's blade **through**
-    a pull bar on 862 designs and the sweep passed every one. Fixed by
-    measuring the footprints off the art (`npm run collide -- boxes`) and by
-    `npm run collide`, which asks the browser for each object's real `getBBox`
-    and never consults a declared number at all.
-11. `render()` and `glassClearance()` both worked out how far the glass was
-    from the lock — one to the pane's edge, the other to the moulding's, 40 mm
-    apart. The drawing placed the recessed channel across the surround on 48
-    designs while `conflicts()` said the door was fine. Fixed by having
-    `render()` call the rules' version.
-12. The same again, ten lines below: `render()` derived the width available to
-    a centred plate itself instead of asking `plateRoom()`, and its version
-    walked a leaf width inboard **from the lock** rather than from the hinge —
-    so on every door with no pull handle the nameplate came out zero wide with
-    a `width="-24"` border inside it. A negative width is not a small rectangle;
-    the browser logs an error and draws nothing. Nothing in `npm test` parses
-    the SVG, so only `npm run audit` — which watches the console — ever knew.
-    (Both the nameplate and `plateRoom` have since been withdrawn with the rest
-    of the add-ons. The assertion against negative geometry stays.)
-
-None threw. All looked like a working page. **Tests catch wrong output easily
-and absent output almost never**, unless someone goes looking on purpose.
-
-So every feature ships with an assertion that it is **present and distinct**,
-not only that it is correct:
-
-- `no dangling gradient or filter references` — every `url(#id)` resolves.
-  Sweeps every handle × finish, every grille, every detail, every size.
-- `every grille draws something`
-- `every option tile draws its own picture` — compares the *markup* of every
-  tile against every other, across all six groups.
-- `a priced option changes the door, and a free one does not` — money and
-  pixels move together, in both directions.
-- `the grip clears the lockset` — exhaustive: every grip × lockset × size ×
-  handing × window.
-- `npm run collide` — renders in a browser and asks every drawn object for its
-  own `getBBox()`. No declared number anywhere in the loop, so it cannot be
-  fooled by a footprint the catalogue asserts and the drawing ignores.
-- no negative `width`/`height`/`r`/`rx`/`ry`/`stroke-width` in any render.
-- `the face wash does not tint the paint` — the tint rule.
-- the moulding must draw all four sides, they must take different light, and
-  **nothing may fill the interior**.
-
----
-
-## 6. Measure before fixing
-
-Twice now the obvious fix would have been wrong:
-
-- Beside a photograph our leaf looked blotchy; the move was to turn the drift
-  down. Measured (`npm run mottle`): photographs 0.089 and 0.155, ours far
-  below both. The conclusion held and still holds — we have *less* unevenness
-  than a real door, not more.
-  ⚠ This line said **0.032** for a long time after it had stopped being true.
-  `drift` was halved and the number was not, so the record described a leaf we
-  had stopped drawing; a plain leaf measures about **0.016**. The tool now
-  renders our leaf and measures it on every run rather than waiting for
-  somebody to hand it a PNG — which nobody ever did, which is exactly why the
-  figure was able to rot here unnoticed. Do not re-copy it into this file.
-- I "corrected" the frame returns 3× narrower using the corpus field `reveal`
-  — which is the shadow *gap*, not the returns. Wrong quantity entirely.
-
-And once the measurement itself was misread: I planned a rebuild around "frame
-face lighter than leaf". Corpus median `face_vs_leaf` is 0.99. I had been
-looking at the wall.
-
-A vsync-bound benchmark also nearly sent me optimising paint that was already
-5 ms of work. **If a number can be got, get it before changing anything.**
-
----
-
-## 7. The instruments
-
-These are not scripts, they are measuring devices. Each exists because
-something was tuned by eye against nothing and landed on "slightly better".
-
-| tool | what it answers |
-|---|---|
-| `npm run audit` | five viewports, every option clicked: overflow, clipping, stale price/code/link, shared codes, 44 px tap targets |
-| `npm run recreate` | a measured photograph beside our render, leaf heights matched |
-| `npm run frame` | our reveal, measured the way the photographs were |
-| `npm run glass` | what is inside the pane, band by band, against the corpus |
-| `npm run mottle` | slow horizontal unevenness of the paint |
-| `npm run profile` | the leaf's VERTICAL fall, against the medians FALLOFF was fitted to |
-| `npm run measure` | contrast, profile, warmth, texture — ours vs photographs |
-| `npm run hardware` | close crops of every grip, every lockset, and pairings |
-| `npm run shot` | the whole page at twelve sizes and designs |
-| `npm run leaf` | the leaf box in all 129 photographs — see the warning in its header |
-| `npm run triage` | descriptors, clusters, and the contact sheets |
-
-**Tools must ask the page, not assume.** FOUR of them have now held constants
-that silently stopped being true: a `0.735` leaf-height ratio, a viewBox origin
-assumed to be zero, crop fractions of the whole picture, and — found in round
-five — `glass.mjs` holding OUR OWN measured numbers in a constant, so a rebuilt
-pane was reported as unchanged. They read `#leaf rect`'s bounding box now, and
-glass.mjs opens the page.
-
-**A contact sheet triages; it does not measure.** Round five read six doors off
-a 150 × 330 tile as carrying a long backplate and built one. Measured with a
-ruler drawn over the crop in units of leaf height, every one is 84 × 230 mm —
-the plate we already had. When a number matters, put a scale on the picture. `tools/hardware.mjs` and `screenshot.mjs` are
-driven from the catalogue, because a hand-kept copy had drifted onto handles
-and colours that no longer existed.
-
-Scratch harnesses go in `tools/_*.mjs`, which is gitignored.
-
----
-
-## 8. Things that will bite
-
-- **BigInt is required** in `url-state.js`. JS bitwise ops truncate to 32 bits
-  and the code layout is 40. The build targets es2020 for this reason.
-- **The short code is an ENCODING, not a hash.** It must decode without a
-  server, because its whole purpose is being read aloud on the telephone.
-- **`fromQuery` never silently substitutes.** An unrecognised option sets a
-  `notice` and the customer is told.
-- **The RTL interface never mirrors the drawing.** `.door-svg` is pinned
-  `direction: ltr`. A right-hinged door is a physical fact; flipping it means
-  ordering the wrong door.
-- **`usedDefs()`** prunes the SVG's defs to what the drawing points at (333
-  nodes → 252). It is derived from the markup, not from a list, because a list
-  goes stale in silence and its symptom is a dangling `url()`.
-- **Blocked options are `aria-disabled`, never `disabled`** — still focusable,
-  still clickable, and they say why. Playwright's actionability check refuses
-  them, so the audit uses `el.click()`.
-- **`minmax(0, 1fr)`, never a bare `1fr` or an implicit `auto` track**, on any
-  grid containing the stage. An `auto` track is floored at its content's
-  min-content width, the stage's content is an SVG whose intrinsic size comes
-  from a viewBox that `fitStage` widens to match the stage, and the loop
-  settles 67 px past the edge of a 320 px screen.
-- **The short code is eight body characters and its VERSION field is four bits.**
-  Version 8 does not fit in three, so a decoder built for this layout reads an
-  older code's version as 14 or 15 and refuses it — which is wanted, and the
-  length check refuses it a line earlier anyway.
-- **`research/works/auto/leaf.json` is a fallback for 41 of 129 doors, and 27
-  of those share ONE box.** `src` says which: 57 `auto`, 31 `hand`, 41
-  `fallback`. A fallback entry is a generic centre rectangle, not a measurement
-  — on d124 and d099 it lands on a neighbouring window and on the fixed
-  side-glazing respectively, and on d076 and d080 it bounds the leaf's raised
-  PANEL rather than the leaf. Anything cropped from it is a picture of
-  somewhere near the door, and any leaf-relative fraction taken off such a crop
-  is scaled by an unknown factor: measuring d035's tube on its fallback tile
-  gives 0.043 of leaf width against 0.022 on the original, which is a whole
-  product category of error. **Check `src` before you measure**, and read the
-  original in `research/works/doors/` when the number matters. This has already
-  put one wrong figure into a specification and it will do it again.
-- **A DROP SHADOW IS NOT AN OBJECT, and two tools have to agree about that.**
-  `metalBox` in `tools/collide.mjs` has always skipped elements carrying a
-  `filter`; the sweep in the same file measured whole `[data-hw]` groups, which
-  include them. The two asked different questions for three rounds without
-  anybody noticing, because every shadow offset was a small constant. They
-  scale with the fitting now — a bar standing 40–50 mm off the leaf throws a
-  shadow a full bar-width clear of itself — and the disagreement surfaced
-  instantly as 165 "collisions" where a bar's shadow crossed a lever with 12 mm
-  of air between the metal. The sweep strips them now, for the same reason it
-  already stripped `data-relight` and `data-hitpad`.
-
----
-
-## 9. What is still open
-
-**Blocked on Peretz** (`ASK-PERETZ.md`): the ימין/שמאל handing convention —
-the only mistake on the list that costs real money — prices per size band,
-which colours he stocks and which cost extra, which grips and which locksets he
-orders, which finishes each comes in, the distance/pricing contradiction, and
-permission to use the photographs.
-
-**Done in round five** (`ROUND5.md`): the glass rebuild — spread now measures
-1× the corpus in every band, from 6–21× too flat — and clear / obscured /
-reeded as a real option.
-
-§7.3 lists the eight kinds of photograph that would unlock the rest, ranked.
-Square-on matters more than good lighting.
-
-**Also open, from the gallery:** the metal strips appear both vertically
-(d043) and horizontally (d078) and we draw one orientation; d067 carries three
-moulded rectangles, not two; d080 is a full classical composition — cornice,
-pilasters, plinth — we have no vocabulary for.
-
-**Not started:** CI, deploy to `design.dlatotmagen.co.il`, prerendering the
-default door into `index.html`, English and Russian.
-
-⚠ The **mobile sticky CTA** used to sit in that list and it SHIPS — `.dock` in
-`index.html`, `position: fixed` at the bottom below 1100 px, price and green
-button both. It stayed listed as unbuilt long enough that an unattended agent
-could have built it a second time. A finished feature filed under "not started"
-is worse than no list at all.
-
----
-
-## 10. How to work here
-
-Commit messages in this repo explain **why**, at length, and name what was
-wrong before. That is deliberate: most of the value in this history is the
-record of what did not work.
-
-The rule that governs the drawing, from REALISM.md §6:
-
-> **Compare against a photograph, every time.**
-
-Every realism pass tuned by eye against nothing landed on "slightly better"
-and stayed there.

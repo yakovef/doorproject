@@ -23,6 +23,1876 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-30 05:40 UTC — run 57: nothing worth changing — verified a completed round finishing Peretz's remaining notes
+
+**Looked at:** `git fetch` pulled two human commits since run 56, completing
+the "renderer work" that `88b6da8` had deliberately left pending —
+`ada5f20` ("The קודן and the כספת redrawn off Peretz's photographs and
+moved to eye level, the stripes made to follow the finish, and the brass
+warmed") and `05602d4` ("A פעמון and a עינית, VERSION 20, and a brass that
+was two different metals in one file"). Together these finish all eleven
+items from his 30.8.2026 notes: the digital keypad (קודן) was redrawn as
+the correct MECHANICAL push-button product (it had been drawn as the
+already-separate digital lock), both special-lock fittings moved from
+knee height to eye height (measured off two anchor points — the peephole
+and the corpus-fixed lever height — across his four attached photographs),
+a finish-precedence rule was settled from two of his sentences that only
+resolve together (פרזול recolours the stripes, a grip's own tone does
+not), the brass ramp was corrected twice in one day (photograph-measured,
+then found to disagree with the Ella bar's own trusted gradient by more
+than double — fixed to agree), and two new fields shipped (bell `bl=`,
+peephole `ey=`, both defaulting to "none" even though the peephole is
+priced free, on the same "nothing appears the customer didn't choose"
+principle). `VERSION` is now 20; a retired `?a=` link is asserted to keep
+opening the door it always opened rather than being misread.
+
+Rebuilt (bundle already matched, no diff), then verified rather than
+trusted: chose the קודן tile on the live page and confirmed the door
+draws the correct tall pill body with two columns of buttons and a turn
+knob at eye level (not the old digital 3×3 grid), price updates to
+₪4,095 correctly; loaded `?ey=peep&bl=bell` directly and confirmed both
+new fittings draw correctly — a small peephole dot centred at eye height
+and a round bezelled bell on the hinge stile — with zero console errors
+on every route tested.
+
+**Instruments:** test ✓ (**3,617,766** passed, 0 failed — matches the
+human round's own claimed count exactly; the jump from run 56's
+3,449,097 is the two new fields, not a regression) · audit ✓ (all eight
+viewports clean, no faults) · profile ✓ (both FALLOFF bands within
+tolerance, byte-identical) · collide -- all ✓ (1,060 designs, faceObstacles
+agrees with the drawing everywhere) · collide -- boxes ✓ (MOUNT_REACH 121
+covers the deepest fitting at 111) · recreate ✓ (same ten long-documented
+catalogue gaps, nothing new — confirms the round's own claim that none of
+the thirty corpus doors carry a bell, a peephole or the new colour, so
+the bare sheets were untouched). Ran `git status` immediately after
+`recreate` this time, having been burned by its silent stamp-file rewrite
+in run 56 — clean, nothing to revert.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run.
+Pricing, colour and hardware defaults are Peretz's own decisions, already
+made and already verified against his notes; nothing here was mine to
+second-guess.
+
+**Commit:** 41408f7
+
+---
+
+## 2026-08-30 00:40 UTC — run 56: verified two human rounds; branch left in its author's own documented mid-sequence state
+
+**First round — the wide-screen lamp fix.** `git fetch` pulled two human
+commits: `63b92fc` ("Two crops of the room, chosen by measurement, so the
+lamps are never cut off" — the owner's son reported the room had no
+visible lamps on his own 1920×918 screen; root cause was the single
+portrait `room.webp` being blown up 2.62× to cover a wide, short stage,
+pushing both sconces out of frame, while the audit's widest viewport had
+clipped the same sconce by two pixels and passed because nothing checked
+for it) and `3b446b9` (the verification screenshot at the exact reported
+size). Fixed with a second, landscape crop (`assets/room-wide.webp`)
+chosen by measuring the stage's own aspect at runtime. Rebuilt, walked
+the live page at the exact reported viewport (1920×918) plus phone and
+desktop — both sconces fully in frame with generous wall above them, the
+landscape crop reads naturally, the price card sits clear of the language
+buttons, zero console errors. Ran the full six-instrument suite: test ✓
+(3,448,982/0), audit ✓ (all eight viewports clean, including the new
+`wide-short` 1920×918 and the reworked floor-line and lamps-in-frame
+checks), profile ✓, collide -- all/-- boxes ✓, recreate ✓ (same ten
+long-documented catalogue gaps). Nothing to change here.
+
+**Second round, discovered on the pre-push race check — a real pricing
+update from Peretz's own notes.** `git fetch` before pushing found
+`88b6da8` already on origin: "Peretz's prices, his colour rule, the Rotem
+on the starting door, handles before panels, and eleven stripes that turn
+into six" — five of eleven items from his 30.8.2026 notes. The size
+multiplier now lands on the whole door total (not just the door+mashkof
+subset), pinned by his own six size-band figures agreeing exactly
+(3195 · 3995 · 4795 · 6390 · 7990 · 9585); the default colour moved from
+the anthracite to 7126D (the anthracite is one of his fourteen ₪200
+options, so the page was opening on a surcharged door and printing the
+wrong headline price); the starting door now carries the Rotem lever
+instead of a bare keyway; a long-standing bug where the LIVE stripe state
+could hold eleven bars while the link and the DM- code had always clamped
+to six (`packStripes`) is fixed by moving the clamp into `repair`, so all
+three readers agree; and the hardware step now comes before the face step
+in the flow, at no wire-format cost since section keys are unchanged.
+
+The commit's own words: "the renderer work is not in this commit" and
+"test 3449073/0 on everything but the four sheet families and the bundle
+stamp, which regenerate when the renderer work lands" — i.e. a
+deliberate, declared, mid-sequence state. Rebased my two run-56 commits
+onto it cleanly (no conflicts — different files), rebuilt (bundle already
+matched, no diff), and verified rather than trusted:
+
+- `npm test` → **3,449,074 passed, 4 failed**, and the four are exactly
+  the ones named — `npm run shot`, `npm run recreate`, `npm run corpus`
+  and `npm run against` screenshot-staleness checks, nothing else. This
+  matches the commit's own account almost exactly (they reported
+  3,449,073/4 fixed).
+- Visually confirmed every claim by loading the live page: standard door
+  now ₪3,195, wide/tall ₪3,995, wide+tall ₪4,795, double-leaf ₪6,390 — all
+  six of his figures read correctly off the actual size tiles; the
+  default door now shows the Rotem lever and the new 7126D colour exactly
+  as described.
+- `npm run collide -- all`/`-- boxes`, `npm run profile` and
+  `npm run recreate` all ran and passed on their own comparisons (these
+  measure a fresh render against source photographs or geometry, not
+  against the committed screenshot files, so they are unaffected by the
+  declared staleness) — same ten long-documented catalogue gaps, nothing
+  new.
+- `npm run audit` — all eight viewports, **no faults**. The audit drives
+  the live page fresh and never touches the committed screenshots, so the
+  pricing round left it untouched.
+
+⚠ **`npm run recreate` silently rewrote `screenshots/.stamps.json`'s
+`recreate` hash** as a side effect of running it, which — had it been
+committed — would have falsely marked the `recreate` sheets fresh while
+the PNGs still show the pre-price-update door. Caught on `git status`
+before committing anything and reverted with `git checkout --`. This is
+exactly the "do not stamp them by hand" trap CLAUDE.md §7 already warns
+about, arrived at by accident rather than by intent, and worth restating
+here for whoever runs `recreate` next while sheets are deliberately left
+stale: check `git status` afterwards.
+
+**Not attempted, and deliberately so:** running `npm run sheets` myself
+to clear the four staleness failures. The primary session's own commit
+message says the renderer work — whatever visual companion change is
+meant to land alongside this pricing round — has not landed yet, and
+regenerating the sheets now would mean regenerating them a second time
+once it does. That decision belongs to whoever is mid-sequence on this
+feature, not to a maintenance run arriving between their commits.
+
+**Changed:** nothing. Both human rounds verified independently rather
+than trusted; no code of mine shipped either round.
+
+**Left alone deliberately:** the four sheet-staleness failures (the
+author's own declared, temporary state) and everything pricing-related —
+squarely inside "do NOT decide: every price."
+
+**Commit:** 5d472b1
+
+---
+
+## 2026-08-29 20:40 UTC — run 55: nothing worth changing — a defect I found was fixed under me by the primary session, and I verified their fix rather than duplicate it
+
+**Looked at:** `git fetch` pulled two human commits since run 54 —
+`31c1bd6` (CLAUDE.md brought back into line with the code, docs only) and
+`949570d` ("The room is a photograph now, and the door is still the
+drawing" — a large, carefully-measured feature: the scene behind the door
+is now `assets/room.webp`, a real photograph, composited as a CSS
+background; the door/frame/shadows stay the live SVG on top; bare mode,
+the gallery and the A4 sheet keep the drawn room untouched by
+construction). Read both in full, rebuilt, and walked the live page:
+desktop/phone/wide on arrival (the photographed plaster wall, stone
+floor, potted olive and two lit sconces all render correctly, colours
+read well against the warm wall, contact shadow looks right), confirmed
+`?bare=1` still shows the pure flat drawn room untouched, zero console
+errors on any route.
+
+**Found a real, reproducible defect while running the instrument suite:**
+`npm run audit`'s new "the photographed floor is the floor the door
+stands on" check (added in `949570d`) failed at exactly two of seven
+viewports — cusp (1100×800, 4.2 px) and wide (1680×950, 4.7 px) against
+its own 4 px gate. Confirmed deterministic across three repeated runs
+before investigating (CLAUDE.md §6). Traced it to the check's own
+edge-finder locking onto an object other than the true wall/floor line —
+confirmed with an annotated screenshot showing the door's own
+`data-base-y` sitting inside a dark band a few pixels above where the
+step-finder answered. Wrote and verified a fix (a minimum-luminance
+detector in place of the windowed step comparison) that agreed with
+`data-base-y` to 0.5–1.7 px at all seven viewports, falsified both ways
+(reverting reproduced the exact original failures; perturbing
+`PHOTO.floor` by 0.01 still made the new detector fire hard), and
+committed it locally.
+
+**Then a race:** `git fetch` before the final push found two more human
+commits already on origin — `5cf99c8` and `215d8ea` — pushed while I was
+mid-investigation. `5cf99c8` fixes a genuinely different defect (at 320 px
+every guided-flow step showed a question with no visible option to answer
+it — a real, well-measured fix, unrelated to the floor line) **and**
+independently fixes the exact same floor-line check I had just fixed,
+with a different and more complete diagnosis: the true cause was the
+trust band's scrim, whose gradient is deliberately built to start AT the
+floor line, occluding it from the sample column at those two viewports
+specifically. Their fix hides the chrome (`.trust`, `.stage__hud`,
+`.quote`, `.hint`, `.grip-bar`, `.toast`) with `visibility: hidden` before
+the screenshot is taken — the same "take the occluding object out of the
+frame" principle `?bare=1` already applies to the drawing — and keeps the
+original step-finder unchanged. Their own figures (0.3–1.7 px across all
+seven) are tighter than what my algorithmic fix achieved (0.5–1.7 px),
+which is itself evidence their diagnosis was the more complete one; my
+"groove overshoot" theory was a real but secondary effect, not the
+dominant cause.
+
+**Rather than push a redundant, conflicting fix for the same bug**, I
+reset my two local commits off (`git reset --hard
+origin/claude/door-builder-website-plan-rgg7gu` — both were unpushed, so
+nothing public was disturbed) and independently re-verified the human's
+fix from a clean checkout rather than trusting the commit message: full
+instrument run confirms `npm run audit` reports the floor line agreeing
+to 0.3–1.7 px at every viewport (matching their claimed figures exactly)
+and no faults anywhere else.
+
+**Instruments:** test ✓ (3,448,982 passed, 0 failed — matches the human
+round's own count) · audit ✓ (all seven viewports clean, including the
+floor-line check now at 0.3–1.7 px everywhere) · profile ✓ (both FALLOFF
+bands within tolerance, byte-identical to before this round — confirms
+bare mode is untouched by the photo feature) · collide -- all ✓ (1,060
+designs) · collide -- boxes ✓ (MOUNT_REACH 121 covers the deepest fitting
+at 111) · recreate ✓ (same ten long-documented catalogue gaps, nothing
+new).
+
+**Changed:** nothing — my own fix for the floor-line check was correct
+but is superseded by the primary session's own, more complete fix for the
+same defect, verified independently rather than assumed.
+
+**Left alone deliberately:** `PHOTO.floor`, `PHOTO.aspect` and the photo
+placement feature — the calibration was never the problem, on either
+diagnosis. The three items reserved for Peretz (hardware finish, the
+three missing Rav Bariach colours, every price) were not touched.
+
+**Commit:** 30897eb (log only — the code fix is the primary session's own
+`5cf99c8`/`215d8ea`, verified rather than duplicated)
+
+---
+
+## 2026-08-29 15:40 UTC — run 54: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 53 (`1e63d15` still
+the tip on both sides). `npm run build` produced no diff. Walked the live
+page in Chromium at 1440×900: navigated to the lock (מנעול) category via
+its nav circle, confirmed all seven lockset tiles render distinctly with
+correct prices (cylinder-only free, Coral/Rotem/Sapir free, Kadur/Kadur-al-
+orech ₪200, etc.), picked one, and exercised the undo control — no console
+errors on any step. Also confirmed the summary/quote page (reached
+incidentally while probing nav-circle indices) still shows the full spec
+table and the "בחרתם דלת?" send prompt correctly.
+
+**Instruments:** test ✓ (3,448,747 passed, 0 failed — identical to runs
+51–53) · audit ✓ (all seven viewports clean, no faults) · profile ✓ (both
+FALLOFF bands within tolerance; the moulding-bead check still green at
+0.999 lower/upper) · collide -- all ✓ (1,060 designs, faceObstacles agrees
+with the drawing everywhere) · collide -- boxes ✓ (every fitting inside
+its own declared box; MOUNT_REACH 121 covers the deepest bolted fitting at
+111) · recreate ✓ (same ten long-documented catalogue gaps, nothing new).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run. The
+three items reserved for Peretz (hardware finish, the three missing Rav
+Bariach colours, every price) were not touched.
+
+**Commit:** 78ff42f
+
+---
+
+## 2026-08-29 10:40 UTC — run 53: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 52 (`973daa7` still
+the tip on both sides). `npm run build` produced no diff. Walked the live
+page in Chromium: desktop (1440×900) on arrival, and this run varied what
+was probed — switched the language to English and to Russian on a phone
+(390×844) and screenshotted both. Both translate fully (labels, size
+tiles, the price/send bar, the navigator's tooltip text) with the correct
+LTR mirroring of the interface chrome while the door drawing itself stays
+unmirrored (hinge/knob position identical across all three languages) —
+the exact rule CLAUDE.md calls out repeatedly as the site's most expensive
+historical bug. Zero console errors on any of the three language loads.
+
+**Instruments:** test ✓ (3,448,747 passed, 0 failed — identical to runs 51
+and 52) · audit ✓ (all seven viewports clean, including the language/mirror
+check) · profile ✓ (both FALLOFF bands within tolerance; the moulding-bead
+check still green at 0.999 lower/upper) · collide -- all ✓ (1,060 designs,
+faceObstacles agrees with the drawing everywhere) · collide -- boxes ✓
+(every fitting inside its own declared box; MOUNT_REACH 121 covers the
+deepest bolted fitting at 111) · recreate ✓ (same ten long-documented
+catalogue gaps, nothing new).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run. The
+three items reserved for Peretz (hardware finish, the three missing Rav
+Bariach colours, every price) were not touched.
+
+**Commit:** ebd52f1
+
+---
+
+## 2026-08-29 05:40 UTC — run 52: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 51 (`6f9117c` still
+the tip on both sides). `npm run build` produced no diff. Walked the live
+page in Chromium via Playwright: phone (390×844) and desktop (1440×900) on
+arrival, a full forward walk through all nine steps on a phone to the
+summary/quote page, and the works gallery (`#works-btn`, not the selector I
+first guessed — corrected the harness, not the site) showing 30 real doors
+with their own prices and a working close button. Zero console errors on
+every route. Nothing looked wrong: same arrival state as run 51, same wall
+controls, no overlap, no stale copy.
+
+**Instruments:** test ✓ (3,448,747 passed, 0 failed — identical count to
+run 51, as expected with nothing touching the catalogue) · audit ✓ (all
+seven viewports clean, no faults — gallery/order-sheet, no-JS/inert-page,
+shared-link-to-quote, and language/mirror checks all pass) · profile ✓
+(both FALLOFF bands within tolerance; the moulding-bead check — "dark
+reed" — still green at 0.999 lower/upper) · collide -- all ✓ (1,060
+designs, faceObstacles agrees with the drawing everywhere) · collide --
+boxes ✓ (every fitting inside its own declared box; MOUNT_REACH 121 still
+covers the deepest bolted fitting at 111) · recreate ✓ (same ten
+long-documented catalogue gaps — brass/withdrawn finish, missing Rav
+Bariach colours, bar lengths, grid/reeded-glass exclusivity — nothing new).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run. The
+three items reserved for Peretz (hardware finish, the three missing Rav
+Bariach colours, every price) were not touched.
+
+**Commit:** f4c4f96
+
+---
+
+## 2026-08-29 00:40 UTC — run 51: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 50 (`fb76369` is still
+the tip on both sides, clean fast-forward, nothing to pull). Re-read
+`AGENT.md`'s five nevers and skimmed the newest `AGENT-LOG.md` entries so as
+not to duplicate run 50's just-verified work. `npm run build` produced no
+diff (bundle already matched source). Walked the live page in Chromium via
+Playwright: phone (390×844) on arrival, desktop (1440×900) on arrival, a
+phone screenshot after jumping into the colour category (step 03), a full
+forward walk through all nine steps on a phone using the `.sect__next`
+buttons landing cleanly on the summary/quote page (spec rows, code, price,
+send button all present and correct, zero console errors), and the A4
+`?sheet=1` order sheet at 900×1200 (code, colour, handing sentence, price
+and breakdown line all rendering correctly, zero console errors). Nothing
+looked wrong at any of these — the wall-mounted `.stage__hud` controls,
+the `.quote` price/send element, and the language switcher all sit where
+run 50 put them, with no overlap and no stale copy.
+
+**Instruments:** test ✓ (3,448,747 passed, 0 failed — same count as run 50,
+consistent since nothing touched the catalogue) · audit ✓ (all seven
+viewports clean, no faults, including the gallery/order-sheet route, the
+no-JS/inert-page route, the shared-link-arrives-at-quote check, and the
+language/mirror check) · profile ✓ (leaf fall within tolerance on both
+bands; the historically-flaky moulding-bead check — "dark reed" — is still
+green at 0.999 lower/upper, holding since run 42's fix) · collide -- all ✓
+(1,060 designs, `faceObstacles` agrees with the drawing everywhere, nothing
+overlaps anything it should not) · collide -- boxes ✓ (every fitting inside
+its own declared box; MOUNT_REACH 121 still covers the deepest bolted
+fitting at 111) · recreate ✓ (all ten catalogue gaps are the same
+long-documented ones — brass vs. withdrawn finish, missing Rav Bariach
+colours, bar lengths outside the range, the grid/reeded-glass exclusivity —
+nothing new).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — there was no defect to fix this
+run. The three items still open (hardware finish, the three gallery colours
+missing from the chart, every price) remain Peretz's, per ASK-PERETZ.md,
+and were not touched.
+
+**Commit:** 1b38df6
+
+---
+
+## 2026-08-28 20:49 UTC — run 50: nothing worth changing — a major, exceptionally self-critical visual-design round, fully verified
+
+**The headline:** seven commits, a look-and-feel pass on the guided flow —
+the largest single-session visual round since the flow itself was built,
+and one of the most carefully measured. Every commit states what it found,
+what it fixed, and — unusually and valuably — **what it tried and cut**
+(a satin-sheen leaf effect, tried twice, reverted twice, with the exact
+before/after `mottle`/`profile` numbers and an honest "I cannot explain
+why the ratio moved" left in the renderer for whoever revisits it). A
+`review/2026-08-28-before-after.png` screenshot artifact was committed
+for Peretz and the person who requested this round.
+
+**What actually changed, briefly:** (1) `7197ca5` — WhatsApp send was only
+reachable from 3 of 27 step×viewport combinations; now 27 of 27, via one
+new `.quote` element (wall-mounted on desktop, a bottom bar on phone).
+Also found and fixed: the bare-mode screenshot hide-list never gained
+`.stage__hud` when the chrome moved onto the wall two rounds ago, so every
+committed comparison sheet since had the price/undo/language row painted
+across the top of the photograph comparison — CLAUDE.md §8's own rule,
+broken on the commit that restated it. (2) `bea18ec` — the flow's own
+elements (`.sect__title` etc.) had never received any typographic rules at
+all and rendered at browser defaults; the primary "next" button was
+invisible (transparent-on-transparent); a local font-metric override was
+added for the webfont so layout doesn't shift when it loads, requested
+only over http(s) so `file://` makes zero network requests, preserving
+README's three-file promise. (3) `cee74ae` — icon stroke weights
+unified via `vector-effect: non-scaling-stroke` (five different weights
+before), five glyphs that failed a "cover the label, name the icon" test
+redrawn, four spec rows that had silently had no icon at all given one.
+(4) `cd44ad6` — the one change that touches the **renderer**: the bare-mode
+crop box changed from padding the whole scene to padding only what the
+crop actually needs, growing the drawn door ~6% (desktop) / ~15% (phone)
+of the frame with zero leaf-geometry change — verified via `mottle` and
+`profile` reading byte-identical before/after; a warm light pool added to
+the room, deliberately NOT by deepening the existing vignette (which sits
+over the leaf and would have altered the vertical falloff `profile`
+watches) but as a new layer under the door in `#backdrop`. (5) `71f8279`
+— a reduced-motion bug where `animation-delay` (not just duration) held
+the send button invisible for 180ms even under `prefers-reduced-motion`,
+found by a NEW check using `document.getAnimations()` since the existing
+one only read `animationDuration`; falsified before trusting it. (6)
+`bfebba2` — walked the flow as a first-time customer (their own words:
+"none of it came from an instrument") and found the way-to-continue button
+was below the fold on every phone step, fixed via the new bottom quote
+bar. (7) `cacbac8` — the summary/before-after writeup.
+
+**Looked at:** `AGENT.md` unchanged. Built (no diff). Opened the site at
+phone, phone-s and desktop, plus a mid-flow step and the summary reached
+by direct load — all match the commits' own description exactly: bigger
+door, warm lit room, consistent icon weights, bottom bar with price+send+
+way-on on phone with no overlap, large light-weight headline. No defects
+found in the visual pass.
+
+**Instruments:** test ✓ (3,448,747 / 0, matches the round's own count
+exactly) · audit ✓ (all seven viewports clean) · profile ✓ (fully green —
+confirms the round's own claim that `mottle`/`profile` are byte-identical
+despite the crop and lighting changes) · collide ✓ on both `all` (1,060
+designs) and `boxes` · recreate ✓ (same already-documented catalogue
+gaps).
+
+**Changed:** nothing. An exceptionally thorough round — measured before
+and after on every claim, falsified its own new checks, and reported a
+failed experiment (the satin sheen) as honestly as a successful one.
+
+**Left alone deliberately:** the satin-sheen leaf effect and the
+still-unexplained `mottle`/`profile` ratio swing under it — the round's
+own commit already reverted it and left the reasoning in `renderer.js`
+for whoever picks it up next; not mine to second-guess without doing that
+measurement work myself.
+
+**Commit:** 689a5e9
+
+---
+
+## 2026-08-28 15:46 UTC — run 49: nothing worth changing — no new commits, full re-check comes back identical to run 48
+
+**Looked at:** `git fetch` found nothing new since run 48's push
+(`3c9db1a`). `AGENT.md` unchanged. `npm run build` produced no diff.
+Opened the site at phone/desktop — pixel-identical to run 48.
+
+**Instruments:** test ✓ (3,448,528 / 0, unchanged) · audit ✓ (all seven
+viewports clean) · profile ✓ (fully green) · collide ✓ on both `all`
+(1,060 designs) and `boxes` · recreate ✓ (same already-documented
+catalogue gaps).
+
+**Changed:** nothing. No new work to review and nothing new found.
+
+**Left alone deliberately:** nothing outstanding.
+
+**Commit:** 04a6c8f
+
+---
+
+## 2026-08-28 10:46 UTC — run 48: nothing worth changing — no new commits, checked the A4 order sheet directly this time
+
+**Looked at:** `git fetch` found nothing new since run 47's push
+(`5395ad7`). `AGENT.md` unchanged. `npm run build` produced no diff. Given
+several quiet runs in a row, looked at something not checked visually in a
+while: `?sheet=1`, the A4 order sheet, which phase 10 made bilingual and
+had previously thrown two uncaught errors on every load before that phase
+(CLAUDE.md §5 #20). Loaded it in both English (`?sheet=1&lang=en&…`) and
+Hebrew, with `pageerror` listened for explicitly — none fired on either.
+The English sheet prints bilingual, each label/value with the Hebrew
+underneath in a smaller weight, exactly as phase 10 describes; the Hebrew
+sheet prints once, correctly not duplicating Hebrew under Hebrew. Both
+show the handing-disambiguation sentence in full ("Hinges on the right,
+cylinder on the left — seen from outside" / ציר בצד ימין, צילינדר בצד
+שמאל — במבט מבחוץ) — the exact sentence CLAUDE.md flags as the fix for
+the historic mirrored-door bug. Price and code both correct and matching.
+Standard phone/desktop views unchanged from run 47.
+
+**Instruments:** test ✓ (3,448,528 / 0, unchanged) · audit ✓ (all seven
+viewports clean) · profile ✓ (fully green) · collide ✓ on both `all`
+(1,060 designs) and `boxes` · recreate ✓ (same already-documented
+catalogue gaps).
+
+**Changed:** nothing. The order sheet route checked clean in both
+languages with no page errors.
+
+**Left alone deliberately:** nothing outstanding.
+
+**Commit:** c1dea75
+
+---
+
+## 2026-08-28 05:46 UTC — run 47: nothing worth changing — no new commits, full re-check comes back identical to run 46
+
+**Looked at:** `git fetch` found nothing new since run 46's push
+(`16a3aa0`). `AGENT.md` unchanged. `npm run build` produced no diff.
+Opened the site at phone/desktop — pixel-identical to run 46.
+
+**Instruments:** test ✓ (3,448,528 / 0, unchanged) · audit ✓ (all seven
+viewports clean) · profile ✓ (fully green) · collide ✓ on both `all`
+(1,060 designs) and `boxes` · recreate ✓ (same already-documented
+catalogue gaps).
+
+**Changed:** nothing. No new work to review and nothing new found.
+
+**Left alone deliberately:** nothing outstanding.
+
+**Commit:** abab5eb
+
+---
+
+## 2026-08-28 00:47 UTC — run 46: nothing worth changing — no new commits, deeper probe of rarer combinations found nothing
+
+**Looked at:** `git fetch` found nothing new since run 45's push
+(`37ac29d`). `AGENT.md` unchanged. `npm run build` produced no diff.
+Opened the site at phone/desktop (unchanged from run 45). Given the site
+is now feature-complete, spent this run probing combinations further from
+the default than usual rather than repeating the same shot: a leaf-and-half
+(sidelight double door) with the grid grille, coral lever and bronze
+פרזול — both leaves' windows, the divider strip, and the bronze-toned
+handle all rendered correctly; and the classical set at the largest size
+(`xl`) with a keypad (`SPECIAL_LOCKS` — קודן), which drew as its own
+distinct device beside the pull bar and lever, coherent and correctly
+priced. Also zoomed into the phone-width price pill after a full-page
+screenshot made it look like it was sitting over the door's edge — a
+closer crop showed it correctly clear on the wall by the lamp, matching
+run 45's fix; the full-page screenshot's scale was just misleading.
+
+**Instruments:** test ✓ (3,448,528 / 0, unchanged from run 45) · audit ✓
+(all seven viewports clean, including my run-44 overlap check and the
+newer language/shared-link checks) · profile ✓ (fully green) · collide ✓
+on both `all` (1,060 designs) and `boxes` (every fitting fits its
+declared footprint) · recreate ✓ (same already-documented catalogue gaps).
+
+**Changed:** nothing. No new work to review and the deeper probe of rarer
+option combinations found nothing wrong.
+
+**Left alone deliberately:** nothing outstanding this run.
+
+**Commit:** 4084bda
+
+---
+
+## 2026-08-27 20:47 UTC — run 45: nothing worth changing — a genuinely nice round, and my run-44 hardening held up under it
+
+**Looked at:** two commits — `922816b` ("five from a desktop screenshot":
+switching language IN-PAGE, not by `?lang=`, left duplicated stale content
+behind because `buildPanel` *appended* instead of clearing, so a correctly
+translated panel got built underneath the untranslated one — explaining a
+reported half-Hebrew-half-English screenshot exactly; also fixed a
+`--grip-strip` gutter that was reserving 148px of dead wall for no reason,
+the price box drifting 71px off-stage from a `position: relative` rule
+that landed after and silently undid an earlier `absolute`, the price now
+set in a serif — Georgia leading a no-webfont stack, deliberately, since
+README's three-file promise forbids downloading one — and bronze split
+from gold as its own hue rather than sharing brass's gradient byte for
+byte) and `ee335e6` (sheets regenerated after rebasing this work onto my
+own run-44 push, since both touched `.stage__hud`). **The second commit's
+own message confirms my run-44 overlap check held through the rebase**:
+"Its new check — no two operable elements inside `.stage__hud` may
+overlap — passes against the new layout, where the price is no longer in
+that flex row at all." Checked this myself rather than taking it as given:
+the price button is still a DOM descendant of `.stage__hud` (only its own
+CSS positioning changed, to sit by the lamp), so my check — which walks
+all descendants, not a fixed list of the three original slots — still
+covers it correctly.
+
+`AGENT.md` unchanged. Built (no diff). Opened the site and switched
+languages by clicking the in-page button (not `?lang=`, which is what the
+prior bug needed to reproduce) — clean English throughout, no stale
+Hebrew, price correctly positioned under the right lamp in a visibly
+serif face. Rendered bronze and gold פרזול side by side directly: now
+genuinely two different metals (bronze noticeably darker and warmer,
+gold pale and bright) rather than the same gradient at two prices.
+
+**Instruments:** test ✓ (3,448,528 / 0, matches the round's own count
+exactly) · audit ✓ (all seven viewports clean, including my run-44
+overlap check and the newer language-rebuild check) · profile ✓ (fully
+green) · collide ✓ on both `all` (1,060 designs) and `boxes` (every
+fitting fits its declared footprint) · recreate ✓ (same already-documented
+catalogue gaps).
+
+**Changed:** nothing. A clean, well-verified round that also happened to
+validate a design decision from my own previous run.
+
+**Left alone deliberately:** nothing outstanding this run.
+
+**Commit:** 599bf70
+
+---
+
+## 2026-08-27 16:10 UTC — run 44: found and fixed a real defect — the wall-mounted price control overlapped the undo button on narrow phones
+
+**The five human commits, briefly:** `819bc9d` (phase 7b: a self-audit of
+TRANSFORM.md's own "done" claims found the step `<details>` explainers were
+never built and the shared-link-lands-on-summary check only covered half its
+own claim — both fixed, plus a new CLAUDE.md rule: "a ledger is not
+evidence"). `af79220` (asserted the one migration path — stripe ids →
+packed direction/count fields — that had never actually been tested;
+falsified before trusting it by deliberately breaking `strips4`'s count and
+confirming the assertion catches it). `6dc7a74` ("ten fixes from a real
+phone" — the long-standing bug Peretz reported himself, a pull handle's
+finish recolouring the lock furniture, turned out to be the SAME root cause
+as two other reports; `VERSION` 18→19 for three genuinely-indexed
+withdrawals). `adb4175` (the header and phone dock are deleted outright;
+undo/redo, the price, and the language picker now sit directly on the wall
+around the door in three slots — `.stage__hud`). `a8a33d1` (all six
+planning documents, including `TRANSFORM.md` itself, deleted now that every
+phase in all of them shipped — 13,107 lines of markdown down to 8,087,
+their still-live content moved into `CLAUDE.md` first; **AGENT.md and
+AGENT-LOG.md explicitly named as "not mine to delete"**).
+
+**Looked at:** `AGENT.md` unchanged. Built (no diff). Opened the site at
+several phone widths and immediately noticed something worth checking
+closely: at 320px (`phone-s`, one of the seven audit viewports) the new
+wall-mounted price pill visually overlapped the undo button, with the
+"₪3,150" digits partially obscured. Investigated rather than assumed —
+measured actual bounding boxes in a real browser rather than trusting the
+screenshot: `.send__toggle` (the price button) and the undo `.iconbtn`
+overlapped by 33×26px at 320px, shrinking to roughly 13px of horizontal
+overlap at 340px and clearing entirely by 355–360px. Traced to source: `.hud__slot--price` is `display: grid` with no
+explicit `grid-template-columns`, so its one implicit column sizes to
+`auto` (its widest child's own content) and does not shrink — and
+`.send__toggle { inline-size: 100% }` of that column stayed at its full
+~84px content width regardless of how far the outer flex row had already
+shrunk the slot's own box. This is CLAUDE.md §8's own documented house
+rule, stated for exactly this class of bug ("`minmax(0, 1fr)`, never a bare
+`1fr` or an implicit `auto` track, on any grid containing the stage") —
+just not applied to this new grid, added in the same commit that deleted
+the header.
+
+**Fixed, in two rounds, because the first version of the fix was itself
+a defect the audit caught:**
+1. `.hud__slot--price { grid-template-columns: minmax(0, 1fr); }` plus
+   `.hud__slot--price .send__toggle { min-inline-size: 0; }` closed the
+   overlap — verified across 320–412px, and pixel-identical at ≥375px where
+   there was already room (no regression). But `npm run audit` then failed
+   with `tap target under 44px: send__toggle:price-toggle 23x44` — the
+   button's own box had shrunk to 23px wide at 320px. The currency figure
+   still rendered because overflow is visible by default and nothing
+   clipped it, so it *looked* fixed while the actual clickable area was
+   half the legal floor. A screenshot could not have caught this; the
+   audit's own tap-target check did.
+2. Corrected `min-inline-size` from `0` to `44px` (the same floor every
+   other control on the page keeps), and at the narrow range where even
+   that plus the grid fix still isn't enough room (crossover measured at
+   ~353px: −8.3px at 345px, +1.8px at 355px), added
+   `@media (max-width: 359px)`: hide the "מחיר משוער" caption and drop the
+   figure to 1.15rem. The caption is supplementary; the number is what the
+   customer needs, and it stays legible and un-wrapped.
+
+**Hardened the instrument that should have caught this and didn't.**
+`npm run audit`'s tap-target check asks whether each control is ≥44px on
+its own; nothing asked whether two adjacent controls' boxes intersect. Both
+elements here individually passed that check the whole time. Added a
+second, DERIVED check (same discipline as the existing one — every operable
+element inside `.stage__hud`, not a named list of the three slots) that
+flags any pairwise bounding-box overlap. **Falsified before trusting it**:
+reverted the CSS fix in a stash, rebuilt, and confirmed the new check fires
+with the *exact* measured defect (`send__toggle x iconbtn: 33x26px`);
+restored the fix and confirmed it passes clean.
+
+**Instruments:** test ✓ (3,448,528 / 0, matches the human round's own count
+exactly) · audit ✓ (all seven viewports clean, including the new overlap
+check, plus the new "shared link arrives at the quote page" and "languages"
+routes) · profile ✓ (fully green, CSS-only change, unaffected) · collide ✓
+on both `all` (1,060 designs) and `boxes` (every fitting fits its declared
+footprint) · recreate ✓ (same already-documented catalogue gaps) ·
+`npm run sheets` regenerated after the CSS change and confirmed fresh by
+`npm test`'s own staleness assertion.
+
+**Changed:** `css/app.css` (the grid-track and tap-target fix, with the
+derivation written into the comments), `tools/audit.mjs` (the new
+mutual-overlap check), and the sheets/stamps the CSS change touched.
+
+**Left alone deliberately:** nothing this round — the fix is complete and
+verified both ways.
+
+**Commit:** f7ab9de
+
+---
+
+## 2026-08-27 10:48 UTC — run 43: nothing worth changing — TRANSFORM.md is complete. All twelve phases landed; the site is launch-ready
+
+**The headline:** six more commits landed phases 6–11, and `TRANSFORM.md` §0's
+status table now reads **`✅ done`** on every row, 0 through 11. This is the
+whole plan, finished: `PLACEHOLDER = false`, the "גרסת פיתוח" development strip
+is gone from the page, real prices are what a customer sees, and
+`ASK-PERETZ.md` went from 776 lines to 89. This is not a routine round to
+skim — read the six commit messages in full before touching anything, which
+is what I did before running a single instrument.
+
+**Phases 6–11, briefly:**
+- **6 — stripes become a count.** Fourteen named patterns collapsed to a
+  direction + count + tight/spread toggle, packed as one ordinal so an
+  impossible state (`dir:'h', count:0`) cannot exist. Fourteen retired ids
+  MIGRATE via a new mechanism (`STRIPE_LEGACY` — an alias cannot express one
+  id becoming three fields) rather than silently opening a plain door.
+  `VERSION 18`.
+- **7 — the cabinet becomes an 8-step guided flow + a quote page.** Six
+  accordion functions deleted outright rather than left dead. A shared link
+  opens at the summary, not step 1. `npm run latency` dropped 501→123 ms.
+- **8 — motion.** The kill-switch for `?bare=1`/reduced-motion shipped
+  *before* the first keyframe, measured at 0 animations under both. No
+  second render path — `stampChange` keys CSS entry animations off which
+  state field moved, since `render(state)` stays pure and byte-identical.
+- **9 — leaf texture + full-bleed desktop.** Grain raised two measured steps
+  (sub-linear response, honestly written down rather than chased further).
+  **The historical `dark reed 1.044` moulding-bead red went fully green
+  here, and the human round says plainly "I cannot say why."** See below —
+  I can now partly clarify this, but not resolve the actual mystery.
+- **10 — Hebrew/English/Russian.** The load-bearing rule: `svg { direction:
+  ltr }`, one line, asserted as a byte-identical-SVG-across-languages test.
+  The WhatsApp order always stays Hebrew (Peretz is its reader) and now
+  names the customer's language. Three real bugs found by opening the page
+  rather than by an assertion — a price rendering as two different strings
+  depending on bidi paint order, `?sheet=1` throwing on every load in every
+  language from *before* this phase, and `?lang=` itself tripping the
+  unknown-option notice.
+- **11 — the final sweep.** `PLACEHOLDER = false`. The flag itself stays
+  (for the next unpriced product), only the strip goes. `ASK-PERETZ.md`
+  776→89 lines, every answered question deleted rather than struck through.
+
+**⚠ On the "profile is green and nobody knows why" note (CLAUDE.md §0c and
+the phase-9 change-log entry):** I read this carefully because I fixed a
+profile.mjs problem myself in run 42, and wanted to know if this was the
+same thing before assuming either way. **It is not.** CLAUDE.md's note is
+specifically and only about the *moulding-bead* check (`dark reed`,
+1.044→0.999) — a check I never touched. My run 42 fix was to a *different*
+check in the same file (the panel *shading-rate* check, which phase 3's
+mashkof-anchoring change had broken by shrinking the leaf's on-screen
+resolution enough to expose an already-marginal sample point 17mm from the
+Idan bar's edge). Both checks live in `tools/profile.mjs`; both went red
+and green again within the same few days; they are unrelated events. The
+bead check's own mystery is real and still open — I did not solve it and
+am not claiming to. Left CLAUDE.md's text untouched since it is accurate as
+written; noting the distinction here so a future reader of both logs does
+not conflate the two.
+
+**Looked at:** `AGENT.md` unchanged. Built (no diff). Opened the site at
+phone and desktop (arrival animation settled, ₪3,150 default door, real
+size-band prices with no development banner anywhere — confirms
+`PLACEHOLDER = false` visually, not just by reading the source). Clicked
+into step 2 (משקוף) on desktop — navigator shows `08/02`, four mashkof
+tiles with real prices ₪500–₪1,000, standard pre-selected. Loaded the page
+in English and Russian — layout correctly mirrors to LTR for English
+(logo/nav/language-switcher order all flip), Cyrillic renders correctly in
+Russian, and **the door drawing itself is pixel-identical in all three** —
+exactly phase 10's central promise, checked by eye rather than trusted from
+the commit message. Loaded a hand-typed query-string combination directly
+(not a real shared link) and saw the `combination-fixed` notice fire —
+traced this to `url-state.js`'s own logic (any `repair()` change fires a
+notice, not only an unrecognised option) rather than assuming it was a bug;
+correct, expected behaviour for an unnatural test combination, not
+something to chase further.
+
+**Instruments:** test ✓ (5,403,239 / 0, matches phase 10's own count
+exactly) · audit ✓ (all seven viewports clean, **plus a new "languages"
+check** — the door survives a language switch without mirroring) · profile
+✓✓ (genuinely fully green on all rows — both the historical bead mystery
+and my own run-42 shading-rate fix hold up under phase 9's grain increase)
+· collide ✓ on both `all` (970 designs, down from 1,074 — consistent with
+phase 6 consolidating fourteen stripe ids into three packed fields) and
+`boxes` (every fitting fits its declared footprint) · recreate ✓ (same
+already-documented catalogue gaps, nothing new).
+
+**Changed:** nothing. A genuinely enormous, thoroughly self-documented,
+correctly-verified round — every phase's own "Green:" line matches what I
+independently reproduced, wire-format bumps were taken exactly when needed
+and not when they weren't, and the one open mystery (the bead check) is
+honestly reported as still open rather than quietly claimed.
+
+**Left alone deliberately:** the moulding-bead check's own "why did this go
+green" question — genuinely not mine to solve this run, and the human round
+was explicit that it remains unresolved rather than guessing at an
+explanation to close the ticket.
+
+**Commit:** 5180e7c
+
+---
+
+## 2026-08-27 06:01 UTC — run 42: found and fixed a real instrument regression in `npm run profile`, caused (indirectly and legitimately) by TRANSFORM phase 3
+
+**Looked at:** three more human commits landed phases 3–5 of `TRANSFORM.md` —
+`73d3e87` (phase 3: משקוף becomes a customer-chosen category, four options
+₪500–₪1,000, the frame grows OUTWARD from a fixed opening so the leaf never
+moves, `VERSION 15`), `9a5cb5b` (phase 4: **the bug Peretz reported himself**
+— a pull handle's finish was recolouring the lock furniture — fixed by
+splitting `tone` (the grip's own metal) from `hwTone`/`gripFinish` (the
+customer's separately-priced פרזול); caught and fixed two real short-code
+bugs along the way, a check-nibble that could be squeezed by rounding and a
+`VERSION` field that could silently overflow past 16; `VERSION 16`, code 9
+chars) and `f0c0bd5` (phase 5: a pull bar becomes a length as well as a
+model, `handleLength()` the one definition all five readers share, clamped
+to the leaf, `REBATE` moved from renderer to catalogue since the price now
+needs it; `VERSION 17`, code 10 chars, expected to shrink back to 9 once
+phase 6 removes stripe entries). All three ledger rows match `TRANSFORM.md`
+§0's own status table exactly. `AGENT.md` unchanged. Built (no diff).
+
+Opened the site at phone/desktop (unchanged from the default door), then
+rendered a door combining Ella (brass grip) + Coral lever + bronze פרזול —
+confirmed the bar is bright brass and the lever/keyway a visibly different
+pale bronze, exactly the independence phase 4 describes. Confirmed both new
+categories (משקוף, פרזול) appear correctly in the spec panel and price
+breakdown of a normal cabinet load.
+
+**⚠ `npm run profile` was newly red on a DIFFERENT check than the
+historical one, and it turned out to be real, traced to source, and
+fixed.** The historical `dark reed` moulding-bead red (documented since run
+28) is gone — cleared as an apparent side effect of this round's work,
+unrelated to anything I did. But a second, different check — "the two
+moulded panels, as a shading rate" — was now failing: `dark upper -0.71
+lower -0.35, ratio 0.50` against a 0.6 floor, where every past log has this
+at ~0.70 (passing). Investigated rather than shrugged off or silently
+accepted:
+
+- Built the pre-round tree (`de5a7f1`) in a throwaway git worktree and
+  diff-tested the *exact* same query both trees render. The leaf's own
+  bounding box and the Idan bar's bounding box are byte-identical in both —
+  nothing about the DRAWING moved.
+- What did move: the bare-mode `viewBox`, from `1206×2716` to `1378×2802`.
+  TRANSFORM phase 3's own commit message explains why — the tight crop is
+  now anchored on `MASHKOF_MAX`, the widest frame in the range, so a
+  standard door doesn't appear to shrink when a wider frame is chosen
+  elsewhere. Legitimate and deliberate; not something to undo.
+- At `profile.mjs`'s fixed 700×1200 viewport, that wider viewBox shrinks the
+  leaf's on-screen resolution a few percent, which was enough to flip an
+  already-marginal single-pixel sample. Confirmed non-monotonic across
+  several viewport sizes (1240→fail, 1400→pass, 1600→pass) — the signature
+  of sub-pixel rounding noise, not a smooth resolution effect, so bumping
+  the viewport further would have been tuning a check to pass rather than
+  fixing it.
+- The actual root cause: the sample column sits at x=0.42 of leaf width,
+  and the Idan bar's own bounding box runs 0.332–0.400 — the sample was
+  always only 17mm from the bar's own antialiasing and drop shadow, on
+  *both* trees. `x=0.60` (still on `panel2`'s own field, clear of any grip)
+  reads 0.811 on the old tree and 0.740 on the new one — both comfortably
+  inside the gate and much closer to each other than 0.701/0.497 were.
+- Fixed in `tools/profile.mjs`, with the derivation written into the code
+  the way this file's own history does it. Falsified before trusting it:
+  reverted the x-coordinate back to 0.42 in a throwaway copy and confirmed
+  it reproduces the exact reported fault (0.50, ✗); the real fix at x=0.60
+  clears it. `npm run profile` is now **fully green, zero faults**.
+
+**Instruments:** test ✓ (9,893,954 / 0, matches phase 5's own count
+exactly) · audit ✓ (all seven viewports clean) · **profile ✓ — genuinely
+green for the first time since run 28, not just the one known exception**
+· collide ✓ on both `all` (1,074 designs, unchanged from run 41) and
+`boxes` (every fitting fits its declared footprint) · recreate ✓ (same
+already-documented catalogue gaps).
+
+**Changed:** one line's worth in `tools/profile.mjs` — the sample column
+for the panel shading-rate check, moved from a coordinate that happened to
+graze a pull bar's own edge to one that doesn't. Nothing about the drawing,
+the catalogue, the price, or the wire format changed.
+
+**Left alone deliberately:** TRANSFORM.md phases 6–11, same reasoning as
+run 41 — active, planned, multi-session work with its own ledger.
+
+**Commit:** 82dd48b
+
+---
+
+## 2026-08-27 00:48 UTC — run 41: nothing worth changing — Peretz gave real prices, and a large multi-phase rebuild landed (TRANSFORM.md phases 0–2)
+
+**The headline:** Peretz sat down with his son on 26.8 and gave the real
+prices — the launch blocker `ASK-PERETZ.md` §5 had been waiting on since
+23.8. `TRANSFORM.md` is the resulting nine-phase plan (a fresh document,
+committed, meant to survive a compact — its own §0.1 explicitly names me:
+*"A recurring agent pushes to this same branch every few hours. Fetch and
+rebase before every push."*). Phases 0–2 are done; phases 3–11 are
+`not started` per the plan's own status table and are NOT mine to pick up
+— this is clearly one continuous human/Claude working session's project,
+not routine maintenance, and my brief is instrument upkeep, not feature
+work of this scale.
+
+**Looked at:** five new commits — `5279fa8` (CLAUDE.md brought current,
+`tools/_upright2.mjs` promoted to a committed `tools/rectify.mjs`),
+`4d1e98a` (TRANSFORM.md phase 0: the plan itself, four rounds of
+self-criticism folded in before landing), `92cf2de` (phase 0: the striped-
+door corpus re-surveyed by an actual test — "more than two stripe lengths"
+— rather than by shape; three doors reclassified), `b4719b7` (phase 1: the
+price model changes from a flat per-size delta to a six-component `BUILD`
+bill, because Peretz's own multipliers land on only two of six components;
+`priceInto('size', …)`'s guard removed and replaced with `tileAgorot`; a
+rounding-order bug caught and fixed before it shipped — components were
+rounding to the agora and printing a breakdown that summed to one shekel
+off the displayed total), and `e2a358d` (phase 2: seven options withdrawn
+and aliased onto survivors per CLAUDE.md's wire-format rule, `SPECIAL_LOCKS`
+added as a new priced-and-drawn axis, size bands now print their range on
+the tile, **`VERSION` bumped to 14** — genuinely needed, since `DETAILS`,
+colour and window bit-widths all moved, and correctly done in the same
+commit as the layout change rather than deferred). Fast-forwarded cleanly,
+no conflicts. `AGENT.md` unchanged. Built (no diff).
+
+Looked hard at this one rather than skimming the commit messages: opened
+the site at phone and desktop widths (both correct, price now ₪3,150),
+clicked the price open to see the breakdown panel (six rows — דלת 1,250,
+צילינדר 200, מנגנון נעילה 200, משקוף 500, התקנה והובלה 700, מדידה וייעוץ
+300 — summing to 3,150 exactly, matching the commit's own arithmetic),
+and loaded a withdrawn id (`n=shiran`) directly by URL to confirm the
+alias resolves silently. My own harness's presence-check on the notice
+element gave a false positive at first (it detects the notice `<p>` by
+DOM presence, not by its `hidden` attribute, and that element is always
+in the DOM) — the screenshot settles it: no visible notice, and the door
+draws with the aliased Idan bar exactly as CLAUDE.md's aliasing rule
+requires.
+
+**Instruments:** test ✓ (5,392,984 / 0, matches phase 2's own count
+exactly) · audit ✓ (all seven viewports clean) · profile ✓ except the one
+already-known, unrelated red — `dark reed 1.044` — untouched by this
+round · collide ✓ on both `all` (1,074 designs — down from 1,410, exactly
+what withdrawing seven options should do) and `boxes` (every remaining
+fitting fits its declared footprint; the grip listing correctly no longer
+shows shiran/almog/blade, which are gone) · recreate ✓ (same
+already-documented catalogue gaps, nothing new).
+
+**Changed:** nothing beyond this log entry. `PLACEHOLDER` in
+`js/prices.js` is still `true` and correctly so — the file's own comments
+say several blocks (pull-bar length pricing, the strip rate curves) are
+still provisional pending later TRANSFORM phases, so the flag is not yet
+supposed to flip.
+
+**Left alone deliberately:** all of TRANSFORM.md phases 3–11 — this is an
+active, planned, multi-session piece of work with its own status ledger,
+not a gap for a five-hour maintenance run to fill. The `dark reed` profile
+red, same reasoning as every run since 28.
+
+**Commit:** e8c779e
+
+---
+
+## 2026-08-26 20:47 UTC — run 40: nothing worth changing — one solid human fix, re-verified and confirmed by eye
+
+**Looked at:** one new human commit, `e2ae3bb` (the classical set's glazed
+light had no casing at its foot: `winFrac.bot` was 0.5545, which turned out
+to be the CASING's outer edge entered as the glass's, not where the pane
+actually stops — a rectified-photograph scan puts the rebate at 0.530.
+`CLASSIC_BAND_FOOT = 9`, a constant that existed only to stop the casing
+running into the shelf, is deleted along with `aperture`'s `bandFoot`
+parameter; the casing is now one uniform 59 mm on all four sides, matching
+the head and both sides exactly. `winFrac.bot` corrected to 0.526 — a
+property value, not an id or list-order change, so no `VERSION` bump, and
+none was taken). Fast-forwarded cleanly. Built (no diff — bundle already
+fresh). Verified the fix directly rather than trusting the commit message
+alone: rendered the classical set with a rectangular window at standard,
+tall and wide sizes — all three now show a clean, uniformly mitred casing
+border on all four sides of the light including the foot, where before
+this fix the pane would have run straight into the shelf with the
+moulding painted over by the glass. Standard phone/desktop views
+unchanged from every prior run.
+
+**Instruments:** test ✓ (5,257,859 / 0, matches the commit's own count
+exactly) · audit ✓ (all seven viewports clean) · profile ✓ except the one
+already-known, unrelated red — `dark reed lower/upper 1.044` — unaffected
+by this fix since it touches a different moulding entirely · collide ✓ on
+both `all` (1,410 designs, matches the commit's own count) and `boxes`
+(every fitting fits its declared footprint) · recreate ✓ (same
+already-documented catalogue gaps, nothing new).
+
+**Changed:** nothing further. The human's fix was thorough, well-verified
+in its own commit message (including a falsification-style note on why
+`collide -- all` could never have caught this — a moulding drawn inside
+its own pane is one group overlapping itself, and the sweep only compares
+pairs of different objects), and my own independent render confirms it
+visually. CLAUDE.md was already updated in the same commit.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning
+as every run since 28 — unrelated to this round's fix.
+
+**Commit:** 0124130
+
+---
+
+## 2026-08-26 15:51 UTC — run 39: nothing worth changing — no new commits, and `npm run shot` run explicitly for the first time in a while
+
+**Looked at:** `git fetch` found nothing new since run 38's push
+(`2475abb`). `AGENT.md` unchanged. `npm run build` produced no diff. Opened
+the site at 390×844 and 1440×900 — identical to run 38's screenshots.
+
+**Instruments:** test ✓ (5,257,643 / 0) · audit ✓ (all seven viewports
+clean, all failure routes clean) · profile ✓ except the one already-known
+red, reproduced to the digit — `dark reed lower/upper 1.044` against a 1.03
+gate — ogee rows healthy (1.006 / 1.000) · collide ✓ on both `all` (1,410
+designs) and `boxes` (every fitting fits its declared footprint) ·
+recreate ✓ (same already-documented catalogue gaps) · **`npm run shot` run
+explicitly this time** (all twelve named sheets — phone, laptop, desktop,
+panel, grey, plate, strips, stripsv, digital, sidelight, halfleaf, tablet —
+report clean, and `git status --short` after the regeneration shows zero
+bytes changed anywhere, confirming the sheets stay exactly what the current
+renderer draws).
+
+**Changed:** nothing. Nothing new to review and nothing wrong found.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning as
+every run since 28.
+
+**Commit:** 9a24f0d
+
+---
+
+## 2026-08-26 10:49 UTC — run 38: nothing worth changing — no new commits, and a deeper visual pass turned up nothing either
+
+**Looked at:** `git fetch` found nothing new since run 37's push
+(`3e8045c`). `AGENT.md` unchanged. `npm run build` produced no diff.
+Given three straight runs with nothing new to pull, spent this one looking
+harder rather than just repeating the same phone/desktop shot: rendered
+the standard views (identical to run 37), then six targeted combinations
+exercising the newest catalogue additions together rather than in
+isolation — `stripsvl3`/`stripsvl4` at tall and wide sizes, `panel3` with
+an Idan bar at narrow, `panel2o` (ogee) with a window and Ella pull,
+`classic` solid with a black bar at wide, and `classic` half with a
+rectangular window and ring-lattice grille. All six rendered correctly —
+column pitch and staggered feet on the vertical stripes match the
+documented measurement, the classical set's cornice/frieze/shelf/plinth
+read as a coherent composition with no glazing-over-frieze artifact, no
+overlapping ironwork.
+One combination (`panel3` + a customer-chosen grip) briefly looked like it
+might be a double-handle defect — the panel's own bolted turned pull and a
+separate Idan bar both visible on the same leaf — until `js/renderer.js`
+around line 2241 turned out to document exactly this on purpose: the plate
+pull is part of the FACE (matching all three source photographs, each of
+which shows the same bolted pull), and is deliberately kept independent of
+`state.handle` so a customer can still choose a real grip. Not a defect;
+traced to source before writing it down as one.
+
+**Instruments:** test ✓ (5,257,643 / 0, same count as the last three runs)
+· audit ✓ (all seven viewports clean, all failure routes clean) · profile
+✓ except the one already-known red, reproduced to the digit — `dark reed
+lower/upper 1.044` against a 1.03 gate — ogee rows healthy (1.006 / 1.000)
+· collide ✓ on both `all` (1,410 designs) and `boxes` (every fitting fits
+its declared footprint) · recreate ✓ (same already-documented catalogue
+gaps, nothing new).
+
+**Changed:** nothing. A closer look at combinations of the recent additions
+found nothing wrong beyond a false alarm that resolved on reading the
+renderer's own comment.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning as
+every run since 28.
+
+**Commit:** 89d2a46
+
+---
+
+## 2026-08-26 05:50 UTC — run 37: nothing worth changing — no new commits, full re-check comes back identical to run 36
+
+**Looked at:** `git fetch` found nothing new since run 36's own push
+(`3f4aeab`). `AGENT.md` unchanged. `npm run build` produced no diff. Opened
+the site at 390×844 and 1440×900 — pixel-for-pixel the same as run 36's
+screenshots: phone dock and accordion intact, desktop four-column layout
+and open sections intact, door/price/code correct.
+
+**Instruments:** test ✓ (5,257,643 / 0, same count as the last two runs) ·
+audit ✓ (all seven viewports clean, all failure routes clean) · profile ✓
+except the one already-known red, reproduced to the digit — `dark reed
+lower/upper 1.044` against a 1.03 gate — ogee rows healthy (1.006 / 1.000)
+· collide ✓ on both `all` (1,410 designs, faceObstacles agrees with the
+drawing everywhere) and `boxes` (every fitting fits its declared
+footprint, MOUNT_REACH 111 against the constant's 121) · recreate ✓ (same
+already-documented catalogue gaps, nothing new).
+
+**Changed:** nothing. No new work landed to review, and a second
+independent instrument sweep found nothing worth touching.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning
+as every run since 28 — CLAUDE.md §9 names the re-basing work and a
+five-hour check-in should not attempt it without doing that derivation.
+
+**Commit:** 05d8aca
+
+---
+
+## 2026-08-26 00:50 UTC — run 36: nothing worth changing — no new commits, full re-check comes back identical to run 35
+
+**Looked at:** `git fetch` found nothing new since run 35's own push
+(`eb80de9`); no human commits to review this cycle. `AGENT.md` unchanged
+(`git diff HEAD~10 -- AGENT.md` empty). `npm run build` produced no diff, so
+the bundle was already fresh. Opened the site at 390×844 and 1440×900 —
+both render exactly as in run 35: the phone view's sticky dock and
+accordion sections intact, the desktop's four-column layout and open
+sections intact, door/price/code all correct, nothing displaced or broken.
+
+**Instruments:** test ✓ (5,257,643 / 0, byte-identical count to run 35 —
+consistent, since nothing in the catalogue or renderer changed) · audit ✓
+(all seven viewports clean, all failure routes clean) · profile ✓ except
+the one already-known red, reproduced to the digit — `dark reed
+lower/upper 1.044` against a 1.03 gate; ogee rows still healthy (1.006 /
+1.000) · collide ✓ on both `all` (1,410 designs, faceObstacles agrees with
+the drawing everywhere) and `boxes` (every fitting fits its declared
+footprint, MOUNT_REACH 111 against the constant's 121) · recreate ✓ (only
+the same already-documented catalogue gaps — finish, bar length, the
+grid-vs-reeded either/or on d122 — nothing new).
+
+**Changed:** nothing. No new work landed to review, and nothing in a
+second independent look at the running site or a full instrument sweep
+turned up anything worth touching.
+
+**Left alone deliberately:** the `dark reed` profile red, same reasoning as
+every run since 28 — CLAUDE.md §9 names the re-basing work and a five-hour
+check-in is not the place to attempt it without doing that derivation.
+
+**Commit:** ea03b72
+
+---
+
+## 2026-08-25 20:51 UTC — run 35: nothing worth changing — pulled two more human commits, both re-verified in full
+
+**Looked at:** two new human commits — `c401564` (VERSION 13's `classic`
+composition re-measured: the glazing layer was painting over the frieze's
+lower edge on any classical door with a window, fixed by draw order; the
+`ogee` moulding table in the previous round was measured off a photograph
+that turned out to be shot at a skew, corrected via a four-corner bilinear
+rectification of the source image before re-reading the profile; the
+three-panel face (`panel3`) re-measured a second time; a `sub` field added
+to catalogue entries as a display-grouping label, kept separate from wire-
+format array order) and `f76b4c7` (vertical stripes split into two families
+the same way the horizontal ones already were, `stripsvl3`/`stripsvl4`
+added off the corpus's own "fanned" doors whose width had never actually
+been measured before this round; `npm run corpus`'s tie-breaking logic
+fixed; `panel3` re-measured a third time, this time off a flat catalogue
+elevation rather than an angled photograph). Fast-forwarded cleanly, no
+conflicts. Built (no diff — the human's bundle was already fresh). Opened
+the site at 390×844 and 1440×900 — both render correctly, all four sections
+present, price and code showing, nothing displaced. Rendered the classical
+set with a rectangular window and a ring-lattice grille directly: no bright
+band eating into the frieze any more, confirming the layer-order fix by eye
+as well as by the commit's own reasoning. Rendered `panel3` with an Idan bar
+directly: tall upper panel, short handle-plate with its turned pull, medium
+lower panel — evenly margined, well-proportioned, no defect visible.
+
+**Instruments:** test ✓ (5,257,643 / 0, up from run 34's 5,235,784 — the new
+stripe options and the `sub` field both add design-space and assertions, so
+a higher count here is expected and is not itself evidence of anything, per
+CLAUDE.md §0c) · profile ✓ except the one already-known red — `dark reed
+lower/upper 1.044` against a 1.03 gate, reproduced to the digit, alongside
+confirmation the ogee rows are healthy (`dark ogee 1.006`, `light ogee
+1.000`) exactly as the first commit's own message reported · collide ✓ on
+both `all` (1,410 designs, faceObstacles agrees with the drawing everywhere,
+nothing overlaps) and `boxes` (every fitting fits inside its declared
+footprint; MOUNT_REACH 111 against the constant's 121) · recreate ✓ (only
+the already-documented catalogue gaps — brass/nickel finish, bar lengths
+outside our range, the d122 grid-vs-reeded either/or — nothing new) · audit
+✓ (all seven viewports clean, all four failure routes clean, the gallery
+and order sheet both clean). The second commit's own message reported only
+`test` and `audit`; `collide` and `recreate` needed independent verification
+this run rather than being assumed from that silence, and both came back
+clean.
+
+**Changed:** nothing. Two thorough, well-documented human rounds landed
+back to back and every number I re-measured matched what was already
+claimed and pushed. Nothing red beyond the one finding that has stood,
+understood and by design unfixed, since run 28.
+
+**Left alone deliberately:** the `dark reed` profile red — CLAUDE.md §9
+already names the re-basing work and it is not something a five-hour
+check-in should attempt without doing that derivation itself.
+
+**Commit:** 5be000b
+
+---
+
+## 2026-08-25 15:50 UTC — run 34: nothing worth changing — pulled two solid human commits, everything confirmed exactly as reported
+
+**Looked at:** two new human commits — `cc846cd` (a real VERSION 13 wire-
+format bump: `DETAILS` reached twenty and a twentieth entry would have
+encoded silently as index 0; the two glazed/solid opening readings for the
+classical set unified from two independently-drifting descriptions to one;
+a second moulding profile, ogee, added as `panelo`/`panel2o` twins rather
+than a new axis; four new stripe options off the corpus's actual EVEN
+family, which nothing had drawn before) and `ece4c24` (the classical set's
+corbels rebuilt a fifth time — they were being drawn INSIDE the shelf's own
+cast shadow, reading as grey smudges, and the fix is draw-order plus a wider
+roll pitch; `npm run profile` had gone silently green on NaN after the
+moulding split changed a gradient id it selects on, now fixed to fail loudly
+on a missing subject). Fast-forwarded cleanly. Built (no diff), opened the
+site at 390×844 and 1440×900, then rendered the solid classical variant and
+the `panel2o` ogee twin directly — both correct, the corbels read as crisp
+lit brackets rather than smudges, and the ogee moulding is visibly the
+broader single curve the commit describes against the reeded original.
+
+**Instruments:** test ✓ (5,235,784, matches the commit's own count exactly)
+· audit ✓ (no faults) · collide ✓ (`all`, 1,398 designs, matches exactly /
+`boxes`) · recreate ✓ (known catalogue gaps only, unchanged) · **profile ✗,
+exactly the one row the human's own commit documents** — `dark reed
+lower/upper 1.044` against a 1.03 gate, reproduced digit-for-digit. Read
+their reasoning in full before treating this as anything to act on: three
+independent attempts at re-deriving the quantity the compositing wash
+cancels out of all still showed a 3.5–4.8% gap between panels, they
+explicitly declined to widen the gate or tune the drawing to fit it, and the
+re-basing work is named in `CLAUDE.md` §9 for whoever picks it up. Not mine
+to second-guess without doing that work myself, and not what a quiet
+five-hour check-in is for.
+
+**Changed:** nothing. Everything I measured matches what was already pushed
+and documented; there was nothing new to find and nothing red that isn't
+already accounted for by name.
+
+**Left alone deliberately:** the profile gate, per the human's own explicit
+reasoning above. `CLAUDE.md` §9's re-basing item, which is real, scoped
+future work and not something to start speculatively at the tail of a
+confirmation run.
+
+**Commit:** `c64d2a9`
+
+---
+
+## 2026-08-25 10:51 UTC — run 33: the last open question about the classical set is traced, and it was not a bug
+
+**Looked at:** no new commits since run 32's push. Built (no diff), opened
+the site at 390×844 and 1440×900 — unchanged from the last two runs. With
+three quiet runs behind me and one concrete, real, already-identified open
+item on the books (not manufactured work), I spent this run closing it
+rather than writing a fourth identical "nothing worth changing" entry.
+
+**The open item:** since run 30, `faceObstacles` sets `band: MOULD_BAND`
+uniformly on all six classical-set obstacle pieces, but `footHits`'s
+ring-with-a-walkable-middle treatment (right for a raised panel, where the
+flat field inside the frame is exactly where a bar's foot belongs) was only
+ever verified for the `panel` piece. Whether it could open a walkable hollow
+in one of the five `moulding`-kind pieces — cornice, frieze, shelf, band,
+plinth — where none should exist, letting a customer's dragged handle rest
+somewhere visually occupied (the shelf's tablet motif, the set's own turned
+pull), was flagged and never traced.
+
+**Traced by direct computation, not by reasoning about it.** Wrote a script
+against the real `gripFeet`/`classicPieces`/`MOULD_BAND` exports — every
+`HANDLES` entry that has feet, every `SIZES` band, both the glazed and solid
+variant — and evaluated `footHits`'s own hollow-interior arithmetic
+(`ob.h > 2·(ob.band + f.r)` and the same for width) against every piece.
+Two things open a hole, and both are correct:
+
+- **The solid variant's `light` piece** — the panel substituted for the glass
+  when the customer picks the unglazed set — opens a real, large hollow
+  (up to 356×659 mm on `wide`). It should: that piece is a genuine raised
+  panel, a moulded frame round a flat field, and its own catalogue comment
+  says as much ("a big raised panel with a peephole and a ring knocker" —
+  and the peephole/knocker are a withdrawn group, so nothing is actually
+  drawn there to be sat on). This is the SAME rule every other panelled door
+  in the range already follows.
+- **The `band` piece on the `tall` size only**, with the three narrowest bars
+  (Ella, Ron, `barblack`, foot radius 9–10 mm) — a 4.5–6.5 mm sliver, smaller
+  than the foot's own diameter. Mathematically a hole; nothing a customer or
+  a photograph could ever tell apart from solid.
+
+**Every genuinely solid piece — cornice, frieze, shelf, plinth, foot — stays
+fully solid on every size, every handle, both glazed states.** None of them
+is tall enough for `MOULD_BAND` (70 mm) to open a hole at any real foot
+radius (9–42 mm across every grip in the catalogue, `shiran` widest). The
+tallest of them, `band` at 143.5 mm on a standard leaf, needs a piece over
+2·(70+r) ≈ 160–184 mm tall before a hole opens, and never reaches it outside
+the `tall` sliver above.
+
+**Changed:** nothing shipped — only `CLAUDE.md`, closing the note run 29 and
+the human's fix both left open. No renderer or rules change, because nothing
+needed fixing: `band: MOULD_BAND` on the moulding-kind pieces is imprecise
+by name but provably inert everywhere it matters, and the one place it is
+NOT inert (the `light` piece) is correct to have a hollow.
+
+**Instruments:** test ✓ (5,158,800) · audit ✓ (no faults) · profile ✓ ·
+collide ✓ (`all`, 1,358 designs / `boxes`) · recreate ✓ (known catalogue
+gaps only). All confirmed green before this investigation and unaffected by
+it, since nothing shipped moved.
+
+**Left alone deliberately:** the `band: MOULD_BAND` field itself. Renaming
+it or splitting it per-piece would be a real cleanup, but it changes no
+behaviour anywhere I could find, and AGENT.md's own standing note applies —
+a change made because it looks tidier, with no defect behind it, is not
+one to make.
+
+**Commit:** `6681e10`
+
+---
+
+## 2026-08-25 05:48 UTC — run 32: nothing worth changing
+
+**Looked at:** no new commits since run 31's push — local and origin already
+matched. Built (no diff), opened the site at 390×844 and 1440×900, then
+opened the real in-page gallery (`#works-btn`, "התחילו מדלת שכבר התקנו") for
+the first time in a few runs rather than repeating the same click sequence —
+all 30 measured doors render distinctly, no console errors, no id collisions
+visible. My first attempt clicked the header's "דגמים" nav link instead,
+which points at the external `dlatotmagen.co.il/works` and correctly fails
+to load over `file://` — that is expected (site not deployed, `PLAN.md` §9)
+and my own test's mistake, not a site defect; re-tested against the actual
+in-page trigger and it works.
+
+**Instruments:** test ✓ (5,158,800) · audit ✓ (no faults) · profile ✓ ·
+collide ✓ (`all`, 1,358 designs / `boxes`) · recreate ✓ (known catalogue
+gaps only). All six green, all confirmed by direct re-run.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — nothing red, nothing found looking
+at the page. The `footHits`/classical-set reachability question from run 30
+is still open and still not started; it needs a dedicated pass, not a few
+spare minutes at the end of a green run.
+
+**Commit:** `30dcf19`
+
+---
+
+## 2026-08-25 00:48 UTC — run 31: nothing worth changing
+
+**Looked at:** no new commits since run 30's push — local and origin were
+already at the same sha. Built (no diff), opened the site at 390×844 and
+1440×900, clicked through all four sections, then exercised window → rect,
+handle → idan, detail → panel3, colour → black in sequence through the real
+UI: no console errors, price and spec line stayed consistent, and selecting
+the three-panel face correctly stepped the window back to "none" (a panel
+and a window in the upper half cannot coexist, and `repair()` did its job
+silently and correctly).
+
+**Instruments:** test ✓ (5,158,800) · audit ✓ (no faults) · profile ✓ ·
+collide ✓ (`all`, 1,358 designs / `boxes`) · recreate ✓ (known catalogue
+gaps only, unchanged). All six green, all confirmed by direct re-run, none
+of it inherited from a commit message.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — there is nothing red and nothing I
+found looking at the page that deserved changing. The one still-open item
+from run 30 (whether `footHits`'s ring treatment on the classical set's
+non-panel rows can ever place a foot somewhere visually occupied) is real
+work for a dedicated pass, not something to start at the tail end of a
+green run with nothing prompting it.
+
+**Commit:** `42f2e3c`
+
+---
+
+## 2026-08-24 21:00 UTC — run 30: `npm run profile` fixed — the check was sampling paint texture it was never meant to see, and it is falsifiable now
+
+**Looked at:** four new human commits since run 29 — a photo-crop correction
+(`e2cb53d`, the classical set's measurements had been read off the whole
+rotated photograph rather than a cropped leaf), five more doors put through
+the recreation loop (`7d8d239`), **the exact fix to run 29's `collide -- all`
+finding** (`4631d8a` — see below), and the three-panel face corrected from a
+derived guess to what three photographs actually show (`8f1d7be`). Fast-
+forwarded cleanly. Built (no diff), opened the site at 390×844 and 1440×900,
+clicked through all four sections, then rendered the corrected three-panel
+face and the classical set directly through `?bare=1` query states and looked
+at both — the three-panel face now shows a tall upper panel, a short handle
+plate at hand height with the turned pull across it, and a medium lower
+panel, matching the commit's description; the classical set's shelf and
+casing no longer show any sign of the overlap the fix describes.
+
+**Instruments:** test ✓ (5,158,800) · audit ✓ (no faults) · collide ✓ on
+**both** `all` (1,358 designs) and `boxes` — confirming the human's fix from
+run 29's finding · recreate ✓ (known catalogue gaps only, unchanged) · sheets
+current · **profile ✗ at the start of the run, then fixed** (see below).
+
+**Run 29's `collide -- all` diagnosis was picked up and fixed exactly as
+laid out**, one commit later: `classicSet()`'s individual pieces are tagged
+now (`data-detail="moulding" data-piece="…"`, the outer wrapper carries
+`data-set` instead, which neither reader selects on), closing both the
+false "classic x pane" overlap and the "obstacles the rules believe in and
+the drawing does not" gap. The fix also found two REAL faults the moment the
+instrument could see the pieces — a band declared at the shelf's width while
+the drawing had narrowed it and hung the brackets outside, and the window's
+casing sharing stock with the shelf's corona for 61 mm — neither of which
+this agent could have found, since neither instrument could see the pieces
+well enough to compare them. Confirmed clean by direct re-run, not by
+trusting the commit message: `collide -- all` now reports `faceObstacles
+agrees with the drawing everywhere` and `nothing overlaps anything it should
+not` over 1,358 designs.
+
+**`npm run profile` fixed this run — three runs of documentation (28, 29,
+this one) turned into one small, verified change.** The diagnosis from run 28
+held: `grainTex`/`drift` paint in the SVG's ABSOLUTE coordinate space, so a
+leaf-relative sample point lands on a different phase of the same fixed
+texture depending on where the leaf sits in the scene, which is not what
+either failing check (panel-rate, moulding-bead) is meant to be measuring —
+`npm run mottle` is the dedicated instrument for paint texture, and already
+divides falloff out for exactly this separation. Fixed with one line in
+`tools/profile.mjs`'s shared `draw()` helper: strip
+`[filter="url(#drift)"], [fill="url(#grainTex)"]` from the DOM before every
+screenshot. Numbers, before → after:
+
+    FALLOFF (dark)      worst row 0.070 → 0.056     (tightened, not shifted)
+    panel rate (dark)   ratio 0.48 ✗ → 0.70 ✓        (gate is 0.6–1.6)
+    moulding bead (dark) ratio 1.083 ✗ → 1.019 ✓     (gate is ±3%)
+
+**Verified both directions before trusting it, not just that the numbers
+moved the right way.** FALLOFF tightening rather than moving is the signal
+that noise came out and nothing else changed. Then falsified: temporarily
+dropped `keyWash` from the moulding's own `data-relight` wash — reproducing,
+on purpose, the exact historical bug `profile.mjs`'s own docstring already
+describes (a bead reading an absolute tone instead of tracking the leaf's
+fall) — and the texture-stripped bead check still failed correctly on both
+bands, 1.336 dark and 1.038 light. Reverted immediately; `js/renderer.js` is
+byte-identical to what was pulled, confirmed via `git status`. A check that
+cannot be broken on purpose after being hardened is not hardened, it is
+blind, and I would rather find that out myself than leave it for whoever
+looks next.
+
+**Left alone deliberately:** the third, unconfirmed thing run 29 and the
+human's fix both flagged — whether `footHits`'s "ring with a walkable flat
+middle" treatment, applied to all six classical rows, ever lets a reachable
+customer state place a foot in a spot that's visually occupied (the shelf's
+tablet motif, the set's own pull) — is still open. Tracing `gripHome`'s
+actual reachable positions for `detail: 'classic'` is a different piece of
+work from either fix in this entry and I did not start it this run.
+
+**Also corrected:** `CLAUDE.md` §0c's "Green" list and "Red, and known"
+section both still said `npm run profile` was excluded/red; struck through
+per the section's own established pattern (kept, not deleted, because the
+diagnosis is the useful part) and moved into Green. Test count refreshed to
+5,158,800 throughout.
+
+**Commit:** `268b5bf`
+
+---
+
+## 2026-08-24 16:11 UTC — run 29: the classical set's frame and its window agree in the rules and disagree in the sweep, and both readers turn out to be asking the wrong question
+
+**Looked at:** one substantial human commit since run 28 — the classical set
+(`classic`), the ring-and-scroll lattice (`rings`) and a black tube bar
+(`barblack`), built against five new photographs in `research/newdoor/`.
+Fast-forwarded cleanly. Built (no diff), opened the site at 390×844 and
+1440×900, clicked through all four sections, then built the exact new
+combination through the real UI (window → rect, detail → classic, grille →
+rings, handle → barblack) rather than trusting a query string — price, spec
+line and drawing all agreed, and the picture matches the composition the
+commit describes: cornice, frieze, corbelled shelf with its own pull, panel,
+plinth, all correctly clear of the ring-lattice window between them.
+
+**Instruments:** test ✓ (4,377,785) · audit ✓ (no faults) · collide `boxes` ✓
+· recreate ✓ (known catalogue gaps only, unchanged) · sheets current (no
+staleness failures) · **collide `all` ✗ (2 findings, both new, both in the
+classical set's obstacle description)** · **profile ✗ (unchanged from run 28,
+re-confirmed byte-identical: dark ratio 0.48 / 1.083, same root cause already
+documented, not re-investigated).**
+
+**Changed:** nothing. Both `collide -- all` findings are real, but neither is
+a customer-visible defect — I traced each to a specific, narrow mechanism and
+am documenting rather than patching three files (renderer markup plus two
+separate `collide.mjs` checks) without the verification that deserves.
+
+**1. "20 obstacles the rules believe in and the drawing does not."**
+`faceObstacles` declares six rectangles for `detail.classic` — window,
+cornice, frieze, shelf+band, panel, plinth — off `CLASSIC_ROWS`/
+`CLASSIC_COLS`, the SAME constants `classicSet()` draws from, so the two
+cannot disagree about position (unlike the ordinary "second description"
+family in CLAUDE.md §5, this one shares its source). The gap is narrower:
+`collide.mjs`'s drift-check reader (`tools/collide.mjs` around line 339-361)
+only knows how to find two kinds of obstacle in the rendered markup —
+`[data-pane]` for `window` and `[data-detail="panel"]` for `panel`. It was
+never taught to look for the `kind: 'moulding'` rectangles `faceObstacles`
+started emitting for cornice/frieze/shelf/plinth, so those four can never be
+independently confirmed against the drawing — not because they drifted, but
+because the reader was never extended when the kind was added.
+
+**2. `footHits`'s ring-with-a-hollow-middle model is applied to four pieces
+that are not panels.** `faceObstacles` sets `band: MOULD_BAND` on ALL SIX
+classic rows, including the four `moulding`-kind ones — and `band` is what
+tells `footHits` to treat a rectangle as a FRAME with a walkable flat field
+inside it, which is exactly right for a raised panel (that flat field is
+where a bar's foot is supposed to stand, per the photograph-verified rule
+already in this file) and is not obviously right for a cornice, a frieze, or
+the corbelled shelf, none of which have a legitimate empty middle — the
+shelf+band rectangle (512×209 mm) is fully occupied by `classicBand`'s tablet
+motif and the set's own `classicPull`. Whether this actually lets a
+buildable, reachable customer state place a foot in that computed "hollow" —
+I did not confirm either way. It needs tracing through `gripHome`'s actual
+reachable positions for this detail, not an assumption.
+
+**3. The reported "classic x pane" collision (4 designs, 496×921 mm,
+`idan+cylinder/rect/{standard,wide}/{right,left}-in/classic`) is a bounding-
+box artefact, not hardware crossing glass.** Read the pair name literally —
+it is not `idan x pane` (the hardware-vs-glass exception in `collide.mjs`
+already skips those, correctly, per its own comment on why a bar may cross an
+architrave). It is the OUTER `<g data-detail="classic">` wrapper against the
+window. `CLASSIC_ROWS` puts the cornice/frieze entirely above the window
+(ending at 0.148, window starts at 0.159) and the shelf entirely below it
+(starting at 0.557, window ends at 0.540) — verified off the constants
+directly, no rendering needed. Nothing in the composition actually touches
+the glass. But `classicSet()` returns all of it as ONE group, and
+`drawnBox()`'s generic `getBBox()`-over-children walk unions cornice-to-
+plinth into a single rectangle that necessarily spans the window's row too,
+since the window sits in the gap between them. The hits-sweep has no way to
+tell "this composite's members don't cover its own bounding box" from "this
+object is genuinely there" — the same class of box-vs-paint gap CLAUDE.md §8
+already names for shadows and clip paths, in a place nobody had reason to
+look until a detail was built from more than one disjoint piece.
+
+**Left alone deliberately, and why.** All three are real gaps in what the
+instruments can currently prove, not proven defects in what the customer
+sees — I checked the composition visually and through the real UI and it is
+correct. Fixing #1 and #3 correctly means tagging `classicSet()`'s individual
+pieces distinctly (cornice/frieze/shelf/plinth) so both the drift-check and
+the hits-sweep read pieces instead of the composite, which also makes #3
+disappear as a side effect since the pieces themselves would stop
+bounding-box-overlapping the window. Fixing #2 needs the reachability trace
+first — patching `footHits` or the `band` field without knowing whether
+anything can actually reach that gap risks a change with no test behind it
+either way. All three belong in one pass, not three rushed edits at the end
+of an already-long investigation, and AGENT.md's own five "never"s make
+patching a rule I have not fully verified the wrong trade against pushing
+red once more.
+
+**Also corrected:** CLAUDE.md §0c's own "Green" list claimed
+`npm run collide` was clean over both `all` and `boxes`, "including the
+classical set's cornice, frieze and shelf, which it had to be taught about
+before it could." Re-ran `collide -- all` twice, on a clean tree, to be sure
+before touching the claim — it is reproducibly red, exactly the two findings
+above. Corrected in the same commit, per CLAUDE.md's own instruction to fix
+what is already there when found wrong, not just add to it.
+
+**Commit:** `a89ed71`
+
+---
+
+## 2026-08-24 11:04 UTC — run 28: `npm run profile` is red, and it is not the drawing
+
+**Looked at:** four new human commits since run 27 — `5c679e0` (fourteen
+outside reports, the scene anchored, the alcove removed), `65e3e5b` (the undo
+button's height, measured by the audit), `9b30b20` (grab-bar placement rule
+and keyhole position), `a554a4d` (the threshold as one path, the sconces
+reaching the door). Fast-forwarded cleanly. Built, opened the site at 390×844
+and 1440×900, clicked all four sections — the room, the reflection and the
+new threshold all look right. Container was healthy; ran the full suite.
+
+**Instruments:** test ✓ (3,704,418) · audit ✓ (no faults) · collide ✓
+(`all` / `boxes`) · recreate ✓ (three known catalogue gaps, unchanged) ·
+**profile ✗ (2 faults, dark band only)**.
+
+**Changed:** nothing shipped. `js/`, `css/`, `assets/bundle.js` and
+`index.html` are byte-identical to `a554a4d`.
+
+**`npm run profile` came up red on the dark band, on two of its three checks —
+the two-panel shading-rate check and the moulding-bead check — and I spent
+this run finding out why rather than either silencing it or guessing at a
+fix.** Bisected across all four commits: the FALLOFF check (nine rows against
+the corpus median, the one the file's own docstring calls "the one number the
+leaf's whole lighting model is built on") passes cleanly at every commit,
+worst row 0.070/0.090 against a 0.09 tolerance. Only the two RATIO checks
+broke, and both broke at the same commit, `5c679e0` — the scene-anchoring
+round — and did not move again in the three commits after it.
+
+**Screenshot of the failing state (dark, two panels, an Idan bar): no visible
+defect.** No bulge, no flat panel, both mouldings read the same depth to the
+eye. So before touching anything I went looking for the mechanism rather than
+the symptom.
+
+**Ablation, not guesswork — CLAUDE.md §6's rule.** I rendered the exact
+failing state (`colour: rb-0097d, detail: panel2, handle: idan`) at both
+commits and diffed the raw SVG: every gradient definition — `leafFill`,
+`keyWash`, `bloom`, `mould-t/b/l/r` — is byte-identical before and after.
+`PANEL_ROWS.pair` is untouched, `[[0.07,0.58],[0.66,0.92]]`. What moved is the
+leaf's own ABSOLUTE position in the scene: `x=178,y=304` before,
+`x=364,y=604` after — the room-anchoring rework the commit itself describes.
+Raw single-pixel luminance at the four sample points shifted by only 2-4 out
+of 255 (~1.5%), which a `log()`-based rate over an already near-flat lower
+panel amplifies into a large ratio swing — exactly the numerical fragility
+this same file's docstring already names for the check ABOVE this one
+("a point sample… lands on the quirk or on the paint's own mottle depending on
+rounding. The peak is stable" — which is why FALLOFF samples a band and these
+two checks sample one pixel).
+
+I tested every plausible cause by turning it off and re-measuring, at both
+commits, holding everything else fixed:
+- **the new sconce-on-door wash** (`lampOnDoorL/R`) — zero effect, identical
+  numbers with and without it (it decays to nothing by 0.34 of the CASING
+  width and never reaches x=0.42 of the LEAF)
+- **the floor reflection** (`<use href="#door">`, opacity 0.13, blurred) —
+  zero effect with it fully suppressed
+- **the pull bar** (`handle: 'idan'` vs `'none'`) — byte-identical numbers
+  either way; the bar and its shadow do not cross the sample column
+- **the leaf's own grain/drift texture** (`grainTex`, `drift` — a repeating
+  180-unit pattern and a turbulence filter, both painted with
+  `patternUnits="userSpaceOnUse"`, i.e. in the SVG's ABSOLUTE coordinate
+  space, not the leaf's local one) — **this was it.** Disabling both at
+  `a554a4d` moves the ratio from 0.484 (fail) to **0.701 (pass)**; disabling
+  both at `3564a5c` gives 0.933. The two states converge to close, both-passing
+  values the moment the texture stops being sampled.
+
+**So the mechanism is real and specific: the leaf's paint texture is anchored
+to the SVG's absolute coordinate space, and the room rework moved the leaf
+186×300 units within that space — landing the SAME leaf-relative sample point
+on a different phase of the SAME repeating pattern.** Visually meaningless (a
+"whisper of fine grain" over a few percent of a panel), numerically enough to
+flip a fragile single-pixel ratio.
+
+**Left alone deliberately, and why.** Two things I did NOT do, both on
+purpose:
+1. **Did not touch the drawing.** No photograph or measurement says the panel
+   is wrong; the screenshot and the FALLOFF check both say it is not. Changing
+   a gradient or a coordinate to chase this ratio would be exactly the
+   mistake §6 already lists three times over — fitting the drawing to an
+   instrument reading instead of to what the corpus shows.
+2. **Did not harden `tools/profile.mjs` this run.** The fix that fits the
+   established precedent (the FALLOFF check already moved from a point probe
+   to a band average for this exact reason) is real, but making the panel-rate
+   and bead checks robust to a 180-unit texture period needs a wide enough
+   sample that it doesn't cross into the mitre or the neighbouring panel —
+   a 7×7 pixel average I tried moved the after-state ratio from 0.484 to only
+   0.532, still short of the 0.6 floor, so a correct fix needs real tuning and
+   a falsification pass (break the symmetry on purpose, confirm it still
+   fails), not a rushed patch at the end of an already-long investigation.
+
+**This is red, understood, and left for the next run to harden properly —
+not silenced, not guessed at, not stamped over.** No shipped file moved this
+run, so there is nothing to push that changes the live site; committing only
+this log entry.
+
+**Commit:** `a5f03a2`
+
+---
+
+## 2026-08-24 07:17 UTC — run 27: fourteen grille tiles shared one id apiece, and the pixels hid it
+
+**Looked at:** two new human commits since run 26 — `29e5c0b` (a six-lens
+review of the previous round, gallery id-collision fixes, a trust-band CSS
+bug, plus 14+ smaller findings) and `1bef09e` (CLAUDE.md rewritten with §0a
+orientation and §0c "where it stands today"). Fast-forwarded cleanly, no
+conflicts. Built, opened the site in Chromium at 390×844 and 1440×900,
+clicked through all four sections. Container was healthy this run —
+`npm run sheets` completed on the first try.
+
+**Instruments:** test ✓ (5,676,741) · audit ✓ (no faults, was 2) · profile ✓ ·
+collide ✓ (`all` / `boxes`) · recreate ✓ · latency ✓ (80/164/410 ms against a
+600 ms gate). All green before pushing.
+
+**Changed:** two faults in `tools/collide.mjs`'s sibling instrument this
+round were in the drawing itself, both surfaced by `npm run audit`'s
+order-sheet checks.
+
+**1. `npm run audit` found `99 duplicated id(s)` on `?sheet=1`, and the cause
+was not the sheet.** Traced it to `grilleGlyph()`, which draws every option's
+tile preview at a fake origin — `grillePaths(grille.id, 0, 0, S, S, …)` — and
+the ironwork id generator only keyed off `x, y`. Every tile therefore computed
+the same sequence, `k0_0_0`, `k0_0_1`… Measured directly on the plain live
+page, no sheet or query string involved:
+
+    130 `k`-prefixed ids, 31 unique — nine tiles (grid, scroll, iron,
+    quatrefoil, arch…) genuinely sharing id="k0_0_0" with nine DIFFERENT `d`
+    attributes.
+
+Per the SVG spec an id resolves to the first matching element in the whole
+document, not per `<svg>` root — the exact mechanism `copyOf` exists to fix
+for the gallery, landed one commit earlier in the same round I pulled. Same
+disease, CLAUDE.md §5 in a third costume: an id computed in one place
+(geometry) and consumed in another (every `<use href>` in the document), never
+asked to be unique because for years each glyph was the only reader of it.
+
+**And it painted correctly anyway**, which is why nothing had caught it before
+the audit's duplicate-id sweep. Isolated before/after screenshots of the
+choices panel with every other change held constant: **0 px differ.** The
+browser's first-match-wins resolution happened to land on a shape close enough
+that nine colliding curls did not visibly break the tile — the markup was
+invalid the whole time and the picture never said so. Fixed by keying `uid`
+off the grille's own id as well as its geometry. A `-light` variant shares its
+base pattern's `d`, and keying off the STRIPPED name (my first attempt)
+recreated the fault at 41 remaining same-kind collisions, harmless in pixels
+and still invalid; keying off the raw name gives `-light` its own copy. 130
+kids in, 130 unique out, confirmed by direct DOM query.
+
+**2. The order sheet also carried two `<h1>`.** `.is-sheet .layout {
+display: none }` hides the base page's heading visually, but `display: none`
+does not remove an element from the DOM — a document meant to be navigated by
+its headings had one hidden `<h1 id="stage-h">` sitting beside
+`buildSheet()`'s own `<h1 class="sheet__brand">`. `.layout` is now actually
+removed from the DOM in sheet mode rather than only CSS-hidden; nothing past
+that point in `?sheet=1` reads it.
+
+Verified the fixed sheet in the browser: one heading, the ironwork drawn
+correctly on both leaf and sidelight panes, dimensions, price, and the
+handing spelled out (ציר בצד שמאל, צילינדר בצד ימין — במבט מבחוץ).
+
+**Left alone deliberately:** everything else the six-lens review already
+covered — I did not re-verify their 29 confirmed findings, only pulled the
+result. The three catalogue gaps `npm run recreate` reports (d106, d113, d122
+— hardware finish, withdrawn axis) are unchanged and are Peretz's call. Also
+corrected CLAUDE.md §0c, which had "npm test reports 4 failures" written down
+as a standing fact — it is a fact about a degraded container, not about the
+repository, and this run's container was healthy.
+
+**Commit:** `60cb6e3`
+
+---
+
+## 2026-08-24 01:06 UTC — run 26: the branch was red, and `collide -- boxes` was printing a ✗ it then threw away
+
+**Looked at:** five human commits since run 25. `npm test` came up **4 failed**
+on a clean tree, all four sheet families stale — so the branch was red as
+pushed. Ran the whole suite from there.
+
+**Instruments:** test ✓ (5,676,680) · audit ✓ (no faults) · profile ✓ ·
+collide ✓ (`all` / `boxes`) · recreate ✓ · shot ✓. All six green before pushing.
+
+**Changed:** regenerated all four sheet families, and fixed three faults in
+`tools/collide.mjs`. Nothing in `js/` or `css/` moved — the drawing is
+untouched, and `git diff` on `js/renderer.js`, `assets/bundle.js` and
+`index.html` is empty.
+
+**1. The sheets were genuinely stale, and the history says exactly how.**
+`1649e9d` regenerated all 33 sheets and wrote `.stamps.json`. `37fc142` ("the
+second mockup, built") then rewrote the page — `css/app.css` +522,
+`index.html` +145, `assets/bundle.js` +423 — regenerated **exactly one**
+screenshot (`phone.png`), and never re-stamped. So 32 sheets were pictures of
+the pre-mockup page while the suite failed four assertions saying so. This is
+not the container ceiling AGENT.md warns about: `npm run sheets` completed
+normally here. Magnitude, against the committed copies —
+
+    phone.png     390x2031 -> 390x2099   (68 px taller: a layout change)
+    laptop.png    32.19% of pixels differ, max channel delta 237
+    corpus-00     9.33% differ, max 48      recreate-d003  9.22% differ, max 49
+
+— and regenerating twice gave byte-identical output both times, which is what
+rules out a flaky renderer and leaves only "the pictures are old". Opened
+`phone.png` and confirmed the page renders correctly in this container: Hebrew
+fonts present, nav, trust band, navigator and spec table all drawn.
+
+**2. `MOUNT_REACH is short by 3 mm` was three millimetres of shadow.** The
+`-- boxes` reader took `getBBox()` on each `[data-mount]`, and `getBBox` on a
+wrapping group returns the union of its children — including the cast shadow
+`disc` draws inside the rosette's own group at `cx + 3`. Measured both ways:
+
+    whole group, shadow included   124 mm   ✗ "short by 3 mm"
+    the metal only                 121 mm   ✓  = MOUNT_REACH, exactly
+
+The 3 is the shadow's own x offset, to the millimetre. **`MOUNT_REACH = 121`
+was right all along** and I changed no measured number — the third outing of
+the fault CLAUDE.md §8 and AGENT.md both already record by name ("a drop shadow
+is not an object"), in the one reader in that file which had never been handed
+`metalBox`. It uses it now instead of growing a fourth copy of the question.
+
+**3. And my own first fix hid five of the six fittings.** `metalBox` walks
+`querySelectorAll`, which finds descendants only — so handed a bare
+`<circle data-mount="shiran-disc">` it returned null and the caller skipped the
+fitting. Every `data-mount` except the Cadoor rose is a leaf shape (two
+backplates, a slab, two plates, the Shiran's discs), so my first version
+measured one of six and called it the deepest. Caught because the grip line
+disappeared from the output. Absent output, not wrong output — CLAUDE.md §5,
+from inside the instrument meant to catch it. `metalBox` now includes the root
+when the root is itself a shape; the grip figure is back at 373 mm, unchanged.
+
+**4. The gate could not fail.** Under the two lines that decide the exit code:
+
+    if (deepest.reach > MOUNT_REACH) process.exitCode = 1;
+    process.exitCode = bad ? 1 : 0;          // <- clobbers the line above
+
+The MOUNT_REACH verdict was computed, printed with a ✗, and overwritten before
+anything could read it. With `bad` at 0 the command exited **green while
+telling the screen it was short** — and both `renderer.js`'s own note and
+CLAUDE.md say of this command that it "re-measures the 121 and fails if it has
+grown". It did not fail; it could not. Verified falsifiable in both directions:
+understating the constant to 118 gives `✗ short by 3 mm` and **exit 1**, the
+true 121 gives ✓ and **exit 0**, and `js/renderer.js` was restored
+byte-identical afterwards.
+
+**Left alone deliberately:** the drawing — nothing here was a reason to move a
+coordinate, and the one number that looked wrong turned out to be correct.
+The hardware finish, the three off-chart colours and every price, all human
+calls in `ASK-PERETZ.md`. `MOUNT_REACH` itself, because it measures 121.
+
+**Commit:** `20d9309`
+
+---
+
+## 2026-08-23 21:01 UTC — run 25: the price on the page was unguarded too, and it is the number that costs money
+
+**Looked at:** no new pushes. Last run closed the spec table's sink; the
+obvious next question is which other page values are shown without anything
+comparing them to their source. The price is the highest-stakes one there is.
+
+**Instruments:** test ✓ (5,674,573) · audit ✓ (7 viewports) · profile ✓ ·
+collide ✓ (base / `all` / `boxes`) · recreate ✓ · shot ✓. Only
+`tools/audit.mjs` differs.
+
+**Changed:** the audit now compares the price on the page against
+`priceAgorot`, and every `[data-price]` copy against the card's.
+
+**The gap, proved the same way as last run.** `tools/audit.mjs` asserted of the
+price only that it **contains a digit** and that it changed when the door did.
+So I added 100 agorot inside `paint`'s own `[data-price]` loop:
+
+    npm test    ✗ 4 failed — all sheet-staleness, which fire for any page change
+    npm audit   ✓ no faults, with every price on the page a shekel high
+
+A render path showing the wrong figure passed. `npm test` proves `priceAgorot`
+is right — I swept 1,197,990 buildable designs for that in run 6 — and
+thoroughness at the source is exactly what makes a drifted sink invisible.
+Third instance of one pattern: `#summary`, then the spec table, now the price.
+
+**Two checks, because the page shows the number twice.** The card and the dock
+both carry `data-price`, which is CLAUDE.md §5's own shape — *two elements each
+fetching their own copy of a number*. So one check says the card equals
+`priceAgorot(decoded)`, and a second says every other copy equals the card.
+Both verified live:
+
+    both wrong   "the price reads ‏4,076 ‏₪ and priceAgorot says ‏4,075 ‏₪
+                  — #price has drifted off js/price.js"
+    dock only    "[data-price] #1 reads ‏4,076 ‏₪ and the card says ‏4,075 ‏₪
+                  — two copies of one number"
+
+The second is the one that matters more: a customer reading the dock and a
+customer reading the card would have been quoted different figures for the same
+door, and every source-level assertion would have stayed green.
+
+**Compared against `formatAgorot(priceAgorot(back))`, not against digits.**
+Stripping to digits would survive a broken formatter — a thousands separator
+lost, the currency dropped — and the formatted string is what a customer
+actually reads. The state comes from decoding the on-screen code, so the page
+supplies both halves and nothing has to be passed in.
+
+**Left alone:** everything else. Tool only — no site file, no bundle change.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
+## 2026-08-23 16:08 UTC — run 24: the spec TABLE was the one sink nobody was watching
+
+**Looked at:** no new pushes, so the property `js/spec.js` exists to guarantee —
+that the table a customer proof-reads and the message Peretz receives are one
+statement of the door.
+
+**Instruments:** test ✓ (5,674,573) · audit ✓ (7 viewports) · profile ✓ ·
+collide ✓ (base / `all`) · recreate ✓ · shot ✓. Only `tools/audit.mjs` differs.
+
+**Changed:** `npm run audit` now checks the spec table against `specRows`, row
+for row, as it already checked `#summary` against `summaryLine`.
+
+**How this was found, including the part where my own check was worthless.**
+I first compared the rendered table against the WhatsApp message across eight
+doors and got eight greens. Then I tried to falsify it — put a wrong value in
+`spec.js` — and it stayed green. **Of course it did:** `share.js` imports
+`specLines` and `app.js` imports `specRows`, both from `spec.js`, so moving the
+source moves both and they agree by construction. A test of that is a test of
+nothing.
+
+Falsified properly by perturbing a **consumer** instead — appending a marker in
+`app.js`'s own table renderer — and then the interesting result:
+
+    npm test    ✗ 4 failed — all four are SHEET-STALENESS checks, which fire
+                  for any change to the page and say nothing about the table
+    npm audit   ✓ no faults, with every row on screen reading "… ZZTOP"
+
+So the table could show a customer one door while the order carried another,
+and the only instrument that can see the page was not looking.
+
+**Why this is the same fault twice.** CLAUDE.md already records it for
+`#summary`: *assertions about `spec.js` prove the SOURCE is right; the defect
+was a SINK that had drifted off its source*. That was fixed — the audit decodes
+the on-screen code and compares. Then Stage 4 built a **second sink** beside it,
+the spec table, and nothing followed it here. The source-level chain is
+thorough (`npm test` asserts every row reaches the order, the summary and the
+accessible name) and thoroughness at the source is exactly what makes a
+drifted sink invisible.
+
+Row for row rather than on the concatenation, because a table that agrees on
+the joined string and disagrees about which row holds what is still wrong.
+Verified live: the marker gives *"spec row 0 on the page is 'colour: שחור
+(רב בריח 9005D) ZZTOP' and js/spec.js says 'colour: שחור (רב בריח 9005D)' —
+#spec has drifted off js/spec.js"*, naming the row, the page and the source.
+
+**Left alone:** everything else. Tool only — no site file, no bundle change.
+
+**Commit:** see the commit carrying this entry.
+
+---
+
 ## 2026-08-23 10:52 UTC — run 23: nothing worth changing. Drove the saved-designs drawer, which nothing had
 
 **Looked at:** no new pushes, so the newest customer-facing surface — the saved

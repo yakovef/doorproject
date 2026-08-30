@@ -2,18 +2,21 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { byId, COLOURS, declaredFinish, DETAILS, effectiveFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, HANDINGS, HANDLES, LOCKSETS, paneCount, SIZES, WINDOWS } from '../js/catalog.js';
+import { BELLS, PEEPHOLES, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
-import { formatAgorot, priceAgorot, shekels } from '../js/price.js';
+import { L, T, withLang } from '../js/copy.js';
+import { breakdownRows, formatAgorot, priceAgorot, shekels, tileAgorot } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT, locksetGlyph,
-  nearestGrip, render, sizeGlyph, windowGlyph,
+  gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT,
+  locksetGlyph, nearestGrip, peepholeFits, render, sizeGlyph, specialLockGlyph,
+  windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { conflicts, repair } from '../js/rules.js';
-import { describeSentence, specRows, summaryLine } from '../js/spec.js';
+import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
+import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
 
 let pass = 0, fail = 0;
@@ -26,14 +29,55 @@ const sizeKeys = Object.keys(SIZES);
    notice the implementation changing it. */
 const ALPHABET_TEST = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
-const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
-               handle: 'idan', lockset: 'coral', detail: 'plain',
-               size: 'standard', handing: 'right-in' };
+/* ⚠ THE FIXTURE'S COLOUR IS ONE OF PERETZ'S THREE INCLUDED ONES, ON PURPOSE.
+   It was `rb-0097d` (אנתרציט) and that colour became +₪200 on 30.8.2026. Left
+   alone it would have added two hundred shekels to every expected figure in
+   the price block below — twenty numbers each silently carrying a colour
+   surcharge nobody reading them would see, which is how a wrong figure hides.
+   The colour premium gets assertions of its own, where it is the subject.
+   It is also the shipped default, and there is a check below that it stays
+   one of the included three. */
+const base = { colour: 'rb-7126d', window: 'none', grille: 'none',
+               handle: 'idan', lockset: 'coral', speciallock: 'nospecial',
+               /* ⚠ ADDED 30.8.2026 WITH THE FIELDS THEMSELVES, and leaving
+                  them out failed exactly the way `DEFAULTS` warns a missing
+                  key does: `toQuery` wrote `bl=undefined`, `fromQuery` did not
+                  recognise it, and 1,900 round-trip assertions reported "an
+                  unexpected notice" about a door that was fine. Loud, which is
+                  the design — but the lesson is that this fixture is a second
+                  statement of DEFAULTS and there is an assertion below that
+                  every key of one is a key of the other. */
+               bell: 'nobell', peephole: 'nopeep',
+               /* ⚠ AND THESE THREE WERE ALREADY MISSING BEFORE TODAY. The
+                  guard below found them on its first run: this fixture has
+                  never carried the stripe fields, and it worked only because
+                  `isLineWork` reads `undefined` as falsy and gets the right
+                  answer by accident. A fixture that is right by accident is
+                  the thing that stops being right. */
+               stripeDir: 'none', stripeCount: 0, stripeTight: false,
+               mashkof: 'mk-std', pirzul: 'pz-nickel', handleLen: 0,
+               detail: 'plain', size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
-              'lockset', 'detail'];
+              'lockset', 'speciallock', 'bell', 'peephole', 'mashkof', 'pirzul',
+              'handleLen', 'detail'];
+
+/* ⚠ THE GUARD THAT WOULD HAVE CAUGHT TWO STALE FIXTURES, AND IT COST NOTHING.
+   `base` and `everyState`'s stem are both descriptions of "a door" written by
+   hand, which makes them second statements of `DEFAULTS` — and on 30.8.2026
+   two new fields landed and neither gained them. The symptom was 1,900
+   assertions failing with `bl=undefined` and "did not round-trip", none of
+   which named the actual fault.
+   Both spread `DEFAULTS` now. This asserts they still cover it, so a fixture
+   that drifts fails with a sentence saying which key is missing rather than
+   with two thousand about something else. */
+for (const k of Object.keys(DEFAULTS)) {
+  ok(Object.prototype.hasOwnProperty.call(base, k),
+     `the price fixture has no "${k}" — a key missing from a fixture encodes as `
+     + 'index 0 in silence, which is what DEFAULTS warns about');
+}
 
 /* The code's length is derived, never typed. It was written as {8} and the
    day the layout grew to nine characters that produced 280 failures saying
@@ -68,11 +112,44 @@ const buildable = st => {
 function* everyState() {
   for (const c of COLOURS) for (const s of sizeKeys) for (const h of HANDINGS)
     for (const w of WINDOWS) for (const g of GRILLES) {
-      const stem = { colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
-                     detail: 'plain' };
+      /* ⚠ `speciallock` IS IN THE STEM, NOT SWEPT. It is a fourth dimension on a
+         product that is already colour x size x handing x window x grille, and
+         multiplying the sweep by three to vary a fitting nothing else depends
+         on would triple a run that already takes minutes. It IS swept on its
+         own below, and the round-trip below needs it present at all: a key
+         missing from the stem encodes as `undefined`, which
+         `Math.max(0, indexOf(undefined))` masks to index 0 in silence. */
+      /* ⚠ SPREAD FROM `DEFAULTS`, AND IT USED TO BE TYPED OUT. The comment
+         above says exactly what a missing key does, and then two new fields
+         arrived on 30.8.2026 and this object did not gain them — 1,900 codes
+         "did not round-trip" about a layout that was fine. A hand-kept copy of
+         a list of keys is a second statement of that list (§5.10), and this
+         file had TWO of them: this stem and the `base` fixture at the top.
+         Both derive now, and there is an assertion below that they still carry
+         every key `DEFAULTS` does, so the next field cannot do it again. */
+      const stem = { ...DEFAULTS,
+                     colour: c.id, size: s, handing: h.id, window: w.id, grille: g.id,
+                     detail: 'plain', speciallock: 'nospecial', mashkof: 'mk-std',
+                     pirzul: 'pz-nickel', handleLen: 0 };
       const out = [];
       for (const n of HANDLES) out.push({ ...stem, handle: n.id, lockset: 'coral' });
       for (const k of LOCKSETS.slice(1)) out.push({ ...stem, handle: 'idan', lockset: k.id });
+      for (const x of SPECIAL_LOCKS.slice(1)) {
+        out.push({ ...stem, handle: 'idan', lockset: 'coral', speciallock: x.id });
+      }
+      for (const m of MASHKOFS.slice(1)) {
+        out.push({ ...stem, handle: 'idan', lockset: 'coral', mashkof: m.id });
+      }
+      for (const z of PIRZUL.slice(1)) {
+        out.push({ ...stem, handle: 'idan', lockset: 'coral', pirzul: z.id });
+      }
+      /* Skip the stem's own length: the HANDLES loop above already emits
+         idan/coral at it, and pushing it again is not a code collision, it is
+         the same door twice. */
+      for (const L of HANDLE_LENS) {
+        if (L === stem.handleLen) continue;
+        out.push({ ...stem, handle: 'idan', lockset: 'coral', handleLen: L });
+      }
       for (const st of out) if (buildable(st)) yield st;
     }
 }
@@ -245,7 +322,12 @@ for (const st of everyState()) {
 {
   const bad = fromQuery('?v=3&c=ral-nope&w=rect&g=none&n=bar-long&d=plain&f=steel&s=standard&h=right-in');
   ok(bad.notice === 'option-unknown', 'unknown option must notify, never silently default');
-  ok(bad.state.colour === 'rb-0097d', 'unknown option should fall back to default');
+  /* ⚠ `DEFAULTS.colour`, NOT THE ID SPELLED OUT. This line said `rb-0097d` and
+     went red the day the default colour moved — about a property of the
+     default that had not changed at all. What it asserts is "falls back to THE
+     DEFAULT"; naming one particular colour was a second statement of which
+     colour that is, in a file that already imports the first. §5.10's shape. */
+  ok(bad.state.colour === DEFAULTS.colour, 'unknown option should fall back to default');
   // The inside view is gone. An old link carrying i=1 must open the door, not
   // fail, and must not leave a stray key behind in the state.
   ok(fromQuery('?v=3&i=1').state.view === undefined, 'i=1 should no longer set anything');
@@ -317,8 +399,18 @@ for (const st of everyState()) {
      somebody's WhatsApp history. It must open the door it names, WITHOUT a
      notice — withdrawing an option is our change, not that customer's mistake
      — and without leaving a key behind that nothing downstream reads. */
+  /* ⚠ `d=panel`, AND IT USED TO BE `d=plain`. This link's subject is the
+     RETIRED PARAMETERS — `f=`, `a=`, `z=` must be ignored in silence, because
+     withdrawing an option is our change and not that customer's mistake. It
+     carried a plain face behind a square window, which was a fine door until
+     Peretz said "square needs to aways have a panel at the bottom"; now that
+     combination legitimately repairs and legitimately announces, and this
+     assertion started failing for a reason that has nothing to do with what it
+     is testing. Changed the door, not the assertion: a test whose fixture has
+     become invalid needs a new fixture, and a test whose expectation has
+     become inconvenient needs neither. */
   const old = fromQuery('?v=8&c=rb-0097d&w=rect&z=clear&g=none&n=idan&k=cylinder'
-                      + '&d=plain&f=brass&s=standard&h=right-in&a=peep,mail');
+                      + '&d=panel&f=brass&s=standard&h=right-in&a=peep,mail');
   ok(old.notice === null, `a pre-withdrawal link should open quietly, got ${old.notice}`);
   ok(old.state.finish === undefined, 'f= must not survive into the state');
   ok(old.state.addons === undefined, 'a= must not survive into the state');
@@ -328,38 +420,358 @@ for (const st of everyState()) {
      'the url must not carry the withdrawn fields');
 }
 
+/* ── THE FRAME MOVES AND THE LEAF DOES NOT ─────────────────────────
+   ⚠ THIS IS THE ASSERTION THE WHOLE MASHKOF CATEGORY DEPENDS ON, and it was
+   written BEFORE the category was built rather than after.
+
+   The fault it exists for has already happened twice on this door. Reported
+   from outside about the classical set: *"wehn i put on a window the panel
+   changes, it supposed to be the same size."* The cause both times was one
+   quantity stated in two places and drifting — and a frame whose width feeds
+   the leaf's origin is precisely that shape of mistake waiting to happen.
+   `x0`, `y0`, `MID_X` and `BASE_Y` are all computed from the STANDARD casing
+   and return; a wider mashkof grows OUTWARD from a fixed opening.
+
+   Asserted on the drawn markup rather than on the constants, because the
+   constants agreeing proves nothing about what was emitted. */
+group('the leaf does not move when the frame does');
+{
+  const leafBox = svg => {
+    const m = svg.match(/<g id="leaf"[\s\S]*?<rect[^>]*?x="([-\d.]+)"[^>]*?y="([-\d.]+)"[^>]*?width="([\d.]+)"[^>]*?height="([\d.]+)"/);
+    return m && { x: +m[1], y: +m[2], w: +m[3], h: +m[4] };
+  };
+  let checked = 0;
+  for (const size of sizeKeys) {
+    const ref = leafBox(render({ ...base, size, mashkof: 'mk-std' }));
+    ok(ref, `no leaf rect found on a ${size} door — this check is asserting nothing`);
+    for (const m of MASHKOFS) {
+      const got = leafBox(render({ ...base, size, mashkof: m.id }));
+      ok(got && got.x === ref.x && got.y === ref.y
+             && got.w === ref.w && got.h === ref.h,
+         `${size}/${m.id}: the leaf is ${JSON.stringify(got)} where the standard `
+       + `frame draws it at ${JSON.stringify(ref)} — a frame changed the door`);
+      checked++;
+    }
+  }
+  /* And the crop too: if the door's own box grew with the frame, `fitStage`
+     would scale everything down and the leaf would APPEAR to shrink even
+     though its millimetres never moved. That is the same complaint wearing a
+     different mechanism, so it gets its own line. */
+  for (const size of sizeKeys) {
+    const fit = svg => (svg.match(/data-fit-w="([\d.]+)"/) || [])[1];
+    const ref = fit(render({ ...base, size, mashkof: 'mk-std' }));
+    for (const m of MASHKOFS) {
+      ok(fit(render({ ...base, size, mashkof: m.id })) === ref,
+         `${size}/${m.id}: the drawing's own box changed width with the frame, `
+       + 'so the whole door would be scaled to fit and the leaf would look smaller');
+    }
+  }
+  console.log(`  (${checked} size x frame pairs, leaf identical in every one)`);
+}
+
+/* ── TWO METALS ON ONE DOOR ────────────────────────────────────────
+   ⚠ THE BUG PERETZ REPORTED, PINNED. In his own words, 26.8.2026: *"some pull
+   handles change the color of the handle and the keyhole, fix it."*
+
+   The renderer built ONE set of metal gradients per door out of the PULL BAR's
+   finish, so choosing the brass Ella painted the Coral lever and the keyway
+   beside it gold. REDESIGN.md §1.1 fixed the half that reached the MESSAGE and
+   left the drawing disagreeing on purpose (ASK-PERETZ §2b1), because nobody had
+   confirmed which way round it should be. Two of his own photographs said the
+   finishes are independent — d072 gold bar / near-black escutcheon, d128 chrome
+   tube / bronze escutcheon — and now he has said so.
+
+   ⚠ AND THE TEST THAT EXISTED ASSERTED THE MIRROR OF THIS. It checked that a
+   brass grip made `gripFinish` say brass, which was true both before and after
+   the fix — it would have agreed with the bug. That is the same trap
+   ASK-PERETZ §1 records for handing, where every instrument called a mirrored
+   door green. So this one reads the EMITTED GRADIENT, on every pair. */
+group('the pull handle does not recolour the lock furniture');
+{
+  const stops = svg => {
+    const m = svg.match(/<linearGradient id="nickel"[\s\S]*?<\/linearGradient>/);
+    return m && [...m[0].matchAll(/stop-color="(#[0-9A-Fa-f]{6})"/g)].map(x => x[1]).join(',');
+  };
+  /* One reading per pirzul, taken with a grip that declares no finish of its
+     own, so it is the pirzul and nothing else that produced it. */
+  const want = {};
+  for (const z of PIRZUL) {
+    want[z.id] = stops(render({ ...base, handle: 'idan', lockset: 'coral', pirzul: z.id }));
+    ok(want[z.id], `no #nickel gradient on a ${z.id} door — this check is asserting nothing`);
+  }
+  ok(new Set([want['pz-nickel'], want['pz-black'], want['pz-bronze']]).size === 3,
+     'three pirzul finishes produced fewer than three different metals');
+
+  let pairs = 0;
+  for (const h of HANDLES) {
+    for (const z of PIRZUL) {
+      const svg = render({ ...base, handle: h.id, lockset: 'coral', pirzul: z.id });
+      ok(stops(svg) === want[z.id],
+         `${h.id} + ${z.id}: the lock furniture's metal changed with the PULL `
+       + 'HANDLE — this is the bug Peretz reported, back again');
+      pairs++;
+    }
+  }
+  /* And the other half: the grip's own finish must still reach the grip. Ella
+     is brass because the PRODUCT is brass, and that is a fact about her rather
+     than a choice — withdrawing it would be over-correcting the bug. */
+  const ella = render({ ...base, handle: 'ella', lockset: 'coral', pirzul: 'pz-nickel' });
+  const idan = render({ ...base, handle: 'idan', lockset: 'coral', pirzul: 'pz-nickel' });
+  ok(ella !== idan, 'the brass Ella and the nickel Idan draw the same door');
+  console.log(`  (${pairs} grip x pirzul pairs, lock furniture unmoved by every grip)`);
+}
+
+/* ── A BAR IS A LENGTH, AND THE LENGTH IS REAL ─────────────────────
+   Peretz: "each handle can be in different length · handle<100 500 ·
+   nickel>100cm every 20cm +150shekel". Three things have to hold together or
+   the customer is charged for a bar they will not get. */
+group('a pull bar is a length');
+{
+  /* 1. THE PRICE IS HIS RULE, EXACTLY. Worked by hand rather than derived from
+        the same expression the code uses, which would agree with any bug. */
+  const P = st => shekels(priceAgorot({ ...base, ...st }));
+  /* ⚠ ON THE TALLEST DOOR, so the clamp does not mask the rate. A 200 cm bar
+     does not fit a standard leaf — 205 cm less a hand's breadth at each end —
+     so `handleLength` shortens it to 180 and the price follows, correctly.
+     Asserting the rate on a door that clamps would have been asserting the
+     clamp twice and the rate never. */
+  const big = { size: 'xl' };
+  const bare = P({ ...big, handle: 'none' });
+  for (const [len, add] of [[600, 500], [800, 500], [1000, 500], [1200, 650],
+                            [1400, 800], [1600, 950], [1800, 1100], [2000, 1250]]) {
+    ok(P({ ...big, handle: 'idan', handleLen: len }) === bare + add,
+       `a ${len / 10} cm bar should add ₪${add}, got `
+     + `₪${P({ ...big, handle: 'idan', handleLen: len }) - bare}`);
+  }
+  /* The two flat ones never reach the rate: a channel is CUT into the leaf. */
+  for (const L of HANDLE_LENS) {
+    ok(P({ ...big, handle: 'grab', handleLen: L }) === bare + 300,
+       'the horizontal bow is flat-priced and must ignore the length');
+    ok(P({ ...big, handle: 'channel', handleLen: L }) === bare + 1700,
+       'the recessed channel is flat-priced and must ignore the length');
+  }
+
+  /* 2. THE LEAF CLAMPS IT, on every size. A 200 cm bar on a 203 cm door is not
+        a door, and a configurator that accepts an impossible one is the single
+        failure PLAN.md §0 exists to prevent. */
+  let clamped = 0;
+  for (const size of sizeKeys) {
+    const leafH = SIZES[size].h - 50;                     // REBATE
+    for (const L of HANDLE_LENS) {
+      const got = handleLength({ ...base, size, handle: 'idan', handleLen: L });
+      ok(got <= leafH - 240,
+         `${size}: a ${L / 10} cm bar came back as ${got / 10} cm on a leaf of `
+       + `${leafH / 10} cm — it would run into the rails`);
+      /* ⚠ 0 IS "AS THE MODEL COMES" AND COMES BACK AS THE MODEL'S OWN LENGTH,
+         which is 1050 for Idan and is deliberately NOT one of the eight
+         steps — the catalogue lengths are measured off photographs and the
+         steps are Peretz's price ladder. Two different things, and the first
+         version of this assertion confused them. */
+      if (L === 0) ok(got === byId(HANDLES, 'idan').len,
+                      `${size}: "as it comes" gave ${got}, not Idan's own 1050`);
+      else ok(HANDLE_LENS.includes(got),
+              `${size}/${L}: clamped to ${got}, not a real length`);
+      if (L !== 0 && got !== L) clamped++;
+    }
+    ok(handleLensFor({ ...base, size }).length >= 1,
+       `${size} offers no bar length at all`);
+  }
+  ok(clamped > 0, 'no size clamps any length — this check is asserting nothing');
+
+  /* 3. AND THE PRICE FOLLOWS THE CLAMP, not the request. Charging for the bar
+        the customer asked for when the drawing shows a shorter one is the same
+        class of fault as charging for a grille on a solid door. */
+  for (const size of sizeKeys) {
+    for (const L of HANDLE_LENS) {
+      const st = { ...base, size, handle: 'idan', handleLen: L };
+      const real = handleLength(st);
+      ok(priceAgorot(st) === priceAgorot({ ...st, handleLen: real }),
+         `${size}: asked for ${L / 10} cm, drawn at ${real / 10} cm, and the two `
+       + 'price differently — the customer is charged for a bar they will not get');
+    }
+  }
+
+  /* 4. AND THE ORDER SAYS SO. Two doors with the same bar at different lengths
+        are two purchase orders at two prices; an order naming only "עידן"
+        makes Peretz ring the customer, which is what §0 forbids. */
+  const line = st => specRows({ ...base, ...st }).find(r => r.key === 'handle').value;
+  ok(line({ handle: 'idan', handleLen: 1400 }).includes('140 ס״מ'),
+     `the order does not name the bar's length: "${line({ handle: 'idan', handleLen: 1400 })}"`);
+  ok(line({ handle: 'idan', handleLen: 1400 }) !== line({ handle: 'idan', handleLen: 1000 }),
+     'two lengths of one bar produce the same order line');
+  ok(!/ס״מ/.test(line({ handle: 'channel' })),
+     'the recessed channel has no length to sell and must not claim one');
+}
+
 // ── 3. Price ──────────────────────────────────────────────────────
 group('price');
 {
   const P = st => shekels(priceAgorot({ ...base, ...st }));
   /* The baseline door carries an Idan bar AND a Coral lockset now, because a
-     grip and a lock are two things. ₪3,195 is the bare door with a lever and
-     no pull. */
+     grip and a lock are two things.
+
+     ⚠ ₪3,195, AND THIS LINE HAS NOW BEEN THREE DIFFERENT NUMBERS. It was
+     ₪3,195 read off the works page and marked PLACEHOLDER; then ₪3,150, the
+     six components Peretz gave on 26.8.2026; and it is ₪3,195 again from
+     30.8.2026, when he gave the standard door as that figure and a `door -
+     1295` line that is exactly the ₪45 between them. Same six components,
+     one of them corrected: 1295 + 200 + 200 + 500 + 700 + 300.
+     It is the number he will check first, so it is pinned exactly. */
   ok(P({ handle: 'none' }) === 3195,
-     `a solid anthracite door with a lever and no pull should be ₪3,195, got ${P({ handle: 'none' })}`);
-  ok(P({}) === 3455, `adding the Idan bar should reach ₪3,455, got ${P({})}`);
-  /* Every colour is delta 0 now: the manufacturer's chart gives codes, not
-     prices, and the old per-colour premiums were our invention. */
-  for (const c of COLOURS) ok(P({ colour: c.id }) === P({}), `colour ${c.id} must not change the price yet`);
+     `a solid door with a lever and no pull should be ₪3,195, got ${P({ handle: 'none' })}`);
+  /* ⚠ ₪650 FOR THE IDAN, NOT ₪500, AND THAT IS PERETZ'S RULE WORKING. His
+     floor is ₪500 for a bar "under 100"; the Idan measures 1050 mm off the
+     photographs, so it is one 20 cm step over and costs ₪650. Every bar in
+     the range except Ron is over a metre as it comes. */
+  ok(P({}) === 3845, `adding the Idan bar should reach ₪3,845, got ${P({})}`);
+  ok(P({ handle: 'ron' }) === 3695, 'Ron is 90 cm as it comes and takes the floor price');
+
+  /* ⚠ THE SIZE MULTIPLIES ALL SIX COMPONENTS, AND THIS BLOCK USED TO ASSERT
+     THE OPPOSITE — deliberately, and correctly, against the rule Peretz gave
+     on 26.8. He replaced that rule on 30.8 (*"the all its all +25% = 3995"*),
+     and the old rule is not merely superseded, it is arithmetically impossible
+     against his own figures: reaching 3995 from 3195 by scaling a subset needs
+     that subset to be worth 3200, and the whole door is 3195. The derivation
+     is in `priceParts`.
+
+     ⚠ SO THE GUARD IS RESTATED, NOT DROPPED, AND IT IS STRONGER THAN IT WAS.
+     The old pair pinned ONE band and refused ONE wrong implementation. This
+     pins all SIX figures he named — including the two that have no size tile,
+     which is what makes the rule certain rather than plausible — and still
+     refuses the other implementation, now in the other direction. A test that
+     passes under both the right implementation and the wrong one is not a
+     test, and that was the point of the line this replaces. */
+  const PERETZ_BANDS = [
+    ['standard', 3195, 'x1'],
+    ['wide',     3995, 'x1.25 — his "the all its all +25%"'],
+    ['tall',     3995, 'x1.25 — the same band, a different door'],
+    ['xl',       4795, 'x1.5 — his "the second extra +50%"'],
+    ['half',     6390, 'x2 — his "du kanfi (double) x2"'],
+  ];
+  for (const [size, want, why] of PERETZ_BANDS) {
+    ok(P({ handle: 'none', size }) === want,
+       `${size} with nothing on it must be exactly ₪${want} (${why}), got ${P({ handle: 'none', size })}`);
+  }
+  /* The two bands he priced that have no tile: one multi-leaf size exists, not
+     three. They are asserted as ARITHMETIC rather than as doors, because six
+     figures agreeing is what establishes the rule and four would not.
+     `ASK-PERETZ.md` asks whether he sells a wide or a tall double. */
+  ok(Math.ceil(3195 * 2.5 / 5) * 5 === 7990, 'a double at +25% is his ₪7,990');
+  ok(Math.ceil(3195 * 3 / 5) * 5 === 9585, 'a double at +50% is his ₪9,585');
+  /* The refusal, inverted. Scaling only the door and the mashkof — the rule
+     that stood until 30.8 — gives ₪3,645 at this band, and must not be what
+     comes out. */
+  ok(Math.ceil((1295 * 1.25 + 200 + 200 + 500 * 1.25 + 700 + 300) / 5) * 5 !== 3995,
+     'the band assertions are worthless if scaling door+mashkof alone gives the same answer');
+
+  /* ⚠ THREE COLOURS ARE INCLUDED AND FOURTEEN COST ₪200. Peretz, 30.8.2026.
+     This block asserted the exact opposite — "colour ${id} must not change the
+     price yet", every colour, which was true while the chart gave us codes and
+     no prices. It is his answer to ASK-PERETZ §3 and it retires assumption
+     A10. Restated as the same shape of exhaustive walk, now with the split in
+     it, so a colour silently changing side still fails. */
+  const COLOUR_FREE = ['rb-9016d', 'rb-9001d', 'rb-7126d'];
+  for (const id of COLOUR_FREE) {
+    ok(byId(COLOURS, id).id === id, `${id} must exist — Peretz named it as included`);
+  }
+  for (const c of COLOURS) {
+    const free = COLOUR_FREE.includes(c.id);
+    const want = free ? 3195 : 3395;
+    ok(P({ handle: 'none', colour: c.id }) === want,
+       `colour ${c.id} should be ${free ? 'included' : '+₪200'} — ₪${want}, got ${P({ handle: 'none', colour: c.id })}`);
+  }
+  ok(COLOURS.filter(c => !c.delta).length === 3,
+     `exactly three colours are in the price, found ${COLOURS.filter(c => !c.delta).length}`);
+  /* ⚠ AND THE DOOR THE PAGE OPENS ON MUST BE ONE OF THEM. Otherwise the
+     opening figure is Peretz's standard door plus an option nobody chose, and
+     it prints ₪3,395 where he says ₪3,195 — which is the first number he
+     checks. This is the assertion that would have caught it. */
+  ok(COLOUR_FREE.includes(DEFAULTS.colour),
+     `the default colour ${DEFAULTS.colour} must be one Peretz includes in the price`);
+  ok(base.colour === DEFAULTS.colour,
+     'the price fixture must be the door the page actually opens on');
   // A link shared before the chart replaced the list must still open a door.
-  ok(P({ colour: 'ral-9005' }) === P({}), 'retired ral-9005 should still resolve');
+  ok(P({ colour: 'ral-9005' }) === P({ colour: 'rb-9005d' }), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
-  ok(P({ size: 'wide' }) === 3755, 'wide band');
-  ok(P({ window: 'rect' }) === 4075, `rectangular window should add ₪620, got ${P({ window: 'rect' })}`);
-  ok(P({ window: 'rect', grille: 'scroll' }) === 4535, 'scrollwork grille adds ₪460');
-  ok(P({ detail: 'panel' }) === 3835, `lower panel should add ₪380, got ${P({ detail: 'panel' })}`);
+  ok(P({ size: 'wide' }) === 4645, 'wide band');
+  /* ⚠ ₪3,700 FOR A WINDOW, WHICH IS MORE THAN THE DOOR. Peretz, 26.8.2026.
+     Every window price in this file was invented at around ₪600 and every one
+     was out by a factor of six. Glass in an armoured leaf is a different
+     product from a hole in one. */
+  ok(P({ window: 'rect' }) === 7545, `a square window should add ₪3,700, got ${P({ window: 'rect' })}`);
+  /* "design: almost all of them in the price." Every grille is ₪0 now except
+     the three laser-cut ones. */
+  ok(P({ window: 'rect', grille: 'scroll' }) === 7545, 'scrollwork is included');
+  ok(P({ window: 'rect', grille: 'vine' }) === 8245, 'the laser-cut ones add ₪700');
+  ok(P({ detail: 'panel' }) === 4570, `a lower panel should add ₪725, got ${P({ detail: 'panel' })}`);
+  /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and these two lines are
+     Peretz's three window figures reduced to the two products they describe:
+     the set solid is ₪2,700, and a square light plus the set glazed is
+     3700 + 1000 = ₪4,700, which is his "square with greek". */
+  ok(P({ detail: 'classic', handle: 'none' }) === 5895, 'the greek set, solid, adds ₪2,700');
+  ok(P({ detail: 'classic', handle: 'none', window: 'rect' }) === 7895,
+     'the greek set glazed is ₪4,700 over a bare door, not ₪6,400');
+  /* The extra locks — a whole axis that did not exist. */
+  ok(P({ speciallock: 'kasefet' }) === 4545, 'a safe lock adds ₪700');
+  ok(P({ speciallock: 'kodan' }) === 4745, 'a keypad adds ₪900');
+  ok(P({ lockset: 'digital', speciallock: 'kodan' }) === 7445,
+     'a smart lock and a keypad are different products and stack');
   /* The finish and the add-ons are withdrawn, so nothing may be charged for
      them — including through a stale link that still names one. */
   ok(P({ finish: 'brass' }) === P({}), 'a withdrawn finish must not add to the price');
   ok(P({ addons: ['peep', 'mail', 'knocker'] }) === P({}),
      'withdrawn add-ons must not add to the price');
   /* The whole point of the split: a pull bar and a backplate on one door. */
-  ok(P({ handle: 'idan', lockset: 'plate' }) === 3515,
-     `Idan with a Rotem backplate should be ₪3,515, got ${P({ handle: 'idan', lockset: 'plate' })}`);
-  ok(P({ handle: 'none', lockset: 'plate' }) === 3255, 'Rotem alone adds ₪60 to the bare door');
+  ok(P({ handle: 'idan', lockset: 'plate' }) === 3845,
+     `Idan with a Rotem backplate should be ₪3,800, got ${P({ handle: 'idan', lockset: 'plate' })}`);
+  /* "main handles: all of them in the price", bar the squares, the circles and
+     the smart lock. Rotem is one of the included ones. */
+  ok(P({ handle: 'none', lockset: 'plate' }) === 3195, 'Rotem is included — and it is what the page now opens on');
+  ok(P({ handle: 'none', lockset: 'square' }) === 3495, 'squares add ₪300');
+  ok(P({ handle: 'none', lockset: 'cadoor' }) === 3395, 'circles add ₪200');
+  ok(P({ handle: 'none', lockset: 'digital' }) === 5895, 'the smart lock adds ₪2,700');
+  /* ⚠ ₪350, AND IT IS THE ONE LEVER THAT IS NOT INCLUDED. Peretz, 30.8.2026:
+     "the ספיר handle needs to be 350". It is neither a square nor a circle, so
+     it joins neither rate — a figure of its own, and the assertion says so. */
+  ok(P({ handle: 'none', lockset: 'sapir' }) === 3545, 'Sapir is ₪350, on its own');
+  ok(P({ handle: 'none', lockset: 'sapir' }) !== P({ handle: 'none', lockset: 'square' })
+     && P({ handle: 'none', lockset: 'sapir' }) !== P({ handle: 'none', lockset: 'cadoor' }),
+     'Sapir must not have been folded into the square or circle rate');
   // A retired id must land on its replacement, not on the first entry.
   ok(P({ handle: 'bar-long' }) === P({ handle: 'idan' }), 'alias bar-long should price as idan');
   ok(P({ handle: 'bar-flat' }) === P({ handle: 'shahar' }), 'alias bar-flat should price as shahar');
+  /* Withdrawn on Peretz's say-so, 26.8.2026 — every one still opens a door. */
+  ok(P({ handle: 'shiran' }) === P({ handle: 'idan' }), 'withdrawn shiran should price as idan');
+  ok(P({ handle: 'blade' }) === P({ handle: 'shahar' }), 'withdrawn blade should price as shahar');
+  ok(P({ lockset: 'almog' }) === P({ lockset: 'sapir' }), 'withdrawn almog should price as sapir');
+  ok(P({ window: 'rect', grille: 'iron' }) === P({ window: 'rect', grille: 'grid' }),
+     'withdrawn iron should price as grid');
+  ok(P({ window: 'rect', grille: 'reeded' }) === P({ window: 'rect', grille: 'mesh' }),
+     'withdrawn reeded should price as mesh');
+  /* ⚠ THE FOURTEEN RETIRED STRIPE IDS — T5's second half, and the half that
+     was not asserted anywhere. Phase 6 turned fourteen named stripe patterns
+     into a direction and a count, and every one of those names is a `d=` in
+     links customers have already sent Peretz. They are not aliases of a
+     surviving DETAIL — there is nothing left in `DETAILS` for them to point
+     at — so they migrate to `(stripeDir, stripeCount, stripeTight)` in
+     `fromQuery`, which is a code path nothing else exercises.
+     Asserted against `STRIPE_LEGACY` itself rather than against a table
+     written out here: a second copy of fourteen rows is CLAUDE.md §5's exact
+     shape, and the failure it produces is a link that opens the wrong door
+     while both tables look right. */
+  for (const [id, want] of Object.entries(STRIPE_LEGACY)) {
+    const { state: got } = fromQuery(`?v=${VERSION}&d=${id}`);
+    ok(got.stripeDir === want.stripeDir && got.stripeCount === want.stripeCount
+       && got.stripeTight === want.stripeTight,
+       `?d=${id} — a link already in the wild — opened `
+     + `${got.stripeDir}/${got.stripeCount}${got.stripeTight ? '/tight' : ''} and `
+     + `STRIPE_LEGACY says ${want.stripeDir}/${want.stripeCount}`
+     + `${want.stripeTight ? '/tight' : ''}`);
+    ok(buildable(repair(got).state),
+       `?d=${id} migrates to a door the rules refuse`);
+    ok(stripePrice(got) > 0, `?d=${id} migrated to a door with no stripes on it`);
+  }
+
   // Luna is gone from the catalogue; its id must still land somewhere real.
   ok(P({ handle: 'luna' }) === P({ handle: 'idan' }), 'retired luna should price as idan');
 
@@ -367,6 +779,44 @@ group('price');
   for (const g of GRILLES) {
     ok(P({ window: 'none', grille: g.id }) === P({ window: 'none', grille: 'none' }),
        `grille ${g.id} must not add cost to a solid door`);
+  }
+
+  /* ⚠ THE BREAKDOWN MUST ADD UP TO THE FIGURE ABOVE IT, on every door the site
+     can build. A customer can now tap the price open and read the column —
+     asked for from outside — and a column that does not sum to its own total
+     tells them, in the clearest way available, that the number is made up.
+
+     The rounding row is what makes this possible to assert at all: the total
+     is rounded UP to the nearest ₪5, so the components alone are short by up
+     to ₪4.99 and `breakdownRows` carries the difference as a line called
+     עיגול. This checks the rendered rows, not the raw parts, because the rows
+     are what the customer adds up. */
+  for (const st of everyState()) {
+    const shown = priceAgorot(st);
+    const rows = breakdownRows(st);
+    const summed = rows.reduce((t, r) => t + r.agorot, 0);
+    ok(summed === shown,
+       `the breakdown sums to ${summed} where the price says ${shown} `
+       + `— ${Object.values(st).join('/')}`);
+    ok(rows.every(r => Number.isInteger(r.agorot)),
+       `a breakdown row is not an integer number of agorot — ${Object.values(st).join('/')}`);
+    /* ⚠ AND EVERY ROW IS A WHOLE SHEKEL, which is a stronger claim and it is
+       the one that matters. The panel formats with `maximumFractionDigits: 0`,
+       so a row holding ₪1,562.50 PRINTS ₪1,563 — and then the visible column
+       sums to one shekel more than the total above it. That shipped, was found
+       by opening the panel and reading it, and `scaled()` in price.js rounds to
+       the shekel because of it. A column a customer can add up is the entire
+       point of the feature. */
+    ok(rows.every(r => r.agorot % 100 === 0),
+       `a breakdown row is not a whole shekel, so the printed column will not `
+       + `add up — ${Object.values(st).join('/')}`);
+    /* Six components always, however bare the door: their absence is what
+       would look wrong, and a customer paying ₪700 for installation should see
+       the line whether or not they chose anything else. */
+    for (const k of ['door', 'cylinder', 'lock', 'mashkof', 'install', 'measure']) {
+      ok(rows.some(r => r.key === k),
+         `the breakdown dropped "${k}" — ${Object.values(st).join('/')}`);
+    }
   }
 
   for (const st of everyState()) {
@@ -469,8 +919,15 @@ group('detail and finish');
      must stay the door's own paint: the whole finding behind this rewrite is
      that the face inside the rectangle and the face outside it are one
      surface, so anything that FILLS the interior is the old bug returning. */
-  for (const c of [COLOURS[0], COLOURS[10], COLOURS[16]]) {
-    const svg = render({ ...base, colour: c.id, detail: 'panel2' });
+  /* ⚠ BOTH SECTIONS. The range has two mouldings — reeded on `panel2`, the
+     broad ogee on `panel2o` — and this group was written when there was one.
+     A check that only ever visits the default would have let the second table
+     ship with three sides drawn, or with no gradients emitted at all. */
+  for (const [c, d] of [[COLOURS[0], 'panel2'], [COLOURS[10], 'panel2'],
+                        [COLOURS[16], 'panel2'], [COLOURS[0], 'panel2o'],
+                        [COLOURS[16], 'panel2o']]) {
+    const svg = render({ ...base, colour: c.id, detail: d });
+    const prof = d.endsWith('o') ? 'ogee' : 'reed';
     /* The panel group only. Sliced to the end of the document it swallowed the
        hardware drawn after it, and the first thing it found was the nickel on
        a lever — a false alarm that would have hidden a real one.
@@ -485,12 +942,17 @@ group('detail and finish');
     const clean = svg.replace(/<g data-relight="moulding"[\s\S]*?<\/g>/g, '');
     const from = clean.indexOf('data-detail="panel"');
     const block = clean.slice(from, clean.indexOf('</g>', from));
-    ok(block.includes('mould-r'), `the panel block on ${c.id} was cut short — this check is dead`);
-    const sides = [...block.matchAll(/fill="url\(#mould-([tblr])\)"/g)].map(m => m[1]);
-    ok(new Set(sides).size === 4, `moulding on ${c.id} draws ${new Set(sides).size} of its 4 sides`);
+    ok(block.includes(`mould-${prof}-r`),
+       `the panel block on ${c.id} ${d} was cut short — this check is dead`);
+    const sides = [...block.matchAll(new RegExp(`fill="url\\(#mould-${prof}-([tblr])\\)"`, 'g'))]
+      .map(m => m[1]);
+    ok(new Set(sides).size === 4,
+       `${prof} moulding on ${c.id} draws ${new Set(sides).size} of its 4 sides`);
 
-    const grads = [...svg.matchAll(/<linearGradient id="mould-[tblr]"[\s\S]*?<\/linearGradient>/g)];
-    ok(grads.length === 4, `expected 4 moulding gradients on ${c.id}, got ${grads.length}`);
+    const grads = [...svg.matchAll(
+      new RegExp(`<linearGradient id="mould-${prof}-[tblr]"[\\s\\S]*?</linearGradient>`, 'g'))];
+    ok(grads.length === 4,
+       `expected 4 ${prof} moulding gradients on ${c.id}, got ${grads.length}`);
     /* The four runs must differ — but NOT at their end stops, which are the
        paint on every side by construction now, because a moulding meets the
        same flat face at both edges. This used to read the first stop, which
@@ -498,13 +960,14 @@ group('detail and finish');
        the face correctly turned that assertion into a false alarm. What has to
        differ is the RELIEF between the edges, so compare the runs whole. */
     const bodies = grads.map(g => g[0]);
-    ok(new Set(bodies).size === 4, `every side of the moulding on ${c.id} takes the same light`);
+    ok(new Set(bodies).size === 4,
+       `every side of the ${prof} moulding on ${c.id} takes the same light`);
 
     const filled = [...block.matchAll(/<(?:rect|path)[^>]*fill="(?!url\(#mould|none)([^"]+)"/g)]
       .map(m => m[1]).filter(v => v !== '#000');
     ok(filled.length === 0,
-      `the moulding on ${c.id} fills its interior with ${filled[0]} — the face inside ` +
-      `the rectangle is the same plane and the same paint as the face outside it`);
+      `the ${prof} moulding on ${c.id} fills its interior with ${filled[0]} — the face ` +
+      `inside the rectangle is the same plane and the same paint as the face outside it`);
   }
 }
 
@@ -551,48 +1014,69 @@ for (const n of HANDLES) {
    company again this is where it shows. */
 group('a grip is checked where it is actually bolted');
 {
-  const st = { ...base, handle: 'shiran', lockset: 'cylinder', window: 'none' };
-  const svg = render(st);
-  const discs = [...svg.matchAll(/data-mount="shiran-disc"[^>]*cy="([\d.]+)"[^>]*r="([\d.]+)"/g)]
-    .map(m => ({ cy: Number(m[1]), r: Number(m[2]) }));
-  ok(discs.length === 2, `the Shiran draws ${discs.length} mounting discs, expected 2`);
+  /* ⚠ THIS TEST USED TO BE ABOUT THE SHIRAN, AND THE SHIRAN NO LONGER EXISTS.
+     Peretz withdrew it on 26.8.2026 — the answer to a question ASK-PERETZ §2
+     had been asking since 23.8, since it appeared on none of the 128
+     photographs. Its id now resolves to `idan`.
 
-  const feet = gripFeet(st, gripAt(st));
-  ok(feet.length === 2, `gripFeet gives the Shiran ${feet.length} feet, expected 2`);
+     The test is NOT deleted, because the property it guarded is real and was a
+     live bug: `gripFeet` used to return ONE circle at the grip's own centre for
+     everything that was not a bar, so a rosette could stand square on a
+     window's surround with the drag showing green — reported from outside as
+     "why can i put the pull handle on that". What is deleted is the part that
+     could only ever have been about one product: a comparison against
+     `data-mount="shiran-disc"`.
 
-  /* The drawing is in leaf-local millimetres offset by the leaf's own origin,
-     so the discs and the feet are compared on their SPACING and their radius —
-     the two things a foot model has to get right — rather than on an absolute
-     y that would just be re-deriving the layout here. */
-  if (discs.length === 2 && feet.length === 2) {
-    const drawnGap = Math.abs(discs[1].cy - discs[0].cy);
-    const footGap = Math.abs(feet[1].y - feet[0].y);
-    ok(Math.abs(drawnGap - footGap) < 1,
-       `the rule spaces the Shiran's feet ${footGap.toFixed(1)} mm apart and the `
-     + `drawing spaces its discs ${drawnGap.toFixed(1)} mm`);
-    ok(Math.abs(discs[0].r - feet[0].r) < 2,
-       `the rule uses a ${feet[0].r.toFixed(1)} mm foot where the drawing bolts `
-     + `through a ${discs[0].r.toFixed(1)} mm disc`);
+     What replaces it is STRONGER, not weaker. The old version checked one grip
+     against its own declared discs; this checks EVERY surviving grip, and it
+     checks the thing that actually matters — that the feet the rule tests are
+     inside the footprint the drawing claims, so the two halves cannot drift
+     apart the way they did for the Shiran. */
+  for (const h of HANDLES) {
+    if (h.style === 'none') continue;
+    const st = { ...base, handle: h.id, lockset: 'cylinder', window: 'none' };
+    const feet = gripFeet(st, gripAt(st));
+    ok(feet.length >= 1 || h.id === 'grab',
+       `${h.id} declares no feet at all, so no position of it can ever be refused`);
+    for (const f of feet) {
+      ok(Number.isFinite(f.x) && Number.isFinite(f.y) && f.r > 0,
+         `${h.id} has a foot at ${f.x},${f.y} r=${f.r} — a foot with no geometry `
+       + 'refuses nothing and permits everything');
+      /* A foot bigger than the leaf is a foot that refuses everything, which
+         reads to a customer as "you cannot put the handle anywhere". */
+      ok(f.r < (SIZES.standard.w) / 4,
+         `${h.id} is checked at a ${f.r.toFixed(1)} mm foot, which is a quarter `
+       + 'of the leaf — that refuses every position on the door');
+    }
   }
 
-  /* And the fault itself: a position that puts a disc on the window's surround
-     has to be refused. Walked rather than asserted at one point, because the
-     old model refused nothing anywhere in this band. */
+  /* And the fault itself, on a grip that still exists: a position that puts a
+     foot on the window's surround has to be refused. Walked rather than
+     asserted at one point, because the old model refused nothing anywhere in
+     this band. */
   {
-    const glazed = { ...base, handle: 'shiran', lockset: 'cylinder', window: 'rect' };
+    const glazed = { ...base, handle: 'idan', lockset: 'cylinder', window: 'rect' };
     const obs = faceObstacles(glazed).find(o => o.kind === 'window');
     let refusedInBand = 0, checked = 0;
+    /* ⚠ AT THE WINDOW'S OWN CENTRE LINE, not at x=155. The old test put the
+       SHIRAN there — a rosette centred on the grip's own axis — and 155 mm in
+       from the closing edge landed its discs on the surround. A pull BAR at
+       155 is a slim thing beside the lock and clears the glass entirely, so
+       the same coordinate asks a question with the answer "no collision", and
+       the check passed by testing nothing. The subject changed, so the
+       coordinate has to. */
+    const overGlass = Math.round(obs.x + obs.w / 2);
     for (let y = Math.round(obs.y); y < obs.y + obs.h; y += 25) {
-      const pl = gripPlacement(glazed, { x: 155, y, rot: 0 });
+      const pl = gripPlacement(glazed, { x: overGlass, y, rot: 0 });
       if (pl.why === 'הידית גבוהה או נמוכה מדי לשימוש'
           || pl.why === 'הידית חורגת מהדלת') continue;   // a different rule
       checked++;
       if (!pl.ok) refusedInBand++;
     }
-    ok(checked > 10, `only ${checked} positions fell inside the window's band to test`);
+    ok(checked > 5, `only ${checked} positions fell inside the window's band to test`);
     ok(refusedInBand === checked,
        `${checked - refusedInBand} of ${checked} positions inside the window's surround `
-     + 'were allowed — a disc can be bolted to the moulding');
+     + 'were allowed — a foot can be bolted to the moulding');
   }
 }
 
@@ -630,6 +1114,12 @@ group('the grip clears the lockset');
          escutcheon as its own art — that is the entire product — so counting
          every escutcheon on the door called it a door with two keyways. The
          drawing marks which one it is; ask for the unowned ones. */
+      /* ⚠ BACK TO EXACTLY ONE, AND IT WAS BRIEFLY `kn.style === 'none' ? 0 : 1`.
+         A bare lockset — no lever, no knob, no keyway — existed for one round
+         and this had to allow zero for it. It is withdrawn: *"there can't be a
+         door without a keyhole."* So the invariant is unconditional again, and
+         that is the stronger form; the conditional version could not have
+         caught a door that lost its keyway to a bug rather than to a choice. */
       const carries = /data-carries-lock="true"/.test(svg);
       const escutcheons = [...svg.matchAll(/data-hw="lock"(?! data-owner)/g)].length;
       ok(carries === !!kn.lock, `data-carries-lock disagrees with the catalogue (${label})`);
@@ -731,6 +1221,23 @@ group('the grip clears the lockset');
    decoration. `npm run corpus` reads them to know which grille each measured
    door carries, so a typo'd id there is a door recreated as the wrong thing,
    silently. */
+/* ⚠ TWO EVIDENCE ROOTS NOW, AND THE CHECK IS THE SAME CHECK. Every citation
+   still has to resolve to a file that exists on disk — that is the whole point
+   of this group and it has not moved. What changed is that there is a second
+   kind of record: `research/works/doors/dNNN.jpeg` is the numbered corpus
+   scraped from Peretz's works page, and `research/<name>/full.jpg` is a door
+   photographed straight off the workshop floor and sent to us. The ring
+   grille was read from the second kind.
+   Resolved through ONE function used by both groups below, because they ask
+   the same question from opposite sides and a second copy of the rule is how
+   they would come apart — §5. Adding a root here is deliberate and cheap;
+   dropping the existsSync is not, and would leave the catalogue free to cite
+   a photograph nobody has. */
+const evidenceFile = id =>
+    /^d\d{3}$/.test(id)          ? `research/works/doors/${id}.jpeg`
+  : /^[a-z][a-z0-9]{3,15}$/.test(id) ? `research/${id}/full.jpg`
+  : null;
+
 group('every door named as evidence has a photograph behind it');
 {
   let named = 0;
@@ -743,13 +1250,23 @@ group('every door named as evidence has a photograph behind it');
          `${name}.${o.id}.doors should be a non-empty list, got ${JSON.stringify(o.doors)}`);
       for (const id of o.doors) {
         named++;
-        ok(/^d\d{3}$/.test(id), `${name}.${o.id} names "${id}", which is not a door id`);
-        ok(existsSync(`research/works/doors/${id}.jpeg`),
-           `${name}.${o.id} cites ${id} and research/works/doors/${id}.jpeg does not exist`);
+        const file = evidenceFile(id);
+        ok(file, `${name}.${o.id} names "${id}", which is not a door id`);
+        ok(file && existsSync(file),
+           `${name}.${o.id} cites ${id} and ${file} does not exist`);
       }
     }
   }
-  ok(named > 40, `only ${named} door citations found — has the evidence been dropped?`);
+  /* ⚠ THE FLOOR CAME DOWN FROM 40 WITH THE OPTIONS IT COUNTED. Fourteen stripe
+     entries left `DETAILS` when the stripes became a count, and every one of
+     them cited the doors its numbers came from. That evidence is not lost —
+     it moved to `research/works/INVENTORY.md` §5a/§5b, where it belongs, since
+     it is now the derivation of two constants rather than of fourteen tiles.
+     The floor is a guard against the `doors` citations being quietly dropped
+     from the options that DO still carry them, so it tracks the list it
+     guards. Lowered deliberately and with the count named, not nudged until
+     it passed. */
+  ok(named > 25, `only ${named} door citations found — has the evidence been dropped?`);
   console.log(`  (${named} citations, every one with a photograph)`);
 }
 
@@ -900,8 +1417,8 @@ group('every grille names the doors it was read from');
     ok(Array.isArray(g.doors) && g.doors.length > 0,
        `grille ${g.id} names no door it was read from: it is a priced option with no evidence`);
     for (const d of g.doors || []) {
-      ok(/^d\d{3}$/.test(d),
-         `grille ${g.id} cites "${d}", which is not a corpus record id`);
+      ok(evidenceFile(d),
+         `grille ${g.id} cites "${d}", which names no evidence root`);
     }
   }
 }
@@ -1161,10 +1678,17 @@ group('a handle on a frame is refused, and told why');
 group('the handle position rides in the link and not in the code');
 {
   /* A position the door can actually take, so that what is being tested is
-     the round trip and not `repair` doing its job on the way in. */
-  const spot = { ...gripHome(DEFAULTS), y: gripHome(DEFAULTS).y - 100 };
-  ok(gripPlacement(DEFAULTS, spot).ok, 'the fixture position should be buildable');
-  const moved = { ...DEFAULTS, grip: spot };
+     the round trip and not `repair` doing its job on the way in.
+     ⚠ AND ON A DOOR THAT HAS A GRIP TO POSITION. The fixture was `DEFAULTS`,
+     and DEFAULTS is a bare door now — no window, no grip, no lock furniture —
+     so `repair` correctly dropped the position on the way back in and this
+     read as the round trip losing it. A test of "does `gp=` survive the link"
+     has to be run on a door where `gp=` means something; the assertion is
+     unchanged. */
+  const draggable = { ...DEFAULTS, handle: 'idan' };
+  const spot = { ...gripHome(draggable), y: gripHome(draggable).y - 100 };
+  ok(gripPlacement(draggable, spot).ok, 'the fixture position should be buildable');
+  const moved = { ...draggable, grip: spot };
   const q = toQuery(moved);
   ok(q.includes('gp='), `the link should carry the position, got ${q}`);
   const back = fromQuery(q);
@@ -1179,11 +1703,19 @@ group('the handle position rides in the link and not in the code');
      builds to. Carrying it would also have cost a VERSION bump and every code
      written so far. If that decision is ever reversed, this line fails and
      says where to look. */
-  ok(encodeCode(moved) === encodeCode(DEFAULTS),
+  /* ⚠ AGAINST `draggable`, NOT `DEFAULTS` — the same door WITHOUT the
+     position, which is the only comparison that says what this claims. It read
+     `encodeCode(DEFAULTS)` while the fixture WAS the default door; the default
+     is a bare leaf now and `moved` differs from it by the handle as well, so
+     the codes differed for a reason that has nothing to do with the position
+     and the assertion would have been "fixed" by weakening it. */
+  ok(encodeCode(moved) === encodeCode(draggable),
      'the short code must NOT carry the handle position');
 
-  /* A link with the handle somewhere impossible opens on a real door. */
-  const wild = fromQuery(toQuery({ ...DEFAULTS, grip: { x: 300, y: 300, rot: 0 } }));
+  /* A link with the handle somewhere impossible opens on a real door. Also on
+     `draggable`: a position on a door with no grip is dropped by `repair`
+     before this can test anything, which is correct and is not this test. */
+  const wild = fromQuery(toQuery({ ...draggable, grip: { x: 300, y: 300, rot: 0 } }));
   ok(gripPlacement(wild.state).ok, 'a link with an impossible handle position must be repaired');
 
   /* And rotation only survives where it fits. */
@@ -1201,24 +1733,144 @@ group('the handle position rides in the link and not in the code');
    every other grip is brushed nickel. If that stops reaching the metal, the
    message goes out naming a door we did not draw, exactly as before.
 
-   `effectiveFinish` is asserted alongside the drawing, because agreeing with
+   `gripFinish` is asserted alongside the drawing, because agreeing with
    itself is the whole job of that function. */
 group('the finish reaches every piece of metal');
 {
   const brassGrip = HANDLES.find(h => h.finish === 'brass');
   ok(brassGrip, 'no grip declares its own finish any more — this group is dead');
   if (brassGrip) {
-    ok(effectiveFinish({ ...base, handle: brassGrip.id }).id === 'brass',
+    ok(gripFinish({ ...base, handle: brassGrip.id }).id === 'brass',
        `${brassGrip.id} should be built in brass`);
-    ok(effectiveFinish({ ...base, handle: 'idan' }).id === 'steel',
+    ok(gripFinish({ ...base, handle: 'idan' }).id === 'steel',
        'a grip with no declared finish should be brushed nickel');
     /* A withdrawn choice must not come back through a stale link: the door is
        whatever its grip says, whatever `finish` a URL still carries. */
-    ok(effectiveFinish({ ...base, handle: 'idan', finish: 'black' }).id === 'steel',
+    ok(gripFinish({ ...base, handle: 'idan', finish: 'black' }).id === 'steel',
        'a stale f= resurrected the withdrawn finish');
     const mid = st => /--hw-mid:([^;"]+)/.exec(render(st))[1];
     ok(mid({ ...base, handle: brassGrip.id }) !== mid({ ...base, handle: 'idan' }),
        `${brassGrip.id} draws in the same metal as a brushed-nickel grip`);
+  }
+
+  /* ── WHAT THE FINISH REACHES, AND WHAT IT MUST NOT ──────────────────
+     Peretz stated this as law on 30.8.2026, in two sentences:
+
+       *"the אלה and מוט שחור are changing the color of the stripes"*
+       *"pirzul doesnt affect the additional lock, but it does affect the
+        stripes"*
+
+     ⚠ AND THE FIRST VERSION OF THIS BLOCK COULD NOT HAVE CAUGHT THE BUG IT WAS
+     WRITTEN FOR, WHICH IS §5 ITEM 14 EXACTLY. It compared each fitting's
+     MARKUP between two pirzul values. But a fitting is painted
+     `fill="url(#nickel)"` and it is the GRADIENT that moves, not the fill — so
+     the lever's markup is byte-identical under nickel and gold, and so was the
+     keypad's back when it still borrowed the lever's gradient. Every
+     special-lock check passed, and would have passed just as happily with the
+     bug in place. The pairing check below is the one that failed and said so.
+
+     So the comparison resolves the reference: pull the group, find which
+     gradient it fills with, and compare THAT gradient's stops. Now a fitting
+     "changes colour" only if the pixels would.
+
+     ⚠ AND EACH CHECK ASSERTS ITS SELECTOR FOUND SOMETHING (§5.15) — the group,
+     and the gradient it names. The day either is renamed is the day these stop
+     asking, and a check that quietly retires is worse than one that fails. */
+  {
+    const striped = { ...base, detail: 'plain', window: 'none', handle: 'none',
+                      stripeDir: 'h', stripeCount: 4, stripeTight: false };
+
+    /** The group's own markup, by any `data-` attribute on its open tag. */
+    const grab = (svg, sel) => {
+      const m = new RegExp(`<g[^>]*${sel}[^>]*>([\\s\\S]*?)</g>`).exec(svg);
+      return m ? m[1] : null;
+    };
+    /** Every gradient this group actually paints with, resolved to its stops. */
+    const paints = (svg, sel) => {
+      const body = grab(svg, sel);
+      if (body == null) return null;
+      const ids = [...new Set([...body.matchAll(/url\(#([A-Za-z0-9_-]+)\)/g)].map(m => m[1]))];
+      const stops = ids.map(id => {
+        const g = new RegExp(`<(linear|radial)Gradient id="${id}"[^>]*>([\\s\\S]*?)</\\1Gradient>`)
+          .exec(svg);
+        return g ? `${id}:${(g[2].match(/stop-color="[^"]+"/g) || []).join(',')}` : `${id}:MISSING`;
+      });
+      /* Literal fills count too: the stripes are painted with hexes off the
+         tone array rather than through a gradient. */
+      const lits = (body.match(/fill="#[0-9A-Fa-f]{3,8}"/g) || []).join(',');
+      return { ids, resolved: stops.join('|') + '||' + lits };
+    };
+    const looks = (svg, sel) => { const p2 = paints(svg, sel); return p2 && p2.resolved; };
+
+    ok(grab(render(striped), 'data-detail="strips"'),
+       'the stripe group is not in the markup — this whole block is dead');
+    for (const id of [...(paints(render(striped), 'data-detail="strips"').ids)]) {
+      ok(!/MISSING/.test(paints(render(striped), 'data-detail="strips"').resolved),
+         `the stripes paint with #${id} and no such gradient is emitted`);
+    }
+
+    /* THE STRIPES FOLLOW THE PIRZUL. This is the half that did NOT work: they
+       were painted with the GRIP's metal and the pirzul never reached them.
+       Falsified by pointing `metalStrips` back at `tone`: all three fire. */
+    for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
+      ok(looks(render({ ...striped, pirzul: pz }), 'data-detail="strips"')
+         !== looks(render({ ...striped, pirzul: 'pz-nickel' }), 'data-detail="strips"'),
+         `the פרזול "${pz}" must recolour the metal stripes — Peretz, 30.8.2026`);
+    }
+
+    /* AND THE GRIP'S OWN METAL STILL DOES, when the customer has expressed no
+       pirzul preference. Both of his sentences have to come out true, and this
+       is the one that already did: אלה is brass and מוט שחור is black. */
+    const nick = { ...striped, pirzul: 'pz-nickel' };
+    for (const grip of ['ella', 'barblack']) {
+      ok(looks(render({ ...nick, handle: grip }), 'data-detail="strips"')
+         !== looks(render({ ...nick, handle: 'idan' }), 'data-detail="strips"'),
+         `the grip "${grip}" must recolour the metal stripes beside a standard פרזול`);
+    }
+
+    /* ⚠ THE PRECEDENCE, WHICH IS THE PART THAT HAD TO BE DECIDED. His two
+       sentences cannot both hold under either simple rule, so an explicit
+       choice beats an implied one: a chosen פרזול wins over a grip's own
+       metal. Asserted, because it is a decision and not an accident. */
+    ok(looks(render({ ...striped, pirzul: 'pz-gold', handle: 'barblack' }), 'data-detail="strips"')
+       === looks(render({ ...striped, pirzul: 'pz-gold', handle: 'idan' }), 'data-detail="strips"'),
+       'a chosen פרזול must win over the grip’s own metal on the stripes');
+
+    /* THE ADDITIONAL LOCK DOES NOT FOLLOW THE PIRZUL. Both fittings were
+       filled with `url(#nickel)` — which IS the pirzul's gradient — so gold
+       turned the keypad gold. Falsified by putting `#nickel` back: all six
+       fire, where the markup comparison this replaces fired none of them. */
+    for (const kind of ['kasefet', 'kodan']) {
+      const withLock = { ...base, speciallock: kind };
+      const sel = `data-kind="${kind}"`;
+      ok(grab(render(withLock), sel), `the ${kind} group is not in the markup — this check is dead`);
+      ok(!/MISSING/.test(paints(render(withLock), sel).resolved),
+         `the ${kind} paints with a gradient that is not emitted`);
+      for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
+        ok(looks(render({ ...withLock, pirzul: pz }), sel)
+           === looks(render({ ...withLock, pirzul: 'pz-nickel' }), sel),
+           `the פרזול "${pz}" must NOT recolour the ${kind} — Peretz, 30.8.2026`);
+      }
+      /* And it must not follow the GRIP either, which nothing had ever asked.
+         The bug that put a pull handle's metal on a lever is in §5 twice. */
+      ok(looks(render({ ...withLock, handle: 'ella' }), sel)
+         === looks(render({ ...withLock, handle: 'idan' }), sel),
+         `a brass grip must not recolour the ${kind} either`);
+      /* ⚠ AND IT MUST NOT BORROW THE PIRZUL'S GRADIENT BY NAME. The checks
+         above would also pass if `#nickel` stopped moving; this one names the
+         thing that was actually wrong. */
+      ok(!paints(render(withLock), sel).ids.includes('nickel'),
+         `the ${kind} still paints with #nickel, which is the פרזול's own gradient`);
+    }
+
+    /* ⚠ AND THE LOCK FURNITURE MUST STILL FOLLOW IT, or every check above is
+       satisfied by a פרזול that does nothing at all. This is the pair that
+       makes them worth having, and it is the one that caught the markup
+       comparison being the wrong instrument. */
+    ok(grab(render(base), 'data-kind="lever"'), 'no lever group found — the pairing check is dead');
+    ok(looks(render({ ...base, lockset: 'coral', pirzul: 'pz-gold' }), 'data-kind="lever"')
+       !== looks(render({ ...base, lockset: 'coral', pirzul: 'pz-nickel' }), 'data-kind="lever"'),
+       'the פרזול must still recolour the lock furniture it was bought for');
   }
 }
 
@@ -1227,13 +1879,20 @@ group('leaf and a half');
 for (const h of HANDINGS) {
   // Hinges are drawn on the inside face only, as the works photographs show.
   const svg = render({ ...base, size: 'half', handing: h.id });
-  const total = Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]);
+  /* ⚠ THE viewBox NO LONGER STARTS AT THE ORIGIN. This read `viewBox="0 0 …"`
+     and took group 1 as the width; the drawing is anchored to a fixed floor
+     and centre line now, so a door's own box begins wherever that door begins
+     and only the widest sizes start at 0. The regex matched nothing and the
+     line threw on `[1]` of null — which is at least loud. Read all four
+     numbers and use the two that are wanted. */
+  const [vx, , vw] = /viewBox="([-\d.]+) ([-\d.]+) ([\d.]+) ([\d.]+)"/.exec(svg)
+    .slice(1).map(Number);
   const hingeXs = [...svg.matchAll(/data-hw="hinge" data-cx="([\d.]+)"/g)].map(m => Number(m[1]));
   /* Hinges are an inside-face detail and that face is gone, so there are none
      to find. What still matters is that nothing is drawn AT the mullion. */
   ok(hingeXs.length === 0, `hinges should no longer be drawn for ${h.id}`);
   // Hinges belong on an outer edge of the opening, never at the mullion.
-  const nearEdge = hingeXs.every(x => x < total * 0.30 || x > total * 0.70);
+  const nearEdge = hingeXs.every(x => x < vx + vw * 0.30 || x > vx + vw * 0.70);
   ok(nearEdge, `hinges sit at the mullion instead of the frame (${h.id}): ${hingeXs}`);
 }
 
@@ -1320,7 +1979,210 @@ group('rules: nothing unbuildable can be reached');
      rules must be reading the same table. */
   for (const st of everyState()) { ok(buildable(st), `everyState yielded an unbuildable door`); break; }
 
+  /* ── ELEVEN STRIPES TURNED SIDEWAYS ARE SIX ────────────────────────
+     Peretz, 30.8.2026: *"when i change the placing of the stripes to vertical
+     instead of horizontal, even if there are 11 stripes it puts 11 vertical
+     stripes, and that cant be happening."*
+
+     ⚠ THIS IS FALSIFIABLE AND IT WAS FALSIFIED: taking the clamp out of
+     `repair` fires the first loop below at counts 7 through 11 — five
+     failures, naming the count each time — and leaves every other assertion in
+     this file green, which is precisely why it had to be written. */
+  {
+    const striped = n2 => ({ ...DEFAULTS, detail: 'plain', window: 'none',
+                             stripeDir: 'v', stripeCount: n2, stripeTight: false });
+    for (let c = 1; c <= 11; c++) {
+      const { state: fixed, changed } = repair(striped(c));
+      const want = Math.min(c, STRIPE_MAX.v);
+      ok(fixed.stripeCount === want,
+         `${c} vertical stripes must land on ${want}, got ${fixed.stripeCount}`);
+      ok(fixed.stripeDir === 'v', `the direction must survive the clamp, got ${fixed.stripeDir}`);
+      /* It must SAY so — a count that changes in silence is the same fault as
+         a price that does. And only when it actually changed. */
+      ok(changed.includes('stripes') === (c > STRIPE_MAX.v),
+         `a clamp at ${c} must ${c > STRIPE_MAX.v ? '' : 'not '}report a change`);
+    }
+
+    /* ⚠ AND GOING BACK TO HORIZONTAL MUST NOT INVENT STRIPES. Eleven across,
+       turned upright, turned across again: six, not eleven. Restoring the old
+       count would mean carrying a shadow value no reader can see. */
+    const { state: down } = repair(striped(11));
+    const { state: back } = repair({ ...down, stripeDir: 'h' });
+    ok(back.stripeCount === 6,
+       `h11 -> v -> h must stay at 6, not resurrect 11 — got ${back.stripeCount}`);
+
+    /* ⚠ AND THE HORIZONTAL CAP IS NOT THE VERTICAL ONE. A clamp written as one
+       number would quietly cut eleven horizontal stripes down to six, which is
+       a different bug wearing this fix's clothes. */
+    const { state: h11, changed: hChanged } = repair(striped(11));
+    ok(h11.stripeCount === 6, 'sanity: the vertical case is the one that clamps');
+    const { state: flat, changed: flatChanged } =
+      repair({ ...DEFAULTS, detail: 'plain', window: 'none',
+               stripeDir: 'h', stripeCount: 11, stripeTight: false });
+    ok(flat.stripeCount === 11 && !flatChanged.includes('stripes'),
+       `eleven HORIZONTAL stripes are legal and must be left alone, got ${flat.stripeCount}`);
+    void hChanged;
+
+    /* ⚠ THE WIRE FORMAT AND THE STATE MUST AGREE. `packStripes` has always
+       clamped, which is why this survived so long: the link and the DM- code
+       were right and only the live state was wrong. Now both are, and this
+       asserts they say the same thing rather than each being right alone. */
+    for (let c = 1; c <= 11; c++) {
+      const { state: fixed } = repair(striped(c));
+      const round = fromQuery(toQuery(fixed)).state;
+      ok(round.stripeCount === fixed.stripeCount && round.stripeDir === fixed.stripeDir,
+         `a link must carry the clamped count: ${c} -> state ${fixed.stripeCount}, link ${round.stripeCount}`);
+      const dec = decodeCode(encodeCode(fixed));
+      ok(dec.stripeCount === fixed.stripeCount && dec.stripeDir === fixed.stripeDir,
+         `a code must carry the clamped count: ${c} -> state ${fixed.stripeCount}, code ${dec.stripeCount}`);
+    }
+
+    /* ⚠ AND THE SENTENCE MUST NAME THE CAP IT DESCRIBES, in all three
+       languages. A toast that says "we adjusted the stripes" leaves the
+       customer counting, and one that names the wrong number is worse than
+       none — this file already records that a toast naming the wrong culprit
+       is worse than no toast at all. */
+    for (const lang of ['he', 'en', 'ru']) {
+      const s = withLang(lang, () => T('fix.stripesCapped'));
+      ok(s && s.includes(String(STRIPE_MAX.v)),
+         `the ${lang} clamp toast must name ${STRIPE_MAX.v}: "${s}"`);
+    }
+  }
+
   console.log(`  (${n} designs repaired and re-checked)`);
+}
+
+
+// ── 8c. The פעמון and the עינית, added on Peretz's word 30.8.2026 ──
+/* ⚠ THE TRIANGLE, ASSERTED PIECE BY PIECE. The house rule for a new priced
+   option is that the drawing shows it, the price charges it and the message
+   names it — and the way that rule fails is never all three at once. It fails
+   as a grille id matching no branch in `grillePaths` (§5.1), or a finish
+   charging ₪220 and moving no pixel (§5.7), or an axis missing from
+   `js/spec.js` so Peretz never hears about it. So each corner is its own
+   assertion and each one names its object.
+
+   ⚠ AND THE עינית IS THE HARDER OF THE TWO TO GET RIGHT, because it is ₪0.
+   Every "does this option do anything" check in this file is written around a
+   price moving, and a free option passes all of them by doing nothing. The
+   checks below ask about the DRAWING and the ORDER instead. */
+group('the doorbell and the peephole');
+{
+  const solid = { ...base, window: 'none', detail: 'plain' };
+  const has = (st, kind) => new RegExp(`data-kind="${kind}"`).test(render(st));
+
+  /* ── the drawing ── */
+  ok(!has(solid, 'bell') && !has(solid, 'peephole'),
+     'a door with neither chosen must draw neither');
+  ok(has({ ...solid, bell: 'bell' }, 'bell'), 'choosing the פעמון must draw one');
+  ok(has({ ...solid, peephole: 'peep' }, 'peephole'), 'choosing the עינית must draw one');
+  /* ⚠ AND THEY MUST BE DIFFERENT PICTURES. Two discs is exactly the shape of
+     §5 item 5 — nine handle tiles that drew one glyph — and both of these are
+     a circle inside a circle. */
+  const bellArt = /<g[^>]*data-kind="bell"[^>]*>([\s\S]*?)<\/g>/
+    .exec(render({ ...solid, bell: 'bell' }))[1];
+  const peepArt = /<g[^>]*data-kind="peephole"[^>]*>([\s\S]*?)<\/g>/
+    .exec(render({ ...solid, peephole: 'peep' }))[1];
+  ok(bellArt.replace(/[\d.-]+/g, '') !== peepArt.replace(/[\d.-]+/g, '')
+     || bellArt !== peepArt,
+     'the bell and the peephole draw the same picture');
+  /* The bell is on the HINGE stile and the peephole is CENTRED — the two
+     placements have different standing and the drawing has to keep them
+     apart. Read off the markup rather than recomputed here, so this cannot
+     agree with a second copy of the arithmetic (§5.10). */
+  for (const h of ['right-in', 'left-in']) {
+    const svg = render({ ...solid, handing: h, bell: 'bell', peephole: 'peep' });
+    const cx = k => Number(new RegExp(`data-kind="${k}"[^>]*data-cx="([\\d.-]+)"`).exec(svg)[1]);
+    const key = Number(/data-kind="cylinder"[^>]*data-cx="([\d.-]+)"/.exec(svg)[1]);
+    const mid = cx('peephole');
+    ok(Math.abs(cx('bell') - key) > Math.abs(mid - key),
+       `on ${h} the bell must stand further from the lock than the leaf's centre line`);
+  }
+
+  /* ── the price ── */
+  const P = st => shekels(priceAgorot({ ...base, ...st }));
+  ok(P({ bell: 'bell' }) - P({}) === 300, `the פעמון must add ₪300, got ${P({ bell: 'bell' }) - P({})}`);
+  ok(P({ peephole: 'peep' }) - P({}) === 0, 'the עינית is included — see A7 and prices.js');
+  ok(tileAgorot('bell', { ...base, bell: 'bell' }) === 30000, 'the bell tile must print ₪300');
+  ok(tileAgorot('peephole', { ...base, peephole: 'peep' }) === 0,
+     'the peephole tile must print a zero, which the label renders as כלול');
+
+  /* ── the order ── */
+  /* ⚠ BOTH REACH PERETZ, INCLUDING THE FREE ONE. "Included" is still a thing
+     he has to fit, and a row that appears only when money moves would tell him
+     about the bell and leave him guessing about the עינית. */
+  for (const [field, id, word] of [['bell', 'bell', 'פעמון'], ['peephole', 'peep', 'עינית']]) {
+    const rows = specRows({ ...solid, [field]: id });
+    ok(rows.some(r => r.key === field && r.id === id),
+       `the ${field} must appear in specRows — an axis that does not reach spec.js is one Peretz never hears about`);
+    const msg = withLang('he', () => specLines({ ...solid, [field]: id }).join('\n'));
+    ok(msg.includes(word), `the order must name the ${field} in Hebrew: expected "${word}"`);
+    /* And it must NOT be there when it was not chosen. */
+    ok(!specRows(solid).some(r => r.key === field), `a door without a ${field} must not carry its row`);
+  }
+
+  /* ── the wire format ── */
+  for (const b of BELLS) for (const e of PEEPHOLES) {
+    const st = repair({ ...solid, bell: b.id, peephole: e.id }).state;
+    const q = fromQuery(toQuery(st)).state;
+    ok(q.bell === st.bell && q.peephole === st.peephole,
+       `a link lost ${b.id}/${e.id}: got ${q.bell}/${q.peephole}`);
+    const c = decodeCode(encodeCode(st));
+    ok(c && c.bell === st.bell && c.peephole === st.peephole,
+       `a code lost ${b.id}/${e.id}: got ${c && c.bell}/${c && c.peephole}`);
+  }
+  /* ⚠ AND THE OLD CODES MUST BE REFUSED, NOT RE-READ. Two new fields shift
+     every bit after them; a v19 code decoded under v20 is a different door.
+     That is the whole reason `VERSION` moved, so it is asserted rather than
+     assumed. Built by hand from the v19 layout: same alphabet, one version
+     short. */
+  ok(VERSION === 20, `VERSION must be 20 for the bell and the peephole, got ${VERSION}`);
+  ok(decodeCode('DM-K400040000') === null,
+     'a version-19 code must be refused outright, never decoded under the new layout');
+
+  /* ── the parameters, which are NEW and must stay new ── */
+  /* `a=` and `f=` are retired FOREVER (CLAUDE.md §1) and the five add-on ids
+     travelled under `a=`. A link still carrying one must open its own door in
+     silence — not be re-read as a bell. */
+  const stale = fromQuery('?v=20&a=peep,mail,knocker');
+  ok(stale.notice !== 'option-unknown', 'a retired a= must not raise a notice');
+  ok(stale.state.peephole === 'nopeep' && stale.state.bell === 'nobell',
+     'a retired a=peep must NOT be re-read as the new peephole');
+  ok(toQuery({ ...solid, bell: 'bell' }).includes('bl=bell'), 'the bell rides in bl=');
+  ok(toQuery({ ...solid, peephole: 'peep' }).includes('ey=peep'), 'the peephole rides in ey=');
+  ok(!/[?&]a=/.test(toQuery({ ...solid, bell: 'bell', peephole: 'peep' })),
+     'nothing may be written into the retired a=');
+
+  /* ── the rule ── */
+  /* ⚠ GEOMETRIC, AND FALSIFIED: both window shapes this catalogue sells are
+     centred and reach viewer height, so a peephole at its measured position
+     has nowhere to be. `tools/_newhw.mjs` swept 426 designs with real getBBox
+     and found the overlap on all 140 glazed ones and nothing else. */
+  for (const w of WINDOWS) {
+    const glazed = w.id !== 'none';
+    ok(peepholeFits({ ...base, window: w.id, detail: glazed ? 'panel' : 'plain' }) === !glazed,
+       `peepholeFits must be ${!glazed} for window "${w.id}"`);
+  }
+  {
+    const { state: fixed, changed } =
+      repair({ ...base, window: 'rect', detail: 'panel', peephole: 'peep' });
+    ok(fixed.peephole === 'nopeep' && changed.includes('peephole'),
+       'a link with a peephole and a window must lose the peephole, and say so');
+    /* And the other way: clicking the peephole ON a glazed door takes the
+       glass, because whichever the customer just clicked wins. */
+    const { state: chosen } =
+      repair({ ...base, window: 'rect', detail: 'panel', peephole: 'peep' }, 'peephole');
+    ok(chosen.peephole === 'peep' && chosen.window === 'none',
+       'clicking the peephole must take the window, not be refused');
+  }
+  /* The BELL has no such rule, and that is a finding rather than an omission:
+     the same sweep found it clear of glass, mouldings, stripes and every
+     fitting, at every size and both handings. */
+  for (const w of WINDOWS) {
+    ok(!conflicts({ ...base, window: w.id, detail: w.id === 'none' ? 'plain' : 'panel' })
+        .bell.bell,
+       `the bell must not be blocked on window "${w.id}"`);
+  }
 }
 
 // ── 8a. A grip is a grip; only the lockset is lock furniture ──────
@@ -1361,6 +2223,37 @@ for (const k of LOCKSETS) {
             + 'app.js will make it draggable and put a gp= for it in the order');
 }
 
+/* ⚠ THE ONE MISTAKE IN ASK-PERETZ.md THAT COSTS REAL MONEY, PINNED.
+   Answered by the owner's son, 23.8.2026: "at our app we are looking from the
+   outside, so a left door is a keyhole on the right." Both values in HANDINGS
+   were the other way round when he said it, so every order the site produced
+   named the mirror of the door on screen.
+   Asserted against the DRAWING rather than against the `hinge` field, because
+   the field is what was wrong: a test that reads `hinge` would have agreed with
+   the bug. This asks where the keyhole actually lands on the leaf. */
+group('a שמאל door puts the keyhole on the right, seen from outside');
+for (const size of Object.keys(SIZES)) {
+  for (const k of LOCKSETS) {
+    for (const [handing, side] of [['left-in', 'right'], ['right-in', 'left']]) {
+      const st = repair({ ...base, size, handing, handle: 'none', lockset: k.id }).state;
+      if (st.handing !== handing || st.lockset !== k.id) continue;
+      const svg = render(st);
+      const i = svg.indexOf('data-hw="lockset"');
+      if (i < 0) continue;
+      const m = /(?:translate\(|cx="|x=")\s*(-?[\d.]+)/.exec(svg.slice(i, i + 400));
+      if (!m) continue;
+      const leaf = /<g id="leaf"[\s\S]{0,300}?x="([\d.]+)"[^>]*width="([\d.]+)"/.exec(svg);
+      if (!leaf) continue;
+      const centre = +leaf[1] + +leaf[2] / 2;
+      const at = +m[1] > centre ? 'right' : 'left';
+      ok(at === side,
+         `${handing} / ${size} / ${k.id}: the keyhole is drawn on the ${at}, and a `
+       + `${handing === 'left-in' ? 'שמאל' : 'ימין'} door carries it on the ${side}. `
+       + 'Every order for this door would name its mirror.');
+    }
+  }
+}
+
 // ── 8b. A moulding is not a raised panel ──────────────────────────
 /* THE MODEL: a panel on these doors is a strip of moulding laid on the face in
    a rectangle. There is nothing inside it. The face within the rectangle is
@@ -1394,19 +2287,23 @@ for (const k of LOCKSETS) {
    `npm run profile` measures the rendered rim against the rendered face beside
    it, on both panels. This assertion is now only the arithmetic half. */
 group('the face inside a moulding is the face outside it');
-for (const c of COLOURS) {
+/* ⚠ AND OVER BOTH SECTIONS. `MOULDS` holds two measured cross-sections now and
+   the rule is a rule about mouldings, not about one of them: the endpoints of
+   the ogee table have to meet the face exactly as the reeded one's do, or the
+   ogee panels ship with the rim this whole group exists to forbid. */
+for (const c of COLOURS) for (const [d, prof] of [['panel2', 'reed'], ['panel2o', 'ogee']]) {
   const svg = render({ ...base, colour: c.id, handle: 'none', lockset: 'coral',
-                       detail: 'panel2', window: 'none' });
+                       detail: d, window: 'none' });
   const head = lighten(c.hex, 0.04).toLowerCase();
   for (const side of ['t', 'b', 'l', 'r']) {
-    const g = new RegExp(`<linearGradient id="mould-${side}"[\\s\\S]*?</linearGradient>`).exec(svg);
-    ok(g, `no mould-${side} gradient on ${c.id} — this check is dead`);
+    const g = new RegExp(`<linearGradient id="mould-${prof}-${side}"[\\s\\S]*?</linearGradient>`).exec(svg);
+    ok(g, `no mould-${prof}-${side} gradient on ${c.id} — this check is dead`);
     if (!g) continue;
     const stops = [...g[0].matchAll(/offset="([\d.]+)"\s+stop-color="([^"]+)"/g)];
-    ok(stops.length > 2, `mould-${side} on ${c.id} has ${stops.length} stops`);
+    ok(stops.length > 2, `mould-${prof}-${side} on ${c.id} has ${stops.length} stops`);
     for (const [label, st] of [['outer', stops[0]], ['inner', stops[stops.length - 1]]]) {
       ok(st[2].toLowerCase() === head,
-        `mould-${side}'s ${label} edge on ${c.id} is ${st[2]}, not the leaf's own `
+        `mould-${prof}-${side}'s ${label} edge on ${c.id} is ${st[2]}, not the leaf's own `
       + `head colour ${head} — a moulding meets the same face on both sides, and a `
       + 'rim that differs from it draws a raised panel where there is none');
     }
@@ -1455,6 +2352,12 @@ group('a new build reaches a browser that has been here before');
   for (const [asset, re] of [
     ['css/app.css', /href="css\/app\.css(\?v=([0-9a-f]+))?"/],
     ['assets/bundle.js', /src="assets\/bundle\.js(\?v=([0-9a-f]+))?"/],
+    /* The photographed room. It is the one file a browser can be missing and
+       still get the whole site — but a CACHED WRONG one is a different fault
+       from a missing one, and the wrong one is exactly what a stamp exists to
+       prevent: `npm run backdrop` re-grades the picture and the floor-line
+       calibration is tuned to the version that produced it. */
+    ['assets/room.webp', /id="room-src" href="assets\/room\.webp(\?v=([0-9a-f]+))?"/],
   ]) {
     const m = re.exec(html);
     ok(m, `index.html no longer references ${asset} — this check is dead`);
@@ -1467,6 +2370,81 @@ group('a new build reaches a browser that has been here before');
        + 'run npm run build before committing, or the stamp is a lie');
     }
   }
+}
+
+/* ── ONE ACCENT, RATIONED, AND THE LIST IS THE POINT ──────────────────
+   `DESIGN-LEVEL.md` §1.3 and §5. The whole visual argument of this page is
+   *"the product is the only colour"* — the door is warm and saturated and
+   everything else recedes, so one tan accent is spent only where it means
+   "this one is chosen". §5 asked for an assertion that no element outside a
+   fixed set paints it, *"so the discipline can't erode commit by commit"*, and
+   nobody built it. It is the cheapest of all the checks that document names
+   and it guards the property the other six exist to produce.
+
+   ⚠ A LIST GOES STALE IN SILENCE, AND THIS ONE IS SUPPOSED TO. Every other
+   list in this repository is a bug waiting to happen (`usedDefs` is derived
+   for exactly that reason); this one is a GATE. It fails the day somebody
+   spends the accent somewhere new, and the failure is the conversation: if the
+   new use belongs, it goes in the list with a line saying why, and if it does
+   not, the check has done its job. So the message says that rather than just
+   reporting a count.
+
+   ⚠ And it asserts the selectors it names still MATCH something — §5.15. A
+   renamed class would otherwise retire this check quietly, on the day the
+   stylesheet is being reorganised, which is the day it is most needed. */
+group('the accent is spent only where it means "this one is chosen"');
+{
+  const css = readFileSync('css/app.css', 'utf8');
+  /* selector → why this one is allowed to carry the accent.
+     Seven places, and every one of them means the same thing: THIS ONE. */
+  const ALLOWED = [
+    ['.steps::after',        'the ordinal line under the navigator, scaled to where you are'],
+    ['.steps__step.is-on',   'the ring on the step you are looking at'],
+    ['.steps__step.is-done', 'the ring on a step you have already answered'],
+    ['[data-chrome="focus"]','the focus ring on the draggable grip'],
+    ['.works-open',          'the gallery opener, on hover only'],
+    ['.work',                'one gallery door, on hover only'],
+    ['.proof a',             'the underline on the proof link'],
+  ];
+  /* Every `var(--accent)` in the file, with the selector block it sits in.
+     ⚠ The `@supports` blocks matter: two of the seven have a `color-mix`
+     version and a plain fallback, and a parser that treats the `@supports`
+     line as the selector would attribute the fallback to the at-rule and
+     report a use nobody can find. So an at-rule opening a block does not
+     replace the current selector; only a real selector does. */
+  const uses = [];
+  let sel = '';
+  for (const raw of css.split('\n')) {
+    const line = raw.trim();
+    const m = /^([.#:\[a-zA-Z][^{}]*)\{/.exec(line);
+    if (m && !line.startsWith('@')) sel = m[1].trim();
+    if (/var\(--accent\)/.test(line)) uses.push(sel);
+  }
+  ok(uses.length > 0,
+     'no element in css/app.css paints var(--accent) at all — either the accent '
+   + 'has been renamed or this check has stopped matching the stylesheet');
+  for (const [needle, why] of ALLOWED) {
+    ok(css.includes(needle),
+       `the accent allowlist names "${needle}" (${why}) and css/app.css no longer `
+     + 'contains it — the list has gone stale and this check is measuring nothing');
+  }
+  for (const u of uses) {
+    ok(ALLOWED.some(([needle]) => u.includes(needle)),
+       `"${u}" paints var(--accent), and it is not one of the ${ALLOWED.length} places `
+     + 'the accent is allowed to appear (DESIGN-LEVEL §1.3: rings, borders and '
+     + 'selected state, never anything else). If it belongs there, add it to '
+     + 'ALLOWED in this test with a line saying what it means; if it does not, '
+     + 'this check has just stopped the accent eroding into decoration.');
+  }
+  /* ⚠ AND THE ACCENT IS NEVER READ. `#B08D57` measures 3.09:1 on white — fine
+     for a 2 px ring, a failure for text. `--accent-ink` exists for anything a
+     customer has to read, and this asserts the two have not swapped roles. */
+  ok(contrast('#B08D57', '#FFFFFF') < 4.5,
+     'var(--accent) now passes 4.5:1 on white, which means it has been changed — '
+   + 'the whole reason --accent-ink exists is that the accent does not');
+  ok(contrast('#7E6134', '#FFFFFF') >= 4.5,
+     'var(--accent-ink) no longer measures 4.5:1 on white, and it is the token '
+   + 'every readable accent uses');
 }
 
 /* ── 12. THE MESSAGE ──────────────────────────────────────────────────
@@ -1548,7 +2526,7 @@ group('every option the customer pays for is named in the message');
 }
 
 /* ⚠ A FINISH IS A FACT ABOUT A PRODUCT, AND IT MUST APPEAR ON THAT PRODUCT.
-   `share.js` printed `effectiveFinish` — the GRIP's finish — on the LOCKSET
+   `share.js` printed `gripFinish` — the GRIP's finish — on the LOCKSET
    line, so `ella + coral` ordered a brass Coral. Coral is a nickel lever; no
    such product is made. 18 of 90 grip x lockset pairs went out that way, and
    `describe()` — the accessible name — said the same thing, and the on-screen
@@ -1691,8 +2669,42 @@ group('a handle the customer moved reaches the order');
     }
   }
   ok(moved > 0, 'no handle could be moved anywhere — this group is asserting nothing');
-  ok(flatHome > 0,
-     'no door has a rotated home position — the 88-door case is not being exercised');
+  /* ⚠ NO PRODUCT HAS A ROTATED HOME ANY MORE, so this is exercised on purpose
+     rather than by accident. `flat` means the bar lies ACROSS the leaf, and
+     the message must add "מותקנת לרוחב הדלת" when it does — a fact about the
+     door that Peretz builds to. It used to arise on its own from the Shiran,
+     whose home position was rotated; Peretz withdrew the Shiran on 26.8.2026
+     and with it the only grip that came that way.
+     The old assertion was `flatHome > 0` — a guard that the case was being
+     reached — and it now fails for a true reason: the case is not reached by
+     any DEFAULT door. The property is unchanged and still worth asserting, so
+     it is asserted on a door explicitly rotated, which is how a customer
+     reaches it: they press סובבו. Weakening it to "0 is fine" would have been
+     the wrong repair; making the coverage deliberate is the right one. */
+  ok(flatHome === 0,
+     `${flatHome} doors have a rotated HOME position — no product should, since `
+   + 'the Shiran was withdrawn. If one was added, restore the sweep above');
+  {
+    let rotated = 0;
+    /* ⚠ AT 60 cm, because a bar only lies across a leaf it is shorter than.
+       `gripCanRotate` hides the control for any bar longer than the leaf is
+       wide, and every bar in the range is over a metre as it comes — so at
+       their default lengths not one of them can be turned, which is what the
+       audit's drag step also had to be taught. Since phase 5 the customer can
+       shorten a bar, and that is how they reach this. */
+    for (const h of HANDLES) {
+      const st = { ...base, handle: h.id, handleLen: 600 };
+      if (!gripCanRotate(st)) continue;
+      const turned = { ...st, grip: { ...gripHome(st), rot: 90 } };
+      const dep = gripDeparture(turned);
+      if (!dep.flat) continue;
+      rotated++;
+      ok(message(turned).includes('מותקנת לרוחב הדלת'),
+         `${h.id} lies across the leaf and the order never says so`);
+    }
+    ok(rotated > 0,
+       'no grip could be rotated at all — the across-the-leaf line is untested');
+  }
   console.log(`  (${still} untouched doors silent, ${moved} moves named, `
             + `${flatHome} lying down at home)`);
 
@@ -1723,9 +2735,19 @@ group('the page still reaches Peretz with no JavaScript');
   ok(!/href="#"/.test(html),
      'a send button ships with href="#": with no JavaScript it is a dead control '
    + 'on the one thing the whole site exists to get pressed');
+  /* ⚠ DERIVED FROM THE MARKUP, NOT A COUNT SOMEBODY REMEMBERED. This read
+     `>= 2` because there were two send buttons — the card's and the phone
+     dock's — and the dock was deleted on 27.8.2026, so a hard 2 would now be
+     asserting the return of a thing the owner asked to remove.
+     What the check is FOR survives whole: every element that offers to send
+     the door must carry a working `wa.me` href, so a page with no JavaScript
+     still reaches Peretz. Count the buttons, then require that many hrefs. */
+  const senders = (html.match(/class="[^"]*btn--wa[^"]*"/g) || []).length;
   const built = (html.match(/href="(https:\/\/wa\.me\/[^"]*)"/g) || []);
-  ok(built.length >= 2,
-     `index.html carries ${built.length} wa.me hrefs; both send buttons need one`);
+  ok(senders >= 1, 'index.html has no send button at all');
+  ok(built.length >= senders,
+     `index.html has ${senders} send button(s) and ${built.length} wa.me href(s) — `
+   + 'one of them is dead without JavaScript');
   for (const h of built) {
     ok(h === `href="${href}"`,
        `index.html carries a wa.me href that fallbackWhatsappUrl() does not build:\n`
@@ -1752,9 +2774,14 @@ group('the page still reaches Peretz with no JavaScript');
      right. This is the single route that survives every failure route in this
      file, which is the reason index.html calls it "the only route left that
      needs nothing from us". */
+  /* ⚠ TWO, NOT THREE, SINCE THE BRAND BAR WAS DELETED ON 27.8.2026. What is
+     left is the one in the cannot-load strip — the route that survives every
+     failure this file simulates — and the one in the send card's fine print.
+     The number is stated here rather than derived because each of those two
+     is a DIFFERENT promise, and losing either is a different bug. */
   const tels = html.match(/href="tel:[^"]*"/g) || [];
-  ok(tels.length >= 3, `index.html carries ${tels.length} tel: links; the header, the `
-                     + 'down strip and the fine print each need one');
+  ok(tels.length >= 2, `index.html carries ${tels.length} tel: links; the down strip and `
+                     + 'the send card fine print each need one');
   for (const t of tels) {
     ok(t.startsWith('href="tel:+'),
        `${t} is not an RFC 3966 global number — without the leading + a dialler `
@@ -1767,18 +2794,246 @@ group('the page still reaches Peretz with no JavaScript');
   ok(tels.every(t => t === `href="tel:${PHONE_TEL}"`),
      'a tel: href in index.html is not the number js/share.js exports');
 
-  /* ⚠ ONE PROMISE, ONE WORDING. The card says these and the order says these,
-     and the order used to say neither the same way — it carried "כולל התקנה
-     ומע״מ" and no estimate caveat at all, so the one line the customer is told
-     three times was the line Peretz never saw. They are exported from
-     `share.js` the way `GRIP_ILLUSTRATIVE` and `FALLBACK_TEXT` are; this is
-     what stops the markup's copy drifting away from them again. */
-  const { PRICE_INCLUDES, PRICE_CAVEAT } = await import('../js/share.js');
-  ok(html.includes(PRICE_INCLUDES),
-     `index.html no longer contains PRICE_INCLUDES ("${PRICE_INCLUDES}") — the card `
-   + 'and the order are describing the same price in two different sentences');
-  ok(html.includes(PRICE_CAVEAT),
-     `index.html no longer contains PRICE_CAVEAT ("${PRICE_CAVEAT}")`);
+  /* ⚠ ONE PROMISE, ONE WORDING — GENERALISED, AND STRONGER THAN WHAT IT
+     REPLACES. This used to import `PRICE_INCLUDES` and `PRICE_CAVEAT` from
+     `share.js` and assert the markup contained those two sentences, because
+     the order once carried "כולל התקנה ומע״מ" with no estimate caveat at all
+     and the one line the customer is told three times was the line Peretz
+     never saw.
+     Both are copy keys now, and so are the other forty-odd strings in
+     `index.html`. `checkStaticCopy` below asserts EVERY `data-t` element's
+     shipped Hebrew equals `T(key)` in Hebrew — the same guarantee, over the
+     whole page rather than over two sentences somebody remembered. */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THREE LANGUAGES.
+   ═══════════════════════════════════════════════════════════════════ */
+async function checkLanguages() {
+  group('languages');
+  const copy = await import('../js/copy.js');
+  const { message } = await import('../js/share.js');
+  const { L, LANGS, T, UI, counted, plural, withLang } = copy;
+  const IDS = LANGS.map(l => l.id);
+
+  /* ── every string exists in all three ─────────────────────────── */
+  for (const [key, row] of Object.entries(UI)) {
+    ok(Array.isArray(row) && row.length === 3,
+       `UI['${key}'] is not a three-element [he, en, ru] array`);
+    IDS.forEach((id, i) => ok(typeof row[i] === 'string' && row[i].trim(),
+       `UI['${key}'] has no ${id} — an untranslated string must fail here, not `
+     + 'show Hebrew inside an English page'));
+  }
+
+  /* ⚠ A PLACEHOLDER DROPPED IN TRANSLATION LOSES A NUMBER. `T('len.cm', 90)`
+     renders "90 cm"; a Russian row written without the `{0}` renders "см" and
+     the customer is shown a handle with no length. Silent, and only in the
+     language nobody here proof-reads. */
+  for (const [key, row] of Object.entries(UI)) {
+    const slots = new Set([...row[0].matchAll(/\{(\d+)\}/g)].map(m => m[1]));
+    for (let i = 1; i < 3; i++) {
+      const mine = new Set([...row[i].matchAll(/\{(\d+)\}/g)].map(m => m[1]));
+      ok(slots.size === mine.size && [...slots].every(x => mine.has(x)),
+         `UI['${key}'] ${IDS[i]} does not carry the same {n} placeholders as he `
+       + `— a number would go missing: "${row[i]}"`);
+    }
+  }
+
+  /* ── every catalogue name exists in all three ─────────────────── */
+  const lists = { COLOURS, WINDOWS, HANDLES, LOCKSETS, PIRZUL, MASHKOFS,
+                  SPECIAL_LOCKS, GRILLES, HANDINGS, DETAILS, FINISHES,
+                  SIZES: Object.values(SIZES) };
+  for (const [name, list] of Object.entries(lists))
+    for (const o of list)
+      for (const id of IDS)
+        ok(typeof o[id] === 'string' && o[id].trim(),
+           `${name} entry '${o.id}' has no ${id} name`);
+  for (const z of Object.values(SIZES))
+    for (const id of IDS)
+      ok(z.band && z.band[id], `SIZES.${z.id}.band has no ${id}`);
+
+  /* ── Russian counts ───────────────────────────────────────────── */
+  const RU = { 1: 'полоса', 2: 'полосы', 4: 'полосы', 5: 'полос', 11: 'полос',
+               14: 'полос', 21: 'полоса', 22: 'полосы', 25: 'полос' };
+  withLang('ru', () => {
+    for (const [n, want] of Object.entries(RU))
+      ok(plural(Number(n), 'stripes.noun') === want,
+         `plural(${n}) in Russian is "${plural(Number(n), 'stripes.noun')}", want "${want}" `
+       + '— 11 is not 1 and 21 is');
+    ok(counted(3, 'stripes.noun') === '3 полосы', 'counted() does not join the count to its noun');
+  });
+  withLang('he', () => ok(plural(1, 'stripes.noun') === 'פס' && plural(3, 'stripes.noun') === 'פסים',
+     'Hebrew plural is wrong'));
+  withLang('en', () => ok(plural(1, 'stripes.noun') === 'strip' && plural(2, 'stripes.noun') === 'strips',
+     'English plural is wrong'));
+
+  /* ── T15, the copy half ───────────────────────────────────────
+     `npm run audit` counts the nine `<details>` on the page and refuses an
+     empty one. It counts them in ONE language — whichever this container's
+     Chromium picked — so a Russian explainer left as a stub would sail past
+     it. Every step's question and answer, in all three, asserted here.
+
+     ⚠ THE LENGTH FLOOR IS THE POINT. A key that exists is not an explainer;
+     `'—'` would satisfy every other check in this file. §10.4 asks for a
+     paragraph that rescues somebody who does not know what a משקוף is, and
+     the cheapest way to fake that is a sentence fragment in the language
+     nobody here proof-reads by eye. */
+  for (const step of ['fit', 'mk', 'colour', 'face', 'glass', 'grip', 'lock', 'pz', 'sum']) {
+    for (const part of ['q', 'a']) {
+      const row = UI[`exp.${step}.${part}`];
+      ok(row, `step '${step}' has no exp.${step}.${part} — TRANSFORM.md §10.4 asks every `
+            + 'step to answer "what is this?", and the cabinet could not');
+      if (!row) continue;
+      const floor = part === 'q' ? 8 : 120;
+      IDS.forEach((id, i) => ok((row[i] || '').trim().length >= floor,
+        `exp.${step}.${part} in ${id} is ${(row[i] || '').trim().length} characters, want `
+      + `${floor}+ — a stub is not an explainer`));
+    }
+  }
+
+  /* ── which language a stranger arrives in ─────────────────────
+     ⚠ ENGLISH IS NEVER CHOSEN FOR ANYBODY, and that is the decision this
+     block defends. `en-US` is the world's factory default and a very large
+     share of phones sold in Israel report it while their owner reads only
+     Hebrew; acting on it would open an English page for a big fraction of a
+     Hebrew business's actual customers. Nobody's browser says Russian by
+     accident, so that one IS acted on. See `js/copy.js`. */
+  const nav = tags => ({ languages: tags });
+  const cases = [
+    ['?lang=ru', null, 'ru', 'an explicit ?lang= must win'],
+    ['?lang=xx', nav(['he']), 'he', 'an unknown ?lang= must not be honoured'],
+    ['', nav(['en-US', 'en']), 'he', 'a browser saying en-US gets HEBREW — see above'],
+    ['', nav(['en-GB']), 'he', 'no dialect of English is auto-selected'],
+    ['', nav(['ru-RU']), 'ru', 'a browser saying Russian was set to Russian on purpose'],
+    ['', nav(['en-US', 'ru']), 'ru', 'English is skipped over, not treated as a match'],
+    ['', nav(['he-IL']), 'he', 'Hebrew stays Hebrew'],
+    ['', nav(['iw']), 'he', 'the retired ISO code for Hebrew still means Hebrew'],
+    ['', nav(['fr-FR']), 'he', 'a language we do not have falls back to Hebrew'],
+    ['', nav([]), 'he', 'a browser that names nothing gets Hebrew'],
+    ['', null, 'he', 'no navigator at all must not throw'],
+  ];
+  for (const [search, n, want, why] of cases) {
+    const got = copy.pickLang(search, n);
+    ok(got === want, `pickLang("${search}", ${JSON.stringify(n)}) = ${got}, want ${want} — ${why}`);
+  }
+
+  /* ═══ A PRICE HAS ONE SHAPE ══════════════════════════════════════
+     ⚠ THIS IS THE BUG THIS BLOCK EXISTS FOR, AND IT SHIPPED. `formatAgorot`
+     was `Intl.NumberFormat('he-IL', {style:'currency'})` under a comment
+     promising the figure could never change shape between languages, because
+     the LOCALE was pinned. It changed anyway: `Intl` wraps the shekel in
+     U+200F RIGHT-TO-LEFT MARKs, and the bidi algorithm then places the symbol
+     at paint time by the direction of the paragraph. `₪ 3,150` in Hebrew and
+     `3,150₪` on the English page — the same door, two prices, decided by a
+     stylesheet. Found by opening the page and looking at a size tile.
+
+     Asserted at the cause rather than at the symptom: a formatted price
+     contains NO bidi control characters at all, so there is nothing for the
+     algorithm to act on. `npm run audit` measures the glyphs' real left-to-
+     right order in all three languages, which is the symptom. */
+  const BIDI = /[\u200E\u200F\u061C\u202A-\u202E\u2066-\u2069]/;
+  for (const a of [0, 15000, 315000, -5000, 490000]) {
+    ok(!BIDI.test(formatAgorot(a)),
+       `formatAgorot(${a}) = ${JSON.stringify(formatAgorot(a))} carries a bidi control `
+     + 'character — the shekel sign will move to the other side of the digits on an '
+     + 'LTR page, and the same door will show two different prices');
+    ok(formatAgorot(a).indexOf('\u20AA') === (a < 0 ? 1 : 0),
+       `formatAgorot(${a}) does not open with the shekel sign: ${formatAgorot(a)}`);
+  }
+  for (const id of ['en', 'ru'])
+    ok(withLang(id, () => formatAgorot(315000)) === withLang('he', () => formatAgorot(315000)),
+       `the price string differs between ${id} and Hebrew`);
+
+  /* ═══ THE HINGE TRAP — PLAN.md §6.1 ═══════════════════════════════
+     ⚠ THE INTERFACE MIRRORS AND THE DOOR MUST NOT. Hebrew puts `dir="rtl"`
+     on `<html>`; a drawing that flipped with it would show one hinge side
+     while Peretz built the other, and the customer would find out when the
+     door arrived. This project has already shipped the mirror of this bug
+     once (ASK-PERETZ.md §1) and every instrument called it green, because a
+     mirrored door is a perfectly plausible door.
+
+     Asserted at the strongest level available to a string test: the SVG is
+     BYTE-IDENTICAL in all three languages except for its `aria-label`, which
+     is the one thing in it that is words. Not "the cylinder is on the right"
+     — that would pass a drawing which had mirrored twice, or which had moved
+     something else. `npm run audit` measures the rendered geometry in a real
+     browser as well; this catches it in half a second on every commit. */
+  const strip = svg => svg.replace(/aria-label="[^"]*"/, 'aria-label=""');
+  for (const door of [base, { ...base, handing: 'left-in', window: 'rect', detail: 'panel' }]) {
+    const he = withLang('he', () => strip(render(door)));
+    for (const id of ['en', 'ru'])
+      ok(withLang(id, () => strip(render(door))) === he,
+         `the drawing is not byte-identical in ${id} — SOMETHING IN THE DOOR MOVED `
+       + 'WITH THE LANGUAGE. See PLAN.md §6.1: the hinge is a fact about a physical '
+       + 'object and must never depend on which language the page is in');
+  }
+  /* And the accessible name DOES change, or the door is silent to a screen
+     reader in two of the three languages. The check above would pass a
+     `describe()` that had been frozen in Hebrew. */
+  for (const id of ['en', 'ru'])
+    ok(withLang(id, () => render(base)) !== withLang('he', () => render(base)),
+       `the drawing's accessible name is identical in ${id} and Hebrew — describe() is frozen`);
+
+  /* ═══ THE ORDER IS ALWAYS HEBREW ══════════════════════════════════
+     PLAN.md §0: an order Peretz can act on without a clarifying question.
+     He reads Hebrew. Every other reader on the page follows the customer;
+     this one does not, and that has to be asserted rather than remembered. */
+  const heLines = withLang('he', () => specLines(base)).join('\n');
+  for (const id of ['en', 'ru'])
+    ok(withLang(id, () => specLines(base)).join('\n') === heLines,
+       `specLines() came out in ${id} — the WhatsApp order would reach Peretz in a `
+     + 'language he would have to translate before he could price it');
+  for (const id of ['en', 'ru'])
+    ok(!/[A-Za-z\u0400-\u04FF]{4,}/.test(withLang(id, () => message(base))
+         .replace(/https?:\/\/\S+/g, '').replace(/DM-\S+/g, '')),
+       `message() in ${id} carries Latin or Cyrillic words outside its link and code`);
+
+  /* ⚠ AND THE CUSTOMER'S LANGUAGE IS REPORTED, because he is about to ring
+     them back and nothing else in the message says which language to use. */
+  ok(!withLang('he', () => message(base)).includes('בעמוד'),
+     'the Hebrew order carries a note about the page language — noise on every order');
+  for (const id of ['en', 'ru'])
+    ok(withLang(id, () => message(base)).includes(copy.CUSTOMER_LANG_NOTE[id]),
+       `an order built in ${id} does not tell Peretz which language to answer in`);
+
+  /* ── the markup and the copy cannot drift ─────────────────────── */
+  checkStaticCopy(copy);
+}
+
+/**
+ * Every `data-t` in `index.html` names a key that exists, and the Hebrew the
+ * markup ships with is the Hebrew `copy.js` holds.
+ *
+ * ⚠ THE MARKUP KEEPS ITS HEBREW ON PURPOSE — see `translateStatic` in
+ * `js/app.js`. It is the no-JS fallback, and this page has a tested one. That
+ * makes every one of these strings a second copy, which is exactly the
+ * situation CLAUDE.md §5 says somebody will change one half of. This is what
+ * stops them.
+ */
+function checkStaticCopy({ T, UI, withLang }) {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const seen = [];
+  for (const m of html.matchAll(/data-t="([^"]+)"[^>]*>([^<]*)</g)) seen.push([m[1], m[2].trim()]);
+  /* `<title data-t=…>` and the attribute form are matched separately: one has
+     its text before the attribute, the other has no text at all. */
+  for (const m of html.matchAll(/<title data-t="([^"]+)">([^<]*)</g)) seen.push([m[1], m[2].trim()]);
+  for (const m of html.matchAll(/data-ta="([^"]+)"/g))
+    for (const pair of m[1].split(','))
+      seen.push([pair.split('=')[1].trim(), null]);
+
+  ok(seen.length > 35,
+     `only ${seen.length} translated strings found in index.html — the markup scan `
+   + 'is matching nothing, which would make every assertion below vacuous');
+
+  withLang('he', () => {
+    for (const [key, text] of seen) {
+      ok(UI[key], `index.html names data-t="${key}" and js/copy.js has no such key`);
+      if (text !== null && UI[key])
+        ok(text === T(key),
+           `index.html ships "${text}" for '${key}' and copy.js holds "${T(key)}" — the `
+         + 'no-JS fallback and the translated page would say different things');
+    }
+  });
 }
 
 /* ⚠ TWO RESOLVERS, ONE ORDER. `byId` in the catalogue tries ids first and
@@ -1788,6 +3043,104 @@ group('the page still reaches Peretz with no JavaScript');
    won over a live id of the same name — and `take` is the reader that actually
    faces stale links. Both are two-pass now. No list collides today; nothing
    asserted that, which is the part that made it a matter of luck. */
+/* ⚠ THE MONEY MOVED OUT OF THE VOCABULARY, so this asserts they cannot drift.
+   Every price now lives in `js/prices.js` as plain shekels — one screen, for
+   the evening the real numbers arrive. `priceInto` in catalog.js already
+   THROWS on a mismatch at load, which is the strong guard; this is the one
+   that names the problem in the suite's own words rather than as a stack
+   trace, and it also pins the shape of the money itself. */
+group('every option has exactly one price, in whole agorot');
+{
+  const { BUILD, MASHKOF_WIDER, COLOUR, WINDOW, GRILLE, DETAIL, HANDLE, LOCKSET, agorot } =
+    await import('../js/prices.js');
+
+  /* ⚠ SIZE IS NOT IN THIS SWEEP ANY MORE, and it needs its own check rather
+     than a quiet absence. A size used to carry a `base` — the whole installed
+     cost — out of a `SIZE` table in prices.js. Peretz's rule is a MULTIPLIER on
+     two of the six components instead (see `BUILD`), so there is no per-size
+     price left to pair up. What replaces it: every size must carry a usable
+     `mult`, or `Math.round(x * undefined)` is NaN all the way to the figure on
+     the screen, and nothing throws anywhere on the way. */
+  for (const z of Object.values(SIZES)) {
+    ok(typeof z.mult === 'number' && Number.isFinite(z.mult) && z.mult > 0,
+       `size "${z.id}" carries mult ${z.mult} — it multiplies the door and the `
+       + 'mashkof, and a missing one prices the whole door as NaN');
+  }
+
+  /* The six components of a fitted door. Their sum is the price of a standard
+     door with nothing on it, and it is Peretz's own arithmetic: ₪3,195. */
+  const BUILD_KEYS = ['door', 'cylinder', 'lock', 'mashkof', 'install', 'measure'];
+  for (const k of BUILD_KEYS) {
+    ok(Object.prototype.hasOwnProperty.call(BUILD, k),
+       `prices.js BUILD has no "${k}" — a missing part is money given away`);
+  }
+  for (const k of Object.keys(BUILD)) {
+    ok(BUILD_KEYS.includes(k),
+       `prices.js BUILD carries "${k}", which nothing adds up`);
+  }
+  ok(BUILD_KEYS.reduce((t, k) => t + agorot(BUILD[k]), 0) === 319500,
+     'the six parts of a standard fitted door must sum to ₪3,195 — Peretz, 30.8.2026');
+  /* ⚠ AND THE `door` LINE IS HIS "door - 1295", WHICH IS WHAT MAKES THE SUM
+     COME OUT. That figure looked like a separate product — the leaf without
+     frame or fitting — and it is not: it is this component, and the ₪45
+     between 1250 and 1295 is exactly the ₪45 between the old total and his
+     new one. Pinned, because the reading is the whole reason the total moved.
+     See `BUILD` in prices.js. */
+  ok(agorot(BUILD.door) === 129500,
+     `Peretz's "door - 1295" is the door component of the six — got ${BUILD.door}`);
+  ok(Number.isInteger(agorot(MASHKOF_WIDER)) && agorot(MASHKOF_WIDER) > 0,
+     'widening the mashkof must cost a whole positive number of agorot');
+
+  const pairs = [['colour', COLOURS, COLOUR, 'delta'], ['window', WINDOWS, WINDOW, 'delta'],
+                 ['grille', GRILLES, GRILLE, 'delta'], ['detail', DETAILS, DETAIL, 'delta'],
+                 ['handle', HANDLES, HANDLE, 'delta'], ['lockset', LOCKSETS, LOCKSET, 'delta']];
+  for (const [what, list, table, key] of pairs) {
+    for (const o of list) {
+      ok(Object.prototype.hasOwnProperty.call(table, o.id),
+         `prices.js has no ${what} price for "${o.id}" — it would cost nothing`);
+      ok(Number.isInteger(o[key]) && o[key] >= 0,
+         `${what} "${o.id}" carries ${o[key]} — prices are non-negative whole agorot`);
+      if (Object.prototype.hasOwnProperty.call(table, o.id)) {
+        ok(o[key] === agorot(table[o.id]),
+           `${what} "${o.id}" is ${o[key]} agorot but prices.js says ${table[o.id]} shekels`);
+      }
+    }
+    const ids = new Set(list.map(o => o.id));
+    for (const id of Object.keys(table)) {
+      ok(ids.has(id), `prices.js prices a ${what} "${id}" that is not in the catalogue`);
+    }
+  }
+  /* Half an agora is not a thing, and a price that quietly became one would be
+     invisible in every shekel-rounded display. */
+  for (const bad of [3195.001, 0.005, NaN, Infinity, '3195', null]) {
+    let threw = false;
+    try { agorot(bad); } catch { threw = true; }
+    ok(threw, `agorot(${JSON.stringify(bad)}) must be refused, not rounded away`);
+  }
+  ok(agorot(3195) === 319500 && agorot(0) === 0 && agorot(12.34) === 1234,
+     'agorot() does not convert shekels correctly');
+
+  /* ⚠ THE VERSION FIELD CAN OVERFLOW AND NOTHING WAS CHECKING IT. `version`
+     was four bits; version 16 does not fit in four bits, so it encoded as 0,
+     decode compared 0 against 16, and EVERY code the app produced was refused.
+     It failed loudly, which is luck: a VERSION that wrapped onto a number this
+     app had once used would have read an old layout as a new one and handed
+     Peretz a different door.
+     The sweep below asserts `list.length <= 2 ** BITS[f]` for every option
+     list and never covered this, because the version is not a list. */
+  {
+    const { BITS: B, VERSION: V } = await import('../js/url-state.js');
+    ok(V < 2 ** B.version,
+       `VERSION ${V} does not fit in ${B.version} bits — it encodes as `
+     + `${V % (2 ** B.version)} and every code the app produces is refused`);
+    /* And leave room to bump: a field with no headroom is one release from
+       this exact failure, and the symptom is total rather than partial. */
+    ok(V <= 2 ** B.version - 4,
+       `VERSION ${V} is within 4 of its ${B.version}-bit ceiling — widen the `
+     + 'field before the next bump, not during it');
+  }
+}
+
 group('no catalogue list reuses a name as both an id and an alias');
 {
   const lists = { COLOURS, WINDOWS, GRILLES, HANDLES, LOCKSETS, DETAILS, HANDINGS };
@@ -1832,8 +3185,19 @@ group('ironwork is counted, and the drawing agrees with the bill');
     checked++;
     const n = paneCount(st);
 
-    /* 1. THE DRAWING AND THE COUNT. `data-pane` is one per aperture drawn. */
-    const drawn = (render(st).match(/data-pane/g) || []).length;
+    /* 1. THE DRAWING AND THE COUNT. `data-pane` is one per aperture drawn.
+       ⚠ THE ATTRIBUTE, NOT THE WORD. This was `/data-pane/g`, which counts
+       every occurrence of those nine characters ANYWHERE in the emitted
+       document — and about 29% of that document is XML comments, because this
+       drawing explains itself to whoever opens the element inspector. The
+       moment a comment mentioned the attribute by name (the reflection's note
+       about which sweeps do and do not see it) every door in the catalogue
+       gained two phantom panes and twenty-five assertions failed, none of them
+       about anything that had moved in the drawing.
+       Prose is not geometry. `\sdata-pane="` matches only where the renderer
+       actually cut an aperture, which is what the sentence above always meant
+       and is strictly narrower than what it asked for. */
+    const drawn = (render(st).match(/\sdata-pane="/g) || []).length;
     ok(drawn === n,
        `${size}/${w.id}: the drawing cuts ${drawn} pane(s), paneCount says ${n}`);
 
@@ -1851,9 +3215,16 @@ group('ironwork is counted, and the drawing agrees with the bill');
       const line = message(st).split('\n').find(l => l.startsWith('סורג'));
       ok(line && line.includes(`(${n} יחידות)`),
          `${size}/${w.id}: charged for ${n} panels and the message says "${line}"`);
+      /* ⚠ `panel.at`, AND EXPLICITLY IN HEBREW. The field was `inHe` when
+         there was only one language to be in; it is a `{he,en,ru}` triple
+         now. `message()` is Hebrew whatever the customer chose (see
+         `specLines`), so the Hebrew is what this line has to contain — asking
+         for `L(panel.at)` in the ambient language would pass by accident
+         today and fail the first time a test above it switches language. */
       for (const panel of glazedPanels(st)) {
-        ok(line.includes(panel.inHe),
-           `${size}/${w.id}: ironwork goes ${panel.inHe} and the message never says so`);
+        const at = withLang('he', () => L(panel.at));
+        ok(line.includes(at),
+           `${size}/${w.id}: ironwork goes ${at} and the message never says so`);
       }
     }
   }
@@ -1863,8 +3234,21 @@ group('ironwork is counted, and the drawing agrees with the bill');
         assertions above derive what they expect from the same catalogue that
         produced it, so they would all stay green if the Hebrew were rewritten
         as nonsense. This one would not. */
-  ok(message({ ...stem, size: 'sidelight', window: 'rect', grille: 'iron' }).split('\n')
-       .includes('סורג: ברזל מחושל — בכנף הדלת ובחלון הצד (2 יחידות)'),
+  /* ⚠ `iron` (ברזל מחושל) IS WITHDRAWN — Peretz, 26.8.2026 — so this literal
+     had to change with it. It is pinned on `scroll`, which is still in the
+     range, and it is still a literal for the reason above: every other
+     assertion in this group derives what it expects from the same catalogue
+     that produced the sentence, so all of them would stay green if the Hebrew
+     were rewritten as nonsense. */
+  /* ⚠ `half`, AND IT USED TO BE `sidelight`. That size was withdrawn on
+     27.8.2026 — *"remove the double door with window, that is just an option
+     if you choose a double door and then a window"* — which is the owner
+     describing this exact door: a דלת וחצי with a window in it. The fixture
+     moves to the size that survived and the sentence moves with it, naming
+     the side LEAF rather than the side LIGHT. Still pinned as a literal, for
+     the reason above. */
+  ok(message({ ...stem, size: 'half', window: 'rect', grille: 'scroll' }).split('\n')
+       .includes('סורג: מעוצב — בכנף הדלת ובכנף הצדדית (2 יחידות)'),
      'the sentence Peretz reads about a two-panel door has changed');
 
   /* 5. And the ordinary door stays quiet: "בכנף הדלת" on a door that has only
@@ -1964,10 +3348,22 @@ group('a finish is named on the fitting that has one, and nowhere else');
    than a stale bundle, because the next person to open d003 sees the old
    threshold beside the photograph and may "fix" something already fixed.
 
-   Each generating tool stamps `screenshots/.stamps.json` with a hash of what
-   the DRAWING is: `js/renderer.js` and `js/catalog.js`. Not of the tool, so a
-   comment in a harness does not cost three minutes of regeneration; of the
-   drawing, because that is what a sheet is a picture of.
+   ⚠ THIS PARAGRAPH DESCRIBED THE OLD RULE AND OUTLIVED IT BY TWO ROUNDS. It
+   said the stamp hashes "`js/renderer.js` and `js/catalog.js`. Not of the
+   tool, so a comment in a harness does not cost three minutes of
+   regeneration." Both halves are now false, and each was changed for a
+   measured reason recorded elsewhere:
+
+   - The stamp hashes the PAGE — `assets/bundle.js`, `css/app.css`,
+     `index.html` — because `recreate`, `corpus` and `against` photograph
+     `index.html?bare=1`, so the stylesheet and the markup are their inputs too
+     and were unhashed.
+   - It hashes the TOOL as well, because changing which door a sheet draws was
+     invisible to a hash of the drawing — which is exactly how a set of
+     mirrored recreations passed. A comment in a harness does now cost a
+     regeneration, and that is the cheaper of the two mistakes.
+
+   `DEPS_FOR` in `tools/fresh.mjs` is the list, and it is the only list.
 
    Fix with `npm run sheets`. */
 group('the comparison sheets are pictures of THIS drawing');
@@ -1997,6 +3393,163 @@ group('the comparison sheets are pictures of THIS drawing');
     console.log(`  (${FAMILIES.length} sheet families, all drawn from the current renderer)`);
   }
 }
+
+group('every door in the gallery is one the site can actually build');
+{
+  /* The gallery is the first offer the page makes, and each tile promises
+     "this exact door, ready to change". A tile whose design the rules quietly
+     repair delivers a DIFFERENT door from the one drawn on it — and the
+     customer has no way to know, because the thing they tapped and the thing
+     they got are both drawn by the same renderer. */
+  ok(WORKS.length > 0, 'the gallery has doors in it at all');
+
+  const seen = new Set();
+  for (const w of WORKS) {
+    ok(!seen.has(w.id), `${w.id} appears twice in the gallery`);
+    seen.add(w.id);
+
+    const full = { ...DEFAULTS, ...w.state };
+    const { state: got, notice } = fromQuery(toQuery(full));
+    ok(!notice, `${w.id}: the gallery's own door arrives with a notice (${notice})`);
+    for (const k of KEYS) {
+      ok(got[k] === full[k],
+         `${w.id}: the rules move ${k} from ${full[k]} to ${got[k]} — the tile draws `
+       + 'one door and tapping it gives you another');
+    }
+    /* And it has to survive the code, because that is what reaches Peretz. */
+    ok(CODE_RE.test(encodeCode(full)), `${w.id}: does not encode to a well-formed code`);
+  }
+
+  /* ⚠ THE TWO OUTPUTS OF ONE RUN, COMPARED. `npm run corpus` writes both
+     `js/works.js` and `screenshots/corpus-links.md` from the same rows in the
+     same block, so they cannot disagree — unless one of them is regenerated
+     and the other is not, which is a `git add` away and is exactly the drift
+     this compares for. */
+  const md = existsSync('screenshots/corpus-links.md')
+    ? readFileSync('screenshots/corpus-links.md', 'utf8') : '';
+  ok(md.length > 0, 'screenshots/corpus-links.md is missing');
+  if (md) {
+    const listed = [...md.matchAll(/^\| (d\d{3}) \|.*?\| `([^`]+)` \|$/gm)]
+      .map(m => ({ id: m[1], q: m[2] }));
+    ok(listed.length === WORKS.length,
+       `the table lists ${listed.length} doors and js/works.js holds ${WORKS.length} — `
+     + 'one of them was regenerated without the other. Run: npm run corpus -- --quiet');
+    for (const [i, row] of listed.entries()) {
+      const w = WORKS[i];
+      if (!w) continue;
+      ok(row.id === w.id, `row ${i}: the table says ${row.id}, js/works.js says ${w.id}`);
+      ok(row.q === toQuery({ ...DEFAULTS, ...w.state }),
+         `${w.id}: the table's query and js/works.js describe different doors`);
+    }
+  }
+}
+
+group('the drawn keyhole is on the side the PHOTOGRAPH puts it');
+{
+  /* ⚠ THIS IS THE ASSERTION THAT ACTUALLY FAILS ON THE OLD BUG, AND THE ONE
+     BELOW IT DOES NOT. That is worth writing down, because the one below was
+     committed under a comment claiming it did.
+
+     The old bug was `HANDINGS[].hinge` being the other way round: for months
+     every order named the mirror of the door on screen. A check that renders a
+     door and asks where the keyhole is drawn CANNOT catch it, because the
+     drawing reads `hinge` too — flip the field and the sentence and the
+     picture move together, and the check passes in both worlds. Verified by
+     flipping it and re-running: 4 passed, 0 failed, before and after.
+     Every check in this repo compared our drawing to our drawing. That is the
+     whole reason the bug lived.
+
+     So this one leaves the catalogue entirely. `js/works.js` carries, per real
+     door, the handing DERIVED FROM THAT DOOR'S PHOTOGRAPH — `tools/corpus.mjs`
+     maps the measured `handle.x` to a name, and that mapping does not go
+     through `hinge`. So the chain is:
+
+       handle.x (measured off a photograph)  →  handing name  →  hinge  →  the
+       side the renderer draws the keyhole on
+
+     and the two ends are independent. Flip `hinge` and the drawn side moves
+     while `handle.x` does not: the test goes red on 30 real doors at once. */
+  const dir = 'research/works/data2';
+  let checked = 0;
+  for (const w of WORKS) {
+    const path = `${dir}/${w.id}.json`;
+    if (!existsSync(path)) continue;
+    const rec = JSON.parse(readFileSync(path, 'utf8'));
+    if (!rec.handle || rec.handle.x == null) continue;
+
+    const st = { ...DEFAULTS, ...w.state };
+    const svg = render(st);
+    const leaf = /<g id="leaf" data-x="([\d.-]+)" data-w="([\d.]+)"/.exec(svg);
+    const lock = /data-hw="lockset"[^>]*?\sdata-cx="([\d.-]+)"/.exec(svg);
+    if (!leaf || !lock) continue;
+    checked++;
+
+    const drawn = Number(lock[1]) > Number(leaf[1]) + Number(leaf[2]) / 2 ? 'right' : 'left';
+    /* The hardware sits on the OPENING edge, away from the hinge, in the
+       photograph as in the drawing. `handle.x` is a fraction of the leaf's
+       width, so past the middle is the right-hand side of the door as
+       photographed — which is to say, from outside. */
+    const measured = rec.handle.x > 0.5 ? 'right' : 'left';
+    ok(drawn === measured,
+       `${w.id}: the photograph puts the hardware on the ${measured} (handle.x = `
+     + `${rec.handle.x}) and we draw the keyhole on the ${drawn} — the site is `
+     + 'building the mirror of this door');
+
+    const words = handingWords(st);
+    ok(words.includes(`צילינדר בצד ${measured === 'right' ? 'ימין' : 'שמאל'}`),
+       `${w.id}: the order says "${words}" about a door whose hardware was `
+     + `measured on the ${measured}`);
+  }
+  ok(checked >= 25,
+     `only ${checked} measured doors were checked against their photographs — `
+   + 'this group is the one anchor outside our own drawing and it has gone thin');
+  console.log(`  (${checked} real doors, each against its own photograph's handle.x)`);
+}
+
+group('and the opening is spelled out, so it cannot be read the wrong way round');
+{
+  /* ⚠ THIS ONE IS CIRCULAR AND IS KEPT ANYWAY, WITH ITS LIMITS NAMED. It
+     checks that the SENTENCE agrees with the PICTURE — both of which read
+     `HANDINGS[].hinge`, so it cannot catch that field being wrong. What it
+     does catch is the sentence and the picture drifting apart, which is a
+     different and real failure: `handingWords` could be edited, or the
+     renderer's lever direction could be, and then the order and the drawing
+     would say opposite things about the same door.
+     The group above is the one anchored outside our own drawing. */
+  for (const h of HANDINGS) {
+    const st = { ...base, handing: h.id, lockset: 'plate', handle: 'none' };
+    const svg = render(st);
+
+    const leaf = /<g id="leaf" data-x="([\d.-]+)" data-w="([\d.]+)"/.exec(svg);
+    ok(!!leaf, `${h.id}: the drawing has no leaf to measure against`);
+    if (!leaf) continue;
+    const centre = Number(leaf[1]) + Number(leaf[2]) / 2;
+
+    /* `data-cx` is the lockset's own centre, published by the renderer for
+       `tools/collide.mjs` — a measurement the drawing already makes about
+       itself, rather than a coordinate scraped out of the first path. */
+    const lock = /data-hw="lockset"[^>]*?\sdata-cx="([\d.-]+)"/.exec(svg);
+    ok(!!lock, `${h.id}: no lockset found in the drawing`);
+    if (!lock) continue;
+
+    const drawnSide = Number(lock[1]) > centre ? 'ימין' : 'שמאל';
+    const words = handingWords(st);
+    ok(words.includes(`צילינדר בצד ${drawnSide}`),
+       `${h.id}: the keyhole is drawn on the ${drawnSide} of the leaf, and the order `
+     + `says "${words}"`);
+    ok(words.includes('מבחוץ'),
+       `${h.id}: the sentence does not say which side you are standing on, which is `
+     + 'the half of the ambiguity that cost this project months');
+  }
+
+  /* And the two handings must not say the same thing, which is the failure a
+     constant would produce. */
+  ok(handingWords({ ...base, handing: 'left-in' })
+     !== handingWords({ ...base, handing: 'right-in' }),
+     'both handings produce the same sentence');
+}
+
+await checkLanguages();
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

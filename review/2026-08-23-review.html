@@ -1,0 +1,792 @@
+<title>Door Configurator Review</title>
+<meta name="description" content="Instrument-grounded review of the Dlatot Magen door configurator, August 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&display=swap">
+
+<style>
+:root {
+  --paper:      #EFEDE8;
+  --surface:    #FBFAF7;
+  --surface-2:  #E7E4DD;
+  --ink:        #24262A;
+  --ink-2:      #5E6167;
+  --ink-3:      #86898F;
+  --rule:       #D6D3CB;
+  --rule-hard:  #B9B5AA;
+  --accent:     #3C5A47;
+  --accent-ink: #2C4435;
+  --accent-bg:  #E0E8E1;
+  --crit:       #9E3B2C;
+  --crit-bg:    #F2DFDA;
+  --warn:       #9A6A18;
+  --warn-bg:    #F1E5CD;
+  --ok:         #3C5A47;
+  --ok-bg:      #E0E8E1;
+
+  --f-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --f-body:    'Literata', Georgia, 'Times New Roman', serif;
+  --f-mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:      #1A1C1F;
+    --surface:    #212428;
+    --surface-2:  #2A2E32;
+    --ink:        #E9E7E2;
+    --ink-2:      #A2A6AC;
+    --ink-3:      #7B7F86;
+    --rule:       #363A3F;
+    --rule-hard:  #4C5157;
+    --accent:     #86AE93;
+    --accent-ink: #A6C7B0;
+    --accent-bg:  #263229;
+    --crit:       #DE8B78;
+    --crit-bg:    #38231E;
+    --warn:       #D6A85C;
+    --warn-bg:    #352A16;
+    --ok:         #86AE93;
+    --ok-bg:      #263229;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper:      #1A1C1F;
+  --surface:    #212428;
+  --surface-2:  #2A2E32;
+  --ink:        #E9E7E2;
+  --ink-2:      #A2A6AC;
+  --ink-3:      #7B7F86;
+  --rule:       #363A3F;
+  --rule-hard:  #4C5157;
+  --accent:     #86AE93;
+  --accent-ink: #A6C7B0;
+  --accent-bg:  #263229;
+  --crit:       #DE8B78;
+  --crit-bg:    #38231E;
+  --warn:       #D6A85C;
+  --warn-bg:    #352A16;
+  --ok:         #86AE93;
+  --ok-bg:      #263229;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 24px 96px;
+}
+
+/* ── masthead ─────────────────────────────────────────── */
+
+.mast {
+  border-bottom: 2px solid var(--ink);
+  padding: 56px 0 20px;
+  margin-bottom: 40px;
+}
+
+.mast__eyebrow {
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 18px;
+}
+
+.mast__title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(2.1rem, 6vw, 3.1rem);
+  line-height: 1.04;
+  letter-spacing: -.022em;
+  margin: 0 0 16px;
+  text-wrap: balance;
+}
+
+.mast__standfirst {
+  font-size: 1.09rem;
+  color: var(--ink-2);
+  margin: 0 0 26px;
+  max-width: 60ch;
+}
+
+.mast__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  font-family: var(--f-mono);
+  font-size: .74rem;
+  color: var(--ink-3);
+}
+
+.mast__meta b { color: var(--ink-2); font-weight: 500; }
+
+/* ── section headings ─────────────────────────────────── */
+
+h2 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.55rem;
+  letter-spacing: -.015em;
+  line-height: 1.2;
+  margin: 60px 0 8px;
+  text-wrap: balance;
+}
+
+h2 + .dek {
+  color: var(--ink-2);
+  margin: 0 0 28px;
+  font-size: 1rem;
+}
+
+h3 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1.12rem;
+  line-height: 1.3;
+  letter-spacing: -.008em;
+  margin: 0 0 10px;
+  text-wrap: balance;
+}
+
+p { margin: 0 0 16px; }
+p:last-child { margin-bottom: 0; }
+
+a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+code, .m {
+  font-family: var(--f-mono);
+  font-size: .87em;
+  font-variant-numeric: tabular-nums;
+}
+
+code {
+  background: var(--surface-2);
+  padding: .1em .34em;
+  border-radius: 3px;
+}
+
+strong { font-weight: 600; }
+
+/* ── the green-light strip ────────────────────────────── */
+
+.strip {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 20px 22px;
+  margin: 0 0 12px;
+}
+
+.strip__head {
+  font-family: var(--f-mono);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 14px;
+}
+
+.strip__rows { display: grid; gap: 9px; }
+
+.strip__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 12px;
+  border-bottom: 1px dotted var(--rule);
+  padding-bottom: 8px;
+}
+.strip__row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.strip__what { font-size: .93rem; color: var(--ink-2); }
+
+.strip__val {
+  font-family: var(--f-mono);
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ok);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ── findings ─────────────────────────────────────────── */
+
+.find {
+  border-top: 1px solid var(--rule-hard);
+  padding-top: 22px;
+  margin-top: 34px;
+}
+
+.find__tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.chip {
+  font-family: var(--f-mono);
+  font-size: .66rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: .28em .6em;
+  border-radius: 3px;
+}
+
+.chip--crit { background: var(--crit-bg); color: var(--crit); }
+.chip--warn { background: var(--warn-bg); color: var(--warn); }
+.chip--note { background: var(--accent-bg); color: var(--accent-ink); }
+
+.find__where {
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  color: var(--ink-3);
+}
+
+/* ── readout: instrument output ───────────────────────── */
+
+.readout {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-inline-start: 3px solid var(--accent);
+  border-radius: 3px;
+  padding: 16px 18px;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.readout__cap {
+  font-family: var(--f-mono);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--f-mono);
+  font-size: .8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+th {
+  text-align: right;
+  font-weight: 600;
+  color: var(--ink-3);
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 0 0 8px 14px;
+  border-bottom: 1px solid var(--rule-hard);
+  white-space: nowrap;
+}
+th:first-child { text-align: left; padding-left: 0; }
+
+td {
+  text-align: right;
+  padding: 7px 0 7px 14px;
+  border-bottom: 1px dotted var(--rule);
+  color: var(--ink);
+  white-space: nowrap;
+}
+td:first-child { text-align: left; padding-left: 0; color: var(--ink-2); }
+tr:last-child td { border-bottom: 0; }
+
+td.bad  { color: var(--crit); font-weight: 600; }
+td.warn { color: var(--warn); font-weight: 500; }
+td.good { color: var(--ok); }
+
+/* ── pull quote / verdict line ────────────────────────── */
+
+.verdict {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 1.18rem;
+  line-height: 1.4;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  border-inline-start: 3px solid var(--accent);
+  padding: 4px 0 4px 18px;
+  padding-inline-start: 18px;
+  margin: 24px 0;
+  text-wrap: balance;
+}
+
+/* ── ideas ────────────────────────────────────────────── */
+
+.idea {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 22px 24px;
+  margin-bottom: 16px;
+}
+
+.idea__top {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.idea__rank {
+  font-family: var(--f-mono);
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.idea__name {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.16rem;
+  letter-spacing: -.012em;
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 12ch;
+}
+
+.idea__cost {
+  display: flex;
+  gap: 6px;
+  font-family: var(--f-mono);
+  font-size: .66rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.idea__cost span {
+  border: 1px solid var(--rule-hard);
+  border-radius: 3px;
+  padding: .22em .5em;
+}
+
+.idea p { font-size: .97rem; }
+
+.idea__why {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dotted var(--rule);
+  font-size: .9rem;
+  color: var(--ink-2);
+}
+
+.idea__why b {
+  font-family: var(--f-mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+/* ── next ─────────────────────────────────────────────── */
+
+.next { display: grid; gap: 0; margin-top: 8px; }
+
+.next__row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.next__row:first-child { border-top: 1px solid var(--rule-hard); }
+
+.next__n {
+  font-family: var(--f-mono);
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.next__t { font-size: .97rem; }
+.next__t b { font-weight: 600; }
+
+.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 2px solid var(--ink);
+  font-family: var(--f-mono);
+  font-size: .73rem;
+  color: var(--ink-3);
+  line-height: 1.6;
+}
+
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .wrap { padding: 0 18px 72px; }
+  .idea { padding: 18px; }
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="mast__eyebrow">Dlatot Magen · configurator review</p>
+  <h1 class="mast__title">Every instrument is green. Here is what they cannot see.</h1>
+  <p class="mast__standfirst">
+    I rebuilt the project from a cold container and re-ran the whole suite. It all
+    passes. So this review is about the three things nothing in the repo measures —
+    and the one asset already sitting in <code>screenshots/</code> that would change
+    the product more than any of them.
+  </p>
+  <div class="mast__meta">
+    <span><b>23 August 2026</b></span>
+    <span>branch <b>claude/app-review-upgrades-2gn7vq</b></span>
+    <span>head <b>3de3cb3</b></span>
+  </div>
+</header>
+
+<h2>State of the build</h2>
+<p class="dek">Everything the repo knows how to ask, it asked, and got the right answer.</p>
+
+<div class="strip">
+  <p class="strip__head">Cold-container run · all green</p>
+  <div class="strip__rows">
+    <div class="strip__row"><span class="strip__what"><code>npm test</code> — string-level assertions</span><span class="strip__val">5,674,573 passed · 0 failed</span></div>
+    <div class="strip__row"><span class="strip__what"><code>npm run audit</code> — real page, every option clicked</span><span class="strip__val">7 viewports · no faults</span></div>
+    <div class="strip__row"><span class="strip__what"><code>npm run collide</code> — drawn geometry vs. the rules</span><span class="strip__val">1,490 designs · clean</span></div>
+    <div class="strip__row"><span class="strip__what">Failure routes: no-JS, init throw, paint throw, bundle 404, no-storage</span><span class="strip__val">all reach Peretz</span></div>
+  </div>
+</div>
+
+<p style="font-size:.88rem;color:var(--ink-3);font-family:var(--f-mono);margin-top:14px">
+  One environment note: a fresh clone needs <code>npm install</code> before
+  <code>npm test</code> — the suite's freshness guard imports <code>esbuild</code>
+  and dies with a raw <code>ERR_MODULE_NOT_FOUND</code> stack rather than saying so.
+</p>
+
+<h2>Three findings</h2>
+<p class="dek">Each one measured before it was written down, per the house rule.</p>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--crit">Measured</span>
+    <span class="find__where">REALISM.md 40 KB gate · js/renderer.js · js/app.js</span>
+  </div>
+  <h3>The size gate counts bytes that are never transferred, while tap latency runs to 315 ms unwatched</h3>
+
+  <p>
+    68% of buildable doors blow the repo's own 40 KB gate — mean 55.3 KB, worst
+    282.9 KB. That number has been treated as a debt to pay down. It is measuring
+    the wrong quantity. The SVG is never sent over a network: it is built in memory
+    and assigned to <code>innerHTML</code>. Compressed, the worst door is 17.7 KB
+    brotli. Bytes are not the cost.
+  </p>
+  <p>
+    The cost is DOM. The worst door is <strong>2,130 nodes torn down and rebuilt on
+    every single tap</strong>. So I measured what a customer actually feels, at 6×
+    CPU throttle — the mid-tier Android someone is holding in their living room:
+  </p>
+
+  <div class="readout">
+    <p class="readout__cap">Time from colour tap to painted door · median of 12 · 390×844</p>
+    <table>
+      <thead>
+        <tr><th>Door</th><th>Nodes</th><th>SVG</th><th>Desktop</th><th>6× throttle</th><th>p90</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>default</td><td>335</td><td>35 KB</td><td>31 ms</td><td class="good">84 ms</td><td>98 ms</td></tr>
+        <tr><td>sidelight + iron</td><td>824</td><td>93 KB</td><td>31 ms</td><td class="warn">145 ms</td><td>163 ms</td></tr>
+        <tr><td>half + quatrefoil</td><td>2,130</td><td>278 KB</td><td>39 ms</td><td class="bad">315 ms</td><td class="bad">370 ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    Under 100 ms reads as instant. 315 ms is a visible stutter on the interaction the
+    customer performs most — and it is invisible on the desktop the site is developed
+    on, where the same door repaints in 39 ms. Note also that coordinate precision is
+    already tight (12,940 decimal numbers, 37 with more than two places, 0.0%
+    recoverable), so <em>bytes cannot be squeezed further anyway.</em> Node count is
+    the only lever.
+  </p>
+
+  <p class="verdict">
+    Retire the byte gate. Replace it with a tap-latency gate on a throttled CPU —
+    the one number that describes what a customer experiences.
+  </p>
+</div>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--crit">Absent</span>
+    <span class="find__where">js/share.js · index.html</span>
+  </div>
+  <h3>The product is WhatsApp-first and sends no picture of the door</h3>
+
+  <p>
+    <code>message()</code> is excellent — it is the most carefully reasoned file in the
+    repo, and the recent work on it shows. But what Peretz receives is nine lines of
+    text and a URL. He has to tap the link to see the door. His fabricator gets nothing
+    he can forward.
+  </p>
+  <p>
+    <code>navigator.share</code> appears nowhere in the codebase, and there is no
+    canvas path. On a phone — which is where every one of these orders is placed —
+    Web Share Level 2 can attach a rendered PNG of the door directly into the WhatsApp
+    message. The drawing is already a pure, self-contained SVG with no external
+    references, so it rasterises cleanly.
+  </p>
+  <p>
+    Separately: <code>index.html</code> carries no <code>og:</code> or
+    <code>twitter:</code> tags, no manifest, no apple-touch-icon. When a customer
+    pastes their door link into WhatsApp it renders as a bare URL. And even with those
+    tags the preview would show the <em>default</em> door, because the page is
+    client-rendered from the query string and WhatsApp's crawler runs no JavaScript.
+  </p>
+</div>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--warn">Blocked</span>
+    <span class="find__where">ASK-PERETZ.md · js/catalog.js</span>
+  </div>
+  <h3>The thing stopping launch is not code, and it is being asked for in a format its reader will never open</h3>
+
+  <p>
+    <code>PLACEHOLDER = true</code>. Every price on screen is invented.
+    <code>ASK-PERETZ.md</code> is 27 KB of Hebrew questions with a closing table of
+    nine items, of which two — the ימין/שמאל handing convention and the prices per
+    size — stop launch on their own.
+  </p>
+  <p>
+    The engineering has been ready for a while. What is missing is answers from one
+    person who is not going to read a markdown file in a git repository. That is a
+    solvable problem, and idea 3 below solves it with the site's own mechanism.
+  </p>
+</div>
+
+<h2>Ideas, ranked</h2>
+<p class="dek">
+  Ranked by value delivered per unit of work, which is why the biggest technical
+  change is not first.
+</p>
+
+<div class="idea">
+  <div class="idea__top">
+    <span class="idea__rank">01</span>
+    <h3 class="idea__name">Start from a door Peretz actually built</h3>
+    <span class="idea__cost"><span>high value</span><span>low effort</span></span>
+  </div>
+  <p>
+    A customer arrives at a default door and roughly sixty options with no reference
+    point. They have opinions about doors they have <em>seen</em>, not about
+    <code>quatrefoil</code> versus <code>vine</code>.
+  </p>
+  <p>
+    Open instead on a grid of Peretz's real installed doors. Tap one and the
+    configurator loads <em>that door</em> as the starting state, ready to change.
+    "Like this, but black, and wider."
+  </p>
+  <div class="idea__why">
+    <b>Why this is cheap</b>
+    The data pipeline already exists and already runs.
+    <code>tools/corpus.mjs</code> derives a full buildable state for all 30 measured
+    doors from their own records, and writes
+    <code>screenshots/corpus-links.md</code> — a committed table of 30 real doors as
+    query strings, each with the photograph beside it. The test suite already asserts
+    every one of them is buildable. This is a gallery page over data that is sitting
+    in the repo today.
+  </div>
+</div>
+
+<div class="idea">
+  <div class="idea__top">
+    <span class="idea__rank">02</span>
+    <h3 class="idea__name">Put the door inside the WhatsApp message</h3>
+    <span class="idea__cost"><span>high value</span><span>low effort</span></span>
+  </div>
+  <p>
+    Rasterise the drawing to a PNG and attach it via
+    <code>navigator.share({ files, text })</code>. Peretz opens WhatsApp and
+    <em>sees the door</em>, with the spec and the <code>DM-</code> code underneath it.
+    He can forward the picture to his workshop without the recipient needing the site
+    at all.
+  </p>
+  <p>
+    Falls back to today's <code>wa.me</code> text link wherever Web Share Level 2 is
+    unavailable, which keeps desktop and <code>file://</code> working exactly as they
+    do now.
+  </p>
+  <div class="idea__why">
+    <b>One constraint, already documented here</b>
+    Canvas <code>toDataURL</code> throws <code>SecurityError</code> over
+    <code>file://</code> — REDESIGN.md found this during the raster-renderer
+    evaluation. So the image path is https-only, which is the same condition
+    <code>shareUrl()</code> already tests for. The two can share one guard.
+  </div>
+</div>
+
+<div class="idea">
+  <div class="idea__top">
+    <span class="idea__rank">03</span>
+    <h3 class="idea__name">Ask Peretz with the product itself</h3>
+    <span class="idea__cost"><span>unblocks launch</span><span>low effort</span></span>
+  </div>
+  <p>
+    Turn <code>ASK-PERETZ.md</code> into a single page he opens on his phone: each
+    question as tappable options, pre-filled with what the catalogue currently
+    assumes, prices as number fields. He works through it in ten minutes on a sofa.
+  </p>
+  <p>
+    At the end it produces <strong>a WhatsApp message back to you</strong> — the same
+    mechanism the customer uses, pointed the other way. The answers arrive as text you
+    paste into <code>catalog.js</code>.
+  </p>
+  <div class="idea__why">
+    <b>Why this is the highest-leverage page in the project</b>
+    Nine questions stand between the current build and
+    <code>PLACEHOLDER = false</code>. Every one of them is a five-second answer from
+    the one person who knows. The format is the entire obstacle.
+  </div>
+</div>
+
+<div class="idea">
+  <div class="idea__top">
+    <span class="idea__rank">04</span>
+    <h3 class="idea__name">A workshop sheet at the other end of the code</h3>
+    <span class="idea__cost"><span>medium value</span><span>low effort</span></span>
+  </div>
+  <p>
+    The <code>DM-</code> code decodes with no server — that is the whole point of it.
+    So give it a destination: <code>index.html?code=DM-…&amp;sheet=1</code> renders a
+    printable A4 spec sheet. Door elevation, dimensioned; the option list; the colour
+    with its manufacturer reference; the handing stated in words and drawn.
+  </p>
+  <p>
+    Peretz stops retyping WhatsApp messages into whatever he currently orders from.
+    The order becomes a document.
+  </p>
+  <div class="idea__why">
+    <b>Reuses what exists</b>
+    <code>decodeCode</code>, <code>specRows(state)</code> and <code>render(state)</code>
+    are all already pure and already exported. This is a stylesheet and a print
+    layout over three functions that are finished.
+  </div>
+</div>
+
+<div class="idea">
+  <div class="idea__top">
+    <span class="idea__rank">05</span>
+    <h3 class="idea__name">Repaint only what changed</h3>
+    <span class="idea__cost"><span>fixes finding 1</span><span>medium effort</span></span>
+  </div>
+  <p>
+    A colour tap is the most common interaction on the page and currently rebuilds all
+    2,130 nodes. It does not need to rebuild any of them — the paint flows through
+    gradient stops and CSS custom properties. Hoist the palette to variables on the
+    SVG root and a colour change becomes a handful of attribute writes.
+  </p>
+  <p>
+    That alone takes the commonest tap from 315 ms to near-zero on the worst door.
+    Structural changes — window, grille, size — still rebuild, and should: they are
+    rarer and the customer expects them to be a bigger event.
+  </p>
+  <div class="idea__why">
+    <b>Guard it the way this repo guards things</b>
+    <code>render(state)</code> must stay pure and stay the source of truth. The
+    assertion is that the incrementally-updated DOM is byte-identical to a full
+    <code>render()</code> of the same state — otherwise this becomes exactly the
+    two-computations-of-one-quantity defect CLAUDE.md §5 is about.
+  </div>
+</div>
+
+<div class="idea">
+  <div class="idea__top">
+    <span class="idea__rank">06</span>
+    <h3 class="idea__name">Give every shared link a real preview</h3>
+    <span class="idea__cost"><span>high value</span><span>needs infrastructure</span></span>
+  </div>
+  <p>
+    The genuinely big change, and the only one that breaks the buildless,
+    static, opens-from-a-folder constraint — so it is a deliberate decision, not a
+    refactor.
+  </p>
+  <p>
+    A single edge function decodes the query string, renders the door server-side into
+    a PNG, and serves <code>og:image</code> plus a real title. Every door link pasted
+    anywhere — WhatsApp, SMS, Instagram DM — becomes a card with the customer's actual
+    door in it. For a product whose distribution channel <em>is</em> people forwarding
+    links, this is the difference between a URL and an advertisement.
+  </p>
+  <div class="idea__why">
+    <b>What it costs, stated plainly</b>
+    The static site stays exactly as it is and keeps working from a folder;
+    the function is additive and only ever serves crawlers. But it is a second runtime
+    to keep in sync with the renderer, and REDESIGN.md's judgement on the 3D
+    experiment — that a permanent second renderer was disqualifying — applies here and
+    should be argued about before anyone builds it. Idea 02 delivers most of the same
+    value with none of this.
+  </div>
+</div>
+
+<h2>What I would do first</h2>
+<p class="dek">In order, and none of these is a week's work.</p>
+
+<div class="next">
+  <div class="next__row">
+    <span class="next__n">01</span>
+    <span class="next__t"><b>Build the Peretz form.</b> Nothing else ships until those nine answers exist, and it is an afternoon.</span>
+  </div>
+  <div class="next__row">
+    <span class="next__n">02</span>
+    <span class="next__t"><b>Ship the gallery entry point</b> from <code>corpus-links.md</code>. Biggest change to what the customer experiences, smallest change to the codebase.</span>
+  </div>
+  <div class="next__row">
+    <span class="next__n">03</span>
+    <span class="next__t"><b>Attach the PNG to the message.</b> The product is the handoff, and the handoff has no picture in it.</span>
+  </div>
+  <div class="next__row">
+    <span class="next__n">04</span>
+    <span class="next__t"><b>Add <code>npm run latency</code></b> and delete the 40 KB gate from REALISM.md, so the number the project watches is the one the customer feels.</span>
+  </div>
+</div>
+
+<p style="margin-top:34px">
+  One last note, in the spirit of the file that governs this repo: the reason all
+  three findings survived a suite of 5.67 million assertions is the same reason
+  CLAUDE.md keeps recording — <strong>every instrument here measures the drawing, and
+  the product is the handoff.</strong> The byte gate watches the SVG. The audit watches
+  the page. Nothing watches the message arriving on Peretz's phone, or the customer
+  waiting 315 ms for a colour, or the nine unanswered questions that make every price
+  on screen fictional.
+</p>
+
+<p class="foot">
+  Measurements reproducible from this checkout. Repaint figures via a scratch harness
+  at <code>tools/_repaint.mjs</code> (gitignored per the repo's convention) using
+  Chromium CDP <code>Emulation.setCPUThrottlingRate</code>. Payload figures from a
+  3,600-design sweep over size × window × grille × detail at default colour, handle,
+  lockset and handing. No source files were changed in the course of this review.
+</p>
+
+</div>

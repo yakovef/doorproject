@@ -40,7 +40,7 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { assertFreshBundle, stampSheets } from './fresh.mjs';
 import { canvas, blit, load, rect, save, text } from './imglib.mjs';
-import { COLOURS, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, WINDOWS, byId }
+import { COLOURS, DETAILS, GRILLES, HANDLES, LOCKSETS, SIZES, STRIPE_MAX, WINDOWS, byId }
   from '../js/catalog.js';
 import { toRgb } from '../js/colour.js';
 import { REBATE } from '../js/renderer.js';
@@ -210,16 +210,51 @@ function handleOf(rec) {
   const h = rec.handle;
   if (!h || h.type !== 'pull-bar') return { id: 'none', residual: 0, note: h ? h.type : 'none' };
   if (h.orientation === 'horizontal') return { id: 'grab', residual: 0, note: 'horizontal bow' };
+
+  /* ⚠ THE FINISH IS A FILTER, AND IT USED TO BE A COMMENT. This matched on
+     length and width alone and printed the record's finish in the note, which
+     cost nothing for as long as every bar in the range was steel. The moment
+     `barblack` was added — 800 x 20 against Ron's 900 x 18 — it won on
+     geometry for d043, d063, d078 and d125 and painted a BLACK bar on four of
+     Peretz's real doors whose own records say "steel" and "polished chrome",
+     three of them in the gallery on the front page. The record was right there
+     in `h.finish` and nothing was reading it.
+     A filter rather than a term in the distance, because a finish is not
+     nearly-right: a black bar on a chrome door is wrong at any length. If the
+     filter empties — a bronze bar, say, which the range has none of — it falls
+     back to the whole list and says so, because refusing to name a fitting at
+     all would take a real door out of the gallery. */
+  const family = f => /black|שחור/.test(String(f || '')) ? 'black'
+                    : /brass|bronze|gold|פליז/.test(String(f || '')) ? 'brass' : 'steel';
+  const want = family(h.finish);
+  /* ⚠ A TERM, NOT A VETO, AND THE REASON IS THAT THE RANGE CANNOT ALWAYS WIN.
+     A veto was the first fix and it was worse than the bug: it put the ONE
+     black bar we sell — 800 mm — on d072, whose bar measures 0.861 of the leaf
+     (about 1,765 mm), so the gallery showed a stub where the photograph has a
+     bar the height of a man. Peretz has long black bars and we do not stock
+     one, which is a hole in the CATALOGUE (ASK-PERETZ §5 and §14) and not
+     something a fitter can paper over.
+     So the finish costs 0.10 — about what being a fifth of the leaf's height
+     wrong in length costs — and the trade is made in the open, per door. It is
+     wide enough to keep steel bars off steel doors (the swap that started
+     this was worth 0.017) and narrow enough that a 0.47 length error still
+     loses to a wrong colour. Every choice is printed in the table below with
+     both the finish asked for and the finish given, so a bad trade is visible
+     rather than buried. */
+  const FINISH_COST = 0.10;
   let best = null, bestD = Infinity;
   for (const n of HANDLES) {
     if (n.style !== 'bar') continue;
-    const d = Math.hypot((n.len / LEAF_H - h.len_h) * 1.0, (n.w / LEAF_W - h.w_w) * 4.0);
+    const d = Math.hypot((n.len / LEAF_H - h.len_h) * 1.0, (n.w / LEAF_W - h.w_w) * 4.0)
+            + (family(n.finish) === want ? 0 : FINISH_COST);
     if (d < bestD) { bestD = d; best = n; }
   }
+  const gave = family(best.finish);
   return { id: best.id, residual: bestD,
     note: `bar ${h.len_h.toFixed(3)}L x ${h.w_w.toFixed(3)}W of leaf -> `
         + `${best.he} ${(best.len / LEAF_H).toFixed(3)}x${(best.w / LEAF_W).toFixed(3)}`
-        + (h.finish && h.finish !== 'steel' && h.finish !== 'chrome' ? `  [${h.finish} in the photograph]` : '') };
+        + `  [${h.finish || 'finish unrecorded'}`
+        + (gave === want ? '' : ` -> ${gave}, nothing nearer in that finish`) + ']' };
 }
 
 /** The lock furniture. `kind` is free text in the records, so it is matched on
@@ -277,37 +312,74 @@ function detailOf(rec) {
        doors — a recreation that looks nothing like its photograph, from a
        measurement that was correct about what it saw and wrong about what it
        meant. Anything below 0.95 of the leaf is the foot, not a design. */
-    const raw = d.grooves;
-    const g = raw.filter(x => !(x.orientation === 'horizontal' && x.y > 0.95));
-    if (!g.length) {
-      return { id: 'plain', residual: 0,
-               note: `the only line recorded is the weather bar at y=${raw[0].y}` };
-    }
-    const count = g.reduce((a, x) => a + (x.count || 1), 0);
-    if (g.every(x => x.orientation === 'perimeter')) {
-      return { id: 'plain', residual: 1,
-               note: `a groove round the leaf's perimeter at ${g[0].inset} inset — `
-                   + 'the catalogue has no perimeter option at all' };
-    }
-    const vertical = g.filter(x => x.orientation === 'vertical').length >= g.length / 2;
-    if (vertical) {
-      /* Vertical line work: `stripsv` is four, `groove` is one. */
-      const want = count >= 2 ? 'stripsv' : 'groove';
-      const have = byId(DETAILS, want).strips || 1;
-      return { id: want, residual: Math.abs(have - count) / Math.max(have, count),
-               note: `${count} vertical -> ${byId(DETAILS, want).he} (${have})` };
-    }
-    const want = count >= 7 ? 'strips' : 'strips3';
-    const have = byId(DETAILS, want).strips;
-    return { id: want, residual: Math.abs(have - count) / Math.max(have, count),
-             note: `${count} horizontal -> ${byId(DETAILS, want).he} (${have})` };
   }
+  /* ⚠ LINE WORK IS NOT A FACE OPTION ANY MORE, so this function stops here.
+     It used to fall through into a hundred lines that matched a groove pattern
+     against fourteen `DETAILS` entries; the stripes are a count on the state
+     now, and `stripesOf` below answers that question instead. What this one
+     still owns is the MOULDED PANEL, which is genuinely one of eight ids. */
   return { id: 'plain', residual: 0, note: 'plain face' };
 }
 
-/** From the grip's side, never typed. */
+/**
+ * THE STRIPES A RECORD SHOWS — a direction and a number, which is all the app
+ * stores now and all a record was ever able to say.
+ *
+ * ⚠ THIS USED TO PICK ONE OF FOURTEEN NAMED COMPOSITIONS, and it could not do
+ * it honestly. The two vertical families share their COLUMNS exactly — the
+ * measured pitch is 0.073 for both — and a record carries each line's `x` and
+ * not its LENGTH, so nothing in the data distinguishes a long group from a
+ * fanned one. Ties fell to list order, which sent d038 and d043, both fanned,
+ * to the long option the moment it was added; a citation tie-break was written
+ * to patch that.
+ * All of it is gone, because the catalogue no longer holds compositions.
+ * Peretz prices per stripe, the app stores a direction and a count, and a
+ * record carries exactly those two things. The matcher reports what it counted.
+ *
+ * ⚠ The ragged and fanned families are WITHDRAWN compositions, so a door that
+ * carried one is drawn with its stripes spread. That is a real difference from
+ * the photograph and the note says so, the same way the grille substitutions
+ * do — a tool that silently redraws a door as something else is worse than one
+ * that refuses.
+ */
+function stripesOf(rec) {
+  const g = (rec.detail && rec.detail.grooves) || [];
+  const count = g.reduce((t, x) => t + (x.count || 1), 0);
+  if (!g.length || count < 1) {
+    return { stripeDir: 'none', stripeCount: 0, residual: 0, note: 'no line work' };
+  }
+  const vertical = g.filter(x => x.orientation === 'vertical').length >= g.length / 2;
+  const dir = vertical ? 'v' : 'h';
+  const cap = vertical ? STRIPE_MAX.v : STRIPE_MAX.h;
+  const n = Math.min(count, cap);
+  return { stripeDir: dir, stripeCount: n, stripeTight: false,
+           residual: Math.abs(n - count) / Math.max(n, count),
+           note: `${count} ${vertical ? 'vertical' : 'horizontal'} -> ${n} ${dir}`
+               + (n !== count ? ` — capped at the ${cap} the leaf holds` : '') };
+}
+
+/**
+ * From the grip's side, never typed.
+ *
+ * ⚠ INVERTED ON 23.8.2026, WITH THE CONVENTION ITSELF. `HANDINGS` had ימין and
+ * שמאל the wrong way round; looking from outside, a שמאל door carries its
+ * keyhole on the RIGHT, so both `hinge` values were swapped in `js/catalog.js`.
+ *
+ * This line is why that fix was not a one-liner. It maps a MEASUREMENT — which
+ * side the hardware sits on in the photograph — onto a handing id, and it was
+ * written against the old meaning: hardware on the left of the leaf
+ * (`handle.x < 0.5`) used to be `left-in`. Under the corrected convention that
+ * same door is `right-in`, because the NAME FOLLOWS THE HINGE, which is the
+ * other side from the hardware.
+ *
+ * Left unflipped, all 31 corpus sheets would have drawn the mirror of their own
+ * photographs — and these sheets are the instrument we use to judge whether the
+ * drawing is right, so it would have read as the RENDERER breaking. A
+ * convention change has to reach every reader of the convention, including the
+ * ones that only ever consume it.
+ */
 const handingOf = rec => (rec.handle && rec.handle.x != null)
-  ? (rec.handle.x < 0.5 ? 'left-in' : 'right-in') : 'right-in';
+  ? (rec.handle.x < 0.5 ? 'right-in' : 'left-in') : 'right-in';
 
 /* ── run ─────────────────────────────────────────────────────────── */
 
@@ -334,10 +406,13 @@ for (const id of ids) {
     handle: handleOf(rec),
     lockset: locksetOf(rec),
     detail: detailOf(rec),
+    stripes: stripesOf(rec),
   };
   const want = {
     colour: parts.colour.id, window: parts.window.id, grille: parts.grille.id,
     handle: parts.handle.id, lockset: parts.lockset.id, detail: parts.detail.id,
+    stripeDir: parts.stripes.stripeDir, stripeCount: parts.stripes.stripeCount,
+    stripeTight: !!parts.stripes.stripeTight,
     size: 'standard', handing: handingOf(rec),
   };
   /* THE RULES GET THE LAST WORD, and what they change is the finding.
@@ -417,6 +492,67 @@ for (const [k, n] of [...fin].sort((a, b) => b[1] - a[1])) console.log(`  ${H(k,
   ];
   writeFileSync('screenshots/corpus-links.md', lines.join('\n') + '\n');
   console.log('\nscreenshots/corpus-links.md — one link per door, for showing him his own work');
+}
+
+/* ── THE SAME DOORS, FOR THE SITE ITSELF ──────────────────────────
+   The table above is for a person to read. This is the same list as a module
+   the bundle can import, so the page can OPEN on Peretz's own work instead of
+   on a default door and sixty options with no reference point.
+
+   ⚠ WHY THIS FILE IS GENERATED AND NOT WRITTEN. Every field of every door
+   here is derived from that door's own measurements by the rules at the top of
+   this file, and the reason those rules exist is on the record: handing was
+   TYPED on eight recreations once and was wrong on four of them. A hand-kept
+   copy of thirty doors is thirty more places to type one.
+
+   ⚠ AND NO PRICES. The table above prints the record's own figure because it
+   is a document for Peretz; this list is read by the page, and the page has
+   exactly one statement of what a door costs — `priceAgorot` on the state the
+   customer is looking at. A second number travelling beside the design would
+   be the shape CLAUDE.md §5 is about, and it would be quoting a past job at a
+   new customer besides.
+
+   Both files are written in the same run of the same tool, so they cannot
+   drift from each other — and `test/units.mjs` compares them, which is what
+   catches one of them being regenerated without the other. */
+{
+  /* ⚠ EVERY FIELD A DOOR CARRIES, AND TWO OF THEM ARE NOT STRINGS. The list
+     used to be eight ids and every one was quoted; `stripeCount` is a number
+     and `stripeTight` a boolean, so quoting them would have written
+     `stripeCount: '3'` — which `toQuery` stringifies identically and
+     `packStripes` reads as NaN. `npm test` compares this file against the
+     markdown table query for query and would have caught it, which is exactly
+     why that comparison exists. */
+  const FIELDS = ['colour', 'detail', 'window', 'grille', 'handle', 'lockset',
+                  'size', 'handing', 'stripeDir', 'stripeCount', 'stripeTight'];
+  const lit = v => typeof v === 'string' ? `'${v}'` : String(v);
+  const body = rows.map(r =>
+    `  { id: '${r.id}', state: { `
+    + FIELDS.map(k => `${k}: ${lit(r.state[k])}`).join(', ')
+    + ' } },');
+  const out = [
+    '/**',
+    ` * ${rows.length} doors Peretz actually built, as the site draws them.`,
+    ' *',
+    ' * (Fewer than the records in `research/works/data2`, and that is right:',
+    ' * a record measured for one thing only — d062, the moulding profile —',
+    ' * carries no colour and no window, and a door recreated from absent',
+    ' * measurements would be a fabrication wearing an exact match.)',
+    ' *',
+    ' * ⚠ GENERATED BY `npm run corpus`. Do not edit by hand — every field is',
+    ' * derived from that door\'s own hand-measured record, and the whole point',
+    ' * of the derivation is that nobody types it. See the header of',
+    ' * `tools/corpus.mjs` for what is derived from what.',
+    ' *',
+    ' * No prices here on purpose: the page has one statement of what a door',
+    ' * costs, and it is `priceAgorot` on the state being shown.',
+    ' */',
+    'export const WORKS = [',
+    ...body,
+    '];',
+  ];
+  writeFileSync('js/works.js', out.join('\n') + '\n');
+  console.log(`js/works.js — the same ${rows.length} doors, for the gallery on the page`);
 }
 
 if (QUIET) process.exit(0);

@@ -12,8 +12,8 @@
  *
  * Run: npm run shot
  */
-import { chromium } from 'playwright';
 import { assertFreshBundle, stampSheets } from './fresh.mjs';
+import { pagePool, deathNote } from './browser.mjs';
 import { fromQuery } from '../js/url-state.js';
 
 /* Every query here must be a BUILDABLE door. They go through the same rules
@@ -53,11 +53,11 @@ const SHOTS = [
        `broad` is the widest opening, which is where the panel below has least
        room and the architrave least stile — the shot to look at first when
        something has moved. */
-    q: '?c=rb-6459d&w=broad&g=grid&n=none&k=coral&d=panel&s=standard&h=right-in' },
+    q: '?c=rb-6459d&w=rect&g=grid&n=none&k=coral&d=panel&s=standard&h=right-in' },
   { name: 'panel',    w: 1280, h: 720,
     /* The Almog swan-neck reaches 220 mm inboard — the deepest fitting we sell
        — so it is the one that leaves a bar least room beside a light. */
-    q: '?c=rb-rb09d&w=tallwin&g=iron&n=none&k=almog&d=plain&s=standard&h=right-in' },
+    q: '?c=rb-rb09d&w=strip&g=grid&n=none&k=sapir&d=plain&s=standard&h=right-in' },
   { name: 'grey',     w: 1280, h: 720,
     /* Worked GLASS rather than ironwork: the rings are etched in the pane, so
        nothing here casts a shadow or takes a highlight. */
@@ -70,11 +70,11 @@ const SHOTS = [
        shot that was hiding it. */
     q: '?c=rb-9016d&w=none&g=none&n=none&k=plate&d=panel2&s=standard&h=right-in' },
   { name: 'strips',   w: 1280, h: 720,
-    q: '?c=rb-0097d&w=none&g=none&n=shiran&k=cadoor&d=strips&s=standard&h=right-in' },
+    q: '?c=rb-0097d&w=none&g=none&n=idan&k=cadoor&sp=11&s=standard&h=right-in' },
   /* Round five: the two new axes and the new hardware, each on a door that
      shows it plainly. */
   { name: 'stripsv',  w: 1280, h: 720,
-    q: '?c=rb-7322d&w=none&g=none&n=blade&k=square&d=stripsv&s=standard&h=right-in' },
+    q: '?c=rb-7322d&w=none&g=none&n=shahar&k=square&sp=22&s=standard&h=right-in' },
   { name: 'digital',  w: 1280, h: 720,
     q: '?c=rb-9302d&w=none&g=none&n=idan&k=digital&d=plain&s=standard&h=left-in' },
   { name: 'sidelight', w: 1280, h: 720,
@@ -85,59 +85,90 @@ const SHOTS = [
        the stile once glass has the middle of the leaf, so this is the cylinder
        eight of the ten installed bar doors carry. d122, the real sidelight
        door, is one of them. */
-    q: '?c=rb-6219d&w=rect&g=reeded&n=idan&k=cylinder&d=plain&s=sidelight&h=right-in' },
+    q: '?c=rb-6219d&w=rect&g=mesh&n=idan&k=cylinder&d=panel&s=sidelight&h=right-in' },
   { name: 'halfleaf', w: 1280, h: 720,
-    q: '?c=rb-9001d&w=rect&g=quatrefoil&n=none&k=sapir&d=plain&s=half&h=left-in' },
+    q: '?c=rb-9001d&w=rect&g=scroll&n=none&k=sapir&d=panel&s=half&h=left-in' },
+  /* ⚠ `d=plain`, AND IT USED TO BE `d=panel`. A vertical slot with a panel
+     under it is refused now — the glass runs to 0.79 of leaf height and the
+     seven corpus doors with a panel below glazing all stop by 0.61, so
+     `panelFits` says no (see WINDOWS in catalog.js). This shot's query was
+     therefore naming a door the site will not draw, and the guard below caught
+     it on the first run after the rule landed: "the query arrives repaired
+     (combination-fixed) — this shot is not the door it names".
+     Only the impossible axis moved. The shot is still what it was for: a tall
+     leaf with a slot and scroll ironwork at a tablet viewport. */
   { name: 'tablet',   w: 834,  h: 1112, full: true,
-    q: '?c=rb-2030d&w=strip&g=scroll&n=none&k=knobplate&d=panel&s=tall&h=left-in' },
+    q: '?c=rb-2030d&w=strip&g=scroll&n=none&k=knobplate&d=plain&s=tall&h=left-in' },
 ];
 
 /**
- * ⚠ THE RASTER HAS A CEILING, AND `desktop` WAS OVER IT.
+ * ⚠ THESE ARE 1x, AND THE CEILING THAT FORCED IT IS NOT A FIXED NUMBER.
  *
- * Every shot was taken at `deviceScaleFactor: 2`, which for the 1680-wide
- * `desktop` shot means a 3360x1900 image — and Chromium in a container simply
- * never produces it. Measured, same page, same machine:
+ * Every shot used to be `deviceScaleFactor: 2`, which for the 1680-wide
+ * `desktop` shot is a 3360x1900 image, and Chromium in this container never
+ * produces it — 30 s, 45 s and 90 s timeouts, four attempts, with
+ * `--disable-dev-shm-usage` and with `/dev/shm` at 16 GB. Not a regression
+ * either: I stashed every local change and a pristine checkout failed
+ * identically, so `npm run sheets` had not been runnable end to end here for as
+ * long as `desktop` has been 1680 wide. It went unnoticed because the sheets
+ * only need regenerating when the drawing moves.
  *
- *   1680 @1.5x  = 2520x1425   641 ms
- *   1680 @1.75x = 2940x1663   never completes (90 s, then 40 s, four times)
- *   1680 @2x    = 3360x1900   never completes
- *   1280 @2x    = 2560x1440   502 ms
+ * ⚠ MY FIRST FIX WAS WRONG AND IS WORTH LEAVING ON THE RECORD. I measured a
+ * threshold and capped the width to it:
  *
- * So the limit is a texture WIDTH somewhere just past 2560, not an area: the
- * `phone` shot is 780 px wide and thousands tall and has always been fine.
- * `--disable-dev-shm-usage` does not help and `/dev/shm` is 16 GB, so it is not
- * that either.
+ *   1680 @1.5x  = 2520x1425    641 ms  ✓
+ *   1280 @2x    = 2560x1440    502 ms  ✓
+ *   1680 @1.75x = 2940x1663    never returns
  *
- * ⚠ THIS IS NOT A REGRESSION AND IT IS WORTH KNOWING WHY IT WAS INVISIBLE. The
- * failure reproduces on a pristine checkout — I stashed every change and it
- * failed identically — so `npm run sheets` has not been runnable end to end in
- * this environment for as long as `desktop` has been 1680 wide. It went
- * unnoticed because the sheets only need regenerating when the drawing moves,
- * and the last few times that happened it was done somewhere else.
+ * and concluded the limit was a texture width just past 2560. An hour later,
+ * under a busier container, 2560x1440 failed three times out of three. The
+ * ceiling MOVES with whatever else is running. Any constant fitted to it is a
+ * guess with an expiry date, and the failure mode is a crashed sheet run that
+ * leaves the committed pictures stale — which is precisely what these stamps
+ * exist to prevent.
  *
- * A staleness check nobody can satisfy is worse than no check: the next person
- * to change the renderer is told to run a command that cannot finish. So the
- * scale is capped at a width this can actually rasterise. Only `desktop`
- * changes, from 2x to 1.5x — it is still the whole page at 1680 logical px.
- * Raise `MAX_RASTER_W` the day this runs somewhere with a bigger ceiling.
+ * So: a fixed 1x, chosen because it is far below any ceiling observed and
+ * because it cannot drift. These twelve are WHOLE-PAGE shots and they are read
+ * to judge LAYOUT — where things sit, what is clipped, what overlaps — which 1x
+ * carries perfectly well. The families that are read to judge the DRAWING
+ * (`recreate`, `corpus`, `against`) shoot 620–700 px wide and stay at 2x, well
+ * inside every ceiling seen.
+ *
+ * Determinism matters more than resolution here for a specific reason: these
+ * are committed artefacts guarded by a content hash. A scale that silently
+ * varies with machine load would make the same command produce different bytes
+ * on different days, and the hash would report drift that is not there.
+ *
+ * ⚠ AND 1x WAS STILL NOT ENOUGH. Measured after the note above was written, on
+ * an unchanged checkout: `phone` came out clean and the SECOND shot died with
+ * `Target crashed`. The ceiling had moved again, below the smallest thing this
+ * file asks for. There is no scale left to retreat to, so the retreat stops
+ * here and `tools/browser.mjs` picks the browser back up instead — see the
+ * note in that file about why a relaunch is not a check being weakened.
  */
-const MAX_RASTER_W = 2520;              // proven at 641 ms; 2940 never returns
-const scaleFor = w => Math.min(2, MAX_RASTER_W / w);
+const PAGE_SCALE = 1;
 
 await assertFreshBundle();
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const pool = pagePool();
 let bad = 0;
 for (const s of SHOTS) {
-  const p = await b.newPage({ viewport: { width: s.w, height: s.h },
-                              deviceScaleFactor: scaleFor(s.w) });
-  const errs = [];
-  p.on('pageerror', e => errs.push(String(e)));
-  p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
-  await p.goto('file://' + process.cwd() + '/index.html' + s.q);
-  await p.waitForTimeout(700);
-  await p.screenshot({ path: `screenshots/${s.name}.png`, fullPage: !!s.full });
+  /* ⚠ EVERYTHING FROM THE GOTO TO THE SHOT IS INSIDE ONE ATTEMPT, deliberately.
+     A crash halfway through leaves no page and no half-written PNG worth
+     keeping, so the whole reading is retaken rather than resumed — and `errs`
+     is built fresh per attempt so a console error from a page that then died
+     cannot be carried into the run that replaced it. */
+  const errs = await pool.use(
+    { viewport: { width: s.w, height: s.h }, deviceScaleFactor: PAGE_SCALE },
+    async p => {
+      const seen = [];
+      p.on('pageerror', e => seen.push(String(e)));
+      p.on('console', m => { if (m.type() === 'error') seen.push(m.text()); });
+      await p.goto('file://' + process.cwd() + '/index.html' + s.q);
+      await p.waitForTimeout(700);
+      await p.screenshot({ path: `screenshots/${s.name}.png`, fullPage: !!s.full });
+      return seen;
+    });
   /* Did the rules have to change this door on the way in? If so the file on
      disk is not the design named above, and every later comparison against it
      is against something nobody chose. */
@@ -145,9 +176,9 @@ for (const s of SHOTS) {
   if (notice) errs.push(`the query arrives repaired (${notice}) — this shot is not the door it names`);
   if (errs.length) bad++;
   console.log(s.name.padEnd(9), errs.length ? 'ERRORS: ' + errs.join(' | ') : 'clean');
-  await p.close();
 }
-await b.close();
+console.log(deathNote(pool));
+await pool.close();
 process.exitCode = bad ? 1 : 0;
 
 /* The sheets are current as of this drawing. `npm test` checks the stamp, so
