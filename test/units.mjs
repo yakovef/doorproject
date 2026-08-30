@@ -2,9 +2,9 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { STRIPE_LEGACY, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
-import { L, withLang } from '../js/copy.js';
+import { L, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, shekels } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
@@ -28,7 +28,15 @@ const sizeKeys = Object.keys(SIZES);
    notice the implementation changing it. */
 const ALPHABET_TEST = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
-const base = { colour: 'rb-0097d', window: 'none', grille: 'none',
+/* ⚠ THE FIXTURE'S COLOUR IS ONE OF PERETZ'S THREE INCLUDED ONES, ON PURPOSE.
+   It was `rb-0097d` (אנתרציט) and that colour became +₪200 on 30.8.2026. Left
+   alone it would have added two hundred shekels to every expected figure in
+   the price block below — twenty numbers each silently carrying a colour
+   surcharge nobody reading them would see, which is how a wrong figure hides.
+   The colour premium gets assertions of its own, where it is the subject.
+   It is also the shipped default, and there is a check below that it stays
+   one of the included three. */
+const base = { colour: 'rb-7126d', window: 'none', grille: 'none',
                handle: 'idan', lockset: 'coral', speciallock: 'nospecial',
                mashkof: 'mk-std', pirzul: 'pz-nickel', handleLen: 0,
                detail: 'plain', size: 'standard', handing: 'right-in' };
@@ -272,7 +280,12 @@ for (const st of everyState()) {
 {
   const bad = fromQuery('?v=3&c=ral-nope&w=rect&g=none&n=bar-long&d=plain&f=steel&s=standard&h=right-in');
   ok(bad.notice === 'option-unknown', 'unknown option must notify, never silently default');
-  ok(bad.state.colour === 'rb-0097d', 'unknown option should fall back to default');
+  /* ⚠ `DEFAULTS.colour`, NOT THE ID SPELLED OUT. This line said `rb-0097d` and
+     went red the day the default colour moved — about a property of the
+     default that had not changed at all. What it asserts is "falls back to THE
+     DEFAULT"; naming one particular colour was a second statement of which
+     colour that is, in a file that already imports the first. §5.10's shape. */
+  ok(bad.state.colour === DEFAULTS.colour, 'unknown option should fall back to default');
   // The inside view is gone. An old link carrying i=1 must open the door, not
   // fail, and must not leave a stray key behind in the state.
   ok(fromQuery('?v=3&i=1').state.view === undefined, 'i=1 should no longer set anything');
@@ -555,63 +568,111 @@ group('price');
   /* The baseline door carries an Idan bar AND a Coral lockset now, because a
      grip and a lock are two things.
 
-     ⚠ ₪3,150 IS THE FIRST REAL PRICE IN THIS FILE. It was ₪3,195 — a figure
-     read off the works page and marked PLACEHOLDER for nine days. Peretz gave
-     the six components on 26.8.2026 and they sum to exactly this: door 1250 +
-     cylinder 200 + lock 200 + mashkof 500 + install 700 + measure 300. It is
-     the number he will check first, so it is pinned exactly. */
-  ok(P({ handle: 'none' }) === 3150,
-     `a solid anthracite door with a lever and no pull should be ₪3,150, got ${P({ handle: 'none' })}`);
+     ⚠ ₪3,195, AND THIS LINE HAS NOW BEEN THREE DIFFERENT NUMBERS. It was
+     ₪3,195 read off the works page and marked PLACEHOLDER; then ₪3,150, the
+     six components Peretz gave on 26.8.2026; and it is ₪3,195 again from
+     30.8.2026, when he gave the standard door as that figure and a `door -
+     1295` line that is exactly the ₪45 between them. Same six components,
+     one of them corrected: 1295 + 200 + 200 + 500 + 700 + 300.
+     It is the number he will check first, so it is pinned exactly. */
+  ok(P({ handle: 'none' }) === 3195,
+     `a solid door with a lever and no pull should be ₪3,195, got ${P({ handle: 'none' })}`);
   /* ⚠ ₪650 FOR THE IDAN, NOT ₪500, AND THAT IS PERETZ'S RULE WORKING. His
      floor is ₪500 for a bar "under 100"; the Idan measures 1050 mm off the
      photographs, so it is one 20 cm step over and costs ₪650. Every bar in
      the range except Ron is over a metre as it comes. */
-  ok(P({}) === 3800, `adding the Idan bar should reach ₪3,800, got ${P({})}`);
-  ok(P({ handle: 'ron' }) === 3650, 'Ron is 90 cm as it comes and takes the floor price');
+  ok(P({}) === 3845, `adding the Idan bar should reach ₪3,845, got ${P({})}`);
+  ok(P({ handle: 'ron' }) === 3695, 'Ron is 90 cm as it comes and takes the floor price');
 
-  /* ⚠ THE SIZE MULTIPLIES TWO COMPONENTS AND NOT THE OTHER FOUR — the whole
-     reason `BUILD` is six numbers instead of one per band. A x1.25 door with
-     nothing on it is 1250x1.25 + 200 + 200 + 500x1.25 + 700 + 300 = 3587.50,
-     rounded up to the nearest ₪5.
-     The second assertion is what makes the first one worth having: if somebody
-     ever "simplifies" `priceParts` by scaling the whole total instead, the
-     answer is 3937.50 and this catches it. A test that passes under both the
-     right implementation and the wrong one is not a test.
-     ⚠ And TRANSFORM.md §4.5 specified this sum as ₪3,637.50 — six numbers
-     added by hand, wrong by ₪50, in a plan about not adding numbers by hand.
-     Writing the assertion is what found it. */
-  ok(P({ handle: 'none', size: 'wide' }) === 3590,
-     `a x1.25 band with nothing on it should be ₪3,590, got ${P({ handle: 'none', size: 'wide' })}`);
-  ok(Math.ceil(3150 * 1.25 / 5) * 5 !== 3590,
-     'the x1.25 assertion is worthless if scaling the whole total gives the same answer');
-  /* Every colour is delta 0 now: the manufacturer's chart gives codes, not
-     prices, and the old per-colour premiums were our invention. */
-  for (const c of COLOURS) ok(P({ colour: c.id }) === P({}), `colour ${c.id} must not change the price yet`);
+  /* ⚠ THE SIZE MULTIPLIES ALL SIX COMPONENTS, AND THIS BLOCK USED TO ASSERT
+     THE OPPOSITE — deliberately, and correctly, against the rule Peretz gave
+     on 26.8. He replaced that rule on 30.8 (*"the all its all +25% = 3995"*),
+     and the old rule is not merely superseded, it is arithmetically impossible
+     against his own figures: reaching 3995 from 3195 by scaling a subset needs
+     that subset to be worth 3200, and the whole door is 3195. The derivation
+     is in `priceParts`.
+
+     ⚠ SO THE GUARD IS RESTATED, NOT DROPPED, AND IT IS STRONGER THAN IT WAS.
+     The old pair pinned ONE band and refused ONE wrong implementation. This
+     pins all SIX figures he named — including the two that have no size tile,
+     which is what makes the rule certain rather than plausible — and still
+     refuses the other implementation, now in the other direction. A test that
+     passes under both the right implementation and the wrong one is not a
+     test, and that was the point of the line this replaces. */
+  const PERETZ_BANDS = [
+    ['standard', 3195, 'x1'],
+    ['wide',     3995, 'x1.25 — his "the all its all +25%"'],
+    ['tall',     3995, 'x1.25 — the same band, a different door'],
+    ['xl',       4795, 'x1.5 — his "the second extra +50%"'],
+    ['half',     6390, 'x2 — his "du kanfi (double) x2"'],
+  ];
+  for (const [size, want, why] of PERETZ_BANDS) {
+    ok(P({ handle: 'none', size }) === want,
+       `${size} with nothing on it must be exactly ₪${want} (${why}), got ${P({ handle: 'none', size })}`);
+  }
+  /* The two bands he priced that have no tile: one multi-leaf size exists, not
+     three. They are asserted as ARITHMETIC rather than as doors, because six
+     figures agreeing is what establishes the rule and four would not.
+     `ASK-PERETZ.md` asks whether he sells a wide or a tall double. */
+  ok(Math.ceil(3195 * 2.5 / 5) * 5 === 7990, 'a double at +25% is his ₪7,990');
+  ok(Math.ceil(3195 * 3 / 5) * 5 === 9585, 'a double at +50% is his ₪9,585');
+  /* The refusal, inverted. Scaling only the door and the mashkof — the rule
+     that stood until 30.8 — gives ₪3,645 at this band, and must not be what
+     comes out. */
+  ok(Math.ceil((1295 * 1.25 + 200 + 200 + 500 * 1.25 + 700 + 300) / 5) * 5 !== 3995,
+     'the band assertions are worthless if scaling door+mashkof alone gives the same answer');
+
+  /* ⚠ THREE COLOURS ARE INCLUDED AND FOURTEEN COST ₪200. Peretz, 30.8.2026.
+     This block asserted the exact opposite — "colour ${id} must not change the
+     price yet", every colour, which was true while the chart gave us codes and
+     no prices. It is his answer to ASK-PERETZ §3 and it retires assumption
+     A10. Restated as the same shape of exhaustive walk, now with the split in
+     it, so a colour silently changing side still fails. */
+  const COLOUR_FREE = ['rb-9016d', 'rb-9001d', 'rb-7126d'];
+  for (const id of COLOUR_FREE) {
+    ok(byId(COLOURS, id).id === id, `${id} must exist — Peretz named it as included`);
+  }
+  for (const c of COLOURS) {
+    const free = COLOUR_FREE.includes(c.id);
+    const want = free ? 3195 : 3395;
+    ok(P({ handle: 'none', colour: c.id }) === want,
+       `colour ${c.id} should be ${free ? 'included' : '+₪200'} — ₪${want}, got ${P({ handle: 'none', colour: c.id })}`);
+  }
+  ok(COLOURS.filter(c => !c.delta).length === 3,
+     `exactly three colours are in the price, found ${COLOURS.filter(c => !c.delta).length}`);
+  /* ⚠ AND THE DOOR THE PAGE OPENS ON MUST BE ONE OF THEM. Otherwise the
+     opening figure is Peretz's standard door plus an option nobody chose, and
+     it prints ₪3,395 where he says ₪3,195 — which is the first number he
+     checks. This is the assertion that would have caught it. */
+  ok(COLOUR_FREE.includes(DEFAULTS.colour),
+     `the default colour ${DEFAULTS.colour} must be one Peretz includes in the price`);
+  ok(base.colour === DEFAULTS.colour,
+     'the price fixture must be the door the page actually opens on');
   // A link shared before the chart replaced the list must still open a door.
-  ok(P({ colour: 'ral-9005' }) === P({}), 'retired ral-9005 should still resolve');
+  ok(P({ colour: 'ral-9005' }) === P({ colour: 'rb-9005d' }), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
-  ok(P({ size: 'wide' }) === 4240, 'wide band');
+  ok(P({ size: 'wide' }) === 4645, 'wide band');
   /* ⚠ ₪3,700 FOR A WINDOW, WHICH IS MORE THAN THE DOOR. Peretz, 26.8.2026.
      Every window price in this file was invented at around ₪600 and every one
      was out by a factor of six. Glass in an armoured leaf is a different
      product from a hole in one. */
-  ok(P({ window: 'rect' }) === 7500, `a square window should add ₪3,700, got ${P({ window: 'rect' })}`);
+  ok(P({ window: 'rect' }) === 7545, `a square window should add ₪3,700, got ${P({ window: 'rect' })}`);
   /* "design: almost all of them in the price." Every grille is ₪0 now except
      the three laser-cut ones. */
-  ok(P({ window: 'rect', grille: 'scroll' }) === 7500, 'scrollwork is included');
-  ok(P({ window: 'rect', grille: 'vine' }) === 8200, 'the laser-cut ones add ₪700');
-  ok(P({ detail: 'panel' }) === 4525, `a lower panel should add ₪725, got ${P({ detail: 'panel' })}`);
+  ok(P({ window: 'rect', grille: 'scroll' }) === 7545, 'scrollwork is included');
+  ok(P({ window: 'rect', grille: 'vine' }) === 8245, 'the laser-cut ones add ₪700');
+  ok(P({ detail: 'panel' }) === 4570, `a lower panel should add ₪725, got ${P({ detail: 'panel' })}`);
   /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and these two lines are
      Peretz's three window figures reduced to the two products they describe:
      the set solid is ₪2,700, and a square light plus the set glazed is
      3700 + 1000 = ₪4,700, which is his "square with greek". */
-  ok(P({ detail: 'classic', handle: 'none' }) === 5850, 'the greek set, solid, adds ₪2,700');
-  ok(P({ detail: 'classic', handle: 'none', window: 'rect' }) === 7850,
+  ok(P({ detail: 'classic', handle: 'none' }) === 5895, 'the greek set, solid, adds ₪2,700');
+  ok(P({ detail: 'classic', handle: 'none', window: 'rect' }) === 7895,
      'the greek set glazed is ₪4,700 over a bare door, not ₪6,400');
   /* The extra locks — a whole axis that did not exist. */
-  ok(P({ speciallock: 'kasefet' }) === 4500, 'a safe lock adds ₪700');
-  ok(P({ speciallock: 'kodan' }) === 4700, 'a keypad adds ₪900');
-  ok(P({ lockset: 'digital', speciallock: 'kodan' }) === 7400,
+  ok(P({ speciallock: 'kasefet' }) === 4545, 'a safe lock adds ₪700');
+  ok(P({ speciallock: 'kodan' }) === 4745, 'a keypad adds ₪900');
+  ok(P({ lockset: 'digital', speciallock: 'kodan' }) === 7445,
      'a smart lock and a keypad are different products and stack');
   /* The finish and the add-ons are withdrawn, so nothing may be charged for
      them — including through a stale link that still names one. */
@@ -619,14 +680,21 @@ group('price');
   ok(P({ addons: ['peep', 'mail', 'knocker'] }) === P({}),
      'withdrawn add-ons must not add to the price');
   /* The whole point of the split: a pull bar and a backplate on one door. */
-  ok(P({ handle: 'idan', lockset: 'plate' }) === 3800,
+  ok(P({ handle: 'idan', lockset: 'plate' }) === 3845,
      `Idan with a Rotem backplate should be ₪3,800, got ${P({ handle: 'idan', lockset: 'plate' })}`);
   /* "main handles: all of them in the price", bar the squares, the circles and
      the smart lock. Rotem is one of the included ones. */
-  ok(P({ handle: 'none', lockset: 'plate' }) === 3150, 'Rotem is included');
-  ok(P({ handle: 'none', lockset: 'square' }) === 3450, 'squares add ₪300');
-  ok(P({ handle: 'none', lockset: 'cadoor' }) === 3350, 'circles add ₪200');
-  ok(P({ handle: 'none', lockset: 'digital' }) === 5850, 'the smart lock adds ₪2,700');
+  ok(P({ handle: 'none', lockset: 'plate' }) === 3195, 'Rotem is included — and it is what the page now opens on');
+  ok(P({ handle: 'none', lockset: 'square' }) === 3495, 'squares add ₪300');
+  ok(P({ handle: 'none', lockset: 'cadoor' }) === 3395, 'circles add ₪200');
+  ok(P({ handle: 'none', lockset: 'digital' }) === 5895, 'the smart lock adds ₪2,700');
+  /* ⚠ ₪350, AND IT IS THE ONE LEVER THAT IS NOT INCLUDED. Peretz, 30.8.2026:
+     "the ספיר handle needs to be 350". It is neither a square nor a circle, so
+     it joins neither rate — a figure of its own, and the assertion says so. */
+  ok(P({ handle: 'none', lockset: 'sapir' }) === 3545, 'Sapir is ₪350, on its own');
+  ok(P({ handle: 'none', lockset: 'sapir' }) !== P({ handle: 'none', lockset: 'square' })
+     && P({ handle: 'none', lockset: 'sapir' }) !== P({ handle: 'none', lockset: 'cadoor' }),
+     'Sapir must not have been folded into the square or circle rate');
   // A retired id must land on its replacement, not on the first entry.
   ok(P({ handle: 'bar-long' }) === P({ handle: 'idan' }), 'alias bar-long should price as idan');
   ok(P({ handle: 'bar-flat' }) === P({ handle: 'shahar' }), 'alias bar-flat should price as shahar');
@@ -1749,6 +1817,76 @@ group('rules: nothing unbuildable can be reached');
      rules must be reading the same table. */
   for (const st of everyState()) { ok(buildable(st), `everyState yielded an unbuildable door`); break; }
 
+  /* ── ELEVEN STRIPES TURNED SIDEWAYS ARE SIX ────────────────────────
+     Peretz, 30.8.2026: *"when i change the placing of the stripes to vertical
+     instead of horizontal, even if there are 11 stripes it puts 11 vertical
+     stripes, and that cant be happening."*
+
+     ⚠ THIS IS FALSIFIABLE AND IT WAS FALSIFIED: taking the clamp out of
+     `repair` fires the first loop below at counts 7 through 11 — five
+     failures, naming the count each time — and leaves every other assertion in
+     this file green, which is precisely why it had to be written. */
+  {
+    const striped = n2 => ({ ...DEFAULTS, detail: 'plain', window: 'none',
+                             stripeDir: 'v', stripeCount: n2, stripeTight: false });
+    for (let c = 1; c <= 11; c++) {
+      const { state: fixed, changed } = repair(striped(c));
+      const want = Math.min(c, STRIPE_MAX.v);
+      ok(fixed.stripeCount === want,
+         `${c} vertical stripes must land on ${want}, got ${fixed.stripeCount}`);
+      ok(fixed.stripeDir === 'v', `the direction must survive the clamp, got ${fixed.stripeDir}`);
+      /* It must SAY so — a count that changes in silence is the same fault as
+         a price that does. And only when it actually changed. */
+      ok(changed.includes('stripes') === (c > STRIPE_MAX.v),
+         `a clamp at ${c} must ${c > STRIPE_MAX.v ? '' : 'not '}report a change`);
+    }
+
+    /* ⚠ AND GOING BACK TO HORIZONTAL MUST NOT INVENT STRIPES. Eleven across,
+       turned upright, turned across again: six, not eleven. Restoring the old
+       count would mean carrying a shadow value no reader can see. */
+    const { state: down } = repair(striped(11));
+    const { state: back } = repair({ ...down, stripeDir: 'h' });
+    ok(back.stripeCount === 6,
+       `h11 -> v -> h must stay at 6, not resurrect 11 — got ${back.stripeCount}`);
+
+    /* ⚠ AND THE HORIZONTAL CAP IS NOT THE VERTICAL ONE. A clamp written as one
+       number would quietly cut eleven horizontal stripes down to six, which is
+       a different bug wearing this fix's clothes. */
+    const { state: h11, changed: hChanged } = repair(striped(11));
+    ok(h11.stripeCount === 6, 'sanity: the vertical case is the one that clamps');
+    const { state: flat, changed: flatChanged } =
+      repair({ ...DEFAULTS, detail: 'plain', window: 'none',
+               stripeDir: 'h', stripeCount: 11, stripeTight: false });
+    ok(flat.stripeCount === 11 && !flatChanged.includes('stripes'),
+       `eleven HORIZONTAL stripes are legal and must be left alone, got ${flat.stripeCount}`);
+    void hChanged;
+
+    /* ⚠ THE WIRE FORMAT AND THE STATE MUST AGREE. `packStripes` has always
+       clamped, which is why this survived so long: the link and the DM- code
+       were right and only the live state was wrong. Now both are, and this
+       asserts they say the same thing rather than each being right alone. */
+    for (let c = 1; c <= 11; c++) {
+      const { state: fixed } = repair(striped(c));
+      const round = fromQuery(toQuery(fixed)).state;
+      ok(round.stripeCount === fixed.stripeCount && round.stripeDir === fixed.stripeDir,
+         `a link must carry the clamped count: ${c} -> state ${fixed.stripeCount}, link ${round.stripeCount}`);
+      const dec = decodeCode(encodeCode(fixed));
+      ok(dec.stripeCount === fixed.stripeCount && dec.stripeDir === fixed.stripeDir,
+         `a code must carry the clamped count: ${c} -> state ${fixed.stripeCount}, code ${dec.stripeCount}`);
+    }
+
+    /* ⚠ AND THE SENTENCE MUST NAME THE CAP IT DESCRIBES, in all three
+       languages. A toast that says "we adjusted the stripes" leaves the
+       customer counting, and one that names the wrong number is worse than
+       none — this file already records that a toast naming the wrong culprit
+       is worse than no toast at all. */
+    for (const lang of ['he', 'en', 'ru']) {
+      const s = withLang(lang, () => T('fix.stripesCapped'));
+      ok(s && s.includes(String(STRIPE_MAX.v)),
+         `the ${lang} clamp toast must name ${STRIPE_MAX.v}: "${s}"`);
+    }
+  }
+
   console.log(`  (${n} designs repaired and re-checked)`);
 }
 
@@ -2635,7 +2773,7 @@ group('every option has exactly one price, in whole agorot');
   }
 
   /* The six components of a fitted door. Their sum is the price of a standard
-     door with nothing on it, and it is Peretz's own arithmetic: ₪3,150. */
+     door with nothing on it, and it is Peretz's own arithmetic: ₪3,195. */
   const BUILD_KEYS = ['door', 'cylinder', 'lock', 'mashkof', 'install', 'measure'];
   for (const k of BUILD_KEYS) {
     ok(Object.prototype.hasOwnProperty.call(BUILD, k),
@@ -2645,8 +2783,16 @@ group('every option has exactly one price, in whole agorot');
     ok(BUILD_KEYS.includes(k),
        `prices.js BUILD carries "${k}", which nothing adds up`);
   }
-  ok(BUILD_KEYS.reduce((t, k) => t + agorot(BUILD[k]), 0) === 315000,
-     'the six parts of a standard fitted door must sum to ₪3,150 — Peretz, 26.8.2026');
+  ok(BUILD_KEYS.reduce((t, k) => t + agorot(BUILD[k]), 0) === 319500,
+     'the six parts of a standard fitted door must sum to ₪3,195 — Peretz, 30.8.2026');
+  /* ⚠ AND THE `door` LINE IS HIS "door - 1295", WHICH IS WHAT MAKES THE SUM
+     COME OUT. That figure looked like a separate product — the leaf without
+     frame or fitting — and it is not: it is this component, and the ₪45
+     between 1250 and 1295 is exactly the ₪45 between the old total and his
+     new one. Pinned, because the reading is the whole reason the total moved.
+     See `BUILD` in prices.js. */
+  ok(agorot(BUILD.door) === 129500,
+     `Peretz's "door - 1295" is the door component of the six — got ${BUILD.door}`);
   ok(Number.isInteger(agorot(MASHKOF_WIDER)) && agorot(MASHKOF_WIDER) > 0,
      'widening the mashkof must cost a whole positive number of agorot');
 

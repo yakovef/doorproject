@@ -96,8 +96,16 @@ export function agorot(shekels) {
    height, because a multiplier is a property of the size and not a price. This
    block carries the money. `priceParts` in `js/price.js` is the one place the
    two meet. */
+/* ⚠ AND `door` MOVED 1250 -> 1295 ON 30.8.2026, WHICH IS WHERE PERETZ'S
+   "door - 1295" GOES. He gave a short list of figures and that line looked
+   like a separate product — the leaf on its own, without frame or fitting.
+   It is not. The six parts above sum to 3150 with 1250 in them and to
+   **exactly 3195** with 1295, and 3195 is the standard door he named in the
+   same breath. It is this line of the same six-part breakdown he recited on
+   26.8, with the door corrected.
+   Arithmetic, not a reading: 1295 + 200 + 200 + 500 + 700 + 300 = 3195. */
 export const BUILD = {
-  door:      1250,   // הדלת עצמה      ⟵ multiplied by the size
+  door:      1295,   // הדלת עצמה      ⟵ multiplied by the size
   cylinder:   200,   // צילינדר
   lock:       200,   // מנעול
   mashkof:    500,   // משקוף סטנדרטי  ⟵ multiplied by the size
@@ -356,7 +364,12 @@ export const LOCKSET = {
   coral:     0,      // קורל          — the one included as standard
   cylinder:  0,      // צילינדר בלבד
   plate:     0,      // רותם
-  sapir:     0,      // ספיר
+  /* ⚠ ₪350, AND IT IS THE ONE LEVER THAT IS NOT INCLUDED. Peretz, 30.8.2026:
+     *"the ספיר handle needs to be 350."* His earlier "all of them in the
+     price" covered the levers as a group; this is that group with one
+     exception named. It is not a square (+300) and not a circle (+200), so it
+     does not join either rate — it is its own figure. */
+  sapir:     350,    // ספיר          — Peretz, 30.8.2026
   cadoor:    200,    // כדור          — a circle
   knobplate: 200,    // כדור על אורך  — a circle, A5
   square:    300,    // ריבועי        — squares
@@ -387,13 +400,32 @@ export const PIRZUL = {
 };
 
 /* ── colour ───────────────────────────────────────────────────────────
-   Every colour is included today. ⚠ Peretz may well charge for some of them —
-   metallics and wood-look finishes usually cost more — and ASK-PERETZ.md §3
-   asks which. The moment any of these stops being 0 the swatch shows it: the
-   tiles are priced from the same arithmetic as everything else. */
+   ⚠ THREE ARE INCLUDED AND THE OTHER FOURTEEN ARE ₪200. Peretz, 30.8.2026:
+   *"clorors: 9016T, 9001T, 7126D in the price · others are +200."* This is
+   ASK-PERETZ §3 answered, and assumption A10 — "colours are all included; he
+   priced none of them" — retired. Fourteen numbers moved off zero.
+
+   ⚠ TWO OF HIS THREE CODES CARRY A `T` AND OUR CHART CARRIES ONLY `D`.
+   He said 9016**T** and 9001**T**; the Rav Bariach chart this catalogue was
+   sampled from gives us `rb-9016d` and `rb-9001d`. The suffix is the FINISH
+   (the chart's smooth/textured pair), not the colour, and the colour NUMBER is
+   unambiguous — there is exactly one 9016 and one 9001 in our seventeen, so
+   matching on the number is not the "nearest colour" guess that would be
+   forbidden here. 7126D matches him letter for letter.
+
+   It is written down rather than waved through, because getting it wrong makes
+   WHITE — the commonest entrance door there is — cost ₪200 it should not, or
+   not cost ₪200 it should. `ASK-PERETZ.md` §3 now asks him the one-line
+   question: are 9016T and 9016D the same colour to you, and do you stock both?
+   If the answer is that he means a different sheet, it is three keys here. */
 export const COLOUR = {
-  'rb-9005d': 0, 'rb-7021d': 0, 'rb-5103d': 0, 'rb-7126d': 0, 'rb-0097d': 0,
-  'rb-6459d': 0, 'rb-rb09d': 0, 'rb-7110d': 0, 'rb-7322d': 0, 'rb-6219d': 0,
-  'rb-0096d': 0, 'rb-7240d': 0, 'rb-2030d': 0, 'rb-7080d': 0, 'rb-9001d': 0,
-  'rb-9302d': 0, 'rb-9016d': 0,
+  /* Peretz's three, included in the base price. */
+  'rb-9016d': 0,     // 9016 לבן   — his "9016T"
+  'rb-9001d': 0,     // 9001 קרם   — his "9001T"
+  'rb-7126d': 0,     // 7126       — his "7126D", exactly
+  /* Everything else. */
+  'rb-9005d': 200, 'rb-7021d': 200, 'rb-5103d': 200, 'rb-0097d': 200,
+  'rb-6459d': 200, 'rb-rb09d': 200, 'rb-7110d': 200, 'rb-7322d': 200,
+  'rb-6219d': 200, 'rb-0096d': 200, 'rb-7240d': 200, 'rb-2030d': 200,
+  'rb-7080d': 200, 'rb-9302d': 200,
 };

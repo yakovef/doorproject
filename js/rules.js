@@ -52,7 +52,8 @@
  */
 
 import { T } from './copy.js';
-import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, LOCKSETS, WINDOWS }
+import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, LOCKSETS,
+         STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
          gripPlacement, nearestGrip, panelFits } from './renderer.js';
@@ -498,6 +499,7 @@ const SAID = {
   setGone:       'fix.setGone',
   needPanel:     'fix.needPanel',
   ownPull:       'fix.ownPull',
+  stripesCapped: 'fix.stripesCapped',
 };
 
 /**
@@ -551,6 +553,41 @@ export function repair(state, intent = null) {
   if (byId(DETAILS, s.detail).rectOnly && s.window !== 'rect' && s.window !== 'none') {
     if (intent === 'window') { s.detail = 'plain'; change('detail', SAID.setGone); }
     else { s.window = 'rect'; change('window', SAID.setWindow); }
+  }
+
+  /* ⚠ ELEVEN STRIPES TURNED SIDEWAYS ARE STILL SIX. Reported by Peretz,
+     30.8.2026: *"when i change the placing of the stripes to vertical instead
+     of horizontal, even if there are 11 stripes it puts 11 vertical stripes,
+     and that cant be happening."*
+
+     The maxima are not the same on the two axes and never have been —
+     `STRIPE_MAX` is `{ h: 11, hTight: 8, v: 6 }`, and the six is the corpus's
+     own 0.073 pitch reaching the stiles, not a preference. Turning the group
+     sideways carried the count across unchanged and drew eleven columns into a
+     leaf that holds six.
+
+     ⚠ AND THE CODE AND THE LINK WERE ALREADY RIGHT, WHICH IS WHY THIS SURVIVED.
+     `packStripes` clamps — `18 + Math.min(n, STRIPE_MAX.v)` — so a shared link
+     and a DM- code have always carried six. Only the LIVE state kept the
+     eleven, and the drawing and the price read the live state. A quantity
+     correct in two of its three readers is the hardest kind to see, and it is
+     CLAUDE.md §5.10 with the copies in an unusual order.
+
+     So the clamp goes HERE, in `repair`, which every one of the three goes
+     through: a click, a link and a decoded code cannot now disagree about how
+     many stripes this door has. `packStripes` keeps its own `Math.min` — it is
+     a wire format and must never emit a value it cannot read back — but it is
+     no longer the only thing standing between a customer and eleven columns.
+
+     ⚠ AND GOING BACK TO HORIZONTAL MUST NOT INVENT STRIPES. It does not,
+     because the clamp overwrites the count rather than remembering the old one:
+     eleven horizontal → six vertical → six horizontal. Restoring the eleven
+     would mean carrying a shadow count no reader can see, which is the same
+     shape of hidden state the packing was designed to make unrepresentable.
+     There is an assertion on exactly that round trip. */
+  if (s.stripeDir === 'v' && (s.stripeCount | 0) > STRIPE_MAX.v) {
+    s.stripeCount = STRIPE_MAX.v;
+    change('stripes', SAID.stripesCapped);
   }
 
   const lined = isLineWork(s);

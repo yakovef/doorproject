@@ -565,6 +565,13 @@ export const UI = {
   'fix.setGone':         ['הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי', 'We removed the classical set — it does not go with a vertical slot', 'Мы убрали классический комплект — он не сочетается с вертикальным окном'],
   'fix.needPanel':       ['הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד', 'We added a panel below — a rectangular window always comes with one', 'Мы добавили нижнюю панель — прямоугольное окно всегда идёт с ней'],
   'fix.ownPull':         ['הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו', 'We removed the pull handle — the middle panel comes with its own grip', 'Мы убрали ручку-скобу — у средней панели своя'],
+  /* ⚠ IT NAMES THE NUMBER, and that is the whole job of this sentence. The
+     customer had eleven stripes and now has six; a toast saying "we adjusted
+     the stripes" leaves them counting. The 6 is `STRIPE_MAX.v` written out —
+     a translated string cannot interpolate at import time (see SAID in
+     rules.js) — and `npm test` asserts all three sentences still name the cap
+     they describe, so the number and the rule cannot drift apart. */
+  'fix.stripesCapped':   ['פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת', 'Vertical stripes cap at 6 — more than that will not fit across the door', 'Вертикальных полос максимум 6 — больше по ширине двери не помещается'],
 
   'why.gripOffDoor':  ['הידית חורגת מהדלת', 'The handle runs off the door', 'Ручка выходит за пределы двери'],
   'why.gripReach':    ['הידית גבוהה או נמוכה מדי לשימוש', 'Too high or too low to use comfortably',

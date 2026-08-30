@@ -101,12 +101,40 @@ function glazedDetail(state) {
 export function priceParts(state) {
   const size = SIZES[state.size] || SIZES.standard;
 
-  /* ⚠ THE SIZE MULTIPLIES TWO COMPONENTS AND NOT THE OTHER FOUR. Peretz, in
-     his own words: "+25% to the price of the door and mashkof". A bigger door
-     is more steel and a bigger frame; it is not more installation, a longer
-     cylinder, or a second visit to measure — and this is exactly why the six
-     parts are six numbers rather than one per size (see `BUILD` in
-     `js/prices.js`, which was `SIZE` until 26.8.2026).
+  /* ⚠ THE SIZE MULTIPLIES ALL SIX COMPONENTS, AND IT USED TO MULTIPLY TWO.
+     This paragraph said the opposite until 30.8.2026 and it was right when it
+     was written. Peretz on 26.8: *"+25% to the price of the door and
+     mashkof."* Peretz on 30.8: *"the all its all +25% = 3995."*
+
+     ⚠ AND THE SECOND ONE IS NOT A READING — THE FIRST IS ARITHMETICALLY
+     IMPOSSIBLE AGAINST HIS OWN FIGURES. Solve it rather than choose between
+     them. A standard door is ₪3,195 and the +25% band is ₪3,995, so whatever
+     the multiplier lands on must satisfy `(d+m) * 0.25 = 800`, giving
+     `d+m = 3200`. But `d + m + rest = 3195` and `rest` cannot be negative, so
+     `d+m <= 3195 < 3200`. There is no subset of the six that produces his
+     number. The multiplier is on the whole base or his figures are wrong.
+
+     It is on the whole base, and all six of his bands fall out of it exactly
+     once the ₪5 rounding `priceAgorot` already does is applied:
+
+         standard      x1     3195      -> 3195   he said 3195
+         +25%          x1.25  3993.75   -> 3995   he said 3995
+         +50%          x1.5   4792.50   -> 4795   he said 4795
+         double        x2     6390      -> 6390   he said 6390
+         double +25%   x2.5   7987.50   -> 7990   he said 7990
+         double +50%   x3     9585      -> 9585   he said 9585
+
+     Six for six. The last two have no size tile — the catalogue has one
+     multi-leaf size, not three — and they are listed because they are what
+     makes the rule certain rather than plausible. `ASK-PERETZ.md` asks whether
+     he sells a wide or tall double.
+
+     ⚠ IT MULTIPLIES THE BASE AND NOT THE OPTIONS, and that is the one part of
+     this that IS a reading. Every figure he gave is a bare door, so nothing he
+     said can settle whether a ₪4,200 window is inside "the all". Leaving the
+     options alone changes nothing about how they are priced and still lands
+     all six of his numbers; sweeping them in would silently add ₪1,050 to a
+     glazed +25% door on nobody's authority. Recorded in `ASK-PERETZ.md`.
 
      ⚠ ROUNDED TO A WHOLE SHEKEL, NOT A WHOLE AGORA, AND THAT IS A BUG FIX.
      The first version of this rounded to the agora, which is what every other
@@ -135,11 +163,11 @@ export function priceParts(state) {
      something that will not happen is a hidden cost with a label on it. */
   return {
     /* The six parts of a fitted door. Their sum on a standard door with
-       nothing on it is ₪3,150, and `npm test` pins that figure — it is the one
-       number Peretz will check first. */
+       nothing on it is ₪3,195, and `npm test` pins that figure and the five
+       bands above it — it is the first number Peretz will check. */
     door:     scaled(BUILD_A.door),
-    cylinder: BUILD_A.cylinder,
-    lock:     BUILD_A.lock,
+    cylinder: scaled(BUILD_A.cylinder),
+    lock:     scaled(BUILD_A.lock),
     /* ⚠ THE SIZE MULTIPLIES THE MASHKOF'S TOTAL, INCLUDING ITS WIDTH EXTRAS,
        and that is a reading of "+25% to the price of the door and mashkof"
        rather than a quotation. The price of the mashkof is whatever the
@@ -148,8 +176,8 @@ export function priceParts(state) {
        ₪500 base, add the extras flat) differs by ₪125 at most and is one
        expression away. TRANSFORM.md §18, assumption A3. */
     mashkof:  scaled(BUILD_A.mashkof + mashkofExtras(state)),
-    install:  BUILD_A.install,
-    measure:  BUILD_A.measure,
+    install:  scaled(BUILD_A.install),
+    measure:  scaled(BUILD_A.measure),
 
     colour:  byId(COLOURS, state.colour).delta,
     window:  byId(WINDOWS, state.window).delta,

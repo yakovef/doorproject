@@ -190,15 +190,42 @@ const GROUPS = [
    bits in the code, and its six tiles carry both facts at once. And the size
    BANDS stay empty — `ASK-PERETZ.md` §8: overlapping bands make a customer
    choose wrong and feel certain about it. */
+/**
+ * ⚠ THE HARDWARE COMES BEFORE THE FACE, AND THAT IS PERETZ, 30.8.2026:
+ * *"handles before the panels."*
+ *
+ * The three hardware steps — grip, lock, pirzul, which together are the old
+ * cabinet's one ידיות ומנעול section — moved above `face`. Nothing else moved:
+ * `face` and `glass` stay adjacent because a panel and a window compete for
+ * the same half of the leaf and `repair` trades between them, and splitting
+ * that pair would put a rule's two halves either side of three unrelated
+ * questions.
+ *
+ * ⚠ THE ORDER OF THIS ARRAY IS THE ORDER OF THE FLOW, AND IT IS NOT A WIRE
+ * FORMAT. These keys appear in the DOM as `data-step` and nowhere in
+ * `js/url-state.js`, so no code, no link and no saved design moves — the same
+ * reason מבנה הדלת could become section 01 for free. The `01`–`08` follow by
+ * themselves because they are a CSS counter, which is exactly why they are
+ * one: there is no number here to keep in step.
+ *
+ * ⚠ AND IT REVERSES WHICH WAY ONE REPAIR RUNS, which is the part worth reading
+ * twice. A three-panel face carries its own pull, so the face and a grip
+ * cannot both be had. Asked in the old order a customer chose the face and
+ * then lost it to a handle; asked in this one they choose the handle and lose
+ * it to the face. `repair`'s `intent` already decides that correctly in both
+ * directions — whichever the customer just clicked wins — so nothing in
+ * `js/rules.js` needed touching. What changes is which sentence they usually
+ * see: `fix.ownPull` rather than `fix.setGone`.
+ */
 const SECTIONS = [
   { key: 'fit',    title: 'step.fit.t',    sub: 'step.fit.s',    lede: 'step.fit.l', exp: 'exp.fit' },
   { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk' },
   { key: 'colour', title: 'step.colour.t', sub: 'step.colour.s', lede: 'step.colour.l', exp: 'exp.colour' },
-  { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face' },
-  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass' },
   { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip' },
   { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock' },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz' },
+  { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face' },
+  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass' },
 ];
 
 /**

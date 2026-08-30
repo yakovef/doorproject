@@ -491,6 +491,13 @@
     "fix.setGone": ["הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי", "We removed the classical set — it does not go with a vertical slot", "Мы убрали классический комплект — он не сочетается с вертикальным окном"],
     "fix.needPanel": ["הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד", "We added a panel below — a rectangular window always comes with one", "Мы добавили нижнюю панель — прямоугольное окно всегда идёт с ней"],
     "fix.ownPull": ["הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו", "We removed the pull handle — the middle panel comes with its own grip", "Мы убрали ручку-скобу — у средней панели своя"],
+    /* ⚠ IT NAMES THE NUMBER, and that is the whole job of this sentence. The
+       customer had eleven stripes and now has six; a toast saying "we adjusted
+       the stripes" leaves them counting. The 6 is `STRIPE_MAX.v` written out —
+       a translated string cannot interpolate at import time (see SAID in
+       rules.js) — and `npm test` asserts all three sentences still name the cap
+       they describe, so the number and the rule cannot drift apart. */
+    "fix.stripesCapped": ["פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת", "Vertical stripes cap at 6 — more than that will not fit across the door", "Вертикальных полос максимум 6 — больше по ширине двери не помещается"],
     "why.gripOffDoor": ["הידית חורגת מהדלת", "The handle runs off the door", "Ручка выходит за пределы двери"],
     "why.gripReach": [
       "הידית גבוהה או נמוכה מדי לשימוש",
@@ -614,7 +621,7 @@
     return a;
   }
   var BUILD = {
-    door: 1250,
+    door: 1295,
     // הדלת עצמה      ⟵ multiplied by the size
     cylinder: 200,
     // צילינדר
@@ -748,8 +755,13 @@
     // צילינדר בלבד
     plate: 0,
     // רותם
-    sapir: 0,
-    // ספיר
+    /* ⚠ ₪350, AND IT IS THE ONE LEVER THAT IS NOT INCLUDED. Peretz, 30.8.2026:
+       *"the ספיר handle needs to be 350."* His earlier "all of them in the
+       price" covered the levers as a group; this is that group with one
+       exception named. It is not a square (+300) and not a circle (+200), so it
+       does not join either rate — it is its own figure. */
+    sapir: 350,
+    // ספיר          — Peretz, 30.8.2026
     cadoor: 200,
     // כדור          — a circle
     knobplate: 200,
@@ -778,23 +790,28 @@
     // זהב
   };
   var COLOUR = {
-    "rb-9005d": 0,
-    "rb-7021d": 0,
-    "rb-5103d": 0,
-    "rb-7126d": 0,
-    "rb-0097d": 0,
-    "rb-6459d": 0,
-    "rb-rb09d": 0,
-    "rb-7110d": 0,
-    "rb-7322d": 0,
-    "rb-6219d": 0,
-    "rb-0096d": 0,
-    "rb-7240d": 0,
-    "rb-2030d": 0,
-    "rb-7080d": 0,
+    /* Peretz's three, included in the base price. */
+    "rb-9016d": 0,
+    // 9016 לבן   — his "9016T"
     "rb-9001d": 0,
-    "rb-9302d": 0,
-    "rb-9016d": 0
+    // 9001 קרם   — his "9001T"
+    "rb-7126d": 0,
+    // 7126       — his "7126D", exactly
+    /* Everything else. */
+    "rb-9005d": 200,
+    "rb-7021d": 200,
+    "rb-5103d": 200,
+    "rb-0097d": 200,
+    "rb-6459d": 200,
+    "rb-rb09d": 200,
+    "rb-7110d": 200,
+    "rb-7322d": 200,
+    "rb-6219d": 200,
+    "rb-0096d": 200,
+    "rb-7240d": 200,
+    "rb-2030d": 200,
+    "rb-7080d": 200,
+    "rb-9302d": 200
   };
 
   // js/catalog.js
@@ -1869,11 +1886,11 @@
     const scaled = (a) => Math.round(a * size.mult / 100) * 100;
     return {
       /* The six parts of a fitted door. Their sum on a standard door with
-         nothing on it is ₪3,150, and `npm test` pins that figure — it is the one
-         number Peretz will check first. */
+         nothing on it is ₪3,195, and `npm test` pins that figure and the five
+         bands above it — it is the first number Peretz will check. */
       door: scaled(BUILD_A.door),
-      cylinder: BUILD_A.cylinder,
-      lock: BUILD_A.lock,
+      cylinder: scaled(BUILD_A.cylinder),
+      lock: scaled(BUILD_A.lock),
       /* ⚠ THE SIZE MULTIPLIES THE MASHKOF'S TOTAL, INCLUDING ITS WIDTH EXTRAS,
          and that is a reading of "+25% to the price of the door and mashkof"
          rather than a quotation. The price of the mashkof is whatever the
@@ -1882,8 +1899,8 @@
          ₪500 base, add the extras flat) differs by ₪125 at most and is one
          expression away. TRANSFORM.md §18, assumption A3. */
       mashkof: scaled(BUILD_A.mashkof + mashkofExtras(state2)),
-      install: BUILD_A.install,
-      measure: BUILD_A.measure,
+      install: scaled(BUILD_A.install),
+      measure: scaled(BUILD_A.measure),
       colour: byId(COLOURS, state2.colour).delta,
       window: byId(WINDOWS, state2.window).delta,
       /* ⚠ ONE FACE IN THE RANGE HAS TWO PRICES, and it is the classical set.
@@ -6825,7 +6842,8 @@ ${body}
     setWindow: "fix.setWindow",
     setGone: "fix.setGone",
     needPanel: "fix.needPanel",
-    ownPull: "fix.ownPull"
+    ownPull: "fix.ownPull",
+    stripesCapped: "fix.stripesCapped"
   };
   function repair(state2, intent = null) {
     let s = { ...state2 };
@@ -6847,6 +6865,10 @@ ${body}
         s.window = "rect";
         change("window", SAID.setWindow);
       }
+    }
+    if (s.stripeDir === "v" && (s.stripeCount | 0) > STRIPE_MAX.v) {
+      s.stripeCount = STRIPE_MAX.v;
+      change("stripes", SAID.stripesCapped);
     }
     const lined = isLineWork(s);
     if (lined && byId(DETAILS, s.detail).panel) {
@@ -6982,11 +7004,26 @@ ${body}
   // js/url-state.js
   var VERSION = 19;
   var DEFAULTS = {
-    colour: "rb-0097d",
+    /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
+       Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
+       price, every other colour is +₪200. The old default `rb-0097d` (אנתרציט)
+       is one of the fourteen, so the page would have opened on a door carrying a
+       ₪200 option nobody chose — and printed ₪3,395 where he says a standard
+       door is ₪3,195. Both halves of that are wrong: the block below is built on
+       "every mark on the leaf is one the customer put there", and the opening
+       figure is the one number he checks first.
+       Of his three, 7126D is the one that keeps the picture: #453F3F against the
+       anthracite's #4B4952 is **dE 7.3** in CIELAB, where the cream is 53.9 and
+       the white 63.8. A dark neutral door stays a dark neutral door. It is also
+       the only one of the three he wrote with the same `D` suffix our chart
+       uses, so it is the least ambiguous of them (see COLOUR in prices.js).
+       `rb-0097d` keeps every alias pointed at it; nothing about the wire format
+       moves, because a default is not a wire format. */
+    colour: "rb-7126d",
     window: "none",
     grille: "none",
     handle: "none",
-    lockset: "cylinder",
+    lockset: "plate",
     /* ⚠ EVERY NEW FIELD NEEDS A DEFAULT HERE THE DAY IT IS INVENTED. A state
        missing a key encodes as `undefined`, which `BigInt()` throws on — or
        worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
@@ -7567,11 +7604,11 @@ ${body}
     { key: "fit", title: "step.fit.t", sub: "step.fit.s", lede: "step.fit.l", exp: "exp.fit" },
     { key: "mk", title: "step.mk.t", sub: "step.mk.s", lede: "step.mk.l", exp: "exp.mk" },
     { key: "colour", title: "step.colour.t", sub: "step.colour.s", lede: "step.colour.l", exp: "exp.colour" },
-    { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l", exp: "exp.face" },
-    { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l", exp: "exp.glass" },
     { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
     { key: "lock", title: "step.lock.t", sub: "step.lock.s", lede: "step.lock.l", exp: "exp.lock" },
-    { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l", exp: "exp.pz" }
+    { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l", exp: "exp.pz" },
+    { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l", exp: "exp.face" },
+    { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l", exp: "exp.glass" }
   ];
   var SUMMARY = {
     key: "sum",

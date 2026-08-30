@@ -323,6 +323,28 @@ for (const v of VIEWS) {
   {
     const keys = await p.evaluate(() =>
       [...document.querySelectorAll('.steps__step')].map(b => b.dataset.step));
+
+    /* ⚠ THE ORDER OF THE QUESTIONS, WHICH NOTHING IN THIS REPOSITORY WAS
+       ASKING. Peretz moved the hardware in front of the face on 30.8.2026 —
+       *"handles before the panels"* — and there was no assertion to restate
+       for the new order, because every walk in this file reads the keys out of
+       the DOM and is therefore true whatever order they arrive in. An order
+       that is a product decision and is asserted nowhere is one a refactor
+       reverses in silence.
+
+       Written as the WHOLE sequence rather than as "grip comes before face":
+       a pair-wise rule is satisfied by plenty of orders nobody chose, and what
+       is being protected is the sequence a customer is walked through. Read
+       off the rendered navigator rather than off `SECTIONS`, so it is the
+       order a person actually meets. Falsified by swapping two entries in
+       `SECTIONS`: it fires at every viewport and prints both sequences. */
+    const WANT_ORDER = ['fit', 'mk', 'colour', 'grip', 'lock', 'pz', 'face', 'glass', 'sum'];
+    if (keys.join(',') !== WANT_ORDER.join(',')) {
+      fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
+        + `and it should be ${WANT_ORDER.join(' → ')} `
+        + '(Peretz, 30.8.2026: handles before the panels)');
+    }
+
     for (const k of keys) {
       /* Back to the top before each jump. The navigator is sticky, so a
          customer never loses it — but Playwright scrolls its target into view

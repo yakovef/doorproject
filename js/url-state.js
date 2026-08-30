@@ -213,24 +213,48 @@ export const VERSION = 19;
  * means the assertion is doing less work than it used to; that is a reason to
  * keep it, not to relax it.
  *
- * ⚠ IT STARTS WITH A KEYHOLE, AND IT HAS TO. For one round this said
- * `lockset: 'none'` — a leaf with no lever, no knob and no keyway — and
- * ASK-PERETZ §13 asked whether Peretz would quote a door that way. The answer
- * was immediate: *"make the door start with just a keyhole. there can't be a
- * door without a keyhole."* Right, and it should not have needed asking: a
- * door you cannot lock is not a door, and PLAN.md §0 says the order must be
- * something he can act on without a clarifying question.
- * So the bare door is bare of everything a customer ADDS — no window, no face
- * design, no pull handle, no ironwork — and carries the one fitting every door
- * has. `cylinder` is literally that: the keyway escutcheon and nothing else,
- * and the commonest lock furniture in the whole corpus.
+ * ⚠ IT STARTS WITH THE ROTEM NOW, AND THAT IS PERETZ REVISING HIS OWN
+ * INSTRUCTION. This block has been rewritten twice by the same person.
+ *
+ * Round one said `lockset: 'none'` — a leaf with no lever, no knob and no
+ * keyway. ASK-PERETZ §13 asked whether he would quote a door that way and the
+ * answer was immediate: *"make the door start with just a keyhole. there can't
+ * be a door without a keyhole."*
+ *
+ * Round two is 30.8.2026: *"at the start put the rotem handle instead of just
+ * the keyhole."* Same direction, one step further — a bare keyway is not a
+ * door anybody buys either, and `plate` (רותם, the lever on the long
+ * backplate) is what he actually fits. It is ₪0, one of the levers his "all of
+ * them in the price" covers, so the opening figure is untouched by it.
+ *
+ * ⚠ THE PRINCIPLE UNDERNEATH DID NOT CHANGE, and it is worth restating so the
+ * next round does not read this as licence. The opening door is still bare of
+ * everything a customer ADDS — no window, no face design, no pull handle, no
+ * ironwork, no extra lock. What it carries is what every door Peretz builds
+ * carries whether or not anybody chooses it. The list of those things grew by
+ * one because he says it did.
  */
 export const DEFAULTS = {
-  colour:  'rb-0097d',
+  /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
+     Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
+     price, every other colour is +₪200. The old default `rb-0097d` (אנתרציט)
+     is one of the fourteen, so the page would have opened on a door carrying a
+     ₪200 option nobody chose — and printed ₪3,395 where he says a standard
+     door is ₪3,195. Both halves of that are wrong: the block below is built on
+     "every mark on the leaf is one the customer put there", and the opening
+     figure is the one number he checks first.
+     Of his three, 7126D is the one that keeps the picture: #453F3F against the
+     anthracite's #4B4952 is **dE 7.3** in CIELAB, where the cream is 53.9 and
+     the white 63.8. A dark neutral door stays a dark neutral door. It is also
+     the only one of the three he wrote with the same `D` suffix our chart
+     uses, so it is the least ambiguous of them (see COLOUR in prices.js).
+     `rb-0097d` keeps every alias pointed at it; nothing about the wire format
+     moves, because a default is not a wire format. */
+  colour:  'rb-7126d',
   window:  'none',
   grille:  'none',
   handle:  'none',
-  lockset: 'cylinder',
+  lockset: 'plate',
   /* ⚠ EVERY NEW FIELD NEEDS A DEFAULT HERE THE DAY IT IS INVENTED. A state
      missing a key encodes as `undefined`, which `BigInt()` throws on — or
      worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
