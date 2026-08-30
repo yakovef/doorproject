@@ -1732,6 +1732,17 @@ how it got there. Detail lives in the section it belongs to.
   mechanism that once made a headline fake a 5.2% drawing regression — and
   `aria-hidden`, because the page's accessible name is the `<h1>` and a logo
   repeating it is one more thing to say before the customer reaches the door.
+  ⚠ **AND IT IS DESKTOP-ONLY, WHICH THE AUDIT DECIDED.** The first version put
+  it in normal flow on a phone. `npm run audit` failed it at `phone-s` on SEVEN
+  steps with one sentence each — *"17 options and NONE on screen — a customer
+  sees the question and nothing to answer it with"* — because a 320x568 screen
+  already spends its height on a fixed navigator, a sticky door and a fixed
+  quote bar, and one more row was the amount that pushed every option below the
+  fold. That is the 27.8 deletion's own argument measured again (*"124 px of a
+  row that could not fit the language it was crowding out"*), and it did not
+  stop being true because the mark got smaller. Above 1100 it is `absolute` and
+  costs the door nothing; below it, the identity stays where the deletion put
+  it — the tab title and the order Peretz receives.
   ⚠ **AND IT WENT INTO THE BARE HIDE-LIST THE SAME EDIT.** `.stage-wrap` is the
   one page element `?bare=1` keeps, so a mark left in would have printed itself
   across all 110 `corpus-*`, `recreate-*` and `against-*` comparisons. That is

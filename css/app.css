@@ -875,15 +875,22 @@ svg { direction: ltr; }
   font: 600 .92rem/1 var(--sans);
   letter-spacing: .01em;
 }
-@media (max-width: 1099px) {
-  .brand {
-    position: static;
-    justify-content: center;
-    padding-block-start: 12px;
-  }
-  .brand__mark { inline-size: 18px; block-size: 22px; }
-  .brand__name { font-size: .84rem; }
-}
+/* ⚠ DESKTOP ONLY, AND THE AUDIT IS WHY — THIS IS THE 27.8 DELETION'S OWN
+   ARGUMENT, MEASURED AGAIN. The first version of this rule put the mark in
+   normal flow on a phone, centred over the heading. `npm run audit` failed it
+   at `phone-s` on SEVEN steps with the same sentence each time: *"17 options
+   and NONE on screen — a customer sees the question and nothing to answer it
+   with."* A 320x568 screen is already spending its height on a fixed
+   navigator, a sticky door and a fixed quote bar; one more row at the top was
+   the amount that pushed every option below the fold.
+
+   Which is exactly what the header's deletion note says in its own words — on
+   a phone the brand name *"was 124 px of a row that could not fit the language
+   it was crowding out"*. That reasoning did not stop being true because the
+   mark got smaller. Above 1100 it is `absolute` and costs the door nothing, so
+   it stays there and nowhere else; on a phone the identity is where the
+   deletion put it, in the tab title and on the order Peretz receives. */
+@media (max-width: 1099px) { .brand { display: none; } }
 
 .stage__h1 {
   margin: 0; padding: 14px 16px 8px;
