@@ -369,8 +369,18 @@ export const UI = {
                        'A viewer, to see who is outside. Included in the price.',
                        'Глазок, чтобы видеть, кто снаружи. Входит в цену.'],
   'g.size':           ['מידה', 'Size', 'Размер'],
-  'g.size.h':         ['נמדוד אצלכם במדויק — בחינם.', 'We measure on site, exactly, free of charge.',
-                       'Точный замер у вас — бесплатно.'],
+  /* ⚠ THIS SAID THE SAME THING AS THE STEP'S OWN LEDE, four lines above it on
+     the screen. `step.fit.l` already ends *"נמדוד אצלכם במדויק, בחינם"* and
+     this repeated it word for word (`UX-FINDINGS` §6) — on the step the same
+     review measures as the most crowded on the page.
+     What it says instead is the thing the lede does NOT, and the thing this
+     group is most misread about: the six bands are the OPENING IN THE WALL,
+     not the door. `js/catalog.js` has carried that distinction since the leaf
+     and the opening were separated — *"SIZES gives the structural OPENING,
+     not the leaf"* — and until now no customer was ever told. */
+  'g.size.h':         ['המידה היא של הפתח בקיר, לא של הדלת עצמה.',
+                       'The size is the opening in the wall, not the door itself.',
+                       'Размер — это проём в стене, а не само полотно.'],
   'g.mashkof':        ['משקוף', 'Frame', 'Коробка'],
   'g.mashkof.h':      ['המסגרת שהדלת נסגרת עליה. נמדוד את הקיר אצלכם.',
                        'The frame the door closes against. We measure your wall on site.',

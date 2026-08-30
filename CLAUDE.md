@@ -1857,6 +1857,13 @@ how it got there. Detail lives in the section it belongs to.
   `.is-reveal` to clear now, and gives up rather than hanging, because under
   reduced motion the class may never be added at all. **An instrument that
   measures during an entrance animation is measuring the wrong moment.**
+  ⚠ **AND IT WAS RE-DRIVEN IN RUSSIAN, WHICH THE REVIEW SAYS IT NEVER WAS**
+  (§9: *"Hebrew only. RTL/LTR layout bugs live in exactly that gap"*). Desktop
+  is identical in both — same rail, same send on screen at 1280, 1440 and
+  1920. The one place they part is 320×568, where the Russian send wraps to
+  two lines (215×99 against Hebrew's 215×74) and sits **440 px below the fold
+  against Hebrew's 202**. Same verdict either way, for the reason above: the
+  phone's send is the pinned chip, and the audit demands that one WHOLE.
   ⚠ **Two of the review's other findings were re-measured and have already
   moved:** §3's *"the counter reads as 8 of 1"* is fixed (`שלב 3 מתוך 8` in
   all three languages), and §3's rail is **396 px of content in 310** now, not
@@ -1884,6 +1891,43 @@ how it got there. Detail lives in the section it belongs to.
   clears 44 px, and that its sentence equals `handingWords()` **to the
   character**. Falsified both ways: a different phrasing and a deleted row
   each fail every viewport.
+- **⚠ TWO LEADS FROM THE REVIEW BRANCH, NOT ACTED ON, WRITTEN DOWN SO THEY ARE
+  NOT RE-DISCOVERED.**
+  · **⚠ THE `https`-ONLY GUARD ON THE SHARE IMAGE IS BROADER THAN IT NEEDS TO
+    BE.** A 14-line correction on `review/2026-08-23-review.html` says canvas
+    tainting over `file://` is narrower than this repo records: only a
+    SEPARATE LOCAL FILE taints the canvas, so our own inline `render()` output
+    should rasterise cleanly from a double-clicked `index.html`. `isServed()`
+    gates two things for one reason each — the share LINK (which really has no
+    address off http(s), and that half stands) and the PICTURE (which may not
+    need the gate at all). If it is right, the README's starred route gets the
+    door in the WhatsApp. Not touched here: it wants its own measurement in a
+    real file:// browser, not a paragraph.
+  · **`RENDER.md`'s measurements stand and its cross-references do not.** It
+    cites `PLAN.md`, `REALISM.md` and `REDESIGN.md`, all deleted on 27.8.2026.
+    `UX-FINDINGS` §9 records it; nothing in it is wrong, and every pointer in
+    it is.
+- **⚠ ITEM 7: STEP 1 STOPS SAYING THE SAME THING TWICE — AND HALF OF THIS ITEM
+  WAS ALREADY DONE BY ANOTHER SESSION.** `UX-FINDINGS` §6.
+  · **The size glyphs are fixed and not by this round.** The review's *"six
+    near-identical door glyphs"* was answered in `1b800e7`: every tile had a
+    `viewBox` cut to its own door with `preserveAspectRatio="meet"`, so
+    950×2100 came out the same size as 1200×2400. They share a `SIZE_FRAME`
+    computed from `SIZES` now, and a standard leaf fills about 58% of the
+    width a דו כנפי חריגה שנייה does. Checked rather than assumed, and left
+    alone rather than re-done.
+  · **The duplicated sentence is gone.** `step.fit.l` and `g.size.h` both
+    ended *"נמדוד אצלכם במדויק, בחינם"*, four lines apart, on the step this
+    review measures as the most crowded on the page. The hint now carries what
+    the lede cannot: **the six bands are the OPENING IN THE WALL, not the
+    door.** `catalog.js` has said that since the leaf and the opening were
+    separated and no customer had ever been told.
+  · **The other duplicate is declined, and it is not one.** ₪3,195 appears on
+    the price chip and on the size tile, and those are two different
+    quantities that happen to coincide on the default door: the tile prints
+    what THAT OPTION costs, which was asked for from outside in as many words
+    (*"the price of the thing needs to be written on the thing"*), and the
+    chip prints the total. On any other size they differ.
 - **⚠ ITEM 5: THE TWO-ROW RAIL IS DECLINED, AND THE ROW NEARLY FITS IN ONE
   INSTEAD.** `UX-FINDINGS` §3 asked for a wrapped, labelled navigator and made
   it conditional on re-measuring §4's vertical budget. Re-measured after item
