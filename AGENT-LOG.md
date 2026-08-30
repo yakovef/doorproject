@@ -75,8 +75,7 @@ Pricing, colour and hardware defaults are Peretz's own decisions, already
 made and already verified against his notes; nothing here was mine to
 second-guess.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** 41408f7
 
 ---
 
