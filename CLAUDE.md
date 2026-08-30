@@ -1700,6 +1700,46 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE DESIGN HALF OF THE SAME REVIEW, 30.8.2026 — THE FLOW REORDERED, THE
+  SEND BUTTON MADE LOUD, AND THE BRAND BACK WITHOUT THE BAR.**
+  ⚠ **משקוף moved from step two to step eight, and nothing else moved.** It is
+  the most technical question in the guide — four cross-sections whose
+  difference is a wall thickness nobody has measured — and it was arriving
+  before the customer had made one choice they enjoyed. Peretz's own ordering
+  rule is the constraint that shaped the rest (*"handles before the panels"*),
+  so `grip` and `lock` stay ahead of `face` and only `mk` travels. The keys do
+  not change and appear nowhere in the URL or the short code, so no link goes
+  stale and no VERSION moves; the `01`–`08` digits follow because they are a
+  CSS counter over position, which is exactly the event a stored digit would
+  have gone stale on.
+  ⚠ **The send button was the quietest thing on the page.** `.quote__send` was
+  a `--surface` pill with a hairline border, outweighed by `הבא` beside it — on
+  the one action this site exists to produce. It is solid `--wa` now, which is
+  also the green-send-button decision taken from outside and recorded as
+  not-to-be-re-litigated; `.btn--wa` in the flow already wore it, and a
+  customer should not learn two shapes for one action.
+  ⚠ **The brand is back and the deleted header is still deleted.** The page
+  opened with nothing saying whose business it is — the one thing the 27.8
+  deletion did not rehome, because the NAME went to the tab title and the order
+  sheet and neither is on screen. So `.brand` is a mark and a name riding with
+  the heading: no nav, no telephone, no saved button, no second row of chrome.
+  It is `absolute` above 1100 so it takes NO height out of the door — the
+  mechanism that once made a headline fake a 5.2% drawing regression — and
+  `aria-hidden`, because the page's accessible name is the `<h1>` and a logo
+  repeating it is one more thing to say before the customer reaches the door.
+  ⚠ **AND IT WENT INTO THE BARE HIDE-LIST THE SAME EDIT.** `.stage-wrap` is the
+  one page element `?bare=1` keeps, so a mark left in would have printed itself
+  across all 110 `corpus-*`, `recreate-*` and `against-*` comparisons. That is
+  the standing rule for anything added to that wrap and it is why the rule
+  exists.
+  ⚠ **And the navigator's remaining overflow is dressed rather than solved.**
+  Nine 44 px circles still cannot fit a 310 px panel, so the desktop row goes
+  on scrolling; what was wrong was the straight vertical slice through the last
+  circle, which read as one layer over another. An 18 px `mask` fade at both
+  inline ends says "there is more this way" instead. It is free of the usual
+  objection because the strip's own background IS `--surface` — what the fade
+  reveals is the card behind it, the same colour — and it fails closed, so a
+  browser without `mask-image` gets exactly today's edge.
 - **⚠ FOUR CORRECTIONS OFF THE SHIPPED PAGE, 30.8.2026 — A PRICE, A FITTING
   DRAWN AS THE WRONG OBJECT, A CHART THAT HID ITS MONEY, AND A NAVIGATOR THAT
   NEVER FIT.** All four reported from outside, looking at the live site, and

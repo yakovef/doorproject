@@ -855,6 +855,36 @@ svg { direction: ltr; }
    trade on the one page whose product is the point.
    44 costs 41 px less and still reads as display type rather than as a label,
    which was the whole complaint. The door gets the rest back in the crop. */
+/* ⚠ THE BRAND MARK — IDENTITY WITHOUT THE DELETED HEADER ROW.
+   See the note in index.html for why it is a mark and a name and nothing
+   else. It is `absolute` so it takes NO height out of the stage: above
+   1100 px the layout is one screen with `overflow: hidden` and anything given
+   height above the door comes straight out of the door, which is the
+   mechanism that once made a heading fake a 5% drawing regression. On a phone
+   it centres over the heading instead, where there is no door to steal from
+   and a corner mark would collide with the fixed navigator. */
+.brand {
+  position: absolute; inset-block-start: 16px; inset-inline-start: 18px;
+  z-index: 4; margin: 0;
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--ink);
+  pointer-events: none;
+}
+.brand__mark { inline-size: 22px; block-size: 27px; flex: 0 0 auto; }
+.brand__name {
+  font: 600 .92rem/1 var(--sans);
+  letter-spacing: .01em;
+}
+@media (max-width: 1099px) {
+  .brand {
+    position: static;
+    justify-content: center;
+    padding-block-start: 12px;
+  }
+  .brand__mark { inline-size: 18px; block-size: 22px; }
+  .brand__name { font-size: .84rem; }
+}
+
 .stage__h1 {
   margin: 0; padding: 14px 16px 8px;
   font: 300 clamp(26px, 3.4vw, 44px)/1.05 var(--sans);
@@ -1260,16 +1290,29 @@ svg { direction: ltr; }
    nothing here is green. It is a line of ink on paper with a hairline round
    it — present on every step, loud on none. The one green button on the site
    is still the summary's. */
+/* ⚠ SOLID GREEN, BECAUSE THIS IS THE ONE ACTION THE SITE EXISTS TO PRODUCE.
+   Reported from outside, 30.8.2026, looking at the shipped page: it was the
+   QUIETEST thing on screen — a `--surface` pill with a hairline border and
+   ink text, outweighed by `הבא` in the panel beside it and by half the
+   chrome. On the bar that carries the price, the button that sends the door
+   to Peretz should be the loudest element, not a ghost of one.
+   `--wa` rather than ink or accent: the green send button is a decision taken
+   from outside and recorded as not-to-be-re-litigated, and `.btn--wa` in the
+   flow already wears it. A customer should not have to learn two shapes for
+   the same action, which is the argument the phone bar's own note makes a few
+   rules down. */
 .quote__send {
   flex: 0 0 auto;
   display: inline-flex; align-items: center; gap: 7px;
-  min-block-size: 44px; padding: 0 14px;
-  border: 1px solid var(--rule); border-radius: var(--r-pill, 999px);
-  background: var(--surface, #fff);
-  color: var(--ink); text-decoration: none;
-  font-size: .84rem; font-weight: 500; white-space: nowrap;
+  min-block-size: 44px; padding: 0 16px;
+  border: 1px solid transparent; border-radius: var(--r-pill, 999px);
+  background: var(--wa);
+  color: #fff; text-decoration: none;
+  font-size: .84rem; font-weight: 600; white-space: nowrap;
+  box-shadow: 0 1px 2px rgb(23 23 21 / .18);
 }
-.quote__send:hover { border-color: var(--ink-3); }
+.quote__send:hover { filter: brightness(1.05); }
+.quote__send .quote__ico { opacity: 1; }
 .quote__send:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
 .quote__ico { inline-size: 17px; block-size: 17px; flex: 0 0 auto; opacity: .85; }
 
@@ -1832,6 +1875,26 @@ svg { direction: ltr; }
    above CSS: a wider panel, a wrapped row, or a rail that shows the current
    step with its neighbours instead of all nine. Recorded, not guessed at. */
 .steps__step { padding: 0; }
+
+/* ⚠ AND WHERE IT STILL SCROLLS, THE CUT IS MADE TO LOOK LIKE A CUT.
+   Nine 44 px circles cannot fit a 310 px panel and the target is not
+   negotiable, so the row goes on scrolling there. What was wrong was never
+   the scrolling — it was that the last circle ended in a straight vertical
+   slice with nothing to say why, which reads as one layer sitting on top of
+   another rather than as "there is more this way".
+   A soft fade at both inline ends says it instead. It is the standard
+   affordance and it is free of the usual objection here: the strip's own
+   background IS `--surface`, the same colour as the card behind it, so what
+   the fade reveals at the very edge is the card — not a hole. 18 px, which is
+   under half a circle: enough to round the cut, not enough to hide a step.
+   `mask` fails closed — an unsupported browser gets today's hard edge and
+   nothing else changes. */
+@supports (mask-image: linear-gradient(#000, #000)) {
+  .steps {
+    mask-image: linear-gradient(to right, transparent 0, #000 18px,
+                                #000 calc(100% - 18px), transparent 100%);
+  }
+}
 /* ⚠ `.steps__l`, `.steps__n` AND `.steps__t` ARE GONE — the number under each
    circle and the title beside it. Both were measured out, not tidied away:
    the number said the same thing as the `NN ⁄ 08` the live step already
@@ -2946,7 +3009,17 @@ html.is-live .wa__off { display: none; }
    it. Anything added to the stage wrap belongs here the same day. */
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
 .is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
-.is-bare .grip-bar, .is-bare .stage__hud, .is-bare .quote { display: none; }
+.is-bare .grip-bar, .is-bare .stage__hud, .is-bare .quote,
+/* ⚠ `.brand` JOINS THE LIST THE DAY IT IS ADDED, which is the standing rule
+   for anything put inside `.stage-wrap` — the one page element `?bare=1`
+   keeps. Bare mode exists so the harnesses photograph THE DRAWING and no page
+   around it, and a brand mark left in would have printed itself onto every
+   `corpus-*`, `recreate-*` and `against-*` sheet: 110 comparisons against
+   photographs, each with a wordmark over the wall. CLAUDE.md records the last
+   time something was added to this wrap and not to this line — the headline,
+   which cost the drawing 70 px and faked a 5.2% regression in `npm run
+   profile` before anyone worked out the door had not moved at all. */
+.is-bare .brand { display: none; }
 .is-bare .layout { display: block; block-size: 100dvh; }
 .is-bare .stage-wrap { block-size: 100dvh; padding: 0; border: 0; }
 /* Natural framing, not the full-bleed room: app.js leaves the viewBox alone

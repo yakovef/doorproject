@@ -262,15 +262,35 @@ const GROUPS = [
  * `js/rules.js` needed touching. What changes is which sentence they usually
  * see: `fix.ownPull` rather than `fix.setGone`.
  */
+/* ⚠ משקוף MOVED FROM SECOND TO LAST, 30.8.2026, AND NOTHING ELSE MOVED.
+   Reported from outside, looking at the shipped flow: it is the most technical
+   decision in the whole guide — four cross-sections whose difference is a wall
+   thickness a homeowner has not measured — and it was arriving at step two,
+   before the customer had made a single choice they enjoyed. A flow that opens
+   with its hardest question is a flow people leave.
+
+   ⚠ AND PERETZ'S OWN ORDERING RULE IS THE CONSTRAINT THAT SHAPED THE REST.
+   30.8: *"handles before the panels."* So `grip` and `lock` stay ahead of
+   `face`, which they already were, and the reorder is only `mk` travelling to
+   the end. What is left reads as: the door's shape, its colour, what you hold,
+   what locks it, the metal's finish, the face, the glass — and then the frame
+   it all hangs in, which is the one thing we measure at the customer's wall
+   anyway.
+
+   ⚠ THE KEYS DO NOT CHANGE, AND THAT IS WHY THIS IS CHEAP. They appear in the
+   DOM as `data-step` and NOWHERE in the URL or the short code, so no link
+   already sent goes stale and no VERSION moves. The `01`-`08` digits are a CSS
+   counter over position, which is exactly why they are a counter — this
+   reorder is the event a stored digit would have gone stale on. */
 const SECTIONS = [
   { key: 'fit',    title: 'step.fit.t',    sub: 'step.fit.s',    lede: 'step.fit.l', exp: 'exp.fit' },
-  { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk' },
   { key: 'colour', title: 'step.colour.t', sub: 'step.colour.s', lede: 'step.colour.l', exp: 'exp.colour' },
   { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip' },
   { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock' },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz' },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face' },
   { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass' },
+  { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk' },
 ];
 
 /**

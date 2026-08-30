@@ -338,11 +338,19 @@ for (const v of VIEWS) {
        off the rendered navigator rather than off `SECTIONS`, so it is the
        order a person actually meets. Falsified by swapping two entries in
        `SECTIONS`: it fires at every viewport and prints both sequences. */
-    const WANT_ORDER = ['fit', 'mk', 'colour', 'grip', 'lock', 'pz', 'face', 'glass', 'sum'];
+    /* ⚠ RESTATED 30.8.2026 — `mk` MOVED FROM SECOND TO LAST, AND IT IS THE
+       ONLY THING THAT MOVED. Reported from outside: משקוף is the most
+       technical question in the guide and it was arriving before the customer
+       had made one choice they enjoyed. Peretz's rule is untouched and is
+       still the reason the middle of this list looks as it does — `grip` and
+       `lock` remain ahead of `face`. The assertion keeps its shape: the WHOLE
+       sequence, read off the rendered navigator, because a pair-wise rule is
+       satisfied by plenty of orders nobody chose. */
+    const WANT_ORDER = ['fit', 'colour', 'grip', 'lock', 'pz', 'face', 'glass', 'mk', 'sum'];
     if (keys.join(',') !== WANT_ORDER.join(',')) {
       fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
         + `and it should be ${WANT_ORDER.join(' → ')} `
-        + '(Peretz, 30.8.2026: handles before the panels)');
+        + '(Peretz, 30.8.2026: handles before the panels; משקוף last, 30.8)');
     }
 
     for (const k of keys) {
