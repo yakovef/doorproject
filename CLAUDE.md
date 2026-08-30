@@ -1739,6 +1739,21 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **`PROMPTS.md` — the instructions for the chat that WRITES the prompts, not
+  the one that carries them out.** 30.8.2026, on branch
+  `claude/prompt-optimization-guide-a22nek`, and it changes no code: the owner
+  runs a second conversation whose only job is turning a one-line ask into the
+  detailed prompt the coding agent receives, and that conversation gets
+  compacted like every other. So it has a file of its own, for the same reason
+  this one exists — *"so that i can do `/compact` whenever i can without you
+  losing significant facts."*
+  It carries the transformation recipe, the routing per kind of ask (a bug seen
+  on a phone, a new priced option, a fidelity question, layout, copy, an
+  instrument, documentation), and the pre-flight checklist. ⚠ **It CITES this
+  file rather than copying it** — a second statement of the wire-format rule or
+  the bare hide-list rule is §5.10 wearing a document, and would go stale the
+  first time somebody obeyed the rule around it.
+
 - **⚠ A GOLD BELL WAS ASKED FOR AND IS NOT AN OPTION — IT IS A FITTING FINALLY
   OBEYING THE FINISH AXIS.** Asked for from outside: *"make a gold bell option
   and change the icon of it to look like the bell."* Adding one would have cost
