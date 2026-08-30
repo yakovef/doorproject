@@ -23,6 +23,75 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-30 15:40 UTC — run 59: nothing worth changing — verified a 19-commit design-branch merge
+
+**Looked at:** `git fetch` pulled 19 human commits since run 58 — much
+larger than the usual batch. The shape of it: a separate design-review
+branch had accumulated five planning documents (`MOCKUP2.md`,
+`REALISM2.md`, `DESIGN-LEVEL.md`, `GUIDED-FLOW.md`, `PHOTOREAL.md`),
+merged in the 124 commits already shipped on this branch for
+reconciliation (`787d6ab`), had four more real corrections made against
+the shipped page (a double-billed panel, a bell drawn as the wrong
+object, a chart hiding its own money, a navigator that never fit —
+`77918a9`), a few more targeted design fixes (brand mark made
+desktop-only after the audit found it costing a phone every option it
+had; navigator circles kept at 44px after a shrink was proposed and
+audit-refused; the send button's contrast recorded and given the one
+accent colour left — `a28bfac`/`137c488`/`7c38545`/`b9adf78`), then the
+whole thing was merged back onto `claude/door-builder-website-plan-rgg7gu`
+(`091f5a6`), sheets regenerated (`34c2e7f`/`084eb38`), CLAUDE.md brought
+back into line (`b973e2d`), and finally a real bugfix pair: the gold
+פרזול finish was reaching the door's lever but not its knocker or
+peephole (both were hard-wired to a constant steel ramp meant only for
+the two bought-in special locks), and the bell/knocker tile was drawing
+the *old* three-circle electric-bell glyph after the door itself had
+already been redrawn as a ring knocker earlier the same day —
+`1b800e7`/`80b7ae7`.
+
+⚠ **One documentation staleness worth flagging, not fixing myself:**
+CLAUDE.md §0c still reads "the four planning documents... are NOT on
+this branch and should not be copied here" (referring to an *earlier*
+round), but this round's own merge put all five of them here in fact.
+`b973e2d` (titled "CLAUDE.md caught up with the code") landed after that
+line was already stale and didn't catch this one. Left alone: I have
+never edited CLAUDE.md's own body in any run, and a merge this size,
+this recent, is exactly the kind of in-flight state where the primary
+session is far better placed than a maintenance pass to decide whether
+those files stay, get pruned, or the paragraph gets rewritten.
+
+Rebuilt (bundle already matched, no diff). Verified visually rather than
+trusted: desktop arrival shows the new desktop-only brand mark and the
+green send button; phone arrival correctly omits the brand mark; loaded
+`?bl=bell&pz=pz-gold` and confirmed both the ring knocker and the lever
+render in matching gold — exactly the fitting-plus-finish combination the
+fix targeted — with the spec row correctly reading "פרזול: זהב". Zero
+console errors on every route tested.
+
+**Instruments:** test ✓ (**4,349,392** passed, 0 failed — matches the
+round's own final claimed count of 4,349,391 to within one, consistent
+with normal environment variance) · audit ✓ (all eight viewports clean,
+no faults) · profile ✓ (both FALLOFF bands within tolerance,
+byte-identical — bare mode untouched by any of this round's fitting or
+CSS work) · collide -- all ✓ (1,902 designs, unchanged from run 58) ·
+collide -- boxes ✓ (MOUNT_REACH 121 covers the deepest fitting at 111) ·
+recreate ✓ (same ten long-documented catalogue gaps, nothing new — the
+round's own commits note that no corpus/recreate/against sheet moved a
+pixel across this entire batch, confirmed independently). `git status`
+checked immediately after `recreate` — clean.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** the CLAUDE.md staleness noted above, and
+everything else — no functional defect surfaced this run. Design
+decisions (brand mark placement, accent colour, size-tile framing) are
+the primary session's own, already made and already verified against
+their own described intent.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-30 10:40 UTC — run 58: nothing worth changing — verified a full size-catalogue restructuring
 
 **Looked at:** `git fetch` pulled one human commit since run 57 —
