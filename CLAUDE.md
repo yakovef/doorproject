@@ -146,6 +146,23 @@ every width. A standard door with nothing on it is **₪3,195**, and tapping the
 figure opens the column it is made of. **In Hebrew, English or Russian** — and
 the order that reaches Peretz is Hebrew whichever one the customer used.
 
+**The order of the eight**, since 30.8: fit · colour · grip · lock · pz · face ·
+glass · **mk**. Peretz's *"handles before the panels"* fixes the middle;
+משקוף sits last because it is the only question in the flow whose answer is a
+wall thickness the customer has not measured, and we measure it for them.
+
+**Four things the shipped page was getting wrong on 30.8, all now fixed and all
+reported from outside rather than caught here.** A square window billed the
+bottom panel it FORCES, so it read ₪7,620 where Peretz says ₪6,995. The פעמון
+was drawn as an electric push on the hinge stile and is a ring knocker on the
+centre line. The colour chart was seventeen identical circles with no way to
+tell the three included ones from the fourteen at +₪200 — it is two headed
+groups now, split on the price itself so it cannot go stale. And the navigator
+overflowed its panel at every width, slicing the last circles down their
+middles. The detail is in §0b; what belongs here is the shape of it — **three
+of the four were visible on the page for anyone who looked, and no instrument
+in this repository was looking at any of them.**
+
 ### Three languages, and the one rule inside them
 
 Hebrew, English, Russian; `js/copy.js`; `?lang=` → `localStorage` →
@@ -918,8 +935,12 @@ opening onto categories, each onto options. One open at a time on a phone; all
 four open on a desktop.
 
 ⚠ **AND THE HARDWARE COMES BEFORE THE FACE SINCE 30.8.2026** — Peretz,
-*"handles before the panels"*. The flow is fit · mk · colour · **grip · lock ·
-pz** · face · glass · sum. `face` and `glass` stay adjacent because a panel and
+*"handles before the panels"*. The flow is fit · colour · **grip · lock ·
+pz** · face · glass · **mk** · sum — משקוף moved from second to LAST later the
+same day, because it is the most technical question in the guide and it was
+arriving before the customer had made one choice they enjoyed. His rule is
+untouched by that move; it is what fixes the middle of the sequence.
+`face` and `glass` stay adjacent because a panel and
 a window compete for the same half of the leaf and `repair` trades between
 them. It cost nothing in the wire format for the same reason the reorder below
 did, and `npm run audit` now asserts the WHOLE sequence off the rendered
@@ -1473,12 +1494,12 @@ the same list in Hebrew, shorter, for him to answer.
 | A5 | `knobplate` is a "circle" at +₪200 | one number |
 | A6 | The widened mashkof is 60 mm outside / 300 mm inside | two numbers in `MASHKOFS` |
 | A7 | The peephole and security latch are standard on every door — **the עינית is now a CHOICE priced at ₪0 on the strength of this**, so it is louder than it was | one number in `prices.js`, and whether the tile says כלול |
-| A8 | A single bottom panel is ₪725, half of two | one number |
+| A8 | A single bottom panel is ₪725, half of two — **but ₪0 where a square window FORCES it**, 30.8; it is priced inside `WINDOW.rect` | one number, and the `DETAIL_GLAZED.panel` beside it |
 | A9 | `Math.ceil` on the handle's 20 cm steps — you cannot buy 10 cm of bar | one word |
 | A10 | ~~Colours are all included~~ — **settled 30.8**: three included, fourteen at +₪200 | — |
 | A11 | Panels and stripes are mutually exclusive — no door carries both | one rule in `js/rules.js` |
 | A12 | `barblack` (מוט שחור) is priced as a bar like the others — he wrote "nickel >100cm" and named no rate for a black one | one entry's `priceKind` |
-| A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | **which window carries ₪4,200 and which ₪3,700** |
+| A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | **which window carries ₪4,200 and which ₪3,800** (was 3,700 until the panel it forces was folded into it, 30.8) |
 | A14 | The reeded and ogee panel mouldings cost the same — he priced "two panels" once and named no families | two numbers, and possibly one whole family |
 | A15 | ~~The tight band is not buildable~~ — **settled 27.8**: it is a toggle | — |
 | A16 | The merged חריגה tile is drawn at 1025 × 2250 — the MIDPOINT of the `wide` and `tall` it replaces. Its leaf aspect is 0.4205 against the corpus median 0.415, closer than either | two numbers in `SIZES`; no price moves |
@@ -1574,13 +1595,19 @@ complete and its findings live here:
   bug it was written for by a wide margin; what it does not do is separate
   correct from correct.
 
-- **A PHOTOGRAPH OF THE פעמון, AND WHERE PERETZ FITS IT.** It is the one
-  fitting in the range drawn without one — 65 mm from a published product
-  spec, the round bezel and raised button conventional, standing on the hinge
-  stile because that is the band of leaf nothing else can reach. Four places
-  were looked at and all came back empty; the list is in `renderer.js` beside
-  `bellPush`. `ASK-PERETZ.md` §0f asks for the picture and for the position,
-  and the position is the answer that matters more.
+- **✅ ANSWERED 30.8.2026 — THE פעמון'S PHOTOGRAPHS ARRIVED, AND BOTH HALVES OF
+  THE GUESS WERE WRONG.** This entry asked for a picture and for the position,
+  and said the position was the answer that mattered more. It was: three
+  installed doors came from the owner and every one carries a RING KNOCKER on
+  the leaf's CENTRE LINE with the peephole directly above it — not a round
+  bell push, and not on the hinge stile. `bellPush` → `bellKnocker`, 132 mm
+  measured at 0.13–0.14 W off the two square-on shots, `BELL_BACKSET` →
+  `KNOCKER_AFF = 1470`. The unit test that pinned the old placement is
+  restated and now pins both axes. ⚠ **One question survives the answer** and
+  is in `ASK-PERETZ.md` §0a2: the cream door carries a knocker AND a small
+  dark plate, so whether Peretz's ₪300 buys the ring, an electric button, or
+  both as separate options is still open. The drawing shows what the
+  photographs show.
 
 - **A DARK-PAINTED OGEE DOOR, to confirm the section that eleven doors use.**
   `MOULDS.ogee` stands on **one** photograph — d050 — and d050 is near-white,
@@ -3085,6 +3112,11 @@ how it got there. Detail lives in the section it belongs to.
   He gave `greek set 2700`, `square 3700`, `square with greek 4700`, which look
   like three products and are two: 3700 + 1000 = 4700, so the set costs ₪1,000
   on a door already paying for its glass and ₪2,700 on one that is not.
+  ⚠ **THE SPLIT MOVED ON 30.8 AND HIS 4,700 DID NOT.** The square window is
+  ₪3,800 now — it absorbed the bottom panel it forces — so the set's glazed
+  supplement came down to ₪900 and the sum is still exactly his figure. The
+  reasoning in this entry is intact; only the two numbers either side of the
+  plus sign changed. Do not quote the 3700/1000 pair as current.
   ⚠ The first draft of the plan made "square with greek" a third WINDOW id.
   That would have added to a public wire format for a door the catalogue can
   already express, and let a customer build the same physical door two ways at
