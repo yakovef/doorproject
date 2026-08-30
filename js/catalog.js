@@ -127,24 +127,140 @@ export const REBATE = 50;
  * what `VERSION` is for and why it moves in the same commit. The `?s=` form
  * is not an index, and links carrying `s=narrow` are already in the wild.
  */
+/**
+ * ⚠ SIX SIZES, TWO FAMILIES, THREE BANDS EACH — 30.8.2026, ON THE OWNER'S
+ * INSTRUCTION, AND IT OVERTURNS AN ARGUMENT THAT WAS WRITTEN RIGHT HERE.
+ *
+ * What stood here said, in as many words, that a price band and a structure
+ * are different things and that `wide` and `tall` must NOT be merged: *"a
+ * customer with a 220 cm opening and one with a 115 cm opening pay the same
+ * surcharge and are looking at different things."* That is still true, and the
+ * owner has decided the other way:
+ *
+ *   > *"for a normal door there are 3 sizes, the standard, the first extra or
+ *   > 'חריגה' plus 25% to the whole price, and then the second extra 'חריגה
+ *   > שנייה' plus 50%. the same thing with the דו כנפי, but the דו כנפי is
+ *   > priced 2x the price of a normal door, and if there is a חריגה, its +25%
+ *   > from the price of the whole דו כנפי. delete the wide and tall and just
+ *   > put them under extra 1 and extra 2, do the same categories to the דו
+ *   > כנפי."*
+ *
+ * ⚠ AND IT IS THE READING THAT MAKES PERETZ'S SIX FIGURES SIX TILES. He gave
+ * 3,195 / 3,995 / 4,795 / 6,390 / 7,990 / 9,585 on 26–30.8, and until today the
+ * last two landed on nothing — the catalogue had one multi-leaf size, so two of
+ * his prices were arithmetic in a comment. The grid he actually sells is
+ * two families times three bands, and now so is this table:
+ *
+ *              standard      חריגה +25%     חריגה שנייה +50%
+ *   single       x1             x1.25            x1.5
+ *   דו כנפי      x2             x2.5             x3
+ *
+ * The double's bands are the single's multiplied by two, which is exactly what
+ * he said: the דו כנפי is 2x a normal door, and a חריגה is +25% of the whole
+ * דו כנפי.
+ *
+ * ⚠ WHAT MERGING COSTS, STATED RATHER THAN GLOSSED. A customer with a wide
+ * opening and one with a tall opening now tap the same tile and see the same
+ * drawing, and one of them is looking at a door that is not the shape of
+ * theirs. That was the objection, it has not gone away, and it is the owner's
+ * call to spend it — he is matching the page to the three names his father
+ * actually quotes, which is worth more than a picture that is right for half
+ * the band.
+ *
+ * ⚠ SO WHAT IS THE MERGED DOOR DRAWN AS? The MIDPOINT of the two it replaces,
+ * which is the one choice here that is derived rather than picked: `wide` was
+ * 1100 x 2100 and `tall` was 950 x 2400, so חריגה is 1025 x 2250. That is not
+ * only the honest middle of the band — its LEAF comes out 925 x 2200, an aspect
+ * of **0.4205 against the corpus median of 0.415**, closer to a real door than
+ * either of the two tiles it replaces (0.488 and 0.362). Assumption A16.
+ *
+ * ⚠ AND THE FIXED LEAF STAYS 400 mm ON ALL THREE DOUBLES, which is a reading
+ * and was the other way round for an hour. A דו כנפי with an oversize opening
+ * could take the extra width in the main leaf, in the fixed one, or in both;
+ * nobody has said. It went in as proportional — 400 x 1025/950 and
+ * 400 x 1200/950 — on the grounds that the whole door getting bigger is what
+ * חריגה means.
+ *
+ * It is a constant now, for a product reason and a measured one, in that order.
+ * The product reason: a narrow FIXED leaf is a standard part a joiner makes to
+ * a standard width, and the thing the customer is buying when they choose a
+ * חריגה is a bigger door to walk through — so the extra belongs in the leaf
+ * that opens. The measured one: `npm run audit` failed on the proportional
+ * version. The grip controls stand in the wall beside the door, and the widest
+ * double left **71 px** of wall at 390 px where the bar needs 76 (56 plus its
+ * own 20 px inset), so it came out 51 and tripped the check that exists to
+ * stop a control becoming a sliver. Holding the fixed leaf at 400 gives the
+ * wall back and the bar measures 61.
+ *
+ * ⚠ THAT ORDER MATTERS AND IS WRITTEN DOWN ON PURPOSE. Choosing product
+ * geometry to satisfy a control would be the wrong way round; what happened is
+ * that two readings were equally available, the audit ruled one of them out,
+ * and the survivor is the one with the better product argument anyway.
+ * Assumption A17, and `ASK-PERETZ.md` asks him.
+ *
+ * ⚠ THE SCENE GETS WIDER AND THE DOOR DOES NOT GET SMALLER, which had to be
+ * checked rather than hoped. `SCENE_MAX` is derived from this table, so the
+ * widest door sets `STAGE_BOX.w` — 1578 -> 1933. It costs the drawing nothing
+ * because **the crop is HEIGHT-driven at every viewport this app has** (§3:
+ * scene aspect 0.68 against a stage of 1.0 to 1.95), and the scene's HEIGHT is
+ * unchanged: `extra2` is the old `xl`, so `leafH` is still 2350. The widest
+ * door goes from 79.8% of the scene's width to 81.6%, which is also why the
+ * photographed sconces still clear it.
+ *
+ * ⚠ EVERY INDEX AFTER `standard` MOVES, SO `VERSION` MOVES. `encodeCode` packs
+ * the INDEX of this object. `wide`, `tall` and `xl` leave it, three entries
+ * arrive, and a v20 code read under v21 would be a different door at a
+ * different price in silence. The `?s=` form is not an index and keeps working
+ * through `SIZE_ALIAS` below.
+ */
+/**
+ * ⚠ `narrow` AND `sidelight` ARE WITHDRAWN, 27.8.2026, and both on the owner's
+ * word rather than on a measurement.
+ *
+ *   `narrow`     — *"remove the narrow door option, it is very rare my dad
+ *                  said."* It was 800 mm against the standard 950 at the same
+ *                  price, so it bought a customer nothing but a decision.
+ *
+ *   `sidelight`  — *"remove the double door with window, that is just an
+ *                  option if you choose a double door and then a window."*
+ *                  He is describing the product correctly: a דו כנפי with a
+ *                  window in it IS this, reached by two choices the customer
+ *                  already has, and the catalogue was selling the combination
+ *                  a third time as its own size.
+ */
 export const SIZES = {
-  standard: { id: 'standard', he: 'סטנדרטית',  en: 'Standard', ru: 'Стандартная',      w: 950,  h: 2100, mult: 1,
-              band: { he: 'עד 98 × 203 ס״מ', en: 'up to 98 × 203 cm', ru: 'до 98 × 203 см' } },
-  wide:     { id: 'wide',     he: 'רחבה',       en: 'Wide', ru: 'Широкая',          w: 1100, h: 2100, mult: 1.25,
-              band: { he: 'עד 120 × 240 ס״מ', en: 'up to 120 × 240 cm', ru: 'до 120 × 240 см' } },
-  tall:     { id: 'tall',     he: 'גבוהה',      en: 'Tall', ru: 'Высокая',          w: 950,  h: 2400, mult: 1.25,
-              band: { he: 'עד 120 × 240 ס״מ', en: 'up to 120 × 240 cm', ru: 'до 120 × 240 см' } },
-  half:     { id: 'half',     he: 'דלת וחצי',   en: 'Leaf and half', ru: 'Полуторная', w: 950,  h: 2100, side: 400, mult: 2,
-              band: { he: 'שתי כנפיים', en: 'Two leaves', ru: 'Две створки' } },
-  /* ⚠ APPENDED, AND THAT IS WHY IT IS LAST. Peretz's "double extra
-     (door>120x240)" at +50%. `encodeCode` packs the INDEX of this list, so a
-     new entry at the END leaves every existing index where it was and costs no
-     `VERSION` bump; inserting it in size order — between `tall` and `half`,
-     where it belongs visually — would have moved `half` and `sidelight` by one
-     and quietly repointed every code ever written. The choices panel can
-     order tiles however it likes; this list is a wire format. */
-  xl: { id: 'xl', he: 'רחבה וגבוהה', en: 'Extra large', ru: 'Широкая и высокая', w: 1200, h: 2400, mult: 1.5,
-        band: { he: 'מעל 120 × 240 ס״מ', en: 'over 120 × 240 cm', ru: 'свыше 120 × 240 см' } },
+  standard:   { id: 'standard', he: 'סטנדרטית', en: 'Standard', ru: 'Стандартная',
+                w: 950, h: 2100, mult: 1,
+                band: { he: 'עד 98 × 203 ס״מ', en: 'up to 98 × 203 cm', ru: 'до 98 × 203 см' } },
+  extra1:     { id: 'extra1', he: 'חריגה', en: 'Oversize', ru: 'Увеличенная',
+                w: 1025, h: 2250, mult: 1.25,
+                band: { he: 'עד 120 × 240 ס״מ', en: 'up to 120 × 240 cm', ru: 'до 120 × 240 см' } },
+  extra2:     { id: 'extra2', he: 'חריגה שנייה', en: 'Second oversize', ru: 'Вторая увеличенная',
+                w: 1200, h: 2400, mult: 1.5,
+                band: { he: 'מעל 120 × 240 ס״מ', en: 'over 120 × 240 cm', ru: 'свыше 120 × 240 см' } },
+  /* ⚠ THE ID STAYS `half` THOUGH THE NAME IS NOW דו כנפי. An id is a public
+     wire format and a display name is not (CLAUDE.md §1) — links and codes in
+     customers' WhatsApp histories carry `s=half`, and renaming it to buy a
+     tidier key would break every one of them for nothing.
+     ⚠ AND THE NAME AND THE DRAWING DO NOT QUITE AGREE, which is written down
+     rather than papered over: Peretz and the owner both say דו כנפי, and what
+     this table draws is a main leaf with a 400 mm FIXED leaf beside it — a
+     דלת וחצי. If his דו כנפי is two EQUAL leaves then the drawing is wrong,
+     not just the label, and that is a bigger fix than a string.
+     `ASK-PERETZ.md` §0h asks him. */
+  half:       { id: 'half', he: 'דו כנפי', en: 'Double', ru: 'Двустворчатая',
+                w: 950, h: 2100, side: 400, mult: 2,
+                band: { he: 'שתי כנפיים', en: 'Two leaves', ru: 'Две створки' } },
+  halfextra1: { id: 'halfextra1', he: 'דו כנפי — חריגה', en: 'Double, oversize',
+                ru: 'Двустворчатая, увеличенная',
+                w: 1025, h: 2250, side: 400, mult: 2.5,
+                band: { he: 'שתי כנפיים, פתח חריג', en: 'Two leaves, oversize opening',
+                        ru: 'Две створки, увеличенный проём' } },
+  halfextra2: { id: 'halfextra2', he: 'דו כנפי — חריגה שנייה', en: 'Double, second oversize',
+                ru: 'Двустворчатая, вторая увеличенная',
+                w: 1200, h: 2400, side: 400, mult: 3,
+                band: { he: 'שתי כנפיים, פתח חריג מאוד', en: 'Two leaves, very large opening',
+                        ru: 'Две створки, очень большой проём' } },
 };
 
 /**
@@ -156,11 +272,21 @@ export const SIZES = {
  * the customer keeps the window they chose beside it, which is the other half
  * of the product.
  *
+ * ⚠ `wide`, `tall` AND `xl` JOIN THEM ON 30.8.2026, and these three are exact
+ * rather than approximate: `wide` and `tall` were both the +25% band and are
+ * now both `extra1`, and `xl` was the +50% band and is now `extra2`. A link
+ * carrying any of the three opens a door at **the same price it always was**.
+ * The picture moves for `wide` and `tall` — that is what merging them means —
+ * and the money does not.
+ *
  * ⚠ NOT AN `aliases` ARRAY, because `SIZES` is a plain OBJECT and `byId` only
  * walks lists. Kept as its own map rather than bolted onto the entries so the
  * lookup cannot accidentally resolve a live id to itself.
  */
-export const SIZE_ALIAS = { narrow: 'standard', sidelight: 'half' };
+export const SIZE_ALIAS = {
+  narrow: 'standard', sidelight: 'half',
+  wide: 'extra1', tall: 'extra1', xl: 'extra2',
+};
 
 /**
  * Colours — the manufacturer's own catalogue, sampled from the Rav Bariach

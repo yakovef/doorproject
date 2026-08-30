@@ -270,7 +270,7 @@ group('short code round-trip');
     const A = ALPHABET_TEST;
     let bad = 0, tried = 0;
     for (const st of [base,
-                      { ...base, colour: 'rb-9016d', size: 'wide', detail: 'panel' },
+                      { ...base, colour: 'rb-9016d', size: 'extra1', detail: 'panel' },
                       { ...base, handle: 'none', lockset: 'digital', window: 'tallwin' }]) {
       const body = encodeCode(st).slice(3);
       for (let i = 0; i < body.length; i++) for (const ch of A) {
@@ -387,9 +387,9 @@ for (const st of everyState()) {
 
   /* A code read down the telephone is typed as ?d=, which PLAN.md §3.2
      documents and which used to land on the DETAIL axis. */
-  const spoken = encodeCode({ ...base, colour: 'rb-9005d', size: 'wide' });
+  const spoken = encodeCode({ ...base, colour: 'rb-9005d', size: 'extra1' });
   ok(fromQuery(`?d=${spoken}`).state.colour === 'rb-9005d'
-  && fromQuery(`?d=${spoken}`).state.size === 'wide',
+  && fromQuery(`?d=${spoken}`).state.size === 'extra1',
      `?d=${spoken} did not open the door that code names`);
   ok(fromQuery('?d=panel').state.detail === 'panel',
      '?d= stopped working as the detail axis, which is what it mostly is');
@@ -535,7 +535,7 @@ group('a pull bar is a length');
      so `handleLength` shortens it to 180 and the price follows, correctly.
      Asserting the rate on a door that clamps would have been asserting the
      clamp twice and the rate never. */
-  const big = { size: 'xl' };
+  const big = { size: 'extra2' };
   const bare = P({ ...big, handle: 'none' });
   for (const [len, add] of [[600, 500], [800, 500], [1000, 500], [1200, 650],
                             [1400, 800], [1600, 950], [1800, 1100], [2000, 1250]]) {
@@ -641,23 +641,39 @@ group('price');
      refuses the other implementation, now in the other direction. A test that
      passes under both the right implementation and the wrong one is not a
      test, and that was the point of the line this replaces. */
+  /* ⚠ SIX FIGURES, SIX TILES, AND UNTIL 30.8 TWO OF THEM WERE A COMMENT. The
+     catalogue had one multi-leaf size, so his 7,990 and 9,585 were asserted
+     here as bare arithmetic with a note that no door reached them. The owner
+     replaced the size list with the grid he actually sells — two families of
+     three bands — and every one of Peretz's prices is now a door a customer
+     can tap. */
   const PERETZ_BANDS = [
-    ['standard', 3195, 'x1'],
-    ['wide',     3995, 'x1.25 — his "the all its all +25%"'],
-    ['tall',     3995, 'x1.25 — the same band, a different door'],
-    ['xl',       4795, 'x1.5 — his "the second extra +50%"'],
-    ['half',     6390, 'x2 — his "du kanfi (double) x2"'],
+    ['standard',   3195, 'x1'],
+    ['extra1',     3995, 'x1.25 — his "the all its all +25%", חריגה'],
+    ['extra2',     4795, 'x1.5 — his "the second extra +50%", חריגה שנייה'],
+    ['half',       6390, 'x2 — his "du kanfi (double) x2"'],
+    ['halfextra1', 7990, 'x2.5 — a חריגה on the whole דו כנפי'],
+    ['halfextra2', 9585, 'x3 — a חריגה שנייה on the whole דו כנפי'],
   ];
   for (const [size, want, why] of PERETZ_BANDS) {
     ok(P({ handle: 'none', size }) === want,
        `${size} with nothing on it must be exactly ₪${want} (${why}), got ${P({ handle: 'none', size })}`);
   }
-  /* The two bands he priced that have no tile: one multi-leaf size exists, not
-     three. They are asserted as ARITHMETIC rather than as doors, because six
-     figures agreeing is what establishes the rule and four would not.
-     `ASK-PERETZ.md` asks whether he sells a wide or a tall double. */
-  ok(Math.ceil(3195 * 2.5 / 5) * 5 === 7990, 'a double at +25% is his ₪7,990');
-  ok(Math.ceil(3195 * 3 / 5) * 5 === 9585, 'a double at +50% is his ₪9,585');
+  /* ⚠ AND THE LIST MUST BE EXACTLY THESE SIX. A seventh size added without a
+     price from Peretz would pass every assertion above by simply not being in
+     the loop, which is how a band nobody quoted reaches a customer. */
+  ok(Object.keys(SIZES).length === PERETZ_BANDS.length
+     && PERETZ_BANDS.every(([id]) => SIZES[id]),
+     `the size list must be exactly the ${PERETZ_BANDS.length} bands Peretz priced, `
+     + `found ${Object.keys(SIZES).join('/')}`);
+  /* ⚠ THE DOUBLE IS THE SINGLE TIMES TWO, BAND FOR BAND — his rule stated as a
+     relationship rather than as six separate numbers, so it survives a reprice
+     of the base. */
+  for (const [one, two] of [['standard', 'half'], ['extra1', 'halfextra1'],
+                            ['extra2', 'halfextra2']]) {
+    ok(SIZES[two].mult === SIZES[one].mult * 2,
+       `${two} must be exactly twice ${one} — "the דו כנפי is 2x the price of a normal door"`);
+  }
   /* The refusal, inverted. Scaling only the door and the mashkof — the rule
      that stood until 30.8 — gives ₪3,645 at this band, and must not be what
      comes out. */
@@ -693,7 +709,38 @@ group('price');
   // A link shared before the chart replaced the list must still open a door.
   ok(P({ colour: 'ral-9005' }) === P({ colour: 'rb-9005d' }), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
-  ok(P({ size: 'wide' }) === 4645, 'wide band');
+  ok(P({ size: 'extra1' }) === 4645, 'the חריגה band, with the fixture\'s Idan bar on it');
+  /* ⚠ AND THE THREE WITHDRAWN IDS MUST LAND ON THE BAND THEY WERE ALREADY IN,
+     AT THE PRICE THEY ALREADY HAD. `wide` and `tall` were both +25% and are
+     both `extra1`; `xl` was +50% and is `extra2`. A link in somebody's WhatsApp
+     history must open the same door at the same money — the PICTURE moves for
+     the first two, which is what merging them means, and the price does not.
+
+     ⚠ ASSERTED THROUGH `fromQuery`, WHICH IS THE ONLY PATH THAT EXISTS. The
+     first version of this handed `priceParts` a raw `{ size: 'wide' }` and
+     expected the alias to apply. It does not: `SIZE_ALIAS` is resolved once,
+     in `take()`, and `priceParts` falls back to `standard` for an id it does
+     not know. That is the right shape — one place resolves the alias, not two
+     (§5.10) — and it means a stale id can only ever arrive as a LINK. It
+     cannot arrive from a saved design either: those store the QUERY string
+     precisely so that a catalogue change is survived with a notice rather than
+     silently, which is the comment above `saveCurrent` earning its keep. */
+  for (const [old, now] of [['wide', 'extra1'], ['tall', 'extra1'], ['xl', 'extra2']]) {
+    const r = fromQuery(`?v=${VERSION}&s=${old}`);
+    ok(r.state.size === now, `a link carrying s=${old} must open ${now}, got ${r.state.size}`);
+    ok(P({ size: r.state.size }) === P({ size: now }),
+       `s=${old} must price as ${now}: ${P({ size: r.state.size })} vs ${P({ size: now })}`);
+  }
+  /* And the price those links land on is the price they always had: `wide` was
+     ₪4,645 with this fixture's Idan bar on it before the merge, and it is
+     ₪4,645 after. */
+  ok(fromQuery(`?v=${VERSION}&s=wide`).state.size === 'extra1'
+     && P({ size: 'extra1' }) === 4645,
+     'a link written for the old רחבה must still cost ₪4,645');
+  /* ⚠ AND AN ID THAT IS NEITHER LIVE NOR ALIASED MUST STILL SAY SO. Silently
+     substituting is the worst failure this site can produce (§0). */
+  ok(fromQuery(`?v=${VERSION}&s=notasize`).notice === 'option-unknown',
+     'an unknown size must raise a notice, never a silent standard door');
   /* ⚠ ₪3,700 FOR A WINDOW, WHICH IS MORE THAN THE DOOR. Peretz, 26.8.2026.
      Every window price in this file was invented at around ₪600 and every one
      was out by a factor of six. Glass in an armoured leaf is a different
@@ -2168,9 +2215,21 @@ group('the doorbell and the peephole');
      That is the whole reason `VERSION` moved, so it is asserted rather than
      assumed. Built by hand from the v19 layout: same alphabet, one version
      short. */
-  ok(VERSION === 20, `VERSION must be 20 for the bell and the peephole, got ${VERSION}`);
-  ok(decodeCode('DM-K400040000') === null,
-     'a version-19 code must be refused outright, never decoded under the new layout');
+  /* ⚠ WRITTEN SO IT CANNOT GO STALE, AND THE FIRST VERSION OF IT DID — one
+     round after this file added a paragraph about numbers in prose going
+     stale, this line read `VERSION === 20` and went red the next time the
+     layout moved, about nothing that had broken. What it is FOR is that a code
+     from an older layout must never decode; the number is incidental.
+     The version rides in the first five bits, which is exactly the first
+     character of the body, so a stale code is built from the alphabet rather
+     than typed. */
+  for (const older of [VERSION - 1, VERSION - 2, VERSION - 3]) {
+    const stale = 'DM-' + ALPHABET_TEST[older] + encodeCode(DEFAULTS).slice(4);
+    ok(decodeCode(stale) === null,
+       `a version-${older} code (${stale}) must be refused, never re-read under the new layout`);
+  }
+  ok(decodeCode(encodeCode(DEFAULTS)) !== null,
+     'and the version the app writes today must still decode');
 
   /* ── the parameters, which are NEW and must stay new ── */
   /* `a=` and `f=` are retired FOREVER (CLAUDE.md §1) and the five add-on ids

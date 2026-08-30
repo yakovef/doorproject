@@ -44,6 +44,25 @@ const ALLOWED = new Set([
   'lockset|lock', 'lock|lockset',
 ]);
 
+/* ⚠ THE SIZES THIS SWEEP VISITS, AND AN ASSERTION THAT THEY EXIST. The list
+   below is a deliberate SUBSET of `SIZES` — the tight cases and the widest,
+   not all six — so it cannot simply be derived. What it can be is checked:
+   `SIZES[undefined]` falls back to `standard` in the renderer, so an id that
+   stops existing makes this tool sweep the same door twice and report a clean
+   run over designs it never rendered. That is exactly what happened between
+   27.8 and 30.8, silently, twice over (`narrow` then `wide`).
+   §5.15: when a check locates its subject by a name, assert the name found
+   something. */
+const SWEEP_SIZES = ['standard', 'extra1', 'extra2', 'half', 'halfextra2'];
+{
+  const missing = SWEEP_SIZES.filter(id => !SIZES[id]);
+  if (missing.length) {
+    console.error(`\n  ✗ collide sweeps sizes that no longer exist: ${missing.join(', ')}`);
+    console.error('    Every one of them would have rendered as `standard` and passed.');
+    process.exit(1);
+  }
+}
+
 await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
@@ -56,9 +75,20 @@ const cases = [];
    those are the tight cases — and the tight cases are not the only ones. A
    grip that cannot stand upright is laid down instead, and a WIDE leaf is
    precisely where one fits: an Ella bar laid across a wide door came to rest
-   touching the cylinder escutcheon, on a size this loop did not visit. */
+   touching the cylinder escutcheon, on a size this loop did not visit.
+   ⚠ AND THE LIST WENT STALE ON 30.8.2026 WITHOUT FAILING. It read
+   `['standard', 'narrow', 'wide']` — and `narrow` was withdrawn on 27.8 and
+   `wide` on 30.8. `SIZES[undefined]` falls back to `standard` in the renderer,
+   so the sweep quietly ran the SAME door three times and reported 1,012
+   designs clean about 337 distinct ones. A hard-coded list of ids inside a
+   tool that sweeps a catalogue is §5.18's shape exactly — "a second statement
+   of what the range contains, inside the tool that measures the range" — and
+   it is spelled out rather than derived here only because the sweep is
+   deliberately a SUBSET: the tight cases plus the widest, not all six. The
+   subset is now standard, both single חריגות, the דו כנפי and its widest
+   band, which is the extremes of both families. */
 for (const h of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
-  for (const sz of ['standard', 'narrow', 'wide']) for (const hd of ['right-in', 'left-in']) {
+  for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in']) {
     const st = {
       colour: 'rb-0097d', window: w.id, grille: 'none',
       handle: h.id, lockset: k.id, detail: 'plain',
@@ -79,7 +109,7 @@ if (deep) {
      success exactly as loudly as one that works. */
   let added = 0;
   for (const d of DETAILS) for (const w of WINDOWS)
-    for (const sz of ['standard', 'narrow', 'wide']) for (const hd of ['right-in', 'left-in']) {
+    for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in']) {
       const st = {
         colour: 'rb-0097d', window: w.id, grille: 'none',
         handle: 'idan', lockset: 'cylinder', detail: d.id,

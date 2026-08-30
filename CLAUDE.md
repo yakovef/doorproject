@@ -285,7 +285,7 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **3,617,766 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+- `npm test` — **4,349,367 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
   ANYTHING; it is the product of the catalogue's list lengths. Read the failure
   count. (This line said **5,403,239** for two rounds after the stripe rework
   cut fourteen `DETAILS` entries — a number in prose describing a thing that
@@ -406,7 +406,7 @@ copied here. `git show origin/claude/app-design-mockup-review-qt00n6:<file>`.
   nearest real one.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   the option ORDER or the bit layout requires a `VERSION` bump in
-  `js/url-state.js` (**20** as of 30.8), so an old code is *refused with a
+  `js/url-state.js` (**21** as of 30.8), so an old code is *refused with a
   notice* rather than decoded into a different door. **Appending to the end of
   a list costs no bump. Changing a property — not the id, not the order —
   costs no bump.**
@@ -925,6 +925,10 @@ them. It cost nothing in the wire format for the same reason the reorder below
 did, and `npm run audit` now asserts the WHOLE sequence off the rendered
 navigator — which nothing in this repository was doing before.
 
+⚠ **AND THE SIZE LIST IS SIX ROWS IN TWO FAMILIES SINCE 30.8.2026** — three
+bands on a single door and the same three on a דו כנפי, replacing רחבה and
+גבוהה with one חריגה. See §0b and `SIZES`.
+
 ⚠ **מבנה הדלת is section 01 and used to be 04.** It is the thing a customer has
 an opinion about before arriving and the thing that changes the drawing most.
 The reorder cost nothing in the wire format — section keys appear in the DOM as
@@ -1256,7 +1260,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
 | `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
-| `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop |
+| `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
 | `npm run fuzz` | random combinations, then click-walks in a real browser |
 | `npm run profile` | the leaf's VERTICAL fall, against the medians `FALLOFF` was fitted to |
@@ -1287,7 +1291,7 @@ empty list cannot be noticed by reading, only by trying to obey it.
 | # | assertion | protects |
 |---|---|---|
 | T1 | Sum of the breakdown rows === the displayed total, every buildable design | a breakdown that does not add up |
-| T2 | The standard door with nothing on it is exactly ₪3,195, and all five size bands match Peretz's own figures | the one number Peretz will check |
+| T2 | The standard door with nothing on it is exactly ₪3,195, and **all six** size bands match Peretz's own figures — and the list is exactly those six, so a seventh cannot slip past by not being in the loop | the one number Peretz will check |
 | T3 | `leafW`/`leafH` identical across all four mashkofs, every size | the fault reported on the classical set |
 | T4 | For every grip × pirzul pair, the lever's fill carries the PIRZUL tone | the existing test asserted the MIRROR of this and would have agreed with the bug |
 | T5 | Every retired id resolves to a buildable door, including the stripe → (dir, count) migration | fourteen `d=` ids already in links customers have sent |
@@ -1477,6 +1481,14 @@ the same list in Hebrew, shorter, for him to answer.
 | A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | **which window carries ₪4,200 and which ₪3,700** |
 | A14 | The reeded and ogee panel mouldings cost the same — he priced "two panels" once and named no families | two numbers, and possibly one whole family |
 | A15 | ~~The tight band is not buildable~~ — **settled 27.8**: it is a toggle | — |
+| A16 | The merged חריגה tile is drawn at 1025 × 2250 — the MIDPOINT of the `wide` and `tall` it replaces. Its leaf aspect is 0.4205 against the corpus median 0.415, closer than either | two numbers in `SIZES`; no price moves |
+| A17 | A דו כנפי's fixed leaf is 400 mm on all three bands — the extra width goes into the leaf that OPENS, because a narrow fixed leaf is a standard part | two numbers in `SIZES`; no price moves |
+| A18 | Peretz's דו כנפי is our דלת וחצי — a main leaf with a narrow FIXED leaf beside it, not two equal leaves | **the drawing, not a label**, on three of the six sizes |
+
+⚠ **A18 is new and it is not a number.** Every other row here is one edit;
+that one is the DRAWING on half the size list. Peretz says דו כנפי and the
+owner says דלת וחצי for the same tile, and the two are different products — an
+equal pair against a main-plus-fixed pair. One photograph settles it.
 
 ⚠ **A2, A7 and A13 are the three worth asking first.** A2 changes every drawn
 dimension in the range; A7 decides whether two fittings appear on every door;
@@ -1817,6 +1829,118 @@ how it got there. Detail lives in the section it belongs to.
   either side of a slash have no reading order a customer can trust — in an RTL
   column the eye takes the left one first, so it read as step eight of three.
   It says `שלב 3 מתוך 8` in words now, in all three languages.
+- **⚠ SIX SIZES, TWO FAMILIES, AND AN ARGUMENT IN `catalog.js` OVERTURNED BY
+  THE OWNER.** He set the structure out plainly: three bands on a single door —
+  סטנדרטית, חריגה (+25%), חריגה שנייה (+50%) — and the same three on a
+  דו כנפי, which is 2× a normal door with its own חריגה at +25% *of the whole
+  דו כנפי*. `wide` and `tall` are deleted and merged into one חריגה; `xl`
+  becomes חריגה שנייה; three double bands arrive.
+
+  |  | standard | חריגה +25% | חריגה שנייה +50% |
+  |---|---|---|---|
+  | single | ×1 — 3,195 | ×1.25 — 3,995 | ×1.5 — 4,795 |
+  | דו כנפי | ×2 — 6,390 | ×2.5 — 7,990 | ×3 — 9,585 |
+
+  ⚠ **THIS IS WHAT MAKES SIX OF PERETZ'S FIGURES SIX TILES.** Until today the
+  catalogue had ONE multi-leaf size, so 7,990 and 9,585 were asserted in
+  `npm test` as bare arithmetic with a note that no door reached them. Every
+  price he has ever given now has a door a customer can tap.
+
+  ⚠ **AND THE MERGE COSTS SOMETHING THAT WAS WRITTEN DOWN AS A REASON NOT TO.**
+  `catalog.js` argued, in that spot, that *"a customer with a 220 cm opening
+  and one with a 115 cm opening pay the same surcharge and are looking at
+  different things"*. Still true. The owner has spent it deliberately, to match
+  the page to the three names his father quotes, and the note now records the
+  trade rather than the refusal.
+
+  **The merged tile is the MIDPOINT of the two it replaces** — `wide` 1100×2100
+  and `tall` 950×2400 give 1025×2250 — which is the one dimension here that is
+  derived rather than picked, and its LEAF lands at aspect **0.4205 against the
+  corpus median 0.415**, closer to a real door than either tile it replaces
+  (0.488 and 0.362). A16.
+
+  ⚠ **THE SCENE GOT 22% WIDER AND THE STANDARD DOOR DID NOT MOVE A PIXEL.**
+  `SCENE_MAX` is derived from `SIZES`, so the widest door sets `STAGE_BOX.w`:
+  1578 → 1933. It costs the drawing nothing because the crop is HEIGHT-driven
+  at every viewport this app has (§3 — scene aspect 0.68 against a stage of 1.0
+  to 1.95) and the scene's HEIGHT is unchanged, `extra2` being the old `xl`.
+  **Measured rather than argued**: the standard door at 1920×918 is 234×563 px
+  before and after, to the pixel. The widest door's clearance from the
+  photographed sconces goes 54 → 30 px at its worst viewport (390) and stays
+  positive at all seven.
+
+  ⚠ **`VERSION` 20 → 21.** Three ids leave the size list and four arrive, so
+  every index after `standard` means something else. `SIZE_ALIAS` carries
+  `wide` and `tall` → `extra1` and `xl` → `extra2`, so a LINK opens the same
+  band at the same money — the picture moves for the first two, which is what
+  merging them means, and the price does not.
+
+  ⚠ **AND 38 BARE SHEETS MOVED, WHICH IS THE RIGHT ANSWER AND HAD TO BE
+  ESTABLISHED RATHER THAN ASSUMED.** All ten corpus doors are `standard` and
+  none of them changed size, so at first sight nothing should have shifted.
+  What shifted is `MID_X`: the scene is centred on the widest door, so it went
+  789 → 966.5 and every coordinate in every drawing moved with it. The DOOR is
+  framed identically — its tight `viewBox` is the same 1378 × 2802 and its x
+  moved by exactly 177.5, the same figure — so what changed inside the frame is
+  the ROOM, whose vignette and light pool are painted from `STAGE_BOX` and are
+  now spread over a wider rectangle. A wider room lights the door slightly
+  differently. `npm run mottle` and `npm run profile` are the instruments that
+  watch exactly that and both were re-run.
+
+  ⚠ **AND THE MERGED חריגה IS NARROWER THAN THE רחבה IT REPLACES, WHICH COST A
+  ROTATION.** 925 mm of leaf against 1000, because the midpoint of a wide door
+  and a tall one is narrower than the wide one. Swept: `barblack` alone turns
+  on חריגה now, where `ron` and `barblack` both turned on רחבה. `ella`,
+  `nitzan`, `ron` and `barblack` all turn on חריגה שנייה. Nothing turns on a
+  standard door or a plain דו כנפי, which has been true since the Shiran went.
+  The audit's drag step was pointed at `s=wide&n=ron` and spent thirty seconds
+  waiting for a button that is now correctly hidden; it names `s=extra2` — the
+  LIVE id, not the alias — because an alias is for a customer's link and a test
+  should say what it means.
+
+  ⚠ **AND THE WIDEST DOUBLE SQUEEZED THE GRIP CONTROLS UNDER THEIR FLOOR,
+  WHICH IS THE AUDIT DOING ITS JOB AND THEN TWO MORE FINDINGS BEHIND IT.**
+  The controls stand in the wall beside the door, and the widest door leaves
+  the least wall. At 390 px the bar came out **51 px** against a 56 floor.
+
+  1. **The fixed leaf went back to 400 mm on all three doubles.** It had gone
+     in proportional (400 → 432 → 505); a narrow FIXED leaf is a standard part
+     and the width a customer buys with a חריגה belongs in the leaf that opens.
+     Two readings were equally available, the audit ruled one out, and the
+     survivor has the better product argument anyway — that ordering is written
+     into `catalog.js` on purpose, because choosing geometry to satisfy a
+     control would be the wrong way round.
+  2. **The breathing room yields before the control does.** Below 1100 the
+     bar's 20 px gap to the casing is 12 and its 8 px inset is 4 — comfort
+     giving way to a tap target, not the reverse. Above 1100 the reserved strip
+     makes both moot and nothing changes.
+  3. ⚠ **AND THE WORST CASE IS AT 360 px, WHICH THE AUDIT DOES NOT VISIT.**
+     Swept over every size at twelve widths: the narrowest wall this catalogue
+     can produce is **72.4 px**, on the widest double at 360×740 — not at any
+     of the eight `VIEWS`. Third time this file has had to go and find the
+     third case.
+
+  ⚠ **AND THE AUDIT'S OWN 56 px FLOOR WAS THE LENIENT ONE.** The bar carries
+  8 px of padding each side, so 56 px of bar is a **40 px button** — under the
+  44 px tap floor enforced everywhere else in the stylesheet. Two statements of
+  one quantity, disagreeing, §5.10 again. The check reads the padding off the
+  element now: `44 + padding`, so the floor follows the design instead of
+  being re-picked. Measured after: the tightest margin in the whole range is
+  **+4 px**, at the widest double on a 360 px phone, with 8 px still clear of
+  the casing.
+  ⚠ And the version of that check that measured the BUTTONS directly was
+  written and thrown away: `#grip-rot` is hidden on a door whose grip cannot
+  turn and `#grip-home` on a door nobody has dragged, so on most states it
+  would have found zero buttons and passed. §5.15, caught before it shipped.
+
+  ⚠ **AND A HARD-CODED SIZE LIST IN `collide.mjs` HAD BEEN STALE FOR THREE
+  DAYS WITHOUT FAILING.** It swept `['standard', 'narrow', 'wide']`; `narrow`
+  went on 27.8 and `wide` today. `SIZES[undefined]` falls back to `standard` in
+  the renderer, so the tool ran the same door three times and reported 1,012
+  designs clean over 337 distinct ones. §5.18's shape — a second statement of
+  what the range contains, inside the tool that measures the range — and it
+  now asserts every id in its subset exists before it starts (§5.15).
+
 - **⚠ A WORK ORDER FROM PERETZ, 30.8.2026 — ELEVEN ITEMS, AND TWO OF HIS LINES
   MEANT SOMETHING OTHER THAN THEY LOOKED LIKE.** He reviewed the app and gave
   notes, with four photographs of installed doors. They are in

@@ -201,7 +201,17 @@ import { repair } from './rules.js';
    The `?...=` query form is not indexed and is unaffected — a link written
    yesterday opens today with no bell and no peephole, which is the door it
    described. */
-export const VERSION = 20;
+/* ⚠ 21: THE SIZE LIST IS SIX ROWS IN TWO FAMILIES, 30.8.2026. `wide`, `tall`
+   and `xl` left it and `extra1`, `extra2`, `halfextra1` and `halfextra2`
+   arrived — the owner's instruction, and the shape Peretz actually quotes:
+   three bands on a single door and the same three on a דו כנפי. `encodeCode`
+   packs the INDEX of `SIZES`, so every index after `standard` means something
+   else now and a v20 code read under this layout would be a different door at
+   a different price, in silence. Refused with a notice instead.
+   The `?s=` form is not indexed and every one of the three withdrawn ids
+   resolves through `SIZE_ALIAS` to the band it was already in, at the price it
+   already had. */
+export const VERSION = 21;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
