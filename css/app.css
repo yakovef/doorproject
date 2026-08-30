@@ -1300,7 +1300,19 @@ svg { direction: ltr; }
    from outside and recorded as not-to-be-re-litigated, and `.btn--wa` in the
    flow already wears it. A customer should not have to learn two shapes for
    the same action, which is the argument the phone bar's own note makes a few
-   rules down. */
+   rules down.
+
+   ⚠ AND THE ONE NUMBER AGAINST IT, MEASURED RATHER THAN LEFT TO BE FOUND:
+   white on `--wa` is **3.05:1**, under the 4.5 normal-size text wants. That is
+   not introduced here — `.btn--wa` in the flow is white on the same green at
+   16 px and has shipped that way — so this inherits an existing exception
+   rather than opening a new one, and the green itself was settled from
+   outside. Two things follow. The label goes from 12.8 px to 14 and stays at
+   600, because if the ratio is fixed the only lever left is size. And it is
+   written down here rather than discovered later: fixing the contrast means
+   fixing `--wa` ITSELF, once, for both buttons — darkening this one alone
+   would put two different greens on one screen for one action, which is worse
+   than the ratio. */
 .quote__send {
   flex: 0 0 auto;
   display: inline-flex; align-items: center; gap: 7px;
@@ -1308,7 +1320,7 @@ svg { direction: ltr; }
   border: 1px solid transparent; border-radius: var(--r-pill, 999px);
   background: var(--wa);
   color: #fff; text-decoration: none;
-  font-size: .84rem; font-weight: 600; white-space: nowrap;
+  font-size: .875rem; font-weight: 600; white-space: nowrap;
   box-shadow: 0 1px 2px rgb(23 23 21 / .18);
 }
 .quote__send:hover { filter: brightness(1.05); }

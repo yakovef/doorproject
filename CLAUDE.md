@@ -1717,7 +1717,12 @@ how it got there. Detail lives in the section it belongs to.
   the one action this site exists to produce. It is solid `--wa` now, which is
   also the green-send-button decision taken from outside and recorded as
   not-to-be-re-litigated; `.btn--wa` in the flow already wore it, and a
-  customer should not learn two shapes for one action.
+  customer should not learn two shapes for one action. ⚠ And the number against
+  it is recorded where the rule is: white on `--wa` measures **3.05:1**, under
+  the 4.5 normal text wants. It is inherited, not introduced — `.btn--wa` has
+  shipped white-on-that-green at 16 px — so the label goes to 14 px, and the
+  note says plainly that fixing it means fixing `--wa` once for both buttons,
+  never darkening one of them into a second green.
   ⚠ **The brand is back and the deleted header is still deleted.** The page
   opened with nothing saying whose business it is — the one thing the 27.8
   deletion did not rehome, because the NAME went to the tab title and the order
