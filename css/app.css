@@ -2746,10 +2746,28 @@ svg { direction: ltr; }
    So the page rests on the truth and `paint()` upgrades it: `is-live` goes on
    `<html>` once there is a real door to send. One direction, and the state
    before JavaScript is the state that is true before JavaScript. */
+/* ⚠ AND A THIRD STATE, FOR A DOOR NOBODY HAS TOUCHED. Two sends are live on
+   arrival and both said "send the door" — so a first-timer could fire off the
+   default as though it were a considered order, and from Peretz's side that
+   is indistinguishable from a real one (`UX-FINDINGS` §5). The send is not
+   removed: it was taken away once and restored on purpose, and the audit
+   asserts a visible send on every step at every viewport. Only the label
+   changes, and the MESSAGE changes with it — `js/share.js` opens with a
+   question rather than "בחרתי דלת".
+
+   ⚠ THE ORDER OF THESE FOUR LINES IS THE WHOLE MECHANISM (§8: a later rule at
+   equal specificity wins). `is-untouched` is written after `is-live`, so on
+   arrival the ask label beats the send label; the moment anything is chosen
+   `paint` drops the class and the send label comes back with no second rule
+   to undo. Both states are still gated on `is-live`, because before the
+   script runs the honest label is neither of them — it is `.wa__off`. */
 .wa__on { display: none; }
 .wa__off { display: inline; }
+.wa__ask { display: none; }
 html.is-live .wa__on { display: inline; }
 html.is-live .wa__off { display: none; }
+html.is-live.is-untouched .wa__on { display: none; }
+html.is-live.is-untouched .wa__ask { display: inline; }
 
 .btn--ghost {
   background: none; color: var(--ink);

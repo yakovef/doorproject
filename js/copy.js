@@ -535,6 +535,19 @@ export const UI = {
   'send.waOff':       ['שלחו לנו הודעה בוואטסאפ', 'Message us on WhatsApp', 'Написать нам в WhatsApp'],
   'send.waOnShort':   ['שלחו בוואטסאפ', 'Send on WhatsApp', 'Отправить в WhatsApp'],
   'send.waOffShort':  ['שלחו הודעה', 'Message us', 'Написать нам'],
+  /* ⚠ A THIRD LABEL, FOR A DOOR NOBODY HAS TOUCHED YET. Two sends are live on
+     arrival and both say "send the door" — so a confused first-timer can fire
+     off the default as though it were a considered order, and from Peretz's
+     side that is indistinguishable from a real one.
+     The send is NOT removed: it was taken away once and put back on purpose,
+     and `npm run audit` asserts a visible send on every step at every
+     viewport. What changes is the label, and the MESSAGE changes with it —
+     `js/share.js` opens with a question instead of "בחרתי דלת". Same channel,
+     honestly named, and both halves move together for the same reason
+     `send.waOff` and `FALLBACK_TEXT` do. */
+  'send.waAsk':       ['יש לי שאלה — דברו איתי בוואטסאפ', 'I have a question — talk to me on WhatsApp',
+                       'У меня вопрос — напишите мне в WhatsApp'],
+  'send.waAskShort':  ['יש לי שאלה', 'I have a question', 'У меня вопрос'],
   'send.copy':        ['העתקת הפרטים', 'Copy the details', 'Скопировать данные'],
   'send.save':        ['שמירת העיצוב', 'Save this design', 'Сохранить дизайн'],
   'send.code':        ['קוד:', 'Code:', 'Код:'],

@@ -311,6 +311,28 @@ export const DEFAULTS = {
   handing: 'right-in',
 };
 
+/**
+ * Has this customer chosen anything at all?
+ *
+ * ⚠ TWO WHATSAPP CONTROLS ARE LIVE ON ARRIVAL, ON A DOOR NOBODY HAS TOUCHED,
+ * and they say "send the door". A confused first-timer can fire off the
+ * default as though it were a considered order — and from Peretz's side that
+ * is indistinguishable from a real one, which is `PLAN.md` §0's failure mode
+ * arriving from the other direction. `UX-FINDINGS` §5.
+ *
+ * ⚠ THE SEND IS NOT REMOVED, AND MUST NOT BE. It was taken away once and put
+ * back on purpose; `npm run audit` asserts a visible send on every step at
+ * every viewport, and deleting one fails that correctly. What changes is the
+ * LABEL and the MESSAGE — the same channel, honestly named.
+ *
+ * ⚠ DERIVED FROM `DEFAULTS`, NEVER FROM A SECOND LIST OF FIELDS. The day a
+ * tenth choice is added, a hand-kept list here would go on calling a door
+ * untouched that somebody had just configured — §5.10 with a long fuse. This
+ * walks the object that IS the definition of "untouched".
+ */
+export const isUntouched = state =>
+  Object.keys(DEFAULTS).every(k => state[k] === DEFAULTS[k]);
+
 // ── Query string ──────────────────────────────────────────────────
 
 export function toQuery(state) {

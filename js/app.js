@@ -47,7 +47,7 @@ import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl, gripI
          gripAddendum, gripDeparture, PHONE_DISPLAY, PHONE_TEL, priceCaveat,
          priceIncludes, sendDoor, whatsappUrl } from './share.js';
 import { counted, L, LANGS, lang, pickLang, setLang, T, withLang } from './copy.js';
-import { DEFAULTS, encodeCode, fromQuery, toQuery } from './url-state.js';
+import { DEFAULTS, encodeCode, fromQuery, isUntouched, toQuery } from './url-state.js';
 import { WORKS } from './works.js';
 
 const $ = sel => document.querySelector(sel);
@@ -2421,6 +2421,15 @@ function paint() {
      than at boot: what licenses the sentence is the href on the line above,
      not the fact that a script ran. */
   document.documentElement.classList.add('is-live');
+  /* ⚠ AND A THIRD STATE, ON THE SAME LINE OF REASONING AS THE SECOND.
+     `is-live` licenses "send the door" because the href now points at one.
+     `is-untouched` withdraws that licence again while the door is still the
+     one the page opened with: both sends ask a question instead, and
+     `message()` opens with a question to match. The label and the text are
+     one decision and they are set from one predicate — `isUntouched`, which
+     is derived from `DEFAULTS` rather than from a hand-kept list of fields,
+     so a tenth choice cannot leave it calling a configured door untouched. */
+  document.documentElement.classList.toggle('is-untouched', isUntouched(state));
   announce(describe(state));
   armGrip();
   /* ⚠ ALWAYS ON THE PAGE NOW, AND `disabled` RATHER THAN HIDDEN. Asked for

@@ -439,6 +439,22 @@
     "send.waOff": ["שלחו לנו הודעה בוואטסאפ", "Message us on WhatsApp", "Написать нам в WhatsApp"],
     "send.waOnShort": ["שלחו בוואטסאפ", "Send on WhatsApp", "Отправить в WhatsApp"],
     "send.waOffShort": ["שלחו הודעה", "Message us", "Написать нам"],
+    /* ⚠ A THIRD LABEL, FOR A DOOR NOBODY HAS TOUCHED YET. Two sends are live on
+       arrival and both say "send the door" — so a confused first-timer can fire
+       off the default as though it were a considered order, and from Peretz's
+       side that is indistinguishable from a real one.
+       The send is NOT removed: it was taken away once and put back on purpose,
+       and `npm run audit` asserts a visible send on every step at every
+       viewport. What changes is the label, and the MESSAGE changes with it —
+       `js/share.js` opens with a question instead of "בחרתי דלת". Same channel,
+       honestly named, and both halves move together for the same reason
+       `send.waOff` and `FALLBACK_TEXT` do. */
+    "send.waAsk": [
+      "יש לי שאלה — דברו איתי בוואטסאפ",
+      "I have a question — talk to me on WhatsApp",
+      "У меня вопрос — напишите мне в WhatsApp"
+    ],
+    "send.waAskShort": ["יש לי שאלה", "I have a question", "У меня вопрос"],
     "send.copy": ["העתקת הפרטים", "Copy the details", "Скопировать данные"],
     "send.save": ["שמירת העיצוב", "Save this design", "Сохранить дизайн"],
     "send.code": ["קוד:", "Code:", "Код:"],
@@ -7552,6 +7568,7 @@ ${body}
     size: "standard",
     handing: "right-in"
   };
+  var isUntouched = (state2) => Object.keys(DEFAULTS).every((k) => state2[k] === DEFAULTS[k]);
   function toQuery(state2) {
     const p = new URLSearchParams();
     p.set("v", String(VERSION));
@@ -7846,7 +7863,20 @@ ${body}
   function message(state2) {
     const spoke = CUSTOMER_LANG_NOTE[lang()];
     return withLang("he", () => [
-      "שלום, בחרתי דלת באתר:",
+      /* ⚠ "בחרתי דלת" IS A FALSE CLAIM ON A DOOR NOBODY HAS TOUCHED. Two sends
+         are live on arrival, and a confused first-timer can fire off the
+         default as though it were a considered order — from Peretz's side
+         indistinguishable from a real one, which is `PLAN.md` §0's failure mode
+         arriving from the other direction (`UX-FINDINGS` §5).
+         The message is not withheld and the button is not removed: what changes
+         is what the first line CLAIMS. Everything under it — the spec, the
+         price, the code, the link — is still exactly the door on screen, so he
+         can price it if that is what they want; he is simply not told they
+         chose it.
+         The precedent is `FALLBACK_TEXT` below, written to be UNMISTAKABLE from
+         a real order. This is the same idea one step earlier, and the label on
+         the button changes with it — see `is-untouched` in `js/app.js`. */
+      isUntouched(state2) ? "שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה:" : "שלום, בחרתי דלת באתר:",
       ...spoke ? [spoke] : [],
       "",
       /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door
@@ -9134,6 +9164,7 @@ ${body}
       el.href = wa;
     });
     document.documentElement.classList.add("is-live");
+    document.documentElement.classList.toggle("is-untouched", isUntouched(state));
     announce(describe(state));
     armGrip();
     $("#undo-btn").disabled = !canUndo();

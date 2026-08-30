@@ -17,7 +17,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { conflicts, repair } from '../js/rules.js';
 import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
-import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery, VERSION } from '../js/url-state.js';
+import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, isUntouched, toQuery, VERSION } from '../js/url-state.js';
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => cond ? (pass++, 0) : (fail++, console.error('  ✗ ' + msg));
@@ -2888,6 +2888,70 @@ group('a handle the customer moved reaches the order');
   globalThis.window = globalThis.window
     || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
   const { message, gripDeparture } = await import('../js/share.js');
+
+  /* One value per field that is NOT the default, taken from the catalogue
+     list that owns the field rather than typed — so a renamed id fails here
+     the same way it fails everywhere else. The four stripe fields have no
+     list; their alternatives are the smallest real change a customer can
+     make to each.
+     ⚠ AND EVERY KEY OF `DEFAULTS` MUST APPEAR (asserted below, §5.15). The
+     day a tenth choice is added, this map is one of the places that has to
+     learn about it, and a silent gap would mean the new field was never
+     checked at all. */
+  const other = (list, now) => (list.find(o => o.id !== now) || {}).id;
+  const ALT_FOR = {
+    colour:      other(COLOURS, DEFAULTS.colour),
+    window:      other(WINDOWS, DEFAULTS.window),
+    grille:      other(GRILLES, DEFAULTS.grille),
+    handle:      other(HANDLES, DEFAULTS.handle),
+    lockset:     other(LOCKSETS, DEFAULTS.lockset),
+    speciallock: other(SPECIAL_LOCKS, DEFAULTS.speciallock),
+    bell:        other(BELLS, DEFAULTS.bell),
+    peephole:    other(PEEPHOLES, DEFAULTS.peephole),
+    mashkof:     other(MASHKOFS, DEFAULTS.mashkof),
+    pirzul:      other(PIRZUL, DEFAULTS.pirzul),
+    detail:      other(DETAILS, DEFAULTS.detail),
+    handing:     other(HANDINGS, DEFAULTS.handing),
+    size:        Object.keys(SIZES).find(k => k !== DEFAULTS.size),
+    stripeDir:   'h',
+    stripeCount: 4,
+    stripeTight: true,
+  };
+
+  /* ── AND THE MESSAGE DOES NOT CLAIM A CHOICE NOBODY MADE ────────────
+     ⚠ TWO SENDS ARE LIVE ON ARRIVAL, ON A DOOR NOBODY HAS TOUCHED, and both
+     opened with "שלום, בחרתי דלת באתר" — I chose a door. A confused
+     first-timer could fire off the default as a considered order, and from
+     Peretz's side that is indistinguishable from a real one, which is
+     `PLAN.md` §0's failure mode arriving from the other direction.
+
+     ⚠ BOTH DIRECTIONS, because either one alone passes on a constant. The
+     untouched door must NOT claim a choice, and any door with one choice on
+     it must. The second is what stops a well-meaning simplification making
+     every order read as a question — which would be the same defect with the
+     customers and Peretz swapped. */
+  {
+    ok(message(DEFAULTS).startsWith('שלום, הסתכלתי'),
+       'the message on an untouched door still claims the customer chose it');
+    ok(!message(DEFAULTS).includes('בחרתי דלת'),
+       'the untouched message still contains the phrase "בחרתי דלת"');
+    /* One changed field is enough, and every field is tried: whichever one a
+       customer touches first, the message has to stop asking and start
+       ordering. `handleLen` is skipped — it is a NUMBER that repair derives
+       from the grip, so setting it alone is not a choice a customer can
+       make. */
+    for (const k of Object.keys(DEFAULTS)) {
+      if (k === 'handleLen') continue;
+      const alt = ALT_FOR[k];
+      ok(alt !== undefined, `no alternative value known for DEFAULTS.${k} — this `
+        + 'check cannot tell whether changing it is noticed');
+      const changed = repair({ ...DEFAULTS, [k]: alt }).state;
+      if (isUntouched(changed)) continue;   // repair bounced it straight back
+      ok(message(changed).startsWith('שלום, בחרתי דלת'),
+         `a door with a chosen ${k} still sends the "I have a question" opener`);
+    }
+  }
+
   const LINE = 'מיקום הידית:';
   let moved = 0, still = 0, flatHome = 0;
 

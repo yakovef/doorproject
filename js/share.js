@@ -15,7 +15,7 @@ import { formatAgorot, priceAgorot } from './price.js';
 import { gripAt, gripHome, render } from './renderer.js';
 import { CUSTOMER_LANG_NOTE, lang, T, withLang } from './copy.js';
 import { handingWords, specLines } from './spec.js';
-import { encodeCode, toQuery } from './url-state.js';
+import { encodeCode, isUntouched, toQuery } from './url-state.js';
 
 export const PHONE_DISPLAY = '053-219-7466';
 /* ⚠ TWO CONSTANTS, BECAUSE THE TWO SCHEMES DISAGREE. `wa.me` wants the digits
@@ -284,7 +284,22 @@ export function gripAddendum(state) {
 export function message(state) {
   const spoke = CUSTOMER_LANG_NOTE[lang()];
   return withLang('he', () => [
-    'שלום, בחרתי דלת באתר:',
+    /* ⚠ "בחרתי דלת" IS A FALSE CLAIM ON A DOOR NOBODY HAS TOUCHED. Two sends
+       are live on arrival, and a confused first-timer can fire off the
+       default as though it were a considered order — from Peretz's side
+       indistinguishable from a real one, which is `PLAN.md` §0's failure mode
+       arriving from the other direction (`UX-FINDINGS` §5).
+       The message is not withheld and the button is not removed: what changes
+       is what the first line CLAIMS. Everything under it — the spec, the
+       price, the code, the link — is still exactly the door on screen, so he
+       can price it if that is what they want; he is simply not told they
+       chose it.
+       The precedent is `FALLBACK_TEXT` below, written to be UNMISTAKABLE from
+       a real order. This is the same idea one step earlier, and the label on
+       the button changes with it — see `is-untouched` in `js/app.js`. */
+    isUntouched(state)
+      ? 'שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה:'
+      : 'שלום, בחרתי דלת באתר:',
     ...(spoke ? [spoke] : []),
     '',
     /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door

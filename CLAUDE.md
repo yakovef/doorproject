@@ -1887,6 +1887,37 @@ how it got there. Detail lives in the section it belongs to.
   reported from outside: nobody writes in to say a gradient promised them
   options that were not there. Falsified in both directions (never set: four
   faults at `cusp`; always set: `colour` and `mk` at `wide` and `wide-short`).
+- **⚠ ITEM 4: THE PAGE STOPS OFFERING TO SEND A DOOR NOBODY HAS CHOSEN.**
+  `UX-FINDINGS` §5. Two sends are live on arrival and both said *"send the
+  door"*, over a message opening *"שלום, בחרתי דלת באתר"* — I chose a door. A
+  confused first-timer could fire off the default as a considered order, and
+  from Peretz's side that is indistinguishable from a real one: `PLAN.md` §0's
+  failure mode arriving from the other direction.
+  ⚠ **THE SEND IS NOT REMOVED AND MUST NOT BE.** It was taken away once and
+  restored on purpose, and the audit asserts a visible send on every step at
+  every viewport. The LABEL changes — a third state, `is-untouched`, written
+  after `is-live` so the later rule wins at equal specificity (§8) — and the
+  MESSAGE changes with it, opening with a question instead. Everything under
+  that first line is still the door on screen, so Peretz can price it if that
+  is what they want; he is simply not told they chose it. The precedent is
+  `FALLBACK_TEXT`, written to be unmistakable from a real order.
+  ⚠ **`isUntouched` IS DERIVED FROM `DEFAULTS`, NEVER FROM A LIST OF FIELDS**,
+  so a tenth choice cannot leave it calling a configured door untouched.
+  `npm test` walks **every key of `DEFAULTS`** and asserts that changing any
+  one of them flips the opener — and asserts the map of alternatives covers
+  every key, so a new field fails loudly rather than going unchecked.
+  ⚠ **AND THE LABEL AND THE MESSAGE ARE SET BY TWO DIFFERENT MECHANISMS** — a
+  stylesheet class and a predicate in `share.js` — so the audit pins them to
+  each other on the real page. Falsified by inverting the CSS: every step at
+  every viewport reports the disagreement.
+  ⚠ **ONE EXISTING ASSERTION HAD TO BE RESTATED, AND IT CAME OUT STRONGER.**
+  The failure-route check read "is a `.wa__on` visible" as its proxy for "the
+  page came up live", and a working arrival now hides that span — so it
+  reported three good routes as broken. It asks for **either live label** now,
+  and adds the half it never had: the DEAD label must not be showing beside a
+  live one. ⚠ Except on `css-404`, where all three show because there is no
+  stylesheet to hide any of them — which is what an unstyled page IS, named
+  rather than skipped by a general rule.
 - **⚠ TWO CORRECTIONS TO THE FINISH AXIS, 31.8.2026 — AND A THIRD FITTING THAT
   WAS FOLLOWING NOTHING AT ALL.** Owner, in his words: *"when the pirzul
   changes the keyhole changes too, and the color of the bell can only be

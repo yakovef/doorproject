@@ -420,6 +420,39 @@ for (const v of VIEWS) {
         fault(v.name, `step "${k}": the ${reach.waTotal} send buttons point at `
           + `${reach.hrefs.length} DIFFERENT doors — one of them is lying`);
       }
+
+      /* ── THE LABEL AND THE MESSAGE ARE ONE DECISION ───────────────────
+         ⚠ AND THEY ARE SET BY TWO DIFFERENT MECHANISMS, WHICH IS THE WHOLE
+         REASON THIS EXISTS. On a door nobody has touched the sends ask a
+         question instead of claiming an order (`UX-FINDINGS` §5) — the LABEL
+         comes from `html.is-untouched` in the stylesheet and the MESSAGE from
+         `isUntouched(state)` in `js/share.js`. Two answers to one question,
+         and §5 is a list of what that eventually does. `npm test` pins the
+         message; this pins them to EACH OTHER, on the real page.
+
+         The same shape as the check this file already makes one line up
+         (`is-live` licensing "send the door" only once the href points at
+         one), which was written after the label and the href said opposite
+         things on every page load for the first second. */
+      const say = await p.evaluate(() => {
+        const el = document.querySelector('[data-wa]');
+        if (!el) return null;
+        const shown = [...el.querySelectorAll('span')]
+          .filter(s => getComputedStyle(s).display !== 'none');
+        return {
+          asks: shown.some(s => s.classList.contains('wa__ask')),
+          href: decodeURIComponent(el.getAttribute('href') || ''),
+          label: shown.map(s => s.textContent.trim()).join(' / '),
+        };
+      });
+      if (say) {
+        const hrefAsks = say.href.includes('ויש לי שאלה');
+        if (say.asks !== hrefAsks) {
+          fault(v.name, `step "${k}": the send says "${say.label}" and its message `
+            + `${hrefAsks ? 'asks a question' : 'claims a chosen door'} — the label `
+            + 'and the message disagree');
+        }
+      }
       if (!reach.priceSeen || !reach.priceText || reach.priceText === '—') {
         fault(v.name, `step "${k}": no price on screen (read "${reach.priceText}")`);
       }
@@ -1445,7 +1478,22 @@ for (const v of VIEWS) {
       lying,
       dead: [...document.querySelectorAll('[data-wa]')]
         .filter(a => !/^https:\/\/wa\.me\//.test(a.getAttribute('href') || '')).length,
-      promising: [...document.querySelectorAll('.wa__on')]
+      /* ⚠ RESTATED 31.8, AND STRICTLY STRONGER THAN THE LINE IT REPLACES.
+         This asked for a visible `.wa__on`, which was a fair proxy for "the
+         page came up live" while the button had two states. It has three now:
+         on a door nobody has touched the send asks a question instead of
+         claiming an order (`UX-FINDINGS` §5), so `.wa__on` is hidden on a
+         perfectly working arrival and the old wording read that as broken.
+
+         What the check MEANS is "the page came up live and is offering the
+         WhatsApp channel with an honest label" — either of the two live
+         labels will do. And the half it never asked is added here: the
+         DEAD label must not be showing at the same time. `.wa__off` is the
+         "the page did not load for me" wording, and a page displaying both is
+         the label/href contradiction this route exists to catch. */
+      promising: [...document.querySelectorAll('.wa__on, .wa__ask')]
+        .filter(e => getComputedStyle(e).display !== 'none').length,
+      resting: [...document.querySelectorAll('.wa__off')]
         .filter(e => getComputedStyle(e).display !== 'none').length,
     };
   });
@@ -1699,12 +1747,25 @@ for (const v of VIEWS) {
     if (name === 'happy' || name === 'no-storage' || name === 'css-404'
         || name === 'no-photo') {
       if (r.down) fault(name, 'the "cannot load" strip is showing on a working page');
-      if (!r.promising) fault(name, 'a working page does not offer to send the door');
+      if (!r.promising) fault(name, 'a working page offers neither to send the door '
+        + 'nor to ask about it — both live labels are hidden');
+      /* ⚠ EXCEPT ON `css-404`, WHERE NOTHING IS HIDDEN BECAUSE THERE IS NO
+         STYLESHEET TO HIDE IT. All three labels show at once there, and that
+         is what an unstyled page IS — the route exists to prove the page is
+         still usable without its looks, not that it still has them. Named
+         rather than skipped by a general rule, so the day a fourth label
+         appears this line is where somebody has to think about it. */
+      if (r.resting && name !== 'css-404') {
+        fault(name, 'a working page is still showing the "the page did not load '
+          + 'for me" label beside a live one');
+      }
     } else {
       if (!r.down) fault(name, 'nothing tells the customer the door did not load');
       if (r.promising) {
         fault(name, 'the button still promises to send a door there is no door for');
       }
+      if (!r.resting) fault(name, 'a broken page is not showing the resting label '
+        + 'either — the button says nothing at all');
     }
     /* ⚠ AND THE SPECIFIC THING ABOUT `no-photo`: the drawn room takes over.
        The route above only asks whether the page is usable; this asks whether
