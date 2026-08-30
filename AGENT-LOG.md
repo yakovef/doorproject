@@ -87,8 +87,7 @@ decisions (brand mark placement, accent colour, size-tile framing) are
 the primary session's own, already made and already verified against
 their own described intent.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** 48f004b
 
 ---
 
