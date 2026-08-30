@@ -1786,6 +1786,60 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE FIRST-TIME-CUSTOMER REVIEW, 31.8.2026 — ITEM 1 OF SEVEN: THE FLOW
+  ENDED WITH ITS OWN SEND BELOW THE FOLD.** `UX-FINDINGS.md` §1, on
+  `origin/claude/app-review-upgrades-2gn7vq` and deliberately not copied here
+  (`git show FETCH_HEAD:UX-FINDINGS.md`). Re-driven at today's HEAD before
+  anything was built, **forward with the button rather than by clicking the
+  rail**, because that is the difference that found this class of fault in the
+  first place.
+  ⚠ **The measurement, re-taken:** on the summary the 228 × 51 primary send
+  sat **154 px below the fold at 1280×720** and **202 px below at 320×568**.
+  At 1440 and 1920 it was on screen — so the review's own table (1440 fine,
+  1280 not) reproduces exactly, and the phone it never looked at is the worst
+  case.
+  ⚠ **THE FIX IS SMALLER THAN THE REVIEW THOUGHT, AND NOT THE SAME AT BOTH
+  WIDTHS.** §1 says the summary *"never gets a `.sect__foot` at all"*; it does,
+  and has since the flow shipped — it just held a Back button and nothing
+  else. So the send MOVES into the foot that is already there, rather than a
+  new bar being built. Above 1100 px that foot is `position: sticky`, so the
+  send is pinned: measured after, whole and on screen at 1280, 1440 and 1920.
+  ⚠ **Below 1100 the same move made it worse and was backed out for that
+  width** — 202 px below the fold became **580**, because there the foot is
+  not pinned, it is merely last, and the primary ended up after the two
+  secondary buttons. Pinning it there instead was measured and refused: at
+  320×568 the navigator is fixed at 62 px and the quote bar at 59, so a 95 px
+  pinned foot leaves 352 px of 568 — three bars of chrome, the same arithmetic
+  that took the brand mark off the phone the day before. The phone already has
+  a pinned send: the quote bar's chip, same `[data-wa]`, same href.
+  ⚠ **SO THE 1100 px CROSSING HAS A LISTENER AGAIN.** The one deleted with the
+  fold reshaped the accordion; this one moves ONE element (`placeSend`) and
+  reshapes nothing. `init`'s comment saying there is nothing to listen for is
+  corrected in place; the §0b entry that recorded the deletion is left as the
+  history it is. Checked: the send survives a language switch on the summary (that
+  is `buildPanel`'s rescue, extended one element down), crosses 1100 in both
+  directions, and stays ONE button with ONE href.
+  ⚠ **AND THE AUDIT ASSERTION IT NEEDED WAS BEING SATISFIED BY A DIFFERENT
+  OBJECT.** `npm run audit` asked whether ANY `[data-wa]` was on screen, and
+  on the summary the floating chip always is — so the green button could be
+  154 px below the fold and the audit called it green. The new check NAMES the
+  summary's primary send, demands the WHOLE control rather than a corner of
+  it, and asserts its selector matched in both directions (§5.15). Falsified:
+  leaving the send in the card fails `cusp`, `narrow-d` and `laptop` with the
+  pixel count in the message.
+  ⚠ **AND IT COST A FALSE RED AT FOUR VIEWPORTS FIRST.** Reaching the summary
+  runs the one flourish this page allows, and `checkVisibility({ checkOpacity:
+  true })` measured the send at opacity 0 — 0 at 120 ms, 0.25 at 400, 0.76 at
+  900 — while it sat in exactly the right place. The check waits for
+  `.is-reveal` to clear now, and gives up rather than hanging, because under
+  reduced motion the class may never be added at all. **An instrument that
+  measures during an entrance animation is measuring the wrong moment.**
+  ⚠ **Two of the review's other findings were re-measured and have already
+  moved:** §3's *"the counter reads as 8 of 1"* is fixed (`שלב 3 מתוך 8` in
+  all three languages), and §3's rail is **396 px of content in 310** now, not
+  428 — the 30.8 gap removal took 32 px off, which is the figure that entry
+  claimed. Still nine circles, still two clipped, still none with visible
+  text.
 - **⚠ TWO CORRECTIONS TO THE FINISH AXIS, 31.8.2026 — AND A THIRD FITTING THAT
   WAS FOLLOWING NOTHING AT ALL.** Owner, in his words: *"when the pirzul
   changes the keyhole changes too, and the color of the bell can only be

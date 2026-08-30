@@ -753,13 +753,23 @@ function init() {
      it is the page as it shipped before there was a photograph. */
   armRoom();
 
-  /* ⚠ THE 1100 px CROSSING NO LONGER RESHAPES ANYTHING, and the listener that
-     did is gone with the fold. It existed because the accordion arrived in one
-     shape on a phone (all shut) and another on a desktop (all open), and
-     crossing the breakpoint left it in the other device's shape — measured in
-     both directions, and reachable by dragging a window or turning an iPad.
-     A flow has one shape: one step is live at every width. There is nothing
-     for a crossing to put right, so there is nothing to listen for. */
+  /* ⚠ THE 1100 px CROSSING RESHAPES ONE ELEMENT, AND ONLY SINCE 31.8.
+     The old listener existed because the accordion arrived in one shape on a
+     phone (all shut) and another on a desktop (all open), and crossing the
+     breakpoint left it in the other device's shape — measured in both
+     directions, and reachable by dragging a window or turning an iPad. That
+     went with the fold: a flow has one shape, one step live at every width.
+
+     What is back is not that. `placeSend` puts the summary's send in the
+     sticky foot above 1100 and in the card below it, because the foot is only
+     pinned at one of those widths — the whole argument is over that function.
+     It moves ONE element and reshapes nothing, and without the listener a
+     customer who drags a window across 1100 keeps the other width's placement
+     until they change step. Guarded, because `matchMedia` is the same API the
+     rest of this file already tests for. */
+  if (typeof window.matchMedia === 'function') {
+    window.matchMedia('(min-width: 1100px)').addEventListener('change', placeSend);
+  }
 }
 
 // ── the panel ─────────────────────────────────────────────────────
@@ -1037,6 +1047,17 @@ function buildPanel() {
      nothing rebuilds. It goes back to the layout and `goStep` re-adopts it on
      the next call. */
   const send = document.querySelector('.panel--send');
+  /* ⚠ AND THE SEND BUTTON BEFORE THE CARD, BECAUSE IT IS NO LONGER IN IT.
+     `goStep` moves `#wa-btn` out of the card and into the summary's
+     `.sect__foot` — a child of THIS element — so rescuing only the card would
+     leave the button behind to be deleted, and `index.html` owns it. Order
+     matters: the button goes home to the card, then the card goes home to the
+     layout. Falsified by dropping this line: switch language on the summary
+     and the green send never comes back. */
+  const wa = document.getElementById('wa-btn');
+  if (send && wa && wa.parentElement !== send.querySelector('.send')) {
+    send.querySelector('.send__alt')?.before(wa);
+  }
   if (send && wrap.contains(send)) $('.layout').appendChild(send);
   wrap.replaceChildren();
 
@@ -1562,6 +1583,55 @@ function buildLengthStepper(host) {
  */
 
 /**
+ * ── WHERE THE SEND BUTTON BELONGS, AT THIS WIDTH ─────────────────────
+ *
+ * ⚠ THE FLOW ENDED WITH ITS OWN SEND BELOW THE FOLD. Measured on the live
+ * page, driving forward with the BUTTON rather than by clicking the rail: on
+ * the summary the 228 x 51 primary send sat **154 px below the fold at
+ * 1280x720** and **202 px below at 320x568** — the one action this site
+ * exists to produce, off screen on the one step whose job is producing it.
+ * For eight consecutive steps the eye learns that the way on is in
+ * `.sect__foot`; on the ninth that bar held a Back button and nothing else.
+ *
+ * ⚠ AND THE FIX IS NOT THE SAME AT BOTH WIDTHS, WHICH IS WHY THIS IS A
+ * FUNCTION AND NOT A LINE IN `goStep`. Above 1100 px the foot is
+ * `position: sticky` at the bottom of a card that scrolls inside its own
+ * column, so moving the send there PINS it — measured after: on screen at
+ * 1280, 1440 and 1920. Below 1100 the foot is not sticky, it is simply the
+ * last thing on a page that scrolls, so the same move made the phone WORSE:
+ * 202 px below the fold became **580**, and it put the primary action after
+ * the two secondary ones. Measured, then backed out for that width.
+ *
+ * ⚠ PINNING IT ON A PHONE TOO WAS THE OBVIOUS THIRD OPTION AND THE NUMBERS
+ * REFUSE IT. At 320x568 the navigator is `fixed` at 62 px and the quote bar
+ * `fixed` at 59; a 95 px pinned foot would leave 352 px of a 568 px screen —
+ * three bars of chrome. That is the same arithmetic that took the brand mark
+ * off the phone on 30.8. The phone already has a pinned send: the quote bar's
+ * chip, which is a `[data-wa]` like this one and carries the identical href.
+ *
+ * ⚠ SO THE 1100 px CROSSING HAS A LISTENER AGAIN, and the note in `init` that
+ * says it does not is corrected. It was deleted when the fold went, because a
+ * flow has one shape at every width and there was nothing for a crossing to
+ * put right. There is exactly one thing now, and this is it — it moves one
+ * element and reshapes nothing.
+ */
+function placeSend() {
+  const wa = $('#wa-btn');
+  const card = document.querySelector('.panel--send .send');
+  if (!wa || !card) return;
+  const wide = typeof window.matchMedia === 'function'
+    && window.matchMedia('(min-width: 1100px)').matches;
+  const foot = document.querySelector('.sect--sum .sect__foot');
+  if (wide && foot) {
+    if (wa.parentElement !== foot) foot.appendChild(wa);
+  } else if (wa.parentElement !== card) {
+    /* Home is above the alternates — the primary before the two secondaries,
+       which is the order the card was written in. */
+    card.querySelector('.send__alt')?.before(wa);
+  }
+}
+
+/**
  * ── THE FLOW ─────────────────────────────────────────────────────────
  *
  * One step is live; the rest are `hidden`. This replaced a two-level cabinet —
@@ -1596,6 +1666,8 @@ function goStep(key, focus = true) {
      for most often. */
   const slot = $('#sum-slot'), send = document.querySelector('.panel--send');
   if (slot && send && send.parentElement !== slot) slot.appendChild(send);
+
+  placeSend();
 
   markSteps();
 

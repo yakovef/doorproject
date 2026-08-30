@@ -2748,7 +2748,14 @@ html.is-live .wa__off { display: none; }
    ⚠ AND IT IS ALLOWED TO BE A PRIMARY, which is worth stating because this
    page has exactly one other: the green send. They never share a screen. The
    summary step has no `.sect__next` at all (it is the end of the road), so the
-   dark pill and the green pill are never both in front of a customer. */
+   dark pill and the green pill are never both in front of a customer.
+   ⚠ AND SINCE 31.8 THE GREEN PILL IS IN THIS BAR, on the summary only. The
+   foot held a Back button and nothing else on the one step whose job is
+   sending — measured on the live page, the 228x51 send sat 154 px below the
+   fold at 1280x720 and 202 px below at 320x568. It takes the room the way
+   `.sect__next` does everywhere else, so the pinned bar means the same thing
+   on all nine steps. The sentence above still holds: the dark pill is not on
+   this step, so the two primaries still never share a screen. */
 .sect__foot {
   display: flex; align-items: center; gap: 10px;
   margin-block-start: 26px;
@@ -2758,6 +2765,8 @@ html.is-live .wa__off { display: none; }
 /* The way on takes the room; the way back takes what it needs. */
 .sect__next { flex: 1 1 auto; }
 .sect__back { flex: 0 0 auto; }
+/* The summary's way on is the send, so it takes the room the same way. */
+.sect__foot .btn--wa { flex: 1 1 auto; margin-block: 0; }
 .sect__next:not(:disabled) {
   background: var(--ink); color: var(--paper);
   border-color: var(--ink);

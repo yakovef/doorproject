@@ -8354,6 +8354,9 @@ ${body}
     document.documentElement.classList.add("is-arriving");
     setTimeout(() => document.documentElement.classList.remove("is-arriving"), 1e3);
     armRoom();
+    if (typeof window.matchMedia === "function") {
+      window.matchMedia("(min-width: 1100px)").addEventListener("change", placeSend);
+    }
   }
   var worksObserver = null;
   function buildWorks() {
@@ -8491,6 +8494,10 @@ ${body}
   function buildPanel() {
     const wrap = $("#choices");
     const send = document.querySelector(".panel--send");
+    const wa = document.getElementById("wa-btn");
+    if (send && wa && wa.parentElement !== send.querySelector(".send")) {
+      send.querySelector(".send__alt")?.before(wa);
+    }
     if (send && wrap.contains(send)) $(".layout").appendChild(send);
     wrap.replaceChildren();
     const opener = document.createElement("button");
@@ -8787,6 +8794,18 @@ ${body}
     }
     host.appendChild(box);
   }
+  function placeSend() {
+    const wa = $("#wa-btn");
+    const card = document.querySelector(".panel--send .send");
+    if (!wa || !card) return;
+    const wide = typeof window.matchMedia === "function" && window.matchMedia("(min-width: 1100px)").matches;
+    const foot = document.querySelector(".sect--sum .sect__foot");
+    if (wide && foot) {
+      if (wa.parentElement !== foot) foot.appendChild(wa);
+    } else if (wa.parentElement !== card) {
+      card.querySelector(".send__alt")?.before(wa);
+    }
+  }
   var liveStep = SECTIONS[0].key;
   var revealed = false;
   var STEP_KEYS = () => [...SECTIONS.map((x) => x.key), SUMMARY.key];
@@ -8802,6 +8821,7 @@ ${body}
     }
     const slot = $("#sum-slot"), send = document.querySelector(".panel--send");
     if (slot && send && send.parentElement !== slot) slot.appendChild(send);
+    placeSend();
     markSteps();
     if (key === SUMMARY.key && !revealed && focus) {
       revealed = true;

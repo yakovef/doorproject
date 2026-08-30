@@ -424,6 +424,88 @@ for (const v of VIEWS) {
         fault(v.name, `step "${k}": no price on screen (read "${reach.priceText}")`);
       }
 
+      /* ── AND ON THE SUMMARY, THE PRIMARY SEND ─────────────────────────
+         ⚠ THE CHECK ABOVE PASSED WHILE THE MAIN SEND WAS OFF SCREEN, and how
+         it passed is the lesson. It asks whether ANY `[data-wa]` is on the
+         screen, and on the summary the floating 131 x 44 `.quote__send` chip
+         always is — so the 228 x 51 green button this whole page exists to
+         produce could sit **154 px below the fold at 1280x720** and this
+         audit called it green. An assertion satisfied by a different object
+         is CLAUDE.md §5.8 in its politest form.
+
+         So this one NAMES the object: a `[data-wa]` that is not the chip.
+
+         ⚠ AND IT ASSERTS ITS SELECTOR MATCHED (§5.15), in both directions. If
+         `.quote__send` is renamed, "everything is the chip" silently becomes
+         "nothing is", and a check that stops asking is worse than one that
+         fails.
+
+         ⚠ FULLY INSIDE, NOT MERELY INTERSECTING. The check above accepts a
+         button one pixel of which is on screen. A send cut in half by the
+         fold is not an affordance.
+
+         Above 1100 px the primary itself must be whole — that is what moving
+         it into the sticky `.sect__foot` buys, measured at 1280, 1440 and
+         1920. Below 1100 the foot is not pinned and pinning it would put
+         three bars of chrome on a 568 px screen (62 + 59 + 95 of 568), so
+         there the requirement falls on the chip, which IS pinned — still
+         stronger than what stood here, because it demands the whole control
+         rather than a corner of it. The argument is in `placeSend`. */
+      if (k === 'sum') {
+        /* ⚠ AND IT WAITS FOR THE ENTRANCE ANIMATION, WHICH COST A FALSE RED
+           AT FOUR VIEWPORTS BEFORE THIS LINE EXISTED. Reaching the summary
+           runs the one flourish this page allows — `.is-reveal`, which fades
+           `.btn--wa` in over half a second — so `checkVisibility({
+           checkOpacity: true })` measured 0 and reported the send invisible
+           while it was in exactly the right place. Measured: opacity 0 at
+           120 ms, 0.25 at 400, 0.76 at 900. The class comes off on a 1000 ms
+           timer, so this waits for its absence rather than for a duration,
+           and gives up rather than hanging if it never clears — under
+           `prefers-reduced-motion` and in bare mode the animation is cut to
+           nothing and the class may not be added at all. */
+        await p.waitForFunction(
+          () => !document.documentElement.classList.contains('is-reveal'),
+          null, { timeout: 3000 }).catch(() => {});
+        await p.waitForTimeout(120);
+        const send = await p.evaluate(() => {
+          const whole = el => {
+            const r = el.getBoundingClientRect();
+            const shown = typeof el.checkVisibility === 'function'
+              ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : true;
+            return shown && r.width > 0 && r.height > 0
+              && r.top >= 0 && r.left >= 0
+              && r.bottom <= innerHeight && r.right <= innerWidth;
+          };
+          const was = [...document.querySelectorAll('[data-wa]')];
+          const chips = was.filter(e => e.classList.contains('quote__send'));
+          const primary = was.filter(e => !e.classList.contains('quote__send'));
+          const box = primary[0] ? primary[0].getBoundingClientRect() : null;
+          return {
+            chips: chips.length,
+            primary: primary.length,
+            primaryWhole: primary.some(whole),
+            chipWhole: chips.some(whole),
+            below: box ? Math.round(Math.max(0, box.bottom - innerHeight)) : 0,
+            wide: innerWidth >= 1100,
+          };
+        });
+        if (!send.chips) {
+          fault(v.name, 'the summary has no `.quote__send` chip — this check can '
+            + 'no longer tell the primary send from the floating one');
+        }
+        if (!send.primary) {
+          fault(v.name, 'the summary has no primary send at all — every [data-wa] '
+            + 'on it is the floating chip');
+        } else if (send.wide && !send.primaryWhole) {
+          fault(v.name, 'the summary\'s primary send is not fully on screen'
+            + (send.below ? ` — ${send.below} px below the fold` : '')
+            + ' — the one action this page exists to produce');
+        } else if (!send.wide && !send.chipWhole && !send.primaryWhole) {
+          fault(v.name, 'the summary has no send fully on screen: the primary is '
+            + `${send.below} px below the fold and the chip is not whole either`);
+        }
+      }
+
       /* ── AND THE ANSWER IS ON SCREEN WITH THE QUESTION ────────────────
          ⚠ A GUIDED FLOW WHOSE LIVE STEP SHOWS NO OPTIONS IS NOT GUIDED, and
          nothing in this repository was asking. `npm run audit` proved a step
