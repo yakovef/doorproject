@@ -2890,6 +2890,27 @@ html.is-live.is-untouched .wa__ask { display: inline; }
   }
   .panel--choose { padding-block-end: 0; }
 
+  /* ── THE RAIL TAKES THE WHOLE CARD, AND IT NEARLY FITS NOW ──────────
+     ⚠ NINE 44 px CIRCLES ARE 396 px AND THAT IS ARITHMETIC. The gaps and the
+     per-step padding already came out on 30.8 (32 px of the desktop's 118),
+     the circles cannot shrink — 44 is asserted at every viewport and the one
+     attempt to soften it was refused at six — and the summary cannot leave
+     the rail without making it unreachable from anywhere but the last step.
+
+     What was left was the CARD'S OWN PADDING, 20 px each side, which the row
+     of circles had no reason to respect: it is a navigator across the top of
+     the card, and its rule already reads as an edge-to-edge divider. Bleeding
+     it through takes the track from **350 to 390**, so the overflow falls
+     from **46 px and two clipped circles to 6 px and one** — measured
+     identically at 1100, 1152, 1280, 1440 and 1920, because the column is
+     capped and the rail is therefore the same width at all of them.
+
+     ⚠ AND THE LAST 6 px CANNOT BE HAD HERE. 392 is the card inside its own
+     margins and 396 is the row; the four pixels are in the card treatment and
+     the two in its border. That is why the `mask` fade stays — it now says
+     "one circle further" instead of "two and a half". */
+  .steps { margin-inline: -20px; }
+
   /* ── AND WHEN THERE IS MORE BELOW, THE FOOT SAYS SO ─────────────────
      ⚠ THE PAGE DOES NOT SCROLL UP HERE AND THE PANEL DOES. `.layout` is
      `overflow: hidden` above 1100 — one screen, two columns, each scrolling

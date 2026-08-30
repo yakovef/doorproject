@@ -1884,6 +1884,34 @@ how it got there. Detail lives in the section it belongs to.
   clears 44 px, and that its sentence equals `handingWords()` **to the
   character**. Falsified both ways: a different phrasing and a deleted row
   each fail every viewport.
+- **⚠ ITEM 5: THE TWO-ROW RAIL IS DECLINED, AND THE ROW NEARLY FITS IN ONE
+  INSTEAD.** `UX-FINDINGS` §3 asked for a wrapped, labelled navigator and made
+  it conditional on re-measuring §4's vertical budget. Re-measured after item
+  6, and the answer is no, on three counts:
+  · **The labels still do not fit.** That is the finding — nine icons, none
+    with a word — and the 30.8 measurement that took the labels out was 429 px
+    of content in a 310 px box. The column is 420 now, the rail's track 390,
+    and five labelled cells need ~360 with the longest word (`עיצוב החזית`)
+    truncating. Wider is not available: §9's wall stops the column at 420.
+  · **Two rows without labels buys only the clipping**, which the `mask` fade
+    already signals, and costs ~44 px on the axis §4 says is short — at 1920
+    four steps have ZERO slack today and would gain an overflow they do not
+    have.
+  · **On a phone it is refused outright.** The rail is FIXED chrome at 62 px
+    of a 568 px screen; a second row makes it ~106, and `npm run audit`'s
+    options-on-screen check at 320×568 is the same check that refused the
+    brand mark on 30.8 for exactly this arithmetic.
+  ⚠ **WHAT WAS AVAILABLE WAS THE CARD'S OWN PADDING.** Nine 44 px circles are
+  396 px; the gaps and per-step padding came out on 30.8, the circles cannot
+  shrink (44 is asserted everywhere and the one attempt was refused at six
+  viewports), and the summary cannot leave the rail without becoming
+  unreachable. The 20 px the card holds on each side had no claim on a
+  navigator that reads as an edge-to-edge divider — bleeding through it takes
+  the track from **350 to 390**, so the overflow falls from **46 px and two
+  clipped circles to 6 px and one**, identically at 1100, 1152, 1280, 1440 and
+  1920. The last 6 px are in the card's margins and border and cannot be had
+  here; the fade stays, saying "one circle further" instead of "two and a
+  half".
 - **⚠ ITEM 6 (TAKEN BEFORE 5): THE CHOICES COLUMN IS WIDER AND THE DOOR DID
   NOT MOVE.** `UX-FINDINGS` §4.1. Taken out of the review's order on purpose:
   item 5 is *"gated on re-measuring §4's vertical budget"*, and this is the
