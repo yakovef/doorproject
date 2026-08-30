@@ -87,8 +87,7 @@ grip-rotate button — should yield at 1100–1152px) are recorded in
 CLAUDE.md/ASK-PERETZ.md for the owner's child to decide, not mine to
 guess at.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** ed1fb46
 
 ---
 
