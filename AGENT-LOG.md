@@ -23,6 +23,101 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-30 00:40 UTC — run 56: verified two human rounds; branch left in its author's own documented mid-sequence state
+
+**First round — the wide-screen lamp fix.** `git fetch` pulled two human
+commits: `63b92fc` ("Two crops of the room, chosen by measurement, so the
+lamps are never cut off" — the owner's son reported the room had no
+visible lamps on his own 1920×918 screen; root cause was the single
+portrait `room.webp` being blown up 2.62× to cover a wide, short stage,
+pushing both sconces out of frame, while the audit's widest viewport had
+clipped the same sconce by two pixels and passed because nothing checked
+for it) and `3b446b9` (the verification screenshot at the exact reported
+size). Fixed with a second, landscape crop (`assets/room-wide.webp`)
+chosen by measuring the stage's own aspect at runtime. Rebuilt, walked
+the live page at the exact reported viewport (1920×918) plus phone and
+desktop — both sconces fully in frame with generous wall above them, the
+landscape crop reads naturally, the price card sits clear of the language
+buttons, zero console errors. Ran the full six-instrument suite: test ✓
+(3,448,982/0), audit ✓ (all eight viewports clean, including the new
+`wide-short` 1920×918 and the reworked floor-line and lamps-in-frame
+checks), profile ✓, collide -- all/-- boxes ✓, recreate ✓ (same ten
+long-documented catalogue gaps). Nothing to change here.
+
+**Second round, discovered on the pre-push race check — a real pricing
+update from Peretz's own notes.** `git fetch` before pushing found
+`88b6da8` already on origin: "Peretz's prices, his colour rule, the Rotem
+on the starting door, handles before panels, and eleven stripes that turn
+into six" — five of eleven items from his 30.8.2026 notes. The size
+multiplier now lands on the whole door total (not just the door+mashkof
+subset), pinned by his own six size-band figures agreeing exactly
+(3195 · 3995 · 4795 · 6390 · 7990 · 9585); the default colour moved from
+the anthracite to 7126D (the anthracite is one of his fourteen ₪200
+options, so the page was opening on a surcharged door and printing the
+wrong headline price); the starting door now carries the Rotem lever
+instead of a bare keyway; a long-standing bug where the LIVE stripe state
+could hold eleven bars while the link and the DM- code had always clamped
+to six (`packStripes`) is fixed by moving the clamp into `repair`, so all
+three readers agree; and the hardware step now comes before the face step
+in the flow, at no wire-format cost since section keys are unchanged.
+
+The commit's own words: "the renderer work is not in this commit" and
+"test 3449073/0 on everything but the four sheet families and the bundle
+stamp, which regenerate when the renderer work lands" — i.e. a
+deliberate, declared, mid-sequence state. Rebased my two run-56 commits
+onto it cleanly (no conflicts — different files), rebuilt (bundle already
+matched, no diff), and verified rather than trusted:
+
+- `npm test` → **3,449,074 passed, 4 failed**, and the four are exactly
+  the ones named — `npm run shot`, `npm run recreate`, `npm run corpus`
+  and `npm run against` screenshot-staleness checks, nothing else. This
+  matches the commit's own account almost exactly (they reported
+  3,449,073/4 fixed).
+- Visually confirmed every claim by loading the live page: standard door
+  now ₪3,195, wide/tall ₪3,995, wide+tall ₪4,795, double-leaf ₪6,390 — all
+  six of his figures read correctly off the actual size tiles; the
+  default door now shows the Rotem lever and the new 7126D colour exactly
+  as described.
+- `npm run collide -- all`/`-- boxes`, `npm run profile` and
+  `npm run recreate` all ran and passed on their own comparisons (these
+  measure a fresh render against source photographs or geometry, not
+  against the committed screenshot files, so they are unaffected by the
+  declared staleness) — same ten long-documented catalogue gaps, nothing
+  new.
+- `npm run audit` — all eight viewports, **no faults**. The audit drives
+  the live page fresh and never touches the committed screenshots, so the
+  pricing round left it untouched.
+
+⚠ **`npm run recreate` silently rewrote `screenshots/.stamps.json`'s
+`recreate` hash** as a side effect of running it, which — had it been
+committed — would have falsely marked the `recreate` sheets fresh while
+the PNGs still show the pre-price-update door. Caught on `git status`
+before committing anything and reverted with `git checkout --`. This is
+exactly the "do not stamp them by hand" trap CLAUDE.md §7 already warns
+about, arrived at by accident rather than by intent, and worth restating
+here for whoever runs `recreate` next while sheets are deliberately left
+stale: check `git status` afterwards.
+
+**Not attempted, and deliberately so:** running `npm run sheets` myself
+to clear the four staleness failures. The primary session's own commit
+message says the renderer work — whatever visual companion change is
+meant to land alongside this pricing round — has not landed yet, and
+regenerating the sheets now would mean regenerating them a second time
+once it does. That decision belongs to whoever is mid-sequence on this
+feature, not to a maintenance run arriving between their commits.
+
+**Changed:** nothing. Both human rounds verified independently rather
+than trusted; no code of mine shipped either round.
+
+**Left alone deliberately:** the four sheet-staleness failures (the
+author's own declared, temporary state) and everything pricing-related —
+squarely inside "do NOT decide: every price."
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-29 20:40 UTC — run 55: nothing worth changing — a defect I found was fixed under me by the primary session, and I verified their fix rather than duplicate it
 
 **Looked at:** `git fetch` pulled two human commits since run 54 —
