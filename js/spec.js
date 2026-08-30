@@ -203,9 +203,14 @@ export function specRows(state) {
      and Peretz always charges for it, so "משקוף: סטנדרטי" is a line on the
      order rather than noise: its absence would read as "no frame quoted". */
   rows.push({ key: 'mashkof', label: T('row.mashkof'), id: mk.id, value: L(mk) });
-  /* ⚠ ALWAYS NAMED, INCLUDING NICKEL. Peretz recolours four things with this —
-     the lever, the hinges, the peephole and the security latch — and the
-     hinges are the reason it cannot be dropped when it is the default: they
+  /* ⚠ ALWAYS NAMED, INCLUDING NICKEL. Peretz's own list is four things — the
+     lever, the hinges, the peephole and the security latch — and since 30.8
+     it is six: the keyhole (*"when the pirzul changes the keyhole changes
+     too"*) and the metal strips. The extra lock is NOT in it, and the פעמון
+     is in it for two of the four finishes only. `exp.pz.a` in `js/copy.js` is
+     where a customer reads the whole of that; what matters HERE is that the
+     hinges are the reason the row cannot be dropped when it is the default:
+     they
      are not drawn (these doors open inwards, so from the street they are
      hidden in the rebate) and this row is the ONLY place the order says what
      colour they are. A fact the drawing cannot carry has to be carried by the

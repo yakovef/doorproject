@@ -311,9 +311,15 @@ export const UI = {
                        'Нажимная ручка и цилиндр — есть в каждой двери. Можно добавить сейфовый или кодовый замок.'],
   'step.pz.t':        ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
   'step.pz.s':        ['גוון הידית והצירים', 'The tone of the lever and the hinges', 'Оттенок ручки и петель'],
-  'step.pz.l':        ['הגוון של הידית, הצירים, העינית והפעמון. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.',
-                       'The tone of the lever, the hinges, the viewer and the knocker. It changes neither the pull handle nor the additional lock.',
-                       'Оттенок нажимной ручки, петель, глазка и кольца. Ручку-скобу и дополнительный замок не меняет.'],
+  /* ⚠ THE KEYHOLE JOINED THE LIST ON 31.8, AND THE ADDITIONAL LOCK LEFT IT
+     ON 30.8. Owner: *"when the pirzul changes the keyhole changes too."* This
+     is the step's one line, so it names what a customer can SEE change and
+     leaves the two qualified cases to `exp.pz.a` — the metal strips, which
+     follow only a NON-nickel פרזול, and the פעמון, which has two metals of
+     the four and says so on its own tile. */
+  'step.pz.l':        ['הגוון של הידית, חור המנעול, הצירים והעינית. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.',
+                       'The tone of the lever, the keyhole, the hinges and the viewer. It changes neither the pull handle nor the additional lock.',
+                       'Оттенок нажимной ручки, замочной скважины, петель и глазка. Ручку-скобу и дополнительный замок не меняет.'],
   'step.sum.t':       ['סיכום', 'Your door', 'Итог'],
   'step.sum.s':       ['הדלת שלכם, והמחיר', 'The door you built, and the price', 'Собранная дверь и цена'],
   'step.sum.l':       ['בדקו שהכול נכון, ושלחו לנו את הדלת.',
@@ -345,16 +351,20 @@ export const UI = {
   'g.pirzul':         ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
   'g.bell':           ['פעמון', 'Doorbell', 'Звонок'],
   'g.peephole':       ['עינית', 'Peephole', 'Глазок'],
-  'g.pirzul.h':       ['הגוון של הידית, הצירים, העינית והפעמון.',
-                       'The tone of the lever, the hinges, the viewer and the knocker.',
-                       'Оттенок ручки, петель, глазка и кольца.'],
-  /* ⚠ A KNOCKER, NOT A PUSH. This said "a bell push on the door itself" for
-     as long as the renderer drew one. The owner's three photographs replaced
-     that with a ring knocker on 30.8.2026 and this line did not follow — the
-     same drift the tile glyph had, in words instead of pixels. */
-  'g.bell.h':         ['טבעת נוקשת במרכז הדלת, מעל העינית.',
-                       'A ring knocker on the centre of the door, above the viewer.',
-                       'Кольцо-стучалка по центру двери, над глазком.'],
+  'g.pirzul.h':       ['הגוון של הידית, חור המנעול, הצירים והעינית.',
+                       'The tone of the lever, the keyhole, the hinges and the viewer.',
+                       'Оттенок ручки, замочной скважины, петель и глазка.'],
+  /* ⚠ THIS DESCRIBED THE FITTING THE DRAWING NO LONGER HAD. It said "a bell
+     push" for as long as the renderer drew one; the owner's three photographs
+     replaced that with a ring knocker on 30.8 and this line did not follow —
+     the same drift the tile glyph had, in words instead of pixels.
+     It now says what is drawn AND the rule the owner gave for its metal on
+     31.8 — *"the color of the bell can only be nickel and gold"* — because a
+     customer who picks bronze and watches every other fitting follow needs to
+     be able to read why this one did not. */
+  'g.bell.h':         ['טבעת נוקשת במרכז הדלת, מעל העינית. בניקל או בזהב בלבד.',
+                       'A ring knocker on the centre of the door, above the viewer. Nickel or gold only.',
+                       'Кольцо-стучалка по центру двери, над глазком. Только никель или золото.'],
   'g.peephole.h':     ['עינית לראות מי בחוץ. כלולה במחיר.',
                        'A viewer, to see who is outside. Included in the price.',
                        'Глазок, чтобы видеть, кто снаружи. Входит в цену.'],
@@ -426,9 +436,23 @@ export const UI = {
                        'As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock (₪700) and a keypad (₪900) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.',
                        'Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый (₪700) и кодовый (₪900) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек.'],
   'exp.pz.q':             ['מה הפרזול משנה?', 'What does the hardware finish change?', 'На что влияет отделка фурнитуры?'],
-  'exp.pz.a':             ['את הגוון של הידית שמסובבים, הצירים, העינית וסגר הביטחון. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את פסי המתכת. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.',
-                       'The tone of the lever you turn, the hinges, the peephole and the security latch. It does NOT change the pull handle — that is its own product and comes in its own finish — and it does not change the metal strips. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.',
-                       'Оттенок нажимной ручки, петель, глазка и предохранительной защёлки. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет металлические полосы. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет.'],
+  /* ⚠ THE LONGEST OF THE THREE, AND IT CARRIED A CLAIM THAT WENT FALSE ON
+     30.8 AND WAS NOT NOTICED FOR A ROUND. It said the finish *"does not
+     change the metal strips"*, and the same day's work made the strips follow
+     it — Peretz: *"pirzul doesnt affect the additional lock, but it does
+     affect the stripes."* So the page told a customer the opposite of what
+     the drawing in front of them was doing. That is the exact fault this
+     project calls its worst (§0): not a crash, a promise the picture did not
+     keep. The list here is now the whole of it, in both directions:
+
+       follows it   the lever, the keyhole, the hinges, the viewer, the
+                    security latch, and the metal strips
+       does not     the pull handle (its own product, its own finish), and
+                    the safe lock and the keypad (bought-in units)
+       two only     the doorbell — nickel or gold, on the owner's word */
+  'exp.pz.a':             ['את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הפעמון מגיע בניקל או בזהב בלבד, ולכן בשחור ובברונזה הוא נשאר ניקל. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את הכספת והקודן, שמגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.',
+                       'The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. The doorbell comes in nickel or gold only, so in black and in bronze it stays nickel. It does NOT change the pull handle — that is its own product and comes in its own finish — nor the safe lock and the keypad, which arrive in the manufacturer’s finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.',
+                       'Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Звонок бывает только никелевым или золотым, поэтому в чёрном и бронзовом он остаётся никелевым. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет сейфовый и кодовый замки, которые приходят в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет.'],
 
   'exp.sum.q':        ['מה קורה אחרי שאני שולח?', 'What happens after I send it?',
                        'Что будет после отправки?'],

@@ -262,7 +262,19 @@ was painted with the other's finish.
   drawing added has to answer "whose is this?" before it can pick a fill.
 - ⚠ **The euro cylinder's black variant was gated on `gripFinish`.** Choosing
   the black pull bar blackened the keyway of a nickel lockset. It follows the
-  pirzul now.
+  pirzul now — and since **31.8 it follows it on all four**, not just black:
+  the owner said *"when the pirzul changes the keyhole changes too"*, which
+  overrules a measurement this file had been right to keep until he decided.
+  `cylinderRamp` in `renderer.js` carries the whole of it; the cylinder keeps
+  `#euroSteel`/`#euroRim` rather than borrowing `#nickel`, because the plug is
+  a different piece of metal from the plate around it.
+- ⚠ **THERE ARE FIVE OWNERS NOW, NOT THREE, AND THE QUESTION IS ALWAYS "WHOSE
+  METAL IS THIS?"** `gripHard`/`gripSoft` are the pull bar's;
+  `nickel`/`nickelSoft`/`plateFace` are the פרזול's; `lockUnit` is the
+  bought-in unit's constant steel (the kodan and the kasefet, on Peretz's
+  word); `euroSteel`/`euroRim` are the cylinder's, following the פרזול at its
+  own stand-off; `bellMetal` is the פעמון's, and it holds **two** metals only
+  — nickel or gold, on the owner's word.
 - ⚠ **`cadoor` declared `out: 78` and the drawing reaches 41.** `lockBackset`
   returns `max(…, out + 10)`, so the ball sat at backset 88 while its keyhole
   stayed pinned at 63 — a knob and the cylinder it turns, 25 mm out of line, on
@@ -336,10 +348,18 @@ walk, and walking it means grepping for each one, not remembering it.
   not luck and it is the strongest single statement about this work order's
   blast radius: those 52 sheets are Peretz's own thirty doors and our option
   range, and not one of them carries a bell, a peephole, an extra lock, a gold
-  פרזול or the default colour. Only the 12 `shot` sheets moved, because they
-  photograph the PAGE — which has a new opening colour, the Rotem, and its
-  steps in a new order — along with `corpus-links.md`, whose every query now
-  carries `v=20`, `bl=` and `ey=`.
+  פרזול or the default colour. The 12 `shot` sheets moved, along with
+  `corpus-links.md`, whose every query now carries `v=20`, `bl=` and `ey=`.
+  ⚠ **THE WORDS "ONLY THE 12 `shot` SHEETS MOVED, BECAUSE THEY PHOTOGRAPH THE
+  PAGE" STOOD HERE, AND THAT INFERENCE IS NOT AVAILABLE.** Measured 31.8: two
+  runs of `npm run shot` **with no code change at all** differ on seven of the
+  twelve — up to 0.29% of pixels, max channel delta 9 of 255, always in one
+  small box over the drawn hardware. It photographs a live browser, and a
+  browser does not rasterise a gradient the same way twice. So a `shot` sheet
+  that moves proves nothing by itself, and one that stays proves nothing
+  either. **The four bare families are still exactly the proof they always
+  were** — they render the SVG rather than photographing it — and every claim
+  above rests on those 52, not on the 12.
   ⚠ The proof was nearly missed, and how it was nearly missed is the lesson:
   `against-ella.png` coming back identical looked WRONG (the brass had moved),
   and chasing it found that the Ella bar has its own absolute gradient and
@@ -987,6 +1007,23 @@ refuse the sale.
   tiles, glyphs, price rows and spec lines for free. New parameters `bl=`
   and `ey=`.
 
+### ⚠ WHAT THE פרזול REACHES — the list, in both directions
+
+It is stated for a customer in `exp.pz.a` (`js/copy.js`) and it is the one
+sentence on this axis that has gone stale twice, so here it is once:
+
+| | |
+|---|---|
+| follows it | the lever and its furniture, **the keyhole** (31.8), the hinges, the peephole, the security latch, and the metal strips |
+| never | the pull handle (its own product, its own finish) and the extra lock (a bought-in unit, `#lockUnit` is a constant) |
+| two of four | the פעמון — nickel or gold, so black and bronze both draw nickel |
+
+⚠ **Each of the three rows has been wrong in shipped copy at least once**, and
+never as a crash: the strips said "not changed" for a round after Peretz
+reversed it, and the peephole was listed as following the finish while the
+drawing painted it from the constant ramp. That is §0's worst failure in its
+quietest form.
+
 They were one list, which made "Idan bar + Rotem backplate" — a combination
 Peretz installs constantly — unreachable.
 
@@ -1290,8 +1327,8 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm run recreate` | ten measured photographs beside our render, leaf heights matched |
 | `npm run corpus` | all 30 measured doors rebuilt from their own records; writes `js/works.js` and `screenshots/corpus-links.md` |
 | `npm run against` | each design and grip beside its own source doors, cropped |
-| `npm run shot` | the whole page at twelve sizes and designs |
-| `npm run sheets` | regenerates all four screenshot families after a change |
+| `npm run shot` | the whole page at twelve sizes and designs. ⚠ **NOT BYTE-STABLE, AND IT IS THE ONLY FAMILY THAT IS NOT.** Two runs with no code change differ on seven of the twelve — 0.29% of pixels at most, max channel delta 9 of 255, always one small box over the drawn hardware. It photographs a live browser; the other three render the SVG. So a moved `shot` sheet is not evidence and an unmoved one is not either. Measured 31.8.2026 |
+| `npm run sheets` | regenerates all four screenshot families after a change. **The 52 BARE sheets are the proof** — `corpus`, `recreate`, `against` — never the 12 |
 | `npm run backdrop` | rebuilds BOTH rooms in `assets/` from the owner's two originals: grades the wall's median 60% of the way to the drawn room's own rendered wall, re-encodes under the 400 KB budget, and prints what it measured going in and coming out. Committed rather than scratch for `rectify.mjs`'s reason — the shipped asset is a pure function of an original plus one number, and re-deriving that from prose is how a picture comes back slightly different from the one everything else was fitted to |
 
 ### The fifteen named assertions
@@ -1411,6 +1448,16 @@ on the hinge stile 120 mm from a window that begins at 245. **Five instruments
 in this repository have now measured the wrong object**, and this is the first
 one that had the answer in front of it. The tell was the same as always: a
 result that is confidently wrong about something you can check by hand.
+
+**⚠ AND AN INSTRUMENT CAN BE NOISY RATHER THAN WRONG, WHICH READS THE SAME
+FROM OUTSIDE.** Every other lesson in this section is about a device pointed at
+the wrong object. `npm run shot` is pointed at the right one and simply does
+not repeat: seven of its twelve sheets differ between two runs of identical
+code, by up to 9 of 255 in one small box. Nothing is broken and there is
+nothing to fix — a browser is entitled to rasterise a gradient differently
+twice. What has to change is what the sheets are allowed to prove, which is
+now written beside them in §7's table and in §0c. **Before reading a diff as a
+finding, run the instrument twice on the same input.**
 
 A contact sheet triages; it does not measure. When a number matters, put a
 scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
@@ -1739,6 +1786,103 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ TWO CORRECTIONS TO THE FINISH AXIS, 31.8.2026 — AND A THIRD FITTING THAT
+  WAS FOLLOWING NOTHING AT ALL.** Owner, in his words: *"when the pirzul
+  changes the keyhole changes too, and the color of the bell can only be
+  nickel and gold."*
+  ⚠ **THE CYLINDER FOLLOWS THE פרזול ON ALL FOUR, AND THIS OVERRULES A
+  MEASUREMENT.** `euroSteel`/`euroRim` were a two-way branch — the measured
+  black when the פרזול was black, one fixed chrome ramp otherwise — so a gold
+  rose carried a chrome plug. The measurement that said it should is read off
+  Peretz's own photographs of brass-furnitured doors, where the plug reads
+  cooler and brighter than the plate, and it is **kept in the comment beside
+  the instruction that overrules it** — the convention the brass ramp set on
+  30.8 (*"this reverses 'keep the gold as is' on his own word"*).
+  `ASK-PERETZ.md` §0a5 asks him to check it against a real door.
+  ⚠ **Nickel and black are byte-identical, by construction.** Both are
+  measured — the chrome off those photographs, the black off
+  `research/newdoor/keyhole.jpg` at 4000 px — so they are emitted as literals;
+  only gold and bronze are derived. What the derivation carries across is the
+  plug's brightness ABOVE ITS OWN FURNITURE (×1.021 / ×1.159 / ×1.163, rim
+  ×1.099), applied to the chosen ramp through `scaleTone`. ⚠ **The multipliers
+  are computed from the two ramps, never typed**, so a refit of the steel ramp
+  moves them; and run on steel the derivation reproduces the measured chrome
+  to **within one step of 255**, which is the check that the derivation and
+  the measurement are the same object. Bronze comes out at contrast 3.10
+  against the chrome's 1.82 because bronze's own ramp is 70% deeper — a fact
+  about bronze, recorded rather than flattened.
+  ⚠ **The cylinder keeps its own ids.** Pointing it at `#nickel` was the
+  smaller edit and the wrong one: one gradient, two owners is the defect phase
+  4 undid, and it would throw away the one thing the photographs still agree
+  on — the plug is a different piece of metal, in the same finish.
+  ⚠ **THE פעמון IS NICKEL OR GOLD AND NOTHING ELSE**, which is narrower than
+  the entry below and supersedes that half of it. `#bellMetal` is a fifth
+  owner holding **two** metals: brass when the פרזול is gold, steel for
+  nickel, black and bronze. The test asserts both halves — gold must change,
+  black and bronze must not — because a check written only as "bronze equals
+  nickel" would have passed on the day the ring was still painted from the
+  constant ramp.
+  ⚠ **TWO SESSIONS FOUND THE SAME TWO BUGS INDEPENDENTLY, HOURS APART, AND
+  THAT IS THE PART WORTH KEEPING.** The entry below landed first. Both found
+  that the ring AND the peephole were filling from `#lockUnit` — the constant
+  steel reserved for the kodan and the kasefet — so neither followed the
+  פרזול at all, and the peephole's case contradicted a sentence of Peretz's
+  that `ASK-PERETZ.md` §0e quotes. Both reached `#nickel` for the viewer and a
+  crowned-boss ring for the tile. ⚠ **And both work orders stated confidently
+  that the bell took all four finishes through `#nickel`** — it took none.
+  That is what a fitting borrowing another owner's gradient looks like from
+  outside: it is invisible until somebody greps the fill.
+  ⚠ **WHERE THE TWO WROTE THE SAME THING, THE EARLIER ONE IS KEPT** — the
+  glyph and the peephole are theirs, not re-done here. The glyph's note
+  carries a point this session's did not: three concentric circles were very
+  nearly the peephole's tile, so the step's two questions looked alike.
+  ⚠ **AND `exp.pz.a` SAID THE FINISH DOES NOT CHANGE THE METAL STRIPS** — a
+  full day after Peretz reversed exactly that, and neither session's first
+  pass at the strings caught it. The customer-facing explainer now carries the
+  list in both directions, and the same stale claim is corrected in the four
+  code comments that quote his list (`app.js`, `prices.js`, `spec.js`, and §3
+  above).
+  **No `VERSION` bump, no id, no list order, no new field, no bit, no price.**
+  Predicted before the run and checked after: **all 52 bare sheets
+  byte-identical**. `npm test` 4,349,420 / 0, and every new assertion
+  falsified by putting its bug back.
+  ⚠ **AND FIVE `shot` SHEETS MOVED THAT COULD NOT HAVE, WHICH TURNED OUT TO BE
+  THE INSTRUMENT.** See the entry below: chasing them found that the `shot`
+  family is not byte-stable run to run. The drawing is identical for all
+  twelve of its queries, checked directly.
+  ⚠ **AND A CONFLICT MARKER REACHED A COMMIT, WHICH ONLY THE AUDIT SAW.** The
+  rebase left `<<<<<<< HEAD` around the two `<script src="assets/bundle.js">`
+  lines in `index.html`; `npm run build` then rewrote the hash in one of them
+  and reported success, because its job is to stamp a hash and it found a line
+  to stamp. `node --check` says nothing about HTML, and `npm test`'s
+  freshness check compares the BUNDLE against `js/` — which was correct. The
+  page loaded, the drawing rendered, and 4.35M assertions passed with two
+  copies of the bundle in the document. The one thing that saw it was
+  `npm run audit`'s `[sheet]` route listening for uncaught page errors:
+  *"Cannot read properties of null (reading 'replaceChildren')"*. **After any
+  rebase, grep the working tree for markers before building** — a generator
+  that runs happily over a conflicted file is how one gets committed.
+- **⚠ THE `shot` SHEETS ARE NOT A BYTE-STABLE PROOF, AND THIS FILE HAS BEEN
+  READING THEM AS ONE.** Found by taking §0c's own instruction seriously —
+  *"when they move on a commit that could not have moved them, find out what
+  did"*. Five of the twelve moved on a change that touches no pixel any of
+  them contains.
+  · **The drawing is byte-identical for all twelve `shot` queries**, checked
+    by rendering each one against `HEAD`'s renderer. And every `shot` lands on
+    the ARRIVAL step, so the copy this change edited (the פרזול step's) is not
+    on any of them either.
+  · **Two runs of `npm run shot` with no code change at all differ on SEVEN of
+    the twelve.** Measured: up to 2,661 pixels of 921,600 (0.29%), max channel
+    delta **9 of 255**, always inside one small box over the drawn hardware —
+    the signature of sub-pixel rasterisation, not of a change.
+  ⚠ **The four bare families are still the proof they always were** — 52 of 52
+  identical here, as on 29.8 and 30.8 — and the difference is exactly what
+  they do: `corpus`, `recreate` and `against` render the SVG, while `shot`
+  photographs a live browser. **A moved `shot` sheet is not evidence of
+  anything on its own; a moved bare sheet still is.** Both halves of that
+  matter — this file used a `shot` move as positive evidence on 30.8 (*"only
+  the 12 shot sheets moved, because they photograph the PAGE"*), and that
+  reasoning was not available.
 - **⚠ A GOLD BELL WAS ASKED FOR AND IS NOT AN OPTION — IT IS A FITTING FINALLY
   OBEYING THE FINISH AXIS.** Asked for from outside: *"make a gold bell option
   and change the icon of it to look like the bell."* Adding one would have cost

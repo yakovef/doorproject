@@ -208,6 +208,121 @@ const toRgbLocal = hex => ({
   b: parseInt(hex.slice(5, 7), 16),
 });
 
+/**
+ * ── THE EURO CYLINDER'S OWN RAMP, ONE PER FINISH ─────────────────────
+ *
+ * ⚠ A MEASUREMENT IS OVERRULED HERE, BY INSTRUCTION, AND IT IS KEPT RATHER
+ * THAN DELETED. What stood in this file — beside `euroSteel`, in as many
+ * words — was:
+ *
+ *   *"The euro cylinder is a separate chromed part pressed into the
+ *   escutcheon. On a brass rosette it reads markedly cooler and brighter than
+ *   the plate around it, which is the giveaway that it is a different
+ *   component rather than a moulded feature. … Only black is special-cased.
+ *   Passing every stop through scaleTone would have turned the cylinder brass
+ *   on a brass door, which is the thing the paragraph above says it is not."*
+ *
+ * That is read off Peretz's own photographs of brass-furnitured doors and it
+ * is not withdrawn: on those doors the plug IS cooler than the furniture
+ * around it. The owner has been shown that and has decided the other way —
+ * *"when the pirzul changes the keyhole changes too"* (30.8.2026) — so a gold
+ * פרזול now draws a gold cylinder. The repo's convention for this is the
+ * brass-ramp entry of 30.8, which reverses *"keep the gold as is"* on his own
+ * word; a measurement overruled by instruction stays written down with the
+ * instruction beside it, so that the next reader can tell which is which.
+ * `ASK-PERETZ.md` §0a5 asks him to confirm it against a real door.
+ *
+ * ⚠ AND IT IS LESS OF AN OVERRULE THAN IT LOOKS. Peretz's own list of what the
+ * פרזול recolours — quoted in four places in this repo — is *"the ידית, the
+ * צירים, the עינית and the סגר ביטחון"*. The cylinder is the closest thing
+ * this drawing has to the last of those. What the photographs disagree with is
+ * the HUE of the plug, not whether the finish reaches it.
+ *
+ * ── HOW GOLD AND BRONZE ARE DERIVED ──────────────────────────────────
+ *
+ * NICKEL AND BLACK ARE UNTOUCHED, byte for byte. Both are measured — the
+ * chrome off the brass-door photographs above, the black off
+ * `research/newdoor/keyhole.jpg` at 4000 px — and neither is what he
+ * complained about. They are literals here and they are emitted as literals.
+ *
+ * The other two are derived, and the thing carried across is the cylinder's
+ * brightness ABOVE ITS OWN FURNITURE. Each chrome stop is divided by the steel
+ * furniture stop it sits against (`#nickel` is `FINISH_TONES.steel` at the
+ * same three offsets), giving
+ *
+ *     1.0208   1.1585   1.1627        rim 1.0993
+ *
+ * — the plug reads 2% to 16% brighter than the plate all the way down. Those
+ * multipliers are applied to the chosen finish's own ramp through `scaleTone`,
+ * which multiplies channels and leaves hue alone, so a gold cylinder is gold
+ * AND is the same amount brighter than the gold around it.
+ *
+ * ⚠ THE MULTIPLIERS ARE COMPUTED, NOT TYPED. If the steel ramp is ever
+ * refitted the way the brass one was, these follow it. A hand-copied number
+ * here would be CLAUDE.md §5.10 with a long fuse.
+ *
+ * Two checks, both of which `npm test` states:
+ *   · run the derivation on STEEL and it reproduces the measured chrome to
+ *     within one step of 255 — #e9ecee #b8bfc5 #7b8288 against #E8ECEE
+ *     #B9BFC4 #7C8288. The derivation and the measurement are the same object.
+ *   · the cylinder's own contrast survives: chrome runs 1.82 highlight to
+ *     core, the derived brass 1.81.
+ *
+ * ⚠ BRONZE COMES OUT AT 3.10 AND THAT IS A FACT ABOUT BRONZE, NOT A BUG. Its
+ * ramp is 70% deeper than steel's or brass's by design — *"shadows that go
+ * almost to a burnt umber rather than to olive"* — so a plug that keeps its
+ * distance above bronze furniture inherits bronze's depth. Forcing 1.82 there
+ * would have put a plug BELOW its own escutcheon at the highlight, which is
+ * the one thing the photographs do agree on.
+ */
+const CYL_CHROME     = ['#E8ECEE', '#B9BFC4', '#7C8288'];
+const CYL_CHROME_RIM = '#8E9398';
+const CYL_BLACK      = ['#5A5D60', '#333639', '#1A1C1E'];
+const CYL_BLACK_RIM  = '#232527';
+/* Which entries of a seven-step ramp the cylinder's three stops stand against.
+   `#nickel` runs its stops at 0 / 0.16 / 0.38 / 0.60 / 0.80 / 1 and the
+   cylinder at 0 / 0.4 / 1, so the plug's highlight sits over ramp[0], its body
+   over ramp[2] and its core over ramp[5]. The rim is a single flat colour and
+   sits over ramp[3]. */
+const CYL_REF     = [0, 2, 5];
+const CYL_REF_RIM = 3;
+/* Raw weighted channel average, NOT `luminance` from colour.js. That one is
+   WCAG's gamma-encoded version; this one is linear in the channels, which is
+   what makes `scaleTone(hex, L(a)/L(b))` land exactly on a's brightness. */
+const rawLum = hex => {
+  const { r, g, b } = toRgbLocal(hex);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const CYL_LIFT     = CYL_CHROME.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[CYL_REF[i]]));
+const CYL_LIFT_RIM = rawLum(CYL_CHROME_RIM) / rawLum(FINISH_TONES.steel[CYL_REF_RIM]);
+
+/** The three cylinder stops and its rim, for one lock-furniture ramp. */
+export function cylinderRamp(tone) {
+  if (tone === FINISH_TONES.steel) return { stops: CYL_CHROME, rim: CYL_CHROME_RIM };
+  if (tone === FINISH_TONES.black) return { stops: CYL_BLACK,  rim: CYL_BLACK_RIM };
+  return {
+    stops: CYL_LIFT.map((m, i) => scaleTone(tone[CYL_REF[i]], m)),
+    rim: scaleTone(tone[CYL_REF_RIM], CYL_LIFT_RIM),
+  };
+}
+
+/**
+ * The פעמון's metal, and it only ever has two.
+ *
+ * Owner, 30.8.2026: *"the color of the bell can only be nickel and gold."* So
+ * a black or a bronze פרזול both draw a NICKEL ring — the two finishes he
+ * stocks this fitting in are the two the drawing offers, and a customer who
+ * picks bronze does not get a bronze knocker in the picture and a nickel one
+ * on the door.
+ *
+ * ⚠ AND THE STARTING POINT WAS NOT WHAT IT LOOKED LIKE. The brief for this
+ * change said the ring took all four finishes through `url(#nickel)`; it did
+ * not. It was filled from `url(#lockUnit)` — the bought-in unit's CONSTANT
+ * steel, the ramp the kodan and the kasefet use — so it took no finish at all
+ * and every door in the range drew a steel ring. Only the gold case moves.
+ */
+export const bellRamp = tone => (tone === FINISH_TONES.brass ? FINISH_TONES.brass : FINISH_TONES.steel);
+
 /* ── The light. Everything shades from this. ────────────────────────
    Key is high and ~30° left of camera. The camera is square on to the door,
    so the two jamb returns are the same width (see RETURN) and the light,
@@ -1169,10 +1284,13 @@ export function render(state) {
   const finish  = gripFinish(state);
   const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
   const hwTone  = FINISH_TONES[byId(PIRZUL, state.pirzul).tone] || FINISH_TONES.steel;
-  /* Is the LOCK FURNITURE black? The euro cylinder is special-cased on it —
-     see the note over `euroSteel`. Asked of the pirzul entry's `tone` rather
-     than of its id, so `pz-black` and any later black share one answer. */
-  const hwBlack = byId(PIRZUL, state.pirzul).tone === 'black';
+  /* The euro cylinder's own ramp and the פעמון's, both functions of the same
+     פרזול. Asked of `hwTone` — the ramp itself — rather than of the pirzul's
+     id, so a later black or a later gold shares one answer with the ones
+     already here. See `cylinderRamp` and `bellRamp` for what each does with
+     it, and which of the four are measured. */
+  const cyl      = cylinderRamp(hwTone);
+  const bellTone = bellRamp(hwTone);
 
   /* ⚠ THE STRIPES FOLLOW THE FINISH, AND WHICH FINISH TOOK DECIDING.
      Peretz gave two sentences on 30.8.2026 and each one alone is satisfiable:
@@ -1786,44 +1904,48 @@ export function render(state) {
       <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
 
-    <!-- The euro cylinder is a separate chromed part pressed into the
-         escutcheon. On a brass rosette it reads markedly cooler and brighter
-         than the plate around it, which is the giveaway that it is a
-         different component rather than a moulded feature.
-         ⚠ EXCEPT ON A BLACK DOOR, WHERE IT IS BLACK, and this is one
-         measurement against another rather than a preference. The chrome above
-         is read off Peretz's own photographs of brass-furnitured doors, and it
-         stands. The file research/newdoor/keyhole.jpg is a close-up of the
-         other case at 4000 px: a black stepped rose with a BLACK cylinder
-         ring inside it, the only bright thing in the whole fitting being the
-         sliver of the key pin.
-         Painting chrome there put a nickel plug in the middle of the one door
-         this whole set was drawn from.
-         Only black is special-cased. Passing every stop through scaleTone
-         would have turned the cylinder brass on a brass door, which is the
-         thing the paragraph above says it is not. -->
-    ${/* ⚠ `hwBlack`, AND IT USED TO BE `finish.id === 'black'` — the PULL
-          BAR's finish. Reported from outside: *"the מוט שחור option changes
-          the keyhole color to black."* It did, exactly: `barblack` declares
-          `finish: 'black'`, and the black cylinder measured off
-          research/newdoor/keyhole.jpg was gated on that instead of on the
-          פרזול. Choosing a black pull bar blackened the keyway of a nickel
-          lockset — a fitting the customer had not touched and is not paying
-          for. The measurement below is unchanged and still right; only the
-          question it answers has moved to the axis that owns the cylinder. */''}
-    ${hwBlack ? `
+    <!-- THE EURO CYLINDER, AND IT FOLLOWS THE פרזול ON ALL FOUR NOW.
+         Owner, 30.8.2026: "when the pirzul changes the keyhole changes too."
+         It used to be a two-way branch - the measured black when the פרזול
+         was black, one fixed chrome ramp otherwise - so a gold פרזול drew a
+         gold rose with a chrome plug in the middle of it.
+         ⚠ IT KEEPS ITS OWN GRADIENT IDS AND MUST. Pointing it at #nickel
+         would give one gradient two owners, which is the defect this file
+         spent phase 4 undoing, and it would throw away the one thing the
+         photographs agree on: the plug is a DIFFERENT PIECE OF METAL from the
+         furniture around it, in the same finish. cylinderRamp keeps that
+         difference - the same 2-16% brighter, in whichever metal.
+         The measurement that was overruled to get here, and the two that were
+         kept byte-identical, are all written out over cylinderRamp.
+         ⚠ The black case used to be gated on the PULL BAR's finish
+         (finish.id === 'black'), reported from outside as "the מוט שחור
+         option changes the keyhole color to black" - it did, exactly. It has
+         been on the פרזול's axis since, and now the whole ramp is. -->
+    ${`
     <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"   stop-color="#5A5D60"/>
-      <stop offset="0.4" stop-color="#333639"/>
-      <stop offset="1"   stop-color="#1A1C1E"/>
+      <stop offset="0"   stop-color="${cyl.stops[0]}"/>
+      <stop offset="0.4" stop-color="${cyl.stops[1]}"/>
+      <stop offset="1"   stop-color="${cyl.stops[2]}"/>
     </linearGradient>
-    <linearGradient id="euroRim"><stop offset="0" stop-color="#232527"/></linearGradient>` : `
-    <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"   stop-color="#E8ECEE"/>
-      <stop offset="0.4" stop-color="#B9BFC4"/>
-      <stop offset="1"   stop-color="#7C8288"/>
+    <linearGradient id="euroRim"><stop offset="0" stop-color="${cyl.rim}"/></linearGradient>`}
+
+    <!-- THE פעמון'S RING. A FOURTH OWNER, AND IT ONLY EVER HOLDS TWO METALS.
+         Owner: "the color of the bell can only be nickel and gold." A
+         conditional url() at the call site would have been the smaller edit
+         and the worse one - usedDefs prunes the defs to what the body points
+         at, so a fitting that chooses between two OTHER fittings' ids leaves
+         the next reader working out whose metal #nickel is on this door. The
+         id says whose it is, the same way gripHard, nickel and lockUnit do.
+         Steel for nickel, black and bronze; brass for gold. Identical stop
+         shape to #nickel so the ring keeps its modelling either way. -->
+    <linearGradient id="bellMetal" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="${bellTone[0]}"/>
+      <stop offset="0.16" stop-color="${bellTone[1]}"/>
+      <stop offset="0.38" stop-color="${bellTone[2]}"/>
+      <stop offset="0.60" stop-color="${bellTone[3]}"/>
+      <stop offset="0.80" stop-color="${bellTone[4]}"/>
+      <stop offset="1"    stop-color="${bellTone[5]}"/>
     </linearGradient>
-    <linearGradient id="euroRim"><stop offset="0" stop-color="#8E9398"/></linearGradient>`}
 
     <!-- ── PULL-BAR CROSS-SECTIONS ────────────────────────────────────
          TWO SECTIONS, NOT FIVE. Twenty-one bar-carrying doors, measured
@@ -8277,6 +8399,22 @@ const keyway = (kx, ky, s = 1) => `
  * here read a mean of 1482 with the same downward compression that reads the
  * LEVER 13-18% low, so they do not beat it.
  */
+/* ⚠ #nickel, AND IT WAS #lockUnit, WHICH MEANT THE עינית FOLLOWED NOTHING.
+   Peretz's own list of what the פרזול recolours is *"the ידית, the צירים, the
+   עינית and the סגר ביטחון"* — the peephole is in it by name, `ASK-PERETZ.md`
+   §0e rests the whole "כלול" answer on that sentence, and the commit that drew
+   this fitting QUOTED it and then filled the ring from the bought-in unit's
+   constant steel. So three shipped strings and the order Peretz receives said
+   the finish changes the עינית, while the drawing painted the same grey ring
+   on all four.
+   That is the shape §5 keeps teaching: not a crash — a promise the picture
+   quietly did not keep. The fix is one id: a viewer is lock furniture, so it
+   takes the lock furniture's ramp, and it takes ALL FOUR finishes. It is the
+   פעמון that Peretz stocks in only two, not this.
+   ⚠ And it is NOT `lockUnit` merely because the kodan and the kasefet are.
+   Those two are bought-in units that arrive in whatever finish the
+   manufacturer ships, and Peretz said so in as many words. Nobody has ever
+   said that about a viewer. */
 const peephole = (cx, cy) => {
   const R = PEEPHOLE_R;          // one statement of it; see the constant
   return `
@@ -8387,7 +8525,7 @@ const bellKnocker = (cx, cy) => {
                stroke-width="${(R * 0.20).toFixed(1)}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
                ry="${(RING * 0.98).toFixed(1)}"
-               fill="none" stroke="url(#nickel)"
+               fill="none" stroke="url(#bellMetal)"
                stroke-width="${(R * 0.18).toFixed(1)}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
                ry="${(RING * 0.98).toFixed(1)}"
@@ -8400,10 +8538,10 @@ const bellKnocker = (cx, cy) => {
        }<path d="M ${(cx - BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)}
                L ${cx} ${(top - BOSS * 1.20).toFixed(1)}
                L ${(cx + BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)} Z"
-            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
+            fill="url(#bellMetal)" stroke="#000" stroke-opacity=".22"/>
       <ellipse cx="${cx}" cy="${top.toFixed(1)}"
                rx="${BOSS.toFixed(1)}" ry="${(BOSS * 0.92).toFixed(1)}"
-               fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+               fill="url(#bellMetal)" stroke="#000" stroke-opacity=".26"/>
       <ellipse cx="${cx}" cy="${top.toFixed(1)}"
                rx="${(BOSS * 0.46).toFixed(1)}" ry="${(BOSS * 0.42).toFixed(1)}"
                fill="#000" fill-opacity=".22"/>

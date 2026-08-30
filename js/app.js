@@ -154,9 +154,14 @@ const GROUPS = [
 
   /* ⚠ THE FINISH OF THE LOCK FURNITURE, AND NOT OF THE PULL HANDLE. Peretz was
      explicit that פרזול recolours the ידית, the צירים, the עינית and the
-     סגר ביטחון and NOT the pull handle or the stripes — which is also the bug
-     he reported in the same sentence. A pull bar's finish is a fact about that
-     product (Ella is brass); this is a choice, and it is ₪0 to ₪900. */
+     סגר ביטחון and NOT the pull handle — which is also the bug he reported in
+     the same sentence. A pull bar's finish is a fact about that product (Ella
+     is brass); this is a choice, and it is ₪0 to ₪900.
+     ⚠ This comment also said "or the stripes", and he reversed that on 30.8:
+     *"pirzul doesnt affect the additional lock, but it does affect the
+     stripes."* The list as it now stands — six things it reaches, two it does
+     not, and one it reaches in two finishes of four — is stated for a
+     customer in `exp.pz.a` and for us in `js/spec.js`. */
   { key: 'pirzul', title: 'g.pirzul', in: 'pz', kind: 'hw', list: () => PIRZUL,
     glyph: pirzulGlyph, hint: 'g.pirzul.h' },
 

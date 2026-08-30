@@ -437,9 +437,13 @@ export const PEEPHOLE = {
 
 /* ── פרזול — the finish of the lock furniture ─────────────────────────
    Peretz: "pirzul: color: black +300, bronze +500, gold +900". It changes the
-   ידית, the צירים, the עינית and the סגר ביטחון — and explicitly NOT the
-   stripes or the pull handle, which is the bug he reported in the same
-   breath. See PIRZUL in catalog.js. */
+   ידית, the צירים, the עינית and the סגר ביטחון, and since 30.8 the keyhole
+   and the metal strips as well. NOT the pull handle — that is the bug he
+   reported in the same breath — and NOT the extra lock.
+   ⚠ This said "explicitly NOT the stripes" for a round after he reversed it:
+   *"pirzul doesnt affect the additional lock, but it does affect the
+   stripes."* One sentence moved two things in opposite directions and only
+   one of them was written down here. See PIRZUL in catalog.js. */
 export const PIRZUL = {
   'pz-nickel': 0,    // ניקל   — the one included as standard
   'pz-black':  300,  // שחור

@@ -172,10 +172,16 @@
     ],
     "step.pz.t": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
     "step.pz.s": ["גוון הידית והצירים", "The tone of the lever and the hinges", "Оттенок ручки и петель"],
+    /* ⚠ THE KEYHOLE JOINED THE LIST ON 31.8, AND THE ADDITIONAL LOCK LEFT IT
+       ON 30.8. Owner: *"when the pirzul changes the keyhole changes too."* This
+       is the step's one line, so it names what a customer can SEE change and
+       leaves the two qualified cases to `exp.pz.a` — the metal strips, which
+       follow only a NON-nickel פרזול, and the פעמון, which has two metals of
+       the four and says so on its own tile. */
     "step.pz.l": [
-      "הגוון של הידית, הצירים, העינית והפעמון. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.",
-      "The tone of the lever, the hinges, the viewer and the knocker. It changes neither the pull handle nor the additional lock.",
-      "Оттенок нажимной ручки, петель, глазка и кольца. Ручку-скобу и дополнительный замок не меняет."
+      "הגוון של הידית, חור המנעול, הצירים והעינית. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.",
+      "The tone of the lever, the keyhole, the hinges and the viewer. It changes neither the pull handle nor the additional lock.",
+      "Оттенок нажимной ручки, замочной скважины, петель и глазка. Ручку-скобу и дополнительный замок не меняет."
     ],
     "step.sum.t": ["סיכום", "Your door", "Итог"],
     "step.sum.s": ["הדלת שלכם, והמחיר", "The door you built, and the price", "Собранная дверь и цена"],
@@ -218,18 +224,22 @@
     "g.bell": ["פעמון", "Doorbell", "Звонок"],
     "g.peephole": ["עינית", "Peephole", "Глазок"],
     "g.pirzul.h": [
-      "הגוון של הידית, הצירים, העינית והפעמון.",
-      "The tone of the lever, the hinges, the viewer and the knocker.",
-      "Оттенок ручки, петель, глазка и кольца."
+      "הגוון של הידית, חור המנעול, הצירים והעינית.",
+      "The tone of the lever, the keyhole, the hinges and the viewer.",
+      "Оттенок ручки, замочной скважины, петель и глазка."
     ],
-    /* ⚠ A KNOCKER, NOT A PUSH. This said "a bell push on the door itself" for
-       as long as the renderer drew one. The owner's three photographs replaced
-       that with a ring knocker on 30.8.2026 and this line did not follow — the
-       same drift the tile glyph had, in words instead of pixels. */
+    /* ⚠ THIS DESCRIBED THE FITTING THE DRAWING NO LONGER HAD. It said "a bell
+       push" for as long as the renderer drew one; the owner's three photographs
+       replaced that with a ring knocker on 30.8 and this line did not follow —
+       the same drift the tile glyph had, in words instead of pixels.
+       It now says what is drawn AND the rule the owner gave for its metal on
+       31.8 — *"the color of the bell can only be nickel and gold"* — because a
+       customer who picks bronze and watches every other fitting follow needs to
+       be able to read why this one did not. */
     "g.bell.h": [
-      "טבעת נוקשת במרכז הדלת, מעל העינית.",
-      "A ring knocker on the centre of the door, above the viewer.",
-      "Кольцо-стучалка по центру двери, над глазком."
+      "טבעת נוקשת במרכז הדלת, מעל העינית. בניקל או בזהב בלבד.",
+      "A ring knocker on the centre of the door, above the viewer. Nickel or gold only.",
+      "Кольцо-стучалка по центру двери, над глазком. Только никель или золото."
     ],
     "g.peephole.h": [
       "עינית לראות מי בחוץ. כלולה במחיר.",
@@ -332,10 +342,24 @@
       "Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый (₪700) и кодовый (₪900) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек."
     ],
     "exp.pz.q": ["מה הפרזול משנה?", "What does the hardware finish change?", "На что влияет отделка фурнитуры?"],
+    /* ⚠ THE LONGEST OF THE THREE, AND IT CARRIED A CLAIM THAT WENT FALSE ON
+         30.8 AND WAS NOT NOTICED FOR A ROUND. It said the finish *"does not
+         change the metal strips"*, and the same day's work made the strips follow
+         it — Peretz: *"pirzul doesnt affect the additional lock, but it does
+         affect the stripes."* So the page told a customer the opposite of what
+         the drawing in front of them was doing. That is the exact fault this
+         project calls its worst (§0): not a crash, a promise the picture did not
+         keep. The list here is now the whole of it, in both directions:
+    
+           follows it   the lever, the keyhole, the hinges, the viewer, the
+                        security latch, and the metal strips
+           does not     the pull handle (its own product, its own finish), and
+                        the safe lock and the keypad (bought-in units)
+           two only     the doorbell — nickel or gold, on the owner's word */
     "exp.pz.a": [
-      "את הגוון של הידית שמסובבים, הצירים, העינית וסגר הביטחון. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את פסי המתכת. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
-      "The tone of the lever you turn, the hinges, the peephole and the security latch. It does NOT change the pull handle — that is its own product and comes in its own finish — and it does not change the metal strips. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
-      "Оттенок нажимной ручки, петель, глазка и предохранительной защёлки. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет металлические полосы. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
+      "את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הפעמון מגיע בניקל או בזהב בלבד, ולכן בשחור ובברונזה הוא נשאר ניקל. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את הכספת והקודן, שמגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
+      "The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. The doorbell comes in nickel or gold only, so in black and in bronze it stays nickel. It does NOT change the pull handle — that is its own product and comes in its own finish — nor the safe lock and the keypad, which arrive in the manufacturer’s finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
+      "Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Звонок бывает только никелевым или золотым, поэтому в чёрном и бронзовом он остаётся никелевым. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет сейфовый и кодовый замки, которые приходят в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
     ],
     "exp.sum.q": [
       "מה קורה אחרי שאני שולח?",
@@ -2351,6 +2375,27 @@
     g: parseInt(hex.slice(3, 5), 16),
     b: parseInt(hex.slice(5, 7), 16)
   });
+  var CYL_CHROME = ["#E8ECEE", "#B9BFC4", "#7C8288"];
+  var CYL_CHROME_RIM = "#8E9398";
+  var CYL_BLACK = ["#5A5D60", "#333639", "#1A1C1E"];
+  var CYL_BLACK_RIM = "#232527";
+  var CYL_REF = [0, 2, 5];
+  var CYL_REF_RIM = 3;
+  var rawLum = (hex) => {
+    const { r, g, b } = toRgbLocal(hex);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  var CYL_LIFT = CYL_CHROME.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[CYL_REF[i]]));
+  var CYL_LIFT_RIM = rawLum(CYL_CHROME_RIM) / rawLum(FINISH_TONES.steel[CYL_REF_RIM]);
+  function cylinderRamp(tone) {
+    if (tone === FINISH_TONES.steel) return { stops: CYL_CHROME, rim: CYL_CHROME_RIM };
+    if (tone === FINISH_TONES.black) return { stops: CYL_BLACK, rim: CYL_BLACK_RIM };
+    return {
+      stops: CYL_LIFT.map((m, i) => scaleTone(tone[CYL_REF[i]], m)),
+      rim: scaleTone(tone[CYL_REF_RIM], CYL_LIFT_RIM)
+    };
+  }
+  var bellRamp = (tone) => tone === FINISH_TONES.brass ? FINISH_TONES.brass : FINISH_TONES.steel;
   var LIGHT = {
     key: 0.24,
     // face wash amplitude
@@ -2589,7 +2634,8 @@
     const finish = gripFinish(state2);
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
-    const hwBlack = byId(PIRZUL2, state2.pirzul).tone === "black";
+    const cyl = cylinderRamp(hwTone);
+    const bellTone = bellRamp(hwTone);
     const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "steel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
@@ -3040,45 +3086,48 @@
       <stop offset="1"    stop-color="${hwTone[5]}"/>
     </linearGradient>
 
-    <!-- The euro cylinder is a separate chromed part pressed into the
-         escutcheon. On a brass rosette it reads markedly cooler and brighter
-         than the plate around it, which is the giveaway that it is a
-         different component rather than a moulded feature.
-         ⚠ EXCEPT ON A BLACK DOOR, WHERE IT IS BLACK, and this is one
-         measurement against another rather than a preference. The chrome above
-         is read off Peretz's own photographs of brass-furnitured doors, and it
-         stands. The file research/newdoor/keyhole.jpg is a close-up of the
-         other case at 4000 px: a black stepped rose with a BLACK cylinder
-         ring inside it, the only bright thing in the whole fitting being the
-         sliver of the key pin.
-         Painting chrome there put a nickel plug in the middle of the one door
-         this whole set was drawn from.
-         Only black is special-cased. Passing every stop through scaleTone
-         would have turned the cylinder brass on a brass door, which is the
-         thing the paragraph above says it is not. -->
-    ${/* ⚠ `hwBlack`, AND IT USED TO BE `finish.id === 'black'` — the PULL
-        BAR's finish. Reported from outside: *"the מוט שחור option changes
-        the keyhole color to black."* It did, exactly: `barblack` declares
-        `finish: 'black'`, and the black cylinder measured off
-        research/newdoor/keyhole.jpg was gated on that instead of on the
-        פרזול. Choosing a black pull bar blackened the keyway of a nickel
-        lockset — a fitting the customer had not touched and is not paying
-        for. The measurement below is unchanged and still right; only the
-        question it answers has moved to the axis that owns the cylinder. */
-    ""}
-    ${hwBlack ? `
+    <!-- THE EURO CYLINDER, AND IT FOLLOWS THE פרזול ON ALL FOUR NOW.
+         Owner, 30.8.2026: "when the pirzul changes the keyhole changes too."
+         It used to be a two-way branch - the measured black when the פרזול
+         was black, one fixed chrome ramp otherwise - so a gold פרזול drew a
+         gold rose with a chrome plug in the middle of it.
+         ⚠ IT KEEPS ITS OWN GRADIENT IDS AND MUST. Pointing it at #nickel
+         would give one gradient two owners, which is the defect this file
+         spent phase 4 undoing, and it would throw away the one thing the
+         photographs agree on: the plug is a DIFFERENT PIECE OF METAL from the
+         furniture around it, in the same finish. cylinderRamp keeps that
+         difference - the same 2-16% brighter, in whichever metal.
+         The measurement that was overruled to get here, and the two that were
+         kept byte-identical, are all written out over cylinderRamp.
+         ⚠ The black case used to be gated on the PULL BAR's finish
+         (finish.id === 'black'), reported from outside as "the מוט שחור
+         option changes the keyhole color to black" - it did, exactly. It has
+         been on the פרזול's axis since, and now the whole ramp is. -->
+    ${`
     <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"   stop-color="#5A5D60"/>
-      <stop offset="0.4" stop-color="#333639"/>
-      <stop offset="1"   stop-color="#1A1C1E"/>
+      <stop offset="0"   stop-color="${cyl.stops[0]}"/>
+      <stop offset="0.4" stop-color="${cyl.stops[1]}"/>
+      <stop offset="1"   stop-color="${cyl.stops[2]}"/>
     </linearGradient>
-    <linearGradient id="euroRim"><stop offset="0" stop-color="#232527"/></linearGradient>` : `
-    <linearGradient id="euroSteel" x1="0.1" y1="0" x2="0.9" y2="1">
-      <stop offset="0"   stop-color="#E8ECEE"/>
-      <stop offset="0.4" stop-color="#B9BFC4"/>
-      <stop offset="1"   stop-color="#7C8288"/>
+    <linearGradient id="euroRim"><stop offset="0" stop-color="${cyl.rim}"/></linearGradient>`}
+
+    <!-- THE פעמון'S RING. A FOURTH OWNER, AND IT ONLY EVER HOLDS TWO METALS.
+         Owner: "the color of the bell can only be nickel and gold." A
+         conditional url() at the call site would have been the smaller edit
+         and the worse one - usedDefs prunes the defs to what the body points
+         at, so a fitting that chooses between two OTHER fittings' ids leaves
+         the next reader working out whose metal #nickel is on this door. The
+         id says whose it is, the same way gripHard, nickel and lockUnit do.
+         Steel for nickel, black and bronze; brass for gold. Identical stop
+         shape to #nickel so the ring keeps its modelling either way. -->
+    <linearGradient id="bellMetal" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="${bellTone[0]}"/>
+      <stop offset="0.16" stop-color="${bellTone[1]}"/>
+      <stop offset="0.38" stop-color="${bellTone[2]}"/>
+      <stop offset="0.60" stop-color="${bellTone[3]}"/>
+      <stop offset="0.80" stop-color="${bellTone[4]}"/>
+      <stop offset="1"    stop-color="${bellTone[5]}"/>
     </linearGradient>
-    <linearGradient id="euroRim"><stop offset="0" stop-color="#8E9398"/></linearGradient>`}
 
     <!-- ── PULL-BAR CROSS-SECTIONS ────────────────────────────────────
          TWO SECTIONS, NOT FIVE. Twenty-one bar-carrying doors, measured
@@ -6692,7 +6741,7 @@ ${body}
                stroke-width="${(R * 0.2).toFixed(1)}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
                ry="${(RING * 0.98).toFixed(1)}"
-               fill="none" stroke="url(#nickel)"
+               fill="none" stroke="url(#bellMetal)"
                stroke-width="${(R * 0.18).toFixed(1)}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
                ry="${(RING * 0.98).toFixed(1)}"
@@ -6705,10 +6754,10 @@ ${body}
     ""}<path d="M ${(cx - BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)}
                L ${cx} ${(top - BOSS * 1.2).toFixed(1)}
                L ${(cx + BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)} Z"
-            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
+            fill="url(#bellMetal)" stroke="#000" stroke-opacity=".22"/>
       <ellipse cx="${cx}" cy="${top.toFixed(1)}"
                rx="${BOSS.toFixed(1)}" ry="${(BOSS * 0.92).toFixed(1)}"
-               fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+               fill="url(#bellMetal)" stroke="#000" stroke-opacity=".26"/>
       <ellipse cx="${cx}" cy="${top.toFixed(1)}"
                rx="${(BOSS * 0.46).toFixed(1)}" ry="${(BOSS * 0.42).toFixed(1)}"
                fill="#000" fill-opacity=".22"/>
@@ -8027,9 +8076,14 @@ ${body}
     },
     /* ⚠ THE FINISH OF THE LOCK FURNITURE, AND NOT OF THE PULL HANDLE. Peretz was
        explicit that פרזול recolours the ידית, the צירים, the עינית and the
-       סגר ביטחון and NOT the pull handle or the stripes — which is also the bug
-       he reported in the same sentence. A pull bar's finish is a fact about that
-       product (Ella is brass); this is a choice, and it is ₪0 to ₪900. */
+       סגר ביטחון and NOT the pull handle — which is also the bug he reported in
+       the same sentence. A pull bar's finish is a fact about that product (Ella
+       is brass); this is a choice, and it is ₪0 to ₪900.
+       ⚠ This comment also said "or the stripes", and he reversed that on 30.8:
+       *"pirzul doesnt affect the additional lock, but it does affect the
+       stripes."* The list as it now stands — six things it reaches, two it does
+       not, and one it reaches in two finishes of four — is stated for a
+       customer in `exp.pz.a` and for us in `js/spec.js`. */
     {
       key: "pirzul",
       title: "g.pirzul",

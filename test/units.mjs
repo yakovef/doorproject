@@ -1937,6 +1937,174 @@ group('the finish reaches every piece of metal');
     ok(looks(render({ ...base, lockset: 'coral', pirzul: 'pz-gold' }), 'data-kind="lever"')
        !== looks(render({ ...base, lockset: 'coral', pirzul: 'pz-nickel' }), 'data-kind="lever"'),
        'the פרזול must still recolour the lock furniture it was bought for');
+
+    /* ── THE CYLINDER FOLLOWS THE פרזול TOO, AND IT DID NOT ─────────────
+       Owner, 30.8.2026: *"when the pirzul changes the keyhole changes too."*
+       `euroSteel` was a two-way branch on whether the פרזול was black — one
+       measured black ramp, one fixed chrome ramp for everything else — so a
+       gold rose carried a chrome plug.
+
+       ⚠ RESOLVED, NOT COMPARED AS MARKUP. The plug is painted
+       `fill="url(#euroSteel)"`, so its <path> is byte-identical under every
+       finish and a markup comparison passes with the bug still in. That is
+       the mistake the paragraph at the top of this block is about, and it is
+       the reason these read the GRADIENT.
+       ⚠ And it cannot use `looks()` above: the escutcheon around the plug is
+       lock furniture and paints with #nickel quite correctly, so the group as
+       a whole moves with the פרזול even when the plug does not. */
+    const stopsOf = (svg, id) => {
+      const g = new RegExp(`<linearGradient id="${id}"[^>]*>([\\s\\S]*?)</linearGradient>`).exec(svg);
+      if (!g) return null;
+      return [...g[1].matchAll(/offset="([^"]+)"\s+stop-color="([^"]+)"/g)]
+        .map(m => ({ at: Number(m[1]), hex: m[2] }));
+    };
+    const asText = st => (st ? st.map(s => s.hex).join(',') : null);
+    const lum = hex => {
+      const v = i => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+      return 0.2126 * v(0) + 0.7152 * v(1) + 0.0722 * v(2);
+    };
+    /* ⚠ `grab` ABOVE STOPS AT THE FIRST `</g>`, AND THE CYLINDER NESTS ONE.
+       Its escutcheon comes from `disc()`, which is a group of its own, so the
+       lazy match returned the disc and none of the plug — and the first
+       version of the check below failed for that reason rather than for the
+       one it was written for. This walks the tags and closes the group it
+       opened. Left beside `grab` rather than replacing it: the checks above
+       are green against the shallow one and re-pointing them is a change to
+       assertions this commit has no business touching. */
+    const grabDeep = (svg, sel) => {
+      const open = new RegExp(`<g[^>]*${sel}[^>]*>`).exec(svg);
+      if (!open) return null;
+      let depth = 0, i = open.index;
+      const re = /<g\b[^>]*?(\/?)>|<\/g>/g;
+      re.lastIndex = i;
+      let m;
+      while ((m = re.exec(svg))) {
+        if (m[0] === '</g>') { if (--depth === 0) return svg.slice(open.index, m.index + 4); }
+        else if (!m[1]) depth++;
+      }
+      return null;
+    };
+    const refs = body => [...new Set([...body.matchAll(/url\(#([A-Za-z0-9_-]+)\)/g)].map(m => m[1]))];
+    {
+      const withCyl = { ...base, lockset: 'cylinder' };
+      const sel = 'data-kind="cylinder"';
+      const body = grabDeep(render(withCyl), sel);
+      ok(body, 'no cylinder group in the markup — every cylinder check is dead');
+      const ids = refs(body);
+      ok(ids.includes('euroSteel') && ids.includes('euroRim'),
+         'the cylinder stopped painting with #euroSteel / #euroRim — its own two ids');
+      /* Not every one is a gradient — the fitting's drop shadow is a <filter>
+         — so this asks only that each id is defined somewhere. §5c asks that
+         of the whole drawing; here it keeps the two ids this block depends on
+         from retiring in silence the day one is renamed (§5.15). */
+      for (const id of ids) {
+        ok(new RegExp(`\\sid="${id}"`).test(render(withCyl)),
+           `the cylinder paints with #${id} and nothing of that id is emitted`);
+      }
+
+      /* THE REQUIRED ONE: four finishes, four different cylinders.
+         Falsified by putting the single chrome ramp back — it drops to two. */
+      const cyl = {};
+      for (const z of PIRZUL) {
+        const svg = render({ ...withCyl, pirzul: z.id });
+        const s = stopsOf(svg, 'euroSteel'), r = stopsOf(svg, 'euroRim');
+        ok(s && r, `#euroSteel / #euroRim are not emitted for the פרזול ${z.id}`);
+        cyl[z.id] = { svg, key: `${asText(s)}|${asText(r)}`, stops: s };
+      }
+      ok(new Set(PIRZUL.map(z => cyl[z.id].key)).size === PIRZUL.length,
+         'the four פרזול finishes must draw four different euro cylinders — '
+         + `got ${new Set(PIRZUL.map(z => cyl[z.id].key)).size}`);
+
+      /* ⚠ AND THE THING THAT WAS DERIVED RATHER THAN PICKED, ASSERTED AS THE
+         PROPERTY IT IS. The plug is the SAME AMOUNT BRIGHTER than the
+         escutcheon around it in every finish — that is the one thing the
+         photographs agree on and it is what `cylinderRamp` carries across.
+         Each cylinder stop is paired with the furniture stop at the nearest
+         OFFSET, both read off the emitted markup, so this holds no copy of
+         which ramp entry feeds which stop. */
+      const lift = z => {
+        const furn = stopsOf(cyl[z].svg, 'nickel');
+        return cyl[z].stops.map(c => {
+          const near = furn.reduce((a, b) =>
+            Math.abs(b.at - c.at) < Math.abs(a.at - c.at) ? b : a);
+          return lum(c.hex) / lum(near.hex);
+        });
+      };
+      const chrome = lift('pz-nickel');
+      for (const z of ['pz-bronze', 'pz-gold']) {
+        const got = lift(z);
+        ok(got.every((v, i) => Math.abs(v - chrome[i]) < 0.02),
+           `the ${z} cylinder does not stand off its own furniture the way the `
+           + `measured chrome one does: ${got.map(v => v.toFixed(3))} against `
+           + `${chrome.map(v => v.toFixed(3))}`);
+      }
+      /* ⚠ BLACK IS THE MEASURED EXCEPTION AND MUST STAY ONE. Its plug reads
+         DARKER than its own rose — research/newdoor/keyhole.jpg, a black
+         cylinder ring in a black stepped rose, the only bright thing in the
+         fitting being the key pin. If it ever quietly joined the derivation
+         this ratio would jump above 1 and nothing else here would notice. */
+      ok(lift('pz-black').every((v, i) => Math.abs(v - chrome[i]) > 0.05),
+         'the black cylinder has stopped being the measured exception it is');
+
+      /* THE PAIR THAT MUST STAY TRUE, restated here so it sits beside the one
+         that had to become true. The extra lock arrives in the manufacturer's
+         own finish — Peretz: "pirzul doesnt affect the additional lock" — and
+         #lockUnit is a CONSTANT for that reason. The block above asserts the
+         fitting; this asserts the ramp itself never moves. */
+      const unit = new Set(PIRZUL.map(z =>
+        asText(stopsOf(render({ ...base, speciallock: 'kodan', pirzul: z.id }), 'lockUnit'))));
+      ok(unit.size === 1 && !unit.has(null),
+         '#lockUnit moved with the פרזול — the bought-in units must not follow it');
+    }
+
+    /* ── THE פעמון IS NICKEL OR GOLD AND NOTHING ELSE ───────────────────
+       Owner, 30.8.2026: *"the color of the bell can only be nickel and
+       gold."* So black and bronze both draw a NICKEL ring.
+
+       ⚠ THE STARTING POINT WAS NOT WHAT IT LOOKED LIKE, AND THAT IS WHY THIS
+       ASSERTS BOTH HALVES. The ring was filled from `#lockUnit` — the
+       bought-in unit's constant steel — so it followed NOTHING, and a check
+       written only as "bronze must equal nickel" would have passed on the day
+       the bug shipped. The half that had to become true is gold. */
+    {
+      const rung = { ...base, bell: 'bell' };
+      const sel = 'data-hw="bell"';
+      ok(grabDeep(render(rung), sel), 'no bell group in the markup — every bell check is dead');
+      const ids = refs(grabDeep(render(rung), sel));
+      ok(ids.includes('bellMetal'),
+         'the פעמון stopped painting with #bellMetal — its own id');
+      ok(!ids.includes('nickel') && !ids.includes('lockUnit'),
+         'the פעמון is painting with another fitting’s gradient — one id, one owner');
+
+      const ring = z => asText(stopsOf(render({ ...rung, pirzul: z }), 'bellMetal'));
+      ok(ring('pz-nickel'), '#bellMetal is not emitted at all');
+      ok(ring('pz-gold') !== ring('pz-nickel'),
+         'a gold פרזול must gild the פעמון — the half of this that had to change');
+      for (const z of ['pz-black', 'pz-bronze']) {
+        ok(ring(z) === ring('pz-nickel'),
+           `the פרזול "${z}" must leave the פעמון in nickel — it is stocked in two metals`);
+      }
+      ok(new Set(PIRZUL.map(z => ring(z.id))).size === 2,
+         'the פעמון must have exactly two metals across the four finishes');
+    }
+
+    /* ── AND THE עינית FOLLOWS IT ON ALL FOUR, WHICH IT DID NOT ─────────
+       Peretz's own list of what the פרזול recolours has the עינית in it by
+       name, `ASK-PERETZ.md` §0e rests the whole "כלול" answer on that
+       sentence, and three shipped strings repeat it — while the ring was
+       filled from `#lockUnit` and came out the same grey on all four. Not a
+       crash: a promise the picture did not keep. */
+    {
+      const eye = { ...base, peephole: 'peep' };
+      const sel = 'data-hw="peephole"';
+      ok(grab(render(eye), sel), 'no peephole group in the markup — this check is dead');
+      ok(!paints(render(eye), sel).ids.includes('lockUnit'),
+         'the עינית is painted from the bought-in unit’s constant ramp again');
+      for (const z of ['pz-black', 'pz-bronze', 'pz-gold']) {
+        ok(looks(render({ ...eye, pirzul: z }), sel) !== looks(render(eye), sel),
+           `the פרזול "${z}" must recolour the עינית — it is in Peretz's own list`);
+      }
+    }
   }
 }
 
