@@ -173,9 +173,9 @@
     "step.pz.t": ["פרזול", "Hardware finish", "Отделка фурнитуры"],
     "step.pz.s": ["גוון הידית והצירים", "The tone of the lever and the hinges", "Оттенок ручки и петель"],
     "step.pz.l": [
-      "הגוון של הידית, הצירים והעינית. לא משנה את גוון ידית המשיכה.",
-      "The tone of the lever, the hinges and the viewer. It does not change the pull handle.",
-      "Оттенок нажимной ручки, петель и глазка. На ручку-скобу не влияет."
+      "הגוון של הידית, הצירים, העינית והפעמון. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.",
+      "The tone of the lever, the hinges, the viewer and the knocker. It changes neither the pull handle nor the additional lock.",
+      "Оттенок нажимной ручки, петель, глазка и кольца. Ручку-скобу и дополнительный замок не меняет."
     ],
     "step.sum.t": ["סיכום", "Your door", "Итог"],
     "step.sum.s": ["הדלת שלכם, והמחיר", "The door you built, and the price", "Собранная дверь и цена"],
@@ -218,14 +218,18 @@
     "g.bell": ["פעמון", "Doorbell", "Звонок"],
     "g.peephole": ["עינית", "Peephole", "Глазок"],
     "g.pirzul.h": [
-      "הגוון של הידית, הצירים והעינית.",
-      "The tone of the lever, the hinges and the viewer.",
-      "Оттенок ручки, петель и глазка."
+      "הגוון של הידית, הצירים, העינית והפעמון.",
+      "The tone of the lever, the hinges, the viewer and the knocker.",
+      "Оттенок ручки, петель, глазка и кольца."
     ],
+    /* ⚠ A KNOCKER, NOT A PUSH. This said "a bell push on the door itself" for
+       as long as the renderer drew one. The owner's three photographs replaced
+       that with a ring knocker on 30.8.2026 and this line did not follow — the
+       same drift the tile glyph had, in words instead of pixels. */
     "g.bell.h": [
-      "לחצן פעמון על הדלת עצמה.",
-      "A bell push on the door itself.",
-      "Кнопка звонка на самой двери."
+      "טבעת נוקשת במרכז הדלת, מעל העינית.",
+      "A ring knocker on the centre of the door, above the viewer.",
+      "Кольцо-стучалка по центру двери, над глазком."
     ],
     "g.peephole.h": [
       "עינית לראות מי בחוץ. כלולה במחיר.",
@@ -2952,7 +2956,20 @@
          Peretz, 30.8.2026: "pirzul doesnt affect the additional lock." A
          kodan and a kasefet arrive in the finish the manufacturer ships them
          in, and no choice on this page changes it - so this ramp is a
-         CONSTANT, not a function of state, which is the whole point. -->
+         CONSTANT, not a function of state, which is the whole point.
+
+         WHO IS EXEMPT, AND WHO ONLY LOOKED IT. His sentence names the
+         ADDITIONAL LOCK and nothing else, so the exemption is exactly two
+         fittings: the kodan and the kasefet. The peephole and the knocker
+         used this ramp too and should never have - the same notes record him
+         saying the pirzul DOES change the peephole's colour, and a knocker is
+         decorative furniture like the lever, not a lock somebody ships us in
+         its own finish. Both read the pirzul now, which is also what gives a
+         gold ring on a gold door: asked for from outside as "a gold bell
+         option", and it is not an option - it is this fitting finally
+         obeying the finish axis that has had a gold entry all along. No new
+         id, no third value in a one-bit field, no VERSION bump, and black and
+         bronze arrive with it. -->
     <linearGradient id="lockUnit" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"    stop-color="${FINISH_TONES.steel[0]}"/>
       <stop offset="0.16" stop-color="${FINISH_TONES.steel[1]}"/>
@@ -6644,7 +6661,7 @@ ${body}
        data-cx="${cx}" data-cy="${cy}" data-r="${R}">
       <ellipse cx="${cx}" cy="${cy + R * 0.18}" rx="${(R * 0.95).toFixed(1)}"
                ry="${(R * 0.88).toFixed(1)}" fill="#000" opacity="0.18"/>
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#nickel)"
               stroke="#000" stroke-opacity=".26"/>
       ${/* the glass inside the ring — dark, because behind it is an unlit hall,
         which is the same reasoning the obscured glazing is drawn on */
@@ -6675,7 +6692,7 @@ ${body}
                stroke-width="${(R * 0.2).toFixed(1)}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
                ry="${(RING * 0.98).toFixed(1)}"
-               fill="none" stroke="url(#lockUnit)"
+               fill="none" stroke="url(#nickel)"
                stroke-width="${(R * 0.18).toFixed(1)}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
                ry="${(RING * 0.98).toFixed(1)}"
@@ -6688,10 +6705,10 @@ ${body}
     ""}<path d="M ${(cx - BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)}
                L ${cx} ${(top - BOSS * 1.2).toFixed(1)}
                L ${(cx + BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)} Z"
-            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".22"/>
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
       <ellipse cx="${cx}" cy="${top.toFixed(1)}"
                rx="${BOSS.toFixed(1)}" ry="${(BOSS * 0.92).toFixed(1)}"
-               fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+               fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
       <ellipse cx="${cx}" cy="${top.toFixed(1)}"
                rx="${(BOSS * 0.46).toFixed(1)}" ry="${(BOSS * 0.42).toFixed(1)}"
                fill="#000" fill-opacity=".22"/>
@@ -6772,9 +6789,17 @@ ${body}
     <rect x="0" y="0" width="${S}" height="${S}" fill="none" stroke="currentColor" stroke-width="18"/>
   </svg>`;
   }
+  var SIZE_FRAME = (() => {
+    const all = Object.values(SIZES);
+    return {
+      w: Math.max(...all.map((s) => s.w + (s.side ? s.side + 46 : 0))),
+      h: Math.max(...all.map((s) => s.h))
+    };
+  })();
   function sizeGlyph(size) {
     const w = size.w + (size.side ? size.side + 46 : 0), pad = 60;
-    return `<svg viewBox="${-pad} ${-pad} ${w + pad * 2} ${size.h + pad * 2}" class="glyph"
+    const dx = (SIZE_FRAME.w - w) / 2, dy = SIZE_FRAME.h - size.h;
+    return `<svg viewBox="${(-pad - dx).toFixed(0)} ${(-pad - dy).toFixed(0)} ${SIZE_FRAME.w + pad * 2} ${SIZE_FRAME.h + pad * 2}" class="glyph"
                aria-hidden="true" preserveAspectRatio="xMidYMid meet">
     ${size.side ? `<rect x="0" y="0" width="${size.side}" height="${size.h}" fill="none"
           stroke="currentColor" stroke-width="44" opacity="0.45"/>` : ""}
@@ -6974,10 +6999,22 @@ ${body}
       nobell: `
     <circle cx="0" cy="0" r="46" fill="none" stroke="currentColor" stroke-width="7" opacity=".3"/>
     <path d="M-30 30 L30 -30" stroke="currentColor" stroke-width="7" opacity=".45"/>`,
+      /* ⚠ A RING ON A BOSS, BECAUSE THAT IS WHAT THE LEAF DRAWS NOW.
+         This was three concentric circles — the bell PUSH the renderer drew
+         until the owner's three photographs replaced it with a ring knocker on
+         30.8.2026. The door changed and the tile did not, which is precisely
+         what the paragraph above this function warns about: a tile showing one
+         fitting while the leaf draws another is §5 items 5 and 6, and the
+         "every option tile draws its own picture" assertion cannot see it,
+         because all that check compares is one TILE against another.
+         It also had a second cost: three concentric circles is very nearly the
+         peephole's tile, so the two questions in this step looked alike. A ring
+         hanging from a crowned boss cannot be mistaken for an eye. */
       bell: `
-    <circle cx="0" cy="0" r="52"/>
-    <circle cx="0" cy="0" r="40" fill="#fff" opacity=".92"/>
-    <circle cx="0" cy="0" r="26"/>`
+    <circle cx="0" cy="-2" r="40" fill="none" stroke="currentColor" stroke-width="13"/>
+    <path d="M-11 -54 L0 -66 L11 -54 Z"/>
+    <circle cx="0" cy="-44" r="17"/>
+    <circle cx="0" cy="-44" r="7" fill="#fff" opacity=".9"/>`
     }[x.id] || "";
     return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>

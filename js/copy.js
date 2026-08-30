@@ -311,9 +311,9 @@ export const UI = {
                        'Нажимная ручка и цилиндр — есть в каждой двери. Можно добавить сейфовый или кодовый замок.'],
   'step.pz.t':        ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
   'step.pz.s':        ['גוון הידית והצירים', 'The tone of the lever and the hinges', 'Оттенок ручки и петель'],
-  'step.pz.l':        ['הגוון של הידית, הצירים והעינית. לא משנה את גוון ידית המשיכה.',
-                       'The tone of the lever, the hinges and the viewer. It does not change the pull handle.',
-                       'Оттенок нажимной ручки, петель и глазка. На ручку-скобу не влияет.'],
+  'step.pz.l':        ['הגוון של הידית, הצירים, העינית והפעמון. לא משנה את גוון ידית המשיכה ולא את המנעול הנוסף.',
+                       'The tone of the lever, the hinges, the viewer and the knocker. It changes neither the pull handle nor the additional lock.',
+                       'Оттенок нажимной ручки, петель, глазка и кольца. Ручку-скобу и дополнительный замок не меняет.'],
   'step.sum.t':       ['סיכום', 'Your door', 'Итог'],
   'step.sum.s':       ['הדלת שלכם, והמחיר', 'The door you built, and the price', 'Собранная дверь и цена'],
   'step.sum.l':       ['בדקו שהכול נכון, ושלחו לנו את הדלת.',
@@ -345,10 +345,16 @@ export const UI = {
   'g.pirzul':         ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
   'g.bell':           ['פעמון', 'Doorbell', 'Звонок'],
   'g.peephole':       ['עינית', 'Peephole', 'Глазок'],
-  'g.pirzul.h':       ['הגוון של הידית, הצירים והעינית.', 'The tone of the lever, the hinges and the viewer.',
-                       'Оттенок ручки, петель и глазка.'],
-  'g.bell.h':         ['לחצן פעמון על הדלת עצמה.', 'A bell push on the door itself.',
-                       'Кнопка звонка на самой двери.'],
+  'g.pirzul.h':       ['הגוון של הידית, הצירים, העינית והפעמון.',
+                       'The tone of the lever, the hinges, the viewer and the knocker.',
+                       'Оттенок ручки, петель, глазка и кольца.'],
+  /* ⚠ A KNOCKER, NOT A PUSH. This said "a bell push on the door itself" for
+     as long as the renderer drew one. The owner's three photographs replaced
+     that with a ring knocker on 30.8.2026 and this line did not follow — the
+     same drift the tile glyph had, in words instead of pixels. */
+  'g.bell.h':         ['טבעת נוקשת במרכז הדלת, מעל העינית.',
+                       'A ring knocker on the centre of the door, above the viewer.',
+                       'Кольцо-стучалка по центру двери, над глазком.'],
   'g.peephole.h':     ['עינית לראות מי בחוץ. כלולה במחיר.',
                        'A viewer, to see who is outside. Included in the price.',
                        'Глазок, чтобы видеть, кто снаружи. Входит в цену.'],

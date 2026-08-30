@@ -1739,6 +1739,32 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ A GOLD BELL WAS ASKED FOR AND IS NOT AN OPTION — IT IS A FITTING FINALLY
+  OBEYING THE FINISH AXIS.** Asked for from outside: *"make a gold bell option
+  and change the icon of it to look like the bell."* Adding one would have cost
+  a VERSION bump: `BITS.bell` is ONE bit, so a third value widens the payload
+  and refuses every code already written. It was not needed. `PIRZUL` has had a
+  gold entry all along, and the knocker was filling from `#lockUnit` — the
+  CONSTANT steel ramp reserved for the additional lock, because Peretz said
+  *"pirzul doesnt affect the additional lock."*
+  ⚠ **His sentence names the additional lock and nothing else.** The exemption
+  is exactly two fittings, the kodan and the kasefet, which arrive in the
+  finish their manufacturer ships. The knocker and the PEEPHOLE were borrowing
+  it too, and the peephole's case is not even arguable — `ASK-PERETZ.md` §0e
+  records him saying the pirzul DOES change the peephole's colour, so the
+  drawing had been contradicting a quoted instruction. Both read the pirzul
+  now: gold, black, bronze and nickel, no new id, no bit, no bump.
+  ⚠ **And the tile was still drawing the fitting that was replaced.** The
+  bell's glyph was three concentric circles — the bell PUSH — while the leaf
+  drew a ring knocker. That is §5 items 5 and 6, and the "every option tile
+  draws its own picture" assertion cannot see it: all that check compares is
+  one tile against another, never a tile against the door. It was also nearly
+  the peephole's tile, so the step's two questions looked alike. It is a ring
+  on a crowned boss now.
+  ⚠ **Three strings were stale in the same way** and are corrected: the bell's
+  hint still said *"a bell push on the door itself"*, and both places that list
+  what the finish touches named the lever, hinges and viewer but not the
+  knocker.
 - **⚠ THE DESIGN HALF OF THE SAME REVIEW, 30.8.2026 — THE FLOW REORDERED, THE
   SEND BUTTON MADE LOUD, AND THE BRAND BACK WITHOUT THE BAR.**
   ⚠ **משקוף moved from step two to step eight, and nothing else moved.** It is
