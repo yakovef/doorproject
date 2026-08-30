@@ -23,6 +23,75 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-30 20:40 UTC — run 60: nothing worth changing — verified a full UX-review pass, item by item
+
+**Looked at:** `git fetch` pulled 8 human commits since run 59, working
+through a UX review (`UX-FINDINGS`, on a separate branch, deliberately
+not copied here) in its own stated order of work, each re-measured at
+today's head before being built rather than trusted from the review's own
+numbers: the flow's send button was below the fold at 1280×720 and
+320×568 (fixed by moving it into the already-existing sticky foot on the
+summary, with a width-dependent placement function since pinning it below
+1100px would have added a third bar of fixed chrome to a 568px phone);
+the handing default (ימין/שמאל) — CLAUDE.md's own "only mistake that
+costs real money" — was pre-answered and below the fold on step 1, fixed
+not by moving the pills but by adding a prominent confirmation card
+("כיוון הפתיחה — נכון?") with a swap button, first thing on the summary
+step, reading the exact same `handingWords()` sentence the WhatsApp
+message and A4 sheet use; three question steps hid more than half a
+screen of options above 1100px with no cue, fixed with a conditional
+fade keyed to real scroll measurements rather than the navigator's
+always-on one; the choices column was widened by up to 40px at zero cost
+to the drawn door (verified: `fitStage` only ever widens the crop, never
+narrows the door); the two-row navigator-label idea was measured and
+explicitly declined (still doesn't fit even in the wider column, and
+costs real height everywhere else); and a duplicated sentence on step 1
+was removed. A separate, independent commit (`95d0e9d`) fixed the gold
+פרזול finish not reaching the cylinder or bell/knocker, overruling by
+explicit owner instruction a chrome-cylinder measurement the same commit
+keeps and documents rather than deletes — and found it had partially
+raced a sibling session (`1b800e7` from run 59) that fixed two of the
+same three bugs independently; the two sessions' overlapping fixes were
+reconciled with attribution rather than silently duplicated.
+
+Rebuilt — checked explicitly for leftover conflict markers first, since
+one of these very commits records catching exactly that failure mode
+after its own rebase. None found; bundle already matched, no diff.
+Verified visually rather than trusted: confirmed the untouched-door send
+label ("יש לי שאלה") shows correctly on arrival instead of a false "send"
+on both the quiet chip and the summary's primary button; confirmed the
+handing confirmation card renders on the summary step with the correct
+sentence and swap button (my first attempt looked for it on step 1 near
+the handing pills, which was my own misreading of the commit — it lives
+on the summary, as a safety net rather than a step-1 layout change);
+confirmed the gold-finish fix by loading `?bl=bell&pz=pz-gold` and seeing
+the ring knocker and lever share the same gold tone. Zero console errors
+on every route tested.
+
+**Instruments:** test ✓ (**4,349,483** passed, 0 failed — matches the
+final commit's own claimed count exactly) · audit ✓ (all eight viewports
+clean, no faults) · profile ✓ (both FALLOFF bands within tolerance,
+byte-identical) · collide -- all ✓ (1,902 designs, unchanged) · collide
+-- boxes ✓ (MOUNT_REACH 121 covers the deepest fitting at 111) · recreate
+✓ (same ten long-documented catalogue gaps, nothing new — every commit in
+this batch reports zero bare sheets moved, confirmed independently).
+`git status` checked immediately after `recreate` — clean.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run.
+Two open items the round's own commits flag for a human (whether the
+https-only guard on the share picture is broader than it needs to be;
+which of two pieces of owner-placed furniture — the price card or the
+grip-rotate button — should yield at 1100–1152px) are recorded in
+CLAUDE.md/ASK-PERETZ.md for the owner's child to decide, not mine to
+guess at.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-30 15:40 UTC — run 59: nothing worth changing — verified a 19-commit design-branch merge
 
 **Looked at:** `git fetch` pulled 19 human commits since run 58 — much
