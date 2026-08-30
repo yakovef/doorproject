@@ -23,6 +23,68 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-30 10:40 UTC — run 58: nothing worth changing — verified a full size-catalogue restructuring
+
+**Looked at:** `git fetch` pulled one human commit since run 57 —
+"Six sizes in two families, and every price Peretz has ever given now has
+a door a customer can tap." A full restructuring of the size list per the
+owner's own words: three bands on a single door (סטנדרטית · חריגה +25% ·
+חריגה שנייה +50%) and the same three on a דו כנפי double-leaf door (2×,
+with its own חריגה figured on the whole double), replacing the previous
+separate wide/tall/xl tiles. Six prices, all matching his own figures
+exactly: 3,195 · 3,995 · 4,795 · 6,390 · 7,990 · 9,585. `VERSION` bumped
+20→21 (three retired ids alias onto four new ones via `SIZE_ALIAS`, so an
+old link keeps opening the same band at the same money). The commit also
+describes three real faults the audit itself caught along the way — a
+merged "extra" tile size the note argues was still the right trade despite
+an old catalogue comment warning against exactly this merge, a fixed
+double-leaf inactive-leaf width reverted from a proportional scheme after
+the wall-control clearance check ruled it out, and a stale `collide.mjs`
+sweep that had been silently running the same door three times under
+different names (`SIZES[undefined]` falling back to `standard`) — plus a
+new finding that the worst-case wall clearance (72.4 px) occurs at
+360×740, a size×viewport pair none of the eight `VIEWS` visit, recorded
+rather than acted on.
+
+Rebuilt (bundle already matched, no diff). Verified rather than trusted:
+loaded the live page, confirmed all six size tiles read exactly ₪3,195 /
+3,995 / 4,795 / 6,390 / 7,990 / 9,585; picked the ₪9,585 tile directly and
+confirmed the widest door renders correctly with both sconces still fully
+clear; loaded `?s=halfextra2` at the exact 1920×918 viewport the previous
+lamp-clipping bug was reported from and confirmed the same — comfortable
+clearance on both sides, price card correctly inside the picture. Zero
+console errors on every route tested. (One of my own probes used a
+guessed id, `?s=extra2` — that turned out to be a real, different, valid
+size, the single-leaf second-oversize at ₪4,795, confirming the id
+round-trips correctly rather than exposing anything wrong; my own
+assumption was off, not the site.)
+
+**Instruments:** test ✓ (**4,349,367** passed, 0 failed — matches the
+human round's own claimed count exactly) · audit ✓ (all eight viewports
+clean, no faults, including the floor-line and lamps-in-frame checks) ·
+profile ✓ (both FALLOFF bands within tolerance, byte-identical) · collide
+-- all ✓ (**1,902** designs, up from 1,060 — the larger size list, not a
+regression; faceObstacles agrees with the drawing everywhere) · collide
+-- boxes ✓ (MOUNT_REACH 121 covers the deepest fitting at 111) · recreate
+✓ (same ten long-documented catalogue gaps, nothing new — all ten corpus
+doors are `standard`, so none of them touch the size change). `git status`
+checked immediately after `recreate` again — clean, no stamp drift.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run.
+The size structure, all six prices and the merged-tile trade-off are
+Peretz's and the owner's own decisions, already made and already
+verified against the commit's own figures; nothing here was mine to
+second-guess. The one open item the commit itself flags (worst-case wall
+clearance at an untested 360×740) is the primary session's own to act on,
+not a defect I found independently.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-30 05:40 UTC — run 57: nothing worth changing — verified a completed round finishing Peretz's remaining notes
 
 **Looked at:** `git fetch` pulled two human commits since run 56, completing
