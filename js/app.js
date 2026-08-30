@@ -1241,6 +1241,40 @@ function buildPanel() {
     <div class="sect__foot">
       <button type="button" class="btn btn--ghost sect__back">${T('nav.back')}</button>
     </div>`;
+  /* ── THE ONE QUESTION THE PAGE ANSWERED FOR THEM, ASKED BACK ─────────
+     ⚠ `handing` IS THE ONLY FIELD WITH A DEFAULT THAT COSTS MONEY TO GET
+     WRONG. `CLAUDE.md` calls the ימין/שמאל convention the only mistake on the
+     list that costs real money — the site had it backwards for weeks — and
+     `js/url-state.js` has to give it a value, because the drawing must draw
+     something. Measured on the live page at 1280x720: on arrival the ONLY
+     controls the fold cuts through are the two handing pills at the foot of
+     step 1. Pre-answered, below the fold, and accepted by pressing הבא.
+
+     ⚠ THIS IS OPTION B OF THE TWO THE REVIEW OFFERED, AND THE OTHER ONE COSTS
+     A VERSION BUMP. "No default" means a third value in a field the short
+     code packs as an INDEX into `HANDINGS`, so every code already written
+     would be refused — for a question we can simply ask again, one screen
+     later, where it can still be changed. No new value, no bit, no
+     `VERSION`, and `DEFAULTS` is untouched.
+
+     The sentence is `handingWords()`, which is what the ORDER says, so the
+     customer confirms in the words Peretz will read. It goes FIRST in the
+     body, above everything, because a confirmation buried under a spec table
+     is the fault this fixes wearing a different hat. */
+  const hand = document.createElement('div');
+  hand.className = 'sum-hand';
+  hand.innerHTML =
+    `<p class="sum-hand__q">${T('sum.hand.q')}</p>`
+    + '<p class="sum-hand__v" data-handing-words></p>'
+    + `<button type="button" class="btn btn--ghost sum-hand__flip">${T('sum.hand.flip')}</button>`;
+  /* Two handings, so confirming is a toggle. Through `set` like every other
+     control — same repair, same history, same URL. */
+  hand.querySelector('.sum-hand__flip').addEventListener('click', () => {
+    const other = HANDINGS.find(h => h.id !== state.handing) || HANDINGS[0];
+    set({ ...state, handing: other.id });
+  });
+  sum.querySelector('.sect__body').appendChild(hand);
+
   if (SUMMARY.exp) {
     const d = document.createElement('details');
     d.className = 'sect__exp';
@@ -2235,6 +2269,14 @@ function paint() {
   const money = formatAgorot(priceAgorot(state));
   document.querySelectorAll('[data-price]').forEach(el => { el.textContent = money; });
   renderBreakdown(state);
+
+  /* The handing confirmation on the summary, written the same way and for the
+     same reason: `handingWords` is the sentence the ORDER carries, so the
+     customer confirms in the words Peretz will read rather than in a second
+     phrasing that could drift from it. Written to every element that claims
+     to show it, never to an id. */
+  const hw = handingWords(state);
+  document.querySelectorAll('[data-handing-words]').forEach(el => { el.textContent = hw; });
 
   /* ⚠ EVERY GROUP, FROM THE REAL ARITHMETIC. This loop used to run over the
      grille group alone, under a comment ending "Only the grille group needs

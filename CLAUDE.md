@@ -1840,6 +1840,27 @@ how it got there. Detail lives in the section it belongs to.
   428 — the 30.8 gap removal took 32 px off, which is the figure that entry
   claimed. Still nine circles, still two clipped, still none with visible
   text.
+- **⚠ ITEM 2: THE ONE DEFAULT THAT COSTS MONEY IS PUT BACK TO THE CUSTOMER.**
+  `UX-FINDINGS` §2. `handing` must have a default — the drawing has to draw
+  something — and this file calls the ימין/שמאל convention the only mistake on
+  the list that costs real money. Re-measured at 1280×720: on arrival the
+  **only** controls the fold cuts through are the two handing pills at the
+  foot of step 1. Pre-answered and below the fold at once, and the natural
+  gesture accepts it in silence.
+  ⚠ **Option B, and option A costs a `VERSION` bump.** "No default" is a third
+  value in a field the short code packs as an INDEX into `HANDINGS`, so every
+  code already written would be refused — for a question that can simply be
+  asked again one screen later, where it can still be changed. No new value,
+  no bit, no bump, `DEFAULTS` untouched.
+  ⚠ **AND IT CONFIRMS IN THE ORDER'S OWN WORDS.** The sentence is
+  `handingWords()` — the same one the WhatsApp message carries — written
+  through `[data-handing-words]` by `paint`, never to an id, for the reason
+  the price is. A confirmation phrased its own way would be a second statement
+  of the fact that matters most on this page. The audit asserts the row
+  exists, that its control is WHOLE on screen at all eight viewports, that it
+  clears 44 px, and that its sentence equals `handingWords()` **to the
+  character**. Falsified both ways: a different phrasing and a deleted row
+  each fail every viewport.
 - **⚠ TWO CORRECTIONS TO THE FINISH AXIS, 31.8.2026 — AND A THIRD FITTING THAT
   WAS FOLLOWING NOTHING AT ALL.** Owner, in his words: *"when the pirzul
   changes the keyhole changes too, and the color of the bell can only be

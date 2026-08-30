@@ -308,6 +308,30 @@ svg { direction: ltr; }
    it, and the audit measures every interactive element in the flow. The
    marker is drawn rather than left to the browser's triangle, which is a
    different glyph and a different size in every engine. */
+/* ── THE HANDING CONFIRMATION, ON THE SUMMARY ONLY ────────────────────
+   ⚠ IT IS A CARD RATHER THAN A LINE, ON PURPOSE. Everything else on this step
+   is a readout; this is the one thing being ASKED, and it is asked because
+   the field it confirms is the only default in the product that costs money
+   to get wrong. A row of the spec table would read as another fact about a
+   decision already made, which is exactly the state it exists to break.
+   ⚠ The button keeps the 44 px floor this project asserts everywhere; the
+   audit measures every control on every step and would say so if it did not. */
+.sum-hand {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
+  margin-block-end: 16px; padding: 12px 14px;
+  border: 1px solid var(--rule); border-radius: 10px;
+  background: var(--paper-up);
+}
+.sum-hand__q {
+  flex: 1 0 100%; margin: 0;
+  font: 600 .86rem var(--sans); color: var(--ink);
+}
+.sum-hand__v {
+  flex: 1 1 auto; margin: 0;
+  font: 400 .86rem var(--sans); color: var(--ink-2);
+}
+.sum-hand__flip { flex: 0 0 auto; }
+
 .sect__exp { margin-block-start: 14px; border-block-start: 1px solid var(--rule); }
 .sect__q {
   display: flex; align-items: center; gap: 8px;

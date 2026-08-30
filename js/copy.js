@@ -380,6 +380,22 @@ export const UI = {
                        'Не уверены? Уточним вместе при замере.'],
   'g.panels':         ['פאנלים', 'Panels', 'Панели'],
 
+  /* ⚠ THE ONE QUESTION THE PAGE ANSWERS FOR THE CUSTOMER, ASKED BACK.
+     `handing` has to have a default — the drawing must draw something — and
+     this file calls the ימין/שמאל convention the only mistake on the list
+     that costs real money. Measured on the live page at 1280x720: on arrival
+     the ONLY controls the fold cuts through are the two handing pills. So the
+     highest-stakes decision in the product is pre-answered, below the fold,
+     and the natural gesture — glance, press הבא — accepts it in silence.
+     This is the confirm row on the summary. It is not a second control: same
+     `set()`, same field, no new value, no wire format, no VERSION. The
+     sentence is `handingWords()`, which is what the ORDER already says, so
+     the customer reads the words Peretz will read. */
+  'sum.hand.q':       ['כיוון הפתיחה — נכון?', 'The opening direction — is this right?',
+                       'Сторона открывания — верно?'],
+  'sum.hand.flip':    ['החלפה לצד השני', 'Switch to the other side',
+                       'Сменить на другую сторону'],
+
   'g.colour.h':       ['הקוד שליד כל גוון הוא הקוד של היצרן.',
                        'The code beside each shade is the manufacturer’s own.',
                        'Код рядом с каждым оттенком — код производителя.'],

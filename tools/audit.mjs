@@ -23,7 +23,7 @@ import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
 import { SIZES } from '../js/catalog.js';
 import { setLang } from '../js/copy.js';
-import { specRows, summaryLine } from '../js/spec.js';
+import { handingWords, specRows, summaryLine } from '../js/spec.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
    the grip and the lockset became separate fields, and a hard-coded length
@@ -503,6 +503,56 @@ for (const v of VIEWS) {
         } else if (!send.wide && !send.chipWhole && !send.primaryWhole) {
           fault(v.name, 'the summary has no send fully on screen: the primary is '
             + `${send.below} px below the fold and the chip is not whole either`);
+        }
+
+        /* ── AND THE HANDING IS CONFIRMED, IN THE ORDER'S OWN WORDS ─────
+           ⚠ `handing` IS THE ONLY DEFAULT IN THIS PRODUCT THAT COSTS MONEY TO
+           GET WRONG, and the page answers it for the customer because the
+           drawing has to draw something. Measured at 1280x720: on arrival the
+           ONLY controls the fold cuts through are the two handing pills — so
+           it is pre-answered and below the fold at once. The confirm row on
+           the summary is the answer (`UX-FINDINGS` §2, option B; option A
+           costs a `VERSION` bump for a third value in a packed index).
+
+           Three things, and the third is the one that would rot quietly: the
+           row is there, its control is WHOLE on screen at this viewport, and
+           its sentence is `handingWords()` to the character — the same
+           sentence the WhatsApp order carries. A confirmation phrased its own
+           way is a second statement of the fact that matters most on this
+           page, and §5's whole subject is what two statements of one fact
+           eventually do. */
+        const hand = await p.evaluate(() => {
+          const row = document.querySelector('.sum-hand');
+          const words = document.querySelector('[data-handing-words]');
+          const flip = document.querySelector('.sum-hand__flip');
+          if (!row || !words || !flip) return { missing: true };
+          const r = flip.getBoundingClientRect();
+          return {
+            words: (words.textContent || '').trim(),
+            whole: r.width > 0 && r.height > 0 && r.top >= 0 && r.left >= 0
+                   && r.bottom <= innerHeight && r.right <= innerWidth,
+            tap: Math.min(Math.round(r.width), Math.round(r.height)),
+            below: Math.round(Math.max(0, r.bottom - innerHeight)),
+          };
+        });
+        if (hand.missing) {
+          fault(v.name, 'the summary has no handing confirmation — the one default '
+            + 'in this product that costs money to get wrong is answered for the '
+            + 'customer and never put back to them');
+        } else {
+          if (!hand.whole) {
+            fault(v.name, 'the handing confirmation is not fully on screen'
+              + (hand.below ? ` — ${hand.below} px below the fold` : ''));
+          }
+          if (hand.tap < 44) {
+            fault(v.name, `the handing confirm control is ${hand.tap} px on its short `
+              + 'side, under the 44 px this project asserts everywhere');
+          }
+          const want = handingWords(DEFAULTS);
+          if (hand.words !== want) {
+            fault(v.name, 'the handing confirmation does not say what the ORDER says: '
+              + `page "${hand.words}" against spec.js "${want}"`);
+          }
         }
       }
 
