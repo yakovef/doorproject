@@ -1512,6 +1512,29 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
 
 ## 9. What is still open
 
+### ⚠ THE WALL CANNOT HOLD BOTH ITS CONTROLS AT 1100–1152 px
+
+Found 31.8 while widening the choices column, and **pre-existing** — measured
+identical at the shipped 380 px cap and at 400 and 420. At `cusp` (1100×800)
+and `narrow-d` (1152×800) the price chip covers `#grip-rot`, so a customer who
+has chosen a pull bar **cannot press the button that rotates it** at those two
+widths. `elementFromPoint` at the button's own centre returns the chip.
+
+The arithmetic says it is not a tuning problem: the wall there is **140–152 px
+and the chip is 163 px wide**, so the two cannot sit side by side at any
+column cap. One of them has to yield, and both were placed by the owner with
+circles on a screenshot (§0a) — the grip controls in the wall on purpose, the
+price under the right-hand lamp on purpose. **That is a decision above CSS**,
+and it is the same shape as the navigator's refused 30 px shrink: recorded
+rather than guessed at.
+
+Three ways out, cheapest first: narrow the chip below the wall's width at
+these two breakpoints (it is the ₪ figure at 1.9rem that sets it); stack the
+grip controls above the chip instead of beside it; or let the grip controls
+sit on the leaf at these widths only. `npm run audit` names the two viewports
+and the one control explicitly, so the exemption shrinks the day this is
+fixed and nothing else can hide behind it.
+
 ### Blocked on a human — `ASK-PERETZ.md`
 ⚠ Every number in this paragraph is a section of THAT file, not of this one.
 
@@ -1861,6 +1884,39 @@ how it got there. Detail lives in the section it belongs to.
   clears 44 px, and that its sentence equals `handingWords()` **to the
   character**. Falsified both ways: a different phrasing and a deleted row
   each fail every viewport.
+- **⚠ ITEM 6 (TAKEN BEFORE 5): THE CHOICES COLUMN IS WIDER AND THE DOOR DID
+  NOT MOVE.** `UX-FINDINGS` §4.1. Taken out of the review's order on purpose:
+  item 5 is *"gated on re-measuring §4's vertical budget"*, and this is the
+  change that moves that budget, so doing 5 first would have measured a
+  panel about to be replaced.
+  ⚠ **THE PREDICTION WAS ZERO PIXELS OF DOOR AND IT HELD EXACTLY.** `fitStage`
+  only ever WIDENS `FIT_BOX` to the stage's shape and the crop is height-driven
+  above the scene's aspect, so width taken off the stage costs the leaf
+  nothing. Measured before and after at four widths: **220.4×475.8,
+  288.0×622.0, 355.9×768.5, 252.2×544.7 — identical to a tenth of a pixel.**
+  What it buys: the panel goes 352→392 px and the overflow falls by a third to
+  a half on the crowded steps (at 1440: grip 393→104, lock 599→311, glass
+  543→498, summary 515→396).
+  ⚠ **AND THE LIMIT IS THE WALL, NOT THE DOOR.** At 440 the price chip lands on
+  `#grip-rot` at 1440×900 and the drag test cannot press a button it can see.
+  420 is the widest cap that adds no new blocked control.
+  ⚠ **CHASING THAT FOUND A PRE-EXISTING DEFECT AND A NEW INSTRUMENT.** At
+  1100×800 and 1152×800 the chip ALREADY covers that button — measured at the
+  shipped 380 cap and at 400 and 420 alike — because the wall there is
+  140–152 px and the chip is 163. §9 has it; both viewports and the one
+  control are named in the audit so the exemption cannot spread. And the wall
+  now has a HIT TEST at every viewport: at each control's own centre, the
+  element on top must be that control. That is a different question from the
+  geometric overlap checks beside it, which all passed while the button was
+  unpressable.
+  ⚠ **THE FIRST VERSION OF BOTH MEASUREMENTS WAS WRONG.** The cap sweep
+  injected each candidate with `addStyleTag` after load, which never re-runs
+  `fitStage` — so the furniture was placed against the previous wall and 440
+  looked broken at widths where it is fine. And the first wall check ran on
+  whatever door the step walk left behind: the DEFAULT, where the grip
+  controls are hidden, so it measured nothing and passed everywhere. It loads
+  a Ron bar on an `extra2` leaf now and asserts it found the controls (§5.15).
+  **A layout measured without the code that lays it out is not a measurement.**
 - **⚠ ITEM 3: THE PANEL SAYS WHEN THERE IS MORE OF IT.** `UX-FINDINGS` §4.2.
   Above 1100 px `.layout` is `overflow: hidden` — one screen, two columns,
   each scrolling inside itself — so the WINDOW has no scrollbar and, on a

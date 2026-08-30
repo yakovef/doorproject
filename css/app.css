@@ -727,8 +727,37 @@ svg { direction: ltr; }
        copy beside the flow — so the track it reserved stood empty on eight
        steps out of nine and 360 px of a laptop went to nothing. With the dock
        gone (27.8.2026) the card is the only send affordance there is, and it
-       belongs to the step whose job is sending. The door gets the width. */
-    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+       belongs to the step whose job is sending. The door gets the width.
+       ⚠ AND SINCE 31.8 THE CAP IS 440, NOT 360, AND THE DOOR DID NOT MOVE.
+       `UX-FINDINGS` §4.1: the picture takes about 73% of the width and is
+       nearly identical between steps, while the choosing — the actual task —
+       has the smaller and more awkward half. Re-measured driving the flow
+       forward: seven of the nine steps overflow their panel at 1440x900, the
+       worst by 599 px.
+       ⚠ THE PREDICTION WAS ZERO PIXELS OF DOOR AND IT WAS CHECKED. `fitStage`
+       only ever WIDENS `FIT_BOX` to the stage's shape, and the crop is
+       height-driven while the stage's aspect stays above the scene's (~0.536)
+       — so taking width off the stage costs the leaf nothing until that
+       crossing. Measured before and after at 1152, 1280, 1440 and 1920.
+       ⚠ AND 420 IS WHERE THE WALL STOPS IT, NOT THE DOOR. The door is free —
+       identical at 480 and at 360 — but the price chip and the grip controls
+       both stand in the plaster beside the leaf, and a narrower stage is a
+       narrower wall. Swept against every wall control's HIT TEST on real page
+       loads at seven widths: **380 (shipped), 400 and 420 are identical** —
+       the only blocked control is `#grip-rot` at 1100 and 1152, which is
+       pre-existing and is in §9 — and **at 440 the chip lands on `#grip-rot`
+       at 1440x900 as well**. So the widening is what the furniture can
+       afford, measured, rather than the 150-200 px the review asked for.
+       ⚠ THE FIRST SWEEP OF THIS WAS WRONG AND SAID SO CONFIDENTLY. It injected
+       each candidate cap with `addStyleTag` after load — which never re-runs
+       `fitStage`, so the chip and the grip bar were still placed against the
+       PREVIOUS wall and 440 looked broken at widths where it is fine. Every
+       number above comes from a real build and a real load. **A layout
+       measured without the code that lays it out is not a measurement.**
+       ⚠ AND IT IS A CAP, NOT A WIDTH: `minmax` still collapses the track
+       toward 300 px on a narrow desktop, which is what keeps `cusp` (1099)
+       from paying for it. */
+    grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
     /* Two rows: the door takes the height that is going and the note sits
        under it, both inside column 2.
        ⚠ ONLY CONSTANT THINGS MAY LIVE IN ROW 2. It is `auto`, so whatever is
@@ -1583,7 +1612,7 @@ svg { direction: ltr; }
 /* ── THE CHOICES, AS A CARD ─────────────────────────────────────────
    From the mockup. Measured before it was written: applying this to
    `.panel--choose` ITSELF, with no wrapper element, moves the door by ZERO
-   pixels at 1100, 1280 and 1536 — the grid track is `minmax(300px, 360px)`
+   pixels at 1100, 1280 and 1536 — the grid track is `minmax(300px, 420px)`
    and a margin on a grid item comes out of the item, never out of the stage's
    `1fr`. So `audit.mjs`'s "the door keeps its size" assertion is untouched by
    construction rather than by luck.
@@ -3384,7 +3413,12 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    what the overlay was for; the rest is a composition, and it deserves a fresh
    look rather than the tail of a long session. */
 @media (min-width: 1280px) {
-  .layout { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr) 0; }
+  /* ⚠ 420 ABOVE 1280 TOO, AND IT WAS 380. One number rather than two: the
+     limit is the WALL, and the wall is narrowest in proportion at the
+     narrowest desktop, so a bigger cap up here would only widen the gap
+     between what the two breakpoints promise. Same measurement behind it —
+     the door is identical to a tenth of a pixel at 1280, 1440 and 1920. */
+  .layout { grid-template-columns: minmax(300px, 420px) minmax(0, 1fr) 0; }
   .stage-wrap { grid-column: 2 / span 2; }
   .stage__bar { grid-column: 2 / span 2; }
   /* The send card is inside the summary step now, so column 3 has nothing to

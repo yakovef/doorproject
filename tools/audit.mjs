@@ -689,6 +689,7 @@ for (const v of VIEWS) {
         }
       }
     }
+
     await p.click('.steps__step');          // back to step 01 for the walk below
     await p.waitForTimeout(120);
   }
@@ -1410,6 +1411,73 @@ for (const v of VIEWS) {
     }
     if (!faults) console.log('  the door keeps its size when it gains a handle, '
                            + 'and the controls stand clear of it');
+  }
+
+  /* ── AND THE FURNITURE IN THE WALL DOES NOT COVER ITSELF ────────────
+     ⚠ THE WALL IS A SHARED SURFACE AND NOTHING WAS MEASURING IT AS ONE.
+     Three things stand in the plaster beside the door — the price chip with
+     its send, the undo/redo circles and the grip controls — and every one is
+     `position: absolute` against a stage whose width moves with the viewport
+     AND with the choices column. Widening that column to 440 on 31.8 put the
+     chip on top of `#grip-rot` at 1440x900, and the only thing that noticed
+     was Playwright refusing to click a button it could plainly see.
+
+     This asks the browser the question a finger asks: at each control's own
+     centre, whatever is on top must BE that control. That is not the same
+     question as "do the boxes overlap" — two boxes can share a rectangle and
+     both still be pressable, and the geometric checks above already cover the
+     overlap case.
+
+     ⚠ AND IT LOADS A DOOR THAT HAS THE CONTROLS. The first version of this
+     ran on whatever door the step walk left behind, which is the DEFAULT —
+     and the grip controls are hidden there, so it measured nothing and passed
+     everywhere. §5.15 again, in the check written to catch a §5.15 fault.
+     The URL is the drag test's own, which carries a Ron bar on an extra2
+     leaf: the widest door in the range beside the narrowest wall.
+
+     ⚠ AND TWO VIEWPORTS ARE EXEMPT FOR `#grip-rot`, WITH THE MEASUREMENT.
+     At `cusp` (1100x800) and `narrow-d` (1152x800) the price chip already
+     covers that button, and it did before this change: measured on real page
+     loads at the shipped 380 cap and again at 400 and 420, identical every
+     time. The arithmetic says why — the wall there is 140-152 px and the chip
+     is **163 px wide**, so the two cannot sit side by side at any cap. That
+     is a decision about which piece of furniture yields, and both were placed
+     by the owner with circles on a screenshot (`CLAUDE.md` §0a), so it is
+     recorded in §9 rather than settled here.
+     ⚠ NAMING THE TWO VIEWPORTS AND THE ONE CONTROL IS THE POINT. A blanket
+     skip would have hidden the 1440x900 regression that prompted this check,
+     and the exemption shrinks the day the chip does. */
+  {
+    await p.goto(`file://${process.cwd()}/index.html`
+               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=panel&s=extra2&h=right-in');
+    await p.waitForTimeout(400);
+    const wall = await p.evaluate(() => {
+      const seen = [], bad = [];
+      for (const sel of ['#grip-rot', '#grip-home', '#price-toggle', '#quote-wa',
+                         '#undo-btn', '#redo-btn']) {
+        const el = document.querySelector(sel);
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) continue;    // hidden controls have no hit test
+        seen.push(sel);
+        const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        if (top && top !== el && !el.contains(top)) {
+          bad.push(`${sel} is covered by ${top.id || top.className || top.tagName}`);
+        }
+      }
+      return { seen, bad };
+    });
+    /* §5.15: the door above was chosen BECAUSE it shows the grip controls. If
+       it stops showing them this check has quietly become an empty loop. */
+    if (!wall.seen.includes('#grip-rot')) {
+      fault(v.name, 'the wall check found no grip controls on a door that carries '
+        + 'a rotatable bar — it is measuring nothing');
+    }
+    for (const b of wall.bad) {
+      if ((v.name === 'narrow-d' || v.name === 'cusp')
+          && b.startsWith('#grip-rot')) continue;
+      fault(v.name, `a control in the wall cannot be pressed: ${b}`);
+    }
   }
 
   await p.close();
