@@ -80,8 +80,7 @@ second-guess. The one open item the commit itself flags (worst-case wall
 clearance at an untested 360×740) is the primary session's own to act on,
 not a defect I found independently.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** ca638f8
 
 ---
 
