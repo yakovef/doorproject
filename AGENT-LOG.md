@@ -23,6 +23,63 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-30 05:40 UTC — run 57: nothing worth changing — verified a completed round finishing Peretz's remaining notes
+
+**Looked at:** `git fetch` pulled two human commits since run 56, completing
+the "renderer work" that `88b6da8` had deliberately left pending —
+`ada5f20` ("The קודן and the כספת redrawn off Peretz's photographs and
+moved to eye level, the stripes made to follow the finish, and the brass
+warmed") and `05602d4` ("A פעמון and a עינית, VERSION 20, and a brass that
+was two different metals in one file"). Together these finish all eleven
+items from his 30.8.2026 notes: the digital keypad (קודן) was redrawn as
+the correct MECHANICAL push-button product (it had been drawn as the
+already-separate digital lock), both special-lock fittings moved from
+knee height to eye height (measured off two anchor points — the peephole
+and the corpus-fixed lever height — across his four attached photographs),
+a finish-precedence rule was settled from two of his sentences that only
+resolve together (פרזול recolours the stripes, a grip's own tone does
+not), the brass ramp was corrected twice in one day (photograph-measured,
+then found to disagree with the Ella bar's own trusted gradient by more
+than double — fixed to agree), and two new fields shipped (bell `bl=`,
+peephole `ey=`, both defaulting to "none" even though the peephole is
+priced free, on the same "nothing appears the customer didn't choose"
+principle). `VERSION` is now 20; a retired `?a=` link is asserted to keep
+opening the door it always opened rather than being misread.
+
+Rebuilt (bundle already matched, no diff), then verified rather than
+trusted: chose the קודן tile on the live page and confirmed the door
+draws the correct tall pill body with two columns of buttons and a turn
+knob at eye level (not the old digital 3×3 grid), price updates to
+₪4,095 correctly; loaded `?ey=peep&bl=bell` directly and confirmed both
+new fittings draw correctly — a small peephole dot centred at eye height
+and a round bezelled bell on the hinge stile — with zero console errors
+on every route tested.
+
+**Instruments:** test ✓ (**3,617,766** passed, 0 failed — matches the
+human round's own claimed count exactly; the jump from run 56's
+3,449,097 is the two new fields, not a regression) · audit ✓ (all eight
+viewports clean, no faults) · profile ✓ (both FALLOFF bands within
+tolerance, byte-identical) · collide -- all ✓ (1,060 designs, faceObstacles
+agrees with the drawing everywhere) · collide -- boxes ✓ (MOUNT_REACH 121
+covers the deepest fitting at 111) · recreate ✓ (same ten long-documented
+catalogue gaps, nothing new — confirms the round's own claim that none of
+the thirty corpus doors carry a bell, a peephole or the new colour, so
+the bare sheets were untouched). Ran `git status` immediately after
+`recreate` this time, having been burned by its silent stamp-file rewrite
+in run 56 — clean, nothing to revert.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run.
+Pricing, colour and hardware defaults are Peretz's own decisions, already
+made and already verified against his notes; nothing here was mine to
+second-guess.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-30 00:40 UTC — run 56: verified two human rounds; branch left in its author's own documented mid-sequence state
 
 **First round — the wide-screen lamp fix.** `git fetch` pulled two human
