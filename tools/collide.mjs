@@ -44,6 +44,25 @@ const ALLOWED = new Set([
   'lockset|lock', 'lock|lockset',
 ]);
 
+/* ⚠ THE SIZES THIS SWEEP VISITS, AND AN ASSERTION THAT THEY EXIST. The list
+   below is a deliberate SUBSET of `SIZES` — the tight cases and the widest,
+   not all six — so it cannot simply be derived. What it can be is checked:
+   `SIZES[undefined]` falls back to `standard` in the renderer, so an id that
+   stops existing makes this tool sweep the same door twice and report a clean
+   run over designs it never rendered. That is exactly what happened between
+   27.8 and 30.8, silently, twice over (`narrow` then `wide`).
+   §5.15: when a check locates its subject by a name, assert the name found
+   something. */
+const SWEEP_SIZES = ['standard', 'extra1', 'extra2', 'half', 'halfextra2'];
+{
+  const missing = SWEEP_SIZES.filter(id => !SIZES[id]);
+  if (missing.length) {
+    console.error(`\n  ✗ collide sweeps sizes that no longer exist: ${missing.join(', ')}`);
+    console.error('    Every one of them would have rendered as `standard` and passed.');
+    process.exit(1);
+  }
+}
+
 await assertFreshBundle();
 
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
@@ -56,9 +75,20 @@ const cases = [];
    those are the tight cases — and the tight cases are not the only ones. A
    grip that cannot stand upright is laid down instead, and a WIDE leaf is
    precisely where one fits: an Ella bar laid across a wide door came to rest
-   touching the cylinder escutcheon, on a size this loop did not visit. */
+   touching the cylinder escutcheon, on a size this loop did not visit.
+   ⚠ AND THE LIST WENT STALE ON 30.8.2026 WITHOUT FAILING. It read
+   `['standard', 'narrow', 'wide']` — and `narrow` was withdrawn on 27.8 and
+   `wide` on 30.8. `SIZES[undefined]` falls back to `standard` in the renderer,
+   so the sweep quietly ran the SAME door three times and reported 1,012
+   designs clean about 337 distinct ones. A hard-coded list of ids inside a
+   tool that sweeps a catalogue is §5.18's shape exactly — "a second statement
+   of what the range contains, inside the tool that measures the range" — and
+   it is spelled out rather than derived here only because the sweep is
+   deliberately a SUBSET: the tight cases plus the widest, not all six. The
+   subset is now standard, both single חריגות, the דו כנפי and its widest
+   band, which is the extremes of both families. */
 for (const h of HANDLES) for (const k of LOCKSETS) for (const w of WINDOWS)
-  for (const sz of ['standard', 'narrow', 'wide']) for (const hd of ['right-in', 'left-in']) {
+  for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in']) {
     const st = {
       colour: 'rb-0097d', window: w.id, grille: 'none',
       handle: h.id, lockset: k.id, detail: 'plain',
@@ -79,7 +109,7 @@ if (deep) {
      success exactly as loudly as one that works. */
   let added = 0;
   for (const d of DETAILS) for (const w of WINDOWS)
-    for (const sz of ['standard', 'narrow', 'wide']) for (const hd of ['right-in', 'left-in']) {
+    for (const sz of SWEEP_SIZES) for (const hd of ['right-in', 'left-in']) {
       const st = {
         colour: 'rb-0097d', window: w.id, grille: 'none',
         handle: 'idan', lockset: 'cylinder', detail: d.id,
@@ -125,7 +155,21 @@ if (boxes) {
       const inv = svg.getScreenCTM().inverse();
       const pt = svg.createSVGPoint();
       let box = null;
-      for (const el of root.querySelectorAll(SHAPES)) {
+      /* ⚠ THE ROOT ITSELF COUNTS WHEN THE ROOT IS A SHAPE, and forgetting that
+         empties the answer rather than shrinking it. `querySelectorAll` walks
+         DESCENDANTS, so handed a bare `<circle data-mount="shiran-disc">` this
+         returned null and its caller skipped the fitting entirely. Every
+         `data-mount` in the renderer except the Cadoor rose is a leaf shape —
+         two backplates, a slab, two plates and the Shiran's discs — so reading
+         mounts through this function without the line below measured exactly
+         one of the six and called it the deepest. Absent output, not wrong
+         output: CLAUDE.md §5, from inside the instrument meant to catch it.
+         Harmless for the `[data-hw]` groups the footprint rows pass in, since a
+         <g> matches nothing here. */
+      const parts = root.matches(SHAPES)
+        ? [root, ...root.querySelectorAll(SHAPES)]
+        : [...root.querySelectorAll(SHAPES)];
+      for (const el of parts) {
         if (el.hasAttribute('filter')) continue;
         /* `getBBox` also reports geometry BEFORE clipping, so a reflection
            trimmed to a backplate measures whatever rect was drawn to make it.
@@ -216,7 +260,25 @@ if (boxes) {
       const svg = host.querySelector('svg');
       const leaf = svg.querySelector('#leaf rect').getBBox();
       for (const m of svg.querySelectorAll('[data-mount]')) {
-        const B = m.getBBox();
+        /* ⚠ THE METAL, NOT THE SHADOW — and this asked for the shadow for as
+           long as the reading has existed. `getBBox` on a wrapping group hands
+           back the union of its children, and `disc` draws the rosette's cast
+           shadow INSIDE the `data-mount` group, offset to `cx + 3`. So the
+           deepest lock furniture read 124 mm where the bolted rose reaches 121,
+           and the tool printed `✗ MOUNT_REACH is short by 3 mm` about three
+           millimetres of shade. The 3 is the shadow's own x offset, exactly.
+           A shadow cannot be bolted to anything; it falls ON things.
+           `metalBox` above has always skipped whatever carries a `filter` and
+           says why, and CLAUDE.md §8 records the same fault in the OTHER sweep
+           in this file, where it invented 165 collisions between metal with
+           12 mm of air between it. This is that fault's third outing, in the
+           one reader here that had never been handed the primitive — so it uses
+           it rather than growing a fourth copy of the question. It also carries
+           the box into the drawing's own space, which a raw `getBBox` does not:
+           the plate, the slab and the keyway are drawn inside translated groups
+           and answer in their own coordinates. */
+        const B = metalBox(m, svg);
+        if (!B) continue;
         const r = Math.min(B.x + B.width - leaf.x, leaf.x + leaf.width - B.x);
         const owner = m.closest('[data-hw]');
         const into = owner && owner.dataset.hw === 'handle' ? deepestGrip : deepest;
@@ -268,8 +330,19 @@ if (boxes) {
     console.log(`the deepest bolted GRIP fixing (checked per position, not by the aperture):`);
     console.log(`  ${deepestGrip.reach}  (${deepestGrip.what} on ${deepestGrip.on})\n`);
   }
-  if (deepest.reach > MOUNT_REACH) process.exitCode = 1;
-  process.exitCode = bad ? 1 : 0;
+  /* ⚠ AND THE VERDICT ABOVE WAS THROWN AWAY ON THE VERY NEXT LINE.
+     `if (deepest.reach > MOUNT_REACH) process.exitCode = 1` was followed by an
+     UNCONDITIONAL `process.exitCode = bad ? 1 : 0`, so the MOUNT_REACH result
+     was computed, printed with a ✗, and then overwritten by the footprint
+     verdict before anything could read it. With `bad` at 0 this command exited
+     GREEN while telling the screen it was short — and the note over
+     `MOUNT_REACH` in renderer.js, and CLAUDE.md with it, says of this very
+     command that it "re-measures the 121 and fails if it has grown". It did
+     not fail; it could not. An instrument that cannot report the thing it is
+     named after is this repo's oldest shape, and a false claim of coverage is
+     worse than none, because it is exactly what stops the next person looking.
+     Both readings gate now, and each names itself on the way out. */
+  process.exitCode = (bad || deepest.reach > MOUNT_REACH) ? 1 : 0;
   process.exit(process.exitCode);
 }
 
@@ -300,6 +373,33 @@ const drift = await p.evaluate(rows => {
       const b = el.getBBox();
       got.push({ kind: 'window', x: b.x - leaf.x, y: b.y - leaf.y, w: b.width, h: b.height });
     }
+    /* ⚠ A THIRD KIND, AND ITS ABSENCE WAS THE WHOLE OF ONE RED RUN. This
+       reader knew `window` and `panel` and nothing else, so the classical
+       set's five moulding rectangles could never be confirmed against the
+       drawing: twenty obstacles "the rules believe in and the drawing does
+       not", every one of them drawn. `data-face` marks the shape that DEFINES
+       each piece — the block's own face, the cap's corona and its hollow — so
+       what is measured here is ink and not a claim. */
+    for (const el of svg.querySelectorAll('[data-detail="moulding"]')) {
+      let a = Infinity, z = -Infinity, t = Infinity, u = -Infinity;
+      /* ⚠ TWO WAYS A PIECE DEFINES ITSELF, because the set has two kinds of
+         piece. The blocks and the caps mark their own face with `data-face`.
+         The panel that stands where the light goes on a SOLID set is drawn by
+         `moulding()` — the same measured section every panel in the range
+         uses — and its ink is the four mitred `mould-*` runs, which is what
+         the panel reader below measures too. Neither is a claim; both are the
+         shapes that are actually on the door. */
+      const faces = el.querySelectorAll('[data-face]');
+      const marks = faces.length ? faces
+        : el.querySelectorAll('path[fill^="url(#mould-"]');
+      for (const f of marks) {
+        const b = f.getBBox();
+        a = Math.min(a, b.x); z = Math.max(z, b.x + b.width);
+        t = Math.min(t, b.y); u = Math.max(u, b.y + b.height);
+      }
+      if (!isFinite(a)) continue;
+      got.push({ kind: 'moulding', x: a - leaf.x, y: t - leaf.y, w: z - a, h: u - t });
+    }
     for (const el of svg.querySelectorAll('[data-detail="panel"]')) {
       for (const g of el.querySelectorAll('[data-relight]')) g.remove();
       /* Rectangle by rectangle, not the group: a two-panel face is ONE group
@@ -307,7 +407,15 @@ const drift = await p.evaluate(rows => {
          "panel" covering the whole leaf, including the flat gap between them
          where a bar's foot is perfectly welcome. Each panel is its top run
          paired with its bottom one, in document order. */
-      const runs = o => [...el.querySelectorAll(`path[fill="url(#mould-${o})"]`)].map(e => e.getBBox());
+      /* ⚠ ANY SECTION, NOT ONE. The gradient ids carry the profile now —
+         `mould-reed-t`, `mould-ogee-t` — because the range has two measured
+         mouldings and a panel can be drawn in either. Matched on the SUFFIX,
+         so a third section costs this reader nothing; asked for `mould-t`
+         exactly, it found no runs at all and reported every panelled door as
+         "the rules believe in a panel and the drawing does not". */
+      const runs = o => [...el.querySelectorAll(`path[fill$="-${o})"]`)]
+        .filter(e => e.getAttribute('fill').startsWith('url(#mould-'))
+        .map(e => e.getBBox());
       const tops = runs('t'), bots = runs('b');
       tops.forEach((t, i) => {
         const bt = bots[i];

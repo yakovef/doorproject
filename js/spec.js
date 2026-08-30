@@ -42,9 +42,11 @@
  * them and the graph stays acyclic.
  */
 
+import { L, T, withLang } from './copy.js';
 import {
   byId, colourCode, COLOURS, declaredFinish, DETAILS, glazedPanels, GRILLES, grillePlacement,
-  HANDINGS, HANDLES, isGlazed, LOCKSETS, SIZES, WINDOWS,
+  handleLength, HANDINGS, HANDLES, isGlazed, LOCKSETS, MASHKOFS, PIRZUL, SIZES,
+  SPECIAL_LOCKS, WINDOWS, BELLS, PEEPHOLES,
 } from './catalog.js';
 
 /**
@@ -66,6 +68,11 @@ export function specRows(state) {
   const g = byId(GRILLES, state.grille);
   const hd = byId(HANDLES, state.handle);
   const lk = byId(LOCKSETS, state.lockset);
+  const xl = byId(SPECIAL_LOCKS, state.speciallock);
+  const bl = byId(BELLS, state.bell);
+  const ep = byId(PEEPHOLES, state.peephole);
+  const mk = byId(MASHKOFS, state.mashkof);
+  const pz = byId(PIRZUL, state.pirzul);
   const dt = byId(DETAILS, state.detail);
   const sz = SIZES[state.size] || SIZES.standard;
   const hn = byId(HANDINGS, state.handing);
@@ -81,12 +88,12 @@ export function specRows(state) {
        a fact asserted in the order that the customer never chose and no
        supplier can fill. `colourCode` is in the catalogue so the five readers
        of this string cannot drift apart again. */
-    { key: 'colour', label: 'צבע', id: c.id, hex: c.hex, value: `${c.he} (${colourCode(c)})` },
-    { key: 'window', label: 'חלון', id: w.id, value: w.he },
+    { key: 'colour', label: T('row.colour'), id: c.id, hex: c.hex, value: `${L(c)} (${colourCode(c)})` },
+    { key: 'window', label: T('row.window'), id: w.id, value: L(w) },
   ];
 
   /* ⚠ A דלת וחצי DRAWS TWO LIGHTS AND THIS USED TO NAME ONE. `glazedPanels`
-     has always built the second sentence — `isHe` on the side panel — and
+     has always built the second sentence — `is` on the side panel — and
      nothing read it. The only place the extra panel was ever named is the
      GRILLE row, through `grillePlacement`, so the second window existed in the
      order if and only if the customer also bought ironwork:
@@ -100,8 +107,8 @@ export function specRows(state) {
      back. A row of its own, so all four readers get it at once. */
   const panels = glazedPanels(state);
   if (panels.length > 1) {
-    rows.push({ key: 'glazing', label: 'זיגוג', id: w.id,
-                value: panels.map(p => `${p.he}: ${p.isHe}`).join(' · ') });
+    rows.push({ key: 'glazing', label: T('row.glazing'), id: w.id,
+                value: panels.map(p => `${L(p.name)}: ${L(p.is)}`).join(' · ') });
   }
 
   /* Named only when there is a window to put it in — and named for WHAT IT IS.
@@ -115,8 +122,8 @@ export function specRows(state) {
      the leaf's own window said nothing. `grillePlacement` adds where it goes
      and how many panels, which the price now multiplies by. */
   if (isGlazed(state) && g.id !== 'none') {
-    const label = g.glass ? 'זכוכית' : 'סורג';
-    const name = g.he.startsWith(label + ' ') ? g.he.slice(label.length + 1) : g.he;
+    const label = T(g.glass ? 'row.glass' : 'row.grille');
+    const name = dropPrefix(L(g), label);
     rows.push({ key: 'grille', label, id: g.id,
                 value: `${name}${grillePlacement(state)}` });
   }
@@ -135,25 +142,140 @@ export function specRows(state) {
      And the rule this exclusion cited — a fact that is not true of the door is
      absent — was not being applied to `חלון: ללא חלון` two rows above, which
      is emitted unconditionally. A chosen "no" is a fact about the door. */
-  rows.push({ key: 'handle', label: 'ידית משיכה', id: hd.id,
-              value: `${hd.he}${fin ? ` · ${fin.he}` : ''}` });
-  rows.push({ key: 'lockset', label: 'מנעול וידית', id: lk.id, value: lk.he });
-  if (dt.id !== 'plain') {
-    /* ⚠ THE COUNT, because the drawing has one and the order did not. Eleven
-       bands and four bands both arrived as "פסי מתכת" / "פסים אנכיים", while
-       the sibling option DOES name its count — so a tradesman reading
-       "שלושה פסים" and "פסי מתכת" on one list will not read the second as
-       eleven. `dt.strips` is the same number `metalStrips()` draws. */
-    const n = dt.strips ? ` (${dt.strips})` : '';
-    rows.push({ key: 'detail', label: 'עיצוב', id: dt.id, value: `${dt.he}${n}` });
+  /* ⚠ THE LENGTH IS IN THE ORDER, because Peretz charges for it. A bar is a
+     model AND a length now — "each handle can be in different length", ₪150
+     for every 20 cm past a metre — and two doors with the same bar at
+     different lengths are two different purchase orders at two prices. An
+     order that names only "עידן" makes him ring the customer to ask, which is
+     the one thing PLAN.md §0 forbids.
+     Read from `handleLength`, not from `state.handleLen`: the chosen length is
+     clamped by the leaf, and what belongs in the order is the bar he will
+     actually cut. Flat-priced grips have no length to name. */
+  const barLen = hd.priceKind === 'bar'
+    ? ` · ${T('len.cm', Math.round(handleLength(state) / 10))}` : '';
+  rows.push({ key: 'handle', label: T('row.handle'), id: hd.id,
+              value: `${L(hd)}${fin ? ` · ${L(fin)}` : ''}${barLen}` });
+  rows.push({ key: 'lockset', label: T('row.lockset'), id: lk.id, value: L(lk) });
+  /* ⚠ NAMED ONLY WHEN THERE IS ONE, and named at all because an axis that does
+     not reach this file is an axis Peretz never hears about. A customer can
+     now add a כספת or a קודן — ₪700 and ₪900 — and every reader of a door
+     (the message, the spec table, the summary line, the drawing's accessible
+     name and the A4 sheet) goes through here. A priced choice missing from
+     this list is a clarifying question with money on it, which is exactly
+     what PLAN.md §0 forbids. */
+  if (xl.id !== 'nospecial') {
+    rows.push({ key: 'speciallock', label: T('row.speciallock'), id: xl.id, value: L(xl) });
   }
-  rows.push({ key: 'size', label: 'מידה', id: state.size, value: sz.he });
-  rows.push({ key: 'handing', label: 'פתיחה', id: hn.id, value: hn.he });
+  /* ⚠ THE פעמון AND THE עינית, 30.8.2026, AND THE SAME ARGUMENT AS THE LINE
+     ABOVE: an axis that does not reach this file is an axis Peretz never hears
+     about. The bell is ₪300 and the peephole is included — and BOTH are named
+     here, because "included" is a thing he still has to fit. A row that
+     appears only when it costs money would tell him about the bell and leave
+     him to guess about the עינית, which is a clarifying question with a hole
+     in it rather than money.
+     Only when CHOSEN, like every optional row here: a door with no bell needs
+     no line saying so. */
+  if (bl.id !== 'nobell') {
+    rows.push({ key: 'bell', label: T('row.bell'), id: bl.id, value: L(bl) });
+  }
+  if (ep.id !== 'nopeep') {
+    rows.push({ key: 'peephole', label: T('row.peephole'), id: ep.id, value: L(ep) });
+  }
+  if (dt.id !== 'plain') {
+    rows.push({ key: 'detail', label: T('row.detail'), id: dt.id, value: L(dt) });
+  }
+  /* ⚠ THE COUNT AND THE DIRECTION, because Peretz is paid per stripe. Eleven
+     bands and four bands used to arrive as one phrase — "פסי מתכת" — and the
+     count went in for that reason. It matters more now: the count IS the
+     price, ₪150 a stripe horizontal and ₪300 vertical, so an order that does
+     not carry it is an order he cannot total.
+     The arrangement is named too. Six spread across the leaf and six in a
+     tight band are the same number of stripes and two different doors — d078
+     against d081 — and the drawing distinguishes them, so the words must. */
+  if (state.stripeDir !== 'none' && state.stripeCount) {
+    const dir = T(state.stripeDir === 'h' ? 'stripes.h' : 'stripes.v');
+    rows.push({ key: 'stripes', label: T('row.stripes'), id: `${state.stripeDir}${state.stripeCount}`,
+                value: `${state.stripeCount} ${state.stripeTight ? T('row.dirTight', dir) : dir}` });
+  }
+  rows.push({ key: 'size', label: T('row.size'), id: state.size, value: L(sz) });
+  /* ⚠ ALWAYS NAMED, even when it is the standard one — unlike the extra lock
+     above, which is named only when there is one. A door always has a frame
+     and Peretz always charges for it, so "משקוף: סטנדרטי" is a line on the
+     order rather than noise: its absence would read as "no frame quoted". */
+  rows.push({ key: 'mashkof', label: T('row.mashkof'), id: mk.id, value: L(mk) });
+  /* ⚠ ALWAYS NAMED, INCLUDING NICKEL. Peretz recolours four things with this —
+     the lever, the hinges, the peephole and the security latch — and the
+     hinges are the reason it cannot be dropped when it is the default: they
+     are not drawn (these doors open inwards, so from the street they are
+     hidden in the rebate) and this row is the ONLY place the order says what
+     colour they are. A fact the drawing cannot carry has to be carried by the
+     words. */
+  rows.push({ key: 'pirzul', label: T('row.pirzul'), id: pz.id, value: L(pz) });
+  rows.push({ key: 'handing', label: T('row.handing'), id: hn.id, value: L(hn) });
   return rows;
 }
 
-/** The rows as `label: value` lines — what the order is made of. */
-export const specLines = state => specRows(state).map(r => `${r.label}: ${r.value}`);
+/**
+ * Which way the door opens, said so that it cannot be misread.
+ *
+ * ⚠ THIS EXISTS BECAUSE `שמאל, פנימה` IS NOT ENOUGH, and the project has the
+ * scar to prove it. `ASK-PERETZ.md` §1 stood open for months over exactly this
+ * — ימין means two different things depending on which side of the door you
+ * are standing on — and when it was finally answered on 23.8.2026 the answer
+ * revealed that the site had the convention BACKWARDS: every order it had ever
+ * produced named the mirror of the door on the customer's screen.
+ *
+ * The name alone carries the same ambiguity into the order and onto the
+ * workshop sheet. Three facts together cannot: which side the hinge is on,
+ * which side the cylinder is on, and that both are read from OUTSIDE.
+ *
+ * Derived from `HANDINGS[].hinge` — the same field the renderer draws from —
+ * so this sentence and the picture beside it cannot disagree. It is NOT in
+ * `specRows`: that row is also the one-line summary a 320 px phone has to fit,
+ * and a clause this long would push the rest of the door off it. One
+ * statement, read by the message and by the sheet.
+ */
+export function handingWords(state) {
+  const hn = byId(HANDINGS, state.handing);
+  const hinge = T(hn.hinge === 'left' ? 'hand.left' : 'hand.right');
+  const lock  = T(hn.hinge === 'left' ? 'hand.right' : 'hand.left');
+  return T('hand.words', hinge, lock);
+}
+
+/**
+ * The rows as `label: value` lines — what the ORDER is made of.
+ *
+ * ⚠ ALWAYS HEBREW, WHATEVER LANGUAGE THE CUSTOMER CHOSE. This is the only
+ * reader of `specRows` whose audience is not the customer: these lines go
+ * into the WhatsApp message, and the person who opens that message is Peretz.
+ * `PLAN.md` §0 asks for an order he can act on without a clarifying question,
+ * and an order in Russian is a question — he would have to translate
+ * "Кованая решётка в цвет двери" before he could price it, and the whole
+ * project exists to remove that phone call.
+ *
+ * The customer's language is not lost, it is REPORTED: `js/share.js` adds one
+ * Hebrew line naming it, so he knows to ring back in Russian.
+ *
+ * The same door in the customer's own language is on their screen and on the
+ * printed sheet beside this — see `buildSheet`, which prints both.
+ */
+export const specLines = state => withLang('he', () =>
+  specRows(state).map(r => `${r.label}: ${r.value}`));
+
+/**
+ * Drop a label that the value already opens with, so the order does not read
+ * `סורג: סורג רשת` — grille: grille grid.
+ *
+ * ⚠ THE SEPARATOR IS NOT ALWAYS A SPACE. Hebrew builds these names as two
+ * words (`סורג רשת`); Russian compounds them with a hyphen
+ * (`Решётка-сетка`), so a space-only test leaves `Решётка: Решётка-сетка`
+ * standing in the one language nobody here proof-reads by eye.
+ */
+function dropPrefix(name, label) {
+  if (!label || !name.startsWith(label)) return name;
+  const next = name[label.length];
+  return next === ' ' || next === '-' || next === '\u2011' ? name.slice(label.length + 1) : name;
+}
 
 /**
  * The rows as one line, for the spec under the price.
@@ -177,4 +299,4 @@ export const summaryLine = state => specRows(state).map(r => r.value).join(' · 
  * A sentence rather than a list, because it is read aloud in one breath.
  */
 export const describeSentence = state =>
-  `דלת כניסה פלדה, ${specRows(state).map(r => r.value).join(', ')}.`;
+  T('spec.summary', specRows(state).map(r => r.value).join(', '));

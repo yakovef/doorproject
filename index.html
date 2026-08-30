@@ -3,48 +3,128 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>בונים דלת — דלתות מגן</title>
+<title data-t="doc.title">בונים דלת — דלתות מגן</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
+<meta name="description" data-ta="content=doc.desc"
+      content="בחרו דלת כניסה — צבע, מידה וכיוון פתיחה. מחיר מלא כולל התקנה ומע״מ.">
 <meta name="theme-color" content="#EFEDE8">
 <!-- A door, as a data URI. There was no icon and no favicon.ico, so every load
      took a 404 for one and the tab showed a blank page. Inline because the
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=52570a9f">
+<link rel="stylesheet" href="css/app.css?v=14c01cae">
+
+<!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
+     The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
+     the tall one is a phone's room, the wide one a desktop's. `js/app.js`
+     picks BY MEASURING — `pickRoom` places both against the real stage and
+     takes the one whose sconces land inside it — so nothing here decides.
+     These two tags are only where the filenames live.
+
+     ⚠ THE PAGE IS COMPLETE BEFORE EITHER ARRIVES. The SVG's own wall, floor
+     and sconces are already on screen and are what a visitor keeps if the file
+     is missing, blocked, slow, or undecodable. Nothing about the layout
+     depends on it. That is why a fourth asset was acceptable at all
+     (PHOTOREAL.md, the header) — and now a fifth, at 78 KB, of which exactly
+     one is downloaded.
+
+     ⚠ NEITHER IS `rel="preload"` ANY MORE, AND THAT IS WHAT PICKING PROPERLY
+     COSTS. A preload starts the fetch in the head, which is faster and was
+     right while there was one file; with two it would pull 160 KB to use 80.
+     The choice needs the stage's measured box, which does not exist until the
+     bundle has run, so the fetch waits for it. `rel="prefetch"` rather than
+     nothing: it is a hint a browser may ignore and it never blocks, so a
+     browser that honours it has the file warm and one that does not is exactly
+     where we were.
+
+     ⚠ AND THIS IS THE ONLY PLACE THE FILENAMES ARE WRITTEN. The stylesheet
+     needs the picture and `js/app.js` needs to know when it arrived — two
+     consumers, and a URL written twice is CLAUDE.md §5's oldest shape with a
+     cache stamp attached: the symptom is a second download of the same 80 KB
+     and nothing visibly wrong at all. So `index.html` owns the URLs,
+     `tools/build.mjs` stamps them beside the other two, `js/app.js` reads the
+     resolved `href` of whichever it chose, and `css/app.css` owns the
+     placement and never names a file. -->
+<link rel="prefetch" as="image" id="room-src" href="assets/room.webp?v=99dcfd43">
+<link rel="prefetch" as="image" id="room-wide-src" href="assets/room-wide.webp?v=c5d1d6af">
+
+<!-- ⚠ THE ONE THING THIS PAGE LOADS FROM ANYWHERE ELSE, AND IT IS AN
+     ENHANCEMENT, NEVER A DEPENDENCY.
+
+     `README.md` promises three files that open from a folder with no server,
+     and that promise still holds: with no network — which is every `file://`
+     load, and therefore every screenshot and every audit route this repository
+     takes — Assistant never arrives and the page renders in the stack behind
+     it. So the OFFLINE path is the one that is continuously verified, which is
+     the right way round for a page most customers open on a phone.
+
+     ⚠ IT DOES NOT BLOCK THE FIRST PAINT. A plain stylesheet `<link>` is
+     render-blocking for the whole document, which would trade the one thing
+     the reference sites actually agree on — restraint and speed over
+     decoration — for a typeface. `media="print"` makes it non-blocking and the
+     `onload` promotes it the moment it has arrived. No `<noscript>` twin: if
+     scripting is off the font simply does not load, which is the case this
+     whole arrangement is built to survive.
+
+     ⚠ AND THE SWAP MOVES NOTHING, because the FALLBACK is tuned to Assistant
+     rather than the other way round — see `@font-face "Assistant Fallback"` in
+     css/app.css and the four measured numbers behind it.
+
+     ⚠ AND IT IS ONLY ASKED FOR WHERE THERE IS SOMEWHERE TO ASK. This was a
+     plain `<link>` first, and `npm run audit` caught the cost inside one run:
+     every `file://` load — every screenshot, every audit route, every
+     measurement this repository takes, and Peretz's own laptop with the folder
+     open — fired a request that cannot resolve, and Chromium logged
+     `net::ERR_CONNECTION_RESET` **four times per page**. The audit counts a
+     console error as a fault, correctly; it also waits for `load`, so the run
+     went from about 15 minutes to 24.
+
+     Teaching the audit to ignore that class of error was the obvious fix and
+     it is the wrong one — an instrument taught to ignore a kind of error will
+     ignore the real one. Not making the request is the right one: a font is
+     only useful where there is a network, so it is asked for on `http(s)` and
+     nowhere else, and the README's promise becomes literally true again —
+     opened from a folder this page makes no network request at all.
+
+     Written as three lines of script rather than a tag, with the same
+     discipline: `media` starts at `print` so it can never block the first
+     paint, and `onload` promotes it when it has arrived. With scripting off
+     there is no font, which is exactly the case this whole arrangement exists
+     to survive. -->
+<script>
+  if (/^https?:$/.test(location.protocol)) {
+    document.head.insertAdjacentHTML('beforeend',
+      '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+      + '<link rel="stylesheet" media="print" onload="this.media=&quot;all&quot;"'
+      + ' href="https://fonts.googleapis.com/css2?family=Assistant'
+      + ':wght@300;400;500;600&display=swap">');
+  }
+</script>
 </head>
 <body>
 
-<header class="bar">
-  <a class="brand" href="https://dlatotmagen.co.il">
-    <span class="brand__name">דלתות מגן</span>
-    <span class="brand__sub">בונים דלת</span>
-  </a>
+<!-- ⚠ THE HEADER IS GONE, DELETED 27.8.2026 ON THE OWNER'S SON'S WORD:
+     *"remove entirely the section that is the purple thing"*, drawn round the
+     whole brand bar on a phone screenshot.
 
-  <!-- ⚠ EVERY LINK GOES SOMEWHERE THAT EXISTS. The mockup draws
-       דגמים / עיצוב אישי / צור קשר as three pages; two of them are not built
-       and `PLAN.md` §9 still lists /works and /about as unwritten. A nav item
-       that goes nowhere is worse than no nav item, so דגמים points at the real
-       works gallery on the main site — the trust layer PLAN.md §4 leans on —
-       and צור קשר at the telephone, which is the one channel that always
-       works. עיצוב אישי is this page and says so with `aria-current`, rather
-       than being a link to where you already are. -->
-  <nav class="nav" aria-label="ניווט ראשי">
-    <a class="nav__a" href="https://dlatotmagen.co.il/works">דגמים</a>
-    <span class="nav__a is-here" aria-current="page">עיצוב אישי</span>
-    <a class="nav__a" href="tel:+972532197466">צור קשר</a>
-  </nav>
+     It held five things and each was answered rather than dropped:
+       · the language buttons  -> the wall beside the door (`.stage__hud`)
+       · the brand name        -> gone. It is the tab's title, the footer's
+                                  first word and the order sheet's letterhead;
+                                  on a 390 px screen it was 124 px of a row
+                                  that could not fit the language it was
+                                  crowding out.
+       · the telephone         -> the send card's fine print and the
+                                  cannot-load strip, where it already was
+       · `דגמים / עיצוב אישי / צור קשר` -> was `display: none` below 1100 px
+                                  and had been for every phone that ever
+                                  loaded this page
+       · my saved designs      -> the send card, beside `שמירת העיצוב`, which
+                                  is where saving happens
 
-  <div class="bar__end">
-    <a class="bar__phone" id="phone-link" href="tel:+972532197466">053-219-7466</a>
-    <!-- The saved designs live in this browser and nowhere else; see app.js. -->
-    <button class="bar__saved" id="saved-btn" type="button" hidden
-            aria-expanded="false" aria-controls="saved">
-      העיצוב שלי <span class="bar__count" data-saved-count>0</span>
-    </button>
-  </div>
-</header>
+     What is left at the top of a phone is the step navigator and the door. -->
+
 
 <!-- ⚠ THE SAVED LIST IS THIS BROWSER'S AND NOBODY ELSE'S. It is `localStorage`
      — nothing leaves the machine, nothing reaches us, and it survives nothing
@@ -52,13 +132,40 @@
      stay exactly where they were: they are the things a customer can actually
      SEND, and this is only a convenience for holding two doors side by side
      before choosing one. -->
-<div class="saved" id="saved" hidden>
-  <p class="saved__none" data-saved-empty>עדיין לא שמרתם עיצוב.</p>
-  <ul class="saved__list" data-saved-list></ul>
-</div>
+
+
+<!-- ── THIRTY DOORS HE ACTUALLY BUILT ──────────────────────────────────
+     A customer arrives at a default door and about sixty options with no
+     reference point at all. They have opinions about doors they have SEEN, not
+     about quatrefoil versus vine. So the page offers Peretz's own installed
+     work: tap one and the configurator loads THAT door as the starting state,
+     ready to change — "like this, but black, and wider."
+
+     ⚠ THESE ARE OUR DRAWINGS, NOT THE PHOTOGRAPHS, and that is a constraint
+     rather than a preference. The 129 photographs are 63 MB in `research/`,
+     and `PLAN.md` §8.1 is the promise that `index.html`, `css/app.css` and
+     `assets/bundle.js` are the whole site — which is what lets Peretz open it
+     on a laptop in somebody's living room with no reception. A gallery of
+     photographs would break that for every visitor to save one scroll.
+     Drawing them is also the better answer: the customer picks from doors
+     rendered in the same language they are about to configure in, so tapping
+     one is continuous rather than a jump from a photo to a diagram.
+
+     The list is `js/works.js`, generated by `npm run corpus` from each door's
+     own hand-measured record. Nothing in it is typed. -->
+<dialog class="works" id="works" aria-labelledby="works-h">
+  <div class="works__head">
+    <h2 class="works__h" id="works-h" data-t="works.h">דלתות שכבר התקנו</h2>
+    <button class="works__x" id="works-close" type="button"
+            aria-label="סגירת הגלריה" data-ta="aria-label=works.close">✕</button>
+  </div>
+  <p class="works__lede" data-t="works.lede">בחרו דלת קרובה למה שרציתם — ומשם תשנו כל פרט.</p>
+  <div class="works__grid" id="works-grid"></div>
+</dialog>
 
 <p class="strip" id="placeholder-note" hidden>
-  <strong>גרסת פיתוח.</strong> הצבעים והמחירים כאן הם דוגמה בלבד — עדיין לא סופיים.
+  <strong data-t="strip.dev.b">גרסת פיתוח.</strong>
+  <span data-t="strip.dev">חלק מהמחירים כאן עדיין לא אושרו על ידי פרץ.</span>
 </p>
 <p class="strip strip--warn" id="notice" hidden></p>
 
@@ -81,9 +188,9 @@
      end of an RTL sentence takes the neutral punctuation with it and the stop
      lands on the wrong side of the number. -->
 <p class="strip strip--warn" id="down" role="alert" hidden>
-  <strong>הדלת לא נטענת בדפדפן הזה.</strong>
-  אפשר לשלוח לנו הודעה בוואטסאפ, או להתקשר אלינו למספר
-  <a href="tel:+972532197466">053-219-7466</a> ונעזור לכם לבחור דלת.
+  <strong data-t="down.h">הדלת לא נטענת בדפדפן הזה.</strong>
+  <span data-t="down.p">אפשר לשלוח לנו הודעה בוואטסאפ, או להתקשר אלינו למספר</span>
+  <a href="tel:+972532197466">053-219-7466</a> <span data-t="down.p2">ונעזור לכם לבחור דלת.</span>
 </p>
 
 <!-- ⚠ ONE COPY OF THE DEGRADED STYLESHEET, WITH TWO WAYS IN.
@@ -102,11 +209,35 @@
      which is showing a placeholder or an empty box and reads as "loading".
      Left are the header telephone, this strip, the WhatsApp buttons and the
      fine print. The button LABEL changes with them: `שלחו את הדלת בוואטסאפ`
-     over a message with no door in it is the same lie one layer down. -->
+     over a message with no door in it is the same lie one layer down.
+
+     ⚠ ON A `?sheet=1` URL ONLY THIS STRIP SURVIVES, which is worth knowing
+     rather than reading the paragraph above and assuming otherwise.
+     `is-sheet` is set by the script at the foot of this file BEFORE the bundle
+     loads, and it hides `.bar` and `.layout` — so a failed order-sheet load
+     keeps neither the header telephone nor either WhatsApp button. Measured,
+     with the bundle aborted, on `?sheet=1`: the strip shows, exactly one
+     `tel:` link is reachable — the one inside it — and zero send buttons are.
+     That is still a customer who can ring the shop, which is the promise that
+     matters. But it is one route rather than four, and the strip's own
+     telephone number is why it holds at all. -->
 <noscript id="down-css"><style>
   #down[hidden] { display: block !important; }
-  #choices, .stage, .grip-bar, .stage__bar, .dock__price,
-  .send__price, .send__spec, .send__lead, .send__alt { display: none; }
+  #choices, .stage, .grip-bar, .stage__bar, .stage__hud,
+  .send__spec, .send__lead, .send__alt { display: none; }
+  /* ⚠ THE QUOTE BAR'S PRICE GOES AND ITS SEND STAYS, and the second half of
+     that is not tidiness — it is the only send button guaranteed to survive.
+     `#choices` is hidden above, and `goStep` MOVES `.panel--send` inside it;
+     so if the app boots, moves the card, and only then throws, `fail()`
+     applies this stylesheet over a page whose one send button is now a child
+     of a hidden element. Measured shape, same family as the `?sheet=1` route
+     in CLAUDE.md §5.20: a guard written for the state at boot, applied to a
+     page that has since moved on. The quote bar is a child of `.stage-wrap`
+     and cannot be moved, so it is the route that holds.
+     The figure goes because it reads `—`, and a price of `—` beside a live
+     send button is the styled-and-inert screen this whole apparatus exists to
+     prevent. */
+  .quote__price { display: none; }
   /* The label swap used to be repeated here. It is the RESTING state in
      app.css now — the page is honest before JavaScript and `paint()` upgrades
      it with `is-live` — so this block no longer has to say it. */
@@ -132,10 +263,51 @@
          `body` is `100dvh` with `overflow: hidden` and `.layout` is `flex: 1`,
          so a heading beside the layout takes its height straight out of the
          door at every desktop size. Inside, the stage flexes around it. -->
-    <h1 class="stage__h1" id="stage-h">בנו את הדלת שלכם
-      <span class="stage__lede">בחרו את הפרטים ותראו את השינוי בזמן אמת</span>
+    <h1 class="stage__h1" id="stage-h"><span data-t="stage.h1">בנו את הדלת שלכם</span>
+      <span class="stage__lede" data-t="stage.lede">בחרו את הפרטים ותראו את השינוי בזמן אמת</span>
     </h1>
     <div class="stage" id="stage"></div>
+
+    <!-- ⚠ THE WALL IS THE CHROME NOW. Asked for from outside with three
+         circles drawn on the wall of a screenshot — top right, top centre,
+         top left — and one instruction: *"in this 3 spots I want you to put
+         the language toggle, the price and the undo buttons."*
+
+         ABSOLUTE, like `.grip-bar` below it and for the identical reason:
+         above 1100 px `.stage-wrap` is a flex column and `.stage` is
+         `flex: 1 1 auto`, so anything in the FLOW here takes its height out
+         of the door. The grip controls were moved into the wall for that and
+         `--grip-strip` is reserved unconditionally for it. This row never
+         changes height, but it must not be in the flow either.
+
+         It clears `.grip-bar` by sitting at the top while that is centred at
+         50% — the two share the wall and never the same band of it. -->
+    <div class="stage__hud">
+      <div class="hud__slot hud__slot--start" id="langs" role="group"
+           aria-label="שפה" data-ta="aria-label=nav.lang"></div>
+
+      <div class="hud__slot hud__slot--end">
+        <div class="steps-back" role="group" aria-label="ביטול וחזרה"
+             data-ta="aria-label=undo.group">
+          <button type="button" class="iconbtn" id="undo-btn" disabled
+                  aria-label="ביטול השינוי האחרון" title="ביטול השינוי האחרון"
+                  data-ta="aria-label=undo,title=undo">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
+              <path d="M4.2 9.2h10.3a5 5 0 0 1 0 10h-5.5"/>
+              <path d="M8 5.2 4 9.2l4 4"/>
+            </svg>
+          </button>
+          <button type="button" class="iconbtn" id="redo-btn" disabled
+                  aria-label="החזרת השינוי" title="החזרת השינוי"
+                  data-ta="aria-label=redo,title=redo">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__ico">
+              <path d="M19.8 9.2H9.5a5 5 0 0 0 0 10H15"/>
+              <path d="M16 5.2l4 4-4 4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- ⚠ INSIDE the stage and OUT OF FLOW, and both halves of that matter.
          It sat under the door in the page's flow, and it is `hidden` until the
@@ -150,9 +322,100 @@
          anything, and a sentence about measuring on site does not belong
          floating on the wall. -->
     <div class="grip-bar" id="grip-bar" hidden>
-      <span class="grip-bar__hint">גררו את הידית למקום שתרצו</span>
-      <button type="button" class="grip-bar__btn" id="grip-rot">סובבו</button>
-      <button type="button" class="grip-bar__btn" id="grip-home">למקום המקורי</button>
+      <!-- ⚠ THE HINT SAYS THE TRUE THING AND KEEPS SAYING IT. The mockup draws
+           four carousel dots and `גררו לסיבוב` — drag to ROTATE — under the
+           door. There is no second view and no photograph to build one from;
+           the drawing is square-on by rule, and everything measured off it
+           (handleFootprint, collide's 24 getBBox calls, profile, every corpus
+           comparison) assumes that. So the mockup's hand icon is welcome and
+           its sentence is not. -->
+      <span class="grip-bar__hint">
+        <!-- ⚠ `grip-bar__ico`, AND IT SAID `grip-saved__ico`. No rule in the
+             stylesheet has ever matched that name, so this hand had no
+             `fill: none` and no stroke — it rendered as a solid black blob
+             rather than as a line drawing. Invisible for as long as it was,
+             because the grip bar is hidden until a door has a pull handle to
+             drag. A class nobody styles is the CSS spelling of a dangling
+             `url(#id)`: nothing throws, nothing is drawn right. -->
+        <svg class="grip-bar__ico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9.4 11.2V5.6a1.4 1.4 0 0 1 2.8 0v5"/>
+          <path d="M12.2 10.4V9a1.4 1.4 0 0 1 2.8 0v1.6"/>
+          <path d="M15 10.8v-.6a1.4 1.4 0 0 1 2.8 0v5.2a4.6 4.6 0 0 1-4.6 4.6h-1.4c-1.6 0-2.8-.8-3.6-2l-2.4-3.8a1.4 1.4 0 0 1 2.2-1.7l1.4 1.6"/>
+        </svg>
+        <span data-t="grip.drag">גררו את הידית למקום שתרצו</span>
+      </span>
+      <button type="button" class="grip-bar__btn" id="grip-rot" data-t="grip.rotate">סובבו</button>
+      <button type="button" class="grip-bar__btn" id="grip-home" data-t="grip.home">למקום המקורי</button>
+    </div>
+
+    <!-- ── THE QUOTE BAR — what it costs, and how to send it ──────────────
+         ⚠ ONE ELEMENT, TWO PLACEMENTS, AND STILL EXACTLY ONE PRICE. Above
+         1100 px it stands in the wall under the right-hand lamp, which is
+         where the owner's son drew a circle and asked for the price to go.
+         Below 1100 px it is a slim bar pinned to the foot of the screen,
+         because the wall on a 390 px phone is ~140 px of plaster and the pill
+         landed ON the leaf — measured, and at 320 px it landed on it every
+         time. One instruction, two widths, two honest answers.
+
+         ⚠ AND THE SEND LIVES HERE NOW, ON EVERY STEP. That reverses part of
+         an instruction from 27.8 — *"remove the WhatsApp from the screen, it
+         will only be available at the end"* — and the reversal is deliberate
+         and narrow. What was removed was a full-width GREEN BAR across every
+         phone screen, offering to send a door somebody was still colouring;
+         that is still gone. What is here is a quiet line of text beside the
+         price. The green primary is still the summary's and only the
+         summary's. The rule it satisfies is older than both:
+         `PLAN.md` §0 — a customer must be able to hand Peretz an order at any
+         moment, and a wizard that buries the send behind eight screens is the
+         single worst change this site could make.
+
+         ⚠ IT IS IN THE MARKUP, NOT BUILT BY SCRIPT, so a page whose bundle
+         never arrives keeps a second route to the shop rather than losing
+         one. Its href is the same "the page did not load for me" message the
+         send card rests on, and `paint()` upgrades BOTH the moment there is a
+         real door — one writer over `[data-wa]`, never an id. -->
+    <div class="quote" id="quote">
+      <div class="quote__price">
+        <span class="send__label" data-t="price.est">מחיר משוער</span>
+        <button class="send__toggle" id="price-toggle" type="button"
+                aria-expanded="false" aria-controls="breakdown">
+          <strong class="send__figure" id="price" data-price>—</strong>
+          <span class="send__chev" aria-hidden="true"></span>
+          <span class="sr-only" data-t="price.breakdown">פירוט המחיר</span>
+        </button>
+        <div class="bd" id="breakdown" hidden>
+          <table class="bd__t"><tbody id="breakdown-body"></tbody></table>
+        </div>
+      </div>
+
+      <a class="quote__send" id="quote-wa"
+         href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F"
+         target="_blank" rel="noopener" data-wa>
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="quote__ico">
+          <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
+        </svg>
+        <span class="wa__on" data-t="send.waOnShort">שלחו בוואטסאפ</span>
+        <span class="wa__off" data-t="send.waOffShort">שלחו הודעה</span>
+      </a>
+
+      <!-- ⚠ THE WAY ON, AND ON A PHONE IT LIVES HERE. Measured by walking the
+           guide the way a first-time customer does — forward, with the button,
+           never with the rail: on all eight question steps at 390 px and at
+           320 px the `.sect__foot` was BELOW THE FOLD. A customer landed on a
+           step, chose something, and had to scroll past the rest of the
+           options and an explainer to find out how to continue. The rail
+           advances too, and a first-timer does not know that.
+
+           It carries `sect__next`, so `markSteps` gives it the same label and
+           the same disabled state as the one in the flow without knowing it
+           exists — one statement of "where does this go and what is it
+           called", two places that show it. On the summary it is disabled, and
+           a disabled way-on is hidden rather than greyed: the bar is then the
+           price and the send, which is exactly what that step is for.
+
+           Above 1100 px it is not shown at all. There the card has room for a
+           sticky foot of its own, and the wall is not a place for a verb. -->
+      <button type="button" class="btn sect__next quote__next">הבא ›</button>
     </div>
   </section>
 
@@ -167,7 +430,17 @@
        while the grip buttons cannot: a row that appears and disappears beside
        a flexible stage resizes the door. -->
   <div class="stage__bar">
-    <p class="stage__note">הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם.</p>
+    <!-- ⚠ THE UNDO PAIR MOVED TO THE WALL — `.stage__hud`, above the leaf.
+         It stood here, under the door, and the owner's son drew a circle on
+         the top-left of the wall instead. Three of them: languages, price,
+         undo. One control, one place.
+         What is left in this bar is the illustration note, which never
+         changes height — and that is the whole rule for this element. Above
+         1100 px `.stage-wrap` is a flex column and `.stage` is
+         `flex: 1 1 auto`, so anything that APPEARS here takes its height out
+         of the door. Measured once at 23,021 pixels of drawing, on a leaf
+         that shrank the moment there was a step to undo. -->
+<p class="stage__note" id="draw-caveat"></p>
   </div>
 
   <!-- ── choices ──────────────────────────────────────────────────
@@ -181,16 +454,20 @@
        Built from the GROUPS table in app.js rather than written out here, so
        that adding a category is one line in one place. The two added this
        round, glazing and add-ons, were exactly that. -->
-  <section class="panel panel--choose" id="choices" aria-label="התאמת הדלת"></section>
+  <section class="panel panel--choose" id="choices"
+         aria-label="התאמת הדלת" data-ta="aria-label=choices.label"></section>
 
   <!-- ── the handoff: the whole point of the site ─────────── -->
-  <section class="panel panel--send" aria-label="שליחת הדלת">
+  <section class="panel panel--send" aria-label="שליחת הדלת" data-ta="aria-label=send.label">
     <div class="send">
-      <div class="send__price">
-        <span class="send__label">מחיר משוער</span>
-        <strong class="send__figure" id="price" data-price>—</strong>
-        <span class="send__incl">כולל דלת, התקנה מלאה ומע״מ</span>
-      </div>
+      <!-- ⚠ THE PRICE ITSELF IS NOT HERE ANY MORE — it is on the wall above
+           the door, in `.stage__hud`, tappable, with the breakdown under it.
+           Asked for from outside with a circle drawn on a screenshot.
+           What stays is the SENTENCE that says what the figure covers. It
+           belongs to the quote rather than to the readout: on the wall it
+           would be a line of small print across a drawing, and this card is
+           where a customer checks what they are buying. -->
+      <p class="send__incl" data-t="price.includes">כולל דלת, משקוף, מנעול, התקנה ומע״מ</p>
 
       <!-- ⚠ TWO RENDERINGS OF ONE LIST, and neither is redundant.
            `#spec` is the mockup's table — label, value, swatch — and `#summary`
@@ -203,77 +480,117 @@
       <div class="spec" id="spec" aria-hidden="true"></div>
       <p class="send__spec sr-only" id="summary"></p>
 
-      <p class="send__lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
+      <p class="send__lead" data-t="send.lead">בחרתם דלת? שלחו לנו אותה ונחזור אליכם עם הצעה מדויקת.</p>
 
       <a class="btn btn--wa" id="wa-btn" href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F" target="_blank" rel="noopener" data-wa>
         <svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
           <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
         </svg>
-        <span class="wa__on">שלחו את הדלת בוואטסאפ</span>
-        <span class="wa__off">שלחו לנו הודעה בוואטסאפ</span>
+        <span class="wa__on" data-t="send.waOn">שלחו את הדלת בוואטסאפ</span>
+        <span class="wa__off" data-t="send.waOff">שלחו לנו הודעה בוואטסאפ</span>
       </a>
 
       <div class="send__alt">
-        <button class="btn btn--ghost" id="copy-btn" type="button">העתקת הפרטים</button>
-        <button class="btn btn--ghost" id="save-btn" type="button">שמירת העיצוב</button>
-        <span class="send__code">קוד: <b id="code">—</b></span>
+        <button class="btn btn--ghost" id="copy-btn" type="button" data-t="send.copy">העתקת הפרטים</button>
+        <button class="btn btn--ghost" id="save-btn" type="button" data-t="send.save">שמירת העיצוב</button>
+        <button class="saved__btn" id="saved-btn" type="button" hidden
+              aria-expanded="false" aria-controls="saved">
+        <svg class="saved__ico" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"
+                d="M6.5 3.5h11v17l-5.5-4-5.5 4Z"/>
+        </svg>
+        <span data-t="saved.mine">העיצוב שלי</span> <span class="saved__n" data-saved-count>0</span>
+    </button>
+        <span class="send__code"><span data-t="send.code">קוד:</span> <b id="code">—</b></span>
+      <div class="saved" id="saved" hidden>
+      <p class="saved__none" data-saved-empty data-t="saved.none">עדיין לא שמרתם עיצוב.</p>
+      <ul class="saved__list" data-saved-list></ul>
+</div>
       </div>
 
+      <!-- ⚠ This sentence is `PRICE_CAVEAT` in js/share.js and `npm test`
+           asserts that this file still contains it word for word. It carries
+           Peretz's ~5% now: "we need to write that the price can change after
+           measurments by ~5%." Change it THERE, and this copy with it in the
+           same edit — the assertion exists because the two drifted once. -->
       <p class="send__fine">
-        מחיר משוער. המחיר הסופי נקבע לאחר מדידה.
-        אפשר גם להתקשר — <a href="tel:+972532197466">053-219-7466</a>.
+        <span data-t="price.caveat">מחיר משוער. המחיר הסופי נקבע לאחר מדידה במקום, ועשוי להשתנות בכ‑5%.</span>
+        <span data-t="send.callToo">אפשר גם להתקשר —</span> <a href="tel:+972532197466">053-219-7466</a>.
       </p>
     </div>
 
     <p class="proof">
-      רוצים לראות דלתות אמיתיות שהתקנו?
-      <a href="https://dlatotmagen.co.il/works">העבודות שלנו →</a>
+      <span data-t="send.seeReal">רוצים לראות דלתות אמיתיות שהתקנו?</span>
+      <a href="https://dlatotmagen.co.il/works" data-t="send.ourWorks">העבודות שלנו →</a>
     </p>
 
   </section>
 </main>
 
-<!-- ── the dock ─────────────────────────────────────────────────
-     A phone shows the door, then the choices, then the price — and measured on
-     a 390x844 screen the price sits 1,796 px down and the WhatsApp button
-     1,991. So a customer picking a colour cannot see what it costs, and the
-     one button the whole site exists to get them to is two screens away the
-     entire time they are deciding.
-
-     This is that price and that button, pinned to the foot of the screen on a
-     phone and absent on desktop, where the send panel is already beside the
-     door. It shows the same number from the same statement: `paint` writes to
-     every `[data-price]` and every `[data-wa]`, so the dock and the card
-     cannot drift apart.
-
-     The card stays as it is. It carries the spec line to proof-read, the code
-     to read down a telephone, the copy button and the fine print — none of
-     which belongs in a 64 px bar. -->
-<div class="dock" aria-hidden="false">
-  <div class="dock__price">
-    <span class="dock__label">מחיר משוער</span>
-    <strong class="dock__figure" data-price>—</strong>
-  </div>
-  <a class="btn btn--wa dock__send" href="https://wa.me/972532197466?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%91%D7%A0%D7%95%D7%AA%20%D7%93%D7%9C%D7%AA%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%A2%D7%9E%D7%95%D7%93%20%D7%9C%D7%90%20%D7%A0%D7%98%D7%A2%D7%9F%20%D7%90%D7%A6%D7%9C%D7%99%2C%20%D7%90%D7%96%20%D7%90%D7%99%D7%9F%20%D7%9C%D7%99%20%D7%A7%D7%95%D7%93%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97.%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%97%D7%96%D7%95%D7%A8%20%D7%90%D7%9C%D7%99%D7%99%20%D7%95%D7%9C%D7%A2%D7%96%D7%95%D7%A8%20%D7%9C%D7%99%20%D7%9C%D7%91%D7%97%D7%95%D7%A8%20%D7%93%D7%9C%D7%AA%3F" target="_blank" rel="noopener" data-wa>
-    <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
-      <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.94 1.34-.5.04-.98.22-3.3-.69-2.78-1.1-4.55-3.94-4.69-4.12-.14-.18-1.12-1.49-1.12-2.85s.71-2.02.97-2.3c.25-.27.55-.34.73-.34l.53.01c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.31.02.49-.09.18-.14.29-.28.45l-.42.49c-.14.14-.28.29-.12.57.16.27.72 1.18 1.54 1.92 1.06.94 1.95 1.23 2.22 1.37.28.14.44.12.6-.07.18-.2.7-.81.88-1.09.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.2.53.32.07.11.07.66-.17 1.34Z"/>
-    </svg>
-    <span class="wa__on">שלחו בוואטסאפ</span>
-    <span class="wa__off">שלחו הודעה</span>
-  </a>
-</div>
+<!-- ⚠ THE DOCK IS GONE, 27.8.2026: *"remove the WhatsApp from the screen, it
+     will only be available at the end."* It was a bar fixed across the foot of
+     every phone screen carrying the price and a green send button, on all nine
+     steps — offering to send a door on the screen where you are still choosing
+     its colour.
+     The price moved to the wall above the leaf, where it is now stated ONCE.
+     Sending belongs to the summary, the step whose whole job is "you have
+     built it, now send it", and the send card lives inside that step now
+     rather than beside it at all times. -->
 
 <!-- ⚠ FOUR CLAIMS MADE ON PERETZ'S BEHALF, and all four were confirmed from
      outside before they were written. The warranty deliberately does NOT say
      "אחריות מלאה": a promise with no term is one nobody can be held to, which
      is the same as no promise. `ASK-PERETZ.md` §9 asks how many years and on
      what, and the number goes in the moment he answers. -->
-<footer class="trust" aria-label="למה אנחנו">
-  <span class="trust__i">שירות אישי וליווי</span>
-  <span class="trust__i">התקנה מקצועית</span>
-  <span class="trust__i">ייצור כחול לבן</span>
-  <span class="trust__i">אחריות</span>
+<!-- ⚠ AND IT STAYS A CHILD OF `body`, WHICH IS WHY IT IS STILL A LANDMARK.
+     `REALISM2.md` §B5 asks for this band to move INSIDE `.stage-wrap` so that
+     it can be absolutely positioned over the floor. Two reasons not to:
+     a `<footer>` inside a sectioning element is no longer `contentinfo`, so
+     the move would quietly cost the page its only such landmark; and below
+     1100 px `.stage-wrap` is `position: sticky`, so anything inside it is
+     pinned with the door — the band would ride over the drawing on a phone
+     for the whole session.
+     It gets the mockup's placement anyway, and by the mechanism this page
+     already uses for the grip controls: `fitStage()` publishes the stage's
+     measured box and the desktop rule places the band inside it with
+     `position: fixed`, which costs the door zero pixels. One measurement, one
+     publisher, and the box the band sits in is the box that was measured. -->
+<footer class="trust" aria-label="למה אנחנו" data-ta="aria-label=trust.label">
+  <span class="trust__i">
+    <svg class="trust__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3.2 4.8 6v5.4c0 4.4 3 8.4 7.2 9.4 4.2-1 7.2-5 7.2-9.4V6Z"/>
+      <path d="m8.8 11.9 2.3 2.3 4.1-4.4"/>
+    </svg><span data-t="trust.warranty">אחריות</span></span>
+  <span class="trust__i">
+    <svg class="trust__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3.6 20.4V9.9L12 3.6l8.4 6.3v10.5"/>
+      <path d="M9.2 20.4V12h5.6v8.4"/>
+    </svg><span data-t="trust.fitting">התקנה מקצועית</span></span>
+  <span class="trust__i">
+    <svg class="trust__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3.4a8.6 8.6 0 1 0 0 17.2 8.6 8.6 0 0 0 0-17.2Z"/>
+      <path d="M3.6 9.4h16.8M3.6 14.6h16.8M12 3.4c2.2 2.4 3.3 5.4 3.3 8.6s-1.1 6.2-3.3 8.6c-2.2-2.4-3.3-5.4-3.3-8.6S9.8 5.8 12 3.4Z"/>
+    </svg><span data-t="trust.made">ייצור כחול לבן</span></span>
+  <span class="trust__i">
+    <svg class="trust__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 11.4a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4Z"/>
+      <path d="M4.8 20.4c0-3.6 3.2-6.2 7.2-6.2s7.2 2.6 7.2 6.2"/>
+    </svg><span data-t="trust.service">שירות אישי וליווי</span></span>
 </footer>
+
+<!-- ── THE ORDER AS A DOCUMENT ─────────────────────────────────────────
+     `index.html?sheet=1&…` — or `?sheet=1&d=DM-…` — renders an A4 order sheet
+     instead of the configurator: the elevation, its dimensions, every option
+     as a row, the handing stated in words as well as drawn, the code and the
+     price. Peretz stops retyping a WhatsApp message into whatever he orders
+     from, and the workshop gets a sheet rather than a screenshot.
+
+     ⚠ NO SECOND PAGE AND NO SECOND RENDERER. `decodeCode`, `specRows(state)`
+     and `render(state)` are already pure and already exported; this is a
+     stylesheet and a layout over three functions that were finished. A
+     `sheet.html` would be a fourth file to copy and a fourth file to forget,
+     which is the argument that put the favicon inline (PLAN.md §8.1). -->
+<section class="sheet" id="sheet" aria-label="דף הזמנה" data-ta="aria-label=sheet.label"></section>
 
 <!-- `role="status"` is an implicit polite live region. Without it the toast was
      visible-only: a repair took the customer's window away, #live announced the
@@ -286,6 +603,13 @@
   // ?bare=1 renders the stage alone, for the realism comparison harness.
   if (new URLSearchParams(location.search).has('bare')) {
     document.documentElement.classList.add('is-bare');
+  }
+  /* ?sheet=1 turns the same page into a printable order sheet for the
+     workshop. Set here rather than in the bundle for the same reason `bare`
+     is: the class has to be on `<html>` before the stylesheet paints, or the
+     configurator flashes up for a moment on its way to being hidden. */
+  if (new URLSearchParams(location.search).has('sheet')) {
+    document.documentElement.classList.add('is-sheet');
   }
 
   /* ⚠ A REQUEST THAT NEVER RESOLVES DEFEATS THE GUARD BELOW. That guard is a
@@ -308,7 +632,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=597b3822"></script>
+<script src="assets/bundle.js?v=2b289560"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

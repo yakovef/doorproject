@@ -8,7 +8,9 @@
  *     without a server, which would make reading it aloud useless.
  */
 
-import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS } from './catalog.js';
+import { BELLS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_LENS, LOCKSETS,
+         MASHKOFS, packStripes, PEEPHOLES, PIRZUL, SIZE_ALIAS, SIZES, SPECIAL_LOCKS,
+         STRIPE_MAX, STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
 
 /* 9: two fields REMOVED. The add-ons and the handle finish are withdrawn at
@@ -67,21 +69,243 @@ import { repair } from './rules.js';
    in words that the handle was moved and points at the link for the
    millimetres. Carrying it in the code as well would have grown the code a
    character to duplicate what the order already says. */
-export const VERSION = 11;
+/* 12: TWO LISTS WERE RE-CUT, SO EVERY INDEX AFTER THE CUT MEANS SOMETHING ELSE.
+   WINDOWS lost `tallwin` and `broad`, and DETAILS lost both milled grooves and
+   gained four panel and strip counts — all at the owner's son's request; the
+   reasoning sits with each list in `catalog.js`. Ids alias, so every LINK ever
+   written still opens a door. The short code cannot be rescued that way: it
+   packs the INDEX, and index 3 in WINDOWS used to be חלון גבוה and is now off
+   the end of the list. A version-11 code read under this layout is a different
+   door, so it is refused with a notice instead.
+   ⚠ Free today for the same reason 11 was, and it is worth restating because
+   it will not be true for long: the site is noindex, undeployed, and not one
+   code has ever been given to a customer. The moment one has, a bump costs
+   somebody a piece of paper with a door on it. */
+/* 13: THE FIELD WIDTHS MOVED. DETAILS has outgrown four bits — it went from
+   fourteen entries to twenty when the two ogee panels and the four missing
+   stripe compositions arrived — so `detail` is five bits now, and `window`
+   pays for it by dropping from four to three. The payload is still 36 bits and
+   the code is still eight characters, which matters: the alternative was to
+   take the bit out of the four the CHECK NIBBLE occupies, and that check is
+   why one-character typos stopped decoding into different doors.
+   Nothing moved because a list was re-cut this time — every id above index 4
+   simply sits at a different index under a different width, which is the same
+   kind of break and gets the same treatment: a version-12 code is refused with
+   a notice rather than read as another door.
+   ⚠ Still free, and this is the third bump to say so. The site is noindex,
+   undeployed, and not one code has been given to a customer. `window` has five
+   spare values and `detail` twelve after this; the next list to watch is
+   `size` at two, which ASK-PERETZ §8 expects Peretz to replace wholesale.
 
+   ── 14 · the catalogue meets Peretz's real range, 26.8.2026 ───────────
+   `speciallock` is a new field (כספת · קודן); seven options were withdrawn on
+   his say-so (ברזל מחושל and its light twin, מדליוני פרח and its twin,
+   זכוכית מחורצת, שירן, להב שטוח, אלמוג); and one size was appended. Every
+   withdrawal shifts the indexes of everything after it in its list, which is
+   exactly the break a version exists to refuse.
+
+   ⚠ AND THE CODE IS STILL EIGHT CHARACTERS. Two over-wide fields paid for the
+   new one — see `BITS` — so the payload is still 36 and the check nibble keeps
+   its full four bits. A longer code would have been the easy answer and a
+   worse one: the code's whole purpose is being read aloud on a telephone.
+
+   ⚠ THE PLAN SAID TO BUMP ONCE AT THE END OF THE CATALOGUE WORK, AND THAT WAS
+   WRONG. TRANSFORM.md §5.7 argued for a single bump across phases 2 to 6, on
+   the grounds that five bumps issue five refusals for codes that never
+   existed. True, and beside the point: a VERSION that stays still while the
+   LAYOUT moves means an old code decodes into a different door with nothing
+   flagging it, which is the precise failure this number exists to prevent.
+   Bumps are free while nothing is deployed. Silence is not. */
+/* ── 15 · the mashkof becomes a choice, 27.8.2026 ─────────────────────
+   Asked for by name from outside. The frame was always drawn and never
+   choosable; it is now four options and ₪500–₪1,000 of a ₪3,150 door.
+
+   ⚠ AND THE CODE IS *STILL* EIGHT CHARACTERS, for the second version running.
+   `mashkof` needs two bits and the seven withdrawals of version 14 handed back
+   exactly two: `grille` is 14 entries and had 5 bits, `lockset` is 8 and had 4.
+   Payload stays at 36, so `PAD_BITS` stays at 4 and the check nibble keeps its
+   width.
+
+   ⚠ THIS IS THE FIRST BUMP WITH NO SLACK LEFT. `lockset` is 8 of 8 and
+   `grille` 14 of 16 — so the next product added to either needs a re-cut
+   rather than a free append, and there is nowhere obvious left to take a bit
+   from. `detail` has twelve spare values and `colour` fifteen; those are where
+   the next bit comes from. The assertion that catches this is
+   `list.length <= 2 ** BITS[f]`, which is why it is not optional.
+
+   ⚠ AND THE FIRST DRAFT OF THIS BUMP GOT IT WRONG IN A WAY WORTH RECORDING.
+   It left `grille` and `lockset` as they were, took the payload to 38, and the
+   code stayed eight characters — which looked like a free win. It was not:
+   `TOTAL_BITS` rounds the payload UP to a whole character, so 38 leaves
+   `PAD_BITS` at **2**, and `checkNibble` returns four. Decoding failed outright
+   rather than silently, which is the good version of this mistake — but had it
+   returned a 2-bit check instead, the chance of a single-character typo
+   surviving would have gone from 1-in-16 to 1-in-4 with nothing on screen to
+   say so. The check nibble is never what gives way to make room. */
+/* ── 16 · פרזול, 27.8.2026 ────────────────────────────────────────────
+   The lock furniture's finish becomes a choice: ניקל · שחור · ברונזה · זהב,
+   ₪0 to ₪900. Two bits, and there was no slack left after version 15 — so the
+   code goes to NINE characters. Payload 38 rounds to 40, leaving the check
+   nibble its full four bits; the alternative was taking a bit off the check,
+   which is never what gives way. `DM-` and nine, read aloud in two groups.
+   ⚠ `pz=`, never `f=`. The retired parameter belonged to the PULL HANDLE's
+   finish and reusing it would make an old link mean something it never did. */
+/* ── 17 · a pull bar is a length, 27.8.2026 ───────────────────────────
+   Peretz prices a bar by how long it is — ₪500 under a metre, ₪150 for every
+   20 cm past it — so a bar is a model AND a length, and the length reaches the
+   code as a three-bit index into eight fixed values.
+
+   ⚠ THE CODE IS TEN CHARACTERS AT THIS VERSION. Payload 42 plus the four-bit
+   floor rounds to 50. It could be held at nine by cutting `handing` to one bit
+   — it has exactly two entries — but that leaves the one field in the layout
+   with NO headroom at all, and the version-16 overflow is a fresh reminder of
+   what a field at its ceiling costs.
+   ⚠ AND THIS NOTE USED TO PROMISE IT WOULD COME BACK TO NINE, on the grounds
+   that phase 6 takes `detail` from 5 bits to 3 when the fourteen stripe
+   entries leave it. It does — and phase 6 also adds a five-bit `stripes`
+   field, which the promise forgot. Net +3, not −2. The arithmetic is left
+   visible because a plan's prediction being wrong is worth more on the record
+   than tidied away, and because it is the same mistake in miniature as the
+   check-nibble one: counting what a change gives back without counting what it
+   takes. */
+/* ── 18 · the stripes become a count, 27.8.2026 ───────────────────────
+   Fourteen fixed compositions leave `DETAILS` and are replaced by a direction,
+   a number and a tight/spread toggle, packed as ONE ordinal — see
+   `packStripes`. Peretz prices per stripe, so a pattern list could not express
+   what he sells; and the test for which compositions survive ("more than two
+   distinct stripe lengths") is recorded in research/works/INVENTORY.md §5a.
+   ⚠ A LINK OR CODE CARRYING A RETIRED STRIPE ID STILL OPENS A REAL DOOR, and
+   it needs a migration rather than an alias: `strips9` was an id in one list
+   and is now a (direction, count) pair in three fields, which the alias
+   mechanism — id to id, inside one list — cannot express. See `STRIPE_LEGACY`. */
+/* ⚠ 19: TWO SIZES, ONE GRILLE AND ONE FACE WERE WITHDRAWN ON 27.8.2026, and
+   three of the four are INDEXED lists. `narrow` and `sidelight` left `SIZES`,
+   `mesh` left `GRILLES`, `panelTop` left `DETAILS` — so every index after each
+   of them moved, and a v18 code decoded against v19 lists would open a
+   different door at a different price in perfect silence. That is what this
+   number is for.
+   The `?...=` query form is not indexed and keeps working: the withdrawn ids
+   resolve through `aliases` (grille, face) and `SIZE_ALIAS` (size). */
+/* ⚠ 20: THE פעמון AND THE עינית ARE TWO NEW FIELDS, 30.8.2026. Peretz asked
+   for both by name. Two new one-bit fields is a BIT-LAYOUT change, which is
+   the one thing an alias can never rescue: a v19 code read against a v20
+   layout would shift every field after the insertion point and open a
+   different door at a different price, in silence. So every code written
+   before today is refused with a notice instead — which is what this number
+   exists to do, and the reason the work order calls the bump a ritual rather
+   than a chore.
+   ⚠ AND THE CODE IS ELEVEN CHARACTERS NOW, NOT TEN. The payload goes 46 -> 48
+   and `TOTAL_BITS` reserves the check nibble BEFORE rounding, so it lands on
+   55 rather than shaving the check. That is the correct thing to give way: a
+   customer reads a code down the telephone once, and a wrong door is forever.
+   The `?...=` query form is not indexed and is unaffected — a link written
+   yesterday opens today with no bell and no peephole, which is the door it
+   described. */
+/* ⚠ 21: THE SIZE LIST IS SIX ROWS IN TWO FAMILIES, 30.8.2026. `wide`, `tall`
+   and `xl` left it and `extra1`, `extra2`, `halfextra1` and `halfextra2`
+   arrived — the owner's instruction, and the shape Peretz actually quotes:
+   three bands on a single door and the same three on a דו כנפי. `encodeCode`
+   packs the INDEX of `SIZES`, so every index after `standard` means something
+   else now and a v20 code read under this layout would be a different door at
+   a different price, in silence. Refused with a notice instead.
+   The `?s=` form is not indexed and every one of the three withdrawn ids
+   resolves through `SIZE_ALIAS` to the band it was already in, at the price it
+   already had. */
+export const VERSION = 21;
+
+/**
+ * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
+ *
+ * ⚠ THIS CHANGED, AND IT CHANGED ON PURPOSE. It used to arrive as a finished
+ * door — a rectangular window, an Idan pull bar, a cylinder — which is a good
+ * showroom photograph and the wrong first move for a configurator. Asked for
+ * from outside: *"i want that when you open up the app for the first time, you
+ * just see a door with nothing, no handle even no keyhole, and then you add
+ * things to that."*
+ *
+ * What that buys, beyond taste. Every option group now starts at its own
+ * "none", so every mark on the leaf is one the customer put there and can see
+ * themselves putting there; and `nowLabel` in app.js — the navigator's summary
+ * of each section — starts out describing a plain door rather than describing
+ * choices nobody made. The old default also quietly meant that a customer who
+ * changed nothing sent Peretz an order for a bar and a window they had never
+ * looked at.
+ *
+ * ⚠ AND IT HAS TO STAY BUILDABLE. There is an assertion that `repair(DEFAULTS)`
+ * changes nothing, and it has caught a bad default twice — once when the
+ * lockset was a lever the corpus refuses beside a bar, and once when a window
+ * left the panel nowhere to go. A bare door passes it trivially today, which
+ * means the assertion is doing less work than it used to; that is a reason to
+ * keep it, not to relax it.
+ *
+ * ⚠ IT STARTS WITH THE ROTEM NOW, AND THAT IS PERETZ REVISING HIS OWN
+ * INSTRUCTION. This block has been rewritten twice by the same person.
+ *
+ * Round one said `lockset: 'none'` — a leaf with no lever, no knob and no
+ * keyway. ASK-PERETZ §13 asked whether he would quote a door that way and the
+ * answer was immediate: *"make the door start with just a keyhole. there can't
+ * be a door without a keyhole."*
+ *
+ * Round two is 30.8.2026: *"at the start put the rotem handle instead of just
+ * the keyhole."* Same direction, one step further — a bare keyway is not a
+ * door anybody buys either, and `plate` (רותם, the lever on the long
+ * backplate) is what he actually fits. It is ₪0, one of the levers his "all of
+ * them in the price" covers, so the opening figure is untouched by it.
+ *
+ * ⚠ THE PRINCIPLE UNDERNEATH DID NOT CHANGE, and it is worth restating so the
+ * next round does not read this as licence. The opening door is still bare of
+ * everything a customer ADDS — no window, no face design, no pull handle, no
+ * ironwork, no extra lock. What it carries is what every door Peretz builds
+ * carries whether or not anybody chooses it. The list of those things grew by
+ * one because he says it did.
+ */
 export const DEFAULTS = {
-  colour:  'rb-0097d',
-  window:  'rect',
+  /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
+     Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
+     price, every other colour is +₪200. The old default `rb-0097d` (אנתרציט)
+     is one of the fourteen, so the page would have opened on a door carrying a
+     ₪200 option nobody chose — and printed ₪3,395 where he says a standard
+     door is ₪3,195. Both halves of that are wrong: the block below is built on
+     "every mark on the leaf is one the customer put there", and the opening
+     figure is the one number he checks first.
+     Of his three, 7126D is the one that keeps the picture: #453F3F against the
+     anthracite's #4B4952 is **dE 7.3** in CIELAB, where the cream is 53.9 and
+     the white 63.8. A dark neutral door stays a dark neutral door. It is also
+     the only one of the three he wrote with the same `D` suffix our chart
+     uses, so it is the least ambiguous of them (see COLOUR in prices.js).
+     `rb-0097d` keeps every alias pointed at it; nothing about the wire format
+     moves, because a default is not a wire format. */
+  colour:  'rb-7126d',
+  window:  'none',
   grille:  'none',
-  handle:  'idan',
-  /* CYLINDER, not the lever it was. The default door carries a pull bar, and
-     of the ten installed doors that carry one, eight have exactly this beside
-     it and not one has a lever — so the old default was a door the rules now
-     refuse, and the DEFAULTS-is-buildable assertion caught it the moment the
-     rule landed. Second time that assertion has earned its keep in two
-     commits, which is a fair argument for writing tests about the boring
-     starting state and not only about the interesting edges. */
-  lockset: 'cylinder',
+  handle:  'none',
+  lockset: 'plate',
+  /* ⚠ EVERY NEW FIELD NEEDS A DEFAULT HERE THE DAY IT IS INVENTED. A state
+     missing a key encodes as `undefined`, which `BigInt()` throws on — or
+     worse, `Math.max(0, indexOf(undefined))` masks it to 0 and it quietly
+     becomes the first entry in the list. */
+  speciallock: 'nospecial',
+  /* ⚠ THE DOOR OPENS WITH NEITHER, INCLUDING THE ONE THAT IS FREE. The עינית
+     costs nothing (assumption A7 says it is standard), so putting it on the
+     opening door would cost the customer nothing either — and it would still
+     be wrong. This block's whole rule is that every mark on the leaf is one
+     the customer put there and can see themselves putting there, and a fitting
+     that appears without being chosen is a fitting nobody can un-choose
+     without first noticing it. The Rotem is on the door because Peretz said
+     every door has one; he has not said that about the עינית, he said "add
+     it". */
+  bell: 'nobell',
+  peephole: 'nopeep',
+  mashkof: 'mk-std',
+  pirzul:  'pz-nickel',
+  /* ⚠ 0 = "as the model comes". Every bar has a length measured off the
+     photographs and thirty recreations are checked against them; a global
+     default would override all of them silently. The length is opt-in, and a
+     door nobody has touched draws exactly what it always drew. */
+  handleLen: 0,
+  stripeDir: 'none',
+  stripeCount: 0,
+  stripeTight: false,
   detail:  'plain',
   size:    'standard',
   handing: 'right-in',
@@ -98,6 +322,30 @@ export function toQuery(state) {
   p.set('g', state.grille);
   p.set('n', state.handle);
   p.set('k', state.lockset);
+  p.set('x', state.speciallock);
+  p.set('m', state.mashkof);
+  /* ⚠ `pz`, NEVER `f`. A finish axis existed once and `f=` is retired forever
+     (CLAUDE.md §1) — that one was the PULL HANDLE's finish, withdrawn because
+     the owner said his customers do not choose it. This is the LOCK
+     FURNITURE's, priced by Peretz in three steps, and it governs a different
+     set of objects. Reusing the parameter would make an old link mean
+     something it never meant. */
+  p.set('pz', state.pirzul);
+  /* ⚠ `bl` AND `ey`, NEVER `a`. There was a multi-select of five accessories
+     once — peephole, letterplate, knocker, closer, nameplate — packed into a
+     bitmask under `a=`, withdrawn on the owner's word, and `a=` is retired
+     FOREVER (CLAUDE.md §1). Somebody's WhatsApp history still holds
+     `?a=peep,mail`; it must open the door it always opened rather than being
+     re-read as something new, so `fromQuery` goes on ignoring it in silence
+     and these two are their own parameters. */
+  p.set('bl', state.bell);
+  p.set('ey', state.peephole);
+  p.set('hl', String(state.handleLen));
+  /* ⚠ ONE PARAMETER FOR THREE PROPERTIES, the same ordinal the code packs.
+     Three separate parameters could carry `sd=h&sc=0` or `sd=none&sc=7` — a
+     link that means nothing and that every reader downstream would have to
+     guard against. One value cannot hold a contradiction. */
+  p.set('sp', String(packStripes(state)));
   p.set('d', state.detail);
   p.set('s', state.size);
   p.set('h', state.handing);
@@ -149,7 +397,27 @@ export function fromQuery(search) {
      deliberately — see the note where they used to be read — but "a parameter
      we retired" and "a parameter that was never ours" are different facts, and
      until they were two lists the exemption covered both. */
-  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'd', 's', 'h', 'gp', 'code', 'bare']);
+  /* ⚠ `sheet` BELONGS HERE AND WAS MISSED THE DAY IT WAS ADDED. `bare` is on
+     this list for exactly the same reason: both are OUR rendering switches
+     rather than the customer's choices. An unlisted key raises
+     `option-unknown`, so every order-sheet URL opened with a red strip saying
+     a choice could not be read — above a document in which every choice had
+     been read perfectly. A new switch joins this list the same day it is
+     invented, like everything added to the bare-mode hide list.
+
+     ⚠ `lang` IS THE THIRD TIME, and the paragraph above predicted it. It was
+     added in the same hour the languages were built and missed here, so every
+     `?lang=en` load opened with a red strip reading "some options in that link
+     are unavailable — showing the closest match" over a door in which nothing
+     was unavailable and nothing had been changed. Found by opening the page
+     and looking at it; no assertion had an opinion, because from the outside a
+     notice is just a notice.
+     It is OURS and not the customer's choice, like `bare` and `sheet` — a
+     language is a fact about the reader, which is also why it is not in the
+     short code (see `js/copy.js`). */
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hl', 'sp',
+                           'd', 's', 'h', 'gp', 'bl', 'ey',
+                           'code', 'bare', 'sheet', 'lang']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
      so a link carrying one opens as itself. */
@@ -221,8 +489,43 @@ export function fromQuery(search) {
       if (handleRaisedIt) notice = beforeHandle;
     }
   }
-  take('detail', 'd', DETAILS);
+  /* ⚠ A RETIRED STRIPE ID IS A MIGRATION, NOT AN ALIAS, and this is the second
+     one in this file (the first is `n=` for the lockset list). `strips9` was
+     one id in `DETAILS`; it is now a direction, a count and a toggle across
+     three state fields, and `aliases` maps id to id INSIDE one list — it
+     cannot express that. Without this, every link and code written before
+     today that carried a striped door would land on `DETAILS[0]` and open a
+     plain one, silently, which is precisely what `fromQuery` exists never to
+     do. Run BEFORE `take('detail', …)`, so the retired id is consumed rather
+     than reported as unknown. */
+  const legacy = STRIPE_LEGACY[p.get('d')];
+  if (legacy) { Object.assign(state, legacy); state.detail = 'plain'; }
+  else take('detail', 'd', DETAILS);
   take('handing', 'h', HANDINGS);
+  take('speciallock', 'x', SPECIAL_LOCKS);
+  take('mashkof', 'm', MASHKOFS);
+  take('pirzul', 'pz', PIRZUL);
+  take('bell', 'bl', BELLS);
+  take('peephole', 'ey', PEEPHOLES);
+  /* ⚠ A NUMBER, SO `take` CANNOT DO IT — `take` resolves an id against a list
+     and reports an unknown one. A length is neither: it is one of eight
+     values, and anything else is a link we cannot read. Refused with the same
+     notice rather than clamped silently, because a customer whose 140 cm bar
+     quietly became 100 cm has been given a different door without being told —
+     which is the whole reason `fromQuery` never substitutes in silence. */
+  const rawStripes = p.get('sp');
+  if (rawStripes != null) {
+    const v = Number(rawStripes);
+    if (Number.isInteger(v) && v >= 0 && v < STRIPE_SLOTS) Object.assign(state, unpackStripes(v));
+    else notice = notice || 'option-unknown';
+  }
+
+  const rawLen = p.get('hl');
+  if (rawLen != null) {
+    const v = Number(rawLen);
+    if (HANDLE_LENS.includes(v)) state.handleLen = v;
+    else notice = notice || 'option-unknown';
+  }
 
   const rawSize = p.get('s');
   if (rawSize != null) {
@@ -247,7 +550,15 @@ export function fromQuery(search) {
        the bundle targets es2020 and nothing in it currently raises the browser
        floor above that. A one-line guard is not worth costing somebody their
        door. */
-    if (Object.prototype.hasOwnProperty.call(SIZES, rawSize)) state.size = rawSize;
+    /* ⚠ `SIZE_ALIAS` FIRST. `SIZES` is a plain object, so it has no `aliases`
+       array and `byId` never sees it — a withdrawn size would otherwise fall
+       through to `option-unknown` and open the default door under a red strip,
+       on links that are already in the wild. `narrow` and `sidelight` were
+       withdrawn on 27.8.2026; see the note over `SIZES`.
+       A resolved alias is OUR withdrawal, not the customer's mistake, so it
+       raises no notice — the same reasoning as `RETIRED` above. */
+    const asSize = SIZE_ALIAS[rawSize] || rawSize;
+    if (Object.prototype.hasOwnProperty.call(SIZES, asSize)) state.size = asSize;
     else notice = 'option-unknown';
   }
 
@@ -377,16 +688,92 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    a comment whose whole job is to make somebody think about the budget.
    If `size` needs widening, `detail`, `handle` and `lockset` can each give a
    bit back and the payload stays at 36. */
-export const BITS = { version: 4, colour: 6, size: 3, handing: 2, window: 4,
-                      grille: 5, handle: 4, lockset: 4, detail: 4 };
+/* ⚠ `detail` IS FIVE BITS AND `window` IS THREE, and they moved together on
+   purpose. DETAILS reached twenty entries — four over its old ceiling, which
+   would have stored the twentieth as the FIRST and built a plain door from a
+   code that reads perfectly. WINDOWS is three of sixteen and has been since it
+   was cut to two shapes and none, so it is the one field with a bit to spare
+   that is not the check nibble's or the colour list's. Payload unchanged at
+   36; code unchanged at eight characters. */
+/* ⚠ RE-CUT FOR `speciallock`, AND THE CODE IS STILL EIGHT CHARACTERS.
+   A new field needs bits and the obvious answer is a longer code. It is not
+   needed here: two fields were carrying more width than their lists have ever
+   used, and tightening them pays for the new one exactly.
+
+     colour   6 -> 5    17 entries, and 5 bits holds 32
+     window   3 -> 2     3 entries, and it has been 3 since the list was cut
+
+   Payload stays at 36, so `PAD_BITS` stays at 4 and the CRC nibble keeps its
+   full width. ⚠ THAT IS THE POINT OF DOING IT THIS WAY. Letting the payload
+   fall to 34 would round the total to 35 and leave the check ONE bit — turning
+   a 1-in-16 chance of a typo slipping through into 1-in-2, silently, as a side
+   effect of tidying. The check nibble is what makes a code safe to read down a
+   telephone (REDESIGN.md §1.5: 38.4% of single-character typos used to decode
+   to a different valid door); it is never the thing that gives way. */
+/* ⚠ `bell` AND `peephole` ARE ONE BIT EACH, ADDED 30.8.2026, AND THE PAYLOAD
+   IS 48. Two two-entry lists need one bit apiece and there is nothing to
+   tighten this time: measured, every other field is at its minimum width bar
+   `handing`, which holds two of four on purpose (the two outward-opening hands
+   fill it exactly). So the code grows, which is what `TOTAL_BITS` is built to
+   let it do.
+
+   ⚠ AND THE COMMENTS ABOVE SAID "PAYLOAD 36" AND "EIGHT CHARACTERS" FOR AN
+   UNKNOWN NUMBER OF ROUNDS. Measured on the committed tree before this change:
+   the payload was **46** and the code was **TEN** characters. Two numbers
+   written into prose about a thing that had moved four times underneath them,
+   which is §6's standing complaint about this repository — and worse here than
+   most, because the paragraphs they sit in are the ones somebody reads when
+   deciding whether a new field will fit. Neither figure is restated as a
+   constant here: `PAYLOAD_BITS` and `CODE_LEN` are both derived, and the test
+   file computes the code's length rather than typing it. */
+export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
+                      grille: 4, handle: 4, lockset: 3, detail: 3,
+                      speciallock: 2, mashkof: 2, pirzul: 2, handleLen: 4,
+                      stripes: 5, bell: 1, peephole: 1 };
 /* 36 bits, which does not divide by 5 — so the code carries 40 and the top
    four are always zero. Rounding UP is the only safe direction: truncating
    would drop the low bits of the last field. */
-const TOTAL_BITS = Math.ceil(Object.values(BITS).reduce((a, b) => a + b, 0) / 5) * 5;
 const PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
-/* ⚠ NO LONGER PADDING. These four bits carry the check nibble; the name is
-   kept because the width is still "whatever rounds the payload up to a whole
-   character", and if a field is ever widened this is what shrinks. */
+
+/**
+ * ⚠ THE CHECK IS RESERVED BEFORE THE ROUNDING, NOT AFTER IT — and this line is
+ * the fix for a trap that caught two consecutive version bumps.
+ *
+ * It used to be `ceil(payload / 5) * 5`, with the check nibble taking whatever
+ * was left over. That reads as thrift and behaves as a hazard: the leftover is
+ * `-payload mod 5`, so it is 4 bits at payload 36 and **2** at payload 38. Add
+ * one two-bit field to a comfortable layout and the typo check silently halves
+ * its own strength, with nothing in the arithmetic to say so.
+ *
+ * It happened twice. Version 15 took the payload to 38 and decoding failed
+ * outright, which is the lucky version — `checkNibble` returns four bits and
+ * the stored field was two, so they could never match. Version 16 walked into
+ * the identical wall one field later. Both times the temptation was to shave a
+ * bit off the check to make the sum come out.
+ *
+ * So the check is a FLOOR, not a remainder: reserve `CHECK_MIN` first, then
+ * round the whole thing up to a character boundary. The code gets longer when
+ * it must, which is the correct thing to give way — a customer reads a code
+ * down a telephone once, and a wrong door is forever. `REDESIGN.md` §1.5
+ * measured the stakes: with no check at all, 38.4% of single-character typos
+ * decoded to a different valid door.
+ */
+/* ⚠ AND THE VERSION FIELD CAN OVERFLOW TOO, WHICH NOTHING WAS CHECKING.
+   `version` was four bits, and version 16 does not fit in four bits: it
+   encoded as 0, decode read 0, compared it against 16 and refused every code
+   the app produced. Every code. It failed loudly, which is luck rather than
+   design — a `VERSION` that wrapped onto a number this app had once USED would
+   have decoded an old layout as a new one.
+
+   The assertion that catches a list outgrowing its field is
+   `list.length <= 2 ** BITS[f]`, and it never covered this one because the
+   version is not a list. It is five bits now (31 versions), and `npm test`
+   asserts VERSION fits — the same guard, on the one field that had none. */
+const CHECK_MIN = 4;
+const TOTAL_BITS = Math.ceil((PAYLOAD_BITS + CHECK_MIN) / 5) * 5;
+/* Whatever is left after the payload — at least `CHECK_MIN`, often more. The
+   CRC written into it is four bits wide, so any spare high bits are always
+   zero and a corruption that sets one is caught for free. */
 const PAD_BITS = TOTAL_BITS - PAYLOAD_BITS;
 
 /**
@@ -445,6 +832,17 @@ export function encodeCode(state) {
     [Math.max(0, HANDLES.findIndex(n => n.id === state.handle)), BITS.handle],
     [Math.max(0, LOCKSETS.findIndex(k => k.id === state.lockset)), BITS.lockset],
     [Math.max(0, DETAILS.findIndex(d => d.id === state.detail)), BITS.detail],
+    [Math.max(0, SPECIAL_LOCKS.findIndex(x => x.id === state.speciallock)),
+     BITS.speciallock],
+    [Math.max(0, MASHKOFS.findIndex(m => m.id === state.mashkof)), BITS.mashkof],
+    [Math.max(0, PIRZUL.findIndex(z => z.id === state.pirzul)), BITS.pirzul],
+    /* The INDEX, not the millimetres: 2000 mm would need eleven bits and the
+       eight lengths need three. This is also why the lengths are a fixed list
+       rather than a free number — see `HANDLE_LENS`. */
+    [Math.max(0, HANDLE_LENS.indexOf(state.handleLen)), BITS.handleLen],
+    [packStripes(state), BITS.stripes],
+    [Math.max(0, BELLS.findIndex(x => x.id === state.bell)), BITS.bell],
+    [Math.max(0, PEEPHOLES.findIndex(x => x.id === state.peephole)), BITS.peephole],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -505,11 +903,27 @@ export function decodeCode(code) {
   const handle  = HANDLES[read(BITS.handle)];
   const lockset = LOCKSETS[read(BITS.lockset)];
   const detail  = DETAILS[read(BITS.detail)];
+  const special = SPECIAL_LOCKS[read(BITS.speciallock)];
+  const mashkof = MASHKOFS[read(BITS.mashkof)];
+  const pirzul  = PIRZUL[read(BITS.pirzul)];
+  const hLen    = HANDLE_LENS[read(BITS.handleLen)];
+  const sp      = read(BITS.stripes);
+  const bell    = BELLS[read(BITS.bell)];
+  const peep    = PEEPHOLES[read(BITS.peephole)];
+  /* ⚠ `hLen === undefined`, NOT `!hLen`. Zero is a VALID value — it is the
+     "as the model comes" default and the commonest length in the range — and
+     `!0` is true, so a truthiness guard refused every code for an untouched
+     door. Every other field here is an object, where falsy really does mean
+     "not found"; this one is a number and needed its own test. */
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
-      || !detail) return null;
+      || !detail || !special || !mashkof || !pirzul || hLen === undefined
+      || !bell || !peep) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
+    speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
+    bell: bell.id, peephole: peep.id,
+    handleLen: hLen, ...unpackStripes(sp),
   };
 }

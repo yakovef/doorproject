@@ -9,6 +9,12 @@ research/works/works.mhtml
 # five landed there and sat in `git status` for a week.
 tools/_*.mjs
 /_*.mjs
+# ⚠ AND WHAT THEY WRITE, not only the scripts. A scratch harness that takes
+# screenshots leaves .png beside itself, and eleven of them (5 MB) turned up in
+# `git status` the first time one did. Same convention, same prefix, so any
+# artefact of a throwaway tool is covered whatever its extension.
+tools/_*
+/_*.png
 
 # Contact sheets: 17 MB, and every one is a pure function of the photographs
 # plus `npm run triage`. What is worth keeping from that pass is the READING
@@ -16,3 +22,13 @@ tools/_*.mjs
 # by (research/works/auto/), and both of those are committed.
 screenshots/sheet-*.png
 screenshots/leaf-check.png
+
+# The backdrop pipeline's intermediates. `research/backdrops/attached-*.webp`
+# are the owner's originals and ARE committed — they are the source the shipped
+# `assets/room.webp` is a pure function of. The PNGs beside them are just what
+# a container with no image library has to decode through, 1.4 MB each, and
+# `npm run backdrop` makes them again from nothing.
+research/backdrops/*.png
+research/backdrops/_*
+research/backdrops/g2-*
+research/backdrops/graded-*

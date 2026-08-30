@@ -127,7 +127,25 @@ const PAGE_DEPS = ['assets/bundle.js', 'css/app.css', 'index.html'];
  * construction — and it deletes a hand-kept list, which is the objection this
  * file already raises against itself twice above.
  */
-const DEPS_FOR = () => PAGE_DEPS;
+/**
+ * ⚠ AND THE TOOL ITSELF, because on 23.8.2026 it hid a mirrored door.
+ *
+ * `HANDINGS` was corrected and every consumer had to move with it. Two of them
+ * live in these tools: `corpus.mjs` derives a handing from `handle.x`, and
+ * `recreate.mjs` did the same thing in its own copy. I fixed the catalogue,
+ * regenerated, and the sheets came back byte-identical — so ten recreations
+ * stood beside their photographs showing the MIRROR of the door, and every
+ * instrument in the repo called it current.
+ *
+ * The old note above says a tool's own comments changing is not worth three
+ * minutes of regeneration. True, and it was the wrong trade: these files hold
+ * the QUERIES — which door each sheet draws — and a query is as much an input
+ * to the picture as the renderer is. Paying three minutes on a comment edit is
+ * cheaper than certifying a sheet that shows a door nobody built.
+ */
+const TOOL_FOR = { shot: 'tools/screenshot.mjs', recreate: 'tools/recreate.mjs',
+                   corpus: 'tools/corpus.mjs', against: 'tools/against.mjs' };
+const DEPS_FOR = name => TOOL_FOR[name] ? [...PAGE_DEPS, TOOL_FOR[name]] : PAGE_DEPS;
 const STAMP_FILE = 'screenshots/.stamps.json';
 
 const depHash = name => createHash('sha256')

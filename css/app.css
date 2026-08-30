@@ -13,8 +13,25 @@
      otherwise the SVG reads as a floating rectangle pasted onto the page. */
   --wall:       #F5F3EF;
   --floor:      #E6E2DA;
-  --ink:        #171715;
+  /* ⚠ WARM NEAR-BLACK, NOT BLACK, AND NOW A HAIR WARMER STILL. `#171715` →
+     `#1C1A17` (DESIGN-LEVEL §2): every reference in that document avoids pure
+     black for body ink because a warm near-black sits in a warm-paper page
+     without punching a hole in it. Measured on `--paper` (#EFEDE8) with the
+     repo's own `contrast()`: **14.84:1**, against 15.34 before — still three
+     times the AA floor, and nothing on this page depends on the difference. */
+  --ink:        #1C1A17;
   --ink-2:      #6B6862;
+  /* ⚠ A THIRD TIER, AND IT IS NOT FOR TEXT. Measured: `#9A968E` is **2.52:1**
+     on `--paper` and 2.95 on white — nowhere near readable, and not meant to
+     be. It exists for the things that are neither ink nor rule: a hover border
+     a shade darker than `--rule`, the stroke of an icon that is deliberately
+     receding. Anything that has to be READ takes `--ink-2` (4.75:1 on paper,
+     5.01 on `--paper-up`, 5.55 on white) or darker.
+     It is named so the next person reaching for "a lighter grey" finds one
+     that has already been measured, instead of reaching for an `opacity` —
+     which is a measured contrast multiplied by an unmeasured one, and is the
+     mistake the section counter made and had corrected. */
+  --ink-3:      #9A968E;
   --rule:       #D6D3CB;
   /* ⚠ THE COLOUR AN ELEMENT IS ACTUALLY SITTING ON, which is not always the
      page's. The swatch ring below used to name `--paper` directly, and the
@@ -28,11 +45,55 @@
      a card, not less. Measured before changing anything.) */
   --surface:    #EFEDE8;
   --accent:     #B08D57;
+  /* ⚠ AND A DARKER STEP FOR ANYTHING THAT IS READ OR THAT DRAWS A STATE.
+     `--accent` is the mockup's tan and it is right for a hairline underline on
+     a number nobody has to decode. It is not right for text, and it is not
+     right for the border that says WHICH TILE IS SELECTED. Measured with
+     `contrast()` from `js/colour.js`, against the three grounds this page
+     actually uses:
+
+                     on #fff   on #EFEDE8 (paper)  on #F5F3EF (paper-up)
+       #B08D57         3.09          2.64                  2.79
+       #8A6A3B         4.99          4.27                  4.51
+       #7E6134         5.76          4.92                  5.20
+
+     REALISM2.md §A2 proposes `#8A6A3B` on the strength of the white column
+     alone — and the card is only white ABOVE 1100 px. Below it the panel sits
+     on `--paper`, where that colour measures 4.27:1 and misses. Nearly every
+     visitor arrives on a phone, so the colour is chosen on the ground the
+     phone actually paints: `#7E6134` clears 4.5:1 on all three.
+
+     The selection border takes it too. WCAG 1.4.11 asks 3:1 of a visual
+     boundary that conveys STATE, and `--accent` on paper is 2.64 — so a
+     selected tile on a phone would be the one control on the page whose
+     "chosen" ring nobody with poor sight can find. The tan stays where it is
+     decoration; this is where it means something. */
+  --accent-ink: #7E6134;
   --wa:         #1EA95A;
   --warn:       #A4442E;
 
   --sp: 4px;
-  --radius: 2px;
+
+  /* ── RADIUS IS A SCALE, NOT A NUMBER ────────────────────────────────
+     `--radius: 2px` everywhere is the single clearest reason the shipped page
+     read as a wireframe beside the mockup (REALISM2.md §A1). One token could
+     not be right for a 340 px card and a 14 px swatch chip at the same time,
+     so it was right for neither.
+     ⚠ A radius is an ABSOLUTE length, so the steps are not one number scaled.
+     `--r-chip` is 4px and not a proportional 10px, because 10px on a 14px
+     square is a circle — and a round chip beside seventeen round swatches
+     would say "colour you can pick" about a thing that is only a label. */
+  --r-card: 18px;   /* the choices card, the send card, the toast */
+  --r-tile: 12px;   /* option tiles */
+  --r-chip: 4px;    /* the 14px swatch beside a spec row */
+  --r-pill: 999px;  /* every button — see the note on `.btn` */
+
+  /* One shadow for anything that floats, rather than three hand-written ones
+     that agree until somebody edits a single card. ⚠ The DOCK is deliberately
+     not on it: it is pinned to the BOTTOM of the screen, so its shadow has to
+     be cast upward, and a shadow pointing the other way is a different
+     quantity rather than a second copy of this one. */
+  --shadow-card: 0 10px 32px rgb(23 23 21 / .07), 0 2px 8px rgb(23 23 21 / .05);
 
   /* The wall strip the grip controls stand in, reserved out of the stage above
      1100 px and zero below it (on a phone the controls are in flow under the
@@ -44,13 +105,117 @@
      record of what happens when a quantity like that lives in two. */
   --grip-strip: 0px;
 
+  /* ⚠ THE TOUCH FLOOR, AS A TOKEN, BECAUSE IT IS NOW A QUANTITY IN TWO PLACES.
+     44 px is written into a dozen rules in this file and that was fine while
+     each was independent — a button is 44 because a thumb is. It stopped being
+     fine when the navigator's ROW had to be tall enough to hold its own
+     circle: two numbers that must agree or the circle is squashed, which is
+     exactly the shape CLAUDE.md §5 is about. The circle and the row that holds
+     it read the same token; the standalone buttons keep their literal 44,
+     because they are answering the thumb, not each other. */
+  --tap: 44px;
+
   --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
-  --sans: "Segoe UI", "Arial Hebrew", Arial, system-ui, sans-serif;
+  /* ⚠ ASSISTANT FIRST, THEN A FALLBACK TUNED TO ASSISTANT, THEN THE OLD STACK
+     UNCHANGED BEHIND BOTH. The middle entry is the whole trick; it is declared
+     immediately after this block, with the four measurements behind it. */
+  --sans: "Assistant", "Assistant Fallback",
+          "Segoe UI", "Arial Hebrew", Arial, system-ui, sans-serif;
+  /* ⚠ THE PRICE'S OWN FACE, AND IT IS STILL A SYSTEM SERIF. Asked for from
+     outside: *"pick a creative font for the price, something that reads
+     rich."* That instruction is newer than the plan that wanted the figure set
+     in a light sans, and it stands: a high-contrast serif — thin hairlines
+     against thick stems — is the whole visual signature of money set in type,
+     and it is the opposite of the interface sans around it. It also costs
+     nothing to load, which now matters more rather than less: Assistant is the
+     page's one network request and the figure is the thing a customer looks at
+     first, so it may not be the thing waiting on a CDN.
+     Georgia leads because its figures are generous and it is on every Windows
+     and Mac; Charter and the iOS/Android serifs follow. */
+  --serif: Georgia, "Charter", "Iowan Old Style", "Times New Roman",
+           "Noto Serif Hebrew", "Frank Ruehl CLM", serif;
 
   --ease: cubic-bezier(.33, 1, .68, 1);
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   THE FALLBACK IS TUNED TO THE WEBFONT, NOT THE WEBFONT TO THE FALLBACK
+   ══════════════════════════════════════════════════════════════════════
+
+   Assistant loads from Google Fonts as an enhancement (see the head of
+   index.html). `font-display: swap` paints the fallback first and swaps —
+   and the two faces have different metrics, so text REFLOWS on the swap
+   unless something is done about it. The usual advice is to tune the webfont
+   to the fallback, and it cannot be done: the fallback is Segoe UI on
+   Windows, Arial Hebrew on a Mac, something else again on Android, and one
+   set of overrides cannot match three faces.
+
+   So it is done the other way. This declares a SECOND family that wraps a
+   local font and stretches it onto Assistant's metrics, and the stack puts it
+   directly behind Assistant. The page then lays out at Assistant's metrics
+   from the first frame, whether or not Assistant ever arrives — and the swap,
+   when it comes, moves nothing.
+
+   ⚠ EVERY NUMBER HERE WAS MEASURED, in `tools/_font/measure.mjs`, against the
+   real woff2 files. Per 100 px: Assistant's ascent is 102 and its descent 29
+   against Arial's 91 and 21, and Assistant is NARROWER — 1591 units of Hebrew
+   against 1840. Hence a size-adjust below 100 % and an ascent above it.
+
+   Verified rather than asserted, on a real paragraph:
+
+                          inline run   line box   wrapped 360 px
+     Assistant (target)      237.1        19.0        69.8
+     this face               235.1        19.0        69.8     <- 2.0 / 0 / 0
+     raw Arial metrics       245.3        18.0        54.0     <- 8.2 / 1 / 15.8
+
+   The last row is what the swap looked like without this: eight pixels on a
+   line and a whole line on a paragraph.
+
+   ⚠ AND IT IS APPROXIMATE ON ANDROID, which is worth writing down rather than
+   discovering. `local("Arial")` resolves to a real Arial on Windows, macOS and
+   iOS; on Android it commonly resolves to Roboto, whose metrics are close to
+   Arial's but not identical. The residual there is a fraction of the 8 px this
+   removes everywhere else. If `local()` matches nothing at all the face is
+   simply skipped and the old stack applies unadjusted — the same page as
+   before this block existed. */
+@font-face {
+  font-family: "Assistant Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
+  size-adjust: 89.05%;
+  ascent-override: 114.55%;
+  descent-override: 32.57%;
+  line-gap-override: 0%;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   ONE ICON FAMILY
+   ══════════════════════════════════════════════════════════════════════
+
+   ⚠ THERE WERE FIVE STROKE WEIGHTS AND FOUR SIZES. Measured: `.spec__ico` 1.4
+   at 17 px, `.steps__g` 1.5 at 21, `.trust__ico` 1.6 at 16, `.btn__ico` 1.8 at
+   16, `.iconbtn .btn__ico` 1.9 at 19, `.saved__ico` 1.9 at 14. Every one was a
+   reasonable choice on its own and no two of them belong to the same family,
+   which is what "the icons don't match" actually means when you go and look.
+
+   ⚠ AND A CONSTANT `stroke-width` DOES NOT GIVE A CONSTANT STROKE. Every glyph
+   is drawn on a 24-unit grid and rendered at 14–22 px, so a width of 1.5 comes
+   out at 1.5 × size/24 — 0.9 px on the bookmark and 1.4 px on a rail circle.
+   Matching the NUMBERS would still not have matched the WEIGHTS.
+   `vector-effect: non-scaling-stroke` is the one declaration that fixes it:
+   the stroke is laid down in device units after the transform, so 1.5 is 1.5
+   px at every size. One weight, everywhere, by construction.
+
+   ⚠ It goes on the drawn elements, not on the `<svg>` — `vector-effect` is not
+   an inherited property — hence the descendant selector. */
+.steps__g, .spec__ico, .trust__ico, .btn__ico, .saved__ico, .grip-bar__ico {
+  fill: none; stroke: currentColor;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  flex: 0 0 auto;
+}
+.steps__g *, .spec__ico *, .trust__ico *, .btn__ico *, .saved__ico *,
+.grip-bar__ico * { vector-effect: non-scaling-stroke; }
 
 /* THE `hidden` ATTRIBUTE HAS TO WIN.
    It is only `display: none` in the browser's own stylesheet, so ANY author
@@ -99,66 +264,238 @@ body {
   body { block-size: 100dvh; overflow: hidden; }
 }
 
-/* ── header ───────────────────────────────────────────────── */
 
-.bar {
-  flex: 0 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px;
-  padding: 12px 16px;
-  border-block-end: 1px solid var(--rule);
-  background: var(--paper);
-}
-
-/* Its two lines of text come to 43px, one short of the minimum, which is the
-   kind of miss only a measurement finds. */
-.brand { text-decoration: none; color: inherit; display: grid; align-content: center;
-         min-block-size: 44px; }
-.brand__name { font-weight: 700; font-size: 1.05rem; letter-spacing: .01em; }
-.brand__sub {
-  font-size: .7rem; letter-spacing: .14em; color: var(--ink-2);
-}
-.bar__phone {
-  font-family: var(--mono); font-size: .9rem;
-  color: var(--ink);
-  /* The underline is drawn on the TEXT, so the box around it can grow to a
-     44px thumb without the rule sliding away from the number. It was a 104x24
-     target — on one of the two actions the whole site exists to produce. */
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  display: inline-flex; align-items: center;
-  min-block-size: 44px; padding-inline: 6px;
-  direction: ltr;
-}
+/* ⚠ THE UNDERLINE IS ON THE NUMBER, NOT ON THE LINK BOX — and it moved here
+   the day the handset icon arrived. `text-decoration` set on an element is
+   painted across every inline descendant of it, so with the rule on
+   `.bar__phone` the tan line was struck straight through the middle of the
+   icon. It has always needed to be on the text rather than the box for the
+   original reason too: the box grows to a 44 px thumb — it was a 104x24 target
+   on one of the two actions the whole site exists to produce — and an
+   underline on a 44 px box floats well below the digits it belongs to. */
+.saved__ico { flex: 0 0 auto; }
 
 /* ── nav, saved, trust ────────────────────────────────────── */
 
-.nav { display: flex; gap: 2px; }
-.nav__a {
-  display: inline-flex; align-items: center;
-  min-block-size: 44px; padding-inline: 10px;
-  font-size: .86rem; color: var(--ink-2); text-decoration: none;
+/* ═══════════════════════════════════════════════════════════════════
+   ⚠ THE INTERFACE MIRRORS. THE DOOR DOES NOT. — PLAN.md §6.1
+   ═══════════════════════════════════════════════════════════════════
+   Hebrew sets `dir="rtl"` on `<html>` and every logical property in this
+   file flips with it, which is the entire point of using them. A DRAWING
+   must not flip. A right-hinged door is a physical fact about an object
+   somebody will hang in a wall: if the picture mirrors with the stylesheet,
+   the site shows one hinge side and Peretz builds the other, and the
+   customer finds out when it arrives. `ASK-PERETZ.md` §1 records that this
+   project already shipped the mirror of this bug once — the handing
+   convention was backwards for months — and that every instrument called
+   it green while it was wrong, because a mirrored door is a perfectly
+   plausible door.
+
+   Every `<svg>` on this page is a drawing in real millimetres: the stage,
+   the sixty option thumbnails, the gallery, the A4 sheet, the picture that
+   goes into WhatsApp. None of them contains a `<text>` element — checked,
+   and the reason this can be one blanket rule rather than five selectors
+   that somebody will add a sixth beside and forget.
+
+   `npm run audit` asserts the cylinder comes out on the same side of the
+   leaf in Hebrew, English and Russian. Do not delete that check. */
+svg { direction: ltr; }
+
+
+/* ── the step's disclosure — TRANSFORM.md §10.4 ──────────────────────
+   Closed by default and quiet enough to ignore. ⚠ The 44 px touch floor
+   applies to a `<summary>` like anything else: it is the control that opens
+   it, and the audit measures every interactive element in the flow. The
+   marker is drawn rather than left to the browser's triangle, which is a
+   different glyph and a different size in every engine. */
+.sect__exp { margin-block-start: 14px; border-block-start: 1px solid var(--rule); }
+.sect__q {
+  display: flex; align-items: center; gap: 8px;
+  min-block-size: 44px; padding-block: 10px;
+  font: 500 .86rem var(--sans); color: var(--ink-2);
+  cursor: pointer; list-style: none;
+}
+.sect__q::-webkit-details-marker { display: none; }
+.sect__q::before {
+  content: ""; inline-size: 18px; block-size: 18px; flex: none;
+  border: 1px solid currentColor; border-radius: 50%;
+  background: no-repeat center / 3px 9px
+    linear-gradient(currentColor, currentColor);
+}
+.sect__q::after {
+  content: "⌄"; margin-inline-start: auto; transition: transform .2s var(--ease);
+}
+.sect__exp[open] .sect__q::after { transform: rotate(180deg); }
+.sect__exp[open] .sect__q { color: var(--ink); }
+.sect__a {
+  margin: 0 0 12px; padding-inline-start: 26px;
+  font-size: .84rem; line-height: 1.62; color: var(--ink-2);
+}
+
+/* ── the language picker ─────────────────────────────────────────────
+   Three buttons rather than a menu, each written in its own script, so a
+   customer who cannot read the rest of the page can still see the way out
+   without opening anything. It sits in the header beside the nav — and
+   unlike the nav it SURVIVES THE PHONE BREAKPOINT, because `.nav`'s three
+   words are all reachable elsewhere (the works link is at the foot of the
+   send card, the telephone is in the header) and a language is not. */
+/* ⚠ `min-inline-size: 0` AND `overflow-x: auto` ARE THE GUARANTEE; the font
+   size below is only the reason it never has to use them. A flex item's
+   default `min-width: auto` refuses to shrink below its content, so a control
+   holding words PUSHES the header wider and takes the whole page sideways
+   with it — which is what happened, and which is also exactly how the
+   navigator circles did it one screen further down. These two lines mean this
+   control can never do that again, whatever a fourth language is called. */
+/* ── undo / redo, under the door ─────────────────────────────────────
+   Two circles, no words. `disabled` rather than hidden, and the row keeps its
+   height either way: anything that appears in the strip under the leaf takes
+   its height out of the door above — measured at 23,021 pixels the one time
+   it was allowed to. */
+.steps-back { display: flex; gap: 6px; align-items: center; }
+.iconbtn {
+  appearance: none; background: none; cursor: pointer;
+  inline-size: 44px; block-size: 44px; padding: 0;
+  display: inline-grid; place-items: center;
+  border: 1px solid var(--rule); border-radius: 50%;
+  color: var(--ink-2);
+}
+.iconbtn:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-3); }
+/* ⚠ A DISABLED CONTROL SHOULD RECEDE, NOT LOOM. `opacity: .32` on a 44 px
+   bordered disc leaves a 44 px bordered disc, and there are two of them side
+   by side in the top corner of the wall — both disabled on arrival, because
+   there is nothing yet to undo. On every first load they were the loudest
+   thing in that corner and they meant nothing.
+   The ring goes and the glyph stays. The target is still 44 px, which is what
+   the audit measures and what a thumb needs; the control is still on the page
+   at all times, which is what the owner's son asked for; it simply stops
+   advertising itself before it can do anything. */
+.iconbtn:disabled {
+  cursor: default;
+  border-color: transparent; background: none;
+  color: var(--ink-3);
+}
+.iconbtn .btn__ico { inline-size: 20px; block-size: 20px; }
+
+.langs { display: flex; gap: 2px; align-items: center; min-inline-size: 0; overflow-x: auto; }
+.lang {
+  appearance: none; background: none; border: 0;
+  /* ⚠ 44 BOTH WAYS. It had the height and not the width: measured on the
+     English page, where `עברית` is the shortest label of the three, the button
+     came out **41 x 44**. Three pixels under a floor this stylesheet keeps
+     everywhere else, on the control a customer who cannot read the page needs
+     to find — and invisible to the audit, whose own tap-target check is a
+     single 44 that both dimensions have to clear only where it looks. */
+  min-block-size: 44px; min-inline-size: 44px; padding-inline: 8px;
+  /* ⚠ `--ink-2`, AND IT USED TO SAY `var(--ink-3, var(--ink-2))`. `--ink-3` did
+     not exist when that was written, so the fallback was doing the whole job
+     and the language buttons rendered at 4.75:1. Defining the token — three
+     hundred lines away, in a commit about type — would have quietly dropped
+     them to **2.52:1**, which is unreadable, on the one control a customer who
+     cannot read the rest of the page needs to find.
+     Nothing would have failed. It is the reason a `var(--x, fallback)` is a
+     LIE about which value is in force: it reads as "prefer x" and behaves as
+     "whatever x becomes, one day, in another file". Named outright now.
+     Found by grepping every `--ink-3` the moment the token was added, which is
+     the habit rather than the luck. */
+  font: 500 .8rem var(--sans); color: var(--ink-2);
+  cursor: pointer; border-radius: var(--r-pill);
   border-block-end: 2px solid transparent;
 }
-.nav__a:hover { color: var(--ink); }
-.nav__a.is-here { color: var(--ink); font-weight: 600; border-block-end-color: var(--ink); }
+.lang:hover { color: var(--ink); }
+.lang.is-on { color: var(--ink); font-weight: 600; border-block-end-color: var(--ink); }
+/* ⚠ ON THE SMALLEST PHONE THE CURRENT LANGUAGE'S OWN BUTTON GOES, and that
+   is the one thing on this control that can be spared. Three buttons are
+   150 px; measured at 320x640 the header came to 359 and the whole page
+   scrolled sideways by 39 px on every one of 81 designs — the same failure
+   the navigator circles produced at 390 px, from the same cause, one screen
+   further down.
+
+   Everything else in the header is load-bearing at that width: the brand, the
+   telephone, the saved count. The button you are least likely to press is the
+   one for the language you are already reading — the page in front of you is
+   the label. What stays is the way OUT, which is what this control is for,
+   and both remaining buttons keep their full name in their own script rather
+   than shrinking to initials nobody who is lost can decode.
+
+   Two buttons come to ~100 px, so the header fits with room. All of them stay
+   44 px tall and tappable. `npm run audit` measures sideways scroll at 320 px
+   on every design, which is what caught this. */
+/* ⚠ THE BREAKPOINT IS THE NAV'S, NOT AN ARBITRARY 400. It was `max-width:
+   400px`, which is one phone wide: reported from a 412 px Android as *"on the
+   top you can see that i need to scroll to view the full name of the
+   language"* — three buttons plus the brand plus the telephone overflowed, the
+   row scrolled, and `Русский` was cut in half.
+   Tied to 1099 now, the width at which `.nav`'s three words are already
+   hidden, so the rule reads as one statement: on a phone the header carries
+   the brand, the way OUT of the language you are in, and the telephone. */
+@media (max-width: 1099px) {
+  .lang { padding-inline: 6px; font-size: .78rem; }
+  .lang.is-on { display: none; }
+  /* ⚠ AND IT IS THE ITEM THAT DOES NOT GIVE. Measured at 390 px with the
+     current-language button already dropped, the header's four children came
+     to exactly the viewport and flexbox took the shortfall out of the widest
+     shrinkable one — `.langs`, 113 px of content in 99 px of box, so `Русский`
+     was still cut in half and still scrolled. Which is what was reported; the
+     earlier fix stopped the PAGE scrolling sideways and left the control
+     scrolling inside itself, one layer down.
+     The brand gives instead. It is the one thing up here that loses nothing by
+     being 14 px narrower — `דלתות מגן` is also the tab title, the footer and
+     the sheet's letterhead — where a language button that cannot be read is a
+     customer who cannot get out of a language they do not speak. */
+  .langs { flex: 0 0 auto; overflow-x: visible; }
+  /* ⚠ AND NOTHING ELSE UP HERE MAY WRAP OR ELLIPSIS EITHER. Making `.langs`
+     rigid moved the shortfall onto its neighbours, and both broke in ways that
+     looked worse than the problem: the brand ellipsised to `דלתות...` and the
+     telephone wrapped to `053-219-` over `7466`. A truncated business name and
+     a number split across two lines are not a saving.
+     So the SUBTITLE goes instead. `בונים דלת` is the page's own `<h1>` twelve
+     pixels below and the browser tab's title above; it is the only thing in
+     this header that is said three times. Dropping it on a phone frees the
+     row without shortening one word anybody needs. */
+  .brand__sub { display: none; }
+  .brand__name, .bar__phone { white-space: nowrap; }
+  /* ⚠ AND THE TELEPHONE KEEPS ITS HANDSET AND LOSES ITS DIGITS. Even without
+     the subtitle the header ran 32 px over 390: brand 124 + languages 113 +
+     telephone 137 does not fit, and one of the three had to give a whole word
+     rather than a few pixels.
+     The number is the one that is said elsewhere — twice, in the send card
+     (`אפשר גם להתקשר`) and in the strip that appears when the page cannot
+     load, which is the moment it matters most. The business NAME is said
+     nowhere else up here, and a language button nobody can read is the fault
+     being fixed. So the digits go and the tap target does not: the handset is
+     still a 44 px `tel:` link, still labelled, and the `data-phone-text` span
+     `app.js` writes into is still in the DOM and still written. */
+  .bar__phone { flex: 0 0 auto; min-inline-size: 44px; justify-content: center; }
+  .bar__phone [data-phone-text] {
+    position: absolute; inline-size: 1px; block-size: 1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .saved__ico { inline-size: 19px; block-size: 19px; }
+}
+
+/* ⚠ 320 px IS A REAL PHONE AND THE HEADER DOES NOT FIT IT ON THE DEFAULTS.
+   `npm run audit` measured 9 px of sideways scroll on every one of 73 designs
+   at `phone-s`: the brand, two language buttons and the handset come to 281 px
+   and the row's own `gap: 16` and `padding-inline: 16` take the rest.
+   Nothing is dropped here — the gap gives way instead, which is the one part
+   of the row that is spacing rather than content. */
+@media (max-width: 400px) {
+  .bar { gap: 8px; padding-inline: 12px; }
+}
 /* A phone has no room for three more words above the door, and every one of
    them is reachable another way — the works link is at the foot of the send
    card and the telephone is right here in the header. */
 @media (max-width: 1099px) { .nav { display: none; } }
 
-.bar__end { display: flex; align-items: center; gap: 8px; }
-.bar__saved {
+.saved__btn {
   appearance: none; background: var(--ink); color: #fff;
-  border: 0; border-radius: 999px;
+  border: 0; border-radius: var(--r-pill);
   min-block-size: 44px; padding-inline: 14px;
   font: 600 .82rem var(--sans); cursor: pointer;
   display: inline-flex; align-items: center; gap: 6px;
 }
-.bar__count {
-  background: rgb(255 255 255 / .22); border-radius: 999px;
+.saved__n {
+  background: rgb(255 255 255 / .22); border-radius: var(--r-pill);
   padding: 1px 7px; font-variant-numeric: tabular-nums;
 }
 
@@ -180,7 +517,7 @@ body {
 .saved__row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
 .saved__open {
   appearance: none; background: none; border: 1px solid var(--rule);
-  border-radius: 999px; min-block-size: 44px; padding-inline: 12px;
+  border-radius: var(--r-pill); min-block-size: 44px; padding-inline: 12px;
   font: 500 .82rem var(--sans); color: var(--ink); cursor: pointer;
   /* Takes the room that is left and gives the × a fixed place to stand.
      `min-inline-size: 0` because a flex item will not shrink below its
@@ -207,9 +544,100 @@ body {
   background: var(--paper-up);
   font-size: .78rem; color: var(--ink-2);
 }
-/* Above 1100 the page is one screen with no scroll, and the band is the least
-   urgent thing on it — the send card is already beside the door. */
-@media (min-width: 1100px) { .trust { display: none; } }
+.trust__i { display: inline-flex; align-items: center; gap: 6px; }
+.trust__ico {
+  inline-size: 18px; block-size: 18px;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: .8;
+}
+
+/* ── THE BAND ON THE WALL, ABOVE 1100 ────────────────────────────────
+   It used to be `display: none` here, and the reason was real: the page is
+   one screen with `overflow: hidden` and `.layout` is `flex: 1`, so anything
+   given HEIGHT at the foot takes it straight out of the door — the same
+   mechanism by which a 70 px headline once faked a 5.2% drawing regression in
+   `npm run profile`.
+
+   `position: fixed` costs the door nothing at all, which is the same argument
+   that put the grip controls in the wall. And it is placed inside the stage's
+   own column rather than across the whole page, because the two panels either
+   side of it scroll internally and a band laid over them would cover whatever
+   the customer had scrolled to.
+   ⚠ THE COLUMN'S BOX IS MEASURED, NOT GUESSED. `--stage-l` and `--stage-w`
+   are published by `fitStage()` off the same rect it already reads for
+   `--wall-gap`, on the same re-fit, so the box the band is placed in and the
+   box that was measured are one box by construction. The fallbacks cover the
+   instant before the first paint.
+   ⚠ `--ink`, NOT `--ink-2`, and that is a measurement. Over the drawn floor
+   `#6B6862` is 4.30:1, and over a light door's floor (`--floor: #D6D2C8`)
+   it is 3.68 — under the 4.5 this page holds itself to, on the two grounds
+   this band will actually sit on. `#171715` measures 13.90 and 11.89. */
+@media (min-width: 1100px) {
+  .trust {
+    position: fixed;
+    /* ⚠ THE STAGE'S FOOT, NOT THE VIEWPORT'S. `inset-block-end: 0` put the
+       band on the viewport bottom — which above 1100 px is exactly where
+       `.stage__bar` ends, so the four claims printed straight over the
+       "הדמיה להמחשה. הדלת נמדדת ומותקנת אצלכם." note. Measured at 1280x800 the
+       two boxes were identical: y 759.7-800, left 360, width 560. At 1100 the
+       band also wrapped to two rows and climbed 27 px up into the drawing.
+       `REALISM2.md` §B5 asked for `absolute` INSIDE the wrap; this shipped as
+       `fixed` against the viewport, which is a different box. `--stage-b` is
+       published off the same rect as the two lines below, on the same re-fit.
+       ⚠ AND THE WIDTH FALLBACK IS `0`, NOT `100%`. Before the bundle runs — or
+       if it never runs — the variables are unset, and a 100% fallback laid the
+       band right across the choices card and the send card too. There is
+       nothing sensible to guess: until the stage has been measured the band
+       does not show, which is what it did at this width for the whole life of
+       the page before this round. */
+    inset-block-end: var(--stage-b, 0px);
+    left: var(--stage-l, 0px);
+    inline-size: var(--stage-w, 0px);
+    overflow: hidden;
+    z-index: 2;
+    justify-content: center; gap: 4px 24px;
+    padding: 10px 16px 12px;
+    background: none;
+    border-block-start: 0;
+    color: var(--ink);
+    font-size: .74rem; font-weight: 600;
+    letter-spacing: .01em;
+    /* A message, never a control — and it lies over the wall the grip buttons
+       stand in. Without this it would swallow a drag that started low. */
+    pointer-events: none;
+  }
+  .trust__ico { opacity: .7; }
+
+  /* ⚠ AND OVER A PHOTOGRAPH IT NEEDS A GROUND, WHICH IT NEVER NEEDED OVER A
+     DRAWING. Four claims in ink laid straight on a photographed stone floor
+     read as writing ON THE FLOOR rather than as chrome over a picture, and
+     that is most of the difference between a product shot and a caption.
+     Contrast was never the problem — `--ink` measures 13.9:1 on the drawn
+     floor and 11.6 on the photographed one — the problem is that a photograph
+     has depth and the words were standing inside it.
+     A scrim answers both: the room dissolves into the page at the very bottom
+     instead of stopping at a ruled edge, and the words come to rest on paper.
+     Only where there IS a photograph; over the drawn floor, which is already
+     the page's own colour, the same gradient is a smudge. */
+  .is-photo .trust {
+    /* ⚠ EXACTLY THE FLOOR STRIP, AND NOT A PIXEL HIGHER. The first version was
+       `padding-block-start: 30px` and a gradient over whatever height that
+       produced — 60 px at 1440, which reached 14 px ABOVE the floor line and
+       washed out the foot of the door, the contact shadow and the threshold:
+       the three things that had just been built to make it stand on the
+       ground. `--floor-b` is the ground in front of the threshold in pixels,
+       published by `fitStage` off the same rect and the drawing's own
+       `data-base-y`, so the scrim's top edge IS the wall/floor junction — an
+       edge that is really in the picture rather than a number that looked
+       about right. */
+    block-size: var(--floor-b, 46px);
+    padding-block: 0 6px;
+    align-items: flex-end;
+    background: linear-gradient(to top, var(--paper) 0%,
+                                        var(--paper) 30%,
+                                        transparent 100%);
+  }
+}
 
 /* ── strips ───────────────────────────────────────────────── */
 
@@ -270,7 +698,13 @@ body {
 
 @media (min-width: 1100px) {
   .layout {
-    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) minmax(300px, 360px);
+    /* ⚠ TWO COLUMNS, NOT THREE. The third was `.panel--send`, and `goStep`
+       has always MOVED that card into the summary step rather than leaving a
+       copy beside the flow — so the track it reserved stood empty on eight
+       steps out of nine and 360 px of a laptop went to nothing. With the dock
+       gone (27.8.2026) the card is the only send affordance there is, and it
+       belongs to the step whose job is sending. The door gets the width. */
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
     /* Two rows: the door takes the height that is going and the note sits
        under it, both inside column 2.
        ⚠ ONLY CONSTANT THINGS MAY LIVE IN ROW 2. It is `auto`, so whatever is
@@ -291,6 +725,34 @@ body {
   /* Each column scrolls on its own, so a long swatch list never pushes the
      door or the send button off screen. */
   .panel { overflow-y: auto; block-size: 100%; }
+}
+
+/* ⚠ AND THE SCROLLBAR IS THE PLATFORM'S UNTIL IT IS ASKED NOT TO BE.
+   Reported off a Windows screenshot and invisible in this container: headless
+   Chromium here gives an overlay bar 2 px wide, Windows gives the classic
+   ~17 px one with arrow buttons at both ends — a hard grey stripe with a
+   scrollbar thumb in it, rammed down the inside edge of a card that is
+   supposed to be floating paper, splitting the page beside the photograph.
+   Same class of thing as the Assistant fallback: the platform default is what
+   most people actually see, and this container is the one place that never
+   shows it.
+   `thin` with the page's own hairline as the thumb; the track is transparent
+   so the card's own surface runs behind it. `::-webkit-scrollbar` for the
+   engines that ignore the standard properties, with the same two colours. */
+.panel, .works, .saved__list, .bd, #choices {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+.panel::-webkit-scrollbar, .works::-webkit-scrollbar,
+.saved__list::-webkit-scrollbar, .bd::-webkit-scrollbar,
+#choices::-webkit-scrollbar { inline-size: 8px; block-size: 8px; }
+.panel::-webkit-scrollbar-track, .works::-webkit-scrollbar-track,
+.saved__list::-webkit-scrollbar-track, .bd::-webkit-scrollbar-track,
+#choices::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb, .works::-webkit-scrollbar-thumb,
+.saved__list::-webkit-scrollbar-thumb, .bd::-webkit-scrollbar-thumb,
+#choices::-webkit-scrollbar-thumb {
+  background: var(--rule); border-radius: 999px;
 }
 
 /* ── stage ────────────────────────────────────────────────── */
@@ -348,8 +810,23 @@ body {
        `.grip-bar` is absolutely positioned against this element, and an
        absolutely positioned box is laid out against the PADDING box — so its
        `inset-inline-start` measures from the outer edge and the bar lands
-       inside the reserved strip rather than beyond it. */
-    padding-inline-start: var(--grip-strip);
+       inside the reserved strip rather than beyond it.
+
+       ⚠ AND THE PADDING IS GONE, 27.8.2026. Reported from outside: *"on the
+       right side continue the background, dont have a white stripe there."*
+       That stripe was this — 148 px of `.stage-wrap` showing its own surface
+       beside the drawing, on the RIGHT in Hebrew and the LEFT in English,
+       because it is a logical inset. It read as a seam in the room.
+
+       The reason for reserving it survives and is met a different way: the
+       controls overlay the wall now, on their own pill, exactly as the three
+       in `.stage__hud` above them do. What the reservation was protecting
+       against — the door RESIZING when it gains a handle — cannot happen
+       either way, because `.grip-bar` is absolute and takes no space in the
+       flow. The padding was buying clear wall, not a stable door, and a pill
+       buys legibility over any wall there is.
+       `--grip-strip` stays: it is still what gives the bar a sane width in the
+       1100–1240 band where the drawn wall is narrow. */
   }
   :root { --grip-strip: 148px; }
 }
@@ -358,15 +835,38 @@ body {
    Small and quiet: it names the page, it does not compete with the door, and
    on a phone every pixel it takes is a pixel off the stage — so below 1100 it
    is tighter still. */
+/* ⚠ WEIGHT 300 AND TWICE THE SIZE, AND THIS ONE LINE IS MOST OF WHY THE PAGE
+   READ AS A TOOL. Measured before: `clamp(17px, 2.2vw, 22px)` at weight 600,
+   which is not a display headline — it is a large label, and a large label at
+   the top of a page is the single clearest tell of an internal tool. Every
+   reference in DESIGN-LEVEL §1.1 sets its hero light and large: BMW at weight
+   300 and 60 px, Rivian, Heart and Atoms all on light display faces with
+   negative tracking. That document calls this the highest-yield change in it,
+   and it had never been made.
+   Negative tracking is what keeps a light face from reading as loose at size;
+   1.05 line-height because a display line has no business breathing like a
+   paragraph. */
+/* ⚠ CAPPED AT 44, NOT 52, AND THE CAP WAS MEASURED. `clamp(30px, 4.4vw, 52px)`
+   is the size DESIGN-LEVEL asks for and it is the right size for a brochure;
+   this heading sits INSIDE `.stage-wrap`, above a stage that is `flex: 1 1
+   auto`, so every pixel it takes comes straight out of the drawing. Measured at
+   1440x900: the stage went 794 -> 753 px and the leaf's share of the frame
+   21.1% -> 20.0%. A display headline that shrinks the product is the wrong
+   trade on the one page whose product is the point.
+   44 costs 41 px less and still reads as display type rather than as a label,
+   which was the whole complaint. The door gets the rest back in the crop. */
 .stage__h1 {
-  margin: 0; padding: 14px 16px 6px;
-  font: 600 clamp(17px, 2.2vw, 22px)/1.25 var(--sans);
+  margin: 0; padding: 14px 16px 8px;
+  font: 300 clamp(26px, 3.4vw, 44px)/1.05 var(--sans);
+  letter-spacing: -.022em;
   color: var(--ink);
   text-align: center;
+  text-wrap: balance;
 }
 .stage__lede {
-  display: block; margin-block-start: 4px;
-  font: 400 clamp(12px, 1.4vw, 14px)/1.35 var(--sans);
+  display: block; margin-block-start: 10px;
+  font: 400 clamp(13px, 1.4vw, 15px)/1.4 var(--sans);
+  letter-spacing: 0;
   color: var(--ink-2);
 }
 @media (max-width: 1099px) {
@@ -394,19 +894,123 @@ body {
    it, and once stuck it left 317 px for the choices. At 92vw it is about 43%
    of a 390x844 screen, the first category shows on arrival, and there is room
    for three rows of swatches under it. */
+/* ⚠ 100vw, UP FROM 92, AND THE BUDGET IS WHY. The old number was chosen when
+   the strip above the door cost 130 px — an 84 px navigator plus a 48 px title
+   band — and at 118vw the door filled the screen on arrival with no sign there
+   was anything to do below it. Both of those are gone: the navigator is 62 and
+   the band is 0.
+   Counted at 390x844: 62 + 390 = 452 of 844, leaving 392 for the question and
+   62 of that to the quote bar — **330 px of question visible on arrival**,
+   against 291 before. So the door grows by 31 px AND the customer sees more of
+   what they are answering. The two are not in tension here; the chrome was
+   simply taking both. */
 @media (max-width: 1099px) {
-  .stage { block-size: clamp(38vh, 92vw, 54vh); }
+  .stage { block-size: clamp(40vh, 100vw, 56vh); }
 }
 @media (min-width: 1100px) {
   .stage { block-size: auto; flex: 1 1 auto; min-block-size: 0; }
 }
 
-/* Light doors would vanish on a light ground, so the stage sinks a shade. */
-/* Set on `.layout`, not on `.stage-wrap`. The grip bar is a SIBLING of the
-   stage now rather than a child, and it paints itself with `--wall` so that
-   there is no seam between the door and the choices — on the stage the
-   variable would not reach it, and a light door got a bar half a shade off. */
-.layout[data-light="true"] { --wall: #E4E0D7; --floor: #D6D2C8; }
+/* ⚠ `.layout[data-light="true"] { --wall: #E4E0D7; --floor: #D6D2C8 }` WAS
+   HERE, AND IT IS GONE. It sank the wall and the floor a shade behind a pale
+   door so a white leaf would not vanish into a white room.
+   Reported from outside: *"there are some colors that the surrounding changes
+   color. the backround and the things around the door needs no change no
+   matter what."* The whole job of this screen is comparing colours, and a
+   ground that shifts under the swatch makes every comparison a lie — cream on
+   a light wall and cream on a darkened wall are two different colours to the
+   eye and neither is the colour of the door. It is the reason a paint shop
+   paints its walls one flat grey.
+   The silhouette of a pale door is the DRAWING's problem, and the drawing
+   already solves it: a painted frame, the reveal ramping in black at falling
+   alpha, and the casing's shadow on the plaster. Those hold on any colour,
+   because they describe the object rather than the backdrop.
+   See the matching note in app.js, where the attribute stopped being copied
+   onto `.layout`. The SVG still carries its own `data-light`, which the
+   moulding reads; that is a fact about the paint and it stays. */
+
+/* ── PHOTO-MODE: THE ROOM BECOMES A PHOTOGRAPH ────────────────────────────
+ *
+ * `PHOTOREAL.md` §1. The door stays the live SVG and the room behind it
+ * becomes `assets/room.webp`, composited as a CSS background on the stage —
+ * NOT as an `<image>` inside the drawing. That choice is the whole feature:
+ *
+ *   · every instrument reads the SVG, and `?bare=1` goes on photographing a
+ *     pure drawing with no change of any kind. `recreate`, `corpus`,
+ *     `against`, `profile`, `collide` and `mottle` cannot tell this shipped;
+ *   · `render(state)` stays pure and byte-stable, so T12 still holds;
+ *   · and the drawn wall, floor and sconces stay in the SVG as the automatic
+ *     fallback. `armRoom` in app.js adds `.is-photo` inside the image's own
+ *     `load` handler, so a missing file, a blocked request or a browser that
+ *     cannot decode WebP all end at the same place — the drawn room, which is
+ *     the page exactly as it shipped before the photograph existed.
+ *
+ * ⚠ THE STYLESHEET NEVER NAMES THE FILE. `index.html`'s `#room-src` owns the
+ * URL and `js/app.js` sets `background-image` from it, so the cache stamp is
+ * written in one place. What is here is the PLACEMENT, and it is driven by
+ * three lengths `fitStage` publishes from the same rects it already reads —
+ * because the picture has to be scaled about its own FLOOR LINE and `cover`
+ * scales about the centre. */
+.is-photo .stage {
+  background-repeat: no-repeat;
+  /* The fallbacks are `100% auto`, which is a valid pair that covers the
+     width — `cover` cannot be one half of the two-value form, and an invalid
+     `background-size` drops the whole declaration and tiles the picture at its
+     natural size. `fitStage` always sets all three before the class goes on,
+     so these are for the impossible case only, and they are still a picture. */
+  background-size: var(--photo-w, 100%) var(--photo-h, auto);
+  background-position: 50% var(--photo-y, 0);
+}
+/* ⚠ NO FADE-IN, AND THAT IS DELIBERATE. The obvious flourish is to cross-fade
+   the room as it arrives, and the only element that could carry it is `.stage`
+   — which contains the DOOR, so fading it fades the product, and animating
+   opacity on the largest element on the page buys a compositor layer for it.
+   `GUIDED-FLOW.md` §3 rules out exactly this trade for the light sweep and the
+   sconce brighten. With `<link rel="preload">` in the head the picture is
+   usually decoded before the first paint anyway, so the case being animated is
+   the rare one. */
+/* ⚠ AND THE PICTURE GETS AN EDGE, above 1100 where there is a header band over
+   it. The page's paper and the photograph's plaster are within a few points of
+   each other, so the top of the room arrived as an accidental tonal step —
+   reported off a 1920 screenshot as the headline band and the picture running
+   into one another. A hairline says the picture starts here on purpose, which
+   is also the honest thing for a rendering to say.
+   Only where there IS something above it: below 1100 the `<h1>` is `.sr-only`
+   and the stage's neighbour is the navigator, which already carries its own
+   `border-block-end`. Two rules stacked would be a two-pixel bar. */
+@media (min-width: 1100px) {
+  .is-photo .stage { border-block-start: 1px solid var(--rule); }
+}
+
+/* ⚠ The drawn room goes only once the photograph is up, and this selector is
+   the whole of it: `#backdrop` is the group holding the wall, the floor, its
+   texture, the warm pool, the falloff, both sconces and the skirting shadow.
+   Scoped to `.stage`, so the thirty doors in the gallery and the order sheet
+   keep their drawn room — a tile 120 px wide has no business carrying an
+   82 KB photograph of a hallway, and the sheet is a document. */
+.is-photo .stage #backdrop { display: none; }
+
+/* ── THE SEAM ─────────────────────────────────────────────────────────────
+ * `PHOTOREAL.md` §2.2: "the shadow is the glue". The shapes are in the drawing
+ * at zero opacity on every door (see `#shadow` in renderer.js for why that is
+ * the safe way to do it); these three rules are the only thing that turns them
+ * up, and they exist only where there is a photograph for them to sit on. */
+.is-photo .stage [data-seam="pool"]    { opacity: .30; }
+.is-photo .stage [data-seam="contact"] { opacity: .58; }
+/* The casing stands proud of the plaster and drops a shadow onto it. On the
+   drawn wall 0.22 was enough — the wall was #F5F3EF and almost anything showed
+   on it. On the photograph's warmer, darker plaster the same shadow reads as
+   nothing, and the door's outer edge becomes a hard vector line against soft
+   grain, which at 2x is the most visible tell left in the composite. It also
+   does a second job the drawn room never needed: it is what keeps a WHITE
+   door's silhouette off a wall it nearly matches. */
+.is-photo .stage [data-seam="casing"] { opacity: .34; }
+
+/* The floor in the photograph is polished porcelain; the one it replaces was
+   matte paper. `render` masks the reflection to about 900 mm of floor and
+   fades it out, and that shape is right for both — what changes is how much
+   of the door the surface throws back. */
+.is-photo .stage g[mask] use { opacity: .2; }
 
 .door-svg {
   /* Fills the stage rather than sitting fitted inside it. The door itself is
@@ -444,6 +1048,21 @@ body {
   text-align: center;
   font-size: .72rem; color: var(--ink-2);
 }
+/* ⚠ ON A PHONE THIS IS THE FIRST THING UNDER THE DOOR, and it is fine print.
+   Seen by walking the guide: with the headline gone the caveat became the top
+   of the scrolling half — two lines of legal text between the drawing and the
+   question a customer is being asked. It stays (it is one sentence from
+   `js/share.js`, so the page and the WhatsApp message cannot promise two
+   different things) and it stops shouting: narrower measure so it wraps
+   deliberately rather than filling the width, a smaller size, and the room
+   above and below it that says "this is an aside". */
+@media (max-width: 1099px) {
+  .stage__bar { padding-block: 6px 8px; }
+  .stage__note {
+    font-size: .66rem; line-height: 1.4;
+    max-inline-size: 34rem; padding-inline: 18px;
+  }
+}
 .pills--compact .pill {
   min-block-size: 36px; padding: 6px 18px; font-size: .82rem;
 }
@@ -466,6 +1085,271 @@ body {
    Vertically centred on the inline-start edge — the right, in RTL, which is
    the side he circled. `inset-inline` rather than `left`, so an English build
    puts them on the other side without a second rule. */
+/* ── THE WALL IS THE CHROME ──────────────────────────────────────────
+   Three things stand on the wall above the door: the language buttons, the
+   price, and undo/redo. Asked for with three circles drawn on a screenshot.
+
+   ⚠ ABSOLUTE, LIKE `.grip-bar`, AND FOR THE SAME MEASURED REASON. Above
+   1100 px `.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so
+   anything in the FLOW up here takes its height out of the DOOR. That is why
+   the grip controls stand in the wall and why `--grip-strip` is reserved even
+   when empty; a row of chrome in the flow would cost the drawing ~60 px at
+   every desktop size.
+
+   ⚠ AND IT DOES NOT COVER THE LEAF. `pointer-events: none` on the strip with
+   `auto` back on the three slots, so the middle of the row — which passes over
+   the door's head on a narrow screen — never eats a drag aimed at the handle.
+   The grip bar is centred at 50%; this sits at the top. They share the wall
+   and never the same band of it. */
+.stage__hud {
+  position: absolute;
+  /* ⚠ THE TOP OF THE DRAWING, NOT OF THE WRAP. The wrap opens with the page's
+     `<h1>`, so a plain `0` put these three controls on top of the heading
+     instead of on the wall. `--stage-top` is published by `fitStage` off the
+     same two rects it already reads. The fallback is for the instant before
+     the first paint, and for a page whose bundle never arrives. */
+  inset-block-start: var(--stage-top, 0px);
+  inset-inline: 8px;
+  z-index: 4;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  padding-block-start: 6px;
+  pointer-events: none;
+}
+/* ⚠ EACH SLOT CARRIES ITS OWN GROUND. The wall is nearly the same colour as
+   the paper, so on a wide screen these three read as if they were painted on
+   it — which is what was drawn. On a 390 px phone the door is tall and the
+   band of wall above its head is only ~165 px, so the price lands ON the
+   lintel: dark text on a dark frame. A surface behind each slot costs nothing
+   where there is wall and rescues it where there is door. */
+/* ⚠ AND THE GROUND IS ONLY AS STRONG AS IT HAS TO BE. It was `--paper` at full
+   strength with a shadow under it, which on a wide screen — where these sit on
+   400 px of clear plaster — read as two chips stuck onto the picture. A wash
+   of the paper at 78 % keeps the rescue where the door really is in the way
+   and lets the wall through where it is not. The shadow goes: a 2 px drop
+   under a pill on a flat wall is the one thing in this room lit from a
+   direction the drawing does not share. */
+.hud__slot {
+  pointer-events: auto; min-inline-size: 0;
+  background: color-mix(in srgb, var(--paper) 78%, transparent);
+  border-radius: var(--r-pill, 999px);
+  padding: 2px 8px;
+}
+/* ⚠ `color-mix` IS NOT UNIVERSAL, AND THE FALLBACK HAS TO BE THE OPAQUE ONE,
+   not none: a browser that drops the declaration above keeps the line before
+   it, so an old engine gets the solid pill it always had rather than dark text
+   on a dark lintel. Declaration order IS the fallback here — there is no
+   `@supports` because the failure mode of the modern value is cosmetic and the
+   failure mode of no value at all is unreadable. */
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+  .hud__slot { background: var(--paper); }
+}
+/* ⚠ AND BELOW 1100 THE GROUND GOES ENTIRELY, BECAUSE IT WAS SITTING ON THE
+   DOOR. Zooming a 320 px screenshot showed two white notches bitten out of the
+   top corners of the casing; measured with `#frame`, the two slots overlap the
+   drawn frame by **253 px² and 154 px²** at 320x568 (1 and 0 at 390, 0 on a
+   desktop). It is the pill's BOX and not its contents: the slot runs to y=116
+   and the frame's head starts at y=105, while the words and glyphs inside stop
+   at y≈92 — comfortably clear.
+
+   The ground was added when the PRICE was up here and landed on a dark lintel.
+   The price left the wall for the quote bar, and the two controls that remain
+   sit above the door's head at every width, so there is nothing left for it to
+   rescue and a real thing for it to spoil.
+
+   ⚠ Capping the slots to `--wall-gap` instead is REFUSED, and it is refused
+   with a receipt: it was tried and reverted, because at 390 px the gap is
+   ~90 px, the cap wrapped `Русский` onto two lines, and the pill grew DOWN over
+   the leaf — the same fault, larger. */
+@media (max-width: 1099px) {
+  .hud__slot { background: none; padding-inline: 4px; }
+}
+/* ⚠ NOT CAPPED TO `--wall-gap`, AND THAT WAS THE FIRST TRY. Capping the two
+   side slots to the measured gap beside the DOOR is the right instinct for
+   `.grip-bar`, which hangs at mid-height where the door really is in the way.
+   Up here it is wrong: this row sits in the band ABOVE the door's head, where
+   the full width of the stage is wall. On a 390 px phone the gap is ~90 px, so
+   the cap wrapped `English` and `Русский` onto two lines and the pill grew
+   down over the leaf — the exact thing the cap was meant to prevent.
+   The flex row's own `space-between` is what keeps the three apart, and
+   `nowrap` is what stops any of them growing downward instead of sideways. */
+.hud__slot--end { display: flex; justify-content: flex-end; }
+.hud__slot--start, .hud__slot--end { flex: 0 0 auto; }
+.stage__hud .langs, .stage__hud .steps-back { flex-wrap: nowrap; }
+.stage__hud .lang { white-space: nowrap; }
+
+/* The language buttons lose their pill chrome up here — on a wall they are
+   text, not a toolbar. */
+.stage__hud .langs { justify-content: flex-start; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE QUOTE BAR — what it costs, and the way to send it
+   ══════════════════════════════════════════════════════════════════════
+
+   ⚠ ONE ELEMENT, TWO PLACEMENTS. Written phone-first, because the phone is
+   where nearly every customer arrives and because the desktop placement is
+   the override that has to come LAST — CLAUDE.md §8: a media query adds no
+   specificity, and this file has been bitten three times by a rule inside one
+   sitting above the base rule it means to beat.
+
+   ⚠ AND STILL EXACTLY ONE PRICE ON THE PAGE. It moved WHOLE — label, figure,
+   chevron and breakdown — and `#price` is still the only `[data-price]` the
+   configurator paints. The audit's "every copy agrees" check therefore still
+   has one reading to make, which is the state CLAUDE.md §0c records. */
+.quote {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 6;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  /* The notch, the home indicator, and the 8 px this bar wants anyway. */
+  padding: 7px 14px calc(7px + env(safe-area-inset-bottom, 0px));
+  background: var(--paper-up);
+  /* Anything inside that has to match what is BEHIND it reads `--surface`,
+     and this bar is not the page's ground — see the note on the token. */
+  --surface: var(--paper-up);
+  border-block-start: 1px solid var(--rule);
+  box-shadow: 0 -6px 22px rgb(23 23 21 / .06);
+}
+.quote__price {
+  position: relative;
+  display: grid; gap: 0;
+  /* CLAUDE.md §8: never a bare `auto` track. An implicit column sizes to its
+     widest item and refuses to shrink, which is how the old wall pill grew
+     into the undo/redo circles at 320-353 px. */
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  min-inline-size: 0;
+}
+.quote__price .send__label {
+  font-size: .64rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-2); line-height: 1.2;
+}
+/* ⚠ 44 px, LIKE EVERYTHING ELSE THAT CAN BE TAPPED, and 44 px WIDE as well as
+   tall. An earlier version let this shrink to `min-inline-size: 0` and the
+   figure still rendered — text overflow is visible by default — so it LOOKED
+   fixed while the real tap target was 23 px. The floor is a floor: the
+   padding gives way, the box does not. */
+.quote__price .send__toggle {
+  min-block-size: 44px; min-inline-size: 44px;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 0;
+}
+.quote__price .send__figure {
+  font: 400 1.45rem/1.05 var(--serif);
+  letter-spacing: .005em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+/* ⚠ THE BREAKDOWN OPENS UPWARD DOWN HERE. It is pinned to the foot of the
+   screen, so a popover hanging off the bottom of its own button is a popover
+   nobody can read. `inset-block-end: 100%` is the same rule the other way up,
+   and it is inside the base (phone) block on purpose — the wall placement
+   below turns it back over. */
+.quote .bd {
+  position: absolute; inset-inline-start: 0; inset-block-end: 100%;
+  inline-size: max-content; max-inline-size: min(22rem, 86vw);
+  margin-block-end: 10px;
+  background: var(--paper); border: 1px solid var(--rule);
+  border-radius: var(--r-card, 10px);
+  padding: 10px 12px; box-shadow: 0 8px 26px rgb(0 0 0 / .12);
+  max-block-size: 46vh; overflow-y: auto;
+  z-index: 1;
+}
+/* ⚠ QUIET. This is the part of the 27.8 instruction that survives: what was
+   removed was a full-width GREEN bar offering to send a half-built door, and
+   nothing here is green. It is a line of ink on paper with a hairline round
+   it — present on every step, loud on none. The one green button on the site
+   is still the summary's. */
+.quote__send {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 7px;
+  min-block-size: 44px; padding: 0 14px;
+  border: 1px solid var(--rule); border-radius: var(--r-pill, 999px);
+  background: var(--surface, #fff);
+  color: var(--ink); text-decoration: none;
+  font-size: .84rem; font-weight: 500; white-space: nowrap;
+}
+.quote__send:hover { border-color: var(--ink-3); }
+.quote__send:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.quote__ico { inline-size: 17px; block-size: 17px; flex: 0 0 auto; opacity: .85; }
+
+/* ── THE WAY ON, IN THE BAR, ON A PHONE ONLY ─────────────────────────
+   See the note in index.html for the measurement that put it here. Solid ink
+   like the one in the flow, because it is the same action and a customer
+   should not have to learn two shapes for it.
+   ⚠ HIDDEN WHEN DISABLED rather than greyed. It is disabled on exactly one
+   step — the summary, where there is nowhere to go — and a dead button beside
+   the send on the screen whose whole job is sending is a distraction with no
+   purpose. The bar becomes the price and the send, which is that step. */
+.quote__next {
+  flex: 0 0 auto;
+  min-block-size: 44px; padding: 0 16px;
+  font-size: .86rem; font-weight: 600;
+  background: var(--ink); color: var(--paper); border-color: var(--ink);
+}
+.quote__next:disabled { display: none; }
+/* ⚠ THE "not above 1100" HALF OF THIS RULE IS NOT HERE, AND THAT IS THE POINT.
+   It was, and it lost: `.btn { display: flex }` is defined eight hundred lines
+   FURTHER DOWN this file at the same specificity, and a media query adds none.
+   CLAUDE.md §8 states it in as many words and this is the fifth time the file
+   has been bitten by it — the sticky stage, the stage's height, the order
+   sheet's phone cap, the deleted dock's body padding, and now this. Measured
+   the way the others were: the button was on screen at 1440x900, in the wall,
+   under the send, in a full-page screenshot taken for another reason.
+   The override lives beside `.btn`, after it. Search for `quote__next`. */
+
+/* ⚠ BELOW 360 px THE CAPTION GOES AND THE FIGURE STAYS. Measured on the old
+   wall pill and still true here: `מחיר משוער` is the caption, the figure is
+   the fact, and a caption that wraps to two lines grows the bar's height on
+   the screen with the least of it. */
+@media (max-width: 359px) {
+  .quote { padding-inline: 10px; gap: 8px; }
+  .quote__price .send__label { display: none; }
+  .quote__price .send__figure { font-size: 1.25rem; }
+  .quote__send { padding: 0 11px; font-size: .8rem; }
+}
+
+/* ── ≥1100 px · THE BAR GOES BACK ON THE WALL ────────────────────────
+   Asked for from outside, with a circle drawn on a DESKTOP screenshot:
+   *"make it so that the price would be on the right side below the lamps."*
+   `--lamp-cx` and `--lamp-b` are published by `fitStage` off the SCONCE'S OWN
+   BOX — a percentage of the stage would have been the wrong instrument.
+   `left`, not `inset-inline-start`: this is pinned to a feature of the
+   DRAWING, and the drawing does not mirror when the interface does. In Hebrew
+   the interface flips and the lamp, and the price under it, stay put. */
+@media (min-width: 1100px) {
+  .quote {
+    position: absolute;
+    inset-block-start: calc(var(--lamp-b, 30%) + 18px);
+    inset-block-end: auto;
+    inset-inline: auto;
+    left: var(--lamp-cx, 76%);
+    transform: translateX(-50%);
+    flex-direction: column; align-items: center; gap: 7px;
+    padding: 5px 16px 9px;
+    background: var(--paper);
+    --surface: var(--paper);
+    border: 0;
+    border-radius: var(--r-card, 16px);
+    box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+  }
+  .quote__price { justify-items: center; }
+  .quote__price .send__label { font-size: .66rem; letter-spacing: .16em; }
+  .quote__price .send__figure { font-size: 1.9rem; }
+  /* Back the right way up: there is a whole wall below it here. */
+  .quote .bd {
+    inset-block-end: auto; inset-block-start: 100%;
+    inset-inline-start: 50%; transform: translateX(-50%);
+    margin-block-end: 0; margin-block-start: 8px;
+  }
+  /* ⚠ 44 px HERE TOO. The first draft said 36 — small enough to sit quietly
+     under the price on a wall with room to spare — and `npm run audit` failed
+     it at all four desktop viewports within a minute: `quote__send 136x36`.
+     The floor is a floor, and it does not soften because the control is meant
+     to be quiet. Quiet is a matter of colour and weight, not of size. */
+  .quote__send { font-size: .8rem; min-block-size: 44px; padding: 0 14px; }
+}
+
 .grip-bar {
   position: absolute;
   /* `--wall-gap` is the measured gap between the stage's edge and the door's
@@ -474,25 +1358,61 @@ body {
      than a narrow leaf — and again with every viewport, so a hand-picked
      width fits a standard leaf on a laptop and lands on the frame on a phone.
      The fallback is for the instant before the first paint. */
-  inset-inline-start: 8px;
+  inset-inline-start: var(--grip-inset, 8px);
   /* Above 1100 the strip is reserved, so the floor is guaranteed rather than
-     hoped for: `--grip-strip` minus this element's own 8 px inset and 20 px of
+     hoped for: `--grip-strip` minus this element's own inset and 20 px of
      breathing room is the width, and `--wall-gap` only widens it when the door
      leaves more wall than the strip reserved. Below 1100 `--grip-strip` is 0
-     and the old measured behaviour is unchanged. */
+     and the width is whatever wall the door leaves.
+
+     ⚠ AND BELOW 1100 THE BREATHING ROOM YIELDS BEFORE THE CONTROL DOES.
+     The 20 px gap between this card and the casing is comfort; 56 px of bar is
+     the audit's floor and a thumb's. On the widest door in the range at 360 px
+     the wall is **72.4 px** — the narrowest this catalogue can produce — and
+     20 + 8 left 52, under the floor. Found by sweeping every size against
+     twelve widths rather than the audit's eight: 360 is not one of the eight,
+     which is this file's "go and find the third case" earning its keep for the
+     third time.
+     So on a phone the gap is 12 and the inset 4, which buys 12 px and puts the
+     worst case at 64 with 8 px still clear of the door. Above 1100 nothing
+     changes: the reserved strip makes both moot. */
+  --grip-gap: 20px;
   inline-size: min(
-    max(calc(var(--grip-strip) - 28px), calc(var(--wall-gap, 9.5rem) - 20px)),
+    max(calc(var(--grip-strip) - var(--grip-inset, 8px) - var(--grip-gap)),
+        calc(var(--wall-gap, 9.5rem) - var(--grip-gap))),
     9.5rem);
   inset-block-start: 50%;
   transform: translateY(-50%);
   z-index: 2;
   display: flex; flex-direction: column; align-items: stretch; gap: 8px;
   text-align: center;
+  /* Its own ground, like `.hud__slot` — the wall runs under it now. */
+  background: var(--paper);
+  border-radius: var(--r-card, 14px);
+  padding: 8px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+}
+/* ⚠ THE PHONE'S TIGHTER FIGURES, AND THEY GO AFTER THE RULE THEY OVERRIDE.
+   A media query adds no specificity (CLAUDE.md §8, three bruises), so this
+   block sits below `.grip-bar` rather than above it. Below 1100 there is no
+   reserved strip and the bar lives on whatever wall the widest door leaves —
+   72.4 px at its worst, measured across every size at twelve widths. */
+@media (max-width: 1099px) {
+  /* ⚠ AND THE PADDING YIELDS TOO, WHICH IS WHERE THE REAL FLOOR IS. The bar's
+     width is not the constraint a thumb cares about — the BUTTON inside it is,
+     and that is the bar less twice this padding. At 8 px a 60 px bar gives
+     exactly 44, the tap floor, with nothing to spare; at 6 px it gives 48.
+     Two statements of one quantity, and the audit's own 56 px bar floor was
+     the lenient one: it would have passed a 40 px button. That check is
+     derived from this padding now rather than picked. */
+  .grip-bar { --grip-inset: 4px; --grip-gap: 12px; padding: 6px; }
 }
 .grip-bar__hint {
   font-size: .72rem; color: var(--ink-2);
   line-height: 1.35;
+  display: grid; justify-items: center; gap: 3px;
 }
+.grip-bar__ico { inline-size: 20px; block-size: 20px; }
 /* 44px, like every other target on the page. It was 34 — a standalone control
    on the phone, ten pixels under the minimum this project holds itself to, and
    the audit never said so because its tap-target check enumerated a list of
@@ -505,7 +1425,7 @@ body {
      44 px floor is untouched. */
   display: inline-flex; align-items: center; justify-content: center;
   text-align: center; line-height: 1.25;
-  border: 1px solid var(--rule); border-radius: 999px;
+  border: 1px solid var(--rule); border-radius: var(--r-pill);
   background: var(--paper-up); color: var(--ink); font: inherit; font-size: .78rem;
   cursor: pointer;
 }
@@ -582,17 +1502,33 @@ body {
    `1fr`. So `audit.mjs`'s "the door keeps its size" assertion is untouched by
    construction rather than by luck.
    `--surface` is re-declared because the card IS a different surface; see the
-   note at the top of this file about the seventeen beige haloes. */
+   note at the top of this file about the seventeen beige haloes.
+
+   ⚠ AND IT IS NOT PURE WHITE ANY MORE, BECAUSE THE ROOM IS A PHOTOGRAPH.
+   Measured at 1440, 1280 and 1680 with `tools/_bright.mjs`: the photographed
+   wall's 99th percentile is **237** and a `#fff` card is **255**, so the
+   loudest thing on the page was a 360x860 rectangle of screen-white standing
+   beside a warm room — and DESIGN-LEVEL §1.2's whole argument is that the
+   product is the only thing allowed to pull the eye.
+   ⚠ THE FIX IS TEMPERATURE, NOT BRIGHTNESS, and the numbers say why. Dropping
+   all the way to `--paper-up` (243) costs the card's internal dividers a tenth
+   of their contrast — `--rule` measures 1.496:1 on white and 1.350 on
+   paper-up, and CLAUDE.md records that white figure as exactly the reason a
+   card keeps its structure. #FDFBF7 is 251: four points of brightness, all of
+   the warmth, `--rule` holding at 1.447 and `--ink-2` at 5.37:1. The card
+   stops reading as SCREEN and starts reading as PAPER, which was the real
+   complaint — every other surface on this page is warm and this was the one
+   neutral. */
 @media (min-width: 1100px) {
   .panel--choose {
-    --surface: #fff;
+    --surface: #FDFBF7;
     background: var(--surface);
     border: 1px solid var(--rule);
     border-inline-start: 1px solid var(--rule);
-    border-radius: 14px;
+    border-radius: var(--r-card);
     margin: 14px;
     block-size: calc(100% - 28px);
-    box-shadow: 0 1px 2px rgb(23 23 21 / .04), 0 8px 24px rgb(23 23 21 / .06);
+    box-shadow: var(--shadow-card);
   }
 }
 
@@ -616,17 +1552,25 @@ body {
 .spec { display: grid; gap: 0; margin: 2px 0 14px; }
 .spec__row {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  /* icon · label · value · swatch. The icon column is a fixed 18 px whether or
+     not the row has one, so nine rows of labels line up rather than stepping
+     in and out as `glazing` appears on a two-panel door. */
+  grid-template-columns: 18px auto 1fr auto;
   align-items: center; gap: 8px;
   padding: 7px 0;
   border-block-end: 1px solid var(--rule);
   font-size: .82rem;
 }
+.spec__ico {
+  inline-size: 18px; block-size: 18px; stroke: var(--ink-2);
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: .85;
+}
 .spec__row:last-child { border-block-end: 0; }
 .spec__label { font-weight: 600; color: var(--ink); }
 .spec__value { color: var(--ink-2); text-align: end; }
 .spec__chip {
-  inline-size: 14px; block-size: 14px; border-radius: 3px;
+  inline-size: 14px; block-size: 14px; border-radius: var(--r-chip);
   background: var(--chip); border: 1px solid rgb(0 0 0 / .22);
 }
 @media (max-width: 1099px) {
@@ -638,39 +1582,257 @@ body {
   }
 }
 
+/* ── THE NAVIGATOR, AS CIRCLES ──────────────────────────────────────
+   From the mockup: an outlined circle per section joined by a hairline, the
+   number and the label beneath, the active one ringed in the accent.
+   ⚠ IT IS STILL A TABLE OF CONTENTS. No ticks, no filled connector running up
+   to "where you are", no `3 מתוך 4` — every one of those is a claim about
+   PROGRESS, and progress here cannot be honest: `nowLabel` falls back to
+   `list[0]`, so all four sections carry a value on first paint and any
+   state-derived indicator reads 4/4 before the customer has touched anything.
+   Measured, and written down in REDESIGN.md §4. */
+/* ⚠ NINE CIRCLES WHERE THERE WERE FOUR, AND THEY MUST SCROLL RATHER THAN PUSH.
+   Measured the moment the flow landed: the row overflowed a 390 px phone by
+   54 px and took the whole PAGE sideways with it — every one of the audit's
+   option clicks reported "page scrolls sideways by 54px", which is the one
+   thing CLAUDE.md §8's `minmax(0, 1fr)` note is about in a different costume.
+   `overflow-x: auto` on the row confines it; `min-inline-size: 0` is what
+   actually lets a flex item shrink below its content, and without it the rule
+   above does nothing. Scroll-snap so a flick lands on a circle rather than
+   between two. */
 .steps {
-  display: flex; gap: 6px; flex-wrap: wrap;
-  padding: 2px 0 12px;
+  position: relative;
+  display: flex; gap: 4px; align-items: center;
+  padding: 8px 0 9px;
   border-block-end: 1px solid var(--rule);
   margin-block-end: 4px;
-  counter-reset: step;
+  min-inline-size: 0;
+  /* ⚠ AND A MINIMUM HEIGHT, BECAUSE `overflow-x: auto` COLLAPSED IT TO NOTHING.
+     Measured on desktop before this line: `.steps` came out **21 px** tall and
+     each 44 px circle inside it **44 x 23** — half-moons across the top of the
+     card, and the 44 px touch floor broken on the one viewport nobody had
+     measured it at.
+     The cause is a spec rule, not a typo: `overflow-x: auto` with
+     `overflow-y: visible` computes `overflow-y: auto`, so this row is a scroll
+     container in BOTH axes — and a scroll container's automatic minimum size in
+     the block axis is ZERO. As a grid item in an auto-sized row it therefore
+     contributed no content height at all, and the flex column inside each step
+     shrank the circle to fit what was left.
+     Two lines fix it and both are needed: a floor here, and `flex: 0 0 auto` on
+     the circle so it can never be the thing that gives. */
+  min-block-size: calc(var(--tap) + 17px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: inline proximity;
+  scroll-padding-inline: 14px;
+  overscroll-behavior-inline: contain;
+  /* ⚠ IT ALWAYS SCROLLS, AND NOTHING SAID SO. Reported off a 1920 screenshot:
+     the row of circles is cut at the edge with no sign there is more of it.
+     Measured in the choices card at that width — 310 px of room against
+     424 px of circles, so **3 of 9 are off the end** — and the row cannot
+     simply be made to fit: nine circles at the 44 px tap floor (T14) need
+     428 px and the card is capped at 360.
+     So the row fades at both ends instead. It is a permanent fade rather than
+     one switched on by a class, because the overflow is permanent: nine
+     circles exceed the rail at EVERY viewport this app has, from 320 px
+     (320 available) to 1680 (360). A conditional class would be a second
+     statement of a fact that is simply always true.
+     `scrollbar-width: none` above is why it needs one at all — the row hides
+     its scrollbar so the door is not framed by a grey stripe, and hiding the
+     affordance is what left nothing. */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 18px,
+                    #000 calc(100% - 18px), transparent 100%);
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 18px,
+                    #000 calc(100% - 18px), transparent 100%);
 }
-.steps__step {
-  counter-increment: step;
-  flex: 1 1 auto;
-  display: inline-flex; align-items: center; gap: 6px;
-  min-block-size: 44px;            /* the floor this file enforces everywhere */
-  padding: 4px 8px;
-  background: none; border: 1px solid transparent; border-radius: 999px;
-  font: 500 .76rem/1.2 var(--sans); color: var(--ink-2);
-  cursor: pointer; text-align: start;
+.steps::-webkit-scrollbar { display: none; }
+.steps__step { scroll-snap-align: center; }
+
+/* ⚠ AND IT STICKS TO THE TOP OF THE PANEL, which four folded sections never
+   needed and nine steps do. Found by the audit: after jumping to a late step
+   the page scrolls, the navigator goes off the top, and the only way back to
+   step 01 is to scroll up hunting for it — Playwright reported the dock
+   intercepting the click, which is the same fault seen from below.
+   A flow's table of contents has to be reachable from anywhere in the flow,
+   or it is not navigation. `--surface` behind it so the step's content does
+   not show through as it passes underneath. */
+.steps {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 3;
+  background: var(--surface);
 }
-.steps__n::before {
-  content: counter(step, decimal-leading-zero);
-  font: 600 10px/1 var(--mono); letter-spacing: .06em; opacity: .7;
-}
-.steps__step:hover { border-color: var(--rule); }
-.steps__step.is-on { color: var(--ink); border-color: var(--rule); background: var(--paper-up); }
-/* ⚠ 44 px BOTH WAYS. Below 1100 the title is hidden and only the counter
-   shows, which made these buttons 31 px wide against the 44 px floor this
-   stylesheet honours everywhere else — and the audit waved them through
-   because its own width floor was 30, one pixel under what they measured.
-   The title is hidden for a real layout reason and stays hidden; the button
-   keeps the size a thumb needs. The accessible NAME is set in app.js, since
-   `display: none` takes the only text out of the accessibility tree. */
+
+/* ⚠ ON A PHONE IT IS FIXED, NOT STICKY, AND THAT IS THE WHOLE POINT.
+   Reported from outside: *"on the phone i want the steps to be on the top no
+   matter what, right now it starts at the bottom and getting to the top and
+   then slides to the top, and there are this in between."*
+
+   Measured at 390x844 before this rule, the navigator's top edge by scroll
+   position: 687, 487, 187, 0. Sticky pins an element at the top of the
+   SCROLLPORT only once the scroll has carried it there, and this one starts
+   below a sticky stage — so it spent the whole middle of that journey drifting
+   ACROSS the door, which is the "in between" and is exactly what the first
+   screenshot shows.
+
+   Fixed from the first paint instead. `.bar` is pushed down by its height so
+   the brand, the language buttons and the telephone are not covered at rest;
+   everything else scrolls underneath. `--steps-h` is one number in two places
+   and it is here, not measured in script: a JavaScript-published height would
+   make the page's top depend on the bundle having run. */
 @media (max-width: 1099px) {
-  .steps__t { display: none; }
-  .steps__step { flex: 0 0 auto; min-inline-size: 44px; justify-content: center; }
+  /* ⚠ 62, DOWN FROM 84. The row lost the number line under each circle, and
+     this is the number that has to follow it — it reserves the fixed strip's
+     height on `body` and pins `.stage-wrap` under it, so leaving it at 84
+     would have opened a 22 px band of nothing between the navigator and the
+     door. It is deliberately NOT measured in script: a JavaScript-published
+     height would make the top of the page depend on the bundle having run.
+     8 px above the circle, 9 below, 1 for the rule = 62. */
+  :root { --steps-h: 62px; }
+  .steps {
+    position: fixed;
+    inset-block-start: 0; inset-inline: 0;
+    z-index: 6;
+    padding-inline: 14px;
+    margin-block-end: 0;
+    box-shadow: 0 1px 0 var(--rule);
+  }
+  /* ⚠ THE PADDING MOVED TO `body` BECAUSE THE BAR IT WAS ON IS DELETED.
+     Something has to reserve the fixed strip's height or the first thing in
+     the document sits under it. And now something has to reserve the quote
+     bar's at the other end, or the last option on every step — and the whole
+     foot of the summary card — sits behind it. `--quote-h` is measured and
+     published by `fitStage`; the fallback is for the instant before the first
+     paint and for a page whose bundle never arrives, and it is deliberately a
+     little generous rather than a little short. */
+  body {
+    padding-block-start: var(--steps-h);
+    padding-block-end: calc(var(--quote-h, 62px) + env(safe-area-inset-bottom, 0px));
+  }
+  /* The door pins UNDER the navigator rather than behind it. */
+  .stage-wrap { inset-block-start: var(--steps-h); }
+  /* ⚠ AND CLEAR THE DOOR, NOT ONLY THE NAVIGATOR. This said
+     `calc(var(--steps-h) + 8px)`, which clears the fixed strip at the top and
+     stops there — but `.stage-wrap` is STICKY immediately below that strip, so
+     the heading a customer had just asked for landed 388 px behind the drawing
+     at 390x844 (323 at 320x568). Measured, on every step, on every jump.
+     `--sticky-h` is the wrap's own measured height, published by `fitStage` off
+     the same rect it already reads. The fallback is what the old rule did, so a
+     page whose bundle never arrives is no worse than it was. */
+  .sect {
+    scroll-margin-block-start: calc(var(--steps-h) + var(--sticky-h, 0px) + 14px);
+  }
+
+  /* ⚠ THE HEADLINE IS VISUALLY HIDDEN ON A PHONE, AND IT COSTS 86 px BACK.
+     It was made visible from the mockup — a page that had a heading only a
+     screen reader could find — and on a desktop that was right and stays.
+     On a 390 px screen it is a 30 px display line in a band of its own colour
+     between the navigator and the door: **86 px of the most expensive strip on
+     the page**, a hard horizontal seam across the top of the room, and a
+     sentence that tells a customer arriving from a WhatsApp link something
+     they already know.
+
+     What replaces it is not nothing: step 01 is `מבנה הדלת` with a lede
+     explaining what is being asked, the tab says `בונים דלת — דלתות מגן`, and
+     the door itself is on screen. On a phone the door is the scarce thing.
+
+     ⚠ `.sr-only`, NOT `display: none`. `.stage-wrap` names this element in
+     `aria-labelledby`, so removing it from the accessibility tree would
+     silently unlabel the region AND leave the document with no `<h1>` at all
+     — which is the exact fault the mockup was pointing at. */
+  .stage__h1 {
+    position: absolute; inline-size: 1px; block-size: 1px;
+    margin: -1px; padding: 0; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+}
+/* The connector, drawn once behind the row rather than as a border on each
+   circle — four separate half-lines would leave a seam wherever the flex
+   gap fell. It stops short of the outer circles so it does not run off the
+   ends of the card. */
+.steps::before {
+  content: '';
+  position: absolute; z-index: 0;
+  inset-inline: 12%;
+  inset-block-start: calc(8px + 22px);       /* the circles' own centre line */
+  block-size: 1px; background: var(--rule);
+}
+/* ⚠ AND THE SAME LINE AGAIN IN ACCENT, SCALED TO WHERE YOU ARE. `--fill` is
+   set by `markSteps` — 0 on step 01, 1 at the summary — and it is an ORDINAL
+   fraction, not a completion one: this row has refused to claim progress since
+   it was four circles, because every step carries a value from the first paint
+   and anything derived from `state` reads 9/9 on arrival.
+   `transform-origin: left` in a logical world would be wrong, so the origin is
+   set per direction below — a `scaleX` is a physical transform and the row
+   reads right-to-left in Hebrew. */
+.steps::after {
+  content: '';
+  position: absolute; z-index: 0;
+  inset-inline: 12%;
+  inset-block-start: calc(8px + 22px);
+  block-size: 1px; background: var(--accent);
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left center;
+  transition: transform .26s linear;
+}
+[dir="rtl"] .steps::after { transform-origin: right center; }
+.steps__step {
+  position: relative; z-index: 1;
+  flex: 1 1 0; min-inline-size: var(--tap);
+  display: inline-flex; align-items: center; justify-content: center;
+  min-block-size: var(--tap);
+  padding: 0 2px;
+  background: none; border: 0;
+  cursor: pointer;
+}
+.steps__c {
+  inline-size: var(--tap); block-size: var(--tap);
+  /* ⚠ NEVER THE THING THAT GIVES. Without this the circle is a flex item with
+     the default `flex-shrink: 1`, and when the row was collapsing (see the
+     note on `.steps` above) it was the circle that absorbed the whole
+     shortfall: 44 x 23 on every desktop viewport. */
+  flex: 0 0 auto;
+  display: grid; place-items: center;
+  border: 1px solid var(--rule); border-radius: 50%;
+  /* ⚠ `--surface`, so the circle punches a hole in the connector behind it on
+     WHATEVER it is sitting on. It is `--paper` below 1100 and `#fff` inside
+     the desktop card, and a hard-coded fill would show as a ring of the wrong
+     beige on one of the two. */
+  background: var(--surface);
+  color: var(--ink-2);
+  transition: border-color .12s var(--ease), color .12s var(--ease);
+}
+.steps__g { inline-size: 21px; block-size: 21px; }
+/* ⚠ `.steps__l`, `.steps__n` AND `.steps__t` ARE GONE — the number under each
+   circle and the title beside it. Both were measured out, not tidied away:
+   the number said the same thing as the `NN ⁄ 08` the live step already
+   prints, for 24 px of a phone's most expensive strip; and the title only ever
+   showed above 1100 px, where nine of them do not fit a 310 px column
+   (measured `scrollWidth` 429), so a desktop customer read nine truncated
+   words. The button's accessible name is set in `app.js` and is now its only
+   text — see the note there. */
+.steps__step:hover .steps__c { border-color: var(--ink-2); color: var(--ink); }
+/* Behind you: the circle picks up the accent hairline the fill is drawing
+   through it, so the row reads as a path rather than as nine equal buttons. */
+/* ⚠ AND QUIETLY. The first version gave every circle behind you the full
+   accent ring, so on step 05 there were four tan rings and one tan ring with a
+   halo, and the row read as five equal marks — the loudest thing on a phone
+   screen whose point is the door. A path is legible when the CURRENT position
+   is the only strong mark on it; behind you needs to be visible, not
+   competing. Half-strength, and the ink stays secondary. */
+.steps__step.is-done .steps__c {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+  color: var(--ink-2);
+}
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .steps__step.is-done .steps__c { border-color: var(--accent); }
+}
+.steps__step.is-on .steps__c {
+  border-color: var(--accent); color: var(--accent-ink);
+  background: var(--paper-up);
+  box-shadow: 0 0 0 3px rgb(176 141 87 / .18);
 }
 
 .panel--choose { counter-reset: sect; }
@@ -679,14 +1841,34 @@ body {
   content: counter(sect, decimal-leading-zero);
   font: 600 11px/1 var(--mono);
   letter-spacing: .06em;
-  color: var(--ink-2);
-  opacity: .65;
+  /* ⚠ AND NO `opacity`. It was `--ink-2` at .65, which is a measured contrast
+     multiplied by an unmeasured one — 0.65 of anything cannot be checked with
+     `contrast()` because the value that reaches the eye depends on the ground.
+     `--accent-ink` is chosen against the two grounds this counter actually
+     sits on (4.92:1 on paper, 5.76:1 on the white card) and then left alone. */
+  color: var(--accent-ink);
   align-self: center;
   min-inline-size: 1.6em;
 }
 
-.sect { border-block-end: 1px solid var(--rule); }
-.sect:first-child { border-block-start: 1px solid var(--rule); }
+/* ══════════════════════════════════════════════════════════════════════
+   THE STEP, AS A CARD OF TYPE
+   ══════════════════════════════════════════════════════════════════════
+
+   ⚠ `.sect__where`, `.sect__title`, `.sect__lede` AND `.sect__foot` HAD NO
+   RULES AT ALL. The flow replaced the accordion and brought four new elements
+   with it; the stylesheet kept the accordion's — `.sect__head`, `.sect__sub`,
+   `.sect__now`, all of which the flow deleted — and never gained the new ones.
+   So the eyebrow, the question, its explanation and the two buttons that carry
+   a customer through the whole page rendered at browser defaults, and the
+   step's own `<h2>` was 1rem/600: the same size as the group label under it.
+   Nothing failed; the page simply had no typographic hierarchy on the surface
+   the entire flow happens on.
+
+   ⚠ AND THE ACCORDION'S BORDERS WENT WITH THEM. A rule above and below `.sect`
+   drew a box round the single live step — correct when four sections were
+   stacked and needed separating, meaningless when there is exactly one on
+   screen. */
 
 .sect__head {
   appearance: none; -webkit-appearance: none;
@@ -697,11 +1879,9 @@ body {
 }
 .sect__head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 
-/* Clearance for the navigator's jump. `.dock` is `position: fixed` and 78 px
-   tall, and `scrollIntoView` cannot see the padding the BODY carries for it —
-   so a heading scrolled to `start` came to rest under the green bar, 77–97% of
-   it hidden, while holding focus. The dock's height is declared here, so the
-   allowance belongs here too. */
+/* Clearance for the navigator's jump. The fixed step strip is what a
+   heading can land behind now — the dock that used to cover the foot of
+   the screen is gone. */
 @media (max-width: 1099px) {
   .sect__head { scroll-margin-block: 8px calc(78px + 12px + env(safe-area-inset-bottom, 0px)); }
 }
@@ -712,7 +1892,109 @@ body {
    one is not. With the priorities swapped the description fits on one line at
    every width above 320px instead of orphaning its last word. */
 .sect__text { flex: 1 1 auto; min-inline-size: 0; display: grid; gap: 2px; }
-.sect__title { font-size: 1rem; font-weight: 600; color: var(--ink); }
+/* The eyebrow: `NN ⁄ 08` on a question, the summary's subtitle on the last
+   step. Small, tracked, and the one place `--accent-ink` is spent as text. */
+.sect__where {
+  margin: 0 0 10px;
+  font: 600 .72rem/1.2 var(--mono);
+  letter-spacing: .14em;
+  color: var(--accent-ink);
+}
+/* ⚠ AND THE RING ON IT IS OURS, AND ONLY FOR THE KEYBOARD. The heading carries
+   `tabindex="-1"` and `goStep` focuses it, because that is what announces the
+   new step to a screen reader — and a programmatic focus can bring the
+   browser's own outline with it: a hard black box round the biggest line on
+   the page, after a tap. Seen in a walk-through screenshot before anybody
+   could report it. `:focus-visible` keeps the ring where it earns its place —
+   a keyboard user has to know where they are — and takes it off the tap. */
+.sect__title:focus { outline: none; }
+.sect__title:focus-visible {
+  outline: 2px solid var(--accent-ink); outline-offset: 6px;
+  border-radius: 3px;
+}
+
+/* The question itself, in the display voice — light and large, one step down
+   from the page's `<h1>`. This is the line a customer reads on every one of
+   nine screens, and it was 16 px semibold. */
+.sect__title {
+  margin: 0 0 10px;
+  font: 300 clamp(22px, 2.4vw, 30px)/1.15 var(--sans);
+  letter-spacing: -.015em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+/* What the question means, for the customer who does not already know. Capped
+   at a readable measure rather than run to the full width of a 380 px card. */
+.sect__lede {
+  margin: 0 0 22px;
+  font: 400 .94rem/1.55 var(--sans);
+  color: var(--ink-2);
+  max-inline-size: 42ch;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ⚠ A GUIDED FLOW WHOSE LIVE STEP SHOWS NO OPTIONS IS NOT GUIDED.
+   ═══════════════════════════════════════════════════════════════════
+   Measured at 320x568, on ALL EIGHT question steps: the first tile's top sat
+   68 px below the fold — 92 px on משקוף, whose explanation runs to four lines.
+   A customer saw a door, a question, and nothing to answer it with. At 390
+   every step passes, which is exactly why looking at a phone had not found it:
+   390 is the phone people test on and 320 is the one they own.
+
+   ⚠ AND THE FOLD IS NOT `innerHeight`. The quote bar is FIXED over the bottom
+   67 px, so a tile that ends behind it is as unreachable as one below the
+   screen. Measuring against the viewport said "1 px short" where the truth was
+   68 — the first version of the new audit check made exactly that mistake and
+   was corrected before it was believed.
+
+   The budget at 320x568, all of it measured rather than assumed:
+
+     rail            62      fixed
+     stage          318      56vh
+     eyebrow         24      13.8 + 10 margin
+     question        35      25.3 + 10
+     explanation     69      46.6 + 22   (69.9 + 22 on משקוף)
+     field header    23
+     quote bar       67      fixed
+     ------------------------------------
+                    598 of 568, before a single tile
+
+   So about 114 px has to come from somewhere, and the memo's rule 4 says
+   where: *the door may shrink to make the answer visible; it may not be
+   cropped and it may not lose its room.* 79 px from the stage (56vh → 42vh)
+   and 35 from the type, and the door is still 239 px tall on a 568 px screen.
+
+   ⚠ AND THE MARGIN MATTERS AS MUCH AS THE FIX. A first pass landed Hebrew and
+   English one pixel clear on משקוף and left RUSSIAN 23 px short, because that
+   step's explanation runs to four lines there and three in the other two. Two
+   languages agreeing by a pixel is not a measurement — see the last line here
+   for where the extra came from.
+
+   ⚠ SCOPED BY HEIGHT AND ORIENTATION, NOT BY WIDTH. A 390x844 phone has room
+   and must not pay for this; a 320x568 one has none. `orientation: portrait`
+   keeps a tablet held sideways out of it — 1024x700 matches both the width and
+   the height test and has plenty of room.
+
+   ⚠ AFTER the rules it overrides, all four of them (`.stage`'s two blocks
+   above, and `.sect__where` / `.sect__title` / `.sect__lede` directly above).
+   §8, five times in this file and twice by me. */
+@media (max-width: 1099px) and (max-height: 700px) and (orientation: portrait) {
+  .stage { block-size: clamp(36vh, 100vw, 42vh); }
+  .sect__where { margin-block-end: 3px; }
+  .sect__title { margin-block-end: 4px; }
+  /* ⚠ AND SMALLER, WHICH IS THE ONE PLACE THIS ROUND TOUCHES TYPE SIZE — the
+     RUSSIAN page is why. Measured at 320 on משקוף: the explanation runs to
+     three lines in Hebrew and English (70 px) and FOUR in Russian (93 px), and
+     23 px is exactly the amount by which the Russian page failed a check the
+     other two passed. Worse, they passed it by ONE pixel, which is not a pass,
+     it is a coincidence waiting for a copy edit.
+     A secondary explanation at 13.8 px on a 320 px screen is ordinary
+     typography; a question a customer cannot answer is not. Note what this
+     does NOT do: it does not shorten anybody's copy — every word survives, in
+     all three languages, and the `<details>` explainer under it is untouched. */
+  .sect__lede  { margin-block-end: 10px; font-size: .86rem; }
+  .field__body { padding-block: 2px 14px; }
+}
 /* What is inside, for a customer who does not yet know which of the four
    holds the thing they came to change. */
 /* WRAPS, where the line below it truncates — and the difference is the whole
@@ -807,6 +2089,143 @@ body {
 
 @media (prefers-reduced-motion: reduce) { .field__chev { transition: none; } }
 
+/* ── THE GALLERY OF REAL DOORS ────────────────────────────────────── */
+
+/* The opener sits above the navigator, so it is the first thing in the panel
+   and the first offer the page makes. Full width and quiet — it is an
+   alternative to choosing, not a competitor to the send button. */
+.works-open {
+  appearance: none; -webkit-appearance: none;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  inline-size: 100%; min-block-size: 56px;
+  margin-block-end: 12px; padding: 10px 14px;
+  background: var(--paper-up);
+  border: 1px solid var(--rule); border-radius: var(--r-tile);
+  font: inherit; color: var(--ink); text-align: start; cursor: pointer;
+}
+.works-open:hover { border-color: var(--accent); }
+/* ⚠ AND ON A PHONE IT SHOWS ON THE FIRST STEP ONLY. See the note in
+   `markSteps` for why: it is an offer about where to START, and on a phone it
+   was standing between the door and the question on all nine steps. The
+   attribute is set by the script; the fallback when it is unset — a page whose
+   bundle never ran — is to SHOW it, because there is no flow then either and
+   the gallery is one of the few things that still works. */
+@media (max-width: 1099px) {
+  .panel--choose[data-live]:not([data-live="fit"]) .works-open { display: none; }
+  /* ⚠ AND ON THE STEP WHERE IT DOES SHOW IT IS A PILL, NOT A CARD. Accounted
+     for pixel by pixel at 320x568, on arrival, on step 01: rail 62 + door 239 +
+     illustration note 45 + panel padding 20 + **this box 56** + gaps 12 + the
+     question block 105 puts the first size tile at y=571 with the fold — the
+     top of the fixed quote bar — at 501. It is the only step with this box on
+     it, and it is the only step at 320 that arrives with no answer in view.
+     A card with a filled ground, a full border and 56 px of height reads as
+     something to DO; this is an offer about where to start, and the question
+     underneath it is the thing to do. Now it is a hairline pill at the 44 px
+     tap floor — which is a floor, so this is as short as it may legally be.
+     ⚠ 16 px is all that buys, and it does not close the gap: see CLAUDE.md's
+     open list for the arrival measurement and what closing it would cost. */
+  .works-open {
+    min-block-size: var(--tap); margin-block-end: 8px;
+    padding: 4px 14px; border-radius: var(--r-pill);
+    background: none;
+  }
+  .works-open__t { font-weight: 500; font-size: .86rem; }
+}
+.works-open__t { font-weight: 600; font-size: .92rem; }
+.works-open__n { font-size: .74rem; color: var(--accent-ink); white-space: nowrap; }
+
+.works {
+  /* ⚠ ONE HEIGHT, NAMED. The dialog's cap and the grid's cap inside it are the
+     SAME quantity minus the head — and they were written as `88dvh` in one
+     rule and `calc(88dvh - 118px)` in another, so changing the dialog's height
+     silently left the grid sized for the old one. CLAUDE.md §5. The 118 is the
+     head and lede above the grid; it is still hand-derived, and it is now the
+     only hand-derived number of the two. */
+  --works-h: 88dvh;
+  inline-size: min(1000px, 94vw);
+  max-block-size: var(--works-h);
+  padding: 0;
+  /* A hairline even in forced colours: every other floating surface on this
+     page has one, and without it the dialog has no edge against its own
+     backdrop when the author colours are thrown away. */
+  border: 1px solid transparent; border-radius: var(--r-card);
+  /* Its own surface, re-declared: anything inside that has to match what is
+     BEHIND it reads `--surface`, and this is a white card over a dim
+     backdrop rather than the page's paper. */
+  --surface: #fff;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.works::backdrop { background: rgb(23 23 21 / .55); }
+.works__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px 10px;
+}
+.works__h { margin: 0; font-size: 1.05rem; }
+.works__x {
+  appearance: none; background: none; border: 1px solid var(--rule);
+  border-radius: var(--r-pill);
+  min-inline-size: 44px; min-block-size: 44px;
+  font: inherit; color: var(--ink); cursor: pointer;
+}
+.works__x:hover { border-color: var(--ink-2); }
+.works__lede { margin: 0; padding: 0 18px 12px; font-size: .82rem; color: var(--ink-2); }
+
+.works__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 12px;
+  /* ⚠ TOP PADDING, because this box scrolls and `:focus-visible` draws its ring
+     2 px OUTSIDE the button. With `padding: 0 18px 18px` the ring on every
+     tile in the first row was clipped away by the scroll container's own edge
+     — the whole top row of a keyboard walk looked unfocused. */
+  padding: 4px 18px 18px;
+  /* This box is the scroll container, so it is also the observer's root — see
+     `buildWorks`. A door is drawn when it comes within a screen of here and
+     thrown away again when it leaves. */
+  max-block-size: calc(var(--works-h) - 118px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.work {
+  appearance: none; -webkit-appearance: none;
+  display: grid; gap: 6px;
+  padding: 8px 8px 10px;
+  background: var(--paper-up);
+  border: 1px solid var(--rule); border-radius: var(--r-tile);
+  font: inherit; color: inherit; cursor: pointer;
+  transition: border-color .12s var(--ease);
+}
+.work:hover { border-color: var(--accent); }
+/* ⚠ A FIXED BOX WHETHER OR NOT THE DOOR INSIDE IT HAS BEEN DRAWN YET. The art
+   is filled in and emptied again as the grid scrolls, and a cell that
+   collapsed when its door was thrown away would move every tile below it —
+   which moves them through the observer, which redraws them. A lazy grid that
+   reflows is a lazy grid that thrashes. */
+.work__art {
+  display: block; block-size: 132px;
+  background: var(--wall);
+  border-radius: 8px; overflow: hidden;
+}
+/* The drawing never mirrors with the interface, here as on the stage: a
+   right-hinged door is a physical fact. PLAN.md §6.1 */
+.work__art svg { inline-size: 100%; block-size: 100%; display: block; }
+.work__meta { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
+.work__name {
+  font-size: .74rem; color: var(--ink-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.work__price { font-size: .78rem; font-weight: 600; white-space: nowrap; }
+
+/* Bare mode photographs the drawing and no page around it. The dialog draws
+   nothing until it is opened and the opener is inside the panel, which is
+   hidden already — but anything added to the page joins this list the same
+   day, which is the rule that stopped a headline faking a 5.2% regression. */
+.is-bare .works, .is-bare .works-open { display: none; }
+
 /* ── swatches ─────────────────────────────────────────────── */
 
 /* ── COLOURS AS CIRCLES ─────────────────────────────────────────────
@@ -821,7 +2240,13 @@ body {
    the accessible name still carries both. */
 .swatches {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  /* 50, up from 46, because the chip grew from 40 to 44 and its selected ring
+     stands 4 px outside that — 44 + 2 gap + 2 ring = 48, which a 46 px track
+     would clip on the one control this page asks you to choose by LOOKING.
+     Measured at the narrowest layout the audit opens (320 px, minus the
+     panel's 32 px of padding and the field's 10 px inset): four to a row where
+     there were five, so seventeen colours take five rows instead of four. */
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
   gap: 10px;
 }
 
@@ -836,7 +2261,7 @@ body {
 
 .swatch__chip {
   --ring: transparent;
-  display: block; inline-size: 40px; block-size: 40px;
+  display: block; inline-size: 44px; block-size: 44px;
   background: var(--chip);
   border: 1px solid rgb(0 0 0 / .22);
   border-radius: 50%;
@@ -844,9 +2269,11 @@ body {
   transition: box-shadow .12s var(--ease);
 }
 .swatch__name, .swatch__meta { display: none; }
-.swatch.is-selected .swatch__chip { --ring: var(--ink); }
+/* The gap-ring construction is already the mockup's. What changes is only its
+   colour — the same move as the tile border, for the same measured reason. */
+.swatch.is-selected .swatch__chip { --ring: var(--accent-ink); }
 .swatch:hover .swatch__chip { --ring: var(--rule); }
-.swatch.is-selected:hover .swatch__chip { --ring: var(--ink); }
+.swatch.is-selected:hover .swatch__chip { --ring: var(--accent-ink); }
 
 .swatch__name { font-size: .82rem; line-height: 1.25; }
 .swatch__meta {
@@ -862,19 +2289,61 @@ body {
 }
 .tiles--sq { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); }
 
+/* A heading INSIDE the tile grid, splitting a long list into halves — the face
+   designs are panels and stripes and there are twenty of them. `1 / -1` so it
+   takes a whole row whatever the column count settles at; without it the
+   heading becomes a grid cell and the tiles flow round it. */
+.opts__sub {
+  grid-column: 1 / -1;
+  margin-block: 6px 0;
+  font-size: .74rem; font-weight: 600; letter-spacing: .04em;
+  color: var(--ink-2);
+}
+.opts__sub:first-child { margin-block-start: 0; }
+
 .tile {
   appearance: none; -webkit-appearance: none;
-  background: none; padding: 6px 4px 7px;
+  background: none; padding: 10px 8px 12px;
   font: inherit; color: inherit; text-align: center;
   cursor: pointer;
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border-radius: var(--r-tile);
   display: grid; gap: 3px; justify-items: center;
   min-block-size: 44px;
+  /* the check badge is drawn against this box */
+  position: relative;
   transition: border-color .12s var(--ease), box-shadow .12s var(--ease);
 }
 .tile:hover { border-color: var(--ink-2); }
-.tile.is-selected { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.tile.is-selected { border-color: var(--accent-ink); box-shadow: inset 0 0 0 1px var(--accent-ink); }
+
+/* ── THE CHECK BADGE ────────────────────────────────────────────────
+   From the mockup. A ring alone says "this one is different"; a tick says
+   "this one is chosen", and on a grid of sixteen grille patterns that is a
+   real difference.
+   ⚠ `content: ''` WITH THE TICK AS A BACKGROUND IMAGE, not `content: '✓'`.
+   Generated text content is not reliably kept out of the accessibility tree —
+   several screen readers announce it — and the state is already carried
+   properly by `aria-checked` on the `role="radio"`. A background image cannot
+   be announced by anything. It is also `pointer-events: none`, because the
+   badge sits over the corner of a 44 px target and must not eat a tap.
+   The disc is `--accent-ink` rather than `--accent`: see the note at the top
+   of this file — the tan measures 2.64:1 on paper and a white tick on it
+   would be a mark nobody with poor sight can read. */
+.tile.is-selected::after {
+  content: '';
+  position: absolute; inset-block-start: -6px; inset-inline-end: -6px;
+  inline-size: 18px; block-size: 18px;
+  border-radius: 50%;
+  background: var(--accent-ink)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.6 6.3 4.8 8.5 9.4 3.9' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 12px 12px no-repeat;
+  pointer-events: none;
+}
+/* An unavailable option is dimmed to .55, and a badge saying "chosen" on a
+   tile the rules are about to move you off would be the page contradicting
+   itself. `markGroup` can leave a tile both selected and blocked. */
+.tile.is-blocked::after { display: none; }
 
 .tile__art { display: block; block-size: 54px; color: var(--ink-2); }
 .tile.is-selected .tile__art { color: var(--ink); }
@@ -886,14 +2355,40 @@ body {
 .tiles--hw { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
 .tiles--hw .tile__art, .glyph--hw { block-size: 74px; }
 
-.tile__name { font-size: .74rem; line-height: 1.2; }
+.tile__name { font-size: .78rem; line-height: 1.2; }
 .tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }
-.tile__why  { font-family: var(--mono); font-size: .6rem; color: var(--warn); }
+/* ⚠ ONE LINE, AND NOT RED. `דורש חלון` was `--warn` at three wrapped lines,
+   which did two things to a grid of tiles: it made the reason the LOUDEST
+   colour on a page whose accent is tan, and it doubled the height of the tiles
+   carrying it — so a row of five stood at five different heights and the grid
+   read as broken rather than as calm.
+   A blocked tile is not an error. It is a tile whose turn has not come, and it
+   is still clickable: tapping it repairs the conflict rather than refusing.
+   So the reason is stated the way a caption is — one line, ellipsised, in the
+   secondary ink — and the ROW keeps its shape. */
+.tile__why {
+  font-family: var(--mono); font-size: .6rem; color: var(--ink-2);
+  inline-size: 100%;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 /* Unavailable, but never `disabled`: still focusable, still clickable, and it
-   says why. Clicking repairs the conflict rather than refusing. */
-.tile.is-blocked { opacity: .55; }
+   says why. Clicking repairs the conflict rather than refusing.
+   ⚠ `.7`, NOT `.55`. At 55% a blocked tile's own artwork was fainter than the
+   hairline round it, so a grid where half the options are blocked — the grille
+   list on a solid door, which is what a customer meets on step 05 — read as a
+   page still loading. It has to look unavailable, not absent. */
+.tile.is-blocked { opacity: .7; }
 .tile.is-blocked .tile__meta { display: none; }
+
+/* ⚠ AND EVERY TILE IN A ROW IS THE SAME HEIGHT, BY CONSTRUCTION RATHER THAN BY
+   LUCK. The grid stretches its items, so a row is as tall as its tallest tile
+   and the SHORT ones were the ragged part: a tile with a one-word name sat
+   with its artwork floating in the middle of a box sized by a three-word
+   neighbour. `align-content: start` inside each tile pins the artwork to the
+   top, so the pictures line up across the row whatever the words below do —
+   which is the only alignment a customer comparing sixteen grilles is using. */
+.tile { align-content: start; }
 
 /* ── pills ────────────────────────────────────────────────── */
 
@@ -906,19 +2401,30 @@ body {
   background: var(--paper-up);
   color: var(--ink);
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border-radius: var(--r-pill);
   transition: border-color .12s var(--ease), background-color .12s var(--ease);
 }
 .pill:hover { border-color: var(--ink-2); }
-.pill.is-selected { border-color: var(--ink); background: var(--paper); box-shadow: inset 0 0 0 1px var(--ink); }
+.pill.is-selected {
+  border-color: var(--accent-ink); background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--accent-ink);
+}
 
 /* ── the send block ───────────────────────────────────────── */
 
+/* ⚠ WHITE, AND IT RE-DECLARES `--surface` FOR THE SAME REASON THE CHOICES
+   CARD DOES. Nothing inside it draws a ring in the page's background today,
+   but the token exists precisely so that the next thing added here does not
+   repeat the seventeen-beige-haloes bug described at the top of this file.
+   `--rule` needs no re-measuring on the change: #D6D3CB is 1.50:1 on white
+   against 1.28:1 on paper, so the dividers get MORE visible, not less. */
 .send {
+  --surface: #fff;
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 18px 16px;
-  background: var(--paper-up);
+  border-radius: var(--r-card);
+  padding: 20px 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
   display: grid; gap: 12px;
 }
 
@@ -927,11 +2433,108 @@ body {
   font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
   color: var(--ink-2);
 }
+/* Light and large, from the mockup: a price is the biggest thing on the card
+   and it does not have to shout as well. 300 falls back to 400 in a face with
+   no light weight (Arial Hebrew has none), which is a smaller figure than the
+   one it replaces rather than a broken one. */
 .send__figure {
-  font-size: 1.9rem; font-weight: 600; line-height: 1.1;
+  font-size: 2.2rem; font-weight: 300; line-height: 1.1;
+  letter-spacing: -.01em;
   font-variant-numeric: tabular-nums;
 }
 .send__incl { font-size: .78rem; color: var(--ink-2); }
+
+/* ── the price opens ──────────────────────────────────────────────────
+   The figure is a button now (see index.html). It must not LOOK like one: a
+   price with a border round it reads as an action, and the action here is
+   secondary to the number. So the button is bare, and the only affordance is
+   the chevron — plus a real focus ring, because a control nobody can see is
+   still a control somebody has to reach. */
+.send__toggle {
+  display: flex; align-items: baseline; gap: 8px;
+  background: none; border: 0; padding: 0;
+  inline-size: 100%; text-align: start; cursor: pointer;
+  color: inherit; font: inherit;
+  /* A 44px floor without pushing the figure around: the figure is already
+     ~38px tall at 2.2rem/1.1, and 4px of block padding clears the target. */
+  padding-block: 3px;
+}
+.send__toggle:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.send__chev {
+  inline-size: 9px; block-size: 9px; flex: none;
+  border-inline-end: 1.5px solid var(--ink-2);
+  border-block-end:  1.5px solid var(--ink-2);
+  transform: rotate(45deg); transform-origin: 60% 60%;
+  transition: transform .18s var(--ease);
+}
+.send__toggle[aria-expanded="true"] .send__chev { transform: rotate(225deg); }
+
+.bd {
+  inline-size: 100%; border-collapse: collapse;
+  margin-block: 6px 2px;
+  font-size: .82rem;
+}
+.bd th, .bd td {
+  padding-block: 5px; text-align: start; font-weight: 400;
+  border-block-end: 1px solid var(--rule);
+}
+.bd th { color: var(--ink-2); }
+/* Tabular, and end-aligned, so the column can actually be added up by eye —
+   which is the entire reason this table exists. */
+.bd td {
+  text-align: end; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.bd__total th, .bd__total td {
+  font-weight: 600; color: var(--ink); border-block-end: 0;
+  padding-block-start: 7px;
+}
+
+/* The size band, under the name and above the price. Small and quiet: it is a
+   fact a customer checks once against a tape measure, not something to read on
+   every tile. Tabular so the two figures line up down a column of tiles. */
+.tile__band {
+  font-size: .66rem; color: var(--ink-2); line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The bar's length, under its tiles. Reads as one control rather than three
+   buttons: label above, minus / value / plus in a row, the value tabular so it
+   does not jog as it changes. 44px on both buttons — the touch floor is a
+   floor, and this is the newest control on the page. */
+.blen { grid-column: 1 / -1; margin-block-start: 10px; }
+.blen__label {
+  display: block; font-size: .68rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-2); margin-block-end: 5px;
+}
+.blen__row { display: flex; align-items: center; gap: 10px; }
+.blen__b {
+  inline-size: 44px; block-size: 44px; flex: none;
+  border: 1px solid var(--rule); border-radius: var(--r-pill);
+  background: var(--surface); color: var(--ink);
+  font-size: 1.1rem; line-height: 1; cursor: pointer;
+}
+.blen__b:disabled { opacity: .35; cursor: default; }
+.blen__b:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+.blen__v {
+  font-variant-numeric: tabular-nums; font-size: .95rem;
+  min-inline-size: 5.5ch; text-align: center;
+}
+
+/* The stripe controls, under the panel tiles. Same visual family as the bar's
+   length stepper — they are the two places on the page where a number is
+   chosen rather than a picture. */
+.stripes { grid-column: 1 / -1; margin-block-start: 12px; display: grid; gap: 8px; }
+.stripes__label {
+  font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.stripes__dirs { display: flex; gap: 6px; flex-wrap: wrap; }
+.stripes__tight { justify-self: start; }
+.stripes__cost { font-size: .78rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+/* The reason, when the door cannot take stripes. Not a disabled control: a
+   dead button tells a customer nothing, a sentence tells them what to change. */
+.stripes__why { margin: 0; font-size: .78rem; color: var(--ink-2); }
 
 .send__spec {
   margin: 0; padding-block: 8px;
@@ -946,7 +2549,13 @@ body {
   font: inherit; font-weight: 600;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   min-block-size: 52px; padding: 12px 18px;
-  border-radius: var(--radius); border: 1px solid transparent;
+  /* ⚠ A PILL, LIKE EVERY OTHER BUTTON ON THE PAGE. `.saved__btn`,
+     `.saved__open`, `.grip-bar__btn` and `.steps__step` were all already
+     999px, so the square corners left the site's PRIMARY call to action as
+     the one button shaped unlike the rest of them. This is the shape changing
+     to match what shipped, not the mockup's near-black pill arriving: the
+     green is settled from outside (REDESIGN.md §4) and is untouched. */
+  border-radius: var(--r-pill); border: 1px solid transparent;
   text-decoration: none; cursor: pointer;
   transition: filter .12s var(--ease);
 }
@@ -987,6 +2596,93 @@ html.is-live .wa__off { display: none; }
 }
 .btn--ghost:hover { border-color: var(--ink-2); }
 
+/* ⚠ AND HERE IS THE OTHER HALF, AFTER `.btn`, WHERE IT WINS. Above 1100 the
+   card has a sticky foot of its own and the wall is not a place for a verb. */
+@media (min-width: 1100px) { .quote__next { display: none; } }
+
+/* ── THE FOOT OF A STEP: the way on, and the way back ────────────────
+   ⚠ `.sect__foot` HAD NO RULES, so two buttons that carry a customer through
+   nine screens were stacked in source order at browser defaults, and the
+   forward one — `class="btn sect__next"`, a `.btn` with no modifier — had a
+   transparent background and a transparent border. The primary action of every
+   step was invisible chrome with a word in it.
+
+   ⚠ AND IT IS ALLOWED TO BE A PRIMARY, which is worth stating because this
+   page has exactly one other: the green send. They never share a screen. The
+   summary step has no `.sect__next` at all (it is the end of the road), so the
+   dark pill and the green pill are never both in front of a customer. */
+.sect__foot {
+  display: flex; align-items: center; gap: 10px;
+  margin-block-start: 26px;
+  padding-block-start: 18px;
+  border-block-start: 1px solid var(--rule);
+}
+/* The way on takes the room; the way back takes what it needs. */
+.sect__next { flex: 1 1 auto; }
+.sect__back { flex: 0 0 auto; }
+.sect__next:not(:disabled) {
+  background: var(--ink); color: var(--paper);
+  border-color: var(--ink);
+}
+.sect__next:not(:disabled):hover { filter: brightness(1.35); }
+/* Disabled only at the very end of the flow, where there is nowhere to go.
+   Ghost rather than dimmed-solid: a faded dark slab still reads as the loudest
+   thing on the card, which is the opposite of what "you cannot press this"
+   should look like. */
+.sect__next:disabled {
+  background: none; color: var(--ink-2);
+  border-color: var(--rule); cursor: default;
+}
+.sect__back:disabled { opacity: .45; cursor: default; }
+
+/* ⚠ AND THE ONE IN THE QUOTE BAR DOES NOT TAKE THE ROOM, which the one in the
+   flow does. Same class, two homes, and the line above — `.sect__next { flex:
+   1 1 auto }` — reaches both at equal specificity, so whichever is written
+   LATER wins. Measured before this line existed: at 1099x800 the bar's way on
+   came out **836 px wide**, eating the slack that the price and the send were
+   spaced by. In the flow it should fill the row; in a bar of three it is one
+   of three. Written here rather than up with the rest of `.quote__next` for
+   exactly the reason the display rule is here: after, not before. */
+.quote__next { flex: 0 0 auto; }
+
+/* ⚠ AND ON A DESKTOP THE FOOT IS PINNED TO THE BOTTOM OF THE CARD, because it
+   was falling off the bottom of the screen. Measured at 1440x900 on the
+   colour step and again on the window step: the card scrolls inside its own
+   column, the two buttons are the last thing in it, and the primary action of
+   the step was simply below the fold on the commonest laptop height — a
+   customer had to scroll a list of grilles to the end to find out how to leave
+   it. Sticky costs nothing: the card already scrolls internally, so the foot
+   rides at its edge instead of at the end of its content.
+   Below 1100 it stays in the flow — the PAGE scrolls there, the quote bar is
+   already pinned at the foot of the screen, and a second pinned row above it
+   would be two bars of chrome over the one thing being chosen. */
+@media (min-width: 1100px) {
+  .sect__foot {
+    position: sticky; inset-block-end: 0; z-index: 2;
+    margin-block-start: 26px;
+    /* ⚠ AND IT RUNS TO THE BOTTOM OF THE SCROLLPORT. Pinned at
+       `inset-block-end: 0` it stops at the padding box, so the card's own
+       28 px of bottom padding stayed BELOW it and a row of tiles scrolled
+       through that gap under the buttons — a strip of moving artwork beneath a
+       pinned bar, which reads as a rendering fault rather than as a scroll.
+       The padding moves off the card and into the foot, so the two cannot
+       disagree: the card ends where the foot ends. */
+    padding-block: 14px 26px;
+    background: var(--surface);
+  }
+  .panel--choose { padding-block-end: 0; }
+}
+
+/* `.btn--undo` and its `is-off` twin are GONE. Undo is two icon circles now —
+   `.iconbtn`, defined up beside the language picker — always on the page and
+   `disabled` when there is nothing to take back, so the strip below the door
+   holds one height for ever instead of two. The 23,021-pixel lesson that made
+   `is-off` necessary is what keeps them both mounted. */
+.btn__ico {
+  inline-size: 18px; block-size: 18px;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
 .send__alt {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; flex-wrap: wrap;
@@ -1002,53 +2698,15 @@ html.is-live .wa__off { display: none; }
 .proof { margin: 0; font-size: .85rem; color: var(--ink-2); }
 .proof a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: .25em; }
 
-/* ── the dock ─────────────────────────────────────────────────
-   The price and the send button, pinned to the foot of a phone.
-
-   Measured before it existed, on a 390x844 screen with the first category
-   opened the way a person opens it: the first colour swatch sat at y=827, the
-   price at 1,796 and the WhatsApp button at 1,991. So for the whole time a
-   customer is choosing, the number they care about and the button this site
-   exists to get them to are both two screens away — and picking a colour
-   appears to do nothing at all.
-
-   Phone only. Above 1100px the send panel is already a column beside the door
-   and a second copy of it would be noise. */
-.dock {
-  position: fixed; inset-block-end: 0; inset-inline: 0;
-  z-index: 40;
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 14px;
-  /* Plus the home indicator on an iPhone, which would otherwise sit on top of
-     the button. `viewport-fit=cover` is already set in the head. */
-  padding-block-end: calc(10px + env(safe-area-inset-bottom, 0px));
-  background: var(--paper-up);
-  border-block-start: 1px solid var(--rule);
-  box-shadow: 0 -6px 18px rgba(23, 23, 21, .06);
-}
-/* Contents centred inside a readable measure rather than stretched edge to
-   edge. On a 390 px phone the two fill the bar anyway; on an 834 px tablet,
-   left to itself, the button became a green slab most of the screen wide with
-   the price marooned at one end. */
-.dock > * { flex: 0 0 auto; }
-.dock { justify-content: center; }
-.dock__price { display: flex; flex-direction: column; line-height: 1.15; }
-.dock__label { font-size: .68rem; color: var(--ink-2); }
-.dock__figure { font-size: 1.2rem; font-weight: 700; white-space: nowrap; }
-.dock__send {
-  flex: 1 1 auto; max-inline-size: 22rem;
-  min-block-size: 46px; padding: 10px 14px; font-size: .95rem;
-}
-
-/* The page has to end above the dock, or the last thing on it — the link to
-   his real work — sits underneath a bar and can be neither read nor tapped. */
-@media (max-width: 1099px) {
-  body { padding-block-end: 78px; }
-}
-@media (min-width: 1100px) {
-  .dock { display: none; }
-}
-.is-bare .dock { display: none; }
+/* ⚠ A HARD-CODED `padding-block-end: 78px` STOOD HERE, LEFT OVER FROM THE
+   DELETED DOCK, AND IT WOULD HAVE BEATEN THE MEASURED ONE. Two `body` rules in
+   two `@media (max-width: 1099px)` blocks, same specificity, and this one is
+   further down the file — so the cascade would have taken 78 px and quietly
+   ignored `--quote-h`. That is CLAUDE.md §8's "a media query adds no
+   specificity" for the fourth time in this stylesheet, and this time it was
+   already sitting in the file waiting.
+   The reservation lives with the fixed strips it reserves for, up beside
+   `--steps-h`. Nothing is needed here. */
 
 /* ── toast ────────────────────────────────────────────────── */
 
@@ -1057,7 +2715,8 @@ html.is-live .wa__off { display: none; }
   inset-inline: 16px;
   margin-inline: auto; max-inline-size: 26rem;
   background: var(--ink); color: var(--paper);
-  padding: 12px 16px; border-radius: var(--radius);
+  padding: 12px 16px; border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
   font-size: .86rem; text-align: center;
   z-index: 50;
   /* ⚠ THE TOAST USED TO EAT THE SEND BUTTON. It is `fixed` at the bottom with
@@ -1069,29 +2728,183 @@ html.is-live .wa__off { display: none; }
      It is a message, not a control — nothing in it is ever clicked. */
   pointer-events: none;
 }
-/* And lifted clear of the dock rather than laid over it, so the price and the
-   button stay readable while it is up. 78px is the dock's own reserved
-   height, declared below. */
+/* And lifted clear of the quote bar rather than laid over it, so the price and
+   the send stay readable while it is up. ⚠ It said `78px` — the deleted dock's
+   height, hand-written here and hand-written again in a `body` rule that no
+   longer exists. Measured now, off the same `--quote-h` the page reserves with,
+   so the toast's clearance and the bar's height are one number. */
 @media (max-width: 1099px) {
-  .toast { inset-block-end: calc(78px + 12px + env(safe-area-inset-bottom, 0px)); }
-}
-
-/* ── reduced motion ───────────────────────────────────────── */
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition-duration: .01ms !important;
-    animation-duration: .01ms !important;
+  .toast {
+    inset-block-end: calc(var(--quote-h, 62px) + 12px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* ── reduced motion ───────────────────────────────────────────
+   ⚠ THE RULE IS STATED ONCE, AT THE FOOT OF THIS FILE, AND IT USED TO BE
+   STATED TWICE. There were two `prefers-reduced-motion` blocks — this one at
+   .01ms and another eight hundred lines down at .001ms — and the second won,
+   which is to say the first was decoration. Two statements of one rule is the
+   §5 shape, and in a kill switch it is worse than usual: somebody reading THIS
+   one would have believed they had seen the whole of it. Search for
+   `prefers-reduced-motion`. */
 
 /* ── forced colours: this UI is hairlines, so guard it ────── */
 
 @media (forced-colors: active) {
   .swatch__chip { forced-color-adjust: none; }
-  .pill.is-selected, .swatch.is-selected .swatch__chip { outline: 2px solid CanvasText; }
+  /* ⚠ `.tile.is-selected` JOINS THIS LIST THE DAY ITS RING BECOMES A COLOUR.
+     Forced colours throw every author colour away, so a selected tile whose
+     only mark is a `--accent-ink` border and an `--accent-ink` disc has NO
+     mark at all in that mode. The badge's tick is a background image, which
+     forced colours also drop. An outline is the one thing the mode keeps. */
+  .pill.is-selected, .tile.is-selected,
+  .swatch.is-selected .swatch__chip { outline: 2px solid CanvasText; }
 }
 
+
+/* ── THE ORDER SHEET ─────────────────────────────────────────────────
+   `?sheet=1` on the same page. Hidden entirely otherwise, so it costs a
+   normal visit one empty element and nothing else. */
+.sheet { display: none; }
+
+.is-sheet body { background: #fff; display: block; block-size: auto; overflow: visible; }
+/* Everything the configurator is, gone. The list is explicit rather than
+   `body > *` because `#sheet` and the live regions have to survive it, and a
+   rule that hides everything and then un-hides three things is two rules that
+   have to agree. */
+.is-sheet .bar, .is-sheet .saved, .is-sheet .strip, .is-sheet .layout,
+.is-sheet .is-sheet .trust, .is-sheet .toast, .is-sheet .works,
+.is-sheet .works-open { display: none !important; }
+/* ⚠ The quote bar is a child of `.stage-wrap`, which is inside `.layout` — so
+   `.is-sheet .layout` already takes it. Named anyway, because the line above
+   is a hand-kept list and the next element added to the page may not be
+   inside `.layout`; a printed order sheet with a fixed WhatsApp bar across the
+   foot of every page is the kind of thing nobody notices until it is on paper. */
+.is-sheet .quote { display: none !important; }
+.is-sheet .sheet { display: block; }
+
+.sheet {
+  inline-size: min(190mm, 96vw);
+  margin: 0 auto; padding: 14mm 0;
+  color: var(--ink);
+}
+.sheet__top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; padding-block-end: 8px;
+  border-block-end: 2px solid var(--ink);
+}
+/* An <h1>, because `.is-sheet` hides `.layout` and with it the page's only
+   heading — the printed document had none at all. Sized here rather than
+   inherited, so it does not arrive at the browser's 2em default. */
+.sheet__brand { margin: 0; font-weight: 700; font-size: 1.25rem; line-height: 1.2; }
+.sheet__sub { font-size: .78rem; color: var(--ink-2); }
+/* ⚠ `direction: ltr` MOVED ONTO THE CODE ITSELF. On the whole row it reordered
+   the Hebrew label around the Latin digits, so the sheet printed
+   `DM-P4040481 :קוד` — label, colon and all, on the wrong side. The code is
+   Latin and must not mirror; the word in front of it is Hebrew and must. */
+.sheet__code { font-family: var(--mono); font-size: .9rem; }
+.sheet__code b { font-size: 1.05rem; }
+
+.sheet__body {
+  display: grid; gap: 10mm;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: start;
+  padding-block: 8mm;
+}
+/* Two columns is an A4 layout, and this page is opened on a phone before it is
+   ever printed — measured at 390 px, the spec column comes out about 170 px
+   wide and every value wraps to four lines, including the colour name and its
+   manufacturer code. A sheet that cannot be proof-read on the device it was
+   sent to is a sheet nobody checks before ordering from it. */
+@media (max-width: 700px) {
+  .sheet__body { grid-template-columns: minmax(0, 1fr); gap: 6mm; }
+}
+/* ⚠ THE HEBREW GLOSS, SHOWN ONLY ON A SHEET BUILT IN ANOTHER LANGUAGE.
+   `dir="rtl"` on the element itself rather than a rule here, because a
+   Hebrew line inside an LTR sheet has to lay itself out right-to-left and
+   nothing else on that page does. Quiet enough to be a footnote and legible
+   enough to order from: this is the line Peretz reads. */
+.sheet__he {
+  display: block; direction: rtl; text-align: start;
+  font-size: .74rem; color: var(--ink-2); margin-block-start: 1px;
+}
+
+.sheet__art { margin: 0; }
+.sheet__art svg {
+  inline-size: 100%; block-size: auto; max-block-size: 150mm;
+  display: block;
+}
+/* ⚠ AFTER the rule it overrides, not before it — THE THIRD TIME THIS FILE HAS
+   BEEN BITTEN BY EXACTLY THIS. A media query adds no specificity, so a
+   `.sheet__art svg` inside one that sits ABOVE the base `.sheet__art svg`
+   loses to it at every width. That is how the phone cap shipped dead: computed
+   `max-block-size` read `150mm` (566.9 px) rather than the `60vh` (506.4 px on
+   a 390x844 phone) it was written for, so the elevation ran 60 px taller than
+   intended and pushed the handing row and the price further below the fold —
+   on a sheet whose own note says it has to be proof-readable on the device it
+   was sent to. Its sibling in the same block, `.sheet__body`, worked, because
+   ITS base rule comes earlier; that is why the miss read as nearly-right.
+   The other two occurrences are recorded at `position: sticky` and at the
+   stage's height. Search this file for "AFTER the rule it overrides". */
+@media (max-width: 700px) {
+  .sheet__art svg { max-block-size: 60vh; }
+}
+.sheet__dims {
+  margin-block-start: 4px; text-align: center;
+  font-family: var(--mono); font-size: .8rem; color: var(--ink-2);
+}
+.sheet__spec { display: grid; gap: 0; }
+/* ⚠ THE LABEL COLUMN HAS TO SURVIVE A LANGUAGE THAT COMPOUNDS. It was a flat
+   `7.5em`, sized by eye against Hebrew, where every label on this sheet is one
+   short word — `משקוף`, `פרזול`, `פתיחה`. Russian writes the same field as
+   `Дополнительный замок`: one word longer than the whole column and with no
+   space in it to break at, so it did not wrap, it OVERFLOWED — the label ran
+   straight over its own value and the sheet read `Дополнительныйефовый замок`.
+   The price row did the same over `₪10,825`.
+   Sized to the longest label the three languages actually produce —
+   `Дополнительный` — rather than to a guess, and `break-word` kept as the
+   backstop for whatever the fourth language turns out to be. Measured on the
+   rendered A4 sheet: the value column keeps 218 px, and the longest value
+   Hebrew or Russian puts in it wraps to two lines at most. */
+.sheet__row {
+  display: grid; grid-template-columns: 10.4em minmax(0, 1fr) auto;
+  align-items: baseline; gap: 8px;
+  padding: 6px 0; border-block-end: 1px solid var(--rule);
+  font-size: .88rem;
+}
+.sheet__row--wide { grid-template-columns: 10.4em minmax(0, 1fr); }
+.sheet__k {
+  font-weight: 600; color: var(--ink-2);
+  min-inline-size: 0; overflow-wrap: break-word; hyphens: auto;
+}
+.sheet__v small { display: block; font-size: .74rem; color: var(--ink-2); }
+.sheet__chip {
+  inline-size: 16px; block-size: 16px; border-radius: var(--r-chip);
+  background: var(--chip); border: 1px solid rgb(0 0 0 / .28);
+  align-self: center;
+}
+/* The two warnings the screen carries in `.strip` and the sheet used to hide:
+   that the price is a placeholder, and that the rules had to change the door
+   on the way in. Both matter more on a document somebody orders from than on
+   a screen they are still playing with. */
+.sheet__warn { display: block; margin-block-start: 4px; color: var(--warn); }
+.sheet__note { display: block; margin-block-start: 4px; color: var(--warn); }
+.sheet__foot {
+  padding-block-start: 6px; border-block-start: 1px solid var(--rule);
+  font-size: .76rem; color: var(--ink-2);
+}
+
+@media print {
+  /* A4 with the browser's own margins; the sheet sets its own measure. */
+  @page { size: A4 portrait; margin: 12mm; }
+  .sheet { inline-size: auto; padding: 0; }
+  /* Chromium drops backgrounds when printing unless the page asks. The colour
+     chip beside the paint row IS the fact on that row, so it has to survive —
+     without this it prints as an empty outline and the sheet says nothing
+     about the colour except its name. */
+  .sheet__chip { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .sheet__art svg { max-block-size: 140mm; }
+}
 
 /* ── bare mode: the stage only, for tools/compare.mjs ─────── */
 /* ⚠ `.stage__h1` IS IN THIS LIST, and leaving it out cost a false alarm.
@@ -1106,7 +2919,7 @@ html.is-live .wa__off { display: none; }
    it. Anything added to the stage wrap belongs here the same day. */
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
 .is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
-.is-bare .grip-bar { display: none; }
+.is-bare .grip-bar, .is-bare .stage__hud, .is-bare .quote { display: none; }
 .is-bare .layout { display: block; block-size: 100dvh; }
 .is-bare .stage-wrap { block-size: 100dvh; padding: 0; border: 0; }
 /* Natural framing, not the full-bleed room: app.js leaves the viewBox alone
@@ -1116,4 +2929,239 @@ html.is-live .wa__off { display: none; }
 .is-bare .door-svg {
   inline-size: auto; block-size: auto;
   max-inline-size: 100%; max-block-size: 100dvh;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MOTION
+   ══════════════════════════════════════════════════════════════════════
+
+   ⚠ READ THE KILL SWITCH FIRST. It is at the TOP of this block on purpose:
+   `?bare=1` is what `npm run sheets`, `recreate`, `corpus`, `against`,
+   `profile` and `collide` photograph, and an animation running during a
+   screenshot makes all 110 committed sheets NON-DETERMINISTIC — the same
+   commit producing a different image every run, every photograph comparison
+   drifting, and the byte-identical check that proves the leaf did not move
+   failing at random. This rule shipped in the same commit as the first
+   animation, not after it.
+
+   THE ONE IDEA: the DOOR is a physical object being assembled; the INTERFACE
+   is paper. The door moves at 260–420 ms with weight; the interface at
+   120–200 ms and is barely noticed. If they move at the same speed the whole
+   page reads as one flat surface and the illusion thirty photographs paid for
+   is spent for nothing.
+
+   ⚠ NO BOUNCE, ANYWHERE. A steel door that boings is a cartoon, and
+   `PLAN.md` §7's generic-tells checklist exists to stop exactly this. */
+
+.is-bare *,
+.is-bare *::before,
+.is-bare *::after {
+  animation: none !important;
+  transition: none !important;
+}
+/* ⚠ AND `animation-delay`, WHICH WAS MISSING AND HID THE SEND BUTTON.
+   `revealSend` carries a 180 ms delay and `both`, so under reduce the DURATION
+   collapsed to nothing and the DELAY did not — leaving the green button at
+   `opacity: 0` for a fifth of a second, on the one screen whose whole job is
+   sending, for exactly the customer who asked the browser to stop moving
+   things. Measured: `document.getAnimations()` reported one animation still
+   "running" under reduce, and it was that one, sitting in its delay phase.
+   Fixing `revealSend` alone would have left the trap armed for the next
+   delayed animation anybody writes, so the kill switch takes the delay too.
+   Same addition on `.is-bare` above, and for the same reason: a screenshot
+   taken during a delay is a screenshot of a hidden element. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Slower to leave, longer to settle, no overshoot. `--ease` (fast out, no
+   bounce) stays the interface's; this is the door's. */
+:root { --ease-fit: cubic-bezier(.2, .7, .3, 1); }
+
+/* ── M1 · the door assembles on load ─────────────────────────────────
+   Peretz: "the start door needs to be with nothing, only the door, no mashkof
+   no keyhole, just hole." This satisfies that sentence LITERALLY, IN TIME,
+   without inventing an un-orderable state: the first frame is a bare leaf, and
+   the frame and the fittings arrive over 900 ms. `ASK-PERETZ.md` §13 settled
+   that a door without a cylinder cannot be ORDERED; nothing here disagrees —
+   the state underneath is a real door throughout.
+   Once, on first paint, which is why it is a class the script removes. */
+.is-arriving #frame     { animation: fitPart .42s var(--ease-fit) .22s both; }
+.is-arriving #hardware  { animation: fitPart .36s var(--ease-fit) .52s both; }
+@keyframes fitPart { from { opacity: 0; transform: translateY(-6px); } }
+
+/* ── M2 · the colour cross-fades ─────────────────────────────────────
+   `PLAN.md` §7, decided long ago and never built: NEVER INTERPOLATE HUE. A CSS
+   colour transition on a fill passes through the midpoint of two hues, so
+   anthracite → sage goes through mud and reads as a rendering bug. The leaf is
+   simply faded in over the outgoing paint, which never leaves the palette
+   because there is nothing between two opacities. */
+#stage[data-changed="colour"] #leaf { animation: paintOn .32s var(--ease-fit) both; }
+@keyframes paintOn { from { opacity: 0; } }
+
+/* ── M3, M5, M6, M7 · the parts are FITTED ───────────────────────────
+   Each keyed off the field that owns it, so changing the colour does not
+   re-animate the panel. See `stampChange` in js/app.js for why the stamp
+   exists and why diffing the drawing was refused. */
+#stage[data-changed="detail"] [data-detail],
+#stage[data-changed="stripeCount"] [data-detail="strips"],
+#stage[data-changed="stripeDir"] [data-detail="strips"],
+#stage[data-changed="stripeTight"] [data-detail="strips"] {
+  animation: fitPart .30s var(--ease-fit) both;
+}
+#stage[data-changed="window"] #glazing,
+#stage[data-changed="grille"] #glazing { animation: openUp .36s var(--ease-fit) both; }
+@keyframes openUp { from { opacity: 0; transform: scaleY(.94); } }
+
+#stage[data-changed="handle"] [data-hw="handle"],
+#stage[data-changed="handleLen"] [data-hw="handle"] {
+  animation: offerUp .28s var(--ease-fit) both;
+}
+@keyframes offerUp { from { opacity: 0; transform: translateX(6px); } }
+
+/* Four fittings change together, and the point is that they change TOGETHER —
+   instantly, nobody sees that they moved as one. */
+#stage[data-changed="pirzul"] [data-hw="lock"],
+#stage[data-changed="lockset"] [data-hw="lock"],
+#stage[data-changed="speciallock"] [data-hw="lock"] {
+  animation: replate .30s var(--ease-fit) both;
+}
+@keyframes replate { from { opacity: 0; } }
+
+/* The frame is its own choice now, so it gets its own arrival. */
+#stage[data-changed="mashkof"] #frame { animation: fitPart .32s var(--ease-fit) both; }
+
+/* ── M8 · the step transition ────────────────────────────────────────
+   Direction is the whole information: a flow whose steps cross-fade has no
+   forward and no back. ⚠ LOGICAL, not left/right — the interface mirrors and
+   the direction of travel has to mirror with it. */
+.sect.is-live { animation: stepIn .22s var(--ease) both; }
+@keyframes stepIn { from { opacity: 0; transform: translateX(14px); } }
+[dir="rtl"] .sect.is-live { animation-name: stepInRtl; }
+@keyframes stepInRtl { from { opacity: 0; transform: translateX(-14px); } }
+
+/* ── M9, M10, M11, M12, M13 · the interface ──────────────────────────
+   Quick, light, and mostly unnoticed. */
+.steps__c {
+  transition: border-color .2s var(--ease), background .2s var(--ease),
+              transform .2s var(--ease);
+}
+/* The current circle stands a hair proud of the row — 4% is under two pixels
+   on a 44 px disc, which is exactly enough to find at a glance and not enough
+   to notice as an animation. */
+.steps__step.is-on .steps__c { transform: scale(1.04); }
+
+/* ── THE TILE CONFIRMS THE PICK BEFORE THE DOOR DOES ─────────────────
+   A tap on a tile has two answers: the ring, which is instant, and the door,
+   which takes a redraw. The badge is what makes the first one feel deliberate
+   rather than accidental — it arrives with a small overshoot, the way a
+   physical switch does, and it is over in 180 ms.
+   `transform` and `opacity` only, on a 18 px pseudo-element that already
+   carries `pointer-events: none`. */
+.tile.is-selected::after { animation: badgePop .18s var(--ease) both; }
+@keyframes badgePop {
+  from { opacity: 0; transform: scale(.4); }
+  60%  { opacity: 1; transform: scale(1.12); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.tile { transition: border-color .14s var(--ease), box-shadow .14s var(--ease); }
+
+/* ── M14 · THE REVEAL, ONCE, ON REACHING THE END ─────────────────────
+   `GUIDED-FLOW.md` §3.4 asks for a flourish when the last step commits: a
+   light sweep, the sconces brightening, a breath on the whole door, and the
+   price counting up.
+
+   What is built is the BREATH and nothing else, and the three omissions are
+   each a decision rather than a shortfall:
+   · the price count-up is banned by name and would show, for ~400 ms, a number
+     that is not the price of anything;
+   · the light sweep would be a white band travelling over the WALL as well as
+     the leaf, because the stage is one box — a shimmer, which is the visual
+     grammar of "still loading";
+   · the sconces cannot brighten on `transform`/`opacity` alone (a `filter`
+     would do it, at the cost of a compositor layer on the largest element on
+     the page), and the performance budget for this round says transform and
+     opacity only.
+
+   What is left is the thing the moment actually needs: the door leans in by
+   1.5% and settles. It is a CSS transform on the `<svg>` and never a viewBox
+   change — `fitStage` owns the viewBox and would fight it, which
+   `GUIDED-FLOW.md` §3.5 predicted before either existed.
+
+   ⚠ ONCE. The class is set the first time the summary becomes live and never
+   again — a flourish that replays every time somebody edits a choice and comes
+   back is not a flourish, it is a tic. `js/app.js` holds the latch. */
+.is-reveal #stage .door-svg { animation: revealBreath .9s var(--ease-fit) both; }
+@keyframes revealBreath {
+  from { transform: scale(1); }
+  40%  { transform: scale(1.015); }
+  to   { transform: scale(1); }
+}
+/* And the green button arrives rather than appearing: the one control the
+   whole page exists to produce, given a beat of its own at the one moment it
+   is the answer. */
+.is-reveal .btn--wa { animation: revealSend .5s var(--ease-fit) .18s both; }
+@keyframes revealSend {
+  from { opacity: 0; transform: translateY(8px) scale(.98); }
+}
+
+/* ⚠ THE PRICE DOES NOT COUNT UP. `PLAN.md` §7's generic-tells checklist bans
+   count-up numbers by name, and there is a harder reason: for ~400 ms the page
+   would display a number that is not the price of anything, on a site whose
+   entire promise is that the figure on screen is real. It settles instead. */
+.send__figure { transition: opacity .16s var(--ease); }
+
+.bd { animation: fitPart .24s var(--ease) both; }
+
+/* ⚠ THE TOAST MUST NOT SWALLOW THE SEND BUTTON. It sat over the dock at
+   z-index 50 with pointer-events auto and killed the site's one call to action
+   for four seconds at a time. Animating it is not permitted to re-open that. */
+.toast { animation: toastUp .2s var(--ease) both; pointer-events: none; }
+@keyframes toastUp { from { opacity: 0; transform: translateY(8px); } }
+
+/* The cheapest thing that makes a page feel like a product on a phone. */
+.tile, .swatch, .pill { transition: transform .09s var(--ease); }
+.tile:active, .swatch:active, .pill:active { transform: scale(.97); }
+
+/* ── ≥1280 · THE DOOR TAKES THE EMPTY COLUMN ─────────────────────────
+   `REALISM2.md` stage F. The mockup runs the drawing full bleed with the
+   price and choices cards FLOATING over it, and this is not that — read on.
+
+   What the flow changed underneath it: `.panel--send` now lives inside the
+   summary STEP, so the third column stands empty at every step but the last.
+   That is the same fault stage F was written for, measured at 1536x1024 as
+   "the choices column is 918 px tall and its content ends at 304 — 614 px of
+   blank", arriving from the other direction. The door takes it.
+
+   ⚠ WHY NOT THE FLOATING OVERLAY, WHICH IS WHAT THE MOCKUP DRAWS. §6 of that
+   file makes the overlay conditional on twelve viewport x size measurements,
+   and its own last paragraph is the instruction for when they will not settle:
+   THE OVERLAY YIELDS, NOT THE CONTROLS. The condition is not the container any
+   more — that is healthy, 6/6 at 1280 and 1680 — it is that the overlay was
+   specified against a three-column CABINET that no longer exists, and its one
+   hard requirement is re-deriving `--wall` from the floating card's inner edge
+   because the grip controls stand in that strip. Spanning the track needs none
+   of that: the stage's padding box is still the wall, `fitStage` still
+   measures the box the bar sits in, and the house rule that the published
+   number and the box are the same box by construction is untouched.
+   Recorded rather than quietly skipped. A door that is 360 px wider is most of
+   what the overlay was for; the rest is a composition, and it deserves a fresh
+   look rather than the tail of a long session. */
+@media (min-width: 1280px) {
+  .layout { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr) 0; }
+  .stage-wrap { grid-column: 2 / span 2; }
+  .stage__bar { grid-column: 2 / span 2; }
+  /* The send card is inside the summary step now, so column 3 has nothing to
+     hold. Zeroed rather than removed from the template: `.panel--send` is
+     still addressed by `grid-column: 3` above, and a rule pointing at a track
+     that does not exist is the kind of silence this stylesheet has paid for. */
+  .panel--send { display: none; }
+  .sect--sum .panel--send { display: block; border: 0; }
 }

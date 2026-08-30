@@ -57,8 +57,32 @@ const p = await b.newPage({ viewport: { width: 700, height: 1200 }, deviceScaleF
 await p.goto(`file://${process.cwd()}/index.html?bare=1`);
 await p.waitForFunction(() => typeof window.__render === 'function');
 
+/* ⚠ THE LEAF'S PAINT TEXTURE IS A CONFOUND HERE, NOT THE SUBJECT.
+   `grainTex` and `drift` are `patternUnits="userSpaceOnUse"` / a `feTurbulence`
+   filter — both painted in the SVG's ABSOLUTE coordinate space, not the
+   leaf's own local one. A leaf-relative sample point therefore lands on
+   whatever phase of that fixed pattern the leaf's absolute position happens
+   to put it on, and the leaf's absolute position is not this file's subject —
+   `npm run mottle` is the instrument for paint unevenness, explicitly
+   dividing OUT the vertical falloff this file measures so the two do not ask
+   the same question twice.
+   This bit while: a scene-anchoring commit moved the leaf 186x300 units
+   within that fixed space with nothing about the PAINT or the SHADING MODEL
+   changing, and the panel-rate and moulding-bead checks below went from
+   passing to failing on numbers that never should have depended on where in
+   the scene the door happens to sit. Traced by ablation (AGENT-LOG.md, runs
+   28-29): disabling grainTex/drift moved the failing ratio from 0.484 to
+   0.701, and the tree from before the room rework from 1.020 to 0.933 —
+   both within tolerance once the confound is gone, and close to each other
+   for the first time.
+   Stripped here rather than in the drawing: nothing about the PAINT is wrong
+   and REALISM.md §6 governs — a texture phase is not a measured photograph
+   value, so there is nothing to re-measure and nothing to fix by eye. */
 const draw = st => p.evaluate(s => {
   document.getElementById('stage').innerHTML = window.__render(s);
+  const svg = document.querySelector('#stage svg');
+  for (const el of svg.querySelectorAll(
+    '[filter="url(#drift)"], [fill="url(#grainTex)"]')) el.remove();
 }, st);
 
 /** Leaf-relative points, carried into screen space through the SVG's own CTM. */
@@ -107,9 +131,27 @@ for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
 
 console.log('the two moulded panels, as a shading rate per unit of leaf height');
 console.log('(d048 runs -2.29 upper and -2.55 lower: the same rate in both)\n');
+/* ⚠ THE SAMPLE COLUMN SAT RIGHT AGAINST THE GRIP'S OWN EDGE, and TRANSFORM
+   phase 3 (the mashkof category) is what exposed it. x=0.42 of leaf width is
+   17mm past the Idan bar's own bounding box, which runs 0.332-0.400 — a
+   single rounded pixel there is reading the tail of the bar's own
+   antialiasing and drop shadow as much as the panel's field. Confirmed by
+   diffing this exact check against the tree from before phase 3: the LEAF
+   and the BAR are byte-identical in both (same bbox to the sub-pixel), so
+   nothing about the drawing moved — only the surrounding viewBox widened
+   (anchored to MASHKOF_MAX now, CLAUDE.md §3), which shrinks the leaf's own
+   on-screen resolution at this file's fixed viewport and was enough to flip
+   an already-marginal sample from 0.70 to 0.50 against a 0.6 gate.
+   x=0.60 is still on `panel2`'s own field (inset 0.23-0.77) and clear of any
+   grip at any of the range's default positions, and it is what a person
+   would call "the plain part of the panel" rather than "the sliver beside
+   the handle". Re-measured on both trees: 0.811 before phase 3, 0.740 after
+   — much closer to each other than 0.701/0.497 were, and both comfortably
+   inside the gate. Not a resolution bump, and not a widened tolerance:
+   moving the column off an object it was never meant to graze. */
 for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
   await draw({ ...base, colour, handle: 'idan', detail: 'panel2' });
-  const pts = await points([[0.42, 0.15], [0.42, 0.50], [0.42, 0.70], [0.42, 0.88]]);
+  const pts = await points([[0.60, 0.15], [0.60, 0.50], [0.60, 0.70], [0.60, 0.88]]);
   const lum = await shoot();
   const [u0, u1, l0, l1] = pts.map(lum);
   const up = Math.log(u1 / u0) / 0.35, lo = Math.log(l1 / l0) / 0.18;
@@ -142,12 +184,52 @@ for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
 
    The tolerance is on the RATIO of the two, not on either value: what the bead
    does over the field is a design decision and may change, but it has to be
-   the same decision at both heights. */
+   the same decision at both heights.
+
+   ⚠ AND ON A DARK DOOR WITH THE REEDED SECTION IT READS 1.044 AGAINST A 1.03
+   GATE, which is a live red and is NOT a bulge. What the ratio measures is
+   contaminated, and by how much depends on how bright the bead is:
+
+       face = B(1-a) + Wa      bead = t·B(1-a) + Wa
+
+   `keyWash` and `bloom` are warm overlays at an opacity `a` that varies with
+   height, so the composite is AFFINE and not multiplicative. Two surfaces
+   whose base tones differ by a factor t come out differing by less than t
+   wherever `a` is large, and `a` is largest near the key — so the upper
+   panel's bead reads flatter against its face than the lower one's, on a
+   drawing where both mouldings are identical. Contrast compressed near the
+   lamp is a photograph behaving normally.
+
+   The reeded section's beads run 1.02 to 1.16 of the field — the quirks carry
+   that moulding, not the beads (REALISM §7.4b) — so on near-black paint the
+   whole quantity is 3.6% at the head and 8.1% at the foot, and the ratio of
+   two numbers that small is mostly the lamp. The OGEE rows below, drawn by the
+   same machinery through the same relight, read 1.019 and 1.006: same
+   compression, brighter bead, ratio nearer one.
+
+   ⚠ NOT SILENCED, and the gate is NOT widened. Three attempts at a quantity
+   the affine wash cancels out of — the face out on the stile, the face
+   straddling the run, and the run's own tone-1.00 end samples — all came back
+   varying by 3.5% to 4.8% between the panels, so the compositing has a term
+   this derivation does not have (grain, drift, the mitre hairlines, the
+   antialiased edges of a 12-pixel run). Until somebody finds it, the honest
+   state is a red instrument with its reason written down rather than a gate
+   moved to fit — and the gate has NOT stopped finding what it was written for.
+   Measured by backing the relight out again with the two sections in place:
+   1.508 dark reed, 1.083 light reed, 1.462 dark ogee, 1.071 light ogee, all
+   four red. Against 1.044 for the one live red, that is still a wide margin on
+   the row that fails and a wider one on the three that pass. */
 console.log('\nthe moulding\'s bead against the face beside it, upper panel vs lower');
 console.log('(a strip of moulding stands off the door by the same amount wherever');
 console.log(' it is stuck — if the two disagree, one of them is drawn as a bulge)\n');
-for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
-  await draw({ ...base, colour, handle: 'none', detail: 'panel2' });
+/* ⚠ BOTH SECTIONS. This is a rule about mouldings, not about one of them, and
+   the range has two measured cross-sections (`MOULDS`) since the panels were
+   split into a reeded family and an ogee one. It ran on `panel2` alone. */
+for (const [band, colour, detail] of [['dark reed ', 'rb-0097d', 'panel2'],
+                                      ['light reed', 'rb-9016d', 'panel2'],
+                                      ['dark ogee ', 'rb-0097d', 'panel2o'],
+                                      ['light ogee', 'rb-9016d', 'panel2o']]) {
+  await draw({ ...base, colour, handle: 'none', detail });
   const spec = await p.evaluate(() => {
     const svg = document.querySelector('#stage svg');
     const m = svg.getScreenCTM();
@@ -157,7 +239,13 @@ for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
     /* The two top runs, straight from the drawing. */
     const leaf = svg.querySelector('#leaf rect').getBBox();
     return [...svg.querySelectorAll('[data-detail="panel"] path')]
-      .filter(e => e.getAttribute('fill') === 'url(#mould-t)')
+      /* ⚠ ANY SECTION'S TOP RUN. The gradient ids carry the profile now —
+         `mould-reed-t`, `mould-ogee-t` — because the range has two measured
+         mouldings. Asked for `url(#mould-t)` exactly this matched nothing, and
+         nothing is what it then measured: `spec` came back empty, both figures
+         came out NaN, `Math.abs(NaN - 1) > 0.03` is false, and the check
+         printed `upper NaN% lower NaN%` and exited GREEN. */
+      .filter(e => /^url\(#mould-[a-z]+-t\)$/.test(e.getAttribute('fill') || ''))
       .map(e => {
         const r = e.getBBox();
         const x = r.x + r.width * 0.5;           // mid-run, clear of both mitres
@@ -178,6 +266,16 @@ for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
       });
   });
   const lum = await shoot();
+  /* ⚠ AND IT SAYS SO WHEN IT FINDS NOTHING. It measured two panels and then
+     silently measured none the moment the selector above stopped matching. An
+     instrument that cannot find its subject has to be LOUDER than one that
+     finds it and disagrees, not quieter — see §7's fourth rule. */
+  if (spec.length < 2) {
+    faults++;
+    console.log(`  ${band}  found ${spec.length} moulded panels, not 2 — `
+              + 'this check measured nothing');
+    continue;
+  }
   const [up, lo] = spec.map(s => {
     const run = s.run.map(lum);
     const peak = run.indexOf(Math.max(...run));      // where the bead is brightest
