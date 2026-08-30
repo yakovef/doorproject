@@ -956,8 +956,21 @@ for (const v of VIEWS) {
        the door most people buy. That is a product consequence of a product
        decision, not a bug — recorded in CLAUDE.md rather than worked around —
        and this step now runs on a door where the button genuinely exists. */
+    /* ⚠ AND `s=wide` BECAME `s=extra2` ON 30.8.2026, FOR THE SAME REASON ONE
+       LEVEL ON. The size list is two families of three bands now, and the
+       merged חריגה is the MIDPOINT of the רחבה and גבוהה it replaces — so its
+       leaf is 925 mm where רחבה's was 1000, and `ron` (a 900 mm bar) no longer
+       turns on it. Swept after the change: `barblack` alone rotates on חריגה,
+       and `ella`, `nitzan`, `ron` and `barblack` on חריגה שנייה. Nothing
+       rotates on a standard door or a plain דו כנפי, which has been true since
+       the Shiran was withdrawn.
+       ⚠ WRITTEN AS THE LIVE ID, NOT THE ALIAS. `s=wide` still resolves —
+       `SIZE_ALIAS` points it at `extra1` — so this link would have gone on
+       loading a real door and waiting thirty seconds for a button that is
+       correctly hidden. An alias keeps a CUSTOMER's link working; a test
+       should name the thing it means. */
     await p.goto(`file://${process.cwd()}/index.html`
-               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=panel&s=wide&h=right-in'
+               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=panel&s=extra2&h=right-in'
                /* ⚠ `d=panel`: a square light always takes a bottom panel now
                   (Peretz), so `d=plain` here arrives REPAIRED — and this step
                   compares the screen after a drag against a fresh load of its
@@ -1121,6 +1134,7 @@ for (const v of VIEWS) {
      because a sidelight is far wider than a narrow leaf and the wall it leaves
      on a 320 px phone is the case that goes wrong. */
   {
+    const TAP = 44;                       // the tap floor, as everywhere else
     const leafHeight = async q => {
       await p.goto(`file://${process.cwd()}/index.html?${q}`);
       await p.waitForTimeout(350);
@@ -1150,7 +1164,10 @@ for (const v of VIEWS) {
         if (gb.hidden) return null;
         const g = gb.getBoundingClientRect();
         const f = document.querySelector('.door-svg #frame').getBoundingClientRect();
-        return { g: [g.x, g.x + g.width, g.width], f: [f.x, f.x + f.width] };
+        const cs = getComputedStyle(gb);
+        const pad = parseFloat(cs.paddingInlineStart) + parseFloat(cs.paddingInlineEnd);
+        return { g: [g.x, g.x + g.width, g.width], f: [f.x, f.x + f.width],
+                 floor: 44 + pad };
       });
       if (!m) { fault(v.name, `no grip controls on a ${size} door carrying a pull`); continue; }
       /* Half a pixel of slack: these are laid out from a measured `--wall` and
@@ -1161,10 +1178,29 @@ for (const v of VIEWS) {
                     + `${Math.round(m.f[0])}..${Math.round(m.f[1])}`);
       }
       /* And they have to stay wide enough to be a control rather than a
-         sliver, which is the other way a measured width can go wrong. */
-      if (m.g[2] < 56) {
-        fault(v.name, `the grip controls are ${Math.round(m.g[2])} px wide on ${size}`);
+         sliver, which is the other way a measured width can go wrong.
+
+         ⚠ THE FLOOR IS DERIVED FROM THE BUTTON, NOT PICKED. It was a literal
+         56, and 56 is the wrong number: the bar carries its own padding on
+         both sides, so a 56 px bar holds a 40 px button — under the 44 px tap
+         floor this file enforces everywhere else. Two statements of one
+         quantity, disagreeing, which is CLAUDE.md §5.10. The bar's real floor
+         is 44 plus its padding, read off the element rather than assumed, so
+         changing the padding cannot silently lower the bar this check will
+         accept. Equal-or-stronger: on a phone the padding is 6, so the floor
+         is 56 as before; above 1100 it is 8 and the floor rises to 60. */
+      if (m.g[2] < m.floor) {
+        fault(v.name, `the grip controls are ${Math.round(m.g[2])} px wide on ${size}, `
+                    + `and ${Math.round(m.floor)} is the floor `
+                    + `(a ${TAP}px button inside ${Math.round((m.floor - TAP) / 2)}px of padding)`);
       }
+      /* ⚠ AND IT IS THE BAR'S INNER WIDTH THAT IS MEASURED, NOT THE BUTTONS.
+         Measuring the buttons directly reads better and is a check that goes
+         DEAD: `#grip-rot` is hidden on a door whose grip cannot turn and
+         `#grip-home` on a door nobody has dragged, so on most states there is
+         nothing to measure and the loop passes by finding zero buttons —
+         §5.15's exact failure. The bar's inner width is the same question in
+         a form that always has an answer. */
     }
     if (!faults) console.log('  the door keeps its size when it gains a handle, '
                            + 'and the controls stand clear of it');

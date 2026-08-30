@@ -872,56 +872,85 @@
       mult: 1,
       band: { he: "עד 98 × 203 ס״מ", en: "up to 98 × 203 cm", ru: "до 98 × 203 см" }
     },
-    wide: {
-      id: "wide",
-      he: "רחבה",
-      en: "Wide",
-      ru: "Широкая",
-      w: 1100,
-      h: 2100,
+    extra1: {
+      id: "extra1",
+      he: "חריגה",
+      en: "Oversize",
+      ru: "Увеличенная",
+      w: 1025,
+      h: 2250,
       mult: 1.25,
       band: { he: "עד 120 × 240 ס״מ", en: "up to 120 × 240 cm", ru: "до 120 × 240 см" }
     },
-    tall: {
-      id: "tall",
-      he: "גבוהה",
-      en: "Tall",
-      ru: "Высокая",
-      w: 950,
+    extra2: {
+      id: "extra2",
+      he: "חריגה שנייה",
+      en: "Second oversize",
+      ru: "Вторая увеличенная",
+      w: 1200,
       h: 2400,
-      mult: 1.25,
-      band: { he: "עד 120 × 240 ס״מ", en: "up to 120 × 240 cm", ru: "до 120 × 240 см" }
+      mult: 1.5,
+      band: { he: "מעל 120 × 240 ס״מ", en: "over 120 × 240 cm", ru: "свыше 120 × 240 см" }
     },
+    /* ⚠ THE ID STAYS `half` THOUGH THE NAME IS NOW דו כנפי. An id is a public
+       wire format and a display name is not (CLAUDE.md §1) — links and codes in
+       customers' WhatsApp histories carry `s=half`, and renaming it to buy a
+       tidier key would break every one of them for nothing.
+       ⚠ AND THE NAME AND THE DRAWING DO NOT QUITE AGREE, which is written down
+       rather than papered over: Peretz and the owner both say דו כנפי, and what
+       this table draws is a main leaf with a 400 mm FIXED leaf beside it — a
+       דלת וחצי. If his דו כנפי is two EQUAL leaves then the drawing is wrong,
+       not just the label, and that is a bigger fix than a string.
+       `ASK-PERETZ.md` §0h asks him. */
     half: {
       id: "half",
-      he: "דלת וחצי",
-      en: "Leaf and half",
-      ru: "Полуторная",
+      he: "דו כנפי",
+      en: "Double",
+      ru: "Двустворчатая",
       w: 950,
       h: 2100,
       side: 400,
       mult: 2,
       band: { he: "שתי כנפיים", en: "Two leaves", ru: "Две створки" }
     },
-    /* ⚠ APPENDED, AND THAT IS WHY IT IS LAST. Peretz's "double extra
-       (door>120x240)" at +50%. `encodeCode` packs the INDEX of this list, so a
-       new entry at the END leaves every existing index where it was and costs no
-       `VERSION` bump; inserting it in size order — between `tall` and `half`,
-       where it belongs visually — would have moved `half` and `sidelight` by one
-       and quietly repointed every code ever written. The choices panel can
-       order tiles however it likes; this list is a wire format. */
-    xl: {
-      id: "xl",
-      he: "רחבה וגבוהה",
-      en: "Extra large",
-      ru: "Широкая и высокая",
+    halfextra1: {
+      id: "halfextra1",
+      he: "דו כנפי — חריגה",
+      en: "Double, oversize",
+      ru: "Двустворчатая, увеличенная",
+      w: 1025,
+      h: 2250,
+      side: 400,
+      mult: 2.5,
+      band: {
+        he: "שתי כנפיים, פתח חריג",
+        en: "Two leaves, oversize opening",
+        ru: "Две створки, увеличенный проём"
+      }
+    },
+    halfextra2: {
+      id: "halfextra2",
+      he: "דו כנפי — חריגה שנייה",
+      en: "Double, second oversize",
+      ru: "Двустворчатая, вторая увеличенная",
       w: 1200,
       h: 2400,
-      mult: 1.5,
-      band: { he: "מעל 120 × 240 ס״מ", en: "over 120 × 240 cm", ru: "свыше 120 × 240 см" }
+      side: 400,
+      mult: 3,
+      band: {
+        he: "שתי כנפיים, פתח חריג מאוד",
+        en: "Two leaves, very large opening",
+        ru: "Две створки, очень большой проём"
+      }
     }
   };
-  var SIZE_ALIAS = { narrow: "standard", sidelight: "half" };
+  var SIZE_ALIAS = {
+    narrow: "standard",
+    sidelight: "half",
+    wide: "extra1",
+    tall: "extra1",
+    xl: "extra2"
+  };
   var COLOURS = [
     /* dark */
     { id: "rb-9005d", ral: "9005D", hex: "#1D1A18", he: "שחור", en: "Black", ru: "Чёрный", aliases: ["ral-9005"] },
@@ -7315,7 +7344,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 20;
+  var VERSION = 21;
   var DEFAULTS = {
     /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
        Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the

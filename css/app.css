@@ -1358,14 +1358,28 @@ svg { direction: ltr; }
      than a narrow leaf — and again with every viewport, so a hand-picked
      width fits a standard leaf on a laptop and lands on the frame on a phone.
      The fallback is for the instant before the first paint. */
-  inset-inline-start: 8px;
+  inset-inline-start: var(--grip-inset, 8px);
   /* Above 1100 the strip is reserved, so the floor is guaranteed rather than
-     hoped for: `--grip-strip` minus this element's own 8 px inset and 20 px of
+     hoped for: `--grip-strip` minus this element's own inset and 20 px of
      breathing room is the width, and `--wall-gap` only widens it when the door
      leaves more wall than the strip reserved. Below 1100 `--grip-strip` is 0
-     and the old measured behaviour is unchanged. */
+     and the width is whatever wall the door leaves.
+
+     ⚠ AND BELOW 1100 THE BREATHING ROOM YIELDS BEFORE THE CONTROL DOES.
+     The 20 px gap between this card and the casing is comfort; 56 px of bar is
+     the audit's floor and a thumb's. On the widest door in the range at 360 px
+     the wall is **72.4 px** — the narrowest this catalogue can produce — and
+     20 + 8 left 52, under the floor. Found by sweeping every size against
+     twelve widths rather than the audit's eight: 360 is not one of the eight,
+     which is this file's "go and find the third case" earning its keep for the
+     third time.
+     So on a phone the gap is 12 and the inset 4, which buys 12 px and puts the
+     worst case at 64 with 8 px still clear of the door. Above 1100 nothing
+     changes: the reserved strip makes both moot. */
+  --grip-gap: 20px;
   inline-size: min(
-    max(calc(var(--grip-strip) - 28px), calc(var(--wall-gap, 9.5rem) - 20px)),
+    max(calc(var(--grip-strip) - var(--grip-inset, 8px) - var(--grip-gap)),
+        calc(var(--wall-gap, 9.5rem) - var(--grip-gap))),
     9.5rem);
   inset-block-start: 50%;
   transform: translateY(-50%);
@@ -1377,6 +1391,21 @@ svg { direction: ltr; }
   border-radius: var(--r-card, 14px);
   padding: 8px;
   box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+}
+/* ⚠ THE PHONE'S TIGHTER FIGURES, AND THEY GO AFTER THE RULE THEY OVERRIDE.
+   A media query adds no specificity (CLAUDE.md §8, three bruises), so this
+   block sits below `.grip-bar` rather than above it. Below 1100 there is no
+   reserved strip and the bar lives on whatever wall the widest door leaves —
+   72.4 px at its worst, measured across every size at twelve widths. */
+@media (max-width: 1099px) {
+  /* ⚠ AND THE PADDING YIELDS TOO, WHICH IS WHERE THE REAL FLOOR IS. The bar's
+     width is not the constraint a thumb cares about — the BUTTON inside it is,
+     and that is the bar less twice this padding. At 8 px a 60 px bar gives
+     exactly 44, the tap floor, with nothing to spare; at 6 px it gives 48.
+     Two statements of one quantity, and the audit's own 56 px bar floor was
+     the lenient one: it would have passed a 40 px button. That check is
+     derived from this padding now rather than picked. */
+  .grip-bar { --grip-inset: 4px; --grip-gap: 12px; padding: 6px; }
 }
 .grip-bar__hint {
   font-size: .72rem; color: var(--ink-2);
