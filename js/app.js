@@ -659,6 +659,54 @@ function init() {
     window.addEventListener('resize', fitStage);
   }
 
+  /* ── THE PANEL SAYS WHEN THERE IS MORE OF IT ─────────────────────────
+     ⚠ ABOVE 1100 THE PAGE DOES NOT SCROLL AND THE PANEL DOES, and nothing on
+     screen said so. `.layout` is `overflow: hidden` up there — one screen,
+     two columns, each scrolling inside itself — so the window has no
+     scrollbar, and on a platform with overlay scrollbars the column has no
+     visible one either. Measured driving the flow forward at 1440x900: the
+     lock step hides **599 px** below the fold, the glass step 543, the grip
+     step 393. Three of eight steps hide more than half a screen of the thing
+     the step is FOR, and the only hint is that the list happens to end in a
+     cut-off row.
+
+     The cue is the device this project already chose for exactly this
+     question — the 18 px `mask` fade on the navigator, added when the row of
+     circles was reported as *"cut at the edge with no sign there is more of
+     it"*. Same idiom, one screen down.
+
+     ⚠ AND IT IS CONDITIONAL, WHICH THE RAIL'S IS NOT. The rail overflows at
+     every width this app has, so its fade is permanent and honest. A step
+     panel does not: `colour` and `mk` fit at 1440 with room to spare, and a
+     permanent fade there would promise content that is not below it. So the
+     attribute is set from the panel's own numbers.
+
+     ⚠ AND IT IS READ IN A rAF, NOT IN THE SCROLL HANDLER. `scrollHeight` and
+     `clientHeight` force layout, and doing that on every scroll event of a
+     list of sixty swatches is the shape of jank this project measures with
+     `npm run latency`. One frame, coalesced. */
+  const panelEl = $('.panel--choose');
+  if (panelEl) {
+    let queued = false;
+    const readMore = () => {
+      queued = false;
+      const more = panelEl.scrollHeight - panelEl.clientHeight - panelEl.scrollTop;
+      /* 8 px of slack: sub-pixel layout leaves a pixel or two of "overflow"
+         on a panel that is visibly complete, and a fade under a finished list
+         is the same lie as no fade under an unfinished one. */
+      if (more > 8) panelEl.setAttribute('data-more', '');
+      else panelEl.removeAttribute('data-more');
+    };
+    markMore = () => {
+      if (queued) return;
+      queued = true;
+      (window.requestAnimationFrame || setTimeout)(readMore);
+    };
+    panelEl.addEventListener('scroll', markMore, { passive: true });
+    window.addEventListener('resize', markMore);
+    markMore();
+  }
+
   /* The dock's `IntersectionObserver` was here — it hid a fixed price-and-send
      bar once the real card came into view. Both are gone: the price is on the
      wall and the card is inside the summary step, so there is nothing to
@@ -795,6 +843,12 @@ function init() {
  * Guarded: with no `IntersectionObserver` every tile is drawn once, up front —
  * slow on an old browser, still correct. Same shape as the dock's guard.
  */
+/* Re-read whether the choices panel has more below the fold. Assigned in
+   `init` once the panel exists; a no-op before that and in `?bare=1`, where
+   there is no panel at all. Called from `goStep` too, because a step change
+   replaces the whole contents and the old answer is about the old step. */
+let markMore = () => {};
+
 let worksObserver = null;
 
 function buildWorks() {
@@ -1702,6 +1756,7 @@ function goStep(key, focus = true) {
   if (slot && send && send.parentElement !== slot) slot.appendChild(send);
 
   placeSend();
+  markMore();
 
   markSteps();
 

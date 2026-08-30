@@ -1861,6 +1861,32 @@ how it got there. Detail lives in the section it belongs to.
   clears 44 px, and that its sentence equals `handingWords()` **to the
   character**. Falsified both ways: a different phrasing and a deleted row
   each fail every viewport.
+- **⚠ ITEM 3: THE PANEL SAYS WHEN THERE IS MORE OF IT.** `UX-FINDINGS` §4.2.
+  Above 1100 px `.layout` is `overflow: hidden` — one screen, two columns,
+  each scrolling inside itself — so the WINDOW has no scrollbar and, on a
+  platform with overlay scrollbars, neither does the column. Re-measured at
+  1440×900 driving forward: **lock hides 599 px, glass 543, grip 393**. Three
+  of the eight question steps hide more than half a screen of the thing the
+  step is for.
+  The cue is the device this project already chose for this question one
+  screen up — the 18 px `mask` fade on the navigator, added when the row of
+  circles was reported as *"cut at the edge with no sign there is more of
+  it"*.
+  ⚠ **IT SITS ABOVE THE FOOT, NOT ON THE PANEL.** A `mask-image` on the scroll
+  container fades its bottom edge, and up here the bottom edge IS the sticky
+  foot — so the obvious version fades out the way forward, and on the summary
+  the send button. It is a pseudo-element on the foot's leading edge instead.
+  ⚠ **AND IT IS CONDITIONAL, WHICH THE RAIL'S IS NOT.** Nine circles overflow
+  at every width, so that fade is permanent and honest; `colour` and `mk` fit
+  with room to spare, and a fade under a finished list promises content that
+  is not there. `data-more` is set from the panel's own `scrollHeight` in a
+  rAF — reading it in the scroll handler forces layout on every frame of a
+  sixty-swatch list, which is the shape `npm run latency` exists to catch.
+  ⚠ **A CONDITIONAL CUE HAS TWO WAYS TO LIE AND THE AUDIT ASSERTS BOTH** —
+  absent over hidden content, and present over none. The second would never be
+  reported from outside: nobody writes in to say a gradient promised them
+  options that were not there. Falsified in both directions (never set: four
+  faults at `cusp`; always set: `colour` and `mk` at `wide` and `wide-short`).
 - **⚠ TWO CORRECTIONS TO THE FINISH AXIS, 31.8.2026 — AND A THIRD FITTING THAT
   WAS FOLLOWING NOTHING AT ALL.** Owner, in his words: *"when the pirzul
   changes the keyhole changes too, and the color of the bell can only be

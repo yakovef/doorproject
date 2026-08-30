@@ -622,6 +622,39 @@ for (const v of VIEWS) {
             + 'screen — a customer sees the question and nothing to answer it with');
         }
       }
+
+      /* ── AND THE CUE AGREES WITH THE OVERFLOW ─────────────────────────
+         Above 1100 the page does not scroll and the panel does, so the fade
+         over the foot is the only thing saying there is more of the step.
+         It is CONDITIONAL, and a conditional cue has two ways to lie: absent
+         over hidden content, or present over none. Both are faults here, and
+         the second is the one that would never be reported from outside —
+         nobody writes in to say a gradient promised them options that were
+         not there.
+
+         Read from the panel's own numbers, so this cannot agree with the page
+         by sharing its arithmetic: `data-more` is set in `js/app.js`, and
+         what is compared against it is `scrollHeight - clientHeight -
+         scrollTop` measured here. */
+      const cue = await p.evaluate(() => {
+        const panel = document.querySelector('.panel--choose');
+        if (!panel) return null;
+        return {
+          wide: innerWidth >= 1100,
+          more: Math.round(panel.scrollHeight - panel.clientHeight - panel.scrollTop),
+          flag: panel.hasAttribute('data-more'),
+        };
+      });
+      if (cue && cue.wide) {
+        if (cue.more > 8 && !cue.flag) {
+          fault(v.name, `step "${k}": ${cue.more} px of the panel is below the `
+            + 'fold and nothing on screen says so');
+        }
+        if (cue.more <= 8 && cue.flag) {
+          fault(v.name, `step "${k}": the panel shows a "more below" fade over `
+            + `${cue.more} px of nothing`);
+        }
+      }
     }
     await p.click('.steps__step');          // back to step 01 for the walk below
     await p.waitForTimeout(120);

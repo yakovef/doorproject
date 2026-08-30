@@ -8358,6 +8358,24 @@ ${body}
     } else {
       window.addEventListener("resize", fitStage);
     }
+    const panelEl = $(".panel--choose");
+    if (panelEl) {
+      let queued = false;
+      const readMore = () => {
+        queued = false;
+        const more = panelEl.scrollHeight - panelEl.clientHeight - panelEl.scrollTop;
+        if (more > 8) panelEl.setAttribute("data-more", "");
+        else panelEl.removeAttribute("data-more");
+      };
+      markMore = () => {
+        if (queued) return;
+        queued = true;
+        (window.requestAnimationFrame || setTimeout)(readMore);
+      };
+      panelEl.addEventListener("scroll", markMore, { passive: true });
+      window.addEventListener("resize", markMore);
+      markMore();
+    }
     paint();
     if (document.documentElement.classList.contains("is-sheet")) {
       $(".layout")?.remove();
@@ -8379,6 +8397,8 @@ ${body}
       window.matchMedia("(min-width: 1100px)").addEventListener("change", placeSend);
     }
   }
+  var markMore = () => {
+  };
   var worksObserver = null;
   function buildWorks() {
     const grid = $("#works-grid");
@@ -8851,6 +8871,7 @@ ${body}
     const slot = $("#sum-slot"), send = document.querySelector(".panel--send");
     if (slot && send && send.parentElement !== slot) slot.appendChild(send);
     placeSend();
+    markMore();
     markSteps();
     if (key === SUMMARY.key && !revealed && focus) {
       revealed = true;

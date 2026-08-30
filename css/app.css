@@ -2842,6 +2842,36 @@ html.is-live .wa__off { display: none; }
     background: var(--surface);
   }
   .panel--choose { padding-block-end: 0; }
+
+  /* ── AND WHEN THERE IS MORE BELOW, THE FOOT SAYS SO ─────────────────
+     ⚠ THE PAGE DOES NOT SCROLL UP HERE AND THE PANEL DOES. `.layout` is
+     `overflow: hidden` above 1100 — one screen, two columns, each scrolling
+     inside itself — so the window has no scrollbar, and on a platform with
+     overlay scrollbars neither does the column. Measured at 1440x900 driving
+     the flow forward: the lock step hides 599 px, glass 543, grip 393. Three
+     of the eight question steps hide more than half a screen of the thing the
+     step is FOR.
+
+     Same device as the navigator's, which was added for the same report one
+     screen up: a soft fade saying "there is more this way".
+
+     ⚠ IT SITS ABOVE THE FOOT, NOT ON THE PANEL. A `mask-image` on the scroll
+     container fades its BOTTOM EDGE — and the bottom edge up here is the
+     sticky foot, so the obvious version fades out the way forward and, on the
+     summary, the send button. The gradient is a pseudo-element riding on top
+     of the foot's own leading edge instead, painting the strip of list that
+     is about to disappear under it.
+
+     ⚠ AND IT IS CONDITIONAL: `[data-more]` is set from the panel's own
+     scrollHeight in `js/app.js`. The rail's fade is permanent because nine
+     circles overflow at every width; a step panel does not, and a fade under
+     a finished list promises content that is not there. */
+  .panel--choose[data-more] .sect__foot::before {
+    content: ''; position: absolute; inset-inline: 0;
+    inset-block-end: 100%; block-size: 26px;
+    background: linear-gradient(to top, var(--surface), transparent);
+    pointer-events: none;
+  }
 }
 
 /* `.btn--undo` and its `is-off` twin are GONE. Undo is two icon circles now —
