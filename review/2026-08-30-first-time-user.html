@@ -184,10 +184,21 @@ figcaption { font-family:var(--f-mono); font-size:.7rem; color:var(--ink-3);
     <strong>Zero of the nine render any visible text.</strong>
   </p>
   <p>
-    And the rail is a horizontal scroller that gives no sign of being one: the track is
-    310 px wide holding 428 px of icons, so <strong>three of the nine steps are off-screen
-    at every desktop size I tried</strong>, with no arrow, no fade, no scrollbar. I could
-    not tell how long this was going to take.
+    And the rail is a horizontal scroller: the track is 310 px wide holding 428 px of icons,
+    so <strong>three of the nine steps are off-screen at every desktop size I tried</strong>.
+    There <em>is</em> an affordance — an 18 px <code>mask-image</code> fade at each end, added
+    deliberately for exactly this complaint — but at 18 px against a 44 px circle it reads as
+    "this icon is clipped," not as "there are three more questions this way." I could not tell
+    how long this was going to take.
+  </p>
+  <p style="background:var(--warn-bg);border:1px solid var(--warn);border-radius:4px;padding:14px 16px">
+    <strong style="color:var(--warn)">And the obvious fix has already been tried and measured
+    out.</strong> <code>js/app.js</code> records why the labels went: the step NUMBER duplicated
+    the <code>NN / 08</code> counter and cost 24 px of a phone's most expensive strip, and the
+    TITLE only ever showed above 1100 px, where nine names in a 310 px column measured
+    <code>scrollWidth</code> 429 — nine truncated words. So "just label them" is not available
+    in one row. Nine circles at the 44 px tap floor need 428 px and the card is capped at 360.
+    The recommendation below has to break that constraint rather than ignore it.
   </p>
 
   <figure>
@@ -219,12 +230,15 @@ figcaption { font-family:var(--f-mono); font-size:.7rem; color:var(--ink-3);
     counter and the navigation disagree about how big this is.
   </p>
   <div class="fix">
-    <b>Fix</b>
-    <p>Put the word under the icon. If nine labels will not fit, show the current step's
-    name in full with its neighbours abbreviated, and let the rail wrap to two rows rather
-    than scroll — a wrapped rail shows everything at once and needs no affordance. Then make
-    the counter agree with the rail, or drop it, since a named current step already says
-    where you are.</p>
+    <b>Fix — the one option the measurements have not already ruled out</b>
+    <p>Let the rail <strong>wrap to two rows</strong> instead of scrolling. Five icons plus
+    four is roughly 5 × 64 px = 320 px per row, which fits the 360 px card where one row of
+    nine (428 px) never can — and a wrapped rail shows all nine at once, so it needs no fade
+    and no scroll affordance at all. That also buys back the room for a short label under each
+    circle, which is the thing that was measured out only because one row could not hold it.
+    Measure the two-row height against the panel budget before committing: this trades
+    horizontal overflow for vertical, and vertical is the axis the panel is already short of.
+    Then make <code>NN / 08</code> agree with the rail, which holds nine.</p>
   </div>
 </div>
 
@@ -349,12 +363,17 @@ figcaption { font-family:var(--f-mono); font-size:.7rem; color:var(--ink-3);
     <span class="find__where">throughout</span>
   </div>
   <h3>Four smaller things that each cost a second of confusion</h3>
-  <p>
-    <strong>The step heading looks like a text box.</strong> <span class="he">מנעול</span> and
-    <span class="he">סיכום</span> render inside a rounded gold-bordered rectangle — that is a
-    focus ring on the heading, and it reads as an input I am supposed to type into. This repo
-    has already learned this exact lesson once, on the grip handle: use
-    <code>:focus-visible</code>, not <code>:focus</code>.
+  <p style="background:var(--crit-bg);border:1px solid var(--crit);border-radius:4px;padding:14px 16px">
+    <strong style="color:var(--crit)">Withdrawn — this was my instrument's fault, not the
+    page's.</strong> I reported that the step heading renders inside a gold box that reads as a
+    text input. It does not, for a real user. The stylesheet already has
+    <code>.sect__title:focus { outline: none }</code> with the ring only on
+    <code>:focus-visible</code> — correct. My probe drove the page with a scripted
+    <code>el.click()</code>, which dispatches no trusted pointer event, so the browser
+    attributed <code>goStep</code>'s programmatic focus to the keyboard and drew the ring.
+    Re-tested three ways: <strong>real mouse click → <code>outline: none</code></strong>;
+    real keyboard → ring, as it should; scripted click → ring, which is what I saw. The page
+    was right and the harness was wrong.
   </p>
   <p>
     <strong>Two unlabelled grey circles sit on the artwork.</strong> Undo and redo, correctly
@@ -384,9 +403,9 @@ figcaption { font-family:var(--f-mono); font-size:.7rem; color:var(--ink-3);
     The flow currently ends in an empty bar with the conversion below the fold.</span>
     <span class="next__c">small</span></div>
   <div class="next__row"><span class="next__n">02</span>
-    <span class="next__t"><b>Label the nine steps and stop the rail scrolling.</b> Words under
-    the icons; wrap to two rows so all nine are visible at once.</span>
-    <span class="next__c">small</span></div>
+    <span class="next__t"><b>Wrap the step rail to two rows and label the icons.</b> Two rows fit
+    the 360 px card where one row of nine cannot — the constraint that forced the labels out.</span>
+    <span class="next__c">medium</span></div>
   <div class="next__row"><span class="next__n">03</span>
     <span class="next__t"><b>Make handing an explicit choice.</b> No silent default on the one
     decision the project itself says costs real money.</span>
