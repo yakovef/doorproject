@@ -1743,11 +1743,20 @@ how it got there. Detail lives in the section it belongs to.
   NINE circles (eight steps and the summary) and it overflowed its space by
   **66 px on a phone and 118 px on the desktop panel — about 2.7 circles**, so
   the last of them were sliced down their middles at the edge. The sticky
-  background was opaque and was never the fault; the slice was. Gaps to zero
-  everywhere, and on a FINE pointer only the circle comes down to 30 px — the
-  44 px floor is a floor for thumbs, not for cursors, and 30 is still well over
-  the 24 px WCAG 2.5.8 minimum that applies to a mouse. Measured after:
-  390/390 and 310/310, nothing hidden.
+  background was opaque and was never the fault; the slice was. The gaps and
+  the 2 px each step carried come out — 32 px of the desktop's 118, and enough
+  to close the phone on its own.
+  ⚠ **And the other half was tried, refused by the audit, and backed out.** The
+  circles were also shrunk to 30 px wherever a mouse does the aiming, on the
+  reasoning that 44 is a floor for thumbs and WCAG 2.5.8 asks 24 for a pointer.
+  `npm run audit` rejected it at SIX viewports — `phone`, `phone-s`, `cusp`,
+  `narrow-d`, `laptop`, `wide` — because this project asserts 44 px everywhere
+  on purpose. That assertion is not reinterpretable from inside a stylesheet,
+  so the shrink was reverted rather than argued with. The desktop panel still
+  cannot show nine 44 px circles in 310 px; the row keeps its scroll there and
+  `markSteps` keeps carrying the active step into view. Closing it properly is
+  a decision above CSS — a wider panel, a wrapped row, or a rail that shows the
+  current step with its neighbours — and it is recorded, not guessed at.
   ⚠ **And `08 ⁄ 03` was a puzzle, not a position.** Two zero-padded numerals
   either side of a slash have no reading order a customer can trust — in an RTL
   column the eye takes the left one first, so it read as step eight of three.

@@ -1791,25 +1791,47 @@ svg { direction: ltr; }
    which is opaque and was never the problem — made the slice look like one
    layer sitting on another.
 
-   Scrolling was not the answer to a row of NINE (eight steps and the summary):
-   a table of contents you must drag sideways to read is not one. So the row is
-   made to fit at both ends instead.
+   The row is a table of contents for NINE things (eight steps and the
+   summary), and one you must drag sideways to read is not much of one. So the
+   overflow is taken out of the SPACING — every gap and the 2 px of padding
+   each step carried — which is 32 px of the desktop's 118 and enough to close
+   the phone's 66 on its own.
 
-   ⚠ AND THE 44 px TOUCH FLOOR SURVIVES WHERE FINGERS ARE. On a coarse pointer
-   the circles stay 44 and the room comes out of the gaps and the padding,
-   which is what closed it there. Only on a FINE pointer,
-   where a mouse is doing the aiming, does the circle come down to 30 — still
-   well over the 24 px WCAG 2.5.8 minimum that applies there, and it buys the
-   118 px the desktop panel was short. The floor is a floor for thumbs; it was
-   never a floor for cursors. */
+   ⚠ WHAT IS NOT DONE HERE, AND WHY, IS THE MORE USEFUL HALF. The circles were
+   also shrunk, on a fine pointer only, to buy the rest. The audit refused it
+   at six viewports and the change was backed out — see the block below. The
+   desktop row therefore still scrolls, and closing that properly is a
+   decision above CSS rather than a number to nudge. */
 .steps { gap: 0; }
-@media (max-width: 1099px) { .steps { padding-inline: 8px; } }
-@media (pointer: fine) {
-  /* the 2 px each side is the last 32 px of the 118 — see the measurement */
-  .steps__step { min-inline-size: 34px; padding: 0; }
-  .steps__c    { inline-size: 30px; block-size: 30px; }
-  .steps__g    { inline-size: 15px; block-size: 15px; }
-}
+/* ⚠ AND ON A TOUCH SCREEN THE ROW STILL SCROLLS, BECAUSE NINE 44 px TARGETS
+   DO NOT FIT IN 390 px AND 44 IS NOT NEGOTIABLE. This block first tried to
+   close the phone gap the same way — padding down, let the steps share what
+   is left — and `npm run audit` caught it within the minute: `steps__step:
+   42x44` at 390 and `34x44` at 320, nine times each. 9 x 44 = 396 against a
+   374 px content box is arithmetic, not a layout bug, and the thing that has
+   to give is the ROW's completeness, never the target. So the circles hold
+   their 44, the row keeps its scroll, and the active step is carried into
+   view by `markSteps` (`scrollIntoView`, inline: nearest) so nobody has to
+   drag it. `flex: 0 0 auto` states the floor as a floor: with `1 1 0` the
+   min was being read as a suggestion and the steps came out 2 px under it. */
+/* ⚠ AND THE CIRCLES KEEP THEIR 44 px AT EVERY WIDTH, WHICH IS WHY THIS BLOCK
+   IS SHORTER THAN IT WAS. The first attempt closed the overflow by shrinking
+   the circle to 30 px wherever a mouse was doing the aiming, on the reasoning
+   that the 44 px floor is a floor for thumbs and WCAG 2.5.8 asks only 24 for a
+   pointer. `npm run audit` refused it — and not only on the phone, which was
+   the case being argued about, but at `cusp`, `narrow-d`, `laptop`, `wide` and
+   `wide-short` as well: this project asserts 44 at EVERY viewport, deliberately
+   and everywhere, and that assertion is not mine to reinterpret from inside a
+   CSS file. It was backed out rather than argued with.
+
+   What survives is the part that costs nothing: the gaps and the 2 px of
+   per-step padding, 32 px of the desktop's 118 and enough to close the phone
+   on its own. The desktop panel still cannot show nine 44 px circles in 310 px
+   — that is arithmetic — so the row keeps its scroll there and `markSteps`
+   keeps carrying the active step into view. Fixing the rest needs a decision
+   above CSS: a wider panel, a wrapped row, or a rail that shows the current
+   step with its neighbours instead of all nine. Recorded, not guessed at. */
+.steps__step { padding: 0; }
 /* ⚠ `.steps__l`, `.steps__n` AND `.steps__t` ARE GONE — the number under each
    circle and the title beside it. Both were measured out, not tidied away:
    the number said the same thing as the `NN ⁄ 08` the live step already
