@@ -40,7 +40,41 @@ import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex,
 const FINISH_TONES = {
   steel: ['#E4E7E9', '#C6CBCF', '#9FA5AA', '#80868B', '#99A0A5', '#6A7075', '#F7F9FA'],
   black: ['#5E6165', '#3D4043', '#26282B', '#171819', '#313437', '#0F1011', '#8A8E93'],
-  brass: ['#EFE5CE', '#D9CBA6', '#BCAD86', '#9C8F6C', '#C7BA9B', '#7C7154', '#FDF6E2'],
+  /* ⚠ WARMED 30.8.2026, AND THE FILE SAID "KEEP THE GOLD AS IS" UNTIL THEN.
+     That instruction is in the bronze note below and it was right when it was
+     given — bronze had to stop looking like gold, and moving gold to do it
+     would have been solving the wrong half. Peretz has now looked at gold on
+     its own: *"in the pirzul gold is too white, add yellow."*
+
+     Measured rather than nudged, against peretz-4 — a door carrying a complete
+     set of polished brass, photographed installed. `tools/_brass.mjs`. Three
+     patches (knocker, pull handle, lever and backplate):
+
+         hue        the photograph 46.6 / 48.5 / 46.6      this ramp 43.5
+         saturation 20.5% / 27.7% / 33.6%                  this ramp 28.7%
+
+     ⚠ SO IT IS NOT A DESATURATED METAL, AND A MEDIAN WOULD HAVE SAID IT WAS.
+     Comparing the ramp's median to a patch's median also reported the ramp 23
+     points too BRIGHT, which is not a finding — a designed ramp runs highlight
+     to core on purpose and a patch of photograph is mostly mid-tone. Cut at
+     matching brightness percentiles instead, the mid-tones agree closely and
+     two things do not:
+
+       · the hue is 3-5 degrees short at EVERY brightness. That is the "add
+         yellow", literally, and it is the whole ramp rather than one stop.
+       · the photograph holds saturation 16-26% into its brightest pixels,
+         where this ramp collapsed to 13.8% at the highlight and 10.7% at the
+         specular. On a fitting the size of a keypad the highlight is most of
+         what anybody sees, so a near-colourless highlight IS the "too white".
+
+     Every VALUE is unchanged — the modelling, which is what separates metal
+     from grey plastic, is not what he complained about. Hue goes to 47.5 and
+     saturation rises where the measurement says it collapsed:
+
+         highlight   41.8 / 13.8%  ->  47.5 / 20.1%
+         body        43.5 / 23.5%  ->  47.1 / 25.8%
+         specular    44.4 / 10.7%  ->  48.0 / 13.8%   */
+  brass: ['#EFE5BF', '#D9CDA1', '#BCB084', '#9C9169', '#C7BD95', '#7C7351', '#FDF6DA'],
   /* ⚠ BRONZE IS ITS OWN METAL, AND IT USED TO BORROW BRASS. Reported from
      outside: *"the bronze and the gold pirzul look the same."* They were the
      same — `pz-bronze` and `pz-gold` both carried `tone: 'brass'`, so the two
@@ -383,12 +417,42 @@ const EDGE  = 38;      // 0.045 W — the ramp, not a band
 const HANDLE_AFF   = 1020;  // 0.486 H — the steadiest number in the whole set
 const CYLINDER_AFF = 904;   // 0.1225 W below the lever, on the same axis
 const PEEPHOLE_AFF = 1600;  // 0.762 H
-/* The extra lock sits BELOW the cylinder on the same axis, where a second
-   keyway or a keypad goes on a door that already has its lock at waist height.
-   Far enough down (250 mm) that its body clears the cylinder's escutcheon on
-   every lockset in the range, and high enough to stay well inside the lock
-   stile rather than running into the plinth of a panelled face. */
-const SPECIAL_AFF  = CYLINDER_AFF - 250;
+/**
+ * ⚠ THE EXTRA LOCK IS AT EYE LEVEL, AND IT WAS AT KNEE HEIGHT.
+ *
+ * This was `CYLINDER_AFF - 250` = **654 mm**, on the reasoning that a second
+ * keyway goes below the first. Peretz, 30.8.2026, with four photographs: they
+ * mount at the TOP of the door, around eye level, not down beside the main
+ * keyhole. `research/handles/peretz-1..4.webp`.
+ *
+ * ⚠ DERIVED TWICE, BECAUSE ONE READING OFF A PHONE SNAPSHOT IS NOT A
+ * MEASUREMENT. Every one of these four is shot from below, which foreshortens
+ * the top of the leaf — and the size of that error is visible rather than
+ * guessed at, because each photograph also contains the LEVER, whose height
+ * this file already knows from thirty corpus doors (`HANDLE_AFF`, 1020). The
+ * four read the lever at 990, 894, 843 and 834: the first is honest, the other
+ * three are compressed by 13-18%.
+ *
+ *   1. peretz-1 is the only door showing the keypad AND the peephole, and they
+ *      are 170 mm apart on the leaf's own scale — a short span, so almost no
+ *      differential foreshortening. Anchored on `PEEPHOLE_AFF`: 1600 - 170
+ *      = **1430**.
+ *
+ *   2. Across all four, the fitting sits 0.169-0.198 of leaf height above the
+ *      lever (mean 0.186 = 381 mm raw). Correcting each door by its own lever
+ *      error gives 388, 450, 492, 424 — mean 439, so 1020 + 439 = **1459**.
+ *
+ * 1430 and 1459, on a 2050 mm leaf. The first is taken, because it rests on
+ * two fittings a hand's breadth apart in one frame rather than on a linear
+ * correction applied to a nonlinear distortion. The 29 mm between them is 1.4%
+ * of the leaf and below what anyone can see.
+ *
+ * ⚠ THE BACKSET DID NOT MOVE, AND THAT WAS CHECKED RATHER THAN ASSUMED. All
+ * four put the fitting on the lock stile, on the cylinder's own axis; measured
+ * off the closing edge they run 45-82 mm against `KEYWAY_BACKSET`'s 63. So the
+ * horizontal placement was already right and only the height was wrong.
+ */
+const SPECIAL_AFF  = 1430;
 const PEEPHOLE_R   = 30;    // outer halo; the bright boss inside it is 0.010 W
 /* Hinge heights, 0.144 / 0.504 / 0.857 H, kept as a note rather than as code.
    These doors open inwards, so from the street the hinges are hidden in the
@@ -1061,6 +1125,35 @@ export function render(state) {
      than of its id, so `pz-black` and any later black share one answer. */
   const hwBlack = byId(PIRZUL, state.pirzul).tone === 'black';
 
+  /* ⚠ THE STRIPES FOLLOW THE FINISH, AND WHICH FINISH TOOK DECIDING.
+     Peretz gave two sentences on 30.8.2026 and each one alone is satisfiable:
+
+       *"the אלה and מוט שחור are changing the color of the stripes"*
+       *"pirzul doesnt affect the additional lock, but it does affect the
+        stripes"*
+
+     ⚠ AND THE SECOND REVERSES WHAT HE SAID ON 26.8 — *"it doesnt change the
+     color of the stripes or the pull handles."* The pull-handle half of that
+     still stands; the stripes half does not.
+
+     Taken together they rule out both simple answers. Stripes always following
+     the GRIP means the pirzul does not reach them, against the second
+     sentence. Stripes always following the PIRZUL means a brass אלה beside the
+     standard nickel pirzul draws steel stripes, against the first.
+
+     So: an EXPLICIT choice beats an IMPLIED one. The pirzul is a finish the
+     customer picked on purpose and paid ₪0–₪900 for; a grip's tone is a fact
+     about the product (Ella is brass because Ella is brass). When the pirzul
+     is the standard nickel the customer has expressed no preference, and the
+     stripes take their cue from the ironmongery that is actually on the door.
+     Both of his sentences come out true.
+
+     ⚠ IT IS A THIRD READER OF `FINISH_TONES` AND NOT A THIRD TABLE. The trim
+     on the leaf is the same stock as the bar; giving it a ramp of its own is
+     how the pull handle and the lock furniture came to be painted with each
+     other's metal (see the note above). */
+  const stripeTone = byId(PIRZUL, state.pirzul).tone === 'steel' ? tone : hwTone;
+
   /* SIZES gives the structural OPENING, not the leaf. We were drawing the two
      as the same thing, which made every door too squat: measured across the 20
      works photographs square-on enough to trust, a real leaf runs h/w 2.44
@@ -1554,6 +1647,21 @@ export function render(state) {
          (No backticks in this comment on purpose: it sits inside the one big
          template literal, and a backtick here terminates it — CLAUDE.md §1b,
          four builds.) -->
+    <!-- THE BOUGHT-IN UNIT'S OWN STEEL. A third owner, and it exists because
+         one gradient cannot have two masters: nickel is the PIRZUL's and
+         gripHard is the BAR's, and the extra lock used to borrow the first.
+         Peretz, 30.8.2026: "pirzul doesnt affect the additional lock." A
+         kodan and a kasefet arrive in the finish the manufacturer ships them
+         in, and no choice on this page changes it - so this ramp is a
+         CONSTANT, not a function of state, which is the whole point. -->
+    <linearGradient id="lockUnit" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="${FINISH_TONES.steel[0]}"/>
+      <stop offset="0.16" stop-color="${FINISH_TONES.steel[1]}"/>
+      <stop offset="0.38" stop-color="${FINISH_TONES.steel[2]}"/>
+      <stop offset="0.60" stop-color="${FINISH_TONES.steel[3]}"/>
+      <stop offset="0.80" stop-color="${FINISH_TONES.steel[4]}"/>
+      <stop offset="1"    stop-color="${FINISH_TONES.steel[5]}"/>
+    </linearGradient>
     <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"    stop-color="${hwTone[0]}"/>
       <stop offset="0.16" stop-color="${hwTone[1]}"/>
@@ -2559,7 +2667,7 @@ export function render(state) {
         : ''}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint, detail.perimeter) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
-    ${metalStrips(mainX, y0, leafW, leafH, state, tone, hingeOnLeft)}
+    ${metalStrips(mainX, y0, leafW, leafH, state, stripeTone, hingeOnLeft)}
   </g>
 
   ${detail.classic ? '' : glazing}
@@ -3683,43 +3791,136 @@ export function gripCanRotate(state) {
 }
 
 /**
- * THE EXTRA LOCK ON THE LEAF — a safe lock or a keypad, below the cylinder.
+ * THE EXTRA LOCK ON THE LEAF — a safe lock or a keypad, AT EYE LEVEL.
  *
- * Small, deliberately: both are utilitarian fittings that sit under the lock
- * on a real door, and drawing them large would make a ₪700 option the loudest
- * thing on a ₪3,150 door. Measured against nothing — there is no photograph of
- * either in the corpus, because neither existed in the catalogue until Peretz
- * named them — so the geometry is honest about being conventional rather than
- * measured: a euro-cylinder-width body for the safe lock, a keypad two
- * cylinders tall. If a photograph of one arrives, REALISM.md §6 governs and
- * this is re-read against it.
+ * ⚠ REDRAWN AND MOVED ON 30.8.2026, OFF FOUR PHOTOGRAPHS PERETZ SENT. The
+ * paragraph that stood here said the geometry was "honest about being
+ * conventional rather than measured" and that REALISM.md §6 would govern if a
+ * photograph ever arrived. Four arrived. They are in `research/handles/` as
+ * `peretz-1..4.webp`, and Peretz named which is which: *"kodan is the frey
+ * dorr with panels and horizontal pull handle, the others are the מנעול
+ * כספת."*
+ *
+ * ── WHAT THE PHOTOGRAPHS SAY THEY LOOK LIKE ──────────────────────────
+ *
+ * The invented drawings were wrong about both fittings, and in the KODAN's
+ * case wrong about what the product IS. It was drawn as a digital keypad — a
+ * display bar over a 3x3 grid of nine buttons, 62 x 96, aspect 0.65. What is
+ * on the door is a MECHANICAL push-button lock: a tall pill body with TEN
+ * buttons in two columns of five, and a large turn knob filling the bottom
+ * third. Nothing about it is digital and it is nearly twice as tall as it was
+ * drawn.
+ *
+ *     KODAN    60 x 154 mm    aspect 0.39   (was 62 x 96, aspect 0.65)
+ *     KASEFET  50 x  68 mm    aspect 0.74   (was 62 x  62, aspect 1.00)
+ *
+ * ⚠ AND THE ASPECT IS NOT READ OFF THE PHOTOGRAPH DIRECTLY, because a leaf in
+ * a phone snapshot is not at the model's aspect. Each dimension is a fraction
+ * of the leaf's OWN matching dimension — height against leaf height, width
+ * against leaf width — so a lens that stretches one axis cannot leak into the
+ * other. Done that way, peretz-1's leaf reads 0.485 where the model says
+ * 0.415, which is not distortion: that door is a WIDE one, and at leafW 1000
+ * the fitting's own aspect comes out 0.396 against 0.392 measured in pixels.
+ * Two routes, agreeing to 1%.
+ *
+ * Corroboration from outside the repository, which is the check this kind of
+ * number most needs: a Codelocks CL200 mechanical keypad is 57 x 168 mm. The
+ * measurement is 60 x 154.
+ *
+ * The KASEFET is an upright plate with a small corner radius, four screws one
+ * at each corner, and a single horizontal slot across the middle. Its height
+ * was read on two different doors — peretz-3 and peretz-4, a brass one and a
+ * dark one — and came out 67 mm and 68 mm. That agreement is why the height is
+ * trusted and the width (45 and 55) is given as the mean.
+ *
+ * ── AND THEY GO AT EYE LEVEL, WHICH IS THE BIGGER CHANGE ──────────────
+ *
+ * Peretz: they mount at the TOP of the door, not down beside the main keyhole.
+ * `SPECIAL_AFF` was **654 mm** — knee height — and is **1430 mm**. See the
+ * constant for the two independent derivations that agree to 30 mm.
+ *
+ * ── AND NEITHER TAKES THE פרזול ───────────────────────────────────────
+ *
+ * Peretz, same notes: *"pirzul doesnt affect the additional lock."* Both were
+ * filled with `url(#nickel)`, which is the PIRZUL's gradient — so choosing
+ * gold turned the keypad and the safe lock gold along with everything else. He
+ * is describing the product: these are bought-in units in whatever finish the
+ * manufacturer ships, and the finish a customer pays for covers the ידית, the
+ * צירים, the עינית and the סגר ביטחון.
+ *
+ * ⚠ THEY GET THEIR OWN GRADIENT RATHER THAN A HARD-CODED HEX, and the reason
+ * is this file's own history: `#nickel` once served a pull handle and a lever
+ * at the same time, and each was painted with the other's metal. The fix was
+ * to name every ramp for WHOSE metal it is. `#lockUnit` is a third owner — the
+ * bought-in unit's own steel — so the next fitting added here has to answer
+ * "whose metal is this?" before it can pick a fill.
  *
  * `data-hw="lock"` so `npm run collide` sweeps it with the rest of the lock
  * furniture, and `data-kind` so the sweep can name it when it does collide.
  */
 function specialLockArt(special, cx, cy, dir) {
   if (!special || special.id === 'nospecial') return '';
-  const W = 62, keypadH = 96;
   const x = cx + dir * 0;          // on the cylinder's own axis
+
   if (special.id === 'kasefet') {
+    /* 50 x 68, measured. The corner radius is small — this is a pressed plate,
+       not a moulded body — and the four screws are the thing that identifies
+       it at a glance on all three doors that carry one. */
+    const W = 50, H = 68, r = 5;
+    const l = x - W / 2, t = cy - H / 2;
+    const screw = (sx, sy) => `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="2.6"
+              fill="#000" fill-opacity=".34"/>`;
     return `
     <g data-hw="lock" data-owner="speciallock" data-kind="kasefet">
-      <rect x="${x - W / 2}" y="${cy - W / 2}" width="${W}" height="${W}" rx="7"
-            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
-      <circle cx="${x}" cy="${cy}" r="${W * 0.27}" fill="none"
-              stroke="#000" stroke-opacity=".38" stroke-width="4"/>
-      <circle cx="${x}" cy="${cy}" r="4.5" fill="#000" fill-opacity=".42"/>
+      <rect x="${(l + 2).toFixed(1)}" y="${(t + 3).toFixed(1)}" width="${W}" height="${H}"
+            rx="${r}" fill="#000" opacity=".20"/>
+      <rect x="${l.toFixed(1)}" y="${t.toFixed(1)}" width="${W}" height="${H}" rx="${r}"
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+      ${/* The keyway: one horizontal slot across the middle. On peretz-3 it is
+            a clean letterbox; on peretz-4 the same slot with a shallow nick at
+            its centre. Drawn as the slot, because that is what both share. */''
+       }<rect x="${(x - W * 0.30).toFixed(1)}" y="${(cy - 3).toFixed(1)}"
+            width="${(W * 0.60).toFixed(1)}" height="6" rx="2.5"
+            fill="#000" fill-opacity=".62"/>
+      ${screw(l + 8, t + 8)}${screw(l + W - 8, t + 8)}
+      ${screw(l + 8, t + H - 8)}${screw(l + W - 8, t + H - 8)}
     </g>`;
   }
+
+  /* THE KODAN — a mechanical push-button lock. 60 x 154, a stadium body,
+     ten buttons in two columns of five over the upper 62%, and the turn knob
+     filling the bottom third. */
+  const W = 60, H = 154;
+  const l = x - W / 2, t = cy - H / 2;
+  const colX = [x - W * 0.19, x + W * 0.19];
+  const row0 = t + H * 0.115, rowStep = H * 0.088;
+  const knobCy = t + H * 0.795, knobRy = H * 0.115, knobRx = W * 0.36;
   return `
     <g data-hw="lock" data-owner="speciallock" data-kind="kodan">
-      <rect x="${x - W / 2}" y="${cy - keypadH / 2}" width="${W}" height="${keypadH}" rx="10"
-            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
-      <rect x="${x - W / 2 + 8}" y="${cy - keypadH / 2 + 9}" width="${W - 16}" height="18" rx="3"
-            fill="#000" fill-opacity=".30"/>
-      ${[0, 1, 2].map(r => [0, 1, 2].map(c =>
-        `<circle cx="${x - 15 + c * 15}" cy="${cy - 2 + r * 16}" r="4.2"
-                 fill="#000" fill-opacity=".26"/>`).join('')).join('')}
+      <rect x="${(l + 2).toFixed(1)}" y="${(t + 3).toFixed(1)}" width="${W}" height="${H}"
+            rx="${W / 2}" fill="#000" opacity=".20"/>
+      <rect x="${l.toFixed(1)}" y="${t.toFixed(1)}" width="${W}" height="${H}" rx="${W / 2}"
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+      ${/* Ten buttons, two columns of five. The old drawing had nine in a 3x3
+            grid under a display bar, which is a DIGITAL keypad — a different
+            product, and one this catalogue already sells separately as
+            `digital` at ₪2,700. Drawing the ₪900 one as the ₪2,700 one is the
+            same class of fault as a price for a panel that is not drawn. */''
+       }${[0, 1, 2, 3, 4].map(r => colX.map(bx => `
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep).toFixed(1)}" r="${(W * 0.115).toFixed(1)}"
+                fill="#000" fill-opacity=".07"/>
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep - 1).toFixed(1)}" r="${(W * 0.095).toFixed(1)}"
+                fill="#fff" fill-opacity=".26"/>
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep + 1).toFixed(1)}" r="${(W * 0.075).toFixed(1)}"
+                fill="#000" fill-opacity=".16"/>`).join('')).join('')}
+      ${/* The turn knob: a rounded slab across the foot, proud of the body. */''
+       }<ellipse cx="${x.toFixed(1)}" cy="${(knobCy + 2).toFixed(1)}"
+                 rx="${knobRx.toFixed(1)}" ry="${knobRy.toFixed(1)}" fill="#000" fill-opacity=".22"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${knobCy.toFixed(1)}"
+               rx="${knobRx.toFixed(1)}" ry="${knobRy.toFixed(1)}" fill="url(#lockUnit)"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${(knobCy - knobRy * 0.30).toFixed(1)}"
+               rx="${(knobRx * 0.72).toFixed(1)}" ry="${(knobRy * 0.42).toFixed(1)}"
+               fill="#fff" fill-opacity=".22"/>
     </g>`;
 }
 
@@ -8335,20 +8536,30 @@ export function specialLockGlyph(x) {
     nospecial: `
     <rect x="-52" y="-70" width="104" height="140" rx="6" opacity=".18"/>
     <path d="M-22 0h44" stroke="currentColor" stroke-width="7" fill="none" opacity=".55"/>`,
+    /* ⚠ BOTH REDRAWN 30.8.2026 TO MATCH THE PHOTOGRAPHS, AND THE TILE HAD TO
+       MOVE WITH THE DOOR. A tile showing one fitting while the leaf draws
+       another is §5 items 5 and 6 - nine handles that shared one picture, and
+       three faces that showed a cheaper option's - and the assertion "every
+       option tile draws its own picture" cannot catch it, because all that one
+       asks is whether two TILES differ from each other.
+       Proportions are the drawing's own: kasefet 50 x 68 (0.74), kodan
+       60 x 154 (0.39). See specialLockArt for where those come from. */
     kasefet: `
-    <rect x="-56" y="-64" width="112" height="128" rx="9"/>
-    <rect x="-42" y="-50" width="84" height="100" rx="5" fill="#fff" opacity=".92"/>
-    <circle cx="6" cy="0" r="24" fill="none" stroke="currentColor" stroke-width="8"/>
-    <circle cx="6" cy="0" r="7"/>
-    <path d="M6 -24v-9M6 24v9M-18 0h-9M30 0h9" stroke="currentColor"
-          stroke-width="6" fill="none"/>
-    <rect x="-36" y="-6" width="9" height="12" rx="2"/>`,
+    <rect x="-45" y="-61" width="90" height="122" rx="9"/>
+    <rect x="-34" y="-46" width="68" height="92" rx="5" fill="#fff" opacity=".92"/>
+    ${/* the slot */''}<rect x="-20" y="-6" width="40" height="12" rx="5"/>
+    ${/* four screws, one at each corner - what identifies it at a glance */''
+     }${[[-23, -35], [23, -35], [-23, 35], [23, 35]]
+        .map(([sx, sy]) => `<circle cx="${sx}" cy="${sy}" r="5"/>`).join('')}`,
     kodan: `
-    <rect x="-46" y="-72" width="92" height="144" rx="14"/>
-    <rect x="-34" y="-58" width="68" height="26" rx="4" fill="#fff" opacity=".92"/>
-    ${[0, 1, 2].map(r => [0, 1, 2].map(c =>
-      `<circle cx="${-22 + c * 22}" cy="${-14 + r * 24}" r="7" fill="#fff" opacity=".92"/>`)
-      .join('')).join('')}`,
+    <rect x="-36" y="-91" width="72" height="182" rx="36"/>
+    <rect x="-27" y="-82" width="54" height="164" rx="27" fill="#fff" opacity=".92"/>
+    ${/* ten buttons in two columns of five - NOT the nine-button digital grid
+          this used to draw, which is a different product at three times the
+          price and is already sold separately as `digital` */''
+     }${[0, 1, 2, 3, 4].map(r => [-13, 13].map(bx =>
+        `<circle cx="${bx}" cy="${-70 + r * 27}" r="8"/>`).join('')).join('')}
+    ${/* the turn knob */''}<ellipse cx="0" cy="54" rx="21" ry="20"/>`,
   }[x.id] || '';
   return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>

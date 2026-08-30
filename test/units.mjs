@@ -1710,6 +1710,126 @@ group('the finish reaches every piece of metal');
     ok(mid({ ...base, handle: brassGrip.id }) !== mid({ ...base, handle: 'idan' }),
        `${brassGrip.id} draws in the same metal as a brushed-nickel grip`);
   }
+
+  /* ── WHAT THE FINISH REACHES, AND WHAT IT MUST NOT ──────────────────
+     Peretz stated this as law on 30.8.2026, in two sentences:
+
+       *"the אלה and מוט שחור are changing the color of the stripes"*
+       *"pirzul doesnt affect the additional lock, but it does affect the
+        stripes"*
+
+     ⚠ AND THE FIRST VERSION OF THIS BLOCK COULD NOT HAVE CAUGHT THE BUG IT WAS
+     WRITTEN FOR, WHICH IS §5 ITEM 14 EXACTLY. It compared each fitting's
+     MARKUP between two pirzul values. But a fitting is painted
+     `fill="url(#nickel)"` and it is the GRADIENT that moves, not the fill — so
+     the lever's markup is byte-identical under nickel and gold, and so was the
+     keypad's back when it still borrowed the lever's gradient. Every
+     special-lock check passed, and would have passed just as happily with the
+     bug in place. The pairing check below is the one that failed and said so.
+
+     So the comparison resolves the reference: pull the group, find which
+     gradient it fills with, and compare THAT gradient's stops. Now a fitting
+     "changes colour" only if the pixels would.
+
+     ⚠ AND EACH CHECK ASSERTS ITS SELECTOR FOUND SOMETHING (§5.15) — the group,
+     and the gradient it names. The day either is renamed is the day these stop
+     asking, and a check that quietly retires is worse than one that fails. */
+  {
+    const striped = { ...base, detail: 'plain', window: 'none', handle: 'none',
+                      stripeDir: 'h', stripeCount: 4, stripeTight: false };
+
+    /** The group's own markup, by any `data-` attribute on its open tag. */
+    const grab = (svg, sel) => {
+      const m = new RegExp(`<g[^>]*${sel}[^>]*>([\\s\\S]*?)</g>`).exec(svg);
+      return m ? m[1] : null;
+    };
+    /** Every gradient this group actually paints with, resolved to its stops. */
+    const paints = (svg, sel) => {
+      const body = grab(svg, sel);
+      if (body == null) return null;
+      const ids = [...new Set([...body.matchAll(/url\(#([A-Za-z0-9_-]+)\)/g)].map(m => m[1]))];
+      const stops = ids.map(id => {
+        const g = new RegExp(`<(linear|radial)Gradient id="${id}"[^>]*>([\\s\\S]*?)</\\1Gradient>`)
+          .exec(svg);
+        return g ? `${id}:${(g[2].match(/stop-color="[^"]+"/g) || []).join(',')}` : `${id}:MISSING`;
+      });
+      /* Literal fills count too: the stripes are painted with hexes off the
+         tone array rather than through a gradient. */
+      const lits = (body.match(/fill="#[0-9A-Fa-f]{3,8}"/g) || []).join(',');
+      return { ids, resolved: stops.join('|') + '||' + lits };
+    };
+    const looks = (svg, sel) => { const p2 = paints(svg, sel); return p2 && p2.resolved; };
+
+    ok(grab(render(striped), 'data-detail="strips"'),
+       'the stripe group is not in the markup — this whole block is dead');
+    for (const id of [...(paints(render(striped), 'data-detail="strips"').ids)]) {
+      ok(!/MISSING/.test(paints(render(striped), 'data-detail="strips"').resolved),
+         `the stripes paint with #${id} and no such gradient is emitted`);
+    }
+
+    /* THE STRIPES FOLLOW THE PIRZUL. This is the half that did NOT work: they
+       were painted with the GRIP's metal and the pirzul never reached them.
+       Falsified by pointing `metalStrips` back at `tone`: all three fire. */
+    for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
+      ok(looks(render({ ...striped, pirzul: pz }), 'data-detail="strips"')
+         !== looks(render({ ...striped, pirzul: 'pz-nickel' }), 'data-detail="strips"'),
+         `the פרזול "${pz}" must recolour the metal stripes — Peretz, 30.8.2026`);
+    }
+
+    /* AND THE GRIP'S OWN METAL STILL DOES, when the customer has expressed no
+       pirzul preference. Both of his sentences have to come out true, and this
+       is the one that already did: אלה is brass and מוט שחור is black. */
+    const nick = { ...striped, pirzul: 'pz-nickel' };
+    for (const grip of ['ella', 'barblack']) {
+      ok(looks(render({ ...nick, handle: grip }), 'data-detail="strips"')
+         !== looks(render({ ...nick, handle: 'idan' }), 'data-detail="strips"'),
+         `the grip "${grip}" must recolour the metal stripes beside a standard פרזול`);
+    }
+
+    /* ⚠ THE PRECEDENCE, WHICH IS THE PART THAT HAD TO BE DECIDED. His two
+       sentences cannot both hold under either simple rule, so an explicit
+       choice beats an implied one: a chosen פרזול wins over a grip's own
+       metal. Asserted, because it is a decision and not an accident. */
+    ok(looks(render({ ...striped, pirzul: 'pz-gold', handle: 'barblack' }), 'data-detail="strips"')
+       === looks(render({ ...striped, pirzul: 'pz-gold', handle: 'idan' }), 'data-detail="strips"'),
+       'a chosen פרזול must win over the grip’s own metal on the stripes');
+
+    /* THE ADDITIONAL LOCK DOES NOT FOLLOW THE PIRZUL. Both fittings were
+       filled with `url(#nickel)` — which IS the pirzul's gradient — so gold
+       turned the keypad gold. Falsified by putting `#nickel` back: all six
+       fire, where the markup comparison this replaces fired none of them. */
+    for (const kind of ['kasefet', 'kodan']) {
+      const withLock = { ...base, speciallock: kind };
+      const sel = `data-kind="${kind}"`;
+      ok(grab(render(withLock), sel), `the ${kind} group is not in the markup — this check is dead`);
+      ok(!/MISSING/.test(paints(render(withLock), sel).resolved),
+         `the ${kind} paints with a gradient that is not emitted`);
+      for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
+        ok(looks(render({ ...withLock, pirzul: pz }), sel)
+           === looks(render({ ...withLock, pirzul: 'pz-nickel' }), sel),
+           `the פרזול "${pz}" must NOT recolour the ${kind} — Peretz, 30.8.2026`);
+      }
+      /* And it must not follow the GRIP either, which nothing had ever asked.
+         The bug that put a pull handle's metal on a lever is in §5 twice. */
+      ok(looks(render({ ...withLock, handle: 'ella' }), sel)
+         === looks(render({ ...withLock, handle: 'idan' }), sel),
+         `a brass grip must not recolour the ${kind} either`);
+      /* ⚠ AND IT MUST NOT BORROW THE PIRZUL'S GRADIENT BY NAME. The checks
+         above would also pass if `#nickel` stopped moving; this one names the
+         thing that was actually wrong. */
+      ok(!paints(render(withLock), sel).ids.includes('nickel'),
+         `the ${kind} still paints with #nickel, which is the פרזול's own gradient`);
+    }
+
+    /* ⚠ AND THE LOCK FURNITURE MUST STILL FOLLOW IT, or every check above is
+       satisfied by a פרזול that does nothing at all. This is the pair that
+       makes them worth having, and it is the one that caught the markup
+       comparison being the wrong instrument. */
+    ok(grab(render(base), 'data-kind="lever"'), 'no lever group found — the pairing check is dead');
+    ok(looks(render({ ...base, lockset: 'coral', pirzul: 'pz-gold' }), 'data-kind="lever"')
+       !== looks(render({ ...base, lockset: 'coral', pirzul: 'pz-nickel' }), 'data-kind="lever"'),
+       'the פרזול must still recolour the lock furniture it was bought for');
+  }
 }
 
 // ── 7. Leaf-and-a-half hinges against the frame, not the fixed panel ──

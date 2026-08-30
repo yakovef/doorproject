@@ -612,6 +612,65 @@ export const SPECIAL_LOCKS = [
   { id: 'kodan',     he: 'קודן',  en: 'Keypad', ru: 'Кодовый замок' },
 ];
 
+/**
+ * ── THE TWO FITTINGS ON THE FACE — פעמון AND עינית ────────────────────
+ *
+ * Peretz, 30.8.2026: *"the bell on the doors is 300, take images of it and add
+ * it"* and *"add עינית"*.
+ *
+ * ⚠ TWO LISTS, NOT ONE MULTI-SELECT, AND THAT IS DELIBERATE. There WAS a
+ * multi-select here once — peephole, letterplate, ring knocker, door closer,
+ * nameplate, packed into the short code as a bitmask under `a=` — and it was
+ * withdrawn on the owner's word. Its shape is not what is coming back: these
+ * are two independent yes/no questions, each priced, each drawn, and each its
+ * own list exactly like every other group on the page. A group that is a list
+ * gets tiles, a glyph, a price row and a spec line for free; a bitmask needed
+ * a special case in every one of those places.
+ *
+ * ⚠ AND THE PARAMETERS ARE NEW: `bl=` and `ey=`. `a=` and `f=` are retired
+ * FOREVER (CLAUDE.md §1) and `fromQuery` goes on ignoring them without a
+ * notice. Somebody's WhatsApp history still holds `?a=peep,mail`, and it must
+ * open the door it always opened rather than being re-read as something new.
+ *
+ * ⚠ THE ID `peep` IS REUSED, AND HERE IS WHY THAT IS SAFE. It was one of the
+ * five add-on ids under the retired parameter. Reusing an id is normally
+ * forbidden — but what made those ids a wire format was the parameter carrying
+ * them, and that parameter is ignored outright. `?a=peep` cannot reach this
+ * list; only `?ey=peep` can, and no link in the world contains one. It is also
+ * the same physical object coming back, so pointing the old name at a
+ * different fitting is the failure being avoided rather than committed.
+ *
+ * ⚠ AND THEY COST A `VERSION` BUMP, WHICH IS THE POINT OF HAVING ONE. Two new
+ * fields is a bit-layout change, so every code written under 19 is refused
+ * with a notice rather than decoded into a door that has a doorbell nobody
+ * asked for. The code goes from ten characters to eleven; see BITS.
+ */
+export const BELLS = [
+  { id: 'nobell', he: 'ללא',    en: 'None', ru: 'Нет' },
+  { id: 'bell',   he: 'פעמון',  en: 'Doorbell', ru: 'Звонок' },
+];
+
+/**
+ * ⚠ AND THE עינית IS ₪0 BECAUSE IT IS ALREADY INCLUDED, WHICH IS NOT A GUESS.
+ * Peretz named no price, and the work order offered ₪0-with-a-question or
+ * visible-but-disabled. Neither is needed: `CLAUDE.md` §9 assumption A7 has
+ * said since before this round that *"the peephole and security latch are
+ * standard on every door"*, and his own 26.8 note on the פרזול lists עינית
+ * among the things the finish recolours — a door he assumes has one.
+ *
+ * So "כלול" on the tile is the assumption this project already holds, printed
+ * where a customer can see it, rather than a zero standing in for a number
+ * nobody has. `ASK-PERETZ.md` asks the one question that is actually open: is
+ * it included, and may a customer decline it?
+ *
+ * What "add עינית" changes is that it was neither DRAWN nor LISTED. It is both
+ * now, which is the whole of the request.
+ */
+export const PEEPHOLES = [
+  { id: 'nopeep', he: 'ללא',   en: 'None', ru: 'Нет' },
+  { id: 'peep',   he: 'עינית', en: 'Peephole', ru: 'Глазок' },
+];
+
 /* ── WITHDRAWN: the glass as its own choice ──────────────────────────
    There was a GLAZINGS axis here — clear, obscured, reeded — priced and packed
    into the short code. It is gone at the owner's son's instruction: "remove

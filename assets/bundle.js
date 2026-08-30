@@ -2126,7 +2126,41 @@
   var FINISH_TONES = {
     steel: ["#E4E7E9", "#C6CBCF", "#9FA5AA", "#80868B", "#99A0A5", "#6A7075", "#F7F9FA"],
     black: ["#5E6165", "#3D4043", "#26282B", "#171819", "#313437", "#0F1011", "#8A8E93"],
-    brass: ["#EFE5CE", "#D9CBA6", "#BCAD86", "#9C8F6C", "#C7BA9B", "#7C7154", "#FDF6E2"],
+    /* ⚠ WARMED 30.8.2026, AND THE FILE SAID "KEEP THE GOLD AS IS" UNTIL THEN.
+         That instruction is in the bronze note below and it was right when it was
+         given — bronze had to stop looking like gold, and moving gold to do it
+         would have been solving the wrong half. Peretz has now looked at gold on
+         its own: *"in the pirzul gold is too white, add yellow."*
+    
+         Measured rather than nudged, against peretz-4 — a door carrying a complete
+         set of polished brass, photographed installed. `tools/_brass.mjs`. Three
+         patches (knocker, pull handle, lever and backplate):
+    
+             hue        the photograph 46.6 / 48.5 / 46.6      this ramp 43.5
+             saturation 20.5% / 27.7% / 33.6%                  this ramp 28.7%
+    
+         ⚠ SO IT IS NOT A DESATURATED METAL, AND A MEDIAN WOULD HAVE SAID IT WAS.
+         Comparing the ramp's median to a patch's median also reported the ramp 23
+         points too BRIGHT, which is not a finding — a designed ramp runs highlight
+         to core on purpose and a patch of photograph is mostly mid-tone. Cut at
+         matching brightness percentiles instead, the mid-tones agree closely and
+         two things do not:
+    
+           · the hue is 3-5 degrees short at EVERY brightness. That is the "add
+             yellow", literally, and it is the whole ramp rather than one stop.
+           · the photograph holds saturation 16-26% into its brightest pixels,
+             where this ramp collapsed to 13.8% at the highlight and 10.7% at the
+             specular. On a fitting the size of a keypad the highlight is most of
+             what anybody sees, so a near-colourless highlight IS the "too white".
+    
+         Every VALUE is unchanged — the modelling, which is what separates metal
+         from grey plastic, is not what he complained about. Hue goes to 47.5 and
+         saturation rises where the measurement says it collapsed:
+    
+             highlight   41.8 / 13.8%  ->  47.5 / 20.1%
+             body        43.5 / 23.5%  ->  47.1 / 25.8%
+             specular    44.4 / 10.7%  ->  48.0 / 13.8%   */
+    brass: ["#EFE5BF", "#D9CDA1", "#BCB084", "#9C9169", "#C7BD95", "#7C7351", "#FDF6DA"],
     /* ⚠ BRONZE IS ITS OWN METAL, AND IT USED TO BORROW BRASS. Reported from
          outside: *"the bronze and the gold pirzul look the same."* They were the
          same — `pz-bronze` and `pz-gold` both carried `tone: 'brass'`, so the two
@@ -2206,7 +2240,7 @@
   var EDGE = 38;
   var HANDLE_AFF = 1020;
   var CYLINDER_AFF = 904;
-  var SPECIAL_AFF = CYLINDER_AFF - 250;
+  var SPECIAL_AFF = 1430;
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
@@ -2400,6 +2434,7 @@
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
     const hwBlack = byId(PIRZUL2, state2.pirzul).tone === "black";
+    const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "steel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
     const totalW = leafW + (sideW ? sideW + MULLION : 0);
@@ -2759,6 +2794,21 @@
          (No backticks in this comment on purpose: it sits inside the one big
          template literal, and a backtick here terminates it — CLAUDE.md §1b,
          four builds.) -->
+    <!-- THE BOUGHT-IN UNIT'S OWN STEEL. A third owner, and it exists because
+         one gradient cannot have two masters: nickel is the PIRZUL's and
+         gripHard is the BAR's, and the extra lock used to borrow the first.
+         Peretz, 30.8.2026: "pirzul doesnt affect the additional lock." A
+         kodan and a kasefet arrive in the finish the manufacturer ships them
+         in, and no choice on this page changes it - so this ramp is a
+         CONSTANT, not a function of state, which is the whole point. -->
+    <linearGradient id="lockUnit" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="${FINISH_TONES.steel[0]}"/>
+      <stop offset="0.16" stop-color="${FINISH_TONES.steel[1]}"/>
+      <stop offset="0.38" stop-color="${FINISH_TONES.steel[2]}"/>
+      <stop offset="0.60" stop-color="${FINISH_TONES.steel[3]}"/>
+      <stop offset="0.80" stop-color="${FINISH_TONES.steel[4]}"/>
+      <stop offset="1"    stop-color="${FINISH_TONES.steel[5]}"/>
+    </linearGradient>
     <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"    stop-color="${hwTone[0]}"/>
       <stop offset="0.16" stop-color="${hwTone[1]}"/>
@@ -3800,7 +3850,7 @@
     ))(panelRows(detail)) : ""}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint2, detail.perimeter) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
-    ${metalStrips(mainX, y0, leafW, leafH, state2, tone, hingeOnLeft)}
+    ${metalStrips(mainX, y0, leafW, leafH, state2, stripeTone, hingeOnLeft)}
   </g>
 
   ${detail.classic ? "" : glazing}
@@ -4261,26 +4311,59 @@ ${body}
   }
   function specialLockArt(special, cx, cy, dir) {
     if (!special || special.id === "nospecial") return "";
-    const W = 62, keypadH = 96;
     const x = cx + dir * 0;
     if (special.id === "kasefet") {
+      const W2 = 50, H2 = 68, r = 5;
+      const l2 = x - W2 / 2, t2 = cy - H2 / 2;
+      const screw = (sx, sy) => `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="2.6"
+              fill="#000" fill-opacity=".34"/>`;
       return `
     <g data-hw="lock" data-owner="speciallock" data-kind="kasefet">
-      <rect x="${x - W / 2}" y="${cy - W / 2}" width="${W}" height="${W}" rx="7"
-            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
-      <circle cx="${x}" cy="${cy}" r="${W * 0.27}" fill="none"
-              stroke="#000" stroke-opacity=".38" stroke-width="4"/>
-      <circle cx="${x}" cy="${cy}" r="4.5" fill="#000" fill-opacity=".42"/>
+      <rect x="${(l2 + 2).toFixed(1)}" y="${(t2 + 3).toFixed(1)}" width="${W2}" height="${H2}"
+            rx="${r}" fill="#000" opacity=".20"/>
+      <rect x="${l2.toFixed(1)}" y="${t2.toFixed(1)}" width="${W2}" height="${H2}" rx="${r}"
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+      ${/* The keyway: one horizontal slot across the middle. On peretz-3 it is
+          a clean letterbox; on peretz-4 the same slot with a shallow nick at
+          its centre. Drawn as the slot, because that is what both share. */
+      ""}<rect x="${(x - W2 * 0.3).toFixed(1)}" y="${(cy - 3).toFixed(1)}"
+            width="${(W2 * 0.6).toFixed(1)}" height="6" rx="2.5"
+            fill="#000" fill-opacity=".62"/>
+      ${screw(l2 + 8, t2 + 8)}${screw(l2 + W2 - 8, t2 + 8)}
+      ${screw(l2 + 8, t2 + H2 - 8)}${screw(l2 + W2 - 8, t2 + H2 - 8)}
     </g>`;
     }
+    const W = 60, H = 154;
+    const l = x - W / 2, t = cy - H / 2;
+    const colX = [x - W * 0.19, x + W * 0.19];
+    const row0 = t + H * 0.115, rowStep = H * 0.088;
+    const knobCy = t + H * 0.795, knobRy = H * 0.115, knobRx = W * 0.36;
     return `
     <g data-hw="lock" data-owner="speciallock" data-kind="kodan">
-      <rect x="${x - W / 2}" y="${cy - keypadH / 2}" width="${W}" height="${keypadH}" rx="10"
-            fill="url(#nickel)" stroke="#000" stroke-opacity=".22"/>
-      <rect x="${x - W / 2 + 8}" y="${cy - keypadH / 2 + 9}" width="${W - 16}" height="18" rx="3"
-            fill="#000" fill-opacity=".30"/>
-      ${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<circle cx="${x - 15 + c * 15}" cy="${cy - 2 + r * 16}" r="4.2"
-                 fill="#000" fill-opacity=".26"/>`).join("")).join("")}
+      <rect x="${(l + 2).toFixed(1)}" y="${(t + 3).toFixed(1)}" width="${W}" height="${H}"
+            rx="${W / 2}" fill="#000" opacity=".20"/>
+      <rect x="${l.toFixed(1)}" y="${t.toFixed(1)}" width="${W}" height="${H}" rx="${W / 2}"
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+      ${/* Ten buttons, two columns of five. The old drawing had nine in a 3x3
+        grid under a display bar, which is a DIGITAL keypad — a different
+        product, and one this catalogue already sells separately as
+        `digital` at ₪2,700. Drawing the ₪900 one as the ₪2,700 one is the
+        same class of fault as a price for a panel that is not drawn. */
+    ""}${[0, 1, 2, 3, 4].map((r) => colX.map((bx) => `
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep).toFixed(1)}" r="${(W * 0.115).toFixed(1)}"
+                fill="#000" fill-opacity=".07"/>
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep - 1).toFixed(1)}" r="${(W * 0.095).toFixed(1)}"
+                fill="#fff" fill-opacity=".26"/>
+        <circle cx="${bx.toFixed(1)}" cy="${(row0 + r * rowStep + 1).toFixed(1)}" r="${(W * 0.075).toFixed(1)}"
+                fill="#000" fill-opacity=".16"/>`).join("")).join("")}
+      ${/* The turn knob: a rounded slab across the foot, proud of the body. */
+    ""}<ellipse cx="${x.toFixed(1)}" cy="${(knobCy + 2).toFixed(1)}"
+                 rx="${knobRx.toFixed(1)}" ry="${knobRy.toFixed(1)}" fill="#000" fill-opacity=".22"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${knobCy.toFixed(1)}"
+               rx="${knobRx.toFixed(1)}" ry="${knobRy.toFixed(1)}" fill="url(#lockUnit)"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${(knobCy - knobRy * 0.3).toFixed(1)}"
+               rx="${(knobRx * 0.72).toFixed(1)}" ry="${(knobRy * 0.42).toFixed(1)}"
+               fill="#fff" fill-opacity=".22"/>
     </g>`;
   }
   var gripOf = (state2) => ({ ...byId(HANDLES, state2.handle), len: handleLength(state2) });
@@ -6646,18 +6729,30 @@ ${body}
       nospecial: `
     <rect x="-52" y="-70" width="104" height="140" rx="6" opacity=".18"/>
     <path d="M-22 0h44" stroke="currentColor" stroke-width="7" fill="none" opacity=".55"/>`,
+      /* ⚠ BOTH REDRAWN 30.8.2026 TO MATCH THE PHOTOGRAPHS, AND THE TILE HAD TO
+         MOVE WITH THE DOOR. A tile showing one fitting while the leaf draws
+         another is §5 items 5 and 6 - nine handles that shared one picture, and
+         three faces that showed a cheaper option's - and the assertion "every
+         option tile draws its own picture" cannot catch it, because all that one
+         asks is whether two TILES differ from each other.
+         Proportions are the drawing's own: kasefet 50 x 68 (0.74), kodan
+         60 x 154 (0.39). See specialLockArt for where those come from. */
       kasefet: `
-    <rect x="-56" y="-64" width="112" height="128" rx="9"/>
-    <rect x="-42" y="-50" width="84" height="100" rx="5" fill="#fff" opacity=".92"/>
-    <circle cx="6" cy="0" r="24" fill="none" stroke="currentColor" stroke-width="8"/>
-    <circle cx="6" cy="0" r="7"/>
-    <path d="M6 -24v-9M6 24v9M-18 0h-9M30 0h9" stroke="currentColor"
-          stroke-width="6" fill="none"/>
-    <rect x="-36" y="-6" width="9" height="12" rx="2"/>`,
+    <rect x="-45" y="-61" width="90" height="122" rx="9"/>
+    <rect x="-34" y="-46" width="68" height="92" rx="5" fill="#fff" opacity=".92"/>
+    ${/* the slot */
+      ""}<rect x="-20" y="-6" width="40" height="12" rx="5"/>
+    ${/* four screws, one at each corner - what identifies it at a glance */
+      ""}${[[-23, -35], [23, -35], [-23, 35], [23, 35]].map(([sx, sy]) => `<circle cx="${sx}" cy="${sy}" r="5"/>`).join("")}`,
       kodan: `
-    <rect x="-46" y="-72" width="92" height="144" rx="14"/>
-    <rect x="-34" y="-58" width="68" height="26" rx="4" fill="#fff" opacity=".92"/>
-    ${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<circle cx="${-22 + c * 22}" cy="${-14 + r * 24}" r="7" fill="#fff" opacity=".92"/>`).join("")).join("")}`
+    <rect x="-36" y="-91" width="72" height="182" rx="36"/>
+    <rect x="-27" y="-82" width="54" height="164" rx="27" fill="#fff" opacity=".92"/>
+    ${/* ten buttons in two columns of five - NOT the nine-button digital grid
+          this used to draw, which is a different product at three times the
+          price and is already sold separately as `digital` */
+      ""}${[0, 1, 2, 3, 4].map((r) => [-13, 13].map((bx) => `<circle cx="${bx}" cy="${-70 + r * 27}" r="8"/>`).join("")).join("")}
+    ${/* the turn knob */
+      ""}<ellipse cx="0" cy="54" rx="21" ry="20"/>`
     }[x.id] || "";
     return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>
