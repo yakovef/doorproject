@@ -113,8 +113,7 @@ than trusted; no code of mine shipped either round.
 author's own declared, temporary state) and everything pricing-related —
 squarely inside "do NOT decide: every price."
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** 5d472b1
 
 ---
 
