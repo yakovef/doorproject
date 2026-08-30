@@ -1700,6 +1700,58 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ FOUR CORRECTIONS OFF THE SHIPPED PAGE, 30.8.2026 — A PRICE, A FITTING
+  DRAWN AS THE WRONG OBJECT, A CHART THAT HID ITS MONEY, AND A NAVIGATOR THAT
+  NEVER FIT.** All four reported from outside, looking at the live site, and
+  three of them were things an instrument could have caught and did not.
+  ⚠ **The square window's panel was billed twice over.** Owner: *"when i choose
+  the square window, it adds a bottom panel, and thats a good thing, but dont
+  add the price of the bottom panel to the price, a blank door with a window,
+  needs to be worth 6995."* It read **₪7,620** on screen — 3195 + 3700 + 725 —
+  and the 725 was for a panel `rules.js` FORCES (`rectNeedsPanel`, Peretz's own
+  *"needs to aways have a panel at the bottom"*). A customer cannot decline it,
+  so charging it separately billed them for a decision they were never offered.
+  `WINDOW.rect` is 3800 and `DETAIL_GLAZED.panel` is 0, which lands his figure
+  exactly. ⚠ And a THIRD number had to move to keep a fourth true: Peretz
+  priced the COMBINATION *"square with greek +4700"*, so `DETAIL_GLAZED.classic`
+  comes down 1000 → 900. Change either alone and his 4700 silently stops being
+  what he said. The panel still costs its full ₪725 on a solid leaf, where it
+  really is a choice — asserted in both directions, because "included with the
+  window" quietly becoming "always free" is the next bug.
+  ⚠ **The פעמון was drawn as the wrong object, in the wrong place.** Three
+  photographs of installed doors arrived. Every one carries a RING KNOCKER on
+  the leaf's CENTRE LINE with the peephole directly above it; the drawing had
+  an electric bell push on the hinge stile. Both halves were guesses and the
+  renderer said so in its own comment — *"a choice rather than a measurement"*,
+  waiting on the photograph that has now come. `bellPush` → `bellKnocker`
+  (132 mm ring, measured at 0.13–0.14 W off the two square-on shots),
+  `BELL_BACKSET` → `KNOCKER_AFF = 1470`. ⚠ The unit test that pinned the old
+  placement is RESTATED, not deleted, and is strictly stronger: it constrained
+  x alone, and now pins the knocker and the peephole to a shared centre line,
+  the knocker BELOW it, and both clear of the lock.
+  ⚠ **Seventeen identical circles said nothing about money.** Owner: *"i want
+  for the user to be able to know which colors cost extra money and which are
+  practically free."* The chart is two headed groups now — כלול במחיר and
+  תוספת ₪200 — and the split is **derived from `o.delta`, never a second list
+  of ids**: Peretz will change which three are free, and a hand-kept copy here
+  would be §5 with a fortnight's fuse. The heading prints the surcharge it
+  actually found. ⚠ And the step's own explainer said *"כל הגוונים באותו
+  מחיר"* — every shade the same price — sitting directly above a chart that
+  contradicted it. That sentence is gone.
+  ⚠ **The navigator never fit, at any width.** Owner: *"when i scroll down the
+  options, the categories above look weird and overlap."* Measured: the row is
+  NINE circles (eight steps and the summary) and it overflowed its space by
+  **66 px on a phone and 118 px on the desktop panel — about 2.7 circles**, so
+  the last of them were sliced down their middles at the edge. The sticky
+  background was opaque and was never the fault; the slice was. Gaps to zero
+  everywhere, and on a FINE pointer only the circle comes down to 30 px — the
+  44 px floor is a floor for thumbs, not for cursors, and 30 is still well over
+  the 24 px WCAG 2.5.8 minimum that applies to a mouse. Measured after:
+  390/390 and 310/310, nothing hidden.
+  ⚠ **And `08 ⁄ 03` was a puzzle, not a position.** Two zero-padded numerals
+  either side of a slash have no reading order a customer can trust — in an RTL
+  column the eye takes the left one first, so it read as step eight of three.
+  It says `שלב 3 מתוך 8` in words now, in all three languages.
 - **⚠ A WORK ORDER FROM PERETZ, 30.8.2026 — ELEVEN ITEMS, AND TWO OF HIS LINES
   MEANT SOMETHING OTHER THAN THEY LOOKED LIKE.** He reviewed the app and gave
   notes, with four photographs of installed doors. They are in

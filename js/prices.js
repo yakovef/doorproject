@@ -138,10 +138,23 @@ export const MASHKOF_WIDER = 250;
    majority of glazed orders if it is the wrong way round. `CLAUDE.md` §9,
    assumption A13, and it is the cheapest question on that list to get wrong
    expensively. */
+/* ⚠ `rect` IS 3800 AND THE PANEL IT FORCES IS FREE — ONE PRICE, NOT TWO.
+   Owner, 30.8.2026: *"when i choose the square window, it adds a bottom panel,
+   and thats a good thing, but dont add the price of the bottom panel to the
+   price, a blank door with a window, needs to be worth 6995."*
+   The square light cannot be built without a panel under it (`rectNeedsPanel`
+   in rules.js, Peretz's own "needs to aways have a panel at the bottom"), so
+   the panel is not a face the customer chose — it is part of what a square
+   window IS. Charging it separately billed a customer for a decision they were
+   never offered, and it read as 3195 + 3700 + 725 = ₪7,620 on screen.
+   His figure settles both halves at once: 3195 + 3800 = 6995 exactly, so the
+   panel's own 725 comes out and 100 goes onto the window. `DETAIL_GLAZED`
+   below is where the panel is zeroed — the same mechanism the classical set
+   already uses to cost differently with glass in it. */
 export const WINDOW = {
   none:    0,        // ללא חלון
   strip:   4200,     // צוהר גבוה   — his "tall"
-  rect:    3700,     // חלון מרובע  — his "square". Requires a bottom panel.
+  rect:    3800,     // חלון מרובע  — his "square". Includes its bottom panel.
 };
 
 /* ── what is in the opening ───────────────────────────────────────────
@@ -293,7 +306,20 @@ export const STRIPE = {
 };
 
 export const DETAIL_GLAZED = {
-  classic: 1000,     // 3700 + 1000 = 4700, which is what he said
+  /* ⚠ 900, NOT 1000, AND THE CHANGE IS ARITHMETIC RATHER THAN A NEW OPINION.
+     Peretz's figure is the COMBINATION: *"square with greek +4700"*. It was
+     3700 + 1000; the owner's 30.8.2026 figure moved the square light to 3800,
+     so the set's glazed supplement comes down by the same 100 and his 4700
+     still holds exactly. Change either number alone and the other silently
+     stops being what he said. */
+  classic: 900,      // 3800 + 900 = 4700, which is what he said
+  /* ⚠ FREE, AND THAT IS NOT A DISCOUNT — IT IS THE PANEL BEING PART OF THE
+     WINDOW. A square light forces a panel under it (rules.js
+     `rectNeedsPanel`), so on a glazed leaf the panel is not a face anybody
+     chose and `WINDOW.rect` already carries it. Its ₪725 still applies in
+     full on an UNGLAZED door, where a lower panel really is a choice.
+     See the note over `WINDOW` above for the owner's figure. */
+  panel:   0,
 };
 
 /* ── the pull handle ───────────────────────────────────────────────────

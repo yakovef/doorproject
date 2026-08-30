@@ -132,10 +132,15 @@
     ],
     "step.colour.t": ["צבע", "Colour", "Цвет"],
     "step.colour.s": ["גוון הדלת", "The shade of the door", "Оттенок двери"],
+    /* ⚠ THIS SAID "EVERY SHADE IS THE SAME PRICE" AND THAT STOPPED BEING TRUE.
+       Peretz includes three in the price and charges ₪200 for the rest, so the
+       old sentence sat directly above a chart that contradicted it. The two
+       headings under it now carry the money; this line stops making a promise
+       about it and says the thing that IS still true of every shade. */
     "step.colour.l": [
-      "צבע בתנור, מלוח הגוונים של היצרן. כל הגוונים באותו מחיר.",
-      "Oven-baked, from the manufacturer’s chart. Every shade is the same price.",
-      "Порошковая окраска по палитре производителя. Все оттенки — по одной цене."
+      "צבע בתנור, מלוח הגוונים של היצרן — באותה עמידות בכל גוון.",
+      "Oven-baked, from the manufacturer’s chart — the same finish in every shade.",
+      "Порошковая окраска по палитре производителя — стойкость одинакова во всех оттенках."
     ],
     "step.face.t": ["עיצוב החזית", "The face", "Полотно"],
     "step.face.s": ["פאנלים או פסי מתכת", "Panels or metal strips", "Панели или металлические полосы"],
@@ -183,7 +188,9 @@
     "nav.back": ["‹ הקודם", "‹ Back", "‹ Назад"],
     "nav.next": ["הבא ›", "Next ›", "Далее ›"],
     "nav.toSummary": ["לסיכום ›", "To the summary ›", "К итогу ›"],
-    "nav.stepOf": ["{0} ⁄ {1}", "{0} ⁄ {1}", "{0} ⁄ {1}"],
+    /* ⚠ WORDS, NOT "08 ⁄ 03" — see the note where this is written into the DOM.
+       The numerals gave no reading order and inverted in an RTL column. */
+    "nav.stepOf": ["שלב {0} מתוך {1}", "Step {0} of {1}", "Шаг {0} из {1}"],
     /* ── the groups inside the steps ──────────────────────────────── */
     "g.colour": ["צבע", "Colour", "Цвет"],
     "g.detail": ["עיצוב החזית", "The face", "Полотно"],
@@ -249,6 +256,11 @@
       "The code beside each shade is the manufacturer’s own.",
       "Код рядом с каждым оттенком — код производителя."
     ],
+    /* The two headings over the colour chart. `{0}` is the surcharge the split
+       actually measured, so the wording cannot drift from the price. */
+    "g.colour.free": ["כלול במחיר", "Included in the price", "Входит в цену"],
+    "g.colour.plus": ["תוספת {0}", "{0} extra", "Доплата {0}"],
+    "g.colour.plusMany": ["בתוספת תשלום", "At extra cost", "За доплату"],
     "g.detail.h": [
       "לא משלבים פאנלים עם פסי מתכת על אותה דלת.",
       "Panels and metal strips do not go on the same door.",
@@ -672,8 +684,8 @@
     // ללא חלון
     strip: 4200,
     // צוהר גבוה   — his "tall"
-    rect: 3700
-    // חלון מרובע  — his "square". Requires a bottom panel.
+    rect: 3800
+    // חלון מרובע  — his "square". Includes its bottom panel.
   };
   var GRILLE = {
     none: 0,
@@ -756,8 +768,21 @@
     // פס אנכי, לכל פס
   };
   var DETAIL_GLAZED = {
-    classic: 1e3
-    // 3700 + 1000 = 4700, which is what he said
+    /* ⚠ 900, NOT 1000, AND THE CHANGE IS ARITHMETIC RATHER THAN A NEW OPINION.
+       Peretz's figure is the COMBINATION: *"square with greek +4700"*. It was
+       3700 + 1000; the owner's 30.8.2026 figure moved the square light to 3800,
+       so the set's glazed supplement comes down by the same 100 and his 4700
+       still holds exactly. Change either number alone and the other silently
+       stops being what he said. */
+    classic: 900,
+    // 3800 + 900 = 4700, which is what he said
+    /* ⚠ FREE, AND THAT IS NOT A DISCOUNT — IT IS THE PANEL BEING PART OF THE
+       WINDOW. A square light forces a panel under it (rules.js
+       `rectNeedsPanel`), so on a glazed leaf the panel is not a face anybody
+       chose and `WINDOW.rect` already carries it. Its ₪725 still applies in
+       full on an UNGLAZED door, where a lower panel really is a choice.
+       See the note over `WINDOW` above for the owner's figure. */
+    panel: 0
   };
   var HANDLE = {
     none: 0,
@@ -2337,7 +2362,7 @@
   var CYLINDER_AFF = 904;
   var PEEPHOLE_AFF = 1600;
   var SPECIAL_AFF = 1430;
-  var BELL_BACKSET = 90;
+  var KNOCKER_AFF = 1470;
   var PEEPHOLE_R = 15;
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
@@ -4004,10 +4029,7 @@
               size, so a fitting nobody has photographed for us cannot collide with
               anything. Both are explained where they are drawn. */
     ""}${state2.peephole === "peep" ? peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ""}
-    ${state2.bell === "bell" ? bellPush(
-      hingeOnLeft ? mainX + BELL_BACKSET : mainX + leafW - BELL_BACKSET,
-      y(SPECIAL_AFF)
-    ) : ""}
+    ${state2.bell === "bell" ? bellKnocker(mainX + leafW / 2, y(KNOCKER_AFF)) : ""}
   </g>
 
   <!-- ── THE SCONCES REACH THE DOOR ───────────────────────────────
@@ -6603,23 +6625,50 @@ ${body}
               r="${(R * 0.2).toFixed(1)}" fill="#fff" fill-opacity=".30"/>
     </g>`;
   };
-  var bellPush = (cx, cy) => {
-    const R = 32.5;
+  var bellKnocker = (cx, cy) => {
+    const R = 66;
+    const RING = R * 0.78;
+    const BOSS = R * 0.42;
+    const top = cy - R * 0.62;
     return `
     <g data-hw="bell" data-owner="bell" data-kind="bell"
        data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      <ellipse cx="${cx}" cy="${cy + R * 0.14}" rx="${(R * 0.96).toFixed(1)}"
-               ry="${(R * 0.9).toFixed(1)}" fill="#000" opacity="0.20"/>
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
-              stroke="#000" stroke-opacity=".26"/>
-      <circle cx="${cx}" cy="${cy}" r="${(R * 0.66).toFixed(1)}"
-              fill="#000" fill-opacity=".10"/>
-      ${/* the button itself, proud of the bezel */
-    ""}<circle cx="${cx}" cy="${(cy + 1.5).toFixed(1)}" r="${(R * 0.5).toFixed(1)}"
-               fill="#000" fill-opacity=".16"/>
-      <circle cx="${cx}" cy="${cy}" r="${(R * 0.5).toFixed(1)}" fill="url(#lockUnit)"/>
-      <circle cx="${(cx - R * 0.16).toFixed(1)}" cy="${(cy - R * 0.18).toFixed(1)}"
-              r="${(R * 0.22).toFixed(1)}" fill="#fff" fill-opacity=".26"/>
+      ${/* the whole fitting stands proud, so it drops one soft shadow */
+    ""}<ellipse cx="${cx}" cy="${(cy + R * 0.1).toFixed(1)}"
+               rx="${(R * 0.86).toFixed(1)}" ry="${(R * 0.92).toFixed(1)}"
+               fill="#000" opacity="0.16"/>
+      ${/* the ring: a heavy annulus, lit along its upper left like every other
+        round fitting in this file, and slightly flattened because a
+        hanging ring rests against the leaf rather than floating on it */
+    ""}<ellipse cx="${cx}" cy="${(cy + 2).toFixed(1)}"
+               rx="${RING.toFixed(1)}" ry="${(RING * 0.98).toFixed(1)}"
+               fill="none" stroke="#000" stroke-opacity=".22"
+               stroke-width="${(R * 0.2).toFixed(1)}"/>
+      <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
+               ry="${(RING * 0.98).toFixed(1)}"
+               fill="none" stroke="url(#lockUnit)"
+               stroke-width="${(R * 0.18).toFixed(1)}"/>
+      <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
+               ry="${(RING * 0.98).toFixed(1)}"
+               fill="none" stroke="#fff" stroke-opacity=".20"
+               stroke-width="${(R * 0.05).toFixed(1)}"
+               stroke-dasharray="${(RING * 1.5).toFixed(1)} ${(RING * 9).toFixed(1)}"
+               transform="rotate(-142 ${cx} ${cy})"/>
+      ${/* the boss the ring hangs from, with the small crown the cast ones
+        carry at the top */
+    ""}<path d="M ${(cx - BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)}
+               L ${cx} ${(top - BOSS * 1.2).toFixed(1)}
+               L ${(cx + BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)} Z"
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".22"/>
+      <ellipse cx="${cx}" cy="${top.toFixed(1)}"
+               rx="${BOSS.toFixed(1)}" ry="${(BOSS * 0.92).toFixed(1)}"
+               fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+      <ellipse cx="${cx}" cy="${top.toFixed(1)}"
+               rx="${(BOSS * 0.46).toFixed(1)}" ry="${(BOSS * 0.42).toFixed(1)}"
+               fill="#000" fill-opacity=".22"/>
+      <ellipse cx="${(cx - BOSS * 0.3).toFixed(1)}" cy="${(top - BOSS * 0.3).toFixed(1)}"
+               rx="${(BOSS * 0.26).toFixed(1)}" ry="${(BOSS * 0.2).toFixed(1)}"
+               fill="#fff" fill-opacity=".26"/>
     </g>`;
   };
   var cylinder = (cx, cy, owned = false) => {
@@ -7803,13 +7852,38 @@ ${body}
   var GROUPS = [
     /* `label` and `meta` used to sit here and nothing read either of them; `meta`
        also spelled the chart code "RAL", which it is not — see `colourCode`. */
+    /* ⚠ THE CHART IS SPLIT BY WHAT IT COSTS, AND THE SPLIT IS DERIVED.
+         Asked for from outside, 30.8.2026: *"in the color category, there are some
+         colors that are in the price and some that are +200, i want for the user
+         to be able to know which colors cost extra money and which are practically
+         free."* Seventeen identical circles said nothing about money until the
+         total moved underneath them, which is the worst moment to find out.
+    
+         Two headed groups rather than a badge on each chip: a badge on fourteen of
+         seventeen swatches is noise, and the three that matter are the ones a
+         customer is looking for. It also survives colour blindness, which a tint
+         or a border on the chip itself would not — this screen IS a colour
+         comparison, so nothing may be said in colour here.
+    
+         ⚠ AND IT PARTITIONS ON `o.delta`, NEVER ON A HAND-KEPT LIST OF IDS. The
+         three free ones are Peretz's (9016T, 9001T, 7126D) and he will change
+         them; a second list here would be the §5 bug with a fortnight's fuse on
+         it. The heading prints the surcharge it actually found, so if the ₪200
+         ever moves the label moves with it. */
     {
       key: "colour",
       title: "g.colour",
       in: "colour",
       kind: "swatch",
       list: () => COLOURS,
-      hint: "g.colour.h"
+      hint: "g.colour.h",
+      split: (list) => {
+        const free = list.filter((o) => !o.delta);
+        const paid = list.filter((o) => o.delta);
+        const deltas = [...new Set(paid.map((o) => o.delta))];
+        const plus = deltas.length === 1 ? T("g.colour.plus", formatAgorot(deltas[0])) : T("g.colour.plusMany");
+        return [[T("g.colour.free"), free], [plus, paid]];
+      }
     },
     /* ⚠ `glazedOnly` FACES ARE NOT OFFERED ON A SOLID DOOR — a LISTING rule,
        not a buildability one. Asked for from outside: *"remove the single panel
@@ -8447,7 +8521,7 @@ ${body}
     host.setAttribute("role", "radiogroup");
     host.setAttribute("aria-label", T(g.title));
     host.className = "field__opts " + { swatch: "swatches", pill: "pills", tile: "tiles", sq: "tiles tiles--sq", hw: "tiles tiles--hw" }[g.kind];
-    const groups = g.subs ? [
+    const groups = g.split ? g.split(g.list(), state).filter(([, items]) => items.length) : g.subs ? [
       [null, g.list().filter((o) => !o.sub)],
       ...g.subs.map(([k, key]) => [T(key), g.list().filter((o) => o.sub === k)])
     ] : [[null, g.list()]];
@@ -8726,7 +8800,7 @@ ${body}
       }
       const where = document.querySelector(`.sect[data-section="${k}"] [data-step-n]`);
       if (where) {
-        where.textContent = k === SUMMARY.key ? T(SUMMARY.sub) : `${String(i2 + 1).padStart(2, "0")} ⁄ ${String(SECTIONS.length).padStart(2, "0")}`;
+        where.textContent = k === SUMMARY.key ? T(SUMMARY.sub) : T("nav.stepOf", i2 + 1, SECTIONS.length);
       }
     }
     const nav = document.querySelector(".steps");

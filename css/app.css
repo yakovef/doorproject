@@ -1776,6 +1776,40 @@ svg { direction: ltr; }
   transition: border-color .12s var(--ease), color .12s var(--ease);
 }
 .steps__g { inline-size: 21px; block-size: 21px; }
+
+/* ── ⚠ NINE CIRCLES HAVE TO FIT, AND THEY DID NOT ────────────────────
+   Reported from outside, 30.8.2026: *"when i scroll down the options, the
+   categories above look weird and overlap."* Measured before this block, with
+   the row at its natural size against the space it is given:
+
+       phone  390 px wide, content 456  ->  66 px hidden
+       desk   310 px wide, content 428  -> 118 px hidden, ~2.7 circles
+
+   So the row was ALWAYS overflowing and the last circles were sliced down
+   their middles at the panel's edge. A half-circle butted against a cut is
+   exactly what "weird and overlap" describes, and the sticky background —
+   which is opaque and was never the problem — made the slice look like one
+   layer sitting on another.
+
+   Scrolling was not the answer to a row of NINE (eight steps and the summary):
+   a table of contents you must drag sideways to read is not one. So the row is
+   made to fit at both ends instead.
+
+   ⚠ AND THE 44 px TOUCH FLOOR SURVIVES WHERE FINGERS ARE. On a coarse pointer
+   the circles stay 44 and the room comes out of the gaps and the padding,
+   which is what closed it there. Only on a FINE pointer,
+   where a mouse is doing the aiming, does the circle come down to 30 — still
+   well over the 24 px WCAG 2.5.8 minimum that applies there, and it buys the
+   118 px the desktop panel was short. The floor is a floor for thumbs; it was
+   never a floor for cursors. */
+.steps { gap: 0; }
+@media (max-width: 1099px) { .steps { padding-inline: 8px; } }
+@media (pointer: fine) {
+  /* the 2 px each side is the last 32 px of the 118 — see the measurement */
+  .steps__step { min-inline-size: 34px; padding: 0; }
+  .steps__c    { inline-size: 30px; block-size: 30px; }
+  .steps__g    { inline-size: 15px; block-size: 15px; }
+}
 /* ⚠ `.steps__l`, `.steps__n` AND `.steps__t` ARE GONE — the number under each
    circle and the title beside it. Both were measured out, not tidied away:
    the number said the same thing as the `NN ⁄ 08` the live step already

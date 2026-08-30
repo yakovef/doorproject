@@ -480,11 +480,20 @@ const PEEPHOLE_AFF = 1600;  // 0.762 H
  * horizontal placement was already right and only the height was wrong.
  */
 const SPECIAL_AFF  = 1430;
-/* How far in from the HINGE edge the bell push stands. A 65 mm button needs
-   its own radius plus the reveal's 38 mm ramp before it is clear of the edge;
-   90 mm gives it 25 mm of paint either side on the narrowest leaf we make and
-   puts it visually on the stile rather than crowding the frame. */
-const BELL_BACKSET = 90;
+/* ⚠ THE KNOCKER'S HEIGHT, AND `BELL_BACKSET` IS GONE WITH THE BELL PUSH.
+   30.8.2026: the owner's three photographs put this fitting on the leaf's
+   CENTRE LINE inside the upper panel, not on the hinge stile, so there is no
+   backset left to state — the x is leafW/2 and the only free number is how far
+   up it sits. See the note over `bellKnocker` for the whole correction.
+
+   1440 is measured the same way `PEEPHOLE_AFF` was, off the two square-on
+   photographs, as a fraction of leaf height converted against the standard
+   2100 leaf: the ring centre lands at 0.69-0.71 H on both. It puts the
+   knocker a little under the peephole at 1600, which is the vertical pair the
+   photographs show, and level with `SPECIAL_AFF` — which is not a collision
+   but the same arrangement the grey door in those photographs has, its keypad
+   on the stile at the height of the ring on the centre line. */
+const KNOCKER_AFF  = 1470;
 /* ⚠ 15, AND IT WAS 30, AND IT WAS A RADIUS ALL ALONG. The old comment called
    this the "outer halo" and nothing drew it, so nobody had to decide whether
    30 meant across or from the centre. Measured on d028 — the same door as
@@ -2753,8 +2762,7 @@ export function render(state) {
           anything. Both are explained where they are drawn. */''
       }${state.peephole === 'peep' ? peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ''}
     ${state.bell === 'bell'
-        ? bellPush(hingeOnLeft ? mainX + BELL_BACKSET : mainX + leafW - BELL_BACKSET,
-                   y(SPECIAL_AFF))
+        ? bellKnocker(mainX + leafW / 2, y(KNOCKER_AFF))
         : ''}
   </g>
 
@@ -8317,23 +8325,78 @@ const peephole = (cx, cy) => {
  * matters most for a fitting nobody has photographed for us. Same eye-level
  * height as the extra lock, on the other side of the door.
  */
-const bellPush = (cx, cy) => {
-  const R = 32.5;                                // 65 mm across; see above
+/**
+ * ⚠ THE PHOTOGRAPHS ARRIVED, AND THE BELL PUSH ABOVE WAS THE WRONG OBJECT.
+ * 30.8.2026, three installed doors from the owner. Every one of them carries,
+ * where the drawing was putting a round push on the hinge stile, a RING
+ * KNOCKER: a small ornate boss on the CENTRE LINE of the leaf with a heavy
+ * metal ring hanging from it. Two are silver on dark leaves, the third a gold
+ * drop-knocker on a cream one. Reported from outside in those words: *"the
+ * bell is not what it is right now on the app, here is 3 photos of doors with
+ * a bell, copy it to the app."*
+ *
+ * So this is REALISM.md §6 doing exactly what the old comment said it would
+ * the moment a picture turned up, and both halves of the old drawing go:
+ *
+ *   · THE SHAPE. A bezel with a raised centre button becomes a boss carrying a
+ *     hanging ring. The ring is the whole object — it is what a caller takes
+ *     hold of, and it is the only part visible from across a landing.
+ *   · THE PLACE, which the old comment flagged as *"a choice rather than a
+ *     measurement"* and the question that *"matters more than the drawing"*.
+ *     It is not on the hinge stile. All three photographs put it on the leaf's
+ *     centre line, inside the upper panel, a little under the peephole —
+ *     which is where the peephole already is (PEEPHOLE_AFF, measured), so the
+ *     two now read as the one vertical group the photographs show.
+ *
+ * SIZE, measured off the two square-on photographs as a fraction of leaf
+ * width and converted against the standard 950 mm leaf: the ring runs 0.13 to
+ * 0.14 W across, so 116 mm outside diameter. The boss is a little over half
+ * that. Both are life-size for a cast knocker and neither is invented.
+ */
+const bellKnocker = (cx, cy) => {
+  const R    = 66;                 // 132 mm ring, outside; see above
+  const RING = R * 0.78;           // the ring's own centre-line radius
+  const BOSS = R * 0.42;           // the plate it hangs from
+  const top  = cy - R * 0.62;      // where the boss sits above the ring
   return `
     <g data-hw="bell" data-owner="bell" data-kind="bell"
        data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      <ellipse cx="${cx}" cy="${cy + R * 0.14}" rx="${(R * 0.96).toFixed(1)}"
-               ry="${(R * 0.90).toFixed(1)}" fill="#000" opacity="0.20"/>
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#lockUnit)"
-              stroke="#000" stroke-opacity=".26"/>
-      <circle cx="${cx}" cy="${cy}" r="${(R * 0.66).toFixed(1)}"
-              fill="#000" fill-opacity=".10"/>
-      ${/* the button itself, proud of the bezel */''
-       }<circle cx="${cx}" cy="${(cy + 1.5).toFixed(1)}" r="${(R * 0.50).toFixed(1)}"
-               fill="#000" fill-opacity=".16"/>
-      <circle cx="${cx}" cy="${cy}" r="${(R * 0.50).toFixed(1)}" fill="url(#lockUnit)"/>
-      <circle cx="${(cx - R * 0.16).toFixed(1)}" cy="${(cy - R * 0.18).toFixed(1)}"
-              r="${(R * 0.22).toFixed(1)}" fill="#fff" fill-opacity=".26"/>
+      ${/* the whole fitting stands proud, so it drops one soft shadow */''
+       }<ellipse cx="${cx}" cy="${(cy + R * 0.10).toFixed(1)}"
+               rx="${(R * 0.86).toFixed(1)}" ry="${(R * 0.92).toFixed(1)}"
+               fill="#000" opacity="0.16"/>
+      ${/* the ring: a heavy annulus, lit along its upper left like every other
+            round fitting in this file, and slightly flattened because a
+            hanging ring rests against the leaf rather than floating on it */''
+       }<ellipse cx="${cx}" cy="${(cy + 2).toFixed(1)}"
+               rx="${RING.toFixed(1)}" ry="${(RING * 0.98).toFixed(1)}"
+               fill="none" stroke="#000" stroke-opacity=".22"
+               stroke-width="${(R * 0.20).toFixed(1)}"/>
+      <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
+               ry="${(RING * 0.98).toFixed(1)}"
+               fill="none" stroke="url(#lockUnit)"
+               stroke-width="${(R * 0.18).toFixed(1)}"/>
+      <ellipse cx="${cx}" cy="${cy}" rx="${RING.toFixed(1)}"
+               ry="${(RING * 0.98).toFixed(1)}"
+               fill="none" stroke="#fff" stroke-opacity=".20"
+               stroke-width="${(R * 0.05).toFixed(1)}"
+               stroke-dasharray="${(RING * 1.5).toFixed(1)} ${(RING * 9).toFixed(1)}"
+               transform="rotate(-142 ${cx} ${cy})"/>
+      ${/* the boss the ring hangs from, with the small crown the cast ones
+            carry at the top */''
+       }<path d="M ${(cx - BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)}
+               L ${cx} ${(top - BOSS * 1.20).toFixed(1)}
+               L ${(cx + BOSS * 0.34).toFixed(1)} ${(top - BOSS * 0.72).toFixed(1)} Z"
+            fill="url(#lockUnit)" stroke="#000" stroke-opacity=".22"/>
+      <ellipse cx="${cx}" cy="${top.toFixed(1)}"
+               rx="${BOSS.toFixed(1)}" ry="${(BOSS * 0.92).toFixed(1)}"
+               fill="url(#lockUnit)" stroke="#000" stroke-opacity=".26"/>
+      <ellipse cx="${cx}" cy="${top.toFixed(1)}"
+               rx="${(BOSS * 0.46).toFixed(1)}" ry="${(BOSS * 0.42).toFixed(1)}"
+               fill="#000" fill-opacity=".22"/>
+      <ellipse cx="${(cx - BOSS * 0.30).toFixed(1)}" cy="${(top - BOSS * 0.30).toFixed(1)}"
+               rx="${(BOSS * 0.26).toFixed(1)}" ry="${(BOSS * 0.20).toFixed(1)}"
+               fill="#fff" fill-opacity=".26"/>
     </g>`;
 };
 

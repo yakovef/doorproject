@@ -79,8 +79,38 @@ let state = { ...DEFAULTS };
 const GROUPS = [
   /* `label` and `meta` used to sit here and nothing read either of them; `meta`
      also spelled the chart code "RAL", which it is not — see `colourCode`. */
+  /* ⚠ THE CHART IS SPLIT BY WHAT IT COSTS, AND THE SPLIT IS DERIVED.
+     Asked for from outside, 30.8.2026: *"in the color category, there are some
+     colors that are in the price and some that are +200, i want for the user
+     to be able to know which colors cost extra money and which are practically
+     free."* Seventeen identical circles said nothing about money until the
+     total moved underneath them, which is the worst moment to find out.
+
+     Two headed groups rather than a badge on each chip: a badge on fourteen of
+     seventeen swatches is noise, and the three that matter are the ones a
+     customer is looking for. It also survives colour blindness, which a tint
+     or a border on the chip itself would not — this screen IS a colour
+     comparison, so nothing may be said in colour here.
+
+     ⚠ AND IT PARTITIONS ON `o.delta`, NEVER ON A HAND-KEPT LIST OF IDS. The
+     three free ones are Peretz's (9016T, 9001T, 7126D) and he will change
+     them; a second list here would be the §5 bug with a fortnight's fuse on
+     it. The heading prints the surcharge it actually found, so if the ₪200
+     ever moves the label moves with it. */
   { key: 'colour', title: 'g.colour', in: 'colour', kind: 'swatch', list: () => COLOURS,
-    hint: 'g.colour.h' },
+    hint: 'g.colour.h',
+    split: list => {
+      const free = list.filter(o => !o.delta);
+      const paid = list.filter(o => o.delta);
+      /* One surcharge today. If two ever coexist the heading would have to
+         name a range rather than a figure, so it says so instead of quietly
+         printing the cheapest. */
+      const deltas = [...new Set(paid.map(o => o.delta))];
+      const plus = deltas.length === 1
+        ? T('g.colour.plus', formatAgorot(deltas[0]))
+        : T('g.colour.plusMany');
+      return [[T('g.colour.free'), free], [plus, paid]];
+    } },
 
   /* ⚠ `glazedOnly` FACES ARE NOT OFFERED ON A SOLID DOOR — a LISTING rule,
      not a buildability one. Asked for from outside: *"remove the single panel
@@ -1296,7 +1326,13 @@ function buildOptions(g, host) {
      The headings are `aria-hidden`: this is one radiogroup with one answer,
      and inserting real headings into it would announce two groups where the
      customer makes one choice. Each tile already carries its own name. */
-  const groups = g.subs
+  /* `split` is the same idea as `subs` with the grouping DERIVED rather than
+     declared — see the colour group, where the two headings are what the
+     options cost and a hand-kept list would go stale the day Peretz changes
+     which paints are included. */
+  const groups = g.split
+    ? g.split(g.list(), state).filter(([, items]) => items.length)
+    : g.subs
     ? [[null, g.list().filter(o => !o.sub)],
        ...g.subs.map(([k, key]) => [T(key), g.list().filter(o => o.sub === k)])]
     : [[null, g.list()]];
@@ -1740,10 +1776,18 @@ function markSteps() {
        A page number in a book claims nothing about whether you understood
        chapter one. The summary is excluded from the count for the same reason
        a contents page is not chapter nine. */
+    /* ⚠ IN WORDS, BECAUSE "08 ⁄ 03" IS A PUZZLE AND NOT A POSITION.
+       Reported from outside, 30.8.2026, looking at the shipped page. Two
+       zero-padded numerals either side of a slash have no reading order a
+       customer can trust: in an RTL column the eye takes the left-hand one
+       first, so the total read as the current step and the whole thing looked
+       like step eight of three. Nothing about the digits says which is which.
+       The words carry it instead — the same information, in the one order
+       every reader of this language already has. */
     const where = document.querySelector(`.sect[data-section="${k}"] [data-step-n]`);
     if (where) {
       where.textContent = k === SUMMARY.key ? T(SUMMARY.sub)
-        : `${String(i + 1).padStart(2, '0')} ⁄ ${String(SECTIONS.length).padStart(2, '0')}`;
+        : T('nav.stepOf', i + 1, SECTIONS.length);
     }
   }
   /* ⚠ THE HAIRLINE FILLS BEHIND YOU, AS A FRACTION, AND IT IS SET HERE RATHER

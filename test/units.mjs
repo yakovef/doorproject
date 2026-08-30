@@ -698,11 +698,30 @@ group('price');
      Every window price in this file was invented at around ₪600 and every one
      was out by a factor of six. Glass in an armoured leaf is a different
      product from a hole in one. */
-  ok(P({ window: 'rect' }) === 7545, `a square window should add ₪3,700, got ${P({ window: 'rect' })}`);
+  /* ⚠ RESTATED 30.8.2026, STRONGER THAN IT WAS. The figure moved to ₪3,800 and
+     the bottom panel the square light FORCES became free, because the owner
+     gave the combination rather than the parts: *"dont add the price of the
+     bottom panel... a blank door with a window, needs to be worth 6995."*
+     So this pair pins BOTH ends — the delta here, and the absolute total the
+     customer is quoted, which is the number he actually said. */
+  ok(P({ window: 'rect' }) === 7645,
+     `a square window and its panel should add ₪3,800, got ${P({ window: 'rect' })}`);
+  ok(P({ window: 'rect', colour: DEFAULTS.colour, handle: 'none' }) === 6995,
+     `a plain door with a square window must be ₪6,995, got ${
+        P({ window: 'rect', colour: DEFAULTS.colour, handle: 'none' })}`);
+  /* ⚠ AND THE PANEL IS ONLY FREE WHERE IT IS FORCED. On a solid leaf a lower
+     panel is a face the customer chose, and it still costs its ₪725 — the
+     assertion that stops "included with the window" quietly becoming
+     "always free". */
+  ok(P({ detail: 'panel', window: 'rect' }) - P({ window: 'rect' }) === 0,
+     'the panel a square window forces is inside the window price');
+  ok(P({ detail: 'panel' }) - P({}) === 725,
+     `a chosen lower panel on a solid door still costs ₪725, got ${
+        P({ detail: 'panel' }) - P({})}`);
   /* "design: almost all of them in the price." Every grille is ₪0 now except
      the three laser-cut ones. */
-  ok(P({ window: 'rect', grille: 'scroll' }) === 7545, 'scrollwork is included');
-  ok(P({ window: 'rect', grille: 'vine' }) === 8245, 'the laser-cut ones add ₪700');
+  ok(P({ window: 'rect', grille: 'scroll' }) === 7645, 'scrollwork is included');
+  ok(P({ window: 'rect', grille: 'vine' }) === 8345, 'the laser-cut ones add ₪700');
   ok(P({ detail: 'panel' }) === 4570, `a lower panel should add ₪725, got ${P({ detail: 'panel' })}`);
   /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and these two lines are
      Peretz's three window figures reduced to the two products they describe:
@@ -2086,17 +2105,30 @@ group('the doorbell and the peephole');
   ok(bellArt.replace(/[\d.-]+/g, '') !== peepArt.replace(/[\d.-]+/g, '')
      || bellArt !== peepArt,
      'the bell and the peephole draw the same picture');
-  /* The bell is on the HINGE stile and the peephole is CENTRED — the two
-     placements have different standing and the drawing has to keep them
-     apart. Read off the markup rather than recomputed here, so this cannot
-     agree with a second copy of the arithmetic (§5.10). */
+  /* ⚠ RESTATED 30.8.2026, AND IT NOW PINS BOTH AXES INSTEAD OF ONE.
+     This used to read "the bell must stand further from the lock than the
+     leaf's centre line", which was the hinge-stile placement the renderer
+     itself flagged as *"a choice rather than a measurement"* while it waited
+     for a photograph. Three arrived, and every one of them puts the ring
+     knocker ON the centre line with the peephole directly above it. So the
+     old assertion was pinning a guess, and the replacement pins what the
+     photographs show — a strictly stronger claim, because the guess only
+     constrained x and this constrains the pair in x AND y.
+     Read off the markup rather than recomputed here, so it cannot agree with
+     a second copy of the arithmetic (§5.10). */
   for (const h of ['right-in', 'left-in']) {
     const svg = render({ ...solid, handing: h, bell: 'bell', peephole: 'peep' });
-    const cx = k => Number(new RegExp(`data-kind="${k}"[^>]*data-cx="([\\d.-]+)"`).exec(svg)[1]);
-    const key = Number(/data-kind="cylinder"[^>]*data-cx="([\d.-]+)"/.exec(svg)[1]);
-    const mid = cx('peephole');
-    ok(Math.abs(cx('bell') - key) > Math.abs(mid - key),
-       `on ${h} the bell must stand further from the lock than the leaf's centre line`);
+    const at = (k, a) =>
+      Number(new RegExp(`data-kind="${k}"[^>]*data-c${a}="([\\d.-]+)"`).exec(svg)[1]);
+    const key = at('cylinder', 'x');
+    ok(Math.abs(at('bell', 'x') - at('peephole', 'x')) < 1,
+       `on ${h} the knocker and the peephole must share the leaf's centre line`);
+    ok(at('bell', 'y') > at('peephole', 'y'),
+       `on ${h} the knocker hangs BELOW the peephole, as all three photographs show`);
+    /* And the centre line is still clear of the lock furniture, which is the
+       one thing the old hinge-stile placement was bought to guarantee. */
+    ok(Math.abs(at('bell', 'x') - key) > 200,
+       `on ${h} the knocker must stand well clear of the lock`);
   }
 
   /* ── the price ── */

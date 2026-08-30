@@ -281,9 +281,14 @@ export const UI = {
                        'Коробка — это рама, к которой прилегает дверь. Более широкий фасад или большая глубина нужны для толстых стен и стоят дороже.'],
   'step.colour.t':    ['צבע', 'Colour', 'Цвет'],
   'step.colour.s':    ['גוון הדלת', 'The shade of the door', 'Оттенок двери'],
-  'step.colour.l':    ['צבע בתנור, מלוח הגוונים של היצרן. כל הגוונים באותו מחיר.',
-                       'Oven-baked, from the manufacturer’s chart. Every shade is the same price.',
-                       'Порошковая окраска по палитре производителя. Все оттенки — по одной цене.'],
+  /* ⚠ THIS SAID "EVERY SHADE IS THE SAME PRICE" AND THAT STOPPED BEING TRUE.
+     Peretz includes three in the price and charges ₪200 for the rest, so the
+     old sentence sat directly above a chart that contradicted it. The two
+     headings under it now carry the money; this line stops making a promise
+     about it and says the thing that IS still true of every shade. */
+  'step.colour.l':    ['צבע בתנור, מלוח הגוונים של היצרן — באותה עמידות בכל גוון.',
+                       'Oven-baked, from the manufacturer’s chart — the same finish in every shade.',
+                       'Порошковая окраска по палитре производителя — стойкость одинакова во всех оттенках.'],
   'step.face.t':      ['עיצוב החזית', 'The face', 'Полотно'],
   'step.face.s':      ['פאנלים או פסי מתכת', 'Panels or metal strips', 'Панели или металлические полосы'],
   'step.face.l':      ['מה יש על פני הדלת — פאנלים מוגבהים, או פסי מתכת. אפשר גם חלק לגמרי.',
@@ -319,7 +324,9 @@ export const UI = {
   'nav.back':         ['‹ הקודם', '‹ Back', '‹ Назад'],
   'nav.next':         ['הבא ›', 'Next ›', 'Далее ›'],
   'nav.toSummary':    ['לסיכום ›', 'To the summary ›', 'К итогу ›'],
-  'nav.stepOf':       ['{0} ⁄ {1}', '{0} ⁄ {1}', '{0} ⁄ {1}'],
+  /* ⚠ WORDS, NOT "08 ⁄ 03" — see the note where this is written into the DOM.
+     The numerals gave no reading order and inverted in an RTL column. */
+  'nav.stepOf':       ['שלב {0} מתוך {1}', 'Step {0} of {1}', 'Шаг {0} из {1}'],
 
   /* ── the groups inside the steps ──────────────────────────────── */
   'g.colour':         ['צבע', 'Colour', 'Цвет'],
@@ -360,6 +367,11 @@ export const UI = {
   'g.colour.h':       ['הקוד שליד כל גוון הוא הקוד של היצרן.',
                        'The code beside each shade is the manufacturer’s own.',
                        'Код рядом с каждым оттенком — код производителя.'],
+  /* The two headings over the colour chart. `{0}` is the surcharge the split
+     actually measured, so the wording cannot drift from the price. */
+  'g.colour.free':    ['כלול במחיר', 'Included in the price', 'Входит в цену'],
+  'g.colour.plus':    ['תוספת {0}', '{0} extra', 'Доплата {0}'],
+  'g.colour.plusMany':['בתוספת תשלום', 'At extra cost', 'За доплату'],
   'g.detail.h':       ['לא משלבים פאנלים עם פסי מתכת על אותה דלת.',
                        'Panels and metal strips do not go on the same door.',
                        'Панели и металлические полосы не сочетаются на одной двери.'],
