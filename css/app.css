@@ -3317,6 +3317,35 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 /* The frame is its own choice now, so it gets its own arrival. */
 #stage[data-changed="mashkof"] #frame { animation: fitPart .32s var(--ease-fit) both; }
 
+/* ── AND THE TWO SMALLEST FITTINGS, WHICH HAD NO CUE AT ALL ──────────
+   ⚠ THE פעמון AND THE עינית ARRIVED ON 30.8, AFTER EVERY RULE ABOVE WAS
+   WRITTEN, AND NOTHING STAMPED THEM. Tapping either changed the door and the
+   eye had no idea where to look — which is `UX-FINDINGS` §4.3 exactly:
+   *"picking a lock swaps a small piece of hardware I have to hunt for"*, and
+   these two are the smallest pieces on the leaf. A 30 mm viewer on a 950 mm
+   door is 3% of its width.
+
+   ⚠ AND A PLAIN FADE IS NOT ENOUGH AT THAT SIZE, which is why this is not
+   `replate`. Something appearing from nothing at 3% of the leaf reads as a
+   rendering hiccup; a brief overshoot reads as an arrival. It peaks at 1.18
+   and settles — no bounce, no second swing (`PLAN.md` §7 bans a door that
+   boings, and this is the fitting on it, not the door).
+
+   ⚠ `transform-box: fill-box` IS LOAD-BEARING HERE AND NOWHERE ABOVE. Every
+   other stamp animates opacity or translate; a SCALE in SVG resolves its
+   origin against the whole viewBox unless told otherwise, so without this the
+   ring would grow from the corner of the scene and fly in across the door. */
+#stage[data-changed="bell"] [data-hw="bell"],
+#stage[data-changed="peephole"] [data-hw="peephole"] {
+  transform-box: fill-box; transform-origin: 50% 50%;
+  animation: spotOn .38s var(--ease-fit) both;
+}
+@keyframes spotOn {
+  from { opacity: 0; transform: scale(.55); }
+  62%  { opacity: 1; transform: scale(1.18); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
 /* ── M8 · the step transition ────────────────────────────────────────
    Direction is the whole information: a flow whose steps cross-fade has no
    forward and no back. ⚠ LOGICAL, not left/right — the interface mirrors and

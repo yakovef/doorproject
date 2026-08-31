@@ -2088,6 +2088,49 @@ group('the finish reaches every piece of metal');
          'the פעמון must have exactly two metals across the four finishes');
     }
 
+    /* ── AND TWO LOCKSETS DO NOT FOLLOW IT AT ALL ──────────────────────
+       Owner, 31.8.2026: *"the pirzul doesnt change the color of the ספיר and
+       כדור handles."*
+
+       ⚠ BOTH WERE ALREADY HALF-CONSTANT, WHICH IS WHY THIS LOOKED LIKE A
+       RENDERING BUG RATHER THAN A WRONG ANSWER. The sapir's mirror knob and
+       the cadoor's ball are absolute hexes measured off the products and
+       wired to no finish at all; what followed the פרזול was the furniture
+       AROUND them — the square backplate and the soft ring. So gold gave a
+       gold plate with a chrome knob in the middle of it: two metals on one
+       fitting, which is the defect phase 4 exists to have ended.
+
+       ⚠ AND THE PAIR IS THE POINT, AGAIN. `knobplate` — כדור על אורך — is a
+       DIFFERENT product and must still follow: the photograph it was drawn
+       from, d092, is bronze, so it demonstrably ships in more than one
+       finish. A check that only said "sapir and cadoor hold still" would be
+       satisfied by a פרזול that had stopped reaching any lockset.
+
+       ⚠ `data-style`, NOT `data-kind`. The two knobs had no marker of any
+       sort until this change and the first version invented one — while
+       `knobplate`, `digital` and `square` beside them have carried
+       `data-style` all along. A fourth attribute meaning the same thing is
+       how a selector comes to match three fittings out of five. */
+    for (const kind of ['sapir', 'cadoor']) {
+      const st = { ...base, lockset: kind };
+      const sel = `data-style="${kind}"`;
+      ok(grabDeep(render(st), sel),
+         `the ${kind} group is not in the markup — this check is dead`);
+      for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
+        ok(looks(render({ ...st, pirzul: pz }), sel) === looks(render(st), sel),
+           `the פרזול "${pz}" recolours the ${kind} handle — the owner says it `
+           + 'does not');
+      }
+      ok(!refs(grabDeep(render(st), sel)).some(id => /^(nickel|nickelSoft|plateFace)$/.test(id)),
+         `the ${kind} still paints with one of the פרזול's own gradients`);
+    }
+    ok(grabDeep(render({ ...base, lockset: 'knobplate' }), 'data-style="knobplate"'),
+       'the knob-on-backplate group is not in the markup — the pair check is dead');
+    ok(looks(render({ ...base, lockset: 'knobplate', pirzul: 'pz-gold' }), 'data-style="knobplate"')
+       !== looks(render({ ...base, lockset: 'knobplate' }), 'data-style="knobplate"'),
+       'the knob-on-backplate has stopped following the פרזול — it is a different '
+       + 'product from the cadoor and d092 photographs it in bronze');
+
     /* ── AND THE עינית FOLLOWS IT ON ALL FOUR, WHICH IT DID NOT ─────────
        Peretz's own list of what the פרזול recolours has the עינית in it by
        name, `ASK-PERETZ.md` §0e rests the whole "כלול" answer on that
@@ -2651,6 +2694,48 @@ group('a new build reaches a browser that has been here before');
    ⚠ And it asserts the selectors it names still MATCH something — §5.15. A
    renamed class would otherwise retire this check quietly, on the day the
    stylesheet is being reorganised, which is the day it is most needed. */
+/* ── EVERY CHOICE THE DRAWING ANSWERS TO HAS A CUE ───────────────────
+   ⚠ `UX-FINDINGS` §4.3: *"picking a lock swaps a small piece of hardware I
+   have to hunt for"*. `stampChange` puts the field that moved on the stage and
+   the stylesheet animates only that field's parts — a mechanism that works
+   perfectly and had NO ENTRY for the two fittings added on 30.8. The פעמון
+   and the עינית could be switched on and off with nothing on screen saying
+   where to look, and nothing was asking.
+
+   So this asks: for every field a customer can change, either the stylesheet
+   has a `data-changed="<field>"` rule, or the field is on a list that says
+   why it does not need one. The list is the valuable half — a field with no
+   cue and no reason is the shape this check exists to catch.
+
+   ⚠ AND IT IS DRIVEN OFF `DEFAULTS`, so a tenth choice cannot be added
+   without landing in one column or the other. */
+group('every choice the drawing answers to has a cue');
+{
+  const css = readFileSync('css/app.css', 'utf8');
+  /* field → why the drawing needs no stamp of its own for it. */
+  const NO_CUE_NEEDED = {
+    size:      'the whole door changes size — there is nothing to point at',
+    handing:   'the whole door mirrors; the keyhole crosses the leaf',
+    handleLen: 'a length, and the bar it belongs to already animates on `handle`',
+  };
+  ok(/data-changed=/.test(css),
+     'no `data-changed` rule in css/app.css at all — either the stamp has been '
+   + 'renamed or this check has stopped matching the stylesheet');
+  for (const k of Object.keys(DEFAULTS)) {
+    if (NO_CUE_NEEDED[k]) continue;
+    ok(css.includes(`data-changed="${k}"`),
+       `changing "${k}" redraws the door and nothing on screen points at what `
+     + 'moved: no `data-changed` rule for it, and it is not on the list of '
+     + 'fields that do not need one');
+  }
+  /* §5.15 in the other direction: a reason on the list for a field that no
+     longer exists is a reason nobody will ever read again. */
+  for (const k of Object.keys(NO_CUE_NEEDED)) {
+    ok(k in DEFAULTS,
+       `"${k}" is excused from needing a change cue and is not a field any more`);
+  }
+}
+
 group('the accent is spent only where it means "this one is chosen"');
 {
   const css = readFileSync('css/app.css', 'utf8');

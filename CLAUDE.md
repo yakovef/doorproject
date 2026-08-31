@@ -1891,6 +1891,43 @@ how it got there. Detail lives in the section it belongs to.
   clears 44 px, and that its sentence equals `handingWords()` **to the
   character**. Falsified both ways: a different phrasing and a deleted row
   each fail every viewport.
+- **⚠ THE ספיר AND THE כדור DO NOT FOLLOW THE פרזול, AND THE REVIEW'S LAST
+  UNBUILT ITEM IS BUILT.** 31.8.2026.
+  ⚠ **Owner: *"the pirzul doesnt change the color of the ספיר and כדור
+  handles."*** And they were ALREADY HALF-CONSTANT, which is why this read as
+  a rendering fault rather than a wrong answer: the sapir's mirror knob and
+  the cadoor's ball are absolute hexes measured off the products and wired to
+  no finish at all, while the furniture AROUND them — the square backplate,
+  the soft ring — followed the פרזול. Gold gave a gold plate with a chrome
+  knob in the middle of it. **Two metals on one fitting is the defect phase 4
+  exists to have ended**, and it had survived inside two fittings all along.
+  `#lockUnitSoft` and `#lockUnitFace` are constants of the same stop shapes,
+  so the modelling is untouched and on a nickel door every pixel is identical.
+  ⚠ **`knobplate` KEEPS FOLLOWING IT, AND THE TEST SAYS SO.** כדור על אורך is
+  a different product — a knob on a long backplate carrying the keyway — and
+  d092, the photograph it was drawn from, is BRONZE, so it demonstrably ships
+  in more than one finish. A check that only said "sapir and cadoor hold
+  still" would pass on a פרזול that had stopped reaching any lockset at all.
+  The near-name is `ASK-PERETZ.md` §0a7.
+  ⚠ **AND THE TWO KNOBS HAD NO MARKER OF ANY KIND.** They carry `data-style`
+  now — the attribute `knobplate`, `digital` and `square` beside them have had
+  all along. The first attempt invented `data-kind` for them, which is how a
+  selector comes to match three fittings out of five.
+  ⚠ **THE REVIEW'S §4.3 WAS THE ONE ITEM NEVER DONE, AND THE GAP WAS THE TWO
+  NEWEST FITTINGS.** *"Picking a lock swaps a small piece of hardware I have
+  to hunt for."* `stampChange` has answered that since phase 8 — the stage is
+  stamped with the field that moved and the stylesheet animates only that
+  field's parts — and the פעמון and the עינית arrived on 30.8, after every
+  rule was written, with **no entry at all**. A 30 mm viewer is 3% of a leaf's
+  width, so a plain fade would not do either: they get a brief overshoot to
+  1.18 and settle. ⚠ `transform-box: fill-box` is load-bearing and is on no
+  other stamp — a SCALE in SVG resolves its origin against the whole viewBox,
+  so without it the ring flies in from the corner of the scene.
+  ⚠ **AND THE GAP IS CLOSED FOR THE NEXT FITTING TOO.** `npm test` now walks
+  every key of `DEFAULTS` and requires either a `data-changed` rule or a place
+  on a named list of fields that do not need one (`size`, `handing`,
+  `handleLen`, each with its reason) — and asserts every name on that list is
+  still a field. A choice with no cue and no reason cannot ship again.
 - **⚠ TWO LEADS FROM THE REVIEW BRANCH, NOT ACTED ON, WRITTEN DOWN SO THEY ARE
   NOT RE-DISCOVERED.**
   · **⚠ THE `https`-ONLY GUARD ON THE SHARE IMAGE IS BROADER THAN IT NEEDS TO

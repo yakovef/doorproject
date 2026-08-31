@@ -383,13 +383,14 @@
     
            follows it   the lever, the keyhole, the hinges, the viewer, the
                         security latch, and the metal strips
-           does not     the pull handle (its own product, its own finish), and
-                        the safe lock and the keypad (bought-in units)
+           does not     the pull handle (its own product, its own finish), the
+                        safe lock and the keypad, and the ספיר and כדור handles —
+                        all bought-in in one finish, on the owner's word 31.8
            two only     the doorbell — nickel or gold, on the owner's word */
     "exp.pz.a": [
-      "את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הפעמון מגיע בניקל או בזהב בלבד, ולכן בשחור ובברונזה הוא נשאר ניקל. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את הכספת והקודן, שמגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
-      "The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. The doorbell comes in nickel or gold only, so in black and in bronze it stays nickel. It does NOT change the pull handle — that is its own product and comes in its own finish — nor the safe lock and the keypad, which arrive in the manufacturer’s finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
-      "Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Звонок бывает только никелевым или золотым, поэтому в чёрном и бронзовом он остаётся никелевым. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет сейфовый и кодовый замки, которые приходят в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
+      "את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הפעמון מגיע בניקל או בזהב בלבד, ולכן בשחור ובברונזה הוא נשאר ניקל. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
+      "The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. The doorbell comes in nickel or gold only, so in black and in bronze it stays nickel. It does NOT change the pull handle — that is its own product and comes in its own finish — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
+      "Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Звонок бывает только никелевым или золотым, поэтому в чёрном и бронзовом он остаётся никелевым. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
     ],
     "exp.sum.q": [
       "מה קורה אחרי שאני שולח?",
@@ -3068,6 +3069,45 @@
       <stop offset="0.38" stop-color="${FINISH_TONES.steel[2]}"/>
       <stop offset="0.60" stop-color="${FINISH_TONES.steel[3]}"/>
       <stop offset="0.80" stop-color="${FINISH_TONES.steel[4]}"/>
+      <stop offset="1"    stop-color="${FINISH_TONES.steel[5]}"/>
+    </linearGradient>
+    <!-- ⚠ AND TWO MORE CONSTANTS FOR THE SAME REASON, ONE STEP OVER.
+         Owner, 31.8.2026: "the pirzul doesnt change the color of the ספיר and
+         כדור handles."
+
+         Both were ALREADY half-constant and that is what made the fault look
+         like a rendering bug rather than a wrong answer: the sapir's mirror
+         knob (mirrorKnob) and the cadoor's ball (domeKnob) are absolute
+         hexes, measured off the products and never wired to any finish. What
+         DID follow the פרזול was the furniture around them — the sapir's
+         square backplate and the soft ring on both — so choosing gold gave a
+         gold plate with a chrome knob sitting in the middle of it. Two metals
+         on one fitting, which is the exact defect phase 4 was about.
+
+         Same six/three/eight-stop shapes as lockUnit, nickelSoft and
+         plateFace, so the MODELLING is unchanged and only the question of
+         whose metal it is has moved. On a nickel door every pixel is
+         identical, because hwTone IS steel there.
+
+         ⚠ knobplate — כדור על אורך — is NOT in this list and keeps following
+         the פרזול. It is a different product from the cadoor (a knob on a
+         long backplate that carries the keyway) and the photograph this
+         drawing came from, d092, is BRONZE — so it demonstrably ships in more
+         than one finish. The owner named two handles; these are those two.
+         ASK-PERETZ §0a7 puts the near-name to him. -->
+    <linearGradient id="lockUnitSoft" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0"   stop-color="${FINISH_TONES.steel[1]}"/>
+      <stop offset="0.5" stop-color="${FINISH_TONES.steel[3]}"/>
+      <stop offset="1"   stop-color="${FINISH_TONES.steel[5]}"/>
+    </linearGradient>
+    <linearGradient id="lockUnitFace" x1="0" y1="0" x2="1" y2="0.22">
+      <stop offset="0"    stop-color="${FINISH_TONES.steel[2]}"/>
+      <stop offset="0.16" stop-color="${FINISH_TONES.steel[4]}"/>
+      <stop offset="0.36" stop-color="${FINISH_TONES.steel[5]}"/>
+      <stop offset="0.50" stop-color="${FINISH_TONES.steel[3]}"/>
+      <stop offset="0.64" stop-color="${FINISH_TONES.steel[1]}"/>
+      <stop offset="0.78" stop-color="${FINISH_TONES.steel[2]}"/>
+      <stop offset="0.92" stop-color="${FINISH_TONES.steel[4]}"/>
       <stop offset="1"    stop-color="${FINISH_TONES.steel[5]}"/>
     </linearGradient>
     <linearGradient id="nickel" x1="0.1" y1="0" x2="0.9" y2="1">
@@ -6544,7 +6584,7 @@ ${body}
     const rx = 34, ry = 40;
     const tilt = -11.8 * dir;
     return `
-    <g>
+    <g data-style="cadoor">
       <ellipse cx="${cx + dir * 5}" cy="${cy + 9}" rx="${rx}" ry="${ry}"
                fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
       <!-- The shank, seen almost edge-on and mostly hidden by the ball. It
@@ -6554,7 +6594,7 @@ ${body}
            instead of asserted. It points inboard now, which is also where the
            spindle goes. -->
       <rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
-            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"
+            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#lockUnitSoft)"
             transform="${dir < 0 ? `translate(${-rx * 1.2} 0)` : ""}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
                transform="rotate(${tilt} ${cx} ${cy})"/>
@@ -6573,15 +6613,15 @@ ${body}
     const kx = cx + dir * side * 0.47, ky = cy + side * 0.11;
     const ks = side * 0.98, kr = ks * 0.13;
     return `
-    <g>
+    <g data-style="sapir">
       <rect x="${cx - half + dir * 6}" y="${cy - half + 8}" width="${side}" height="${side}"
             rx="${r}" fill="#000" opacity="0.34" filter="url(#hwShadow)"/>
       <rect data-mount="plate"
             x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
-            fill="url(#plateFace)"/>
+            fill="url(#lockUnitFace)"/>
       <rect x="${cx - half}" y="${cy - half}" width="${side}" height="${side}" rx="${r}"
             fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="2"/>
-      <circle cx="${cx}" cy="${cy}" r="${side * 0.325}" fill="url(#nickelSoft)"/>
+      <circle cx="${cx}" cy="${cy}" r="${side * 0.325}" fill="url(#lockUnitSoft)"/>
       <circle cx="${cx}" cy="${cy}" r="${side * 0.195}" fill="none" stroke="#000"
               stroke-opacity="0.22" stroke-width="2"/>
       <rect x="${kx - ks / 2 + dir * 5}" y="${ky - ks / 2 + 7}" width="${ks}" height="${ks}"
