@@ -23,6 +23,44 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-31 05:40 UTC — run 62: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 61 (`0ba7915`
+still the tip on both sides). `npm run build` produced no diff. This
+run's visual check exercised the grip drag/undo interaction, which
+hadn't been directly checked in several runs: picked the עידן (Idan)
+pull bar through the real UI (a first attempt used two wrong id/param
+guesses — `אידן` instead of `עידן`, and `gp=`/`h=` URL params that
+turned out to be the grip-position override and an unrecognised key
+respectively, both my own mistakes rather than site issues, caught
+because no handle appeared and corrected by reading `js/url-state.js`
+and re-driving through the real tiles), then dragged the handle and
+confirmed it clamped correctly to the buildable range with a clear toast
+("the handle exceeds the door — moved to the nearest possible place")
+and an offered "back to original position" control. Measured the
+handle's exact screen Y before the drag (387.1px), after it (509.3px),
+and after clicking undo (387.1px, exactly) — confirming undo is a real,
+precise state round-trip rather than an approximate reset.
+
+**Instruments:** test ✓ (4,349,483 passed, 0 failed — identical to run
+61) · audit ✓ (all eight viewports clean, no faults) · profile ✓ (both
+FALLOFF bands within tolerance, byte-identical) · collide -- all ✓
+(1,902 designs, faceObstacles agrees with the drawing everywhere) ·
+collide -- boxes ✓ (MOUNT_REACH 121 covers the deepest fitting at 111) ·
+recreate ✓ (same ten long-documented catalogue gaps, nothing new). `git
+status` checked after `recreate` — clean.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run.
+The three items reserved for Peretz (hardware finish, the three missing
+Rav Bariach colours, every price) were not touched.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-31 00:40 UTC — run 61: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 60 (`1d6334c` still
