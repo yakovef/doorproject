@@ -23,6 +23,82 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-31 10:40 UTC — run 63: fixed a doubled `.is-sheet` selector that let the trust band leak onto the printed order sheet; also verified a human commit found mid-fix
+
+**Looked at:** `git fetch` — no new commits since run 62 at the start.
+`npm run build` produced no diff. Walked the live page, then checked the
+A4 order sheet (`?sheet=1`) with a built-up door (Idan bar, gold פרזול,
+bell, peephole) to exercise several recently-added features at once —
+the sheet's price, spec table and handing sentence all read correctly,
+and the gold ring knocker, gold lever and peephole all render correctly.
+
+**Found a real, reproducible defect:** a `fullPage` screenshot of the
+sheet route showed a sliver of stray, mispositioned text at the page's
+far-left edge. Traced with `getBoundingClientRect()` over every
+off-screen element to the footer trust band (`.trust`) sitting at
+negative x-coordinates, well below the sheet's visible content.
+`css/app.css`'s sheet-mode hide list read
+`.is-sheet .bar, .is-sheet .saved, .is-sheet .strip, .is-sheet .layout,`
+`.is-sheet .is-sheet .trust, .is-sheet .toast, .is-sheet .works, …` — the
+`.trust` selector doubled by typo, requiring `.trust` inside two nested
+`.is-sheet` ancestors. `.is-sheet` is only ever added to
+`document.documentElement` (checked in `js/app.js`), never nested, so
+that selector could never match — confirmed by `.trust` computing to its
+normal `display: flex` on the sheet route before the fix. `.trust` is
+also a sibling of `<main class="layout">`, not a descendant, so the
+correctly-written `.is-sheet .layout` rule beside it was never going to
+catch it either. Every other item in the hide list works; only `.trust`
+had the typo. This is the document Peretz actually prints and works
+from, carrying stray footer text on every single order, silently, since
+whenever this list was written.
+
+**Mid-fix, `git fetch` before pushing found a new human commit** —
+"The ספיר and the כדור stop following the פרזול, and the review's last
+unbuilt item is built" (owner's word that two more lockset fittings were
+wrongly recolouring with the finish; plus a change-highlight animation
+for the bell and peephole, closing the one item the UX review never got
+to). It touched `css/app.css` among other files. Rather than force a
+binary-conflicted rebase (the shot-family PNGs both sides had
+regenerated conflicted at the binary level), reset cleanly to the
+human's new tip (both of my local commits were unpushed, so nothing
+public was disturbed), confirmed the same `.is-sheet .is-sheet .trust`
+typo was still present and unaddressed by their commit, and reapplied
+the one-line fix on top of their latest work.
+
+**Fixed:** removed the duplicated `.is-sheet` prefix in `css/app.css`.
+Rebuilt, verified `.trust` now computes `display: none` on the sheet
+route and `display: flex` (unaffected) on the normal page, confirmed
+visually — the stray text is gone, the sheet ends cleanly after its
+price-caveat footnote. Regenerated all four screenshot families (`css/
+app.css` feeds their staleness hash) — as the proof this project relies
+on, **zero pixels changed in any `recreate-*`, `corpus-*` or `against-*`
+file** (bare-mode, untouched by a chrome-only CSS fix); only the `shot`
+family's PNGs differ, which CLAUDE.md's own §7 already documents as the
+one non-byte-stable family (live-browser rasterisation noise).
+
+**Instruments (all re-run on top of the human's latest commit, after the
+fix):** test ✓ (**4,349,513** passed, 0 failed — matches the human
+commit's own claimed count exactly) · audit ✓ (all eight viewports
+clean, no faults) · profile ✓ (both FALLOFF bands within tolerance,
+byte-identical) · collide -- all ✓ (1,902 designs) · collide -- boxes ✓
+(MOUNT_REACH 121 covers the deepest fitting at 111) · recreate ✓ (same
+ten long-documented catalogue gaps, nothing new, zero pixels moved).
+
+**Changed:** `css/app.css` — removed a doubled `.is-sheet` prefix on the
+`.trust` selector in the sheet-mode chrome-hide list, so the footer
+trust band is now actually hidden on the printed A4 order sheet, as the
+surrounding rule always intended. `index.html` re-stamped by `npm run
+build`. All four screenshot families regenerated and back in sync.
+
+**Left alone deliberately:** everything else — no other defect surfaced
+this run. The three items reserved for Peretz (hardware finish, the
+three missing Rav Bariach colours, every price) were not touched.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-31 05:40 UTC — run 62: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 61 (`0ba7915`

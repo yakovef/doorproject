@@ -3042,7 +3042,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    rule that hides everything and then un-hides three things is two rules that
    have to agree. */
 .is-sheet .bar, .is-sheet .saved, .is-sheet .strip, .is-sheet .layout,
-.is-sheet .is-sheet .trust, .is-sheet .toast, .is-sheet .works,
+.is-sheet .trust, .is-sheet .toast, .is-sheet .works,
 .is-sheet .works-open { display: none !important; }
 /* ⚠ The quote bar is a child of `.stage-wrap`, which is inside `.layout` — so
    `.is-sheet .layout` already takes it. Named anyway, because the line above
