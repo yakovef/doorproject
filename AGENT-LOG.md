@@ -23,6 +23,39 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-31 00:40 UTC — run 61: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 60 (`1d6334c` still
+the tip on both sides). `npm run build` produced no diff. Walked the live
+page in Chromium, varying what was probed this run: loaded a sidelight
+door with a leaf window, a strip window in the sidelight and a bronze
+פרזול via URL params — the site correctly recognised the combination as
+unbuildable, repaired it to the nearest real door, and showed the
+"some options in the link are unavailable" notice rather than silently
+substituting or crashing. A second probe used a guessed, wrong parameter
+name for the classical set and correctly fell back the same way. Both are
+the notice-and-repair mechanism working as designed, not defects. Zero
+console errors on either route.
+
+**Instruments:** test ✓ (4,349,483 passed, 0 failed — identical to run
+60) · audit ✓ (all eight viewports clean, no faults) · profile ✓ (both
+FALLOFF bands within tolerance, byte-identical) · collide -- all ✓ (1,902
+designs, faceObstacles agrees with the drawing everywhere) · collide --
+boxes ✓ (MOUNT_REACH 121 covers the deepest fitting at 111) · recreate ✓
+(same ten long-documented catalogue gaps, nothing new). `git status`
+checked after `recreate` — clean.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run.
+The three items reserved for Peretz (hardware finish, the three missing
+Rav Bariach colours, every price) were not touched.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-30 20:40 UTC — run 60: nothing worth changing — verified a full UX-review pass, item by item
 
 **Looked at:** `git fetch` pulled 8 human commits since run 59, working
