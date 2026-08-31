@@ -23,6 +23,41 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-31 15:40 UTC — run 64: nothing worth changing — verified both run 63's own fix and the human commit it landed beside
+
+**Looked at:** `git fetch` — no new commits since run 63 (`08e40a6`
+still the tip on both sides). `npm run build` produced no diff. Two
+targeted visual checks: confirmed run 63's own printed-sheet fix still
+holds (`.trust` computes `display: none` on `?sheet=1`, no stray footer
+text in a fresh `fullPage` screenshot); and confirmed the human commit
+that landed alongside it (the ספיר/כדור finish fix) by picking the ספיר
+lockset, applying the gold פרזול, and zooming into the fitting — the
+knob and its backplate correctly stay a fixed neutral colour while the
+cylinder beside it correctly follows the gold finish on its own, exactly
+matching "the pirzul doesnt change the color of the ספיר & כדור
+handles." (One of my own probes first clicked in the wrong category —
+ספיר is a lockset, not a pull handle — corrected and re-driven.) Zero
+console errors on every route tested.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+63) · audit ✓ (all eight viewports clean, no faults) · profile ✓ (both
+FALLOFF bands within tolerance, byte-identical) · collide -- all ✓
+(1,902 designs, faceObstacles agrees with the drawing everywhere) ·
+collide -- boxes ✓ (MOUNT_REACH 121 covers the deepest fitting at 111) ·
+recreate ✓ (same ten long-documented catalogue gaps, nothing new). `git
+status` checked after `recreate` — clean, no stamp drift.
+
+**Changed:** nothing.
+
+**Left alone deliberately:** everything — no defect surfaced this run.
+The three items reserved for Peretz (hardware finish, the three missing
+Rav Bariach colours, every price) were not touched.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-08-31 10:40 UTC — run 63: fixed a doubled `.is-sheet` selector that let the trust band leak onto the printed order sheet; also verified a human commit found mid-fix
 
 **Looked at:** `git fetch` — no new commits since run 62 at the start.
