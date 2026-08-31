@@ -56,8 +56,7 @@ status` checked after `recreate` — clean.
 The three items reserved for Peretz (hardware finish, the three missing
 Rav Bariach colours, every price) were not touched.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** 1a99c3d
 
 ---
 
