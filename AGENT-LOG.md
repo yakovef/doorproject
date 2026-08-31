@@ -23,6 +23,68 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-08-31 20:40 UTC — run 65: nothing worth changing — chased a genuine audit red to a container flake and a scroll-band false alarm, neither a real defect
+
+**Looked at:** `git fetch` — no new commits since run 64 (`08e40a6` still
+the tip on both sides). `npm run build` produced no diff.
+
+The first `npm run audit` came back with a real fault: at `wide`
+(1680x950), step "pz" — 8 tiles across the pirzul/bell/peephole groups —
+reported "8 options and NONE on screen." Reproduced the exact sequence
+by hand (fresh load → the bare-mode roundtrip → the reduced-motion
+roundtrip → scroll-to-top → click the step, 90 ms wait, same selectors)
+twice and got all 8 tiles visible both times. Re-ran the full
+`npm run audit` end to end: 0 faults, every viewport clean, including
+`wide`. Concluded it was a timing race under load in this container (§7:
+"the ceiling falls the longer the container lives"), not a deterministic
+site defect — no code touched for it.
+
+That chase turned up a second thing worth checking properly rather than
+waving off: on a phone (390x844), the "pz" step's last row of tiles
+(peephole yes/no) sits low enough that `scrollIntoViewIfNeeded()` +
+`.click()` timed out, intercepted at different scroll offsets by either
+the fixed `.quote` bar or the sticky `.stage-wrap`. Swept every 20px of
+scroll position by hand: the tile IS reachable, in the 280px window
+between s=540 and s=820, where neither fixed element covers it. Checked
+whether this was `pz`-specific by running the same sweep on `face`
+(22 tiles, definitely the most crowded step) — same pattern, a real
+scroll pass finds a reachable band. This is ordinary sticky-header /
+fixed-footer scrolling — a continuous scroll gesture passes through the
+clear band and a person lifts their thumb there — not the "no legal
+position at all" shape this file's §9 already reserves for a genuinely
+unreachable control. The audit's own on-screen check is written to
+allow exactly this ("a grid that needs scrolling is normal, a grid with
+nothing showing is not") and correctly did not fire. Nothing to fix.
+
+Also drove a fresh combination not recently exercised: the wide mashkof
+(חזית רחבה) selected on the `mk` step at 1440x900 in Russian, carried
+through to the summary. ₪3,445, spec rows all correctly translated
+(Коробка: Широкий фасад), send button present, zero console errors —
+matches the six-band pricing landed in run 58.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed) · audit ✓ (second
+full run, 0 faults — see above for the first run's flake) · profile ✓
+(both FALLOFF bands and all four bead ratios within tolerance) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same ten catalogue-gap
+notes as prior runs, zero stamp drift) · shot ✓ (ran once for
+completeness; the usual 10 of 12 sheets differ by rasterisation noise
+only, per §7 — discarded via `git checkout -- screenshots/`, nothing to
+commit).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** the `wide`/`pz` audit fault — confirmed
+non-reproducible on a clean re-run, attributed to container timing
+rather than the site. The phone scroll-band finding — confirmed
+reachable by a normal scroll gesture and not unique to `pz`, so not a
+defect to fix.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-31 15:40 UTC — run 64: nothing worth changing — verified both run 63's own fix and the human commit it landed beside
 
 **Looked at:** `git fetch` — no new commits since run 63 (`08e40a6`
