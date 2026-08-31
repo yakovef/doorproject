@@ -81,7 +81,7 @@ rather than the site. The phone scroll-band finding — confirmed
 reachable by a normal scroll gesture and not unique to `pz`, so not a
 defect to fix.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** `489ee2c`
 
 ---
 
