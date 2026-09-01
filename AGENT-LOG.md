@@ -23,6 +23,55 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-01 05:40 UTC — run 67: nothing worth changing — chased the "position is in the link" addendum to a deployment-conditional non-issue
+
+**Looked at:** `git fetch` — no new commits since run 66 (`255d340`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+Printed the A4 order sheet in English on a built-up door (white,
+vertical-slot window, Ron bar, black פרזול) — bilingual rows correct
+throughout, black finish correctly reaches the lever/backplate as well
+as the bar, no `.trust`-band leak (still holding since run 63's fix),
+₪8,195 with the 5% caveat, no console errors.
+
+Then dragged the Ron pull bar on a wide door at 1280x720 and read the
+resulting `[data-wa]` href directly: it never carries `gp=`, and the
+message's addendum line still unconditionally says "the exact spot is
+in the link" (`addendum.shifted` in `js/copy.js`). Traced it to
+`shareUrl()` in `js/share.js`, which returns `null` whenever
+`isServed()` is false — i.e. whenever the page is opened over `file://`,
+which is how every check in this session opens it, and how the site is
+currently reached at all (`CLAUDE.md` §0c: not deployed, on
+instruction). The comment beside `shareUrl` in `message()` says this is
+intentional — "dropped, not faked" — and it is deployment-conditional
+by construction: once the site is live over https, every customer visit
+has `isServed() === true`, so the link is always present and the
+addendum's promise always holds. Confirmed `gp=` is written by
+`toQuery` (`js/url-state.js:393`) whenever the grip has moved, so the
+mechanism itself is correct — the gap is only reachable pre-deployment,
+which is a state the owner asked for on purpose. Not a defect; nothing
+to fix. Recorded here so a future run does not re-discover the same
+dead end.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+66) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** the missing link in a dragged-handle
+message under `file://` — correct, deployment-conditional behaviour,
+not a bug; will resolve itself the day the site is deployed.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-01 00:40 UTC — run 66: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 65 (`ed64c22`
