@@ -68,7 +68,7 @@ notes as prior runs, zero stamp drift).
 message under `file://` — correct, deployment-conditional behaviour,
 not a bug; will resolve itself the day the site is deployed.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** `1ab00ac`
 
 ---
 
