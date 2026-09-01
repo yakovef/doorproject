@@ -59,7 +59,7 @@ stamp drift).
 **Left alone deliberately:** nothing new — the language-switch scare
 did not survive a careful re-check.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** `9f2e394`
 
 ---
 
