@@ -23,6 +23,46 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-01 10:40 UTC — run 68: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 67 (`5a3f8a0`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+Chose the Rotem lock tile on a phone (390x844), then switched the
+interface from Hebrew to English mid-flow via the language buttons (not
+a fresh `?lang=` load). Chased a false alarm from my own first probe: a
+crude `body.innerText` regex for stray Hebrew flagged a hit after the
+switch, which looked like it could be the buildPanel-append class of bug
+CLAUDE.md documents at length (§0c). Re-checked properly — the SVG's
+`aria-label` reads correctly in English after the live switch ("Steel
+entrance door, Dark umber (Rav Bariach 7126D)…"), the live step stayed
+on "lock", and a `TreeWalker` over real text nodes found only two
+Hebrew hits: the "דלתות מגן" brand name (correctly untranslated, it's a
+proper name) and a JS comment inside a `<script>` tag that isn't
+rendered. No stale text anywhere. The audit's own "languages: the
+interface mirrors, the door does not, and the door survives the switch"
+check (below) independently confirms the same thing. Not a defect — my
+own first probe's `innerText` snapshot was just noisy.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+67) · audit ✓ (0 faults, all eight viewports, including the language
+route) · profile ✓ (both FALLOFF bands and all four bead ratios within
+tolerance, byte-identical) · collide -- all ✓ (1,902 designs,
+faceObstacles agrees with the drawing everywhere) · collide -- boxes ✓
+(deepest bolted lock furniture 111 mm against MOUNT_REACH 121) ·
+recreate ✓ (10 doors, same catalogue-gap notes as prior runs, zero
+stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new — the language-switch scare
+did not survive a careful re-check.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-01 05:40 UTC — run 67: nothing worth changing — chased the "position is in the link" addendum to a deployment-conditional non-issue
 
 **Looked at:** `git fetch` — no new commits since run 66 (`255d340`
