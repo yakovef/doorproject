@@ -55,7 +55,7 @@ notes as prior runs, zero stamp drift).
 **Left alone deliberately:** nothing new — both "notices" were my own
 wrong query parameters, not site defects.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** `32a7b49`
 
 ---
 
