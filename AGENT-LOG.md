@@ -23,6 +23,41 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-01 00:40 UTC — run 66: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 65 (`ed64c22`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+Two fresh visual checks, neither recently exercised: opened the works
+gallery at 1440x900 (30 tiles found, one picked and loaded cleanly into
+the configurator with no console errors); and drove a fresh combination
+at 390x844 — widened single door (`extra1`), strip window with grid
+ironwork, the Ella pull bar, gold פרזול — through to the summary. The
+lever furniture and pull bar both correctly read gold, price ₪9,595, no
+stray "unrecognised option" notice, zero console errors on either page.
+
+`npm run audit`'s `wide`/`pz` step came back clean this run (0 faults,
+all eight viewports) — no repeat of run 65's flake, consistent with that
+being a one-off container timing race rather than a real fault.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+65) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical to run
+65) · collide -- all ✓ (1,902 designs, faceObstacles agrees with the
+drawing everywhere) · collide -- boxes ✓ (deepest bolted lock furniture
+111 mm against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-
+gap notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new — no genuine defect found this
+run.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-08-31 20:40 UTC — run 65: nothing worth changing — chased a genuine audit red to a container flake and a scroll-band false alarm, neither a real defect
 
 **Looked at:** `git fetch` — no new commits since run 64 (`08e40a6` still
