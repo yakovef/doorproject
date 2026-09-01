@@ -23,6 +23,42 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-01 15:40 UTC — run 69: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 68 (`ab09e09`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+Printed the A4 order sheet in Russian for a fresh combination not
+recently exercised: the widened mashkof (`m=mk-both`, רחב ועמוק), bell
+and peephole both on. Two of my own probes first used wrong parameter
+names — `bl=1&ey=1` (real ids are `bell`/`peep`, not `1`) and `mk=` for
+the frame (the real query key is `m`; `mk` is only the step/section
+key). Both correctly produced the red "some parameters from the link
+are unavailable" notice and fell back to the nearest buildable default
+rather than silently substituting — exactly the `fromQuery` rule
+`CLAUDE.md` §8 documents, working as designed. Re-ran with the correct
+keys: clean load, no notice, "Коробка: Широкая и глубокая", bell
+knocker and peephole both drawn on the centre line, ₪3,995, no console
+errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+68) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new — both "notices" were my own
+wrong query parameters, not site defects.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-01 10:40 UTC — run 68: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 67 (`5a3f8a0`
