@@ -23,6 +23,34 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-02 10:40 UTC — run 73: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 72 (`ee1dfc2`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+The digital smart lock (`n=digital`) beside a vertical-slot window on
+an oversize door (`?n=digital&w=strip&s=extra1&c=rb-9016d`), not
+recently exercised — the black smart-lock unit clears the glass with
+room to spare, ₪10,895, spec row reads "מנעול וידית: מנעול חכם", no
+console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+72) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-02 05:40 UTC — run 72: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 71 (`d2130be`
