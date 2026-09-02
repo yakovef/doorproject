@@ -23,6 +23,33 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-02 20:40 UTC — run 75: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 74 (`d125ef3`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+The tight horizontal band (`?d=stripsband&c=rb-0097d`), not recently
+exercised — eight fine lines across the middle fifth of the leaf, spec
+row correctly reads "פסים: 8 אופקיים · צפופים" (tight, not the spread
+ragged family). ₪4,595, no console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+74) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-02 15:40 UTC — run 74: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 73 (`211bcf9`
