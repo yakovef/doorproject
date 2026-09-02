@@ -23,6 +23,38 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-02 00:40 UTC — run 71: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 70 (`df1580a`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+Checked the קודן (mechanical keypad) against `CLAUDE.md`'s documented
+redraw, not recently exercised directly: `?x=kodan&pz=pz-black` and a
+cropped screenshot of `[data-owner="speciallock"]` at 3x device scale.
+Correct on both counts it was rebuilt for — a pill body with buttons in
+two columns and a turn knob filling the bottom third (not the old
+digital-keypad shape), and it stays its own constant steel tone while
+the black פרזול correctly reaches the lever and backplate beside it —
+matching the documented rule that the bought-in special-lock units are
+the one thing the finish never touches. ₪4,395, no console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+70) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-01 20:40 UTC — run 70: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 69 (`3377044`
