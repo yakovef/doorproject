@@ -23,6 +23,38 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-03 15:40 UTC — run 79: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 78 (`1d9401d`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+Drove the LIVE stripe controls through the actual UI on the face step —
+the direction pills, the +/− stepper, the tight toggle — rather than
+via `?d=` query ids, since runs 74/75/77/78 all turned out to be
+exercising the retired-id migration path (`STRIPE_LEGACY`) without
+realizing it (noted in run 78's entry). Switched to vertical, stepped
+the count to 5: five even vertical stripes drawn correctly, counter
+reads "5 פסים", the tight pill correctly absent (vertical has no tight
+variant), the stripe line-item reads ₪1,500 (5 × ₪300, matching
+Peretz's per-stripe vertical rate). ₪4,895 total, no console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+78) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-03 10:40 UTC — run 78: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 77 (`fa63e91`
