@@ -23,6 +23,43 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-03 10:40 UTC — run 78: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 77 (`fa63e91`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+`?d=stripsx`, not recently exercised. Worth writing down: this and the
+last several runs' `?d=strips9`/`stripsband`/`stripsv6`/etc. checks were
+all exercising the retired-id MIGRATION path (`STRIPE_LEGACY` in
+`js/catalog.js`), not a live `DETAILS` entry — the stripe axis was
+recut to three state fields (`stripeDir`/`stripeCount`/`stripeTight`)
+and these ids only survive as backward-compatible link migrations.
+`stripsx` is the interesting one: its old form crossed one vertical
+member with two pairs of horizontals, which the current model refuses
+on purpose (one direction only), so its documented migration drops it
+to the vertical member alone — and that's exactly what rendered: one
+vertical stripe, spec row "פסים: 1 אנכיים", ₪3,695, no console errors.
+Confirms that migration path is still intact for the one legacy id
+whose old shape the current model cannot represent at all.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+77) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new — the single-vertical result
+is `stripsx`'s documented, deliberate migration, not a defect.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-03 05:40 UTC — run 77: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 76 (`515d8d4`
