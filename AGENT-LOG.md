@@ -56,7 +56,7 @@ notes as prior runs, zero stamp drift).
 **Left alone deliberately:** nothing new — the single-vertical result
 is `stripsx`'s documented, deliberate migration, not a defect.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** `843b978`
 
 ---
 
