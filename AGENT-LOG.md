@@ -23,6 +23,35 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-04 10:40 UTC — run 83: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 82 (`496e30d`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+The two-panel ogee twin (`?d=panel2o`), not recently exercised — same
+two rectangles as `panel2` but in the ogee moulding section (a soft
+single scribed groove rather than reed's several fine beads), spec row
+reads "עיצוב: שני פאנלים קלאסים", ₪4,845 — matching `panel2`'s own
+price exactly, per the documented rule that the ogee/reed twins differ
+in nothing but the moulding profile. No console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+82) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-04 05:40 UTC — run 82: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 81 (`278d876`
