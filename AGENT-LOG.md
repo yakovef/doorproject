@@ -52,7 +52,7 @@ notes as prior runs, zero stamp drift).
 **Left alone deliberately:** nothing new — the "unavailable" notice was
 my own bad query parameter, not a site defect.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** `981d035`
 
 ---
 
