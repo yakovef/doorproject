@@ -50,7 +50,7 @@ notes as prior runs, zero stamp drift).
 
 **Left alone deliberately:** nothing new.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** `0b26071`
 
 ---
 
