@@ -23,6 +23,39 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-04 20:40 UTC — run 85: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 84 (`0fdeaf4`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+The Shahar flat-blade handle on a left-hinged door in English
+(`?lang=en&n=shahar&h=left-in&c=rb-6219d`), not recently exercised
+together — drawn correctly as a wide flat ribbon standing off the leaf,
+door hinged left with the cylinder on the right, handing card reads
+"Hinges on the left, cylinder on the right — seen from outside".
+₪4,195, no console errors. My own first probe used an invalid handing
+id (`left-out` — only `right-in`/`left-in` exist) and correctly got the
+"some parameters unavailable" notice rather than a silent substitution;
+corrected and re-verified with `left-in`.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+84) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new — the "unavailable" notice was
+my own bad query parameter, not a site defect.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-04 15:40 UTC — run 84: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 83 (`35ce32a`
