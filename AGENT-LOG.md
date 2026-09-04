@@ -23,6 +23,37 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-04 05:40 UTC — run 82: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 81 (`278d876`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+The three-panel face (`?d=panel3`) with the pull handle explicitly set
+to `none`, not recently exercised together — confirmed the panel's own
+turned pull (`grab: true` on the catalogue entry) still draws on the
+middle handle plate even though the customer's separate handle choice
+is "no pull," which is the documented, deliberate split between a
+face-supplied fitting and the handle group. Spec row correctly reads
+"ידית משיכה: ללא ידית משיכה" while the pull is visibly on the door.
+₪5,095, no console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical to run
+81) · audit ✓ (0 faults, all eight viewports) · profile ✓ (both FALLOFF
+bands and all four bead ratios within tolerance, byte-identical) ·
+collide -- all ✓ (1,902 designs, faceObstacles agrees with the drawing
+everywhere) · collide -- boxes ✓ (deepest bolted lock furniture 111 mm
+against MOUNT_REACH 121) · recreate ✓ (10 doors, same catalogue-gap
+notes as prior runs, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-04 00:40 UTC — run 81: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 80 (`9243cb7`
