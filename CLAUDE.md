@@ -385,9 +385,12 @@ It is healthy today — 6/6 loads at 1280 and 1680, zero crashes — which is wh
 
 ### Blocked on a human
 
-`ASK-PERETZ.md` is **160 lines now, not 776**, and that is the change that
-matters most about it: nobody answers a 500-line document between jobs, and
-that is why it went nine days unanswered. What is left is fifteen assumptions
+`ASK-PERETZ.md` is **256 lines now, not 776** — cut to 160 on 30.8 and grown
+back by the question each round raised — and the cut is the change that matters
+most about it: nobody answers a 500-line document between jobs, and that is why
+it went nine days unanswered. ⚠ **It is drifting back toward the length that
+failed. The next round should prune the sections already marked ✅ rather than
+add a tenth question.** What is left is fifteen assumptions
 (`CLAUDE.md` §9), of which one is expensive:
 
 ⚠ **A13 — which of our two windows is his "tall".** ₪500 on the majority of
