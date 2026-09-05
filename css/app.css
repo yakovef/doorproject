@@ -2083,12 +2083,46 @@ svg { direction: ltr; }
    one is not. With the priorities swapped the description fits on one line at
    every width above 320px instead of orphaning its last word. */
 .sect__text { flex: 1 1 auto; min-inline-size: 0; display: grid; gap: 2px; }
-/* The eyebrow: `NN ⁄ 08` on a question, the summary's subtitle on the last
-   step. Small, tracked, and the one place `--accent-ink` is spent as text. */
+/* The eyebrow: the step's position in words on a question, the summary's
+   subtitle on the last step. Small, lightly tracked, and the one place
+   `--accent-ink` is spent as text.
+
+   ⚠ IT WAS SET IN `--mono` AT .14em, AND THE MOMENT ITS CONTENT BECAME A
+   SENTENCE THAT STOPPED BEING TYPOGRAPHY AND BECAME A SUBSTITUTION. Reported
+   from outside as "the summary's eyebrow renders oddly" — one step, low
+   stakes. It was on all nine, and the cause is bigger than the symptom:
+
+     · `--mono` is `ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas,
+       monospace` and NOT ONE OF THOSE FACES CARRIES HEBREW. Chromium picks a
+       face per glyph, so the line came out in two typefaces at once — the
+       numerals in the monospace face the token asks for, the Hebrew words in
+       whatever last-resort face the machine happens to have. Measured at
+       1280x720 on the real page: the string `שלב 1 מתוך 8` is 95.58 px wide
+       in `--mono` and 80.44 px in `--sans`, and the control is the digits,
+       which the mono stack DOES cover — `11118888` is 55.47 against 43.33.
+       Two different widths for the same string is two different faces.
+     · AND .14em ON HEBREW IS NOT TRACKING, IT IS A GAP. Same string, same
+       face: 80.44 px tracked against 61.06 px untracked. Thirty-two per cent
+       of the line was letter-spacing, on a script that takes almost none.
+
+   ⚠ THE TOKEN IS NOT AT FAULT AND IS NOT CHANGED. `--mono` exists to give
+   prices, codes and dimensions tabular figures, and it does that correctly.
+   What was wrong is that `NN ⁄ 08` — a Latin code, which is what the mono
+   voice was chosen for — became `שלב 1 מתוך 8`, a sentence, when the slash
+   was found to read backwards in an RTL column (see `markSteps`). The
+   treatment did not follow the content. Four more slots still set Hebrew in
+   `--mono` and are recorded in CLAUDE.md §9 rather than swept up here: they
+   are captions at .6-.66rem where the substitution is small and the tabular
+   figures beside it are the point. This one is 11.5 px, tracked, in the
+   accent ink, on every screen. */
 .sect__where {
   margin: 0 0 10px;
-  font: 600 .72rem/1.2 var(--mono);
-  letter-spacing: .14em;
+  font: 600 .72rem/1.2 var(--sans);
+  /* The eyebrow keeps a voice — it is still the smallest, driest line on the
+     step — but at the counter's .06em rather than a Latin code's .14em, which
+     is the same value `.sect__head::before` already uses for the one thing on
+     this page that IS still a bare numeral. */
+  letter-spacing: .06em;
   color: var(--accent-ink);
 }
 /* ⚠ AND THE RING ON IT IS OURS, AND ONLY FOR THE KEYBOARD. The heading carries

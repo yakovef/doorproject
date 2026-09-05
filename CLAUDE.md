@@ -1636,6 +1636,32 @@ complete and its findings live here:
 
 ### Wanted next, and named so it is not forgotten
 
+- **⚠ FOUR MORE SLOTS STILL SET HEBREW IN `--mono`, WHICH HAS NO HEBREW IN
+  IT.** `.swatch__meta`, `.tile__meta`, `.tile__why` and `.sheet__dims`. The
+  fault is the one §0b records for the eyebrow on 5.9: the token is
+  `ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, monospace`, none of
+  those faces carries the script, and Chromium resolves a face per glyph — so
+  `כלול` and `דורש חלון` are drawn by whatever last-resort face the machine
+  has while the `+₪350` beside them is drawn by the monospace one. **One line,
+  two typefaces**, in four places.
+  These were left where they are rather than swept up with the eyebrow, and
+  the reason is the token's actual job: they are captions at .6–.66rem whose
+  Latin content is *figures* — a price, a dimension, a code — and tabular
+  figures are exactly what `--mono` is spent on. The eyebrow was 11.5 px,
+  tracked, in the accent ink, on every screen, with no figures in it worth the
+  token. These are small and mixed, and the trade goes the other way.
+  ⚠ **THE STACK CANNOT BE FIXED BY REORDERING IT, and the obvious try is a
+  trap.** Putting a Hebrew face behind the monospace ones only works while no
+  monospace face on the machine covers Hebrew — and some do (this container's
+  does, which is why the measurement above came out at 95.58 rather than
+  matching `--sans`). Putting Assistant *first* fixes Hebrew and steals the
+  Latin digits, losing the tabular figures the token exists for. The only
+  mechanism that says "this face for this script" is `@font-face` +
+  `unicode-range`, and Assistant is a Google webfont that `local()` will not
+  match, so that route wants a second `src` URL — a real decision about a
+  network request, not a tidy-up. Whoever takes it should take all four at
+  once.
+
 - **A recreate case for the classical-set door.** `research/newdoor/` is
   committed and the catalogue cites it, but `npm run recreate` still only knows
   the thirty numbered doors, so nothing in the repo re-checks the new one
@@ -1808,6 +1834,41 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE EYEBROW WAS SET IN A FACE THAT CANNOT DRAW HEBREW, ON ALL NINE
+  STEPS — 5.9.2026.** `UX-FINDINGS.md` §6's fourth and smallest bullet: *"the
+  summary's eyebrow renders oddly… worth a look; low stakes."* It was one step
+  in the report and nine on the page, and the cause is not the summary's.
+  ⚠ **`--mono` IS `ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas,
+  monospace` AND NOT ONE OF THOSE FACES CARRIES HEBREW.** Chromium resolves a
+  face per glyph, so `.sect__where` came out in **two typefaces at once** — the
+  numerals in the monospace face the token asks for, the Hebrew words in
+  whatever last-resort face the machine happens to have. Measured on the real
+  page at 1280×720: `שלב 1 מתוך 8` is **95.58 px** wide in `--mono` and
+  **80.44 px** in `--sans`. The control is the digits, which the mono stack
+  *does* cover — `11118888` is **55.47** against **43.33** — so the two stacks
+  demonstrably resolve to different faces, and the Hebrew above is a
+  substitution rather than a coincidence of widths.
+  ⚠ **AND THE .14em WAS NOT TRACKING, IT WAS A GAP.** Same string, same face:
+  **80.44 px tracked against 61.06 px untracked** — thirty-two per cent of the
+  line was letter-spacing, on a script that takes almost none.
+  **THE TREATMENT DID NOT FOLLOW THE CONTENT, AND THE CHANGE THAT BROKE IT WAS
+  ONE OF OURS.** The slot used to hold `NN ⁄ 08` — a Latin code, which is
+  exactly what a tracked monospace voice is for. It became `שלב 1 מתוך 8` when
+  `08 ⁄ 03` was found to read backwards in an RTL column (see `markSteps`): a
+  correct fix that moved a sentence into a slot styled for numerals. Nothing on
+  the page and nothing in the suite objects to type set in a font that cannot
+  draw the language, which is why it took an outside eye to see it and why the
+  report filed it as cosmetic. Now `--sans` at `.06em`, the tracking
+  `.sect__head::before` already uses for the one thing here that IS a bare
+  numeral.
+  ⚠ **THE TOKEN IS NOT AT FAULT AND WAS NOT TOUCHED.** `--mono` exists to give
+  prices, codes and dimensions tabular figures and it does that correctly.
+  Four more slots set Hebrew in it and are recorded in §9 rather than swept up
+  behind this one.
+  Gate: `npm test` 4,349,513 / 0, `npm run audit` no faults, sheets
+  regenerated — **all 52 bare sheets unchanged**; the 12 `shot` sheets moved,
+  which is what a change to the page's type is supposed to do.
 
 - **⚠ THE FIRST-TIME-CUSTOMER REVIEW, 31.8.2026 — ITEM 1 OF SEVEN: THE FLOW
   ENDED WITH ITS OWN SEND BELOW THE FOLD.** `UX-FINDINGS.md` §1, on
