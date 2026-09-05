@@ -8637,6 +8637,7 @@ ${body}
       b.dataset.step = sec.key;
       b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`;
       b.setAttribute("aria-label", T(sec.title));
+      b.title = T(sec.title);
       b.addEventListener("click", () => goStep(sec.key));
       nav.appendChild(b);
     }

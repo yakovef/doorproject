@@ -141,9 +141,36 @@ for (const v of VIEWS) {
     liveKey: (document.querySelector('.sect:not([hidden])') || {}).dataset?.section,
     nav: document.querySelectorAll('.steps__step').length,
     current: document.querySelectorAll('.steps__step[aria-current]').length,
+    /* Each circle's tooltip beside its accessible name — asserted below. */
+    railNames: [...document.querySelectorAll('.steps__step')].map(b => ({
+      step: b.dataset.step,
+      aria: b.getAttribute('aria-label') || '',
+      title: b.getAttribute('title') || '',
+    })),
     visibleOptions: [...document.querySelectorAll('[role="radio"]')]
       .filter(e => e.getBoundingClientRect().height > 0).length,
   }));
+
+  /* ⚠ THE RAIL'S NINE CIRCLES SAY THEIR NAME TO A MOUSE AS WELL AS TO A
+     SCREEN READER, AND THE TWO NAMES ARE ONE STRING.
+     `UX-FINDINGS.md` §3: nine icon buttons, no visible text, every one
+     carrying a correct `aria-label` — *"a screen reader is better informed
+     about this page than a sighted customer."* Its one untried remedy, two
+     labelled rows, was built and measured out (CLAUDE.md §9); the `title`
+     is what the row can afford, and it is worth an assertion for the same
+     reason the `aria-label` is: it is invisible until someone hovers, so
+     nothing on the page shows it going missing or going stale.
+     Both come from `T(sec.title)` in `buildPanel`. Asserting they are EQUAL
+     rather than merely present is the point — a rename that touched one and
+     not the other would leave the tooltip and the screen reader disagreeing
+     about what a button does, and no instrument here would have noticed. */
+  for (const r of shut.railNames) {
+    if (!r.aria) fault(v.name, `step circle "${r.step}" has no accessible name`);
+    if (!r.title) fault(v.name, `step circle "${r.step}" has no tooltip — a sighted customer cannot read the rail`);
+    else if (r.title !== r.aria) {
+      fault(v.name, `step circle "${r.step}" says "${r.title}" to a mouse and "${r.aria}" to a screen reader`);
+    }
+  }
   /* THE DRAWING IS PAINTED ON THE WALL, and it can stop being.
      `#backdrop` is filled with `fill="var(--wall)"`, so any script that sets
      `--wall` to something that is not a colour makes the fill invalid and the

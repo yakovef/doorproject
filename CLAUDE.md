@@ -1507,6 +1507,15 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
   the floor reflection is invisible to `collide`, `profile` and `glass` — which
   was verified over 1,490 designs rather than assumed, against a plan that
   insisted a strip was required.
+- **A WRAPPING FLEX CONTAINER LIES ABOUT ITS HEIGHT TO AN AUTO GRID ROW.** Its
+  `max-content` size is computed as if nothing wrapped, so a `flex-wrap: wrap`
+  element in an `auto` track gets a track sized for ONE line and its other
+  lines render outside the box, behind whatever is beneath. Nothing throws and
+  no assertion here would see it. Met head-on by the two-row rail spike on 5.9
+  (`.panel--choose` is a grid): content 134 px in a 61 px row. The only fix is
+  an explicit height, which is a second copy of the font size, the tap floor
+  and the row gap — §5.10 — so **if a row inside the panel has to wrap, give
+  it its own grid or flex column, do not wrap it in place.**
 
 ---
 
@@ -1835,6 +1844,40 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE TWO-ROW RAIL WAS FINALLY BUILT, MEASURED AND THROWN AWAY, AND IT
+  CORRECTS THIS FILE — 5.9.2026.** `UX-FINDINGS.md` §3 is the one item of the
+  seven that was declined on an ESTIMATE rather than on the thing itself, and
+  the estimate was wrong. Built as a real spike — labels in `buildPanel`,
+  `flex-wrap` in the stylesheet, `npm run build`, loaded at seven viewports —
+  and the row **fits, with all nine labels whole and none ellipsised**: 74 × 60
+  cells against a 50 px longest label at 1280. This file said they would
+  truncate. They do not.
+  ⚠ **THE COST IS 82 px OF THE ONE AXIS THE PANEL HAS NONE OF.** Rail 61 →
+  143. Panel overflow on arrival: cusp **195 → 277**, laptop **279 → 361**,
+  wide **49 → 131**, wide-short **81 → 163**; driven forward to the worst step
+  at 1280, **678 → 760**. That is §4 of the same report — *"every step
+  overflows its panel"* — made a third worse in order to answer §3.
+  ⚠ **AND THE REVIEW'S OWN FALLBACK IS BACKWARDS.** It offered *"labels on
+  desktop only, where the panel has room"*. Desktop is where the panel has
+  **least** room: below 1100 the panel is not a scroll container at all — the
+  page scrolls — so the figure is 0 on every phone and tablet and 279 on a
+  1280 laptop.
+  Two structural blockers on top of the budget, the first now in §8: above
+  1100 a wrapping flex container reports its single-line height to an auto
+  grid row, so the second row rendered *behind* the step below it; below 1100
+  the rail is `position: fixed` against a hand-written `--steps-h: 62px`, and
+  correcting that to 144 brought the sticky stage down over the panel — at
+  320×568 the spike could not click `הבא` at all, the door was intercepting
+  the pointer.
+  ⚠ **WHAT SHIPPED INSTEAD IS THE NAME ON HOVER.** §3's complaint is precisely
+  *"a screen reader is better informed about this page than a sighted
+  customer"*, and a `title` on each circle — same `T(sec.title)` as the
+  `aria-label`, no layout at all — closes that asymmetry on the desktop, which
+  is where the review found it. `npm run audit` asserts both exist and are
+  **equal**, so a rename cannot leave the tooltip and the screen reader
+  disagreeing about what a button does. Falsified by appending one character:
+  72 faults, nine circles × eight viewports.
+
 - **⚠ THE EYEBROW WAS SET IN A FACE THAT CANNOT DRAW HEBREW, ON ALL NINE
   STEPS — 5.9.2026.** `UX-FINDINGS.md` §6's fourth and smallest bullet: *"the
   summary's eyebrow renders oddly… worth a look; low stakes."* It was one step
@@ -2029,20 +2072,54 @@ how it got there. Detail lives in the section it belongs to.
 - **⚠ ITEM 5: THE TWO-ROW RAIL IS DECLINED, AND THE ROW NEARLY FITS IN ONE
   INSTEAD.** `UX-FINDINGS` §3 asked for a wrapped, labelled navigator and made
   it conditional on re-measuring §4's vertical budget. Re-measured after item
-  6, and the answer is no, on three counts:
-  · **The labels still do not fit.** That is the finding — nine icons, none
-    with a word — and the 30.8 measurement that took the labels out was 429 px
-    of content in a 310 px box. The column is 420 now, the rail's track 390,
-    and five labelled cells need ~360 with the longest word (`עיצוב החזית`)
-    truncating. Wider is not available: §9's wall stops the column at 420.
-  · **Two rows without labels buys only the clipping**, which the `mask` fade
-    already signals, and costs ~44 px on the axis §4 says is short — at 1920
-    four steps have ZERO slack today and would gain an overflow they do not
-    have.
-  · **On a phone it is refused outright.** The rail is FIXED chrome at 62 px
-    of a 568 px screen; a second row makes it ~106, and `npm run audit`'s
-    options-on-screen check at 320×568 is the same check that refused the
-    brand mark on 30.8 for exactly this arithmetic.
+  6, and the answer is no.
+  ⚠ **THE FIRST BULLET HERE WAS WRONG AND IS CORRECTED, 5.9.2026.** It said
+  *"the labels still do not fit… five labelled cells need ~360 with the
+  longest word (`עיצוב החזית`) truncating"* — an ESTIMATE, made from the 30.8
+  one-row figure rather than from the two-row thing itself, and it is false.
+  The rail was built as a real spike on 5.9 — labels in the markup, `flex-wrap`
+  in the stylesheet, `npm run build`, loaded at seven viewports — and it
+  **fits, with all nine labels whole and none ellipsised**: at 1280 the cell
+  comes out 74 × 60 against a 50 px longest label. The review was right about
+  the width and this file was wrong. The decision does not change; **the
+  reason does**, and an estimate standing in a change log as a measurement is
+  the fault §6 is about.
+  What the spike actually costs, measured:
+  · **+82 px, at every desktop viewport.** The rail goes 61 → 143. Panel
+    overflow on arrival: cusp **195 → 277**, laptop **279 → 361**, wide
+    **49 → 131**, wide-short **81 → 163**. Driven forward with the button to
+    the worst step: laptop **678 → 760**. That is §4 — *"every step overflows
+    its panel"* — made a third worse to answer §3, and the two findings are in
+    the same report. The review's fallback, *"labels on desktop only, where
+    the panel has room"*, is not available either: **desktop is where the
+    panel has LEAST room.** Below 1100 the panel is not a scroll container at
+    all — the page scrolls — so `hiddenBelow` is 0 on every phone and tablet
+    and 279 on a 1280 laptop.
+  · **⚠ AND ABOVE 1100 THE WRAPPED RAIL DOES NOT GROW ITS OWN ROW.**
+    `.panel--choose` is a grid, and a multi-line flex container reports its
+    SINGLE-LINE height as `max-content` — so the track stayed 61 px while the
+    content measured 134, and the second row of circles rendered behind the
+    step beneath it. Nothing throws; it just looks like a rendering bug. The
+    only fix is an explicit height on `.steps`, which is the label's font
+    size, the tap floor and the row gap written out a second time in a place
+    that cannot see any of them — §5.10 exactly.
+  · **⚠ BELOW 1100 IT BREAKS THE PAGE.** The rail is `position: fixed` there
+    and the page's top padding is `--steps-h: 62px`, hand-written on purpose
+    (*"a JavaScript-published height would make the top of the page depend on
+    the bundle having run"*). Left alone, 82 px of rail lands on top of the
+    door. Set to 144 to match, the sticky stage comes down over the panel and
+    the flow stops working: driving the spike forward at 320×568, Playwright
+    could not click `הבא` at all — *the door was intercepting the pointer*.
+  ⚠ **WHAT WAS TAKEN INSTEAD, 5.9: THE NAME ON HOVER.** §3's complaint is not
+  really "no labels", it is *"a screen reader is better informed about this
+  page than a sighted customer"* — and the asymmetry closes with a `title`
+  on each circle, from the same `T(sec.title)` the `aria-label` already uses.
+  No layout at all. It is half an answer, since a phone has no hover, and the
+  half it answers is the desktop, which is where the review found the fault.
+  `npm run audit` asserts every circle has both and that they are **equal**,
+  so a rename cannot leave the tooltip and the screen reader disagreeing;
+  falsified by appending one character, which fires 72 faults (nine circles ×
+  eight viewports).
   ⚠ **WHAT WAS AVAILABLE WAS THE CARD'S OWN PADDING.** Nine 44 px circles are
   396 px; the gaps and per-step padding came out on 30.8, the circles cannot
   shrink (44 is asserted everywhere and the one attempt was refused at six

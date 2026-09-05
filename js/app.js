@@ -1180,6 +1180,25 @@ function buildPanel() {
        `{role: "button", name: ""}` at every width rather than only below
        1100 px. */
     b.setAttribute('aria-label', T(sec.title));
+    /* ⚠ AND THE SAME NAME AGAIN AS A `title`, WHICH IS THE ONLY LABEL THIS
+       ROW CAN AFFORD. `UX-FINDINGS.md` §3 measured the asymmetry and stated
+       it better than a comment can: every circle carries a correct
+       `aria-label`, so **a screen reader is better informed about this page
+       than a sighted customer**. Its one untried remedy was to wrap the rail
+       to two labelled rows, and that was built as a spike on 5.9 and
+       measured out — the numbers are in CLAUDE.md §0b, and the short version
+       is that it costs 82 px at every viewport in the one axis the panel is
+       already short of, on top of §4's own finding.
+       `title` is what is left: the name on hover, no layout at all. It is
+       half an answer — there is no hover on a phone — and the half it
+       answers is the desktop, which is where the review found the fault and
+       where the rail's nine names have never been readable.
+       ⚠ It does NOT double up in the accessibility tree: `aria-label` wins
+       the accessible-name computation outright, so `title` is only ever the
+       tooltip. The two are set from the same `T(sec.title)` on purpose, and
+       `npm test` asserts they are equal so a future rename cannot leave a
+       tooltip saying one thing and a screen reader another. */
+    b.title = T(sec.title);
     b.addEventListener('click', () => goStep(sec.key));
     nav.appendChild(b);
   }
