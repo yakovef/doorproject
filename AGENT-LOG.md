@@ -47,7 +47,7 @@ notes as prior runs, zero stamp drift).
 
 **Left alone deliberately:** nothing new.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** 334db6742a46184d89786c0af73c4bc64c7f344e
 
 ---
 
