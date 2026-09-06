@@ -23,6 +23,52 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-06 00:40 UTC — run 91: nothing worth changing
+
+**Looked at:** `git fetch` found origin 3 commits ahead of run 90
+(`f7eee29`) — a human/other-agent session (session_01JrJkfqqYrZ9kcBnv7Lx4Di)
+had pushed while this agent was idle: the step eyebrow's font fix (it
+was rendering in `--mono`, which has no Hebrew glyphs, so the words fell
+back to a second face while the digits stayed monospace — now `--sans`
+at .06em), the two-row navigator rail spike (built, measured, declined —
+82 px of panel overflow was too expensive for what CLAUDE.md's own
+estimate had understated — with a `title`/`aria-label` hover name added
+as the smaller fix instead), and one new question in `ASK-PERETZ.md`
+§0a8 (whether the undo/redo and language chrome sitting on the product
+photograph should move, raised there rather than left in a chat
+transcript). Fast-forwarded cleanly, no rebase needed.
+
+Re-read `AGENT.md` (unchanged) and confirmed `AGENT-LOG.md` was not
+touched by that session — it uses `CLAUDE.md` §0b for its own record,
+which is where its three commits are logged in full.
+
+`npm run build` — no diff, bundle already matched source.
+
+Verified the two landed fixes directly rather than trusting the commit
+messages: the step eyebrow (`.sect__where`) now computes
+`font-family: Assistant, "Assistant Fallback", "Segoe UI", "Arial
+Hebrew", Arial, system-ui, sans-serif` with the Hebrew text intact and a
+letter-spacing of ~0.69px on "שלב 1 מתוך 8" — no mixed-face rendering.
+All nine navigator circles (`.steps__step`) carry a `title` equal to
+their `aria-label`, character for character.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical) ·
+audit ✓ (0 faults, all eight viewports, including the new title/aria
+pairing this session's own commit added) · profile ✓ (byte-identical
+FALLOFF and bead ratios) · collide -- all ✓ (1,902 designs) · collide
+-- boxes ✓ (deepest bolted furniture 111 mm against MOUNT_REACH 121) ·
+recreate ✓ (10 doors, same catalogue-gap notes, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** the chrome-on-photograph question in
+`ASK-PERETZ.md` §0a8 — it is explicitly waiting on the owner's son, not
+on this agent.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-05 20:40 UTC — run 90: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 89 (`d604593`
