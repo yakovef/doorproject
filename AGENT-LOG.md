@@ -23,6 +23,42 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-06 05:40 UTC — run 92: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 91 (`6e73d08`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+Two fresh combinations. `?w=broad&g=quatrefoil&c=rb-9016d` — both
+`broad` (window) and `quatrefoil` (grille) are deliberately-withdrawn
+ids; confirmed both alias transparently (`broad`→`rect`, `quatrefoil`→
+`scroll`) with no "some parameters unavailable" notice, which is
+correct since an alias is not an unrecognised value. Spec rows read
+correctly (סורג: מעוצב, the bottom panel forced by the rectangular
+window), ₪6,995, no console errors.
+
+`?s=extra2&m=mk-both&n=cadoor` — the wide-and-deep מ frame (`mk-both`,
++82mm outer face, +112mm inner return) on the largest single-door size
+band, with the Cadoor knob lockset — not recently exercised together.
+Screenshot confirmed the widened casing renders correctly, the door
+stays centred and properly sized against the anchored scene, wall
+clearance from both sconces intact, spec rows and ₪5,745 correct, zero
+console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical) ·
+audit ✓ (0 faults, all eight viewports) · profile ✓ (byte-identical
+FALLOFF and bead ratios) · collide -- all ✓ (1,902 designs) · collide
+-- boxes ✓ (deepest bolted furniture 111 mm against MOUNT_REACH 121) ·
+recreate ✓ (10 doors, same catalogue-gap notes, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-06 00:40 UTC — run 91: nothing worth changing
 
 **Looked at:** `git fetch` found origin 3 commits ahead of run 90
