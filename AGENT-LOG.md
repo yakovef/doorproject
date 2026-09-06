@@ -23,6 +23,45 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-06 10:40 UTC — run 93: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 92 (`f7b02c8`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+A fresh combination not recently exercised: Russian language, vertical
+slot window (`strip`), keypad extra lock (`x=kodan`), bell and
+peephole, gold פרזול. First pass used two wrong ids of my own
+guessing — `pz=gold` instead of `pz-gold`, and I initially missed the
+resulting "some options unavailable" notice because I checked the
+Hebrew/English substrings on a Russian page rather than the Russian
+one ("недоступны"). Corrected and re-verified: the notice fired
+exactly as documented, own mistake caught before being logged as a
+finding.
+
+With `pz-gold` correct, the door showed a genuinely interesting result:
+a red banner reading "Мы убрали глазок — окно занимает как раз его
+место" (we removed the peephole — the window takes its exact place).
+This is `peepholeFits`'s documented geometric rule working correctly —
+both glazed window shapes are centred and reach viewer height, so a
+peephole has nowhere to sit beside one — not a defect. Screenshot
+confirmed the gold-toned lever, keypad and bell rendering correctly,
+sconces intact, price ₪9,495, zero console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical) ·
+audit ✓ (0 faults, all eight viewports) · profile ✓ (byte-identical
+FALLOFF and bead ratios) · collide -- all ✓ (1,902 designs) · collide
+-- boxes ✓ (deepest bolted furniture 111 mm against MOUNT_REACH 121) ·
+recreate ✓ (10 doors, same catalogue-gap notes, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-06 05:40 UTC — run 92: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 91 (`6e73d08`
