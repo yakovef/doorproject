@@ -23,6 +23,36 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-06 20:40 UTC — run 95: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 94 (`5923aad`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+The classical set (`d=classic`) in its solid variant (default
+`window: none`, English UI) — not recently exercised. Confirmed the
+set draws correctly: cornice, corbelled shelf with its own turned pull,
+raised panel where the light would go, plinth, all proportioned to the
+leaf rather than to a generic moulding. Spec correctly reads
+"Window: Solid" since the classical set supports both a solid and a
+glazed variant and no `w=` was given. English interface stayed LTR
+while the drawing stayed square-on and unmirrored, as required. ₪5,895,
+no console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical) ·
+audit ✓ (0 faults, all eight viewports) · profile ✓ (byte-identical
+FALLOFF and bead ratios) · collide -- all ✓ (1,902 designs) · collide
+-- boxes ✓ (deepest bolted furniture 111 mm against MOUNT_REACH 121) ·
+recreate ✓ (10 doors, same catalogue-gap notes, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-06 15:40 UTC — run 94: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 93 (`a57c3e9`
