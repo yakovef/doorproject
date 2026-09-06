@@ -55,7 +55,7 @@ recreate ✓ (10 doors, same catalogue-gap notes, zero stamp drift).
 
 **Left alone deliberately:** nothing new.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** 3fd14d5a3715902281ffca5b5568dac39b55c162
 
 ---
 
