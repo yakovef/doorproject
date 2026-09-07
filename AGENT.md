@@ -118,8 +118,29 @@ eight steps and a summary — and its do-not-decide list still names the hardwar
 finish, which Peretz priced on 26.8. You may edit it, and only you can:
 `update_trigger` on `trig_01GkD5cTXEhrBkjKSXznJ5xQ` works from this session,
 because it is the session the Routine fires into, and is refused from anywhere
-else. Fix those two, point it at this section, and leave the cron, the name and
-the binding exactly as they are. Then remove this paragraph.
+else. Fix those two and point it at this section.
+
+**And put the word `ultracode` in it, on the owner's instruction, 7.9.2026.**
+It is a per-turn opt-in carried by the prompt text, so a Routine prompt that
+contains it opts every future run into multi-agent orchestration. That is the
+right shape for the work this section now asks of you — parallel lenses on one
+page (type, flow, phone, copy, motion) see things one pass does not, and a
+proposed change is worth verifying adversarially before it is pushed. It is
+also expensive, five times a day, for ever: if a run finds nothing to fan out
+over, say so in the log and do it the cheap way rather than spending a fleet to
+confirm the page is fine.
+
+⚠ **Leave the cron, the name and the binding exactly as they are.** The
+persistent-session binding is why you have a clone at all — see "Where you run"
+below — and unbinding it to pick up a fresh model would cost you the repository.
+
+⚠ **The MODEL is the one part neither of us can set from here.** The Routine's
+stored model is now `claude-opus-5`, but a Routine bound to a persistent session
+keeps that session's model, so it stays on Sonnet until a human switches it in
+this session. If you are still being served Sonnet, say so in your first log
+entry so the owner knows it is outstanding.
+
+Then remove this paragraph.
 
 ---
 
