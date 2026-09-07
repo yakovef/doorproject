@@ -1847,6 +1847,39 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ TWO SESSIONS DIAGNOSED THE THIRTY-FIVE RUNS WITHIN THE HOUR, AND THE
+  OWNER HAD ALREADY SAID SO OUT LOUD — 7.9.2026.** The entry below landed
+  first and **is kept whole**; this adds only what it did not carry. Same day,
+  same subject, no contact between them: one session reasoned it out of the
+  log, the other was told. **The owner's words, on run 98's own offer to look
+  this way: *"yes, do that from now on."*** So the method below is instructed
+  rather than self-prescribed, and a later run may not drift back to touring
+  features on the grounds that the instruments were green.
+  ⚠ **AND THE WALK AS WRITTEN STOPPED ONE STEP SHORT OF THE PRODUCT.** It ended
+  at the summary. **The product is the MESSAGE, not the page** — `PLAN.md` §0 —
+  so every walk now finishes by decoding the send button's href and reading it
+  beside the door on screen, then doing the same for `?sheet=1`. Every fault
+  this project has had that cost real money lived in exactly that gap: two
+  panels charged and one drawn (₪520 × 30 combinations), a brass Coral lever
+  that is not manufactured, ₪620 of ironwork given away on every sidelight
+  door, a dragged handle that reached the long URL and neither the message nor
+  the code. **The screen looked right in all four.**
+  Two smaller additions: **be a different customer each run** — one person
+  walking one way five times a day converges on their own blind spots by the
+  third — and ⚠ **hold a finding against the record before believing it**,
+  which matters more now than it ever has, because the section below newly
+  licenses restructuring and relighting and a newly bold agent is exactly the
+  one who rebuilds the alcove. The satin sheen was built twice and cut twice;
+  the drawn street behind the glass hit its measurement and was reverted; the
+  two-row rail, the 30 px circles and the incremental repaint all the same.
+  ⚠ **The model half of the entry below is CLOSED**: the owner switched this
+  session to **Opus 5** by hand, minutes after it was written, which was the
+  only way it could be done. What is still open is the Routine's PROMPT edit,
+  and it is blocked rather than forgotten — the `claude-code-remote` MCP server
+  was disconnected from this session at the moment it was asked for, so
+  `update_trigger` could not be called. `AGENT.md` says to do it the moment
+  those tools return.
+
 - **⚠ THIRTY-FIVE RUNS OF "NOTHING WORTH CHANGING", AND THE RECURRING AGENT'S
   BRIEF IS WHAT CAUSED IT — 7.9.2026.** Runs 64 to 98 changed nothing; the last
   one that altered anything was run 63 on 31.8. Asked why, run 98 diagnosed

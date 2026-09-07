@@ -96,6 +96,46 @@ the owner wanted*. Nobody is watching you work; that is the arrangement, and it
 is why you were built. This file is the permission, and a run that waits for it
 has spent five hours producing a question the owner already answered here.
 
+⚠ **AND HE ANSWERED IT ANYWAY, IN SO MANY WORDS: *"yes, do that from now on."***
+7.9.2026, on run 98's own offer. Two sessions reached this section
+independently within the hour — the account above from the log, this line from
+the owner — so it is not one agent's theory about itself. It is instructed, and
+a later run may not quietly drift back to touring features on the grounds that
+the instruments were green.
+
+### Three things the walk above does not yet say
+
+**Read the order you would have sent.** Walking to the summary and stopping is
+half the job: the product is not the page, it is the message. At the end of
+every walk, get the send button's href, decode the text, and read it beside the
+door on screen — then do the same for the A4 sheet at `?sheet=1`. Every fault
+this project has ever had that cost real money lived in exactly that gap and
+nowhere else: two panels charged and one drawn (₪520, thirty combinations); a
+brass Coral lever that is not manufactured; ₪620 of ironwork given away on
+every sidelight door; a dragged handle that reached the long URL and neither
+the message nor the code. The screen looked right in all four. **A door that is
+drawn correctly and described wrongly is the worst output this site has.**
+
+**Be a different customer each time.** One person walking one way five times a
+day converges on their own blind spots by the third run. Rotate deliberately:
+the 320 px phone somebody actually owns; Russian copy, which is the longest, on
+the smallest screen; the shared link Peretz himself opens rather than the flow;
+the keyboard with no mouse at all; the customer who changes their mind and
+walks backwards; the one who starts from the gallery. Each finds what the last
+could not.
+
+⚠ **And hold a finding against the record before you believe it.** This section
+now licenses you to restructure, retype and relight — which makes this the
+paragraph that matters most, because a newly bold agent is exactly the one who
+rebuilds the alcove. The satin sheen was built twice and cut twice. The drawn
+street behind the glass hit its measurement and was reverted. The two-row rail,
+the 30 px navigator circles, the incremental colour repaint, the alcove — all
+built, all measured, all deliberately undone, every reason written down. Others
+that read as defects are open questions for Peretz. So grep `CLAUDE.md` §0b,
+§5 and §9 and `ASK-PERETZ.md` before acting on anything, and say in your log
+that you did. *"This is already decided, and here is where"* is a good run's
+work. Undoing a considered decision is worse than another run of nothing.
+
 ### What ambition costs, so that it goes where it is cheap
 
 - **FREE** — the flow's order, its length, what a step contains, all of
@@ -134,13 +174,21 @@ confirm the page is fine.
 persistent-session binding is why you have a clone at all — see "Where you run"
 below — and unbinding it to pick up a fresh model would cost you the repository.
 
-⚠ **The MODEL is the one part neither of us can set from here.** The Routine's
-stored model is now `claude-opus-5`, but a Routine bound to a persistent session
-keeps that session's model, so it stays on Sonnet until a human switches it in
-this session. If you are still being served Sonnet, say so in your first log
-entry so the owner knows it is outstanding.
+⚠ **The MODEL is settled — the owner switched it by hand on 7.9.2026**, in this
+session, minutes after the paragraph above was written, and this agent has been
+served **Opus 5** since. The reasoning above was right and the outstanding half
+is closed; nothing to report in the log. Left in place only because it records
+WHY it had to be done by a human: a Routine bound to a persistent session keeps
+that session's model, and unbinding to pick up the stored one would cost the
+clone.
 
-Then remove this paragraph.
+⚠ **What is still outstanding is the PROMPT edit**, and it is blocked rather
+than forgotten: at the moment the owner asked for this, the
+`claude-code-remote` MCP server was disconnected from this session, so
+`update_trigger` could not be called at all. **Do it the moment those tools are
+back** — the four fixes are named above (the four-sections line, the hardware
+finish, a pointer to this section, and `ultracode`) — and only then remove this
+paragraph.
 
 ---
 
