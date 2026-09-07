@@ -50,7 +50,7 @@ recreate ✓ (10 doors, same catalogue-gap notes, zero stamp drift).
 `ASK-PERETZ.md` §0a8 — still waiting on the owner's son, not on this
 agent.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+**Commit:** f3bfa8c102923538269750859f6a7cd93403ebfb
 
 ---
 
