@@ -23,6 +23,37 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-07 05:40 UTC — run 97: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 96 (`aea58e3`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+The undo/redo stack — not directly driven by hand in a while (only
+covered indirectly via the audit's own click walk). Confirmed `#undo-btn`
+starts disabled, picking the חריגה size (`extra1`) moves the price
+₪3,195 → ₪3,995 (exactly the documented ×1.25) and enables undo, undo
+reverts the price and enables redo, redo restores ₪3,995. No console
+errors. Also relevant given the human session's open ASK-PERETZ.md
+§0a8 question about whether this control's wall placement should move
+— its function is unaffected either way.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical) ·
+audit ✓ (0 faults, all eight viewports) · profile ✓ (byte-identical
+FALLOFF and bead ratios) · collide -- all ✓ (1,902 designs) · collide
+-- boxes ✓ (deepest bolted furniture 111 mm against MOUNT_REACH 121) ·
+recreate ✓ (10 doors, same catalogue-gap notes, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** the chrome-on-photograph question in
+`ASK-PERETZ.md` §0a8 — still waiting on the owner's son, not on this
+agent.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-07 00:40 UTC — run 96: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 95 (`746ac20`
