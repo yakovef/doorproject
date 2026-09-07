@@ -161,8 +161,7 @@ Any group whose assertions all bind one fixture is blind in exactly the same
 way. A check that every `DEFAULTS` field is varied somewhere in its own group's
 assertions would find the next one before a customer does.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** 555857cdd918b66ab08b8b5e984fd8db579b3190
 
 ---
 
