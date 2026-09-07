@@ -23,6 +23,35 @@ measurement in the entry — not the conclusion, the numbers.
 
 ---
 
+## 2026-09-07 10:40 UTC — run 98: nothing worth changing
+
+**Looked at:** `git fetch` — no new commits since run 97 (`a625be3`
+still the tip on both sides). `npm run build` produced no diff, bundle
+already matched source.
+
+The price breakdown (`#price-toggle` / `#breakdown-body`) — not
+clicked by hand in a while. Built a door with a vertical slot window,
+Cadoor knob and bronze פרזול (`?w=strip&n=cadoor&pz=pz-bronze`),
+expanded the breakdown, and added the nine rows by hand: 1295 + 200 +
+200 + 500 + 700 + 300 + 4200 + 200 + 500 = ₪8,095, matching the total
+exactly. `aria-expanded` flipped correctly, the card renders clear of
+the door and sconces, and the bronze finish showed correctly on both
+the knob and the cylinder rim. No console errors.
+
+**Instruments:** test ✓ (4,349,513 passed, 0 failed — identical) ·
+audit ✓ (0 faults, all eight viewports) · profile ✓ (byte-identical
+FALLOFF and bead ratios) · collide -- all ✓ (1,902 designs) · collide
+-- boxes ✓ (deepest bolted furniture 111 mm against MOUNT_REACH 121) ·
+recreate ✓ (10 doors, same catalogue-gap notes, zero stamp drift).
+
+**Changed:** nothing.
+
+**Left alone deliberately:** nothing new.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands, per the established two-commit pattern)
+
+---
+
 ## 2026-09-07 05:40 UTC — run 97: nothing worth changing
 
 **Looked at:** `git fetch` — no new commits since run 96 (`aea58e3`
