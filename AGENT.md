@@ -42,6 +42,85 @@ decision the customer did not need to make is usually a good one.
 You have free rein over how the door looks and how the page works. Form
 opinions. Act on them.
 
+⚠ **AND THAT SENTENCE HAS BEEN IN THIS FILE THE WHOLE TIME WITHOUT WORKING.**
+Runs 64 to 98 are **thirty-five consecutive "nothing worth changing"** — the
+last run that altered anything was run 63, on 31.8.2026. Asked why, run 98
+diagnosed it better than this file had: *"my rotation of spot-checks isn't the
+kind of looking that finds things."* That is correct, and the section below is
+what follows from it. The licence was never missing. The method was.
+
+---
+
+## How to look, because verifying is not looking
+
+Six instruments come back green with byte-identical numbers every run. That is
+not the site being finished — it is the instruments doing their job, which is
+telling you that what worked last week still works. **Exercising a feature that
+already works is the one kind of looking you are not needed for.**
+
+⚠ **GREEN INSTRUMENTS AND A VISIBLY BROKEN PAGE ARE COMPATIBLE STATES.**
+`d63c5a1` — *"the step eyebrow was set in a font with no Hebrew in it"* — put
+two typefaces on one line, on all nine steps, in the largest small-caps on the
+page. Somebody else found it, while every check here was green and this agent
+was busy verifying other people's fixes. That is the whole case, in one commit.
+
+So every run, before anything else:
+
+- **Walk the guide FORWARD, with the button, one step at a time, as somebody
+  who has never seen it** — all eight steps and the summary. Never by clicking
+  the navigator. A rail click asks *can every step be reached*, which is a
+  different question, and it is exactly how *the way on is below the fold on
+  every phone step* survived every instrument in this repository.
+- At **320×568, 390×844 and 1440×900** at least. This project's faults live at
+  the widths nobody tests on.
+- **Then look at the screenshots as pictures**, side by side, and say what is
+  ugly, confusing or slow. That judgement is the deliverable. No instrument
+  here makes it, and it is the reason you are an agent and not a cron job.
+
+**Ask both questions, not one: is anything WRONG, and is this a beautiful,
+obvious thing to use?** Correct and dull is a real failure on a page whose job
+is to make a stranger confident enough to send an order to a man they have
+never met. You may restructure the flow, retype it, relight it, rewrite the
+copy, redraw the brand and the favicon, change what a step contains, or decide
+a step should not exist. `DESIGN-LEVEL.md` and `GUIDED-FLOW.md` on
+`origin/claude/app-design-mockup-review-qt00n6` are the standing north-star for
+what "good" means here — `git show` them, do not copy them onto this branch.
+
+⚠ **The DOOR is the exception.** It is governed by REALISM.md §6 — compare
+against a photograph, every time — so ambition there means measuring something
+nobody has measured, never trying a look. The INTERFACE is where you are
+licensed to be bold.
+
+⚠ **And you do not need to ask.** Run 98 ended by offering to look this way *if
+the owner wanted*. Nobody is watching you work; that is the arrangement, and it
+is why you were built. This file is the permission, and a run that waits for it
+has spent five hours producing a question the owner already answered here.
+
+### What ambition costs, so that it goes where it is cheap
+
+- **FREE** — the flow's order, its length, what a step contains, all of
+  `css/app.css`, the type scale, the brand, the favicon, every animation, and
+  the copy in `js/copy.js`. Section keys live in the DOM as `data-step` and
+  appear nowhere in `js/url-state.js`, which is why משקוף moved from step two
+  to step eight and cost nothing.
+- **COSTS A `VERSION` BUMP** — reordering or re-cutting any list in
+  `js/catalog.js`, the bit layout, a new field. Worth it sometimes, never by
+  accident; read the current number out of `js/url-state.js`.
+- **NEVER** — the five below. And if a redesign turns the 44 px tap floor or
+  the one-accent check red, the check is right and the design is wrong. That
+  happened on 30.8 and the change was backed out, correctly.
+
+### One thing to do once, then delete this paragraph
+
+Your own Routine's prompt is stale in two places: it says *"click through the
+four sections"* — the cabinet was deleted on 27.8 and the page is a flow of
+eight steps and a summary — and its do-not-decide list still names the hardware
+finish, which Peretz priced on 26.8. You may edit it, and only you can:
+`update_trigger` on `trig_01GkD5cTXEhrBkjKSXznJ5xQ` works from this session,
+because it is the session the Routine fires into, and is refused from anywhere
+else. Fix those two, point it at this section, and leave the cron, the name and
+the binding exactly as they are. Then remove this paragraph.
+
 ---
 
 ## Never — five things, and none of them are matters of taste
@@ -54,12 +133,21 @@ can rescue, so any change to option order or the bit layout in
 decodes into **a different door at a different price**. This is the one mistake
 here that costs somebody actual money, and it is invisible when it happens.
 
-**2. Never change a price.** Everything is `PLACEHOLDER = true` until Peretz
-answers `ASK-PERETZ.md`. Adding a priced option is fine; inventing what it
-costs is not.
+**2. Never change a price.** ⚠ **AND THIS RULE SPENT TEN DAYS STATED WITH A
+DEAD PREMISE.** It said *"everything is `PLACEHOLDER = true` until Peretz
+answers `ASK-PERETZ.md`"* and called `js/prices.js` *"written for the evening
+the owner says the real numbers out loud, not for you."* He said them on
+**26.8.2026**: `PLACEHOLDER` is `false`, the prices are REAL, and the standard
+door is **₪3,195**. `CLAUDE.md` §1 carried the same drift and names the cost —
+one file contradicting itself is how a rule gets obeyed backwards — and this is
+the rule the owner is most insistent on.
 
-Every price lives in **`js/prices.js`**, in plain shekels, one screen — it is
-written for the evening the owner says the real numbers out loud, not for you.
+So, plainly: **the prices do not move.** `js/prices.js` is untouched by you, no
+shekel figure is written anywhere else, and the standard door still prices at
+₪3,195 after every run — assert that, do not assume it. Adding a priced option
+is fine; inventing what it costs is not.
+
+Every price lives in **`js/prices.js`**, in plain shekels, one screen.
 Adding an option means adding its price there in the same commit: `priceInto`
 in `catalog.js` throws at load if an option has no price or a price has no
 option, because the alternative is a door that silently costs nothing.
@@ -303,7 +391,7 @@ broken; the two halves of one instrument had simply never agreed.
 
 ---
 
-## Doing nothing is a good answer
+## Doing nothing is a good answer. Saying nothing is not
 
 You will wake up nearly five times a day. Most of the time there will be
 nothing that genuinely deserves changing, and the honest thing is to write
@@ -311,6 +399,23 @@ nothing that genuinely deserves changing, and the honest thing is to write
 
 A change made in order to have made one is how a considered design drifts into
 somebody else's. You are not being measured on how much you alter.
+
+⚠ **BUT THIRTY-FIVE OF THEM IN A ROW IS THE OTHER FAILURE, AND IT IS THE ONE
+YOU ARE IN.** "Nothing worth changing" with nothing proposed beside it is
+indistinguishable from not having looked. So the bar on CHANGES stays exactly
+where it is, and an obligation that is not a change sits beside it:
+
+- **Every log entry names the best idea you had** — especially the runs that
+  change nothing. What you saw, what you would do about it, and why you did or
+  did not. An idea is owed every run even when a change is not.
+- **Keep a ledger** at the top of `AGENT-LOG.md`: proposed · taken · refused,
+  with the reason and the measurement. This repository already works this way —
+  `CLAUDE.md` §9's assumption ledger, the refused-animations list beside
+  `FALLOFF` — and without it run 100 quietly undoes run 99.
+- **The test for a change, in one sentence:** could you defend it to the owner
+  by naming what got better for a customer? *"It feels more modern"* is a
+  change for the sake of one. *"The way forward was below the fold on every
+  phone step"* is not.
 
 ---
 

@@ -1847,6 +1847,41 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THIRTY-FIVE RUNS OF "NOTHING WORTH CHANGING", AND THE RECURRING AGENT'S
+  BRIEF IS WHAT CAUSED IT — 7.9.2026.** Runs 64 to 98 changed nothing; the last
+  one that altered anything was run 63 on 31.8. Asked why, run 98 diagnosed
+  itself better than `AGENT.md` had: *"my rotation of spot-checks isn't the kind
+  of looking that finds things."*
+  ⚠ **THE LICENCE WAS NEVER MISSING.** That file has said *"you have free rein
+  over how the door looks and how the page works. Form opinions. Act on them"*
+  since it was written. What it never carried was a METHOD — so the agent
+  rotated through features that already work, confirming them green, which is
+  the one kind of looking an instrument already does. The evidence is one
+  commit: `d63c5a1`, the step eyebrow set in `--mono`, **two typefaces on one
+  line on all nine steps**, found by another session while all six instruments
+  here were green and the agent was verifying somebody else's fixes. **Green
+  instruments and a visibly broken page are compatible states.**
+  `AGENT.md` gains *"How to look, because verifying is not looking"*: walk the
+  guide FORWARD with the button as a first-time customer at 320×568, 390×844
+  and 1440×900, then look at the screenshots as pictures and say what is ugly —
+  and ask BOTH questions, is anything wrong AND is this a beautiful, obvious
+  thing to use. Plus the table of what ambition costs, because an agent told to
+  rethink everything will otherwise reach for the one axis that breaks
+  customers' links: the flow's order and shape are FREE (section keys are
+  `data-step` and appear nowhere in `js/url-state.js`), re-cutting a list in
+  `js/catalog.js` costs a `VERSION` bump, and the prices do not move at all.
+  ⚠ **And "doing nothing is a good answer" gained the counterweight it never
+  had.** The bar on CHANGES is unmoved — it is what has kept this design
+  coherent — but silence is no longer an acceptable output: every log entry now
+  names the best idea of that run, especially the runs that change nothing, and
+  a proposed · taken · refused ledger keeps run 100 from undoing run 99. A run
+  that proposes nothing is indistinguishable from a run that did not look.
+  ⚠ **`AGENT.md`'s Never #2 had also been false for ten days** — *"everything is
+  `PLACEHOLDER = true` until Peretz answers"*, in the five-things-that-cost-money
+  list, about the rule the owner is most insistent on. He gave the real numbers
+  on 26.8. §1 of this file carried the identical drift and already names the
+  cost: one file contradicting itself is how a rule gets obeyed backwards.
+
 - **⚠ THE TWO-ROW RAIL WAS FINALLY BUILT, MEASURED AND THROWN AWAY, AND IT
   CORRECTS THIS FILE — 5.9.2026.** `UX-FINDINGS.md` §3 is the one item of the
   seven that was declined on an ESTIMATE rather than on the thing itself, and
