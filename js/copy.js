@@ -362,9 +362,18 @@ export const UI = {
      31.8 — *"the color of the bell can only be nickel and gold"* — because a
      customer who picks bronze and watches every other fitting follow needs to
      be able to read why this one did not. */
-  'g.bell.h':         ['טבעת נוקשת במרכז הדלת, מעל העינית. בניקל או בזהב בלבד.',
-                       'A ring knocker on the centre of the door, above the viewer. Nickel or gold only.',
-                       'Кольцо-стучалка по центру двери, над глазком. Только никель или золото.'],
+  /* ⚠ "BELOW THE VIEWER", AND IT SAID ABOVE IN ALL THREE LANGUAGES. Found
+     7.9.2026 on the customer walk. `KNOCKER_AFF` is 1470 and `PEEPHOLE_AFF`
+     is 1600, so the ring sits 130 mm UNDER the viewer — which is what the
+     owner's three photographs show, what `bellKnocker`'s docstring says ("a
+     little under the peephole"), and what the drawing does: measured on the
+     default door, peephole cy 1054 against the ring's 1184. The sentence was
+     written in the same round that moved the fitting and was written the wrong
+     way up; nothing on the page and nothing in the suite compares a hint with
+     the picture it describes. */
+  'g.bell.h':         ['טבעת נוקשת במרכז הדלת, מתחת לעינית. בניקל או בזהב בלבד.',
+                       'A ring knocker on the centre of the door, below the viewer. Nickel or gold only.',
+                       'Кольцо-стучалка по центру двери, под глазком. Только никель или золото.'],
   'g.peephole.h':     ['עינית לראות מי בחוץ. כלולה במחיר.',
                        'A viewer, to see who is outside. Included in the price.',
                        'Глазок, чтобы видеть, кто снаружи. Входит в цену.'],
@@ -674,10 +683,13 @@ export const UI = {
      rules.js) — and `npm test` asserts all three sentences still name the cap
      they describe, so the number and the rule cannot drift apart. */
   'fix.peepGone':        ['הסרנו את העינית — החלון תופס בדיוק את מקומה', 'We removed the peephole — the window sits exactly where it goes', 'Мы убрали глазок — окно занимает как раз его место'],
+  'fix.bellGone':        ['הסרנו את הפעמון — החלון תופס את מקומו במרכז הדלת', 'We removed the doorbell — the window sits where it goes, on the centre of the door', 'Мы убрали звонок — окно занимает его место по центру двери'],
   'fix.stripesCapped':   ['פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת', 'Vertical stripes cap at 6 — more than that will not fit across the door', 'Вертикальных полос максимум 6 — больше по ширине двери не помещается'],
 
   'why.peepWindow':   ['החלון תופס את מקום העינית', 'The window sits where the peephole goes',
                        'Окно занимает место глазка'],
+  'why.bellWindow':   ['החלון תופס את מקום הפעמון', 'The window sits where the doorbell goes',
+                       'Окно занимает место звонка'],
   'why.gripOffDoor':  ['הידית חורגת מהדלת', 'The handle runs off the door', 'Ручка выходит за пределы двери'],
   'why.gripReach':    ['הידית גבוהה או נמוכה מדי לשימוש', 'Too high or too low to use comfortably',
                        'Слишком высоко или слишком низко'],

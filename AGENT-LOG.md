@@ -16,10 +16,153 @@ measurement in the entry — not the conclusion, the numbers.
 
 **Looked at:** …
 **Instruments:** test ✓/✗ · audit ✓/✗ · profile ✓/✗ · collide ✓/✗ · recreate · shot
+⚠ **Never #5 applies and is answered here rather than in a code comment.** An
+assertion was CHANGED, not deleted. It used to claim, over four hundred
+combinations, that *"the bell must not be blocked on window X"* — under a
+comment reading *"The BELL has no such rule, and that is a finding rather than
+an omission: the same sweep found it clear of glass, mouldings, stripes and
+every fitting."* That was true of `bellPush` on the hinge stile and false from
+30.8, when the photographs moved the fitting to the centre line; the sweep it
+cites measured an object the renderer had deleted. So the assertion was
+defending the bug, and the correct fix would have gone red against it.
+
+⚠ **And the question this project requires before a FOURTH geometric rule is
+asked out loud, because three have been written and withdrawn for one reason.**
+Is this the depth error — a square-on elevation with no depth, two things
+overlapping in the drawing that do not touch on the door? **No, and the
+difference is what is BOLTED.** A lever is cantilevered on its spindle from a
+backplate on solid stile, so only its blade passes over the pane, and
+`collide.mjs` scopes that exemption in its own words to what earns it. A ring
+knocker is a cast boss bolted THROUGH the leaf at its own centre, and on a
+glazed door that centre IS the glass. Nor is it a near miss to argue about: the
+fitting is WHOLLY INSIDE the opening on all twelve glazed states, with 176 mm
+of clear glass either side on the rectangle.
+
 **Changed:** … (or "nothing")
 **Left alone deliberately:** … (and why)
 **Commit:** <sha or "none">
 ```
+
+---
+
+## 2026-09-07 20:45 UTC — run 99: the ₪300 פעמון was being drawn on the glass
+
+⚠ **This run spans three firings** — 10:40, 15:40 and 20:41 — because the walk
+it is built on took about three hours of wall clock and then returned nine
+things to reproduce. It is logged as ONE run rather than three, and the two
+firings that landed mid-flight changed nothing and are not separately logged: a
+log entry per firing when the work is continuous would say "still working"
+twice and bury the one entry that matters.
+
+**Looked at:** not a rotation of spot-checks. The owner's instruction from run
+98 — *"yes, do that from now on"* — walked as ten first-time customers at
+320/375/390/1100/1280/1440/1920, in three languages, forward with the BUTTON,
+each walk ending at the WhatsApp text and the A4 sheet rather than at the
+summary. Then every finding reproduced independently and put against the
+record before being believed.
+
+**What it found, and this is the whole point of the run:** thirty-five previous
+runs changed nothing on the same green instruments. This one returned **nine
+reproduced defects, none of them recorded anywhere**, and the worst is
+`PLAN.md` §0's own failure mode with money on it.
+
+**The ₪300 פעמון is painted dead centre on the pane on every glazed door.**
+Measured myself with real `getBBox`, `[data-relight]`/`[data-hitpad]`/
+`[data-chrome]` stripped first: the knocker is **wholly inside** the opening on
+**12 of 12** glazed size × window states and clear on all **6** solid ones.
+Cause: `js/rules.js` declined a bell entry in a comment — *"it stands on the
+hinge stile and a 426-design sweep with real getBBox found it clear of
+everything"* — and `js/renderer.js` deleted that fitting on 30.8, putting a
+132 mm ring on the leaf's CENTRE LINE. The ₪0 עינית 130 mm above it on the same
+line is refused correctly; the ₪300 one was not. §5 item 23.
+
+⚠ **The report's own measurement was 30 mm too wide and I nearly built the rule
+on it.** Both the walker and its verifier read the knocker's group as
+**143.3 mm** across and published "106.8 mm of clear glass either side". The
+ink is **113.6**. The ring's dashed highlight carries `rotate(-142)` and
+Chromium bounds a transformed child by the corners of its axis-aligned box:
+`103·cos142 + 101·sin142 = 143.4`, the reported width to a tenth. Found by
+removing the group's children one at a time. **The browser's own `getBBox` is
+an instrument** and is now in §7. The rule states its reach from the template's
+own fractions (`KNOCKER_REACH` = 0.86 across, 1.124 up, 1.02 down of `R`).
+
+⚠ **And I checked whether the fix was only half of one.** `bellFits` answers
+about GLASS; the knocker could equally have been landing on a panel moulding.
+Swept all 210 bell-carrying states against `faceObstacles` with the ring
+semantics copied from `footHits` — **0 overlaps**. The first version of that
+sweep treated a panel as a solid rect and reported 24 hits, which was my
+instrument, not the door: the photographs put the ring INSIDE the upper panel.
+
+⚠ **And writing the rule exposed a second defect that no check was asking
+about.** The bell's repair, written as its own `if` beside the peephole's, is
+correct read alone — and wrong beside it. On a door carrying BOTH fittings and
+a window, tapping the פעמון ran the PEEPHOLE's repair first, which saw
+`intent === 'bell'` rather than its own and removed the עינית; the bell's
+repair then removed the WINDOW — the very thing the peephole had just been
+sacrificed to. **One tap, and the customer paid for one fitting with the
+other, on a door with room for both.** Same mirrored. The question is asked
+once of both fittings now: is the glass going, or are the fittings? Found by
+reasoning through the interaction, not by a red check.
+
+⚠ **And the bell's own hint was upside down in all three languages** — *"מעל
+העינית" / "above the viewer" / "над глазком"*. `KNOCKER_AFF` 1470 against
+`PEEPHOLE_AFF` 1600, so it is 130 mm BELOW; measured on the default door,
+peephole cy 1054 against the ring's 1184. One of the unverified findings, in
+scope, so it was checked and taken.
+
+**Instruments:** test ✓ (4,349,611 passed, 0 failed — up 98 from run 98's
+4,349,513, all of it the new bell and repair-ordering assertions) · audit ✓ · profile ✓ · collide -- all ✓ ·
+collide -- boxes ✓ · recreate ✓ · sheets regenerated — **all 52 bare sheets
+byte-identical**, which is the proof this change moved no pixel.
+
+**Changed:** `KNOCKER_R`/`KNOCKER_REACH` hoisted so the rule and the drawing
+read one number; `bellFits` in `js/renderer.js`; the block and the one-question
+two-fitting repair in `js/rules.js`, with the stale comment corrected in place rather than
+deleted; `why.bellWindow` and `fix.bellGone` in three languages; the bell hint
+corrected; the blind test fixture replaced with a **biconditional between the
+rule and the picture** (`bellFits(state) === the drawn knocker clears every
+drawn pane`, both read out of the emitted markup, run on the RAW state — the
+one-sided form is dead the moment `repair` exists); `ASK-PERETZ.md` §0f2;
+`CLAUDE.md` §0b, §5 item 23 and §7.
+**No price, no id, no list order, no bit, no `VERSION`.**
+
+**Left alone deliberately:**
+· **Moving the knocker instead of refusing it.** No photograph shows one on a
+  glazed leaf, and the last position invented for this fitting — the hinge
+  stile — was flagged in its own comment as *"a choice rather than a
+  measurement"* and overturned by the photographs a week ago. Inventing a
+  second is the mistake, not the fix. `ASK-PERETZ.md` §0f2 asks him.
+· **`data-mount` on the knocker**, which looks like the right hardening and is
+  not: `collide.mjs` reads every `data-mount` as a BACKSET from the closing
+  edge, so a centre-line fitting would report ~531 mm and fail
+  `collide -- boxes` about nothing — the trap that file already records at
+  373 mm.
+· **The other eight confirmed findings.** Reproduced, recorded nowhere, and
+  each is its own piece of work: the face step's tile list filtered once at
+  boot (glazed doors and 10 of 30 gallery doors show no selection, first tap
+  deletes a ₪725 panel); only `said[0]` shown when one tap changes several
+  things (a ₪1,900 face goes silently); the colour explainer still saying
+  *"כל הגוונים באותו מחיר"* under a **תוספת ₪200** heading, which `CLAUDE.md`
+  §0b claims is already gone; a walked door reaching Peretz as *"I have a
+  question"*; the breakdown printing the raw key `bell`; six pull-bar tiles as
+  one grey line; tile name and price behind the quote bar on 6–7 of 8 phone
+  steps; the toast fixed-centred. Named so run 100 does not rediscover them.
+· **21 findings that never reached verification** — the walk hit the org's
+  monthly spend limit with 28 of 50 agents unfinished. Among them: *"a ₪500
+  pull handle deleted by one repair"*, *"the A4 order sheet…"*, *"the short
+  code carries the handle length…"*, *"tapping a tile drawn as unavailable
+  applies…"*, *"a mistyped short code opened as ?d= says…"*. **An unverified
+  finding is not a finding** and none is claimed as one; the run resumes from
+  cache when the limit resets.
+
+**Best idea of this run, not taken:** the fixture that hid this — `const solid
+= { ...base, window: 'none', detail: 'plain' }` — is not unique to the bell.
+Any group whose assertions all bind one fixture is blind in exactly the same
+way. A check that every `DEFAULTS` field is varied somewhere in its own group's
+assertions would find the next one before a customer does.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
 
 ---
 

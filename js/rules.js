@@ -56,7 +56,8 @@ import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, L
          STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
-         gripPlacement, nearestGrip, panelFits, peepholeFits } from './renderer.js';
+         bellFits, gripPlacement, nearestGrip, panelFits,
+         peepholeFits } from './renderer.js';
 
 /** Does this detail put ruled line work on the face?
  *  `perimeter` counts: it is a groove like any other, and both doors that
@@ -146,9 +147,23 @@ export function conflicts(state) {
                    and both reach viewer height, so on a glazed door the
                    fitting has nowhere to be — `peepholeFits` computes that
                    from the same `apertureLayout` the drawing calls, so the
-                   tile and the picture cannot disagree. The bell needs no such
-                   entry: it stands on the hinge stile and a 426-design sweep
-                   with real getBBox found it clear of everything. */
+                   tile and the picture cannot disagree.
+                   ⚠ AND THE פעמון NEEDS THE IDENTICAL ENTRY, WHICH THIS
+                   COMMENT SPENT A WEEK EXPLAINING WHY IT DID NOT. It said:
+                   *"the bell needs no such entry: it stands on the hinge stile
+                   and a 426-design sweep with real getBBox found it clear of
+                   everything."* Both halves were true of `bellPush`, and
+                   `js/renderer.js` deleted `bellPush` on 30.8 — the owner's
+                   photographs put the fitting on the leaf's CENTRE LINE, and
+                   `bellKnocker`'s docstring has said *"It is not on the hinge
+                   stile"* ever since. The sweep that cleared it measured a
+                   fitting that no longer exists, so the ₪300 ring was drawn
+                   inside the pane on every glazed door, priced, with the tile
+                   never greyed and no toast when a window landed on top of
+                   it — while the ₪0 peephole 130 mm above it on the same
+                   centre line was refused correctly. `bellFits` is the same
+                   computation as `peepholeFits`; the whole argument, and why
+                   the fitting is not simply moved, is over it. */
                 peephole: {}, bell: {},
                 /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
                    longer options with ids. Every other key here is
@@ -256,6 +271,7 @@ export function conflicts(state) {
      for where a stripe goes on a panelled leaf, and inventing one would put
      geometry on screen no photograph supports (REALISM.md §6). */
   if (!peepholeFits(state)) out.peephole.peep = T('why.peepWindow');
+  if (!bellFits(state))     out.bell.bell     = T('why.bellWindow');
   if (onLeaf) out.stripes = T('why.stripesWindow');
   else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
   if (lined) {
@@ -509,6 +525,7 @@ const SAID = {
   setGone:       'fix.setGone',
   needPanel:     'fix.needPanel',
   peepGone:      'fix.peepGone',
+  bellGone:      'fix.bellGone',
   peepWindow:    'fix.peepWindow',
   ownPull:       'fix.ownPull',
   stripesCapped: 'fix.stripesCapped',
@@ -602,15 +619,42 @@ export function repair(state, intent = null) {
     change('stripes', SAID.stripesCapped);
   }
 
-  /* ⚠ THE עינית AND THE GLASS WANT THE SAME PIECE OF LEAF, and the trade is
-     the same two-sided one every other pair here gets: whichever the customer
-     just clicked wins. Without an intent — a link — the WINDOW stays, because
-     glass is the more expensive and the more visible of the two to lose
-     silently, which is the identical argument the line-work repair below
-     makes. */
-  if (s.peephole === 'peep' && !peepholeFits(s)) {
-    if (intent === 'peephole') { s.window = 'none'; change('window', SAID.windowGone); }
-    else { s.peephole = 'nopeep'; change('peephole', SAID.peepGone); }
+  /* ⚠ THE עינית, THE פעמון AND THE GLASS ALL WANT THE SAME PIECE OF LEAF, and
+     the trade is the two-sided one every other pair here gets: whichever the
+     customer just clicked wins. Without an intent — a link — the WINDOW stays,
+     because glass is the more expensive and the more visible of the three to
+     lose silently, which is the identical argument the line-work repair below
+     makes.
+
+     ⚠ THIS IS ONE BLOCK AND IT WAS TWO, AND THE TWO WERE WRONG TOGETHER WHILE
+     EACH WAS RIGHT ALONE. Written as separate `if`s — the peephole's, then the
+     bell's — a door carrying BOTH fittings and a window lost the peephole for
+     nothing: the peephole's repair ran first, saw `intent === 'bell'` rather
+     than its own, and removed the עינית; the bell's repair then removed the
+     WINDOW, which is the very thing the peephole had just been sacrificed to.
+     The customer tapped one fitting and paid for it with the other, and the
+     door they ended on had room for both.
+     That is this file's third recorded ordering constraint arriving a fourth
+     time — *a repair that reads a value another repair is about to change is
+     neither idempotent nor guaranteed to land somewhere buildable* — and the
+     shape is worth naming: **two repairs competing for one resource cannot be
+     written independently, because each is correct only if the other does not
+     fire.** So the question is asked ONCE, of both fittings together: is the
+     glass going, or are the fittings? Found by reasoning it through rather
+     than by a failing check, which is why the assertion for it is written
+     beside the others rather than after the fact. */
+  const peepBad = s.peephole === 'peep' && !peepholeFits(s);
+  const bellBad = s.bell === 'bell' && !bellFits(s);
+  if (peepBad || bellBad) {
+    if (intent === 'peephole' || intent === 'bell') {
+      s.window = 'none'; change('window', SAID.windowGone);
+    } else {
+      /* Both are named when both go. They are separate fields with separate
+         prices, and a customer told about one removal would find the other on
+         the order. */
+      if (peepBad) { s.peephole = 'nopeep'; change('peephole', SAID.peepGone); }
+      if (bellBad) { s.bell = 'nobell'; change('bell', SAID.bellGone); }
+    }
   }
 
   const lined = isLineWork(s);

@@ -9,7 +9,7 @@ import { breakdownRows, formatAgorot, priceAgorot, shekels, tileAgorot } from '.
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT,
-  locksetGlyph, nearestGrip, peepholeFits, render, sizeGlyph, specialLockGlyph,
+  bellFits, locksetGlyph, nearestGrip, peepholeFits, render, sizeGlyph, specialLockGlyph,
   windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
@@ -2477,14 +2477,116 @@ group('the doorbell and the peephole');
     ok(chosen.peephole === 'peep' && chosen.window === 'none',
        'clicking the peephole must take the window, not be refused');
   }
-  /* The BELL has no such rule, and that is a finding rather than an omission:
-     the same sweep found it clear of glass, mouldings, stripes and every
-     fitting, at every size and both handings. */
+  /* ⚠ THIS BLOCK SAID THE BELL NEEDED NO RULE, AND IT WAS THE BLIND SPOT.
+     Verbatim, for a week: *"The BELL has no such rule, and that is a finding
+     rather than an omission: the same sweep found it clear of glass,
+     mouldings, stripes and every fitting, at every size and both handings."*
+     The sweep was `tools/_newhw.mjs` over `bellPush` on the hinge stile;
+     `js/renderer.js` deleted that fitting on 30.8 and put a 132 mm ring
+     knocker on the leaf's CENTRE LINE. So this assertion went on requiring, in
+     four hundred combinations, that the ₪300 fitting NOT be blocked — while it
+     was being painted inside the pane on every glazed door. **An assertion
+     written from a measurement can outlive the measurement, and then it defends
+     the bug**: this one would have failed the fix.
+     ⚠ AND THE REASON NOTHING ELSE CAUGHT IT IS THE FIXTURE. Every bell DRAWING
+     assertion in this group binds `solid` — `{ ...base, window: 'none', detail:
+     'plain' }` — so not one of them can see a glazed door, including the 30.8
+     one that "pins both axes". The window is varied below for that reason. */
   for (const w of WINDOWS) {
-    ok(!conflicts({ ...base, window: w.id, detail: w.id === 'none' ? 'plain' : 'panel' })
-        .bell.bell,
-       `the bell must not be blocked on window "${w.id}"`);
+    const glazed = w.id !== 'none';
+    const st = { ...base, window: w.id, detail: glazed ? 'panel' : 'plain' };
+    ok(bellFits(st) === !glazed, `bellFits must be ${!glazed} for window "${w.id}"`);
+    ok(!!conflicts(st).bell.bell === glazed,
+       `the bell must be ${glazed ? 'blocked' : 'offered'} on window "${w.id}"`);
   }
+  {
+    const { state: fixed, changed } =
+      repair({ ...base, window: 'rect', detail: 'panel', bell: 'bell' });
+    ok(fixed.bell === 'nobell' && changed.includes('bell'),
+       'a link with a bell and a window must lose the bell, and say so');
+    const { state: chosen } =
+      repair({ ...base, window: 'rect', detail: 'panel', bell: 'bell' }, 'bell');
+    ok(chosen.bell === 'bell' && chosen.window === 'none',
+       'clicking the bell must take the window, not be refused');
+    /* ⚠ AND BOTH FITTINGS MUST BE NAMED WHEN BOTH GO. They are two fields with
+       two prices, and one sentence for two removals is a fault of its own. */
+    const both = repair({ ...base, window: 'rect', detail: 'panel',
+                          bell: 'bell', peephole: 'peep' });
+    ok(both.state.bell === 'nobell' && both.state.peephole === 'nopeep',
+       'a link carrying a bell AND a peephole with a window must lose both');
+    ok(both.changed.includes('bell') && both.changed.includes('peephole'),
+       'and must report both, not whichever repair ran first');
+
+    /* ⚠ AND THE CASE THAT WAS SILENTLY WRONG WHILE EACH HALF LOOKED RIGHT.
+       Written as two independent repairs, tapping the פעמון on a door already
+       carrying the עינית and a window removed the עינית (its repair ran first
+       and saw somebody else's intent) and THEN removed the window — so the
+       customer lost a fitting to make room for glass that was going anyway.
+       Both fittings must survive, because the thing they were competing with
+       is what leaves. Asserted in both directions, since the mirror is the
+       half that would go unnoticed. */
+    for (const [click, other] of [['bell', 'peephole'], ['peephole', 'bell']]) {
+      const r = repair({ ...base, window: 'rect', detail: 'panel',
+                         bell: 'bell', peephole: 'peep' }, click);
+      ok(r.state.window === 'none',
+         `clicking the ${click} on a glazed door must take the window`);
+      ok(r.state.bell === 'bell' && r.state.peephole === 'peep',
+         `clicking the ${click} must not cost the customer their ${other} — `
+       + `got bell ${r.state.bell}, peephole ${r.state.peephole}`);
+      ok(!r.changed.includes(other),
+         `and must not report removing the ${other}, which it did not remove`);
+    }
+  }
+
+  /* ⚠ AND THE ASSERTION THAT DOES NOT ANSWER ITSELF, which is the whole of
+     §5.14 — a check anchored in our own model cannot catch our own model being
+     wrong. `bellFits` is a model of the drawing; this asks the DRAWING.
+     It reads the knocker's own published centre and radius out of the emitted
+     markup, and the opening's box out of the four mitred runs the pane group
+     draws — both in scene coordinates, neither through `apertureLayout` and
+     neither through the rule — and requires the two to AGREE:
+
+         bellFits(state)  ===  the drawn knocker clears every drawn pane
+
+     ⚠ IT IS A BICONDITIONAL ON PURPOSE, AND THE OBVIOUS ONE-SIDED VERSION IS
+     DEAD ON ARRIVAL. "A door must never draw a bell over a pane" passes
+     trivially the moment `repair` exists, because a repaired door never
+     carries both — a check that cannot find its subject, which is the fault
+     §5.15 is about. So this runs on the RAW state, where the drawing will
+     happily put a ring on the glass, and pins the rule to what the picture
+     does. Move the knocker, add a third window shape, or delete `bellFits`,
+     and it goes red on the object rather than on the theory. */
+  let bellPaneChecks = 0;
+  for (const sz of Object.keys(SIZES)) for (const w of WINDOWS) {
+    const st = { ...base, size: sz, window: w.id, bell: 'bell',
+                 detail: w.id === 'none' ? 'plain' : 'panel' };
+    const svg = render(st);
+    const g = (svg.match(/<g data-hw="bell"[^>]*>/) || [])[0];
+    ok(g, `the raw state must draw a bell for ${sz}/${w.id} — without it this check is dead`);
+    const num = k => Number((g.match(new RegExp(`data-${k}="([-0-9.]+)"`)) || [])[1]);
+    const cx = num('cx'), cy = num('cy'), R = num('r');
+    ok(Number.isFinite(cx) && Number.isFinite(cy) && R > 0,
+       `the drawn bell must publish cx/cy/r (${sz}/${w.id}) — this check is dead without them`);
+    /* Each pane group opens with its four mitred casing runs; the first is the
+       head (`M x0 y0 H x1`) and the second the sill (`M x0 y1 H x1`), so the
+       opening's outer box comes straight off the ink. */
+    let clear = true;
+    for (const pane of svg.match(/<g data-pane="[\s\S]*?<clipPath/g) || []) {
+      const runs = [...pane.matchAll(/M ([-0-9.]+) ([-0-9.]+) H ([-0-9.]+)/g)];
+      ok(runs.length >= 2, `a pane group must show its head and sill runs (${sz}/${w.id})`);
+      const x0 = Math.min(+runs[0][1], +runs[0][3]), x1 = Math.max(+runs[0][1], +runs[0][3]);
+      const y0 = Math.min(+runs[0][2], +runs[1][2]), y1 = Math.max(+runs[0][2], +runs[1][2]);
+      if (cx + R > x0 && cx - R < x1 && cy + R > y0 && cy - R < y1) clear = false;
+      bellPaneChecks++;
+    }
+    ok(bellFits(st) === clear,
+       `the rule and the picture disagree about the פעמון on ${sz}/${w.id}: `
+     + `bellFits says ${bellFits(st)} and the drawn knocker (${cx},${cy} r${R}) is `
+     + `${clear ? 'clear of' : 'inside'} the drawn opening`);
+  }
+  ok(bellPaneChecks >= 12,
+     `only ${bellPaneChecks} bell-against-pane comparisons were made — the pane selector `
+   + 'has stopped matching and this check has gone blind');
 }
 
 // ── 8a. A grip is a grip; only the lockset is lock furniture ──────

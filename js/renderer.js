@@ -618,6 +618,29 @@ const KNOCKER_AFF  = 1470;
    inside a 22-35 mm trim ring, so 30 mm is the ring and the reading lands mid
    range. This is the radius, and `peephole()` is what draws it. */
 const PEEPHOLE_R   = 15;    // 30 mm across, measured on d028
+/* ⚠ THE KNOCKER'S RADIUS LIVES UP HERE BECAUSE A RULE READS IT NOW. It was a
+   bare `66` inside `bellKnocker`, which was correct for as long as nothing but
+   the drawing needed to know how big the fitting is — and on 7.9.2026
+   `bellFits` did, so a second copy of it would have been §5's oldest shape.
+   132 mm ring, 0.13-0.14 W off the two square-on photographs; see the note
+   over `bellKnocker`.
+   `KNOCKER_REACH` is how far the drawn ink actually goes from the ring's
+   centre, and it is 0.86 across and 1.124 up rather than 1.0 either way,
+   because the fitting is not the ring: the soft shadow is the widest thing in
+   it (`R * 0.86`) and the boss's little cast crown is the highest
+   (`R * 0.62 + R * 0.42 * 1.20`). Both fractions are read off the template
+   below rather than off a measurement, so they move with it.
+   ⚠ AND THEY ARE NOT WHAT A BROWSER'S `getBBox` ON THE GROUP REPORTS. It says
+   143.3 x 145.7 against the 113.6 x 148.4 these give — because the ring's
+   dashed highlight carries `rotate(-142)`, and Chromium bounds a transformed
+   child by the corners of its axis-aligned box rather than by the shape:
+   103*cos142 + 101*sin142 = 143.4, which is the reported width to a tenth.
+   The 30 mm of difference is a rotation artefact and none of it is ink.
+   §7's rule about instruments applies to the browser's own: measured 7.9.2026
+   by removing the group's children one at a time. */
+const KNOCKER_R    = 66;
+const KNOCKER_REACH = { x: KNOCKER_R * 0.86, up: KNOCKER_R * 1.124,
+                        down: KNOCKER_R * 1.02 };
 /* Hinge heights, 0.144 / 0.504 / 0.857 H, kept as a note rather than as code.
    These doors open inwards, so from the street the hinges are hidden in the
    rebate: every outside photograph on the works page shows a leaf with none on
@@ -3855,6 +3878,91 @@ export function peepholeFits(state) {
   const R = PEEPHOLE_R + 8;                       // its radius plus a bead of paint
   return !openings.some(o =>
     cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
+}
+
+/**
+ * ⚠ THE SAME RULE FOR THE פעמון, AND IT SHOULD HAVE ARRIVED WITH THE ONE
+ * ABOVE. 7.9.2026. `js/rules.js` declined a bell entry in as many words —
+ * *"the bell needs no such entry: it stands on the hinge stile and a
+ * 426-design sweep with real getBBox found it clear of everything"* — and
+ * that sentence was true of `bellPush`, which this file deleted on 30.8 when
+ * the owner's three photographs moved the fitting to the leaf's CENTRE LINE.
+ * `bellKnocker`'s own docstring has said *"It is not on the hinge stile"* for
+ * a week, four hundred lines from a rule still citing the stile as the reason
+ * it needs no rule. So the ₪300 ring was painted dead centre on the glass on
+ * every glazed door, charged for, with no tile state and no toast, while the
+ * ₪0 peephole 130 mm above it on the same centre line was correctly refused.
+ * CLAUDE.md §5 exactly: a justification outliving the thing it justified, with
+ * nothing failing in between.
+ *
+ * ⚠ GEOMETRIC, NOT OBSERVED — the same distinction the peephole's note draws,
+ * and it matters more here because the OBSERVED version would be false in the
+ * other direction: d076 carries a knocker on a solid leaf, the corpus has
+ * glazed doors with fittings on them, and "Peretz does not sell a bell with a
+ * window" is not something any photograph says. What this computes is only
+ * that on OUR two windows there is nowhere for THIS fitting to go, from the
+ * same `apertureLayout` the drawing calls.
+ *
+ * ⚠ AND IT IS THE PEEPHOLE'S ARGUMENT WITH MORE FORCE, NOT A NEW ONE. Both
+ * windows we sell are centred on the leaf; the knocker sits on that centre
+ * line 130 mm BELOW the peephole (`KNOCKER_AFF` 1470 against 1600) and is
+ * 132 mm across against the peephole's 30. Measured over every size x window:
+ * the knocker is not merely overlapping but WHOLLY INSIDE the pane on 12 of
+ * 12 glazed states and clear on all 6 solid ones.
+ *
+ * ⚠ MOVING IT INSTEAD WAS THE OTHER FIX AND IS REFUSED. There is no measured
+ * position for a knocker on a glazed leaf — the three photographs are of solid
+ * and panelled doors — and the last position invented for this fitting was the
+ * hinge stile, which its own comment flagged as *"a choice rather than a
+ * measurement"* and which the photographs then overturned. Inventing a second
+ * one a week later is the mistake, not the fix. REALISM.md §6 governs, and
+ * `ASK-PERETZ.md` §0f2 asks him where the knocker goes on a door with a
+ * window — which is the only thing that can reopen this.
+ *
+ * ⚠ AND THE QUESTION THIS PROJECT REQUIRES BEFORE A FOURTH GEOMETRIC RULE IS
+ * WRITTEN, ASKED OUT LOUD: is this the depth error again? Three compatibility
+ * rules have been written and withdrawn here — pull-bar-versus-lever, the
+ * panel shrinking for a bar, and lockset-versus-glazing — and all three were
+ * one mistake: a square-on elevation has no depth in it, so two things that
+ * overlap in the drawing are not two things that touch. A lever really does
+ * pass in front of a pane.
+ * **It is not that error, and the difference is what is BOLTED.** A lever is
+ * CANTILEVERED on its spindle from a backplate fixed to the stile — the part
+ * carrying it is on solid leaf, and only the blade reaches over the glass.
+ * `collide.mjs` scopes that exemption in its own words to what earns it: *"the
+ * part it is cantilevered FROM … is bolted flat to the leaf, and you cannot
+ * bolt anything to a sheet of glass."* A ring knocker is a cast boss bolted
+ * THROUGH the leaf at its own centre, and on a glazed door that centre IS the
+ * pane. There is nothing for it to cantilever from. Nor is this a near miss to
+ * argue about: the fitting is not merely overlapping but WHOLLY INSIDE the
+ * opening on all twelve glazed states, 176 mm of clear glass either side.
+ *
+ * ⚠ AND `data-mount` IS THE WRONG MARKER FOR IT, though it looks like the
+ * right one. `tools/collide.mjs` asserts nothing bolted lands on glass, which
+ * is exactly this fault — but it also reads every `data-mount` box as a
+ * BACKSET from the closing edge and compares the deepest against
+ * `MOUNT_REACH` (121). This fitting stands on the centre line, so it would
+ * report a reach of about 531 mm and fail `collide -- boxes` about nothing,
+ * which is the trap that file already records at 373 mm. The clearance the
+ * knocker needs is a rule, not a mount.
+ */
+export function bellFits(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const openings = apertureLayout(byId(WINDOWS, state.window),
+                                  leafW, byId(DETAILS, state.detail), leafH);
+  if (!openings.length) return true;
+  /* Where the drawing puts it: centred across, `KNOCKER_AFF` up from the
+     floor. `bellKnocker`'s reach is asymmetric, so this is four numbers and
+     not a radius — see `KNOCKER_REACH`. The bead of paint either side is the
+     peephole rule's own 8 mm, so the two fittings are judged alike. */
+  const PAINT = 8;
+  const cx = leafW / 2, cy = leafH - KNOCKER_AFF;
+  return !openings.some(o =>
+    cx + KNOCKER_REACH.x + PAINT > o.x &&
+    cx - KNOCKER_REACH.x - PAINT < o.x + o.w &&
+    cy + KNOCKER_REACH.down + PAINT > o.top &&
+    cy - KNOCKER_REACH.up - PAINT < o.top + o.h);
 }
 
 export function panelFits(state) {
@@ -8544,7 +8652,7 @@ const peephole = (cx, cy) => {
  * that. Both are life-size for a cast knocker and neither is invented.
  */
 const bellKnocker = (cx, cy) => {
-  const R    = 66;                 // 132 mm ring, outside; see above
+  const R    = KNOCKER_R;          // 132 mm ring, outside; see the constant
   const RING = R * 0.78;           // the ring's own centre-line radius
   const BOSS = R * 0.42;           // the plate it hangs from
   const top  = cy - R * 0.62;      // where the boss sits above the ring

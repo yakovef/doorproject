@@ -236,10 +236,19 @@
        31.8 — *"the color of the bell can only be nickel and gold"* — because a
        customer who picks bronze and watches every other fitting follow needs to
        be able to read why this one did not. */
+    /* ⚠ "BELOW THE VIEWER", AND IT SAID ABOVE IN ALL THREE LANGUAGES. Found
+       7.9.2026 on the customer walk. `KNOCKER_AFF` is 1470 and `PEEPHOLE_AFF`
+       is 1600, so the ring sits 130 mm UNDER the viewer — which is what the
+       owner's three photographs show, what `bellKnocker`'s docstring says ("a
+       little under the peephole"), and what the drawing does: measured on the
+       default door, peephole cy 1054 against the ring's 1184. The sentence was
+       written in the same round that moved the fitting and was written the wrong
+       way up; nothing on the page and nothing in the suite compares a hint with
+       the picture it describes. */
     "g.bell.h": [
-      "טבעת נוקשת במרכז הדלת, מעל העינית. בניקל או בזהב בלבד.",
-      "A ring knocker on the centre of the door, above the viewer. Nickel or gold only.",
-      "Кольцо-стучалка по центру двери, над глазком. Только никель или золото."
+      "טבעת נוקשת במרכז הדלת, מתחת לעינית. בניקל או בזהב בלבד.",
+      "A ring knocker on the centre of the door, below the viewer. Nickel or gold only.",
+      "Кольцо-стучалка по центру двери, под глазком. Только никель или золото."
     ],
     "g.peephole.h": [
       "עינית לראות מי בחוץ. כלולה במחיר.",
@@ -609,11 +618,17 @@
        rules.js) — and `npm test` asserts all three sentences still name the cap
        they describe, so the number and the rule cannot drift apart. */
     "fix.peepGone": ["הסרנו את העינית — החלון תופס בדיוק את מקומה", "We removed the peephole — the window sits exactly where it goes", "Мы убрали глазок — окно занимает как раз его место"],
+    "fix.bellGone": ["הסרנו את הפעמון — החלון תופס את מקומו במרכז הדלת", "We removed the doorbell — the window sits where it goes, on the centre of the door", "Мы убрали звонок — окно занимает его место по центру двери"],
     "fix.stripesCapped": ["פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת", "Vertical stripes cap at 6 — more than that will not fit across the door", "Вертикальных полос максимум 6 — больше по ширине двери не помещается"],
     "why.peepWindow": [
       "החלון תופס את מקום העינית",
       "The window sits where the peephole goes",
       "Окно занимает место глазка"
+    ],
+    "why.bellWindow": [
+      "החלון תופס את מקום הפעמון",
+      "The window sits where the doorbell goes",
+      "Окно занимает место звонка"
     ],
     "why.gripOffDoor": ["הידית חורגת מהדלת", "The handle runs off the door", "Ручка выходит за пределы двери"],
     "why.gripReach": [
@@ -2489,6 +2504,12 @@
   var SPECIAL_AFF = 1430;
   var KNOCKER_AFF = 1470;
   var PEEPHOLE_R = 15;
+  var KNOCKER_R = 66;
+  var KNOCKER_REACH = {
+    x: KNOCKER_R * 0.86,
+    up: KNOCKER_R * 1.124,
+    down: KNOCKER_R * 1.02
+  };
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
@@ -4574,6 +4595,20 @@ ${body}
     const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
     const R = PEEPHOLE_R + 8;
     return !openings.some((o) => cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
+  }
+  function bellFits(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const openings = apertureLayout(
+      byId(WINDOWS, state2.window),
+      leafW,
+      byId(DETAILS, state2.detail),
+      leafH
+    );
+    if (!openings.length) return true;
+    const PAINT = 8;
+    const cx = leafW / 2, cy = leafH - KNOCKER_AFF;
+    return !openings.some((o) => cx + KNOCKER_REACH.x + PAINT > o.x && cx - KNOCKER_REACH.x - PAINT < o.x + o.w && cy + KNOCKER_REACH.down + PAINT > o.top && cy - KNOCKER_REACH.up - PAINT < o.top + o.h);
   }
   function panelFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
@@ -6807,7 +6842,7 @@ ${body}
     </g>`;
   };
   var bellKnocker = (cx, cy) => {
-    const R = 66;
+    const R = KNOCKER_R;
     const RING = R * 0.78;
     const BOSS = R * 0.42;
     const top = cy - R * 0.62;
@@ -7288,9 +7323,23 @@ ${body}
          and both reach viewer height, so on a glazed door the
          fitting has nowhere to be — `peepholeFits` computes that
          from the same `apertureLayout` the drawing calls, so the
-         tile and the picture cannot disagree. The bell needs no such
-         entry: it stands on the hinge stile and a 426-design sweep
-         with real getBBox found it clear of everything. */
+         tile and the picture cannot disagree.
+         ⚠ AND THE פעמון NEEDS THE IDENTICAL ENTRY, WHICH THIS
+         COMMENT SPENT A WEEK EXPLAINING WHY IT DID NOT. It said:
+         *"the bell needs no such entry: it stands on the hinge stile
+         and a 426-design sweep with real getBBox found it clear of
+         everything."* Both halves were true of `bellPush`, and
+         `js/renderer.js` deleted `bellPush` on 30.8 — the owner's
+         photographs put the fitting on the leaf's CENTRE LINE, and
+         `bellKnocker`'s docstring has said *"It is not on the hinge
+         stile"* ever since. The sweep that cleared it measured a
+         fitting that no longer exists, so the ₪300 ring was drawn
+         inside the pane on every glazed door, priced, with the tile
+         never greyed and no toast when a window landed on top of
+         it — while the ₪0 peephole 130 mm above it on the same
+         centre line was refused correctly. `bellFits` is the same
+         computation as `peepholeFits`; the whole argument, and why
+         the fitting is not simply moved, is over it. */
       peephole: {},
       bell: {},
       /* ⚠ A STRING, NOT A MAP OF IDS, because the stripes are no
@@ -7325,6 +7374,7 @@ ${body}
       }
     }
     if (!peepholeFits(state2)) out.peephole.peep = T("why.peepWindow");
+    if (!bellFits(state2)) out.bell.bell = T("why.bellWindow");
     if (onLeaf) out.stripes = T("why.stripesWindow");
     else if (byId(DETAILS, state2.detail).panel) out.stripes = T("why.stripesPanel");
     if (lined) {
@@ -7395,6 +7445,7 @@ ${body}
     setGone: "fix.setGone",
     needPanel: "fix.needPanel",
     peepGone: "fix.peepGone",
+    bellGone: "fix.bellGone",
     peepWindow: "fix.peepWindow",
     ownPull: "fix.ownPull",
     stripesCapped: "fix.stripesCapped"
@@ -7424,13 +7475,21 @@ ${body}
       s.stripeCount = STRIPE_MAX.v;
       change("stripes", SAID.stripesCapped);
     }
-    if (s.peephole === "peep" && !peepholeFits(s)) {
-      if (intent === "peephole") {
+    const peepBad = s.peephole === "peep" && !peepholeFits(s);
+    const bellBad = s.bell === "bell" && !bellFits(s);
+    if (peepBad || bellBad) {
+      if (intent === "peephole" || intent === "bell") {
         s.window = "none";
         change("window", SAID.windowGone);
       } else {
-        s.peephole = "nopeep";
-        change("peephole", SAID.peepGone);
+        if (peepBad) {
+          s.peephole = "nopeep";
+          change("peephole", SAID.peepGone);
+        }
+        if (bellBad) {
+          s.bell = "nobell";
+          change("bell", SAID.bellGone);
+        }
       }
     }
     const lined = isLineWork(s);

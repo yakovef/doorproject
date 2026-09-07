@@ -314,7 +314,7 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **4,349,367 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+- `npm test` — **4,349,611 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
   ANYTHING; it is the product of the catalogue's list lengths. Read the failure
   count. (This line said **5,403,239** for two rounds after the stripe rework
   cut fourteen `DETAILS` entries — a number in prose describing a thing that
@@ -1065,8 +1065,8 @@ sheet. A right-hinged door is a physical fact.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Twenty-two so far. None of them threw.
-All of them looked like a working page.
+**Things that vanish rather than break.** Twenty-three so far. None of them
+threw. All of them looked like a working page.
 
 1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
    nothing at all.
@@ -1278,6 +1278,54 @@ it is **present and distinct**, not only that it is correct:
     The comparison resolves the reference now: find which gradients a group
     paints with, then compare THOSE gradients' stops.
 
+23. **A RULE THAT DECLINED TO EXIST, CITING A MEASUREMENT OF AN OBJECT THAT HAD
+    BEEN DELETED — AND AN ABSENCE HAS NOTHING TO GO STALE.** `js/rules.js`
+    carried no entry for the פעמון and said why, in a comment: *"The bell needs
+    no such entry: it stands on the hinge stile and a 426-design sweep with
+    real getBBox found it clear of everything."* Both halves were true of
+    `bellPush`. On 30.8 the owner's photographs replaced it with a 132 mm ring
+    knocker on the leaf's CENTRE LINE, and `bellKnocker`'s own docstring has
+    said *"It is not on the hinge stile"* ever since — four hundred lines from
+    a rule still citing the stile as the reason it needed no rule. So on every
+    glazed door the ₪300 ring was painted **dead centre on the glass**, on top
+    of the ironwork, tile never greyed, no toast when a window landed on it,
+    and ₪300 charged. Measured 7.9: the knocker is not merely overlapping but
+    **wholly inside the pane on 12 of 12 glazed states**, and clear on all 6
+    solid ones.
+    ⚠ **THE FITTING IT SITS BESIDE WAS HANDLED CORRECTLY, WHICH IS WHAT MAKES
+    IT STARK.** The עינית is 130 mm HIGHER on the same centre line and 30 mm
+    across against the knocker's 132; `peepholeFits` refuses it with a printed
+    reason and removes it with a toast. Every word of that argument applies to
+    the knocker with more force. The ₪0 fitting was gated and the ₪300 one was
+    not.
+    ⚠ **AND ALL THREE GUARDS WERE STRUCTURALLY BLIND, none of them broken.**
+    `npm test`'s bell group binds `const solid = { ...base, window: 'none',
+    detail: 'plain' }`, so every bell DRAWING assertion — including the 30.8
+    one written to "pin both axes" — runs on a fixture that **cannot represent
+    a glazed door**. `tools/collide.mjs` omits the bell from its base state
+    entirely. And the "you cannot bolt anything to a sheet of glass" check
+    selects `[data-mount]`, which the knocker does not carry — correctly, since
+    that attribute is read as a BACKSET from the closing edge and a centre-line
+    fitting would report ~531 mm and fail `collide -- boxes` about nothing.
+    ⚠ **The test did worse than miss it: it DEFENDED it.** The group asserted,
+    in four hundred combinations, that the bell must NOT be blocked on any
+    window — so the correct fix would have gone red against a check written
+    from a measurement that had expired. **An assertion inherits the lifespan
+    of the measurement it was written from, and nothing tells it when that
+    expires.**
+    ⚠ **And it had been looked straight at.** `AGENT-LOG.md` run 93, the day
+    before, drove this exact state, screenshotted it, correctly identified the
+    peephole's removal banner as `peepholeFits` working, and logged the bell as
+    *"rendering correctly"*. The ring was in the middle of the window in that
+    screenshot.
+    The fix is `bellFits`, the same computation as `peepholeFits`, and the
+    assertion that replaces the blind one is a BICONDITIONAL between the rule
+    and the picture — `bellFits(state) === the drawn knocker clears every drawn
+    pane`, both sides read out of the emitted markup, run on the RAW state.
+    ⚠ The one-sided form ("a door must never draw a bell over a pane") is dead
+    on arrival, because once `repair` exists no door carries both: a check that
+    cannot find its subject, §5.15 again, caught before it shipped.
+
 ⚠ **And one assertion was counting PROSE.** The ironwork group asked
 `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
 document. About 32% of a rendered door is XML comments, so the moment a comment
@@ -1441,6 +1489,21 @@ grew down the leaf — the pieces at the head and the foot came out narrow and
 the two in the middle came out right, which is the signature. `_upright2.mjs`
 rectifies from four measured corners instead. **When a check is a ratio, ask
 what pair of errors would cancel in it.**
+
+**⚠ AND THE BROWSER'S OWN `getBBox` IS AN INSTRUMENT, AND IT ROUNDS A ROTATED
+CHILD UP.** Measured 7.9.2026 while writing the פעמון's clearance rule. Chromium
+reports the knocker's group as **143.3 x 145.7** where the ink is
+**113.6 x 148.4**, and the 30 mm of extra width is not a fitting, a shadow or a
+stroke: the ring's dashed highlight carries `rotate(-142)`, and a `<g>`'s box is
+computed by transforming the corners of a child's axis-aligned box rather than
+the shape inside it. `103*cos142 + 101*sin142 = 143.4`, which is the reported
+width to a tenth. Two independent readers — the walker and its verifier — took
+that figure at face value and published "106.8 mm of clear glass either side"
+off it; had the rule been written from it, a rotation artefact would have been
+baked into a clearance. **Found by removing the group's children one at a time**,
+which is the same move as every other entry here: when a number is confidently
+wrong about something you can check by hand, go and check it by hand. The rule
+states its reach from the template's own fractions instead (`KNOCKER_REACH`).
 
 **⚠ AND A WARNING PRINTED IN THE FILE YOU COPY FROM IS STILL A WARNING YOU CAN
 WALK PAST.** `collide.mjs` says, in as many words, *"the relight rects are the
@@ -1846,6 +1909,92 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE ₪300 פעמון WAS BEING PAINTED ON THE GLASS, AND THE FIRST WALK OF THE
+  NEW METHOD FOUND IT — 7.9.2026.** The entry below records the owner
+  instructing this agent to walk the page as a customer instead of touring
+  features. The first walk under that instruction — ten customers, then
+  reproduce and refute — returned **nine confirmed defects**, and the worst of
+  them is `PLAN.md` §0's own failure mode with money on it: choose the פעמון
+  and then any window, and the 132 mm ring knocker is drawn **dead centre on
+  the pane**, over the ironwork, with the tile never greyed, no toast, ₪300
+  charged, and the message and the A4 sheet both printing `פעמון: פעמון`. All
+  three artefacts AGREE, so nothing inside the product can catch it — only the
+  picture shows that the door cannot be built. **Thirty-five runs of "nothing
+  worth changing" preceded this, on the same green instruments.**
+  The mechanism, the three blind guards and the assertion that DEFENDED the bug
+  are §5 item 23. What belongs here is the shape: **a comment explaining why a
+  rule was unnecessary, still citing a fitting the drawing had deleted a week
+  earlier.** An absence has nothing to go stale, and nothing failed in between.
+  ⚠ **THE FIX IS `bellFits`, AND MOVING THE KNOCKER WAS THE OTHER FIX AND IS
+  REFUSED.** There is no measured position for a knocker on a glazed leaf — the
+  three photographs are of solid and panelled doors — and the last position
+  invented for this fitting was the hinge stile, which its own comment flagged
+  as *"a choice rather than a measurement"* and which the photographs then
+  overturned. Inventing a second one a week later is the mistake, not the fix
+  (REALISM.md §6). So the rule mirrors `peepholeFits` exactly, computed from the
+  same `apertureLayout` the drawing calls, and `ASK-PERETZ.md` §0f2 asks him the
+  only thing that can reopen it: *on a door with a window, where does the ring
+  go?* **No price moved, no id, no list order, no bit, no `VERSION`** — a rule
+  and two strings.
+  ⚠ **AND THE MEASUREMENT THE REPORT ARRIVED WITH WAS 30 mm TOO WIDE**, which
+  is worth more than the fix. Both the walker and its verifier read the
+  knocker's group as 143.3 mm across off `getBBox` and published "106.8 mm of
+  clear glass either side". The ink is 113.6: the ring's dashed highlight is
+  rotated -142° and Chromium bounds a transformed child by its box's corners,
+  not by the shape — `103*cos142 + 101*sin142 = 143.4`. **The browser's own
+  `getBBox` is an instrument and it belongs in §7**, which it now does. The
+  finding survives untouched (the fitting is WHOLLY INSIDE the pane on 12 of 12
+  glazed states, clear on all 6 solid ones); what would not have survived is a
+  clearance rule built on a rotation artefact.
+  ⚠ **AND WRITING THE RULE EXPOSED A SECOND ONE THAT NO CHECK WOULD HAVE
+  CAUGHT.** The bell's repair was written as its own `if`, beside the
+  peephole's, and each is correct read alone. Together they are not: on a door
+  carrying BOTH fittings and a window, tapping the פעמון ran the PEEPHOLE's
+  repair first, which saw `intent === 'bell'` rather than its own and removed
+  the עינית — and the bell's repair then removed the WINDOW, which is the very
+  thing the peephole had just been sacrificed to. **The customer tapped one
+  fitting and paid for it with the other, on a door that had room for both.**
+  The mirror was identical with the fittings swapped.
+  It is this file's third recorded ordering constraint arriving a fourth time —
+  *a repair that reads a value another repair is about to change is neither
+  idempotent nor guaranteed to land somewhere buildable* — and the general
+  shape is worth naming: **two repairs competing for one resource cannot be
+  written independently, because each is only correct if the other does not
+  fire.** So the question is asked ONCE of both fittings together: is the glass
+  going, or are the fittings? Found by reasoning through the interaction rather
+  than by a red check — nothing in the suite was asking — which is why the
+  assertion for it went in beside the others rather than after the fact.
+  ⚠ **AND THE BELL'S OWN HINT WAS UPSIDE DOWN, IN ALL THREE LANGUAGES** — one
+  of the twenty-one findings the spend limit stopped before verification, and
+  the one that fell inside this fix, so it was checked and taken. It said the
+  ring sits *"מעל העינית"* / *"above the viewer"* / *"над глазком"*.
+  `KNOCKER_AFF` is 1470 against `PEEPHOLE_AFF`'s 1600, so it is 130 mm BELOW —
+  which is what the photographs show, what `bellKnocker`'s docstring says, and
+  what the drawing does (measured on the default door: peephole cy 1054, ring
+  cy 1184). The sentence was written in the same round that moved the fitting,
+  and written the wrong way up. **Nothing on the page and nothing in the suite
+  compares a hint against the picture it describes**, which is the same gap the
+  knocker itself fell through one level down.
+  ⚠ **The other eight are real, reproduced and recorded nowhere**, and are not
+  fixed here: the face step's tile list is filtered ONCE at boot, so on every
+  glazed door and 10 of the 30 gallery doors the customer's own face has no
+  tile and the first tap deletes it; a repair that changes several things shows
+  only `said[0]`, so a ₪1,900 face goes silently while the ₪0 peephole gets the
+  toast; the colour step's explainer still says *"כל הגוונים באותו מחיר"* under
+  a heading reading **תוספת ₪200** — which the 30.8 entry in this very log
+  claims *"is gone"*, and it is not; a door walked step by step, or changed and
+  changed back, reaches Peretz as *"I looked at the door the site opens with
+  and I have a question"*; the breakdown prints the doorbell row as the raw key
+  `bell` in all three languages; six pull-bar tiles at four prices are one grey
+  line, including the one whose difference is that it is black; on 6-7 of the 8
+  phone steps the first tile's NAME and PRICE sit behind the fixed quote bar;
+  and the repair toast is fixed-centred, landing 217 px from the panel on a
+  desktop and over the handing control on a phone.
+  ⚠ **And 21 further findings never reached verification** — the run hit the
+  org's monthly spend limit with 28 of 50 agents unfinished — so they are named
+  in `AGENT-LOG.md` and claimed as nothing. **An unverified finding is not a
+  finding**, which is the same rule this file applies to its own numbers.
 
 - **⚠ TWO SESSIONS DIAGNOSED THE THIRTY-FIVE RUNS WITHIN THE HOUR, AND THE
   OWNER HAD ALREADY SAID SO OUT LOUD — 7.9.2026.** The entry below landed
