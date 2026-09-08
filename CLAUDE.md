@@ -1910,6 +1910,52 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ A LISTING RULE THAT FROZE AT BOOT, AND THE COMMENT ABOVE IT NAMED THE
+  DOOR IT WOULD BREAK — 8.9.2026.** Second of the nine the customer walk found.
+  `glazedOnly` faces — פאנל תחתון and its ogee twin — are not offered on a
+  solid door, on Peretz's instruction, and the group's predicate has ALWAYS
+  carried the clause that keeps the customer's CURRENT face listed whatever the
+  rule says. It was a filter inside `list()`, and `list()` is read when
+  `buildPanel` BUILDS the tiles: at boot, and on a language switch. So it was
+  evaluated against the state the page booted in — the default door, which is
+  solid — and never again.
+  Two doors reach a glazed-only face after boot and both showed the face step
+  **with nothing selected and the customer's own answer absent**: choosing
+  חלון מרובע, which `rectNeedsPanel` FORCES a bottom panel onto, and the
+  gallery's **d048, d051 and d087** — the three solid one-panel doors.
+  ⚠ **AND THE COMMENT OVER THE PREDICATE NAMES d048 BY NAME**, describing this
+  outcome as the thing the clause prevents: *"Arriving from the gallery on
+  d048 — solid, one panel — with that tile filtered out would show a group in
+  which nothing is selected."* The reasoning was right, the predicate was
+  right, and it ran at the wrong moment. That is §5 item 23's shape one level
+  up: not a stale justification this time but a correct guard evaluated once,
+  early, and never re-asked.
+  ⚠ **THE REPORTED CONSEQUENCE WAS WRONG AND IS CORRECTED RATHER THAN
+  REPEATED.** The walk said *"the first tap deletes it"* — a ₪725 panel gone
+  silently — and the entry below repeated it. Driven on the live page at 390
+  and 1440: tapping חלק leaves the door and the price exactly where they were.
+  On the glazed route `repair` puts the forced panel straight back (the toast
+  fires, correctly); on d048 the tap simply does nothing. **What the customer
+  meets is a control that does not respond and a question showing no answer —
+  friction, not a wrong door.** Recorded at the severity it earns. Second time
+  in two runs that a walk's MECHANISM was right and its CONSEQUENCE was not;
+  reproduce before repeating, including from this file's own log.
+  ⚠ **THE FIX IS A LIVE PREDICATE, AND REBUILDING WAS THE OBVIOUS ONE AND IS
+  REFUSED.** Every face is always BUILT now; a new optional `listed(o)` on the
+  group decides per paint which are SHOWN, from the same three clauses, applied
+  in `markGroup` beside the blocked marking that already runs there. Calling
+  `buildOptions` again instead would have been the `buildPanel` fault of §0c
+  exactly — that function APPENDS and carries its own rescue logic, so a second
+  build over a live host assembles a fresh list underneath the stale one.
+  Hiding costs no DOM churn, no re-attached listeners and no lost focus.
+  Measured on the page, forward with the button: solid → both hidden, `plain`
+  checked; + חלון מרובע → `panel` shown AND checked; − window → `panel` stays
+  shown because it is now the customer's face, `panelo` hides again.
+  ⚠ **`npm test` CANNOT SEE THIS** — `hidden` is a DOM fact, not a string — so
+  the assertion is in `npm run audit`, with the §5.15 clause that the tiles
+  were found at all. **Falsified by putting the filter back in `list()`.**
+  No price, no id, no list order, no bit, no `VERSION`.
+
 - **⚠ THE ₪300 פעמון WAS BEING PAINTED ON THE GLASS, AND THE FIRST WALK OF THE
   NEW METHOD FOUND IT — 7.9.2026.** The entry below records the owner
   instructing this agent to walk the page as a customer instead of touring
@@ -1977,9 +2023,10 @@ how it got there. Detail lives in the section it belongs to.
   compares a hint against the picture it describes**, which is the same gap the
   knocker itself fell through one level down.
   ⚠ **The other eight are real, reproduced and recorded nowhere**, and are not
-  fixed here: the face step's tile list is filtered ONCE at boot, so on every
-  glazed door and 10 of the 30 gallery doors the customer's own face has no
-  tile and the first tap deletes it; a repair that changes several things shows
+  fixed here: the face step's tile list is filtered ONCE at boot, so the
+  customer's own face has no tile and nothing is selected (⚠ **fixed 8.9, and
+  the "first tap deletes it" in this line was the report's claim, not a
+  measurement — it does not**; see the entry above); a repair that changes several things shows
   only `said[0]`, so a ₪1,900 face goes silently while the ₪0 peephole gets the
   toast; the colour step's explainer still says *"כל הגוונים באותו מחיר"* under
   a heading reading **תוספת ₪200** — which the 30.8 entry in this very log

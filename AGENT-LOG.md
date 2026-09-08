@@ -45,6 +45,58 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-08 01:20 UTC — run 100: the face step's listing rule froze at boot
+
+**Looked at:** not a new walk. Run 99's walk left **eight confirmed defects
+recorded and unfixed**, and looking for a ninth while those wait is the wrong
+call. Took the worst of them — the face step's tile list — as a different
+customer from run 99's: the one who arrives from the GALLERY, plus the one who
+adds a square window, driven forward with the button at 390 and 1440.
+
+**Reproduced before touching anything, and the report was half wrong.** The
+mechanism is real: `glazedOnly` faces are filtered inside `list()`, which
+`buildPanel` reads when it BUILDS the tiles — at boot and on a language switch
+— so it froze at the default door, which is solid. Both routes that reach a
+glazed-only face afterwards showed the face step with **nothing selected and
+the customer's own answer absent**: `?w=rect` (the square window FORCES a
+bottom panel) and the gallery's d048/d051/d087.
+
+⚠ **The comment over the predicate names d048 by name** and describes exactly
+this outcome as the thing the clause prevents. The reasoning was right, the
+predicate was right, and it ran at the wrong moment — §5.23's shape one level
+up: a correct guard evaluated once, early, and never re-asked.
+
+⚠ **AND THE REPORTED CONSEQUENCE IS WRONG.** The walk said *"the first tap
+deletes it"*, ₪725 gone silently, and run 99's entry repeated it. Measured:
+tapping חלק leaves the door and the price where they were — `repair` restores
+the forced panel on the glazed route (toast fires, correctly), and on d048 the
+tap does nothing at all. Friction, not a wrong door. **Second run running where
+a walk's mechanism was right and its consequence was not**; both entries are
+corrected rather than left, including this log's own.
+
+**Changed:** the listing rule is a live predicate instead of a build-time
+filter — every face always BUILT, a new optional `listed(o)` on the group
+decides per paint which are SHOWN, applied in `markGroup` beside the blocked
+marking already running there. Plus the audit check and the two corrected
+records. **No price, no id, no list order, no bit, no `VERSION`.**
+
+**Left alone deliberately:**
+· **Rebuilding the group**, which is the obvious fix. `buildOptions` APPENDS
+  and carries rescue logic, so a second build over a live host assembles a
+  fresh list underneath the stale one — the `buildPanel` fault §0c records.
+· **The remaining seven findings**, still named in §0b for run 101.
+
+**Best idea of this run, not taken:** every group's `list()` is read at build
+time, and `detail` was the only one whose answer depends on the state. Nothing
+asserts that. A check that calls each group's `list()` under two different
+states and fails if any returns different ids would catch the next one before
+a customer does — the general form of both this run's fix and run 99's.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-09-07 20:45 UTC — run 99: the ₪300 פעמון was being drawn on the glass
 
 ⚠ **This run spans three firings** — 10:40, 15:40 and 20:41 — because the walk
@@ -139,8 +191,8 @@ one-sided form is dead the moment `repair` exists); `ASK-PERETZ.md` §0f2;
   373 mm.
 · **The other eight confirmed findings.** Reproduced, recorded nowhere, and
   each is its own piece of work: the face step's tile list filtered once at
-  boot (glazed doors and 10 of 30 gallery doors show no selection, first tap
-  deletes a ₪725 panel); only `said[0]` shown when one tap changes several
+  boot (⚠ **fixed in run 100 — and "first tap deletes a ₪725 panel" was the
+  report's claim repeated here without measuring; it does not delete it**); only `said[0]` shown when one tap changes several
   things (a ₪1,900 face goes silently); the colour explainer still saying
   *"כל הגוונים באותו מחיר"* under a **תוספת ₪200** heading, which `CLAUDE.md`
   §0b claims is already gone; a walked door reaching Peretz as *"I have a

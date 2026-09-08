@@ -8160,24 +8160,54 @@ ${body}
       }
     },
     /* ⚠ `glazedOnly` FACES ARE NOT OFFERED ON A SOLID DOOR — a LISTING rule,
-       not a buildability one. Asked for from outside: *"remove the single panel
-       options, the only instance when on a door is only one panel is when there
-       is a window and a panel at the bottom."*
-       `js/rules.js` deliberately does NOT refuse them: three of Peretz's own
-       measured doors are solid leaves with one panel, so refusing would re-fit
-       three photographs in the gallery to a door he never built. See the long
-       note there. Not offered, still reachable — which is precisely the
-       difference between a catalogue and a constraint.
-       ⚠ AND THE CURRENT VALUE IS ALWAYS LISTED. Arriving from the gallery on
-       d048 — solid, one panel — with that tile filtered out would show a group
-       in which nothing is selected, and the first tap anywhere in it would throw
-       the customer's face away without saying so. */
+         not a buildability one. Asked for from outside: *"remove the single panel
+         options, the only instance when on a door is only one panel is when there
+         is a window and a panel at the bottom."*
+         `js/rules.js` deliberately does NOT refuse them: three of Peretz's own
+         measured doors are solid leaves with one panel, so refusing would re-fit
+         three photographs in the gallery to a door he never built. See the long
+         note there. Not offered, still reachable — which is precisely the
+         difference between a catalogue and a constraint.
+         ⚠ AND THE CURRENT VALUE IS ALWAYS LISTED. Arriving from the gallery on
+         d048 — solid, one panel — with that tile filtered out would show a group
+         in which nothing is selected, and the first tap anywhere in it would throw
+         the customer's face away without saying so.
+    
+         ⚠ THAT PARAGRAPH WAS RIGHT, THE PREDICATE UNDER IT WAS RIGHT, AND IT RAN
+         AT THE WRONG MOMENT — 8.9.2026. It was a `list()` FILTER, and `list()` is
+         read when `buildPanel` builds the tiles: at boot, and on a language
+         switch. So it was evaluated against the state the page BOOTED in and never
+         again. The default door is solid, so `panel` and `panelo` were filtered
+         out at boot and stayed out — and then:
+           · a customer choosing חלון מרובע gets a bottom panel FORCED by
+             `rectNeedsPanel`, so `state.detail` becomes `panel` with no tile;
+           · the gallery's d048, d051 and d087 — the three solid one-panel doors
+             this very comment names — load with `detail: panel` and no tile.
+         Both leave the step that asks what is on the front of the door showing a
+         list with **nothing selected** and the customer's own answer absent.
+         Reproduced on the live page at 390 and 1440 before it was touched.
+         ⚠ It is NOT the ₪725 deletion the first report claimed, and that was
+         checked rather than repeated: tapping חלק on either route leaves the door
+         and the price exactly where they were — `repair` puts the forced panel
+         straight back on the glazed route, and on d048 the tap simply does
+         nothing. What the customer sees is a control that does not respond and a
+         question with no visible answer. Friction, not a wrong door — recorded at
+         the severity it earns.
+    
+         ⚠ SO THE RULE IS A LIVE PREDICATE NOW, NOT A BUILD-TIME FILTER. Every
+         face is always BUILT; `listed` decides per paint which are shown, from the
+         same three clauses. Rebuilding the group instead was the obvious fix and
+         is refused: `buildOptions` APPENDS and carries its own rescue logic, and a
+         second build over a live host is precisely the `buildPanel` fault §0c
+         records — a correctly translated panel assembled underneath the stale one.
+         Hiding costs no DOM churn, no re-attached listeners and no focus loss. */
     {
       key: "detail",
       title: "g.detail",
       in: "face",
       kind: "tile",
-      list: () => DETAILS.filter((d) => !d.glazedOnly || leafGlazed(state) || d.id === state.detail),
+      list: () => DETAILS,
+      listed: (o) => !o.glazedOnly || leafGlazed(state) || o.id === state.detail,
       glyph: detailGlyph,
       subs: DETAIL_SUBS,
       hint: "g.detail.h"
@@ -9417,9 +9447,11 @@ ${body}
   }
   function markGroup(g, blocked) {
     const chosen = [state[g.key]];
+    const listed = g.listed ? new Set(g.list().filter((o) => g.listed(o)).map((o) => o.id)) : null;
     let anyBlocked = false;
     document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"]`).forEach((el) => {
       const id = el.dataset.id;
+      if (listed) el.hidden = !listed.has(id);
       const on = chosen.includes(id);
       el.setAttribute("aria-checked", String(on));
       el.tabIndex = on || !chosen.length && el === el.parentElement.firstElementChild ? 0 : -1;

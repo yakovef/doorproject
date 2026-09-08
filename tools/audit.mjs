@@ -338,6 +338,61 @@ for (const v of VIEWS) {
     fault(v.name, 'the live step shows no options at all — its question cannot be answered');
   }
 
+  /* ⚠ A LISTING RULE MUST FOLLOW THE DOOR, NOT THE BOOT — 8.9.2026.
+     `glazedOnly` faces (פאנל תחתון and its ogee twin) are not offered on a
+     solid door, on Peretz's own instruction, and the group's predicate has
+     always carried the clause that keeps the CURRENT face listed whatever the
+     rule says. It was a filter inside `list()`, which is read when the tiles
+     are BUILT — so it froze at the state the page booted in, and the two doors
+     that reach a glazed-only face AFTER boot both showed the face step with
+     nothing selected and the customer's own answer absent: choosing חלון
+     מרובע, which FORCES a bottom panel, and the gallery's d048/d051/d087.
+     Three things, and the third is the one that would rot quietly:
+       · on a solid door the two are HIDDEN — the listing rule still holds,
+       · after the square window forces one it is SHOWN and CHECKED,
+       · and the tiles were found at all (§5.15) — a selector that stops
+         matching would otherwise turn all of this green in silence.
+     This is a DOM fact, so `npm test` cannot see it; it lives here.
+     Falsified by putting the filter back in `list()`: the second clause fails
+     with `shown=false checked=false` at every viewport. */
+  const listing = await (async () => {
+    const cell = () => p.evaluate(() => {
+      const q = i => document.querySelector(`.field[data-group="detail"] [data-id="${i}"]`);
+      const one = i => { const e = q(i); return e && { hidden: !!e.hidden,
+        checked: e.getAttribute('aria-checked') === 'true' }; };
+      return { found: !!q('plain'), panel: one('panel'), panelo: one('panelo'),
+               detail: (location.search.match(/[?&]d=([^&]*)/) || [])[1] || 'plain' };
+    });
+    const solid = await cell();
+    await p.evaluate(() => {
+      const t = document.querySelector('.field[data-group="window"] [data-id="rect"]');
+      if (t) t.click();
+    });
+    await p.waitForTimeout(400);
+    const glazed = await cell();
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
+    return { solid, glazed };
+  })();
+  if (!listing.solid.found || !listing.solid.panel || !listing.glazed.panel) {
+    fault(v.name, 'the face group has no פאנל תחתון tile in the DOM at all — the '
+      + 'listing check cannot see its subject and is dead');
+  } else {
+    if (!listing.solid.panel.hidden || !listing.solid.panelo.hidden) {
+      fault(v.name, 'a glazed-only face is offered on a SOLID door '
+        + `(panel hidden=${listing.solid.panel.hidden}, `
+        + `panelo hidden=${listing.solid.panelo.hidden}) — Peretz's listing rule`);
+    }
+    if (listing.glazed.detail === 'panel'
+        && (listing.glazed.panel.hidden || !listing.glazed.panel.checked)) {
+      fault(v.name, 'the square window forced a bottom panel and the face step does '
+        + `not show it (shown=${!listing.glazed.panel.hidden}, `
+        + `checked=${listing.glazed.panel.checked}) — the customer's own answer `
+        + 'is missing from the question that asks it');
+    }
+  }
+
   /* ⚠ EVERY STEP MUST BE REACHABLE FROM THE NAVIGATOR AT ANY TIME, and this
      replaced "clicking one heading must not shut the others" — a check written
      because `toggleSection` passed `null` to `openSection`, which set
