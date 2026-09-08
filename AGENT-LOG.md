@@ -92,8 +92,7 @@ asserts that. A check that calls each group's `list()` under two different
 states and fails if any returns different ids would catch the next one before
 a customer does — the general form of both this run's fix and run 99's.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** `46cb232`
 
 ---
 
