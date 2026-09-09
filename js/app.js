@@ -2102,7 +2102,23 @@ function choose(g, id) {
      only while a group has one reason to move. */
   const { state: fixed, said } = repair({ ...state, [g.key]: id }, g.key);
   set(fixed);
-  if (said.length) toast(said[0]);
+  /* ⚠ EVERY SENTENCE, NOT `said[0]` — AND `said[0]` WAS NOT "THE MAIN ONE".
+     It is whichever repair `repair()` happens to run FIRST, and that order is
+     fixed by geometry (glazing before line work, no-glass-no-grille last), not
+     by what a customer would care about. Measured over 1,449 taps from every
+     face x window: 274 change more than one thing, and on 23 of them the
+     UNSPOKEN half is worth ₪3,800–4,200. The worst is a door carrying the
+     ₪4,200 צוהר אנכי: tap the three-panel face and the toast says we removed
+     the PULL HANDLE, while the window and its ironwork go without a word.
+     ⚠ The one-sentence rule was itself a fix, for a real fault — "₪1,540 off a
+     door in four repairs, with four toasts overwriting each other" (see UNDO
+     below). Four toasts overwriting each other is cured by ONE toast, which is
+     what this is; it was never cured by one SENTENCE, and nothing measured the
+     difference until now. `showNotice` twenty lines down has joined them with
+     ' · ' for a shared LINK all along, so the same repair has been explained
+     two ways: in full to somebody opening a link, and a third of the way to
+     the customer at the moment they are choosing. */
+  toast(said.join(' · '));
 }
 
 /**
@@ -3289,13 +3305,30 @@ async function onCopy() {
 }
 
 let toastTimer = null;
+/**
+ * ⚠ THE DWELL FOLLOWS THE LENGTH, because a fixed 4,000 ms was chosen when
+ * every toast was one sentence and it is not a constant that survived the
+ * change above: the longest thing a repair can now say is 155 characters
+ * (English, two sentences, measured over every face x window), which is about
+ * 28 words — roughly eight seconds of careful reading of an unfamiliar line.
+ * Four seconds would show the customer the ₪4,200 half of the sentence and
+ * take it away before they reached it, which is the defect wearing a timer.
+ *
+ * 55 ms per character is a PROXY and is written down as one: it is not
+ * measured off a reader, it is picked so that today's typical single sentence
+ * (~40 chars) still dwells ~4.2 s — the case this change must not alter the
+ * feel of — while the three-sentence worst case gets ~11 s. Floored at the old
+ * 4,000 and capped at 12,000, because a message that will not go away is its
+ * own fault and `.toast` is `pointer-events: none`, so nobody can dismiss it.
+ */
 function toast(text) {
   if (!text) return;
   const el = $('#toast');
   el.textContent = text;
   el.hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.hidden = true; }, 4000);
+  const ms = Math.min(12000, Math.max(4000, 2000 + 55 * text.length));
+  toastTimer = setTimeout(() => { el.hidden = true; }, ms);
 }
 
 /**

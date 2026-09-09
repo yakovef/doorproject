@@ -45,6 +45,83 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-09 21:10 UTC — run 101: one tap took ₪4,200 off the door and the page announced the pull handle
+
+**Looked at:** the third of run 99's nine, taken in order of what it costs a
+customer rather than in the order they were found — *"a repair that changes
+several things shows only `said[0]`"*. Not a fresh walk: five findings from
+that walk are still unfixed, and hunting a tenth while they wait is the wrong
+call for a second run running.
+
+**Reproduced, and the walk understated it.** `tools/_toast.mjs` (scratch,
+deleted) swept **1,449 taps** from every face × window with hardware on:
+**274 change more than one thing**, and **23 leave ₪3,800–4,200 unspoken**.
+Worst case driven on the real page at 320, 390 and 1440 — a door carrying the
+₪4,200 צוהר אנכי, tap the three-panel face: **₪7,895 → ₪5,095**, and the one
+sentence shown was *"we removed the pull handle — the middle panel comes with
+its own grip"*, while the window and its ironwork went in silence.
+
+⚠ **`said[0]` is not "the main change", it is whichever repair ran FIRST**, and
+that order is fixed by this project's three recorded ordering constraints —
+glazing before line work, no-glass-no-grille last, face after line work. None
+of them has anything to do with what a customer wants to hear first.
+
+⚠ **AND THE FIX WAS TWENTY LINES AWAY.** `showNotice` has joined `said` with
+`' · '` for a shared LINK all along, with a docstring arguing exactly why a
+repair must speak for itself. One repair, explained in full to somebody opening
+a link and a third of the way to the customer who is actually choosing.
+
+⚠ **Never #5's neighbour: the rule I replaced was itself a fix.** §0b records
+*"₪1,540 off a door in four repairs, with four toasts overwriting each other."*
+Four toasts overwriting each other is cured by ONE toast — which is what
+shipped — and never by one SENTENCE. Said in the code where the next reader
+will meet it, rather than quietly reversed.
+
+⚠ **AND MY OWN FIRST MEASUREMENT WAS WRONG, IN THE DIRECTION THAT FLATTERED THE
+FINDING.** It priced the naive tap against the repaired door and reported
+₪4,500 of silence — a figure that is mostly the change the toast DOES mention.
+Isolated properly (revert only the groups after the first, price against the
+door the customer has) those same three states came out **₪0 on every one**,
+and the real defect appeared only when the starting doors went from three to
+every face. Two errors, both mine, both caught by asking what the number was
+of. The corrected metric is written into the harness's own comment.
+
+**Instruments:** test ✓ 4,349,611 / 0 · audit ✓ · profile ✓ all four rows ·
+collide ✓ `all` (1,902 designs) and `boxes` (111 against MOUNT_REACH 121) ·
+recreate ✓ 10 doors, same catalogue-gap notes · sheets regenerated, **all 52
+bare sheets byte-identical** — only the 12 `shot` sheets moved, which is what a
+change to the page and not the drawing should do.
+
+**Changed:** `choose()` joins every sentence instead of `said[0]`; the toast's
+dwell follows its length (`2000 + 55·chars`, floored at the old 4,000, capped
+at 12,000) because 155 characters cannot be read in four seconds; a new audit
+check that asks `repair` in node what a tap does and requires every sentence on
+screen, with the §5.15 clause. **No price, no id, no list order, no bit, no
+`VERSION`.**
+
+**Left alone deliberately:**
+· **The toast's POSITION** — fixed-centred, one of the seven open findings.
+  Measured after the change: 288×88 at 320 px, clear of the quote bar by 12 px,
+  wholly on screen at all three widths. Legible where it stands; moving it is a
+  separate change and wants its own measurement.
+· **`showNotice`'s trailing full stop.** It adds one, the toast does not, and
+  matching them would change how every existing single-sentence toast looks for
+  no reason a customer would name.
+· **The four remaining findings** from run 99, still listed in `CLAUDE.md` §0b.
+
+**Best idea of this run, not taken:** the `55 ms/char` dwell is a proxy and is
+labelled one. The honest version is to stop auto-dismissing a message that
+reports money at all — a repair that moved the price by more than some
+threshold could stay until the next interaction. That is a real design question
+(the toast is `pointer-events: none`, so it cannot be dismissed, and making it
+dismissable puts a control over the send button again — the fault §0b records)
+and it should not be decided inside a commit about sentences.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-09-08 01:20 UTC — run 100: the face step's listing rule froze at boot
 
 **Looked at:** not a new walk. Run 99's walk left **eight confirmed defects

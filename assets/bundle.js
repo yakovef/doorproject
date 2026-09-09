@@ -9180,7 +9180,7 @@ ${body}
   function choose(g, id) {
     const { state: fixed, said } = repair({ ...state, [g.key]: id }, g.key);
     set(fixed);
-    if (said.length) toast(said[0]);
+    toast(said.join(" · "));
   }
   var HISTORY_MAX = 100;
   var history_ = [];
@@ -9656,9 +9656,10 @@ ${body}
     el.textContent = text;
     el.hidden = false;
     clearTimeout(toastTimer);
+    const ms = Math.min(12e3, Math.max(4e3, 2e3 + 55 * text.length));
     toastTimer = setTimeout(() => {
       el.hidden = true;
-    }, 4e3);
+    }, ms);
   }
   function showNotice(kind, said) {
     const el = $("#notice");

@@ -24,6 +24,7 @@ import { formatAgorot, priceAgorot } from '../js/price.js';
 import { SIZES } from '../js/catalog.js';
 import { setLang } from '../js/copy.js';
 import { handingWords, specRows, summaryLine } from '../js/spec.js';
+import { repair } from '../js/rules.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
    the grip and the lockset became separate fields, and a hard-coded length
@@ -391,6 +392,64 @@ for (const v of VIEWS) {
         + `checked=${listing.glazed.panel.checked}) — the customer's own answer `
         + 'is missing from the question that asks it');
     }
+  }
+
+  /* ⚠ ONE TAP, EVERY SENTENCE — 9.9.2026. `choose()` showed `said[0]` and
+     `said[0]` is not "the main change": it is whichever repair ran FIRST, and
+     that order is fixed by geometry (glazing before line work,
+     no-glass-no-grille last) rather than by what a customer would care about.
+     Swept over 1,449 taps from every face x window, 274 change more than one
+     thing and 23 of those leave ₪3,800–4,200 unspoken — the worst being a door
+     carrying the ₪4,200 צוהר אנכי where tapping the three-panel face announces
+     the PULL HANDLE and lets the window and its ironwork go in silence.
+     The check is the RULE'S OWN ACCOUNT against the page: read the door off
+     the page's own code, ask `repair` in node what that tap does, and require
+     every sentence it returns to be on screen. That is a wiring question, not
+     a question about our model, so §5.14's objection does not apply — the two
+     sides here are "what the rule said" and "what the customer was shown", and
+     the defect was precisely that they differed.
+     §5.15: it fails loudly if the tile or the toast cannot be found at all.
+     Falsified by putting `said[0]` back: fails at every viewport, naming the
+     sentence that went missing. */
+  {
+    await p.goto('file://' + process.cwd() + '/index.html?w=strip&d=plain&n=ella&g=grid&lang=he');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
+    const before = await p.evaluate(() =>
+      (document.querySelector('#code')?.textContent || '').trim());
+    const state = decodeCode(before);
+    const tap = await p.evaluate(() => {
+      const t = document.querySelector('.field[data-group="detail"] [data-id="panel3"]');
+      if (!t) return null;
+      t.click();
+      return true;
+    });
+    await p.waitForTimeout(300);
+    const shown = await p.evaluate(() => {
+      const el = document.querySelector('#toast');
+      return el && !el.hidden ? el.textContent.trim() : null;
+    });
+    if (!state || !tap) {
+      fault(v.name, 'the multi-change toast check could not find its subject '
+        + `(code=${before || 'none'}, panel3 tile=${tap ? 'yes' : 'no'}) — it is dead`);
+    } else {
+      const { said } = repair({ ...state, detail: 'panel3' }, 'detail');
+      if (said.length < 2) {
+        fault(v.name, `the tap this check is built on now changes only ${said.length} `
+          + 'thing — it no longer exercises the fault and must be re-aimed');
+      } else if (!shown) {
+        fault(v.name, `one tap changed ${said.length} things and no toast appeared at all`);
+      } else {
+        const missing = said.filter(s => !shown.includes(s));
+        if (missing.length) {
+          fault(v.name, `one tap changed ${said.length} things and the toast names `
+            + `${said.length - missing.length}: "${shown}" — unsaid: "${missing.join(' · ')}"`);
+        }
+      }
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
   }
 
   /* ⚠ EVERY STEP MUST BE REACHABLE FROM THE NAVIGATOR AT ANY TIME, and this

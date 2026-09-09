@@ -1910,6 +1910,66 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ ONE TAP TOOK ₪4,200 OFF THE DOOR AND THE PAGE ANNOUNCED THE PULL HANDLE
+  — 9.9.2026.** Third of the nine the customer walk found. `choose()` showed
+  `said[0]` and nothing else.
+  ⚠ **AND `said[0]` IS NOT "THE MAIN CHANGE" — IT IS WHICHEVER REPAIR RAN
+  FIRST.** That order is fixed by geometry, and this file records why: glazing
+  repairs before line-work repairs, no-glass-no-grille LAST, face repairs after
+  line work. Not one of those constraints has anything to do with what a
+  customer would want to hear first, so the sentence that reached them was
+  chosen by the order the rules happen to fire in.
+  **Measured** over 1,449 taps from every face × window, `tools/_toast.mjs`:
+  **274 taps change more than one thing**, and on **23 of them the unspoken
+  half is worth ₪3,800–4,200**. The worst is a door carrying the ₪4,200
+  צוהר אנכי — tap the three-panel face and the toast says *"we removed the pull
+  handle — the middle panel comes with its own grip"* while the window and its
+  ironwork go without a word. Driven on the real page at 320, 390 and 1440:
+  **₪7,895 → ₪5,095, one sentence.**
+  ⚠ **THE FIX WAS ALREADY IN THIS FILE, TWENTY LINES AWAY.** `showNotice` has
+  joined `said` with `' · '` for a shared LINK since it was written, with a
+  docstring arguing exactly why a repair must speak for itself. So one repair
+  has been explained two ways — in full to somebody opening a link, a third of
+  the way to the customer at the moment they are choosing. `choose()` joins
+  now, which is four characters of behaviour and the whole of the finding.
+  ⚠ **AND THE ONE-SENTENCE RULE WAS ITSELF A FIX FOR A REAL FAULT**, which is
+  why it survived: §0b records *"a tap that quietly took ₪1,540 off a door in
+  four repairs, with four toasts overwriting each other."* Four toasts
+  overwriting each other is cured by **one toast**, and that is what shipped;
+  it was never cured by one **sentence**, and nothing measured the difference
+  for a fortnight. A remedy that fixes the symptom and quietly narrows the
+  message is the shape to watch for.
+  ⚠ **The dwell had to follow the length, or the fix hides inside a timer.**
+  4,000 ms was picked when every toast was one sentence; the longest a repair
+  can now say is **155 characters** (English, measured), about 28 words and
+  some eight seconds of careful reading. It is `2000 + 55·chars`, floored at
+  the old 4,000 and capped at 12,000 — so today's ~40-character sentence still
+  dwells ~4.2 s and nothing about the common case moves. **55 ms/char is a
+  proxy and says so where it is written**; it is not measured off a reader.
+  ⚠ **`npm test` cannot see this** — a toast is a DOM fact — so the assertion
+  is in `npm run audit`: read the door off the page's own code, ask `repair` in
+  node what that tap does, and require **every** sentence on screen. That is a
+  WIRING question, so §5.14's objection does not apply: the two sides are what
+  the rule said and what the customer was shown, and the defect was exactly
+  that they differed. §5.15 clause included — it fails loudly if the tile or
+  the toast cannot be found. **Falsified by restoring `said[0]`.**
+  ⚠ **AND MY OWN FIRST MEASUREMENT WAS WRONG IN THE DIRECTION THAT FLATTERS
+  THE FINDING**, which is worth more than the fix. It priced the naive tap
+  against the repaired door and reported the silent half at ₪4,500 — a figure
+  dominated by the change the toast DOES mention. Isolated properly (revert
+  only the groups after the first, price that against the door the customer
+  has) the same three states came out at **₪0 on every one**, and the real
+  defect only appeared when the starting doors were widened from three to every
+  face. **Both errors were mine and both were caught by asking what the number
+  was of** — the same move §7 keeps recording. No price, no id, no list order,
+  no bit, no `VERSION`; the 52 bare sheets came back byte-identical.
+  ⚠ **Not touched, and it is the next thing on this axis:** the toast is
+  fixed-centred at the foot of the screen, which is one of the seven findings
+  still open. It is now a four-line box at 320 px — measured 288×88, clear of
+  the quote bar by 12 px and wholly on screen at all three widths — so it is
+  legible where it stands, and moving it is a separate change with its own
+  measurement.
+
 - **⚠ A LISTING RULE THAT FROZE AT BOOT, AND THE COMMENT ABOVE IT NAMED THE
   DOOR IT WOULD BREAK — 8.9.2026.** Second of the nine the customer walk found.
   `glazedOnly` faces — פאנל תחתון and its ogee twin — are not offered on a
@@ -2028,7 +2088,8 @@ how it got there. Detail lives in the section it belongs to.
   the "first tap deletes it" in this line was the report's claim, not a
   measurement — it does not**; see the entry above); a repair that changes several things shows
   only `said[0]`, so a ₪1,900 face goes silently while the ₪0 peephole gets the
-  toast; the colour step's explainer still says *"כל הגוונים באותו מחיר"* under
+  toast (⚠ **fixed 9.9, and the amount was understated: measured over 1,449
+  taps the unspoken half reaches ₪4,200**; see the entry above); the colour step's explainer still says *"כל הגוונים באותו מחיר"* under
   a heading reading **תוספת ₪200** — which the 30.8 entry in this very log
   claims *"is gone"*, and it is not; a door walked step by step, or changed and
   changed back, reaches Peretz as *"I looked at the door the site opens with
