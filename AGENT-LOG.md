@@ -117,8 +117,7 @@ threshold could stay until the next interaction. That is a real design question
 dismissable puts a control over the send button again — the fault §0b records)
 and it should not be decided inside a commit about sentences.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** `0409036`
 
 ---
 
