@@ -124,8 +124,7 @@ points at AGENT.md's "How to look" rather than restating it, and it carries
 `ultracode`. Cron, name, model and the persistent-session binding untouched.
 `AGENT.md`'s "do this once" paragraph is replaced by what it leaves behind.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** `61590da`
 
 ---
 
