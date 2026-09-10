@@ -1910,6 +1910,73 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ SIX PULL BARS AT FOUR PRICES WERE SIX IDENTICAL GREY LINES, AND THE
+  ASSERTION THAT EXISTS TO CATCH THAT PASSED ON EVERY ONE OF THEM —
+  10.9.2026.** Sixth of the nine the customer walk found, confirmed as a
+  picture this time rather than as a claim: on the grip step at 390 px, אלה
+  ₪500, עידן ₪650, רון ₪500, שחר ₪800, ניצן ₪500 and מוט שחור ₪500 are six
+  vertical strokes three to seven pixels wide. **Measured pairwise on the real
+  page: `ella` and `barblack` differed on 0.45% of pixels, `ron` and
+  `barblack` on 1.34%** — so a customer comparing a ₪500 bar with an ₪800 one
+  was looking at the same picture, and the two products whose whole difference
+  is their METAL (Peretz sells one brass bar and one black one) were drawn in
+  the same flat ink as the four steel ones.
+  ⚠ **`every option tile draws its own picture` PASSED THE WHOLE TIME, AND
+  CORRECTLY.** It compares MARKUP, and the markup does differ — each bar is
+  drawn at its own true width and length, so the strings are distinct while
+  the pictures are not. That is §5.22's shape one level out: a check that
+  compares the document rather than what the document paints.
+  ⚠ **THE GEOMETRY IS DELIBERATE AND IS UNTOUCHED.** `FITTING_GLYPH.bar`
+  draws a bar at TRUE SIZE inside a fixed slice of leaf so that length and
+  slenderness compare across tiles, and that decision replaced invented
+  fixings which were once the only thing telling six products apart. The
+  arithmetic it costs is the finding: a 20 mm bar inside a 340 × 1300 slice,
+  which `handleGlyph` then pads to 3:4, is **about 2% of the tile's width** —
+  and at three pixels, colour is the only channel left that can carry a
+  difference. So the fill changed and nothing else: no new shape, no new
+  artwork, no crop. (Cropping the length was the other fix and is refused:
+  length is exactly what the price steps on — ₪500 under a metre, ₪650 for
+  Idan's 1050 mm, ₪800 for Shahar's 1230 — so a tile that stops showing length
+  stops showing what the customer is paying for.)
+  ⚠ **AND THE METAL HAS ONE OWNER, WHICH IS THE WHOLE ENGINEERING OF IT.**
+  Giving the glyph its own gold would have been the smaller edit and this
+  file's most expensive habit — `barGold` against the פרזול ramp drifted more
+  than twofold apart before 30.8, and `#nickel` served a pull handle and the
+  lock furniture at once. The three sections are a table now, `BAR_RAMP`, and
+  **`render`'s defs and the tile both build from it**; `raw: true` marks
+  `barGold` as an absolute measurement of brass that must never pass through
+  `inFinish`. The tone is the product's OWN declared finish (`ella` brass,
+  `barblack` black), never the customer's פרזול — the same rule the ORDER
+  obeys, so a fitting that declares nothing keeps saying nothing.
+  ⚠ **A hairline was needed and it is `vector-effect="non-scaling-stroke"`.**
+  Painted in honest steel the four tube tiles went pale — mean luminance 178
+  to 205 against a 251 card — because a real slim bar is a bright metal line
+  and the tile is nearly white. A 1 px non-scaling stroke restores the
+  silhouette at any size without touching the drawn width, which a scaled
+  stroke could not do: the bar is 20 units wide in a 975-unit viewBox, so a
+  stroke thick enough to see would have doubled its apparent width and broken
+  the true-size comparison. After: `ella` against `barblack` 0.45% → **2.46%**
+  of pixels, `nitzan` against `barblack` **4.96%**, and the six read as three
+  metals in two sections.
+  ⚠ **The assertion is the JOIN, not the appearance** (`npm test`): every
+  stop a bar tile paints with must appear, in order, inside a gradient of the
+  DOOR drawn with that same handle — true only while both read `BAR_RAMP` —
+  and `idan`, `ella` and `barblack` must resolve to three different stop sets,
+  which is the half the old markup check could not see. **Falsified** by
+  pointing every tile at one steel ramp: four join faults plus the
+  three-metals fault. The 52 bare sheets came back **byte-identical** (the
+  door's markup is unchanged but for whitespace inside its defs, checked
+  render-by-render before the sheets were run); 9 of the 12 `shot` sheets
+  moved, which is a page change and proves nothing on its own.
+  ⚠ **It brushes a decision taken from outside and the tension is recorded
+  rather than hidden:** *"no new tile artwork and no per-option previews"*.
+  This adds neither — it is the same rect, filled with the metal the product
+  already is, and the tile beside it (`pirzulGlyph`) has drawn its fitting in
+  the real metal since the day it was written, for the reason written there:
+  *"a customer choosing a finish is choosing what the handle will look like
+  and a bare swatch of colour would not say that."* No price, no id, no list
+  order, no bit, no `VERSION`.
+
 - **⚠ THE CUSTOMER WHO BOUGHT THE ₪300 פעמון READ A PRICE ROW CALLED `bell`,
   IN ALL THREE LANGUAGES — 10.9.2026.** Fifth of the nine the customer walk
   found, and the cheapest to fix of any of them: `renderBreakdown` titles each
@@ -2185,7 +2252,9 @@ how it got there. Detail lives in the section it belongs to.
   and I have a question"* (⚠ **fixed 10.9**; see the entry above); the breakdown prints the doorbell row as the raw key
   `bell` in all three languages (⚠ **fixed 10.9, and the check written for it
   was blind to `bell` itself**; see the entry above); six pull-bar tiles at four prices are one grey
-  line, including the one whose difference is that it is black; on 6-7 of the 8
+  line, including the one whose difference is that it is black (⚠ **fixed
+  10.9, and measured: `ella` and `barblack` differed on 0.45% of pixels**;
+  see the entry above); on 6-7 of the 8
   phone steps the first tile's NAME and PRICE sit behind the fixed quote bar;
   and the repair toast is fixed-centred, landing 217 px from the panel on a
   desktop and over the handing control on a phone.

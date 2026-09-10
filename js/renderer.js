@@ -209,6 +209,55 @@ const toRgbLocal = hex => ({
 });
 
 /**
+ * ── THE THREE PULL-BAR SECTIONS, AS DATA ─────────────────────────────
+ *
+ * These stops were three literal `<linearGradient>`s inside `render`'s defs
+ * and nothing else could read them — which was fine for exactly as long as
+ * the DOOR was the only thing that drew a bar.
+ *
+ * ⚠ IT IS NOT ANY MORE, AND THE ALTERNATIVE WAS THE DEFECT THIS FILE IS A
+ * LIST OF. The catalogue tile draws a bar too, and it drew it in flat ink, so
+ * the brass Ella and the black tube came out as the same grey line — measured
+ * at tile size, 0.45% of pixels differ between those two tiles (see
+ * `AGENT-LOG.md`, run 104). Giving the glyph its own copy of "what brass is"
+ * would have been the smaller edit and the wrong one: this repository has
+ * already paid twice for one metal with two owners — `barGold` against the
+ * פרזול ramp, drifting more than twofold apart, and `#nickel` shared between
+ * a pull handle and the lock furniture. **One table, both readers.**
+ *
+ * `raw: true` means the stops are absolute and never pass through
+ * `inFinish` — `barGold` is a measurement of BRASS, not of steel waiting to
+ * be remapped, which is exactly what `inFinish`'s own docstring says.
+ */
+const BAR_RAMP = {
+  /* Round tube. d035 reads 103,142,212,231,202,76 across eleven pixels: one
+     peak, a hard dark rim each side, minimum at 0.86-0.96 and never in the
+     interior. */
+  barTube: { stops: [['0', '#4A453F'], ['0.07', '#7E7A73'], ['0.16', '#B4B0A8'],
+                     ['0.32', '#FCFBF7'], ['0.42', '#EBE8E1'], ['0.58', '#A9A39B'],
+                     ['0.74', '#7A746D'], ['0.90', '#4A443E'], ['1', '#6A635C']] },
+  /* The same cylinder in gold, off the manufacturer's photograph. `#C79E5C`
+     is the stop the פרזול ramp was refitted ONTO on 30.8, so the tile, the
+     lever and the bar now agree about brass by construction. */
+  barGold: { raw: true,
+             stops: [['0', '#6B5230'], ['0.07', '#95733F'], ['0.16', '#C79E5C'],
+                     ['0.32', '#F5D191'], ['0.42', '#E4BE7C'], ['0.58', '#B0863F'],
+                     ['0.74', '#84632F'], ['0.90', '#4A2F0C'], ['1', '#7A5C33']] },
+  /* Flat strap: two hairline arrises and one uniform field between them —
+     d049's face is flat inside 3.6% across twenty-three pixels. */
+  barStrap: { stops: [['0', '#9B9992'], ['0.055', '#CFCDC7'],
+                      ['0.945', '#C9C7C1'], ['1', '#9B9992']] },
+};
+
+/** One section, painted in one finish, as a `<linearGradient>`. */
+function barRamp(name, tone, id = name) {
+  const r = BAR_RAMP[name] || BAR_RAMP.barTube;
+  const stops = r.stops.map(([o, hex]) =>
+    `      <stop offset="${o}" stop-color="${r.raw ? hex : inFinish(hex, tone)}"/>`).join('\n');
+  return `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0">\n${stops}\n    </linearGradient>`;
+}
+
+/**
  * ── THE EURO CYLINDER'S OWN RAMP, ONE PER FINISH ─────────────────────
  *
  * ⚠ A MEASUREMENT IS OVERRULED HERE, BY INSTRUCTION, AND IT IS KEPT RATHER
@@ -2027,39 +2076,14 @@ export function render(state) {
          rims and bright once, off centre. Measured on the photographs the
          peak-to-trough is about 3.2:1 (d035 233:57, d065 215:25) and the
          minimum sits at 0.86-0.96 across, never in the interior. -->
-    <linearGradient id="barTube" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish('#4A453F', tone)}"/>
-      <stop offset="0.07" stop-color="${inFinish('#7E7A73', tone)}"/>
-      <stop offset="0.16" stop-color="${inFinish('#B4B0A8', tone)}"/>
-      <stop offset="0.32" stop-color="${inFinish('#FCFBF7', tone)}"/>
-      <stop offset="0.42" stop-color="${inFinish('#EBE8E1', tone)}"/>
-      <stop offset="0.58" stop-color="${inFinish('#A9A39B', tone)}"/>
-      <stop offset="0.74" stop-color="${inFinish('#7A746D', tone)}"/>
-      <stop offset="0.90" stop-color="${inFinish('#4A443E', tone)}"/>
-      <stop offset="1"    stop-color="${inFinish('#6A635C', tone)}"/>
-    </linearGradient>
+    ${barRamp('barTube', tone)}
     <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
          drew them silver, because ella carried no finish key of its own and
          gripFinish fell through to steel. -->
-    <linearGradient id="barGold" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#6B5230"/>
-      <stop offset="0.07" stop-color="#95733F"/>
-      <stop offset="0.16" stop-color="#C79E5C"/>
-      <stop offset="0.32" stop-color="#F5D191"/>
-      <stop offset="0.42" stop-color="#E4BE7C"/>
-      <stop offset="0.58" stop-color="#B0863F"/>
-      <stop offset="0.74" stop-color="#84632F"/>
-      <stop offset="0.90" stop-color="#4A2F0C"/>
-      <stop offset="1"    stop-color="#7A5C33"/>
-    </linearGradient>
+    ${barRamp('barGold', tone)}
     <!-- The flat strap: two hairline arrises and one uniform field between
          them. Total swing across the middle 89% stays under 4%. -->
-    <linearGradient id="barStrap" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"     stop-color="${inFinish('#9B9992', tone)}"/>
-      <stop offset="0.055" stop-color="${inFinish('#CFCDC7', tone)}"/>
-      <stop offset="0.945" stop-color="${inFinish('#C9C7C1', tone)}"/>
-      <stop offset="1"     stop-color="${inFinish('#9B9992', tone)}"/>
-    </linearGradient>
+    ${barRamp('barStrap', tone)}
     <!-- ALONG the length, which is where a strap keeps all its modelling and
          where every one of our bars had none. Measured bar-face over adjacent
          paint on d049: 1.15 at the head falling monotonically to 0.75 at the
@@ -9022,8 +9046,30 @@ const FITTING_GLYPH = {
   bar: (h) => {
     const half = Math.min(h.len, 1240) / 2;
     const w = h.w || 30, spec = BARS[h.bar] || BARS.idan;
+    /* ⚠ IN ITS OWN METAL, AND THAT IS THE WHOLE OF THIS EDIT — no new shape,
+       no artwork, one fill. Drawn in flat ink these six tiles were six grey
+       lines: measured at 390 px, `ella` (brass, ₪500) and `barblack` (black,
+       ₪500) differ on **0.45% of pixels** and `ron` on 1.34%, so the customer
+       comparing a ₪500 bar with an ₪800 one is looking at the same picture
+       three times. The geometry above is deliberate and is untouched — true
+       size in a fixed slice of leaf, so length and slenderness compare across
+       tiles — but a 20 mm bar in that slice is about 2% of the tile's width,
+       and at three pixels COLOUR is the only channel left that can carry a
+       difference. Two of these products are defined by it: Peretz sells one
+       brass bar and one black one.
+       The stops are `BAR_RAMP`, which is the same table the door paints this
+       bar from, so the tile cannot come to disagree with the drawing about
+       what brass is. The tone is the product's OWN declared finish, never the
+       customer's פרזול: a bar's colour is a fact about the product (see
+       `declaredFinish`), which is also why a fitting that declares nothing
+       stays exactly as it was. */
+    const id = `bg-${h.id}`;
+    const tone = FINISH_TONES[h.finish] || FINISH_TONES.steel;
     return { box: [-170, -650, 170, 650], art: `
-    <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"/>` };
+    <defs>${barRamp(spec.tone, tone, id)}</defs>
+    <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"
+          fill="url(#${id})" stroke="currentColor" stroke-opacity="0.55" stroke-width="1"
+          vector-effect="non-scaling-stroke"/>` };
   },
 };
 

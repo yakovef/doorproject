@@ -2449,6 +2449,54 @@
     g: parseInt(hex.slice(3, 5), 16),
     b: parseInt(hex.slice(5, 7), 16)
   });
+  var BAR_RAMP = {
+    /* Round tube. d035 reads 103,142,212,231,202,76 across eleven pixels: one
+       peak, a hard dark rim each side, minimum at 0.86-0.96 and never in the
+       interior. */
+    barTube: { stops: [
+      ["0", "#4A453F"],
+      ["0.07", "#7E7A73"],
+      ["0.16", "#B4B0A8"],
+      ["0.32", "#FCFBF7"],
+      ["0.42", "#EBE8E1"],
+      ["0.58", "#A9A39B"],
+      ["0.74", "#7A746D"],
+      ["0.90", "#4A443E"],
+      ["1", "#6A635C"]
+    ] },
+    /* The same cylinder in gold, off the manufacturer's photograph. `#C79E5C`
+       is the stop the פרזול ramp was refitted ONTO on 30.8, so the tile, the
+       lever and the bar now agree about brass by construction. */
+    barGold: {
+      raw: true,
+      stops: [
+        ["0", "#6B5230"],
+        ["0.07", "#95733F"],
+        ["0.16", "#C79E5C"],
+        ["0.32", "#F5D191"],
+        ["0.42", "#E4BE7C"],
+        ["0.58", "#B0863F"],
+        ["0.74", "#84632F"],
+        ["0.90", "#4A2F0C"],
+        ["1", "#7A5C33"]
+      ]
+    },
+    /* Flat strap: two hairline arrises and one uniform field between them —
+       d049's face is flat inside 3.6% across twenty-three pixels. */
+    barStrap: { stops: [
+      ["0", "#9B9992"],
+      ["0.055", "#CFCDC7"],
+      ["0.945", "#C9C7C1"],
+      ["1", "#9B9992"]
+    ] }
+  };
+  function barRamp(name, tone, id = name) {
+    const r = BAR_RAMP[name] || BAR_RAMP.barTube;
+    const stops = r.stops.map(([o, hex]) => `      <stop offset="${o}" stop-color="${r.raw ? hex : inFinish(hex, tone)}"/>`).join("\n");
+    return `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0">
+${stops}
+    </linearGradient>`;
+  }
   var CYL_CHROME = ["#E8ECEE", "#B9BFC4", "#7C8288"];
   var CYL_CHROME_RIM = "#8E9398";
   var CYL_BLACK = ["#5A5D60", "#333639", "#1A1C1E"];
@@ -3266,39 +3314,14 @@
          rims and bright once, off centre. Measured on the photographs the
          peak-to-trough is about 3.2:1 (d035 233:57, d065 215:25) and the
          minimum sits at 0.86-0.96 across, never in the interior. -->
-    <linearGradient id="barTube" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="${inFinish("#4A453F", tone)}"/>
-      <stop offset="0.07" stop-color="${inFinish("#7E7A73", tone)}"/>
-      <stop offset="0.16" stop-color="${inFinish("#B4B0A8", tone)}"/>
-      <stop offset="0.32" stop-color="${inFinish("#FCFBF7", tone)}"/>
-      <stop offset="0.42" stop-color="${inFinish("#EBE8E1", tone)}"/>
-      <stop offset="0.58" stop-color="${inFinish("#A9A39B", tone)}"/>
-      <stop offset="0.74" stop-color="${inFinish("#7A746D", tone)}"/>
-      <stop offset="0.90" stop-color="${inFinish("#4A443E", tone)}"/>
-      <stop offset="1"    stop-color="${inFinish("#6A635C", tone)}"/>
-    </linearGradient>
+    ${barRamp("barTube", tone)}
     <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
          drew them silver, because ella carried no finish key of its own and
          gripFinish fell through to steel. -->
-    <linearGradient id="barGold" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#6B5230"/>
-      <stop offset="0.07" stop-color="#95733F"/>
-      <stop offset="0.16" stop-color="#C79E5C"/>
-      <stop offset="0.32" stop-color="#F5D191"/>
-      <stop offset="0.42" stop-color="#E4BE7C"/>
-      <stop offset="0.58" stop-color="#B0863F"/>
-      <stop offset="0.74" stop-color="#84632F"/>
-      <stop offset="0.90" stop-color="#4A2F0C"/>
-      <stop offset="1"    stop-color="#7A5C33"/>
-    </linearGradient>
+    ${barRamp("barGold", tone)}
     <!-- The flat strap: two hairline arrises and one uniform field between
          them. Total swing across the middle 89% stays under 4%. -->
-    <linearGradient id="barStrap" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"     stop-color="${inFinish("#9B9992", tone)}"/>
-      <stop offset="0.055" stop-color="${inFinish("#CFCDC7", tone)}"/>
-      <stop offset="0.945" stop-color="${inFinish("#C9C7C1", tone)}"/>
-      <stop offset="1"     stop-color="${inFinish("#9B9992", tone)}"/>
-    </linearGradient>
+    ${barRamp("barStrap", tone)}
     <!-- ALONG the length, which is where a strap keeps all its modelling and
          where every one of our bars had none. Measured bar-face over adjacent
          paint on d049: 1.15 at the head falling monotonically to 0.75 at the
@@ -7113,8 +7136,13 @@ ${body}
     bar: (h) => {
       const half = Math.min(h.len, 1240) / 2;
       const w = h.w || 30, spec = BARS[h.bar] || BARS.idan;
+      const id = `bg-${h.id}`;
+      const tone = FINISH_TONES[h.finish] || FINISH_TONES.steel;
       return { box: [-170, -650, 170, 650], art: `
-    <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"/>` };
+    <defs>${barRamp(spec.tone, tone, id)}</defs>
+    <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"
+          fill="url(#${id})" stroke="currentColor" stroke-opacity="0.55" stroke-width="1"
+          vector-effect="non-scaling-stroke"/>` };
     }
   };
   function handleGlyph(handle) {

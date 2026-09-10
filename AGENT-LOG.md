@@ -45,6 +45,90 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-10 18:40 UTC — run 104: six pull bars at four prices were six identical grey lines, and the check for exactly that passed on every one
+
+**Looked at:** the page as **the customer who starts from the gallery**, at
+390×844 — a customer type this log has never walked. Opened
+`התחילו מדלת שכבר התקנו`, picked the third of the thirty, then went forward
+with the button through all eight steps and read the order the send button
+would have produced.
+
+⚠ **The 10:40 firing is missing from this log and was not a run that changed
+nothing: the container was restarted mid-run and everything uncommitted with
+it.** Nothing reached the branch, so there is no gap in the code — only in the
+record, and it is named here rather than left to look like silence.
+
+**Instruments:** test ✓ 4,349,736 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` and `boxes` · recreate ✓ · sheets — **52 bare sheets
+byte-identical**, 9 of 12 `shot` moved.
+
+**What the walk found, in the order it found it.**
+· The gallery itself is sound: 30 tiles, modal, the scrim measured (the page
+  behind reads 121 and 106 where it reads ~245 unscrimmed — **I first wrote
+  this down as a defect from the screenshot and it was my eye, not the page**;
+  the pixels settled it in one command).
+· The order produced by a gallery pick is complete and matches the door.
+· **The grip step is six grey lines.** אלה ₪500, עידן ₪650, רון ₪500,
+  שחר ₪800, ניצן ₪500, מוט שחור ₪500 — measured pairwise off the live page,
+  **`ella` vs `barblack` 0.45% of pixels, `ron` vs `barblack` 1.34%**. Two of
+  those products are defined by their metal (Peretz sells one brass bar and
+  one black one) and all six were drawn in flat ink.
+
+**Changed:** the bar tile is painted from the bar's own ramp — `BAR_RAMP`, one
+table now read by BOTH `render`'s defs and the glyph, so the tile cannot grow
+a second brass; the tone is the product's own declared finish, never the
+customer's פרזול. A 1 px `non-scaling-stroke` keeps the silhouette after the
+steel tiles went honestly pale. Geometry untouched. `ella` vs `barblack`
+0.45% → **2.46%**, `nitzan` vs `barblack` **4.96%**.
+
+⚠ **The existing assertion could not have caught this and was not wrong.**
+`every option tile draws its own picture` compares MARKUP, and the markup
+really did differ — each bar is drawn at its own true width and length. The
+new check asserts the JOIN instead: every stop a tile paints with must appear,
+in order, inside a gradient of the DOOR drawn with that handle, and idan/ella/
+barblack must resolve to three different stop sets. **Falsified** by pointing
+every tile at one steel ramp — four join faults and the three-metals fault.
+
+**Left alone deliberately:**
+· **Cropping the bar's length to make the section read.** The tile shows a bar
+  at true size precisely so length compares, and length is what the price
+  steps on (₪500 under a metre, ₪650 for Idan's 1050, ₪800 for Shahar's 1230).
+  A tile that stops showing length stops showing what is being paid for.
+· **The gallery tiles' labels.** They name the COLOUR — 8 of the 30 read
+  אפור בהיר — which is the one attribute the picture already carries and the
+  one a customer is most likely to change, while the face is named only in the
+  accessible name. It is the same asymmetry the navigator's `title` closed on
+  5.9, but the fix is not obvious (`.tile__meta` is the `--mono` slot §9 says
+  must not take more Hebrew), so it is written down rather than guessed at.
+· **The three findings still open from run 99's walk**: the colour step's
+  explainer (still unverified — the string is not in `js/copy.js`), the first
+  tile sitting under the fixed quote bar on arrival at step 01 (measured again
+  here: its price row is 65 px behind the bar at 390 px, and every step
+  reached with the button is clear), and the fixed-centred toast.
+
+**Best idea of the run that was NOT taken:** give the gallery tile the door's
+own one-line description instead of its colour — `describe()` already writes
+it into the aria-label, so the sighted customer is the only reader who does
+not get it. Refused this run for the `--mono` reason above; it wants the
+`unicode-range` decision §9 names, and that is a real piece of work rather
+than a line.
+
+**Proposed · taken · refused:** proposed the bar-tile metal (taken), the
+`BAR_RAMP` extraction that makes it one-owner (taken), the join assertion
+(taken), the length crop (refused, above), the gallery label (refused for
+now, above). Also done this run and long blocked: **the Routine's own prompt**
+— the `claude-code-remote` tools came back, so `update_trigger` finally ran.
+It no longer says "click through the four sections" (the cabinet went on
+27.8), no longer lists the hardware finish as undecidable (priced 26.8), it
+points at AGENT.md's "How to look" rather than restating it, and it carries
+`ultracode`. Cron, name, model and the persistent-session binding untouched.
+`AGENT.md`'s "do this once" paragraph is replaced by what it leaves behind.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-09-10 06:15 UTC — run 103: the ₪300 doorbell was billed as a row called `bell`, and my own guard for it was blind to `bell`
 
 **Looked at:** the fifth of run 99's nine, taken in order of what it costs a

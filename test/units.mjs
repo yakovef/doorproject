@@ -1622,6 +1622,55 @@ group('every option tile draws its own picture');
   for (const s of Object.values(SIZES)) check('size', s.id, sizeGlyph(s));
 }
 
+/* ── 6b2. AND A BAR'S TILE IS PAINTED FROM THE DOOR'S OWN METAL ─────
+   The check above compares one tile against another, which is why it passed
+   for months on six pull-bar tiles that were six identical grey lines: their
+   MARKUP differs (each bar is drawn at its own true width and length) while
+   the PICTURE did not — measured on the page at 390 px, `ella` (brass, ₪500)
+   and `barblack` (black, ₪500) differed on 0.45% of pixels. Run 104 gave the
+   glyph the bar's own metal, and the one thing that must not follow from that
+   is a SECOND statement of what brass is: this repository has already paid
+   twice for one metal with two owners.
+   ⚠ So this asserts the join rather than the appearance. The stops a tile
+   paints with must appear, verbatim, in the DOOR drawn with that same handle
+   — which is only true while both read `BAR_RAMP` — and the three finishes
+   the range actually contains must come out as three different metals, which
+   is the customer-visible half and the half the old check could not see. */
+group('a pull-bar tile is painted from the door\'s own metal');
+{
+  const stopsIn = (svg, id) => {
+    const g = new RegExp(`<linearGradient id="${id}"[\\s\\S]*?</linearGradient>`).exec(svg);
+    return g ? [...g[0].matchAll(/stop-color="([^"]+)"/g)].map(m => m[1]) : null;
+  };
+  const seen = new Map();
+  for (const h of HANDLES.filter(x => x.style === 'bar')) {
+    const tile = handleGlyph(h);
+    const ref = /fill="url\(#([^)]+)\)"/.exec(tile);
+    ok(ref, `the ${h.id} tile no longer fills its bar from a gradient, so this check is dead`);
+    const mine = ref && stopsIn(tile, ref[1]);
+    ok(mine && mine.length >= 4,
+      `the ${h.id} tile points at #${ref && ref[1]} and no such gradient is in the tile`);
+    const door = render({ ...base, handle: h.id });
+    /* every stop of the tile's ramp, in order, inside one gradient of the door */
+    const inDoor = mine && [...door.matchAll(/<linearGradient[\s\S]*?<\/linearGradient>/g)]
+      .some(g => {
+        const st = [...g[0].matchAll(/stop-color="([^"]+)"/g)].map(m => m[1]);
+        return st.length === mine.length && st.every((c, i) => c === mine[i]);
+      });
+    ok(inDoor,
+      `the ${h.id} tile paints its bar ${mine && mine.join(' ')} and the DOOR with that ` +
+      `same handle paints it from no such gradient — the tile has grown its own ` +
+      `copy of the metal, which is how two brasses got into one file before`);
+    if (mine) seen.set(h.id, mine.join(' '));
+  }
+  /* three products, three metals: steel, the brass Ella, the black tube. */
+  const trio = ['idan', 'ella', 'barblack'].map(id => seen.get(id));
+  ok(trio.every(Boolean), 'idan, ella or barblack is no longer a bar — this check is dead');
+  ok(new Set(trio).size === 3,
+    'two of idan (steel), ella (brass) and barblack (black) paint their tiles from the ' +
+    'same stops, so the customer is choosing between two prices and one picture');
+}
+
 // ── 6c. Nothing may be charged for that does not change the door ───
 /* The rule holds in both directions: money and pixels move together. If two
    designs draw identically they must cost the same, and if they cost

@@ -150,47 +150,37 @@ work. Undoing a considered decision is worse than another run of nothing.
   the one-accent check red, the check is right and the design is wrong. That
   happened on 30.8 and the change was backed out, correctly.
 
-### One thing to do once, then delete this paragraph
+### Your Routine's prompt, and the fleet it now opts you into
 
-Your own Routine's prompt is stale in two places: it says *"click through the
-four sections"* — the cabinet was deleted on 27.8 and the page is a flow of
-eight steps and a summary — and its do-not-decide list still names the hardware
-finish, which Peretz priced on 26.8. You may edit it, and only you can:
-`update_trigger` on `trig_01GkD5cTXEhrBkjKSXznJ5xQ` works from this session,
-because it is the session the Routine fires into, and is refused from anywhere
-else. Fix those two and point it at this section.
+**Done 10.9.2026, and recorded rather than left as a to-do.** That prompt had
+gone stale in two places — it still said *"click through the four sections"*
+(the cabinet was deleted on 27.8; the page is a flow of eight steps and a
+summary) and its do-not-decide list still named the hardware finish, which
+Peretz priced on 26.8. Both are fixed, it points at "How to look" above rather
+than restating it, and it carries `ultracode`. Cron, name and the
+persistent-session binding are untouched, which matters: that binding is why
+you have a clone at all (see "Where you run"), and unbinding it to pick up a
+fresh model would cost you the repository.
 
-**And put the word `ultracode` in it, on the owner's instruction, 7.9.2026.**
-It is a per-turn opt-in carried by the prompt text, so a Routine prompt that
-contains it opts every future run into multi-agent orchestration. That is the
-right shape for the work this section now asks of you — parallel lenses on one
-page (type, flow, phone, copy, motion) see things one pass does not, and a
-proposed change is worth verifying adversarially before it is pushed. It is
-also expensive, five times a day, for ever: if a run finds nothing to fan out
-over, say so in the log and do it the cheap way rather than spending a fleet to
-confirm the page is fine.
+⚠ **`update_trigger` on `trig_01GkD5cTXEhrBkjKSXznJ5xQ` works from THIS session
+and is refused from anywhere else**, because this is the session the Routine
+fires into. It was blocked for three days for a duller reason than that: the
+`claude-code-remote` MCP server was simply not connected to the session when
+the owner asked. **A tool that is missing is not a permission you lack** —
+check whether it has come back before recording something as impossible.
 
-⚠ **Leave the cron, the name and the binding exactly as they are.** The
-persistent-session binding is why you have a clone at all — see "Where you run"
-below — and unbinding it to pick up a fresh model would cost you the repository.
-
-⚠ **The MODEL is settled — the owner switched it by hand on 7.9.2026**, in this
-session, minutes after the paragraph above was written, and this agent has been
-served **Opus 5** since. The reasoning above was right and the outstanding half
-is closed; nothing to report in the log. Left in place only because it records
-WHY it had to be done by a human: a Routine bound to a persistent session keeps
-that session's model, and unbinding to pick up the stored one would cost the
+⚠ **The MODEL was settled by the owner by hand on 7.9.2026** (Opus 5) and could
+only be done that way: a Routine bound to a persistent session keeps that
+session's model, so unbinding to pick up a stored one would have cost the
 clone.
 
-⚠ **What is still outstanding is the PROMPT edit**, and it is blocked rather
-than forgotten: at the moment the owner asked for this, the
-`claude-code-remote` MCP server was disconnected from this session, so
-`update_trigger` could not be called at all. **Do it the moment those tools are
-back** — the four fixes are named above (the four-sections line, the hardware
-finish, a pointer to this section, and `ultracode`) — and only then remove this
-paragraph.
-
----
+**What `ultracode` means for you every run:** multi-agent orchestration is
+opted in for every firing, because parallel lenses on one page — type, flow,
+phone, copy, motion — see what one pass does not, and a proposed change is
+worth verifying adversarially before it is pushed. ⚠ **It is also expensive,
+five times a day, for ever.** If a run has nothing to fan out over, do it the
+cheap way and say so in the log; a fleet spent confirming the page is fine is
+the same waste as a change made in order to have made one.
 
 ## Never — five things, and none of them are matters of taste
 
