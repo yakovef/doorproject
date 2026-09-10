@@ -116,8 +116,7 @@ keys are both, which is the constant §5.17 warns about. Recorded here so run
 `bd.*` strings (taken), the spec-row merge (refused, above), moving the
 fallback to a throw (refused, above).
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** `030bf5a`
 
 ---
 
