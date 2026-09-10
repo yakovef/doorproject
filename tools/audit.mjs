@@ -452,6 +452,93 @@ for (const v of VIEWS) {
     await p.waitForTimeout(300);
   }
 
+  /* ⚠ AND IT MUST NOT COVER THE ANSWERS — 10.9.2026. The same toast, asked a
+     question about WHERE it lands rather than what it says. Sitting above the
+     quote bar it cleared the price and the send and then covered the only
+     other thing a one-column phone has down there: measured on this very
+     repair, 2 of 2 tiles at 320x568 and 3 of 3 at 390x844 — including the
+     tile just tapped — while the desktop covered 0 of 15, because there the
+     toast lands over the door and the panel is a separate column. It hangs
+     off the foot of the STAGE below 1100 now, which is the desktop's own
+     answer in one column.
+     The property is the one a customer feels: while a message about their door
+     is up, they can still see the options and which one is chosen. `npm test`
+     cannot see it — a box is not a string — so it is here.
+     ⚠ It walks the flow with the BUTTON rather than loading a query, because
+     a full query lands on the summary (T11) where there are no tiles to cover
+     and the check would pass by having no subject. §5.15: every tap and every
+     selector reports if it found nothing.
+     Falsified by restoring `inset-block-end: var(--quote-h) + 12px`: fails at
+     every phone viewport, naming the tiles. */
+  {
+    await p.goto('file://' + process.cwd() + '/index.html?lang=he');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
+    const tap = id => p.evaluate(i => {
+      const t = document.querySelector(`.sect:not([hidden]) [data-id="${i}"]`);
+      if (!t) return false; t.click(); return true;
+    }, id);
+    const fwd = () => p.evaluate(() => {
+      const n = [...document.querySelectorAll('.sect__next')].filter(x => !x.disabled && x.offsetParent)[0];
+      if (!n) return false; n.click(); return true;
+    });
+    let picked = 0;
+    for (let i = 0; i < 9; i++) {
+      if (await p.evaluate(() => !!document.querySelector('.sect:not([hidden]) [data-id="rect"]'))) break;
+      if (await tap('ella')) picked++;
+      if (await tap('panel2')) picked++;
+      if (!(await fwd())) break;
+      await p.waitForTimeout(260);
+    }
+    const onGlass = await p.evaluate(() => !!document.querySelector('.sect:not([hidden]) [data-id="rect"]'));
+    const tapped = onGlass && await tap('rect');
+    await p.waitForTimeout(320);
+    const m = tapped ? await p.evaluate(() => {
+      const toast = document.querySelector('#toast');
+      if (!toast || toast.hidden || getComputedStyle(toast).opacity === '0') return { noToast: true };
+      const tr = toast.getBoundingClientRect();
+      const bar = document.querySelector('.quote');
+      const fold = bar && getComputedStyle(bar).position === 'fixed'
+        ? bar.getBoundingClientRect().top : innerHeight;
+      const over = (a, c) => Math.max(0, Math.min(a.right, c.right) - Math.max(a.left, c.left))
+                           * Math.max(0, Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top));
+      const tiles = [...document.querySelectorAll('.sect:not([hidden]) [role="radio"]')]
+        .filter(el => { const r = el.getBoundingClientRect();
+          return r.top < fold && r.bottom > 0 && r.left < innerWidth && r.right > 0; });
+      const covered = tiles.filter(el => over(tr, el.getBoundingClientRect()) > 0);
+      const money = [...document.querySelectorAll('[data-price], [data-wa]')]
+        .filter(el => el.checkVisibility() && over(tr, el.getBoundingClientRect()) > 0);
+      return {
+        sentences: toast.textContent.split(' · ').length,
+        tiles: tiles.length,
+        covered: covered.map(el => el.dataset.id),
+        money: money.length,
+      };
+    }) : null;
+    if (!tapped || !m) {
+      fault(v.name, 'the toast-placement check never reached the window step '
+        + `(picked ${picked} options, on the glass step: ${onGlass}) — it is dead`);
+    } else if (m.noToast) {
+      fault(v.name, 'choosing the square window on a panelled door with a bar '
+        + 'raised no toast at all — this check has lost its subject');
+    } else if (m.sentences < 2) {
+      fault(v.name, `the repair this check is built on now says ${m.sentences} sentence — `
+        + 'it no longer produces the tall toast it exists to place, and must be re-aimed');
+    } else if (!m.tiles) {
+      fault(v.name, 'no option tile was on screen when the toast appeared — the check '
+        + 'cannot see whether the toast covers one');
+    } else if (m.covered.length) {
+      fault(v.name, `the repair toast covers ${m.covered.length} of ${m.tiles} option tiles `
+        + `on screen (${m.covered.join(', ')}) — the customer is told what changed and `
+        + 'cannot see the answers it changed');
+    } else if (m.money) {
+      fault(v.name, 'the repair toast covers the price or a send button');
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
+  }
+
   /* ⚠ A WALKED DOOR IS A CHOSEN DOOR — 10.9.2026. The opener is picked by
      `isUntouched(state)`, which asks whether this is the door the page opened
      with; that is the same question as "has anybody engaged" at exactly one

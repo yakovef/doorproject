@@ -88,6 +88,17 @@
   --r-chip: 4px;    /* the 14px swatch beside a spec row */
   --r-pill: 999px;  /* every button — see the note on `.btn` */
 
+  /* ⚠ THE CHOICES COLUMN'S CAP, AND IT IS A TOKEN BECAUSE A SECOND READER
+     ARRIVED. It was written out twice as a bare `420px` in two
+     `grid-template-columns`, which was two copies of one number and survived
+     only because nothing else needed it. The toast now does — it must stay
+     out of that column, and a hand-written 420 beside it would be a third
+     copy of a figure whose whole history is being re-measured (380 → 420,
+     31.8, against every wall control's hit test). One statement, three
+     readers. It is a CAP: `minmax` still collapses the track toward 300 px
+     when the width is not there. */
+  --panel-max: 420px;
+
   /* One shadow for anything that floats, rather than three hand-written ones
      that agree until somebody edits a single card. ⚠ The DOCK is deliberately
      not on it: it is pinned to the BOTTOM of the screen, so its shadow has to
@@ -757,7 +768,7 @@ svg { direction: ltr; }
        ⚠ AND IT IS A CAP, NOT A WIDTH: `minmax` still collapses the track
        toward 300 px on a narrow desktop, which is what keeps `cusp` (1099)
        from paying for it. */
-    grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
+    grid-template-columns: minmax(300px, var(--panel-max)) minmax(0, 1fr);
     /* Two rows: the door takes the height that is going and the note sits
        under it, both inside column 2.
        ⚠ ONLY CONSTANT THINGS MAY LIVE IN ROW 2. It is `auto`, so whatever is
@@ -3031,15 +3042,54 @@ html.is-live.is-untouched .wa__ask { display: inline; }
      It is a message, not a control — nothing in it is ever clicked. */
   pointer-events: none;
 }
-/* And lifted clear of the quote bar rather than laid over it, so the price and
-   the send stay readable while it is up. ⚠ It said `78px` — the deleted dock's
-   height, hand-written here and hand-written again in a `body` rule that no
-   longer exists. Measured now, off the same `--quote-h` the page reserves with,
-   so the toast's clearance and the bar's height are one number. */
+/* ⚠ ON A PHONE IT HANGS OFF THE FOOT OF THE DOOR, NOT THE FOOT OF THE SCREEN,
+   AND THE MEASUREMENT IS WHY. Sitting above the quote bar it cleared the price
+   and the send — which is what it was moved there for — and then covered the
+   only other thing a one-column layout has down there: the ANSWERS. Measured
+   on the real page, driving the repair a customer meets most often (a square
+   window onto a two-panel door with a pull bar, which changes two things and
+   so speaks two sentences):
+
+       320x568   2 of 2 option tiles on screen covered
+       390x844   3 of 3 covered — including `rect`, THE TILE JUST TAPPED
+       1440x900  0 of 15 covered
+
+   So for the whole dwell — 2000 + 55·chars, about eight seconds on a
+   two-sentence repair in Russian — the customer could not see the options, or
+   which one was selected, on the step whose options had just changed. The
+   desktop had the answer all along: there the toast lands over the DOOR and
+   never over the panel, because the columns are side by side.
+   Below 1100 the door is above the flow rather than beside it, so the same
+   placement is `100dvh` less the rail and the stage's own measured height —
+   its bottom edge sits exactly on the stage's foot, over the threshold, which
+   is the least informative band of the drawing and never where a repair
+   changes anything. `--sticky-h` is published by `fitStage` off the rect it
+   already reads, so this cannot drift from the stage it is measured against.
+   ⚠ NO `transform` HERE: the entry animation animates one, and a static
+   translate would be flown in from 8px past it. */
 @media (max-width: 1099px) {
   .toast {
-    inset-block-end: calc(var(--quote-h, 62px) + 12px + env(safe-area-inset-bottom, 0px));
+    inset-block-end: calc(100dvh - var(--steps-h) - var(--sticky-h, 320px));
   }
+}
+/* ⚠ AND THE DESKTOP'S OWN VERSION OF THE SAME FAULT, WHICH THE CHECK WRITTEN
+   FOR THE PHONE FOUND AT TWO WIDTHS. The toast is centred on the VIEWPORT, and
+   the choices column stands at the inline-start edge — so the centring is only
+   clear of it while the stage is wide. Measured on the same repair, panel card
+   against toast box: `cusp` 1100 **64 px INTO the panel**, `narrow-d` 1152
+   **38 px in** (two grille tiles, `arch` and `vine`, covered at both), against
+   +26 px of daylight at 1280, +106 at 1440, +226 at 1680 and +346 at 1920.
+   Pre-existing, and the same shape as §9's price chip over `#grip-rot`: the two
+   narrowest desktops are where this layout runs out of room first.
+   So the toast is centred on the STAGE rather than on the window — which is
+   what it was already doing everywhere it looked right, and is now true by
+   construction rather than by having enough width. It reads the panel's own
+   cap, so the day that cap moves the toast moves with it.
+   After: `cusp` +146 px clear, `narrow-d` +172, and at 1440 the box centres on
+   the door (302–718 against a stage of 0–1020) instead of drifting toward the
+   panel. Nothing below 1100 is touched — there the panel is not a column. */
+@media (min-width: 1100px) {
+  .toast { inset-inline-start: calc(var(--panel-max) + 16px); }
 }
 
 /* ── reduced motion ───────────────────────────────────────────
@@ -3502,7 +3552,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
      narrowest desktop, so a bigger cap up here would only widen the gap
      between what the two breakpoints promise. Same measurement behind it —
      the door is identical to a tenth of a pixel at 1280, 1440 and 1920. */
-  .layout { grid-template-columns: minmax(300px, 420px) minmax(0, 1fr) 0; }
+  .layout { grid-template-columns: minmax(300px, var(--panel-max)) minmax(0, 1fr) 0; }
   .stage-wrap { grid-column: 2 / span 2; }
   .stage__bar { grid-column: 2 / span 2; }
   /* The send card is inside the summary step now, so column 3 has nothing to

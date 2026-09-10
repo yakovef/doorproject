@@ -45,6 +45,93 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-10 21:20 UTC — run 105: the message about the door was sitting on top of the answers, on every phone and on the two narrowest desktops
+
+**Looked at:** the page as **the customer who changes their mind**, at 320×568
+in **Russian** — walked forward with the button through size, colour, grip,
+lock and face, then BACK with the button to the colour step, changed the
+colour, used undo and redo, drove a real repair and undid that too, and read
+the order the send button produces.
+
+**Instruments:** test ✓ 4,349,736 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets —
+**52 bare sheets byte-identical**, 9 of 12 `shot` moved (§7: proves nothing).
+
+**What the walk found.**
+· Undo and redo are correct and were the thing most likely to be wrong: 44×44,
+  hidden until there is a step to take back, they restore a multi-field repair
+  in one press, and they speak Russian. Not a defect.
+· The back button works and sits below the fold on a 320 px screen — but the
+  fixed rail gives one-tap backwards navigation from anywhere, so this is the
+  known arrival-fold item, not a new one.
+· ⚠ **The repair toast covered every option tile on screen.** Driving the
+  commonest loud repair (a square window onto a two-panel door carrying a pull
+  bar — two sentences) and measuring the toast's box against the live step's
+  tiles: **320×568 2 of 2 · 390×844 3 of 3, including `rect`, the tile just
+  tapped · 834×1112 5 of 12 · 1440×900 0 of 15.** For the whole dwell —
+  `2000 + 55·chars`, about eight seconds in Russian — the customer is told what
+  changed and cannot see the thing that changed or which tile is now chosen.
+
+**Changed:** below 1100 the toast hangs off the foot of the STAGE
+(`100dvh - --steps-h - --sticky-h`) instead of floating above the quote bar, so
+its bottom edge sits on the threshold — the desktop's own behaviour (the
+message over the drawing, never over the panel) in one column. After: **0 of 2,
+0 of 3, 0 of 12**, desktop box unmoved.
+
+⚠ **And the audit check written for the phone found a DESKTOP fault on a rule
+nobody had touched.** The toast is centred on the VIEWPORT and the choices
+column stands at the inline-start edge: measured, `cusp` 1100 was **64 px into
+the panel** and `narrow-d` 1152 **38 px in** (`arch` and `vine` covered at
+both), against +26 px of daylight at 1280 and +346 at 1920. It is centred on
+the STAGE now — `cusp` +146, `narrow-d` +172, and at 1440 the box finally
+centres on the door (302–718 against a stage of 0–1020). The panel's 420 px cap
+became `--panel-max` rather than being written out a third time by hand.
+
+⚠ **The assertion is geometric and lives in `npm run audit`** — `npm test`
+cannot see a box — beside the run-101 check that already fires this same
+repair: no option tile on screen may be covered, with §5.15 clauses for the
+step, the toast, the two sentences and the tiles. It walks the flow with the
+BUTTON, because a full query lands on the summary (T11) where there is nothing
+to cover and the check would pass by having no subject. **Falsified:** the old
+rule gives three faults (`phone` 3 of 3, `phone-s` 2 of 2, `tablet` 5 of 12),
+and the desktop half was falsified by the run that discovered it.
+
+**Left alone deliberately:**
+· **The residual overlap at 320 only:** with a bar on the door the toast band
+  (213–301) crosses `.grip-bar` (134–229) and `#grip-rot` (179–223) by ~10 px.
+  Harmless — the toast is `pointer-events: none`, so the button is still
+  pressable — and no clash at 360, 390 or 1099. Measured, not eyeballed.
+· **A `transform` to fine-tune the placement.** `.toast` carries an entry
+  animation that animates one; a static translate would be flown in from 8 px
+  past it.
+· **The ₪6,995 plain door with a square window** — read on the summary and it
+  is Peretz's own figure, not a defect.
+· **The two findings still open from run 99's walk**: the colour step's
+  explainer (still unverified — the string is not in `js/copy.js`) and the
+  first tile's name and price behind the fixed quote bar on arrival at step 01.
+
+**Best idea of the run that was NOT taken:** the toast is the only thing on
+this page that speaks and then leaves, and a repair that changes ₪4,200 of door
+gets the same eight seconds as one that changes nothing — the undo button is
+sitting right there in the wall, unlabelled and unmentioned, on the one gesture
+a customer most wants to reverse. A repair toast that named the undo would
+close the loop the 9.9 entry opened. Refused this run because it makes the
+toast a CONTROL, and `pointer-events: none` is there because the toast once ate
+the send button for four seconds at a time; that is a design decision with its
+own measurement, not a line.
+
+**Proposed · taken · refused:** proposed the phone re-anchor (taken), the
+geometric audit assertion (taken), the desktop stage-centring the assertion
+exposed (taken), `--panel-max` (taken), a `transform` nudge (refused, above),
+an actionable toast (refused for now, above). Done the cheap way on purpose:
+one browser at a time, no fan-out — the finding was one measurement repeated at
+six viewports, and `ultracode` would have bought nothing but tokens.
+
+**Commit:** (pending — recorded in a follow-up commit, because this line is
+written before the commit it names exists)
+
+---
+
 ## 2026-09-10 18:40 UTC — run 104: six pull bars at four prices were six identical grey lines, and the check for exactly that passed on every one
 
 **Looked at:** the page as **the customer who starts from the gallery**, at

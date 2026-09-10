@@ -314,7 +314,7 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **4,349,611 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+- `npm test` — **4,349,736 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
   ANYTHING; it is the product of the catalogue's list lengths. Read the failure
   count. (This line said **5,403,239** for two rounds after the stripe rework
   cut fourteen `DETAILS` entries — a number in prose describing a thing that
@@ -1367,7 +1367,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched). ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1910,6 +1910,74 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE MESSAGE ABOUT THE DOOR WAS COVERING THE ANSWERS IT WAS ABOUT — ON
+  EVERY PHONE, AND ON THE TWO NARROWEST DESKTOPS TOO. 10.9.2026.** Seventh of
+  the nine the customer walk found, and the last line of the 9.9 entry below
+  said it was next: *"the toast is fixed-centred at the foot of the screen…
+  moving it is a separate change with its own measurement."* This is the
+  measurement.
+  Driven on the real page, on the commonest loud repair — a square window onto
+  a two-panel door carrying a pull bar, two sentences — measuring the toast's
+  box against the tiles of the step whose options had just changed:
+
+  | | tiles on screen | covered |
+  |---|---|---|
+  | 320×568 | 2 | **2** |
+  | 390×844 | 3 | **3**, including `rect`, THE TILE JUST TAPPED |
+  | 834×1112 | 12 | **5** |
+  | 1440×900 | 15 | 0 |
+
+  So for the whole dwell — `2000 + 55·chars`, about **eight seconds** on a
+  two-sentence repair in Russian — a customer was told what had changed and
+  could not see the thing that changed, or which tile was now selected. The
+  send and the price were clear, because the toast had already been lifted off
+  the quote bar for exactly that reason; nobody then asked what it landed on
+  instead.
+  ⚠ **THE DESKTOP HAD THE ANSWER ALL ALONG, AND THE FIX IS ITS OWN BEHAVIOUR
+  IN ONE COLUMN.** Above 1100 the message lands over the DOOR and never over
+  the panel, because the columns are side by side. Below 1100 the door is above
+  the flow rather than beside it, so the toast now hangs off the foot of the
+  STAGE — `100dvh - --steps-h - --sticky-h` — and its bottom edge sits on the
+  threshold, the least informative band of the drawing and never where a repair
+  changes anything. After: **0 of 2, 0 of 3, 0 of 12**, and the desktop box
+  unmoved. `--sticky-h` is published by `fitStage` off the rect it already
+  reads, so this cannot drift from the stage it is measured against.
+  ⚠ **NO `transform` in that rule**, and it is the trap this change had to walk
+  past: `.toast` carries an entry animation that animates one, so a static
+  translate would be flown in from 8 px past wherever it puts the box.
+  ⚠ **AND THE CHECK WRITTEN FOR THE PHONE FOUND A DESKTOP FAULT NOBODY WAS
+  LOOKING FOR.** The toast is centred on the VIEWPORT and the choices column
+  stands at the inline-start edge, so the centring is only clear of it while
+  the stage is wide. Measured, panel card against toast box: `cusp` 1100 **64
+  px INTO the panel** and `narrow-d` 1152 **38 px in** — two grille tiles,
+  `arch` and `vine`, covered at both — against +26 px of daylight at 1280,
+  +106 at 1440, +226 at 1680 and +346 at 1920. Pre-existing, and the same shape
+  as §9's price chip over `#grip-rot`: the two narrowest desktops are where
+  this layout runs out of room first. The toast is centred on the STAGE now
+  rather than on the window, which is what it was already doing everywhere it
+  looked right; after, `cusp` clears the panel by 146 px, `narrow-d` by 172,
+  and at 1440 the box centres on the door (302–718 against a stage of 0–1020)
+  instead of drifting toward the panel.
+  ⚠ **THE 420 IS A TOKEN NOW, `--panel-max`, BECAUSE THAT NUMBER HAS A SECOND
+  READER.** It was written out twice as a bare `420px` in two
+  `grid-template-columns` and a hand-written third copy beside the toast is
+  exactly §5.10 — a figure whose whole history is being re-measured (380 → 420
+  on 31.8, against every wall control's hit test) kept in three places by hand.
+  One statement, three readers; the day the cap moves, the toast moves with it.
+  ⚠ **`npm test` CANNOT SEE THIS — A BOX IS NOT A STRING** — so the assertion
+  is in `npm run audit`, driving a real repair and requiring that no option
+  tile on screen is covered, with the §5.15 clauses that it reached the step,
+  that a toast appeared, that the repair still says two sentences, and that
+  there were tiles on screen at all. ⚠ It walks the flow with the BUTTON rather
+  than loading a query: a full query lands on the summary (T11), where there
+  are no tiles to cover and the check would pass by having no subject.
+  **Falsified by restoring the old rule: three faults — `phone` 3 of 3,
+  `phone-s` 2 of 2, `tablet` 5 of 12** — and the desktop half was falsified by
+  the run that found it, which named `arch` and `vine` at both widths.
+  No price, no id, no list order, no bit, no `VERSION`; one CSS rule, one new
+  rule and one token. The 52 bare sheets came back **byte-identical**; 9 of the
+  12 `shot` sheets moved, which proves nothing either way (§7).
+
 - **⚠ SIX PULL BARS AT FOUR PRICES WERE SIX IDENTICAL GREY LINES, AND THE
   ASSERTION THAT EXISTS TO CATCH THAT PASSED ON EVERY ONE OF THEM —
   10.9.2026.** Sixth of the nine the customer walk found, confirmed as a
@@ -2124,7 +2192,10 @@ how it got there. Detail lives in the section it belongs to.
   still open. It is now a four-line box at 320 px — measured 288×88, clear of
   the quote bar by 12 px and wholly on screen at all three widths — so it is
   legible where it stands, and moving it is a separate change with its own
-  measurement.
+  measurement. (⚠ **TAKEN 10.9, and "legible where it stands" was the half of
+  this sentence that was checked**: the box was clear of the price and the send
+  and sat on top of every option tile on screen at both phone widths. See the
+  entry above.)
 
 - **⚠ A LISTING RULE THAT FROZE AT BOOT, AND THE COMMENT ABOVE IT NAMED THE
   DOOR IT WOULD BREAK — 8.9.2026.** Second of the nine the customer walk found.
@@ -2257,7 +2328,10 @@ how it got there. Detail lives in the section it belongs to.
   see the entry above); on 6-7 of the 8
   phone steps the first tile's NAME and PRICE sit behind the fixed quote bar;
   and the repair toast is fixed-centred, landing 217 px from the panel on a
-  desktop and over the handing control on a phone.
+  desktop and over the handing control on a phone (⚠ **fixed 10.9, and the
+  phone half was worse than reported: it covered EVERY option tile on screen,
+  and the check written for it found the same fault at 1100 and 1152**; see the
+  entry above).
   ⚠ **And 21 further findings never reached verification** — the run hit the
   org's monthly spend limit with 28 of 50 agents unfinished — so they are named
   in `AGENT-LOG.md` and claimed as nothing. **An unverified finding is not a
