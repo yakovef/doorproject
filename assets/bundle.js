@@ -7968,23 +7968,44 @@ ${body}
       ...shifted ? [T("addendum.shifted", gripIllustrative())] : []
     ];
   }
-  function message(state2) {
+  function message(state2, chosen = false) {
     const spoke = CUSTOMER_LANG_NOTE[lang()];
     return withLang("he", () => [
       /* ⚠ "בחרתי דלת" IS A FALSE CLAIM ON A DOOR NOBODY HAS TOUCHED. Two sends
-         are live on arrival, and a confused first-timer can fire off the
-         default as though it were a considered order — from Peretz's side
-         indistinguishable from a real one, which is `PLAN.md` §0's failure mode
-         arriving from the other direction (`UX-FINDINGS` §5).
-         The message is not withheld and the button is not removed: what changes
-         is what the first line CLAIMS. Everything under it — the spec, the
-         price, the code, the link — is still exactly the door on screen, so he
-         can price it if that is what they want; he is simply not told they
-         chose it.
-         The precedent is `FALLBACK_TEXT` below, written to be UNMISTAKABLE from
-         a real order. This is the same idea one step earlier, and the label on
-         the button changes with it — see `is-untouched` in `js/app.js`. */
-      isUntouched(state2) ? "שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה:" : "שלום, בחרתי דלת באתר:",
+             are live on arrival, and a confused first-timer can fire off the
+             default as though it were a considered order — from Peretz's side
+             indistinguishable from a real one, which is `PLAN.md` §0's failure mode
+             arriving from the other direction (`UX-FINDINGS` §5).
+             The message is not withheld and the button is not removed: what changes
+             is what the first line CLAIMS. Everything under it — the spec, the
+             price, the code, the link — is still exactly the door on screen, so he
+             can price it if that is what they want; he is simply not told they
+             chose it.
+             The precedent is `FALLBACK_TEXT` below, written to be UNMISTAKABLE from
+             a real order. This is the same idea one step earlier, and the label on
+             the button changes with it — see `is-untouched` in `js/app.js`.
+      
+             ⚠ AND `isUntouched(state)` ALONE WAS THE WRONG QUESTION, 10.9.2026.
+             It asks whether the DOOR is the one the page opened with, and that is
+             the same thing as "nobody has engaged" at exactly one moment: arrival.
+             Measured by walking the guide forward with the button at 390 px — a
+             customer who taps הבא through all eight steps and accepts the standard
+             ₪3,195 door, the commonest thing Peretz sells, reached him as *"I
+             looked at the door the site opens with and I have a question"*. So did
+             one who changed the colour and changed it back. That is `PLAN.md` §0
+             from the other side again: an order he cannot act on without asking
+             whether it was an order.
+             `chosen` is the second half — a fact about the SESSION, not about the
+             door, which is why it is an ARGUMENT and not a field. It cannot go in
+             the state for the reason `liveStep` cannot: it would reach the URL and
+             the short code, and "which questions somebody read" is not part of a
+             door. It defaults to FALSE so that every caller with no session — node,
+             the tests, the A4 sheet, and Peretz opening a shared link — keeps
+             exactly the conservative answer it has today, and a caller that forgets
+             to pass it fails towards the old behaviour rather than towards a false
+             claim. `js/app.js` is the only place that knows, and it passes the same
+             value to the label and to the text so the two stay one decision. */
+      isUntouched(state2) && !chosen ? "שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה:" : "שלום, בחרתי דלת באתר:",
       ...spoke ? [spoke] : [],
       "",
       /* ⚠ THE ROWS, from `js/spec.js`. This function used to assemble the door
@@ -8022,7 +8043,7 @@ ${body}
       ...shareUrl(state2) ? ["", `לצפייה: ${shareUrl(state2)}`] : []
     ].join("\n"));
   }
-  var whatsappUrl = (state2) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2))}`;
+  var whatsappUrl = (state2, chosen = false) => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state2, chosen))}`;
   var FALLBACK_TEXT = "שלום, ניסיתי לבנות דלת באתר והעמוד לא נטען אצלי, אז אין לי קוד לשלוח. אפשר לחזור אליי ולעזור לי לבחור דלת?";
   var fallbackWhatsappUrl = () => `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(FALLBACK_TEXT)}`;
   var canSharePicture = () => isServed() && typeof navigator !== "undefined" && typeof navigator.share === "function" && typeof navigator.canShare === "function";
@@ -8051,7 +8072,7 @@ ${body}
       URL.revokeObjectURL(url);
     }
   }
-  async function sendDoor(state2) {
+  async function sendDoor(state2, chosen = false) {
     if (!canSharePicture()) return "unavailable";
     let file;
     try {
@@ -8059,7 +8080,7 @@ ${body}
     } catch {
       return "unavailable";
     }
-    const payload = { files: [file], text: message(state2) };
+    const payload = { files: [file], text: message(state2, chosen) };
     if (!navigator.canShare(payload)) return "unavailable";
     try {
       await navigator.share(payload);
@@ -8068,8 +8089,8 @@ ${body}
       return e && e.name === "AbortError" ? "dismissed" : "unavailable";
     }
   }
-  async function copyMessage(state2) {
-    const text = message(state2);
+  async function copyMessage(state2, chosen = false) {
+    const text = message(state2, chosen);
     try {
       await navigator.clipboard.writeText(text);
       return true;
@@ -8505,7 +8526,7 @@ ${body}
         el.dataset.sending = "1";
         let how = "unavailable";
         try {
-          how = await sendDoor(state);
+          how = await sendDoor(state, engaged);
         } catch {
         } finally {
           el.dataset.sending = "0";
@@ -8727,7 +8748,10 @@ ${body}
       b.innerHTML = `<span class="steps__c" aria-hidden="true">${sectionIcon(sec.key)}</span>`;
       b.setAttribute("aria-label", T(sec.title));
       b.title = T(sec.title);
-      b.addEventListener("click", () => goStep(sec.key));
+      b.addEventListener("click", () => {
+        noteEngaged();
+        goStep(sec.key);
+      });
       nav.appendChild(b);
     }
     wrap.appendChild(nav);
@@ -9061,7 +9085,12 @@ ${body}
     fitStage();
     paint();
   }
+  var engaged = false;
+  var noteEngaged = () => {
+    engaged = true;
+  };
   function stepBy(d) {
+    noteEngaged();
     const keys = STEP_KEYS();
     const i = keys.indexOf(liveStep) + d;
     if (i < 0 || i >= keys.length) return;
@@ -9178,6 +9207,7 @@ ${body}
     }
   }
   function choose(g, id) {
+    noteEngaged();
     const { state: fixed, said } = repair({ ...state, [g.key]: id }, g.key);
     set(fixed);
     toast(said.join(" · "));
@@ -9298,12 +9328,12 @@ ${body}
     if (faceOpts) buildStripes(faceOpts);
     const gripOpts = document.querySelector('.field[data-group="handle"] .field__opts');
     if (gripOpts) buildLengthStepper(gripOpts);
-    const wa = whatsappUrl(state);
+    const wa = whatsappUrl(state, engaged);
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.href = wa;
     });
     document.documentElement.classList.add("is-live");
-    document.documentElement.classList.toggle("is-untouched", isUntouched(state));
+    document.documentElement.classList.toggle("is-untouched", isUntouched(state) && !engaged);
     announce(describe(state));
     armGrip();
     $("#undo-btn").disabled = !canUndo();
@@ -9646,7 +9676,7 @@ ${body}
     }, 500);
   }
   async function onCopy() {
-    const ok = await copyMessage(state);
+    const ok = await copyMessage(state, engaged);
     toast(T(ok ? "copy.ok" : "copy.fail"));
   }
   var toastTimer = null;

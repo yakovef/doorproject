@@ -45,6 +45,75 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-10 02:05 UTC — run 102: a customer who walked all eight steps reached Peretz as "I only had a question"
+
+**Looked at:** the fourth of run 99's nine, again in order of what it costs a
+customer rather than the order they were found. Not a fresh walk — four
+findings from that walk are still unfixed, and this is the one that lands on
+`PLAN.md` §0 head-on: the product is an order Peretz can act on **without a
+clarifying question**, and this one arrives asking to be asked.
+
+**Reproduced first, three customers, forward with the button at 390 px:**
+· A taps הבא through all eight steps and keeps the standard **₪3,195** door →
+  *"שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה"*.
+· B changes the colour and changes it back → the same.
+· C changes the colour and leaves it → correct.
+Both sends said *"I have a question"* to match. **The label and the message
+agreed with each other and both were wrong about the customer.**
+
+⚠ **`isUntouched(state)` asks whether this is the DOOR the page opened with**,
+and that is the same question as "has anybody engaged" at exactly one moment:
+arrival. It is not a bug in the predicate; it is a proxy that is only ever
+true at the instant it was written for.
+
+⚠ **The feature is right, so nothing about it is removed.** The case
+`UX-FINDINGS` §5 built it for — arrive, send without moving — is measured and
+unchanged, and so is a shared link carrying the DEFAULT door, because Peretz
+opening his own link really is looking at the door the site opens with.
+
+**Changed:** `message(state, chosen)` — the session's own answer, an ARGUMENT
+and not a field, because it cannot ride into the URL and the short code for
+the same reason `liveStep` cannot. Defaults to `false`, so node, the suite,
+the A4 sheet and every link keep exactly today's answer and a forgetful caller
+fails towards the old behaviour rather than towards a false claim. `app.js`
+holds a monotone latch and hands the same value to the label and the text.
+⚠ **Set at the GESTURE, never inside `goStep`** — boot and the language switch
+call it too, and marking there would tell Peretz that a link he opened himself
+was a door somebody chose. **No price, no id, no list order, no bit, no
+`VERSION`.**
+
+**Instruments:** test ✓ **4,349,615 / 0** (+4, exactly the new assertions) ·
+audit ✓ no faults · profile ✓ four rows · collide ✓ `all` and `boxes`
+(111 vs MOUNT_REACH 121) · recreate ✓ 10 doors · sheets regenerated, **all 52
+bare sheets byte-identical**, only 7 `shot` sheets moved.
+
+**Falsified** by dropping the argument in `paint`: the new check fires, and so
+does the OLDER label-versus-message pact — the two mechanisms confirming they
+are still pinned to each other, which is what that older check is for.
+
+**Left alone deliberately:**
+· **The predicate itself.** Widening `isUntouched` to mean "engaged" would put
+  a session fact in `url-state.js`, where the sheet and every link would read
+  it and get an answer about a session that never happened.
+· **A rail click that chooses nothing** counts as engagement. Arguable — but
+  the alternative is a hand-kept list of which gestures are real, which is the
+  shape §5 keeps punishing, and the failure direction is the mild one.
+· **The three remaining findings** from run 99, still listed in `CLAUDE.md`
+  §0b.
+
+**Best idea of this run, not taken:** the opener is now right about WHETHER
+they chose, and still says nothing about what they were unsure of. A customer
+who walked every step and changed nothing is a different customer from one who
+configured eight axes, and Peretz would price them differently. A line naming
+how many questions the customer actually answered would tell him that — but it
+is a new claim in the one artefact that must not overstate, and it wants his
+opinion before it wants code (`ASK-PERETZ.md`), not a commit.
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-09-09 21:10 UTC — run 101: one tap took ₪4,200 off the door and the page announced the pull handle
 
 **Looked at:** the third of run 99's nine, taken in order of what it costs a

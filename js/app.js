@@ -660,7 +660,7 @@ function init() {
       if (el.dataset.sending === '1') return;
       el.dataset.sending = '1';
       let how = 'unavailable';
-      try { how = await sendDoor(state); } catch { /* fall through to the link */ }
+      try { how = await sendDoor(state, engaged); } catch { /* fall through to the link */ }
       finally { el.dataset.sending = '0'; }
       if (how === 'sent' || how === 'dismissed') return;
       /* The share could not happen, so the order still has to. `location`
@@ -1228,7 +1228,7 @@ function buildPanel() {
        `npm test` asserts they are equal so a future rename cannot leave a
        tooltip saying one thing and a screen reader another. */
     b.title = T(sec.title);
-    b.addEventListener('click', () => goStep(sec.key));
+    b.addEventListener('click', () => { noteEngaged(); goStep(sec.key); });
     nav.appendChild(b);
   }
   wrap.appendChild(nav);
@@ -1877,9 +1877,35 @@ function goStep(key, focus = true) {
   paint();
 }
 
+/**
+ * ⚠ HAS THIS CUSTOMER ENGAGED WITH THE GUIDE? — 10.9.2026.
+ *
+ * `isUntouched(state)` answers "is this the door the page opened with", and
+ * that is the same question as "has anybody engaged" for exactly as long as
+ * the customer has not moved: at arrival, and never again. Walked forward
+ * with the button through all eight steps at 390 px, accepting the standard
+ * ₪3,195 door, the message reaching Peretz still read *"I looked at the door
+ * the site opens with and I have a question"* — and so did the one from a
+ * customer who changed the colour and changed it back.
+ *
+ * ⚠ IT IS PRESENTATION, EXACTLY LIKE `liveStep`, and is kept out of `state`
+ * for the same reason: it would ride into the URL and the short code, and
+ * which questions somebody read is not a fact about a door. A MONOTONE LATCH,
+ * because engagement does not un-happen — and that also means no reader has
+ * to care what order things ran in.
+ *
+ * ⚠ SET AT THE GESTURE, not inside `goStep`, and that distinction is the
+ * whole correctness of it. `goStep` is also called by BOOT and by the
+ * language switch, and marking there would tell Peretz that a shared link he
+ * opened himself — which lands on the summary — was a door somebody chose.
+ */
+let engaged = false;
+const noteEngaged = () => { engaged = true; };
+
 /** One step forward or back, clamped. Never wraps: a flow that loops has no
  *  end, and the end is the whole point — it is where the door gets sent. */
 function stepBy(d) {
+  noteEngaged();
   const keys = STEP_KEYS();
   const i = keys.indexOf(liveStep) + d;
   if (i < 0 || i >= keys.length) return;
@@ -2096,6 +2122,7 @@ function markSteps() {
  * a shared URL cannot disagree about what is buildable.
  */
 function choose(g, id) {
+  noteEngaged();
   /* `said` comes back from the repair itself, one sentence per change, because
      the branch that made the change is the only place that knows why it did.
      It used to be looked up afterwards from the group name, which is right
@@ -2477,7 +2504,7 @@ function paint() {
   const gripOpts = document.querySelector('.field[data-group="handle"] .field__opts');
   if (gripOpts) buildLengthStepper(gripOpts);
 
-  const wa = whatsappUrl(state);
+  const wa = whatsappUrl(state, engaged);
   document.querySelectorAll('[data-wa]').forEach(el => { el.href = wa; });
   /* ⚠ THE LABEL AND THE HREF CHANGE TOGETHER, and this is the line that makes
      that true. The buttons rest on "שלחו לנו הודעה" over the fallback message;
@@ -2493,7 +2520,7 @@ function paint() {
      one decision and they are set from one predicate — `isUntouched`, which
      is derived from `DEFAULTS` rather than from a hand-kept list of fields,
      so a tenth choice cannot leave it calling a configured door untouched. */
-  document.documentElement.classList.toggle('is-untouched', isUntouched(state));
+  document.documentElement.classList.toggle('is-untouched', isUntouched(state) && !engaged);
   announce(describe(state));
   armGrip();
   /* ⚠ ALWAYS ON THE PAGE NOW, AND `disabled` RATHER THAN HIDDEN. Asked for
@@ -3300,7 +3327,7 @@ function announce(text) {
 // ── actions ───────────────────────────────────────────────────────
 
 async function onCopy() {
-  const ok = await copyMessage(state);
+  const ok = await copyMessage(state, engaged);
   toast(T(ok ? 'copy.ok' : 'copy.fail'));
 }
 

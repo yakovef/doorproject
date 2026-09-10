@@ -281,7 +281,7 @@ export function gripAddendum(state) {
  * because a line saying "the customer used the Hebrew page" on every single
  * order is noise, and noise is how the useful lines stop being read.
  */
-export function message(state) {
+export function message(state, chosen = false) {
   const spoke = CUSTOMER_LANG_NOTE[lang()];
   return withLang('he', () => [
     /* ⚠ "בחרתי דלת" IS A FALSE CLAIM ON A DOOR NOBODY HAS TOUCHED. Two sends
@@ -296,8 +296,29 @@ export function message(state) {
        chose it.
        The precedent is `FALLBACK_TEXT` below, written to be UNMISTAKABLE from
        a real order. This is the same idea one step earlier, and the label on
-       the button changes with it — see `is-untouched` in `js/app.js`. */
-    isUntouched(state)
+       the button changes with it — see `is-untouched` in `js/app.js`.
+
+       ⚠ AND `isUntouched(state)` ALONE WAS THE WRONG QUESTION, 10.9.2026.
+       It asks whether the DOOR is the one the page opened with, and that is
+       the same thing as "nobody has engaged" at exactly one moment: arrival.
+       Measured by walking the guide forward with the button at 390 px — a
+       customer who taps הבא through all eight steps and accepts the standard
+       ₪3,195 door, the commonest thing Peretz sells, reached him as *"I
+       looked at the door the site opens with and I have a question"*. So did
+       one who changed the colour and changed it back. That is `PLAN.md` §0
+       from the other side again: an order he cannot act on without asking
+       whether it was an order.
+       `chosen` is the second half — a fact about the SESSION, not about the
+       door, which is why it is an ARGUMENT and not a field. It cannot go in
+       the state for the reason `liveStep` cannot: it would reach the URL and
+       the short code, and "which questions somebody read" is not part of a
+       door. It defaults to FALSE so that every caller with no session — node,
+       the tests, the A4 sheet, and Peretz opening a shared link — keeps
+       exactly the conservative answer it has today, and a caller that forgets
+       to pass it fails towards the old behaviour rather than towards a false
+       claim. `js/app.js` is the only place that knows, and it passes the same
+       value to the label and to the text so the two stay one decision. */
+    isUntouched(state) && !chosen
       ? 'שלום, הסתכלתי על הדלת שהאתר נפתח בה ויש לי שאלה:'
       : 'שלום, בחרתי דלת באתר:',
     ...(spoke ? [spoke] : []),
@@ -339,8 +360,8 @@ export function message(state) {
 }
 
 /** One tap: opens WhatsApp with the message already written, addressed to Peretz. */
-export const whatsappUrl = state =>
-  `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state))}`;
+export const whatsappUrl = (state, chosen = false) =>
+  `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(message(state, chosen))}`;
 
 /* ── WHAT THE BUTTON DOES WHEN THERE IS NO DOOR ──────────────────────
  *
@@ -469,7 +490,7 @@ export async function doorPng(state, width = 1000) {
  * closes it would have WhatsApp opened for them anyway a moment later. That is
  * the page arguing with somebody who has just said no.
  */
-export async function sendDoor(state) {
+export async function sendDoor(state, chosen = false) {
   if (!canSharePicture()) return 'unavailable';
   let file;
   try {
@@ -477,7 +498,7 @@ export async function sendDoor(state) {
   } catch {
     return 'unavailable';              // no picture; the link still works
   }
-  const payload = { files: [file], text: message(state) };
+  const payload = { files: [file], text: message(state, chosen) };
   if (!navigator.canShare(payload)) return 'unavailable';
   try {
     await navigator.share(payload);
@@ -491,8 +512,8 @@ export async function sendDoor(state) {
   }
 }
 
-export async function copyMessage(state) {
-  const text = message(state);
+export async function copyMessage(state, chosen = false) {
+  const text = message(state, chosen);
   try {
     await navigator.clipboard.writeText(text);
     return true;

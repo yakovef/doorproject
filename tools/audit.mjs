@@ -452,6 +452,75 @@ for (const v of VIEWS) {
     await p.waitForTimeout(300);
   }
 
+  /* ⚠ A WALKED DOOR IS A CHOSEN DOOR — 10.9.2026. The opener is picked by
+     `isUntouched(state)`, which asks whether this is the door the page opened
+     with; that is the same question as "has anybody engaged" at exactly one
+     moment, arrival. Walked forward with the BUTTON through all eight steps
+     at 390 px, accepting the standard ₪3,195 door, the message still read
+     *"I looked at the door the site opens with and I have a question"* — the
+     commonest door Peretz sells, reaching him as an idle enquiry, which is
+     `PLAN.md` §0 from the other side.
+     BOTH DIRECTIONS, because either alone passes on a constant: the guard
+     that this whole feature exists for (arrive, send without moving → it must
+     still ask) and the defect (walk the guide → it must claim). It has to be
+     HERE rather than in `npm test`, because engagement is a fact about the
+     session and the suite has none.
+     §5.15: it fails loudly if the send or the way on cannot be found.
+     Falsified by dropping the session argument in `paint`: the second half
+     fails at every viewport. */
+  {
+    const opener = () => p.evaluate(() => {
+      const el = document.querySelector('[data-wa]');
+      if (!el) return null;
+      const href = decodeURIComponent(el.getAttribute('href') || '');
+      return { asks: href.includes('ויש לי שאלה'),
+               claims: href.includes('בחרתי דלת'),
+               untouched: document.documentElement.classList.contains('is-untouched') };
+    });
+    await p.goto('file://' + process.cwd() + '/index.html?lang=he');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
+    const fresh = await opener();
+    let walked = 0;
+    for (let i = 0; i < 8; i++) {
+      const moved = await p.evaluate(() => {
+        const b = [...document.querySelectorAll('.sect__next')]
+          .find(x => x.offsetParent && !x.disabled);
+        if (!b) return false;
+        b.click(); return true;
+      });
+      if (!moved) break;
+      walked++;
+      await p.waitForTimeout(150);
+    }
+    const after = await opener();
+    if (!fresh || !after) {
+      fault(v.name, 'no [data-wa] on the page at all — the walked-door opener '
+        + 'check cannot see its subject and is dead');
+    } else if (walked < 8) {
+      fault(v.name, `the guide could only be walked ${walked} of 8 steps forward `
+        + 'with the button — this check cannot reach the summary');
+    } else {
+      if (!fresh.asks || fresh.claims) {
+        fault(v.name, 'on arrival, before any gesture, the send already claims the '
+          + 'customer chose this door — the guard against firing off the default '
+          + 'as a considered order is gone');
+      }
+      if (after.asks || !after.claims) {
+        fault(v.name, 'a customer walked all eight steps with the button and the '
+          + 'order still reaches Peretz as "I only had a question" — he cannot '
+          + 'act on it without asking whether it was an order');
+      }
+      if (after.untouched) {
+        fault(v.name, 'the walked door still carries `is-untouched`, so the LABEL '
+          + 'and the message have come apart');
+      }
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
+  }
+
   /* ⚠ EVERY STEP MUST BE REACHABLE FROM THE NAVIGATOR AT ANY TIME, and this
      replaced "clicking one heading must not shut the others" — a check written
      because `toggleSection` passed `null` to `openSection`, which set

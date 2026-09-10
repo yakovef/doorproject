@@ -3074,7 +3074,7 @@ group('a handle the customer moved reaches the order');
 {
   globalThis.window = globalThis.window
     || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
-  const { message, gripDeparture } = await import('../js/share.js');
+  const { message, gripDeparture, whatsappUrl } = await import('../js/share.js');
 
   /* One value per field that is NOT the default, taken from the catalogue
      list that owns the field rather than typed — so a renamed id fails here
@@ -3137,6 +3137,33 @@ group('a handle the customer moved reaches the order');
       ok(message(changed).startsWith('שלום, בחרתי דלת'),
          `a door with a chosen ${k} still sends the "I have a question" opener`);
     }
+
+    /* ⚠ AND THE THIRD DIRECTION, 10.9.2026 — THE DOOR IS NOT THE ONLY THING
+       THAT SAYS WHETHER SOMEBODY CHOSE. `isUntouched(state)` asks whether
+       this is the door the page opened with, and that is only the same
+       question as "has anybody engaged" at arrival. Measured on the real page
+       at 390 px: a customer who walks the guide FORWARD with the button
+       through all eight steps and accepts the standard ₪3,195 door — the
+       commonest thing Peretz sells — reached him as *"I looked at the door
+       the site opens with and I have a question"*, and so did one who changed
+       the colour and changed it back.
+       So `message` takes the session's own answer, and both directions of THAT
+       are asserted here. The default stays FALSE, which is the whole safety of
+       the argument: node, the A4 sheet and a shared link Peretz opens himself
+       keep exactly the answer they had. */
+    ok(message(DEFAULTS, true).startsWith('שלום, בחרתי דלת'),
+       'a customer who walked the guide and kept the standard door still '
+       + 'reaches Peretz as somebody who only had a question');
+    ok(message(DEFAULTS, false).startsWith('שלום, הסתכלתי'),
+       'the untouched opener is gone even when nobody has engaged — the '
+       + 'guard against sending a door nobody chose has been lost');
+    ok(message(DEFAULTS) === message(DEFAULTS, false),
+       'message() no longer defaults to the conservative answer, so every '
+       + 'caller with no session (the sheet, a link, this suite) now claims '
+       + 'a choice nobody made');
+    ok(whatsappUrl(DEFAULTS, true) !== whatsappUrl(DEFAULTS, false),
+       'whatsappUrl swallows the session argument — the label on the page '
+       + 'would move and the message behind it would not');
   }
 
   const LINE = 'מיקום הידית:';

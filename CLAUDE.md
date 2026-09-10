@@ -1910,6 +1910,54 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ A CUSTOMER WHO WALKED ALL EIGHT STEPS REACHED PERETZ AS "I ONLY HAD A
+  QUESTION" — 10.9.2026.** Fourth of the nine the customer walk found, and the
+  one that lands on `PLAN.md` §0 most directly: the product is an order he can
+  act on **without a clarifying question**, and this one arrives asking to be
+  asked.
+  The opener is chosen by `isUntouched(state)`, which asks *is this the door
+  the page opened with*. ⚠ **That is the same question as "has anybody
+  engaged" at exactly one moment — arrival — and at no other.** Measured by
+  walking the guide FORWARD with the button at 390 px: a customer who taps
+  הבא through all eight steps and keeps the standard **₪3,195** door, the
+  commonest thing Peretz sells, reached him as *"שלום, הסתכלתי על הדלת שהאתר
+  נפתח בה ויש לי שאלה"*. So did one who changed the colour and changed it
+  back. Both send buttons said *"I have a question"* to match, correctly and
+  uselessly — **the label and the message agreed with each other and both
+  were wrong about the customer.**
+  ⚠ **THE FEATURE IS RIGHT AND ITS PROXY WAS INCOMPLETE**, which is why
+  nothing here is removed. `UX-FINDINGS` §5 built this so a confused
+  first-timer cannot fire off the default as a considered order, and that case
+  is measured and unchanged: arrive, send without moving, and it still asks.
+  So does a shared link carrying the DEFAULT door — Peretz opening his own
+  link really is looking at the door the site opens with.
+  ⚠ **THE SECOND HALF IS A FACT ABOUT THE SESSION AND IS AN ARGUMENT, NOT A
+  FIELD.** `message(state, chosen)` — and `chosen` cannot live in `state` for
+  the same reason `liveStep` does not: it would ride into the URL and the
+  short code, and which questions somebody read is not a fact about a door.
+  It **defaults to `false`**, so node, the suite, the A4 sheet and every
+  shared link keep exactly today's answer, and a caller that forgets it fails
+  towards the old behaviour rather than towards a false claim. `js/app.js`
+  holds a monotone latch — engagement does not un-happen — and hands the same
+  value to the label and to the text, so the two remain one decision.
+  ⚠ **The latch is set at the GESTURE, never inside `goStep`**, and that is
+  the whole correctness of it: `goStep` is also called by boot and by the
+  language switch, so marking there would tell Peretz that a shared link he
+  opened himself — which lands on the summary — was a door somebody chose.
+  `stepBy`, the navigator circle and `choose` are the three gestures; `choose`
+  is there for the tap that lands back on the default (an undo, or picking the
+  colour you already had).
+  ⚠ **Asserted in both places, because neither can see the other half.**
+  `npm test` pins the strings — untouched still asks, `chosen` claims, the
+  default argument is the conservative one, and `whatsappUrl` does not swallow
+  it. `npm run audit` pins the SESSION, which the suite has none of: arrive
+  and it must ask, walk all eight steps with the button and it must claim, and
+  the `is-untouched` class must follow. **Falsified by dropping the argument
+  in `paint`** — the new check fires, and so does the older label-versus-
+  message pact, which is the two mechanisms confirming they are still pinned
+  to each other. No price, no id, no list order, no bit, no `VERSION`; the 52
+  bare sheets came back byte-identical.
+
 - **⚠ ONE TAP TOOK ₪4,200 OFF THE DOOR AND THE PAGE ANNOUNCED THE PULL HANDLE
   — 9.9.2026.** Third of the nine the customer walk found. `choose()` showed
   `said[0]` and nothing else.
@@ -2093,7 +2141,7 @@ how it got there. Detail lives in the section it belongs to.
   a heading reading **תוספת ₪200** — which the 30.8 entry in this very log
   claims *"is gone"*, and it is not; a door walked step by step, or changed and
   changed back, reaches Peretz as *"I looked at the door the site opens with
-  and I have a question"*; the breakdown prints the doorbell row as the raw key
+  and I have a question"* (⚠ **fixed 10.9**; see the entry above); the breakdown prints the doorbell row as the raw key
   `bell` in all three languages; six pull-bar tiles at four prices are one grey
   line, including the one whose difference is that it is black; on 6-7 of the 8
   phone steps the first tile's NAME and PRICE sit behind the fixed quote bar;
