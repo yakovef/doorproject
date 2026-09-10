@@ -127,8 +127,7 @@ an actionable toast (refused for now, above). Done the cheap way on purpose:
 one browser at a time, no fan-out — the finding was one measurement repeated at
 six viewports, and `ultracode` would have bought nothing but tokens.
 
-**Commit:** (pending — recorded in a follow-up commit, because this line is
-written before the commit it names exists)
+**Commit:** `8c68cb8`
 
 ---
 
