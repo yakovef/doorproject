@@ -4,8 +4,8 @@
  */
 import { BELLS, PEEPHOLES, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
-import { L, T, withLang } from '../js/copy.js';
-import { breakdownRows, formatAgorot, priceAgorot, shekels, tileAgorot } from '../js/price.js';
+import { L, LANG_IDS, T, withLang } from '../js/copy.js';
+import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT,
@@ -857,6 +857,7 @@ group('price');
      to ₪4.99 and `breakdownRows` carries the difference as a line called
      עיגול. This checks the rendered rows, not the raw parts, because the rows
      are what the customer adds up. */
+  const BREAKDOWN_SEEN = new Set();
   for (const st of everyState()) {
     const shown = priceAgorot(st);
     const rows = breakdownRows(st);
@@ -882,6 +883,74 @@ group('price');
     for (const k of ['door', 'cylinder', 'lock', 'mashkof', 'install', 'measure']) {
       ok(rows.some(r => r.key === k),
          `the breakdown dropped "${k}" — ${Object.values(st).join('/')}`);
+    }
+    for (const r of rows) BREAKDOWN_SEEN.add(r.key);
+  }
+
+  /* ⚠ EVERY ROW THE COLUMN CAN PRINT HAS A NAME — 10.9.2026, and it did not.
+     `renderBreakdown` in `js/app.js` looks each row's key up in a hand-kept
+     `BREAKDOWN_KEY` and falls through to printing `r.key` when it misses. The
+     פעמון and the עינית became priced fields on 30.8 and were never added, so
+     a customer who bought the ₪300 ring tapped the price open and read a row
+     called **`bell`** — in Hebrew, English and Russian alike. §5's own family:
+     a hand-kept map beside a DERIVED list, with a fallback quiet enough that
+     only somebody spending money could find it.
+
+     ⚠ IT IS READ OUT OF THE SOURCE TEXT because `js/app.js` is not importable
+     here — it touches the DOM at import — which is the same reason the
+     one-accent check walks `css/app.css` as text. §5.15 applies with force:
+     if the parse stops matching, this check would go green about nothing, so
+     the count it found is asserted first.
+
+     BOTH HALVES, because either alone passes on a constant: every key the
+     breakdown can print must have an entry, and every entry must RESOLVE in
+     all three languages — `T()` returns the key itself when it misses, so a
+     label pointing at a string nobody wrote would print `bd.bell` instead,
+     which is the same defect wearing a prefix.
+
+     ⚠ AND THE FIRST VERSION OF THIS CHECK WAS BLIND TO THE ONE KEY THAT
+     CAUSED THE DEFECT, which is worth more than the fix. It collected the
+     keys the `everyState()` sweep above happened to EMIT — and that stem
+     spreads `DEFAULTS`, where `bell` is `nobell` at ₪0, so the row is dropped
+     and `bell` was never in the set. Deleting `bell` from `BREAKDOWN_KEY` on
+     purpose left the suite green. Found by falsifying, not by reading it.
+     The list is DERIVED now: `priceParts` returns every key on every call,
+     so its own key set plus `round` is the complete set of rows the column
+     can ever print, and no sampling decides what gets checked. §5.15 twice
+     over — the sweep is kept beside it only to assert that nothing is emitted
+     which the derived list does not already contain. */
+  {
+    const src = readFileSync(new URL('../js/app.js', import.meta.url), 'utf8');
+    const block = /const BREAKDOWN_KEY = \{([\s\S]*?)\n\};/.exec(src);
+    ok(block, 'BREAKDOWN_KEY could not be found in js/app.js — this check is dead');
+    const map = new Map();
+    for (const m of (block ? block[1] : '').matchAll(/(\w+):\s*'([^']+)'/g)) {
+      map.set(m[1], m[2]);
+    }
+    ok(map.size >= 16, `only ${map.size} BREAKDOWN_KEY entries were parsed out of `
+      + 'js/app.js — the pattern has stopped matching and this check is blind');
+    const canPrint = new Set([...Object.keys(priceParts(DEFAULTS)), 'round']);
+    ok(canPrint.size >= 17, `only ${canPrint.size} keys came out of priceParts — `
+      + 'the derived list has stopped describing the column and this check is blind');
+    for (const k of canPrint) {
+      ok(map.has(k), `the price breakdown can print a row keyed "${k}" and `
+        + `BREAKDOWN_KEY has no name for it, so js/app.js prints "${k}" to the `
+        + 'customer — in all three languages');
+    }
+    /* The sweep is the cross-check, not the source: anything actually emitted
+       that the derived list does not contain means `breakdownRows` has grown a
+       row `priceParts` does not know about. */
+    for (const k of BREAKDOWN_SEEN) {
+      ok(canPrint.has(k), `a real door printed a breakdown row keyed "${k}" and `
+        + 'priceParts does not emit it — the derived list above is incomplete');
+    }
+    for (const [k, str] of map) {
+      for (const lg of LANG_IDS) {
+        withLang(lg, () => {
+          ok(T(str) !== str, `the breakdown row "${k}" points at "${str}", which `
+            + `has no ${lg} string — the customer reads the key instead`);
+        });
+      }
     }
   }
 

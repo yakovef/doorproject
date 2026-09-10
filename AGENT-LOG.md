@@ -45,6 +45,82 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-10 06:15 UTC — run 103: the ₪300 doorbell was billed as a row called `bell`, and my own guard for it was blind to `bell`
+
+**Looked at:** the fifth of run 99's nine, taken in order of what it costs a
+customer. Built and drove the page at 390 and 1440; opened the price column on
+a door carrying the פעמון, which is what the walk said to do.
+
+**Instruments:** test ✓ 4,349,716 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` and `boxes` (1,902 designs) · recreate ✓ · sheets — **52
+bare sheets byte-identical**, 7 of 12 `shot` moved (which proves nothing either
+way, §7).
+
+**The defect.** `renderBreakdown` in `js/app.js` titles each row
+`BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key`. The פעמון and the
+עינית arrived on 30.8 and were never added to that map, so the column reads,
+measured in node on the default door plus a bell:
+
+```
+door=1295 cylinder=200 lock=200 mashkof=500 install=700 measure=300 bell=300
+```
+
+Six Hebrew names and one raw identifier, in Hebrew, English and Russian alike —
+against the ₪300 line, which is the row a customer is most likely to be
+checking.
+
+⚠ **The עינית half never printed and is recorded as preventive rather than
+claimed as a second bug.** `breakdownRows` drops any row worth ₪0 that is not
+in `ALWAYS`, and A7 prices the peephole at ₪0 because it is already included.
+One number in `js/prices.js` would start printing it.
+
+**Changed:** two strings in `js/copy.js` (`bd.bell`, `bd.peephole`), two
+entries in `BREAKDOWN_KEY`, its docstring count corrected (it said THIRTEEN and
+there are eighteen), and a new block in `npm test`.
+
+⚠ **THE PART WORTH KEEPING IS THAT MY FIRST GUARD COULD NOT HAVE CAUGHT THIS.**
+It collected the row keys the `everyState()` sweep actually EMITS and required
+each to have a name. That stem spreads `DEFAULTS`, where `bell` is `nobell` at
+₪0 — so the row is dropped, the key never enters the set, and **deleting
+`bell: 'bd.bell'` and `peephole: 'bd.peephole'` from `BREAKDOWN_KEY` on purpose
+left the suite green.** Its own §5.15 clause (`BREAKDOWN_SEEN.size >= 10`)
+passed on the other ten keys and said the check was fed. Falsification A did
+not fire twice; the second time I stopped re-checking the edit and asked what
+the set contained.
+The list is DERIVED now — `new Set([...Object.keys(priceParts(DEFAULTS)),
+'round'])`, seventeen keys, every row the column can ever print, because
+`priceParts` returns every key on every call. The sweep stays beside it with
+the question reversed: anything emitted that the derived list does not contain
+means `breakdownRows` has grown a row `priceParts` does not know about.
+**Both falsifications fire now** — dropping the two entries names `bell` and
+`peephole` by name, and `bd.bellNope` fails the resolve half in all three
+languages (`T()` returns the key when it misses, so `bd.bell` on screen is the
+same defect wearing a prefix).
+
+**Left alone deliberately:**
+· **The `: r.key` fallback.** Throwing in `renderBreakdown` would blank the
+  page (§5.20), and a row with money and no name beats a row with money and no
+  row. The guard belongs in `npm test`, where it costs a customer nothing.
+· **No price, no id, no list order, no bit, no `VERSION`.**
+
+**Best idea of this run that was NOT taken:** print the breakdown row's name
+from `specRows` instead of a second map in `app.js` — one enumeration of what a
+door is, which is what `js/spec.js` exists for. It is refused for now because
+the two lists are not the same list: a breakdown row is a line of MONEY
+(`round`, `install`, `measure` are rows and are not specifications) and a spec
+row is a line of PRODUCT. Merging them would need a third table saying which
+keys are both, which is the constant §5.17 warns about. Recorded here so run
+104 does not re-propose it as new.
+
+**Proposed · taken · refused:** proposed the derived-key guard (taken), the
+`bd.*` strings (taken), the spec-row merge (refused, above), moving the
+fallback to a throw (refused, above).
+
+**Commit:** (pending — recorded in a follow-up commit once this entry lands,
+per the established two-commit pattern)
+
+---
+
 ## 2026-09-10 02:05 UTC — run 102: a customer who walked all eight steps reached Peretz as "I only had a question"
 
 **Looked at:** the fourth of run 99's nine, again in order of what it costs a

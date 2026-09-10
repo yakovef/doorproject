@@ -1431,10 +1431,25 @@ function tilePrice(g, o, state) {
  * WHAT EACH LINE OF THE BREAKDOWN IS CALLED.
  *
  * Keyed by `breakdownRows`' key, which is the FIELD — six components plus the
- * priced groups plus the rounding — and there are thirteen of them, not
- * sixty-odd options. That distinction is the same one `SPEC_ICONS` had to be
- * corrected on: a table keyed by the option would need an entry per product
- * and would silently draw nothing the day a new one arrived.
+ * priced groups plus the rounding, EIGHTEEN of them, not sixty-odd options.
+ * That distinction is the same one `SPEC_ICONS` had to be corrected on: a
+ * table keyed by the option would need an entry per product and would silently
+ * draw nothing the day a new one arrived.
+ *
+ * ⚠ AND THE COUNT ABOVE SAID THIRTEEN UNTIL 10.9.2026, WHICH IS THE WHOLE
+ * DEFECT IN ONE NUMBER. The פעמון and the עינית became priced fields on 30.8;
+ * `priceParts` emits them, this table was not extended, and the renderer below
+ * falls through to printing `r.key` — so a customer who bought the ₪300 ring
+ * opened the column under the price and read a row called **`bell`**, in
+ * Hebrew, English and Russian alike. §5's own family: a hand-kept map beside a
+ * DERIVED list, and a fallback quiet enough that only a customer could find it.
+ *
+ * ⚠ THE FALLBACK STAYS AND IS NOT THE GUARD. A row with money and no name is
+ * worse than a row with a programmer's name on it, and throwing here would
+ * blank the page — §5.20's lesson about `?sheet=1` is exactly that. The guard
+ * is in `npm test`, which sweeps every buildable door for every key
+ * `breakdownRows` can emit and requires a label here AND a string in all three
+ * languages, so this can never again be discovered by somebody spending ₪300.
  *
  * ⚠ `lock` AND `lockset` ARE DIFFERENT THINGS AND MUST NOT READ ALIKE. `lock`
  * is the multi-point mechanism inside every door Peretz sells, ₪200, part of
@@ -1448,6 +1463,7 @@ const BREAKDOWN_KEY = {
   detail: 'bd.detail', window: 'bd.window', grille: 'bd.grille',
   handle: 'bd.handle', lockset: 'bd.lockset', speciallock: 'bd.speciallock',
   pirzul: 'bd.pirzul', stripes: 'bd.stripes', round: 'bd.round',
+  bell: 'bd.bell', peephole: 'bd.peephole',
 };
 
 /**

@@ -544,6 +544,18 @@ export const UI = {
   'bd.speciallock':   ['מנעול מיוחד', 'Extra lock', 'Дополнительный замок'],
   'bd.pirzul':        ['פרזול', 'Hardware finish', 'Отделка фурнитуры'],
   'bd.stripes':       ['פסי מתכת', 'Metal strips', 'Металлические полосы'],
+  /* ⚠ ADDED 10.9.2026, TEN DAYS LATE. The פעמון and the עינית became priced
+     fields on 30.8 and `BREAKDOWN_KEY` was not extended, so `renderBreakdown`
+     fell through to printing the raw key: a customer who bought the ₪300 ring
+     opened the column under the price and read a row called `bell`, in all
+     three languages. The peephole's row is ₪0 and dropped, so it was invisible
+     — until A7 moves, which is one number away.
+     They are the GROUPS' own names (`g.bell`, `g.peephole`) said again rather
+     than referenced, because these two tables are read in different places and
+     a column heading is allowed to differ from a question's title; every other
+     `bd.*` here is written out the same way. */
+  'bd.bell':          ['פעמון', 'Doorbell', 'Звонок'],
+  'bd.peephole':      ['עינית', 'Peephole', 'Глазок'],
   'bd.round':         ['עיגול', 'Rounding', 'Округление'],
 
   /* ── sending it ───────────────────────────────────────────────── */

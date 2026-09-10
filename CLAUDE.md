@@ -1910,6 +1910,47 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE CUSTOMER WHO BOUGHT THE ₪300 פעמון READ A PRICE ROW CALLED `bell`,
+  IN ALL THREE LANGUAGES — 10.9.2026.** Fifth of the nine the customer walk
+  found, and the cheapest to fix of any of them: `renderBreakdown` titles each
+  row `BREAKDOWN_KEY[r.key] ? T(BREAKDOWN_KEY[r.key]) : r.key`, and the פעמון
+  and the עינית arrived on 30.8 without ever being added to that map. So the
+  column a customer opens to check what a door is made of ends
+  `door · cylinder · lock · mashkof · install · measure · bell — ₪300`, with
+  six Hebrew names and one raw identifier. Measured in node on the default
+  door plus a bell: rows `door=1295 cylinder=200 lock=200 mashkof=500
+  install=700 measure=300 bell=300`.
+  ⚠ **The עינית half is preventive and is recorded as preventive.**
+  `breakdownRows` drops every row worth ₪0 that is not in `ALWAYS`, and A7
+  prices the peephole at ₪0 because it is already included — so that row has
+  never actually printed. It is one number in `js/prices.js` away from
+  printing, which is exactly the shape of thing to fix while the map is open.
+  ⚠ **AND THE GUARD WRITTEN FOR THIS WAS BLIND TO THE ONE KEY THAT CAUSED IT,
+  WHICH IS WORTH MORE THAN THE FIX.** The first version collected the row keys
+  the `everyState()` sweep in `npm test` happened to EMIT and required each to
+  have a name. That sweep spreads `DEFAULTS`, where `bell` is `nobell` at ₪0 —
+  the row is dropped, the key never enters the set, and **deleting `bell` and
+  `peephole` from `BREAKDOWN_KEY` on purpose left the suite green**. Its own
+  §5.15 clause (`BREAKDOWN_SEEN.size >= 10`) passed happily on the ten keys it
+  could see. Found by falsifying, twice, not by reading it.
+  The list is DERIVED now: `priceParts` returns every key on every call, so
+  `new Set([...Object.keys(priceParts(DEFAULTS)), 'round'])` is the complete
+  set of rows the column can ever print — seventeen of them — and no sampling
+  decides what gets checked. The sweep is kept beside it with the question
+  reversed: anything actually emitted that the derived list does not contain
+  means `breakdownRows` has grown a row `priceParts` does not know about.
+  **Both falsifications fire now** — dropping the two entries names both keys,
+  and pointing one at a string nobody wrote (`bd.bellNope`) fails the
+  resolve half in all three languages, because `T()` returns the key when it
+  misses and `bd.bell` on the screen is the same defect wearing a prefix.
+  ⚠ **The fallback `: r.key` stays, and that is a decision.** Throwing there
+  would blank the page (§5.20 — a throw in the render path), and a row with
+  money and no name is worse than a row with money and an ugly name. The guard
+  lives in `npm test`, where it costs a customer nothing.
+  No price, no id, no list order, no bit, no `VERSION`; two strings, two map
+  entries, one stale docstring count (thirteen → eighteen). The 52 bare sheets
+  came back byte-identical.
+
 - **⚠ A CUSTOMER WHO WALKED ALL EIGHT STEPS REACHED PERETZ AS "I ONLY HAD A
   QUESTION" — 10.9.2026.** Fourth of the nine the customer walk found, and the
   one that lands on `PLAN.md` §0 most directly: the product is an order he can
@@ -2142,7 +2183,8 @@ how it got there. Detail lives in the section it belongs to.
   claims *"is gone"*, and it is not; a door walked step by step, or changed and
   changed back, reaches Peretz as *"I looked at the door the site opens with
   and I have a question"* (⚠ **fixed 10.9**; see the entry above); the breakdown prints the doorbell row as the raw key
-  `bell` in all three languages; six pull-bar tiles at four prices are one grey
+  `bell` in all three languages (⚠ **fixed 10.9, and the check written for it
+  was blind to `bell` itself**; see the entry above); six pull-bar tiles at four prices are one grey
   line, including the one whose difference is that it is black; on 6-7 of the 8
   phone steps the first tile's NAME and PRICE sit behind the fixed quote bar;
   and the repair toast is fixed-centred, landing 217 px from the panel on a
