@@ -109,8 +109,7 @@ how many questions the customer actually answered would tell him that — but it
 is a new claim in the one artefact that must not overstate, and it wants his
 opinion before it wants code (`ASK-PERETZ.md`), not a commit.
 
-**Commit:** (pending — recorded in a follow-up commit once this entry lands,
-per the established two-commit pattern)
+**Commit:** `0b98acd`
 
 ---
 
