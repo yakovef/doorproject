@@ -136,7 +136,7 @@ measure — and it should be measured in Russian.
 **proposed · taken · refused:** proposed 3 (price does not yield · way on
 becomes a disc · drop the send label below a breakpoint) · taken 1 · refused 2.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `cd4a722`
 
 ---
 
