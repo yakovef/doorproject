@@ -147,7 +147,7 @@ for. **That is the change to spend a fleet on next.**
 wider summary column · move the repair notice · cut one of the two send
 sentences) · taken 1 · refused 3.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `4de83ef`
 
 ---
 
