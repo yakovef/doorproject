@@ -2894,6 +2894,114 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── A PHONE HELD SIDEWAYS CAN SEE WHAT IT IS BEING ASKED ────────────────
+   ⚠ NOT IN `VIEWS`, DELIBERATELY, AND FOR THE PRICE SWEEP'S REASON. Every
+   viewport this audit walks is portrait or a desktop; a phone in landscape is
+   a shape none of the eight has, and adding one would cost a whole audit pass
+   per width. This carries its own five, once per run, in one language — the
+   sweep above proved the three agree here to the pixel, because the step's
+   title is one line in all of them and it is the LEDE that differs.
+
+   What it is for: until 12.9.2026 the short-screen compression block carried
+   `and (orientation: portrait)`, so a phone on its side got the full 56vh
+   stage on a 390 px screen and the step's own QUESTION rendered behind the
+   fixed quote bar — on every step, at 568x320, 667x375, 740x360, 844x390 and
+   932x430. The customer saw a rail, a room, a 65 x 157 px door, a price, and
+   `שלב 3 מתוך 8` with nothing under it.
+
+   ⚠ IT WALKS FORWARD WITH THE BUTTON. A rail click asks whether a step can be
+   REACHED; this asks what is on screen when you get there, and that difference
+   is the whole reason this class of fault survived every instrument here.
+
+   ⚠ AND THE TWO EXEMPTIONS ARE ASSERTED TO STILL BE NEEDED, which is the only
+   honest way to carry one. `fit` — the ARRIVAL step — is short at every width
+   in this sweep because `goStep` scrolls ~50 px on a step change and the boot
+   call does not (CLAUDE.md §9, the same mechanism as the 320x568 arrival), and
+   568x320 is short by FIVE pixels on every step, which this file's own rule
+   says to record rather than shave a margin to meet. Both are required to
+   REMAIN short: the day either stops being, this check fails and says so, and
+   the exemption comes out. A quiet exemption is how a fault becomes a
+   feature. */
+{
+  console.log('\na phone held sideways can see what it is being asked');
+  /* Its own, because `URL` above is scoped to the price sweep's block. */
+  const SIDEWAYS = `file://${process.cwd()}/index.html`;
+  const LAND = [[568, 320], [667, 375], [740, 360], [844, 390], [932, 430]];
+  const EXEMPT_W = 568;          /* short by 5 px on every step; §9 */
+  const EXEMPT_STEP = 'fit';     /* arrival; boot does not scroll */
+  let steps = 0, exemptSeen = 0, exemptWide = 0;
+  for (const [w, h] of LAND) {
+    const where = `landscape ${w}x${h}`;
+    const p = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await p.goto(SIDEWAYS, { waitUntil: 'load' });
+      await p.waitForTimeout(500);
+      for (let i = 0; i < 9; i++) {
+        const m = await p.evaluate(() => {
+          const live = document.querySelector('.sect.is-live');
+          if (!live) return { missing: 'no live step' };
+          const t = live.querySelector('.sect__title');
+          if (!t) return { missing: 'no .sect__title on the live step' };
+          const q = document.querySelector('.quote');
+          const qb = q ? q.getBoundingClientRect() : null;
+          /* The fold is the top of the FIXED quote bar, never innerHeight —
+             a heading that ends behind it is as unread as one off the screen,
+             and measuring against the viewport is the mistake this file
+             records being made and corrected once already. */
+          const fold = qb && qb.top > 0 && qb.top < innerHeight ? qb.top : innerHeight;
+          const r = t.getBoundingClientRect();
+          return {
+            key: live.dataset.section,
+            bar: !!qb,
+            short: Math.round(Math.max(0, r.bottom - fold)),
+            text: (t.textContent || '').trim().slice(0, 24),
+          };
+        });
+        if (m.missing) { fault(where, m.missing); break; }
+        if (!m.bar) { fault(where, 'no fixed quote bar, so this check has no fold to measure against'); break; }
+        const exempt = w === EXEMPT_W || m.key === EXEMPT_STEP;
+        if (!exempt) {
+          steps++;
+          if (m.short) {
+            fault(where, `step "${m.key}": its own question "${m.text}" ends `
+              + `${m.short} px behind the quote bar — the customer is shown a `
+              + 'step number and no question');
+          }
+        } else if (m.key === EXEMPT_STEP && w !== EXEMPT_W) {
+          exemptWide += m.short ? 1 : 0;
+        } else if (w === EXEMPT_W && m.key !== EXEMPT_STEP) {
+          exemptSeen += m.short ? 1 : 0;
+        }
+        if (i === 8) break;
+        const next = await p.$('.quote__next:not([hidden])');
+        if (!next) { fault(where, `step "${m.key}": no way on in the quote bar`); break; }
+        await next.click();
+        await p.waitForTimeout(300);
+      }
+    } catch (e) {
+      fault(where, `could not be walked: ${e.message}`);
+    }
+    await p.close().catch(() => {});
+  }
+  if (!steps) {
+    fault('landscape', 'not one step was measured — the sweep walked nothing');
+  }
+  /* The exemptions, asserted in the direction that makes them shrink. */
+  if (exemptSeen < 7) {
+    fault('landscape', `568x320 now shows its question on ${8 - exemptSeen} of 8 `
+      + 'steps — it was short on every one. Take the exemption out of this check '
+      + 'and out of CLAUDE.md §9');
+  }
+  if (exemptWide < LAND.length - 1) {
+    fault('landscape', 'the arrival step now fits at a landscape width it used to '
+      + 'miss — take the `fit` exemption out of this check and out of CLAUDE.md §9');
+  }
+  if (!faults) {
+    console.log(`    ${steps} steps across ${LAND.length - 1} landscape phones: the `
+      + 'question is on screen; arrival and 568x320 are the two named exemptions');
+  }
+}
+
 await b.close();
 
 if (skipped.length) {

@@ -2307,29 +2307,60 @@ svg { direction: ltr; }
    languages agreeing by a pixel is not a measurement — see the last line here
    for where the extra came from.
 
-   ⚠ SCOPED BY HEIGHT AND ORIENTATION, NOT BY WIDTH. A 390x844 phone has room
-   and must not pay for this; a 320x568 one has none. `orientation: portrait`
-   keeps a tablet held sideways out of it.
+   ⚠ SCOPED BY HEIGHT, NOT BY WIDTH. A 390x844 phone has room and must not pay
+   for this; a 320x568 one has none.
 
-   ⚠ AND THE REASON GIVEN FOR THAT EXCLUSION WAS MEASURED ON 11.9.2026 AND IS
-   FALSE. It read: *"1024x700 matches both the width and the height test and
-   has plenty of room."* It does not. At **1024x768 — an iPad in landscape,
-   the commonest posture there is — the band left for the question between the
-   stage and the quote bar is 205 px, against 200 px on a 320x568 phone**, on
-   4.3x the screen area, and 0 of the grip step's 9 tiles are whole above the
-   fold. The cause is one line: `.stage` is `clamp(40vh, 100vw, 56vh)`, and on
-   any wide-and-short viewport `100vw` runs past `56vh`, so the door is pinned
-   at its MAXIMUM exactly where the screen is shortest — 56% of 768 px. The
-   exclusion itself is left standing rather than widened here, because the
-   right answer is probably to stop capping at 56vh when the viewport is wide
-   and short, and that moves the door on a whole band and wants its own
-   measurement. CLAUDE.md §9 carries it. **A claim in a comment is not
-   evidence, and this one was doing damage while it sat there.**
+   ⚠ AND IT CARRIED `and (orientation: portrait)` UNTIL 12.9.2026, WHICH
+   EXCLUDED THE SCREENS THAT NEEDED IT MOST AND NOTHING ELSE. The reason
+   written here for that clause was *"it keeps a tablet held sideways out of
+   it — 1024x700 matches both the width and the height test and has plenty of
+   room."* Both halves are false, and each was measured rather than argued:
+
+   · **The tablets it names are already excluded by the HEIGHT test.** Every
+     tablet in landscape that anybody owns is taller than 700 px — 1024x768 is
+     768, and portrait ones are 1024, 1112, 1366. `max-height: 700px` has been
+     keeping them out on its own the whole time, so the orientation clause was
+     never load-bearing for its stated purpose. (Where a landscape tablet IS
+     short — 1024x600 — it wants this rule, and now gets it: the band left for
+     the question goes 131 → 215 px.)
+   · **1024x768 does not have plenty of room.** Measured 11.9: the band
+     between the stage and the quote bar is 205 px against a 320x568 phone's
+     200, on 4.3x the screen area, and 0 of the grip step's 9 tiles are whole.
+     That case is NOT fixed here — it fails `max-height: 700px` honestly — and
+     it is in CLAUDE.md §9 with its cause, which is `.stage`'s `clamp(40vh,
+     100vw, 56vh)` pinning the door at its MAXIMUM wherever `100vw` runs past
+     `56vh`, i.e. exactly where the screen is shortest.
+
+   So what the clause actually did was exclude **a phone held sideways**, and
+   measured on the grip step that is the worst arrival in the whole app:
+
+     | | stage | band | the step's own QUESTION |
+     |---|---|---|---|
+     | 568x320 | 179 | 8 | behind the quote bar |
+     | 667x375 | 210 | 32 | behind the quote bar |
+     | 740x360 | 202 | 25 | behind the quote bar |
+     | 844x390 | 218 | 38 | behind the quote bar |
+     | 932x430 | 241 | 56 | behind the quote bar |
+
+   On arrival a customer who turns their phone sideways sees a rail, a room, a
+   65 x 157 px door and a price — **and `שלב 3 מתוך 8` with no question under
+   it**. That is worse than the 320x568 case this block was written for, where
+   the question at least renders.
+
+   ⚠ **AND ROTATING DOES NOT BUY A BIGGER DOOR, WHICH IS THE OBJECTION TO
+   SHRINKING IT HERE AND IT DOES NOT SURVIVE A MEASUREMENT.** The crop is
+   height-driven (§3), so the leaf's size is set by the stage's HEIGHT: at
+   390x844 portrait the leaf is 120 x 290 px and at 844x390 it is **65 x 157**.
+   Landscape is already the worst place on this site to look at a door. Rule 4
+   applies at full strength — *the door may shrink to make the answer visible.*
+   After: 667, 740, 844 and 932 all show the question. **Every portrait
+   viewport is byte-identical**, checked at six of them, and 1024x768 is
+   untouched.
 
    ⚠ AFTER the rules it overrides, all four of them (`.stage`'s two blocks
    above, and `.sect__where` / `.sect__title` / `.sect__lede` directly above).
    §8, five times in this file and twice by me. */
-@media (max-width: 1099px) and (max-height: 700px) and (orientation: portrait) {
+@media (max-width: 1099px) and (max-height: 700px) {
   .stage { block-size: clamp(36vh, 100vw, 42vh); }
   .sect__where { margin-block-end: 3px; }
   .sect__title { margin-block-end: 4px; }

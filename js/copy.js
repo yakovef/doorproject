@@ -617,7 +617,17 @@ export const UI = {
                        'Каталожные размеры — проём замеряется на месте'],
   'sheet.sidelight':  ['חלון צד {0} מ״מ', 'sidelight {0} mm', 'боковое окно {0} мм'],
   'unit.mm':          ['מ״מ', 'mm', 'мм'],
-  'sheet.handing':    ['כיוון', 'Handing', 'Открывание'],
+  /* ⚠ THIS IS NOT `row.handing`, AND IN ENGLISH AND RUSSIAN IT USED TO BE.
+     The A4 sheet prints both: `row.handing` labels the short value (`ימין,
+     פנימה`) and this one labels the sentence that spells it out so it cannot
+     be misread (`ציר בצד ימין, צילינדר בצד שמאל — במבט מבחוץ`). Hebrew tells
+     them apart — פתיחה against כיוון — and the other two both read `Handing` /
+     `Открывание`, so the order document Peretz works from carried two adjacent
+     rows under one heading with two different values. Found 12.9 by reading
+     `?sheet=1` in Russian at the end of a walk, which is the half of the walk
+     that exists for exactly this. The label now names what the sentence is
+     about, which is the side the hinges are on. */
+  'sheet.handing':    ['כיוון', 'Hinge side', 'Сторона петель'],
   'sheet.grip':       ['ידית', 'Handle', 'Ручка'],
   /* ⚠ REWORDED 30.8.2026, AND THE FLAG THAT SHOWS IT IS STILL `false`.
      These two strings said the prices were "examples only", which was true for

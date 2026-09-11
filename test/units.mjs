@@ -4246,6 +4246,52 @@ group('and the opening is spelled out, so it cannot be read the wrong way round'
      'both handings produce the same sentence');
 }
 
+group('no two rows of the A4 order sheet carry the same heading');
+{
+  /* ⚠ FOUND ON THE ARTEFACT, NOT IN THE SOURCE — `?sheet=1` read in Russian
+     at the end of a walk, 12.9.2026. The sheet prints `specRows(state)` and
+     then two rows of its own: `sheet.handing` over the sentence that spells
+     the opening out, and `sheet.grip` over the handle notes. Hebrew keeps the
+     first two apart — פתיחה for the short value, כיוון for the sentence — and
+     **English and Russian both said `Handing` / `Открывание` for BOTH**, so
+     the document Peretz works from carried two adjacent rows under one
+     heading with two different values in it.
+
+     ⚠ THE CHECK IS THE GENERAL CLAIM, NOT THE TWO STRINGS. A test naming
+     `sheet.handing` would pass for ever the moment that one string was fixed
+     and say nothing about the next row anybody adds; a duplicate heading on
+     an order document is the defect, whichever pair produces it. So it
+     collects every heading the sheet emits, per language, per door, and
+     requires them distinct.
+
+     §5.15: it asserts it found headings at all, and that it found the two the
+     sheet adds on top of the spec's — a selector that stops matching is how a
+     check retires in silence. */
+  const SHEET_OWN = ['sheet.handing', 'sheet.grip'];
+  for (const lang of LANG_IDS) {
+    for (const st of [DEFAULTS,
+                      { ...DEFAULTS, window: 'rect', detail: 'panel', handle: 'idan' },
+                      { ...DEFAULTS, size: 'half', grille: 'grid', special: 'kodan' }]) {
+      const seen = withLang(lang, () => [
+        ...specRows(st).map(r => r.label),
+        ...SHEET_OWN.map(k => T(k)),
+      ]);
+      ok(seen.length >= 6,
+         `${lang}: the sheet reports only ${seen.length} headings — this check has `
+       + 'lost its subject');
+      for (const k of SHEET_OWN) {
+        const v = withLang(lang, () => T(k));
+        ok(v && v !== k,
+           `${lang}: ${k} resolves to "${v}", so the sheet prints a raw key as a heading`);
+      }
+      const dup = seen.filter((v, i) => seen.indexOf(v) !== i);
+      ok(!dup.length,
+         `${lang}: the order sheet prints the heading "${dup[0]}" on more than one row — `
+       + `a reader cannot tell which row is which (${seen.join(' · ')})`);
+    }
+  }
+}
+
 await checkLanguages();
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} passed, ${fail} failed\n`);

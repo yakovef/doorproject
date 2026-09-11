@@ -45,6 +45,139 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-12 00:05 UTC — run 110: a phone held sideways showed "step 3 of 8" and no question under it
+
+**Looked at:** the page as **the customer who turns the phone sideways** —
+844x390, with 568x320, 667x375, 740x360 and 932x430 beside it. A shape no walk
+has ever visited, none of the audit's eight viewports has, and one my own last
+run newly discriminated on. Recent lenses: 104 gallery, 105 mind-changer, 106
+English keyboard, 107 Russian at 320, 108 Peretz on a laptop, 109 the tablet
+band. Walked FORWARD with the button through all eight steps and the summary,
+screenshotting each and reading them as pictures; then the order the send
+button produces and `?sheet=1`, in Russian.
+
+**Instruments:** test ✓ 4,349,803 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets —
+**52 bare sheets byte-identical**.
+Done the cheap way, single-threaded, and saying so: the finding was in the
+second screenshot, the cause was one media feature, and the adversarial
+question ("does shrinking the door cost anything here?") is a measurement I
+could take myself in one sweep. There was nothing for a fleet to fan out over.
+`ultracode` deliberately not spent.
+
+**Changed, first:** `and (orientation: portrait)` is off the short-screen
+compression block. On arrival at 844x390 a customer saw a rail, a room, a
+**65 x 157 px** door, a price — and `שלב 3 מתוך 8` with the step's own QUESTION
+rendered behind the fixed quote bar. On every step. That is worse than the
+320x568 case §9 records, where the question at least renders.
+
+The clause excluded the screens that needed it most and nothing else. The
+reason written beside it was *"it keeps a tablet held sideways out of it —
+1024x700 matches both the width and the height test and has plenty of room."*
+Both halves measured, both false: **every tablet anybody owns is taller than
+700 px in landscape** (1024x768 is 768; portrait ones are 1024, 1112, 1366), so
+`max-height: 700px` had been excluding them on its own the whole time — and
+1024x768 does not have plenty of room either, which run 109 measured at 205 px
+against a 320 px phone's 200. What the clause did was exclude a phone on its
+side.
+
+| | stage | band | the step's question, before | after |
+|---|---|---|---|---|
+| 568x320 | 179→134 | 8→52 | 93 px behind the bar | **still 5 px** |
+| 667x375 | 210→158 | 32→84 | 61 behind | **on screen** |
+| 740x360 | 202→151 | 25→76 | 69 behind | **on screen** |
+| 844x390 | 218→164 | 38→93 | 52 behind | **on screen** |
+| 932x430 | 241→181 | 56→116 | 29 behind | **on screen** |
+| 1024x600 | 336→252 | 131→215 | on screen | on screen |
+
+⚠ **The objection to shrinking the door here is that somebody rotated their
+phone to see it bigger, and it does not survive a measurement.** The crop is
+height-driven (§3), so the leaf follows the stage's HEIGHT: **120 x 290 px at
+390x844 portrait against 65 x 157 at 844x390.** Landscape is already the worst
+place on this site to look at a door. The block's own rule 4 — *the door may
+shrink to make the answer visible* — applies at full strength.
+**Every portrait viewport is byte-identical**, checked at six, and 1024x768 is
+untouched because it fails the height test honestly.
+
+⚠ **The check carries its own five viewports and its two exemptions are
+asserted to still be needed.** `VIEWS` is all portrait or desktop and adding a
+width costs a whole audit pass, so this is a standalone sweep like the price
+figure's. It walks FORWARD with the button, because a rail click asks whether a
+step can be REACHED and this asks what is on screen when you get there — the
+difference that let this class of fault survive every instrument here. Arrival
+(`goStep` scrolls ~50 px, boot does not) and 568x320 (short by **five** pixels,
+which this project records rather than shaves a margin to meet) are named, and
+the check **fails if either stops being short**. One language: measured, the
+three agree to the pixel, because the title is one line in all of them and it
+is the LEDE that differs. **Falsified** by restoring the clause: **32 faults**,
+eight steps x four phones, each naming the question and the pixels.
+
+**Changed, second — found by reading `?sheet=1`, which is what that half of the
+walk is for.** The A4 order sheet printed **two adjacent rows under one
+heading** in English and in Russian. It prints `specRows(state)` and then two
+rows of its own: `row.handing` over the short value (`ימין, פנימה`) and
+`sheet.handing` over the sentence that spells it out (`ציר בצד ימין, צילינדר
+בצד שמאל — במבט מבחוץ`). Hebrew keeps them apart — **פתיחה** against **כיוון** —
+and English and Russian both said `Handing` / `Открывание` for BOTH. `Hinge
+side` / `Сторона петель` now, which is what that sentence is about.
+⚠ **The assertion is the general claim, not the two strings.** A test naming
+`sheet.handing` would pass for ever the moment that one string was fixed and
+say nothing about the next row anybody adds. `npm test` collects every heading
+the sheet emits, per language, per door, and requires them distinct, with
+§5.15 clauses that it found headings at all and that the sheet's own two
+resolve rather than printing a raw key. **Falsified** by putting the old
+strings back: six faults, three doors x two languages, each printing the whole
+heading list.
+
+**The order itself, read and found correct.** A Russian customer on a
+landscape phone choosing white, an Idan bar and a Coral lever: **₪3,845** =
+3195 + 650 (Idan is 105 cm, over Peretz's metre), the white is one of the three
+included colours at ₪0 and the Coral is the lever "all of them in the price"
+covers. The message carries the line naming the language the customer built in,
+and is Hebrew for Peretz. `?sheet=1` on the code the page itself shows: no
+page errors, bilingual, every row present.
+
+No price, no id, no list order, no bit, no `VERSION`; one media feature and one
+string in two languages.
+
+**Left alone deliberately:**
+· **The two residuals above**, both in §9 with their arithmetic. 568x320 at
+  five pixels is the tempting one and the one this file's own rule forbids
+  chasing — a number that comes out at 0 or 1 is a coincidence, not a
+  measurement.
+· **1024x768**, which is §9's own item from run 109 and is NOT fixed by this:
+  it fails `max-height: 700px` honestly. Its answer is `.stage`'s
+  `clamp(40vh, 100vw, 56vh)` pinning the door at its maximum wherever `100vw`
+  runs past `56vh`, and that moves the door on a whole band.
+· **The option grids' auto-fill holes**, still the best NEW idea in the
+  building and still not taken — run 109 measured them (893 px of hole on the
+  face step at 1024) and the reason for waiting has not changed: `auto-fit`
+  alone makes two tiles 486 px wide, a track max re-creates the hole, and
+  capping the card costs the big groups the columns a tablet is good for.
+
+**Best idea of the run that was NOT taken:** the landscape phone is the one
+posture where this page's whole layout is wrong rather than tight. The stage
+is above the flow because a portrait phone is tall; sideways there is 844 px of
+width and 390 of height, which is the DESKTOP's shape, and the desktop already
+knows what to do with it — door beside the questions rather than above them.
+The two-column layout starts at 1100 because the panel wants 420 and the stage
+wants the rest; at 844 that is 420 + 424, which is more stage than the 218 px
+strip it gets today. **Lowering the two-column breakpoint for LANDSCAPE only**
+would give the door more room AND put the question beside it, instead of
+trading one against the other — which is what every fix in this band has had
+to do so far. Refused here because it is a layout change to every screen in a
+band on the first run that has walked it, and it wants an adversarial second
+opinion and a measurement of what the panel does at 420 in a 390 px-tall
+window. **That is the change to spend a fleet on next.**
+
+**proposed · taken · refused:** proposed 4 (drop the orientation clause ·
+distinct sheet headings · shave 5 px at 568x320 · two columns in landscape) ·
+taken 2 · refused 2.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-11 17:05 UTC — run 109: on an iPad the summary stated the door as nine unlabelled words
 
 **Looked at:** the page as **the customer on a TABLET** — 768x1024, 834x1112

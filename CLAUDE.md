@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1615,6 +1615,25 @@ grip controls above the chip instead of beside it; or let the grip controls
 sit on the leaf at these widths only. `npm run audit` names the two viewports
 and the one control explicitly, so the exemption shrinks the day this is
 fixed and nothing else can hide behind it.
+
+### ⚠ A PHONE HELD SIDEWAYS: TWO RESIDUALS, BOTH MEASURED
+
+Closed on 12.9 for 667×375, 740×360, 844×390, 932×430 and 1024×600 — see §0b —
+and two cases are left, both recorded rather than shaved:
+
+- **Arrival.** On step 01 the question still ends 29–69 px behind the quote bar
+  (Hebrew and English; 44–84 in Russian), for the reason §9 already records at
+  320×568: `goStep` scrolls ~50 px on a step change and the boot call does not.
+  Every step the customer reaches with the button is fine.
+- **568×320 — an iPhone SE on its side — is short by FIVE pixels**, on every
+  step, in all three languages. Five is not a pass and it is not a reason to
+  shave a margin: this file's own rule is that a number coming out at 0 or 1 is
+  a coincidence, not a measurement. 62 px of rail and 71 of quote bar out of
+  320 leaves 187, and that is the arithmetic.
+
+`npm run audit` carries both as NAMED exemptions and **asserts they are still
+needed** — it fails if either stops being short, so the exemption comes out the
+day it is fixed rather than outliving the fault.
 
 ### ⚠ AN iPAD IN LANDSCAPE GETS 5 px MORE ROOM FOR THE QUESTION THAN A 320 px PHONE
 
@@ -1980,6 +1999,78 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ A PHONE HELD SIDEWAYS SHOWED `שלב 3 מתוך 8` AND NO QUESTION UNDER IT, ON
+  EVERY STEP — 12.9.2026.** Found by walking as **the customer who turns the
+  phone sideways**, 844×390, a shape no walk had ever visited and one none of
+  the audit's eight viewports has. On arrival: a rail, a room, a **65 × 157 px**
+  door, a price — and the step's eyebrow with its own QUESTION rendered behind
+  the fixed quote bar. Worse than the 320×568 case §9 records, where the
+  question at least renders.
+  ⚠ **THE CAUSE IS `and (orientation: portrait)` ON THE SHORT-SCREEN
+  COMPRESSION BLOCK, AND IT EXCLUDED THE SCREENS THAT NEEDED IT MOST AND
+  NOTHING ELSE.** The reason written beside that clause was *"it keeps a tablet
+  held sideways out of it — 1024x700 matches both the width and the height test
+  and has plenty of room."* Both halves measured, both false:
+  **every tablet anybody owns is taller than 700 px in landscape** (1024×768 is
+  768; portrait ones are 1024, 1112, 1366), so `max-height: 700px` had been
+  excluding them on its own the whole time and the orientation clause was never
+  load-bearing for its stated purpose — and 1024×768 does not have plenty of
+  room either (§9, measured 11.9: 205 px against a 320 px phone's 200). What
+  the clause actually did was exclude a phone on its side. Measured on the grip
+  step, the step's own question against the fold:
+
+  | | stage | band | before | after |
+  |---|---|---|---|---|
+  | 568×320 | 179→134 | 8→52 | 93 px behind the bar | **still 5 px** |
+  | 667×375 | 210→158 | 32→84 | 61 behind | **on screen** |
+  | 740×360 | 202→151 | 25→76 | 69 behind | **on screen** |
+  | 844×390 | 218→164 | 38→93 | 52 behind | **on screen** |
+  | 932×430 | 241→181 | 56→116 | 29 behind | **on screen** |
+  | 1024×600 | 336→252 | 131→215 | on screen | on screen |
+
+  ⚠ **AND ROTATING DOES NOT BUY A BIGGER DOOR, WHICH IS THE OBJECTION TO
+  SHRINKING IT AND IT DOES NOT SURVIVE A MEASUREMENT.** The crop is
+  height-driven (§3), so the leaf's size follows the stage's HEIGHT: 120 × 290
+  px at 390×844 portrait against **65 × 157** at 844×390. Landscape is already
+  the worst place on this site to look at a door, so the block's own rule 4 —
+  *the door may shrink to make the answer visible* — applies at full strength.
+  **Every portrait viewport is byte-identical**, checked at six; 1024×768 is
+  untouched because it fails `max-height: 700px` honestly.
+  ⚠ **THE CHECK CARRIES ITS OWN FIVE VIEWPORTS, AND ITS TWO EXEMPTIONS ARE
+  ASSERTED TO STILL BE NEEDED.** `VIEWS` is all portrait or desktop and adding
+  a width costs a whole audit pass, so this is a standalone sweep like the
+  price figure's — five landscape phones, walked FORWARD with the button,
+  because a rail click asks whether a step can be REACHED and this asks what is
+  on screen when you get there. Arrival (`goStep` scrolls ~50 px and boot does
+  not) and 568×320 (short by **five** pixels, which this file's own rule says
+  to record rather than shave a margin to meet) are named exemptions, and the
+  check **fails if either stops being short** — a quiet exemption is how a
+  fault becomes a feature. One language: measured, the three agree to the
+  pixel here, because the title is one line in all of them and it is the LEDE
+  that differs. **Falsified** by restoring the clause: **32 faults**, eight
+  steps × four phones, each naming the question and the pixels.
+  No price, no id, no list order, no bit, no `VERSION`; one media feature
+  deleted.
+
+- **⚠ AND THE ORDER SHEET PRINTED TWO ROWS UNDER ONE HEADING, IN ENGLISH AND IN
+  RUSSIAN — 12.9.2026.** Found in the same walk by reading `?sheet=1`, which is
+  the half of a walk that exists for exactly this. The A4 sheet prints
+  `specRows(state)` and then two rows of its own: `row.handing` labels the short
+  value (`ימין, פנימה`) and `sheet.handing` labels the sentence that spells it
+  out (`ציר בצד ימין, צילינדר בצד שמאל — במבט מבחוץ`). Hebrew keeps them apart —
+  **פתיחה** against **כיוון** — and English and Russian both said `Handing` /
+  `Открывание` for BOTH, so the document Peretz works from carried two adjacent
+  rows with one heading and two different values. `Hinge side` / `Сторона
+  петель` now, which is what that sentence is about.
+  ⚠ **THE ASSERTION IS THE GENERAL CLAIM, NOT THE TWO STRINGS.** A test naming
+  `sheet.handing` would pass for ever the moment that one string was fixed and
+  say nothing about the next row anybody adds. `npm test` collects **every
+  heading the sheet emits**, per language, per door, and requires them
+  distinct, with §5.15 clauses that it found headings at all and that the two
+  the sheet adds resolve rather than printing a raw key. **Falsified** by
+  putting `Handing` / `Открывание` back: six faults, three doors × two
+  languages, each printing the whole heading list.
 
 - **⚠ ON AN iPAD THE SUMMARY STATED THE DOOR AS NINE UNLABELLED WORDS, AND THE
   BREAKPOINT THAT DECIDED THAT WAS THE LAYOUT'S, NOT THE QUESTION'S —
