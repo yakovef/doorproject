@@ -130,7 +130,7 @@ run that can measure it). Done the cheap way on purpose: one browser, no
 fan-out — the finding came from reading one predicate against five addresses,
 and `ultracode` would have bought nothing.
 
-**Commit:** (pending — recorded in a follow-up commit)
+**Commit:** `5c172ac`
 
 ---
 
