@@ -186,7 +186,7 @@ looking like a page and looking like content that failed to load.
 two-axis gate · correcting the false comment · the grid holes · un-capping the
 stage when wide and short) · taken 3 · refused 2.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `3a91083`
 
 ---
 
