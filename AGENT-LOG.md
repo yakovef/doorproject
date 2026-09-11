@@ -45,6 +45,112 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-11 12:05 UTC — run 108: the summary explained itself before it showed the door
+
+**Looked at:** the page as **PERETZ, on his own laptop, opening the link a
+customer sent him** — the reader of the product, and a lens no run had used as
+its primary one (99 Hebrew walk, 104 gallery, 105 mind-changer, 106 English
+keyboard, 107 Russian 320 phone). Three doors a customer would actually send —
+the standard ₪3,195, a glazed one with a gold פרזול, a big one — read at
+1440×900 as he would: the summary, the price column opened, the order the send
+button produces, and `?sheet=1`. Then the same summary measured at 1100, 1280,
+1680 and 1920.
+
+**Instruments:** test ✓ 4,349,768 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets —
+**52 bare sheets byte-identical**, all 12 `shot` moved, which was PREDICTED:
+run 106 records that every one of their twelve queries is a non-default door
+and so arrives at the summary, the one surface this run changed.
+Done the cheap way again, single-threaded. The finding came out of three
+screenshots and a stack measurement and the fix is one DOM call; there was
+nothing for a fleet to fan out over. `ultracode` deliberately not spent.
+
+**Read and found correct, rather than changed:** the order Peretz receives on
+all three doors (every row matches the summary on screen, the price agrees,
+both caveats and the code present, Hebrew for him whichever language the
+customer used); the A4 sheet on all three (no page errors, bilingual, and it
+prints the repair notice at the foot — the glazed door's *"we removed the pull
+handle"* and the big one's *"some options in the link are unavailable"*, which
+is exactly what he needs to know about a link that was repaired on the way in);
+the price column adding up on all three (the loud door 1619+250+250+625+875+375
++4200+800+200+1 = 9195 ✓); and the ₪0 grille correctly printing no row, which
+I checked against `js/prices.js` rather than assuming.
+
+**Changed:** where the summary's explainer sits. Every question step appends
+its `<details>` AFTER the answers — `buildPanel` builds the groups, then the
+disclosure. The summary came out the other way round and **not by anybody's
+decision**: its explainer is appended when the step is BUILT and
+`.panel--send` (the spec table, the price line, the code) is moved in LATER by
+`goStep`, so the order was an artefact of which code ran first.
+
+It cost the step that the whole site exists to produce. At **1280×720 — the
+commonest laptop, and one of the audit's own eight viewports** — the fold is
+612 and the spec table began at **568**: not one of the eight rows was whole on
+screen, under a lede reading *"בדקו שהכול נכון"*, check that everything is
+right. **The page asked the customer to proof-read a list it was not showing
+them.** `slot.appendChild(send)` → `slot.insertBefore(send, .sect__exp)`, which
+appends unchanged when there is no explainer. Whole rows, standard door:
+1100 **2→4** · 1280 **0→1** · 1440 **5→6** · 1680 **7→8** · 1920 **6→7**.
+
+⚠ **My own forecast was wrong and is corrected in the code rather than quietly
+dropped.** The comment I wrote before the run said the table would start at 507
+and four rows would be whole at 1280; it starts at 523 and one row is — I had
+double-counted a gap. Re-measured and rewritten before it was committed. §6
+applies to a prediction as much as to a constant.
+
+⚠ **The assertion is the ORDER, not a row count.** The obvious check — "at
+least one spec row whole above the fold" — is met at 1280 by exactly one row,
+and CLAUDE.md §0b already records what a gate with no margin is worth (the
+band-mean profile proposal, 0.090 against a tolerance of 0.09). A DOM order is
+binary and cannot drift to within a pixel of failing. The audit checks both the
+markup order and the DRAWN order, because an `order` or `flex-direction` could
+put them back visually while the markup stayed right. §5.15 clauses for the
+step, the explainer and the send card. **Falsified** by restoring the append:
+one fault, naming both y positions.
+
+No price, no id, no list order, no bit, no `VERSION`.
+
+**Left alone deliberately:**
+· **1280×720 still showing one row of eight.** It is arithmetic: the table is
+  317 px and would have to start at 295, behind 92 px of heading and the
+  122 px handing confirmation — which is `UX-FINDINGS` §2, *the one default
+  that costs real money put back to the customer*, asserted whole on screen at
+  every viewport. One of them has to yield and both were put there on purpose.
+  CLAUDE.md §9 records it beside the wall that cannot hold both its controls,
+  with the three ways out.
+· **The repair notice's placement.** On a 1440 desktop it sits in the extreme
+  top-right corner of the window, in the smallest type on the page, ~900 px
+  from the door it is about — and it is the one sentence telling Peretz the
+  door he is looking at is not the door the customer built. I did not move it:
+  it is not silent (it is also printed on the A4 sheet and I confirmed that on
+  two doors this run), and where a page-level notice belongs at five viewports
+  is its own measurement, not the tail of a run.
+· **The two "send it to us" sentences** — the lede at y=238 and `send__lead` at
+  y=866, 628 px apart on one screen, both telling the customer to send. Copy is
+  free per `AGENT.md`, but they sit in different contexts (the step's
+  instruction and the card's) and cutting one is a copy decision I would want
+  to make against all three languages, not against Hebrew alone.
+
+**Best idea of the run that was NOT taken:** the summary is the one step with
+no tiles to lay out, so it is the one step that does not need a
+tile-width column — and at 1280 the stage beside it is ~840 px holding a
+250 px door. Giving the summary alone a wider (or full-width) panel would make
+the spec fit at every width this app has, and it costs no drawing: `fitStage`
+only ever WIDENS `FIT_BOX` to the stage's shape, so width taken off the stage
+costs the leaf nothing — measured on 31.8 at four widths, identical to a tenth
+of a pixel. Refused here because it is a layout change to the page's most
+load-bearing screen on one run's single lens, and it wants an adversarial
+second opinion before it is pushed — which is precisely what `ultracode` is
+for. **That is the change to spend a fleet on next.**
+
+**proposed · taken · refused:** proposed 4 (explainer after the spec · a
+wider summary column · move the repair notice · cut one of the two send
+sentences) · taken 1 · refused 3.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-11 07:05 UTC — run 107: the one number on the page was painted under the green button
 
 **Looked at:** the page as **the Russian-speaking customer on a 320x568 phone**

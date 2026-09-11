@@ -9105,7 +9105,9 @@ ${body}
       }
     }
     const slot = $("#sum-slot"), send = document.querySelector(".panel--send");
-    if (slot && send && send.parentElement !== slot) slot.appendChild(send);
+    if (slot && send && send.parentElement !== slot) {
+      slot.insertBefore(send, slot.querySelector(".sect__exp"));
+    }
     placeSend();
     markMore();
     markSteps();

@@ -1834,9 +1834,39 @@ function goStep(key, focus = true) {
   /* The send card lives in the summary step and nowhere else. It is MOVED
      rather than copied — `index.html` still owns the markup, and two copies of
      the price and the spec table is the one duplication this codebase has paid
-     for most often. */
+     for most often.
+
+     ⚠ BEFORE THE EXPLAINER, NOT AFTER IT — 11.9.2026. Every one of the eight
+     question steps appends its `<details>` AFTER the answers (`buildPanel`),
+     because "what is a משקוף?" is a question somebody asks while looking at
+     the tiles, not before reaching them. The summary came out the other way
+     round, and not by anybody's decision: the explainer is appended when the
+     step is BUILT and this card is moved in LATER, so the order was an
+     artefact of the clock rather than of the argument. It cost the one thing
+     the summary is short of.
+     Measured at 1280x720, the commonest laptop, on a customer's shared link:
+     the spec table began at y=568 against a fold of 612, so **not one of the
+     eight rows was whole on screen** under a lede that says "check that
+     everything is right". The explainer is 45 px and a gap, and the table
+     moves up by exactly that: 568 → 523. Whole rows, standard door:
+
+       1100  2 → 4      1280  0 → 1      1440  5 → 6
+       1680  7 → 8      1920  6 → 7
+
+     ⚠ AND 1280 IS STILL ONE ROW, WHICH IS ARITHMETIC AND NOT A TUNING
+     PROBLEM. The fold there is 612 and the table is 317 px, so it would have
+     to start at 295; what stands above it is 92 px of heading, the 122 px
+     handing confirmation (`UX-FINDINGS` §2, deliberate, and asserted whole on
+     screen at every viewport) and the card's own padding. One of those would
+     have to go. Recorded in CLAUDE.md §9 rather than guessed at, like the
+     wall that cannot hold both its controls.
+
+     `insertBefore(node, null)` appends, so a summary with no explainer
+     behaves exactly as before. */
   const slot = $('#sum-slot'), send = document.querySelector('.panel--send');
-  if (slot && send && send.parentElement !== slot) slot.appendChild(send);
+  if (slot && send && send.parentElement !== slot) {
+    slot.insertBefore(send, slot.querySelector('.sect__exp'));
+  }
 
   placeSend();
   markMore();

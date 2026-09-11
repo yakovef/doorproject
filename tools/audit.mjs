@@ -2468,6 +2468,72 @@ for (const v of VIEWS) {
   await pg.close();
 }
 
+/* ⚠ AND THE SUMMARY SHOWS THE DOOR BEFORE IT EXPLAINS ITSELF — 11.9.2026.
+   Every one of the eight question steps appends its `<details>` AFTER the
+   answers, because "what is a משקוף?" is asked while looking at the tiles.
+   The summary came out the other way round and not by anybody's decision: the
+   explainer is appended when the step is BUILT and `.panel--send` — the spec
+   table, the price line and the code — is moved in LATER, so the order was an
+   artefact of the clock. It cost 45 px of the one axis this step has none of,
+   and at 1280x720 that was the difference between one whole spec row on
+   screen and NONE, under a lede reading "check that everything is right".
+
+   ⚠ THE ASSERTION IS THE ORDER, NOT A PIXEL COUNT, AND THAT IS DELIBERATE.
+   The obvious check — "at least one spec row is whole above the fold" — is
+   met at 1280 by exactly one row, and this file already records what a gate
+   with no margin is worth (§0b, the band-mean profile proposal: "our light
+   band lands at 0.090 against a tolerance of 0.09 — it passes only because
+   the comparison is `>`"). A DOM order is binary: it cannot drift to within a
+   pixel of failing, and it fails the instant somebody restores the append.
+   The pixel arithmetic that is still short at 1280 is in CLAUDE.md §9, where
+   decisions above CSS are recorded rather than guessed at.
+
+   §5.15 in both directions: it fails if the summary has no explainer, no send
+   card, or if the two stop sharing a parent — any of which would retire the
+   check silently.
+   Falsified by restoring `slot.appendChild(send)`: fires at every viewport. */
+{
+  console.log('\n  the summary shows the door before it explains itself');
+  const pg = await b.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+  await pg.goto(`file://${process.cwd()}/index.html`
+    + '?c=rb-7021d&w=rect&d=panel&k=plate&pz=pz-gold');
+  await pg.waitForSelector('#stage svg');
+  await pg.waitForTimeout(900);
+  const o = await pg.evaluate(() => {
+    const sum = document.querySelector('.sect[data-section="sum"]');
+    if (!sum) return { noStep: true };
+    const body = sum.querySelector('.sect__body');
+    const exp = body?.querySelector(':scope > .sect__exp');
+    const send = body?.querySelector(':scope > .panel--send');
+    if (!body || !exp || !send) {
+      return { missing: `body=${!!body} exp=${!!exp} send=${!!send}` };
+    }
+    const kids = [...body.children];
+    /* Both in the DOM and on the page: a `order`/`flex-direction` in the
+       stylesheet could put them back the wrong way round visually while the
+       markup stayed right, and the customer reads the page. */
+    return {
+      domSendFirst: kids.indexOf(send) < kids.indexOf(exp),
+      drawnSendFirst: send.getBoundingClientRect().top < exp.getBoundingClientRect().top,
+      specTop: +(send.querySelector('.spec')?.getBoundingClientRect().top ?? -1).toFixed(0),
+      expTop: +exp.getBoundingClientRect().top.toFixed(0),
+    };
+  });
+  if (o.noStep || o.missing) {
+    fault('summary', 'the summary-order check cannot find its subject '
+      + `(${o.noStep ? 'no sum step' : o.missing}) — it is dead`);
+  } else if (!o.domSendFirst || !o.drawnSendFirst) {
+    fault('summary', 'the summary explains itself before it shows the door: the '
+      + `<details> ${o.domSendFirst ? 'is drawn' : 'sits in the markup'} above the spec `
+      + `table (explainer at y=${o.expTop}, spec at y=${o.specTop}). Every question `
+      + 'step puts its explainer after the answers; this one costs the spec a row '
+      + 'of the only axis the summary is short of');
+  } else if (!faults) {
+    console.log(`    the spec comes first (spec y=${o.specTop}, explainer y=${o.expTop})`);
+  }
+  await pg.close();
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    THE HINGE TRAP — PLAN.md §6.1, and the one check this phase exists for.
    ═══════════════════════════════════════════════════════════════════

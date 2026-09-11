@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1615,6 +1615,34 @@ grip controls above the chip instead of beside it; or let the grip controls
 sit on the leaf at these widths only. `npm run audit` names the two viewports
 and the one control explicitly, so the exemption shrinks the day this is
 fixed and nothing else can hide behind it.
+
+### ⚠ THE SUMMARY CANNOT SHOW ITS WHOLE SPEC AT 1280×720
+
+Found 11.9 reading the page as Peretz opening a customer's link, and **partly
+fixed the same day** — the explainer moved below the spec, which bought 45 px
+and took 1280 from **0 whole rows to 1** (1100 2→4, 1440 5→6, 1680 7→8, 1920
+6→7). What is left is arithmetic, not tuning.
+
+At 1280×720 the choices column gets 690 px, the sticky foot takes 93, and the
+spec table is **317 px**. For the whole table to clear the fold it would have
+to start at 295; it starts at 523, behind 92 px of heading, the **122 px
+handing confirmation** and the card's own padding. Nothing left above it is
+spare: the heading names the step, and the handing card is `UX-FINDINGS` §2 —
+*the one default that costs real money, put back to the customer* — which the
+audit asserts WHOLE on screen at all eight viewports.
+
+So one of them has to yield, and both were put there on purpose. **Same shape
+as the wall above**, and the same instruction: recorded rather than guessed at.
+
+Three ways out, cheapest first: a denser spec row (35 px today, and the table
+is the one thing on this screen a customer is told to read); the handing
+confirmation folded into the spec's own פתיחה row, which it already duplicates
+in words — **but that row is the `handingWords()` sentence the ORDER carries,
+and §2 put the confirmation first on purpose, so this is a product decision**;
+or the summary taking a wider column than a question step, since it has no
+tiles to lay out. ⚠ `npm run audit` asserts the ORDER of the two blocks and
+not a row count, deliberately: a count that passes at 1280 by exactly one row
+is a gate with no margin, which §0b records as worse than no gate at all.
 
 ### Blocked on a human — `ASK-PERETZ.md`
 ⚠ Every number in this paragraph is a section of THAT file, not of this one.
@@ -1915,6 +1943,62 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE SUMMARY EXPLAINED ITSELF BEFORE IT SHOWED THE DOOR, AND THE ORDER
+  WAS AN ARTEFACT OF THE CLOCK — 11.9.2026.** Found by reading the page as
+  **Peretz on his own laptop, opening the link a customer sent him** — the
+  reader of the product, and a lens no run had used as its primary one.
+  Every one of the eight question steps appends its `<details>` explainer
+  AFTER the answers: `buildPanel` builds the option groups, then the
+  disclosure, because *"what is a משקוף?"* is a question somebody asks while
+  looking at the tiles. **The summary came out the other way round, and not by
+  anybody's decision.** Its explainer is appended when the step is BUILT;
+  `.panel--send` — the spec table, the price line, the code — is moved in
+  LATER by `goStep`, so the order was decided by which code ran first.
+  ⚠ **AND THE STEP IT COST IS THE ONE THE WHOLE SITE EXISTS TO PRODUCE.**
+  Measured on a shared link at **1280×720, the commonest laptop and one of the
+  audit's own eight viewports**: the fold (the sticky foot's top) is at 612 and
+  the spec table began at **568**, so **not one of the eight rows was whole on
+  screen** — under a lede that says, in as many words, *"בדקו שהכול נכון"*:
+  check that everything is right. **The page asked the customer to proof-read a
+  list it was not showing them.** The explainer is 45 px and a gap, and the
+  table moves up by exactly that, 568 → 523. Whole spec rows on the standard
+  door:
+
+  | | 1100 | 1280 | 1440 | 1680 | 1920 |
+  |---|---|---|---|---|---|
+  | before | 2 | **0** | 5 | 7 | 6 |
+  | after | 4 | **1** | 6 | 8 | 7 |
+
+  ⚠ **AND 1280 IS STILL ONE ROW, WHICH IS ARITHMETIC RATHER THAN TUNING.** The
+  table is 317 px and would have to start at 295; what stands above it is 92 px
+  of heading, the 122 px handing confirmation (`UX-FINDINGS` §2, deliberate,
+  and asserted whole on screen at all eight viewports) and the card's own
+  padding. One of them would have to yield. §9 records it beside the wall that
+  cannot hold both its controls — **a decision above CSS, not a number to
+  nudge.**
+  ⚠ **MY OWN PREDICTION WAS WRONG AND IS CORRECTED RATHER THAN QUIETLY
+  DROPPED.** The comment written before the run said the table would start at
+  507 and four rows would be whole at 1280; it starts at 523 and one row is.
+  The arithmetic had double-counted a gap. §6: get the number again before
+  writing it down — including when the number is your own forecast.
+  ⚠ **THE ASSERTION IS THE ORDER, NOT A PIXEL COUNT, AND THAT IS THE PART
+  WORTH KEEPING.** The obvious check — *at least one spec row whole above the
+  fold* — is met at 1280 by exactly one, and this log already records what a
+  gate with no margin is worth (the band-mean `profile` proposal: *"our light
+  band lands at 0.090 against a tolerance of 0.09 — it passes only because the
+  comparison is `>`"*). A DOM order is binary: it cannot drift to within a
+  pixel of failing. `npm run audit` asserts the send card precedes the
+  explainer **both in the markup and in the drawn geometry** — a
+  `flex-direction` or an `order` could put them back the wrong way round
+  visually while the markup stayed right, and the customer reads the page —
+  with §5.15 clauses for the step, the explainer and the card. **Falsified** by
+  restoring `slot.appendChild(send)`: one fault, naming both y positions.
+  No price, no id, no list order, no bit, no `VERSION`; one `appendChild`
+  became an `insertBefore`. The 52 bare sheets came back **byte-identical**;
+  **all 12 `shot` sheets moved, which is the right answer and was predicted** —
+  run 106 records that every one of their twelve queries is a non-default door
+  and therefore arrives at the summary, which is the one surface this changed.
 
 - **⚠ THE ONE NUMBER ON THE PAGE WAS PAINTED UNDER THE GREEN BUTTON, ON THE
   PHONES PEOPLE ACTUALLY OWN — 11.9.2026.** ⚠ **NOT one of the nine the
