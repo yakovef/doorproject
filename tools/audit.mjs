@@ -2631,6 +2631,137 @@ for (const v of VIEWS) {
   await pg.close();
 }
 
+/* ⚠ THE PRICE MUST BE READABLE, WHICH IS NOT THE SAME AS ON SCREEN —
+   11.9.2026. The step walk above already asks `priceSeen`, and that question
+   is "does this element intersect the viewport". It passed for an unknown
+   number of commits while ₪3,195 was painted 23.4 px UNDER the green send
+   pill at 320x568 in Russian — the one number on the page, on the screen with
+   the least room for it. Same blind spot the toast-placement check was
+   written for, one bar down: a box that is where it should be, and a box with
+   something on top of it, look identical to an intersection test.
+
+   ⚠ THREE LANGUAGES, BECAUSE IT CANNOT BE FOUND IN ONE. The send's label is
+   the widest thing in that row and it is 13 characters in Hebrew, 16 in
+   English and 20 in Russian — Hebrew clears it at every width and Russian
+   does not. A check run in the page's default language is a check that cannot
+   see its own subject.
+
+   ⚠ AND ITS OWN WIDTHS, WHICH IS WHY IT IS NOT IN THE `VIEWS` LOOP. The worst
+   case is at **360 and 375**, not at 320, because the compression block in
+   `css/app.css` stops at `max-width: 359px` — so the two widths where the
+   deficit is largest (34.1 and 19.1 px against 320's 31.4) are the two this
+   audit has never visited. CLAUDE.md §7's "go and find the third case" for
+   the third time, and adding them to `VIEWS` would have cost a whole audit
+   pass each to answer a question about one bar. Above 1100 the bar is a
+   COLUMN on the wall and the question does not arise, so the sweep stops
+   there.
+
+   ⚠ AND IT ENGAGES FIRST, OR IT MEASURES THE WRONG LABEL. On arrival the send
+   says "У меня вопрос" (13 chars) and the row fits; the long label arrives
+   only once somebody has walked a step. A fixture measuring the state in
+   which the defect cannot appear is run 106's T11 again, so this asserts the
+   label actually GREW — if the two states ever stop differing it says so
+   rather than passing on the short one.
+
+   §5.15 throughout: the bar, its three children and the engagement each
+   report if they were not found.
+   Falsified by restoring `.quote__send { flex: 0 0 auto }` and dropping
+   `.quote__price { flex: 0 0 auto }`: six faults, ru and en, 320 through 390. */
+{
+  console.log('\nthe price is readable, not merely on screen');
+  const URL = `file://${process.cwd()}/index.html`;
+  let said = 0;
+  for (const w of [320, 360, 375, 390, 834]) {
+    for (const lang of ['he', 'en', 'ru']) {
+      const pg = await b.newPage({ viewport: { width: w, height: 700 } });
+      const where = `${w}px ${lang}`;
+      await pg.goto(`${URL}?lang=${lang}`);
+      await pg.waitForSelector('#stage svg');
+      await pg.waitForTimeout(320);
+      const label = () => pg.evaluate(() => {
+        const a = document.querySelector('.quote__send');
+        if (!a) return null;
+        return [...a.querySelectorAll('span')]
+          .filter(x => getComputedStyle(x).display !== 'none')
+          .map(x => x.textContent.trim()).join(' ');
+      });
+      const before = await label();
+      const walked = await pg.evaluate(() => {
+        const n = document.querySelector('.quote__next');
+        if (!n || n.disabled || !n.offsetParent) return false;
+        n.click(); return true;
+      });
+      await pg.waitForTimeout(320);
+      const after = await label();
+      const m = await pg.evaluate(() => {
+        const bar = document.querySelector('.quote');
+        if (!bar) return { noBar: true };
+        if (getComputedStyle(bar).position !== 'fixed') return { notFixed: true };
+        const fig = bar.querySelector('.send__figure');
+        const box = bar.querySelector('.quote__price');
+        const send = bar.querySelector('.quote__send');
+        const way = bar.querySelector('.quote__next');
+        if (!fig || !box || !send) return { noParts: `${!!fig},${!!box},${!!send}` };
+        const R = e => e.getBoundingClientRect();
+        const f = R(fig);
+        const ox = (a, c) => Math.max(0, Math.min(a.right, c.right) - Math.max(a.left, c.left))
+                           * Math.max(0, Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top));
+        /* Two questions, not one. The overlap catches a neighbour that has
+           grown into the figure; the hit test at the figure's two ends in
+           reading order catches anything else this page ever paints over the
+           bar, which an overlap against two named siblings cannot. */
+        const hit = x => {
+          const e = document.elementFromPoint(x, f.top + f.height / 2);
+          if (!e) return 'nothing';
+          if (e.classList && e.classList.contains('send__figure')) return 'figure';
+          return e.className && typeof e.className === 'string'
+            ? '.' + e.className.split(' ')[0] : e.tagName;
+        };
+        return {
+          text: fig.textContent.trim(),
+          figW: +f.width.toFixed(1), boxW: +R(box).width.toFixed(1),
+          spill: +(f.width - R(box).width).toFixed(1),
+          onSend: +ox(f, R(send)).toFixed(0),
+          onWay: way && !way.disabled && way.offsetParent ? +ox(f, R(way)).toFixed(0) : 0,
+          hitNear: hit(f.left + 2), hitFar: hit(f.right - 2),
+          sendW: +R(send).width.toFixed(1),
+        };
+      });
+      await pg.close();
+      if (m.notFixed) continue;
+      if (m.noBar || m.noParts) {
+        fault(where, `the quote bar check cannot find its subject `
+          + `(${m.noBar ? 'no .quote' : 'figure,box,send = ' + m.noParts}) — it is dead`);
+      } else if (!walked) {
+        fault(where, "the quote bar's way on could not be pressed, so the send never "
+          + 'took its long label and this check measured the easy case');
+      } else if (before === after) {
+        fault(where, `walking a step did not change the send's label (still "${after}") — `
+          + 'this check is pinned to the label that GROWS on engagement, and it no '
+          + 'longer grows');
+      } else if (m.onSend || m.onWay) {
+        fault(where, `the price ${m.text} is painted under the `
+          + `${m.onSend ? 'send button' : 'way on'} — ${m.onSend || m.onWay} px² of the `
+          + `one number on the page (a ${m.figW} px figure in a ${m.boxW} px box)`);
+      } else if (m.spill > 0) {
+        fault(where, `the price figure is ${m.figW} px wide in a ${m.boxW} px box and `
+          + `spills ${m.spill} px out of it — nothing is over it today, but the box has `
+          + 'stopped being a description of what is drawn');
+      } else if (m.hitNear !== 'figure' || m.hitFar !== 'figure') {
+        fault(where, `something is painted over the price: its near edge reports `
+          + `${m.hitNear} and its far edge ${m.hitFar}`);
+      } else { said++; }
+    }
+  }
+  if (!said) {
+    fault('price', 'not one width in this sweep had a fixed quote bar — the check '
+      + 'measured nothing at all');
+  } else if (!faults) {
+    console.log(`    ${said} width x language pairs: the figure is whole, in its own box, `
+      + 'with nothing on top of it');
+  }
+}
+
 await b.close();
 
 if (skipped.length) {

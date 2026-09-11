@@ -45,6 +45,101 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-11 07:05 UTC — run 107: the one number on the page was painted under the green button
+
+**Looked at:** the page as **the Russian-speaking customer on a 320x568 phone**
+— the longest copy on the smallest screen, the rotation `AGENT.md` names and
+no recent run had used (99 Hebrew, 104 gallery, 105 mind-changer, 106 English
+keyboard). Walked FORWARD with the button through all eight steps and the
+summary, screenshotting each; then the same walk at 390 and 1440 in all three
+languages; then the order the send button produces, and `?sheet=1`.
+
+**Instruments:** test ✓ 4,349,768 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets —
+**52 bare sheets byte-identical**, 11 of 12 `shot` moved (expected: the bar
+changed on every page; §7 says a moved `shot` sheet proves nothing on its own).
+Done the cheap way, single-threaded: the finding was visible in the third
+screenshot and the fix is three CSS declarations, so there was nothing for a
+fleet to fan out over. `ultracode` deliberately not spent.
+
+**Changed:** the quote bar's flex. `₪3,195` was being painted **under the green
+send pill** — 23.4 px at 320x568, 24.1 at 360x740, 9.1 at 375x667, in Russian,
+after any engagement. The bar is a row of three; the send and the way on both
+declare `flex: 0 0 auto` and the price declared nothing (`0 1 auto`) with
+`min-inline-size: 0`, so it absorbed 100% of the deficit: at 320 the row left
+it **26.4 px for a 57.8 px figure**, and text overflow is visible by default,
+so the figure rendered whole and the overflow went under the pill. The price is
+`flex: 0 0 auto` now and the SEND yields instead, its label truncating with an
+ellipsis — the verb survives in all three languages and the WhatsApp glyph
+carries the brand. After: 0 px covered at every width in every language; Hebrew
+and English unchanged.
+
+⚠ **The compression rule written for exactly this was fitted to one language.**
+`@media (max-width: 359px)` drops the caption and tightens the send — so 360
+and 375, where the deficit is 34.1 and 19.1 px, get none of it and came out
+WORSE than 320. Another breakpoint would have repeated the mistake; the price
+keeping its content width at every width does not.
+
+⚠ **And it is `send__toggle`'s own recorded mechanism one box out.** That
+comment says an earlier version let the toggle shrink and *"the figure still
+rendered… so it LOOKED fixed while the real tap target was 23 px"*. The 44 px
+floor went on the toggle, the figure is 57.8, and the spill moved up to the
+grid cell above. A floor under the wrong box.
+
+⚠ **The audit read this green because it was asking a different question.**
+`priceSeen` is *does this element intersect the viewport* — the same blind spot
+run 105's toast check was written for, one bar down. The new sweep measures the
+FIGURE against the send and the way on, hit-tests its two ends in reading
+order, in **three languages**, and **carries its own widths rather than using
+`VIEWS`**: 360 and 375 are the worst case and are not in the eight, and adding
+them there would cost a full audit pass each. It engages first and asserts the
+label GREW, so it cannot pass on the short arrival label — run 106's T11
+fixture avoided rather than repeated. **Falsified** by restoring both `flex`
+declarations: four faults, ru at 320/360/375 on the covering clause and 390 on
+the spill clause.
+
+No price, no id, no list order, no bit, no `VERSION`. The standard door still
+reads **₪3,195** on a bare load — asserted, not assumed. The order and the A4
+sheet were read at the end of the walk and both are correct: every row matches
+the summary on screen, the message is Hebrew for Peretz and names the Russian
+page, ₪7,195 agrees with the bar, no page errors on either.
+
+**Left alone deliberately:**
+· **The first option tile's NAME and PRICE behind the quote bar.** Measured
+  this run, and worse than the record: at 320x568 it is **7 of the 8 question
+  steps in all three languages** (tiles at 438–572 against a fold of 501, the
+  name at 526), and at 390 it is step 01 in all three. CLAUDE.md §9 already
+  owns this and names the only two places left to take it from — the
+  illustration note, which is an honesty commitment not to be moved without
+  asking, and the 131 px tile, which is real design work. Recorded with the
+  new numbers, not taken.
+· **Step 01 arriving at 320 with NO tile on screen at all** (8 tiles, 0
+  visible, in all three languages). Same §9 item; §9 has already measured and
+  refused the obvious fix, which is scrolling on arrival.
+· **The four-line Russian toast covering the door on the summary.** It is
+  clear of every option tile and of the price and the send, which is exactly
+  what run 105 placed it to do; its bottom edge is on the threshold and a
+  tall message in the longest language reaches up the leaf. The rule is
+  behaving as written.
+
+**Best idea of the run that was NOT taken:** the quote bar is three controls
+in 284 px on a 320 px phone, and the reason it is tight is that the way on and
+the send are both full-width-ish pills with words. The idea is to make the way
+on a chevron-only disc at the narrowest widths and give the room back to the
+send's label — it buys 44 px, which is the whole deficit. Refused because the
+way on is the step's primary action and 28.8 put it in this bar precisely
+because a customer could not find it; taking its word away to save another
+control's word is trading the finding of 28.8 for the finding of 11.9. If the
+row ever needs more room than truncation can give, that is the next thing to
+measure — and it should be measured in Russian.
+
+**proposed · taken · refused:** proposed 3 (price does not yield · way on
+becomes a disc · drop the send label below a breakpoint) · taken 1 · refused 2.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-11 01:10 UTC — run 106: the link for the door Peretz sells most opened on the size picker
 
 **Looked at:** the page as **the customer with no mouse**, in **ENGLISH** — a

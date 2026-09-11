@@ -1312,8 +1312,37 @@ svg { direction: ltr; }
   border-block-start: 1px solid var(--rule);
   box-shadow: 0 -6px 22px rgb(23 23 21 / .06);
 }
+/* ⚠ THE PRICE IS THE ONE THING IN THIS BAR THAT DOES NOT YIELD — 11.9.2026.
+   All three children were `flex: 0 0 auto` except this one, which had no
+   `flex` at all: `0 1 auto` with `min-inline-size: 0`, so it absorbed a
+   hundred per cent of any deficit. Measured after engaging (the send's label
+   grows from "У меня вопрос" to "Отправить в WhatsApp" once somebody walks a
+   step) at 320x568 in RUSSIAN: available 284 px, send 169.2 + way-on 88.4 =
+   257.6, leaving this box **26.4 px for a 57.8 px figure**. Text overflow is
+   visible by default, so ₪3,195 rendered in full and 23.4 px of it was
+   painted UNDER the green pill, which comes later in the DOM. 360x740 24.1 px,
+   375x667 9.1 px; 390 and up clear it.
+
+   ⚠ AND IT IS THE SAME MECHANISM `send__toggle` BELOW ALREADY RECORDS, one
+   box out. That note says a shrunk toggle "LOOKED fixed while the real tap
+   target was 23 px"; the floor put on it there is 44 px and the figure is
+   57.8, so the spill simply moved up to the grid cell. A floor under the
+   wrong box.
+
+   ⚠ AND THE COMPRESSION BLOCK BELOW WAS FITTED TO ONE LANGUAGE. `max-width:
+   359px` drops the caption and shrinks the figure — which is why 320 came out
+   LESS broken than 360 and 375, where the deficit is 34.1 and 19.1 px with no
+   compression at all. A threshold measured in Hebrew and applied to Russian.
+   So the fix is not another breakpoint: the price keeps its content width at
+   every width, and the SEND yields instead (see `.quote__send`).
+
+   `flex-basis: auto` here is the figure's own width, so a five-digit door
+   (₪11,295, 67 px at this size) takes what it needs rather than being told.
+   The grid inside is untouched — it is what stops the CAPTION setting the
+   box's width, which is a different question and still the right answer. */
 .quote__price {
   position: relative;
+  flex: 0 0 auto;
   display: grid; gap: 0;
   /* CLAUDE.md §8: never a bare `auto` track. An implicit column sizes to its
      widest item and refuses to shrink, which is how the old wall pill grew
@@ -1384,8 +1413,31 @@ svg { direction: ltr; }
    fixing `--wa` ITSELF, once, for both buttons — darkening this one alone
    would put two different greens on one screen for one action, which is worse
    than the ratio. */
+/* ⚠ AND THIS IS THE CHILD THAT YIELDS, BECAUSE ITS MEANING IS SAID TWICE.
+   11.9.2026. Something in this row has to give on a 320 px phone — three
+   controls at their natural widths want 315 px of a 284 px row in Russian —
+   and of the three this is the only one whose job survives being narrowed: it
+   is a green pill carrying the WhatsApp mark, so the brand is said by the
+   glyph and the verb is said by the first word of the label. The price is a
+   fact that has to be read whole, and the way on is the step's primary action
+   with a word `markSteps` writes into it.
+
+   ⚠ THE LABEL TRUNCATES RATHER THAN VANISHING, and that is the decision.
+   Dropping it below a breakpoint was the other fix and is refused for the
+   reason the breakpoint above already failed: it would be a width fitted to
+   whichever language happened to be measured, and it would take the label
+   away from Hebrew and English at widths where theirs fit comfortably. An
+   ellipsis bites only where the row genuinely cannot hold the words, in
+   whatever language, and the verb is what survives in all three — "שלחו…",
+   "Send on…", "Отправить в…". A longer string invented later degrades the
+   same way instead of climbing over the price.
+
+   The spans need no `display` change: a flex item is blockified, so these
+   `display: inline` labels are already block boxes and `text-overflow` reaches
+   them. `white-space: nowrap` is inherited from the pill. */
 .quote__send {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-inline-size: 0;
   display: inline-flex; align-items: center; gap: 7px;
   min-block-size: 44px; padding: 0 16px;
   border: 1px solid transparent; border-radius: var(--r-pill, 999px);
@@ -1394,6 +1446,7 @@ svg { direction: ltr; }
   font-size: .875rem; font-weight: 600; white-space: nowrap;
   box-shadow: 0 1px 2px rgb(23 23 21 / .18);
 }
+.quote__send > span { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
 .quote__send:hover { filter: brightness(1.05); }
 .quote__send .quote__ico { opacity: 1; }
 .quote__send:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }

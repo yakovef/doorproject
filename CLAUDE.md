@@ -326,6 +326,12 @@ walk, and walking it means grepping for each one, not remembering it.
   `[data-wa]` carries the identical href, the keyboard walk, the bare-mode
   motion kill, the **`prefers-reduced-motion` route** (nothing left running,
   delays included), and the language route.
+  ⚠ **"A READABLE PRICE" THERE MEANS "INTERSECTS THE VIEWPORT", AND THAT IS
+  NOT THE SAME THING** — it read green for an unknown number of commits while
+  the figure was painted under the send button on every Russian phone (§0b,
+  11.9). There is a second sweep now that measures the FIGURE's box and
+  hit-tests its two ends, in three languages, at five widths of its own
+  including the 360 and 375 that `VIEWS` has never visited.
 - `npm run collide` — clean on `all` and `boxes`, at the extra lock's new
   eye-level height.
 - `npm run latency` — **226 ms** against a 600 ms gate (135 on the default door; the worst is the sidelight with ironwork, 522 elements).
@@ -1367,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched). ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1909,6 +1915,75 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE ONE NUMBER ON THE PAGE WAS PAINTED UNDER THE GREEN BUTTON, ON THE
+  PHONES PEOPLE ACTUALLY OWN — 11.9.2026.** ⚠ **NOT one of the nine the
+  customer walk of 7.9 found** — a tenth, and it was found the same way and by
+  a lens none of those walks had used: **320×568 in Russian**, the longest
+  copy on the smallest screen. It was seen in the screenshot before it was
+  measured, which is the half of this method no instrument performs.
+  The quote bar is a flex row of three — the price, the green send, the way
+  on. Two of the three declare `flex: 0 0 auto`. The price declared nothing,
+  which is `0 1 auto`, and it carries `min-inline-size: 0` — **so it absorbed
+  a hundred per cent of any deficit.** Measured after engaging (the send's
+  label grows from *"У меня вопрос"* to *"Отправить в WhatsApp"* the moment
+  somebody walks a step):
+
+  | | send | way on | left for the price | the figure wants | covered |
+  |---|---|---|---|---|---|
+  | 320×568 ru | 169.2 | 88.4 | **26.4** | 57.8 | **23.4 px** |
+  | 360×740 ru | 190.7 | 88.4 | **32.9** | 67 | **24.1 px** |
+  | 375×667 ru | 190.7 | 88.4 | **47.9** | 67 | **9.1 px** |
+  | 390×844 ru | — | — | 62.9 | 67 | 0 (4.1 px of spill, inside the gap) |
+
+  Text overflow is visible by default, so `₪3,195` rendered in full and the
+  overflow was painted **under** the pill, which comes later in the DOM. In
+  Hebrew and English the label is 13 and 16 characters and it clears at every
+  width; in Russian it is 20.
+  ⚠ **THE COMPRESSION RULE THAT EXISTS FOR THIS WAS FITTED TO ONE LANGUAGE**,
+  which is why 320 came out LESS broken than 360 and 375. `@media (max-width:
+  359px)` drops the caption, shrinks the figure and tightens the send — so the
+  two widths where the deficit is largest are the two where none of it
+  applies. A threshold measured in Hebrew, applied to Russian.
+  ⚠ **AND IT IS THE MECHANISM `send__toggle`'s OWN COMMENT ALREADY RECORDS,
+  ONE BOX OUT.** That note says an earlier version let the toggle shrink and
+  *"the figure still rendered — text overflow is visible by default — so it
+  LOOKED fixed while the real tap target was 23 px"*. A 44 px floor was put on
+  the toggle; the figure is 57.8, so the spill simply moved up to the grid
+  cell above it. **A floor under the wrong box.**
+  ⚠ **THE PRICE IS THE CHILD THAT DOES NOT YIELD, AND THE SEND IS THE ONE THAT
+  DOES.** Something in that row has to give at 320 — three controls at their
+  natural widths want 315 px of a 284 px row — and of the three only the send
+  survives being narrowed: it is a green pill carrying the WhatsApp mark, so
+  the brand is said by the glyph and the verb by the first word. The price is
+  a fact that has to be read whole; the way on is the step's primary action
+  with a word `markSteps` writes into it. The label TRUNCATES rather than
+  vanishing below a breakpoint, for the reason the breakpoint above already
+  failed — a width fitted to whichever language was measured — and the verb is
+  what survives in all three: *"שלחו…"*, *"Send on…"*, *"Отправить в…"*. After:
+  **0 px covered at every width in every language**, Hebrew and English
+  byte-identical to before, and the ellipsis bites only at 320–375 in Russian.
+  ⚠ **`npm test` CANNOT SEE THIS — A BOX IS NOT A STRING** — and the check
+  that should have was asking the wrong question: `npm run audit`'s step walk
+  asks `priceSeen`, which is *does this element intersect the viewport*. A box
+  that is where it should be and a box with something on top of it are the
+  same picture to an intersection test. That is the toast finding of 10.9 one
+  bar down. The new check measures the FIGURE against the send and the way on,
+  and hit-tests its two ends in reading order, **in all three languages**.
+  ⚠ **AND IT IS NOT IN THE `VIEWS` LOOP, WHICH IS THE PART WORTH KEEPING.**
+  The audit's eight viewports do not include 360 or 375 — the two widths where
+  this is worst — so the check carries its own sweep (320 · 360 · 375 · 390 ·
+  834 × three languages, once per run) rather than costing a whole audit pass
+  per width. Third time this file has had to go and find the third case.
+  It engages before measuring, and asserts the label GREW, so it cannot pass
+  on the short arrival label — run 106's T11 fixture, avoided rather than
+  repeated. **Falsified** by restoring the two `flex` declarations: four
+  faults, ru at 320/360/375 covered and 390 on the spill clause.
+  No price, no id, no list order, no bit, no `VERSION`; three CSS
+  declarations. The standard door still reads **₪3,195** on a bare load,
+  asserted rather than assumed. The 52 bare sheets came back
+  **byte-identical**; 11 of the 12 `shot` sheets moved, which is what a change
+  to the bar on every page does and proves nothing on its own (§7).
 
 - **⚠ THE LINK FOR THE COMMONEST DOOR PERETZ SELLS OPENED ON THE SIZE PICKER —
   11.9.2026.** A customer walks all eight steps, keeps the standard ₪3,195
