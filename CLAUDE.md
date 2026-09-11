@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1615,6 +1615,43 @@ grip controls above the chip instead of beside it; or let the grip controls
 sit on the leaf at these widths only. `npm run audit` names the two viewports
 and the one control explicitly, so the exemption shrinks the day this is
 fixed and nothing else can hide behind it.
+
+### ⚠ AN iPAD IN LANDSCAPE GETS 5 px MORE ROOM FOR THE QUESTION THAN A 320 px PHONE
+
+Found 11.9 by a second lens on the tablet band and re-measured here before it
+was believed. The band left for the question — between the sticky stage and the
+fixed quote bar — on arrival:
+
+| | stage | free band | grip step, whole tiles |
+|---|---|---|---|
+| 320×568 | 239 (42%) | **200** | 0 of 9 |
+| 390×844 | 390 (46%) | 321 | 3 of 9 |
+| 768×1024 | 573 (56%) | 317 | 6 of 9 |
+| 834×1112 | 623 (56%) | 356 | 7 of 9 |
+| **1024×768** | 430 (56%) | **205** | **0 of 9** |
+
+So the commonest iPad posture is as bad as the worst phone, on 4.3× the screen
+area — nine tiles of which the customer sees the top third, no name and no
+price. ⚠ **The cause is one line and it is the opposite of a shortage:**
+`.stage` is `clamp(40vh, 100vw, 56vh)`, and on any wide-and-short viewport
+`100vw` runs past `56vh`, so **the door is pinned at its MAXIMUM exactly where
+the screen is shortest.**
+
+⚠ **AND THE STYLESHEET SAID THE OPPOSITE, IN A COMMENT, FOR AS LONG AS THE RULE
+HAS EXISTED.** The short-portrait compression that rescued 320×568 excludes
+landscape deliberately, on the stated ground that *"1024x700 matches both the
+width and the height test and has plenty of room."* Measured: it does not. The
+comment is corrected in place beside the rule; the rule itself is NOT widened
+here, because the answer is probably to stop capping at 56vh when the viewport
+is wide and short, and that moves the door on a whole band.
+
+⚠ **AND NO INSTRUMENT HERE HAS EVER VISITED IT.** `VIEWS` carries one tablet,
+`tablet` 834×1112 — which is the BEST of the band — and no landscape tablet and
+no 768 portrait. Two smaller faults live in the same band and are verified:
+**`Needs a window` is clipped to `Needs a w…` on twelve English grille tiles**
+(the `.tile__why` wants 20 px more than it gets, and the clipped word is the
+one carrying the meaning), and **seven Russian tile labels are drawn 12–13 px
+OUTSIDE their own tile**, past the rounded border toward the neighbour.
 
 ### ⚠ THE SUMMARY CANNOT SHOW ITS WHOLE SPEC AT 1280×720
 
@@ -1943,6 +1980,92 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ ON AN iPAD THE SUMMARY STATED THE DOOR AS NINE UNLABELLED WORDS, AND THE
+  BREAKPOINT THAT DECIDED THAT WAS THE LAYOUT'S, NOT THE QUESTION'S —
+  11.9.2026.** Found by reading the page as **the customer on a TABLET** —
+  768, 834 and 1024 px, the widest screens that still get the phone layout
+  (the rail, the sticky stage and the quote bar are all `max-width: 1099px`),
+  and a band no walk had ever used as its lens.
+  The summary says what the door is twice over: `#spec`, the labelled table
+  with an icon and a colour chip per row, and `#summary`, the same
+  `specRows(state)` run together with middots. **Exactly one is ever on
+  screen**, and which one was decided by `@media (max-width: 1099px)` — the
+  LAYOUT's breakpoint. The reason written beside that rule is about a phone,
+  in as many words: *"six rows of table is a lot of a 390 px screen to spend
+  on something the customer already chose."* True at 390. Applied to 834 and
+  1024, where there is no shortage of room at all, it gave **the widest
+  screens in the phone layout the least scannable form of the door**, on the
+  one step whose lede reads *"בדקו שהכול נכון"* — check that everything is
+  right.
+  What that form is, default door, Hebrew:
+  `חום-אפור כהה (רב בריח 7126D) · ללא חלון · ללא ידית משיכה · רותם · סטנדרטית
+  · סטנדרטי · ניקל · ימין, פנימה` — nine values, no labels, and two of them
+  are **`סטנדרטית · סטנדרטי`** side by side: the SIZE and the משקוף, one
+  letter apart. A customer told to check that everything is right cannot tell
+  which of those is the frame, and `רותם` does not say whether it is the lock
+  or the pull handle. The table answers all three with a label and an icon,
+  which is exactly why it exists above 1100.
+  ⚠ **THE BREAKPOINT MOVED TO 700 ON BOTH AXES AND IS DELIBERATELY NOT
+  LOWERED TO THE PHONE**, because that decision was already taken, the other
+  way, on purpose. Measured on the default door landing at the summary, all
+  three languages: the table is **282 px at every width from 375 up** (302 at
+  320, where one value wraps) against a line of 38–99 px, so it costs **244 px
+  at 834 and 223 px at 390** — barely cheaper on a phone than on a tablet. The
+  budget argument is a real one at 390 and this run does not reopen it.
+  ⚠ **AND `min-width` ALONE WOULD HAVE TURNED IT ON FOR A PHONE LYING ON ITS
+  SIDE, WHICH IS THE CASE THE PARAGRAPH ABOVE DECLINES TO REOPEN.** 740×360,
+  844×390 and 932×430 are all past 700 ACROSS and are 390 px screens rotated.
+  Two further numbers came with that: `specRows` emits up to fifteen rows and
+  the loudest buildable door measures **twelve rows, 423 px** — so 282 is the
+  default door, not the table — and **the table's height does not depend on
+  its width at all** (423 px at 600, 700, 768, 834 and 1024 alike), so a
+  width-only gate controls the one variable that does not matter. The rule is
+  two queries OR'd: hidden below 700 across, and hidden below 700 TALL while
+  under 1100 across. 423 / 0.6 ≈ 705, so the worst table stays under 60% of
+  the screen; it admits every portrait tablet and 1024×768 (55%) and excludes
+  every landscape phone by 270 px. Width ≥ 1100 is not in the rule at all, so
+  the desktop is untouched at any height — 1920×918 and a short 1280×600
+  window both keep the table they have always had.
+  ⚠ **THAT HALF OF THE CHANGE IS THE FLEET'S, AND IT IS WHY THE FLEET WAS
+  SPENT.** `ultracode` ran two lenses against this run: an adversarial reader
+  told to argue the change down, and a second pair of eyes on the same band in
+  English and Russian. The adversary's own dependency sweep came back clean
+  (the audit reads `#spec`'s rows and `#summary`'s text from the DOM, not from
+  CSS; `.sr-only` is 1 px and not `display: none`, so no check silently
+  retires; the handing row precedes the table and does not move) and it said
+  so plainly — and then produced the landscape-phone case and the 423 px
+  figure, neither of which this run had. A single lens would have shipped a
+  gate that was right about tablets and wrong about a rotated phone.
+  ⚠ **AND MY OWN FIRST READING OF THE LINE WAS WRONG, AND IS CORRECTED RATHER
+  THAN QUIETLY DROPPED.** I measured its height and called 38 px one line, and
+  wrote that at 1024 the summary was "a single 105-character run across
+  922 px". It is 38 px of a 19 px line-height — **two lines of about 52
+  characters**, which is a perfectly comfortable measure, and it is three
+  lines below 660. So the length of the line was never the fault and the
+  argument above does not rest on it: the fault is that it carries **no
+  labels**. §6 again, on my own number, for the second run running.
+  700 is where the card's measure is 598 px — 42% past the 420 px
+  `--panel-max` column the table was drawn for and is asserted in above 1100 —
+  and it clears the largest phone in portrait (430) with room to spare, which
+  this log already records as the difference between a gate and no gate.
+  ⚠ **THE ASSERTION IS "EXACTLY ONE, AND WHICH", AND THE FIRST HALF IS THE
+  ONE THAT CANNOT ROT.** `npm run audit` requires at every viewport that
+  exactly one of the two is drawn — never both (the door stated twice, which
+  is §5's whole subject) and never neither (a summary with no spec at all) —
+  and then that it is the table where the stylesheet's own two-axis rule says
+  so — restated once in the check rather than as a bare 700. ⚠ **And "drawn" is
+  not `display`**: the hidden one is `sr-only`, which is 1 px and
+  `clip-path: inset(50%)`, and `checkVisibility` reports a clipped element as
+  VISIBLE — so a `display` test would call both of them shown at every width
+  and the check could never fail. It reads the drawn WIDTH. §5.15 clauses for
+  both elements and for the table having rows. **Falsified** by putting 1099
+  back: one fault, at `tablet`, naming the width — reproduced independently by
+  the adversarial run against its own copy of the predicate.
+  No price, no id, no list order, no bit, no `VERSION`; one media query. Screen readers are unaffected — they were reading `#summary`
+  at every width before and still are. The 52 bare sheets came back
+  **byte-identical** (`.is-bare` keeps only `.stage-wrap`); of the 12 `shot`
+  sheets only `tablet` 834×1112 is in the band this touches.
 
 - **⚠ THE SUMMARY EXPLAINED ITSELF BEFORE IT SHOWED THE DOOR, AND THE ORDER
   WAS AN ARTEFACT OF THE CLOCK — 11.9.2026.** Found by reading the page as

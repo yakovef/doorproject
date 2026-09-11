@@ -45,6 +45,151 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-11 17:05 UTC — run 109: on an iPad the summary stated the door as nine unlabelled words
+
+**Looked at:** the page as **the customer on a TABLET** — 768x1024, 834x1112
+and 1024x768, the widest screens that still get the phone layout (the rail, the
+sticky stage and the quote bar are all `max-width: 1099px`) and a band no walk
+has ever used as its lens. Recent lenses: 99 Hebrew, 104 gallery, 105
+mind-changer, 106 English keyboard, 107 Russian at 320, 108 Peretz on a laptop.
+Walked FORWARD with the button through all eight steps and the summary at 834,
+screenshotting each and reading them as pictures; then the tile grids measured
+at twelve widths in three languages; then the order the send button produces
+and `?sheet=1`.
+
+**The order and the A4 sheet, read and found correct.** A door a tablet
+customer would build (sage green, gold פרזול, square window, two panels asked
+for, a Ron bar asked for): the message names `ללא ידית משיכה` and `פאנל תחתון`
+— i.e. it describes the door `repair` actually built, not the one I clicked —
+the price adds up (3195 + 3800 window + 900 gold + 200 colour = **₪8,095**, and
+the forced bottom panel is correctly ₪0), both caveats and the code are there,
+and it is Hebrew. `?sheet=1` on the same code: no page errors, every row
+present, dimensions and the measured-on-site note at the head.
+
+**Instruments:** test ✓ 4,349,767 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets — see
+below.
+
+**`ultracode` SPENT, and it earned half the change.** Two lenses in parallel
+with my own: an adversarial reader told to argue the change down, and a second
+pair of eyes on the same band in English and Russian. Both are named where
+their findings landed. The adversary's dependency sweep came back clean and it
+said so — and then produced the landscape-phone case and the 423 px figure,
+neither of which I had. **A single lens would have shipped a gate that was
+right about tablets and wrong about a rotated phone.**
+
+**Changed:** which form the summary states the door in, below 1100 px.
+The summary says what the door is twice over — `#spec`, the labelled table
+with an icon and a colour chip per row, and `#summary`, the same
+`specRows(state)` run together with middots. Exactly one is ever drawn, and
+which one was decided by `@media (max-width: 1099px)` — the LAYOUT's
+breakpoint. The reason written beside that rule is about a phone, in as many
+words: *"six rows of table is a lot of a 390 px screen to spend."* True at 390.
+Applied to an 834 px iPad and a 1024 px one it gave **the widest screens in the
+phone layout the least scannable form of the door**, on the one step whose lede
+reads *"בדקו שהכול נכון"* — check that everything is right.
+
+What that form is, default door, Hebrew: `חום-אפור כהה (רב בריח 7126D) · ללא
+חלון · ללא ידית משיכה · רותם · סטנדרטית · סטנדרטי · ניקל · ימין, פנימה`. Nine
+values, no labels, and two of them are **`סטנדרטית · סטנדרטי`** side by side —
+the SIZE and the משקוף, one letter apart. A customer told to check everything
+is right cannot tell which of those is the frame, and `רותם` does not say
+whether it is the lock or the pull handle.
+
+⚠ **My own first reading of the line was wrong and is corrected rather than
+quietly dropped.** I measured its height, called 38 px one line, and wrote that
+at 1024 it was "a single 105-character run across 922 px". It is 38 px of a
+19 px line-height — **two lines of about 52 characters**, a perfectly
+comfortable measure, and three lines below 660. The length was never the fault;
+the absence of labels is. §6 on my own number, second run running.
+
+**The gate is 700 px on BOTH axes, and the second axis is the fleet's.**
+`min-width: 700px` alone turns the table on for 740x360, 844x390 and 932x430 —
+phones lying on their side, which is the exact case the paragraph above
+declines to reopen. Numbers: `specRows` emits up to fifteen rows and the
+loudest buildable door is **twelve rows, 423 px** (so 282 px is the default
+door, not the table), and **the table's height does not depend on its width at
+all** — 423 px at 600, 700, 768, 834 and 1024 alike — so a width-only gate
+controls the one variable that does not matter. Two queries OR'd: hidden below
+700 across, and hidden below 700 tall while under 1100 across. 423 / 0.6 ≈ 705,
+so the worst table stays under 60% of the screen; it admits every portrait
+tablet and 1024x768 (55%) and excludes every landscape phone by 270 px. Width
+≥ 1100 is not in the rule at all, so the desktop is untouched at any height —
+1920x918 and a short 1280x600 window both keep the table they have always had.
+Verified at sixteen viewports, every one landing where the rule says.
+
+⚠ **The assertion is "exactly one, and which", and the first half cannot rot.**
+`npm run audit` requires at every viewport that exactly one of the two is drawn
+— never both (the door stated twice, §5's whole subject) and never neither —
+then that it is the table where the stylesheet's own two-axis rule says so. ⚠
+**And "drawn" is not `display`:** the hidden one is `sr-only`, 1 px with
+`clip-path: inset(50%)`, and `checkVisibility` calls a clipped element VISIBLE,
+so a `display` test would report both as shown at every width and could never
+fail. It reads the drawn WIDTH. §5.15 clauses for both elements and for the
+table having rows. **Falsified** by putting 1099 back: one fault, at `tablet`,
+naming the width — reproduced independently by the adversarial run.
+
+No price, no id, no list order, no bit, no `VERSION`; one media query.
+Screen readers are unaffected — they read `#summary` at every width before and
+still do.
+
+**Also corrected, and it is a documentation fix rather than a behaviour one:**
+the short-portrait compression block excludes a tablet held sideways on the
+stated ground that *"1024x700 matches both the width and the height test and
+has plenty of room."* Measured: **at 1024x768 the band left for the question is
+205 px, against 200 px on a 320x568 phone** — on 4.3x the screen area — and
+**0 of the grip step's 9 tiles are whole above the fold**, the same as the
+worst phone. The cause is one line and it is the opposite of a shortage:
+`.stage` is `clamp(40vh, 100vw, 56vh)`, so on any wide-and-short viewport
+`100vw` runs past `56vh` and **the door is pinned at its MAXIMUM exactly where
+the screen is shortest.** The comment is corrected in place; the rule is not
+widened here. CLAUDE.md §9 carries it with the table.
+
+**Left alone deliberately:**
+· **The 1024x768 stage itself.** The fix is probably to stop capping at 56vh
+  when the viewport is wide and short, and that moves the door on a whole band
+  on the first run that has ever looked at it. Recorded, not guessed at.
+· **The option grids' holes.** `repeat(auto-fill, …)` lays down as many tracks
+  as fit and an EMPTY track still takes its `1fr`, so a group with fewer
+  options than tracks leaves a hole at the inline-end and its tiles stay at the
+  minimum. Measured: at 834 the 6 size tiles leave **201 px**, the 4 פרזול
+  tiles 344; at 1024 the 7 face tiles leave **893 px** of a 982 px row and the
+  two-option groups 772. And the tiles get NARROWER as the screen widens —
+  134 px at 320, 109 at 390, **89 at 1024** — so the widest screen in the phone
+  layout draws the smallest tiles and the tallest (the size tile goes 131 →
+  159 px as its name wraps to two lines). Not taken: `auto-fit` alone makes two
+  tiles 486 px wide, a track max re-creates the hole, and capping the card
+  costs the big groups (17 colours, 16 windows) the extra columns a tablet is
+  good for. It wants a measured answer, not the first idiom.
+· **Three verified faults in the same band**, re-measured here rather than
+  taken on trust: `Needs a window` clipped to `Needs a w…` on **twelve**
+  English grille tiles (`.tile__why` is 20 px short, and the clipped word
+  carries the meaning); **seven Russian tile labels drawn 12–13 px OUTSIDE**
+  their own tile, past the rounded border toward the neighbour; and the first
+  step's lede cut mid-sentence at 1024x768. Each is a separate change.
+· **`VIEWS` has no landscape tablet and no 768 portrait.** `tablet` 834x1112 is
+  the BEST of the three and the only one any instrument here has visited. That
+  is why this band had gone unlooked-at, and adding a viewport costs a whole
+  audit pass — the price sweep's own answer (carry your own widths) is probably
+  the right shape.
+
+**Best idea of the run that was NOT taken:** run 108 named the wider summary
+column as the change to spend a fleet on; I spent it here instead, because this
+band had never been looked at and that one had already been measured. It stands
+— and it is now the SECOND thing the summary needs, not the first, since below
+1100 the spec is a table again and the 1280 arithmetic in §9 is unchanged.
+The best NEW idea is the grid holes above: one CSS rule reaches eleven grids
+at every width from 600 to 1099, and it is the difference between a tablet
+looking like a page and looking like content that failed to load.
+
+**proposed · taken · refused:** proposed 5 (the spec table below 1100 · the
+two-axis gate · correcting the false comment · the grid holes · un-capping the
+stage when wide and short) · taken 3 · refused 2.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-11 12:05 UTC — run 108: the summary explained itself before it showed the door
 
 **Looked at:** the page as **PERETZ, on his own laptop, opening the link a

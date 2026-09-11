@@ -884,6 +884,72 @@ for (const v of VIEWS) {
               + `page "${hand.words}" against spec.js "${want}"`);
           }
         }
+
+        /* ── AND THE DOOR IS STATED IN ONE FORM, THE RIGHT ONE FOR THE WIDTH
+           The summary says what the door is twice over — `#spec`, the labelled
+           table a desktop customer proof-reads, and `#summary`, the same rows
+           run together with middots. Exactly one of them is ever on screen;
+           the other is the screen reader's. Which one was decided by the
+           LAYOUT's 1100 px breakpoint, so an 834 px iPad and a 1024 px one —
+           the widest screens in the phone layout, with room to spare — got the
+           unlabelled run: nine values, no labels, `סטנדרטית · סטנדרטי` side by
+           side for the size and the משקוף. Measured 11.9 and moved to 700 px.
+
+           ⚠ TWO CLAIMS, NOT ONE, AND THE FIRST IS THE ONE THAT CANNOT ROT.
+           "Exactly one is on screen" is binary and holds at every viewport, so
+           it catches both directions — a stylesheet that shows both (the door
+           stated twice, which is §5's whole subject) and one that shows
+           neither (the summary with no spec at all). The second claim names
+           which, against this viewport's own width, so the breakpoint cannot
+           quietly move.
+
+           ⚠ AND "ON SCREEN" IS NOT `display`. The hidden one here is `sr-only`
+           — absolutely positioned, 1 px, `clip-path: inset(50%)` — and
+           `checkVisibility` reports a clipped element as visible, so a
+           `display` test would call both of them shown at every width and this
+           check would never fail. It reads the drawn WIDTH instead.
+
+           §5.15: both elements must be found, and the table must have rows. */
+        const said = await p.evaluate(() => {
+          const spec = document.getElementById('spec');
+          const line = document.getElementById('summary');
+          if (!spec || !line) return { missing: !spec ? '#spec' : '#summary' };
+          const drawn = el => {
+            const r = el.getBoundingClientRect();
+            return getComputedStyle(el).display !== 'none' && r.width > 40 && r.height > 4;
+          };
+          return {
+            rows: spec.querySelectorAll('.spec__row').length,
+            table: drawn(spec), line: drawn(line),
+            w: innerWidth, h: innerHeight,
+          };
+        });
+        /* The stylesheet's rule, restated once here rather than as a bare 700:
+           the desktop keeps the table at any height, and below 1100 the table
+           needs 700 px of BOTH axes — the width so the card beats the column
+           the table was drawn for, the height because a landscape phone is
+           700+ px across and 390 px tall and the worst table is 423 px. */
+        const wantTable = said.w >= 1100 || (said.w >= 700 && said.h >= 700);
+        if (said.missing) {
+          fault(v.name, `the summary has no ${said.missing} — this check can no `
+            + 'longer tell which form the door is stated in');
+        } else if (!said.rows) {
+          fault(v.name, 'the spec table has no rows, so "the table is on screen" '
+            + 'cannot mean anything');
+        } else if (said.table === said.line) {
+          fault(v.name, said.table
+            ? 'the summary states the door TWICE — the spec table and the '
+              + 'one-line summary are both on screen'
+            : 'the summary states the door in NEITHER form — no spec table and '
+              + 'no one-line summary on screen');
+        } else if (wantTable && !said.table) {
+          fault(v.name, `${said.w}x${said.h} of screen and the summary shows the `
+            + 'unlabelled one-line summary rather than the spec table');
+        } else if (!wantTable && !said.line) {
+          fault(v.name, `${said.w}x${said.h} of screen and the summary spends up `
+            + 'to 423 px on the spec table rather than the one line a phone-sized '
+            + 'screen was given');
+        }
       }
 
       /* ── AND THE ANSWER IS ON SCREEN WITH THE QUESTION ────────────────

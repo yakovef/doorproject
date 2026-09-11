@@ -1725,9 +1725,45 @@ svg { direction: ltr; }
    be honest. */
 /* ── THE SPEC TABLE ─────────────────────────────────────────────────
    From the mockup. One row per fact, label on the right, value on the left.
-   On a phone it collapses to the single line (`#summary`) instead — six rows
+   On a PHONE it collapses to the single line (`#summary`) instead — six rows
    of table is a lot of a 390 px screen to spend on something the customer
-   already chose. */
+   already chose.
+
+   ⚠ AND "A PHONE" USED TO MEAN "ANYTHING UNDER 1100 px", WHICH IS THE LAYOUT'S
+   BREAKPOINT AND NOT THIS QUESTION'S. The argument above is about a 390 px
+   screen and it was applied to an 834 px iPad and a 1024 px one, where there
+   is no shortage of room at all — so the widest screens in the phone layout
+   got the LEAST scannable form of the door, on the one step whose lede says
+   בדקו שהכול נכון, check that everything is right.
+
+   What the line actually reads, default door, Hebrew:
+     חום-אפור כהה (רב בריח 7126D) · ללא חלון · ללא ידית משיכה · רותם ·
+     סטנדרטית · סטנדרטי · ניקל · ימין, פנימה
+   Nine values, no labels, and two of them are `סטנדרטית · סטנדרטי` side by
+   side — the size and the משקוף, one letter apart. A customer asked to check
+   that everything is right cannot tell which of those is the frame, and
+   `רותם` does not say whether it is the lock or the grip. The table answers
+   all three with a label and an icon, which is exactly why it exists above
+   1100 and why it is the thing a desktop customer proof-reads.
+
+   ⚠ THE 700 IS MEASURED, NOT PICKED, AND IT IS DELIBERATELY NOT LOWERED TO
+   THE PHONE. Measured on the default door landing at the summary, in all
+   three languages: the table is **282 px at every width from 375 up** and
+   costs 244 px over the line at 834 and 223 px at 390 — so it is not much
+   cheaper on a phone than on a tablet, and the decision to spend that budget
+   on a 390 px screen has already been taken, the other way, on purpose. At
+   700 the card's measure is 598 px, 42% wider than the 420 px column
+   (`--panel-max`) the table was drawn for and is asserted in above 1100, and
+   700 clears the largest phone in portrait (430) by a wide margin — this file
+   records what a gate with no margin is worth.
+   ⚠ **282 px IS THE DEFAULT DOOR AND NOT THE TABLE.** `specRows` emits up to
+   fifteen; the loudest buildable door measures **twelve rows, 423 px**, and
+   that figure is the same at 600, 700, 768, 834 and 1024 — the table's height
+   does not depend on width at all, which is why the height gate below exists.
+   No row wraps at any width from 375 up in any language; at 320 and 360 one
+   or two do (423 → 464 px in Russian).
+   `npm run audit` asserts that EXACTLY ONE of the two is on screen at every
+   viewport, and which one. */
 .spec { display: grid; gap: 0; margin: 2px 0 14px; }
 .spec__row {
   display: grid;
@@ -1752,7 +1788,19 @@ svg { direction: ltr; }
   inline-size: 14px; block-size: 14px; border-radius: var(--r-chip);
   background: var(--chip); border: 1px solid rgb(0 0 0 / .22);
 }
-@media (max-width: 1099px) {
+/* ⚠ TWO QUERIES, OR'D, AND THE SECOND IS THE ONE AN ADVERSARIAL READ ADDED.
+   `min-width: 700px` alone turns the table on for a LANDSCAPE PHONE — 740×360,
+   844×390, 932×430 are all past 700 across and are 390 px screens lying on
+   their side, which is the exact case the paragraph above declines to reopen.
+   Measured there: the worst table is 423 px (a loud door emits twelve rows,
+   not eight), which is 108% of an 844×390 viewport. So height is gated too,
+   at 700: 423 / 0.6 ≈ 705, i.e. the worst table stays under 60% of the screen
+   — margin rather than the one-pixel gates this file keeps paying for. It
+   admits every tablet in portrait and 1024×768 (55%) and excludes every
+   landscape phone measured, by 270 px.
+   Width ≥ 1100 is never in this rule at all, so the desktop is untouched at
+   any height — 1920×918 keeps the table it has always had. */
+@media (max-width: 699px), (max-height: 699px) and (max-width: 1099px) {
   .spec { display: none; }
   /* and the one-line version comes back out of the screen-reader-only box */
   #summary.sr-only {
@@ -2261,8 +2309,22 @@ svg { direction: ltr; }
 
    ⚠ SCOPED BY HEIGHT AND ORIENTATION, NOT BY WIDTH. A 390x844 phone has room
    and must not pay for this; a 320x568 one has none. `orientation: portrait`
-   keeps a tablet held sideways out of it — 1024x700 matches both the width and
-   the height test and has plenty of room.
+   keeps a tablet held sideways out of it.
+
+   ⚠ AND THE REASON GIVEN FOR THAT EXCLUSION WAS MEASURED ON 11.9.2026 AND IS
+   FALSE. It read: *"1024x700 matches both the width and the height test and
+   has plenty of room."* It does not. At **1024x768 — an iPad in landscape,
+   the commonest posture there is — the band left for the question between the
+   stage and the quote bar is 205 px, against 200 px on a 320x568 phone**, on
+   4.3x the screen area, and 0 of the grip step's 9 tiles are whole above the
+   fold. The cause is one line: `.stage` is `clamp(40vh, 100vw, 56vh)`, and on
+   any wide-and-short viewport `100vw` runs past `56vh`, so the door is pinned
+   at its MAXIMUM exactly where the screen is shortest — 56% of 768 px. The
+   exclusion itself is left standing rather than widened here, because the
+   right answer is probably to stop capping at 56vh when the viewport is wide
+   and short, and that moves the door on a whole band and wants its own
+   measurement. CLAUDE.md §9 carries it. **A claim in a comment is not
+   evidence, and this one was doing damage while it sat there.**
 
    ⚠ AFTER the rules it overrides, all four of them (`.stage`'s two blocks
    above, and `.sect__where` / `.sect__title` / `.sect__lede` directly above).
