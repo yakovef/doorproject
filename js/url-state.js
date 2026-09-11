@@ -448,6 +448,29 @@ export function fromQuery(search) {
     if (!KNOWN.has(key) && !RETIRED.has(key)) notice = notice || 'option-unknown';
   }
 
+  /* ⚠ `carries` — DID THIS ADDRESS DESCRIBE A DOOR AT ALL? A fact about the
+     URL, and it is here because the page has been answering it with a
+     different question: `js/app.js` decided "this is a shared link" by
+     comparing the decoded door against `DEFAULTS`, so the ONE door that
+     equals the default — the standard ₪3,195 leaf, the commonest thing
+     Peretz sells — arrived at step 01 with a size picker instead of at the
+     summary, on a link somebody had deliberately sent him. Measured 11.9.2026:
+     `?d=DM-N300080000A` landed on `fit`; the same link with a window on it
+     landed on `sum`. The door the link carries cannot answer "did somebody
+     send this", and an address can.
+
+     Everything is the customer's door except OUR OWN rendering switches. That
+     is the list to keep current, and this stylesheet-shaped mistake has been
+     made three times already in `KNOWN` above (`sheet`, then `bare`, then
+     `lang`) — so it is stated as an exemption rather than as an allow-list: a
+     new switch invented tomorrow and forgotten here makes a link open at the
+     summary, which is wrong but harmless, where forgetting it in `KNOWN`
+     raises a false notice. `i` is the withdrawn inside view, which was a
+     switch too; `f`, `a` and `z` were axes of the DOOR and so still count as
+     one, because a link carrying them is still a door somebody chose. */
+  const SWITCH = new Set(['bare', 'sheet', 'lang', 'i']);
+  const carries = [...p.keys()].some(k => !SWITCH.has(k));
+
   /* PLAN.md §3.2 wrote this entry point as `?d=DM-…`, and `d` is the detail
      axis — so the one URL a person would type from a code read down the
      telephone landed on `take('detail', …)`, produced the DEFAULT door, and
@@ -458,7 +481,7 @@ export function fromQuery(search) {
   const code = p.get('code') || (/^DM-/i.test(p.get('d') || '') ? p.get('d') : null);
   if (code) {
     const decoded = decodeCode(code);
-    if (decoded) return settle(decoded, null);
+    if (decoded) return { ...settle(decoded, null), carries };
     notice = 'code-unknown';
   }
 
@@ -602,7 +625,7 @@ export function fromQuery(search) {
      customer's door, so it opens as itself rather than being flagged as
      damaged. Withdrawing an option is our change, not their mistake. */
 
-  return settle(state, notice);
+  return { ...settle(state, notice), carries };
 }
 
 /**

@@ -311,6 +311,48 @@ group('short code round-trip');
 }
 
 // ── 2. URL ────────────────────────────────────────────────────────
+/* ⚠ DID THE ADDRESS CARRY A DOOR — the question `js/app.js` decides the
+   ARRIVAL STEP on, and the one it used to answer with a different question.
+   It asked whether the decoded door differed from `DEFAULTS`, so a link
+   carrying the standard ₪3,195 leaf — the door the page opens with, and the
+   commonest thing Peretz sells — was indistinguishable from somebody arriving
+   with no link at all, and he landed on the size picker instead of on the
+   door he had been sent.
+   The list below is DERIVED from `toQuery` rather than typed, because a
+   sampled list is how the same class of guard went blind on `bell` (§0b,
+   10.9): every parameter the page can put in an address must count as a door,
+   and the day a tenth field is added it is covered without anybody coming
+   back here. The switches are asserted from the other side — each must be a
+   key `fromQuery` already accepts silently, so this list cannot rot into a
+   name nothing else knows. */
+group('an address that carries a door is told apart from one that does not');
+{
+  ok(fromQuery('').carries === false, 'a bare load reads as a shared link');
+  for (const sw of ['lang=en', 'lang=ru', 'bare=1', 'sheet=1', 'bare=1&lang=ru']) {
+    const r = fromQuery('?' + sw);
+    ok(r.carries === false, `?${sw} reads as a door somebody sent, and it is one of our own switches`);
+    ok(r.notice === null, `?${sw} raises ${r.notice} — a switch this check calls harmless is not a key fromQuery knows`);
+  }
+  /* every parameter the page itself emits, one at a time */
+  const emitted = [...new URLSearchParams(toQuery(DEFAULTS)).entries()];
+  ok(emitted.length >= 10, `toQuery emits only ${emitted.length} parameters — this check has lost its subject`);
+  for (const [k, v] of emitted) {
+    ok(fromQuery(`?${k}=${v}`).carries === true,
+       `?${k}= does not read as a door, so a link carrying only it would open the design flow`);
+  }
+  /* and the two whole addresses a customer actually sends, for the DEFAULT
+     door — the case the old predicate could not see */
+  ok(fromQuery(toQuery(DEFAULTS)).carries === true,
+     'a full query for the standard door reads as nobody having sent anything');
+  ok(fromQuery(`?d=${encodeCode(DEFAULTS)}`).carries === true,
+     'the standard door\'s own short code reads as nobody having sent anything — '
+   + 'Peretz opening it lands on step 01 with a size picker');
+  /* a retired axis is still the customer's door; the withdrawn inside VIEW is
+     not, it was a switch like `bare` */
+  ok(fromQuery('?a=peep,mail').carries === true, 'a link carrying a withdrawn OPTION stops reading as a door');
+  ok(fromQuery('?i=1').carries === false, 'the withdrawn inside view reads as a door; it was a rendering switch');
+}
+
 group('url round-trip');
 for (const st of everyState()) {
   const { state: back, notice } = fromQuery(toQuery(st));

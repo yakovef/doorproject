@@ -45,6 +45,95 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-11 01:10 UTC — run 106: the link for the door Peretz sells most opened on the size picker
+
+**Looked at:** the page as **the customer with no mouse**, in **ENGLISH** — a
+language no recent walk has used (99 Hebrew, 105 Russian) — at 1440×900 and
+390×844: the whole tab ring from a cold load, then forward through all eight
+steps with Tab and Enter only, then the summary, the price column, the order
+and `?sheet=1`.
+
+**Instruments:** test ✓ 4,349,768 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` and `boxes` · recreate ✓ · sheets — **52 bare sheets
+byte-identical**, 5 of 12 `shot` moved (§7: noise; all twelve of their queries
+are non-default doors and already arrived at the summary).
+
+**What the keyboard walk found — and most of it is that the page is sound.**
+Everything is reachable, in a sane order: the rail, then the live step's own
+controls, then the wall chrome (three languages, the price, the quiet send),
+then the gallery opener. `Next` is 4–7 tabs from wherever focus lands; pressing
+it moves focus to the new step's `<h2>`, which is the right landing; every stop
+draws a 2 px ring; hidden steps are out of the ring entirely; the roving
+tabindex means one tile per group, as ARIA asks. The gallery is a real
+`<dialog>` opened with `showModal`, so Escape and the focus trap are the
+platform's. The grip has arrow keys (`onGripKey`). **⚠ And my own first probe
+said the price breakdown was keyboard-dead — it is not**: `#price-toggle` is a
+button with `aria-expanded`/`aria-controls`, and my selector had walked UP from
+a wrapper div. Checked before it reached the log.
+
+**Changed:** the arrival step. `?d=DM-N300080000A` — the code for the standard
+₪3,195 door — landed on **step 01 with a size picker**, while the same door
+carrying a window landed on the summary. The predicate was
+`GROUPS.some(g => state[g.key] !== DEFAULTS[g.key])`: *is this door different
+from the one the page opens with*, which answers "did somebody send this" on
+every door except the one a customer most often sends. `fromQuery` returns
+`carries` now — did the address hold any of the customer's choices, as against
+nothing but our own switches — and `js/app.js` reads that. Bare loads, `?lang=`,
+`?bare=1` and `?sheet=1` still open at step 01; an unreadable code now lands on
+the summary with its notice, which is where a link-follower belongs.
+
+⚠ **T11's own fixture could not see it**, and that is the part worth keeping:
+both arrival rows in `npm run audit` carry a heavily non-default door, and the
+comment beside them names "an unreadable code lands on the default door, at
+step 01" as the signature of FAILURE — so the case was known and never asked
+of a real customer. Two rows added, neither typed (the code is read off the
+page's own bare load, the query is built from `DEFAULTS`). **Falsified** by
+restoring the old predicate: the two new rows fail, the two old ones stay
+green. `npm test` gets the string half, derived from `toQuery` rather than
+sampled; falsified by calling `c` and `d` switches.
+
+**Left alone deliberately:**
+· **The message's opener.** A link carrying the default door still says *"I
+  looked at the door the site opens with and I have a question"* — 10.9
+  decided that deliberately, and where somebody LANDS and what the message
+  CLAIMS are two questions.
+· **The first size tile behind the quote bar at 390 in English** (first tile
+  720–851 against a fold at ~777, so its name and price are covered on
+  arrival). This is CLAUDE.md §9's open item, measured there in Hebrew at 320
+  and recorded as "comfortable at 390" — it is not comfortable in English.
+  Recorded rather than fixed: §9 says the only places left to take it from are
+  the illustration note (an honesty commitment, not to be moved without
+  asking) and the 131 px size tile, which is real design work and not the tail
+  of a run.
+· **The tab order starting mid-rail.** A cold load's first Tab lands on the
+  SECOND navigator circle, because `markSteps` calls `scrollIntoView` on the
+  live one and Chromium moves the sequential-focus starting point with it.
+  Nothing is unreachable and the wall chrome is one wrap away; not worth a
+  behaviour change on a heuristic that differs between engines.
+
+**Best idea of the run that was NOT taken:** at 390 the gallery opener, the
+illustration note, the eyebrow, the question, its explanation and a group
+heading stand between the door and the first answer — six bands on step 01, and
+the answers arrive cut. The idea is to give step 01 alone the treatment the
+other steps get from `goStep`'s ~50 px scroll: land the page with the question
+at the top of the flow rather than the door at the top of the screen. Refused
+here because §9 has already measured the obvious version of it — the section's
+`scroll-margin-block-start` gains exactly those 50 px and is still 28 px short,
+and scrolling further means scrolling past the question — so it needs the tile
+height, which is design work with its own measurement.
+
+**Proposed · taken · refused:** proposed the arrival predicate (taken), the two
+derived T11 rows (taken), the `carries` string assertions (taken), a keyboard
+fix for the price column (refused — it was my instrument, not the page), the
+step-01 arrival scroll (refused, above), the size-tile height (recorded for a
+run that can measure it). Done the cheap way on purpose: one browser, no
+fan-out — the finding came from reading one predicate against five addresses,
+and `ultracode` would have bought nothing.
+
+**Commit:** (pending — recorded in a follow-up commit)
+
+---
+
 ## 2026-09-10 21:20 UTC — run 105: the message about the door was sitting on top of the answers, on every phone and on the two narrowest desktops
 
 **Looked at:** the page as **the customer who changes their mind**, at 320×568

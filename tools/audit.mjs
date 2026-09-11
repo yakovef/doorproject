@@ -19,7 +19,7 @@ import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
 import { crashed } from './browser.mjs';
 import { load, lum } from './imglib.mjs';
-import { DEFAULTS, decodeCode, encodeCode } from '../js/url-state.js';
+import { DEFAULTS, decodeCode, encodeCode, toQuery } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
 import { SIZES } from '../js/catalog.js';
 import { setLang } from '../js/copy.js';
@@ -2409,13 +2409,36 @@ for (const v of VIEWS) {
      a nonsense path and quietly fail to be the check it claims to be. */
   const HOME = `file://${process.cwd()}/index.html`;
   const pg = await b.newPage({ viewport: { width: 390, height: 844 } });
+  /* ⚠ AND THE FIXTURE BELOW COULD NOT SEE THE ONE DOOR THIS FAILS ON.
+     Both of the original rows carry a heavily non-default door, and the
+     predicate `js/app.js` used until 11.9 was "does this door differ from the
+     default" — so the check passed on every door except the standard ₪3,195
+     leaf, which is the commonest thing Peretz sells and the one a link most
+     often carries. Measured: `?d=DM-N300080000A` landed on `fit`. The two
+     rows below are that case, from both directions, and neither is typed:
+     the code is read off the page's own bare load and the query is built from
+     `DEFAULTS`, so they follow the catalogue rather than going stale in
+     silence (§5.15 — a fixture that cannot fail is not a check). */
   const arrivals = [
     ['a full query', '?v=18&c=rb-9016d&w=rect&d=panel&k=coral&s=wide&h=left-in'],
     ['a short code', null],
+    ['the standard door as a query', toQuery(DEFAULTS)],
+    ['the standard door as a code', 'DEFAULT-CODE'],
     ['a bare load',  ''],
   ];
   for (const [what, q] of arrivals) {
     let query = q;
+    if (query === 'DEFAULT-CODE') {
+      /* the code the page itself prints for the door it opens with */
+      await pg.goto(HOME);
+      await pg.waitForTimeout(400);
+      const code = await pg.evaluate(() => document.querySelector('#code')?.textContent);
+      if (!code || !/^DM-/.test(code)) {
+        fault('arrival', `could not read the standard door's own code off a bare load (${code}) — this row is dead`);
+        continue;
+      }
+      query = `?d=${code}`;
+    }
     if (query === null) {
       /* Read the code off a built door rather than typing one: a literal here
          would go stale the next time VERSION moves, and it would go stale

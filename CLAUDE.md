@@ -314,7 +314,7 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **4,349,736 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
+- `npm test` — **4,349,768 / 0**. ⚠ A CHANGE IN THIS NUMBER IS NOT EVIDENCE OF
   ANYTHING; it is the product of the catalogue's list lengths. Read the failure
   count. (This line said **5,403,239** for two rounds after the stripe rework
   cut fourteen `DETAILS` entries — a number in prose describing a thing that
@@ -1409,7 +1409,7 @@ empty list cannot be noticed by reading, only by trying to obey it.
 | T8 | The cylinder is on the same side in he, en and ru | the hinge trap |
 | T9 | The page is fully usable under `prefers-reduced-motion: reduce` | — |
 | T10 | `window: rect` cannot be chosen without a bottom panel | Peretz's own rule |
-| T11 | `?d=CODE` **and** a full query both land on the quote page, not step 01 | ⚠ shipped half-done and closed 27.8 — the shared-link half is the half Peretz uses |
+| T11 | `?d=CODE` **and** a full query both land on the quote page, not step 01 | ⚠ shipped half-done and closed 27.8 — the shared-link half is the half Peretz uses. ⚠ **And then asserted with a fixture that could not fail**: both rows carried a heavily non-default door, and the page's predicate was *does this door differ from the default* — so the ONE door it got wrong was the standard ₪3,195 leaf. Two derived rows added 11.9 |
 | T12 | Two renders of one state stay byte-identical with the two stacked leaf rects in place | purity |
 | T13 | Under `.is-bare`, `getComputedStyle` reports `animation-name: none` on every animated element | the 110 sheets go non-deterministic otherwise |
 | T14 | Every interactive control in the flow measures ≥ 44 px on both axes, at all seven `VIEWS` | the grip controls were 22 px for two rounds |
@@ -1909,6 +1909,60 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE LINK FOR THE COMMONEST DOOR PERETZ SELLS OPENED ON THE SIZE PICKER —
+  11.9.2026.** A customer walks all eight steps, keeps the standard ₪3,195
+  door, and sends it. Peretz opens the link — or types the code off the
+  telephone — and lands on **step 01 of the design flow**, with a size picker,
+  rather than on the summary with the door, the spec and the price. Measured
+  on the real page: `?d=DM-N300080000A` → step `fit`; the same door with a
+  window on it → `sum`; `?c=rb-7126d`, the default colour spelled out → `fit`.
+  ⚠ **THE INTENT WAS RIGHT AND THE QUESTION WAS A PROXY.** `js/app.js` has
+  said in its own comment since the flow shipped that *"somebody following a
+  link is not designing a door, they are LOOKING at one — Peretz most of
+  all"*. What it computed was `GROUPS.some(g => state[g.key] !== DEFAULTS[g.key])`
+  — *is this door different from the one the page opens with* — which answers
+  the intended question on every door except the one the page opens with.
+  **The door a link carries cannot say whether somebody sent it. An address
+  can.** `fromQuery` returns `carries` now: did this URL hold any of the
+  customer's choices, as against nothing but our own rendering switches
+  (`bare`, `sheet`, `lang`, and the withdrawn `i`).
+  ⚠ **It is the SAME SHAPE as the 10.9 fix one layer up** — the send label
+  asking `isUntouched` when it meant "has anybody engaged". A proxy that is
+  right at arrival and wrong afterwards, and a proxy that is right on every
+  door but the default, are one mistake in two hats. §5's family, with the
+  copies in an unusual order again: nothing is duplicated here, the single
+  statement is simply of the wrong quantity.
+  ⚠ **THE MESSAGE'S OPENER IS DELIBERATELY NOT CHANGED WITH IT.** 10.9 decided
+  that a link carrying the default door still opens *"I looked at the door the
+  site opens with and I have a question"*, because Peretz opening his own link
+  really is looking at that door and the conservative sentence cannot make a
+  false claim about a customer. Where somebody LANDS and what the message
+  CLAIMS are two questions; only the first moved.
+  ⚠ **AND T11'S FIXTURE COULD NOT SEE THIS, WHICH IS WORTH MORE THAN THE FIX.**
+  `npm run audit` asserts both halves of T11 — a full query and a `?d=` code —
+  and both rows carry `c=rb-9016d&w=rect&d=panel&k=coral&s=wide&h=left-in`. A
+  check whose subject is chosen so that the defect cannot appear in it is
+  §5.15 from the other end: not a selector that stopped matching, but a
+  fixture that was never able to fail. The comment beside it even names *"an
+  unreadable code lands on the default door, at step 01"* as the SIGNATURE OF
+  FAILURE — the author knew the default door lands at step 01 and never asked
+  whether a customer could legitimately send one. Two rows added, and neither
+  is typed: the code is read off the page's own bare load, the query is built
+  from `DEFAULTS`. **Falsified** by restoring the old predicate — the two new
+  rows fail and the two old ones stay green, which is the fixture's blindness
+  measured rather than argued.
+  `npm test` gets the string half, DERIVED rather than sampled (the lesson of
+  the `bell` guard, 10.9): **every parameter `toQuery` can emit** must read as
+  a door on its own, so a tenth field is covered without anybody coming back;
+  each switch must read as not-a-door AND be a key `fromQuery` already accepts
+  silently, so the exemption list cannot rot into a name nothing knows.
+  Falsified by calling `c` and `d` switches: three faults.
+  No price, no id, no list order, no bit, no `VERSION` — one predicate, one
+  returned field. The 52 bare sheets came back **byte-identical**; 5 of the 12
+  `shot` sheets moved, which proves nothing either way (§7) — every one of
+  their twelve queries is a non-default door and already arrived at the
+  summary.
 
 - **⚠ THE MESSAGE ABOUT THE DOOR WAS COVERING THE ANSWERS IT WAS ABOUT — ON
   EVERY PHONE, AND ON THE TWO NARROWEST DESKTOPS TOO. 10.9.2026.** Seventh of

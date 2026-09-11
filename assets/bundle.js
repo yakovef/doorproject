@@ -7772,10 +7772,12 @@ ${body}
     for (const key of p.keys()) {
       if (!KNOWN.has(key) && !RETIRED.has(key)) notice = notice || "option-unknown";
     }
+    const SWITCH = /* @__PURE__ */ new Set(["bare", "sheet", "lang", "i"]);
+    const carries = [...p.keys()].some((k) => !SWITCH.has(k));
     const code = p.get("code") || (/^DM-/i.test(p.get("d") || "") ? p.get("d") : null);
     if (code) {
       const decoded = decodeCode(code);
-      if (decoded) return settle(decoded, null);
+      if (decoded) return { ...settle(decoded, null), carries };
       notice = "code-unknown";
     }
     const take = (key, param, list, idOf = (o) => o.id) => {
@@ -7837,7 +7839,7 @@ ${body}
         state2.grip = { x: gx, y: gy, rot: gr === 90 ? 90 : 0 };
       }
     }
-    return settle(state2, notice);
+    return { ...settle(state2, notice), carries };
   }
   function settle(state2, notice) {
     const { state: fixed, changed, said } = repair(state2);
@@ -8530,7 +8532,7 @@ ${body}
     setLang(pickLang(window.location.search));
     translateStatic();
     buildLangs();
-    const { state: parsed, notice, said } = fromQuery(window.location.search);
+    const { state: parsed, notice, said, carries } = fromQuery(window.location.search);
     state = parsed;
     buildPanel();
     if (PLACEHOLDER2) $("#placeholder-note").hidden = false;
@@ -8616,8 +8618,7 @@ ${body}
       }
     }
     if (!document.documentElement.classList.contains("is-sheet")) {
-      const shared = GROUPS.some((g) => state[g.key] !== DEFAULTS[g.key]) || state.stripeDir !== DEFAULTS.stripeDir;
-      goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
+      goStep(carries ? SUMMARY.key : SECTIONS[0].key, false);
     }
     document.documentElement.classList.add("is-arriving");
     setTimeout(() => document.documentElement.classList.remove("is-arriving"), 1e3);

@@ -584,7 +584,7 @@ function init() {
   translateStatic();
   buildLangs();
 
-  const { state: parsed, notice, said } = fromQuery(window.location.search);
+  const { state: parsed, notice, said, carries } = fromQuery(window.location.search);
   state = parsed;
 
   buildPanel();
@@ -807,10 +807,29 @@ function init() {
      and "which step is the customer on" is not a question it has. Guarding the
      callers one at a time would answer that question with `null` four times
      over and leave the fifth for whoever adds it. */
+  /* ⚠ AND "SHARED" IS A FACT ABOUT THE ADDRESS, NOT ABOUT THE DOOR. This read
+     `GROUPS.some(g => state[g.key] !== DEFAULTS[g.key])` — is this door
+     different from the one the page opens with — which answers the intended
+     question on every door but ONE, and that one is the door Peretz sells
+     most. Measured 11.9.2026 on the real page: `?d=DM-N300080000A`, the code
+     for the standard ₪3,195 leaf, landed on `fit` with a size picker, while
+     the same door with a window on it landed on `sum`. A customer who walks
+     all eight steps, keeps the standard door and sends it had Peretz open
+     their link on the design flow rather than on the door and the price.
+     `fromQuery` answers the honest question now: did this URL carry any of
+     the customer's choices at all, as against nothing but our own switches.
+     ⚠ It is the SAME SHAPE as the fault fixed on 10.9 one layer up — the send
+     label asking `isUntouched` when it meant "has anybody engaged". A proxy
+     that is right at arrival and wrong afterwards, and a proxy that is right
+     on every door but the default, are the same mistake wearing two hats.
+     ⚠ THE MESSAGE'S OPENER IS NOT CHANGED WITH IT, and that is deliberate:
+     10.9 decided that a link carrying the default door should still open
+     "I had a question", because Peretz opening his own link really is looking
+     at the door the site opens with, and the conservative sentence is the one
+     that cannot make a false claim about a customer. Where he LANDS and what
+     the message CLAIMS are two questions. */
   if (!document.documentElement.classList.contains('is-sheet')) {
-    const shared = GROUPS.some(g => state[g.key] !== DEFAULTS[g.key])
-                || state.stripeDir !== DEFAULTS.stripeDir;
-    goStep(shared ? SUMMARY.key : SECTIONS[0].key, false);
+    goStep(carries ? SUMMARY.key : SECTIONS[0].key, false);
   }
 
   /* ⚠ M1: THE DOOR ASSEMBLES, ONCE. `is-arriving` is on `<html>` for one
