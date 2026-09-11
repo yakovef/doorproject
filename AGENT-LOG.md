@@ -174,7 +174,7 @@ window. **That is the change to spend a fleet on next.**
 distinct sheet headings · shave 5 px at 568x320 · two columns in landscape) ·
 taken 2 · refused 2.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `bccea1a`
 
 ---
 
