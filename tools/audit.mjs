@@ -3067,6 +3067,143 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── THE ORDER SHEET PRINTS ON ONE SHEET OF PAPER ────────────────────────
+   ⚠ THIS IS THE ONLY CHECK IN THE REPOSITORY THAT PUTS THE SHEET ON PAPER,
+   AND UNTIL 12.9.2026 THERE WAS NONE. `?sheet=1` is an A4 document — the thing
+   Peretz prints and carries to the workshop — and `css/app.css` has carried a
+   whole `@media print` block for it since it was built. Every check that ever
+   looked at that route read its innerText in a browser window at SCREEN size.
+   A screen has no pages. Two separate faults were living behind that:
+   `body`'s 32.8 mm reservation for two fixed bars the sheet deletes, and the
+   two-column grid holding the drawing's half of the page for the document's
+   whole height. Four of nine door x language PDFs printed on two pages; the
+   widest דו כנפי in Russian printed on THREE.
+
+   ⚠ THE GATE IS THE PAGE COUNT, WHICH IS THE ARTEFACT AND NOT OUR ARITHMETIC
+   ABOUT IT. A `scrollHeight` against a printable height would be §5.14 — a
+   check anchored in our own model of the page, and our model of the page is
+   exactly what was wrong twice over. `page.pdf()` makes Chromium lay the
+   document out on real A4 and the answer comes back as a count of `/Type
+   /Page` objects: one, or not one. A binary cannot drift to within a pixel of
+   failing.
+
+   ⚠ AND IT MEASURES AT 703 px, WHICH IS THE PAPER. A4 inside the stylesheet's
+   own 12 mm `@page` margin is 186 mm = 703 css px, so a printed page always
+   matches `@media (max-width: 1099px)` — the phone rules are the rules on
+   paper — and it clears the sheet's own 700 px rule by THREE pixels. The
+   first version of this check ran at 1200 px and reported millimetres of a
+   document Chromium never laid out.
+
+   ⚠ THE DOORS ARE THE TWO ENDS OF THE RANGE AND THE WORST IS IN IT. The
+   tallest sheet the catalogue can produce is the widest דו כנפי with a square
+   window: its סורג row names two panels, which is the longest value on the
+   sheet, and it is 271.8 mm of 273 in Russian — **1.2 mm to spare, which this
+   file's own rule says is a coincidence and not a pass.** It is here so that
+   the day a copy edit costs that millimetre, this check says so rather than
+   Peretz finding out at the printer. The headroom is PRINTED every run rather
+   than gated: a threshold under it would be a constant fitted to nothing.
+
+   ⚠ AND IT SWEEPS THE LANGUAGES BECAUSE THE SHEET IS BILINGUAL, which is the
+   whole of why it overflowed — every row prints the customer's language over
+   the Hebrew Peretz reads, so a Russian spec column runs 239 mm against
+   Hebrew's 142. A Hebrew-only check would have been green throughout both
+   faults. §5.15 clauses for the rest: the sheet has to be found, it has to
+   carry rows, each state has to survive `repair` (a sheet of a door the site
+   cannot build is a page about nothing), and Hebrew must come out SHORTER
+   than the other two — if it does not, the bilingual rows are gone or this
+   check has stopped switching language, and either way it can no longer see
+   the fault it was written for. */
+{
+  console.log('\nthe order sheet prints on one sheet of paper');
+  const PRINT = `file://${process.cwd()}/index.html`;
+  /* 703 x 1032 css px is A4 inside the `@page { margin: 12mm }` the print
+     block sets — 186 x 273 mm. Anything else lays out a different document. */
+  const PAPER = { width: 703, height: 1032 };
+  const PAGE_MM = 297 - 12 * 2;
+  const LOAD = {
+    colour: 'rb-6219d', detail: 'panel', handle: 'shahar', lockset: 'knobplate',
+    pirzul: 'pz-gold', special: 'kodan', mashkof: 'mk-wide',
+  };
+  const DOORS = {
+    /* The tallest sheet in the range: two glazed panels, so the סורג row
+       carries the longest value the document can hold. */
+    'widest דו כנפי, glazed': { ...DEFAULTS, ...LOAD, size: 'halfextra2',
+      window: 'rect', grille: 'grid' },
+    /* The most spec rows on a single leaf — a window displaces the bell and
+       the peephole (`bellFits`), so the loudest solid door is a different
+       door from the loudest glazed one and both are worth printing. */
+    'single leaf, every fitting': { ...DEFAULTS, ...LOAD, size: 'extra2',
+      bell: 'bell', peephole: 'peep' },
+  };
+  const byLang = {};
+  for (const [what, st] of Object.entries(DOORS)) {
+    const fixed = repair(st);
+    if (fixed.changed.length) {
+      fault('sheet-print', `the "${what}" door is not buildable — the rules repaired `
+        + `${fixed.changed.join(', ')}, so the page measured is not the page named. `
+        + 'Pick another door rather than printing a repaired one');
+      continue;
+    }
+    for (const lang of ['he', 'en', 'ru']) {
+      const where = `sheet-print ${lang}`;
+      const p = await b.newPage({ viewport: PAPER });
+      try {
+        await p.goto(`${PRINT}?sheet=1&lang=${lang}&d=${encodeCode(st)}`,
+          { waitUntil: 'load' });
+        await p.waitForTimeout(800);
+        await p.emulateMedia({ media: 'print' });
+        await p.waitForTimeout(200);
+        const m = await p.evaluate(() => {
+          const mm = px => Math.round(px / (96 / 25.4) * 10) / 10;
+          const sheet = document.querySelector('.sheet');
+          if (!sheet) return { missing: 'no .sheet in the document' };
+          const r = sheet.getBoundingClientRect();
+          /* BOTH, because they differ and the difference IS one of the two
+             faults: the first version reported only `.sheet` and its failure
+             message read "260.2 mm against 273" about a document on two
+             pages — the 32.8 mm that spilled it was `body`'s padding, which
+             is OUTSIDE the sheet's own box. A message that contradicts its
+             own verdict sends the next reader to the wrong element. */
+          return { rows: document.querySelectorAll('.sheet__row').length,
+                   h: mm(r.height), doc: mm(document.documentElement.scrollHeight) };
+        });
+        if (m.missing) { fault(where, `${what}: ${m.missing}`); await p.close(); continue; }
+        if (!m.rows) {
+          fault(where, `${what}: the order sheet printed no spec rows at all — this `
+            + 'check would pass on a blank page');
+        }
+        const pdf = await p.pdf({ format: 'A4', printBackground: true, margin: {} });
+        /* `/Type /Page` with no `s`: `/Pages` is the tree node, `/Page` a leaf. */
+        const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+        byLang[lang] = Math.max(byLang[lang] || 0, m.h);
+        if (pages !== 1) {
+          fault(where, `${what}: the A4 order sheet printed on ${pages} pages — the `
+            + `document lays out ${m.doc} mm against ${PAGE_MM} mm of printable page `
+            + `(the sheet itself is ${m.h} mm; anything above that is padding around `
+            + 'it), so Peretz carries a second sheet holding the tail of the spec table');
+        } else {
+          console.log(`    ${lang} ${what}: 1 page, ${m.h} mm of ${PAGE_MM}, `
+            + `${Math.round((PAGE_MM - m.h) * 10) / 10} mm to spare, ${m.rows} rows`);
+        }
+      } catch (e) {
+        fault(where, `${what}: could not be printed: ${e.message}`);
+      }
+      await p.close().catch(() => {});
+    }
+  }
+  /* §5.15: the fault lived in the second line of every row, so a sweep that
+     is not really changing language cannot see it. Hebrew has no gloss and
+     must therefore be the short one. */
+  if (byLang.he && byLang.en && byLang.ru
+      && !(byLang.he < byLang.en && byLang.he < byLang.ru)) {
+    fault('sheet-print', `Hebrew laid out at ${byLang.he} mm against English `
+      + `${byLang.en} and Russian ${byLang.ru} — the sheet is supposed to print the `
+      + "customer's language OVER the Hebrew, and that second line is what made it "
+      + 'overflow. Either the bilingual rows are gone or this check is no longer '
+      + 'switching language, and it can no longer see the fault it was written for');
+  }
+}
+
 await b.close();
 
 if (skipped.length) {

@@ -45,6 +45,109 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-12 07:05 UTC — run 112: the A4 order sheet printed on two pages, and on three for the widest door
+
+**Looked at:** the page as **PERETZ PRINTING THE ORDER AND CARRYING IT TO THE
+WORKSHOP**. `?sheet=1` is the document he builds from, `css/app.css` has carried
+a whole `@media print` block for it since it was written — `@page { size: A4
+portrait; margin: 12mm }`, a `print-color-adjust` so the colour chip survives,
+a 140 mm cap on the elevation — and **no run had ever put it on paper.** Every
+check that has ever looked at that route read its innerText in a browser window
+at screen size, and a screen has no pages. Walked the flow forward at 320x568,
+390x844 and 1440x900 first, then read the send button's message, then printed
+real A4 PDFs of nine door × language sheets and counted `/Type /Page`. Recent
+lenses: 107 Russian at 320, 108 Peretz on a laptop, 109 the tablet band, 110 the
+phone held sideways, 111 Peretz on the telephone.
+
+**Instruments:** test ✓ 4,349,822 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets —
+**52 bare sheets byte-identical**, 4 of 12 `shot` moved (proves nothing, §7).
+Done the cheap way, single-threaded, and saying so: the whole run was one
+harness printing PDFs and one picture read with my own eyes. `ultracode`
+deliberately not spent — there was nothing to fan out over, and the two things
+that mattered most (the BFC and the flung gloss) were found by grepping the
+cascade and by looking at the page, neither of which parallelises.
+
+**What was wrong:** **four of nine door × language PDFs printed on two pages**,
+and the widest דו כנפי in Russian on **three**. Two independent causes, and
+they are the same defect at two scales — *space held for an object that is not
+there*:
+1. **`body` went on reserving 62 px at each end for the two FIXED bars.** Sheet
+   mode deletes both, and the comment beside the deletion says exactly why —
+   *"a printed order sheet with a fixed WhatsApp bar across the foot of every
+   page is the kind of thing nobody notices until it is on paper."* Right about
+   the BAR; the **reservation** stayed. 32.8 mm of nothing on a 273 mm page.
+2. **The elevation was a GRID COLUMN**, so its half of the page was reserved for
+   the document's whole height: the spec got 94 mm of 186 mm for its entire
+   length and went on wrapping in a narrow column below the drawing's foot with
+   **92 mm of blank paper beside it**. It floats now.
+
+| widest דו כנפי, glazed | Hebrew | English | Russian |
+|---|---|---|---|
+| as shipped | 179.6 mm · 1 page | 270.8 · 1 | **281.5 · 2** |
+| widest band | 178.9 · 1 | 270.8 · 1 | **287.2 · 3** |
+| after both | 178.9 · 1 | 260.2 · 1 | **271.8 · 1** |
+
+**Three things I got wrong, all caught here rather than shipped:**
+- **My first check ran at a 1200 px viewport** and reported millimetres of a
+  document Chromium never laid out. `page.pdf()` lays out at **703 px, which is
+  the paper** — 186 mm inside the 12 mm `@page` margin — so the phone rules are
+  the rules on paper, and it clears the sheet's own 700 px rule by THREE pixels.
+  §6 on my own instrument.
+- **My first fixture was refused by the check's own §5.15 clause.** The loud
+  door I typed carried a square window AND a bell, and `bellFits` removes both
+  fittings, so it would have printed a repaired door.
+- **The float did nothing at all until `.sheet__spec` stopped being a grid.** A
+  grid container is a block formatting context and **a BFC root does not flow
+  around a float** — it is placed beside it and narrowed, for its whole height,
+  which is the two-column behaviour the float was put in to end. The page came
+  back byte-identical, two pages and all, and I nearly read that as the float
+  being wrong. Found by grepping the cascade, which also caught `.sheet__art
+  { margin: 0 }` sitting thirty lines BELOW my rule and silently zeroing its
+  gutter — §8's trap, fourth occurrence.
+
+**And the float made the page fit and made it worse to read, which only the
+PICTURE showed.** `.sheet__he` is `direction: rtl` and `text-align: start`
+resolves against THAT direction, so in the new full-measure rows **the line
+Peretz reads was thrown 90 mm across the page** from the value it glosses. Not
+one number in this run said anything was wrong. Scoped to a row now; the foot's
+Hebrew SENTENCE keeps its own direction, because flush-left would start it at
+the end a Hebrew reader finishes on.
+
+**Read and found correct, rather than changed:** the printed CODE — the one
+thing on this sheet that has to be transcribed — is whole at every door and
+language, 0 px clipped and 0 px past the sheet. I opened a harness on it
+because it looked like it ran to the page edge in a screenshot; it does not,
+and my measurement of its "gap to the brand" was meaningless because
+`.sheet__brand` is a block heading spanning the row, not a neighbour.
+
+**Recorded rather than shaved, and it is in §9:** the worst door now fits by
+**1.2 mm** (271.8 of 273, Russian). This file's own rule says a number that
+comes out at 1 is a coincidence, not a pass. The audit prints the headroom every
+run and carries that exact door, so the day a copy edit costs the millimetre it
+says so — but nothing prevents it.
+
+**Best idea of the run that was NOT taken:** **measure how big the elevation has
+to be to be read off paper in a workshop.** The print block caps it at
+`max-block-size: 140mm` — **over half the page** — on a document whose job is
+the list of specifications beside it, and that number was picked when nobody
+here had ever printed the sheet. Taking it down pays twice: a millimetre of page
+per millimetre of cap, AND more rows running at full measure under the float. It
+is the whole of the 1.2 mm and more. What stops it being a one-line change is
+that the right number is a fact about a printed picture and a workshop, not
+about 273 mm — fit it to the page and it is a shave, which is what §6 exists to
+forbid. **That is the next thing to measure.** Run 111's idea (the read-aloud
+cost of an eleven-character code) and run 110's (two columns on a landscape
+phone) are still standing behind it.
+
+**proposed · taken · refused:** proposed 6 (the body reservation · the grid
+column · the BFC · the gloss alignment · shave `.sheet__body`'s padding · cut
+the 140 mm elevation cap) · taken 4 · refused 2.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-12 04:15 UTC — run 111: a code Peretz typed wrong said "showing the nearest one", about a door that is not near anything
 
 **Looked at:** the page as **PERETZ ON THE TELEPHONE** — a customer reads him

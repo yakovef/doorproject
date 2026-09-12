@@ -3266,7 +3266,38 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    normal visit one empty element and nothing else. */
 .sheet { display: none; }
 
-.is-sheet body { background: #fff; display: block; block-size: auto; overflow: visible; }
+/* ⚠ `padding: 0` IS IN THIS LIST BECAUSE IT COST A SECOND SHEET OF PAPER, AND
+   THE COMMENT TWELVE LINES DOWN NEARLY CAUGHT IT. Below 1100 px `body`
+   reserves the two FIXED bars — `padding-block: var(--steps-h)` for the
+   navigator and `var(--quote-h)` for the quote bar, **62 px each**. Sheet mode
+   deletes both: `.layout` takes the rail with it and the line below names the
+   quote bar explicitly, on the stated grounds that *"a printed order sheet
+   with a fixed WhatsApp bar across the foot of every page is the kind of thing
+   nobody notices until it is on paper."* That is exactly right about the BAR.
+   **The reservation for the bar stayed** — §5's family, the object removed and
+   the space held for it left behind.
+
+   ⚠ AND A PRINTED PAGE ALWAYS MATCHES THAT MEDIA QUERY. A4 inside a 12 mm
+   `@page` margin lays out at 186 mm = **703 css px**, so the phone rules are
+   the rules on paper, every time, at every screen size the customer used.
+
+   Measured 12.9.2026 by printing real PDFs, a glazed door with ironwork:
+
+     | | sheet | + 32.8 mm of reservation | A4 has 273 mm | pages |
+     |---|---|---|---|---|
+     | Hebrew  | 194.5 mm | 227.3 | fits | 1 |
+     | English | 246.3 mm | **279.1** | 6.1 over | **2** |
+     | Russian | 251.1 mm | **283.9** | 10.9 over | **2** |
+
+   The sheet is BILINGUAL — every row prints the customer's language over the
+   Hebrew Peretz reads — so an English or Russian order is inherently taller
+   (rows 16.1 and 16.5 mm against Hebrew's 10.1). Hebrew fits either way, which
+   is why nobody saw it: the language Peretz builds in is the one that never
+   spilled. Without the reservation both fit with 22 mm to spare.
+   `.sheet` carries its own `padding: 14mm 0`, so the document's air was never
+   this rule's job — three stacked margins put 42.4 mm of white above the first
+   line of an order form. */
+.is-sheet body { background: #fff; display: block; block-size: auto; overflow: visible; padding: 0; }
 /* Everything the configurator is, gone. The list is explicit rather than
    `body > *` because `#sheet` and the live regions have to survive it, and a
    rule that hides everything and then un-hides three things is two rules that
@@ -3304,19 +3335,60 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 .sheet__code { font-family: var(--mono); font-size: .9rem; }
 .sheet__code b { font-size: 1.05rem; }
 
+/* ⚠ THE DRAWING FLOATS, AND IT WAS A GRID COLUMN — WHICH RESERVED THE
+   DRAWING'S HALF OF THE PAGE FOR THE WHOLE HEIGHT OF THE DOCUMENT. Same
+   defect as `padding: 0` twenty lines up, one level down and with the object
+   still present: a two-column grid gives the spec 94 mm of a 186 mm page for
+   its entire length, so below the elevation's foot the spec went on wrapping
+   in a narrow column with **92 mm of blank paper beside it** — and ran off
+   the bottom of the sheet.
+   ⚠ AND IT ONLY SHOWS IN A LANGUAGE PERETZ DOES NOT READ. Every row prints
+   the customer's language over the Hebrew gloss, so a Russian row is two
+   lines before it wraps at all; Hebrew's spec column is 142 mm against
+   Russian's 239 and has never come near the foot. Measured 12.9.2026 on real
+   A4 PDFs, a דו כנפי with a square window and ironwork — the door with the
+   longest values in the range, because its סורג row names two panels:
+
+     | | Hebrew | English | Russian |
+     |---|---|---|---|
+     | grid, as it was | 179.6 mm · 1 page | 270.8 · 1 | **281.5 · 2 pages** |
+     | grid, widest דו כנפי | 178.9 · 1 | 270.8 · 1 | **287.2 · 3 pages** |
+     | float | 178.9 · 1 | 260.2 · 1 | **266 · 1** |
+
+   Every door × language in the range now prints on one page. `float` and not
+   a second grid track, because the whole point is that the spec must stop
+   being a column the moment the drawing ends, and a grid column does not
+   end — it is exactly as long as its row. `inline-start`, so the elevation
+   sits on the leading edge in all three languages and the sheet mirrors with
+   the interface the way the rest of the page does.
+   The 44% is the grid's own `1fr` of `1fr 1.15fr` to within a millimetre
+   (81.9 mm of 186), so the drawing is the size it has always printed at and
+   nothing about the picture moved. */
 .sheet__body {
-  display: grid; gap: 10mm;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  align-items: start;
+  display: block;
   padding-block: 8mm;
+}
+.sheet__art {
+  /* `margin: 0` first because this is a <figure> and the UA gives it 1em on
+     all four sides. It used to be its own rule thirty lines DOWN, which would
+     have silently reset the two margins below — a media query adds no
+     specificity but a later rule of equal specificity still wins, and that is
+     §8's trap in its plainest form. Folded in here so there is one statement
+     of this element's box. */
+  margin: 0; float: inline-start; inline-size: 44%;
+  margin-inline-end: 10mm; margin-block-end: 6mm;
 }
 /* Two columns is an A4 layout, and this page is opened on a phone before it is
    ever printed — measured at 390 px, the spec column comes out about 170 px
    wide and every value wraps to four lines, including the colour name and its
    manufacturer code. A sheet that cannot be proof-read on the device it was
-   sent to is a sheet nobody checks before ordering from it. */
+   sent to is a sheet nobody checks before ordering from it.
+   ⚠ AFTER the rule it overrides — §8, the fourth time in this file. A float
+   here would put the elevation beside two rows and the rest underneath it on
+   a 390 px screen, which is the narrow-column wrap this block exists to end. */
 @media (max-width: 700px) {
-  .sheet__body { grid-template-columns: minmax(0, 1fr); gap: 6mm; }
+  .sheet__body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6mm; }
+  .sheet__art { float: none; inline-size: auto; margin: 0; }
 }
 /* ⚠ THE HEBREW GLOSS, SHOWN ONLY ON A SHEET BUILT IN ANOTHER LANGUAGE.
    `dir="rtl"` on the element itself rather than a rule here, because a
@@ -3328,7 +3400,6 @@ html.is-live.is-untouched .wa__ask { display: inline; }
   font-size: .74rem; color: var(--ink-2); margin-block-start: 1px;
 }
 
-.sheet__art { margin: 0; }
 .sheet__art svg {
   inline-size: 100%; block-size: auto; max-block-size: 150mm;
   display: block;
@@ -3352,7 +3423,16 @@ html.is-live.is-untouched .wa__ask { display: inline; }
   margin-block-start: 4px; text-align: center;
   font-family: var(--mono); font-size: .8rem; color: var(--ink-2);
 }
-.sheet__spec { display: grid; gap: 0; }
+/* ⚠ `block`, AND IT WAS `grid; gap: 0` — WHICH IS THE WHOLE REASON THE FLOAT
+   ABOVE DOES ANYTHING. A grid container establishes a block formatting
+   context, and a BFC root does not flow around a float: it is placed beside
+   it and NARROWED, for its entire height, which is precisely the two-column
+   behaviour the float was put in to end. With this left as a grid the
+   elevation floated and the sheet came out byte-identical — 281.5 mm and two
+   pages on a Russian דו כנפי, exactly as before. The change is invisible
+   otherwise: the gap was 0 and every row is its own grid, so nothing about
+   this element was using the grid it declared. */
+.sheet__spec { display: block; }
 /* ⚠ THE LABEL COLUMN HAS TO SURVIVE A LANGUAGE THAT COMPOUNDS. It was a flat
    `7.5em`, sized by eye against Hebrew, where every label on this sheet is one
    short word — `משקוף`, `פרזול`, `פתיחה`. Russian writes the same field as
@@ -3376,6 +3456,19 @@ html.is-live.is-untouched .wa__ask { display: inline; }
   font-weight: 600; color: var(--ink-2);
   min-inline-size: 0; overflow-wrap: break-word; hyphens: auto;
 }
+/* ⚠ THE GLOSS ALIGNS WITH ITS VALUE, NOT WITH ITS OWN DIRECTION — and it only
+   started mattering when the rows below the elevation got the full measure.
+   `.sheet__he` is `direction: rtl` so its glyphs order correctly, and
+   `text-align: start` then resolves against THAT direction: the right-hand
+   edge. In a 94 mm column that lands the Hebrew roughly under its own value;
+   in the 186 mm rows that now run under the float it threw the line Peretz
+   reads **90 mm across the page**, so the value and its gloss read as two
+   unrelated columns. Seen in the rendered PDF, not computed — no measurement
+   here says anything is wrong.
+   Scoped to a ROW on purpose: `.sheet__foot`'s caveat is a whole Hebrew
+   SENTENCE with nothing above it to align to, and flush-left would start it
+   at the end a Hebrew reader finishes on. That one keeps its own direction. */
+.sheet__row .sheet__he { text-align: left; }
 .sheet__v small { display: block; font-size: .74rem; color: var(--ink-2); }
 .sheet__chip {
   inline-size: 16px; block-size: 16px; border-radius: var(--r-chip);

@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1615,6 +1615,38 @@ grip controls above the chip instead of beside it; or let the grip controls
 sit on the leaf at these widths only. `npm run audit` names the two viewports
 and the one control explicitly, so the exemption shrinks the day this is
 fixed and nothing else can hide behind it.
+
+### ⚠ THE WIDEST DOOR'S RUSSIAN ORDER SHEET FITS ITS PAGE BY 1.2 mm
+
+Closed on 12.9 for every door × language in the range — see §0b — and the
+worst case is a pass by a margin this file's own rule refuses to call one.
+
+The tallest sheet the catalogue can produce is the **widest דו כנפי with a
+square window**: two glazed panels, so its סורג row carries the longest value
+the document holds. In Russian it lays out at **271.8 mm against 273 mm** of
+printable A4. English is 260.2. Hebrew, which has no gloss line, is 178.9 and
+is not close.
+
+⚠ **One word of copy is a second sheet of paper**, and the customer who meets
+it is the one whose language Peretz does not read. `npm run audit` prints the
+headroom on every run and carries that exact door, so the day it goes it says
+so — but nothing prevents it.
+
+⚠ **THE CHEAPEST WAY OUT IS THE ELEVATION AND IT IS NOT A SHAVE.** The print
+block caps the drawing at `max-block-size: 140mm` — **over half the page** —
+on a document whose job is the list of specifications beside it, and that
+number was picked when nobody in this repository had ever printed the sheet.
+Taking it down is worth 1 mm of page per 1 mm of cap AND lets more rows run at
+full measure under the float, so it pays twice. What it needs first is a
+measurement nobody has taken: **how large the elevation has to be for Peretz
+to read the drawing off paper in a workshop** — which is a question about a
+printed picture, not about 273 mm. Do not fit it to the page.
+
+Two cheaper-looking sources are refused: `.sheet__body`'s 8 mm of block
+padding is the separation between the head rule and the first row and between
+the last row and the foot, and the `@page` margin is 12 mm because that is
+what a printer can hold. Shaving either to meet a number is what this file
+spends most of §6 warning about.
 
 ### ⚠ A PHONE HELD SIDEWAYS: TWO RESIDUALS, BOTH MEASURED
 
@@ -1999,6 +2031,92 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE A4 ORDER SHEET PRINTED ON TWO PAGES, AND ON THREE FOR THE WIDEST
+  DOOR — 12.9.2026.** Found by walking as **Peretz printing the order and
+  carrying it to the workshop**. `?sheet=1` is the document he builds from,
+  `css/app.css` has carried a whole `@media print` block for it since it was
+  written — `@page { size: A4 portrait; margin: 12mm }`, a `print-color-adjust`
+  on the colour chip, a 140 mm cap on the elevation — and **no run had ever put
+  it on paper.** Every check that has ever looked at that route read its
+  innerText in a browser window at screen size, and a screen has no pages.
+  Measured by printing real PDFs and counting `/Type /Page`: **four of nine
+  door × language sheets came out on two pages**, and the widest דו כנפי in
+  Russian on **three**. The tail was the last rows of the spec table and the
+  price.
+  ⚠ **TWO INDEPENDENT CAUSES, AND THEY ARE THE SAME DEFECT AT TWO SCALES —
+  SPACE HELD FOR AN OBJECT THAT IS NOT THERE.**
+  1. **`body` went on reserving 62 px at each end for the two FIXED bars.**
+     Sheet mode deletes both — `.layout` takes the rail with it and the line
+     below names the quote bar explicitly, on the stated grounds that *"a
+     printed order sheet with a fixed WhatsApp bar across the foot of every
+     page is the kind of thing nobody notices until it is on paper."* Exactly
+     right about the BAR. The **reservation** stayed: 32.8 mm of nothing on a
+     page with 273 mm of printable height. `padding: 0`.
+  2. **The drawing was a GRID COLUMN, so its half of the page was reserved for
+     the document's whole height.** The spec got 94 mm of a 186 mm page for its
+     entire length, so below the elevation's foot it went on wrapping in a
+     narrow column with **92 mm of blank paper beside it**. It floats now, and
+     the spec runs full width the moment the drawing ends.
+  ⚠ **AND THE FLOAT DID NOTHING UNTIL `.sheet__spec` STOPPED BEING A GRID.** A
+  grid container establishes a block formatting context and **a BFC root does
+  not flow around a float** — it is placed beside it and NARROWED, for its
+  whole height, which is the two-column behaviour the float was put in to end.
+  With that left alone the elevation floated and the page came back
+  byte-identical, two pages and all. It was `display: grid; gap: 0` over rows
+  that are each their own grid, so nothing was using it.
+  ⚠ **AND IT ONLY SHOWS IN A LANGUAGE PERETZ DOES NOT READ**, which is why it
+  survived. The sheet is BILINGUAL — every row prints the customer's language
+  over the Hebrew gloss — so a Russian row is two lines before it wraps at all
+  and the Russian spec column runs **239 mm against Hebrew's 142**. Hebrew has
+  never come near the foot. Measured on the widest דו כנפי with a square
+  window, the tallest sheet the catalogue can produce (its סורג row names two
+  panels, the longest value on the document):
+
+  | | Hebrew | English | Russian |
+  |---|---|---|---|
+  | as shipped | 179.6 mm · 1 page | 270.8 · 1 | **281.5 · 2** |
+  | widest דו כנפי | 178.9 · 1 | 270.8 · 1 | **287.2 · 3** |
+  | after both | 178.9 · 1 | 260.2 · 1 | **271.8 · 1** |
+
+  ⚠ **271.8 OF 273 IS 1.2 mm, AND THIS FILE\'S OWN RULE SAYS THAT IS A
+  COINCIDENCE RATHER THAN A PASS.** It is recorded in §9 rather than shaved to
+  meet, and the check carries that worst door on purpose so the day a copy
+  edit costs the millimetre it says so. The cheapest way out is named there and
+  is NOT taken here: the elevation\'s print cap is **140 mm, over half the
+  page**, on a document whose job is the list beside it, and that number was
+  picked when nobody had printed the page — so it wants its own measurement of
+  what the drawing has to be to be legible, not a shave against 273.
+  ⚠ **AND THE FLOAT MADE THE DOCUMENT FIT AND MADE IT WORSE TO READ, WHICH ONLY
+  THE PICTURE SHOWED.** `.sheet__he` is `direction: rtl` so its glyphs order
+  correctly, and `text-align: start` then resolves against THAT direction — the
+  right-hand edge. In a 94 mm column that landed the Hebrew roughly under its
+  own value; in the full-measure rows that now run under the float it threw
+  **the line Peretz reads 90 mm across the page**, so each value and its gloss
+  read as two unrelated columns. No number in this run said anything was wrong.
+  It is `text-align: left` scoped to a ROW now — `.sheet__foot`\'s caveat is a
+  whole Hebrew SENTENCE with nothing above it to align to, and flush-left would
+  start it at the end a Hebrew reader finishes on, so that one keeps its own
+  direction.
+  ⚠ **THE GATE IS THE PAGE COUNT, WHICH IS THE ARTEFACT AND NOT OUR ARITHMETIC
+  ABOUT IT.** A `scrollHeight` against a printable height would be §5.14 — a
+  check anchored in our own model of the page, and our model of the page is
+  exactly what was wrong twice over. `page.pdf()` makes Chromium lay the
+  document out on real A4. ⚠ And it measures at **703 px, which is the paper**:
+  A4 inside the stylesheet\'s own 12 mm margin is 186 mm = 703 css px, so a
+  printed page always matches `@media (max-width: 1099px)` — **the phone rules
+  are the rules on paper** — and it clears the sheet\'s own 700 px rule by
+  THREE pixels. My first version of the check ran at 1200 px and reported
+  millimetres of a document Chromium never laid out. §6, on my own instrument.
+  **Falsified** in both directions: restoring the padding gives two faults (en
+  and ru, at 292.9 and 304.5 mm of document), restoring the grid gives one at
+  three pages. ⚠ And my own first fixture was refused by the check\'s own
+  §5.15 clause — the loud door I typed carried a square window AND a bell, and
+  `bellFits` removes both fittings, so it would have printed a repaired door.
+  No price, no id, no list order, no bit, no `VERSION`; four CSS declarations.
+  The 52 bare sheets came back **byte-identical** — `?bare=1` keeps only
+  `.stage-wrap` and this touches nothing but `?sheet=1` — and 4 of the 12
+  `shot` sheets moved, which proves nothing either way (§7).
 
 - **⚠ A CODE PERETZ TYPED WRONG OFF THE TELEPHONE SAID "SOME OF THE OPTIONS ARE
   UNAVAILABLE — SHOWING THE NEAREST ONE", ABOUT A DOOR THAT IS NOT NEAR
