@@ -144,7 +144,7 @@ a hand-rolled scroll · rounding the focus ring) · taken 2 · refused 2 — the
 `preventScroll` route because it would put a second statement of the scroll
 arithmetic in JavaScript beside the one in CSS, which is §5.10 exactly.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `633ab0f`
 
 ---
 
