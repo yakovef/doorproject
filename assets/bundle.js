@@ -9722,6 +9722,19 @@ ${body}
     if (quoteEl) {
       document.documentElement.style.setProperty("--quote-h", `${Math.round(quoteH)}px`);
     }
+    const style = document.documentElement.style;
+    const choose2 = document.querySelector(".panel--choose");
+    const railEl = choose2 && choose2.querySelector(".steps");
+    const footEl = document.querySelector(".sect:not([hidden]) .sect__foot");
+    if (choose2 && railEl && getComputedStyle(railEl).position === "sticky") {
+      const pad = parseFloat(getComputedStyle(choose2).paddingBlockStart) || 0;
+      const band = pad + railEl.getBoundingClientRect().height;
+      if (band > 0) style.setProperty("--rail-band", `${Math.round(band)}px`);
+    }
+    if (footEl && getComputedStyle(footEl).position === "sticky") {
+      const r = footEl.getBoundingClientRect();
+      if (r.height > 0) style.setProperty("--foot-band", `${Math.round(r.height)}px`);
+    }
   }
   var liveTimer = null;
   function announce(text) {

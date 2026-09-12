@@ -3287,6 +3287,135 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── A CUSTOMER WITH NO MOUSE CAN SEE THE OPTION THEY JUST FOCUSED ───────
+   ⚠ NOT IN `VIEWS`, AND FOR THE PRICE SWEEP'S REASON — this needs the two
+   breakpoints' two different scrollports, and each width in `VIEWS` costs a
+   whole audit pass. Four widths, once per run.
+
+   What it is for, measured 12.9.2026 by arrowing through every option group
+   of every step with the keyboard and nothing else: `keyboardGrid` moves
+   focus with `items[next].focus()` and no `preventScroll`, so the browser
+   scrolls the newly focused option into view — and "into view" means flush
+   against the edge of the SCROLLPORT, which below 1100 px is 62 px of fixed
+   navigator plus a sticky door at one end and a fixed quote bar at the other,
+   and above it is a sticky rail and a sticky foot inside the panel. The
+   option the customer had just focused was hidden on 7 of 8 steps at every
+   width, usually entirely: 44 px of a 44 px colour swatch behind the door at
+   320x568, all 134 px of a lock tile, 93 px of one behind the foot at 1280.
+   The focus ring went with it, so there was nothing on screen saying where
+   they were.
+
+   ⚠ A MOUSE NEVER MEETS THIS, which is why every other check here is blind to
+   it: nothing scrolls when you click what you can already see. The audit's
+   own keyboard walk (above) presses Tab and Enter and asserts that the door
+   CHANGES; it has never pressed an arrow key inside a group.
+
+   ⚠ AND IT DRIVES REAL KEYS, not `el.focus()` from script. The fault IS the
+   browser's scroll-into-view on a focus change, so a scripted focus would
+   reproduce it and a scripted focus with `preventScroll` would hide it; what
+   is being asserted is what Chromium does when a person presses a key.
+
+   ⚠ The measure is the fixed and STICKY furniture, not `innerHeight`. A tile
+   behind the door is as unreadable as one off the screen, and this file has
+   already recorded making the viewport mistake once (§0b, 29.8). */
+{
+  console.log('\na customer with no mouse can see the option they just focused');
+  const KB_URL = `file://${process.cwd()}/index.html`;
+  const KB = [[320, 568], [390, 844], [768, 1024], [1280, 720]];
+  /* Anything painted over the scrollport, read off the live page rather than
+     listed here — the bars differ by breakpoint and a list would go stale. */
+  const covering = () => {
+    window.__cov = [];
+    for (const el of document.querySelectorAll('body *')) {
+      const cs = getComputedStyle(el);
+      if (cs.position !== 'fixed' && cs.position !== 'sticky') continue;
+      if (cs.visibility === 'hidden' || cs.display === 'none' || el.hidden) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 40 || r.height < 10) continue;
+      if (el.closest('.toast')) continue;   /* it fades; it is run 105's check */
+      window.__cov.push({ el, r, sel: el.className ? '.' + String(el.className).trim().split(/\s+/)[0] : el.tagName });
+    }
+    return window.__cov.length;
+  };
+  const hiddenBy = () => {
+    const el = document.activeElement;
+    if (!el || el === document.body) return { missing: 'focus left the document' };
+    const r = el.getBoundingClientRect();
+    let worst = 0, why = '';
+    for (const c of window.__cov) {
+      if (c.el.contains(el)) continue;      /* the rail does not cover its own circles */
+      const ox = Math.min(r.right, c.r.right) - Math.max(r.left, c.r.left);
+      const oy = Math.min(r.bottom, c.r.bottom) - Math.max(r.top, c.r.top);
+      if (ox > 1 && oy > worst) { worst = oy; why = c.sel; }
+    }
+    if (r.bottom - innerHeight > worst) { worst = r.bottom - innerHeight; why = 'off the screen'; }
+    if (-r.top > worst) { worst = -r.top; why = 'above the screen'; }
+    return {
+      hidden: Math.round(Math.max(0, worst)), why, tall: Math.round(r.height),
+      lbl: (el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 28),
+      radio: el.getAttribute('role') === 'radio',
+    };
+  };
+  let measured = 0, stepsSeen = 0;
+  for (const [w, h] of KB) {
+    const where = `keyboard ${w}x${h}`;
+    const p = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await p.goto(KB_URL, { waitUntil: 'load' });
+      await p.waitForTimeout(700);
+      for (let s = 0; s < 9; s++) {
+        const live = await p.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section || null);
+        if (!live || live === 'sum') break;
+        stepsSeen++;
+        const groups = await p.evaluate(() => document.querySelectorAll('.sect.is-live [role="radiogroup"]').length);
+        if (!groups) { fault(where, `step "${live}" has no option group — this check has no subject`); break; }
+        for (let g = 0; g < groups; g++) {
+          const n = await p.evaluate(gi => {
+            const gs = document.querySelectorAll('.sect.is-live [role="radiogroup"]');
+            const rs = gs[gi] ? gs[gi].querySelectorAll('[role="radio"]') : [];
+            if (rs.length) rs[0].focus();
+            return rs.length;
+          }, g);
+          if (n < 2) continue;              /* nothing to arrow through */
+          for (const k of ['End', 'ArrowUp', 'ArrowUp', 'Home', 'ArrowDown', 'ArrowDown', 'ArrowDown']) {
+            await p.keyboard.press(k);
+            await p.waitForTimeout(90);
+            await p.evaluate(covering);
+            const m = await p.evaluate(hiddenBy);
+            if (m.missing) { fault(where, `step "${live}": ${m.missing} on ${k}`); break; }
+            /* §5.15: if the keys stopped landing on options, this sweep is
+               measuring the way-on button and can no longer fail. */
+            if (!m.radio) { fault(where, `step "${live}": ${k} left focus on something that is not an option ("${m.lbl}") — this sweep is no longer measuring what it is named after`); break; }
+            measured++;
+            if (m.hidden > 2) {
+              fault(where, `step "${live}", ${k}: the option "${m.lbl}" the customer `
+                + `just focused is ${m.hidden} px of ${m.tall} behind ${m.why} — a keyboard `
+                + 'customer cannot see what they have selected');
+            }
+          }
+        }
+        const moved = await p.evaluate(() => {
+          const btns = [...document.querySelectorAll('.sect__next')].filter(x => x.offsetParent !== null && !x.disabled);
+          if (!btns.length) return false;
+          btns[0].focus();
+          return true;
+        });
+        if (!moved) { fault(where, `step "${live}": no way on to press with the keyboard`); break; }
+        await p.keyboard.press('Enter');
+        await p.waitForTimeout(360);
+      }
+    } catch (e) {
+      fault(where, `could not be walked with the keyboard: ${e.message}`);
+    }
+    await p.close().catch(() => {});
+  }
+  /* §5.15, twice: a sweep that walked nothing, and one that walked fewer steps
+     than the flow has, both read green without these. */
+  if (measured < 200) fault('keyboard', `only ${measured} focus moves were measured across ${KB.length} widths — the sweep is not walking the guide`);
+  if (stepsSeen < 8 * KB.length) fault('keyboard', `${stepsSeen} question steps were reached of ${8 * KB.length} — the walk stopped short`);
+  if (!faults) console.log(`    ${measured} focused options across ${stepsSeen} steps and ${KB.length} widths: every one whole on screen`);
+}
+
 await b.close();
 
 if (skipped.length) {

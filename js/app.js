@@ -3379,6 +3379,56 @@ function fitStage() {
   if (quoteEl) {
     document.documentElement.style.setProperty('--quote-h', `${Math.round(quoteH)}px`);
   }
+
+  /* ⚠ AND HOW MUCH OF THE DESKTOP PANEL IS SPOKEN FOR, for the
+     same reason `--sticky-h` and `--quote-h` exist one breakpoint down: above
+     1100 px the page does not scroll, the choices column does, and the
+     navigator is sticky at its top edge while `.sect__foot` is sticky at its
+     bottom. Anything scrolled into view inside that column therefore lands
+     behind one of them unless the scrollport says how much of itself is
+     already spoken for — which is `scroll-padding-block` in the stylesheet.
+
+     Both are MEASURED rather than declared because neither is a constant: the
+     foot carries one button on a question step and a button plus the green
+     send on the summary (46 px against 93 measured at 1100x800), and the rail
+     follows the 44 px tap floor and its own rule. Read here, on the re-fit
+     this function already performs, so the published number and the box it
+     describes are the same box. Outside the `#frame` guard for `--quote-h`'s
+     reason: these exist whether or not the drawing came up. */
+  const style = document.documentElement.style;
+  const choose = document.querySelector('.panel--choose');
+  const railEl = choose && choose.querySelector('.steps');
+  const footEl = document.querySelector('.sect:not([hidden]) .sect__foot');
+  if (choose && railEl && getComputedStyle(railEl).position === 'sticky') {
+    /* ⚠ THE BAND, NOT THE HEIGHT, AND THE DIFFERENCE IS 10 px OF TILE.
+       `scroll-padding` is measured from the scrollport's PADDING box; a sticky
+       element is clamped by its own CONTAINING BLOCK, which for the rail is
+       `.panel--choose`'s content box — so the panel's block-start padding
+       stands between the two and the rail comes to rest below it, never on the
+       padding edge. Measured at 1100, 1280 and 1440: rail 61 px tall resting
+       23 px down a panel whose padding edge is at 1, band 83. Shipping the
+       height alone left exactly 10 px of every tile behind the navigator on
+       `Home` and `ArrowUp`, which is how this number was found.
+       ⚠ AND IT IS NOT THE RAIL'S CURRENT RECT. At `scrollTop: 0` the rail has
+       not stuck yet and sits 91 px down, so reading its live box published 151
+       and over-padded the scrollport by 68 px. The quantity is where it comes
+       to REST, which is the panel's own padding plus the rail's own height —
+       both read off the element rather than copied from the stylesheet, so
+       neither can drift from a declaration forty lines away (§5.10).
+       ⚠ The foot is not symmetric and is deliberately NOT given the same
+       treatment: its containing block is the `.sect`, and the card's bottom
+       padding was moved INTO the foot on purpose (see `.sect__foot`'s own
+       note), so it rests flush on the padding edge and its band IS its
+       height. Measured: with `foot height + 12` the sweep is clean at every
+       desktop width. */
+    const pad = parseFloat(getComputedStyle(choose).paddingBlockStart) || 0;
+    const band = pad + railEl.getBoundingClientRect().height;
+    if (band > 0) style.setProperty('--rail-band', `${Math.round(band)}px`);
+  }
+  if (footEl && getComputedStyle(footEl).position === 'sticky') {
+    const r = footEl.getBoundingClientRect();
+    if (r.height > 0) style.setProperty('--foot-band', `${Math.round(r.height)}px`);
+  }
 }
 
 // Debounced so arrowing through ten colours announces once on settle,

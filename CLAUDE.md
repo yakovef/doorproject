@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -2031,6 +2031,84 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ A CUSTOMER WITH NO MOUSE COULD NOT SEE THE OPTION THEY HAD JUST
+  FOCUSED, ON 7 OF 8 STEPS AT EVERY WIDTH — 12.9.2026.** Found by walking as
+  **the customer with no mouse at all**, which `AGENT.md`'s rotation names and
+  run 106 half-used: that run pressed **Tab and Enter** and concluded, rightly,
+  that the tab ring is sound. **Nobody had ever pressed an ARROW KEY inside an
+  option group**, which is how a keyboard customer actually reads a list of
+  seventeen colours.
+  `keyboardGrid` moves focus with `items[next].focus()` and no `preventScroll`
+  — correct, and the one line that matters — so **the browser scrolls the newly
+  focused option into view**. "Into view" means flush against the edge of the
+  SCROLLPORT, and this page puts a bar on both edges of both its scrollports:
+  below 1100 px a 62 px FIXED navigator with a STICKY door under it at one end
+  and the fixed quote bar at the other; above 1100 px a STICKY rail and a
+  STICKY foot inside the choices panel. So the browser did exactly what it was
+  asked and parked the customer's own selection underneath the furniture.
+  Measured, keyboard only, `End`/`Home`/arrows through every group of every
+  step at eight viewports — **62 of 64 step × viewport cases hid the focused
+  option**, usually the whole of it:
+
+  | | worst focused option | hidden | behind |
+  |---|---|---|---|
+  | 320×568 | a 44 px colour swatch | **44 px** | the sticky door |
+  | 320×568 | a 134 px lock tile | **134 px** | the sticky door |
+  | 390×844 | a 134 px משקוף tile | 71 px | the quote bar |
+  | 768×1024 | a 144 px סורג tile | **144 px** | the sticky door |
+  | 1280×720 | a 134 px lock tile | 93 px | the sticky foot |
+  | 1440×900 | a 114 px grille tile | 61 px | the sticky rail |
+
+  **The focus ring went with it**, so there was nothing on screen saying where
+  the customer was — the one affordance a keyboard user has instead of a
+  pointer. ⚠ **A MOUSE NEVER MEETS THIS, which is why every check here is
+  blind to it:** nothing scrolls when you click what you can already see.
+  ⚠ **THE FIX IS THE SAME NUMBER THE PAGE ALREADY HELD, MOVED ONE LEVEL UP.**
+  `.sect` carried `scroll-margin-block-start: calc(var(--steps-h) +
+  var(--sticky-h) + 14px)` — the arithmetic that clears the navigator and the
+  door, written in 2026 for `goStep`'s heading. `scroll-margin` is a property
+  of the thing being scrolled TO, so it protected one element and nothing else,
+  and `goStep` is not the only thing on this page that scrolls something into
+  view. It is `scroll-padding-block` on the SCROLLPORT now — the same
+  expression, said once, in the one place that applies to every scroll into
+  view there will ever be: the heading, a Tab, an arrow key, and whatever is
+  written next. §5.10 with the copies in an unusual order again — not two
+  statements of one quantity, but one statement scoped so narrowly that most of
+  its readers never saw it. **`goStep`'s landing is byte-identical at all eight
+  viewports before and after**, measured rather than argued, which is what makes
+  the move a move and not a change.
+  ⚠ **AND THE DESKTOP HALF NEEDED A BAND, NOT A HEIGHT, AND THE DIFFERENCE WAS
+  10 px OF EVERY TILE.** `scroll-padding` is measured from the scrollport's
+  PADDING box; a sticky element is clamped by its own containing block, which
+  for the rail is the panel's CONTENT box — so the panel's 22 px of block-start
+  padding stands between the two and the rail rests below it. Shipping the
+  rail's height alone left exactly 10 px of every tile behind the navigator,
+  which is how the number was found; it is `paddingBlockStart + height` now.
+  ⚠ **And the first version of that read the rail's LIVE rect**, which at
+  `scrollTop: 0` has not stuck yet and sits 91 px down the panel — so it
+  published 151 and over-padded the scrollport by 68 px. The quantity is where
+  the rail comes to REST. §6, on my own instrument, for the third run running.
+  `--rail-band` and `--foot-band` are published by `fitStage` off rects it
+  already takes, beside `--sticky-h` and `--quote-h`; the fallbacks are today's
+  measurements, so a page whose bundle never arrives is no worse than it was.
+  The foot is deliberately NOT given the same treatment and its band IS its
+  height — the card's bottom padding was moved INTO it on purpose (its own
+  note says so), so it rests flush on the padding edge.
+  ⚠ **THE CHECK DRIVES REAL KEYS AND CARRIES ITS OWN FOUR WIDTHS.** A scripted
+  `el.focus()` would reproduce the fault and `focus({preventScroll})` would hide
+  it: what is being asserted is what Chromium does when a person presses a key.
+  It measures against the FIXED AND STICKY furniture read off the live page, not
+  against `innerHeight` — a tile behind the door is as unreadable as one off the
+  screen, and this file records making that mistake once already (§0b, 29.8).
+  §5.15 clauses: every landing must still be a `[role="radio"]` (else the sweep
+  is measuring the way-on button and can no longer fail), and it fails if it
+  measured fewer focus moves or fewer steps than the flow has. **Falsified** by
+  restoring `.sect`'s scroll-margin: the fault comes back at every width.
+  After: **64 of 64 clean**, every focused option whole on screen at 320, 360,
+  390, 768, 834, 1100, 1280 and 1440.
+  No price, no id, no list order, no bit, no `VERSION`; two CSS rules and two
+  published numbers. The 52 bare sheets came back **byte-identical**.
 
 - **⚠ ON A 320 px PHONE THE GALLERY SHOWED TWO OF PERETZ'S THIRTY DOORS, AND
   THE WIDTH THAT DID IT WAS CHROME'S RATHER THAN OURS — 12.9.2026.** Found by

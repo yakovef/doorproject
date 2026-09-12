@@ -789,6 +789,38 @@ svg { direction: ltr; }
   /* Each column scrolls on its own, so a long swatch list never pushes the
      door or the send button off screen. */
   .panel { overflow-y: auto; block-size: 100%; }
+
+  /* ⚠ AND UP HERE THE SCROLLPORT IS THE PANEL, WITH TWO OF ITS OWN CHILDREN
+     PINNED OVER IT. The navigator is `position: sticky` at the panel's top
+     edge and `.sect__foot` is sticky at its bottom, so the same fault the
+     phone has lives here with different furniture: `keyboardGrid` focuses the
+     next option, the browser scrolls it flush to an edge, and the edge has a
+     bar on it. Measured, keyboard only, End and the arrows through every group
+     of every step: **93 px of a 134 px lock tile behind the foot at 1280x720
+     and 1440x900**, 57 at 1100, 47 of a 47 px handing pill, and 61 px of the
+     first grille tile behind the rail on `Home`.
+
+     ⚠ THE TWO BANDS ARE MEASURED, NOT DECLARED, and they are BANDS rather
+     than heights on purpose. Neither is a constant — the rail is 44 px of
+     circle plus its rule, and the foot is one button on a question step and a
+     button plus the green send on the summary (46 px against 93 at 1100) —
+     and the rail's band is not its height either: `scroll-padding` is measured
+     from the scrollport's PADDING box while a sticky child rests against its
+     CONTENT box, so this panel's own 22 px of block-start padding stands
+     between them, and the height alone left 10 px of every tile behind the
+     navigator. `fitStage` publishes both off rects it takes on the same
+     re-fit, beside `--sticky-h` and `--quote-h`, so a number and the box it
+     describes cannot drift. The fallbacks are today's measurements, so a page
+     whose bundle never arrives is no worse than it was; and `goStep` sets
+     `panel.scrollTop` by hand up here rather than scrolling into view, so
+     nothing it does moves with this.
+
+     ⚠ `.panel--choose` and not `.panel`: the send column has neither bar over
+     it, and 200 px of scroll padding in a column that does not need it is a
+     different fault of the same kind. */
+  .panel--choose {
+    scroll-padding-block: calc(var(--rail-band, 83px) + 12px) calc(var(--foot-band, 93px) + 12px);
+  }
 }
 
 /* ⚠ AND THE SCROLLBAR IS THE PLATFORM'S UNTIL IT IS ASKED NOT TO BE.
@@ -1947,9 +1979,30 @@ svg { direction: ltr; }
      at 390x844 (323 at 320x568). Measured, on every step, on every jump.
      `--sticky-h` is the wrap's own measured height, published by `fitStage` off
      the same rect it already reads. The fallback is what the old rule did, so a
-     page whose bundle never arrives is no worse than it was. */
-  .sect {
-    scroll-margin-block-start: calc(var(--steps-h) + var(--sticky-h, 0px) + 14px);
+     page whose bundle never arrives is no worse than it was.
+
+     ⚠ AND IT IS `scroll-padding` ON THE SCROLLPORT NOW, NOT `scroll-margin` ON
+     `.sect` — SAME NUMBER, AND IT WAS ONLY EVER PROTECTING ONE ELEMENT.
+     `scroll-margin` is a property of the thing being scrolled to, so this
+     cleared the door for the step card and for nothing else, and `goStep` is
+     not the only thing on this page that scrolls something into view.
+     `keyboardGrid` calls `items[next].focus()` with no `preventScroll`, so the
+     browser scrolls each newly focused OPTION into view — and "into view"
+     means flush against the edge of the scrollport, which here is 62 px of
+     fixed navigator plus a sticky door at one end and a fixed quote bar at the
+     other. Measured, keyboard only, arrowing through every group of every step
+     at eight viewports: the focused option was hidden on **7 of 8 steps at
+     every width below 1100**, usually entirely — a 44 px colour swatch with
+     44 px of it behind the door at 320x568, a 134 px lock tile with all 134
+     behind it, 71 px behind the quote bar at 390. The ring went with it.
+
+     A mouse never meets this: nothing scrolls when you click what you can
+     already see. `scroll-padding` on the scrollport is the same arithmetic
+     said once, in the one place that applies to every scroll into view —
+     `goStep`'s heading, a tab, an arrow key, and whatever scrolls next. */
+  :root {
+    scroll-padding-block-start: calc(var(--steps-h) + var(--sticky-h, 0px) + 14px);
+    scroll-padding-block-end: calc(var(--quote-h, 62px) + 14px);
   }
 
   /* ⚠ THE HEADLINE IS VISUALLY HIDDEN ON A PHONE, AND IT COSTS 86 px BACK.

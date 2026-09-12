@@ -45,6 +45,109 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-12 16:40 UTC — run 114: a customer with no mouse could not see the option they had just focused
+
+**Looked at:** the page as **THE CUSTOMER WITH NO MOUSE AT ALL** — the last of
+`AGENT.md`'s named lenses that is genuinely unused. Run 106 used a keyboard and
+pressed **Tab and Enter**, concluding rightly that the tab ring is sound; it
+never pressed an **arrow key inside an option group**, which is how a keyboard
+customer reads a list of seventeen colours. Walked the guide forward with the
+button, keyboard only, `End`/`Home`/arrows through every group of every step at
+320×568, 360×740, 390×844, 768×1024, 834×1112, 1100×800, 1280×720 and 1440×900;
+then chose with Enter all the way to the summary and read the order the send
+button produces and `?sheet=1`. Recent lenses: 109 the tablet band, 110 the
+phone sideways, 111 Peretz on the telephone, 112 Peretz printing the sheet,
+113 the gallery.
+
+**Instruments:** test ✓ 4,349,822 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets —
+**52 bare sheets byte-identical**, 5 of 12 `shot` moved (§7: proves nothing;
+this change paints nothing). Done the cheap way and saying so: the finding was
+one harness pressing real keys and the fix is two CSS rules, and the thing that
+mattered most — that the number was already in the stylesheet, scoped to one
+element — was found by reading the cascade, which does not parallelise.
+`ultracode` deliberately not spent.
+
+**What was wrong:** `keyboardGrid` moves focus with `items[next].focus()` and
+no `preventScroll` — correct — so **the browser scrolls the newly focused
+option into view**, and "into view" means flush against the edge of the
+SCROLLPORT. This page puts a bar on both edges of both its scrollports: below
+1100 px a 62 px FIXED navigator with a STICKY door under it and the fixed quote
+bar at the foot; above 1100 px a STICKY rail and a STICKY foot inside the
+panel. So the browser did as asked and parked the customer's own selection
+under the furniture. **62 of 64 step × viewport cases hid the focused option**,
+usually the whole of it — and the focus ring went with it, which is the one
+affordance a keyboard user has instead of a pointer.
+
+| | worst focused option | hidden | behind |
+|---|---|---|---|
+| 320×568 | a 44 px colour swatch | **44 px** | the sticky door |
+| 320×568 | a 134 px lock tile | **134 px** | the sticky door |
+| 390×844 | a 134 px משקוף tile | 71 px | the quote bar |
+| 768×1024 | a 144 px סורג tile | **144 px** | the sticky door |
+| 1280×720 | a 134 px lock tile | 93 px | the sticky foot |
+| 1440×900 | a 114 px grille tile | 61 px | the sticky rail |
+
+⚠ **A mouse never meets this**, which is why every check here was blind to it:
+nothing scrolls when you click what you can already see.
+
+**Changed:** `.sect`'s `scroll-margin-block-start` — the arithmetic that clears
+the navigator and the door, written for `goStep`'s heading — became
+`scroll-padding-block` on the SCROLLPORT. Same expression, said once, in the
+one place that applies to every scroll into view there will ever be. **`goStep`'s
+landing is byte-identical at all eight viewports before and after**, measured
+rather than argued, which is what makes it a move and not a change. After:
+**64 of 64 clean.**
+
+⚠ **The desktop half needed a BAND, not a height, and the difference was 10 px
+of every tile.** `scroll-padding` is measured from the scrollport's PADDING
+box; a sticky element is clamped by its own containing block, which for the
+rail is the panel's CONTENT box, so the panel's 22 px of block-start padding
+stands between them. `paddingBlockStart + height` now. ⚠ **And my first version
+read the rail's LIVE rect**, which at `scrollTop: 0` has not stuck yet and sits
+91 px down — it published 151 and over-padded the scrollport by 68 px. The
+quantity is where the rail comes to REST. §6 on my own instrument, third run
+running.
+
+**The check** drives REAL key presses, not `el.focus()`: the fault IS the
+browser's scroll-into-view on a focus change, so a scripted focus would
+reproduce it and `focus({preventScroll})` would hide it. It carries its own
+four widths (both breakpoints, both scrollports) rather than costing four
+`VIEWS` passes, measures against the fixed AND sticky furniture read off the
+live page rather than `innerHeight`, and has §5.15 clauses that every landing
+is still a `[role="radio"]` and that it measured as many steps as the flow has.
+**Falsified** by restoring `.sect`'s scroll-margin.
+
+**Already decided, and here is where** — two things this walk hit that are on
+the record and were left alone: the **first option tile behind the quote bar on
+arrival** (§9, and runs 106 and 107 measured it in two languages — arrival does
+no scrolling, so it is a different fault from this one and its named fixes are
+the illustration note and the tile height); and the **first Tab landing on the
+second navigator circle**, run 106's item, declined as an engine heuristic with
+nothing unreachable behind it.
+
+**Left alone deliberately:** the focus ring is a square 2 px outline on a round
+colour swatch. It is correct, visible and consistent with every other control;
+rounding it is taste, and this file's rule is that a change made to have made
+one is how a considered design drifts.
+
+**Best idea of the run that was NOT taken:** run 113's, still standing —
+measure whether the gallery tile's 132 px drawing already carries what
+`describe(st)` would add, and give the tile a `title` if it does not. Not taken
+here because it is a measurement about pictures and this run's subject was a
+scrollport; behind it are run 112's (how large the printed elevation must be to
+read off paper) and run 111's (the read-aloud cost of an eleven-character code).
+
+**proposed · taken · refused:** proposed 4 (scroll-padding on the scrollport ·
+the rail's band rather than its height · `preventScroll` on `keyboardGrid` with
+a hand-rolled scroll · rounding the focus ring) · taken 2 · refused 2 — the
+`preventScroll` route because it would put a second statement of the scroll
+arithmetic in JavaScript beside the one in CSS, which is §5.10 exactly.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-12 11:30 UTC — run 113: a 320 px phone showed two of Peretz's thirty doors, and the width that did it was Chrome's
 
 **Looked at:** the page as **THE CUSTOMER WHO STARTS FROM THE GALLERY** —
