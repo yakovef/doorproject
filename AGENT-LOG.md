@@ -135,7 +135,7 @@ read-aloud cost of an eleven-character code) are still standing behind it.
 lower the 132 minimum · a `title` on the tile · widen the dialog with `vw` ·
 name the design on the tile) · taken 1 · refused 4.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `63b5905`
 
 ---
 
