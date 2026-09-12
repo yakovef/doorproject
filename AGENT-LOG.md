@@ -144,7 +144,7 @@ phone) are still standing behind it.
 column · the BFC · the gloss alignment · shave `.sheet__body`'s padding · cut
 the 140 mm elevation cap) · taken 4 · refused 2.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `b5bea35`
 
 ---
 
