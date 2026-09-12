@@ -1616,6 +1616,77 @@ sit on the leaf at these widths only. `npm run audit` names the two viewports
 and the one control explicitly, so the exemption shrinks the day this is
 fixed and nothing else can hide behind it.
 
+### ⚠ THE PHONE'S BACK BUTTON LEAVES THE GUIDE, AND THE OBVIOUS FIX IS WORSE
+
+Found 12.9.2026 by walking as **the customer who presses the system Back**, a
+gesture no run had ever pressed (106 used a keyboard and pressed Tab; 105
+walked backwards with the page's own `‹ הקודם`). **The whole nine-screen walk
+is ONE history entry.** `scheduleUrl` writes the door with `replaceState` —
+which is right, the address bar is the design and a step forward must not bury
+the last one under near-identical URLs — and nothing has ever pushed. So on a
+phone, where Back is the one universal "undo this screen" gesture, pressing it
+anywhere in the guide leaves the site.
+
+Measured from a real previous page: a customer on **step 04 of 09** pressed
+Back, landed back where they had come from, pressed Forward, and arrived at the
+**summary** — four steps past where they were, under *"בדקו שהכול נכון"*, for a
+door whose last five questions they had never seen. The door and the price
+survive (`replaceState` doing its job) and `carries` correctly treats a
+door-carrying address as a link; what is lost is their place.
+
+⚠ **THE OBVIOUS FIX WAS BUILT, MEASURED AND THROWN AWAY, AND THE NUMBERS ARE
+WHY.** `pushState({step}, '')` at the two gestures (`stepBy` and the rail
+circle), the step in `history.state` and never in the URL, a `popstate` handler
+calling `goStep`. It works — Back walked the flow, Forward returned, the
+address bar was byte-identical on every forward gesture. Three measurements
+killed it, and two of them were found by a second lens rather than by the
+session that built it:
+
+- **The inversion.** `‹ הקודם` is `stepBy(-1)` and would push too, so going
+  back GROWS the stack and the system Back then replays the *gesture*: measured
+  `pz` → in-page back → `lock` → **system Back → `pz`**, forward. There is no
+  reading of "Back" under which that is right.
+- **The cap, which is the number that settles it.** A tab holds about fifty
+  history entries and this spends one per gesture. Measured: **60 rail taps —
+  a comparison session, the behaviour the `revealed` latch exists for — take
+  `history.length` to 50, evict the page the customer arrived from, and after
+  SEVENTY Back presses they still cannot leave the site.** "Back exits the
+  guide" is at least predictable; "Back can stop working" is not.
+- **A dead entry per rail tap on the step already live**, with no guard, so the
+  customer presses Back and nothing on screen changes.
+
+Two more faults were in the built version and are recorded because whoever
+tries again will meet them: `writeUrl` on every `popstate` turned a bare
+`index.html` into a 139-character query spelling out the DEFAULT door after one
+Back with nothing chosen — and `carries` reads the address, so a restored tab
+then landed on the summary for a door nobody built (fixed in the spike by
+guarding on `isUntouched(state)`, which is the right predicate: an EMPTY
+address bar is not a lie about the default door, it is the bare load that draws
+it). And with the gallery open a desktop Back left `dialog.open` **true** while
+the flow stepped `fit` → `grip` **underneath the modal**, invisibly — Android
+hides that one, because Chrome routes its Back gesture through CloseWatcher and
+a modal `<dialog>` claims it, so `popstate` never fires there.
+
+⚠ **AND ONE DEFECT IN THE SPIKE WAS §0'S WORST FAILURE, INTRODUCED BY THE FIX
+ITSELF.** A pushed entry FREEZES whatever URL was current when it was pushed
+and `scheduleUrl` only rewrites the entry the customer stands on, so a Back
+restored an OLDER address against the CURRENT door: screen and code said the
+₪500 עידן bar at **₪4,695**, address bar said **`n=none`**. A customer copying
+the address bar out of the browser would have sent Peretz a door ₪500 cheaper
+with no pull handle on it, silently. It was found by tracing the mechanism and
+then measuring it, fixed by rewriting the URL on every `popstate`, and
+independently reproduced and falsified by the second lens — so **anything built
+here must carry that assertion first.**
+
+What a correct fix would need, and none of it is a line of CSS: backward moves
+calling `history.back()` rather than pushing (which removes the inversion and
+halves the stack), no push when the target is already live, a bound on the
+depth that a rail-heavy session cannot blow, focus restored on a `popstate` (it
+falls to `<body>` today, because `goStep` hides the step the customer was
+focused in), and a decision about what a reload mid-flow should do with the
+entries behind it. That is a product decision above CSS, like the wall below
+and the summary's spec — **recorded rather than guessed at.**
+
 ### ⚠ THE WIDEST DOOR'S RUSSIAN ORDER SHEET FITS ITS PAGE BY 1.2 mm
 
 Closed on 12.9 for every door × language in the range — see §0b — and the

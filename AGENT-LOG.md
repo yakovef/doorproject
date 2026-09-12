@@ -45,6 +45,120 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-12 20:40 UTC — run 115: the phone's Back button leaves the guide, and the fix for it was built, measured and thrown away
+
+**Looked at:** the page as **THE CUSTOMER WHO PRESSES THE SYSTEM BACK BUTTON** —
+a gesture no run had ever pressed. 106 used a keyboard and pressed Tab and
+Enter; 105 walked backwards with the page's own `‹ הקודם`; nobody had touched
+the browser's own Back, which on Android is the one universal "undo this
+screen". Walked forward with the button at 320×568, 390×844 and 1440×900,
+pressed Back at the summary and in the middle of the walk, read the order the
+send button produces and `?sheet=1`, and looked at the screenshots. Recent
+lenses: 110 the phone sideways, 111 the telephone code, 112 printing the sheet,
+113 the gallery, 114 the keyboard with no mouse.
+
+**Instruments:** test ✓ 4,349,822 / 0 · audit ✓ no faults · sheets not needed —
+**nothing shipped, the tree is byte-identical to `a5a6359`**. (Both were also
+run green against the spike before it was reverted: `npm test` red only on the
+four staleness assertions, `npm run audit` clean including the new block.)
+
+**`ultracode` WAS spent, and it is the reason this run ends in a revert.** Two
+lenses against the built change: an adversary told to argue it down, and a
+second pair of eyes on the interactions. Between them they found five faults I
+had not, three of them fatal. A single lens would have shipped it.
+
+**What is wrong, and it is real:** the whole nine-screen walk is **one history
+entry**. `scheduleUrl` writes the door with `replaceState` and nothing has ever
+pushed, so Back anywhere in the guide leaves the site. Driven from a real
+previous page: a customer on **step 04 of 09** pressed Back, landed where they
+had come from, pressed Forward, and arrived at the **summary** — four steps
+past where they were, under *"בדקו שהכול נכון"*, for a door whose last five
+questions they had never seen. The door and the price survive; their place does
+not.
+
+**Changed: nothing.** The fix was built in full — `pushState({step}, '')` at
+the two gestures, the step in `history.state` and never in the URL, a `popstate`
+handler, and an audit block — and it worked: Back walked the flow, Forward
+returned, the address bar was byte-identical on every forward gesture. It is
+reverted on three measurements:
+
+| | measured |
+|---|---|
+| **the inversion** | `‹ הקודם` is `stepBy(-1)` and pushes too, so going back GROWS the stack and the system Back replays the gesture: `pz` → in-page back → `lock` → **system Back → `pz`**, forward |
+| **the cap** | 60 rail taps — a comparison session — take `history.length` to **50**, evict the page the customer arrived from, and after **70 Back presses they still cannot leave the site** |
+| **dead entries** | the rail pushes with no `key === liveStep` guard, so tapping the live circle adds an entry that changes nothing on screen |
+
+"Back exits the guide" is at least predictable. "Back can stop working" is not,
+and that is the trade this change makes. Both decisive numbers were re-measured
+on my own harness before the revert, because a finding that kills a change is
+the one to suspect the instrument on.
+
+⚠ **AND THE SPIKE'S OWN WORST DEFECT WAS §0'S, INTRODUCED BY THE FIX.** A
+pushed entry FREEZES the URL current when it was pushed and `scheduleUrl` only
+rewrites the entry the customer stands on — so a Back restored an OLDER address
+against the CURRENT door: screen and code said the ₪500 עידן bar at **₪4,695**,
+address bar said **`n=none`**. Copying that address bar sends Peretz a door
+₪500 cheaper with no pull handle, silently. Found by tracing the mechanism and
+then measuring it, fixed, and then independently reproduced AND falsified by the
+adversarial lens (with the rewrite: `n=ella`; without: `n=none`, and it persists
+rather than being a 300 ms window). Anything built here must carry that
+assertion first.
+
+⚠ **TWO MORE THE SECOND LENS FOUND THAT I HAD NOT.** `writeUrl` on every
+`popstate` turned a bare `index.html` into a 139-character query spelling out
+the DEFAULT door after one Back with nothing chosen — and `carries` reads the
+address, so a restored tab landed on the summary for a door nobody built, which
+is the very symptom the change was written to cure. And with the gallery open a
+desktop Back left `dialog.open` **true** while the flow stepped `fit` → `grip`
+**underneath the modal**, invisibly. Both were fixed in the spike (the first by
+guarding on `isUntouched(state)` — an empty address bar is not a lie about the
+default door, it is the bare load that draws it) before the three above made
+the whole thing not worth shipping.
+
+⚠ **AND MY OWN AUDIT BLOCK COULD NOT HAVE FAILED ON THE BARE-URL FAULT**, which
+is §5.15-from-the-other-end for the third time in this repo (T11's non-default
+door on 11.9, the `?code=` fixture on 12.9). It chose an option on every step
+before pressing Back, so `location.search` already carried a query and its §0
+clause was trivially satisfied. The adversary replicated the block and removed
+only the choice: **2 of 2 widths failed.** Walking forward without choosing is
+not exotic — it is the standard ₪3,195 door, the commonest thing Peretz sells.
+
+**Read and found sound** (measured, by the second lens, against the spike):
+undo/redo across a Back, the language picker not pushing, the summary reveal
+not replaying, `?sheet=1` (no listener registered, `history.state` null, zero
+errors), a shared link's Back correctly leaving the site, reduced motion,
+`?bare=1`, two tabs, `history.go(-3)`, and 120 pushes in 2.7 s.
+
+**The walk itself is clean.** Same door, price and code at 320, 390 and 1440
+(`DM-NE48141800E`, ₪9,460); message, screen spec and A4 sheet in agreement; one
+distinct `[data-wa]` href; no page errors on either route.
+
+**Left alone deliberately:** the focus ring round the step heading in my
+screenshots is the harness — a scripted `element.click()` is keyboard-ish to
+Chromium's focus-visible heuristic — not the page; checked before reporting it.
+
+**Best idea of the run that was NOT taken** is the one above, and what it would
+need is in `CLAUDE.md` §9: backward moves calling `history.back()` rather than
+pushing, no push when the target is already live, a bound on the depth a
+rail-heavy session cannot blow, focus restored on a `popstate` (it falls to
+`<body>` today, because `goStep` hides the step the customer was focused in),
+and a decision about what a reload mid-flow does with the entries behind it.
+Behind it stand run 113's (does the gallery tile's 132 px drawing already carry
+what `describe(st)` would add), run 112's (how large the printed elevation must
+be to read off paper) and run 111's (the read-aloud cost of an eleven-character
+code).
+
+**proposed · taken · refused:** proposed 6 (push a history entry per step ·
+carry the step in `history.state` rather than the URL · rewrite the address bar
+on `popstate` · guard that rewrite on `isUntouched` · close an open modal before
+stepping · an audit block for all of it) · **taken 0** · refused 6 — all six
+reverted together, because the first is what the other five exist to make safe
+and the first is what the measurements refuse.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-12 16:40 UTC — run 114: a customer with no mouse could not see the option they had just focused
 
 **Looked at:** the page as **THE CUSTOMER WITH NO MOUSE AT ALL** — the last of
