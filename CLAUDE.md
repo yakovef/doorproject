@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -2031,6 +2031,68 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ ON A 320 px PHONE THE GALLERY SHOWED TWO OF PERETZ'S THIRTY DOORS, AND
+  THE WIDTH THAT DID IT WAS CHROME'S RATHER THAN OURS — 12.9.2026.** Found by
+  walking as **the customer who starts from the gallery** — `js/works.js` is
+  thirty doors Peretz actually built, offered on step 01 as *"התחילו מדלת שכבר
+  התקנו · 30 דלתות אמיתיות"*, and **no run had ever entered the page that
+  way.** Its own lede is *"choose a door close to what you wanted — and from
+  there change every detail"*, which is a claim about COMPARING.
+  ⚠ **THE CAP IS A BROWSER DEFAULT, AND OUR OWN RULE WAS INERT AT EXACTLY THE
+  WIDTH IT MATTERED AT.** A modal `<dialog>` carries a UA `margin: 19px` and
+  `max-inline-size: calc(100% - 38px)`; `max-` beats the `inline-size:
+  min(1000px, 94vw)` this stylesheet declares, so on a 320 px screen the dialog
+  is **282, not the 300.8 we ask for**. Read off the live dialog's computed
+  style, after two rounds of guessing at it got the mechanism wrong.
+  Then 320 − 38 of UA margin − 36 of the grid's own padding leaves **244** for
+  the doors, and two columns of the 132 px minimum plus a 12 px gap want
+  **276**. So it fell to one column:
+
+  | | dialog | for the doors | columns | on screen |
+  |---|---|---|---|---|
+  | 320, as it was | 282 | 244 | **1** | **2 of 30** |
+  | 320, now | 308 | 284 | **2** | **4 of 30** |
+  | 360, untouched | 322 | 286 | 2 | 6 of 30 |
+
+  An `auto-fill` cliff — the shape §9 already records for the option grids —
+  and it put a customer on the phone this file keeps naming as *the one people
+  own* fifteen screens away from thirty doors, while a 360 px phone twelve per
+  cent wider got three times as many.
+  ⚠ **THE 132 px MINIMUM IS NOT TOUCHED, AND THAT IS THE WHOLE POINT.** The
+  tile comes out at **135 px — the size it already ships at on a 360 px
+  phone** — so nothing rests on a judgement about how small a door may be drawn
+  and still be chosen from. **Lowering the minimum was measured and refused**:
+  at a 105 px art box the closest pair of Peretz's thirty doors differ on
+  **0.48% of pixels**, against the **0.45%** this log records for `ella` and
+  `barblack` as the figure meaning *a customer comparing two products was
+  looking at the same picture*. Six doors nobody can tell apart is worse than
+  two they can. Every width from 360 up is **byte-identical**, all three
+  languages, nothing clipped, no sideways scroll.
+  ⚠ **AND AN INSTRUMENT I WROTE THIS RUN WAS NOT MEASURING WHAT I NAMED IT.**
+  A sweep comparing the thirty tiles pairwise at seven sizes came back
+  **non-monotonic** — a bigger tile reporting a *smaller* difference, which
+  cannot happen — so its numbers decided nothing, and the refusal above rests
+  on the two readings taken at a fixed host size instead. §7's own rule after
+  the floor-line episode: three detectors giving three answers is the signal to
+  go and get ground truth, not to keep tuning. I nearly justified a change on it.
+  ⚠ **THE CHECK CARRIES ITS OWN FIVE WIDTHS AND TWO CLAUSES, AND THE SECOND IS
+  THE ONE THAT WILL MATTER LATER.** The audit's gallery block drives ONE
+  viewport, 390×844, so it could never have seen this. The new sweep asserts at
+  320, 359, 360, 390 and 768 that the grid is never a single column — a count
+  of columns is a binary and cannot drift to within a pixel — **and** that no
+  tile is under the declared 132, because the obvious way to buy a column at
+  some future width is to shrink the door, which is the thing that was
+  measured and refused. §5.15: the dialog must have opened and the grid must
+  have tiles, and the sweep fails if it measured fewer widths than it claims.
+  **Falsified** both ways: removing the rule fires the column clause at 320;
+  lowering the minimum to 104 fires the floor clause at 768, which is where a
+  smaller tile actually gets packed. Both halves of the fix are load-bearing —
+  the reclaimed margin ALONE leaves 272 and stays one column.
+  No price, no id, no list order, no bit, no `VERSION`; one media block. The 52
+  bare sheets came back **byte-identical** (`?bare=1` keeps only
+  `.stage-wrap`); 2 of the 12 `shot` sheets moved, which proves nothing either
+  way (§7).
 
 - **⚠ THE A4 ORDER SHEET PRINTED ON TWO PAGES, AND ON THREE FOR THE WIDEST
   DOOR — 12.9.2026.** Found by walking as **Peretz printing the order and

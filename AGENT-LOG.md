@@ -45,6 +45,100 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-12 11:30 UTC — run 113: a 320 px phone showed two of Peretz's thirty doors, and the width that did it was Chrome's
+
+**Looked at:** the page as **THE CUSTOMER WHO STARTS FROM THE GALLERY** —
+`js/works.js` is thirty doors Peretz actually built, offered on step 01, and
+**no run had ever entered the page that way.** AGENT.md's own rotation names it
+and it was the only one of the three unused lenses that had not been covered
+from another angle (105 already walked "changes their mind"). Opened the
+gallery at 320×568, 390×844 and 1440×900, picked doors, read the order all
+thirty produce, drove undo and redo on a gallery load, and walked forward and
+backwards. Recent lenses: 108 Peretz on a laptop, 109 the tablet band, 110 the
+phone sideways, 111 Peretz on the telephone, 112 Peretz printing the sheet.
+
+**Instruments:** test ✓ 4,349,822 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets —
+**52 bare sheets byte-identical**, 2 of 12 `shot` moved (§7: proves nothing).
+Done the cheap way and saying so: the finding was one dialog's computed style
+and the refusal was one pairwise measurement. Nothing to fan out over;
+`ultracode` deliberately not spent.
+
+**What was wrong:** at **320×568 the gallery showed 2 of 30 doors** at a time
+against 6 at 360 — and the cap is a browser default, not ours. A modal
+`<dialog>` carries a UA `margin: 19px` and `max-inline-size: calc(100% - 38px)`,
+and `max-` beats the `inline-size: min(1000px, 94vw)` this stylesheet declares,
+so the dialog came out at **282 rather than the 300.8 we ask for** — our own
+rule inert at exactly the width it mattered at. 320 − 38 of UA margin − 36 of
+grid padding leaves 244 for the doors; two columns of the 132 minimum plus the
+12 gap want 276. An `auto-fill` cliff, and it put the phone this file keeps
+naming as *the one people own* fifteen screens away from thirty doors.
+
+| | dialog | for the doors | columns | on screen |
+|---|---|---|---|---|
+| 320, as it was | 282 | 244 | **1** | **2 of 30** |
+| 320, now | 308 | 284 | **2** | **4 of 30** |
+| 360, untouched | 322 | 286 | 2 | 6 of 30 |
+
+**The 132 minimum is untouched and that is the whole point.** The tile lands at
+**135 px — the size it already ships at on a 360 px phone** — so nothing rests
+on my judgement of how small a door may be drawn. Lowering the minimum instead
+was measured and **refused**: at a 105 px art box the closest pair of Peretz's
+doors differ on **0.48% of pixels**, against the **0.45%** §0b records for
+`ella`/`barblack` as meaning two products were the same picture.
+
+⚠ **And an instrument I wrote this run was not measuring what I named it.** A
+sweep comparing the thirty tiles pairwise at seven sizes came back
+**non-monotonic** — a bigger tile reporting a smaller difference, which cannot
+happen. I had been one step from justifying a grid change on it. §7's rule
+after the floor-line episode is the one that applies: three detectors giving
+three answers is the signal to get ground truth, not to keep tuning. The
+refusal above rests on the two readings taken at a fixed host size instead, and
+the fix rests on a tile size that already ships — neither needs that sweep.
+
+**Read and found correct, rather than changed** — four suspicions, all dropped:
+· **The tile pictures do distinguish the doors.** Closest of 435 pairs 1.82%,
+  three under 3%; not the six-pull-bars fault I opened the run suspecting.
+· **All thirty gallery doors produce a clean order** — correct price against
+  the screen, no notice, no broken token, 14–16 lines.
+· **Undo and redo are correct on a gallery load**: pick → undo returns the
+  ₪3,195 default, redo returns the door.
+· **The tile's `viewBox` is the tight door box** (`225 214 1378 2802`, §3), so
+  the door is ~49% of the tile's width against the stage's 28%. The room around
+  it paints from outside the box.
+
+**Already decided, and here is where** — two things this walk hit that are on
+the record: the **back button sits below the fold** (measured 686 px at
+390×844) is run 105's item, closed because the fixed rail gives one-tap
+backwards navigation from anywhere, and my magnitude does not touch that
+reasoning; and the **illustration note standing between the door and the
+question** is §9, declined as an honesty commitment not to be quietly relocated.
+
+**Best idea of the run that was NOT taken:** the tile computes `describe(st)` —
+the whole door in a sentence — and gives it **only to `aria-label`**. Measured:
+**30 distinct sentences for a screen reader, 26 distinct visible labels, 0
+`title` attributes**. Doors 5 and 7 differ only by handing; 21, 24 and 26 by
+ironwork and lockset; all read identically to the eye as a colour and a price.
+That is `UX-FINDINGS` §3's complaint — *a screen reader is better informed
+about this page than a sighted customer* — on a different element, and the
+navigator's 5.9 remedy (a `title` from the same string, no layout) is sitting
+right there. Not taken because the analogy is imperfect and I could not close
+it honestly: a navigator circle has no picture of its content and a gallery
+tile has a 132 px drawing of the actual door, so the question is whether the
+picture already carries what the sentence would add — and the instrument that
+would have answered it is the one that failed above. **That measurement, taken
+properly, is the next thing to do here.** Run 112's idea (measuring how large
+the printed elevation has to be to read off paper) and run 111's (the
+read-aloud cost of an eleven-character code) are still standing behind it.
+
+**proposed · taken · refused:** proposed 5 (reclaim the dialog's UA margin ·
+lower the 132 minimum · a `title` on the tile · widen the dialog with `vw` ·
+name the design on the tile) · taken 1 · refused 4.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-12 07:05 UTC — run 112: the A4 order sheet printed on two pages, and on three for the widest door
 
 **Looked at:** the page as **PERETZ PRINTING THE ORDER AND CARRYING IT TO THE

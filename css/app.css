@@ -2572,6 +2572,51 @@ svg { direction: ltr; }
   overscroll-behavior: contain;
 }
 
+/* ⚠ AT 320 px THIS GALLERY SHOWED **TWO** OF PERETZ'S THIRTY DOORS, AND THE
+   WIDTH THAT DID IT IS CHROME'S, NOT OURS. A modal `<dialog>` carries a UA
+   `margin: 19px` and `max-inline-size: calc(100% - 38px)`, and `max-` beats
+   the `inline-size: min(1000px, 94vw)` declared above — so on a 320 px screen
+   the dialog is **282**, not the 300.8 this file asks for, and our own rule is
+   inert at exactly the width it matters at. Measured 12.9.2026, computed
+   styles off the live dialog.
+
+   What that costs, and it is all margin rather than tiles: 320 px of screen,
+   less 38 of UA margin, less 36 of the grid's own padding, leaves **244** for
+   the doors. Two columns of the 132 minimum plus the 12 gap want **276**. So
+   it fell to one column and a customer scrolled fifteen screens to see thirty
+   doors — while a 360 px phone, 12% wider, got two columns and three times as
+   many on screen. An `auto-fill` cliff, the shape §9 already records for the
+   option grids.
+
+   | | dialog | for the doors | columns | on screen |
+   |---|---|---|---|---|
+   | 320, as it was | 282 | 244 | **1** | **2 of 30** |
+   | 320, now | 308 | 284 | **2** | **4 of 30** |
+   | 360, untouched | 322 | 286 | 2 | 6 of 30 |
+
+   ⚠ **THE 132 MINIMUM IS NOT TOUCHED, AND THAT IS THE WHOLE POINT.** The tile
+   comes out at **135 px — the size it already ships at on a 360 px phone** —
+   so nothing here rests on a judgement about how small a door may be drawn and
+   still be chosen from. Dropping the minimum instead was measured and refused:
+   at a 105 px art box the closest pair of Peretz's doors differ on **0.48% of
+   pixels**, and §0b records 0.45% (`ella` against `barblack`) as the figure
+   that meant *a customer comparing two products was looking at the same
+   picture*. Six doors nobody can tell apart is worse than two they can.
+
+   Both halves are load-bearing: at the 18 px grid padding the reclaimed margin
+   leaves 272 and it stays one column. `inline-size` is restated because with
+   only `max-inline-size` widened our own `94vw` becomes the binding constraint
+   and lands at 301 — one pixel short of the 276 + 24 it needs, which is a
+   coincidence rather than a margin. AFTER the rules it overrides — §8. */
+@media (max-width: 359px) {
+  .works {
+    margin-inline: 6px;
+    inline-size: calc(100% - 12px);
+    max-inline-size: calc(100% - 12px);
+  }
+  .works__grid { padding-inline: 12px; }
+}
+
 .work {
   appearance: none; -webkit-appearance: none;
   display: grid; gap: 6px;

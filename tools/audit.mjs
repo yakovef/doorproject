@@ -3067,6 +3067,89 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── A CUSTOMER CAN COMPARE PERETZ'S DOORS, NOT SCROLL PAST THEM ─────────
+   ⚠ NOT IN `VIEWS`, AND FOR THE PRICE SWEEP'S REASON. The gallery block above
+   drives one viewport, 390x844, and the fault this exists for lived only at
+   320 — the phone this file keeps recording as the one people OWN while 390 is
+   the one they test on.
+
+   What it is for: until 12.9.2026 a 320 px screen showed **two of thirty
+   doors** at a time, and the width that did it was Chrome's rather than ours.
+   A modal `<dialog>` carries a UA `margin: 19px` and `max-inline-size:
+   calc(100% - 38px)`, which beats the `inline-size: min(1000px, 94vw)`
+   `css/app.css` declares — so our own rule was inert at exactly the width it
+   mattered at, the doors got 244 px of a 320 px screen, and the two columns
+   they needed wanted 276. An `auto-fill` cliff: 360 px, twelve per cent
+   wider, got two columns and three times as many doors on screen.
+
+   ⚠ TWO CLAUSES, AND THE SECOND IS THE ONE THAT WILL MATTER LATER. Columns is
+   the cheap half. The track floor is there because the OBVIOUS way to buy a
+   column at some future width is to lower the 132 px minimum, and that was
+   measured and refused: at a 105 px art box the closest pair of Peretz's
+   thirty doors differ on **0.48% of pixels**, against the 0.45% that §0b
+   records as the figure meaning two products were "the same picture". Six
+   doors nobody can tell apart is worse than two they can. So the floor is
+   asserted here, where somebody widening the gallery will meet it.
+
+   §5.15 throughout: the dialog has to have opened and the grid has to have
+   tiles in it, or this passes about nothing. */
+{
+  console.log('\na customer can compare Peretz\'s doors');
+  const GAL = `file://${process.cwd()}/index.html`;
+  /* Its own widths. 320 is the fault's; 359 and 360 are the two sides of the
+     seam the fix is scoped to, so a rule that stops applying says so here. */
+  const WIDE = [[320, 568], [359, 640], [360, 740], [390, 844], [768, 1024]];
+  const MIN_TRACK = 132;   /* the declared minimum in css/app.css */
+  let swept = 0;
+  for (const [w, h] of WIDE) {
+    const where = `gallery ${w}x${h}`;
+    const p = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await p.goto(GAL, { waitUntil: 'load' });
+      await p.waitForTimeout(600);
+      await p.evaluate(() => document.querySelector('#works-btn').click());
+      await p.waitForTimeout(700);
+      const m = await p.evaluate(() => {
+        const dlg = document.querySelector('#works');
+        const g = document.querySelector('#works-grid');
+        if (!dlg || !dlg.open) return { missing: 'the gallery did not open' };
+        if (!g || !g.children.length) return { missing: 'the gallery has no doors in it' };
+        const tracks = getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean);
+        const gr = g.getBoundingClientRect();
+        const on = [...g.children].filter(t => {
+          const r = t.getBoundingClientRect();
+          return r.top < Math.min(gr.bottom, innerHeight) && r.bottom > Math.max(gr.top, 0);
+        }).length;
+        return { cols: tracks.length, track: Math.round(parseFloat(tracks[0])),
+                 on, tiles: g.children.length };
+      });
+      if (m.missing) { fault(where, m.missing); await p.close(); continue; }
+      swept++;
+      if (m.cols < 2) {
+        fault(where, `the gallery is ONE column — ${m.on} of ${m.tiles} doors on screen. `
+          + 'A customer cannot compare doors they cannot see beside each other, and the '
+          + 'width is probably not ours: a modal dialog carries a UA margin of 19px a side');
+      }
+      if (m.track < MIN_TRACK) {
+        fault(where, `a gallery tile is ${m.track} px against the ${MIN_TRACK} px this `
+          + 'stylesheet declares. Buying a column by shrinking the door was measured and '
+          + 'refused — at a 105 px art box two of Peretz\'s doors differ on 0.48% of '
+          + 'pixels, and 0.45% is what this repo already calls the same picture (§0b, '
+          + 'the six pull bars). Take the width from the margins, not from the door');
+      }
+      if (!faults) console.log(`    ${w}x${h}: ${m.cols} columns of ${m.track} px, `
+        + `${m.on} of ${m.tiles} doors on screen`);
+    } catch (e) {
+      fault(where, `the gallery could not be opened: ${e.message}`);
+    }
+    await p.close().catch(() => {});
+  }
+  if (swept < WIDE.length) {
+    fault('gallery', `only ${swept} of ${WIDE.length} widths were measured — the sweep `
+      + 'did not see what it claims to check');
+  }
+}
+
 /* ── THE ORDER SHEET PRINTS ON ONE SHEET OF PAPER ────────────────────────
    ⚠ THIS IS THE ONLY CHECK IN THE REPOSITORY THAT PUTS THE SHEET ON PAPER,
    AND UNTIL 12.9.2026 THERE WAS NONE. `?sheet=1` is an A4 document — the thing
