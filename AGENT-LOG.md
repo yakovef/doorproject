@@ -155,7 +155,7 @@ stepping · an audit block for all of it) · **taken 0** · refused 6 — all si
 reverted together, because the first is what the other five exist to make safe
 and the first is what the measurements refuse.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `5da4694` — the log and `CLAUDE.md` §9 only; no code shipped
 
 ---
 
