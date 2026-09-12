@@ -7795,7 +7795,7 @@ ${body}
       if (raw == null) return;
       const hit = list.find((o) => idOf(o) === raw) || list.find((o) => (o.aliases || []).includes(raw));
       if (hit) state2[key] = idOf(hit);
-      else notice = "option-unknown";
+      else notice = notice || "option-unknown";
     };
     take("colour", "c", COLOURS);
     take("window", "w", WINDOWS);
@@ -7840,7 +7840,7 @@ ${body}
     if (rawSize != null) {
       const asSize = SIZE_ALIAS[rawSize] || rawSize;
       if (Object.prototype.hasOwnProperty.call(SIZES, asSize)) state2.size = asSize;
-      else notice = "option-unknown";
+      else notice = notice || "option-unknown";
     }
     const rawGrip = p.get("gp");
     if (rawGrip != null) {

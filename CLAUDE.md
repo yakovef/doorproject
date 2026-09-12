@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1999,6 +1999,78 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ A CODE PERETZ TYPED WRONG OFF THE TELEPHONE SAID "SOME OF THE OPTIONS ARE
+  UNAVAILABLE — SHOWING THE NEAREST ONE", ABOUT A DOOR THAT IS NOT NEAR
+  ANYTHING — 12.9.2026.** Found by walking as **Peretz on the telephone**: a
+  customer reads him the `DM-` code and he puts it in. `PLAN.md` §0 names that
+  as one of the two ways an order reaches him and `js/url-state.js` spends a
+  whole CHECK NIBBLE on it — measured, because 38.4% of single-character typos
+  used to decode into a different valid door — and **no run had ever walked
+  it.**
+  When the nibble does its job the page falls back to the standard ₪3,195
+  door, and then the sentence on the strip is the only thing between Peretz and
+  building the wrong one. It was the wrong sentence, on every refused code, at
+  every width, on the page AND on the A4 sheet:
+  *"חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר"* — some of the
+  options in the link are unavailable, showing the nearest one. **A refused
+  code is not near anything.** `notice.code` — *"הקוד לא זוהה — מציגים דלת
+  ברירת מחדל"*, the code was not recognised, this is a default door — is the
+  string written for exactly this, in all three languages, and **it was
+  unreachable from any input.**
+  ⚠ **THE MECHANISM IS TWO CHARACTERS, AND THE COMMENT ABOVE IT DESCRIBES THE
+  BUG IT LEFT BEHIND.** `?d=` holds the code and `d` is also the detail axis;
+  `fromQuery` sets `notice = 'code-unknown'` when `decodeCode` refuses, then
+  falls through to `take('detail', 'd', DETAILS)`, which misses (no detail id
+  starts `DM-`) and **overwrote it** — two of the five places that raise
+  `option-unknown` were guarded with `notice ||` and three were bare. The
+  comment over that branch already says `?d=DM-…` is *"the one URL a person
+  would type from a code read down the telephone"* and that reading it as a
+  detail *"said 'some of the options in this link are unavailable — showing the
+  closest', which is false twice over"*. That fix made a GOOD code work and
+  left the failure path saying the very sentence it condemns — and the failure
+  path is the half that matters, because a good code shows the right door
+  anyway. §5's family: nothing threw, and the page looked entirely correct.
+  ⚠ **AND THE ASSERTION FOR IT PASSED THE WHOLE TIME, BECAUSE IT USED A
+  PARAMETER NOBODY TYPES.** `npm test` has checked
+  `fromQuery('?code=…').notice === 'code-unknown'` since the check nibble
+  shipped. With `?code=` there is no `d` to re-read, so `code-unknown`
+  survives and the row is green; the page prints `DM-…`, the comment names
+  `d`, and the test used `code`. **A fixture chosen so the defect cannot
+  appear in it** — §5.15 from the other end, and the second time this file has
+  found one (the first was T11's non-default door, 11.9).
+  The replacement is DERIVED, not sampled: five ways a telephone breaks a code
+  (a character misheard at the end, one in the middle, a transposition, a code
+  from a layout we no longer use, nonsense), built from the page's own current
+  code so they move with `VERSION`, each asserted under **both** `?d=` and
+  `?code=`; plus the precedence the fix restores (a refused code beside a
+  refused option still says the code — the worse news wins, which `showNotice`
+  documents and nothing was holding) and its mirror, so the pair cannot pass by
+  the notice becoming a constant. ⚠ **My own first fixture was vacuous and its
+  own §5.15 clause caught it on the first run:** the transposition swapped two
+  characters that are both `0` on this door's code, so the "broken" code was
+  the good one and three assertions passed about nothing. It finds two that
+  differ now.
+  `npm run audit` carries the other half, because only a browser proves the
+  SENTENCE on the page is the one `showNotice` chose — the same argument as
+  `#summary` and the price. **Falsified** by restoring the bare assignment: six
+  unit faults, every one of them on `?d=` with the `?code=` rows staying green,
+  which is the old fixture's blindness measured rather than argued; and one
+  audit fault quoting the wrong sentence verbatim.
+  No price, no id, no list order, no bit, no `VERSION`; two `||`.
+
+- **⚠ AND THE FIRST PARAGRAPH OF `js/url-state.js` SAID THE CODE WAS SIX
+  CHARACTERS, THROUGH ELEVEN VERSION BUMPS, WITH AN INVENTED EXAMPLE.**
+  Measured on the standard door at VERSION 21: the body is **eleven**. That is
+  §1's own complaint about the VERSION number, one file over — *"a number
+  written into prose is a number that goes stale the first time somebody obeys
+  the rule around it"* — and it had gone stale in the first thing a reader of
+  that file sees, on the quantity this lens is entirely about (how long a thing
+  somebody has to read down a telephone). The header no longer restates a
+  length: `BITS` decides it, `TOTAL_BITS` computes it, and `tools/audit.mjs`
+  already derives its own pattern from `encodeCode(DEFAULTS).length`. Every
+  `── NN ──` note below it is HISTORY and correctly says what the length was
+  then; only the header was claiming a present tense, and only it changed.
 
 - **⚠ A PHONE HELD SIDEWAYS SHOWED `שלב 3 מתוך 8` AND NO QUESTION UNDER IT, ON
   EVERY STEP — 12.9.2026.** Found by walking as **the customer who turns the

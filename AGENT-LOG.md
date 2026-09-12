@@ -45,6 +45,130 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-12 04:15 UTC — run 111: a code Peretz typed wrong said "showing the nearest one", about a door that is not near anything
+
+**Looked at:** the page as **PERETZ ON THE TELEPHONE** — a customer reads him
+the `DM-` code and he puts it in. `PLAN.md` §0 names that as one of the two ways
+an order reaches him, `js/url-state.js` spends a whole CHECK NIBBLE on it
+(measured: 38.4% of single-character typos used to decode into a different
+valid door), and **no run had ever walked it.** Drove nine things a telephone
+produces — the code exactly as printed, lower case, with a space where he said
+it in two groups, without the `DM-`, one character misheard at the end, one in
+the middle, two transposed, O said for zero, I said for one — at 1440x900 and
+390x844, then the same on `?sheet=1` in Hebrew and Russian. Recent lenses: 106
+English keyboard, 107 Russian at 320, 108 Peretz on a laptop, 109 the tablet
+band, 110 the phone held sideways.
+
+**Instruments:** test ✓ 4,349,822 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets —
+**52 bare sheets byte-identical**.
+Done the cheap way, single-threaded, and saying so: the finding came out of one
+harness driving nine URLs, the cause was two characters, and every question it
+raised was a measurement I could take. Nothing for a fleet to fan out over.
+`ultracode` deliberately not spent.
+
+**Read and found correct, rather than changed:** the read-aloud tolerances all
+hold — lower case, a stray space, and a missing `DM-` each decode to the right
+door, and Crockford maps O to zero and I to one so a customer saying "oh" for
+nought costs nothing. The A4 sheet on a good code is clean in both languages.
+
+**Changed:** what a refused code SAYS. When the check nibble does its job the
+page falls back to the standard ₪3,195 door, and then the sentence on the strip
+is the only thing between Peretz and building the wrong one. It was the wrong
+sentence, on every refused code, at every width, on the page AND on the A4
+sheet: *"חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר"* — some of
+the options in the link are unavailable, showing the nearest one. **A refused
+code is not near anything.** `notice.code` — *"הקוד לא זוהה — מציגים דלת ברירת
+מחדל"* — is the string written for exactly this, in all three languages, and it
+was **unreachable from any input**.
+
+⚠ **The mechanism is two characters, and the comment above it describes the bug
+it left behind.** `?d=` holds the code and `d` is also the detail axis;
+`fromQuery` sets `notice = 'code-unknown'` when `decodeCode` refuses, then falls
+through to `take('detail', 'd', DETAILS)`, which misses (no detail id starts
+`DM-`) and **overwrote it** — two of the five places that raise
+`option-unknown` were guarded with `notice ||` and three were bare. The comment
+over that branch already says `?d=DM-…` is *"the one URL a person would type
+from a code read down the telephone"* and that reading it as a detail *"said
+'some of the options in this link are unavailable — showing the closest', which
+is false twice over"*. That fix made a GOOD code work and left the failure path
+saying the very sentence it condemns — and the failure path is the half that
+matters, because a good code shows the right door anyway.
+
+⚠ **AND THE ASSERTION FOR IT PASSED THE WHOLE TIME, BECAUSE IT USED A PARAMETER
+NOBODY TYPES.** `npm test` has checked `fromQuery('?code=…').notice ===
+'code-unknown'` since the check nibble shipped. With `?code=` there is no `d` to
+re-read, so the row is green; the page prints `DM-…`, the comment names `d`, and
+the test used `code`. A fixture chosen so the defect cannot appear in it —
+§5.15 from the other end, and the second one this project has found in two days.
+The replacement is DERIVED: five ways a telephone breaks a code, built from the
+page's own current code so they move with `VERSION`, each asserted under **both**
+`?d=` and `?code=`, plus the precedence the fix restores (a refused code beside
+a refused option still says the code) and its mirror so the pair cannot pass by
+the notice becoming a constant. ⚠ **My own first fixture was vacuous and its own
+§5.15 clause caught it on the first run** — the transposition swapped two
+characters that are both `0` on this door's code, so the "broken" code was the
+good one and three assertions passed about nothing. It finds two that differ now.
+`npm run audit` carries the other half, because only a browser proves the
+SENTENCE on the page is the one `showNotice` chose. **Falsified** by restoring
+the bare assignment: **six unit faults, every one on `?d=` with the `?code=`
+rows staying green** — the old fixture's blindness measured rather than argued —
+and **one audit fault quoting the wrong sentence verbatim**.
+
+**Changed, second — a documentation fix.** The first paragraph of
+`js/url-state.js` said the code was *"a 6-character code (DM-8EH48X)"*, through
+eleven version bumps, with an invented example. Measured at VERSION 21: the
+body is **eleven** characters. That is §1's own complaint about the VERSION
+number one file over — a number written into prose goes stale the first time
+somebody obeys the rule around it — sitting in the first thing a reader of that
+file sees, on the quantity this lens is entirely about. The header no longer
+restates a length; `BITS` decides it, `TOTAL_BITS` computes it, and the audit
+already derives its pattern from `encodeCode(DEFAULTS).length`. Every `── NN ──`
+note below it is history and correctly says what the length was THEN.
+
+No price, no id, no list order, no bit, no `VERSION`; two `||` and one comment.
+
+**Left alone deliberately:**
+· **There is nowhere on the page to type a code.** The page has no `<input>` at
+  all — I grepped. The only way in is to hand-edit a URL. That looks like a
+  hole and the record says otherwise: `url-state.js` cites `PLAN.md` §3.2 as
+  having specified this entry point as `?d=DM-…`, so a URL is the spec, and
+  whether Peretz can comfortably type one is a question for a human rather than
+  something to build unasked.
+· **Where the notice SITS.** Run 108 looked at this and left it, measuring it
+  in the extreme top-right corner of a 1440 px window in the smallest type on
+  the page. The case is stronger now than it was then — the sentence has gone
+  from "some options are unavailable" to "this is not the door you were read" —
+  and the picture is worse than the words: a thin 37 px strip at y=0 above a
+  confident summary with a door, a price and a green send button. It is still
+  its own measurement across five viewports and not the tail of this run.
+· **Landing on the SUMMARY for a refused code.** `carries` is true because `d=`
+  is not a rendering switch (run 106), so a refused code opens the quote page
+  showing a complete door. With the notice now saying "this is a default door"
+  that is at least consistent; whether step 01 would be more honest is a T11
+  question and a second behaviour change.
+
+**Best idea of the run that was NOT taken:** the code is **eleven characters**
+and the file still calls it "read aloud in two groups". Eleven of Crockford
+base32, spoken down a telephone in Hebrew, is a long thing to say and a long
+thing to hear — and the payload has grown by a field or two per round with no
+budget on it. Nobody has ever measured the read-aloud cost the way this project
+measures everything else: how long it takes to say, how often it is heard
+wrong, and what the CHECK actually buys at eleven characters versus what it
+bought at six. That measurement would tell us whether the code is still the
+artefact §0 describes or has quietly stopped being one — and it is the kind of
+question that decides a `VERSION` bump rather than following one. **That is the
+next thing to measure**, and the run-110 idea (two columns on a landscape
+phone) is still standing behind it.
+
+**proposed · taken · refused:** proposed 5 (the notice kind · the stale header ·
+a code input · move the notice · land a refused code on step 01) · taken 2 ·
+refused 3.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-12 00:05 UTC — run 110: a phone held sideways showed "step 3 of 8" and no question under it
 
 **Looked at:** the page as **the customer who turns the phone sideways** —

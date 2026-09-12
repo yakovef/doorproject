@@ -3,9 +3,21 @@
  *
  * PLAN.md §8.2. Two representations of the same thing:
  *   - a readable query string, for links
- *   - a 6-character code (DM-8EH48X), for customers who telephone instead of
- *     messaging. It is an ENCODING, not a hash — a hash cannot be decoded
- *     without a server, which would make reading it aloud useless.
+ *   - a short `DM-` code, for customers who telephone instead of messaging. It
+ *     is an ENCODING, not a hash — a hash cannot be decoded without a server,
+ *     which would make reading it aloud useless.
+ *
+ * ⚠ THIS SAID "a 6-character code (DM-8EH48X)" UNTIL 12.9.2026, THROUGH ELEVEN
+ * VERSION BUMPS, AND THE EXAMPLE WAS INVENTED. Measured on the standard door
+ * at VERSION 21 the body is **eleven** characters. That is the fault CLAUDE.md
+ * §1 names about the VERSION number one paragraph over — *"a number written
+ * into prose is a number that goes stale the first time somebody obeys the
+ * rule around it"* — and it had gone stale in the first thing a reader of this
+ * file sees. So the length is not restated here: `BITS` below is where it is
+ * decided, `TOTAL_BITS` is where it is computed, and `tools/audit.mjs` derives
+ * its own pattern from `encodeCode(DEFAULTS).length` rather than spelling one
+ * out. Each `── NN ──` note below is history and correctly says what the
+ * length was THEN; only this header was claiming a present tense.
  */
 
 import { BELLS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_LENS, LOCKSETS,
@@ -498,7 +510,23 @@ export function fromQuery(search) {
     const hit = list.find(o => idOf(o) === raw)
              || list.find(o => (o.aliases || []).includes(raw));
     if (hit) state[key] = idOf(hit);
-    else notice = 'option-unknown';
+    /* ⚠ `||`, NEVER A BARE ASSIGNMENT, AND THE REASON IS `code-unknown`.
+       Two of the five places that raise `option-unknown` were guarded and
+       three were not, and one of the unguarded ones is reached on EVERY
+       refused code: `?d=` holds the code, the branch above sets
+       `code-unknown`, and then `take('detail', 'd', DETAILS)` looks at that
+       same `d`, misses (no detail id starts `DM-`), and overwrote it. So a
+       code Peretz mistyped off the telephone came up saying *"some of the
+       options in the link are unavailable — showing the nearest one"*, which
+       is the sentence the comment above this function calls **false twice
+       over**, and `code-unknown` — the one that says *"the code was not
+       recognised, this is a default door"* — was unreachable from any input.
+       Measured 12.9: `?d=<bad>` returned `option-unknown` for a one-character
+       change, a transposition and pure nonsense alike.
+       The ordering this restores is the one `showNotice` already documents:
+       the WORSE news wins, and a whole door nobody recognised is worse than
+       one option nobody recognised. */
+    else notice = notice || 'option-unknown';
   };
 
   take('colour', 'c', COLOURS);
@@ -604,7 +632,9 @@ export function fromQuery(search) {
        raises no notice — the same reasoning as `RETIRED` above. */
     const asSize = SIZE_ALIAS[rawSize] || rawSize;
     if (Object.prototype.hasOwnProperty.call(SIZES, asSize)) state.size = asSize;
-    else notice = 'option-unknown';
+    /* `||` for the reason given inside `take` — the worse news wins, and a
+       refused CODE is worse news than a refused size. */
+    else notice = notice || 'option-unknown';
   }
 
   const rawGrip = p.get('gp');

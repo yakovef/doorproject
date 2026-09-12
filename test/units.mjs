@@ -301,6 +301,66 @@ group('short code round-trip');
   ok(fromQuery('?code=DM-M4040480').notice === 'code-unknown',
      'an old code is refused without telling the customer why');
 
+  /* ⚠ AND THE SAME CODE UNDER `?d=`, WHICH IS THE PARAMETER A PERSON ACTUALLY
+     TYPES — the line above passed for the life of the feature while this one
+     could not have. `js/url-state.js` says in as many words that `?d=DM-…` is
+     *"the one URL a person would type from a code read down the telephone"*,
+     and `?code=` is the spelling nothing produces: the page prints `DM-…`, the
+     comment names `d`, and the test used `code`. So the fixture could not
+     reach the branch it was written about, and on `?d=` a refused code came
+     back `option-unknown` — *"some of the options in the link are unavailable,
+     showing the nearest one"* — about a door that is not near anything. A
+     fixture chosen so the defect cannot appear in it is CLAUDE.md §5.15 from
+     the other end, and it is the second time this file has found one.
+
+     DERIVED, not sampled: every way of breaking a code that a telephone
+     produces, taken from the page's OWN current code rather than a literal,
+     so the day the layout changes these move with it. */
+  {
+    const good = encodeCode(base);
+    const flip = (s, i) => s.slice(0, i) + (s[i] === 'A' ? 'B' : 'A') + s.slice(i + 1);
+    /* ⚠ THE TRANSPOSITION HAS TO FIND TWO CHARACTERS THAT DIFFER, AND MY FIRST
+       VERSION DID NOT — it swapped a fixed pair of indices, which on this
+       door's code are both `0`, so the "broken" code was the good one and
+       three assertions passed about nothing. The §5.15 clause below caught it
+       on its first run, which is the whole reason that clause is there. */
+    const t = [...good].findIndex((ch, i) => i >= 3 && good[i + 1] && good[i + 1] !== ch);
+    const BROKEN = {
+      'one character misheard at the end': flip(good, good.length - 1),
+      'one character misheard in the middle': flip(good, good.length - 4),
+      'two characters swapped': good.slice(0, t) + good[t + 1] + good[t] + good.slice(t + 2),
+      'a code from a layout we no longer use': 'DM-M4040480',
+      'nothing like a code at all': 'DM-ZZZZZZZZZZZZ',
+    };
+    for (const [how, bad] of Object.entries(BROKEN)) {
+      /* §5.15: if a "broken" code ever starts decoding, this check has lost
+         its subject and must say so rather than passing about nothing. */
+      ok(decodeCode(bad) === null,
+         `${how}: "${bad}" still decodes, so the case below tests nothing`);
+      for (const param of ['d', 'code']) {
+        ok(fromQuery(`?${param}=${bad}`).notice === 'code-unknown',
+           `?${param}=: ${how} is reported as `
+         + `"${fromQuery(`?${param}=${bad}`).notice}" — Peretz is shown a default `
+         + 'door under a sentence saying it is the nearest thing to the one the '
+         + 'customer described');
+      }
+    }
+    /* And the ORDER of the two, which is what the fix actually restores: a
+       refused code beside a refused option must still say the code, because a
+       whole door nobody recognised is worse news than one option nobody
+       recognised. `showNotice` documents that precedence and nothing was
+       holding it. */
+    ok(fromQuery(`?d=${BROKEN['two characters swapped']}&c=no-such-colour`).notice
+       === 'code-unknown',
+       'a refused code beside a refused option reports the option — the milder '
+     + 'of the two wins and the customer is told the smaller thing');
+    /* The mirror, so this pair cannot pass by the notice becoming a constant. */
+    ok(fromQuery('?c=no-such-colour').notice === 'option-unknown',
+       'a refused option on its own no longer reports itself');
+    ok(fromQuery(`?d=${good}`).notice === null,
+       'a code that is perfectly good now raises a notice');
+  }
+
   // Read-aloud tolerance: a customer says these over the phone.
   const ref = encodeCode(base);
   ok(decodeCode(ref.toLowerCase()) !== null, 'lowercase code rejected');

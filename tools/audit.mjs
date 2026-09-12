@@ -22,7 +22,7 @@ import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode, toQuery } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
 import { SIZES } from '../js/catalog.js';
-import { setLang } from '../js/copy.js';
+import { setLang, T, withLang } from '../js/copy.js';
 import { handingWords, specRows, summaryLine } from '../js/spec.js';
 import { repair } from '../js/rules.js';
 
@@ -2530,7 +2530,72 @@ for (const v of VIEWS) {
     }
     if (at.notice) fault('arrival', `${what} raised a notice on a door that is buildable`);
   }
-  if (!faults) console.log('    a link opens the door; a bare load opens step 01');
+
+  /* ── AND A CODE HE TYPED WRONG SAYS SO, IN THOSE WORDS ────────────────
+     ⚠ EVERY ROW ABOVE IS A CODE THAT WORKS, AND THE ROW THAT MATTERS IS THE
+     ONE THAT DOES NOT. `PLAN.md` §0 has two ways an order reaches Peretz — a
+     WhatsApp button and a code read down the telephone — and `url-state.js`
+     spends a whole check nibble on the second, measured, because 38.4% of
+     single-character typos used to decode into a DIFFERENT valid door. When
+     the nibble does its job the page falls back to the standard door, and
+     then the only thing standing between Peretz and building the wrong one is
+     the sentence on the strip.
+     Measured 12.9: it was the WRONG sentence. `?d=` holds the code AND is the
+     detail axis, so `take('detail', 'd', …)` overwrote `code-unknown` with
+     `option-unknown` on every refused code — *"some of the options in the
+     link are unavailable, showing the nearest one"*, about a door that is not
+     near anything, which is the sentence `url-state.js`'s own comment calls
+     false twice over.
+     `npm test` proves the KIND `fromQuery` returns; only a browser proves the
+     SENTENCE on the page is the one `showNotice` chose for it — the same
+     argument as `#summary` and the price. §5.15: it asserts the strip was
+     found and that it actually says something. */
+  {
+    await pg.goto(HOME);
+    await pg.waitForTimeout(400);
+    const good = await pg.evaluate(() => document.querySelector('#code')?.textContent);
+    if (!good || !CODE.test(good)) {
+      fault('arrival', `could not read a code off a bare load (${good}) — the `
+        + 'mistyped-code row cannot be built');
+    } else {
+      const bad = good.slice(0, -1) + (good.slice(-1) === 'A' ? 'B' : 'A');
+      await pg.goto(`${HOME}?d=${bad}`);
+      await pg.waitForTimeout(500);
+      const strip = await pg.evaluate(() => {
+        const n = document.getElementById('notice');
+        if (!n) return { missing: true };
+        const r = n.getBoundingClientRect();
+        return {
+          hidden: n.hidden,
+          text: (n.textContent || '').trim(),
+          whole: r.height > 0 && r.top >= 0 && r.bottom <= innerHeight,
+        };
+      });
+      /* The page under test is in Hebrew (no `?lang=`), so read the two
+         sentences in Hebrew too rather than in whatever this process last set. */
+      const want = withLang('he', () => T('notice.code'));
+      const some = withLang('he', () => T('notice.some'));
+      if (strip.missing) {
+        fault('arrival', 'there is no #notice strip, so a refused code says nothing at all');
+      } else if (strip.hidden || !strip.text) {
+        fault('arrival', `a code with one character wrong (${bad}) opens a door and `
+          + 'says nothing — Peretz is shown the standard door as though it were '
+          + "the customer's");
+      } else if (strip.text !== want) {
+        fault('arrival', `a code with one character wrong says "${strip.text}"`
+          + (strip.text === some
+            ? ' — which tells Peretz this is the NEAREST door to the one the customer'
+              + ' described, and it is not near anything'
+            : ` — want "${want}"`));
+      } else if (!strip.whole) {
+        fault('arrival', 'the refused-code notice is not fully on screen');
+      }
+    }
+  }
+  if (!faults) {
+    console.log('    a link opens the door; a bare load opens step 01; a code '
+      + 'typed wrong says the code was not recognised');
+  }
   await pg.close();
 }
 
