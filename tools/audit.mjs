@@ -19,7 +19,7 @@ import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
 import { crashed } from './browser.mjs';
 import { load, lum } from './imglib.mjs';
-import { DEFAULTS, decodeCode, encodeCode, toQuery } from '../js/url-state.js';
+import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
 import { SIZES } from '../js/catalog.js';
 import { setLang, T, withLang } from '../js/copy.js';
@@ -3929,6 +3929,258 @@ for (const v of VIEWS) {
   if (faults === before) {
     console.log(`    ${pressed} undos across ${SHAPES.length} shapes in two languages: ${named} named `
       + 'what came back, and no toast covered an option tile, the price or the send');
+  }
+}
+
+/* ── THE SAVED-DESIGNS DRAWER FITS THE CARD IT HANGS IN ──────────────────
+   Measured 13.9 by walking as the customer who cannot decide between two
+   doors — save one, build another, come back. Nothing in this repository had
+   ever put a design IN that drawer, so nothing had ever opened it with rows.
+
+   Each row's label is a whole `summaryLine`, 100-160 characters, in a pill
+   with `white-space: nowrap`. `min-inline-size: 0` was declared on the pill,
+   with its reason written out, and on none of the three boxes above it — so
+   the min-content of one sentence set the width of the summary card's grid
+   track. Measured with three saved designs, before:
+     · the DOCUMENT went 768 / 886 / 1105 px wide against a 320 px viewport in
+       he / en / ru, so the whole page could be dragged sideways by up to
+       785 px, and in Hebrew the drawer sat at x = -448 with all three delete
+       buttons entirely off screen;
+     · at 1440 the card stayed 310 px while `.send__alt` became 717, and it
+       carried `#spec` and the price caveat out with it — 272 -> 717 px, 445 px
+       of the summary's own contents laid across the door.
+
+   ⚠ AND THE CLAUSE THAT MUST STAY TRUE IS BESIDE IT (§5.22). The cheap way to
+   pass the first half is to shrink the rows until they say nothing, and that
+   is not hypothetical — it is what the fix does: once the chain stopped
+   overflowing, the description alone was 132 px at 320 and three doors a
+   customer would really compare (₪3,195, ₪6,995, ₪4,995 — same colour) read as
+   ONE distinct row in five of six shape x language cases. So every row must
+   also carry a PRICE, and every delete button must be whole on screen and
+   return itself from `elementFromPoint`. Russian is carried for the reason it
+   always is: the longest copy, and the box grew with it. */
+{
+  console.log('\nthe saved-designs drawer fits the card it hangs in');
+  const before = faults;
+  const SHAPES = [
+    { name: '320x568', w: 320, h: 568 }, { name: '390x844', w: 390, h: 844 },
+    { name: '834x1112', w: 834, h: 1112 }, { name: '1280x720', w: 1280, h: 720 },
+    { name: '1440x900', w: 1440, h: 900 },
+  ];
+  /* Three doors of ONE colour, so the description alone cannot tell them
+     apart — which is the case the price clause exists for. Asserted
+     unrepaired below, because a fixture the rules had to fix is a door nobody
+     saved. */
+  const DOORS = [
+    '?s=standard&c=rb-7126d&w=none&d=plain&n=plate&pz=pz-nickel',
+    '?s=standard&c=rb-7126d&w=rect&d=panel&g=grid&n=plate&pz=pz-nickel',
+    '?s=standard&c=rb-7126d&w=none&d=plain&n=coral&pz=pz-gold&x=kodan',
+  ];
+  /* ⚠ ASSERT THE FIXTURES ARE UNREPAIRED. Twice now a door typed into a check
+     in this file arrived traded down by `repair`, and what was then measured
+     was a door nobody had chosen. */
+  for (const q of DOORS) {
+    const r = fromQuery(q);
+    if (r.notice) fault('saved', `the fixture ${q} arrives repaired (${r.notice}) — it is not a `
+      + 'door a customer could have saved');
+  }
+  let opened = 0, rowsSeen = 0;
+  for (const lang of ['he', 'ru']) {
+    for (const s of SHAPES) {
+      const p = await b.newPage({ viewport: { width: s.w, height: s.h } });
+      try {
+        await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
+        await p.evaluate(l => localStorage.setItem('dm.saved.v1', JSON.stringify(l)), DOORS);
+        await p.goto(`file://${process.cwd()}/index.html${DOORS[0]}&lang=${lang}`,
+          { waitUntil: 'load' });
+        /* Past the 900 ms summary reveal — an instrument that measures during
+           an entrance animation is measuring the wrong moment (§0b). */
+        await p.waitForTimeout(1500);
+
+        const m = await p.evaluate(() => {
+          const doc = document.documentElement;
+          const shut = {
+            side: doc.scrollWidth - doc.clientWidth,
+            card: document.querySelector('.panel--send .send')?.getBoundingClientRect().width,
+            spec: document.querySelector('#spec')?.getBoundingClientRect().width,
+          };
+          const btn = document.querySelector('#saved-btn');
+          if (!btn || btn.hidden) return { noBtn: true };
+          btn.click();
+          const box = document.querySelector('#saved');
+          if (!box || box.hidden) return { noDrawer: true };
+          box.scrollIntoView({ block: 'center' });
+          const W = innerWidth, H = innerHeight;
+          /* ⚠ WHAT IS PAINTED, NOT WHAT IS IN THE NODE. The description is
+             elided, so `textContent` is the whole `summaryLine` whatever the
+             customer can see — and the first version of this compared exactly
+             that, which made the distinctness clause unable to fail for the
+             reason it was written. Measured by binary-searching the longest
+             prefix that still fits the box, against a hidden clone allowed to
+             size itself. */
+          const visible = el => {
+            if (!el) return '';
+            const room = el.getBoundingClientRect().width + 0.5;
+            const probe = el.cloneNode(true);
+            probe.style.position = 'absolute';
+            probe.style.visibility = 'hidden';
+            probe.style.inlineSize = 'auto';
+            probe.style.maxInlineSize = 'none';
+            el.parentElement.appendChild(probe);
+            const t = el.textContent;
+            let lo = 0, hi = t.length;
+            while (lo < hi) {
+              const mid = (lo + hi + 1) >> 1;
+              probe.textContent = t.slice(0, mid);
+              if (probe.getBoundingClientRect().width <= room) lo = mid; else hi = mid - 1;
+            }
+            probe.remove();
+            return t.slice(0, lo);
+          };
+          const rows = [...document.querySelectorAll('.saved__row')].map(r => {
+            const d = r.querySelector('.saved__drop');
+            const rb = d.getBoundingClientRect();
+            const top = document.elementFromPoint(rb.x + rb.width / 2, rb.y + rb.height / 2);
+            return {
+              cost: (r.querySelector('.saved__cost')?.textContent || '').trim(),
+              what: visible(r.querySelector('.saved__what')).trim(),
+              dropOn: rb.x >= -0.5 && rb.right <= W + 0.5 && rb.y >= -0.5 && rb.bottom <= H + 0.5,
+              dropHit: !!top && (top === d || d.contains(top)),
+            };
+          });
+          return {
+            shut,
+            open: {
+              side: doc.scrollWidth - doc.clientWidth,
+              card: document.querySelector('.panel--send .send')?.getBoundingClientRect().width,
+              spec: document.querySelector('#spec')?.getBoundingClientRect().width,
+              alt: document.querySelector('.send__alt')?.getBoundingClientRect().width,
+            },
+            rows,
+          };
+        });
+
+        if (m.noBtn) {
+          fault('saved', `${lang} ${s.name}: three designs are in storage and the drawer's own `
+            + 'toggle is not on the page — this sweep has no subject');
+          await p.close().catch(() => {});
+          continue;
+        }
+        if (m.noDrawer) {
+          fault('saved', `${lang} ${s.name}: the toggle did not open the drawer`);
+          await p.close().catch(() => {});
+          continue;
+        }
+        opened++;
+        rowsSeen += m.rows.length;
+        if (m.rows.length !== DOORS.length) {
+          fault('saved', `${lang} ${s.name}: ${m.rows.length} rows for ${DOORS.length} saved `
+            + 'designs — the sweep is not measuring what it names');
+        }
+
+        /* must become true */
+        if (m.open.side > 1) {
+          fault('saved', `${lang} ${s.name}: opening the drawer makes the page scroll sideways by `
+            + `${Math.round(m.open.side)} px (it was ${Math.round(m.shut.side)} px shut). A saved `
+            + 'design is a label, not a reason to widen the document under the door');
+        }
+        for (const [k, was, now] of [['card', m.shut.card, m.open.card],
+                                     ['spec table', m.shut.spec, m.open.spec]]) {
+          if (was != null && now != null && Math.abs(now - was) > 1) {
+            fault('saved', `${lang} ${s.name}: opening the drawer moved the summary's ${k} from `
+              + `${Math.round(was)} to ${Math.round(now)} px. The drawer's contents are setting `
+              + "the width of the card's own track");
+          }
+        }
+        if (m.open.alt != null && m.open.card != null && m.open.alt > m.open.card + 1) {
+          fault('saved', `${lang} ${s.name}: the drawer's row is ${Math.round(m.open.alt)} px `
+            + `inside a ${Math.round(m.open.card)} px card`);
+        }
+
+        /* must stay true */
+        const priced = m.rows.filter(r => /\d/.test(r.cost)).length;
+        if (priced < m.rows.length) {
+          fault('saved', `${lang} ${s.name}: ${m.rows.length - priced} of ${m.rows.length} saved `
+            + 'rows name no price. Fitting the drawer must not cost the customer the one fact '
+            + 'they saved two doors to compare');
+        }
+        const distinct = new Set(m.rows.map(r => r.what + '|' + r.cost)).size;
+        if (distinct < m.rows.length) {
+          fault('saved', `${lang} ${s.name}: only ${distinct} of ${m.rows.length} saved rows are `
+            + `distinguishable from what is PAINTED on them — e.g. "${m.rows[0].what}`
+            + `${m.rows[0].cost ? ' ' + m.rows[0].cost : ''}". Three different doors reading the `
+            + 'same is a drawer a customer cannot choose from');
+        }
+        const bad = m.rows.filter(r => !r.dropOn || !r.dropHit);
+        if (bad.length) {
+          fault('saved', `${lang} ${s.name}: ${bad.length} of ${m.rows.length} delete buttons are `
+            + `${bad.every(r => !r.dropOn) ? 'off screen' : 'off screen or covered'}`);
+        }
+      } catch (e) {
+        fault('saved', `${lang} ${s.name}: ${String(e).slice(0, 90)}`);
+      }
+      await p.close().catch(() => {});
+    }
+  }
+  /* ⚠ AND WHAT HAPPENS WHEN A SAVED DESIGN NO LONGER EXISTS. `saveCurrent`'s
+     docstring says the stored form is a query because that "survives a
+     catalogue change WITH A NOTICE rather than silently", and the open handler
+     was destructuring `state` alone — so the door came back traded down, at a
+     different price, without a word. Nothing fires on a design saved today,
+     because `repair` is idempotent and every saved query was buildable when it
+     was written; the fixture below is what the NEXT withdrawal produces, and
+     it is the only way to assert the promise before it is spent. */
+  {
+    const STALE = '?s=standard&c=rb-7126d&pz=gold&n=plate';
+    if (!fromQuery(STALE).notice) {
+      fault('saved', `the stale-design fixture ${STALE} no longer raises a notice — this clause `
+        + 'has no subject and cannot fail');
+    }
+    for (const lang of ['he', 'ru']) {
+      const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+      try {
+        await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
+        await p.evaluate(q => localStorage.setItem('dm.saved.v1', JSON.stringify([q])), STALE);
+        await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
+        await p.waitForTimeout(900);
+        const said = await p.evaluate(() => {
+          const btn = document.querySelector('#saved-btn');
+          if (!btn || btn.hidden) return null;
+          btn.click();
+          const row = document.querySelector('.saved__open');
+          if (!row) return null;
+          row.click();
+          const t = document.querySelector('#toast');
+          return t && !t.hidden ? t.textContent.trim() : '';
+        });
+        if (said === null) {
+          fault('saved', `${lang}: the stale design did not reach the drawer — nothing to open`);
+        } else if (!said) {
+          fault('saved', `${lang}: opening a saved design the catalogue no longer builds said `
+            + 'NOTHING. It came back as the nearest buildable door at a different price, which is '
+            + "the silent substitution the stored query form exists to prevent");
+        }
+      } catch (e) {
+        fault('saved', `${lang} stale design: ${String(e).slice(0, 90)}`);
+      }
+      await p.close().catch(() => {});
+    }
+  }
+
+  /* §5.15: the day the drawer stops opening, or the rows stop being found,
+     every clause above passes by having no subject. */
+  const want = 2 * SHAPES.length;
+  if (opened < want) {
+    fault('saved', `the drawer opened on only ${opened} of ${want} shape x language cases`);
+  }
+  if (rowsSeen < want * DOORS.length) {
+    fault('saved', `${rowsSeen} saved rows were measured across ${want} cases, expected `
+      + `${want * DOORS.length}`);
+  }
+  if (faults === before) {
+    console.log(`    ${rowsSeen} saved rows across ${SHAPES.length} shapes in two languages: the `
+      + 'page never scrolls sideways, the card and its spec table do not move, every row names '
+      + 'its price and every delete button is on screen and hit-testable');
   }
 }
 

@@ -2075,15 +2075,46 @@ function paintSaved() {
     const open = document.createElement('button');
     open.type = 'button';
     open.className = 'saved__open';
-    /* Named by what the door IS, from the same rows everything else uses. */
-    let label = q;
-    try { label = summaryLine(fromQuery(q).state); } catch { /* keep the query */ }
-    open.textContent = label;
+    /* Named by what the door IS, from the same rows everything else uses —
+       and by what it COSTS, which is the only part of the row a 320 px phone
+       has room for and the reason somebody saved two doors. `priceAgorot` on
+       the state, never a figure stored beside the query: a price written down
+       at save time is a price that goes stale the day `js/prices.js` moves,
+       which is the shape `js/works.js` already refuses for the gallery. */
+    let label = q, cost = '';
+    try {
+      const st = fromQuery(q).state;
+      label = summaryLine(st);
+      cost = formatAgorot(priceAgorot(st));
+    } catch { /* keep the query */ }
+    const what = document.createElement('span');
+    what.className = 'saved__what';
+    what.textContent = label;
+    open.append(what);
+    if (cost) {
+      const money = document.createElement('b');
+      money.className = 'saved__cost';
+      money.textContent = cost;
+      open.append(money);
+    }
     open.addEventListener('click', () => {
-      const { state: st } = fromQuery(q);
+      /* ⚠ THE NOTICE IS THE WHOLE REASON THE STORED FORM IS A QUERY, AND IT
+         WAS BEING DROPPED ON THE FLOOR. `saveCurrent`'s own docstring says the
+         query is kept because it "survives a catalogue change WITH A NOTICE
+         rather than silently" — and this handler destructured `state` alone,
+         so a design saved before an option was withdrawn came back as the
+         nearest buildable door, at a different price, without a word. Nothing
+         fires today, because `repair` is idempotent and every saved query was
+         buildable when it was written; it is the next withdrawal that spends
+         it, and by then the customer's localStorage is already full of them.
+         Said as a TOAST rather than through `showNotice`: that strip is the
+         boot-time reader for an address somebody arrived on, and this customer
+         is standing in front of the drawer having just tapped a row. */
+      const { state: st, notice, said } = fromQuery(q);
       set(st);
       $('#saved').hidden = true;
       $('#saved-btn').setAttribute('aria-expanded', 'false');
+      if (notice) toast(said && said.length ? said.join(' · ') : T('notice.some'));
     });
     const drop = document.createElement('button');
     drop.type = 'button';

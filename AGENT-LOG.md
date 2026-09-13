@@ -45,6 +45,120 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-13 21:15 UTC — run 120: opening "העיצוב שלי" dragged the whole page 785 px sideways, and on a desktop pulled the spec table across the door
+
+**proposed · taken · refused:** proposed 4 (`min-inline-size` on the three
+boxes above the pill · `minmax(0, 1fr)` on the list's track · the price on
+every saved row · pass `fromQuery`'s notice through when a saved design is
+opened) · taken 4 · refused 1 (move שמירת העיצוב out of the summary — run
+119's own best-idea-not-taken, and still a placement decision above CSS; see
+below).
+
+**Looked at:** the page as **THE CUSTOMER WHO CANNOT DECIDE BETWEEN TWO
+DOORS** — save one, build another, come back and compare. That is run 119's
+best idea not taken, and **nothing in this repository had ever put a design IN
+the saved drawer**: every check that has opened it opened it empty. Walked
+forward with the button through all eight steps at 320×568, 390×844 and
+1440×900, saved on the summary, went back and built a second door, then opened
+the drawer with three designs in it at seven widths in all three languages.
+Then the order the send button produces, then `?sheet=1`, then the screenshots
+as pictures. Recent lenses: 115 the system Back button, 116 the zoomed page,
+117 the customer being read the page, 118 the price shopper, 119 the customer
+who changes their mind.
+
+**Instruments:** test ✓ · audit ✓ no faults · profile ✓ all four rows ·
+collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets ✓
+regenerated.
+
+**What the walk found, in three parts.**
+
+**1. The drawer broke the page around it.** Each row's label is a whole
+`summaryLine`, 100–160 characters, in a `nowrap` pill. `min-inline-size: 0` was
+declared on the pill — with its reason written out beside it — and on none of
+the three boxes above it, so one sentence's min-content set the summary card's
+grid track. With three saved designs:
+
+| | drawer | card | document | ×'s off screen |
+|---|---|---|---|---|
+| he 320×568 | **717 @x −448** | 256 | **768** / 320 | **3 of 3** |
+| en 320×568 | 835 | 256 | **886** / 320 | 3 of 3 |
+| **ru 320×568** | **1054** | 256 | **1105** / 320 | 3 of 3 |
+| ru 834×1112 | 1054 | 770 | 1105 / 834 | 3 of 3 |
+| he 1440×900 | 717 | 310 | 1440 / 1440 | 0 of 3 |
+
+Below 1100 the whole page — door, navigator, quote bar — could be dragged
+448–785 px sideways, and in Hebrew the drawer sat **off the leading edge** with
+every delete button outside the window. At 1440, where nothing scrolled, it was
+arguably worse: `.send__alt` went 272 → **717 px** and took `#spec` and the
+price caveat with it, **445 px of the summary's own contents laid across the
+door**, on the step whose lede says *"בדקו שהכול נכון"*.
+
+**2. Fixing it alone made three doors read the same.** Once the chain stopped
+overflowing the description was **132 px at 320 and 186 at 1440**. Three doors
+a customer would really compare — ₪3,195 plain, ₪6,995 with a square window and
+ironwork, ₪4,995 with a gold פרזול and a keypad, **all one colour** — read as
+**1 distinct row of 3 in five of six shape × language cases**, because
+`summaryLine` opens with the colour. So the row carries its **price**, tabular
+and unelidable, beside the elided description: **3 of 3 distinct everywhere**.
+`priceAgorot` on the state, never a figure stored beside the query; no new
+shekel figure anywhere and `js/prices.js` untouched.
+
+**3. A comment promising what the code did not do.** `saveCurrent`'s docstring
+says the stored form is a query because it *"survives a catalogue change with a
+notice rather than silently"* — and the open handler destructured `state`
+alone. A design saved before a withdrawal came back as the nearest buildable
+door at a different price, in silence. **Nothing fires today** (`repair` is
+idempotent and every saved query was buildable when written), so this is latent
+and the next withdrawal spends it; recorded at that severity, fixed anyway
+because it is two lines and it is §0's worst failure.
+
+**Changed** (`css/app.css`, `js/app.js`, `tools/audit.mjs`, `CLAUDE.md`):
+four `min-inline-size: 0`, the list's track declared `minmax(0, 1fr)` (§8's own
+rule about the stage, one grid over), a price span on each saved row, and the
+notice passed through as a toast.
+
+**Got wrong, and the falsification is what found it.** My first distinctness
+clause compared `textContent`, and the description is ELIDED — the node holds
+the whole `summaryLine` whatever a customer can see. So with the price removed,
+the price clause fired ten times and **the distinctness clause stayed green
+about the exact fault it was written for**: a check that could not fail. It
+binary-searches the longest prefix that still fits the box now, which is what
+the scratch harness that produced the 1-of-3 figure already did and the check
+should have copied rather than approximated. §7's rule one level in — an
+instrument that cannot see the thing it is named after is not an instrument.
+
+**Falsified in three directions, each isolating one half.** Removing the
+`min-inline-size` chain: **31 faults** — sideways scroll, the card's track and
+the delete buttons — with the price clauses staying green. Removing the price:
+**18 faults** — the price clause at all ten shape x language cases and the distinctness clause at eight of them (834x1112 is the exception: its card is 770 px and the description alone is long enough to differ). Restoring the one-field destructure: the stale-design clause fired
+in both languages.
+
+**Left alone deliberately:** `saved.loaded` — *"טענו את הדלת. אפשר לשנות כל
+פרט."* — is written in all three languages and read by nobody. The drawer
+closing and the door redrawing is the feedback on the normal path, and a toast
+on every load is a behaviour nobody asked for; recorded rather than wired up.
+Also not touched: the description is still only ~10 characters at 320 px, which
+the price now makes survivable but does not fix.
+
+**Best idea not taken, and it is run 119's again:** **the save button is still
+reachable only on the summary.** Measured this run, walking forward with the
+button: `#save-btn` is 0×0 on all eight question steps at 320, 390 and 1440,
+and `#saved-btn` is invisible mid-flow — so a customer who has saved one door
+and is building a second cannot reach either control until they walk to the end
+again. Refused for the second run running, and now for a sharper reason than
+last time: the drawer's own contents were broken, and moving a control into the
+wall before it works is the wrong order. It wants its own measurement of how
+often a walk doubles back.
+
+**Fleet:** not spent. `ultracode` is opted in every firing and this run did it
+the cheap way on purpose — one lens finds a box that does not fit its parent,
+and the verification that mattered was falsifying each of the three halves
+separately, which a second opinion would not have improved.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-13 16:25 UTC — run 119: an undo put up to ₪4,500 back on the door and said "the last step was cancelled"
 
 **Looked at:** the page as **THE CUSTOMER WHO CHANGES THEIR MIND** — the undo

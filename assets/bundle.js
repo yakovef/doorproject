@@ -9210,17 +9210,29 @@ ${body}
       const open = document.createElement("button");
       open.type = "button";
       open.className = "saved__open";
-      let label = q;
+      let label = q, cost = "";
       try {
-        label = summaryLine(fromQuery(q).state);
+        const st = fromQuery(q).state;
+        label = summaryLine(st);
+        cost = formatAgorot(priceAgorot(st));
       } catch {
       }
-      open.textContent = label;
+      const what = document.createElement("span");
+      what.className = "saved__what";
+      what.textContent = label;
+      open.append(what);
+      if (cost) {
+        const money = document.createElement("b");
+        money.className = "saved__cost";
+        money.textContent = cost;
+        open.append(money);
+      }
       open.addEventListener("click", () => {
-        const { state: st } = fromQuery(q);
+        const { state: st, notice, said } = fromQuery(q);
         set(st);
         $("#saved").hidden = true;
         $("#saved-btn").setAttribute("aria-expanded", "false");
+        if (notice) toast(said && said.length ? said.join(" · ") : T("notice.some"));
       });
       const drop = document.createElement("button");
       drop.type = "button";

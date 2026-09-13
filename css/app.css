@@ -534,22 +534,53 @@ svg { direction: ltr; }
   padding: 1px 7px; font-variant-numeric: tabular-nums;
 }
 
+/* ⚠ `min-inline-size: 0` FOUR TIMES DOWN ONE CHAIN, AND THE PILL AT THE FOOT
+   OF IT HAS CARRIED THE RULE — WITH ITS REASON WRITTEN OUT — SINCE THE DRAWER
+   SHIPPED. It was stated at the innermost box and applied nowhere above, so
+   every box between the pill and the summary card sized itself to a whole
+   `summaryLine`: 631 px in Hebrew, 749 in English, 968 in Russian, against a
+   256 px card on a 320 px phone.
+   Measured on the live page with three saved designs, before:
+     · below 1100 the DOCUMENT went 768 / 886 / 1105 px wide against the
+       viewport, so the whole page — door, navigator, quote bar — could be
+       dragged sideways by 448 / 566 / 785 px, and in Hebrew the drawer sat at
+       x = -448, off the leading edge, with all three × buttons entirely off
+       screen;
+     · at 1440 the card stayed 310 px and `.send__alt` became 717, and it took
+       `#spec` AND the price caveat with it — 272 -> 717 px, 445 px of the
+       summary's own contents laid across the door.
+   The four boxes are `.send__alt` (a grid item of the card), `.saved` (a flex
+   item of that), `.saved__row` (a grid item of the list) and the pill. The
+   list's track is `minmax(0, 1fr)` for the same reason CLAUDE.md §8 already
+   gives about the stage: an implicit `auto` track is floored at its content's
+   min-content width, so the floor has to be removed where the track is
+   declared, not only on the thing inside it.
+   After: no sideways scroll at 320, 360, 390, 834, 844, 1280 or 1440 in any
+   of the three languages, card and `#spec` byte-identical open and shut, and
+   every × on screen and hit-testable. */
 .saved {
   margin: 0; padding: 10px 16px;
+  inline-size: 100%; min-inline-size: 0;
   background: var(--paper-up); border-block-end: 1px solid var(--rule);
   /* Six saved designs measured 639 px of an 844 px phone screen, pushing the
      door and every control off it. The drawer is a drawer, not a page. */
   max-block-size: 40vh; overflow-y: auto;
 }
 .saved__none { margin: 0; font-size: .82rem; color: var(--ink-2); }
-.saved__list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.saved__list {
+  margin: 0; padding: 0; list-style: none;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px;
+}
 /* ⚠ `nowrap`. The pill carries a whole `summaryLine` and had no width floor,
    so on a phone it took the entire row and the 44 px delete button wrapped
    into the 6 px gap ABOVE the next entry: measured 10 px from a pill to its
    own ×, and 6 px from that × to the NEXT design's pill. The control nearest
    your thumb deleted the wrong door. At 1440 the rows did stay on one line,
    but the pills were 513 px and 810 px, so the × jumped 297 px between rows. */
-.saved__row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+.saved__row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;
+  min-inline-size: 0;
+}
 .saved__open {
   appearance: none; background: none; border: 1px solid var(--rule);
   border-radius: var(--r-pill); min-block-size: 44px; padding-inline: 12px;
@@ -558,8 +589,25 @@ svg { direction: ltr; }
      `min-inline-size: 0` because a flex item will not shrink below its
      content without it, which is what pushed the × out of the row. */
   flex: 1 1 auto; min-inline-size: 0;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   text-align: start;
+  display: flex; align-items: center; gap: 8px;
+}
+/* ⚠ THE PRICE IS THE ONE PART OF A SAVED ROW THAT MUST NOT BE ELIDED, AND IT
+   IS WHY THE DRAWER EXISTS. Once the chain above stopped overflowing, the
+   description alone was 132 px on a 320 px phone and 186 at 1440 — measured,
+   three doors a customer would really compare (the standard ₪3,195 leaf, the
+   same leaf with a square window and ironwork at ₪6,995, and the same leaf
+   with a gold פרזול and a keypad at ₪4,995): **one distinct row out of three**
+   in five of six shape x language cases, because `summaryLine` opens with the
+   colour and all three are the same colour. The money is what tells them
+   apart, and it is the reason somebody saved two doors rather than one. */
+.saved__what {
+  flex: 1 1 auto; min-inline-size: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.saved__cost {
+  flex: 0 0 auto; font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .saved__drop {
   appearance: none; background: none; border: 0; cursor: pointer;
@@ -3299,6 +3347,13 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 .send__alt {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; flex-wrap: wrap;
+  /* ⚠ THIS ONE IS LOAD-BEARING AND ITS REASON IS 2,800 LINES AWAY, BESIDE
+     `.saved`. It is a grid item of the send card, so without it the card's
+     implicit `auto` track is floored at this row's min-content — and the
+     saved-designs drawer hangs in here carrying a whole `summaryLine`. With it
+     missing, opening the drawer widened `#spec` from 272 to 717 px and dragged
+     the document 785 px past a 320 px phone. Measured 13.9. */
+  min-inline-size: 0;
 }
 .send__code { font-size: .78rem; color: var(--ink-2); }
 .send__code b { font-family: var(--mono); color: var(--ink); direction: ltr; display: inline-block; }
