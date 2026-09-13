@@ -141,7 +141,7 @@ the cheap way on purpose — the finding was a single geometry question that one
 lens settles, and the verification that mattered was falsifying each half of
 the fix separately, which a second opinion would not have improved.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `6d877ad`
 
 ---
 
