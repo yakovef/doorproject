@@ -129,7 +129,7 @@ the cheap way on purpose — one lens settles "what does this control tell the
 customer", and the verification that mattered was falsifying each half
 separately, which a second opinion would not have improved.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `893dfe2`
 
 ---
 
