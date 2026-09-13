@@ -155,7 +155,7 @@ the cheap way on purpose — one lens finds a box that does not fit its parent,
 and the verification that mattered was falsifying each of the three halves
 separately, which a second opinion would not have improved.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `7d490b5`
 
 ---
 
