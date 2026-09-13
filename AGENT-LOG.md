@@ -147,7 +147,7 @@ different criterion and still cannot close the worst two shapes, the layout
 because of the eight readers above, and the links because the exemption they
 sit under is correct.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `edce00a`
 
 ---
 
