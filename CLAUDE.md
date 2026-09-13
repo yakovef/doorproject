@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed. Plus **the price breakdown can be read to its last line** (13.9) — its own eight shapes again, including a 1280×600 windowed browser that is in no list here, on two doors that are asserted to survive `repair` first: the column must never leave the screen, its TOTAL must be readable without scrolling, and — the clause that must stay true beside it — every component row must still be reachable when it is scrolled, so the cheap way to pass the first half (shrink the column until only the total shows) fails the second |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed. Plus **the price breakdown can be read to its last line** (13.9) — its own eight shapes again, including a 1280×600 windowed browser that is in no list here, on two doors that are asserted to survive `repair` first: the column must never leave the screen, its TOTAL must be readable without scrolling, and — the clause that must stay true beside it — every component row must still be reachable when it is scrolled, so the cheap way to pass the first half (shrink the column until only the total shows) fails the second. Plus **an undo says what came back** (13.9) — its own four shapes in Hebrew AND Russian, walked FORWARD with the button because a rail click builds a different history: whenever an undo moves the price it must name a spec row, and — the clause that must stay true — its toast must cover no option tile, no price and no send, because the cheap way to pass the first half is a longer toast and a longer toast is what the 10.9 entry measured. Russian is carried because it is the longest copy and the box grows with it, 99 characters against Hebrew's 71 |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -2200,6 +2200,82 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ AN UNDO PUT UP TO ₪4,500 BACK ON THE DOOR AND SAID "THE LAST STEP WAS
+  CANCELLED" — 13.9.2026.** Found by walking as **the customer who changes
+  their mind**: the two circles in the wall that no walk had ever pressed.
+  `undo()` restores a whole previous state, so it reverses exactly the
+  multi-field taps the 9.9 entry measured going forward — and it said one fixed
+  string whatever it had done.
+
+  Measured over **250 taps that change the door**, from four starting doors
+  (the default, a glazed panelled one, a gold-pirzul one with a bar, and a
+  double with a keypad):
+
+  | spec rows one tap moves | 1 | 2 | 3 | 4 |
+  |---|---|---|---|---|
+  | taps | 194 | 19 | 25 | 12 |
+
+  **56 of 250 — 22.4% — move more than one row**, and the worst puts **₪4,500**
+  back across three: choosing an etched glass on a square-window door takes the
+  window, the ironwork and the face with it, so undoing it brings all three
+  back under one sentence that names none of them.
+
+  ⚠ **AND THE ANSWER IN FRONT OF THE CUSTOMER NEVER MOVES, WHICH IS WHAT MAKES
+  THE SILENCE EXPENSIVE RATHER THAN MERELY TERSE.** Measured by walking forward
+  with the button and pressing undo at 320×568, 390×844 and 1440×900: on
+  **every** press, the checked option on the step the customer is standing on
+  is unchanged. An undo reverses the choice made on the step they have just
+  LEFT, so the tile that moved is on another screen. The drawing does change —
+  whether they notice depends on whether the field was a window or a 30 mm
+  viewer. Driven on the real page: standing on `glass`, one undo took
+  **₪14,885 → ₪12,685** and said only *"הצעד האחרון בוטל"*.
+
+  ⚠ **THIS IS `choose()`'s OWN FINDING ONE CONTROL OVER, AND THE FIX WAS
+  TWENTY LINES AWAY.** §0b's 9.9 entry records `choose()` showing `said[0]` and
+  nothing else, and fixes it by joining every sentence with `' · '`. So the
+  forward tap has named everything it did since 9.9 and the backward press
+  named nothing — in the same file, on the same toast.
+
+  **What shipped:** `undo()` and `redo()` compute the spec rows that differ
+  between the door being left and the door restored, and the toast names them —
+  *"הצעד האחרון בוטל · ידית משיכה: מוט שחור · שחור מט · 80 ס״מ · עיצוב: ללא"*.
+  ⚠ **It reads `specRows`, which is the ONE description of a door.** A map of
+  field names to labels here would be the shape §5 is a list of, and this file
+  has paid for exactly that once already — `BREAKDOWN_KEY`, a hand-kept map
+  beside a derived list, printed a row called `bell`. A field added to the
+  catalogue is named here by having a spec row, which the ORDER requires of it
+  anyway. The fallback stays the bare sentence: the grip's POSITION is
+  deliberately not a spec row, so undoing a drag legitimately names nothing —
+  and a drag is the one gesture whose result is unmistakable on the drawing.
+
+  ⚠ **AND MY FIRST VERSION SHIPPED THE FAULT IT WAS WRITTEN TO FIX, CAUGHT BY
+  MEASURING IT RATHER THAN BY READING IT.** `specRows` OMITS a row whose option
+  is "none" — the default door has eight rows and a loud one eleven — so
+  filtering over the rows of the door being moved TO named every feature an
+  undo brought BACK and not one it took AWAY. Taking away is what an undo
+  mostly does: on the live page, undoing the **₪300 פעמון** moved the price and
+  printed the bare sentence, inside the fix. §5.22's rule one level down — a
+  derivation that only looks for presence cannot tell presence from absence.
+  The keys are the UNION now, and a row that has gone says `undo.gone`, one new
+  string in `js/copy.js` (`stripes.none` beside it is not reusable: its Russian
+  is *"Без полос"*, about stripes).
+
+  ⚠ **THE CLAUSE THAT MUST STAY TRUE IS ASSERTED BESIDE THE ONE THAT MUST
+  BECOME TRUE**, because the cheap way to pass the first is a longer toast and a
+  longer toast is precisely what §0b's 10.9 entry measured: the repair toast
+  covered **every** option tile on screen at both phone widths. Measured after,
+  six shapes × two languages, worst toast **99 characters in Russian, 288×88 px
+  at 320×568** against Hebrew's 71 and 67: **0 of 2–15 option tiles covered at
+  every one**, nothing off screen, the price and the send clear.
+  **Falsified both ways.** Restoring the bare sentence: **17 faults** — sixteen
+  price-moving undos plus the derived clause that fires when not one undo names
+  anything. Restoring my own one-directional filter: **8 faults**, one per shape
+  × language, every one of them the ₪300 bell removal — so the union half is
+  load-bearing and is not decoration on the first.
+  No price, no id, no list order, no bit, no `VERSION`; one helper, two call
+  sites, one string. `npm test` 4,349,828 / 0; the 52 bare sheets came back
+  **byte-identical**, 7 of the 12 `shot` sheets moved.
 
 - **⚠ THE BOTTOM LINE OF THE PRICE BREAKDOWN WAS THE ONE ROW A CUSTOMER COULD
   NOT READ — 13.9.2026.** Found by walking as **the customer who wants to know

@@ -3793,6 +3793,145 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── AN UNDO SAYS WHAT CAME BACK ─────────────────────────────────────────
+   Measured 13.9 by walking as the customer who changes their mind — the two
+   circles in the wall that no walk had ever pressed. `undo()` restores a whole
+   previous state, so it reverses exactly the multi-field taps the 9.9 entry
+   measured going forward: over 250 taps that change the door, from four
+   starting doors, **56 (22.4%) move more than one spec row**, up to four at
+   once, and the worst puts **₪4,500** back across three. It said
+   `undo.done` — "the last step was cancelled" — and nothing else, whatever it
+   had done.
+
+   ⚠ AND THE ANSWER IN FRONT OF THE CUSTOMER NEVER MOVES, which is what makes
+   that expensive rather than merely terse: an undo reverses the choice made on
+   the step they have just LEFT, so on every press measured, at three
+   viewports, the checked option on the live step was unchanged. The thing that
+   moved is on another screen.
+
+   So: whenever an undo moves the PRICE, the toast must name at least one row.
+   It reads `specRows`, which is the one description of a door, so a field
+   added to the catalogue is named here by having a spec row — which the ORDER
+   requires of it anyway.
+
+   ⚠ AND THE CLAUSE THAT MUST STAY TRUE IS BESIDE IT (§5.22), because the cheap
+   way to pass the first half is a longer toast and a longer toast is exactly
+   what the 10.9 entry measured: the repair toast covered every option tile on
+   screen at both phone widths. This asserts the undo toast covers NO option
+   tile, and neither the price nor the send. Russian is carried because it is
+   the longest copy and the box grows with it — 99 characters against Hebrew's
+   71, and 88 px tall at 320 against 67. */
+{
+  console.log('\nan undo says what came back');
+  const before = faults;
+  const SHAPES = [
+    { name: '320x568', w: 320, h: 568 }, { name: '390x844', w: 390, h: 844 },
+    { name: '844x390', w: 844, h: 390 }, { name: '1440x900', w: 1440, h: 900 },
+  ];
+  let pressed = 0, named = 0;
+  for (const lang of ['he', 'ru']) {
+    for (const s of SHAPES) {
+      const p = await b.newPage({ viewport: { width: s.w, height: s.h } });
+      try {
+        await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
+        await p.waitForTimeout(800);
+        /* Walk FORWARD with the button, choosing on each step — a rail click
+           would build a different history and this check is about what the
+           customer who walked the guide gets back. */
+        for (let i = 0; i < 6; i++) {
+          await p.evaluate(() => {
+            const live = document.querySelector('.sect.is-live');
+            if (!live) return;
+            for (const g of live.querySelectorAll('[role="radiogroup"]')) {
+              const o = [...g.querySelectorAll('[role="radio"]')]
+                .filter(x => x.getAttribute('aria-disabled') !== 'true' && !x.hidden);
+              if (o.length) o[o.length - 1].click();
+            }
+          });
+          await p.waitForTimeout(320);
+          let moved = false;
+          for (const h of await p.$$('.sect.is-live .sect__next, .quote__next')) {
+            if (await h.isVisible().catch(() => false)) { await h.click(); moved = true; break; }
+          }
+          if (!moved) break;
+          await p.waitForTimeout(320);
+        }
+        const bare = await p.evaluate(() => document.querySelector('#undo-btn')?.disabled);
+        if (bare === undefined) {
+          fault('undo', `${lang} ${s.name}: no undo button — this check has lost its subject`);
+          await p.close(); continue;
+        }
+        if (bare) {
+          fault('undo', `${lang} ${s.name}: nothing to undo after walking six steps and `
+            + 'choosing on each — the history is not recording, or the walk did not walk');
+          await p.close(); continue;
+        }
+        for (let u = 0; u < 3; u++) {
+          if (await p.$eval('#undo-btn', e => e.disabled)) break;
+          const was = await p.$eval('[data-price]', e => e.textContent.trim());
+          await p.click('#undo-btn');
+          await p.waitForTimeout(420);
+          const m = await p.evaluate(() => {
+            const t = document.querySelector('#toast');
+            if (!t || t.hidden) return null;
+            const tb = t.getBoundingClientRect();
+            const live = document.querySelector('.sect.is-live');
+            const tiles = [...(live ? live.querySelectorAll('[role="radio"]') : [])]
+              .map(e => e.getBoundingClientRect())
+              .filter(r => r.bottom > 0 && r.top < innerHeight && r.width > 0);
+            const hit = r => r && !(r.right <= tb.left || r.left >= tb.right
+              || r.bottom <= tb.top || r.top >= tb.bottom);
+            return {
+              text: t.textContent.trim(),
+              price: document.querySelector('[data-price]').textContent.trim(),
+              tiles: tiles.length, covered: tiles.filter(hit).length,
+              onPrice: hit(document.querySelector('[data-price]').getBoundingClientRect()),
+              onSend: hit(document.querySelector('.quote__send')?.getBoundingClientRect()),
+              off: Math.round(Math.max(0, tb.bottom - innerHeight) + Math.max(0, -tb.top)),
+            };
+          });
+          if (!m) { fault('undo', `${lang} ${s.name}: an undo raised no toast at all`); continue; }
+          pressed++;
+          const says = m.text.includes(' · ');
+          if (says) named++;
+          if (m.price !== was && !says) {
+            fault('undo', `${lang} ${s.name}: an undo moved the price ${was} → ${m.price} and `
+              + `said only "${m.text}" — it names nothing that came back, and the answer on the `
+              + 'step the customer is standing on does not move either');
+          }
+          if (m.covered) {
+            fault('undo', `${lang} ${s.name}: the undo toast covers ${m.covered} of ${m.tiles} `
+              + 'option tiles on screen. Saying what came back must not cost the customer sight '
+              + 'of what they are choosing (§0b, 10.9)');
+          }
+          if (m.onPrice || m.onSend) {
+            fault('undo', `${lang} ${s.name}: the undo toast covers the `
+              + `${m.onPrice ? 'price' : 'send button'}`);
+          }
+          if (m.off) fault('undo', `${lang} ${s.name}: the undo toast hangs ${m.off} px off the screen`);
+        }
+      } catch (e) {
+        fault('undo', `${lang} ${s.name}: ${String(e).slice(0, 90)}`);
+      }
+      await p.close().catch(() => {});
+    }
+  }
+  /* §5.15: the day undo stops raising a toast, or the walk stops building a
+     history, every clause above passes by having no subject. */
+  if (pressed < 2 * SHAPES.length) {
+    fault('undo', `only ${pressed} undos were measured across ${2 * SHAPES.length} shape x language `
+      + 'cases — the sweep is not pressing the button');
+  }
+  if (!named) {
+    fault('undo', `${pressed} undos were pressed and not one named a row that came back — `
+      + 'the toast has gone back to saying only that something was cancelled');
+  }
+  if (faults === before) {
+    console.log(`    ${pressed} undos across ${SHAPES.length} shapes in two languages: ${named} named `
+      + 'what came back, and no toast covered an option tile, the price or the send');
+  }
+}
+
 await b.close();
 
 if (skipped.length) {

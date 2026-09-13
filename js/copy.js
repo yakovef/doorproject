@@ -267,6 +267,11 @@ export const UI = {
   'redo':             ['החזרת השינוי', 'Redo the change', 'Вернуть изменение'],
   'redo.done':        ['החזרנו את השינוי', 'Change restored', 'Изменение возвращено'],
   'undo.done':        ['הצעד האחרון בוטל', 'Last step undone', 'Последний шаг отменён'],
+  /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
+     a row whose option is "none", so a field the step removed has no row to
+     print a value from — and `stripes.none` beside it is not reusable, its
+     Russian being "Без полос", about stripes. This one is the general word. */
+  'undo.gone':        ['ללא', 'None', 'Нет'],
 
   /* ── the flow: the eight steps ────────────────────────────────── */
   'step.fit.t':       ['מבנה הדלת', 'The door itself', 'Сама дверь'],

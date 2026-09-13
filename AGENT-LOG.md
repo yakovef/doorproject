@@ -45,6 +45,94 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-13 16:25 UTC — run 119: an undo put up to ₪4,500 back on the door and said "the last step was cancelled"
+
+**Looked at:** the page as **THE CUSTOMER WHO CHANGES THEIR MIND** — the undo
+and redo circles in the wall, which no walk had ever pressed, and the
+saved-designs drawer. Walked forward with the button choosing on every step, at
+320×568, 390×844 and 1440×900, then pressed undo standing on a question step.
+Then the order the send button produces, then `?sheet=1`, then the screenshots
+as pictures. Recent lenses: 114 the keyboard, 115 the system Back button, 116
+the zoomed page, 117 the customer being read the page, 118 the price shopper.
+
+**Instruments:** test ✓ 4,349,828 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets ✓
+regenerated — **the 52 bare sheets came back byte-identical**, 7 of the 12
+`shot` sheets moved (§7: that proves nothing either way).
+
+**What the walk found.** `undo()` restores a whole previous state, so it
+reverses exactly the multi-field taps run 109 measured going forward — and it
+said one fixed string whatever it had done. Measured over **250 taps that
+change the door**, from four starting doors: **56 (22.4%) move more than one
+spec row** (1 row ×194 · 2 ×19 · 3 ×25 · 4 ×12), and the worst puts **₪4,500**
+back across three — an etched glass on a square-window door takes the window,
+the ironwork and the face with it.
+
+⚠ **And the answer in front of the customer never moves**, which is what makes
+the silence expensive rather than merely terse. On **every** press measured, at
+all three viewports, the checked option on the step they are standing on is
+unchanged: an undo reverses the choice made on the step they have just LEFT, so
+the tile that moved is on another screen. Driven on the real page, standing on
+`glass`: one undo took **₪14,885 → ₪12,685** and said only *"הצעד האחרון
+בוטל"*.
+
+⚠ **This is `choose()`'s own finding one control over, and the fix was twenty
+lines away.** Run 109 fixed `choose()` to join every sentence with `' · '`. So
+the forward tap has named everything it did since 9.9 and the backward press
+named nothing — same file, same toast.
+
+**Changed** (`js/app.js`, `js/copy.js`, `tools/audit.mjs`, `CLAUDE.md`):
+`undo()` and `redo()` name the spec rows that differ between the door being
+left and the door restored — *"הצעד האחרון בוטל · ידית משיכה: מוט שחור ·
+שחור מט · 80 סמ · עיצוב: ללא"*. ⚠ It reads `specRows`, the ONE description
+of a door: a map of field names to labels here would be the shape §5 is a list
+of, and this file has paid for that once already (`BREAKDOWN_KEY` printed a row
+called `bell`). The fallback stays the bare sentence — the grip's POSITION is
+deliberately not a spec row, so undoing a drag names nothing, and a drag is the
+one gesture whose result is unmistakable on the drawing.
+
+**Got wrong, and it is the useful part.** My first version shipped the fault it
+was written to fix. `specRows` OMITS a row whose option is "none" — eight rows
+on the default door, eleven on a loud one — so filtering over the rows of the
+door being moved TO named every feature an undo brought BACK and not one it
+took AWAY, which is what an undo mostly does. Undoing the **₪300 פעמון** moved
+the price and printed the bare sentence, inside the fix. Caught by measuring it
+on the page, not by reading it. §5.22 one level down: a derivation that only
+looks for presence cannot tell presence from absence. The keys are the UNION
+now.
+
+**Falsified both ways, and neither half is redundant.** Restoring the bare
+sentence: **17 faults** — sixteen price-moving undos plus the derived clause
+that fires when not one undo names anything. Restoring my own one-directional
+filter: **8 faults**, one per shape × language, every one the ₪300 bell removal.
+
+**Left alone deliberately:** the longer toast had to be measured against run
+110's invariant before it could ship — six shapes × two languages, worst toast
+**99 characters in Russian, 288×88 px at 320×568** against Hebrew's 71 and 67:
+**0 of 2–15 option tiles covered at every one**, nothing off screen, price and
+send clear. Also checked and NOT a fault: `paintSaved()` does run at boot, so a
+customer who saved a door yesterday still sees the drawer — I went looking for
+a §5-shaped "data present, nothing on screen" there and it is not one.
+
+**Best idea not taken:** **שמירת העיצוב is reachable only on the summary.**
+The save button and the saved drawer live in `.panel--send`, which `goStep`
+MOVES into the summary step, so a customer comparing two doors — the behaviour
+§9's `revealed` latch exists for — must walk to the end before they can keep
+either. Undo/redo stand in the wall on every step; saving does not. Not taken
+because where that control belongs is a placement decision on a page whose
+chrome the owner positioned himself with circles on a screenshot, and this run
+had already changed what the toast says; it wants its own measurement of how
+often a walk doubles back.
+
+**Fleet:** not spent. `ultracode` is opted in every firing and this run did it
+the cheap way on purpose — one lens settles "what does this control tell the
+customer", and the verification that mattered was falsifying each half
+separately, which a second opinion would not have improved.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-13 11:05 UTC — run 118: the bottom line of the price breakdown was the one row a customer could not read
 
 **Looked at:** the page as **THE CUSTOMER WHO WANTS TO KNOW WHAT IT COSTS** —

@@ -115,6 +115,11 @@
     "redo": ["החזרת השינוי", "Redo the change", "Вернуть изменение"],
     "redo.done": ["החזרנו את השינוי", "Change restored", "Изменение возвращено"],
     "undo.done": ["הצעד האחרון בוטל", "Last step undone", "Последний шаг отменён"],
+    /* ⚠ WHAT AN UNDO SAYS WHEN IT TOOK SOMETHING OFF THE DOOR. `specRows` omits
+       a row whose option is "none", so a field the step removed has no row to
+       print a value from — and `stripes.none` beside it is not reusable, its
+       Russian being "Без полос", about stripes. This one is the general word. */
+    "undo.gone": ["ללא", "None", "Нет"],
     /* ── the flow: the eight steps ────────────────────────────────── */
     "step.fit.t": ["מבנה הדלת", "The door itself", "Сама дверь"],
     "step.fit.s": ["גודל הדלת וכיוון הפתיחה", "Size and opening direction", "Размер и сторона открывания"],
@@ -9273,23 +9278,40 @@ ${body}
   var future_ = [];
   var canUndo = () => history_.length > 0;
   var canRedo = () => future_.length > 0;
+  function restored(from, to) {
+    const was = specRows(from), now = specRows(to);
+    const key = new Map(now.map((r) => [r.key, r]));
+    const out = [];
+    for (const k of /* @__PURE__ */ new Set([...was.map((r) => r.key), ...now.map((r) => r.key)])) {
+      const a = was.find((r) => r.key === k), b = key.get(k);
+      if ((a && a.value) === (b && b.value)) continue;
+      out.push(`${(b || a).label}: ${b ? b.value : T("undo.gone")}`);
+    }
+    return out;
+  }
+  var stepSaid = (lead, from, to) => {
+    const rows = restored(from, to);
+    return rows.length ? `${T(lead)} · ${rows.join(" · ")}` : T(lead);
+  };
   function undo() {
     const prev = history_.pop();
     if (!prev) return;
+    const said = stepSaid("undo.done", state, prev);
     future_.push(state);
     state = prev;
     guard(paint)();
     scheduleUrl();
-    toast(T("undo.done"));
+    toast(said);
   }
   function redo() {
     const next = future_.pop();
     if (!next) return;
+    const said = stepSaid("redo.done", state, next);
     history_.push(state);
     state = next;
     guard(paint)();
     scheduleUrl();
-    toast(T("redo.done"));
+    toast(said);
   }
   var urlTimer = null;
   function scheduleUrl() {

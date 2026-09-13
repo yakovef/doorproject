@@ -2285,17 +2285,89 @@ const future_ = [];
 const canUndo = () => history_.length > 0;
 const canRedo = () => future_.length > 0;
 
+/**
+ * WHAT CAME BACK, IN THE DOOR'S OWN WORDS.
+ *
+ * ⚠ AN UNDO RESTORES A WHOLE STATE, SO IT REVERSES EXACTLY THE MULTI-FIELD
+ * TAPS §0b's 9.9 ENTRY MEASURED IN THE FORWARD DIRECTION — and until 13.9 it
+ * said one fixed sentence whatever it had done. Measured over 250 taps that
+ * change the door, from four starting doors: **56 of them (22.4%) change more
+ * than one spec row**, up to four at once, and the worst puts **₪4,500** back
+ * across three (choosing an etched glass off a square-window door takes the
+ * window, the ironwork and the face with it). So a customer standing on the
+ * glass step pressed undo, ₪2,200 came off the door, and the page said *"the
+ * last step was cancelled"*.
+ *
+ * ⚠ AND THE ANSWER IN FRONT OF THEM NEVER MOVES, which is what makes the
+ * silence expensive rather than merely terse. Measured by walking forward with
+ * the button and pressing undo at 320x568, 390x844 and 1440x900: on **every**
+ * press, the checked option on the step the customer is standing on is
+ * unchanged — undo reverses the most recent choice, which was made on the step
+ * they have just left, so the tile that moved is on another screen. The
+ * drawing does change; whether they notice depends on whether the field was a
+ * window or a 30 mm viewer.
+ *
+ * This is `choose()`'s own finding one control over, and `choose()` already
+ * carries the fix: it joins every sentence with ' · ' rather than showing the
+ * first. The forward tap names everything it did and the backward press named
+ * nothing.
+ *
+ * ⚠ IT READS `specRows`, WHICH IS THE ONE DESCRIPTION OF A DOOR. Assembling a
+ * second account here — a map of field names to labels — is the shape §5 is a
+ * list of, and this file has paid for it once already (`BREAKDOWN_KEY`, a
+ * hand-kept map beside a derived list, printed a row called `bell`). A field
+ * added to the catalogue gets named here by having a spec row, which it must
+ * have anyway for the ORDER to carry it.
+ *
+ * ⚠ Rows that changed, phrased as the door being MOVED TO, because that is
+ * what the customer now has. And the fallback stays the bare sentence: the
+ * grip's POSITION is deliberately not a spec row (it is settled on site, not a
+ * specification), so undoing a drag legitimately changes no row — and a drag
+ * is the one gesture whose result is unmistakable on the drawing.
+ *
+ * ⚠ AND IT WALKS BOTH DIRECTIONS, WHICH THE FIRST VERSION OF THIS DID NOT —
+ * caught by measuring it rather than by reading it. `specRows` OMITS a row
+ * whose option is "none", so a row appears and disappears with the feature:
+ * the default door has eight rows and a loud one eleven. Filtering over the
+ * rows of the door being moved TO therefore named every feature an undo
+ * brought BACK and not one it took AWAY — and taking away is what an undo
+ * mostly does. Measured on the live page: undoing the ₪300 פעמון moved the
+ * price and printed the bare sentence, which is the exact fault this was
+ * written to fix, surviving inside the fix. §5.22's rule one level down — a
+ * derivation that only ever looks for presence cannot tell presence from
+ * absence. The keys are the UNION now, and a row that has gone says so.
+ */
+function restored(from, to) {
+  const was = specRows(from), now = specRows(to);
+  const key = new Map(now.map(r => [r.key, r]));
+  const out = [];
+  for (const k of new Set([...was.map(r => r.key), ...now.map(r => r.key)])) {
+    const a = was.find(r => r.key === k), b = key.get(k);
+    if ((a && a.value) === (b && b.value)) continue;
+    /* The label comes from whichever side HAS the row; only one can be gone. */
+    out.push(`${(b || a).label}: ${b ? b.value : T('undo.gone')}`);
+  }
+  return out;
+}
+
+/** `undo.done` / `redo.done` plus what actually came back. */
+const stepSaid = (lead, from, to) => {
+  const rows = restored(from, to);
+  return rows.length ? `${T(lead)} · ${rows.join(' · ')}` : T(lead);
+};
+
 function undo() {
   const prev = history_.pop();
   if (!prev) return;
   /* ⚠ NOT `set`, WHICH WOULD PUSH THIS ONTO THE STACK AND UNDO NOTHING. Going
      back is not a change to record; it is the removal of one. Straight to the
      same three things `set` does, minus the push. */
+  const said = stepSaid('undo.done', state, prev);
   future_.push(state);
   state = prev;
   guard(paint)();
   scheduleUrl();
-  toast(T('undo.done'));
+  toast(said);
 }
 
 function redo() {
@@ -2304,12 +2376,15 @@ function redo() {
   /* Symmetrical with `undo`: the door we are leaving goes onto the BACK stack
      so the two buttons stay each other's inverse however often they are
      pressed. Not through `set`, for the same reason — `set` would clear the
-     future we are walking through. */
+     future we are walking through. And it says what came back for the same
+     reason too: a forward press that names nothing is the same silence read
+     the other way round. */
+  const said = stepSaid('redo.done', state, next);
   history_.push(state);
   state = next;
   guard(paint)();
   scheduleUrl();
-  toast(T('redo.done'));
+  toast(said);
 }
 
 /** The URL write, debounced — shared by `set` and `undo`. It was inline in
