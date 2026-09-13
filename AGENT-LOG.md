@@ -45,6 +45,106 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-13 11:05 UTC — run 118: the bottom line of the price breakdown was the one row a customer could not read
+
+**Looked at:** the page as **THE CUSTOMER WHO WANTS TO KNOW WHAT IT COSTS** —
+the one who taps the ₪ figure and reads the column under it. Walked forward
+with the button, choosing on every step so the column grew, then the same
+column opened on shared links at eight shapes in three languages. Then the
+order the send button produces, then `?sheet=1`, then the screenshots as
+pictures. Recent lenses: 113 the gallery, 114 the keyboard, 115 the system Back
+button, 116 the zoomed page, 117 the customer being read the page.
+
+**Instruments:** test ✓ 4,349,822 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · recreate ✓ · sheets ✓
+regenerated — **the 52 bare sheets came back byte-identical**, 4 of the 12
+`shot` sheets moved (§7: that proves nothing either way).
+
+**What the walk found.** The breakdown is the only place on this site where a
+door's price is broken into what it is made of; it exists so somebody can add
+the column up and arrive at the figure on the chip. **The row that states the
+figure was the row that went missing**, by two independent mechanisms.
+
+1. **Above 1100 px it ran past a page that cannot scroll.** Scrolled to its own
+   end, the `סה״כ` row's box against the window: **1280×720, one +₪200 colour
+   and nothing else — 700..732 against 720.** 1280×600 61 px out, 1100×800 21,
+   1280×720 loud 72, 1920×918 loud 35, 1280×600 loud 70. Clean at 1152×800 and
+   1440×900. Above 1100 `body` is `100dvh; overflow: hidden`, so that is not
+   below the fold — **no gesture reaches it**. Two of the audit's own eight
+   viewports.
+2. **And wherever it overflows its cap it is cut at the BOTTOM** (`scrollTop` is
+   0 on every shape measured), so the row it takes is always the last one. At
+   **320×568 one paid colour is enough**: 8 rows want 272 px against 261, and
+   the total is the only hidden row, identically in he/en/ru.
+
+**The phone side was measured CORRECT at nine shapes** — landscape phones and
+the zoomed laptop of CLAUDE.md §9 included — and is untouched: there the bar is
+`position: fixed`, which no `overflow` ancestor clips.
+
+**Changed** (`js/app.js`, `css/app.css`, `tools/audit.mjs`, `CLAUDE.md`):
+· `fitStage` publishes **`--bd-room`**, the room between the popover's anchor
+  and the box that actually clips it, beside `--sticky-h` / `--quote-h` /
+  `--rail-band`. ⚠ **The clipping box is NOT the window on a desktop, and the
+  first version of this got it wrong — a picture caught it.** In the wall the
+  quote is `absolute` inside `.stage-wrap`, which is `overflow: hidden`, so the
+  column was being CLIPPED and the caveat band behind it showed through; it
+  only looked like something painted over it. The page is asked which box
+  (`position: fixed` → the viewport, else the first non-visible `overflow-y`
+  ancestor) rather than the 1100 px breakpoint being restated in JavaScript.
+· the desktop rule caps at `max(132px, min(46vh, calc(var(--bd-room) -
+  var(--bd-gap) - 12px)))` — the margin said once, where it is applied.
+· **`.bd__total`'s cells are sticky at the foot of the scrollport**, so the
+  components scroll behind a bottom line that stays put, and the half-row cut
+  behind it is an honest cue that there is more. No JS, no-op when it fits.
+· **`border-collapse: collapse` was declared on the popover DIV, not on the
+  table**, so it had never applied: measured, every row's `<th>` and `<td>` sit
+  2 px apart and each draws its own bottom border, so the rule under every line
+  was two segments with a nick between them. Moved to `.bd__t` — and it is not
+  only cosmetic: collapsing took **18 px off an eight-row column and 26 off a
+  thirteen-row one**, which on its own closed the one-colour case at 1280×720.
+
+**Falsified, both halves, and neither is redundant.** Removing the cap: **8
+faults** over five shape × door cases, each naming the pixels it hangs by.
+Removing the sticky: **10 faults**, including 320×568 and 844×390 — a phone on
+its side — which the cap does not reach.
+
+**Got wrong, and it is the useful part.** (a) My first harness clicked options
+with the popover open and scrolled it, so my first screenshot showed the column
+cut at the TOP as well; re-measured without the clicking, `scrollTop` is 0 on
+every shape and the cut is only ever at the bottom. The finding is the smaller,
+true one. (b) My loud fixture **arrived repaired** — `pz=gold` is not an id
+(they are prefixed) and `d=panel2` behind a square window is traded down — so
+the column I was measuring belonged to a door nobody had chosen. Caught by
+reading `?sheet=1`, which is the half of the walk that exists for exactly that.
+The check now asserts its own fixtures are unrepaired rather than trusting me.
+
+**Left alone deliberately:** the DESKTOP COLUMN IS SHORTER for the cap — a
+twelve-row door gets 198 px at 1280×720 against 414 px of which the last five
+rows were unreachable. Everything is reachable now; less is on screen at once.
+Recorded in CLAUDE.md §9 with the two ways out, and neither is taken here: the
+chip's place in the wall was set by the owner with a circle on a screenshot, so
+moving it is a decision above CSS, and setting the rows in two columns on a
+desktop is the better idea and wants a measurement nobody has taken.
+Also left: the popover does not close when you walk on, so it stands over 2–9
+option tiles on every later step — but it is a disclosure the customer opened,
+and a popover that shuts itself is a different argument.
+
+**Best idea not taken:** **two columns of rows on the desktop breakdown.** The
+popover is 146 px wide inside a wall several times that; the height is the
+scarce axis and the width is free. It would turn a five-row window into a
+ten-row one at 1280×720 without moving anything the owner placed. Not taken
+because it is a layout nobody has measured and this run had already changed the
+box's height rule; it belongs to a run that starts there.
+
+**Fleet:** not spent. `ultracode` is opted in every firing and this run did it
+the cheap way on purpose — the finding was a single geometry question that one
+lens settles, and the verification that mattered was falsifying each half of
+the fix separately, which a second opinion would not have improved.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-13 06:40 UTC — run 117: six of the eight steps printed their own title twice, and it was the cabinet's heading still standing
 
 **Looked at:** the page as **THE CUSTOMER WHO IS BEING READ IT** rather than

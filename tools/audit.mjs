@@ -3657,6 +3657,142 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── THE BOTTOM LINE OF THE BILL IS READABLE ─────────────────────────────
+   Measured 13.9 by walking as the customer who wants to know what it costs —
+   the one who taps the ₪ figure and reads the column under it. Two faults,
+   one sentence: the row that says `סה״כ` was the row you could not see.
+
+   1. ABOVE 1100 px THE COLUMN WAS CLIPPED AND THE TOTAL WENT WITH IT. The
+      chip stands in the wall, so the popover hangs off `.quote__price` inside
+      `.stage-wrap`, which is `overflow: hidden` — and it was capped at a flat
+      `46vh`, which is a guess at the room rather than the room. At 1280x720,
+      on a door carrying ONE +₪200 colour and nothing else, the box ran past
+      the wrap and past the window; scrolled to its own end the total sat at
+      700..732 against a 720 px screen. Above 1100 `body` is `100dvh;
+      overflow: hidden`, so that was not below the fold — no gesture reached
+      it. Four of six desktop shapes, two of them viewports in `VIEWS`.
+   2. AND WHEREVER THE COLUMN OVERFLOWS ITS OWN CAP IT IS CUT AT THE BOTTOM —
+      `scrollTop` is 0 on every shape measured, so the cut is never at the top
+      and the row it takes is always the last one. At 320x568 one paid colour
+      is enough: 8 rows want 272 px against 261, and the only hidden row is
+      the total, in all three languages.
+
+   ⚠ SO THIS ASSERTS THE ROW, NOT THE BOX. A check that the popover fits on
+   screen would pass on a column whose last row is behind its own scroll, and
+   a check that the popover scrolls would pass on one hanging off the window.
+   What a customer has to be able to do is read the figure the column adds up
+   to, without scrolling and without guessing that there is more.
+
+   ⚠ AND THE CLAUSE THAT MUST STAY TRUE IS BESIDE IT (§5.22): the components
+   must still be REACHABLE — scrolled to the end, the last component row has
+   to be on screen too. The cheap way to pass the first half is to shrink the
+   column until only the total shows, which would be worse than the fault.
+
+   ⚠ ITS OWN VIEWPORTS, and they are not `VIEWS`. The fault is about the room
+   under the chip, so the shapes that matter are short ones — 1280x600 is a
+   windowed browser and is in no list here — and adding a width to `VIEWS`
+   costs a whole audit pass. The phone widths are carried too, because the
+   phone side was measured CORRECT before the change and has to stay that way:
+   there the bar is `position: fixed` and no `overflow` ancestor clips it. */
+{
+  console.log('\nthe price breakdown can be read to its last line');
+  const before = faults;
+  const SHAPES = [
+    { name: '320x568', w: 320, h: 568 }, { name: '390x844', w: 390, h: 844 },
+    { name: '844x390', w: 844, h: 390 }, { name: '1100x800', w: 1100, h: 800 },
+    { name: '1280x720', w: 1280, h: 720 }, { name: '1280x600', w: 1280, h: 600 },
+    { name: '1440x900', w: 1440, h: 900 }, { name: '1920x918', w: 1920, h: 918 },
+  ];
+  /* One paid colour and nothing else — the very next thing past the default —
+     and an ordinary loud door. The first is the case that makes this common;
+     the second is the case that makes it bad. */
+  /* ⚠ AND BOTH ARE ASSERTED TO SURVIVE `repair`, WHICH MY FIRST PAIR DID NOT.
+     The loud door I typed carried `pz=gold` — not an id, the ids are prefixed
+     — and `d=panel2` behind a square window, which `rectNeedsPanel` trades
+     down to the single lower panel. So it arrived under a red strip saying
+     some of the options were unavailable, and the column being measured was a
+     door nobody had chosen. That is the trap §0b records twice already (the
+     order sheet's first fixture, and the `bell` behind a window); the guard
+     is one line and it goes here rather than in my memory. */
+  const DOORS = {
+    'one colour': '?c=rb-9302d',
+    'a loud door': '?s=extra2&c=rb-9302d&w=rect&d=panel&g=grid&n=knobplate&x=kodan&pz=pz-gold',
+  };
+  let seen = 0;
+  for (const [dk, q] of Object.entries(DOORS)) {
+    for (const s of SHAPES) {
+      const p = await b.newPage({ viewport: { width: s.w, height: s.h } });
+      try {
+        await p.goto(`file://${process.cwd()}${'/index.html'}${q}&lang=he`, { waitUntil: 'load' });
+        /* Past the summary's 900 ms reveal: §0b already records an instrument
+           measuring during an entrance animation and reading the wrong
+           moment. */
+        await p.waitForTimeout(1400);
+        const t = await p.$('#price-toggle');
+        if (!t) { fault('bill', `${s.name}: no price toggle at all — this check has lost its subject`); await p.close(); continue; }
+        await t.click();
+        await p.waitForTimeout(300);
+        const m = await p.evaluate(() => {
+          const box = document.querySelector('#breakdown');
+          if (!box || box.hidden) return null;
+          const rows = [...document.querySelectorAll('#breakdown-body tr')];
+          const tot = [...document.querySelectorAll('.bd__total th, .bd__total td')];
+          if (!rows.length || !tot.length) return { rows: rows.length, tot: tot.length };
+          const clear = els => els.every(e => {
+            const r = e.getBoundingClientRect(), bb = box.getBoundingClientRect();
+            return r.top >= -.5 && r.bottom <= innerHeight + .5
+                && r.top >= bb.top - .5 && r.bottom <= bb.bottom + .5;
+          });
+          const totalAtRest = clear(tot);
+          /* the last COMPONENT row, with the column scrolled to its end */
+          box.scrollTop = box.scrollHeight;
+          const lastComp = rows[rows.length - 2];
+          const compReachable = lastComp ? clear([...lastComp.children]) : false;
+          const bb = box.getBoundingClientRect();
+          return {
+            rows: rows.length, tot: tot.length, totalAtRest, compReachable,
+            repaired: !document.querySelector('#notice')?.hidden,
+            offBelow: Math.round(Math.max(0, bb.bottom - innerHeight)),
+            name: rows[rows.length - 1].querySelector('th')?.textContent.trim() || '',
+          };
+        });
+        if (!m) { fault('bill', `${s.name} / ${dk}: the breakdown did not open`); await p.close(); continue; }
+        if (!m.rows || !m.tot) {
+          fault('bill', `${s.name} / ${dk}: ${m.rows} rows and ${m.tot} total cells — `
+            + 'the selectors have stopped matching and this check is measuring nothing');
+        } else if (m.repaired) {
+          fault('bill', `${s.name} / ${dk}: this fixture arrives REPAIRED — the column being `
+            + 'measured is a door nobody chose. Fix the query, not this check');
+        } else {
+          seen++;
+          if (!m.totalAtRest) {
+            fault('bill', `${s.name} / ${dk}: the breakdown's "${m.name}" row is not readable `
+              + 'without scrolling the column — and it is the row the whole table exists for'
+              + (m.offBelow ? `. The box hangs ${m.offBelow} px past the screen`
+                            : '. The box is on screen, so the row is behind its own scroll'));
+          }
+          if (!m.compReachable) {
+            fault('bill', `${s.name} / ${dk}: scrolled to its own end, the last COMPONENT row is `
+              + 'still not on screen, so part of the column cannot be reached at all. Either the '
+              + `box hangs off the screen (${m.offBelow} px here) or it has been shortened until `
+              + 'little but its total shows — and a total nobody can check the arithmetic of is '
+              + 'worse than the fault this check was written for');
+          }
+        }
+      } catch (e) {
+        fault('bill', `${s.name} / ${dk}: ${String(e).slice(0, 90)}`);
+      }
+      await p.close().catch(() => {});
+    }
+  }
+  const want = SHAPES.length * Object.keys(DOORS).length;
+  if (seen < want) fault('bill', `only ${seen} of ${want} shape x door cases were measured`);
+  if (faults === before) {
+    console.log(`    ${seen} shapes x doors: the column never leaves the screen, its total is `
+      + 'readable without scrolling, and every component row can still be reached');
+  }
+}
+
 await b.close();
 
 if (skipped.length) {

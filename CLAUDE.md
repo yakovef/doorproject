@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed. Plus **the price breakdown can be read to its last line** (13.9) — its own eight shapes again, including a 1280×600 windowed browser that is in no list here, on two doors that are asserted to survive `repair` first: the column must never leave the screen, its TOTAL must be readable without scrolling, and — the clause that must stay true beside it — every component row must still be reachable when it is scrolled, so the cheap way to pass the first half (shrink the column until only the total shows) fails the second |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1718,6 +1718,34 @@ padding is the separation between the head rule and the first row and between
 the last row and the foot, and the `@page` margin is 12 mm because that is
 what a printer can hold. Shaving either to meet a number is what this file
 spends most of §6 warning about.
+
+### ⚠ THE DESKTOP PRICE BREAKDOWN IS A SHORT WINDOW ON A LONG COLUMN
+
+Left over from the 13.9 fix above, and it is arithmetic rather than tuning. In
+the wall the popover hangs off the price chip inside `.stage-wrap`, which is
+`overflow: hidden`, so the room it has is the room between the chip's foot and
+the wrap's — and that is what it is now capped to, because anything beyond it
+was never visible in the first place. Measured, twelve-row door:
+
+| | column | wants | rows shown |
+|---|---|---|---|
+| 1440×900 | 399 | 397 | all of it |
+| 1920×918 | 326 | 397 | ~10 + the pinned total |
+| 1100×800 | 286 | 397 | ~8 |
+| **1280×720** | **198** | 397 | **~5** |
+| 1280×600 (a windowed browser) | 145 | 397 | ~4 |
+
+Everything is reachable and the total never moves, so nothing is hidden — it is
+simply a small window. ⚠ **The cheapest-looking way out is the one not to
+take**: the chip's position in the wall under the right-hand lamp was placed by
+the owner with a circle on a screenshot (§0a), and moving it to buy the popover
+room is a decision above CSS, the same shape as the wall that cannot hold both
+its controls. Two ways that do not touch it: open the popover UPWARD on the
+desktop as it already does on a phone (measured: 384 px of room above the chip
+at 1280×720 against 198 below — but it would then stand over the door, which
+the downward placement was chosen to avoid), or set the rows in **two columns**
+on a desktop, where the popover is 146 px wide inside a wall several times
+that. The second is the better idea and is not a measurement anybody has taken.
 
 ### ⚠ A SHORT-AND-WIDE SCREEN SHOWS THE QUESTION AND NOT ONE ANSWER
 
@@ -2172,6 +2200,101 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE BOTTOM LINE OF THE PRICE BREAKDOWN WAS THE ONE ROW A CUSTOMER COULD
+  NOT READ — 13.9.2026.** Found by walking as **the customer who wants to know
+  what it costs**: the one who taps the ₪ figure and reads the column under it.
+  That column is the only place on the site where a door's price is broken into
+  what it is made of, it is there so somebody can add it up and arrive at the
+  figure on the chip — and the row that states the figure was the row that went
+  missing. Two independent mechanisms, one sentence.
+
+  ⚠ **1. ABOVE 1100 px THE COLUMN RAN PAST A PAGE THAT CANNOT SCROLL.** In the
+  wall the popover hangs off `.quote__price` and opens downward, capped at a
+  flat `46vh` — which is a guess at the room under the chip, not the room.
+  Scrolled to its own end, the last row's box against the window:
+
+  | door | viewport | `סה״כ` row | window | off screen |
+  |---|---|---|---|---|
+  | **one +₪200 colour** | **1280×720** | 700..732 | 720 | **12** |
+  | one colour | 1280×600 | 629..661 | 600 | 61 |
+  | an ordinary loud door | 1100×800 | 789..821 | 800 | 21 |
+  | " | 1280×720 | 760..792 | 720 | 72 |
+  | " | 1920×918 | 921..953 | 918 | 35 |
+  | " | 1280×600 | 638..670 | 600 | 70 |
+
+  Clean at 1152×800 and 1440×900. ⚠ **AND ABOVE 1100 `body` IS `100dvh;
+  overflow: hidden`**, so that is not "below the fold" — there is no page scroll
+  to reach it with, and scrolling the popover only drags its content toward an
+  edge that is already off screen. **Unreachable by any gesture**, on two of the
+  audit's own eight viewports, for a door carrying one paid colour.
+  ⚠ **AND THE BOX THAT CLIPS IT IS NOT THE WINDOW, WHICH THE FIRST FIX GOT
+  WRONG AND ONLY A PICTURE CAUGHT.** Capped against `innerHeight` the column
+  still came out cut, with the illustration caveat apparently painted over it.
+  It is not painted over: in the wall the quote is `position: absolute` inside
+  **`.stage-wrap`, which is `overflow: hidden`**, so the popover simply stops at
+  the wrap and the sibling band behind it shows through. On a phone the bar is
+  `position: fixed`, which no `overflow` ancestor clips, and the window really
+  is the edge. Two different boxes; `fitStage` asks the page which
+  (`position: fixed` → the viewport, else the first ancestor whose `overflow-y`
+  is not `visible`) rather than restating the 1100 px breakpoint in JavaScript —
+  §9 counts eight readers of that media query already.
+
+  ⚠ **2. AND WHEREVER THE COLUMN OVERFLOWS ITS CAP IT IS CUT AT THE BOTTOM, SO
+  THE ROW IT TAKES IS ALWAYS THE LAST ONE.** `scrollTop` is 0 on every shape
+  measured — the cut is never at the top — and the last row is the total. At
+  **320×568 one +₪200 colour is enough**: eight rows want 272 px against a 261
+  px cap and `סה״כ` / `Total` / `Итого` is the only hidden row, identically in
+  all three languages. Nothing said the list continued, either: the popover is
+  `overflow-y: auto` with an overlay scrollbar, which is the fault §0b's own
+  "the panel says when there is more of it" fixed one screen over.
+
+  ⚠ **THE PHONE SIDE WAS MEASURED CORRECT AND IS NOT TOUCHED.** Nine shapes
+  including the landscape phones and the zoomed laptop of §9: the box never
+  leaves the screen and the total is always reachable. Only the desktop rule
+  gained a cap.
+
+  **What shipped:** `fitStage` publishes `--bd-room` off the anchor's own rect
+  against the box that actually clips it, beside `--sticky-h`, `--quote-h` and
+  `--rail-band`; the desktop rule caps at
+  `max(132px, min(46vh, calc(var(--bd-room) - var(--bd-gap) - 12px)))`, the
+  margin stated once where it is applied (§5.10); and **`.bd__total`'s cells are
+  `position: sticky; inset-block-end: 0`**, so the components scroll behind a
+  bottom line that stays put and the half-row cut behind it is an honest cue
+  that there is more. No JS for that half, nothing to go stale, a no-op when the
+  column fits.
+
+  ⚠ **AND A THIRD THING, WHICH IS THE SAME SHAPE AS EVERY §5 ENTRY: A
+  DECLARATION ON A BOX IT CANNOT APPLY TO.** `border-collapse: collapse` was
+  written on `.bd` — which is the *popover div*, `.bd__t` being the table — so
+  it had never done anything, and the table kept `separate` with 2 px of
+  `border-spacing`. Measured on the live page: every row's `<th>` and `<td>` are
+  2 px apart and each draws its **own** `border-block-end`, so the rule under
+  every line of the one table a customer is told to read down was two segments
+  with a nick between them. Moved to `.bd__t`. It is not only cosmetic —
+  collapsing took **18 px off an eight-row column and 26 off a thirteen-row
+  one**, which on its own closed the one-colour case at 1280×720 (the overhang
+  fell 25 px → 7).
+
+  ⚠ **THE COST IS RECORDED RATHER THAN FUDGED.** The desktop column is shorter
+  for the cap: a twelve-row door at 1280×720 gets **198 px** — about five rows
+  and the pinned total — where it used to get 414 px of which the last five rows
+  could not be reached at all. Everything is now reachable; less is on screen at
+  once. §9 carries it and what would actually close it.
+
+  **Falsified in both directions, and neither half is redundant.** Removing the
+  cap: **8 faults** across five shape × door cases, each naming the pixels it
+  hangs by. Removing the sticky: **10 faults**, including 320×568 and 844×390 —
+  a phone on its side — which the cap does not reach at all.
+  ⚠ **AND MY OWN FIXTURE ARRIVED REPAIRED, CAUGHT BY READING `?sheet=1`**, which
+  is the half of the walk that exists for exactly that: the loud door I typed
+  carried `pz=gold` (not an id — they are prefixed) and `d=panel2` behind a
+  square window, which `rectNeedsPanel` trades down. The column being measured
+  was a door nobody had chosen. Third time this log records that trap; the check
+  now asserts its own fixtures are unrepaired rather than trusting me.
+  No price, no id, no list order, no bit, no `VERSION`. The 52 bare sheets came
+  back **byte-identical**; 4 of the 12 `shot` sheets moved, which proves nothing
+  either way (§7).
 
 - **⚠ SIX OF THE EIGHT STEPS PRINTED THEIR OWN TITLE TWICE, IN HEBREW AND IN
   RUSSIAN — 13.9.2026.** Found by walking as **the customer who is being READ

@@ -3404,6 +3404,64 @@ function fitStage() {
     document.documentElement.style.setProperty('--quote-h', `${Math.round(quoteH)}px`);
   }
 
+  /* ⚠ AND HOW MUCH ROOM THERE IS UNDER THE PRICE FOR ITS OWN BREAKDOWN.
+     Measured 13.9.2026 by opening the price the way a customer does. Above
+     1100 px the breakdown hangs off `.quote__price` and opens DOWNWARD into
+     the wall, capped at `46vh` — and 46vh is a guess at the room, not the
+     room. On a 1280x720 laptop, on a door carrying one +₪200 colour and
+     nothing else, the column's bottom edge landed 25 px past the foot of the
+     window, and the row it took with it was **the total**: scrolled to the
+     popover's own end, `סה״כ` sat at 700..732 against a 720 px screen.
+
+     ⚠ AND THAT IS NOT "BELOW THE FOLD", WHICH IS THE WHOLE SEVERITY OF IT.
+     Above 1100 `body` is `100dvh; overflow: hidden` — one screen, two columns
+     scrolling inside it — so there is no page scroll to reach it with, and
+     scrolling the popover only drags its content toward a bottom edge the
+     window is already clipping. The bottom line of the customer's own bill,
+     unreachable by any gesture. Measured on four of six desktop shapes,
+     including two of the audit's own eight viewports (1280x720 and
+     1920x918); 1152x800 and 1440x900 were clear.
+
+     ⚠ THE PHONE SIDE IS CORRECT AND IS NOT TOUCHED. Below 1100 the bar is
+     fixed at the foot and the box opens UPWARD into a whole screen of room —
+     measured at nine shapes including the landscape phones and the zoomed
+     laptop of §9, the box never leaves the screen and the total is always
+     reachable. So this number is published for, and read by, the desktop rule
+     alone, exactly as `--sticky-h` is published for the phone one.
+
+     ⚠ AND THE BOX THAT CLIPS IT IS NOT THE WINDOW ON A DESKTOP, WHICH THE
+     FIRST VERSION OF THIS GOT WRONG AND A PICTURE CAUGHT. Capped against
+     `innerHeight` the column still came out cut at the foot, with the
+     illustration caveat apparently painted over it — and it is not painted
+     over, it is CLIPPED: in the wall the quote is `position: absolute` inside
+     `.stage-wrap`, which is `overflow: hidden`, so anything hanging below the
+     wrap simply stops and the sibling band behind it shows through. On the
+     phone the bar is `position: fixed`, which no `overflow` ancestor clips,
+     and the window really is the edge. Two different boxes, and the page is
+     asked which rather than the 1100 px breakpoint being restated here —
+     CLAUDE.md §9 counts eight readers of that one media query already, and a
+     ninth written in JavaScript is the worst of them.
+
+     `--bd-gap` is the box's own margin and stays in the CSS: the room is
+     measured here, the margin subtracted where it is applied (§5.10). Read on
+     every re-fit, off a rect this function is already in the business of
+     taking, so it cannot drift from the box it describes. */
+  const bdAnchor = document.querySelector('.quote__price');
+  if (bdAnchor) {
+    const a = bdAnchor.getBoundingClientRect();
+    let clip = window.innerHeight;
+    for (let n = bdAnchor; n && n !== document.body; n = n.parentElement) {
+      const cs = getComputedStyle(n);
+      if (cs.position === 'fixed') break;
+      if (n !== bdAnchor && cs.overflowY !== 'visible') {
+        clip = Math.min(clip, n.getBoundingClientRect().bottom);
+        break;
+      }
+    }
+    document.documentElement.style.setProperty(
+      '--bd-room', `${Math.max(0, Math.round(clip - a.bottom))}px`);
+  }
+
   /* ⚠ AND HOW MUCH OF THE DESKTOP PANEL IS SPOKEN FOR, for the
      same reason `--sticky-h` and `--quote-h` exist one breakpoint down: above
      1100 px the page does not scroll, the choices column does, and the

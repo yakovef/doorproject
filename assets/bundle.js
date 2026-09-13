@@ -9723,6 +9723,23 @@ ${body}
     if (quoteEl) {
       document.documentElement.style.setProperty("--quote-h", `${Math.round(quoteH)}px`);
     }
+    const bdAnchor = document.querySelector(".quote__price");
+    if (bdAnchor) {
+      const a = bdAnchor.getBoundingClientRect();
+      let clip = window.innerHeight;
+      for (let n = bdAnchor; n && n !== document.body; n = n.parentElement) {
+        const cs = getComputedStyle(n);
+        if (cs.position === "fixed") break;
+        if (n !== bdAnchor && cs.overflowY !== "visible") {
+          clip = Math.min(clip, n.getBoundingClientRect().bottom);
+          break;
+        }
+      }
+      document.documentElement.style.setProperty(
+        "--bd-room",
+        `${Math.max(0, Math.round(clip - a.bottom))}px`
+      );
+    }
     const style = document.documentElement.style;
     const choose2 = document.querySelector(".panel--choose");
     const railEl = choose2 && choose2.querySelector(".steps");

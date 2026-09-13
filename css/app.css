@@ -1547,11 +1547,34 @@ svg { direction: ltr; }
   .quote__price { justify-items: center; }
   .quote__price .send__label { font-size: .66rem; letter-spacing: .16em; }
   .quote__price .send__figure { font-size: 1.9rem; }
-  /* Back the right way up: there is a whole wall below it here. */
+  /* Back the right way up: there is a whole wall below it here.
+     ⚠ AND "A WHOLE WALL" WAS NOT MEASURED, AND ON HALF THE DESKTOP SHAPES IT
+     IS NOT THERE — 13.9.2026. `46vh` is a guess at the room under the chip;
+     the room is a fact, and `fitStage` publishes it as `--bd-room` off the
+     anchor's own rect. On a 1280x720 laptop, one +₪200 colour and nothing
+     else, the column ran 25 px past the foot of the window and took the
+     `סה״כ` row with it — and above 1100 `body` is `100dvh; overflow: hidden`,
+     so that row was not below the fold, it was unreachable by any gesture.
+     Four of six desktop shapes, two of them audit viewports.
+     `--bd-gap` is the margin, said ONCE and subtracted where it is applied.
+     The `max()` is a floor: a screen too short to hold four rows under the
+     chip gets a small overhang rather than a popover of zero height, which
+     would be the same fault wearing the fix's clothes. Measured: the tightest
+     shape tried is a 1280x600 window at 165 px of room, so nothing reaches the
+     floor today — it is there for a window nobody has yet dragged that small.
+     ⚠ AND THE COLUMN IS SHORTER FOR THIS, WHICH IS THE HONEST TRADE AND IS
+     RECORDED RATHER THAN FUDGED. A twelve-row door at 1280x720 gets 198 px of
+     column — about five rows and the pinned total — where it used to get 414
+     px of which the last five rows could not be reached at all. Everything is
+     now reachable; less of it is on screen at once. CLAUDE.md §9 carries the
+     residual and what would actually close it, which is a question about where
+     the chip stands rather than a number to nudge. */
   .quote .bd {
+    --bd-gap: 8px;
     inset-block-end: auto; inset-block-start: 100%;
     inset-inline-start: 50%; transform: translateX(-50%);
-    margin-block-end: 0; margin-block-start: 8px;
+    margin-block-end: 0; margin-block-start: var(--bd-gap);
+    max-block-size: max(132px, min(46vh, calc(var(--bd-room, 100vh) - var(--bd-gap) - 12px)));
   }
   /* ⚠ 44 px HERE TOO. The first draft said 36 — small enough to sit quietly
      under the price on a wall with room to spare — and `npm run audit` failed
@@ -2950,10 +2973,26 @@ svg { direction: ltr; }
 .send__toggle[aria-expanded="true"] .send__chev { transform: rotate(225deg); }
 
 .bd {
-  inline-size: 100%; border-collapse: collapse;
+  inline-size: 100%;
   margin-block: 6px 2px;
   font-size: .82rem;
 }
+/* ⚠ `border-collapse` WAS DECLARED ON THE DIV, WHERE IT DOES NOTHING —
+   13.9.2026. `.bd` is the popover (`<div class="bd" id="breakdown">`) and
+   `.bd__t` is the table inside it, so the property sat on a box it cannot
+   apply to and the table kept the default `separate` with 2 px of
+   `border-spacing`. Measured on the live page: the `<th>` and the `<td>` of
+   every row are 2 px apart, and each draws its OWN `border-block-end`, so the
+   rule under every line of the column was two segments with a nick between
+   them — in the one table on this site a customer is told to read down.
+   It also has to be collapsed for the sticky total below: uncollapsed, that
+   row's top rule and the previous row's bottom rule are two hairlines 2 px
+   apart rather than the single line a bill's foot is.
+   ⚠ `inline-size: 100%` above is left where it is on purpose. `.quote .bd`
+   sets `max-content` at higher specificity so it has never applied, and the
+   table is already exactly that width — moving it would change a shipped
+   layout to say something it already says. */
+.bd__t { border-collapse: collapse; }
 .bd th, .bd td {
   padding-block: 5px; text-align: start; font-weight: 400;
   border-block-end: 1px solid var(--rule);
@@ -2965,9 +3004,25 @@ svg { direction: ltr; }
   text-align: end; font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+/* ⚠ THE BOTTOM LINE DOES NOT SCROLL AWAY — 13.9.2026. Whenever the column is
+   taller than its own cap it is cut at the BOTTOM (`scrollTop` is 0 on every
+   shape measured, so the cut is never at the top), and the row the cut takes
+   is always the last one: the total. That is the row the table exists for —
+   the whole point of a breakdown is that a customer can add the column up and
+   arrive at the figure on the chip — so the one row that cannot be allowed to
+   go missing was the one that always did. Measured at 320x568, in all three
+   languages: ONE +₪200 colour is enough. 8 rows want 290 px against a 46vh
+   cap of 261, and `סה״כ` / `Total` / `Итого` is the only row hidden.
+   Sticky, so the components scroll behind a bottom line that stays put — and
+   the half-row cut behind it is then an honest cue that there is more, which
+   is the other half of what was wrong: nothing said the list continued.
+   No JS, nothing to publish, and a no-op when the column fits. */
 .bd__total th, .bd__total td {
   font-weight: 600; color: var(--ink); border-block-end: 0;
   padding-block-start: 7px;
+  position: sticky; inset-block-end: 0;
+  background: var(--paper);
+  border-block-start: 1px solid var(--rule);
 }
 
 /* The size band, under the name and above the price. Small and quiet: it is a
