@@ -45,6 +45,112 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-13 00:40 UTC — run 116: a short-and-wide screen shows the question and not one answer, and the 29.8 fix had never been guarded
+
+**Looked at:** the page as **THE CUSTOMER WHO HAS ZOOMED IT**. No instrument
+here has ever driven anything but `deviceScaleFactor: 1` and nothing anywhere
+scales the type; Peretz sells steel security doors and his customers are not
+twenty. Browser zoom does not change the device, it changes how many CSS pixels
+the viewport holds — **a 1280 laptop at 200% is a 640×360 css viewport**, at
+150% it is 853×480 — so a zoomed laptop lands in the short-and-wide band.
+Walked forward with the button at 320×568, 390×844, 1440×900 and six zoom
+shapes, read the order and `?sheet=1`, and looked at the screenshots. Recent
+lenses: 111 the telephone code, 112 printing the sheet, 113 the gallery, 114
+the keyboard with no mouse, 115 the system Back button.
+
+**Instruments:** test ✓ 4,349,822 / 0 · audit ✓ no faults (with the new block)
+· profile ✓ all four rows · collide ✓ `all` (1,902 designs) and `boxes` ·
+sheets not run and not needed — **only `tools/audit.mjs` changed, which is not
+in `PAGE_DEPS`**, and the four staleness assertions stayed green throughout.
+Done the cheap way and saying so: this was one harness and a lot of doubting
+it. `ultracode` deliberately not spent — the work was measuring one quantity
+carefully at thirteen viewports, which does not parallelise, and run 115 had
+just spent the fleet on an adversarial verification that earned it.
+
+**What is wrong:** on a **phone held sideways** — 844×390, which is run 110's
+own viewport — the customer reads *"שלב 3 מתוך 8"*, reads the question, reads
+the explanation, and **not one answer is on screen, on any of the eight
+steps**. Run 110 closed that shape for the QUESTION on 12.9; nobody then asked
+whether there was an answer under it. A 1280 laptop at 200% zoom is the same,
+and at 150% it fails two steps of eight.
+
+| | stage | band for the question AND its answers | steps with NO answer visible |
+|---|---|---|---|
+| 390×844 phone | 390 | 320 | 0 of 8 |
+| 320×568 phone | 239 | 199 | 1 of 8 — arrival, §9 |
+| 1024×768 iPad landscape | 430 | 204 | 1 of 8 — arrival |
+| **853×480 — 1280 laptop @150%** | 202 | **144** | **2 of 8** |
+| **844×390 — a phone on its side** | 164 | **92** | **8 of 8** |
+| **640×360 — 1280 laptop @200%** | 151 | **75** | **8 of 8** |
+
+**Changed:** `npm run audit` asserts it. **29.8 fixed exactly this fault at
+320×568 — §0b calls it the worst thing that round, *"a guided flow whose live
+step shows no options is not guided"* — and nothing has been asserting it
+since.** The arrival block's `visibleOptions` asks whether the tiles are in the
+DOM and not `hidden`, which is a different question from whether any of them is
+ON SCREEN. Four viewports must show an answer on every step; the two shapes
+above are NAMED exemptions that the check requires to STILL show none, so they
+come out the day this is closed. **Falsified** by moving 844×390 into the
+must-pass set: **8 faults, one per step**, each naming its tile count.
+
+⚠ **AND THE CRITERION IS "ANY PART OF ONE", WHICH IS WEAKER THAN I FIRST WROTE
+AND THAT IS THE MOST USEFUL THING HERE.** My first sweep demanded a WHOLE tile
+and reported 7 of 8 steps failing at 320×568 — which would have made a check
+whose exemptions outnumbered its assertions. Measured properly: the first
+colour swatch lands at **466–510 against a fold of 501** and is cut by NINE
+pixels. That is a residual of §9's arrival item, not the fault 29.8 fixed. A
+check written on the stricter criterion would have codified a band of
+exemptions and asserted almost nothing.
+
+⚠ **TWO SUSPICIONS OPENED AND DROPPED, BOTH BY DOUBTING THE INSTRUMENT FIRST.**
+The summary scrolls sideways 3–7 px at these shapes — it is the 900 ms reveal
+scaling the door 1.5%, it settles to **0 at every width**, and a shared link
+never has it; my harness had measured during an entrance animation, which §0b
+already records as measuring the wrong moment. And the `tel:` link (64×15) and
+the works link (85×18) are under the 44 px floor **at every viewport including
+an unzoomed 1280×720** — both are genuinely inline in a sentence, which is the
+one exemption the tap sweep carries and WCAG 2.5.8 grants; growing them would
+break the paragraph. `npm run audit` is right and was right.
+
+⚠ **And I misread my own screenshot by the device scale factor.** At 150% the
+PNG is 1280 px wide for an 853 px viewport, so the door measured ~300 px in the
+image and 202 in CSS — I had read the compression block as not applying when it
+was applying correctly. §6 on my own instrument, and the numbers above are the
+corrected ones.
+
+**Already decided, and here is where:** §9 already names the cause — `.stage`'s
+`clamp(40vh, 100vw, 56vh)` pinning the door at its maximum wherever `100vw`
+runs past `56vh` — and already refuses to widen it. This run adds the shapes it
+reaches and one correction: §9's proposed remedy (stop capping at 56vh) cannot
+close 844×390 or 640×360 on the arithmetic, because taking the stage to ZERO at
+844×390 yields 256 px against a question block of ~110 and a tile of 134.
+
+**Best idea of the run that was NOT taken:** the layout is chosen by **width**
+alone and the thing that decides whether "door above choices" works is
+**height**. At 853×480 there are 853 px of width and no height, and the
+two-column desktop layout — door beside choices — is exactly right for that
+shape and already exists, asserted, above 1100. Not taken because
+`max-width: 1099px` is the trigger for the fixed rail, `body`'s `--steps-h`
+padding, the fixed quote bar, the sticky stage, the grip controls, `placeSend`,
+the toast's anchor and the `#spec`/`#summary` swap — **one breakpoint with
+eight readers** — and moving it for one desynchronises the rest. That is a
+decision above CSS and a run of its own. Behind it stand run 113's (does the
+gallery tile's drawing already carry what `describe(st)` would add), 112's (how
+large the printed elevation must be to read off paper) and 111's (the read-aloud
+cost of an eleven-character code).
+
+**proposed · taken · refused:** proposed 4 (assert an answer is on screen ·
+a harder compression tier for very short viewports · the two-column layout at
+short-and-wide · grow the two inline links to 44 px) · taken 1 · refused 3 —
+the compression tier because it re-tunes numbers run 110 fitted against a
+different criterion and still cannot close the worst two shapes, the layout
+because of the eight readers above, and the links because the exemption they
+sit under is correct.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-12 20:40 UTC — run 115: the phone's Back button leaves the guide, and the fix for it was built, measured and thrown away
 
 **Looked at:** the page as **THE CUSTOMER WHO PRESSES THE SYSTEM BACK BUTTON** —

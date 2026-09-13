@@ -3416,6 +3416,160 @@ for (const v of VIEWS) {
   if (!faults) console.log(`    ${measured} focused options across ${stepsSeen} steps and ${KB.length} widths: every one whole on screen`);
 }
 
+/* ── A STEP SHOWS AN ANSWER, NOT JUST A QUESTION ─────────────────────────
+   ⚠ THE 29.8 FIX HAS NEVER HAD A GUARD, AND IT IS THE ONE THAT MATTERS MOST.
+   §0b records it as the worst thing that round: *"AT 320 PX NO STEP SHOWED AN
+   ANSWER, AND NOTHING IN THIS REPOSITORY WAS ASKING. A guided flow whose live
+   step shows no options is not guided."* It was measured, fixed with ~114 px,
+   and then left with nothing standing behind it: the arrival block below
+   asserts `visibleOptions`, which is whether the tiles are in the DOM and not
+   `hidden` — a different question from whether any of them is ON SCREEN.
+
+   ⚠ AND THE CRITERION IS "ANY PART OF ONE", WHICH IS WEAKER THAN IT LOOKS AND
+   IS DELIBERATE. Measured 13.9: requiring a WHOLE tile fails 7 of 8 steps at
+   320x568, because the first colour swatch lands at 466–510 against a fold of
+   501 and is cut by NINE pixels. That is a residual of §9's arrival item, not
+   the fault this check is for, and a check whose exemptions outnumber its
+   assertions is not a check. What 29.8 fixed, and what this pins, is that the
+   customer can see that there is something to answer with.
+
+   ⚠ THE FOLD IS THE FIXED AND STICKY FURNITURE, NEVER `innerHeight`. A tile
+   behind the door or behind the quote bar is as unreachable as one off the
+   screen, and §0b records this file making exactly that mistake once and
+   reporting a 68 px shortfall as 1 px.
+
+   ⚠ AND THE TWO EXEMPTIONS ARE MEASURED, NAMED, AND ASSERTED TO STILL BE
+   NEEDED — run 110's pattern, because a quiet exemption is how a fault becomes
+   a feature. A phone held SIDEWAYS shows no answer on any of the eight steps,
+   and so does a 1280 laptop at 200% browser zoom (640x360 css px): run 110
+   closed the QUESTION being painted behind the quote bar at those shapes and
+   nobody then asked whether there was an answer under it. Both are in
+   CLAUDE.md §9 with the arithmetic — 92 px and 75 px of band against a
+   question block of ~110 — and both are refused here rather than shaved,
+   because closing them means moving the door on a whole band or giving that
+   band the two-column layout, and that is a decision above CSS. */
+{
+  console.log('\na step shows an answer, not just a question');
+  const AN_URL = `file://${process.cwd()}/index.html`;
+  /* must show an answer on every step but the named arrival */
+  const MUST = [
+    { name: '390x844', w: 390, h: 844, arrival: true },
+    { name: '834x1112', w: 834, h: 1112, arrival: true },
+    { name: '1280x720', w: 1280, h: 720, arrival: true },
+    { name: '320x568', w: 320, h: 568, arrival: false },
+  ];
+  /* measured to show NO answer on ANY step, and required to still be that way */
+  const EXEMPT = [
+    { name: '844x390 a phone on its side', w: 844, h: 390 },
+    { name: '640x360 a 1280 laptop at 200% zoom', w: 640, h: 360 },
+  ];
+
+  /* How much of a tile the customer can actually see: its box, clipped to the
+     viewport and then to whatever fixed or sticky furniture covers it. Read
+     off the live page rather than listed, because the bars differ by
+     breakpoint and a list would go stale. */
+  const seen = () => {
+    const live = document.querySelector('.sect.is-live');
+    if (!live) return null;
+    const bars = [];
+    for (const el of document.querySelectorAll('body *')) {
+      const cs = getComputedStyle(el);
+      if (cs.position !== 'fixed' && cs.position !== 'sticky') continue;
+      if (cs.visibility === 'hidden' || cs.display === 'none' || el.hidden) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 40 || r.height < 10) continue;
+      if (el.closest('.toast')) continue;      /* it fades; run 105 owns it */
+      bars.push({ el, r });
+    }
+    const visible = t => {
+      const r = t.getBoundingClientRect();
+      if (r.height < 1) return 0;              /* a tile the rules are hiding */
+      let top = Math.max(r.top, 0), bot = Math.min(r.bottom, innerHeight);
+      for (const c of bars) {
+        if (c.el.contains(t)) continue;
+        if (Math.min(r.right, c.r.right) - Math.max(r.left, c.r.left) <= 1) continue;
+        if (c.r.top <= top && c.r.bottom > top) top = Math.max(top, c.r.bottom);
+        if (c.r.bottom >= bot && c.r.top < bot) bot = Math.min(bot, c.r.top);
+      }
+      return Math.max(0, bot - top);
+    };
+    const tiles = [...live.querySelectorAll('[role="radio"]')].filter(t => t.getBoundingClientRect().height >= 1);
+    const shown = tiles.map(visible);
+    return {
+      step: live.dataset.section, tiles: tiles.length,
+      any: shown.filter(v => v > 4).length, best: Math.round(Math.max(0, ...shown, 0)),
+    };
+  };
+
+  let steps = 0;
+  const walk = async (p, onStep) => {
+    for (let s = 0; s < 9; s++) {
+      const m = await p.evaluate(seen);
+      if (!m) return 'no live step';
+      if (m.step === 'sum') return null;
+      onStep(m, s);
+      const moved = await p.evaluate(() => {
+        const b2 = [...document.querySelectorAll('.sect__next')].filter(x => x.offsetParent !== null && !x.disabled);
+        if (!b2.length) return false; b2[0].click(); return true;
+      });
+      if (!moved) return `step "${m.step}": no way on`;
+      await p.waitForTimeout(420);
+    }
+    return null;
+  };
+
+  for (const v of MUST) {
+    const where = `answer ${v.name}`;
+    const p = await b.newPage({ viewport: { width: v.w, height: v.h } });
+    try {
+      await p.goto(AN_URL, { waitUntil: 'load' });
+      await p.waitForTimeout(700);
+      let n = 0;
+      const err = await walk(p, (m, s) => {
+        n++; steps++;
+        if (!m.tiles) { fault(where, `step "${m.step}" has no option tiles — this check has no subject`); return; }
+        /* §9: arrival is short at 320x568 and 1024x768 because `goStep`
+           scrolls ~50 px on a step change and the boot call does not. */
+        if (s === 0 && !v.arrival) return;
+        if (!m.any) {
+          fault(where, `step "${m.step}": not one of its ${m.tiles} answers is on screen — `
+            + 'the customer is shown a question and nothing to answer it with '
+            + '(29.8 fixed exactly this and nothing has been asserting it since)');
+        }
+      });
+      if (err) fault(where, err);
+      if (n < 8) fault(where, `only ${n} of 8 question steps were walked`);
+    } catch (e) {
+      fault(where, `could not be walked: ${e.message}`);
+    }
+    await p.close().catch(() => {});
+  }
+
+  /* The exemptions, asserted in the direction that makes them shrink. */
+  for (const v of EXEMPT) {
+    const p = await b.newPage({ viewport: { width: v.w, height: v.h } });
+    let shows = 0, n = 0;
+    try {
+      await p.goto(AN_URL, { waitUntil: 'load' });
+      await p.waitForTimeout(700);
+      await walk(p, m => { n++; if (m.tiles && m.any) shows++; });
+    } catch { /* counted as 0 below, and `n` will say so */ }
+    await p.close().catch(() => {});
+    if (n < 8) {
+      fault('answer', `${v.name}: only ${n} of 8 steps were walked, so this exemption is not being checked`);
+    } else if (shows) {
+      fault('answer', `${v.name} now shows an answer on ${shows} of 8 steps — it showed none on `
+        + 'any. Take the exemption out of this check and out of CLAUDE.md §9, and move the '
+        + 'other one with it if it has moved too');
+    }
+  }
+  if (steps < 8 * MUST.length) fault('answer', `only ${steps} steps were measured of ${8 * MUST.length} — the sweep is not walking the guide`);
+  if (!faults) {
+    console.log(`    ${steps} steps across ${MUST.length} viewports show an answer; a phone on its `
+      + 'side and a laptop at 200% zoom show none, and are the two named exemptions');
+  }
+}
+
 await b.close();
 
 if (skipped.length) {

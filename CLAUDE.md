@@ -1719,10 +1719,80 @@ the last row and the foot, and the `@page` margin is 12 mm because that is
 what a printer can hold. Shaving either to meet a number is what this file
 spends most of §6 warning about.
 
+### ⚠ A SHORT-AND-WIDE SCREEN SHOWS THE QUESTION AND NOT ONE ANSWER
+
+Found 13.9.2026 by walking as **the customer who has zoomed the page** — no
+instrument here has ever driven anything but `deviceScaleFactor: 1` and nothing
+anywhere scales the type, and Peretz sells steel security doors to customers
+who are not twenty. Browser zoom does not change the device, it changes how
+many CSS pixels the viewport holds: **a 1280 laptop at 200% is a 640×360 css
+viewport**, and at 150% it is 853×480. So a zoomed laptop lands in the
+short-and-wide band — and that band is worse than any phone.
+
+⚠ **AND THE SAME MEASUREMENT CONDEMNS A SHAPE THAT IS NOT ZOOMED AT ALL.** The
+section below records the landscape phone as **closed on 12.9** — and it was
+closed for the QUESTION. Nobody then asked whether there was an ANSWER under
+it. Measured, walking forward with the button, counting a tile as visible if
+any part of it clears the fixed and sticky furniture:
+
+| | stage | band for the question AND its answers | steps with NO answer visible |
+|---|---|---|---|
+| 390×844 phone | 390 | 320 | 0 of 8 |
+| 320×568 phone | 239 | 199 | 1 of 8 — arrival, §9 below |
+| 1024×768 iPad landscape | 430 | 204 | 1 of 8 — arrival |
+| **853×480 — a 1280 laptop at 150%** | 202 | **144** | **2 of 8** |
+| **844×390 — a phone on its side** | 164 | **92** | **8 of 8** |
+| **640×360 — a 1280 laptop at 200%** | 151 | **75** | **8 of 8** |
+
+So on the very viewport run 110 repaired, the customer now reads *"שלב 3 מתוך
+8"*, reads the question, reads the explanation — and there is nothing under it
+to press. `npm run audit` asserts the answer now (29.8 fixed exactly this at
+320×568 and **nothing had been asserting it since**), with those two shapes as
+named exemptions that the check requires to STILL show nothing, so they come
+out the day this is closed.
+
+⚠ **IT IS ARITHMETIC, NOT TUNING, AND THAT IS WHY IT IS RECORDED RATHER THAN
+SHAVED.** At 844×390: 62 px of fixed rail + 164 of stage + 71 of quote bar
+leaves **92**, and the question block — eyebrow, title, lede, group heading —
+is about 110 before a tile is reached. Run 110 already compressed that stage to
+42vh against a measured criterion (the question on screen); compressing it
+further re-tunes a band another round fitted, for a different criterion, with
+no photograph behind it. Taking the stage to ZERO at 844×390 yields 256 px,
+which holds the question and a 44 px swatch but not a 134 px tile.
+
+⚠ **THE READING WORTH MEASURING NEXT IS NOT THE ONE §9 ALREADY NAMES.** The
+section below says the answer is *"probably to stop capping at 56vh when the
+viewport is wide and short"*, and on these numbers that cannot close 844×390 or
+640×360 on its own. The other reading is that **the layout is chosen by WIDTH
+alone and the thing that decides whether "door above choices" works is
+HEIGHT**: at 853×480 there are 853 px of width and no height, and the
+two-column desktop layout — door beside choices — is exactly the right shape
+for it and already exists, asserted, above 1100. What makes that a decision
+above CSS rather than a media query is that `max-width: 1099px` is the trigger
+for the fixed rail, `body`'s `--steps-h` padding, the fixed quote bar, the
+sticky stage, the grip controls, `placeSend`, the toast's anchor and the
+`#spec`/`#summary` swap — **one breakpoint with eight readers**, and moving it
+for one of them desynchronises the rest.
+
+⚠ **Two things were suspected this run and dropped as correct-as-built**, both
+after the instrument was doubted first. The summary scrolls sideways by 3–7 px
+at these shapes — it is the 900 ms reveal scaling the door 1.5%, it settles to
+0 at every width, and a shared link never has it; my harness had measured
+during an entrance animation, which §0b already records as measuring the wrong
+moment. And the `tel:` link at 64×15 and the works link at 85×18 are under the
+44 px floor at every viewport — both are genuinely inline in a sentence, which
+is the one exemption `npm run audit`'s tap sweep carries and WCAG 2.5.8 grants,
+and growing them would break the paragraph they sit in.
+
 ### ⚠ A PHONE HELD SIDEWAYS: TWO RESIDUALS, BOTH MEASURED
 
 Closed on 12.9 for 667×375, 740×360, 844×390, 932×430 and 1024×600 — see §0b —
-and two cases are left, both recorded rather than shaved:
+and two cases are left, both recorded rather than shaved.
+
+⚠ **AND "CLOSED" HERE MEANS CLOSED FOR THE QUESTION.** Measured 13.9: at
+844×390 the question is on screen on all eight steps and **not one ANSWER is,
+on any of them.** The section above carries that finding and its arithmetic;
+this line is here so the word "closed" cannot be read as more than it was.
 
 - **Arrival.** On step 01 the question still ends 29–69 px behind the quote bar
   (Hebrew and English; 44–84 in Russian), for the reason §9 already records at
