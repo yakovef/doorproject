@@ -144,7 +144,7 @@ move the first field's top rule when it has no heading) · taken 1 · refused 3
 of code, the CSS because it buys a customer nothing, and the rule because the
 picture says it is doing real work separating the explanation from the answers.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `b76b430`
 
 ---
 
