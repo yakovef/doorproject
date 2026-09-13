@@ -1286,8 +1286,32 @@ function buildPanel() {
       /* ⚠ NO `field__head` BUTTON ANY MORE. The title is a heading, because
          nothing folds — and a `<button>` that toggles nothing is a control
          that lies to a screen reader about being interactive. */
+      /* ⚠ AND IT IS DROPPED WHERE IT REPEATS THE STEP'S OWN QUESTION, which
+         in Hebrew is six steps of eight. This heading is a survivor of the
+         CABINET: four sections each held several groups, so the group's name
+         was the only name a group had. In a FLOW the step IS the question —
+         `סיכום`/`פרזול`/`משקוף` are the `<h2>` — and the same word then
+         appeared again 18 px below it in tracked small caps, saying nothing
+         the line above had not. Measured: he and ru drop it on colour, grip,
+         pz, face, glass and mk; EN drops three, because its step titles carry
+         an article ("The frame" over a group called "Frame") — so the rule
+         must be per-language and DERIVED, never a list of six keys that a
+         copy edit would silently rot.
+         The comparison is between the two strings a customer actually reads.
+         `buildPanel` runs again on every language switch, so a step that
+         stops repeating itself in English keeps its heading and one that
+         starts repeating itself loses it, with nobody coming back here.
+         ⚠ The GROUP IS STILL NAMED: `buildOptions` puts `T(g.title)` on the
+         radiogroup's `aria-label`, so a screen reader still hears which
+         question it has entered — it simply hears it once instead of three
+         times (h2, h3, radiogroup). And the convention this follows is the
+         one `buildOptions` already uses a level down, in its own words:
+         *"options with no `sub` come first and carry no heading."* A step's
+         first group belongs to the step; the ones after it are the ones that
+         need naming, which is why `פעמון` and `עינית` keep theirs. */
+      const named = T(g.title) !== T(sec.title);
       field.innerHTML = `
-        <h3 class="field__title" id="head-${g.key}">${T(g.title)}</h3>
+        ${named ? `<h3 class="field__title" id="head-${g.key}">${T(g.title)}</h3>` : ''}
         <div class="field__body" id="body-${g.key}">
           <div class="field__opts"></div>
           ${g.hint ? `<p class="field__hint">${T(g.hint)}</p>` : ''}

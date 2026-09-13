@@ -45,6 +45,109 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-13 06:40 UTC — run 117: six of the eight steps printed their own title twice, and it was the cabinet's heading still standing
+
+**Looked at:** the page as **THE CUSTOMER WHO IS BEING READ IT** rather than
+looking at it — the guide walked forward with the button, one step at a time,
+with the accessibility tree dumped at every step, in all three languages, at
+320×568, 390×844 and 1440×900. Then the order the send button produces, then
+`?sheet=1`, then the screenshots as pictures. Recent lenses: 112 printing the
+sheet, 113 the gallery, 114 the keyboard with no mouse, 115 the system Back
+button, 116 the zoomed page.
+
+**Instruments:** test ✓ 4,349,822 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` (1,902 designs) and `boxes` · sheets ✓ regenerated —
+**the 52 bare sheets came back byte-identical**, 6 of the 12 `shot` sheets
+moved and that is the instrument rather than the change (verified: every one
+of their twelve queries carries a full door, so `carries` lands them on the
+SUMMARY, which has no `.field` on it at all — measured, `step: sum, fields: 0`).
+Done the cheap way and saying so: `ultracode` not spent. One harness and a
+lot of doubting it; the work was reading one tree carefully in three languages,
+which does not parallelise, and run 115 spent the fleet on the adversarial
+verification that earned it.
+
+**What is wrong:** a screen reader on step 5 hears *"פרזול"* — the `<h2>` —
+then *"פרזול"* — the `<h3>` — then *"פרזול, radio group"*. One word, three
+times, before the first option. Sighted, the same thing is a line of tracked
+small caps 18 px under a heading that has just said it.
+
+| | steps that repeat themselves | which |
+|---|---|---|
+| Hebrew | **6 of 8** | colour · grip · pz · face · glass · mk |
+| Russian | **6 of 8** | the same six |
+| English | **3 of 8** | colour · pz · face |
+
+⚠ **ENGLISH DIFFERING IS THE PART THAT DECIDED THE SHAPE OF THE FIX.** Its
+step titles carry an article — *"The frame"* over a group called *"Frame"* —
+so the same catalogue duplicates differently in each language and one copy
+edit moves it. A list of six keys would have been right today and rotting by
+the next translation pass. `buildPanel` compares the two strings a customer
+reads and re-runs on every language switch.
+
+**Changed:** `buildPanel` drops the group's `<h3>` where its text equals the
+step's own title. `T(g.title) !== T(sec.title)`, one ternary. The heading is a
+survivor of the CABINET, where four sections each held several groups and the
+group's name was the only name a group had; in a FLOW the step IS the
+question. **The group keeps its accessible name** — the radiogroup's
+`aria-label` is untouched — so the question is announced once rather than not
+at all, and `npm run audit` asserts that pair together: no heading may repeat
+its step AND every radiogroup must still be named, because the cheap way to
+pass the first half is to stop naming the group and leave a blind customer
+inside seventeen colours with nothing saying what they are choosing.
+**Falsified** by restoring the heading unconditionally: **15 faults**, he 6 ·
+en 3 · ru 6, each quoting the word printed twice.
+
+**What it buys, measured at 320×568 walking forward with the button:** 18 px
+on each of those steps — the heading's box, its margins and the gap under it —
+on the axis §9 spends three sections fighting over. The first colour swatch
+goes **466–510 against a fold of 501**, which run 116 recorded as *"cut by
+NINE pixels"*, to **448–492, wholly on screen**. `glass` 416→399, `face`
+438→420, `grip`/`pz`/`mk` 438→420. `fit` and `lock` name groups that are not
+the step and keep both headings, which is the check that the rule is about
+repetition and not about headings.
+
+⚠ **And the convention it follows was already in the file one level down**,
+which is what stopped this being a new opinion: `buildOptions` says of its own
+sub-headings, *"options with no `sub` come first and carry no heading."* A
+step's first group belongs to the step; `פעמון` and `עינית` keep theirs on the
+very step that drops `פרזול`.
+
+⚠ **A suspicion opened and dropped, by doubting the instrument first.** The
+repair toast sets its text while the element is still `hidden` and unhides it
+on the next line, which is the classic shape of a live region that never
+announces. Instrumented with a MutationObserver: the record is delivered after
+the synchronous block, with the element already `display: block` and in the
+tree — so the sequence a screen reader sees is the visible one, and what
+Playwright can measure says the toast is fine. Claiming otherwise would have
+been reasoning about a reader I cannot observe, which is the mistake §7 keeps
+recording.
+
+**Left alone deliberately:**
+· **The price is never in the live announcement.** `paint` announces
+`describe(state)` — the door, twenty words, no money — so tapping the ₪4,200
+צוהר אנכי moves the figure from ₪5,295 to ₪6,995 with nothing said. Measured
+this run. Not taken because the fix is a judgement about a READER, not a box:
+whether a twenty-word door description plus a price on every colour tap is
+help or noise is exactly the kind of constant this repo refuses to fit against
+nobody. It wants its own run and a decision about what that sentence is for.
+· **~40 lines of dead CSS** — `.field__head`, `.field__now`, `.field__chev`,
+`.field.is-open` — all of it the deleted cabinet's, none of it emitted since
+27.8. Deleting it is a change made in order to have made one.
+· **The step heading's focus ring** in my own screenshots is my harness, not
+the page: a scripted `click()` carries no pointer event, so Chromium reports
+`:focus-visible` where a thumb does not. §0b records that fix; correct as built.
+
+**proposed · taken · refused:** proposed 4 (drop the heading that repeats the
+step · announce the price to a screen reader · sweep the cabinet's dead CSS ·
+move the first field's top rule when it has no heading) · taken 1 · refused 3
+— the price because it needs a decision about the sentence rather than a line
+of code, the CSS because it buys a customer nothing, and the rule because the
+picture says it is doing real work separating the explanation from the answers.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-13 00:40 UTC — run 116: a short-and-wide screen shows the question and not one answer, and the 29.8 fix had never been guarded
 
 **Looked at:** the page as **THE CUSTOMER WHO HAS ZOOMED IT**. No instrument

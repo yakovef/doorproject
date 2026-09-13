@@ -8822,8 +8822,9 @@ ${body}
         const field = document.createElement("div");
         field.className = "field";
         field.dataset.group = g.key;
+        const named = T(g.title) !== T(sec.title);
         field.innerHTML = `
-        <h3 class="field__title" id="head-${g.key}">${T(g.title)}</h3>
+        ${named ? `<h3 class="field__title" id="head-${g.key}">${T(g.title)}</h3>` : ""}
         <div class="field__body" id="body-${g.key}">
           <div class="field__opts"></div>
           ${g.hint ? `<p class="field__hint">${T(g.hint)}</p>` : ""}

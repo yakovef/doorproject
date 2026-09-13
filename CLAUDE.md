@@ -2173,6 +2173,65 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ SIX OF THE EIGHT STEPS PRINTED THEIR OWN TITLE TWICE, IN HEBREW AND IN
+  RUSSIAN — 13.9.2026.** Found by walking as **the customer who is being READ
+  the page rather than looking at it**: driving the guide forward with the
+  button and dumping the accessibility tree at every step, in all three
+  languages. A screen reader on step 5 hears the `<h2>` **פרזול**, then the
+  `<h3>` **פרזול**, then *"פרזול, radio group"* — one word, three times, before
+  the first option. On screen the same thing is a line of tracked small caps
+  18 px under a heading that already said it.
+
+  | | steps that repeat themselves | which |
+  |---|---|---|
+  | Hebrew | **6 of 8** | colour · grip · pz · face · glass · mk |
+  | Russian | **6 of 8** | the same six |
+  | English | **3 of 8** | colour · pz · face |
+
+  ⚠ **ENGLISH DIFFERS, AND THAT IS WHY THE RULE IS DERIVED RATHER THAN A LIST
+  OF SIX KEYS.** Its step titles carry an article — *"The frame"* over a group
+  called *"Frame"*, *"The pull handle"* over *"Pull handle"* — so the same
+  catalogue produces a different set of duplicates in each language, and one
+  copy edit moves it. `buildPanel` compares the two strings a customer actually
+  reads (`T(g.title) !== T(sec.title)`) and runs again on every language
+  switch, so a step that stops repeating itself in English keeps its heading
+  and one that starts repeating itself loses it, with nobody coming back.
+  ⚠ **THE `<h3>` IS A SURVIVOR OF THE CABINET.** Four sections each held
+  several groups, so the group's name was the only name a group had. In a FLOW
+  the step IS the question, and the heading became a second printing of it.
+  ⚠ **AND THE CONVENTION IT NOW FOLLOWS WAS ALREADY IN THE FILE, ONE LEVEL
+  DOWN.** `buildOptions` says of its own sub-headings: *"options with no `sub`
+  come first and carry no heading."* A step's FIRST group belongs to the step;
+  the ones after it are the ones that need naming — which is why `פעמון` and
+  `עינית` keep theirs on the same step that drops `פרזול`.
+  ⚠ **THE GROUP IS STILL NAMED FOR SOMEBODY WHO CANNOT SEE IT.** The
+  radiogroup's `aria-label` is untouched, so the question is announced once
+  instead of three times rather than not at all. The audit asserts that pair
+  together — no heading may repeat its step, AND every radiogroup must keep a
+  non-empty accessible name — because the cheap way to pass the first half is
+  to stop naming the group, which would leave a blind customer inside seventeen
+  colours with nothing saying what they are choosing. §5.22's rule: write the
+  assertion that must stay true beside the one that must become true.
+
+  **What it buys, measured at 320×568 in Hebrew, walking forward with the
+  button:** 18 px on every one of those steps — the heading's own box, its
+  margins and the gap under it — on the axis §9 spends three sections fighting
+  over. The first colour swatch goes **466–510 against a fold of 501** —
+  §0b's own 12.9 entry records it as *"cut by NINE pixels"* — to **448–492,
+  wholly on screen**. `glass` 416→399, `face` 438→420, `grip`/`pz`/`mk`
+  438→420. Nothing else moves: `fit` (מידה · כיוון פתיחה) and `lock`
+  (מנעול וידית · מנעול מיוחד) name groups that are not the step, and keep both.
+  **Falsified** by restoring the heading unconditionally: **15 faults** —
+  he 6, en 3, ru 6, exactly the table above, each naming the word printed
+  twice.
+  No price, no id, no list order, no bit, no `VERSION`; one ternary in
+  `buildPanel`. The 52 bare sheets came back **byte-identical** (`?bare=1`
+  keeps only `.stage-wrap` and this is inside `#choices`); 6 of the 12 `shot`
+  sheets moved and **that is the instrument, not the change** — every one of
+  their twelve queries carries a full door, so `carries` lands them all on the
+  SUMMARY, which has no `.field` on it at all, and §7 records the `shot` family
+  differing on seven of twelve between two runs of identical code.
+
 - **⚠ A CUSTOMER WITH NO MOUSE COULD NOT SEE THE OPTION THEY HAD JUST
   FOCUSED, ON 7 OF 8 STEPS AT EVERY WIDTH — 12.9.2026.** Found by walking as
   **the customer with no mouse at all**, which `AGENT.md`'s rotation names and

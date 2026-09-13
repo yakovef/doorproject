@@ -3570,6 +3570,93 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── A STEP DOES NOT SAY ITS OWN NAME TWICE ──────────────────────────────
+   Measured 13.9 by walking as somebody being read the page rather than
+   looking at it. Six of the eight steps in Hebrew — and the same six in
+   Russian — printed the step's own title again, 18 px below it, as the
+   group's `<h3>`: `פרזול` in the heading and `פרזול` in tracked small caps
+   under the rule. Three times for a screen reader, which hears the `<h2>`,
+   then the `<h3>`, then the radiogroup whose `aria-label` is the same string.
+
+   ⚠ ENGLISH ONLY DID IT ON THREE, which is what makes a hand-kept list of
+   keys wrong here: its step titles carry an article ("The frame" over a group
+   called "Frame"), so the same catalogue produces a different set of
+   duplicates per language, and one copy edit moves it. `buildPanel` compares
+   the two strings a customer actually reads and re-runs on every language
+   switch; this asserts the result rather than the rule.
+
+   ⚠ AND THE CLAUSE THAT MUST STAY TRUE IS BESIDE THE ONE THAT MUST BECOME
+   TRUE (§5.22): every radiogroup keeps a non-empty accessible name. The
+   cheap way to pass the first half is to stop naming the group at all, which
+   would leave a blind customer inside seventeen colours with no idea what
+   they are choosing — strictly worse than the repetition this removes. */
+{
+  console.log('\na step does not say its own name twice');
+  const before = faults;
+  let steps = 0, headings = 0;
+  for (const lang of ['he', 'en', 'ru']) {
+    const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+    try {
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
+      await p.waitForTimeout(700);
+      for (let s = 0; s < 9; s++) {
+        const m = await p.evaluate(() => {
+          const live = document.querySelector('.sect.is-live');
+          if (!live) return null;
+          const title = (live.querySelector('.sect__title')?.textContent || '').trim();
+          /* DRAWN, not `display` — §0b 11.9: `checkVisibility` calls a clipped
+             element visible, so a heading hidden by `sr-only` would pass a
+             display test while still being announced. */
+          const heads = [...live.querySelectorAll('.field__title')]
+            .filter(h => h.getBoundingClientRect().width > 0)
+            .map(h => h.textContent.trim());
+          const groups = [...live.querySelectorAll('[role="radiogroup"]')]
+            .map(g => (g.getAttribute('aria-label') || '').trim());
+          return { step: live.dataset.section, title, heads, groups };
+        });
+        if (!m) { fault('twice', `${lang}: no live step after ${s} steps`); break; }
+        if (m.step === 'sum') break;
+        steps++;
+        headings += m.heads.length;
+        for (const h of m.heads) {
+          if (h && h === m.title) {
+            fault('twice', `${lang} step "${m.step}": the group heading repeats the step's own `
+              + `title — "${h}" is printed twice, ${m.heads.length} heading(s) on this step`);
+          }
+        }
+        if (!m.groups.length) {
+          fault('twice', `${lang} step "${m.step}": no radiogroup found — this check has lost its subject`);
+        }
+        for (const g of m.groups) {
+          if (!g) {
+            fault('twice', `${lang} step "${m.step}": a radiogroup has no accessible name. Dropping the `
+              + 'visible heading is only correct while the group is still named for somebody who '
+              + 'cannot see it');
+          }
+        }
+        const moved = await p.evaluate(() => {
+          const b2 = [...document.querySelectorAll('.sect__next')].filter(x => x.offsetParent !== null && !x.disabled);
+          if (!b2.length) return false; b2[0].click(); return true;
+        });
+        if (!moved) { fault('twice', `${lang} step "${m.step}": no way on`); break; }
+        await p.waitForTimeout(380);
+      }
+    } catch (e) {
+      fault('twice', `${lang}: ${String(e).slice(0, 90)}`);
+    }
+    await p.close().catch(() => {});
+  }
+  if (steps < 24) fault('twice', `only ${steps} steps of 24 were walked — the sweep is not walking the guide`);
+  /* §5.15: the day nothing renders a `.field__title` this passes for the wrong
+     reason, and the steps that legitimately keep one are what say otherwise. */
+  if (headings < 8) fault('twice', `only ${headings} group headings were found across three languages — `
+    + 'the selector has stopped matching and this check is measuring nothing');
+  if (faults === before) {
+    console.log(`    ${steps} steps in three languages: ${headings} group headings, not one of them a `
+      + 'second printing of the step it is on, and every group still named');
+  }
+}
+
 await b.close();
 
 if (skipped.length) {
