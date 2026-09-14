@@ -4184,6 +4184,158 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── THE WALL CHROME'S OWN INK STAYS OFF THE DOOR ────────────────────────
+   Measured 14.9 by walking as the customer who changes the language halfway
+   through — which is clean, and which put the wall's two controls in front of
+   a lens that had never measured them against the DRAWING.
+
+   §0b's 28.8 entry is the reason this needs saying carefully. The language
+   pill was reported from outside as sitting on the door at 320 px, measured at
+   **253 px² and 154 px²**, and fixed by taking its GROUND away below 1100 —
+   under an explicit finding that the BOX may overlap and the words may not:
+   *"It is the pill's BOX and not its contents — the slot runs to y=116 and the
+   frame's head starts at y=105, while the words and glyphs inside stop at
+   y≈92."* That was true, and it was measured on ONE door.
+
+   There are six. Measured on the ink itself (Range rects for the labels, the
+   `<svg>` for the undo circles, disabled controls skipped because a disabled
+   control is exempt from contrast and is not a control yet), Hebrew, px² of
+   GLYPH on `#frame`:
+
+     size          320    360    390    430   1100   1152+
+     standard        ·      ·      ·      ·      ·      ·
+     extra1          ·      7      ·      ·      ·      ·
+     half           55      ·      ·      ·      ·      ·
+     extra2         58    200     65      ·      ·      ·
+     halfextra1    198    235    127     34      ·      ·
+     halfextra2    323    600    498    361    446      ·
+
+   So the words are on the leaf on FIVE of the six sizes, and on the widest
+   דו כנפי they are on it at every phone width and at 1100 — where the wall is
+   73 px and the control is 100–110, which is arithmetic and not tuning.
+   Photographed: at 360×740 `Русский` is charcoal-on-charcoal, and the sample
+   under it reads 1.1:1 against its own ink.
+
+   ⚠ SO THIS CHECK GATES THE DOOR THAT IS CLEAR AND ASSERTS THE EXEMPTION FOR
+   THE ONES THAT ARE NOT. `standard` — the ₪3,195 leaf, the commonest thing
+   Peretz sells — is clean at every width in both languages, and that is the
+   half a widened control or a fourth wall fitting would break first; so is
+   every size at 1152 px and up. The five that overlap are NAMED, and the check
+   fails if they stop overlapping, so the exemption comes out the day the wall
+   is fixed rather than outliving the fault. §9 carries what a fix would cost.
+   Russian is carried because its labels are the longest. */
+{
+  console.log('\nthe wall chrome keeps its ink off the door');
+  const before = faults;
+  /* Its own widths: `VIEWS` has no 360 and no 430, and the worst reading is at
+     360 — the third time this file has had to go and find the third case. */
+  const NARROW = [[320, 568], [360, 740], [390, 844], [430, 932], [1100, 800]];
+  const WIDE = [[1152, 800], [1280, 720], [1440, 900], [1920, 918]];
+  /* Derived from `SIZES`, never listed: a withdrawal must not leave this
+     sweep quietly measuring a door that no longer exists (§5.18). */
+  const ALL = Object.keys(SIZES);
+  const CLEAR = 'standard';
+  const KNOWN = ALL.filter(s => s !== CLEAR);   // the exemption, asserted below
+  let measured = 0;
+  const seen = {};
+
+  const inkOnDoor = async (lang, size, w, h) => {
+    const p = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}&n=ron`,
+        { waitUntil: 'load' });
+      await p.waitForTimeout(700);
+      /* One real change, so the undo circles are live ink. A disabled control
+         is `--ink-3` on purpose and is not what this measures. */
+      await p.evaluate(() => {
+        const g = document.querySelector('.sect.is-live [role="radiogroup"]');
+        const r = g && [...g.querySelectorAll('[role="radio"]')].filter(e => !e.hidden);
+        if (r && r.length > 1) r[1].click();
+      });
+      await p.waitForTimeout(350);
+      return await p.evaluate(() => {
+        const f = document.querySelector('.door-svg #frame');
+        if (!f) return { noFrame: true };
+        const fr = f.getBoundingClientRect();
+        const ink = [];
+        for (const e of document.querySelectorAll('.stage__hud .lang, .stage__hud .iconbtn')) {
+          if (e.disabled || e.getAttribute('aria-disabled') === 'true') continue;
+          if (e.classList.contains('lang')) {
+            const rg = document.createRange();
+            rg.selectNodeContents(e);
+            for (const r of rg.getClientRects()) ink.push({ t: e.textContent.trim(), r });
+          } else {
+            const g = e.querySelector('svg');
+            if (g) ink.push({ t: e.id || 'icon', r: g.getBoundingClientRect() });
+          }
+        }
+        let worst = 0, who = '';
+        for (const { t, r } of ink) {
+          const ow = Math.min(r.right, fr.right) - Math.max(r.x, fr.x);
+          const oh = Math.min(r.bottom, fr.bottom) - Math.max(r.y, fr.y);
+          const o = ow > 0 && oh > 0 ? Math.round(ow * oh) : 0;
+          if (o > worst) { worst = o; who = t; }
+        }
+        return { worst, who, pieces: ink.length };
+      });
+    } finally { await p.close().catch(() => {}); }
+  };
+
+  for (const lang of ['he', 'ru']) {
+    /* the gate: the standard door, every width */
+    for (const [w, h] of [...NARROW, ...WIDE]) {
+      const m = await inkOnDoor(lang, CLEAR, w, h);
+      if (m.noFrame) { fault('wall-ink', `${lang} ${w}x${h}: no #frame — nothing to measure against`); continue; }
+      /* §5.15: with no live control in the wall every clause here passes by
+         having no subject. Two languages leave two buttons plus two circles. */
+      if (m.pieces < 2) {
+        fault('wall-ink', `${lang} ${w}x${h}: only ${m.pieces} live wall controls found — `
+          + 'this sweep has no subject');
+      }
+      measured++;
+      if (m.worst > 0) {
+        fault('wall-ink', `${lang} ${w}x${h}: the wall chrome paints ${m.worst} px² of "${m.who}" `
+          + `on the STANDARD door. That is the ₪3,195 leaf and it is the one size with wall to `
+          + `spare — §0b 28.8 measured the words stopping clear of the casing and this is that `
+          + 'measurement going the other way');
+      }
+    }
+    /* the gate: no size at all, once the screen is wide */
+    for (const size of ALL) for (const [w, h] of WIDE) {
+      const m = await inkOnDoor(lang, size, w, h);
+      measured++;
+      if (m.worst > 0) {
+        fault('wall-ink', `${lang} ${w}x${h}: the wall chrome paints ${m.worst} px² of "${m.who}" `
+          + `on a ${size} door. Above 1152 the wall is wide enough for every door in the range`);
+      }
+    }
+    /* the exemption, asserted to still be needed */
+    for (const size of KNOWN) {
+      let worst = 0;
+      for (const [w, h] of NARROW) {
+        const m = await inkOnDoor(lang, size, w, h);
+        measured++;
+        worst = Math.max(worst, m.worst);
+      }
+      (seen[size] ||= {})[lang] = worst;
+    }
+  }
+  for (const size of KNOWN) {
+    const he = seen[size]?.he ?? 0, ru = seen[size]?.ru ?? 0;
+    if (he === 0 && ru === 0) {
+      fault('wall-ink', `${size} is named as a door whose wall chrome lands on it below 1152 and `
+        + 'it no longer does. If the wall has been fixed, take it off the exemption list and out '
+        + 'of CLAUDE.md §9 — an exemption nobody removes is how a fault becomes a feature');
+    }
+  }
+  if (faults === before) {
+    console.log(`    ${measured} readings in two languages: the standard door's wall chrome never `
+      + 'touches it, no size is touched at 1152 px and up, and the five doors §9 names are still '
+      + `the five that overlap (worst px² of glyph, he/ru: `
+      + KNOWN.map(s => `${s} ${seen[s].he}/${seen[s].ru}`).join(', ') + ')');
+  }
+}
+
 await b.close();
 
 if (skipped.length) {

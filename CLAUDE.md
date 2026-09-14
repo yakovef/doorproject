@@ -1373,7 +1373,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | tool | what it answers |
 |---|---|
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
-| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed. Plus **the price breakdown can be read to its last line** (13.9) — its own eight shapes again, including a 1280×600 windowed browser that is in no list here, on two doors that are asserted to survive `repair` first: the column must never leave the screen, its TOTAL must be readable without scrolling, and — the clause that must stay true beside it — every component row must still be reachable when it is scrolled, so the cheap way to pass the first half (shrink the column until only the total shows) fails the second. Plus **an undo says what came back** (13.9) — its own four shapes in Hebrew AND Russian, walked FORWARD with the button because a rail click builds a different history: whenever an undo moves the price it must name a spec row, and — the clause that must stay true — its toast must cover no option tile, no price and no send, because the cheap way to pass the first half is a longer toast and a longer toast is what the 10.9 entry measured. Russian is carried because it is the longest copy and the box grows with it, 99 characters against Hebrew's 71. Plus **the saved-designs drawer fits the card it hangs in** (13.9) — its own five shapes in Hebrew and Russian, and the first check here that ever puts a design IN that drawer: opening it must not make the document scroll sideways and must not move the summary card or its `#spec` by a pixel, and — the clause that must stay true — every row must still name its PRICE and every delete button must be whole on screen and return itself from `elementFromPoint`, because the cheap way to fit a drawer is to shrink its rows until they say nothing, which is what the fix itself does (three doors of one colour read as ONE distinct row before the price went on). Plus a sixth page that saves a design the catalogue no longer builds and requires the drawer to SAY so on opening it, the promise `saveCurrent`'s own docstring makes and the handler was dropping |
+| `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed. Plus **the price breakdown can be read to its last line** (13.9) — its own eight shapes again, including a 1280×600 windowed browser that is in no list here, on two doors that are asserted to survive `repair` first: the column must never leave the screen, its TOTAL must be readable without scrolling, and — the clause that must stay true beside it — every component row must still be reachable when it is scrolled, so the cheap way to pass the first half (shrink the column until only the total shows) fails the second. Plus **an undo says what came back** (13.9) — its own four shapes in Hebrew AND Russian, walked FORWARD with the button because a rail click builds a different history: whenever an undo moves the price it must name a spec row, and — the clause that must stay true — its toast must cover no option tile, no price and no send, because the cheap way to pass the first half is a longer toast and a longer toast is what the 10.9 entry measured. Russian is carried because it is the longest copy and the box grows with it, 99 characters against Hebrew's 71. Plus **the saved-designs drawer fits the card it hangs in** (13.9) — its own five shapes in Hebrew and Russian, and the first check here that ever puts a design IN that drawer: opening it must not make the document scroll sideways and must not move the summary card or its `#spec` by a pixel, and — the clause that must stay true — every row must still name its PRICE and every delete button must be whole on screen and return itself from `elementFromPoint`, because the cheap way to fit a drawer is to shrink its rows until they say nothing, which is what the fix itself does (three doors of one colour read as ONE distinct row before the price went on). Plus a sixth page that saves a design the catalogue no longer builds and requires the drawer to SAY so on opening it, the promise `saveCurrent`'s own docstring makes and the handler was dropping. Plus **the wall chrome keeps its ink off the door** (14.9) — its own five phone widths (320, 360, 390, 430, 1100; 360 is where the worst reading is and `VIEWS` has neither it nor 430) plus the four wide ones, every size read off `SIZES` rather than listed, in Hebrew and Russian, measuring the GLYPHS (Range rects for the labels, the `<svg>` for the undo circles, disabled controls skipped) and not the padded button — because §0b's 28.8 fix deliberately allowed the BOX to overlap and measured the words stopping clear, on the one door in six where they do. It gates the two halves that are sound (the standard ₪3,195 leaf at every width, and every door at 1152 px and up) and NAMES the five that overlap as an exemption it fails if they stop needing, so §9's entry cannot outlive the fault |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
@@ -1592,6 +1592,59 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
 ---
 
 ## 9. What is still open
+
+### ⚠ AND ON A PHONE IT CANNOT HOLD THEM BESIDE THE FIVE BIGGEST DOORS
+
+Found 14.9.2026, and it is the section below with the other axis varied: that
+one is one viewport band and every door, this one is one door band and every
+phone. The wall's two controls — the language picker and the undo/redo circles
+— are pinned to the stage's inline edges and read nothing about how much wall
+there is, unlike `.grip-bar`, which is laid out from the measured `--wall` and
+is asserted clear of `#frame` at every size.
+
+⚠ **§0b's 28.8 entry is why this has to be stated as INK.** The language pill
+was reported from outside as sitting on the door at 320 px, measured at
+**253 px² and 154 px²**, and fixed by taking its ground away — under an
+explicit finding that the BOX may overlap and the words may not: *"the slot
+runs to y=116 and the frame's head starts at y=105, while the words and glyphs
+inside stop at y≈92."* True, and **measured on one door.** There are six.
+Measured on the glyphs themselves (Range rects for the labels, the `<svg>` for
+the circles, disabled controls skipped), px² of ink on `#frame`, Hebrew:
+
+| size | 320×568 | 360×740 | 390×844 | 430×932 | 1100×800 | 1152+ |
+|---|---|---|---|---|---|---|
+| **standard** | · | · | · | · | · | · |
+| extra1 | · | 7 | · | · | · | · |
+| half | 55 | · | · | · | · | · |
+| extra2 | 58 | 200 | 65 | · | · | · |
+| halfextra1 | 198 | 235 | 127 | 34 | · | · |
+| **halfextra2** | 323 | **600** | 498 | 361 | 446 | · |
+
+⚠ **THE STANDARD DOOR IS CLEAR AT EVERY WIDTH, WHICH IS EXACTLY WHY NOBODY HAS
+SEEN IT.** Every check in this repository that loads a door loads that one, and
+28.8's own measurement was taken on it. The five that are not clear are the
+five nobody tests on.
+⚠ **What it looks like rather than what it measures:** photographed at 360×740
+on the widest דו כנפי, `Русский` is charcoal ink on a charcoal leaf — the
+sample under it reads **1.1:1**. The control a customer who cannot read the
+page needs to find is the one that disappears, which is the sentence
+`css/app.css` already spends a comment on about `--ink-3`.
+
+⚠ **IT IS ARITHMETIC, NOT TUNING.** At 360×740 the widest double leaves **73 px
+of wall** and the picker is **100–110 px** with its labels at their own script's
+full spelling. Two controls of that width cannot stand in that wall at any
+padding. And every way out moves chrome **the owner positioned himself with
+circles on a screenshot** (§0a): give the slots the grip bar's `--wall` clamp
+and they clip or scroll, which is the fault reported from a 412 px Android and
+recorded beside `.lang`; shrink the labels to initials, which the same comment
+refuses in as many words; give them back a ground, which is the 28.8 decision
+reversed. **Recorded rather than guessed at**, like the price chip over
+`#grip-rot` below.
+
+`npm run audit` gates the two halves that are sound — the standard door at every
+width, and every door at 1152 px and up — and NAMES the five as an exemption it
+asserts is **still needed**, so it comes out the day the wall is fixed rather
+than outliving the fault.
 
 ### ⚠ THE WALL CANNOT HOLD BOTH ITS CONTROLS AT 1100–1152 px
 
@@ -2200,6 +2253,60 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE WALL'S OWN WORDS ARE PAINTED ON THE DOOR ON FIVE OF THE SIX SIZES,
+  AND THE MEASUREMENT THAT SAID THEY WERE NOT WAS TAKEN ON THE SIXTH —
+  14.9.2026.** Found by walking as **the customer who changes the language
+  halfway through**. That walk came back clean — the step, the price, the code,
+  all thirteen choices, the scroll and the focus survive a mid-flow switch, no
+  page error, no Hebrew left — and it is recorded as clean. What it did was put
+  the wall's two controls in front of a lens that had never measured them
+  against the DRAWING.
+
+  §0b's 28.8 entry fixed this control for exactly this fault at **253 px² and
+  154 px²**, by taking its ground away, and under an explicit finding that the
+  BOX may overlap and the words may not: *"the slot runs to y=116 and the
+  frame's head starts at y=105, while the words and glyphs inside stop at
+  y≈92."* Every word of that is true **of one door.** Measured on the glyphs
+  themselves across all six, px² of ink on `#frame`, Hebrew: `standard` clear
+  everywhere, and then 7 · 55 · 200 · 235 · **600** as the door grows, with the
+  widest דו כנפי on the leaf at **every phone width and at 1100** (323 / 600 /
+  498 / 361 / 446). §9 carries the table.
+
+  ⚠ **THE STANDARD DOOR BEING THE CLEAN ONE IS THE WHOLE REASON IT SURVIVED.**
+  Every check here that loads a door loads that one. `.grip-bar` has had a
+  "does it sit on the door" sweep over **every size** since it moved into the
+  wall; `.stage__hud` got an overlap check against its own siblings and against
+  the price card, and never one against the door.
+  ⚠ **And the picture says it better than the pixels:** at 360×740 `Русский` is
+  charcoal on a charcoal leaf, **1.1:1** against the sample under it — the
+  control a customer who cannot read the page needs to find, invisible.
+
+  **Not fixed, and that is the finding's own answer.** 73 px of wall against a
+  100–110 px control is arithmetic; every way out moves chrome the owner placed
+  by hand, reverses 28.8, or re-opens a fault reported from a 412 px Android.
+  §9 has the three ways and their receipts. What shipped is the ASSERTION that
+  was missing: the standard door gated clear at every width, every door gated
+  clear at 1152 px and up, and the five that overlap NAMED as an exemption the
+  check **fails if they stop needing** — so it comes out when the wall is fixed
+  instead of outliving it.
+
+  ⚠ **AND THE RULE THAT KEEPS IT FROM BEING WORSE WAS DEFENDED BY A DEAD
+  MEASUREMENT.** `.lang.is-on { display: none }` below 1100 — the current
+  language's own button is dropped — was justified in a comment by *"the header
+  came to 359 and the whole page scrolled sideways by 39 px… everything else in
+  the header is load-bearing: the brand, the telephone, the saved count."*
+  **There is no header**; it was deleted on 27.8 and these buttons stand in the
+  wall. Re-measured with the button restored: sideways scroll is **0 px** at
+  320, 360, 375, 390, 430, 834 and 844 in all three languages — the cited fault
+  is gone. The rule is still right for a reason nobody had written down: the
+  three-button picker is 154 px and lands **2,697–4,032 px²** on the door. So
+  the comment now carries today's numbers, and the check above is what watches
+  it — the sideways-scroll sweep the old note cited cannot see this at all.
+  §5.23's shape, on a rule rather than on an absence: a live guard standing on
+  a measurement of an object that had been deleted.
+  No price, no id, no list order, no bit, no `VERSION`; one check and two
+  comments. Nothing in `js/` or the drawing was touched.
 
 - **⚠ OPENING "העיצוב שלי" DRAGGED THE WHOLE PAGE 785 px SIDEWAYS, AND ON A
   DESKTOP IT PULLED THE SPEC TABLE OUT OF THE CARD AND ACROSS THE DOOR —

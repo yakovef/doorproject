@@ -439,22 +439,33 @@ svg { direction: ltr; }
 .lang:hover { color: var(--ink); }
 .lang.is-on { color: var(--ink); font-weight: 600; border-block-end-color: var(--ink); }
 /* ⚠ ON THE SMALLEST PHONE THE CURRENT LANGUAGE'S OWN BUTTON GOES, and that
-   is the one thing on this control that can be spared. Three buttons are
-   150 px; measured at 320x640 the header came to 359 and the whole page
-   scrolled sideways by 39 px on every one of 81 designs — the same failure
-   the navigator circles produced at 390 px, from the same cause, one screen
-   further down.
+   is the one thing on this control that can be spared. The button you are
+   least likely to press is the one for the language you are already reading —
+   the page in front of you is the label. What stays is the way OUT, which is
+   what this control is for, and both remaining buttons keep their full name in
+   their own script rather than shrinking to initials nobody who is lost can
+   decode. All of them stay 44 px tall and tappable.
 
-   Everything else in the header is load-bearing at that width: the brand, the
-   telephone, the saved count. The button you are least likely to press is the
-   one for the language you are already reading — the page in front of you is
-   the label. What stays is the way OUT, which is what this control is for,
-   and both remaining buttons keep their full name in their own script rather
-   than shrinking to initials nobody who is lost can decode.
+   ⚠ AND THE REASON WRITTEN HERE HAD OUTLIVED THE THING IT MEASURED — corrected
+   14.9.2026, and the rule survives on a NEW measurement rather than on the old
+   one. It used to read: *"three buttons are 150 px; measured at 320x640 the
+   header came to 359 and the whole page scrolled sideways by 39 px on every
+   one of 81 designs… everything else in the header is load-bearing at that
+   width: the brand, the telephone, the saved count."* There is no header. It
+   was deleted on 27.8.2026 and these buttons now stand in the WALL beside the
+   door (`.stage__hud`); the brand is desktop-only and `aria-hidden`, the
+   telephone is in the trust band at the foot, and the saved count is in the
+   send card. Re-measured with the button restored: the page scrolls sideways
+   by **0 px** at 320, 360, 375, 390, 430, 834 and 844 in all three languages.
+   The stated fault is gone.
 
-   Two buttons come to ~100 px, so the header fits with room. All of them stay
-   44 px tall and tappable. `npm run audit` measures sideways scroll at 320 px
-   on every design, which is what caught this. */
+   What it costs today is the WALL. Restored, the picker is 154 px against
+   100–110, and it lands on the door: **2,697 px² at 375×667 up to 4,032 at
+   360×740**, in every language, on the widest דו כנפי — against the 253 px²
+   that got this control's own ground taken away on 28.8 (§0b). So the rule
+   stands, its reason is the wall rather than a row that no longer exists, and
+   `npm run audit`'s wall-ink sweep is what watches it now — the sideways-scroll
+   check the old note cited cannot see this at all. */
 /* ⚠ THE BREAKPOINT IS THE NAV'S, NOT AN ARBITRARY 400. It was `max-width:
    400px`, which is one phone wide: reported from a 412 px Android as *"on the
    top you can see that i need to scroll to view the full name of the

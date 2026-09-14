@@ -45,6 +45,113 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-14 01:30 UTC — run 121: the wall's own words are painted on the door on five of the six sizes, and the measurement that said they were not was taken on the sixth
+
+**proposed · taken · refused:** proposed 3 (assert the wall chrome's ink stays
+off the door · correct the `.lang` rule's dead justification · move or clamp
+the wall controls so the overlap goes) · taken 2 · refused 1 (the placement —
+see below; it is §9's shape and the numbers say so).
+
+**Looked at:** the page as **THE CUSTOMER WHO CHANGES THE LANGUAGE HALFWAY
+THROUGH** — a Russian speaker who lands on the Hebrew default, walks five
+steps, then spots `Русский`. Nothing had ever pressed those buttons mid-flow.
+Walked forward with the button choosing on every step at 320×568, 390×844 and
+1440×900, switched on step 6, then swept the wall controls against the drawing
+across all six sizes × ten viewports × three languages. Recent lenses: 116 the
+zoomed page, 117 the customer being read the page, 118 the price shopper, 119
+the customer who changes their mind, 120 the customer comparing two doors.
+
+**Instruments:** test ✓ · audit ✓ no faults · profile ✓ all four rows ·
+collide ✓ `all` and `boxes` · recreate ✓ · sheets ✓ regenerated.
+
+**The lens itself came back clean, and that is recorded rather than dropped.**
+A mid-flow language switch keeps the live step, the price, the code, all
+thirteen choices, the scroll position and the focused element; zero Hebrew
+characters left in the panel; `dir` and `lang` flip; no page error. At three
+widths. `buildPanel`'s rescue works.
+
+**What the lens found instead.** It put the wall's two controls — the language
+picker and the undo/redo circles — in front of a measurement nobody had taken:
+their position against the DOOR. §0b's 28.8 entry fixed this very control for
+this very fault (reported from outside at **253 px² and 154 px²**, ground
+removed) under an explicit finding that the BOX may overlap and the words may
+not — *"the words and glyphs inside stop at y≈92"*. True, and **measured on one
+door.** There are six. px² of GLYPH on `#frame`, Hebrew:
+
+| size | 320 | 360 | 390 | 430 | 1100 | 1152+ |
+|---|---|---|---|---|---|---|
+| **standard** | · | · | · | · | · | · |
+| extra1 | · | 7 | · | · | · | · |
+| half | 55 | · | · | · | · | · |
+| extra2 | 58 | 200 | 65 | · | · | · |
+| halfextra1 | 198 | 235 | 127 | 34 | · | · |
+| **halfextra2** | 323 | **600** | 498 | 361 | 446 | · |
+
+⚠ **The standard door being the clean one is the whole reason it survived** —
+every check here that loads a door loads that one, and 28.8's measurement was
+taken on it. `.grip-bar` has had a "does it sit on the door" sweep over every
+SIZE since it moved into the wall; `.stage__hud` was checked against its own
+siblings and the price card and never against the door.
+⚠ **The picture says it better than the pixels:** at 360×740 on the widest
+דו כנפי, `Русский` is charcoal ink on a charcoal leaf — **1.1:1** against the
+sample under it.
+
+**Got wrong, twice, and both were caught by measuring again.** I first read the
+grip hint as sitting on the door off a screenshot; measured, it is 0 px² at
+every size, width and language — 8 px of clearance that the casing's shadow
+fills. And my first contrast sweep reported the undo circles at 1.93:1 on doors
+with no overlap at all: they are **disabled** on a bare load and `--ink-3` on
+purpose. Both readings were binned, not published. §7's rule — suspect the
+instrument, and here also the eye.
+
+**Changed** (`tools/audit.mjs`, `css/app.css`, `CLAUDE.md`): a check that gates
+the two halves that are sound — the standard ₪3,195 leaf at every width, and
+every door at 1152 px and up — and NAMES the five that overlap as an exemption
+it **fails if they stop needing**. Its own five phone widths (360 and 430 are
+in no list here, and 360 is where the worst reading is). It measures the GLYPHS
+via Range rects, not the padded button, because the padded button is what 28.8
+deliberately allowed.
+
+⚠ **And the rule that keeps it from being worse was defended by a dead
+measurement.** `.lang.is-on { display: none }` below 1100 was justified by
+*"the header came to 359 and the whole page scrolled sideways by 39 px…
+everything else in the header is load-bearing: the brand, the telephone, the
+saved count."* There is no header — deleted 27.8. Re-measured with the button
+restored: sideways scroll **0 px** at seven widths in three languages. The rule
+is still right for a reason nobody had written down (the picker goes 100→154 px
+and lands 2,697–4,032 px² on the door), and the comment now carries that.
+
+**Falsified both clauses.** Deleting `.lang.is-on { display: none }` — the tidy
+somebody would make from the stale comment — puts **240 px² of `Русский` on the
+STANDARD door** at 320×568 and fires the gate in both languages. Lifting the
+hud off the door fires the exemption clause on four of the five named sizes.
+
+**Left alone deliberately — the placement.** 73 px of wall against a 100–110 px
+control at 360×740 is arithmetic. Clamping the slots to `--wall` clips or
+scrolls the picker, which is the fault reported from a 412 px Android and
+recorded beside `.lang`; initials are refused in that same comment; a ground
+reverses 28.8. All three move chrome the owner placed himself with circles on a
+screenshot. §9's documented answer for exactly this shape is record and assert,
+which is what shipped.
+
+**Best idea not taken:** **the wall controls could read `--wall` the way
+`.grip-bar` already does.** That is the one mechanism in this codebase that has
+solved this problem before — the grip bar is laid out from the measured wall
+and is asserted clear of `#frame` at every size, which is why my first suspicion
+about it measured 0. What it needs first is the measurement nobody has taken:
+what these two controls may become when the wall is 73 px — a smaller type
+size, a single stacked column, or the row moving above the door's head — and
+that is a design question with the owner's circles on it, not a clamp.
+
+**Fleet:** not spent. One lens finds a box painted over a picture, and the
+verification that mattered was falsifying each clause separately and re-taking
+my own two wrong readings — neither of which a second opinion would have
+improved.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-13 21:15 UTC — run 120: opening "העיצוב שלי" dragged the whole page 785 px sideways, and on a desktop pulled the spec table across the door
 
 **proposed · taken · refused:** proposed 4 (`min-inline-size` on the three
