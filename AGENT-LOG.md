@@ -188,7 +188,7 @@ question about a picture, not about 139 px of wall.
 **Fleet:** one adversarial lens, and it earned its firing — it produced the
 popover regression and the un-failable clause, neither of which this run had.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `bb66fa5`
 
 ---
 
