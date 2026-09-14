@@ -170,7 +170,7 @@ the cheap way: every question it asked was a measurement with one right answer
 judgement a second lens sharpens. The run's only change is a paragraph of
 prose.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `fef2d59`
 
 ---
 
