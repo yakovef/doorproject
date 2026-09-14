@@ -9691,7 +9691,9 @@ ${body}
     const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
     const box = stage.getBoundingClientRect();
     const quoteEl = document.querySelector(".quote");
-    const quoteH = quoteEl ? quoteEl.getBoundingClientRect().height : 0;
+    const quoteR = quoteEl ? quoteEl.getBoundingClientRect() : null;
+    const quoteH = quoteR ? quoteR.height : 0;
+    const quoteW = quoteR ? quoteR.width : 0;
     if (!(w > 0 && h > 0 && Number.isFinite(fx) && Number.isFinite(fy) && box.width > 0 && box.height > 0)) return;
     const scale = Math.min(box.width / w, box.height / h);
     const vw = box.width / scale, vh = box.height / scale;
@@ -9700,6 +9702,8 @@ ${body}
       `${(fx + (w - vw) / 2).toFixed(1)} ${(fy + (h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
     );
     sizeHitPad();
+    const frame = svg.querySelector("#frame");
+    const frameR = frame ? frame.getBoundingClientRect() : null;
     const baseY = Number(svg.dataset.baseY);
     if (Number.isFinite(baseY)) {
       document.documentElement.style.setProperty(
@@ -9721,13 +9725,17 @@ ${body}
       ss.setProperty("--photo-y", `${p.top.toFixed(1)}px`);
       const wrapR = $(".stage-wrap").getBoundingClientRect();
       const lampB = Math.min(Math.max(p.lampBot, quoteH + 8), box.height - 8);
+      const half = quoteW / 2;
+      const edge = Math.min(wrapR.right, window.innerWidth) - box.x;
+      const pull = Math.min(p.lampX, edge - half - 8);
+      const stop = frameR ? frameR.right - box.x + half : -Infinity;
+      const lampX = Math.max(pull, Math.min(p.lampX, stop));
       const st = $(".stage-wrap").style;
-      st.setProperty("--lamp-cx", `${Math.round(box.x - wrapR.x + p.lampX)}px`);
+      st.setProperty("--lamp-cx", `${Math.round(box.x - wrapR.x + lampX)}px`);
       st.setProperty("--lamp-b", `${Math.round(box.y - wrapR.y + lampB)}px`);
     }
-    const frame = svg.querySelector("#frame");
-    if (frame) {
-      const f = frame.getBoundingClientRect();
+    if (frameR) {
+      const f = frameR;
       const wrap = $(".stage-wrap").getBoundingClientRect();
       const wall = Math.max(
         0,

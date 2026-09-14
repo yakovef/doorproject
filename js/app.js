@@ -3285,10 +3285,12 @@ function fitStage() {
   const fx = Number(svg.dataset.fitX), fy = Number(svg.dataset.fitY);
   const w = Number(svg.dataset.fitW), h = Number(svg.dataset.fitH);
   const box = stage.getBoundingClientRect();
-  /* Read once, used twice: by the lamp clamp below and by `--quote-h` at the
-     end. See the note at the clamp. */
+  /* Read once, used three times: by the two lamp clamps below and by
+     `--quote-h` at the end. See the note at the clamp. */
   const quoteEl = document.querySelector('.quote');
-  const quoteH = quoteEl ? quoteEl.getBoundingClientRect().height : 0;
+  const quoteR = quoteEl ? quoteEl.getBoundingClientRect() : null;
+  const quoteH = quoteR ? quoteR.height : 0;
+  const quoteW = quoteR ? quoteR.width : 0;
   if (!(w > 0 && h > 0 && Number.isFinite(fx) && Number.isFinite(fy)
         && box.width > 0 && box.height > 0)) return;
 
@@ -3320,6 +3322,17 @@ function fitStage() {
      because `cover` scales about the CENTRE and this has to scale about the
      floor line. Published as three lengths; the stylesheet owns which
      properties they become. */
+  /* ⚠ READ ONCE, HERE, BECAUSE TWO THINGS NEED THE DOOR'S BOX AND ONLY ONE OF
+     THEM USED TO ASK. The wall publication at the foot of this function has
+     always measured `#frame`; the lamp clamp below now needs the same rect, to
+     know how far the price card may be pulled inboard before it stops standing
+     on plaster and starts standing on the door. Two `getBoundingClientRect()`
+     calls on one element in one pass is the wasted forced reflow the note at
+     the clamp already records costing 19 ms — and the "one quantity, two
+     measurements" smell CLAUDE.md §5.10 is a list of. */
+  const frame = svg.querySelector('#frame');
+  const frameR = frame ? frame.getBoundingClientRect() : null;
+
   const baseY = Number(svg.dataset.baseY);
   /* ⚠ HOW DEEP THE FLOOR IS, published whether or not there is a photograph.
      The strip of ground in front of the threshold is the only part of the
@@ -3366,8 +3379,55 @@ function fitStage() {
        reflow and the "one quantity, two measurements" smell §5 is a list of.
        `npm run latency` went 180 -> 219 ms when the second read went in. */
     const lampB = Math.min(Math.max(p.lampBot, quoteH + 8), box.height - 8);
+    /* ⚠ AND THE SENTENCE ABOVE WAS TRUE OF ONE AXIS AND WRITTEN AS A RULE.
+       *"A control anchored to a feature of the picture must not leave the
+       picture when the feature does"* — and the card went on leaving it
+       sideways. `.quote` is `left: var(--lamp-cx); translateX(-50%)`, so half
+       its width hangs either side of a lamp that the crop can bring within
+       50 px of the stage's edge; `.stage-wrap` is `overflow: hidden`, so what
+       is past that edge is not off the fold, it is cut off. Measured over 162
+       readings (9 desktop widths × 3 languages × all six sizes), px of card
+       lost, worst size:
+
+           1100x800   he 23   en 34   ru 46
+           1152x800   he 18   en 29   ru 41
+           1200x800   he 14   en 25   ru 37
+           1440x900   he  0   en  5   ru 17
+           1280, 1366, 1536, 1680, 1920 — clean in all three
+
+       64 of the 162 lose something, up to 30 px of the GREEN SEND ITSELF, and
+       three of those widths are audit viewports. ⚠ Two axes of the fault are
+       the two this project keeps meeting: the card is 22–44 px wider on any
+       size but `standard` (the send's label grows the moment the door stops
+       being the default one, 11.9), and 22–44 px wider again in Russian —
+       so the reading everything here takes, the standard door in Hebrew, is
+       the least bad of the eighteen.
+
+       ⚠ AND IT MAY NOT SIMPLY BE PULLED INBOARD, which was the first version.
+       At 1100–1152 the wall is 139–213 px and the card is 141–207, so on the
+       wide doors there is no position that is both inside the stage and clear
+       of the leaf: a plain clamp lays up to 76 px × 122 of OPAQUE PAPER on the
+       door — three hundred times the 253 px² that got the language pill's
+       ground taken away on 28.8. So the pull stops at the casing. Where the
+       wall cannot hold the card the card stays where it is and stays cut, and
+       that residual is CLAUDE.md §9's existing entry about this wall gaining a
+       second occupant rather than a new fault.
+       ⚠ It only ever moves the card INBOARD. Where the card already overlaps
+       the door (1100 px, the two widest doubles) pushing it back out would buy
+       clean plaster with a bigger cut, which is a different decision and not
+       this one. */
+    /* ⚠ AGAINST THE WRAP, WHICH IS THE BOX THAT CLIPS, not against `.stage`.
+       They are coincident on every shape measured today — checked, 162
+       readings — and that is exactly the kind of agreement that stops being
+       true the day somebody gives the wrap a side padding again. The wrap is
+       what carries `overflow: hidden`, so it is what decides what is cut. */
+    const half = quoteW / 2;
+    const edge = Math.min(wrapR.right, window.innerWidth) - box.x;
+    const pull = Math.min(p.lampX, edge - half - 8);            // inside the picture
+    const stop = frameR ? frameR.right - box.x + half : -Infinity;   // not onto the door
+    const lampX = Math.max(pull, Math.min(p.lampX, stop));
     const st = $('.stage-wrap').style;
-    st.setProperty('--lamp-cx', `${Math.round(box.x - wrapR.x + p.lampX)}px`);
+    st.setProperty('--lamp-cx', `${Math.round(box.x - wrapR.x + lampX)}px`);
     st.setProperty('--lamp-b', `${Math.round(box.y - wrapR.y + lampB)}px`);
   }
 
@@ -3381,10 +3441,10 @@ function fitStage() {
      laptop and overlapped the frame by seven pixels on a 390 px phone, which
      is the kind of number that is right until somebody opens it on a phone.
      Measured off `#frame`, which is the whole door assembly including its
-     casing — not the leaf, whose edge is 158 mm inside it. */
-  const frame = svg.querySelector('#frame');
-  if (frame) {
-    const f = frame.getBoundingClientRect();
+     casing — not the leaf, whose edge is 158 mm inside it.
+     The rect is the one read once above, for the lamp clamp and for this. */
+  if (frameR) {
+    const f = frameR;
     /* ⚠ Measured against the WRAP, not against `.stage`. Above 1100 px the
        wrap carries `padding-inline-start: var(--grip-strip)` so the controls
        always have somewhere to stand, and `.stage` begins after it. Measuring

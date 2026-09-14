@@ -45,6 +45,153 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-14 06:40 UTC — run 122: the price card was being sliced by the edge of the picture it is pinned to, and the rule that would have prevented it was written in the same function, about the other axis
+
+**proposed · taken · refused:** proposed 5 (clamp the price card inside the
+picture · correct the RTL centring of the price breakdown · correct a check
+whose heading claimed both axes and whose code tests one · assert both, in
+three languages × nine widths × six sizes · move the grip controls out of the
+wall the card stands in) · taken 4 · refused 1 (the placement — §9's shape, and
+it moves chrome the owner positioned himself).
+
+**Looked at:** the page as **THE CUSTOMER WHO HAS A QUESTION HALFWAY THROUGH**
+— the one who taps the quiet send from a question step instead of the green one
+at the end. `PLAN.md` §0 names two ways an order reaches Peretz and no run had
+ever read the one produced mid-flow. Walked forward with the button at 320×568,
+390×844 and 1440×900, decoding the send's href on all nine screens, then read
+`?sheet=1` for the code the walk ended on. Recent lenses: 117 the customer
+being read the page, 118 the price shopper, 119 the customer who changes their
+mind, 120 the customer comparing two doors, 121 the customer who switches
+language mid-flow.
+
+**Instruments:** test ✓ 4,349,828 / 0 · audit ✓ no faults · profile ✓ all four
+rows · collide ✓ `all` and `boxes` · recreate ✓ · sheets ✓ regenerated, **all
+52 bare sheets byte-identical**, 10 of 12 `shot` moved. latency 194 ms against
+a 600 ms gate.
+
+**The lens itself came back clean, and that is recorded rather than dropped.**
+The mid-flow order is honest on every one of the nine screens at three widths:
+the opener flips from *"I looked at the door the site opens with"* to *"I chose
+a door"* on the first tap and not before, every spec row follows the door, the
+price and the `DM-` code move together, a send is visible on every step, and
+the A4 sheet for the code the walk ended on decodes to the same door with no
+page error. What the walk did was put the wall in front of a lens looking at it
+as a picture.
+
+**What it found.** `.quote` is `left: var(--lamp-cx); translateX(-50%)` — on
+the lamp because that is where the owner drew a circle, `left` rather than
+`inset-inline-start` because the drawing does not mirror. All right. But the
+crop can bring that lamp within 50 px of the stage's edge and `.stage-wrap` is
+`overflow: hidden`, so the outboard half of the card was **cut off**. px of
+card lost, worst size of six, over 162 readings:
+
+| | he | en | ru |
+|---|---|---|---|
+| 1100×800 | 23 | 34 | **46** |
+| 1152×800 | 18 | 29 | 41 |
+| 1200×800 | 14 | 25 | 37 |
+| 1440×900 | 0 | **5** | 17 |
+
+**64 of 162**, up to **30 px of the green send itself**, and `cusp`, `narrow-d`
+and `wide` are three of the audit's own eight viewports. ⚠ The two axes that
+hid it are this project's usual pair: the card is 22–44 px wider on any size
+but `standard` (the send's label grows the moment the door stops being the
+default one — 11.9 measured that on the phone bar and nobody on the wall) and
+22–44 px wider again in Russian, **so the standard door in Hebrew is the least
+bad of the eighteen**, and it is the one every other check here loads.
+
+⚠ **And the rule was already written down in that function, about the other
+axis.** `--lamp-b` has been clamped since 29.8 and its comment states the
+general case: *"A control anchored to a feature of the picture must not leave
+the picture when the feature does… with room for the card itself."* It reads
+the card's HEIGHT. Nothing read its WIDTH. §5.19 at ninety degrees.
+⚠ **And the check named for it reads one axis too.** *"the room keeps its
+lamps, and the price stays in the picture"* compares `top` and `bottom` and has
+never looked at `left` or `right`. Its heading is corrected and it now points
+at the new sweep rather than claiming what it does not measure.
+
+**Changed** (`js/app.js`, `css/app.css`, `tools/audit.mjs`, `CLAUDE.md`): the
+same clamp on `--lamp-cx`, from the same rect, against the WRAP because the
+wrap is what clips; `#frame`'s rect hoisted so the door's box is read once for
+this and for `--wall-gap`. **64 → 16**, and all sixteen are readings where the
+card is wider than the wall (139–204 px of wall for a 163–207 px card) — §9's
+arithmetic, not a new fault.
+
+**Got wrong, and the fleet caught both.** `ultracode` was spent on one
+adversarial lens told to kill the change, and it did, twice:
+- ⚠ **The box that moves with the card is not the card.** The price BREAKDOWN
+  hangs off it, and in Hebrew it was never centred on it: `.quote .bd` had a
+  LOGICAL inset with a PHYSICAL transform, so its centre sat **−139.9 to
+  −146.5 px** from the card's — exactly its own half-width — against 0.1–1.4 px
+  in English and Russian, standing on the leaf by up to **25,033 px²**.
+  Pre-existing, and my clamp dragged it further in. Fixed, and ⚠ `left: 50%`
+  alone did NOT fix it: the phone rule sets `inset-inline-start: 0`, so in RTL
+  both insets were set on a definite width and the over-constrained rule
+  dropped `left`. `inset-inline: auto; left: 50%`. After: 0.1–6.6 px in all
+  three languages and **0 px² of popover on the leaf at every reading**.
+- ⚠ **My clause-that-must-stay-true could not fail.** Both clauses were gated
+  *where the wall can hold the card*, and the card is only ever pulled onto the
+  leaf where the wall CANNOT — which the gate excludes. Rebuilt with the stop
+  deleted, the gated clause reported **0 faults** about a page laying 76 px ×
+  122 of paper on the widest double, and printed those rows as exempt. Third
+  time in this log (run 120's distinctness clause; 12.9's `?code=` fixture).
+  Ungated now, with the four already-overlapping readings NAMED and asserted to
+  still overlap.
+- Two numbers of mine were also wrong and are corrected in `CLAUDE.md`: the
+  falsification count is **40**, not 64 (24 of the 64 are §9's residual, which
+  the gate correctly excludes), and the residual walls are 139–**204**, not 195.
+- ⚠ **It is not a strict no-op and I had claimed it was.** 66 of 162 move; **7
+  were already whole** and move 2–7 px, all at 1440×900, where the clamp's 8 px
+  gap pulls a card with 0.7–5.7 px of clearance. And the WORST single cut is
+  unchanged — 29.6 px of the green send before and after — it just moves to a
+  different tight row. What the clamp buys is the 40 readings with room.
+
+**Falsified three ways**, each in an isolated copy of the tree rather than in
+the working one (run 120's stash incident): clamp removed → clause 1 fires
+**40 times**; `#frame` stop removed → clause 2 fires **18 times**; popover
+centring reverted → clause 3 fires **9 times**, one per width, all Hebrew.
+
+⚠ **And one thing I nearly reported as a fault was my own harness.** Every
+screenshot in the walk showed a 2 px gold focus ring round the step title.
+Driven with a REAL mouse and a REAL tap, `:focus-visible` does not match and
+the outline is `none`; with `element.click()` or a key press it does. The ring
+is the keyboard affordance working exactly as designed, and a scripted click
+leaves Chromium in keyboard mode. **A screenshot harness that clicks in script
+photographs a page no finger ever sees.**
+
+**Left alone deliberately — and it is a new §9 entry.** In Hebrew the grip
+controls and the price card stand in the SAME wall, because `.grip-bar` is
+pinned with `inset-inline-start` (logical, mirrors) and `.quote` with `left`
+(physical, does not); in English and Russian they are in opposite walls and
+cannot touch. Measured, Hebrew: at 1152 and 1200 the card covers **all 2,112
+px² of the grip hint on all six sizes, including the standard ₪3,195 door**,
+and at 1440 the rotate button's centre clears it by **seven pixels**. The hint
+is the only thing on the page saying the handle can be moved at all, and it is
+present on every door where `#grip-rot` is hidden on four of six — which is why
+the audit's hit test, which reads controls that have a box, finds nothing there
+and passes. Not fixed: pinning the grip controls physically moves them to the
+other side of the door in Hebrew, which is a product decision with the owner's
+circles on it, not a clamp. §9 carries the table.
+
+**Best idea of the run, not taken.** The card is wider than the wall on
+sixteen readings because of its SEND BUTTON's label, not its figure — measured,
+the send is 109→131 px in Hebrew, 141→152 in English and **131→175 in Russian**
+between the default door and any other. §0b's 11.9 entry solved the identical
+problem on the phone bar by letting that label truncate to the verb, and the
+desktop card has never been asked the same question. If the wall card's label
+truncated the same way, ten or more of the sixteen residual readings would
+close and §9's *"the wall cannot hold both its controls"* would shrink with
+them. What it needs first is a measurement nobody has taken: **how narrow that
+green pill may be before it stops reading as the WhatsApp send** — which is a
+question about a picture, not about 139 px of wall.
+
+**Fleet:** one adversarial lens, and it earned its firing — it produced the
+popover regression and the un-failable clause, neither of which this run had.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-14 01:30 UTC — run 121: the wall's own words are painted on the door on five of the six sizes, and the measurement that said they were not was taken on the sixth
 
 **proposed · taken · refused:** proposed 3 (assert the wall chrome's ink stays

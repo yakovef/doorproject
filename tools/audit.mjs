@@ -2372,7 +2372,7 @@ for (const v of VIEWS) {
    reads the file out of the computed `background-image` and takes that room's
    own constants. */
 {
-  console.log('\nthe room keeps its lamps, and the price stays in the picture');
+  console.log('\nthe room keeps its lamps, and the price card stays inside its top and foot');
   /* Fractions of each ORIGINAL, measured in `tools/_bd2.mjs`. The same numbers
      are in `js/app.js`'s ROOMS — deliberately, because an instrument that
      borrows the implementation's own table cannot notice the table changing,
@@ -2435,7 +2435,18 @@ for (const v of VIEWS) {
         + `${lampBot.toFixed(0)}, x ${lampX.toFixed(0)} of ${r.boxW.toFixed(0)})`);
     }
     /* The quote bar is FIXED at the foot of the screen below 1100 and hung on
-       the wall above it. Only the wall placement can leave the picture. */
+       the wall above it. Only the wall placement can leave the picture.
+       ⚠ THIS CLAUSE IS THE BLOCK'S VERTICAL HALF, AND UNTIL 14.9 THE HEADING
+       ABOVE IT CLAIMED BOTH. It compares `top` and `bottom` and has never
+       looked at `left` or `right` — correct for the fault it was written for
+       on 29.8 (the lamp climbing off the top of a 1920x918 stage, the card
+       following it onto the language buttons), and silent while up to 46 px of
+       that same card was being sliced off the stage's INLINE end. The card,
+       the clamp and this check were all written in one axis; see the sweep at
+       the foot of this file, which owns the inline question because it needs
+       nine widths, three languages and all six sizes and this loop has one
+       door at `VIEWS`. Not restated here: two statements of one assertion is
+       CLAUDE.md §5.10 wearing a test. */
     if (!r.qFixed) {
       if (r.qTop < r.boxT - 1 || r.qBot > r.boxB + 1) {
         fault(v.name, `the price card is outside the stage (${Math.round(r.boxT - r.qTop)} px above `
@@ -2450,7 +2461,7 @@ for (const v of VIEWS) {
     }
     if (!faults) { /* keep the log quiet on a clean run */ }
   }
-  if (!faults) console.log('  every stage: lamps whole, price card inside the picture, chrome clear');
+  if (!faults) console.log('  every stage: lamps whole, price card between the stage\'s top and foot, chrome clear');
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -4334,6 +4345,192 @@ for (const v of VIEWS) {
       + `the five that overlap (worst px² of glyph, he/ru: `
       + KNOWN.map(s => `${s} ${seen[s].he}/${seen[s].ru}`).join(', ') + ')');
   }
+}
+
+/* ── THE PRICE CARD STAYS INSIDE THE PICTURE IT IS PINNED TO ─────────────
+   Measured 14.9 by walking as the customer who has a QUESTION halfway through
+   — the one who taps the quiet send from a question step rather than the green
+   one at the end — and then by looking at the wall as a picture.
+
+   `.quote` is `left: var(--lamp-cx); transform: translateX(-50%)`, centred on
+   the right-hand sconce because that is where the owner drew a circle, with
+   `left` rather than `inset-inline-start` because it is pinned to a feature of
+   the DRAWING and the drawing does not mirror. All correct. What was missing
+   is that the crop can bring that lamp within 50 px of the stage's edge, and
+   `.stage-wrap` is `overflow: hidden` — so the outboard half of the card was
+   not below a fold, it was cut off. Measured before the fix, px of card lost,
+   worst size of six:
+
+       1100x800   he 23   en 34   ru 46
+       1152x800   he 18   en 29   ru 41
+       1200x800   he 14   en 25   ru 37
+       1440x900   he  0   en  5   ru 17
+
+   64 of 162 readings, up to 30 px of the GREEN SEND itself, and `cusp`,
+   `narrow-d` and `wide` are audit viewports that saw none of it.
+
+   ⚠ THE FIRST CLAUSE IS GATED ON ARITHMETIC AND THE SECOND IS NOT, AND THAT
+   ASYMMETRY IS THE WHOLE DESIGN OF THIS CHECK. At 1100-1152 the wall is
+   139-204 px and the card is 141-207, so on the wide doors there is no
+   position that is both inside the stage and clear of the leaf — CLAUDE.md
+   §9's entry about this wall, not a new fault. So "the card is whole" is asked
+   only WHERE THE WALL CAN HOLD IT.
+   ⚠ The clause that must stay true beside it (§5.22) had to be asked of every
+   reading, and the first draft was gated the same way and COULD NOT FIRE. The
+   cheap way to pass the first clause is to pull the card inboard until it
+   stands on the leaf — and that only ever happens where the wall is too narrow,
+   which is precisely what the gate excludes. Falsified, the gated version
+   reported 0 faults about a change that laid 76 px x 122 of opaque paper on the
+   widest double. So the second clause is UNGATED, with the four readings that
+   already overlap named, and asserted to STILL overlap so the exemption cannot
+   outlive the wall. Re-falsified: it fires 18 times.
+
+   ⚠ AND A THIRD CLAUSE, BECAUSE THE BOX THAT MOVES WITH THE CARD IS NOT THE
+   CARD. `.quote .bd` — the price breakdown — hangs off the card, and until
+   14.9 it was centred with a LOGICAL inset and a PHYSICAL transform, so in
+   Hebrew it sat its own half-width to the left of the price it belongs to and
+   stood on the leaf: measured 25,033 px² at 1100x800 on the widest double,
+   0 px² in English and Russian. Pre-existing, and the clamp would have made it
+   worse by dragging the card inboard. The centring is fixed in `css/app.css`
+   and asserted here, because a popover that is not centred on its anchor is
+   exactly what turns "pull the card in off the edge" into ink on the door.
+   It is asked once per width per language rather than per size: the offset is
+   a property of the two boxes, not of the door, and opening the popover on all
+   162 readings would add forty seconds to a block that is already the longest
+   in this file.
+
+   ⚠ IT CARRIES ITS OWN WIDTHS AND ALL SIX SIZES. `VIEWS` costs a whole audit
+   pass per width and does not hold 1200 or 1366; and the card is 22-44 px
+   wider on any size but `standard` — the send's label grows the moment the
+   door stops being the default one — so the standard door in Hebrew, which is
+   what every other check here loads, is the least bad of the eighteen. */
+try {
+  const before = faults;
+  const SHAPES = [[1100, 800], [1152, 800], [1200, 800], [1280, 720], [1366, 768],
+                  [1440, 900], [1536, 864], [1680, 950], [1920, 918]];
+  const GAP = 8;                 // the same 8 px the vertical clamp keeps
+  /* The four readings where the card already stands on the door, measured on
+     the commit before the clamp and unchanged by it. Each is a wall narrower
+     than the card it has to hold; §9 has the arithmetic. */
+  const ON_DOOR_OK = new Set(['en 1100x800 halfextra2', 'ru 1100x800 halfextra1',
+                              'ru 1100x800 halfextra2', 'ru 1152x800 halfextra2']);
+  const stillOverlapping = new Set();
+  let room = 0, tight = [], measured = 0, popovers = 0;
+  const p = await b.newPage();
+  for (const lang of ['he', 'en', 'ru']) {
+    for (const [w, h] of SHAPES) {
+      await p.setViewportSize({ width: w, height: h });
+      for (const size of Object.keys(SIZES)) {
+        await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}`);
+        await p.waitForTimeout(260);
+        const m = await p.evaluate(() => {
+          const q = document.querySelector('.quote');
+          const wrap = document.querySelector('.stage-wrap');
+          const fr = document.querySelector('.door-svg #frame');
+          if (!q || !wrap || !fr) return null;
+          const r = q.getBoundingClientRect(), rw = wrap.getBoundingClientRect();
+          const f = fr.getBoundingClientRect();
+          /* the box that actually PAINTS the card: its clipping ancestor, itself
+             inside the window. Above 1100 the page cannot scroll, so anything
+             outside this is gone rather than reachable. */
+          const vis = { l: Math.max(rw.left, 0), r: Math.min(rw.right, innerWidth) };
+          const mid = (f.left + f.right) / 2;
+          const wall = (r.left + r.right) / 2 > mid
+            ? vis.r - f.right : f.left - vis.l;
+          return {
+            card: Math.round(r.width),
+            wall: Math.round(wall),
+            cut: Math.round(Math.max(0, r.right - vis.r) + Math.max(0, vis.l - r.left)),
+            onDoor: Math.round(Math.max(0, Math.min(r.right, f.right) - Math.max(r.left, f.left))),
+          };
+        });
+        const tag = `${lang} ${w}x${h} ${size}`;
+        if (!m) { fault('quote-wall', `${tag}: no price card, stage wrap or #frame on the `
+          + 'page — this sweep has no subject'); continue; }
+        measured++;
+        /* 1 — where there is room, the card must be whole */
+        if (m.wall >= m.card + 2 * GAP) {
+          room++;
+          if (m.cut > 0) {
+            fault('quote-wall', `${tag}: ${m.cut} px of the price card is cut off by the edge `
+              + `of the stage, in a wall ${m.wall} px wide holding a ${m.card} px card. The `
+              + 'card is pinned to the lamp and nothing holds it inside the picture');
+          }
+        } else if (m.cut > 0) {
+          tight.push(`${tag} ${m.cut}px`);
+        }
+        /* 2 — and nowhere at all may it be pulled onto the leaf */
+        if (m.onDoor > 0) {
+          if (ON_DOOR_OK.has(tag)) stillOverlapping.add(tag);
+          else fault('quote-wall', `${tag}: the price card stands ${m.onDoor} px into the door `
+            + `(${m.wall} px of wall for a ${m.card} px card). Pulling the card in off the edge `
+            + 'must not push it onto the leaf');
+        }
+      }
+      /* 3 — and the popover that hangs off the card is centred on it */
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=standard`);
+      await p.waitForTimeout(260);
+      const bd = await p.evaluate(async () => {
+        const t = document.querySelector('#price-toggle');
+        if (!t) return null;
+        t.click();
+        await new Promise(r => setTimeout(r, 240));
+        const b = document.querySelector('#breakdown'), q = document.querySelector('.quote');
+        if (!b || !q) return null;
+        const rb = b.getBoundingClientRect(), rq = q.getBoundingClientRect();
+        if (!rb.width) return { shut: true };
+        return { off: Math.round(((rb.left + rb.right) / 2 - (rq.left + rq.right) / 2) * 10) / 10 };
+      });
+      if (!bd || bd.shut) {
+        fault('quote-wall', `${lang} ${w}x${h}: the price breakdown would not open, so its `
+          + 'placement is measuring nothing');
+      } else {
+        popovers++;
+        if (Math.abs(bd.off) > 8) {
+          fault('quote-wall', `${lang} ${w}x${h}: the price breakdown's centre is ${bd.off} px `
+            + 'from the price card it hangs off — a logical inset with a physical transform '
+            + 'does not centre anything in RTL, and what it hangs over here is the door');
+        }
+      }
+    }
+  }
+  await p.close();
+  /* §5.15: if the wall never has room, every clause above passes by having no
+     subject — which is what a narrower card or a wider door range would do to
+     this check without anybody coming back to it. */
+  if (room < measured / 2) {
+    fault('quote-wall', `the wall had room for the card on only ${room} of ${measured} readings — `
+      + 'this sweep is measuring almost nothing');
+  }
+  if (popovers < 27) {
+    fault('quote-wall', `only ${popovers} of 27 price breakdowns opened — the placement clause `
+      + 'is measuring almost nothing');
+  }
+  /* and the exemption cannot outlive the fault */
+  for (const tag of ON_DOOR_OK) {
+    if (!stillOverlapping.has(tag)) {
+      fault('quote-wall', `${tag} is named as a reading where the price card stands on the door `
+        + 'and it no longer does. If the wall has been fixed, take it off the list here and out '
+        + 'of CLAUDE.md §9 — an exemption nobody removes is how a fault becomes a feature');
+    }
+  }
+  if (faults === before) {
+    console.log(`    ${measured} readings in three languages x nine desktop widths x all six `
+      + `sizes: the price card is whole on all ${room} where the wall can hold it, it stands on `
+      + `the door on none but the ${ON_DOOR_OK.size} §9 names, and its breakdown is centred on `
+      + `it in all ${popovers}. ${tight.length} cut where the wall cannot hold it (§9): `
+      + tight.slice(0, 4).join(', ') + (tight.length > 4 ? ` +${tight.length - 4} more` : ''));
+  }
+} catch (e) {
+  /* ⚠ THE LONGEST BLOCK IN THIS FILE AND THE LAST, so a renderer death here
+     would throw out of the script and take the whole run's `N faults` line and
+     its `skipped` report with it. CLAUDE.md §7: the ceiling falls the longer
+     the container lives, and this block navigates 189 times up to 1920x918. */
+  if (!crashed(e)) throw e;
+  console.log('  ⚠ chromium died during the price-card sweep — it was NOT completed');
+  fault('quote-wall', 'chromium died before this sweep finished, so the price card is unchecked');
+  await b.close().catch(() => {});
+  b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 }
 
 await b.close();

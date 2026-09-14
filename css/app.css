@@ -1631,7 +1631,19 @@ svg { direction: ltr; }
   .quote .bd {
     --bd-gap: 8px;
     inset-block-end: auto; inset-block-start: 100%;
-    inset-inline-start: 50%; transform: translateX(-50%);
+    /* ⚠ `left`, NOT `inset-inline-start`, AND IT HAS BEEN WRONG IN HEBREW
+       SINCE THE WALL PLACEMENT SHIPPED — 14.9.2026. A LOGICAL inset with a
+       PHYSICAL transform does not centre anything: in RTL `inset-inline-start`
+       resolves to `right`, so the popover's right edge landed half the CARD's
+       width in from the card's right and `translateX(-50%)` then moved it half
+       the POPOVER's width further left again. Measured at 1440×900: in English
+       and Russian the two centres agree to 0.0 px; in Hebrew the popover's
+       centre sat **145.6 px** — its own half-width — to the left of the card's,
+       which on this page is straight onto the door. `left: 50%` is measured
+       from `.quote`'s own left edge in both directions, so the pair centres in
+       both. §0c's rule one box further in: the interface mirrors, and a
+       transform does not mirror with it. */
+    inset-inline: auto; left: 50%; transform: translateX(-50%);
     margin-block-end: 0; margin-block-start: var(--bd-gap);
     max-block-size: max(132px, min(46vh, calc(var(--bd-room, 100vh) - var(--bd-gap) - 12px)));
   }
