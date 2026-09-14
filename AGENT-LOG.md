@@ -148,7 +148,7 @@ verification that mattered was falsifying each clause separately and re-taking
 my own two wrong readings — neither of which a second opinion would have
 improved.
 
-**Commit:** (pending — recorded in the next commit)
+**Commit:** `8f81dd9`
 
 ---
 
