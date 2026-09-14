@@ -339,30 +339,39 @@ for (const v of VIEWS) {
     fault(v.name, 'the live step shows no options at all — its question cannot be answered');
   }
 
-  /* ⚠ A LISTING RULE MUST FOLLOW THE DOOR, NOT THE BOOT — 8.9.2026.
-     `glazedOnly` faces (פאנל תחתון and its ogee twin) are not offered on a
-     solid door, on Peretz's own instruction, and the group's predicate has
-     always carried the clause that keeps the CURRENT face listed whatever the
-     rule says. It was a filter inside `list()`, which is read when the tiles
-     are BUILT — so it froze at the state the page booted in, and the two doors
-     that reach a glazed-only face AFTER boot both showed the face step with
-     nothing selected and the customer's own answer absent: choosing חלון
-     מרובע, which FORCES a bottom panel, and the gallery's d048/d051/d087.
+  /* ⚠ THE CUSTOMER'S OWN ANSWER IS ON THE FACE STEP, WHATEVER THE WINDOW —
+     14.9.2026, and this replaces the listing check that stood here.
+     What it used to guard: `glazedOnly` faces (פאנל תחתון and its ogee twin)
+     were not offered on a solid door, and the predicate had to be asked on
+     every PAINT rather than inside `list()`, which is read when the tiles are
+     BUILT and so froze at the state the page booted in. The symptom both ways
+     round was the same and is the thing actually worth checking — a step that
+     asks what is on the front of the door, showing a list with NOTHING
+     selected and the customer's own answer absent.
+     Peretz withdrew both faces on 14.9.2026 and put the panel inside the
+     square window, so there is no listing rule left and no face is ever
+     hidden. The symptom is still reachable, by a different route: choosing
+     חלון מרובע no longer forces a face, so what the step must show afterwards
+     is חלק — CHECKED, and visible. If a repair ever silently moved the face
+     again, or a tile went missing, this is what would catch it.
      Three things, and the third is the one that would rot quietly:
-       · on a solid door the two are HIDDEN — the listing rule still holds,
-       · after the square window forces one it is SHOWN and CHECKED,
+       · on a solid door every face in the catalogue is SHOWN — no survivor of
+         the old rule is hiding anything,
+       · after the square window is chosen the face step shows חלק checked,
        · and the tiles were found at all (§5.15) — a selector that stops
          matching would otherwise turn all of this green in silence.
      This is a DOM fact, so `npm test` cannot see it; it lives here.
-     Falsified by putting the filter back in `list()`: the second clause fails
-     with `shown=false checked=false` at every viewport. */
+     Falsified by hiding any face in `markGroup`, or by making the window
+     repair write a face again: the relevant clause fails at every viewport. */
   const listing = await (async () => {
     const cell = () => p.evaluate(() => {
-      const q = i => document.querySelector(`.field[data-group="detail"] [data-id="${i}"]`);
-      const one = i => { const e = q(i); return e && { hidden: !!e.hidden,
-        checked: e.getAttribute('aria-checked') === 'true' }; };
-      return { found: !!q('plain'), panel: one('panel'), panelo: one('panelo'),
-               detail: (location.search.match(/[?&]d=([^&]*)/) || [])[1] || 'plain' };
+      const all = [...document.querySelectorAll('.field[data-group="detail"] [role="radio"]')];
+      const one = i => { const e = document.querySelector(
+        `.field[data-group="detail"] [data-id="${i}"]`);
+        return e && { hidden: !!e.hidden,
+                      checked: e.getAttribute('aria-checked') === 'true' }; };
+      return { tiles: all.length, hidden: all.filter(e => e.hidden).map(e => e.dataset.id),
+               plain: one('plain') };
     });
     const solid = await cell();
     await p.evaluate(() => {
@@ -376,21 +385,23 @@ for (const v of VIEWS) {
     await p.waitForTimeout(300);
     return { solid, glazed };
   })();
-  if (!listing.solid.found || !listing.solid.panel || !listing.glazed.panel) {
-    fault(v.name, 'the face group has no פאנל תחתון tile in the DOM at all — the '
-      + 'listing check cannot see its subject and is dead');
+  if (!listing.solid.plain || listing.solid.tiles < 4) {
+    fault(v.name, `the face group has ${listing.solid.tiles} tiles and no חלק in the `
+      + 'DOM — this check cannot see its subject and is dead');
   } else {
-    if (!listing.solid.panel.hidden || !listing.solid.panelo.hidden) {
-      fault(v.name, 'a glazed-only face is offered on a SOLID door '
-        + `(panel hidden=${listing.solid.panel.hidden}, `
-        + `panelo hidden=${listing.solid.panelo.hidden}) — Peretz's listing rule`);
+    if (listing.solid.hidden.length) {
+      fault(v.name, `the face step hides ${listing.solid.hidden.join(', ')} on a solid `
+        + 'door — no face is glazed-only any more, so nothing should be hidden');
     }
-    if (listing.glazed.detail === 'panel'
-        && (listing.glazed.panel.hidden || !listing.glazed.panel.checked)) {
-      fault(v.name, 'the square window forced a bottom panel and the face step does '
-        + `not show it (shown=${!listing.glazed.panel.hidden}, `
-        + `checked=${listing.glazed.panel.checked}) — the customer's own answer `
-        + 'is missing from the question that asks it');
+    if (listing.glazed.hidden.length) {
+      fault(v.name, `the face step hides ${listing.glazed.hidden.join(', ')} behind a `
+        + 'square window — no face is glazed-only any more');
+    }
+    if (!listing.glazed.plain || !listing.glazed.plain.checked) {
+      fault(v.name, 'the square window was chosen and the face step does not show חלק '
+        + `checked (checked=${listing.glazed.plain && listing.glazed.plain.checked}) — `
+        + "the square window brings its own panel, so the face is plain and that is "
+        + "the customer's own answer to the question being asked");
     }
   }
 
@@ -1383,7 +1394,7 @@ for (const v of VIEWS) {
      own, and it is the part that was broken. */
   {
     await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=tallwin&n=idan`
-               + '&k=cylinder&d=panel&s=standard&h=right-in');
+               + '&k=cylinder&d=plain&s=standard&h=right-in');
     await p.waitForTimeout(300);
     const gp = () => (p.url().match(/gp=([^&]*)/) || [])[1] || null;
     const pad = await p.$('[data-hitpad]');
@@ -1459,7 +1470,7 @@ for (const v of VIEWS) {
          real drag, further down — which found it at 1,530 pixels. */
     }
     await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=tallwin&n=idan`
-               + '&k=cylinder&d=panel&s=standard&h=right-in');
+               + '&k=cylinder&d=plain&s=standard&h=right-in');
     await p.waitForTimeout(300);
 
     const g = await (await p.$('[data-hw="handle"]')).boundingBox();
@@ -1540,7 +1551,7 @@ for (const v of VIEWS) {
        correctly hidden. An alias keeps a CUSTOMER's link working; a test
        should name the thing it means. */
     await p.goto(`file://${process.cwd()}/index.html`
-               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=panel&s=extra2&h=right-in'
+               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=plain&s=extra2&h=right-in'
                /* ⚠ `d=panel`: a square light always takes a bottom panel now
                   (Peretz), so `d=plain` here arrives REPAIRED — and this step
                   compares the screen after a drag against a fresh load of its
@@ -1812,7 +1823,7 @@ for (const v of VIEWS) {
      and the exemption shrinks the day the chip does. */
   {
     await p.goto(`file://${process.cwd()}/index.html`
-               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=panel&s=extra2&h=right-in');
+               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=plain&s=extra2&h=right-in');
     await p.waitForTimeout(400);
     const wall = await p.evaluate(() => {
       const seen = [], bad = [];
@@ -2024,7 +2035,7 @@ for (const v of VIEWS) {
     sheetPg.on('pageerror', e => sheetErrs.push(String(e)));
     sheetPg.on('console', m => { if (m.type() === 'error') sheetErrs.push(m.text()); });
     await sheetPg.goto(`${URL}?sheet=1&c=rb-6219d&w=rect&g=iron&n=idan`
-                     + '&k=cylinder&d=panel&s=sidelight&h=left-in');
+                     + '&k=cylinder&d=plain&s=sidelight&h=left-in');
     await sheetPg.waitForTimeout(700);
     if (sheetErrs.length) {
       fault('sheet', `${sheetErrs.length} uncaught error(s) building the order sheet: `
@@ -2037,7 +2048,7 @@ for (const v of VIEWS) {
        See `buildSheet`. */
     const ruPg = await b.newPage({ viewport: { width: 794, height: 1123 } });
     await ruPg.goto(`${URL}?sheet=1&lang=ru&c=rb-6219d&w=rect&g=iron&n=idan`
-                  + '&k=cylinder&d=panel&s=sidelight&h=left-in');
+                  + '&k=cylinder&d=plain&s=sidelight&h=left-in');
     await ruPg.waitForTimeout(600);
     const ru = await ruPg.evaluate(() => ({
       cyrillic: /[\u0400-\u04FF]/.test(document.querySelector('#sheet')?.textContent || ''),
@@ -2496,8 +2507,18 @@ for (const v of VIEWS) {
      the code is read off the page's own bare load and the query is built from
      `DEFAULTS`, so they follow the catalogue rather than going stale in
      silence (§5.15 — a fixture that cannot fail is not a check). */
+  /* ⚠ `d=plain` BEHIND `w=rect`, AND IT WAS `d=panel` — 14.9.2026. Ten query
+     fixtures in this file named the lone lower panel behind a square window,
+     which is the door that face existed for. Peretz withdrew it (*"remove the
+     one panel option from the files entirely, it only exists within the
+     rectangle option"*), its id aliases onto the PAIR, and a pair behind a
+     square light legitimately repairs — so every one of them started arriving
+     under a notice and five checks in this file failed at once, each correctly.
+     All ten moved to `plain`, which draws the IDENTICAL door: the panel is in
+     `WINDOWS.rect` now. Every one of the ten is behind a glazed window, so
+     none of them was testing a panelled FACE and none lost its subject. */
   const arrivals = [
-    ['a full query', '?v=18&c=rb-9016d&w=rect&d=panel&k=coral&s=wide&h=left-in'],
+    ['a full query', '?v=18&c=rb-9016d&w=rect&d=plain&k=coral&s=wide&h=left-in'],
     ['a short code', null],
     ['the standard door as a query', toQuery(DEFAULTS)],
     ['the standard door as a code', 'DEFAULT-CODE'],
@@ -2521,7 +2542,7 @@ for (const v of VIEWS) {
          would go stale the next time VERSION moves, and it would go stale
          SILENTLY — an unreadable code lands on the default door, at step 01,
          which is exactly the failure this check is looking for. */
-      await pg.goto(`${HOME}?v=18&c=rb-9016d&w=rect&d=panel&k=coral&s=wide&h=left-in`);
+      await pg.goto(`${HOME}?v=18&c=rb-9016d&w=rect&d=plain&k=coral&s=wide&h=left-in`);
       await pg.waitForTimeout(400);
       const code = await pg.evaluate(() => document.querySelector('#code')?.textContent);
       query = `?d=${code}`;
@@ -2638,7 +2659,7 @@ for (const v of VIEWS) {
   console.log('\n  the summary shows the door before it explains itself');
   const pg = await b.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
   await pg.goto(`file://${process.cwd()}/index.html`
-    + '?c=rb-7021d&w=rect&d=panel&k=plate&pz=pz-gold');
+    + '?c=rb-7021d&w=rect&d=plain&k=plate&pz=pz-gold');
   await pg.waitForSelector('#stage svg');
   await pg.waitForTimeout(900);
   const o = await pg.evaluate(() => {
@@ -3214,20 +3235,28 @@ for (const v of VIEWS) {
      block sets — 186 x 273 mm. Anything else lays out a different document. */
   const PAPER = { width: 703, height: 1032 };
   const PAGE_MM = 297 - 12 * 2;
+  /* ⚠ `detail` LEFT THIS BLOCK ON 14.9.2026, because the two doors below want
+     different faces now and they used to share one. `panel` — the lone lower
+     panel — was withdrawn and its id aliases onto the PAIR, which a square
+     light refuses; so the glazed door takes `plain` and carries its panel in
+     the WINDOW (the row is longer that way, not shorter, because it prints
+     "(עם פאנל תחתון)"), and the solid one names the pair outright rather than
+     reaching it through an alias. A fixture that goes through an alias is a
+     fixture that stops saying what it tests. */
   const LOAD = {
-    colour: 'rb-6219d', detail: 'panel', handle: 'shahar', lockset: 'knobplate',
+    colour: 'rb-6219d', handle: 'shahar', lockset: 'knobplate',
     pirzul: 'pz-gold', special: 'kodan', mashkof: 'mk-wide',
   };
   const DOORS = {
     /* The tallest sheet in the range: two glazed panels, so the סורג row
        carries the longest value the document can hold. */
     'widest דו כנפי, glazed': { ...DEFAULTS, ...LOAD, size: 'halfextra2',
-      window: 'rect', grille: 'grid' },
+      detail: 'plain', window: 'rect', grille: 'grid' },
     /* The most spec rows on a single leaf — a window displaces the bell and
        the peephole (`bellFits`), so the loudest solid door is a different
        door from the loudest glazed one and both are worth printing. */
     'single leaf, every fitting': { ...DEFAULTS, ...LOAD, size: 'extra2',
-      bell: 'bell', peephole: 'peep' },
+      detail: 'panel2', bell: 'bell', peephole: 'peep' },
   };
   const byLang = {};
   for (const [what, st] of Object.entries(DOORS)) {
@@ -3719,15 +3748,23 @@ for (const v of VIEWS) {
      the second is the case that makes it bad. */
   /* ⚠ AND BOTH ARE ASSERTED TO SURVIVE `repair`, WHICH MY FIRST PAIR DID NOT.
      The loud door I typed carried `pz=gold` — not an id, the ids are prefixed
-     — and `d=panel2` behind a square window, which `rectNeedsPanel` trades
-     down to the single lower panel. So it arrived under a red strip saying
-     some of the options were unavailable, and the column being measured was a
-     door nobody had chosen. That is the trap §0b records twice already (the
-     order sheet's first fixture, and the `bell` behind a window); the guard
-     is one line and it goes here rather than in my memory. */
+     — and `d=panel2` behind a square window, which the rules traded down to
+     the single lower panel. So it arrived under a red strip saying some of the
+     options were unavailable, and the column being measured was a door nobody
+     had chosen. That is the trap §0b records twice already (the order sheet's
+     first fixture, and the `bell` behind a window); the guard is one line and
+     it goes here rather than in my memory.
+     ⚠ AND IT CAUGHT THE SAME FIXTURE A SECOND TIME, 14.9.2026. It had settled
+     on `d=panel`, which was the face the square window forced — and Peretz
+     withdrew that face, so the id became an alias for the PAIR and the pair
+     behind a square light repairs to plain. Same red strip, same wrong column,
+     from the opposite direction. It is the Greek set now: a face that is
+     `rectOnly` and therefore cannot be traded away from this window by any
+     rule, at ₪2,700 solid and a supplement glazed, which also makes the
+     breakdown one row LOUDER than the panel it replaces. */
   const DOORS = {
     'one colour': '?c=rb-9302d',
-    'a loud door': '?s=extra2&c=rb-9302d&w=rect&d=panel&g=grid&n=knobplate&x=kodan&pz=pz-gold',
+    'a loud door': '?s=extra2&c=rb-9302d&w=rect&d=classic&g=grid&n=knobplate&x=kodan&pz=pz-gold',
   };
   let seen = 0;
   for (const [dk, q] of Object.entries(DOORS)) {
@@ -3984,7 +4021,7 @@ for (const v of VIEWS) {
      saved. */
   const DOORS = [
     '?s=standard&c=rb-7126d&w=none&d=plain&n=plate&pz=pz-nickel',
-    '?s=standard&c=rb-7126d&w=rect&d=panel&g=grid&n=plate&pz=pz-nickel',
+    '?s=standard&c=rb-7126d&w=rect&d=plain&g=grid&n=plate&pz=pz-nickel',
     '?s=standard&c=rb-7126d&w=none&d=plain&n=coral&pz=pz-gold&x=kodan',
   ];
   /* ⚠ ASSERT THE FIXTURES ARE UNREPAIRED. Twice now a door typed into a check

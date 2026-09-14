@@ -284,14 +284,24 @@ was painted with the other's finish.
   raised from `LOCK_BACKSET_GRIP` to `KEYWAY_BACKSET`. Measured cost: 8 designs
   of 2,688 lose a pull handle to a collision, 0.3%.
 
-⚠ **AND A CATALOGUE INSTRUCTION WAS CONTRADICTED BY THREE OF HIS OWN DOORS.**
+⚠ **AND A CATALOGUE INSTRUCTION LOOKED CONTRADICTED BY THREE OF HIS OWN DOORS
+FOR TWO ROUNDS, AND WAS NOT — 14.9.2026.**
 *"The only instance when on a door is only one panel is when there is a window
-and a panel at the bottom."* d048, d051 and d087 are solid leaves with a single
-lower panel, hand-measured off his photographs. Enforcing it as a RULE made
-`npm test` re-fit three real doors in the gallery. So it is a LISTING rule
-instead — `js/app.js` leaves those faces out of the tiles, `js/rules.js`
-refuses nothing — and the contradiction is in `ASK-PERETZ.md` §2 beside the
-ברזל מחושל one. **A catalogue is not a constraint.**
+and a panel at the bottom."* d048, d051 and d087 were said here, and in four
+other files, to be solid leaves with a single lower panel, hand-measured off
+his photographs. **They carry two panels each.** Measured when the face was
+finally withdrawn: a tall upper over a short lower, d048 at 0.08–0.60 and
+0.70–0.91 of leaf height, inside 0.03 of `PANEL_ROWS.pair`.
+"Hand-measured" was the untrue half. `detail.panel` is a bare boolean on every
+record and `tools/corpus.mjs` DEFAULTED the count to one, saying so in its own
+note. The instruction was never contradicted; all ten of his panelled doors
+confirm it. See the 14.9 entry in §0b — it is the most expensive instance in
+this project of a stated uncertainty being read as a measurement.
+**What survives is the other half, and it survives intact:** enforcing a
+catalogue instruction as a RULE would have re-fitted real doors in the gallery
+to doors he did not build, so it was a LISTING rule instead — not offered,
+still reachable. **A catalogue is not a constraint.** (Both the listing rule
+and the faces it hid are gone now: the panel belongs to the window.)
 
 ### ⚠ A LEDGER IS NOT EVIDENCE
 
@@ -742,8 +752,9 @@ not one, and which a face uses is a catalogue choice:
 
 | | what it looks like | doors | tiles |
 |---|---|---|---|
-| **`reed`** | three to five fine beads, hard dark quirks between them, low relief, sharp mitres | d042 d048 d058 d062 d065 d068 d070 d087 d091 d094 d099 d116 d122 | `panel` `panel2` `panelTop` `panel3`, and every face with no `profile` |
-| **`ogee`** | one narrow GROOVE near the outer edge, a LONG FLAT at the paint's own tone across half the band, a shallower groove near the inner edge — a scribed frame | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | `panelo` `panel2o` `classic` |
+| **`reed`** | three to five fine beads, hard dark quirks between them, low relief, sharp mitres | d042 d048 d058 d062 d065 d068 d070 d087 d091 d094 d099 d116 d122 | `panel2` `panel3`, and every face with no `profile` |
+| **`ogee`** | one narrow GROOVE near the outer edge, a LONG FLAT at the paint's own tone across half the band, a shallower groove near the inner edge — a scribed frame | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | `panel2o` `panel3o` `classic` |
+
 
 Thirteen doors against eleven, so neither is "the" moulding — and a round that
 re-measured the one table off a door of the OTHER family drew the ogee round
@@ -778,24 +789,50 @@ which is exactly how one shades a raised panel. It was reported from outside as
 the panel "bulging". Pinned now by `the face inside a moulding is the face
 outside it`.
 
-`PANEL_INSET` is **0.23**. It has been wrong in both directions — 0.18, then
-"corrected" to 0.13 off a contact sheet, both too wide, so a pull bar was drawn
-across the panel's stile. Settled by an edge-gradient ruler over the
-photographs: real panel edges sit at 0.21–0.39 of leaf width.
+`PANEL_INSET` is **0.23**, and it is now the inset for EVERY panelled face. It
+has been wrong in both directions — 0.18, then "corrected" to 0.13 off a
+contact sheet, both too wide, so a pull bar was drawn across the panel's stile.
+Settled by an edge-gradient ruler over the photographs: real panel edges sit at
+0.21–0.39 of leaf width.
 
-### The face list as it stands — 22 options in two halves
+⚠ **The trio had its own 0.15 and lost it on 14.9.2026, by instruction and not
+by measurement.** d067, d068 and d077 all put the three-panel face's rectangles
+at about 0.15 from each edge, which gave that door equal margins all round
+(125 mm head, 115 foot, 128 sides) — three independent photographs agreeing,
+which is not what a bad reading does. Peretz: *"the 3 panel option looks wider
+than the other panel options, so change the size of the panels as they are in
+the 2 panel options."* `PANEL_INSETS` is empty; the measurement is kept in full
+beside `PANEL_ROWS` with whose word overruled it, and `ASK-PERETZ.md` §1c asks
+whether those three doors are a different product.
 
-`DETAILS` is 22 entries. `sub` puts each in a half and `buildOptions` groups by
-it, so **the order on the screen and the order in the array are two different
-things** — the array's order is a wire format (the short code packs its INDEX)
-and the screen's is not. `plain` has no `sub` and is drawn first with no
-heading over it.
+### The face list as it stands — six faces, and the stripes are not in it
 
-| | count | ids |
-|---|---|---|
-| — | 1 | `plain` |
-| **פאנלים** | 7 | `panel` `panel2` `panelTop` `panel3` `panelo` `panel2o` `classic` |
-| **פסים** | 14 | `strips2` `strips4` `stripsband` `strips3` `strips5` `strips7` `strips9` `strips` `stripsvl3` `stripsvl4` `stripsv3` `stripsv` `stripsv6` `stripsx` |
+`sub` puts each face in a half and `buildOptions` groups by it, so **the order
+on the screen and the order in the array are two different things** — the
+array's order is a wire format (the short code packs its INDEX) and the
+screen's is not. `plain` has no `sub` and is drawn first with no heading over
+it.
+
+| | ids |
+|---|---|
+| — | `plain` |
+| **פאנלים**, reed | `panel2` `panel3` |
+| **פאנלים**, ogee | `panel2o` `panel3o` `classic` (architrave only) |
+
+⚠ **THIS TABLE SAID "22 OPTIONS IN TWO HALVES" AND LISTED FOURTEEN STRIPE IDS
+THAT HAD ALREADY LEFT THE ARRAY** — the stripes became a COUNT with their own
+control, not tiles in this list, and nothing came back here to say so. It then
+survived a second round in which `panelTop` was withdrawn. Two separate
+withdrawals, neither reflected, in the one table somebody consults to find out
+what a customer can pick: §6 in miniature, and the reason the counts are gone
+from the heading and the row labels. Do not put a number back.
+
+⚠ **`panel` and `panelo` — the two lone lower panels — left on 14.9.2026**
+(*"remove the one panel option from the files entirely, it only exists within
+the rectangle option"*). The panel under a square light belongs to the WINDOW
+now: `WINDOWS.rect` carries `panel: true`. Both ids alias onto the PAIR in
+their own moulding section, so old links and codes still open a door.
+`panel3o` arrived in the same round.
 
 **Every family below is a MEASURED composition and they are not variations of
 one thing.** The recurring mistake in this file's history is deriving one from
@@ -2081,17 +2118,18 @@ the same list in Hebrew, shorter, for him to answer.
 | A5 | `knobplate` is a "circle" at +₪200 | one number |
 | A6 | The widened mashkof is 60 mm outside / 300 mm inside | two numbers in `MASHKOFS` |
 | A7 | The peephole and security latch are standard on every door — **the עינית is now a CHOICE priced at ₪0 on the strength of this**, so it is louder than it was | one number in `prices.js`, and whether the tile says כלול |
-| A8 | A single bottom panel is ₪725, half of two — **but ₪0 where a square window FORCES it**, 30.8; it is priced inside `WINDOW.rect` | one number, and the `DETAIL_GLAZED.panel` beside it |
+| A8 | ~~A single bottom panel is ₪725, half of two~~ — **CLOSED 14.9**: the face is withdrawn (*"remove the one panel option from the files entirely"*) and the panel belongs to `WINDOWS.rect`, whose ₪3,800 pays for it. No invented number is left on this axis | — |
 | A9 | `Math.ceil` on the handle's 20 cm steps — you cannot buy 10 cm of bar | one word |
 | A10 | ~~Colours are all included~~ — **settled 30.8**: three included, fourteen at +₪200 | — |
 | A11 | Panels and stripes are mutually exclusive — no door carries both | one rule in `js/rules.js` |
 | A12 | `barblack` (מוט שחור) is priced as a bar like the others — he wrote "nickel >100cm" and named no rate for a black one | one entry's `priceKind` |
 | A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | **which window carries ₪4,200 and which ₪3,800** (was 3,700 until the panel it forces was folded into it, 30.8) |
-| A14 | The reeded and ogee panel mouldings cost the same — he priced "two panels" once and named no families | two numbers, and possibly one whole family |
+| A14 | The reeded and ogee panel mouldings cost the same — he priced "two panels" once and named no families. **Three pairs of faces since 14.9**, with `panel3o` | three numbers, and possibly one whole family |
 | A15 | ~~The tight band is not buildable~~ — **settled 27.8**: it is a toggle | — |
 | A16 | The merged חריגה tile is drawn at 1025 × 2250 — the MIDPOINT of the `wide` and `tall` it replaces. Its leaf aspect is 0.4205 against the corpus median 0.415, closer than either | two numbers in `SIZES`; no price moves |
 | A17 | A דו כנפי's fixed leaf is 400 mm on all three bands — the extra width goes into the leaf that OPENS, because a narrow fixed leaf is a standard part | two numbers in `SIZES`; no price moves |
 | A18 | Peretz's דו כנפי is our דלת וחצי — a main leaf with a narrow FIXED leaf beside it, not two equal leaves | **the drawing, not a label**, on three of the six sizes |
+| A19 | The curved lever is priced as the Coral — included. He asked for the handle by pointing at a drawing and named neither a price nor a name for it, and **its id is a placeholder that can never be renamed** | one number, and one label in three languages |
 
 ⚠ **A18 is new and it is not a number.** Every other row here is one edit;
 that one is the DRAWING on half the size list. Peretz says דו כנפי and the
@@ -2351,6 +2389,158 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE CATALOGUE ROUND: SIX ITEMS, ONE `VERSION`, AND THE LONE PANEL IS THE
+  WINDOW'S NOW — 14.9.2026.** First of five parts of a review Peretz sent. It
+  is one commit because three of the six move indices in `js/catalog.js` and a
+  version number is a fence rather than a changelog: `VERSION` **21 → 22**, and
+  `BITS.lockset` 3 → 4 because `LOCKSETS` was eight entries in a three-bit
+  field — **exactly full**, the first field in this layout ever to fill up, and
+  the ninth lever would have encoded as index 0 and built a Coral from a code
+  that reads perfectly. Payload 48 → 49; `TOTAL_BITS` absorbs it inside the
+  same 55 because the check nibble is reserved before the rounding, so the code
+  is still eleven characters with its full four check bits.
+
+  **A1 · The lone lower panel leaves the catalogue, and its panel does not.**
+  *"remove the one panel option from the files entirely, it only exists within
+  the rectangle option."* Read literally that is a contradiction — `rect` had
+  always FORCED that face — and it resolves the other way round: the panel
+  under a square light is not a face anybody picks, it is part of what a square
+  window IS. `WINDOWS.rect` carries `panel: true`; `state.detail` stays
+  `plain`; two rules, two `why.` keys, two `fix.` keys, the `glazedOnly` flag
+  and the whole `listed` predicate come out. The order reads "חלון מרובע (עם
+  פאנל תחתון)" and "חלק" — one new copy key, `row.withPanel`, in `spec.js`,
+  which is the one description of a door. **The alternative was refused**:
+  forcing `panel2` at ₪0 would have printed "שני פאנלים" on a door drawing one,
+  which is an order needing a clarifying question.
+  ⚠ **AND THE THREE DOORS IT WAS SUPPOSED TO COST US DO NOT EXIST. THIS FILE
+  HAS BEEN WRONG ABOUT THEM SINCE 27.8 AND SO HAS EVERYTHING DOWNSTREAM.**
+  `npm run corpus` moves ten gallery doors. Seven — d092 d097 d099 d106 d108
+  d116 d122 — go `panel` → `plain` and **draw exactly what they drew before**,
+  because their panel is their window's. The other three are **d048, d051 and
+  d087**, and they are the doors five files have been citing as proof that
+  Peretz's instruction contradicts his own work: *"solid leaves carrying a
+  single lower panel"*. Withdrawing the face meant the claim finally had to be
+  acted on rather than repeated, so it was **measured** — luminance derivative
+  down each leaf's own centre band, the method `PANEL_ROWS` was read with.
+  **All three carry two panels.** A tall upper over a short lower; d048 comes
+  out at 0.08–0.60 and 0.70–0.91 of leaf height, inside 0.03 of
+  `PANEL_ROWS.pair`. They are the pair, exactly.
+  ⚠ **WHERE "ONE PANEL" CAME FROM.** `detail.panel` is a bare BOOLEAN on all
+  ten panelled records — not one of the 34 records in `research/works/data2`
+  has ever carried a panel count — and `tools/corpus.mjs` defaulted it to one.
+  It printed a residual for the guess and said in its own note, in as many
+  words, that this was a default and not a reading and that d087 plainly had
+  two. **The note was right and nobody acted on it for two rounds.** A stated
+  uncertainty was promoted to a measurement by every reader downstream: a rule
+  in `js/rules.js` withdrawn on its authority, the `glazedOnly` listing
+  predicate and its audit check written to serve it, a long paragraph in this
+  file, and a question put to the owner twice telling him his own doors
+  contradicted him. §5 is about a stale justification outliving its subject;
+  this is the same failure with the arrow reversed, and it is worse, because a
+  default that prints a residual reads as evidence.
+  The counts are in the three records now with the runs they were read from,
+  so the fitter derives instead of defaulting and all three sit at residual 0.
+  **Peretz's rule is confirmed by all ten of his panelled doors** — seven
+  glazed with one panel under the light, three solid with two — so the
+  withdrawal costs nothing, and `ASK-PERETZ.md` §2 says so instead of asking.
+  ⚠ While reading that table it turned out **it has been printing the ANSWER's
+  id in the column headed by the DOOR** — `{ id: r.id, ...p }`, so every part
+  overwrote the door with its own id and no row could be looked up. One line.
+  It is the one table in that tool meant to be acted on, which is presumably
+  how the note beside the default went unread for two rounds.
+
+  **A2 ·** סט קלאסי → **סט יווני**, his own word. Labels in three languages
+  plus the four customer-facing rule sentences; the id `classic` does not move
+  and no alias is added, because nothing ever showed a customer an id.
+
+  **A3 · No face brings its own handle.** *"the handle should only appear if i
+  choose it in the pull handle section."* `ownPull` and `grab` off both faces,
+  the trio's pull block and `classicPull` deleted (measurements kept in a note
+  where the call was), the conflict, the repair, `SAID.ownPull` and two copy
+  keys gone. **What it costs, measured rather than guessed:** the trio's middle
+  plate is now a short blank rectangle — a real door (d065 d070 d087 are this
+  face with the pull on bare timber) but not the door its three photographs
+  show — and the Greek set's corbelled shelf carries nothing, which no
+  photograph shows at all. It is drawn on his instruction against the evidence,
+  and the catalogue entry says so.
+  ⚠ **AND IT MADE 188 MORE DOORS BUILDABLE**, which is where the interesting
+  consequence is. `npm run collide -- all` goes 1,902 → 2,090 designs. Sixteen
+  of the new ones — the Greek set with a נִיצָן or a barblack bar on the four
+  WIDE sizes — have **no upright position for the bar at hand height**, because
+  the composition fills the leaf cornice to plinth, so `gripHome` lays it
+  ACROSS the door, which is what its last resort is for and what an outside
+  request asked for in those words. The order says "מותקנת לרוחב הדלת" on every
+  one. That killed a `npm test` assertion (`flatHome === 0`, "no product has a
+  rotated home") — see below, because the repair of it is the interesting part.
+
+  **A4 · The trio's panels are narrowed to the pair's — AN OVERRULE.** *"change
+  the size of the panels as they are in the 2 panel options."* `PANEL_INSETS`
+  is empty and `PANEL_INSET`'s 0.23 applies to every face. The measured 0.15 is
+  **kept in full** beside `PANEL_ROWS`, with what it was measured on (d067 d068
+  d077), what made it credible (equal margins all round: 125 mm head, 115 foot,
+  128 sides) and **on whose word it is overruled**. `ASK-PERETZ.md` §1c asks
+  whether those three doors are a different product.
+
+  **A5 · `panel3o`**, the ogee trio, appended at the end of `DETAILS` at the
+  reeded trio's own price — the last hole in the two-mouldings grid.
+
+  **A6 · The Coral is an even blade, and the shape it used to be is a second
+  product.** *"the handle needs to be even wide along its length, more like the
+  width of the top of it right now"*, then *"the one thats there right now with
+  the curve, add it as a different handle."* `lever()` ran 40 units deep at the
+  neck and 26 at the tip; it is a constant 26 now. `leverTaper()` keeps the
+  taper, makes the upward drift a real rise and shortens the reach to 0.85, and
+  it is a new `LOCKSETS` entry. **Its id `lever-taper` is a placeholder and it
+  is permanent** — an id is packed into every short code by index, so his name
+  becomes the LABEL and never the id. ₪0, as the Coral, is assumption **A19**.
+  ⚠ **THE TILE HAD BEEN DRAWING IT EVEN ALL ALONG.** `FITTING_GLYPH.lever` is a
+  `rect` with an `rx` — constant depth, no taper — so the picture a customer
+  chose from and the door they got have disagreed about this handle's shape for
+  as long as both have existed. Nothing could see it: the distinctness test
+  compares tiles to other TILES, and the collision sweep asks where metal
+  reaches, not what shape it is. **The owner saw it on the door.** That is the
+  §5 shape with an instrument gap instead of a stale justification.
+
+  **Assertions — restated, never weakened, and each falsified both ways.**
+  · the panel biconditional now reads `d.panel || w.panel` (81 doors fail when
+  either clause is dropped from the render condition);
+  · the panel-COUNT check read `/data-panels="2"/` and scored anything else as
+  one, so the three-panel face was compared as 1 against a `paid` of 1 and
+  passed on **both sides being wrong** — it reads the number now;
+  · `?d=panel` asserts the alias lands on the PAIR, which is stronger than
+  `=== 'panel'` was, since `byId` falls back to `DETAILS[0]` and a dropped
+  alias would have opened a plain door in silence;
+  · the ₪725 pair of price assertions is replaced by the two-directional one
+  the seam no longer needs: the window adds ₪3,800 and **nothing else moves**;
+  · `PANEL_ROWS`' own sanity sentence — "the trio lands within 0.02 of the
+  pair" — **had no assertion behind it and was false**. The four edges differ
+  by 0.009, 0.125, 0.053 and 0.024: the head and foot are close, the inner
+  edges are not and were never meant to be. It now asserts the ENVELOPE at
+  0.03, through `faceObstacles` so it measures the DRAWN rows and not the table
+  agreeing with itself.
+  ⚠ **AND THE FIRST REPLACEMENT FOR `flatHome === 0` WAS A DECORATION.** "A
+  leaf with nothing on it never takes a bar lying down" is TRUE, reads like a
+  guard, and caught **nothing** when `gripHome` was patched to prefer its last
+  resort: rotated homes went 16 → 296 and not one was on a bare leaf. An
+  assertion that survives the regression it was written for is not weak, it is
+  ornamental. What ships instead searches each rotated door for an upright
+  place the way the page does when a customer drags — `nearestGrip` with the
+  rotation off — and requires there not to be one **within `HOME_REACH` of hand
+  height**. Legality alone was not enough either: on nitzan/extra2 an upright
+  bar is legal at 260 mm above hand height, which on a 2,600 mm leaf is
+  chest-high. `HOME_REACH` is exported now, which its own comment had been
+  asking for ("so that the assertion and the code are the same number rather
+  than two guesses that happen to agree").
+
+  **Gates.** `npm test` 9,710,978 assertions, 0 failed · `npm run audit` no
+  faults · `collide -- all` 2,090 designs, `faceObstacles` agrees with the
+  drawing everywhere · `collide -- boxes` every fitting inside its declaration,
+  the new lever measured 30/123/30 against a declared 40/132/51 and the Coral
+  unchanged at 30/145/30 · the standard door is still **₪3,195** and a plain
+  door with a square window still **₪6,995**, both asserted rather than assumed.
+  Sheets moved: the drawing changed, so this is the round where they are
+  allowed to.
 
 - **⚠ THIS FILE SAID A STRING WAS "READ BY NOBODY" AND THE GALLERY HAS BEEN
   SAYING IT TO EVERY CUSTOMER SINCE BEFORE THE THREE LANGUAGES EXISTED —

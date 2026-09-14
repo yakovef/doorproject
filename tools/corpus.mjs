@@ -276,28 +276,64 @@ function locksetOf(rec) {
            note: k || 'no lock read' };
 }
 
-function detailOf(rec) {
+function detailOf(rec, win) {
   const d = rec.detail || {};
   if (d.panel) {
-    /* ⚠ THE RECORDS DO NOT COUNT PANELS. `detail.panel` is a boolean and there
-       is no `panels` array on any of the ten panelled doors, so "one panel" is
-       not a derivation, it is a default — and d087 plainly carries two, a tall
-       upper over a short lower, which is why `tools/recreate.mjs` types
-       `d=panel2` for it by hand.
-       Reported as an unknown rather than asserted as a one. A tool that fills
-       a hole with its default and prints no residual is claiming to have
-       measured something it never looked at, which is the fault this whole
-       file exists to avoid. The branch below is live for the day the records
-       carry a count. */
+    /* ⚠ THE SQUARE LIGHT BRINGS ITS OWN PANEL, SO THE FACE IS PLAIN — and this
+       branch is why `detailOf` was given the window, 14.9.2026. On a door with
+       a rectangular light the single panel below the glass is not a face
+       anybody chose; it is part of the window (`WINDOWS.rect` carries
+       `panel: true`). Fitting a FACE to it would double the panel on the
+       drawing and put a choice in the record that the customer never makes.
+       Residual 0: this is not a gap in the catalogue, it is the catalogue
+       describing the door correctly with a different field. */
+    if (win && win.panel) {
+      return { id: 'plain', residual: 0,
+               note: 'the panel below the square light belongs to the window' };
+    }
+    /* ⚠ THE RECORDS DID NOT COUNT PANELS, AND THE DEFAULT THEY GOT WAS WRONG
+       — 14.9.2026. `detail.panel` is a bare boolean on all ten panelled
+       records, so "one panel" was never a derivation: it was this function's
+       default, printed at residual 0.5 with a note saying so.
+       Nobody read the note. The project then built two rounds of reasoning on
+       top of the default — a rule withdrawn, a `glazedOnly` listing predicate
+       written, and a standing entry in `ASK-PERETZ.md` telling Peretz that
+       three of his own doors contradicted his own instruction.
+       ⚠ THEY DO NOT. Measured on 14.9.2026, the day the single-panel face was
+       withdrawn and the default finally had to be looked at: d048, d051 and
+       d087 each carry a TALL UPPER PANEL OVER A SHORT LOWER ONE, read by
+       luminance derivative down each leaf's own centre band. d048 comes out at
+       0.08-0.60 and 0.70-0.91 of leaf height, inside 0.03 of `PANEL_ROWS.pair`
+       — they are two-panel doors. The counts are in the records now, with the
+       runs they were read from, so this branch derives instead of defaulting.
+       What Peretz said — *"the only instance when on a door is only one panel
+       is when there is a window and a panel at the bottom"* — is confirmed by
+       all ten of his measured panelled doors: the seven glazed ones carry one
+       panel under a light, and the three solid ones carry two. The
+       contradiction this project reported to him for two rounds was an
+       artifact of the line below.
+       The branch stays, for a record that still has no count. It reports at
+       residual 1 rather than 0.5: a guess that has already been wrong once,
+       and been believed, has earned the top of the residual table. */
     const n = (d.panels && d.panels.length) || d.panel_count || null;
     if (n == null) {
-      return { id: 'panel', residual: 0.5,
-               note: 'the record says there is a panel and does not say how many; '
-                   + 'assumed one (d087 has two)' };
+      return { id: 'panel2', residual: 1,
+               note: 'the record does not count the panels. The catalogue has no '
+                   + 'single-panel face (Peretz, 14.9), so this is drawn as two — '
+                   + 'and the three records that HAVE been counted all came back two' };
     }
-    const want = n >= 2 ? 'panel2' : 'panel';
-    return { id: want, residual: 0, note: `${n} panel(s)` };
+    /* A counted record. `panel2` is the only pair in the reeded section and
+       three or more is the trio; one is not in the range at all, and no
+       measured record has ever said one. */
+    return n >= 3
+      ? { id: 'panel3', residual: 0, note: `${n} panel(s)` }
+      : n === 2
+        ? { id: 'panel2', residual: 0, note: `${n} panel(s)` }
+        : { id: 'panel2', residual: 1,
+            note: `the record counts ${n} panel and a single panel is not in the `
+                + 'range since 14.9 (Peretz); drawn as two' };
   }
+
   if (d.groove && d.grooves && d.grooves.length) {
     /* A GROOVE FOLLOWING THE LEAF'S EDGE, which is not a direction at all.
        Two doors carry one and the catalogue has no entry for it, so it used to
@@ -399,13 +435,19 @@ for (const id of ids) {
               + `no colour/window/detail — ${(rec.notes || '').slice(0, 60)}…)`);
     continue;
   }
+  /* ⚠ THE WINDOW IS FITTED FIRST AND THE FACE IS FITTED AGAINST IT, since
+     14.9.2026: a square light carries its own bottom panel, so what the face
+     should be depends on which window this door has. The only order dependency
+     in this object, and it is written out rather than left to the order of the
+     keys below — an object literal cannot see its own siblings. */
+  const window = windowOf(rec);
   const parts = {
     colour: colourOf(rec.colour.hex, rec.colour.family),
-    window: windowOf(rec),
+    window,
     grille: grilleOf(rec),
     handle: handleOf(rec),
     lockset: locksetOf(rec),
-    detail: detailOf(rec),
+    detail: detailOf(rec, byId(WINDOWS, window.id)),
     stripes: stripesOf(rec),
   };
   const want = {
@@ -440,7 +482,15 @@ for (const r of rows) {
             + H(r.state.grille, 12) + H(r.state.handle, 9) + H(r.state.lockset, 11)
             + H(r.state.detail, 9) + res.join('  '));
   for (const [k, p] of Object.entries(r.parts)) {
-    if (p.residual > 0.02) hardest.push({ id: r.id, k, ...p });
+    /* ⚠ `id: r.id` GOES AFTER THE SPREAD, and it did not. Every part carries
+       its own `id` — the colour it fitted, the face it fitted — so `{ id:
+       r.id, ...p }` let the PART overwrite the DOOR, and the "what the
+       catalogue could not say" table below has been printing `rb-7021d` in a
+       column headed by the door. That is the one table in this tool whose job
+       is to be acted on, and a row naming the answer instead of the door
+       cannot be looked up. Found on 14.9.2026 because a new row was added to
+       it and could not be read. */
+    if (p.residual > 0.02) hardest.push({ ...p, id: r.id, k });
   }
 }
 

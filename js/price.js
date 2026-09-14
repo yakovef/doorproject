@@ -182,7 +182,7 @@ export function priceParts(state) {
 
     colour:  byId(COLOURS, state.colour).delta,
     window:  byId(WINDOWS, state.window).delta,
-    /* ⚠ ONE FACE IN THE RANGE HAS TWO PRICES, and it is the classical set.
+    /* ⚠ ONE FACE IN THE RANGE HAS TWO PRICES, and it is the Greek set.
        Peretz gave three figures — the set solid ₪2,700, a square light ₪3,700,
        and "square with greek" ₪4,700 — which describe TWO products, not three:
        3700 + 1000 = 4700, so the set costs ₪1,000 on a door that is already

@@ -130,7 +130,9 @@
   "panel": true,
   "groove": false,
   "grooves": [],
-  "texture": "smooth"
+  "texture": "smooth",
+  "panel_count": 2,
+  "panel_count_why": "two panels, same method and date as d048: runs at 0.085-0.122, ~0.54-0.63, 0.663-0.710 and 0.876-0.922 of leaf height - a tall upper panel over a short lower one. Noisier than d048 because a hard diagonal shadow crosses the leaf and the pull handle sits at 0.58; the four moulding runs survive both."
  },
  "extras": [
   "chrome bow pull handle across mid-face",

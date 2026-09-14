@@ -44,7 +44,12 @@ const SHOTS = [
        to stand clear of whatever the lever reaches, which on a glazed leaf
        leaves it nowhere to go — so a bar beside a WINDOW keeps its cylinder,
        which is what eight of the ten installed bar doors carry anyway. */
-    q: '?c=rb-9016d&w=rect&g=mesh&n=idan&k=cylinder&d=panel&s=standard&h=right-in' },
+    /* ⚠ `d=plain` SINCE 14.9.2026, AND THE DOOR IS THE SAME DOOR. The lone
+       lower panel left `DETAILS` and its id aliases onto the PAIR, which a
+       square light refuses — so the old query named a door the site will not
+       draw. `WINDOWS.rect` carries the panel now, so the sheet still shows a
+       square light over a moulded panel; it is the FACE that is plain. */
+    q: '?c=rb-9016d&w=rect&g=mesh&n=idan&k=cylinder&d=plain&s=standard&h=right-in' },
   { name: 'laptop',   w: 1280, h: 720,
     q: '?c=rb-9005d&w=none&g=none&n=channel&k=plate&d=plain&s=standard&h=right-in' },
   { name: 'desktop',  w: 1680, h: 950,
@@ -53,7 +58,10 @@ const SHOTS = [
        `broad` is the widest opening, which is where the panel below has least
        room and the architrave least stile — the shot to look at first when
        something has moved. */
-    q: '?c=rb-6459d&w=rect&g=grid&n=none&k=coral&d=panel&s=standard&h=right-in' },
+    /* `d=plain` since 14.9.2026 — see the note on `phone` above. This is
+       also the sheet the redrawn Coral shows on: its blade is even along its
+       whole length now rather than tapering to the tip. */
+    q: '?c=rb-6459d&w=rect&g=grid&n=none&k=coral&d=plain&s=standard&h=right-in' },
   { name: 'panel',    w: 1280, h: 720,
     /* The Almog swan-neck reaches 220 mm inboard — the deepest fitting we sell
        — so it is the one that leaves a bar least room beside a light. */
@@ -61,7 +69,8 @@ const SHOTS = [
   { name: 'grey',     w: 1280, h: 720,
     /* Worked GLASS rather than ironwork: the rings are etched in the pane, so
        nothing here casts a shadow or takes a highlight. */
-    q: '?c=rb-7110d&w=rect&g=circles&n=none&k=coral&d=panel&s=standard&h=right-in' },
+    /* `d=plain` since 14.9.2026 — see the note on `phone` above. */
+    q: '?c=rb-7110d&w=rect&g=circles&n=none&k=coral&d=plain&s=standard&h=right-in' },
   { name: 'plate',    w: 1280, h: 720,
     /* The two-panel face lives here now, because it needs a SOLID leaf: a
        window takes the upper panel's place, and the sheet's only panel2 shot
@@ -85,9 +94,17 @@ const SHOTS = [
        the stile once glass has the middle of the leaf, so this is the cylinder
        eight of the ten installed bar doors carry. d122, the real sidelight
        door, is one of them. */
-    q: '?c=rb-6219d&w=rect&g=mesh&n=idan&k=cylinder&d=panel&s=sidelight&h=right-in' },
+    /* ⚠ AND `d=panel` BECAME `d=plain` ON 14.9.2026, for the same reason as
+       `tablet` below and from the opposite direction. The lone lower panel
+       left `DETAILS` (*"remove the one panel option from the files entirely,
+       it only exists within the rectangle option"*) and its id now aliases
+       onto the PAIR — which a square light refuses, so this query started
+       naming a door the site will not draw. The panel is still ON the door:
+       `WINDOWS.rect` brings it. The shot is unchanged in what it shows. */
+    q: '?c=rb-6219d&w=rect&g=mesh&n=idan&k=cylinder&d=plain&s=sidelight&h=right-in' },
   { name: 'halfleaf', w: 1280, h: 720,
-    q: '?c=rb-9001d&w=rect&g=scroll&n=none&k=sapir&d=panel&s=half&h=left-in' },
+    /* `d=plain` since 14.9.2026 — see the note on `sidelight` above. */
+    q: '?c=rb-9001d&w=rect&g=scroll&n=none&k=sapir&d=plain&s=half&h=left-in' },
   /* ⚠ `d=plain`, AND IT USED TO BE `d=panel`. A vertical slot with a panel
      under it is refused now — the glass runs to 0.79 of leaf height and the
      seven corpus doors with a panel below glazing all stop by 0.61, so

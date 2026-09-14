@@ -223,7 +223,28 @@ import { repair } from './rules.js';
    The `?s=` form is not indexed and every one of the three withdrawn ids
    resolves through `SIZE_ALIAS` to the band it was already in, at the price it
    already had. */
-export const VERSION = 21;
+/* ⚠ 22: ONE BUMP FOR A WHOLE ROUND OF THE CATALOGUE, 14.9.2026, and it is one
+   deliberately. Four separate changes in this round each earn a bump on their
+   own, and a version number is not a changelog — it is a fence, and a code
+   either falls inside it or does not. Batched:
+     · `panel` and `panelo` LEFT `DETAILS` — every index after them moved;
+     · `panel3o` ARRIVED at the end of `DETAILS` — free on its own, since
+       appending renumbers nothing, and carried along regardless;
+     · `lever-taper` ARRIVED at the end of `LOCKSETS` — NOT free: the list was
+       eight entries in a three-bit field, exactly full, so the ninth needs
+       `BITS.lockset: 4` and that is a BIT-LAYOUT change, the one thing no
+       alias can rescue. A v21 code read under this layout would shift every
+       field after the lockset and open a different door at a different price,
+       in silence;
+     · `WINDOWS.rect` gained its own panel, which moves no index at all and is
+       named here only so the list of what changed is the whole list.
+   The payload goes 48 -> 49 and `TOTAL_BITS` reserves the check nibble BEFORE
+   rounding, so it lands on 55 exactly as it did at 48: the code stays ELEVEN
+   characters and the typo check keeps its full four bits.
+   The `?...=` query form is not indexed. Every withdrawn id resolves through
+   `aliases` — `panel` and `panelo` onto the pairs — so a link written
+   yesterday opens a door rather than a notice. */
+export const VERSION = 22;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -715,15 +736,20 @@ function settle(state, notice) {
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
 
-/* Capacities against what is used today:
-     version 16 / 10     colour  64 / 17     size     8 / 6
-     handing  4 / 2      window  16 / 5      grille   32 / 15
-     handle  16 / 10     lockset 16 / 10     detail   16 / 9
-   Every one has room, which is the point of keeping any: a field that
-   overflows does not throw. An eighth grille in three bits would have been
-   stored as grille 0 — the customer picks scrollwork, reads the code down the
-   phone, and Peretz builds a door with no grille. Not an error, not a refusal,
-   just a different door.
+/* ⚠ THE CAPACITY TABLE THAT USED TO BE HERE IS DELETED, 14.9.2026, and this
+   is the THIRD hand-kept copy of the same figures this file has had to
+   correct. It printed nine "capacity / used" pairs, every one of them typed,
+   and by the time anybody read it again the lists had moved four times
+   underneath it: it claimed `lockset 16 / 10` for a field that was three bits
+   holding eight and completely full. A budget table that is wrong about which
+   field is full is worse than no table, because its whole job is to be
+   consulted before an append.
+   `npm test` measures the spare per field off `BITS` and the lists themselves
+   and prints it. Read that. What belongs here is only the REASON: a field that
+   overflows does not throw. An eighth grille in three bits is stored as grille
+   0 — the customer picks scrollwork, reads the code down the phone, and Peretz
+   builds a door with no grille. Not an error, not a refusal, just a different
+   door.
 
    ⚠ THE GRILLE FIELD IS FIVE BITS NOW. It was four, and the list has just gone
    from eight entries to fifteen — one more and four bits would have silently
@@ -743,33 +769,34 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    fault. That is the one way a catalogue APPEND — the operation this whole
    VERSION discipline exists to keep free — can be silently wrong.
 
-   ⚠ AND THE FIELD TO WATCH IS `size`, NOT `detail`. This warning used to name
-   `detail` as "the field nearest its ceiling" and print a table beside it.
-   Measured, the order is:
-
-     size 2 spare · handing 2 · version 4 · handle 6 · lockset 7 ·
-     detail 8 · window 11 · grille 17 · colour 47
-
-   `detail` is the THIRD ROOMIEST, with four times the headroom of the field
-   the warning should have been about — and `SIZES`, at 6 of 8, is the one list
-   ASK-PERETZ.md expects the owner to REPLACE WHOLESALE (§8, the size bands).
-   A door shop naming nine bands is not exotic; the ninth would encode as index
-   0 and Peretz would build a standard door from a code that reads perfectly.
-   `handing` is level with it at 2 of 4: the two outward-opening hands fill it
-   exactly, and a fifth wraps to `right-in`.
-
-   No table is kept here any more. `npm test` measures the spare per field and
-   prints it — three of the nine rows of the hand-kept one had gone stale, in
-   a comment whose whole job is to make somebody think about the budget.
-   If `size` needs widening, `detail`, `handle` and `lockset` can each give a
-   bit back and the payload stays at 36. */
-/* ⚠ `detail` IS FIVE BITS AND `window` IS THREE, and they moved together on
-   purpose. DETAILS reached twenty entries — four over its old ceiling, which
-   would have stored the twentieth as the FIRST and built a plain door from a
-   code that reads perfectly. WINDOWS is three of sixteen and has been since it
-   was cut to two shapes and none, so it is the one field with a bit to spare
-   that is not the check nibble's or the colour list's. Payload unchanged at
-   36; code unchanged at eight characters. */
+   ⚠ AND IT HAS NOW HAPPENED FOR REAL, 14.9.2026. This warning has named a
+   different "field nearest its ceiling" in each of its last three revisions —
+   first `detail`, then `size` — and the field that actually filled up was
+   `lockset`: eight entries in three bits, exactly full, and Peretz asked for a
+   ninth lever. Nothing reported it. It was found by reading `BITS` beside the
+   list before appending, which is the habit this note exists to instil, and it
+   was paid for by widening the field rather than by tightening another (see
+   the note on `BITS`).
+   ⚠ SO THE RULE IS NOT "WATCH THIS FIELD", IT IS "MEASURE BEFORE APPENDING".
+   No table is kept here. `npm test` measures the spare per field and prints
+   it, because every hand-kept copy of those figures this file has carried went
+   stale — three of nine rows in one, and the one deleted above named the full
+   field as the roomiest. `SIZES` is still the list ASK-PERETZ.md expects the
+   owner to REPLACE WHOLESALE (§8, the size bands), and `handing` still holds
+   the two outward-opening hands in a field that fits exactly four, so a fifth
+   would wrap to `right-in`. Neither of those is a measurement; both are facts
+   about what the owner may yet ask for. */
+/* ⚠ `detail` AND `window` ONCE MOVED TOGETHER, and the episode is worth
+   keeping even though neither width survives. DETAILS reached twenty entries —
+   over its ceiling, which would have stored the twentieth as the FIRST and
+   built a plain door from a code that reads perfectly — so it was widened, and
+   WINDOWS paid for it out of the slack it had carried since being cut to two
+   shapes and none. Both lists have since been re-cut again; the widths are in
+   `BITS` below and nowhere else, and the sizes each field can hold are
+   measured and printed by `npm test` rather than written here. Two numbers in
+   this paragraph used to name the payload and the code length and both had
+   been wrong for an unknown number of rounds — see the note four blocks down,
+   which is why nothing in this file states either as prose any more. */
 /* ⚠ RE-CUT FOR `speciallock`, AND THE CODE IS STILL EIGHT CHARACTERS.
    A new field needs bits and the obvious answer is a longer code. It is not
    needed here: two fields were carrying more width than their lists have ever
@@ -801,13 +828,23 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    deciding whether a new field will fit. Neither figure is restated as a
    constant here: `PAYLOAD_BITS` and `CODE_LEN` are both derived, and the test
    file computes the code's length rather than typing it. */
+/* ⚠ `lockset` IS FOUR BITS, 14.9.2026, AND IT WAS THE FIRST FIELD IN THIS
+   LAYOUT TO ACTUALLY FILL UP. Three bits hold eight and `LOCKSETS` held
+   exactly eight, so the ninth — the curved lever Peretz asked for — would have
+   encoded as index 0 and built a Coral from a code that reads perfectly. That
+   is the failure the warning above describes for `SIZES` and it arrived here
+   first. Nothing is tightened to pay for it: the payload goes 48 -> 49 and
+   `TOTAL_BITS` absorbs it inside the same 55, because the check nibble is
+   reserved before the rounding. The code does not get longer. */
 export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
-                      grille: 4, handle: 4, lockset: 3, detail: 3,
+                      grille: 4, handle: 4, lockset: 4, detail: 3,
                       speciallock: 2, mashkof: 2, pirzul: 2, handleLen: 4,
                       stripes: 5, bell: 1, peephole: 1 };
-/* 36 bits, which does not divide by 5 — so the code carries 40 and the top
-   four are always zero. Rounding UP is the only safe direction: truncating
-   would drop the low bits of the last field. */
+/* The payload does not divide by 5, so the code carries the next multiple up
+   and the top bits are always zero. Rounding UP is the only safe direction:
+   truncating would drop the low bits of the last field. Both numbers are
+   derived below — see the note on `PAYLOAD_BITS` and `CODE_LEN`, and §6 on
+   what writing them into prose has cost this file before. */
 const PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
 
 /**

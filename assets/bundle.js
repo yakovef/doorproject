@@ -363,9 +363,9 @@
     ],
     "exp.face.q": ["פאנלים או פסים — מה ההבדל?", "Panels or strips — what is the difference?", "Панели или полосы — в чём разница?"],
     "exp.face.a": [
-      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — 150 ₪ לפס אופקי ו‑300 ₪ לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון. שלושה פאנלים והסט הקלאסי מגיעים עם מאחז משלהם, ולכן אין בהם ידית משיכה נפרדת.",
-      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — ₪150 a horizontal strip and ₪300 a vertical one. Panels and strips do not go on the same door, and neither goes with a window. Three panels and the classical set come with a grip of their own, so they take no separate pull handle.",
-      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: ₪150 за горизонтальную и ₪300 за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном. Три панели и классический комплект идут со своей скобой, поэтому отдельная ручка к ним не ставится."
+      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — 150 ₪ לפס אופקי ו‑300 ₪ לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון — חלון מרובע מגיע עם הפאנל שלו בתחתית, ואין צורך לבחור אותו כאן. כל עיצוב חזית מתאים לכל ידית משיכה.",
+      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — ₪150 a horizontal strip and ₪300 a vertical one. Panels and strips do not go on the same door, and neither goes with a window — a square window brings its own panel below it, and there is nothing to choose here for that. Every face goes with every pull handle.",
+      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: ₪150 за горизонтальную и ₪300 за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном: у квадратного окна своя нижняя панель, и выбирать её здесь не нужно. Любое оформление полотна сочетается с любой ручкой-скобой."
     ],
     "exp.glass.q": ["מה נכנס לתוך החלון?", "What goes inside the window?", "Что ставится в окно?"],
     "exp.glass.a": [
@@ -610,14 +610,16 @@
     "why.needsWindow": ["דורש חלון", "Needs a window", "Нужно окно"],
     "why.winTakesTop": ["החלון תופס את מקומו של הפאנל העליון", "The window takes the upper panel’s place", "Окно занимает место верхней панели"],
     "why.noRoomBelow": ["אין מקום לפאנל מתחת לחלון", "No room for a panel below the window", "Под окном нет места для панели"],
-    "why.setNoSlot": ["הסט הקלאסי לא משתלב עם צוהר אנכי", "The classical set does not go with a vertical slot", "Классический комплект не сочетается с вертикальным окном"],
-    "why.setOwnWindow": ["הסט הקלאסי מגיע עם חלון מלבני משלו", "The classical set comes with a rectangular window of its own", "У классического комплекта своё прямоугольное окно"],
+    "why.setNoSlot": ["הסט היווני לא משתלב עם צוהר אנכי", "The Greek set does not go with a vertical slot", "Греческий комплект не сочетается с вертикальным окном"],
+    "why.setOwnWindow": ["הסט היווני מגיע עם חלון מלבני משלו", "The Greek set comes with a rectangular window of its own", "У греческого комплекта своё прямоугольное окно"],
     "why.stripesWindow": ["לא משלבים פסי מתכת עם חלון", "Metal strips do not go with a window", "Металлические полосы не сочетаются с окном"],
     "why.stripesPanel": ["לא משלבים פסי מתכת עם פאנל", "Metal strips do not go with a panel", "Металлические полосы не сочетаются с панелью"],
     "why.windowStripes": ["לא משלבים חלון עם קווי מתכת", "A window does not go with metal strips", "Окно не сочетается с металлическими полосами"],
     "why.panelStripes": ["לא משלבים פאנל עם פסי מתכת", "A panel does not go with metal strips", "Панель не сочетается с металлическими полосами"],
-    "why.rectNeedsPanel": ["חלון מרובע מגיע תמיד עם פאנל בתחתית", "A rectangular window always comes with a panel below", "Прямоугольное окно всегда идёт с нижней панелью"],
-    "why.panelOwnPull": ["הפאנל האמצעי מגיע עם המאחז שלו", "The middle panel comes with its own grip", "У средней панели своя скоба"],
+    /* `why.rectNeedsPanel` and `why.panelOwnPull` are withdrawn with the two
+       rules they explained, 14.9.2026 — the forced bottom panel and the pull a
+       face brought with it. Neither sentence was wrong; both stopped describing
+       anything the customer can be refused. See `conflicts` in rules.js. */
     "why.channelPlain": ["ידית שקועה דורשת דלת חלקה", "A recessed channel needs a plain face", "Врезная ручка требует гладкого полотна"],
     "why.notWithChannel": ["לא משתלב עם ידית שקועה", "Does not go with a recessed channel", "Не сочетается с врезной ручкой"],
     "why.noRoomHandle": ["אין מקום לידית הזו על הדלת", "No room for this handle on the door", "На двери нет места для этой ручки"],
@@ -626,7 +628,14 @@
     "fix.windowAdded": ["הוספנו חלון — הסורג והזכוכית צריכים אותו", "We added a window — the grille and the glass need one", "Мы добавили окно — решётке и стеклу оно необходимо"],
     "fix.windowGone": ["הסרנו את החלון", "We removed the window", "Мы убрали окно"],
     "fix.lineWorkGone": ["הסרנו את קווי המתכת — לא משלבים אותם עם חלון", "We removed the metal strips — they do not go with a window", "Мы убрали металлические полосы — с окном они не сочетаются"],
-    "fix.onePanel": ["עברנו לפאנל אחד — החלון תופס את מקומו של העליון", "We moved to one panel — the window takes the upper one’s place", "Оставили одну панель — окно занимает место верхней"],
+    /* ⚠ TWO SENTENCES WHERE `fix.onePanel` WAS ONE. It said "we moved to one
+       panel", and since 14.9.2026 there is no face with one panel to move to:
+       the face goes plain. What happens next depends on the window, and the
+       difference is a panel on the customer's door, so it is not glossed. The
+       square light brings its own panel with it; the vertical slot brings
+       nothing and leaves a bare leaf under the glass. */
+    "fix.facePlain": ["החלקנו את הדלת — החלון תופס את מקום הפאנלים", "We cleared the face — the window takes the panels’ place", "Мы убрали панели — окно занимает их место"],
+    "fix.rectPanel": ["החלקנו את הדלת — החלון המרובע מגיע עם הפאנל שלו בתחתית", "We cleared the face — the square window comes with its own panel below", "Мы убрали панели — у квадратного окна своя нижняя панель"],
     "fix.noPanelRoom": ["הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום", "We removed the panel — the tall window leaves no room for it", "Мы убрали панель — высокому окну не хватает места"],
     "fix.faceCleared": ["החלקנו את הדלת — ידית שקועה דורשת פנים חלקות", "We smoothed the face — a recessed channel needs it plain", "Мы сделали полотно гладким — врезная ручка этого требует"],
     "fix.grilleGone": ["הסרנו את הסורג — אין חלון", "We removed the grille — there is no window", "Мы убрали решётку — окна нет"],
@@ -634,10 +643,11 @@
     "fix.locksetSwapped": ["החלפנו את המנעול — אין לו מקום ליד המאחז", "We swapped the lockset — there is no room for it beside the grip", "Мы заменили замок — рядом со скобой ему нет места"],
     "fix.gripMoved": ["הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה", "We moved the handle — where you put it no longer works", "Мы сдвинули ручку — на выбранном месте она больше не подходит"],
     "fix.gripHome": ["הידית הוסרה, ואיתה המיקום שבחרתם לה", "The handle is gone, and with it the place you chose for it", "Ручка убрана, а вместе с ней и выбранное для неё место"],
-    "fix.setWindow": ["התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו", "We adjusted the window — the classical set comes with a rectangular one of its own", "Мы изменили окно — у классического комплекта своё прямоугольное"],
-    "fix.setGone": ["הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי", "We removed the classical set — it does not go with a vertical slot", "Мы убрали классический комплект — он не сочетается с вертикальным окном"],
-    "fix.needPanel": ["הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד", "We added a panel below — a rectangular window always comes with one", "Мы добавили нижнюю панель — прямоугольное окно всегда идёт с ней"],
-    "fix.ownPull": ["הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו", "We removed the pull handle — the middle panel comes with its own grip", "Мы убрали ручку-скобу — у средней панели своя"],
+    "fix.setWindow": ["התאמנו את החלון — הסט היווני מגיע עם חלון מלבני משלו", "We adjusted the window — the Greek set comes with a rectangular one of its own", "Мы изменили окно — у греческого комплекта своё прямоугольное"],
+    "fix.setGone": ["הסרנו את הסט היווני — הוא לא משתלב עם צוהר אנכי", "We removed the Greek set — it does not go with a vertical slot", "Мы убрали греческий комплект — он не сочетается с вертикальным окном"],
+    /* `fix.needPanel` and `fix.ownPull` are withdrawn with their rules — see the
+       note beside `why.rectNeedsPanel` above. Nothing adds a face the customer
+       did not ask for any more, and nothing takes their pull handle away. */
     /* ⚠ IT NAMES THE NUMBER, and that is the whole job of this sentence. The
        customer had eleven stripes and now has six; a toast saying "we adjusted
        the stripes" leaves them counting. The 6 is `STRIPE_MAX.v` written out —
@@ -737,6 +747,14 @@
     /* ── the order sheet's row names ──────────────────────────────── */
     "row.colour": ["צבע", "Colour", "Цвет"],
     "row.window": ["חלון", "Window", "Окно"],
+    /* ⚠ THE ORDER HAS TO SAY WHERE THE PANEL WENT. Since 14.9.2026 the panel
+       under a square light belongs to the WINDOW and not to the face, so the
+       face row on that door reads "חלק" — and without this the order Peretz
+       reads describes a plain leaf with a window and no panel, which is not the
+       door. Appended to the window's own value rather than given a row of its
+       own: it is not a thing anybody chose, and a row for it would invite the
+       question of why it has no price. */
+    "row.withPanel": ["עם פאנל תחתון", "with a panel below", "с нижней панелью"],
     "row.glazing": ["זיגוג", "Glazing", "Остекление"],
     "row.grille": ["סורג", "Grille", "Решётка"],
     "row.glass": ["זכוכית", "Glass", "Стекло"],
@@ -844,23 +862,34 @@
   var DETAIL = {
     plain: 0,
     // חלק
-    /* ⚠ PERETZ PRICED THREE FACES AND THIS LIST HAS EIGHT. His words: "panels:
-       2 panels +1450 · 3 panel +1900 (remove the handle) · greek set +2700
-       (remove the handle)". Two panels, three panels and the classical set are
-       his. A SINGLE panel is not on his list and cannot simply be deleted —
-       `rect` requires a bottom panel, so one must stay buildable — so it is
-       priced at half of two. `CLAUDE.md` §9, assumption A8, and it is the only
-       face price in the range with no source behind it. */
-    panel: 725,
-    // פאנל תחתון      — A8, half of two
-    /* `panelTop` (פאנל עליון) is WITHDRAWN, 27.8.2026: a lone UPPER panel is
-       one of the single-panel faces the owner removed, and unlike the lower one
-       it has no glazed form to survive as — a window takes that half of the
-       leaf. Its id resolves to `panel2`. */
+    /* ⚠ EVERY FACE IN THIS TABLE IS NOW ONE PERETZ PRICED, and that is new as of
+       14.9.2026. His words: "panels: 2 panels +1450 · 3 panel +1900 (remove the
+       handle) · greek set +2700 (remove the handle)". The list used to hold
+       eight faces for his three, and the extras were the two single panels —
+       ₪725 apiece, half of two, invented here and carried as assumption A8
+       because `rect` forced a bottom panel and something had to be buildable.
+       Both are withdrawn: *"remove the one panel option from the files entirely,
+       it only exists within the rectangle option."* The panel under a square
+       light is inside `WINDOW.rect` now — see the note there — so nothing forces
+       a face and no face needs a price that is not his.
+       A8 is CLOSED by this, and it was the only face price in the range with no
+       source behind it. `panel3o` below is the one figure here that is a
+       deduction rather than a quotation, and it deduces from his own trio.
+       ⚠ THEIR KEYS ARE GONE AND THAT IS LOAD-BEARING: `catalog.js` throws on a
+       price for an id the catalogue does not offer, so leaving `panel: 725` here
+       would refuse to start rather than quietly charge nobody. */
+    /* `panelTop` (פאנל עליון) is WITHDRAWN, 27.8.2026, and `panel`/`panelo` on
+       14.9.2026. All three resolve to a PAIR through `aliases`, so a link or a
+       code written while they existed opens a door and is charged this row. */
     panel2: 1450,
     // שני פאנלים      — Peretz
+    /* ⚠ NO LONGER "removes the pull handle" — Peretz, 14.9.2026: *"the handle
+       should only appear if i choose it in the pull handle section."* The figure
+       is untouched; what is gone is the rule that came with it. A customer who
+       buys this face and a pull bar now pays for both, which is what the two
+       prices have always said separately. */
     panel3: 1900,
-    // שלושה פאנלים    — Peretz. Removes the pull handle.
+    // שלושה פאנלים    — Peretz
     /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and Peretz's list does
        not settle it either way: he priced "two panels" once and named no
        families at all, because a customer buys "two panels". They are the same
@@ -868,13 +897,19 @@
        renderer — and a broader, deeper moulding is more timber and more work.
        ASK-PERETZ §14 asks whether both are even his, which is the question that
        matters more than the price. `CLAUDE.md` §9, assumption A14. */
-    panelo: 725,
-    // פאנל תחתון קלאסי
     panel2o: 1450,
     // שני פאנלים קלאסיים
-    /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
-       and plinth, all as one. Peretz's "greek set +2700", and it removes the
-       pull handle. */
+    /* ⚠ THE OGEE TRIO IS ₪1,900 BECAUSE THE REEDED TRIO IS, and the same
+       sentence that settles the pair settles this: he priced "3 panel" once and
+       named no moulding families at all, because a customer buys "three panels".
+       Added 14.9.2026 with the face. `CLAUDE.md` §9, assumption A14, which now
+       covers three pairs of faces instead of two. */
+    panel3o: 1900,
+    // שלושה פאנלים קלאסיים
+    /* The Greek set: cornice, frieze, corbelled shelf, panel and plinth, all as
+       one. Peretz's "greek set +2700". His "(remove the handle)" is withdrawn by
+       his own later instruction — see `panel3` above — and the shelf is drawn
+       empty now; the figure is unchanged, because what he priced was the set. */
     classic: 2700
     // סט יווני
   };
@@ -891,15 +926,18 @@
        so the set's glazed supplement comes down by the same 100 and his 4700
        still holds exactly. Change either number alone and the other silently
        stops being what he said. */
-    classic: 900,
+    classic: 900
     // 3800 + 900 = 4700, which is what he said
-    /* ⚠ FREE, AND THAT IS NOT A DISCOUNT — IT IS THE PANEL BEING PART OF THE
-       WINDOW. A square light forces a panel under it (rules.js
-       `rectNeedsPanel`), so on a glazed leaf the panel is not a face anybody
-       chose and `WINDOW.rect` already carries it. Its ₪725 still applies in
-       full on an UNGLAZED door, where a lower panel really is a choice.
-       See the note over `WINDOW` above for the owner's figure. */
-    panel: 0
+    /* ⚠ `panel: 0` WAS HERE AND THE MECHANISM IT STOOD FOR HAS MOVED UP A LEVEL,
+       14.9.2026. It zeroed the lower panel on a glazed leaf, because a square
+       light forced one and a forced thing must not be charged. There is no lower
+       panel FACE any more and nothing is forced: `WINDOWS.rect` carries
+       `panel: true` and `WINDOW.rect`'s ₪3,800 pays for it, which is the owner's
+       *"a blank door with a window, needs to be worth 6995"* arriving at the
+       same place by construction instead of by subtraction.
+       Kept as a note because the reasoning is the reasoning above it: a price
+       that depends on the glass is a real thing in this range, and `classic` is
+       the remaining one. */
   };
   var HANDLE = {
     none: 0,
@@ -942,8 +980,18 @@
     // כדור על אורך  — a circle, A5
     square: 300,
     // ריבועי        — squares
-    digital: 2700
+    digital: 2700,
     // מנעול חכם     — by far the largest single add-on
+    /* ⚠ ₪0 IS AN ASSUMPTION, NOT A QUOTATION — `CLAUDE.md` §9, A19, 14.9.2026.
+       Peretz asked for this handle by pointing at a drawing (*"the one thats
+       there right now with the curve, add it as a different handle"*) and named
+       neither a price nor a name for it. Priced as the Coral because his "main
+       handles: all of them in the price" covers the levers as a group and Sapir
+       is the one exception he has ever named. If it is a different product with
+       a different figure, this is the line and ASK-PERETZ carries the question.
+       Its id is a placeholder too — see the catalogue entry. */
+    "lever-taper": 0
+    // ידית מתעקלת   — A19, priced as the Coral until he says
   };
   var SPECIAL_LOCK = {
     nospecial: 0,
@@ -1144,6 +1192,24 @@
          every one of the seven. `rules.js` refuses the pairing now; before, it
          was left to `appliedFrame` returning an empty string while the price went
          on charging ₪380 for a panel nobody could see. */
+    /* ⚠ `panel: true` — THIS WINDOW COMES WITH THE PANEL UNDER IT, and that is a
+       property of the WINDOW as of 14.9.2026 rather than a face the customer is
+       made to choose. Peretz, twice: *"square +3700 (needs to aways have a panel
+       at the bottom)"* and *"remove the one panel option from the files
+       entirely, it only exists within the rectangle option."* The price already
+       worked this way — the owner's *"a blank door with a window, needs to be
+       worth 6995"* put the panel inside `WINDOW.rect` on 30.8 — so this is the
+       catalogue finally saying what the price list had been saying alone.
+       What follows from it, and is the whole point of doing it here: there is no
+       repair forcing a face, no face priced at zero, and no tile a customer
+       never picked showing as their answer. The leaf stays חלק and the order
+       reads "חלון מרובע (עם פאנל תחתון)". See the withdrawal note on `panel2`.
+       The drawing reads this flag rather than `state.detail`, so the panel is
+       drawn wherever this window is and cannot be separated from it.
+       ⚠ ON A דו כנפי THE MAIN LEAF GETS ITS PANEL AND THE SECOND LEAF DOES NOT,
+       which is a gap in the DRAWING and not in this flag: the fixed leaf's
+       branch in `renderer.js` draws a clamped aperture and nothing under it.
+       Reported by Peretz separately and fixed in its own round. */
     {
       id: "rect",
       he: "חלון מלבני",
@@ -1151,6 +1217,7 @@
       ru: "Прямоугольное окно",
       aliases: ["square", "duo", "tallwin", "broad"],
       doors: ["d108", "d099", "d122", "d116"],
+      panel: true,
       rects: [{ w: 357, h: 902, top: 185 }]
     }
   ];
@@ -1394,7 +1461,7 @@
       style: "square",
       lever: true,
       lock: true
-    }
+    },
     /* ⚠ THERE WAS A `none` LOCKSET HERE — no lever, no knob, no keyway — and it
        lasted one round. It was added so the page could open on a completely
        bare leaf, and ASK-PERETZ §13 asked whether Peretz would quote a door
@@ -1411,6 +1478,37 @@
        Its id aliases onto the cylinder, which is the smallest real thing it
        could have meant. No VERSION bump: it was the LAST entry, so removing it
        renumbers nothing. */
+    /* ── the second lever, 14.9.2026 ───────────────────────────────────
+         Peretz, looking at the Coral on the page: *"the handle needs to be even
+         wide along its length, more like the width of the top of it right now"* —
+         and then, about the shape that was there, *"the one thats there right now
+         with the curve, add it as a different handle."*
+         So this entry is the drawing the Coral used to be. `lever()` tapered from
+         40 units at the neck to 26 at the tip and drifted a shade upward on the
+         way, which is a real product and is not the one he sells as קורל. The
+         Coral is now an even blade at the tip's own width; the tapered, curving,
+         shorter blade is drawn by `leverTaper()` and is this.
+    
+         ⚠ THE ID IS A PLACEHOLDER AND IT IS PERMANENT. `lever-taper` is our word,
+         not his — he has not said what this handle is called and ASK-PERETZ asks.
+         An id is a WIRE FORMAT: it is packed into every short code by index and
+         written into every link by name, so whatever it says today it will still
+         say in five years. When his name arrives it becomes the LABEL below, in
+         three languages, and this id stays exactly as it is. Renaming it would
+         break every code and link already written, which is the one thing an
+         alias cannot rescue (see `VERSION` in url-state.js).
+    
+         ⚠ AND IT PRICES AS THE CORAL UNTIL HE SAYS OTHERWISE — ₪0, included.
+         That is an assumption, not a quotation: `CLAUDE.md` §9, A19. It is the
+         safe direction to be wrong in only if he checks it, so it is asked. */
+    {
+      id: "lever-taper",
+      he: "ידית מתעקלת (שם זמני)",
+      en: "Curved lever (provisional)",
+      ru: "Изогнутая ручка (временное название)",
+      style: "levertaper",
+      lever: true
+    }
   ];
   var PIRZUL2 = [
     { id: "pz-nickel", he: "ניקל", en: "Nickel", ru: "Никель", tone: "steel" },
@@ -1607,48 +1705,77 @@
          of the leaf, where glazing would otherwise go. Both are read by
          `hasUpperPanel`, which is the one question the rules and the drawing ask:
          can this face carry a window as well? */
-    /* `both` — panel AND groove on one leaf — is retired. Counted across the 31
-       hand-measured installations, ruled line work and a moulded panel share a
-       leaf on exactly ZERO of them: eleven doors carry line work, ten carry a
-       panel, and no door carries both. It was a combination we invented and
-       priced at ₪540.
-       ⚠ AND `groove` AND `perimeter` RESOLVE HERE TOO — the two milled grooves,
-       withdrawn at the owner's son's request: *"in the עיצוב חזית category there
-       are two things that i would like you to delete"*, naming the two entries
-       whose Hebrew begins with חריץ. A groove is the only thing this list ever
-       offered that is CUT rather than APPLIED, and the corpus was never
-       enthusiastic: of the seven measured doors with line work on the face, two
-       are milled and four are applied strips.
-       They alias onto the lower panel rather than onto `plain`, because an alias
-       should substitute for a decision, not delete it. */
-    /* ⚠ GLAZED ONLY — not a tile on a solid door. See `glazedOnly` below. */
-    {
-      id: "panel",
-      sub: "panel",
-      he: "פאנל תחתון",
-      en: "Lower panel",
-      ru: "Нижняя панель",
-      glazedOnly: true,
-      panel: true,
-      groove: false,
-      aliases: ["both", "groove", "perimeter"]
-    },
+    /* ⚠ THE LONE LOWER PANEL IS GONE FROM THIS LIST, 14.9.2026, AND ITS PANEL IS
+         NOT — IT BELONGS TO THE WINDOW NOW. Peretz: *"remove the one panel option
+         from the files entirely, it only exists within the rectangle option."*
+         Read literally that is a contradiction, because `rect` has always FORCED a
+         lower panel and the thing it forced was this entry. His sentence resolves
+         it the other way round from the way the code had it: the panel under a
+         square light is not a face anybody picks, it is part of what a square
+         window IS — which is exactly the argument `prices.js` had already made
+         when it zeroed the panel on a glazed leaf (owner, 30.8: *"dont add the
+         price of the bottom panel to the price"*). A thing that is never chosen,
+         never separately priced and never separately drawable is not an option.
+         So `WINDOWS.rect` carries `panel: true`, `rules.js` forces nothing, and a
+         door with a square window reads "חלון מרובע (עם פאנל תחתון)" and "חלק".
+         The alternative — keep forcing a face and make it `panel2` at ₪0 — was
+         refused: the tile, the spec table and the order to Peretz would all say
+         "שני פאנלים" for a door drawing one, which is an order needing a
+         clarifying question, and PLAN.md §0 says it must not be.
+         ⚠ AND THE THREE DOORS THIS WAS SUPPOSED TO COST US DO NOT EXIST. Since
+         27.8 this file, `js/rules.js`, `js/app.js`, `tools/audit.mjs` and
+         `ASK-PERETZ.md` have all said the same thing: d048, d051 and d087 are
+         solid leaves carrying ONE panel, so Peretz's instruction is contradicted
+         by three of his own doors. Withdrawing the face meant the claim finally
+         had to be acted on, so it was measured — and it is false. All three carry
+         a TALL UPPER PANEL OVER A SHORT LOWER ONE. d048 reads 0.08-0.60 and
+         0.70-0.91 of leaf height by luminance derivative down its own centre band,
+         inside 0.03 of `PANEL_ROWS.pair`. They are two-panel doors; the counts are
+         in their records now, with the runs they were read from.
+         Where "one panel" came from: `detail.panel` is a bare BOOLEAN on all ten
+         panelled records, and `tools/corpus.mjs` defaulted it to one — printing a
+         residual and a note that said it was a default. Nobody read the note. Two
+         rounds of rules and a standing question to the owner were built on top of
+         it. See CLAUDE.md §5 for the shape; this is the most expensive instance of
+         it in the project so far.
+         So nothing is lost by this withdrawal. Peretz's rule — one panel only
+         under a window — is confirmed by all ten of his measured panelled doors:
+         seven glazed with a single panel under the light, three solid with two.
+    
+         `panel`'s id survives as an alias, so a link or a code written while it
+         was a face still opens a door. It lands on the PAIR: an alias should
+         substitute for a decision, not delete it, and the pair is what the corpus
+         read of a panelled leaf now is.
+         `both` — panel AND groove on one leaf — is retired. Counted across the 31
+         hand-measured installations, ruled line work and a moulded panel share a
+         leaf on exactly ZERO of them: eleven doors carry line work, ten carry a
+         panel, and no door carries both. It was a combination we invented and
+         priced at ₪540.
+         ⚠ AND `groove` AND `perimeter` RESOLVE HERE TOO — the two milled grooves,
+         withdrawn at the owner's son's request: *"in the עיצוב חזית category there
+         are two things that i would like you to delete"*, naming the two entries
+         whose Hebrew begins with חריץ. A groove is the only thing this list ever
+         offered that is CUT rather than APPLIED, and the corpus was never
+         enthusiastic: of the seven measured doors with line work on the face, two
+         are milled and four are applied strips. */
     /* The classic two-rectangle face — tall upper, short lower — which d048
        carries and a single bottom-quarter panel cannot describe. */
     /* ⚠ `panelTop` RESOLVES HERE. A lone UPPER panel is withdrawn, 27.8.2026:
        *"remove the single panel options, the only instance when on a door is
        only one panel is when there is a window and a panel at the bottom."*
        An upper panel alone has no glazed form either — the window takes that
-       half of the leaf — so unlike `panel` and `panelo` below it does not
-       survive as a repair target and its id comes here, to the panelled face
-       nearest it. */
+       half of the leaf — so it did not survive as a repair target the way the
+       two lower panels then did, and its id comes here, to the panelled face
+       nearest it. All three are aliases of this entry now: the lower panels
+       followed it out on 14.9.2026, and this is where every withdrawn reeded
+       panel lands. */
     {
       id: "panel2",
       sub: "panel",
       he: "שני פאנלים",
       en: "Two panels",
       ru: "Две панели",
-      aliases: ["panelTop"],
+      aliases: ["panelTop", "panel", "both", "groove", "perimeter"],
       panel: true,
       groove: false,
       panels: 2,
@@ -1664,21 +1791,27 @@
        The rows themselves are in PANEL_ROWS beside the pair they are derived
        from, not here: this file says WHAT a door can be and the renderer says
        where the metal goes. */
-    /* ⚠ THE MIDDLE ONE IS A HANDLE PLATE, and `grab: true` is what says the face
-       brings its own pull. Three photographs of this door — installed, as a
-       catalogue shot, and in white — all carry the same turned bar bolted across
-       that middle rectangle, which is why it is a ninth of the leaf tall and sits
-       at hand height instead of a third of the way down. It is the same fitting
-       the classical set has on its shelf and it is drawn the same way, as part of
-       the FACE, so the hardware axis stays free for whatever else goes on the
-       door. See PANEL_ROWS in renderer.js for the rows and the ±0.03 on them.
+    /* ⚠ THE MIDDLE ONE IS A HANDLE PLATE — AND IT IS A PLATE WITH NOTHING ON IT
+       NOW, 14.9.2026. Three photographs of this door — installed, as a catalogue
+       shot, and in white — all carry the same turned bar bolted across that
+       middle rectangle, which is why it is a ninth of the leaf tall and sits at
+       hand height instead of a third of the way down. That measurement stands
+       and is kept; what is withdrawn is the DRAWING of the bar and the rule that
+       came with it.
+       Peretz: *"remove the handle from the clasic set option and the 3 panel
+       option — the handle should only appear if i choose it in the pull handle
+       section."* So `ownPull` and `grab` are gone from this entry, `rules.js`
+       refuses nothing, and the hardware axis answers for every pull on the door.
+       ⚠ WHAT IT COSTS, written down rather than discovered later: the plate now
+       reads as a short blank rectangle between two tall ones, which is a real
+       door (d065, d070 and d087 are this face with the pull bolted to bare face
+       and no plate at all) but is NOT the door these three photographs show. A
+       customer who wants what the photographs show picks the face and then picks
+       a pull handle, which is what he asked for. If the turned pull is a product
+       he sells, it belongs in `HANDLES` — ASK-PERETZ carries that question.
        The name stays "three panels" because that is what it was asked for as and
-       what a customer counts; the plate is the third. */
-    /* ⚠ `ownPull` — PERETZ: "3 panel +1900 (remove the handle)". The middle
-       panel of the three IS a grab plate and it comes with its own turned pull;
-       ASK-PERETZ §14 asked whether it always does, and this is that answered.
-       A second pull handle is not something he fits, so `js/rules.js` removes
-       one rather than drawing two. */
+       what a customer counts; the plate is the third. See PANEL_ROWS in
+       renderer.js for the rows and the ±0.03 on them. */
     {
       id: "panel3",
       sub: "panel",
@@ -1687,10 +1820,8 @@
       ru: "Три панели",
       panel: true,
       groove: false,
-      ownPull: true,
       panels: 3,
-      top: true,
-      grab: true
+      top: true
     },
     /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
          ⚠ THERE ARE TWO MOULDINGS IN THIS RANGE AND WE DREW ONE. Asked for from
@@ -1720,25 +1851,20 @@
          ⚠ AND THE SECTION GOES ROUND THE GLASS TOO. `mouldOf` is asked once and
          answers for the panel and for the architrave together, because every
          corpus door with a window over a panel cases both in the same section. */
-    /* ⚠ GLAZED ONLY — not a tile on a solid door. See `glazedOnly` below. */
-    {
-      id: "panelo",
-      sub: "panel",
-      he: "פאנל תחתון קלאסי",
-      en: "Lower panel, ogee",
-      ru: "Нижняя панель, классика",
-      glazedOnly: true,
-      panel: true,
-      groove: false,
-      profile: "ogee",
-      doors: ["d050", "d053"]
-    },
+    /* ⚠ `panelo` — THE OGEE SINGLE — GOES WITH THE REEDED ONE, 14.9.2026. Same
+       instruction, same reason: see the long note over `panel2`. Its id aliases
+       onto the ogee PAIR, so the profile a customer picked on purpose survives
+       the withdrawal even though the count cannot. d050 and d053, the two doors
+       it was measured on, are named on the pair now — they are solid leaves with
+       one ogee panel and the gallery draws them with two, which is the cost
+       ASK-PERETZ §2 asks about. */
     {
       id: "panel2o",
       sub: "panel",
       he: "שני פאנלים קלאסיים",
       en: "Two panels, ogee",
       ru: "Две панели, классика",
+      aliases: ["panelo"],
       panel: true,
       groove: false,
       panels: 2,
@@ -1746,6 +1872,11 @@
       profile: "ogee",
       doors: ["d051", "d061", "d067", "d077"]
     },
+    /* ⚠ THE OGEE TRIO IS AT THE FOOT OF THIS ARRAY, not here beside its twin —
+       see the entry after `classic`. The short code packs this array's INDEX, so
+       a new face goes on the END and the SCREEN order is `sub` plus
+       `buildOptions`, which files it next to `panel3` where a customer expects
+       it. Two different orders, and only one of them is a wire format. */
     /* ── APPLIED STRIPS ───────────────────────────────────────────────
          The designed tier's signature, and we had it backwards at first. Of the
          seven measured doors with line work on the face, only two are milled
@@ -1853,12 +1984,18 @@
          and to the openings between them, and letting a customer put a cornice
          with no plinth would offer doors nobody builds.
     
-         ⚠ THE HORIZONTAL PULL IS PART OF THE SET, NOT OF THE HARDWARE. That is
-         how it was described and it is also what makes the model work: the door
-         carries this pull AND a long vertical bar, and `state.handle` holds one
-         grip. Drawing the set's own pull as part of the FACE leaves the hardware
-         axis free for the bar, which is the choice a customer actually makes.
-         `grab: true` is what says so; nothing else in the catalogue has it.
+         ⚠ THE HORIZONTAL PULL WAS PART OF THE SET AND IS NOT DRAWN ANY MORE,
+         14.9.2026. Peretz: *"remove the handle from the clasic set option and the
+         3 panel option — the handle should only appear if i choose it in the pull
+         handle section."* It was described to us as part of the set — *"the whole
+         windows and panels and the horizontal pull bar are one set"* — and the
+         photographs of `research/newdoor/` do carry it on the shelf. He has
+         overruled both. `ownPull` and `grab` are gone from this entry.
+         ⚠ WHAT IT COSTS: the corbelled shelf is now a shelf with nothing on it.
+         That is a composition the photographs do not show, and it is drawn on his
+         instruction rather than on evidence — the one place in this file where
+         those two part company, which is why it is written here. `classicPull`'s
+         measured dimensions survive as a note in the renderer where the call was.
     
          `panel: true` — it has a raised panel, so it prices and repairs as a
          panelled face. No `top` and no `panels`, so `hasUpperPanel` is false: the
@@ -1895,19 +2032,22 @@
        from one door, photographed off the workshop floor into
        `research/newdoor/`. Whether those five are the same product is a question
        for Peretz and it is asked. */
-    /* `ownPull` — the set carries a turned pull on its own corbelled shelf.
-       Peretz: "greek set + 2700 (remove the handle)". */
+    /* ⚠ סט יווני, NOT סט קלאסי — 14.9.2026, Peretz's own word for it: *"change
+       the name of the סט קלאסי to סט יווני."* The LABELS move in all three
+       languages; the id `classic` does not, and no alias is added, because an id
+       is a wire format and nothing outside this file ever showed it to anybody.
+       His earlier note priced it as "greek set +2700", so the new name is the
+       one he had all along and קלאסי was ours. `profile: 'ogee'` below is a
+       MOULDING SECTION and keeps its own name — the two words are unrelated. */
     {
       id: "classic",
       sub: "panel",
-      he: "סט קלאסי",
-      en: "Classical set",
-      ru: "Классический комплект",
+      he: "סט יווני",
+      en: "Greek set",
+      ru: "Греческий комплект",
       panel: true,
       groove: false,
-      ownPull: true,
       classic: true,
-      grab: true,
       rectOnly: true,
       doors: ["newdoor"],
       /* The set's own mouldings are drawn by `classicSet` and are the ogee by
@@ -1923,6 +2063,32 @@
          instrument's own error, and drawing them back over the photograph in red
          put them on the glass twice. */
       winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 }
+    },
+    /* ⚠ THE TRIO IN THE OTHER MOULDING SECTION, ADDED 14.9.2026. Asked for by
+       Peretz: *"add an option of 3 panels but classic ones"* — the twin of
+       `panel3`, and the last hole in the grid the two-mouldings block above
+       opened. Every other panelled face came in both sections; three panels came
+       in one, so a customer who had chosen the ogee for its own sake lost it the
+       moment they asked for the middle plate.
+       Same rows, same inset and the SAME PRICE as `panel3` — `profile` is the
+       only field between them, which is what that block says the two sections
+       are. `js/prices.js` carries the figure, once, beside its twin's.
+       ⚠ IT DOES NOT BRING A HANDLE, and neither does `panel3` any more: see the
+       note on `grab` there. Nothing in this list carries its own pull now.
+       ⚠ APPENDED, so no index before it moves. The ogee half of the list is not
+       contiguous in this array and does not need to be; `sub` and `profile` are
+       what the screen and the drawing read. */
+    {
+      id: "panel3o",
+      sub: "panel",
+      he: "שלושה פאנלים קלאסיים",
+      en: "Three panels, ogee",
+      ru: "Три панели, классика",
+      panel: true,
+      groove: false,
+      panels: 3,
+      top: true,
+      profile: "ogee"
     }
   ];
   var FINISHES = [
@@ -2128,7 +2294,7 @@
       measure: scaled(BUILD_A.measure),
       colour: byId(COLOURS, state2.colour).delta,
       window: byId(WINDOWS, state2.window).delta,
-      /* ⚠ ONE FACE IN THE RANGE HAS TWO PRICES, and it is the classical set.
+      /* ⚠ ONE FACE IN THE RANGE HAS TWO PRICES, and it is the Greek set.
          Peretz gave three figures — the set solid ₪2,700, a square light ₪3,700,
          and "square with greek" ₪4,700 — which describe TWO products, not three:
          3700 + 1000 = 4700, so the set costs ₪1,000 on a door that is already
@@ -2244,7 +2410,18 @@
          supplier can fill. `colourCode` is in the catalogue so the five readers
          of this string cannot drift apart again. */
       { key: "colour", label: T("row.colour"), id: c.id, hex: c.hex, value: `${L(c)} (${colourCode(c)})` },
-      { key: "window", label: T("row.window"), id: w.id, value: L(w) }
+      /* ⚠ `w.panel` IS NAMED HERE OR IT IS NAMED NOWHERE. The square light comes
+         with a panel under it and that panel is no longer a FACE — so the face
+         row on such a door says חלק, correctly, and every reader of this table
+         (the summary, the A4 sheet, the aria description, the WhatsApp order)
+         would otherwise describe a plain leaf with a window and no panel.
+         `specRows` is the one description of a door; this is the one place. */
+      {
+        key: "window",
+        label: T("row.window"),
+        id: w.id,
+        value: w.panel ? `${L(w)} (${T("row.withPanel")})` : L(w)
+      }
     ];
     const panels = glazedPanels(state2);
     if (panels.length > 1) {
@@ -4193,7 +4370,15 @@ ${stops}
         rather than asked to place a panel inside it. See CLASSIC_ROWS. */
     ""}
     ${detail.classic ? classicSet(mainX, y0, leafW, leafH, paint2, pale, tone, openings.length > 0) : ""}
-    ${detail.panel && !detail.classic ? appliedFrame(
+    ${/* ⚠ `win.panel` IS THE SECOND WAY A PANEL GETS ONTO A LEAF, 14.9.2026,
+        and on a square-window door it is the ONLY way. The lone lower panel
+        left `DETAILS` — see the withdrawal note there — so the face on such
+        a door is `plain` and the panel belongs to the window. One call, two
+        reasons to make it, and the lone branch of `appliedFrame` draws the
+        same rectangle it always drew: `mouldOf(plain)` is the reed, which is
+        the section the seven glazed corpus doors with a panel carry. */
+    ""}
+    ${(detail.panel || win.panel) && !detail.classic ? appliedFrame(
       mainX,
       y0,
       leafW,
@@ -4208,21 +4393,22 @@ ${stops}
       panelInset(detail),
       mouldOf(detail)
     ) : ""}
-    ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND IT COMES WITH THE
-        HANDLE. All three photographs of this face carry the same turned pull
-        bolted across that plate — the same fitting the classical set has on
-        its shelf — which is what the plate is for and why it is short. Drawn
-        as part of the FACE, like the set's, so `state.handle` stays free for
-        whatever else the customer wants: `grab: true` on the catalogue entry
-        is the flag, and it is now on two faces rather than one. */
+    ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND THE PULL THAT WAS
+        BOLTED ACROSS IT IS GONE, 14.9.2026. Peretz: *"remove the handle from
+        the clasic set option and the 3 panel option — the handle should only
+        appear if i choose it in the pull handle section."*
+        The measurement stands and is kept: all three photographs of this
+        face carry the same turned bar across that plate, at `leafW * 0.33`
+        long and `leafH * 0.028` thick, centred on the plate's own row — the
+        same fitting the set had on its shelf, drawn by `classicPull`, which
+        is also withdrawn below. That is why the plate is a ninth of the leaf
+        tall and sits at hand height rather than a third of the way down, and
+        those rows do NOT move: the plate is still the plate.
+        What the drawing shows now is the plate empty, which is d065, d070
+        and d087 — the same face photographed with the pull bolted to bare
+        timber — minus the pull. A customer who wants the bar picks one in
+        the pull-handle step, which is exactly what he asked for. */
     ""}
-    ${detail.grab && !detail.classic && hasUpperPanel(detail) ? ((rows) => classicPull(
-      mainX + leafW / 2,
-      y0 + leafH * (rows[1][0] + rows[1][1]) / 2,
-      leafW * 0.33,
-      leafH * 0.028,
-      tone
-    ))(panelRows(detail)) : ""}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint2, detail.perimeter) : ""}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint2, hingeOnLeft, winSpan) : ""}
     ${metalStrips(mainX, y0, leafW, leafH, state2, stripeTone, hingeOnLeft)}
@@ -4520,7 +4706,7 @@ ${body}
     top: [[0.07, 0.58]],
     lone: [0.68, 0.9]
   };
-  var PANEL_INSETS = { trio: 0.15 };
+  var PANEL_INSETS = {};
   var panelRows = (detail) => detail.panels >= 3 ? PANEL_ROWS.trio : detail.panels === 2 ? PANEL_ROWS.pair : detail.top ? PANEL_ROWS.top : [PANEL_ROWS.lone];
   var panelInset = (detail) => (detail.panels >= 3 ? PANEL_INSETS.trio : null) ?? PANEL_INSET;
   function appliedFrame(lx, ly, lw, lh, paint2, pale, winBottom, upper, clearTo = 0, key = "m", alignTo = null, inset0 = PANEL_INSET, profile = MOULD_DEFAULT) {
@@ -4614,7 +4800,7 @@ ${body}
       }
       return out;
     }
-    if (detail.panel) {
+    if (detail.panel || byId(WINDOWS, state2.window).panel) {
       const inset = openings.length ? Math.max(0, Math.min(...openings.map((o) => o.x)) - MOULD_BAND) : leafW * panelInset(detail);
       const winBottom = openings.length ? Math.max(...openings.map((o) => o.top + o.h)) : 0;
       const rows = hasUpperPanel(detail) && !openings.length ? panelRows(detail) : [[Math.max(PANEL_ROWS.lone[0], (winBottom + leafW * 0.08) / leafH), PANEL_ROWS.lone[1]]];
@@ -4663,7 +4849,7 @@ ${body}
   function panelFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const detail = byId(DETAILS, state2.detail);
-    if (!detail.panel) return true;
+    if (!detail.panel && !byId(WINDOWS, state2.window).panel) return true;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const openings = apertureLayout(
       byId(WINDOWS, state2.window),
@@ -6135,7 +6321,6 @@ ${body}
         classicCorbel(lx + q.x, ly + q.y, q.w, q.h, paint2, !!r)
       );
     }
-    out.push(classicPull(X(0.5), Y((R.band[0] + R.band[1]) / 2), lw * 0.33, lh * 0.028, tone));
     const pn = at(P.panel);
     out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">` + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint2, pale, leaf, "cpn", "ogee") + `</g>`);
     piece(
@@ -6150,37 +6335,6 @@ ${body}
     );
     piece("foot", classicCap(...at(P.foot), paint2, "ft", true));
     return `<g data-set="classic">${out.join("")}</g>`;
-  }
-  function classicPull(cx, cy, len, thick, tone) {
-    const n = (v) => Number(v.toFixed(1));
-    const x0 = cx - len / 2;
-    const at = (t) => x0 + len * t;
-    const rod = thick * 0.3;
-    const ball = rod * 1.47;
-    const shade = `<rect x="${n(at(0.1))}" y="${n(cy + rod * 0.9)}" width="${n(len * 0.8)}"
-                       height="${n(rod * 1.3)}" rx="${n(rod * 0.65)}"
-                       fill="#000" opacity="0.22" filter="url(#hwShadow)"/>`;
-    return `
-    ${shade}
-    <rect x="${n(at(0.16))}" y="${n(cy - rod)}" width="${n(len * 0.68)}"
-          height="${n(rod * 2)}" rx="${n(rod)}" fill="url(#blackRod)"/>
-    ${[0.16, 0.84].map((t) => `
-      <circle cx="${n(at(t))}" cy="${n(cy)}" r="${n(ball)}" fill="url(#blackRod)"/>
-      <circle cx="${n(at(t) - ball * 0.3)}" cy="${n(cy - ball * 0.34)}"
-              r="${n(ball * 0.3)}" fill="#fff" opacity="0.18"/>`).join("")}
-    ${/* the turned neck, knop and cap beyond each ball, where it bolts down */
-    ""}
-    ${/* neck, knop, cap — spaced so the knop clears the ball. At 0.045 with a
-        ball of 0.44 thick they overlapped completely and the two ends of the
-        pull each came out as one flattened blob. */
-    ""}
-    ${[[0.02, 1], [0.98, -1]].map(([t, d]) => `
-      <rect x="${n(Math.min(at(t), at(t + d * 0.11)))}" y="${n(cy - rod * 0.4)}"
-            width="${n(len * 0.11)}" height="${n(rod * 0.8)}" fill="url(#blackRod)"/>
-      <circle cx="${n(at(t + d * 0.03))}" cy="${n(cy)}" r="${n(ball * 0.58)}"
-              fill="url(#blackRod)"/>
-      <circle cx="${n(at(t))}" cy="${n(cy)}" r="${n(ball * 0.34)}"
-              fill="url(#blackRod)"/>`).join("")}`;
   }
   function handleFootprint(handle, leafH, panelled = false) {
     switch (handle.style) {
@@ -6224,6 +6378,13 @@ ${body}
          `in` stopped being one symmetric `hx`. */
       case "lever":
         return { out: 40, in: 152, vy: 51 };
+      /* The curved lever: shorter than the Coral (0.85 of the reach) and no
+         wider anywhere, so it sits inside the Coral's declaration on every axis.
+         Declared on its own anyway rather than shared, because it is a different
+         product and a shared line is a claim that it is not. Measured by
+         `npm run collide -- boxes`, which is what the numbers below are. */
+      case "levertaper":
+        return { out: 40, in: 132, vy: 51 };
       case "plate":
         return { out: 47, in: 119, vy: 170 };
       case "almog":
@@ -6306,6 +6467,7 @@ ${body}
   };
   var LOCK_ART = {
     lever: (h, g) => lever(g.cx, g.cy, g.dir),
+    levertaper: (h, g) => leverTaper(g.cx, g.cy, g.dir),
     plate: (h, g) => plateHandle(g.cx, g.cy, g.dir),
     almog: (h, g) => almogLever(g.cx, g.cy, g.dir),
     cadoor: (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
@@ -6803,54 +6965,106 @@ ${body}
   function lever(cx, cy, dir) {
     const L2 = LEVER_REACH;
     const at = (t) => cx + dir * t;
+    const T2 = cy - 14, B = cy + 12;
     return `
     <g data-kind="lever">
-      <path d="M ${at(12)} ${cy - 7} L ${at(L2 - 16)} ${cy - 3}
-               Q ${at(L2 + 4)} ${cy - 3} ${at(L2 + 4)} ${cy + 9}
-               Q ${at(L2 + 4)} ${cy + 21} ${at(L2 - 16)} ${cy + 21}
-               L ${at(12)} ${cy + 24} Z"
+      <path d="M ${at(12)} ${T2 + 7} L ${at(L2 - 16)} ${T2 + 11}
+               Q ${at(L2 + 4)} ${T2 + 11} ${at(L2 + 4)} ${T2 + 23}
+               Q ${at(L2 + 4)} ${B + 23} ${at(L2 - 16)} ${B + 23}
+               L ${at(12)} ${B + 26} Z"
             fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
 
-      <!-- Body: broad at the neck, tapering slightly, rounded at the tip.
-           A pointed tip reads as a blade; real levers are capped. -->
-      <path d="M ${at(0)} ${cy - 20}
-               L ${at(L2 - 20)} ${cy - 14}
-               Q ${at(L2)} ${cy - 14} ${at(L2)} ${cy - 1}
-               Q ${at(L2)} ${cy + 12} ${at(L2 - 20)} ${cy + 12}
-               L ${at(0)} ${cy + 20} Z"
+      <!-- Body: one depth from the neck to the cap. A pointed tip reads as a
+           blade and a tapered one as a wedge; this lever is neither. -->
+      <path d="M ${at(0)} ${T2}
+               L ${at(L2 - 20)} ${T2}
+               Q ${at(L2)} ${T2} ${at(L2)} ${(T2 + B) / 2}
+               Q ${at(L2)} ${B} ${at(L2 - 20)} ${B}
+               L ${at(0)} ${B} Z"
             fill="url(#nickel)"/>
 
       <!-- Metal is BANDED, not shaded: the photographs show a hard clipped
            arris along the top (the only blown highlight anywhere in the
            frame), a mid band under it, and a body that goes nearly as dark as
            the paint underneath. A smooth gradient down the whole section is
-           what makes rendered hardware look like grey plastic. -->
-      <path d="M ${at(14)} ${cy - 17} L ${at(L2 - 20)} ${cy - 12}
-               Q ${at(L2 - 6)} ${cy - 12} ${at(L2 - 6)} ${cy - 9}
-               L ${at(14)} ${cy - 13} Z"
+           what makes rendered hardware look like grey plastic.
+           The bands run parallel to the blade now, because the blade is
+           parallel to itself: they used to converge with the taper. -->
+      <path d="M ${at(14)} ${T2 + 3} L ${at(L2 - 20)} ${T2 + 3}
+               Q ${at(L2 - 6)} ${T2 + 3} ${at(L2 - 6)} ${T2 + 6}
+               L ${at(14)} ${T2 + 6} Z"
             fill="#fff" opacity="0.92"/>
-      <path d="M ${at(16)} ${cy - 12} L ${at(L2 - 14)} ${cy - 8}
-               L ${at(L2 - 14)} ${cy - 3} L ${at(16)} ${cy - 6} Z"
+      <path d="M ${at(16)} ${T2 + 7} L ${at(L2 - 14)} ${T2 + 7}
+               L ${at(L2 - 14)} ${T2 + 11} L ${at(16)} ${T2 + 11} Z"
             fill="#fff" opacity="0.26"/>
       <!-- rolled underside, turned away from the key and nearly in shadow -->
-      <path d="M ${at(16)} ${cy + 3} L ${at(L2 - 16)} ${cy + 2}
-               L ${at(L2 - 16)} ${cy + 11} L ${at(16)} ${cy + 16} Z"
+      <path d="M ${at(16)} ${B - 9} L ${at(L2 - 16)} ${B - 9}
+               L ${at(L2 - 16)} ${B - 1} L ${at(16)} ${B - 1} Z"
             fill="#000" opacity="0.44"/>
-      <!-- the tip turns out of the key and picks up the darker surround -->
-      <path d="M ${at(L2 - 26)} ${cy - 11} L ${at(L2 - 4)} ${cy - 10}
-               Q ${at(L2)} ${cy - 9} ${at(L2)} ${cy - 1}
-               Q ${at(L2)} ${cy + 9} ${at(L2 - 14)} ${cy + 9}
-               L ${at(L2 - 26)} ${cy + 8} Z"
+      <!-- the cap turns out of the key and picks up the darker surround -->
+      <path d="M ${at(L2 - 26)} ${T2 + 3} L ${at(L2 - 4)} ${T2 + 4}
+               Q ${at(L2)} ${T2 + 5} ${at(L2)} ${(T2 + B) / 2}
+               Q ${at(L2)} ${B - 3} ${at(L2 - 14)} ${B - 3}
+               L ${at(L2 - 26)} ${B - 4} Z"
             fill="#000" opacity="0.16"/>
 
       ${disc(cx, cy, LEVER_ROSETTE)}
 
-      <!-- the neck swelling out of the rosette, drawn over it -->
-      <path d="M ${at(2)} ${cy - 19} Q ${at(28)} ${cy - 18} ${at(33)} ${cy - 15}
-               L ${at(33)} ${cy + 13} Q ${at(28)} ${cy + 18} ${at(2)} ${cy + 19} Z"
+      <!-- the neck swelling out of the rosette, drawn over it. It still swells
+           — a cast lever grows out of its collar — but it now closes onto the
+           blade's own depth instead of onto a wider root. -->
+      <path d="M ${at(2)} ${T2 - 4} Q ${at(28)} ${T2 - 3} ${at(33)} ${T2}
+               L ${at(33)} ${B} Q ${at(28)} ${B + 3} ${at(2)} ${B + 4} Z"
             fill="url(#nickel)"/>
-      <path d="M ${at(9)} ${cy - 14} Q ${at(26)} ${cy - 13} ${at(30)} ${cy - 11}
-               L ${at(30)} ${cy - 6} L ${at(9)} ${cy - 7} Z"
+      <path d="M ${at(9)} ${T2 + 1} Q ${at(26)} ${T2 + 2} ${at(30)} ${T2 + 3}
+               L ${at(30)} ${T2 + 8} L ${at(9)} ${T2 + 7} Z"
+            fill="#fff" opacity="0.42"/>
+    </g>`;
+  }
+  function leverTaper(cx, cy, dir) {
+    const L2 = Math.round(LEVER_REACH * 0.85);
+    const at = (t) => cx + dir * t;
+    const RISE = 13;
+    const mid = (t) => cy - RISE * (t / L2);
+    const half = (t) => 20 - 7 * (t / L2);
+    const pt = (t, s) => `${at(t)} ${(mid(t) + s * half(t)).toFixed(1)}`;
+    return `
+    <g data-kind="lever">
+      <path d="M ${pt(12, -0.7)} L ${pt(L2 - 16, -0.7)}
+               Q ${pt(L2 + 4, 0)} ${pt(L2 - 16, 1.5)} L ${pt(12, 1.5)} Z"
+            transform="translate(0 8)" fill="#000" opacity="0.30"
+            filter="url(#hwShadow)"/>
+
+      <!-- Body: broad at the neck, tapering, rising, capped at the tip. -->
+      <path d="M ${pt(0, -1)} L ${pt(L2 - 20, -1)}
+               Q ${pt(L2, -0.95)} ${pt(L2, 0)}
+               Q ${pt(L2, 0.95)} ${pt(L2 - 20, 1)}
+               L ${pt(0, 1)} Z"
+            fill="url(#nickel)"/>
+
+      <!-- the same banding as the Coral: clipped arris, mid band, dark roll -->
+      <path d="M ${pt(14, -0.85)} L ${pt(L2 - 20, -0.85)}
+               Q ${pt(L2 - 6, -0.8)} ${pt(L2 - 6, -0.62)} L ${pt(14, -0.66)} Z"
+            fill="#fff" opacity="0.92"/>
+      <path d="M ${pt(16, -0.6)} L ${pt(L2 - 14, -0.58)}
+               L ${pt(L2 - 14, -0.2)} L ${pt(16, -0.3)} Z"
+            fill="#fff" opacity="0.26"/>
+      <path d="M ${pt(16, 0.18)} L ${pt(L2 - 16, 0.16)}
+               L ${pt(L2 - 16, 0.84)} L ${pt(16, 0.8)} Z"
+            fill="#000" opacity="0.44"/>
+      <path d="M ${pt(L2 - 26, -0.55)} L ${pt(L2 - 4, -0.52)}
+               Q ${pt(L2, -0.45)} ${pt(L2, 0)}
+               Q ${pt(L2, 0.7)} ${pt(L2 - 14, 0.7)} L ${pt(L2 - 26, 0.62)} Z"
+            fill="#000" opacity="0.16"/>
+
+      ${disc(cx, cy, LEVER_ROSETTE)}
+
+      <!-- the neck over the rose, as on the Coral -->
+      <path d="M ${pt(2, -0.95)} Q ${pt(28, -0.92)} ${pt(33, -0.78)}
+               L ${pt(33, 0.72)} Q ${pt(28, 0.92)} ${pt(2, 0.95)} Z"
+            fill="url(#nickel)"/>
+      <path d="M ${pt(9, -0.7)} Q ${pt(26, -0.68)} ${pt(30, -0.58)}
+               L ${pt(30, -0.3)} L ${pt(9, -0.35)} Z"
             fill="#fff" opacity="0.42"/>
     </g>`;
   }
@@ -7039,10 +7253,23 @@ ${body}
     none: () => ({ box: [-60, -80, 60, 80], art: `
     <path d="M -34 -46 L 34 46 M 34 -46 L -34 46" fill="none" stroke="currentColor"
           stroke-width="7" stroke-linecap="round" opacity="0.45"/>` }),
-    // Coral: plain lever on a round rose, reaching toward the hinge.
+    /* Coral: plain lever on a round rose, reaching toward the hinge.
+       ⚠ THIS TILE WAS ALREADY RIGHT AND THE DOOR WAS WRONG. It has drawn a
+       constant-depth bar since it was written; `lever()` on the door tapered,
+       and the two disagreed until 14.9.2026, when the owner noticed on the door.
+       Nothing could have caught it: the distinctness test compares tiles to
+       other tiles, not tiles to the drawing they promise. */
     lever: () => ({ box: [-172, -48, 52, 48], art: `
     <circle cx="0" cy="0" r="39"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>` }),
+    /* The curved lever: the tile has to carry all three things that make it a
+       different product from the Coral above — it tapers, it rises, and it is
+       shorter — or the two tiles are a bar and a slightly shorter bar. Drawn as
+       a polygon rather than a `rect` for exactly that reason. */
+    levertaper: () => ({ box: [-152, -60, 52, 48], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <path d="M -8 -20 L -118 -33 Q -132 -34 -132 -27 L -132 -20
+             Q -132 -14 -118 -15 L -8 20 Z"/>` }),
     /* Cylinder only: an escutcheon with a euro keyway and nothing else. It had
        no entry here, so it fell to the `else` branch and drew a lever — the
        picture of the one lockset it exists to be an alternative to. Same shape
@@ -7436,14 +7663,6 @@ ${body}
       for (const w of WINDOWS) if (w.rects.length) out.window[w.id] = T("why.windowStripes");
       for (const d of DETAILS) if (d.panel) out.detail[d.id] = T("why.panelStripes");
     }
-    if (state2.window === "rect") {
-      out.detail.plain = out.detail.plain || T("why.rectNeedsPanel");
-    }
-    if (byId(DETAILS, state2.detail).ownPull) {
-      for (const h of HANDLES) {
-        if (h.style !== "none") out.handle[h.id] = T("why.panelOwnPull");
-      }
-    }
     const CHANNEL = HANDLES.find((h) => h.style === "channel");
     if (CHANNEL) {
       if (onLeaf || faceWorked(byId(DETAILS, state2.detail))) {
@@ -7488,7 +7707,12 @@ ${body}
     windowAdded: "fix.windowAdded",
     windowGone: "fix.windowGone",
     lineWorkGone: "fix.lineWorkGone",
-    onePanel: "fix.onePanel",
+    /* `onePanel` — "we moved to one panel" — went with the one-panel faces on
+       14.9.2026. The two sentences that replaced it say which window is over the
+       cleared face, because the square light leaves a panel behind and the
+       vertical slot does not. */
+    facePlain: "fix.facePlain",
+    rectPanel: "fix.rectPanel",
     noPanelRoom: "fix.noPanelRoom",
     faceCleared: "fix.faceCleared",
     grilleGone: "fix.grilleGone",
@@ -7498,11 +7722,12 @@ ${body}
     gripHome: "fix.gripHome",
     setWindow: "fix.setWindow",
     setGone: "fix.setGone",
-    needPanel: "fix.needPanel",
     peepGone: "fix.peepGone",
     bellGone: "fix.bellGone",
     peepWindow: "fix.peepWindow",
-    ownPull: "fix.ownPull",
+    /* `needPanel` and `ownPull` are gone with the two rules they announced —
+       the forced bottom panel and the pull a face brought with it. Both rules
+       were withdrawn by Peretz on 14.9.2026; see `conflicts`. */
     stripesCapped: "fix.stripesCapped"
   };
   function repair(state2, intent = null) {
@@ -7568,24 +7793,6 @@ ${body}
         change("stripes", SAID.lineWorkGone);
       }
     }
-    if (s.window === "rect" && s.detail === "plain") {
-      if (intent === "detail") {
-        s.window = "none";
-        change("window", SAID.windowGone);
-      } else {
-        s.detail = "panel";
-        change("detail", SAID.needPanel);
-      }
-    }
-    if (byId(DETAILS, s.detail).ownPull && byId(HANDLES, s.handle).style !== "none") {
-      if (intent === "handle") {
-        s.detail = "plain";
-        change("detail", SAID.setGone);
-      } else {
-        s.handle = "none";
-        change("handle", SAID.ownPull);
-      }
-    }
     if (leafGlazed(s) && byId(DETAILS, s.detail).panel && !panelFits(s)) {
       if (intent === "detail") {
         s.window = "none";
@@ -7600,13 +7807,8 @@ ${body}
         s.window = "none";
         change("window", SAID.windowGone);
       } else {
-        const cur = byId(DETAILS, s.detail);
-        const singles = DETAILS.filter((d) => d.panel && !hasUpperPanel(d));
-        const one = singles.find((d) => (d.profile || null) === (cur.profile || null)) || singles[0];
-        if (one) {
-          s.detail = one.id;
-          change("detail", SAID.onePanel);
-        }
+        s.detail = "plain";
+        change("detail", byId(WINDOWS, s.window).panel ? SAID.rectPanel : SAID.facePlain);
       }
     }
     if (byId(HANDLES, s.handle).style === "channel" && (leafGlazed(s) || faceWorked(byId(DETAILS, s.detail)))) {
@@ -7679,7 +7881,7 @@ ${body}
   }
 
   // js/url-state.js
-  var VERSION = 21;
+  var VERSION = 22;
   var DEFAULTS = {
     /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
        Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
@@ -7869,7 +8071,7 @@ ${body}
     window: 2,
     grille: 4,
     handle: 4,
-    lockset: 3,
+    lockset: 4,
     detail: 3,
     speciallock: 2,
     mashkof: 2,
@@ -8179,21 +8381,21 @@ ${body}
     { id: "d034", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
     { id: "d038", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
     { id: "d043", state: { colour: "rb-7126d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
-    { id: "d048", state: { colour: "rb-5103d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d051", state: { colour: "rb-7240d", detail: "panel", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d048", state: { colour: "rb-5103d", detail: "panel2", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d051", state: { colour: "rb-7240d", detail: "panel2", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d063", state: { colour: "rb-7240d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 4, stripeTight: false } },
     { id: "d064", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 7, stripeTight: false } },
     { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "shahar", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
     { id: "d078", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 11, stripeTight: false } },
-    { id: "d087", state: { colour: "rb-7021d", detail: "panel", window: "none", grille: "none", handle: "shahar", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d092", state: { colour: "rb-6219d", detail: "panel", window: "rect", grille: "none", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d097", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d099", state: { colour: "rb-7126d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d106", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d108", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d087", state: { colour: "rb-7021d", detail: "panel2", window: "none", grille: "none", handle: "shahar", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "none", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d097", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d099", state: { colour: "rb-7126d", detail: "plain", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "barblack", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d116", state: { colour: "rb-7080d", detail: "panel", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d122", state: { colour: "rb-7240d", detail: "panel", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d116", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d122", state: { colour: "rb-7240d", detail: "plain", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
     { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
   ];
@@ -8237,55 +8439,38 @@ ${body}
         return [[T("g.colour.free"), free], [plus, paid]];
       }
     },
-    /* ⚠ `glazedOnly` FACES ARE NOT OFFERED ON A SOLID DOOR — a LISTING rule,
-         not a buildability one. Asked for from outside: *"remove the single panel
-         options, the only instance when on a door is only one panel is when there
-         is a window and a panel at the bottom."*
-         `js/rules.js` deliberately does NOT refuse them: three of Peretz's own
-         measured doors are solid leaves with one panel, so refusing would re-fit
-         three photographs in the gallery to a door he never built. See the long
-         note there. Not offered, still reachable — which is precisely the
-         difference between a catalogue and a constraint.
-         ⚠ AND THE CURRENT VALUE IS ALWAYS LISTED. Arriving from the gallery on
-         d048 — solid, one panel — with that tile filtered out would show a group
-         in which nothing is selected, and the first tap anywhere in it would throw
-         the customer's face away without saying so.
+    /* ⚠ EVERY FACE IN THIS LIST IS OFFERED ON EVERY DOOR SINCE 14.9.2026, and
+         the machinery that made that untrue is gone with the faces it hid.
+         `glazedOnly` marked the two lone panels — offered only on a glazed leaf,
+         because *"the only instance when on a door is only one panel is when there
+         is a window and a panel at the bottom"* — and `listed` was the predicate
+         that applied it. Peretz has now withdrawn both faces outright, and the
+         panel under a square light belongs to the WINDOW rather than to this list.
+         With nothing left to hide there is no predicate, and `markGroup` shows
+         every option in every group.
     
-         ⚠ THAT PARAGRAPH WAS RIGHT, THE PREDICATE UNDER IT WAS RIGHT, AND IT RAN
-         AT THE WRONG MOMENT — 8.9.2026. It was a `list()` FILTER, and `list()` is
+         ⚠ THE EPISODE IS WORTH KEEPING BECAUSE THE BUG WAS IN WHEN IT RAN, NOT IN
+         WHAT IT SAID — 8.9.2026. It began as a `list()` FILTER, and `list()` is
          read when `buildPanel` builds the tiles: at boot, and on a language
          switch. So it was evaluated against the state the page BOOTED in and never
-         again. The default door is solid, so `panel` and `panelo` were filtered
-         out at boot and stayed out — and then:
-           · a customer choosing חלון מרובע gets a bottom panel FORCED by
-             `rectNeedsPanel`, so `state.detail` becomes `panel` with no tile;
-           · the gallery's d048, d051 and d087 — the three solid one-panel doors
-             this very comment names — load with `detail: panel` and no tile.
-         Both leave the step that asks what is on the front of the door showing a
-         list with **nothing selected** and the customer's own answer absent.
-         Reproduced on the live page at 390 and 1440 before it was touched.
-         ⚠ It is NOT the ₪725 deletion the first report claimed, and that was
-         checked rather than repeated: tapping חלק on either route leaves the door
-         and the price exactly where they were — `repair` puts the forced panel
-         straight back on the glazed route, and on d048 the tap simply does
-         nothing. What the customer sees is a control that does not respond and a
-         question with no visible answer. Friction, not a wrong door — recorded at
-         the severity it earns.
-    
-         ⚠ SO THE RULE IS A LIVE PREDICATE NOW, NOT A BUILD-TIME FILTER. Every
-         face is always BUILT; `listed` decides per paint which are shown, from the
-         same three clauses. Rebuilding the group instead was the obvious fix and
-         is refused: `buildOptions` APPENDS and carries its own rescue logic, and a
-         second build over a live host is precisely the `buildPanel` fault §0c
-         records — a correctly translated panel assembled underneath the stale one.
-         Hiding costs no DOM churn, no re-attached listeners and no focus loss. */
+         again. The default door is solid, so both singles were filtered out at
+         boot and stayed out; a customer who then chose חלון מרובע had a panel
+         forced onto them with no tile to show it, and the gallery's d048, d051 and
+         d087 loaded with a face the list omitted. Both left the step that asks
+         what is on the front of the door showing a list with nothing selected and
+         the customer's own answer absent.
+         It became a live predicate, asked on every paint, and that was right. The
+         lesson survives the deletion: a rule about WHAT IS SHOWN belongs where the
+         painting happens, because the thing it depends on can change after the
+         tiles are built. If a listing rule is ever wanted again it goes in
+         `markGroup` and not in `list()` — the hook there is deleted with this
+         one, because a hook nothing uses is a branch nothing tests. */
     {
       key: "detail",
       title: "g.detail",
       in: "face",
       kind: "tile",
       list: () => DETAILS,
-      listed: (o) => !o.glazedOnly || leafGlazed(state) || o.id === state.detail,
       glyph: detailGlyph,
       subs: DETAIL_SUBS,
       hint: "g.detail.h"
@@ -9567,11 +9752,9 @@ ${body}
   }
   function markGroup(g, blocked) {
     const chosen = [state[g.key]];
-    const listed = g.listed ? new Set(g.list().filter((o) => g.listed(o)).map((o) => o.id)) : null;
     let anyBlocked = false;
     document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"]`).forEach((el) => {
       const id = el.dataset.id;
-      if (listed) el.hidden = !listed.has(id);
       const on = chosen.includes(id);
       el.setAttribute("aria-checked", String(on));
       el.tabIndex = on || !chosen.length && el === el.parentElement.firstElementChild ? 0 : -1;

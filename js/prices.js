@@ -138,19 +138,24 @@ export const MASHKOF_WIDER = 250;
    majority of glazed orders if it is the wrong way round. `CLAUDE.md` §9,
    assumption A13, and it is the cheapest question on that list to get wrong
    expensively. */
-/* ⚠ `rect` IS 3800 AND THE PANEL IT FORCES IS FREE — ONE PRICE, NOT TWO.
+/* ⚠ `rect` IS 3800 AND ITS PANEL IS INSIDE THAT — ONE PRICE, NOT TWO.
    Owner, 30.8.2026: *"when i choose the square window, it adds a bottom panel,
    and thats a good thing, but dont add the price of the bottom panel to the
    price, a blank door with a window, needs to be worth 6995."*
-   The square light cannot be built without a panel under it (`rectNeedsPanel`
-   in rules.js, Peretz's own "needs to aways have a panel at the bottom"), so
-   the panel is not a face the customer chose — it is part of what a square
-   window IS. Charging it separately billed a customer for a decision they were
-   never offered, and it read as 3195 + 3700 + 725 = ₪7,620 on screen.
+   The square light cannot be built without a panel under it — Peretz's own
+   "needs to aways have a panel at the bottom" — so the panel is not a face the
+   customer chose; it is part of what a square window IS. Charging it
+   separately billed a customer for a decision they were never offered, and it
+   read as 3195 + 3700 + 725 = ₪7,620 on screen.
    His figure settles both halves at once: 3195 + 3800 = 6995 exactly, so the
-   panel's own 725 comes out and 100 goes onto the window. `DETAIL_GLAZED`
-   below is where the panel is zeroed — the same mechanism the classical set
-   already uses to cost differently with glass in it. */
+   panel's own 725 comes out and 100 goes onto the window.
+   ⚠ AND SINCE 14.9.2026 THE ARITHMETIC IS NOT A SUBTRACTION ANY MORE. This
+   used to be one price minus a face zeroed in `DETAIL_GLAZED`; the lone panel
+   FACE is withdrawn (*"remove the one panel option from the files entirely, it
+   only exists within the rectangle option"*) and `WINDOWS.rect` carries
+   `panel: true` in the catalogue. So ₪3,800 buys a light and the panel under
+   it, full stop — there is no second number to keep in step with this one, and
+   no way to be charged twice or zero times for the same piece of timber. */
 export const WINDOW = {
   none:    0,        // ללא חלון
   strip:   4200,     // צוהר גבוה   — his "tall"
@@ -232,20 +237,32 @@ export const GRILLE = {
    Their keys go with them: `catalog.js` refuses a price with no option. */
 export const DETAIL = {
   plain:     0,      // חלק
-  /* ⚠ PERETZ PRICED THREE FACES AND THIS LIST HAS EIGHT. His words: "panels:
-     2 panels +1450 · 3 panel +1900 (remove the handle) · greek set +2700
-     (remove the handle)". Two panels, three panels and the classical set are
-     his. A SINGLE panel is not on his list and cannot simply be deleted —
-     `rect` requires a bottom panel, so one must stay buildable — so it is
-     priced at half of two. `CLAUDE.md` §9, assumption A8, and it is the only
-     face price in the range with no source behind it. */
-  panel:     725,    // פאנל תחתון      — A8, half of two
-  /* `panelTop` (פאנל עליון) is WITHDRAWN, 27.8.2026: a lone UPPER panel is
-     one of the single-panel faces the owner removed, and unlike the lower one
-     it has no glazed form to survive as — a window takes that half of the
-     leaf. Its id resolves to `panel2`. */
+  /* ⚠ EVERY FACE IN THIS TABLE IS NOW ONE PERETZ PRICED, and that is new as of
+     14.9.2026. His words: "panels: 2 panels +1450 · 3 panel +1900 (remove the
+     handle) · greek set +2700 (remove the handle)". The list used to hold
+     eight faces for his three, and the extras were the two single panels —
+     ₪725 apiece, half of two, invented here and carried as assumption A8
+     because `rect` forced a bottom panel and something had to be buildable.
+     Both are withdrawn: *"remove the one panel option from the files entirely,
+     it only exists within the rectangle option."* The panel under a square
+     light is inside `WINDOW.rect` now — see the note there — so nothing forces
+     a face and no face needs a price that is not his.
+     A8 is CLOSED by this, and it was the only face price in the range with no
+     source behind it. `panel3o` below is the one figure here that is a
+     deduction rather than a quotation, and it deduces from his own trio.
+     ⚠ THEIR KEYS ARE GONE AND THAT IS LOAD-BEARING: `catalog.js` throws on a
+     price for an id the catalogue does not offer, so leaving `panel: 725` here
+     would refuse to start rather than quietly charge nobody. */
+  /* `panelTop` (פאנל עליון) is WITHDRAWN, 27.8.2026, and `panel`/`panelo` on
+     14.9.2026. All three resolve to a PAIR through `aliases`, so a link or a
+     code written while they existed opens a door and is charged this row. */
   panel2:    1450,   // שני פאנלים      — Peretz
-  panel3:    1900,   // שלושה פאנלים    — Peretz. Removes the pull handle.
+  /* ⚠ NO LONGER "removes the pull handle" — Peretz, 14.9.2026: *"the handle
+     should only appear if i choose it in the pull handle section."* The figure
+     is untouched; what is gone is the rule that came with it. A customer who
+     buys this face and a pull bar now pays for both, which is what the two
+     prices have always said separately. */
+  panel3:    1900,   // שלושה פאנלים    — Peretz
   /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and Peretz's list does
      not settle it either way: he priced "two panels" once and named no
      families at all, because a customer buys "two panels". They are the same
@@ -253,11 +270,17 @@ export const DETAIL = {
      renderer — and a broader, deeper moulding is more timber and more work.
      ASK-PERETZ §14 asks whether both are even his, which is the question that
      matters more than the price. `CLAUDE.md` §9, assumption A14. */
-  panelo:    725,    // פאנל תחתון קלאסי
   panel2o:   1450,   // שני פאנלים קלאסיים
-  /* The classical set: cornice, frieze, corbelled shelf with its pull, panel
-     and plinth, all as one. Peretz's "greek set +2700", and it removes the
-     pull handle. */
+  /* ⚠ THE OGEE TRIO IS ₪1,900 BECAUSE THE REEDED TRIO IS, and the same
+     sentence that settles the pair settles this: he priced "3 panel" once and
+     named no moulding families at all, because a customer buys "three panels".
+     Added 14.9.2026 with the face. `CLAUDE.md` §9, assumption A14, which now
+     covers three pairs of faces instead of two. */
+  panel3o:   1900,   // שלושה פאנלים קלאסיים
+  /* The Greek set: cornice, frieze, corbelled shelf, panel and plinth, all as
+     one. Peretz's "greek set +2700". His "(remove the handle)" is withdrawn by
+     his own later instruction — see `panel3` above — and the shelf is drawn
+     empty now; the figure is unchanged, because what he priced was the set. */
   classic:   2700,   // סט יווני
 };
 
@@ -313,13 +336,16 @@ export const DETAIL_GLAZED = {
      still holds exactly. Change either number alone and the other silently
      stops being what he said. */
   classic: 900,      // 3800 + 900 = 4700, which is what he said
-  /* ⚠ FREE, AND THAT IS NOT A DISCOUNT — IT IS THE PANEL BEING PART OF THE
-     WINDOW. A square light forces a panel under it (rules.js
-     `rectNeedsPanel`), so on a glazed leaf the panel is not a face anybody
-     chose and `WINDOW.rect` already carries it. Its ₪725 still applies in
-     full on an UNGLAZED door, where a lower panel really is a choice.
-     See the note over `WINDOW` above for the owner's figure. */
-  panel:   0,
+  /* ⚠ `panel: 0` WAS HERE AND THE MECHANISM IT STOOD FOR HAS MOVED UP A LEVEL,
+     14.9.2026. It zeroed the lower panel on a glazed leaf, because a square
+     light forced one and a forced thing must not be charged. There is no lower
+     panel FACE any more and nothing is forced: `WINDOWS.rect` carries
+     `panel: true` and `WINDOW.rect`'s ₪3,800 pays for it, which is the owner's
+     *"a blank door with a window, needs to be worth 6995"* arriving at the
+     same place by construction instead of by subtraction.
+     Kept as a note because the reasoning is the reasoning above it: a price
+     that depends on the glass is a real thing in this range, and `classic` is
+     the remaining one. */
 };
 
 /* ── the pull handle ───────────────────────────────────────────────────
@@ -401,6 +427,15 @@ export const LOCKSET = {
   knobplate: 200,    // כדור על אורך  — a circle, A5
   square:    300,    // ריבועי        — squares
   digital:   2700,   // מנעול חכם     — by far the largest single add-on
+  /* ⚠ ₪0 IS AN ASSUMPTION, NOT A QUOTATION — `CLAUDE.md` §9, A19, 14.9.2026.
+     Peretz asked for this handle by pointing at a drawing (*"the one thats
+     there right now with the curve, add it as a different handle"*) and named
+     neither a price nor a name for it. Priced as the Coral because his "main
+     handles: all of them in the price" covers the levers as a group and Sapir
+     is the one exception he has ever named. If it is a different product with
+     a different figure, this is the line and ASK-PERETZ carries the question.
+     Its id is a placeholder too — see the catalogue entry. */
+  'lever-taper': 0,  // ידית מתעקלת   — A19, priced as the Coral until he says
 };
 
 /* ── the extra lock ───────────────────────────────────────────────────

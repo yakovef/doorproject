@@ -118,12 +118,19 @@ const CASES = [
      all said `tallwin` because that was once the only tall opening we had, not
      because the doors agreed. */
   { id: 'd097', label: 'luxury 7500 - tall light, medallions',
-    q: 'c=rb-9016d&w=tallwin&g=scroll-light&n=none&k=coral&d=panel&s=standard',
+    /* ⚠ `d=plain` SINCE 14.9.2026, AND THE DRAWING DOES NOT MOVE. The lone
+       lower panel left `DETAILS` — *"remove the one panel option from the
+       files entirely, it only exists within the rectangle option"* — and its
+       id aliases onto the PAIR, which a square light refuses, so this query
+       began naming a door the site will not draw and the guard below caught
+       it. The panel is still under the glass: the WINDOW brings it. */
+    q: 'c=rb-9016d&w=tallwin&g=scroll-light&n=none&k=coral&d=plain&s=standard',
     gap: 'the grid is the door colour but the medallions inside it are BLACK, and '
        + '`light` is one switch over the whole grille, so ours makes both pale; the '
        + 'real ornament is denser scrollwork where ours is a single opposed pair' },
   { id: 'd106', label: 'luxury 8500 - interlocking rings',
-    q: 'c=rb-7080d&w=broad&g=circles&n=none&k=plate&d=panel&s=standard',
+    /* `d=plain` since 14.9.2026 — see the note on d097 above. */
+    q: 'c=rb-7080d&w=broad&g=circles&n=none&k=plate&d=plain&s=standard',
     /* ⚠ This note claimed the ring cell was "capped at 96 mm", and there has
        been no such cap since the glass patterns were redrawn — a tool
        describing a drawing that no longer exists, which is CLAUDE.md §5 in its
@@ -150,7 +157,8 @@ const CASES = [
        bar and this sheet stood a bar-less door beside a photograph of one with
        a 1056 mm bar down it. `lock.kind` is "round-escutcheon". The check
        below is there so the next one of these is not silent. */
-    q: 'c=rb-6219d&w=rect&g=grid-light&n=idan&k=cylinder&d=panel&s=sidelight',
+    /* `d=plain` since 14.9.2026 — see the note on d097 above. */
+    q: 'c=rb-6219d&w=rect&g=grid-light&n=idan&k=cylinder&d=plain&s=sidelight',
     gap: 'this door carries BOTH — a pale grid over reeded glass — and one list means '
        + 'one choice, so the reeded pane is the half we drop (see GRILLES); the bar '
        + 'is black in the photograph and ours is nickel' },

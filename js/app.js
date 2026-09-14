@@ -29,7 +29,7 @@
 
 import {
   BELLS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
-  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, leafGlazed, LOCKSETS, MASHKOFS,
+  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, LOCKSETS, MASHKOFS,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
@@ -112,51 +112,34 @@ const GROUPS = [
       return [[T('g.colour.free'), free], [plus, paid]];
     } },
 
-  /* ⚠ `glazedOnly` FACES ARE NOT OFFERED ON A SOLID DOOR — a LISTING rule,
-     not a buildability one. Asked for from outside: *"remove the single panel
-     options, the only instance when on a door is only one panel is when there
-     is a window and a panel at the bottom."*
-     `js/rules.js` deliberately does NOT refuse them: three of Peretz's own
-     measured doors are solid leaves with one panel, so refusing would re-fit
-     three photographs in the gallery to a door he never built. See the long
-     note there. Not offered, still reachable — which is precisely the
-     difference between a catalogue and a constraint.
-     ⚠ AND THE CURRENT VALUE IS ALWAYS LISTED. Arriving from the gallery on
-     d048 — solid, one panel — with that tile filtered out would show a group
-     in which nothing is selected, and the first tap anywhere in it would throw
-     the customer's face away without saying so.
+  /* ⚠ EVERY FACE IN THIS LIST IS OFFERED ON EVERY DOOR SINCE 14.9.2026, and
+     the machinery that made that untrue is gone with the faces it hid.
+     `glazedOnly` marked the two lone panels — offered only on a glazed leaf,
+     because *"the only instance when on a door is only one panel is when there
+     is a window and a panel at the bottom"* — and `listed` was the predicate
+     that applied it. Peretz has now withdrawn both faces outright, and the
+     panel under a square light belongs to the WINDOW rather than to this list.
+     With nothing left to hide there is no predicate, and `markGroup` shows
+     every option in every group.
 
-     ⚠ THAT PARAGRAPH WAS RIGHT, THE PREDICATE UNDER IT WAS RIGHT, AND IT RAN
-     AT THE WRONG MOMENT — 8.9.2026. It was a `list()` FILTER, and `list()` is
+     ⚠ THE EPISODE IS WORTH KEEPING BECAUSE THE BUG WAS IN WHEN IT RAN, NOT IN
+     WHAT IT SAID — 8.9.2026. It began as a `list()` FILTER, and `list()` is
      read when `buildPanel` builds the tiles: at boot, and on a language
      switch. So it was evaluated against the state the page BOOTED in and never
-     again. The default door is solid, so `panel` and `panelo` were filtered
-     out at boot and stayed out — and then:
-       · a customer choosing חלון מרובע gets a bottom panel FORCED by
-         `rectNeedsPanel`, so `state.detail` becomes `panel` with no tile;
-       · the gallery's d048, d051 and d087 — the three solid one-panel doors
-         this very comment names — load with `detail: panel` and no tile.
-     Both leave the step that asks what is on the front of the door showing a
-     list with **nothing selected** and the customer's own answer absent.
-     Reproduced on the live page at 390 and 1440 before it was touched.
-     ⚠ It is NOT the ₪725 deletion the first report claimed, and that was
-     checked rather than repeated: tapping חלק on either route leaves the door
-     and the price exactly where they were — `repair` puts the forced panel
-     straight back on the glazed route, and on d048 the tap simply does
-     nothing. What the customer sees is a control that does not respond and a
-     question with no visible answer. Friction, not a wrong door — recorded at
-     the severity it earns.
-
-     ⚠ SO THE RULE IS A LIVE PREDICATE NOW, NOT A BUILD-TIME FILTER. Every
-     face is always BUILT; `listed` decides per paint which are shown, from the
-     same three clauses. Rebuilding the group instead was the obvious fix and
-     is refused: `buildOptions` APPENDS and carries its own rescue logic, and a
-     second build over a live host is precisely the `buildPanel` fault §0c
-     records — a correctly translated panel assembled underneath the stale one.
-     Hiding costs no DOM churn, no re-attached listeners and no focus loss. */
+     again. The default door is solid, so both singles were filtered out at
+     boot and stayed out; a customer who then chose חלון מרובע had a panel
+     forced onto them with no tile to show it, and the gallery's d048, d051 and
+     d087 loaded with a face the list omitted. Both left the step that asks
+     what is on the front of the door showing a list with nothing selected and
+     the customer's own answer absent.
+     It became a live predicate, asked on every paint, and that was right. The
+     lesson survives the deletion: a rule about WHAT IS SHOWN belongs where the
+     painting happens, because the thing it depends on can change after the
+     tiles are built. If a listing rule is ever wanted again it goes in
+     `markGroup` and not in `list()` — the hook there is deleted with this
+     one, because a hook nothing uses is a branch nothing tests. */
   { key: 'detail', title: 'g.detail', in: 'face', kind: 'tile',
     list: () => DETAILS,
-    listed: o => !o.glazedOnly || leafGlazed(state) || o.id === state.detail,
     glyph: detailGlyph, subs: DETAIL_SUBS, hint: 'g.detail.h' },
 
   { key: 'window', title: 'g.window', in: 'glass', kind: 'tile', list: () => WINDOWS,
@@ -287,14 +270,16 @@ const GROUPS = [
  * themselves because they are a CSS counter, which is exactly why they are
  * one: there is no number here to keep in step.
  *
- * ⚠ AND IT REVERSES WHICH WAY ONE REPAIR RUNS, which is the part worth reading
- * twice. A three-panel face carries its own pull, so the face and a grip
- * cannot both be had. Asked in the old order a customer chose the face and
- * then lost it to a handle; asked in this one they choose the handle and lose
- * it to the face. `repair`'s `intent` already decides that correctly in both
- * directions — whichever the customer just clicked wins — so nothing in
- * `js/rules.js` needed touching. What changes is which sentence they usually
- * see: `fix.ownPull` rather than `fix.setGone`.
+ * ⚠ IT USED TO REVERSE WHICH WAY ONE REPAIR RAN, AND THAT REPAIR IS GONE.
+ * A three-panel face carried its own pull, so the face and a grip could not
+ * both be had, and the ORDER of the two steps decided which of them a customer
+ * usually lost. Peretz withdrew the rule on 14.9.2026 — *"the handle should
+ * only appear if i choose it in the pull handle section"* — so every face goes
+ * with every grip and the ordering has no such consequence left.
+ * The observation the paragraph made is still the reason to think about order
+ * at all: where two steps can take each other's answer away, the LATER one
+ * wins for most customers, whatever `repair`'s `intent` tie-break says, simply
+ * because that is the one they reach second.
  */
 /* ⚠ משקוף MOVED FROM SECOND TO LAST, 30.8.2026, AND NOTHING ELSE MOVED.
    Reported from outside, looking at the shipped flow: it is the most technical
@@ -3018,22 +3003,21 @@ function onGripKey(ev) {
 function markGroup(g, blocked) {
   const chosen = [state[g.key]];
 
-  /* ⚠ A LISTING RULE IS APPLIED HERE, LIVE, AND NOT IN `list()`. See the long
-     note over the face group: a filter inside `list()` is read when the tiles
-     are BUILT and so freezes at the state the page booted in. `listed` is
-     asked on every paint, so a door that becomes glazed — or arrives from the
-     gallery already carrying a face the solid list omits — gets its tile.
-     A group with no `listed` shows everything, which is every group but one.
-     ⚠ `hidden`, not removed: the tile keeps its listeners and its place, so
-     nothing has to be rebuilt and the roving tabindex below still finds it. */
-  const listed = g.listed
-    ? new Set(g.list().filter(o => g.listed(o)).map(o => o.id))
-    : null;
+  /* ⚠ A LISTING RULE BELONGS HERE, LIVE, AND NOT IN `list()` — and there is no
+     longer one to apply. The face group had the only one: a filter inside
+     `list()` is read when the tiles are BUILT and so freezes at the state the
+     page booted in, which is the 8.9.2026 fault the long note over that group
+     records. It was moved here, asked on every paint, and on 14.9.2026 the two
+     faces it hid left the catalogue, so the predicate and this loop's `hidden`
+     clause go with them: every option in every group is shown, and what a
+     customer cannot have is marked `aria-disabled` below rather than removed.
+     If a rule about what is SHOWN is ever wanted again it goes in this
+     function — three lines building a Set of permitted ids off `g.list()` —
+     and it never goes in `list()`. */
 
   let anyBlocked = false;
   document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"]`).forEach(el => {
     const id = el.dataset.id;
-    if (listed) el.hidden = !listed.has(id);
     const on = chosen.includes(id);
     el.setAttribute('aria-checked', String(on));
     el.tabIndex = on || (!chosen.length && el === el.parentElement.firstElementChild) ? 0 : -1;

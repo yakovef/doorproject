@@ -200,26 +200,49 @@ export function conflicts(state) {
      are selected would overstate a change the customer will barely notice.
      Read off `panels` rather than the id, so a third panelled face added later
      is covered without anybody remembering to come back here. */
-  /* ⚠ A LONE PANEL ON A SOLID DOOR IS NOT REFUSED, AND THAT IS THE SECOND
-     TIME THIS RANGE HAS CONTRADICTED WHAT WE WERE TOLD ABOUT IT.
+  /* ⚠ A LONE PANEL ON A SOLID DOOR WAS NOT REFUSED, ON THE STRENGTH OF THREE
+     DOORS THAT TURNED OUT NOT TO BE WHAT THIS NOTE SAID THEY WERE.
 
      Asked for from outside: *"remove the single panel options, the only
      instance when on a door is only one panel is when there is a window and a
      panel at the bottom."* This first shipped as a conflict — `panel` and
      `panelo` blocked whenever the leaf had no glass — and `npm test` refused
-     it, naming three doors: d048, d051 and d087 are Peretz's OWN installed
-     doors, hand-measured off his own photographs, each a solid leaf carrying a
-     single lower panel. The instruction is contradicted by three of the thirty
-     doors it was given about, exactly the way "there is no ברזל מחושל" is
-     contradicted by ten of them (`ASK-PERETZ.md` §2).
+     it, naming three doors: d048, d051 and d087, Peretz's OWN installed doors,
+     hand-measured off his own photographs, each said to be a solid leaf
+     carrying a single lower panel. That read as the instruction being
+     contradicted by three of the thirty doors it was given about, exactly the
+     way "there is no ברזל מחושל" is contradicted by ten of them.
+     So the two were split for two rounds: not a CHOICE — `js/app.js` left both
+     out of the tile list on a solid door, which is what was actually asked for
+     — but still a STATE, so the gallery could draw his three doors as they
+     were built and an old link opened as itself.
 
-     So the two are split. It is not a CHOICE — `js/app.js` leaves both out of
-     the tile list on a solid door, which is what was actually asked for, and
-     the customer cannot reach one. It is still a STATE, so the gallery draws
-     his three real doors as they were built and an old link opens as itself,
-     with no notice and no repair moving it. A rule here would have done
-     neither: it would have re-fitted three photographs to a door he did not
-     build, in the one part of the site whose whole job is being true. */
+     ⚠ MEASURED ON 14.9.2026, AND ALL THREE CARRY TWO PANELS. A tall upper over
+     a short lower — d048 at 0.08-0.60 and 0.70-0.91 of leaf height, read by
+     luminance derivative down its own centre band, inside 0.03 of
+     `PANEL_ROWS.pair`. "One panel" was never measured: `detail.panel` is a
+     bare boolean on every one of the ten panelled records, and
+     `tools/corpus.mjs` defaulted it to one, printed a residual for it, and
+     said in its own note that it was a default and not a reading. The note was
+     right and nobody acted on it — so a DEFAULT became a fact, the fact became
+     a contradiction, and the contradiction bought a withdrawn rule, a listing
+     predicate, an audit check and a standing question to the owner.
+     Peretz's instruction is confirmed by all ten of his panelled doors: the
+     seven glazed ones carry a single panel under the light, and the three
+     solid ones carry two. He closed it himself on 14.9.2026 — *"remove the one
+     panel option from the files entirely, it only exists within the rectangle
+     option"* — and both faces are gone from `DETAILS` with their ids aliased
+     onto the PAIR, so an old link still opens the same door.
+
+     ⚠ THE LESSON IS NOT THE ONE THIS NOTE USED TO CARRY. It said: an
+     instruction from the owner can be contradicted by the owner's own work,
+     and the right first move is to say so rather than to pick one. That is
+     true, and it is not what happened here. What happened is that a tool's
+     stated UNCERTAINTY was quietly promoted to a measurement by every reader
+     downstream. CLAUDE.md §5 is about a stale justification surviving its
+     subject; this is the same failure with the arrow reversed, and it is the
+     more expensive of the two because it reads as evidence. */
+
   if (onLeaf) {
     for (const d of DETAILS) if (hasUpperPanel(d)) {
       out.detail[d.id] = T('why.winTakesTop');
@@ -238,7 +261,7 @@ export function conflicts(state) {
     }
   }
 
-  /* The classical set and its own light — the other half of the repair below.
+  /* The Greek set and its own light — the other half of the repair below.
      ⚠ IT NO LONGER NEEDS A WINDOW, IT ONLY REFUSES THE WRONG ONE. `needsWindow`
      forced the rectangle, and a photograph of the same set built SOLID — the
      glass swapped for a raised panel with a peephole and a ring knocker, every
@@ -279,25 +302,26 @@ export function conflicts(state) {
     for (const d of DETAILS) if (d.panel) out.detail[d.id] = T('why.panelStripes');
   }
 
-  /* PERETZ: "square +3700 (needs to aways have a panel at the bottom)". The
-     square light leaves the bottom half of the leaf bare and he fills it, so a
-     plain face is not a door he builds with that window. Reported on the FACE
-     rather than on the window, because the window is what the customer chose
-     and the face is what has to move. */
-  if (state.window === 'rect') {
-    out.detail.plain = out.detail.plain || T('why.rectNeedsPanel');
-  }
+  /* ⚠ TWO RULES CAME OUT OF THIS TABLE ON 14.9.2026 AND NOTHING REPLACED
+     THEM. Both were Peretz's and both are withdrawn by Peretz.
 
-  /* PERETZ: "3 panel +1900 (remove the handle)" and the same for the greek
-     set. The middle panel of the three IS a grab plate carrying its own turned
-     pull, and the classical set has its own pull on the shelf — so a second
-     one is not an option he offers. ASK-PERETZ §14 asked whether the three
-     panels always come with their pull; this is that answered. */
-  if (byId(DETAILS, state.detail).ownPull) {
-    for (const h of HANDLES) {
-      if (h.style !== 'none') out.handle[h.id] = T('why.panelOwnPull');
-    }
-  }
+     THE FIRST forced a panel under a square light — "square +3700 (needs to
+     aways have a panel at the bottom)" — by refusing `plain` beside `rect`.
+     The fact is unchanged and the mechanism is gone: the panel belongs to the
+     WINDOW now (`WINDOWS.rect` carries `panel: true`), so there is nothing to
+     force and no face to refuse. A door with a square light and a plain leaf
+     is exactly the door he described, and the customer is no longer told that
+     their own answer is unavailable in order to get there.
+
+     THE SECOND refused every pull handle beside the trio and the Greek set,
+     because both carried their own. *"remove the handle from the clasic set
+     option and the 3 panel option — the handle should only appear if i choose
+     it in the pull handle section."* So neither face brings a pull, `ownPull`
+     is gone from the catalogue, and every lockset and every grip is available
+     on every face. This is the third time a rule in this table has been
+     withdrawn by the man whose sentence put it there, after the pull-bar x
+     lever pairing below and the lone panel above — and each time the rule was
+     a correct reading of what he said and a wrong reading of what he sells. */
 
   /* WITHDRAWN: pull bar x lever. This was the strongest OBSERVED rule in the
      table — of the ten installed doors carrying a pull bar, not one has a
@@ -513,7 +537,12 @@ const SAID = {
   windowAdded:   'fix.windowAdded',
   windowGone:    'fix.windowGone',
   lineWorkGone:  'fix.lineWorkGone',
-  onePanel:      'fix.onePanel',
+  /* `onePanel` — "we moved to one panel" — went with the one-panel faces on
+     14.9.2026. The two sentences that replaced it say which window is over the
+     cleared face, because the square light leaves a panel behind and the
+     vertical slot does not. */
+  facePlain:     'fix.facePlain',
+  rectPanel:     'fix.rectPanel',
   noPanelRoom:   'fix.noPanelRoom',
   faceCleared:   'fix.faceCleared',
   grilleGone:    'fix.grilleGone',
@@ -523,11 +552,12 @@ const SAID = {
   gripHome:      'fix.gripHome',
   setWindow:     'fix.setWindow',
   setGone:       'fix.setGone',
-  needPanel:     'fix.needPanel',
   peepGone:      'fix.peepGone',
   bellGone:      'fix.bellGone',
   peepWindow:    'fix.peepWindow',
-  ownPull:       'fix.ownPull',
+  /* `needPanel` and `ownPull` are gone with the two rules they announced —
+     the forced bottom panel and the pull a face brought with it. Both rules
+     were withdrawn by Peretz on 14.9.2026; see `conflicts`. */
   stripesCapped: 'fix.stripesCapped',
 };
 
@@ -687,20 +717,21 @@ export function repair(state, intent = null) {
      Repair must be idempotent and must always LAND somewhere buildable; a
      repair that reads a value another repair is about to change is neither. */
 
-  /* PERETZ: "square +3700 (needs to aways have a panel at the bottom)". If the
-     customer asked for the window, the face gains a panel; if they asked for a
-     plain face, the window yields. */
-  if (s.window === 'rect' && s.detail === 'plain') {
-    if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
-    else { s.detail = 'panel'; change('detail', SAID.needPanel); }
-  }
-
-  /* PERETZ: "3 panel +1900 (remove the handle)", and the same for the greek
-     set — both carry their own pull. */
-  if (byId(DETAILS, s.detail).ownPull && byId(HANDLES, s.handle).style !== 'none') {
-    if (intent === 'handle') { s.detail = 'plain'; change('detail', SAID.setGone); }
-    else { s.handle = 'none'; change('handle', SAID.ownPull); }
-  }
+  /* ⚠ THE "A SQUARE LIGHT NEEDS A PANEL" REPAIR IS GONE, 14.9.2026, and its
+     absence is the point. It wrote `s.detail = 'panel'` — a literal id, the
+     one thing in this file that named a catalogue entry in a string — and the
+     entry it named no longer exists. Left in place it would have encoded as
+     index 0 through `Math.max(0, findIndex)` and written a PLAIN door into
+     every short code for a glazed one, in silence, which is exactly the class
+     of fault `VERSION` exists to prevent and which no version bump can catch.
+     Nothing takes its place: `WINDOWS.rect` carries its own panel, so the
+     state the repair used to construct is now the default state and `plain`
+     beside `rect` is buildable. See the withdrawal note in `conflicts`.
+     ⚠ AND THE THIRD ORDERING CONSTRAINT ABOVE STILL HOLDS, for the repair
+     below it rather than for this one. The face repairs still run after the
+     line-work repairs, and the reason is unchanged: line work can clear the
+     face, and a repair that reads a value another repair is about to change is
+     not idempotent. */
 
   /* Two panels and a window want the same half of the leaf, and the window
      takes it. The face drops to the single lower panel — a real option at a
@@ -718,17 +749,26 @@ export function repair(state, intent = null) {
   if (leafGlazed(s) && hasUpperPanel(byId(DETAILS, s.detail))) {
     if (intent === 'detail') { s.window = 'none'; change('window', SAID.windowGone); }
     else {
-      /* ⚠ THE SAME MOULDING, not just the same count. `panelo` is the ogee
-         single and `panel` the plain one; a customer on two CLASSICAL panels
-         who adds a window was dropped onto the plain single, quietly changing
-         the profile of the moulding they had picked on purpose. It matters
-         more now: since 27.8 those two singles are the only way to reach one
-         panel at all, so this is the only thing that puts them on a door. */
-      const cur = byId(DETAILS, s.detail);
-      const singles = DETAILS.filter(d => d.panel && !hasUpperPanel(d));
-      const one = singles.find(d => (d.profile || null) === (cur.profile || null))
-               || singles[0];
-      if (one) { s.detail = one.id; change('detail', SAID.onePanel); }
+      /* ⚠ THE FACE GOES PLAIN, AND UNTIL 14.9.2026 IT WENT TO A SINGLE PANEL.
+         It used to drop onto the lone panel of the same MOULDING SECTION —
+         `panelo` for a customer on the ogee pair, `panel` for the reeded one —
+         and that care was the right care: dropping a customer who had chosen
+         the classical profile onto the plain single changed a decision they
+         had made on purpose. Both singles are withdrawn, so there is no face
+         left with one panel and the profile has nothing to ride on.
+         ⚠ THE BRANCH COULD NOT SIMPLY BE LEFT. `DETAILS.filter(d => d.panel &&
+         !hasUpperPanel(d))` now matches exactly ONE entry — the Greek set,
+         which has `panel: true` and neither `top` nor `panels` — so the old
+         code would have answered "a window over two panels" with a whole
+         cornice-and-plinth composition at ₪2,700. Measured before deleting it,
+         not assumed.
+         What the customer loses is a panel; what they keep is the glass they
+         just asked for, and on the square light they keep a panel too, because
+         that window brings its own. `SAID.rectPanel` says exactly that and
+         `SAID.facePlain` is the honest sentence for the slot, which brings
+         nothing. Two sentences because they are two different doors. */
+      s.detail = 'plain';
+      change('detail', byId(WINDOWS, s.window).panel ? SAID.rectPanel : SAID.facePlain);
     }
   }
 

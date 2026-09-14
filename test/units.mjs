@@ -2,13 +2,13 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, PEEPHOLES, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, grilleGlyph, handleGlyph, LIGHT,
+  gripHome, gripPlacement, grilleGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, locksetGlyph, nearestGrip, peepholeFits, render, sizeGlyph, specialLockGlyph,
   windowGlyph,
 } from '../js/renderer.js';
@@ -493,26 +493,42 @@ for (const st of everyState()) {
   ok(fromQuery(`?d=${spoken}`).state.colour === 'rb-9005d'
   && fromQuery(`?d=${spoken}`).state.size === 'extra1',
      `?d=${spoken} did not open the door that code names`);
-  ok(fromQuery('?d=panel').state.detail === 'panel',
-     '?d= stopped working as the detail axis, which is what it mostly is');
+  /* ⚠ `panel` IS AN ALIAS NOW, NOT A FACE — 14.9.2026. The claim this line
+     makes is unchanged and is about the PARAMETER: `?d=` still names the
+     detail axis and still resolves a face id through it. What it lands on is
+     the pair, because the lone panel was withdrawn and its id aliases there.
+     Asserted as "the alias lands somewhere real", which is stronger than
+     `=== 'panel'` was: `byId` falls back to `DETAILS[0]` for an id it cannot
+     resolve, so an alias quietly dropped from the catalogue would open a PLAIN
+     door and the old form of this line would have caught it only by accident.
+     Falsified by removing `panel` from `panel2`'s aliases: lands on `plain`. */
+  ok(fromQuery('?d=panel').state.detail === 'panel2',
+     '?d= stopped working as the detail axis, or the withdrawn lone panel '
+     + 'no longer resolves to the pair it aliases to');
+  ok(fromQuery('?d=panelo').state.detail === 'panel2o',
+     'the withdrawn ogee single must resolve to the ogee pair, not to the '
+     + 'reeded one and not to plain — the profile is the thing it kept');
   ok(!toQuery({ ...base }).includes('i=1'), 'the url must not carry a view flag');
 
   /* A link written while the finish and the add-ons were on offer is in
      somebody's WhatsApp history. It must open the door it names, WITHOUT a
      notice — withdrawing an option is our change, not that customer's mistake
      — and without leaving a key behind that nothing downstream reads. */
-  /* ⚠ `d=panel`, AND IT USED TO BE `d=plain`. This link's subject is the
+  /* ⚠ `d=plain`, AND IT HAS NOW BEEN BOTH TWICE. This link's subject is the
      RETIRED PARAMETERS — `f=`, `a=`, `z=` must be ignored in silence, because
-     withdrawing an option is our change and not that customer's mistake. It
-     carried a plain face behind a square window, which was a fine door until
-     Peretz said "square needs to aways have a panel at the bottom"; now that
-     combination legitimately repairs and legitimately announces, and this
-     assertion started failing for a reason that has nothing to do with what it
-     is testing. Changed the door, not the assertion: a test whose fixture has
-     become invalid needs a new fixture, and a test whose expectation has
-     become inconvenient needs neither. */
+     withdrawing an option is our change and not that customer's mistake.
+     It carried a plain face behind a square window; that became unbuildable
+     when Peretz said "square needs to aways have a panel at the bottom", so
+     the fixture moved to `d=panel`; and on 14.9.2026 he withdrew the lone
+     panel and put it inside the window, which makes `d=panel` an alias for the
+     PAIR — and a pair behind a square light legitimately repairs. So the
+     fixture comes back to the door it started as, which is buildable again
+     and for the owner's own reason.
+     Twice now the fixture has moved and the assertion has not, which is the
+     point: a test whose fixture has become invalid needs a new fixture, and a
+     test whose expectation has become inconvenient needs neither. */
   const old = fromQuery('?v=8&c=rb-0097d&w=rect&z=clear&g=none&n=idan&k=cylinder'
-                      + '&d=panel&f=brass&s=standard&h=right-in&a=peep,mail');
+                      + '&d=plain&f=brass&s=standard&h=right-in&a=peep,mail');
   ok(old.notice === null, `a pre-withdrawal link should open quietly, got ${old.notice}`);
   ok(old.state.finish === undefined, 'f= must not survive into the state');
   ok(old.state.addons === undefined, 'a= must not survive into the state');
@@ -658,7 +674,10 @@ group('a pull bar is a length');
         failure PLAN.md §0 exists to prevent. */
   let clamped = 0;
   for (const size of sizeKeys) {
-    const leafH = SIZES[size].h - 50;                     // REBATE
+    /* ⚠ `REBATE`, NOT A TYPED 50. It was a literal with the constant's name
+       in a comment beside it, which is the shape this suite exists to catch
+       — read from the catalogue since 14.9.2026. */
+    const leafH = SIZES[size].h - REBATE;
     for (const L of HANDLE_LENS) {
       const got = handleLength({ ...base, size, handle: 'idan', handleLen: L });
       ok(got <= leafH - 240,
@@ -858,20 +877,43 @@ group('price');
   ok(P({ window: 'rect', colour: DEFAULTS.colour, handle: 'none' }) === 6995,
      `a plain door with a square window must be ₪6,995, got ${
         P({ window: 'rect', colour: DEFAULTS.colour, handle: 'none' })}`);
-  /* ⚠ AND THE PANEL IS ONLY FREE WHERE IT IS FORCED. On a solid leaf a lower
-     panel is a face the customer chose, and it still costs its ₪725 — the
-     assertion that stops "included with the window" quietly becoming
-     "always free". */
-  ok(P({ detail: 'panel', window: 'rect' }) - P({ window: 'rect' }) === 0,
-     'the panel a square window forces is inside the window price');
-  ok(P({ detail: 'panel' }) - P({}) === 725,
-     `a chosen lower panel on a solid door still costs ₪725, got ${
+  /* ⚠ THE PANEL A SQUARE WINDOW BRINGS IS INSIDE THE WINDOW AND IS THE ONLY
+     PANEL ON THAT DOOR — asserted from both ends, 14.9.2026.
+     It used to be a forced FACE zeroed by `DETAIL_GLAZED`, and the pair of
+     assertions here guarded the seam between the two numbers. There is no seam
+     now: `WINDOWS.rect` carries the panel and `WINDOW.rect` carries its price,
+     so what has to be true is that adding the window adds ₪3,800 and NOTHING
+     else moves — no face is charged, and no face is quietly added either.
+     Falsified by putting a `DETAIL` entry back for a lone panel, which is what
+     the `plain` clause catches, or by charging the window's panel twice. */
+  ok(P({ window: 'rect' }) - P({}) === 3800,
+     `a square window and the panel it brings add ₪3,800 exactly, got ${
+        P({ window: 'rect' }) - P({})}`);
+  ok(repair({ ...DEFAULTS, window: 'rect' }, 'window').state.detail === 'plain',
+     'a square window no longer forces a face onto the customer’s door');
+  /* ⚠ AND THE WITHDRAWN IDS STILL PRICE, THROUGH THE PAIR THEY ALIAS TO. A
+     link or a code written while פאנל תחתון was a face must open a door and be
+     charged for the door it opens — which is two panels now, at the pair's own
+     figure. The alternative, an id that resolves to `DETAILS[0]` by the
+     fall-back in `byId`, would have opened a plain door at ₪3,195 and said
+     nothing; that is what makes this an assertion rather than a note. */
+  ok(P({ detail: 'panel' }) - P({}) === 1450,
+     `the withdrawn lone panel resolves to the pair and is charged as one, got ${
         P({ detail: 'panel' }) - P({})}`);
+  ok(P({ detail: 'panelo' }) === P({ detail: 'panel2o' }),
+     'the withdrawn ogee single must price as the ogee pair it resolves to');
   /* "design: almost all of them in the price." Every grille is ₪0 now except
      the three laser-cut ones. */
   ok(P({ window: 'rect', grille: 'scroll' }) === 7645, 'scrollwork is included');
   ok(P({ window: 'rect', grille: 'vine' }) === 8345, 'the laser-cut ones add ₪700');
-  ok(P({ detail: 'panel' }) === 4570, `a lower panel should add ₪725, got ${P({ detail: 'panel' })}`);
+  ok(P({ detail: 'panel2' }) === 5295, `two panels should add ₪1,450, got ${P({ detail: 'panel2' })}`);
+  /* ⚠ THE OGEE TRIO COSTS WHAT THE REEDED TRIO COSTS, added 14.9.2026 with the
+     face. Asserted as an EQUALITY between the two rather than against ₪1,900,
+     because the claim is that the two moulding sections are one product at one
+     price — so if Peretz ever prices them apart, this is the line that has to
+     be argued with rather than a figure that silently stops matching. */
+  ok(P({ detail: 'panel3o' }) === P({ detail: 'panel3' }),
+     'the ogee trio must cost exactly what the reeded trio costs');
   /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and these two lines are
      Peretz's three window figures reduced to the two products they describe:
      the set solid is ₪2,700, and a square light plus the set glazed is
@@ -1131,7 +1173,19 @@ group('detail and finish');
     const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
     ok(new Set(ids).size === ids.length, `duplicate id in ${label}`);
     const d = DETAILS.find(x => x.id === st.detail);
-    ok(svg.includes('data-detail="panel"') === d.panel, `panel mismatch: ${label}`);
+    /* ⚠ TWO THINGS CAN PUT A PANEL ON A LEAF SINCE 14.9.2026. The FACE is one.
+       The square WINDOW is the other — `WINDOWS.rect` carries `panel: true`,
+       because Peretz withdrew the lone-panel face and the panel under a square
+       light belongs to the window that forces it. On such a door the face is
+       `plain` and the panel is still there.
+       Asked as a biconditional over the union rather than over `d.panel`
+       alone, which is strictly stronger than what it replaced: it still fails
+       for a face that draws no panel and a face that draws one uninvited, and
+       it now also fails if the window's panel goes missing or appears on a
+       door where no window brings one. Falsified both ways by dropping either
+       clause from the render condition in `renderer.js`. */
+    const wantsPanel = d.panel || !!WINDOWS.find(x => x.id === st.window).panel;
+    ok(svg.includes('data-detail="panel"') === wantsPanel, `panel mismatch: ${label}`);
     ok(svg.includes('data-detail="groove"') === d.groove, `groove mismatch: ${label}`);
     // The metal still gets a tone, even though nobody chooses it any more.
     ok(svg.includes('--hw-mid:'), `finish tone not applied: ${label}`);
@@ -1819,6 +1873,70 @@ for (const [key, list, ctx] of [
 
    Asked of the markup rather than of a browser, because `data-panels` is put
    there by the drawing for exactly this kind of question. */
+/* ⚠ THE SENTENCE IN `PANEL_ROWS` THAT HAD NO ASSERTION BEHIND IT, 14.9.2026.
+   The table's own sanity check — the one that made the re-measured trio
+   credible — reads: "the trio's upper and lower rectangles land within 0.02 of
+   `pair`'s own 0.07-0.58 and 0.66-0.92 ... the three-panel door IS the
+   two-panel door with a plate let in between". Nothing tested it, and it was
+   wrong: measured off the table, the four edges differ by 0.009, 0.125, 0.053
+   and 0.024. The head and the foot are close; the INNER edges are not, and
+   were never meant to be — the pair's panels meet around a gap at mid-leaf
+   while the trio's open to let a plate in. So the claim is about the ENVELOPE
+   and the figure is 0.03, which is stated in the comment now and asserted
+   here.
+
+   ⚠ ASKED OF `faceObstacles`, NOT OF THE TABLE. Comparing `PANEL_ROWS.trio` to
+   `PANEL_ROWS.pair` would be the table agreeing with itself. `faceObstacles`
+   is what the placement rules believe is on the face, and `npm run collide`
+   checks it against the geometry the drawing actually emits — so going through
+   it means this asserts the DRAWN envelope, one step closer to the door.
+
+   ⚠ AND IT IS WHAT THE A4 OVERRULE LEFT ALONE. Peretz widened the trio's
+   margins to match the pair on 14.9.2026, which is the INSET — horizontal.
+   The rows are vertical and did not move with it. Asserting them here is what
+   makes that separation visible: if somebody ever "finishes the job" by
+   pulling the rows onto the pair's as well, the plate loses its row and this
+   fails rather than the drawing quietly changing. */
+group('the three-panel face is the two-panel face with a plate let in');
+{
+  const solid = d => ({ ...base, detail: d, window: 'none', size: 'standard',
+                        handle: 'none' });
+  const rowsOf = d => faceObstacles(solid(d))
+    .filter(o => o.kind === 'panel')
+    .sort((a, b) => a.y - b.y);
+  const pair = rowsOf('panel2'), trio = rowsOf('panel3');
+  ok(pair.length === 2, `the pair draws ${pair.length} panels, so this check is dead`);
+  ok(trio.length === 3, `the trio draws ${trio.length} panels, so this check is dead`);
+  if (pair.length === 2 && trio.length === 3) {
+    const leafH = SIZES.standard.h - REBATE;
+    const TOL = 0.03;
+    const head = Math.abs(trio[0].y - pair[0].y) / leafH;
+    const foot = Math.abs((trio[2].y + trio[2].h) - (pair[1].y + pair[1].h)) / leafH;
+    ok(head <= TOL,
+       `the trio's head is ${head.toFixed(3)} of the leaf from the pair's, past ${TOL}`);
+    ok(foot <= TOL,
+       `the trio's foot is ${foot.toFixed(3)} of the leaf from the pair's, past ${TOL}`);
+    /* And the middle one is the PLATE: shorter than either rectangle it sits
+       between, which is the whole reason the envelope can match while the
+       inner edges do not. Read off three photographs at 0.114 of the leaf. */
+    ok(trio[1].h < trio[0].h && trio[1].h < trio[2].h,
+       `the trio's middle rectangle is ${trio[1].h.toFixed(0)} mm tall against `
+     + `${trio[0].h.toFixed(0)} and ${trio[2].h.toFixed(0)} — it is a handle plate `
+     + 'and must be the short one');
+    /* ⚠ AND THE INSET IS THE PAIR'S, ON PERETZ'S WORD. `PANEL_INSETS.trio` was
+       0.15, measured off d067, d068 and d077 and agreeing with their equal
+       margins all round; he overruled it on 14.9.2026 — *"change the size of
+       the panels as they are in the 2 panel options."* Asserted as an equality
+       with the pair rather than against 0.23, because what he asked for is
+       that the two faces MATCH: if `PANEL_INSET` ever moves, they move
+       together or this fails. The measurement is kept in `PANEL_ROWS`'s note
+       and is not withdrawn — it is overruled, and by whom is written there. */
+    ok(trio[0].x === pair[0].x && trio[0].w === pair[0].w,
+       `the trio insets to ${trio[0].x.toFixed(0)} mm and the pair to `
+     + `${pair[0].x.toFixed(0)} — Peretz asked for the panels to be the same`);
+  }
+}
+
 group('a panel that is charged for is a panel that is drawn');
 {
   let n = 0, missing = 0;
@@ -1828,12 +1946,28 @@ group('a panel that is charged for is a panel that is drawn');
     n++;
     const svg = render(st);
     const g = /<g data-detail="panel"([^>]*)>/.exec(svg);
-    const drawn = g ? (/data-panels="2"/.test(g[1]) ? 2 : 1) : 0;
-    const paid = d.panel ? (d.panels === 2 ? 2 : 1) : 0;
+    /* ⚠ THE COUNT, NOT "TWO OR NOT TWO". This read `/data-panels="2"/` and
+       scored anything else as one — so the three-panel face was compared as
+       1 against a `paid` of 1 and the check passed on both sides being wrong.
+       It reads the number the drawing wrote. */
+    const drawnAttr = g && /data-panels="(\d+)"/.exec(g[1]);
+    const drawn = g ? (drawnAttr ? Number(drawnAttr[1]) : 1) : 0;
+    /* ⚠ AND TWO THINGS CAN BE PAID FOR SINCE 14.9.2026. The face is one, at
+       its own `DETAIL` price. The square window is the other: `WINDOWS.rect`
+       carries `panel: true` and `WINDOW.rect`'s ₪3,800 includes that panel —
+       the owner's *"a blank door with a window, needs to be worth 6995"*. So a
+       plain leaf behind a square light is paid up for exactly one panel and
+       must draw exactly one, and a face that brings its own is not given a
+       second by the window. The money behind the second clause is asserted in
+       the price group; what is asserted here is that the door shows what the
+       customer is paying for either way. */
+    const wp = w.panel && !d.panel ? 1 : 0;
+    const paid = (d.panel ? (d.panels || 1) : 0) + wp;
     if (drawn !== paid) missing++;
     ok(drawn === paid,
-       `${d.id}/${w.id}/${size}: the price is for ${paid} panel(s) at ₪${shekels(d.delta)}, `
-     + `the drawing shows ${drawn}`);
+       `${d.id}/${w.id}/${size}: the price is for ${paid} panel(s) — `
+     + `₪${shekels(d.delta)} on the face${wp ? ' and one inside the window' : ''} — `
+     + `and the drawing shows ${drawn}`);
   }
   console.log(`  (${n} buildable faces, ${missing} charged for a panel they do not show)`);
 }
@@ -3407,6 +3541,20 @@ group('a handle the customer moved reaches the order');
          Peretz drills for it either way — that is not a report of a drag. */
       ok(untouched.includes('מותקנת לרוחב הדלת'),
          `${st.handle}/${st.size}/${st.window}: home is rotated and the order never says so`);
+      /* ⚠ AND IT MAY ONLY LIE DOWN WHERE IT COULD NOT STAND UP. `gripHome`
+         tries upright over the whole leaf first and lays the bar across only
+         as a last resort — "a handle that could stand up should stand up: that
+         is what every door in the corpus does". These two say the last resort
+         was actually reached: the rotated home is a LEGAL placement, and the
+         door is one where the bar can be turned at all. A rotation that is
+         neither is `gripHome` preferring to lay bars down, which no photograph
+         supports. Added 14.9.2026, when flat homes became reachable again. */
+      ok(gripPlacement(st, home).ok,
+         `${st.handle}/${st.size}/${st.window}/${st.detail}: home is rotated and `
+       + 'is not even a legal placement');
+      ok(gripCanRotate(st),
+         `${st.handle}/${st.size}/${st.window}/${st.detail}: home is rotated on a `
+       + 'door whose bar cannot be turned');
     }
 
     /* 2. MOVE IT AND THE ORDER CHANGES. Only where the move is legal, or the
@@ -3426,21 +3574,74 @@ group('a handle the customer moved reaches the order');
     }
   }
   ok(moved > 0, 'no handle could be moved anywhere — this group is asserting nothing');
-  /* ⚠ NO PRODUCT HAS A ROTATED HOME ANY MORE, so this is exercised on purpose
-     rather than by accident. `flat` means the bar lies ACROSS the leaf, and
-     the message must add "מותקנת לרוחב הדלת" when it does — a fact about the
-     door that Peretz builds to. It used to arise on its own from the Shiran,
-     whose home position was rotated; Peretz withdrew the Shiran on 26.8.2026
-     and with it the only grip that came that way.
-     The old assertion was `flatHome > 0` — a guard that the case was being
-     reached — and it now fails for a true reason: the case is not reached by
-     any DEFAULT door. The property is unchanged and still worth asserting, so
-     it is asserted on a door explicitly rotated, which is how a customer
-     reaches it: they press סובבו. Weakening it to "0 is fine" would have been
-     the wrong repair; making the coverage deliberate is the right one. */
-  ok(flatHome === 0,
-     `${flatHome} doors have a rotated HOME position — no product should, since `
-   + 'the Shiran was withdrawn. If one was added, restore the sweep above');
+  /* ⚠ A ROTATED HOME IS REACHABLE AGAIN SINCE 14.9.2026, AND NOT BECAUSE A
+     PRODUCT CAME BACK. This line read `flatHome === 0` — "no product has a
+     rotated home any more" — and that was true for a reason nobody had
+     written down: the Greek set and the three-panel face refused EVERY pull
+     handle, so the two compositions that could crowd a bar off the upright
+     were the two it was never allowed to stand beside. Peretz withdrew that
+     rule (*"the handle should only appear if i choose it in the pull handle
+     section"*), so a bar on the set is a door now — and on the four wide sizes
+     the composition, cornice to plinth, leaves an upright bar nowhere within
+     reach of hand height. Sixteen doors, all of them `classic`, all of them
+     `nitzan` or `barblack`: the bar lies across the leaf at hand height, which
+     is what `gripHome`'s last resort exists for and what the outside request
+     that added it asked for in those words.
+     ⚠ THE HISTORY MATTERS BECAUSE THIS LINE HAS NOW BEEN BOTH WAYS ROUND. It
+     was `flatHome > 0` — a coverage guard — until the Shiran was withdrawn on
+     26.8.2026 took away the only grip whose home came rotated, and it became
+     `=== 0`, a claim about the catalogue. Neither survives: a COUNT is not the
+     property, it is a census of the range, and the range moves every round.
+     So nothing here asserts the number. What the sweep asserts instead is the
+     property itself, on every flat home it finds — the order names it, the
+     placement is legal, and the bar could be turned — plus the invariant
+     below, which is the one a count was standing in for.
+     ⚠ IT LIES DOWN ONLY WHERE IT CANNOT STAND UP, and that is asked WITHOUT
+     going back through `gripHome`. For every rotated home, the same door is
+     searched for an upright place the way the page itself searches when a
+     customer drags — `nearestGrip` from the home position with the rotation
+     taken off — and there must not be one. "A handle that could stand up
+     should stand up: that is what every door in the corpus does."
+     ⚠ AND THE OBVIOUS VERSION OF THIS CHECK DOES NOT WORK, which is worth a
+     line because it looks like it should. "A leaf with nothing on it never
+     rotates" was written first, and it is TRUE — and it caught nothing when
+     `gripHome` was patched to prefer its last resort: rotated homes went from
+     16 to 296 and not one of them was on a bare leaf, because a bare leaf's
+     upright placement is legal from the first candidate and the flat branch
+     never has to be consulted for it to pass. An assertion that survives the
+     regression it was written for is not a weak assertion, it is a decoration.
+     Falsified by moving the flat branch above the upright one in `gripHome`:
+     this fails on the doors where both are legal, which is the regression. */
+  {
+    let checked = 0;
+    for (const st of everyPlacement()) {
+      const home = gripHome(st);
+      if (home.rot !== 90) continue;
+      checked++;
+      const stood = nearestGrip(st, { ...home, rot: 0 });
+      /* ⚠ LEGAL *AND* WITHIN REACH, because that is `gripHome`'s actual
+         promise and legality alone is not it. On nitzan/extra2 behind the
+         Greek set an upright bar IS legal — at 230,760, which is 260 mm above
+         hand height and on a 2,600 mm leaf is chest-high on the door and
+         nowhere near where a hand goes. `gripHome` refuses it for the same
+         reason the grab bar's note gives ("a knee rail"), and a check that
+         ignored the band would have demanded the drawing put a handle there.
+         `HOME_REACH` comes from the renderer rather than being typed here —
+         see the note on it, which asked for exactly this. */
+      const reachable = gripPlacement(st, stood).ok
+                     && Math.abs(stood.y - home.y) <= HOME_REACH;
+      ok(!reachable,
+         `${st.handle}/${st.size}/${st.window}/${st.detail}: the bar lies across `
+       + `the leaf and would stand up at ${Math.round(stood.x)},${Math.round(stood.y)}, `
+       + `${Math.round(Math.abs(stood.y - home.y))} mm from hand height — an upright `
+       + 'grip was available and was not taken');
+    }
+    ok(checked === flatHome,
+       `the sweep found ${flatHome} rotated homes and this one found ${checked} — `
+     + 'the two are walking different doors');
+    console.log(`  (${flatHome} rotated homes, every one of them on a door with `
+              + 'nowhere for an upright bar)');
+  }
   {
     let rotated = 0;
     /* ⚠ AT 60 cm, because a bar only lies across a leaf it is shorter than.

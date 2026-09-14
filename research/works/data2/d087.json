@@ -125,7 +125,9 @@
   "panel": true,
   "groove": false,
   "grooves": [],
-  "texture": "smooth"
+  "texture": "smooth",
+  "panel_count": 2,
+  "panel_count_why": "two panels, same method and date as d048: runs at 0.122-0.151, 0.470-0.497, 0.644-0.669 and 0.834-0.856 of leaf height - a tall upper panel over a short lower one. The cluster at 0.567-0.582 is the horizontal pull bar bolted across the face, not a panel edge. CLAUDE.md and tools/corpus.mjs had both said in prose that d087 carries two; this is that measured."
  },
  "extras": [
   "ornate black bow pull between the panels at y 0.56",

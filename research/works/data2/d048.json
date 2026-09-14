@@ -125,7 +125,9 @@
   "panel": true,
   "groove": false,
   "grooves": [],
-  "texture": "smooth"
+  "texture": "smooth",
+  "panel_count": 2,
+  "panel_count_why": "two panels, read by luminance derivative down the leaf centre band (0.47-0.53 W) on 14.9.2026: moulding runs at 0.063-0.103, 0.590-0.610, 0.691-0.704 and 0.897-0.918 of leaf height, so a tall upper panel ~0.08-0.60 over a short lower one ~0.70-0.91. The cluster at 0.214-0.291 is the ring knocker, not an edge. Within 0.03 of PANEL_ROWS.pair. The record carried detail.panel as a bare boolean and tools/corpus.mjs defaulted it to ONE, which is where the \"three solid doors with a single panel\" claim came from; it was never measured."
  },
  "extras": [
   "ring knocker on a diamond backplate with the peephole set inside the ring",

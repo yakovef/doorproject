@@ -1422,7 +1422,7 @@ export function render(state) {
      per state, a wider mashkof would grow this box, `fitStage` would scale the
      whole drawing down to fit it, and the LEAF would appear to shrink when the
      customer changed something that does not touch the leaf. That is the fault
-     reported from outside about the classical set. See `MASHKOF_MAX`. */
+     reported from outside about the Greek set. See `MASHKOF_MAX`. */
   const view = {
     x: x0 - MASHKOF_MAX.in - MASHKOF_MAX.out - PAD.x,
     y: y0 - MASHKOF_MAX.head - MASHKOF_MAX.out - PAD.top,
@@ -1551,7 +1551,7 @@ export function render(state) {
 
   /* The glazing, built once and PLACED once — either before the face design or
      after it, never both. See the note at the two call sites in the markup:
-     the classical set is a whole composition applied over the light's
+     the Greek set is a whole composition applied over the light's
      architrave, and every other face is one feature laid on a leaf beside it. */
   const glazing = `
   <g id="glazing">
@@ -2917,24 +2917,34 @@ export function render(state) {
     ${detail.classic
         ? classicSet(mainX, y0, leafW, leafH, paint, pale, tone, openings.length > 0)
         : ''}
-    ${detail.panel && !detail.classic
+    ${/* ⚠ `win.panel` IS THE SECOND WAY A PANEL GETS ONTO A LEAF, 14.9.2026,
+          and on a square-window door it is the ONLY way. The lone lower panel
+          left `DETAILS` — see the withdrawal note there — so the face on such
+          a door is `plain` and the panel belongs to the window. One call, two
+          reasons to make it, and the lone branch of `appliedFrame` draws the
+          same rectangle it always drew: `mouldOf(plain)` is the reed, which is
+          the section the seven glazed corpus doors with a panel carry. */''}
+    ${(detail.panel || win.panel) && !detail.classic
         ? appliedFrame(mainX, y0, leafW, leafH, paint, pale, winBottom,
             hasUpperPanel(detail) ? panelRows(detail) : null, 0, 'm',
             openings.length ? Math.min(...openings.map(o => o.x)) - MOULD_BAND : null,
             panelInset(detail), mouldOf(detail))
         : ''}
-    ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND IT COMES WITH THE
-          HANDLE. All three photographs of this face carry the same turned pull
-          bolted across that plate — the same fitting the classical set has on
-          its shelf — which is what the plate is for and why it is short. Drawn
-          as part of the FACE, like the set's, so `state.handle` stays free for
-          whatever else the customer wants: `grab: true` on the catalogue entry
-          is the flag, and it is now on two faces rather than one. */''}
-    ${detail.grab && !detail.classic && hasUpperPanel(detail)
-        ? (rows => classicPull(mainX + leafW / 2,
-                               y0 + leafH * (rows[1][0] + rows[1][1]) / 2,
-                               leafW * 0.33, leafH * 0.028, tone))(panelRows(detail))
-        : ''}
+    ${/* ⚠ THE TRIO'S MIDDLE RECTANGLE IS A HANDLE PLATE AND THE PULL THAT WAS
+          BOLTED ACROSS IT IS GONE, 14.9.2026. Peretz: *"remove the handle from
+          the clasic set option and the 3 panel option — the handle should only
+          appear if i choose it in the pull handle section."*
+          The measurement stands and is kept: all three photographs of this
+          face carry the same turned bar across that plate, at `leafW * 0.33`
+          long and `leafH * 0.028` thick, centred on the plate's own row — the
+          same fitting the set had on its shelf, drawn by `classicPull`, which
+          is also withdrawn below. That is why the plate is a ninth of the leaf
+          tall and sits at hand height rather than a third of the way down, and
+          those rows do NOT move: the plate is still the plate.
+          What the drawing shows now is the plate empty, which is d065, d070
+          and d087 — the same face photographed with the pull bolted to bare
+          timber — minus the pull. A customer who wants the bar picks one in
+          the pull-handle step, which is exactly what he asked for. */''}
     ${detail.perimeter ? edgeGroove(mainX, y0, leafW, leafH, paint, detail.perimeter) : ''}
     ${detail.groove ? inlayGroove(mainX, y0, leafW, leafH, paint, hingeOnLeft, winSpan) : ''}
     ${metalStrips(mainX, y0, leafW, leafH, state, stripeTone, hingeOnLeft)}
@@ -3181,7 +3191,7 @@ function bevel(x, y, w, h, d, paint, raised = true) {
  * between 0.34 and 1.16, then replaced by thirteen stops with a single hollow,
  * re-read at 4000 px off `research/newdoor/`. Both readings are correct. They
  * are readings of DIFFERENT DOORS, and putting the second over the first drew
- * the classical set's broad ogee round every panel in the range — which is
+ * the Greek set's broad ogee round every panel in the range — which is
  * what *"i want you to remake how the panels look because they dont look
  * good"* was about.
  *
@@ -3196,9 +3206,11 @@ function bevel(x, y, w, h, d, paint, raised = true) {
  *            d077 d103 d112 d129 and the set in `research/newdoor/` — eleven.
  *
  * Near enough evenly split, which is why neither can be "the" moulding, and
- * why the choice is in the catalogue rather than here: `panel` and `panel2`
- * are reeded, `panelo` and `panel2o` are the ogee, and the classical set is
- * the ogee by construction.
+ * why the choice is in the catalogue rather than here: `panel2` and `panel3`
+ * are reeded, `panel2o` and `panel3o` are the ogee, and the Greek set is the
+ * ogee by construction. (`panel` and `panelo`, the two lone lower panels, were
+ * withdrawn on 14.9.2026 and alias onto the pair in their own section, so a
+ * customer who picked a profile on purpose keeps it.)
  *
  * `at` runs from the band's OUTER edge to its inner one; `tone` is how much
  * light that point returns compared with the field. Both are carried as
@@ -3585,19 +3597,51 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  * Two things fall out. The plate is 0.114 of the leaf and not 0.09 — half
  * again as tall — and the whole composition sits some 0.05 LOWER than it was
  * drawn, so the pull was riding about 100 mm high. And the trio's upper and
- * lower rectangles land within 0.02 of `pair`'s own 0.07-0.58 and 0.66-0.92,
- * which is the sanity check this table never had: the three-panel door IS the
+ * lower rectangles land CLOSE TO `pair`'s own 0.07-0.58 and 0.66-0.92, which
+ * is the sanity check this table never had: the three-panel door IS the
  * two-panel door with a plate let in between, once the plate is the right
  * height. The reasoning that was wrong before was the ENVELOPE — splitting the
  * pair's span three ways — not the family resemblance.
+ * ⚠ "WITHIN 0.02" IS WHAT THIS SENTENCE SAID FOR FOUR ROUNDS AND IT WAS NOT
+ * TRUE. The four edges differ by 0.009, 0.125, 0.053 and 0.024 — the head and
+ * the foot are close, the INNER edges are not, and they are not meant to be:
+ * the pair's panels meet around a 0.08 gap at mid-leaf while the trio's open
+ * to let a plate in. So the claim is about the ENVELOPE, head and foot, and
+ * the figure is 0.03. It has an assertion behind it now; it never had one,
+ * which is how a false number survived in a comment whose job was to be the
+ * check on the table under it.
  *
- * ⚠ AND THE TRIO'S PANELS ARE WIDER. `PANEL_INSET` is 0.23 and measured, but
- * measured on the one- and two-panel doors; on all three of these photographs
- * the panels run to about 0.15 of the leaf from each edge. Read off the
- * catalogue shot, which is the only one of the three square-on: 0.131 and
- * 0.133. The other two agree to within four hundredths, which is as much as an
- * angled snapshot can be asked for — so the figure is 0.15 and the honest
- * error on it is ±0.03, stated here rather than implied by three decimals.
+ * ⚠ AND THE TRIO'S PANELS ARE WIDER — MEASURED 0.15, DRAWN 0.23, OVERRULED.
+ * `PANEL_INSET` is 0.23 and measured, but measured on the one- and two-panel
+ * doors; on all three of these photographs the panels run to about 0.15 of the
+ * leaf from each edge. Read off the catalogue shot, which is the only one of
+ * the three square-on: 0.131 and 0.133. The other two agree to within four
+ * hundredths, which is as much as an angled snapshot can be asked for — so the
+ * figure is 0.15 and the honest error on it is ±0.03.
+ *
+ * ⚠ THIS IS AN OVERRULE, NOT A CORRECTION. Peretz, 14.9.2026: *"the 3 panel
+ * option looks wider than the other panel options, so change the size of the
+ * panels as they are in the 2 panel options."* So `PANEL_INSETS` is empty and
+ * the trio takes `PANEL_INSET` — 0.23 — like every other face. The
+ * measurement above is not withdrawn and is not wrong: three independent
+ * photographs put those panels at 0.15, and the check that made it credible
+ * was that it gave equal margins all round (top 0.061 of the leaf's height =
+ * 125 mm, foot 0.056 = 115, sides 0.15 of the width = 128). Drawing 0.23
+ * gives the trio side margins of about 196 mm against 125 at the head, which
+ * is not what those three doors are.
+ * It is drawn that way on his word, and whose word it is belongs in the file
+ * rather than in a commit message. Either the doors we measured are a
+ * different product from the one he sells, or he wants the range to look like
+ * itself more than he wants each face to look like its photograph — and
+ * `ASK-PERETZ.md` asks which.
+ *
+ * ⚠ THE ROWS DO NOT MOVE WITH IT. The inset is horizontal and the rows are
+ * vertical, so `PANEL_ROWS.trio` is untouched by this. The sentence below
+ * about the trio landing within 0.02 of the pair is about the ROWS, and it now
+ * has an assertion behind it in `test/units.mjs` — it did not before, and it
+ * was wrong: the foot of the trio's lower panel is 0.944 against the pair's
+ * 0.92, which is 0.024. The tolerance the test states is 0.03, chosen to be
+ * honest about that rather than tightened until the sentence came true.
  */
 const PANEL_ROWS = {
   pair: [[0.07, 0.58], [0.66, 0.92]],
@@ -3605,9 +3649,14 @@ const PANEL_ROWS = {
   top:  [[0.07, 0.58]],
   lone: [0.68, 0.90],
 };
-/* How far a panelled face keeps its rectangles from the leaf's edges. One per
-   composition, because they are different products: see the note above. */
-const PANEL_INSETS = { trio: 0.15 };
+/* How far a panelled face keeps its rectangles from the leaf's edges, where it
+   differs from `PANEL_INSET`.
+   ⚠ EMPTY SINCE 14.9.2026. It held `trio: 0.15`, measured off d067, d068 and
+   d077, and Peretz overruled it: *"change the size of the panels as they are
+   in the 2 panel options."* Kept as a table rather than deleted, because the
+   fact it expressed — that a composition can have its own inset — is still a
+   fact about the range, and because the measurement above is still good. */
+const PANEL_INSETS = {};
 
 /**
  * The rows THIS face wants — one statement, read by the drawing, by the
@@ -3638,8 +3687,8 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
      defect as the two moulding weights and just as visible.
      So on a glazed leaf the panel takes the opening's own outer edges. On a
      solid one there is nothing to line up with and the composition's own inset
-     stands — `inset0`, which is PANEL_INSET for every face but the trio; see
-     the note on PANEL_INSETS. */
+     stands — `inset0`, which is PANEL_INSET for every face there now is; see
+     the note on PANEL_INSETS for the one that had its own and lost it. */
   const inset = alignTo != null
     ? Math.max(0, alignTo)
     : Math.min(lw * PANEL_INSET_MAX, Math.max(lw * inset0, clearTo));
@@ -3779,7 +3828,7 @@ export const faceObstacles = memo(function faceObstacles(state) {
   const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
                                   byId(DETAILS, state.detail), leafH);
   /* ⚠ THE SAME BAND THE DRAWING CASES IT IN. This said MOULD_BAND flat, and
-     for the classical set the drawing now says 59: an obstacle eleven
+     for the Greek set the drawing now says 59: an obstacle eleven
      millimetres bigger than the thing it describes is the §5 shape again. */
   const paneBand = detail.classic ? CLASSIC_BAND : MOULD_BAND;
   const paneFoot = paneBand;
@@ -3814,7 +3863,17 @@ export const faceObstacles = memo(function faceObstacles(state) {
     return out;
   }
 
-  if (detail.panel) {
+  /* ⚠ `win.panel` IS ASKED HERE TOO, 14.9.2026, AND FORGETTING IT WOULD HAVE
+     BEEN THE §5 SHAPE AGAIN. A square light brings its own lower panel now and
+     the face on such a door is `plain`, so asking only `detail.panel` would
+     have told every placement rule in the project that the bottom of the leaf
+     was bare timber while the drawing had a moulded rectangle on it — a pull
+     bar's feet bolted through a panel frame, on every plain door with a square
+     window, with `npm run collide` the only thing that would have noticed.
+     It is the same one-line omission as in `panelFits`, which is why both read
+     the same two flags. The row arithmetic below is already the glazed one:
+     `openings.length` is non-zero here by construction. */
+  if (detail.panel || byId(WINDOWS, state.window).panel) {
     /* The SAME inset `appliedFrame` draws with — the opening's outer edge on a
        glazed leaf, PANEL_INSET on a solid one. It was PANEL_INSET either way,
        and `npm run collide` caught it the moment the panel started lining up
@@ -3992,7 +4051,15 @@ export function bellFits(state) {
 export function panelFits(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const detail = byId(DETAILS, state.detail);
-  if (!detail.panel) return true;
+  /* ⚠ THE WINDOW CAN BRING A PANEL OF ITS OWN, 14.9.2026, and this question is
+     about the PANEL rather than about the face that asked for one. `plain`
+     behind a square light draws a lower panel now (`WINDOWS.rect` carries
+     `panel: true`), so asking only `detail.panel` would have answered "fits"
+     without looking at anything. As it happens no window in the range fails
+     this — `rect` stops at 0.52 of the leaf, well inside the 0.62 below — but
+     a reader that is right by accident stops being right when the list grows,
+     and this one is asked by the rules as well as by the drawing. */
+  if (!detail.panel && !byId(WINDOWS, state.window).panel) return true;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   const openings = apertureLayout(byId(WINDOWS, state.window), leafW,
                                   byId(DETAILS, state.detail), leafH);
@@ -4560,7 +4627,7 @@ export function gripPlacement(state, place = null) {
     for (const ob of obstacles) {
       if (footHits(f, ob)) {
         /* Three kinds now, and the third had been reading as the second:
-           the classical set's cornice, frieze and shelf are mouldings but
+           the Greek set's cornice, frieze and shelf are mouldings but
            they are not the panel, and a customer told "the feet are on the
            panel's frame" while the bar is across the SHELF is being told
            where to look and looking at the wrong thing. */
@@ -4717,8 +4784,13 @@ export function gripPlacement(state, place = null) {
    asserted the default against; it is written down here so that the assertion
    and the code are the same number rather than two guesses that happen to
    agree. It bounds the DEFAULT only — a customer may drag anywhere the rules
-   allow, which is a much wider band. */
-const HOME_REACH = 500;
+   allow, which is a much wider band.
+   ⚠ EXPORTED SINCE 14.9.2026, which is what the sentence above was asking for
+   and had not got. `npm test` asserted against a 500 it typed itself; the
+   check that a rotated home was only ever chosen where an upright bar has
+   nowhere to go needs the same band, and a second hand-typed copy of it would
+   have been the third guess that happens to agree. */
+export const HOME_REACH = 500;
 
 export function nearestGrip(state, want) {
   if (gripPlacement(state, want).ok) return want;
@@ -5489,7 +5561,7 @@ const HW_STILE = MOUNT_REACH + LOCK_CLEAR;
  * rules, `panelFits`, `glassClearance` and the catalogue glyph all read it.
  *
  * ⚠ `detail` IS AN INPUT BECAUSE A FACE DESIGN CAN OWN ITS OWN WINDOW.
- * The classical set is a composition, not a feature: a cornice over a frieze
+ * The Greek set is a composition, not a feature: a cornice over a frieze
  * over the glass over a corbelled shelf over a panel over a plinth, each sized
  * to the next. Its window is 326 mm down a standard leaf and 781 tall; the
  * catalogue's rectangle is 185 down and 902 tall, and drawn there the frieze
@@ -5581,7 +5653,7 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
      under it is what "the inside of it is bulging out" was; leaving the
      surround exempt would have been the same defect, waiting for a door with a
      window low enough to show it. */
-  /* ⚠ THE BAND IS A PARAMETER NOW, and the classical set is why. Every other
+  /* ⚠ THE BAND IS A PARAMETER NOW, and the Greek set is why. Every other
      opening in the range is cased in the same 70 mm stock the panels use. The
      set is not: its light is closed at the bottom by the SHELF, and its rows
      leave 59 mm between the frieze and the glass, so a 70 mm casing runs into
@@ -7070,10 +7142,17 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
     piece(r ? 'corbelR' : 'corbelL',
           classicCorbel(lx + q.x, ly + q.y, q.w, q.h, paint, !!r));
   }
-  /* THE SET'S OWN PULL. Part of the face, not of the hardware axis — see the
-     catalogue entry: this door carries it AND a long vertical bar, and
-     `state.handle` holds one grip. */
-  out.push(classicPull(X(0.5), Y((R.band[0] + R.band[1]) / 2), lw * 0.33, lh * 0.028, tone));
+  /* ⚠ THE SET'S OWN PULL IS NOT DRAWN, 14.9.2026. Peretz: *"remove the handle
+     from the clasic set option and the 3 panel option — the handle should only
+     appear if i choose it in the pull handle section."*
+     The measurement is kept here because it is the only record of it: the bar
+     sat centred on the shelf's band at `lw * 0.33` long and `lh * 0.028`
+     thick, drawn by `classicPull` — a black turned rod with a ball and a
+     finial at each end, ball 1.47 of the rod, no backplate. Every photograph
+     in `research/newdoor/` carries it. The shelf is drawn empty on his
+     instruction, which is the one place in this composition where the drawing
+     and the photographs part company; the catalogue entry says so too.
+     `classicPull` itself is deleted below — it had no other caller. */
 
   /* ── the panel ──────────────────────────────────────────────────
      ⚠ TAGGED `data-detail="panel"`, AND THAT IS LOAD-BEARING. Three assertions
@@ -7106,55 +7185,36 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
   return `<g data-set="classic">${out.join('')}</g>`;
 }
 
-/**
- * The turned pull that comes with the set: a shaft with a ball and a finial at
- * each end, on a textured backplate with square corner blocks.
+/* ⚠ `classicPull` IS DELETED, 14.9.2026, AND WHAT IT MEASURED IS NOT.
  *
- * ⚠ IT IS BLACK, AND THAT WAS A CORRECTION. Read off the photographs it looks
- * like antique bronze — and the measurement says otherwise: the median of
- * every dark pixel across all four files is #2A2627 to #36322E, warmth (r−b)
- * of 2 to 8. Neutral. Brass in this drawing runs r−b above 40. What made it
- * look warm is the light the door was photographed in, and it was reported
- * from outside before the measurement was taken: "there is no bronze in the
- * picture".
+ * It drew the turned pull that came with the Greek set and, since the trio
+ * arrived, the one bolted across the trio's middle plate. Peretz has withdrawn
+ * both: *"remove the handle from the clasic set option and the 3 panel option
+ * — the handle should only appear if i choose it in the pull handle section."*
+ * With no caller left it goes rather than sitting here as a function nobody
+ * runs, which the note at the foot of LOCK_ART gives the reason for: a drawing
+ * this file still contains is a claim the catalogue can produce it.
+ *
+ * THE MEASUREMENTS, so they are not lost if he asks for it back or decides it
+ * is a product in its own right. Read off the four `research/newdoor/` files:
+ *
+ *   rod        0.30 of the fitting's declared thickness
+ *   balls      1.47 of the rod, at 0.16 and 0.84 along it — they were 2.0,
+ *              which is a dumbbell and looked like one
+ *   ends       neck, knop and cap beyond each ball, the knop at 0.58 of a ball
+ *              and the cap at 0.34, spaced 0.11 along so the knop clears it
+ *   colour     BLACK, not bronze, and that was a correction: the median of
+ *              every dark pixel across all four files is #2A2627 to #36322E,
+ *              warmth (r-b) of 2 to 8, where brass in this drawing runs past
+ *              40. What made it look warm is the light it was photographed in
+ *   backplate  NONE. There was one and it stood proud of the 0.062-tall band
+ *              it sat on, reading as a translucent grey box laid over the
+ *              middle of the door. The band moulding and its three tablets ARE
+ *              the backplate; the fitting bolts through them
+ *
+ * If it comes back it belongs in `HANDLES`, on the hardware axis, which is
+ * where he has just said every pull on a door lives.
  */
-function classicPull(cx, cy, len, thick, tone) {
-  const n = v => Number(v.toFixed(1));
-  const x0 = cx - len / 2;
-  const at = t => x0 + len * t;
-  /* ⚠ NO BACKPLATE. There was one — a pale rounded rectangle at 1.16 of the
-     pull's length and 3.2 of its thickness — and because the band it sat on is
-     only 0.062 of the leaf tall, it stood proud of the band top and bottom and
-     read as a translucent grey box laid over the middle of the door. The band
-     moulding and its three tablets ARE the backplate; the fitting bolts
-     through them. Nothing goes behind the rod.
-     ⚠ AND THE BALLS ARE 1.47 OF THE ROD, measured ball-to-rod off the close-up
-     of the shelf. They were 2.0, which is a dumbbell and looked like one. */
-  const rod = thick * 0.30;
-  const ball = rod * 1.47;
-  const shade = `<rect x="${n(at(0.10))}" y="${n(cy + rod * 0.9)}" width="${n(len * 0.80)}"
-                       height="${n(rod * 1.3)}" rx="${n(rod * 0.65)}"
-                       fill="#000" opacity="0.22" filter="url(#hwShadow)"/>`;
-  return `
-    ${shade}
-    <rect x="${n(at(0.16))}" y="${n(cy - rod)}" width="${n(len * 0.68)}"
-          height="${n(rod * 2)}" rx="${n(rod)}" fill="url(#blackRod)"/>
-    ${[0.16, 0.84].map(t => `
-      <circle cx="${n(at(t))}" cy="${n(cy)}" r="${n(ball)}" fill="url(#blackRod)"/>
-      <circle cx="${n(at(t) - ball * 0.30)}" cy="${n(cy - ball * 0.34)}"
-              r="${n(ball * 0.30)}" fill="#fff" opacity="0.18"/>`).join('')}
-    ${/* the turned neck, knop and cap beyond each ball, where it bolts down */''}
-    ${/* neck, knop, cap — spaced so the knop clears the ball. At 0.045 with a
-          ball of 0.44 thick they overlapped completely and the two ends of the
-          pull each came out as one flattened blob. */''}
-    ${[[0.02, 1], [0.98, -1]].map(([t, d]) => `
-      <rect x="${n(Math.min(at(t), at(t + d * 0.11)))}" y="${n(cy - rod * 0.40)}"
-            width="${n(len * 0.11)}" height="${n(rod * 0.80)}" fill="url(#blackRod)"/>
-      <circle cx="${n(at(t + d * 0.030))}" cy="${n(cy)}" r="${n(ball * 0.58)}"
-              fill="url(#blackRod)"/>
-      <circle cx="${n(at(t))}" cy="${n(cy)}" r="${n(ball * 0.34)}"
-              fill="url(#blackRod)"/>`).join('')}`;
-}
 
 /* ── hardware ───────────────────────────────────────────────────── */
 
@@ -7218,6 +7278,12 @@ function handleFootprint(handle, leafH, panelled = false) {
        half the height and now reports the reach, for the same reason `out` and
        `in` stopped being one symmetric `hx`. */
     case 'lever':   return { out: 40, in: 152, vy: 51 };
+    /* The curved lever: shorter than the Coral (0.85 of the reach) and no
+       wider anywhere, so it sits inside the Coral's declaration on every axis.
+       Declared on its own anyway rather than shared, because it is a different
+       product and a shared line is a claim that it is not. Measured by
+       `npm run collide -- boxes`, which is what the numbers below are. */
+    case 'levertaper': return { out: 40, in: 132, vy: 51 };
     case 'plate':   return { out: 47, in: 119, vy: 170 };
     case 'almog':   return { out: 42, in: 220, vy: 42 };
     /* ⚠ `out` WAS 78 AND THE DRAWING REACHES 41. Reported from outside as
@@ -7521,6 +7587,7 @@ const GRIP_ART = {
 
 const LOCK_ART = {
   lever:   (h, g) => lever(g.cx, g.cy, g.dir),
+  levertaper: (h, g) => leverTaper(g.cx, g.cy, g.dir),
   plate:   (h, g) => plateHandle(g.cx, g.cy, g.dir),
   almog:   (h, g) => almogLever(g.cx, g.cy, g.dir),
   cadoor:  (h, g) => cadoorKnob(g.cx, g.cy, g.dir),
@@ -8443,7 +8510,28 @@ const disc = (cx, cy, r) => `
 /**
  * Brushed-nickel lever on a turned rosette, after the supplied hardware photo:
  * a broad flat top face carrying one long specular, a rolled and shadowed
- * underside, and a slight taper to a rounded tip.
+ * underside, and a capped tip.
+ *
+ * ⚠ EVEN ALONG ITS WHOLE LENGTH SINCE 14.9.2026, AND IT USED TO TAPER.
+ * Peretz, looking at this drawing: *"the handle needs to be even wide along
+ * its length, more like the width of the top of it right now."* It ran 40
+ * units deep at the neck and closed to 26 at the tip — a third of its own
+ * depth lost over the reach — and the centreline drifted up a unit on the way,
+ * so the blade read as a wedge sweeping upward rather than as a bar. It is a
+ * constant 26 now, at the tip's own depth, which is the half of the section he
+ * pointed at: `cy - 14` to `cy + 12`, held from the neck to the cap.
+ *
+ * ⚠ AND THE TILE HAS BEEN DRAWING IT EVEN ALL ALONG. `FITTING_GLYPH.lever` is
+ * a `rect` with `rx`, constant depth, no taper — so the picture a customer
+ * chose from and the door they got had disagreed about this handle's shape for
+ * as long as both have existed, and nothing could see it: the distinctness
+ * test compares tiles to other TILES, and the collision sweep asks where metal
+ * reaches, not what shape it is. The owner saw it on the door.
+ *
+ * ⚠ THE SHAPE IT WAS IS NOT DISCARDED — see `leverTaper` below. *"the one
+ * thats there right now with the curve, add it as a different handle."* So the
+ * tapered, upward-curving blade is a second product in `LOCKSETS`, and this
+ * function keeps only what the Coral is.
  *
  * `dir` is +1 when the lever points right, -1 when it points left; the whole
  * thing is built from the rosette outward so it cannot degenerate.
@@ -8464,54 +8552,139 @@ function lever(cx, cy, dir) {
      beside a cylinder drew a lever nobody chose, that nothing charged for, and
      that never appeared in the message to Peretz. A thing that APPEARS rather
      than breaks, which is the same family as CLAUDE.md §5 read backwards. */
+  /* The section, held from neck to cap. `T` is the top of the blade and `B`
+     its underside; every band below is placed off these two rather than off
+     `cy`, so the depth cannot be changed in one line and forgotten in six. */
+  const T = cy - 14, B = cy + 12;
   return `
     <g data-kind="lever">
-      <path d="M ${at(12)} ${cy - 7} L ${at(L - 16)} ${cy - 3}
-               Q ${at(L + 4)} ${cy - 3} ${at(L + 4)} ${cy + 9}
-               Q ${at(L + 4)} ${cy + 21} ${at(L - 16)} ${cy + 21}
-               L ${at(12)} ${cy + 24} Z"
+      <path d="M ${at(12)} ${T + 7} L ${at(L - 16)} ${T + 11}
+               Q ${at(L + 4)} ${T + 11} ${at(L + 4)} ${T + 23}
+               Q ${at(L + 4)} ${B + 23} ${at(L - 16)} ${B + 23}
+               L ${at(12)} ${B + 26} Z"
             fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
 
-      <!-- Body: broad at the neck, tapering slightly, rounded at the tip.
-           A pointed tip reads as a blade; real levers are capped. -->
-      <path d="M ${at(0)} ${cy - 20}
-               L ${at(L - 20)} ${cy - 14}
-               Q ${at(L)} ${cy - 14} ${at(L)} ${cy - 1}
-               Q ${at(L)} ${cy + 12} ${at(L - 20)} ${cy + 12}
-               L ${at(0)} ${cy + 20} Z"
+      <!-- Body: one depth from the neck to the cap. A pointed tip reads as a
+           blade and a tapered one as a wedge; this lever is neither. -->
+      <path d="M ${at(0)} ${T}
+               L ${at(L - 20)} ${T}
+               Q ${at(L)} ${T} ${at(L)} ${(T + B) / 2}
+               Q ${at(L)} ${B} ${at(L - 20)} ${B}
+               L ${at(0)} ${B} Z"
             fill="url(#nickel)"/>
 
       <!-- Metal is BANDED, not shaded: the photographs show a hard clipped
            arris along the top (the only blown highlight anywhere in the
            frame), a mid band under it, and a body that goes nearly as dark as
            the paint underneath. A smooth gradient down the whole section is
-           what makes rendered hardware look like grey plastic. -->
-      <path d="M ${at(14)} ${cy - 17} L ${at(L - 20)} ${cy - 12}
-               Q ${at(L - 6)} ${cy - 12} ${at(L - 6)} ${cy - 9}
-               L ${at(14)} ${cy - 13} Z"
+           what makes rendered hardware look like grey plastic.
+           The bands run parallel to the blade now, because the blade is
+           parallel to itself: they used to converge with the taper. -->
+      <path d="M ${at(14)} ${T + 3} L ${at(L - 20)} ${T + 3}
+               Q ${at(L - 6)} ${T + 3} ${at(L - 6)} ${T + 6}
+               L ${at(14)} ${T + 6} Z"
             fill="#fff" opacity="0.92"/>
-      <path d="M ${at(16)} ${cy - 12} L ${at(L - 14)} ${cy - 8}
-               L ${at(L - 14)} ${cy - 3} L ${at(16)} ${cy - 6} Z"
+      <path d="M ${at(16)} ${T + 7} L ${at(L - 14)} ${T + 7}
+               L ${at(L - 14)} ${T + 11} L ${at(16)} ${T + 11} Z"
             fill="#fff" opacity="0.26"/>
       <!-- rolled underside, turned away from the key and nearly in shadow -->
-      <path d="M ${at(16)} ${cy + 3} L ${at(L - 16)} ${cy + 2}
-               L ${at(L - 16)} ${cy + 11} L ${at(16)} ${cy + 16} Z"
+      <path d="M ${at(16)} ${B - 9} L ${at(L - 16)} ${B - 9}
+               L ${at(L - 16)} ${B - 1} L ${at(16)} ${B - 1} Z"
             fill="#000" opacity="0.44"/>
-      <!-- the tip turns out of the key and picks up the darker surround -->
-      <path d="M ${at(L - 26)} ${cy - 11} L ${at(L - 4)} ${cy - 10}
-               Q ${at(L)} ${cy - 9} ${at(L)} ${cy - 1}
-               Q ${at(L)} ${cy + 9} ${at(L - 14)} ${cy + 9}
-               L ${at(L - 26)} ${cy + 8} Z"
+      <!-- the cap turns out of the key and picks up the darker surround -->
+      <path d="M ${at(L - 26)} ${T + 3} L ${at(L - 4)} ${T + 4}
+               Q ${at(L)} ${T + 5} ${at(L)} ${(T + B) / 2}
+               Q ${at(L)} ${B - 3} ${at(L - 14)} ${B - 3}
+               L ${at(L - 26)} ${B - 4} Z"
             fill="#000" opacity="0.16"/>
 
       ${disc(cx, cy, LEVER_ROSETTE)}
 
-      <!-- the neck swelling out of the rosette, drawn over it -->
-      <path d="M ${at(2)} ${cy - 19} Q ${at(28)} ${cy - 18} ${at(33)} ${cy - 15}
-               L ${at(33)} ${cy + 13} Q ${at(28)} ${cy + 18} ${at(2)} ${cy + 19} Z"
+      <!-- the neck swelling out of the rosette, drawn over it. It still swells
+           — a cast lever grows out of its collar — but it now closes onto the
+           blade's own depth instead of onto a wider root. -->
+      <path d="M ${at(2)} ${T - 4} Q ${at(28)} ${T - 3} ${at(33)} ${T}
+               L ${at(33)} ${B} Q ${at(28)} ${B + 3} ${at(2)} ${B + 4} Z"
             fill="url(#nickel)"/>
-      <path d="M ${at(9)} ${cy - 14} Q ${at(26)} ${cy - 13} ${at(30)} ${cy - 11}
-               L ${at(30)} ${cy - 6} L ${at(9)} ${cy - 7} Z"
+      <path d="M ${at(9)} ${T + 1} Q ${at(26)} ${T + 2} ${at(30)} ${T + 3}
+               L ${at(30)} ${T + 8} L ${at(9)} ${T + 7} Z"
+            fill="#fff" opacity="0.42"/>
+    </g>`;
+}
+
+/**
+ * The tapered, upward-curving lever — the shape the Coral was drawn as until
+ * 14.9.2026, kept because Peretz recognised it as a product of its own:
+ * *"the one thats there right now with the curve, add it as a different
+ * handle."*
+ *
+ * ⚠ WHAT IT IS, AND WHERE THE NUMBERS COME FROM. Every figure here is the one
+ * `lever()` carried before it was straightened, with two deliberate changes
+ * that are what make it a different handle rather than a copy of the old bug:
+ *
+ *   depth    40 units at the neck closing to 26 at the tip — the taper, and it
+ *            is a real taper now rather than a side effect of a capped tip
+ *   rise     the centreline lifts across the reach instead of drifting a
+ *            single unit. `RISE` below, and it is the "curve" he named
+ *   reach    0.85 of `LEVER_REACH`. Shorter, which is the other half of what
+ *            distinguishes it on the door at a glance
+ *
+ * ⚠ IT IS NOT THE ALMOG. That handle is also a swan neck and is a different
+ * object: bronze rather than nickel, 2.8 rosette diameters rather than 2.4,
+ * and its taper runs BACKWARDS — thin at the root, thick at the tip. This one
+ * is nickel, short, and thick at the root.
+ *
+ * ⚠ AND ITS NAME IS NOT KNOWN. `lever-taper` is a placeholder id; see the
+ * catalogue entry for why an id cannot be renamed later and a label can.
+ */
+function leverTaper(cx, cy, dir) {
+  const L = Math.round(LEVER_REACH * 0.85);
+  const at = t => cx + dir * t;
+  /* The rise across the reach, and the curve is in the CENTRELINE rather than
+     in a rotation: rotating the whole fitting would lift the rosette off the
+     spindle it turns, which is the mistake the droop on the Coral was. */
+  const RISE = 13;
+  const mid = t => cy - RISE * (t / L);
+  /* Half-depth at `t`: 20 at the neck, 13 at the cap. */
+  const half = t => 20 - 7 * (t / L);
+  const pt = (t, s) => `${at(t)} ${(mid(t) + s * half(t)).toFixed(1)}`;
+  return `
+    <g data-kind="lever">
+      <path d="M ${pt(12, -0.7)} L ${pt(L - 16, -0.7)}
+               Q ${pt(L + 4, 0)} ${pt(L - 16, 1.5)} L ${pt(12, 1.5)} Z"
+            transform="translate(0 8)" fill="#000" opacity="0.30"
+            filter="url(#hwShadow)"/>
+
+      <!-- Body: broad at the neck, tapering, rising, capped at the tip. -->
+      <path d="M ${pt(0, -1)} L ${pt(L - 20, -1)}
+               Q ${pt(L, -0.95)} ${pt(L, 0)}
+               Q ${pt(L, 0.95)} ${pt(L - 20, 1)}
+               L ${pt(0, 1)} Z"
+            fill="url(#nickel)"/>
+
+      <!-- the same banding as the Coral: clipped arris, mid band, dark roll -->
+      <path d="M ${pt(14, -0.85)} L ${pt(L - 20, -0.85)}
+               Q ${pt(L - 6, -0.8)} ${pt(L - 6, -0.62)} L ${pt(14, -0.66)} Z"
+            fill="#fff" opacity="0.92"/>
+      <path d="M ${pt(16, -0.60)} L ${pt(L - 14, -0.58)}
+               L ${pt(L - 14, -0.20)} L ${pt(16, -0.30)} Z"
+            fill="#fff" opacity="0.26"/>
+      <path d="M ${pt(16, 0.18)} L ${pt(L - 16, 0.16)}
+               L ${pt(L - 16, 0.84)} L ${pt(16, 0.80)} Z"
+            fill="#000" opacity="0.44"/>
+      <path d="M ${pt(L - 26, -0.55)} L ${pt(L - 4, -0.52)}
+               Q ${pt(L, -0.45)} ${pt(L, 0)}
+               Q ${pt(L, 0.7)} ${pt(L - 14, 0.7)} L ${pt(L - 26, 0.62)} Z"
+            fill="#000" opacity="0.16"/>
+
+      ${disc(cx, cy, LEVER_ROSETTE)}
+
+      <!-- the neck over the rose, as on the Coral -->
+      <path d="M ${pt(2, -0.95)} Q ${pt(28, -0.92)} ${pt(33, -0.78)}
+               L ${pt(33, 0.72)} Q ${pt(28, 0.92)} ${pt(2, 0.95)} Z"
+            fill="url(#nickel)"/>
+      <path d="M ${pt(9, -0.70)} Q ${pt(26, -0.68)} ${pt(30, -0.58)}
+               L ${pt(30, -0.30)} L ${pt(9, -0.35)} Z"
             fill="#fff" opacity="0.42"/>
     </g>`;
 }
@@ -8921,10 +9094,24 @@ const FITTING_GLYPH = {
     <path d="M -34 -46 L 34 46 M 34 -46 L -34 46" fill="none" stroke="currentColor"
           stroke-width="7" stroke-linecap="round" opacity="0.45"/>` }),
 
-  // Coral: plain lever on a round rose, reaching toward the hinge.
+  /* Coral: plain lever on a round rose, reaching toward the hinge.
+     ⚠ THIS TILE WAS ALREADY RIGHT AND THE DOOR WAS WRONG. It has drawn a
+     constant-depth bar since it was written; `lever()` on the door tapered,
+     and the two disagreed until 14.9.2026, when the owner noticed on the door.
+     Nothing could have caught it: the distinctness test compares tiles to
+     other tiles, not tiles to the drawing they promise. */
   lever: () => ({ box: [-172, -48, 52, 48], art: `
     <circle cx="0" cy="0" r="39"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>` }),
+
+  /* The curved lever: the tile has to carry all three things that make it a
+     different product from the Coral above — it tapers, it rises, and it is
+     shorter — or the two tiles are a bar and a slightly shorter bar. Drawn as
+     a polygon rather than a `rect` for exactly that reason. */
+  levertaper: () => ({ box: [-152, -60, 52, 48], art: `
+    <circle cx="0" cy="0" r="39"/>
+    <path d="M -8 -20 L -118 -33 Q -132 -34 -132 -27 L -132 -20
+             Q -132 -14 -118 -15 L -8 20 Z"/>` }),
 
   /* Cylinder only: an escutcheon with a euro keyway and nothing else. It had
      no entry here, so it fell to the `else` branch and drew a lever — the

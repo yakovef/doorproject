@@ -20,8 +20,20 @@
  * `?bare=1` exposes `window.__render`, so thousands of designs are swept
  * inside ONE page load rather than one navigation each.
  *
- * Run: npm run collide          every grip x lockset x window x size
- *      npm run collide -- all   add every face detail as well
+ * Run: npm run collide            every grip x lockset x window x size
+ *      npm run collide -- all     add every face detail as well
+ *      npm run collide -- boxes   measure, do not sweep: prints where each
+ *                                 fitting's metal actually reaches against the
+ *                                 footprint `handleFootprint` declares for it,
+ *                                 and marks any declaration the drawing does
+ *                                 not fit inside
+ *
+ * ⚠ `boxes` IS HOW A NEW FITTING GETS ITS NUMBERS, and it was missing from
+ * this list while being the mode most often needed. Every `out`/`in`/`vy` in
+ * `handleFootprint` is read off this table, not estimated — see the note there
+ * about the grab bar, whose declared 320 was a number somebody typed and which
+ * left that handle with no legal position on a standard leaf. Draw the
+ * fitting, run this, paste what it says, run it again to see the ✓.
  */
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';

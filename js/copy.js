@@ -460,9 +460,9 @@ export const UI = {
                        'The colour is oven-baked from the manufacturer’s chart, and the code beside each name is theirs. Every shade costs the same, so the choice is purely taste. The drawing here is an illustration — the shade that comes out of the oven may look slightly different, in sheen most of all.',
                        'Цвет наносится порошком и запекается, по палитре производителя; код рядом с названием — его. Все оттенки стоят одинаково, так что выбор — дело вкуса. Изображение здесь — визуализация: готовый оттенок может немного отличаться, прежде всего по блеску.'],
   'exp.face.q':           ['פאנלים או פסים — מה ההבדל?', 'Panels or strips — what is the difference?', 'Панели или полосы — в чём разница?'],
-  'exp.face.a':           ['פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — 150 ₪ לפס אופקי ו‑300 ₪ לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון. שלושה פאנלים והסט הקלאסי מגיעים עם מאחז משלהם, ולכן אין בהם ידית משיכה נפרדת.',
-                       'Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — ₪150 a horizontal strip and ₪300 a vertical one. Panels and strips do not go on the same door, and neither goes with a window. Three panels and the classical set come with a grip of their own, so they take no separate pull handle.',
-                       'Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: ₪150 за горизонтальную и ₪300 за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном. Три панели и классический комплект идут со своей скобой, поэтому отдельная ручка к ним не ставится.'],
+  'exp.face.a':           ['פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — 150 ₪ לפס אופקי ו‑300 ₪ לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון — חלון מרובע מגיע עם הפאנל שלו בתחתית, ואין צורך לבחור אותו כאן. כל עיצוב חזית מתאים לכל ידית משיכה.',
+                       'Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — ₪150 a horizontal strip and ₪300 a vertical one. Panels and strips do not go on the same door, and neither goes with a window — a square window brings its own panel below it, and there is nothing to choose here for that. Every face goes with every pull handle.',
+                       'Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: ₪150 за горизонтальную и ₪300 за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном: у квадратного окна своя нижняя панель, и выбирать её здесь не нужно. Любое оформление полотна сочетается с любой ручкой-скобой.'],
   'exp.glass.q':          ['מה נכנס לתוך החלון?', 'What goes inside the window?', 'Что ставится в окно?'],
   'exp.glass.a':          ['יש שני חלונות: צוהר אנכי צר לאורך הדלת, וחלון מלבני. חלון מלבני מגיע תמיד עם פאנל בתחתית. מה שנמצא בתוך הזכוכית — סורג מברזל או זכוכית מעוצבת — נבחר בנפרד. בדלת וחצי ובדלת עם חלון צד יש שני פתחים מזוגגים, והסורג מותקן בשניהם ומתומחר לפי מספרם.',
                        'There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. What fills the glass — wrought iron, or worked glass — is chosen separately. A leaf and a half, and a door with a sidelight, have TWO glazed openings; the ironwork goes in both and is priced per opening.',
@@ -675,14 +675,16 @@ export const UI = {
   'why.needsWindow':     ['דורש חלון', 'Needs a window', 'Нужно окно'],
   'why.winTakesTop':     ['החלון תופס את מקומו של הפאנל העליון', 'The window takes the upper panel’s place', 'Окно занимает место верхней панели'],
   'why.noRoomBelow':     ['אין מקום לפאנל מתחת לחלון', 'No room for a panel below the window', 'Под окном нет места для панели'],
-  'why.setNoSlot':       ['הסט הקלאסי לא משתלב עם צוהר אנכי', 'The classical set does not go with a vertical slot', 'Классический комплект не сочетается с вертикальным окном'],
-  'why.setOwnWindow':    ['הסט הקלאסי מגיע עם חלון מלבני משלו', 'The classical set comes with a rectangular window of its own', 'У классического комплекта своё прямоугольное окно'],
+  'why.setNoSlot':       ['הסט היווני לא משתלב עם צוהר אנכי', 'The Greek set does not go with a vertical slot', 'Греческий комплект не сочетается с вертикальным окном'],
+  'why.setOwnWindow':    ['הסט היווני מגיע עם חלון מלבני משלו', 'The Greek set comes with a rectangular window of its own', 'У греческого комплекта своё прямоугольное окно'],
   'why.stripesWindow':   ['לא משלבים פסי מתכת עם חלון', 'Metal strips do not go with a window', 'Металлические полосы не сочетаются с окном'],
   'why.stripesPanel':    ['לא משלבים פסי מתכת עם פאנל', 'Metal strips do not go with a panel', 'Металлические полосы не сочетаются с панелью'],
   'why.windowStripes':   ['לא משלבים חלון עם קווי מתכת', 'A window does not go with metal strips', 'Окно не сочетается с металлическими полосами'],
   'why.panelStripes':    ['לא משלבים פאנל עם פסי מתכת', 'A panel does not go with metal strips', 'Панель не сочетается с металлическими полосами'],
-  'why.rectNeedsPanel':  ['חלון מרובע מגיע תמיד עם פאנל בתחתית', 'A rectangular window always comes with a panel below', 'Прямоугольное окно всегда идёт с нижней панелью'],
-  'why.panelOwnPull':    ['הפאנל האמצעי מגיע עם המאחז שלו', 'The middle panel comes with its own grip', 'У средней панели своя скоба'],
+  /* `why.rectNeedsPanel` and `why.panelOwnPull` are withdrawn with the two
+     rules they explained, 14.9.2026 — the forced bottom panel and the pull a
+     face brought with it. Neither sentence was wrong; both stopped describing
+     anything the customer can be refused. See `conflicts` in rules.js. */
   'why.channelPlain':    ['ידית שקועה דורשת דלת חלקה', 'A recessed channel needs a plain face', 'Врезная ручка требует гладкого полотна'],
   'why.notWithChannel':  ['לא משתלב עם ידית שקועה', 'Does not go with a recessed channel', 'Не сочетается с врезной ручкой'],
   'why.noRoomHandle':    ['אין מקום לידית הזו על הדלת', 'No room for this handle on the door', 'На двери нет места для этой ручки'],
@@ -691,7 +693,14 @@ export const UI = {
   'fix.windowAdded':     ['הוספנו חלון — הסורג והזכוכית צריכים אותו', 'We added a window — the grille and the glass need one', 'Мы добавили окно — решётке и стеклу оно необходимо'],
   'fix.windowGone':      ['הסרנו את החלון', 'We removed the window', 'Мы убрали окно'],
   'fix.lineWorkGone':    ['הסרנו את קווי המתכת — לא משלבים אותם עם חלון', 'We removed the metal strips — they do not go with a window', 'Мы убрали металлические полосы — с окном они не сочетаются'],
-  'fix.onePanel':        ['עברנו לפאנל אחד — החלון תופס את מקומו של העליון', 'We moved to one panel — the window takes the upper one’s place', 'Оставили одну панель — окно занимает место верхней'],
+  /* ⚠ TWO SENTENCES WHERE `fix.onePanel` WAS ONE. It said "we moved to one
+     panel", and since 14.9.2026 there is no face with one panel to move to:
+     the face goes plain. What happens next depends on the window, and the
+     difference is a panel on the customer's door, so it is not glossed. The
+     square light brings its own panel with it; the vertical slot brings
+     nothing and leaves a bare leaf under the glass. */
+  'fix.facePlain':       ['החלקנו את הדלת — החלון תופס את מקום הפאנלים', 'We cleared the face — the window takes the panels’ place', 'Мы убрали панели — окно занимает их место'],
+  'fix.rectPanel':       ['החלקנו את הדלת — החלון המרובע מגיע עם הפאנל שלו בתחתית', 'We cleared the face — the square window comes with its own panel below', 'Мы убрали панели — у квадратного окна своя нижняя панель'],
   'fix.noPanelRoom':     ['הסרנו את הפאנל — החלון הגבוה לא משאיר לו מקום', 'We removed the panel — the tall window leaves no room for it', 'Мы убрали панель — высокому окну не хватает места'],
   'fix.faceCleared':     ['החלקנו את הדלת — ידית שקועה דורשת פנים חלקות', 'We smoothed the face — a recessed channel needs it plain', 'Мы сделали полотно гладким — врезная ручка этого требует'],
   'fix.grilleGone':      ['הסרנו את הסורג — אין חלון', 'We removed the grille — there is no window', 'Мы убрали решётку — окна нет'],
@@ -699,10 +708,11 @@ export const UI = {
   'fix.locksetSwapped':  ['החלפנו את המנעול — אין לו מקום ליד המאחז', 'We swapped the lockset — there is no room for it beside the grip', 'Мы заменили замок — рядом со скобой ему нет места'],
   'fix.gripMoved':       ['הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה', 'We moved the handle — where you put it no longer works', 'Мы сдвинули ручку — на выбранном месте она больше не подходит'],
   'fix.gripHome':        ['הידית הוסרה, ואיתה המיקום שבחרתם לה', 'The handle is gone, and with it the place you chose for it', 'Ручка убрана, а вместе с ней и выбранное для неё место'],
-  'fix.setWindow':       ['התאמנו את החלון — הסט הקלאסי מגיע עם חלון מלבני משלו', 'We adjusted the window — the classical set comes with a rectangular one of its own', 'Мы изменили окно — у классического комплекта своё прямоугольное'],
-  'fix.setGone':         ['הסרנו את הסט הקלאסי — הוא לא משתלב עם צוהר אנכי', 'We removed the classical set — it does not go with a vertical slot', 'Мы убрали классический комплект — он не сочетается с вертикальным окном'],
-  'fix.needPanel':       ['הוספנו פאנל בתחתית — חלון מרובע תמיד מגיע עם אחד', 'We added a panel below — a rectangular window always comes with one', 'Мы добавили нижнюю панель — прямоугольное окно всегда идёт с ней'],
-  'fix.ownPull':         ['הסרנו את ידית המשיכה — הפאנל האמצעי מגיע עם המאחז שלו', 'We removed the pull handle — the middle panel comes with its own grip', 'Мы убрали ручку-скобу — у средней панели своя'],
+  'fix.setWindow':       ['התאמנו את החלון — הסט היווני מגיע עם חלון מלבני משלו', 'We adjusted the window — the Greek set comes with a rectangular one of its own', 'Мы изменили окно — у греческого комплекта своё прямоугольное'],
+  'fix.setGone':         ['הסרנו את הסט היווני — הוא לא משתלב עם צוהר אנכי', 'We removed the Greek set — it does not go with a vertical slot', 'Мы убрали греческий комплект — он не сочетается с вертикальным окном'],
+  /* `fix.needPanel` and `fix.ownPull` are withdrawn with their rules — see the
+     note beside `why.rectNeedsPanel` above. Nothing adds a face the customer
+     did not ask for any more, and nothing takes their pull handle away. */
   /* ⚠ IT NAMES THE NUMBER, and that is the whole job of this sentence. The
      customer had eleven stripes and now has six; a toast saying "we adjusted
      the stripes" leaves them counting. The 6 is `STRIPE_MAX.v` written out —
@@ -767,6 +777,14 @@ export const UI = {
   /* ── the order sheet's row names ──────────────────────────────── */
   'row.colour':       ['צבע', 'Colour', 'Цвет'],
   'row.window':       ['חלון', 'Window', 'Окно'],
+  /* ⚠ THE ORDER HAS TO SAY WHERE THE PANEL WENT. Since 14.9.2026 the panel
+     under a square light belongs to the WINDOW and not to the face, so the
+     face row on that door reads "חלק" — and without this the order Peretz
+     reads describes a plain leaf with a window and no panel, which is not the
+     door. Appended to the window's own value rather than given a row of its
+     own: it is not a thing anybody chose, and a row for it would invite the
+     question of why it has no price. */
+  'row.withPanel':    ['עם פאנל תחתון', 'with a panel below', 'с нижней панелью'],
   'row.glazing':      ['זיגוג', 'Glazing', 'Остекление'],
   'row.grille':       ['סורג', 'Grille', 'Решётка'],
   'row.glass':        ['זכוכית', 'Glass', 'Стекло'],

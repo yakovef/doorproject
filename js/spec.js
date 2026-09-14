@@ -89,7 +89,14 @@ export function specRows(state) {
        supplier can fill. `colourCode` is in the catalogue so the five readers
        of this string cannot drift apart again. */
     { key: 'colour', label: T('row.colour'), id: c.id, hex: c.hex, value: `${L(c)} (${colourCode(c)})` },
-    { key: 'window', label: T('row.window'), id: w.id, value: L(w) },
+    /* ⚠ `w.panel` IS NAMED HERE OR IT IS NAMED NOWHERE. The square light comes
+       with a panel under it and that panel is no longer a FACE — so the face
+       row on such a door says חלק, correctly, and every reader of this table
+       (the summary, the A4 sheet, the aria description, the WhatsApp order)
+       would otherwise describe a plain leaf with a window and no panel.
+       `specRows` is the one description of a door; this is the one place. */
+    { key: 'window', label: T('row.window'), id: w.id,
+      value: w.panel ? `${L(w)} (${T('row.withPanel')})` : L(w) },
   ];
 
   /* ⚠ A דלת וחצי DRAWS TWO LIGHTS AND THIS USED TO NAME ONE. `glazedPanels`
