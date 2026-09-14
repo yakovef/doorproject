@@ -1593,6 +1593,53 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
 
 ## 9. What is still open
 
+### ⚠ A WIDER GALLERY TILE BUYS NO MORE DOOR — IT BUYS MORE WALL
+
+Found 14.9.2026 by walking as **the customer who starts from one of Peretz's
+thirty doors**, and it is arithmetic rather than taste. `.work__art` is a fixed
+**132 px tall** box (its comment says why: a cell that collapsed when its door
+was thrown away would move every tile below it through the observer that draws
+them), and the tile's SVG carries the DOOR's own tight `viewBox` —
+`225 214 1378 2802`, **aspect 0.492** — at the browser's default
+`xMidYMid meet`. So the picture is fitted by HEIGHT, and the height never
+changes. Measured, tile 0, all six shapes:
+
+| | tile art | columns | the frame, drawn | of the tile |
+|---|---|---|---|---|
+| 320×568 | 117 × 132 | 2 | 51 × 109 | 35.7% |
+| 360×740 | 118 × 132 | 2 | 51 × 109 | 35.4% |
+| 390×844 | 133 × 132 | 2 | 51 × 109 | 31.4% |
+| **430×932** | **153 × 132** | 2 | 51 × 109 | **27.3%** |
+| 768×1024 | 144 × 132 | 4 | 51 × 109 | 29.0% |
+| 1440×900 | 132 × 132 | 6 | 51 × 109 | 31.6% |
+
+**The leaf is 40 × 97 px on every screen anybody owns.** A 430 px phone is
+31% wider than a 320 px one and draws the identical door; the 36 extra pixels
+are wall, because the scene overflows the fitted viewBox and `.work__art`'s
+`overflow: hidden` crops it, so there are no letterbox bars to show that the
+width is going nowhere. On the largest phone in portrait the leaf is **26% of
+its tile's width**.
+
+⚠ **AND THE TWO OBVIOUS FIXES ARE BOTH REFUSED, WHICH IS WHY THIS IS
+RECORDED.** `preserveAspectRatio="…slice"` fills the tile with door and crops
+the door's head and foot — §3 forbids exactly that, *"a configurator exists so
+somebody can judge proportions"*. A PORTRAIT tile at the door's own 0.492
+aspect would be about 65 px wide, which draws the same 40 px leaf in a third
+less tile and buys columns instead: 4 at 320 where there are 2. But the tile's
+second row is its NAME and its PRICE, and §0b's 13.9 entry is the receipt for
+what a narrow row costs — three doors of one colour read as ONE distinct row
+until the price went on, and `₪3,545` beside `אפור בהיר` does not fit 65 px.
+
+⚠ **What is NOT wrong with it, measured rather than assumed:** the thirty
+tiles are genuinely distinguishable at the shipped size — pairwise at 390×844
+over a 133 × 132 art box, the closest pair is **2.07%** of pixels (d004/d026),
+then 3.03% and 3.16%, and **0 of 435 pairs fall under the 0.45% §0b calls "the
+same picture"**. So this is a question about how much of a comparison surface
+is spent on the thing being compared, not about whether the comparison works.
+The measurement that would settle it is one nobody has taken: what the tile
+has to be for somebody to pick a door off it, which is a question about a
+picture and not about 132 px.
+
 ### ⚠ AND ON A PHONE IT CANNOT HOLD THEM BESIDE THE FIVE BIGGEST DOORS
 
 Found 14.9.2026, and it is the section below with the other axis varied: that
@@ -2305,6 +2352,76 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THIS FILE SAID A STRING WAS "READ BY NOBODY" AND THE GALLERY HAS BEEN
+  SAYING IT TO EVERY CUSTOMER SINCE BEFORE THE THREE LANGUAGES EXISTED —
+  14.9.2026.** Found by walking as **the customer who starts from one of
+  Peretz's thirty doors**: `js/works.js` is offered on step 01 as *"התחילו
+  מדלת שכבר התקנו · 30 דלתות אמיתיות"*, and run 114 measured that grid's COLUMN
+  COUNT at 320 px and never walked on from a tile. **The walk came back clean
+  and is recorded as clean.** At 320×568, 390×844 and 1440×900 the gallery
+  opens (30 tiles, 10/12/30 drawn by the lazy observer), a tap loads the door
+  and closes the drawer, and the guide then walks forward with the button
+  through all eight steps with an answer on screen at every one. The address is
+  `?v=21&c=rb-7110d&…&d=plain&s=standard&h=left-in`, the order and the code
+  `DM-N7100800005` agree at **₪3,395** (the standard ₪3,195 leaf plus one
+  +₪200 colour), and `?sheet=1` on that code prints the same door with no
+  notice and **no page error**.
+
+  What the run changes is one paragraph of this file. §0b's 13.9 entry, on the
+  saved-designs drawer, ends: *"One string is still unused… `saved.loaded` is
+  written in all three languages and read by nobody."* `js/app.js:954` is the
+  gallery tile handler, and its last line is `toast(T('saved.loaded'))`.
+  `git log -S` puts the key at `0a9a259` (TRANSFORM phase 10, 27.8) and that
+  commit merely renamed an already-existing Hebrew literal, so the toast is
+  older than the translation work and older than the entry that says it does
+  not exist. ⚠ **The argument beside the false claim is right and is kept, with
+  its scope corrected**: a drawer closing inline inside the summary card needs
+  no toast, and a modal `<dialog>` closing over the whole page is the opposite
+  case — the door changed while something was on top of it. Measured after a
+  real pick rather than argued: one line, **288×45 at 320 and 416×45 on a
+  desktop**, 32 characters in Hebrew and 36 in Russian, **0 of 3 drawn hardware
+  boxes covered at every one of eight shapes**, 0 px² of leaf at every desktop
+  width, worst **1,740 px² — 14.2% of the leaf and all of it the threshold**,
+  which is the band §0b's 10.9 entry moved it onto on purpose. It is shorter
+  than the 71- and 99-character undo toasts the 13.9 sweep already gates, so it
+  is said here rather than asserted a second time.
+
+  ⚠ **AND THREE SUSPICIONS OF MINE WERE KILLED BY MEASURING THEM, WHICH IS
+  MOST OF WHAT THIS RUN DID.** (1) *The thirty tiles are too small to tell
+  apart* — pairwise over every one of the 435 pairs at 390×844, closest
+  **2.07%** (d004/d026), then 3.03% and 3.16%, and **0 pairs under the 0.45%
+  this log calls "the same picture"**. (2) *The load toast is painted across
+  the door the customer just chose* — the table above; it is on the threshold.
+  (3) *`repair` changes all thirty gallery doors on load*, which would
+  contradict `npm test`'s *"every door in the gallery is one the site can
+  actually build"*. It does not: asked which FIELDS move rather than whether
+  `changed` is truthy, the answer is **none, on all thirty, and none again with
+  the `grip: null` the tile handler actually passes** — 0 prices move and 0
+  repairs say a sentence. My harness had been reading a truthy empty result as
+  a repair. **A finding is what the changed keys say, not what a truthy object
+  says**, and this is §7's rule about instruments arriving as my own mistake
+  for the third run running. (4) *Walking forward with the button scrolls the
+  step counter — `.sect__where`, "שלב 5 מתוך 8" — behind the sticky door*,
+  which is what the 320 px screenshot looks like. It does not: measured against
+  the fixed rail and the sticky stage read off the live page, **0 of 9 steps
+  hide it at 320, 360, 390, 430, 768 and 1440 in Hebrew AND Russian**, with
+  14 px of clearance at 320 and 4 px under the sticky rail at 1440. That is
+  12.9's `scroll-padding-block` doing its job one element further up than it
+  was written for. ⚠ **And that sweep was checked for being blind before its
+  zero was believed** (§5.15): it prints the furniture it measured against —
+  `.steps` fixed 0..62 and `.stage-wrap` sticky 62..302 at 320 — so the fold is
+  real and a hidden eyebrow would have been reported.
+
+  ⚠ **The one thing measured and NOT fixed is in §9**, with the two obvious
+  fixes and why each is refused: the tile's art box is a fixed 132 px tall and
+  its SVG carries the door's own 0.492-aspect `viewBox` at the default `meet`,
+  so the door is fitted by HEIGHT and is **51 × 109 px on every screen there
+  is** — a 430 px phone is 31% wider than a 320 px one, draws the identical
+  door, and spends the difference on wall.
+  No price, no id, no list order, no bit, no `VERSION`, and not a line of
+  `js/`, `css/` or `index.html` — so the four sheet families are untouched by
+  construction rather than by regeneration.
+
 - **⚠ THE PRICE CARD WAS BEING SLICED BY THE EDGE OF THE PICTURE IT IS PINNED
   TO, AND THE RULE THAT WOULD HAVE PREVENTED IT WAS WRITTEN IN THE SAME
   FUNCTION, ABOUT THE OTHER AXIS — 14.9.2026.** Found by walking as **the
@@ -2582,11 +2699,29 @@ how it got there. Detail lives in the section it belongs to.
   three fixtures arrive unrepaired, and has §5.15 clauses that the drawer
   opened and that the rows were found — because with an empty drawer every
   clause in it passes by having no subject, which is how this survived.
-  ⚠ **One string is still unused and is recorded rather than wired up:**
-  `saved.loaded` — *"טענו את הדלת. אפשר לשנות כל פרט."* — is written in all
-  three languages and read by nobody. The drawer closing and the door redrawing
-  is the feedback on the normal path; a toast on every load is a behaviour
-  nobody asked for.
+  ⚠ **THIS ENTRY SAID `saved.loaded` WAS "READ BY NOBODY" AND IT HAS BEEN
+  FIRED ON EVERY GALLERY PICK SINCE BEFORE THE THREE LANGUAGES EXISTED —
+  corrected 14.9.2026.** `js/app.js:954`, inside the gallery tile handler:
+  `set(…); closeWorks(); toast(T('saved.loaded'))`. `git log -S` puts it at
+  `0a9a259` (TRANSFORM phase 10, 27.8), and that commit merely KEYED a Hebrew
+  literal that was already there — so the toast predates the translation work
+  and was never introduced by any recorded request. What is true is the
+  narrower claim: the SAVED-DESIGNS DRAWER does not use it, and the reason
+  given here is the reason it should not — the drawer closes inline inside the
+  summary card and the door redraws in front of the customer. **The gallery is
+  the case that argument does not cover**, and it is the opposite case: a modal
+  `<dialog>` closes over the whole page, so the customer is looking at a door
+  that changed while a drawer was on top of it, and the sentence they get —
+  *"we loaded the door, you can change any detail"* — is the gallery's own lede
+  said again at the moment it becomes actionable. Measured before it was
+  believed, after a real gallery pick, Hebrew and Russian, eight shapes: the
+  box is **one line, 288×45 at 320 and 416×45 on a desktop, 32 characters in
+  Hebrew and 36 in Russian**, it covers **0 of 3 drawn hardware boxes at every
+  one**, 0 px² of the leaf at every desktop width, and at worst **1,740 px² —
+  14.2% of the leaf, all of it the threshold band** at 320×568. That is exactly
+  where §0b's 10.9 entry put it on purpose. It is also strictly shorter than
+  the 71- and 99-character undo toasts the 13.9 sweep above already gates, so
+  it needs no check of its own — said here rather than asserted twice.
   No price, no id, no list order, no bit, no `VERSION`; four CSS declarations,
   one grid track, two spans and a destructure. The 52 bare sheets came back
   **byte-identical**.

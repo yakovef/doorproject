@@ -45,6 +45,135 @@ of clear glass either side on the rectangle.
 
 ---
 
+## 2026-09-14 11:05 UTC — run 123: this file's own record said a string was "read by nobody" and the gallery has been saying it to every customer since before the three languages existed
+
+**proposed · taken · refused:** proposed 5 (correct the false `saved.loaded`
+line in `CLAUDE.md` · record in §9 that a wider gallery tile buys no more door ·
+drop or shorten the gallery's load toast · add an audit clause for that toast ·
+narrow the gallery tile toward the door's own aspect to buy columns) · taken 2 ·
+refused 3.
+
+**Looked at:** the page as **THE CUSTOMER WHO STARTS FROM ONE OF PERETZ'S
+THIRTY DOORS**. Step 01 offers *"התחילו מדלת שכבר התקנו · 30 דלתות אמיתיות"*
+and its lede is a claim about COMPARING — *choose a door close to what you
+wanted, and from there change every detail*. Run 114 measured that grid's
+column count at 320 px and **no run has ever walked on from a tile.** Opened
+the gallery, tapped a door and walked the guide FORWARD with the button at
+320×568, 390×844 and 1440×900, then read the send's order and `?sheet=1` for
+the code the walk ended on, then looked at the gallery and the nine screens as
+pictures. Recent lenses: 118 the price shopper, 119 the customer who changes
+their mind, 120 comparing two doors, 121 the language switch mid-flow, 122 the
+customer with a question halfway through.
+
+**Instruments:** test ✓ **4,349,828 / 0** · audit ✓ **no faults** · profile ✓
+all four rows (dark reed 0.999, light reed 0.992, dark ogee 1.005, light ogee
+0.991) · collide ✓ `all` over 1,822 designs and `boxes` (deepest bolted
+furniture 111 mm against `MOUNT_REACH` 121) · recreate ✓ · sheets ✓ — **all 52
+bare sheets byte-identical and 8 of the 12 `shot` sheets moved**, which proves
+nothing either way (§7: seven of twelve differ between two runs of identical
+code). ⚠ **Those eight were REVERTED rather than committed.** `.stamps.json` is
+unchanged, because `PAGE_DEPS` cannot have moved on a run that edits no `js/`,
+`css/` or `index.html` — so the regeneration was a re-photograph of an
+identical page and the new bytes are rasteriser noise. Committing them would
+have put eight binary diffs in the history under a documentation change and
+spent the one signal those sheets carry.
+
+**The walk came back CLEAN and is recorded as clean.** The gallery opens (30
+tiles; 10 / 12 / 30 drawn by the lazy observer), a tap loads the door and
+closes the drawer, and every one of the eight steps then has an answer on
+screen. The address is `?v=21&c=rb-7110d&…&d=plain&s=standard&h=left-in`, the
+order and the code `DM-N7100800005` agree at **₪3,395** — the standard ₪3,195
+leaf plus one +₪200 colour — and `?sheet=1` on that code prints the same door,
+bilingually, with **no notice and no page error**.
+
+**What it found is in the record rather than in the code.** §0b's 13.9 entry
+ends *"One string is still unused… `saved.loaded` is written in all three
+languages and read by nobody."* `js/app.js:954` is the gallery tile handler and
+its last line is `toast(T('saved.loaded'))`. `git log -S` puts the key at
+`0a9a259` (TRANSFORM phase 10, 27.8) and that commit merely renamed a Hebrew
+literal that was already there — so the toast is older than the translation
+work and older than the sentence saying it does not exist. The ARGUMENT beside
+the false claim is right and is kept with its scope corrected: a drawer closing
+inline in the summary card needs no toast; a modal `<dialog>` closing over the
+whole page is the opposite case, because the door changed while something was
+on top of it.
+
+**Measured before it was believed** — a real gallery pick, Hebrew and Russian,
+eight shapes: the toast is one line, **288×45 at 320 and 416×45 on a desktop**,
+32 characters in Hebrew and 36 in Russian, covering **0 of 3 drawn hardware
+boxes at every reading**, **0 px² of leaf at every desktop width**, and at
+worst **1,740 px² — 14.2% of the leaf and all of it the threshold band** at
+320×568, which is where §0b's 10.9 entry put the toast on purpose.
+
+**Got wrong, and each was killed by measuring it rather than by reading it.**
+Four suspicions of mine, all from looking at pictures, all false:
+- *the thirty tiles are too small to tell apart* — pairwise over all 435 pairs
+  at 390×844 the closest is **2.07%** of pixels (d004/d026), then 3.03% and
+  3.16%, and **0 pairs fall under the 0.45% this log calls "the same
+  picture"**;
+- *the load toast is painted across the door the customer just chose* — the
+  table above;
+- *`repair` changes all thirty gallery doors on load*, which would contradict
+  `npm test`'s *"every door in the gallery is one the site can actually
+  build"* — asked which FIELDS move rather than whether `changed` is truthy,
+  the answer is **none on all thirty, and none again with the `grip: null` the
+  handler really passes**; 0 prices move, 0 repairs say a sentence. My harness
+  had read a truthy empty result as a repair. **A finding is what the changed
+  keys say, not what a truthy object says**;
+- *walking forward with the button scrolls the step counter behind the sticky
+  door* — **0 of 9 steps hide `.sect__where` at 320, 360, 390, 430, 768 and
+  1440 in both languages**, 14 px of clearance at 320 and 4 px under the sticky
+  rail at 1440. That sweep was checked for blindness before its zero was
+  believed (§5.15): it prints the furniture it measured against — `.steps`
+  fixed 0..62, `.stage-wrap` sticky 62..302 at 320 — so a hidden eyebrow would
+  have been reported.
+
+**Changed:** `CLAUDE.md` only. The 13.9 entry's false sentence is corrected in
+place with what it used to claim and why that was wrong (§6's standing
+instruction), and §9 gains the one thing this run measured and did not fix.
+**No price, no id, no list order, no bit, no `VERSION`, and not a line of
+`js/`, `css/` or `index.html`.**
+
+**Left alone deliberately:**
+- **The gallery's load toast.** It is the gallery's own lede said again at the
+  moment it becomes actionable, it stands on the threshold, and it covers
+  nothing. Removing it would be acting on a sentence in the change log rather
+  than on the page.
+- **An audit clause for it.** It is strictly shorter than the 71- and
+  99-character undo toasts the 13.9 sweep already gates at the same shapes, so
+  a check would be a second, weaker assertion of a smaller box. Said in
+  `CLAUDE.md` instead.
+- **The tile's proportions.** See below — both obvious fixes are refused for
+  reasons already paid for once.
+
+**Best idea not taken — WHAT A GALLERY TILE HAS TO BE FOR SOMEBODY TO PICK A
+DOOR OFF IT.** `.work__art` is a fixed 132 px tall box and the tile's SVG
+carries the door's own tight `viewBox` (`225 214 1378 2802`, aspect **0.492**)
+at the browser's default `meet`, so the picture is fitted by HEIGHT and the
+height never changes. Measured on tile 0 at six shapes: the frame is **51 × 109
+px and the leaf 40 × 97 px at every single one**, while the tile's art box runs
+117 → 153 px wide. **A 430 px phone is 31% wider than a 320 px one, draws the
+identical door, and spends the difference on wall** — the leaf is 26% of its
+tile's width there. Both obvious fixes are refused and that is why this is
+recorded rather than shipped: `preserveAspectRatio="…slice"` fills the tile by
+cropping the door's head and foot, which §3 forbids in as many words; and a
+portrait tile at the door's own aspect would be ~65 px wide and buy 4 columns
+at 320 where there are 2, but the tile's second row is its NAME and its PRICE,
+and §0b's 13.9 entry is the receipt for what a narrow row costs — three doors
+of one colour read as ONE distinct row until the price went on. What is wanted
+first is a measurement nobody has taken, and it is about a picture rather than
+about 132 px.
+
+**Fleet:** none. `ultracode` is on the brief and this run deliberately did it
+the cheap way: every question it asked was a measurement with one right answer
+— a box against a box, a field list, a pixel count — and not one of them was a
+judgement a second lens sharpens. The run's only change is a paragraph of
+prose.
+
+**Commit:** (pending — recorded in the next commit)
+
+---
+
 ## 2026-09-14 06:40 UTC — run 122: the price card was being sliced by the edge of the picture it is pinned to, and the rule that would have prevented it was written in the same function, about the other axis
 
 **proposed · taken · refused:** proposed 5 (clamp the price card inside the
