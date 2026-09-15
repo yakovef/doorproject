@@ -1362,13 +1362,33 @@ function buildPanel() {
       body.appendChild(d);
     }
 
-    /* The foot: where you are in the money, and the way on. */
+    /* The foot: where you are in the money, and the way on.
+       ⚠ AND A WAY STRAIGHT TO THE END, 14.9.2026. Asked for from outside: a
+       customer who is happy with the door as it stands should not have to
+       press הבא through the questions they do not care about.
+       ⚠ IT IS NOT IN THE QUOTE BAR, AND THAT WAS MEASURED BEFORE IT WAS
+       DECIDED. The bar carries the price, the send and the way on, and at
+       320 px in RUSSIAN its content box is 300 px and those three use exactly
+       300 — no spare at all, with the send button already flexing from 114 px
+       down to 72 as the price grows. A fourth control there comes out of the
+       primary action. So the skip lives here, where there is room, and the
+       stylesheet hides it below 1100.
+       ⚠ THE PHONE ALREADY HAS ONE. The navigator's ninth circle IS the
+       summary — measured 44 x 44 at y=8 on a 320 px screen, fixed at the top
+       of every screen a customer ever sees. Adding a second way to the same
+       place, on the one layout with no room for it, is not a feature.
+       `markSteps` hides it on the last two steps: on the summary there is
+       nothing to skip to, and on the step before it `.sect__next` already
+       reads לסיכום, so the two buttons would sit side by side saying the same
+       thing. */
     const foot = document.createElement('div');
     foot.className = 'sect__foot';
     foot.innerHTML = `
       <button type="button" class="btn btn--ghost sect__back">${T('nav.back')}</button>
+      <button type="button" class="btn btn--ghost sect__skip">${T('nav.skip')}</button>
       <button type="button" class="btn sect__next">${T('nav.next')}</button>`;
     foot.querySelector('.sect__back').addEventListener('click', () => stepBy(-1));
+    foot.querySelector('.sect__skip').addEventListener('click', () => goStep(SUMMARY.key));
     foot.querySelector('.sect__next').addEventListener('click', () => stepBy(1));
     box.appendChild(foot);
   }
@@ -2302,6 +2322,10 @@ function markSteps() {
     b.disabled = i >= keys.length - 1;
     b.textContent = T(i === keys.length - 2 ? 'nav.toSummary' : 'nav.next');
   }
+  /* The skip is pointless on the last two: the summary IS the destination, and
+     the step before it already offers לסיכום on `.sect__next`. `hidden` rather
+     than `disabled` — a dead control asks to be pressed and then refuses. */
+  for (const b of document.querySelectorAll('.sect__skip')) b.hidden = i >= keys.length - 2;
 }
 
 /* ⚠ SIX FUNCTIONS DIED HERE AND THE COMMENT IS THE POINT.

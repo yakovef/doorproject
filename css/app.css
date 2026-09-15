@@ -3322,6 +3322,19 @@ html.is-live.is-untouched .wa__ask { display: inline; }
 /* The way on takes the room; the way back takes what it needs. */
 .sect__next { flex: 1 1 auto; }
 .sect__back { flex: 0 0 auto; }
+/* ⚠ THE SKIP IS A DESKTOP CONTROL AND IT IS HIDDEN EVERYWHERE ELSE — added
+   14.9.2026. It goes straight to the summary for a customer who is happy with
+   the door as it stands. Below 1100 the navigator is a fixed row of circles at
+   the top of the screen and its NINTH is the summary — 44 x 44 at y=8, on
+   every screen a customer ever sees — so the skip is already there in the one
+   form a phone has room for. The quote bar has none: measured at 320 px in
+   Russian its content box is 300 and the price, the send and the way on use
+   exactly 300, with the send already flexing down from 114 to 72 as the price
+   grows. A fourth control there comes out of the primary action.
+   `display: none` and not `visibility`, so it takes no room in the flex row
+   and the two buttons that were there keep the layout they were measured in. */
+.sect__skip { flex: 0 0 auto; display: none; }
+@media (min-width: 1100px) { .sect__skip:not([hidden]) { display: inline-flex; } }
 /* The summary's way on is the send, so it takes the room the same way. */
 .sect__foot .btn--wa { flex: 1 1 auto; margin-block: 0; }
 .sect__next:not(:disabled) {

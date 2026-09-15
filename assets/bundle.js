@@ -199,6 +199,10 @@
     "nav.back": ["‹ הקודם", "‹ Back", "‹ Назад"],
     "nav.next": ["הבא ›", "Next ›", "Далее ›"],
     "nav.toSummary": ["לסיכום ›", "To the summary ›", "К итогу ›"],
+    /* The skip in `.sect__foot`, desktop only — see the note where it is built.
+       No chevron: it is a jump rather than a step, and the arrow on `nav.next`
+       and `nav.toSummary` is what says "one more". */
+    "nav.skip": ["דלגו לסיכום", "Skip to the summary", "Перейти к итогу"],
     /* ⚠ WORDS, NOT "08 ⁄ 03" — see the note where this is written into the DOM.
        The numerals gave no reading order and inverted in an RTL column. */
     "nav.stepOf": ["שלב {0} מתוך {1}", "Step {0} of {1}", "Шаг {0} из {1}"],
@@ -9142,8 +9146,10 @@ ${body}
       foot.className = "sect__foot";
       foot.innerHTML = `
       <button type="button" class="btn btn--ghost sect__back">${T("nav.back")}</button>
+      <button type="button" class="btn btn--ghost sect__skip">${T("nav.skip")}</button>
       <button type="button" class="btn sect__next">${T("nav.next")}</button>`;
       foot.querySelector(".sect__back").addEventListener("click", () => stepBy(-1));
+      foot.querySelector(".sect__skip").addEventListener("click", () => goStep(SUMMARY.key));
       foot.querySelector(".sect__next").addEventListener("click", () => stepBy(1));
       box.appendChild(foot);
     }
@@ -9577,6 +9583,7 @@ ${body}
       b.disabled = i >= keys.length - 1;
       b.textContent = T(i === keys.length - 2 ? "nav.toSummary" : "nav.next");
     }
+    for (const b of document.querySelectorAll(".sect__skip")) b.hidden = i >= keys.length - 2;
   }
   function choose(g, id) {
     noteEngaged();

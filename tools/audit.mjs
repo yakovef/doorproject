@@ -405,6 +405,77 @@ for (const v of VIEWS) {
     }
   }
 
+  /* ⚠ THE SKIP TO THE END, AND THE BAR IT IS NOT IN — 14.9.2026. Asked for
+     from outside: a customer happy with the door as it stands should not have
+     to press הבא through the questions they do not care about.
+     Four claims:
+       · above 1100 it is in `.sect__foot` on the steps where it means
+         something, and it clears the 44 px tap floor;
+       · it is HIDDEN on the last two — the summary is the destination, and the
+         step before it already offers לסיכום on `.sect__next`, so the two
+         would sit side by side saying the same thing;
+       · below 1100 it is not rendered at all. The navigator's ninth circle is
+         the summary and is fixed at the top of every phone screen, so the skip
+         is already there in the one form a phone has room for;
+       · and the QUOTE BAR is untouched. That is the claim worth guarding: at
+         320 px in Russian its content box is 300 and the price, the send and
+         the way on use exactly 300, with the send already flexing from 114 to
+         72 as the price grows. A fourth control there comes out of the primary
+         action, so the child count is asserted rather than trusted.
+     Falsified by dropping the media query (clause 3 fails at every phone
+     width), by removing the `markSteps` hide (clause 2), or by appending the
+     skip to `#quote` (clause 4). */
+  {
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(350);
+    const go = async k => {
+      await p.evaluate(s => {
+        const c = [...document.querySelectorAll('[data-step]')].find(e => e.dataset.step === s);
+        if (c) c.click();
+      }, k);
+      await p.waitForTimeout(280);
+    };
+    const skip = () => p.evaluate(() => {
+      const s = document.querySelector('.sect.is-live .sect__skip');
+      if (!s) return null;
+      const r = s.getBoundingClientRect();
+      return { w: Math.round(r.width), h: Math.round(r.height), hidden: !!s.hidden };
+    });
+    await go('colour');
+    const mid = await skip();
+    const wide = v.w >= 1100;
+    if (wide) {
+      if (!mid || mid.w === 0) {
+        fault(v.name, 'no skip-to-the-summary button in the step foot above 1100 px');
+      } else if (mid.h < 44 || mid.w < 44) {
+        fault(v.name, `the skip button is ${mid.w}x${mid.h} and the tap floor is 44`);
+      }
+    } else if (mid && mid.w > 0) {
+      fault(v.name, `the skip button is ${mid.w}x${mid.h} below 1100 px, where the quote `
+        + 'bar has no room and the rail already carries a summary circle');
+    }
+    await go('mk');
+    const last = await skip();
+    if (last && last.w > 0) {
+      fault(v.name, 'the skip is shown on the step before the summary, whose הבא already '
+        + 'reads לסיכום — two buttons side by side saying the same thing');
+    }
+    /* And the bar that was measured full stays as it was. */
+    await go('colour');
+    const bar = await p.evaluate(() => {
+      const q = document.querySelector('#quote');
+      return q ? [...q.children].length : -1;
+    });
+    if (bar !== 3) {
+      fault(v.name, `the quote bar has ${bar} children and it has three — the price, the `
+        + 'send and the way on. At 320 in Russian they use its whole 300 px content box');
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(250);
+  }
+
   /* ⚠ EVERY SUMMARY ROW IS THE WAY BACK TO THE STEP THAT ASKED FOR IT —
      14.9.2026. Asked for from outside: the summary lists every answer, and a
      customer reading it who wanted to change one had to find the step
