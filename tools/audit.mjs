@@ -654,7 +654,12 @@ for (const v of VIEWS) {
        `lock` remain ahead of `face`. The assertion keeps its shape: the WHOLE
        sequence, read off the rendered navigator, because a pair-wise rule is
        satisfied by plenty of orders nobody chose. */
-    const WANT_ORDER = ['fit', 'colour', 'grip', 'lock', 'pz', 'face', 'glass', 'mk', 'sum'];
+    /* ⚠ RESTATED AGAIN 14.9.2026 — `lock` AND `grip` SWAPPED, and again it is
+       the only thing that moved. Peretz: *"the lockset section should come
+       before the pull handle section."* His "handles before the panels" is
+       untouched — both still stand ahead of `face` — so this is an order
+       within the pair and the sequence below is the whole of the change. */
+    const WANT_ORDER = ['fit', 'colour', 'lock', 'grip', 'pz', 'face', 'glass', 'mk', 'sum'];
     if (keys.join(',') !== WANT_ORDER.join(',')) {
       fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
         + `and it should be ${WANT_ORDER.join(' → ')} `

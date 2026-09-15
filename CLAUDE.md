@@ -146,10 +146,13 @@ every width. A standard door with nothing on it is **₪3,195**, and tapping the
 figure opens the column it is made of. **In Hebrew, English or Russian** — and
 the order that reaches Peretz is Hebrew whichever one the customer used.
 
-**The order of the eight**, since 30.8: fit · colour · grip · lock · pz · face ·
-glass · **mk**. Peretz's *"handles before the panels"* fixes the middle;
-משקוף sits last because it is the only question in the flow whose answer is a
-wall thickness the customer has not measured, and we measure it for them.
+**The order of the eight**: fit · colour · **lock · grip** · pz · face ·
+glass · **mk**. Peretz's *"handles before the panels"* (30.8) fixes the middle;
+**the lock stands before the grip since 14.9**, on his *"the lockset section
+should come before the pull handle section"*, which is an order within that
+pair and leaves his earlier rule intact. משקוף sits last because it is the only
+question in the flow whose answer is a wall thickness the customer has not
+measured, and we measure it for them.
 
 **Four things the shipped page was getting wrong on 30.8, all now fixed and all
 reported from outside rather than caught here.** A square window billed the
@@ -1010,11 +1013,12 @@ opening onto categories, each onto options. One open at a time on a phone; all
 four open on a desktop.
 
 ⚠ **AND THE HARDWARE COMES BEFORE THE FACE SINCE 30.8.2026** — Peretz,
-*"handles before the panels"*. The flow is fit · colour · **grip · lock ·
+*"handles before the panels"*. The flow is fit · colour · **lock · grip ·
 pz** · face · glass · **mk** · sum — משקוף moved from second to LAST later the
 same day, because it is the most technical question in the guide and it was
-arriving before the customer had made one choice they enjoyed. His rule is
-untouched by that move; it is what fixes the middle of the sequence.
+arriving before the customer had made one choice they enjoyed, and the lock
+moved ahead of the grip on 14.9 on another sentence of his. His rule is
+untouched by both moves; it is what fixes the middle of the sequence.
 `face` and `glass` stay adjacent because a panel and
 a window compete for the same half of the leaf and `repair` trades between
 them. It cost nothing in the wire format for the same reason the reorder below

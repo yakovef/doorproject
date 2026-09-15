@@ -8682,8 +8682,22 @@ ${body}
   var SECTIONS = [
     { key: "fit", title: "step.fit.t", sub: "step.fit.s", lede: "step.fit.l", exp: "exp.fit" },
     { key: "colour", title: "step.colour.t", sub: "step.colour.s", lede: "step.colour.l", exp: "exp.colour" },
-    { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
+    /* ⚠ THE LOCK COMES BEFORE THE GRIP, 14.9.2026 — Peretz: *"the lockset
+       section should come before the pull handle section."* They were the other
+       way round and had been since the two were split.
+       His own earlier rule, *"handles before the panels"* (30.8), is untouched:
+       both of these still stand ahead of `face`, which is what that sentence was
+       about. This is an order WITHIN the pair.
+       ⚠ AND IT IS THE THIRD TIME THIS LIST HAS MOVED FOR ONE SENTENCE FROM HIM
+       — `mk` from second to last, `pz` after the two fittings, and now this. The
+       keys do not change, so no link goes stale and no `VERSION` moves; the
+       `01`-`08` a customer sees is a CSS counter over position, which is exactly
+       why it is a counter. What does have to move with it is `WANT_ORDER` in
+       `tools/audit.mjs`, which asserts the WHOLE sequence off the rendered
+       navigator rather than a pair-wise rule — so a half-finished reorder fails
+       there rather than shipping. */
     { key: "lock", title: "step.lock.t", sub: "step.lock.s", lede: "step.lock.l", exp: "exp.lock" },
+    { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
     { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l", exp: "exp.pz" },
     { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l", exp: "exp.face" },
     { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l", exp: "exp.glass" },
