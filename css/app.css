@@ -1936,6 +1936,28 @@ svg { direction: ltr; }
   padding: 7px 0;
   border-block-end: 1px solid var(--rule);
   font-size: .82rem;
+  /* ⚠ MOST OF THESE ROWS ARE `<button>` SINCE 14.9.2026 — a tap goes back to
+     the step that asked for that answer. The declarations below are what a
+     button needs to look like the row it already was, and they are here rather
+     than on a `.spec__row--btn` because every row that CAN be one is one, and
+     a rule that applies to a div as well costs nothing.
+     `min-block-size: 44px` is the tap floor, which `npm run audit`'s sweep
+     measures on both axes; the row is full-width so the other axis is free.
+     It was 7 px of padding on a .82rem line — about 31 px — so this is the
+     only thing about the table that moves. */
+  min-block-size: 44px;
+  inline-size: 100%;
+  appearance: none; -webkit-appearance: none;
+  background: none;
+  border-inline: 0; border-block-start: 0;
+  font: inherit; color: inherit; text-align: inherit;
+}
+button.spec__row { cursor: pointer; }
+/* The row is a control, so it says so on hover and focus — but quietly: this
+   is a summary being read, not a menu being chosen from. */
+button.spec__row:hover .spec__label { text-decoration: underline; }
+button.spec__row:focus-visible {
+  outline: 2px solid var(--ink); outline-offset: -2px; border-radius: 6px;
 }
 .spec__ico {
   inline-size: 18px; block-size: 18px; stroke: var(--ink-2);

@@ -492,6 +492,23 @@ const specIcon = key => (Object.prototype.hasOwnProperty.call(SPEC_ICON, key)
 const groupsIn = key => GROUPS.filter(g => g.in === key);
 const sectionOf = key => (GROUPS.find(g => g.key === key) || {}).in;
 
+/**
+ * The STEP that owns a spec row, so a row in the summary can be tapped to go
+ * back and change it.
+ *
+ * ⚠ TWO SPEC KEYS ARE NOT GROUP KEYS and that is not an oversight in either
+ * file. `specRows` describes a DOOR, and a door has line work and a count of
+ * glazed openings; neither is a control with a `GROUPS` entry. `stripes` is a
+ * direction and a number edited by `buildStripes` on the face step, and
+ * `glazing` is a derived row that appears only when a door has two lights and
+ * is edited by choosing a window. So they are mapped by hand — two entries,
+ * written where they can be seen, rather than a `?? 'fit'` fallback that would
+ * send a customer to the wrong step in silence when a row is added later.
+ * A key with no step is not guessed: the row simply is not a button.
+ */
+const SPEC_STEP = { stripes: 'face', glazing: 'glass' };
+const stepFor = key => sectionOf(key) || SPEC_STEP[key] || null;
+
 // ── language ──────────────────────────────────────────────────────
 
 /**
@@ -2781,10 +2798,30 @@ function paint() {
      drifted off `js/spec.js`. The table is the desktop's version of it. */
   const table = $('#spec');
   if (table) {
+    /* ⚠ EVERY ROW IS A BUTTON BACK TO THE STEP THAT OWNS IT — 14.9.2026.
+       Asked for from outside: the summary lists every answer, and a customer
+       reading it who wants to change one had to find the step themselves.
+       The row already knows which answer it is; `stepFor` knows which question
+       asked it.
+       A real `<button>`, not a `<div>` with a listener: it is in the tab order,
+       it takes Enter and Space, and a screen reader says "button" rather than
+       reading a row of text nobody has said is interactive. The grid is
+       unchanged — `display: grid` is set on `.spec__row` and a button takes it
+       as happily as a div — so the four columns still line up.
+       `aria-label` carries "label: value" because the visible text is split
+       across two spans and a swatch, which a screen reader would otherwise
+       read as three fragments with no relation. */
     table.replaceChildren(...specRows(state).map(r => {
-      const row = document.createElement('div');
+      const step = stepFor(r.key);
+      const row = document.createElement(step ? 'button' : 'div');
       row.className = 'spec__row';
       row.dataset.key = r.key;
+      if (step) {
+        row.type = 'button';
+        row.dataset.step = step;
+        row.setAttribute('aria-label', `${r.label}: ${r.value}`);
+        row.addEventListener('click', () => goStep(step));
+      }
       row.innerHTML = specIcon(r.key)
         + `<span class="spec__label">${r.label}</span>`
         + `<span class="spec__value">${r.value}</span>`

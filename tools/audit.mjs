@@ -405,6 +405,83 @@ for (const v of VIEWS) {
     }
   }
 
+  /* ⚠ EVERY SUMMARY ROW IS THE WAY BACK TO THE STEP THAT ASKED FOR IT —
+     14.9.2026. Asked for from outside: the summary lists every answer, and a
+     customer reading it who wanted to change one had to find the step
+     themselves.
+     Four claims:
+       · every row is a real `<button>`, so it is in the tab order and takes
+         Enter and Space — a div with a listener is none of that;
+       · it meets the 44 px tap floor on BOTH axes;
+       · it carries "label: value" on `aria-label`, because the visible text is
+         split across two spans and a swatch and would otherwise be read as
+         three unrelated fragments;
+       · and the tap LANDS on the step that owns the row. `stepFor` maps
+         `stripes` and `glazing` by hand — they are spec keys with no `GROUPS`
+         entry — and a wrong entry there sends a customer to the wrong question
+         in silence, which nothing else would catch.
+     Measured where the table is on screen. Below 700 px it is `display: none`
+     and the one-line `#summary` stands in its place, which is the deliberate
+     phone design: the rail is fixed at the top of every phone screen and every
+     step is already one tap away.
+     Falsified by making the row a div again (clause 1), by removing
+     `min-block-size` (2), by dropping the `aria-label` (3), or by pointing
+     `SPEC_STEP.stripes` at the wrong step (4). */
+  if (v.w >= 700) {
+    await p.goto('file://' + process.cwd() + '/index.html?sp=13&s=half&w=rect&g=grid&lang=he');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(400);
+    await p.evaluate(() => {
+      const c = [...document.querySelectorAll('[data-step]')].find(e => e.dataset.step === 'sum');
+      if (c) c.click();
+    });
+    await p.waitForTimeout(600);
+    const rows = await p.evaluate(() => [...document.querySelectorAll('.spec__row')].map(e => {
+      const r = e.getBoundingClientRect();
+      return { key: e.dataset.key, tag: e.tagName, step: e.dataset.step || '',
+               w: Math.round(r.width), h: Math.round(r.height),
+               aria: e.getAttribute('aria-label') || '' };
+    }));
+    if (rows.length < 5) {
+      fault(v.name, `the summary shows ${rows.length} spec rows and this check has lost `
+        + 'its subject');
+    }
+    for (const r of rows) {
+      if (r.tag !== 'BUTTON') {
+        fault(v.name, `the summary row "${r.key}" is a <${r.tag.toLowerCase()}> — a row a `
+          + 'customer can tap has to be a button, or it is not in the tab order');
+        continue;
+      }
+      if (r.h < 44 || r.w < 44) {
+        fault(v.name, `the summary row "${r.key}" is ${r.w}x${r.h} and the tap floor is 44`);
+      }
+      if (!/.+:\s*.+/.test(r.aria)) {
+        fault(v.name, `the summary row "${r.key}" has no "label: value" aria-label — its `
+          + 'visible text is three fragments a screen reader cannot relate');
+      }
+      if (!r.step) {
+        fault(v.name, `the summary row "${r.key}" is a button that goes nowhere`);
+      }
+    }
+    /* And the tap actually lands there. One row is enough to prove the wiring;
+       `stepFor` is asserted per row above. */
+    const target = rows.find(r => r.step && r.key === 'lockset') || rows.find(r => r.step);
+    if (target) {
+      await p.evaluate(k => document.querySelector(`.spec__row[data-key="${k}"]`).click(),
+                       target.key);
+      await p.waitForTimeout(400);
+      const live = await p.evaluate(() =>
+        (document.querySelector('.sect.is-live') || {}).dataset?.section);
+      if (live !== target.step) {
+        fault(v.name, `tapping the "${target.key}" row opened step "${live}" and that row `
+          + `belongs to "${target.step}"`);
+      }
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(250);
+  }
+
   /* ⚠ A CHOICE GIVES BACK WHAT AN EARLIER ONE TOOK — 14.9.2026. Peretz:
      *"when i choose a window and then go back to no window, i want it to go
      back to the panels that it had before. and that goes for all the options

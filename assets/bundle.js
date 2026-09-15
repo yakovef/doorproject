@@ -8799,6 +8799,9 @@ ${body}
   };
   var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
   var groupsIn = (key) => GROUPS.filter((g) => g.in === key);
+  var sectionOf = (key) => (GROUPS.find((g) => g.key === key) || {}).in;
+  var SPEC_STEP = { stripes: "face", glazing: "glass" };
+  var stepFor = (key) => sectionOf(key) || SPEC_STEP[key] || null;
   function translateStatic(root = document) {
     for (const el of root.querySelectorAll("[data-t]")) el.textContent = T(el.dataset.t);
     for (const el of root.querySelectorAll("[data-ta]")) {
@@ -9722,9 +9725,16 @@ ${body}
     const table = $("#spec");
     if (table) {
       table.replaceChildren(...specRows(state).map((r) => {
-        const row = document.createElement("div");
+        const step2 = stepFor(r.key);
+        const row = document.createElement(step2 ? "button" : "div");
         row.className = "spec__row";
         row.dataset.key = r.key;
+        if (step2) {
+          row.type = "button";
+          row.dataset.step = step2;
+          row.setAttribute("aria-label", `${r.label}: ${r.value}`);
+          row.addEventListener("click", () => goStep(step2));
+        }
         row.innerHTML = specIcon(r.key) + `<span class="spec__label">${r.label}</span><span class="spec__value">${r.value}</span>` + (r.hex ? `<span class="spec__chip" style="--chip:${r.hex}"></span>` : "");
         return row;
       }));
