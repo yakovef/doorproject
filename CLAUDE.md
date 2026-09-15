@@ -2403,6 +2403,90 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE FLOW ROUND: FIVE ITEMS, FIVE COMMITS, AND THE 52 BARE SHEETS CAME
+  BACK BYTE-IDENTICAL FROM EVERY ONE — 14.9.2026.** Part C of Peretz's review.
+  Nothing here reaches the drawing, so a moved bare sheet would have been a
+  finding; `npm run sheets` ran after each item and moved only `.stamps.json`
+  and the 12 `shot` sheets, five times.
+
+  **C1 · The lockset is asked before the pull handle.** His sentence. "Handles
+  before the panels" (30.8) is about where the pair sits relative to `face`
+  and both still stand ahead of it, so this is an order WITHIN the pair. Third
+  time this list has moved for one sentence from him, so the three places that
+  state the order in prose moved with it. `WANT_ORDER` asserts the WHOLE
+  sequence off the rendered navigator, which is what makes a half-finished
+  reorder fail rather than ship.
+
+  **C2 · The stripes stop disappearing when panels are chosen.** They vanished
+  completely: `buildStripes` replaced the pills, the stepper, the tight toggle
+  and the price with its label and one sentence — measured 278×44 at 320 and
+  348×44 at 390 — so a customer who had chosen a panel could not see that
+  stripes exist, what they cost, or that one tap would trade the panel for
+  them. It is the tile idiom now, which `PLAN.md` §10.5 states and every other
+  group already used: `aria-disabled` and `.is-blocked` at the same 0.7 a
+  blocked tile uses, the reason UNDER the control, and a tap that performs the
+  repair. The CSS comment arguing the other way is kept and answered — it is
+  right about a DEAD button, and this is not one. **Cost: 44 px → 99 px** on
+  the face step. Rejected: a heading over the missing control (the fault with a
+  label on it) and a step of its own (a ninth question for a ₪150 line).
+  ⚠ **Two faults fell out of making the tap reachable.** The sentence was
+  wrong — the stripes-versus-panel repair announced `fix.setGone`, *"we removed
+  the Greek set, it does not go with a vertical slot"*, on a door carrying
+  neither. And the tap was **silent**: the handler kept `.state` and discarded
+  `said`, so it cleared the face or removed the window without telling anybody.
+  Every other control goes through `choose`, which has joined its sentences
+  since 9.9; the stripes are the one control that is not a tile, so they have
+  their own handler and it never got that fix.
+
+  **C3 · Removing a thing gives back what it took away.** A `Map` in `app.js`
+  beside `liveStep`, keyed by the FIELD THAT DID THE DISPLACING — `window` took
+  the panels, so `window` hands them back, and a second tap in the same group
+  is the only event that consults it. Entries are `{ was, became }` and are
+  honoured only while the field still holds `became`, so a customer who picked
+  a different face on purpose has already invalidated it with nothing having to
+  notice. **It proposes and `repair` decides**: the restore goes into a
+  candidate state that runs through `repair` like any tap and is kept only if
+  it survives, so it cannot reintroduce a refused combination or fight a rule
+  added later. ⚠ **It never rides in the URL or the code**, for the reason
+  `liveStep` does not — a link is a DOOR, and a memory that travelled would
+  hand a stranger somebody else's panels.
+  ⚠ **The plan's own instruction was the bug.** Keying it off `changed` looked
+  right and silently did nothing: `changed` is the ANNOUNCEMENT vocabulary and
+  carries `'stripes'` where the state carries `stripeDir`, so it recorded
+  `{ was: undefined }`. The window round trip worked because `'window'` happens
+  to be both, and the stripes did not — found by DRIVING the page, not reading
+  it. It diffs the state now. Second fault alongside it: `fix.lineWorkGone`
+  names a window while serving two branches, so choosing a panel over stripes
+  said *"they do not go with a window"* on a solid door. Same shape as
+  `fix.setGone`, same fix — one said per reason.
+
+  **C4 · Every summary row is the way back to the question that asked it.** A
+  real `<button>`, so it is in the tab order and takes Enter and Space;
+  `aria-label` carries "label: value" because the visible text is three
+  fragments a screen reader cannot relate. 272×44–65 at 1280, against the 31 px
+  a `.82rem` line with 7 px padding used to be. ⚠ **Two spec keys are not group
+  keys** — `stripes` and `glazing` describe a door, not a control — so they are
+  mapped by hand rather than through a `?? 'fit'` fallback that would send a
+  customer to the wrong step in silence. A key with no step is not guessed; the
+  row simply is not a button. The phone keeps its one-line sentence: below 700
+  the table is `display:none`, and the rail is already one tap from everything.
+
+  **C5 · A way straight to the end, in the one place there is room for it.**
+  ⚠ **The quote bar is full, and that was measured before it was decided.** At
+  320 px in RUSSIAN its content box is 300 and the three controls use exactly
+  300 — price 82, send 114, way-on 88, two 8 px gaps. The send is already
+  flexing, 114 px at 320 down to 72 at 360 as the price grows to 152. A fourth
+  control there comes out of the primary action, not out of slack. So the skip
+  is a third button in `.sect__foot` above 1100 (99×48 he, 130×48 ru) and is
+  not rendered below it — where **the navigator's ninth circle already is the
+  summary**, 44×44 at y=8, fixed at the top of every phone screen. Hidden on
+  the last two steps, because the summary is the destination and the step
+  before it already offers לסיכום.
+
+  **Gates.** `npm test` 9,711,019 / 0 · `npm run audit` no faults · **zero bare
+  sheets moved across all five commits**, which is the whole point of doing
+  Parts C, D and E after A and B.
+
 - **⚠ THE DRAWING ROUND: THE SECOND LEAF GETS ITS PANEL AND ITS ORNAMENT BACK,
   AND ONE OF THE FIVE ITEMS TURNED OUT TO BE ALREADY DONE — 14.9.2026.** Part B
   of Peretz's review. `REALISM.md` §6 governs every item: compare against a
