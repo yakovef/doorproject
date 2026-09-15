@@ -405,6 +405,95 @@ for (const v of VIEWS) {
     }
   }
 
+  /* ⚠ A CHOICE GIVES BACK WHAT AN EARLIER ONE TOOK — 14.9.2026. Peretz:
+     *"when i choose a window and then go back to no window, i want it to go
+     back to the panels that it had before. and that goes for all the options
+     that remove things."*
+     Four things, and they are four different claims:
+       · the round trip restores — a window takes the panels, no window gives
+         them back;
+       · it is NOT limited to the window. A face chosen over line work takes
+         the stripes, and going back to a plain face gives them back. That
+         clause is the one that failed first: the memory was keyed off
+         `changed`, which is the ANNOUNCEMENT vocabulary and carries
+         `'stripes'` where the state carries `stripeDir`, so it recorded
+         nothing and restored nothing while looking entirely correct;
+       · a DELIBERATE choice beats the memory. Pick a window, then pick a
+         different face on purpose, then remove the window: the face you chose
+         stays. The memory only offers back a value the field still holds;
+       · and it never arrives down a link. A memory that travelled would hand
+         somebody else's panels to a customer opening a shared door.
+     Driven on the page because the memory is app.js's alone — not in `state`,
+     not in the URL, not in the short code, for the same reason `liveStep` is
+     none of those. `npm test` cannot see it.
+     Falsified by deleting the restore block in `choose` (clauses 1 and 2), by
+     dropping the `state[k] === m.became` guard (clause 3), or by seeding
+     `displaced` from the query (clause 4). */
+  {
+    const tap = async (group, id) => {
+      await p.evaluate(([g, i]) => {
+        const e = document.querySelector(`.field[data-group="${g}"] [data-id="${i}"]`);
+        if (e) e.click();
+      }, [group, id]);
+      await p.waitForTimeout(320);
+    };
+    const now = () => p.evaluate(() => ({
+      face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
+             || {}).dataset?.id,
+      dir: (document.querySelector('.stripes__dirs .pill.is-on') || {}).dataset?.dir,
+    }));
+    const fresh = async q => {
+      await p.goto('file://' + process.cwd() + '/index.html' + q);
+      await p.waitForSelector('#stage svg');
+      await p.waitForTimeout(400);
+    };
+
+    await fresh('?d=panel2&w=none&n=none&k=coral&lang=he');
+    await tap('window', 'rect');
+    const took = await now();
+    await tap('window', 'none');
+    const gave = await now();
+    if (took.face !== 'plain') {
+      fault(v.name, `a square window left the face at ${took.face} — this check has lost `
+        + 'its subject, nothing was taken away to give back');
+    } else if (gave.face !== 'panel2') {
+      fault(v.name, `window → rect → none left the face at ${gave.face} and it was panel2 `
+        + 'before the window took it — going back does not give the panels back');
+    }
+
+    await fresh('?sp=13&d=plain&w=none&n=none&k=coral&lang=he');
+    await tap('detail', 'panel2');
+    const tookS = await now();
+    await tap('detail', 'plain');
+    const gaveS = await now();
+    if (tookS.dir !== 'none') {
+      fault(v.name, `a panelled face left the stripes at ${tookS.dir} — this half of the `
+        + 'check has lost its subject');
+    } else if (gaveS.dir !== 'h') {
+      fault(v.name, `face → panel2 → plain left the stripes at ${gaveS.dir} and they were `
+        + 'horizontal before — the memory is only working for the window');
+    }
+
+    await fresh('?d=panel2&w=none&n=none&k=coral&lang=he');
+    await tap('window', 'rect');
+    await tap('detail', 'panel3');
+    await tap('window', 'none');
+    const kept = await now();
+    if (kept.face !== 'panel3') {
+      fault(v.name, `a face chosen on purpose (panel3) was overwritten with ${kept.face} `
+        + 'when the window came off — the memory must yield to a deliberate choice');
+    }
+
+    /* And nothing of it rides in the address. */
+    await fresh('?d=panel2&w=none&n=none&k=coral&lang=he');
+    await tap('window', 'rect');
+    const url = await p.evaluate(() => location.search + location.hash);
+    if (/displaced|memo|was%3A|back=/.test(url)) {
+      fault(v.name, `the displaced-value memory reached the address bar: ${url}`);
+    }
+    await fresh('');
+  }
+
   /* ⚠ THE STRIPE CONTROL IS ON THE FACE STEP IN EVERY STATE — 14.9.2026.
      Peretz: the stripes disappear when panels are chosen. They did — the whole
      control was replaced by its label and one sentence, so a customer who had

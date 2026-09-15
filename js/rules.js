@@ -537,6 +537,7 @@ const SAID = {
   windowAdded:   'fix.windowAdded',
   windowGone:    'fix.windowGone',
   lineWorkGone:  'fix.lineWorkGone',
+  lineWorkFace:  'fix.lineWorkFace',
   /* `onePanel` — "we moved to one panel" — went with the one-panel faces on
      14.9.2026. The two sentences that replaced it say which window is over the
      cleared face, because the square light leaves a panel behind and the
@@ -698,7 +699,7 @@ export function repair(state, intent = null) {
      both halves of that sentence are true; here neither is. */
   if (lined && byId(DETAILS, s.detail).panel) {
     if (intent === 'detail') {
-      s.stripeDir = 'none'; s.stripeCount = 0; change('stripes', SAID.lineWorkGone);
+      s.stripeDir = 'none'; s.stripeCount = 0; change('stripes', SAID.lineWorkFace);
     } else { s.detail = 'plain'; change('detail', SAID.faceGone); }
   }
 

@@ -653,6 +653,18 @@
        was found), and the two sites are genuinely different: at `rectOnly` the
        thing removed really is the set and the thing it clashes with really is a
        slot. One said per reason. */
+    /* ⚠ SAID WHEN A CHOICE HANDS BACK WHAT AN EARLIER ONE TOOK — 14.9.2026.
+       Peretz: *"when i choose a window and then go back to no window, i want it
+       to go back to the panels that it had before."* The restore is silent about
+       WHAT came back on purpose: `specRows` and the drawing both show it, and
+       the alternative is interpolating a list of option names into a sentence in
+       three languages, which is the trap `counted` exists for. */
+    "fix.back": ["החזרנו את מה שהבחירה הקודמת הסירה", "We put back what the earlier choice removed", "Мы вернули то, что убрал предыдущий выбор"],
+    /* ⚠ `fix.lineWorkGone` NAMES A WINDOW AND SERVES TWO BRANCHES — same shape
+       as `fix.setGone` below, found the same way, corrected 14.9.2026. Line work
+       is cleared by GLAZING and by a PANEL, and the one sentence said "they do
+       not go with a window" on a solid panelled door. One said per reason. */
+    "fix.lineWorkFace": ["הסרנו את קווי המתכת — לא משלבים אותם עם פאנל", "We removed the metal strips — they do not go on a door with panels", "Мы убрали металлические полосы — с панелями они не сочетаются"],
     "fix.faceGone": ["הסרנו את הפאנלים — לא משלבים אותם עם פסי מתכת", "We cleared the panels — they do not go on a door with metal strips", "Мы убрали панели — они не сочетаются с металлическими полосами"],
     "fix.setGone": ["הסרנו את הסט היווני — הוא לא משתלב עם צוהר אנכי", "We removed the Greek set — it does not go with a vertical slot", "Мы убрали греческий комплект — он не сочетается с вертикальным окном"],
     /* `fix.needPanel` and `fix.ownPull` are withdrawn with their rules — see the
@@ -7785,6 +7797,7 @@ ${body}
     windowAdded: "fix.windowAdded",
     windowGone: "fix.windowGone",
     lineWorkGone: "fix.lineWorkGone",
+    lineWorkFace: "fix.lineWorkFace",
     /* `onePanel` — "we moved to one panel" — went with the one-panel faces on
        14.9.2026. The two sentences that replaced it say which window is over the
        cleared face, because the square light leaves a panel behind and the
@@ -7856,7 +7869,7 @@ ${body}
       if (intent === "detail") {
         s.stripeDir = "none";
         s.stripeCount = 0;
-        change("stripes", SAID.lineWorkGone);
+        change("stripes", SAID.lineWorkFace);
       } else {
         s.detail = "plain";
         change("detail", SAID.faceGone);
@@ -9391,6 +9404,7 @@ ${body}
   }
   var liveStep = SECTIONS[0].key;
   var revealed = false;
+  var displaced = /* @__PURE__ */ new Map();
   var STEP_KEYS = () => [...SECTIONS.map((x) => x.key), SUMMARY.key];
   function goStep(key, focus = true) {
     if (!STEP_KEYS().includes(key)) return;
@@ -9563,8 +9577,29 @@ ${body}
   }
   function choose(g, id) {
     noteEngaged();
-    const { state: fixed, said } = repair({ ...state, [g.key]: id }, g.key);
+    const want = { ...state, [g.key]: id };
+    const memo2 = displaced.get(g.key);
+    const back = [];
+    if (memo2) {
+      for (const [k, m] of Object.entries(memo2)) {
+        if (state[k] === m.became && want[k] === m.became) {
+          want[k] = m.was;
+          back.push(k);
+        }
+      }
+    }
+    const { state: fixed, said } = repair(want, g.key);
+    const stood = back.filter((k) => fixed[k] === memo2[k].was);
+    for (const k of stood) delete memo2[k];
+    for (const k of Object.keys(fixed)) {
+      if (k === g.key || stood.includes(k)) continue;
+      if (typeof fixed[k] === "object" || typeof state[k] === "object") continue;
+      if (state[k] === fixed[k]) continue;
+      if (!displaced.has(g.key)) displaced.set(g.key, {});
+      displaced.get(g.key)[k] = { was: state[k], became: fixed[k] };
+    }
     set(fixed);
+    if (stood.length) said.unshift(T("fix.back"));
     toast(said.join(" · "));
   }
   var HISTORY_MAX = 100;

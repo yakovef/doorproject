@@ -1880,6 +1880,43 @@ let liveStep = SECTIONS[0].key;
  *  Presentation, like `liveStep`: not in `state`, not in the URL, not in the
  *  code, and reset by nothing but a reload. */
 let revealed = false;
+
+/**
+ * ── WHAT A CHOICE TOOK AWAY, SO THE NEXT ONE CAN GIVE IT BACK ─────────
+ *
+ * Asked for from outside: *"when i choose a window and then go back to no
+ * window, i want it to go back to the panels that it had before. and that goes
+ * for all the options that remove things."*
+ *
+ * Keyed by the FIELD that did the displacing, not by the field displaced, and
+ * that is the whole design: `window` took the panels, so `window` is the thing
+ * that can hand them back. A second tap in the same group is the only event
+ * that consults it, which is exactly the customer's sentence — go back to no
+ * window, get your panels.
+ *
+ * Each entry is `{ was, became }`. `became` is what makes this safe to keep
+ * for the whole session without any bookkeeping: an entry is only honoured
+ * while the field still holds the value the repair left it at, so a customer
+ * who chose a window, lost their panels, and then deliberately picked a
+ * different face has already invalidated it. Nothing has to notice that
+ * happening; the check is made at the moment of restoring.
+ *
+ * ⚠ IT PROPOSES, `repair` DECIDES. The restored value is put into a CANDIDATE
+ * state which goes through `repair` like any other, and is kept only if it
+ * survives. So this cannot reintroduce a combination the rules refuse, and it
+ * cannot fight the 7.9 paired-fittings block or any rule added later. It is a
+ * suggestion with a veto over it, not a second rule table.
+ *
+ * ⚠ AND IT NEVER RIDES IN THE URL OR THE SHORT CODE, for exactly the reason
+ * `liveStep` does not. What a customer had two taps ago is a fact about their
+ * afternoon, not about the door: a link is a DOOR, and a code read down the
+ * telephone is a door. Somebody opening either of them has no panels to get
+ * back, and a memory that travelled would silently give them somebody else's.
+ * There is no storage, no serialisation and nothing to migrate; a reload
+ * empties it, which is correct.
+ */
+const displaced = new Map();
+
 const STEP_KEYS = () => [...SECTIONS.map(x => x.key), SUMMARY.key];
 
 function goStep(key, focus = true) {
@@ -2281,8 +2318,50 @@ function choose(g, id) {
      the branch that made the change is the only place that knows why it did.
      It used to be looked up afterwards from the group name, which is right
      only while a group has one reason to move. */
-  const { state: fixed, said } = repair({ ...state, [g.key]: id }, g.key);
+  const want = { ...state, [g.key]: id };
+
+  /* ⚠ GIVE BACK WHAT THIS FIELD TOOK AWAY, BEFORE ASKING THE RULES. See
+     `displaced`. Everything this group displaced earlier is offered back, but
+     only where the field still holds the value the repair left it at — a
+     customer who has since chosen a face on purpose keeps it. The proposal
+     then goes through `repair` like any other and is kept only if it survives,
+     so nothing here can build a door the rules refuse. */
+  const memo = displaced.get(g.key);
+  const back = [];
+  if (memo) {
+    for (const [k, m] of Object.entries(memo)) {
+      if (state[k] === m.became && want[k] === m.became) { want[k] = m.was; back.push(k); }
+    }
+  }
+
+  const { state: fixed, said } = repair(want, g.key);
+
+  /* Only the ones that actually stood. A restored value the rules moved again
+     is not something to tell the customer about — they never asked for it. */
+  const stood = back.filter(k => fixed[k] === memo[k].was);
+  for (const k of stood) delete memo[k];
+
+  /* ⚠ RECORDED BY DIFFING THE STATE, NOT FROM `changed`, AND THAT WAS A REAL
+     BUG BEFORE IT WAS A DESIGN. `changed` is the ANNOUNCEMENT vocabulary — it
+     carries `'stripes'` for a change that actually moves `stripeDir` and
+     `stripeCount`, and `'glazing'` for one that moves `window`. Used as state
+     keys it silently records `{ was: undefined, became: undefined }` and
+     restores nothing, which is exactly what the stripes did when this was
+     first wired: a face chosen over line work took it away and going back
+     never gave it back. Caught by driving the page rather than by reading it.
+     So the record is a diff of the STATE, which is the vocabulary the restore
+     has to speak. Objects are skipped — `grip` is a position and two of them
+     are never `===` — and the field the customer touched is skipped because
+     they chose that. */
+  for (const k of Object.keys(fixed)) {
+    if (k === g.key || stood.includes(k)) continue;
+    if (typeof fixed[k] === 'object' || typeof state[k] === 'object') continue;
+    if (state[k] === fixed[k]) continue;
+    if (!displaced.has(g.key)) displaced.set(g.key, {});
+    displaced.get(g.key)[k] = { was: state[k], became: fixed[k] };
+  }
   set(fixed);
+  if (stood.length) said.unshift(T('fix.back'));
   /* ⚠ EVERY SENTENCE, NOT `said[0]` — AND `said[0]` WAS NOT "THE MAIN ONE".
      It is whichever repair `repair()` happens to run FIRST, and that order is
      fixed by geometry (glazing before line work, no-glass-no-grille last), not
