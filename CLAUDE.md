@@ -753,7 +753,16 @@ not one, and which a face uses is a catalogue choice:
 | | what it looks like | doors | tiles |
 |---|---|---|---|
 | **`reed`** | three to five fine beads, hard dark quirks between them, low relief, sharp mitres | d042 d048 d058 d062 d065 d068 d070 d087 d091 d094 d099 d116 d122 | `panel2` `panel3`, and every face with no `profile` |
-| **`ogee`** | one narrow GROOVE near the outer edge, a LONG FLAT at the paint's own tone across half the band, a shallower groove near the inner edge — a scribed frame | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | `panel2o` `panel3o` `classic` |
+| **`ogee`** | one narrow GROOVE near the outer edge, a LONG FLAT at the paint's own tone across half the band, a shallower groove near the inner edge — a scribed frame | d041 d050 d051 d053 d061 d067 d077 d103 d112 d129 `newdoor` | `panel2o` `panel3o` · `classic`'s ARCHITRAVE only |
+
+⚠ **`classic` is in the ogee row for its architrave and its PANEL is reed since
+14.9.2026** — Peretz: *"the panels on the greek set are not classic ones, they
+are normal."* That is an OVERRULE and the photograph disagrees with it: a
+cross-section through that panel's own surround at 4000 px is one broad soft
+curve with a bead at its inner edge, which is this row exactly. Measured before
+it was overruled, kept in full beside the token in `classicSet`, and §0b's 14.9
+entry carries the numbers. The architrave is untouched — he spoke about the
+panels — which is why the entry above is still true of it.
 
 
 Thirteen doors against eleven, so neither is "the" moulding — and a round that
@@ -2389,6 +2398,132 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE DRAWING ROUND: THE SECOND LEAF GETS ITS PANEL AND ITS ORNAMENT BACK,
+  AND ONE OF THE FIVE ITEMS TURNED OUT TO BE ALREADY DONE — 14.9.2026.** Part B
+  of Peretz's review. `REALISM.md` §6 governs every item: compare against a
+  photograph, every time. Every one below was.
+
+  **B1 · The three glass designs, examined and NOT redrawn.** He asked for
+  `vine`, `tree` and `rings` to be redrawn from their evidence doors. They had
+  already been — each branch in `grillePaths` carries the note of what its
+  photograph corrected (the vine had no leaves at all and berries at twice life
+  size; the tree was drawn pale when the real one is a black silhouette, and it
+  forks; the rings died three wrong readings before the candidate lattice was
+  drawn back over the photograph in red). So the check that was owed was
+  whether the NUMBERS are right, not whether the work was done.
+  ⚠ **`rings` was re-measured independently and it holds.** A fresh 1-D
+  autocorrelation of the ink on `research/newdoor/window.jpg`, written without
+  looking at the recorded figures, returns 447 px and 378 px against the
+  recorded 512 x 440 — **0.873 and 0.859, the same ratio on both axes to within
+  a hundredth and a half.** That is a scale error, not a reading error, and the
+  scale is mine: I read the pane's edges off a grid at 0.10 steps and came out
+  15% small. Two harnesses agreeing on the SHAPE of a lattice to 1.5% while
+  disagreeing about the frame is the strongest confirmation that figure has had.
+  ⚠ **What IS still broken is the leaf boxes, and they cannot be fixed from
+  these photographs.** d109, d111 and d114 all carry the corpus median —
+  the identical rectangle on all three, `src: "fallback"` — and `tools/leaf.mjs`
+  says of itself that its width is median 14% out with no confidence signal
+  predicting which doors it gets wrong. Per door: **d111's photograph does not
+  contain the foot of the door at all**; d109 is shot from below and off-axis
+  (its head reads as a pointed arch in the picture and is a rectangle on the
+  wall); d114's foot is behind a doormat. The patterns are drawn in fractions
+  of the PANE and so do not depend on the leaf box — which is why they could be
+  measured at all — but `npm run against` FRAMES its crops from it, so the two
+  sheets that are supposed to judge these designs crop a guessed rectangle.
+  The instrument is blunt, not the drawing. `ASK-PERETZ.md` §1e asks for one
+  square-on photograph of each. Redrawing measured art off a worse photograph
+  would have been a regression and is refused.
+
+  **B2 · The fixed leaf's design was a miniature of the main leaf's.** *"the
+  half door window designs look like crops"* — and the word is exact. Every
+  figure in `grillePaths` is a fraction of the pane's own width, so the דו כנפי's
+  160 mm fixed-leaf pane drew the same option at 0.45 of the size it has on the
+  357 mm main leaf beside it.
+  **d119 settles it**: a main leaf and a narrow fixed leaf, both glazed, both
+  with ironwork. Its two panes were cropped at one scale and measured — the
+  ring course that crosses both is **27 image-px across in the main pane and 25
+  in the narrow one**, at the same height in both. The ornament is the same
+  size on the two leaves and simply has fewer repeats. So `aperture` takes an
+  `ornW` — the width the ornament is DRAWN at, as against the width of the hole
+  it is drawn in — and the clip that has always been the pane's own rect cuts
+  it to the glass. Nothing else in the range passes it.
+  ⚠ **`glazingArt` takes it too, and had to.** Everything in there is a
+  fraction of the pane's width as well, so the ETCHED designs — `vine`, `tree`,
+  `rings`, `circles` — had exactly the same fault as the ironwork. Fixing one
+  and not the other would have left the half door drawing its ironwork at one
+  scale and its worked glass at another, on the same door, from one sentence.
+
+  **B3 · And the square window's panel goes under BOTH lights.** Same door says
+  so: d119 has a window over a panel on each leaf, the two at the same height.
+  The fixed leaf's branch drew a clamped aperture and nothing beneath it — the
+  same one-line omission that `panelFits` and `faceObstacles` had, arriving in
+  the place that draws. ⚠ `alignTo` stays NULL here, the opposite of the main
+  leaf, and the photograph is why: on d119's narrow leaf the panel is
+  measurably **wider than the window above it — 0.50 of that leaf's width
+  against the window's 0.34** — so it keeps the composition's own inset.
+  `PANEL_INSET` gives 1 − 2(0.23) = 0.54, that measurement to four hundredths.
+  ⚠ **Asserted in both directions**: `half` draws 2 panels where `standard`
+  draws 1, and the window adds **₪3,800 on both** — the second panel is not a
+  second charge. Falsified by removing the call (count fails) and by
+  multiplying the window by `paneCount` (money fails).
+
+  **B4 · The Greek set's panel takes the ordinary section — AN OVERRULE, and
+  the photograph says otherwise.** *"the panels on the greek set are not classic
+  ones, they are normal."* Measured before it was overruled rather than after:
+  a cross-section through that panel's own surround in `research/newdoor/
+  full.jpg`, median of 148 parallel lines at 4000 px, normalised against the
+  flat field beside it — 1.42 rising to a broad maximum of **1.75 at 0.08** of
+  the band, falling smoothly to 1.24 at 0.41, one small bead at 0.48, a second
+  broad run to 1.57 at 0.77. **One broad soft curve with a bead at its inner
+  edge**, which is the `ogee` row in `MOULDS` to the letter; `reed` is three to
+  five fine beads with hard dark quirks and this section has none.
+  So nothing was stale and nothing had drifted: the catalogue said ogee, MOULDS
+  said ogee, the drawing drew ogee, and **the door in the photograph IS ogee.**
+  The owner wants the product to carry the ordinary panel and that is his to
+  decide. The ARCHITRAVE round its light is untouched and still ogee — he spoke
+  about the panels — which is why §3's moulding table stays correct.
+
+  **B5 · The area under the door, and the bare drawing was already right.**
+  *"the area beneath the door and between the 2 sides of the frame looks weird,
+  take a screenshot of it and redesign this area."* Screenshotted at 1440x900x3
+  on the photographic room and measured as a luminance profile straight down
+  from the leaf's foot in leaf-width units, each reading over the floor's own
+  tone well outside the doorway:
+
+  | below the foot | 0.00 | 0.04 | 0.08 | 0.12 | 0.16 | 0.24 |
+  |---|---|---|---|---|---|---|
+  | shipped, photo | 0.31 | 0.51 | **0.38** | 0.79 | 0.95 | 1.07 |
+  | bare drawing | 0.40 | 0.73 | 0.84 | 0.98 | 1.08 | 1.17 |
+  | after | 0.32 | 0.55 | 0.56 | 0.84 | 0.97 | 1.07 |
+
+  The shipped row is **not monotonic**: it lightens to 0.51 and goes back down
+  to 0.38 — a dark ring 0.08 of a leaf width below the door, separate from the
+  contact and darker than the band above it. A shadow that deepens as it moves
+  away from what casts it has no physical reading, and it blurred out past the
+  frame's returns onto the open floor either side, which is a shadow in front
+  of a piece of frame nearer the viewer than the leaf. That ring is the "weird".
+  ⚠ **The fault was never in `render`.** The bare row is monotonic and matches
+  the corpus — the three measured doors with no threshold read 0.76, 0.79 and
+  0.33 at the contact and recover within about 0.10 W (d116, d113, d128, each
+  against its own floor). It was in how far two CSS terms turn up shapes the
+  drawing emits at `opacity="0"`. So the fix is two numbers in `css/app.css`
+  and **all 52 bare sheets come back byte-identical from it**.
+  ⚠ **No threshold was added**, and the note refusing one was re-read first: 16
+  of 30 measured doors have one, median 0.0175 of leaf height, and a previous
+  round drew the 87th percentile of a feature absent from half the corpus. Two
+  of the four feet I cropped do show a bright metal sill (d026's is a ribbed
+  aluminium extrusion); half of them do not. Peretz asked for this area to be
+  redesigned, not for a part to be added to every door he sells.
+
+  **Gates.** `npm test` 9,710,995 / 0 · `npm run audit` no faults ·
+  `collide -- all` 2,090 designs, `faceObstacles` agrees with the drawing
+  everywhere · prices unmoved: ₪3,195, ₪6,995, ₪5,895/₪7,895.
+  **One bare sheet moved and only one** — `recreate-d122`, the sidelight door,
+  which is the only bare fixture with a second leaf, and it moved to agree with
+  the photograph printed beside it: the narrow leaf now carries a panel and its
+  glazing bars are the main leaf's size. Nothing carries the Greek set in the
+  bare families, so B4 moved none of them.
 
 - **⚠ THE CATALOGUE ROUND: SIX ITEMS, ONE `VERSION`, AND THE LONE PANEL IS THE
   WINDOW'S NOW — 14.9.2026.** First of five parts of a review Peretz sent. It

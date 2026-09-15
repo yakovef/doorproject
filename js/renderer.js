@@ -2869,17 +2869,43 @@ export function render(state) {
             return aperture({ x: sideX + 95, y: top, w: sideW - 190, h: tall,
                               paint, edge, grille, key: 's', profile: mouldOf(detail),
                               leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
-              + (detail.panel
+              + (detail.panel || win.panel
                   ? appliedFrame(sideX, y0, sideW, leafH, paint, pale, top + tall, null, 0, 's',
                                  null, PANEL_INSET, mouldOf(detail))
                   : '');
           })()
       : win.rects[0] && sideW > 320
-        ? aperture({ x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
-                     y: y0 + win.rects[0].top,
-                     w: Math.min(win.rects[0].w, sideW - 240), h: win.rects[0].h,
+        ? (() => {
+            /* ⚠ THE SECOND LEAF GETS THE PANEL TOO — 14.9.2026, and it is the
+               same one-line omission as in `panelFits` and `faceObstacles`,
+               arriving in the place that draws. Peretz: the square window on a
+               דו כנפי puts a panel on BOTH leaves. d119 is that door and shows
+               it — a main leaf with a window over a panel beside a narrow leaf
+               with a window over a panel, the two panels at the same height.
+               ⚠ `alignTo` STAYS NULL HERE, which is the opposite of the main
+               leaf, and the photograph is why. On the main leaf the panel
+               takes the opening's own outer edges; on d119's narrow leaf the
+               panel is measurably WIDER than the window above it — 0.50 of
+               that leaf's width against the window's 0.34 — so it keeps the
+               composition's own inset instead. `PANEL_INSET` gives 1 - 2(0.23)
+               = 0.54, which is that measurement to four hundredths.
+               The rows are `PANEL_ROWS.lone` through `appliedFrame`'s lone
+               branch, and because both leaves are the same height the two
+               panels line up across the door without being told to. */
+            const paneW = Math.min(win.rects[0].w, sideW - 240);
+            const paneTop = y0 + win.rects[0].top;
+            return aperture({ x: sideX + (sideW - paneW) / 2, y: paneTop,
+                     w: paneW, h: win.rects[0].h,
+                     /* The ornament at the MAIN leaf's scale — see grillePaths. */
+                     ornW: win.rects[0].w,
                      paint, edge, grille, key: 's', profile: mouldOf(detail),
                      leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
+              + (detail.panel || win.panel
+                  ? appliedFrame(sideX, y0, sideW, leafH, paint, pale,
+                                 paneTop + win.rects[0].h, null, 0, 's',
+                                 null, PANEL_INSET, mouldOf(detail))
+                  : '');
+          })()
         : ''}</g>` : ''}
 
   <!-- ── main leaf ────────────────────────────────────────────── -->
@@ -5147,7 +5173,17 @@ function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
  * Returned in two parts, because they go either side of the grille: ironwork
  * sits in front of the glass, not behind its texture.
  */
-function glazingArt(kind, x, y, w, h, paint, key = 'g') {
+/* ⚠ `ornW` — SAME RULE AS `grillePaths`, AND FOR THE SAME DOOR. Everything in
+   here is a fraction of the pane's own width too, so an etched film on the
+   narrow leaf of a דו כנפי came out as a miniature of the film on the main
+   leaf beside it — the same fault as the ironwork and the same half of
+   Peretz's sentence. The two had to move together or the half door would draw
+   its ironwork at one scale and its worked glass at another.
+   Widened and re-centred; `aperture`'s clip is the pane's own rect and cuts
+   it back to the glass. `over` is empty on every branch and `veil` is always
+   drawn inside that clip, so nothing escapes the opening. */
+function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
+  if (ornW && ornW > w) { x -= (ornW - w) / 2; w = ornW; }
   const n2 = v => v.toFixed(1);
   const uid = s => `gz-${key}-${s}`;
 
@@ -5616,14 +5652,19 @@ export const apertureLayout = memo(function apertureLayout(win, leafW, detail, l
      `${win.id}|${leafW}|${detail ? detail.id : '-'}|${leafH}`);
 
 /* ── a glazed opening, with a raised moulded surround ───────────── */
+/* ⚠ `ornW` — THE WIDTH THE ORNAMENT IS DRAWN AT, which is not always the width
+   of the pane it is drawn in. See the note over `grillePaths`; it exists for
+   the fixed leaf of a דו כנפי, whose pane is narrower than the main leaf's and
+   whose ironwork is NOT smaller. Defaults to the pane's own width, so every
+   other opening in the range is unaffected. */
 function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
-                    splits = [], band = MOULD_BAND,
+                    splits = [], band = MOULD_BAND, ornW = null,
                     profile = MOULD_DEFAULT }) {
   /* WORKED GLASS IS A GRILLE NOW. The pattern in the pane and the ironwork
      over it were two choices and are one, so the same option decides both:
      `glass: true` in the catalogue means it is etched into the glass, and
      `glazingArt` draws it exactly as it drew the old glazing. */
-  const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint, key) : null;
+  const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint, key, ornW) : null;
   /* The architrave. It was a 30 mm band with a single 10 mm bevel, and that
      thinness is most of why a glazed door of ours read as CAD next to a
      photograph: on the measured doors the surround is a MOULDING, wide and
@@ -5704,7 +5745,7 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
            half a ring's worth of scallops appeared on the door beside the
            opening. A pattern is in the glass; the glass stops at the frame. -->
       <g clip-path="url(#${id})">${glass ? glass.veil : ''}</g>
-      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint, 0.10) : null)}</g>
+      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint, 0.10) : null, ornW)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
       <rect x="${x}" y="${y}" width="${w}" height="34" fill="url(#aoTop)"/>
@@ -5770,7 +5811,31 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
  *   gleam by 1.5 whatever the stroke, so the same grille came out proportion-
  *   ally three times heavier on a narrow opening than on a wide one.
  */
-function grillePaths(kind, x, y, w, h, tint) {
+/* ⚠ `ornW` IS THE SCALE, `w` IS THE HOLE, AND ON ONE SIZE THEY DIFFER —
+   14.9.2026. Everything below is a fraction of `w`, so a narrower pane draws a
+   SMALLER pattern: on a דו כנפי the fixed leaf's pane is 160 mm against the
+   main leaf's 357, and the same option came out as a miniature of itself
+   beside the full-size one. Reported by Peretz as the half door's window
+   designs looking like CROPS, and the word is exact — it is the same design
+   photographed through a smaller hole.
+   The photograph says otherwise, and it says it plainly. d119 is this door: a
+   main leaf and a narrow fixed leaf, both glazed, both with ironwork. Its two
+   panes were cropped out at one scale and measured — the ring course that runs
+   across both is **27 image-px** across in the main pane and **25** in the
+   narrow one, at the same height in both. The ornament is the SAME SIZE on the
+   two leaves and simply has fewer repeats across the narrow one. That is what
+   a workshop does: it bends the same stock round the same formers and stops
+   when it runs out of pane.
+   So the caller may hand over a scale that is WIDER than the hole. The
+   pattern is drawn centred at that scale and `aperture`'s own clip — which
+   has always been the pane's rect — cuts it to the glass. Nothing else in the
+   range passes it, so nothing else moves.
+   ⚠ THE UID TAKES `x` AFTER THE SHIFT, which keeps two panes on one door
+   apart exactly as before: they were distinguished by their origins and their
+   origins are still different. `npm run audit`'s duplicate-id sweep is the
+   check on that, and it is the reason this is safe to do here rather than by
+   passing a second origin down every branch. */
+function grillePaths(kind, x, y, w, h, tint, ornW = null) {
   /* `tint` is the bar's own colour. Ironwork is near-black, but muntins in the
      door's own paint are just as common — d097 is white bars on a white door,
      legible only by their shadow — and drawing those dark inverts the most
@@ -5793,6 +5858,11 @@ function grillePaths(kind, x, y, w, h, tint) {
   kind = idKind.replace(/-light$/, '');
   const body = tint || '#232527';
   const gleam = tint ? '#fff' : '#8A8F94';
+
+  /* The ornament's own frame: the pane, widened to `ornW` and re-centred on
+     it. `V` is untouched — the two leaves are the same height and their
+     openings start and stop together, which the photograph also shows. */
+  if (ornW && ornW > w) { x -= (ornW - w) / 2; w = ornW; }
 
   const U = f => x + w * f;
   const V = f => y + h * f;
@@ -5995,6 +6065,21 @@ function grillePaths(kind, x, y, w, h, tint) {
      the pitch along it, so the rings OVERLAP top to bottom. That is where the
      pointed leaf-shaped crossings come from, and getting the two ratios the
      same would lose them.
+
+     ⚠ RE-MEASURED INDEPENDENTLY ON 14.9.2026 AND IT HOLDS. Peretz asked for
+     this pattern to be redrawn from its photograph; it had already been, by
+     the method above, so the check that was owed was whether the numbers are
+     right rather than whether the work was done. A fresh 1-D autocorrelation
+     of the ink along each axis of `research/newdoor/window.jpg` — a different
+     harness, written without looking at the figures here — returns the
+     strongest lags at 447 px across the long axis of the pane and 378 px
+     across the short one. Against the 512 x 440 above those are 0.873 and
+     0.859: the SAME ratio on both axes to within a hundredth and a half, which
+     is what a scale error looks like and not what a wrong reading looks like.
+     The scale is mine — the pane's edges were read off a grid at 0.10 steps
+     and came out about 15% small. Two harnesses agreeing on the SHAPE of a
+     lattice to 1.5% while disagreeing about the frame they measured it in is
+     the strongest confirmation this figure has had. Not changed.
 
      ⚠ THE CURLS SIT IN THE DIAGONAL GAPS, FOUR AT A TIME. Where two rings
      merely cross there is nothing but the crossing; it is the concave diamond
@@ -7162,11 +7247,32 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
      three, and 297 combinations reported a face with no panel while the price
      list took ₪1,680. `data-top` is there for the same reason: the third check
      goes DEAD rather than failing without it.
-     This one keeps `moulding()`. A panel is what that section was measured on,
-     and the photograph's panel surround is a broad ogee, not a band. */
+     This one keeps `moulding()`. A panel is what that section was measured on.
+
+     ⚠ `MOULD_DEFAULT`, NOT `'ogee'` — AN OVERRULE, 14.9.2026, AND THE
+     PHOTOGRAPH SAYS OTHERWISE. Peretz: *"the panels on the greek set are not
+     classic ones, they are normal."*
+     What the evidence says, measured before it was overruled rather than
+     after: a cross-section through this panel's own surround in
+     `research/newdoor/full.jpg`, median of 148 parallel lines at 4000 px,
+     normalised against the flat field beside it — 1.42 rising to a broad
+     maximum of 1.75 at 0.08 of the band and falling smoothly to 1.24 at 0.41,
+     one small bead at 0.48, a second broad run to 1.57 at 0.77, then the
+     field. ONE broad soft curve with a bead at its inner edge, which is the
+     `ogee` row in MOULDS to the letter; the `reed` row is three to five fine
+     beads with hard dark quirks between them and this section has none.
+     So nothing here was stale and nothing had drifted: the catalogue said
+     ogee, MOULDS said ogee, the drawing drew ogee, and the door in the
+     photograph IS ogee. The owner wants the product to carry the ordinary
+     panel section, and that is his to decide.
+     ⚠ THE ARCHITRAVE ROUND THE LIGHT IS UNTOUCHED and is still ogee: it comes
+     from `profile: 'ogee'` on the catalogue entry, through `aperture`, and he
+     spoke about the PANELS. CLAUDE.md §3's moulding table files `classic`
+     under ogee for exactly that reason and stays correct. */
   const pn = at(P.panel);
   out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">`
-    + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn', 'ogee')
+    + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn',
+               MOULD_DEFAULT)
     + `</g>`);
 
   /* ── THE PLINTH: the frieze upside down, then the splayed foot ──

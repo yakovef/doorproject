@@ -1937,6 +1937,49 @@ group('the three-panel face is the two-panel face with a plate let in');
   }
 }
 
+/* ⚠ THE SQUARE WINDOW PUTS A PANEL ON EVERY LEAF IT IS DRAWN IN, AND CHARGES
+   FOR NONE OF THEM — 14.9.2026, both directions, because one alone passes on a
+   constant.
+   Reported by Peretz: on a דו כנפי the square window should put the panel on
+   BOTH leaves. It did not — the fixed leaf's branch drew a clamped aperture
+   and nothing under it — and d119 is the door that settles it: a main leaf
+   with a window over a panel beside a narrow leaf with a window over a panel,
+   the two panels at the same height.
+   The price half is the one that could rot quietly. `WINDOW.rect` carries the
+   panel (A8 is closed on that), so a SECOND panel appearing on a second leaf
+   must not become a second charge — and nothing in the price table knows how
+   many leaves a size has. Asserted as an equality between the two sizes
+   rather than against ₪3,800, so the claim survives Peretz repricing the
+   window. Falsified by removing the `appliedFrame` call from the fixed leaf's
+   branch (the count fails) or by multiplying the window by `paneCount` (the
+   money fails). */
+group('a square window brings its panel to both leaves and charges for one');
+{
+  const P = st => shekels(priceAgorot({ ...base, ...st }));
+  const panels = st => (render({ ...base, ...st }).match(/data-detail="panel"/g) || []).length;
+  const bare = { detail: 'plain', handle: 'none', grille: 'none' };
+  const twoLeaf = Object.keys(SIZES).filter(k => SIZES[k].side);
+  ok(twoLeaf.length > 0, 'no size has a second leaf — this group is asserting nothing');
+  ok(panels({ ...bare, size: 'standard', window: 'rect' }) === 1,
+     'a standard leaf behind a square window draws exactly one panel');
+  ok(panels({ ...bare, size: 'standard', window: 'none' }) === 0,
+     'a plain standard leaf with no window draws no panel at all');
+  for (const size of twoLeaf) {
+    ok(panels({ ...bare, size, window: 'rect' }) === 2,
+       `${size}: a square window draws ${panels({ ...bare, size, window: 'rect' })} panels `
+     + 'and this door has two leaves — Peretz asked for one under each light');
+    ok(panels({ ...bare, size, window: 'none' }) === 0,
+       `${size}: a plain two-leaf door with no window draws a panel from nowhere`);
+    /* And the money: the same window on a one-leaf and a two-leaf door adds
+       the same figure, so the extra panel is inside the window on both. */
+    const one = P({ ...bare, size: 'standard', window: 'rect' }) - P({ ...bare, size: 'standard' });
+    const two = P({ ...bare, size, window: 'rect' }) - P({ ...bare, size });
+    ok(one === two,
+       `${size}: the square window adds ₪${two} on two leaves and ₪${one} on one — `
+     + 'the second panel has become a second charge');
+  }
+}
+
 group('a panel that is charged for is a panel that is drawn');
 {
   let n = 0, missing = 0;

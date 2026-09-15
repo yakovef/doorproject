@@ -1626,6 +1626,34 @@
       glass: true,
       doors: ["d106"]
     },
+    /* ⚠ THESE THREE DOORS HAVE NO HAND-MEASURED LEAF BOX AND CANNOT BE GIVEN
+       ONE — examined 14.9.2026, when the patterns were re-opened to be redrawn
+       from the photographs and it turned out they already had been.
+       `research/works/auto/leaf.json` carries d109, d111 and d114 at the corpus
+       MEDIAN — the identical rectangle 241,193,424,1183 on all three, `src:
+       "fallback"` — which `tools/leaf.mjs` is explicit about: its width is
+       median 14% out and "no confidence signal predicts which doors it gets
+       wrong". Everything measured in millimetres has to come from a hand box.
+       Why they have none, per door:
+         d111  the photograph DOES NOT CONTAIN THE FOOT OF THE DOOR. The leaf
+               runs off the bottom edge of the frame, so its height cannot be
+               read at any accuracy from this file;
+         d109  shot from below and well off-axis — the light above it is a
+               pointed arch in the picture and a rectangle on the wall — so a
+               fraction of the image is not a fraction of the leaf. That is the
+               same trap CLASSIC_ROWS fell into twice;
+         d114  square-on and the best of the three, but its foot is behind a
+               doormat and the bottom rail is not visible.
+       What that costs, precisely: `npm run against` frames its crops from the
+       leaf box, so the `vine` and `tree` comparison sheets crop a GUESSED
+       rectangle. The patterns themselves are drawn in fractions of the PANE and
+       do not depend on it, which is why they could be measured at all — see the
+       long notes in `grillePaths`, both of which record what the photograph
+       corrected (the vine had no leaves and berries at twice life size; the tree
+       was drawn pale when the real one is a black silhouette, and it forks).
+       So the sheets are the instrument that is blunt here, not the drawing, and
+       the honest fix is a better photograph rather than a better guess.
+       ASK-PERETZ asks for one. */
     {
       id: "vine",
       he: "גפן",
@@ -4307,7 +4335,7 @@ ${stops}
         key: "s",
         profile: mouldOf(detail),
         leaf: { x: sideX, y: y0, w: sideW, h: leafH }
-      }) + (detail.panel ? appliedFrame(
+      }) + (detail.panel || win.panel ? appliedFrame(
         sideX,
         y0,
         sideW,
@@ -4322,18 +4350,38 @@ ${stops}
         PANEL_INSET,
         mouldOf(detail)
       ) : "");
-    })() : win.rects[0] && sideW > 320 ? aperture({
-      x: sideX + (sideW - Math.min(win.rects[0].w, sideW - 240)) / 2,
-      y: y0 + win.rects[0].top,
-      w: Math.min(win.rects[0].w, sideW - 240),
-      h: win.rects[0].h,
-      paint: paint2,
-      edge,
-      grille,
-      key: "s",
-      profile: mouldOf(detail),
-      leaf: { x: sideX, y: y0, w: sideW, h: leafH }
-    }) : ""}</g>` : ""}
+    })() : win.rects[0] && sideW > 320 ? (() => {
+      const paneW = Math.min(win.rects[0].w, sideW - 240);
+      const paneTop = y0 + win.rects[0].top;
+      return aperture({
+        x: sideX + (sideW - paneW) / 2,
+        y: paneTop,
+        w: paneW,
+        h: win.rects[0].h,
+        /* The ornament at the MAIN leaf's scale — see grillePaths. */
+        ornW: win.rects[0].w,
+        paint: paint2,
+        edge,
+        grille,
+        key: "s",
+        profile: mouldOf(detail),
+        leaf: { x: sideX, y: y0, w: sideW, h: leafH }
+      }) + (detail.panel || win.panel ? appliedFrame(
+        sideX,
+        y0,
+        sideW,
+        leafH,
+        paint2,
+        pale,
+        paneTop + win.rects[0].h,
+        null,
+        0,
+        "s",
+        null,
+        PANEL_INSET,
+        mouldOf(detail)
+      ) : "");
+    })() : ""}</g>` : ""}
 
   <!-- ── main leaf ────────────────────────────────────────────── -->
   <g id="leaf" data-x="${mainX}" data-w="${leafW}">${leaf(mainX, leafW)}</g>
@@ -5199,7 +5247,11 @@ ${body}
             fill="${darken(paint2, 0.34)}"/>
     </g>`;
   }
-  function glazingArt(kind, x, y, w, h, paint2, key = "g") {
+  function glazingArt(kind, x, y, w, h, paint2, key = "g", ornW = null) {
+    if (ornW && ornW > w) {
+      x -= (ornW - w) / 2;
+      w = ornW;
+    }
     const n2 = (v) => v.toFixed(1);
     const uid = (s) => `gz-${key}-${s}`;
     if (kind === "reeded") {
@@ -5510,9 +5562,10 @@ ${body}
     leaf = null,
     splits = [],
     band = MOULD_BAND,
+    ornW = null,
     profile = MOULD_DEFAULT
   }) {
-    const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint2, key) : null;
+    const glass = grille.glass ? glazingArt(grille.id, x, y, w, h, paint2, key, ornW) : null;
     const M = band, MF = band;
     const id = `cl-${key}`;
     return `
@@ -5567,7 +5620,7 @@ ${body}
            half a ring's worth of scallops appeared on the door beside the
            opening. A pattern is in the glass; the glass stops at the frame. -->
       <g clip-path="url(#${id})">${glass ? glass.veil : ""}</g>
-      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint2, 0.1) : null)}</g>
+      <g clip-path="url(#${id})">${grillePaths(grille.id, x, y, w, h, grille.light ? lighten(paint2, 0.1) : null, ornW)}</g>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sheen)"/>
       <!-- occlusion under the head of the aperture -->
       <rect x="${x}" y="${y}" width="${w}" height="34" fill="url(#aoTop)"/>
@@ -5595,11 +5648,15 @@ ${body}
     }).join("")}
     </g>`;
   }
-  function grillePaths(kind, x, y, w, h, tint) {
+  function grillePaths(kind, x, y, w, h, tint, ornW = null) {
     const idKind = String(kind);
     kind = idKind.replace(/-light$/, "");
     const body = tint || "#232527";
     const gleam = tint ? "#fff" : "#8A8F94";
+    if (ornW && ornW > w) {
+      x -= (ornW - w) / 2;
+      w = ornW;
+    }
     const U = (f) => x + w * f;
     const V = (f) => y + h * f;
     const n2 = (v) => v.toFixed(1);
@@ -6322,7 +6379,18 @@ ${body}
       );
     }
     const pn = at(P.panel);
-    out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">` + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint2, pale, leaf, "cpn", "ogee") + `</g>`);
+    out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">` + moulding(
+      pn[0],
+      pn[1],
+      pn[2],
+      pn[3],
+      MOULD_BAND,
+      paint2,
+      pale,
+      leaf,
+      "cpn",
+      MOULD_DEFAULT
+    ) + `</g>`);
     piece(
       "plinth",
       block(...at(P.plinth)) + inBand(...at(P.plinth), "cpb", "flute", "oval") + beadRun(

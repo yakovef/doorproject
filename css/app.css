@@ -1187,8 +1187,43 @@ svg { direction: ltr; }
  * at zero opacity on every door (see `#shadow` in renderer.js for why that is
  * the safe way to do it); these three rules are the only thing that turns them
  * up, and they exist only where there is a photograph for them to sit on. */
-.is-photo .stage [data-seam="pool"]    { opacity: .30; }
-.is-photo .stage [data-seam="contact"] { opacity: .58; }
+/* ⚠ .30 AND .58 UNTIL 14.9.2026, AND TOGETHER THEY PUT A SECOND SHADOW UNDER
+   THE DOOR THAT NOTHING CAST. Peretz: *"the area beneath the door and between
+   the 2 sides of the frame looks weird, take a screenshot of it and redesign
+   this area."*
+   Screenshotted and measured, at 1440 x 900 x3 on the photographic room, as a
+   luminance profile straight down from the leaf's foot in leaf-width units,
+   each reading divided by the floor's own tone well outside the doorway:
+
+     below the foot   0.00  0.04  0.08  0.12  0.16  0.24
+     shipped          0.31  0.51  0.38  0.79  0.95  1.07
+     bare drawing     0.40  0.73  0.84  0.98  1.08  1.17
+     these values     0.32  0.55  0.56  0.84  0.97  1.07
+
+   The shipped row is NOT MONOTONIC. It lightens from 0.31 to 0.51 and then
+   goes back DOWN to 0.38 before recovering — a dark ring 0.08 of a leaf width
+   below the door, separate from the contact and darker than the band above
+   it. A shadow that deepens as it moves away from the thing casting it has no
+   physical reading at all, and that ring is what makes the area read as a
+   smudge rather than as a door standing in a doorway. It also blurred out
+   PAST the frame's returns onto the open floor either side, which is a shadow
+   in front of a piece of frame that is nearer the viewer than the leaf.
+
+   ⚠ THE BARE DRAWING WAS ALREADY RIGHT and is not touched. Its row is
+   monotonic and it matches the corpus: the three measured doors with no
+   threshold read 0.76, 0.79 and 0.33 at the contact and recover to their
+   floor within about 0.10 of a leaf width (d116, d113, d128, each normalised
+   to its own floor the same way). So the fault was never in `render` — it was
+   in how far these two CSS terms turned up shapes the drawing emits at
+   `opacity="0"`, which is why the fix is here and why all 52 bare comparison
+   sheets come back byte-identical from it.
+   The terms still do their job: the contact line sits at 0.32 against the
+   bare drawing's 0.40, so the foot is still darkened for the photographic
+   floor — which is the whole reason they exist, the drawn room's shadow
+   having read as nothing on the warmer stone. They are simply no longer
+   turned up past the point where the blur makes its own second shadow. */
+.is-photo .stage [data-seam="pool"]    { opacity: .10; }
+.is-photo .stage [data-seam="contact"] { opacity: .16; }
 /* The casing stands proud of the plaster and drops a shadow onto it. On the
    drawn wall 0.22 was enough — the wall was #F5F3EF and almost anything showed
    on it. On the photograph's warmer, darker plaster the same shadow reads as
