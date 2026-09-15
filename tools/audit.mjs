@@ -405,6 +405,83 @@ for (const v of VIEWS) {
     }
   }
 
+  /* ⚠ THE STRIPE CONTROL IS ON THE FACE STEP IN EVERY STATE — 14.9.2026.
+     Peretz: the stripes disappear when panels are chosen. They did — the whole
+     control was replaced by its label and one sentence, so a customer who had
+     picked a panel could not see that stripes exist, what they cost, or that
+     one tap would trade the panel for them. It is the tile idiom now: the
+     pills are always rendered, the blocked ones are `aria-disabled` and
+     `.is-blocked`, the reason sits under them, and a tap performs the repair.
+     Three things, and the third is the one that would rot quietly:
+       · the three direction pills are in the DOM on a panelled door,
+       · the blocked ones say so to a screen reader AND carry a reason,
+       · and a tap on one still WORKS — it clears the face, turns the stripes
+         on, and says what it took away.
+     That last clause is a second fault this found: the handler discarded
+     `said` and performed its repairs in silence, which no tile has done since
+     9.9. It was unreachable while the control vanished.
+     This is a DOM fact and a behaviour, so `npm test` cannot see it.
+     Falsified by putting the `why ? … : …` replace back in `buildStripes`
+     (the first clause fails), by using `disabled` instead of `aria-disabled`
+     (the third), or by dropping `toast(said…)` again (the fourth). */
+  {
+    await p.goto('file://' + process.cwd() + '/index.html?d=panel2&w=none&n=none&k=coral&lang=he');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(400);
+    await p.evaluate(() => {
+      const c = [...document.querySelectorAll('[data-step]')].find(e => e.dataset.step === 'face');
+      if (c) c.click();
+    });
+    await p.waitForTimeout(350);
+    const before = await p.evaluate(() => {
+      const pills = [...document.querySelectorAll('.stripes__dirs .pill')];
+      return { n: pills.length,
+               dirs: pills.map(e => e.dataset.dir).join(','),
+               blocked: pills.filter(e => e.getAttribute('aria-disabled') === 'true')
+                             .map(e => e.dataset.dir).join(','),
+               dead: pills.filter(e => e.disabled).map(e => e.dataset.dir).join(','),
+               why: (document.querySelector('.stripes__why') || {}).textContent || '',
+               face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
+                      || {}).dataset?.id };
+    });
+    if (before.n !== 3) {
+      fault(v.name, `the face step shows ${before.n} stripe direction pills on a panelled `
+        + 'door and there are three — the control vanishes instead of saying why');
+    } else {
+      if (before.blocked !== 'h,v') {
+        fault(v.name, `the blocked stripe directions are "${before.blocked}" and should be `
+          + '"h,v" — a panelled door cannot take stripes and the pills must say so');
+      }
+      if (before.dead) {
+        fault(v.name, `stripe pills ${before.dead} use \`disabled\` — blocked options stay `
+          + 'focusable and clickable (PLAN.md §10.5); they are aria-disabled');
+      }
+      if (before.why.trim().length < 10) {
+        fault(v.name, 'the blocked stripe control shows no reason under it');
+      }
+      await p.evaluate(() => document.querySelector('.stripes__dirs .pill[data-dir="h"]').click());
+      await p.waitForTimeout(350);
+      const after = await p.evaluate(() => ({
+        face: (document.querySelector('.field[data-group="detail"] [aria-checked="true"]')
+               || {}).dataset?.id,
+        dir: (document.querySelector('.stripes__dirs .pill.is-on') || {}).dataset?.dir,
+        toast: (() => { const t = document.querySelector('#toast');
+                        return t && !t.hidden ? t.textContent.trim() : ''; })(),
+      }));
+      if (after.dir !== 'h' || after.face === before.face) {
+        fault(v.name, `tapping a blocked stripe pill left the door at face=${after.face} `
+          + `dir=${after.dir} — it should trade the panel for the stripes`);
+      }
+      if (!after.toast) {
+        fault(v.name, 'the stripe control cleared the face and said nothing — every other '
+          + 'control in this flow names what a repair took away');
+      }
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(250);
+  }
+
   /* ⚠ ONE TAP, EVERY SENTENCE — 9.9.2026. `choose()` showed `said[0]` and
      `said[0]` is not "the main change": it is whichever repair ran FIRST, and
      that order is fixed by geometry (glazing before line work,

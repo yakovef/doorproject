@@ -1664,14 +1664,36 @@ function buildStripes(host) {
 
   const box = document.createElement('div');
   box.className = 'stripes';
+  /* ⚠ THE CONTROL IS ALWAYS HERE NOW, AND IT SAYS WHY RATHER THAN VANISHING —
+     14.9.2026. Peretz: the stripes disappear when panels are chosen.
+     They did, completely: the whole control was replaced by its label and one
+     sentence, so a customer who had picked a panel could not see that stripes
+     exist, what they cost, or that one tap would trade the panel for them.
+     The old comment on `.stripes__why` argued "a dead button tells a customer
+     nothing, a sentence tells them what to change", and that reasoning is
+     right about DEAD buttons — which is why this is not one. It is the tile
+     idiom, which every other group in this flow has used all along and
+     `PLAN.md` §10.5 states: blocked options stay focusable and clickable and
+     say why, and where there is an obvious repair the click performs it.
+     So the pills are rendered in every state, marked `aria-disabled` and
+     `.is-blocked` when the face is in the way, with the reason under them —
+     and a tap runs the same `repair(…, 'stripes')` every other tap runs, which
+     clears the panels and says so. Nothing here decides anything: the rule
+     table is still the only thing that knows what can go with what.
+     ⚠ WHAT WAS REJECTED. A second `.opts__sub` heading over the missing
+     control — that is the present fault with a label on it. Moving stripes to
+     a step of their own — a ninth question for a ₪150 line, and the flow has
+     just had `mk` moved for being one question too many. */
   box.innerHTML = `
     <span class="stripes__label" id="stripes-l">${T('stripes.label')}</span>
-    ${why ? `<p class="stripes__why">${why}</p>` : `
     <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
       ${[['none', 'stripes.none'], ['h', 'stripes.h'], ['v', 'stripes.v']].map(([id, k]) => `
-        <button type="button" class="pill${dir === id ? ' is-on' : ''}"
-                data-dir="${id}" aria-pressed="${dir === id}">${T(k)}</button>`).join('')}
+        <button type="button" class="pill${dir === id ? ' is-on' : ''}${why && id !== 'none' ? ' is-blocked' : ''}"
+                data-dir="${id}" aria-pressed="${dir === id}"
+                aria-disabled="${!!why && id !== 'none'}">${T(k)}</button>`).join('')}
     </div>
+    ${why ? `<p class="stripes__why">${why}</p>` : ''}
+
     ${dir === 'none' ? '' : `
       <div class="blen__row">
         <button type="button" class="blen__b" data-n="-1" aria-label="${T('stripes.fewer')}"
@@ -1688,15 +1710,27 @@ function buildStripes(host) {
       ${dir === 'h' ? `
         <button type="button" class="pill stripes__tight${state.stripeTight ? ' is-on' : ''}"
                 data-tight="1" aria-pressed="${state.stripeTight}">${T('stripes.tight')}</button>` : ''}
-      <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`}
-    `}`;
+      <span class="stripes__cost">${priceLabel(priceParts(state).stripes)}</span>`}`;
 
+  /* ⚠ AND IT SAYS WHAT IT TOOK AWAY — 14.9.2026. This discarded `said` and
+     kept only `.state`, so a tap here performed its repairs in SILENCE: on a
+     panelled door it cleared the face, on a glazed one it removed the window,
+     and the customer was told neither. Every other control in this flow goes
+     through `choose`, which has joined the sentences with ' · ' since 9.9;
+     the stripes are the one control that is not a tile and so had its own
+     handler, and the handler never got that fix.
+     It was nearly unreachable while a blocked door showed no pills at all —
+     which is how it stayed hidden — and this round makes the blocked tap the
+     normal way to trade a panel for stripes, so it has to speak. */
   for (const b of box.querySelectorAll('[data-dir]')) {
     b.addEventListener('click', () => {
       const d = b.dataset.dir;
-      set(repair({ ...state, stripeDir: d,
+      noteEngaged();
+      const { state: fixed, said } = repair({ ...state, stripeDir: d,
                    stripeCount: d === 'none' ? 0 : Math.max(1, state.stripeCount || 2),
-                   stripeTight: d === 'v' ? false : state.stripeTight }, 'stripes').state);
+                   stripeTight: d === 'v' ? false : state.stripeTight }, 'stripes');
+      set(fixed);
+      toast(said.join(' · '));
     });
   }
   for (const b of box.querySelectorAll('[data-n]')) {

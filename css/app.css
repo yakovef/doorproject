@@ -3174,8 +3174,22 @@ svg { direction: ltr; }
 .stripes__tight { justify-self: start; }
 .stripes__cost { font-size: .78rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 /* The reason, when the door cannot take stripes. Not a disabled control: a
-   dead button tells a customer nothing, a sentence tells them what to change. */
+   dead button tells a customer nothing, a sentence tells them what to change.
+   ⚠ AND SINCE 14.9.2026 IT SITS UNDER THE CONTROL RATHER THAN INSTEAD OF IT.
+   The sentence used to REPLACE the pills, the stepper and the price, so a
+   customer who had chosen a panel could not see that stripes exist at all —
+   which is what Peretz reported. The argument above is right about a DEAD
+   button and this is not one: the pills are `aria-disabled` and `.is-blocked`,
+   which is the same idiom every tile in this flow uses, and a tap still runs
+   the repair that trades the panel for the stripes and says so. */
 .stripes__why { margin: 0; font-size: .78rem; color: var(--ink-2); }
+
+/* Blocked, not disabled — see `markGroup` and `.tile.is-blocked`, whose 0.7
+   this matches so that a blocked pill and a blocked tile read as one thing.
+   `aria-disabled` rather than `disabled` keeps it focusable and clickable, and
+   the pointer stays a pointer because the click DOES something: it performs
+   the repair the sentence beside it describes. */
+.pill.is-blocked { opacity: .7; }
 
 .send__spec {
   margin: 0; padding-block: 8px;

@@ -709,6 +709,16 @@ export const UI = {
   'fix.gripMoved':       ['הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה', 'We moved the handle — where you put it no longer works', 'Мы сдвинули ручку — на выбранном месте она больше не подходит'],
   'fix.gripHome':        ['הידית הוסרה, ואיתה המיקום שבחרתם לה', 'The handle is gone, and with it the place you chose for it', 'Ручка убрана, а вместе с ней и выбранное для неё место'],
   'fix.setWindow':       ['התאמנו את החלון — הסט היווני מגיע עם חלון מלבני משלו', 'We adjusted the window — the Greek set comes with a rectangular one of its own', 'Мы изменили окно — у греческого комплекта своё прямоугольное'],
+  /* ⚠ `fix.setGone` USED TO ANSWER FOR THIS TOO AND IT IS THE WRONG SENTENCE.
+     Stripes and a panel want the same face, so asking for stripes clears the
+     face — and the repair announced "we removed the Greek set, it does not go
+     with a vertical slot" on a door carrying neither. False twice over.
+     It was almost unreachable while the stripe control DISAPPEARED on a
+     panelled door (14.9 made it a blocked control instead, which is how this
+     was found), and the two sites are genuinely different: at `rectOnly` the
+     thing removed really is the set and the thing it clashes with really is a
+     slot. One said per reason. */
+  'fix.faceGone':        ['הסרנו את הפאנלים — לא משלבים אותם עם פסי מתכת', 'We cleared the panels — they do not go on a door with metal strips', 'Мы убрали панели — они не сочетаются с металлическими полосами'],
   'fix.setGone':         ['הסרנו את הסט היווני — הוא לא משתלב עם צוהר אנכי', 'We removed the Greek set — it does not go with a vertical slot', 'Мы убрали греческий комплект — он не сочетается с вертикальным окном'],
   /* `fix.needPanel` and `fix.ownPull` are withdrawn with their rules — see the
      note beside `why.rectNeedsPanel` above. Nothing adds a face the customer

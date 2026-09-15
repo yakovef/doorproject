@@ -552,6 +552,7 @@ const SAID = {
   gripHome:      'fix.gripHome',
   setWindow:     'fix.setWindow',
   setGone:       'fix.setGone',
+  faceGone:      'fix.faceGone',
   peepGone:      'fix.peepGone',
   bellGone:      'fix.bellGone',
   peepWindow:    'fix.peepWindow',
@@ -689,11 +690,16 @@ export function repair(state, intent = null) {
 
   const lined = isLineWork(s);
 
-  /* Stripes and a panel want the same face. */
+  /* Stripes and a panel want the same face.
+     ⚠ `SAID.faceGone`, NOT `SAID.setGone` — corrected 14.9.2026. This branch
+     said "we removed the Greek set, it does not go with a vertical slot" for
+     any panelled face and any reason, on doors carrying neither a set nor a
+     slot. The other user of `setGone` is the `rectOnly` repair above, where
+     both halves of that sentence are true; here neither is. */
   if (lined && byId(DETAILS, s.detail).panel) {
     if (intent === 'detail') {
       s.stripeDir = 'none'; s.stripeCount = 0; change('stripes', SAID.lineWorkGone);
-    } else { s.detail = 'plain'; change('detail', SAID.setGone); }
+    } else { s.detail = 'plain'; change('detail', SAID.faceGone); }
   }
 
   if (leafGlazed(s) && lined) {
