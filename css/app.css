@@ -2914,6 +2914,12 @@ button.spec__row:focus-visible {
    swan-neck and a cushion knob are only different if you can see them. */
 .tiles--hw { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
 .tiles--hw .tile__art, .glyph--hw { block-size: 74px; }
+/* The משקוף glyph is the only picture on the page with type in it — the two
+   dimensions Peretz orders by, written on the section. It takes the same
+   mono face as `.tile__meta` beside it so a number on the drawing and a
+   number under it read as the same kind of thing; the size is a `font-size`
+   attribute in the SVG's own units, because that is where the layout is. */
+.glyph__dim { font-family: var(--mono); }
 
 .tile__name { font-size: .78rem; line-height: 1.2; }
 .tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }

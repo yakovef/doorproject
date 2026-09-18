@@ -9506,24 +9506,62 @@ export function pirzulGlyph(pz) {
  *
  * Wall hatched, frame solid, leaf a thin slab at the back. The two dimensions
  * are the two that change, and they change by the real ratio.
+ *
+ * ⚠ AND SINCE 15.9.2026 THEY ALSO SAY THE NUMBER, which makes this the one
+ * picture in the file carrying type. The DOOR never does: a drawing with
+ * writing on it is a diagram of a door rather than a door, and §4's whole
+ * argument is that the customer is looking at the thing itself. A catalogue
+ * glyph is already a diagram (see the note above about the viewpoint), so the
+ * objection does not reach it — and Peretz asked for it in the same breath as
+ * the rest of the round, because 46 against 82 is what he orders by and the
+ * tile said only "wide face".
+ *
+ * ⚠ THE NUMBERS ARE `MASHKOFS`' OWN, NEVER TYPED HERE, and the marks are
+ * exactly as long as the numbers claim: `sc` scales both, the face dimension
+ * spans ONE WING of the casing (`cx - out … cx`, which is `mk.out * sc`) and
+ * the return spans the stem (`mk.in * sc`). Dimensioning the whole plate would
+ * have put "46" against a mark twice that long — the plate is one wing each
+ * side of the frame, which is what `casX0 = revX0 - mk.out` says in `render`.
+ * No unit is printed: מ״מ beside a numeral inside an eleven-pixel line is a
+ * bidi reordering risk for a word the section drawing already implies, and the
+ * four tiles are read against each other, not off a ruler.
  */
 export function mashkofGlyph(mk) {
   const W = 200, H = 150;
   const sc = 0.62;                        // mm to glyph units
   const out = mk.out * sc, dep = mk.in * sc;
-  const wallY = 30, frameY = wallY;
+  const cx = W / 2;
+  /* The section sits 16 units lower than it did: that band is where the face
+     dimension and its number now live, and moving the drawing down was
+     cheaper than shrinking it — at 74 px tall the difference between a 62 and
+     a 112 return is 19 px against 34 px, and `sc` is what carries it. */
+  const wallY = 46, frameY = wallY;
+  const dimY = 30, dimX = cx + 22;
+  const foot = frameY + dep;
+  const f = n => n.toFixed(1);
   return `<svg viewBox="0 0 ${W} ${H}" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">
       <!-- the wall, cut -->
       <rect x="0" y="${wallY}" width="${W}" height="26" opacity=".16"/>
       <!-- the frame's face on the wall, and its return into the opening -->
-      <rect x="${W / 2 - out}" y="${frameY - 9}" width="${out * 2}" height="9"/>
-      <rect x="${W / 2 - 7}" y="${frameY}" width="14" height="${dep}"/>
+      <rect x="${f(cx - out)}" y="${frameY - 9}" width="${f(out * 2)}" height="9"/>
+      <rect x="${cx - 7}" y="${frameY}" width="14" height="${f(dep)}"/>
       <!-- the leaf, at the back of the return -->
-      <rect x="${W / 2 - 46}" y="${frameY + dep}" width="92" height="11" opacity=".72"/>
-      <!-- the two dimensions, as ticks -->
-      <rect x="${W / 2 - out}" y="${frameY - 20}" width="${out * 2}" height="2.5" opacity=".55"/>
-      <rect x="${W / 2 + 16}" y="${frameY}" width="2.5" height="${dep}" opacity=".55"/>
+      <rect x="${cx - 46}" y="${f(foot)}" width="92" height="11" opacity=".72"/>
+    </g>
+    <g fill="none" stroke="currentColor" stroke-width="2.6" opacity=".6">
+      <!-- the face, over one wing -->
+      <path d="M${f(cx - out)} ${dimY}H${cx}"/>
+      <path d="M${f(cx - out)} ${dimY - 5}v10"/>
+      <path d="M${cx} ${dimY - 5}v10"/>
+      <!-- the return, wall face to leaf -->
+      <path d="M${dimX} ${frameY}V${f(foot)}"/>
+      <path d="M${dimX - 5} ${frameY}h10"/>
+      <path d="M${dimX - 5} ${f(foot)}h10"/>
+    </g>
+    <g class="glyph__dim" fill="currentColor" font-size="23" opacity=".8">
+      <text x="${f(cx - out / 2)}" y="${dimY - 8}" text-anchor="middle">${mk.out}</text>
+      <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 8)}">${mk.in}</text>
     </g>
   </svg>`;
 }

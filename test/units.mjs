@@ -7,9 +7,10 @@ import { contrast, lighten, silhouette } from '../js/colour.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
-  detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
+  bellGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, grilleGlyph, handleGlyph, HOME_REACH, LIGHT,
-  bellFits, locksetGlyph, nearestGrip, peepholeFits, render, sizeGlyph, specialLockGlyph,
+  bellFits, locksetGlyph, mashkofGlyph, nearestGrip, peepholeFits, peepholeGlyph,
+  pirzulGlyph, render, sizeGlyph, specialLockGlyph,
   windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
@@ -1831,6 +1832,83 @@ group('every option tile draws its own picture');
   for (const g of GRILLES) check('grille', g.id, grilleGlyph(g));
   for (const d of DETAILS) check('detail', d.id, detailGlyph(d));
   for (const s of Object.values(SIZES)) check('size', s.id, sizeGlyph(s));
+  /* ⚠ THE OTHER FIVE LISTS, ADDED 15.9.2026, AND THEY WERE MISSING FROM A LOOP
+     WHOSE NAME SAYS "EVERY OPTION TILE". Six of eleven option lists were
+     covered; the משקוף, the פרזול, the פעמון, the עינית and the extra lock
+     were not — and the comment two functions up in `renderer.js` about the two
+     "none" tiles having to differ from each other was describing a property
+     nothing checked. None of the five fails today. That is the point: the
+     handle glyph did not fail on the day it was written either. */
+  for (const m of MASHKOFS) check('mashkof', m.id, mashkofGlyph(m));
+  for (const p of PIRZUL) check('pirzul', p.id, pirzulGlyph(p));
+  for (const x of BELLS) check('bell', x.id, bellGlyph(x));
+  for (const x of PEEPHOLES) check('peephole', x.id, peepholeGlyph(x));
+  for (const x of SPECIAL_LOCKS) check('special', x.id, specialLockGlyph(x));
+}
+
+/* ── 6b2. THE משקוף TILES SAY THE NUMBER, AND THE MARK IS THAT LONG ──
+   Four frames whose names are "standard", "wide face", "deep return" and
+   "wide and deep" — which is the whole of what the page told you until
+   15.9.2026, while Peretz orders them as 46 and 82 across the face and 62 and
+   112 into the wall. The numbers are now on the section.
+
+   ⚠ ASSERTED AS ONE SCALE SHARED BY BOTH AXES AND ALL FOUR TILES, because
+   that is what makes a dimensioned diagram honest: every mark is exactly as
+   long as the number written on it, so a customer comparing two tiles is
+   comparing two measurements and not two drawings. The face dimension spans
+   ONE WING of the casing, which is what `mk.out` is — dimensioning the whole
+   plate would print 46 against a mark 92 long, and the drawing would be
+   lying in the customer's favour on a frame he pays ₪250 a side for.
+
+   The numbers are read out of `MASHKOFS`, never typed, so the test feeds a
+   frame that is not in the catalogue and demands the glyph follow it: a
+   hard-coded "46" survives every assertion that only reads the four real
+   tiles. Falsified three ways — printing `mk.out * 2`, dimensioning the whole
+   plate, and scaling the return by a second constant. */
+group('the משקוף tiles print the frame\'s own numbers, at the length they claim');
+{
+  const runs = svg => ({
+    face: (([, x0, , x1]) => Number(x1) - Number(x0))(/M([\d.-]+) ([\d.-]+)H([\d.-]+)/.exec(svg)),
+    ret:  (([, , y0, y1]) => Number(y1) - Number(y0))(/M([\d.-]+) ([\d.-]+)V([\d.-]+)/.exec(svg)),
+    text: [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
+  });
+
+  const scales = [];
+  for (const mk of MASHKOFS) {
+    const r = runs(mashkofGlyph(mk));
+    ok(r.text.length === 2,
+      `the ${mk.id} tile writes ${r.text.length} numbers, not two: the face and ` +
+      `the return are the two dimensions this frame is sold by`);
+    ok(r.text[0] === String(mk.out) && r.text[1] === String(mk.in),
+      `the ${mk.id} tile writes ${r.text.join('/')} where MASHKOFS says ` +
+      `${mk.out}/${mk.in}`);
+    ok(r.face > 0 && r.ret > 0,
+      `the ${mk.id} tile draws a dimension of zero length (face ${r.face}, return ${r.ret})`);
+    scales.push({ id: `${mk.id} face`, k: r.face / mk.out },
+                { id: `${mk.id} return`, k: r.ret / mk.in });
+  }
+  /* One ruler, both axes, four tiles — the same property the size tiles were
+     given on 14.9 and for the same reason. Tolerance is the glyph's own
+     rounding to one decimal place: an endpoint moves at most 0.05 units, over
+     the smallest number dimensioned (46) that is 0.0011 per mm. 0.004 is that
+     with room, and it is 150 times under the error the check is for —
+     dimensioning the whole plate instead of one wing doubles the scale. */
+  const k0 = scales[0].k;
+  for (const s of scales) {
+    ok(Math.abs(s.k - k0) < 0.004,
+      `the ${s.id} tile draws a dimension at ${s.k.toFixed(4)} units per mm where ` +
+      `${scales[0].id} draws ${k0.toFixed(4)}: four tiles on four rulers are not ` +
+      `comparable`);
+  }
+
+  /* A frame that is not in the catalogue: the only way to tell a glyph that
+     reads `MASHKOFS` from one that has the four numbers written into it. */
+  const odd = runs(mashkofGlyph({ id: 'mk-test', out: 33, in: 155 }));
+  ok(odd.text[0] === '33' && odd.text[1] === '155',
+    `a frame of 33/155 draws ${odd.text.join('/')}: the numbers on this tile are typed, not read`);
+  ok(Math.abs(odd.face / 33 - k0) < 0.01 && Math.abs(odd.ret / 155 - k0) < 0.01,
+    `a frame of 33/155 draws marks ${odd.face}/${odd.ret} units long, which is not ` +
+    `${k0.toFixed(4)} per mm: the marks do not follow the numbers`);
 }
 
 /* ── 6a2. THE SIZE TILES SHARE ONE RULER ────────────────────────────
