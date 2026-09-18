@@ -62,7 +62,13 @@ for (const [name, opts] of CASES) {
      rather than photographing paint if it finds nothing, because a crop of
      bare leaf that reports `ok` is how this survived. */
   const box = await p.evaluate(() => {
-    const els = [...document.querySelectorAll('#stage svg [data-hw="lock"], #stage svg [data-hw="handle"]')];
+    /* ⚠ `[data-hw]`, NOT A LIST OF ITS VALUES. There are five in the drawing —
+       `handle`, `grab`, `lockset`, `lockset-art` and `lock` (the cylinder and
+       the extra lock) — and the first version of this named two of them and
+       threw on `lock-plate`, whose furniture is `lockset`. Which is the guard
+       below working, and the reason it is a throw. Any fitting the drawing
+       marks is a fitting this sheet should frame. */
+    const els = [...document.querySelectorAll('#stage svg [data-hw]')];
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const el of els) {
       const r = el.getBoundingClientRect();

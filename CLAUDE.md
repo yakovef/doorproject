@@ -2403,6 +2403,50 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THREE FITTINGS WERE DRAWN FROM NOTHING AND THE CHECK THAT SHOULD HAVE
+  SAID SO WAS LOOKING THE OTHER WAY — 18.9.2026.** The last of Part A, and the
+  thing that makes the audit above repeatable instead of a one-off reading of a
+  folder. *"every door named as evidence has a photograph behind it"* already
+  covered `HANDLES` and `LOCKSETS` — and its first line is
+  `if (!o.doors) continue`, so an entry citing **nothing at all** was invisible
+  to it. That is how `knobplate`, `digital` and `square` arrived *"from the
+  hardware contact sheets"* with no picture of any kind, and why the audit had
+  to be done by hand.
+  The question is asked from the other end now: **every handle and every
+  lockset must declare what it was drawn from.** `photo` is a product cut-out,
+  `doors` are corpus doors, and an entry may have either, both, or — stated in
+  the entry — neither. ⚠ **`photo: null` IS THE POINT.** A missing field is an
+  author who did not think about it; an explicit null is an author who looked
+  and found nothing, and one word tells those apart for ever.
+  ⚠ **AND THE CITATIONS ARE ONLY WHAT THE CODE ALREADY SAID.** Nothing was
+  inferred: `ella`'s three doors, `nitzan`'s four, `ron`'s three and the
+  cylinder's d026/d030 were all sitting in comments a few lines away. Where
+  there was nothing to cite, nothing was written — `plate`'s own comment
+  measures six doors on a contact sheet and **names none of them**, so it gets
+  a null and stays on the blind list rather than a citation somebody invented.
+  ⚠ **AND `barblack`'s PHOTOGRAPH WAS NEARLY A GUESS.** There are black bars in
+  `rb/` — `shahar-black-*`, `rotem-black-*` — and citing one would assert that
+  our black tube is that product, which is exactly what the audit above left
+  open. It cites the door it was measured from and `photo: null`.
+  What the check prints on every run: **8 product cut-outs, 11 with corpus
+  doors, 2 drawn from neither** — `plate` and `lever-taper`. Those two are
+  printed rather than failed, because failing them means deleting something
+  Peretz sells or inventing a citation. What is GATED is that the number does
+  not grow, exactly rather than with slack: a third fitting drawn from nothing
+  has to stop somebody, because *"we already had two"* is how a list becomes
+  ten.
+  **Falsified three ways**, and the first fired two clauses at once: removing
+  `coral`'s `photo` field fires both the declaration clause and the blind
+  count; pointing it at a file that is not there fires the existence clause;
+  and a third fitting set to `photo: null` fires the count on its own.
+  ⚠ **And it moves no pixel, which was checked rather than claimed**: 516
+  renders — all thirty gallery doors plus every handle x lockset x size on the
+  default door — are **byte-identical to `HEAD`**, because `photo` and `doors`
+  are read by the suite and by nothing in the renderer. The four sheet families
+  were regenerated anyway, since the bundle's hash moves with any catalogue
+  edit, and the 52 bare sheets came back unchanged from the pass before it.
+  No id, no list order, no bit, no `VERSION`, no price.
+
 - **⚠ THE CORAL'S BLADE WAS 13% TOO LONG FOR ITS OWN ROSE, ITS TILE WAS DRAWN
   AT A THIRD SCALE AGAIN, AND THE ספיר HAD A ROUND KEYWAY PLATE UNDER A SQUARE
   KNOB — 18.9.2026.** Part A of the handles work, and the owner's own priority:

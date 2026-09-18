@@ -1561,6 +1561,61 @@ group('every door named as evidence has a photograph behind it');
   console.log(`  (${named} citations, every one with a photograph)`);
 }
 
+/* ── 6b3. Every fitting DECLARES what it was drawn from ────────────
+   The group above only looks at entries that carry a `doors` list, so an entry
+   with no evidence at all was invisible to it — `if (!o.doors) continue`. That
+   is how `knobplate`, `digital` and `square` arrived "from the hardware
+   contact sheets" with no photograph of any kind and nothing said so for a
+   year, and how the audit of 18.9 had to be a human reading a folder rather
+   than a check.
+
+   So the question is asked from the other end: every handle and every lockset
+   must say, in the entry, what it was drawn from. `photo` is a product
+   photograph and `doors` are corpus doors; an entry may have either, both, or
+   — stated explicitly — neither. **`photo: null` is the point of this check.**
+   A missing field is an author who did not think about it; an explicit null is
+   an author who looked and found nothing, and it costs one word to tell those
+   two apart for ever.
+
+   ⚠ AND A CITED FILE MUST EXIST. That is the whole value of the sibling group
+   above and the reason it was written: a catalogue free to cite a photograph
+   nobody has is a catalogue that will. */
+group('every handle and lockset says what it was drawn from');
+{
+  let withPhoto = 0, withDoors = 0, blind = [];
+  for (const [list, name] of [[HANDLES, 'HANDLES'], [LOCKSETS, 'LOCKSETS']]) {
+    for (const o of list) {
+      ok(Object.prototype.hasOwnProperty.call(o, 'photo'),
+         `${name}.${o.id} declares no \`photo\` — say which cut-out it was drawn `
+         + `from, or \`photo: null\` and why there is none`);
+      if (o.photo) {
+        withPhoto++;
+        ok(typeof o.photo === 'string' && existsSync(o.photo),
+           `${name}.${o.id} cites ${o.photo} and that file does not exist`);
+      }
+      if (o.doors) withDoors++;
+      if (!o.photo && !o.doors && o.style !== 'none') blind.push(`${name}.${o.id}`);
+    }
+  }
+  /* ⚠ THE BLIND LIST IS PRINTED AND ITS LENGTH IS GATED, WHICH ARE TWO
+     DIFFERENT JOBS. Two fittings are drawn from neither a product shot nor a
+     named door — `plate`, whose own comment measures six doors on a contact
+     sheet and names none of them, and `lever-taper`, which is a shape the
+     owner asked for from the screen rather than from a product. Failing on
+     those would mean deleting something Peretz sells or inventing a citation,
+     which is the fault this group exists to make VISIBLE rather than to
+     punish. What is gated is that the number does not GROW: a third fitting
+     drawn from nothing has to stop somebody, because "we already had two" is
+     how a list becomes ten. ⚠ Exact rather than slack on purpose — a gate
+     with margin in it is a gate that passes the next mistake. */
+  ok(blind.length <= 2,
+     `${blind.length} fittings are drawn from no photograph and no named door `
+     + `(${blind.join(', ')}) — two are known and recorded; a new one needs `
+     + `evidence, or a question in ASK-PERETZ, not a row on its own`);
+  console.log(`  (${withPhoto} product cut-outs, ${withDoors} with corpus doors, `
+    + `${blind.length} drawn from neither: ${blind.join(', ') || 'none'})`);
+}
+
 // ── 6c. What the works photographs actually show ──────────────────
 group('hinges and peephole match the photographs');
 for (const hd of HANDINGS) for (const sz of sizeKeys) {

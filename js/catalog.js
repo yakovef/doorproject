@@ -461,7 +461,8 @@ export const WINDOWS = [
  * pull bar" is not.
  */
 export const HANDLES = [
-  { id: 'none',    he: 'ללא ידית משיכה', en: 'No pull', ru: 'Без ручки-скобы', len: 0, style: 'none' },
+  { id: 'none',    he: 'ללא ידית משיכה', en: 'No pull', ru: 'Без ручки-скобы', len: 0, style: 'none',
+    photo: null },   // there is no photograph of an absence
 
   /* Pull bars. `bar` selects the section and the tone profile; see BARS in the
      renderer.
@@ -477,18 +478,30 @@ export const HANDLES = [
      is 56. A number nobody could reproduce from the line above it.
      The measured widths, on an 850 x 2050 leaf: */
   { id: 'idan',    he: 'עידן',  en: 'Idan', ru: 'Идан',   len: 1050, w: 32, style: 'bar', bar: 'idan', pull: true,
-    aliases: ['bar-long', 'luna', 'shiran'] },
+    aliases: ['bar-long', 'luna', 'shiran'],
+    photo: 'research/handles/rb/idan-400-00000002.png' },
   /* Brass, and the catalogue never said so: with no `finish` of its own
      `gripFinish` fell through to steel and the bar the inventory calls
      brass rendered silver on every door. d072, d074 and d082 are gold rods at
      0.017-0.024 of leaf width — half what we drew. */
   { id: 'ella',    he: 'אלה',   en: 'Ella', ru: 'Эла',   len: 1000, w: 20, style: 'bar', bar: 'ella', pull: true,
-    finish: 'brass' },
+    finish: 'brass', doors: ['d072', 'd074', 'd082'],
+    photo: 'research/handles/rb/ella-450.png' },
   { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', ru: 'Ницан', len: 1000, w: 44, style: 'bar', bar: 'nitzan', pull: true,
-    aliases: ['bar-short'] },
+    aliases: ['bar-short'], doors: ['d049', 'd066', 'd034', 'd104'],
+    photo: 'research/handles/rb/nitzan-400.png' },
   { id: 'shahar',  he: 'שחר',   en: 'Shahar', ru: 'Шахар', len: 1230, w: 40, style: 'bar', bar: 'shahar', pull: true,
-    aliases: ['bar-flat', 'blade'] },
-  { id: 'ron',     he: 'רון',   en: 'Ron', ru: 'Рон',    len: 900,  w: 18, style: 'bar', bar: 'ron', pull: true },
+    aliases: ['bar-flat', 'blade'], doors: ['d060'],
+    photo: 'research/handles/rb/shahar-400-1.png' },
+  /* ⚠ THE PHOTOGRAPH AND THE DOORS DISAGREE ABOUT WHAT THIS IS, and the audit
+     of 18.9 says so rather than resolving it: RB's own רון is a DARK,
+     SQUARE-section bar with bright steel end caps at both photographed
+     lengths, and the doors cited here carry a round polished tube. The
+     drawing follows the doors, which is the right way round; the NAME may
+     belong to the other product. `ASK-PERETZ.md` §1f asks. */
+  { id: 'ron',     he: 'רון',   en: 'Ron', ru: 'Рон',    len: 900,  w: 18, style: 'bar', bar: 'ron', pull: true,
+    doors: ['d072', 'd035', 'd074'],
+    photo: 'research/handles/rb/ron-400-00000002.png' },
 
   /* The ornate pull, the horizontal bow, and the recess. */
   /* ⚠ `shiran` IS WITHDRAWN, and this closes a question rather than dropping a
@@ -498,7 +511,7 @@ export const HANDLES = [
      the one grip whose picture we cannot check". Peretz, 26.8.2026: "there is
      no: שירן, להב שטוח." The id resolves to `idan`. */
   { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', ru: 'Горизонтальная скоба', len: 0, style: 'grab',
-    aliases: ['dee'] },
+    aliases: ['dee'], doors: ['d078'], photo: null },
   /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
      runs nearly the whole leaf and it is twice as wide as we drew it.
 
@@ -517,8 +530,11 @@ export const HANDLES = [
      `armGrip` (which does not arm the drag) and by `repair` (which drops a
      stale position out of a shared link). One flag, three readers, because a
      rule enforced only in the interface is a rule a link walks past. */
+  /* `photo: null` — a channel is a VOID pressed into the leaf, so there is no
+     product shot of it to have. d084 is the measurement. */
   { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel', ru: 'Врезная ручка',
-    len: 1780, w: 85, inset: 0.30, style: 'channel', pull: true, fixed: true },
+    len: 1780, w: 85, inset: 0.30, style: 'channel', pull: true, fixed: true,
+    doors: ['d084'], photo: null },
 
   /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
      the tubes: a wide rectangular ribbon standing off the leaf, catching the
@@ -545,7 +561,16 @@ export const HANDLES = [
      `finish: 'black'` reaches the lock furniture too, through
      `gripFinish`: on this door the keyway escutcheon is the same black. */
   { id: 'barblack', he: 'מוט שחור', en: 'Black tube bar', ru: 'Чёрная трубчатая скоба', len: 800, w: 20,
-    style: 'bar', bar: 'ron', pull: true, finish: 'black' },
+    style: 'bar', bar: 'ron', pull: true, finish: 'black',
+    /* ⚠ `photo: null`, DELIBERATELY. There ARE black bars in `rb/` —
+       `shahar-black-*` and `rotem-black-*` — and citing one of them here would
+       assert that this product is that product, which is precisely the
+       question the audit of 18.9 left open: RB's own רון is already a dark
+       square bar with steel caps, so our black tube may be a second name for
+       a bar we already carry, or a bar of theirs we have not identified. The
+       door in `research/newdoor/` is what it was measured from and is cited;
+       the product shot is not, because nobody knows yet which one it is. */
+    doors: ['newdoor'], photo: null },
 ];
 
 /**
@@ -564,7 +589,8 @@ export const HANDLES = [
  * a link written when it existed still opens a door.
  */
 export const LOCKSETS = [
-  { id: 'coral',   he: 'קורל',  en: 'Coral', ru: 'Корал',      style: 'lever', aliases: ['lever'], lever: true },
+  { id: 'coral',   he: 'קורל',  en: 'Coral', ru: 'Корал',      style: 'lever', aliases: ['lever'], lever: true,
+    photo: 'research/handles/rb/enterance-handle-product-coral.png' },
 
   /* Cylinder only: a keyway escutcheon and nothing else.
      This is the commonest lock furniture in the whole corpus on the doors that
@@ -575,8 +601,12 @@ export const LOCKSETS = [
      face needs a keyway and nothing more. A lever there would be redundant,
      and it is also physically in the way, which is what the configurator was
      drawing. */
+  /* `doors` are the two the escutcheon's DOME was read off — `cylinder()` in
+     the renderer names them: "on d026 and d030 it is plainly a little
+     hemisphere standing off the door". Cited here so the check can see the
+     evidence that was already in the drawing's comment. */
   { id: 'cylinder', he: 'צילינדר בלבד', en: 'Cylinder only', ru: 'Только цилиндр', style: 'cylinder', lock: true,
-    aliases: ['none'] },
+    aliases: ['none'], doors: ['d026', 'd030'], photo: null },
   /* `longplate` is retired one commit after it was added, and the reason is
      worth keeping. It went in because six doors on the hardware contact sheet
      looked like they carried a plate running a third of the stile. Measured
@@ -590,9 +620,16 @@ export const LOCKSETS = [
      contact sheet triages, it does not measure; and an automatic span that
      comes back equal to its own search window twice is telling you to draw the
      thing with a scale over it instead of tuning the detector a third time. */
+  /* ⚠ THE NAME IS A COLLISION AND THE AUDIT OF 18.9 RECORDS IT: every file in
+     `research/handles/rb/` carrying "rotem" is a PULL BAR with a white or
+     black inlay stripe, not a backplate. Either RB sells two products under
+     the name or this label is on the wrong row. `photo: null` rather than a
+     citation of those files, because citing them would assert the very thing
+     that is in doubt. `ASK-PERETZ.md` §1f asks. */
   { id: 'plate',   he: 'רותם',  en: 'Rotem', ru: 'Ротем',   style: 'plate', lock: true, lever: true,
-    aliases: ['longplate'] },
-  { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', ru: 'Шаровая',  style: 'cadoor' },
+    aliases: ['longplate'], photo: null },
+  { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', ru: 'Шаровая',  style: 'cadoor',
+    photo: 'research/handles/rb/enterance-handle-product-cadoor-1.png' },
   /* ⚠ `escutcheon: 'square'` — THE KEYWAY PLATE UNDER THIS KNOB IS SQUARE, and
      we drew a round one under a square backplate for the life of the entry.
      RB's own `…product-sapir.png` is two pieces: a square knob on a square
@@ -613,14 +650,15 @@ export const LOCKSETS = [
      §6's own case for leaving it. If a Sapir turns up in the works
      photographs, that ratio is the first thing to re-read. */
   { id: 'sapir',   he: 'ספיר',   en: 'Sapir', ru: 'Сапир',  style: 'sapir', aliases: ['almog'],
-    escutcheon: 'square' },
+    escutcheon: 'square',
+    photo: 'research/handles/rb/enterance-handle-product-sapir.png' },
   /* ⚠ `almog` IS WITHDRAWN — Peretz, 26.8.2026: "there is no: אלמוג". It
      resolves to `sapir`, the nearest lever left in the range. */
   /* Knob on a long backplate — the bronze fitting on d092, named three times
      across the luxury tier. A different object from a knob on a rose: the
      plate carries the keyway too, so it locks like the Rotem backplate. */
   { id: 'knobplate', he: 'כדור על אורך', en: 'Knob on backplate', ru: 'Шар на планке',
-    style: 'knobplate', lock: true },
+    style: 'knobplate', lock: true, doors: ['d092'], photo: null },
 
   /* ── added in round five, from the hardware contact sheets ──────────
      Every one of these was already on Peretz's doors; none of them was in the
@@ -634,7 +672,8 @@ export const LOCKSETS = [
      round thumb-turn — no buttons at all — and the twelve-button grid drawn
      first was invented from the English word. */
   { id: 'digital', he: 'מנעול חכם', en: 'Smart lock', ru: 'Умный замок',
-    style: 'digital', lock: true },
+    style: 'digital', lock: true,
+    doors: ['d070', 'd081', 'd084', 'd087', 'd113'], photo: null },
 
   /* Two square backplates stacked, lever on the upper — four doors (d032 d037
      d059 d066). A whole hardware family in squares rather than rounds, and
@@ -643,7 +682,8 @@ export const LOCKSETS = [
      and d037 show. Without it a separate round escutcheon was drawn on top
      of the plates, 22 x 22 mm into them, on every square-backplate door. */
   { id: 'square', he: 'ריבועי', en: 'Square backplates', ru: 'Квадратные накладки',
-    style: 'square', lever: true, lock: true },
+    style: 'square', lever: true, lock: true,
+    doors: ['d032', 'd037', 'd059', 'd066'], photo: null },
 
   /* ⚠ THERE WAS A `none` LOCKSET HERE — no lever, no knob, no keyway — and it
      lasted one round. It was added so the page could open on a completely
@@ -685,9 +725,12 @@ export const LOCKSETS = [
      ⚠ AND IT PRICES AS THE CORAL UNTIL HE SAYS OTHERWISE — ₪0, included.
      That is an assumption, not a quotation: `CLAUDE.md` §9, A19. It is the
      safe direction to be wrong in only if he checks it, so it is asked. */
+  /* `photo: null` — it is the drawing the Coral used to be, asked for by the
+     owner from the screen rather than from a product. If a cut-out turns out
+     to match it, that is A0's question and not an assumption to make here. */
   { id: 'lever-taper', he: 'ידית מתעקלת (שם זמני)', en: 'Curved lever (provisional)',
     ru: 'Изогнутая ручка (временное название)',
-    style: 'levertaper', lever: true },
+    style: 'levertaper', lever: true, photo: null },
 ];
 
 /**
