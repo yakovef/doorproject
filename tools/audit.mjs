@@ -22,6 +22,7 @@ import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 import { formatAgorot, priceAgorot } from '../js/price.js';
 import { SIZES } from '../js/catalog.js';
+import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { setLang, T, withLang } from '../js/copy.js';
 import { handingWords, specRows, summaryLine } from '../js/spec.js';
 import { repair } from '../js/rules.js';
@@ -4389,6 +4390,157 @@ for (const v of VIEWS) {
       + 'page never scrolls sideways, the card and its spec table do not move, every row names '
       + 'its price and every delete button is on screen and hit-testable');
   }
+}
+
+/* ── NO TWO OF THE PAGE'S OWN MARKS ARE THE SAME PICTURE ─────────────────
+   Measured 15.9.2026 by doing to the navigator's circles and the summary's row
+   marks what `npm test` has done to the option tiles since the day nine
+   handles shared one drawing: compare every mark against every other. The
+   difference is that a tile is 54-74 px and these are 21 and 18, and at that
+   size the markup is not the picture. Five pairs differed in every character
+   and drew the same thing:
+
+       0.427  spec  detail ~ speciallock     a box with a box in it, against a
+                                             box whose eight dots sat 2.1 px
+                                             apart and closed into a grey haze
+       0.423  nav   fit ~ sum                THE SAME RECTANGLE, M6 3.4h12v13.2
+                                             against M6 3.6h12v16.8
+       0.454  spec  grille ~ detail          six panes against one
+       0.457  spec  handing ~ speciallock
+       0.484  spec  window ~ grille          four panes against six
+
+   ⚠ THE NUMBER IS DIFFERING PIXELS OVER INKED PIXELS, WHICH IS A SCREEN AND
+   NOT A JUDGEMENT. 0 is the same picture. It cannot tell "confusing" from
+   "merely similar" — a paint drop against a four-pane window scored 0.51 and
+   nobody would confuse them — so the floor is set where the measurements put
+   it: above every pair a reader actually confused (the five above run 0.42 to
+   0.48) and below every pair that survived the redraw (the worst is nav
+   glass~lock at 0.63 and spec window~detail at 0.55). What it catches is the
+   thing it is for: two marks that have become one picture.
+
+   ⚠ THE SIZE AND THE WEIGHT COME OFF THE STYLESHEET, through a real element of
+   each class, because a rasteriser measuring 21 px after the CSS has moved to
+   16 is measuring a picture the page does not draw. And the table is checked
+   against what the RAIL actually renders first, so this cannot pass by
+   comparing nine marks nobody sees. */
+{
+  console.log('\nno two of the page\'s own marks are the same picture');
+  const FLOOR = 0.50;
+  const INK = [0.05, 0.55];        // share of the box a mark may cover
+  const p = await b.newPage({ viewport: { width: 1280, height: 720 } });
+  try {
+    await p.goto(`file://${process.cwd()}/index.html?lang=he`, { waitUntil: 'load' });
+    await p.waitForTimeout(700);
+
+    const style = await p.evaluate(() => {
+      const read = (cls) => {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        el.setAttribute('class', cls);
+        el.setAttribute('viewBox', '0 0 24 24');
+        document.body.appendChild(el);
+        const c = getComputedStyle(el);
+        const out = {
+          px: Math.round(parseFloat(c.inlineSize) || parseFloat(c.width) || 0),
+          w: c.strokeWidth, cap: c.strokeLinecap, join: c.strokeLinejoin,
+        };
+        el.remove();
+        return out;
+      };
+      const rail = [...document.querySelectorAll('.steps__g')]
+        .map(s => [...s.querySelectorAll('path')].map(q => q.getAttribute('d')).join('|'));
+      return { nav: read('steps__g'), spec: read('spec__ico'), rail };
+    });
+
+    const ds = art => [...art.matchAll(/ d="([^"]*)"/g)].map(m => m[1]).join('|');
+    const navArt = Object.fromEntries(Object.entries(SECTION_ICON).map(([k, d]) => [k, ds(d)]));
+    if (style.rail.length !== Object.keys(SECTION_ICON).length) {
+      fault('marks', `the rail draws ${style.rail.length} circles and SECTION_ICON holds `
+        + `${Object.keys(SECTION_ICON).length} — this check is not reading the table the page uses`);
+    }
+    /* One fault, not one per circle: nine copies of the same sentence is the
+       fault reported nine times, and the useful number is how many of them. */
+    const strays = [...new Set(style.rail.filter(d => !Object.values(navArt).includes(d)))];
+    if (strays.length) {
+      fault('marks', `${style.rail.filter(d => strays.includes(d)).length} of the rail's `
+        + `${style.rail.length} circles draw a mark that is not in SECTION_ICON — so what this `
+        + `check compares is not what the page shows. First: ${strays[0].slice(0, 60)}`);
+    }
+
+    for (const [tag, tbl, s] of [['nav', SECTION_ICON, style.nav], ['spec', SPEC_ICON, style.spec]]) {
+      const famBefore = faults;
+      if (!s.px || s.px < 8) {
+        fault('marks', `a ${tag} mark computes to ${s.px}px — the stylesheet has moved under this check`);
+        continue;
+      }
+      const res = await p.evaluate(async ([icons, px, sw, cap, join, DSF]) => {
+        const ink = async (art) => {
+          const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"'
+            + ` width="${px}" height="${px}" fill="none" stroke="#000" stroke-width="${sw}"`
+            + ` stroke-linecap="${cap}" stroke-linejoin="${join}">`
+            + art.replace(/<(path|circle|rect)/g, '<$1 vector-effect="non-scaling-stroke"')
+            + '</svg>';
+          const img = new Image();
+          await new Promise((ok2, no) => {
+            img.onload = ok2; img.onerror = no;
+            img.src = 'data:image/svg+xml;base64,'
+              + btoa(unescape(encodeURIComponent(svg)));
+          });
+          const cv = document.createElement('canvas');
+          cv.width = px * DSF; cv.height = px * DSF;
+          const g = cv.getContext('2d');
+          g.drawImage(img, 0, 0, cv.width, cv.height);
+          const d = g.getImageData(0, 0, cv.width, cv.height).data;
+          const m = new Uint8Array(cv.width * cv.height);
+          for (let i = 0; i < m.length; i++) m[i] = d[i * 4 + 3] > 40 ? 1 : 0;
+          return m;
+        };
+        const fam = new Map();
+        for (const [k, art] of Object.entries(icons)) fam.set(k, await ink(art));
+        const box = (px * DSF) ** 2;
+        const cover = {}, pairs = [];
+        for (const [k, m] of fam) cover[k] = m.reduce((t, x) => t + x, 0) / box;
+        const ids = [...fam.keys()];
+        for (let i = 0; i < ids.length; i++) {
+          for (let j = i + 1; j < ids.length; j++) {
+            const a = fam.get(ids[i]), c = fam.get(ids[j]);
+            let diff = 0, uni = 0;
+            for (let k = 0; k < a.length; k++) { if (a[k] | c[k]) uni++; if (a[k] !== c[k]) diff++; }
+            pairs.push({ a: ids[i], b: ids[j], d: uni ? diff / uni : 0 });
+          }
+        }
+        return { cover, pairs: pairs.sort((x, y) => x.d - y.d) };
+      }, [tbl, s.px, s.w, s.cap, s.join, 3]);
+
+      for (const [k, c] of Object.entries(res.cover)) {
+        if (c < INK[0] || c > INK[1]) {
+          fault('marks', `${tag} mark "${k}" inks ${(c * 100).toFixed(1)}% of its ${s.px}px box — `
+            + `outside ${(INK[0] * 100).toFixed(0)}-${(INK[1] * 100).toFixed(0)}%, so it is a `
+            + 'hairline or a filled block, not a drawing');
+        }
+      }
+      for (const r of res.pairs) {
+        if (r.d < FLOOR) {
+          fault('marks', `${tag} "${r.a}" and "${r.b}" differ on only ${(r.d * 100).toFixed(0)}% `
+            + `of the pixels they ink at ${s.px}px (floor ${FLOOR * 100}%) — at that size they are `
+            + 'one picture under two names');
+        }
+      }
+      if (!res.pairs.length) {
+        fault('marks', `${tag} produced no pairs to compare — the table is empty or has one entry`);
+      }
+      if (faults === famBefore) {
+        const w = res.pairs[0];
+        console.log(`    ${Object.keys(tbl).length} ${tag} marks at ${s.px}px, `
+          + `${res.pairs.length} pairs: closest is ${w.a} ~ ${w.b} at `
+          + `${(w.d * 100).toFixed(0)}%, ink ${(Math.min(...Object.values(res.cover)) * 100).toFixed(0)}`
+          + `-${(Math.max(...Object.values(res.cover)) * 100).toFixed(0)}% of the box`);
+      }
+    }
+  } catch (e) {
+    if (!crashed(e)) throw e;
+    fault('marks', 'chromium died before the marks were compared, so they are unchecked');
+  }
+  await p.close().catch(() => {});
 }
 
 /* ── THE WALL CHROME'S OWN INK STAYS OFF THE DOOR ────────────────────────

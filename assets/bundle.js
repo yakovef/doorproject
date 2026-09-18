@@ -8128,6 +8128,81 @@ ${body}
     return { state: s, changed, said };
   }
 
+  // js/icons.js
+  var SECTION_ICON = {
+    /* HOW BIG THE OPENING IS: the ruler every joiner's drawing uses. It was a
+       door with the arrow underneath, and the door was the whole problem — at
+       21 px it was the same rectangle as the summary's page. */
+    fit: '<path d="M4.4 4.4v15.2M19.6 4.4v15.2"/><path d="M4.4 12h15.2"/><path d="m7.4 9.4-3 2.6 3 2.6M16.6 9.4l3 2.6-3 2.6"/>',
+    /* THE FRAME: the casing outside, the opening inside, drawn as one section
+       through the head. Two nested rectangles say "a frame round a hole"; a
+       cross says nothing. Shared with `SPEC_ICON.mashkof`. */
+    mk: '<path d="M3.2 4.6h17.6v14.8H3.2Z"/><path d="M7.4 8.8h9.2v10.6H7.4Z"/>',
+    /* a paint drop. Shared with `SPEC_ICON.colour` since 15.9 */
+    colour: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
+    /* a panelled face */
+    face: '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.4 6.6h7.2v4.4H8.4Z"/><path d="M8.4 13.6h7.2v3.8H8.4Z"/>',
+    /* A GLAZED LIGHT: a transom across the head and two streaks of reflection
+       below it. The streaks are what say GLASS — the four-pane grid this used to
+       draw said "a divided rectangle", which at 21 px is `mk` with more lines.
+       ⚠ The sill was dropped, not moved: a wide rule under a landscape pane is a
+       laptop and a narrow one is a monitor stand. Both were tried and looked at,
+       and both were worse than no rule at all. */
+    glass: '<path d="M4.4 5.4h15.2v11.2H4.4Z"/><path d="M4.4 8.6h15.2"/><path d="M10 10.4 7.4 14M15.4 10.4 11.6 15"/>',
+    /* THE PULL BAR: the leaf's edge on the left, the bar standing off it on two
+       brackets. The bar has to be beside something for the standoffs to read as
+       standoffs — on its own it was a line with two ticks. */
+    grip: '<path d="M4.4 3.6h5v16.8h-5"/><path d="M15.8 5.2v13.6"/><path d="M9.4 8h6.4M9.4 16h6.4"/>',
+    /* THE LOCK: a keyhole. A round case over a tapered slot is the one mark on
+       this page a stranger names without being told, and the step it heads is
+       the lock furniture. */
+    lock: '<path d="M12 4.4a7.4 7.4 0 0 0-7.4 7.4v7.8h14.8v-7.8A7.4 7.4 0 0 0 12 4.4Z"/><path d="M12 9.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/><path d="m11 13.2-.8 3.6h3.6l-.8-3.6"/>',
+    /* THE FINISH: a lever handle, with a highlight along its shank saying the
+       choice is which METAL. Two concentric circles read as a paint swatch, and
+       this is the one step whose subject is not colour but material.
+       Shared with `SPEC_ICON.pirzul`. */
+    pz: '<path d="M14.6 12a2.6 2.6 0 1 0-5.2 0 2.6 2.6 0 0 0 5.2 0Z"/><path d="M14.6 12h4.8a1.8 1.8 0 0 1 0 3.6"/><path d="M9.4 12H4.6"/><path d="M6.8 8.6h2.4"/>',
+    /* A SHEET OF PAPER WITH FIGURES ON IT, and the folded corner is the whole
+       point of it: a plain rectangle with three lines inside was the same
+       picture as the door on the first step. */
+    sum: '<path d="M6.6 3.6h7.4l3.4 3.4v13.4H6.6Z"/><path d="M14 3.6v3.4h3.4"/><path d="M9.4 11.4h5.2M9.4 14.6h5.2M9.4 17.8h3"/>'
+  };
+  function sectionIcon(key) {
+    if (!Object.prototype.hasOwnProperty.call(SECTION_ICON, key)) {
+      throw new Error(`SECTION_ICON has no glyph for the "${key}" section — every section needs one, or its navigator circle draws nothing`);
+    }
+    return `<svg class="steps__g" viewBox="0 0 24 24" aria-hidden="true">${SECTION_ICON[key]}</svg>`;
+  }
+  var SPEC_ICON = {
+    colour: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
+    window: '<path d="M4.6 5h14.8v11.4H4.6Z"/><path d="M12 5v11.4M4.6 10.7h14.8"/>',
+    glazing: '<path d="M3.4 6.2h7.2v11.6H3.4Z"/><path d="M13.4 6.2h7.2v11.6h-7.2Z"/>',
+    /* the ironwork itself, not the pane it sits in */
+    grille: '<path d="M4.6 12 12 4.6M4.6 19.4 19.4 4.6M12 19.4 19.4 12"/><path d="M4.6 12 12 19.4M4.6 4.6 19.4 19.4M12 4.6 19.4 12"/>',
+    handle: '<path d="M8.4 5.6h3v12.8h-3Z"/><path d="M11.4 12h4.6"/>',
+    /* a key going into the case */
+    lockset: '<circle cx="7.4" cy="12" r="2.4"/><path d="M9.8 12h3.8"/><path d="M13.6 9.2h4.4v5.6h-4.4Z"/>',
+    detail: '<path d="M5.2 4.4h13.6v15.2H5.2Z"/><path d="M8.4 7.6h7.2v8.8H8.4Z"/>',
+    size: '<path d="M4.4 4.4v15.2M19.6 4.4v15.2"/><path d="M4.4 12h15.2"/><path d="m7.4 9.4-3 2.6 3 2.6M16.6 9.4l3 2.6-3 2.6"/>',
+    handing: '<path d="M6 3.8h12v16.4H6Z"/><path d="m14.6 8.6 3.4 3.4-3.4 3.4"/>',
+    /* ⚠ FOUR ROWS HAD NO MARK, AND THE GAP WAS VISIBLE. `specRows` can return
+       twelve keys and this table held nine, so the DEFAULT door — eight rows —
+       showed six icons and two empty slots, and a fully configured one showed
+       eight and four. The comment above says a missing mark is "deliberately not
+       an error, the label carries it", and that is true of a rare row; it is not
+       true of `mashkof` and `pirzul`, which are on EVERY door. A column of marks
+       with holes in it reads as a loading state.
+       Drawn to match their own step's circle rather than invented afresh: the
+       frame is the same nested pair, the פרזול the same lever. One idea, one
+       mark, wherever it appears. */
+    mashkof: '<path d="M3.4 5h17.2v14H3.4Z"/><path d="M7.4 9h9.2v10H7.4Z"/>',
+    pirzul: '<path d="M14.4 12a2.4 2.4 0 1 0-4.8 0 2.4 2.4 0 0 0 4.8 0Z"/><path d="M14.4 12h4.6a1.7 1.7 0 0 1 0 3.4"/><path d="M9.6 12H5"/>',
+    stripes: '<path d="M4.6 7.4h14.8M4.6 12h14.8M4.6 16.6h14.8"/>',
+    /* the קודן's own case — the one of the two a stranger names */
+    speciallock: '<rect x="7.4" y="3.6" width="9.2" height="16.8" rx="4.6"/><path d="M10.6 8.6h.01M13.4 8.6h.01M10.6 12.2h.01M13.4 12.2h.01"/><circle cx="12" cy="16.6" r="1.6"/>'
+  };
+  var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
+
   // js/url-state.js
   var VERSION = 22;
   var DEFAULTS = {
@@ -8855,70 +8930,6 @@ ${body}
     lede: "step.sum.l",
     exp: "exp.sum"
   };
-  var SECTION_ICON = {
-    /* THE OPENING AND HOW BIG IT IS: a door with a dimension arrow under it.
-       The step is size and handing, and a plain door outline cannot say "how
-       big"; a measuring arrow can, and it is the mark every joiner's drawing
-       uses for exactly this. */
-    fit: '<path d="M6 3.4h12v13.2H6Z"/><path d="M15 10.2h.01"/><path d="M4.4 20.2h15.2"/><path d="m6.6 18.4-2.2 1.8 2.2 1.8"/><path d="m17.4 18.4 2.2 1.8-2.2 1.8"/>',
-    /* THE FRAME: the casing outside, the opening inside, drawn as one section
-       through the head. Two nested rectangles say "a frame round a hole"; a
-       cross says nothing. */
-    mk: '<path d="M3.2 4.6h17.6v14.8H3.2Z"/><path d="M7.4 8.8h9.2v10.6H7.4Z"/>',
-    /* a paint drop */
-    colour: '<path d="M12 3.4 6.6 10a7 7 0 1 0 10.8 0Z"/><path d="M5.4 14.6h13.2"/>',
-    /* a panelled face */
-    face: '<path d="M5 3.6h14v16.8H5Z"/><path d="M8.4 6.6h7.2v4.4H8.4Z"/><path d="M8.4 13.6h7.2v3.8H8.4Z"/>',
-    /* a glazed light with muntins */
-    glass: '<path d="M4 4.6h16v11.6H4Z"/><path d="M12 4.6v11.6M4 10.4h16"/><path d="M7 19.4h10"/>',
-    /* THE PULL BAR: the leaf's edge on the left, the bar standing off it on two
-       brackets. The bar has to be beside something for the standoffs to read as
-       standoffs — on its own it was a line with two ticks. */
-    grip: '<path d="M4.4 3.6h5v16.8h-5"/><path d="M15.8 5.2v13.6"/><path d="M9.4 8h6.4M9.4 16h6.4"/>',
-    /* THE LOCK: a keyhole. A round case over a tapered slot is the one mark on
-       this page a stranger names without being told, and the step it heads is
-       the lock furniture. */
-    lock: '<path d="M12 4.4a7.4 7.4 0 0 0-7.4 7.4v7.8h14.8v-7.8A7.4 7.4 0 0 0 12 4.4Z"/><path d="M12 9.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/><path d="m11 13.2-.8 3.6h3.6l-.8-3.6"/>',
-    /* THE FINISH: a lever handle, with a highlight along its shank saying the
-       choice is which METAL. Two concentric circles read as a paint swatch, and
-       this is the one step whose subject is not colour but material. */
-    pz: '<path d="M14.6 12a2.6 2.6 0 1 0-5.2 0 2.6 2.6 0 0 0 5.2 0Z"/><path d="M14.6 12h4.8a1.8 1.8 0 0 1 0 3.6"/><path d="M9.4 12H4.6"/><path d="M6.8 8.6h2.4"/>',
-    /* a page with a line of figures on it */
-    sum: '<path d="M6 3.6h12v16.8H6Z"/><path d="M9 8h6M9 11.6h6M9 15.2h3.4"/>'
-  };
-  function sectionIcon(key) {
-    if (!Object.prototype.hasOwnProperty.call(SECTION_ICON, key)) {
-      throw new Error(`SECTION_ICON has no glyph for the "${key}" section — every section needs one, or its navigator circle draws nothing`);
-    }
-    return `<svg class="steps__g" viewBox="0 0 24 24" aria-hidden="true">${SECTION_ICON[key]}</svg>`;
-  }
-  var SPEC_ICON = {
-    colour: '<circle cx="12" cy="12" r="7.6"/><path d="M12 4.4v15.2"/>',
-    window: '<path d="M4.6 5h14.8v11.4H4.6Z"/><path d="M12 5v11.4M4.6 10.7h14.8"/>',
-    glazing: '<path d="M3.4 6.2h7.2v11.6H3.4Z"/><path d="M13.4 6.2h7.2v11.6h-7.2Z"/>',
-    grille: '<path d="M4.6 5h14.8v14H4.6Z"/><path d="M9.5 5v14M14.5 5v14M4.6 12h14.8"/>',
-    handle: '<path d="M8.4 5.6h3v12.8h-3Z"/><path d="M11.4 12h4.6"/>',
-    lockset: '<path d="M5 12h8.6"/><path d="M13.6 9.2h4.4v5.6h-4.4Z"/><path d="M8.2 15.6a.7.7 0 1 0 0-1.4.7.7 0 0 0 0 1.4Z"/>',
-    detail: '<path d="M5.2 4.4h13.6v15.2H5.2Z"/><path d="M8.4 7.6h7.2v8.8H8.4Z"/>',
-    size: '<path d="M4.4 4.4v15.2M19.6 4.4v15.2"/><path d="M4.4 12h15.2"/><path d="m7.4 9.4-3 2.6 3 2.6M16.6 9.4l3 2.6-3 2.6"/>',
-    handing: '<path d="M6 3.8h12v16.4H6Z"/><path d="m14.6 8.6 3.4 3.4-3.4 3.4"/>',
-    /* ⚠ FOUR ROWS HAD NO MARK, AND THE GAP WAS VISIBLE. `specRows` can return
-       twelve keys and this table held nine, so the DEFAULT door — eight rows —
-       showed six icons and two empty slots, and a fully configured one showed
-       eight and four. The comment above says a missing mark is "deliberately not
-       an error, the label carries it", and that is true of a rare row; it is not
-       true of `mashkof` and `pirzul`, which are on EVERY door. A column of marks
-       with holes in it reads as a loading state.
-       Drawn to match their own step's circle rather than invented afresh: the
-       frame is the same nested pair, the פרזול the same lever. One idea, one
-       mark, wherever it appears. */
-    mashkof: '<path d="M3.4 5h17.2v14H3.4Z"/><path d="M7.4 9h9.2v10H7.4Z"/>',
-    pirzul: '<path d="M14.4 12a2.4 2.4 0 1 0-4.8 0 2.4 2.4 0 0 0 4.8 0Z"/><path d="M14.4 12h4.6a1.7 1.7 0 0 1 0 3.4"/><path d="M9.6 12H5"/>',
-    stripes: '<path d="M4.6 7.4h14.8M4.6 12h14.8M4.6 16.6h14.8"/>',
-    /* a keypad — the one thing a כספת and a קודן have in common on the face */
-    speciallock: '<path d="M5.6 4.2h12.8v15.6H5.6Z"/><path d="M9.2 8.4h.01M12 8.4h.01M14.8 8.4h.01M9.2 12h.01M12 12h.01M14.8 12h.01M9.2 15.6h.01M12 15.6h.01"/>'
-  };
-  var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
   var groupsIn = (key) => GROUPS.filter((g) => g.in === key);
   var sectionOf = (key) => (GROUPS.find((g) => g.key === key) || {}).in;
   var SPEC_STEP = { stripes: "face", glazing: "glass" };

@@ -4,6 +4,7 @@
  */
 import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
+import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
@@ -1909,6 +1910,95 @@ group('the משקוף tiles print the frame\'s own numbers, at the length they c
   ok(Math.abs(odd.face / 33 - k0) < 0.01 && Math.abs(odd.ret / 155 - k0) < 0.01,
     `a frame of 33/155 draws marks ${odd.face}/${odd.ret} units long, which is not ` +
     `${k0.toFixed(4)} per mm: the marks do not follow the numbers`);
+}
+
+/* ── 6b3. THE PAGE'S OWN MARKS ───────────────────────────────────────
+   The navigator's nine circles and the summary's thirteen row marks, which
+   until 15.9.2026 nothing checked at all: they were two `const`s inside
+   `js/app.js`, a module that touches the DOM at load, so no test could read
+   them and no test did.
+
+   What is asked here is only what arithmetic can answer — every mark draws
+   something, no two in a family are the same STRING, the guard that keeps the
+   navigator complete still throws, the guard that lets a spec row go without
+   one still does not, and every row `specRows` can return has a mark. Whether
+   two marks are the same PICTURE is a different question and cannot be asked
+   here: `js/icons.js`'s round found five pairs that differ in every character
+   and draw the same rectangle at 18 px. That one is in `tools/audit.mjs`,
+   which has a rasteriser.
+
+   ⚠ AND THE TWO MARKS THAT ARE DELIBERATELY ONE MARK ARE PINNED AS ONE.
+   `colour` and `fit`/`size` are shared between the families on purpose — the
+   file's own rule, "one idea, one mark, wherever it appears". Shared by
+   copy-paste is shared until somebody edits one of them, so the identity is
+   asserted rather than commented. */
+group('the page\'s own marks');
+{
+  /* ⚠ COUNTED AS SHAPES AND STROKES, NOT AS DISTINCT COORDINATES, and the
+     first draft of this check counted coordinates and was WRONG: `grille` is
+     six lines of a lattice drawn from three numbers — 4.6, 12 and 19.4 — and
+     `stripes` is three rules drawn from five. Both are pictures; a rule that
+     called them empty would have been a rule pushing the marks towards more
+     numbers, which is the opposite of what 18 px wants. */
+  const shapes = d => (d.match(/<(circle|rect)\b/g) || []).length
+    + [...d.matchAll(/ d="([^"]*)"/g)].reduce((n, m) => n + (m[1].match(/[Mm]/g) || []).length, 0);
+  const strokes = d => (d.match(/<(circle|rect)\b/g) || []).length
+    + [...d.matchAll(/ d="([^"]*)"/g)]
+      .reduce((n, m) => n + (m[1].match(/[MmLlHhVvCcSsQqTtAaZz]/g) || []).length, 0);
+  for (const [fam, tbl] of [['SECTION_ICON', SECTION_ICON], ['SPEC_ICON', SPEC_ICON]]) {
+    const seen = new Map();
+    for (const [k, d] of Object.entries(tbl)) {
+      ok(/<(path|circle|rect)\b/.test(d), `${fam}.${k} draws no shape at all`);
+      /* Two shapes and four strokes. A lone rectangle is one shape and five
+         strokes, and a lone rule is one and two — both would sit in a 44 px
+         circle looking like the page had failed to load. */
+      ok(shapes(d) >= 2 && strokes(d) >= 4,
+        `${fam}.${k} is ${shapes(d)} shape(s) and ${strokes(d)} stroke(s): that is not a picture`);
+      const art = d.replace(/\s+/g, ' ').trim();
+      ok(!seen.has(art),
+        `${fam}.${k} is character-for-character the same mark as ${fam}.${seen.get(art)}`);
+      seen.set(art, k);
+    }
+  }
+  ok(Object.keys(SECTION_ICON).length >= 9 && Object.keys(SPEC_ICON).length >= 13,
+    `${Object.keys(SECTION_ICON).length} navigator marks and ${Object.keys(SPEC_ICON).length} ` +
+    `row marks: a table that has lost entries passes every assertion above it vacuously`);
+
+  ok(SECTION_ICON.colour === SPEC_ICON.colour,
+    'the paint drop on the colour step and the paint drop on the colour row have come apart');
+  ok(SECTION_ICON.fit === SPEC_ICON.size,
+    'the ruler on the fit step and the ruler on the size row have come apart');
+
+  let threw = false;
+  try { sectionIcon('no-such-step'); } catch { threw = true; }
+  ok(threw, 'sectionIcon drew something for a step that has no mark: a blank circle in the '
+    + 'navigator is a broken page, and this guard is what takes it down at boot instead');
+  ok(/class="spec__ico"/.test(specIcon('no-such-row')),
+    'specIcon threw or drew nothing for a row with no mark. A rare row without a mark is a '
+    + 'row — the label carries it — and it still has to hold its column');
+
+  /* Every row a door can actually show has a mark. The four that did not, on
+     30.8, were `mashkof` and `pirzul` — which are on EVERY door — and the
+     column of marks read as a loading state. */
+  const seenKeys = new Set();
+  const lists = { colour: COLOURS, window: WINDOWS, grille: GRILLES, handle: HANDLES,
+                  lockset: LOCKSETS, speciallock: SPECIAL_LOCKS, mashkof: MASHKOFS,
+                  pirzul: PIRZUL, detail: DETAILS, handing: HANDINGS };
+  const walk = st => { for (const r of specRows(repair(st, null).state)) seenKeys.add(r.key); };
+  walk(DEFAULTS);
+  for (const [field, list] of Object.entries(lists)) {
+    for (const o of list) walk({ ...DEFAULTS, [field]: o.id });
+  }
+  for (const s of Object.values(SIZES)) walk({ ...DEFAULTS, size: s.id });
+  walk({ ...DEFAULTS, stripeDir: 'v', stripeCount: 3 });
+  walk({ ...DEFAULTS, detail: 'panel2', window: 'rect' });
+  ok(seenKeys.size >= 12,
+    `the sweep reached ${seenKeys.size} kinds of spec row: it has stopped walking the catalogue`);
+  for (const k of seenKeys) {
+    ok(Object.prototype.hasOwnProperty.call(SPEC_ICON, k),
+      `a door can show a "${k}" row and SPEC_ICON has no mark for it — an empty slot in a `
+      + `column of marks reads as a loading state`);
+  }
 }
 
 /* ── 6a2. THE SIZE TILES SHARE ONE RULER ────────────────────────────
