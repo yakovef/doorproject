@@ -4479,18 +4479,20 @@ const gripOf = state => ({ ...byId(HANDLES, state.handle), len: handleLength(sta
 /** Is this grip cut into the leaf rather than bolted onto it? */
 export const gripIsFixed = state => !!gripOf(state).fixed;
 
-/** The grip's position for this design: the customer's, or its home. */
+/**
+ * The grip's position for this design.
+ *
+ * ⚠ THERE IS ONE, AND THE CUSTOMER DOES NOT CHOOSE IT — 18.9.2026. This read
+ * `state.grip` first and fell back to `gripHome`; the field is gone, with the
+ * drag, the rotate button and the home button, at the owner's instruction:
+ * *"i dont really like the part where you can move the pull handle, it just
+ * makes it more complicated for the customer."*
+ * Kept as a function of its own rather than folded into `gripHome`, because
+ * every caller asks "where is this door's handle" and only one of them should
+ * ever need to know how that is decided.
+ */
 export function gripAt(state) {
-  const home = gripHome(state);
-  const g = state.grip;
-  /* ⚠ A FIXED GRIP HAS ONE POSITION AND IT IS NOT NEGOTIABLE. The recessed
-     channel is cut into the leaf, not screwed to it; see its catalogue entry.
-     Answered HERE rather than only in the interface, because the position also
-     arrives down a link as `gp=` — and a rule that only the page enforces is a
-     rule a shared link walks straight past (CLAUDE.md §3, rules.js). */
-  if (!g || gripOf(state).fixed) return home;
-  const rot = g.rot === 90 && gripCanRotate(state) ? 90 : 0;
-  return { x: g.x, y: g.y, rot };
+  return gripHome(state);
 }
 
 /**
@@ -7767,53 +7769,23 @@ function gripArt(handle, cx, cy, leafH, dir, paint, centreX, leafW, y0, panelled
   const box = rot === 90
     ? { out: foot.vy, in: foot.vy, vy: Math.max(foot.out, foot.in) }
     : foot;
-  /* SOMETHING A FINGER CAN HOLD — AND NOTHING MORE THAN THAT.
-     A pull bar is 16 to 62 mm of section, which on a phone is four or five
-     pixels of screen; you cannot put a fingertip on that, and the drag was
-     reported as unusable before there was a pad at all.
-     ⚠ THE PAD IS THE HANDLE NOW. It used to be a 120 mm floor CENTRED ON THE
-     GRIP'S OWN AXIS, and both halves of that were wrong. The floor made every
-     pad far larger than the thing it stands for — and it was never needed,
-     because `sizeHitPad` in app.js already grows the pad to 44 real pixels
-     through the SVG's own screen matrix, which is the honest way to say "big
-     enough for a finger" on a drawing that scales. Two answers to one
-     question, and the millimetre one could only ever be wrong at some zoom.
-     The centring was worse. `out` and `in` are measured from the grip's axis
-     and they are NOT symmetric — the grab bar reaches 26 mm one way and 320
-     the other, because it hangs off the stile and is centred on the leaf. Laid
-     out symmetrically that pad was 346 mm wide in the wrong place, covering
-     the lockset and a stripe of bare door beside it. It is visible, too: the
-     focus ring outlines the whole group, so what a keyboard user saw was a
-     rectangle over most of the door with the handle off to one side of it.
-     `transparent` and not `none`: a fill of `none` is not painted and does not
-     receive a pointer at all, which is the whole point of the rect.
-     It is marked so the measuring tools can drop it — it is not on the door. */
-  const padL = own ? own.x : cx - (dir > 0 ? foot.out : foot.in);
-  const padR = own ? own.x + own.w : cx + (dir > 0 ? foot.in : foot.out);
-  const padW = padR - padL, padH = own ? own.h : foot.vy * 2;
-  const padCx = (padL + padR) / 2;
-  const padCy = own ? own.y + own.h / 2
-              : foot.atY != null ? y0 + leafH * foot.atY : cy;
-  const pad = `<rect data-hitpad="1" x="${padL}" y="${padCy - padH / 2}"
-                     width="${padW}" height="${padH}"
-                     data-cx="${padCx}" data-cy="${padCy}" data-w="${padW}" data-h="${padH}"
-                     fill="transparent" pointer-events="all"/>`;
-  /* THE FOCUS RING IS NOT THE TOUCH TARGET, and conflating them is what was
-     reported. A finger needs 44 css pixels and the audit asserts it; the eye
-     needs to be shown the handle. While the ring was the browser's own outline
-     on the group, it traced whichever child reached furthest — the pad — so
-     making the target big enough to hit and making the ring hug the handle
-     were the same knob turned two ways.
-     They are two objects now. This one is never grown, never painted until the
-     group takes visible focus, and marked as chrome so the measuring tools
-     drop it exactly as they drop the pad: it is not on the door. */
-  const ring = `<rect data-chrome="focus" x="${padL}" y="${padCy - padH / 2}"
-                      width="${padW}" height="${padH}" rx="6"
-                      fill="none" pointer-events="none"/>`;
+  /* ⚠ THE HIT PAD AND THE FOCUS RING ARE GONE WITH THE DRAG — 18.9.2026.
+     Two invisible rects used to ride with every grip: `data-hitpad`, grown by
+     `sizeHitPad` to 44 real pixels so a finger could catch a bar four pixels
+     wide, and `data-chrome="focus"`, which existed because the browser's own
+     outline traced the PAD and so drew a box across half the door.
+     Neither has a subject any more. Nothing on this page positions a handle,
+     so there is nothing to catch and nothing to focus — and three tools
+     (`collide.mjs` in three places) stripped these before measuring, which is
+     three dead selectors saved from becoming §5.15's blind ones.
+     `data-aty` stays: it is where the fitting actually hangs, and the sheet
+     and the collision sweep read it. */
+  const atY = own ? own.y + own.h / 2
+            : foot.atY != null ? y0 + leafH * foot.atY : cy;
   return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-aty="${padCy}"
+             data-cx="${cx}" data-cy="${cy}" data-aty="${atY}"
              data-out="${box.out}" data-in="${box.in}"
-             data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
+             data-vy="${box.vy}" data-rot="${rot}"${turned}>${art}</g>`;
 }
 
 /**

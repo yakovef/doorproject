@@ -251,17 +251,16 @@ export const UI = {
                        'Choose the details and watch the door change',
                        'Выбирайте детали и смотрите, как меняется дверь'],
   'stage.label':      ['הדלת שלכם', 'Your door', 'Ваша дверь'],
-  'grip.drag':        ['גררו את הידית למקום שתרצו', 'Drag the handle where you want it',
-                       'Перетащите ручку туда, где она вам нужна'],
-  'grip.rotate':      ['סובבו', 'Rotate', 'Повернуть'],
-  'grip.home':        ['למקום המקורי', 'Put it back', 'Вернуть на место'],
-  'grip.aria':        ['מיקום הידית. גררו, או הזיזו עם מקשי החיצים',
-                       'Handle position. Drag it, or move it with the arrow keys',
-                       'Положение ручки. Перетащите или сдвиньте стрелками'],
-  'grip.ariaAt':      ['מיקום הידית {0}', 'Handle position {0}', 'Положение ручки {0}'],
-  'grip.tooLong':     ['הידית הזו ארוכה מרוחב הדלת — אפשר לסובב רק ידית שנכנסת בין המזוזות',
-                       'This handle is longer than the door is wide — only a handle that fits between the jambs can be turned',
-                       'Эта ручка длиннее ширины двери — повернуть можно только ту, что помещается между косяками'],
+  /* ⚠ SEVEN GRIP KEYS AND `notice.moved` CAME OUT ON 18.9.2026 with the drag,
+     the rotate button and the home button: `grip.drag`, `grip.rotate`,
+     `grip.home`, `grip.aria`, `grip.ariaAt`, `grip.tooLong`,
+     `grip.illustrative`, `addendum.shifted`, `fix.gripMoved` and
+     `fix.gripHome`. Every one of them was about a position a customer could
+     set, and no customer can. `fix.gripGone` and `addendum.flat` STAY — a door
+     with nowhere to put the chosen handle still drops it and still says so,
+     and a bar that lies across the leaf is still something Peretz drills for.
+     Named here rather than deleted in silence, because a key that comes back
+     under an old name is a string nobody can find the history of. */
   'undo':             ['ביטול השינוי האחרון', 'Undo the last change', 'Отменить последнее изменение'],
   'undo.group':       ['ביטול וחזרה', 'Undo and redo', 'Отменить и вернуть'],
   'redo':             ['החזרת השינוי', 'Redo the change', 'Вернуть изменение'],
@@ -667,8 +666,6 @@ export const UI = {
   'notice.some':      ['חלק מהאפשרויות בקישור אינן זמינות — מציגים את הקרוב ביותר.',
                        'Some options in that link are unavailable — showing the closest match.',
                        'Некоторые параметры из ссылки недоступны — показываем ближайшее.'],
-  'notice.moved':     ['{0} — הזזנו למקום הקרוב שאפשר', '{0} — moved it to the nearest place that works',
-                       '{0} — сдвинули в ближайшее подходящее место'],
 
   /* ── why a tile is greyed out, and what a repair just did ─────────
      ⚠ THESE ARE THE STRINGS A CUSTOMER READS AT THE MOMENT SOMETHING
@@ -710,8 +707,6 @@ export const UI = {
   'fix.grilleGone':      ['הסרנו את הסורג — אין חלון', 'We removed the grille — there is no window', 'Мы убрали решётку — окна нет'],
   'fix.gripGone':        ['הסרנו את ידית המשיכה — אין לה מקום כאן', 'We removed the pull handle — there is no room for it here', 'Мы убрали ручку-скобу — для неё здесь нет места'],
   'fix.locksetSwapped':  ['החלפנו את המנעול — אין לו מקום ליד המאחז', 'We swapped the lockset — there is no room for it beside the grip', 'Мы заменили замок — рядом со скобой ему нет места'],
-  'fix.gripMoved':       ['הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה', 'We moved the handle — where you put it no longer works', 'Мы сдвинули ручку — на выбранном месте она больше не подходит'],
-  'fix.gripHome':        ['הידית הוסרה, ואיתה המיקום שבחרתם לה', 'The handle is gone, and with it the place you chose for it', 'Ручка убрана, а вместе с ней и выбранное для неё место'],
   'fix.setWindow':       ['התאמנו את החלון — הסט היווני מגיע עם חלון מלבני משלו', 'We adjusted the window — the Greek set comes with a rectangular one of its own', 'Мы изменили окно — у греческого комплекта своё прямоугольное'],
   /* ⚠ `fix.setGone` USED TO ANSWER FOR THIS TOO AND IT IS THE WRONG SENTENCE.
      Stripes and a panel want the same face, so asking for stripes clears the
@@ -795,10 +790,6 @@ export const UI = {
   'addendum.flat':    ['הערה: ידית המשיכה מותקנת לרוחב הדלת',
                        'Note: the pull handle is fitted across the door',
                        'Примечание: ручка-скоба ставится поперёк двери'],
-  'addendum.shifted': ['מיקום הידית: הזזתי אותה ממקומה הרגיל. {0}, והמיקום המדויק בקישור.',
-                       'Handle position: I moved it from where it normally sits. {0}, and the exact spot is in the link.',
-                       'Положение ручки: я сдвинул её с обычного места. {0}, точная позиция — по ссылке.'],
-  'grip.illustrative':['להמחשה — נקבע בהתקנה', 'illustrative — set at fitting', 'ориентировочно — уточняется при установке'],
 
   /* ── the order sheet's row names ──────────────────────────────── */
   'row.colour':       ['צבע', 'Colour', 'Цвет'],

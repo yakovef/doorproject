@@ -276,12 +276,21 @@ whenever a new option can be silently reduced.
 
 ---
 
-## The handle can be moved, so ask rather than compute
+## The handle has ONE place, and `gripPlacement` is still the authority
+
+⚠ **This section used to be called "the handle can be moved, so ask rather than
+compute". It cannot be moved — the drag, the rotate button and the home button
+were withdrawn on 18.9.2026 at the owner's request, with `state.grip` and the
+`gp=` parameter.** Everything below still holds, and the first paragraph holds
+harder than it did.
 
 `gripHome` places the grip and `gripPlacement` says whether a place is legal.
 Those are two different jobs and the second is the authority: home is computed
 by arithmetic that was derived in x and says nothing about y, so it is run
-through the check and corrected before anybody sees it.
+through the check and corrected before anybody sees it. With the customer out
+of it, `gripHome` is the ONLY thing that ever decides where a handle goes — so
+a fault there is now on every door that carries one, where it used to be on the
+default position of a door the customer could re-aim.
 
 If you add anything to the face — a new detail, a new window shape, a moulding
 that moves — add it to `faceObstacles` in the same commit. It is the list of

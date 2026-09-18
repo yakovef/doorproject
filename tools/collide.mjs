@@ -188,10 +188,6 @@ if (boxes) {
            The clip's own outline is one of the shapes here, so skipping the
            clipped copy loses nothing. */
         if (el.hasAttribute('clip-path') || el.hasAttribute('mask')) continue;
-        /* The grip's touch target and its focus ring. Invisible, and on no
-           door: one is something a finger can hold and the other is something
-           the browser draws round it. */
-        if (el.hasAttribute('data-hitpad') || el.hasAttribute('data-chrome')) continue;
         if (el.closest('defs,clipPath,mask,pattern,marker,symbol')) continue;
         let b; try { b = el.getBBox(); } catch { continue; }
         if (!b.width && !b.height) continue;
@@ -473,10 +469,15 @@ const hits = await p.evaluate(({ cases, allowed }) => {
        Removed rather than skipped: nothing here draws, and a thing that cannot
        be touched has no business in a collision test. */
     for (const g of svg.querySelectorAll('[data-relight]')) g.remove();
-    /* And the grip's touch target, for the same reason: it is something a
-       finger can hold, not something the door has on it. Left in, every grip
-       measures 120 mm wide and collides with its own lockset. */
-    for (const g of svg.querySelectorAll('[data-hitpad],[data-chrome]')) g.remove();
+    /* ⚠ AND THE GRIP'S TOUCH PAD AND FOCUS RING USED TO BE STRIPPED HERE AND
+       AT TWO PLACES ABOVE. Both are gone from the drawing on 18.9.2026 with
+       the drag itself, so all three selectors matched nothing — and a selector
+       that matches nothing is §5.15's shape waiting to happen, not a harmless
+       leftover. Removed with the thing they were written for.
+       The lesson they carried is kept because the next invisible rect will
+       need it: anything emitted for the PAGE rather than for the DOOR has no
+       business in a collision test, and left in, every grip measured 120 mm
+       wide and collided with its own lockset. */
     /* AND THE DROP SHADOWS, which is the same rule a third time and the one
        place this file was not applying it.
        `metalBox` above — the `-- boxes` reader — has always skipped any
@@ -519,7 +520,6 @@ const hits = await p.evaluate(({ cases, allowed }) => {
       for (const el of root.querySelectorAll(SHAPE)) {
         if (el.hasAttribute('filter')) continue;
         if (el.hasAttribute('clip-path') || el.hasAttribute('mask')) continue;
-        if (el.hasAttribute('data-hitpad') || el.hasAttribute('data-chrome')) continue;
         if (el.closest('defs,clipPath,mask,pattern,marker,symbol')) continue;
         let b; try { b = el.getBBox(); } catch { continue; }
         if (!b.width && !b.height) continue;

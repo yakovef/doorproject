@@ -85,8 +85,17 @@ short question, not a document.**
 He has made several decisions from outside that are settled and must not be
 re-litigated. They are marked as such where they appear — the green send
 button, the withdrawal of the add-ons and the handle-finish choice, the plain
-window pane, the grip controls standing in the wall. Where the corpus disagrees
-with one of his decisions, the disagreement is recorded rather than acted on.
+window pane. Where the corpus disagrees with one of his decisions, the
+disagreement is recorded rather than acted on.
+
+⚠ **AND ONE OF THEM HE REVERSED HIMSELF, WHICH IS WHY THIS LIST NAMES WHO
+DECIDED RATHER THAN JUST WHAT.** "The grip controls standing in the wall" was
+on it, placed with a circle drawn on a screenshot — and on 18.9.2026 he asked
+for the whole feature to go: *"i dont really like the part where you can move
+the pull handle, it just makes it more complicated for the customer."* A
+settled decision is settled against US re-opening it, never against him. See
+§0b; the REASON they stood in the wall rather than under the door is still
+live and still governs anything put there next.
 
 ### The person you actually talk to — his child
 
@@ -1743,7 +1752,13 @@ width, and every door at 1152 px and up — and NAMES the five as an exemption i
 asserts is **still needed**, so it comes out the day the wall is fixed rather
 than outliving the fault.
 
-### ⚠ AND IN HEBREW THEY ARE IN THE SAME WALL, WHICH IS WHY THEY COMPETE AT ALL
+### ✅ AND IN HEBREW THEY ARE IN THE SAME WALL — CLOSED 18.9.2026
+
+**Closed the same way the entry below it is: `.grip-bar` is gone, so there is
+no second control to compete with.** Kept whole, because the MECHANISM is the
+finding and it is still live for anything put in that wall next — two controls
+pinned by rules that mirror differently will stand in opposite walls in one
+language and the same wall in another, and nothing measures that.
 
 Found 14.9.2026 while clamping the price card into the picture (§0b). The
 section below treats "the wall cannot hold both its controls" as arithmetic
@@ -1779,36 +1794,40 @@ size **including the standard ₪3,195 door**.
 ⚠ **And at 1440 the rotate button's centre clears the card by SEVEN pixels**,
 which by this file's own rule is a coincidence rather than a pass.
 
-**Not fixed, and the reason is the one below.** Both pieces were placed by the
-owner with circles on a screenshot (§0a), and the obvious fix — pin the grip
-controls physically, so they take the wall the price card is not in — moves
-them to the other side of the door in Hebrew, which is a product decision and
-not a clamp. What is cheap and honest is that the clamp of 14.9 never makes
+**It was not fixed, and the reason was the one below.** Both pieces were placed
+by the owner with circles on a screenshot (§0a), and the obvious fix — pin the
+grip controls physically, so they take the wall the price card is not in —
+moved them to the other side of the door in Hebrew, which is a product decision
+and not a clamp. ⚠ **The feature was withdrawn before anybody had to choose**,
+which is worth noticing: a fault recorded rather than guessed at was still
+recorded when the thing it was about was deleted, and the record cost nothing. What is cheap and honest is that the clamp of 14.9 never makes
 this worse than the arithmetic already does: it moves the card inboard only
 where the card was being cut, and only as far as the casing.
 
-### ⚠ THE WALL CANNOT HOLD BOTH ITS CONTROLS AT 1100–1152 px
+### ✅ THE WALL CANNOT HOLD BOTH ITS CONTROLS AT 1100–1152 px — CLOSED 18.9.2026
 
-Found 31.8 while widening the choices column, and **pre-existing** — measured
-identical at the shipped 380 px cap and at 400 and 420. At `cusp` (1100×800)
-and `narrow-d` (1152×800) the price chip covers `#grip-rot`, so a customer who
-has chosen a pull bar **cannot press the button that rotates it** at those two
-widths. `elementFromPoint` at the button's own centre returns the chip.
+**Closed by one of the two controls leaving, not by anything being fixed**, and
+that distinction is why the entry is kept rather than deleted.
 
-The arithmetic says it is not a tuning problem: the wall there is **140–152 px
-and the chip is 163 px wide**, so the two cannot sit side by side at any
-column cap. One of them has to yield, and both were placed by the owner with
-circles on a screenshot (§0a) — the grip controls in the wall on purpose, the
-price under the right-hand lamp on purpose. **That is a decision above CSS**,
-and it is the same shape as the navigator's refused 30 px shrink: recorded
-rather than guessed at.
+It was found 31.8 while widening the choices column and was **pre-existing** —
+measured identical at the shipped 380 px cap and at 400 and 420. At `cusp`
+(1100×800) and `narrow-d` (1152×800) the price chip covered `#grip-rot`, so a
+customer who had chosen a pull bar could not press the button that rotates it
+at those two widths; `elementFromPoint` at the button's own centre returned the
+chip. The arithmetic said it was not a tuning problem: the wall there is
+**140–152 px and the chip is 163 px wide**, so the two could not sit side by
+side at any column cap. One of them had to yield, and both had been placed by
+the owner with circles on a screenshot.
 
-Three ways out, cheapest first: narrow the chip below the wall's width at
-these two breakpoints (it is the ₪ figure at 1.9rem that sets it); stack the
-grip controls above the chip instead of beside it; or let the grip controls
-sit on the leaf at these widths only. `npm run audit` names the two viewports
-and the one control explicitly, so the exemption shrinks the day this is
-fixed and nothing else can hide behind it.
+The grip controls went on 18.9 (§0b), so the chip is the only thing in that
+band and there is nothing left to cover. The audit's two-viewport exemption and
+the §5.15 guard that kept it honest went with them.
+
+⚠ **THE ARITHMETIC IS NOT CLOSED AND IS THE REASON TO KEEP READING THIS.** A
+163 px chip in a 140–152 px wall is still what those widths hold, so **anything
+put back into that band meets the same wall** — and the entry two sections down,
+the language picker and undo/redo on the five biggest doors, is the same
+shortage on the other axis and is still open.
 
 ### ⚠ THE PHONE'S BACK BUTTON LEAVES THE GUIDE, AND THE OBVIOUS FIX IS WORSE
 
@@ -2402,6 +2421,102 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE HANDLE CANNOT BE MOVED ANY MORE, AND ABOUT 600 LINES CAME OUT WITH IT
+  — 18.9.2026.** Part B of the handles work. The owner, in his words: *"i dont
+  really like the part where you can move the pull handle, it just makes it
+  more complicated for the customer, so that part needs to be redone."* All
+  three controls go — the drag, `סובבו`, and `למקום המקורי` — and the state
+  field, the URL parameter and the repair branch behind them.
+
+  ⚠ **THIS REVERSES A PLACEMENT THE OWNER MADE HIMSELF.** §0a lists *"the grip
+  controls standing in the wall"* among the decisions not to be re-litigated;
+  he is the one reversing it, and this entry is what stops the next agent
+  restoring them on the strength of that paragraph. **The REASON they were in
+  the wall is still true and still governs what goes there next**: above
+  1100 px `.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so
+  anything in the FLOW takes its height out of the DRAWING — a control that
+  merely *appeared* once cost the leaf 23,021 pixels. `.stage__hud` and
+  `.quote` are absolute for exactly that reason and are untouched.
+
+  **What went, and where:** `state.grip`; `gripAt`, which now simply returns
+  `gripHome`; the `data-hitpad` and `data-chrome="focus"` rects from every
+  grip; `repair`'s position branch; `gripDeparture`'s `shifted`/`moved` and
+  `gripIllustrative`; ~270 lines of `app.js` (the pointer drag, the arrow keys,
+  `sizeHitPad`, the non-passive touch swallow, both button handlers); the
+  markup; `.grip-bar`, `.grip-live`, `.grip-bad`, the focus ring and
+  `--grip-strip`; ten copy keys; the fuzzer's position generator; three strip
+  sites in `collide.mjs`; and two whole blocks of `npm run audit`.
+
+  ⚠ **`gp=` MOVED FROM `KNOWN` TO `RETIRED`, AND THE DIFFERENCE IS THE WHOLE
+  POINT.** In `KNOWN` it is a parameter we still read; deleted from both it
+  raises `option-unknown` on every link a customer has already sent. In
+  `RETIRED`, beside `f`, `a`, `z` and `i`, it is what it actually is — a name
+  we own, reserved so nothing can take it, and **silent**. Withdrawing an
+  option is our change, not that customer's mistake.
+  ⚠ **AND NO `VERSION` BUMP, WHICH IS THE OLD DECISION PAYING OFF.** The
+  position never entered the short code: it rode in the link alone, on the
+  owner's son's instruction that it was a picture rather than something his
+  father builds to. So not one code ever read down a telephone means anything
+  different today. Withdrawing a parameter that was never packed costs nothing;
+  withdrawing one that was would have cost every code Peretz holds.
+
+  ⚠ **AND REMOVING `--grip-strip` GAVE THE DOOR NOTHING BACK, WHICH IS THE
+  OPPOSITE OF WHAT I EXPECTED AND WAS MEASURED RATHER THAN ASSUMED.** It
+  reserved 148 px of wall above 1100 px so that choosing a handle could not
+  shrink the door — but the PADDING that did the reserving came out on
+  27.8.2026, and from then on the token's only reader was the bar's own width.
+  Measured at 1100, 1280, 1440 and 1920, with a handle and without: **the leaf
+  and the stage are identical to the digit**, before and after, on all eight
+  readings.
+
+  ⚠ **AND I OVER-DELETED THE STYLESHEET, WHICH THE FUZZER CAUGHT AND NOTHING
+  ELSE WOULD HAVE.** The first cut bounded the block from *"the handle, and
+  moving it"* to *"panel"* and took `.stage__hud`, `.hud__slot`, `.quote`,
+  `.quote__price`, `.quote__send` and `.quote__next` with it — **the price and
+  send bar and the whole of the wall chrome**. `#stage` collapsed to height 0
+  and the leaf rendered at its raw 850 x 2050, and `npm run fuzz` said so in
+  one line: *"the leaf is cut off by the stage — laptop step 1 (2654px)"*.
+  Reverted and redone as two surgical cuts with the wall rules checked present
+  afterwards. This file already records the same shape from the other side —
+  a global search-and-replace that stripped backticks out of two innocent
+  comments — and the lesson is the same one: **when a deletion is bounded by
+  two comment headers, read what is between them.**
+
+  **Every check is RESTATED, never quietly dropped**, and two of them were
+  §5.15 guards that fired the moment their subject vanished — which is exactly
+  what they were written to do:
+  · *"the handle position rides in the link and not in the code"* becomes
+    **"`gp` is a retired parameter"**: nothing writes it, an old link carrying
+    it opens with **no notice** and the door it names, an impossible position is
+    ignored just as quietly, and the short code is unaffected. ⚠ Paired with
+    its opposite — an invented parameter must still raise `option-unknown` —
+    because "quiet" could otherwise be the notice having stopped working.
+  · *"the position-only case should be common enough to matter"* (a 153-point
+    sweep with a floor of 100) is gone; what it protected — a repaired link
+    must carry the sentences that explain it — is asserted two lines above it.
+  · *"no handle could be moved anywhere"* and *"no grip could be rotated at
+    all"*, both floors under clauses that could otherwise pass by finding
+    nothing, are gone with their clauses. The claim they surrounded — **a bar
+    that lies down at home says so on the handle's line, because Peretz drills
+    for it either way** — is untouched and keeps its own `flatHome` floor.
+  · the audit's wall hit-test loses `#grip-rot`, `#grip-home` **and the
+    two-viewport exemption that named them** — which closes §9's *"the wall
+    cannot hold both its controls at 1100–1152 px"* by the chip being the only
+    thing left in that band. ⚠ Its §5.15 guard is restated on the two controls
+    that remain rather than deleted: a wall check that finds nothing in the
+    wall is an empty loop whatever is missing from it.
+  ⚠ **The OTHER §9 wall entry stays open** — the language picker and undo/redo
+  on the five biggest doors is not about the grip bar, and the audit still
+  prints its five exemptions.
+
+  ⚠ **AND THE 52 BARE SHEETS COULD NOT MOVE, WHICH WAS PROVED BEFORE THEY WERE
+  RUN.** Rendering all thirty gallery doors against the previous commit, ten
+  differ — exactly the ten carrying a pull handle — and stripping the two
+  removed rects makes all ten byte-identical, so **nothing visible changed on
+  any door**. `npm test` 9,770,203 / 0 on everything but the staleness
+  assertions, `npm run fuzz` clean over 30,000 designs and 1,800 clicks,
+  `npm run audit` no faults at eight viewports.
 
 - **⚠ THREE FITTINGS WERE DRAWN FROM NOTHING AND THE CHECK THAT SHOULD HAVE
   SAID SO WAS LOOKING THE OTHER WAY — 18.9.2026.** The last of Part A, and the

@@ -35,16 +35,15 @@ import {
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
   from './price.js';
 import {
-  describe, detailGlyph, gripAt, gripCanRotate, gripHome, gripIsFixed,
-  gripPlacement, grilleGlyph, handleGlyph, locksetGlyph, nearestGrip,
+  describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
   bellGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
   specialLockGlyph,
   windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
 import { handingWords, specRows, summaryLine } from './spec.js';
-import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl, gripIllustrative,
-         gripAddendum, gripDeparture, PHONE_DISPLAY, PHONE_TEL, priceCaveat,
+import { canSharePicture, copyMessage, drawingCaveat, fallbackWhatsappUrl,
+         gripAddendum, PHONE_DISPLAY, PHONE_TEL, priceCaveat,
          priceIncludes, sendDoor, whatsappUrl } from './share.js';
 import { counted, L, LANGS, lang, pickLang, setLang, T, withLang } from './copy.js';
 import { DEFAULTS, encodeCode, fromQuery, isUntouched, toQuery } from './url-state.js';
@@ -609,15 +608,6 @@ function init() {
   if (notice) showNotice(notice, said);
 
   $('#copy-btn').addEventListener('click', onCopy);
-  $('#grip-rot').addEventListener('click', () => {
-    if (!gripCanRotate(state)) {
-      toast(T('grip.tooLong'));
-      return;
-    }
-    const now = gripAt(state);
-    placeGrip({ ...now, rot: now.rot === 90 ? 0 : 90 }, true);
-  });
-  $('#grip-home').addEventListener('click', () => set({ ...state, grip: null }));
   $('#undo-btn').addEventListener('click', undo);
   $('#redo-btn').addEventListener('click', redo);
   $('#save-btn').addEventListener('click', saveCurrent);
@@ -962,11 +952,13 @@ function buildWorks() {
        customer besides. */
     b.addEventListener('click', () => {
       /* Through `set`, like every other choice on the page, so the URL, the
-         price, the code, the order and the announcement all follow. `grip` is
-         dropped deliberately: these doors carry no measured grip position, and
-         inheriting the previous door's would put a handle where nobody put
-         one. */
-      set({ ...DEFAULTS, ...w.state, grip: null });
+         price, the code, the order and the announcement all follow.
+         ⚠ This carried `grip: null` until 18.9.2026, to stop a previous door's
+         dragged position riding onto one of Peretz's. There is no position to
+         inherit now — `gripAt` computes it from the state — so the clause went
+         with the field rather than being left as a no-op somebody would later
+         wonder about. */
+      set({ ...DEFAULTS, ...w.state });
       closeWorks();
       toast(T('saved.loaded'));
     });
@@ -1058,12 +1050,15 @@ function buildSheet() {
     + (r.hex ? `<span class="sheet__chip" style="--chip:${r.hex}"></span>` : '')
     + '</div>').join('');
 
-  /* ⚠ THE TWO GRIP NOTES, which this sheet shipped without. `gripAddendum` is
-     what tells Peretz that a pull bar has to be drilled ACROSS the leaf rather
-     than upright, and that the customer moved the handle on purpose. Both
-     reached him in the WhatsApp and neither was on the sheet he would take to
-     the workshop — the same door, two readers, disagreeing. Same function, so
-     they cannot drift. */
+  /* ⚠ THE GRIP NOTE, which this sheet shipped without. `gripAddendum` is what
+     tells Peretz that a pull bar has to be drilled ACROSS the leaf rather than
+     upright. It reached him in the WhatsApp and was not on the sheet he would
+     take to the workshop — the same door, two readers, disagreeing. Same
+     function, so they cannot drift.
+     ⚠ It was TWO notes until 18.9.2026; the second said the customer had moved
+     the handle on purpose, and there is no longer a way for them to. The
+     function still returns a list, so this loop is unchanged and a second note
+     can come back without touching the sheet. */
   const grip = gripAddendum(state);
 
   host.innerHTML = `
@@ -2891,7 +2886,6 @@ function paint() {
      so a tenth choice cannot leave it calling a configured door untouched. */
   document.documentElement.classList.toggle('is-untouched', isUntouched(state) && !engaged);
   announce(describe(state));
-  armGrip();
   /* ⚠ ALWAYS ON THE PAGE NOW, AND `disabled` RATHER THAN HIDDEN. Asked for
      from outside: *"i wanna see the reverse last change button at all times."*
      It used to appear only once there was a step to take back, which is the
@@ -2909,276 +2903,37 @@ function paint() {
   $('#redo-btn').disabled = !canRedo();
 }
 
-/* ── moving the handle ────────────────────────────────────────────
+/* ── the handle does not move ─────────────────────────────────────
  *
- * The grip is the one object on the stage a customer can touch. Dragging it
- * does not re-render the door: the group is moved with a `transform` while the
- * pointer is down, because a full `render()` per pointermove is a few hundred
- * nodes replaced sixty times a second and on a phone that is what the drag
- * feels like. One render on release, through `set`, so the price line, the
- * link and the code all follow as they do for every other change.
+ * ⚠ ABOUT 240 LINES CAME OUT HERE ON 18.9.2026, and this note is what is left
+ * of them so nobody rebuilds it by accident.
  *
- * A position that cannot be built goes red under the finger and snaps to the
- * nearest place that works WHEN THE FINGER LIFTS, never before. Red is what it
- * says while you are still holding it; moving it is what happens when you let
- * go.
+ * The grip used to be the one object on the stage a customer could touch. It
+ * dragged under the pointer with a `transform` rather than a re-render (a full
+ * `render()` per pointermove is a few hundred nodes replaced sixty times a
+ * second, which on a phone is what the drag felt like); it went red where it
+ * could not be built and snapped on release; it took arrow keys at 10 mm and
+ * 50; it had a 44 px touch pad grown through the SVG's own screen matrix, a
+ * separate focus ring so the outline did not trace the pad, a non-passive
+ * touch swallow so Chrome would not steal the gesture as a scroll, and
+ * `pointercancel` wired to ABANDON rather than to commit — which was itself a
+ * bug fixed from a report, because a mobile browser fires cancel the moment it
+ * decides a gesture is a scroll.
  *
- * ── it did not work on a phone, and here is why ──────────────────────
- * Reported from the outside: the handle moved a couple of pixels at a time and
- * teleported while the finger was still down. One cause, three mistakes.
+ * All of it worked. The owner's objection was not that it was broken:
+ * *"i dont really like the part where you can move the pull handle, it just
+ * makes it more complicated for the customer, so that part needs to be
+ * redone."* A configurator's job is to ask a customer questions they can
+ * answer, and where to drill a standoff is not one of them — Peretz sets it on
+ * site, which is what the hint under the door used to say in as many words.
  *
- * `pointercancel` was wired to the same handler as `pointerup`. A mobile
- * browser fires cancel the moment it decides a gesture is a page scroll — so a
- * finger moving faster than a few pixels ENDED the drag, which committed the
- * position and snapped it. Both symptoms, one line. A cancel is an
- * interruption, not a decision: it now abandons the drag and puts the handle
- * back where it was, with nothing committed and nothing said.
- *
- * The browser should never have decided it was a scroll. `touch-action: none`
- * on an SVG group is not reliable, so the grip also takes a non-passive
- * `touchstart` and `touchmove` that call `preventDefault` — the one way to
- * stop a page scrolling under a finger that every mobile browser honours.
- *
- * And the move and up listeners hung off the grip element itself, which is
- * fine exactly as long as the pointer capture holds. Capture is the thing
- * being lost here. They hang off `window` now, so once a drag has started
- * nothing but a lift can end it.
+ * What replaces it is `gripHome`: one position per design, computed from the
+ * state, identical from a tap, a link and a code. The three controls in the
+ * wall are gone from `index.html`, `state.grip` is gone from the state, `gp=`
+ * is retired in `url-state.js`, and `repair` no longer walks a stale position
+ * to the nearest buildable one because there is no longer a stale position.
  */
-let dragging = null;
-const swallowTouch = ev => ev.preventDefault();
 
-function armGrip() {
-  const bar = $('#grip-bar');
-  const g = $('#stage svg [data-hw="handle"]');
-  /* ⚠ AND NOT EVERY GRIP THAT IS DRAWN CAN BE MOVED. The recessed channel is
-     cut into the leaf rather than bolted to it, so there is nothing here to
-     arm: no drag, no arrow keys, no controls in the wall. See its catalogue
-     entry — `gripAt` and `repair` refuse the position as well, because this
-     one is a fact about the product and not a preference of the page. */
-  bar.hidden = !g || gripIsFixed(state);
-  if (!g || gripIsFixed(state)) return;
-
-  g.classList.add('grip-live');
-  g.setAttribute('tabindex', '0');
-  g.setAttribute('role', 'button');
-  g.setAttribute('aria-label', T('grip.aria'));
-  g.addEventListener('pointerdown', onGripDown);
-  g.addEventListener('keydown', onGripKey);
-  /* Non-passive, so `preventDefault` is allowed to mean something. Chrome
-     assumes a touch listener is passive unless told otherwise, and a passive
-     listener cannot stop the page scrolling. */
-  g.addEventListener('touchstart', swallowTouch, { passive: false });
-  g.addEventListener('touchmove', swallowTouch, { passive: false });
-
-  /* ⚠ HIDDEN, NOT DISABLED, AND THAT IS THE OPPOSITE OF THE RULE NEXT DOOR.
-     The option tiles use `aria-disabled` and stay clickable on purpose, so a
-     customer who wants a combination the door cannot take is told WHY instead
-     of finding a dead control. That is right for a choice about the door.
-     This is not a choice about the door. Turning a grip on its side is a thing
-     you can do to SOME grips — five of the seven bars are longer than a
-     standard leaf is wide — and on the rest the button has nothing to say
-     except that it does not apply. A greyed control that never becomes
-     available on this door is furniture: it takes a tap to discover, it takes
-     up the width the two live controls want, and its explanation is about the
-     button rather than about the door.
-     Asked for from outside: *"if a pull handle cant be rotated then dont show
-     the rotate button."* `#grip-home` beside it already works this way. */
-  const rot = $('#grip-rot');
-  rot.hidden = !gripCanRotate(state);
-  /* Moved, and saying so. The position is not part of the order — it is not in
-     the code and not in the WhatsApp message, at the owner's son's instruction
-     — so a customer who has dragged the handle somewhere is told, plainly,
-     that where it ends up is settled on site. Anything less would be the site
-     promising something nobody is building to. */
-  sizeHitPad();
-
-  /* ⚠ `gripDeparture`, not the comparison written out here. This read
-     `now.rot === 0`, which is the same thing on every door whose home stands
-     up and wrong on the 88 where it does not — `gripHome` lays a bar down by
-     itself where nothing upright fits, so an untouched Shiran on a broad light
-     offered to put its handle back where it already was, under a hint saying
-     the position was only an illustration. And `share.js` asked the question
-     not at all, which is how a dragged handle reached Peretz in no form
-     whatever. One definition, in the file that sends the order. */
-  const { moved } = gripDeparture(state);
-  $('#grip-home').hidden = !moved;
-  $('.grip-bar__hint').textContent = moved
-    ? T('grip.ariaAt', gripIllustrative())
-    : T('grip.drag');
-}
-
-/**
- * The grip's touch target, in SCREEN terms.
- *
- * `gripArt` draws the pad at the handle's own size, which is the right thing
- * for a drawing to know and the wrong unit for a finger: the door is scaled to
- * fit whatever screen it lands on, and on a phone a 32 mm bar is four or five
- * css pixels. Reported from the outside as barely being able to drag it.
- *
- * So the drawing gives the pad the handle and the page gives it a floor. 44 px
- * is the smallest target a touch interface should offer, measured through the
- * SVG's own screen matrix so it is right at any zoom, on any viewport, after
- * any re-fit.
- *
- * ⚠ THE PAD IS NOT WHAT YOU SEE. It was, and that is what got reported as the
- * hit box being huge: the browser's focus outline sits on the GROUP and traces
- * whichever child reaches furthest, which is this rect after it has been grown
- * to a fingertip. So the drawing carries a second rect, `data-chrome="focus"`,
- * at the handle's own size and never grown, and the ring is drawn on that.
- * Grow this one freely — nobody looks at it.
- */
-const TOUCH_TARGET = 44;
-function sizeHitPad() {
-  const svg = $('#stage svg');
-  const pad = svg && svg.querySelector('[data-hitpad]');
-  if (!pad) return;
-  const m = svg.getScreenCTM();
-  if (!m || !m.a || !m.d) return;
-  const mmPerPx = { x: 1 / Math.abs(m.a), y: 1 / Math.abs(m.d) };
-  const cx = Number(pad.dataset.cx), cy = Number(pad.dataset.cy);
-  /* ⚠ HALF A PIXEL OVER, not exactly on. Sized to exactly 44, the rect comes
-     back from `getBoundingClientRect` as 43.99-something once the matrix and
-     the layout have each rounded once, and 44 is a FLOOR — a target computed
-     to land precisely on a minimum lands under it about half the time.
-     It went unnoticed until the stage was made shorter on a phone: the scale
-     changed, the arithmetic landed on the other side of the boundary, and the
-     audit reported a 320 px screen with a 43-and-a-bit target. The number was
-     always this fragile; the height change only moved which viewport showed
-     it. Rounding UP is the only safe direction, as it is for the short code's
-     bit count, and half a pixel is invisible. */
-  const w = Math.max(Number(pad.dataset.w), (TOUCH_TARGET + 0.5) * mmPerPx.x);
-  const h = Math.max(Number(pad.dataset.h), (TOUCH_TARGET + 0.5) * mmPerPx.y);
-  pad.setAttribute('x', cx - w / 2);
-  pad.setAttribute('y', cy - h / 2);
-  pad.setAttribute('width', w);
-  pad.setAttribute('height', h);
-}
-
-/** Pointer position in LEAF-LOCAL millimetres, x from the leaf's left edge. */
-function leafPoint(svg, ev) {
-  const pt = svg.createSVGPoint();
-  pt.x = ev.clientX; pt.y = ev.clientY;
-  const q = pt.matrixTransform(svg.getScreenCTM().inverse());
-  const leaf = svg.querySelector('#leaf rect').getBBox();
-  return { x: q.x - leaf.x, y: q.y - leaf.y, leaf };
-}
-
-const hingeLeft = () => byId(HANDINGS, state.handing).hinge === 'left';
-/* The design stores the grip's distance from the CLOSING edge, because that is
-   the edge a backset is measured from and it means flipping the handing
-   mirrors the handle instead of leaving it behind. The drawing works from the
-   leaf's left. One conversion, used both ways round. */
-const fromEdge = (x, leafW) => (hingeLeft() ? leafW - x : x);
-
-function onGripDown(ev) {
-  const svg = $('#stage svg');
-  const g = ev.currentTarget;
-  const p = leafPoint(svg, ev);
-  const now = gripAt(state);
-  dragging = {
-    g, svg, leaf: p.leaf,
-    cx0: Number(g.dataset.cx), cy0: Number(g.dataset.cy),
-    /* Where inside the handle they took hold, so it does not jump to centre
-       itself under the finger the moment it moves. */
-    dx: p.x - fromEdge(now.x, p.leaf.width), dy: p.y - now.y,
-    rot: now.rot, at: now,
-  };
-  /* Capture is still asked for — it is what keeps a mouse drag working outside
-     the window — but nothing depends on it holding. */
-  try { g.setPointerCapture(ev.pointerId); } catch { /* not all pointers can */ }
-  window.addEventListener('pointermove', onGripMove, { passive: false });
-  window.addEventListener('pointerup', onGripUp);
-  window.addEventListener('pointercancel', onGripAbandon);
-  ev.preventDefault();
-}
-
-/** Take the listeners down. Called by both endings. */
-function unhook() {
-  window.removeEventListener('pointermove', onGripMove);
-  window.removeEventListener('pointerup', onGripUp);
-  window.removeEventListener('pointercancel', onGripAbandon);
-}
-
-/** Snap to 5 mm: finer than anyone can aim and coarser than a float. */
-const snap = v => Math.round(v / 5) * 5;
-
-function onGripMove(ev) {
-  if (!dragging) return;
-  const { svg, leaf, g } = dragging;
-  const p = leafPoint(svg, ev);
-  const want = {
-    x: snap(fromEdge(p.x - dragging.dx, leaf.width)),
-    y: snap(p.y - dragging.dy),
-    rot: dragging.rot,
-  };
-  dragging.at = want;
-  const fit = gripPlacement(state, want);
-  g.classList.toggle('grip-bad', !fit.ok);
-  const sx = leaf.x + fromEdge(want.x, leaf.width), sy = leaf.y + want.y;
-  g.setAttribute('transform',
-    (want.rot === 90 ? `rotate(90 ${sx} ${sy}) ` : '')
-    + `translate(${(sx - dragging.cx0).toFixed(1)} ${(sy - dragging.cy0).toFixed(1)})`);
-  ev.preventDefault();
-}
-
-function onGripUp() {
-  if (!dragging) return;
-  const { at } = dragging;
-  dragging = null;
-  unhook();
-  placeGrip(at, true);
-}
-
-/**
- * The pointer was taken away from us — the system claimed the gesture, a phone
- * call arrived, the finger left the screen edge.
- *
- * Nothing is committed. The handle goes back to where it was, which is the one
- * position we know the customer chose on purpose. Treating this as a drop is
- * what made the handle teleport mid-drag on a phone, and it was worse than a
- * lost gesture: the door changed while nobody had decided anything.
- */
-function onGripAbandon() {
-  if (!dragging) return;
-  const { g } = dragging;
-  dragging = null;
-  unhook();
-  g.classList.remove('grip-bad');
-  g.removeAttribute('transform');
-  if (gripAt(state).rot === 90) {
-    g.setAttribute('transform', `rotate(90 ${g.dataset.cx} ${g.dataset.cy})`);
-  }
-}
-
-/** Commit a position, snapping back to the nearest buildable one. */
-function placeGrip(want, saySo) {
-  const fit = gripPlacement(state, want);
-  let at = fit.ok ? want : nearestGrip(state, want);
-  /* The search is a fixed budget and it can come back empty — it samples about
-     150 places and a door can have valid ones it did not sample. Home is the
-     one position we always know works, because it is how the door was drawn
-     before anybody touched it. Never leave the customer holding a door that
-     cannot be made. */
-  if (!gripPlacement(state, at).ok) at = gripHome(state);
-  set({ ...state, grip: at });
-  if (!fit.ok && saySo) toast(T('notice.moved', fit.why));
-  const g = $('#stage svg [data-hw="handle"]');
-  if (g) g.focus({ preventScroll: true });
-}
-
-/* 10 mm a press, 50 with shift: the same two speeds the option grids use. */
-function onGripKey(ev) {
-  const step = ev.shiftKey ? 50 : 10;
-  const now = gripAt(state);
-  const move = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[ev.key];
-  if (!move) return;
-  /* Left and right are named from the SCREEN, not from the door: an arrow
-     that moves the handle the other way on a left-hung door would be a bug
-     nobody could describe. */
-  const dir = hingeLeft() ? -1 : 1;
-  placeGrip({ x: now.x + move[0] * step * dir, y: now.y + move[1] * step, rot: now.rot }, false);
-  ev.preventDefault();
-}
 
 /**
  * Tick what is chosen, and mark what cannot be — in one pass, from the one
@@ -3472,10 +3227,6 @@ function fitStage() {
   svg.setAttribute('viewBox',
     `${(fx + (w - vw) / 2).toFixed(1)} ${(fy + (h - vh) / 2).toFixed(1)} `
     + `${vw.toFixed(1)} ${vh.toFixed(1)}`);
-  /* The crop just changed, so the scale did, so the touch target is the wrong
-     size. A rotated phone is the case that matters. */
-  sizeHitPad();
-
   /* ── WHERE THE PHOTOGRAPH GOES ────────────────────────────────────
      Two things have to be true at once and neither is negotiable: the
      picture's own wall/floor junction must land on the line the door stands

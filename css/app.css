@@ -106,15 +106,19 @@
      quantity rather than a second copy of this one. */
   --shadow-card: 0 10px 32px rgb(23 23 21 / .07), 0 2px 8px rgb(23 23 21 / .05);
 
-  /* The wall strip the grip controls stand in, reserved out of the stage above
-     1100 px and zero below it (on a phone the controls are in flow under the
-     door). 148 leaves the bar 128 after its own 8 px inset and the 20 px the
-     `.grip-bar` width rule takes off — comfortably past the 56 px the audit
-     demands and past a 44 px touch target on each button.
-     One number in one place: the padding that reserves the strip and the width
-     the bar is allowed to take are the same quantity, and CLAUDE.md §5 is the
-     record of what happens when a quantity like that lives in two. */
-  --grip-strip: 0px;
+  /* ⚠ `--grip-strip` IS GONE — 18.9.2026, and it cost the drawing NOTHING,
+     which was measured rather than assumed. It began as 148 px of wall
+     reserved out of the stage above 1100 px so that choosing a pull handle
+     could not shrink the door; the PADDING that did the reserving came out on
+     27.8.2026 (see the desktop block below, and the report that asked for the
+     background to run to the edge), and from then on the token's only reader
+     was `.grip-bar`'s own width. So removing it with the bar moves neither the
+     stage nor the leaf: measured at 1100, 1280, 1440 and 1920, with a handle
+     and without, both boxes are identical to the digit.
+     The RULE it was written for is not gone and is restated where
+     `.stage__hud` and `.quote` are laid out: anything in FLOW beside a
+     flexible stage takes its height out of the drawing, which is exactly why
+     those two are absolute. */
 
   /* ⚠ THE TOUCH FLOOR, AS A TOKEN, BECAUSE IT IS NOW A QUANTITY IN TWO PLACES.
      44 px is written into a dozen rules in this file and that was fine while
@@ -220,13 +224,13 @@
 
    ⚠ It goes on the drawn elements, not on the `<svg>` — `vector-effect` is not
    an inherited property — hence the descendant selector. */
-.steps__g, .spec__ico, .trust__ico, .btn__ico, .saved__ico, .grip-bar__ico {
+.steps__g, .spec__ico, .trust__ico, .btn__ico, .saved__ico {
   fill: none; stroke: currentColor;
   stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
   flex: 0 0 auto;
 }
-.steps__g *, .spec__ico *, .trust__ico *, .btn__ico *, .saved__ico *,
-.grip-bar__ico * { vector-effect: non-scaling-stroke; }
+.steps__g *, .spec__ico *, .trust__ico *, .btn__ico *,
+.saved__ico * { vector-effect: non-scaling-stroke; }
 
 /* THE `hidden` ATTRIBUTE HAS TO WIN.
    It is only `display: none` in the browser's own stylesheet, so ANY author
@@ -980,10 +984,11 @@ svg { direction: ltr; }
        either way, because `.grip-bar` is absolute and takes no space in the
        flow. The padding was buying clear wall, not a stable door, and a pill
        buys legibility over any wall there is.
-       `--grip-strip` stays: it is still what gives the bar a sane width in the
-       1100–1240 band where the drawn wall is narrow. */
+       ⚠ AND `--grip-strip: 148px` STOOD HERE UNTIL 18.9.2026. It was the last
+       thing still widening the reservation, and its only job was giving the
+       grip bar a sane width in the 1100–1240 band where the drawn wall is
+       narrow. The bar is gone; nothing stands in that wall. */
   }
-  :root { --grip-strip: 148px; }
 }
 
 /* The page's heading, which was `sr-only` and is now the first thing read.
@@ -1294,40 +1299,24 @@ svg { direction: ltr; }
   min-block-size: 36px; padding: 6px 18px; font-size: .82rem;
 }
 
-/* ── the handle, and moving it ─────────────────────────────
-   The grip is the one thing on the stage you can touch. It gets a real
-   pointer, a focus ring of its own, and `touch-action: none` so a finger
-   dragging it moves the handle instead of scrolling the page — which is what
-   happens by default and is indistinguishable, to the customer, from the
-   feature not existing. */
-/* ── the grip controls, standing in the wall ──────────────────
-   They were a row under the door, and they are `hidden` until the door has a
-   pull handle — so choosing one made the row appear, and on desktop the stage
-   is the flexible row above it: THE DOOR SHRANK the moment you gave it a
-   handle. Reported from the outside in those words. Anything in flow beside a
-   flexible stage does that, whatever height it is.
-   So they are out of flow, in the empty wall beside the door, which is where
-   the owner's son drew a circle and asked for them. The door's size no longer
-   depends on whether it has a handle.
-   Vertically centred on the inline-start edge — the right, in RTL, which is
-   the side he circled. `inset-inline` rather than `left`, so an English build
-   puts them on the other side without a second rule. */
 /* ── THE WALL IS THE CHROME ──────────────────────────────────────────
    Three things stand on the wall above the door: the language buttons, the
    price, and undo/redo. Asked for with three circles drawn on a screenshot.
 
-   ⚠ ABSOLUTE, LIKE `.grip-bar`, AND FOR THE SAME MEASURED REASON. Above
-   1100 px `.stage-wrap` is a flex column and `.stage` is `flex: 1 1 auto`, so
-   anything in the FLOW up here takes its height out of the DOOR. That is why
-   the grip controls stand in the wall and why `--grip-strip` is reserved even
-   when empty; a row of chrome in the flow would cost the drawing ~60 px at
-   every desktop size.
+   ⚠ ABSOLUTE, AND FOR A MEASURED REASON. Above 1100 px `.stage-wrap` is a flex
+   column and `.stage` is `flex: 1 1 auto`, so anything in the FLOW up here
+   takes its height out of the DOOR; a row of chrome in the flow would cost the
+   drawing ~60 px at every desktop size. The grip controls used to stand in
+   this wall for the same reason, with `--grip-strip` reserved even when they
+   were empty — both went on 18.9.2026, and the rule they demonstrated is why
+   this element and `.quote` are written the way they are.
 
    ⚠ AND IT DOES NOT COVER THE LEAF. `pointer-events: none` on the strip with
    `auto` back on the three slots, so the middle of the row — which passes over
    the door's head on a narrow screen — never eats a drag aimed at the handle.
-   The grip bar is centred at 50%; this sits at the top. They share the wall
-   and never the same band of it. */
+   It used to share this wall with the grip bar — that was centred at 50% and
+   this sits at the top, so they never met in the same band. The bar is gone
+   and the whole wall is this element's and `.quote`'s. */
 .stage__hud {
   position: absolute;
   /* ⚠ THE TOP OF THE DRAWING, NOT OF THE WRAP. The wrap opens with the page's
@@ -1690,123 +1679,24 @@ svg { direction: ltr; }
   .quote__send { font-size: .8rem; min-block-size: 44px; padding: 0 14px; }
 }
 
-.grip-bar {
-  position: absolute;
-  /* `--wall-gap` is the measured gap between the stage's edge and the door's
-     casing, published by `fitStage` on every re-fit. It has to be measured:
-     the door's drawn width changes with the SIZE — a sidelight is far wider
-     than a narrow leaf — and again with every viewport, so a hand-picked
-     width fits a standard leaf on a laptop and lands on the frame on a phone.
-     The fallback is for the instant before the first paint. */
-  inset-inline-start: var(--grip-inset, 8px);
-  /* Above 1100 the strip is reserved, so the floor is guaranteed rather than
-     hoped for: `--grip-strip` minus this element's own inset and 20 px of
-     breathing room is the width, and `--wall-gap` only widens it when the door
-     leaves more wall than the strip reserved. Below 1100 `--grip-strip` is 0
-     and the width is whatever wall the door leaves.
-
-     ⚠ AND BELOW 1100 THE BREATHING ROOM YIELDS BEFORE THE CONTROL DOES.
-     The 20 px gap between this card and the casing is comfort; 56 px of bar is
-     the audit's floor and a thumb's. On the widest door in the range at 360 px
-     the wall is **72.4 px** — the narrowest this catalogue can produce — and
-     20 + 8 left 52, under the floor. Found by sweeping every size against
-     twelve widths rather than the audit's eight: 360 is not one of the eight,
-     which is this file's "go and find the third case" earning its keep for the
-     third time.
-     So on a phone the gap is 12 and the inset 4, which buys 12 px and puts the
-     worst case at 64 with 8 px still clear of the door. Above 1100 nothing
-     changes: the reserved strip makes both moot. */
-  --grip-gap: 20px;
-  inline-size: min(
-    max(calc(var(--grip-strip) - var(--grip-inset, 8px) - var(--grip-gap)),
-        calc(var(--wall-gap, 9.5rem) - var(--grip-gap))),
-    9.5rem);
-  inset-block-start: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  display: flex; flex-direction: column; align-items: stretch; gap: 8px;
-  text-align: center;
-  /* Its own ground, like `.hud__slot` — the wall runs under it now. */
-  background: var(--paper);
-  border-radius: var(--r-card, 14px);
-  padding: 8px;
-  box-shadow: 0 1px 2px rgb(0 0 0 / .05);
-}
-/* ⚠ THE PHONE'S TIGHTER FIGURES, AND THEY GO AFTER THE RULE THEY OVERRIDE.
-   A media query adds no specificity (CLAUDE.md §8, three bruises), so this
-   block sits below `.grip-bar` rather than above it. Below 1100 there is no
-   reserved strip and the bar lives on whatever wall the widest door leaves —
-   72.4 px at its worst, measured across every size at twelve widths. */
-@media (max-width: 1099px) {
-  /* ⚠ AND THE PADDING YIELDS TOO, WHICH IS WHERE THE REAL FLOOR IS. The bar's
-     width is not the constraint a thumb cares about — the BUTTON inside it is,
-     and that is the bar less twice this padding. At 8 px a 60 px bar gives
-     exactly 44, the tap floor, with nothing to spare; at 6 px it gives 48.
-     Two statements of one quantity, and the audit's own 56 px bar floor was
-     the lenient one: it would have passed a 40 px button. That check is
-     derived from this padding now rather than picked. */
-  .grip-bar { --grip-inset: 4px; --grip-gap: 12px; padding: 6px; }
-}
-.grip-bar__hint {
-  font-size: .72rem; color: var(--ink-2);
-  line-height: 1.35;
-  display: grid; justify-items: center; gap: 3px;
-}
-.grip-bar__ico { inline-size: 20px; block-size: 20px; }
-/* 44px, like every other target on the page. It was 34 — a standalone control
-   on the phone, ten pixels under the minimum this project holds itself to, and
-   the audit never said so because its tap-target check enumerated a list of
-   classes that this one is not on. Both buttons in the grip bar carry it, so
-   the reset button was the same ten pixels short whenever it appeared. */
-.grip-bar__btn {
-  min-block-size: 44px; padding: 5px 10px;
-  /* In a column narrow enough to fit the wall, a label has to be allowed to
-     wrap — and a wrapped label makes the button taller, never narrower, so the
-     44 px floor is untouched. */
-  display: inline-flex; align-items: center; justify-content: center;
-  text-align: center; line-height: 1.25;
-  border: 1px solid var(--rule); border-radius: var(--r-pill);
-  background: var(--paper-up); color: var(--ink); font: inherit; font-size: .78rem;
-  cursor: pointer;
-}
-.grip-bar__btn:hover { border-color: var(--ink-2); }
-.grip-bar__btn[aria-disabled="true"] { opacity: .45; cursor: default; }
-
-[data-hw="handle"].grip-live,
-[data-hw="handle"].grip-live * { cursor: grab; touch-action: none; }
-[data-hw="handle"].grip-live:active { cursor: grabbing; }
-/* THE RING FOLLOWS THE HANDLE, NOT THE TOUCH TARGET.
-   This was `outline: 3px solid` on the group, and an outline traces whichever
-   child reaches furthest — which is the invisible hit pad, grown to 44 css
-   pixels for a fingertip. So focusing a 35 mm rod drew a box 131 mm wide
-   around it, and it was reported from the outside as the hit box being huge.
-   The pad still grows, because a finger still needs it; the ring is drawn on a
-   second rect that is the handle's own size and is never grown. */
-/* ⚠ `:focus`, NOT `:focus-visible`, and that one word was the whole of the
-   "lines left behind" report.
-   Dropping a drag focuses the handle so a keyboard user keeps their place —
-   and a MOUSE drop is plain `:focus`, never `:focus-visible`. So this rule did
-   not apply, Chromium painted its own `outline: auto` on the group, and an
-   outline traces whichever child reaches furthest: the touch pad, grown to
-   44 css pixels. On a rotated Shiran that is a box 135 x 45 round art that is
-   135 x 24, so its top and bottom edges show as two grey lines above and below
-   the handle — and they appear after every drop, at whatever position the
-   handle was left in.
-   Same fault as the original "the hit box shows as huge", fixed for the
-   keyboard case and left standing for the pointer case. The browser's ring is
-   off in BOTH states now; ours is drawn only when `:focus-visible` says a
-   focus indicator is wanted, which is what that pseudo-class is for. */
-[data-hw="handle"].grip-live:focus { outline: none; }
-[data-hw="handle"].grip-live:focus-visible [data-chrome="focus"] {
-  stroke: var(--accent); stroke-width: 3; vector-effect: non-scaling-stroke;
-}
-/* RED, and it has to be red on metal — the grips are greys and browns under
-   gradients, so a tint would barely show. A colour matrix that keeps the
-   modelling and throws away everything but the red channel does: the bar still
-   reads as a bar, lit the same way, and it is unmistakably wrong. */
-[data-hw="handle"].grip-bad {
-  filter: grayscale(1) sepia(1) saturate(18) hue-rotate(-56deg) brightness(.95);
-}
+/* ⚠ `.grip-bar`, `.grip-live`, `.grip-bad` AND THE FOCUS RING STOOD HERE —
+   REMOVED 18.9.2026 with the feature they dressed.
+   The bar was an absolutely-positioned pill in the wall holding a hint and two
+   buttons; `.grip-live` gave the handle `cursor: grab` and `touch-action:
+   none` so a finger dragging it moved the handle instead of scrolling;
+   `.grip-bad` was a colour matrix that kept the modelling and threw away every
+   channel but red, because a tint does not show on metal; and the ring was
+   drawn on `[data-chrome="focus"]` rather than by the browser, because
+   Chromium's own outline traced the 44 px touch PAD and put a box across half
+   the door — reported from outside twice, as "the hit box shows as huge" and
+   as "lines left behind".
+   None of it has a subject: nothing on this page positions a handle now.
+   ⚠ TWO THINGS THE DELETION MUST NOT TAKE WITH IT, and both are above:
+   `.stage__hud` and `.quote` are absolute for the SAME measured reason the bar
+   was — above 1100 px `.stage-wrap` is a flex column and `.stage` is
+   `flex: 1 1 auto`, so anything in FLOW there takes its height out of the
+   DRAWING, and a control that merely appeared once cost the leaf 23,021
+   pixels. That rule is why they are written the way they are. */
 
 /* ── panel ────────────────────────────────────────────────── */
 
@@ -3826,7 +3716,7 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    it. Anything added to the stage wrap belongs here the same day. */
 .is-bare .bar, .is-bare .strip, .is-bare .panel, .is-bare .stage__bar,
 .is-bare .stage__h1, .is-bare .steps, .is-bare .trust, .is-bare .saved,
-.is-bare .grip-bar, .is-bare .stage__hud, .is-bare .quote,
+.is-bare .stage__hud, .is-bare .quote,
 /* ⚠ `.brand` JOINS THE LIST THE DAY IT IS ADDED, which is the standing rule
    for anything put inside `.stage-wrap` — the one page element `?bare=1`
    keeps. Bare mode exists so the harnesses photograph THE DRAWING and no page

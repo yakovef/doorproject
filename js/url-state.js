@@ -404,27 +404,16 @@ export function toQuery(state) {
   p.set('d', state.detail);
   p.set('s', state.size);
   p.set('h', state.handing);
-  /* `gp` — where the customer stood the grip, in millimetres: inboard from the
-     closing edge, down from the leaf's top, then 0 or 90 for which way up.
-     Written ONLY when they moved it, so every door nobody dragged produces
-     exactly the URL it always did.
-     It is in the link and NOT in the code, at the owner's son's instruction:
-     the position is a picture of what the customer had in mind, not an
-     instruction his father builds to, and the code is the thing read down a
-     telephone as a specification. The link still carries it, so the door
-     Peretz taps through to is the door they were looking at, and the stage
-     says underneath that the final position is set on site.
-     ⚠ It stayed out of the code even when VERSION 11 made a bump free. The
-     old reason given here — "it would cost a bump and every code written so
-     far" — stopped being the reason the moment a bump was happening anyway.
-     The reason now is simply that it does not belong there: since Stage 1.4
-     the MESSAGE says in words that the handle was moved and points here for
-     the millimetres, so a character added to a telephone code would duplicate
-     what the order already says. */
-  if (state.grip) {
-    const g = state.grip;
-    p.set('gp', `${Math.round(g.x)},${Math.round(g.y)},${g.rot === 90 ? 90 : 0}`);
-  }
+    /* ⚠ `gp=` IS RETIRED — 18.9.2026. It carried the handle's position, and
+     nothing positions a handle any more: the drag, the rotate button and the
+     home button are gone at the owner's instruction. It is NOT written, it is
+     NOT read, and it must never be reused — `f`, `a`, `z` and `i` are the
+     same shape of promise.
+     ⚠ NO `VERSION` BUMP, and the reason is worth keeping: the position was
+     never in the short code. It rode in the link alone, deliberately, so no
+     code ever written means anything different today. Withdrawing a parameter
+     that was never packed costs nothing; withdrawing one that was would have
+     cost every code Peretz has been read down the telephone. */
   return '?' + p.toString();
 }
 
@@ -471,12 +460,19 @@ export function fromQuery(search) {
      language is a fact about the reader, which is also why it is not in the
      short code (see `js/copy.js`). */
   const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hl', 'sp',
-                           'd', 's', 'h', 'gp', 'bl', 'ey',
+                           'd', 's', 'h', 'bl', 'ey',
                            'code', 'bare', 'sheet', 'lang']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
      still. Withdrawing an option is OUR change and not the customer's mistake,
-     so a link carrying one opens as itself. */
-  const RETIRED = new Set(['f', 'a', 'z', 'i']);
+     so a link carrying one opens as itself.
+     ⚠ `gp` JOINED THEM ON 18.9.2026 — the handle's position, withdrawn with
+     the drag. It MOVED from `KNOWN` to here rather than simply being deleted,
+     and the difference is the whole point: in `KNOWN` it would have been a
+     parameter we still read, and deleted from both it would raise
+     `option-unknown` on every link a customer has already sent. Here it is
+     what it is — a name we own, still reserved so nothing else can take it,
+     and silent. */
+  const RETIRED = new Set(['f', 'a', 'z', 'i', 'gp']);
   for (const key of p.keys()) {
     if (!KNOWN.has(key) && !RETIRED.has(key)) notice = notice || 'option-unknown';
   }
@@ -658,23 +654,16 @@ export function fromQuery(search) {
     else notice = notice || 'option-unknown';
   }
 
-  const rawGrip = p.get('gp');
-  if (rawGrip != null) {
-    const [gx, gy, gr] = rawGrip.split(',').map(Number);
-    /* A position that is not three numbers is a link somebody edited by hand.
-       It does not earn `option-unknown` — nothing was misnamed and the door is
-       still theirs — so the grip simply goes home, which is where it would
-       have been if they had never dragged it. */
-    if ([gx, gy].every(Number.isFinite)) {
-      state.grip = { x: gx, y: gy, rot: gr === 90 ? 90 : 0 };
-    }
-  }
-
-  /* `f` and `a` — the finish and the add-ons — are read by nobody now, and
-     deliberately do not set the notice. A link carrying them was written when
-     the site offered them; the door it names is still buildable and still that
-     customer's door, so it opens as itself rather than being flagged as
-     damaged. Withdrawing an option is our change, not their mistake. */
+  /* `f`, `a` and `gp` — the finish, the add-ons and the handle's position —
+     are read by nobody now, and deliberately do not set the notice. A link
+     carrying them was written when the site offered them; the door it names is
+     still buildable and still that customer's door, so it opens as itself
+     rather than being flagged as damaged. Withdrawing an option is our change,
+     not their mistake.
+     ⚠ `gp` JOINED THEM ON 18.9.2026 and stays in `KNOWN` for exactly that
+     reason: a parameter that is ignored ON PURPOSE has to be told apart from
+     one nobody has heard of, or the customer gets a red strip about a door
+     that is perfectly correct. */
 
   return { ...settle(state, notice), carries };
 }
@@ -701,13 +690,18 @@ function settle(state, notice) {
      for the toast when a customer dropping to one panel was told we had
      removed their metal strips — and this, the second reader of the same
      repair, was still throwing them away and printing one generic line.
-     It read "the combination in the link cannot be manufactured", which is
-     false for the commonest repair there is: a stale `gp=` moves the HANDLE,
-     and the handle's position is not part of the order at all. Measured on the
-     default door, 1,344 of 1,353 positions repair the position and nothing
-     else, and every one of them said the door could not be built. Peretz
-     opening that link has to ask which door it is — the one question this site
-     exists to make unnecessary. */
+     It read "the combination in the link cannot be manufactured", which was
+     false for the commonest repair there then was: a stale `gp=` moved the
+     HANDLE, and the handle's position was not part of the order at all.
+     Measured on the default door at the time, 1,344 of 1,353 positions
+     repaired the position and nothing else, and every one of them said the
+     door could not be built. Peretz opening that link had to ask which door it
+     is — the one question this site exists to make unnecessary.
+     ⚠ THAT REPAIR NO LONGER EXISTS: `gp=` was retired on 18.9.2026 and the
+     handle has one position. The measurement is kept because the ARGUMENT it
+     produced is what still governs — `said` rides along because the notice's
+     KIND cannot say what happened — and because a reader meeting `gp` in this
+     paragraph should find out here that it is gone rather than go looking. */
   return { state: fixed, said, notice: notice || (changed.length ? 'combination-fixed' : null) };
 }
 

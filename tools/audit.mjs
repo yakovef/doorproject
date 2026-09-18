@@ -1693,232 +1693,31 @@ for (const v of VIEWS) {
   errs.forEach(e => fault(v.name, `console: ${e}`));
   if (!small.length && !errs.length) console.log('  clicked every option, clean');
 
-  /* ── DRAGGING THE HANDLE ──────────────────────────────────────────
-     Three faults, all reported from a phone and none of them visible to
-     anything that renders SVG strings:
+  /* ⚠ TWO WHOLE BLOCKS STOOD HERE AND CAME OUT ON 18.9.2026 — "DRAGGING THE
+     HANDLE" and "A DRAG LEAVES NOTHING BEHIND". Between them they were the
+     only thing in this repository that had ever driven a pointer gesture, and
+     what they proved is worth writing down because none of it was findable any
+     other way:
 
-     the handle moved a couple of pixels and stopped, because `pointercancel`
-     was wired to the same handler as `pointerup` and a mobile browser fires
-     cancel the moment it thinks a gesture is a page scroll;
+       · a 220 px drag had to TRACK every move, not stop after the first —
+         `pointercancel` was wired to the same handler as `pointerup`, and a
+         mobile browser fires cancel the moment it decides a gesture is a
+         scroll, so a finger moving at any speed ENDED the drag and snapped it;
+       · a CANCELLED drag had to change nothing at all;
+       · the touch pad had to measure 44 real pixels through the SVG's own
+         screen matrix, at every viewport, after every re-fit;
+       · and the focus ring had to hug the HANDLE rather than the pad, which
+         was checked by dragging the handle about and then comparing the screen
+         against a fresh load of the resulting link, pixel for pixel — it found
+         Chromium's own outline at 1,530 pixels of difference.
 
-     it teleported while the finger was still down — the same line, since
-     ending a drag is what commits and snaps it;
-
-     and the target was four pixels of bar. The pad is drawn 120 mm across and
-     grown to 44 real pixels by the page, so this asks the page and not the
-     drawing.
-
-     A cancel is dispatched deliberately here rather than hoped for. It is the
-     one part of a touch drag that a desktop browser will not produce on its
-     own, and it is the part that was broken. */
-  {
-    await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=tallwin&n=idan`
-               + '&k=cylinder&d=plain&s=standard&h=right-in');
-    await p.waitForTimeout(300);
-    const gp = () => (p.url().match(/gp=([^&]*)/) || [])[1] || null;
-    const pad = await p.$('[data-hitpad]');
-    const box = pad && await pad.boundingBox();
-    if (!box) fault(v.name, 'the handle has no touch target at all');
-    else if (box.width < 44 || box.height < 44) {
-      fault(v.name, `the handle's touch target is ${Math.round(box.width)}x`
-                     + `${Math.round(box.height)} px, under the 44 minimum`);
-    }
-
-    /* AND WHAT YOU SEE IS THE HANDLE, which is a different claim from the one
-       above and was in conflict with it for three rounds. The touch target has
-       to be 44 px whatever the drawing is; the FOCUS RING has to be the size
-       of the thing it is outlining. While both were one rect the browser drew
-       its outline round the grown pad, and a 35 mm rod got a box 131 mm wide —
-       reported from the outside, twice, as the hit box being huge.
-       So: the ring may not be bigger than the art it rings. Checked on the
-       GRAB bar, which is the case that goes wrong first because it is the one
-       grip centred on the leaf rather than hung off the stile — a pad laid out
-       symmetrically about the grip's axis lands beside it, not on it. */
-    /* ⚠ AND THE ROTATED PULL, which is the case that was still wrong after the
-       grab bar was fixed. A grip laid on its side has a pad 135 x 45 css px
-       round art that is 135 x 24, so the pad's own edges show above and below
-       it — which is what the browser's `outline: auto` traced. */
-    const RINGS = [
-      'c=rb-9016d&w=none&n=grab&k=coral&d=plain&s=standard&h=right-in',
-      'c=rb-9016d&w=none&n=grab&k=coral&d=plain&s=standard&h=left-in',
-      'c=rb-0097d&w=rect&n=shiran&k=cylinder&d=plain&s=standard&h=right-in&gp=285,1280,90',
-      'c=rb-0097d&w=rect&n=shiran&k=cylinder&d=plain&s=standard&h=right-in',
-    ];
-    for (const hd of RINGS) {
-      await p.goto(`file://${process.cwd()}/index.html?${hd}`);
-      await p.waitForTimeout(250);
-      const m = await p.evaluate(() => {
-        const g = document.querySelector('.door-svg [data-hw="handle"]');
-        const ring = g && g.querySelector('[data-chrome="focus"]');
-        if (!ring) return null;
-        const r = ring.getBoundingClientRect();
-        let a = 1e9, z = -1e9, t = 1e9, u = -1e9;
-        for (const el of g.querySelectorAll('rect,ellipse,circle,path')) {
-          if (el.hasAttribute('data-hitpad') || el.hasAttribute('data-chrome')) continue;
-          const b = el.getBoundingClientRect();
-          if (!b.width || !b.height) continue;
-          a = Math.min(a, b.x); z = Math.max(z, b.x + b.width);
-          t = Math.min(t, b.y); u = Math.max(u, b.y + b.height);
-        }
-        return { ring: [r.x, r.y, r.width, r.height], art: [a, t, z - a, u - t] };
-      });
-      if (!m) { fault(v.name, `[${hd}] the handle has no focus ring to draw`); continue; }
-      const slack = 4;
-      if (m.ring[2] > m.art[2] + slack || m.ring[3] > m.art[3] + slack) {
-        fault(v.name, `[${hd}] the focus ring is ${Math.round(m.ring[2])}x`
-                     + `${Math.round(m.ring[3])} px round a handle that is only `
-                     + `${Math.round(m.art[2])}x${Math.round(m.art[3])}`);
-      }
-      /* And it is ON the handle, not beside it. */
-      if (m.ring[0] > m.art[0] + m.art[2] || m.ring[0] + m.ring[2] < m.art[0]
-          || m.ring[1] > m.art[1] + m.art[3] || m.ring[1] + m.ring[3] < m.art[1]) {
-        fault(v.name, `[${hd}] the focus ring does not overlap the handle it rings`);
-      }
-
-      /* ⚠ THE BROWSER'S OWN OUTLINE IS NOT CHECKED HERE, and that is
-         deliberate. `outline: auto` on the group traces whichever child
-         reaches furthest — the touch pad — so the ring can be perfect above
-         and the customer still see a box; that is precisely the "lines left
-         behind" fault. But it cannot be reproduced from a harness: Chromium
-         reports focus-visible for a scripted `focus()` AND for a synthesised
-         mouse press, so a check written here reads the state that was already
-         suppressed and passes while the real one is broken. It did exactly
-         that on the first attempt.
-         A check that cannot fire is worse than no check, because it reads as a
-         live rule. What catches this instead is the pixel comparison after a
-         real drag, further down — which found it at 1,530 pixels. */
-    }
-    await p.goto(`file://${process.cwd()}/index.html?c=rb-9016d&w=tallwin&n=idan`
-               + '&k=cylinder&d=plain&s=standard&h=right-in');
-    await p.waitForTimeout(300);
-
-    const g = await (await p.$('[data-hw="handle"]')).boundingBox();
-    const cx = g.x + g.width / 2, cy = g.y + g.height / 2;
-
-    /* A long drag must track every step of the way, not stop after the first. */
-    await p.mouse.move(cx, cy);
-    await p.mouse.down();
-    const seen = [];
-    for (const dy of [20, 70, 140, 220]) {
-      await p.mouse.move(cx, cy + dy);
-      seen.push(await p.$eval('[data-hw="handle"]', e => e.getAttribute('transform')));
-    }
-    await p.mouse.up();
-    await p.waitForTimeout(400);
-    if (new Set(seen).size < seen.length) {
-      fault(v.name, `a 220 px drag tracked ${new Set(seen).size} of ${seen.length} moves`);
-    }
-    if (!gp()) fault(v.name, 'a completed drag did not move the handle');
-
-    /* And an interrupted one must change nothing. */
-    const before = gp();
-    const g2 = await (await p.$('[data-hw="handle"]')).boundingBox();
-    await p.mouse.move(g2.x + g2.width / 2, g2.y + g2.height / 2);
-    await p.mouse.down();
-    await p.mouse.move(g2.x + g2.width / 2 - 30, g2.y + g2.height / 2 - 120, { steps: 5 });
-    await p.evaluate(() =>
-      window.dispatchEvent(new PointerEvent('pointercancel', { pointerId: 1, bubbles: true })));
-    await p.waitForTimeout(300);
-    await p.mouse.up();
-    await p.waitForTimeout(300);
-    if (gp() !== before) {
-      fault(v.name, `a cancelled drag moved the handle anyway (${before} -> ${gp()})`);
-    }
-    if (await p.$eval('[data-hw="handle"]', e => e.getAttribute('transform'))) {
-      fault(v.name, 'a cancelled drag left the handle displaced');
-    }
-    if (!faults) console.log('  the handle drags, and a cancelled drag changes nothing');
-  }
-
-  /* ── A DRAG LEAVES NOTHING BEHIND ─────────────────────────────────
-     The strongest form of the check above, and the one that would have caught
-     all three reports of a visible box round the handle: drag it about, then
-     load the RESULTING LINK fresh and compare the two pictures pixel for
-     pixel. A shared link is the door; if the screen after a drag is not the
-     screen that link produces, something is on the door that is not part of
-     it.
-     It found the browser's own focus outline sitting round the touch pad after
-     every drop — 1,530 pixels, four grey lines above and below the handle.
-     Once at one viewport: this is about the drag, not the layout, and it costs
-     two navigations and two screenshots. */
-  if (v.name === 'laptop') {
-    /* ⚠ A WIDE DOOR WITH `ron`, AND IT USED TO BE A STANDARD ONE WITH `shiran`.
-       Peretz withdrew the Shiran on 26.8.2026 and its id now resolves to
-       `idan`, a 1050 mm bar — and `gripCanRotate` hides `#grip-rot` for any
-       bar longer than the leaf is wide, so on a standard door the button this
-       step clicks is `hidden` and the click waited thirty seconds for it.
-
-       ⚠ AND THE REAL FINDING IS BIGGER THAN THE TEST. Swept after the
-       withdrawal: NO grip can be rotated on a standard, narrow, tall, half or
-       sidelight door any more. Only `ron` and `barblack` on רחבה, and four
-       bars on the new רחבה וגבוהה. The Shiran was the one short grip in the
-       range, so it was quietly the only thing making that control reachable on
-       the door most people buy. That is a product consequence of a product
-       decision, not a bug — recorded in CLAUDE.md rather than worked around —
-       and this step now runs on a door where the button genuinely exists. */
-    /* ⚠ AND `s=wide` BECAME `s=extra2` ON 30.8.2026, FOR THE SAME REASON ONE
-       LEVEL ON. The size list is two families of three bands now, and the
-       merged חריגה is the MIDPOINT of the רחבה and גבוהה it replaces — so its
-       leaf is 925 mm where רחבה's was 1000, and `ron` (a 900 mm bar) no longer
-       turns on it. Swept after the change: `barblack` alone rotates on חריגה,
-       and `ella`, `nitzan`, `ron` and `barblack` on חריגה שנייה. Nothing
-       rotates on a standard door or a plain דו כנפי, which has been true since
-       the Shiran was withdrawn.
-       ⚠ WRITTEN AS THE LIVE ID, NOT THE ALIAS. `s=wide` still resolves —
-       `SIZE_ALIAS` points it at `extra1` — so this link would have gone on
-       loading a real door and waiting thirty seconds for a button that is
-       correctly hidden. An alias keeps a CUSTOMER's link working; a test
-       should name the thing it means. */
-    await p.goto(`file://${process.cwd()}/index.html`
-               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=plain&s=extra2&h=right-in'
-               /* ⚠ `d=panel`: a square light always takes a bottom panel now
-                  (Peretz), so `d=plain` here arrives REPAIRED — and this step
-                  compares the screen after a drag against a fresh load of its
-                  own link, which is a comparison a repaired arrival muddies. */);
-    await p.waitForTimeout(350);
-    await p.click('#grip-rot');
-    await p.waitForTimeout(300);
-    const leaf = await p.$eval('#leaf rect', e => {
-      const r = e.getBoundingClientRect();
-      return { x: Math.round(r.x), y: Math.round(r.y),
-               width: Math.round(r.width), height: Math.round(r.height) };
-    });
-    const gb = await (await p.$('[data-hw="handle"]')).boundingBox();
-    const cx = gb.x + gb.width / 2, cy = gb.y + gb.height / 2;
-    await p.mouse.move(cx, cy);
-    await p.mouse.down();
-    for (const d of [-40, -120, -200, -120, -30]) {
-      await p.mouse.move(cx, cy + d);
-      await p.waitForTimeout(60);
-    }
-    await p.mouse.up();
-    await p.waitForTimeout(450);
-    const url = p.url();
-    await p.screenshot({ path: '/tmp/audit-dragged.png', clip: leaf });
-    await p.goto(url);
-    /* ⚠ 1100 ms, NOT 500. A fresh load runs the arrival animation — the door
-       assembles over 900 ms — and a screenshot taken at 500 catches the frame
-       and the fittings mid-fade, which this check then reports as "something is
-       on the door that the link does not carry". It said 928 pixels the first
-       time motion landed. The comparison is about what the DOOR is, not about
-       when the browser got round to drawing it. */
-    await p.waitForTimeout(1100);
-    await p.screenshot({ path: '/tmp/audit-fresh.png', clip: leaf });
-
-    const A = load('/tmp/audit-dragged.png'), B = load('/tmp/audit-fresh.png');
-    let diff = 0;
-    for (let i = 0; i < Math.min(A.d.length, B.d.length); i += 4) {
-      if (Math.abs(A.d[i] - B.d[i]) + Math.abs(A.d[i + 1] - B.d[i + 1])
-        + Math.abs(A.d[i + 2] - B.d[i + 2]) > 18) diff++;
-    }
-    /* A hair of slack for antialiasing on the handle's own edges; the fault
-       this exists for was fifteen hundred pixels. */
-    if (diff > 120) {
-      fault(v.name, `after a drag the door differs from a fresh load of its own link `
-                  + `by ${diff} pixels — something is on the door that the link does not carry`);
-    }
-    if (!faults) console.log('  and a drag leaves the door exactly as its own link draws it');
-  }
+     None of those has a subject any more: nothing on this page positions a
+     handle. The blocks are removed rather than left to pass vacuously, which
+     is what a check with no subject does (§5.15).
+     ⚠ THE LAST OF THEM IS THE ONE TO MISS, and its IDEA is the thing to reuse:
+     *a shared link is the door, so anything on screen that the link does not
+     carry is not part of it.* If a future gesture ever changes what is drawn
+     without changing what is sent, that comparison is how it gets caught. */
 
   /* ── THE WHOLE THING FROM THE KEYBOARD ────────────────────────────
      Nothing anywhere had ever pressed a key. The audit clicks, the fuzzer
@@ -2045,75 +1844,47 @@ for (const v of VIEWS) {
        survived and is what this check was really about. */
     for (const size of ['standard', 'half']) {
       const bare = await leafHeight(`${stem}&s=${size}&n=none`);
-      const held = await leafHeight(`${stem}&s=${size}&n=shiran`);
+      /* ⚠ `n=idan`, NOT `n=shiran`. `shiran` is a withdrawn id that aliases
+         onto `idan`, so this was loading the right door under a name the
+         catalogue no longer sells — harmless, and exactly the drift that put a
+         stale size list inside `collide.mjs` for three days. A check should
+         say what it means. */
+      const held = await leafHeight(`${stem}&s=${size}&n=idan`);
       if (bare !== held) {
         fault(v.name, `choosing a pull handle resized the door on ${size}: `
                     + `the leaf went from ${bare} px to ${held}`);
       }
     }
 
-    /* Every size there is — read off `SIZES` rather than listed, so a
-       withdrawal cannot leave this sweep quietly testing a door that no
-       longer exists. `narrow` and `sidelight` left on 27.8.2026 and this
-       line was the only place still naming them. */
-    for (const size of Object.keys(SIZES)) {
-      await p.goto(`file://${process.cwd()}/index.html?${stem}&s=${size}&n=shiran`);
-      await p.waitForTimeout(350);
-      const m = await p.evaluate(() => {
-        const gb = document.getElementById('grip-bar');
-        if (gb.hidden) return null;
-        const g = gb.getBoundingClientRect();
-        const f = document.querySelector('.door-svg #frame').getBoundingClientRect();
-        const cs = getComputedStyle(gb);
-        const pad = parseFloat(cs.paddingInlineStart) + parseFloat(cs.paddingInlineEnd);
-        return { g: [g.x, g.x + g.width, g.width], f: [f.x, f.x + f.width],
-                 floor: 44 + pad };
-      });
-      if (!m) { fault(v.name, `no grip controls on a ${size} door carrying a pull`); continue; }
-      /* Half a pixel of slack: these are laid out from a measured `--wall` and
-         a rounded css pixel is not a collision. */
-      if (!(m.g[1] <= m.f[0] + 0.5 || m.g[0] >= m.f[1] - 0.5)) {
-        fault(v.name, `the grip controls sit on the ${size} door: `
-                    + `${Math.round(m.g[0])}..${Math.round(m.g[1])} against a frame at `
-                    + `${Math.round(m.f[0])}..${Math.round(m.f[1])}`);
-      }
-      /* And they have to stay wide enough to be a control rather than a
-         sliver, which is the other way a measured width can go wrong.
-
-         ⚠ THE FLOOR IS DERIVED FROM THE BUTTON, NOT PICKED. It was a literal
-         56, and 56 is the wrong number: the bar carries its own padding on
-         both sides, so a 56 px bar holds a 40 px button — under the 44 px tap
-         floor this file enforces everywhere else. Two statements of one
-         quantity, disagreeing, which is CLAUDE.md §5.10. The bar's real floor
-         is 44 plus its padding, read off the element rather than assumed, so
-         changing the padding cannot silently lower the bar this check will
-         accept. Equal-or-stronger: on a phone the padding is 6, so the floor
-         is 56 as before; above 1100 it is 8 and the floor rises to 60. */
-      if (m.g[2] < m.floor) {
-        fault(v.name, `the grip controls are ${Math.round(m.g[2])} px wide on ${size}, `
-                    + `and ${Math.round(m.floor)} is the floor `
-                    + `(a ${TAP}px button inside ${Math.round((m.floor - TAP) / 2)}px of padding)`);
-      }
-      /* ⚠ AND IT IS THE BAR'S INNER WIDTH THAT IS MEASURED, NOT THE BUTTONS.
-         Measuring the buttons directly reads better and is a check that goes
-         DEAD: `#grip-rot` is hidden on a door whose grip cannot turn and
-         `#grip-home` on a door nobody has dragged, so on most states there is
-         nothing to measure and the loop passes by finding zero buttons —
-         §5.15's exact failure. The bar's inner width is the same question in
-         a form that always has an answer. */
-    }
-    if (!faults) console.log('  the door keeps its size when it gains a handle, '
-                           + 'and the controls stand clear of it');
+    /* ⚠ AND THE SECOND HALF OF THIS BLOCK IS GONE — 18.9.2026. It swept every
+       size in `SIZES` and asserted two things about `#grip-bar`: that it
+       cleared `#frame` (a sidelight is far wider than a narrow leaf, and the
+       wall the widest door leaves on a 320 px phone is 72.4 px, which is where
+       it went wrong), and that it stayed wider than a 44 px button plus its
+       own measured padding. There is no grip bar. Both are removed rather than
+       left to pass by finding nothing.
+       ⚠ ITS BEST LINE IS KEPT HERE because the next control put in that wall
+       will need it: it measured the BAR'S INNER WIDTH and not the buttons, on
+       the stated grounds that measuring the buttons "reads better and is a
+       check that goes DEAD — `#grip-rot` is hidden on a door whose grip cannot
+       turn and `#grip-home` on a door nobody has dragged, so on most states
+       there is nothing to measure and the loop passes by finding zero
+       buttons". That is §5.15 stated by the author who avoided it, and it is
+       the reason the half above — which measures the LEAF, a thing every door
+       has — is the half that survives. */
+    if (!faults) console.log('  the door keeps its size when it gains a handle');
   }
 
   /* ── AND THE FURNITURE IN THE WALL DOES NOT COVER ITSELF ────────────
      ⚠ THE WALL IS A SHARED SURFACE AND NOTHING WAS MEASURING IT AS ONE.
-     Three things stand in the plaster beside the door — the price chip with
-     its send, the undo/redo circles and the grip controls — and every one is
-     `position: absolute` against a stage whose width moves with the viewport
-     AND with the choices column. Widening that column to 440 on 31.8 put the
-     chip on top of `#grip-rot` at 1440x900, and the only thing that noticed
-     was Playwright refusing to click a button it could plainly see.
+     Two things stand in the plaster beside the door — the price chip with its
+     send, and the undo/redo circles — and both are `position: absolute`
+     against a stage whose width moves with the viewport AND with the choices
+     column. ⚠ THERE WERE THREE until 18.9.2026, and the third is why this
+     check exists: widening that column to 440 on 31.8 put the chip on top of
+     `#grip-rot`, and the only thing that noticed was Playwright refusing to
+     click a button it could plainly see. The grip controls are gone; the
+     shared surface and the way it goes wrong are not.
 
      This asks the browser the question a finger asks: at each control's own
      centre, whatever is on top must BE that control. That is not the same
@@ -2121,32 +1892,36 @@ for (const v of VIEWS) {
      both still be pressable, and the geometric checks above already cover the
      overlap case.
 
-     ⚠ AND IT LOADS A DOOR THAT HAS THE CONTROLS. The first version of this
-     ran on whatever door the step walk left behind, which is the DEFAULT —
-     and the grip controls are hidden there, so it measured nothing and passed
-     everywhere. §5.15 again, in the check written to catch a §5.15 fault.
-     The URL is the drag test's own, which carries a Ron bar on an extra2
-     leaf: the widest door in the range beside the narrowest wall.
+     ⚠ IT STILL LOADS THE WIDEST DOOR IN THE RANGE, and the reason has changed.
+     The first version ran on whatever door the step walk left behind — the
+     DEFAULT — where the grip controls were hidden, so it measured nothing and
+     passed everywhere: §5.15 inside the check written to catch a §5.15 fault.
+     The controls are gone, but `extra2` is still the door that leaves the
+     narrowest wall for the two controls that remain, which is where the chip
+     and the circles are likeliest to meet.
 
-     ⚠ AND TWO VIEWPORTS ARE EXEMPT FOR `#grip-rot`, WITH THE MEASUREMENT.
-     At `cusp` (1100x800) and `narrow-d` (1152x800) the price chip already
-     covers that button, and it did before this change: measured on real page
-     loads at the shipped 380 cap and again at 400 and 420, identical every
-     time. The arithmetic says why — the wall there is 140-152 px and the chip
-     is **163 px wide**, so the two cannot sit side by side at any cap. That
-     is a decision about which piece of furniture yields, and both were placed
-     by the owner with circles on a screenshot (`CLAUDE.md` §0a), so it is
-     recorded in §9 rather than settled here.
-     ⚠ NAMING THE TWO VIEWPORTS AND THE ONE CONTROL IS THE POINT. A blanket
-     skip would have hidden the 1440x900 regression that prompted this check,
-     and the exemption shrinks the day the chip does. */
+     ⚠ AND THE TWO-VIEWPORT EXEMPTION FOR `#grip-rot` IS GONE WITH THE BUTTON,
+     18.9.2026 — with the §5.15 guard that made sure it was still needed. At
+     `cusp` (1100x800) and `narrow-d` (1152x800) the price chip covered that
+     button, pre-existing, measured at the shipped 380 cap and again at 400 and
+     420, identically every time; the wall there is 140-152 px and the chip is
+     163 px wide, so the two could not sit side by side at any cap. It is
+     `CLAUDE.md` §9's entry "THE WALL CANNOT HOLD BOTH ITS CONTROLS AT
+     1100-1152 px", and it closes by the chip being the only thing left in that
+     band rather than by anything being fixed. **The other §9 wall entry — the
+     language picker and undo on the five biggest doors — is NOT about the grip
+     bar and stays open.**
+     ⚠ NAMING AN EXEMPTION RATHER THAN SKIPPING BLANKET IS STILL THE POINT, and
+     is why this one could be removed with confidence: it said which viewports
+     and which control, so establishing that it had no subject left took one
+     reading rather than an argument. */
   {
     await p.goto(`file://${process.cwd()}/index.html`
                + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=plain&s=extra2&h=right-in');
     await p.waitForTimeout(400);
     const wall = await p.evaluate(() => {
       const seen = [], bad = [];
-      for (const sel of ['#grip-rot', '#grip-home', '#price-toggle', '#quote-wa',
+      for (const sel of ['#price-toggle', '#quote-wa',
                          '#undo-btn', '#redo-btn']) {
         const el = document.querySelector(sel);
         if (!el) continue;
@@ -2160,17 +1935,17 @@ for (const v of VIEWS) {
       }
       return { seen, bad };
     });
-    /* §5.15: the door above was chosen BECAUSE it shows the grip controls. If
-       it stops showing them this check has quietly become an empty loop. */
-    if (!wall.seen.includes('#grip-rot')) {
-      fault(v.name, 'the wall check found no grip controls on a door that carries '
-        + 'a rotatable bar — it is measuring nothing');
+    /* ⚠ §5.15, RESTATED RATHER THAN DROPPED. It used to require `#grip-rot` to
+       have been seen, because that control was the reason for the fixture; the
+       guard is now on the two that remain, and it is the same guard. A wall
+       check that finds nothing in the wall is an empty loop whatever is
+       missing from it. */
+    for (const need of ['#price-toggle', '#undo-btn']) {
+      if (!wall.seen.includes(need)) {
+        fault(v.name, `the wall check never saw ${need} — it is measuring nothing`);
+      }
     }
-    for (const b of wall.bad) {
-      if ((v.name === 'narrow-d' || v.name === 'cusp')
-          && b.startsWith('#grip-rot')) continue;
-      fault(v.name, `a control in the wall cannot be pressed: ${b}`);
-    }
+    for (const b of wall.bad) fault(v.name, `a control in the wall cannot be pressed: ${b}`);
   }
 
   await p.close();
@@ -2617,7 +2392,7 @@ for (const v of VIEWS) {
        `visibility`, not `display`, so nothing reflows and the stage keeps the
        size the rest of this block already measured. */
     await pg.addStyleTag({ content:
-      '.trust, .stage__hud, .quote, .hint, .grip-bar, .toast '
+      '.trust, .stage__hud, .quote, .hint, .toast '
       + '{ visibility: hidden !important; }' });
     await pg.waitForTimeout(60);
     await pg.screenshot({ path: '/tmp/audit-floor.png',

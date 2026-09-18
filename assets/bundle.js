@@ -92,24 +92,16 @@
       "Выбирайте детали и смотрите, как меняется дверь"
     ],
     "stage.label": ["הדלת שלכם", "Your door", "Ваша дверь"],
-    "grip.drag": [
-      "גררו את הידית למקום שתרצו",
-      "Drag the handle where you want it",
-      "Перетащите ручку туда, где она вам нужна"
-    ],
-    "grip.rotate": ["סובבו", "Rotate", "Повернуть"],
-    "grip.home": ["למקום המקורי", "Put it back", "Вернуть на место"],
-    "grip.aria": [
-      "מיקום הידית. גררו, או הזיזו עם מקשי החיצים",
-      "Handle position. Drag it, or move it with the arrow keys",
-      "Положение ручки. Перетащите или сдвиньте стрелками"
-    ],
-    "grip.ariaAt": ["מיקום הידית {0}", "Handle position {0}", "Положение ручки {0}"],
-    "grip.tooLong": [
-      "הידית הזו ארוכה מרוחב הדלת — אפשר לסובב רק ידית שנכנסת בין המזוזות",
-      "This handle is longer than the door is wide — only a handle that fits between the jambs can be turned",
-      "Эта ручка длиннее ширины двери — повернуть можно только ту, что помещается между косяками"
-    ],
+    /* ⚠ SEVEN GRIP KEYS AND `notice.moved` CAME OUT ON 18.9.2026 with the drag,
+       the rotate button and the home button: `grip.drag`, `grip.rotate`,
+       `grip.home`, `grip.aria`, `grip.ariaAt`, `grip.tooLong`,
+       `grip.illustrative`, `addendum.shifted`, `fix.gripMoved` and
+       `fix.gripHome`. Every one of them was about a position a customer could
+       set, and no customer can. `fix.gripGone` and `addendum.flat` STAY — a door
+       with nowhere to put the chosen handle still drops it and still says so,
+       and a bar that lies across the leaf is still something Peretz drills for.
+       Named here rather than deleted in silence, because a key that comes back
+       under an old name is a string nobody can find the history of. */
     "undo": ["ביטול השינוי האחרון", "Undo the last change", "Отменить последнее изменение"],
     "undo.group": ["ביטול וחזרה", "Undo and redo", "Отменить и вернуть"],
     "redo": ["החזרת השינוי", "Redo the change", "Вернуть изменение"],
@@ -600,11 +592,6 @@
       "Some options in that link are unavailable — showing the closest match.",
       "Некоторые параметры из ссылки недоступны — показываем ближайшее."
     ],
-    "notice.moved": [
-      "{0} — הזזנו למקום הקרוב שאפשר",
-      "{0} — moved it to the nearest place that works",
-      "{0} — сдвинули в ближайшее подходящее место"
-    ],
     /* ── why a tile is greyed out, and what a repair just did ─────────
        ⚠ THESE ARE THE STRINGS A CUSTOMER READS AT THE MOMENT SOMETHING
        REFUSES THEM, which makes them the ones a bad translation costs the
@@ -645,8 +632,6 @@
     "fix.grilleGone": ["הסרנו את הסורג — אין חלון", "We removed the grille — there is no window", "Мы убрали решётку — окна нет"],
     "fix.gripGone": ["הסרנו את ידית המשיכה — אין לה מקום כאן", "We removed the pull handle — there is no room for it here", "Мы убрали ручку-скобу — для неё здесь нет места"],
     "fix.locksetSwapped": ["החלפנו את המנעול — אין לו מקום ליד המאחז", "We swapped the lockset — there is no room for it beside the grip", "Мы заменили замок — рядом со скобой ему нет места"],
-    "fix.gripMoved": ["הזזנו את הידית — במקום שבחרתם היא כבר לא מתאימה", "We moved the handle — where you put it no longer works", "Мы сдвинули ручку — на выбранном месте она больше не подходит"],
-    "fix.gripHome": ["הידית הוסרה, ואיתה המיקום שבחרתם לה", "The handle is gone, and with it the place you chose for it", "Ручка убрана, а вместе с ней и выбранное для неё место"],
     "fix.setWindow": ["התאמנו את החלון — הסט היווני מגיע עם חלון מלבני משלו", "We adjusted the window — the Greek set comes with a rectangular one of its own", "Мы изменили окно — у греческого комплекта своё прямоугольное"],
     /* ⚠ `fix.setGone` USED TO ANSWER FOR THIS TOO AND IT IS THE WRONG SENTENCE.
        Stripes and a panel want the same face, so asking for stripes clears the
@@ -764,12 +749,6 @@
       "Note: the pull handle is fitted across the door",
       "Примечание: ручка-скоба ставится поперёк двери"
     ],
-    "addendum.shifted": [
-      "מיקום הידית: הזזתי אותה ממקומה הרגיל. {0}, והמיקום המדויק בקישור.",
-      "Handle position: I moved it from where it normally sits. {0}, and the exact spot is in the link.",
-      "Положение ручки: я сдвинул её с обычного места. {0}, точная позиция — по ссылке."
-    ],
-    "grip.illustrative": ["להמחשה — נקבע בהתקנה", "illustrative — set at fitting", "ориентировочно — уточняется при установке"],
     /* ── the order sheet's row names ──────────────────────────────── */
     "row.colour": ["צבע", "Colour", "Цвет"],
     "row.window": ["חלון", "Window", "Окно"],
@@ -5169,13 +5148,8 @@ ${body}
     </g>`;
   }
   var gripOf = (state2) => ({ ...byId(HANDLES, state2.handle), len: handleLength(state2) });
-  var gripIsFixed = (state2) => !!gripOf(state2).fixed;
   function gripAt(state2) {
-    const home = gripHome(state2);
-    const g = state2.grip;
-    if (!g || gripOf(state2).fixed) return home;
-    const rot = g.rot === 90 && gripCanRotate(state2) ? 90 : 0;
-    return { x: g.x, y: g.y, rot };
+    return gripHome(state2);
   }
   function gripFeet(state2, place = null) {
     const size = SIZES[state2.size] || SIZES.standard;
@@ -6711,22 +6685,11 @@ ${body}
     const foot = handleFootprint(handle, leafH, panelled);
     const turned = rot === 90 ? ` transform="rotate(90 ${cx} ${cy})"` : "";
     const box = rot === 90 ? { out: foot.vy, in: foot.vy, vy: Math.max(foot.out, foot.in) } : foot;
-    const padL = own ? own.x : cx - (dir > 0 ? foot.out : foot.in);
-    const padR = own ? own.x + own.w : cx + (dir > 0 ? foot.in : foot.out);
-    const padW = padR - padL, padH = own ? own.h : foot.vy * 2;
-    const padCx = (padL + padR) / 2;
-    const padCy = own ? own.y + own.h / 2 : foot.atY != null ? y0 + leafH * foot.atY : cy;
-    const pad = `<rect data-hitpad="1" x="${padL}" y="${padCy - padH / 2}"
-                     width="${padW}" height="${padH}"
-                     data-cx="${padCx}" data-cy="${padCy}" data-w="${padW}" data-h="${padH}"
-                     fill="transparent" pointer-events="all"/>`;
-    const ring = `<rect data-chrome="focus" x="${padL}" y="${padCy - padH / 2}"
-                      width="${padW}" height="${padH}" rx="6"
-                      fill="none" pointer-events="none"/>`;
+    const atY = own ? own.y + own.h / 2 : foot.atY != null ? y0 + leafH * foot.atY : cy;
     return `<g data-hw="handle" data-style="${handle.style}" data-len="${foot.vy * 2}"
-             data-cx="${cx}" data-cy="${cy}" data-aty="${padCy}"
+             data-cx="${cx}" data-cy="${cy}" data-aty="${atY}"
              data-out="${box.out}" data-in="${box.in}"
-             data-vy="${box.vy}" data-rot="${rot}"${turned}>${pad}${art}${ring}</g>`;
+             data-vy="${box.vy}" data-rot="${rot}"${turned}>${art}</g>`;
   }
   var lockAff = (lockset) => lockset.style === "cylinder" ? CYLINDER_AFF : HANDLE_AFF;
   function locksetArt(lockset, cx, cy, dir) {
@@ -7976,8 +7939,11 @@ ${body}
     grilleGone: "fix.grilleGone",
     gripGone: "fix.gripGone",
     locksetSwapped: "fix.locksetSwapped",
-    gripMoved: "fix.gripMoved",
-    gripHome: "fix.gripHome",
+    /* `gripMoved` and `gripHome` are gone with the position itself, 18.9.2026.
+       They announced a repair that walked a stale `gp=` to the nearest place
+       that still worked; there is no stale position now, because there is no
+       position a customer can set. `gripGone` above STAYS — a door with nowhere
+       to put the chosen handle still drops the handle, and still says so. */
     setWindow: "fix.setWindow",
     setGone: "fix.setGone",
     faceGone: "fix.faceGone",
@@ -8116,20 +8082,6 @@ ${body}
         change("handle", SAID.gripGone);
       }
     }
-    if (s.grip) {
-      if (byId(HANDLES, s.handle).style === "none" || byId(HANDLES, s.handle).fixed) {
-        s.grip = null;
-        change("grip", SAID.gripHome);
-      } else {
-        const want = { ...s.grip, rot: s.grip.rot === 90 && gripCanRotate(s) ? 90 : 0 };
-        let near = gripPlacement(s, want).ok ? want : nearestGrip(s, want);
-        if (!gripPlacement(s, near).ok) near = gripHome(s);
-        if (near.x !== s.grip.x || near.y !== s.grip.y || near.rot !== s.grip.rot) {
-          s.grip = near;
-          change("grip", SAID.gripMoved);
-        }
-      }
-    }
     if (!isGlazed(s)) {
       if (s.grille !== "none") {
         s.grille = "none";
@@ -8211,10 +8163,6 @@ ${body}
     p.set("d", state2.detail);
     p.set("s", state2.size);
     p.set("h", state2.handing);
-    if (state2.grip) {
-      const g = state2.grip;
-      p.set("gp", `${Math.round(g.x)},${Math.round(g.y)},${g.rot === 90 ? 90 : 0}`);
-    }
     return "?" + p.toString();
   }
   function fromQuery(search) {
@@ -8236,7 +8184,6 @@ ${body}
       "d",
       "s",
       "h",
-      "gp",
       "bl",
       "ey",
       "code",
@@ -8244,7 +8191,7 @@ ${body}
       "sheet",
       "lang"
     ]);
-    const RETIRED = /* @__PURE__ */ new Set(["f", "a", "z", "i"]);
+    const RETIRED = /* @__PURE__ */ new Set(["f", "a", "z", "i", "gp"]);
     for (const key of p.keys()) {
       if (!KNOWN.has(key) && !RETIRED.has(key)) notice = notice || "option-unknown";
     }
@@ -8307,13 +8254,6 @@ ${body}
       const asSize = SIZE_ALIAS[rawSize] || rawSize;
       if (Object.prototype.hasOwnProperty.call(SIZES, asSize)) state2.size = asSize;
       else notice = notice || "option-unknown";
-    }
-    const rawGrip = p.get("gp");
-    if (rawGrip != null) {
-      const [gx, gy, gr] = rawGrip.split(",").map(Number);
-      if ([gx, gy].every(Number.isFinite)) {
-        state2.grip = { x: gx, y: gy, rot: gr === 90 ? 90 : 0 };
-      }
     }
     return { ...settle(state2, notice), carries };
   }
@@ -8456,35 +8396,12 @@ ${body}
     return window.location.href.split(/[?#]/)[0] + toQuery(state2);
   }
   function gripDeparture(state2) {
-    if (byId(HANDLES, state2.handle).style === "none") {
-      return { flat: false, shifted: false, moved: false };
-    }
-    const home = gripHome(state2), now = gripAt(state2);
-    const shifted = now.x !== home.x || now.y !== home.y;
-    return { flat: now.rot === 90, shifted, moved: shifted || now.rot !== home.rot };
+    if (byId(HANDLES, state2.handle).style === "none") return { flat: false };
+    return { flat: gripAt(state2).rot === 90 };
   }
-  var gripIllustrative = () => T("grip.illustrative");
   function gripAddendum(state2) {
-    const { flat, shifted } = gripDeparture(state2);
-    return [
-      /* TWO FACTS, and they are not the same KIND of fact.
-      
-             THE BAR LIES DOWN is something Peretz BUILDS TO — a horizontal pull is
-             different drilling from an upright one — so it rides on the handle's own
-             spec row, added here because `js/spec.js` cannot see it: the grip
-             geometry lives in the renderer, and rows that imported it would make
-             `renderer -> spec -> renderer` a cycle. It is named whenever it is true,
-             not only when somebody asked: `gripHome` lays a bar down by itself where
-             nothing upright fits, on 88 designs nobody has touched.
-      
-             THE BAR IS NOT IN THE USUAL PLACE is a PICTURE of what the customer had
-             in mind. It was ruled from outside that the position is not a
-             specification and that the final spot is set on site — which is exactly
-             why it is an ADDENDUM here and not a row in the spec. The stage says the
-             same thing under the door, in the same words, from `GRIP_ILLUSTRATIVE`. */
-      ...flat ? [T("addendum.flat")] : [],
-      ...shifted ? [T("addendum.shifted", gripIllustrative())] : []
-    ];
+    const { flat } = gripDeparture(state2);
+    return flat ? [T("addendum.flat")] : [];
   }
   function message(state2, chosen = false) {
     const spoke = CUSTOMER_LANG_NOTE[lang()];
@@ -9014,15 +8931,6 @@ ${body}
     if (PLACEHOLDER2) $("#placeholder-note").hidden = false;
     if (notice) showNotice(notice, said);
     $("#copy-btn").addEventListener("click", onCopy);
-    $("#grip-rot").addEventListener("click", () => {
-      if (!gripCanRotate(state)) {
-        toast(T("grip.tooLong"));
-        return;
-      }
-      const now = gripAt(state);
-      placeGrip({ ...now, rot: now.rot === 90 ? 0 : 90 }, true);
-    });
-    $("#grip-home").addEventListener("click", () => set({ ...state, grip: null }));
     $("#undo-btn").addEventListener("click", undo);
     $("#redo-btn").addEventListener("click", redo);
     $("#save-btn").addEventListener("click", saveCurrent);
@@ -9129,7 +9037,7 @@ ${body}
       b.setAttribute("aria-label", describe(st));
       b.innerHTML = `<span class="work__art" aria-hidden="true"></span><span class="work__meta"><span class="work__name">${L(byId(COLOURS, st.colour))}</span><span class="work__price">${formatAgorot(priceAgorot(st))}</span></span>`;
       b.addEventListener("click", () => {
-        set({ ...DEFAULTS, ...w.state, grip: null });
+        set({ ...DEFAULTS, ...w.state });
         closeWorks();
         toast(T("saved.loaded"));
       });
@@ -9922,145 +9830,8 @@ ${body}
     document.documentElement.classList.add("is-live");
     document.documentElement.classList.toggle("is-untouched", isUntouched(state) && !engaged);
     announce(describe(state));
-    armGrip();
     $("#undo-btn").disabled = !canUndo();
     $("#redo-btn").disabled = !canRedo();
-  }
-  var dragging = null;
-  var swallowTouch = (ev) => ev.preventDefault();
-  function armGrip() {
-    const bar = $("#grip-bar");
-    const g = $('#stage svg [data-hw="handle"]');
-    bar.hidden = !g || gripIsFixed(state);
-    if (!g || gripIsFixed(state)) return;
-    g.classList.add("grip-live");
-    g.setAttribute("tabindex", "0");
-    g.setAttribute("role", "button");
-    g.setAttribute("aria-label", T("grip.aria"));
-    g.addEventListener("pointerdown", onGripDown);
-    g.addEventListener("keydown", onGripKey);
-    g.addEventListener("touchstart", swallowTouch, { passive: false });
-    g.addEventListener("touchmove", swallowTouch, { passive: false });
-    const rot = $("#grip-rot");
-    rot.hidden = !gripCanRotate(state);
-    sizeHitPad();
-    const { moved } = gripDeparture(state);
-    $("#grip-home").hidden = !moved;
-    $(".grip-bar__hint").textContent = moved ? T("grip.ariaAt", gripIllustrative()) : T("grip.drag");
-  }
-  var TOUCH_TARGET = 44;
-  function sizeHitPad() {
-    const svg = $("#stage svg");
-    const pad = svg && svg.querySelector("[data-hitpad]");
-    if (!pad) return;
-    const m = svg.getScreenCTM();
-    if (!m || !m.a || !m.d) return;
-    const mmPerPx = { x: 1 / Math.abs(m.a), y: 1 / Math.abs(m.d) };
-    const cx = Number(pad.dataset.cx), cy = Number(pad.dataset.cy);
-    const w = Math.max(Number(pad.dataset.w), (TOUCH_TARGET + 0.5) * mmPerPx.x);
-    const h = Math.max(Number(pad.dataset.h), (TOUCH_TARGET + 0.5) * mmPerPx.y);
-    pad.setAttribute("x", cx - w / 2);
-    pad.setAttribute("y", cy - h / 2);
-    pad.setAttribute("width", w);
-    pad.setAttribute("height", h);
-  }
-  function leafPoint(svg, ev) {
-    const pt = svg.createSVGPoint();
-    pt.x = ev.clientX;
-    pt.y = ev.clientY;
-    const q = pt.matrixTransform(svg.getScreenCTM().inverse());
-    const leaf = svg.querySelector("#leaf rect").getBBox();
-    return { x: q.x - leaf.x, y: q.y - leaf.y, leaf };
-  }
-  var hingeLeft = () => byId(HANDINGS, state.handing).hinge === "left";
-  var fromEdge = (x, leafW) => hingeLeft() ? leafW - x : x;
-  function onGripDown(ev) {
-    const svg = $("#stage svg");
-    const g = ev.currentTarget;
-    const p = leafPoint(svg, ev);
-    const now = gripAt(state);
-    dragging = {
-      g,
-      svg,
-      leaf: p.leaf,
-      cx0: Number(g.dataset.cx),
-      cy0: Number(g.dataset.cy),
-      /* Where inside the handle they took hold, so it does not jump to centre
-         itself under the finger the moment it moves. */
-      dx: p.x - fromEdge(now.x, p.leaf.width),
-      dy: p.y - now.y,
-      rot: now.rot,
-      at: now
-    };
-    try {
-      g.setPointerCapture(ev.pointerId);
-    } catch {
-    }
-    window.addEventListener("pointermove", onGripMove, { passive: false });
-    window.addEventListener("pointerup", onGripUp);
-    window.addEventListener("pointercancel", onGripAbandon);
-    ev.preventDefault();
-  }
-  function unhook() {
-    window.removeEventListener("pointermove", onGripMove);
-    window.removeEventListener("pointerup", onGripUp);
-    window.removeEventListener("pointercancel", onGripAbandon);
-  }
-  var snap = (v) => Math.round(v / 5) * 5;
-  function onGripMove(ev) {
-    if (!dragging) return;
-    const { svg, leaf, g } = dragging;
-    const p = leafPoint(svg, ev);
-    const want = {
-      x: snap(fromEdge(p.x - dragging.dx, leaf.width)),
-      y: snap(p.y - dragging.dy),
-      rot: dragging.rot
-    };
-    dragging.at = want;
-    const fit = gripPlacement(state, want);
-    g.classList.toggle("grip-bad", !fit.ok);
-    const sx = leaf.x + fromEdge(want.x, leaf.width), sy = leaf.y + want.y;
-    g.setAttribute(
-      "transform",
-      (want.rot === 90 ? `rotate(90 ${sx} ${sy}) ` : "") + `translate(${(sx - dragging.cx0).toFixed(1)} ${(sy - dragging.cy0).toFixed(1)})`
-    );
-    ev.preventDefault();
-  }
-  function onGripUp() {
-    if (!dragging) return;
-    const { at } = dragging;
-    dragging = null;
-    unhook();
-    placeGrip(at, true);
-  }
-  function onGripAbandon() {
-    if (!dragging) return;
-    const { g } = dragging;
-    dragging = null;
-    unhook();
-    g.classList.remove("grip-bad");
-    g.removeAttribute("transform");
-    if (gripAt(state).rot === 90) {
-      g.setAttribute("transform", `rotate(90 ${g.dataset.cx} ${g.dataset.cy})`);
-    }
-  }
-  function placeGrip(want, saySo) {
-    const fit = gripPlacement(state, want);
-    let at = fit.ok ? want : nearestGrip(state, want);
-    if (!gripPlacement(state, at).ok) at = gripHome(state);
-    set({ ...state, grip: at });
-    if (!fit.ok && saySo) toast(T("notice.moved", fit.why));
-    const g = $('#stage svg [data-hw="handle"]');
-    if (g) g.focus({ preventScroll: true });
-  }
-  function onGripKey(ev) {
-    const step2 = ev.shiftKey ? 50 : 10;
-    const now = gripAt(state);
-    const move = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[ev.key];
-    if (!move) return;
-    const dir = hingeLeft() ? -1 : 1;
-    placeGrip({ x: now.x + move[0] * step2 * dir, y: now.y + move[1] * step2, rot: now.rot }, false);
-    ev.preventDefault();
   }
   function markGroup(g, blocked) {
     const chosen = [state[g.key]];
@@ -10196,7 +9967,6 @@ ${body}
       "viewBox",
       `${(fx + (w - vw) / 2).toFixed(1)} ${(fy + (h - vh) / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`
     );
-    sizeHitPad();
     const frame = svg.querySelector("#frame");
     const frameR = frame ? frame.getBoundingClientRect() : null;
     const baseY = Number(svg.dataset.baseY);

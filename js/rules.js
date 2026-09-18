@@ -55,8 +55,8 @@ import { T } from './copy.js';
 import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, LOCKSETS,
          STRIPE_MAX, WINDOWS }
   from './catalog.js';
-import { gripCanRotate, gripClashesLockset, gripFitsAnywhere, gripHome,
-         bellFits, gripPlacement, nearestGrip, panelFits,
+import { gripClashesLockset, gripFitsAnywhere,
+         bellFits, panelFits,
          peepholeFits } from './renderer.js';
 
 /** Does this detail put ruled line work on the face?
@@ -549,8 +549,11 @@ const SAID = {
   grilleGone:    'fix.grilleGone',
   gripGone:      'fix.gripGone',
   locksetSwapped:'fix.locksetSwapped',
-  gripMoved:     'fix.gripMoved',
-  gripHome:      'fix.gripHome',
+  /* `gripMoved` and `gripHome` are gone with the position itself, 18.9.2026.
+     They announced a repair that walked a stale `gp=` to the nearest place
+     that still worked; there is no stale position now, because there is no
+     position a customer can set. `gripGone` above STAYS — a door with nowhere
+     to put the chosen handle still drops the handle, and still says so. */
   setWindow:     'fix.setWindow',
   setGone:       'fix.setGone',
   faceGone:      'fix.faceGone',
@@ -825,41 +828,19 @@ export function repair(state, intent = null) {
     else { s.handle = 'none'; change('handle', SAID.gripGone); }
   }
 
-  /* THE GRIP THE CUSTOMER MOVED, on a door that has changed under it.
-     A position is chosen against one arrangement of windows, panels and lock
-     furniture, and every one of those can change afterwards — from a tile, or
-     from a link written weeks ago. So the position is re-asked here rather
-     than trusted, and moved to the nearest place that still works. It is the
-     same `nearestGrip` the drag uses on release; a design arriving down a link
-     and a design arriving from a click must not be able to disagree about
-     where a handle can stand.
-     A grip that is gone takes its position with it, and a bar that can no
-     longer be turned comes back upright — otherwise a stale `gp=` in a URL
-     would carry a rotation the leaf cannot take. */
-  if (s.grip) {
-    /* ⚠ A GRIP CUT INTO THE LEAF DROPS ITS POSITION HERE TOO, not only in
-       `gripAt`. The drawing already ignores `gp=` for the recessed channel —
-       but a design that CARRIES a position it will never honour is the same
-       shape of lie as the retired `f=` parameter, and `toQuery` would write it
-       straight back out for the next person who opens the link. Dropped, and
-       said out loud, because the customer may well have dragged the previous
-       grip before choosing this one. */
-    if (byId(HANDLES, s.handle).style === 'none' || byId(HANDLES, s.handle).fixed) {
-      s.grip = null;
-      change('grip', SAID.gripHome);
-    } else {
-      const want = { ...s.grip, rot: s.grip.rot === 90 && gripCanRotate(s) ? 90 : 0 };
-      let near = gripPlacement(s, want).ok ? want : nearestGrip(s, want);
-      /* And home when even that finds nowhere: the search has a fixed budget,
-         and a link can carry a position on a door that has changed out of all
-         recognition under it. */
-      if (!gripPlacement(s, near).ok) near = gripHome(s);
-      if (near.x !== s.grip.x || near.y !== s.grip.y || near.rot !== s.grip.rot) {
-        s.grip = near;
-        change('grip', SAID.gripMoved);
-      }
-    }
-  }
+  /* ⚠ THE WHOLE "THE GRIP THE CUSTOMER MOVED" BRANCH IS GONE — 18.9.2026, and
+     it is worth saying what it did so nobody rebuilds it. A position chosen
+     against one arrangement of windows, panels and lock furniture could be
+     invalidated by any later change, from a tile or from a link written weeks
+     before, so `repair` re-asked it every time and walked it to the nearest
+     place that still worked. That was correct while a customer could choose a
+     position. They cannot: the handle has exactly one, `gripAt` returns it,
+     and it is recomputed from the state on every render — so there is nothing
+     stale to repair and no way for a link and a click to disagree.
+     What did NOT go is the branch above this one: a door with nowhere at all
+     to put the chosen handle still drops the handle, or the window if the
+     handle is what the customer just tapped. That is the refusal, and it is
+     the half that matters. */
 
   /* LAST, and only once ALL the glass is gone. This used to run straight after
      the line-work repair, which was too early: three of the repairs below it

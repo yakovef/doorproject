@@ -181,26 +181,27 @@ export function shareUrl(state) {
  * comment prose there would cost a three-minute regeneration of 110 sheets for
  * a change that draws nothing. `app.js` already imports this file.
  */
+/* ⚠ `shifted` AND `moved` ARE GONE — 18.9.2026. They asked whether the
+   customer had moved the handle, and a customer cannot: the drag, the rotate
+   button and the home button went at the owner's instruction and `gripAt` now
+   returns one position computed from the state.
+   `flat` STAYS, and the distinction is the whole reason this function survives
+   rather than being deleted with them. A bar lying on its side is something
+   Peretz BUILDS TO — horizontal drilling rather than upright — and `gripHome`
+   still lays one down by itself where nothing upright fits. That is a fact
+   about the DOOR. "The customer put it somewhere unusual" was a fact about
+   their afternoon, and there is no longer such a fact to state. */
 export function gripDeparture(state) {
-  if (byId(HANDLES, state.handle).style === 'none') {
-    return { flat: false, shifted: false, moved: false };
-  }
-  const home = gripHome(state), now = gripAt(state);
-  const shifted = now.x !== home.x || now.y !== home.y;
-  return { flat: now.rot === 90, shifted, moved: shifted || now.rot !== home.rot };
+  if (byId(HANDLES, state.handle).style === 'none') return { flat: false };
+  return { flat: gripAt(state).rot === 90 };
 }
 
-/**
- * ONE sentence, in two places that must not drift.
- *
- * The stage says this under the door the moment a handle is dragged, and the
- * order says it to Peretz. They are the same promise — that where the bar ends
- * up is settled on site — and two hand-kept Hebrew literals making one promise
- * is this codebase's characteristic bug, which is a poor thing to introduce in
- * the fix whose whole thesis is that a second hand-written copy is how the
- * first one came to be wrong.
- */
-export const gripIllustrative = () => T('grip.illustrative');
+/* ⚠ `gripIllustrative` IS GONE — 18.9.2026. It was one sentence with two
+   readers that must not drift: the stage said it under the door the moment a
+   handle was dragged, and the order said it to Peretz. Both readers went with
+   the drag, so the sentence has nobody to say it to. The ARGUMENT for having
+   written it once is untouched and is why `drawingCaveat` and `priceCaveat`
+   beside it are still shaped this way. */
 
 /**
  * The grip, and its finish ON THE LINE THAT NAMES THE THING THAT HAS ONE.
@@ -241,26 +242,20 @@ export const gripIllustrative = () => T('grip.illustrative');
    him in the WhatsApp and vanished from the sheet he would actually take to
    the workshop — the two readers of one door disagreeing again. */
 export function gripAddendum(state) {
-  const { flat, shifted } = gripDeparture(state);
-  return [
-    /* TWO FACTS, and they are not the same KIND of fact.
-
-       THE BAR LIES DOWN is something Peretz BUILDS TO — a horizontal pull is
-       different drilling from an upright one — so it rides on the handle's own
-       spec row, added here because `js/spec.js` cannot see it: the grip
-       geometry lives in the renderer, and rows that imported it would make
-       `renderer -> spec -> renderer` a cycle. It is named whenever it is true,
-       not only when somebody asked: `gripHome` lays a bar down by itself where
-       nothing upright fits, on 88 designs nobody has touched.
-
-       THE BAR IS NOT IN THE USUAL PLACE is a PICTURE of what the customer had
-       in mind. It was ruled from outside that the position is not a
-       specification and that the final spot is set on site — which is exactly
-       why it is an ADDENDUM here and not a row in the spec. The stage says the
-       same thing under the door, in the same words, from `GRIP_ILLUSTRATIVE`. */
-    ...(flat ? [T('addendum.flat')] : []),
-    ...(shifted ? [T('addendum.shifted', gripIllustrative())] : []),
-  ];
+  const { flat } = gripDeparture(state);
+  /* ONE FACT NOW, and it is the one Peretz builds to: a horizontal pull is
+     different drilling from an upright one. It rides on the handle's own spec
+     row, added here because `js/spec.js` cannot see it — the grip geometry
+     lives in the renderer, and rows that imported it would make
+     `renderer -> spec -> renderer` a cycle. It is named whenever it is true
+     rather than when somebody asked for it: `gripHome` lays a bar down by
+     itself where nothing upright fits.
+     ⚠ THE SECOND NOTE IS GONE WITH THE DRAG. It said the bar was not in the
+     usual place and that the final spot is settled on site, which was a
+     PICTURE of what the customer had in mind rather than an instruction. There
+     is no such picture to send any more, and a sentence about a position
+     nobody chose is the clarifying question `PLAN.md` §0 exists to prevent. */
+  return flat ? [T('addendum.flat')] : [];
 }
 
 /**

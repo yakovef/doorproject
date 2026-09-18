@@ -2193,53 +2193,62 @@ group('a handle on a frame is refused, and told why');
   }
 }
 
-group('the handle position rides in the link and not in the code');
+/* ⚠ THIS WAS "the handle position rides in the link and not in the code", and
+   the position is gone — 18.9.2026. The group is RESTATED rather than deleted,
+   because what it used to prove is exactly what has to stay true of a RETIRED
+   parameter, and T5's shape says a retired id must still resolve to a
+   buildable door.
+
+   What it used to claim: `toQuery` writes `gp=`, `fromQuery` brings it back,
+   an impossible position is repaired, a rotation the leaf cannot take comes
+   back upright, and the short code never carries any of it.
+
+   What it claims now: none of that is written, a link that still carries it
+   opens the door it names WITHOUT a notice, and the short code is unaffected —
+   which it always was, and which is the whole reason no `VERSION` bump was
+   needed to withdraw the parameter. */
+group('`gp` is a retired parameter, and a link still carrying it is not an error');
 {
-  /* A position the door can actually take, so that what is being tested is
-     the round trip and not `repair` doing its job on the way in.
-     ⚠ AND ON A DOOR THAT HAS A GRIP TO POSITION. The fixture was `DEFAULTS`,
-     and DEFAULTS is a bare door now — no window, no grip, no lock furniture —
-     so `repair` correctly dropped the position on the way back in and this
-     read as the round trip losing it. A test of "does `gp=` survive the link"
-     has to be run on a door where `gp=` means something; the assertion is
-     unchanged. */
   const draggable = { ...DEFAULTS, handle: 'idan' };
-  const spot = { ...gripHome(draggable), y: gripHome(draggable).y - 100 };
-  ok(gripPlacement(draggable, spot).ok, 'the fixture position should be buildable');
-  const moved = { ...draggable, grip: spot };
-  const q = toQuery(moved);
-  ok(q.includes('gp='), `the link should carry the position, got ${q}`);
-  const back = fromQuery(q);
-  ok(back.state.grip && back.state.grip.x === spot.x && back.state.grip.y === spot.y,
-     `the link should bring the position back, got ${JSON.stringify(back.state.grip)}`);
+  const q = toQuery(draggable);
+  ok(!q.includes('gp='), `the link must not carry a position any more, got ${q}`);
   ok(!toQuery(DEFAULTS).includes('gp='),
-     'a door nobody dragged should produce exactly the link it always did');
+     'and neither should the default door');
 
-  /* DELIBERATE, and the reason is worth an assertion rather than a comment:
-     the code is read down a telephone as a specification, and the owner's son
-     ruled that the position is a picture rather than something his father
-     builds to. Carrying it would also have cost a VERSION bump and every code
-     written so far. If that decision is ever reversed, this line fails and
-     says where to look. */
-  /* ⚠ AGAINST `draggable`, NOT `DEFAULTS` — the same door WITHOUT the
-     position, which is the only comparison that says what this claims. It read
-     `encodeCode(DEFAULTS)` while the fixture WAS the default door; the default
-     is a bare leaf now and `moved` differs from it by the handle as well, so
-     the codes differed for a reason that has nothing to do with the position
-     and the assertion would have been "fixed" by weakening it. */
-  ok(encodeCode(moved) === encodeCode(draggable),
-     'the short code must NOT carry the handle position');
+  /* ⚠ THE LINK A CUSTOMER ALREADY SENT. This is the half that matters: `gp=`
+     is in `KNOWN`, so it must be swallowed in SILENCE. A red strip saying an
+     option could not be read, about a door that is perfectly correct, is our
+     change charged to their mistake — the same rule that governs `f`, `a`, `z`
+     and `i`. */
+  const old = fromQuery(toQuery(draggable) + '&gp=285,1280,90');
+  ok(old.notice === null,
+     `an old link carrying gp= must open without a notice, got ${old.notice}`);
+  ok(old.state.grip === undefined,
+     `and must not put the position back into the state, got ${JSON.stringify(old.state.grip)}`);
+  ok(old.state.handle === 'idan',
+     'and the door it names is still the door it names');
+  /* ⚠ INCLUDING A POSITION THAT WAS NEVER BUILDABLE. The old reader repaired
+     these; the new one never looks, so a hand-edited link cannot produce
+     anything at all. */
+  const wild = fromQuery(toQuery(draggable) + '&gp=-900,99999,90');
+  ok(wild.notice === null && wild.state.handle === 'idan',
+     'and an impossible one is ignored just as quietly');
 
-  /* A link with the handle somewhere impossible opens on a real door. Also on
-     `draggable`: a position on a door with no grip is dropped by `repair`
-     before this can test anything, which is correct and is not this test. */
-  const wild = fromQuery(toQuery({ ...draggable, grip: { x: 300, y: 300, rot: 0 } }));
-  ok(gripPlacement(wild.state).ok, 'a link with an impossible handle position must be repaired');
+  /* The code was never the position's carrier, and that is why withdrawing the
+     parameter cost no `VERSION` bump. Asserted from both ends: the code for a
+     door is unchanged by anything `gp=` could have said. */
+  ok(encodeCode(fromQuery(toQuery(draggable) + '&gp=285,1280,90').state)
+     === encodeCode(draggable),
+     'the short code is unaffected by a gp= a link still carries');
 
-  /* And rotation only survives where it fits. */
-  const turned = fromQuery(toQuery({ ...DEFAULTS, handle: 'shahar', grip: { x: 160, y: 1030, rot: 90 } }));
-  ok(!gripCanRotate(turned.state), 'shahar is longer than a standard leaf is wide');
-  ok(gripAt(turned.state).rot === 0, 'a rotation the leaf cannot take must come back upright');
+  /* ⚠ AND IT IS SILENT FOR THE RIGHT REASON, WHICH IS WORTH ITS OWN CHECK.
+     A parameter nobody has heard of MUST raise `option-unknown` — that is the
+     whole of `PLAN.md` §8.2, a customer is told rather than quietly given a
+     different door. So the two behaviours are asserted side by side: `gp`
+     quiet, an invented name loud. Without the second, "quiet" could be the
+     notice having stopped working altogether. */
+  ok(fromQuery(toQuery(draggable) + '&nosuchparam=1').notice === 'option-unknown',
+     'a parameter nobody has heard of must still raise a notice');
 }
 
 /* The finish must reach the METAL, not merely change the document.
@@ -2687,22 +2696,17 @@ group('rules: nothing unbuildable can be reached');
      Asserted at the boundary the page actually reads. */
   ok(link.said.length, 'a repaired link must carry the sentences that explain it');
 
-  {
-    const solid = { ...DEFAULTS };
-    const DESIGN = ['colour', 'window', 'glazing', 'grille', 'handle',
-                    'lockset', 'detail', 'size', 'handing'];
-    let posOnly = 0;
-    for (let x = 0; x <= 800; x += 50) for (let y = 0; y <= 2000; y += 100) {
-      const r = fromQuery(toQuery({ ...solid, grip: { x, y, rot: 0 } }));
-      if (r.notice !== 'combination-fixed') continue;
-      if (DESIGN.some(k => r.state[k] !== solid[k])) continue;   // the design moved too
-      posOnly++;
-      ok(r.said.length === 1 && /הידית/.test(r.said[0]),
-         `a link that only moved the handle must say so, got ${JSON.stringify(r.said)}`);
-    }
-    ok(posOnly > 100,
-       `the position-only case should be common enough to matter, saw ${posOnly}`);
-  }
+  /* ⚠ THE POSITION-ONLY SWEEP THAT STOOD HERE IS GONE — 18.9.2026. It drove
+     153 handle positions into `fromQuery` and required each repair that moved
+     ONLY the position to say so in one sentence naming the handle, with a
+     floor of 100 so the case could not quietly stop being exercised. `gp=` is
+     retired and there is no position to move, so the sweep had no subject and
+     its own floor said so — which is the §5.15 guard doing exactly its job
+     rather than a check to delete quietly.
+     What it was protecting is NOT gone and is asserted two lines above: a
+     repaired link must carry the sentences that explain it, rather than one
+     generic "this cannot be manufactured". That was the finding; the position
+     was merely the commonest way to reach it. */
 
   /* And every reachable design really is reachable — the generator and the
      rules must be reading the same table. */
@@ -3655,23 +3659,20 @@ group('a handle the customer moved reaches the order');
        + 'door whose bar cannot be turned');
     }
 
-    /* 2. MOVE IT AND THE ORDER CHANGES. Only where the move is legal, or the
-          renderer puts the grip straight back and nothing moved after all. */
-    for (const d of [80, 160]) {
-      const at = { x: home.x, y: home.y - d, rot: home.rot };
-      if (!gripPlacement(st, at).ok) continue;
-      const shifted = { ...st, grip: at };
-      if (!gripDeparture(shifted).shifted) continue;
-      moved++;
-      const text = message(shifted);
-      ok(text !== untouched,
-         `the handle moved ${d} mm and the order Peretz receives did not change: `
-       + `${st.handle}/${st.size}/${st.window}`);
-      ok(text.includes(LINE),
-         `the handle moved ${d} mm and no line names it: ${st.handle}/${st.size}`);
-    }
+    /* ⚠ CLAUSE 2 IS GONE — 18.9.2026. It moved the handle 80 and 160 mm and
+       required the ORDER to change and to name it, which is the fault it was
+       written for: a dragged handle once reached Peretz in no form at all —
+       the message was byte-identical to the untouched door's and the short
+       code was the default's, so two visibly different doors shared one order.
+       Nothing can move a handle now, so there is nothing to under-report.
+       ⚠ Its `moved > 0` floor is gone with it, and that floor is the reason
+       this is a restatement rather than a deletion: it existed so the clause
+       could not quietly stop having a subject, and when the subject went it
+       said so on the first run. `flatHome` below keeps its own floor for the
+       same reason, and clause 1 above — a bar that lies down at home must say
+       so on the handle's line — is untouched, because `gripHome` still lays
+       bars down and Peretz still drills for it. */
   }
-  ok(moved > 0, 'no handle could be moved anywhere — this group is asserting nothing');
   /* ⚠ A ROTATED HOME IS REACHABLE AGAIN SINCE 14.9.2026, AND NOT BECAUSE A
      PRODUCT CAME BACK. This line read `flatHome === 0` — "no product has a
      rotated home any more" — and that was true for a reason nobody had
@@ -3740,33 +3741,24 @@ group('a handle the customer moved reaches the order');
     console.log(`  (${flatHome} rotated homes, every one of them on a door with `
               + 'nowhere for an upright bar)');
   }
-  {
-    let rotated = 0;
-    /* ⚠ AT 60 cm, because a bar only lies across a leaf it is shorter than.
-       `gripCanRotate` hides the control for any bar longer than the leaf is
-       wide, and every bar in the range is over a metre as it comes — so at
-       their default lengths not one of them can be turned, which is what the
-       audit's drag step also had to be taught. Since phase 5 the customer can
-       shorten a bar, and that is how they reach this. */
-    for (const h of HANDLES) {
-      const st = { ...base, handle: h.id, handleLen: 600 };
-      if (!gripCanRotate(st)) continue;
-      const turned = { ...st, grip: { ...gripHome(st), rot: 90 } };
-      const dep = gripDeparture(turned);
-      if (!dep.flat) continue;
-      rotated++;
-      ok(message(turned).includes('מותקנת לרוחב הדלת'),
-         `${h.id} lies across the leaf and the order never says so`);
-    }
-    ok(rotated > 0,
-       'no grip could be rotated at all — the across-the-leaf line is untested');
-  }
-  console.log(`  (${still} untouched doors silent, ${moved} moves named, `
+  /* ⚠ THE FORCED-ROTATION SWEEP IS GONE — 18.9.2026. It shortened every bar to
+     60 cm so `gripCanRotate` would allow it, set `rot: 90` by hand, and
+     required the order to say the bar lies across the leaf. Nothing can set a
+     rotation now; `gripHome` decides it, and where it decides 90 the clause
+     above already asserts the same sentence on the same states, with its own
+     `flatHome` floor. So the claim survives at full strength and only the way
+     of reaching it has gone.
+     ⚠ It also carried the reason a bar can be turned at all — every bar in the
+     range is over a metre as it comes, so at its default length not one of
+     them fits across a leaf, and it is the customer SHORTENING a bar that
+     makes a flat home reachable. That is still true and is still what
+     `flatHome` counts. */
+  console.log(`  (${still} untouched doors silent, `
             + `${flatHome} lying down at home)`);
 
   /* 3. A door with no pull bar departs from nothing, and `message` is called
         on states that never went through `repair`. */
-  const bare = { ...base, handle: 'none', grip: { x: 10, y: 10, rot: 90 } };
+  const bare = { ...base, handle: 'none' };
   ok(!message(bare).includes(LINE),
      'a door with no pull handle reports a handle position');
   ok(!message(bare).includes('מותקנת לרוחב'),

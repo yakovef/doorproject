@@ -102,11 +102,12 @@ console.log(`seed ${SEED}\n\nA. ${CASES} random designs, all nine axes at once`)
       lockset: pick(LOCKSETS).id,
       detail:  pick(DETAILS).id,
     };
-    /* A dragged handle, a quarter of the time, anywhere on a 950 x 2100 leaf
-       including well outside it — a link can carry any two numbers. */
-    if (r() < 0.25) raw.grip = { x: Math.round(r() * 1200 - 100),
-                                 y: Math.round(r() * 2400 - 150),
-                                 rot: r() < 0.3 ? 90 : 0 };
+    /* ⚠ A QUARTER OF EVERY SAMPLE USED TO CARRY A DRAGGED HANDLE, anywhere on
+       a 950 x 2100 leaf and well outside it, because a link could carry any
+       two numbers. `gp=` was retired on 18.9.2026 and `state.grip` with it, so
+       there are no two numbers to carry. What that arm was exercising —
+       `repair` settling in one pass on a position the door cannot take — no
+       longer exists to exercise. */
 
     const { state: fixed } = repair(raw);
     const again = repair(fixed);
@@ -143,9 +144,12 @@ console.log(`seed ${SEED}\n\nA. ${CASES} random designs, all nine axes at once`)
 
     /* Rendering is the expensive part, so a slice of the sample gets it — but
        a big enough slice that a fault in one grille on one size still turns
-       up. Every design that carries a dragged handle is rendered, because that
-       is where the arithmetic is. */
-    if (raw.grip || i % 4 === 0) {
+       up. ⚠ It used to render EVERY design carrying a dragged handle on top of
+       the slice, because that was where the arithmetic was; with the position
+       gone the slice is the whole rule, and it is widened from a quarter to a
+       third so the count of rendered designs does not quietly fall by the
+       share the drag used to add. */
+    if (i % 3 === 0) {
       const svg = render(fixed);
       rendered++;
       const bad = BAD_VALUE.exec(svg);
