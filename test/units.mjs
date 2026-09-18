@@ -1833,6 +1833,67 @@ group('every option tile draws its own picture');
   for (const s of Object.values(SIZES)) check('size', s.id, sizeGlyph(s));
 }
 
+/* ── 6a2. THE SIZE TILES SHARE ONE RULER ────────────────────────────
+   The six size tiles are the one place in this catalogue where the options
+   are not different SHAPES but different SIZES — 98x203 and 120x240 are
+   within three per cent of the same aspect. Drawing each in a viewBox cut to
+   its own door made all six the same rectangle, which is §5 item 5, and the
+   distinctness check above cannot see it: the markup differs (the numbers in
+   it are different) while the customer sees no difference.
+   So every tile is drawn inside ONE frame, the largest door in the catalogue,
+   computed from `SIZES`. Against that frame a standard door is 58% of the
+   width and 51% of the area — and since 14.9.2026 the frame is drawn faintly
+   on every tile, because a rectangle with nothing to compare it to is just a
+   rectangle and standard against extra1 is 8%.
+
+   ⚠ ASSERTED AS AN IDENTITY ACROSS THE SIX, which is the whole property: a
+   ruler that is not the same on every tile is not a ruler. Reading the
+   attributes rather than the picture, because that is what can drift — a
+   `dx`/`dy` sign error would move the ghost per tile and still look plausible
+   on any one of them.
+   Falsified by drawing the frame at the door's own size instead of
+   `SIZE_FRAME`: the six stop agreeing and every one of them fails. */
+group('the size tiles are six readings of one ruler');
+{
+  const frames = Object.values(SIZES).map(s => {
+    /* `[\s\S]` between the attributes: the emitted rect wraps across lines, and
+       a regex that assumed one line matched nothing while looking correct. */
+    const m = /<rect x="(-?[\d.]+)"\s+y="(-?[\d.]+)"\s+width="(\d+)"[\s\S]{0,120}?height="(\d+)"[\s\S]{0,120}?opacity="0\.16"/
+      .exec(sizeGlyph(s));
+    return { id: s.id, m };
+  });
+  ok(frames.every(f => f.m),
+     `${frames.filter(f => !f.m).length} size tiles draw no reference frame — `
+     + 'the tile that is about SIZE has nothing to be a size against');
+  if (frames.every(f => f.m)) {
+    const dims = frames.map(f => `${f.m[3]}x${f.m[4]}`);
+    ok(new Set(dims).size === 1,
+       `the reference frame is ${[...new Set(dims)].join(' and ')} across the six size `
+       + 'tiles — it has to be ONE rectangle or it measures nothing');
+    /* And it is the largest door, so the largest tile fills it exactly. */
+    const big = Object.values(SIZES)
+      .reduce((a, s) => Math.max(a, s.w + (s.side ? s.side + 46 : 0)), 0);
+    ok(Number(frames[0].m[3]) === big,
+       `the reference frame is ${frames[0].m[3]} wide and the widest door this catalogue `
+       + `sells is ${big} — the frame is not the range, so the ratios are invented`);
+    /* ⚠ AND IT LANDS IN THE SAME PLACE ON EVERY TILE, which is measured
+       against the VIEWBOX and not in door coordinates. The ghost's `x` is
+       `-dx`, an offset in the door's own space that differs per size; the
+       viewBox is shifted by the same `dx`, so what is constant — and what the
+       customer sees — is the gap between the viewBox's edge and the frame.
+       Asserting the raw `x` was the first thing written here and it failed on
+       all six for a reason that was in the test rather than in the drawing. */
+    const spots = frames.map(f => {
+      const vb = /viewBox="(-?[\d.]+) (-?[\d.]+)/.exec(sizeGlyph(
+        Object.values(SIZES).find(z => z.id === f.id)));
+      return `${Number(f.m[1]) - Number(vb[1])},${Number(f.m[2]) - Number(vb[2])}`;
+    });
+    ok(new Set(spots).size === 1,
+       `the reference frame sits at ${[...new Set(spots)].join(' / ')} inside the viewBox `
+       + 'across the six tiles — it must land in one place or they cannot be compared');
+  }
+}
+
 /* ── 6b2. AND A BAR'S TILE IS PAINTED FROM THE DOOR'S OWN METAL ─────
    The check above compares one tile against another, which is why it passed
    for months on six pull-bar tiles that were six identical grey lines: their

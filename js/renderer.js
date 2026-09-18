@@ -9196,6 +9196,27 @@ export function sizeGlyph(size) {
   return `<svg viewBox="${(-pad - dx).toFixed(0)} ${(-pad - dy).toFixed(0)} ${
                  SIZE_FRAME.w + pad * 2} ${SIZE_FRAME.h + pad * 2}" class="glyph"
                aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+    ${/* ⚠ THE FRAME ITSELF, DRAWN FAINTLY — 14.9.2026, AND IT IS THE OTHER HALF
+         OF THE 30.8 FIX. The shared frame above made the six tiles honest:
+         every door is drawn at one scale and a standard leaf really does take
+         58% of the width the widest door does, 51% of its area. Measured on
+         the rendered tiles at 88 px: the drawn leaf runs 33.2 px on a standard
+         door against 41.9 on a חריגה שנייה, which is the 79% those two main
+         leaves genuinely are.
+         What the tile did not have is anything to read that AGAINST. A
+         rectangle alone is just a rectangle; 58% of nothing is nothing, and
+         standard against extra1 is 8% — invisible without a ruler. This is the
+         ruler: the same faint rectangle on all six, at the size of the largest
+         door in the catalogue, so a small door is visibly a door that does not
+         fill it and the six tiles are six readings of one scale.
+         Thinner and much paler than the door itself, so it reads as the wall
+         behind rather than as a second leaf, and drawn FIRST so the door sits
+         over it. It is `SIZE_FRAME`, computed from `SIZES` — it cannot drift
+         from the thing it measures, and it grows by itself if Peretz adds a
+         bigger band. */''}
+    <rect x="${-dx.toFixed(0)}" y="${-dy.toFixed(0)}" width="${SIZE_FRAME.w}"
+          height="${SIZE_FRAME.h}" fill="none" stroke="currentColor"
+          stroke-width="18" opacity="0.16"/>
     ${size.side ? `<rect x="0" y="0" width="${size.side}" height="${size.h}" fill="none"
           stroke="currentColor" stroke-width="44" opacity="0.45"/>` : ''}
     ${/* דלת וחצי and a sidelight are the same rectangle on the plan and a
