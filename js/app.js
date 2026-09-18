@@ -1626,14 +1626,36 @@ function buildOptions(g, host) {
 
     if (g.kind === 'swatch') {
       b.className = 'swatch';
-      /* ⚠ The name and the RAL are hidden by CSS, not removed — so the
-         accessible name and the tooltip still carry both. A circle with no
-         name is a colour a blind customer cannot choose, and Peretz orders by
-         the number on the manufacturer's sheet. */
+      /* ⚠ THE CODE IS ON THE SWATCH NOW, 14.9.2026 — Peretz asked for the
+         colour options to be rectangles with the code inside them. It is what
+         he orders by: the number on the manufacturer's sheet, which until now
+         was in the tooltip and the accessible name and nowhere a customer
+         reading the page could see it.
+         ⚠ IT SITS IN A BAND RATHER THAN ON THE COLOUR, AND THAT IS A
+         MEASUREMENT AND NOT A PREFERENCE. Contrast was computed for all
+         seventeen against both inks: ten read better in white and seven in
+         dark, and SIXTEEN clear 4.5 comfortably — but ירוק מרווה (6219D,
+         #7A8272) tops out at **3.99 in white and 3.94 in dark**. There is no
+         ink that works on a mid-tone. Small text at 3.99 fails the contrast
+         bar, and the bar is right: a code a customer has to squint at is the
+         same defect as no code. A scrim or a text-shadow is the same thing
+         with the evidence hidden, and it would sit the text on a colour that
+         is no longer the colour.
+         So the rectangle carries a band across its foot in the panel's own
+         surface, with the code in the page's own ink — the pairing every other
+         label on the page already uses and the audit already checks — and the
+         colour above it is untouched and unobscured. It is how the
+         manufacturer's own chart prints a code, and it is the same on all
+         seventeen rather than one ink for ten and another for seven.
+         The name stays hidden and stays in the accessible name: seventeen
+         Hebrew colour names would not fit a 64 px tile at any size worth
+         reading, and the tooltip and `aria-label` below carry both. */
       b.title = `${L(o)} · ${colourCode(o)}`;
       b.setAttribute('aria-label', `${L(o)}, ${colourCode(o)}`);
       b.innerHTML = `
-        <span class="swatch__chip" style="--chip:${o.hex}"></span>
+        <span class="swatch__chip" style="--chip:${o.hex}">
+          <span class="swatch__code">${colourCode(o).replace(/^.*\s/, '')}</span>
+        </span>
         <span class="swatch__name">${L(o)}</span>
         <span class="swatch__meta">${colourCode(o)} · ${priceLabel(tilePrice(g, o, state))}</span>`;
     } else if (g.kind === 'pill') {

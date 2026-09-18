@@ -9364,7 +9364,9 @@ ${body}
           b.title = `${L(o)} · ${colourCode(o)}`;
           b.setAttribute("aria-label", `${L(o)}, ${colourCode(o)}`);
           b.innerHTML = `
-        <span class="swatch__chip" style="--chip:${o.hex}"></span>
+        <span class="swatch__chip" style="--chip:${o.hex}">
+          <span class="swatch__code">${colourCode(o).replace(/^.*\s/, "")}</span>
+        </span>
         <span class="swatch__name">${L(o)}</span>
         <span class="swatch__meta">${colourCode(o)} · ${priceLabel(tilePrice(g, o, state))}</span>`;
         } else if (g.kind === "pill") {

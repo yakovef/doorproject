@@ -2767,7 +2767,21 @@ button.spec__row:focus-visible {
      Measured at the narrowest layout the audit opens (320 px, minus the
      panel's 32 px of padding and the field's 10 px inset): four to a row where
      there were five, so seventeen colours take five rows instead of four. */
-  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  /* ⚠ 64 SINCE 14.9.2026, up from 50: the chip is a 64 px rectangle carrying
+     its code rather than a 44 px circle. What it costs, measured on the live
+     page at four widths — the track, then swatches per row, rows, and the
+     block's height:
+
+       320   278px    4 -> 3 per row    5 -> 6 rows    323 -> 425 px
+       360   318px    5 -> 4            4 -> 5         269 -> 363
+       390   348px    5 -> 4            4 -> 5         269 -> 363
+      1280   340px    5 -> 4            4 -> 5         269 -> 363
+
+     One fewer to a row and one more row everywhere, and about 100 px of
+     height. That is the price of putting the manufacturer's code on every
+     swatch — the thing Peretz orders by, and the thing that was in the
+     tooltip and nowhere a customer reading the page could see. */
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
   gap: 10px;
 }
 
@@ -2780,14 +2794,39 @@ button.spec__row:focus-visible {
   min-block-size: 44px;
 }
 
+/* ⚠ A RECTANGLE CARRYING ITS CODE, 14.9.2026 — it was a 44 px circle and the
+   code was `display: none`. Peretz asked for the colour options to be
+   rectangles with the code inside them; it is what he orders by, and until now
+   it lived in the tooltip and the accessible name and nowhere on the page.
+   The code sits in a BAND at the foot rather than on the colour, and that is
+   measured: across the seventeen, ten read better in white ink and seven in
+   dark, sixteen clear 4.5 comfortably — and ירוק מרווה (#7A8272) tops out at
+   3.99 white / 3.94 dark. No ink works on a mid-tone. The band is the panel's
+   own surface with the page's own ink, which is the pairing every other label
+   uses, so the contrast is the same on all seventeen instead of one ink for
+   ten and another for seven, and the colour above it is left alone.
+   Radius 8 rather than 50%: a circle has no straight foot to put a band on,
+   and the swatches are the one control on this page a customer chooses by
+   LOOKING — the colour wants the area a rectangle gives it. */
 .swatch__chip {
   --ring: transparent;
-  display: block; inline-size: 44px; block-size: 44px;
+  display: grid; grid-template-rows: 1fr auto;
+  inline-size: 64px; block-size: 52px;
   background: var(--chip);
   border: 1px solid rgb(0 0 0 / .22);
-  border-radius: 50%;
+  border-radius: 8px;
+  overflow: hidden;
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ring);
   transition: box-shadow .12s var(--ease);
+}
+.swatch__code {
+  grid-row: 2;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--mono); font-size: .58rem; line-height: 1.6;
+  letter-spacing: .02em;
+  text-align: center;
+  border-block-start: 1px solid rgb(0 0 0 / .14);
 }
 .swatch__name, .swatch__meta { display: none; }
 /* The gap-ring construction is already the mockup's. What changes is only its

@@ -405,6 +405,71 @@ for (const v of VIEWS) {
     }
   }
 
+  /* ⚠ EVERY COLOUR SWATCH PRINTS ITS CODE, AND EVERY CODE IS LEGIBLE —
+     14.9.2026. Peretz asked for the colour options to be rectangles with the
+     code inside them; it is what he orders by, and it used to live in the
+     tooltip and the accessible name and nowhere on the page.
+     ⚠ THE CONTRAST IS THE REASON THE CODE IS IN A BAND RATHER THAN ON THE
+     COLOUR, and it is asserted here rather than reasoned about. Computed
+     across the seventeen against both inks: ten read better in white and
+     seven in dark, sixteen clear 4.5 comfortably — and ירוק מרווה (#7A8272)
+     tops out at **3.99 in white and 3.94 in dark**. No ink works on a
+     mid-tone. So the band is the panel's own surface with the page's own ink,
+     the same on all seventeen, and this reads the COMPUTED colours off the
+     live page rather than trusting the token.
+     Falsified by moving the code onto the colour with a per-swatch ink: the
+     sage fails at 3.99 and prints its own figure. */
+  {
+    await p.goto('file://' + process.cwd() + '/index.html?lang=he');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(350);
+    await p.evaluate(() => {
+      const c = [...document.querySelectorAll('[data-step]')].find(e => e.dataset.step === 'colour');
+      if (c) c.click();
+    });
+    await p.waitForTimeout(400);
+    const sw = await p.evaluate(() => {
+      const lum = c => {
+        const [r, g, b] = c.match(/[\d.]+/g).slice(0, 3).map(Number).map(v => {
+          const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      return [...document.querySelectorAll('.swatch')].map(b => {
+        const code = b.querySelector('.swatch__code');
+        const chip = b.querySelector('.swatch__chip');
+        if (!code || !chip) return { id: b.dataset.id, missing: true };
+        const cs = getComputedStyle(code);
+        const l1 = lum(cs.color), l2 = lum(cs.backgroundColor);
+        const r = chip.getBoundingClientRect();
+        return { id: b.dataset.id, text: code.textContent.trim(),
+                 ratio: +(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05))).toFixed(2),
+                 w: Math.round(r.width), h: Math.round(r.height) };
+      });
+    });
+    if (sw.length < 10) {
+      fault(v.name, `the colour step shows ${sw.length} swatches and this check has lost `
+        + 'its subject');
+    }
+    for (const c of sw) {
+      if (c.missing || !c.text) {
+        fault(v.name, `the colour swatch "${c.id}" prints no code — it is what Peretz `
+          + 'orders by, and it is not on the page');
+        continue;
+      }
+      if (c.ratio < 4.5) {
+        fault(v.name, `the code on swatch "${c.id}" reads at ${c.ratio}:1 against its own `
+          + 'background and the floor is 4.5 — a code a customer squints at is no code');
+      }
+      if (c.h < 44) {
+        fault(v.name, `the colour swatch "${c.id}" is ${c.w}x${c.h} and the tap floor is 44`);
+      }
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(250);
+  }
+
   /* ⚠ THE SKIP TO THE END, AND THE BAR IT IS NOT IN — 14.9.2026. Asked for
      from outside: a customer happy with the door as it stands should not have
      to press הבא through the questions they do not care about.
