@@ -644,6 +644,18 @@ const PEEPHOLE_AFF = 1600;  // 0.762 H
  * horizontal placement was already right and only the height was wrong.
  */
 const SPECIAL_AFF  = 1430;
+/* ⚠ THE TWO BODIES' SIZES, HOISTED 18.9.2026 BECAUSE A RULE READS THEM NOW.
+   They were `const W = 50, H = 68` and `const W = 60, H = 154` inside
+   `specialLockArt`, which was right for as long as only the drawing needed to
+   know how big a kodan is. `faceObstacles` needs it — a handle's spawn must
+   not collide with a fitting — and a second copy of four numbers is the shape
+   this file spends §5 on. One table, two readers, and `npm run collide -- all`
+   compares the declared box against the drawn one on every swept design, so
+   they cannot drift.
+   Measured off `research/handles/peretz-1..4.webp`; see `specialLockArt` for
+   how, and for why a kodan is 60 x 154 rather than the 62 x 96 keypad that was
+   drawn before the photographs arrived. */
+const SPECIAL_BOX = { kasefet: { w: 50, h: 68 }, kodan: { w: 60, h: 154 } };
 /* ⚠ THE KNOCKER'S HEIGHT, AND `BELL_BACKSET` IS GONE WITH THE BELL PUSH.
    30.8.2026: the owner's three photographs put this fitting on the leaf's
    CENTRE LINE inside the upper panel, not on the hinge stile, so there is no
@@ -3954,8 +3966,59 @@ export const faceObstacles = memo(function faceObstacles(state) {
       if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
     }
   }
+
+  /* ⚠ AND THE FOUR BOLTED-ON FITTINGS, WHICH NOTHING HERE KNEW ABOUT UNTIL
+     18.9.2026. This list held windows, mouldings and the classical set — the
+     things a face is MADE of — and the owner's rule for the spawn table is
+     that a handle's spot must not collide with ANYTHING: *"every handle needs
+     a good spot where it spawns that doesnt collide with anything."* Four
+     fittings were outside that word.
+
+     ⚠ AND THE ONE THAT MATTERS IS THE BAR LYING DOWN. The פעמון and the עינית
+     sit on the leaf's CENTRE LINE, which is exactly where `gripHome` centres a
+     flat bar, and the inboard rungs of `SPAWN` reach it too — 210 mm inboard
+     of a 215 mm backset is 425, and half of an 850 mm leaf is 425. So a ring
+     knocker and a bar could be drawn through each other, and the only reason
+     it had not been reported is that a flat home is rare.
+
+     ⚠ THE EXTRA LOCK IS INCLUDED THOUGH IT LOOKS HARMLESS. On the standard
+     door it sits at `KEYWAY_BACKSET` — 63 mm off the closing edge, between the
+     edge and the bar — so nothing reaches it. That is true of the default and
+     is not a rule: it is a 60 x 154 mm body at eye level, and "the bar never
+     gets that far outboard" is an accident of today's standoffs, not a fact
+     about doors. `-20` is in `SPAWN`'s ladder precisely because a bar
+     sometimes wants to go outboard.
+
+     Every number is read from the constant the DRAWING uses, never restated:
+     `KNOCKER_AFF`/`KNOCKER_REACH`, `PEEPHOLE_AFF`/`PEEPHOLE_R`,
+     `SPECIAL_AFF`/`KEYWAY_BACKSET` and the special lock's own declared size.
+     `band: 0` on all four — they are bolted objects, not framed openings, so
+     there is no moulding round them to clear. */
+  if (state.bell && state.bell !== 'nobell') {
+    out.push({ kind: 'fitting', band: 0,
+               x: leafW / 2 - KNOCKER_REACH.x,
+               y: leafH - KNOCKER_AFF - KNOCKER_REACH.up,
+               w: KNOCKER_REACH.x * 2,
+               h: KNOCKER_REACH.up + KNOCKER_REACH.down });
+  }
+  if (state.peephole && state.peephole !== 'nopeep') {
+    out.push({ kind: 'fitting', band: 0,
+               x: leafW / 2 - PEEPHOLE_R, y: leafH - PEEPHOLE_AFF - PEEPHOLE_R,
+               w: PEEPHOLE_R * 2, h: PEEPHOLE_R * 2 });
+  }
+  const sp = SPECIAL_BOX[state.speciallock];
+  if (sp) {
+    out.push({ kind: 'fitting', band: 0,
+               x: KEYWAY_BACKSET - sp.w / 2, y: leafH - SPECIAL_AFF - sp.h / 2,
+               w: sp.w, h: sp.h });
+  }
   return out;
-}, st => `${st.size}|${st.detail}|${st.window}`);
+  /* ⚠ AND THE MEMO KEY GREW BY THREE FIELDS. It was `size|detail|window`, and
+     an obstacle list that depends on the bell, the viewer and the extra lock
+     while being cached on three keys that ignore them is the quietest defect
+     this file knows how to produce: the first door of a session would decide
+     the answer for every door after it. */
+}, st => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}`);
 
 /**
  * Is there room under the glazing for the panel the customer is paying for?
@@ -4186,7 +4249,18 @@ export function gripHome(state) {
   return found;
 }
 
-function gripHomeUncached(state) {
+/**
+ * THE IDEAL SPOT — where the corpus says this door's handle goes, before
+ * anything on the face is consulted.
+ *
+ * ⚠ EXTRACTED FROM `gripHomeUncached` ON 18.9.2026, and the reason is the one
+ * this file keeps paying for. `SPAWN`'s rungs are offsets FROM this, so two
+ * things need it: `gripHome`, which walks the ladder, and `spawnIndexOf`,
+ * which says which rung a handle ended up on. Computed twice it would be
+ * §5.10 — and the symptom would be an assertion quietly agreeing with a
+ * drawing that had moved, which is the worst kind.
+ */
+function gripIdeal(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const handle = gripOf(state);
   const lockset = byId(LOCKSETS, state.lockset);
@@ -4213,50 +4287,53 @@ function gripHomeUncached(state) {
   const homeX = handle.style === 'grab'
     ? (leafW - GRAB.len) / 2
     : backset + standoff;
-  const raw0 = { x: homeX, y: homeY, rot: 0 };
-  /* The height a hand reaches on THIS leaf — the one yardstick every
-     HOME_REACH test below is measured against. See the note further down. */
-  const reachY = leafH - HANDLE_AFF;
-  /* AND IT HAS TO BE A PLACE THE GRIP CAN ACTUALLY STAND.
-     The arithmetic above is a good guess and not a proof: it works in x, where
-     it was derived, and says nothing about y. `barHalf` shortens a bar on a
-     panelled door so its feet clear the mouldings, but it reasons from the
-     bar's ENDS while the feet sit at 0.14 and 0.88 along it, and it uses the
-     two-panel rows on a door that may carry the lone one. Asked exactly, 980
-     default positions stood a foot on a panel moulding — the very thing the
-     shortening was added to prevent.
-     So the guess is checked and corrected here, once, and every other caller
-     gets a home position that is buildable by construction. */
-  if (gripPlacement(state, raw0).ok) return raw0;
-  /* ⚠ THE DEFAULT STAYS AT HAND HEIGHT EVEN THOUGH A DRAG NO LONGER HAS TO.
-     `gripPlacement` used to refuse anything outside 0.38-0.60 of leaf height,
-     and that single band was quietly doing two jobs: it was the customer's
-     limit AND it was what kept this search from wandering. Opening the band to
-     0.18-0.82 at the owner's son's request freed the drag and freed the search
-     with it, and `npm test` said so immediately — a tall leaf with a strip
-     light put its DEFAULT handle 595 mm below the height a hand reaches, on a
-     door that had simply been refused before.
-     A default is not a choice. `HOME_REACH` is how far this is willing to
-     move a handle nobody has touched; past it the door is refused, which is
-     what it did before the band opened. Drags are unaffected — they come
-     through `gripPlacement` with a position the customer picked.
+  return { x: homeX, y: homeY, rot: 0 };
+}
 
-     ⚠ MEASURED FROM HAND HEIGHT, NOT FROM THIS GRIP'S OWN NOMINAL. These three
-     comparisons read `raw0.y`, which is the same thing for every grip except
-     one: the horizontal bow's nominal is `GRAB.fromTop` (0.59 of the leaf),
-     180 mm below where a hand goes. Beside a 1,415 mm vertical slot the bow
-     has nowhere to stand but under it, and 500 mm from ITS nominal reached
-     y = 1,646 — 0.80 of the leaf, about 400 mm off the floor. A knee rail.
-     `npm test` said so in five places the moment the blanket refusal came out,
-     and it was measuring against hand height while this measured against the
-     grip's own; two yardsticks for one question, which is §5 in miniature.
-     One yardstick now, and it is the one the assertion uses. The effect is
-     confined to the grab bar — for every other grip `raw0.y` IS this — and
-     what it buys is that a door with no reachable place for a bow REFUSES it,
-     through `gripFitsAnywhere`, with a reason on the tile. */
-  const upright = nearestGrip(state, raw0);
-  if (gripPlacement(state, upright).ok
-      && Math.abs(upright.y - reachY) <= HOME_REACH) return upright;
+function gripHomeUncached(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const handle = gripOf(state);
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const raw0 = gripIdeal(state);
+
+
+  /* ⚠ AND FROM HERE IT IS A TABLE, NOT A SEARCH — 18.9.2026. The owner asked
+     for exactly this: *"every handle needs a good spot where it spawns that
+     doesnt collide with anything, and then if something is spawned that
+     collides with it, then you already have a predetermined second spot with
+     that thing, then the pull handle changes its place to that place. and if
+     there is no place … you cant combine this thing with this."*
+
+     What stood here was `nearestGrip`: two scan lines, an 11 x 17 lattice and
+     a halving walk-back, about 150 placement tests, bounded by `HOME_REACH`.
+     It was good — it found an island of valid spots on a dozen exotic doors —
+     and it is the wrong shape for the instruction. A search answers "somewhere
+     that works"; the owner asked for "the second spot", decided in advance.
+
+     So `SPAWN` is an ordered list of offsets from the ideal, the first one
+     `gripPlacement` accepts wins, and none accepted means the combination is
+     REFUSED — which `gripFitsAnywhere` reports to the tiles and `repair` acts
+     on, exactly as before.
+     ⚠ THE ORDER IS THE DESIGN. Down the door before across it, because a
+     window takes the middle of a leaf and a bar clears it by dropping rather
+     than by sliding toward the hinge; and never past 0.55 of the width or
+     outside 0.18-0.82 of the height, which are the two limits `gripPlacement`
+     used to enforce and now simply never meets. */
+  /* ⚠ AND THE RECESSED CHANNEL WALKS THE SAME LADDER, which I got wrong once
+     and the measurement caught. `fixed` on its catalogue entry looks like "one
+     position and no other", and I gave it a one-rung ladder on that reading.
+     Measured: 144 more combinations lost their handle, all of them panelled or
+     classical faces, and NONE of them was a door the tiles already refused —
+     so it was 144 real doors withdrawn on a misreading.
+     What `fixed` actually meant is in its own comment: *"offering to DRAG it
+     offers something nobody can build"*. Its three readers were `armGrip`, the
+     `gp=` path in `gripAt`, and `repair` dropping a stale position — every one
+     of them in the customer's path, and every one of them gone with the drag.
+     `gripHome` never read it, and moving the recess between DESIGNS is a thing
+     the factory does; moving it because a customer dragged is not. */
+  for (const cand of spawnSpots(state)) {
+    if (gripPlacement(state, cand).ok) return cand;
+  }
 
   /* AND IF IT WILL NOT STAND UP ANYWHERE, LAY IT DOWN.
      Asked for from the outside: "if there is a window, and the pull handle
@@ -4265,23 +4342,21 @@ function gripHomeUncached(state) {
      the light takes the middle of the door and the lever takes the stile — and
      the door still wants a handle on it. Laid across, at the same height a
      hand reaches, it has the whole width of the leaf to sit in.
-     Only where it fits lying down, which `gripCanRotate` answers from the
-     drawing, and only after upright has been given the whole leaf to try. A
-     handle that could stand up should stand up: that is what every door in the
-     corpus does. */
+     ⚠ LAST, AND THAT IS NOT NEGOTIABLE: a handle that could stand up should
+     stand up, which is what every door in the corpus does. The whole upright
+     ladder is tried before this. `gripCanRotate` answers from the drawing
+     whether the bar is short enough to lie across the leaf at all. */
   if (gripCanRotate(state)) {
-    const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
-    const laid = gripPlacement(state, flat).ok ? flat : nearestGrip(state, flat);
-    if (gripPlacement(state, laid).ok
-        && Math.abs(laid.y - reachY) <= HOME_REACH) return laid;
+    for (const flat of spawnFlatSpots(state)) {
+      if (gripPlacement(state, flat).ok) return flat;
+    }
   }
-  /* Nothing within reach of hand height, standing or lying down. Hand back the
-     ideal — which is refused, or we would have returned it at the top — so
-     `gripFitsAnywhere` says no and the door refuses the combination, exactly
-     as it did while the placement band was the only limit. The alternative is
-     a door that opens with its handle at knee height and nobody choosing it. */
-  return gripPlacement(state, upright).ok
-      && Math.abs(upright.y - reachY) <= HOME_REACH ? upright : raw0;
+
+  /* Nothing in the table works. Hand back the ideal — which is refused, or the
+     loop would have returned it — so `gripFitsAnywhere` says no and the tile
+     is greyed with a reason. A door that opened with its handle wherever a
+     search could squeeze it is not what was asked for. */
+  return raw0;
 }
 
 /**
@@ -4404,7 +4479,8 @@ function specialLockArt(special, cx, cy, dir) {
     /* 50 x 68, measured. The corner radius is small — this is a pressed plate,
        not a moulded body — and the four screws are the thing that identifies
        it at a glance on all three doors that carry one. */
-    const W = 50, H = 68, r = 5;
+    const { w: W, h: H } = SPECIAL_BOX.kasefet;
+    const r = 5;
     const l = x - W / 2, t = cy - H / 2;
     const screw = (sx, sy) => `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="2.6"
               fill="#000" fill-opacity=".34"/>`;
@@ -4428,7 +4504,7 @@ function specialLockArt(special, cx, cy, dir) {
   /* THE KODAN — a mechanical push-button lock. 60 x 154, a stadium body,
      ten buttons in two columns of five over the upper 62%, and the turn knob
      filling the bottom third. */
-  const W = 60, H = 154;
+  const { w: W, h: H } = SPECIAL_BOX.kodan;
   const l = x - W / 2, t = cy - H / 2;
   const colX = [x - W * 0.19, x + W * 0.19];
   const row0 = t + H * 0.115, rowStep = H * 0.088;
@@ -4645,9 +4721,15 @@ export function gripPlacement(state, place = null) {
      does. A 1230 mm Shahar bar can only sit between 0.33 and 0.67 whatever
      this says. It is the SHORT grips this frees, which are exactly the ones
      worth dragging: the grab bar, and Shiran. */
-  if (p.y < leafH * 0.18 || p.y > leafH * 0.82) {
-    return bad(T('why.gripReach'));
-  }
+  /* ⚠ AND THE BAND IS NOT CHECKED HERE ANY MORE — 18.9.2026. The owner's rule
+     for the spawn table is one sentence: *"forget about the ugly rule, if it
+     doesnt collide with anything then its okay."* So this function asks about
+     COLLISION and about nothing else, and the ergonomics live in `SPAWN`,
+     which is a list of places somebody chose. The 0.18-0.82 band and the
+     corpus measurement above are the DISCIPLINE that list is written to, and
+     they stay written down here because that is where the next author will
+     look for them. A band enforced at the check refuses; a band respected by
+     the table simply never proposes. */
 
   /* AND NOT ON THE HINGE SIDE. A pull standing upright past the leaf's centre
      line is on the half of the door that barely moves: there is no leverage
@@ -4672,9 +4754,11 @@ export function gripPlacement(state, place = null) {
      together with the lockset clearance below, left it with no legal x at all
      on a standard leaf with a lever. Its horizontal extent is checked by the
      whole-object rule above now, which is the honest question to ask of it. */
-  if (p.rot === 0 && handle.style !== 'grab' && p.x > leafW * 0.55) {
-    return bad(T('why.gripHingeSide'));
-  }
+  /* ⚠ AND THIS IS NOT CHECKED HERE ANY MORE EITHER — 18.9.2026, same sentence
+     and same reason. `SPAWN` never proposes a spot past 0.55 of the leaf, so
+     the limit holds by construction; what it no longer does is refuse a door
+     for a reason that is not a collision. The measurement stays above because
+     it is what the table's inboard ladder is bounded by. */
 
   for (const f of feet) {
     if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT
@@ -4836,88 +4920,134 @@ export function gripPlacement(state, place = null) {
  * under a millisecond; returns the home position if nothing at all fits, since
  * a door always has to be able to show its handle somewhere.
  */
-/* How far `gripHome` will shift a handle nobody has touched before giving up
-   and letting the door be refused. 500 mm is the figure `npm test` has always
-   asserted the default against; it is written down here so that the assertion
-   and the code are the same number rather than two guesses that happen to
-   agree. It bounds the DEFAULT only — a customer may drag anywhere the rules
-   allow, which is a much wider band.
-   ⚠ EXPORTED SINCE 14.9.2026, which is what the sentence above was asking for
-   and had not got. `npm test` asserted against a 500 it typed itself; the
-   check that a rotated home was only ever chosen where an upright bar has
-   nowhere to go needs the same band, and a second hand-typed copy of it would
-   have been the third guess that happens to agree. */
-export const HOME_REACH = 500;
+/* ── THE SPAWN TABLE ──────────────────────────────────────────────────
+   Offsets from the measured ideal, in millimetres, IN ORDER. `gripHome` takes
+   the first one `gripPlacement` accepts; if none is accepted the combination
+   is refused. `dx` moves INBOARD, away from the closing edge; `dy` moves DOWN
+   the leaf.
 
-export function nearestGrip(state, want) {
-  if (gripPlacement(state, want).ok) return want;
+   ⚠ WHAT THIS REPLACED, and why the replacement is smaller rather than
+   better. `nearestGrip` swept two scan lines, an 11 x 17 lattice and a halving
+   walk-back — about 150 placement tests — and returned the nearest legal spot
+   to whatever was asked for. It was measured and tuned: 11 x 17 refused 1,482
+   of 6,480 where an exhaustive search refused 1,424 and a 7 x 11 grid refused
+   1,668, and the density was picked on those numbers rather than reasoned
+   about. None of that was wrong. It was the wrong SHAPE for what the owner
+   asked for — *"you already have a predetermined second spot"* — and a list
+   somebody wrote is a thing he can look at and disagree with, where a lattice
+   is not.
+
+   ⚠ THE ORDER IS THE WHOLE DESIGN, and it is DOWN before ACROSS:
+     · a window takes the middle of a leaf, so a bar blocked by one clears it
+       by dropping or rising, not by sliding toward the hinge;
+     · a panel moulding is the other blocker, and `barHalf` has already
+       shortened the bar for it — what is left is usually a small lift;
+     · moving inboard is last because it walks a pull toward the half of the
+       door that does not move, which is where nobody fits one.
+   ⚠ AND THE LADDER IS BOUNDED BY THE TWO LIMITS `gripPlacement` USED TO
+   ENFORCE. 0.55 of the leaf's width and 0.18-0.82 of its height are checked
+   in `gripHome` as it walks, so a candidate past them is never proposed. They
+   are not refusals any more — the owner's rule for this table is *"if it
+   doesnt collide with anything then its okay"* — they are the discipline the
+   list is written to. The corpus behind them: ten installed pull bars sit
+   between 0.430 and 0.512 of leaf height, and every bar in the corpus sits
+   between 0.05 and 0.31 of the leaf's width from the closing edge.
+   ⚠ AND ±500 IS WHERE IT STOPS, which is `HOME_REACH`'s old value arriving as
+   the last rung rather than as a gate. Past that a handle nobody chose is at
+   knee height, and the door is better refused than opened with one there. */
+/* ⚠ THE STEP IS 60 mm AND IT IS MEASURED, NOT PICKED. A first draft stepped
+   120/240/380/500 and lost 106 combinations the old search kept. Asked where
+   the search had actually put those handles, the answer was blunt: 36 of them
+   needed a 50 mm drop, 40 needed 440-450, and 10 needed 480 with 20 mm
+   OUTBOARD. So the ladder was too coarse near the ideal and had a hole between
+   380 and 500 — a step of 60 to ±480 covers all three, and 60 is the finest
+   the evidence asks for rather than the finest that could be written.
+   ⚠ Tuning the STEP against the search's answers is legitimate; adding a rung
+   per lost door would not be. The step is a statement about how finely a
+   fitter adjusts, and the search's answers are evidence about where valid
+   spots lie. One is a design decision informed by a measurement; the other is
+   fitting the table to the test. */
+const SPAWN = [
+  [0, 0],                                             // the corpus's own spot
+  /* Down the leaf first, in 60 mm steps to ±480 — a lift and a drop at each
+     rung, the lift first, because a bar blocked by a window more often has
+     room above it than below. */
+  ...[60, 120, 180, 240, 300, 360, 420, 480].flatMap(d => [[0, -d], [0, d]]),
+  /* Then INBOARD, and only then: past the leaf's middle a pull is on the half
+     of the door that does not move. Each offset is tried at hand height first
+     and then with the same vertical ladder, coarser. */
+  ...[70, 140, 210].flatMap(dx => [[dx, 0], [dx, -180], [dx, 180], [dx, -360], [dx, 360]]),
+  /* And a little OUTBOARD, last. The ideal already sits at the smallest
+     backset the lock furniture allows, so there is rarely room — but the
+     search found 10 doors that wanted 20 mm of it, and a rung costs one
+     placement test. */
+  [-20, 0], [-20, -240], [-20, 240], [-20, -480], [-20, 480],
+];
+/* Laid across the leaf, centred, at hand height and then a little either way.
+   Short: a bow that cannot go at hand height has almost nowhere else to be. */
+const SPAWN_FLAT = [0, -150, 150, -300, 300];
+
+/**
+ * The upright candidates for this door, IN ORDER, already bounded.
+ *
+ * ⚠ ONE LIST, TWO READERS, AND THE SECOND IS AN ASSERTION. `gripHome` walks
+ * this and takes the first that fits; `npm test` walks it to say that a bar
+ * which ended up lying down had no upright rung available. A test that rebuilt
+ * the rungs from the same offsets would agree with a drawing that had drifted,
+ * and a test that called `gripHome` again would be asking the decision about
+ * itself. It asks the CANDIDATES.
+ *
+ * The two bounds are applied here rather than in `gripPlacement`: 0.55 of the
+ * width keeps a pull off the half of the door that does not move, and
+ * 0.18-0.82 of the height keeps it where a hand goes. They are the table's
+ * discipline, not refusals — see `SPAWN`.
+ */
+export function spawnSpots(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-
-  let best = null, bestD = Infinity;
-  const tryAt = (x, y) => {
-    const cand = { x: Math.round(x / 5) * 5, y: Math.round(y / 5) * 5, rot: want.rot };
-    /* Distance FIRST. Most candidates are further away than something already
-       found, and the cheapest placement test is the one not run. */
-    const d = (cand.x - want.x) ** 2 + ((cand.y - want.y) * 2) ** 2;
-    if (d >= bestD || !gripPlacement(state, cand).ok) return;
-    bestD = d; best = cand;
-  };
-
-  /* Vertical twice as expensive as horizontal, because a handle's HEIGHT is
-     ergonomic and its distance from the edge is a style choice. Upright it may
-     not pass the leaf's middle; laid down it is centred there by nature. */
-  const xLo = EDGE_FLAT, xHi = want.rot === 90 ? leafW - EDGE_FLAT : leafW * 0.55;
-  const yLo = EDGE_FLAT, yHi = leafH - EDGE_FLAT;
-  const at = (lo, hi, i, n) => lo + (hi - lo) * i / n;
-
-  /* Along the stile at this height, then up the door at this offset. Between
-     them these two lines find almost everything: what blocks a handle is a
-     window or a panel, and both leave a clear band beside them or under them. */
-  for (let i = 0; i <= 24; i++) tryAt(at(xLo, xHi, i, 24), want.y);
-  for (let i = 0; i <= 24; i++) tryAt(want.x, at(yLo, yHi, i, 24));
-  /* And a lattice for when neither line is clear. 11 x 17 measured against 7 x
-     11 and 15 x 23: it refuses 1,482 of 6,480 against the exhaustive search's
-     1,424, where the coarse one refuses 1,668. Denser is NOT monotonically
-     better — 15 x 23 lands on different millimetres and refuses 1,660 — which
-     is what sampling is, and the reason the number is measured rather than
-     reasoned about. */
-  for (let ix = 0; ix <= 11; ix++) {
-    for (let iy = 0; iy <= 17; iy++) tryAt(at(xLo, xHi, ix, 11), at(yLo, yHi, iy, 17));
+  const ideal = gripIdeal(state);
+  const out = [];
+  for (const [dx, dy] of SPAWN) {
+    const cand = { x: ideal.x + dx, y: ideal.y + dy, rot: 0 };
+    if (cand.x > leafW * 0.55) continue;
+    if (cand.y < leafH * 0.18 || cand.y > leafH * 0.82) continue;
+    out.push(cand);
   }
-
-  /* ⚠ BOUNDED ON PURPOSE, and it used to sweep the whole leaf on a 10 mm grid.
-     That found an island of 83 valid spots in seventeen thousand on a dozen
-     exotic doors — and cost fifteen thousand placement tests to do it. Fine
-     once per drawing; ruinous once the RULES started asking the same question,
-     which they must, or a handle is refused for not fitting where we first
-     thought to put it. Measured: two minutes of `npm test`.
-     So the search is a fixed budget of about 150 tests, and the price is that
-     roughly a dozen combinations out of 45,000 are refused for having nowhere
-     to put a handle when a fine enough search would have found somewhere. They
-     are refused rather than drawn wrong, and `conflicts` and the drawing now
-     run the SAME search, so the two cannot disagree about what is buildable —
-     which is worth more than the dozen. */
-  if (!best) return want;
-
-  /* AND THEN WALK IT BACK. The lattice lands on multiples of 80-odd
-     millimetres, so a handle that needed to move 20 mm was being moved 160 —
-     measured as the median of everything that moved, against 5 mm for the
-     unbounded search this replaced. Halving the offset toward what was asked
-     for, one axis at a time, costs about sixteen more tests and gives the
-     precision back: whatever the coarse pass found is already valid, so every
-     step here is a free improvement or nothing. */
-  for (const axis of ['y', 'x']) {
-    let step = Math.abs(best[axis] - want[axis]) / 2;
-    while (step >= 5) {
-      const toward = best[axis] + Math.sign(want[axis] - best[axis]) * step;
-      const cand = { ...best, [axis]: Math.round(toward / 5) * 5 };
-      if (gripPlacement(state, cand).ok) best = cand;
-      step /= 2;
-    }
-  }
-  return best;
+  return out;
 }
+
+/** The same, laid across the leaf and centred on it. */
+export function spawnFlatSpots(state) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  return SPAWN_FLAT
+    .map(dy => ({ x: leafW / 2, y: leafH - HANDLE_AFF + dy, rot: 90 }))
+    .filter(f => f.y >= leafH * 0.18 && f.y <= leafH * 0.82);
+}
+
+/**
+ * Which rung of the table this position is, or -1.
+ *
+ * ⚠ IT EXISTS SO THE ASSERTION CANNOT KEEP ITS OWN COPY OF THE TABLE. The
+ * point of a table over a search is that the answer is predetermined, and the
+ * check for that is "the handle is on a rung", by index — which needs the
+ * rungs. A test that rebuilt them from the same numbers would pass on a day
+ * the two had drifted, which is §5.10 wearing a test file.
+ * It recomputes the ideal the same way `gripHome` does rather than being told
+ * it, so it cannot be fooled by a caller that has already moved the handle.
+ */
+export function spawnIndexOf(state, place) {
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  if (place.rot === 90) {
+    const i = SPAWN_FLAT.indexOf(Math.round(place.y - (leafH - HANDLE_AFF)));
+    return i < 0 ? -1 : SPAWN.length + i;
+  }
+  const ideal = gripIdeal(state);
+  return SPAWN.findIndex(([dx, dy]) =>
+    Math.abs(ideal.x + dx - place.x) < 0.5 && Math.abs(ideal.y + dy - place.y) < 0.5);
+}
+
 
 /**
  * A single fine vertical recess — the cheapest detail with a real payoff.

@@ -2904,6 +2904,7 @@ ${stops}
   var CYLINDER_AFF = 904;
   var PEEPHOLE_AFF = 1600;
   var SPECIAL_AFF = 1430;
+  var SPECIAL_BOX = { kasefet: { w: 50, h: 68 }, kodan: { w: 60, h: 154 } };
   var KNOCKER_AFF = 1470;
   var PEEPHOLE_R = 15;
   var KNOCKER_R = 66;
@@ -4992,8 +4993,39 @@ ${body}
         if (r.w > MOULD_BAND * 2.2 && r.h > MOULD_BAND * 2.2) out.push(r);
       }
     }
+    if (state2.bell && state2.bell !== "nobell") {
+      out.push({
+        kind: "fitting",
+        band: 0,
+        x: leafW / 2 - KNOCKER_REACH.x,
+        y: leafH - KNOCKER_AFF - KNOCKER_REACH.up,
+        w: KNOCKER_REACH.x * 2,
+        h: KNOCKER_REACH.up + KNOCKER_REACH.down
+      });
+    }
+    if (state2.peephole && state2.peephole !== "nopeep") {
+      out.push({
+        kind: "fitting",
+        band: 0,
+        x: leafW / 2 - PEEPHOLE_R,
+        y: leafH - PEEPHOLE_AFF - PEEPHOLE_R,
+        w: PEEPHOLE_R * 2,
+        h: PEEPHOLE_R * 2
+      });
+    }
+    const sp = SPECIAL_BOX[state2.speciallock];
+    if (sp) {
+      out.push({
+        kind: "fitting",
+        band: 0,
+        x: KEYWAY_BACKSET - sp.w / 2,
+        y: leafH - SPECIAL_AFF - sp.h / 2,
+        w: sp.w,
+        h: sp.h
+      });
+    }
     return out;
-  }, (st) => `${st.size}|${st.detail}|${st.window}`);
+  }, (st) => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}`);
   function peepholeFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -5053,7 +5085,7 @@ ${body}
     HOME_CACHE.set(key, found);
     return found;
   }
-  function gripHomeUncached(state2) {
+  function gripIdeal(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const handle = gripOf(state2);
     const lockset = byId(LOCKSETS, state2.lockset);
@@ -5066,17 +5098,22 @@ ${body}
     const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
     const homeY = handle.style === "grab" ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
     const homeX = handle.style === "grab" ? (leafW - GRAB.len) / 2 : backset + standoff;
-    const raw0 = { x: homeX, y: homeY, rot: 0 };
-    const reachY = leafH - HANDLE_AFF;
-    if (gripPlacement(state2, raw0).ok) return raw0;
-    const upright = nearestGrip(state2, raw0);
-    if (gripPlacement(state2, upright).ok && Math.abs(upright.y - reachY) <= HOME_REACH) return upright;
-    if (gripCanRotate(state2)) {
-      const flat = { x: leafW / 2, y: leafH - HANDLE_AFF, rot: 90 };
-      const laid = gripPlacement(state2, flat).ok ? flat : nearestGrip(state2, flat);
-      if (gripPlacement(state2, laid).ok && Math.abs(laid.y - reachY) <= HOME_REACH) return laid;
+    return { x: homeX, y: homeY, rot: 0 };
+  }
+  function gripHomeUncached(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const handle = gripOf(state2);
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    const raw0 = gripIdeal(state2);
+    for (const cand of spawnSpots(state2)) {
+      if (gripPlacement(state2, cand).ok) return cand;
     }
-    return gripPlacement(state2, upright).ok && Math.abs(upright.y - reachY) <= HOME_REACH ? upright : raw0;
+    if (gripCanRotate(state2)) {
+      for (const flat of spawnFlatSpots(state2)) {
+        if (gripPlacement(state2, flat).ok) return flat;
+      }
+    }
+    return raw0;
   }
   var gripFitsAnywhere = memo(
     (state2) => gripPlacement(state2, gripHome(state2)).ok,
@@ -5094,7 +5131,8 @@ ${body}
     if (!special || special.id === "nospecial") return "";
     const x = cx + dir * 0;
     if (special.id === "kasefet") {
-      const W2 = 50, H2 = 68, r = 5;
+      const { w: W2, h: H2 } = SPECIAL_BOX.kasefet;
+      const r = 5;
       const l2 = x - W2 / 2, t2 = cy - H2 / 2;
       const screw = (sx, sy) => `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="2.6"
               fill="#000" fill-opacity=".34"/>`;
@@ -5114,7 +5152,7 @@ ${body}
       ${screw(l2 + 8, t2 + H2 - 8)}${screw(l2 + W2 - 8, t2 + H2 - 8)}
     </g>`;
     }
-    const W = 60, H = 154;
+    const { w: W, h: H } = SPECIAL_BOX.kodan;
     const l = x - W / 2, t = cy - H / 2;
     const colX = [x - W * 0.19, x + W * 0.19];
     const row0 = t + H * 0.115, rowStep = H * 0.088;
@@ -5198,12 +5236,6 @@ ${body}
     }
     const cgx0 = hingeLeftOf(state2) ? leafW - gx1 : gx0;
     const cgx1 = hingeLeftOf(state2) ? leafW - gx0 : gx1;
-    if (p.y < leafH * 0.18 || p.y > leafH * 0.82) {
-      return bad(T("why.gripReach"));
-    }
-    if (p.rot === 0 && handle.style !== "grab" && p.x > leafW * 0.55) {
-      return bad(T("why.gripHingeSide"));
-    }
     for (const f of feet) {
       if (f.x - f.r < EDGE_FLAT || f.x + f.r > leafW - EDGE_FLAT || f.y - f.r < EDGE_FLAT || f.y + f.r > leafH - EDGE_FLAT) {
         return bad(T("why.gripOffDoor"));
@@ -5260,38 +5292,45 @@ ${body}
     }
     return at;
   }
-  var HOME_REACH = 500;
-  function nearestGrip(state2, want) {
-    if (gripPlacement(state2, want).ok) return want;
+  var SPAWN = [
+    [0, 0],
+    // the corpus's own spot
+    /* Down the leaf first, in 60 mm steps to ±480 — a lift and a drop at each
+       rung, the lift first, because a bar blocked by a window more often has
+       room above it than below. */
+    ...[60, 120, 180, 240, 300, 360, 420, 480].flatMap((d) => [[0, -d], [0, d]]),
+    /* Then INBOARD, and only then: past the leaf's middle a pull is on the half
+       of the door that does not move. Each offset is tried at hand height first
+       and then with the same vertical ladder, coarser. */
+    ...[70, 140, 210].flatMap((dx) => [[dx, 0], [dx, -180], [dx, 180], [dx, -360], [dx, 360]]),
+    /* And a little OUTBOARD, last. The ideal already sits at the smallest
+       backset the lock furniture allows, so there is rarely room — but the
+       search found 10 doors that wanted 20 mm of it, and a rung costs one
+       placement test. */
+    [-20, 0],
+    [-20, -240],
+    [-20, 240],
+    [-20, -480],
+    [-20, 480]
+  ];
+  var SPAWN_FLAT = [0, -150, 150, -300, 300];
+  function spawnSpots(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    let best = null, bestD = Infinity;
-    const tryAt = (x, y) => {
-      const cand = { x: Math.round(x / 5) * 5, y: Math.round(y / 5) * 5, rot: want.rot };
-      const d = (cand.x - want.x) ** 2 + ((cand.y - want.y) * 2) ** 2;
-      if (d >= bestD || !gripPlacement(state2, cand).ok) return;
-      bestD = d;
-      best = cand;
-    };
-    const xLo = EDGE_FLAT, xHi = want.rot === 90 ? leafW - EDGE_FLAT : leafW * 0.55;
-    const yLo = EDGE_FLAT, yHi = leafH - EDGE_FLAT;
-    const at = (lo, hi, i, n) => lo + (hi - lo) * i / n;
-    for (let i = 0; i <= 24; i++) tryAt(at(xLo, xHi, i, 24), want.y);
-    for (let i = 0; i <= 24; i++) tryAt(want.x, at(yLo, yHi, i, 24));
-    for (let ix = 0; ix <= 11; ix++) {
-      for (let iy = 0; iy <= 17; iy++) tryAt(at(xLo, xHi, ix, 11), at(yLo, yHi, iy, 17));
+    const ideal = gripIdeal(state2);
+    const out = [];
+    for (const [dx, dy] of SPAWN) {
+      const cand = { x: ideal.x + dx, y: ideal.y + dy, rot: 0 };
+      if (cand.x > leafW * 0.55) continue;
+      if (cand.y < leafH * 0.18 || cand.y > leafH * 0.82) continue;
+      out.push(cand);
     }
-    if (!best) return want;
-    for (const axis of ["y", "x"]) {
-      let step2 = Math.abs(best[axis] - want[axis]) / 2;
-      while (step2 >= 5) {
-        const toward = best[axis] + Math.sign(want[axis] - best[axis]) * step2;
-        const cand = { ...best, [axis]: Math.round(toward / 5) * 5 };
-        if (gripPlacement(state2, cand).ok) best = cand;
-        step2 /= 2;
-      }
-    }
-    return best;
+    return out;
+  }
+  function spawnFlatSpots(state2) {
+    const size = SIZES[state2.size] || SIZES.standard;
+    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+    return SPAWN_FLAT.map((dy) => ({ x: leafW / 2, y: leafH - HANDLE_AFF + dy, rot: 90 })).filter((f) => f.y >= leafH * 0.18 && f.y <= leafH * 0.82);
   }
   var STRIP_H = { pitch: 0.19, span: 0.8, mid: 0.52 };
   var STRIP_H_TIGHT = { pitch: 0.033, mid: 0.55 };

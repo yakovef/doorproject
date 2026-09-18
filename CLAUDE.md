@@ -1098,6 +1098,36 @@ Peretz installs constantly — unreachable.
 `handleFootprint()` returns `{ out, in, vy }`, and every number is **measured
 off the drawing** with `npm run collide -- boxes`, never asserted.
 
+### ⚠ AND THE HANDLE HAS ONE PLACE, FROM A TABLE — 18.9.2026
+
+The customer does not position anything: the drag, the rotate button and the
+home button went at the owner's request, with `state.grip` and `gp=`.
+
+`gripHome` walks **`SPAWN`** — an ordered list of offsets from the measured
+ideal, 60 mm steps down the leaf to ±480, then inboard in 70s, then a short
+outboard rung — and takes the first one `gripPlacement` accepts. None accepted
+means the combination is **refused**, which `gripFitsAnywhere` reports to the
+tiles and `repair` acts on. A flat, centred candidate is tried last and only
+where `gripCanRotate` allows it: a handle that could stand up should stand up.
+
+⚠ **`gripPlacement` ASKS ABOUT COLLISION AND NOTHING ELSE.** The reach band
+(0.18–0.82 of leaf height) and the hinge-half limit (0.55 of the width) used to
+be refusals there; they are the table's own discipline now — `spawnSpots` never
+proposes past them. The owner's rule is *"if it doesnt collide with anything
+then its okay"*. **A band enforced at the check refuses; a band respected by
+the table never proposes.**
+
+⚠ **`faceObstacles` INCLUDES THE FOUR BOLTED FITTINGS** since the same day —
+the פעמון, the עינית, the קודן and the כספת. It knew only what a face is MADE
+of before, and a flat bar is centred exactly where the knocker and the viewer
+sit. Its memo key carries all three fields, or the first door of a session
+decides the answer for every door after it.
+
+`gripIdeal` is the one statement of where a handle wants to go;
+`spawnSpots`/`spawnFlatSpots` are the one statement of where it may go instead;
+`spawnIndexOf` is what lets a test say which rung it landed on rather than
+merely that it landed somewhere legal.
+
 ---
 
 ## 4. Rules the drawing obeys
@@ -1434,7 +1464,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm test` | ~3.4M string-level assertions: price, code, link, rules, drawing. The total moves with the catalogue's own lengths — see §0c |
 | `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed. Plus **the price breakdown can be read to its last line** (13.9) — its own eight shapes again, including a 1280×600 windowed browser that is in no list here, on two doors that are asserted to survive `repair` first: the column must never leave the screen, its TOTAL must be readable without scrolling, and — the clause that must stay true beside it — every component row must still be reachable when it is scrolled, so the cheap way to pass the first half (shrink the column until only the total shows) fails the second. Plus **an undo says what came back** (13.9) — its own four shapes in Hebrew AND Russian, walked FORWARD with the button because a rail click builds a different history: whenever an undo moves the price it must name a spec row, and — the clause that must stay true — its toast must cover no option tile, no price and no send, because the cheap way to pass the first half is a longer toast and a longer toast is what the 10.9 entry measured. Russian is carried because it is the longest copy and the box grows with it, 99 characters against Hebrew's 71. Plus **the saved-designs drawer fits the card it hangs in** (13.9) — its own five shapes in Hebrew and Russian, and the first check here that ever puts a design IN that drawer: opening it must not make the document scroll sideways and must not move the summary card or its `#spec` by a pixel, and — the clause that must stay true — every row must still name its PRICE and every delete button must be whole on screen and return itself from `elementFromPoint`, because the cheap way to fit a drawer is to shrink its rows until they say nothing, which is what the fix itself does (three doors of one colour read as ONE distinct row before the price went on). Plus a sixth page that saves a design the catalogue no longer builds and requires the drawer to SAY so on opening it, the promise `saveCurrent`'s own docstring makes and the handler was dropping. Plus **the wall chrome keeps its ink off the door** (14.9) — its own five phone widths (320, 360, 390, 430, 1100; 360 is where the worst reading is and `VIEWS` has neither it nor 430) plus the four wide ones, every size read off `SIZES` rather than listed, in Hebrew and Russian, measuring the GLYPHS (Range rects for the labels, the `<svg>` for the undo circles, disabled controls skipped) and not the padded button — because §0b's 28.8 fix deliberately allowed the BOX to overlap and measured the words stopping clear, on the one door in six where they do. It gates the two halves that are sound (the standard ₪3,195 leaf at every width, and every door at 1152 px and up) and NAMES the five that overlap as an exemption it fails if they stop needing, so §9's entry cannot outlive the fault. Plus **the price card stays inside the picture it is pinned to** (14.9) — its own nine desktop widths (1200 and 1366 are in no other list here) × three languages × all six sizes, because the card is 22–44 px wider on any size but `standard` and again in Russian, so the standard door in Hebrew is the least bad of the eighteen. ⚠ Its first clause is gated on arithmetic and its second deliberately is NOT: *where the wall can hold the card* the card must be whole, and NOWHERE may it be pulled onto `#frame`. Gated the same way the second clause could not fire at all — the card is only pulled onto the leaf where the wall cannot hold it, which is what the gate excludes, and falsified it reported 0 faults about 76 px × 122 of opaque paper on the widest double. Four readings already overlap and are NAMED and asserted to still overlap. Plus a third clause, that the price BREAKDOWN is centred on the card it hangs off, in three languages: the box that moves with the card is not the card, and in Hebrew that popover had never been centred on it. Where the wall is narrower than the card there is no good position and the sweep PRINTS those readings instead of gating them (§9). Plus **no two of the page's own marks are the same picture** (15.9) — the nine navigator circles and the thirteen spec-row marks RASTERISED at the size each ships at and compared pair by pair, which is the only instrument here that can see a fault the markup does not carry: `fit` and `sum` differed in every character and were the same rectangle. ⚠ The px size and the stroke weight are read off the STYLESHEET through a real element of each class, so it cannot go on measuring 21 px after the CSS moves, and the table is checked against what the RAIL renders before anything is compared, so it cannot pass on nine marks nobody sees. The floor is 0.50 differing-over-inked and it is a SCREEN, not a judgement — a paint drop against a four-pane window scores 0.51 and nobody confuses them — set above every pair a reader actually confused (0.42-0.48) and below every pair that survived the redraw (0.55) |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
-| `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times |
+| `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times. ⚠ Since 18.9.2026 it is also what keeps `SPECIAL_BOX` honest: the kodan's and kasefet's sizes are declared once and read by the drawing AND by `faceObstacles`, and this compares the declared box against the drawn one on every swept design |
 | `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
 | `npm run fuzz` | random combinations, then click-walks in a real browser |
 | `npm run profile` | the leaf's VERTICAL fall, against the medians `FALLOFF` was fitted to |
@@ -2431,6 +2461,118 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE PLACEMENT SEARCH IS A TABLE NOW, AND IT COSTS 20 DOORS OF 7,776 —
+  18.9.2026.** Part C, and the owner's own description of what he wanted:
+  *"every handle needs a good spot where it spawns that doesnt collide with
+  anything, and then if something is spawned that collides with it, then you
+  already have a predetermined second spot with that thing, then the pull
+  handle changes its place to that place. and if there is no place … you cant
+  combine this thing with this."*
+
+  What stood there was `nearestGrip` — two scan lines, an 11 × 17 lattice and a
+  halving walk-back, about 150 placement tests, bounded by `HOME_REACH`. It was
+  **measured and tuned rather than guessed**: 11 × 17 refused 1,482 of 6,480
+  where an exhaustive search refused 1,424 and a 7 × 11 grid refused 1,668.
+  None of that was wrong. It was the wrong SHAPE for the instruction — a search
+  answers *"somewhere that works"* and he asked for *"the second spot"* — and
+  **a list somebody wrote is a thing he can look at and disagree with, where a
+  lattice is not.**
+
+  ⚠ **THE STEP IS 60 mm AND IT IS MEASURED, WHICH IS THE ONLY PART OF THE TABLE
+  THAT IS NOT TASTE.** A first draft stepped 120/240/380/500 and lost **106**
+  combinations the search had kept. Asked where the search had actually put
+  those handles, the answer was blunt: **36 needed a 50 mm drop, 40 needed
+  440–450, and 10 needed 480 with 20 mm OUTBOARD.** So the ladder was too
+  coarse near the ideal and had a hole between 380 and 500. A uniform 60 mm
+  step to ±480, then 70 mm inboard, then a short outboard rung, takes it to
+  **20**. ⚠ Tuning the STEP against the search's answers is legitimate; adding
+  a rung per lost door would not be — one is a design decision informed by a
+  measurement, the other is fitting the table to the test.
+
+  ⚠ **AND THE 20 THAT ARE LEFT ARE ALL ONE CASE, AND THE SEARCH'S ANSWER TO IT
+  IS ONE THE CORPUS CONDEMNS.** Every one is `idan` + a backplate lockset + the
+  square window, on `extra1` and `halfextra1`. The search's spot was **0.741 of
+  the leaf** — a 1050 mm bar with its top at mid-door and its foot 80 mm off the
+  floor. The ten installed pull bars in the corpus sit between **0.430 and
+  0.512**. So this is not obviously a loss, and it is listed rather than
+  argued: the owner can look at those twenty and say.
+
+  ⚠ **AND THE TWO CLAUSES THAT WERE TASTE MOVED OUT OF THE RUNTIME.**
+  `gripPlacement` refused a position outside 0.18–0.82 of leaf height
+  (`why.gripReach`) and, upright, past 0.55 of the width
+  (`why.gripHingeSide`). The owner's rule for this table is one sentence —
+  *"forget about the ugly rule, if it doesnt collide with anything then its
+  okay"* — so the check now asks about COLLISION and nothing else, and the two
+  limits live in `spawnSpots`, which simply never proposes past them. The
+  measurements behind them stay written down where they were, because they are
+  the discipline the ladder is written to. **A band enforced at the check
+  refuses; a band respected by the table never proposes.**
+
+  ⚠ **AND FOUR FITTINGS BECAME OBSTACLES, WHICH THEY HAD NEVER BEEN.**
+  `faceObstacles` knew windows, mouldings and the classical set — the things a
+  face is MADE of — and the פעמון, the עינית, the קודן and the כספת were
+  outside the word "anything". **The one that matters is the bar lying down**:
+  the knocker and the viewer sit on the leaf's CENTRE LINE, which is exactly
+  where a flat bar is centred, and `SPAWN`'s inboard rungs reach it too — 210
+  mm inboard of a 215 mm backset is 425, and half an 850 mm leaf is 425. A ring
+  knocker and a pull bar could be drawn through each other; the only reason it
+  had not been reported is that a flat home is rare. Measured over **15,552**
+  combinations including all three fittings: making them obstacles costs
+  **zero** additional refusals.
+  ⚠ **AND THE MEMO KEY GREW BY THREE FIELDS**, which is the defect that would
+  have been quietest of all: `faceObstacles` is cached on
+  `size|detail|window`, and an obstacle list that depends on the bell, the
+  viewer and the extra lock while being cached on three keys that ignore them
+  lets the first door of a session decide the answer for every door after it.
+  ⚠ **AND `SPECIAL_BOX` IS HOISTED** — the kodan's 60 × 154 and the kasefet's
+  50 × 68 were `const W`, `const H` inside `specialLockArt`, which was right
+  while only the drawing needed them. Two readers now, one table, and
+  `npm run collide -- all` compares the declared box against the drawn one on
+  every swept design.
+
+  ⚠ **AND `gripIdeal` WAS EXTRACTED FOR THE SAME REASON.** `SPAWN`'s rungs are
+  offsets FROM the ideal, so `gripHome` needs it and so does `spawnIndexOf`,
+  which says which rung a handle landed on. Computed twice it is §5.10, and the
+  symptom would be an assertion quietly agreeing with a drawing that had moved.
+
+  **Three assertions, and what each would miss alone:**
+  · **the contract** — either the table found a spot and that spot is
+    buildable, or it found none and `gripFitsAnywhere` refuses the door. Never
+    a third thing, which would be a handle drawn through a window on a door
+    nothing had refused.
+    ⚠ Its §5.15 clause fired on the first run — *"83 placed and 0 refused"* —
+    because it was sweeping `everyPlacement()`, which filters by `buildable`
+    and therefore can never yield a refused door. **One of its two arms had no
+    subject and the guard said so.** It sweeps the raw cross-product now: 31
+    placed, 12 refused.
+  · **by INDEX** — the handle is on a RUNG of `SPAWN`, not merely somewhere
+    legal. That is the whole difference between a table and a search, and it is
+    the assertion a "somewhere legal" check would never make.
+  · **it lies down only where it cannot stand up** — asked of `spawnSpots`'
+    own candidates rather than by re-running `gripHome`, so it tests the
+    CANDIDATES and not the decision about itself.
+  **Falsified both ways**: nudging the returned spot 3 mm off its rung fires
+  the index check, and moving the flat branch above the upright one fires the
+  stand-up check on every door where both are legal.
+
+  ⚠ **AND THE 52 BARE SHEETS CAME BACK BYTE-IDENTICAL, WHICH IS THE STRONGEST
+  THING THAT CAN BE SAID ABOUT THIS CHANGE.** Predicted in node before they
+  were run — rendering all thirty gallery doors against the commit before it,
+  **not one moves** — and then `corpus`, `recreate` and `against` all came back
+  0 of 52. So the table reproduces the 150-test search on **every one of
+  Peretz's real doors and every comparison sheet**; the twenty it refuses are
+  in the catalogue's corners, not in his work.
+
+  ⚠ **AND ONE THING I GOT WRONG AND THE MEASUREMENT CAUGHT.** I read `fixed` on
+  the recessed channel's entry as "one position and no other" and gave it a
+  one-rung ladder. Measured: **144 more combinations lost their handle, all of
+  them panelled or classical faces, and not one was a door the tiles already
+  refused** — 144 real doors withdrawn on a misreading. `fixed`'s own comment
+  says what it means: *"offering to DRAG it offers something nobody can
+  build"*. Its three readers were all in the customer's path and all went with
+  the drag; `gripHome` never read it. Moving a recess between DESIGNS is what
+  the factory does. Reverted.
 
 - **⚠ THE HANDLE CANNOT BE MOVED ANY MORE, AND ABOUT 600 LINES CAME OUT WITH IT
   — 18.9.2026.** Part B of the handles work. The owner, in his words: *"i dont

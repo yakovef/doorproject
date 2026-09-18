@@ -9,9 +9,9 @@ import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   bellGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, grilleGlyph, handleGlyph, HOME_REACH, LIGHT,
-  bellFits, locksetGlyph, mashkofGlyph, nearestGrip, peepholeFits, peepholeGlyph,
-  pirzulGlyph, render, sizeGlyph, specialLockGlyph,
+  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleGlyph, LIGHT,
+  bellFits, locksetGlyph, mashkofGlyph, spawnIndexOf, spawnSpots, peepholeFits,
+  peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph,
   windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
@@ -2403,22 +2403,61 @@ group('a handle on a frame is refused, and told why');
   ok(!bad.ok, 'a foot on the window architrave should be refused');
   ok(/חלון/.test(bad.why || ''), `the reason should name the window, got "${bad.why}"`);
 
-  /* And the way out of it is a position that IS buildable, every time. */
-  let i = 0;
+  /* ⚠ THE SPAWN TABLE'S CONTRACT, restated from `nearestGrip`'s — 18.9.2026.
+     This used to drop the grip somewhere absurd and require the SEARCH either
+     to hand back a buildable spot or to hand back exactly what it was given;
+     there is no search and nothing hands it a position. What survives is the
+     half that was always the important one, and it is stronger now because
+     `gripHome` is the ONLY thing that decides where a handle goes:
+
+       either the table found a spot and that spot is buildable,
+       or it found none and `gripFitsAnywhere` says the door refuses the grip.
+
+     Never a third thing — a home that is not buildable and not refused is a
+     door drawn with its handle through a window. */
+  /* ⚠ THE RAW CROSS-PRODUCT, NOT `everyPlacement()`. That generator filters by
+     `buildable`, so every door it yields has already been accepted — and the
+     REFUSED arm below could never fire in it. The §5.15 clause caught exactly
+     that on the first run: "83 placed and 0 refused". A sweep in which one of
+     two arms has no subject is proving half of what it says. */
+  let i = 0, placed = 0, refusedN = 0;
+  for (const n of HANDLES) for (const w of WINDOWS) for (const d of DETAILS)
+    for (const size of sizeKeys) {
+      if (i++ % 23) continue;
+      const st2 = { ...base, handle: n.id, window: w.id, detail: d.id, size };
+      const home = gripHome(st2);
+      if (gripFitsAnywhere(st2)) {
+        placed++;
+        ok(gripPlacement(st2, home).ok,
+           `the table said this door has a spot and handed back one that does not `
+         + `work: ${st2.handle}/${st2.window}/${st2.detail}/${st2.size}`);
+      } else {
+        refusedN++;
+        ok(!gripPlacement(st2, home).ok,
+           `the table refused this door and handed back a spot that DOES work — `
+         + `the refusal and the drawing disagree: `
+         + `${st2.handle}/${st2.window}/${st2.detail}/${st2.size}`);
+      }
+    }
+  /* §5.15: both arms have to be exercised, or "every home is buildable" is
+     being proved by a sweep in which nothing is ever refused, and the reverse. */
+  ok(placed > 0 && refusedN > 0,
+     `the sweep saw ${placed} placed and ${refusedN} refused — it needs both arms`);
+  console.log(`  (${placed} doors placed from the table, ${refusedN} refused)`);
+
+  /* ⚠ AND THE SPOT IS ONE OF THE TABLE'S, BY INDEX. The point of a table over
+     a search is that the answer is predetermined, so the assertion is not
+     "somewhere legal" but "the Nth rung, and the first one that fits". A spot
+     that is legal but not on the ladder means something is still searching. */
+  let checked = 0;
   for (const st2 of everyPlacement()) {
-    if (i++ % 97) continue;
-    /* Dropped somewhere absurd. The search has a FIXED budget — about 150
-       samples — so it may legitimately come back with nothing, and the callers
-       fall back to home. What must never happen is that it hands back a spot
-       it has not checked. */
-    const wild = { x: 40, y: 200, rot: 0 };
-    const near = nearestGrip(st2, wild);
-    ok(gripPlacement(st2, near).ok || (near.x === wild.x && near.y === wild.y),
-       `nearestGrip moved the grip somewhere unbuildable on `
-     + `${st2.handle}/${st2.window}/${st2.size}`);
-    ok(gripPlacement(st2, gripHome(st2)).ok,
-       `and home is where the callers fall back to, so home must work on `
-     + `${st2.handle}/${st2.window}/${st2.size}`);
+    if (checked++ % 211) continue;
+    if (!gripFitsAnywhere(st2)) continue;
+    const home = gripHome(st2);
+    const idx = spawnIndexOf(st2, home);
+    ok(idx >= 0,
+       `the handle landed somewhere that is not a rung of SPAWN on `
+     + `${st2.handle}/${st2.window}/${st2.size}: ${JSON.stringify(home)}`);
   }
 }
 
@@ -3946,23 +3985,22 @@ group('a handle the customer moved reaches the order');
       const home = gripHome(st);
       if (home.rot !== 90) continue;
       checked++;
-      const stood = nearestGrip(st, { ...home, rot: 0 });
-      /* ⚠ LEGAL *AND* WITHIN REACH, because that is `gripHome`'s actual
-         promise and legality alone is not it. On nitzan/extra2 behind the
-         Greek set an upright bar IS legal — at 230,760, which is 260 mm above
-         hand height and on a 2,600 mm leaf is chest-high on the door and
-         nowhere near where a hand goes. `gripHome` refuses it for the same
-         reason the grab bar's note gives ("a knee rail"), and a check that
-         ignored the band would have demanded the drawing put a handle there.
-         `HOME_REACH` comes from the renderer rather than being typed here —
-         see the note on it, which asked for exactly this. */
-      const reachable = gripPlacement(st, stood).ok
-                     && Math.abs(stood.y - home.y) <= HOME_REACH;
-      ok(!reachable,
+      /* ⚠ ASKED OF THE TABLE'S OWN CANDIDATES — 18.9.2026. It used to search
+         with `nearestGrip` and then require the answer to be both illegal and
+         within `HOME_REACH`, because legality alone was not `gripHome`'s
+         promise: on nitzan/extra2 behind the Greek set an upright bar IS legal
+         at 230,760, which on a 2,600 mm leaf is chest-high and nowhere near
+         where a hand goes.
+         There is no search now, and the band is not a refusal — it is what
+         `spawnSpots` declines to propose. So the question is simply whether ANY
+         upright rung was available, which is the same claim without the second
+         clause: a rung that is out of reach is not on the list. */
+      const stood = spawnSpots(st).find(c => gripPlacement(st, c).ok);
+      ok(!stood,
          `${st.handle}/${st.size}/${st.window}/${st.detail}: the bar lies across `
-       + `the leaf and would stand up at ${Math.round(stood.x)},${Math.round(stood.y)}, `
-       + `${Math.round(Math.abs(stood.y - home.y))} mm from hand height — an upright `
-       + 'grip was available and was not taken');
+       + `the leaf and an upright rung of SPAWN was available at `
+       + `${stood ? Math.round(stood.x) + ',' + Math.round(stood.y) : ''} — `
+       + 'a handle that could stand up should stand up');
     }
     ok(checked === flatHome,
        `the sweep found ${flatHome} rotated homes and this one found ${checked} — `
