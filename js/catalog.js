@@ -593,7 +593,27 @@ export const LOCKSETS = [
   { id: 'plate',   he: 'רותם',  en: 'Rotem', ru: 'Ротем',   style: 'plate', lock: true, lever: true,
     aliases: ['longplate'] },
   { id: 'cadoor',  he: 'כדור',   en: 'Cadoor', ru: 'Шаровая',  style: 'cadoor' },
-  { id: 'sapir',   he: 'ספיר',   en: 'Sapir', ru: 'Сапир',  style: 'sapir', aliases: ['almog'] },
+  /* ⚠ `escutcheon: 'square'` — THE KEYWAY PLATE UNDER THIS KNOB IS SQUARE, and
+     we drew a round one under a square backplate for the life of the entry.
+     RB's own `…product-sapir.png` is two pieces: a square knob on a square
+     plate, and below it a square escutcheon carrying the cylinder. Measured
+     18.9: the lower piece is 114 x 117 px and its column-ink profile is flat
+     at 116-117 all the way across, where a circle ramps. It is 1.065 of the
+     plate above it.
+     The property names a SHAPE and never a position — `KEYWAY_BACKSET` and
+     `CYLINDER_AFF` still decide where the cylinder goes, and they are corpus
+     numbers. `cadoor` is deliberately not given one: its product shot shows
+     the knob alone, so there is no photograph of its escutcheon to read.
+     ⚠ AND ONE MEASURED RATIO IS RECORDED RATHER THAN ACTED ON. In the
+     photograph the escutcheon is **1.065 of the knob plate**; ours is 0.917,
+     because its half-side is `LOCK_R` and `LOCK_R` is the corpus's own
+     0.078 W across every escutcheon on the site. Matching the photograph
+     means a Sapir escutcheon 16% larger than every other one, on the strength
+     of ONE product shot with no corpus door behind it — which is REALISM.md
+     §6's own case for leaving it. If a Sapir turns up in the works
+     photographs, that ratio is the first thing to re-read. */
+  { id: 'sapir',   he: 'ספיר',   en: 'Sapir', ru: 'Сапир',  style: 'sapir', aliases: ['almog'],
+    escutcheon: 'square' },
   /* ⚠ `almog` IS WITHDRAWN — Peretz, 26.8.2026: "there is no: אלמוג". It
      resolves to `sapir`, the nearest lever left in the range. */
   /* Knob on a long backplate — the bronze fitting on d092, named three times

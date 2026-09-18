@@ -2403,6 +2403,117 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE CORAL'S BLADE WAS 13% TOO LONG FOR ITS OWN ROSE, ITS TILE WAS DRAWN
+  AT A THIRD SCALE AGAIN, AND THE ספיר HAD A ROUND KEYWAY PLATE UNDER A SQUARE
+  KNOB — 18.9.2026.** Part A of the handles work, and the owner's own priority:
+  *"the part with making them look like their real counterparts needs to be
+  bigger, this is probably the section that is most important"*, and
+  *"proportions is the most important thing."* So every number below is a RATIO
+  and not a millimetre read off a picture.
+
+  ⚠ **`LEVER_REACH` WAS 145 AND ITS OWN COMMENT SAID 4.0 ROSETTE RADII, WHICH
+  IS 120.** Three readings of one quantity, taken three different ways, and the
+  shipped constant was outside all of them:
+
+  | reading | source | gives |
+  |---|---|---|
+  | 4.0 rosette radii | the constant's own comment, first clause | 120 |
+  | 0.151 W of an 850 leaf | the same comment, second clause — the door metrology | **128.4** |
+  | 4.145 rosette radii | RB's two Coral photographs, measured 18.9 | 124.4 |
+  | — | **what shipped** | **145 — 4.83 radii** |
+
+  The two product shots agree with each other to 1.7% (`…product-coral.png`
+  reads a 222 px reach about a 54 px rose radius, `…coral-black-1.png` 234
+  about 56) and both put the ROSE at **0.48 of the reach where 145 put it at
+  0.41**. **128 taken rather than 124**: how far a lever reaches across a leaf
+  is a scale-on-the-door quantity and §7 gives those to the corpus, proportion
+  to the product shot; the two differ by 3% and the corpus wins the tie. The
+  blade's own depth needed nothing — measured 0.184 of the reach against our
+  0.179, which is inside the instrument's error.
+  ⚠ **AND THE ESCUTCHEON-TO-ROSE RATIO WAS ALREADY RIGHT**, which is worth
+  saying as loudly: `LOCK_R`/`LEVER_ROSETTE` is 1.10 and the photographs read
+  1.102 and 1.080. The constant that was wrong was the one with the prose
+  around it, and the one with no prose was correct.
+
+  ⚠ **AND THE TILE WAS DRAWN AT ITS OWN SCALE UNDER A HEADER SAYING IT CANNOT
+  BE.** `FITTING_GLYPH`'s docstring promises *"the numbers are the same measured
+  millimetres, so a tile cannot drift from its door"*, and `lever` carried
+  `r="39"` and `width="152"` against the door's 30 and 145 — **a rose 30%
+  oversized beside a blade that was not**, so the one thing that tile exists to
+  show, how big the rose is against the blade, was at 0.51 against the door's
+  own ratio. §5.19: a comment promising what the code does not do. Both levers
+  now build from `LEVER_ROSETTE`, `LEVER_REACH` and four new named constants
+  (`TAPER_REACH_F`, `TAPER_RISE`, `TAPER_HALF_NECK`, `TAPER_HALF_CAP`) that
+  `leverTaper()` reads too — so "it tapers, it rises and it is shorter" cannot
+  become true of the door and not of the tile.
+
+  ⚠ **THE ספיר'S KEYWAY PLATE IS SQUARE AND WE DREW A ROUND ONE UNDER A SQUARE
+  KNOB ON A SQUARE BACKPLATE.** Measured off `…product-sapir.png`: the lower
+  piece is 114 x 117 px and its column-ink profile is **flat at 116-117 all the
+  way across**, where a circle ramps — the Coral's escutcheon in the same
+  folder reads 19 52 68 80 … 121 … 18. `escutcheon: 'square'` on the catalogue
+  entry, `squareRose()` beside `disc()`, and `cylinder()` takes a shape.
+  ⚠ **THE SHAPE IS ALL IT TAKES.** The keyway, its rim, the key slot and both
+  speculars are placed off `kx`/`ky` and do not move: `KEYWAY_BACKSET` and
+  `CYLINDER_AFF` decide where a cylinder sits on a leaf and they are corpus
+  numbers a plate's outline may not touch. The square keeps `data-mount="rose"`,
+  because that attribute means *bolted through the leaf* and is read by the
+  check that says nothing may be bolted to a pane.
+  ⚠ **And one measured ratio is RECORDED RATHER THAN ACTED ON**: the
+  photograph's escutcheon is **1.065 of the knob plate** and ours is 0.917,
+  because its half-side is `LOCK_R` — the corpus's own 0.078 W, shared by every
+  escutcheon on the site. Matching it means a Sapir escutcheon 16% larger than
+  every other one on the strength of ONE product shot with no corpus door
+  behind it. REALISM.md §6's own case for leaving it.
+
+  ⚠ **AND THE BAR WIDTHS WERE MEASURED, FOUND TO DISAGREE WITH THE CORPUS BY
+  20%, AND NOT MOVED — BECAUSE THE FILES CANNOT GIVE A MILLIMETRE AT ALL.** The
+  obvious reading is to divide a bar's shaft pixels by the length in its
+  filename. Done on the whole-bar shots it gives `idan` 38 mm against the
+  catalogue's 32, `shahar` 36 against 40, `ron` 26 against 18. Then the same
+  arithmetic on the SECOND length of one product refutes the method: `ron` is
+  22 px over 215 at "400" and 21 px over 342 at "800" — both bars whole in
+  frame, both end caps visible — so a product twice as long would have to be
+  **49 mm** thick where the shorter one is 26. Each file is independently
+  scaled to fit a 402 x 519 frame, so **no scale survives from one to the
+  next**, and a width in millimetres cannot be recovered from any of them. The
+  corpus stays the only source for bar widths, which is where they came from
+  (a round tube at 0.036 of leaf width over twenty-one doors). ⚠ What these
+  files CAN decide is scale-free and is in the audit entry below: the SECTION,
+  and the end profile.
+  `npm run collide -- boxes` re-measured every footprint and the three
+  declarations that moved follow the drawing (`lever` 152 → 135, `levertaper`
+  132 → 118, `square` 152 → 135); `-- all` is clean over 2,104 designs.
+  No id, no list order, no bit, no `VERSION`, no price.
+
+  ⚠ **AND `npm run hardware` HAS BEEN PHOTOGRAPHING BARE PAINT, WHICH IS HOW
+  ALL OF THE ABOVE CAME TO NEED A SCRATCH HARNESS.** That sheet is 21 close
+  crops of the lock stile and its docstring says it exists *"so that failure is
+  visible without hunting for it in a full-door screenshot"*. It cropped
+  `leaf.x + leaf.w * 0.42` rightward — the right-hand 58% of the leaf, which is
+  where the lock is on a LEFT-handed door — and every case but one is
+  `h=right-in`, on which the cylinder is on the LEFT. **Twenty of the
+  twenty-one were blank leaf**, and the loop printed `ok` for each. The one
+  that worked is `lock-plate-left`, the one case that passes `h=left-in`, which
+  is what made it findable at all.
+  ⚠ **§7's own rule is the cure and a mirrored fraction is not**: it asks the
+  page for the union of the drawn `[data-hw]` boxes, which cannot be wrong
+  about handing, about a fitting that moves, or about one added later — and it
+  THROWS when it finds none, because a crop of bare paint reporting `ok` is
+  exactly how this survived. ⚠ **AND `f=steel` / `f=brass` WERE ON EVERY
+  CASE**: `f` is the retired finish parameter, ignored outright since the axis
+  was withdrawn, so the two cases whose whole subject was brass were
+  byte-identical to their steel neighbours while claiming otherwise. They ask
+  the פרזול for it now (`pz=pz-gold`), and `pair-shahar-almog` is named for the
+  fitting it actually draws, `almog` being a withdrawn id that resolves to
+  `sapir`.
+  ⚠ **AND THE SHEET IS THE ONE COMMITTED FAMILY WITH NO STALENESS STAMP**, so
+  it had also stopped covering the range: `barblack`, `cylinder`, `digital`,
+  `square` and `lever-taper` have no crop in the repository at all. Recorded
+  rather than fixed by adding a fifth stamped family — the guard that matters
+  here is the throw, since a stamp cannot tell a current blank from a stale
+  one.
+
 - **⚠ THE HANDLE CATALOGUE WAS AUDITED AGAINST THE MANUFACTURER'S OWN
   PHOTOGRAPHS AND FIVE OF ITS SIXTEEN ROWS ARE NOT WHAT THEY SAY THEY ARE —
   18.9.2026. NOTHING WAS CHANGED.** Asked for from outside, in these words:

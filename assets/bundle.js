@@ -1441,7 +1441,34 @@
       aliases: ["longplate"]
     },
     { id: "cadoor", he: "כדור", en: "Cadoor", ru: "Шаровая", style: "cadoor" },
-    { id: "sapir", he: "ספיר", en: "Sapir", ru: "Сапир", style: "sapir", aliases: ["almog"] },
+    /* ⚠ `escutcheon: 'square'` — THE KEYWAY PLATE UNDER THIS KNOB IS SQUARE, and
+       we drew a round one under a square backplate for the life of the entry.
+       RB's own `…product-sapir.png` is two pieces: a square knob on a square
+       plate, and below it a square escutcheon carrying the cylinder. Measured
+       18.9: the lower piece is 114 x 117 px and its column-ink profile is flat
+       at 116-117 all the way across, where a circle ramps. It is 1.065 of the
+       plate above it.
+       The property names a SHAPE and never a position — `KEYWAY_BACKSET` and
+       `CYLINDER_AFF` still decide where the cylinder goes, and they are corpus
+       numbers. `cadoor` is deliberately not given one: its product shot shows
+       the knob alone, so there is no photograph of its escutcheon to read.
+       ⚠ AND ONE MEASURED RATIO IS RECORDED RATHER THAN ACTED ON. In the
+       photograph the escutcheon is **1.065 of the knob plate**; ours is 0.917,
+       because its half-side is `LOCK_R` and `LOCK_R` is the corpus's own
+       0.078 W across every escutcheon on the site. Matching the photograph
+       means a Sapir escutcheon 16% larger than every other one, on the strength
+       of ONE product shot with no corpus door behind it — which is REALISM.md
+       §6's own case for leaving it. If a Sapir turns up in the works
+       photographs, that ratio is the first thing to re-read. */
+    {
+      id: "sapir",
+      he: "ספיר",
+      en: "Sapir",
+      ru: "Сапир",
+      style: "sapir",
+      aliases: ["almog"],
+      escutcheon: "square"
+    },
     /* ⚠ `almog` IS WITHDRAWN — Peretz, 26.8.2026: "there is no: אלמוג". It
        resolves to `sapir`, the nearest lever left in the range. */
     /* Knob on a long backplate — the bronze fitting on d092, named three times
@@ -2819,7 +2846,13 @@ ${stops}
   var KEYWAY_BACKSET = 63;
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
-  var LEVER_REACH = 145;
+  var LEVER_REACH = 128;
+  var TAPER_REACH_F = 0.85;
+  var TAPER_RISE = 13;
+  var TAPER_HALF_NECK = 20;
+  var TAPER_HALF_CAP = 13;
+  var taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
+  var taperHalf = (t, L2) => TAPER_HALF_NECK - (TAPER_HALF_NECK - TAPER_HALF_CAP) * (t / L2);
   var LOCK_CLEAR = 15;
   var PANEL_GAP = 25;
   var MOULD_BAND = 70;
@@ -4517,7 +4550,7 @@ ${stops}
         business, not the keyhole's. See KEYWAY_BACKSET — this is the
         second round the keyhole has had to be nailed down, and the first
         fix only caught the grip. */
-    ""}${lockset.lock ? "" : cylinder(keyX, y(CYLINDER_AFF))}
+    ""}${lockset.lock ? "" : cylinder(keyX, y(CYLINDER_AFF), false, lockset.escutcheon || "round")}
     ${/* ⚠ THE EXTRA LOCK IS DRAWN, AND THAT IS NOT DECORATION. A כספת is ₪700
         and a קודן is ₪900, and a configurator that takes money for something
         the drawing does not show is a hidden cost with a label on it — the
@@ -6471,14 +6504,14 @@ ${body}
          half the height and now reports the reach, for the same reason `out` and
          `in` stopped being one symmetric `hx`. */
       case "lever":
-        return { out: 40, in: 152, vy: 51 };
+        return { out: 40, in: 135, vy: 51 };
       /* The curved lever: shorter than the Coral (0.85 of the reach) and no
          wider anywhere, so it sits inside the Coral's declaration on every axis.
          Declared on its own anyway rather than shared, because it is a different
          product and a shared line is a claim that it is not. Measured by
          `npm run collide -- boxes`, which is what the numbers below are. */
       case "levertaper":
-        return { out: 40, in: 132, vy: 51 };
+        return { out: 40, in: 118, vy: 51 };
       case "plate":
         return { out: 47, in: 119, vy: 170 };
       case "almog":
@@ -6506,7 +6539,7 @@ ${body}
       case "digital":
         return { out: 28, in: 33, vy: 145 };
       case "square":
-        return { out: 41, in: 152, vy: 149 };
+        return { out: 41, in: 135, vy: 149 };
       case "shiran":
         return { out: 43, in: 43, vy: 240 };
       default: {
@@ -7056,6 +7089,18 @@ ${body}
       ${step(cx, cy, r * 0.7, 2, 0.26, 0.2)}
       ${brushing(cx, cy, r * 0.16, r * 0.62)}
     </g>`;
+  var squareRose = (cx, cy, r) => `
+    <g data-mount="rose">
+      <rect x="${cx - r + 3}" y="${cy - r + 5}" width="${r * 2}" height="${r * 2}"
+            rx="${r * 0.18}" fill="#000" opacity="0.36" filter="url(#hwShadow)"/>
+      <rect x="${cx - r}" y="${cy - r}" width="${r * 2}" height="${r * 2}"
+            rx="${r * 0.18}" fill="url(#nickel)"/>
+      <rect x="${cx - r + 1.5}" y="${cy - r + 1.5}" width="${r * 2 - 3}" height="${r * 2 - 3}"
+            rx="${r * 0.16}" fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="2"/>
+      <rect x="${cx - r * 0.82}" y="${cy - r * 0.82}" width="${r * 1.64}" height="${r * 1.64}"
+            rx="${r * 0.14}" fill="none" stroke="#000" stroke-opacity="0.26" stroke-width="2"/>
+      ${brushing(cx, cy, r * 0.16, r * 0.62)}
+    </g>`;
   function lever(cx, cy, dir) {
     const L2 = LEVER_REACH;
     const at = (t) => cx + dir * t;
@@ -7116,11 +7161,10 @@ ${body}
     </g>`;
   }
   function leverTaper(cx, cy, dir) {
-    const L2 = Math.round(LEVER_REACH * 0.85);
+    const L2 = taperReach();
     const at = (t) => cx + dir * t;
-    const RISE = 13;
-    const mid = (t) => cy - RISE * (t / L2);
-    const half = (t) => 20 - 7 * (t / L2);
+    const mid = (t) => cy - TAPER_RISE * (t / L2);
+    const half = (t) => taperHalf(t, L2);
     const pt = (t, s) => `${at(t)} ${(mid(t) + s * half(t)).toFixed(1)}`;
     return `
     <g data-kind="lever">
@@ -7245,13 +7289,16 @@ ${body}
                fill="#fff" fill-opacity=".26"/>
     </g>`;
   };
-  var cylinder = (cx, cy, owned = false) => {
+  var cylinder = (cx, cy, owned = false, shape = "round") => {
     const R = LOCK_R;
     const kx = cx, ky = cy + 2;
+    const plate = shape === "square" ? squareRose(cx, cy, R) : disc(cx, cy, R);
+    const domed = shape === "square" ? `<rect x="${cx - R * 0.9}" y="${cy - R * 0.9}" width="${R * 1.8}" height="${R * 1.8}"
+             rx="${R * 0.1}"` : `<circle cx="${cx}" cy="${cy}" r="${R * 0.9}"`;
     return `
     <g data-hw="lock"${owned ? ' data-owner="lockset"' : ""} data-kind="cylinder"
-       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      ${disc(cx, cy, R)}
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}" data-plate="${shape}">
+      ${plate}
       <!-- The escutcheon is DOMED, not a flat plate. On d026 and d030 it is
            plainly a little hemisphere standing off the door with a highlight
            up its top-left and a crescent of shade under it; drawn flat it
@@ -7263,8 +7310,7 @@ ${body}
         <stop offset="0.55" stop-color="#fff" stop-opacity="0.05"/>
         <stop offset="1"    stop-color="#000" stop-opacity="0.22"/>
       </radialGradient>
-      <circle cx="${cx}" cy="${cy}" r="${R * 0.9}"
-              fill="url(#dome-${Math.round(cx)}-${Math.round(cy)})"/>
+      ${domed} fill="url(#dome-${Math.round(cx)}-${Math.round(cy)})"/>
 
       <!-- the euro cylinder is recessed into the escutcheon, so its opening
            is occluded at the top and catches a little bounce at the bottom -->
@@ -7353,17 +7399,44 @@ ${body}
        and the two disagreed until 14.9.2026, when the owner noticed on the door.
        Nothing could have caught it: the distinctness test compares tiles to
        other tiles, not tiles to the drawing they promise. */
-    lever: () => ({ box: [-172, -48, 52, 48], art: `
-    <circle cx="0" cy="0" r="39"/>
-    <rect x="-152" y="-13" width="152" height="26" rx="13"/>` }),
+    /* ⚠ AND IT WAS DRAWN AT ITS OWN SCALE, WHICH IS WHAT THE HEADER ABOVE SAYS
+       CANNOT HAPPEN. `r="39"` against the door's 30 and `width="152"` against
+       its reach: the tile's rose was 30% oversized and its blade was not, so the
+       one thing this tile exists to show — how big the rose is beside the blade
+       — was the thing it got wrong, at 0.51 against the door's own ratio. Both
+       numbers come off the constants now, so `LEVER_REACH` moving moves the tile
+       with it. */
+    lever: () => ({ box: [
+      -(LEVER_REACH + 16),
+      -(LEVER_ROSETTE + 12),
+      LEVER_ROSETTE + 12,
+      LEVER_ROSETTE + 12
+    ], art: `
+    <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
+    <rect x="${-LEVER_REACH}" y="-13" width="${LEVER_REACH}" height="26" rx="13"/>` }),
     /* The curved lever: the tile has to carry all three things that make it a
        different product from the Coral above — it tapers, it rises, and it is
        shorter — or the two tiles are a bar and a slightly shorter bar. Drawn as
-       a polygon rather than a `rect` for exactly that reason. */
-    levertaper: () => ({ box: [-152, -60, 52, 48], art: `
-    <circle cx="0" cy="0" r="39"/>
-    <path d="M -8 -20 L -118 -33 Q -132 -34 -132 -27 L -132 -20
-             Q -132 -14 -118 -15 L -8 20 Z"/>` }),
+       a polygon rather than a `rect` for exactly that reason, and off the same
+       four constants `leverTaper()` draws the door with, so "shorter" and "it
+       tapers" cannot become true of one of them and not the other. */
+    levertaper: () => {
+      const L2 = taperReach();
+      const mid = (t) => -TAPER_RISE * (t / L2);
+      const half = (t) => taperHalf(t, L2);
+      const pt = (t, s) => `${-t} ${(mid(t) + s * half(t)).toFixed(1)}`;
+      return { box: [
+        -(L2 + 16),
+        -(LEVER_ROSETTE + TAPER_RISE + 12),
+        LEVER_ROSETTE + 12,
+        LEVER_ROSETTE + 12
+      ], art: `
+    <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
+    <path d="M ${pt(0, -1)} L ${pt(L2 - 20, -1)}
+             Q ${pt(L2, -0.95)} ${pt(L2, 0)}
+             Q ${pt(L2, 0.95)} ${pt(L2 - 20, 1)}
+             L ${pt(0, 1)} Z"/>` };
+    },
     /* Cylinder only: an escutcheon with a euro keyway and nothing else. It had
        no entry here, so it fell to the `else` branch and drew a lever — the
        picture of the one lockset it exists to be an alternative to. Same shape
