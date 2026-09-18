@@ -2403,6 +2403,114 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE HANDLE CATALOGUE WAS AUDITED AGAINST THE MANUFACTURER'S OWN
+  PHOTOGRAPHS AND FIVE OF ITS SIXTEEN ROWS ARE NOT WHAT THEY SAY THEY ARE —
+  18.9.2026. NOTHING WAS CHANGED.** Asked for from outside, in these words:
+  *"be very sceptic about our handles, some might be very different, maybe we
+  have 2 types of handles that are actually one, maybe there are some handles
+  that need to be added, make sure you get everything right, dont add something
+  if you are not sure."* So this round is an AUDIT: it opens every cut-out in
+  `research/handles/rb/`, compares it against the entry that claims it, and
+  reports. **No id, no alias, no list order, no price, no drawing and no
+  `VERSION` moved** — which is the whole reason it costs nothing to run.
+
+  ⚠ **THE THREE ALIASES PERETZ'S 26.8 WITHDRAWAL CREATED EACH POINT AT A
+  VISIBLY DIFFERENT PRODUCT, AND RB PHOTOGRAPHS ALL THREE.** The withdrawal is
+  his and stands; what is new is that we now know what each id was:
+
+  | alias | resolves to | what the photograph shows |
+  |---|---|---|
+  | `shiran` | `idan` | an **ornate antique-brass turned pull** — finials, bulbous bosses, a fluted shaft. `idan` is a plain brushed-steel round tube |
+  | `luna` | `idan` | a **black half-disc slab**, 242 x 488 px, aspect 0.496 — a flat semicircular panel pull |
+  | `almog` | `sapir` | a **lever on a round rose**, 391 x 117 horizontal. `sapir` is a square KNOB on a square backplate |
+
+  ⚠ **AND THE FIRST OF THOSE IS THE RATIO TRAP §7 ALREADY RECORDS, ARRIVING
+  WHERE NOBODY WAS WATCHING FOR IT.** `shiran`'s ink box is 80 x 439 (aspect
+  0.182) and `idan`'s is 80 x 471 (0.170) — **the two agree to seven per cent
+  and share nothing whatever.** Both are long thin vertical things, so the one
+  cheap number that would have been taken cannot separate them. *"When a check
+  is a ratio, ask what pair of errors would cancel in it"*, and here it is not
+  even a pair: a single scalar cannot tell a fluted brass baluster from a steel
+  tube. **The alias is not restored** — it is how a customer's old link
+  survives, and Peretz said *"there is no: שירן"* — but `ASK-PERETZ.md` now
+  asks whether he fits any of the three, because three products we can name and
+  cannot draw is a different fact from three ids nobody uses.
+
+  ⚠ **FIVE PRODUCTS RB SELLS THAT OUR CATALOGUE DOES NOT NAME, AND NOT ONE OF
+  THEM IS ADDED.** `sivan.png` is a **square-section** bar with square
+  standoffs (50 x 558, 0.0896); `…product-shira-1.png` is the slimmest thing in
+  the folder, a fine square bar with small round bosses (16 x 493, **0.0325**);
+  and `rotem-pas-lavavn`, `rotem-black-{400,800}` and `rotem-white-400` are one
+  product in two variants — **a flat bar with a contrasting inlay stripe down
+  its face**, white or black. Plus Shiran and Luna above. An id is a permanent
+  wire format and this file already records `shiran` as the one grip *"drawn
+  from nothing"* and withdrawn for it, so the rule held: **they are asked
+  about, not added.**
+
+  ⚠ **AND `רותם` IS A NAME COLLISION.** Our `plate` entry is labelled רותם /
+  Rotem and draws a lock BACKPLATE. Every file in `rb/` carrying that name is a
+  PULL BAR. Either RB sells two products under it or the label is on the wrong
+  row, and neither is something to guess at.
+
+  ⚠ **`ron` IS RIGHT ABOUT THE DOOR AND PROBABLY WRONG ABOUT THE NAME, WHICH IS
+  THE "TWO THAT ARE ACTUALLY ONE" CASE ARRIVING BACKWARDS.** RB's רון is a
+  **dark, square-section bar with bright steel square end caps**, identically
+  at 400 and at 800. Our `ron` is `bar: 'ron'` → `barTube`, a round steel tube,
+  and its widths were measured off d072, d035 and d074. Cropped and looked at,
+  **d035's bar really is a round polished tube** — so the entry describes a real
+  thing on a real door and merely carries a name that RB puts on something else.
+  `barblack` then sits on top of that: it is `bar: 'ron'` with `finish: 'black'`,
+  which is our round tube painted black, while RB's Ron is already the black
+  square one. Reported, not resolved: changing either would move a drawing that
+  thirty recreations are checked against.
+
+  ⚠ **THE SUSPICION THAT `ella` AND `nitzan` ARE ONE PRODUCT MEASURED TWICE IS
+  REFUTED**, and it is worth saying so as loudly as the findings. They are
+  declared 1000 mm apart only in width (20 against 44), which is exactly what a
+  double measurement looks like — and the photographs settle it in one look:
+  **Ella is a round ANTIQUE-BRASS tube with banded collars; Nitzan is a
+  SQUARE-section steel bar with clamp blocks.** Two products.
+
+  ⚠ **AND THE LOG'S OWN WORD "INVENTED" IS WRONG ABOUT THE FIXINGS, WHICH
+  CHANGES NOTHING AND HAD TO BE CORRECTED ANYWAY.** §0b records *"Ella's banded
+  collars, Nitzan's clamp blocks over a backplate with a screw head, Ron's
+  bright two-tone end shoes, Shahar's mitred legs… all invented"*. **Every one
+  of the four is in RB's own product photograph**, and Shahar's legs are not a
+  decoration at all — that bar turns ninety degrees at each end and the legs ARE
+  its fixing. What the corpus supports is the narrower claim, and it is the one
+  that governs: *twenty-one bar-carrying doors show unbroken metal end to end*,
+  so a square-on elevation does not draw them. **The decision stands on the
+  corpus; the word does not stand on anything**, and a false "invented" is
+  exactly what stops the next person looking.
+
+  ⚠ **THE SECTIONS DISAGREE ON THREE OF FIVE BARS.** RB photographs `idan` and
+  `ella` as round tubes — which `BARS` has right — and `nitzan`, `ron` and
+  `shahar` as **square**, where `BARS` puts nitzan and shahar on `barStrap`
+  (flat) and ron on `barTube` (round). Flat-against-square is a soft
+  disagreement (a square tube presents a flat face square-on, which is what
+  `barStrap`'s two hairline arrises draw); round-against-square is not.
+
+  ⚠ **AND THE MEASUREMENT THIS AUDIT WANTED CANNOT BE TAKEN FROM THESE FILES,
+  WHICH IS WORTH MORE THAN ANY OF THE ABOVE.** The obvious move is to read a
+  true millimetre width off the length-labelled shots — `idan-400`,
+  `idan-1200`, `ella-450`, `ela-800`, `ella-1200` and the rest — by dividing the
+  shaft's pixels by the nominal length. Done, it gives `idan` a diameter of
+  38 mm at 400 and **76 mm at 1200**, and `ella` 38 / 54 / 83: a product cannot
+  have three diameters. **The 1200 shots are CROPPED by the frame at both
+  ends** — the bar runs off the top and bottom edge — so the ink height is the
+  frame, not the length, and every figure derived from it is a measurement of
+  the picture's border. Found by opening the file after the arithmetic came
+  back absurd, which is this file's oldest habit: *when a number is confidently
+  wrong about something you can check by hand, go and check it by hand.* The
+  400-mm shots are whole and are the ones a width may be read from.
+
+  ⚠ **WHAT THIS AUDIT DID NOT ESTABLISH.** The names above are RB's **file
+  names**, not RB's printed catalogue; the twenty-one pages in
+  `research/handles/pages/` were not read for a price list or a name beside
+  each picture. And `knobplate`, `digital` and `square` still have **no
+  photograph of any kind** — the audit confirms the gap rather than closing it.
+  Four questions go to `ASK-PERETZ.md` §1f as four lines.
+
 - **⚠ THE FLOW ROUND: FIVE ITEMS, FIVE COMMITS, AND THE 52 BARE SHEETS CAME
   BACK BYTE-IDENTICAL FROM EVERY ONE — 14.9.2026.** Part C of Peretz's review.
   Nothing here reaches the drawing, so a moved bare sheet would have been a
