@@ -608,16 +608,28 @@ group('the leaf does not move when the frame does');
    door green. So this one reads the EMITTED GRADIENT, on every pair. */
 group('the pull handle does not recolour the lock furniture');
 {
+  /* ⚠ BOTH OF THE FURNITURE'S GRADIENTS, NOT JUST `nickel` — 19.9.2026.
+     This read `#nickel` alone, which was every gradient the lock furniture
+     painted with on the day it was written. The rose moved to `#roseFace` when
+     it stopped being drawn as a ball, and a check that reads one gradient
+     cannot see a fitting that has quietly stopped following the finish through
+     a new one — which is exactly the defect this block exists for, arriving
+     through a door it was not watching. Any gradient added to that family goes
+     in here the same day. */
+  const NAMES = ['nickel', 'roseFace'];
   const stops = svg => {
-    const m = svg.match(/<linearGradient id="nickel"[\s\S]*?<\/linearGradient>/);
-    return m && [...m[0].matchAll(/stop-color="(#[0-9A-Fa-f]{6})"/g)].map(x => x[1]).join(',');
+    const parts = NAMES.map(n => {
+      const m = svg.match(new RegExp(`<(linear|radial)Gradient id="${n}"[\\s\\S]*?</\\1Gradient>`));
+      return m && [...m[0].matchAll(/stop-color="(#[0-9A-Fa-f]{6})"/g)].map(x => x[1]).join(',');
+    });
+    return parts.every(Boolean) ? parts.join(' | ') : null;
   };
   /* One reading per pirzul, taken with a grip that declares no finish of its
      own, so it is the pirzul and nothing else that produced it. */
   const want = {};
   for (const z of PIRZUL) {
     want[z.id] = stops(render({ ...base, handle: 'idan', lockset: 'coral', pirzul: z.id }));
-    ok(want[z.id], `no #nickel gradient on a ${z.id} door — this check is asserting nothing`);
+    ok(want[z.id], `a ${z.id} door is missing one of ${NAMES.join('/')} — this check is asserting nothing`);
   }
   ok(new Set([want['pz-nickel'], want['pz-black'], want['pz-bronze']]).size === 3,
      'three pirzul finishes produced fewer than three different metals');
@@ -2681,9 +2693,15 @@ group('the finish reaches every piece of metal');
        ⚠ And it cannot use `looks()` above: the escutcheon around the plug is
        lock furniture and paints with #nickel quite correctly, so the group as
        a whole moves with the פרזול even when the plug does not. */
+    /* ⚠ `linear|radial` SINCE 19.9.2026. The rose became a RADIAL gradient when
+       it stopped being drawn as a ball, and this matched the word
+       `linearGradient` literally — so it returned null for the one gradient the
+       escutcheon now paints with, and the `lift` below fell over on it rather
+       than going quietly, which is the good outcome of the two. */
     const stopsOf = (svg, id) => {
-      const g = new RegExp(`<linearGradient id="${id}"[^>]*>([\\s\\S]*?)</linearGradient>`).exec(svg);
+      const g = new RegExp(`<(linear|radial)Gradient id="${id}"[^>]*>([\\s\\S]*?)</\\1Gradient>`).exec(svg);
       if (!g) return null;
+      g[1] = g[2];
       return [...g[1].matchAll(/offset="([^"]+)"\s+stop-color="([^"]+)"/g)]
         .map(m => ({ at: Number(m[1]), hex: m[2] }));
     };
@@ -2751,8 +2769,29 @@ group('the finish reaches every piece of metal');
          Each cylinder stop is paired with the furniture stop at the nearest
          OFFSET, both read off the emitted markup, so this holds no copy of
          which ramp entry feeds which stop. */
+      /* ⚠ THE COMPARATOR IS THE פרזול'S BODY RAMP AND IT HAS TO BE READ OFF A
+         DOOR THAT STILL CARRIES IT — 19.9.2026. `cylinderRamp` derives the
+         plug's stand-off against `#nickel`, so `#nickel` is the quantity this
+         invariant is defined in. On 19.9 the rose stopped being drawn as a ball
+         and moved to `#roseFace`, and on a CYLINDER-ONLY door the rose was the
+         last thing referencing `#nickel` — so `usedDefs` correctly pruned it
+         and this read null. §5.15 arriving through a fill rather than through a
+         selector.
+         ⚠ AND `roseFace` IS NOT THE SUBSTITUTE, WHICH WAS MEASURED BEFORE IT
+         WAS BELIEVED. It is the obvious one — it is what paints the escutcheon
+         now — and its stops are a different set of ramp entries at different
+         offsets, so pairing the plug against it by nearest offset gives chrome
+         1.434/1.158/0.970 against bronze 1.698/1.156/0.762: a quarter apart on
+         an invariant whose tolerance is 0.02. That is not the cylinder having
+         moved, it is the comparator having changed, and adopting it would have
+         meant widening a gate to fit a reading.
+         So the ramp is read off a door with a LEVER on it, which emits the same
+         `#nickel` it always did — the numbers here are identical to what they
+         were before the rose changed, which is the whole point. */
       const lift = z => {
-        const furn = stopsOf(cyl[z].svg, 'nickel');
+        const furn = stopsOf(render({ ...base, lockset: 'coral', pirzul: z }), 'nickel');
+        ok(furn, `#nickel is not emitted on a coral door for the פרזול ${z} — `
+               + 'this check has lost its comparator and is asserting nothing');
         return cyl[z].stops.map(c => {
           const near = furn.reduce((a, b) =>
             Math.abs(b.at - c.at) < Math.abs(a.at - c.at) ? b : a);

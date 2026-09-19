@@ -2901,7 +2901,7 @@ ${stops}
   var MULLION = 22;
   var EDGE = 38;
   var HANDLE_AFF = 1020;
-  var CYLINDER_AFF = 904;
+  var CYLINDER_AFF = 915;
   var PEEPHOLE_AFF = 1600;
   var SPECIAL_AFF = 1430;
   var SPECIAL_BOX = { kasefet: { w: 50, h: 68 }, kodan: { w: 60, h: 154 } };
@@ -2917,6 +2917,7 @@ ${stops}
   var LOCK_R = 33;
   var LEVER_ROSETTE = 30;
   var LEVER_REACH = 128;
+  var LEVER_BLADE = Math.round(LEVER_ROSETTE * 2 * 0.377);
   var TAPER_REACH_F = 0.85;
   var TAPER_RISE = 13;
   var TAPER_HALF_NECK = 20;
@@ -3561,6 +3562,43 @@ ${stops}
       <stop offset="0.5" stop-color="${hwTone[3]}"/>
       <stop offset="1"   stop-color="${hwTone[5]}"/>
     </linearGradient>
+
+    <!-- ⚠ THE ROSE IS A TURNED DISC AND nickel WAS DRAWING IT AS A BALL.
+         disc() filled with url(#nickel) — a LINEAR ramp from the brightest
+         entry to the darkest — laid across the whole face of a 60 mm circle.
+         Measured on the live page, horizontally through the rose's centre:
+
+           ours       148 151 170 177 169 161 153 146 143 145 150 152 148 143
+                      139 138 132 125 120        a smooth 32% fall, one side
+                                                 to the other: a sphere
+           photograph 138 134 123 116 113 112 111 110 107 106 105 104 105 106
+                      105 103 108 110 102 110 135 155
+                                                 flat within 5% across the
+                                                 face, and BRIGHT AT BOTH RIMS
+
+         A rose is a disc turned on a lathe and seen dead square-on: its face
+         is one plane at one angle to the light, and what catches the light is
+         the chamfer round its edge. So this is RADIAL — a flat crown out to
+         0.6 of the radius, lifting to the brightest entry at the rim and
+         turning down again in the last two per cent, which is the chamfer
+         rolling away. The measured rim-to-centre ratio is about 1.35 and
+         hwTone[0] over hwTone[2] is 1.40 on steel.
+
+         ⚠ WHOSE METAL: the פרזול's, like nickel, nickelSoft and
+         plateFace beside it — built from hwTone and from nothing else, so
+         a gold pirzul still gives a gold rose. The check that says the pull
+         handle may not recolour the lock furniture reads BOTH this and
+         nickel for exactly that reason: a fitting that quietly stopped
+         following the finish through a NEW gradient is the defect that has
+         shipped twice here and was invisible both times until somebody
+         grepped the fill. -->
+    <radialGradient id="roseFace" cx="0.42" cy="0.38" r="0.62">
+      <stop offset="0"    stop-color="${hwTone[2]}"/>
+      <stop offset="0.60" stop-color="${hwTone[2]}"/>
+      <stop offset="0.86" stop-color="${hwTone[1]}"/>
+      <stop offset="0.98" stop-color="${hwTone[0]}"/>
+      <stop offset="1"    stop-color="${hwTone[3]}"/>
+    </radialGradient>
 
     <!-- WARNING: THE GRIP'S OWN PAIR, AND WHY THERE HAS TO BE A SECOND SET.
          One gradient cannot serve two masters: grabHandle is a PULL HANDLE
@@ -7175,7 +7213,7 @@ ${body}
     <g data-mount="rose">
       <circle cx="${cx + 3}" cy="${cy + 5}" r="${r}" fill="#000" opacity="0.36"
               filter="url(#hwShadow)"/>
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#nickel)"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#roseFace)"/>
       ${step(cx, cy, r - 1.5, 3, 0.5, 0.34)}
       ${step(cx, cy, r * 0.82, 2.4, 0.34, 0.26)}
       ${step(cx, cy, r * 0.7, 2, 0.26, 0.2)}
@@ -7196,23 +7234,42 @@ ${body}
   function lever(cx, cy, dir) {
     const L2 = LEVER_REACH;
     const at = (t) => cx + dir * t;
-    const T2 = cy - 14, B = cy + 12;
+    const D = LEVER_BLADE;
+    const T2 = cy - D / 2 - 1, B = cy + D / 2 - 1;
+    const b = (f) => T2 + D * f;
+    const CAP = D / 2;
     return `
     <g data-kind="lever">
-      <path d="M ${at(12)} ${T2 + 7} L ${at(L2 - 16)} ${T2 + 11}
-               Q ${at(L2 + 4)} ${T2 + 11} ${at(L2 + 4)} ${T2 + 23}
-               Q ${at(L2 + 4)} ${B + 23} ${at(L2 - 16)} ${B + 23}
-               L ${at(12)} ${B + 26} Z"
+      <path d="M ${at(12)} ${b(0.27)} L ${at(L2 - 16)} ${b(0.42)}
+               Q ${at(L2 + 4)} ${b(0.42)} ${at(L2 + 4)} ${b(0.88)}
+               Q ${at(L2 + 4)} ${B + D * 0.88} ${at(L2 - 16)} ${B + D * 0.88}
+               L ${at(12)} ${B + D} Z"
             fill="#000" opacity="0.30" filter="url(#hwShadow)"/>
 
       <!-- Body: one depth from the neck to the cap. A pointed tip reads as a
            blade and a tapered one as a wedge; this lever is neither. -->
       <path d="M ${at(0)} ${T2}
-               L ${at(L2 - 20)} ${T2}
+               L ${at(L2 - CAP)} ${T2}
                Q ${at(L2)} ${T2} ${at(L2)} ${(T2 + B) / 2}
-               Q ${at(L2)} ${B} ${at(L2 - 20)} ${B}
+               Q ${at(L2)} ${B} ${at(L2 - CAP)} ${B}
                L ${at(0)} ${B} Z"
             fill="url(#nickel)"/>
+      <!-- A BLACK WASH OVER THE WHOLE BODY, because the base ramp is too light
+           for a lever seen against paint. Measured on seven photographed doors
+           as the blade's darkest point over the paint beside it: 0.22 0.27
+           0.30 0.35 0.35 0.65 0.68, median 0.35 - and DARKER THAN THE PAINT
+           even on the near-black doors (d015 at 0.65 of a paint of 33, d048 at
+           0.35 of 42), which is the rolled underside turned away from the
+           light. Ours floored at 0.41 of a pale door and its broad face sat at
+           0.73 to 1.10, so most of the blade was at or above the paint: that
+           is the whole of "it reads as grey plastic". Black at alpha, never a
+           tinted black, so the pirzul's hue survives it (see the tint rule). -->
+      <path d="M ${at(0)} ${T2}
+               L ${at(L2 - CAP)} ${T2}
+               Q ${at(L2)} ${T2} ${at(L2)} ${(T2 + B) / 2}
+               Q ${at(L2)} ${B} ${at(L2 - CAP)} ${B}
+               L ${at(0)} ${B} Z"
+            fill="#000" opacity="0.14"/>
 
       <!-- Metal is BANDED, not shaded: the photographs show a hard clipped
            arris along the top (the only blown highlight anywhere in the
@@ -7221,22 +7278,22 @@ ${body}
            what makes rendered hardware look like grey plastic.
            The bands run parallel to the blade now, because the blade is
            parallel to itself: they used to converge with the taper. -->
-      <path d="M ${at(14)} ${T2 + 3} L ${at(L2 - 20)} ${T2 + 3}
-               Q ${at(L2 - 6)} ${T2 + 3} ${at(L2 - 6)} ${T2 + 6}
-               L ${at(14)} ${T2 + 6} Z"
+      <path d="M ${at(14)} ${b(0.115)} L ${at(L2 - CAP)} ${b(0.115)}
+               Q ${at(L2 - CAP * 0.3)} ${b(0.115)} ${at(L2 - CAP * 0.3)} ${b(0.231)}
+               L ${at(14)} ${b(0.231)} Z"
             fill="#fff" opacity="0.92"/>
-      <path d="M ${at(16)} ${T2 + 7} L ${at(L2 - 14)} ${T2 + 7}
-               L ${at(L2 - 14)} ${T2 + 11} L ${at(16)} ${T2 + 11} Z"
-            fill="#fff" opacity="0.26"/>
+      <path d="M ${at(16)} ${b(0.269)} L ${at(L2 - CAP * 0.7)} ${b(0.269)}
+               L ${at(L2 - CAP * 0.7)} ${b(0.423)} L ${at(16)} ${b(0.423)} Z"
+            fill="#fff" opacity="0.18"/>
       <!-- rolled underside, turned away from the key and nearly in shadow -->
-      <path d="M ${at(16)} ${B - 9} L ${at(L2 - 16)} ${B - 9}
-               L ${at(L2 - 16)} ${B - 1} L ${at(16)} ${B - 1} Z"
-            fill="#000" opacity="0.44"/>
+      <path d="M ${at(16)} ${b(0.654)} L ${at(L2 - CAP * 0.8)} ${b(0.654)}
+               L ${at(L2 - CAP * 0.8)} ${b(0.962)} L ${at(16)} ${b(0.962)} Z"
+            fill="#000" opacity="0.56"/>
       <!-- the cap turns out of the key and picks up the darker surround -->
-      <path d="M ${at(L2 - 26)} ${T2 + 3} L ${at(L2 - 4)} ${T2 + 4}
-               Q ${at(L2)} ${T2 + 5} ${at(L2)} ${(T2 + B) / 2}
-               Q ${at(L2)} ${B - 3} ${at(L2 - 14)} ${B - 3}
-               L ${at(L2 - 26)} ${B - 4} Z"
+      <path d="M ${at(L2 - CAP * 1.3)} ${b(0.115)} L ${at(L2 - CAP * 0.2)} ${b(0.154)}
+               Q ${at(L2)} ${b(0.192)} ${at(L2)} ${(T2 + B) / 2}
+               Q ${at(L2)} ${b(0.885)} ${at(L2 - CAP * 0.7)} ${b(0.885)}
+               L ${at(L2 - CAP * 1.3)} ${b(0.846)} Z"
             fill="#000" opacity="0.16"/>
 
       ${disc(cx, cy, LEVER_ROSETTE)}
@@ -7244,11 +7301,11 @@ ${body}
       <!-- the neck swelling out of the rosette, drawn over it. It still swells
            — a cast lever grows out of its collar — but it now closes onto the
            blade's own depth instead of onto a wider root. -->
-      <path d="M ${at(2)} ${T2 - 4} Q ${at(28)} ${T2 - 3} ${at(33)} ${T2}
-               L ${at(33)} ${B} Q ${at(28)} ${B + 3} ${at(2)} ${B + 4} Z"
+      <path d="M ${at(2)} ${T2 - D * 0.215} Q ${at(28)} ${T2 - D * 0.16} ${at(33)} ${T2}
+               L ${at(33)} ${B} Q ${at(28)} ${B + D * 0.16} ${at(2)} ${B + D * 0.215} Z"
             fill="url(#nickel)"/>
-      <path d="M ${at(9)} ${T2 + 1} Q ${at(26)} ${T2 + 2} ${at(30)} ${T2 + 3}
-               L ${at(30)} ${T2 + 8} L ${at(9)} ${T2 + 7} Z"
+      <path d="M ${at(9)} ${b(0.038)} Q ${at(26)} ${b(0.077)} ${at(30)} ${b(0.115)}
+               L ${at(30)} ${b(0.308)} L ${at(9)} ${b(0.269)} Z"
             fill="#fff" opacity="0.42"/>
     </g>`;
   }
@@ -7271,6 +7328,22 @@ ${body}
                Q ${pt(L2, 0.95)} ${pt(L2 - 20, 1)}
                L ${pt(0, 1)} Z"
             fill="url(#nickel)"/>
+      <!-- ⚠ AND THE SAME BLACK WASH AS THE CORAL, FOR THE SAME REASON AND OFF
+           THE SAME MEASUREMENT. The seven photographed levers put the blade's
+           darkest point at 0.22 to 0.68 of the paint beside it, median 0.35,
+           and that is a fact about a lever seen against a painted door rather
+           than about the Coral in particular. Leaving this one out would have
+           given the range two nickel levers made of visibly different metal,
+           which is the defect the five-owners rule exists to prevent, arriving
+           through the shape axis instead of the finish axis.
+           Its SHAPE is untouched: the taper, the rise and the short reach are
+           what Peretz recognised as a second product, and there is no
+           photograph of this one anywhere to move them against. -->
+      <path d="M ${pt(0, -1)} L ${pt(L2 - 20, -1)}
+               Q ${pt(L2, -0.95)} ${pt(L2, 0)}
+               Q ${pt(L2, 0.95)} ${pt(L2 - 20, 1)}
+               L ${pt(0, 1)} Z"
+            fill="#000" opacity="0.14"/>
 
       <!-- the same banding as the Coral: clipped arris, mid band, dark roll -->
       <path d="M ${pt(14, -0.85)} L ${pt(L2 - 20, -0.85)}
@@ -7278,10 +7351,10 @@ ${body}
             fill="#fff" opacity="0.92"/>
       <path d="M ${pt(16, -0.6)} L ${pt(L2 - 14, -0.58)}
                L ${pt(L2 - 14, -0.2)} L ${pt(16, -0.3)} Z"
-            fill="#fff" opacity="0.26"/>
+            fill="#fff" opacity="0.18"/>
       <path d="M ${pt(16, 0.18)} L ${pt(L2 - 16, 0.16)}
                L ${pt(L2 - 16, 0.84)} L ${pt(16, 0.8)} Z"
-            fill="#000" opacity="0.44"/>
+            fill="#000" opacity="0.56"/>
       <path d="M ${pt(L2 - 26, -0.55)} L ${pt(L2 - 4, -0.52)}
                Q ${pt(L2, -0.45)} ${pt(L2, 0)}
                Q ${pt(L2, 0.7)} ${pt(L2 - 14, 0.7)} L ${pt(L2 - 26, 0.62)} Z"
@@ -7520,6 +7593,12 @@ ${body}
        — was the thing it got wrong, at 0.51 against the door's own ratio. Both
        numbers come off the constants now, so `LEVER_REACH` moving moves the tile
        with it. */
+    /* ⚠ AND ITS DEPTH WAS THE NEXT COPY TO GO STALE, 19.9.2026. The rose and the
+       reach were hoisted on 18.9 and the blade's `26` was left as a literal, so
+       the first measured change to the section — 26 to `LEVER_BLADE` — would have
+       moved the door and left the tile drawing the old one, which is the very
+       fault the paragraph above is about, one number over. `rx` is the
+       half-depth because the door's cap is a semicircle. */
     lever: () => ({ box: [
       -(LEVER_REACH + 16),
       -(LEVER_ROSETTE + 12),
@@ -7527,7 +7606,8 @@ ${body}
       LEVER_ROSETTE + 12
     ], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
-    <rect x="${-LEVER_REACH}" y="-13" width="${LEVER_REACH}" height="26" rx="13"/>` }),
+    <rect x="${-LEVER_REACH}" y="${-LEVER_BLADE / 2 - 1}" width="${LEVER_REACH}"
+          height="${LEVER_BLADE}" rx="${LEVER_BLADE / 2}"/>` }),
     /* The curved lever: the tile has to carry all three things that make it a
        different product from the Coral above — it tapers, it rises, and it is
        shorter — or the two tiles are a bar and a slightly shorter bar. Drawn as
@@ -7555,19 +7635,42 @@ ${body}
        no entry here, so it fell to the `else` branch and drew a lever — the
        picture of the one lockset it exists to be an alternative to. Same shape
        as the door draws, at tile scale. */
-    cylinder: () => ({ box: [-52, -52, 52, 52], art: `
-    <circle cx="0" cy="0" r="39"/>
-    <path d="M -12 -16 a 12 12 0 1 1 24 0 l 3.6 30 a 4.4 4.4 0 0 1 -4.4 4.8
-             h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper, #EFEDE8)"/>
-    <path d="M -4 -18 a 4 4 0 1 1 8 0 l 1.4 24 h -10.8 Z"/>` }),
+    /* ⚠ AND THIS ONE WAS THE SAME FAULT LEFT STANDING, FOUND 19.9.2026. The
+       18.9 round hoisted the two LEVER tiles onto the constants and wrote the
+       header above; `r="39"` sat here against the door's `LOCK_R` of 33, an
+       escutcheon drawn 18% oversized, in the tile for the commonest lock
+       furniture in the corpus. The keyway inside it was measured against that 39
+       and so scales with it — the SHAPE is the measurement and the radius is
+       not, which is why `k` multiplies rather than the numbers being re-typed. */
+    cylinder: () => {
+      const k = (LOCK_R / 39).toFixed(4);
+      return {
+        box: [-(LOCK_R + 13), -(LOCK_R + 13), LOCK_R + 13, LOCK_R + 13],
+        art: `
+    <circle cx="0" cy="0" r="${LOCK_R}"/>
+    <g transform="scale(${k})">
+      <path d="M -12 -16 a 12 12 0 1 1 24 0 l 3.6 30 a 4.4 4.4 0 0 1 -4.4 4.8
+               h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper, #EFEDE8)"/>
+      <path d="M -4 -18 a 4 4 0 1 1 8 0 l 1.4 24 h -10.8 Z"/>
+    </g>`
+      };
+    },
     // Almog: swan-neck, raked 15 degrees up, and thicker at the tip than the root.
-    almog: () => ({ box: [-244, -62, 52, 46], art: `
-    <circle cx="0" cy="0" r="39"/>
+    almog: () => ({ box: [-244, -62, LOCK_R + 13, 46], art: `
+    <circle cx="0" cy="0" r="${LOCK_R}"/>
     <path d="M 0 13 L -218 -47 L -218 -26 L 0 29 Z"/>` }),
     // Rotem: lever and cylinder on one waisted backplate.
+    /* ⚠ ITS LEVER FOLLOWS `LEVER_BLADE`; ITS PLATE IS STILL ITS OWN AND IS A
+       KNOWN DRIFT, recorded in §9 rather than guessed at. The plate here is
+       90 x 240 where the door's is about 166 x 340 — not one scale in both axes,
+       so it cannot be closed by multiplying, and closing it properly means
+       deriving this glyph from the same outline the door draws and then
+       re-running the pairwise raster check, which is a redraw rather than a
+       constant swap. */
     plate: () => ({ box: [-172, -88, 56, 184], art: `
     <rect x="-45" y="-72" width="90" height="240" rx="45"/>
-    <rect x="-152" y="-13" width="152" height="26" rx="13"/>
+    <rect x="-152" y="${-LEVER_BLADE / 2}" width="152" height="${LEVER_BLADE}"
+          rx="${LEVER_BLADE / 2}"/>
     <circle cx="0" cy="106" r="13" fill="var(--paper, #EFEDE8)"/>` }),
     // Knob on a long backplate — the plate carries the keyway too.
     knobplate: () => ({ box: [-58, -118, 58, 214], art: `

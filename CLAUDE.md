@@ -1075,6 +1075,19 @@ refuse the sale.
   tiles, glyphs, price rows and spec lines for free. New parameters `bl=`
   and `ey=`.
 
+⚠ **AND THE LOCK FURNITURE HAS AN INSTRUMENT OF ITS OWN SINCE 19.9.2026** —
+`npm run lockset`, which is the only thing here that has ever put a lever
+beside a photograph of one. What it settled, and where each number comes from,
+because the two authorities answer different questions (§7):
+
+| | source | |
+|---|---|---|
+| blade depth ÷ rose diameter | **0.377**, RB's two Coral cut-outs | the ten corpus doors filed under `coral` carry ten DIFFERENT levers, so their median is a median over products Peretz does not sell |
+| the tip | **a semicircle**, RB | it was a quarter ellipse 1.54 times longer than round |
+| lever → keyway | **105 mm**, the ten lever-rose corpus records | RB photographs the two pieces stacked for a catalogue page, so its 88.8 mm is a measurement of a LAYOUT |
+| escutcheon ÷ rose | 1.082 measured against 1.100 drawn | inside the instrument's 7%, left alone |
+| rose ÷ leaf width | **unsettled** — 0.073, 0.082 and ~0.095 | §9; `LEVER_BLADE` is held as a ratio to the rose so the fitting stays in proportion whichever way it goes |
+
 ### ⚠ WHAT THE פרזול REACHES — the list, in both directions
 
 It is stated for a customer in `exp.pz.a` (`js/copy.js`) and it is the one
@@ -1709,6 +1722,72 @@ scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
 ---
 
 ## 9. What is still open
+
+### ⚠ THE `plate` TILE'S BACKPLATE IS NOT THE DOOR'S BACKPLATE
+
+Found 19.9.2026 while closing the tile drift 18.9 half-fixed. `FITTING_GLYPH`'s
+header promises *"the numbers are the same measured millimetres, so a tile
+cannot drift from its door"*, and three of the four drifts it named are closed
+— the lever tile's blade, the `cylinder` tile's escutcheon and `almog`'s. This
+one is not, and it is a redraw rather than a constant swap.
+
+The tile draws the Rotem's plate as **90 × 240**; `handleFootprint` declares
+the door's as `out 47, in 119, vy 170` — about **166 × 340**. That is 0.54 of
+the width and 0.71 of the height, **not one scale in both axes**, so it cannot
+be closed by multiplying anything. Closing it means building the glyph from the
+same outline `plateHandle` draws, which also moves the keyway boss (an oval
+34 × 50 on the door against a 26 mm circle here) and changes what the tile
+looks like enough that the pairwise raster floor has to be re-run.
+
+⚠ **It is not a wrong PICTURE** — a customer looking at that tile sees a lever
+and a keyway on a long rounded plate, which is what the product is. What it is
+wrong about is the one thing a size-carrying glyph exists to show, how the
+plate sits against the lever, and the header above it claims that cannot
+happen.
+
+### ⚠ HOW BIG THE LEVER'S ROSE IS AGAINST THE LEAF — THREE READINGS, THREE ANSWERS
+
+Found 19.9.2026 while redrawing the lock furniture, and it is the one number of
+that round that was measured and deliberately **not** moved. `LEVER_ROSETTE` is
+30, so the rose is 60 mm across — **0.0765 of a 784 mm leaf**. Three
+instruments disagree about what the photographs say it should be:
+
+| | reads | against our 0.0765 |
+|---|---|---|
+| `npm run lockset`'s own sweep, 6 doors both sides | **0.082** | +7% |
+| a flood fill by hand over 7 stable doors | **0.0726** | −5% |
+| our outline drawn back over 4 photographs, by eye | **0.095–0.103** | +25 to +35% |
+
+⚠ **THE THIRD IS THE ONE THE PROJECT NORMALLY TRUSTS** — *draw the answer over
+the evidence* is what killed three wrong `rings` readings in one look — and it
+is the one furthest from the code. So this is not a small disagreement to
+average out; §7's rule is that three detectors giving three answers is the
+signal to go and get ground truth, not to keep tuning.
+
+⚠ **AND THE GROUND TRUTH IS EXACTLY WHAT IS MISSING.** RB's Coral cut-out
+settles every RATIO inside the fitting — blade to rose, escutcheon to rose,
+reach to rose — because it is one product photographed square on. It cannot
+settle this one, because **there is no door in it**, and a rose against a leaf
+is a fraction of something the picture does not contain. The corpus can only
+answer in fractions of a photographed leaf, and those leaves are Peretz's real
+doors at widths we do not know: our standard leaf is 784 mm and his standard
+band runs *"up to 98 × 203"*, so a correctly-sized rose on a narrower door
+reads as a bigger fraction and this whole axis moves with assumption **A2**.
+
+⚠ **A FOURTH DERIVATION WAS BUILT AND REFUSED, AND IT IS RECORDED SO NOBODY
+REBUILDS IT.** The corpus gives the lever-to-keyway gap robustly (105 mm, two
+recorded centres, no segmentation); RB's shot gives that gap as 1.48 rose
+diameters; so rose = 105 / 1.48 = **71 mm**, which lands neatly between the
+sweep and the eye. It is worthless: RB photographs the rose and the escutcheon
+**stacked with white space between them** for a catalogue page, so 1.48 is a
+measurement of a LAYOUT. A chain of inference across two sources, each doing
+its own job correctly, producing a number about nothing.
+
+What would settle it: one photograph of a door whose leaf width Peretz states,
+or the rose's own diameter in millimetres from him — *"a euro rose is 52 mm"* is
+the sort of fact that ends this in one sentence. `ASK-PERETZ.md` asks for it.
+Until then the blade is held as `LEVER_ROSETTE * 2 * 0.377` rather than as an
+absolute, so the whole fitting stays in proportion whichever way this goes.
 
 ### ⚠ A WIDER GALLERY TILE BUYS NO MORE DOOR — IT BUYS MORE WALL
 
@@ -2479,6 +2558,218 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE ROSE WAS A BALL AND THE BLADE WAS LIGHTER THAN THE DOOR IT IS BOLTED
+  TO — 19.9.2026.** Part 3, the half the owner named when he chose **shape and
+  light both**, and the half that could not be judged at all until Part 0
+  existed: the photograph is a WHITE door and our render was a CHARCOAL one, so
+  every tone reading off his two screenshots was comparing two different
+  questions. `npm run lockset` renders ours in each photograph's own paint, and
+  the two findings below are what it made askable.
+
+  **1 · `disc()` FILLED WITH A LINEAR RAMP ACROSS A CIRCLE, WHICH IS A SPHERE.**
+  `url(#nickel)` runs the pirzul's brightest entry to its darkest over 0→1, and
+  it was laid across the whole face of a 60 mm disc. Measured horizontally
+  through the rose's centre:
+
+  | | |
+  |---|---|
+  | ours | `148 151 170 177 169 161 153 146 143 145 150 152 148 143 139 138 132 125 120` |
+  | photograph | `138 134 123 116 113 112 111 110 107 106 105 104 105 106 105 103 108 110 102 110 135 155` |
+
+  Ours falls 32% smoothly from one side to the other. The photograph's is **flat
+  within 5% across the face and bright at BOTH rims** — which is what a disc
+  turned on a lathe and seen dead square-on has to be: one plane at one angle to
+  the light, with the chamfer round its edge catching it. **`roseFace` is
+  RADIAL**, a flat crown to 0.6 of the radius, lifting to the brightest entry at
+  the rim and turning down again in the last two per cent. The measured
+  rim-to-centre ratio is about 1.35 and `hwTone[0]` over `hwTone[2]` is 1.40 on
+  steel. The `step()` rings and `brushing()` over it are right and are untouched
+  — RB's own product shot shows real machined steps.
+  ⚠ **WHOSE METAL: the פרזול's**, built from `hwTone` and nothing else, in the
+  family with `nickel`, `nickelSoft` and `plateFace`.
+  ⚠ **AND THE CHECK THAT SAYS THE PULL HANDLE MAY NOT RECOLOUR THE LOCK
+  FURNITURE READ ONE GRADIENT.** It matched `<linearGradient id="nickel">` and
+  compared its stops across every grip × pirzul pair — every gradient the
+  furniture painted with **on the day it was written**. The rose moving to
+  `roseFace` is exactly the event that check cannot see: a fitting quietly
+  ceasing to follow the finish through a NEW gradient, which is the defect §0b
+  records shipping twice and being invisible both times until somebody grepped
+  the fill. It reads both now, by name, and fails loudly if either is missing.
+  §5.22 — the clause that must stay true, beside the one that must become true.
+
+  **2 · THE BLADE'S BROAD FACE SAT AT OR ABOVE THE PAINT, AND `lever()`'s OWN
+  COMMENT ALREADY SAID IT SHOULD NOT.** That comment promises *"a body that goes
+  nearly as dark as the paint underneath"* — §5.19, a comment describing what
+  the code does not do. Measured on seven photographed doors, the blade's
+  darkest point over the paint beside it:
+
+  | d016 | d099 | d097 | d116 | d048 | d015 | d026 | median |
+  |---|---|---|---|---|---|---|---|
+  | 0.22 | 0.27 | 0.30 | 0.35 | 0.35 | 0.65 | 0.68 | **0.35** |
+
+  ⚠ **AND IT IS DARKER THAN THE PAINT ON THE NEAR-BLACK DOORS TOO** — d015 is
+  0.65 of a paint of 33, d048 0.35 of 42 — which is the rolled underside turned
+  away from the light, and is what rules out "the metal is simply brighter than
+  a dark door". Ours floored at **0.41** and its broad face ran **0.73 to 1.10**,
+  so most of the blade was at or above the paint. That is the whole of *"it
+  reads as grey plastic"*.
+  A black wash at 0.14 over the body, the rolled underside deepened 0.44 → 0.56
+  and the mid band softened 0.26 → 0.18 put the four bands at about **1.35 ·
+  0.77 · 0.63 · 0.28** of a pale door's paint, against the photograph's blown
+  arris → 0.66 → 0.32. ⚠ **Black at alpha and never a tinted black**, so the
+  pirzul's hue survives it (§4).
+  ⚠ **AND `leverTaper` TAKES THE SAME WASH AND THE SAME TWO BAND OPACITIES.**
+  The measurement is about a lever seen against a painted door, not about the
+  Coral, and leaving the second lever out would have given the range two nickel
+  levers made of visibly different metal — which is the defect the five-owners
+  rule exists to prevent, arriving through the SHAPE axis instead of the finish
+  axis. Its shape is untouched: the taper, the rise and the short reach are what
+  Peretz recognised as a second product, and there is no photograph of that one
+  anywhere — no corpus door, no RB cut-out — to move them against.
+
+- **⚠ AND THE TILE DRIFT 18.9 HALF-FIXED — 19.9.2026.** Part 4.
+  `FITTING_GLYPH`'s header claims *"the numbers are the same measured
+  millimetres, so a tile cannot drift from its door"*. The 18.9 round made that
+  true of the two levers and left it false elsewhere, and this round would have
+  broken it again the moment the blade's depth moved:
+  · **the lever tile's own `26`** — the rose and the reach were hoisted on 18.9
+    and the blade's depth was left a literal, so changing the section would have
+    moved the door and left the tile drawing the old one. `LEVER_BLADE` now,
+    with `rx` at the half-depth because the door's cap is a semicircle.
+  · **the `cylinder` tile's `r="39"`** against the door's `LOCK_R` of 33 — an
+    escutcheon 18% oversized, in the tile for the commonest lock furniture in
+    the corpus. ⚠ The keyway inside it was measured against that 39, so it is
+    SCALED by `LOCK_R / 39` rather than re-typed: the shape is the measurement
+    and the radius is not.
+  · **`almog`'s `r="39"`**, the same.
+  · **the `plate` tile's lever**, now `LEVER_BLADE`.
+  ⚠ **AND THE `plate` TILE'S PLATE IS A KNOWN DRIFT LEFT OPEN**: 90 × 240 where
+  the door's is about 166 × 340 — **not one scale in both axes**, so it cannot
+  be closed by multiplying. Closing it means deriving the glyph from the same
+  outline the door draws and re-running the pairwise raster check, which is a
+  redraw rather than a constant swap. §9.
+
+  **Two prose drifts corrected, both §6's standing complaint.**
+  · `LOCK_R`/`LEVER_ROSETTE` said the ratio between them is **1.08** and the
+    constants give **1.100**. ⚠ The PROSE was the half that was right: RB's two
+    Coral cut-outs read 1.093 and 1.071, mean **1.082**, and `npm run lockset`
+    reads 1.080 off the installed photographs against 1.062 on our own render
+    measured identically. So the drawn 1.100 is just above every reading, by
+    about one millimetre on the escutcheon — inside the instrument's own 7% and
+    not worth moving a constant for. What was worth fixing is a comment claiming
+    a number the code does not hold.
+  · `MOUNT_REACH`'s comment said *"the deepest is the Cadoor rose at 121 mm. 126
+    leaves five for the drawing's own strokes"*, and **neither half is true**:
+    the constant is 121, so there is no five, and `npm run collide -- boxes`
+    reads the deepest at **111 mm, on the knobplate's backplate**. Both figures
+    moved under a sentence nobody came back to. ⚠ **121 is deliberately NOT
+    lowered to 111** — it is what a window's architrave must clear, so shrinking
+    it lets a light come 10 mm nearer the ironmongery and changes what the
+    catalogue can build. Held above the measured maximum, which is the safe
+    direction, with the margin printed on every run.
+
+  ⚠ **AND §1b COST A BUILD, AGAIN, IN THE COMMIT THAT CITES IT.** The new
+  `roseFace` comment sits inside `renderer.js`'s SVG template literal and was
+  written with backticks around two identifiers; the file stopped parsing and
+  said `SyntaxError: Unexpected identifier 'nickel'` about an innocent word.
+  Fixed the way §1b says to — **only** the backticks inside that one comment —
+  because a global strip has taken them out of two legitimate JS comments here
+  before. Four builds have now been lost to this and the rule was read, quoted
+  and then broken within the hour.
+
+- **⚠ THE LEVER'S BLADE, ITS TIP AND ITS DISTANCE FROM THE KEYWAY, ALL THREE
+  MEASURED AND ALL THREE MOVED — 19.9.2026.** Part 2 of the handles round, off
+  the sheet Part 0 built. Three numbers, three different authorities, and the
+  interesting part is which authority was ruled OUT for each.
+
+  ⚠ **THE TEN CORPUS DOORS FILED UNDER `coral` CARRY TEN DIFFERENT LEVERS, AND
+  THAT IS WHY THE BLADE COULD NOT BE MEASURED ON THEM.** `npm run corpus`'s
+  fitter assigns every lever-on-a-round-rose to our only lever-on-a-round-rose,
+  so d026 is a flat paddle, d097 and d116 are swan necks, d038 is black and d048
+  is a wide flat one — and a median blade depth over that set is a median over
+  products Peretz does not sell. The sheet's own header already warns *"when a
+  door appears under a lockset it does not look like, suspect the fitter before
+  the drawing"*; this is the first time that warning has been the finding.
+  So §7's split decides it — **proportion to the product photograph** — and
+  **RB's two Coral cut-outs agree to 4%**:
+
+  | | `product-coral` | `coral-black-1` | mean | ours | |
+  |---|---|---|---|---|---|
+  | blade depth ÷ rose diameter | 0.370 | 0.384 | **0.377** | 0.433 | ✗ 15% deep |
+  | reach ÷ rose radius | 4.074 | 4.161 | **4.118** | 4.267 | ~ 3.5%, **left alone** |
+  | escutcheon ÷ rose | 1.093 | 1.071 | **1.082** | 1.100 | ~ **left alone** |
+  | centreline drift over the reach | −0.04 → −0.01 | +0.02 | **≈0** | 0 | ✓ |
+  | depth at .3 .5 .7 .8 .9 of reach | 40 40 40 39 37 | 42 43 43 42 39 | **even** | even | ✓ |
+
+  **`LEVER_BLADE` = 23**, which is `LEVER_ROSETTE * 2 * 0.377` and is written
+  that way rather than as a bare 23: the rose is not settled (below), and a
+  blade fitted to today's rose as an absolute would stop being 0.377 of it the
+  day the rose moves.
+  ⚠ **AND THE BANDING IS FRACTIONS OF THE DEPTH NOW, NOT OFFSETS FROM IT.** The
+  section's own comment promised that every band is placed off `T` and `B` *"so
+  the depth cannot be changed in one line and forgotten in six"* — and it held
+  the DEPTH in one place and the PROPORTIONS in nine, as `T + 3`, `T + 7`,
+  `B - 9` and so on, each fitted to a 26-deep blade. Shrinking the blade would
+  have made the clipped arris and the rolled underside each take a different
+  share of it than they were measured at. `b(f)` places a band at a fraction of
+  the depth. §5.19 one level in: a comment true of one quantity and false of the
+  one beside it.
+  ⚠ The 1 mm the blade sits above the spindle is the old 14/12 asymmetry and is
+  KEPT rather than tidied — RB reads the centreline within 0.02 of a rose
+  diameter of the rose's, which is that offset to the millimetre.
+
+  **The tip is a SEMICIRCLE, and it was a nose half again longer than round.**
+  The cap was a quarter ellipse 20 across against a half-depth of 13 — 1.54.
+  Fitted against RB's depth readings, a semicircular end predicts 0.89 of the
+  blade at 0.95 of the reach against 0.85 measured, where the old ellipse
+  predicts 0.72. `CAP = D / 2`. ⚠ **The owner's own word for what it should be
+  is *"a bit rounded"***, and a semicircle is exactly that — which is worth
+  recording because the first reading of that sentence, with a wrong threshold
+  under it, turned it into a taper the lever does not have.
+
+  **`CYLINDER_AFF` 904 → 915: the lever-to-keyway gap is 105 mm, not 116.**
+  This one is the CORPUS's, because where two fittings sit on a leaf is exactly
+  what §7 gives it — and it needs no segmentation at all, being the distance
+  between two recorded centres, so none of the three instruments this round
+  threw away can reach it. Every record carrying both a lever and a lock:
+
+  | | fractions of leaf height | median | × 2100 |
+  |---|---|---|---|
+  | **lever-rose**, 10 doors | .038 .041 .045 .049 .050 .050 .050 .053 .054 .054 | **.0500** | **105 mm** |
+  | `lever-plate`, 5 tight doors | .025 .027 .027 .028 .028 | .028 | 59 mm |
+  | drawn | — | .0554 | 116 mm |
+
+  ⚠ **116 IS ABOVE ALL TEN**, not merely above the median, which is what makes
+  this a correction rather than a re-fit.
+  ⚠ **AND THE RECORDS SPLIT BY LOCKSET TYPE, WHICH IS WHY THE MEDIAN IS OVER
+  TEN AND NOT SEVENTEEN.** A backplate carries the lever and the keyway on one
+  plate, so its two centres are about 59 mm apart; pooling those five would have
+  pulled the constant toward a product it does not describe.
+  ⚠ **AND RB'S OWN SHOT IS NOT EVIDENCE HERE, WHICH WAS NEARLY MISSED.** It
+  reads 1.48 rose diameters — 88.8 mm — and it photographs the rose and the
+  escutcheon **stacked with white space between them**, which is a catalogue
+  layout and not a mounted spacing. A number measured off a page, about to be
+  used as a distance on a door. The three prose copies of "116 mm below the
+  lever" moved with the constant.
+
+  ⚠ **THE ROSE'S OWN SIZE IS NOT SETTLED AND IS NOT MOVED.** Three readings of
+  the same quantity disagree: the committed sweep says the photographs' rose is
+  **0.082** of leaf width against our 0.0765; a flood-fill by hand over seven
+  doors said **0.0726**; and our outline drawn back over four photographs in red
+  looks **0.095–0.103** by eye. §7's rule when detectors disagree is to get
+  ground truth rather than to pick, and the ground truth that would settle it —
+  an absolute size — is the one thing RB's cut-out cannot give, because it has
+  no door in it. **A fourth derivation was built and then refused**: corpus gap
+  ÷ RB's gap-to-rose ratio gives 71 mm, and it rests on the catalogue-layout
+  spacing above, so it is arithmetic on a page. §9 carries it.
+
+  **Gates.** `npm run collide -- boxes` — every fitting still inside its
+  declaration, the Coral drawing 30/128/30 against a declared 40/135/51, and
+  `MOUNT_REACH` covered at 111 of 121. ⚠ The declarations are NOT tightened to
+  the new drawing: they are what `gripPlacement` refuses against, so narrowing
+  them makes doors buildable that were not, which is a change to the range and
+  not to a silhouette.
 
 - **⚠ NOTHING HAD EVER PUT OUR LOCK FURNITURE BESIDE A PHOTOGRAPH OF LOCK
   FURNITURE, AND THE OWNER FOUND THAT OUT BY DOING IT HIMSELF — 19.9.2026.**
