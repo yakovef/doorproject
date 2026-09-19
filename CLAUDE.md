@@ -576,7 +576,7 @@ research/works/     129 photographs, 31 measured records (30 usable)
 
 **Commands:** `build` `dev` `test` `audit` `latency` `collide` `fuzz` `profile`
 `glass` `mottle` `measure` `frame` `hardware` `recreate` `corpus` `against`
-`shot` `sheets` `backdrop` `leaf` `triage` `ask` `compare`
+`shot` `lockset` `sheets` `backdrop` `leaf` `triage` `ask` `compare`
 
 `npm test` is string-level and cannot see layout, CSS or event wiring.
 `npm run audit` opens the real page and drives it. **Both are needed and
@@ -1473,8 +1473,9 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm run recreate` | ten measured photographs beside our render, leaf heights matched |
 | `npm run corpus` | all 30 measured doors rebuilt from their own records; writes `js/works.js` and `screenshots/corpus-links.md` |
 | `npm run against` | each design and grip beside its own source doors, cropped |
+| `npm run lockset` | **our lock furniture beside the photographs of it, and measured against them** (19.9.2026) — the comparison nothing here had ever made, which is why the owner found the lever wrong by eye and no instrument had. One sheet per fitting, in PAIRS: each photograph beside our own door rendered in **that door's own paint** (derived from `js/works.js`, never matched a second time), both crops the same number of model millimetres wide and scaled by the LEAF, so a fitting too big for its door looks too big. It crops to the fitting off the `[data-hw]` union and **throws** rather than photographing bare paint. ⚠ Its `fitting()` measures the PHOTOGRAPH and OUR RENDER with one function, so a segmentation error lands on both and the ratio survives it — and it prints the **calibration**, our rose's drawn size against the size the sweep reads it as, because without that a reader cannot tell a 20% finding from a 20% instrument. Per door the sweep scatters; over six doors the median is within 7% of the truth. Three of the nine fittings have no corpus door and it names them |
 | `npm run shot` | the whole page at twelve sizes and designs. ⚠ **NOT BYTE-STABLE, AND IT IS THE ONLY FAMILY THAT IS NOT.** Two runs with no code change differ on seven of the twelve — 0.29% of pixels at most, max channel delta 9 of 255, always one small box over the drawn hardware. It photographs a live browser; the other three render the SVG. So a moved `shot` sheet is not evidence and an unmoved one is not either. Measured 31.8.2026 |
-| `npm run sheets` | regenerates all four screenshot families after a change. **The 52 BARE sheets are the proof** — `corpus`, `recreate`, `against` — never the 12 |
+| `npm run sheets` | regenerates all five screenshot families after a change. **The 52 BARE sheets are the proof** — `corpus`, `recreate`, `against` — never the 12 |
 | `npm run backdrop` | rebuilds BOTH rooms in `assets/` from the owner's two originals: grades the wall's median 60% of the way to the drawn room's own rendered wall, re-encodes under the 400 KB budget, and prints what it measured going in and coming out. Committed rather than scratch for `rectify.mjs`'s reason — the shipped asset is a pure function of an original plus one number, and re-deriving that from prose is how a picture comes back slightly different from the one everything else was fitted to |
 
 ⚠ **AND ONE RULE THAT IS NOT AN INSTRUMENT BUT LIVES BESIDE THEM: THE RAIL DOES
@@ -1619,6 +1620,23 @@ on the hinge stile 120 mm from a window that begins at 245. **Five instruments
 in this repository have now measured the wrong object**, and this is the first
 one that had the answer in front of it. The tell was the same as always: a
 result that is confidently wrong about something you can check by hand.
+
+**⚠ AND A CAST SHADOW READS AS METAL AT A LOOSE THRESHOLD, WHICH MANUFACTURES
+A TAPER ON A LEVER THAT HAS NONE.** Measured 19.9.2026 while building
+`npm run lockset`. On a pale door a lever's own shadow recovers to about **0.85
+of the paint** and the metal bottoms out near **0.31**, so a threshold at 0.85
+swallows the shadow — and a shadow is wide at the root and narrow at the tip.
+Read that way the blade appeared to taper from 5 px to 14; at 0.70, metal only,
+it reads 4 6 6 6 6 5 5 5 5 4 6 6 7 7 6, which is constant. **The owner caught
+it by eye before any instrument did**, and named both halves of the error in one
+sentence: *"it does not get smaller … and maybe you counted the circle part
+too"* — the second half being the ROSE's chord, read as blade. Two more
+harnesses died the same week for the same reason, and both are recorded in
+§0b's 19.9 entry: a band wide enough to hold the rose also holds the
+ESCUTCHEON, and a tip search that scans outward walks off the lock stile onto a
+window's IRONWORK. **The cure in all three is connectivity rather than a
+window**: a lever is one piece of metal touching its own rose, and nothing else
+in the crop is connected to it.
 
 **⚠ AND AN INSTRUMENT CAN BE NOISY RATHER THAN WRONG, WHICH READS THE SAME
 FROM OUTSIDE.** Every other lesson in this section is about a device pointed at
@@ -2461,6 +2479,162 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ NOTHING HAD EVER PUT OUR LOCK FURNITURE BESIDE A PHOTOGRAPH OF LOCK
+  FURNITURE, AND THE OWNER FOUND THAT OUT BY DOING IT HIMSELF — 19.9.2026.**
+  Part 0 of the round he opened with two pictures side by side and one
+  sentence: *"i am not satisfied with how the handles look, i want you to
+  redraw them… you see how different they are? that is not acceptable."* He has
+  chosen **shape and light both**, across **all nine locksets**.
+
+  ⚠ **THE GAP IS IN THE INSTRUMENTS AND IT IS EXACTLY THE SHAPE §7 KEEPS
+  RECORDING.** `npm run against` crops window designs and pull grips and
+  **`LOCKSETS` is not in its imports at all**. `npm run hardware` crops the lock
+  stile and compares it with *nothing* — it photographs our own render and
+  prints `ok`. `npm run recreate` carries lever doors and compares whole leaves,
+  where a 128 mm lever is about fifteen pixels of a 1200-pixel door. So the
+  fitting a customer looks at from arm's length is the one thing in this drawing
+  that had no evidence pointed at it, and the 18.9 round moved `LEVER_REACH`,
+  both lever tiles and the Sapir's plate shape **without once opening a
+  photograph of a lever**.
+
+  **`npm run lockset` is the fifth sheet family** — `tools/lockset.mjs`,
+  stamped beside the other four in `screenshots/.stamps.json`. Six of the nine
+  fittings have a photographed corpus door: coral 10, cylinder 8, plate 7,
+  cadoor 2, digital 2, knobplate 1. **`sapir`, `square` and `lever-taper` have
+  none and the sheet says so by name** rather than leaving a gap somebody reads
+  as coverage.
+  ⚠ **AND THAT REFINES 18.9's OWN LIST.** That entry records `knobplate`,
+  `digital` and `square` as *"drawn from neither"* — true of RB **product
+  cut-outs**, and this sheet shows the corpus carries doors for the first two.
+  The blind list is `plate` and `lever-taper` on cut-outs, and `sapir`, `square`
+  and `lever-taper` on corpus doors; only `lever-taper` is on both, and it is
+  ours by construction (18.9 made it from the Coral's old outline).
+
+  **Four things it does that the other four sheets do not**, each of them a
+  defect the round found while building it:
+  · **It crops to the FITTING**, off the union of the drawn `[data-hw]` boxes —
+    and it **throws** when it finds none, which is `tools/hardware.mjs`'s own
+    18.9 guard copied rather than re-derived: twenty of that file's twenty-one
+    crops were bare paint and the loop printed `ok` for every one.
+  · **It renders our door in each photograph's OWN PAINT**, once per
+    photograph, so every adjacent pair is the same colour of door. The colour is
+    **derived** from `js/works.js`, which already carries the catalogue colour
+    `npm run corpus` chose by ΔE94 — a second copy of that matcher is §5.10, and
+    this one would be worse than most, since its own header records it choosing
+    visibly wrong paint twice before it was right. ⚠ Without it the sheet
+    compares a white door against a charcoal one, which is the state the
+    owner's two screenshots were in and half of why they look so unalike.
+  · **It scales both by the LEAF, not by the fitting.** ⚠ Matching the two
+    crops on the ROSE was the first design and it is a trap: it hides a
+    rose-size error completely and converts it into an apparent error in
+    everything else. The leaf's width is known exactly on both sides and needs
+    no segmentation to find. ⚠ And **one crop width in millimetres for the
+    whole sheet**, not one per door: sized off each record's own lever-to-lock
+    gap the cells came out at four magnifications and the sheet could only be
+    read a pair at a time, which is the fault `npm run against` already paid
+    for once — three readers took its crop's height for the leaf's and each
+    reported the same pull bar a third too long.
+  · **It measures both sides with ONE function.** That is the whole reason
+    `fitting()` is in a committed tool rather than in a gitignored scratch
+    harness: a segmentation error lands on the photograph and on our render
+    equally, so the RATIO survives it — and §7's standing complaint that the
+    scratch harness dies while only the prose survives does not apply to the
+    numbers below. They can be re-derived by running the file.
+
+  ⚠ **THE MEASUREMENT TOOK THREE TRIES AND ALL THREE FAILURES ARE §7's SUBJECT.**
+  (1) A band around the lever wide enough to hold the rose also holds the
+  **escutcheon**, so "the rose's widest run" was the escutcheon — d097's rose
+  read 0.1155 of leaf width against a hand measurement of 0.0736. (2) Scanning
+  outward for the tip **walked off the lock stile onto the window's ironwork**
+  and reported d097's reach as 8.26 rose-radii against 3.29. (3) A single
+  absolute luminance threshold worked on a dark door and failed on a pale one —
+  our nickel against `rb-7080d` departs by about 30 of 255, so the mask found
+  nothing but the arris line and reported a lever **18 rose-radii long**.
+  What ships instead: **connectivity, not a band** (a lever is one piece of
+  metal touching its own rose; the escutcheon is a separate component and the
+  ironwork is across bare paint); a **departure from the paint measured per ROW
+  and smoothed**, because over a 380 mm crop a leaf's own vertical falloff
+  departs from a single crop median by as much as a low-contrast fitting does;
+  a threshold that is a **fraction of the crop's own contrast** rather than an
+  absolute number, so one sweep covers brass on near-black and nickel on
+  near-white; the measurement window **clipped to the leaf** while the displayed
+  crop is not, since more than half of a 190 mm crop is frame, reveal and wall
+  and all of it departs from the paint harder than a nickel lever does; and a
+  **reading outside 0.75–4 rose diameters of reach rejected outright**, because
+  a measurement that cannot be true is the instrument and not the door.
+
+  ⚠ **AND THE FIRST READING OF THE BLADE WAS WRONG AND THE OWNER CAUGHT IT BY
+  EYE.** Thresholding at 0.86 of the leaf, the blade appeared to taper from 5 px
+  at the tip to 14 at the root. It does not. That threshold was catching **the
+  lever's own cast shadow**, which is wide at the root and narrow at the tip and
+  recovers to about 0.85 of the paint, **and the rose**, whose chord was being
+  read as blade. His words: *"it does not get smaller, what happens is that it
+  is a bit rounded, and maybe you counted the circle part too, but it is the
+  same length for the lever."* All three clauses correct. Re-measured at 0.70 —
+  metal only — the blade reads 4, 6, 6, 6, 6, 5, 5, 5, 5, 4, 6, 6, 7, 7, 6
+  across its length: **constant, which is what Peretz asked for on 14.9 and what
+  `lever()` already draws.** That instruction is not re-opened. §7 carries the
+  trap now, beside the five other instruments in this repository that measured
+  the wrong object.
+
+  ⚠ **THE CALIBRATION IS PRINTED, AND IT IS WHAT MAKES ANY OF THE NUMBERS
+  READABLE.** Our own rose is a drawn circle whose size the browser states
+  exactly, so the same quantity is available both by segmentation and by fact,
+  and the difference between them IS the instrument's error on that door.
+  Per door the sweep scatters badly — our own known 0.0765 reads anywhere from
+  0.067 to 0.089. **Over six doors the median lands within 7% of the truth on
+  every quantity**, and 7% is the resolution any conclusion here may claim.
+
+  **The coral, median over the six doors where both sides measured:**
+
+  | | photograph | ours, measured the same way | ours, drawn |
+  |---|---|---|---|
+  | rose ÷ leaf width | 0.083 | 0.069 | **0.0765** |
+  | blade depth ÷ rose diameter | **0.275** | 0.409 | **0.433** |
+  | reach ÷ rose radius | **3.46** | 4.27 | **4.27** |
+  | escutcheon ÷ rose | 1.079 | 1.070 | **1.10** |
+  | tip fullness (depth at 0.92 of reach ÷ mid-blade) | **0.905** | 0.807 | — |
+  | lever → cylinder centres | **101 mm** | 115 | **116** |
+
+  So three findings survive the error bar and two do not. **The blade is about
+  half again too deep** (0.275 against 0.433, and the instrument reads our own
+  by −6%). **The tip is drawn out where the real one is blunt** — which is the
+  owner's own word for it, *"a bit rounded"*. **The lever sits too far above the
+  cylinder** — 116 mm against a photographed 101, and this is the one figure
+  that needs no segmentation at all, being two centroids. ⚠ The **escutcheon
+  ratio is confirmed CORRECT** (1.079 against our 1.070 measured identically),
+  which is worth as much as a fault: it is the number 18.9 left alone and the
+  comments beside it still misstate as 1.08. And **rose ÷ leaf is not settled**
+  — the sweep says the photograph's rose is 20% bigger than ours, a careful hand
+  measurement over seven doors said 0.0726 against our 0.0765, and §7's rule
+  when two detectors disagree is to go and get ground truth rather than to pick.
+
+  ⚠ **AND THE PICTURE SAYS MORE THAN THE TABLE, WHICH IS WHY THE SHEET IS THE
+  DELIVERABLE.** Ten pairs of coral, eight of cylinder and seven of plate, each
+  on its own paint and every cell the same number of millimetres of door, show
+  five things no ratio above names. Our blade is a **flat slab butt-joined to a
+  disc** where every photograph shows one continuous swell out of the rose.
+  **Every real lever's centreline rises or curves** toward its tip and ours is
+  dead horizontal — which is not the taper Peretz withdrew on 14.9, and is
+  exactly the owner's *"a bit rounded"*. Our rose and our escutcheon are
+  **stepped cones of three or four concentric rings** where the real ones are
+  one turned disc with a rim. Our **drop shadow is a soft grey cloud** against a
+  tight short one. And the **Rotem's backplate is WAISTED on five of its seven
+  doors** — swelling at the head and the foot, narrowing at the middle — where
+  ours is a plain rounded rectangle with parallel sides. Those are Parts 2 and
+  3.
+  ⚠ **And by eye the rose gap looks larger than the 20% the sweep reports**,
+  on every one of the ten coral pairs. That is the disagreement above, seen
+  from the third direction, and it is the one thing Part 1 must settle with
+  ground truth rather than with another detector.
+
+  **The sheet is the whole of this commit — no drawing changed**, so the 52
+  bare sheets are untouched by construction rather than by regeneration.
+  `tools/fresh.mjs`'s `TOOL_FOR`, `test/units.mjs`'s `FAMILIES` and
+  `package.json`'s `sheets` all carry the fifth family, so a drawing change that
+  is not followed by a regeneration is caught here exactly as it is for the
+  other four. No price, no id, no list order, no bit, no `VERSION`.
 
 - **⚠ THE PLACEMENT SEARCH IS A TABLE NOW, AND IT COSTS 20 DOORS OF 7,776 —
   18.9.2026.** Part C, and the owner's own description of what he wanted:

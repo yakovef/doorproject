@@ -144,7 +144,8 @@ const PAGE_DEPS = ['assets/bundle.js', 'css/app.css', 'index.html'];
  * cheaper than certifying a sheet that shows a door nobody built.
  */
 const TOOL_FOR = { shot: 'tools/screenshot.mjs', recreate: 'tools/recreate.mjs',
-                   corpus: 'tools/corpus.mjs', against: 'tools/against.mjs' };
+                   corpus: 'tools/corpus.mjs', against: 'tools/against.mjs',
+                   lockset: 'tools/lockset.mjs' };
 const DEPS_FOR = name => TOOL_FOR[name] ? [...PAGE_DEPS, TOOL_FOR[name]] : PAGE_DEPS;
 const STAMP_FILE = 'screenshots/.stamps.json';
 

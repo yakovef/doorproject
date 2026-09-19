@@ -4684,7 +4684,12 @@ group('a finish is named on the fitting that has one, and nowhere else');
 group('the comparison sheets are pictures of THIS drawing');
 {
   const { staleSheets } = await import('../tools/fresh.mjs');
-  const FAMILIES = ['shot', 'recreate', 'corpus', 'against'];
+  /* ⚠ FIVE FAMILIES SINCE 19.9.2026. `lockset` is the sheet that puts our
+     lock furniture beside a photograph of it — the comparison nothing in
+     this repository had ever made, which is why the owner found the lever
+     wrong by eye and no instrument had. It is stamped like the others so
+     it cannot quietly stop being a picture of this drawing. */
+  const FAMILIES = ['shot', 'recreate', 'corpus', 'against', 'lockset'];
   const { stale, unknown } = staleSheets(FAMILIES);
   for (const n of stale) {
     /* `shot` photographs the whole page, so what went stale under it may be
