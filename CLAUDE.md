@@ -1487,7 +1487,7 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm run corpus` | all 30 measured doors rebuilt from their own records; writes `js/works.js` and `screenshots/corpus-links.md` |
 | `npm run against` | each design and grip beside its own source doors, cropped |
 | `npm run lockset` | **our lock furniture beside the photographs of it, and measured against them** (19.9.2026) — the comparison nothing here had ever made, which is why the owner found the lever wrong by eye and no instrument had. One sheet per fitting, in PAIRS: each photograph beside our own door rendered in **that door's own paint** (derived from `js/works.js`, never matched a second time), both crops the same number of model millimetres wide and scaled by the LEAF, so a fitting too big for its door looks too big. It crops to the fitting off the `[data-hw]` union and **throws** rather than photographing bare paint. ⚠ Its `fitting()` measures the PHOTOGRAPH and OUR RENDER with one function, so a segmentation error lands on both and the ratio survives it — and it prints the **calibration**, our rose's drawn size against the size the sweep reads it as, because without that a reader cannot tell a 20% finding from a 20% instrument. Per door the sweep scatters; over six doors the median is within 7% of the truth. Three of the nine fittings have no corpus door and it names them |
-| `npm run shot` | the whole page at twelve sizes and designs. ⚠ **NOT BYTE-STABLE, AND IT IS THE ONLY FAMILY THAT IS NOT.** Two runs with no code change differ on seven of the twelve — 0.29% of pixels at most, max channel delta 9 of 255, always one small box over the drawn hardware. It photographs a live browser; the other three render the SVG. So a moved `shot` sheet is not evidence and an unmoved one is not either. Measured 31.8.2026 |
+| `npm run shot` | the whole page at twelve sizes and designs. ⚠ **NOT BYTE-STABLE, AND IT IS THE ONLY FAMILY THAT IS NOT.** Two runs with no code change differ on seven of the twelve — 0.29% of pixels at most, max channel delta 9 of 255, always one small box over the drawn hardware. So a moved `shot` sheet is not evidence and an unmoved one is not either. Measured 31.8.2026. ⚠ **AND THIS SAID "it photographs a live browser; the other three render the SVG", WHICH IS FALSE — corrected 19.9.2026.** All four navigate a browser and screenshot it; `tools/fresh.mjs` has quoted the three `page.goto` lines since `SHEET_DEPS` was deleted and this table was never corrected to match. The bare families are stable — `npm run against` re-run with no code change comes back byte-identical on all twenty-five sheets — for a different reason: `?bare=1` strips the page to `.stage-wrap`, so what is rasterised is flat vector fill with no webfont, no photograph and no animation, where `shot` photographs the whole chrome |
 | `npm run sheets` | regenerates all five screenshot families after a change. **The 52 BARE sheets are the proof** — `corpus`, `recreate`, `against` — never the 12 |
 | `npm run backdrop` | rebuilds BOTH rooms in `assets/` from the owner's two originals: grades the wall's median 60% of the way to the drawn room's own rendered wall, re-encodes under the 400 KB budget, and prints what it measured going in and coming out. Committed rather than scratch for `rectify.mjs`'s reason — the shipped asset is a pure function of an original plus one number, and re-deriving that from prose is how a picture comes back slightly different from the one everything else was fitted to |
 
@@ -2558,6 +2558,64 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ FIVE `against` SHEETS MOVED THAT COULD NOT HAVE, AND CHASING THEM
+  CORRECTED §7's REASON FOR TRUSTING ALL FOUR BARE FAMILIES — 19.9.2026.**
+  The lever round redrew `lever()` and `disc()`, so the sheets carrying lock
+  furniture were expected to move. Twenty-nine of the fifty-two did. What did
+  not fit: **`against-grid`, `-scroll`, `-arch`, `-circles`, `-vine` and their
+  `-light` twins moved, and `-iron`, `-mesh`, `-tree`, `-deco`, `-quatrefoil`
+  and `-reeded` did not** — on crops that are arithmetically identical, with
+  the same lockset, and (computed) **none of them reaching the lock stile at
+  all**. Six families and five families, same window sizes between them.
+
+  ⚠ **THE FIRST SUSPICION WAS THE INSTRUMENT, AND IT WAS WRONG.** `against`
+  navigates a browser and screenshots it — `page.goto` then `page.screenshot`,
+  exactly like `npm run shot`, which §7 records as differing on seven of twelve
+  sheets between two runs of identical code. So the obvious reading was that
+  the bare families are noisy too and this project's strongest proof is weaker
+  than it claims. **Tested rather than argued**, which is §7's own rule: `npm
+  run against` re-run with no code change at all came back **byte-identical on
+  all twenty-five sheets**. It is stable.
+
+  ⚠ **SO §7's CLAIM IS TRUE AND ITS REASON IS FALSE, WHICH IS THE WORSE OF THE
+  TWO.** That table says of `shot`: *"It photographs a live browser; the other
+  three render the SVG."* **All four navigate a browser** — `tools/fresh.mjs`
+  has recorded that since the day `SHEET_DEPS` was deleted, quoting the three
+  `page.goto` lines, and §7 was never corrected to match. The four bare
+  families are stable for a different reason than the file gives, and the real
+  one is worth having: `?bare=1` strips the page to `.stage-wrap`, so what is
+  rasterised is flat vector fill with no webfont, no photograph and no
+  animation, where `shot` photographs the whole chrome. **A reader who believed
+  §7's version would conclude that making a fifth family render the SVG
+  directly would buy stability it already has.**
+
+  **What the five sheets actually were:** the window crop runs from 0.2 of the
+  opening's width outside it to 1.2 across, and on those five families it is
+  wide enough — and the opening low enough — for **the tip of the lever to
+  enter the frame**. Measured: 327 differing pixels of 2,090,700 (**0.016%**),
+  max channel 85, in one 15 × 35 box, and cropped and looked at it is
+  unmistakably the cap of the blade against the architrave. Every moved and
+  unmoved sheet in the round is now accounted for:
+
+  | family | moved | why |
+  |---|---|---|
+  | `corpus` 01–09 | 9 | levers and cylinders on Peretz's own doors |
+  | `corpus-00` | — | its three doors carry neither |
+  | `recreate` d026 d048 d097 | 3 | `k=coral` |
+  | `recreate` d078 d122 | 2 | `k=cylinder` — the escutcheon is `disc()` |
+  | `recreate` ×5 | — | all five carry a `plate` or a `digital`, and **neither draws through `lever()` or `disc()`** |
+  | `against` grips ×7 | 7 | they crop the whole leaf and every one renders `k=cylinder` |
+  | `against` windows ×8 | 8 | the lever's tip is in the crop |
+  | `against` windows ×10 | — | it is not |
+
+  ⚠ **AND THE HALF HOUR WAS THE POINT.** §0b's own rule is that a sheet which
+  does not move when you think it should is worth the same half hour as one
+  that moves when it should not, and this was both at once — five that should
+  not have and six that should have. The finding is not the lever's tip; it is
+  that the sentence everyone reads about why these sheets are evidence has
+  been wrong about the mechanism for as long as `fresh.mjs` has carried the
+  correction beside it.
 
 - **⚠ THE ROSE WAS A BALL AND THE BLADE WAS LIGHTER THAN THE DOOR IT IS BOLTED
   TO — 19.9.2026.** Part 3, the half the owner named when he chose **shape and
