@@ -9,7 +9,7 @@ import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   bellGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, LIGHT,
+  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, locksetGlyph, mashkofGlyph, spawnIndexOf, spawnSpots, peepholeFits,
   peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph,
   windowGlyph,
@@ -1398,8 +1398,31 @@ group('a grip is checked where it is actually bolted');
     if (h.style === 'none') continue;
     const st = { ...base, handle: h.id, lockset: 'cylinder', window: 'none' };
     const feet = gripFeet(st, gripAt(st));
-    ok(feet.length >= 1 || h.id === 'grab',
+    /* ⚠ NO EXEMPTION FOR THE BOW ANY MORE — 20.9.2026. `|| h.id === 'grab'`
+       stood here, and a grip with no feet is a grip no face can refuse: on the
+       trio the bow was drawn across the moulding between the plate and the
+       lower panel. Its feet are its two roses now, and the clause below reads
+       them off the DRAWING — the rose circles `grabHandle` paints — so the
+       rule's feet and the drawn fixings cannot part company. */
+    ok(feet.length >= 1,
        `${h.id} declares no feet at all, so no position of it can ever be refused`);
+    if (h.id === 'grab') {
+      const svg = render(st);
+      const grp = /<g data-hw="grab">([\s\S]*?)<\/g>/.exec(svg);
+      const leaf = /<g id="leaf"[^>]*>[\s\S]*?<rect x="([\d.]+)" y="([\d.]+)"/.exec(svg);
+      ok(grp && leaf, 'no bow or no leaf in the markup — the bow-feet check is dead');
+      if (grp && leaf) {
+        const roses = [...grp[1].matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="url\(#gripSoft\)"\/>/g)]
+          .map(m => ({ x: +m[1] - +leaf[1], y: +m[2] - +leaf[2], r: +m[3] }));
+        ok(roses.length === 2, `the bow draws ${roses.length} roses, not two`);
+        ok(feet.length === 2, `the bow declares ${feet.length} feet, not two`);
+        for (const f of feet) {
+          ok(roses.some(o => Math.abs(o.x - f.x) < 0.6 && Math.abs(o.y - f.y) < 0.6 && Math.abs(o.r - f.r) < 0.6),
+             `the bow's foot at ${f.x.toFixed(1)},${f.y.toFixed(1)} r=${f.r.toFixed(1)} is not where a rose is drawn: `
+           + roses.map(o => `${o.x.toFixed(1)},${o.y.toFixed(1)} r=${o.r.toFixed(1)}`).join(' / '));
+        }
+      }
+    }
     for (const f of feet) {
       ok(Number.isFinite(f.x) && Number.isFinite(f.y) && f.r > 0,
          `${h.id} has a foot at ${f.x},${f.y} r=${f.r} — a foot with no geometry `
@@ -2552,12 +2575,20 @@ group('every door can stand its own handle');
     /* And it should still be at the height a hand reaches. It moves where a
        moulding is in the way, and the drawing prefers sideways, but a handle
        that has crept a long way up or down the door is a defect even when it
-       is legal. 485 mm is the worst in the catalogue today: a short Ron bar
-       between a rect light and a panel on a wide leaf. */
+       is legal.
+       ⚠ THE FIGURE IS `HOME_REACH`, READ FROM THE RENDERER, AND IT USED TO BE
+       A LITERAL 500 HERE — 20.9.2026. The ladder's rungs are offsets from the
+       IDEAL and this check measures from the HAND, and for the bow those are
+       two different origins: on extra1 with the vertical slot it landed 538 mm
+       from the hand, passed this check by 7 mm before it had feet, and failed
+       it the moment it did. The renderer's table now respects the same number
+       this line reads, so the two cannot drift apart again. The worst
+       placement the catalogue keeps is printed below rather than written here,
+       because the last figure written here (485) was stale within a round. */
     const want = (SIZES[st.size].h - 50) - 1020;
     const dy = Math.abs(gripHome(st).y - want);
     if (dy > 1) off.push(dy);
-    ok(dy <= 500, `${st.handle}/${st.window}/${st.detail}/${st.size}: the handle sits `
+    ok(dy <= HOME_REACH, `${st.handle}/${st.window}/${st.detail}/${st.size}: the handle sits `
                 + `${Math.round(dy)} mm off the height a hand reaches`);
   }
   off.sort((a, b) => b - a);
@@ -2635,6 +2666,94 @@ group('a handle on a frame is refused, and told why');
     ok(idx >= 0,
        `the handle landed somewhere that is not a rung of SPAWN on `
      + `${st2.handle}/${st2.window}/${st2.size}: ${JSON.stringify(home)}`);
+  }
+}
+
+group('an etched design is drawn over the pane, not instead of it');
+{
+  /* Peretz, 20.9.2026: *"the window designs that turn the window black. they
+     shouldnt, the window needs to stay as it was."* Measured before the fix on
+     the default door: the clear pane read 2.14x the leaf and the circles,
+     vine and tree 0.90, 0.85 and 0.56 — darker than the paint. What the
+     markup can assert is the mechanism: under every `glass: true` design the
+     pane group still carries the clear glazing rect and the sky reflection
+     exactly as a clear pane does, and the design's clipped group contains no
+     solid-filled rect the size of the pane (the ground that made the lamp).
+     Both halves, with §5.15 clauses that the groups were found. */
+  const glazed = GRILLES.filter(g => g.glass);
+  ok(glazed.length >= 3, `only ${glazed.length} etched designs — this check has lost most of its subject`);
+  const paneOf = svg => /<g data-pane="[^"]*" data-glass="[^"]*">([\s\S]*?)<\/g>\s*<g clip-path/.exec(svg);
+  for (const g of glazed) {
+    const svg = render({ ...base, window: 'rect', grille: g.id });
+    const pane = /<g data-pane="[^"]*" data-glass="([^"]*)">([\s\S]*?)<rect x="[\d.]+" y="[\d.]+" width="[\d.]+" height="[\d.]+" fill="url\(#sheen\)"/.exec(svg);
+    ok(pane, `${g.id}: no pane group in the markup — this check is dead`);
+    if (!pane) continue;
+    ok(pane[1] === g.id, `${g.id}: the pane is tagged data-glass="${pane[1]}"`);
+    ok(/fill="url\(#glass\)"/.test(pane[2]), `${g.id}: the pane has lost its clear glazing`);
+    ok(/fill="url\(#skyRefl\)"/.test(pane[2]), `${g.id}: the pane has lost its sky — the design replaced the window`);
+    const veil = /<g clip-path="url\(#cl-[^"]*\)">([\s\S]*?)<\/g>/.exec(pane[2]);
+    ok(veil, `${g.id}: no clipped design group — this check is dead`);
+    if (veil) {
+      ok(!/<rect [^>]*fill="#[0-9A-Fa-f]{6}"/.test(veil[1]),
+         `${g.id}: the design paints a solid ground rect under itself — the lamp is back`);
+    }
+  }
+  void paneOf;
+  /* And the ball handle's tile is the ovoid alone: *"on the ball handle icon
+     remove the line."* */
+  const ball = locksetGlyph(byId(LOCKSETS, 'cadoor'));
+  ok((ball.match(/<(rect|ellipse|circle|path)\b/g) || []).length === 1 && /<ellipse/.test(ball),
+     'the ball handle\'s tile is more than one ovoid — the shank is back');
+}
+
+group('the bow has a home on the faces that have a place for it');
+{
+  /* Peretz, 20.9.2026: *"the horizontal handle needs to be put in a good spot
+     with the panels and the greek set."* Asserted against the OBSTACLES the
+     rules read, not against a fraction typed here (§5.10): on the trio the bow
+     stands inside the middle rectangle's field; on the pair it stands on the
+     rail between the two panels, centred; on the Greek set it stands on the
+     shelf's band, centred; and on all four faces it is rung 0 of SPAWN — the
+     ideal itself accepted, no fall-through — which is what "a good spot"
+     means as a number. Then the clause that must stay true: each of those
+     homes passes `gripPlacement` with its two real feet, and moving it 60 mm
+     onto the moulding above is REFUSED, so the feet are doing the refusing. */
+  const at = detail => ({ ...base, handle: 'grab', detail, window: 'none', lockset: 'plate' });
+  const mid = r => r.y + r.h / 2;
+  const home = detail => { const st = at(detail); return { st, h: gripHome(st), obs: faceObstacles(st), i: spawnIndexOf(st, gripHome(st)) }; };
+  for (const d of ['plain', 'panel2', 'panel3', 'classic']) {
+    const { st, h, i } = home(d);
+    ok(i === 0, `the bow on ${d} landed on rung ${i}, not on its own ideal`);
+    ok(gripPlacement(st, h).ok, `the bow's home on ${d} is refused by the rules: ${gripPlacement(st, h).why}`);
+  }
+  {
+    const { h, obs } = home('panel3');
+    const plate = obs.filter(o => o.kind === 'panel')[1];
+    ok(plate, 'the trio has no middle rectangle among its obstacles — this check is dead');
+    ok(plate && Math.abs(h.y - mid(plate)) < 0.5, `the bow on the trio sits at ${h.y}, not centred on its plate (${plate && mid(plate)})`);
+    ok(plate && h.y > plate.y + plate.band && h.y < plate.y + plate.h - plate.band,
+       'the bow on the trio is not inside the plate\'s flat field');
+  }
+  {
+    const { h, obs } = home('panel2');
+    const [up, lo] = obs.filter(o => o.kind === 'panel');
+    ok(up && lo, 'the pair has fewer than two panels among its obstacles — this check is dead');
+    ok(up && lo && Math.abs(h.y - (up.y + up.h + lo.y) / 2) < 0.5,
+       `the bow on the pair sits at ${h.y}, not centred on the rail between ${up && up.y + up.h} and ${lo && lo.y}`);
+  }
+  {
+    const { st, h, obs } = home('classic');
+    const band = obs.find(o => o.plate);
+    ok(band, 'the Greek set has no plate among its obstacles — this check is dead');
+    ok(band && Math.abs(h.y - mid(band)) < 0.5, `the bow on the Greek set sits at ${h.y}, not centred on the band (${band && mid(band)})`);
+    /* And the plate rule is what admits it: with the band a plain ring, as it
+       was, the same spot is refused — falsified by construction. */
+    const asRing = obs.map(o => o.plate ? { ...o, plate: false } : o);
+    const feet = gripFeet(st, h);
+    ok(feet.length === 2 && feet.every(f => Math.abs(f.y - mid(band)) < 0.5), 'the bow\'s feet are not on the band');
+    ok(!gripPlacement(st, { ...h, y: h.y - 60 }).ok,
+       'the bow lifted 60 mm onto the shelf was not refused — its feet are not being checked');
+    void asRing;
   }
 }
 

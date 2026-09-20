@@ -2994,7 +2994,7 @@ ${stops}
   var MOULD_BAND = 70;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
-  var GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15 };
+  var GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15, post: [0.175, 0.825] };
   var GRAB_D = GRAB.len * GRAB.ratio;
   var PLATE = {
     w: 90,
@@ -5035,6 +5035,10 @@ ${body}
     const inside = (x, y, r) => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h;
     const near = { x: ob.x - f.r, y: ob.y - f.r, w: ob.w + f.r * 2, h: ob.h + f.r * 2 };
     if (!inside(f.x, f.y, near)) return false;
+    if (ob.plate) {
+      const on = { x: ob.x + f.r, y: ob.y + f.r, w: ob.w - f.r * 2, h: ob.h - f.r * 2 };
+      return !(on.w > 0 && on.h > 0 && inside(f.x, f.y, on));
+    }
     if (!ob.band) return true;
     const hole = {
       x: ob.x + ob.band + f.r,
@@ -5076,7 +5080,15 @@ ${body}
     }));
     if (detail.classic) {
       for (const q of classicPieces(leafW, leafH, openings.length > 0)) {
-        out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND });
+        out.push({
+          kind: q.kind,
+          x: q.x,
+          y: q.y,
+          w: q.w,
+          h: q.h,
+          band: MOULD_BAND,
+          ...q.piece === "band" ? { plate: true } : {}
+        });
       }
       return out;
     }
@@ -5200,7 +5212,16 @@ ${body}
     const panelled = detail.panel && !byId(WINDOWS, state2.window).rects.length;
     const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
     const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
-    const homeY = handle.style === "grab" ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
+    const grabY = () => {
+      if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
+      if (panelled) {
+        const rows = panelRows(detail);
+        if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
+        if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
+      }
+      return leafH * GRAB.fromTop;
+    };
+    const homeY = handle.style === "grab" ? grabY() : leafH - HANDLE_AFF;
     const homeX = handle.style === "grab" ? (leafW - GRAB.len) / 2 : backset + standoff;
     return { x: homeX, y: homeY, rot: 0 };
   }
@@ -5302,7 +5323,11 @@ ${body}
     const cx = hingeLeftOf(state2) ? leafW - p.x : p.x;
     const cy = p.y;
     const along = (offsets, r) => offsets.map((d) => p.rot === 90 ? { x: cx + d, y: cy, r } : { x: cx, y: cy + d, r });
-    if (handle.style === "grab") return [];
+    if (handle.style === "grab") {
+      const dirX = hingeLeftOf(state2) ? -1 : 1;
+      const r = GRAB_D * 0.9;
+      return GRAB.post.map((t) => ({ x: cx + dirX * GRAB.len * t, y: cy, r }));
+    }
     if (handle.style === "shiran") {
       const H = SHIRAN.h(leafH);
       const r = H / 5.49 * SHIRAN.disc / 2;
@@ -5418,6 +5443,8 @@ ${body}
     [-20, 480]
   ];
   var SPAWN_FLAT = [0, -150, 150, -300, 300];
+  var HOME_REACH = 500;
+  var handY = (leafH) => leafH - HANDLE_AFF;
   function spawnSpots(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -5427,6 +5454,7 @@ ${body}
       const cand = { x: ideal.x + dx, y: ideal.y + dy, rot: 0 };
       if (cand.x > leafW * 0.55) continue;
       if (cand.y < leafH * 0.18 || cand.y > leafH * 0.82) continue;
+      if (Math.abs(cand.y - handY(leafH)) > HOME_REACH) continue;
       out.push(cand);
     }
     return out;
@@ -5434,7 +5462,7 @@ ${body}
   function spawnFlatSpots(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    return SPAWN_FLAT.map((dy) => ({ x: leafW / 2, y: leafH - HANDLE_AFF + dy, rot: 90 })).filter((f) => f.y >= leafH * 0.18 && f.y <= leafH * 0.82);
+    return SPAWN_FLAT.map((dy) => ({ x: leafW / 2, y: handY(leafH) + dy, rot: 90 })).filter((f) => f.y >= leafH * 0.18 && f.y <= leafH * 0.82 && Math.abs(f.y - handY(leafH)) <= HOME_REACH);
   }
   var STRIP_H = { pitch: 0.19, span: 0.8, mid: 0.52 };
   var STRIP_H_TIGHT = { pitch: 0.033, mid: 0.55 };
@@ -5567,8 +5595,7 @@ ${body}
       const s = w / cols, r = s;
       const sw = Math.max(1, r * 0.11);
       const ink = scaleTone(paint2, 1.06);
-      let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
-                     fill="${scaleTone(paint2, 0.44)}"/>`;
+      let out = "";
       const rows = Math.ceil(h / s) + 1;
       let d = "";
       for (let i = -1; i <= cols + 1; i++) {
@@ -5587,8 +5614,7 @@ ${body}
       const STEM = w * 0.03, OUT = w * 0.021, THIN = w * 0.014;
       const str = (d2, sw) => `<path d="${d2}" fill="none" stroke="${ink}"
       stroke-width="${sw.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
-      let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
-                     fill="${scaleTone(paint2, 0.46)}"/>`;
+      let out = "";
       const pitch = w * 0.26;
       const n = Math.max(4, Math.round(h / pitch));
       const stemX = (t) => x + w * (0.5 + 0.2 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
@@ -5675,7 +5701,7 @@ ${body}
       const ground = scaleTone(paint2, 0.42);
       let ink = scaleTone(paint2, 0.12);
       if (luminance(ink) > luminance(ground) * 0.3) ink = "#17120F";
-      let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="${ground}"/>`;
+      let out = "";
       const fill = (d) => `<path d="${d}" fill="${ink}"/>`;
       const ribbon = (spine, hw) => {
         const pts = [];
@@ -5873,11 +5899,12 @@ ${body}
            Screen only ever lightens, so this had nowhere to go but pale. -->
       <rect x="${x}" y="${y}" width="${w}" height="${h}"
             filter="url(#frost)" opacity="0.10" style="mix-blend-mode:screen"/>
-      <!-- reflected sky across the upper third. Obscured and reeded glass has
-           nothing to reflect it off: the surface that would carry the sky is
-           the same surface that has been etched away, which is exactly why
-           those panes read as a lit panel rather than as a hole. -->
-      ${glass ? "" : `<rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>`}
+      <!-- reflected sky across the upper third. It used to be withheld from
+           an etched pane on the argument that etched glass has no surface to
+           reflect off; Peretz asked for the window to stay as it was under
+           every design (20.9.2026, see glazingArt), so the sky is on every
+           pane and the design is drawn over it. -->
+      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
       <!-- THE GLASS IS CUT TO THE HOLE, like the ironwork over it. The veil
            used to be drawn unclipped, which was invisible while every pattern
@@ -6880,7 +6907,7 @@ ${body}
     const rod = (a, b, hh, rx, fill) => `
       <rect x="${n1(P(a))}" y="${n1(by - hh)}" width="${n1(P(b) - P(a))}"
             height="${n1(hh * 2)}" rx="${n1(rx)}" fill="${fill}"/>`;
-    const POST = [0.175, 0.825];
+    const POST = GRAB.post;
     const drew = { x: x0, y: by - D * 0.85, w: L2, h: D * 1.7 };
     const svg = `
     <g>
@@ -7771,9 +7798,12 @@ ${body}
     <rect x="-41" y="67" width="82" height="82" rx="5"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
     <circle cx="0" cy="108" r="12" fill="var(--paper, #EFEDE8)"/>` }),
-    // Cadoor: a free-standing ovoid, no rose — taller than wide, on a stub shank.
-    cadoor: () => ({ box: [-44, -48, 86, 48], art: `
-    <rect x="34" y="-11" width="45" height="22" rx="11"/>
+    /* Cadoor: a free-standing ovoid, no rose — taller than wide. ⚠ THE STUB
+       SHANK IS GONE, 20.9.2026 — Peretz: *"on the ball handle icon remove the
+       line."* It was a 45 x 22 rounded rect beside the ovoid, a side view of
+       the neck on a tile whose every neighbour is square-on, and it read as a
+       line drawn next to the ball. The box is symmetric again. */
+    cadoor: () => ({ box: [-44, -48, 44, 48], art: `
     <ellipse cx="0" cy="0" rx="34" ry="40"/>` }),
     // Sapir: square cushion knob on a square rose, the knob offset off the plate.
     sapir: () => ({ box: [-78, -46, 46, 52], art: `

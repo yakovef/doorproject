@@ -978,7 +978,11 @@ const BAR_GAP_MIN = 0.090;
    And a grab bar is a manufactured product. Peretz buys a 280 mm bar; he does
    not buy a third of a door. The constant is the truer model as well as the
    checkable one. */
-const GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15 };
+/* `post` — where the two fixings sit along the bar, tip to tip. ⚠ READ BY
+   `grabHandle`, WHICH DRAWS THE ROSES THERE, AND BY `gripFeet`, WHICH PLACES
+   THE FEET THERE (20.9.2026). It was a local `POST` inside the drawing while
+   the bow had no feet at all; a second copy in the rules would be §5.10. */
+const GRAB = { fromTop: 0.59, len: 280, ratio: 1 / 15, post: [0.175, 0.825] };
 /* Where the bow's metal actually starts and stops, measured out from the
    grip's axis, which is its OUTBOARD tip. `grabHandle` draws exactly this and
    `handleFootprint` reports exactly this — one statement, two readers. */
@@ -3990,6 +3994,13 @@ const footHits = (f, ob) => {
   const inside = (x, y, r) => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h;
   const near = { x: ob.x - f.r, y: ob.y - f.r, w: ob.w + f.r * 2, h: ob.h + f.r * 2 };
   if (!inside(f.x, f.y, near)) return false;
+  /* A plate: a raised face built to be bolted through (the Greek set's band).
+     A foot wholly on it stands where the set's own pull stood; a foot that
+     crosses its edge is on the moulded arris and is a hit. */
+  if (ob.plate) {
+    const on = { x: ob.x + f.r, y: ob.y + f.r, w: ob.w - f.r * 2, h: ob.h - f.r * 2 };
+    return !(on.w > 0 && on.h > 0 && inside(f.x, f.y, on));
+  }
   if (!ob.band) return true;
   /* A ring: the moulding is the band, and the flat field inside it is where a
      bar on a panelled door is supposed to stand. */
@@ -4067,7 +4078,15 @@ export const faceObstacles = memo(function faceObstacles(state) {
        had no way to see a moulding at all. Both ends of that are fixed
        together or neither is worth fixing. */
     for (const q of classicPieces(leafW, leafH, openings.length > 0)) {
-      out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND });
+      /* ⚠ THE BAND IS A PLATE, NOT A RING — 20.9.2026. The shelf's band is
+         the raised face the set's own pull was bolted through ("the band
+         moulding and its three tablets ARE the backplate"), and as a 70 mm
+         ring its hole was one millimetre tall, so no fitting could stand on
+         it and the bow Peretz wants there was refused by the rules the moment
+         it had feet. `plate: true` says a foot WHOLLY on it is fine and a
+         foot half off its edge is not — see `footHits`. */
+      out.push({ kind: q.kind, x: q.x, y: q.y, w: q.w, h: q.h, band: MOULD_BAND,
+                 ...(q.piece === 'band' ? { plate: true } : {}) });
     }
     return out;
   }
@@ -4418,7 +4437,32 @@ function gripIdeal(state) {
      floor; this one sits on the mid rail, and the measured median across d051,
      d062, d067, d068, d070 and d077 is 0.59 of leaf height. It used to be a
      constant inside the drawing, which is why the bar could not be dragged. */
-  const homeY = handle.style === 'grab' ? leafH * GRAB.fromTop : leafH - HANDLE_AFF;
+  /* ⚠ AND ON A FACE THAT HAS A PLACE FOR IT, THE BOW GOES THERE — 20.9.2026,
+     Peretz: *"the horizontal handle needs to be put in a good spot with the
+     panels and the greek set."* The corpus median 0.59 is where a bow sits on
+     a PLAIN leaf; on the faces it is the composition that says where:
+       trio     the middle rectangle is the HANDLE PLATE — d067, d068 and
+                d077 all bolt their pull through it — so the bow sits centred
+                in its field
+       pair     on the rail between the two panels, centred on it, which is
+                what the corpus's 0.59 was measuring on the pair doors
+       classic  on the shelf's band, where the set's own pull sat until 14.9
+                (`lw * 0.33` long, centred), and which is the one raised face
+                on that door built to be bolted through
+     Each is read off the SAME rows the drawing draws — `panelRows` and
+     `CLASSIC_ROWS` — so the home cannot drift from the moulding it sits in;
+     a fraction typed here would be §5.10. The plain leaf and every glazed
+     face keep 0.59. */
+  const grabY = () => {
+    if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
+    if (panelled) {
+      const rows = panelRows(detail);
+      if (rows.length >= 3) return leafH * (rows[1][0] + rows[1][1]) / 2;
+      if (rows.length === 2) return leafH * (rows[0][1] + rows[1][0]) / 2;
+    }
+    return leafH * GRAB.fromTop;
+  };
+  const homeY = handle.style === 'grab' ? grabY() : leafH - HANDLE_AFF;
   /* ⚠ AND THE BOW'S OWN DEFAULT X, which used to be the drawing's business.
      `grabHandle` centred it on the leaf no matter what it was handed; now it
      draws where it is told, so the centring has to happen HERE, where a
@@ -4755,7 +4799,22 @@ export function gripFeet(state, place = null) {
      across, and its ends are on flat face on every door we draw: `rules.js`
      already refuses it across a centred window, and the nine installed ones
      are all on solid or panelled leaves. */
-  if (handle.style === 'grab') return [];
+  /* ⚠ THE BOW HAS FEET SINCE 20.9.2026, AND THE PARAGRAPH ABOVE IS WHY IT
+     HAD NONE. "Its ends are on flat face on every door we draw" was true of
+     the plain leaf and stopped being true the day the panelled faces
+     arrived: with no feet, `gripPlacement` asked nothing about the face, rung
+     0 was always accepted, and on the trio the bar was drawn ACROSS the
+     moulding between the handle plate and the lower panel, its bosses
+     straddling two mouldings 43 mm apart — which is the "good spot" Peretz
+     asked for. The feet are the two roses, where `grabHandle` draws them:
+     `GRAB.post` along the bar from its outboard tip, inboard being +x when
+     the lock is on the left and -x when it is on the right, at the rose's
+     own radius. */
+  if (handle.style === 'grab') {
+    const dirX = hingeLeftOf(state) ? -1 : 1;
+    const r = GRAB_D * 0.9;
+    return GRAB.post.map(t => ({ x: cx + dirX * GRAB.len * t, y: cy, r }));
+  }
 
   /* THE SHIRAN IS A PULL ON TWO MOUNTS, like a bar, and it was the only one of
      them modelled as a dot at its own centre — which is the bare shaft, the
@@ -5095,9 +5154,12 @@ export function gripPlacement(state, place = null) {
    list is written to. The corpus behind them: ten installed pull bars sit
    between 0.430 and 0.512 of leaf height, and every bar in the corpus sits
    between 0.05 and 0.31 of the leaf's width from the closing edge.
-   ⚠ AND ±500 IS WHERE IT STOPS, which is `HOME_REACH`'s old value arriving as
-   the last rung rather than as a gate. Past that a handle nobody chose is at
-   knee height, and the door is better refused than opened with one there. */
+   ⚠ AND ±480 IS WHERE THE RUNGS STOP, AND `HOME_REACH` IS A GATE BESIDE THEM
+   — 20.9.2026. This note used to say the last rung had REPLACED the gate, and
+   that was true of every grip whose ideal is hand height and false of the
+   bow, whose ideal is 0.59 of the leaf: from there ±480 reaches a knee rail.
+   Past HOME_REACH from the HAND a handle nobody chose is at knee height, and
+   the door is better refused than opened with one there. */
 /* ⚠ THE STEP IS 60 mm AND IT IS MEASURED, NOT PICKED. A first draft stepped
    120/240/380/500 and lost 106 combinations the old search kept. Asked where
    the search had actually put those handles, the answer was blunt: 36 of them
@@ -5131,6 +5193,36 @@ const SPAWN = [
 const SPAWN_FLAT = [0, -150, 150, -300, 300];
 
 /**
+ * HOW FAR A DEFAULT MAY STRAY FROM HAND HEIGHT, in millimetres, measured from
+ * the hand and not from the ideal.
+ *
+ * ⚠ THIS IS THE THIRD STATEMENT OF ONE QUANTITY AND IT IS THE ONE THAT WAS
+ * MISSING — 20.9.2026. The ladder above runs to ±480 from the IDEAL, and the
+ * assertion in npm test allows 500 from the HAND. For every grip but the bow
+ * those are the same origin, so the two agreed by construction. The bow's
+ * ideal is 0.59 of the leaf — 118 to 180 mm below hand height, measured off
+ * seven doors — so its lower rungs reached 538 to 600 mm from the hand while
+ * nothing in this file said they could not. Beside the vertical slot on the
+ * two middle sizes that walked the bow UNDER the slot to 0.78 of the leaf: a
+ * knee rail, which is the exact placement the 27.8 round measured (about
+ * 400 mm off the floor) and refused on the standard leaf. The standard leaf
+ * refuses it still, because its feet land on the slot's frame; the two sizes
+ * with 274 mm of field beside a 280 mm bow did not, and the difference was
+ * never a decision.
+ *
+ * So the reach is stated ONCE, here, read by spawnSpots and spawnFlatSpots as
+ * a bound the table respects (a band respected by the table never proposes)
+ * and by npm test as the figure it measures against. Measured before it was
+ * believed: over every size x window x handle x lockset x face, 2,592
+ * combinations, exactly the 18 bow-beside-slot combos on extra1 and
+ * halfextra1 go from a 538 mm placement to refused, and no other handle
+ * moves a millimetre.
+ */
+export const HOME_REACH = 500;
+/** Hand height on this leaf, from its head — the origin HOME_REACH is measured from. */
+const handY = leafH => leafH - HANDLE_AFF;
+
+/**
  * The upright candidates for this door, IN ORDER, already bounded.
  *
  * ⚠ ONE LIST, TWO READERS, AND THE SECOND IS AN ASSERTION. `gripHome` walks
@@ -5140,10 +5232,13 @@ const SPAWN_FLAT = [0, -150, 150, -300, 300];
  * and a test that called `gripHome` again would be asking the decision about
  * itself. It asks the CANDIDATES.
  *
- * The two bounds are applied here rather than in `gripPlacement`: 0.55 of the
- * width keeps a pull off the half of the door that does not move, and
- * 0.18-0.82 of the height keeps it where a hand goes. They are the table's
- * discipline, not refusals — see `SPAWN`.
+ * The three bounds are applied here rather than in `gripPlacement`: 0.55 of
+ * the width keeps a pull off the half of the door that does not move,
+ * 0.18-0.82 of the height keeps it on the leaf where a hand can go, and
+ * `HOME_REACH` from hand height keeps a DEFAULT near the hand — the ladder's
+ * rungs are offsets from the ideal, and the bow's ideal is not hand height,
+ * so without this third bound its lower rungs are knee rails. They are the
+ * table's discipline, not refusals — see `SPAWN` and `HOME_REACH`.
  */
 export function spawnSpots(state) {
   const size = SIZES[state.size] || SIZES.standard;
@@ -5154,6 +5249,7 @@ export function spawnSpots(state) {
     const cand = { x: ideal.x + dx, y: ideal.y + dy, rot: 0 };
     if (cand.x > leafW * 0.55) continue;
     if (cand.y < leafH * 0.18 || cand.y > leafH * 0.82) continue;
+    if (Math.abs(cand.y - handY(leafH)) > HOME_REACH) continue;
     out.push(cand);
   }
   return out;
@@ -5164,8 +5260,9 @@ export function spawnFlatSpots(state) {
   const size = SIZES[state.size] || SIZES.standard;
   const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
   return SPAWN_FLAT
-    .map(dy => ({ x: leafW / 2, y: leafH - HANDLE_AFF + dy, rot: 90 }))
-    .filter(f => f.y >= leafH * 0.18 && f.y <= leafH * 0.82);
+    .map(dy => ({ x: leafW / 2, y: handY(leafH) + dy, rot: 90 }))
+    .filter(f => f.y >= leafH * 0.18 && f.y <= leafH * 0.82
+              && Math.abs(f.y - handY(leafH)) <= HOME_REACH);
 }
 
 /**
@@ -5471,8 +5568,20 @@ function inlayGroove(lx, ly, lw, lh, paint, hingeOnLeft, winSpan) {
  * behind it, so it comes out darker than the leaf and carries a reflection of
  * the sky across its top. Obscured glazing scatters that street into a flat
  * bright field with no picture in it, and the sky reflection has nothing to
- * reflect off. So this does not just add a pattern on top of the clear pane —
- * it replaces what is behind the pattern too.
+ * reflect off. So this used to replace what is behind the pattern too.
+ *
+ * ⚠ IT DOES NOT ANY MORE — 20.9.2026, ON PERETZ'S WORD. *"the window designs
+ * that turn the window black. they shouldnt, the window needs to stay as it
+ * was."* Measured on the default anthracite door before the change: the
+ * clear pane reads 2.14x the leaf's luminance, and under the circles, the
+ * vine and the tree it read 0.90, 0.85 and 0.56 — a pane DARKER than the
+ * paint, which is exactly "black". The measurement above is what a
+ * photograph of obscured glass does and it stays as that; what he sells is a
+ * clear pane with a design etched INTO it, and that is what is drawn: the
+ * pane as it was — the same gradient, the same sky across its head — and the
+ * design over it. Every branch below that painted a ground rect the size of
+ * the pane has lost it, and `aperture` no longer withholds the sky from an
+ * etched pane. REALISM.md §6: measured, overruled, kept.
  *
  * Returned in two parts, because they go either side of the grille: ironwork
  * sits in front of the glass, not behind its texture.
@@ -5576,8 +5685,7 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
     const s = w / cols, r = s;
     const sw = Math.max(1, r * 0.11);
     const ink = scaleTone(paint, 1.06);
-    let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
-                     fill="${scaleTone(paint, 0.44)}"/>`;
+    let out = '';                                  // no ground: the pane shows through
     const rows = Math.ceil(h / s) + 1;
     let d = '';
     for (let i = -1; i <= cols + 1; i++) {
@@ -5610,8 +5718,7 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
     const STEM = w * 0.030, OUT = w * 0.021, THIN = w * 0.014;
     const str = (d, sw) => `<path d="${d}" fill="none" stroke="${ink}"
       stroke-width="${sw.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"
-                     fill="${scaleTone(paint, 0.46)}"/>`;
+    let out = '';                                  // no ground: the pane shows through
 
     const pitch = w * 0.26;
     const n = Math.max(4, Math.round(h / pitch));
@@ -5710,10 +5817,13 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
      No hairlines anywhere: nothing on that door is thinner than about 0.035 W,
      so this is filled tapering ribbons and never a stroked path. */
   if (kind === 'tree') {
+    /* `ground` is what the pane USED to be filled with under this design and
+       is kept only as the reference the ink is tested against — the
+       silhouette has to be darker than any field it could stand on. */
     const ground = scaleTone(paint, 0.42);
     let ink = scaleTone(paint, 0.12);
     if (luminance(ink) > luminance(ground) * 0.30) ink = '#17120F';
-    let out = `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" fill="${ground}"/>`;
+    let out = '';                                  // no ground: the pane shows through
     const fill = d => `<path d="${d}" fill="${ink}"/>`;
 
     /* A filled ribbon from a spine and a half-width along it: the real limbs
@@ -6046,11 +6156,12 @@ function aperture({ x, y, w, h, paint, edge, grille, key, leaf = null,
            Screen only ever lightens, so this had nowhere to go but pale. -->
       <rect x="${x}" y="${y}" width="${w}" height="${h}"
             filter="url(#frost)" opacity="0.10" style="mix-blend-mode:screen"/>
-      <!-- reflected sky across the upper third. Obscured and reeded glass has
-           nothing to reflect it off: the surface that would carry the sky is
-           the same surface that has been etched away, which is exactly why
-           those panes read as a lit panel rather than as a hole. -->
-      ${glass ? '' : `<rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>`}
+      <!-- reflected sky across the upper third. It used to be withheld from
+           an etched pane on the argument that etched glass has no surface to
+           reflect off; Peretz asked for the window to stay as it was under
+           every design (20.9.2026, see glazingArt), so the sky is on every
+           pane and the design is drawn over it. -->
+      <rect x="${x}" y="${y}" width="${w}" height="${h * 0.36}" fill="url(#skyRefl)"/>
       <clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>
       <!-- THE GLASS IS CUT TO THE HOLE, like the ironwork over it. The veil
            used to be drawn unclipped, which was invisible while every pattern
@@ -8221,7 +8332,7 @@ function grabHandle(cx, cy, dir, centreX, leafW, leafH, y0) {
   const rod = (a, b, hh, rx, fill) => `
       <rect x="${n1(P(a))}" y="${n1(by - hh)}" width="${n1(P(b) - P(a))}"
             height="${n1(hh * 2)}" rx="${n1(rx)}" fill="${fill}"/>`;
-  const POST = [0.175, 0.825];
+  const POST = GRAB.post;
 
   /* WHAT IT ACTUALLY DREW, handed back rather than described again.
      The footprint in `handleFootprint` is a shade generous on purpose — it is
@@ -9734,9 +9845,12 @@ const FITTING_GLYPH = {
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
     <circle cx="0" cy="108" r="12" fill="var(--paper, #EFEDE8)"/>` }),
 
-  // Cadoor: a free-standing ovoid, no rose — taller than wide, on a stub shank.
-  cadoor: () => ({ box: [-44, -48, 86, 48], art: `
-    <rect x="34" y="-11" width="45" height="22" rx="11"/>
+  /* Cadoor: a free-standing ovoid, no rose — taller than wide. ⚠ THE STUB
+     SHANK IS GONE, 20.9.2026 — Peretz: *"on the ball handle icon remove the
+     line."* It was a 45 x 22 rounded rect beside the ovoid, a side view of
+     the neck on a tile whose every neighbour is square-on, and it read as a
+     line drawn next to the ball. The box is symmetric again. */
+  cadoor: () => ({ box: [-44, -48, 44, 48], art: `
     <ellipse cx="0" cy="0" rx="34" ry="40"/>` }),
 
   // Sapir: square cushion knob on a square rose, the knob offset off the plate.

@@ -1134,6 +1134,14 @@ proposes past them. The owner's rule is *"if it doesnt collide with anything
 then its okay"*. **A band enforced at the check refuses; a band respected by
 the table never proposes.**
 
+⚠ **AND `HOME_REACH` (500 mm from hand height) IS THE THIRD BOUND THE TABLE
+RESPECTS, SINCE 20.9.2026.** The rungs are offsets from the IDEAL, and for
+every grip but the bow the ideal is hand height, so ±480 stayed inside the
+reach by construction. The bow's ideal is 0.59 of the leaf, so its lower rungs
+reached a knee rail under the vertical slot on two sizes while the standard
+leaf refused the same placement. One constant now, in `renderer.js`, read by
+the table and by `npm test`; the §0b Part C entry of 20.9 has the sweep.
+
 ⚠ **`faceObstacles` INCLUDES THE FOUR BOLTED FITTINGS** since the same day —
 the פעמון, the עינית, the קודן and the כספת. It knew only what a face is MADE
 of before, and a flat bar is centred exactly where the knocker and the viewer
@@ -2568,6 +2576,134 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ PERETZ'S SECOND REVIEW, PART C — THE ETCHED DESIGNS KEEP THE WINDOW,
+  THE BALL LOSES ITS LINE, AND THE BOW HAS A HOME ON THE FACES BUILT TO CARRY
+  ONE — 20.9.2026.** Three drawing notes, each measured before it was touched
+  and after (REALISM.md §6), and this is the round where bare sheets are
+  ALLOWED to move, so every one that did is attributed below.
+
+  **C1 · *"the window designs that turn the window black. they shouldnt, the
+  window needs to stay as it was."*** `glazingArt` painted a ground rect the
+  size of the pane under the circles, the vine and the tree — obscured glass
+  as a lamp, on a measurement of real obscured glass — and `aperture`
+  withheld the sky reflection from any etched pane. Measured on the default
+  anthracite door, pane luminance against the leaf's, before → after:
+
+  | | clear | rings | circles | vine | tree |
+  |---|---|---|---|---|---|
+  | before | 2.14 | 1.86 | **0.90** | **0.85** | **0.56** |
+  | after | 2.14 | 1.86 | 1.91 | 1.99 | 1.46 |
+
+  Under three of the four designs the pane read DARKER than the paint — which
+  is "black" as a number. The rings never had a ground (they are `grillePaths`
+  ink over the pane) and read the same both times, which is the control. The
+  ground rects are gone, the sky is on every pane, and the designs are drawn
+  over the glass as it was. The obscured-glass measurement stays in the
+  docstring as what a photograph does, overruled and kept. `npm run glass`
+  before and after is identical to the digit — it measures the CLEAR pane,
+  and the clear pane did not move.
+  ⚠ On a pale door the figures barely move (circles 0.73 → 0.76, tree 0.40 →
+  0.44), because a white leaf is brighter than any street behind glass; the
+  fault was the dark door's and the dark door is the default.
+
+  **C2 · *"on the ball handle icon remove the line."*** `FITTING_GLYPH.cadoor`
+  was an ovoid and a 45 × 22 stub shank beside it — a side view of the neck
+  on a tile whose every neighbour is square-on. The stub is gone and the box
+  is symmetric. The lock step's nine tiles rasterised at their shipped 57 × 75
+  px: the closest pair is the two levers at **6.60 %** of pixels, then
+  knobplate/digital 18.6 and cylinder/sapir 18.9; the ball's closest pair is
+  above 26.5 and it is not in the five closest.
+
+  **C3 · *"the horizontal handle needs to be put in a good spot with the
+  panels and the greek set."*** ⚠ **THE BOW HAD NO FEET, SO NO FACE COULD
+  REFUSE IT.** `gripFeet` returned `[]` for the grab bar on the argument that
+  *"its ends are on flat face on every door we draw"* — true of the plain
+  leaf, and false since the panelled faces arrived: `gripPlacement` asked
+  nothing about the face, rung 0 was always accepted, and on the trio the bar
+  was drawn ACROSS the moulding between the handle plate and the lower panel
+  with its bosses straddling two mouldings 43 mm apart, while the plate above
+  it — the rectangle d067, d068 and d077 bolt their pull through — stood
+  empty. On the Greek set it sat 10 mm above the shelf. Three things moved,
+  and each is read off the drawing's own tables rather than typed:
+  · **the feet are the two roses** — `GRAB.post` (0.175, 0.825 along the bar,
+    hoisted out of `grabHandle` so the rule and the drawing read one table)
+    at the rose's own radius, inboard being +x when the lock is on the left
+    and −x on the right; `npm test` reads the rose circles off the markup and
+    requires each foot to be where one is drawn, to 0.6 mm.
+  · **the ideal by face** (`gripIdeal`): the trio's bow is centred in its
+    middle rectangle's field (0.533 of the leaf, off `PANEL_ROWS.trio`); the
+    pair's on the rail between its two panels (0.62, the midpoint of the
+    pair's rows); the Greek set's on the shelf's band (0.6295, off
+    `CLASSIC_ROWS.band`), where the set's own pull sat until 14.9; the plain
+    leaf and every glazed face keep the corpus's 0.59.
+  · **the Greek band is a PLATE** in `faceObstacles` — a foot wholly on it
+    stands where the set's pull was bolted ("the band moulding and its three
+    tablets ARE the backplate"), a foot across its edge is a hit. As a 70 mm
+    ring its hole was one millimetre tall and no fitting could ever stand on
+    it, which is why the bow was refused there the moment it had feet.
+  Measured over every size × window × lockset × face that survives `repair`:
+  **360 placed and 0 refused, before and after**, all at rung 0 except the
+  vertical slot. The homes on the standard leaf: plain 1209.5, pair 1271,
+  trio 1092.6, Greek set 1290.5, every one rung 0 and accepted, every one
+  photographed in the log. The assertions ask the OBSTACLES rather than a
+  fraction: inside the plate's field, centred on the rail to 0.5 mm, centred
+  on the band to 0.5 mm, and — the clause that must stay true — the bow lifted
+  60 mm onto the shelf is refused, so the feet are doing the refusing.
+
+  ⚠ **AND GIVING THE BOW FEET FOUND A REACH THAT WAS STATED TWICE AND OWNED
+  ONCE.** `npm test` came back with thirty-six of *"the handle sits 538 mm off
+  the height a hand reaches"*: the bow beside the vertical slot on `extra1`
+  and `halfextra1`, nine locksets each, two handings. Measured rather than
+  read: on the standard leaf the slot REFUSES the bow (feet on the window's
+  frame — the 27.8 decision, still right); on the two middle sizes the field
+  beside the slot is 274 mm for a 280 mm bow, so `SPAWN` walked it to rung
+  14, +420 from the bow's own ideal, and parked it UNDER the slot at 0.78 of
+  the leaf — the knee rail 27.8 measured at about 400 mm off the floor and
+  refused. Before this round the same door passed the check **by 7 mm** (rung
+  10, no feet to refuse it), which this file's own rule calls a coincidence.
+  The mechanism: the ladder's rungs are offsets from the IDEAL, the check
+  measures from the HAND, and the bow is the one grip whose ideal is not hand
+  height (0.59 of the leaf, 118–180 mm below it), so its lower rungs reached
+  538–600 mm from the hand while the check's literal `500` — whose comment
+  still cited a `HOME_REACH` deleted on 18.9, §5.19 — said 500. **`HOME_REACH`
+  exists again, stated once in the renderer**: `spawnSpots` and
+  `spawnFlatSpots` never propose a rung further than that from hand height
+  (§3's *a band respected by the table never proposes*), and the test reads
+  the same constant. Swept before it was believed over all 2,592 size ×
+  window × handle × lockset × face combinations: **exactly the 18 bow + slot
+  combos on those two sizes go from a 538 mm placement to refused, and no
+  other handle moves a millimetre**; the worst default the catalogue keeps is
+  now 480 mm from the hand (an Idan beside the square window on a חריגה).
+  Refused means the tile greys with the window as the reason, which is Part
+  D's second rule arriving one part early.
+  ⚠ **And the bow-feet clause's own §5.15 guard fired on its first run** — the
+  leaf regex asked for `<g id="leaf">` and the group is emitted with
+  `data-x`/`data-w` on it, so the selector matched nothing and the guard said
+  *"the bow-feet check is dead"* rather than passing on an empty subject. That
+  is the guard doing the one thing it is for, and it cost one character class.
+
+  **Gates.** `npm test` **11,686,669 / 0** once the sheets were regenerated
+  (its first pass failed exactly the five staleness rows, which is those
+  checks doing their one job) · `npm run fuzz` 30,000 designs and 1,800 clicks
+  clean · `npm run collide -- all` **1,110** designs (1,128 before the reach
+  gate — the 18 are the bow beside the slot on the two middle sizes, refused
+  now), `faceObstacles` agreeing with the drawing everywhere · `-- boxes` the
+  bow drawn 0/280/17 against a declared 4/290/26, `MOUNT_REACH` covered at 111
+  of 121 · `npm run audit` no faults at eight viewports, the two named
+  exemptions (§9's keypad row on the Russian print, and the landscape/zoomed
+  shapes) still needed.
+
+  **Sheets.** The drawing changed, so bare sheets are ALLOWED to move and each
+  is attributed: **5 of 52 bare sheets moved and all five are C1's** —
+  `against-circles`, `against-vine` and `against-tree` (the three etched
+  designs over a clear pane; `rings` never had a ground and did not move,
+  which is the control), `corpus-07` (the sheet carrying d106, the one gallery
+  door with an etched design) and `recreate-d106`. The other 47 bare sheets
+  and **all six `lockset` sheets came back byte-identical**, which is the
+  check that the ball tile, the bow's feet, the reach gate and the bow's new
+  homes moved no comparison door — no bare fixture carries a bow, and a tile
+  is not on a sheet. 6 of the 12 `shot` sheets moved and prove nothing (§7).
 
 - **⚠ PERETZ'S SECOND REVIEW, PART B — THE משקוף IS A SECTION AND SIX
   CHOICES, AND THE TWO SHEKEL FIGURES PART A WROTE INTO COPY ARE PASSED IN —
