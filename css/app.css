@@ -3141,6 +3141,52 @@ button.spec__row:focus-visible {
    the repair that trades the panel for the stripes and says so. */
 .stripes__why { margin: 0; font-size: .78rem; color: var(--ink-2); }
 
+/* ── THE משקוף CONTROL — a section and six choices ─────────────────────
+   Peretz's "square C" (the frame cut through, seen from above) over three
+   rows of two pills, one row per part. The diagram is `mashkofGlyph`, the
+   same drawing the tiles used, grown to the width of the column and redrawn
+   from the state on every paint; the rows are `role="radiogroup"`s so a
+   screen reader hears "קאנט חיצוני: רחב, +₪250" and not six unrelated
+   buttons. Pills reuse `.pill` and its selected ring, at the 44 px floor. */
+.mkc { display: grid; gap: 10px; }
+.mkc__art { justify-self: center; inline-size: min(100%, 300px); }
+/* ⚠ ON A PHONE THE ROWS COME FIRST AND THE SECTION FOLLOWS. Drawn first, as
+   Peretz described it, the section is ~220 px tall at 390 px and the fold
+   band between the sticky door and the quote bar is 200–320 px (§9): every
+   one of the six choices landed below the fold and `npm run audit` said so
+   at once — "6 options and NONE on screen". The 29.8 rule is that the
+   question AND an answer are on screen, and the thing taking the room here
+   is the diagram, not the door. So below 1100 px the diagram takes `order`
+   after the rows and is capped a little smaller; a customer ticks a part and
+   the section under the rows redraws to show what they ticked. Above 1100
+   px the column has room for both in his order. */
+@media (max-width: 1099px) {
+  .mkc__art { order: 1; inline-size: min(100%, 260px); margin-block-start: 4px; }
+}
+.mkc__art .glyph {
+  block-size: auto; inline-size: 100%;   /* the viewBox sets the aspect */
+  color: var(--ink-2);
+}
+.mkc__row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center; gap: 8px;
+}
+.mkc__part { font-size: .82rem; font-weight: 600; min-inline-size: 0; }
+.mkc__opt {
+  display: grid; gap: 1px; justify-items: center;
+  padding: 6px 12px; min-inline-size: 84px; min-block-size: 44px; line-height: 1.2;
+}
+.mkc__opt-t { font-size: .82rem; }
+.mkc__opt-p { font-size: .68rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.mkc__opt.is-selected .mkc__opt-p { color: var(--ink); }
+/* Under 360 px the two Russian pills are 217 px between them and the part's
+   name was left 67 px — three lines of "Внутренний кант". The name takes a
+   line of its own there and the pills sit under it. */
+@media (max-width: 359px) {
+  .mkc__row { grid-template-columns: auto auto; justify-content: start; }
+  .mkc__part { grid-column: 1 / -1; }
+}
+
 /* Blocked, not disabled — see `markGroup` and `.tile.is-blocked`, whose 0.7
    this matches so that a blocked pill and a blocked tile read as one thing.
    `aria-disabled` rather than `disabled` keeps it focusable and clickable, and

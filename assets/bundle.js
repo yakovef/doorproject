@@ -289,10 +289,12 @@
     ],
     "g.mashkof": ["משקוף", "Frame", "Коробка"],
     "g.mashkof.h": [
-      "המסגרת שהדלת נסגרת עליה. הסטנדרטי כלול; כל חלק שמרחיבים — 250 ₪. הקאנט הפנימי לא נראה בציור. נמדוד את הקיר אצלכם.",
-      "The frame the door closes against. Standard is included; each part you widen is ₪250. The inner kant does not show in the drawing. We measure your wall on site.",
-      "Рама, к которой прилегает дверь. Стандартная входит в цену; каждая расширенная часть — ₪250. Внутренний кант на рисунке не виден. Толщину стены замерим на месте."
+      "המסגרת שהדלת נסגרת עליה. הסטנדרטי כלול; כל חלק שמרחיבים — {0}. הקאנט הפנימי נמצא בצד הפנימי של הקיר ולא נראה בציור. נמדוד את הקיר אצלכם.",
+      "The frame the door closes against. Standard is included; each part you widen is {0}. The inner kant is on the room side of the wall and does not show in the drawing. We measure your wall on site.",
+      "Рама, к которой прилегает дверь. Стандартная входит в цену; каждая расширенная часть — {0}. Внутренний кант находится со стороны комнаты и на рисунке не виден. Толщину стены замерим на месте."
     ],
+    "mk.std": ["סטנדרטי", "Standard", "Стандартный"],
+    "mk.wide": ["רחב", "Wide", "Расширенный"],
     "g.handing": ["כיוון פתיחה", "Opening direction", "Сторона открывания"],
     "g.handing.h": [
       "לא בטוחים? נבדוק יחד במדידה.",
@@ -368,9 +370,9 @@
        though the breakdown lists it at ₪500 — the same distinction the size
        tiles make between what an option costs and what the door costs. */
     "exp.mk.a": [
-      "המשקוף הוא המסגרת שמותקנת בקיר, והדלת נסגרת עליה. יש לו שלושה חלקים: הקאנט החיצוני (הכנף שנראית מבחוץ על הקיר), הפאלץ (המדרגה שהדלת נסגרת לתוכה) והקאנט הפנימי (הכנף בצד הפנימי של הקיר). המשקוף הסטנדרטי כלול במחיר הדלת; כל חלק שמרחיבים מוסיף 250 ₪, ואפשר להרחיב כל שילוב. בציור הדלת רואים רק את שני החלקים החיצוניים — הקאנט הפנימי נמצא מאחורי הקיר. את הקיר נמדוד אצלכם.",
-      "The frame is what is fitted into the wall and what the door closes against. It has three parts: the outer kant (the wing seen from outside on the wall), the falc (the step the door closes into) and the inner kant (the wing on the room side of the wall). The standard frame is inside the door’s price; each part you widen adds ₪250, in any combination. The drawing of the door shows only the two outer parts — the inner kant is behind the wall. We measure the wall on site.",
-      "Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. У неё три части: наружный кант (борт, видимый снаружи на стене), фальц (ступень, в которую закрывается дверь) и внутренний кант (борт со стороны комнаты). Стандартная коробка входит в цену двери; каждая расширенная часть добавляет ₪250, в любом сочетании. На рисунке двери видны только две наружные части — внутренний кант за стеной. Стену замерим на месте."
+      "המשקוף הוא המסגרת שמותקנת בקיר, והדלת נסגרת עליה. יש לו שלושה חלקים: הקאנט החיצוני (הכנף שנראית מבחוץ על הקיר), הפאלץ (המדרגה שהדלת נסגרת לתוכה) והקאנט הפנימי (הכנף בצד הפנימי של הקיר). המשקוף הסטנדרטי כלול במחיר הדלת — בפירוט המחיר הוא מופיע כ‑{1}, אחד משישה חלקים של דלת מותקנת, ולא כתוספת; כל חלק שמרחיבים מוסיף {0}, ואפשר להרחיב כל שילוב. בציור הדלת רואים רק את שני החלקים החיצוניים — הקאנט הפנימי נמצא מאחורי הקיר. את הקיר נמדוד אצלכם.",
+      "The frame is what is fitted into the wall and what the door closes against. It has three parts: the outer kant (the wing seen from outside on the wall), the falc (the step the door closes into) and the inner kant (the wing on the room side of the wall). The standard frame is inside the door’s price — the breakdown lists it at {1} as one of the six parts of a fitted door, not as a surcharge; each part you widen adds {0}, in any combination. The drawing of the door shows only the two outer parts — the inner kant is behind the wall. We measure the wall on site.",
+      "Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. У неё три части: наружный кант (борт, видимый снаружи на стене), фальц (ступень, в которую закрывается дверь) и внутренний кант (борт со стороны комнаты). Стандартная коробка входит в цену двери — в раскладке цены она указана как {1}, одна из шести частей установленной двери, а не доплата; каждая расширенная часть добавляет {0}, в любом сочетании. На рисунке двери видны только две наружные части — внутренний кант за стеной. Стену замерим на месте."
     ],
     "exp.colour.q": ["איך נראה הצבע במציאות?", "How does the colour look in reality?", "Как цвет выглядит вживую?"],
     "exp.colour.a": [
@@ -1679,6 +1681,7 @@
     }
     return o;
   });
+  var mashkofFor = (wide) => MASHKOFS.find((m) => m.wide.length === wide.length && wide.every((k) => m.wide.includes(k))) || null;
   var MASHKOF_MAX = MASHKOFS.reduce((m, k) => ({
     out: Math.max(m.out, k.out),
     in: Math.max(m.in, k.in),
@@ -2585,6 +2588,10 @@
   function priceLabel(agorot2) {
     if (!agorot2) return T("price.included");
     return formatAgorot(agorot2);
+  }
+  function deltaLabel(agorot2) {
+    if (!agorot2) return T("price.included");
+    return (agorot2 < 0 ? "−" : "+") + SHEKEL + fmt.format(Math.abs(agorot2) / 100);
   }
 
   // js/spec.js
@@ -7890,15 +7897,16 @@ ${body}
   </svg>`;
   }
   function mashkofGlyph(mk) {
-    const W = 200, H = 150;
+    const W = 232, H = 172;
     const sc = 0.62;
     const out = mk.out * sc, dep = mk.in * sc;
     const inner = (mk.inner == null ? mk.out : mk.inner) * sc;
-    const cx = W / 2;
+    const cx = 100;
     const wallY = 46, frameY = wallY;
     const dimY = 30, dimX = cx + 22;
     const foot = frameY + dep;
     const f = (n) => n.toFixed(1);
+    const part = (k) => MASHKOF_PARTS.find((p) => p.key === k);
     return `<svg viewBox="0 0 ${W} ${H}" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">
       <!-- the wall, cut -->
@@ -7931,6 +7939,11 @@ ${body}
       <text x="${f(cx - out / 2)}" y="${dimY - 8}" text-anchor="middle">${mk.out}</text>
       <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 8)}">${mk.in}</text>
       <text x="${f(cx - inner / 2)}" y="${H - 13}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
+    </g>
+    <g class="glyph__lbl" fill="currentColor" font-size="11" opacity=".72">
+      <text x="${cx + 9}" y="${dimY + 4}">${L(part("out"))}</text>
+      <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 24)}">${L(part("in"))}</text>
+      <text x="${cx + 9}" y="${H - 9}">${L(part("inner"))}</text>
     </g>
   </svg>`;
   }
@@ -9155,14 +9168,25 @@ ${body}
        leave as a fact about the picture. It sits in `fit` beside the size and the
        opening direction because all three are facts about the HOLE IN THE WALL
        rather than about the door, which is the one thing a fitter asks first. */
+    /* ⚠ NOT TILES SINCE 20.9.2026 — `kind: 'mashkof'` is the one group with a
+       builder of its own (`buildMashkof`): a section diagram and three rows of
+       two, because Peretz sells the frame as three PARTS, any combination, and
+       eight tiles for eight combinations would have asked the customer to find
+       their frame in a list instead of ticking the parts they want. The list is
+       still `MASHKOFS`, so the state, the URL, the code, the price and the order
+       see one id exactly as before; only the control changed shape.
+       ⚠ THE FIGURE IN THE HINT IS PASSED IN, NOT WRITTEN INTO THE STRING. A
+       shekel figure may be written in `prices.js` and nowhere else (CLAUDE.md
+       §1), and Part A of this round put "₪250" into two copy strings in three
+       languages, which is six places for one number to go stale. */
     {
       key: "mashkof",
       title: "g.mashkof",
       in: "mk",
-      kind: "hw",
+      kind: "mashkof",
       list: () => MASHKOFS,
-      glyph: mashkofGlyph,
-      hint: "g.mashkof.h"
+      hint: "g.mashkof.h",
+      hintArgs: () => [formatAgorot(MASHKOF_WIDER_A)]
     },
     {
       key: "handing",
@@ -9195,7 +9219,14 @@ ${body}
     { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l", exp: "exp.pz" },
     { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l", exp: "exp.face" },
     { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l", exp: "exp.glass" },
-    { key: "mk", title: "step.mk.t", sub: "step.mk.s", lede: "step.mk.l", exp: "exp.mk" }
+    {
+      key: "mk",
+      title: "step.mk.t",
+      sub: "step.mk.s",
+      lede: "step.mk.l",
+      exp: "exp.mk",
+      expArgs: () => [formatAgorot(MASHKOF_WIDER_A), formatAgorot(BUILD_A.mashkof)]
+    }
   ];
   var SUMMARY = {
     key: "sum",
@@ -9523,7 +9554,7 @@ ${body}
         ${named ? `<h3 class="field__title" id="head-${g.key}">${T(g.title)}</h3>` : ""}
         <div class="field__body" id="body-${g.key}">
           <div class="field__opts"></div>
-          ${g.hint ? `<p class="field__hint">${T(g.hint)}</p>` : ""}
+          ${g.hint ? `<p class="field__hint">${T(g.hint, ...g.hintArgs ? g.hintArgs() : [])}</p>` : ""}
           <p class="field__note" data-note hidden></p>
         </div>`;
         body.appendChild(field);
@@ -9532,7 +9563,7 @@ ${body}
       if (sec.exp) {
         const d = document.createElement("details");
         d.className = "sect__exp";
-        d.innerHTML = `<summary class="sect__q">${T(sec.exp + ".q")}</summary><p class="sect__a">${T(sec.exp + ".a")}</p>`;
+        d.innerHTML = `<summary class="sect__q">${T(sec.exp + ".q")}</summary><p class="sect__a">${T(sec.exp + ".a", ...sec.expArgs ? sec.expArgs() : [])}</p>`;
         body.appendChild(d);
       }
       const foot = document.createElement("div");
@@ -9639,6 +9670,7 @@ ${body}
     }
   }
   function buildOptions(g, host) {
+    if (g.kind === "mashkof") return buildMashkof(g, host);
     host.setAttribute("role", "radiogroup");
     host.setAttribute("aria-label", T(g.title));
     host.className = "field__opts " + { swatch: "swatches", pill: "pills", tile: "tiles", sq: "tiles tiles--sq", hw: "tiles tiles--hw" }[g.kind];
@@ -9697,6 +9729,55 @@ ${body}
     keyboardGrid(host);
     if (g.key === "handle") buildLengthStepper(host);
     if (g.key === "detail") buildStripes(host);
+  }
+  function buildMashkof(g, host) {
+    host.className = "field__opts mkc";
+    host.removeAttribute("role");
+    host.removeAttribute("aria-label");
+    host.innerHTML = `<div class="mkc__art" aria-hidden="true"></div>` + MASHKOF_PARTS.map((p) => `
+      <div class="mkc__row" role="radiogroup" aria-label="${L(p)}" data-part="${p.key}">
+        <span class="mkc__part" aria-hidden="true">${L(p)}</span>
+        <button type="button" class="pill mkc__opt" role="radio"
+                data-id="${p.key}-std" data-part="${p.key}" data-wide="0">
+          <span class="mkc__opt-t">${T("mk.std")}</span>
+          <span class="mkc__opt-p">${priceLabel(0)}</span></button>
+        <button type="button" class="pill mkc__opt" role="radio"
+                data-id="${p.key}-wide" data-part="${p.key}" data-wide="1">
+          <span class="mkc__opt-t">${T("mk.wide")}</span>
+          <span class="mkc__opt-p" data-mk-price></span></button>
+      </div>`).join("");
+    for (const b of host.querySelectorAll('[data-part][role="radio"]')) {
+      b.addEventListener("click", () => {
+        const now = byId(MASHKOFS, state.mashkof).wide;
+        const key = b.dataset.part;
+        const next = b.dataset.wide === "1" ? [.../* @__PURE__ */ new Set([...now, key])] : now.filter((k) => k !== key);
+        const mk = mashkofFor(next);
+        if (mk) choose(g, mk.id);
+      });
+    }
+    keyboardGrid(host);
+    markMashkof(g);
+  }
+  function markMashkof(g) {
+    const host = document.querySelector(`.field[data-group="${g.key}"] .mkc`);
+    if (!host) return;
+    const mk = byId(MASHKOFS, state.mashkof);
+    host.querySelector(".mkc__art").innerHTML = mashkofGlyph(mk);
+    for (const p of MASHKOF_PARTS) {
+      const isWide = mk.wide.includes(p.key);
+      const others = mk.wide.filter((k) => k !== p.key);
+      const withIt = priceParts({ ...state, mashkof: mashkofFor([...others, p.key]).id }).mashkof;
+      const without = priceParts({ ...state, mashkof: mashkofFor(others).id }).mashkof;
+      const row = host.querySelector(`.mkc__row[data-part="${p.key}"]`);
+      row.querySelector("[data-mk-price]").textContent = deltaLabel(withIt - without);
+      for (const b of row.querySelectorAll('[role="radio"]')) {
+        const on = b.dataset.wide === "1" === isWide;
+        b.setAttribute("aria-checked", String(on));
+        b.classList.toggle("is-selected", on);
+        b.tabIndex = on ? 0 : -1;
+        b.setAttribute("aria-label", `${L(p)}: ${b.querySelector(".mkc__opt-t").textContent}, ` + b.querySelector(".mkc__opt-p").textContent);
+      }
+    }
   }
   function buildStripes(host) {
     const old = host.querySelector(".stripes");
@@ -10158,6 +10239,7 @@ ${body}
     $("#redo-btn").disabled = !canRedo();
   }
   function markGroup(g, blocked) {
+    if (g.kind === "mashkof") return markMashkof(g);
     const chosen = [state[g.key]];
     let anyBlocked = false;
     document.querySelectorAll(`.field[data-group="${g.key}"] [role="radio"]`).forEach((el) => {

@@ -926,6 +926,15 @@ export const MASHKOFS = Object.entries(MK_IDS).map(([keys, id]) => {
 });
 
 /**
+ * The entry for exactly this SET of widened parts — the control's one lookup,
+ * so three rows of two can land on one id without a table of eight cases
+ * written out a second time in `app.js`. Order-insensitive: `['in', 'out']`
+ * and `['out', 'in']` are one frame.
+ */
+export const mashkofFor = wide => MASHKOFS.find(m =>
+  m.wide.length === wide.length && wide.every(k => m.wide.includes(k))) || null;
+
+/**
  * ⚠ THE WIDEST FRAME IN THE RANGE, AND THE CROP IS ANCHORED ON IT.
  *
  * The door's own tight box in `render()` is computed from this rather than

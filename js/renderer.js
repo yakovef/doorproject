@@ -17,9 +17,9 @@
  */
 
 import { byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
-         handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, PEEPHOLES, PIRZUL,
+         handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
          REBATE, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
-import { T } from './copy.js';
+import { L, T } from './copy.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
 
@@ -9949,13 +9949,38 @@ export function handleFinishGlyph(hf) {
    when it is widened, which the group's hint says in so many words. So this
    section is the only picture of it, and the test that every option tile
    draws its own picture is what keeps a widened inner kant from being a tile
-   identical to the standard one. */
+   identical to the standard one.
+   ⚠ AND IT IS NOT A TILE ANY MORE, IT IS THE CONTROL'S OWN DIAGRAM — Part B
+   of the same review: *"a sort of a square C shape that represents how the
+   mashkof looks from above if it is cut half way … 6 boxes."* The eight tiles
+   went; this one picture redraws from the three fields on every paint, and
+   it NAMES its parts in the customer's language, because the three rows of
+   choices under it are labelled with the same three words and a diagram
+   that does not say which piece is which is a diagram the rows cannot point
+   at. The names are `L(part)` off `MASHKOF_PARTS` — the rows read the same
+   entries — and they sit in their own group, apart from the dimension
+   figures, so the check that the numbers are the table's own can still find
+   exactly three of them. `render()` never calls this: the door carries no
+   type (§4), and the language it is drawn in is the panel's affair. */
 export function mashkofGlyph(mk) {
-  const W = 200, H = 150;
+  /* ⚠ 172 TALL SINCE PART B, NOT 150: at tile size the foot mark sat on the
+     leaf and nobody could see it; drawn 300 px wide as the control's own
+     section the "46" was printed ACROSS the leaf slab. The deepest return
+     ends at 126 and the figure's top is about H − 31, so 172 keeps it clear
+     of the leaf on every frame; the stylesheet takes the aspect off the
+     viewBox rather than restating it. */
+  /* ⚠ AND 232 WIDE WITH THE SECTION AT x=100, NOT CENTRED: the part names
+     are the customer's language and "Внутренний кант" is 95 units at this
+     size. Anchored to the RIGHT of each mark they need 130 units of room on
+     that side; right-anchored to the left of the face mark, as the first
+     version drew it, "Наружный кант" ran off the viewBox at x<0 and printed
+     "аружный кант" on a 320 px phone. Seen in a screenshot, not by any
+     instrument — a clipped glyph is not a fault the markup carries. */
+  const W = 232, H = 172;
   const sc = 0.62;                        // mm to glyph units
   const out = mk.out * sc, dep = mk.in * sc;
   const inner = (mk.inner == null ? mk.out : mk.inner) * sc;
-  const cx = W / 2;
+  const cx = 100;
   /* The section sits 16 units lower than it did: that band is where the face
      dimension and its number now live, and moving the drawing down was
      cheaper than shrinking it — at 74 px tall the difference between a 62 and
@@ -9964,6 +9989,7 @@ export function mashkofGlyph(mk) {
   const dimY = 30, dimX = cx + 22;
   const foot = frameY + dep;
   const f = n => n.toFixed(1);
+  const part = k => MASHKOF_PARTS.find(p => p.key === k);
   return `<svg viewBox="0 0 ${W} ${H}" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">
       <!-- the wall, cut -->
@@ -9996,6 +10022,11 @@ export function mashkofGlyph(mk) {
       <text x="${f(cx - out / 2)}" y="${dimY - 8}" text-anchor="middle">${mk.out}</text>
       <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 8)}">${mk.in}</text>
       <text x="${f(cx - inner / 2)}" y="${H - 13}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
+    </g>
+    <g class="glyph__lbl" fill="currentColor" font-size="11" opacity=".72">
+      <text x="${cx + 9}" y="${dimY + 4}">${L(part('out'))}</text>
+      <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 24)}">${L(part('in'))}</text>
+      <text x="${cx + 9}" y="${H - 9}">${L(part('inner'))}</text>
     </g>
   </svg>`;
 }

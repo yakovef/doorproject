@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
@@ -1941,15 +1941,32 @@ group('the משקוף tiles print the frame\'s own numbers, at the length they c
      prices, it shows in the section and nowhere else, and it is dimensioned
      under the drawing. The two horizontal marks are told apart by their
      order in the markup — the face first, the inner kant last. */
+  /* ⚠ THE NUMBERS ARE READ OUT OF THE `glyph__dim` GROUP ONLY, since 20.9
+     Part B: the section is the control's own diagram now and NAMES its parts
+     in a `glyph__lbl` group beside the figures. A regex over every `<text>`
+     would count six and call the tile wrong about a number it prints right. */
   const runs = svg => {
     const H = [...svg.matchAll(/M([\d.-]+) ([\d.-]+)H([\d.-]+)/g)]
       .map(([, x0, , x1]) => Number(x1) - Number(x0));
+    const dim = /<g class="glyph__dim"[\s\S]*?<\/g>/.exec(svg);
+    const lbl = /<g class="glyph__lbl"[\s\S]*?<\/g>/.exec(svg);
     return {
       face: H[0], inner: H[H.length - 1],
       ret:  (([, , y0, y1]) => Number(y1) - Number(y0))(/M([\d.-]+) ([\d.-]+)V([\d.-]+)/.exec(svg)),
-      text: [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
+      text: [...(dim ? dim[0] : '').matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
+      names: [...(lbl ? lbl[0] : '').matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
     };
   };
+  /* The three part names on the section are the three the rows under it
+     carry — `L(part)` off `MASHKOF_PARTS` in the current language — so the
+     diagram and the choices cannot name one piece two ways. In all three
+     languages, because the label is drawn at build time in the customer's. */
+  for (const lang of LANG_IDS) withLang(lang, () => {
+    const r = runs(mashkofGlyph(MASHKOFS[0]));
+    const want = MASHKOF_PARTS.map(p => L(p));
+    ok(r.names.length === 3 && want.every((w, i) => r.names[i] === w),
+      `${lang}: the section names its parts ${JSON.stringify(r.names)} where the rows say ${JSON.stringify(want)}`);
+  });
 
   const scales = [];
   for (const mk of MASHKOFS) {
@@ -1989,6 +2006,63 @@ group('the משקוף tiles print the frame\'s own numbers, at the length they c
      && Math.abs(odd.inner / 61 - k0) < 0.01,
     `a frame of 33/155/61 draws marks ${odd.face}/${odd.ret}/${odd.inner} units long, which is not ` +
     `${k0.toFixed(4)} per mm: the marks do not follow the numbers`);
+
+  /* ── 6b3. THREE ROWS OF TWO LAND ON ONE ID, AND THE DOOR MOVES FOR TWO OF
+     THREE — Part B, 20.9.2026. `mashkofFor` is the control's one lookup from
+     a set of widened parts to the `MASHKOFS` entry that set is; every entry
+     must come back from its own set, whatever order the keys are in, and a
+     set no entry holds must come back null rather than the standard frame.
+     Then the DRAWING: the eight frames pair up four ways on the inner kant,
+     which is behind the wall, and each pair must render byte-identical —
+     while any two frames that differ on a drawn part must not. Both halves,
+     because a renderer that started reading `inner` would fail the first and
+     one that stopped reading `out` would fail the second. */
+  for (const m of MASHKOFS) {
+    ok(mashkofFor(m.wide) && mashkofFor(m.wide).id === m.id,
+       `mashkofFor(${JSON.stringify(m.wide)}) gave ${mashkofFor(m.wide)?.id}, not ${m.id}`);
+    ok(mashkofFor([...m.wide].reverse())?.id === m.id, `mashkofFor is order-sensitive on ${m.id}`);
+  }
+  ok(mashkofFor(['out', 'in', 'inner']).id === 'mk-all' && mashkofFor(['in', 'out']).id === 'mk-both',
+     'the two named combinations must resolve to their old ids');
+  ok(mashkofFor(['nosuchpart']) === null, 'a part nobody sells must not resolve to a frame');
+  {
+    const drawnSame = (a, b) => MASHKOF_PARTS.filter(p => p.drawn)
+      .every(p => a.wide.includes(p.key) === b.wide.includes(p.key));
+    /* ⚠ THE DRAWING, NOT THE DOCUMENT. `render` carries the door's accessible
+       name — `describeSentence`, which is the ORDER's own description — and
+       that sentence rightly says "מורחב: קאנט פנימי" on a frame whose picture
+       is the standard one. The first version compared whole markup and failed
+       all four pairs about a name that must differ. So the name is stripped
+       for the picture clause, and asserted to differ in a clause of its own:
+       a frame Peretz is paid ₪250 for has to be in the words even where it
+       cannot be in the pixels. */
+    const picture = svg => svg.replace(/aria-label="[^"]*"/g, '');
+    const name = svg => (/aria-label="([^"]*)"/.exec(svg) || [])[1] || '';
+    let same = 0, diff = 0;
+    for (let i = 0; i < MASHKOFS.length; i++) for (let j = i + 1; j < MASHKOFS.length; j++) {
+      const a = MASHKOFS[i], b = MASHKOFS[j];
+      const ra = render({ ...base, mashkof: a.id }), rb = render({ ...base, mashkof: b.id });
+      ok(name(ra) && name(rb) && name(ra) !== name(rb),
+         `${a.id} and ${b.id} share an accessible name — the order would not say which frame`);
+      if (drawnSame(a, b)) {
+        same++;
+        ok(picture(ra) === picture(rb), `${a.id} and ${b.id} differ only on the inner kant and draw different doors`);
+      } else {
+        diff++;
+        ok(picture(ra) !== picture(rb), `${a.id} and ${b.id} differ on a drawn part and draw the same door`);
+      }
+    }
+    ok(same === 4 && diff === 24, `expected 4 inner-only pairs and 24 drawn pairs, got ${same}/${diff} — this check has lost its subject`);
+  }
+  /* And the money: every frame on every size is the standard frame plus
+     ₪250 per widened part, scaled by the size and rounded to the shekel the
+     way `priceParts` rounds every component. The pill prints the difference
+     between two of these, so this is what the pill prints. */
+  for (const size of Object.values(SIZES)) for (const m of MASHKOFS) {
+    const want = Math.round((BUILD_A.mashkof + m.wide.length * MASHKOF_WIDER_A) * size.mult / 100) * 100;
+    const got = priceParts({ ...base, size: size.id, mashkof: m.id }).mashkof;
+    ok(got === want, `${size.id} ${m.id}: the frame's row is ${got} agorot, not ${want}`);
+  }
 }
 
 /* ── 6b3. THE PAGE'S OWN MARKS ───────────────────────────────────────

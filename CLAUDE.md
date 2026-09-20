@@ -2569,6 +2569,110 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ PERETZ'S SECOND REVIEW, PART B — THE משקוף IS A SECTION AND SIX
+  CHOICES, AND THE TWO SHEKEL FIGURES PART A WROTE INTO COPY ARE PASSED IN —
+  20.9.2026.** His words: *"a sort of a square C shape that represents how the
+  mashkof looks from above if it is cut half way … 6 boxes, 3 rows, 2 columns,
+  in each row there is an option of 0 (the normal size) and +250 … the user
+  can check whatever they like … say that the regular mashkof is within the
+  price (although it is 500) and the other are +250 or +500."* Part A gave the
+  model (three parts, eight combinations, one id); this is the control.
+
+  **What shipped.** `kind: 'mashkof'` is the one group with a builder of its
+  own — `buildMashkof` in `js/app.js`, the `buildStripes` precedent — and
+  `markGroup` hands it to `markMashkof` on every paint. The section is
+  `mashkofGlyph`, the same drawing the eight tiles used, redrawn from the state
+  and grown to the column's width, and **it names its three parts in the
+  customer's language** — `L(part)` off `MASHKOF_PARTS`, the entries the three
+  rows read too, in a `glyph__lbl` group apart from the figures so the check
+  that the numbers are the table's own still finds exactly three. Under it,
+  three `role="radiogroup"` rows — קאנט חיצוני · פאלץ · קאנט פנימי — of two
+  pills each, סטנדרטי · כלול against רחב · +₪250. A tap computes the set of
+  widened parts, asks `mashkofFor` (the catalogue's one lookup from a set to
+  an id, order-insensitive) and goes through `choose` like any tile, so the
+  rules, the URL, the code, the price and the order never learn the control
+  is not a list.
+  ⚠ **THE WIDE PILL PRINTS WHAT THAT PART COSTS ON THIS DOOR**, read off
+  `priceParts` as the difference the part makes to the frame's row — ₪250 on
+  the three standard-multiplier sizes and more on a חריגה, because the size
+  multiplier lands on the whole frame including its extras (A3). Typing
+  "+₪250" would have been right on three sizes of six. The standard pill says
+  כלול, and the step's explainer says in one sentence why the breakdown still
+  lists the frame at ₪500: it is one of the six parts of a fitted door, not a
+  surcharge. **The door moves for two parts of three, by construction** —
+  `render` reads `out` and `in` — and the hint says so, so a customer who
+  ticks the inner kant and sees nothing move is told why.
+
+  ⚠ **THE SHEKEL FIGURES LEFT THE COPY.** Part A wrote "₪250" into
+  `g.mashkof.h` and `exp.mk.a`, three languages each — six places for one
+  number, in a file §1 says may hold none. They are `{0}`/`{1}` now, and the
+  group carries `hintArgs` and the section `expArgs`, both reading
+  `MASHKOF_WIDER_A` and `BUILD_A.mashkof` through `formatAgorot`; `buildPanel`
+  passes them to `T`. The mechanism is general and costs the other groups
+  nothing.
+
+  ⚠ **TWO INSTRUMENTS COUNTED "ONE CHECKED PER FIELD", AND ONE OF THEM WAS
+  RIGHT BY COINCIDENCE.** `npm run fuzz` asserted exactly one
+  `aria-checked="true"` per `.field[data-group]`, which was the ARIA invariant
+  only while a field was one radiogroup; three rows of two put three checked
+  in one field. It counts per `[role="radiogroup"]` now, which is what the
+  invariant always was, and the tile groups are unchanged by it. The generic
+  `markGroup` would have done the same damage from the other side — its
+  `chosen.includes(el.dataset.id)` against ids that are PART choices
+  (`out-wide`) would have unchecked all six on every paint — which is why the
+  group has its own marker.
+
+  ⚠ **TWO FAULTS SEEN IN A SCREENSHOT AND IN NO INSTRUMENT.** Drawn 300 px
+  wide instead of 74, the section's foot figure was printed ACROSS the leaf
+  slab (the viewBox is 172 tall now, not 150, and the stylesheet takes the
+  aspect off the viewBox rather than restating it); and on a 320 px phone in
+  Russian "Наружный кант", right-anchored to the left of the face mark, ran
+  off the viewBox at x<0 and read "аружный кант". The names sit to the RIGHT
+  of every mark now, the viewBox is 232 wide with the section at x=100, and
+  under 360 px the part's name takes a line of its own over the two pills
+  (the two Russian pills are 217 px between them and the name was left 67,
+  three lines of "Внутренний кант"). A clipped glyph is not a fault the
+  markup carries; the pictures are how it was found and the pictures are
+  what it was checked against, at 320, 390, 1280 and 1440 in three languages.
+
+  **Asserted.** `npm test`: the three names on the section are `L(part)` in
+  all three languages; the dimension figures are still exactly three and
+  their marks that long; `mashkofFor` returns every entry from its own set in
+  either order and `null` for a part nobody sells; **the door is byte-identical
+  across the four pairs that differ only on the inner kant and differs across
+  all twenty-four pairs that differ on a drawn part** — both halves, because a
+  renderer that started reading `inner` would fail the first and one that
+  stopped reading `out` the second; and every frame on every size prices as
+  the standard frame plus ₪250 per widened part, scaled and rounded the way
+  `priceParts` rounds every component. `npm run audit`, at all eight
+  viewports: a section drawn, three rows, six radios; every one of the six
+  whole on screen and what `elementFromPoint` returns at its own centre;
+  ticking each part's wide pill moves the frame's row by EXACTLY the figure
+  the pill printed and the spec row then names the part in the row's own
+  words; ticking standard takes exactly that figure back — with §5.15 clauses
+  for the field, the section, the rows and the radios.
+
+  ⚠ **AND ITS FIRST VERSION REPORTED 48 FAULTS ABOUT A PAGE DOING EXACTLY
+  THE RIGHT THING.** The click walk before it presses every radio in the
+  field in DOM order, so it leaves every part WIDE; the block then ticked
+  wide first, read a move of 0 agorot on a pill that was already on, and
+  called that a fault at all eight viewports. It ticks standard, then wide,
+  then standard now — the first normalises, the second must move the row by
+  the printed figure, the third must take it back — which is §6 on my own
+  instrument, again: a check that does not know what state it starts from
+  is measuring its own assumption.
+
+  **Gates.** `npm test` **11,764,809 / 0** (its first pass caught a stale stylesheet
+  stamp — the rows-first rule went in after the last build — which is the
+  stamp check doing its one job) · `npm run fuzz` 30,000 designs and 1,800
+  clicks clean · `npm run audit` **no faults at eight viewports**, the one
+  named exemption (§9, the keypad row) still needed.
+
+  **Sheets.** `render` is untouched by construction — the section is the
+  panel's, not the door's — and the 52 bare sheets and the five `lockset`
+  sheets **came back byte-identical, 0 of 57 moved**; 4 of the 12 `shot`
+  sheets moved and prove nothing (§7).
+
 - **⚠ PERETZ'S SECOND REVIEW, PART A — FOUR PULL HANDLES IN TWO BANDS WITH A
   FINISH OF THEIR OWN, THE BELL MOVES IN WITH THEM, A DIGITAL VIEWER, THE OGEE
   FACES GONE, THE משקוף IN THREE PARTS, AND `VERSION` 22 → 23 — 20.9.2026.**

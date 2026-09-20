@@ -30,9 +30,10 @@
 import {
   BELLS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
   GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
+  mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
-import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
+import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
   from './price.js';
 import {
   describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
@@ -227,9 +228,19 @@ const GROUPS = [
      leave as a fact about the picture. It sits in `fit` beside the size and the
      opening direction because all three are facts about the HOLE IN THE WALL
      rather than about the door, which is the one thing a fitter asks first. */
-  { key: 'mashkof', title: 'g.mashkof', in: 'mk', kind: 'hw', list: () => MASHKOFS,
-    glyph: mashkofGlyph,
-    hint: 'g.mashkof.h' },
+  /* ⚠ NOT TILES SINCE 20.9.2026 — `kind: 'mashkof'` is the one group with a
+     builder of its own (`buildMashkof`): a section diagram and three rows of
+     two, because Peretz sells the frame as three PARTS, any combination, and
+     eight tiles for eight combinations would have asked the customer to find
+     their frame in a list instead of ticking the parts they want. The list is
+     still `MASHKOFS`, so the state, the URL, the code, the price and the order
+     see one id exactly as before; only the control changed shape.
+     ⚠ THE FIGURE IN THE HINT IS PASSED IN, NOT WRITTEN INTO THE STRING. A
+     shekel figure may be written in `prices.js` and nowhere else (CLAUDE.md
+     §1), and Part A of this round put "₪250" into two copy strings in three
+     languages, which is six places for one number to go stale. */
+  { key: 'mashkof', title: 'g.mashkof', in: 'mk', kind: 'mashkof', list: () => MASHKOFS,
+    hint: 'g.mashkof.h', hintArgs: () => [formatAgorot(MASHKOF_WIDER_A)] },
 
   { key: 'handing', title: 'g.handing', in: 'fit', kind: 'pill', list: () => HANDINGS,
     hint: 'g.handing.h' },
@@ -344,7 +355,8 @@ const SECTIONS = [
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz' },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face' },
   { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass' },
-  { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk' },
+  { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk',
+    expArgs: () => [formatAgorot(MASHKOF_WIDER_A), formatAgorot(BUILD_A.mashkof)] },
 ];
 
 /**
@@ -1200,7 +1212,7 @@ function buildPanel() {
         ${named ? `<h3 class="field__title" id="head-${g.key}">${T(g.title)}</h3>` : ''}
         <div class="field__body" id="body-${g.key}">
           <div class="field__opts"></div>
-          ${g.hint ? `<p class="field__hint">${T(g.hint)}</p>` : ''}
+          ${g.hint ? `<p class="field__hint">${T(g.hint, ...(g.hintArgs ? g.hintArgs() : []))}</p>` : ''}
           <p class="field__note" data-note hidden></p>
         </div>`;
       body.appendChild(field);
@@ -1227,7 +1239,7 @@ function buildPanel() {
       const d = document.createElement('details');
       d.className = 'sect__exp';
       d.innerHTML = `<summary class="sect__q">${T(sec.exp + '.q')}</summary>`
-                  + `<p class="sect__a">${T(sec.exp + '.a')}</p>`;
+                  + `<p class="sect__a">${T(sec.exp + '.a', ...(sec.expArgs ? sec.expArgs() : []))}</p>`;
       body.appendChild(d);
     }
 
@@ -1460,6 +1472,7 @@ function repriceOptions(state) {
 }
 
 function buildOptions(g, host) {
+  if (g.kind === 'mashkof') return buildMashkof(g, host);
   host.setAttribute('role', 'radiogroup');
   host.setAttribute('aria-label', T(g.title));
   host.className = 'field__opts '
@@ -1560,6 +1573,101 @@ function buildOptions(g, host) {
   keyboardGrid(host);
   if (g.key === 'handle') buildLengthStepper(host);
   if (g.key === 'detail') buildStripes(host);
+}
+
+/**
+ * ── THE משקוף — A SECTION AND SIX CHOICES ──────────────────────────────
+ *
+ * Peretz, 20.9.2026: *"there needs to be a sort of a square C shape that
+ * represents how the mashkof looks from above if it is cut half way … there
+ * are 3 parts to the mashkof, the outer kant, the falc, and the inner kant …
+ * 6 boxes, 3 rows, 2 columns, in each row there is an option of 0 (the normal
+ * size) and +250 … the user can check whatever they like … say that the
+ * regular mashkof is within the price (although it is 500) and the other are
+ * +250 or +500."*
+ *
+ * So: the section (`mashkofGlyph`, redrawn from the state on every paint, its
+ * parts named in the customer's language), and under it three ROWS, one per
+ * part, each a `radiogroup` of two — סטנדרטי · כלול against רחב · +₪250. A
+ * tap computes the set of widened parts and asks `mashkofFor` for the one id
+ * that set is, then goes through `choose` like every other tap, so the rules,
+ * the URL, the code, the price and the order never learn that this control is
+ * not a list of tiles.
+ *
+ * ⚠ THREE RADIOGROUPS IN ONE FIELD, AND TWO INSTRUMENTS COUNTED "ONE CHECKED
+ * PER FIELD". `npm run fuzz` asserted exactly one `aria-checked="true"` per
+ * `.field[data-group]`, which was the right invariant while a field was one
+ * radiogroup; it counts per `[role="radiogroup"]` now, which is what the ARIA
+ * invariant always was. `markGroup` hands this group to `markMashkof`, because
+ * its radios' ids are PART choices (`out-wide`), not entries of `MASHKOFS`,
+ * and the generic marker would have unchecked all six on every paint.
+ *
+ * ⚠ THE WIDE PILL PRINTS WHAT THAT PART COSTS ON THIS DOOR, read off
+ * `priceParts` as the difference the part makes to the frame's row — ₪250 on
+ * a standard door, and more on a חריגה, because the size multiplier lands on
+ * the whole frame including its extras (assumption A3). Typing "+₪250" would
+ * have been right on three sizes of six. The standard pill says כלול, and the
+ * step's explainer says in one sentence why the breakdown still shows the
+ * frame at ₪500: it is one of the six parts of a fitted door, not a surcharge.
+ *
+ * ⚠ THE DOOR MOVES FOR TWO PARTS OF THREE, BY CONSTRUCTION. `render` reads
+ * `out` and `in`; the inner kant is behind the wall from the street. The hint
+ * says so, so a customer who ticks it and sees nothing move is told why.
+ */
+function buildMashkof(g, host) {
+  host.className = 'field__opts mkc';
+  host.removeAttribute('role');
+  host.removeAttribute('aria-label');
+  host.innerHTML = `<div class="mkc__art" aria-hidden="true"></div>`
+    + MASHKOF_PARTS.map(p => `
+      <div class="mkc__row" role="radiogroup" aria-label="${L(p)}" data-part="${p.key}">
+        <span class="mkc__part" aria-hidden="true">${L(p)}</span>
+        <button type="button" class="pill mkc__opt" role="radio"
+                data-id="${p.key}-std" data-part="${p.key}" data-wide="0">
+          <span class="mkc__opt-t">${T('mk.std')}</span>
+          <span class="mkc__opt-p">${priceLabel(0)}</span></button>
+        <button type="button" class="pill mkc__opt" role="radio"
+                data-id="${p.key}-wide" data-part="${p.key}" data-wide="1">
+          <span class="mkc__opt-t">${T('mk.wide')}</span>
+          <span class="mkc__opt-p" data-mk-price></span></button>
+      </div>`).join('');
+  for (const b of host.querySelectorAll('[data-part][role="radio"]')) {
+    b.addEventListener('click', () => {
+      const now = byId(MASHKOFS, state.mashkof).wide;
+      const key = b.dataset.part;
+      const next = b.dataset.wide === '1'
+        ? [...new Set([...now, key])] : now.filter(k => k !== key);
+      const mk = mashkofFor(next);
+      if (mk) choose(g, mk.id);
+    });
+  }
+  keyboardGrid(host);
+  markMashkof(g);
+}
+
+/** Which of the six is on, what each wide part costs on THIS door, and the
+    section redrawn — asked on every paint, like `markGroup` for the tiles. */
+function markMashkof(g) {
+  const host = document.querySelector(`.field[data-group="${g.key}"] .mkc`);
+  if (!host) return;
+  const mk = byId(MASHKOFS, state.mashkof);
+  host.querySelector('.mkc__art').innerHTML = mashkofGlyph(mk);
+  for (const p of MASHKOF_PARTS) {
+    const isWide = mk.wide.includes(p.key);
+    const others = mk.wide.filter(k => k !== p.key);
+    const withIt = priceParts({ ...state, mashkof: mashkofFor([...others, p.key]).id }).mashkof;
+    const without = priceParts({ ...state, mashkof: mashkofFor(others).id }).mashkof;
+    const row = host.querySelector(`.mkc__row[data-part="${p.key}"]`);
+    row.querySelector('[data-mk-price]').textContent = deltaLabel(withIt - without);
+    for (const b of row.querySelectorAll('[role="radio"]')) {
+      const on = (b.dataset.wide === '1') === isWide;
+      b.setAttribute('aria-checked', String(on));
+      b.classList.toggle('is-selected', on);
+      b.tabIndex = on ? 0 : -1;
+      b.setAttribute('aria-label', `${L(p)}: ${b.querySelector('.mkc__opt-t').textContent}, `
+                                 + b.querySelector('.mkc__opt-p').textContent);
+    }
+  }
 }
 
 /**
@@ -2841,6 +2949,7 @@ function paint() {
  * happened".
  */
 function markGroup(g, blocked) {
+  if (g.kind === 'mashkof') return markMashkof(g);
   const chosen = [state[g.key]];
 
   /* ⚠ A LISTING RULE BELONGS HERE, LIVE, AND NOT IN `list()` — and there is no

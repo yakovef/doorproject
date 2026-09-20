@@ -245,8 +245,17 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
           wa: document.getElementById('wa-btn').getAttribute('href'),
           summary: document.getElementById('summary').textContent.trim(),
           url: location.search,
+          /* ⚠ KEYED BY RADIOGROUP, NOT BY FIELD — 20.9.2026. A field was one
+             radiogroup until the משקוף became three rows of two, so "one
+             checked per field" was the ARIA invariant by coincidence; the
+             invariant is one checked per `[role="radiogroup"]`, and that is
+             what is counted. The tile groups are unchanged by it. */
           checked: [...document.querySelectorAll('[role="radio"][aria-checked="true"]')]
-            .map(e => `${e.closest('.field').dataset.group}=${e.dataset.id}`),
+            .map(e => {
+              const rg = e.closest('[role="radiogroup"]');
+              const rgs = [...e.closest('.field').querySelectorAll('[role="radiogroup"]')];
+              return `${e.closest('.field').dataset.group}${rgs.length > 1 ? '#' + rgs.indexOf(rg) : ''}=${e.dataset.id}`;
+            }),
         };
       });
 
@@ -266,9 +275,9 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
       if (!s2.wa || !s2.wa.startsWith('https://')) fault('the WhatsApp link is broken', where);
       if (!s2.summary) fault('the spec line is empty', where);
 
-      /* EXACTLY ONE TILE CHECKED PER GROUP. Two would mean the customer and
-         Peretz can read two different doors off the same page, and none would
-         mean a repair moved the design and never told the panel. */
+      /* EXACTLY ONE TILE CHECKED PER RADIOGROUP. Two would mean the customer
+         and Peretz can read two different doors off the same page, and none
+         would mean a repair moved the design and never told the panel. */
       const perGroup = new Map();
       for (const c of s2.checked) {
         const g = c.split('=')[0];

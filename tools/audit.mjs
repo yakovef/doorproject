@@ -20,7 +20,7 @@ import { assertFreshBundle } from './fresh.mjs';
 import { crashed } from './browser.mjs';
 import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
-import { formatAgorot, priceAgorot } from '../js/price.js';
+import { deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts } from '../js/price.js';
 import { SIZES } from '../js/catalog.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { setLang, T, withLang } from '../js/copy.js';
@@ -1758,6 +1758,93 @@ for (const v of VIEWS) {
   }
   errs.forEach(e => fault(v.name, `console: ${e}`));
   if (!small.length && !errs.length) console.log('  clicked every option, clean');
+
+  /* ── THE משקוף IS THREE ROWS OF TWO, AND EACH TICK IS THE MONEY IT SAYS ──
+     Part B of Peretz's second review (20.9.2026). The click walk above presses
+     all six radios and proves the page survives; this asks what a customer
+     asks. At this viewport, on the mk step: a section is drawn and three rows
+     are under it; every one of the six is whole on screen and is what
+     `elementFromPoint` returns at its own centre (a pill under the sticky
+     foot or the quote bar is not a choice); ticking a part's wide pill moves
+     the frame's price row by EXACTLY the figure that pill printed (read off
+     `priceParts` of the codes before and after, which is the same arithmetic
+     the pill reads — the sum is asserted against the page's price by the walk
+     above); the spec row then NAMES the part in the words on the row; and
+     ticking standard again takes exactly that figure back. Three rows, six
+     ticks, at every one of the eight viewports.
+     §5.15 clauses: the field, the art, the three rows and the six radios must
+     all be found, or the sweep says so rather than passing on nothing. */
+  {
+    await p.click('.steps__step[data-step="mk"]');
+    await p.waitForTimeout(150);
+    const shape = await p.evaluate(() => {
+      const field = document.querySelector('.field[data-group="mashkof"]');
+      return {
+        field: !!field,
+        art: !!(field && field.querySelector('.mkc__art svg')),
+        rows: field ? field.querySelectorAll('.mkc__row[role="radiogroup"]').length : 0,
+        radios: field ? field.querySelectorAll('.mkc__row [role="radio"]').length : 0,
+        parts: field ? [...field.querySelectorAll('.mkc__row')].map(r => r.dataset.part) : [],
+      };
+    });
+    if (!shape.field) fault(v.name, 'no משקוף field on the mk step — the control is gone and this sweep has no subject');
+    else {
+      if (!shape.art) fault(v.name, 'the משקוף control draws no section');
+      if (shape.rows !== 3) fault(v.name, `the משקוף control has ${shape.rows} rows, not three`);
+      if (shape.radios !== 6) fault(v.name, `the משקוף control has ${shape.radios} choices, not six`);
+    }
+    if (shape.field && shape.rows === 3 && shape.radios === 6) {
+      const readCode = () => p.$eval('#code', e => e.textContent.trim());
+      const rowOf = st => priceParts(st).mashkof;
+      /* ⚠ STANDARD, THEN WIDE, THEN STANDARD — three ticks per part, because
+         the click walk above leaves every part WIDE (its last click in this
+         field is the inner kant's wide pill) and the first version of this
+         ticked wide first, read a move of 0 agorot on a pill that was already
+         on, and reported 48 faults about a page doing exactly the right
+         thing. The first tick normalises; the second is the one whose move
+         must equal the printed figure; the third must take it back exactly. */
+      for (const part of shape.parts) {
+        let printed = null;
+        for (const [wide, expect] of [['0', 'norm'], ['1', 'add'], ['0', 'back']]) {
+          const sel = `.field[data-group="mashkof"] .mkc__row[data-part="${part}"] [data-wide="${wide}"]`;
+          const before = decodeCode(await readCode());
+          const seen = await p.$eval(sel, el => {
+            el.scrollIntoView({ block: 'nearest' });
+            const r = el.getBoundingClientRect();
+            const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+            return {
+              price: (el.querySelector('.mkc__opt-p') || {}).textContent || '',
+              whole: r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight && r.right <= innerWidth,
+              mine: !!hit && (hit === el || el.contains(hit)),
+              partName: el.closest('.mkc__row').querySelector('.mkc__part').textContent.trim(),
+              box: `${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}x${Math.round(r.height)}`,
+            };
+          });
+          const which = wide === '1' ? 'wide' : 'standard';
+          if (!seen.whole) fault(v.name, `משקוף ${part} ${which} is not whole on screen at ${seen.box}`);
+          if (!seen.mine) fault(v.name, `משקוף ${part} ${which} at ${seen.box} is under something else — a customer cannot press it`);
+          await p.$eval(sel, el => el.click());
+          await p.waitForTimeout(60);
+          const after = decodeCode(await readCode());
+          if (!before || !after) { fault(v.name, `משקוף ${part}: the code could not be read back`); break; }
+          const moved = rowOf(after) - rowOf(before);
+          const spec = await p.$eval('#spec .spec__row[data-key="mashkof"] .spec__value', e => e.textContent.trim()).catch(() => '');
+          if (expect === 'norm') {
+            if (moved > 0) fault(v.name, `משקוף ${part}: ticking standard first ADDED ${moved} agorot`);
+            if (seen.price !== priceLabel(0)) fault(v.name, `משקוף ${part}: the standard pill printed "${seen.price}" — it is included`);
+          } else if (expect === 'add') {
+            printed = seen.price;
+            if (moved <= 0) fault(v.name, `משקוף ${part}: ticking wide from standard moved the frame's row by ${moved} agorot`);
+            if (seen.price !== deltaLabel(moved)) fault(v.name, `משקוף ${part}: the wide pill printed "${seen.price}" and the tick cost ${deltaLabel(moved)}`);
+            if (!spec.includes(seen.partName)) fault(v.name, `משקוף ${part}: the spec row reads "${spec}" and does not name "${seen.partName}"`);
+          } else {
+            if (printed !== deltaLabel(-moved)) fault(v.name, `משקוף ${part}: ticking standard again took back ${deltaLabel(-moved)} where the wide pill had printed "${printed}"`);
+            if (spec.includes(seen.partName)) fault(v.name, `משקוף ${part}: the spec row still reads "${spec}" after the part went back to standard`);
+          }
+        }
+      }
+    }
+  }
 
   /* ⚠ TWO WHOLE BLOCKS STOOD HERE AND CAME OUT ON 18.9.2026 — "DRAGGING THE
      HANDLE" and "A DRAG LEAVES NOTHING BEHIND". Between them they were the
