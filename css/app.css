@@ -3882,7 +3882,11 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    instantly, nobody sees that they moved as one. */
 #stage[data-changed="pirzul"] [data-hw="lock"],
 #stage[data-changed="lockset"] [data-hw="lock"],
-#stage[data-changed="speciallock"] [data-hw="lock"] {
+#stage[data-changed="speciallock"] [data-hw="lock"],
+/* The pull handle's finish, 20.9.2026: it repaints the bar AND the bell, and
+   they change together the way the lock furniture does under the פרזול. */
+#stage[data-changed="handleFinish"] [data-hw="handle"],
+#stage[data-changed="handleFinish"] [data-hw="bell"] {
   animation: replate .30s var(--ease-fit) both;
 }
 @keyframes replate { from { opacity: 0; } }

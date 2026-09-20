@@ -96,7 +96,7 @@ const CASES = [
     q: 'c=rb-0096d&w=none&g=none&n=nitzan&k=cylinder&d=strips&s=standard',
     gap: `the bar is 0.32 of leaf height; our shortest is ${shortestBar}` },
   { id: 'd087', label: 'designed 8000 - smart lock, long bar',
-    q: 'c=rb-9005d&w=none&g=none&n=shahar&k=digital&d=panel2&s=standard',
+    q: 'c=rb-9005d&w=none&g=none&n=nitzan&k=digital&d=panel2&s=standard',
     /* ⚠ THE COLOUR HALF OF THIS GAP CLOSED AND THE LENGTH HALF DID NOT. It
        used to read "BLACK, which we no longer offer"; `barblack` is in the
        range now — but at 800 mm it is our SHORTEST bar, and this door's is
@@ -147,7 +147,7 @@ const CASES = [
        what one door is, and this was the one that did not move; the note under
        it went on saying "ours are nickel" about a bar that is no longer
        nickel. What is left of the gap is length, not colour. */
-    q: 'c=rb-9001d&w=strip&g=grid-light&n=barblack&k=digital&d=plain&s=standard',
+    q: 'c=rb-9001d&w=strip&g=grid-light&n=idan&hf=hf-black&k=digital&d=plain&s=standard',
     gap: 'the bar measures 0.54 of leaf height and our black one is 0.39, the '
        + 'shortest in the range; the lock body is black in the photograph and '
        + 'ours follows the bar now, so that half of this gap has closed' },
@@ -157,11 +157,13 @@ const CASES = [
        bar and this sheet stood a bar-less door beside a photograph of one with
        a 1056 mm bar down it. `lock.kind` is "round-escutcheon". The check
        below is there so the next one of these is not silent. */
-    /* `d=plain` since 14.9.2026 — see the note on d097 above. */
-    q: 'c=rb-6219d&w=rect&g=grid-light&n=idan&k=cylinder&d=plain&s=sidelight',
+    /* `d=plain` since 14.9.2026 — see the note on d097 above. `hf=hf-black`
+       since 20.9.2026: the record says the bar is black, the pull handle has
+       a finish of its own again, and the note below had gone on saying "ours
+       is nickel" for as long as a nickel bar was the only one we could draw. */
+    q: 'c=rb-6219d&w=rect&g=grid-light&n=idan&hf=hf-black&k=cylinder&d=plain&s=sidelight',
     gap: 'this door carries BOTH — a pale grid over reeded glass — and one list means '
-       + 'one choice, so the reeded pane is the half we drop (see GRILLES); the bar '
-       + 'is black in the photograph and ours is nickel' },
+       + 'one choice, so the reeded pane is the half we drop (see GRILLES)' },
 ];
 
 const load = f => f.endsWith('.png')

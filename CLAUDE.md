@@ -474,17 +474,21 @@ copied here. `git show origin/claude/app-design-mockup-review-qt00n6:<file>`.
   nearest real one.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   the option ORDER or the bit layout requires a `VERSION` bump in
-  `js/url-state.js` (**21** as of 30.8), so an old code is *refused with a
+  `js/url-state.js` (**23** as of 20.9), so an old code is *refused with a
   notice* rather than decoded into a different door. **Appending to the end of
   a list costs no bump. Changing a property — not the id, not the order —
   costs no bump.**
-  ⚠ This line said **13** through six bumps. A version number written into
-  prose is a number that goes stale the first time somebody obeys the rule
-  around it, so **read `js/url-state.js` and do not trust this figure** — it is
-  here for orientation, not for arithmetic.
-- **Retired URL parameters `f`, `a`, `z`, `i` must never be reused**, and
-  `fromQuery` ignores them without a notice: withdrawing an option is our
-  change, not that customer's mistake.
+  ⚠ This line said **13** through six bumps, and then **21** through the 22
+  bump of 14.9. A version number written into prose is a number that goes
+  stale the first time somebody obeys the rule around it, so **read
+  `js/url-state.js` and do not trust this figure** — it is here for
+  orientation, not for arithmetic.
+- **Retired URL parameters `f`, `a`, `z`, `i` (and `gp`) must never be
+  reused**, and `fromQuery` ignores them without a notice: withdrawing an
+  option is our change, not that customer's mistake. ⚠ **The pull handle's
+  finish came BACK on 20.9.2026, on Peretz's own word, and it came back under
+  a NEW parameter, `hf=`** — `f=` stays retired, and a link still carrying
+  `f=black` opens the same door it always did.
 - **All money is in agorot (integers).** Never floats.
 - **⚠ THE PRICES ARE REAL. `PLACEHOLDER` IS `false`.** This rule used to read
   "every price is `PLACEHOLDER = true` until Peretz answers"; he answered on
@@ -2037,21 +2041,27 @@ focused in), and a decision about what a reload mid-flow should do with the
 entries behind it. That is a product decision above CSS, like the wall below
 and the summary's spec — **recorded rather than guessed at.**
 
-### ⚠ THE WIDEST DOOR'S RUSSIAN ORDER SHEET FITS ITS PAGE BY 1.2 mm
+### ⚠ THE WIDEST DOOR'S RUSSIAN ORDER SHEET PRINTS ON TWO PAGES, AND HAS SINCE THE KEYPAD EXISTED
 
-Closed on 12.9 for every door × language in the range — see §0b — and the
-worst case is a pass by a margin this file's own rule refuses to call one.
+⚠ **This heading said "fits its page by 1.2 mm" from 12.9 to 20.9, and the
+door it measured was not the door it named.** The audit's fixture typed
+`special: 'kodan'` — `speciallock` is the key — and `mashkof: 'mk-wide'`, no
+id, so the "loudest glazed door" it printed carried no keypad and a standard
+frame. Corrected on 20.9 while re-cutting the frame, it printed the widest
+דו כנפי with a square window AND its keypad, and in Russian that is
+**277.5 mm of sheet against 273 mm of paper: two pages.** Measured row by row
+under print media: the keypad's row is the whole **14.3 mm** (263.2 without
+it), and neither the frame's new three-part label nor the bar's finish suffix
+adds a line in Russian (the three-part label does wrap one row in ENGLISH,
+265.1 mm, still one page). So this has been true of every Russian order for
+that door since the קודן shipped on 30.8, and nothing printed it. §5.15 from
+the fixture's end, for the fourth time in this file.
 
-The tallest sheet the catalogue can produce is the **widest דו כנפי with a
-square window**: two glazed panels, so its סורג row carries the longest value
-the document holds. In Russian it lays out at **271.8 mm against 273 mm** of
-printable A4. English is 260.2. Hebrew, which has no gloss line, is 178.9 and
-is not close.
-
-⚠ **One word of copy is a second sheet of paper**, and the customer who meets
-it is the one whose language Peretz does not read. `npm run audit` prints the
-headroom on every run and carries that exact door, so the day it goes it says
-so — but nothing prevents it.
+⚠ **It is carried as a NAMED EXEMPTION in `npm run audit`**, on the 12.9
+pattern: that one door, Russian only, exactly two pages, with a ceiling of
+280 mm the sheet may not grow past — and a clause that fails the day it
+prints on one page, so the exemption cannot outlive the fault. Hebrew, which
+has no gloss line, is 212.6 mm and is not close.
 
 ⚠ **THE CHEAPEST WAY OUT IS THE ELEVATION AND IT IS NOT A SHAVE.** The print
 block caps the drawing at `max-block-size: 140mm` — **over half the page** —
@@ -2288,17 +2298,17 @@ the same list in Hebrew, shorter, for him to answer.
 | A6 | The widened mashkof is 60 mm outside / 300 mm inside | two numbers in `MASHKOFS` |
 | A7 | The peephole and security latch are standard on every door — **the עינית is now a CHOICE priced at ₪0 on the strength of this**, so it is louder than it was | one number in `prices.js`, and whether the tile says כלול |
 | A8 | ~~A single bottom panel is ₪725, half of two~~ — **CLOSED 14.9**: the face is withdrawn (*"remove the one panel option from the files entirely"*) and the panel belongs to `WINDOWS.rect`, whose ₪3,800 pays for it. No invented number is left on this axis | — |
-| A9 | `Math.ceil` on the handle's 20 cm steps — you cannot buy 10 cm of bar | one word |
+| A9 | ~~`Math.ceil` on the handle's 20 cm steps~~ — **closed 20.9**: there are no steps. Two bands, under and over a metre, and the bar's price is one of two figures | — |
 | A10 | ~~Colours are all included~~ — **settled 30.8**: three included, fourteen at +₪200 | — |
 | A11 | Panels and stripes are mutually exclusive — no door carries both | one rule in `js/rules.js` |
-| A12 | `barblack` (מוט שחור) is priced as a bar like the others — he wrote "nickel >100cm" and named no rate for a black one | one entry's `priceKind` |
+| A12 | ~~`barblack` is priced as a bar like the others~~ — **closed 20.9**: black is a FINISH now, +₪100 on any bar, and `barblack` is the round bar in black | — |
 | A13 | `strip` (צוהר גבוה, 27×142 cm) is Peretz's "tall" and `rect` (36×90 cm) is his "square" | **which window carries ₪4,200 and which ₪3,800** (was 3,700 until the panel it forces was folded into it, 30.8) |
-| A14 | The reeded and ogee panel mouldings cost the same — he priced "two panels" once and named no families. **Three pairs of faces since 14.9**, with `panel3o` | three numbers, and possibly one whole family |
+| A14 | ~~The reeded and ogee panel mouldings cost the same~~ — **closed 20.9**: *"remove entirely the classic panels."* One family drawn; the ogee section is kept as a measurement nothing reads | — |
 | A15 | ~~The tight band is not buildable~~ — **settled 27.8**: it is a toggle | — |
 | A16 | The merged חריגה tile is drawn at 1025 × 2250 — the MIDPOINT of the `wide` and `tall` it replaces. Its leaf aspect is 0.4205 against the corpus median 0.415, closer than either | two numbers in `SIZES`; no price moves |
 | A17 | A דו כנפי's fixed leaf is 400 mm on all three bands — the extra width goes into the leaf that OPENS, because a narrow fixed leaf is a standard part | two numbers in `SIZES`; no price moves |
 | A18 | Peretz's דו כנפי is our דלת וחצי — a main leaf with a narrow FIXED leaf beside it, not two equal leaves | **the drawing, not a label**, on three of the six sizes |
-| A19 | The curved lever is priced as the Coral — included. He asked for the handle by pointing at a drawing and named neither a price nor a name for it, and **its id is a placeholder that can never be renamed** | one number, and one label in three languages |
+| A19 | ~~The curved lever is priced as the Coral~~ — **closed 20.9**: *"the weird one +200."* ₪200. The NAME is still open and **its id is a placeholder that can never be renamed** | one label in three languages |
 
 ⚠ **A18 is new and it is not a number.** Every other row here is one edit;
 that one is the DRAWING on half the size list. Peretz says דו כנפי and the
@@ -2558,6 +2568,213 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ PERETZ'S SECOND REVIEW, PART A — FOUR PULL HANDLES IN TWO BANDS WITH A
+  FINISH OF THEIR OWN, THE BELL MOVES IN WITH THEM, A DIGITAL VIEWER, THE OGEE
+  FACES GONE, THE משקוף IN THREE PARTS, AND `VERSION` 22 → 23 — 20.9.2026.**
+  He sat with his son over the live page and gave twenty-two notes; the eight
+  that were ambiguous were settled in chat the same evening and are decisions,
+  not options. This is the one commit that re-cuts lists or widens fields, so
+  it is one `VERSION` — the 14.9 catalogue round is its template. Parts B–F
+  (the משקוף control, the drawing, the rules and the dialog, the page, the
+  record) follow, each in its own commit. **The standard door is still ₪3,195
+  and a plain door with a square window is still ₪6,995**, asserted before and
+  after.
+
+  **A1 · Four pull handles, not eight.** His list is the WHOLE list: *"1.
+  cylinder (idan) 500, from 70–100 cm · 2. cylinder but bigger 800, from
+  120–200 cm · 3. rectangle 600 · 4. rectangle but bigger 900 · 5. shkua 1900
+  · 6. horizontal 300 · remove ela."* `idan` (the round tube), `nitzan` (the
+  square section — his "rectangle", settled in chat), `channel` and `grab`
+  survive. `ron` → `idan` and `shahar` (with `bar-flat`, `blade`) → `nitzan`
+  are aliases. ⚠ **`ella` AND `barblack` ARE MIGRATIONS, NOT ALIASES** —
+  `STRIPE_LEGACY`'s shape: `HANDLE_LEGACY` in `catalog.js` maps each onto
+  `idan` PLUS a value of the new finish field, so a link carrying `n=ella`
+  opens the round bar in gold and `n=barblack` opens it in black, **with no
+  notice**, and an explicit `hf=` on the same link wins. Asserted both ways
+  beside the clause that an invented id still raises `option-unknown`. The
+  three withdrawn `BARS` sections keep their measured numbers as prose beside
+  the two that survive; they are the only record of those products.
+
+  **A2 · Two length bands, and the 20 cm steps go.** `HANDLE_LENS` is
+  `[0, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000]` — 10 cm steps to
+  the metre because that is how he stated the small band, 20 past it because
+  that is how he stated the big one; over a metre is the bigger product, 110
+  included (his son's word). `HANDLE_RATE` is gone and A9 with it; `HANDLE` in
+  `prices.js` carries `{ short, long }` per bar and `priceHandles` in the
+  catalogue refuses a bar with one figure or a flat grip with two.
+  ⚠ **AND THE IDAN'S STOCK LENGTH MOVED 1050 → 1000, WHICH IS A TRADE AND IS
+  RECORDED AS ONE.** The bar was measured at 105 cm off the photographs;
+  `handleLen: 0` means "as it comes"; under the bands an untouched Idan would
+  have priced at ₪800 while his line reads *"cylinder (idan) 500"*. Drawing
+  105 and pricing it as a metre was refused (§0's worst failure — a picture
+  and a price that disagree), so the drawn bar is a metre and prices as he
+  said, and `ASK-PERETZ.md` §1b asks him in one line whether he stocks 100 or
+  105. Measured cost: every gallery door carrying an Idan is on a corpus sheet
+  that moved for another reason as well (below), so the 5% shortening moved
+  no sheet on its own.
+
+  **A3 · A finish for the pull handle — and it is NOT `f=`.** *"an option to
+  make them gold or black, black is +100, gold +200, its like pirzul but for
+  the pull handle."* `HANDLE_FINISHES` — `hf-nickel` (included), `hf-black`
+  (+100), `hf-gold` (+200) — a new field `handleFinish`, a new parameter
+  `hf=` (free in both `KNOWN` and `RETIRED`, checked), two bits. `f=` was the
+  pull handle's finish at ₪220, withdrawn because *"customers do not make that
+  decision"*, and it stays retired: a link carrying `f=black` opens the same
+  door it always did, asserted. **Whose metal?** The bar's — `gripFinish`
+  reads the state's finish instead of a declared product finish (no surviving
+  product declares one), and the gold tube is the measured `barGold` under
+  the `barTube` id through `tubeRamp`, so a gold Idan is the same brass the
+  Ella was. Charged **per object** (his son's word): the bar's row carries
+  its surcharge and the bell's row carries its own. The finish group sits on
+  the grip step under the handles, with a hint, and its tiles build from
+  `BAR_RAMP` like the bar tiles do — the 10.9 join assertion is restated on
+  them: every stop the tile paints with is in the door rendered in that
+  finish, and the three are three pictures. Only handles with `finishes:
+  true` take it (idan, nitzan, grab); the channel is painted with the door and
+  the order says nothing about its metal. T4 restated: the bar's fill carries
+  the finish's tone AND the lever's fill still carries the פרזול's, unchanged
+  by it.
+
+  **A4 · The bell moves in with the pull handles and follows their finish.**
+  *"put the bell with the pull handles and the pirzul for it changes its
+  price by 100 or 200."* `bell` is `in: 'grip'` now, after the finish; the
+  `pz` step keeps the פרזול and the עינית. ₪300 nickel, 400 black, 500 gold.
+  ⚠ **`bellMetal` CHANGES OWNER, AND THIS OVERRULES 31.8.** It held two metals
+  off the פרזול on Peretz's *"the color of the bell can only be nickel and
+  gold"*; it follows the handle finish now, in three, on his son's answer to
+  the ambiguous note. The 31.8 quote is kept in `bellRamp`'s docstring as the
+  instruction this one overrules, the way `cylinderRamp` keeps its measurement
+  beside the word that overruled it. The assertion is restated the same way:
+  **the bell follows the handle finish on all three and the פרזול on none of
+  four**, and gilds on a door with no pull handle at all — the axis is the
+  door's, not the bar's. The "what the פרזול reaches" table in §3 loses its
+  bell row (Part F carries the sweep).
+
+  **A5 · A digital peephole, +₪390.** `peep-digital`, appended to
+  `PEEPHOLES`, `BITS.peephole` 1 → 2. ⚠ **It has no photograph and it draws
+  something** (§5.1): a rounded-square bezel of published dimensions
+  (`PEEPHOLE_DIGITAL_R = 27`) at the optical viewer's own position, in the
+  פרזול's metal, `photo: null`, with `peepholeR(state)` read by the drawing,
+  by `peepholeFits` and by `faceObstacles` — one number, three readers. Spec
+  row, price row and message line for free by being a list entry. Its tile is
+  a lens on a square bezel, distinct from the optical one's rings and from the
+  bell's crowned boss. `ASK-PERETZ.md` §1b asks for a picture.
+
+  **A6 · The classic panels go, and the Greek set's architrave is the normal
+  one.** *"remove entirely the classic panels, and in the greek set the thing
+  around the window needs to be like the normal panel."* `panel2o` and
+  `panel3o` leave `DETAILS` (mid-list, which is part of why this is one
+  commit); `panel2o` and `panelo` → `panel2`, `panel3o` → `panel3`;
+  `classic.profile` is `reed`, so `mouldOf` returns the reed for the light's
+  architrave too. A14 closes. ⚠ **`MOULDS.ogee` IS KEPT AND NOTHING READS
+  IT** — one photograph, d050, stored un-compressed (§3), eleven of his
+  installed doors carry it, and `mouldOf` says in one line that nothing has
+  drawn it since 20.9.2026. The 14.9 measurement showing the Greek set's own
+  panel IS ogee stays beside the instruction, as before: measured, overruled,
+  kept.
+
+  **A7 · The משקוף is three parts.** *"the outer kant, the falc, and the inner
+  kant … 6 boxes … the door illustration only shows the change of the outer
+  kant and the falc."* Settled in chat: outer kant = today's FACE (46 → 82),
+  falc = today's RETURN (62 → 112, head 148 → 198 with it), inner kant new
+  and never drawn, any combination. `MASHKOF_PARTS` states each part standard
+  and widened once, and `MASHKOFS` is GENERATED from it — eight entries, the
+  first four keeping their ids AND their indices (`mk-std`, `mk-out`,
+  `mk-in`, `mk-both`), so an old `mk=` opens the same frame with no
+  migration and no notice, and `BITS.mashkof` goes 2 → 3. ₪250 per widened
+  part, 500 · 750 · 1,000 · 1,250, the size multiplier landing on the whole
+  (A3, unchanged). The renderer reads `out` and `in` exactly as it did, so
+  the standard frame is byte-identical — T3 is now 8 × 6. `mashkofGlyph`
+  draws the inner wing and dimensions all three; the CONTROL is Part B.
+
+  **A8 · The prices**, all in `prices.js` with his words beside each: coral
+  0 → **100**; `lever-taper` 0 → **200** (A19 closes on the money, the name
+  is still his); sapir and square 350/300 → **390/390** (*"all the square
+  handles"*; the כדור על אורך is a circle and keeps 200); kasefet 700 →
+  **690**; kodan 900 → **880**; `pz-gold` 900 → **870**; channel 1700 →
+  **1,900**; idan **500/800** and nitzan **600/900** by band; the bow 300;
+  the bell 300/400/500 by finish; the digital viewer 390; the משקוף up to
+  1,250.
+
+  ⚠ **THE WIRE FORMAT.** `VERSION` 23. `BITS`: `handleFinish` 2 new,
+  `peephole` 1 → 2, `mashkof` 2 → 3; payload 49 → 53, and with the four
+  check bits reserved first the code rounds to 60 bits — **twelve characters
+  now, read off `encodeCode(DEFAULTS).length` and never typed** (`js/url-
+  state.js`'s header stopped restating a length on 12.9 for this reason).
+  Every code written under 22 is refused with a notice.
+
+  ⚠ **THE FITTER WRITES SOURCE, AND IT DROPPED THE NEW FIELD ON THE FLOOR.**
+  `npm run corpus`'s `handleOf` now matches geometry among the two surviving
+  bars and returns the record's finish as `hf-black`/`hf-gold`/`hf-nickel`;
+  `want` carried it, the markdown table's query carried it — and the `FIELDS`
+  list that writes `js/works.js`, typed before the field existed, did not,
+  so the gallery would have drawn **d072, d087, d113 and d122** with nickel
+  bars their own records call black. §5.10, caught by the units check that
+  compares the two files, exactly as its note promises. Eight of Peretz's
+  thirty doors moved in the gallery, and every one is a bar: d043, d063,
+  d078, d125 `ron` → `idan`; d072 `shahar` → `nitzan` (0.063 W is the square
+  section's width, not the tube's); d087 `shahar` → `idan` black; d113
+  `barblack` → `idan` black; d122 gains `hf-black`.
+
+  ⚠ **AND `tools/recreate.mjs` HAD A NOTE SAYING "OURS IS NICKEL" ABOUT A BAR
+  THE RECORD CALLS BLACK** — d122's; the query carries `hf=hf-black` now and
+  the sentence is gone. Two more notes of the same shape were found and
+  LEFT: d003's and d106's say *"the plate is brass in the photograph; the
+  finish is withdrawn, so ours is nickel"* about the LOCK plate, whose
+  finish has been the פרזול since 27.8 (`pz=pz-gold`). They are stale about
+  a different axis from this round's, and `js/works.js` carries no פרזול
+  field for the gallery either — recorded here rather than moved, because
+  moving two recreate sheets for a reason this commit is not about is how a
+  regeneration stops being evidence.
+
+  **Restated, never deleted**, in `test/units.mjs`: the fixture and `KEYS`
+  carry `handleFinish`; the withdrawn-parameter check reads PARAMETERS rather
+  than the substring `f=` (which `hf=` contains — it would have gone red on
+  the fix and green on nothing); the bar-length ladder becomes the two bands
+  on both bars with the split asserted at the metre; the price group's stem
+  carries the Rotem (its Coral is ₪100 now) and every absolute figure is
+  re-derived; the ogee loops run the reed and ask the DRAWING which section
+  it used; the משקוף tile prints three numbers on one ruler; "three metals"
+  is the finish group's three tiles joined to the door; the finish, stripes
+  and bell groups run on the new axis with both clauses; the price-coverage
+  loop reads a bar's two figures and asserts the long band dearer; and the
+  finish-naming group asks that every grip with `finishes: true` — and the
+  bell — names the chosen finish on its own line while the channel and every
+  lockset name none. **11,764,671 / 0** after the sheets.
+
+  ⚠ **AND THE AUDIT'S PRINT FIXTURE HAD BEEN PRINTING A DIFFERENT DOOR FROM
+  THE ONE IT NAMED.** It read `special: 'kodan'` (the key is `speciallock`)
+  and `mashkof: 'mk-wide'` (no such id), so the "loudest glazed door" of the
+  12.9 page-count check carried a standard frame and no keypad. Corrected here
+  — `mk-all`, `speciallock: 'kodan'`, `shahar` → `nitzan` — it printed the
+  widest glazed double on **two pages in Russian, 277.5 mm against 273**, and
+  the keypad's row is the whole 14.3 mm; the three-part frame label and the
+  finish suffix add no line (the label wraps one row in English, one page
+  still). A fault as old as the קודן, invisible to a fixture that could not
+  carry it: §5.15 from the fixture's end, fourth time. §9 refuses the cheap
+  ways out, so it is a NAMED exemption in the audit — that door, Russian,
+  exactly two pages, a 280 mm ceiling, and a clause that fails when it stops
+  being needed — and the §9 entry that said "fits by 1.2 mm" says what it
+  measured.
+
+  **Gates.** `npm run fuzz` 30,000 designs and 1,800 clicks clean ·
+  `npm run collide -- all` **1,128** designs (2,090 before — four fewer
+  grips, two fewer faces), `faceObstacles` agreeing with the drawing
+  everywhere · `-- boxes` every fitting inside its declaration, the Coral
+  30/128/30 against 40/135/51, `MOUNT_REACH` covered at 111 of 121 ·
+  `npm run audit` no faults at eight viewports beyond the one exemption above.
+
+  **Sheets.** The drawing changed, so bare sheets are ALLOWED to move and
+  each is attributed: `corpus-04/05/06/08/09` are the five sheets holding
+  the eight gallery doors above and no other corpus sheet moved;
+  `recreate-d087`, `-d113`, `-d122` are the three recreate cases whose bar
+  changed product or finish; `against-idan` and `against-nitzan` are the two
+  surviving grip sheets (they crop the whole leaf, and the Idan is 5%
+  shorter); `against-ella/-ron/-shahar/-blade` are DELETED rather than left
+  stale. **All five `lockset` sheets came back byte-identical**, which is
+  the check that the lock furniture did not move under a round that
+  repriced most of it. The 12 `shot` sheets moved and prove nothing (§7).
 
 - **⚠ FIVE `against` SHEETS MOVED THAT COULD NOT HAVE, AND CHASING THEM
   CORRECTED §7's REASON FOR TRUSTING ALL FOUR BARE FAMILIES — 19.9.2026.**

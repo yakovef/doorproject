@@ -8,47 +8,59 @@
  */
 
 import { T } from './copy.js';
-import { BELLS, BUILD_A, byId, COLOURS, DETAILS, GRILLES, HANDLES, isGlazed,
-         PEEPHOLES,
-         handleLength, HANDLE_RATE_A, MASHKOF_WIDER_A, MASHKOFS, paneCount,
+import { BELLS, BUILD_A, byId, COLOURS, DETAILS, GRILLES, gripTakesFinish, HANDLES,
+         HANDLE_BAND, HANDLE_FINISHES, isGlazed, PEEPHOLES,
+         handleLength, MASHKOF_WIDER_A, MASHKOFS, paneCount,
          LOCKSETS, PIRZUL, SIZES, SPECIAL_LOCKS, stripePrice,
          WINDOWS } from './catalog.js';
 
 /**
  * What WIDENING the frame costs, before the size multiplier.
  *
- * Peretz: "+250 every side that gets wider", where a "side" is one of the two
- * dimensions he had just named — the outside face and the inside return — and
- * not one of the three jambs. Settled from outside. So this is ₪0, ₪250 or
- * ₪500, read off the two flags the catalogue entry carries rather than off its
- * millimetres: the flags are what Peretz is pricing, and the millimetres are
- * what the renderer draws. Deriving one from the other would tie his price
- * list to our drawing.
+ * Peretz: "+250 every side that gets wider" — and since 20.9.2026 a "side" is
+ * one of the section's THREE parts, the outer kant, the falc and the inner
+ * kant, any combination. So this is ₪0 to ₪750, read off the list of widened
+ * parts the catalogue entry carries rather than off its millimetres: the
+ * parts are what Peretz is pricing, and the millimetres are what the renderer
+ * draws (two of the three; the inner kant is on the room side and never
+ * drawn). Deriving one from the other would tie his price list to our
+ * drawing.
  */
 function mashkofExtras(state) {
-  const mk = byId(MASHKOFS, state.mashkof);
-  return (mk.wideOut ? MASHKOF_WIDER_A : 0) + (mk.wideIn ? MASHKOF_WIDER_A : 0);
+  return byId(MASHKOFS, state.mashkof).wide.length * MASHKOF_WIDER_A;
 }
 
 /**
- * WHAT THE PULL BAR COSTS, which is a floor plus its length.
+ * WHAT THE PULL HANDLE COSTS: one of a bar's two length bands, plus its finish.
  *
- * Peretz: *"handle<100 - 500 · nickel>100cm - every 20cm +150shekel."* The two
- * flat-priced grips — the horizontal bow and the recessed channel — keep their
- * own number and never reach the rate; a channel is cut into the leaf when it
- * is made, so there is no length to sell.
+ * Peretz, 20.9.2026: *"cylinder (idan) 500, from 70-100 cm · cylinder but
+ * bigger 800, from 120-200 cm"* — and the same for the rectangle at 600 and
+ * 900. Two figures per bar, split at `HANDLE_BAND` (a metre; over it is the
+ * bigger one, 110 included, on his son's word). The per-20-cm rate this used
+ * to add is gone with the rule. The two flat-priced grips — the horizontal bow
+ * and the recessed channel — keep their one number; a channel is cut into the
+ * leaf when it is made, so there is no length to sell.
  *
  * ⚠ ASKED OF `handleLength`, NOT OF `state.handleLen`. The chosen length is
  * clamped by the leaf — a 200 cm bar on a 203 cm door is not a door — and the
  * customer must be charged for the bar they will actually get. Reading the raw
- * field here would quote a metre of bar the drawing refuses to draw, which is
- * the same class of fault as charging for a grille on a solid door.
+ * field here would quote a bar the drawing refuses to draw, which is the same
+ * class of fault as charging for a grille on a solid door.
+ *
+ * ⚠ AND THE FINISH IS ON THIS ROW, PER OBJECT. *"black is +100, gold +200"*,
+ * charged on each thing it recolours — his son's answer — so the bar's own
+ * row carries it here and the bell's carries it below; there is no separate
+ * "finish" line that would be one charge. Only on a grip that takes a finish
+ * at all: the channel is painted with the door and pays nothing for a metal
+ * it is not made of.
  */
+function finishExtra(state) {
+  return byId(HANDLE_FINISHES, state.handleFinish).delta;
+}
 function handlePrice(state) {
   const h = byId(HANDLES, state.handle);
-  if (h.priceKind !== 'bar') return h.delta;
-  const over = Math.max(0, handleLength(state) - HANDLE_RATE_A.over);
-  return h.delta + Math.ceil(over / HANDLE_RATE_A.step) * HANDLE_RATE_A.per;
+  const base = h.priceKind === 'bar' && handleLength(state) > HANDLE_BAND ? h.deltaLong : h.delta;
+  return base + (gripTakesFinish(state) ? finishExtra(state) : 0);
 }
 
 /** What the face costs, which for one entry depends on whether it has glass. */
@@ -203,7 +215,12 @@ export function priceParts(state) {
        zero row is dropped by `breakdownRows`, so the עינית costs the column
        nothing and still reaches the ORDER through `js/spec.js`, which is where
        Peretz needs to see it. */
-    bell:    byId(BELLS, state.bell).delta,
+    /* ⚠ AND THE BELL FOLLOWS THE PULL HANDLE'S FINISH, 20.9.2026 — *"the
+       pirzul for it changes its price by 100 or 200"*, the pull-handle finish
+       on his son's word, per object: a nickel ring is ₪300, black ₪400, gold
+       ₪500. Nothing on a door with no bell. */
+    bell:    byId(BELLS, state.bell).delta
+             + (state.bell !== 'nobell' ? finishExtra(state) : 0),
     peephole: byId(PEEPHOLES, state.peephole).delta,
     /* A grille needs a window to sit in — and so does worked glass, which is
        in the same list now. Neither can be charged on a solid door: the
@@ -264,6 +281,15 @@ export function priceAgorot(state) {
  */
 export function tileAgorot(groupKey, state) {
   if (groupKey === 'size') return priceAgorot(state);
+  /* ⚠ THE FINISH IS THE SECOND SPECIAL CASE, AND FOR THE OPPOSITE REASON. It
+     has no row of its own in `priceParts` — it rides on the bar's row and on
+     the bell's, per object — so there is no key to read, and the honest figure
+     on a finish tile is what the finish costs ON EACH THING it paints: nickel
+     is included, black +100, gold +200. Printing the sum over the objects on
+     the door would make the tile read ₪0 with no bar chosen and ₪200 with a
+     bar and a bell, which is a delta and not a price (see `priceParts` on why
+     the tiles stopped printing deltas). */
+  if (groupKey === 'handleFinish') return byId(HANDLE_FINISHES, state.handleFinish).delta;
   const parts = priceParts(state);
   return Object.prototype.hasOwnProperty.call(parts, groupKey)
     ? parts[groupKey] : undefined;

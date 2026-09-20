@@ -32,7 +32,7 @@ const CASES = [
   ...HANDLES.filter(h => h.style !== 'none').map(h => [`grip-${h.id}`, `n=${h.id}&k=coral`]),
   ...LOCKSETS.map(k => [`lock-${k.id}`, `n=none&k=${k.id}`]),
   ['pair-idan-plate',  'n=idan&k=plate'],
-  ['pair-shahar-sapir', 'n=shahar&k=sapir&pz=pz-gold'],
+  ['pair-nitzan-sapir', 'n=nitzan&k=sapir&pz=pz-gold'],
   ['lock-plate-brass', 'n=none&k=plate&pz=pz-gold'],
   ['lock-plate-left',  'n=none&k=plate&h=left-in'],
 ];

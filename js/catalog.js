@@ -21,7 +21,8 @@ import { agorot, PLACEHOLDER as PRICES_ARE_PLACEHOLDER,
          BUILD, MASHKOF_WIDER,
          COLOUR as COLOUR_PRICE, WINDOW as WINDOW_PRICE, PIRZUL as PIRZUL_PRICE,
          GRILLE as GRILLE_PRICE, DETAIL as DETAIL_PRICE, DETAIL_GLAZED,
-         HANDLE as HANDLE_PRICE, HANDLE_RATE, LOCKSET as LOCKSET_PRICE, STRIPE,
+         HANDLE as HANDLE_PRICE, HANDLE_BAND, HANDLE_FINISH as HANDLE_FINISH_PRICE,
+         LOCKSET as LOCKSET_PRICE, STRIPE,
          SPECIAL_LOCK as SPECIAL_LOCK_PRICE,
          BELL as BELL_PRICE, PEEPHOLE as PEEPHOLE_PRICE } from './prices.js';
 
@@ -464,53 +465,76 @@ export const HANDLES = [
   { id: 'none',    he: 'ללא ידית משיכה', en: 'No pull', ru: 'Без ручки-скобы', len: 0, style: 'none',
     photo: null },   // there is no photograph of an absence
 
-  /* Pull bars. `bar` selects the section and the tone profile; see BARS in the
+  /* ⚠ FOUR PRODUCTS SINCE 20.9.2026, AND THERE WERE EIGHT. Peretz's list,
+     verbatim: *"1. cylinder (idan) 500, from 70-100 cm · 2. cylinder but
+     bigger 800, from 120-200 cm · 3. rectangle 600, from 70-100 cm · 4.
+     rectangle but bigger 900, from 120-200 cm · 5. shkua 1900 · 6. horizontal
+     300 · remove ela."* His son settled the two readings the list allows: it
+     is the WHOLE list, "bigger" is a length band of the same bar rather than
+     a second product, and the rectangle is ניצן.
+
+     So אלה, שחר, רון and מוט שחור leave. Every one of their ids stays alive
+     below as an alias, and two of them are MIGRATIONS rather than aliases —
+     see `HANDLE_LEGACY` — because what made them products was a finish, and
+     the finish is its own axis now (`HANDLE_FINISHES`). A link carrying
+     `n=ella` opens THIS bar in gold; `n=barblack` opens it in black.
+
+     ⚠ THE MEASUREMENTS OF THE FOUR THAT LEFT ARE KEPT, because they are the
+     only record of those products and the corpus still carries them:
+       ella     1000 x 20, brass round tube   d072 d074 d082 (0.017-0.024 W)
+       ron       900 x 18, round tube         d072 d035 d074
+       shahar   1230 x 40, flat strap         d060 (0.60 of leaf height)
+       barblack  800 x 20, black round tube   research/newdoor/
+     The corpus fitter (`npm run corpus`) now reads a brass or black bar as
+     THIS bar in that finish, and a flat one as ניצן.
+
+     Pull bars. `bar` selects the section and the tone profile; see BARS in the
      renderer.
      ⚠ THE WIDTHS WERE THE THING THAT WAS WRONG. Read against the leaf on
      twenty-one bar-carrying doors, a round tube measures 0.036 of leaf width
      (range 0.017-0.048) and a flat strap 0.052 (0.046-0.077); lengths cluster
-     at 0.45 and 0.48 of leaf height respectively. Our lengths were between 0%
-     and 15% out and four of them are unchanged — but three of the six bars
-     were 50% to 80% too NARROW, which at catalogue-thumbnail size is the
-     difference between a handle and a pinstripe. The comment that used to sit
-     here claimed "ella the stockiest at L/W 15, ron the slimmest at L/W 27",
-     and neither figure was even its own arithmetic: 900/34 is 26.5 and 900/16
-     is 56. A number nobody could reproduce from the line above it.
-     The measured widths, on an 850 x 2050 leaf: */
-  { id: 'idan',    he: 'עידן',  en: 'Idan', ru: 'Идан',   len: 1050, w: 32, style: 'bar', bar: 'idan', pull: true,
-    aliases: ['bar-long', 'luna', 'shiran'],
-    photo: 'research/handles/rb/idan-400-00000002.png' },
-  /* Brass, and the catalogue never said so: with no `finish` of its own
-     `gripFinish` fell through to steel and the bar the inventory calls
-     brass rendered silver on every door. d072, d074 and d082 are gold rods at
-     0.017-0.024 of leaf width — half what we drew. */
-  { id: 'ella',    he: 'אלה',   en: 'Ella', ru: 'Эла',   len: 1000, w: 20, style: 'bar', bar: 'ella', pull: true,
-    finish: 'brass', doors: ['d072', 'd074', 'd082'],
-    photo: 'research/handles/rb/ella-450.png' },
-  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', ru: 'Ницан', len: 1000, w: 44, style: 'bar', bar: 'nitzan', pull: true,
-    aliases: ['bar-short'], doors: ['d049', 'd066', 'd034', 'd104'],
-    photo: 'research/handles/rb/nitzan-400.png' },
-  { id: 'shahar',  he: 'שחר',   en: 'Shahar', ru: 'Шахар', len: 1230, w: 40, style: 'bar', bar: 'shahar', pull: true,
-    aliases: ['bar-flat', 'blade'], doors: ['d060'],
-    photo: 'research/handles/rb/shahar-400-1.png' },
-  /* ⚠ THE PHOTOGRAPH AND THE DOORS DISAGREE ABOUT WHAT THIS IS, and the audit
-     of 18.9 says so rather than resolving it: RB's own רון is a DARK,
-     SQUARE-section bar with bright steel end caps at both photographed
-     lengths, and the doors cited here carry a round polished tube. The
-     drawing follows the doors, which is the right way round; the NAME may
-     belong to the other product. `ASK-PERETZ.md` §1f asks. */
-  { id: 'ron',     he: 'רון',   en: 'Ron', ru: 'Рон',    len: 900,  w: 18, style: 'bar', bar: 'ron', pull: true,
-    doors: ['d072', 'd035', 'd074'],
-    photo: 'research/handles/rb/ron-400-00000002.png' },
+     at 0.45 and 0.48 of leaf height respectively. Three of the six bars were
+     50% to 80% too NARROW once, which at catalogue-thumbnail size is the
+     difference between a handle and a pinstripe.
 
-  /* The ornate pull, the horizontal bow, and the recess. */
+     ⚠ `len` IS 1000 FOR THE IDAN, AND IT WAS 1050 — a measured figure, moved
+     on 20.9.2026 for a price rule and not for a photograph, which needs saying
+     carefully. `handleLen: 0` means "as the model comes", and under Peretz's
+     two bands an untouched 1050 mm Idan would price in the OVER-a-metre band
+     at ₪800 while his own line reads *"cylinder (idan) 500"*: the bar as it
+     comes IS the small band. Three ways out: draw 1050 and price it at 800
+     (true, and ₪300 over what he quoted for the bar he stocks); draw 1050 and
+     price it as a metre (a picture and a price that disagree, which is §0's
+     worst failure); or stock it at the top of the band he priced it in. The
+     third is taken. It shortens the drawn bar 5% against the photographs it
+     was measured on, and the gallery doors carrying an Idan move with it —
+     `npm run corpus` says which. `ASK-PERETZ.md` asks the one-line question
+     that would settle it: is the Idan he stocks 100 or 105 cm? */
+  { id: 'idan',    he: 'עידן',  en: 'Idan', ru: 'Идан',   len: 1000, w: 32, style: 'bar', bar: 'idan', pull: true,
+    finishes: true,
+    aliases: ['bar-long', 'luna', 'shiran', 'ron', 'ella', 'barblack'],
+    photo: 'research/handles/rb/idan-400-00000002.png' },
+  /* The square-section bar — RB photographs it square, d049's face is flat
+     inside 3.6% across twenty-three pixels, and Peretz calls it "rectangle".
+     ⚠ `shahar` RESOLVES HERE, and `blade` and `bar-flat` with it: the flat
+     strap family is one product on his list now. */
+  { id: 'nitzan',  he: 'ניצן',  en: 'Nitzan', ru: 'Ницан', len: 1000, w: 44, style: 'bar', bar: 'nitzan', pull: true,
+    finishes: true,
+    aliases: ['bar-short', 'shahar', 'bar-flat', 'blade'], doors: ['d049', 'd066', 'd034', 'd104'],
+    photo: 'research/handles/rb/nitzan-400.png' },
+
+  /* The horizontal bow, and the recess. */
   /* ⚠ `shiran` IS WITHDRAWN, and this closes a question rather than dropping a
      product. ASK-PERETZ §2 has been asking since 23.8 whether he orders it at
      all — it appears on NONE of the 128 photographs, it was the one grip in the
      range drawn from nothing, and the note there says in as many words "it is
      the one grip whose picture we cannot check". Peretz, 26.8.2026: "there is
      no: שירן, להב שטוח." The id resolves to `idan`. */
+  /* `finishes: true` — the bow's rods paint from the grip's metal
+     (`gripHard`/`gripSoft` in the renderer), so it takes the finish and its
+     surcharge like a bar does. */
   { id: 'grab',    he: 'מאחז אופקי', en: 'Grab bar', ru: 'Горизонтальная скоба', len: 0, style: 'grab',
+    finishes: true,
     aliases: ['dee'], doors: ['d078'], photo: null },
   /* d084's recess measures 0.099 of leaf width and 0.906 of leaf height — it
      runs nearly the whole leaf and it is twice as wide as we drew it.
@@ -531,47 +555,60 @@ export const HANDLES = [
      stale position out of a shared link). One flag, three readers, because a
      rule enforced only in the interface is a rule a link walks past. */
   /* `photo: null` — a channel is a VOID pressed into the leaf, so there is no
-     product shot of it to have. d084 is the measurement. */
+     product shot of it to have. d084 is the measurement.
+     ⚠ NO `finishes`: the channel is painted with the door (`channelHandle`
+     darkens the paint), so a metal finish would change no pixel and charging
+     for it would be money for nothing — §5's own shape. */
   { id: 'channel', he: 'ידית שקועה', en: 'Recessed channel', ru: 'Врезная ручка',
     len: 1780, w: 85, inset: 0.30, style: 'channel', pull: true, fixed: true,
     doors: ['d084'], photo: null },
-
-  /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
-     the tubes: a wide rectangular ribbon standing off the leaf, catching the
-     key across one broad face instead of wrapping it round a cylinder. The
-     section is the most visible thing about a pull bar at door scale, and the
-     corpus has three of them — round, square and this — where we modelled five
-     bars differing mainly in their fixings. */
-  /* ⚠ `blade` IS WITHDRAWN — the second of the two Peretz named. Three doors
-     carried it (d034 d073 d104) and its section really is unmistakable beside
-     the tubes, so this is a product leaving the range rather than a drawing
-     being wrong. The id resolves to `shahar`, the widest flat bar left. */
-
-  /* ⚠ BLACK, AND THAT IS A PROPERTY OF THE PRODUCT — the same argument that
-     kept Shiran's brass on Shiran's own row after the finish group was
-     withdrawn. Peretz does not sell this bar in a choice of finishes; he sells
-     a black bar.
-     Measured off the door in `research/newdoor/`: the median of every dark
-     pixel across its four photographs is #2A2627 to #36322E, warmth (r−b) of
-     2 to 8 — neutral. Our brass runs r−b above 40, which is why the same
-     photographs read as antique bronze until somebody sampled them, and why
-     the correction came from outside: "there is no bronze in the picture".
-     800 x 20 on that door — a slim tube, shorter than anything else in the
-     range, which is what leaves the leaf's ornament room to be seen.
-     `finish: 'black'` reaches the lock furniture too, through
-     `gripFinish`: on this door the keyway escutcheon is the same black. */
-  { id: 'barblack', he: 'מוט שחור', en: 'Black tube bar', ru: 'Чёрная трубчатая скоба', len: 800, w: 20,
-    style: 'bar', bar: 'ron', pull: true, finish: 'black',
-    /* ⚠ `photo: null`, DELIBERATELY. There ARE black bars in `rb/` —
-       `shahar-black-*` and `rotem-black-*` — and citing one of them here would
-       assert that this product is that product, which is precisely the
-       question the audit of 18.9 left open: RB's own רון is already a dark
-       square bar with steel caps, so our black tube may be a second name for
-       a bar we already carry, or a bar of theirs we have not identified. The
-       door in `research/newdoor/` is what it was measured from and is cited;
-       the product shot is not, because nobody knows yet which one it is. */
-    doors: ['newdoor'], photo: null },
 ];
+
+/**
+ * ── THE PULL HANDLE'S FINISH — a choice, 20.9.2026 ─────────────────────
+ *
+ * Peretz: *"there needs to be an option to make them gold or black, black is
+ * +100, gold +200, its like pirzul but for the pull handle."*
+ *
+ * ⚠ THIS IS THE AXIS THAT WAS WITHDRAWN ON 27.8 COMING BACK ON HIS OWN WORD.
+ * That one was priced ₪220 for *"a decision the owner said his customers do
+ * not make"*; this one he asked for by name, with his own two figures. It comes
+ * back under NEW ids and a NEW parameter — `hf=`, never `f=`, which is retired
+ * for ever (CLAUDE.md §1) — so a link in somebody's history still carrying
+ * `f=black` goes on being ignored rather than read as this.
+ *
+ * `tone` names an entry in the renderer's `FINISH_TONES`, exactly as `PIRZUL`
+ * does. Whose metal it paints: the pull bar (`gripHard`/`gripSoft` and the
+ * bar sections in `BAR_RAMP`) and, since the same day, the פעמון — Peretz put
+ * the bell with the pull handles and priced its finish by the same two
+ * figures. NOT the lock furniture, the keyway or the strips, which stay with
+ * the פרזול; NOT the extra lock, which is constant.
+ *
+ * ⚠ CHARGED PER OBJECT: the bar's row carries it and the bell's row carries
+ * it, and a fitting with no `finishes` flag (the recessed channel, painted
+ * with the door) carries nothing.
+ */
+export const HANDLE_FINISHES = [
+  { id: 'hf-nickel', he: 'ניקל', en: 'Nickel', ru: 'Никель', tone: 'steel' },
+  { id: 'hf-black',  he: 'שחור', en: 'Black',  ru: 'Чёрный', tone: 'black' },
+  { id: 'hf-gold',   he: 'זהב',  en: 'Gold',   ru: 'Золото', tone: 'brass' },
+];
+
+/**
+ * ⚠ A WITHDRAWN BAR WHOSE WHOLE IDENTITY WAS A FINISH IS A MIGRATION, NOT AN
+ * ALIAS. `aliases` maps id → id inside one list; `ella` was the round tube in
+ * BRASS and `barblack` the round tube in BLACK, and the finish is a different
+ * field now. So `idan.aliases` carries both names (every reader of `byId`
+ * lands on the right bar), and `fromQuery` additionally sets the finish off
+ * this table when the raw `n=` is one of them — silently, because withdrawing
+ * a product is OUR change and not that customer's mistake. Same shape as
+ * `STRIPE_LEGACY`, for the same reason.
+ * `ron` and `shahar` are plain aliases: nothing about them was a finish.
+ */
+export const HANDLE_LEGACY = {
+  ella:     { handleFinish: 'hf-gold' },
+  barblack: { handleFinish: 'hf-black' },
+};
 
 /**
  * Lock furniture: lever or knob, and the keyway.
@@ -814,13 +851,79 @@ export const PIRZUL = [
   { id: 'pz-gold',   he: 'זהב',    en: 'Gold', ru: 'Золото',   tone: 'brass' },
 ];
 
-export const MASHKOFS = [
-  { id: 'mk-std',  he: 'סטנדרטי',   en: 'Standard', ru: 'Стандартная',    out: 46, in:  62, head: 148 },
-  { id: 'mk-out',  he: 'חזית רחבה', en: 'Wide face', ru: 'Широкий фасад',   out: 82, in:  62, head: 148, wideOut: true },
-  { id: 'mk-in',   he: 'עומק מוגדל', en: 'Deep return', ru: 'Увеличенная глубина', out: 46, in: 112, head: 198, wideIn: true },
-  { id: 'mk-both', he: 'רחב ועמוק', en: 'Wide and deep', ru: 'Широкая и глубокая', out: 82, in: 112, head: 198,
-    wideOut: true, wideIn: true },
+/**
+ * ⚠ THE FRAME IS THREE PARTS, 20.9.2026, AND THE CUSTOMER TICKS EACH ONE.
+ * Peretz, drawing the section: *"there are 3 parts to the mashkof, the outer
+ * kant, the falc, and the inner kant … in each row there is an option of 0
+ * (the normal size) and +250 … the door illustration only shows the change of
+ * the outer kant and the falc."* His son mapped them onto the two dimensions
+ * the drawing already had: the OUTER KANT is the face on the wall (`out`, 46
+ * → 82), the FALC is the rebate the leaf closes into (`in`, 62 → 112, and the
+ * head with it), and the INNER KANT is the wing on the room side — new, and
+ * NEVER DRAWN on the door, because from the street it is behind the wall. The
+ * section diagram is the only place it shows. Any combination, +250 apiece.
+ *
+ * `MASHKOF_PARTS` is the one table: what each part measures standard and
+ * widened. `MASHKOFS` is every combination, generated from it, because the
+ * URL and the short code carry ONE id per door and `byId` resolves it like any
+ * other list.
+ *
+ * ⚠ THE FOUR OLD IDS KEEP THEIR MEANING AND THEIR INDEX. `mk-std`, `mk-out`,
+ * `mk-in` (the return, which is the falc) and `mk-both` are the first four
+ * entries exactly as they were, so a link written under the four-tile frame
+ * opens the same frame with no migration and no notice. The four with the
+ * inner kant are appended. `BITS.mashkof` still widens 2 → 3, which is a
+ * layout change — see `VERSION` 23.
+ *
+ * ⚠ THE NAMES ARE GENERATED FROM THE PARTS, in three languages, so the ORDER
+ * says which pieces are widened in the words Peretz uses for them — *"משקוף:
+ * מורחב: קאנט חיצוני, פאלץ"* — rather than a label somebody would have to
+ * keep in step with eight combinations by hand.
+ *
+ * ⚠ THE MILLIMETRES ARE OURS, NOT HIS, WHICH NEEDS SAYING CAREFULLY. Peretz's
+ * 3 cm and 16 cm describe the frame SECTION a joiner orders. The numbers here
+ * are what the drawing shows SQUARE-ON, and they are not the same quantity:
+ * most of a 16 cm return is inside the wall and invisible from the street.
+ * The standard is exactly the three constants this renderer has always used —
+ * CASING 46, RETURN 62, RET_HEAD 148, every one measured off the works
+ * photographs — so the standard door is drawn byte-identically to how it was
+ * before this category existed. The wider options SCALE the measured standard
+ * by roughly 1.8. The inner kant's two figures are the outer kant's, because
+ * it is the same wing on the other face of the wall and nothing drawn depends
+ * on them. `head` is the soffit and moves with the falc, because they are one
+ * piece of frame.
+ */
+export const MASHKOF_PARTS = [
+  { key: 'out',   he: 'קאנט חיצוני', en: 'Outer kant', ru: 'Наружный кант',
+    std: 46, wide: 82, drawn: true },
+  { key: 'in',    he: 'פאלץ',        en: 'Falc',       ru: 'Фальц',
+    std: 62, wide: 112, head: { std: 148, wide: 198 }, drawn: true },
+  { key: 'inner', he: 'קאנט פנימי',  en: 'Inner kant', ru: 'Внутренний кант',
+    std: 46, wide: 82, drawn: false },
 ];
+
+/* The eight combinations. The first four are the four ids that existed before
+   the inner kant, in their old order and with their old meaning. */
+const MK_IDS = { '': 'mk-std', out: 'mk-out', in: 'mk-in', 'out,in': 'mk-both',
+                 inner: 'mk-inner', 'out,inner': 'mk-out-inner',
+                 'in,inner': 'mk-in-inner', 'out,in,inner': 'mk-all' };
+const MK_LABEL = { he: ['סטנדרטי', 'מורחב: '], en: ['Standard', 'Wide: '],
+                   ru: ['Стандартная', 'Расширено: '] };
+export const MASHKOFS = Object.entries(MK_IDS).map(([keys, id]) => {
+  const wide = keys ? keys.split(',') : [];
+  const part = k => MASHKOF_PARTS.find(p => p.key === k);
+  const dim = k => (wide.includes(k) ? part(k).wide : part(k).std);
+  const o = { id, wide,
+    out: dim('out'), in: dim('in'), inner: dim('inner'),
+    head: wide.includes('in') ? part('in').head.wide : part('in').head.std,
+    wideOut: wide.includes('out'), wideIn: wide.includes('in'),
+    wideInner: wide.includes('inner') };
+  for (const lang of ['he', 'en', 'ru']) {
+    o[lang] = wide.length ? MK_LABEL[lang][1] + wide.map(k => part(k)[lang]).join(', ')
+                          : MK_LABEL[lang][0];
+  }
+  return o;
+});
 
 /**
  * ⚠ THE WIDEST FRAME IN THE RANGE, AND THE CROP IS ANCHORED ON IT.
@@ -905,6 +1008,14 @@ export const BELLS = [
 export const PEEPHOLES = [
   { id: 'nopeep', he: 'ללא',   en: 'None', ru: 'Нет' },
   { id: 'peep',   he: 'עינית', en: 'Peephole', ru: 'Глазок' },
+  /* ⚠ A DIGITAL VIEWER, +390, 20.9.2026 — Peretz: *"einit digital +390."*
+     APPENDED, so `peep` keeps its index; `BITS.peephole` still had to go 1 → 2,
+     which is a layout change and is inside `VERSION` 23 with the rest.
+     No photograph yet — `peepholeDigital` in the renderer says what is sourced
+     and what is convention — and `ASK-PERETZ.md` asks for one. It stands where
+     the optical viewer stands and is refused by the same `peepholeFits`. */
+  { id: 'peep-digital', he: 'עינית דיגיטלית', en: 'Digital peephole', ru: 'Цифровой глазок',
+    digital: true, photo: null },
 ];
 
 /* ── WITHDRAWN: the glass as its own choice ──────────────────────────
@@ -1252,7 +1363,9 @@ export const DETAILS = [
      followed it out on 14.9.2026, and this is where every withdrawn reeded
      panel lands. */
   { id: 'panel2', sub: 'panel', he: 'שני פאנלים',     en: 'Two panels', ru: 'Две панели',
-    aliases: ['panelTop', 'panel', 'both', 'groove', 'perimeter'],
+    /* `panel2o` and `panelo` — the ogee pair and the ogee single — resolve
+       here since 20.9.2026: Peretz, *"remove entirely the classic panels."* */
+    aliases: ['panelTop', 'panel', 'both', 'groove', 'perimeter', 'panel2o', 'panelo'],
     panel: true,  groove: false,
     panels: 2, top: true },
   /* ⚠ THE UPPER RECTANGLE ALONE. Asked for from outside: *"add an option of
@@ -1287,7 +1400,7 @@ export const DETAILS = [
      what a customer counts; the plate is the third. See PANEL_ROWS in
      renderer.js for the rows and the ±0.03 on them. */
   { id: 'panel3', sub: 'panel', he: 'שלושה פאנלים',   en: 'Three panels', ru: 'Три панели',   panel: true,  groove: false,
-    panels: 3, top: true },
+    panels: 3, top: true, aliases: ['panel3o'] },
 
   /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
      ⚠ THERE ARE TWO MOULDINGS IN THIS RANGE AND WE DREW ONE. Asked for from
@@ -1324,15 +1437,19 @@ export const DETAILS = [
      it was measured on, are named on the pair now — they are solid leaves with
      one ogee panel and the gallery draws them with two, which is the cost
      ASK-PERETZ §2 asks about. */
-  { id: 'panel2o', sub: 'panel', he: 'שני פאנלים קלאסיים', en: 'Two panels, ogee', ru: 'Две панели, классика',
-    aliases: ['panelo'],
-    panel: true, groove: false, panels: 2, top: true, profile: 'ogee',
-    doors: ['d051', 'd061', 'd067', 'd077'] },
-  /* ⚠ THE OGEE TRIO IS AT THE FOOT OF THIS ARRAY, not here beside its twin —
-     see the entry after `classic`. The short code packs this array's INDEX, so
-     a new face goes on the END and the SCREEN order is `sub` plus
-     `buildOptions`, which files it next to `panel3` where a customer expects
-     it. Two different orders, and only one of them is a wire format. */
+  /* ⚠ `panel2o` AND `panel3o` — THE OGEE PAIR AND TRIO — ARE WITHDRAWN,
+     20.9.2026, on Peretz's word: *"remove entirely the classic panels, and in
+     the greek set the thing around the window needs to be like the normal
+     panel."* Both ids alias onto the reeded twin above, so a link or a code
+     written while they existed opens a door at the pair's or the trio's own
+     price. The doors they were measured on — d051 d061 d067 d077 for the pair,
+     and the eleven ogee doors named in the note above — are still his doors;
+     the gallery draws them with the reed now, which is the cost of an
+     instruction that overrules a measurement, and it is recorded rather than
+     hidden. The ogee SECTION itself stays measured in `MOULDS` in the
+     renderer, with nothing left that draws it.
+     ⚠ MID-LIST REMOVAL RE-INDEXES `detail`, which is part of why this landed
+     under `VERSION` 23 with the rest of the round. */
 
   /* ── APPLIED STRIPS ───────────────────────────────────────────────
      The designed tier's signature, and we had it backwards at first. Of the
@@ -1501,12 +1618,19 @@ export const DETAILS = [
      MOULDING SECTION and keeps its own name — the two words are unrelated. */
   { id: 'classic', sub: 'panel', he: 'סט יווני',      en: 'Greek set', ru: 'Греческий комплект',  panel: true,  groove: false,
     classic: true, rectOnly: true, doors: ['newdoor'],
-    /* The set's own mouldings are drawn by `classicSet` and are the ogee by
-       construction — that section was measured on this very door. This field
-       says so for the ARCHITRAVE round its light, which `render` cases through
-       `aperture` like any other opening and which would otherwise have come
-       out reeded on the one door that certainly is not. */
-    profile: 'ogee',
+    /* ⚠ `reed`, ON PERETZ'S WORD, AGAINST THE PHOTOGRAPH — 20.9.2026: *"in the
+       greek set the thing around the window needs to be like the normal
+       panel."* This field is what `render` cases the ARCHITRAVE round its
+       light in, through `aperture` like any other opening. It said `ogee`,
+       and the ogee is what `research/newdoor/` shows: that section was
+       measured on this very door (a cross-section through its panel surround
+       at 4000 px on 14.9 read one broad soft curve with a bead at its inner
+       edge, the ogee row of `MOULDS` to the letter). B4 on 14.9 made the set's
+       PANEL reed on the same instruction; this is the other half of it.
+       Measured, overruled, kept — REALISM.md §6. The set's own pieces
+       (cornice, frieze, shelf, plinth) are drawn by `classicSet` and are
+       untouched. */
+    profile: 'reed',
     /* ⚠ THE ROWS ARE SCALED BY 3698/3730 with CLASSIC_ROWS — the crop the set
        was measured from was 0.86% short, see the note there. The COLUMNS are
        left alone: an edge-find on the rectified leaf puts the pane at 0.291 to
@@ -1515,22 +1639,9 @@ export const DETAILS = [
        put them on the glass twice. */
     winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 } },
 
-  /* ⚠ THE TRIO IN THE OTHER MOULDING SECTION, ADDED 14.9.2026. Asked for by
-     Peretz: *"add an option of 3 panels but classic ones"* — the twin of
-     `panel3`, and the last hole in the grid the two-mouldings block above
-     opened. Every other panelled face came in both sections; three panels came
-     in one, so a customer who had chosen the ogee for its own sake lost it the
-     moment they asked for the middle plate.
-     Same rows, same inset and the SAME PRICE as `panel3` — `profile` is the
-     only field between them, which is what that block says the two sections
-     are. `js/prices.js` carries the figure, once, beside its twin's.
-     ⚠ IT DOES NOT BRING A HANDLE, and neither does `panel3` any more: see the
-     note on `grab` there. Nothing in this list carries its own pull now.
-     ⚠ APPENDED, so no index before it moves. The ogee half of the list is not
-     contiguous in this array and does not need to be; `sub` and `profile` are
-     what the screen and the drawing read. */
-  { id: 'panel3o', sub: 'panel', he: 'שלושה פאנלים קלאסיים', en: 'Three panels, ogee', ru: 'Три панели, классика',
-    panel: true, groove: false, panels: 3, top: true, profile: 'ogee' },
+  /* `panel3o`, the ogee trio Peretz asked for on 14.9 (*"add an option of 3
+     panels but classic ones"*), stood here from that day until 20.9.2026,
+     when he withdrew the classic panels outright. It aliases onto `panel3`. */
 ];
 
 /**
@@ -1601,25 +1712,6 @@ export const declaredFinish = o => !o || !o.finish ? null
 export const colourCode = c => `${T('brand.ravbariach')} ${c.ral}`;
 
 /**
- * The single tone THE DRAWING paints metal in.
- *
- * ⚠ This used to be documented as "the finish this door is built in", and that
- * sentence was the defect. A door is not built in a finish. Each fitting
- * bolted to it is made in one, and they need not agree — two of Peretz's own
- * photographs settle it in opposite directions. On d072 the pull bar is a gold
- * rod (R−B +75 at its recorded axis) beside a near-black escutcheon (R−B +6).
- * On d128 a cold chrome tube (R−B −3) stands beside a bronze escutcheon
- * (R−B +24). A brass grip does not imply brass lock furniture, and a steel
- * grip does not imply steel lock furniture.
- *
- * So this is no longer allowed to describe the ORDER — `share.js` and
- * `describe()` ask `declaredFinish` per fitting now. It survives only as what
- * it actually is: the renderer builds ONE set of metal gradients per door, and
- * this picks which. That is a real limitation of the drawing and it is
- * recorded in `REDESIGN.md` rather than papered over — a brass Ella still
- * paints the Coral lever beside it gold.
- */
-/**
  * HOW LONG THE PULL BAR IS, on this door — the ONE definition, read by the
  * drawing, the rules, the price, the order and the stepper.
  *
@@ -1657,7 +1749,14 @@ export const colourCode = c => `${T('brand.ravbariach')} ${c.ral}`;
  * for. The 0 costs one bit in the short code and buys back every measured
  * drawing unchanged.
  */
-export const HANDLE_LENS = [0, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000];
+/* ⚠ TEN CENTIMETRES UP TO THE METRE, TWENTY PAST IT, 20.9.2026. Peretz stated
+   the two bands as *"from 70-100 cm"* and *"from 120-200 cm"*, and the list is
+   the steps he stated them in. The 20 cm PRICE step is gone — a bar is one of
+   two figures now, split at `HANDLE_BAND` — so the list no longer has to match
+   a rate; it matches how he says the lengths. 600 left with the rate: nothing
+   he sells starts under 70. A link still carrying `hl=600` is refused with a
+   notice rather than clamped in silence. */
+export const HANDLE_LENS = [0, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000];
 
 export function handleLength(state) {
   const h = byId(HANDLES, state.handle);
@@ -1685,13 +1784,42 @@ export const handleLensFor = state => {
   return fits.length ? fits : [HANDLE_LENS[1]];
 };
 
+/**
+ * The single tone THE DRAWING paints the PULL HANDLE's metal in — and since
+ * 20.9.2026 it is the customer's choice on the `handleFinish` axis.
+ *
+ * ⚠ This used to be documented as "the finish this door is built in", and that
+ * sentence was the defect. A door is not built in a finish. Each fitting
+ * bolted to it is made in one, and they need not agree — two of Peretz's own
+ * photographs settle it in opposite directions. On d072 the pull bar is a gold
+ * rod (R−B +75 at its recorded axis) beside a near-black escutcheon (R−B +6).
+ * On d128 a cold chrome tube (R−B −3) stands beside a bronze escutcheon
+ * (R−B +24). A brass grip does not imply brass lock furniture, and a steel
+ * grip does not imply steel lock furniture.
+ *
+ * So this answers for the BAR, the bow and the פעמון only. The lock furniture
+ * is the פרזול's (`hwTone` in the renderer), the extra lock is a constant, and
+ * the order names the handle's finish on the handle's own line through
+ * `js/spec.js` — never on the lockset's. (⚠ This docstring stood for a month
+ * with no function under it, describing a `gripFinish` that had moved two
+ * hundred lines down and an order that "asks `declaredFinish` per fitting",
+ * which nothing had done since the finish became a field. §5.19.)
+ */
 export function gripFinish(state) {
-  /* Stated once, through `declaredFinish`, so the two cannot drift: the paint
-     is whatever the grip declares, and brushed nickel only where it declares
-     nothing. Spelled out a second time as `byId(FINISHES, …finish || 'steel')`
-     this was two copies of one rule in adjacent functions — §5. */
-  return declaredFinish(byId(HANDLES, state.handle)) || byId(FINISHES, 'steel');
+  /* ⚠ THE STATE'S OWN CHOICE SINCE 20.9.2026, not the product's declaration.
+     No surviving pull handle declares a finish — the two that did, אלה and
+     מוט שחור, became the round bar in gold and in black through
+     `HANDLE_LEGACY` — so the paint is whatever the customer picked on the
+     `handleFinish` axis, nickel until they pick. Returned as a `FINISHES`
+     entry so every reader that asks for `.id` (`FINISH_TONES[finish.id]` in
+     the renderer, the tests) keeps working unchanged. */
+  const hf = byId(HANDLE_FINISHES, state.handleFinish || HANDLE_FINISHES[0].id);
+  return byId(FINISHES, hf.tone);
 }
+
+/** Does this pull handle take the finish at all? The recessed channel is
+ *  painted with the door and does not. Read by the price and the order. */
+export const gripTakesFinish = state => !!byId(HANDLES, state.handle).finishes;
 
 /* Aliases count: a superseded id must resolve to its replacement rather than
    silently falling through to the first entry, which is how a stale link
@@ -2063,7 +2191,10 @@ export const STRIPE_LEGACY = {
  *  none — a stripe costs the same whether it is the first or the eleventh. */
 export const stripePrice = st =>
   st.stripeDir === 'none' ? 0 : (STRIPE_A[st.stripeDir] || 0) * (st.stripeCount | 0);
-export const HANDLE_RATE_A = { ...HANDLE_RATE, per: agorot(HANDLE_RATE.per) };
+/* The metre that splits a bar's two prices, re-exported from `js/prices.js`
+   so `js/price.js` can read it beside `handleLength` without importing the
+   price list twice. Millimetres, not money, so it needs no `agorot`. */
+export { HANDLE_BAND };
 
 /* ⚠ WHICH GRIPS ARE PRICED BY LENGTH. Tagged from `style` rather than listed
    by id, so a bar added tomorrow is priced correctly without anybody
@@ -2071,11 +2202,48 @@ export const HANDLE_RATE_A = { ...HANDLE_RATE, per: agorot(HANDLE_RATE.per) };
    hold its own stale copy of the strip counts. */
 for (const h of HANDLES) h.priceKind = h.style === 'bar' ? 'bar' : 'flat';
 
+/* ⚠ A BAR HAS TWO PRICES AND A FLAT GRIP HAS ONE, and this refuses either
+   shape in the other's place. `priceInto` cannot do it — it converts one
+   number per id — so the handles get their own pass with the same two
+   guarantees: every id priced, nothing priced that is not sold. */
+function priceHandles(list, table) {
+  const seen = new Set();
+  for (const o of list) {
+    if (!Object.prototype.hasOwnProperty.call(table, o.id)) {
+      throw new Error(`prices.js has no handle price for "${o.id}" — every option `
+                    + 'needs one, or it silently costs nothing');
+    }
+    const v = table[o.id];
+    if (o.priceKind === 'bar') {
+      if (!v || typeof v !== 'object' || typeof v.short !== 'number' || typeof v.long !== 'number') {
+        throw new Error(`prices.js must price the bar "${o.id}" as { short, long } — `
+                      + 'it is sold in two length bands');
+      }
+      o.delta = agorot(v.short);
+      o.deltaLong = agorot(v.long);
+    } else {
+      if (typeof v !== 'number') {
+        throw new Error(`prices.js prices the flat grip "${o.id}" as an object — `
+                      + 'it has no length bands');
+      }
+      o.delta = agorot(v);
+    }
+    seen.add(o.id);
+  }
+  for (const id of Object.keys(table)) {
+    if (!seen.has(id)) {
+      throw new Error(`prices.js prices a handle called "${id}" that is not in the `
+                    + 'catalogue — a renamed id, or a price nobody will ever be charged');
+    }
+  }
+}
+
 priceInto('colour',  COLOURS,              COLOUR_PRICE,  'delta');
 priceInto('window',  WINDOWS,              WINDOW_PRICE,  'delta');
 priceInto('grille',  GRILLES,              GRILLE_PRICE,  'delta');
 priceInto('detail',  DETAILS,              DETAIL_PRICE,  'delta');
-priceInto('handle',  HANDLES,              HANDLE_PRICE,  'delta');
+priceHandles(HANDLES, HANDLE_PRICE);
+priceInto('handle finish', HANDLE_FINISHES,  HANDLE_FINISH_PRICE, 'delta');
 priceInto('lockset', LOCKSETS,             LOCKSET_PRICE, 'delta');
 priceInto('special lock', SPECIAL_LOCKS,    SPECIAL_LOCK_PRICE, 'delta');
 priceInto('pirzul',  PIRZUL,               PIRZUL_PRICE,  'delta');

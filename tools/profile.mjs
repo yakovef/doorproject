@@ -222,13 +222,14 @@ for (const [band, colour] of [['dark', 'rb-0097d'], ['light', 'rb-9016d']]) {
 console.log('\nthe moulding\'s bead against the face beside it, upper panel vs lower');
 console.log('(a strip of moulding stands off the door by the same amount wherever');
 console.log(' it is stuck — if the two disagree, one of them is drawn as a bulge)\n');
-/* ⚠ BOTH SECTIONS. This is a rule about mouldings, not about one of them, and
-   the range has two measured cross-sections (`MOULDS`) since the panels were
-   split into a reeded family and an ogee one. It ran on `panel2` alone. */
+/* ⚠ ONE SECTION AGAIN SINCE 20.9.2026. This ran over both mouldings while the
+   range had two; the ogee panels were withdrawn on Peretz's word (*"remove
+   entirely the classic panels"*) and `panel2o` now aliases onto `panel2`, so
+   an ogee row here would measure the reed a second time and print a second
+   answer to one question. `MOULDS.ogee` is still measured and still in the
+   renderer; the day a face reads it again, the two rows come back. */
 for (const [band, colour, detail] of [['dark reed ', 'rb-0097d', 'panel2'],
-                                      ['light reed', 'rb-9016d', 'panel2'],
-                                      ['dark ogee ', 'rb-0097d', 'panel2o'],
-                                      ['light ogee', 'rb-9016d', 'panel2o']]) {
+                                      ['light reed', 'rb-9016d', 'panel2']]) {
   await draw({ ...base, colour, handle: 'none', detail });
   const spec = await p.evaluate(() => {
     const svg = document.querySelector('#stage svg');

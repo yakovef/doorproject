@@ -116,10 +116,16 @@ export const BUILD = {
 
 /* Widening the frame. Peretz gave a standard of at most 3 cm on the outside
    face and 16 cm of return on the inside, and "+250 every side that gets
-   wider" — where a "side" is one of those two DIMENSIONS, not one of the
-   jambs. So a mashkof is ₪500 standard, ₪750 with one widened, ₪1,000 with
-   both. The dimensions themselves live in `MASHKOFS` in `js/catalog.js`,
-   because they are millimetres the renderer draws rather than money. */
+   wider" — where a "side" is one of the frame's DIMENSIONS, not one of the
+   jambs.
+   ⚠ THREE PARTS SINCE 20.9.2026, NOT TWO. Peretz named the section's three
+   pieces — the outer kant (the wing on the wall face), the falc (the rebate
+   the leaf closes into) and the inner kant (the wing on the room side) — and
+   each one is +250 on its own, any combination: ₪500, ₪750, ₪1,000 or
+   ₪1,250. The parts and their millimetres live in `MASHKOF_PARTS` in
+   `js/catalog.js`, because they are what the renderer draws rather than
+   money; the inner kant is never drawn on the door at all (it is on the room
+   side), and the section diagram is where a customer sees it. */
 export const MASHKOF_WIDER = 250;
 
 /* ── the opening ─────────────────────────────────────────────────────
@@ -263,20 +269,14 @@ export const DETAIL = {
      buys this face and a pull bar now pays for both, which is what the two
      prices have always said separately. */
   panel3:    1900,   // שלושה פאנלים    — Peretz
-  /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and Peretz's list does
-     not settle it either way: he priced "two panels" once and named no
-     families at all, because a customer buys "two panels". They are the same
-     rectangles in a different section of stock — see the two `MOULDS` in the
-     renderer — and a broader, deeper moulding is more timber and more work.
-     ASK-PERETZ §14 asks whether both are even his, which is the question that
-     matters more than the price. `CLAUDE.md` §9, assumption A14. */
-  panel2o:   1450,   // שני פאנלים קלאסיים
-  /* ⚠ THE OGEE TRIO IS ₪1,900 BECAUSE THE REEDED TRIO IS, and the same
-     sentence that settles the pair settles this: he priced "3 panel" once and
-     named no moulding families at all, because a customer buys "three panels".
-     Added 14.9.2026 with the face. `CLAUDE.md` §9, assumption A14, which now
-     covers three pairs of faces instead of two. */
-  panel3o:   1900,   // שלושה פאנלים קלאסיים
+  /* ⚠ `panel2o` AND `panel3o` — THE OGEE PAIR AND TRIO — ARE WITHDRAWN,
+     20.9.2026, on Peretz's word: *"remove entirely the classic panels."*
+     Their keys go with them, because `catalog.js` refuses a price with no
+     option as hard as it refuses an option with no price. Both ids stay alive
+     as `aliases` onto the reeded pair and trio, so a link written while they
+     existed opens a door and is charged THIS row. Assumption A14 — whether the
+     two mouldings cost the same — closes with them: there is one panel family
+     now. */
   /* The Greek set: cornice, frieze, corbelled shelf, panel and plinth, all as
      one. Peretz's "greek set +2700". His "(remove the handle)" is withdrawn by
      his own later instruction — see `panel3` above — and the shelf is drawn
@@ -349,52 +349,65 @@ export const DETAIL_GLAZED = {
 };
 
 /* ── the pull handle ───────────────────────────────────────────────────
-   ⚠ TWO ARE WITHDRAWN: *"there is no: שירן, להב שטוח."* `shiran` is the one
-   ASK-PERETZ §2 has been asking about since 23.8 — it appears on NONE of the
-   128 photographs and was drawn from nothing — so this is that question
-   answered. Both ids stay alive as `aliases` in the catalogue.
+   ⚠ FOUR PRODUCTS AND TWO LENGTH BANDS, 20.9.2026, AND THE 20 cm STEPS ARE
+   GONE. Peretz, verbatim: *"1. cylinder (idan) 500, from 70-100 cm · 2.
+   cylinder but bigger 800, from 120-200 cm · 3. rectangle 600, from 70-100 cm
+   · 4. rectangle but bigger 900, from 120-200 cm · 5. shkua 1900 · 6.
+   horizontal 300 · remove ela."* Decided with his son the same day: it is the
+   WHOLE list, "bigger" is a length band of the same product rather than a
+   second product, the rectangle is ניצן, and anything over a metre is the
+   bigger band — 110 cm included.
 
-   ⚠ AND THESE FIGURES ARE PROVISIONAL, in a way the rest of this file is not.
-   Peretz prices a pull bar BY LENGTH — *"handle<100 - 500 · nickel>100cm -
-   every 20cm +150shekel · each handle can be in different length"* — and a
-   length is not a property this catalogue has yet. It arrives in TRANSFORM.md
-   phase 5, along with a rate table that replaces most of this block. Until
-   then every bar is priced at his under-100 cm figure, which is right for a
-   bar at its default length and wrong for a longer one. The two he DID price
-   flat are already correct below. */
-/* ⚠ A PULL BAR IS PRICED BY LENGTH, so these are not per-model prices any
-   more and this table is two shapes at once. Peretz: *"handle<100 - 500 ·
-   nickel>100cm - every 20cm +150shekel · each handle can be in different
-   length · the horizontal 300 · shkua 1700."*
+   So a bar carries TWO figures: what it costs up to a metre, and what it
+   costs past one. `HANDLE_BAND` below is the metre, and `handleLength` in the
+   catalogue — the ONE definition of how long the bar on this door is — decides
+   which side of it a door falls on. The per-20-cm rate that used to sit here
+   (`HANDLE_RATE`, ₪150 a step) is deleted with assumption A9, because he no
+   longer prices that way.
 
-   The two FLAT ones keep a number here, because they genuinely have one: a
-   recessed channel is cut when the leaf is made and a horizontal bow is one
-   product he buys. Every BAR reads `HANDLE_RATE` below instead — its entry
-   here is the ₪500 floor, which is what a bar at or under 100 cm costs, and
-   the rate adds to it.
+   ⚠ WITHDRAWN, ALL FOUR ON HIS WORD: אלה, שחר, רון and מוט שחור. Their ids
+   stay alive as `aliases` in the catalogue — and two of them are MIGRATIONS
+   rather than plain aliases, because what made them products was a finish:
+   a link carrying `n=ella` opens the round bar in GOLD and `n=barblack` opens
+   it in BLACK, through the finish axis below. See `HANDLE_LEGACY` in
+   `js/catalog.js`.
 
-   ⚠ `catalog.js` still requires every id to appear exactly once. That guard is
-   the reason it is safe to keep money in one file and vocabulary in another,
-   and it is not relaxed for this: a bar's floor price is still a price. */
+   ⚠ `catalog.js` still requires every id to appear exactly once; a bar's
+   entry is an object with both bands and a flat grip's is a number, and
+   `priceHandles` there refuses either shape in the other's place. */
 export const HANDLE = {
-  none:    0,        // ללא ידית משיכה
-  idan:    500,      // עידן          — the floor; see HANDLE_RATE
-  ella:    500,      // אלה
-  nitzan:  500,      // ניצן
-  shahar:  500,      // שחר
-  ron:     500,      // רון
-  barblack: 500,     // מוט שחור      — A12: he named no rate for a black one
-  grab:    300,      // מאחז אופקי    — Peretz, flat, no length choice
-  channel: 1700,     // ידית שקועה    — Peretz, flat, and it is CUT not bolted
+  none:    0,                              // ללא ידית משיכה
+  idan:    { short: 500, long: 800 },      // עידן — מוט עגול, עד מטר / מעל מטר
+  nitzan:  { short: 600, long: 900 },      // ניצן — מוט מלבני, עד מטר / מעל מטר
+  grab:    300,                            // מאחז אופקי   — Peretz, flat, no length choice
+  channel: 1900,                           // ידית שקועה   — Peretz, 20.9.2026 ("shkua 1900")
 };
 
-/* What length costs, on a bar. ₪150 for every 20 cm past the first metre.
-   ⚠ CEILING, NOT ROUNDING, and it is a choice rather than arithmetic: you
-   cannot buy 10 cm of extra bar, so 110 cm is one step over and not half of
-   one. `Math.floor` is equally defensible arithmetic and gives a different,
-   wrong, answer — which is why it is written down. If Peretz sells by exact
-   length this is one word. `CLAUDE.md` §9, assumption A9. */
-export const HANDLE_RATE = { over: 1000, step: 200, per: 150 };  // mm, mm, ₪
+/* The metre that splits a bar's two prices, in millimetres. A bar at or under
+   it takes `short`; anything past it takes `long`. Peretz stated the bands as
+   "70-100" and "120-200", and his son settled the gap: over 100 is the bigger
+   one. */
+export const HANDLE_BAND = 1000;
+
+/* ── the pull handle's finish ──────────────────────────────────────────
+   Peretz, 20.9.2026: *"there needs to be an option to make them gold or black,
+   black is +100, gold +200, its like pirzul but for the pull handle."*
+
+   ⚠ CHARGED PER OBJECT, NOT ONCE — his son's answer to the question. The
+   surcharge lands on the bar's own row AND on the bell's own row, because the
+   bell now follows this finish too (see `BELL`): a black bar and a black bell
+   is +100 and +100. It does not land on the recessed channel, which is cut
+   into the leaf and painted with the door — a finish charged on a fitting the
+   drawing paints in no metal would be money for no pixel.
+
+   ⚠ THIS IS THE FINISH AXIS THAT WAS WITHDRAWN ON 27.8 COMING BACK ON HIS OWN
+   WORD, and it comes back under NEW ids and a NEW parameter (`hf=`). `f=` is
+   retired for ever — see `js/url-state.js`. */
+export const HANDLE_FINISH = {
+  'hf-nickel': 0,    // ניקל  — the bar as it comes
+  'hf-black':  100,  // שחור
+  'hf-gold':   200,  // זהב
+};
 
 /* ── the lock and the lever ───────────────────────────────────────────
    ⚠ MOST OF THEM ARE INCLUDED. Peretz: *"main handles: there is no אלמוג · all
@@ -414,28 +427,26 @@ export const HANDLE_RATE = { over: 1000, step: 200, per: 150 };  // mm, mm, ₪
    order apart, ₪2,700 against ₪900. He listed them under different headings.
    `kodan` is in `SPECIAL_LOCK` below, and they may be bought together. */
 export const LOCKSET = {
-  coral:     0,      // קורל          — the one included as standard
+  /* ⚠ ₪100 SINCE 20.9.2026 — Peretz: *"coral +100."* It was the one lever
+     included as standard; the Rotem is the included one now, and the page
+     still opens on it, so the opening figure does not move. */
+  coral:     100,    // קורל          — Peretz, 20.9.2026
   cylinder:  0,      // צילינדר בלבד
-  plate:     0,      // רותם
-  /* ⚠ ₪350, AND IT IS THE ONE LEVER THAT IS NOT INCLUDED. Peretz, 30.8.2026:
-     *"the ספיר handle needs to be 350."* His earlier "all of them in the
-     price" covered the levers as a group; this is that group with one
-     exception named. It is not a square (+300) and not a circle (+200), so it
-     does not join either rate — it is its own figure. */
-  sapir:     350,    // ספיר          — Peretz, 30.8.2026
+  plate:     0,      // רותם          — included, and what the page opens on
+  /* ⚠ ₪390, AND SO IS THE ריבועי — Peretz, 20.9.2026: *"all the square
+     handles 390."* The Sapir was ₪350 on its own figure from 30.8; it is a
+     square knob on a square plate, and his sentence puts every square fitting
+     on one rate. כדור על אורך is a "circle" and is not in it. */
+  sapir:     390,    // ספיר          — a square
   cadoor:    200,    // כדור          — a circle
   knobplate: 200,    // כדור על אורך  — a circle, A5
-  square:    300,    // ריבועי        — squares
+  square:    390,    // ריבועי        — a square
   digital:   2700,   // מנעול חכם     — by far the largest single add-on
-  /* ⚠ ₪0 IS AN ASSUMPTION, NOT A QUOTATION — `CLAUDE.md` §9, A19, 14.9.2026.
-     Peretz asked for this handle by pointing at a drawing (*"the one thats
-     there right now with the curve, add it as a different handle"*) and named
-     neither a price nor a name for it. Priced as the Coral because his "main
-     handles: all of them in the price" covers the levers as a group and Sapir
-     is the one exception he has ever named. If it is a different product with
-     a different figure, this is the line and ASK-PERETZ carries the question.
-     Its id is a placeholder too — see the catalogue entry. */
-  'lever-taper': 0,  // ידית מתעקלת   — A19, priced as the Coral until he says
+  /* ⚠ ₪200 SINCE 20.9.2026, AND ASSUMPTION A19 CLOSES. Peretz: *"the weird
+     one +200"* — his son confirmed the weird one is this, the curved lever he
+     asked for on 14.9 by pointing at a drawing. Its id is still a placeholder
+     (see the catalogue entry) and its NAME is still his to give. */
+  'lever-taper': 200, // ידית מתעקלת  — Peretz, 20.9.2026
 };
 
 /* ── the extra lock ───────────────────────────────────────────────────
@@ -443,10 +454,12 @@ export const LOCKSET = {
    kodan +900."* Neither is a lever — they are locks fitted BESIDE the lock
    furniture, so they are their own choice and can be bought with any lockset,
    including the smart one. */
+/* ⚠ 690 AND 880 SINCE 20.9.2026 — Peretz's own correction of his 26.8
+   figures: *"kasefet - 690 · kodan 880."* */
 export const SPECIAL_LOCK = {
   nospecial: 0,      // ללא
-  kasefet:   700,    // כספת
-  kodan:     900,    // קודן
+  kasefet:   690,    // כספת          — Peretz, 20.9.2026
+  kodan:     880,    // קודן          — Peretz, 20.9.2026
 };
 
 /* ── the two fittings on the face ─────────────────────────────────────
@@ -460,14 +473,25 @@ export const SPECIAL_LOCK = {
    printed where a customer can see it rather than hidden in a ledger.
    `ASK-PERETZ.md` asks the question that IS open: is it included, and may a
    customer decline it? If the answer is a number, it is this line. */
+/* ⚠ THE BELL'S ROW CARRIES THE PULL-HANDLE FINISH'S SURCHARGE ON TOP OF
+   THIS, 20.9.2026 — Peretz: *"put the bell with the pull handles and the
+   pirzul for it changes its price by 100 or 200."* His son settled which
+   finish: the pull handle's (`HANDLE_FINISH` above), not the lock furniture's.
+   So a bell is ₪300 in nickel, ₪400 in black and ₪500 in gold, and the
+   drawing paints it in the same metal as the bar beside it. */
 export const BELL = {
   nobell: 0,         // ללא
-  bell:   300,       // פעמון — Peretz, 30.8.2026
+  bell:   300,       // פעמון — Peretz, 30.8.2026; + the handle finish
 };
 
+/* ⚠ A DIGITAL PEEPHOLE, +390, 20.9.2026 — Peretz: *"einit digital +390."* A
+   third option beside the included optical viewer, not a replacement for it.
+   It has no photograph yet; see `peepholeDigital` in the renderer for what is
+   sourced and what is convention. */
 export const PEEPHOLE = {
   nopeep: 0,         // ללא
   peep:   0,         // עינית — included; see the note above and A7
+  'peep-digital': 390, // עינית דיגיטלית — Peretz, 20.9.2026
 };
 
 /* ── פרזול — the finish of the lock furniture ─────────────────────────
@@ -479,11 +503,13 @@ export const PEEPHOLE = {
    *"pirzul doesnt affect the additional lock, but it does affect the
    stripes."* One sentence moved two things in opposite directions and only
    one of them was written down here. See PIRZUL in catalog.js. */
+/* ⚠ GOLD IS 870 SINCE 20.9.2026 — Peretz: *"the gold pirzul 870."* The other
+   two are his 26.8 figures, unchanged. */
 export const PIRZUL = {
   'pz-nickel': 0,    // ניקל   — the one included as standard
   'pz-black':  300,  // שחור
   'pz-bronze': 500,  // ברונזה
-  'pz-gold':   900,  // זהב
+  'pz-gold':   870,  // זהב    — Peretz, 20.9.2026
 };
 
 /* ── colour ───────────────────────────────────────────────────────────

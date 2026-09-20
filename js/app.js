@@ -29,14 +29,14 @@
 
 import {
   BELLS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
-  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, LOCKSETS, MASHKOFS,
+  GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
   PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
   from './price.js';
 import {
   describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
-  bellGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
+  bellGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
   specialLockGlyph,
   windowGlyph,
 } from './renderer.js';
@@ -155,6 +155,26 @@ const GROUPS = [
   { key: 'handle', title: 'g.handle', in: 'grip', kind: 'hw', list: () => HANDLES,
     glyph: handleGlyph, hint: 'g.handle.h' },
 
+  /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026, ON THE OWNER'S OWN WORD — *"its
+     like pirzul but for the pull handle"* — and it is the axis withdrawn on
+     27.8 coming back under a new id and a new parameter (`hf=`, never `f=`;
+     see `HANDLE_FINISHES`). It paints the bar and the bow, and since the same
+     day the פעמון, which is why the bell's group follows this one on the
+     same step rather than staying with the פרזול. Nickel, black +100, gold
+     +200, charged on each thing it recolours. */
+  { key: 'handleFinish', title: 'g.handleFinish', in: 'grip', kind: 'hw',
+    list: () => HANDLE_FINISHES, glyph: handleFinishGlyph, hint: 'g.handleFinish.h' },
+
+  /* ⚠ THE פעמון STANDS WITH THE PULL HANDLES SINCE 20.9.2026 — Peretz: *"put
+     the bell with the pull handles and the pirzul for it changes its price by
+     100 or 200."* It was on the פרזול step from 30.8 with the עינית, for the
+     reason written over that group; what moved it is that its metal and its
+     surcharge follow the HANDLE finish now, so the customer who has just
+     chosen a gold bar sees the ring go gold beside it. The עינית stays on
+     `pz`: the פרזול is what recolours it. */
+  { key: 'bell', title: 'g.bell', in: 'grip', kind: 'hw', list: () => BELLS,
+    glyph: bellGlyph, hint: 'g.bell.h' },
+
   { key: 'lockset', title: 'g.lockset', in: 'lock', kind: 'hw', list: () => LOCKSETS,
     glyph: locksetGlyph, hint: 'g.lockset.h' },
 
@@ -181,17 +201,13 @@ const GROUPS = [
   { key: 'pirzul', title: 'g.pirzul', in: 'pz', kind: 'hw', list: () => PIRZUL,
     glyph: pirzulGlyph, hint: 'g.pirzul.h' },
 
-  /* ⚠ THE פעמון AND THE עינית, 30.8.2026, AND THEY SIT ON THE פרזול STEP.
-     Peretz asked for both by name. Neither is a lock and neither is a grip, so
-     they do not belong on `lock` or `grip` — and neither is worth a tenth step
-     of its own, because a step with one yes/no question in it is a page turn
-     for a checkbox. `pz` is the step that already asks "and what else is on
-     the door", and it is where a customer who has just chosen the finish of
-     the ironmongery is looking.
-     ⚠ Their ORDER here decides the order on the screen, and the bell is first
-     because it is the one that costs money. */
-  { key: 'bell', title: 'g.bell', in: 'pz', kind: 'hw', list: () => BELLS,
-    glyph: bellGlyph, hint: 'g.bell.h' },
+  /* ⚠ THE עינית, 30.8.2026, ON THE פרזול STEP. Peretz asked for it by name.
+     It is neither a lock nor a grip, so it does not belong on `lock` or
+     `grip` — and it is not worth a tenth step of its own, because a step with
+     one yes/no question in it is a page turn for a checkbox. `pz` is the step
+     that already asks "and what else is on the door", and the פרזול is what
+     recolours it. (The פעמון stood beside it here until 20.9.2026; it follows
+     the pull handle's finish now and stands on `grip` — see above.) */
   { key: 'peephole', title: 'g.peephole', in: 'pz', kind: 'hw', list: () => PEEPHOLES,
     glyph: peepholeGlyph, hint: 'g.peephole.h' },
 

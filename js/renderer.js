@@ -16,8 +16,8 @@
  *   4. One declared light governs every surface (see LIGHT below).
  */
 
-import { byId, COLOURS, declaredFinish, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
-         handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, PIRZUL,
+import { byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
+         handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOFS, PEEPHOLES, PIRZUL,
          REBATE, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
 import { T } from './copy.js';
 import { describeSentence } from './spec.js';
@@ -249,6 +249,18 @@ const BAR_RAMP = {
                       ['0.945', '#C9C7C1'], ['1', '#9B9992']] },
 };
 
+/**
+ * Which ramp the ROUND TUBE takes in a given finish. Steel and black remap the
+ * measured steel tube through `inFinish`; brass takes `barGold`, which is a
+ * MEASUREMENT of a brass tube off the manufacturer's photograph and must not
+ * be a remap (its `raw` flag says so). Since 20.9.2026 the gold tube is no
+ * longer a product of its own (אלה) but the standard tube in the gold
+ * finish, so the choice is made here, once, for the door's defs and for the
+ * finish tile alike — the id stays `barTube`, "the tube in this door's
+ * finish", and `usedDefs` never sees a second name.
+ */
+const tubeRamp = tone => (tone === FINISH_TONES.brass ? 'barGold' : 'barTube');
+
 /** One section, painted in one finish, as a `<linearGradient>`. */
 function barRamp(name, tone, id = name) {
   const r = BAR_RAMP[name] || BAR_RAMP.barTube;
@@ -356,21 +368,32 @@ export function cylinderRamp(tone) {
 }
 
 /**
- * The פעמון's metal, and it only ever has two.
+ * The פעמון's metal — the PULL HANDLE's finish, since 20.9.2026.
  *
- * Owner, 30.8.2026: *"the color of the bell can only be nickel and gold."* So
- * a black or a bronze פרזול both draw a NICKEL ring — the two finishes he
- * stocks this fitting in are the two the drawing offers, and a customer who
- * picks bronze does not get a bronze knocker in the picture and a nickel one
- * on the door.
+ * Peretz: *"put the bell with the pull handles and the pirzul for it changes
+ * its price by 100 or 200."* His son settled which finish the sentence means:
+ * the pull handle's, the new `handleFinish` axis — nickel, black or gold —
+ * priced per object on the bell's own row. So the ring is painted from the
+ * same tone the bar beside it is, whatever the פרזול on the lock furniture
+ * says, and it has THREE metals.
  *
- * ⚠ AND THE STARTING POINT WAS NOT WHAT IT LOOKED LIKE. The brief for this
- * change said the ring took all four finishes through `url(#nickel)`; it did
- * not. It was filled from `url(#lockUnit)` — the bought-in unit's CONSTANT
- * steel, the ramp the kodan and the kasefet use — so it took no finish at all
- * and every door in the range drew a steel ring. Only the gold case moves.
+ * ⚠ THIS OVERRULES THE 31.8 INSTRUCTION, WHICH IS KEPT HERE RATHER THAN
+ * DELETED. Owner, 31.8.2026: *"the color of the bell can only be nickel and
+ * gold"* — and until today this function held the פרזול's tone to those two,
+ * so a black or bronze פרזול drew a nickel ring. That was right on the day and
+ * it is superseded by the later sentence: a black bell exists now because the
+ * finish it follows has a black in it. If he ever says the bell does not come
+ * in black, this is one line and `HANDLE_FINISHES` is untouched.
+ *
+ * ⚠ AND THE STARTING POINT, BEFORE EITHER, WAS NOT WHAT IT LOOKED LIKE. The
+ * 31.8 brief said the ring took all four פרזול finishes through
+ * `url(#nickel)`; it did not. It was filled from `url(#lockUnit)` — the
+ * bought-in unit's CONSTANT steel — so it took no finish at all. That is how a
+ * fitting borrowing another owner's gradient looks from outside, and why
+ * `#bellMetal` has its own id: whose metal it is has now changed twice, and
+ * both times the change was one function.
  */
-export const bellRamp = tone => (tone === FINISH_TONES.brass ? FINISH_TONES.brass : FINISH_TONES.steel);
+export const bellRamp = tone => tone;
 
 /* ── The light. Everything shades from this. ────────────────────────
    Key is high and ~30° left of camera. The camera is square on to the door,
@@ -703,6 +726,18 @@ const KNOCKER_AFF  = 1470;
    inside a 22-35 mm trim ring, so 30 mm is the ring and the reading lands mid
    range. This is the radius, and `peephole()` is what draws it. */
 const PEEPHOLE_R   = 15;    // 30 mm across, measured on d028
+/* ⚠ THE DIGITAL VIEWER'S BEZEL IS SOURCED, NOT MEASURED — 20.9.2026. Peretz
+   priced one (*"einit digital +390"*) and sent no photograph; none of the 129
+   in the corpus carries one. What is outside the door on a digital viewer is
+   the camera's bezel, and published outer bezels run 50-65 mm across (a
+   camera lens needs more plate than a 30 mm optical viewer does), so 54 is
+   the middle of that range. Half of it here, because every reader wants a
+   radius. REALISM.md §6 governs the day a picture arrives; `ASK-PERETZ.md`
+   asks for one. */
+const PEEPHOLE_DIGITAL_R = 27;
+/** The viewer's reach from its centre, whichever kind is on this door. */
+const peepholeR = state =>
+  (byId(PEEPHOLES, state.peephole).digital ? PEEPHOLE_DIGITAL_R : PEEPHOLE_R);
 /* ⚠ THE KNOCKER'S RADIUS LIVES UP HERE BECAUSE A RULE READS IT NOW. It was a
    bare `66` inside `bellKnocker`, which was correct for as long as nothing but
    the drawing needed to know how big the fitting is — and on 7.9.2026
@@ -1456,13 +1491,13 @@ export function render(state) {
   const finish  = gripFinish(state);
   const tone    = FINISH_TONES[finish.id] || FINISH_TONES.steel;
   const hwTone  = FINISH_TONES[byId(PIRZUL, state.pirzul).tone] || FINISH_TONES.steel;
-  /* The euro cylinder's own ramp and the פעמון's, both functions of the same
-     פרזול. Asked of `hwTone` — the ramp itself — rather than of the pirzul's
-     id, so a later black or a later gold shares one answer with the ones
-     already here. See `cylinderRamp` and `bellRamp` for what each does with
-     it, and which of the four are measured. */
+  /* The euro cylinder's own ramp, a function of the פרזול; the פעמון's, a
+     function of the PULL HANDLE's finish since 20.9.2026 (see `bellRamp`).
+     Asked of the ramps themselves rather than of the ids, so a later finish
+     shares one answer with the ones already here. See `cylinderRamp` for
+     which of the four cylinders are measured. */
   const cyl      = cylinderRamp(hwTone);
-  const bellTone = bellRamp(hwTone);
+  const bellTone = bellRamp(tone);
 
   /* ⚠ THE STRIPES FOLLOW THE FINISH, AND WHICH FINISH TOOK DECIDING.
      Peretz gave two sentences on 30.8.2026 and each one alone is satisfiable:
@@ -2213,11 +2248,11 @@ export function render(state) {
          rims and bright once, off centre. Measured on the photographs the
          peak-to-trough is about 3.2:1 (d035 233:57, d065 215:25) and the
          minimum sits at 0.86-0.96 across, never in the interior. -->
-    ${barRamp('barTube', tone)}
-    <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
-         drew them silver, because ella carried no finish key of its own and
-         gripFinish fell through to steel. -->
-    ${barRamp('barGold', tone)}
+    ${barRamp(tubeRamp(tone), tone, 'barTube')}
+    <!-- In gold the SAME id carries barGold — the measured brass tube off the
+         manufacturer's photograph (d072, d074 and d082 are brass rods) —
+         rather than the steel stops remapped, which is what tubeRamp decides
+         once for the door and for the finish tile. -->
     <!-- The flat strap: two hairline arrises and one uniform field between
          them. Total swing across the middle 89% stays under 4%. -->
     ${barRamp('barStrap', tone)}
@@ -3154,7 +3189,11 @@ export function render(state) {
           lever, the cylinder, the extra lock and the pull handle at every
           size, so a fitting nobody has photographed for us cannot collide with
           anything. Both are explained where they are drawn. */''
-      }${state.peephole === 'peep' ? peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ''}
+      }${state.peephole !== 'nopeep'
+          ? (byId(PEEPHOLES, state.peephole).digital
+              ? peepholeDigital(mainX + leafW / 2, y(PEEPHOLE_AFF))
+              : peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)))
+          : ''}
     ${state.bell === 'bell'
         ? bellKnocker(mainX + leafW / 2, y(KNOCKER_AFF))
         : ''}
@@ -3465,6 +3504,13 @@ const MOULD_DEFAULT = 'reed';
  * A face with no `profile` — `plain`, and every strip design — takes the
  * default, which is what a glazed leaf with no panel gets.
  */
+/* ⚠ NOTHING ANSWERS `ogee` SINCE 20.9.2026. The ogee pair and trio left the
+   catalogue on Peretz's word and the Greek set's architrave was made reed on
+   the same sentence, so every `profile` in `DETAILS` is now the reed or
+   absent. The `MOULDS.ogee` table is kept — one door, d050, measured
+   un-compressed, the only record of that section and eleven of his installed
+   doors carry it — and this function still honours a `profile` naming it, so
+   restoring a face is one field on a catalogue entry and no drawing work. */
 const mouldOf = detail =>
   (detail && MOULDS[detail.profile] ? detail.profile : MOULD_DEFAULT);
 
@@ -4098,9 +4144,10 @@ export const faceObstacles = memo(function faceObstacles(state) {
                h: KNOCKER_REACH.up + KNOCKER_REACH.down });
   }
   if (state.peephole && state.peephole !== 'nopeep') {
+    const R = peepholeR(state);
     out.push({ kind: 'fitting', band: 0,
-               x: leafW / 2 - PEEPHOLE_R, y: leafH - PEEPHOLE_AFF - PEEPHOLE_R,
-               w: PEEPHOLE_R * 2, h: PEEPHOLE_R * 2 });
+               x: leafW / 2 - R, y: leafH - PEEPHOLE_AFF - R,
+               w: R * 2, h: R * 2 });
   }
   const sp = SPECIAL_BOX[state.speciallock];
   if (sp) {
@@ -4172,7 +4219,7 @@ export function peepholeFits(state) {
      `PEEPHOLE_AFF` up from the floor, which is `leafH - PEEPHOLE_AFF` down
      from the leaf's head. */
   const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
-  const R = PEEPHOLE_R + 8;                       // its radius plus a bead of paint
+  const R = peepholeR(state) + 8;                 // its radius plus a bead of paint
   return !openings.some(o =>
     cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
 }
@@ -8301,19 +8348,20 @@ export function bossReach(handle) {
  * and telling `gripFeet` where the bolts are, which is what decides whether a
  * dragged handle is standing on solid material.
  */
+/* ⚠ TWO SECTIONS SINCE 20.9.2026, AND THERE WERE SIX ROWS. Peretz withdrew
+   אלה, שחר, רון and מוט שחור (`HANDLES` in the catalogue has the sentence);
+   their rows here were `ella: barGold` (the brass tube, d072 d074 d082,
+   fixings at 0.15/0.80), `ron: barTube` (the slim rod, d072 d035 d074, at
+   0.10/0.90), `shahar: barStrap` (the long strap, d060, at 0.15/0.85) and
+   `blade: barStrap` (d073, rx 0.03, at 0.09/0.95). Kept as prose because the
+   fixing fractions were measured and nothing else records them. The brass
+   tube is not gone from the drawing: it is `idan` in the gold finish, and
+   `tubeRamp` below picks the measured `barGold` for it. */
 const BARS = {
   // Standard round tube — a dozen doors, the commonest grip Peretz fits.
   idan:   { tone: 'barTube',  rx: 0.30, fix: { t: [0.14, 0.85] } },
-  // The same cylinder in brass. d072, d074, d082.
-  ella:   { tone: 'barGold',  rx: 0.30, fix: { t: [0.15, 0.80] } },
-  // The slim rod: d072 at 0.017 of leaf width, d035 at 0.022, d074 at 0.024.
-  ron:    { tone: 'barTube',  rx: 0.30, fix: { t: [0.10, 0.90] } },
-  // Flat strap, standard width — d049, d066, d034, d104.
+  // Square-section bar, drawn as its flat face — d049, d066, d034, d104.
   nitzan: { tone: 'barStrap', rx: 0.02, fix: { t: [0.10, 0.89] } },
-  // Flat strap, long — d060 runs 0.60 of leaf height against d049's 0.45.
-  shahar: { tone: 'barStrap', rx: 0.02, fix: { t: [0.15, 0.85] } },
-  // Flat strap, wide — d073, the one bar in the corpus past 0.07 of leaf width.
-  blade:  { tone: 'barStrap', rx: 0.03, fix: { t: [0.09, 0.95] } },
 };
 
 function pullBar(cx, cy, handle, leafH, panelled) {
@@ -9193,6 +9241,38 @@ const peephole = (cx, cy) => {
 };
 
 /**
+ * The DIGITAL viewer, 20.9.2026 — a camera in a rounded-square bezel where the
+ * optical one is a round eye. It stands exactly where the optical viewer
+ * stands (`PEEPHOLE_AFF`, the centre line) and is refused by the same
+ * `peepholeFits`, with its own larger reach. Nickel bezel through `#nickel`,
+ * because Peretz's 26.8 list has the עינית among what the פרזול recolours and
+ * nothing he has said since separates the two viewers on that. What is
+ * sourced and what is convention is written beside `PEEPHOLE_DIGITAL_R`; the
+ * rounded-square plate is the common shape of the product and is the one
+ * thing here that lets a customer tell the two viewers apart at tile size.
+ * `data-kind="peephole"` like the optical one, because every rule that asks
+ * "is there a viewer on the centre line" asks by kind.
+ */
+const peepholeDigital = (cx, cy) => {
+  const R = PEEPHOLE_DIGITAL_R;
+  const n1 = v => v.toFixed(1);
+  return `
+    <g data-hw="peephole" data-owner="peephole" data-kind="peephole" data-digital="1"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+      <rect x="${n1(cx - R * 0.95)}" y="${n1(cy - R * 0.95 + R * 0.16)}"
+            width="${n1(R * 1.9)}" height="${n1(R * 1.9)}" rx="${n1(R * 0.34)}"
+            fill="#000" opacity="0.18"/>
+      <rect x="${cx - R}" y="${cy - R}" width="${R * 2}" height="${R * 2}" rx="${n1(R * 0.34)}"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+      ${/* the lens: a dark disc with the sensor's darker centre and one highlight */''
+       }<circle cx="${cx}" cy="${cy}" r="${n1(R * 0.56)}" fill="#000" fill-opacity=".62"/>
+      <circle cx="${cx}" cy="${cy}" r="${n1(R * 0.30)}" fill="#000" fill-opacity=".55"/>
+      <circle cx="${n1(cx - R * 0.16)}" cy="${n1(cy - R * 0.18)}" r="${n1(R * 0.12)}"
+              fill="#fff" fill-opacity=".34"/>
+    </g>`;
+};
+
+/**
  * ── THE פעמון ─────────────────────────────────────────────────────────
  *
  * Peretz, 30.8.2026: *"the bell on the doors is 300, take images of it and add
@@ -9740,12 +9820,14 @@ const FITTING_GLYPH = {
        brass bar and one black one.
        The stops are `BAR_RAMP`, which is the same table the door paints this
        bar from, so the tile cannot come to disagree with the drawing about
-       what brass is. The tone is the product's OWN declared finish, never the
-       customer's פרזול: a bar's colour is a fact about the product (see
-       `declaredFinish`), which is also why a fitting that declares nothing
-       stays exactly as it was. */
+       what a metal is.
+       ⚠ IN NICKEL, ALWAYS, SINCE 20.9.2026. The finish is the customer's
+       choice now (`HANDLE_FINISHES`) and no bar declares one, so this tile
+       shows the product as it comes and the FINISH tiles beside it
+       (`handleFinishGlyph`) show the metals — the same split the lockset
+       tiles and the פרזול tiles make. */
     const id = `bg-${h.id}`;
-    const tone = FINISH_TONES[h.finish] || FINISH_TONES.steel;
+    const tone = FINISH_TONES.steel;
     return { box: [-170, -650, 170, 650], art: `
     <defs>${barRamp(spec.tone, tone, id)}</defs>
     <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"
@@ -9804,6 +9886,28 @@ export function pirzulGlyph(pz) {
 }
 
 /**
+ * The pull handle's finish — drawn as the thing it recolours, a length of the
+ * round tube in the metal itself, for the reason `pirzulGlyph` gives: a
+ * customer choosing a finish is choosing what the bar will look like.
+ *
+ * ⚠ THE SAME `tubeRamp` THE DOOR USES, so the tile and the bar cannot
+ * disagree about what gold is — brass is the measured `barGold`, not a remap,
+ * exactly as on the door. The three tiles must resolve to three different
+ * stop sets and each must appear in a door rendered in that finish; `npm test`
+ * asserts both, restated from the check that used to name אלה and מוט שחור.
+ */
+export function handleFinishGlyph(hf) {
+  const t = FINISH_TONES[hf.tone] || FINISH_TONES.steel;
+  const id = `hfg-${hf.id}`;
+  return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
+    <defs>${barRamp(tubeRamp(t), t, id)}</defs>
+    <rect x="-8" y="-72" width="32" height="150" rx="10" fill="#000" opacity=".18"/>
+    <rect x="-16" y="-80" width="32" height="150" rx="10" fill="url(#${id})"
+          stroke="#000" stroke-opacity=".18"/>
+  </svg>`;
+}
+
+/**
  * THE MASHKOF, drawn as what a joiner would show you: the frame in section,
  * looking down on the head of the opening from above.
  *
@@ -9838,10 +9942,19 @@ export function pirzulGlyph(pz) {
  * bidi reordering risk for a word the section drawing already implies, and the
  * four tiles are read against each other, not off a ruler.
  */
+/* ⚠ THREE PARTS SINCE 20.9.2026, AND THE THIRD IS THE ONE THE DOOR CANNOT
+   SHOW. The inner kant — the wing on the room side of the wall — is drawn here
+   as the mirror of the outer one, at the wall's inner face, and numbered on
+   the left; on the elevation it is behind the wall and nothing there moves
+   when it is widened, which the group's hint says in so many words. So this
+   section is the only picture of it, and the test that every option tile
+   draws its own picture is what keeps a widened inner kant from being a tile
+   identical to the standard one. */
 export function mashkofGlyph(mk) {
   const W = 200, H = 150;
   const sc = 0.62;                        // mm to glyph units
   const out = mk.out * sc, dep = mk.in * sc;
+  const inner = (mk.inner == null ? mk.out : mk.inner) * sc;
   const cx = W / 2;
   /* The section sits 16 units lower than it did: that band is where the face
      dimension and its number now live, and moving the drawing down was
@@ -9858,6 +9971,8 @@ export function mashkofGlyph(mk) {
       <!-- the frame's face on the wall, and its return into the opening -->
       <rect x="${f(cx - out)}" y="${frameY - 9}" width="${f(out * 2)}" height="9"/>
       <rect x="${cx - 7}" y="${frameY}" width="14" height="${f(dep)}"/>
+      <!-- the inner kant: the same wing on the room side of the wall -->
+      <rect x="${f(cx - inner)}" y="${wallY + 26}" width="${f(inner * 2)}" height="9"/>
       <!-- the leaf, at the back of the return -->
       <rect x="${cx - 46}" y="${f(foot)}" width="92" height="11" opacity=".72"/>
     </g>
@@ -9870,10 +9985,17 @@ export function mashkofGlyph(mk) {
       <path d="M${dimX} ${frameY}V${f(foot)}"/>
       <path d="M${dimX - 5} ${frameY}h10"/>
       <path d="M${dimX - 5} ${f(foot)}h10"/>
+      <!-- the inner kant, over one wing, at the foot of the glyph: the band
+           between the wing and the leaf is too short to hold a mark on the
+           deep frame, so the mark sits under everything -->
+      <path d="M${f(cx - inner)} ${H - 7}H${cx}"/>
+      <path d="M${f(cx - inner)} ${H - 12}v10"/>
+      <path d="M${cx} ${H - 12}v10"/>
     </g>
     <g class="glyph__dim" fill="currentColor" font-size="23" opacity=".8">
       <text x="${f(cx - out / 2)}" y="${dimY - 8}" text-anchor="middle">${mk.out}</text>
       <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 8)}">${mk.in}</text>
+      <text x="${f(cx - inner / 2)}" y="${H - 13}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
     </g>
   </svg>`;
 }
@@ -9940,6 +10062,14 @@ export function peepholeGlyph(x) {
     <circle cx="0" cy="0" r="40"/>
     <circle cx="0" cy="0" r="21" fill="#fff" opacity=".92"/>
     <circle cx="-7" cy="-8" r="8" opacity=".55"/>`,
+    /* The digital viewer: the rounded-square bezel the leaf draws, with a lens
+       in it — so it cannot be mistaken for the round optical eye above or for
+       the ring on a boss the bell tile draws. */
+    'peep-digital': `
+    <rect x="-46" y="-46" width="92" height="92" rx="16"/>
+    <circle cx="0" cy="0" r="24" fill="#fff" opacity=".92"/>
+    <circle cx="0" cy="0" r="12" opacity=".75"/>
+    <circle cx="-5" cy="-6" r="4" fill="#fff" opacity=".9"/>`,
   }[x.id] || '';
   return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>

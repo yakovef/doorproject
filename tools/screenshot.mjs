@@ -83,7 +83,7 @@ const SHOTS = [
   /* Round five: the two new axes and the new hardware, each on a door that
      shows it plainly. */
   { name: 'stripsv',  w: 1280, h: 720,
-    q: '?c=rb-7322d&w=none&g=none&n=shahar&k=square&sp=22&s=standard&h=right-in' },
+    q: '?c=rb-7322d&w=none&g=none&n=nitzan&k=square&sp=22&s=standard&h=right-in' },
   { name: 'digital',  w: 1280, h: 720,
     q: '?c=rb-9302d&w=none&g=none&n=idan&k=digital&d=plain&s=standard&h=left-in' },
   { name: 'sidelight', w: 1280, h: 720,

@@ -20,7 +20,8 @@
  * length was THEN; only this header was claiming a present tense.
  */
 
-import { BELLS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_LENS, LOCKSETS,
+import { BELLS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES,
+         HANDLE_LEGACY, HANDLE_LENS, LOCKSETS,
          MASHKOFS, packStripes, PEEPHOLES, PIRZUL, SIZE_ALIAS, SIZES, SPECIAL_LOCKS,
          STRIPE_MAX, STRIPE_LEGACY, STRIPE_SLOTS, unpackStripes, WINDOWS } from './catalog.js';
 import { repair } from './rules.js';
@@ -244,7 +245,28 @@ import { repair } from './rules.js';
    The `?...=` query form is not indexed. Every withdrawn id resolves through
    `aliases` — `panel` and `panelo` onto the pairs — so a link written
    yesterday opens a door rather than a notice. */
-export const VERSION = 22;
+/* ⚠ 23: PERETZ'S SECOND REVIEW, 20.9.2026, AND AGAIN ONE BUMP FOR THE WHOLE
+   ROUND. Five separate changes each earn it and a version is a fence, not a
+   changelog. Batched:
+     · `HANDLES` was re-cut from nine entries to five — אלה, שחר, רון and
+       מוט שחור LEFT — so every index after `idan` moved;
+     · `handleFinish` is a NEW two-bit field (ניקל · שחור · זהב), the pull
+       handle's finish coming back on Peretz's own word under a new parameter
+       `hf=`, never the retired `f=`;
+     · `PEEPHOLES` gained a third entry — appended, so `peep` keeps its index —
+       and `BITS.peephole` went 1 → 2, which is a layout change on its own;
+     · `MASHKOFS` went from four entries to eight (the inner kant) and
+       `BITS.mashkof` 2 → 3. The four old ids keep their index and meaning;
+     · `DETAILS` lost `panel2o` and `panel3o` mid-list, so `classic` moved.
+   `HANDLE_LENS` was also re-cut (600 out, 700 and 900 in), which moves the
+   `handleLen` indices too. Payload 49 → 53; `TOTAL_BITS` reserves the check
+   nibble before rounding and lands on 60, so the code is one character longer
+   and the typo check keeps its full four bits.
+   The `?...=` query form is not indexed. Every withdrawn id resolves through
+   `aliases`, and two of them — `ella` and `barblack` — through `HANDLE_LEGACY`
+   as well, because what made them products was a finish and the finish is a
+   field now: `n=ella` opens the round bar in gold, silently. */
+export const VERSION = 23;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.
@@ -331,6 +353,11 @@ export const DEFAULTS = {
   peephole: 'nopeep',
   mashkof: 'mk-std',
   pirzul:  'pz-nickel',
+  /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — nickel until the customer picks,
+     like the פרזול. It is a field whether or not a bar is on the door,
+     because the פעמון follows it too; with neither on the door it prices at
+     nothing and paints nothing, which is what `isUntouched` needs of it. */
+  handleFinish: 'hf-nickel',
   /* ⚠ 0 = "as the model comes". Every bar has a length measured off the
      photographs and thirty recreations are checked against them; a global
      default would override all of them silently. The length is opt-in, and a
@@ -386,6 +413,13 @@ export function toQuery(state) {
      set of objects. Reusing the parameter would make an old link mean
      something it never meant. */
   p.set('pz', state.pirzul);
+  /* ⚠ `hf`, NEVER `f`. The pull handle's finish came back on 20.9.2026 on
+     Peretz's own word — *"its like pirzul but for the pull handle"* — and it
+     is the axis `f=` carried before it was withdrawn on 27.8. `f=` stays
+     retired: a link in somebody's history carrying `f=black` was written when
+     that choice cost ₪220 for a decision nobody made, and reading it as this
+     one would make an old link mean something it never meant. */
+  p.set('hf', state.handleFinish);
   /* ⚠ `bl` AND `ey`, NEVER `a`. There was a multi-select of five accessories
      once — peephole, letterplate, knocker, closer, nameplate — packed into a
      bitmask under `a=`, withdrawn on the owner's word, and `a=` is retired
@@ -459,7 +493,7 @@ export function fromQuery(search) {
      It is OURS and not the customer's choice, like `bare` and `sheet` — a
      language is a fact about the reader, which is also why it is not in the
      short code (see `js/copy.js`). */
-  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hl', 'sp',
+  const KNOWN   = new Set(['v', 'c', 'w', 'g', 'n', 'k', 'x', 'm', 'pz', 'hf', 'hl', 'sp',
                            'd', 's', 'h', 'bl', 'ey',
                            'code', 'bare', 'sheet', 'lang']);
   /* `f` finish, `a` add-ons, `z` — and `i`, the inside view, withdrawn earlier
@@ -579,6 +613,17 @@ export function fromQuery(search) {
       if (handleRaisedIt) notice = beforeHandle;
     }
   }
+  /* ⚠ A WITHDRAWN BAR WHOSE IDENTITY WAS A FINISH — the third migration in
+     this file, 20.9.2026. `take('handle', …)` has already landed `n=ella` and
+     `n=barblack` on `idan` through its aliases; what an alias cannot carry is
+     that אלה was that bar in BRASS and מוט שחור was it in BLACK, and the
+     finish is a field of its own now. So the finish is set here, off
+     `HANDLE_LEGACY`, and NO notice: withdrawing a product is our change and
+     not this customer's mistake, and the door that opens is the door they
+     sent. An explicit `hf=` on the same link wins, because it was written by
+     a page that already knew the axis. */
+  const legacyHandle = HANDLE_LEGACY[rawN];
+  if (legacyHandle && !p.get('hf')) Object.assign(state, legacyHandle);
   /* ⚠ A RETIRED STRIPE ID IS A MIGRATION, NOT AN ALIAS, and this is the second
      one in this file (the first is `n=` for the lockset list). `strips9` was
      one id in `DETAILS`; it is now a direction, a count and a toggle across
@@ -595,6 +640,7 @@ export function fromQuery(search) {
   take('speciallock', 'x', SPECIAL_LOCKS);
   take('mashkof', 'm', MASHKOFS);
   take('pirzul', 'pz', PIRZUL);
+  take('handleFinish', 'hf', HANDLE_FINISHES);
   take('bell', 'bl', BELLS);
   take('peephole', 'ey', PEEPHOLES);
   /* ⚠ A NUMBER, SO `take` CANNOT DO IT — `take` resolves an id against a list
@@ -830,10 +876,16 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford: no I L O U
    first. Nothing is tightened to pay for it: the payload goes 48 -> 49 and
    `TOTAL_BITS` absorbs it inside the same 55, because the check nibble is
    reserved before the rounding. The code does not get longer. */
+/* ⚠ THREE FIELDS MOVED ON 20.9.2026 AND ONE ARRIVED. `handleFinish` is new
+   (three entries, two bits); `peephole` is two bits for its third entry;
+   `mashkof` is three bits for its eight. Nothing is tightened to pay for
+   them — `handle` stays four bits over five entries because Peretz has five
+   more RB products he has not named yet (ASK-PERETZ §1f), and a field at its
+   ceiling is what the 14.9 lockset overflow was about. Payload 53. */
 export const BITS = { version: 5, colour: 5, size: 3, handing: 2, window: 2,
                       grille: 4, handle: 4, lockset: 4, detail: 3,
-                      speciallock: 2, mashkof: 2, pirzul: 2, handleLen: 4,
-                      stripes: 5, bell: 1, peephole: 1 };
+                      speciallock: 2, mashkof: 3, pirzul: 2, handleLen: 4,
+                      stripes: 5, bell: 1, peephole: 2, handleFinish: 2 };
 /* The payload does not divide by 5, so the code carries the next multiple up
    and the top bits are always zero. Rounding UP is the only safe direction:
    truncating would drop the low bits of the last field. Both numbers are
@@ -949,6 +1001,7 @@ export function encodeCode(state) {
     [packStripes(state), BITS.stripes],
     [Math.max(0, BELLS.findIndex(x => x.id === state.bell)), BITS.bell],
     [Math.max(0, PEEPHOLES.findIndex(x => x.id === state.peephole)), BITS.peephole],
+    [Math.max(0, HANDLE_FINISHES.findIndex(x => x.id === state.handleFinish)), BITS.handleFinish],
   ];
 
   /* BigInt, not <<. JavaScript's bitwise operators truncate to 32 bits, and
@@ -1016,6 +1069,7 @@ export function decodeCode(code) {
   const sp      = read(BITS.stripes);
   const bell    = BELLS[read(BITS.bell)];
   const peep    = PEEPHOLES[read(BITS.peephole)];
+  const hf      = HANDLE_FINISHES[read(BITS.handleFinish)];
   /* ⚠ `hLen === undefined`, NOT `!hLen`. Zero is a VALID value — it is the
      "as the model comes" default and the commonest length in the range — and
      `!0` is true, so a truthiness guard refused every code for an untouched
@@ -1023,13 +1077,13 @@ export function decodeCode(code) {
      "not found"; this one is a number and needed its own test. */
   if (!colour || !size || !handing || !window || !grille || !handle || !lockset
       || !detail || !special || !mashkof || !pirzul || hLen === undefined
-      || !bell || !peep) return null;
+      || !bell || !peep || !hf) return null;
 
   return {
     colour: colour.id, size, handing: handing.id, window: window.id,
     grille: grille.id, handle: handle.id, lockset: lockset.id, detail: detail.id,
     speciallock: special.id, mashkof: mashkof.id, pirzul: pirzul.id,
-    bell: bell.id, peephole: peep.id,
+    bell: bell.id, peephole: peep.id, handleFinish: hf.id,
     handleLen: hLen, ...unpackStripes(sp),
   };
 }

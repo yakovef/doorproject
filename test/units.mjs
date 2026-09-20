@@ -2,14 +2,14 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
+import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
 import { breakdownRows, formatAgorot, priceAgorot, priceParts, shekels, tileAgorot } from '../js/price.js';
 import {
   bellGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
-  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleGlyph, LIGHT,
+  gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, LIGHT,
   bellFits, locksetGlyph, mashkofGlyph, spawnIndexOf, spawnSpots, peepholeFits,
   peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph,
   windowGlyph,
@@ -58,13 +58,15 @@ const base = { colour: 'rb-7126d', window: 'none', grille: 'none',
                   the thing that stops being right. */
                stripeDir: 'none', stripeCount: 0, stripeTight: false,
                mashkof: 'mk-std', pirzul: 'pz-nickel', handleLen: 0,
+               /* The pull handle's finish, 20.9.2026 — added with the field. */
+               handleFinish: 'hf-nickel',
                detail: 'plain', size: 'standard', handing: 'right-in' };
 
 /** The keys a design is made of, in one place, so a new one cannot be forgotten
  *  by half the round-trip checks below. */
 const KEYS = ['colour', 'size', 'handing', 'window', 'grille', 'handle',
               'lockset', 'speciallock', 'bell', 'peephole', 'mashkof', 'pirzul',
-              'handleLen', 'detail'];
+              'handleLen', 'handleFinish', 'detail'];
 
 /* ⚠ THE GUARD THAT WOULD HAVE CAUGHT TWO STALE FIXTURES, AND IT COST NOTHING.
    `base` and `everyState`'s stem are both descriptions of "a door" written by
@@ -507,9 +509,14 @@ for (const st of everyState()) {
   ok(fromQuery('?d=panel').state.detail === 'panel2',
      '?d= stopped working as the detail axis, or the withdrawn lone panel '
      + 'no longer resolves to the pair it aliases to');
-  ok(fromQuery('?d=panelo').state.detail === 'panel2o',
-     'the withdrawn ogee single must resolve to the ogee pair, not to the '
-     + 'reeded one and not to plain — the profile is the thing it kept');
+  /* ⚠ THE OGEE PAIR LEFT ON 20.9.2026, so the ogee single lands on the REEDED
+     pair now — one alias hop further than it did, and still somewhere real.
+     Falsified by dropping `panelo` from `panel2`'s aliases: lands on `plain`. */
+  ok(fromQuery('?d=panelo').state.detail === 'panel2',
+     'the withdrawn ogee single must resolve to the pair, not to plain');
+  ok(fromQuery('?d=panel2o').state.detail === 'panel2'
+     && fromQuery('?d=panel3o').state.detail === 'panel3',
+     'the withdrawn ogee pair and trio must resolve to the reeded pair and trio');
   ok(!toQuery({ ...base }).includes('i=1'), 'the url must not carry a view flag');
 
   /* A link written while the finish and the add-ons were on offer is in
@@ -536,8 +543,15 @@ for (const st of everyState()) {
   ok(old.state.addons === undefined, 'a= must not survive into the state');
   ok(old.state.window === 'rect' && old.state.handle === 'idan',
      'a pre-withdrawal link must still open the door it names');
-  ok(!toQuery(base).includes('f=') && !toQuery(base).includes('a='),
-     'the url must not carry the withdrawn fields');
+  /* ⚠ BY PARAMETER, NOT BY SUBSTRING — `hf=` (the pull handle's finish,
+     20.9.2026) contains the two characters `f=`, and this line read
+     `includes('f=')` for as long as no live parameter ended in an f. */
+  {
+    const q = new URLSearchParams(toQuery(base));
+    ok(!q.has('f') && !q.has('a'), 'the url must not carry the withdrawn fields');
+    ok(q.has('hf') && q.get('hf') === 'hf-nickel',
+       'the url must carry the pull handle\'s finish under hf=, its own parameter');
+  }
 }
 
 /* ── THE FRAME MOVES AND THE LEAF DOES NOT ─────────────────────────
@@ -644,12 +658,13 @@ group('the pull handle does not recolour the lock furniture');
       pairs++;
     }
   }
-  /* And the other half: the grip's own finish must still reach the grip. Ella
-     is brass because the PRODUCT is brass, and that is a fact about her rather
-     than a choice — withdrawing it would be over-correcting the bug. */
-  const ella = render({ ...base, handle: 'ella', lockset: 'coral', pirzul: 'pz-nickel' });
+  /* And the other half: the grip's own finish must still reach the grip. It
+     is the customer's choice since 20.9.2026 (the brass אלה became the round
+     bar in gold), and a finish that stopped reaching the bar would be the
+     27.8 bug over-corrected. */
+  const gold = render({ ...base, handle: 'idan', handleFinish: 'hf-gold', lockset: 'coral', pirzul: 'pz-nickel' });
   const idan = render({ ...base, handle: 'idan', lockset: 'coral', pirzul: 'pz-nickel' });
-  ok(ella !== idan, 'the brass Ella and the nickel Idan draw the same door');
+  ok(gold !== idan, 'the gold Idan and the nickel Idan draw the same door');
   console.log(`  (${pairs} grip x pirzul pairs, lock furniture unmoved by every grip)`);
 }
 
@@ -669,17 +684,28 @@ group('a pull bar is a length');
      clamp twice and the rate never. */
   const big = { size: 'extra2' };
   const bare = P({ ...big, handle: 'none' });
-  for (const [len, add] of [[600, 500], [800, 500], [1000, 500], [1200, 650],
-                            [1400, 800], [1600, 950], [1800, 1100], [2000, 1250]]) {
-    ok(P({ ...big, handle: 'idan', handleLen: len }) === bare + add,
-       `a ${len / 10} cm bar should add ₪${add}, got `
-     + `₪${P({ ...big, handle: 'idan', handleLen: len }) - bare}`);
+  /* ⚠ TWO BANDS SINCE 20.9.2026, NOT A RATE. Peretz: *"cylinder (idan) 500,
+     from 70-100 cm · cylinder but bigger 800, from 120-200 cm · rectangle 600
+     … rectangle but bigger 900"*; his son settled that over a metre is the
+     bigger band. Every length in the list is pinned to one of the two figures
+     for BOTH bars, worked by hand, and the split is asserted to be the metre
+     and nothing else — 1000 takes the small price, 1200 the big one. */
+  for (const [bar, small, big$] of [['idan', 500, 800], ['nitzan', 600, 900]]) {
+    for (const len of HANDLE_LENS.filter(v => v > 0)) {
+      const add = len > 1000 ? big$ : small;
+      ok(P({ ...big, handle: bar, handleLen: len }) === bare + add,
+         `a ${len / 10} cm ${bar} should add ₪${add}, got `
+       + `₪${P({ ...big, handle: bar, handleLen: len }) - bare}`);
+    }
   }
-  /* The two flat ones never reach the rate: a channel is CUT into the leaf. */
+  ok(HANDLE_BAND === 1000, `the band splits at ${HANDLE_BAND} mm, not at the metre Peretz named`);
+  ok(HANDLE_LENS.includes(1000) && HANDLE_LENS.includes(1200) && !HANDLE_LENS.includes(1100),
+     'the length list must hold the metre and the first step past it, and nothing between');
+  /* The two flat ones never reach the bands: a channel is CUT into the leaf. */
   for (const L of HANDLE_LENS) {
     ok(P({ ...big, handle: 'grab', handleLen: L }) === bare + 300,
        'the horizontal bow is flat-priced and must ignore the length');
-    ok(P({ ...big, handle: 'channel', handleLen: L }) === bare + 1700,
+    ok(P({ ...big, handle: 'channel', handleLen: L }) === bare + 1900,
        'the recessed channel is flat-priced and must ignore the length');
   }
 
@@ -697,13 +723,14 @@ group('a pull bar is a length');
       ok(got <= leafH - 240,
          `${size}: a ${L / 10} cm bar came back as ${got / 10} cm on a leaf of `
        + `${leafH / 10} cm — it would run into the rails`);
-      /* ⚠ 0 IS "AS THE MODEL COMES" AND COMES BACK AS THE MODEL'S OWN LENGTH,
-         which is 1050 for Idan and is deliberately NOT one of the eight
-         steps — the catalogue lengths are measured off photographs and the
-         steps are Peretz's price ladder. Two different things, and the first
-         version of this assertion confused them. */
+      /* ⚠ 0 IS "AS THE MODEL COMES" AND COMES BACK AS THE MODEL'S OWN LENGTH.
+         That was 1050 for Idan, measured, and deliberately not on the price
+         ladder; it is 1000 since 20.9.2026, for the reason written on the
+         catalogue entry — under Peretz's two bands the bar as it comes has to
+         price in the band he priced it in. The stock length is still the
+         catalogue's number and not a step's. */
       if (L === 0) ok(got === byId(HANDLES, 'idan').len,
-                      `${size}: "as it comes" gave ${got}, not Idan's own 1050`);
+                      `${size}: "as it comes" gave ${got}, not Idan's own stock length`);
       else ok(HANDLE_LENS.includes(got),
               `${size}/${L}: clamped to ${got}, not a real length`);
       if (L !== 0 && got !== L) clamped++;
@@ -741,7 +768,13 @@ group('a pull bar is a length');
 // ── 3. Price ──────────────────────────────────────────────────────
 group('price');
 {
-  const P = st => shekels(priceAgorot({ ...base, ...st }));
+  /* ⚠ THE STEM CARRIES THE ROTEM, NOT THE CORAL, SINCE 20.9.2026. Peretz
+     priced the Coral at ₪100 that day (*"coral +100"*), so the fixture's Coral
+     would put every absolute figure below ₪100 over what it asserts. The
+     Rotem is the included lever and the one the page opens on — `DEFAULTS`
+     says so — so it is the honest stem for a group whose first line is the
+     number Peretz checks first. */
+  const P = st => shekels(priceAgorot({ ...base, lockset: 'plate', ...st }));
   /* The baseline door carries an Idan bar AND a Coral lockset now, because a
      grip and a lock are two things.
 
@@ -754,12 +787,22 @@ group('price');
      It is the number he will check first, so it is pinned exactly. */
   ok(P({ handle: 'none' }) === 3195,
      `a solid door with a lever and no pull should be ₪3,195, got ${P({ handle: 'none' })}`);
-  /* ⚠ ₪650 FOR THE IDAN, NOT ₪500, AND THAT IS PERETZ'S RULE WORKING. His
-     floor is ₪500 for a bar "under 100"; the Idan measures 1050 mm off the
-     photographs, so it is one 20 cm step over and costs ₪650. Every bar in
-     the range except Ron is over a metre as it comes. */
-  ok(P({}) === 3845, `adding the Idan bar should reach ₪3,845, got ${P({})}`);
-  ok(P({ handle: 'ron' }) === 3695, 'Ron is 90 cm as it comes and takes the floor price');
+  /* ⚠ ₪500 FOR THE IDAN AS IT COMES, SINCE 20.9.2026 — Peretz: *"cylinder
+     (idan) 500, from 70-100 cm."* It was ₪650 under his old 20 cm rate,
+     because the measured bar is 105 cm; the stock length is a metre now so
+     the bar he priced at 500 IS the bar the page draws — see the catalogue
+     entry for the trade. The Coral beside it is ₪100 on the same day's word. */
+  ok(P({}) === 3695, `adding the Idan bar should reach ₪3,695, got ${P({})}`);
+  ok(P({ handle: 'none', lockset: 'coral' }) === 3295, 'the Coral is ₪100 — Peretz, 20.9.2026');
+  ok(P({ handle: 'none', lockset: 'lever-taper' }) === 3395,
+     'the curved lever — "the weird one" — is ₪200, and A19 is closed');
+  /* The four withdrawn bars land on the two that survive, at their money. */
+  ok(P({ handle: 'ron' }) === P({ handle: 'idan' }), 'withdrawn ron should price as idan');
+  ok(P({ handle: 'ella' }) === P({ handle: 'idan' }), 'withdrawn ella should price as idan (the finish rides in the link)');
+  ok(P({ handle: 'shahar' }) === P({ handle: 'nitzan' }), 'withdrawn shahar should price as nitzan');
+  ok(P({ handle: 'barblack' }) === P({ handle: 'idan' }), 'withdrawn barblack should price as idan');
+  ok(P({ handle: 'nitzan' }) === 3795, `the rectangle bar is ₪600 as it comes, got ${P({ handle: 'nitzan' })}`);
+  ok(P({ handle: 'channel' }) === 5095, `the recessed channel is ₪1,900 — "shkua 1900"`);
 
   /* ⚠ THE SIZE MULTIPLIES ALL SIX COMPONENTS, AND THIS BLOCK USED TO ASSERT
      THE OPPOSITE — deliberately, and correctly, against the rule Peretz gave
@@ -844,7 +887,7 @@ group('price');
   // A link shared before the chart replaced the list must still open a door.
   ok(P({ colour: 'ral-9005' }) === P({ colour: 'rb-9005d' }), 'retired ral-9005 should still resolve');
   ok(byId(COLOURS, 'ral-7016').id === 'rb-0097d', 'anthracite alias should land on 0097D');
-  ok(P({ size: 'extra1' }) === 4645, 'the חריגה band, with the fixture\'s Idan bar on it');
+  ok(P({ size: 'extra1' }) === 4495, 'the חריגה band, with the fixture\'s Idan bar on it');
   /* ⚠ AND THE THREE WITHDRAWN IDS MUST LAND ON THE BAND THEY WERE ALREADY IN,
      AT THE PRICE THEY ALREADY HAD. `wide` and `tall` were both +25% and are
      both `extra1`; `xl` was +50% and is `extra2`. A link in somebody's WhatsApp
@@ -866,12 +909,14 @@ group('price');
     ok(P({ size: r.state.size }) === P({ size: now }),
        `s=${old} must price as ${now}: ${P({ size: r.state.size })} vs ${P({ size: now })}`);
   }
-  /* And the price those links land on is the price they always had: `wide` was
-     ₪4,645 with this fixture's Idan bar on it before the merge, and it is
-     ₪4,645 after. */
+  /* And the price those links land on is the price the band has: `wide` was
+     ₪4,645 with this fixture's Idan bar on it before the merge and after; the
+     Idan's own price moved on 20.9 (₪650 → ₪500 as it comes), so the figure
+     is asserted as the band's rather than as a number that moves with the
+     bar. */
   ok(fromQuery(`?v=${VERSION}&s=wide`).state.size === 'extra1'
-     && P({ size: 'extra1' }) === 4645,
-     'a link written for the old רחבה must still cost ₪4,645');
+     && P({ size: 'extra1' }) === P({ size: 'extra1', handle: 'none' }) + 500,
+     'a link written for the old רחבה must still cost the חריגה band plus the bar');
   /* ⚠ AND AN ID THAT IS NEITHER LIVE NOR ALIASED MUST STILL SAY SO. Silently
      substituting is the worst failure this site can produce (§0). */
   ok(fromQuery(`?v=${VERSION}&s=notasize`).notice === 'option-unknown',
@@ -886,7 +931,7 @@ group('price');
      bottom panel... a blank door with a window, needs to be worth 6995."*
      So this pair pins BOTH ends — the delta here, and the absolute total the
      customer is quoted, which is the number he actually said. */
-  ok(P({ window: 'rect' }) === 7645,
+  ok(P({ window: 'rect' }) === 7495,
      `a square window and its panel should add ₪3,800, got ${P({ window: 'rect' })}`);
   ok(P({ window: 'rect', colour: DEFAULTS.colour, handle: 'none' }) === 6995,
      `a plain door with a square window must be ₪6,995, got ${
@@ -914,20 +959,20 @@ group('price');
   ok(P({ detail: 'panel' }) - P({}) === 1450,
      `the withdrawn lone panel resolves to the pair and is charged as one, got ${
         P({ detail: 'panel' }) - P({})}`);
-  ok(P({ detail: 'panelo' }) === P({ detail: 'panel2o' }),
-     'the withdrawn ogee single must price as the ogee pair it resolves to');
+  ok(P({ detail: 'panelo' }) === P({ detail: 'panel2' })
+     && P({ detail: 'panel2o' }) === P({ detail: 'panel2' }),
+     'the withdrawn ogee single and pair must price as the pair they resolve to');
   /* "design: almost all of them in the price." Every grille is ₪0 now except
      the three laser-cut ones. */
-  ok(P({ window: 'rect', grille: 'scroll' }) === 7645, 'scrollwork is included');
-  ok(P({ window: 'rect', grille: 'vine' }) === 8345, 'the laser-cut ones add ₪700');
-  ok(P({ detail: 'panel2' }) === 5295, `two panels should add ₪1,450, got ${P({ detail: 'panel2' })}`);
-  /* ⚠ THE OGEE TRIO COSTS WHAT THE REEDED TRIO COSTS, added 14.9.2026 with the
-     face. Asserted as an EQUALITY between the two rather than against ₪1,900,
-     because the claim is that the two moulding sections are one product at one
-     price — so if Peretz ever prices them apart, this is the line that has to
-     be argued with rather than a figure that silently stops matching. */
+  ok(P({ window: 'rect', grille: 'scroll' }) === 7495, 'scrollwork is included');
+  ok(P({ window: 'rect', grille: 'vine' }) === 8195, 'the laser-cut ones add ₪700');
+  ok(P({ detail: 'panel2' }) === 5145, `two panels should add ₪1,450, got ${P({ detail: 'panel2' })}`);
+  /* ⚠ THE OGEE TRIO IS WITHDRAWN, 20.9.2026, AND ITS ID RESOLVES TO THE REEDED
+     TRIO — so the equality that used to say "one product at one price" now
+     says "one product", which is stronger. Falsified by dropping the alias:
+     `byId` falls to `plain` and the two prices part by ₪1,900. */
   ok(P({ detail: 'panel3o' }) === P({ detail: 'panel3' }),
-     'the ogee trio must cost exactly what the reeded trio costs');
+     'the withdrawn ogee trio must price as the reeded trio it resolves to');
   /* ⚠ THE CLASSICAL SET COSTS LESS ON A GLAZED DOOR, and these two lines are
      Peretz's three window figures reduced to the two products they describe:
      the set solid is ₪2,700, and a square light plus the set glazed is
@@ -936,9 +981,11 @@ group('price');
   ok(P({ detail: 'classic', handle: 'none', window: 'rect' }) === 7895,
      'the greek set glazed is ₪4,700 over a bare door, not ₪6,400');
   /* The extra locks — a whole axis that did not exist. */
-  ok(P({ speciallock: 'kasefet' }) === 4545, 'a safe lock adds ₪700');
-  ok(P({ speciallock: 'kodan' }) === 4745, 'a keypad adds ₪900');
-  ok(P({ lockset: 'digital', speciallock: 'kodan' }) === 7445,
+  /* ₪690 and ₪880 since 20.9.2026 — Peretz's own correction of his 26.8
+     figures: *"kasefet - 690 · kodan 880."* */
+  ok(P({ speciallock: 'kasefet' }) === 4385, 'a safe lock adds ₪690');
+  ok(P({ speciallock: 'kodan' }) === 4575, 'a keypad adds ₪880');
+  ok(P({ lockset: 'digital', speciallock: 'kodan' }) === 7275,
      'a smart lock and a keypad are different products and stack');
   /* The finish and the add-ons are withdrawn, so nothing may be charged for
      them — including through a stale link that still names one. */
@@ -946,27 +993,31 @@ group('price');
   ok(P({ addons: ['peep', 'mail', 'knocker'] }) === P({}),
      'withdrawn add-ons must not add to the price');
   /* The whole point of the split: a pull bar and a backplate on one door. */
-  ok(P({ handle: 'idan', lockset: 'plate' }) === 3845,
-     `Idan with a Rotem backplate should be ₪3,800, got ${P({ handle: 'idan', lockset: 'plate' })}`);
+  ok(P({ handle: 'idan', lockset: 'plate' }) === 3695,
+     `Idan with a Rotem backplate should be ₪3,695, got ${P({ handle: 'idan', lockset: 'plate' })}`);
   /* "main handles: all of them in the price", bar the squares, the circles and
      the smart lock. Rotem is one of the included ones. */
   ok(P({ handle: 'none', lockset: 'plate' }) === 3195, 'Rotem is included — and it is what the page now opens on');
-  ok(P({ handle: 'none', lockset: 'square' }) === 3495, 'squares add ₪300');
+  /* ⚠ ₪390 FOR EVERY SQUARE FITTING SINCE 20.9.2026 — Peretz: *"all the square
+     handles 390."* The Sapir was ₪350 on its own figure from 30.8 and the
+     ריבועי ₪300 as "squares"; one sentence put both on one rate, and the
+     כדור על אורך — a "circle" — stays out of it. Asserted as the equality
+     between the two squares AND the figure, so a reprice of one without the
+     other fails here rather than reaching a customer. */
+  ok(P({ handle: 'none', lockset: 'square' }) === 3585, 'the square backplates add ₪390');
   ok(P({ handle: 'none', lockset: 'cadoor' }) === 3395, 'circles add ₪200');
+  ok(P({ handle: 'none', lockset: 'knobplate' }) === 3395, 'the knob on a backplate is a circle, ₪200');
   ok(P({ handle: 'none', lockset: 'digital' }) === 5895, 'the smart lock adds ₪2,700');
-  /* ⚠ ₪350, AND IT IS THE ONE LEVER THAT IS NOT INCLUDED. Peretz, 30.8.2026:
-     "the ספיר handle needs to be 350". It is neither a square nor a circle, so
-     it joins neither rate — a figure of its own, and the assertion says so. */
-  ok(P({ handle: 'none', lockset: 'sapir' }) === 3545, 'Sapir is ₪350, on its own');
-  ok(P({ handle: 'none', lockset: 'sapir' }) !== P({ handle: 'none', lockset: 'square' })
+  ok(P({ handle: 'none', lockset: 'sapir' }) === 3585, 'Sapir is ₪390 — a square');
+  ok(P({ handle: 'none', lockset: 'sapir' }) === P({ handle: 'none', lockset: 'square' })
      && P({ handle: 'none', lockset: 'sapir' }) !== P({ handle: 'none', lockset: 'cadoor' }),
-     'Sapir must not have been folded into the square or circle rate');
+     'the two square fittings share one rate and it is not the circle rate');
   // A retired id must land on its replacement, not on the first entry.
   ok(P({ handle: 'bar-long' }) === P({ handle: 'idan' }), 'alias bar-long should price as idan');
-  ok(P({ handle: 'bar-flat' }) === P({ handle: 'shahar' }), 'alias bar-flat should price as shahar');
+  ok(P({ handle: 'bar-flat' }) === P({ handle: 'nitzan' }), 'alias bar-flat should price as nitzan');
   /* Withdrawn on Peretz's say-so, 26.8.2026 — every one still opens a door. */
   ok(P({ handle: 'shiran' }) === P({ handle: 'idan' }), 'withdrawn shiran should price as idan');
-  ok(P({ handle: 'blade' }) === P({ handle: 'shahar' }), 'withdrawn blade should price as shahar');
+  ok(P({ handle: 'blade' }) === P({ handle: 'nitzan' }), 'withdrawn blade should price as nitzan');
   ok(P({ lockset: 'almog' }) === P({ lockset: 'sapir' }), 'withdrawn almog should price as sapir');
   ok(P({ window: 'rect', grille: 'iron' }) === P({ window: 'rect', grille: 'grid' }),
      'withdrawn iron should price as grid');
@@ -1228,11 +1279,17 @@ group('detail and finish');
      broad ogee on `panel2o` — and this group was written when there was one.
      A check that only ever visits the default would have let the second table
      ship with three sides drawn, or with no gradients emitted at all. */
+  /* ⚠ ONE SECTION AGAIN SINCE 20.9.2026: the ogee faces were withdrawn on
+     Peretz's word and `panel2o` aliases onto `panel2`, so an ogee row here
+     would render the reed twice and assert nothing new. The `prof` is asked
+     of the DRAWING rather than typed, so a face that reads the ogee table
+     again one day is covered without anybody coming back. */
   for (const [c, d] of [[COLOURS[0], 'panel2'], [COLOURS[10], 'panel2'],
-                        [COLOURS[16], 'panel2'], [COLOURS[0], 'panel2o'],
-                        [COLOURS[16], 'panel2o']]) {
+                        [COLOURS[16], 'panel2'], [COLOURS[5], 'panel3']]) {
     const svg = render({ ...base, colour: c.id, detail: d });
-    const prof = d.endsWith('o') ? 'ogee' : 'reed';
+    const profM = /fill="url\(#mould-(reed|ogee)-t\)"/.exec(svg);
+    ok(profM, `no moulding gradient on ${c.id} ${d} — this check is dead`);
+    const prof = profM ? profM[1] : 'reed';
     /* The panel group only. Sliced to the end of the document it swallowed the
        hardware drawn after it, and the first thing it found was the nickel on
        a lever — a false alarm that would have hidden a real one.
@@ -1880,25 +1937,34 @@ group('every option tile draws its own picture');
    plate, and scaling the return by a second constant. */
 group('the משקוף tiles print the frame\'s own numbers, at the length they claim');
 {
-  const runs = svg => ({
-    face: (([, x0, , x1]) => Number(x1) - Number(x0))(/M([\d.-]+) ([\d.-]+)H([\d.-]+)/.exec(svg)),
-    ret:  (([, , y0, y1]) => Number(y1) - Number(y0))(/M([\d.-]+) ([\d.-]+)V([\d.-]+)/.exec(svg)),
-    text: [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
-  });
+  /* ⚠ THREE MARKS SINCE 20.9.2026: the inner kant is the third part Peretz
+     prices, it shows in the section and nowhere else, and it is dimensioned
+     under the drawing. The two horizontal marks are told apart by their
+     order in the markup — the face first, the inner kant last. */
+  const runs = svg => {
+    const H = [...svg.matchAll(/M([\d.-]+) ([\d.-]+)H([\d.-]+)/g)]
+      .map(([, x0, , x1]) => Number(x1) - Number(x0));
+    return {
+      face: H[0], inner: H[H.length - 1],
+      ret:  (([, , y0, y1]) => Number(y1) - Number(y0))(/M([\d.-]+) ([\d.-]+)V([\d.-]+)/.exec(svg)),
+      text: [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]),
+    };
+  };
 
   const scales = [];
   for (const mk of MASHKOFS) {
     const r = runs(mashkofGlyph(mk));
-    ok(r.text.length === 2,
-      `the ${mk.id} tile writes ${r.text.length} numbers, not two: the face and ` +
-      `the return are the two dimensions this frame is sold by`);
-    ok(r.text[0] === String(mk.out) && r.text[1] === String(mk.in),
+    ok(r.text.length === 3,
+      `the ${mk.id} tile writes ${r.text.length} numbers, not three: the outer kant, ` +
+      `the falc and the inner kant are the three parts this frame is sold by`);
+    ok(r.text[0] === String(mk.out) && r.text[1] === String(mk.in) && r.text[2] === String(mk.inner),
       `the ${mk.id} tile writes ${r.text.join('/')} where MASHKOFS says ` +
-      `${mk.out}/${mk.in}`);
-    ok(r.face > 0 && r.ret > 0,
-      `the ${mk.id} tile draws a dimension of zero length (face ${r.face}, return ${r.ret})`);
+      `${mk.out}/${mk.in}/${mk.inner}`);
+    ok(r.face > 0 && r.ret > 0 && r.inner > 0,
+      `the ${mk.id} tile draws a dimension of zero length (face ${r.face}, return ${r.ret}, inner ${r.inner})`);
     scales.push({ id: `${mk.id} face`, k: r.face / mk.out },
-                { id: `${mk.id} return`, k: r.ret / mk.in });
+                { id: `${mk.id} return`, k: r.ret / mk.in },
+                { id: `${mk.id} inner`, k: r.inner / mk.inner });
   }
   /* One ruler, both axes, four tiles — the same property the size tiles were
      given on 14.9 and for the same reason. Tolerance is the glyph's own
@@ -1916,11 +1982,12 @@ group('the משקוף tiles print the frame\'s own numbers, at the length they c
 
   /* A frame that is not in the catalogue: the only way to tell a glyph that
      reads `MASHKOFS` from one that has the four numbers written into it. */
-  const odd = runs(mashkofGlyph({ id: 'mk-test', out: 33, in: 155 }));
-  ok(odd.text[0] === '33' && odd.text[1] === '155',
-    `a frame of 33/155 draws ${odd.text.join('/')}: the numbers on this tile are typed, not read`);
-  ok(Math.abs(odd.face / 33 - k0) < 0.01 && Math.abs(odd.ret / 155 - k0) < 0.01,
-    `a frame of 33/155 draws marks ${odd.face}/${odd.ret} units long, which is not ` +
+  const odd = runs(mashkofGlyph({ id: 'mk-test', out: 33, in: 155, inner: 61 }));
+  ok(odd.text[0] === '33' && odd.text[1] === '155' && odd.text[2] === '61',
+    `a frame of 33/155/61 draws ${odd.text.join('/')}: the numbers on this tile are typed, not read`);
+  ok(Math.abs(odd.face / 33 - k0) < 0.01 && Math.abs(odd.ret / 155 - k0) < 0.01
+     && Math.abs(odd.inner / 61 - k0) < 0.01,
+    `a frame of 33/155/61 draws marks ${odd.face}/${odd.ret}/${odd.inner} units long, which is not ` +
     `${k0.toFixed(4)} per mm: the marks do not follow the numbers`);
 }
 
@@ -2115,12 +2182,36 @@ group('a pull-bar tile is painted from the door\'s own metal');
       `copy of the metal, which is how two brasses got into one file before`);
     if (mine) seen.set(h.id, mine.join(' '));
   }
-  /* three products, three metals: steel, the brass Ella, the black tube. */
-  const trio = ['idan', 'ella', 'barblack'].map(id => seen.get(id));
-  ok(trio.every(Boolean), 'idan, ella or barblack is no longer a bar — this check is dead');
-  ok(new Set(trio).size === 3,
-    'two of idan (steel), ella (brass) and barblack (black) paint their tiles from the ' +
-    'same stops, so the customer is choosing between two prices and one picture');
+  /* ⚠ THREE METALS ARE THREE FINISH TILES NOW, NOT THREE PRODUCTS — 20.9.2026.
+     This read `idan`, `ella` and `barblack`; the brass and the black bar are
+     the round bar in a finish the customer picks, so the tile that has to
+     carry the metal is the FINISH group's, and the same join is asserted of
+     it: every stop it paints with must be in the door rendered in that
+     finish (`#barTube` is "the tube in this door's finish", so the gold tile
+     and the gold door both read the measured `barGold`), and the three must
+     be three different pictures. */
+  ok(seen.size === HANDLES.filter(x => x.style === 'bar').length && seen.size >= 2,
+     'fewer bar tiles than bars — this check is dead');
+  const metals = new Map();
+  for (const hf of HANDLE_FINISHES) {
+    const tile = handleFinishGlyph(hf);
+    const ref = /fill="url\(#([^)]+)\)"/.exec(tile);
+    ok(ref, `the ${hf.id} finish tile fills its bar from no gradient — this check is dead`);
+    const mine = ref && stopsIn(tile, ref[1]);
+    ok(mine && mine.length >= 4, `the ${hf.id} finish tile paints from no ramp`);
+    const door = render({ ...base, handle: 'idan', handleFinish: hf.id });
+    const inDoor = mine && [...door.matchAll(/<linearGradient[\s\S]*?<\/linearGradient>/g)]
+      .some(g => {
+        const st = [...g[0].matchAll(/stop-color="([^"]+)"/g)].map(m => m[1]);
+        return st.length === mine.length && st.every((c, i) => c === mine[i]);
+      });
+    ok(inDoor, `the ${hf.id} finish tile paints ${mine && mine.join(' ')} and the door in that ` +
+       'finish paints the bar from no such gradient — the tile has its own copy of the metal');
+    if (mine) metals.set(hf.id, mine.join(' '));
+  }
+  ok(metals.size === 3 && new Set(metals.values()).size === 3,
+    'two of nickel, black and gold paint their tiles from the same stops, so the customer ' +
+    'is choosing between two prices and one picture');
 }
 
 // ── 6c. Nothing may be charged for that does not change the door ───
@@ -2544,21 +2635,41 @@ group('`gp` is a retired parameter, and a link still carrying it is not an error
    itself is the whole job of that function. */
 group('the finish reaches every piece of metal');
 {
-  const brassGrip = HANDLES.find(h => h.finish === 'brass');
-  ok(brassGrip, 'no grip declares its own finish any more — this group is dead');
-  if (brassGrip) {
-    ok(gripFinish({ ...base, handle: brassGrip.id }).id === 'brass',
-       `${brassGrip.id} should be built in brass`);
-    ok(gripFinish({ ...base, handle: 'idan' }).id === 'steel',
-       'a grip with no declared finish should be brushed nickel');
-    /* A withdrawn choice must not come back through a stale link: the door is
-       whatever its grip says, whatever `finish` a URL still carries. */
-    ok(gripFinish({ ...base, handle: 'idan', finish: 'black' }).id === 'steel',
-       'a stale f= resurrected the withdrawn finish');
-    const mid = st => /--hw-mid:([^;"]+)/.exec(render(st))[1];
-    ok(mid({ ...base, handle: brassGrip.id }) !== mid({ ...base, handle: 'idan' }),
-       `${brassGrip.id} draws in the same metal as a brushed-nickel grip`);
+  /* ⚠ THE FINISH IS THE CUSTOMER'S SINCE 20.9.2026, AND NO GRIP DECLARES ONE.
+     This block found the one brass grip in the range and asserted its brass
+     reached the metal; that grip is the round bar in gold now, so the same
+     three assertions are made of the AXIS: each finish maps to its tone,
+     nickel is what a door gets until somebody picks, and a stale `f=` still
+     resurrects nothing. */
+  ok(HANDLES.every(h => !h.finish), 'a grip still declares a finish of its own — the axis has two owners');
+  ok(gripFinish({ ...base, handle: 'idan', handleFinish: 'hf-gold' }).id === 'brass',
+     'the gold finish should build the bar in brass');
+  ok(gripFinish({ ...base, handle: 'idan', handleFinish: 'hf-black' }).id === 'black',
+     'the black finish should build the bar in black');
+  ok(gripFinish({ ...base, handle: 'idan' }).id === 'steel',
+     'a grip with no finish chosen should be brushed nickel');
+  /* A withdrawn choice must not come back through a stale link: the door is
+     whatever `hf=` says, whatever `finish` a URL still carries. */
+  ok(gripFinish({ ...base, handle: 'idan', finish: 'black' }).id === 'steel',
+     'a stale f= resurrected the withdrawn finish');
+  const mid = st => /--hw-mid:([^;"]+)/.exec(render(st))[1];
+  ok(mid({ ...base, handle: 'idan', handleFinish: 'hf-gold' }) !== mid({ ...base, handle: 'idan' }),
+     'a gold bar draws in the same metal as a brushed-nickel one');
+  /* ⚠ AND THE TWO MIGRATIONS OPEN THE DOOR THEY ALWAYS OPENED, SILENTLY. A
+     link carrying the brass אלה is the round bar in gold; one carrying
+     מוט שחור is the round bar in black; an explicit hf= on the same link
+     wins; and an id nobody has heard of still raises the notice — the clause
+     that keeps "quiet" from meaning the notice has stopped working. */
+  for (const [old, hf] of Object.entries(HANDLE_LEGACY)) {
+    const q = fromQuery(`?v=${VERSION}&n=${old}`);
+    ok(q.notice === null, `a link carrying n=${old} must open quietly, got ${q.notice}`);
+    ok(q.state.handle === 'idan' && q.state.handleFinish === hf.handleFinish,
+       `n=${old} must open the round bar in ${hf.handleFinish}, got ${q.state.handle}/${q.state.handleFinish}`);
+    ok(fromQuery(`?v=${VERSION}&n=${old}&hf=hf-nickel`).state.handleFinish === 'hf-nickel',
+       `an explicit hf= must win over the ${old} migration`);
   }
+  ok(fromQuery(`?v=${VERSION}&n=nosuchbar`).notice === 'option-unknown',
+     'an invented handle id must still raise a notice');
 
   /* ── WHAT THE FINISH REACHES, AND WHAT IT MUST NOT ──────────────────
      Peretz stated this as law on 30.8.2026, in two sentences:
@@ -2628,18 +2739,18 @@ group('the finish reaches every piece of metal');
     /* AND THE GRIP'S OWN METAL STILL DOES, when the customer has expressed no
        pirzul preference. Both of his sentences have to come out true, and this
        is the one that already did: אלה is brass and מוט שחור is black. */
-    const nick = { ...striped, pirzul: 'pz-nickel' };
-    for (const grip of ['ella', 'barblack']) {
-      ok(looks(render({ ...nick, handle: grip }), 'data-detail="strips"')
-         !== looks(render({ ...nick, handle: 'idan' }), 'data-detail="strips"'),
-         `the grip "${grip}" must recolour the metal stripes beside a standard פרזול`);
+    const nick = { ...striped, pirzul: 'pz-nickel', handle: 'idan' };
+    for (const hf of ['hf-gold', 'hf-black']) {
+      ok(looks(render({ ...nick, handleFinish: hf }), 'data-detail="strips"')
+         !== looks(render({ ...nick, handleFinish: 'hf-nickel' }), 'data-detail="strips"'),
+         `the handle finish "${hf}" must recolour the metal stripes beside a standard פרזול`);
     }
 
     /* ⚠ THE PRECEDENCE, WHICH IS THE PART THAT HAD TO BE DECIDED. His two
        sentences cannot both hold under either simple rule, so an explicit
        choice beats an implied one: a chosen פרזול wins over a grip's own
        metal. Asserted, because it is a decision and not an accident. */
-    ok(looks(render({ ...striped, pirzul: 'pz-gold', handle: 'barblack' }), 'data-detail="strips"')
+    ok(looks(render({ ...striped, pirzul: 'pz-gold', handle: 'idan', handleFinish: 'hf-black' }), 'data-detail="strips"')
        === looks(render({ ...striped, pirzul: 'pz-gold', handle: 'idan' }), 'data-detail="strips"'),
        'a chosen פרזול must win over the grip’s own metal on the stripes');
 
@@ -2660,9 +2771,9 @@ group('the finish reaches every piece of metal');
       }
       /* And it must not follow the GRIP either, which nothing had ever asked.
          The bug that put a pull handle's metal on a lever is in §5 twice. */
-      ok(looks(render({ ...withLock, handle: 'ella' }), sel)
+      ok(looks(render({ ...withLock, handle: 'idan', handleFinish: 'hf-gold' }), sel)
          === looks(render({ ...withLock, handle: 'idan' }), sel),
-         `a brass grip must not recolour the ${kind} either`);
+         `a gold grip must not recolour the ${kind} either`);
       /* ⚠ AND IT MUST NOT BORROW THE PIRZUL'S GRADIENT BY NAME. The checks
          above would also pass if `#nickel` stopped moving; this one names the
          thing that was actually wrong. */
@@ -2825,15 +2936,14 @@ group('the finish reaches every piece of metal');
          '#lockUnit moved with the פרזול — the bought-in units must not follow it');
     }
 
-    /* ── THE פעמון IS NICKEL OR GOLD AND NOTHING ELSE ───────────────────
-       Owner, 30.8.2026: *"the color of the bell can only be nickel and
-       gold."* So black and bronze both draw a NICKEL ring.
-
-       ⚠ THE STARTING POINT WAS NOT WHAT IT LOOKED LIKE, AND THAT IS WHY THIS
-       ASSERTS BOTH HALVES. The ring was filled from `#lockUnit` — the
-       bought-in unit's constant steel — so it followed NOTHING, and a check
-       written only as "bronze must equal nickel" would have passed on the day
-       the bug shipped. The half that had to become true is gold. */
+    /* ── THE פעמון FOLLOWS THE PULL HANDLE'S FINISH, AND THE פרזול NOT AT ALL ──
+       Peretz, 20.9.2026: *"put the bell with the pull handles and the pirzul
+       for it changes its price by 100 or 200"* — the pull handle's finish, on
+       his son's word, which overrules the 31.8 "nickel or gold only" that this
+       block used to assert. Both halves again, because the ring has changed
+       owner twice and each time the check that only looked one way would
+       have passed: it must MOVE with all three handle finishes and must NOT
+       move with any of the four פרזול finishes. */
     {
       const rung = { ...base, bell: 'bell' };
       const sel = 'data-hw="bell"';
@@ -2841,19 +2951,23 @@ group('the finish reaches every piece of metal');
       const ids = refs(grabDeep(render(rung), sel));
       ok(ids.includes('bellMetal'),
          'the פעמון stopped painting with #bellMetal — its own id');
-      ok(!ids.includes('nickel') && !ids.includes('lockUnit'),
+      ok(!ids.includes('nickel') && !ids.includes('lockUnit') && !ids.includes('gripHard'),
          'the פעמון is painting with another fitting’s gradient — one id, one owner');
 
-      const ring = z => asText(stopsOf(render({ ...rung, pirzul: z }), 'bellMetal'));
-      ok(ring('pz-nickel'), '#bellMetal is not emitted at all');
-      ok(ring('pz-gold') !== ring('pz-nickel'),
-         'a gold פרזול must gild the פעמון — the half of this that had to change');
-      for (const z of ['pz-black', 'pz-bronze']) {
-        ok(ring(z) === ring('pz-nickel'),
-           `the פרזול "${z}" must leave the פעמון in nickel — it is stocked in two metals`);
+      const ring = st => asText(stopsOf(render({ ...rung, ...st }), 'bellMetal'));
+      ok(ring({}), '#bellMetal is not emitted at all');
+      const byHf = HANDLE_FINISHES.map(hf => ring({ handleFinish: hf.id }));
+      ok(new Set(byHf).size === HANDLE_FINISHES.length,
+         'the פעמון must take a different metal for each pull-handle finish — Peretz, 20.9.2026');
+      for (const z of PIRZUL) {
+        ok(ring({ pirzul: z.id }) === ring({}),
+           `the פרזול "${z.id}" must not move the פעמון — it follows the handle finish now`);
       }
-      ok(new Set(PIRZUL.map(z => ring(z.id))).size === 2,
-         'the פעמון must have exactly two metals across the four finishes');
+      /* And on a door with NO pull handle the finish still reaches the ring:
+         the axis is the door's, not the bar's, which is why it is a field
+         whatever is on the leaf. */
+      ok(ring({ handle: 'none', handleFinish: 'hf-gold' }) !== ring({ handle: 'none' }),
+         'a gold finish must gild a פעמון on a door with no pull handle');
     }
 
     /* ── AND TWO LOCKSETS DO NOT FOLLOW IT AT ALL ──────────────────────
@@ -3458,7 +3572,10 @@ group('the face inside a moulding is the face outside it');
    the rule is a rule about mouldings, not about one of them: the endpoints of
    the ogee table have to meet the face exactly as the reeded one's do, or the
    ogee panels ship with the rim this whole group exists to forbid. */
-for (const c of COLOURS) for (const [d, prof] of [['panel2', 'reed'], ['panel2o', 'ogee']]) {
+/* ⚠ THE OGEE ROW LEFT THIS LOOP ON 20.9.2026 WITH THE OGEE FACES — Peretz
+   withdrew them, `panel2o` aliases onto `panel2`, and a row for it would
+   assert the reed twice. `MOULDS.ogee` is still in the renderer, unread. */
+for (const c of COLOURS) for (const [d, prof] of [['panel2', 'reed']]) {
   const svg = render({ ...base, colour: c.id, handle: 'none', lockset: 'coral',
                        detail: d, window: 'none' });
   const head = lighten(c.hex, 0.04).toLowerCase();
@@ -3860,6 +3977,7 @@ group('a handle the customer moved reaches the order');
     peephole:    other(PEEPHOLES, DEFAULTS.peephole),
     mashkof:     other(MASHKOFS, DEFAULTS.mashkof),
     pirzul:      other(PIRZUL, DEFAULTS.pirzul),
+    handleFinish: other(HANDLE_FINISHES, DEFAULTS.handleFinish),
     detail:      other(DETAILS, DEFAULTS.detail),
     handing:     other(HANDINGS, DEFAULTS.handing),
     size:        Object.keys(SIZES).find(k => k !== DEFAULTS.size),
@@ -4405,7 +4523,7 @@ function checkStaticCopy({ T, UI, withLang }) {
    trace, and it also pins the shape of the money itself. */
 group('every option has exactly one price, in whole agorot');
 {
-  const { BUILD, MASHKOF_WIDER, COLOUR, WINDOW, GRILLE, DETAIL, HANDLE, LOCKSET, agorot } =
+  const { BUILD, MASHKOF_WIDER, COLOUR, WINDOW, GRILLE, DETAIL, HANDLE, HANDLE_FINISH, LOCKSET, agorot } =
     await import('../js/prices.js');
 
   /* ⚠ SIZE IS NOT IN THIS SWEEP ANY MORE, and it needs its own check rather
@@ -4447,7 +4565,8 @@ group('every option has exactly one price, in whole agorot');
 
   const pairs = [['colour', COLOURS, COLOUR, 'delta'], ['window', WINDOWS, WINDOW, 'delta'],
                  ['grille', GRILLES, GRILLE, 'delta'], ['detail', DETAILS, DETAIL, 'delta'],
-                 ['handle', HANDLES, HANDLE, 'delta'], ['lockset', LOCKSETS, LOCKSET, 'delta']];
+                 ['handle', HANDLES, HANDLE, 'delta'], ['lockset', LOCKSETS, LOCKSET, 'delta'],
+                 ['handle finish', HANDLE_FINISHES, HANDLE_FINISH, 'delta']];
   for (const [what, list, table, key] of pairs) {
     for (const o of list) {
       ok(Object.prototype.hasOwnProperty.call(table, o.id),
@@ -4455,8 +4574,19 @@ group('every option has exactly one price, in whole agorot');
       ok(Number.isInteger(o[key]) && o[key] >= 0,
          `${what} "${o.id}" carries ${o[key]} — prices are non-negative whole agorot`);
       if (Object.prototype.hasOwnProperty.call(table, o.id)) {
-        ok(o[key] === agorot(table[o.id]),
-           `${what} "${o.id}" is ${o[key]} agorot but prices.js says ${table[o.id]} shekels`);
+        /* ⚠ A BAR IS TWO FIGURES SINCE 20.9.2026 — `{ short, long }`, one per
+           length band — and a flat grip is one. Both shapes are checked to the
+           agora, and a bar's long band is asserted above its short one, which
+           is the direction Peretz's two figures point on both bars. */
+        const v = table[o.id];
+        if (o.priceKind === 'bar') {
+          ok(v && typeof v === 'object' && o[key] === agorot(v.short) && o.deltaLong === agorot(v.long),
+             `bar "${o.id}" is ${o[key]}/${o.deltaLong} agorot but prices.js says ${JSON.stringify(v)}`);
+          ok(o.deltaLong > o[key], `bar "${o.id}" is not dearer past the metre than under it`);
+        } else {
+          ok(o[key] === agorot(v),
+             `${what} "${o.id}" is ${o[key]} agorot but prices.js says ${v} shekels`);
+        }
       }
     }
     const ids = new Set(list.map(o => o.id));
@@ -4620,42 +4750,51 @@ group('a finish is named on the fitting that has one, and nowhere else');
   globalThis.window = globalThis.window
     || { location: { href: 'https://dlatotmagen.example/index.html', protocol: 'https:' } };
   const { message } = await import('../js/share.js');
-  const names = FINISHES.map(f => f.he);
+  /* ⚠ THE FINISH IS THE CUSTOMER'S SINCE 20.9.2026, so "the fitting that has
+     one" is any fitting that TAKES it — the bars, the bow and the פעמון —
+     and the ones that do not (the channel, painted with the door; every
+     lockset) must say nothing. The names asked about are the axis's own
+     three plus the old product-finish vocabulary, so a "ניקל מוברש" invented
+     off the renderer's fallback is still caught. */
+  const names = [...new Set([...FINISHES.map(f => f.he), ...HANDLE_FINISHES.map(f => f.he)])];
   let checked = 0, withFinish = 0;
 
-  for (const hn of HANDLES) for (const k of LOCKSETS) {
-    const st = { ...base, handle: hn.id, lockset: k.id };
+  for (const hn of HANDLES) for (const k of LOCKSETS) for (const hf of HANDLE_FINISHES) {
+    const st = { ...base, handle: hn.id, lockset: k.id, handleFinish: hf.id, bell: 'bell' };
     if (!buildable(st)) continue;
     checked++;
     const lines = message(st).split('\n');
     const lockLine = lines.find(l => l.startsWith('מנעול וידית:'));
     const gripLine = lines.find(l => l.startsWith('ידית משיכה:'));
+    const bellLine = lines.find(l => l.startsWith('פעמון:'));
 
-    /* 1. The lockset line never names a finish. No lockset declares one. */
+    /* 1. The lockset line never names a finish. No lockset declares one, and
+          the handle's finish is not the lock furniture's. */
     for (const f of names) {
       ok(!lockLine.includes(f),
-         `${hn.id}+${k.id}: the lockset line says "${lockLine}" — `
+         `${hn.id}+${k.id}+${hf.id}: the lockset line says "${lockLine}" — `
        + `"${f}" is not a fact about ${k.id}, it walked over from the grip`);
     }
 
-    /* 2. A grip that declares a finish says so on its own line. */
-    const want = declaredFinish(hn);
-    if (want) {
+    /* 2. A grip that takes the finish says which, on its own line — nickel
+          included, because the order is read down a telephone. */
+    if (hn.finishes) {
       withFinish++;
-      ok(gripLine && gripLine.includes(want.he),
-         `${hn.id} is made in ${want.he} and its own line does not say so: "${gripLine}"`);
+      ok(gripLine && gripLine.includes(hf.he),
+         `${hn.id} is in ${hf.he} and its own line does not say so: "${gripLine}"`);
     } else if (gripLine) {
-      /* 3. And a grip that declares nothing has NOTHING invented for it —
-            no "ניקל מוברש" default. The corpus carries the same round tube in
-            steel, chrome and black; 13 of 30 measured doors are not nickel. */
+      /* 3. And a grip that takes no finish has NOTHING invented for it. */
       for (const f of names) {
         ok(!gripLine.includes(f),
-           `${hn.id} declares no finish and the message says "${gripLine}" — `
+           `${hn.id} takes no finish and the message says "${gripLine}" — `
          + 'the renderer\'s fallback is not a specification');
       }
     }
+    /* 4. The bell names the same finish, because it is priced by it. */
+    ok(bellLine && bellLine.includes(hf.he),
+       `the פעמון is in ${hf.he} and its line does not say so: "${bellLine}"`);
   }
-  ok(withFinish > 0, 'no grip declares a finish — this group is asserting nothing');
+  ok(withFinish > 0, 'no grip takes a finish — this group is asserting nothing');
 
   /* ⚠ AND `declaredFinish` MUST NOT FALL THROUGH TO THE FIRST ENTRY.
      `byId` does, and `FINISHES[0]` is brushed nickel — so written the obvious

@@ -205,9 +205,21 @@
     "g.grille": ["עיצוב החלון", "Inside the window", "Наполнение окна"],
     "g.handle": ["ידית משיכה", "Pull handle", "Ручка-скоба"],
     "g.handle.h": [
-      "הידית האנכית. אפשר גם בלעדיה.",
-      "The upright bar. Going without one is fine.",
-      "Вертикальная скоба. Можно и без неё."
+      "הידית האנכית. אפשר גם בלעדיה. עד מטר במחיר הנמוך, מעל מטר במחיר הגבוה.",
+      "The upright bar. Going without one is fine. Up to a metre at the lower price, past a metre at the higher one.",
+      "Вертикальная скоба. Можно и без неё. До метра — по низкой цене, свыше метра — по высокой."
+    ],
+    /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — the axis withdrawn on 27.8
+       coming back on Peretz's own word: *"there needs to be an option to make
+       them gold or black, black is +100, gold +200, its like pirzul but for the
+       pull handle."* The hint names the bell because the bell follows this
+       finish too and a customer should not have to discover that from the
+       price. */
+    "g.handleFinish": ["גימור ידית המשיכה", "Pull handle finish", "Отделка ручки-скобы"],
+    "g.handleFinish.h": [
+      "הגוון של ידית המשיכה והפעמון. התוספת היא לכל פריט.",
+      "The tone of the pull handle and the doorbell. The surcharge is per item.",
+      "Оттенок ручки-скобы и звонка. Доплата — за каждый предмет."
     ],
     "g.lockset": ["מנעול וידית", "Lever and cylinder", "Ручка и цилиндр"],
     "g.lockset.h": [
@@ -246,15 +258,19 @@
        written in the same round that moved the fitting and was written the wrong
        way up; nothing on the page and nothing in the suite compares a hint with
        the picture it describes. */
+    /* ⚠ "IN THE PULL HANDLE'S FINISH" SINCE 20.9.2026, and it said "nickel or
+       gold only" from 31.8 until then. Peretz put the bell with the pull
+       handles and priced its finish by the same two figures; a black ring
+       exists now because the finish it follows has a black in it. */
     "g.bell.h": [
-      "טבעת נוקשת במרכז הדלת, מתחת לעינית. בניקל או בזהב בלבד.",
-      "A ring knocker on the centre of the door, below the viewer. Nickel or gold only.",
-      "Кольцо-стучалка по центру двери, под глазком. Только никель или золото."
+      "טבעת נוקשת במרכז הדלת, מתחת לעינית. בגימור של ידית המשיכה.",
+      "A ring knocker on the centre of the door, below the viewer. In the pull handle’s finish.",
+      "Кольцо-стучалка по центру двери, под глазком. В отделке ручки-скобы."
     ],
     "g.peephole.h": [
-      "עינית לראות מי בחוץ. כלולה במחיר.",
-      "A viewer, to see who is outside. Included in the price.",
-      "Глазок, чтобы видеть, кто снаружи. Входит в цену."
+      "עינית לראות מי בחוץ. הרגילה כלולה במחיר; הדיגיטלית מצלמת.",
+      "A viewer, to see who is outside. The ordinary one is included; the digital one has a camera.",
+      "Глазок, чтобы видеть, кто снаружи. Обычный входит в цену; цифровой — с камерой."
     ],
     "g.size": ["מידה", "Size", "Размер"],
     /* ⚠ THIS SAID THE SAME THING AS THE STEP'S OWN LEDE, four lines above it on
@@ -273,9 +289,9 @@
     ],
     "g.mashkof": ["משקוף", "Frame", "Коробка"],
     "g.mashkof.h": [
-      "המסגרת שהדלת נסגרת עליה. נמדוד את הקיר אצלכם.",
-      "The frame the door closes against. We measure your wall on site.",
-      "Рама, к которой прилегает дверь. Толщину стены замерим на месте."
+      "המסגרת שהדלת נסגרת עליה. הסטנדרטי כלול; כל חלק שמרחיבים — 250 ₪. הקאנט הפנימי לא נראה בציור. נמדוד את הקיר אצלכם.",
+      "The frame the door closes against. Standard is included; each part you widen is ₪250. The inner kant does not show in the drawing. We measure your wall on site.",
+      "Рама, к которой прилегает дверь. Стандартная входит в цену; каждая расширенная часть — ₪250. Внутренний кант на рисунке не виден. Толщину стены замерим на месте."
     ],
     "g.handing": ["כיוון פתיחה", "Opening direction", "Сторона открывания"],
     "g.handing.h": [
@@ -346,10 +362,15 @@
       "Размер определяется проёмом в стене, и мы замеряем его у вас бесплатно. До 98 × 203 см — базовая цена; шире или выше — плюс 25%, свыше 120 × 240 см — плюс 50%. Полуторная дверь — это две створки, и стоит вдвое. Сторона открывания всегда считается СНАРУЖИ — по стороне петель."
     ],
     "exp.mk.q": ["מה זה משקוף?", "What is the frame?", "Что такое коробка?"],
+    /* ⚠ THREE PARTS SINCE 20.9.2026 — Peretz named the section's pieces and
+       priced each one: the outer kant, the falc and the inner kant, +250 apiece,
+       any combination. The standard frame is inside the price of the door even
+       though the breakdown lists it at ₪500 — the same distinction the size
+       tiles make between what an option costs and what the door costs. */
     "exp.mk.a": [
-      "המשקוף הוא המסגרת שמותקנת בקיר, והדלת נסגרת עליה. המשקוף הסטנדרטי מתאים לקיר רגיל. אם החזית שנראית מבחוץ צריכה להיות רחבה יותר, או שהקיר עבה והמשקוף צריך להיכנס עמוק יותר פנימה — כל צד שמתרחב מוסיף 250 ₪. את הקיר נמדוד אצלכם.",
-      "The frame is what is fitted into the wall and what the door closes against. The standard frame suits an ordinary wall. If the face seen from outside has to be wider, or the wall is thick and the frame has to reach further in, each side that widens adds ₪250. We measure the wall on site.",
-      "Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. Стандартная подходит для обычной стены. Если фасад снаружи должен быть шире или стена толстая и коробка должна уходить глубже, каждая расширенная сторона добавляет ₪250. Стену замерим на месте."
+      "המשקוף הוא המסגרת שמותקנת בקיר, והדלת נסגרת עליה. יש לו שלושה חלקים: הקאנט החיצוני (הכנף שנראית מבחוץ על הקיר), הפאלץ (המדרגה שהדלת נסגרת לתוכה) והקאנט הפנימי (הכנף בצד הפנימי של הקיר). המשקוף הסטנדרטי כלול במחיר הדלת; כל חלק שמרחיבים מוסיף 250 ₪, ואפשר להרחיב כל שילוב. בציור הדלת רואים רק את שני החלקים החיצוניים — הקאנט הפנימי נמצא מאחורי הקיר. את הקיר נמדוד אצלכם.",
+      "The frame is what is fitted into the wall and what the door closes against. It has three parts: the outer kant (the wing seen from outside on the wall), the falc (the step the door closes into) and the inner kant (the wing on the room side of the wall). The standard frame is inside the door’s price; each part you widen adds ₪250, in any combination. The drawing of the door shows only the two outer parts — the inner kant is behind the wall. We measure the wall on site.",
+      "Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. У неё три части: наружный кант (борт, видимый снаружи на стене), фальц (ступень, в которую закрывается дверь) и внутренний кант (борт со стороны комнаты). Стандартная коробка входит в цену двери; каждая расширенная часть добавляет ₪250, в любом сочетании. На рисунке двери видны только две наружные части — внутренний кант за стеной. Стену замерим на месте."
     ],
     "exp.colour.q": ["איך נראה הצבע במציאות?", "How does the colour look in reality?", "Как цвет выглядит вживую?"],
     "exp.colour.a": [
@@ -370,10 +391,15 @@
       "Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Наполнение стекла — кованая решётка или художественное стекло — выбирается отдельно. У полуторной двери и двери с боковым окном ДВА остеклённых проёма: решётка ставится в оба и считается по их числу."
     ],
     "exp.grip.q": ["איזה אורך לבחור?", "What length should I choose?", "Какую длину выбрать?"],
+    /* ⚠ TWO PRICES PER BAR SINCE 20.9.2026, NOT A RATE. Peretz: *"cylinder
+       (idan) 500, from 70-100 cm · cylinder but bigger 800, from 120-200 cm"* —
+       and the same shape for the rectangle. The 20 cm rate this sentence used
+       to explain is gone with the rule, and the finish and the bell are named
+       because both arrived on the same step the same day. */
     "exp.grip.a": [
-      "ידית המשיכה היא המוט שמושכים בו כדי לפתוח. אפשר לבחור את אורכו: עד מטר במחיר הדגם, וכל 20 ס״מ מעבר לכך מוסיפים 150 ₪. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר גם בלי ידית משיכה בכלל. המאחז האופקי והידית השקועה מותקנים לרוחב הדלת ואין להם בחירת אורך.",
-      "The pull handle is the bar you pull to open the door. The length is yours: up to a metre at the model’s price, and every 20 cm past that adds ₪150. It is capped by the height of the leaf, so a short door cannot take a bar that would not fit. Going without one is a choice too. The grab bar and the recessed channel are fitted across the door and have no length to choose.",
-      "Ручка-скоба — это то, за что тянут дверь. Длину выбираете вы: до метра — по цене модели, каждые 20 см сверх того добавляют ₪150. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Можно обойтись и без неё. Горизонтальная скоба и врезная ручка ставятся поперёк двери, и длина у них не выбирается."
+      "ידית המשיכה היא המוט שמושכים בו כדי לפתוח. יש מוט עגול ומוט מלבני, ולכל אחד שני מחירים: עד מטר, ומעל מטר. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר לבחור לידית גימור שחור או זהב — התוספת היא לידית ולפעמון, לכל אחד בנפרד. אפשר גם בלי ידית משיכה בכלל. המאחז האופקי והידית השקועה מותקנים לרוחב הדלת ואין להם בחירת אורך.",
+      "The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The handle can be finished in black or gold — the surcharge is on the handle and on the doorbell, each on its own. Going without one is a choice too. The grab bar and the recessed channel are fitted across the door and have no length to choose.",
+      "Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за ручку и за звонок, за каждый отдельно. Можно обойтись и без ручки. Горизонтальная скоба и врезная ручка ставятся поперёк двери, и длина у них не выбирается."
     ],
     "exp.lock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
     "exp.lock.a": [
@@ -398,9 +424,9 @@
                         all bought-in in one finish, on the owner's word 31.8
            two only     the doorbell — nickel or gold, on the owner's word */
     "exp.pz.a": [
-      "את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הפעמון מגיע בניקל או בזהב בלבד, ולכן בשחור ובברונזה הוא נשאר ניקל. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
-      "The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. The doorbell comes in nickel or gold only, so in black and in bronze it stays nickel. It does NOT change the pull handle — that is its own product and comes in its own finish — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
-      "Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Звонок бывает только никелевым или золотым, поэтому в чёрном и бронзовом он остаётся никелевым. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
+      "את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
+      "The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
+      "Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
     ],
     "exp.sum.q": [
       "מה קורה אחרי שאני שולח?",
@@ -895,22 +921,14 @@
        prices have always said separately. */
     panel3: 1900,
     // שלושה פאנלים    — Peretz
-    /* ⚠ THE OGEE PANELS COST WHAT THE REEDED ONES COST, and Peretz's list does
-       not settle it either way: he priced "two panels" once and named no
-       families at all, because a customer buys "two panels". They are the same
-       rectangles in a different section of stock — see the two `MOULDS` in the
-       renderer — and a broader, deeper moulding is more timber and more work.
-       ASK-PERETZ §14 asks whether both are even his, which is the question that
-       matters more than the price. `CLAUDE.md` §9, assumption A14. */
-    panel2o: 1450,
-    // שני פאנלים קלאסיים
-    /* ⚠ THE OGEE TRIO IS ₪1,900 BECAUSE THE REEDED TRIO IS, and the same
-       sentence that settles the pair settles this: he priced "3 panel" once and
-       named no moulding families at all, because a customer buys "three panels".
-       Added 14.9.2026 with the face. `CLAUDE.md` §9, assumption A14, which now
-       covers three pairs of faces instead of two. */
-    panel3o: 1900,
-    // שלושה פאנלים קלאסיים
+    /* ⚠ `panel2o` AND `panel3o` — THE OGEE PAIR AND TRIO — ARE WITHDRAWN,
+       20.9.2026, on Peretz's word: *"remove entirely the classic panels."*
+       Their keys go with them, because `catalog.js` refuses a price with no
+       option as hard as it refuses an option with no price. Both ids stay alive
+       as `aliases` onto the reeded pair and trio, so a link written while they
+       existed opens a door and is charged THIS row. Assumption A14 — whether the
+       two mouldings cost the same — closes with them: there is one panel family
+       now. */
     /* The Greek set: cornice, frieze, corbelled shelf, panel and plinth, all as
        one. Peretz's "greek set +2700". His "(remove the handle)" is withdrawn by
        his own later instruction — see `panel3` above — and the shelf is drawn
@@ -947,76 +965,76 @@
   var HANDLE = {
     none: 0,
     // ללא ידית משיכה
-    idan: 500,
-    // עידן          — the floor; see HANDLE_RATE
-    ella: 500,
-    // אלה
-    nitzan: 500,
-    // ניצן
-    shahar: 500,
-    // שחר
-    ron: 500,
-    // רון
-    barblack: 500,
-    // מוט שחור      — A12: he named no rate for a black one
+    idan: { short: 500, long: 800 },
+    // עידן — מוט עגול, עד מטר / מעל מטר
+    nitzan: { short: 600, long: 900 },
+    // ניצן — מוט מלבני, עד מטר / מעל מטר
     grab: 300,
-    // מאחז אופקי    — Peretz, flat, no length choice
-    channel: 1700
-    // ידית שקועה    — Peretz, flat, and it is CUT not bolted
+    // מאחז אופקי   — Peretz, flat, no length choice
+    channel: 1900
+    // ידית שקועה   — Peretz, 20.9.2026 ("shkua 1900")
   };
-  var HANDLE_RATE = { over: 1e3, step: 200, per: 150 };
+  var HANDLE_BAND = 1e3;
+  var HANDLE_FINISH = {
+    "hf-nickel": 0,
+    // ניקל  — the bar as it comes
+    "hf-black": 100,
+    // שחור
+    "hf-gold": 200
+    // זהב
+  };
   var LOCKSET = {
-    coral: 0,
-    // קורל          — the one included as standard
+    /* ⚠ ₪100 SINCE 20.9.2026 — Peretz: *"coral +100."* It was the one lever
+       included as standard; the Rotem is the included one now, and the page
+       still opens on it, so the opening figure does not move. */
+    coral: 100,
+    // קורל          — Peretz, 20.9.2026
     cylinder: 0,
     // צילינדר בלבד
     plate: 0,
-    // רותם
-    /* ⚠ ₪350, AND IT IS THE ONE LEVER THAT IS NOT INCLUDED. Peretz, 30.8.2026:
-       *"the ספיר handle needs to be 350."* His earlier "all of them in the
-       price" covered the levers as a group; this is that group with one
-       exception named. It is not a square (+300) and not a circle (+200), so it
-       does not join either rate — it is its own figure. */
-    sapir: 350,
-    // ספיר          — Peretz, 30.8.2026
+    // רותם          — included, and what the page opens on
+    /* ⚠ ₪390, AND SO IS THE ריבועי — Peretz, 20.9.2026: *"all the square
+       handles 390."* The Sapir was ₪350 on its own figure from 30.8; it is a
+       square knob on a square plate, and his sentence puts every square fitting
+       on one rate. כדור על אורך is a "circle" and is not in it. */
+    sapir: 390,
+    // ספיר          — a square
     cadoor: 200,
     // כדור          — a circle
     knobplate: 200,
     // כדור על אורך  — a circle, A5
-    square: 300,
-    // ריבועי        — squares
+    square: 390,
+    // ריבועי        — a square
     digital: 2700,
     // מנעול חכם     — by far the largest single add-on
-    /* ⚠ ₪0 IS AN ASSUMPTION, NOT A QUOTATION — `CLAUDE.md` §9, A19, 14.9.2026.
-       Peretz asked for this handle by pointing at a drawing (*"the one thats
-       there right now with the curve, add it as a different handle"*) and named
-       neither a price nor a name for it. Priced as the Coral because his "main
-       handles: all of them in the price" covers the levers as a group and Sapir
-       is the one exception he has ever named. If it is a different product with
-       a different figure, this is the line and ASK-PERETZ carries the question.
-       Its id is a placeholder too — see the catalogue entry. */
-    "lever-taper": 0
-    // ידית מתעקלת   — A19, priced as the Coral until he says
+    /* ⚠ ₪200 SINCE 20.9.2026, AND ASSUMPTION A19 CLOSES. Peretz: *"the weird
+       one +200"* — his son confirmed the weird one is this, the curved lever he
+       asked for on 14.9 by pointing at a drawing. Its id is still a placeholder
+       (see the catalogue entry) and its NAME is still his to give. */
+    "lever-taper": 200
+    // ידית מתעקלת  — Peretz, 20.9.2026
   };
   var SPECIAL_LOCK = {
     nospecial: 0,
     // ללא
-    kasefet: 700,
-    // כספת
-    kodan: 900
-    // קודן
+    kasefet: 690,
+    // כספת          — Peretz, 20.9.2026
+    kodan: 880
+    // קודן          — Peretz, 20.9.2026
   };
   var BELL = {
     nobell: 0,
     // ללא
     bell: 300
-    // פעמון — Peretz, 30.8.2026
+    // פעמון — Peretz, 30.8.2026; + the handle finish
   };
   var PEEPHOLE = {
     nopeep: 0,
     // ללא
-    peep: 0
+    peep: 0,
     // עינית — included; see the note above and A7
+    "peep-digital": 390
+    // עינית דיגיטלית — Peretz, 20.9.2026
   };
   var PIRZUL = {
     "pz-nickel": 0,
@@ -1025,8 +1043,8 @@
     // שחור
     "pz-bronze": 500,
     // ברונזה
-    "pz-gold": 900
-    // זהב
+    "pz-gold": 870
+    // זהב    — Peretz, 20.9.2026
   };
   var COLOUR = {
     /* Peretz's three, included in the base price. */
@@ -1237,50 +1255,69 @@
       photo: null
     },
     // there is no photograph of an absence
-    /* Pull bars. `bar` selects the section and the tone profile; see BARS in the
-       renderer.
-       ⚠ THE WIDTHS WERE THE THING THAT WAS WRONG. Read against the leaf on
-       twenty-one bar-carrying doors, a round tube measures 0.036 of leaf width
-       (range 0.017-0.048) and a flat strap 0.052 (0.046-0.077); lengths cluster
-       at 0.45 and 0.48 of leaf height respectively. Our lengths were between 0%
-       and 15% out and four of them are unchanged — but three of the six bars
-       were 50% to 80% too NARROW, which at catalogue-thumbnail size is the
-       difference between a handle and a pinstripe. The comment that used to sit
-       here claimed "ella the stockiest at L/W 15, ron the slimmest at L/W 27",
-       and neither figure was even its own arithmetic: 900/34 is 26.5 and 900/16
-       is 56. A number nobody could reproduce from the line above it.
-       The measured widths, on an 850 x 2050 leaf: */
+    /* ⚠ FOUR PRODUCTS SINCE 20.9.2026, AND THERE WERE EIGHT. Peretz's list,
+         verbatim: *"1. cylinder (idan) 500, from 70-100 cm · 2. cylinder but
+         bigger 800, from 120-200 cm · 3. rectangle 600, from 70-100 cm · 4.
+         rectangle but bigger 900, from 120-200 cm · 5. shkua 1900 · 6. horizontal
+         300 · remove ela."* His son settled the two readings the list allows: it
+         is the WHOLE list, "bigger" is a length band of the same bar rather than
+         a second product, and the rectangle is ניצן.
+    
+         So אלה, שחר, רון and מוט שחור leave. Every one of their ids stays alive
+         below as an alias, and two of them are MIGRATIONS rather than aliases —
+         see `HANDLE_LEGACY` — because what made them products was a finish, and
+         the finish is its own axis now (`HANDLE_FINISHES`). A link carrying
+         `n=ella` opens THIS bar in gold; `n=barblack` opens it in black.
+    
+         ⚠ THE MEASUREMENTS OF THE FOUR THAT LEFT ARE KEPT, because they are the
+         only record of those products and the corpus still carries them:
+           ella     1000 x 20, brass round tube   d072 d074 d082 (0.017-0.024 W)
+           ron       900 x 18, round tube         d072 d035 d074
+           shahar   1230 x 40, flat strap         d060 (0.60 of leaf height)
+           barblack  800 x 20, black round tube   research/newdoor/
+         The corpus fitter (`npm run corpus`) now reads a brass or black bar as
+         THIS bar in that finish, and a flat one as ניצן.
+    
+         Pull bars. `bar` selects the section and the tone profile; see BARS in the
+         renderer.
+         ⚠ THE WIDTHS WERE THE THING THAT WAS WRONG. Read against the leaf on
+         twenty-one bar-carrying doors, a round tube measures 0.036 of leaf width
+         (range 0.017-0.048) and a flat strap 0.052 (0.046-0.077); lengths cluster
+         at 0.45 and 0.48 of leaf height respectively. Three of the six bars were
+         50% to 80% too NARROW once, which at catalogue-thumbnail size is the
+         difference between a handle and a pinstripe.
+    
+         ⚠ `len` IS 1000 FOR THE IDAN, AND IT WAS 1050 — a measured figure, moved
+         on 20.9.2026 for a price rule and not for a photograph, which needs saying
+         carefully. `handleLen: 0` means "as the model comes", and under Peretz's
+         two bands an untouched 1050 mm Idan would price in the OVER-a-metre band
+         at ₪800 while his own line reads *"cylinder (idan) 500"*: the bar as it
+         comes IS the small band. Three ways out: draw 1050 and price it at 800
+         (true, and ₪300 over what he quoted for the bar he stocks); draw 1050 and
+         price it as a metre (a picture and a price that disagree, which is §0's
+         worst failure); or stock it at the top of the band he priced it in. The
+         third is taken. It shortens the drawn bar 5% against the photographs it
+         was measured on, and the gallery doors carrying an Idan move with it —
+         `npm run corpus` says which. `ASK-PERETZ.md` asks the one-line question
+         that would settle it: is the Idan he stocks 100 or 105 cm? */
     {
       id: "idan",
       he: "עידן",
       en: "Idan",
       ru: "Идан",
-      len: 1050,
+      len: 1e3,
       w: 32,
       style: "bar",
       bar: "idan",
       pull: true,
-      aliases: ["bar-long", "luna", "shiran"],
+      finishes: true,
+      aliases: ["bar-long", "luna", "shiran", "ron", "ella", "barblack"],
       photo: "research/handles/rb/idan-400-00000002.png"
     },
-    /* Brass, and the catalogue never said so: with no `finish` of its own
-       `gripFinish` fell through to steel and the bar the inventory calls
-       brass rendered silver on every door. d072, d074 and d082 are gold rods at
-       0.017-0.024 of leaf width — half what we drew. */
-    {
-      id: "ella",
-      he: "אלה",
-      en: "Ella",
-      ru: "Эла",
-      len: 1e3,
-      w: 20,
-      style: "bar",
-      bar: "ella",
-      pull: true,
-      finish: "brass",
-      doors: ["d072", "d074", "d082"],
-      photo: "research/handles/rb/ella-450.png"
-    },
+    /* The square-section bar — RB photographs it square, d049's face is flat
+       inside 3.6% across twenty-three pixels, and Peretz calls it "rectangle".
+       ⚠ `shahar` RESOLVES HERE, and `blade` and `bar-flat` with it: the flat
+       strap family is one product on his list now. */
     {
       id: "nitzan",
       he: "ניצן",
@@ -1291,50 +1328,21 @@
       style: "bar",
       bar: "nitzan",
       pull: true,
-      aliases: ["bar-short"],
+      finishes: true,
+      aliases: ["bar-short", "shahar", "bar-flat", "blade"],
       doors: ["d049", "d066", "d034", "d104"],
       photo: "research/handles/rb/nitzan-400.png"
     },
-    {
-      id: "shahar",
-      he: "שחר",
-      en: "Shahar",
-      ru: "Шахар",
-      len: 1230,
-      w: 40,
-      style: "bar",
-      bar: "shahar",
-      pull: true,
-      aliases: ["bar-flat", "blade"],
-      doors: ["d060"],
-      photo: "research/handles/rb/shahar-400-1.png"
-    },
-    /* ⚠ THE PHOTOGRAPH AND THE DOORS DISAGREE ABOUT WHAT THIS IS, and the audit
-       of 18.9 says so rather than resolving it: RB's own רון is a DARK,
-       SQUARE-section bar with bright steel end caps at both photographed
-       lengths, and the doors cited here carry a round polished tube. The
-       drawing follows the doors, which is the right way round; the NAME may
-       belong to the other product. `ASK-PERETZ.md` §1f asks. */
-    {
-      id: "ron",
-      he: "רון",
-      en: "Ron",
-      ru: "Рон",
-      len: 900,
-      w: 18,
-      style: "bar",
-      bar: "ron",
-      pull: true,
-      doors: ["d072", "d035", "d074"],
-      photo: "research/handles/rb/ron-400-00000002.png"
-    },
-    /* The ornate pull, the horizontal bow, and the recess. */
+    /* The horizontal bow, and the recess. */
     /* ⚠ `shiran` IS WITHDRAWN, and this closes a question rather than dropping a
        product. ASK-PERETZ §2 has been asking since 23.8 whether he orders it at
        all — it appears on NONE of the 128 photographs, it was the one grip in the
        range drawn from nothing, and the note there says in as many words "it is
        the one grip whose picture we cannot check". Peretz, 26.8.2026: "there is
        no: שירן, להב שטוח." The id resolves to `idan`. */
+    /* `finishes: true` — the bow's rods paint from the grip's metal
+       (`gripHard`/`gripSoft` in the renderer), so it takes the finish and its
+       surcharge like a bar does. */
     {
       id: "grab",
       he: "מאחז אופקי",
@@ -1342,6 +1350,7 @@
       ru: "Горизонтальная скоба",
       len: 0,
       style: "grab",
+      finishes: true,
       aliases: ["dee"],
       doors: ["d078"],
       photo: null
@@ -1365,7 +1374,10 @@
          stale position out of a shared link). One flag, three readers, because a
          rule enforced only in the interface is a rule a link walks past. */
     /* `photo: null` — a channel is a VOID pressed into the leaf, so there is no
-       product shot of it to have. d084 is the measurement. */
+       product shot of it to have. d084 is the measurement.
+       ⚠ NO `finishes`: the channel is painted with the door (`channelHandle`
+       darkens the paint), so a metal finish would change no pixel and charging
+       for it would be money for nothing — §5's own shape. */
     {
       id: "channel",
       he: "ידית שקועה",
@@ -1379,53 +1391,17 @@
       fixed: true,
       doors: ["d084"],
       photo: null
-    },
-    /* The flat blade. Three doors (d034 d073 d104) and it is unmistakable beside
-       the tubes: a wide rectangular ribbon standing off the leaf, catching the
-       key across one broad face instead of wrapping it round a cylinder. The
-       section is the most visible thing about a pull bar at door scale, and the
-       corpus has three of them — round, square and this — where we modelled five
-       bars differing mainly in their fixings. */
-    /* ⚠ `blade` IS WITHDRAWN — the second of the two Peretz named. Three doors
-       carried it (d034 d073 d104) and its section really is unmistakable beside
-       the tubes, so this is a product leaving the range rather than a drawing
-       being wrong. The id resolves to `shahar`, the widest flat bar left. */
-    /* ⚠ BLACK, AND THAT IS A PROPERTY OF THE PRODUCT — the same argument that
-       kept Shiran's brass on Shiran's own row after the finish group was
-       withdrawn. Peretz does not sell this bar in a choice of finishes; he sells
-       a black bar.
-       Measured off the door in `research/newdoor/`: the median of every dark
-       pixel across its four photographs is #2A2627 to #36322E, warmth (r−b) of
-       2 to 8 — neutral. Our brass runs r−b above 40, which is why the same
-       photographs read as antique bronze until somebody sampled them, and why
-       the correction came from outside: "there is no bronze in the picture".
-       800 x 20 on that door — a slim tube, shorter than anything else in the
-       range, which is what leaves the leaf's ornament room to be seen.
-       `finish: 'black'` reaches the lock furniture too, through
-       `gripFinish`: on this door the keyway escutcheon is the same black. */
-    {
-      id: "barblack",
-      he: "מוט שחור",
-      en: "Black tube bar",
-      ru: "Чёрная трубчатая скоба",
-      len: 800,
-      w: 20,
-      style: "bar",
-      bar: "ron",
-      pull: true,
-      finish: "black",
-      /* ⚠ `photo: null`, DELIBERATELY. There ARE black bars in `rb/` —
-         `shahar-black-*` and `rotem-black-*` — and citing one of them here would
-         assert that this product is that product, which is precisely the
-         question the audit of 18.9 left open: RB's own רון is already a dark
-         square bar with steel caps, so our black tube may be a second name for
-         a bar we already carry, or a bar of theirs we have not identified. The
-         door in `research/newdoor/` is what it was measured from and is cited;
-         the product shot is not, because nobody knows yet which one it is. */
-      doors: ["newdoor"],
-      photo: null
     }
   ];
+  var HANDLE_FINISHES = [
+    { id: "hf-nickel", he: "ניקל", en: "Nickel", ru: "Никель", tone: "steel" },
+    { id: "hf-black", he: "שחור", en: "Black", ru: "Чёрный", tone: "black" },
+    { id: "hf-gold", he: "זהב", en: "Gold", ru: "Золото", tone: "brass" }
+  ];
+  var HANDLE_LEGACY = {
+    ella: { handleFinish: "hf-gold" },
+    barblack: { handleFinish: "hf-black" }
+  };
   var LOCKSETS = [
     {
       id: "coral",
@@ -1638,22 +1614,71 @@
     { id: "pz-bronze", he: "ברונזה", en: "Bronze", ru: "Бронза", tone: "bronze" },
     { id: "pz-gold", he: "זהב", en: "Gold", ru: "Золото", tone: "brass" }
   ];
-  var MASHKOFS = [
-    { id: "mk-std", he: "סטנדרטי", en: "Standard", ru: "Стандартная", out: 46, in: 62, head: 148 },
-    { id: "mk-out", he: "חזית רחבה", en: "Wide face", ru: "Широкий фасад", out: 82, in: 62, head: 148, wideOut: true },
-    { id: "mk-in", he: "עומק מוגדל", en: "Deep return", ru: "Увеличенная глубина", out: 46, in: 112, head: 198, wideIn: true },
+  var MASHKOF_PARTS = [
     {
-      id: "mk-both",
-      he: "רחב ועמוק",
-      en: "Wide and deep",
-      ru: "Широкая и глубокая",
-      out: 82,
-      in: 112,
-      head: 198,
-      wideOut: true,
-      wideIn: true
+      key: "out",
+      he: "קאנט חיצוני",
+      en: "Outer kant",
+      ru: "Наружный кант",
+      std: 46,
+      wide: 82,
+      drawn: true
+    },
+    {
+      key: "in",
+      he: "פאלץ",
+      en: "Falc",
+      ru: "Фальц",
+      std: 62,
+      wide: 112,
+      head: { std: 148, wide: 198 },
+      drawn: true
+    },
+    {
+      key: "inner",
+      he: "קאנט פנימי",
+      en: "Inner kant",
+      ru: "Внутренний кант",
+      std: 46,
+      wide: 82,
+      drawn: false
     }
   ];
+  var MK_IDS = {
+    "": "mk-std",
+    out: "mk-out",
+    in: "mk-in",
+    "out,in": "mk-both",
+    inner: "mk-inner",
+    "out,inner": "mk-out-inner",
+    "in,inner": "mk-in-inner",
+    "out,in,inner": "mk-all"
+  };
+  var MK_LABEL = {
+    he: ["סטנדרטי", "מורחב: "],
+    en: ["Standard", "Wide: "],
+    ru: ["Стандартная", "Расширено: "]
+  };
+  var MASHKOFS = Object.entries(MK_IDS).map(([keys, id]) => {
+    const wide = keys ? keys.split(",") : [];
+    const part = (k) => MASHKOF_PARTS.find((p) => p.key === k);
+    const dim = (k) => wide.includes(k) ? part(k).wide : part(k).std;
+    const o = {
+      id,
+      wide,
+      out: dim("out"),
+      in: dim("in"),
+      inner: dim("inner"),
+      head: wide.includes("in") ? part("in").head.wide : part("in").head.std,
+      wideOut: wide.includes("out"),
+      wideIn: wide.includes("in"),
+      wideInner: wide.includes("inner")
+    };
+    for (const lang2 of ["he", "en", "ru"]) {
+      o[lang2] = wide.length ? MK_LABEL[lang2][1] + wide.map((k) => part(k)[lang2]).join(", ") : MK_LABEL[lang2][0];
+    }
+    return o;
+  });
   var MASHKOF_MAX = MASHKOFS.reduce((m, k) => ({
     out: Math.max(m.out, k.out),
     in: Math.max(m.in, k.in),
@@ -1670,7 +1695,21 @@
   ];
   var PEEPHOLES = [
     { id: "nopeep", he: "ללא", en: "None", ru: "Нет" },
-    { id: "peep", he: "עינית", en: "Peephole", ru: "Глазок" }
+    { id: "peep", he: "עינית", en: "Peephole", ru: "Глазок" },
+    /* ⚠ A DIGITAL VIEWER, +390, 20.9.2026 — Peretz: *"einit digital +390."*
+       APPENDED, so `peep` keeps its index; `BITS.peephole` still had to go 1 → 2,
+       which is a layout change and is inside `VERSION` 23 with the rest.
+       No photograph yet — `peepholeDigital` in the renderer says what is sourced
+       and what is convention — and `ASK-PERETZ.md` asks for one. It stands where
+       the optical viewer stands and is refused by the same `peepholeFits`. */
+    {
+      id: "peep-digital",
+      he: "עינית דיגיטלית",
+      en: "Digital peephole",
+      ru: "Цифровой глазок",
+      digital: true,
+      photo: null
+    }
   ];
   var GRILLES = [
     {
@@ -1925,7 +1964,9 @@
       he: "שני פאנלים",
       en: "Two panels",
       ru: "Две панели",
-      aliases: ["panelTop", "panel", "both", "groove", "perimeter"],
+      /* `panel2o` and `panelo` — the ogee pair and the ogee single — resolve
+         here since 20.9.2026: Peretz, *"remove entirely the classic panels."* */
+      aliases: ["panelTop", "panel", "both", "groove", "perimeter", "panel2o", "panelo"],
       panel: true,
       groove: false,
       panels: 2,
@@ -1971,7 +2012,8 @@
       panel: true,
       groove: false,
       panels: 3,
-      top: true
+      top: true,
+      aliases: ["panel3o"]
     },
     /* ── THE SAME PANELS IN THE OTHER SECTION ─────────────────────────
          ⚠ THERE ARE TWO MOULDINGS IN THIS RANGE AND WE DREW ONE. Asked for from
@@ -2008,25 +2050,19 @@
        it was measured on, are named on the pair now — they are solid leaves with
        one ogee panel and the gallery draws them with two, which is the cost
        ASK-PERETZ §2 asks about. */
-    {
-      id: "panel2o",
-      sub: "panel",
-      he: "שני פאנלים קלאסיים",
-      en: "Two panels, ogee",
-      ru: "Две панели, классика",
-      aliases: ["panelo"],
-      panel: true,
-      groove: false,
-      panels: 2,
-      top: true,
-      profile: "ogee",
-      doors: ["d051", "d061", "d067", "d077"]
-    },
-    /* ⚠ THE OGEE TRIO IS AT THE FOOT OF THIS ARRAY, not here beside its twin —
-       see the entry after `classic`. The short code packs this array's INDEX, so
-       a new face goes on the END and the SCREEN order is `sub` plus
-       `buildOptions`, which files it next to `panel3` where a customer expects
-       it. Two different orders, and only one of them is a wire format. */
+    /* ⚠ `panel2o` AND `panel3o` — THE OGEE PAIR AND TRIO — ARE WITHDRAWN,
+       20.9.2026, on Peretz's word: *"remove entirely the classic panels, and in
+       the greek set the thing around the window needs to be like the normal
+       panel."* Both ids alias onto the reeded twin above, so a link or a code
+       written while they existed opens a door at the pair's or the trio's own
+       price. The doors they were measured on — d051 d061 d067 d077 for the pair,
+       and the eleven ogee doors named in the note above — are still his doors;
+       the gallery draws them with the reed now, which is the cost of an
+       instruction that overrules a measurement, and it is recorded rather than
+       hidden. The ogee SECTION itself stays measured in `MOULDS` in the
+       renderer, with nothing left that draws it.
+       ⚠ MID-LIST REMOVAL RE-INDEXES `detail`, which is part of why this landed
+       under `VERSION` 23 with the rest of the round. */
     /* ── APPLIED STRIPS ───────────────────────────────────────────────
          The designed tier's signature, and we had it backwards at first. Of the
          seven measured doors with line work on the face, only two are milled
@@ -2200,12 +2236,19 @@
       classic: true,
       rectOnly: true,
       doors: ["newdoor"],
-      /* The set's own mouldings are drawn by `classicSet` and are the ogee by
-         construction — that section was measured on this very door. This field
-         says so for the ARCHITRAVE round its light, which `render` cases through
-         `aperture` like any other opening and which would otherwise have come
-         out reeded on the one door that certainly is not. */
-      profile: "ogee",
+      /* ⚠ `reed`, ON PERETZ'S WORD, AGAINST THE PHOTOGRAPH — 20.9.2026: *"in the
+         greek set the thing around the window needs to be like the normal
+         panel."* This field is what `render` cases the ARCHITRAVE round its
+         light in, through `aperture` like any other opening. It said `ogee`,
+         and the ogee is what `research/newdoor/` shows: that section was
+         measured on this very door (a cross-section through its panel surround
+         at 4000 px on 14.9 read one broad soft curve with a bead at its inner
+         edge, the ogee row of `MOULDS` to the letter). B4 on 14.9 made the set's
+         PANEL reed on the same instruction; this is the other half of it.
+         Measured, overruled, kept — REALISM.md §6. The set's own pieces
+         (cornice, frieze, shelf, plinth) are drawn by `classicSet` and are
+         untouched. */
+      profile: "reed",
       /* ⚠ THE ROWS ARE SCALED BY 3698/3730 with CLASSIC_ROWS — the crop the set
          was measured from was 0.86% short, see the note there. The COLUMNS are
          left alone: an edge-find on the rectified leaf puts the pane at 0.291 to
@@ -2213,42 +2256,18 @@
          instrument's own error, and drawing them back over the photograph in red
          put them on the glass twice. */
       winFrac: { x0: 0.289, x1: 0.711, top: 0.154, bot: 0.526 }
-    },
-    /* ⚠ THE TRIO IN THE OTHER MOULDING SECTION, ADDED 14.9.2026. Asked for by
-       Peretz: *"add an option of 3 panels but classic ones"* — the twin of
-       `panel3`, and the last hole in the grid the two-mouldings block above
-       opened. Every other panelled face came in both sections; three panels came
-       in one, so a customer who had chosen the ogee for its own sake lost it the
-       moment they asked for the middle plate.
-       Same rows, same inset and the SAME PRICE as `panel3` — `profile` is the
-       only field between them, which is what that block says the two sections
-       are. `js/prices.js` carries the figure, once, beside its twin's.
-       ⚠ IT DOES NOT BRING A HANDLE, and neither does `panel3` any more: see the
-       note on `grab` there. Nothing in this list carries its own pull now.
-       ⚠ APPENDED, so no index before it moves. The ogee half of the list is not
-       contiguous in this array and does not need to be; `sub` and `profile` are
-       what the screen and the drawing read. */
-    {
-      id: "panel3o",
-      sub: "panel",
-      he: "שלושה פאנלים קלאסיים",
-      en: "Three panels, ogee",
-      ru: "Три панели, классика",
-      panel: true,
-      groove: false,
-      panels: 3,
-      top: true,
-      profile: "ogee"
     }
+    /* `panel3o`, the ogee trio Peretz asked for on 14.9 (*"add an option of 3
+       panels but classic ones"*), stood here from that day until 20.9.2026,
+       when he withdrew the classic panels outright. It aliases onto `panel3`. */
   ];
   var FINISHES = [
     { id: "steel", he: "ניקל מוברש", en: "Brushed nickel", ru: "Матовый никель" },
     { id: "black", he: "שחור מט", en: "Matte black", ru: "Матовый чёрный" },
     { id: "brass", he: "פליז", en: "Brass", ru: "Латунь" }
   ];
-  var declaredFinish = (o) => !o || !o.finish ? null : FINISHES.find((f) => f.id === o.finish || (f.aliases || []).includes(o.finish)) || null;
   var colourCode = (c) => `${T("brand.ravbariach")} ${c.ral}`;
-  var HANDLE_LENS = [0, 600, 800, 1e3, 1200, 1400, 1600, 1800, 2e3];
+  var HANDLE_LENS = [0, 700, 800, 900, 1e3, 1200, 1400, 1600, 1800, 2e3];
   function handleLength(state2) {
     const h = byId(HANDLES, state2.handle);
     if (h.priceKind !== "bar") return h.len;
@@ -2264,8 +2283,10 @@
     return fits.length ? fits : [HANDLE_LENS[1]];
   };
   function gripFinish(state2) {
-    return declaredFinish(byId(HANDLES, state2.handle)) || byId(FINISHES, "steel");
+    const hf = byId(HANDLE_FINISHES, state2.handleFinish || HANDLE_FINISHES[0].id);
+    return byId(FINISHES, hf.tone);
   }
+  var gripTakesFinish = (state2) => !!byId(HANDLES, state2.handle).finishes;
   var byId = (list, id) => list.find((o) => o.id === id) || list.find((o) => (o.aliases || []).includes(id)) || list[0];
   var leafGlazed = (state2) => byId(WINDOWS, state2.window).rects.length > 0;
   var hasUpperPanel = (detail) => !!detail.top || detail.panels >= 2;
@@ -2387,13 +2408,40 @@
     stripsx: { stripeDir: "v", stripeCount: 1, stripeTight: false }
   };
   var stripePrice = (st) => st.stripeDir === "none" ? 0 : (STRIPE_A[st.stripeDir] || 0) * (st.stripeCount | 0);
-  var HANDLE_RATE_A = { ...HANDLE_RATE, per: agorot(HANDLE_RATE.per) };
   for (const h of HANDLES) h.priceKind = h.style === "bar" ? "bar" : "flat";
+  function priceHandles(list, table) {
+    const seen = /* @__PURE__ */ new Set();
+    for (const o of list) {
+      if (!Object.prototype.hasOwnProperty.call(table, o.id)) {
+        throw new Error(`prices.js has no handle price for "${o.id}" — every option needs one, or it silently costs nothing`);
+      }
+      const v = table[o.id];
+      if (o.priceKind === "bar") {
+        if (!v || typeof v !== "object" || typeof v.short !== "number" || typeof v.long !== "number") {
+          throw new Error(`prices.js must price the bar "${o.id}" as { short, long } — it is sold in two length bands`);
+        }
+        o.delta = agorot(v.short);
+        o.deltaLong = agorot(v.long);
+      } else {
+        if (typeof v !== "number") {
+          throw new Error(`prices.js prices the flat grip "${o.id}" as an object — it has no length bands`);
+        }
+        o.delta = agorot(v);
+      }
+      seen.add(o.id);
+    }
+    for (const id of Object.keys(table)) {
+      if (!seen.has(id)) {
+        throw new Error(`prices.js prices a handle called "${id}" that is not in the catalogue — a renamed id, or a price nobody will ever be charged`);
+      }
+    }
+  }
   priceInto("colour", COLOURS, COLOUR, "delta");
   priceInto("window", WINDOWS, WINDOW, "delta");
   priceInto("grille", GRILLES, GRILLE, "delta");
   priceInto("detail", DETAILS, DETAIL, "delta");
-  priceInto("handle", HANDLES, HANDLE, "delta");
+  priceHandles(HANDLES, HANDLE);
+  priceInto("handle finish", HANDLE_FINISHES, HANDLE_FINISH, "delta");
   priceInto("lockset", LOCKSETS, LOCKSET, "delta");
   priceInto("special lock", SPECIAL_LOCKS, SPECIAL_LOCK, "delta");
   priceInto("pirzul", PIRZUL2, PIRZUL, "delta");
@@ -2409,14 +2457,15 @@
 
   // js/price.js
   function mashkofExtras(state2) {
-    const mk = byId(MASHKOFS, state2.mashkof);
-    return (mk.wideOut ? MASHKOF_WIDER_A : 0) + (mk.wideIn ? MASHKOF_WIDER_A : 0);
+    return byId(MASHKOFS, state2.mashkof).wide.length * MASHKOF_WIDER_A;
+  }
+  function finishExtra(state2) {
+    return byId(HANDLE_FINISHES, state2.handleFinish).delta;
   }
   function handlePrice(state2) {
     const h = byId(HANDLES, state2.handle);
-    if (h.priceKind !== "bar") return h.delta;
-    const over = Math.max(0, handleLength(state2) - HANDLE_RATE_A.over);
-    return h.delta + Math.ceil(over / HANDLE_RATE_A.step) * HANDLE_RATE_A.per;
+    const base = h.priceKind === "bar" && handleLength(state2) > HANDLE_BAND ? h.deltaLong : h.delta;
+    return base + (gripTakesFinish(state2) ? finishExtra(state2) : 0);
   }
   function glazedDetail(state2) {
     const d = byId(DETAILS, state2.detail);
@@ -2465,7 +2514,11 @@
          zero row is dropped by `breakdownRows`, so the עינית costs the column
          nothing and still reaches the ORDER through `js/spec.js`, which is where
          Peretz needs to see it. */
-      bell: byId(BELLS, state2.bell).delta,
+      /* ⚠ AND THE BELL FOLLOWS THE PULL HANDLE'S FINISH, 20.9.2026 — *"the
+         pirzul for it changes its price by 100 or 200"*, the pull-handle finish
+         on his son's word, per object: a nickel ring is ₪300, black ₪400, gold
+         ₪500. Nothing on a door with no bell. */
+      bell: byId(BELLS, state2.bell).delta + (state2.bell !== "nobell" ? finishExtra(state2) : 0),
       peephole: byId(PEEPHOLES, state2.peephole).delta,
       /* A grille needs a window to sit in — and so does worked glass, which is
          in the same list now. Neither can be charged on a solid door: the
@@ -2499,6 +2552,7 @@
   }
   function tileAgorot(groupKey, state2) {
     if (groupKey === "size") return priceAgorot(state2);
+    if (groupKey === "handleFinish") return byId(HANDLE_FINISHES, state2.handleFinish).delta;
     const parts = priceParts(state2);
     return Object.prototype.hasOwnProperty.call(parts, groupKey) ? parts[groupKey] : void 0;
   }
@@ -2548,7 +2602,8 @@
     const dt = byId(DETAILS, state2.detail);
     const sz = SIZES[state2.size] || SIZES.standard;
     const hn = byId(HANDINGS, state2.handing);
-    const fin = declaredFinish(hd);
+    const hf = byId(HANDLE_FINISHES, state2.handleFinish);
+    const fin = gripTakesFinish(state2) ? hf : null;
     const rows = [
       /* ⚠ NOT "RAL". These are Rav Bariach's own chart codes — the catalogue says
          so where it defines them ("Codes are theirs"), and the RAL numbers we
@@ -2604,7 +2659,7 @@
       rows.push({ key: "speciallock", label: T("row.speciallock"), id: xl.id, value: L(xl) });
     }
     if (bl.id !== "nobell") {
-      rows.push({ key: "bell", label: T("row.bell"), id: bl.id, value: L(bl) });
+      rows.push({ key: "bell", label: T("row.bell"), id: bl.id, value: `${L(bl)} · ${L(hf)}` });
     }
     if (ep.id !== "nopeep") {
       rows.push({ key: "peephole", label: T("row.peephole"), id: ep.id, value: L(ep) });
@@ -2832,6 +2887,7 @@
       ["1", "#9B9992"]
     ] }
   };
+  var tubeRamp = (tone) => tone === FINISH_TONES.brass ? "barGold" : "barTube";
   function barRamp(name, tone, id = name) {
     const r = BAR_RAMP[name] || BAR_RAMP.barTube;
     const stops = r.stops.map(([o, hex]) => `      <stop offset="${o}" stop-color="${r.raw ? hex : inFinish(hex, tone)}"/>`).join("\n");
@@ -2859,7 +2915,7 @@ ${stops}
       rim: scaleTone(tone[CYL_REF_RIM], CYL_LIFT_RIM)
     };
   }
-  var bellRamp = (tone) => tone === FINISH_TONES.brass ? FINISH_TONES.brass : FINISH_TONES.steel;
+  var bellRamp = (tone) => tone;
   var LIGHT = {
     key: 0.24,
     // face wash amplitude
@@ -2907,6 +2963,8 @@ ${stops}
   var SPECIAL_BOX = { kasefet: { w: 50, h: 68 }, kodan: { w: 60, h: 154 } };
   var KNOCKER_AFF = 1470;
   var PEEPHOLE_R = 15;
+  var PEEPHOLE_DIGITAL_R = 27;
+  var peepholeR = (state2) => byId(PEEPHOLES, state2.peephole).digital ? PEEPHOLE_DIGITAL_R : PEEPHOLE_R;
   var KNOCKER_R = 66;
   var KNOCKER_REACH = {
     x: KNOCKER_R * 0.86,
@@ -3113,7 +3171,7 @@ ${stops}
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
     const cyl = cylinderRamp(hwTone);
-    const bellTone = bellRamp(hwTone);
+    const bellTone = bellRamp(tone);
     const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "steel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
     const sideW = size.side ? size.side - REBATE : 0;
@@ -3701,11 +3759,11 @@ ${stops}
          rims and bright once, off centre. Measured on the photographs the
          peak-to-trough is about 3.2:1 (d035 233:57, d065 215:25) and the
          minimum sits at 0.86-0.96 across, never in the interior. -->
-    ${barRamp("barTube", tone)}
-    <!-- The same cylinder in gold. d072, d074 and d082 are brass rods and we
-         drew them silver, because ella carried no finish key of its own and
-         gripFinish fell through to steel. -->
-    ${barRamp("barGold", tone)}
+    ${barRamp(tubeRamp(tone), tone, "barTube")}
+    <!-- In gold the SAME id carries barGold — the measured brass tube off the
+         manufacturer's photograph (d072, d074 and d082 are brass rods) —
+         rather than the steel stops remapped, which is what tubeRamp decides
+         once for the door and for the finish tile. -->
     <!-- The flat strap: two hairline arrises and one uniform field between
          them. Total swing across the middle 89% stays under 4%. -->
     ${barRamp("barStrap", tone)}
@@ -4681,7 +4739,7 @@ ${stops}
               lever, the cylinder, the extra lock and the pull handle at every
               size, so a fitting nobody has photographed for us cannot collide with
               anything. Both are explained where they are drawn. */
-    ""}${state2.peephole === "peep" ? peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ""}
+    ""}${state2.peephole !== "nopeep" ? byId(PEEPHOLES, state2.peephole).digital ? peepholeDigital(mainX + leafW / 2, y(PEEPHOLE_AFF)) : peephole(mainX + leafW / 2, y(PEEPHOLE_AFF)) : ""}
     ${state2.bell === "bell" ? bellKnocker(mainX + leafW / 2, y(KNOCKER_AFF)) : ""}
   </g>
 
@@ -5042,13 +5100,14 @@ ${body}
       });
     }
     if (state2.peephole && state2.peephole !== "nopeep") {
+      const R = peepholeR(state2);
       out.push({
         kind: "fitting",
         band: 0,
-        x: leafW / 2 - PEEPHOLE_R,
-        y: leafH - PEEPHOLE_AFF - PEEPHOLE_R,
-        w: PEEPHOLE_R * 2,
-        h: PEEPHOLE_R * 2
+        x: leafW / 2 - R,
+        y: leafH - PEEPHOLE_AFF - R,
+        w: R * 2,
+        h: R * 2
       });
     }
     const sp = SPECIAL_BOX[state2.speciallock];
@@ -5075,7 +5134,7 @@ ${body}
     );
     if (!openings.length) return true;
     const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
-    const R = PEEPHOLE_R + 8;
+    const R = peepholeR(state2) + 8;
     return !openings.some((o) => cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
   }
   function bellFits(state2) {
@@ -6875,16 +6934,8 @@ ${body}
   var BARS = {
     // Standard round tube — a dozen doors, the commonest grip Peretz fits.
     idan: { tone: "barTube", rx: 0.3, fix: { t: [0.14, 0.85] } },
-    // The same cylinder in brass. d072, d074, d082.
-    ella: { tone: "barGold", rx: 0.3, fix: { t: [0.15, 0.8] } },
-    // The slim rod: d072 at 0.017 of leaf width, d035 at 0.022, d074 at 0.024.
-    ron: { tone: "barTube", rx: 0.3, fix: { t: [0.1, 0.9] } },
-    // Flat strap, standard width — d049, d066, d034, d104.
-    nitzan: { tone: "barStrap", rx: 0.02, fix: { t: [0.1, 0.89] } },
-    // Flat strap, long — d060 runs 0.60 of leaf height against d049's 0.45.
-    shahar: { tone: "barStrap", rx: 0.02, fix: { t: [0.15, 0.85] } },
-    // Flat strap, wide — d073, the one bar in the corpus past 0.07 of leaf width.
-    blade: { tone: "barStrap", rx: 0.03, fix: { t: [0.09, 0.95] } }
+    // Square-section bar, drawn as its flat face — d049, d066, d034, d104.
+    nitzan: { tone: "barStrap", rx: 0.02, fix: { t: [0.1, 0.89] } }
   };
   function pullBar(cx, cy, handle, leafH, panelled) {
     const spec = BARS[handle.bar] || BARS.idan;
@@ -7408,6 +7459,24 @@ ${body}
               r="${(R * 0.2).toFixed(1)}" fill="#fff" fill-opacity=".30"/>
     </g>`;
   };
+  var peepholeDigital = (cx, cy) => {
+    const R = PEEPHOLE_DIGITAL_R;
+    const n1 = (v) => v.toFixed(1);
+    return `
+    <g data-hw="peephole" data-owner="peephole" data-kind="peephole" data-digital="1"
+       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
+      <rect x="${n1(cx - R * 0.95)}" y="${n1(cy - R * 0.95 + R * 0.16)}"
+            width="${n1(R * 1.9)}" height="${n1(R * 1.9)}" rx="${n1(R * 0.34)}"
+            fill="#000" opacity="0.18"/>
+      <rect x="${cx - R}" y="${cy - R}" width="${R * 2}" height="${R * 2}" rx="${n1(R * 0.34)}"
+            fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
+      ${/* the lens: a dark disc with the sensor's darker centre and one highlight */
+    ""}<circle cx="${cx}" cy="${cy}" r="${n1(R * 0.56)}" fill="#000" fill-opacity=".62"/>
+      <circle cx="${cx}" cy="${cy}" r="${n1(R * 0.3)}" fill="#000" fill-opacity=".55"/>
+      <circle cx="${n1(cx - R * 0.16)}" cy="${n1(cy - R * 0.18)}" r="${n1(R * 0.12)}"
+              fill="#fff" fill-opacity=".34"/>
+    </g>`;
+  };
   var bellKnocker = (cx, cy) => {
     const R = KNOCKER_R;
     const RING = R * 0.78;
@@ -7763,7 +7832,7 @@ ${body}
       const half = Math.min(h.len, 1240) / 2;
       const w = h.w || 30, spec = BARS[h.bar] || BARS.idan;
       const id = `bg-${h.id}`;
-      const tone = FINISH_TONES[h.finish] || FINISH_TONES.steel;
+      const tone = FINISH_TONES.steel;
       return { box: [-170, -650, 170, 650], art: `
     <defs>${barRamp(spec.tone, tone, id)}</defs>
     <rect x="${-w / 2}" y="${-half}" width="${w}" height="${half * 2}" rx="${w * spec.rx}"
@@ -7810,10 +7879,21 @@ ${body}
     <rect x="-4.5" y="36" width="9" height="13" rx="2" fill="#000" fill-opacity=".5"/>
   </svg>`;
   }
+  function handleFinishGlyph(hf) {
+    const t = FINISH_TONES[hf.tone] || FINISH_TONES.steel;
+    const id = `hfg-${hf.id}`;
+    return `<svg viewBox="-70 -93 140 186" class="glyph glyph--hw" aria-hidden="true">
+    <defs>${barRamp(tubeRamp(t), t, id)}</defs>
+    <rect x="-8" y="-72" width="32" height="150" rx="10" fill="#000" opacity=".18"/>
+    <rect x="-16" y="-80" width="32" height="150" rx="10" fill="url(#${id})"
+          stroke="#000" stroke-opacity=".18"/>
+  </svg>`;
+  }
   function mashkofGlyph(mk) {
     const W = 200, H = 150;
     const sc = 0.62;
     const out = mk.out * sc, dep = mk.in * sc;
+    const inner = (mk.inner == null ? mk.out : mk.inner) * sc;
     const cx = W / 2;
     const wallY = 46, frameY = wallY;
     const dimY = 30, dimX = cx + 22;
@@ -7826,6 +7906,8 @@ ${body}
       <!-- the frame's face on the wall, and its return into the opening -->
       <rect x="${f(cx - out)}" y="${frameY - 9}" width="${f(out * 2)}" height="9"/>
       <rect x="${cx - 7}" y="${frameY}" width="14" height="${f(dep)}"/>
+      <!-- the inner kant: the same wing on the room side of the wall -->
+      <rect x="${f(cx - inner)}" y="${wallY + 26}" width="${f(inner * 2)}" height="9"/>
       <!-- the leaf, at the back of the return -->
       <rect x="${cx - 46}" y="${f(foot)}" width="92" height="11" opacity=".72"/>
     </g>
@@ -7838,10 +7920,17 @@ ${body}
       <path d="M${dimX} ${frameY}V${f(foot)}"/>
       <path d="M${dimX - 5} ${frameY}h10"/>
       <path d="M${dimX - 5} ${f(foot)}h10"/>
+      <!-- the inner kant, over one wing, at the foot of the glyph: the band
+           between the wing and the leaf is too short to hold a mark on the
+           deep frame, so the mark sits under everything -->
+      <path d="M${f(cx - inner)} ${H - 7}H${cx}"/>
+      <path d="M${f(cx - inner)} ${H - 12}v10"/>
+      <path d="M${cx} ${H - 12}v10"/>
     </g>
     <g class="glyph__dim" fill="currentColor" font-size="23" opacity=".8">
       <text x="${f(cx - out / 2)}" y="${dimY - 8}" text-anchor="middle">${mk.out}</text>
       <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 8)}">${mk.in}</text>
+      <text x="${f(cx - inner / 2)}" y="${H - 13}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
     </g>
   </svg>`;
   }
@@ -7880,7 +7969,15 @@ ${body}
       peep: `
     <circle cx="0" cy="0" r="40"/>
     <circle cx="0" cy="0" r="21" fill="#fff" opacity=".92"/>
-    <circle cx="-7" cy="-8" r="8" opacity=".55"/>`
+    <circle cx="-7" cy="-8" r="8" opacity=".55"/>`,
+      /* The digital viewer: the rounded-square bezel the leaf draws, with a lens
+         in it — so it cannot be mistaken for the round optical eye above or for
+         the ring on a boss the bell tile draws. */
+      "peep-digital": `
+    <rect x="-46" y="-46" width="92" height="92" rx="16"/>
+    <circle cx="0" cy="0" r="24" fill="#fff" opacity=".92"/>
+    <circle cx="0" cy="0" r="12" opacity=".75"/>
+    <circle cx="-5" cy="-6" r="4" fill="#fff" opacity=".9"/>`
     }[x.id] || "";
     return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>
@@ -8346,7 +8443,7 @@ ${body}
   var specIcon = (key) => Object.prototype.hasOwnProperty.call(SPEC_ICON, key) ? `<svg class="spec__ico" viewBox="0 0 24 24" aria-hidden="true">${SPEC_ICON[key]}</svg>` : '<span class="spec__ico" aria-hidden="true"></span>';
 
   // js/url-state.js
-  var VERSION = 22;
+  var VERSION = 23;
   var DEFAULTS = {
     /* ⚠ 7126D, NOT THE ANTHRACITE, AND THE REASON IS THE OPENING PRICE.
        Peretz priced colour on 30.8.2026: 9016T, 9001T and 7126D are in the
@@ -8386,6 +8483,11 @@ ${body}
     peephole: "nopeep",
     mashkof: "mk-std",
     pirzul: "pz-nickel",
+    /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — nickel until the customer picks,
+       like the פרזול. It is a field whether or not a bar is on the door,
+       because the פעמון follows it too; with neither on the door it prices at
+       nothing and paints nothing, which is what `isUntouched` needs of it. */
+    handleFinish: "hf-nickel",
     /* ⚠ 0 = "as the model comes". Every bar has a length measured off the
        photographs and thirty recreations are checked against them; a global
        default would override all of them silently. The length is opt-in, and a
@@ -8410,6 +8512,7 @@ ${body}
     p.set("x", state2.speciallock);
     p.set("m", state2.mashkof);
     p.set("pz", state2.pirzul);
+    p.set("hf", state2.handleFinish);
     p.set("bl", state2.bell);
     p.set("ey", state2.peephole);
     p.set("hl", String(state2.handleLen));
@@ -8433,6 +8536,7 @@ ${body}
       "x",
       "m",
       "pz",
+      "hf",
       "hl",
       "sp",
       "d",
@@ -8480,6 +8584,8 @@ ${body}
         if (handleRaisedIt) notice = beforeHandle;
       }
     }
+    const legacyHandle = HANDLE_LEGACY[rawN];
+    if (legacyHandle && !p.get("hf")) Object.assign(state2, legacyHandle);
     const legacy = STRIPE_LEGACY[p.get("d")];
     if (legacy) {
       Object.assign(state2, legacy);
@@ -8489,6 +8595,7 @@ ${body}
     take("speciallock", "x", SPECIAL_LOCKS);
     take("mashkof", "m", MASHKOFS);
     take("pirzul", "pz", PIRZUL2);
+    take("handleFinish", "hf", HANDLE_FINISHES);
     take("bell", "bl", BELLS);
     take("peephole", "ey", PEEPHOLES);
     const rawStripes = p.get("sp");
@@ -8527,12 +8634,13 @@ ${body}
     lockset: 4,
     detail: 3,
     speciallock: 2,
-    mashkof: 2,
+    mashkof: 3,
     pirzul: 2,
     handleLen: 4,
     stripes: 5,
     bell: 1,
-    peephole: 1
+    peephole: 2,
+    handleFinish: 2
   };
   var PAYLOAD_BITS = Object.values(BITS).reduce((a, b) => a + b, 0);
   var CHECK_MIN = 4;
@@ -8571,7 +8679,8 @@ ${body}
       [Math.max(0, HANDLE_LENS.indexOf(state2.handleLen)), BITS.handleLen],
       [packStripes(state2), BITS.stripes],
       [Math.max(0, BELLS.findIndex((x) => x.id === state2.bell)), BITS.bell],
-      [Math.max(0, PEEPHOLES.findIndex((x) => x.id === state2.peephole)), BITS.peephole]
+      [Math.max(0, PEEPHOLES.findIndex((x) => x.id === state2.peephole)), BITS.peephole],
+      [Math.max(0, HANDLE_FINISHES.findIndex((x) => x.id === state2.handleFinish)), BITS.handleFinish]
     ];
     let bits = 0n;
     for (const [value, width] of parts) {
@@ -8617,7 +8726,8 @@ ${body}
     const sp = read(BITS.stripes);
     const bell = BELLS[read(BITS.bell)];
     const peep = PEEPHOLES[read(BITS.peephole)];
-    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep) return null;
+    const hf = HANDLE_FINISHES[read(BITS.handleFinish)];
+    if (!colour || !size || !handing || !window2 || !grille || !handle || !lockset || !detail || !special || !mashkof || !pirzul || hLen === void 0 || !bell || !peep || !hf) return null;
     return {
       colour: colour.id,
       size,
@@ -8632,6 +8742,7 @@ ${body}
       pirzul: pirzul.id,
       bell: bell.id,
       peephole: peep.id,
+      handleFinish: hf.id,
       handleLen: hLen,
       ...unpackStripes(sp)
     };
@@ -8798,36 +8909,36 @@ ${body}
 
   // js/works.js
   var WORKS = [
-    { id: "d003", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d012", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d015", state: { colour: "rb-9005d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d016", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d026", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "cadoor", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
-    { id: "d034", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
-    { id: "d038", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
-    { id: "d043", state: { colour: "rb-7126d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
-    { id: "d048", state: { colour: "rb-5103d", detail: "panel2", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d051", state: { colour: "rb-7240d", detail: "panel2", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d063", state: { colour: "rb-7240d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 4, stripeTight: false } },
-    { id: "d064", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 7, stripeTight: false } },
-    { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "shahar", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
-    { id: "d078", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 11, stripeTight: false } },
-    { id: "d087", state: { colour: "rb-7021d", detail: "panel2", window: "none", grille: "none", handle: "shahar", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "none", handle: "none", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d097", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d099", state: { colour: "rb-7126d", detail: "plain", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles", handle: "none", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "barblack", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d116", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d122", state: { colour: "rb-7240d", detail: "plain", window: "rect", grille: "grid", handle: "idan", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "ron", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
-    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
+    { id: "d003", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d004", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d012", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d015", state: { colour: "rb-9005d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d016", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d022", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d026", state: { colour: "rb-7080d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d029", state: { colour: "rb-rb09d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d030", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "cadoor", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d031", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "cadoor", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 1, stripeTight: false } },
+    { id: "d034", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
+    { id: "d038", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
+    { id: "d043", state: { colour: "rb-7126d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "v", stripeCount: 3, stripeTight: false } },
+    { id: "d048", state: { colour: "rb-5103d", detail: "panel2", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d051", state: { colour: "rb-7240d", detail: "panel2", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d063", state: { colour: "rb-7240d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 4, stripeTight: false } },
+    { id: "d064", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "h", stripeCount: 7, stripeTight: false } },
+    { id: "d072", state: { colour: "rb-0096d", detail: "plain", window: "none", grille: "none", handle: "nitzan", handleFinish: "hf-black", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "v", stripeCount: 1, stripeTight: false } },
+    { id: "d078", state: { colour: "rb-7110d", detail: "plain", window: "none", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "h", stripeCount: 11, stripeTight: false } },
+    { id: "d087", state: { colour: "rb-7021d", detail: "panel2", window: "none", grille: "none", handle: "idan", handleFinish: "hf-black", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d092", state: { colour: "rb-6219d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "knobplate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d097", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d099", state: { colour: "rb-7126d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d106", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "circles", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d108", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "none", handle: "none", handleFinish: "hf-nickel", lockset: "plate", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d113", state: { colour: "rb-7080d", detail: "plain", window: "strip", grille: "grid", handle: "idan", handleFinish: "hf-black", lockset: "digital", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d116", state: { colour: "rb-7080d", detail: "plain", window: "rect", grille: "scroll", handle: "none", handleFinish: "hf-nickel", lockset: "coral", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d122", state: { colour: "rb-7240d", detail: "plain", window: "rect", grille: "grid", handle: "idan", handleFinish: "hf-black", lockset: "cylinder", size: "standard", handing: "right-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d125", state: { colour: "rb-9001d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } },
+    { id: "d128", state: { colour: "rb-7322d", detail: "plain", window: "strip", grille: "none", handle: "idan", handleFinish: "hf-nickel", lockset: "cylinder", size: "standard", handing: "left-in", stripeDir: "none", stripeCount: 0, stripeTight: false } }
   ];
 
   // js/app.js
@@ -8932,6 +9043,38 @@ ${body}
       glyph: handleGlyph,
       hint: "g.handle.h"
     },
+    /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026, ON THE OWNER'S OWN WORD — *"its
+       like pirzul but for the pull handle"* — and it is the axis withdrawn on
+       27.8 coming back under a new id and a new parameter (`hf=`, never `f=`;
+       see `HANDLE_FINISHES`). It paints the bar and the bow, and since the same
+       day the פעמון, which is why the bell's group follows this one on the
+       same step rather than staying with the פרזול. Nickel, black +100, gold
+       +200, charged on each thing it recolours. */
+    {
+      key: "handleFinish",
+      title: "g.handleFinish",
+      in: "grip",
+      kind: "hw",
+      list: () => HANDLE_FINISHES,
+      glyph: handleFinishGlyph,
+      hint: "g.handleFinish.h"
+    },
+    /* ⚠ THE פעמון STANDS WITH THE PULL HANDLES SINCE 20.9.2026 — Peretz: *"put
+       the bell with the pull handles and the pirzul for it changes its price by
+       100 or 200."* It was on the פרזול step from 30.8 with the עינית, for the
+       reason written over that group; what moved it is that its metal and its
+       surcharge follow the HANDLE finish now, so the customer who has just
+       chosen a gold bar sees the ring go gold beside it. The עינית stays on
+       `pz`: the פרזול is what recolours it. */
+    {
+      key: "bell",
+      title: "g.bell",
+      in: "grip",
+      kind: "hw",
+      list: () => BELLS,
+      glyph: bellGlyph,
+      hint: "g.bell.h"
+    },
     {
       key: "lockset",
       title: "g.lockset",
@@ -8975,24 +9118,13 @@ ${body}
       glyph: pirzulGlyph,
       hint: "g.pirzul.h"
     },
-    /* ⚠ THE פעמון AND THE עינית, 30.8.2026, AND THEY SIT ON THE פרזול STEP.
-       Peretz asked for both by name. Neither is a lock and neither is a grip, so
-       they do not belong on `lock` or `grip` — and neither is worth a tenth step
-       of its own, because a step with one yes/no question in it is a page turn
-       for a checkbox. `pz` is the step that already asks "and what else is on
-       the door", and it is where a customer who has just chosen the finish of
-       the ironmongery is looking.
-       ⚠ Their ORDER here decides the order on the screen, and the bell is first
-       because it is the one that costs money. */
-    {
-      key: "bell",
-      title: "g.bell",
-      in: "pz",
-      kind: "hw",
-      list: () => BELLS,
-      glyph: bellGlyph,
-      hint: "g.bell.h"
-    },
+    /* ⚠ THE עינית, 30.8.2026, ON THE פרזול STEP. Peretz asked for it by name.
+       It is neither a lock nor a grip, so it does not belong on `lock` or
+       `grip` — and it is not worth a tenth step of its own, because a step with
+       one yes/no question in it is a page turn for a checkbox. `pz` is the step
+       that already asks "and what else is on the door", and the פרזול is what
+       recolours it. (The פעמון stood beside it here until 20.9.2026; it follows
+       the pull handle's finish now and stands on `grip` — see above.) */
     {
       key: "peephole",
       title: "g.peephole",

@@ -55,13 +55,16 @@ const WINDOW_DOORS = {
 };
 
 /* research/works/INVENTORY.md §1. The two sections and their sizes. */
+/* ⚠ FOUR ROWS LEFT ON 20.9.2026 with the products — `ella` (d072 d074 d082),
+   `ron` (d035 d113), `shahar` (d060 d066) and `blade` (d073 d034). Their
+   doors are folded into the two bars that survive: a brass or black round
+   tube is `idan` in that finish now, and every flat or square bar is
+   `nitzan`. The sheets `against-ella/ron/shahar/blade.png` are deleted rather
+   than left stale. */
 const GRIP_DOORS = {
-  idan:   ['d035', 'd044', 'd063', 'd086', 'd125', 'd036', 'd046', 'd057', 'd128'],
-  ella:   ['d072', 'd074', 'd082'],
-  ron:    ['d035', 'd113'],
-  nitzan: ['d049', 'd066', 'd034', 'd104'],
-  shahar: ['d060', 'd066'],
-  blade:  ['d073', 'd034'],
+  idan:   ['d035', 'd044', 'd063', 'd086', 'd125', 'd036', 'd046', 'd057', 'd128',
+           'd072', 'd074', 'd082', 'd113'],
+  nitzan: ['d049', 'd066', 'd034', 'd104', 'd060', 'd073'],
   grab:   ['d051', 'd058', 'd062', 'd067', 'd068', 'd070', 'd077'],
   channel: ['d084'],
 };

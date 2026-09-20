@@ -348,8 +348,19 @@ export const UI = {
   'g.window':         ['חלון', 'Window', 'Окно'],
   'g.grille':         ['עיצוב החלון', 'Inside the window', 'Наполнение окна'],
   'g.handle':         ['ידית משיכה', 'Pull handle', 'Ручка-скоба'],
-  'g.handle.h':       ['הידית האנכית. אפשר גם בלעדיה.', 'The upright bar. Going without one is fine.',
-                       'Вертикальная скоба. Можно и без неё.'],
+  'g.handle.h':       ['הידית האנכית. אפשר גם בלעדיה. עד מטר במחיר הנמוך, מעל מטר במחיר הגבוה.',
+                       'The upright bar. Going without one is fine. Up to a metre at the lower price, past a metre at the higher one.',
+                       'Вертикальная скоба. Можно и без неё. До метра — по низкой цене, свыше метра — по высокой.'],
+  /* ⚠ THE PULL HANDLE'S FINISH, 20.9.2026 — the axis withdrawn on 27.8
+     coming back on Peretz's own word: *"there needs to be an option to make
+     them gold or black, black is +100, gold +200, its like pirzul but for the
+     pull handle."* The hint names the bell because the bell follows this
+     finish too and a customer should not have to discover that from the
+     price. */
+  'g.handleFinish':   ['גימור ידית המשיכה', 'Pull handle finish', 'Отделка ручки-скобы'],
+  'g.handleFinish.h': ['הגוון של ידית המשיכה והפעמון. התוספת היא לכל פריט.',
+                       'The tone of the pull handle and the doorbell. The surcharge is per item.',
+                       'Оттенок ручки-скобы и звонка. Доплата — за каждый предмет.'],
   'g.lockset':        ['מנעול וידית', 'Lever and cylinder', 'Ручка и цилиндр'],
   'g.lockset.h':      ['הידית שמסובבים והצילינדר. יש בכל דלת.', 'The lever you turn and the cylinder. Every door has them.',
                        'Нажимная ручка и цилиндр. Есть в каждой двери.'],
@@ -379,12 +390,16 @@ export const UI = {
      written in the same round that moved the fitting and was written the wrong
      way up; nothing on the page and nothing in the suite compares a hint with
      the picture it describes. */
-  'g.bell.h':         ['טבעת נוקשת במרכז הדלת, מתחת לעינית. בניקל או בזהב בלבד.',
-                       'A ring knocker on the centre of the door, below the viewer. Nickel or gold only.',
-                       'Кольцо-стучалка по центру двери, под глазком. Только никель или золото.'],
-  'g.peephole.h':     ['עינית לראות מי בחוץ. כלולה במחיר.',
-                       'A viewer, to see who is outside. Included in the price.',
-                       'Глазок, чтобы видеть, кто снаружи. Входит в цену.'],
+  /* ⚠ "IN THE PULL HANDLE'S FINISH" SINCE 20.9.2026, and it said "nickel or
+     gold only" from 31.8 until then. Peretz put the bell with the pull
+     handles and priced its finish by the same two figures; a black ring
+     exists now because the finish it follows has a black in it. */
+  'g.bell.h':         ['טבעת נוקשת במרכז הדלת, מתחת לעינית. בגימור של ידית המשיכה.',
+                       'A ring knocker on the centre of the door, below the viewer. In the pull handle’s finish.',
+                       'Кольцо-стучалка по центру двери, под глазком. В отделке ручки-скобы.'],
+  'g.peephole.h':     ['עינית לראות מי בחוץ. הרגילה כלולה במחיר; הדיגיטלית מצלמת.',
+                       'A viewer, to see who is outside. The ordinary one is included; the digital one has a camera.',
+                       'Глазок, чтобы видеть, кто снаружи. Обычный входит в цену; цифровой — с камерой.'],
   'g.size':           ['מידה', 'Size', 'Размер'],
   /* ⚠ THIS SAID THE SAME THING AS THE STEP'S OWN LEDE, four lines above it on
      the screen. `step.fit.l` already ends *"נמדוד אצלכם במדויק, בחינם"* and
@@ -399,9 +414,9 @@ export const UI = {
                        'The size is the opening in the wall, not the door itself.',
                        'Размер — это проём в стене, а не само полотно.'],
   'g.mashkof':        ['משקוף', 'Frame', 'Коробка'],
-  'g.mashkof.h':      ['המסגרת שהדלת נסגרת עליה. נמדוד את הקיר אצלכם.',
-                       'The frame the door closes against. We measure your wall on site.',
-                       'Рама, к которой прилегает дверь. Толщину стены замерим на месте.'],
+  'g.mashkof.h':      ['המסגרת שהדלת נסגרת עליה. הסטנדרטי כלול; כל חלק שמרחיבים — 250 ₪. הקאנט הפנימי לא נראה בציור. נמדוד את הקיר אצלכם.',
+                       'The frame the door closes against. Standard is included; each part you widen is ₪250. The inner kant does not show in the drawing. We measure your wall on site.',
+                       'Рама, к которой прилегает дверь. Стандартная входит в цену; каждая расширенная часть — ₪250. Внутренний кант на рисунке не виден. Толщину стены замерим на месте.'],
   'g.handing':        ['כיוון פתיחה', 'Opening direction', 'Сторона открывания'],
   'g.handing.h':      ['לא בטוחים? נבדוק יחד במדידה.', 'Not sure? We will check it together at the measure.',
                        'Не уверены? Уточним вместе при замере.'],
@@ -455,9 +470,14 @@ export const UI = {
                        'The size follows the opening in your wall, and we measure it on site, free. Up to 98 × 203 cm is the base price; wider or taller adds 25%, and over 120 × 240 cm adds 50%. A leaf and a half is two leaves and costs double. Handing is always read from OUTSIDE — the side the hinges are on.',
                        'Размер определяется проёмом в стене, и мы замеряем его у вас бесплатно. До 98 × 203 см — базовая цена; шире или выше — плюс 25%, свыше 120 × 240 см — плюс 50%. Полуторная дверь — это две створки, и стоит вдвое. Сторона открывания всегда считается СНАРУЖИ — по стороне петель.'],
   'exp.mk.q':             ['מה זה משקוף?', 'What is the frame?', 'Что такое коробка?'],
-  'exp.mk.a':             ['המשקוף הוא המסגרת שמותקנת בקיר, והדלת נסגרת עליה. המשקוף הסטנדרטי מתאים לקיר רגיל. אם החזית שנראית מבחוץ צריכה להיות רחבה יותר, או שהקיר עבה והמשקוף צריך להיכנס עמוק יותר פנימה — כל צד שמתרחב מוסיף 250 ₪. את הקיר נמדוד אצלכם.',
-                       'The frame is what is fitted into the wall and what the door closes against. The standard frame suits an ordinary wall. If the face seen from outside has to be wider, or the wall is thick and the frame has to reach further in, each side that widens adds ₪250. We measure the wall on site.',
-                       'Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. Стандартная подходит для обычной стены. Если фасад снаружи должен быть шире или стена толстая и коробка должна уходить глубже, каждая расширенная сторона добавляет ₪250. Стену замерим на месте.'],
+  /* ⚠ THREE PARTS SINCE 20.9.2026 — Peretz named the section's pieces and
+     priced each one: the outer kant, the falc and the inner kant, +250 apiece,
+     any combination. The standard frame is inside the price of the door even
+     though the breakdown lists it at ₪500 — the same distinction the size
+     tiles make between what an option costs and what the door costs. */
+  'exp.mk.a':             ['המשקוף הוא המסגרת שמותקנת בקיר, והדלת נסגרת עליה. יש לו שלושה חלקים: הקאנט החיצוני (הכנף שנראית מבחוץ על הקיר), הפאלץ (המדרגה שהדלת נסגרת לתוכה) והקאנט הפנימי (הכנף בצד הפנימי של הקיר). המשקוף הסטנדרטי כלול במחיר הדלת; כל חלק שמרחיבים מוסיף 250 ₪, ואפשר להרחיב כל שילוב. בציור הדלת רואים רק את שני החלקים החיצוניים — הקאנט הפנימי נמצא מאחורי הקיר. את הקיר נמדוד אצלכם.',
+                       'The frame is what is fitted into the wall and what the door closes against. It has three parts: the outer kant (the wing seen from outside on the wall), the falc (the step the door closes into) and the inner kant (the wing on the room side of the wall). The standard frame is inside the door’s price; each part you widen adds ₪250, in any combination. The drawing of the door shows only the two outer parts — the inner kant is behind the wall. We measure the wall on site.',
+                       'Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. У неё три части: наружный кант (борт, видимый снаружи на стене), фальц (ступень, в которую закрывается дверь) и внутренний кант (борт со стороны комнаты). Стандартная коробка входит в цену двери; каждая расширенная часть добавляет ₪250, в любом сочетании. На рисунке двери видны только две наружные части — внутренний кант за стеной. Стену замерим на месте.'],
   'exp.colour.q':         ['איך נראה הצבע במציאות?', 'How does the colour look in reality?', 'Как цвет выглядит вживую?'],
   'exp.colour.a':         ['הצבע נצרב בתנור, מלוח הגוונים של היצרן, והקוד שליד כל שם הוא הקוד שלו. כל הגוונים עולים אותו דבר, כך שהבחירה היא בטעם בלבד. הציור באתר הוא הדמיה — הגוון שיֵצא מהתנור עשוי להיראות מעט שונה, ובעיקר בברק.',
                        'The colour is oven-baked from the manufacturer’s chart, and the code beside each name is theirs. Every shade costs the same, so the choice is purely taste. The drawing here is an illustration — the shade that comes out of the oven may look slightly different, in sheen most of all.',
@@ -471,9 +491,14 @@ export const UI = {
                        'There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. What fills the glass — wrought iron, or worked glass — is chosen separately. A leaf and a half, and a door with a sidelight, have TWO glazed openings; the ironwork goes in both and is priced per opening.',
                        'Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Наполнение стекла — кованая решётка или художественное стекло — выбирается отдельно. У полуторной двери и двери с боковым окном ДВА остеклённых проёма: решётка ставится в оба и считается по их числу.'],
   'exp.grip.q':           ['איזה אורך לבחור?', 'What length should I choose?', 'Какую длину выбрать?'],
-  'exp.grip.a':           ['ידית המשיכה היא המוט שמושכים בו כדי לפתוח. אפשר לבחור את אורכו: עד מטר במחיר הדגם, וכל 20 ס״מ מעבר לכך מוסיפים 150 ₪. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר גם בלי ידית משיכה בכלל. המאחז האופקי והידית השקועה מותקנים לרוחב הדלת ואין להם בחירת אורך.',
-                       'The pull handle is the bar you pull to open the door. The length is yours: up to a metre at the model’s price, and every 20 cm past that adds ₪150. It is capped by the height of the leaf, so a short door cannot take a bar that would not fit. Going without one is a choice too. The grab bar and the recessed channel are fitted across the door and have no length to choose.',
-                       'Ручка-скоба — это то, за что тянут дверь. Длину выбираете вы: до метра — по цене модели, каждые 20 см сверх того добавляют ₪150. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Можно обойтись и без неё. Горизонтальная скоба и врезная ручка ставятся поперёк двери, и длина у них не выбирается.'],
+  /* ⚠ TWO PRICES PER BAR SINCE 20.9.2026, NOT A RATE. Peretz: *"cylinder
+     (idan) 500, from 70-100 cm · cylinder but bigger 800, from 120-200 cm"* —
+     and the same shape for the rectangle. The 20 cm rate this sentence used
+     to explain is gone with the rule, and the finish and the bell are named
+     because both arrived on the same step the same day. */
+  'exp.grip.a':           ['ידית המשיכה היא המוט שמושכים בו כדי לפתוח. יש מוט עגול ומוט מלבני, ולכל אחד שני מחירים: עד מטר, ומעל מטר. האורך מוגבל לגובה הכנף, כך שדלת נמוכה לא תקבל מוט ארוך מדי. אפשר לבחור לידית גימור שחור או זהב — התוספת היא לידית ולפעמון, לכל אחד בנפרד. אפשר גם בלי ידית משיכה בכלל. המאחז האופקי והידית השקועה מותקנים לרוחב הדלת ואין להם בחירת אורך.',
+                       'The pull handle is the bar you pull to open the door. There is a round bar and a rectangular one, and each has two prices: up to a metre, and past a metre. The length is capped by the height of the leaf, so a short door cannot take a bar that would not fit. The handle can be finished in black or gold — the surcharge is on the handle and on the doorbell, each on its own. Going without one is a choice too. The grab bar and the recessed channel are fitted across the door and have no length to choose.',
+                       'Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за ручку и за звонок, за каждый отдельно. Можно обойтись и без ручки. Горизонтальная скоба и врезная ручка ставятся поперёк двери, и длина у них не выбирается.'],
   'exp.lock.q':           ['כספת וקודן — במקום המנעול או בנוסף?', 'Safe lock and keypad — instead of the lock, or as well?', 'Сейфовый и кодовый замок — вместо основного или вдобавок?'],
   'exp.lock.a':           ['בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת (700 ₪) וקודן (900 ₪) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.',
                        'As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock (₪700) and a keypad (₪900) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.',
@@ -494,9 +519,9 @@ export const UI = {
                     safe lock and the keypad, and the ספיר and כדור handles —
                     all bought-in in one finish, on the owner's word 31.8
        two only     the doorbell — nickel or gold, on the owner's word */
-  'exp.pz.a':             ['את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הפעמון מגיע בניקל או בזהב בלבד, ולכן בשחור ובברונזה הוא נשאר ניקל. הוא לא משנה את ידית המשיכה — היא מוצר בפני עצמו ומגיעה בגימור שלה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.',
-                       'The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. The doorbell comes in nickel or gold only, so in black and in bronze it stays nickel. It does NOT change the pull handle — that is its own product and comes in its own finish — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.',
-                       'Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Звонок бывает только никелевым или золотым, поэтому в чёрном и бронзовом он остаётся никелевым. Он НЕ меняет ручку-скобу — это отдельный продукт со своей отделкой — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет.'],
+  'exp.pz.a':             ['את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.',
+                       'The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.',
+                       'Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет.'],
 
   'exp.sum.q':        ['מה קורה אחרי שאני שולח?', 'What happens after I send it?',
                        'Что будет после отправки?'],

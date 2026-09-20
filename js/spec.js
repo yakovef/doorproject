@@ -44,9 +44,9 @@
 
 import { L, T, withLang } from './copy.js';
 import {
-  byId, colourCode, COLOURS, declaredFinish, DETAILS, glazedPanels, GRILLES, grillePlacement,
-  handleLength, HANDINGS, HANDLES, isGlazed, LOCKSETS, MASHKOFS, PIRZUL, SIZES,
-  SPECIAL_LOCKS, WINDOWS, BELLS, PEEPHOLES,
+  byId, colourCode, COLOURS, DETAILS, glazedPanels, GRILLES, grillePlacement,
+  gripTakesFinish, handleLength, HANDINGS, HANDLES, HANDLE_FINISHES, isGlazed, LOCKSETS,
+  MASHKOFS, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BELLS, PEEPHOLES,
 } from './catalog.js';
 
 /**
@@ -76,7 +76,16 @@ export function specRows(state) {
   const dt = byId(DETAILS, state.detail);
   const sz = SIZES[state.size] || SIZES.standard;
   const hn = byId(HANDINGS, state.handing);
-  const fin = declaredFinish(hd);
+  /* ⚠ THE FINISH IS THE CUSTOMER'S CHOICE NOW, 20.9.2026, not the product's
+     declaration — `declaredFinish(hd)` stood here and answered for two bars
+     that no longer exist. It is named on the handle's row whenever the handle
+     takes a finish (the channel does not — it is painted with the door), and
+     on the bell's row, because both are priced by it per object and an order
+     that named "עידן · 100 ס״מ" for a gold bar would make Peretz ring back.
+     Nickel is named too: the picture shows it, but the order is read down a
+     telephone as often as it is looked at. */
+  const hf = byId(HANDLE_FINISHES, state.handleFinish);
+  const fin = gripTakesFinish(state) ? hf : null;
 
   const rows = [
     /* ⚠ NOT "RAL". These are Rav Bariach's own chart codes — the catalogue says
@@ -183,7 +192,7 @@ export function specRows(state) {
      Only when CHOSEN, like every optional row here: a door with no bell needs
      no line saying so. */
   if (bl.id !== 'nobell') {
-    rows.push({ key: 'bell', label: T('row.bell'), id: bl.id, value: L(bl) });
+    rows.push({ key: 'bell', label: T('row.bell'), id: bl.id, value: `${L(bl)} · ${L(hf)}` });
   }
   if (ep.id !== 'nopeep') {
     rows.push({ key: 'peephole', label: T('row.peephole'), id: ep.id, value: L(ep) });

@@ -31,7 +31,9 @@
  */
 import { chromium } from 'playwright';
 import { assertFreshBundle } from './fresh.mjs';
-import { COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, LOCKSETS, SIZES, WINDOWS }
+import { BELLS, COLOURS, DETAILS, GRILLES, HANDINGS, HANDLES, HANDLE_FINISHES, HANDLE_LENS,
+         LOCKSETS, MASHKOFS, PEEPHOLES, PIRZUL, SIZES, SPECIAL_LOCKS, STRIPE_SLOTS,
+         unpackStripes, WINDOWS }
   from '../js/catalog.js';
 import { conflicts, repair } from '../js/rules.js';
 import { render } from '../js/renderer.js';
@@ -101,6 +103,22 @@ console.log(`seed ${SEED}\n\nA. ${CASES} random designs, all nine axes at once`)
       handle:  pick(HANDLES).id,
       lockset: pick(LOCKSETS).id,
       detail:  pick(DETAILS).id,
+      /* ⚠ THE OTHER AXES WERE NEVER FUZZED — 20.9.2026. "All nine axes at
+         once" said the header, and the generator varied eight of the
+         SEVENTEEN fields `DEFAULTS` holds: the frame, the פרזול, the bell,
+         the viewer, the extra lock, the length, the stripes and (new today)
+         the finish were all left at their defaults, so no random design ever
+         put a bell beside a window or a bar in the over-a-metre band. Every
+         list the state indexes is drawn from now, and the stripes through
+         the same packer the code uses. */
+      speciallock: pick(SPECIAL_LOCKS).id,
+      mashkof: pick(MASHKOFS).id,
+      pirzul:  pick(PIRZUL).id,
+      bell:    pick(BELLS).id,
+      peephole: pick(PEEPHOLES).id,
+      handleFinish: pick(HANDLE_FINISHES).id,
+      handleLen: pick(HANDLE_LENS),
+      ...unpackStripes(Math.floor(r() * STRIPE_SLOTS)),
     };
     /* ⚠ A QUARTER OF EVERY SAMPLE USED TO CARRY A DRAGGED HANDLE, anywhere on
        a 950 x 2100 leaf and well outside it, because a link could carry any

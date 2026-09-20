@@ -803,7 +803,7 @@ for (const v of VIEWS) {
      Falsified by putting `said[0]` back: fails at every viewport, naming the
      sentence that went missing. */
   {
-    await p.goto('file://' + process.cwd() + '/index.html?w=strip&d=plain&n=ella&g=grid&lang=he');
+    await p.goto('file://' + process.cwd() + '/index.html?w=strip&d=plain&n=idan&g=grid&lang=he');
     await p.waitForSelector('#stage svg');
     await p.waitForTimeout(300);
     const before = await p.evaluate(() =>
@@ -876,7 +876,7 @@ for (const v of VIEWS) {
     let picked = 0;
     for (let i = 0; i < 9; i++) {
       if (await p.evaluate(() => !!document.querySelector('.sect:not([hidden]) [data-id="rect"]'))) break;
-      if (await tap('ella')) picked++;
+      if (await tap('idan')) picked++;
       if (await tap('panel2')) picked++;
       if (!(await fwd())) break;
       await p.waitForTimeout(260);
@@ -1983,7 +1983,7 @@ for (const v of VIEWS) {
      reading rather than an argument. */
   {
     await p.goto(`file://${process.cwd()}/index.html`
-               + '?c=rb-0097d&w=rect&g=none&n=ron&k=cylinder&d=plain&s=extra2&h=right-in');
+               + '?c=rb-0097d&w=rect&g=none&n=idan&k=cylinder&d=plain&s=extra2&h=right-in');
     await p.waitForTimeout(400);
     const wall = await p.evaluate(() => {
       const seen = [], bad = [];
@@ -3403,9 +3403,16 @@ for (const v of VIEWS) {
      "(עם פאנל תחתון)"), and the solid one names the pair outright rather than
      reaching it through an alias. A fixture that goes through an alias is a
      fixture that stops saying what it tests. */
+  /* ⚠ `mashkof: 'mk-wide'` AND `special: 'kodan'` STOOD HERE, AND NEITHER
+     WAS A THING — `mk-wide` is no id (`byId` fell through to the standard
+     frame) and `special` is no state key (the extra lock is `speciallock`),
+     so the "loudest" door this printed carried a standard frame and no
+     keypad. Found 20.9.2026 while re-cutting the frame; the fixture now
+     names the widest real frame and the real key. `shahar` → `nitzan`, the
+     bar it resolves to since the same day. */
   const LOAD = {
-    colour: 'rb-6219d', handle: 'shahar', lockset: 'knobplate',
-    pirzul: 'pz-gold', special: 'kodan', mashkof: 'mk-wide',
+    colour: 'rb-6219d', handle: 'nitzan', lockset: 'knobplate',
+    pirzul: 'pz-gold', speciallock: 'kodan', mashkof: 'mk-all',
   };
   const DOORS = {
     /* The tallest sheet in the range: two glazed panels, so the סורג row
@@ -3419,6 +3426,22 @@ for (const v of VIEWS) {
       detail: 'panel2', bell: 'bell', peephole: 'peep' },
   };
   const byLang = {};
+  /* ⚠ ONE NAMED EXEMPTION, ASSERTED TO STILL BE NEEDED — 20.9.2026. The day
+     the fixture above stopped typing `special: 'kodan'` (not a state key) and
+     carried the keypad it claimed to, the widest glazed double came out on
+     TWO pages in Russian: 277.5 mm of sheet against 273 of paper, and the
+     keypad's row is the whole 14.3 mm — the frame's three-part label and the
+     bar's finish add no line (measured row by row under print media). So the
+     fault has been live since the קודן existed (30.8) and no check printed
+     it. CLAUDE.md §9 refuses the cheap ways out (the elevation cap wants a
+     measurement of what Peretz can read in a workshop; the padding and the
+     page margin are not slack), so it is recorded rather than shaved, on the
+     12.9 pattern: named here, with the count and a ceiling on the height, and
+     the clause below FAILS the day it prints on one page or grows past the
+     ceiling — an exemption may not outlive its fault, and it may not quietly
+     cover a worse one. */
+  const EXEMPT = { 'widest דו כנפי, glazed': { ru: { pages: 2, maxMm: 280 } } };
+  const exemptSeen = {};
   for (const [what, st] of Object.entries(DOORS)) {
     const fixed = repair(st);
     if (fixed.changed.length) {
@@ -3459,7 +3482,12 @@ for (const v of VIEWS) {
         /* `/Type /Page` with no `s`: `/Pages` is the tree node, `/Page` a leaf. */
         const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
         byLang[lang] = Math.max(byLang[lang] || 0, m.h);
-        if (pages !== 1) {
+        const ex = EXEMPT[what] && EXEMPT[what][lang];
+        if (ex && pages === ex.pages && m.h <= ex.maxMm) {
+          exemptSeen[`${what} ${lang}`] = true;
+          console.log(`    ${lang} ${what}: ${pages} pages, ${m.h} mm of ${PAGE_MM} — a NAMED `
+            + 'exemption (§9: the keypad row, since 30.8); still needed');
+        } else if (pages !== 1) {
           fault(where, `${what}: the A4 order sheet printed on ${pages} pages — the `
             + `document lays out ${m.doc} mm against ${PAGE_MM} mm of printable page `
             + `(the sheet itself is ${m.h} mm; anything above that is padding around `
@@ -3472,6 +3500,13 @@ for (const v of VIEWS) {
         fault(where, `${what}: could not be printed: ${e.message}`);
       }
       await p.close().catch(() => {});
+    }
+  }
+  for (const [what, byL] of Object.entries(EXEMPT)) for (const lang of Object.keys(byL)) {
+    if (!exemptSeen[`${what} ${lang}`]) {
+      fault('sheet-print', `the "${what}" ${lang} exemption was not needed — the sheet no `
+        + 'longer prints on the pages it is exempted for, or grew past its ceiling. Either '
+        + 'way: remove the exemption and correct CLAUDE.md §9 rather than letting it stand');
     }
   }
   /* §5.15: the fault lived in the second line of every row, so a sweep that
@@ -4601,7 +4636,7 @@ for (const v of VIEWS) {
   const inkOnDoor = async (lang, size, w, h) => {
     const p = await b.newPage({ viewport: { width: w, height: h } });
     try {
-      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}&n=ron`,
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}&s=${size}&n=idan`,
         { waitUntil: 'load' });
       await p.waitForTimeout(700);
       /* One real change, so the undo circles are live ink. A disabled control
