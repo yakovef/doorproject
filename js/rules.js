@@ -71,8 +71,19 @@ import { gripClashesLockset, gripFitsAnywhere,
 export const isLineWork = state =>
   !!(state && state.stripeDir && state.stripeDir !== 'none' && state.stripeCount);
 
-/** Does this detail put ANYTHING on the face — moulding or line work alike? */
+/** Does this door put ANYTHING on the face — moulding or line work alike?
+ *  ⚠ A STATE, LIKE `isLineWork` ABOVE — AND THREE CALLERS HANDED IT A DETAIL
+ *  UNTIL 20.9.2026. `faceWorked(byId(DETAILS, state.detail))` reads
+ *  `detail.detail`, which is undefined, which `byId` resolves to `plain`; so
+ *  it returned false for every face there is, and the recessed channel's
+ *  "needs a plain leaf" rule fired on glass and never once on a panel. A
+ *  ידית שקועה could be put on the two-panel door, drawn through its
+ *  mouldings, priced and ordered, from the day the stripes moved onto the
+ *  state. §5.19's cousin: a comment that said "detail" over a function that
+ *  took a state, and every reader believed the comment. `detailWorked` is
+ *  the question about a DETAILS entry alone. */
 export const faceWorked = state => !!byId(DETAILS, state.detail).panel || isLineWork(state);
+export const detailWorked = d => !!d.panel;
 
 /**
  * Two different questions, and conflating them broke the sidelight the first
@@ -129,6 +140,45 @@ export function fallbackLockset(state) {
   const k = LOCKSETS.find(x => locksetFits(state, x.id));
   return k ? k.id : null;
 }
+
+/** Both questions the grip asks of a door, as one: the bow against the lock
+ *  stile (`gripClashesLockset`) and the handle against everything on the face
+ *  (`gripFitsAnywhere`). Two callers used to ask one each and drift. */
+const gripFits = state => !gripClashesLockset(state) && gripFitsAnywhere({ ...state, grip: null });
+
+/**
+ * What stands in a pull handle's way on this door — `null` when it fits.
+ *
+ * ⚠ PERETZ, 20.9.2026: *"when a person wants a pull handle when there is no
+ * space, then the normal handle goes away, not the window or the panels."* So
+ * the first thing asked is whether the LEVER is the obstacle — whether the bar
+ * fits once the lockset falls back to the cylinder — because that is the one
+ * obstacle the page is allowed to move for a bar. `'lock'` means exactly that:
+ * the tile is NOT greyed, and a tap swaps the lockset and keeps the bar.
+ * Everything after it is a reason the tile prints and the tap does not act on:
+ * `'window'` when the glass alone is in the way, `'face'` when the panels or
+ * the set are, `'door'` when it is more than one of them or the leaf itself.
+ * The order matters — a reason has to name the thing a customer could change,
+ * and the window is the dearer and the more visible of the two.
+ */
+export function gripObstacle(state, handleId) {
+  const s = { ...state, handle: handleId };
+  if (gripFits(s)) return null;
+  const k = fallbackLockset(s);
+  if (k && k !== s.lockset && gripFits({ ...s, lockset: k })) return 'lock';
+  if (leafGlazed(s) && gripFits({ ...s, window: 'none' })) return 'window';
+  if (faceWorked(s) && gripFits({ ...s, detail: 'plain', stripeDir: 'none', stripeCount: 0 })) return 'face';
+  return 'door';
+}
+
+/** Does this door, or this door with its lever swapped for the fallback, hold
+ *  its grip? The window side of `conflicts` asks it, because choosing a window
+ *  that only the LEVER is in the way of swaps the lever rather than refusing. */
+const gripResolvable = state => {
+  if (gripFits(state)) return true;
+  const k = fallbackLockset(state);
+  return !!k && k !== state.lockset && gripFits({ ...state, lockset: k });
+};
 
 /**
  * Every option that cannot be chosen from where the design currently stands,
@@ -363,14 +413,14 @@ export function conflicts(state) {
      picked the pattern first. */
   const CHANNEL = HANDLES.find(h => h.style === 'channel');
   if (CHANNEL) {
-    if (onLeaf || faceWorked(byId(DETAILS, state.detail))) {
+    if (onLeaf || faceWorked(state)) {
       out.handle[CHANNEL.id] = T('why.channelPlain');
     }
     if (grip.style === 'channel') {
       for (const w of WINDOWS) if (w.rects.length) {
         out.window[w.id] = out.window[w.id] || T('why.notWithChannel');
       }
-      for (const d of DETAILS) if (faceWorked(d)) {
+      for (const d of DETAILS) if (detailWorked(d)) {
         out.detail[d.id] = out.detail[d.id] || T('why.notWithChannel');
       }
     }
@@ -393,11 +443,19 @@ export function conflicts(state) {
      of the thing that actually decides. The answer is memoised on the six
      fields a placement depends on, which is what makes asking it of every grip
      in the catalogue affordable. */
+  /* ⚠ AND THE LEVER IS NEVER THE REASON A HANDLE IS GREYED — 20.9.2026. A bar
+     whose only obstacle is the lock furniture is offered, and the tap swaps
+     the lever for the cylinder (`repair`, and Peretz's own sentence in
+     `gripObstacle`). What IS greyed says what stands in the way and that it
+     stays: the window, or the face. `why.noRoomHandle` is the answer when it
+     is neither alone, and it still exists because a leaf can simply be too
+     small — the bow beside the vertical slot on a standard leaf, for one. */
+  const GRIP_WHY = { window: 'why.noRoomHandleWindow', face: 'why.noRoomHandleFace',
+                     door: 'why.noRoomHandle' };
   for (const h of HANDLES) {
     if (h.style === 'none' || out.handle[h.id]) continue;
-    if (!gripFitsAnywhere({ ...state, handle: h.id, grip: null })) {
-      out.handle[h.id] = T('why.noRoomHandle');
-    }
+    const what = gripObstacle(state, h.id);
+    if (what && what !== 'lock') out.handle[h.id] = T(GRIP_WHY[what]);
   }
 
   /* ⚠ AND THE SAME QUESTION FROM THE WINDOW'S SIDE, because the customer may
@@ -415,7 +473,11 @@ export function conflicts(state) {
   if (grip.style !== 'none') {
     for (const w of WINDOWS) {
       if (out.window[w.id]) continue;
-      if (!gripFitsAnywhere({ ...state, window: w.id, grip: null })) {
+      /* `gripResolvable`, not `gripFits`: a window that only the LEVER stands
+         between the bar and is not refused — the tap swaps the lever and keeps
+         both, which is what `repair` does for every intent but the lockset's
+         own since 20.9.2026. Greyed means the bar itself will go. */
+      if (!gripResolvable({ ...state, window: w.id })) {
         out.window[w.id] = T('why.noRoomWithWindow');
       }
     }
@@ -454,16 +516,25 @@ export function conflicts(state) {
      glass and reads as standing off it. That is the honest way to draw
      "elevated" — not by refusing the pairing. */
 
-  /* GEOMETRIC: the grab bar's bow against a long lever, which only bites on a
-     narrow leaf — the bow is centred and does not move out of the way. */
-  for (const k of LOCKSETS) {
-    if (gripClashesLockset({ ...state, lockset: k.id })) {
-      out.lockset[k.id] = out.lockset[k.id] || T('why.noRoomGripLock');
-    }
-  }
-  for (const h of HANDLES) {
-    if (gripClashesLockset({ ...state, handle: h.id })) {
-      out.handle[h.id] = out.handle[h.id] || T('why.noRoomGripLock');
+  /* GEOMETRIC, FROM THE LOCKSET'S SIDE: a lever that leaves the bar already
+     on the door nowhere to go. Both questions — the bow against the stile
+     (`gripClashesLockset`, which only bites on a narrow leaf) and the bar
+     against the lever's footprint on the face (`gripFitsAnywhere`).
+     ⚠ UNTIL 20.9.2026 ONLY THE FIRST WAS ASKED HERE, so the second went
+     untold: a customer with an Idan beside the vertical slot could tap the
+     Coral, and `repair` took the BAR away with a toast — a ₪500 product
+     gone for a ₪100 lever, and nothing on the tile said it would. Peretz:
+     *"if a person wants a lever handle when there is a pull handle that
+     prevents it, then there should be a window pop up that says that it
+     cannot be together."* The tile is greyed with this reason, and `choose`
+     in `app.js` opens that dialog instead of repairing — so `repair` never
+     sees a lockset intent on a greyed lockset from the page, and its own
+     lockset branch is there for links and for the fuzzer.
+     The handle side of the same clash is inside `gripObstacle` above. */
+  if (grip.style !== 'none') {
+    for (const k of LOCKSETS) {
+      if (out.lockset[k.id]) continue;
+      if (!gripFits({ ...state, lockset: k.id })) out.lockset[k.id] = T('why.leverBar');
     }
   }
 
@@ -535,6 +606,9 @@ export function isBlocked(state, group, id) {
  */
 const SAID = {
   windowAdded:   'fix.windowAdded',
+  /* `windowGone` is said by the fittings, the stripes and the face repairs —
+     never by a HANDLE repair since 20.9.2026 (Peretz: the window and the
+     panels stay; the lever goes, then the bar). */
   windowGone:    'fix.windowGone',
   lineWorkGone:  'fix.lineWorkGone',
   lineWorkFace:  'fix.lineWorkFace',
@@ -785,47 +859,57 @@ export function repair(state, intent = null) {
   /* The recessed channel wants a plain leaf. Whichever the customer just asked
      for wins; without an intent the CHANNEL yields, because a pattern and a
      window are both things you can see from the street and a grip is not. */
-  if (byId(HANDLES, s.handle).style === 'channel'
-      && (leafGlazed(s) || faceWorked(byId(DETAILS, s.detail)))) {
-    if (intent === 'handle') {
-      if (leafGlazed(s)) { s.window = 'none'; change('window', SAID.windowGone); }
-      if (faceWorked(byId(DETAILS, s.detail))) { s.detail = 'plain'; change('detail', SAID.faceCleared); }
-    } else {
-      s.handle = 'none';
-      change('handle', SAID.gripGone);
-    }
+  /* ⚠ A PULL HANDLE NEVER COSTS THE WINDOW OR THE FACE — 20.9.2026. Peretz:
+     *"when a person wants a pull handle when there is no space, then the
+     normal handle goes away, not the window or the panels."* Three branches
+     below this line used to read `if (intent === 'handle') { s.window =
+     'none' }` — the channel's, the bow's and the general one — each of them
+     correct about a link and each of them the opposite of his rule about a
+     tap. They are one branch now, and it has one direction: the LEVER yields
+     first, the handle second, and the glass and the face never.
+     ⚠ On the page a greyed handle is never handed to `repair` at all —
+     `choose` in `app.js` says the tile's reason and leaves the door alone,
+     because running this on a tap would drop the bar the customer already
+     had for one they cannot have. What reaches here with a handle intent is a
+     handle that FITS, or one whose only obstacle is the lever. The refusal
+     below is for links and for the fuzzer, which must still land buildable. */
+
+  /* The recessed channel wants a plain leaf. It is a hole cut into the door,
+     so there is no in-front to be had, and `conflicts` greys it with
+     `why.channelPlain` on any glazed or worked leaf: on a link, the channel
+     yields, because a pattern and a window are both things you can see from
+     the street and a grip is not. Whatever the intent — see above. */
+  if (byId(HANDLES, s.handle).style === 'channel' && (leafGlazed(s) || faceWorked(s))) {
+    s.handle = 'none';
+    change('handle', SAID.gripGone);
   }
 
-  /* The grab bar is centred on the leaf and runs across a centred window. */
-  if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === 'grab') {
-    if (intent === 'handle') { s.window = 'none'; change('window', SAID.windowGone); }
-    else { s.handle = 'none'; change('handle', SAID.gripGone); }
-  }
-
-  /* The grab bar against the lock furniture. The window used to be part of
-     this repair and is not any more — the bow is centred on the LEAF, so
-     taking the glass away never moved it out of the lockset's way, and now
-     that the glazing is not consulted at all there is nothing here for it to
-     do. What is left is a stile too short for both objects.
-     Whichever the customer just asked for wins. Without an intent — a link —
-     the lockset yields first, because every door needs a lock and the fallback
-     is the cylinder that eight of the ten installed bar doors carry. */
-  if (gripClashesLockset(s)) {
+  /* The grip against the lock furniture and against the face, asked as one
+     question (`gripFits`): the bow against the stile, and every handle against
+     the lever's footprint, the glass and the mouldings.
+     The LEVER yields first — for a tap on a handle, a window or a face, and
+     for a link — because every door needs a lock and the fallback is the
+     cylinder that eight of the ten installed bar doors carry, and because it
+     is the one obstacle Peretz named as the one to move. Never for a lockset
+     intent: a customer who asked for THAT lever is told on the page that it
+     cannot stand beside their bar (`why.leverBar`, and the dialog), and a
+     link carrying both simply lands with the bar gone.
+     ⚠ The bow used to have a branch of its own here that took the WINDOW
+     away on a handle intent, on the argument that the bow is centred and runs
+     across a centred window. It does run across it; the answer is that the
+     bow is not added, which `conflicts` says on the tile and `choose`
+     enforces. The old branch also called `conflicts(s)` from inside `repair`,
+     which was the most expensive line in this function. */
+  if (!gripFits(s)) {
     if (intent !== 'lockset') {
       const k = fallbackLockset(s);
-      if (k) { s.lockset = k; change('lockset', SAID.locksetSwapped); }
+      if (k && k !== s.lockset && gripFits({ ...s, lockset: k })) {
+        s.lockset = k; change('lockset', SAID.locksetSwapped);
+      }
     }
-    /* If the pair still does not fit, the grip is the last thing left to give. */
-    if (gripClashesLockset(s)) { s.handle = 'none'; change('handle', SAID.gripGone); }
-  }
-
-  /* A grip with nowhere to go loses the grip, never the window: the window is
-     the thing the customer can see from the street. Same two-stage question as
-     `conflicts` — the cheap arithmetic first, and the search only when it says
-     there is a problem. */
-  if (!gripFitsAnywhere({ ...s, grip: null })) {
-    if (intent === 'handle') { s.window = 'none'; change('window', SAID.windowGone); }
-    else { s.handle = 'none'; change('handle', SAID.gripGone); }
+    /* Still no room: the grip is the last thing left to give — never the
+       window, never the face, whatever the customer just tapped. */
+    if (!gripFits(s)) { s.handle = 'none'; change('handle', SAID.gripGone); }
   }
 
   /* ⚠ THE WHOLE "THE GRIP THE CUSTOMER MOVED" BRANCH IS GONE — 18.9.2026, and

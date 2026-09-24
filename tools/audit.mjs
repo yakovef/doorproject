@@ -843,6 +843,160 @@ for (const v of VIEWS) {
     await p.waitForTimeout(300);
   }
 
+  /* ⚠ A PULL HANDLE NEVER COSTS THE WINDOW, AND A LEVER AGAINST THE BAR OPENS
+     A DIALOG — 20.9.2026. Peretz: *"when a person wants a pull handle when
+     there is no space, then the normal handle goes away, not the window or
+     the panels. and if a person wants a lever handle when there is a pull
+     handle that prevents it, then there should be a window pop up that says
+     that it cannot be together."* `npm test` proves the RULE on the raw
+     cross-product; only a browser can prove that the tap does what the rule
+     says, and that the dialog is a dialog. Two fixtures, each asserted to
+     arrive unrepaired first (§5.15 — three fixtures in this file have arrived
+     repaired and measured a door nobody chose):
+       1. the vertical slot on a standard leaf, no bar. The bow's tile is
+          greyed and NAMES THE WINDOW; tapping it changes nothing — the code,
+          the price and the window stay, no bar is added — and the toast says
+          the tile's own reason. The tile stays `aria-disabled`, never
+          `disabled` (§8), which is what lets the tap say anything at all.
+       2. the same door with an Idan on it. The Coral's tile is greyed and
+          names the bar; tapping it opens `#clash` with `dlg.leverBar` on
+          screen, whole in the viewport, focus INSIDE it, and the code and the
+          price unchanged; Escape closes it and the door is the same; the OK
+          button closes it too. In Russian as well, because the sentence is
+          `data-t` and a static string in a dialog is the kind that gets left
+          behind (§0c, the illustration note).
+     Falsified by dropping the guard in `choose` (fixture 1: the bow is added;
+     fixture 2: no dialog and the bar goes), by `disabled` on the tile (the
+     tap never fires and no toast appears), and by `show()` for `showModal()`
+     (focus is not inside the dialog and Escape does nothing). */
+  {
+    const load = async q => {
+      await p.goto('file://' + process.cwd() + '/index.html' + q);
+      await p.waitForSelector('#stage svg');
+      await p.waitForTimeout(300);
+    };
+    const goStep = async step => {
+      await p.evaluate(st => document.querySelector(`.steps__step[data-step="${st}"]`)?.click(), step);
+      await p.waitForTimeout(300);
+    };
+    const read = () => p.evaluate(() => {
+      const t = document.querySelector('#toast');
+      const d = document.querySelector('#clash');
+      const pr = d && d.open ? d.querySelector('#clash-p') : null;
+      const r = d && d.open ? d.getBoundingClientRect() : null;
+      return {
+        code: (document.querySelector('#code')?.textContent || '').trim(),
+        price: (document.querySelector('[data-price]')?.textContent || '').trim(),
+        toast: t && !t.hidden ? t.textContent.trim() : '',
+        open: !!(d && d.open),
+        sentence: pr ? pr.textContent.trim() : '',
+        shown: !!(pr && pr.checkVisibility()),
+        whole: !!(r && r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight),
+        focusIn: !!(d && d.open && d.contains(document.activeElement)),
+      };
+    });
+    const tile = (group, id) => p.evaluate(([g, i]) => {
+      const e = document.querySelector(`.field[data-group="${g}"] [data-id="${i}"]`);
+      if (!e) return null;
+      const why = e.querySelector('.tile__why');
+      return { ariaDisabled: e.getAttribute('aria-disabled'), disabled: !!e.disabled,
+               why: why && !why.hidden ? why.textContent.trim() : '' };
+    }, [group, id]);
+    const tap = (group, id) => p.evaluate(([g, i]) => {
+      const e = document.querySelector(`.field[data-group="${g}"] [data-id="${i}"]`);
+      if (!e) return false; e.click(); return true;
+    }, [group, id]).then(hit => p.waitForTimeout(320).then(() => hit));
+
+    /* 1 · the bow against the slot. */
+    await load('?w=strip&d=plain&n=none&k=cylinder&s=standard&lang=he');
+    const a0 = await read();
+    const s1 = decodeCode(a0.code);
+    if (!s1 || s1.window !== 'strip' || s1.handle !== 'none') {
+      fault(v.name, `the bow-against-the-slot fixture arrived repaired (window ${s1?.window}, `
+        + `handle ${s1?.handle}) — the check has no subject`);
+    } else {
+      await goStep('grip');
+      const want = withLang('he', () => T('why.noRoomHandleWindow'));
+      const t = await tile('handle', 'grab');
+      const before = await read();
+      if (!t) fault(v.name, 'no bow tile on the grip step — the check has no subject');
+      else {
+        if (t.ariaDisabled !== 'true') fault(v.name, 'the bow beside the vertical slot is not greyed');
+        if (t.disabled) fault(v.name, 'the bow tile is `disabled` — a keyboard cannot reach it and the tap cannot say why');
+        if (t.why !== want) {
+          fault(v.name, `the bow's reason reads "${t.why}" and the window is what stands in its way ("${want}")`);
+        }
+        if (!(await tap('handle', 'grab'))) fault(v.name, 'the bow tile could not be tapped');
+        const after = await read();
+        const s2 = decodeCode(after.code);
+        if (after.code !== before.code || after.price !== before.price) {
+          fault(v.name, `tapping the greyed bow changed the door: ${before.code} ${before.price} → `
+            + `${after.code} ${after.price}`);
+        }
+        if (s2 && s2.window !== 'strip') fault(v.name, 'tapping the greyed bow took the WINDOW away');
+        if (s2 && s2.handle !== 'none') fault(v.name, `tapping the greyed bow put a ${s2.handle} on the door`);
+        if (after.toast !== want) fault(v.name, `the tap on the greyed bow said "${after.toast}" and the tile says "${want}"`);
+        if (after.open) fault(v.name, 'the bow opened the lever dialog');
+      }
+    }
+
+    /* 2 · the lever against the bar. */
+    for (const lang of ['he', 'ru']) {
+      await load(`?w=strip&d=plain&n=idan&k=cylinder&s=standard&lang=${lang}`);
+      const b0 = await read();
+      const st = decodeCode(b0.code);
+      if (!st || st.window !== 'strip' || st.handle !== 'idan' || st.lockset !== 'cylinder') {
+        fault(v.name, `${lang}: the lever-against-bar fixture arrived repaired (window ${st?.window}, `
+          + `handle ${st?.handle}, lockset ${st?.lockset}) — the check has no subject`);
+        continue;
+      }
+      await goStep('lock');
+      const want = withLang(lang, () => T('why.leverBar'));
+      const sentence = withLang(lang, () => T('dlg.leverBar'));
+      const t = await tile('lockset', 'coral');
+      const before = await read();
+      if (!t) { fault(v.name, `${lang}: no Coral tile on the lock step — the check has no subject`); continue; }
+      if (t.ariaDisabled !== 'true') fault(v.name, `${lang}: the Coral beside an Idan and the slot is not greyed`);
+      if (t.disabled) fault(v.name, `${lang}: the Coral tile is \`disabled\` — the dialog can never open from a keyboard`);
+      if (t.why !== want) fault(v.name, `${lang}: the Coral's reason reads "${t.why}", expected "${want}"`);
+      if (!(await tap('lockset', 'coral'))) { fault(v.name, `${lang}: the Coral tile could not be tapped`); continue; }
+      const open = await read();
+      if (!open.open) fault(v.name, `${lang}: tapping the greyed Coral opened no dialog`);
+      else {
+        if (!open.shown || open.sentence !== sentence) {
+          fault(v.name, `${lang}: the dialog says "${open.sentence}"${open.shown ? '' : ' (not visible)'}, `
+            + `expected "${sentence}"`);
+        }
+        if (!open.whole) fault(v.name, `${lang}: the lever dialog is not whole on screen`);
+        if (!open.focusIn) fault(v.name, `${lang}: focus is not inside the lever dialog — it is not modal`);
+      }
+      if (open.code !== before.code || open.price !== before.price) {
+        fault(v.name, `${lang}: the dialog opened AND the door changed: ${before.code} → ${open.code}`);
+      }
+      await p.keyboard.press('Escape');
+      await p.waitForTimeout(200);
+      const closed = await read();
+      if (closed.open) fault(v.name, `${lang}: Escape does not close the lever dialog`);
+      if (closed.code !== before.code) fault(v.name, `${lang}: the door changed on closing the dialog: ${before.code} → ${closed.code}`);
+      const st2 = decodeCode(closed.code);
+      if (st2 && (st2.handle !== 'idan' || st2.lockset !== 'cylinder')) {
+        fault(v.name, `${lang}: after the dialog the door carries ${st2.handle}/${st2.lockset} — the bar or the lever moved`);
+      }
+      /* And the button. */
+      await tap('lockset', 'coral');
+      const again = await read();
+      if (!again.open) fault(v.name, `${lang}: the dialog did not open a second time`);
+      await p.evaluate(() => document.querySelector('#clash-ok')?.click());
+      await p.waitForTimeout(200);
+      const done = await read();
+      if (done.open) fault(v.name, `${lang}: the OK button does not close the lever dialog`);
+      if (done.code !== before.code) fault(v.name, `${lang}: the door changed on OK: ${before.code} → ${done.code}`);
+    }
+    await p.goto('file://' + process.cwd() + '/index.html');
+    await p.waitForSelector('#stage svg');
+    await p.waitForTimeout(300);
+  }
+
   /* ⚠ AND IT MUST NOT COVER THE ANSWERS — 10.9.2026. The same toast, asked a
      question about WHERE it lands rather than what it says. Sitting above the
      quote bar it cleared the price and the send and then covered the only
@@ -1611,6 +1765,11 @@ for (const v of VIEWS) {
          off — so this drives them the way Enter on a focused button does. */
       await p.$eval(`${g} [data-id="${id}"]`, el => el.click());
       await p.waitForTimeout(30);
+      /* A greyed lever opens the lever-against-bar dialog (20.9.2026) and the
+         page behind it is inert — so the NEXT `p.click` on a rail circle
+         would time out against the backdrop. Closed here; what the dialog
+         does is asserted in its own block below, on a fixture built for it. */
+      await p.evaluate(() => { const d = document.querySelector('#clash'); if (d && d.open) d.close(); });
 
       const s = await p.evaluate(() => {
         const doc = document.documentElement;

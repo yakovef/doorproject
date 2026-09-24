@@ -508,6 +508,7 @@ function init() {
     box.hidden = open;
   });
   $('#works-close').addEventListener('click', closeWorks);
+  $('#clash-ok').addEventListener('click', closeClash);
 
   /* ⚠ THE QUOTE BAR'S WAY ON IS WIRED ONCE, HERE, AND NOT IN `buildPanel`.
      Every other `.sect__next` is built with its step and gets its listener in
@@ -882,6 +883,25 @@ function openWorks() {
 
 function closeWorks() {
   const d = $('#works');
+  if (typeof d.close === 'function') d.close();
+  else d.removeAttribute('open');
+}
+
+/* The lever-against-bar dialog — `choose` above. Same `showModal` guard as
+   the gallery's, for the same reason: it traps focus, closes on Escape and
+   makes the page inert, and an old browser without it must not take the
+   configurator down inside a click handler. Nothing here touches `state`:
+   the door a customer sees behind the backdrop is the door they keep. */
+function openClash() {
+  const d = $('#clash');
+  if (!d) return;
+  if (typeof d.showModal === 'function') d.showModal();
+  else d.setAttribute('open', '');
+}
+
+function closeClash() {
+  const d = $('#clash');
+  if (!d) return;
   if (typeof d.close === 'function') d.close();
   else d.removeAttribute('open');
 }
@@ -2354,6 +2374,31 @@ function markSteps() {
  */
 function choose(g, id) {
   noteEngaged();
+  /* ⚠ A GREYED PULL HANDLE OR LOCKSET CHANGES NOTHING — 20.9.2026. Peretz:
+     *"when a person wants a pull handle when there is no space, then the
+     normal handle goes away, not the window or the panels. and if a person
+     wants a lever handle when there is a pull handle that prevents it, then
+     there should be a window pop up that says that it cannot be together."*
+     Every other greyed tile performs its repair on a tap — the stripes clear
+     the face, a window drops the bar — and that idiom stays. These two are
+     the exception because running `repair` on them would take away something
+     the customer already had for something they cannot have: a bar tapped
+     against the glass would drop the bar they HAVE, and a lever tapped
+     against the bar would drop the bar for the lever. So the handle's tap
+     says the tile's own reason (the window stays, the panels stay) and the
+     lockset's opens the one dialog in the flow besides the gallery. The
+     reasons are `conflicts`' — the same table `markGroup` painted the tile
+     from — so the tap and the tile cannot disagree about why.
+     ⚠ A handle whose only obstacle is the LEVER is not greyed at all, and its
+     tap goes through `repair` below, which swaps the lever for the cylinder
+     and says so. That is the half of his sentence about the lever going. */
+  if ((g.key === 'handle' || g.key === 'lockset') && id !== state[g.key]) {
+    const why = conflicts(state)[g.key][id];
+    if (why) {
+      if (g.key === 'lockset') openClash(); else toast(why);
+      return;
+    }
+  }
   /* `said` comes back from the repair itself, one sentence per change, because
      the branch that made the change is the only place that knows why it did.
      It used to be looked up afterwards from the group name, which is right

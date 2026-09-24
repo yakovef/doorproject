@@ -16,7 +16,7 @@ import {
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { conflicts, repair } from '../js/rules.js';
+import { conflicts, detailWorked, fallbackLockset, gripObstacle, repair } from '../js/rules.js';
 import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, isUntouched, toQuery, VERSION } from '../js/url-state.js';
@@ -2771,6 +2771,188 @@ group('the bow has a home on the faces that have a place for it');
    opens the door it names WITHOUT a notice, and the short code is unaffected —
    which it always was, and which is the whole reason no `VERSION` bump was
    needed to withdraw the parameter. */
+group('a pull handle never costs the window — 20.9.2026');
+{
+  /* Peretz: *"when a person wants a pull handle when there is no space, then
+     the normal handle goes away, not the window or the panels. and if a person
+     wants a lever handle when there is a pull handle that prevents it, then
+     there should be a window pop up that says that it cannot be together."*
+     Three clauses, each on the RAW cross-product of size x window x face x
+     lockset (18.9's placement contract found its own §5.15 clause fired on a
+     FILTERED sweep — `everyPlacement()` yields only accepted doors, so a
+     refused arm never has a subject there):
+       1. a handle tap never moves the window, the face or the stripes —
+          whatever else happens, on every one of the 1,500-odd pairs;
+       2. a handle whose only obstacle is the LEVER is offered, and the tap
+          swaps the lever for the fallback, keeps the bar, and says so;
+       3. a handle the glass or the face leaves no room for is greyed with a
+          reason that names the obstacle, and a LINK carrying it lands with
+          the bar gone and the window kept.
+     And from the lockset's side, a biconditional: a lockset is greyed exactly
+     when a link carrying it beside the bar would drop the bar — the tile and
+     the rule are one table — and a lockset intent never moves the window or
+     the face either. The DIALOG is a DOM fact and lives in `npm run audit`.
+     Falsified by restoring `if (intent === 'handle') { s.window = 'none' }`
+     on the general branch (clause 1, on every glazed refusal), by greying the
+     lever-only handles in `conflicts` (clause 2), and by dropping the
+     `gripFits` question from the lockset side of `conflicts` (the
+     biconditional). All three were run before this shipped. */
+  const KEEP = ['window', 'detail', 'stripeDir', 'stripeCount', 'grille'];
+  const WHY = { window: 'why.noRoomHandleWindow', face: 'why.noRoomHandleFace',
+                door: 'why.noRoomHandle' };
+  const bases = [];
+  for (const size of sizeKeys) for (const w of WINDOWS) for (const d of DETAILS)
+    for (const k of LOCKSETS) {
+      const st = { ...base, size, window: w.id, detail: d.id, lockset: k.id, handle: 'none' };
+      if (buildable(st)) bases.push(st);
+    }
+  /* Line work is on the state, not in DETAILS, so the loop above never sees
+     a striped face; two of each direction, so the face clause has stripes
+     under it as well as mouldings. */
+  for (const size of sizeKeys) for (const k of LOCKSETS)
+    for (const [dir, n] of [['h', 5], ['v', 3]]) {
+      const st = { ...base, size, window: 'none', detail: 'plain', lockset: k.id,
+                   handle: 'none', stripeDir: dir, stripeCount: n };
+      if (buildable(st)) bases.push(st);
+    }
+  ok(bases.length > 300, `only ${bases.length} buildable doors to put a handle on — the sweep is thin`);
+
+  let fit = 0, swapped = 0;
+  const refused = { window: 0, face: 0, door: 0, channel: 0 };
+  for (const st of bases) {
+    const c = conflicts(st);
+    for (const h of HANDLES) {
+      if (h.style === 'none') continue;
+      const label = `${h.id} onto ${st.size}/${st.window}/${st.detail}/`
+                  + `${st.stripeDir}${st.stripeCount}/${st.lockset}`;
+      const { state: r, said } = repair({ ...st, handle: h.id }, 'handle');
+      for (const key of KEEP) {
+        ok(r[key] === st[key], `${label}: a handle tap moved ${key} ${st[key]} → ${r[key]} — `
+          + 'the window and the face never yield to a pull handle');
+      }
+      ok(buildable(r), `${label}: the door after the tap is not buildable (${said.join(' · ')})`);
+      if (c.handle[h.id]) {
+        /* Greyed. On the page the tap never reaches `repair` (`choose` says
+           the reason and returns); a LINK carrying the pair lands with the
+           bar gone, and says so. */
+        ok(r.handle === 'none',
+           `${label}: greyed ("${c.handle[h.id]}") and a link carrying it keeps the handle`);
+        ok(said.includes(T('fix.gripGone')),
+           `${label}: a link dropped the handle and did not say so (${said.join(' · ')})`);
+        if (h.style === 'channel') {
+          refused.channel++;
+          ok(c.handle[h.id] === T('why.channelPlain'),
+             `${label}: the channel is greyed for "${c.handle[h.id]}", not for wanting a plain leaf`);
+        } else {
+          const what = gripObstacle(st, h.id);
+          ok(what && what !== 'lock',
+             `${label}: greyed, and the obstacle is ${what === 'lock' ? 'the LEVER — which is '
+             + 'the one obstacle a bar may move' : 'nothing at all'}`);
+          if (what && what !== 'lock') {
+            refused[what]++;
+            ok(c.handle[h.id] === T(WHY[what]),
+               `${label}: the obstacle is the ${what} and the tile says "${c.handle[h.id]}"`);
+          }
+        }
+      } else {
+        ok(r.handle === h.id, `${label}: offered, and the tap did not add it (${said.join(' · ')})`);
+        const what = gripObstacle(st, h.id);
+        if (what === 'lock') {
+          swapped++;
+          const fb = fallbackLockset({ ...st, handle: h.id });
+          ok(r.lockset === fb && fb !== st.lockset,
+             `${label}: the lever was the obstacle and the tap left the lockset at ${r.lockset}`);
+          ok(said.includes(T('fix.locksetSwapped')),
+             `${label}: the lever was swapped and the tap did not say so (${said.join(' · ')})`);
+        } else {
+          fit++;
+          ok(what === null, `${label}: offered with the ${what} in its way`);
+          ok(r.lockset === st.lockset && !said.length,
+             `${label}: a handle that fits changed something else: ${said.join(' · ')}`);
+        }
+      }
+    }
+  }
+  /* §5.15: every arm has to have fired, or the clause about it is decoration.
+     The face arm is PRINTED and not gated: today no panelled face refuses a
+     bar (the bow has a home in every field since 20.9, C3), so its count is 0
+     and a gate on it would be a gate on the catalogue rather than on the
+     rule. The channel arm is the `faceWorked` fix of the same day — it was 0
+     before it, on every panelled door. */
+  ok(fit > 0 && swapped > 0 && refused.window > 0 && refused.channel > 0,
+     `the sweep saw ${fit} fit, ${swapped} lever swaps, ${refused.window} refused for the `
+   + `window and ${refused.channel} channels refused a worked face — every arm needs a subject`);
+  console.log(`  (${bases.length} doors: ${fit} handles fit, ${swapped} swap the lever, `
+            + `refused for the window ${refused.window}, the face ${refused.face}, `
+            + `the leaf ${refused.door}; the channel refused a worked face ${refused.channel} times)`);
+
+  /* The lockset's side. */
+  let greyedK = 0, offeredK = 0;
+  for (const st of bases) for (const h of HANDLES) {
+    if (h.style === 'none') continue;
+    const s0 = repair({ ...st, handle: h.id }, 'handle').state;
+    if (s0.handle !== h.id) continue;
+    const c = conflicts(s0);
+    for (const k of LOCKSETS) {
+      if (k.id === s0.lockset) continue;
+      const label = `${k.id} beside ${h.id} on ${s0.size}/${s0.window}/${s0.detail}/${s0.lockset}`;
+      const grey = !!c.lockset[k.id];
+      const { state: r, said } = repair({ ...s0, lockset: k.id }, 'lockset');
+      for (const key of KEEP) {
+        ok(r[key] === s0[key], `${label}: a lockset tap moved ${key} ${s0[key]} → ${r[key]}`);
+      }
+      ok(buildable(r), `${label}: the door after the lockset tap is not buildable`);
+      ok(r.lockset === k.id, `${label}: the customer asked for this lever and got ${r.lockset}`);
+      ok(grey === (r.handle === 'none'),
+         `${label}: the tile ${grey ? 'is' : 'is not'} greyed and a link carrying both `
+       + `${r.handle === 'none' ? 'drops the bar' : 'keeps it'} — the tile and the rule disagree`);
+      if (grey) {
+        greyedK++;
+        ok(c.lockset[k.id] === T('why.leverBar'),
+           `${label}: greyed for "${c.lockset[k.id]}" and the bar is what stands in its way`);
+        ok(said.includes(T('fix.gripGone')), `${label}: the bar went and the link was not told`);
+      } else {
+        offeredK++;
+        ok(r.handle === h.id && !said.length,
+           `${label}: offered, and the tap changed something: ${said.join(' · ')}`);
+      }
+    }
+  }
+  ok(greyedK > 0 && offeredK > 0,
+     `the lockset sweep saw ${greyedK} greyed and ${offeredK} offered — it needs both`);
+  console.log(`  (${greyedK} lever tiles greyed for the bar, ${offeredK} offered beside one)`);
+
+  /* ⚠ AND THE CHANNEL'S OWN RULE, FROM BOTH SIDES, WHICH HAD ONLY EVER FIRED
+     ON GLASS. `faceWorked` reads a STATE and three callers handed it a DETAIL
+     (found 20.9.2026 while writing `gripObstacle`), so a ידית שקועה was
+     offered on the two-panel door and drawn through its mouldings. Every
+     worked face greys the channel, and a door carrying the channel greys
+     every worked face; falsified by putting `faceWorked(byId(DETAILS, …))`
+     back — 0 of each. */
+  let facesGrey = 0, detailsGrey = 0;
+  for (const size of sizeKeys) {
+    for (const d of DETAILS) {
+      const st = { ...base, size, window: 'none', detail: d.id, handle: 'none' };
+      const grey = conflicts(st).handle.channel;
+      ok(!!grey === detailWorked(d),
+         `${size}/${d.id}: the channel is ${grey ? 'greyed' : 'offered'} on a `
+       + `${detailWorked(d) ? 'worked' : 'plain'} face`);
+      if (grey) facesGrey++;
+      const withCh = { ...base, size, window: 'none', detail: 'plain', handle: 'channel' };
+      const blocked = !!conflicts(withCh).detail[d.id];
+      ok(blocked === detailWorked(d),
+         `${size}/${d.id}: with the channel on the door the face is ${blocked ? 'greyed' : 'offered'}`);
+      if (blocked) detailsGrey++;
+    }
+    const striped = { ...base, size, window: 'none', detail: 'plain', handle: 'none',
+                      stripeDir: 'h', stripeCount: 3 };
+    ok(conflicts(striped).handle.channel === T('why.channelPlain'),
+       `${size}: the channel is offered on a striped leaf`);
+  }
+  ok(facesGrey > 0 && detailsGrey > 0,
+     `the channel sweep greyed ${facesGrey} faces and ${detailsGrey} details — it needs both`);
+}
+
 group('`gp` is a retired parameter, and a link still carrying it is not an error');
 {
   const draggable = { ...DEFAULTS, handle: 'idan' };

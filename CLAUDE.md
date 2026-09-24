@@ -1068,6 +1068,27 @@ line-work repairs, and the "no glass, so no grille" cleanup runs **last**.
 beside a lever was withdrawn at the owner's request: move the bar, do not
 refuse the sale.
 
+⚠ **AND A PULL HANDLE NEVER COSTS THE WINDOW OR THE FACE — 20.9.2026.**
+Peretz: *"when a person wants a pull handle when there is no space, then the
+normal handle goes away, not the window or the panels. and if a person wants
+a lever handle when there is a pull handle that prevents it, then there should
+be a window pop up that says that it cannot be together."* So the grip's two
+questions (`gripFits`: the bow against the stile, the handle against the
+face) are answered in ONE `repair` branch with one direction — the lever
+yields first (`fallbackLockset`, `SAID.locksetSwapped`), the handle second,
+the glass and the face never, whatever the intent. `gripObstacle(state, id)`
+is the one statement of what stands in a bar's way (`null` · `lock` ·
+`window` · `face` · `door`), and the lever is never a reason a handle is
+GREYED: a bar whose only obstacle is the lock furniture is offered and the
+tap swaps it. A greyed handle names its obstacle and says it stays; a greyed
+lockset names the bar (`why.leverBar`). ⚠ **And on the page those two taps
+change nothing** — `choose` says the handle's reason, or opens the
+`<dialog id="clash">` for the lockset, and returns before `repair`: running
+the repair would take away the bar the customer HAS for one they cannot
+have. Every other greyed tile still performs its repair on a tap.
+⚠ **`faceWorked` takes a STATE.** Three callers handed it a detail until
+20.9.2026 and it answered false for every face there is — §5.24.
+
 ### Hardware — two groups
 - **`HANDLES` = the grip** (what you pull), optional.
 - **`LOCKSETS` = the lock furniture** (what you turn, and the keyway), always.
@@ -1185,7 +1206,7 @@ sheet. A right-hinged door is a physical fact.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Twenty-three so far. None of them
+**Things that vanish rather than break.** Twenty-four so far. None of them
 threw. All of them looked like a working page.
 
 1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
@@ -1445,6 +1466,27 @@ it is **present and distinct**, not only that it is correct:
     ⚠ The one-sided form ("a door must never draw a bell over a pane") is dead
     on arrival, because once `repair` exists no door carries both: a check that
     cannot find its subject, §5.15 again, caught before it shipped.
+
+24. **A PREDICATE HANDED THE WRONG OBJECT, AND A FALLBACK THAT MADE THE WRONG
+    ANSWER SILENT.** `faceWorked(state)` — does this door put anything on the
+    face — was called three times in `js/rules.js` as
+    `faceWorked(byId(DETAILS, state.detail))`, with a DETAIL. `detail.detail`
+    is undefined; `byId` resolves an unknown id to `list[0]`, which is
+    `plain`; `plain.panel` is false. So it returned false for every face in
+    the catalogue, and the recessed channel's "needs a plain leaf" rule fired
+    on a window (the `onLeaf ||` half of the same line) and never once on a
+    panel: a ידית שקועה could be put on the two-panel door, drawn through its
+    mouldings, priced at ₪1,900 and ordered, from the day `isLineWork` moved
+    onto the state (27.8) and `faceWorked` followed it. The comment over the
+    function said "this detail".
+    ⚠ **`byId`'s fallback exists so a stale id in a LINK opens something**,
+    and it cannot tell that customer's link from a programmer's argument —
+    it rescued the wrong one here and rescued it in silence. Found 20.9.2026
+    by calling it the same wrong way in a new function and watching a probe
+    say that a two-panel door greyed nothing. `detailWorked(d)` asks a
+    DETAILS entry the question an entry can answer; the channel is greyed on
+    432 worked-face doors in the sweep where it had been greyed on 162, all
+    glazed.
 
 ⚠ **And one assertion was counting PROSE.** The ironwork group asked
 `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
@@ -2576,6 +2618,111 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ PERETZ'S SECOND REVIEW, PART D — A PULL HANDLE NEVER COSTS THE WINDOW,
+  THE LEVER YIELDS FIRST, AND A LEVER AGAINST THE BAR OPENS A DIALOG —
+  20.9.2026.** His words: *"when a person wants a pull handle when there is no
+  space, then the normal handle goes away, not the window or the panels. and
+  if a person wants a lever handle when there is a pull handle that prevents
+  it, then there should be a window pop up that says that it cannot be
+  together."* Decided in chat: a real modal dialog; the lever swaps to the
+  cylinder first; where the glass is the obstacle the bar's tile is greyed
+  with the reason. Rules and page only — `render` is untouched.
+
+  **What `repair` did before.** Three branches read `if (intent === 'handle')
+  { s.window = 'none' }` — the channel's, the bow's and the general one — each
+  correct about a LINK and each the opposite of his rule about a tap: tap a
+  bar with no room beside the ₪4,200 slot and the slot went, with a toast.
+  They are one branch now, asking `gripFits` (both questions the grip asks —
+  the bow against the stile and the handle against the face — as one) with
+  one direction: the lever yields first (`fallbackLockset`,
+  `SAID.locksetSwapped`), the handle second, the glass and the face never.
+  Measured on the raw cross-product, **486 buildable doors × 4 handles**:
+  1,402 fit, 74 swap the lever, 36 are refused for the window and 0 for the
+  face; a handle tap moves the window, the face or the stripes on **0**.
+  ⚠ The bow's own branch also called `conflicts(s)` from inside `repair` —
+  the most expensive line in the function — and is gone with it.
+
+  **What the tiles say.** `gripObstacle(state, handleId)` is the one statement
+  of what stands in a bar's way — `null` · `lock` · `window` · `face` ·
+  `door` — and **the lever is never a reason a handle is greyed**: a bar whose
+  only obstacle is the lock furniture is offered, and the tap swaps the lever
+  and says so; that is the half of his sentence about the lever going. What
+  IS greyed names the obstacle and that it stays: `why.noRoomHandleWindow`
+  *"החלון בדרך — והוא נשאר"*, `why.noRoomHandleFace`, and `why.noRoomHandle`
+  for a leaf that is simply too small. ⚠ **Subject first**: the first wording
+  clipped to *"אין מקום למנעול הז…"* under a 1280 px tile — the same sentence
+  as the generic reason with its meaning cut off, which is §9's *"the clipped
+  word is the one carrying the meaning"* — so what is in the way leads and
+  the full sentence is in the toast and the dialog. From the lockset's side
+  `why.leverBar` *"ידית המשיכה בדרך"* — ⚠ **and until today only the BOW's
+  stile clash was asked there**: a customer with an Idan beside the slot could
+  tap the Coral, and `repair` took the ₪500 bar for the ₪100 lever with
+  nothing on the tile saying it would. 666 lever tiles are greyed for a bar
+  across the sweep and 11,142 offered beside one, and the biconditional —
+  greyed exactly when a link carrying both drops the bar — holds on all of
+  them. `why.noRoomGripLock` left with the rule that said it from both sides.
+
+  **`choose` and the dialog.** Every other greyed tile performs its repair on
+  a tap — the stripes clear the face, a window drops the bar — and that idiom
+  stays. A greyed HANDLE and a greyed LOCKSET are the exception, because
+  running `repair` on them would take away something the customer already
+  had for something they cannot have. The handle's tap says the tile's own
+  reason; the lockset's opens `<dialog id="clash">` — `dlg.leverBar`
+  *"ידית זו וידית המשיכה שבחרתם לא יכולות להיות יחד באותה דלת"*, one `.btn`,
+  `showModal` behind the gallery's guard, focus trapped, Escape and the button
+  close it, the door byte-identical on close. No animation, so nothing for T9
+  or T13 to kill; in the `.is-bare` hide-list regardless. The tile stays
+  `aria-disabled`, never `disabled` (§8), which is what lets a keyboard open
+  the dialog at all.
+  ⚠ The fuzzer's click walk and the audit's every-option walk both close the
+  dialog after each click — the page behind a modal is inert and the next
+  rail click would time out against the backdrop — and the fuzzer counts how
+  many of its clicks opened one, so a walk that never met the dialog reads
+  differently from one where it stopped opening.
+
+  **⚠ AND A RULE THAT HAD FIRED ON GLASS AND NEVER ON A PANEL — §5.24.**
+  `faceWorked` reads a STATE and three callers in `rules.js` handed it a
+  DETAIL, so it answered false for every face there is: the recessed
+  channel's "needs a plain leaf" rule greyed the channel on a window and
+  never on a panel, and a ידית שקועה could be put on the two-panel door,
+  drawn through its mouldings, priced at ₪1,900 and ordered. Found while
+  writing `gripObstacle`, which called it the same wrong way for one build.
+  `detailWorked(d)` is the question about a DETAILS entry; the channel is
+  greyed on 432 worked-face doors in the sweep where it had been greyed on
+  162, all glazed. No gallery door moves — none carries a channel.
+
+  **Asserted.** `npm test`: *"a pull handle never costs the window"* — the
+  three clauses and the lockset biconditional on the raw cross-product, with
+  §5.15 counts for every arm (the face arm is printed rather than gated,
+  because no panelled face refuses a bar since C3 and a gate on it would be a
+  gate on the catalogue), plus the channel's rule from both sides.
+  **Falsified four ways before it shipped**: restoring `s.window = 'none'` on
+  the general branch (108 faults), greying the lever-only handles (223),
+  asking only the bow clash on the lockset side (1,333), and
+  `faceWorked(byId(…))` again (583). `npm run audit`, at eight viewports: the
+  bow beside the slot is greyed naming the window, a tap changes nothing and
+  the toast says the tile's reason; the Coral beside an Idan opens the dialog
+  with the sentence on screen, whole in the viewport, focus inside, the code
+  and the price unchanged, Escape and OK both closing it, in Hebrew and in
+  Russian — both fixtures asserted to arrive unrepaired first (§5.15, the
+  fourth time in this file).
+
+  **Gates.** `npm test` **11,809,843 / 0** once the sheets were regenerated (its first
+  pass failed exactly the five staleness rows) · `npm run fuzz` 30,000 designs
+  and 1,800 clicks clean, 9 of those clicks on a lever the bar refused, each
+  opening the dialog · `npm run collide -- all` 1,110 designs, `faceObstacles`
+  agreeing with the drawing everywhere · `-- boxes` every fitting inside its
+  declaration (the bow 0/280/17 against 4/290/26, the Coral 30/128/30 against
+  40/135/51, `MOUNT_REACH` covered at 111 of 121) · `npm run latency` worst
+  **115 ms** against 600 (the dialog is new DOM) · `npm run audit` **no faults**
+  at eight viewports.
+
+  **Sheets.** `render` is untouched by construction — this is rules and page —
+  and **0 of the 48 bare sheets and 0 of the 6 `lockset` sheets moved**.
+  ⚠ Forty-eight, not 52: Part A deleted four `against-*` sheets with the bars
+  they showed. 7 of the 12 `shot` sheets moved (desktop, laptop, panel,
+  phone, sidelight, strips, tablet) and prove nothing (§7).
 
 - **⚠ PERETZ'S SECOND REVIEW, PART C — THE ETCHED DESIGNS KEEP THE WINDOW,
   THE BALL LOSES ITS LINE, AND THE BOW HAS A HOME ON THE FACES BUILT TO CARRY

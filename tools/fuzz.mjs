@@ -193,7 +193,7 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const CODE = new RegExp(`^DM-[0-9A-Z]{${encodeCode(DEFAULTS).length - 3}}$`);
   const r = rng(SEED ^ 0x5EED);
-  let clicks = 0;
+  let clicks = 0, dialogs = 0;
 
   for (let wk = 0; wk < WALKS; wk++) {
     const v = VIEWS[wk % VIEWS.length];
@@ -228,6 +228,17 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
       await hit.evaluate(el => el.click());
       await p.waitForTimeout(12);
       clicks++;
+      /* ⚠ A GREYED LEVER OPENS A MODAL DIALOG (20.9.2026) and changes nothing,
+         which is what the walk is here to see happen — and then the page is
+         inert behind it. Closed the way a person closes it, so the next click
+         lands on the door and not on the backdrop; counted so a walk that
+         never met one is distinguishable from one where the dialog stopped
+         opening. */
+      if (await p.evaluate(() => {
+        const d = document.querySelector('#clash');
+        if (!d || !d.open) return false;
+        d.close(); return true;
+      })) dialogs++;
 
       const s2 = await p.evaluate(() => {
         const doc = document.documentElement;
@@ -317,7 +328,7 @@ console.log(`\nB. ${WALKS} random click walks of ${STEPS} clicks, in a real brow
     await p.close();
   }
   await b.close();
-  console.log(`  ${clicks} clicks`);
+  console.log(`  ${clicks} clicks, ${dialogs} of them on a lever the bar refused (the dialog)`);
 }
 
 console.log(faults

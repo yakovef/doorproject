@@ -13,7 +13,7 @@
      whole point of PLAN.md §8.1 is that these three files work alone from a
      folder, and a fourth file to copy is a fourth file to forget. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFEDE8'/%3E%3Crect x='7' y='4' width='18' height='26' rx='1.5' fill='%234A5C6A'/%3E%3Crect x='10' y='8' width='12' height='9' rx='1' fill='%23BFD0DA'/%3E%3Ccircle cx='12' cy='22' r='1.4' fill='%23E8E4DC'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=142c339f">
+<link rel="stylesheet" href="css/app.css?v=a7ae18b4">
 
 <!-- ⚠ THE PHOTOGRAPHED ROOM, IN TWO CROPS, AND ONLY ONE IS EVER FETCHED.
      The owner supplied the same entrance framed 3:4 and 16:9 and both ship:
@@ -161,6 +161,19 @@
   </div>
   <p class="works__lede" data-t="works.lede">בחרו דלת קרובה למה שרציתם — ומשם תשנו כל פרט.</p>
   <div class="works__grid" id="works-grid"></div>
+</dialog>
+
+<!-- The one other modal in the flow: a lever tapped against the pull handle
+     already on the door. Peretz, 20.9.2026: "if a person wants a lever handle
+     when there is a pull handle that prevents it, then there should be a
+     window pop up that says that it cannot be together." One sentence, one
+     button, and the door is exactly what it was when it closes — `choose` in
+     js/app.js opens it INSTEAD of repairing. The tile that opens it stays
+     `aria-disabled`, never `disabled` (CLAUDE.md §8), which is what lets a
+     keyboard reach it at all. -->
+<dialog class="clash" id="clash" aria-labelledby="clash-p">
+  <p class="clash__p" id="clash-p" data-t="dlg.leverBar">ידית זו וידית המשיכה שבחרתם לא יכולות להיות יחד באותה דלת</p>
+  <button class="btn clash__ok" id="clash-ok" type="button" data-t="dlg.ok">הבנתי</button>
 </dialog>
 
 <p class="strip" id="placeholder-note" hidden>
@@ -641,7 +654,7 @@
       css.textContent.replace('<style>', '<style id="down-css-live">'));
   }, 4000);
 </script>
-<script src="assets/bundle.js?v=b8848e59"></script>
+<script src="assets/bundle.js?v=196a6fe3"></script>
 <!-- ⚠ THE BUNDLE ITSELF NOT ARRIVING is the one failure the other two guards
      cannot see: scripting is ON, so `<noscript>` is inert, and no handler was
      ever registered, so `fail()` never runs. A 404 after a bad deploy, a

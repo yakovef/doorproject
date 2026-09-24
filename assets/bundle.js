@@ -560,6 +560,16 @@
     ],
     "works.open": ["התחילו מדלת שכבר התקנו", "Start from a door we have fitted", "Начните с уже установленной двери"],
     "works.count": ["{0} דלתות אמיתיות", "{0} real doors", "{0} реальных дверей"],
+    /* The one dialog in the flow besides the gallery: a lever tapped against
+       the pull handle already on the door. One sentence, one button, and the
+       door unchanged when it closes — see `openClash` in `js/app.js`. */
+    "dlg.leverBar": [
+      "ידית זו וידית המשיכה שבחרתם לא יכולות להיות יחד באותה דלת",
+      "This lever and the pull handle you chose cannot be on the same door",
+      "Эта ручка и выбранная вами ручка-скоба не могут быть на одной двери"
+    ],
+    "dlg.ok": ["הבנתי", "OK", "Понятно"],
+    "dlg.close": ["סגירת ההודעה", "Close this message", "Закрыть сообщение"],
     /* ── the print sheet ──────────────────────────────────────────── */
     "sheet.label": ["דף הזמנה", "Order sheet", "Бланк заказа"],
     "sheet.dims": [
@@ -643,7 +653,20 @@
     "why.notWithChannel": ["לא משתלב עם ידית שקועה", "Does not go with a recessed channel", "Не сочетается с врезной ручкой"],
     "why.noRoomHandle": ["אין מקום לידית הזו על הדלת", "No room for this handle on the door", "На двери нет места для этой ручки"],
     "why.noRoomWithWindow": ["אין מקום לידית שבחרתם עם החלון הזה", "No room for the handle you chose with this window", "С этим окном нет места для выбранной ручки"],
-    "why.noRoomGripLock": ["אין מקום בין המאחז למנעול", "No room between the grip and the lock", "Между скобой и замком нет места"],
+    /* Three reasons for one rule, 20.9.2026 — Peretz: the window and the panels
+       stay, the lever goes. A greyed HANDLE names what stands in its way and that
+       it stays; a greyed LOCKSET names the bar, and `choose` opens `dlg.leverBar`
+       over it instead of repairing. `why.noRoomGripLock` ("no room between the
+       grip and the lock") left with the rule that said it from both sides. */
+    /* ⚠ THE SUBJECT FIRST. `.tile__why` is one clipped line under a tile
+       (§9: "the clipped word is the one carrying the meaning"), and the first
+       wording — "אין מקום למנעול הזה לצד ידית המשיכה" — clipped to "אין מקום
+       למנעול הז…" at 1280 px, which is the same sentence as `why.noRoomHandle`
+       with the reason cut off. What is in the way goes first, so a clip keeps
+       it; the full sentence is in the toast and the dialog. */
+    "why.noRoomHandleWindow": ["החלון בדרך — והוא נשאר", "The window is in the way — it stays", "Мешает окно — оно остаётся"],
+    "why.noRoomHandleFace": ["העיצוב בדרך — והוא נשאר", "The design is in the way — it stays", "Мешает узор — он остаётся"],
+    "why.leverBar": ["ידית המשיכה בדרך", "The pull handle is in the way", "Мешает ручка-скоба"],
     "fix.windowAdded": ["הוספנו חלון — הסורג והזכוכית צריכים אותו", "We added a window — the grille and the glass need one", "Мы добавили окно — решётке и стеклу оно необходимо"],
     "fix.windowGone": ["הסרנו את החלון", "We removed the window", "Мы убрали окно"],
     "fix.lineWorkGone": ["הסרנו את קווי המתכת — לא משלבים אותם עם חלון", "We removed the metal strips — they do not go with a window", "Мы убрали металлические полосы — с окном они не сочетаются"],
@@ -8120,12 +8143,28 @@ ${body}
   // js/rules.js
   var isLineWork = (state2) => !!(state2 && state2.stripeDir && state2.stripeDir !== "none" && state2.stripeCount);
   var faceWorked = (state2) => !!byId(DETAILS, state2.detail).panel || isLineWork(state2);
+  var detailWorked = (d) => !!d.panel;
   var locksetFits = (state2, id) => !gripClashesLockset({ ...state2, lockset: id });
   function fallbackLockset(state2) {
     if (locksetFits(state2, "cylinder")) return "cylinder";
     const k = LOCKSETS.find((x) => locksetFits(state2, x.id));
     return k ? k.id : null;
   }
+  var gripFits = (state2) => !gripClashesLockset(state2) && gripFitsAnywhere({ ...state2, grip: null });
+  function gripObstacle(state2, handleId) {
+    const s = { ...state2, handle: handleId };
+    if (gripFits(s)) return null;
+    const k = fallbackLockset(s);
+    if (k && k !== s.lockset && gripFits({ ...s, lockset: k })) return "lock";
+    if (leafGlazed(s) && gripFits({ ...s, window: "none" })) return "window";
+    if (faceWorked(s) && gripFits({ ...s, detail: "plain", stripeDir: "none", stripeCount: 0 })) return "face";
+    return "door";
+  }
+  var gripResolvable = (state2) => {
+    if (gripFits(state2)) return true;
+    const k = fallbackLockset(state2);
+    return !!k && k !== state2.lockset && gripFits({ ...state2, lockset: k });
+  };
   function conflicts(state2) {
     const glazed = isGlazed(state2);
     const onLeaf = leafGlazed(state2);
@@ -8204,46 +8243,49 @@ ${body}
     }
     const CHANNEL = HANDLES.find((h) => h.style === "channel");
     if (CHANNEL) {
-      if (onLeaf || faceWorked(byId(DETAILS, state2.detail))) {
+      if (onLeaf || faceWorked(state2)) {
         out.handle[CHANNEL.id] = T("why.channelPlain");
       }
       if (grip.style === "channel") {
         for (const w of WINDOWS) if (w.rects.length) {
           out.window[w.id] = out.window[w.id] || T("why.notWithChannel");
         }
-        for (const d of DETAILS) if (faceWorked(d)) {
+        for (const d of DETAILS) if (detailWorked(d)) {
           out.detail[d.id] = out.detail[d.id] || T("why.notWithChannel");
         }
       }
     }
+    const GRIP_WHY = {
+      window: "why.noRoomHandleWindow",
+      face: "why.noRoomHandleFace",
+      door: "why.noRoomHandle"
+    };
     for (const h of HANDLES) {
       if (h.style === "none" || out.handle[h.id]) continue;
-      if (!gripFitsAnywhere({ ...state2, handle: h.id, grip: null })) {
-        out.handle[h.id] = T("why.noRoomHandle");
-      }
+      const what = gripObstacle(state2, h.id);
+      if (what && what !== "lock") out.handle[h.id] = T(GRIP_WHY[what]);
     }
     if (grip.style !== "none") {
       for (const w of WINDOWS) {
         if (out.window[w.id]) continue;
-        if (!gripFitsAnywhere({ ...state2, window: w.id, grip: null })) {
+        if (!gripResolvable({ ...state2, window: w.id })) {
           out.window[w.id] = T("why.noRoomWithWindow");
         }
       }
     }
-    for (const k of LOCKSETS) {
-      if (gripClashesLockset({ ...state2, lockset: k.id })) {
-        out.lockset[k.id] = out.lockset[k.id] || T("why.noRoomGripLock");
-      }
-    }
-    for (const h of HANDLES) {
-      if (gripClashesLockset({ ...state2, handle: h.id })) {
-        out.handle[h.id] = out.handle[h.id] || T("why.noRoomGripLock");
+    if (grip.style !== "none") {
+      for (const k of LOCKSETS) {
+        if (out.lockset[k.id]) continue;
+        if (!gripFits({ ...state2, lockset: k.id })) out.lockset[k.id] = T("why.leverBar");
       }
     }
     return out;
   }
   var SAID = {
     windowAdded: "fix.windowAdded",
+    /* `windowGone` is said by the fittings, the stripes and the face repairs —
+       never by a HANDLE repair since 20.9.2026 (Peretz: the window and the
+       panels stay; the lever goes, then the bar). */
     windowGone: "fix.windowGone",
     lineWorkGone: "fix.lineWorkGone",
     lineWorkFace: "fix.lineWorkFace",
@@ -8355,48 +8397,19 @@ ${body}
         change("detail", byId(WINDOWS, s.window).panel ? SAID.rectPanel : SAID.facePlain);
       }
     }
-    if (byId(HANDLES, s.handle).style === "channel" && (leafGlazed(s) || faceWorked(byId(DETAILS, s.detail)))) {
-      if (intent === "handle") {
-        if (leafGlazed(s)) {
-          s.window = "none";
-          change("window", SAID.windowGone);
-        }
-        if (faceWorked(byId(DETAILS, s.detail))) {
-          s.detail = "plain";
-          change("detail", SAID.faceCleared);
-        }
-      } else {
-        s.handle = "none";
-        change("handle", SAID.gripGone);
-      }
+    if (byId(HANDLES, s.handle).style === "channel" && (leafGlazed(s) || faceWorked(s))) {
+      s.handle = "none";
+      change("handle", SAID.gripGone);
     }
-    if (conflicts(s).handle[s.handle] && byId(HANDLES, s.handle).style === "grab") {
-      if (intent === "handle") {
-        s.window = "none";
-        change("window", SAID.windowGone);
-      } else {
-        s.handle = "none";
-        change("handle", SAID.gripGone);
-      }
-    }
-    if (gripClashesLockset(s)) {
+    if (!gripFits(s)) {
       if (intent !== "lockset") {
         const k = fallbackLockset(s);
-        if (k) {
+        if (k && k !== s.lockset && gripFits({ ...s, lockset: k })) {
           s.lockset = k;
           change("lockset", SAID.locksetSwapped);
         }
       }
-      if (gripClashesLockset(s)) {
-        s.handle = "none";
-        change("handle", SAID.gripGone);
-      }
-    }
-    if (!gripFitsAnywhere({ ...s, grip: null })) {
-      if (intent === "handle") {
-        s.window = "none";
-        change("window", SAID.windowGone);
-      } else {
+      if (!gripFits(s)) {
         s.handle = "none";
         change("handle", SAID.gripGone);
       }
@@ -9324,6 +9337,7 @@ ${body}
       box.hidden = open;
     });
     $("#works-close").addEventListener("click", closeWorks);
+    $("#clash-ok").addEventListener("click", closeClash);
     const barNext = document.querySelector(".quote__next");
     if (barNext) barNext.addEventListener("click", () => stepBy(1));
     document.querySelectorAll("[data-wa]").forEach((el) => {
@@ -9443,6 +9457,18 @@ ${body}
   }
   function closeWorks() {
     const d = $("#works");
+    if (typeof d.close === "function") d.close();
+    else d.removeAttribute("open");
+  }
+  function openClash() {
+    const d = $("#clash");
+    if (!d) return;
+    if (typeof d.showModal === "function") d.showModal();
+    else d.setAttribute("open", "");
+  }
+  function closeClash() {
+    const d = $("#clash");
+    if (!d) return;
     if (typeof d.close === "function") d.close();
     else d.removeAttribute("open");
   }
@@ -10093,6 +10119,14 @@ ${body}
   }
   function choose(g, id) {
     noteEngaged();
+    if ((g.key === "handle" || g.key === "lockset") && id !== state[g.key]) {
+      const why = conflicts(state)[g.key][id];
+      if (why) {
+        if (g.key === "lockset") openClash();
+        else toast(why);
+        return;
+      }
+    }
     const want = { ...state, [g.key]: id };
     const memo2 = displaced.get(g.key);
     const back = [];

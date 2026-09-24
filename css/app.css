@@ -2745,7 +2745,28 @@ button.spec__row:focus-visible {
    nothing until it is opened and the opener is inside the panel, which is
    hidden already — but anything added to the page joins this list the same
    day, which is the rule that stopped a headline faking a 5.2% regression. */
-.is-bare .works, .is-bare .works-open { display: none; }
+/* ── the lever-against-bar dialog ─────────────────────────────
+   `choose` opens it instead of repairing (js/app.js, 20.9.2026). A card the
+   width of a sentence, the gallery's own surface and backdrop, one pill
+   button at the tap floor. No animation on purpose: nothing for `.is-bare`
+   or `prefers-reduced-motion` to kill (T9, T13), and a modal that appears
+   at once is the honest shape for "no". Centred by the UA's own dialog
+   rules, like `.works`. */
+.clash {
+  inline-size: min(420px, 92vw);
+  padding: 22px 22px 18px;
+  border: 1px solid transparent; border-radius: var(--r-card);
+  --surface: #fff;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+}
+.clash::backdrop { background: rgb(23 23 21 / .55); }
+.clash__p { margin: 0 0 16px; font-size: 1rem; line-height: 1.5; }
+/* A `.btn` with nothing to fill it is the solid ink pill (28.8); 44 px on
+   both axes because it is the only control in the dialog. */
+.clash__ok { min-block-size: 44px; min-inline-size: 44px; margin-inline-start: auto; }
+.is-bare .works, .is-bare .works-open, .is-bare .clash { display: none; }
 
 /* ── swatches ─────────────────────────────────────────────── */
 

@@ -645,6 +645,14 @@ export const UI = {
                        'Начните с двери, похожей на задуманную, — а дальше меняйте любую деталь.'],
   'works.open':       ['התחילו מדלת שכבר התקנו', 'Start from a door we have fitted', 'Начните с уже установленной двери'],
   'works.count':      ['{0} דלתות אמיתיות', '{0} real doors', '{0} реальных дверей'],
+  /* The one dialog in the flow besides the gallery: a lever tapped against
+     the pull handle already on the door. One sentence, one button, and the
+     door unchanged when it closes — see `openClash` in `js/app.js`. */
+  'dlg.leverBar':     ['ידית זו וידית המשיכה שבחרתם לא יכולות להיות יחד באותה דלת',
+                       'This lever and the pull handle you chose cannot be on the same door',
+                       'Эта ручка и выбранная вами ручка-скоба не могут быть на одной двери'],
+  'dlg.ok':           ['הבנתי', 'OK', 'Понятно'],
+  'dlg.close':        ['סגירת ההודעה', 'Close this message', 'Закрыть сообщение'],
 
   /* ── the print sheet ──────────────────────────────────────────── */
   'sheet.label':      ['דף הזמנה', 'Order sheet', 'Бланк заказа'],
@@ -717,7 +725,20 @@ export const UI = {
   'why.notWithChannel':  ['לא משתלב עם ידית שקועה', 'Does not go with a recessed channel', 'Не сочетается с врезной ручкой'],
   'why.noRoomHandle':    ['אין מקום לידית הזו על הדלת', 'No room for this handle on the door', 'На двери нет места для этой ручки'],
   'why.noRoomWithWindow': ['אין מקום לידית שבחרתם עם החלון הזה', 'No room for the handle you chose with this window', 'С этим окном нет места для выбранной ручки'],
-  'why.noRoomGripLock':  ['אין מקום בין המאחז למנעול', 'No room between the grip and the lock', 'Между скобой и замком нет места'],
+  /* Three reasons for one rule, 20.9.2026 — Peretz: the window and the panels
+     stay, the lever goes. A greyed HANDLE names what stands in its way and that
+     it stays; a greyed LOCKSET names the bar, and `choose` opens `dlg.leverBar`
+     over it instead of repairing. `why.noRoomGripLock` ("no room between the
+     grip and the lock") left with the rule that said it from both sides. */
+  /* ⚠ THE SUBJECT FIRST. `.tile__why` is one clipped line under a tile
+     (§9: "the clipped word is the one carrying the meaning"), and the first
+     wording — "אין מקום למנעול הזה לצד ידית המשיכה" — clipped to "אין מקום
+     למנעול הז…" at 1280 px, which is the same sentence as `why.noRoomHandle`
+     with the reason cut off. What is in the way goes first, so a clip keeps
+     it; the full sentence is in the toast and the dialog. */
+  'why.noRoomHandleWindow': ['החלון בדרך — והוא נשאר', 'The window is in the way — it stays', 'Мешает окно — оно остаётся'],
+  'why.noRoomHandleFace': ['העיצוב בדרך — והוא נשאר', 'The design is in the way — it stays', 'Мешает узор — он остаётся'],
+  'why.leverBar':        ['ידית המשיכה בדרך', 'The pull handle is in the way', 'Мешает ручка-скоба'],
   'fix.windowAdded':     ['הוספנו חלון — הסורג והזכוכית צריכים אותו', 'We added a window — the grille and the glass need one', 'Мы добавили окно — решётке и стеклу оно необходимо'],
   'fix.windowGone':      ['הסרנו את החלון', 'We removed the window', 'Мы убрали окно'],
   'fix.lineWorkGone':    ['הסרנו את קווי המתכת — לא משלבים אותם עם חלון', 'We removed the metal strips — they do not go with a window', 'Мы убрали металлические полосы — с окном они не сочетаются'],
