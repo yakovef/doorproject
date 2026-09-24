@@ -11,7 +11,7 @@ import {
   bellGlyph, detailGlyph, faceObstacles, gripAt, gripCanRotate, gripFeet,
   gripHome, gripPlacement, gripFitsAnywhere, grilleGlyph, handleFinishGlyph, handleGlyph, HOME_REACH, LIGHT,
   bellFits, locksetGlyph, mashkofGlyph, spawnIndexOf, spawnSpots, peepholeFits,
-  peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph,
+  peepholeGlyph, pirzulGlyph, render, sizeGlyph, specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
@@ -1937,6 +1937,60 @@ group('every option tile draws its own picture');
   for (const x of BELLS) check('bell', x.id, bellGlyph(x));
   for (const x of PEEPHOLES) check('peephole', x.id, peepholeGlyph(x));
   for (const x of SPECIAL_LOCKS) check('special', x.id, specialLockGlyph(x));
+  /* The stripe control's three pills, 23.9.2026 — not an option list, but
+     three pictures a customer chooses between, which is this loop's subject. */
+  for (const d of ['none', 'h', 'v']) check('stripes', d, stripesGlyph(d));
+}
+
+/* ── 6b1b. THE STRIPE PICTURES ARE THE DOOR'S OWN LINES ──
+   Peretz, 20.9.2026: *"add icons for the stripes to make them more visible."*
+   `stripesGlyph` draws a window on the standard leaf in the leaf's own
+   millimetres, so a line's coordinate in the icon IS where the door draws that
+   band. This reads both out of the markup — the icon's lines, and the band
+   bodies the door emits for the same count — and requires them to be the same
+   set inside the window, in both directions: an icon line with no band under
+   it is a picture of a door we do not build, and a band inside the window with
+   no line is a picture that has drifted off its door. §5.15: both sides must
+   have found lines, or this is comparing two empty sets. Falsified by giving
+   the icon a pitch and a column offset of its own: 15 of 22 fail. ⚠ Moving the
+   WINDOW falsifies nothing, and correctly — the window only crops, so every
+   line it keeps is still on a band. */
+group('the stripe pictures are the door\'s own lines');
+{
+  const leafAt = svg => {
+    const m = svg.match(/<g id="leaf"[\s\S]*?<rect[^>]*?x="([-\d.]+)"[^>]*?y="([-\d.]+)"/);
+    return m && { x: +m[1], y: +m[2] };
+  };
+  const bodies = svg => {
+    const g = (svg.match(/<g data-detail="strips"[\s\S]*?<\/g>/) || [''])[0];
+    const r = [...g.matchAll(/<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)"\s+height="([\d.]+)"/g)]
+      .map(m => ({ x: +m[1], y: +m[2], w: +m[3], h: +m[4] }));
+    return r.filter((_, i) => i % 3 === 1);          // shadow, BODY, highlight
+  };
+  const hingeLeft = HANDINGS.find(h => h.hinge === 'left').id;
+  for (const [dir, n] of [['h', STRIPE_MAX.h], ['v', STRIPE_MAX.v]]) {
+    const icon = stripesGlyph(dir);
+    const [x0, y0, C] = icon.match(/viewBox="([-\d.]+) ([-\d.]+) ([\d.]+)/).slice(1).map(Number);
+    const lines = [...icon.matchAll(/<line x1="([-\d.]+)" y1="([-\d.]+)" x2="([-\d.]+)" y2="([-\d.]+)"/g)]
+      .map(m => dir === 'h' ? +m[2] : +m[1]);
+    const svg = render({ ...DEFAULTS, size: 'standard', handing: hingeLeft, detail: 'plain', window: 'none',
+                         stripeDir: dir, stripeCount: n, stripeTight: false });
+    const leaf = leafAt(svg), bs = bodies(svg);
+    ok(leaf && bs.length === n, `${dir}: found the leaf ${!!leaf} and ${bs.length} band bodies for ${n} stripes — this check is reading nothing`);
+    if (!leaf || !bs.length) continue;
+    const door = bs.map(b => dir === 'h' ? b.y + b.h / 2 - leaf.y : b.x + b.w / 2 - leaf.x)
+      .filter(v => dir === 'h' ? v > y0 && v < y0 + C : v > x0 && v < x0 + C);
+    ok(lines.length >= 2 && door.length >= 2,
+       `${dir}: the icon draws ${lines.length} lines and the door has ${door.length} bands in its window — too few to be a picture of stripes`);
+    for (const v of lines) {
+      ok(door.some(d => Math.abs(d - v) < 0.6),
+         `${dir}: the icon draws a line at ${v} mm and the door has no band there (${door.map(d => d.toFixed(1))})`);
+    }
+    for (const d of door) {
+      ok(lines.some(v => Math.abs(d - v) < 0.6),
+         `${dir}: the door draws a band at ${d.toFixed(1)} mm inside the icon's window and the icon has no line there`);
+    }
+  }
 }
 
 /* ── 6b2. THE משקוף TILES SAY THE NUMBER, AND THE MARK IS THAT LONG ──

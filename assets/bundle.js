@@ -374,11 +374,28 @@
       "The frame is what is fitted into the wall and what the door closes against. It has three parts: the outer kant (the wing seen from outside on the wall), the falc (the step the door closes into) and the inner kant (the wing on the room side of the wall). The standard frame is inside the door’s price — the breakdown lists it at {1} as one of the six parts of a fitted door, not as a surcharge; each part you widen adds {0}, in any combination. The drawing of the door shows only the two outer parts — the inner kant is behind the wall. We measure the wall on site.",
       "Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. У неё три части: наружный кант (борт, видимый снаружи на стене), фальц (ступень, в которую закрывается дверь) и внутренний кант (борт со стороны комнаты). Стандартная коробка входит в цену двери — в раскладке цены она указана как {1}, одна из шести частей установленной двери, а не доплата; каждая расширенная часть добавляет {0}, в любом сочетании. На рисунке двери видны только две наружные части — внутренний кант за стеной. Стену замерим на месте."
     ],
+    /* ⚠ THE COLOUR IS SETTLED AT THE MEASURE — Peretz, 20.9.2026: *"write that
+       the color is decided at the measurements with the guy, he brings the real
+       color irl."* One sentence under one key, shown twice — at the foot of the
+       colour step's explainer (through `{0}`) and in the summary's caveat — so
+       the page cannot promise it two ways. Not in the WhatsApp order: Peretz is
+       the one who brings the samples.
+       ⚠ AND THE EXPLAINER'S OLD SECOND SENTENCE IS GONE WITH IT. It said every
+       shade costs the same — כל הגוונים עולים אותו דבר — directly under a chart
+       headed תוספת ₪200. The 7.9 walk found it, the 30.8 entry says it is gone,
+       and it was still here on 20.9, in all three languages. The explainer now
+       makes no claim about price at all: the chart's two headings state it, off
+       `o.delta`, and cannot go stale. */
+    "colour.measured": [
+      "את הגוון הסופי קובעים במדידה — המודד מביא איתו דוגמאות צבע אמיתיות.",
+      "The final shade is settled at the measuring visit — the measurer brings real colour samples.",
+      "Окончательный оттенок утверждается на замере — замерщик привозит настоящие образцы цвета."
+    ],
     "exp.colour.q": ["איך נראה הצבע במציאות?", "How does the colour look in reality?", "Как цвет выглядит вживую?"],
     "exp.colour.a": [
-      "הצבע נצרב בתנור, מלוח הגוונים של היצרן, והקוד שליד כל שם הוא הקוד שלו. כל הגוונים עולים אותו דבר, כך שהבחירה היא בטעם בלבד. הציור באתר הוא הדמיה — הגוון שיֵצא מהתנור עשוי להיראות מעט שונה, ובעיקר בברק.",
-      "The colour is oven-baked from the manufacturer’s chart, and the code beside each name is theirs. Every shade costs the same, so the choice is purely taste. The drawing here is an illustration — the shade that comes out of the oven may look slightly different, in sheen most of all.",
-      "Цвет наносится порошком и запекается, по палитре производителя; код рядом с названием — его. Все оттенки стоят одинаково, так что выбор — дело вкуса. Изображение здесь — визуализация: готовый оттенок может немного отличаться, прежде всего по блеску."
+      "הצבע נצרב בתנור, מלוח הגוונים של היצרן, והקוד שליד כל שם הוא הקוד שלו. הציור באתר הוא הדמיה — הגוון שיֵצא מהתנור עשוי להיראות מעט שונה, ובעיקר בברק. {0}",
+      "The colour is oven-baked from the manufacturer’s chart, and the code beside each name is theirs. The drawing here is an illustration — the shade that comes out of the oven may look slightly different, in sheen most of all. {0}",
+      "Цвет наносится порошком и запекается, по палитре производителя; код рядом с названием — его. Изображение здесь — визуализация: готовый оттенок может немного отличаться, прежде всего по блеску. {0}"
     ],
     "exp.face.q": ["פאנלים או פסים — מה ההבדל?", "Panels or strips — what is the difference?", "Панели или полосы — в чём разница?"],
     "exp.face.a": [
@@ -8102,41 +8119,52 @@ ${body}
                        stroke-width="36"/>`;
       })
     ].join("") : !detail.panel ? "" : panelRows(detail).map(([t, b]) => panelAt(t, b)).join("");
-    const n = detail.strips || 0;
-    const RHYTHM = [0.94, 0.7, 0.61, 0.91, 0.59, 0.68, 0.91];
-    const strips = detail.even ? (STRIP_ROWS[detail.rows] || STRIP_ROWS.quad).map((f) => `<rect x="${W * (1 - STRIP_EVEN_W) / 2}" y="${H * f - 14}"
-               width="${W * STRIP_EVEN_W}" height="28" fill="currentColor"/>`).join("") : detail.cross ? [
-      `<rect x="${W * 0.309 - 11}" y="${H * 0.155}" width="22"
-              height="${H * (0.864 - 0.155)}" fill="currentColor"/>`,
-      ...[0.42, 0.448, 0.578, 0.606].map((y) => `<rect x="${W * 0.167}" y="${H * y - 9}" width="${W * (0.556 - 0.167)}"
-                height="18" fill="currentColor"/>`)
-    ].join("") : detail.vertical && detail.long ? Array.from({ length: n }, (_, i) => {
-      const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
-      const top = H * 0.098;
-      const bot = H * (0.945 + (0.915 - 0.945) * (n > 1 ? i / (n - 1) : 0.5));
-      return `<rect x="${x - 8}" y="${top}" width="16" height="${bot - top}"
-                      fill="currentColor"/>`;
-    }).join("") : detail.vertical ? Array.from({ length: n }, (_, i) => {
-      const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
-      const top = H * (0.05 + 0.34 * (n > 1 ? i / (n - 1) : 0.5));
-      return `<rect x="${x - 9}" y="${top}" width="18" height="${H * 0.778 - top}"
-                      fill="currentColor"/>`;
-    }).join("") : Array.from({ length: n }, (_, i) => {
-      const span = Math.min(0.95, 0.458 + 0.044 * n);
-      const y = H * (0.5 - span / 2 + (n > 1 ? i * span / (n - 1) : span / 2));
-      return `<rect x="${W * 0.03}" y="${y - 14}"
-                      width="${W * RHYTHM[i % RHYTHM.length]}" height="28"
-                      fill="currentColor"/>`;
-    }).join("");
     return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
-    ${panels}${strips}
+    ${panels}
     ${detail.groove ? `<rect x="${W * 0.7 - 18}" y="190" width="18" height="${H - 380}"
           fill="currentColor"/>` : ""}
     ${detail.perimeter ? `<rect x="${W * detail.perimeter}" y="${W * detail.perimeter}"
           width="${W * (1 - detail.perimeter * 2)}"
           height="${H - W * detail.perimeter * 2}"
           fill="none" stroke="currentColor" stroke-width="18"/>` : ""}
+  </svg>`;
+  }
+  var STRIPE_ICON_WINDOW = 420;
+  function stripesGlyph(dir) {
+    const lw = SIZES.standard.w - REBATE * 2, lh = SIZES.standard.h - REBATE;
+    const C = STRIPE_ICON_WINDOW;
+    const x0 = lw * STRIP_V.mid - C / 2, y0 = lh * STRIP_H.mid - C / 2;
+    const m = C * 0.1;
+    const f1 = (v) => v.toFixed(1);
+    const lines = [];
+    if (dir === "h") {
+      const n = STRIPE_MAX.h;
+      const pitch = Math.min(STRIP_H.pitch, STRIP_H.span / Math.max(1, n - 1));
+      const top = STRIP_H.mid - (n - 1) * pitch / 2;
+      const xa = Math.max(x0 + m, lw * (1 - STRIP_EVEN_W) / 2);
+      const xb = Math.min(x0 + C - m, lw * (1 + STRIP_EVEN_W) / 2);
+      for (let i = 0; i < n; i++) {
+        const y = lh * (top + i * pitch);
+        if (y > y0 && y < y0 + C) {
+          lines.push(`<line x1="${f1(xa)}" y1="${f1(y)}" x2="${f1(xb)}" y2="${f1(y)}" vector-effect="non-scaling-stroke"/>`);
+        }
+      }
+    } else if (dir === "v") {
+      const n = STRIPE_MAX.v;
+      const ya = Math.max(y0 + m, lh * STRIP_V_RUN.top), yb = Math.min(y0 + C - m, lh * STRIP_V_RUN.foot);
+      for (let i = 0; i < n; i++) {
+        const x = lw * stripVAt(i, n);
+        if (x > x0 && x < x0 + C) {
+          lines.push(`<line x1="${f1(x)}" y1="${f1(ya)}" x2="${f1(x)}" y2="${f1(yb)}" vector-effect="non-scaling-stroke"/>`);
+        }
+      }
+    }
+    return `<svg viewBox="${f1(x0)} ${f1(y0)} ${C} ${C}" class="stripes__ico" aria-hidden="true"
+    data-dir="${dir}" fill="none" stroke="currentColor" stroke-linecap="butt">
+    <rect x="${f1(x0)}" y="${f1(y0)}" width="${C}" height="${C}" rx="${C * 0.12}"
+          stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <g stroke-width="1.6">${lines.join("")}</g>
   </svg>`;
   }
 
@@ -9242,7 +9270,14 @@ ${body}
   ];
   var SECTIONS = [
     { key: "fit", title: "step.fit.t", sub: "step.fit.s", lede: "step.fit.l", exp: "exp.fit" },
-    { key: "colour", title: "step.colour.t", sub: "step.colour.s", lede: "step.colour.l", exp: "exp.colour" },
+    {
+      key: "colour",
+      title: "step.colour.t",
+      sub: "step.colour.s",
+      lede: "step.colour.l",
+      exp: "exp.colour",
+      expArgs: () => [T("colour.measured")]
+    },
     /* ⚠ THE LOCK COMES BEFORE THE GRIP, 14.9.2026 — Peretz: *"the lockset
        section should come before the pull handle section."* They were the other
        way round and had been since the two were split.
@@ -9847,9 +9882,9 @@ ${body}
     <span class="stripes__label" id="stripes-l">${T("stripes.label")}</span>
     <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
       ${[["none", "stripes.none"], ["h", "stripes.h"], ["v", "stripes.v"]].map(([id, k]) => `
-        <button type="button" class="pill${dir === id ? " is-on" : ""}${why && id !== "none" ? " is-blocked" : ""}"
+        <button type="button" class="pill stripes__dir${dir === id ? " is-on" : ""}${why && id !== "none" ? " is-blocked" : ""}"
                 data-dir="${id}" aria-pressed="${dir === id}"
-                aria-disabled="${!!why && id !== "none"}">${T(k)}</button>`).join("")}
+                aria-disabled="${!!why && id !== "none"}">${stripesGlyph(id)}<span>${T(k)}</span></button>`).join("")}
     </div>
     ${why ? `<p class="stripes__why">${why}</p>` : ""}
 
@@ -10106,8 +10141,12 @@ ${body}
     const panel = document.querySelector(".panel--choose");
     if (panel) panel.dataset.live = liveStep;
     const live = document.querySelector(".steps__step.is-on");
-    if (live && typeof live.scrollIntoView === "function") {
-      live.scrollIntoView({ inline: "nearest", block: "nearest" });
+    const row = live && live.closest(".steps");
+    if (row && typeof row.scrollBy === "function") {
+      const pad = parseFloat(getComputedStyle(row).scrollPaddingInlineStart) || 0;
+      const r = row.getBoundingClientRect(), c = live.getBoundingClientRect();
+      const dx = c.left < r.left + pad ? c.left - (r.left + pad) : c.right > r.right - pad ? c.right - (r.right - pad) : 0;
+      if (Math.abs(dx) > 0.5) row.scrollBy({ left: dx, behavior: "instant" });
     }
     const i = keys.indexOf(liveStep);
     for (const b of document.querySelectorAll(".sect__back")) b.disabled = i <= 0;

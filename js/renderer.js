@@ -18,7 +18,7 @@
 
 import { byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
          handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
-         REBATE, SIZES, SPECIAL_LOCKS, WINDOWS } from './catalog.js';
+         REBATE, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS } from './catalog.js';
 import { L, T } from './copy.js';
 import { describeSentence } from './spec.js';
 import { darken, isLight, lighten, luminance, mix, scaleTone, silhouette, toHex, toRgb } from './colour.js';
@@ -10311,71 +10311,90 @@ export function detailGlyph(detail) {
     : !detail.panel ? ''
     : panelRows(detail).map(([t, b]) => panelAt(t, b)).join('');
 
-  /* metalStrips, both axes. Horizontal: inset a tenth each side, evenly spaced
-     0.09–0.91. Vertical: fewer, longer, grouped in one third of the leaf —
-     and the tile has to show that difference, because "metal strips" names
-     two options that look nothing alike on the door. */
-  /* ⚠ AND THE TILE HAS TO SHOW THE STAGGER, because the door does.
-     These were four identical bars and eleven identical bands, matching a
-     drawing that was itself wrong; now that the drawing fans them, a tile
-     showing a fence would be advertising a different door. Same fractions the
-     renderer uses, so the two cannot drift: the vertical run climbs from 0.39
-     to 0.05 off a common foot at 0.778, and the horizontal run is anchored at
-     one edge with free ends following the measured rhythm. */
-  const n = detail.strips || 0;
-  const RHYTHM = [0.94, 0.70, 0.61, 0.91, 0.59, 0.68, 0.91];
-  /* ⚠ THE CROSS NEEDS ITS OWN TILE. Sent through the horizontal branch it
-     draws five bands and is then indistinguishable from חמישה פסים — two
-     names, two prices, one picture, which is the defect `every option tile
-     draws its own picture` exists to catch. Same fractions the door uses. */
-  /* ⚠ AND THE EVEN COMPOSITIONS NEED THEIR OWN PICTURE TOO. Sent through the
-     ragged branch, `strips4` would draw four bands of four different lengths —
-     a picture of the option beside it rather than of itself. Off STRIP_ROWS,
-     which is what the door draws. */
-  const strips = detail.even
-    ? (STRIP_ROWS[detail.rows] || STRIP_ROWS.quad).map(f =>
-        `<rect x="${W * (1 - STRIP_EVEN_W) / 2}" y="${H * f - 14}"
-               width="${W * STRIP_EVEN_W}" height="28" fill="currentColor"/>`).join('')
-    : detail.cross
-    ? [`<rect x="${W * 0.309 - 11}" y="${H * 0.155}" width="22"
-              height="${H * (0.864 - 0.155)}" fill="currentColor"/>`,
-       ...[0.420, 0.448, 0.578, 0.606].map(y =>
-         `<rect x="${W * 0.167}" y="${H * y - 9}" width="${W * (0.556 - 0.167)}"
-                height="18" fill="currentColor"/>`)].join('')
-    : detail.vertical && detail.long
-    ? Array.from({ length: n }, (_, i) => {
-        /* ⚠ ITS OWN PICTURE. Sent through the fanned branch a long vertical
-           set draws a fan, which is a picture of the option two tiles down. */
-        const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
-        const top = H * 0.098;   // STRIP_V, spelled out: a glyph is 44 px
-        const bot = H * (0.945 + (0.915 - 0.945) * (n > 1 ? i / (n - 1) : 0.5));
-        return `<rect x="${x - 8}" y="${top}" width="16" height="${bot - top}"
-                      fill="currentColor"/>`;
-      }).join('')
-    : detail.vertical
-    ? Array.from({ length: n }, (_, i) => {
-        const x = W * (0.33 - (n - 1) * 0.073 / 2 + i * 0.073);
-        const top = H * (0.05 + 0.34 * (n > 1 ? i / (n - 1) : 0.5));
-        return `<rect x="${x - 9}" y="${top}" width="18" height="${H * 0.778 - top}"
-                      fill="currentColor"/>`;
-      }).join('')
-    : Array.from({ length: n }, (_, i) => {
-        const span = Math.min(0.95, 0.458 + 0.044 * n);
-        const y = H * (0.5 - span / 2 + (n > 1 ? (i * span) / (n - 1) : span / 2));
-        return `<rect x="${W * 0.03}" y="${y - 14}"
-                      width="${W * RHYTHM[i % RHYTHM.length]}" height="28"
-                      fill="currentColor"/>`;
-      }).join('');
-
+  /* GONE, 23.9.2026: the stripe branches that stood here — a count off
+     detail.strips, the ragged RHYTHM table, the even rows off STRIP_ROWS, the
+     cross and the two vertical families. The stripes stopped being faces on
+     27.8 and became a count with its own control, so no DETAILS entry has set
+     any of those flags since, and every branch drew nothing. One of them was
+     worse than dead: STRIP_ROWS is defined nowhere in this file, so the even
+     branch was a ReferenceError waiting for the first entry to carry the flag
+     (the same landmine GLAZINGS was in describe). The stripe control's own
+     pictures are stripesGlyph, below, built from the tables the door uses. */
   return `<svg viewBox="${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}" class="glyph" aria-hidden="true">
     <rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="currentColor" stroke-width="44"/>
-    ${panels}${strips}
+    ${panels}
     ${detail.groove ? `<rect x="${W * 0.70 - 18}" y="190" width="18" height="${H - 380}"
           fill="currentColor"/>` : ''}
     ${detail.perimeter ? `<rect x="${W * detail.perimeter}" y="${W * detail.perimeter}"
           width="${W * (1 - detail.perimeter * 2)}"
           height="${H - W * detail.perimeter * 2}"
           fill="none" stroke="currentColor" stroke-width="18"/>` : ''}
+  </svg>`;
+}
+
+/**
+ * THE STRIPE CONTROL'S THREE PICTURES — none, horizontal, vertical. Peretz,
+ * 20.9.2026: *"add icons for the stripes to make them more visible."* The
+ * three direction pills were words alone.
+ *
+ * A WINDOW ON THE LEAF, IN THE LEAF'S OWN MILLIMETRES. The viewBox is a
+ * square of the standard leaf, centred where the stripes stand — across, at
+ * STRIP_V.mid from the hinge edge; down, at STRIP_H.mid — so every line below
+ * is placed by the same tables metalStrips draws the door from, and a
+ * coordinate in this picture IS a coordinate on the leaf. Nothing is typed.
+ *
+ * ⚠ A WINDOW, NOT THE WHOLE LEAF, AND THE 2 px RULE IS WHY (15.9). The
+ * vertical pitch is 0.073 of the leaf's width — 62 mm — and on a whole-leaf
+ * icon 26 px tall that is under a pixel, so the columns would be a grey smear:
+ * the speciallock mark's fault, which closed eight dots into a haze. At
+ * STRIPE_ICON_WINDOW the columns come out about 4 px apart at the shipped
+ * size and the rows about 11.
+ *
+ * The COUNTS are the most each axis takes (STRIPE_MAX), because the most is
+ * what shows the pitch; the pill picks a direction, not a count. The frame is
+ * the edge of the window — a piece of the leaf's face — so "none" is that
+ * piece with nothing on it, which is exactly what the plain leaf is. Strokes
+ * do not scale, like the rail's marks: a 16 mm band is under a pixel here.
+ */
+const STRIPE_ICON_WINDOW = 420;   // mm, square
+export function stripesGlyph(dir) {
+  const lw = SIZES.standard.w - REBATE * 2, lh = SIZES.standard.h - REBATE;
+  const C = STRIPE_ICON_WINDOW;
+  const x0 = lw * STRIP_V.mid - C / 2, y0 = lh * STRIP_H.mid - C / 2;
+  /* Where a line's ENDS stop: inside the window's rounded frame. The door's
+     bands run on past the window, so the window is what cuts them; stopping
+     them a tenth in keeps a band from poking through a rounded corner, and it
+     moves no line — only how far each one is drawn. */
+  const m = C * 0.1;
+  const f1 = v => v.toFixed(1);
+  const lines = [];
+  if (dir === 'h') {
+    const n = STRIPE_MAX.h;
+    const pitch = Math.min(STRIP_H.pitch, STRIP_H.span / Math.max(1, n - 1));
+    const top = STRIP_H.mid - (n - 1) * pitch / 2;
+    const xa = Math.max(x0 + m, lw * (1 - STRIP_EVEN_W) / 2);
+    const xb = Math.min(x0 + C - m, lw * (1 + STRIP_EVEN_W) / 2);
+    for (let i = 0; i < n; i++) {
+      const y = lh * (top + i * pitch);
+      if (y > y0 && y < y0 + C) {
+        lines.push(`<line x1="${f1(xa)}" y1="${f1(y)}" x2="${f1(xb)}" y2="${f1(y)}" vector-effect="non-scaling-stroke"/>`);
+      }
+    }
+  } else if (dir === 'v') {
+    const n = STRIPE_MAX.v;
+    const ya = Math.max(y0 + m, lh * STRIP_V_RUN.top), yb = Math.min(y0 + C - m, lh * STRIP_V_RUN.foot);
+    for (let i = 0; i < n; i++) {
+      const x = lw * stripVAt(i, n);
+      if (x > x0 && x < x0 + C) {
+        lines.push(`<line x1="${f1(x)}" y1="${f1(ya)}" x2="${f1(x)}" y2="${f1(yb)}" vector-effect="non-scaling-stroke"/>`);
+      }
+    }
+  }
+  return `<svg viewBox="${f1(x0)} ${f1(y0)} ${C} ${C}" class="stripes__ico" aria-hidden="true"
+    data-dir="${dir}" fill="none" stroke="currentColor" stroke-linecap="butt">
+    <rect x="${f1(x0)}" y="${f1(y0)}" width="${C}" height="${C}" rx="${C * 0.12}"
+          stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <g stroke-width="1.6">${lines.join('')}</g>
   </svg>`;
 }
 

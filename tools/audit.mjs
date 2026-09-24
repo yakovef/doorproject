@@ -21,7 +21,8 @@ import { crashed } from './browser.mjs';
 import { load, lum } from './imglib.mjs';
 import { DEFAULTS, decodeCode, encodeCode, fromQuery, toQuery } from '../js/url-state.js';
 import { deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts } from '../js/price.js';
-import { SIZES } from '../js/catalog.js';
+import { DETAILS, SIZES } from '../js/catalog.js';
+import { detailGlyph, stripesGlyph } from '../js/renderer.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { setLang, T, withLang } from '../js/copy.js';
 import { handingWords, specRows, summaryLine } from '../js/spec.js';
@@ -4822,6 +4823,324 @@ for (const v of VIEWS) {
     fault('marks', 'chromium died before the marks were compared, so they are unchecked');
   }
   await p.close().catch(() => {});
+}
+
+/* ── A TAP DOES NOT SCROLL THE PANEL IT IS IN ────────────────────────────
+   Peretz on a laptop, 20.9.2026: *"every time i press a button the page goes
+   up a bit."* Reproduced 23.9 and ONLY with the choices panel scrolled down —
+   every harness that tapped from the panel's top saw nothing, 283 real clicks
+   at nine desktop shapes. Scrolled, nearly every tap scrolled the panel back
+   UP by up to 65 px (41 of 81 at 1100x800 ru, 37 of 77 at 1536x730 en), on
+   every step, adding up press by press. The cause was the navigator bringing
+   its live circle into view with `block: 'nearest'`: the circle is in a
+   STICKY rail inside that panel, the panel's `scroll-padding-block` reserves
+   the rail's band, and a stuck circle is always inside the band — so the
+   panel was scrolled toward its top on every paint. `markSteps` now scrolls
+   the ROW alone.
+
+   ⚠ REAL CLICKS, AND THE PANEL SCROLLED FIRST. `el.click()` skips the focus a
+   real press causes, and a tap from the panel's top cannot show a scroll
+   toward the top — which is exactly how three harnesses came back clean on a
+   page doing this on every press. Its own shapes, like the price sweep: the
+   fault is desktop-only (only the desktop panel scrolls with a sticky rail in
+   it) and `VIEWS` would cost a whole pass per width.
+
+   ⚠ A TAP THAT CHANGES WHAT IS IN THE PANEL MAY MOVE IT, and those are counted
+   and printed rather than failed: when content comes or goes the panel's
+   height changes, and at the bottom of a list the browser has to clamp.
+   ⚠ AND THE CLAUSE THAT MUST STAY TRUE BESIDE IT (§5.22): the live circle is
+   whole inside the navigator row after every step change, at these shapes and
+   on a 320 px phone — which is the one reason the row scrolls at all. The
+   cheap way to pass the first half is to stop bringing the circle into view. */
+{
+  console.log('\na tap does not scroll the panel it is in');
+  const TAP = [[1100, 800, 'ru', true], [1280, 720, 'he', true], [1440, 900, 'he', true],
+               [1536, 730, 'en', true], [320, 568, 'he', false], [390, 844, 'ru', false]];
+  const PICK = '.sect.is-live [role="radio"], .sect.is-live .stripes__dirs .pill, .sect.is-live .blen__b, .sect.is-live .stripes__tight';
+  const snap = () => {
+    const pn = document.querySelector('.panel--choose');
+    return { y: Math.round(scrollY), top: Math.round(pn.scrollTop), sh: pn.scrollHeight };
+  };
+  const before0 = faults;
+  let clicks = 0, changed = 0, circles = 0;
+  for (const [w, h, lang, taps] of TAP) {
+    const where = `tap ${w}x${h} ${lang}`;
+    const p = await b.newPage({ viewport: { width: w, height: h } });
+    try {
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
+      await p.waitForTimeout(900);
+      for (let s = 0; s < 8; s++) {
+        const live = await p.evaluate(() => document.querySelector('.sect.is-live')?.dataset.section || null);
+        if (!live) { fault(where, 'no live step — this check has no subject'); break; }
+        const inRow = await p.evaluate(() => {
+          const row = document.querySelector('.steps'), c = document.querySelector('.steps__step.is-on');
+          if (!row || !c) return null;
+          const r = row.getBoundingClientRect(), k = c.getBoundingClientRect();
+          return k.left >= r.left - 1 && k.right <= r.right + 1;
+        });
+        if (inRow === null) fault(where, `step "${live}": no navigator row or no live circle — the circle clause has no subject`);
+        else if (!inRow) fault(where, `step "${live}": the live circle is cut by the edge of the navigator row — a navigator whose current position is off its own edge is not a navigator`);
+        else circles++;
+        if (taps) {
+          for (const at of ['mid', 'bottom']) {
+            const room = await p.evaluate(at => {
+              const pn = document.querySelector('.panel--choose');
+              const m = pn.scrollHeight - pn.clientHeight;
+              pn.scrollTop = at === 'mid' ? m / 2 : m;
+              return m;
+            }, at);
+            if (room < 20) continue;
+            await p.waitForTimeout(150);
+            const targets = await p.evaluate(PICK => {
+              const pr = document.querySelector('.panel--choose').getBoundingClientRect(), out = [];
+              for (const e of document.querySelectorAll(PICK)) {
+                const r = e.getBoundingClientRect();
+                if (!r.width || r.bottom < pr.top || r.top > pr.bottom) continue;
+                const cx = r.left + r.width / 2, cy = (Math.max(r.top, pr.top) + Math.min(r.bottom, pr.bottom)) / 2;
+                const hit = document.elementFromPoint(cx, cy);
+                if (!hit || !e.contains(hit) || e.disabled || e.getAttribute('aria-disabled') === 'true') continue;
+                out.push({ id: e.dataset.id || e.dataset.dir || e.dataset.n || 'tight', cx, cy });
+              }
+              return out.slice(0, 5);
+            }, PICK);
+            for (const t of targets) {
+              const a = await p.evaluate(snap);
+              await p.mouse.click(t.cx, t.cy);
+              await p.waitForTimeout(320);
+              await p.evaluate(() => { const d = document.querySelector('#clash'); if (d && d.open) d.close(); });
+              const z = await p.evaluate(snap);
+              clicks++;
+              if (z.sh !== a.sh) { changed++; continue; }
+              if (Math.abs(z.y - a.y) > 1 || Math.abs(z.top - a.top) > 1) {
+                fault(where, `step "${live}", panel scrolled to its ${at}: tapping "${t.id}" moved `
+                  + `${z.y !== a.y ? `the page ${z.y - a.y}` : `the panel ${z.top - a.top}`} px — a tap on `
+                  + 'an option the customer can see must not scroll anything');
+              }
+            }
+          }
+        }
+        const moved = await p.evaluate(() => {
+          const b2 = [...document.querySelectorAll('.sect__next')].filter(x => x.offsetParent !== null && !x.disabled);
+          if (!b2.length) return false;
+          b2[0].click();
+          return true;
+        });
+        if (!moved) break;
+        await p.waitForTimeout(450);
+      }
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault(where, 'chromium died before the taps were measured, so they are unchecked');
+    }
+    await p.close().catch(() => {});
+  }
+  /* §5.15, twice: a sweep that tapped nothing and one that never looked at the
+     circle both read green without these. */
+  if (clicks < 60) fault('tap', `only ${clicks} taps were made with the panel scrolled — this check is not measuring what it is named after`);
+  if (circles < 8 * TAP.length - 2) fault('tap', `the live circle was checked on ${circles} steps of ${8 * TAP.length} — the walk stopped short`);
+  if (faults === before0) {
+    console.log(`    ${clicks} real taps with the panel scrolled, none scrolled anything `
+      + `(${changed} changed what the panel holds and were not judged); `
+      + `the live circle whole in its row on ${circles} steps`);
+  }
+}
+
+/* ── THE STRIPE PILLS CARRY THREE PICTURES, AND NONE IS THE PLAIN FACE ────
+   Peretz, 20.9.2026: *"add icons for the stripes to make them more visible."*
+   `stripesGlyph` draws each as a window on the leaf at the door's own pitch.
+   `npm test` asserts the lines are the door's lines; only a rasteriser can say
+   they are three PICTURES at the size they ship at — the 15.9 marks sweep found
+   two marks that differed in every character and were the same rectangle.
+   The size is read off the page, through the icon the pill actually renders,
+   and the page's icons are checked to be the renderer's before anything is
+   compared (§5.15), so this cannot pass on three pictures nobody sees. The
+   plain face tile is in the comparison because it is the picture beside them
+   on the same step. */
+{
+  console.log('\nthe stripe pills carry three pictures, and none of them is the plain face');
+  const FLOOR = 0.50;
+  const before0 = faults;
+  const p = await b.newPage({ viewport: { width: 1280, height: 720 } });
+  try {
+    await p.goto(`file://${process.cwd()}/index.html?lang=he`, { waitUntil: 'load' });
+    await p.waitForTimeout(700);
+    await p.evaluate(() => document.querySelector('.steps__step[data-step="face"]')?.click());
+    await p.waitForTimeout(500);
+    const shown = await p.evaluate(() => [...document.querySelectorAll('.stripes__dir')].map(e => {
+      const i = e.querySelector('.stripes__ico');
+      return { dir: e.dataset.dir, px: i ? Math.round(i.getBoundingClientRect().width) : 0,
+               lines: i ? i.querySelectorAll('line').length : -1, vb: i ? i.getAttribute('viewBox') : '' };
+    }));
+    const want = ['none', 'h', 'v'];
+    if (shown.length !== 3 || want.some(d => !shown.find(s => s.dir === d))) {
+      fault('stripes', `the face step shows ${shown.length} direction pills (${shown.map(s => s.dir)}) — expected none, h and v`);
+    }
+    for (const s of shown) {
+      const g = stripesGlyph(s.dir);
+      const n = (g.match(/<line/g) || []).length, vb = (g.match(/viewBox="([^"]*)"/) || [])[1];
+      if (s.px < 16) fault('stripes', `the "${s.dir}" pill's picture is ${s.px} px — it is not being drawn`);
+      if (s.lines !== n || s.vb !== vb) {
+        fault('stripes', `the "${s.dir}" pill draws ${s.lines} lines in ${s.vb} and stripesGlyph makes ${n} in ${vb} — this check is not reading what the page shows`);
+      }
+    }
+    const px = Math.max(...shown.map(s => s.px));
+    const plain = DETAILS.find(d => d.id === 'plain');
+    const arts = { none: stripesGlyph('none'), h: stripesGlyph('h'), v: stripesGlyph('v'), 'plain face': detailGlyph(plain) };
+    const res = await p.evaluate(async ([arts, px, DSF]) => {
+      const ink = async art => {
+        const svg = art.replace(/currentColor/g, '#000')
+          .replace('<svg ', `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" `);
+        const img = new Image();
+        await new Promise((ok2, no) => {
+          img.onload = ok2; img.onerror = no;
+          img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+        });
+        const cv = document.createElement('canvas');
+        cv.width = px * DSF; cv.height = px * DSF;
+        const g = cv.getContext('2d');
+        g.drawImage(img, 0, 0, cv.width, cv.height);
+        const d = g.getImageData(0, 0, cv.width, cv.height).data;
+        const m = new Uint8Array(cv.width * cv.height);
+        for (let i = 0; i < m.length; i++) m[i] = d[i * 4 + 3] > 40 ? 1 : 0;
+        return m;
+      };
+      const fam = new Map();
+      for (const [k, a] of Object.entries(arts)) fam.set(k, await ink(a));
+      const ids = [...fam.keys()], pairs = [];
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          const a = fam.get(ids[i]), c = fam.get(ids[j]);
+          let diff = 0, uni = 0;
+          for (let k = 0; k < a.length; k++) { if (a[k] | c[k]) uni++; if (a[k] !== c[k]) diff++; }
+          pairs.push({ a: ids[i], b: ids[j], d: uni ? diff / uni : 0 });
+        }
+      }
+      return pairs.sort((x, y) => x.d - y.d);
+    }, [arts, px, 3]);
+    for (const r of res) {
+      if (r.d < FLOOR) {
+        fault('stripes', `"${r.a}" and "${r.b}" differ on only ${(r.d * 100).toFixed(0)}% of the pixels `
+          + `they ink at ${px}px (floor ${FLOOR * 100}%) — at that size they are one picture`);
+      }
+    }
+    /* ⚠ AND THE PICTURE COSTS WIDTH: three pills that each gained 34 px, in
+       the longest copy on the narrowest screen. They may wrap — the row is a
+       wrapping flex row on purpose — but they may not push the page sideways
+       or run off it. */
+    const q = await b.newPage({ viewport: { width: 320, height: 568 } });
+    try {
+      await q.goto(`file://${process.cwd()}/index.html?lang=ru`, { waitUntil: 'load' });
+      await q.waitForTimeout(700);
+      await q.evaluate(() => document.querySelector('.steps__step[data-step="face"]')?.click());
+      await q.waitForTimeout(500);
+      const fit = await q.evaluate(() => ({
+        sw: document.documentElement.scrollWidth, iw: innerWidth,
+        pills: [...document.querySelectorAll('.stripes__dir')].map(e => {
+          const r = e.getBoundingClientRect();
+          return { dir: e.dataset.dir, l: Math.round(r.left), r: Math.round(r.right) };
+        }),
+      }));
+      if (fit.pills.length !== 3) fault('stripes 320 ru', `${fit.pills.length} direction pills on the face step — this clause has no subject`);
+      if (fit.sw > fit.iw) fault('stripes 320 ru', `the page is ${fit.sw} px wide on a ${fit.iw} px screen with the stripe pills on it`);
+      for (const pl of fit.pills) {
+        if (pl.l < 0 || pl.r > fit.iw) fault('stripes 320 ru', `the "${pl.dir}" pill runs from ${pl.l} to ${pl.r} on a ${fit.iw} px screen`);
+      }
+    } finally {
+      await q.close().catch(() => {});
+    }
+    if (faults === before0) {
+      console.log(`    three pictures at ${px}px and the plain face beside them: closest is `
+        + `${res[0].a} ~ ${res[0].b} at ${(res[0].d * 100).toFixed(0)}%; the pills fit a 320 px screen in Russian`);
+    }
+  } catch (e) {
+    if (!crashed(e)) throw e;
+    fault('stripes', 'chromium died before the stripe pictures were compared, so they are unchecked');
+  }
+  await p.close().catch(() => {});
+}
+
+/* ── NO STEP'S EXPLAINER CONTRADICTS THE PRICE ON IT ──────────────────────
+   ⚠ THE COLOUR STEP SAID EVERY SHADE COSTS THE SAME UNDER A CHART HEADED
+   תוספת ₪200. The 7.9 walk found it and asked for exactly this check; the 30.8
+   entry in CLAUDE.md says the sentence was gone; it was still there on 20.9,
+   in all three languages, because a claim in prose has no reader. So: on every
+   step that shows a non-zero price, the explainer may not say the prices are
+   the same. A phrase list per language, and the list is tested against the
+   sentence it was written for before it is trusted (§5.15) — a list that has
+   drifted from the copy passes about everything.
+   And the sentence that replaced it — the colour is settled at the measure,
+   Peretz, 20.9.2026 — must be on the colour step and in the summary's caveat,
+   in all three languages: one key, two places, `js/copy.js`. */
+{
+  console.log('\nno step\'s explainer contradicts the price on it');
+  const SAME = { he: ['אותו דבר', 'אותו מחיר'],
+                 en: ['costs the same', 'cost the same', 'same price'],
+                 ru: ['стоят одинаково', 'стоит одинаково', 'одна цена', 'одинаковой цене'] };
+  const OLD = { he: 'כל הגוונים עולים אותו דבר, כך שהבחירה היא בטעם בלבד.',
+                en: 'Every shade costs the same, so the choice is purely taste.',
+                ru: 'Все оттенки стоят одинаково, так что выбор — дело вкуса.' };
+  const before0 = faults;
+  for (const [l, s] of Object.entries(OLD)) {
+    if (!SAME[l].some(ph => s.includes(ph))) {
+      fault('explainers', `the "same price" list for ${l} does not catch the sentence it was written for — this check is blind`);
+    }
+  }
+  let priced = 0;
+  for (const lang of ['he', 'en', 'ru']) {
+    const where = `explainers ${lang}`;
+    const measured = withLang(lang, () => T('colour.measured'));
+    const p = await b.newPage({ viewport: { width: 1280, height: 720 } });
+    try {
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
+      await p.waitForTimeout(700);
+      const keys = await p.evaluate(() => [...document.querySelectorAll('.steps__step[data-step]')].map(e => e.dataset.step));
+      if (keys.length < 9) fault(where, `the navigator has ${keys.length} circles — this walk has no steps to read`);
+      let sawColour = false, sawSum = false;
+      for (const k of keys) {
+        await p.evaluate(k => document.querySelector(`.steps__step[data-step="${k}"]`)?.click(), k);
+        await p.waitForTimeout(300);
+        const r = await p.evaluate(() => {
+          const live = document.querySelector('.sect.is-live');
+          if (!live) return null;
+          const strip = t => t.replace(/[‎‏⁦-⁩]/g, '');
+          const metas = [...live.querySelectorAll('.tile__meta, .swatch__meta, .opts__sub, .stripes__cost, .mkc__opt-p')]
+            .map(e => strip(e.textContent || ''));
+          return {
+            key: live.dataset.section,
+            a: (live.querySelector('.sect__a')?.textContent || '').replace(/\s+/g, ' '),
+            priced: metas.some(t => /₪\s*[1-9]|[1-9][\d,.]*\s*₪/.test(t)),
+            fine: (document.querySelector('.sect.is-live .send__fine')?.textContent || '').replace(/\s+/g, ' '),
+          };
+        });
+        if (!r) { fault(where, `step "${k}" did not come up`); continue; }
+        if (r.priced) {
+          priced++;
+          const hit = SAME[lang].find(ph => r.a.includes(ph));
+          if (hit) {
+            fault(where, `step "${r.key}" shows a surcharge and its explainer says "${hit}" — `
+              + 'the one paragraph a customer opens to understand the step contradicts the price on it');
+          }
+        }
+        if (r.key === 'colour') {
+          sawColour = true;
+          if (!r.a.includes(measured)) fault(where, `the colour step's explainer does not say "${measured}"`);
+        }
+        if (r.key === 'sum') {
+          sawSum = true;
+          if (!r.fine.includes(measured)) fault(where, `the summary's caveat does not say "${measured}"`);
+        }
+      }
+      if (!sawColour || !sawSum) fault(where, `the walk never reached ${sawColour ? 'the summary' : 'the colour step'} — the sentence is unchecked`);
+    } catch (e) {
+      if (!crashed(e)) throw e;
+      fault(where, 'chromium died before the explainers were read, so they are unchecked');
+    }
+    await p.close().catch(() => {});
+  }
+  /* §5.15: the colour step alone shows a surcharge on arrival, so a reader
+     that found fewer than one priced step per language is not reading prices. */
+  if (priced < 3) fault('explainers', `only ${priced} priced steps were found across three languages — the price reader is not reading the page`);
+  if (faults === before0) console.log(`    ${priced} priced steps across three languages, no explainer says the prices are the same; the colour sentence is on the colour step and the summary in all three`);
 }
 
 /* ── THE WALL CHROME'S OWN INK STAYS OFF THE DOOR ────────────────────────

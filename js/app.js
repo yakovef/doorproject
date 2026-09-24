@@ -38,7 +38,7 @@ import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, price
 import {
   describe, detailGlyph, grilleGlyph, handleGlyph, locksetGlyph,
   bellGlyph, handleFinishGlyph, copyOf, mashkofGlyph, peepholeGlyph, pirzulGlyph, render, sizeGlyph,
-  specialLockGlyph,
+  specialLockGlyph, stripesGlyph,
   windowGlyph,
 } from './renderer.js';
 import { conflicts, repair } from './rules.js';
@@ -335,7 +335,8 @@ const GROUPS = [
    reorder is the event a stored digit would have gone stale on. */
 const SECTIONS = [
   { key: 'fit',    title: 'step.fit.t',    sub: 'step.fit.s',    lede: 'step.fit.l', exp: 'exp.fit' },
-  { key: 'colour', title: 'step.colour.t', sub: 'step.colour.s', lede: 'step.colour.l', exp: 'exp.colour' },
+  { key: 'colour', title: 'step.colour.t', sub: 'step.colour.s', lede: 'step.colour.l', exp: 'exp.colour',
+    expArgs: () => [T('colour.measured')] },
   /* ⚠ THE LOCK COMES BEFORE THE GRIP, 14.9.2026 — Peretz: *"the lockset
      section should come before the pull handle section."* They were the other
      way round and had been since the two were split.
@@ -1744,9 +1745,9 @@ function buildStripes(host) {
     <span class="stripes__label" id="stripes-l">${T('stripes.label')}</span>
     <div class="stripes__dirs" role="group" aria-labelledby="stripes-l">
       ${[['none', 'stripes.none'], ['h', 'stripes.h'], ['v', 'stripes.v']].map(([id, k]) => `
-        <button type="button" class="pill${dir === id ? ' is-on' : ''}${why && id !== 'none' ? ' is-blocked' : ''}"
+        <button type="button" class="pill stripes__dir${dir === id ? ' is-on' : ''}${why && id !== 'none' ? ' is-blocked' : ''}"
                 data-dir="${id}" aria-pressed="${dir === id}"
-                aria-disabled="${!!why && id !== 'none'}">${T(k)}</button>`).join('')}
+                aria-disabled="${!!why && id !== 'none'}">${stripesGlyph(id)}<span>${T(k)}</span></button>`).join('')}
     </div>
     ${why ? `<p class="stripes__why">${why}</p>` : ''}
 
@@ -2318,20 +2319,38 @@ function markSteps() {
   const panel = document.querySelector('.panel--choose');
   if (panel) panel.dataset.live = liveStep;
 
-  /* ⚠ AND THE LIVE CIRCLE IS SCROLLED INTO VIEW. The row is nine 44 px circles
-     and it does not fit 320 px, 390 px or a 310 px desktop column — measured
-     `scrollWidth` 456 against 390, 429 against 310 — so it scrolls, and a
-     navigator whose current position is off its own edge is not a navigator.
-     `nearest`, so a circle already on screen does not jog the row on every
-     paint; `inline` only, so it can never scroll the PAGE (this row is fixed
-     at the top of a phone and sticky in the card, and a block-axis scroll here
-     was how the heading used to end up behind the door).
-     ⚠ Guarded: `scrollIntoView` on a detached or displayless element throws in
-     no browser, but the element is absent in `?sheet=1` where the flow is not
-     built at all — CLAUDE.md §5.20 is what happens when that is assumed. */
+  /* ⚠ AND THE LIVE CIRCLE IS BROUGHT INTO VIEW — BY SCROLLING THE ROW, AND
+     NOTHING ELSE. The row is nine 44 px circles and it does not fit 320 px,
+     390 px or a 310 px desktop column — measured `scrollWidth` 456 against
+     390, 429 against 310 — so it scrolls, and a navigator whose current
+     position is off its own edge is not a navigator.
+     ⚠ THIS WAS `live.scrollIntoView({ inline: 'nearest', block: 'nearest' })`
+     UNDER A COMMENT SAYING "inline only, so it can never scroll the PAGE" —
+     and it passed `block`. Reported by Peretz on a laptop, 20.9.2026: *"every
+     time i press a button the page goes up a bit."* Measured 23.9: taps with
+     the choices panel at its top moved nothing, and with the panel scrolled
+     down nearly every tap scrolled it back UP by as much as 65 px — 41 of 81 at
+     1100x800, 37 of 77 at 1536x730, on every step — so it added up press by
+     press until the panel reached its top. The circle lives in a STICKY rail
+     inside that panel, and since 12.9 the panel's `scroll-padding-block`
+     reserves the rail's own band; a stuck circle always sits inside that band,
+     so "nearest" on the block axis always found it short and scrolled the
+     panel by the difference. Switching this one call off took the moving taps
+     from 15 of 25 to 1 of 25 with the circle still in view.
+     So the row is scrolled directly, by a relative inline delta — which is
+     right in RTL for free, where `scrollLeft` counts negative — inset by the
+     row's own `scroll-padding-inline`. A sticky element is never again asked
+     to scroll the box it is stuck in.
+     ⚠ Guarded: the row is absent in `?sheet=1`, where the flow is not built at
+     all — CLAUDE.md §5.20 is what happens when that is assumed. */
   const live = document.querySelector('.steps__step.is-on');
-  if (live && typeof live.scrollIntoView === 'function') {
-    live.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  const row = live && live.closest('.steps');
+  if (row && typeof row.scrollBy === 'function') {
+    const pad = parseFloat(getComputedStyle(row).scrollPaddingInlineStart) || 0;
+    const r = row.getBoundingClientRect(), c = live.getBoundingClientRect();
+    const dx = c.left < r.left + pad ? c.left - (r.left + pad)
+             : c.right > r.right - pad ? c.right - (r.right - pad) : 0;
+    if (Math.abs(dx) > 0.5) row.scrollBy({ left: dx, behavior: 'instant' });
   }
 
   /* The way on and the way back, disabled at the ends rather than wrapping. */

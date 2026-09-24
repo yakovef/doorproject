@@ -480,10 +480,25 @@ export const UI = {
   'exp.mk.a':             ['המשקוף הוא המסגרת שמותקנת בקיר, והדלת נסגרת עליה. יש לו שלושה חלקים: הקאנט החיצוני (הכנף שנראית מבחוץ על הקיר), הפאלץ (המדרגה שהדלת נסגרת לתוכה) והקאנט הפנימי (הכנף בצד הפנימי של הקיר). המשקוף הסטנדרטי כלול במחיר הדלת — בפירוט המחיר הוא מופיע כ‑{1}, אחד משישה חלקים של דלת מותקנת, ולא כתוספת; כל חלק שמרחיבים מוסיף {0}, ואפשר להרחיב כל שילוב. בציור הדלת רואים רק את שני החלקים החיצוניים — הקאנט הפנימי נמצא מאחורי הקיר. את הקיר נמדוד אצלכם.',
                        'The frame is what is fitted into the wall and what the door closes against. It has three parts: the outer kant (the wing seen from outside on the wall), the falc (the step the door closes into) and the inner kant (the wing on the room side of the wall). The standard frame is inside the door’s price — the breakdown lists it at {1} as one of the six parts of a fitted door, not as a surcharge; each part you widen adds {0}, in any combination. The drawing of the door shows only the two outer parts — the inner kant is behind the wall. We measure the wall on site.',
                        'Коробка — это рама, устанавливаемая в стену, к которой прилегает дверь. У неё три части: наружный кант (борт, видимый снаружи на стене), фальц (ступень, в которую закрывается дверь) и внутренний кант (борт со стороны комнаты). Стандартная коробка входит в цену двери — в раскладке цены она указана как {1}, одна из шести частей установленной двери, а не доплата; каждая расширенная часть добавляет {0}, в любом сочетании. На рисунке двери видны только две наружные части — внутренний кант за стеной. Стену замерим на месте.'],
+  /* ⚠ THE COLOUR IS SETTLED AT THE MEASURE — Peretz, 20.9.2026: *"write that
+     the color is decided at the measurements with the guy, he brings the real
+     color irl."* One sentence under one key, shown twice — at the foot of the
+     colour step's explainer (through `{0}`) and in the summary's caveat — so
+     the page cannot promise it two ways. Not in the WhatsApp order: Peretz is
+     the one who brings the samples.
+     ⚠ AND THE EXPLAINER'S OLD SECOND SENTENCE IS GONE WITH IT. It said every
+     shade costs the same — כל הגוונים עולים אותו דבר — directly under a chart
+     headed תוספת ₪200. The 7.9 walk found it, the 30.8 entry says it is gone,
+     and it was still here on 20.9, in all three languages. The explainer now
+     makes no claim about price at all: the chart's two headings state it, off
+     `o.delta`, and cannot go stale. */
+  'colour.measured':      ['את הגוון הסופי קובעים במדידה — המודד מביא איתו דוגמאות צבע אמיתיות.',
+                           'The final shade is settled at the measuring visit — the measurer brings real colour samples.',
+                           'Окончательный оттенок утверждается на замере — замерщик привозит настоящие образцы цвета.'],
   'exp.colour.q':         ['איך נראה הצבע במציאות?', 'How does the colour look in reality?', 'Как цвет выглядит вживую?'],
-  'exp.colour.a':         ['הצבע נצרב בתנור, מלוח הגוונים של היצרן, והקוד שליד כל שם הוא הקוד שלו. כל הגוונים עולים אותו דבר, כך שהבחירה היא בטעם בלבד. הציור באתר הוא הדמיה — הגוון שיֵצא מהתנור עשוי להיראות מעט שונה, ובעיקר בברק.',
-                       'The colour is oven-baked from the manufacturer’s chart, and the code beside each name is theirs. Every shade costs the same, so the choice is purely taste. The drawing here is an illustration — the shade that comes out of the oven may look slightly different, in sheen most of all.',
-                       'Цвет наносится порошком и запекается, по палитре производителя; код рядом с названием — его. Все оттенки стоят одинаково, так что выбор — дело вкуса. Изображение здесь — визуализация: готовый оттенок может немного отличаться, прежде всего по блеску.'],
+  'exp.colour.a':         ['הצבע נצרב בתנור, מלוח הגוונים של היצרן, והקוד שליד כל שם הוא הקוד שלו. הציור באתר הוא הדמיה — הגוון שיֵצא מהתנור עשוי להיראות מעט שונה, ובעיקר בברק. {0}',
+                       'The colour is oven-baked from the manufacturer’s chart, and the code beside each name is theirs. The drawing here is an illustration — the shade that comes out of the oven may look slightly different, in sheen most of all. {0}',
+                       'Цвет наносится порошком и запекается, по палитре производителя; код рядом с названием — его. Изображение здесь — визуализация: готовый оттенок может немного отличаться, прежде всего по блеску. {0}'],
   'exp.face.q':           ['פאנלים או פסים — מה ההבדל?', 'Panels or strips — what is the difference?', 'Панели или полосы — в чём разница?'],
   'exp.face.a':           ['פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — 150 ₪ לפס אופקי ו‑300 ₪ לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון — חלון מרובע מגיע עם הפאנל שלו בתחתית, ואין צורך לבחור אותו כאן. כל עיצוב חזית מתאים לכל ידית משיכה.',
                        'Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — ₪150 a horizontal strip and ₪300 a vertical one. Panels and strips do not go on the same door, and neither goes with a window — a square window brings its own panel below it, and there is nothing to choose here for that. Every face goes with every pull handle.',

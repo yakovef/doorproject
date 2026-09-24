@@ -3149,6 +3149,23 @@ button.spec__row:focus-visible {
   color: var(--ink-2);
 }
 .stripes__dirs { display: flex; gap: 6px; flex-wrap: wrap; }
+/* ⚠ THE PICTURE BESIDE THE WORD, 23.9.2026 — Peretz: "add icons for the
+   stripes to make them more visible." `stripesGlyph` in js/renderer.js draws
+   each one as a window on the leaf at the door's own pitch; this only sizes
+   it. 26 px is what puts the vertical columns about 4 px apart (the 2 px
+   rule, 15.9); smaller and they close into a grey band. It takes the pill's
+   ink, so a blocked pill's icon fades with its word. */
+.stripes__dir { display: inline-flex; align-items: center; gap: 8px; }
+.stripes__ico { inline-size: 26px; block-size: 26px; flex: 0 0 auto; display: block; }
+/* ⚠ AND THE CHOSEN ONE LOOKS CHOSEN, WHICH NO RULE SAID UNTIL NOW. The
+   pills carry `is-on` and `aria-pressed`, and nothing in this stylesheet read
+   either: measured on the live page, the chosen direction and the tight toggle
+   drew exactly like the pills beside them, so the only sign of which way the
+   stripes ran was the drawing. The same ring a chosen tile wears. */
+.stripes__dir.is-on, .stripes__tight.is-on {
+  border-color: var(--accent-ink); background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--accent-ink);
+}
 .stripes__tight { justify-self: start; }
 .stripes__cost { font-size: .78rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 /* The reason, when the door cannot take stripes. Not a disabled control: a
