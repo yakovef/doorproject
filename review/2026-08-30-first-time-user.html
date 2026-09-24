@@ -1,0 +1,447 @@
+<title>Nine Icons, No Words</title>
+<meta name="description" content="A first-time-user critique of the Dlatot Magen door configurator on desktop, with measured findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&display=swap">
+
+<style>
+:root {
+  --paper:#EFEDE8; --surface:#FBFAF7; --surface-2:#E7E4DD;
+  --ink:#24262A; --ink-2:#5E6167; --ink-3:#86898F;
+  --rule:#D6D3CB; --rule-hard:#B9B5AA;
+  --accent:#3C5A47; --accent-ink:#2C4435; --accent-bg:#E0E8E1;
+  --crit:#9E3B2C; --crit-bg:#F2DFDA;
+  --warn:#9A6A18; --warn-bg:#F1E5CD;
+  --ok:#3C5A47;   --ok-bg:#E0E8E1;
+  --f-display:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --f-body:'Literata',Georgia,'Times New Roman',serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:#1A1C1F; --surface:#212428; --surface-2:#2A2E32;
+    --ink:#E9E7E2; --ink-2:#A2A6AC; --ink-3:#7B7F86;
+    --rule:#363A3F; --rule-hard:#4C5157;
+    --accent:#86AE93; --accent-ink:#A6C7B0; --accent-bg:#263229;
+    --crit:#DE8B78; --crit-bg:#38231E;
+    --warn:#D6A85C; --warn-bg:#352A16;
+    --ok:#86AE93;   --ok-bg:#263229;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:#1A1C1F; --surface:#212428; --surface-2:#2A2E32;
+  --ink:#E9E7E2; --ink-2:#A2A6AC; --ink-3:#7B7F86;
+  --rule:#363A3F; --rule-hard:#4C5157;
+  --accent:#86AE93; --accent-ink:#A6C7B0; --accent-bg:#263229;
+  --crit:#DE8B78; --crit-bg:#38231E;
+  --warn:#D6A85C; --warn-bg:#352A16;
+  --ok:#86AE93;   --ok-bg:#263229;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--f-body); font-size:17px; line-height:1.65; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:800px; margin:0 auto; padding:0 24px 96px; }
+
+.mast { border-bottom:2px solid var(--ink); padding:56px 0 20px; margin-bottom:36px; }
+.mast__eyebrow { font-family:var(--f-mono); font-size:.72rem; font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin:0 0 18px; }
+.mast__title { font-family:var(--f-display); font-weight:700;
+  font-size:clamp(2.1rem,6vw,3.1rem); line-height:1.04; letter-spacing:-.022em;
+  margin:0 0 16px; text-wrap:balance; }
+.mast__standfirst { font-size:1.09rem; color:var(--ink-2); margin:0 0 26px; max-width:62ch; }
+.mast__meta { display:flex; flex-wrap:wrap; gap:6px 22px;
+  font-family:var(--f-mono); font-size:.74rem; color:var(--ink-3); }
+.mast__meta b { color:var(--ink-2); font-weight:500; }
+
+h2 { font-family:var(--f-display); font-weight:700; font-size:1.55rem; letter-spacing:-.015em;
+  line-height:1.2; margin:56px 0 8px; text-wrap:balance; }
+h2 + .dek { color:var(--ink-2); margin:0 0 26px; font-size:1rem; }
+h3 { font-family:var(--f-display); font-weight:600; font-size:1.1rem; line-height:1.3;
+  letter-spacing:-.008em; margin:0 0 10px; text-wrap:balance; }
+p { margin:0 0 16px; } p:last-child { margin-bottom:0; }
+code { font-family:var(--f-mono); font-size:.87em; background:var(--surface-2);
+  padding:.1em .34em; border-radius:3px; }
+strong { font-weight:600; }
+.he { font-family:'Segoe UI','Noto Sans Hebrew',sans-serif; direction:rtl; unicode-bidi:isolate; }
+
+.verdict { font-family:var(--f-display); font-weight:500; font-size:1.18rem; line-height:1.4;
+  letter-spacing:-.01em; border-inline-start:3px solid var(--accent);
+  padding-inline-start:18px; margin:24px 0; text-wrap:balance; }
+
+.readout { background:var(--surface); border:1px solid var(--rule);
+  border-inline-start:3px solid var(--accent); border-radius:3px;
+  padding:16px 18px; margin:20px 0; overflow-x:auto; }
+.readout__cap { font-family:var(--f-mono); font-size:.68rem; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin:0 0 12px; }
+table { width:100%; border-collapse:collapse; font-family:var(--f-mono);
+  font-size:.79rem; font-variant-numeric:tabular-nums; }
+th { text-align:right; font-weight:600; color:var(--ink-3); font-size:.66rem;
+  letter-spacing:.08em; text-transform:uppercase; padding:0 0 8px 14px;
+  border-bottom:1px solid var(--rule-hard); white-space:nowrap; }
+th:first-child { text-align:left; padding-left:0; }
+td { text-align:right; padding:7px 0 7px 14px; border-bottom:1px dotted var(--rule); white-space:nowrap; }
+td:first-child { text-align:left; padding-left:0; color:var(--ink-2); white-space:normal; }
+tr:last-child td { border-bottom:0; }
+td.bad { color:var(--crit); font-weight:600; }
+td.good { color:var(--ok); font-weight:600; }
+
+.find { border-top:1px solid var(--rule-hard); padding-top:22px; margin-top:32px; }
+.find__tag { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+.chip { font-family:var(--f-mono); font-size:.64rem; font-weight:600; letter-spacing:.09em;
+  text-transform:uppercase; padding:.26em .58em; border-radius:3px; white-space:nowrap; }
+.chip--crit { background:var(--crit-bg); color:var(--crit); }
+.chip--warn { background:var(--warn-bg); color:var(--warn); }
+.chip--note { background:var(--accent-bg); color:var(--accent-ink); }
+.find__where { font-family:var(--f-mono); font-size:.71rem; color:var(--ink-3); }
+
+.good-list { background:var(--ok-bg); border:1px solid var(--rule); border-radius:4px;
+  padding:18px 22px; margin:20px 0; }
+.good-list ul { margin:0; padding-inline-start:20px; }
+.good-list li { margin-bottom:7px; font-size:.96rem; }
+.good-list li:last-child { margin-bottom:0; }
+
+figure { margin:22px 0; }
+figure svg { display:block; width:100%; height:auto;
+  border:1px solid var(--rule); border-radius:4px; background:var(--surface); }
+figcaption { font-family:var(--f-mono); font-size:.7rem; color:var(--ink-3);
+  margin-top:8px; line-height:1.5; }
+
+.fix { background:var(--surface); border:1px solid var(--rule); border-radius:4px;
+  padding:14px 18px; margin-top:14px; }
+.fix b { display:block; font-family:var(--f-mono); font-size:.64rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:5px; font-weight:600; }
+.fix p { font-size:.94rem; margin:0; }
+
+.next { display:grid; margin-top:8px; }
+.next__row { display:grid; grid-template-columns:auto 1fr auto; gap:14px; padding:14px 0;
+  border-bottom:1px solid var(--rule); align-items:baseline; }
+.next__row:first-child { border-top:1px solid var(--rule-hard); }
+.next__n { font-family:var(--f-mono); font-size:.78rem; font-weight:600; color:var(--accent); }
+.next__t { font-size:.96rem; }
+.next__c { font-family:var(--f-mono); font-size:.64rem; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap; }
+
+.foot { margin-top:56px; padding-top:20px; border-top:2px solid var(--ink);
+  font-family:var(--f-mono); font-size:.72rem; color:var(--ink-3); line-height:1.6; }
+
+@media (max-width:560px) { body { font-size:16px; } .wrap { padding:0 18px 72px; } }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="mast__eyebrow">Dlatot Magen · first-time-user review</p>
+  <h1 class="mast__title">Nine icons, no words, and the send button off the bottom of the screen.</h1>
+  <p class="mast__standfirst">
+    I opened the live site knowing nothing about it and tried to buy a door. The
+    craft on display is real — this is a handsome page. But the navigation refuses to
+    tell me where I am, and on a 1280×720 laptop the flow ends with its own call to
+    action below the fold. Everything below was measured in the browser, not eyeballed.
+  </p>
+  <div class="mast__meta">
+    <span><b>30 August 2026</b></span>
+    <span>head <b>c829ea3</b> (agent run 58)</span>
+    <span>1440×900 · 1280×720 · 1920×1080</span>
+  </div>
+</header>
+
+<h2>First, what is genuinely good</h2>
+
+<div class="good-list">
+  <ul>
+    <li><strong>The render is beautiful.</strong> Wall lights, a plant, cast shadows, a real
+      room. It looks like a premium product rather than a diagram, and it is the reason
+      I trusted the page at all.</li>
+    <li><strong>The honesty line under the image</strong> — <span class="he">הציור באתר הוא הדמיה
+      ממוחשבת</span> — sets expectations before anyone can feel misled.</li>
+    <li><strong>"Start from a door we already installed · 30 real doors"</strong> is exactly
+      the right front door for someone with no vocabulary for this. It is the single best
+      idea on the page.</li>
+    <li><strong>The price is always on screen</strong> and moves as you choose.</li>
+    <li><strong>Three languages</strong> (he/en/ru) — right for this market, and rarely bothered with.</li>
+    <li><strong>The summary step</strong> is a clean, icon-led spec table. That page is doing its job.</li>
+    <li><strong>Undo/redo start correctly disabled</strong> — someone thought about the empty state.</li>
+  </ul>
+</div>
+
+<p class="verdict">
+  The problems are not taste. Every one below is a place where the interface knows
+  something and declines to tell me.
+</p>
+
+<h2>What went wrong, in the order I hit it</h2>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--crit">Blocking</span>
+    <span class="find__where">the step rail</span>
+  </div>
+  <h3>Nine circular icons, none of them labelled, and only six fit</h3>
+  <p>
+    The whole navigation is nine unlabelled glyphs. Every one carries a perfectly good
+    <code>aria-label</code> — <span class="he">מבנה הדלת, משקוף, צבע, ידית משיכה, מנעול,
+    פרזול, עיצוב החזית, חלון, סיכום</span> — which a screen reader gets and my eyes do not.
+    <strong>Zero of the nine render any visible text.</strong>
+  </p>
+  <p>
+    And the rail is a horizontal scroller: the track is 310 px wide holding 428 px of icons,
+    so <strong>three of the nine steps are off-screen at every desktop size I tried</strong>.
+    There <em>is</em> an affordance — an 18 px <code>mask-image</code> fade at each end, added
+    deliberately for exactly this complaint — but at 18 px against a 44 px circle it reads as
+    "this icon is clipped," not as "there are three more questions this way." I could not tell
+    how long this was going to take.
+  </p>
+  <p style="background:var(--warn-bg);border:1px solid var(--warn);border-radius:4px;padding:14px 16px">
+    <strong style="color:var(--warn)">And the obvious fix has already been tried and measured
+    out.</strong> <code>js/app.js</code> records why the labels went: the step NUMBER duplicated
+    the <code>NN / 08</code> counter and cost 24 px of a phone's most expensive strip, and the
+    TITLE only ever showed above 1100 px, where nine names in a 310 px column measured
+    <code>scrollWidth</code> 429 — nine truncated words. So "just label them" is not available
+    in one row. Nine circles at the 44 px tap floor need 428 px and the card is capped at 360.
+    The recommendation below has to break that constraint rather than ignore it.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 640 96" role="img" aria-label="Diagram: the step rail shows six of nine icons, three cut off beyond the right edge with no scroll affordance.">
+      <rect x="16" y="26" width="310" height="46" rx="8" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="4 3"/>
+      <text x="16" y="18" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" fill-opacity=".55">visible track — 310px</text>
+      <g>
+        <circle cx="46" cy="49" r="17" fill="none" stroke="#9A6A18" stroke-width="2"/>
+        <circle cx="96" cy="49" r="17" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+        <circle cx="146" cy="49" r="17" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+        <circle cx="196" cy="49" r="17" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+        <circle cx="246" cy="49" r="17" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+        <circle cx="296" cy="49" r="17" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+      </g>
+      <g opacity=".3">
+        <circle cx="352" cy="49" r="17" fill="none" stroke="currentColor" stroke-dasharray="3 3"/>
+        <circle cx="402" cy="49" r="17" fill="none" stroke="currentColor" stroke-dasharray="3 3"/>
+        <circle cx="452" cy="49" r="17" fill="none" stroke="currentColor" stroke-dasharray="3 3"/>
+      </g>
+      <line x1="326" y1="20" x2="326" y2="78" stroke="#9E3B2C" stroke-width="1.5"/>
+      <text x="336" y="88" font-family="IBM Plex Mono, monospace" font-size="10" fill="#9E3B2C">3 steps beyond the edge — nothing indicates they exist</text>
+    </svg>
+    <figcaption>Measured: track 310 px, content 428 px, 6 of 9 children fully inside. Identical at 1440 and 1280.</figcaption>
+  </figure>
+
+  <p>
+    The one text cue, <code>08 / 01</code>, makes it worse. Glanced at, it reads as
+    "8 of 1". It is RTL for "1 of 8" — but the rail holds <em>nine</em> icons, so the
+    counter and the navigation disagree about how big this is.
+  </p>
+  <div class="fix">
+    <b>Fix — the one option the measurements have not already ruled out</b>
+    <p>Let the rail <strong>wrap to two rows</strong> instead of scrolling. Five icons plus
+    four is roughly 5 × 64 px = 320 px per row, which fits the 360 px card where one row of
+    nine (428 px) never can — and a wrapped rail shows all nine at once, so it needs no fade
+    and no scroll affordance at all. That also buys back the room for a short label under each
+    circle, which is the thing that was measured out only because one row could not hold it.
+    Measure the two-row height against the panel budget before committing: this trades
+    horizontal overflow for vertical, and vertical is the axis the panel is already short of.
+    Then make <code>NN / 08</code> agree with the rail, which holds nine.</p>
+  </div>
+</div>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--crit">Blocking</span>
+    <span class="find__where">summary step · 1280×720</span>
+  </div>
+  <h3>I reached the end and the send button was not on screen</h3>
+  <p>
+    On the final step the choices panel holds <strong>593 px more content than it can
+    show</strong> at 1280×720. The main call to action —
+    <span class="he">שלחו את הדלת בוואטסאפ</span>, 232×52, the entire purpose of the site —
+    sits below that fold. The action bar at the panel's foot, which showed
+    <span class="he">הבא</span> on every previous step, now shows only
+    <span class="he">הקודם</span>. Nothing tells me to scroll.
+  </p>
+
+  <div class="readout">
+    <p class="readout__cap">Final step · is the primary CTA reachable without scrolling?</p>
+    <table>
+      <thead><tr><th>Viewport</th><th>Panel content hidden</th><th>Main send button</th></tr></thead>
+      <tbody>
+        <tr><td>1440 × 900</td><td>413 px</td><td class="good">on screen</td></tr>
+        <tr><td>1280 × 720</td><td class="bad">593 px</td><td class="bad">below the fold</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    The only send I can see is a 131×44 chip floating on the photograph — which, being on
+    the artwork rather than in the flow, does not read as "this is the finish line."
+    A funnel that hides its own conversion step at the exact moment the user is ready is
+    the most expensive defect on this page.
+  </p>
+  <div class="fix">
+    <b>Fix</b>
+    <p>On the summary step, the pinned action bar should carry the WhatsApp send where
+    <span class="he">הבא</span> lives everywhere else. The bar is already pinned and already
+    the place the eye goes after each step; it should not go empty on the one step that matters.</p>
+  </div>
+</div>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--crit">Costs real money</span>
+    <span class="find__where">step 1 · 1280×720</span>
+  </div>
+  <h3>The most expensive question on the site is pre-answered and half off-screen</h3>
+  <p>
+    Step 1 ends with <span class="he">כיוון פתיחה</span> — which way the door opens.
+    At 1280×720 those two radio buttons are the <strong>only two controls in the whole page
+    that the viewport cuts through</strong>; I measured for clipped controls and got exactly
+    <span class="he">ימין, פנימה</span> and <span class="he">שמאל, פנימה</span>. They already
+    have a default selected. So the obvious move — glance, hit
+    <span class="he">הבא</span> — silently accepts a handing I never chose.
+  </p>
+  <p>
+    This project's own <code>CLAUDE.md</code> calls the ימין/שמאל convention
+    <em>"the only mistake on the list that costs real money."</em> It is currently the
+    easiest thing on the page to skip.
+  </p>
+  <div class="fix">
+    <b>Fix</b>
+    <p>Handing should not have a silent default. Either leave it genuinely unselected and
+    require a choice before <span class="he">הבא</span> enables, or promote it to its own
+    confirm-row on the summary — "opens right, inward — is that right?" — so it is impossible
+    to send an order without having looked at it once.</p>
+  </div>
+</div>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--warn">Structural</span>
+    <span class="find__where">desktop layout</span>
+  </div>
+  <h3>Three quarters of the screen is a picture that barely changes</h3>
+  <p>
+    At 1440 the door image takes roughly 73% of the width and the choices — the thing I am
+    actually here to do — get a narrow column that scrolls internally on
+    <strong>every single step</strong>: 113 px hidden on arrival, up to 599 px mid-flow.
+    Meanwhile the image is nearly identical between steps; picking a lock swaps a small
+    piece of hardware I have to hunt for.
+  </p>
+  <p>
+    For a configurator the proportions are inverted. The picture is the reward; the choosing
+    is the task, and the task has been given the smaller, more awkward half.
+  </p>
+  <div class="fix">
+    <b>Fix</b>
+    <p>Widen the choices column on large screens — the door does not need 1,060 px to be
+    convincing — so a step's options fit without internal scrolling. Where a step genuinely
+    overflows, the panel needs a visible scroll cue. And when a choice changes a small
+    detail, briefly draw attention to the part that changed; otherwise the live preview,
+    which is the page's main selling point, goes unnoticed.</p>
+  </div>
+</div>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--warn">Trust</span>
+    <span class="find__where">arrival state</span>
+  </div>
+  <h3>It offers to send my order before I have chosen anything</h3>
+  <p>
+    Two WhatsApp buttons are live on arrival, on a door I have not touched. A confused
+    first-timer can fire off a default door as though it were a considered order — and
+    from Peretz's side that is indistinguishable from a real one.
+  </p>
+  <div class="fix">
+    <b>Fix</b>
+    <p>Before any choice is made, the floating button should ask a question rather than
+    submit an order — <span class="he">יש לי שאלה</span> — and become
+    <span class="he">שלחו את הדלת</span> once the customer has actually chosen something.
+    Same channel, honest label.</p>
+  </div>
+</div>
+
+<div class="find">
+  <div class="find__tag">
+    <span class="chip chip--note">Polish</span>
+    <span class="find__where">throughout</span>
+  </div>
+  <h3>Four smaller things that each cost a second of confusion</h3>
+  <p style="background:var(--crit-bg);border:1px solid var(--crit);border-radius:4px;padding:14px 16px">
+    <strong style="color:var(--crit)">Withdrawn — this was my instrument's fault, not the
+    page's.</strong> I reported that the step heading renders inside a gold box that reads as a
+    text input. It does not, for a real user. The stylesheet already has
+    <code>.sect__title:focus { outline: none }</code> with the ring only on
+    <code>:focus-visible</code> — correct. My probe drove the page with a scripted
+    <code>el.click()</code>, which dispatches no trusted pointer event, so the browser
+    attributed <code>goStep</code>'s programmatic focus to the keyboard and drew the ring.
+    Re-tested three ways: <strong>real mouse click → <code>outline: none</code></strong>;
+    real keyboard → ring, as it should; scripted click → ring, which is what I saw. The page
+    was right and the harness was wrong.
+  </p>
+  <p>
+    <strong>Two unlabelled grey circles sit on the artwork.</strong> Undo and redo, correctly
+    disabled at the start, so they are two dead buttons with no text explaining themselves —
+    on top of the photograph, next to the language switcher, which is also on the photograph.
+    Page chrome floating over the product shot makes the shot look like a background rather
+    than the thing being sold.
+  </p>
+  <p>
+    <strong>Six size tiles, six near-identical door glyphs.</strong> The tiles differ only in
+    their text; the pictures are the same rectangle at the same size, so they add nothing and
+    slow the scan. Either draw them to relative proportion — which is the actual difference —
+    or drop the glyph and let the numbers do the work.
+  </p>
+  <p>
+    <strong>Things are said twice.</strong> <span class="he">נמדוד אצלכם במדויק — בחינם</span>
+    appears in the step description and again under the size grid. ₪3,195 appears on the
+    floating card and on the selected tile. Neither is wrong; both make a dense panel denser.
+  </p>
+</div>
+
+<h2>What I would change, in order</h2>
+
+<div class="next">
+  <div class="next__row"><span class="next__n">01</span>
+    <span class="next__t"><b>Put the send button in the action bar on the summary step.</b>
+    The flow currently ends in an empty bar with the conversion below the fold.</span>
+    <span class="next__c">small</span></div>
+  <div class="next__row"><span class="next__n">02</span>
+    <span class="next__t"><b>Wrap the step rail to two rows and label the icons.</b> Two rows fit
+    the 360 px card where one row of nine cannot — the constraint that forced the labels out.</span>
+    <span class="next__c">medium</span></div>
+  <div class="next__row"><span class="next__n">03</span>
+    <span class="next__t"><b>Make handing an explicit choice.</b> No silent default on the one
+    decision the project itself says costs real money.</span>
+    <span class="next__c">small</span></div>
+  <div class="next__row"><span class="next__n">04</span>
+    <span class="next__t"><b>Give the panel a visible scroll cue</b> wherever a step overflows —
+    every step overflows at 1280×720.</span>
+    <span class="next__c">small</span></div>
+  <div class="next__row"><span class="next__n">05</span>
+    <span class="next__t"><b>Rebalance the desktop split</b> so the choices column is wide enough
+    that most steps need no internal scrolling at all.</span>
+    <span class="next__c">medium</span></div>
+  <div class="next__row"><span class="next__n">06</span>
+    <span class="next__t"><b>Relabel the send button before any choice is made</b>, and lift
+    undo/redo and the language switcher off the photograph.</span>
+    <span class="next__c">small</span></div>
+</div>
+
+<h2>Limits</h2>
+<p>
+  This is desktop only, in Chromium, at three viewport sizes, on the committed build at
+  <code>c829ea3</code> — not the deployed GitHub Pages copy, though the two should match.
+  I judged the Hebrew interface; I did not walk the English or Russian versions, and RTL
+  layout bugs often live in exactly that gap. I also did not test with a keyboard or a
+  screen reader here — worth noting because several findings above (unlabelled icons that
+  <em>do</em> carry <code>aria-label</code>s, disabled undo buttons) suggest the
+  accessibility layer may be in better shape than the visual one, which is an unusual and
+  fixable asymmetry.
+</p>
+
+<p class="foot">
+  Probes, all gitignored under <code>tools/_*.mjs</code>: <code>_uxshots</code> (arrival
+  state and visible-control inventory), <code>_uxprobe</code> (clipped controls, rail
+  metrics, panel overflow), <code>_uxflow</code> (walking the eight steps),
+  <code>_uxsummary</code> (rail scroll geometry and final-step CTA position).
+  No source file was changed.
+</p>
+
+</div>

@@ -638,11 +638,15 @@ td.good { color: var(--ok); }
     do now.
   </p>
   <div class="idea__why">
-    <b>One constraint, already documented here</b>
-    Canvas <code>toDataURL</code> throws <code>SecurityError</code> over
-    <code>file://</code> — REDESIGN.md found this during the raster-renderer
-    evaluation. So the image path is https-only, which is the same condition
-    <code>shareUrl()</code> already tests for. The two can share one guard.
+    <b>Corrected 24 Aug — this is better than stated</b>
+    This said the image path was https-only, because canvas <code>toDataURL</code>
+    throws <code>SecurityError</code> over <code>file://</code>. That is too broad, and
+    I have since measured it: only a <strong>separate local file</strong> taints the
+    canvas. Procedural drawing, <code>data:</code> URIs, <code>blob:</code> URLs and
+    <em>our own inline <code>render()</code> output</em> all read back cleanly from a
+    double-clicked <code>index.html</code>. So the door can be rasterised on every
+    route the app ships on, not just over https. See the
+    <a href="https://claude.ai/code/artifact/1dec41c5-995a-4e21-81eb-0738b5ec0298">rendering study</a>.
   </div>
 </div>
 
