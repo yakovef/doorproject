@@ -1643,7 +1643,13 @@ export function render(state) {
      the fix is not to correct both, it is to have one. */
   const rawStandoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
 
-  /* A PULL BAR ON A PANELLED DOOR GOES INSIDE THE PANEL, and the panel keeps
+  /* ⚠ OVERRULED 24.9.2026, KEPT AS THE RECORD OF WHAT IT REPLACED: a pull no
+     longer stands on a panel at all — "window and panels > pull handle >
+     lever", the owner's son. The panel still keeps its size; the bar goes on
+     the stile, and the lever yields if the stile is too narrow. See the
+     whole-grip check in `gripPlacement`.
+
+     A PULL BAR ON A PANELLED DOOR GOES INSIDE THE PANEL, and the panel keeps
      its size.
 
      This used to work the other way round: the panel was pushed inboard to
@@ -1661,7 +1667,6 @@ export function render(state) {
      Read from MOULD_BAND rather than repeating its value. The band has since
      changed width, and this line was the second place the old 0.09 was written
      down — exactly the promise that somebody will change one of them. */
-  const panelled = detail.panel && !win.rects.length;
   /* WHERE THE GRIP ACTUALLY STANDS. The arithmetic above and below this line
      is `gripHome`'s, and it lives there now because the customer can drag the
      grip: with two possible positions, something outside the drawing has to be
@@ -3157,7 +3162,7 @@ export function render(state) {
   <!-- ── hardware ─────────────────────────────────────────────── -->
   <g id="hardware">
     ${gripArt(handle, handleX, handleY, leafH, leverDir, paint,
-              centreX, leafW, y0, panelled && place.rot !== 90, place.rot)}
+              centreX, leafW, y0, false, place.rot)}
     ${locksetArt(lockset, lockX, y(lockAff(lockset)), leverDir)}
     ${/* No separate escutcheon when the fitting carries its own cylinder —
           and none either when there is no lock furniture at all, which is the
@@ -3962,6 +3967,11 @@ function appliedFrame(lx, ly, lw, lh, paint, pale, winBottom, upper, clearTo = 0
  * standoff needs flat steel under it. So the bar is free and its feet are not,
  * which is exactly what he said.
  *
+ * ⚠ OVERRULED 24.9.2026, and by him: the bar is NOT free. Off a screenshot of
+ * an Idan drawn through all three panels of the trio, "window and panels >
+ * pull handle > lever". The whole grip may not cross a window or a panel now
+ * (`gripPlacement`); the paragraph above is the record of what it replaced.
+ *
  * Everything below works in LEAF-LOCAL millimetres — x from the leaf's left
  * edge as drawn, y down from its top — because that is the space the drag
  * happens in. The one place handing enters is `gripHome`, which measures from
@@ -3984,10 +3994,13 @@ const hingeLeftOf = state => byId(HANDINGS, state.handing).hinge === 'left';
    positions declared unbuildable by their own drawing: the feet were being
    computed from the bar's catalogue length while the door drew a shorter one.
    A quantity computed in two places, exactly as advertised. */
-const gripPanelled = (state, place) =>
-  byId(DETAILS, state.detail).panel
-  && !byId(WINDOWS, state.window).rects.length
-  && place.rot !== 90;
+/* ⚠ AND NEVER, SINCE 24.9.2026: a pull no longer stands on a panel, so there
+   are no fields for its feet to reach and nothing to shorten it for. The clamp
+   was also STRETCHING short bars to reach both fields — a 70 cm bar was drawn
+   786 mm on the panel faces while it was priced and ordered as 70 cm. Kept as
+   a function so its readers stay one statement; the bar is drawn at the
+   length it is sold at, on every face. */
+const gripPanelled = () => false;
 
 /** Does a foot (a circle, roughly) land on this obstacle? */
 const footHits = (f, ob) => {
@@ -4431,8 +4444,13 @@ function gripIdeal(state) {
   const backset = lockBackset(handle, lockset);
   const raw = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state));
   const panelled = detail.panel && !byId(WINDOWS, state.window).rects.length;
-  const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
-  const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
+  /* ⚠ NOT INSIDE THE PANEL ANY MORE — 24.9.2026. This floored a pull's
+     standoff at `insideField` so that on a panelled face the bar stood in the
+     panel's field; the owner's son has since ruled that a pull handle may not
+     stand on a panel at all ("window and panels > pull handle > lever"), so a
+     pull's ideal is the stile on every face and the lever yields if the stile
+     is too narrow. See the whole-grip check in `gripPlacement`. */
+  const standoff = raw;
   /* The grab bar's own height. Every other fitting hangs at HANDLE_AFF off the
      floor; this one sits on the mid rail, and the measured median across d051,
      d062, d067, d068, d070 and d077 is 0.59 of leaf height. It used to be a
@@ -5102,12 +5120,40 @@ export function gripPlacement(state, place = null) {
      this asked `Math.abs(cx - paneCentre) < gw + o.w / 2` with `gw` the grip's
      widest reach in either direction, which puts the horizontal bow's 290 mm
      on BOTH sides of its axis and refuses panes it is nowhere near. */
-  for (const o of apertureLayout(byId(WINDOWS, state.window), leafW,
-                                 byId(DETAILS, state.detail), leafH)) {
-    if (cgx0 < o.x + o.w && cgx1 > o.x
-        && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
-      return bad(T('why.gripCrossesWindow'));
+  /* ⚠ AND NOW THE WHOLE GRIP, NOT ITS FIXINGS — 24.9.2026. The owner's son,
+     off a screenshot of an Idan drawn straight down through all three panels
+     of the trio with its two feet sitting in two fields: *"this cannot happen.
+     1 because a pull handle just cant be there. 2 … if there is no space for
+     the pull handle, then the lever gets deleted and the pull handle be put
+     there. window and panels > pull handle > lever."*
+     That overrules the 27.8 depth argument above (a bar 50 mm proud "may pass
+     over a moulding") and the glass-only allowance it granted the architrave:
+     the grip's body may not overlap a window with its architrave, a panel, a
+     piece of the Greek set or a bolted fitting. Measured before the change:
+     every Idan and Nitzan placement on panel2, panel3 and the Greek set stood
+     across mouldings, 540 of 540 each. d087 and d122 in the corpus show a bar
+     across a panel; overruled on his word, kept on record.
+     THE BOW ALONE may lie wholly inside a panel's field, or wholly on the
+     Greek band: those are the homes Peretz asked for on 20.9 (the trio's
+     handle plate, the pair's rail, the set's shelf) and they cross no frame.
+     A vertical pull goes on the stile, never on a panel — which is why the
+     LEVER then has to yield, and the lever-first branch in `repair` does
+     that already. */
+  const by0 = p.rot === 90 ? p.y - Math.max(grip.out, grip.in) : p.y - gh;
+  const by1 = p.rot === 90 ? p.y + Math.max(grip.out, grip.in) : p.y + gh;
+  const within = (x0, y0, x1, y1) =>
+    cgx0 >= x0 && cgx1 <= x1 && by0 >= y0 && by1 <= y1;
+  for (const ob of obstacles) {
+    if (!(cgx0 < ob.x + ob.w && cgx1 > ob.x && by0 < ob.y + ob.h && by1 > ob.y)) continue;
+    if (handle.style === 'grab') {
+      if (ob.plate && within(ob.x, ob.y, ob.x + ob.w, ob.y + ob.h)) continue;
+      if (ob.band && !ob.plate
+          && within(ob.x + ob.band, ob.y + ob.band,
+                    ob.x + ob.w - ob.band, ob.y + ob.h - ob.band)) continue;
     }
+    return bad(ob.kind === 'window' ? T('why.gripCrossesWindow')
+             : ob.kind === 'moulding' ? T('why.feetOnFace')
+                                      : T('why.feetOnPanel'));
   }
 
   return at;

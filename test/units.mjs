@@ -3007,6 +3007,99 @@ group('a pull handle never costs the window — 20.9.2026');
      `the channel sweep greyed ${facesGrey} faces and ${detailsGrey} details — it needs both`);
 }
 
+group('a pull bar never stands across a window or a panel — 24.9.2026');
+{
+  /* The owner's son, off a screenshot of an Idan drawn down through all three
+     panels of the trio with a Coral beside it: "this cannot happen … window
+     and panels > pull handle > lever." Before this, `gripPlacement` asked only
+     where the two FIXINGS landed, and on panel2, panel3 and the Greek set
+     every bar placement — 540 of 540 each — stood across mouldings. */
+  const shot = fromQuery('?v=23&c=rb-6219d&w=none&g=none&n=idan&k=coral&x=nospecial'
+    + '&m=mk-std&pz=pz-gold&hf=hf-gold&bl=nobell&d=panel3');
+  const s0 = shot.state;
+  ok(s0.detail === 'panel3', `the reported link lost its panels (${s0.detail}) — the panels outrank the bar`);
+  ok(s0.handle === 'idan', `the reported link lost its bar (${s0.handle}) — the bar outranks the lever`);
+  ok(s0.lockset !== 'coral', 'the reported link kept the Coral beside a bar with no room — the lever must yield');
+  ok(shot.said.includes(T('fix.locksetSwapped')),
+     `the reported link swapped the lever without saying so: ${JSON.stringify(shot.said)}`);
+
+  /* The grip's body, from the CATALOGUE's width and length and the feet the
+     renderer places — not from `handleFootprint`, which is the rule's own
+     number and would agree with it by construction. */
+  const bodyOf = (st, home) => {
+    const f = gripFeet(st, home);
+    const h = byId(HANDLES, st.handle);
+    if (h.style === 'grab') {
+      const [a, b] = [...f].sort((p, q) => p.x - q.x);
+      const ext = (b.x - a.x) * 0.175 / 0.65;
+      return { x0: a.x - ext, x1: b.x + ext, y0: a.y - a.r, y1: a.y + a.r };
+    }
+    const leafH = (SIZES[st.size] || SIZES.standard).h - REBATE;
+    const half = Math.min(handleLength(st), leafH - 320) / 2;
+    const w = (h.w || 30) / 2;
+    return home.rot === 90
+      ? { x0: f[0].x - half, x1: f[0].x + half, y0: home.y - w, y1: home.y + w }
+      : { x0: f[0].x - w, x1: f[0].x + w, y0: home.y - half, y1: home.y + half };
+  };
+  const crosses = (st, b) => faceObstacles(st).some(ob => {
+    const e = 0.5;
+    if (!(b.x0 < ob.x + ob.w - e && b.x1 > ob.x + e && b.y0 < ob.y + ob.h - e && b.y1 > ob.y + e)) return false;
+    if (byId(HANDLES, st.handle).style !== 'grab') return true;
+    const inside = (x0, y0, x1, y1) => b.x0 >= x0 - e && b.x1 <= x1 + e && b.y0 >= y0 - e && b.y1 <= y1 + e;
+    if (ob.plate) return !inside(ob.x, ob.y, ob.x + ob.w, ob.y + ob.h);
+    if (ob.band) return !inside(ob.x + ob.band, ob.y + ob.band, ob.x + ob.w - ob.band, ob.y + ob.h - ob.band);
+    return true;
+  });
+  {
+    const leafW = SIZES.standard.w - REBATE * 2;
+    const b = bodyOf(s0, gripHome(s0));
+    const panelX = Math.min(...faceObstacles(s0).map(o => o.x));
+    ok(b.x1 <= panelX, `the reported bar still reaches ${b.x1.toFixed(0)} mm into a panel starting at ${panelX.toFixed(0)}`);
+    ok(b.x0 >= 0 && b.x1 <= leafW, 'the reported bar is off the leaf');
+  }
+
+  const faces = ['plain', 'panel2', 'panel3', 'classic'];
+  let placed = 0, panelPlaced = 0, swaps = 0, refusedFace = 0, bad = 0, plainMiss = 0, lenBad = 0;
+  for (const size of Object.keys(SIZES)) for (const detail of faces) for (const w of WINDOWS)
+  for (const handle of ['idan', 'nitzan', 'grab']) for (const hl of (handle === 'grab' ? [0] : [0, 700]))
+  for (const k of LOCKSETS) for (const handing of HANDINGS.map(x => x.id)) {
+    const st = { ...DEFAULTS, size, detail, window: w.id, handle, handleLen: hl, lockset: k.id, handing, grip: null };
+    const what = gripObstacle(st, handle);
+    if (what === 'lock' && detail !== 'plain') swaps++;
+    if (what === 'face') refusedFace++;
+    if (detail === 'plain' && w.id === 'none' && k.id === 'cylinder' && what !== null) plainMiss++;
+    if (!gripFitsAnywhere(st)) continue;
+    placed++;
+    if (detail !== 'plain') panelPlaced++;
+    const home = gripHome(st);
+    if (crosses(st, bodyOf(st, home)) && bad++ < 5) {
+      ok(false, `${handle} ${hl || ''} on ${detail}/${w.id}/${size}/${k.id}/${handing} stands across a frame at ${Math.round(home.x)},${Math.round(home.y)}`);
+    }
+    /* The bar is drawn at the length it is priced at, on every face. The
+       panelled clamp stretched a 70 cm bar to 786 mm on panel2 and panel3. */
+    if (handle !== 'grab' && home.rot !== 90) {
+      const h = byId(HANDLES, handle);
+      const leafH = SIZES[size].h - REBATE;
+      const want = Math.min(handleLength(st), leafH - 320);
+      const svg = render(st);
+      const g = svg.slice(svg.indexOf('data-hw="handle"'));
+      const m = g.slice(0, 4000).match(new RegExp(`<rect x="[\\d.-]+" y="[\\d.-]+" width="${h.w}" height="([\\d.]+)"`));
+      if ((!m || Math.abs(+m[1] - want) > 0.5) && lenBad++ < 5) {
+        ok(false, `${handle} ${hl || ''} on ${detail}/${size} is drawn ${m ? m[1] : 'nowhere'} mm long and priced at ${want}`);
+      }
+    }
+  }
+  ok(bad === 0, `${bad} accepted grips stand across a window or a panel`);
+  ok(lenBad === 0, `${lenBad} bars drawn at a length they are not priced at`);
+  /* §5.15: each arm must have a subject, or the sweep passes by finding nothing. */
+  ok(panelPlaced > 500, `only ${panelPlaced} grips placed on a worked face — the across-a-frame check has no subject`);
+  ok(swaps > 50, `only ${swaps} doors where the lever yields to a bar on a worked face — the priority is not being exercised`);
+  ok(refusedFace > 0, 'no bar is ever refused for the panels — the Greek set leaves no room on four sizes, so the check has gone blind');
+  /* The clause that must stay true: a plain solid leaf with the cylinder takes every grip. */
+  ok(plainMiss === 0, `${plainMiss} grips no longer fit a plain solid leaf with the cylinder`);
+  console.log(`  ${placed} placed (${panelPlaced} on a worked face), ${swaps} lever swaps, ${refusedFace} refused for the face`);
+}
+
 group('`gp` is a retired parameter, and a link still carrying it is not an error');
 {
   const draggable = { ...DEFAULTS, handle: 'idan' };

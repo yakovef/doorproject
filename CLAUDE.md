@@ -339,7 +339,8 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **11,809,879 / 0** (re-read 23.9.2026). ⚠ A CHANGE IN THIS
+- `npm test` — **9,769,450 / 0** (24.9.2026; 11,809,879 on 23.9 — the drop is
+  the buildable sweeps shrinking, see §0b). ⚠ A CHANGE IN THIS
   NUMBER IS NOT EVIDENCE OF ANYTHING; it is the product of the catalogue's list
   lengths. Read the failure count. (This line said **5,403,239** for two rounds
   after the stripe rework cut fourteen `DETAILS` entries, and then **4,349,768**
@@ -2669,6 +2670,89 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ A PULL BAR NEVER STANDS ACROSS A WINDOW OR A PANEL, AND THE LEVER
+  YIELDS FIRST — 24.9.2026.** A quick fix, off a screenshot of the live page:
+  the three-panel face with a gold Idan drawn straight down through all three
+  panels and the Coral still beside it. The owner's son: *"this cannot happen.
+  1 because a pull handle just cant be there. 2, i told you that if there is
+  no space for the pull handle, then the lever gets deleted and the pull
+  handle be put there. window and panels>pull handle>lever"*.
+  **The cause:** `gripPlacement` checked only where the bar's two FIXINGS
+  landed. A panel is a ring whose field is allowed, so an Idan with one foot
+  in the upper field and one in the lower passed while it crossed four
+  moulding runs and the whole handle plate. Measured read-only before the fix:
+  **every Idan and Nitzan placement on `panel2`, `panel3` and the Greek set,
+  540 of 540 each**, and 80 more beside the square window. Because the bar
+  "fitted", Part D's lever-first `repair` branch never ran.
+  **The fix, `js/renderer.js` only:**
+  · the whole grip's body may not overlap any window with its architrave, a
+    panel, a Greek-set piece or a bolted fitting. The bow alone may lie wholly
+    inside a field or on the Greek band, which keeps Part C's three homes;
+  · `gripIdeal` stopped putting a pull inside the panel field, so its ideal is
+    the stile on every face;
+  · the panelled length clamp is gone.
+
+  Two earlier decisions are overruled, and both comments now say so: the 27.8
+  *"the bar is 50 mm proud, so it may pass over a moulding"*, and *"a pull bar
+  on a panelled door goes INSIDE the panel"*. No rule changed; Part D's branch
+  now does what it was written for.
+  ⚠ **THE CLAMP WAS A SECOND FAULT: A 70 cm BAR WAS DRAWN 786 mm** on the panel
+  faces, stretched so its feet reached both fields, while it was priced and
+  ordered as 70 cm. That is a picture disagreeing with the price. It is now
+  asserted off the markup on every face.
+  **The screenshot's own link now opens** with `panel3` and the Idan kept, the
+  Coral swapped for the cylinder with the notice *"החלפנו את המנעול"*, and the
+  bar on the stile at 169 mm against a panel that starts at 196.
+  **Over the sweep:**
+  · 4,128 placed, 2,804 of them on a worked face;
+  · 976 lever swaps;
+  · 720 refused for the face.
+
+  ⚠ **The Greek set cannot take a stock-length bar beside it on four of six
+  sizes, even with the cylinder:** its shelf's cap reaches within 150 mm of
+  the lock edge, and on the standard leaf the Idan misses by 8 mm. The tile
+  greys with *"the panels are in the way, and they stay"*. Shorter bars fit,
+  placed higher. The face tile does NOT yet warn in advance when choosing the
+  set would cost the bar (the window tiles do); the tap still drops the bar
+  with a toast. Left out for speed.
+  ⚠ **Peretz's own d087 now draws its bar on the stile** (x 290 → 169). Its
+  photograph shows the bar across the panels (`collide.mjs`'s exemption note
+  cites d122 as well; its drawn bar already stood on the stile and does not
+  move). Measured, overruled, kept.
+  **Asserted.** In `npm test`, *"a pull bar never stands across a window or a
+  panel"*:
+  · the reported link;
+  · every accepted grip's body, built from the catalogue's width and length
+    rather than the rule's own footprint;
+  · the drawn bar length against the priced one;
+  · §5.15 floors for placed, swapped and refused;
+  · the clause that must stay true: a plain solid leaf with the cylinder takes
+    every grip.
+
+  **Falsified both ways:** with the body check off, 1,592 grips cross a frame
+  and the reported link fails; with the clamp back, *"drawn 786 mm long and
+  priced at 700"*.
+  **Gates:**
+  · `npm test` **9,769,450 / 0**. It went from 11.8M because the buildable
+    sweeps shrink: a bar beside a lever on a panelled face is now a repaired
+    door;
+  · `npm run collide -- all` clean over 1,078 designs.
+
+  **Sheets:** exactly two bare sheets moved, `corpus-06` and `recreate-d087`,
+  and both are d087's bar moving onto the stile. 0 of 6 lockset sheets moved.
+  Some `shot` sheets moved, which proves nothing (§7): `plate` and `digital`
+  differ by a max channel delta of 2 and 7 on doors whose state did not
+  change.
+  **Not touched, for speed:**
+  · the face-tile warning;
+  · `tools/collide.mjs`'s *"hardware over face detail is layering"* exemption,
+    which still does not measure a grip against a moulding;
+  · an audit block;
+  · the §3 sweep.
+
+  They are the full version in the plan file, and the owner's son asked for
+  the quick fix.
 
 - **⚠ PERETZ'S SECOND REVIEW, PART F — THE RECORD, SWEPT AGAINST WHAT THE
   ROUND MADE FALSE — 23.9.2026.** No code. What was stale, and it is the

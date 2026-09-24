@@ -3030,7 +3030,6 @@ ${stops}
   var taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
   var taperHalf = (t, L2) => TAPER_HALF_NECK - (TAPER_HALF_NECK - TAPER_HALF_CAP) * (t / L2);
   var LOCK_CLEAR = 15;
-  var PANEL_GAP = 25;
   var MOULD_BAND = 70;
   var BAR_GAP = 0.125;
   var BAR_GAP_MIN = 0.09;
@@ -3262,7 +3261,6 @@ ${stops}
       x1: mainX + Math.max(...openings.map((o) => o.x + o.w))
     } : null;
     const rawStandoff = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
-    const panelled = detail.panel && !win.rects.length;
     const place = gripAt(state2);
     const handleX = lockX + inward * (place.x - lockBackset(handle, lockset));
     const handleY = y0 + place.y;
@@ -4748,7 +4746,7 @@ ${stops}
       centreX,
       leafW,
       y0,
-      panelled && place.rot !== 90,
+      false,
       place.rot
     )}
     ${locksetArt(lockset, lockX, y(lockAff(lockset)), leverDir)}
@@ -5070,7 +5068,7 @@ ${body}
   }
   var EDGE_FLAT = EDGE;
   var hingeLeftOf = (state2) => byId(HANDINGS, state2.handing).hinge === "left";
-  var gripPanelled = (state2, place) => byId(DETAILS, state2.detail).panel && !byId(WINDOWS, state2.window).rects.length && place.rot !== 90;
+  var gripPanelled = () => false;
   var footHits = (f, ob) => {
     const inside = (x, y, r) => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h;
     const near = { x: ob.x - f.r, y: ob.y - f.r, w: ob.w + f.r * 2, h: ob.h + f.r * 2 };
@@ -5250,8 +5248,7 @@ ${body}
     const backset = lockBackset(handle, lockset);
     const raw = gripStandoff(handle, lockset, leafW, leafH, glassClearance(state2));
     const panelled = detail.panel && !byId(WINDOWS, state2.window).rects.length;
-    const insideField = leafW * PANEL_INSET + MOULD_BAND + PANEL_GAP - backset;
-    const standoff = handle.pull && panelled ? Math.max(raw, insideField) : raw;
+    const standoff = raw;
     const grabY = () => {
       if (detail.classic) return leafH * (CLASSIC_ROWS.band[0] + CLASSIC_ROWS.band[1]) / 2;
       if (panelled) {
@@ -5449,15 +5446,21 @@ ${body}
         return bad(T("why.gripTouchesLock"));
       }
     }
-    for (const o of apertureLayout(
-      byId(WINDOWS, state2.window),
-      leafW,
-      byId(DETAILS, state2.detail),
-      leafH
-    )) {
-      if (cgx0 < o.x + o.w && cgx1 > o.x && Math.abs(p.y - (o.top + o.h / 2)) < gh + o.h / 2) {
-        return bad(T("why.gripCrossesWindow"));
+    const by0 = p.rot === 90 ? p.y - Math.max(grip.out, grip.in) : p.y - gh;
+    const by1 = p.rot === 90 ? p.y + Math.max(grip.out, grip.in) : p.y + gh;
+    const within = (x0, y0, x1, y1) => cgx0 >= x0 && cgx1 <= x1 && by0 >= y0 && by1 <= y1;
+    for (const ob of obstacles) {
+      if (!(cgx0 < ob.x + ob.w && cgx1 > ob.x && by0 < ob.y + ob.h && by1 > ob.y)) continue;
+      if (handle.style === "grab") {
+        if (ob.plate && within(ob.x, ob.y, ob.x + ob.w, ob.y + ob.h)) continue;
+        if (ob.band && !ob.plate && within(
+          ob.x + ob.band,
+          ob.y + ob.band,
+          ob.x + ob.w - ob.band,
+          ob.y + ob.h - ob.band
+        )) continue;
       }
+      return bad(ob.kind === "window" ? T("why.gripCrossesWindow") : ob.kind === "moulding" ? T("why.feetOnFace") : T("why.feetOnPanel"));
     }
     return at;
   }
