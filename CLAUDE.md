@@ -899,14 +899,18 @@ its own table with its own doors named.
 `PANEL_INSETS` holds the one inset that is not `PANEL_INSET`.
 
 - `pair` 0.07–0.58 and 0.66–0.92, inset 0.23.
-- `trio` 0.061–0.455, 0.480–0.586, 0.607–0.944, inset **0.23 by instruction**
-  (measured 0.15 — see above). ⚠ **The middle rectangle is a HANDLE PLATE** on
+- `trio` **0.064–0.497, 0.523–0.617, 0.642–0.913** since 24.9.2026, off an
+  installed door the owner's son sent, de-keystoned and checked against the
+  peephole and the lever (§0b). Inset **0.23 by instruction** (measured 0.15
+  on 14.9, and 0.20 on the 24.9 photograph — see above). ⚠ **The middle rectangle is a HANDLE PLATE** on
   d067, d068 and d077, which carry a turned pull through it; d065, d070 and
   d087 are the same door WITHOUT the plate. The face stopped bringing its own
   pull on 14.9 (*"the handle should only appear if i choose it"*), and a bow
   chosen on this face is homed IN that plate's field since 20.9 (`gripIdeal`).
-  The check that the rows are right is the MARGINS: 125 mm at the head, 115 at
-  the foot — equal, which is what a panelled door is.
+  ⚠ The 14.9 check — equal margins, 125 mm head and 115 foot — was read off
+  photographs partly shot from below. The 24.9 door has a deeper bottom rail
+  (0.087 against 0.064 at the head); what it confirms instead is two EQUAL
+  rails either side of the plate, 0.026 and 0.025.
 
 **The stripes are a COUNT and a DIRECTION, not tiles in this list, since
 27.8.2026** — Peretz prices them per stripe and asked for the complicated
@@ -2671,6 +2675,38 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE THREE-PANEL FACE RE-MEASURED OFF AN INSTALLED DOOR, AND THE BOW
+  NOW HANGS BELOW THE LEVER — 24.9.2026.** Sent in beside a screenshot of
+  ours: *"our panel proportions are not so great, please fix them, you can see
+  that the pull handle on the actual image that the horizontal is a little bit
+  below the main handle."* One phone photograph of a black `panel3` door with
+  a turned pull on the plate and a lever beside it.
+  ⚠ **THE PHOTOGRAPH IS A TRAPEZOID AND WAS NOT READ STRAIGHT.** The casing is
+  506 px across at the head and 404 at the foot, linear in y (residual under
+  4 px at three intermediate rows), so the camera is above mid-door and the
+  foot is compressed. Each edge went through the 1-D homography that taper
+  implies, `t = v / (1 − k v)`. Raw → true: upper 0.080–0.555 → **0.064–0.497**,
+  plate 0.581–0.670 → **0.523–0.617**, lower 0.694–0.930 → **0.642–0.913**.
+  ⚠ **What makes it a measurement rather than a transform picked to look
+  right:** the same map puts the peephole at 0.221 of the leaf against
+  `PEEPHOLE_AFF`'s 0.207 and the lever at 0.505 against `HANDLE_AFF`'s 0.494 —
+  two heights this file already held, from other doors, within 0.015. Read
+  raw they were 0.264 and 0.564. And the two rails either side of the plate
+  come out equal, 0.026 and 0.025.
+  **The bow follows by construction**: `gripIdeal` centres it on `rows[1]`, so
+  its home on the standard leaf moves from about 1093 mm below the head to
+  **1168.5**, which is below the lever as on the photograph. No constant was
+  typed for it.
+  ⚠ **THE WIDTH WAS MEASURED AND DELIBERATELY NOT MOVED.** The photograph's
+  panels stand 0.20 of the leaf from each edge (0.202/0.187 at the upper,
+  0.20/0.19 at the lower); we draw 0.23 because Peretz asked on 14.9 for the
+  trio to match the pair, and `npm test` pins that equality. It is a one-number
+  change (`PANEL_INSETS.trio = 0.20`, plus restating that assertion) and it is
+  the owner's to take, not an agent's.
+  **Gates.** `npm test` 0 failed after the sheets · `collide -- all` 1,110
+  designs clean, `-- boxes` clean · **0 of 48 bare sheets moved** — no gallery
+  door and no comparison fixture carries `panel3` — and 7 `shot` sheets moved,
+  which proves nothing either way (§7) · `npm run audit` — see the commit.
 - **⚠ A PULL BAR NEVER STANDS ACROSS A WINDOW OR A PANEL, AND THE LEVER
   YIELDS FIRST — 24.9.2026.** A quick fix, off a screenshot of the live page:
   the three-panel face with a gold Idan drawn straight down through all three

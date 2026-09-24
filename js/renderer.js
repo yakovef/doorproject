@@ -3861,9 +3861,34 @@ const PANEL_INSET_MAX = 0.39;  // measured maximum: never narrower than a real o
  * 0.92, which is 0.024. The tolerance the test states is 0.03, chosen to be
  * honest about that rather than tightened until the sentence came true.
  */
+/* ⚠ AND RE-READ ON 24.9.2026 OFF AN INSTALLED DOOR, WHICH MOVED EVERY ROW.
+ * Sent in beside a screenshot of ours: *"our panel proportions are not so
+ * great ... the horizontal is a little bit below the main handle."* One phone
+ * photograph, black leaf, the turned pull on the plate and a lever beside it.
+ * The camera is above mid-door, so the leaf is a trapezoid — the casing
+ * measures 506 px across at the head and 404 at the foot, linear in between —
+ * and every edge was put through the one-dimensional homography that taper
+ * implies (t = v / (1 - k v), k off the width's own slope) rather than read
+ * straight off the frame.
+ *
+ *              upper          plate          lower
+ *     raw    0.080-0.555   0.581-0.670   0.694-0.930
+ *     true   0.064-0.497   0.523-0.617   0.642-0.913
+ *
+ * ⚠ THE CORRECTION WAS CHECKED AGAINST TWO FITTINGS WHOSE HEIGHTS THIS FILE
+ * ALREADY HOLDS, and that is what makes it a measurement. Put through the
+ * same map, the peephole lands at 0.221 of the leaf against PEEPHOLE_AFF's
+ * 0.207 and the lever at 0.505 against HANDLE_AFF's 0.494; uncorrected they
+ * read 0.264 and 0.564. The two rails come out equal (0.026 and 0.025), which
+ * a real door's joinery is and a bad reading is not.
+ * What it changes: the upper panel is taller, the plate sits 0.04 LOWER —
+ * about 90 mm — and the lower panel is shorter with a deeper bottom rail. The
+ * bow is centred on the plate by `gripIdeal`, so it moves down with it and
+ * ends up below the lever, as it is on the photograph. The three-photograph
+ * mean of 14.9 is kept above; it was read off doors partly shot from below. */
 const PANEL_ROWS = {
   pair: [[0.07, 0.58], [0.66, 0.92]],
-  trio: [[0.061, 0.455], [0.480, 0.586], [0.607, 0.944]],
+  trio: [[0.064, 0.497], [0.523, 0.617], [0.642, 0.913]],
   top:  [[0.07, 0.58]],
   lone: [0.68, 0.90],
 };
