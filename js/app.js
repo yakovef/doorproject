@@ -351,9 +351,28 @@ const SECTIONS = [
      `tools/audit.mjs`, which asserts the WHOLE sequence off the rendered
      navigator rather than a pair-wise rule — so a half-finished reorder fails
      there rather than shipping. */
+  /* ⚠ AND THE פרזול COMES STRAIGHT AFTER THE LEVER, 25.9.2026, ON THE OWNER'S
+     SON'S WORD: *"the pirzul page needs to be straight after the lever
+     page."* It stood after the grip, where 30.8 put it when the three
+     hardware steps moved ahead of `face` as one block.
+     ⚠ FOURTH MOVE OF THIS LIST AND THE FIRST WITH A REASON THE PAGE ITSELF
+     STATES: the פרזול is the FINISH of the lock furniture chosen one step
+     earlier — `exp.pz.a` names the lever and its keyhole first among what it
+     recolours — so a customer who has just picked a Coral lever is asked what
+     metal it is in while the lever is still the thing they are looking at.
+     Asked after the pull handle, the answer applied to something two screens
+     back. The grip keeps its own finish (`hf=`) on its own step, which is why
+     the two can be separated at all without splitting one question in half.
+     Peretz's *"handles before the panels"* (30.8) is untouched — `lock`, `pz`
+     and `grip` all still stand ahead of `face` — and so is his *"the lockset
+     section should come before the pull handle section"* (14.9): `lock` is
+     still ahead of `grip`, with the finish of what `lock` chose between them.
+     What has to move with it is `WANT_ORDER` in `tools/audit.mjs`, which
+     asserts the WHOLE sequence off the rendered navigator, so a half-finished
+     reorder fails there rather than shipping. */
   { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock' },
-  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip' },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz' },
+  { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip' },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face' },
   { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass' },
   { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk',
@@ -1325,39 +1344,42 @@ function buildPanel() {
     <div class="sect__foot">
       <button type="button" class="btn btn--ghost sect__back">${T('nav.back')}</button>
     </div>`;
-  /* ── THE ONE QUESTION THE PAGE ANSWERED FOR THEM, ASKED BACK ─────────
-     ⚠ `handing` IS THE ONLY FIELD WITH A DEFAULT THAT COSTS MONEY TO GET
-     WRONG. `CLAUDE.md` calls the ימין/שמאל convention the only mistake on the
-     list that costs real money — the site had it backwards for weeks — and
-     `js/url-state.js` has to give it a value, because the drawing must draw
-     something. Measured on the live page at 1280x720: on arrival the ONLY
-     controls the fold cuts through are the two handing pills at the foot of
-     step 1. Pre-answered, below the fold, and accepted by pressing הבא.
+  /* ── THE HANDING CONFIRMATION IS GONE, 25.9.2026, AND WHAT IT PROTECTED IS
+     ────────────────────────────────────────────────────────────────────
+     The owner's son: *"in the final section, remove the thing that asks you if
+     you are sure that the side of the door is right, it just takes up space."*
+     It was a `.sum-hand` card at the TOP of the summary's body — a question, the
+     `handingWords()` sentence, and a flip button — 122 px of the one screen
+     `PLAN.md` §3.3 asks to be "one clean card that survives being screenshotted
+     and forwarded", and it was measured as the block standing between the
+     summary's heading and its spec table in §9's *"the summary cannot show its
+     whole spec at 1280x720"*.
 
-     ⚠ THIS IS OPTION B OF THE TWO THE REVIEW OFFERED, AND THE OTHER ONE COSTS
-     A VERSION BUMP. "No default" means a third value in a field the short
-     code packs as an INDEX into `HANDINGS`, so every code already written
-     would be refused — for a question we can simply ask again, one screen
-     later, where it can still be changed. No new value, no bit, no
-     `VERSION`, and `DEFAULTS` is untouched.
+     ⚠ THE ARGUMENT FOR IT WAS SOUND AND IS NOT THROWN AWAY, BECAUSE THE PAGE
+     ANSWERS IT ANOTHER WAY NOW. `handing` really is the only default in this
+     product that costs money to get wrong — the ימין/שמאל convention was
+     backwards for weeks — and `js/url-state.js` must give it a value because
+     the drawing has to draw something. What has changed since `UX-FINDINGS` §2
+     put this card here is that **every spec row is a button back to the
+     question that asked it** (14.9.2026): the summary's table carries a פתיחה
+     row, in `handingWords`'s own vocabulary through `row.handing`, and tapping
+     it goes to step 01 with the two pills under the customer's thumb. So the
+     fact is still stated on the screen the customer is told to proof-read, in
+     the order's own words, one tap from being changed — which is what the card
+     did, without a card.
+     And the SENTENCE itself is untouched where it matters: `handingWords()`
+     still writes the WhatsApp order (`js/share.js`) and the A4 sheet, which are
+     the two artefacts Peretz reads. The one thing that is gone is the second
+     copy of it on the page, and `[data-handing-words]` has no reader left —
+     `paint` no longer writes it, because a loop over an attribute nothing
+     carries is the dead branch a later reader wires back up.
 
-     The sentence is `handingWords()`, which is what the ORDER says, so the
-     customer confirms in the words Peretz will read. It goes FIRST in the
-     body, above everything, because a confirmation buried under a spec table
-     is the fault this fixes wearing a different hat. */
-  const hand = document.createElement('div');
-  hand.className = 'sum-hand';
-  hand.innerHTML =
-    `<p class="sum-hand__q">${T('sum.hand.q')}</p>`
-    + '<p class="sum-hand__v" data-handing-words></p>'
-    + `<button type="button" class="btn btn--ghost sum-hand__flip">${T('sum.hand.flip')}</button>`;
-  /* Two handings, so confirming is a toggle. Through `set` like every other
-     control — same repair, same history, same URL. */
-  hand.querySelector('.sum-hand__flip').addEventListener('click', () => {
-    const other = HANDINGS.find(h => h.id !== state.handing) || HANDINGS[0];
-    set({ ...state, handing: other.id });
-  });
-  sum.querySelector('.sect__body').appendChild(hand);
+     ⚠ AND THE AUDIT'S THREE ASSERTIONS WENT WITH IT rather than being softened:
+     the row exists, its control is whole on screen, and its sentence equals
+     `handingWords()` to the character. The third is the one worth naming, and
+     the check that replaces it is stronger in the one way that matters — the
+     spec table's own handing row must still SAY what the order says, which is
+     asserted for every row at once by `#spec` being built from `specRows`. */
 
   if (SUMMARY.exp) {
     const d = document.createElement('details');
@@ -2410,8 +2432,21 @@ function choose(g, id) {
      from — so the tap and the tile cannot disagree about why.
      ⚠ A handle whose only obstacle is the LEVER is not greyed at all, and its
      tap goes through `repair` below, which swaps the lever for the cylinder
-     and says so. That is the half of his sentence about the lever going. */
-  if ((g.key === 'handle' || g.key === 'lockset') && id !== state[g.key]) {
+     and says so. That is the half of his sentence about the lever going.
+
+     ⚠ AND THE עינית JOINED THEM ON 25.9.2026, on the owner's son's *"digital
+     and normal peepholes arent compatable with a window"* — which brought the
+     viewer under the same rule: a fitting never costs the glass. Before today a
+     tap on the greyed viewer removed the WINDOW; now the window stays, so
+     `repair` would set the viewer and take it straight back off, and the toast
+     would read *"we removed the peephole"* to somebody who had just tried to
+     add one. Saying the tile's own reason is both shorter and true.
+     ⚠ THE פעמון IS DELIBERATELY NOT IN THIS LIST. Nothing he has said reaches
+     the bell, so a bell tap still drops the glass and still goes through
+     `repair`, which is why that branch in `js/rules.js` had to keep asking
+     about both fittings together rather than becoming two. */
+  if ((g.key === 'handle' || g.key === 'lockset' || g.key === 'peephole')
+      && id !== state[g.key]) {
     const why = conflicts(state)[g.key][id];
     if (why) {
       if (g.key === 'lockset') openClash(); else toast(why);
@@ -2828,13 +2863,13 @@ function paint() {
   document.querySelectorAll('[data-price]').forEach(el => { el.textContent = money; });
   renderBreakdown(state);
 
-  /* The handing confirmation on the summary, written the same way and for the
-     same reason: `handingWords` is the sentence the ORDER carries, so the
-     customer confirms in the words Peretz will read rather than in a second
-     phrasing that could drift from it. Written to every element that claims
-     to show it, never to an id. */
-  const hw = handingWords(state);
-  document.querySelectorAll('[data-handing-words]').forEach(el => { el.textContent = hw; });
+  /* ⚠ THE HANDING SENTENCE USED TO BE WRITTEN HERE TOO, over every
+     `[data-handing-words]`, for the summary's confirmation card. The card went
+     on 25.9.2026 at the owner's request and nothing on the page carries that
+     attribute any more, so the loop went with it rather than staying as a
+     no-op somebody would later feed. `handingWords()` still writes the
+     WhatsApp order and the A4 sheet, which are where Peretz reads it, and the
+     summary states the same fact through its spec table's פתיחה row. */
 
   /* ⚠ EVERY GROUP, FROM THE REAL ARITHMETIC. This loop used to run over the
      grille group alone, under a comment ending "Only the grille group needs

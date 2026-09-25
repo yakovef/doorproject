@@ -302,27 +302,16 @@
       "Не уверены? Уточним вместе при замере."
     ],
     "g.panels": ["פאנלים", "Panels", "Панели"],
-    /* ⚠ THE ONE QUESTION THE PAGE ANSWERS FOR THE CUSTOMER, ASKED BACK.
-       `handing` has to have a default — the drawing must draw something — and
-       this file calls the ימין/שמאל convention the only mistake on the list
-       that costs real money. Measured on the live page at 1280x720: on arrival
-       the ONLY controls the fold cuts through are the two handing pills. So the
-       highest-stakes decision in the product is pre-answered, below the fold,
-       and the natural gesture — glance, press הבא — accepts it in silence.
-       This is the confirm row on the summary. It is not a second control: same
-       `set()`, same field, no new value, no wire format, no VERSION. The
-       sentence is `handingWords()`, which is what the ORDER already says, so
-       the customer reads the words Peretz will read. */
-    "sum.hand.q": [
-      "כיוון הפתיחה — נכון?",
-      "The opening direction — is this right?",
-      "Сторона открывания — верно?"
-    ],
-    "sum.hand.flip": [
-      "החלפה לצד השני",
-      "Switch to the other side",
-      "Сменить на другую сторону"
-    ],
+    /* ⚠ `sum.hand.q` AND `sum.hand.flip` STOOD HERE AND ARE GONE, 25.9.2026 —
+       the summary's handing confirmation, withdrawn at the owner's request. The
+       thing they protected is real and is protected elsewhere now: `handing` is
+       the only default in this product that costs money to get wrong, and since
+       14.9 the summary's spec rows are buttons back to their own question, so
+       the פתיחה row says it in `handingWords`'s own words and one tap changes
+       it. `js/app.js`'s `buildPanel` carries the whole argument.
+       ⚠ A COPY KEY IS NOT A WIRE FORMAT — nothing outside this file addresses
+       one, so a withdrawn string leaves nothing behind. That is exactly why an
+       OPTION id may never be deleted and a copy key may. */
     "g.colour.h": [
       "הקוד שליד כל גוון הוא הקוד של היצרן.",
       "The code beside each shade is the manufacturer’s own.",
@@ -442,10 +431,21 @@
                         safe lock and the keypad, and the ספיר and כדור handles —
                         all bought-in in one finish, on the owner's word 31.8
            two only     the doorbell — nickel or gold, on the owner's word */
+    /* ⚠ THE כדור LEFT THE "DOES NOT" LIST ON 25.9.2026, on the owner's son's
+       *"the ball handle needs to be affected by the pirzul"* — and this sentence
+       is the reason that change is not finished until this file is edited.
+       CLAUDE.md §3 keeps a table of what the פרזול reaches in both directions
+       and says of it: *"Each row has been wrong in shipped copy at least once,
+       and never as a crash: a promise the picture quietly did not keep."* The
+       strips said "not changed" for a round after Peretz reversed it; the
+       peephole was listed as following the finish while the drawing painted it
+       from the constant ramp. This is the same row moving again, and the only
+       thing that stops it being the same defect is editing the sentence in the
+       same commit as the gradient. The ספיר stays: he named the ball. */
     "exp.pz.a": [
-      "את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
-      "The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
-      "Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
+      "את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית, סגר הביטחון וידית הכדור — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את ידית ספיר: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
+      "The tone of the lever you turn, the keyhole, the hinges, the peephole, the security latch and the ball knob — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the Sapir handle: those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
+      "Оттенок нажимной ручки, замочной скважины, петель, глазка, предохранительной защёлки и шаровой ручки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручку «Сапир»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
     ],
     "exp.sum.q": [
       "מה קורה אחרי שאני שולח?",
@@ -736,10 +736,20 @@
     "fix.peepGone": ["הסרנו את העינית — החלון תופס בדיוק את מקומה", "We removed the peephole — the window sits exactly where it goes", "Мы убрали глазок — окно занимает как раз его место"],
     "fix.bellGone": ["הסרנו את הפעמון — החלון תופס את מקומו במרכז הדלת", "We removed the doorbell — the window sits where it goes, on the centre of the door", "Мы убрали звонок — окно занимает его место по центру двери"],
     "fix.stripesCapped": ["פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת", "Vertical stripes cap at 6 — more than that will not fit across the door", "Вертикальных полос максимум 6 — больше по ширине двери не помещается"],
+    /* ⚠ AND IT SAYS THE WINDOW STAYS, 25.9.2026 — the same clause
+       `why.noRoomHandleWindow` carries, for the same reason. On 20.9 a greyed
+       pull handle learned to name its obstacle AND say that the obstacle is not
+       going anywhere, because Peretz's rule is that a fitting never costs the
+       glass; the viewer came under that rule today (*"digital and normal
+       peepholes arent compatable with a window"*) and its tile has to say the
+       same thing. Without the second clause a customer reads "the window sits
+       where the peephole goes" as an invitation to tap it and find out which one
+       wins — and the answer is now always the window, which the sentence should
+       not make them discover. */
     "why.peepWindow": [
-      "החלון תופס את מקום העינית",
-      "The window sits where the peephole goes",
-      "Окно занимает место глазка"
+      "החלון תופס את מקום העינית — והוא נשאר",
+      "The window sits where the peephole goes — it stays",
+      "Окно занимает место глазка — оно остаётся"
     ],
     "why.bellWindow": [
       "החלון תופס את מקום הפעמון",
@@ -2962,6 +2972,10 @@ ${stops}
       rim: scaleTone(tone[CYL_REF_RIM], CYL_LIFT_RIM)
     };
   }
+  var DOME_STEEL = ["#F2EEEA", "#E3DFDB", "#5D5249", "#988E86", "#6B625B"];
+  var DOME_REF = [6, 6, 5, 2, 5];
+  var DOME_LIFT = DOME_STEEL.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[DOME_REF[i]]));
+  var domeRamp = (tone) => tone === FINISH_TONES.steel ? DOME_STEEL : DOME_LIFT.map((m, i) => scaleTone(tone[DOME_REF[i]], m));
   var bellRamp = (tone) => tone;
   var LIGHT = {
     key: 0.24,
@@ -3010,8 +3024,21 @@ ${stops}
   var SPECIAL_BOX = { kasefet: { w: 50, h: 68 }, kodan: { w: 60, h: 154 } };
   var KNOCKER_AFF = 1470;
   var PEEPHOLE_R = 15;
-  var PEEPHOLE_DIGITAL_R = 27;
-  var peepholeR = (state2) => byId(PEEPHOLES, state2.peephole).digital ? PEEPHOLE_DIGITAL_R : PEEPHOLE_R;
+  var PEEPHOLE_DIGITAL = {
+    w: 48,
+    // mm across the plate
+    h: 92,
+    // mm down it
+    lens: 0.3,
+    // the camera's centre, as a fraction of the height from the top
+    lensR: 8
+    // the lens housing's radius — an 16 mm eye in a 48 mm plate
+  };
+  var peepholeReach = (state2) => byId(PEEPHOLES, state2.peephole).digital ? {
+    x: PEEPHOLE_DIGITAL.w / 2,
+    up: PEEPHOLE_DIGITAL.h * PEEPHOLE_DIGITAL.lens,
+    down: PEEPHOLE_DIGITAL.h * (1 - PEEPHOLE_DIGITAL.lens)
+  } : { x: PEEPHOLE_R, up: PEEPHOLE_R, down: PEEPHOLE_R };
   var KNOCKER_R = 66;
   var KNOCKER_REACH = {
     x: KNOCKER_R * 0.86,
@@ -3218,6 +3245,7 @@ ${stops}
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
     const cyl = cylinderRamp(hwTone);
+    const dome = domeRamp(hwTone);
     const bellTone = bellRamp(tone);
     const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "steel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -3630,7 +3658,19 @@ ${stops}
          long backplate that carries the keyway) and the photograph this
          drawing came from, d092, is BRONZE — so it demonstrably ships in more
          than one finish. The owner named two handles; these are those two.
-         ASK-PERETZ §0a7 puts the near-name to him. -->
+         ASK-PERETZ §0a7 puts the near-name to him.
+
+         ⚠ AND THE כדור LEFT THIS EXEMPTION ON 25.9.2026 — HALF OF THE 31.8
+         INSTRUCTION IS REVERSED, ON THE OWNER'S SON'S WORD: *"the ball handle
+         needs to be affected by the pirzul."* So lockUnitSoft and
+         lockUnitFace are the ספיר's alone now, plus the two bought-in locks
+         lockUnit was always for; the cadoor's shank paints with nickelSoft
+         and its ball with domeKnob, which passes its measured stops through
+         inFinish with hwTone. The quote above is kept rather than rewritten —
+         a withdrawn instruction is the thing a later reader most needs to see
+         beside the one that withdrew it, which is how cylinderRamp and
+         bellRamp are written. The ספיר is untouched: he named the ball, and
+         a square cushion knob in mirror chrome is not it. -->
     <linearGradient id="lockUnitSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${FINISH_TONES.steel[1]}"/>
       <stop offset="0.5" stop-color="${FINISH_TONES.steel[3]}"/>
@@ -3866,13 +3906,31 @@ ${stops}
       <stop offset="0.78" stop-color="#5A4B40"/>
       <stop offset="1"   stop-color="#8C8179"/>
     </linearGradient>
-    <!-- Cadoor's dome: a hard terminator, not a smooth falloff. -->
+    <!-- Cadoor's dome: a hard terminator, not a smooth falloff.
+         ⚠ AND IT FOLLOWS THE פרזול SINCE 25.9.2026, WHICH OVERRULES 31.8.
+         The owner's son: *"the ball handle needs to be affected by the
+         pirzul."* The 31.8 instruction that put this knob outside the finish
+         axis — *"the pirzul doesnt change the color of the ספיר and כדור
+         handles"* — is kept in full beside lockUnitSoft above, as the
+         instruction this one overrules, the way cylinderRamp and bellRamp
+         keep theirs. The ספיר is NOT in this reversal: he named the ball.
+
+         ⚠ THE MEASURED PROFILE IS CARRIED ACROSS, NOT REPLACED, AND inFinish
+         IS THE WRONG TOOL FOR IT — the whole derivation, the numbers that
+         refuse inFinish here, and why nickel stays byte-identical are written
+         out at domeRamp beside cylinderRamp. What matters at this site is only
+         that the five stops come from one function of one ramp.
+         ⚠ hwTone, NEVER tone. tone is the PULL HANDLE's metal and the
+         five-owners rule in CLAUDE.md §3 is that every ramp answers "whose
+         metal is this?" before it picks a fill. A knob you turn is lock
+         furniture, so it is the פרזול's — which is the whole of what he
+         asked. -->
     <radialGradient id="domeKnob" cx="0.34" cy="0.26" r="0.86">
-      <stop offset="0"    stop-color="#F2EEEA"/>
-      <stop offset="0.28" stop-color="#E3DFDB"/>
-      <stop offset="0.42" stop-color="#5D5249"/>
-      <stop offset="0.72" stop-color="#988E86"/>
-      <stop offset="1"    stop-color="#6B625B"/>
+      <stop offset="0"    stop-color="${dome[0]}"/>
+      <stop offset="0.28" stop-color="${dome[1]}"/>
+      <stop offset="0.42" stop-color="${dome[2]}"/>
+      <stop offset="0.72" stop-color="${dome[3]}"/>
+      <stop offset="1"    stop-color="${dome[4]}"/>
     </radialGradient>
     <!-- Sapir: mirror chrome is bright at both edges with a dark reflected
          core — the opposite of the satin gradient everything else uses. -->
@@ -5159,14 +5217,14 @@ ${body}
       });
     }
     if (state2.peephole && state2.peephole !== "nopeep") {
-      const R = peepholeR(state2);
+      const R = peepholeReach(state2);
       out.push({
         kind: "fitting",
         band: 0,
-        x: leafW / 2 - R,
-        y: leafH - PEEPHOLE_AFF - R,
-        w: R * 2,
-        h: R * 2
+        x: leafW / 2 - R.x,
+        y: leafH - PEEPHOLE_AFF - R.up,
+        w: R.x * 2,
+        h: R.up + R.down
       });
     }
     const sp = SPECIAL_BOX[state2.speciallock];
@@ -5183,18 +5241,7 @@ ${body}
     return out;
   }, (st) => `${st.size}|${st.detail}|${st.window}|${st.bell}|${st.peephole}|${st.speciallock}`);
   function peepholeFits(state2) {
-    const size = SIZES[state2.size] || SIZES.standard;
-    const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-    const openings = apertureLayout(
-      byId(WINDOWS, state2.window),
-      leafW,
-      byId(DETAILS, state2.detail),
-      leafH
-    );
-    if (!openings.length) return true;
-    const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
-    const R = peepholeR(state2) + 8;
-    return !openings.some((o) => cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
+    return !leafGlazed(state2);
   }
   function bellFits(state2) {
     const size = SIZES[state2.size] || SIZES.standard;
@@ -5651,89 +5698,108 @@ ${body}
     }
     if (kind === "vine") {
       const ink = scaleTone(paint2, 1.06);
-      const STEM = w * 0.03, OUT = w * 0.021, THIN = w * 0.014;
-      const str = (d2, sw) => `<path d="${d2}" fill="none" stroke="${ink}"
-      stroke-width="${sw.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      const INK = w * 0.0265;
+      const str = (d) => `<path d="${d}" fill="none" stroke="${ink}"
+      stroke-width="${INK.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
       let out = "";
-      const pitch = w * 0.26;
-      const n = Math.max(4, Math.round(h / pitch));
-      const stemX = (t) => x + w * (0.5 + 0.2 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
-      let d = `M ${n2(stemX(-0.03))} ${n2(y - h * 0.03)}`;
-      for (let i = 1; i <= 48; i++) {
-        const t = -0.03 + 1.06 * i / 48;
-        d += ` L ${n2(stemX(t))} ${n2(y + h * t)}`;
+      const MID = 0.5, AMP = 0.045, WAVE = 1.05;
+      const half = w * WAVE / 2;
+      const yTop = y - half, yBot = y + h + half;
+      const stemX = (t) => x + w * (MID + AMP * Math.sin(t * Math.PI));
+      const nHalf = Math.ceil((yBot - yTop) / half);
+      {
+        let d = `M ${n2(x + w * MID)} ${n2(yTop)}`;
+        for (let i2 = 0; i2 < nHalf; i2++) {
+          const dir = i2 % 2 ? -1 : 1;
+          d += ` Q ${n2(x + w * (MID + dir * AMP * 2))} ${n2(yTop + half * (i2 + 0.5))} ${n2(x + w * MID)} ${n2(yTop + half * (i2 + 1))}`;
+        }
+        out += str(d);
       }
-      out += str(d, STEM);
-      const KIND = ["leaf", "cluster", "leaf", "leaf", "cluster", "leaf", "cluster", "leaf"];
-      const LSZ = [1, 0.86, 1.15, 0.94, 1.08, 0.9];
-      const LROT = [-25, 15, -10, 30, -35, 20];
-      const BR = [1, 0.95, 0.78, 0.92, 1.18, 1.02, 0.95, 1.05, 1];
-      for (let i = 0; i < n; i++) {
-        const t = (i + 0.5) / n;
-        const ay = y + h * t, side = i % 2 ? 1 : -1;
-        const ax = stemX(t) + side * w * 0.26;
-        if (KIND[i % 8] === "cluster") {
-          const r = w * 0.065;
-          let k = 0;
-          [3, 3, 2, 1].forEach((per, row) => {
-            for (let c = 0; c < per; c++) {
-              const f = BR[k % BR.length];
-              k++;
-              const bx = ax + (c - (per - 1) / 2) * r * 2.04 + (row % 2 ? r * 0.5 : 0);
-              const by = ay + row * r * 1.76;
-              out += `<circle cx="${n2(bx)}" cy="${n2(by)}" r="${n2(r * f)}" fill="none"
-                            stroke="${ink}" stroke-width="${OUT.toFixed(2)}"/>`;
-            }
-          });
-          out += str(`M ${n2(stemX(t))} ${n2(ay - r)} Q ${n2((stemX(t) + ax) / 2)} ${n2(ay - r * 1.8)}
-                    ${n2(ax)} ${n2(ay - r * 1.1)}`, THIN);
+      const stemAt = (yy) => x + w * (MID + AMP * Math.sin((yy - yTop) / half * Math.PI));
+      const LOBE_OUT = 0.3, POW_OUT = 0.55;
+      const LOBE_IN = 0.34, POW_IN = 1.9;
+      const APEX = 0.1, SINUS = 0.4, SINUS_D = 0.72;
+      const leafR = (th) => {
+        const c = Math.cos(5 * th);
+        let r = c >= 0 ? 1 + LOBE_OUT * c ** POW_OUT : 1 - LOBE_IN * (-c) ** POW_IN;
+        r *= 1 + APEX * Math.cos(th);
+        const fromFoot = Math.abs(Math.PI - th);
+        if (fromFoot < SINUS) {
+          const k = 1 - fromFoot / SINUS;
+          r *= 1 - (1 - SINUS_D) * k * k * (3 - 2 * k);
+        }
+        return r;
+      };
+      const leafPath = (cx, cy, span, rot) => {
+        const R = span / 2;
+        const N = 64;
+        let d = "";
+        const ca = Math.cos(rot), sa = Math.sin(rot);
+        const put = (u, v) => [cx + u * ca - v * sa, cy + u * sa + v * ca];
+        const ring = (th, f) => {
+          const rr = R * leafR(th) * f;
+          return put(rr * Math.sin(th), -rr * Math.cos(th) * 0.95);
+        };
+        for (let i2 = 0; i2 < N; i2++) {
+          const [px, py] = ring(i2 / N * Math.PI * 2, 1);
+          d += `${i2 ? " L" : "M"} ${n2(px)} ${n2(py)}`;
+        }
+        const root = ring(Math.PI, 0.88), apex = ring(0, 0.8), mid = put(0, 0);
+        let veins = str(`M ${n2(root[0])} ${n2(root[1])} L ${n2(mid[0])} ${n2(mid[1])} L ${n2(apex[0])} ${n2(apex[1])}`) + `<circle cx="${n2(apex[0])}" cy="${n2(apex[1])}" r="${n2(INK * 0.62)}" fill="${ink}"/>`;
+        for (const th of [Math.PI * 0.4, -Math.PI * 0.4]) {
+          const b = ring(th, 0.66);
+          veins += str(`M ${n2(mid[0])} ${n2(mid[1])} L ${n2(b[0])} ${n2(b[1])}`) + `<circle cx="${n2(b[0])}" cy="${n2(b[1])}" r="${n2(INK * 0.62)}" fill="${ink}"/>`;
+        }
+        return str(d + " Z") + veins;
+      };
+      const BR = [1, 0.72, 1.28, 0.86, 1.15, 0.64, 1.32, 0.94, 1.08, 0.78, 1.2];
+      const bunchPath = (cx, cy, seed) => {
+        const R = w * 0.048;
+        let s = "", k = seed, y0 = 0;
+        const rows = [3, 3, 2, 1];
+        rows.forEach((per, row) => {
+          const rs = [...Array(per)].map(() => R * BR[k++ % BR.length]);
+          const span = rs.reduce((a, b) => a + b * 2, 0) + (per - 1) * INK * 0.5;
+          let bx = cx - span / 2;
+          const mean = rs.reduce((a, b) => a + b, 0) / per;
+          for (let c = 0; c < per; c++) {
+            bx += rs[c];
+            s += `<circle cx="${n2(bx)}" cy="${n2(cy + y0)}" r="${n2(rs[c])}" fill="none"
+                        stroke="${ink}" stroke-width="${INK.toFixed(2)}"/>`;
+            bx += rs[c] + INK * 0.5;
+          }
+          y0 += mean * 1.86;
+        });
+        return s;
+      };
+      const tendril = (sx, sy, dir) => {
+        let d = `M ${n2(sx)} ${n2(sy)}`;
+        for (let k = 1; k <= 24; k++) {
+          const a = k / 24 * Math.PI * 1.15 * dir - Math.PI * 0.5 * dir;
+          const r = w * (0.1 - 0.028 * (k / 24));
+          d += ` L ${n2(sx + dir * w * 0.088 + Math.cos(a) * r)} ${n2(sy + Math.sin(a) * r * dir)}`;
+        }
+        return str(d);
+      };
+      const PITCH = w * 0.34;
+      const REACH = w * 0.33;
+      const ROT = [-0.42, 0.24, -0.2, 0.5, -0.34, 0.15];
+      const SZ = [1, 0.88, 1.1, 0.94, 1.04, 0.91];
+      const first = Math.floor((yTop - y) / PITCH) - 1;
+      const last = Math.ceil((yBot - y) / PITCH) + 1;
+      let i = 0;
+      for (let m = first; m <= last; m++, i++) {
+        const my = y + m * PITCH + (i % 2 ? PITCH * 0.5 : 0);
+        if (my < y - PITCH || my > y + h + PITCH) continue;
+        const side = i % 2 ? 1 : -1;
+        const sx = stemAt(my), ax = sx + side * REACH;
+        out += str(`M ${n2(sx)} ${n2(my + w * 0.06)} Q ${n2(sx + side * REACH * 0.55)} ${n2(my + w * 0.04)} ${n2(ax)} ${n2(my - w * 0.02)}`);
+        if (i % 4 === 1 || i % 4 === 2) {
+          out += bunchPath(ax, my, i * 3);
         } else {
-          const L2 = w * 0.34 * LSZ[i % LSZ.length], H2 = L2 * 0.82;
-          const a = LROT[i % LROT.length] * side * Math.PI / 180;
-          const pt = (u, v) => {
-            const px = u * L2 * 0.5, py = v * H2 * 0.5;
-            return [
-              n2(ax + px * Math.cos(a) - py * Math.sin(a)),
-              n2(ay + px * Math.sin(a) + py * Math.cos(a))
-            ];
-          };
-          const lobe = [
-            [0, -1],
-            [0.34, -0.55],
-            [0.3, -0.3],
-            [0.72, -0.42],
-            [0.6, 0.02],
-            [0.95, 0.3],
-            [0.42, 0.42],
-            [0.2, 0.86],
-            [0, 0.55]
-          ];
-          let ld = `M ${pt(0, -1).join(" ")}`;
-          for (const [u, v] of lobe.slice(1)) ld += ` Q ${pt(u * 1.12, v * 0.92).join(" ")} ${pt(u, v).join(" ")}`;
-          for (const [u, v] of [...lobe].reverse().slice(1)) {
-            ld += ` Q ${pt(-u * 1.12, v * 0.92).join(" ")} ${pt(-u, v).join(" ")}`;
-          }
-          out += str(ld + " Z", OUT);
-          out += str(`M ${pt(0, 0.55).join(" ")} L ${n2(stemX(t))} ${n2(ay + H2 * 0.2)}`, THIN);
-          for (const [u, v] of [[0, -0.62], [0.42, -0.2], [-0.42, -0.2]]) {
-            out += str(`M ${pt(0, 0.5).join(" ")} L ${pt(u, v).join(" ")}`, THIN);
-          }
+          out += leafPath(ax, my, w * 0.42 * SZ[i % SZ.length], ROT[i % ROT.length] * side);
         }
-      }
-      const tn = Math.max(2, Math.round(h / (1.4 * w)));
-      for (let i = 0; i < tn; i++) {
-        const t = (i + 0.5) / tn, side = i % 2 ? -1 : 1;
-        const sx = stemX(t), sy = y + h * t;
-        let td = `M ${n2(sx)} ${n2(sy)}`, ex = sx, ey = sy;
-        for (let k = 1; k <= 22; k++) {
-          const a = k / 22 * Math.PI * 2.2 * side;
-          const r = w * (0.07 - 0.045 * (k / 22));
-          ex = sx + side * w * 0.1 + Math.cos(a) * r;
-          ey = sy + Math.sin(a) * r;
-          td += ` L ${n2(ex)} ${n2(ey)}`;
-        }
-        out += str(td, THIN);
-        out += `<circle cx="${n2(ex)}" cy="${n2(ey)}" r="${n2(w * 0.012)}" fill="${ink}"/>`;
+        if (i % 2 === 0) out += tendril(sx, my + PITCH * 0.42, -side);
       }
       return { veil: out, over: "" };
     }
@@ -7222,8 +7288,14 @@ ${body}
            the door. Invisible until the footprints were measured off the art
            instead of asserted. It points inboard now, which is also where the
            spindle goes. -->
-      <rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
-            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#lockUnitSoft)"
+      ${/* ⚠ #nickelSoft, AND IT WAS #lockUnitSoft — 25.9.2026. The two are the
+        same three-stop ramp on two different metals: the פרזול's and the
+        bought-in unit's constant steel. The shank had to move with the ball
+        above it or this fitting would have gone gold with a grey neck,
+        which is the "two metals on one fitting" defect the finish axis
+        exists to prevent, arriving through the fix for it. */
+    ""}<rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
+            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"
             transform="${dir < 0 ? `translate(${-rx * 1.2} 0)` : ""}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
                transform="rotate(${tilt} ${cx} ${cy})"/>
@@ -7534,21 +7606,40 @@ ${body}
     </g>`;
   };
   var peepholeDigital = (cx, cy) => {
-    const R = PEEPHOLE_DIGITAL_R;
+    const { w, h, lens, lensR } = PEEPHOLE_DIGITAL;
     const n1 = (v) => v.toFixed(1);
+    const x0 = cx - w / 2, y0 = cy - h * lens;
+    const rx = w * 0.18;
     return `
     <g data-hw="peephole" data-owner="peephole" data-kind="peephole" data-digital="1"
-       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      <rect x="${n1(cx - R * 0.95)}" y="${n1(cy - R * 0.95 + R * 0.16)}"
-            width="${n1(R * 1.9)}" height="${n1(R * 1.9)}" rx="${n1(R * 0.34)}"
-            fill="#000" opacity="0.18"/>
-      <rect x="${cx - R}" y="${cy - R}" width="${R * 2}" height="${R * 2}" rx="${n1(R * 0.34)}"
+       data-cx="${cx}" data-cy="${cy}" data-w="${w}" data-h="${h}">
+      ${/* the plate stands proud of the leaf, so it casts down and inboard */
+    ""}<rect x="${n1(x0 + w * 0.06)}" y="${n1(y0 + h * 0.03)}"
+            width="${w}" height="${h}" rx="${n1(rx)}" fill="#000" opacity="0.20"/>
+      <rect x="${n1(x0)}" y="${n1(y0)}" width="${w}" height="${h}" rx="${n1(rx)}"
             fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
-      ${/* the lens: a dark disc with the sensor's darker centre and one highlight */
-    ""}<circle cx="${cx}" cy="${cy}" r="${n1(R * 0.56)}" fill="#000" fill-opacity=".62"/>
-      <circle cx="${cx}" cy="${cy}" r="${n1(R * 0.3)}" fill="#000" fill-opacity=".55"/>
-      <circle cx="${n1(cx - R * 0.16)}" cy="${n1(cy - R * 0.18)}" r="${n1(R * 0.12)}"
-              fill="#fff" fill-opacity=".34"/>
+      ${/* One inset line down the plate rather than a second gradient: this is a
+        moulded housing with a seam where its two halves meet, and at leaf
+        scale the plate is seven pixels wide — a gradient inside a gradient
+        reads as noise there, a single hairline reads as an edge. */
+    ""}<rect x="${n1(x0 + w * 0.1)}" y="${n1(y0 + h * 0.055)}"
+            width="${n1(w * 0.8)}" height="${n1(h * 0.89)}" rx="${n1(rx * 0.7)}"
+            fill="none" stroke="#000" stroke-opacity=".13"/>
+      ${/* the camera: a housing ring, the dark glass, the sensor behind it, and
+        one specular off the top-left, which is where LIGHT.key is */
+    ""}<circle cx="${cx}" cy="${cy}" r="${n1(lensR * 1.3)}" fill="#000" fill-opacity=".22"/>
+      <circle cx="${cx}" cy="${cy}" r="${n1(lensR)}" fill="#000" fill-opacity=".66"/>
+      <circle cx="${cx}" cy="${cy}" r="${n1(lensR * 0.52)}" fill="#000" fill-opacity=".55"/>
+      <circle cx="${n1(cx - lensR * 0.34)}" cy="${n1(cy - lensR * 0.36)}"
+              r="${n1(lensR * 0.26)}" fill="#fff" fill-opacity=".38"/>
+      ${/* The IR aperture, below the lens on the plate's own axis. It is what
+        tells a customer at a glance that this is a camera and not a bigger
+        peephole — a lens alone on a plate could be either. One small dot,
+        not the ring of six a product photograph shows: at this scale six
+        dots 2 mm apart close into a grey smudge, which is the 2 px rule
+        §0b's 15.9 entry paid for on the navigator's marks. */
+    ""}<circle cx="${cx}" cy="${n1(cy + h * 0.2)}" r="${n1(w * 0.075)}"
+              fill="#000" fill-opacity=".46"/>
     </g>`;
   };
   var bellKnocker = (cx, cy) => {
@@ -8053,14 +8144,34 @@ ${body}
     <circle cx="0" cy="0" r="40"/>
     <circle cx="0" cy="0" r="21" fill="#fff" opacity=".92"/>
     <circle cx="-7" cy="-8" r="8" opacity=".55"/>`,
-      /* The digital viewer: the rounded-square bezel the leaf draws, with a lens
-         in it — so it cannot be mistaken for the round optical eye above or for
-         the ring on a boss the bell tile draws. */
-      "peep-digital": `
-    <rect x="-46" y="-46" width="92" height="92" rx="16"/>
-    <circle cx="0" cy="0" r="24" fill="#fff" opacity=".92"/>
-    <circle cx="0" cy="0" r="12" opacity=".75"/>
-    <circle cx="-5" cy="-6" r="4" fill="#fff" opacity=".9"/>`
+      /* ⚠ THE DIGITAL VIEWER, REDRAWN WITH THE DOOR — 25.9.2026. It was a
+         rounded SQUARE with concentric circles, which is what the leaf drew and
+         which the owner's son said is not what the product looks like. The leaf
+         draws a tall plate with the camera high on it now, and a tile showing one
+         fitting while the leaf draws another is §5 items 5 and 6 — nine handles
+         that shared one picture — and the "every option tile draws its own
+         picture" assertion cannot catch it, because all that one asks is whether
+         two TILES differ from each other.
+         ⚠ THE PROPORTIONS ARE `PEEPHOLE_DIGITAL`'s OWN, scaled to this glyph's
+         140-unit box rather than typed: 48 x 92 at 1.5 units per mm is 72 x 138,
+         the lens at 0.30 of the height. `FITTING_GLYPH`'s header promises the
+         numbers are the same measured millimetres so a tile cannot drift from
+         its door, and §9 already carries one open drift against that promise —
+         this is not a second. */
+      "peep-digital": (() => {
+        const S = 1.5, w = PEEPHOLE_DIGITAL.w * S, h = PEEPHOLE_DIGITAL.h * S;
+        const r = PEEPHOLE_DIGITAL.lensR * S;
+        const ly = -h / 2 + h * PEEPHOLE_DIGITAL.lens;
+        return `
+    <rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="${(w * 0.18).toFixed(1)}"/>
+    <circle cx="0" cy="${ly.toFixed(1)}" r="${(r * 1.5).toFixed(1)}" fill="#fff" opacity=".92"/>
+    <circle cx="0" cy="${ly.toFixed(1)}" r="${(r * 0.8).toFixed(1)}" opacity=".8"/>
+    <circle cx="${(-r * 0.5).toFixed(1)}" cy="${(ly - r * 0.5).toFixed(1)}"
+            r="${(r * 0.35).toFixed(1)}" fill="#fff" opacity=".9"/>
+    ${/* the IR aperture, the same 0.20 H below the lens the door draws it at */
+        ""}<circle cx="0" cy="${(ly + h * 0.2).toFixed(1)}" r="${(w * 0.075).toFixed(1)}"
+            fill="#fff" opacity=".55"/>`;
+      })()
     }[x.id] || "";
     return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>
@@ -8261,8 +8372,12 @@ ${body}
         out.window[w.id] = out.window[w.id] || T("why.setOwnWindow");
       }
     }
-    if (!peepholeFits(state2)) out.peephole.peep = T("why.peepWindow");
-    if (!bellFits(state2)) out.bell.bell = T("why.bellWindow");
+    if (!peepholeFits(state2)) {
+      for (const p of PEEPHOLES) if (p.id !== "nopeep") out.peephole[p.id] = T("why.peepWindow");
+    }
+    if (!bellFits(state2)) {
+      for (const b of BELLS) if (b.id !== "nobell") out.bell[b.id] = T("why.bellWindow");
+    }
     if (onLeaf) out.stripes = T("why.stripesWindow");
     else if (byId(DETAILS, state2.detail).panel) out.stripes = T("why.stripesPanel");
     if (lined) {
@@ -8369,21 +8484,20 @@ ${body}
       s.stripeCount = STRIPE_MAX.v;
       change("stripes", SAID.stripesCapped);
     }
-    const peepBad = s.peephole === "peep" && !peepholeFits(s);
-    const bellBad = s.bell === "bell" && !bellFits(s);
-    if (peepBad || bellBad) {
-      if (intent === "peephole" || intent === "bell") {
+    const peepBad = () => s.peephole && s.peephole !== "nopeep" && !peepholeFits(s);
+    const bellBad = () => s.bell && s.bell !== "nobell" && !bellFits(s);
+    if (peepBad() || bellBad()) {
+      if (intent === "bell" && bellBad()) {
         s.window = "none";
         change("window", SAID.windowGone);
-      } else {
-        if (peepBad) {
-          s.peephole = "nopeep";
-          change("peephole", SAID.peepGone);
-        }
-        if (bellBad) {
-          s.bell = "nobell";
-          change("bell", SAID.bellGone);
-        }
+      }
+      if (peepBad()) {
+        s.peephole = "nopeep";
+        change("peephole", SAID.peepGone);
+      }
+      if (bellBad()) {
+        s.bell = "nobell";
+        change("bell", SAID.bellGone);
       }
     }
     const lined = isLineWork(s);
@@ -9292,9 +9406,28 @@ ${body}
        `tools/audit.mjs`, which asserts the WHOLE sequence off the rendered
        navigator rather than a pair-wise rule — so a half-finished reorder fails
        there rather than shipping. */
+    /* ⚠ AND THE פרזול COMES STRAIGHT AFTER THE LEVER, 25.9.2026, ON THE OWNER'S
+       SON'S WORD: *"the pirzul page needs to be straight after the lever
+       page."* It stood after the grip, where 30.8 put it when the three
+       hardware steps moved ahead of `face` as one block.
+       ⚠ FOURTH MOVE OF THIS LIST AND THE FIRST WITH A REASON THE PAGE ITSELF
+       STATES: the פרזול is the FINISH of the lock furniture chosen one step
+       earlier — `exp.pz.a` names the lever and its keyhole first among what it
+       recolours — so a customer who has just picked a Coral lever is asked what
+       metal it is in while the lever is still the thing they are looking at.
+       Asked after the pull handle, the answer applied to something two screens
+       back. The grip keeps its own finish (`hf=`) on its own step, which is why
+       the two can be separated at all without splitting one question in half.
+       Peretz's *"handles before the panels"* (30.8) is untouched — `lock`, `pz`
+       and `grip` all still stand ahead of `face` — and so is his *"the lockset
+       section should come before the pull handle section"* (14.9): `lock` is
+       still ahead of `grip`, with the finish of what `lock` chose between them.
+       What has to move with it is `WANT_ORDER` in `tools/audit.mjs`, which
+       asserts the WHOLE sequence off the rendered navigator, so a half-finished
+       reorder fails there rather than shipping. */
     { key: "lock", title: "step.lock.t", sub: "step.lock.s", lede: "step.lock.l", exp: "exp.lock" },
-    { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
     { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l", exp: "exp.pz" },
+    { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
     { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l", exp: "exp.face" },
     { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l", exp: "exp.glass" },
     {
@@ -9691,14 +9824,6 @@ ${body}
     <div class="sect__foot">
       <button type="button" class="btn btn--ghost sect__back">${T("nav.back")}</button>
     </div>`;
-    const hand = document.createElement("div");
-    hand.className = "sum-hand";
-    hand.innerHTML = `<p class="sum-hand__q">${T("sum.hand.q")}</p><p class="sum-hand__v" data-handing-words></p><button type="button" class="btn btn--ghost sum-hand__flip">${T("sum.hand.flip")}</button>`;
-    hand.querySelector(".sum-hand__flip").addEventListener("click", () => {
-      const other = HANDINGS.find((h) => h.id !== state.handing) || HANDINGS[0];
-      set({ ...state, handing: other.id });
-    });
-    sum.querySelector(".sect__body").appendChild(hand);
     if (SUMMARY.exp) {
       const d = document.createElement("details");
       d.className = "sect__exp";
@@ -10158,7 +10283,7 @@ ${body}
   }
   function choose(g, id) {
     noteEngaged();
-    if ((g.key === "handle" || g.key === "lockset") && id !== state[g.key]) {
+    if ((g.key === "handle" || g.key === "lockset" || g.key === "peephole") && id !== state[g.key]) {
       const why = conflicts(state)[g.key][id];
       if (why) {
         if (g.key === "lockset") openClash();
@@ -10298,10 +10423,6 @@ ${body}
       el.textContent = money;
     });
     renderBreakdown(state);
-    const hw = handingWords(state);
-    document.querySelectorAll("[data-handing-words]").forEach((el) => {
-      el.textContent = hw;
-    });
     markSteps();
     repriceOptions(state);
     $("#code").textContent = encodeCode(state);

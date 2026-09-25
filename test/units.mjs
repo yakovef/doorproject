@@ -2,7 +2,7 @@
  * Assertions. No framework — plain node, per PLAN.md §16.3.
  * Run: npm test
  */
-import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
+import { BELLS, PEEPHOLES, REBATE, STRIPE_LEGACY, STRIPE_MAX, stripePrice, byId, COLOURS, declaredFinish, DETAILS, gripFinish, FINISHES, glazedPanels, GRILLES, grillePlacement, handleLength, handleLensFor, HANDLE_BAND, HANDLE_FINISHES, HANDLE_LEGACY, HANDLE_LENS, HANDINGS, HANDLES, leafGlazed, LOCKSETS, mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, MASHKOFS, paneCount, PIRZUL, SIZES, SPECIAL_LOCKS, WINDOWS, BUILD_A } from '../js/catalog.js';
 import { contrast, lighten, silhouette } from '../js/colour.js';
 import { SECTION_ICON, sectionIcon, SPEC_ICON, specIcon } from '../js/icons.js';
 import { L, LANG_IDS, T, withLang } from '../js/copy.js';
@@ -3399,9 +3399,29 @@ group('the finish reaches every piece of metal');
          'a gold finish must gild a פעמון on a door with no pull handle');
     }
 
-    /* ── AND TWO LOCKSETS DO NOT FOLLOW IT AT ALL ──────────────────────
+    /* ── AND ONE LOCKSET DOES NOT FOLLOW IT AT ALL, AND IT USED TO BE TWO ──
        Owner, 31.8.2026: *"the pirzul doesnt change the color of the ספיר and
        כדור handles."*
+
+       ⚠ THE כדור LEFT THAT EXEMPTION ON 25.9.2026, on the owner's son's *"the
+       ball handle needs to be affected by the pirzul"* — so this block is now
+       a PAIR IN BOTH DIRECTIONS rather than a list of two things that hold
+       still. The cadoor's ball takes its measured five-stop dome through
+       `domeRamp(hwTone)` and its shank takes `nickelSoft`; the ספיר is
+       untouched, because he named the ball and a square cushion knob in mirror
+       chrome is not it.
+       ⚠ `domeRamp` AND NOT `inFinish`, WHICH WAS THE OBVIOUS TOOL AND FLATTENS
+       THE BALL. That helper maps a stop's luminance onto a POSITION in the
+       seven-step ramp, and the brass and bronze ramps are not monotone in that
+       order — measured on this dome, terminator/bounce/range read 2.67/1.71/2.85
+       as authored and 1.29/1.00/1.34 through `inFinish` in gold, so a gold ball
+       came out a flat disc. `domeRamp` divides each measured stop by the steel
+       entry it stands against and applies the ratio to the chosen finish, the
+       way `cylinderRamp` and `bellRamp` do.
+       ⚠ AND IT IS WHY NICKEL IS BYTE-IDENTICAL: the ramp RETURNS THE MEASURED
+       LITERALS for steel rather than deriving them, so the default door cannot
+       drift by a channel. That is what makes this safe to assert as "moves on
+       the other three" rather than as "moves".
 
        ⚠ BOTH WERE ALREADY HALF-CONSTANT, WHICH IS WHY THIS LOOKED LIKE A
        RENDERING BUG RATHER THAN A WRONG ANSWER. The sapir's mirror knob and
@@ -3422,18 +3442,50 @@ group('the finish reaches every piece of metal');
        `knobplate`, `digital` and `square` beside them have carried
        `data-style` all along. A fourth attribute meaning the same thing is
        how a selector comes to match three fittings out of five. */
-    for (const kind of ['sapir', 'cadoor']) {
-      const st = { ...base, lockset: kind };
-      const sel = `data-style="${kind}"`;
+    {
+      const st = { ...base, lockset: 'sapir' };
+      const sel = 'data-style="sapir"';
       ok(grabDeep(render(st), sel),
-         `the ${kind} group is not in the markup — this check is dead`);
+         'the sapir group is not in the markup — this check is dead');
       for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
         ok(looks(render({ ...st, pirzul: pz }), sel) === looks(render(st), sel),
-           `the פרזול "${pz}" recolours the ${kind} handle — the owner says it `
-           + 'does not');
+           `the פרזול "${pz}" recolours the ספיר handle — the owner says it does not`);
       }
       ok(!refs(grabDeep(render(st), sel)).some(id => /^(nickel|nickelSoft|plateFace)$/.test(id)),
-         `the ${kind} still paints with one of the פרזול's own gradients`);
+         'the ספיר still paints with one of the פרזול\'s own gradients');
+    }
+    /* ── AND THE כדור FOLLOWS IT ON ALL THREE, WHICH IT DID NOT ─────────
+       ⚠ THE WHOLE FITTING, NOT THE BALL. The shank is a separate shape with a
+       separate fill, and the cheap version of this fix moves the ball and
+       leaves a grey neck under a gold sphere — two metals on one fitting, which
+       is the defect the finish axis exists to have ended, arriving through the
+       fix for it. So the comparison is over the whole `data-style="cadoor"`
+       group with its references resolved, and there is a second clause naming
+       the constant ramps it may no longer paint with at all. */
+    {
+      const st = { ...base, lockset: 'cadoor' };
+      const sel = 'data-style="cadoor"';
+      ok(grabDeep(render(st), sel),
+         'the cadoor group is not in the markup — this check is dead');
+      for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
+        ok(looks(render({ ...st, pirzul: pz }), sel) !== looks(render(st), sel),
+           `the פרזול "${pz}" does not recolour the כדור handle — the owner's son, `
+           + '25.9.2026: "the ball handle needs to be affected by the pirzul"');
+      }
+      ok(!refs(grabDeep(render(st), sel))
+           .some(id => /^lockUnit(Soft|Face)?$/.test(id)),
+         'the כדור still paints with the bought-in unit\'s constant steel — that ramp '
+         + 'is the kodan\'s, the kasefet\'s and the ספיר\'s, and a fitting on it cannot '
+         + 'follow the פרזול however many other fills are pointed at hwTone');
+      /* The clause that must stay TRUE beside the one that must become true:
+         nickel is the profile's own finish, so a door nobody has changed must
+         render this fitting exactly as it did. Without it the fix could have
+         been "recolour everything, including the default", which would move
+         every committed comparison sheet carrying a ball knob. */
+      ok(looks(render({ ...st, pirzul: 'pz-nickel' }), sel) === looks(render(st), sel),
+         'a nickel פרזול moves the כדור — `domeRamp` returns the measured literals '
+         + 'on steel rather than deriving them, so the default door must be '
+         + 'byte-identical across this change');
     }
     ok(grabDeep(render({ ...base, lockset: 'knobplate' }), 'data-style="knobplate"'),
        'the knob-on-backplate group is not in the markup — the pair check is dead');
@@ -3761,27 +3813,71 @@ group('the doorbell and the peephole');
   ok(!/[?&]a=/.test(toQuery({ ...solid, bell: 'bell', peephole: 'peep' })),
      'nothing may be written into the retired a=');
 
-  /* ── the rule ── */
-  /* ⚠ GEOMETRIC, AND FALSIFIED: both window shapes this catalogue sells are
-     centred and reach viewer height, so a peephole at its measured position
-     has nowhere to be. `tools/_newhw.mjs` swept 426 designs with real getBBox
-     and found the overlap on all 140 glazed ones and nothing else. */
+  /* ── the rule ──
+     ⚠ NEITHER VIEWER GOES ON A GLAZED LEAF, AND IT USED TO BE ONE OF THEM.
+     The owner's son, 25.9.2026: *"digital and normal peepholes arent
+     compatable with a window."* Three things changed and the second is the
+     defect:
+
+       · the rule is OBSERVED now rather than geometric — `peepholeFits` is
+         `!leafGlazed(state)`, and the whole trade that costs is written over
+         it in `js/renderer.js`;
+       · `repair`'s guard was `s.peephole === 'peep'`, AN ID LITERAL, and the
+         digital viewer appended on 20.9 is `peep-digital` — so it was never
+         repaired at all. Measured on the shipped page: on all 24 glazed
+         states carrying it the tile was correctly greyed, `peepholeFits`
+         correctly said false, `repair` did nothing, and the drawing put the
+         viewer on the glass with ₪390 on the order;
+       · and a viewer no longer costs the WINDOW, on Peretz's 20.9 rule for
+         the identical trade — *"the normal handle goes away, not the window
+         or the panels."*
+
+     ⚠ SO THE LOOP RUNS OVER BOTH VIEWERS, which is the clause that would have
+     caught the literal. Written as `WINDOWS` alone it passes on the optical
+     one and says nothing about the digital one, which is exactly how this
+     shipped: a fixture that cannot carry the defect. */
   for (const w of WINDOWS) {
     const glazed = w.id !== 'none';
-    ok(peepholeFits({ ...base, window: w.id, detail: glazed ? 'panel' : 'plain' }) === !glazed,
-       `peepholeFits must be ${!glazed} for window "${w.id}"`);
+    for (const pe of PEEPHOLES.filter(p => p.id !== 'nopeep')) {
+      const st = { ...base, window: w.id, detail: glazed ? 'panel' : 'plain', peephole: pe.id };
+      ok(peepholeFits(st) === !glazed,
+         `peepholeFits must be ${!glazed} for window "${w.id}" with "${pe.id}"`);
+      ok(!!conflicts(st).peephole[pe.id] === glazed,
+         `"${pe.id}" must be ${glazed ? 'blocked' : 'offered'} on window "${w.id}"`);
+      /* A LINK carrying both loses the viewer and says so — for BOTH kinds. */
+      const { state: fixed, changed } = repair(st);
+      ok(fixed.peephole === (glazed ? 'nopeep' : pe.id),
+         `a link with "${pe.id}" and window "${w.id}" must `
+         + `${glazed ? 'lose the viewer' : 'keep it'}`);
+      ok(!glazed || changed.includes('peephole'),
+         `losing "${pe.id}" to window "${w.id}" must be said, not silent`);
+      /* ⚠ AND A TAP DOES NOT BUY IT WITH THE GLASS. This is the assertion that
+         reverses: it used to require that clicking the viewer take the window.
+         Both halves, because the cheap way to pass the first is to refuse the
+         tap by removing the glass anyway. */
+      const tapped = repair(st, 'peephole');
+      ok(tapped.state.peephole === (glazed ? 'nopeep' : pe.id),
+         `tapping "${pe.id}" on window "${w.id}" must be refused rather than granted`);
+      ok(leafGlazed(tapped.state) === glazed,
+         `tapping "${pe.id}" took the window off a door carrying "${w.id}" — a fitting `
+         + 'never costs the glass (Peretz, 20.9.2026)');
+    }
   }
+  /* ⚠ AND THE פעמון KEEPS ITS TWO-SIDED TRADE, which is the clause that must
+     stay TRUE beside the ones that had to become true. Nothing the owner said
+     on 25.9 reaches the bell, so a bell tap still drops the glass — and the
+     two fittings are still resolved in ONE block, so the viewer that now fits
+     must be KEPT rather than thrown away for a conflict the bell's repair has
+     just removed. That is the 7.9 ordering finding, restated against the new
+     direction rather than dropped with the branch it was written for. */
   {
-    const { state: fixed, changed } =
-      repair({ ...base, window: 'rect', detail: 'panel', peephole: 'peep' });
-    ok(fixed.peephole === 'nopeep' && changed.includes('peephole'),
-       'a link with a peephole and a window must lose the peephole, and say so');
-    /* And the other way: clicking the peephole ON a glazed door takes the
-       glass, because whichever the customer just clicked wins. */
-    const { state: chosen } =
-      repair({ ...base, window: 'rect', detail: 'panel', peephole: 'peep' }, 'peephole');
-    ok(chosen.peephole === 'peep' && chosen.window === 'none',
-       'clicking the peephole must take the window, not be refused');
+    const both = repair({ ...base, window: 'rect', detail: 'panel',
+                          bell: 'bell', peephole: 'peep' }, 'bell');
+    ok(both.state.bell === 'bell' && both.state.window === 'none',
+       'a bell tap must still take the window — nothing said on 25.9 reaches the bell');
+    ok(both.state.peephole === 'peep',
+       'the bell tap removed the glass and the viewer was dropped anyway — the two '
+       + 'fittings must be re-asked against the state the window leaves');
   }
   /* ⚠ THIS BLOCK SAID THE BELL NEEDED NO RULE, AND IT WAS THE BLIND SPOT.
      Verbatim, for a week: *"The BELL has no such rule, and that is a finding
@@ -3831,16 +3927,39 @@ group('the doorbell and the peephole');
        Both fittings must survive, because the thing they were competing with
        is what leaves. Asserted in both directions, since the mirror is the
        half that would go unnoticed. */
-    for (const [click, other] of [['bell', 'peephole'], ['peephole', 'bell']]) {
-      const r = repair({ ...base, window: 'rect', detail: 'panel',
-                         bell: 'bell', peephole: 'peep' }, click);
+    /* ⚠ RESTATED 25.9.2026 AND NOT WEAKENED — THE MIRROR HALF REVERSED.
+       This ran both ways round, because a bell tap and a viewer tap were the
+       same gesture: either took the window and both fittings then survived.
+       A viewer may no longer take the window (see the rule block above), so
+       the `peephole` half of this loop now asserts something the code must
+       REFUSE, and leaving it as it stood would have been an assertion
+       defending the behaviour the owner asked to change — which is exactly
+       what the bell's own note four lines up records happening to it.
+       The BELL half is unchanged and is the half that carries the 7.9 finding:
+       the glass leaves and the viewer beside it must SURVIVE, because the
+       thing it was competing with is what went. */
+    {
+      const both = { ...base, window: 'rect', detail: 'panel',
+                     bell: 'bell', peephole: 'peep' };
+      const r = repair(both, 'bell');
       ok(r.state.window === 'none',
-         `clicking the ${click} on a glazed door must take the window`);
+         'clicking the bell on a glazed door must take the window');
       ok(r.state.bell === 'bell' && r.state.peephole === 'peep',
-         `clicking the ${click} must not cost the customer their ${other} — `
+         'clicking the bell must not cost the customer their peephole — '
        + `got bell ${r.state.bell}, peephole ${r.state.peephole}`);
-      ok(!r.changed.includes(other),
-         `and must not report removing the ${other}, which it did not remove`);
+      ok(!r.changed.includes('peephole'),
+         'and must not report removing the peephole, which it did not remove');
+
+      const p = repair(both, 'peephole');
+      ok(p.state.window === 'rect',
+         'clicking the peephole on a glazed door must NOT take the window — a '
+       + 'fitting never costs the glass (Peretz, 20.9.2026; the viewer came under '
+       + 'that rule on 25.9)');
+      ok(p.state.peephole === 'nopeep' && p.changed.includes('peephole'),
+         'the viewer must be refused and the refusal said, not granted silently');
+      ok(p.state.bell === 'nobell' && p.changed.includes('bell'),
+         'the bell is on the same glazed door and must go with it — the two '
+       + 'fittings are resolved together or the tap leaves a knocker on the glass');
     }
   }
 

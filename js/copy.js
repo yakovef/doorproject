@@ -424,21 +424,16 @@ export const UI = {
                        'Не уверены? Уточним вместе при замере.'],
   'g.panels':         ['פאנלים', 'Panels', 'Панели'],
 
-  /* ⚠ THE ONE QUESTION THE PAGE ANSWERS FOR THE CUSTOMER, ASKED BACK.
-     `handing` has to have a default — the drawing must draw something — and
-     this file calls the ימין/שמאל convention the only mistake on the list
-     that costs real money. Measured on the live page at 1280x720: on arrival
-     the ONLY controls the fold cuts through are the two handing pills. So the
-     highest-stakes decision in the product is pre-answered, below the fold,
-     and the natural gesture — glance, press הבא — accepts it in silence.
-     This is the confirm row on the summary. It is not a second control: same
-     `set()`, same field, no new value, no wire format, no VERSION. The
-     sentence is `handingWords()`, which is what the ORDER already says, so
-     the customer reads the words Peretz will read. */
-  'sum.hand.q':       ['כיוון הפתיחה — נכון?', 'The opening direction — is this right?',
-                       'Сторона открывания — верно?'],
-  'sum.hand.flip':    ['החלפה לצד השני', 'Switch to the other side',
-                       'Сменить на другую сторону'],
+  /* ⚠ `sum.hand.q` AND `sum.hand.flip` STOOD HERE AND ARE GONE, 25.9.2026 —
+     the summary's handing confirmation, withdrawn at the owner's request. The
+     thing they protected is real and is protected elsewhere now: `handing` is
+     the only default in this product that costs money to get wrong, and since
+     14.9 the summary's spec rows are buttons back to their own question, so
+     the פתיחה row says it in `handingWords`'s own words and one tap changes
+     it. `js/app.js`'s `buildPanel` carries the whole argument.
+     ⚠ A COPY KEY IS NOT A WIRE FORMAT — nothing outside this file addresses
+     one, so a withdrawn string leaves nothing behind. That is exactly why an
+     OPTION id may never be deleted and a copy key may. */
 
   'g.colour.h':       ['הקוד שליד כל גוון הוא הקוד של היצרן.',
                        'The code beside each shade is the manufacturer’s own.',
@@ -536,9 +531,20 @@ export const UI = {
                     safe lock and the keypad, and the ספיר and כדור handles —
                     all bought-in in one finish, on the owner's word 31.8
        two only     the doorbell — nickel or gold, on the owner's word */
-  'exp.pz.a':             ['את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.',
-                       'The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.',
-                       'Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет.'],
+  /* ⚠ THE כדור LEFT THE "DOES NOT" LIST ON 25.9.2026, on the owner's son's
+     *"the ball handle needs to be affected by the pirzul"* — and this sentence
+     is the reason that change is not finished until this file is edited.
+     CLAUDE.md §3 keeps a table of what the פרזול reaches in both directions
+     and says of it: *"Each row has been wrong in shipped copy at least once,
+     and never as a crash: a promise the picture quietly did not keep."* The
+     strips said "not changed" for a round after Peretz reversed it; the
+     peephole was listed as following the finish while the drawing painted it
+     from the constant ramp. This is the same row moving again, and the only
+     thing that stops it being the same defect is editing the sentence in the
+     same commit as the gradient. The ספיר stays: he named the ball. */
+  'exp.pz.a':             ['את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית, סגר הביטחון וידית הכדור — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את ידית ספיר: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.',
+                       'The tone of the lever you turn, the keyhole, the hinges, the peephole, the security latch and the ball knob — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the Sapir handle: those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.',
+                       'Оттенок нажимной ручки, замочной скважины, петель, глазка, предохранительной защёлки и шаровой ручки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручку «Сапир»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет.'],
 
   'exp.sum.q':        ['מה קורה אחרי שאני שולח?', 'What happens after I send it?',
                        'Что будет после отправки?'],
@@ -807,8 +813,19 @@ export const UI = {
   'fix.bellGone':        ['הסרנו את הפעמון — החלון תופס את מקומו במרכז הדלת', 'We removed the doorbell — the window sits where it goes, on the centre of the door', 'Мы убрали звонок — окно занимает его место по центру двери'],
   'fix.stripesCapped':   ['פסים אנכיים יורדים ל-6 — יותר מזה לא נכנס לרוחב הדלת', 'Vertical stripes cap at 6 — more than that will not fit across the door', 'Вертикальных полос максимум 6 — больше по ширине двери не помещается'],
 
-  'why.peepWindow':   ['החלון תופס את מקום העינית', 'The window sits where the peephole goes',
-                       'Окно занимает место глазка'],
+  /* ⚠ AND IT SAYS THE WINDOW STAYS, 25.9.2026 — the same clause
+     `why.noRoomHandleWindow` carries, for the same reason. On 20.9 a greyed
+     pull handle learned to name its obstacle AND say that the obstacle is not
+     going anywhere, because Peretz's rule is that a fitting never costs the
+     glass; the viewer came under that rule today (*"digital and normal
+     peepholes arent compatable with a window"*) and its tile has to say the
+     same thing. Without the second clause a customer reads "the window sits
+     where the peephole goes" as an invitation to tap it and find out which one
+     wins — and the answer is now always the window, which the sentence should
+     not make them discover. */
+  'why.peepWindow':   ['החלון תופס את מקום העינית — והוא נשאר',
+                       'The window sits where the peephole goes — it stays',
+                       'Окно занимает место глазка — оно остаётся'],
   'why.bellWindow':   ['החלון תופס את מקום הפעמון', 'The window sits where the doorbell goes',
                        'Окно занимает место звонка'],
   'why.gripOffDoor':  ['הידית חורגת מהדלת', 'The handle runs off the door', 'Ручка выходит за пределы двери'],

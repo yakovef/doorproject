@@ -52,8 +52,8 @@
  */
 
 import { T } from './copy.js';
-import { byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed, LOCKSETS,
-         STRIPE_MAX, WINDOWS }
+import { BELLS, byId, DETAILS, GRILLES, HANDLES, hasUpperPanel, isGlazed, leafGlazed,
+         LOCKSETS, PEEPHOLES, STRIPE_MAX, WINDOWS }
   from './catalog.js';
 import { gripClashesLockset, gripFitsAnywhere,
          bellFits, panelFits,
@@ -343,8 +343,26 @@ export function conflicts(state) {
      The real reason it holds today is that the DRAWING has no measured answer
      for where a stripe goes on a panelled leaf, and inventing one would put
      geometry on screen no photograph supports (REALISM.md §6). */
-  if (!peepholeFits(state)) out.peephole.peep = T('why.peepWindow');
-  if (!bellFits(state))     out.bell.bell     = T('why.bellWindow');
+  /* ⚠ EVERY VIEWER, NOT THE ID `peep` — 25.9.2026, AND THIS WAS THE SECOND
+     HALF OF THE SAME DEFECT. `repair`'s guard was an id literal and so was
+     this one, so the digital viewer appended on 20.9 was neither greyed NOR
+     repaired: its tile was offered on a glazed door, tapping it kept it, the
+     drawing put it on the glass and ₪390 went onto the order. Found by the
+     assertion in `npm test` that loops over `PEEPHOLES` rather than over
+     `WINDOWS` alone — the old one asked only about `peep` and was green
+     throughout.
+     Written over the LIST, so the third viewer is covered by being appended.
+     `nopeep` is skipped because "none" is never blocked: there is always room
+     for nothing. */
+  if (!peepholeFits(state)) {
+    for (const p of PEEPHOLES) if (p.id !== 'nopeep') out.peephole[p.id] = T('why.peepWindow');
+  }
+  /* The same shape for the bell. `BELLS` has two entries today, so this is the
+     trap unfired rather than a defect — and an id literal that happens to be
+     exhaustive is exactly what `peep` was until 20.9. */
+  if (!bellFits(state)) {
+    for (const b of BELLS) if (b.id !== 'nobell') out.bell[b.id] = T('why.bellWindow');
+  }
   if (onLeaf) out.stripes = T('why.stripesWindow');
   else if (byId(DETAILS, state.detail).panel) out.stripes = T('why.stripesPanel');
   if (lined) {
@@ -752,18 +770,52 @@ export function repair(state, intent = null) {
      glass going, or are the fittings? Found by reasoning it through rather
      than by a failing check, which is why the assertion for it is written
      beside the others rather than after the fact. */
-  const peepBad = s.peephole === 'peep' && !peepholeFits(s);
-  const bellBad = s.bell === 'bell' && !bellFits(s);
-  if (peepBad || bellBad) {
-    if (intent === 'peephole' || intent === 'bell') {
+  /* ⚠ AND THE VIEWER NEVER COSTS THE WINDOW ANY MORE — 25.9.2026. The owner's
+     son: *"digital and normal peepholes arent compatable with a window."* Read
+     as a flat incompatibility, which is what it says, and settled the way
+     Peretz settled the identical trade for the pull handle on 20.9 — *"when a
+     person wants a pull handle when there is no space, then the normal handle
+     goes away, not the window or the panels."* A ₪0 or ₪390 viewer may not take
+     a ₪3,800 window off the door whichever tile the customer pressed, so the
+     `intent === 'peephole'` arm is gone: on a glazed leaf the viewer is
+     REFUSED, its tile is greyed with the window named as the reason, and the
+     tap says so and changes nothing (see `choose`).
+     The פעמון keeps its two-sided trade, because nothing he has said reaches
+     it: a bell tap still drops the glass. The two are still resolved in ONE
+     block for the 7.9 reason below, and the order inside it is what makes that
+     work — the window goes first if a bell tap is taking it, and then BOTH
+     fittings are asked again against the state that leaves, so a viewer that
+     now fits is kept rather than thrown away for a conflict that no longer
+     exists.
+
+     ⚠ AND THE GUARD WAS AN ID LITERAL, SO THE DIGITAL VIEWER WAS NEVER
+     REPAIRED AT ALL. `s.peephole === 'peep'` — and the entry appended on
+     20.9.2026 is `peep-digital`. Measured on the shipped page before the fix,
+     over every size x window: on all 24 glazed states carrying it, `conflicts`
+     greyed the tile correctly, `peepholeFits` said false correctly, `repair`
+     did NOTHING, and `render` drew the viewer — 54 mm of bezel then, a 48 x 92
+     plate now — dead centre on the glass, with ₪390 on the order. A shared link
+     carrying `ey=peep-digital&w=rect` opened exactly that door.
+     That is §5.23 with the arrow pointing at the newer fitting: the bell's
+     ₪300 ring was found on the glass because the peephole beside it was handled
+     correctly, and here the peephole's own digital twin went the same way for a
+     different reason — not a stale justification this time but a predicate
+     written as an equality against one id of a list that has since grown. Both
+     are predicates over the FIELD now, so the next entry appended to either
+     list is covered by having been appended. The bell's `=== 'bell'` was the
+     same trap unfired: `BELLS` has two entries today. */
+  const peepBad = () => s.peephole && s.peephole !== 'nopeep' && !peepholeFits(s);
+  const bellBad = () => s.bell && s.bell !== 'nobell' && !bellFits(s);
+  if (peepBad() || bellBad()) {
+    if (intent === 'bell' && bellBad()) {
       s.window = 'none'; change('window', SAID.windowGone);
-    } else {
-      /* Both are named when both go. They are separate fields with separate
-         prices, and a customer told about one removal would find the other on
-         the order. */
-      if (peepBad) { s.peephole = 'nopeep'; change('peephole', SAID.peepGone); }
-      if (bellBad) { s.bell = 'nobell'; change('bell', SAID.bellGone); }
     }
+    /* Whatever is still in the way once that has run, the FITTING yields.
+       Both are named when both go: they are separate fields with separate
+       prices, and a customer told about one removal would find the other on
+       the order. */
+    if (peepBad()) { s.peephole = 'nopeep'; change('peephole', SAID.peepGone); }
+    if (bellBad()) { s.bell = 'nobell'; change('bell', SAID.bellGone); }
   }
 
   const lined = isLineWork(s);

@@ -25,7 +25,12 @@ import { DETAILS, SIZES } from '../js/catalog.js';
 import { detailGlyph, stripesGlyph } from '../js/renderer.js';
 import { SECTION_ICON, SPEC_ICON } from '../js/icons.js';
 import { setLang, T, withLang } from '../js/copy.js';
-import { handingWords, specRows, summaryLine } from '../js/spec.js';
+/* ⚠ `handingWords` LEFT THIS IMPORT ON 25.9.2026 with the `.sum-hand` check
+   that was its only reader here. It is still the sentence the WhatsApp order
+   and the A4 sheet carry, and `npm test` still pins it; what this file asks
+   about the handing now is the summary's spec ROW, which comes from
+   `specRows`. */
+import { specRows, summaryLine } from '../js/spec.js';
 import { repair } from '../js/rules.js';
 
 /* Derived, not spelled out: the code grew from seven characters to eight when
@@ -538,6 +543,70 @@ for (const v of VIEWS) {
       fault(v.name, `the quote bar has ${bar} children and it has three — the price, the `
         + 'send and the way on. At 320 in Russian they use its whole 300 px content box');
     }
+
+    /* ── AND ON A PHONE THE STEP HAS NO FOOT AT ALL — 25.9.2026 ─────────
+       The owner's son: *"you already have a next button at the bottom of the
+       screen at all times, so remove the 2 buttons from the bottom of the
+       sections, and just have the 3 buttons always on the screen."* Measured
+       before the cut: the bar is 71 px under a 26 px margin — **97 px on every
+       one of the nine steps** — spent repeating a control that is already fixed
+       over the foot of the screen.
+       Three claims, and the second and third are what keep the first honest:
+         · below 1100 nothing in `.sect__foot` draws — the whole bar, not just
+           the two buttons, because the rule and the padding go with them;
+         · the way on is STILL on screen, in the quote bar, whole and enabled —
+           removing the foot without that would leave a phone with no way
+           forward at all;
+         · and the way BACK is still reachable, which is the navigator: its
+           circles are fixed at the top of the screen and each one clears the
+           44 px floor. That is the clause that must stay true beside the cut,
+           because "remove the back button" is only acceptable while there is
+           another way back, and the cheap way to pass the first two claims is
+           to lose it.
+       Above 1100 the foot is the way on and is asserted present.
+       Falsified by restoring `display: flex` in the base rule (clause 1 fires
+       at every phone width) and by hiding `.quote__next` (clause 2). */
+    const footing = await p.evaluate(() => {
+      const foot = document.querySelector('.sect.is-live .sect__foot');
+      const fr = foot ? foot.getBoundingClientRect() : null;
+      const on = document.querySelector('.quote__next');
+      const or_ = on ? on.getBoundingClientRect() : null;
+      const circles = [...document.querySelectorAll('.steps__step')].map(c => {
+        const r = c.getBoundingClientRect();
+        return { w: Math.round(r.width), h: Math.round(r.height),
+                 onScreen: r.top >= 0 && r.bottom <= innerHeight };
+      });
+      return {
+        foot: foot ? { h: Math.round(fr.height), drawn: fr.height > 0 } : null,
+        wayOn: on ? { w: Math.round(or_.width), h: Math.round(or_.height),
+                      drawn: or_.height > 0, off: on.disabled } : null,
+        circles,
+      };
+    });
+    if (!footing.foot) {
+      fault(v.name, 'no `.sect__foot` in the live step at all — this check can no '
+        + 'longer tell a foot that is hidden from one that was deleted');
+    } else if (wide) {
+      if (!footing.foot.drawn) {
+        fault(v.name, 'the step has no foot above 1100 px, where it is the way on and '
+          + 'the quote bar carries none');
+      }
+    } else {
+      if (footing.foot.drawn) {
+        fault(v.name, `the step still draws a ${footing.foot.h} px foot below 1100 px, `
+          + 'repeating the way on that is already fixed over the foot of the screen');
+      }
+      if (!footing.wayOn || !footing.wayOn.drawn || footing.wayOn.off) {
+        fault(v.name, 'the quote bar has no way on below 1100 px, and the step foot '
+          + 'that used to carry one is gone — there is no way forward');
+      }
+      const back = footing.circles.filter(c => c.onScreen && c.w >= 44 && c.h >= 44);
+      if (back.length < 2) {
+        fault(v.name, `only ${back.length} navigator circle(s) are on screen at 44 px `
+          + 'below 1100 px — the rail is the only way back now that the step foot is gone');
+      }
+    }
+
     await p.goto('file://' + process.cwd() + '/index.html');
     await p.waitForSelector('#stage svg');
     await p.waitForTimeout(250);
@@ -1194,7 +1263,14 @@ for (const v of VIEWS) {
        before the pull handle section."* His "handles before the panels" is
        untouched — both still stand ahead of `face` — so this is an order
        within the pair and the sequence below is the whole of the change. */
-    const WANT_ORDER = ['fit', 'colour', 'lock', 'grip', 'pz', 'face', 'glass', 'mk', 'sum'];
+    /* ⚠ AND AGAIN 25.9.2026 — `pz` MOVED UP BETWEEN `lock` AND `grip`, on the
+       owner's son's *"the pirzul page needs to be straight after the lever
+       page."* Both of Peretz's rules survive it: all three hardware steps are
+       still ahead of `face`, and `lock` is still ahead of `grip`. Fourth
+       restatement of this one line, which is the argument for the assertion
+       being the whole sequence: each of those four moves would satisfy a
+       pair-wise rule and none of them is the order anybody chose. */
+    const WANT_ORDER = ['fit', 'colour', 'lock', 'pz', 'grip', 'face', 'glass', 'mk', 'sum'];
     if (keys.join(',') !== WANT_ORDER.join(',')) {
       fault(v.name, `the flow asks its questions as ${keys.join(' → ')}, `
         + `and it should be ${WANT_ORDER.join(' → ')} `
@@ -1386,53 +1462,54 @@ for (const v of VIEWS) {
             + `${send.below} px below the fold and the chip is not whole either`);
         }
 
-        /* ── AND THE HANDING IS CONFIRMED, IN THE ORDER'S OWN WORDS ─────
+        /* ── AND THE HANDING IS STILL STATED, AND IS STILL ONE TAP FROM BEING
+           CHANGED ───────────────────────────────────────────────────────
            ⚠ `handing` IS THE ONLY DEFAULT IN THIS PRODUCT THAT COSTS MONEY TO
            GET WRONG, and the page answers it for the customer because the
            drawing has to draw something. Measured at 1280x720: on arrival the
            ONLY controls the fold cuts through are the two handing pills — so
-           it is pre-answered and below the fold at once. The confirm row on
-           the summary is the answer (`UX-FINDINGS` §2, option B; option A
-           costs a `VERSION` bump for a third value in a packed index).
+           it is pre-answered and below the fold at once.
 
-           Three things, and the third is the one that would rot quietly: the
-           row is there, its control is WHOLE on screen at this viewport, and
-           its sentence is `handingWords()` to the character — the same
-           sentence the WhatsApp order carries. A confirmation phrased its own
-           way is a second statement of the fact that matters most on this
-           page, and §5's whole subject is what two statements of one fact
-           eventually do. */
+           ⚠ THE `.sum-hand` CONFIRMATION CARD THAT USED TO ANSWER THAT WENT ON
+           25.9.2026, at the owner's request — *"it just takes up space"* — and
+           the three assertions about it went with it rather than being
+           softened: the row exists, its control is whole on screen, and its
+           sentence is `handingWords()` to the character.
+
+           What replaces them is the promise that made the card removable, and
+           it is asserted rather than assumed: the summary's spec table carries
+           a פתיחה row, it says what `specRows` says, and it is a BUTTON whose
+           step is the one that asks the question. That is the same fact, in the
+           order's own vocabulary, one tap from the two pills. It is a wiring
+           question, so it is asked here and not in `npm test`.
+           §5.15: it fails loudly when the row cannot be found, because a
+           selector that stops matching is exactly how this check would go from
+           protecting the most expensive field in the product to protecting
+           nothing. */
         const hand = await p.evaluate(() => {
-          const row = document.querySelector('.sum-hand');
-          const words = document.querySelector('[data-handing-words]');
-          const flip = document.querySelector('.sum-hand__flip');
-          if (!row || !words || !flip) return { missing: true };
-          const r = flip.getBoundingClientRect();
+          const row = document.querySelector('#spec [data-key="handing"]');
+          if (!row) return { missing: true };
           return {
-            words: (words.textContent || '').trim(),
-            whole: r.width > 0 && r.height > 0 && r.top >= 0 && r.left >= 0
-                   && r.bottom <= innerHeight && r.right <= innerWidth,
-            tap: Math.min(Math.round(r.width), Math.round(r.height)),
-            below: Math.round(Math.max(0, r.bottom - innerHeight)),
+            value: (row.querySelector('.spec__value')?.textContent || '').trim(),
+            tag: row.tagName,
+            step: row.dataset.step || '',
+            label: (row.querySelector('.spec__label')?.textContent || '').trim(),
           };
         });
         if (hand.missing) {
-          fault(v.name, 'the summary has no handing confirmation — the one default '
-            + 'in this product that costs money to get wrong is answered for the '
-            + 'customer and never put back to them');
+          fault(v.name, 'the summary has no handing row in its spec table — the one '
+            + 'default in this product that costs money to get wrong is answered for '
+            + 'the customer and no longer stated back to them anywhere');
         } else {
-          if (!hand.whole) {
-            fault(v.name, 'the handing confirmation is not fully on screen'
-              + (hand.below ? ` — ${hand.below} px below the fold` : ''));
+          const want = specRows(DEFAULTS).find(r => r.key === 'handing');
+          if (hand.value !== want.value) {
+            fault(v.name, 'the summary\'s handing row does not say what js/spec.js '
+              + `says: page "${hand.value}" against "${want.value}"`);
           }
-          if (hand.tap < 44) {
-            fault(v.name, `the handing confirm control is ${hand.tap} px on its short `
-              + 'side, under the 44 px this project asserts everywhere');
-          }
-          const want = handingWords(DEFAULTS);
-          if (hand.words !== want) {
-            fault(v.name, 'the handing confirmation does not say what the ORDER says: '
-              + `page "${hand.words}" against spec.js "${want}"`);
+          if (hand.tag !== 'BUTTON' || hand.step !== 'fit') {
+            fault(v.name, `the summary's handing row is a ${hand.tag} going to `
+              + `"${hand.step}" — it has to be a button back to the step that asks `
+              + 'the question, which is what let the confirmation card go');
           }
         }
 
@@ -5163,13 +5240,20 @@ for (const v of VIEWS) {
 
      size          320    360    390    430   1100   1152+
      standard        ·      ·      ·      ·      ·      ·
-     extra1          ·      7      ·      ·      ·      ·
+     extra1          ·      7 →·   ·      ·      ·      ·   ← gated since 25.9
      half           55      ·      ·      ·      ·      ·
      extra2         58    200     65      ·      ·      ·
      halfextra1    198    235    127     34      ·      ·
      halfextra2    323    600    498    361    446      ·
 
-   So the words are on the leaf on FIVE of the six sizes, and on the widest
+   ⚠ AND `extra1`'s SINGLE 7 px² READING WENT TO ZERO ON 25.9.2026, which is
+   why it is in the gate above rather than in the list below. The phone's door
+   moved from `100vw` to `92vw` that day to buy the question a row, and a
+   smaller leaf is a wider wall — so a change made for one reason closed a
+   reading recorded for another. The check FOUND that rather than being told:
+   its §5.15 clause fired saying the exemption was no longer needed.
+
+   So the words are on the leaf on FOUR of the six sizes, and on the widest
    דו כנפי they are on it at every phone width and at 1100 — where the wall is
    73 px and the control is 100–110, which is arithmetic and not tuning.
    Photographed: at 360×740 `Русский` is charcoal-on-charcoal, and the sample
@@ -5193,8 +5277,17 @@ for (const v of VIEWS) {
   /* Derived from `SIZES`, never listed: a withdrawal must not leave this
      sweep quietly measuring a door that no longer exists (§5.18). */
   const ALL = Object.keys(SIZES);
-  const CLEAR = 'standard';
-  const KNOWN = ALL.filter(s => s !== CLEAR);   // the exemption, asserted below
+  /* ⚠ TWO DOORS ARE GATED CLEAN NOW, NOT ONE — 25.9.2026, AND THE CHECK IS
+     WHAT SAID SO. `extra1` was on the exemption list with a single 7 px² reading
+     at 360, and after the round that took the phone's door from `100vw` to
+     `92vw` it reads 0 in both languages at all five narrow widths: a smaller
+     leaf is a wider wall. The §5.15 clause below fired on it — *"it is named as
+     a door whose wall chrome lands on it and it no longer does"* — which is the
+     exemption refusing to outlive the fault, exactly as it was written to. So
+     it moves from the exemption into the GATE, where a future regression on it
+     fails rather than passing as expected. */
+  const CLEAR = ['standard', 'extra1'];
+  const KNOWN = ALL.filter(s => !CLEAR.includes(s));   // the exemption, asserted below
   let measured = 0;
   const seen = {};
 
@@ -5241,9 +5334,9 @@ for (const v of VIEWS) {
   };
 
   for (const lang of ['he', 'ru']) {
-    /* the gate: the standard door, every width */
-    for (const [w, h] of [...NARROW, ...WIDE]) {
-      const m = await inkOnDoor(lang, CLEAR, w, h);
+    /* the gate: the doors that are clear, every width */
+    for (const size of CLEAR) for (const [w, h] of [...NARROW, ...WIDE]) {
+      const m = await inkOnDoor(lang, size, w, h);
       if (m.noFrame) { fault('wall-ink', `${lang} ${w}x${h}: no #frame — nothing to measure against`); continue; }
       /* §5.15: with no live control in the wall every clause here passes by
          having no subject. Two languages leave two buttons plus two circles. */
@@ -5254,8 +5347,8 @@ for (const v of VIEWS) {
       measured++;
       if (m.worst > 0) {
         fault('wall-ink', `${lang} ${w}x${h}: the wall chrome paints ${m.worst} px² of "${m.who}" `
-          + `on the STANDARD door. That is the ₪3,195 leaf and it is the one size with wall to `
-          + `spare — §0b 28.8 measured the words stopping clear of the casing and this is that `
+          + `on the ${size} door, which this check GATES rather than exempts. `
+          + `§0b 28.8 measured the words stopping clear of the casing and this is that `
           + 'measurement going the other way');
       }
     }
@@ -5288,9 +5381,10 @@ for (const v of VIEWS) {
     }
   }
   if (faults === before) {
-    console.log(`    ${measured} readings in two languages: the standard door's wall chrome never `
-      + 'touches it, no size is touched at 1152 px and up, and the five doors §9 names are still '
-      + `the five that overlap (worst px² of glyph, he/ru: `
+    console.log(`    ${measured} readings in two languages: the wall chrome never touches the `
+      + `${CLEAR.length} gated door(s) (${CLEAR.join(', ')}), no size is touched at 1152 px and `
+      + `up, and the ${KNOWN.length} doors §9 names are still the ones that overlap `
+      + `(worst px² of glyph, he/ru: `
       + KNOWN.map(s => `${s} ${seen[s].he}/${seen[s].ru}`).join(', ') + ')');
   }
 }

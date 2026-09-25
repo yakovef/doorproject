@@ -17,7 +17,8 @@
  */
 
 import { byId, COLOURS, DETAILS, gripFinish, GRILLES, HANDINGS, HANDLES,
-         handleLength, hasUpperPanel, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS, PEEPHOLES, PIRZUL,
+         handleLength, hasUpperPanel, leafGlazed, LOCKSETS, MASHKOF_MAX, MASHKOF_PARTS, MASHKOFS,
+         PEEPHOLES, PIRZUL,
          REBATE, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS } from './catalog.js';
 import { L, T } from './copy.js';
 import { describeSentence } from './spec.js';
@@ -366,6 +367,82 @@ export function cylinderRamp(tone) {
     rim: scaleTone(tone[CYL_REF_RIM], CYL_LIFT_RIM),
   };
 }
+
+/**
+ * ── THE כדור'S BALL, IN ONE LOCK-FURNITURE FINISH ─────────────────────
+ *
+ * The owner's son, 25.9.2026: *"the ball handle needs to be affected by the
+ * pirzul."* This is that, and it is built exactly like `cylinderRamp` above
+ * rather than with `inFinish`, for a measured reason.
+ *
+ * ⚠ `inFinish` WAS TRIED FIRST AND IT FLATTENS THE BALL. That helper maps a
+ * stop's luminance onto a POSITION in the seven-step ramp ordered specular,
+ * brightest-to-darkest — and `inFinish`'s own docstring records that the STEEL
+ * ramp is strictly decreasing in that order. Brass and bronze are not: their
+ * index 4 is a lit return sitting between index 2 and index 3, so the mapping
+ * is not monotone and two different input brightnesses land on nearly the same
+ * output. Measured on this dome, stop-to-stop:
+ *
+ *              stops (luminance)        terminator   lit bounce   range
+ *   measured   239 224  84 144  99         2.67         1.71       2.85
+ *   inFinish, gold                         1.29         1.00       1.34
+ *   inFinish, bronze                       1.50         0.97       1.65
+ *
+ * A gold ball came out with no terminator and no bounce at all: a flat disc.
+ * That is §0b's own account of what `inFinish` used to do to the bar profiles
+ * — *"nine distinct values collapsed to five, contrast 3.64:1 down to 1.57:1,
+ * and SYMMETRIC… what shipped was a soft pill"* — arriving again in the one
+ * place where the whole character of the fitting is a hard terminator.
+ *
+ * ── SO THE MULTIPLIERS ARE THE MEASUREMENT ───────────────────────────
+ * Each measured stop is divided by the STEEL ramp entry it stands against,
+ * giving how much brighter or darker that part of the ball is than the
+ * furniture around it; `scaleTone` applies that to the chosen finish's own
+ * entry, which multiplies channels and leaves hue alone. So a gold ball is
+ * gold AND keeps the 2.67 step into its terminator.
+ *
+ * ⚠ THE REFERENCES ARE CHOSEN SO EVERY MULTIPLIER IS BELOW 1, which is not
+ * tidiness: `scaleTone` clamps at 255 a channel, so a lift above 1 on a bright
+ * ramp entry clips and the clipping is invisible in the source. The two bright
+ * stops stand against ramp[6], the specular, which is what they are; the
+ * terminator and the foot against ramp[5], the core; the lit bounce against
+ * ramp[2]. All five come out 0.75 to 0.96.
+ *
+ * ⚠ AND THE MULTIPLIERS ARE COMPUTED, NOT TYPED — `CYL_LIFT`'s rule. If the
+ * steel ramp is ever refitted the way the brass one was, these follow it.
+ *
+ * ⚠ NICKEL IS THE MEASUREMENT AND IS RETURNED AS LITERALS, so the default door
+ * and every committed comparison sheet carrying a ball knob are byte-identical
+ * across this change — asserted in `npm test`. BLACK IS DERIVED, and that is
+ * the one difference from `cylinderRamp`, which has a black measured off
+ * `research/newdoor/keyhole.jpg`. There is no photograph of a black ball knob
+ * anywhere in `research/`, so nothing is claimed as measured that is not.
+ *
+ * ── WHAT IT COMES OUT AT, MEASURED AND RECORDED RATHER THAN TUNED ─────
+ *
+ *   פרזול    stops (luminance)      terminator   lit bounce   range
+ *   nickel   239 224  84 144  99       2.67         1.71       2.85
+ *   gold     208 195  74 131  88       2.64         1.77       2.81
+ *   bronze   208 195  39  97  46       5.00         2.49       5.33
+ *   black    136 127  12  35  14      10.58         2.92      11.33
+ *
+ * Gold reproduces the measurement to within 2% on every figure, which is the
+ * derivation working. Bronze and black come out much deeper, and that is a fact
+ * about those ramps rather than a fault here: steel's own ramp runs 2.24:1 from
+ * specular to core and black's runs 8.9:1, so EVERY fitting painted from black
+ * is that much deeper. A ball holding 2.85:1 beside a lever running 8.9:1 would
+ * be the one piece of furniture on the door made of a different metal, which is
+ * the defect the five-owners rule exists to prevent. `cylinderRamp` records the
+ * same thing about bronze in its own words and for the same reason.
+ */
+const DOME_STEEL = ['#F2EEEA', '#E3DFDB', '#5D5249', '#988E86', '#6B625B'];
+const DOME_REF   = [6, 6, 5, 2, 5];
+const DOME_LIFT  = DOME_STEEL.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[DOME_REF[i]]));
+
+/** The ball's five radial stops, for one lock-furniture ramp. */
+export const domeRamp = tone => (tone === FINISH_TONES.steel
+  ? DOME_STEEL
+  : DOME_LIFT.map((m, i) => scaleTone(tone[DOME_REF[i]], m)));
 
 /**
  * The פעמון's metal — the PULL HANDLE's finish, since 20.9.2026.
@@ -726,18 +803,83 @@ const KNOCKER_AFF  = 1470;
    inside a 22-35 mm trim ring, so 30 mm is the ring and the reading lands mid
    range. This is the radius, and `peephole()` is what draws it. */
 const PEEPHOLE_R   = 15;    // 30 mm across, measured on d028
-/* ⚠ THE DIGITAL VIEWER'S BEZEL IS SOURCED, NOT MEASURED — 20.9.2026. Peretz
-   priced one (*"einit digital +390"*) and sent no photograph; none of the 129
-   in the corpus carries one. What is outside the door on a digital viewer is
-   the camera's bezel, and published outer bezels run 50-65 mm across (a
-   camera lens needs more plate than a 30 mm optical viewer does), so 54 is
-   the middle of that range. Half of it here, because every reader wants a
-   radius. REALISM.md §6 governs the day a picture arrives; `ASK-PERETZ.md`
-   asks for one. */
-const PEEPHOLE_DIGITAL_R = 27;
-/** The viewer's reach from its centre, whichever kind is on this door. */
-const peepholeR = state =>
-  (byId(PEEPHOLES, state.peephole).digital ? PEEPHOLE_DIGITAL_R : PEEPHOLE_R);
+/**
+ * ── THE DIGITAL VIEWER IS A TALL PLATE, NOT A BIG EYE — 25.9.2026 ─────
+ *
+ * The owner's son, looking at the shipped page: *"the digital עינית doesnt look
+ * like that."* He is right, and the shape of the error is worth writing down
+ * because no instrument in this repository could have found it.
+ *
+ * ⚠ WHAT WAS DRAWN: a rounded SQUARE, 54 x 54 mm, with two concentric dark
+ * circles and a highlight in the middle of it. At leaf scale that is a circle
+ * inside a square with a corner radius of a third of the side — so beside the
+ * optical viewer, which is a 30 mm circle with two concentric circles in it,
+ * the two fittings differed in size and in nothing else. The ONE thing the
+ * drawing had to say about this product — that it is a camera unit and not a
+ * larger peephole — was the one thing it did not say. `20.9`'s own note admits
+ * the bezel was *"sourced, not measured"*, and the source was a bezel DIAMETER,
+ * which is the wrong quantity: a bezel diameter is what you look up when you
+ * have already decided the thing is round.
+ *
+ * ⚠ IT IS NOT ROUND. The outside unit of every digital door viewer on the
+ * market is a TALL PLATE with a small camera high on it: the camera, its
+ * sensor board and (on most) an IR aperture stack vertically, so the housing is
+ * a portrait rectangle roughly twice as tall as it is wide. Published outside
+ * panels: Eques VEIU about 48 x 90 mm, Aqara and Xiaomi smart viewers about
+ * 55 x 100, the generic units Peretz would actually be quoted about 45 x 80.
+ * 48 x 92 is the middle of that range on both axes and its aspect, 0.52, is
+ * the middle of theirs (0.53 / 0.55 / 0.56).
+ *
+ * ⚠ THE LENS IS AT VIEWER HEIGHT AND THE PLATE HANGS AROUND IT, which is the
+ * only part of this that is a measurement rather than a product dimension.
+ * `PEEPHOLE_AFF` is 1600 and it is a corpus figure over thirty doors — where a
+ * person's eye goes. On a round viewer that is the fitting's centre; on a tall
+ * plate it is the LENS's centre, and the lens sits at 0.30 of the plate's
+ * height from the top, so the plate reaches 0.30 x 92 up and 0.70 x 92 down
+ * from it. Centring the PLATE on 1600 instead would put the camera 18 mm above
+ * eye level on every door, which is the same class of error as reading a bezel
+ * diameter for a thing that is not round.
+ *
+ * ⚠ NO BELL BUTTON ON IT, and that is a decision rather than an omission. Many
+ * of these units carry one under the lens — and this site sells the פעמון as
+ * its own priced option, so drawing a second button on the viewer would show a
+ * customer a bell they have not bought and Peretz an order that does not say
+ * what the picture shows. §0's worst failure in its quietest form.
+ *
+ * ⚠ AND IT IS STILL SOURCED RATHER THAN MEASURED. There is no photograph of
+ * one in `research/`, none of the 129 corpus doors carries one, and
+ * `ASK-PERETZ.md` §1b asks for a picture. REALISM.md §6 governs the day it
+ * arrives, and what it will govern is this table and nothing else — every
+ * figure in the drawing below is a fraction of it.
+ */
+const PEEPHOLE_DIGITAL = {
+  w: 48,        // mm across the plate
+  h: 92,        // mm down it
+  lens: 0.30,   // the camera's centre, as a fraction of the height from the top
+  lensR: 8,     // the lens housing's radius — an 16 mm eye in a 48 mm plate
+};
+/**
+ * How far the viewer's ink reaches from the point `PEEPHOLE_AFF` names,
+ * whichever kind is on this door.
+ *
+ * ⚠ IT WAS A SINGLE RADIUS, `peepholeR`, AND A TALL PLATE CANNOT BE ONE. Both
+ * readers — `faceObstacles` and the old geometric `peepholeFits` — took it as a
+ * symmetric half-width and used it for all four sides, which is right for a
+ * circle and would have declared the digital viewer's clearance box 48 mm tall
+ * where the plate is 92, with the error all on the low side because the lens is
+ * high on the plate. A pull bar lying across the leaf could then have been
+ * drawn through the bottom third of it and `npm run collide` would have been
+ * the only thing to notice.
+ *
+ * `up`/`down` rather than a centre and a radius, which is `KNOCKER_REACH`'s own
+ * shape one fitting over and for the same reason: these fittings are not
+ * centred on the height that positions them.
+ */
+const peepholeReach = (state) => (byId(PEEPHOLES, state.peephole).digital
+  ? { x: PEEPHOLE_DIGITAL.w / 2,
+      up: PEEPHOLE_DIGITAL.h * PEEPHOLE_DIGITAL.lens,
+      down: PEEPHOLE_DIGITAL.h * (1 - PEEPHOLE_DIGITAL.lens) }
+  : { x: PEEPHOLE_R, up: PEEPHOLE_R, down: PEEPHOLE_R });
 /* ⚠ THE KNOCKER'S RADIUS LIVES UP HERE BECAUSE A RULE READS IT NOW. It was a
    bare `66` inside `bellKnocker`, which was correct for as long as nothing but
    the drawing needed to know how big the fitting is — and on 7.9.2026
@@ -1501,6 +1643,11 @@ export function render(state) {
      shares one answer with the ones already here. See `cylinderRamp` for
      which of the four cylinders are measured. */
   const cyl      = cylinderRamp(hwTone);
+  /* The ball knob's five stops, on the פרזול's ramp since 25.9.2026 — see
+     `domeRamp`. Read here beside the cylinder's for the same reason: one
+     function of one ramp, so the question "whose metal is this?" is answered
+     once per fitting and not once per fill. */
+  const dome     = domeRamp(hwTone);
   const bellTone = bellRamp(tone);
 
   /* ⚠ THE STRIPES FOLLOW THE FINISH, AND WHICH FINISH TOOK DECIDING.
@@ -2076,7 +2223,19 @@ export function render(state) {
          long backplate that carries the keyway) and the photograph this
          drawing came from, d092, is BRONZE — so it demonstrably ships in more
          than one finish. The owner named two handles; these are those two.
-         ASK-PERETZ §0a7 puts the near-name to him. -->
+         ASK-PERETZ §0a7 puts the near-name to him.
+
+         ⚠ AND THE כדור LEFT THIS EXEMPTION ON 25.9.2026 — HALF OF THE 31.8
+         INSTRUCTION IS REVERSED, ON THE OWNER'S SON'S WORD: *"the ball handle
+         needs to be affected by the pirzul."* So lockUnitSoft and
+         lockUnitFace are the ספיר's alone now, plus the two bought-in locks
+         lockUnit was always for; the cadoor's shank paints with nickelSoft
+         and its ball with domeKnob, which passes its measured stops through
+         inFinish with hwTone. The quote above is kept rather than rewritten —
+         a withdrawn instruction is the thing a later reader most needs to see
+         beside the one that withdrew it, which is how cylinderRamp and
+         bellRamp are written. The ספיר is untouched: he named the ball, and
+         a square cushion knob in mirror chrome is not it. -->
     <linearGradient id="lockUnitSoft" x1="0.1" y1="0" x2="0.9" y2="1">
       <stop offset="0"   stop-color="${FINISH_TONES.steel[1]}"/>
       <stop offset="0.5" stop-color="${FINISH_TONES.steel[3]}"/>
@@ -2312,13 +2471,31 @@ export function render(state) {
       <stop offset="0.78" stop-color="#5A4B40"/>
       <stop offset="1"   stop-color="#8C8179"/>
     </linearGradient>
-    <!-- Cadoor's dome: a hard terminator, not a smooth falloff. -->
+    <!-- Cadoor's dome: a hard terminator, not a smooth falloff.
+         ⚠ AND IT FOLLOWS THE פרזול SINCE 25.9.2026, WHICH OVERRULES 31.8.
+         The owner's son: *"the ball handle needs to be affected by the
+         pirzul."* The 31.8 instruction that put this knob outside the finish
+         axis — *"the pirzul doesnt change the color of the ספיר and כדור
+         handles"* — is kept in full beside lockUnitSoft above, as the
+         instruction this one overrules, the way cylinderRamp and bellRamp
+         keep theirs. The ספיר is NOT in this reversal: he named the ball.
+
+         ⚠ THE MEASURED PROFILE IS CARRIED ACROSS, NOT REPLACED, AND inFinish
+         IS THE WRONG TOOL FOR IT — the whole derivation, the numbers that
+         refuse inFinish here, and why nickel stays byte-identical are written
+         out at domeRamp beside cylinderRamp. What matters at this site is only
+         that the five stops come from one function of one ramp.
+         ⚠ hwTone, NEVER tone. tone is the PULL HANDLE's metal and the
+         five-owners rule in CLAUDE.md §3 is that every ramp answers "whose
+         metal is this?" before it picks a fill. A knob you turn is lock
+         furniture, so it is the פרזול's — which is the whole of what he
+         asked. -->
     <radialGradient id="domeKnob" cx="0.34" cy="0.26" r="0.86">
-      <stop offset="0"    stop-color="#F2EEEA"/>
-      <stop offset="0.28" stop-color="#E3DFDB"/>
-      <stop offset="0.42" stop-color="#5D5249"/>
-      <stop offset="0.72" stop-color="#988E86"/>
-      <stop offset="1"    stop-color="#6B625B"/>
+      <stop offset="0"    stop-color="${dome[0]}"/>
+      <stop offset="0.28" stop-color="${dome[1]}"/>
+      <stop offset="0.42" stop-color="${dome[2]}"/>
+      <stop offset="0.72" stop-color="${dome[3]}"/>
+      <stop offset="1"    stop-color="${dome[4]}"/>
     </radialGradient>
     <!-- Sapir: mirror chrome is bright at both edges with a dark reflected
          core — the opposite of the satin gradient everything else uses. -->
@@ -4163,10 +4340,13 @@ export const faceObstacles = memo(function faceObstacles(state) {
                h: KNOCKER_REACH.up + KNOCKER_REACH.down });
   }
   if (state.peephole && state.peephole !== 'nopeep') {
-    const R = peepholeR(state);
+    /* ⚠ `peepholeReach`, NOT A RADIUS — see its own note. The digital viewer is
+       a 48 x 92 plate whose lens sits at 0.30 of its height, so its box is
+       neither square nor centred on the height that places it. */
+    const R = peepholeReach(state);
     out.push({ kind: 'fitting', band: 0,
-               x: leafW / 2 - R, y: leafH - PEEPHOLE_AFF - R,
-               w: R * 2, h: R * 2 });
+               x: leafW / 2 - R.x, y: leafH - PEEPHOLE_AFF - R.up,
+               w: R.x * 2, h: R.up + R.down });
   }
   const sp = SPECIAL_BOX[state.speciallock];
   if (sp) {
@@ -4203,44 +4383,49 @@ export const faceObstacles = memo(function faceObstacles(state) {
 /**
  * CAN A עינית BE FITTED ON THIS LEAF?
  *
- * ⚠ GEOMETRIC, NOT OBSERVED, AND THE DISTINCTION MATTERS HERE. `js/rules.js`
- * keeps the two kinds apart because they carry different weight: an OBSERVED
- * rule says "Peretz does not build this" and a GEOMETRIC one says "this does
- * not fit". This is the second, and it is computed from the same
- * `apertureLayout` the drawing calls, so it cannot drift away from the picture
- * the way a listed rule would.
+ * ⚠ A GLAZED LEAF TAKES NO VIEWER, OF EITHER KIND, SINCE 25.9.2026 — and this
+ * replaced a GEOMETRIC rule with a flat one at the owner's son's word:
+ * *"digital and normal peepholes arent compatable with a window."*
  *
- * ⚠ AND THE OBSERVED VERSION WOULD HAVE BEEN WRONG. `render()` once suppressed
- * the peephole whenever `win.rects.length` was non-zero, and
- * `research/works/INVENTORY.md` records that rule as a FINDING against the
- * code: glazed doors in the corpus do carry peepholes, and d076 carries one on
- * a solid leaf above a knocker. So "a glazed door has no peephole" is not true
- * of Peretz's doors and must not be written down as if it were.
+ * ── what the geometric version was, and why it goes ───────────────────
+ * It laid the fitting's own box over every opening `apertureLayout` returns and
+ * asked whether they touched, with the clearance read from the fitting's own
+ * measured size so the rule moved by itself if either was re-measured. That is
+ * a good shape for a rule and it was RIGHT: swept over every size x window x
+ * face in the catalogue it refused the viewer on all 96 glazed states and on no
+ * solid one. Nothing about it was broken.
  *
- * What IS true is narrower and is about this catalogue: both window shapes we
- * sell are centred on the leaf and both reach the height a viewer goes at, so
- * on OUR two glazed doors a peephole at its measured position has nowhere to
- * be. Measured rather than reasoned — `tools/_newhw.mjs` swept 426 designs
- * with real `getBBox` and found the overlap on all 140 glazed ones and on
- * nothing else. A door with a small high window off to one side would pass
- * this; we do not make one.
+ * What it was, though, is a computation whose answer never varies — an
+ * arithmetic proof, run on every conflicts() call, of a fact the range settles:
+ * both window shapes we sell are centred on the leaf and both reach the height
+ * a viewer goes at. The owner has now stated that fact as a rule about his
+ * products rather than as a property of two rectangles, and a rule he states
+ * outranks a derivation of ours that agrees with it.
  *
- * The clearance is the fitting's own radius plus a little, so the rule moves
- * by itself if either the peephole or a window is ever re-measured.
+ * ⚠ SO IT IS OBSERVED NOW, NOT GEOMETRIC, AND THAT COSTS SOMETHING REAL.
+ * `js/rules.js` keeps the two kinds apart because they carry different weight,
+ * and the geometric one had a property this loses: a door with a small high
+ * window off to one side would have PASSED it. We do not make one — but if
+ * Peretz ever adds a narrow top light, this rule refuses a viewer on it and the
+ * old one would not have. That is the trade, and it is his to make.
+ * ⚠ AND `research/works/INVENTORY.md` DISAGREES WITH HIM, which is recorded
+ * rather than acted on. Glazed corpus doors DO carry peepholes, and that
+ * finding is why `render()`'s original blanket suppression was called a bug.
+ * The difference is that the corpus is what he has built and this is what he
+ * says he sells; where the two disagree, §0a says the disagreement is recorded
+ * and his decision stands. `ASK-PERETZ.md` has it.
+ *
+ * ⚠ `leafGlazed`, NOT `isGlazed`, AND THE TWO COINCIDE TODAY. The reason a
+ * viewer cannot go on a glazed door is that the glass is where the viewer goes
+ * — which is a fact about the LEAF's own face. A sidelight's pane is in the
+ * panel beside the leaf and competes with nothing; d128 carries ironwork there
+ * with no window in its leaf at all. In this catalogue the side leaf's light
+ * mirrors the main leaf's, so the two predicates give the same answer on all 36
+ * size x window states — measured. Using the narrower one is what keeps that a
+ * coincidence rather than a dependency.
  */
 export function peepholeFits(state) {
-  const size = SIZES[state.size] || SIZES.standard;
-  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
-  const openings = apertureLayout(byId(WINDOWS, state.window),
-                                  leafW, byId(DETAILS, state.detail), leafH);
-  if (!openings.length) return true;
-  /* The fitting, in the leaf's own coordinates: centred across, and
-     `PEEPHOLE_AFF` up from the floor, which is `leafH - PEEPHOLE_AFF` down
-     from the leaf's head. */
-  const cx = leafW / 2, cy = leafH - PEEPHOLE_AFF;
-  const R = peepholeR(state) + 8;                 // its radius plus a bead of paint
-  return !openings.some(o =>
-    cx + R > o.x && cx - R < o.x + o.w && cy + R > o.top && cy - R < o.top + o.h);
+  return !leafGlazed(state);
 }
 
 /**
@@ -5703,102 +5888,389 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
     return { veil: out, over: '' };
   }
 
-  /* ── גפן — d109 and d111 ────────────────────────────────────────────
-     A repeating film cut by the opening, not a motif placed in the middle of
-     it: one sinuous stem running off both ends with leaves and bunches tied to
-     it by thin stalks, and tendrils filling the gaps.
-     The LEAF is the dominant thing — five leaves to three bunches, each as
-     wide as a whole bunch — and ours had none at all, so the pane read as
-     fruit floating in a void. The berries were also twice life size: 0.22 W
-     against a measured 0.12-0.14 W, which put one bunch across most of the
-     opening. And three identical bunches at identical spacing is not what a
-     drawn film does. */
+  /* ── גפן — d109, REDRAWN 25.9.2026 ─────────────────────────────────
+     The owner's son: *"fix the grape and vine pattern, look at a real image
+     with that design and copy it the best you can, then try to critisize your
+     design, and then fix those critisisms."*
+
+     ⚠ THE EVIDENCE IS d109 AND IT IS THE ONLY DOOR THAT CAN BE READ. Both
+     doors filed under this design carry a FALLBACK leaf box (CLAUDE.md §8), so
+     nothing here starts from `research/works/auto`; the PANE is found in the
+     image instead, as the widest bright rectangle inside the leaf, and every
+     number below is a fraction of ITS WIDTH — 226 px on a 464 px-tall opening,
+     aspect 0.487. That is the only unit `glazingArt` lays ornament out in
+     (§0b, 30.8: *"ornament is sized by the pane's WIDTH and never by its
+     height"*). d111's pane could not be located automatically and is not used.
+
+     ── WHAT THE PHOTOGRAPH SAYS, MEASURED ──────────────────────────────
+     · ONE STROKE WEIGHT, 6 px of 226 = **0.0265 W**, and it is the same on the
+       stem, the leaf outlines, the berry rings and the tendrils. Taken as the
+       MODE of every ink run along every row: 6 px x426, then 5 x380 and 7 x285
+       either side of it, which is one line weight seen at every angle.
+     · the film reaches **every edge** — first ink at 0.000 W and last at
+       0.996 W across, 0.000 to 0.998 down. Cut by the opening on all four
+       sides, not placed inside it.
+     · ink coverage **25.0%** of the pane, and by quarter 23.6 / 37.0 / 17.1 /
+       22.2. Even enough to be a repeating film and uneven enough not to be a
+       lattice.
+
+     ── WHAT WAS WRONG WITH OURS, BESIDE IT ─────────────────────────────
+     Rendered at the photograph's own pane aspect and put next to it:
+     · **the stem zigzagged.** It swung ±0.20 W in a sine sampled as 48
+       straight `L` segments, so every reversal was a corner and the thing read
+       as a lightning bolt. The real stem is a gentle meander: measured on the
+       ruled crop it stays between 0.46 and 0.55 W, so **±0.045 W about the
+       middle**, with about two bows over the 2.05 W of height — a wavelength
+       near 1.0 W — and it CURVES the whole way.
+     · **the leaves were half size and the wrong shape.** A leaf in the
+       photograph spans about **0.42 W**; ours spanned 0.22. And ours were
+       spiky — sharp lobes with deep V notches, which is a maple — where the
+       real ones have blunt ROUNDED lobes, shallow rounded notches and a
+       heart-shaped base.
+     · **the berries were a quarter too big and the bunch too tidy.** Read off
+       the grid a berry is about **0.12 W across** the outside, packed at
+       about 0.11 W centre to centre so the rings just touch; ours drew 0.151 W
+       in a neat pyramid of identical circles.
+     · **three stroke weights** — 0.030 for the stem, 0.021 for outlines and
+       0.014 for tendrils — against the photograph's one.
+     · **the tendrils were invisible.** Ours were tight curls about 0.14 W;
+       the real ones are open spirals about 0.19 W and there are four or five
+       of them, and they are what fills the ground between the motifs.
+
+     ── AND THE SELF-CRITICISM HE ASKED FOR, WHICH TOOK FOUR ROUNDS ──────
+     Each round is recorded where its number lives, because every one of them
+     was a fault in the REDRAW rather than in the original:
+     · **round 1** — the motifs hung off the stem on hairline stalks and
+       floated; the branches are the stem's own weight now and are a third of
+       what is on the pane. The leaves all leaned the same way. And one motif
+       per side at an even pitch read as a ladder, so the two sides are offset
+       by half a pitch and the kind alternates on a four-cycle.
+     · **round 2** — the leaf. A spline through ten measured points overshoots
+       at every direction reversal, so the lobes came to spikes: it is a polar
+       radius now, which cannot have a corner. See `LOBE_OUT`.
+     · **round 3** — the leaf again, twice more. The lobe depth was a GUESS
+       this comment claimed as a measurement, and the veins crossed out through
+       the notches. See `LOBE_OUT` and the vein note.
+     · **round 4** — the density, and my eye had it backwards. See `PITCH`.
+     ⚠ THE PATTERN IN ALL FOUR IS THE SAME: every one was found by rendering
+     the thing LARGE and looking at it, or by measuring it, and not one by
+     reasoning about the code. The comparison sheet that started this round
+     squashed our pane to two thirds of its aspect and cost two wrong
+     conclusions on its own.
+
+     ⚠ ONE THING IS NOT COPIED, DELIBERATELY. The photograph's film is grey on
+     bright frosted glass — dark ornament on a light ground. Our pane is the
+     sky-reflecting glass Part C put back on 20.9, so the ornament is drawn
+     LIGHTER than the paint and reads against the glass rather than into it.
+     Matching the photograph's polarity would mean darkening the pane, which is
+     the exact thing that round undid (*"the window designs that turn the
+     window black. they shouldnt"*). */
   if (kind === 'vine') {
     const ink = scaleTone(paint, 1.06);
-    const STEM = w * 0.030, OUT = w * 0.021, THIN = w * 0.014;
-    const str = (d, sw) => `<path d="${d}" fill="none" stroke="${ink}"
-      stroke-width="${sw.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    /* ONE weight, measured: 6 px of a 226 px pane. The three-weight version is
+       what made the stem read as a different object from the leaves. */
+    const INK = w * 0.0265;
+    const str = d => `<path d="${d}" fill="none" stroke="${ink}"
+      stroke-width="${INK.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
     let out = '';                                  // no ground: the pane shows through
 
-    const pitch = w * 0.26;
-    const n = Math.max(4, Math.round(h / pitch));
-    /* The stem, cut by both the top and the bottom edge, and swinging far
-       enough across the pane that the motifs hanging off it are cut by the
-       SIDE edges too. It wandered 0.11 of the width and the leaves reached
-       0.19 beyond that, which left a clear margin of bare glass down both
-       sides — and this is a repeating film cut by an opening, not a motif
-       placed in the middle of one. Both photographs run off all four edges. */
-    const stemX = t => x + w * (0.50 + 0.20 * Math.sin(t * Math.PI * 2 * (n / 3.2)));
-    let d = `M ${n2(stemX(-0.03))} ${n2(y - h * 0.03)}`;
-    for (let i = 1; i <= 48; i++) {
-      const t = -0.03 + (1.06 * i) / 48;
-      d += ` L ${n2(stemX(t))} ${n2(y + h * t)}`;
+    /* ── the stem ──────────────────────────────────────────────────────
+       ⚠ QUADRATIC HALF-WAVES, NOT A SAMPLED SINE. A quadratic from one zero
+       crossing to the next, with its control point at TWICE the amplitude at
+       the quarter point, passes through exactly ±amp at its midpoint and is
+       smooth everywhere — so the stem has no facets and no corners at any
+       scale, including the 140 mm the A4 sheet prints it at. The old version
+       emitted 48 `L` segments and every reversal showed.
+       The wavelength is in W and not in H, so a tall pane gets more bows and a
+       squat one fewer, which is what a repeating film cut by an opening does.
+       It starts a half wave above the head and runs a half wave past the foot,
+       so both ends are cut by the edge rather than stopping at it. */
+    const MID = 0.500, AMP = 0.045, WAVE = 1.05;   // all x W, measured on d109
+    const half = w * WAVE / 2;
+    const yTop = y - half, yBot = y + h + half;
+    const stemX = t => x + w * (MID + AMP * Math.sin(t * Math.PI));
+    const nHalf = Math.ceil((yBot - yTop) / half);
+    {
+      let d = `M ${n2(x + w * MID)} ${n2(yTop)}`;
+      for (let i = 0; i < nHalf; i++) {
+        const dir = i % 2 ? -1 : 1;
+        d += ` Q ${n2(x + w * (MID + dir * AMP * 2))} ${n2(yTop + half * (i + 0.5))}`
+           + ` ${n2(x + w * MID)} ${n2(yTop + half * (i + 1))}`;
+      }
+      out += str(d);
     }
-    out += str(d, STEM);
+    /* Where the stem is at a given y, for hanging things off it. Derived from
+       the same three constants rather than re-fitted, so a branch always
+       leaves the stem ON the stem. */
+    const stemAt = yy => x + w * (MID + AMP * Math.sin(((yy - yTop) / half) * Math.PI));
 
-    const KIND = ['leaf', 'cluster', 'leaf', 'leaf', 'cluster', 'leaf', 'cluster', 'leaf'];
-    const LSZ = [1.00, 0.86, 1.15, 0.94, 1.08, 0.90];
-    const LROT = [-25, 15, -10, 30, -35, 20];
-    const BR = [1.00, 0.95, 0.78, 0.92, 1.18, 1.02, 0.95, 1.05, 1.00];
-    for (let i = 0; i < n; i++) {
-      const t = (i + 0.5) / n;
-      const ay = y + h * t, side = i % 2 ? 1 : -1;
-      const ax = stemX(t) + side * w * 0.26;
-      if (KIND[i % 8] === 'cluster') {
-        const r = w * 0.065;
-        let k = 0;
-        [3, 3, 2, 1].forEach((per, row) => {
-          for (let c = 0; c < per; c++) {
-            const f = BR[k % BR.length]; k++;
-            const bx = ax + (c - (per - 1) / 2) * r * 2.04 + (row % 2 ? r * 0.5 : 0);
-            const by = ay + row * r * 1.76;
-            out += `<circle cx="${n2(bx)}" cy="${n2(by)}" r="${n2(r * f)}" fill="none"
-                            stroke="${ink}" stroke-width="${OUT.toFixed(2)}"/>`;
-          }
-        });
-        out += str(`M ${n2(stemX(t))} ${n2(ay - r)} Q ${n2((stemX(t) + ax) / 2)} ${n2(ay - r * 1.8)}
-                    ${n2(ax)} ${n2(ay - r * 1.1)}`, THIN);
+    /* ── the leaf ──────────────────────────────────────────────────────
+       ⚠ POLAR, AND THE FIRST REDRAW OF THIS WAS A LIST OF POINTS THROUGH A
+       SPLINE, WHICH CAME OUT AS A STAR. That version put ten measured points
+       round a half leaf and smoothed them with Catmull-Rom; a spline through
+       points that reverse direction overshoots AT the reversal, so every lobe
+       tip came to a spike and the leaf read as a thistle — the exact fault the
+       redraw was for, reintroduced by the method rather than by the numbers.
+       Written as a radius that VARIES WITH ANGLE there is no reversal to
+       overshoot: the outline cannot have a corner because the function that
+       makes it has none.
+
+         r(θ) = R · (1 + LOBE · shaped(cos 5θ))
+
+       is a five-lobed rosette with the apex at the top, and `LOBE` is how deep
+       the notches cut.
+
+       ⚠ AND 0.155 WAS A GUESS THAT THIS COMMENT CLAIMED AS A MEASUREMENT. It
+       said *"1.155/0.845 is 1.37 against the 1.35 the photograph gives"* and no
+       such reading had been taken. Drawn at that depth the lobes dissolved and
+       the leaf came out an amoeba with an X of veins on it — worse than the
+       spiky version it replaced. §6 in one line: get the number before changing
+       anything, and get it again before writing it down.
+       Measured, on a leaf cropped whole at 4x with a 0.10 W scale bar beside
+       it: the notches cut **more than half way in**, lobe over notch about
+       **2.3**, which needs LOBE ≈ 0.40 and not 0.155. A grape leaf is a deeply
+       cut thing and the photograph says so plainly at magnification.
+
+       ⚠ `shaped` IS WHY IT IS NOT A BARE COSINE. A cosine gives lobes and
+       notches the same width; the photograph's lobes are broad flaps and its
+       notches are narrow slots. Raising |cos| to a power below 1 broadens the
+       extremes and steepens the crossings, which is that difference exactly,
+       and it keeps the curve smooth — the thing a spline through measured
+       points could not do without spiking at every tip.
+
+       ⚠ AND THE SINUS IS A SEPARATE TERM. θ = π is straight down and
+       `cos 5π = -1`, so a notch already falls there; this deepens it into the
+       V the petiole enters through, which is the single feature that stops a
+       five-lobed rosette reading as a flower. */
+    /* ⚠ AND 0.40 WITH A 0.65 POWER WAS TOO FAR THE OTHER WAY, which is the
+       third reading of this one number and the second time it was wrong. At
+       that depth the lobes came out FLAT-TOPPED and the notches became narrow
+       slots, so the outline read as a splat rather than as a leaf: a power
+       well below 1 holds the curve near its extremes for most of the cycle,
+       which squares off the very thing it was meant to round. 0.30 at 0.80
+       keeps the lobe-to-notch ratio at 1.9 — inside the 2.3 measured on the
+       crop, and the difference is the stroke, which fattens every lobe and
+       narrows every notch by half a line weight once it is drawn. */
+    /* ⚠ TWO EXPONENTS, ONE PER SIDE, AND ONE EXPONENT CANNOT DO IT. Drawn
+       large, a single power gave lobes and notches the SAME angular width and
+       the leaf read as a starfish — five fingers with five equal gaps. On the
+       magnified crop the lobes are broad flaps taking most of each 72° period
+       and the notches are narrow slots taking the rest, which is two different
+       shapes and needs two numbers:
+         · out (c > 0), a LOW power broadens the lobe — it holds near its
+           maximum across most of the arc and falls away only at the edges;
+         · in (c < 0), a HIGH power narrows the notch — it stays near nothing
+           except right at the bottom, so the slot is a slot.
+       ⚠ AND `APEX` IS THE ONE DEPARTURE FROM FIVEFOLD SYMMETRY. A pure
+       5-lobed rosette has an equal lobe in every direction including straight
+       down, and a leaf does not: its apex is the biggest lobe and its basal
+       pair are the smallest. Ten per cent of bias, which is enough to give the
+       shape a top and a bottom without making it a different outline. */
+    const LOBE_OUT = 0.30, POW_OUT = 0.55;
+    const LOBE_IN  = 0.34, POW_IN  = 1.90;
+    const APEX = 0.10, SINUS = 0.40, SINUS_D = 0.72;
+    /* One statement of the outline, so the veins cannot leave it (below). */
+    const leafR = th => {
+      const c = Math.cos(5 * th);
+      let r = c >= 0 ? 1 + LOBE_OUT * c ** POW_OUT
+                     : 1 - LOBE_IN * (-c) ** POW_IN;
+      r *= 1 + APEX * Math.cos(th);
+      const fromFoot = Math.abs(Math.PI - th);
+      if (fromFoot < SINUS) {
+        const k = 1 - fromFoot / SINUS;
+        r *= 1 - (1 - SINUS_D) * k * k * (3 - 2 * k);
+      }
+      return r;
+    };
+    const leafPath = (cx, cy, span, rot) => {
+      const R = span / 2;
+      const N = 64;                     // sub-pixel at pane scale and at A4
+      let d = '';
+      const ca = Math.cos(rot), sa = Math.sin(rot);
+      /* 0.95 on the y axis: the photograph's leaves are a touch wider than
+         they are tall, which is what a grape leaf is. */
+      const put = (u, v) => [cx + u * ca - v * sa, cy + u * sa + v * ca];
+      const ring = (th, f) => {
+        const rr = R * leafR(th) * f;
+        return put(rr * Math.sin(th), -rr * Math.cos(th) * 0.95);
+      };
+      for (let i = 0; i < N; i++) {
+        /* θ from the apex, clockwise: θ=0 is the top. */
+        const [px, py] = ring((i / N) * Math.PI * 2, 1);
+        d += `${i ? ' L' : 'M'} ${n2(px)} ${n2(py)}`;
+      }
+      /* ⚠ THREE VEINS FROM THE PETIOLE, AND THEY ARE LONG. The first redraw
+         made them short stubs from the leaf's CENTRE and they came out as an
+         asterisk lying on a blob. On the magnified crop the midrib runs from
+         the sinus nearly to the apex and the two side veins reach well into
+         the side lobes — they are most of what makes the shape read as a leaf
+         rather than as a cut-out. Each ends in a small blob, which the film
+         has and which also stops a stroke ending in mid-air.
+         ⚠ AND THEY START AND END ON THE SAME CURVE THE OUTLINE IS DRAWN FROM,
+         which is why `leafR` is a function rather than eight lines repeated.
+         The version before this put the root at a flat 0.52 R and drew to a
+         radius that ignored the sinus — so on every leaf the root sat OUTSIDE
+         the outline at the bottom and three strokes crossed the edge, which is
+         the X that was showing through the shape. The root is now the sinus's
+         own point pulled a little inside it, and each vein ends at a fraction
+         of the radius at its own angle. Re-measure `LOBE` and both follow. */
+      /* ⚠ ROOT → CENTRE → TIP, AND A STRAIGHT ROOT-TO-TIP CROSSES THE OUTLINE.
+         This is the third try at the veins and the second real defect in them.
+         A leaf with notches this deep is NOT convex, so a chord from the sinus
+         at the foot to a lobe tip at 72° leaves the shape through the notch
+         between them — drawn large, three strokes ran out past the edge and
+         the leaf read as a splat with a star scribbled over it. Every segment
+         is RADIAL now: the root runs in to the centre along 180°, and each
+         vein runs out from the centre along its own angle, so a vein is inside
+         the outline by construction whatever `LOBE` is re-measured to. */
+      /* ⚠ THREE STROKES, NOT FOUR. The midrib is ONE line from the sinus
+         through the centre to the apex — drawn as two, the leaf's interior
+         came out as an X with a stroke crossing it, because four lines meeting
+         at a point is a star whatever the outline round it does. The
+         photograph has a midrib and two side veins, and the midrib is the
+         petiole carrying on. */
+      const root = ring(Math.PI, 0.88), apex = ring(0, 0.80), mid = put(0, 0);
+      let veins = str(`M ${n2(root[0])} ${n2(root[1])} L ${n2(mid[0])} ${n2(mid[1])}`
+                    + ` L ${n2(apex[0])} ${n2(apex[1])}`)
+        + `<circle cx="${n2(apex[0])}" cy="${n2(apex[1])}" r="${n2(INK * 0.62)}" fill="${ink}"/>`;
+      for (const th of [Math.PI * 0.4, -Math.PI * 0.4]) {
+        const b = ring(th, 0.66);
+        veins += str(`M ${n2(mid[0])} ${n2(mid[1])} L ${n2(b[0])} ${n2(b[1])}`)
+               + `<circle cx="${n2(b[0])}" cy="${n2(b[1])}" r="${n2(INK * 0.62)}" fill="${ink}"/>`;
+      }
+      return str(d + ' Z') + veins;
+    };
+
+    /* ── the bunch ─────────────────────────────────────────────────────
+       Rings, never discs, at a pitch just under their own diameter so they
+       touch the way the photograph's do. Rows of 3-3-2-1 with the odd rows
+       offset by half a pitch, and the radii varied a little: three identical
+       bunches at identical spacing is not what a drawn film looks like. */
+    /* ⚠ THE BERRIES VARY BY MORE THAN TWO TO ONE, AND OURS VARIED BY SIX PER
+       CENT. Cropped at 4x with a 0.10 W bar beside it, one bunch on d109 holds
+       berries of 0.061, 0.094 and 0.139 W across — a factor of 2.3 inside a
+       single bunch, packed so they touch and nest rather than sitting on a
+       grid. A tidy pyramid of identical rings is what a PATTERN looks like;
+       this is what fruit looks like, and the difference is most of why ours
+       read as a diagram.
+       Mean diameter 0.105 W, so the ring's centreline radius is 0.039 W with
+       the 0.0265 W stroke on it. */
+    const BR = [1.00, 0.72, 1.28, 0.86, 1.15, 0.64, 1.32, 0.94, 1.08, 0.78, 1.20];
+    /* ⚠ AND THE ROWS ARE LAID OUT BY ACCUMULATING DIAMETERS, NOT ON A PITCH.
+       With sizes varying two to one a fixed centre-to-centre spacing leaves
+       gaps under the small berries and drives the large ones through each
+       other. Each berry is placed against the edge of the one before it, less
+       a little, so they touch whatever size they are — which is also what
+       makes a row of three come out a different width each time. */
+    const bunchPath = (cx, cy, seed) => {
+      const R = w * 0.048;
+      let s = '', k = seed, y0 = 0;
+      /* ⚠ THEY TOUCH, THEY DO NOT OVERLAP, and the first version of this drew
+         them through each other. With radii varying two to one, an overlap of
+         a fixed 0.22 R put a big berry's ring inside a small one's and a bunch
+         came out as a tangle of arcs rather than as fruit. On the magnified
+         crop the rings meet and stop — you can follow every berry all the way
+         round. A hair of air rather than none, so two strokes never merge into
+         one thick line at pane scale. */
+      const rows = [3, 3, 2, 1];
+      rows.forEach((per, row) => {
+        const rs = [...Array(per)].map(() => R * BR[k++ % BR.length]);
+        const span = rs.reduce((a, b) => a + b * 2, 0) + (per - 1) * INK * 0.5;
+        let bx = cx - span / 2;
+        const mean = rs.reduce((a, b) => a + b, 0) / per;
+        for (let c = 0; c < per; c++) {
+          bx += rs[c];
+          s += `<circle cx="${n2(bx)}" cy="${n2(cy + y0)}" r="${n2(rs[c])}" fill="none"
+                        stroke="${ink}" stroke-width="${INK.toFixed(2)}"/>`;
+          bx += rs[c] + INK * 0.5;
+        }
+        y0 += mean * 1.86;                // rows sit under each other, nested a little
+      });
+      return s;
+    };
+
+    /* ── the tendril ───────────────────────────────────────────────────
+       An open spiral that never closes into a ring — a closed loop reads as a
+       stray berry. 0.19 W across and 1.3 turns, which is what the photograph
+       shows; ours were 0.14 W at a hairline weight and disappeared. */
+    const tendril = (sx, sy, dir) => {
+      let d = `M ${n2(sx)} ${n2(sy)}`;
+      /* ⚠ 1.15 TURNS, AND IT TOOK THREE GOES. At 2.6 turns it closed into a
+         paisley blob with a hook; at 1.6, drawn large, it still came round far
+         enough to read as a capital G — a shape with a bar across it, which is
+         the one thing a tendril is not. d109's curl comes round about once and
+         a sixth and stops, so the eye follows it out and off rather than round
+         and back. It is drawn from the stem OUTWARD, with the first point on
+         the stem, so it reads as growing off the branch rather than as a mark
+         laid beside it. */
+      for (let k = 1; k <= 24; k++) {
+        const a = (k / 24) * Math.PI * 1.15 * dir - Math.PI * 0.5 * dir;
+        const r = w * (0.100 - 0.028 * (k / 24));
+        d += ` L ${n2(sx + dir * w * 0.088 + Math.cos(a) * r)} ${n2(sy + Math.sin(a) * r * dir)}`;
+      }
+      return str(d);
+    };
+
+    /* ── laying them out ───────────────────────────────────────────────
+       One motif per PITCH down the stem, alternating side, and alternating
+       kind on a four-cycle so each side gets leaf, bunch, leaf, bunch rather
+       than the same thing every time. The two sides are offset by half a pitch
+       so nothing lines up across the pane, which is what stopped it reading as
+       a ladder. Both ends run past the opening, so the film is cut rather than
+       arranged inside it. */
+    /* ⚠ THE PITCH IS SET BY A MEASUREMENT AND MY EYE HAD IT BACKWARDS.
+       Looking at the first redraw beside the photograph I called it too sparse
+       and halved the pitch. Measured, it was too DENSE: **41.3% ink against
+       d109's 25.6%**, and I had been reading a comparison sheet that squashed
+       our pane to two thirds of its aspect. §6 in one line, and it is the
+       second time in this one round — the leaf's lobe depth was the first.
+
+       ⚠ AND THE INSTRUMENT THAT SAID 41.3% WAS ALSO WRONG, WHICH IS WHY THE
+       NUMBER BELOW IS TRUSTWORTHY AND THAT ONE WAS NOT. Three versions:
+         · recolour every shape in the pane and count — 0.8% on a pane plainly
+           a third covered, because the glass is a gradient and it missed it;
+         · diff against the same door with `grille: 'none'` — 58.9%, of which
+           most was the two panes carrying different sky;
+         · departure from the crop's own median — 41.3%, and it would NOT MOVE:
+           pitching the motifs 45% apart changed it by three points. That is
+           the tell. Our pane's own head-to-foot fall is a bigger departure
+           from its median than the ornament is, so the test was measuring the
+           glass; d109's pane is flat frosted glass, so the same test measured
+           the film there. One function, two subjects it cannot both be right
+           about.
+       What works is the same function HIGH-PASSED — subtract a box blur at a
+       quarter of the pane's width, which is far wider than any stroke and far
+       narrower than any gradient, and threshold what is left. It responds:
+       0.34 / 0.40 / 0.46 / 0.52 read 26.6 / 24.1 / 23.7 / 21.4 per cent.
+
+       **0.34 W puts us at 26.6% on the square window and 28.5% on the vertical
+       slot, against the photograph's 27.6%.** The reach follows from the leaf:
+       a 0.42 W leaf centred 0.33 W from a stem at 0.50 reaches past the edge,
+       so it is cut, which is what every motif in the photograph is. */
+    const PITCH = w * 0.34;                          // a motif each 0.34 W down the stem
+    const REACH = w * 0.33;                          // stem to motif centre
+    const ROT = [-0.42, 0.24, -0.20, 0.50, -0.34, 0.15];
+    const SZ  = [1.00, 0.88, 1.10, 0.94, 1.04, 0.91];
+    const first = Math.floor((yTop - y) / PITCH) - 1;
+    const last  = Math.ceil((yBot - y) / PITCH) + 1;
+    let i = 0;
+    for (let m = first; m <= last; m++, i++) {
+      const my = y + m * PITCH + (i % 2 ? PITCH * 0.5 : 0);
+      if (my < y - PITCH || my > y + h + PITCH) continue;
+      const side = i % 2 ? 1 : -1;
+      const sx = stemAt(my), ax = sx + side * REACH;
+      /* the branch, the same weight as the stem — this is the thing that was
+         a hairline stalk before, and it is a third of the ink on the pane */
+      out += str(`M ${n2(sx)} ${n2(my + w * 0.06)}`
+        + ` Q ${n2(sx + side * REACH * 0.55)} ${n2(my + w * 0.04)}`
+        + ` ${n2(ax)} ${n2(my - w * 0.02)}`);
+      if (i % 4 === 1 || i % 4 === 2) {
+        out += bunchPath(ax, my, i * 3);
       } else {
-        /* A five-lobed grape leaf: pointed centre lobe, two side lobes, two
-           basal ones, four V-notches cutting in to about a third of the half
-           width, and a heart-shaped base where the petiole enters. */
-        const L = w * 0.34 * LSZ[i % LSZ.length], H2 = L * 0.82;
-        const a = ((LROT[i % LROT.length] * side) * Math.PI) / 180;
-        const pt = (u, v) => {
-          const px = u * L * 0.5, py = v * H2 * 0.5;
-          return [n2(ax + px * Math.cos(a) - py * Math.sin(a)),
-                  n2(ay + px * Math.sin(a) + py * Math.cos(a))];
-        };
-        const lobe = [[0, -1], [0.34, -0.55], [0.30, -0.30], [0.72, -0.42], [0.60, 0.02],
-                      [0.95, 0.30], [0.42, 0.42], [0.20, 0.86], [0, 0.55]];
-        let ld = `M ${pt(0, -1).join(' ')}`;
-        for (const [u, v] of lobe.slice(1)) ld += ` Q ${pt(u * 1.12, v * 0.92).join(' ')} ${pt(u, v).join(' ')}`;
-        for (const [u, v] of [...lobe].reverse().slice(1)) {
-          ld += ` Q ${pt(-u * 1.12, v * 0.92).join(' ')} ${pt(-u, v).join(' ')}`;
-        }
-        out += str(ld + ' Z', OUT);
-        out += str(`M ${pt(0, 0.55).join(' ')} L ${n2(stemX(t))} ${n2(ay + H2 * 0.2)}`, THIN);
-        for (const [u, v] of [[0, -0.62], [0.42, -0.20], [-0.42, -0.20]]) {
-          out += str(`M ${pt(0, 0.5).join(' ')} L ${pt(u, v).join(' ')}`, THIN);
-        }
+        out += leafPath(ax, my, w * 0.42 * SZ[i % SZ.length], ROT[i % ROT.length] * side);
       }
-    }
-    /* Tendrils: open spirals that never close into a ring — a closed loop
-       reads as a stray berry. */
-    const tn = Math.max(2, Math.round(h / (1.4 * w)));
-    for (let i = 0; i < tn; i++) {
-      const t = (i + 0.5) / tn, side = i % 2 ? -1 : 1;
-      const sx = stemX(t), sy = y + h * t;
-      let td = `M ${n2(sx)} ${n2(sy)}`, ex = sx, ey = sy;
-      for (let k = 1; k <= 22; k++) {
-        const a = (k / 22) * Math.PI * 2.2 * side;
-        const r = w * (0.07 - 0.045 * (k / 22));
-        ex = sx + side * w * 0.10 + Math.cos(a) * r;
-        ey = sy + Math.sin(a) * r;
-        td += ` L ${n2(ex)} ${n2(ey)}`;
-      }
-      out += str(td, THIN);
-      out += `<circle cx="${n2(ex)}" cy="${n2(ey)}" r="${n2(w * 0.012)}" fill="${ink}"/>`;
+      /* a tendril off every other branch, on the same side, below the motif */
+      if (i % 2 === 0) out += tendril(sx, my + PITCH * 0.42, -side);
     }
     return { veil: out, over: '' };
   }
@@ -8798,8 +9270,14 @@ function cadoorKnob(cx, cy, dir) {
            the door. Invisible until the footprints were measured off the art
            instead of asserted. It points inboard now, which is also where the
            spindle goes. -->
-      <rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
-            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#lockUnitSoft)"
+      ${/* ⚠ #nickelSoft, AND IT WAS #lockUnitSoft — 25.9.2026. The two are the
+            same three-stop ramp on two different metals: the פרזול's and the
+            bought-in unit's constant steel. The shank had to move with the ball
+            above it or this fitting would have gone gold with a grey neck,
+            which is the "two metals on one fitting" defect the finish axis
+            exists to prevent, arriving through the fix for it. */''
+       }<rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
+            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"
             transform="${dir < 0 ? `translate(${-rx * 1.2} 0)` : ''}"/>
       <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
                transform="rotate(${tilt} ${cx} ${cy})"/>
@@ -9352,34 +9830,63 @@ const peephole = (cx, cy) => {
 };
 
 /**
- * The DIGITAL viewer, 20.9.2026 — a camera in a rounded-square bezel where the
- * optical one is a round eye. It stands exactly where the optical viewer
- * stands (`PEEPHOLE_AFF`, the centre line) and is refused by the same
- * `peepholeFits`, with its own larger reach. Nickel bezel through `#nickel`,
- * because Peretz's 26.8 list has the עינית among what the פרזול recolours and
- * nothing he has said since separates the two viewers on that. What is
- * sourced and what is convention is written beside `PEEPHOLE_DIGITAL_R`; the
- * rounded-square plate is the common shape of the product and is the one
- * thing here that lets a customer tell the two viewers apart at tile size.
+ * The DIGITAL viewer — a camera high on a tall plate, REDRAWN 25.9.2026.
+ *
+ * The owner's son: *"the digital עינית doesnt look like that."* What it was —
+ * a rounded square with two concentric circles in it — and what a digital door
+ * viewer's outside unit actually is, are set out in full over
+ * `PEEPHOLE_DIGITAL`. Every number below is a fraction of that table, so the
+ * day a photograph arrives there is one place to re-measure.
+ *
+ * ⚠ `cy` IS THE LENS, NOT THE PLATE'S CENTRE. `PEEPHOLE_AFF` is a corpus figure
+ * for where a person's eye goes, and on this product the eye is the camera. The
+ * plate is laid out from the lens: `lens` of its height above, the rest below.
+ *
+ * ⚠ THE PLATE IS `#nickel` AND FOLLOWS THE פרזול, like the optical viewer
+ * beside it — Peretz's 26.8 list has the עינית among what the finish recolours,
+ * by name, and nothing he has said since separates the two kinds on that. The
+ * LENS is not: glass behind a camera is glass, and it is drawn in black at
+ * alpha so the plate's own metal shows through it, which is §4's tint rule —
+ * a partial tinted black would both mute the metal and announce itself.
+ *
  * `data-kind="peephole"` like the optical one, because every rule that asks
  * "is there a viewer on the centre line" asks by kind.
  */
 const peepholeDigital = (cx, cy) => {
-  const R = PEEPHOLE_DIGITAL_R;
+  const { w, h, lens, lensR } = PEEPHOLE_DIGITAL;
   const n1 = v => v.toFixed(1);
+  const x0 = cx - w / 2, y0 = cy - h * lens;   // the plate's head, off the lens
+  const rx = w * 0.18;                          // corner radius, 8.6 mm on a 48 plate
   return `
     <g data-hw="peephole" data-owner="peephole" data-kind="peephole" data-digital="1"
-       data-cx="${cx}" data-cy="${cy}" data-r="${R}">
-      <rect x="${n1(cx - R * 0.95)}" y="${n1(cy - R * 0.95 + R * 0.16)}"
-            width="${n1(R * 1.9)}" height="${n1(R * 1.9)}" rx="${n1(R * 0.34)}"
-            fill="#000" opacity="0.18"/>
-      <rect x="${cx - R}" y="${cy - R}" width="${R * 2}" height="${R * 2}" rx="${n1(R * 0.34)}"
+       data-cx="${cx}" data-cy="${cy}" data-w="${w}" data-h="${h}">
+      ${/* the plate stands proud of the leaf, so it casts down and inboard */''
+       }<rect x="${n1(x0 + w * 0.06)}" y="${n1(y0 + h * 0.03)}"
+            width="${w}" height="${h}" rx="${n1(rx)}" fill="#000" opacity="0.20"/>
+      <rect x="${n1(x0)}" y="${n1(y0)}" width="${w}" height="${h}" rx="${n1(rx)}"
             fill="url(#nickel)" stroke="#000" stroke-opacity=".26"/>
-      ${/* the lens: a dark disc with the sensor's darker centre and one highlight */''
-       }<circle cx="${cx}" cy="${cy}" r="${n1(R * 0.56)}" fill="#000" fill-opacity=".62"/>
-      <circle cx="${cx}" cy="${cy}" r="${n1(R * 0.30)}" fill="#000" fill-opacity=".55"/>
-      <circle cx="${n1(cx - R * 0.16)}" cy="${n1(cy - R * 0.18)}" r="${n1(R * 0.12)}"
-              fill="#fff" fill-opacity=".34"/>
+      ${/* One inset line down the plate rather than a second gradient: this is a
+            moulded housing with a seam where its two halves meet, and at leaf
+            scale the plate is seven pixels wide — a gradient inside a gradient
+            reads as noise there, a single hairline reads as an edge. */''
+       }<rect x="${n1(x0 + w * 0.10)}" y="${n1(y0 + h * 0.055)}"
+            width="${n1(w * 0.80)}" height="${n1(h * 0.89)}" rx="${n1(rx * 0.7)}"
+            fill="none" stroke="#000" stroke-opacity=".13"/>
+      ${/* the camera: a housing ring, the dark glass, the sensor behind it, and
+            one specular off the top-left, which is where LIGHT.key is */''
+       }<circle cx="${cx}" cy="${cy}" r="${n1(lensR * 1.30)}" fill="#000" fill-opacity=".22"/>
+      <circle cx="${cx}" cy="${cy}" r="${n1(lensR)}" fill="#000" fill-opacity=".66"/>
+      <circle cx="${cx}" cy="${cy}" r="${n1(lensR * 0.52)}" fill="#000" fill-opacity=".55"/>
+      <circle cx="${n1(cx - lensR * 0.34)}" cy="${n1(cy - lensR * 0.36)}"
+              r="${n1(lensR * 0.26)}" fill="#fff" fill-opacity=".38"/>
+      ${/* The IR aperture, below the lens on the plate's own axis. It is what
+            tells a customer at a glance that this is a camera and not a bigger
+            peephole — a lens alone on a plate could be either. One small dot,
+            not the ring of six a product photograph shows: at this scale six
+            dots 2 mm apart close into a grey smudge, which is the 2 px rule
+            §0b's 15.9 entry paid for on the navigator's marks. */''
+       }<circle cx="${cx}" cy="${n1(cy + h * 0.20)}" r="${n1(w * 0.075)}"
+              fill="#000" fill-opacity=".46"/>
     </g>`;
 };
 
@@ -10207,14 +10714,34 @@ export function peepholeGlyph(x) {
     <circle cx="0" cy="0" r="40"/>
     <circle cx="0" cy="0" r="21" fill="#fff" opacity=".92"/>
     <circle cx="-7" cy="-8" r="8" opacity=".55"/>`,
-    /* The digital viewer: the rounded-square bezel the leaf draws, with a lens
-       in it — so it cannot be mistaken for the round optical eye above or for
-       the ring on a boss the bell tile draws. */
-    'peep-digital': `
-    <rect x="-46" y="-46" width="92" height="92" rx="16"/>
-    <circle cx="0" cy="0" r="24" fill="#fff" opacity=".92"/>
-    <circle cx="0" cy="0" r="12" opacity=".75"/>
-    <circle cx="-5" cy="-6" r="4" fill="#fff" opacity=".9"/>`,
+    /* ⚠ THE DIGITAL VIEWER, REDRAWN WITH THE DOOR — 25.9.2026. It was a
+       rounded SQUARE with concentric circles, which is what the leaf drew and
+       which the owner's son said is not what the product looks like. The leaf
+       draws a tall plate with the camera high on it now, and a tile showing one
+       fitting while the leaf draws another is §5 items 5 and 6 — nine handles
+       that shared one picture — and the "every option tile draws its own
+       picture" assertion cannot catch it, because all that one asks is whether
+       two TILES differ from each other.
+       ⚠ THE PROPORTIONS ARE `PEEPHOLE_DIGITAL`'s OWN, scaled to this glyph's
+       140-unit box rather than typed: 48 x 92 at 1.5 units per mm is 72 x 138,
+       the lens at 0.30 of the height. `FITTING_GLYPH`'s header promises the
+       numbers are the same measured millimetres so a tile cannot drift from
+       its door, and §9 already carries one open drift against that promise —
+       this is not a second. */
+    'peep-digital': (() => {
+      const S = 1.5, w = PEEPHOLE_DIGITAL.w * S, h = PEEPHOLE_DIGITAL.h * S;
+      const r = PEEPHOLE_DIGITAL.lensR * S;
+      const ly = -h / 2 + h * PEEPHOLE_DIGITAL.lens;      // the lens, off the plate's head
+      return `
+    <rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="${(w * 0.18).toFixed(1)}"/>
+    <circle cx="0" cy="${ly.toFixed(1)}" r="${(r * 1.5).toFixed(1)}" fill="#fff" opacity=".92"/>
+    <circle cx="0" cy="${ly.toFixed(1)}" r="${(r * 0.8).toFixed(1)}" opacity=".8"/>
+    <circle cx="${(-r * 0.5).toFixed(1)}" cy="${(ly - r * 0.5).toFixed(1)}"
+            r="${(r * 0.35).toFixed(1)}" fill="#fff" opacity=".9"/>
+    ${/* the IR aperture, the same 0.20 H below the lens the door draws it at */''
+     }<circle cx="0" cy="${(ly + h * 0.20).toFixed(1)}" r="${(w * 0.075).toFixed(1)}"
+            fill="#fff" opacity=".55"/>`;
+    })(),
   }[x.id] || '';
   return `<svg viewBox="-70 -70 140 140" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">${art}</g>

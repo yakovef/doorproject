@@ -323,29 +323,16 @@ svg { direction: ltr; }
    it, and the audit measures every interactive element in the flow. The
    marker is drawn rather than left to the browser's triangle, which is a
    different glyph and a different size in every engine. */
-/* ── THE HANDING CONFIRMATION, ON THE SUMMARY ONLY ────────────────────
-   ⚠ IT IS A CARD RATHER THAN A LINE, ON PURPOSE. Everything else on this step
-   is a readout; this is the one thing being ASKED, and it is asked because
-   the field it confirms is the only default in the product that costs money
-   to get wrong. A row of the spec table would read as another fact about a
-   decision already made, which is exactly the state it exists to break.
-   ⚠ The button keeps the 44 px floor this project asserts everywhere; the
-   audit measures every control on every step and would say so if it did not. */
-.sum-hand {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
-  margin-block-end: 16px; padding: 12px 14px;
-  border: 1px solid var(--rule); border-radius: 10px;
-  background: var(--paper-up);
-}
-.sum-hand__q {
-  flex: 1 0 100%; margin: 0;
-  font: 600 .86rem var(--sans); color: var(--ink);
-}
-.sum-hand__v {
-  flex: 1 1 auto; margin: 0;
-  font: 400 .86rem var(--sans); color: var(--ink-2);
-}
-.sum-hand__flip { flex: 0 0 auto; }
+/* ⚠ `.sum-hand` STOOD HERE AND IS GONE, 25.9.2026 — the handing confirmation
+   card on the summary, withdrawn at the owner's request (*"it just takes up
+   space"*). It was a bordered card of 122 px at the top of the summary's body,
+   and the argument for it being a card rather than a spec row was that
+   everything else on that step is a readout while this was the one thing being
+   ASKED. That argument was right, and the reason it can go is that the spec
+   table's rows became BUTTONS back to their own question on 14.9: the פתיחה
+   row states the same fact in the order's own words and one tap changes it.
+   No rule is left pointing at those classes — see `buildPanel`'s note for the
+   whole of it, including the three audit assertions that went with them. */
 
 .sect__exp { margin-block-start: 14px; border-block-start: 1px solid var(--rule); }
 .sect__q {
@@ -1101,8 +1088,38 @@ svg { direction: ltr; }
    against 291 before. So the door grows by 31 px AND the customer sees more of
    what they are answering. The two are not in tension here; the chrome was
    simply taking both. */
+/* ⚠ AND BACK TO 92vw ON 25.9.2026, WHICH PARTLY REVERSES THE PARAGRAPH ABOVE
+   — the owner's son: *"its best so that everything will be on the screen when
+   you are in some category."*
+
+   The 29.8 raise from 92 to 100 was right and its argument was honest: the
+   chrome above the door had just lost 130 px, so the door could grow AND the
+   question could gain, and *"the two are not in tension here"*. They are in
+   tension now, because this round has taken another **118 px** out of the
+   chrome — 97 for the step's foot and 21 for its head — and given all of it to
+   the question. There is nothing left above the door to release, so the only
+   remaining source of band is the door itself, and that is a trade rather than
+   a saving. It is stated as one.
+
+   Measured, walking forward with the button, band = the readable strip between
+   the sticky stage and the fixed quote bar:
+
+     | | band at 100vw | at 92 | at 86 | whole answers on `fit` | on `face` |
+     |---|---|---|---|---|---|
+     | 390x844 | 320 | 351 | 372 | 0 → 0 → 0 | 1 → 1 → 1 |
+     | 430x932 | 368 | 402 | 425 | **0 → 4 → 4** | **1 → 4 → 4** |
+
+   92 is where the discrete wins are: two steps at 430 go from showing no whole
+   answer to showing four. 86 buys more band and only continuous gains beyond
+   that (`colour` 7 → 11 at 390, `lock` 4 → 8 at 430) for a door 14% smaller
+   instead of 8%, which is trading the product for the metric.
+
+   ⚠ 320x568 IS UNTOUCHED BY THIS and reads identically at all three, because
+   its stage is governed by the short-screen block below (42vh, 239 px) and not
+   by `100vw` at all. The phone that needs the band most is the one this cannot
+   give it to; §9 carries that arithmetic and this round does not close it. */
 @media (max-width: 1099px) {
-  .stage { block-size: clamp(40vh, 100vw, 56vh); }
+  .stage { block-size: clamp(40vh, 92vw, 56vh); }
 }
 @media (min-width: 1100px) {
   .stage { block-size: auto; flex: 1 1 auto; min-block-size: 0; }
@@ -2454,6 +2471,31 @@ button.spec__row:focus-visible {
    ⚠ AFTER the rules it overrides, all four of them (`.stage`'s two blocks
    above, and `.sect__where` / `.sect__title` / `.sect__lede` directly above).
    §8, five times in this file and twice by me. */
+
+/* ── THE STEP'S HEAD, TIGHTENED ON EVERY PHONE — 25.9.2026 ───────────
+   The owner's son: *"try to make everything to be so that you dont have to
+   scroll down to reveal more things, its best so that everything will be on
+   the screen when you are in some category."*
+   Measured before the cut, walking forward with the button: the block above
+   the first option — eyebrow, question, lede and their margins — is 128 px at
+   390 and 430, against 99 px on a 320 px screen, because the base margins are
+   10 / 10 / 22 and the short-screen block below already pulls them to 3 / 4 /
+   10. There is no reason a 390 px phone should spend 29 px more than a 320 px
+   one on the same three lines; it was simply never asked.
+   4 / 5 / 12 rather than the short block's 3 / 4 / 10: this is a phone with
+   room, not a phone without, and the lede is a sentence that wants a little
+   air under it before a grid of tiles starts.
+   ⚠ BEFORE the short-screen block and not after, which is the whole reason
+   this sits here. Both are `max-width: 1099px` and a media query adds no
+   specificity, so whichever is written LATER wins — and the later one has to
+   be the tighter one, or a 320 px screen would be given a 390 px screen's
+   margins back. §8's oldest trap, and this file has paid for it three times. */
+@media (max-width: 1099px) {
+  .sect__where { margin-block-end: 4px; }
+  .sect__title { margin-block-end: 5px; }
+  .sect__lede  { margin-block-end: 12px; }
+}
+
 @media (max-width: 1099px) and (max-height: 700px) {
   .stage { block-size: clamp(36vh, 100vw, 42vh); }
   .sect__where { margin-block-end: 3px; }
@@ -2942,8 +2984,25 @@ button.spec__row:focus-visible {
    attribute in the SVG's own units, because that is where the layout is. */
 .glyph__dim { font-family: var(--mono); }
 
-.tile__name { font-size: .78rem; line-height: 1.2; }
-.tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }
+/* ⚠ A NAME BREAKS RATHER THAN RUNNING ONTO THE TILE NEXT DOOR — 25.9.2026.
+   A name wraps on spaces by default, so a single word wider than the tile has
+   nowhere to go and is simply painted past the rounded border. §9 has recorded
+   that as *"seven Russian tile labels are drawn 12-13 px OUTSIDE their own
+   tile, past the rounded border toward the neighbour"* since 11.9, and the
+   narrower grille grid this round doubled it: measured on the glass step with
+   the four columns a 320 px screen now gets, Декоративный and Круги stand
+   **30 px** outside their tiles, and it is 22-29 px at 430, 768 and 1024 too.
+   Hebrew is clean at every width and English has one 4 px case at 320, so this
+   is a Russian fault about long compounds and not a layout fault.
+   ⚠ `anywhere` AND NOT `break-word`: the two break the same words, and only
+   `anywhere` also lets the tile's MIN-CONTENT width come down, which is what a
+   grid track actually measures — with `break-word` the column would still be
+   floored at the longest word and the four columns would collapse to three.
+   It costs one line of height on the tiles that use it, which is the trade:
+   a name half on its neighbour is not a name. */
+.tile__name { font-size: .78rem; line-height: 1.2; overflow-wrap: anywhere; }
+.tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2);
+              overflow-wrap: anywhere; }
 /* ⚠ ONE LINE, AND NOT RED. `דורש חלון` was `--warn` at three wrapped lines,
    which did two things to a grid of tiles: it made the reason the LOUDEST
    colour on a page whose accent is tan, and it doubled the height of the tiles
@@ -2967,6 +3026,39 @@ button.spec__row:focus-visible {
    page still loading. It has to look unavailable, not absent. */
 .tile.is-blocked { opacity: .7; }
 .tile.is-blocked .tile__meta { display: none; }
+
+/* ── AND ONE MORE COLUMN ON A PHONE — 25.9.2026 ──────────────────────
+   The owner's son: *"its best so that everything will be on the screen when
+   you are in some category."* Nothing else in this round buys as much of that
+   as the column count does, because a row is a whole tile tall.
+
+   Measured at 320x568 before the cut, with the fixed navigator and the fixed
+   quote bar read off the live page: the band left for the question and its
+   answers is **439 px**, and a hardware tile is 134 px. At `minmax(100px)` the
+   grid settles at TWO columns of 134, so the lockset's twelve tiles are six
+   rows — 864 px of options in a 439 px band. At `minmax(84px)` it settles at
+   three of 86.7 and the same twelve are four rows.
+
+   ⚠ THE TILES GET NARROWER AND NOT SHORTER, which is the trade and it is the
+   right way round: `.tiles--hw`'s 74 px of artwork is the whole reason that
+   modifier exists — *"a swan-neck and a cushion knob are only different if you
+   can see them"* — and it is untouched. What a third column costs is the
+   WIDTH of the name under the picture, and a name that wraps to two lines
+   makes its row taller, which would give the saving straight back. Measured
+   after, at 320 and at 390 in all three languages: no row grows.
+
+   ⚠ AND 84 IS NOT A ROUND NUMBER, it is the widest value that gives three
+   columns in the 280 px a 320 px screen leaves inside the card: (280 + 10) /
+   (84 + 10) is 3.08. At 88 — the base value — it is 2.96 and the grid settles
+   at two. The sq grid's 62 is the same arithmetic for four columns.
+   ⚠ AFTER `.tiles--hw` and not before, for the reason the head's block one
+   screen up spells out. And the 44 px tap floor is nowhere near: the narrowest
+   tile this produces is 62 px. */
+@media (max-width: 1099px) {
+  .tiles     { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
+  .tiles--hw { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
+  .tiles--sq { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); }
+}
 
 /* ⚠ AND EVERY TILE IN A ROW IS THE SAME HEIGHT, BY CONSTRUCTION RATHER THAN BY
    LUCK. The grid stretches its items, so a row is as tall as its tallest tile
@@ -3332,8 +3424,42 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    `.sect__next` does everywhere else, so the pinned bar means the same thing
    on all nine steps. The sentence above still holds: the dark pill is not on
    this step, so the two primaries still never share a screen. */
+/* ⚠ AND BELOW 1100 IT IS NOT THERE AT ALL — 25.9.2026, AT THE OWNER'S
+   REQUEST, AND THE ARITHMETIC IS WHY IT IS THE RIGHT CUT. His words: *"on the
+   phone, when you scroll down the section, at the end you see the next and back
+   buttons, but you already have a next button at the bottom of the screen at
+   all times, so remove the 2 buttons from the bottom of the sections, and just
+   have the 3 buttons always on the screen."*
+   Measured on the live page before the cut, walking forward with the button:
+   this bar is **71 px of content under a 26 px margin — 97 px** on every one of
+   the nine steps, at every width under 1100.
+   ⚠ AND THE BAND IT COMES OUT OF IS NOT THE ONE BETWEEN THE TWO FIXED BARS.
+   That reading is 568 less 62 of navigator and 67 of quote bar = 439 px, and it
+   is the wrong quantity: the door is STICKY directly under the navigator, so a
+   tile behind it is as unreadable as one off the screen. Measured with the
+   sticky stage counted, at 320x568 the band a customer can read an option in is
+   **199 px** and a hardware tile is 134 px tall — so 97 px is not "most of a
+   row", it is half of the whole readable strip. And
+   it was 97 px spent SAYING AGAIN what the quote bar says at the top of the
+   thumb's reach: `.quote__next` carries `sect__next`, so `markSteps` gives it
+   the same label and the same disabled state.
+   ⚠ WHAT IS LOST IS THE WAY BACK, AND IT IS NOT LOST. The navigator is nine
+   fixed circles at the top of every phone screen — 44 x 44 at y=8, measured —
+   and any of them jumps to its step, backwards as happily as forwards. That is
+   why this foot could go on a phone and could not go on a desktop, where the
+   rail is sticky inside a scrolling card rather than fixed over the screen.
+   ⚠ `display: none` AND NOT `visibility`, so it takes no room — which is the
+   whole point — and so its two buttons leave the tab order rather than sitting
+   in it invisible. The card keeps its own bottom padding down here: the rule
+   that moves that padding into the foot is inside the 1100 block, for exactly
+   this reason.
+   ⚠ AND THE SWITCH IS IN ONE PLACE. This is `none` in the base and `flex` in
+   the 1100 block below, rather than `flex` here and `none` in a phone query —
+   §8's "a media query adds no specificity" has bitten this file three times,
+   and a rule that turns something ON inside the query that also styles it
+   cannot be beaten by a base rule written later. */
 .sect__foot {
-  display: flex; align-items: center; gap: 10px;
+  display: none; align-items: center; gap: 10px;
   margin-block-start: 26px;
   padding-block-start: 18px;
   border-block-start: 1px solid var(--rule);
@@ -3394,6 +3520,11 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    would be two bars of chrome over the one thing being chosen. */
 @media (min-width: 1100px) {
   .sect__foot {
+    /* ⚠ AND THIS IS WHERE THE FOOT EXISTS AT ALL — see its base rule. Below
+       1100 the quote bar is fixed over the foot of the screen and carries the
+       price, the send and the way on; up here there is no such bar, the card
+       scrolls inside its own column, and this is the way on. */
+    display: flex;
     position: sticky; inset-block-end: 0; z-index: 2;
     margin-block-start: 26px;
     /* ⚠ AND IT RUNS TO THE BOTTOM OF THE SCROLLPORT. Pinned at
@@ -4124,11 +4255,53 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    what the overlay was for; the rest is a composition, and it deserves a fresh
    look rather than the tail of a long session. */
 @media (min-width: 1280px) {
-  /* ⚠ 420 ABOVE 1280 TOO, AND IT WAS 380. One number rather than two: the
-     limit is the WALL, and the wall is narrowest in proportion at the
-     narrowest desktop, so a bigger cap up here would only widen the gap
-     between what the two breakpoints promise. Same measurement behind it —
-     the door is identical to a tenth of a pixel at 1280, 1440 and 1920. */
+  /* ⚠ 520 ABOVE 1280 SINCE 25.9.2026, AND IT WAS 420 EVERYWHERE — the owner's
+     son: *"its best so that everything will be on the screen when you are in
+     some category."* Above 1100 the page does not scroll, the choices column
+     does, and a wider column is fewer rows.
+
+     ⚠ THE DOOR PAYS NOTHING FOR IT, MEASURED RATHER THAN ARGUED. The crop is
+     height-driven at every viewport this app has (§3), so width taken off the
+     stage never reaches the leaf. Swept at 420 / 470 / 520 / 560 on a real
+     build and a real load: the leaf is **175x421 at 1280, 228x550 at 1440 and
+     234x563 at 1920 — the same numbers at all four caps**, to the pixel.
+
+     ⚠ WHAT IT COSTS IS THE WALL, AND THAT IS WHY 1280 AND NOT 1100. The price
+     card stands in the wall under the right-hand lamp, and §9 records the
+     arithmetic: 139-204 px of wall for a 163-207 px card, the card being
+     22-44 px wider on any size but `standard` and again in Russian. Measured
+     across the sweep, the narrowest wall at each cap:
+
+       cap      1100   1152   1280   1440   1920
+       420       213    239    319    365    602
+       470       188    214    294    340    577
+       520       163    189    269    315    552
+       560       143    169    249    295    532
+
+     At 1100 a 520 cap leaves 163 px for a card that reaches 207, so the 14.9
+     clamp would start pulling it inboard on the loud doors — §9's residual,
+     made worse. At 1280 it leaves 269 for the same 207, which is 62 px of
+     margin. So the cap moves where there is room for it to move and stays
+     where there is not, which is what a cap is for.
+     ⚠ AND NOT 560. It buys almost nothing over 520 on the steps that are
+     still hidden (the summary 493 → 462 px and nothing else moves) and takes
+     the 1280 margin from 62 px to 42.
+
+     What it buys, hidden pixels per step, at 1280 / 1440 / 1920:
+       glass  660 → 457   480 → 277   462 → 259
+       pz     329 → 184   149 → 4     131 → 0
+       colour 206 → 144    26 → 0       8 → 0
+       summary 555 → 493  375 → 313   357 → 295
+     Two steps stop overflowing at all on a 1920 screen.
+
+     ⚠ ON `:root`, NOT AS A BARE DECLARATION IN THE MEDIA BLOCK — that is not
+     valid CSS and the browser drops it silently, which is the quietest way a
+     change like this can do nothing at all. And on the TOKEN rather than on
+     `.layout`'s track, because `--panel-max` has a second reader: the toast is
+     inset by it so that a repair's sentence clears the column (§0b, 10.9). A
+     track widened without the token would have left the toast measuring a
+     panel that had moved. */
+  :root { --panel-max: 520px; }
   .layout { grid-template-columns: minmax(300px, var(--panel-max)) minmax(0, 1fr) 0; }
   .stage-wrap { grid-column: 2 / span 2; }
   .stage__bar { grid-column: 2 / span 2; }
