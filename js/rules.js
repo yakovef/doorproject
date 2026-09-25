@@ -603,8 +603,25 @@ export function isBlocked(state, group, id) {
  * `change` calls `T` instead, at the instant of the repair, which is also the
  * instant before the toast. The same trap waits in any other top-level
  * constant that wants a translated string in it: hold the key.
+ *
+ * ⚠ AND HOLDING A KEY BUYS NOTHING IF NOBODY CHECKS THE KEY EXISTS. `T`
+ * returns the KEY when it misses — it does not throw, and §0b records the
+ * customer-facing cost of that once already, a price row headed `bell` in
+ * all three languages. Found 25.9.2026 by asking `T` for every key this
+ * table holds: `peepWindow: 'fix.peepWindow'` named a string `js/copy.js`
+ * has never contained. It was NOT live — nothing pushed it, so nothing was
+ * ever said — which is what makes it worth naming rather than quietly
+ * deleting: it is the `GLAZINGS` landmine again, a dead line that the next
+ * person to write `said.push(SAID.peepWindow)` would have shipped as the
+ * literal text `fix.peepWindow` into a customer's toast. There is no branch
+ * for it to belong to either, because since 7.9.2026 the FITTINGS yield to
+ * the glass and never the other way round, so `peepGone` says the only
+ * thing that happens. Deleted rather than written.
+ * `SAID` is exported for the assertion that now walks it — every value must
+ * resolve through `T` in all three languages, the same object the code
+ * reads rather than a second list that agrees with it today.
  */
-const SAID = {
+export const SAID = {
   windowAdded:   'fix.windowAdded',
   /* `windowGone` is said by the fittings, the stripes and the face repairs —
      never by a HANDLE repair since 20.9.2026 (Peretz: the window and the
@@ -633,7 +650,6 @@ const SAID = {
   faceGone:      'fix.faceGone',
   peepGone:      'fix.peepGone',
   bellGone:      'fix.bellGone',
-  peepWindow:    'fix.peepWindow',
   /* `needPanel` and `ownPull` are gone with the two rules they announced —
      the forced bottom panel and the pull a face brought with it. Both rules
      were withdrawn by Peretz on 14.9.2026; see `conflicts`. */

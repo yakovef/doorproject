@@ -16,7 +16,7 @@ import {
 } from '../js/renderer.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { conflicts, detailWorked, fallbackLockset, gripObstacle, repair } from '../js/rules.js';
+import { conflicts, detailWorked, fallbackLockset, gripObstacle, repair, SAID } from '../js/rules.js';
 import { describeSentence, handingWords, specLines, specRows, summaryLine } from '../js/spec.js';
 import { WORKS } from '../js/works.js';
 import { BITS, DEFAULTS, decodeCode, encodeCode, fromQuery, isUntouched, toQuery, VERSION } from '../js/url-state.js';
@@ -5520,6 +5520,54 @@ group('no two rows of the A4 order sheet carry the same heading');
        + `a reader cannot tell which row is which (${seen.join(' · ')})`);
     }
   }
+}
+
+group('every key a table holds names a string that exists');
+{
+  /* ⚠ `T` RETURNS THE KEY WHEN IT MISSES. It does not throw, nothing fails a
+     build, and the page looks entirely correct until a customer reads the
+     word `fix.peepWindow` in a toast. §0b records the live version of this
+     once already — a price row headed `bell` in all three languages, because
+     `BREAKDOWN_KEY` had no entry for a fitting that had been added — and the
+     fix there was to DERIVE the list of rows rather than keep one by hand.
+     `SAID` is the same shape one file over: a hand-kept table of keys with
+     nothing checking that the keys name anything.
+
+     Found 25.9.2026 by asking `T` for all of them: `peepWindow` named
+     `fix.peepWindow`, which `js/copy.js` has never contained. It was not
+     live — no branch pushed it — so this check would have gone green on the
+     page and red here, which is where a landmine belongs.
+
+     ⚠ IT WALKS THE TABLE THE CODE READS, not a copy of it, which is why
+     `SAID` is exported. A list here would agree with `rules.js` today and be
+     the second statement of one thing by tomorrow (§5.10).
+     ⚠ And it asks in ALL THREE LANGUAGES, because `T` falls back to `row[0]`
+     — Hebrew — when a row is short, so a key present in Hebrew and missing
+     in Russian resolves to Hebrew on the Russian page and never to its own
+     name. That is a different fault from this one and the same sweep sees
+     it: a Russian toast in Hebrew is not something anybody would report.
+     §5.15: it fails if the table came back small, because an empty loop
+     passes every clause in it. */
+  ok(Object.keys(SAID).length >= 10,
+     `SAID holds only ${Object.keys(SAID).length} keys — this check is not reading the table`);
+  for (const [name, key] of Object.entries(SAID)) {
+    ok(typeof key === 'string' && key.includes('.'),
+       `SAID.${name} holds ${JSON.stringify(key)}, which is not a copy key — a top-level `
+       + `constant must hold a KEY and never a sentence (§0c)`);
+    for (const lang of LANG_IDS) {
+      const s = withLang(lang, () => T(key));
+      ok(s !== key,
+         `SAID.${name} names '${key}' and js/copy.js has no such string, so T returns the key `
+         + `itself — a repair that used it would say "${key}" to a customer in ${lang}`);
+      ok(typeof s === 'string' && s.trim().length > 0,
+         `SAID.${name} ('${key}') is empty in ${lang}`);
+    }
+  }
+  /* The clause that must stay true beside it (§5.22): a key that names
+     nothing must still be CAUGHT, or the loop above is passing because `T`
+     has quietly started resolving everything. */
+  ok(withLang('he', () => T('fix.thisStringDoesNotExist')) === 'fix.thisStringDoesNotExist',
+     'T no longer returns the key on a miss, so the check above cannot fail');
 }
 
 await checkLanguages();

@@ -4945,6 +4945,111 @@ for (const v of VIEWS) {
   }
 }
 
+/* ── EVERY MARK THE PAGE DRAWS COMES FROM A FACE THE PAGE ASKED FOR ──────
+   Three times now a character has been set in a face that does not carry it,
+   and every time it looked like a working page: the step eyebrow in `--mono`,
+   which has no Hebrew in it (§0b, 5.9); `→` at the end of an RTL line, which
+   is not a mirroring character and pointed back into its own sentence
+   (25.9); and `content: "⌄"` on the disclosure, U+2304 DOWN ARROWHEAD, which
+   NOTHING in this page's stack carries — the one affordance saying an
+   explainer opens, on all nine steps in all three languages, drawn by
+   whatever last-resort face the machine had. None of the three threw, none
+   was visible to `npm test`, and each was found by somebody looking.
+
+   ⚠ THE PROBE IS THE ADVANCE WIDTH, AND `document.fonts.check()` IS A TRAP.
+   Asked about U+2304 it answers TRUE, because over `file://` Assistant is
+   never requested (§0c) and it is reporting on the fallback. What cannot lie
+   is setting the character twice — once in the page's own stack and once in a
+   family that does not exist — and comparing the advance: a face that
+   supplies the glyph gives a different number, and a face that does not falls
+   through to the same last resort both times. Measured over every mark the
+   page draws, all at 1rem in one run: `₪` 12.09/9.73, `—` 14.23/16, `‹ ›`
+   4.75/5.33, `← →` 14.23/16, `‑` 4.75/5.33, `…` 14.23/16, `’` 3.17/5.33 — all
+   supplied and all separated comfortably. Only `⌄` came back 13.41/13.41.
+   ⚠ Quote these at ONE size or they cannot be compared: the first draft of
+   this note mixed readings taken at 1rem and at .86rem, which is §6's
+   complaint arriving inside the fix for it.
+
+   It is DERIVED rather than a list of characters: it collects every codepoint
+   at U+2000 or above that is on screen or in a `::before`/`::after`, across
+   every step and all three languages, so a mark added later is covered
+   without anybody coming back here. §5.15: it fails if it found fewer marks
+   than the page certainly has, because a sweep that collects nothing passes
+   every clause in it. */
+{
+  console.log('\nevery mark the page draws comes from a face the page asked for');
+  const before0 = faults;
+  const p = await b.newPage({ viewport: { width: 1280, height: 800 } });
+  let seen = 0;
+  try {
+    for (const lang of ['he', 'en', 'ru']) {
+      await p.goto(`file://${process.cwd()}/index.html?lang=${lang}`, { waitUntil: 'load' });
+      await p.waitForSelector('#stage svg');
+      await p.waitForTimeout(600);
+      const steps = await p.evaluate(() =>
+        [...document.querySelectorAll('.steps [data-step]')].map(e => e.dataset.step));
+      const found = new Map();
+      for (const s of [...steps, null]) {
+        if (s) {
+          await p.evaluate(k => document.querySelector(`.steps [data-step="${k}"]`)?.click(), s);
+          await p.waitForTimeout(220);
+          // open every explainer, or its own chevron is never on screen
+          await p.evaluate(() => document.querySelectorAll('.sect:not([hidden]) details')
+            .forEach(d => { d.open = true; }));
+          await p.waitForTimeout(80);
+        }
+        const here = await p.evaluate(() => {
+          const out = [];
+          const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+          for (let n; (n = walk.nextNode());) {
+            const host = n.parentElement;
+            if (!host || (!host.offsetParent && host !== document.body)) continue;
+            for (const ch of n.textContent) if (ch.codePointAt(0) >= 0x2000)
+              out.push([ch, host.className || host.tagName]);
+          }
+          for (const el of document.querySelectorAll('*')) {
+            if (!el.offsetParent) continue;
+            for (const pe of ['::before', '::after']) {
+              const c = getComputedStyle(el, pe).content;
+              if (!c || c === 'none' || c === 'normal') continue;
+              for (const ch of c.replace(/^"|"$/g, ''))
+                if (ch.codePointAt(0) >= 0x2000) out.push([ch, (el.className || el.tagName) + pe]);
+            }
+          }
+          return out;
+        });
+        for (const [ch, where] of here) if (!found.has(ch)) found.set(ch, where);
+      }
+      const verdict = await p.evaluate(chars => {
+        const stack = getComputedStyle(document.body).fontFamily;
+        const adv = (ch, fam) => {
+          const s = document.createElement('span');
+          s.style.cssText = `position:fixed;left:-9999px;font:1rem ${fam};white-space:pre`;
+          s.textContent = ch; document.body.append(s);
+          const w = s.getBoundingClientRect().width; s.remove(); return +w.toFixed(2);
+        };
+        return chars.map(ch => ({ ch, cp: 'U+' + ch.codePointAt(0).toString(16).toUpperCase(),
+          own: adv(ch, stack), nofont: adv(ch, '"NoSuchFaceAnywhereOnThisMachine"') }));
+      }, [...found.keys()]);
+      seen = Math.max(seen, verdict.length);
+      for (const v of verdict) {
+        if (v.own === v.nofont) {
+          fault('marks', `[${lang}] ${v.cp} "${v.ch}" on ${String(found.get(v.ch)).slice(0, 40)} `
+            + `measures ${v.own}px in the page's own stack and ${v.nofont}px in a font family that `
+            + `does not exist — the same, so nothing the page asks for carries it and a last-resort `
+            + `face is drawing it. Draw the mark instead of typing it.`);
+        }
+      }
+    }
+    // §5.15 — a sweep that collected nothing would pass every clause above
+    if (seen < 4) {
+      fault('marks', `only ${seen} mark(s) were collected across nine steps and three languages; `
+        + `the page certainly draws more than that, so this sweep is not reading the page`);
+    }
+  } finally { await p.close(); }
+  if (faults === before0) console.log(`    ${seen} marks, every one of them supplied by the page's own stack`);
+}
+
 /* ── THE STRIPE PILLS CARRY THREE PICTURES, AND NONE IS THE PLAIN FACE ────
    Peretz, 20.9.2026: *"add icons for the stripes to make them more visible."*
    `stripesGlyph` draws each as a window on the leaf at the door's own pitch.

@@ -377,10 +377,42 @@ svg { direction: ltr; }
   background: no-repeat center / 3px 9px
     linear-gradient(currentColor, currentColor);
 }
+/* ⚠ DRAWN, NOT TYPED, AND THAT IS THE WHOLE OF IT. This was `content: "⌄"` —
+   U+2304 DOWN ARROWHEAD — and the page's own font stack does not carry it.
+   Measured at 1rem, the character's advance in `--sans` against its advance
+   in a family that does not exist — a face that supplies a glyph gives a
+   different number, a face that does not falls through to the same last
+   resort both times. Every mark on this page, one size, one run:
+
+     ₪ 12.09/9.73   — 14.23/16    ‹ › 4.75/5.33   ← → 14.23/16
+     ‑ 4.75/5.33    … 14.23/16    ’ 3.17/5.33     ⌄ 13.41/13.41  ← the same
+
+   So the one affordance saying this row opens was drawn by
+   whatever last-resort face the machine happened to have, at whatever size
+   and baseline that face gives it, on all nine steps in all three languages.
+   It is the fault §0b records for the eyebrow set in `--mono` and for `→` in
+   an RTL line, arriving a third time in a character nobody thinks to check.
+   ⚠ `document.fonts.check()` ANSWERS TRUE FOR IT AND IS NO USE HERE: over
+   `file://` Assistant is never requested, so it reports on the fallback. The
+   honest probe is the advance width against a family that does not exist,
+   and `npm run audit` now runs it over every mark the page draws.
+   ⚠ AND THE BORDERS ARE PHYSICAL ON PURPOSE. `border-inline-end` mirrors, so
+   a square built from two LOGICAL borders points down-right in English and
+   down-left in Hebrew — one control, two marks. A chevron is a shape, which
+   is the same rule as `svg { direction: ltr }` one element down.
+   ⚠ And the nudge is inside the `transform` rather than a margin, so it is
+   interpolated with the rotation instead of jumping at the start of it.
+   The `::before` beside this has been drawn in CSS since the day it was
+   written; this is that idiom, and it is why the row now has one. */
 .sect__q::after {
-  content: "⌄"; margin-inline-start: auto; transition: transform .2s var(--ease);
+  content: ""; margin-inline-start: auto; flex: none;
+  inline-size: 7px; block-size: 7px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform .2s var(--ease);
 }
-.sect__exp[open] .sect__q::after { transform: rotate(180deg); }
+.sect__exp[open] .sect__q::after { transform: translateY(2px) rotate(-135deg); }
 .sect__exp[open] .sect__q { color: var(--ink); }
 .sect__a {
   margin: 0 0 12px; padding-inline-start: 26px;

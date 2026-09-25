@@ -7822,7 +7822,7 @@ ${body}
     <circle cx="0" cy="0" r="${LOCK_R}"/>
     <g transform="scale(${k})">
       <path d="M -12 -16 a 12 12 0 1 1 24 0 l 3.6 30 a 4.4 4.4 0 0 1 -4.4 4.8
-               h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--paper, #EFEDE8)"/>
+               h -22.4 a 4.4 4.4 0 0 1 -4.4 -4.8 Z" fill="var(--surface, #EFEDE8)"/>
       <path d="M -4 -18 a 4 4 0 1 1 8 0 l 1.4 24 h -10.8 Z"/>
     </g>`
       };
@@ -7843,30 +7843,30 @@ ${body}
     <rect x="-45" y="-72" width="90" height="240" rx="45"/>
     <rect x="-152" y="${-LEVER_BLADE / 2}" width="152" height="${LEVER_BLADE}"
           rx="${LEVER_BLADE / 2}"/>
-    <circle cx="0" cy="106" r="13" fill="var(--paper, #EFEDE8)"/>` }),
+    <circle cx="0" cy="106" r="13" fill="var(--surface, #EFEDE8)"/>` }),
     // Knob on a long backplate — the plate carries the keyway too.
     knobplate: () => ({ box: [-58, -118, 58, 214], art: `
     <rect x="-48" y="-102" width="96" height="300" rx="30"/>
-    <circle cx="0" cy="0" r="30" fill="var(--paper, #EFEDE8)"/>
+    <circle cx="0" cy="0" r="30" fill="var(--surface, #EFEDE8)"/>
     <circle cx="0" cy="0" r="21"/>
-    <circle cx="0" cy="120" r="12" fill="var(--paper, #EFEDE8)"/>` }),
+    <circle cx="0" cy="120" r="12" fill="var(--surface, #EFEDE8)"/>` }),
     /* The smart lock: a slim black slab with a reader window near the top, a
        round thumb-turn, and the key override at the foot. Measured off d087 at
        56 x 226 mm — the twelve-button keypad drawn first came from the English
        word rather than from the door. */
     digital: () => ({ box: [-40, -96, 40, 150], art: `
     <rect x="-28" y="-80" width="56" height="226" rx="10"/>
-    <rect x="-17" y="-62" width="34" height="52" rx="5" fill="var(--paper, #EFEDE8)"/>
-    <circle cx="0" cy="44" r="15" fill="var(--paper, #EFEDE8)"/>
+    <rect x="-17" y="-62" width="34" height="52" rx="5" fill="var(--surface, #EFEDE8)"/>
+    <circle cx="0" cy="44" r="15" fill="var(--surface, #EFEDE8)"/>
     <circle cx="0" cy="44" r="9"/>
-    <rect x="-12" y="104" width="24" height="9" rx="4" fill="var(--paper, #EFEDE8)"/>` }),
+    <rect x="-12" y="104" width="24" height="9" rx="4" fill="var(--surface, #EFEDE8)"/>` }),
     /* Two squares. Nothing else in the range has a corner, which is the whole
        point of drawing it this way. */
     square: () => ({ box: [-172, -60, 56, 152], art: `
     <rect x="-41" y="-41" width="82" height="82" rx="5"/>
     <rect x="-41" y="67" width="82" height="82" rx="5"/>
     <rect x="-152" y="-13" width="152" height="26" rx="13"/>
-    <circle cx="0" cy="108" r="12" fill="var(--paper, #EFEDE8)"/>` }),
+    <circle cx="0" cy="108" r="12" fill="var(--surface, #EFEDE8)"/>` }),
     /* Cadoor: a free-standing ovoid, no rose — taller than wide. ⚠ THE STUB
        SHANK IS GONE, 20.9.2026 — Peretz: *"on the ball handle icon remove the
        line."* It was a 45 x 22 rounded rect beside the ovoid, a side view of
@@ -7877,7 +7877,7 @@ ${body}
     // Sapir: square cushion knob on a square rose, the knob offset off the plate.
     sapir: () => ({ box: [-78, -46, 46, 52], art: `
     <rect x="-36" y="-36" width="72" height="72" rx="3"/>
-    <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--paper, #EFEDE8)"/>
+    <rect x="-69" y="-27" width="70" height="70" rx="9" fill="var(--surface, #EFEDE8)"/>
     <rect x="-65" y="-23" width="62" height="62" rx="7"/>` }),
     // Shiran: the ornate pull — spigot, bulge, disc, parallel shaft, mirrored.
     shiran: () => ({ box: [-48, -252, 48, 252], art: `
@@ -8367,7 +8367,6 @@ ${body}
     faceGone: "fix.faceGone",
     peepGone: "fix.peepGone",
     bellGone: "fix.bellGone",
-    peepWindow: "fix.peepWindow",
     /* `needPanel` and `ownPull` are gone with the two rules they announced —
        the forced bottom panel and the pull a face brought with it. Both rules
        were withdrawn by Peretz on 14.9.2026; see `conflicts`. */
