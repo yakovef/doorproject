@@ -339,7 +339,7 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **9,085,339 / 0** (25.9.2026; 11,809,879 on 23.9 — the drop is
+- `npm test` — **9,085,342 / 0** (25.9.2026; 11,809,879 on 23.9 — the drop is
   the buildable sweeps shrinking, see §0b 24.9). ⚠ A CHANGE IN THIS
   NUMBER IS NOT EVIDENCE OF ANYTHING; it is the product of the catalogue's list
   lengths. Read the failure count. (This line said **5,403,239** for two rounds
@@ -2675,6 +2675,50 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE CURVED LEVER HANGS DOWN, STARTS WIDER AND CURVES MORE —
+  25.9.2026.** The owner's son on the morning's scythe: *"The curved lever is
+  better than it was but still not it. 1. It is curved downwards not upwards
+  like right now. 2, at the start of it its a little bit wider. 3, the curve
+  is a little bit more curved."* Three constants in `js/renderer.js`, one for
+  each point. The door and the tile both read them through `taperBand`, so
+  they move together.
+  · **The direction:** `TAPER_RISE` became `TAPER_DROP`, and `taperMid` changed
+    sign. The centreline still leaves the rose flat, so the rose stays on its
+    spindle and the curl stays at the tip, which now hangs below the spindle.
+  · **More curved:** the drop is 30 where the rise was 22, which is 0.28 of
+    the 109 mm reach against 0.20.
+  · **Wider at the start:** `TAPER_HALF_NECK` went 14 → 16, a 32 mm neck.
+    That is 1.39 of the Coral's 23 mm blade against 1.22.
+  · **Unchanged:** the point (8 mm) and the reach (0.85 of the Coral's).
+  · **The tile's box:** it now extends downward to hold the drop, and no longer
+    upward.
+
+  **The footprint:** drawn at 30/112/34 against a declared 40/118/51, still
+  inside (`npm run collide -- boxes`).
+
+  **Asserted.** The scythe clause in `npm test` is restated:
+  · the tip is BELOW the neck;
+  · the drop is more than 0.25 of the reach;
+  · the curl is still at the tip;
+  · the neck is at least 1.35 of the Coral's blade.
+
+  Each clause fails on its own when last night's value is put back. The
+  sign gives a tip 30 above the neck, the old drop gives 0.20 and the old
+  neck gives 1.22. This was checked on a scratch copy with the test's own
+  expressions.
+
+  ⚠ **Still no photograph of this product.** These are his words turned into
+  geometry, and `ASK-PERETZ` §1b still asks for its name.
+
+  **Gates:**
+  · `npm test` **9,085,342 / 0** after the sheets;
+  · `npm run audit` found **no faults**, including the lock step's pairwise
+    tile raster floor.
+
+  **Sheets:** **0 of 48 bare and 0 lockset sheets moved**, because no
+  comparison fixture carries the curved lever. 9 of the 12 `shot` sheets moved,
+  which proves nothing either way (§7).
 
 - **⚠ THE NIGHT ROUND — THE IDAN FITS BESIDE THE GREEK SET, THE RING LATTICE
   IS GONE, A DOOR-AND-A-HALF CARRIES THE SET ON BOTH LEAVES, AND THE CURVED

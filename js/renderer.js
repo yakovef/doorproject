@@ -891,7 +891,8 @@ const LEVER_BLADE  = Math.round(LEVER_ROSETTE * 2 * 0.377);
    thicker than the Coral along its whole length. A scythe is three things the
    wedge was not, and each is one constant:
      · the SWEEP is a curve, not a slope: the centreline leaves the rose flat
-       and climbs as the square of the distance, so the curl is at the tip;
+       and bends as the square of the distance, so the curl is at the tip
+       (it climbed until the note below turned it down);
      · it NARROWS FAST: the half-depth falls as the square of what is left,
        so it is past half its narrowing by a third of the way out, and ends
        in a point barely a third of the Coral's blade;
@@ -900,12 +901,23 @@ const LEVER_BLADE  = Math.round(LEVER_ROSETTE * 2 * 0.377);
    under it and RB has no cut-out (§7) — so these are the words turned into
    geometry, not a measurement, and they are held as ratios to nothing but
    each other. */
+/* ⚠ AND IT HANGS DOWN, SINCE LATER THE SAME DAY — the owner's son again, on
+   the scythe above: *"better than it was but still not it. 1. It is curved
+   downwards not upwards like right now. 2, at the start of it its a little
+   bit wider. 3, the curve is a little bit more curved."* Three constants, one
+   each: the sweep's sign flipped (the centreline still leaves the rose flat,
+   so the rose stays on its spindle, and the curl is still at the tip — it
+   now falls away from the hand instead of climbing), the drop 22 → 30 (0.20
+   of the reach → 0.28), and the neck 28 → 32 deep (1.22 → 1.39 of the
+   Coral's blade). The 25.9 morning version climbed 22 on a 28 neck. Still his
+   words, still no photograph. */
 const TAPER_REACH_F  = 0.85;  // a bit shorter than the Coral
-const TAPER_RISE     = 22;    // the sweep's climb at the tip, as the square of the reach
-const TAPER_HALF_NECK = 14;   // half-depth where it leaves the rose (the Coral's is 11.5) …
+const TAPER_DROP     = 30;    // how far the tip hangs below the spindle, as the square of the reach
+const TAPER_HALF_NECK = 16;   // half-depth where it leaves the rose (the Coral's is 11.5) …
 const TAPER_HALF_CAP  = 4;    // … and at the point
 const taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
-const taperMid   = (t, L) => -TAPER_RISE * (t / L) ** 2;
+/* Positive is DOWN in the drawing's y. */
+const taperMid   = (t, L) => TAPER_DROP * (t / L) ** 2;
 const taperHalf  = (t, L) =>
   TAPER_HALF_CAP + (TAPER_HALF_NECK - TAPER_HALF_CAP) * (1 - Math.min(1, t / L)) ** 2;
 /* One outline, two readers — the door and the tile — so the blade on the tile
@@ -9313,8 +9325,9 @@ function lever(cx, cy, dir) {
 }
 
 /**
- * The curved lever — a SCYTHE since 25.9.2026 (see TAPER_RISE for the words
- * and the three constants). It began as the shape the Coral was drawn as until
+ * The curved lever — a SCYTHE since 25.9.2026, and one that HANGS DOWN since
+ * later that day (see TAPER_DROP for both sets of words and the constants).
+ * It began as the shape the Coral was drawn as until
  * 14.9.2026, kept because Peretz recognised it as a product of its own:
  * *"the one thats there right now with the curve, add it as a different
  * handle."*
@@ -9341,8 +9354,8 @@ function leverTaper(cx, cy, dir) {
             transform="translate(0 8)" fill="#000" opacity="0.30"
             filter="url(#hwShadow)"/>
 
-      <!-- Body: full where it leaves the rose, narrowing fast, sweeping up to
-           a point. -->
+      <!-- Body: full where it leaves the rose, narrowing fast, curving down
+           to a point. -->
       <path d="${body}" fill="url(#nickel)"/>
       <!-- ⚠ AND THE SAME BLACK WASH AS THE CORAL, FOR THE SAME REASON AND OFF
            THE SAME MEASUREMENT. The seven photographed levers put the blade's
@@ -9864,16 +9877,16 @@ const FITTING_GLYPH = {
           height="${LEVER_BLADE}" rx="${LEVER_BLADE / 2}"/>` }),
 
   /* The curved lever: the tile has to carry all three things that make it a
-     different product from the Coral above — it tapers, it rises, and it is
-     shorter — or the two tiles are a bar and a slightly shorter bar. Drawn as
+     different product from the Coral above — it tapers, it curves down, and
+     it is shorter — or the two tiles are a bar and a slightly shorter bar. Drawn as
      a polygon rather than a `rect` for exactly that reason, and off the same
      four constants `leverTaper()` draws the door with, so "shorter" and "it
      tapers" cannot become true of one of them and not the other. */
   levertaper: () => {
     const L = taperReach();
     const pt = (t, s) => `${(-t).toFixed(1)} ${(taperMid(t, L) + s * taperHalf(t, L)).toFixed(1)}`;
-    return { box: [-(L + 16), -(LEVER_ROSETTE + TAPER_RISE + 12),
-                   LEVER_ROSETTE + 12, LEVER_ROSETTE + 12], art: `
+    return { box: [-(L + 16), -(LEVER_ROSETTE + 12), LEVER_ROSETTE + 12,
+                   Math.max(LEVER_ROSETTE, TAPER_DROP + TAPER_HALF_CAP) + 12], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
     <path d="${taperBand(pt, L)}"/>` };
   },

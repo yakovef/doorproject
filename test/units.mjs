@@ -3199,9 +3199,20 @@ group('the second review\'s night round — 25.9.2026');
     ok(depth(last) < depth(0) * 0.4, `the scythe's point is ${depth(last).toFixed(1)} deep against ${depth(0).toFixed(1)} at the neck`);
     ok(depth(half) - depth(last) < (depth(0) - depth(last)) * 0.5,
        'the curved lever narrows evenly — it should be past half its narrowing by the middle');
-    const sweep = mid(0) - mid(last), early = mid(0) - mid(half);
+    /* And later the same day: "It is curved downwards not upwards like right
+       now. 2, at the start of it its a little bit wider. 3, the curve is a
+       little bit more curved." The drawing's y runs DOWN, so a tip that hangs
+       has the larger mid. Each number below is one the morning's scythe
+       fails: it climbed, it swept 0.20 of its reach, and its neck was 1.22 of
+       the Coral's blade. */
+    const sweep = mid(last) - mid(0), early = mid(half) - mid(0);
+    ok(sweep > 0, `the curved lever's tip is ${(-sweep).toFixed(1)} ABOVE its neck — it curves downwards, not up`);
     ok(sweep > depth(0) * 0.5, `the curved lever's tip sweeps ${sweep.toFixed(1)} — it is not curved`);
-    ok(early < sweep * 0.4, 'the curved lever climbs in a straight line — the curl belongs at the tip');
+    ok(sweep > reach * 0.25, `the curved lever drops ${sweep.toFixed(1)} over a ${reach} reach — it should be a little more curved than 0.20 of it`);
+    ok(early < sweep * 0.4, 'the curved lever bends in a straight line — the curl belongs at the tip');
+    const coralBlade = Number(/height="([\d.]+)" rx/.exec(coral)[1]);
+    ok(depth(0) >= coralBlade * 1.35,
+       `the curved lever is ${depth(0).toFixed(1)} deep at the neck against the Coral's ${coralBlade} — it should start a little wider`);
   }
 }
 

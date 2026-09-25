@@ -3026,11 +3026,11 @@ ${stops}
   var LEVER_REACH = 128;
   var LEVER_BLADE = Math.round(LEVER_ROSETTE * 2 * 0.377);
   var TAPER_REACH_F = 0.85;
-  var TAPER_RISE = 22;
-  var TAPER_HALF_NECK = 14;
+  var TAPER_DROP = 30;
+  var TAPER_HALF_NECK = 16;
   var TAPER_HALF_CAP = 4;
   var taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
-  var taperMid = (t, L2) => -TAPER_RISE * (t / L2) ** 2;
+  var taperMid = (t, L2) => TAPER_DROP * (t / L2) ** 2;
   var taperHalf = (t, L2) => TAPER_HALF_CAP + (TAPER_HALF_NECK - TAPER_HALF_CAP) * (1 - Math.min(1, t / L2)) ** 2;
   var TAPER_STEPS = 14;
   var taperBand = (pt, L2, s0 = -1, s1 = 1, t0 = 0, t1 = L2) => {
@@ -7493,8 +7493,8 @@ ${body}
             transform="translate(0 8)" fill="#000" opacity="0.30"
             filter="url(#hwShadow)"/>
 
-      <!-- Body: full where it leaves the rose, narrowing fast, sweeping up to
-           a point. -->
+      <!-- Body: full where it leaves the rose, narrowing fast, curving down
+           to a point. -->
       <path d="${body}" fill="url(#nickel)"/>
       <!-- ⚠ AND THE SAME BLACK WASH AS THE CORAL, FOR THE SAME REASON AND OFF
            THE SAME MEASUREMENT. The seven photographed levers put the blade's
@@ -7773,8 +7773,8 @@ ${body}
     <rect x="${-LEVER_REACH}" y="${-LEVER_BLADE / 2 - 1}" width="${LEVER_REACH}"
           height="${LEVER_BLADE}" rx="${LEVER_BLADE / 2}"/>` }),
     /* The curved lever: the tile has to carry all three things that make it a
-       different product from the Coral above — it tapers, it rises, and it is
-       shorter — or the two tiles are a bar and a slightly shorter bar. Drawn as
+       different product from the Coral above — it tapers, it curves down, and
+       it is shorter — or the two tiles are a bar and a slightly shorter bar. Drawn as
        a polygon rather than a `rect` for exactly that reason, and off the same
        four constants `leverTaper()` draws the door with, so "shorter" and "it
        tapers" cannot become true of one of them and not the other. */
@@ -7783,9 +7783,9 @@ ${body}
       const pt = (t, s) => `${(-t).toFixed(1)} ${(taperMid(t, L2) + s * taperHalf(t, L2)).toFixed(1)}`;
       return { box: [
         -(L2 + 16),
-        -(LEVER_ROSETTE + TAPER_RISE + 12),
+        -(LEVER_ROSETTE + 12),
         LEVER_ROSETTE + 12,
-        LEVER_ROSETTE + 12
+        Math.max(LEVER_ROSETTE, TAPER_DROP + TAPER_HALF_CAP) + 12
       ], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
     <path d="${taperBand(pt, L2)}"/>` };
