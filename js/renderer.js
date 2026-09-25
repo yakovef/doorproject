@@ -5888,390 +5888,362 @@ function glazingArt(kind, x, y, w, h, paint, key = 'g', ornW = null) {
     return { veil: out, over: '' };
   }
 
-  /* ── גפן — d109, REDRAWN 25.9.2026 ─────────────────────────────────
-     The owner's son: *"fix the grape and vine pattern, look at a real image
-     with that design and copy it the best you can, then try to critisize your
-     design, and then fix those critisisms."*
+  /* ── גפן — TRACED OFF THE PHOTOGRAPH, 25.9.2026 ─────────────────────
+     Second redraw in one round, and the method is the change. The owner's son
+     read the first one and said so in one line: *"i dont like the grape design
+     still, find a new way to copy it right this time."*
 
-     ⚠ THE EVIDENCE IS d109 AND IT IS THE ONLY DOOR THAT CAN BE READ. Both
-     doors filed under this design carry a FALLBACK leaf box (CLAUDE.md §8), so
-     nothing here starts from `research/works/auto`; the PANE is found in the
-     image instead, as the widest bright rectangle inside the leaf, and every
-     number below is a fraction of ITS WIDTH — 226 px on a 464 px-tall opening,
-     aspect 0.487. That is the only unit `glazingArt` lays ornament out in
-     (§0b, 30.8: *"ornament is sized by the pane's WIDTH and never by its
-     height"*). d111's pane could not be located automatically and is not used.
+     ── WHY THE FIRST METHOD COULD NOT GET THERE ────────────────────────
+     Every previous attempt AUTHORED the motifs from measured scalars — a
+     stroke weight, an ink coverage, a lobe depth, a repeat pitch — and
+     CLAUDE.md §9 records where that stalled: coverage is invariant to trading
+     motif SIZE against motif COUNT, so the one number the pitch was fitted
+     against is structurally blind to the thing an eye complains about. Three
+     further instruments were built to measure the motif's scale and all three
+     came back blind. A fourth scalar was not going to close it.
+     So nothing here is authored. The shapes are TRACED out of the film's own
+     ink: threshold the pane, take the interior of a leaf as an enclosed hole,
+     follow its boundary, offset outward by half the measured stroke, and that
+     is the curve the film was cut along. A traced outline carries its own
+     scale, so the size-against-count question cannot arise.
 
-     ── WHAT THE PHOTOGRAPH SAYS, MEASURED ──────────────────────────────
-     · ONE STROKE WEIGHT, 6 px of 226 = **0.0265 W**, and it is the same on the
-       stem, the leaf outlines, the berry rings and the tendrils. Taken as the
-       MODE of every ink run along every row: 6 px x426, then 5 x380 and 7 x285
-       either side of it, which is one line weight seen at every angle.
-     · the film reaches **every edge** — first ink at 0.000 W and last at
-       0.996 W across, 0.000 to 0.998 down. Cut by the opening on all four
-       sides, not placed inside it.
-     · ink coverage **25.0%** of the pane, and by quarter 23.6 / 37.0 / 17.1 /
-       22.2. Even enough to be a repeating film and uneven enough not to be a
-       lattice.
+     ── AND THE EVIDENCE HAD TO BE DE-SKEWED FIRST ──────────────────────
+     ⚠ BOTH DOORS ARE PHOTOGRAPHED FROM BELOW AND THEIR PANES ARE KEYSTONES.
+     d111 measures 292 px across at its head and 330 at its foot, d109 209 and
+     237 — 13% on both. The four edges were fitted by least squares to the dark
+     rebate line (rms 0.3 to 1.4 px over ~250 rows), and then rectified.
+     ⚠ AND `tools/rectify.mjs` IS BILINEAR, WHICH IS THE WRONG MAP FOR THIS.
+     It interpolates along the two long edges, which is right for a shear; a
+     keystone is projective, and under perspective equal steps on the real door
+     do NOT map to equal steps in the image, they crowd toward the far end.
+     Rectified bilinearly, d111's berries — which are CIRCLES on the real door
+     — came back 1.23 times wider than tall at the head of the pane and 1.03 at
+     its foot. That gradient is the missing projective term, and a homography
+     removes it: head and foot then agree to 0.015 at every output height.
+     ⚠ THE OUTPUT ASPECT IS MEASURED, NOT ASSUMED. A quadrilateral alone does
+     not fix a rectangle's proportions, so the one free parameter is set by
+     ground truth: sweep the output height, take the one where the berries come
+     back round. d111 lands at 0.443 and d109 at 0.431 — two doors, two
+     independent de-skews, agreeing to 3%.
 
-     ── WHAT WAS WRONG WITH OURS, BESIDE IT ─────────────────────────────
-     Rendered at the photograph's own pane aspect and put next to it:
-     · **the stem zigzagged.** It swung ±0.20 W in a sine sampled as 48
-       straight `L` segments, so every reversal was a corner and the thing read
-       as a lightning bolt. The real stem is a gentle meander: measured on the
-       ruled crop it stays between 0.46 and 0.55 W, so **±0.045 W about the
-       middle**, with about two bows over the 2.05 W of height — a wavelength
-       near 1.0 W — and it CURVES the whole way.
-     · **the leaves were half size and the wrong shape.** A leaf in the
-       photograph spans about **0.42 W**; ours spanned 0.22. And ours were
-       spiky — sharp lobes with deep V notches, which is a maple — where the
-       real ones have blunt ROUNDED lobes, shallow rounded notches and a
-       heart-shaped base.
-     · **the berries were a quarter too big and the bunch too tidy.** Read off
-       the grid a berry is about **0.12 W across** the outside, packed at
-       about 0.11 W centre to centre so the rings just touch; ours drew 0.151 W
-       in a neat pyramid of identical circles.
-     · **three stroke weights** — 0.030 for the stem, 0.021 for outlines and
-       0.014 for tendrils — against the photograph's one.
-     · **the tendrils were invisible.** Ours were tight curls about 0.14 W;
-       the real ones are open spirals about 0.19 W and there are four or five
-       of them, and they are what fills the ground between the motifs.
+     ── THE CORNERS, WRITTEN DOWN BECAUSE THE TOOLS ARE NOT THE MEASUREMENT ──
+     The same reason CLAUDE.md §3 carries `newdoor`'s four corners in prose:
+     every figure below is a fraction of the picture these produce, and a
+     reader who has to re-find them will re-find them slightly differently.
+     Both are in their own file's pixels, in the order `tools/rectify.mjs`
+     takes (top-right, bottom-right, bottom-left, top-left), with the output
+     size that put the berries at aspect 1.000:
 
-     ── AND THE SELF-CRITICISM HE ASKED FOR, WHICH TOOK FOUR ROUNDS ──────
-     Each round is recorded where its number lives, because every one of them
-     was a fault in the REDRAW rather than in the original:
-     · **round 1** — the motifs hung off the stem on hairline stalks and
-       floated; the branches are the stem's own weight now and are a third of
-       what is on the pane. The leaves all leaned the same way. And one motif
-       per side at an even pitch read as a ladder, so the two sides are offset
-       by half a pitch and the kind alternates on a four-cycle.
-     · **round 2** — the leaf. A spline through ten measured points overshoots
-       at every direction reversal, so the lobes came to spikes: it is a polar
-       radius now, which cannot have a corner. See `LOBE_OUT`.
-     · **round 3** — the leaf again, twice more. The lobe depth was a GUESS
-       this comment claimed as a measurement, and the veins crossed out through
-       the notches. See `LOBE_OUT` and the vein note.
-     · **round 4** — the density, and my eye had it backwards. See `PITCH`.
-     ⚠ THE PATTERN IN ALL FOUR IS THE SAME: every one was found by rendering
-     the thing LARGE and looking at it, or by measuring it, and not one by
-     reasoning about the code. The comparison sheet that started this round
-     squashed our pane to two thirds of its aspect and cost two wrong
-     conclusions on its own.
+       d111  615.0,238.6  632.1,878.1  302.2,874.0  322.8,232.3   620 x 1400
+       d109  551.1,484.1  566.3,943.3  329.4,941.6  341.6,470.3   620 x 1440
 
-     ⚠ ONE THING IS NOT COPIED, DELIBERATELY. The photograph's film is grey on
-     bright frosted glass — dark ornament on a light ground. Our pane is the
-     sky-reflecting glass Part C put back on 20.9, so the ornament is drawn
-     LIGHTER than the paint and reads against the glass rather than into it.
-     Matching the photograph's polarity would mean darkening the pane, which is
-     the exact thing that round undid (*"the window designs that turn the
-     window black. they shouldnt"*). */
+     Reproduce with:
+       node tools/pane.mjs research/works/doors/d111.jpeg 300 195 665 910 90 3
+       node tools/pane.mjs research/works/doors/d109.jpeg 315 450 590 990 -170 4
+     ⚠ The SIGN of that threshold is not a taste. d111 has dark glass in a
+     white frame and the boundary is a near-black rebate; d109 has frosted
+     glass in a mid-green frame and the glass is BRIGHTER than the frame, so
+     the rule inverts. A finder that knew only the first read d109's pane as
+     57 px wide and negative.
+
+     ── WHAT THE FILM MEASURES, ON THOSE TWO VIEWS ──────────────────────
+     Every figure is a fraction of the PANE'S WIDTH, which is the only unit
+     this function lays ornament out in (§0b, 30.8).
+     · ONE stroke weight. Mode of the distance transform sampled on the
+       SKELETON: 14.0 px of 620 on d111 (0.0226 W) and 12.0 on d109 (0.0194 W).
+       The main stem measures 13-16 px in the rows where nothing crosses it, so
+       it is the same weight as the outlines and not a heavier member.
+       ⚠ The first reading of this sampled "ridge" pixels instead and returned
+       4.0 px on a stroke that is plainly 10: a local maximum along x or y is
+       satisfied one step in from the stroke's own edge, so the histogram
+       filled with edge pixels. The medial axis is what means "the middle".
+     · A BERRY is a hole 0.053 W in radius (d111 0.0513 and 0.0529 on its two
+       bunches, d109 0.0575), so its centreline radius is 0.053 + half a
+       stroke. Adjacent holes are 18.6 px apart against a 14 px stroke, so the
+       rings very nearly touch. Roundness 0.97 to 1.03 — they are circles.
+     · A BUNCH is 3, 3, 2, 1 top to bottom, counted at 2.6x on a bunch that is
+       whole in the frame, with the top row a little smaller than the rest.
+     · A LEAF is 0.417 W across (five traced leaves: 0.389, 0.394, 0.417,
+       0.422, 0.429) and 0.395 W tall on the two that are not cut by their
+       crop. The outline below is one of those two, at 47 points.
+     · A TENDRIL is ONE open loop just over a turn, interior 0.08 W across, not
+       a multi-turn coil.
+     · THE STEM meanders between 0.47 and 0.53 W in the rows where it is clear,
+       so about 0.03 W either side of the pane's middle.
+
+     ⚠ ONE THING IS STILL NOT COPIED, DELIBERATELY. The photograph's film is
+     grey on bright frosted glass — dark ornament on a light ground. Our pane
+     is the sky-reflecting glass Part C put back on 20.9, so the ornament is
+     drawn LIGHTER than the paint and reads against the glass rather than into
+     it. Matching the polarity would mean darkening the pane, which is the
+     exact thing that round undid (*"the window designs that turn the window
+     black. they shouldnt"*). */
   if (kind === 'vine') {
     const ink = scaleTone(paint, 1.06);
-    /* ONE weight, measured: 6 px of a 226 px pane. The three-weight version is
-       what made the stem read as a different object from the leaves. */
-    const INK = w * 0.0265;
-    const str = d => `<path d="${d}" fill="none" stroke="${ink}"
-      stroke-width="${INK.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    let out = '';                                  // no ground: the pane shows through
+    /* ⚠ THE UNIT IS THE PANE'S WIDTH, AND ON ONE SURFACE IT CANNOT BE.
+       Everything below is a fraction of W because that is the house rule
+       (§0b, 30.8) — and the option TILE is a 300 x 300 SQUARE, where one
+       cycle is 1.34 W tall and three quarters of it fits. Rendered at the
+       size it ships, the vine tile was the worst of the twelve on that step:
+       every other one reads as a pattern and this one showed a single leaf
+       and two fragments. A customer picks the design off that square, and
+       §5.5 is nine handle tiles that each drew a picture and none of which
+       said which product it was.
+       So the unit is the pane's width unless the pane is too SHORT to show
+       the pattern, in which case it is set so a cycle and a quarter fits, and
+       the ornament is centred in what width there is. On every pane the
+       catalogue can build this is exactly w — the square window is 2.53 W
+       tall, the slot far more — so it changes no door, which is asserted
+       rather than claimed. */
+    const U   = Math.min(w, h / 1.7);
+    const X0  = x + (w - U) / 2;
+    const INK = U * 0.021;                 // one weight, both doors
+    const LW  = U * 0.417;                 // a leaf, across
+    const BR  = U * 0.064;                 // a berry, centreline radius
+    const BP  = U * 0.132;                 // berry centres, apart
+    const ROW = U * 0.124;                 // berry rows, apart
+    const CY  = U * 1.34;                  // the pattern repeats this far down
+    const TR  = U * 0.050;                 // a tendril loop, centreline radius
 
-    /* ── the stem ──────────────────────────────────────────────────────
-       ⚠ QUADRATIC HALF-WAVES, NOT A SAMPLED SINE. A quadratic from one zero
-       crossing to the next, with its control point at TWICE the amplitude at
-       the quarter point, passes through exactly ±amp at its midpoint and is
-       smooth everywhere — so the stem has no facets and no corners at any
-       scale, including the 140 mm the A4 sheet prints it at. The old version
-       emitted 48 `L` segments and every reversal showed.
-       The wavelength is in W and not in H, so a tall pane gets more bows and a
-       squat one fewer, which is what a repeating film cut by an opening does.
-       It starts a half wave above the head and runs a half wave past the foot,
-       so both ends are cut by the edge rather than stopping at it. */
-    const MID = 0.500, AMP = 0.045, WAVE = 1.05;   // all x W, measured on d109
-    const half = w * WAVE / 2;
-    const yTop = y - half, yBot = y + h + half;
-    const stemX = t => x + w * (MID + AMP * Math.sin(t * Math.PI));
-    const nHalf = Math.ceil((yBot - yTop) / half);
-    {
-      let d = `M ${n2(x + w * MID)} ${n2(yTop)}`;
-      for (let i = 0; i < nHalf; i++) {
-        const dir = i % 2 ? -1 : 1;
-        d += ` Q ${n2(x + w * (MID + dir * AMP * 2))} ${n2(yTop + half * (i + 0.5))}`
-           + ` ${n2(x + w * MID)} ${n2(yTop + half * (i + 1))}`;
+    /* The traced leaf, in units of its own width, centred on its own centroid.
+       Moore-neighbourhood contour of the interior hole, box-smoothed at 0.6 of
+       a stroke, offset outward by half a stroke along the normal, then
+       Ramer-Douglas-Peucker at 1.2 px of a 261 px leaf. The veins reach the
+       margin and cut slits into the hole, so the hole is morphologically
+       closed at 0.75 of a stroke first — an intrusion that thin goes and the
+       sinuses between the lobes, which are several times wider, stay. */
+    const LEAF = [
+      [0.131,-0.399],[0.153,-0.4],[0.205,-0.394],[0.269,-0.366],
+      [0.343,-0.312],[0.403,-0.246],[0.429,-0.212],[0.439,-0.186],
+      [0.439,-0.169],[0.432,-0.154],[0.417,-0.139],[0.374,-0.118],
+      [0.366,-0.11],[0.439,-0.071],[0.469,-0.043],[0.488,-0.016],
+      [0.507,0.036],[0.515,0.09],[0.515,0.155],[0.508,0.19],[0.497,0.206],
+      [0.478,0.221],[0.332,0.271],[0.271,0.285],[0.191,0.288],[0.148,0.278],
+      [0.103,0.26],[0.099,0.265],[0.117,0.312],[0.117,0.348],[0.105,0.378],
+      [0.078,0.397],[-0.121,0.42],[-0.192,0.417],[-0.252,0.398],
+      [-0.275,0.385],[-0.296,0.366],[-0.32,0.328],[-0.333,0.279],
+      [-0.338,0.204],[-0.351,0.201],[-0.423,0.217],[-0.452,0.215],
+      [-0.475,0.197],[-0.485,0.163],[-0.485,0.125],[-0.476,0.073],
+      [-0.464,0.042],[-0.442,0.007],[-0.404,-0.034],[-0.371,-0.062],
+      [-0.349,-0.077],[-0.31,-0.094],[-0.332,-0.13],[-0.341,-0.177],
+      [-0.335,-0.246],[-0.312,-0.309],[-0.281,-0.354],[-0.259,-0.374],
+      [-0.233,-0.384],[-0.211,-0.383],[-0.192,-0.373],[-0.174,-0.356],
+      [-0.118,-0.263],[-0.07,-0.31],[0.01,-0.364],[0.081,-0.392]
+    ];
+
+    /* ⚠ A QUADRATIC B-SPLINE, NOT A SPLINE THROUGH THE POINTS. Every anchor is
+       an edge MIDPOINT and every traced vertex is a control point, so the curve
+       is guaranteed to lie inside the convex hull of the traced polygon. §0b
+       records the previous redraw failing exactly here: a spline THROUGH ten
+       measured points overshot at every direction reversal and turned the lobes
+       into thorns. This one cannot overshoot at any point density. */
+    const spline = (pts, close) => {
+      const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      const P = p => `${n2(p[0])} ${n2(p[1])}`;
+      if (pts.length < 3) return `M${pts.map(P).join('L')}`;
+      if (close) {
+        let d = `M${P(mid(pts[pts.length - 1], pts[0]))}`;
+        for (let i = 0; i < pts.length; i++)
+          d += `Q${P(pts[i])} ${P(mid(pts[i], pts[(i + 1) % pts.length]))}`;
+        return `${d}Z`;
       }
-      out += str(d);
-    }
-    /* Where the stem is at a given y, for hanging things off it. Derived from
-       the same three constants rather than re-fitted, so a branch always
-       leaves the stem ON the stem. */
-    const stemAt = yy => x + w * (MID + AMP * Math.sin(((yy - yTop) / half) * Math.PI));
-
-    /* ── the leaf ──────────────────────────────────────────────────────
-       ⚠ POLAR, AND THE FIRST REDRAW OF THIS WAS A LIST OF POINTS THROUGH A
-       SPLINE, WHICH CAME OUT AS A STAR. That version put ten measured points
-       round a half leaf and smoothed them with Catmull-Rom; a spline through
-       points that reverse direction overshoots AT the reversal, so every lobe
-       tip came to a spike and the leaf read as a thistle — the exact fault the
-       redraw was for, reintroduced by the method rather than by the numbers.
-       Written as a radius that VARIES WITH ANGLE there is no reversal to
-       overshoot: the outline cannot have a corner because the function that
-       makes it has none.
-
-         r(θ) = R · (1 + LOBE · shaped(cos 5θ))
-
-       is a five-lobed rosette with the apex at the top, and `LOBE` is how deep
-       the notches cut.
-
-       ⚠ AND 0.155 WAS A GUESS THAT THIS COMMENT CLAIMED AS A MEASUREMENT. It
-       said *"1.155/0.845 is 1.37 against the 1.35 the photograph gives"* and no
-       such reading had been taken. Drawn at that depth the lobes dissolved and
-       the leaf came out an amoeba with an X of veins on it — worse than the
-       spiky version it replaced. §6 in one line: get the number before changing
-       anything, and get it again before writing it down.
-       Measured, on a leaf cropped whole at 4x with a 0.10 W scale bar beside
-       it: the notches cut **more than half way in**, lobe over notch about
-       **2.3**, which needs LOBE ≈ 0.40 and not 0.155. A grape leaf is a deeply
-       cut thing and the photograph says so plainly at magnification.
-
-       ⚠ `shaped` IS WHY IT IS NOT A BARE COSINE. A cosine gives lobes and
-       notches the same width; the photograph's lobes are broad flaps and its
-       notches are narrow slots. Raising |cos| to a power below 1 broadens the
-       extremes and steepens the crossings, which is that difference exactly,
-       and it keeps the curve smooth — the thing a spline through measured
-       points could not do without spiking at every tip.
-
-       ⚠ AND THE SINUS IS A SEPARATE TERM. θ = π is straight down and
-       `cos 5π = -1`, so a notch already falls there; this deepens it into the
-       V the petiole enters through, which is the single feature that stops a
-       five-lobed rosette reading as a flower. */
-    /* ⚠ AND 0.40 WITH A 0.65 POWER WAS TOO FAR THE OTHER WAY, which is the
-       third reading of this one number and the second time it was wrong. At
-       that depth the lobes came out FLAT-TOPPED and the notches became narrow
-       slots, so the outline read as a splat rather than as a leaf: a power
-       well below 1 holds the curve near its extremes for most of the cycle,
-       which squares off the very thing it was meant to round. 0.30 at 0.80
-       keeps the lobe-to-notch ratio at 1.9 — inside the 2.3 measured on the
-       crop, and the difference is the stroke, which fattens every lobe and
-       narrows every notch by half a line weight once it is drawn. */
-    /* ⚠ TWO EXPONENTS, ONE PER SIDE, AND ONE EXPONENT CANNOT DO IT. Drawn
-       large, a single power gave lobes and notches the SAME angular width and
-       the leaf read as a starfish — five fingers with five equal gaps. On the
-       magnified crop the lobes are broad flaps taking most of each 72° period
-       and the notches are narrow slots taking the rest, which is two different
-       shapes and needs two numbers:
-         · out (c > 0), a LOW power broadens the lobe — it holds near its
-           maximum across most of the arc and falls away only at the edges;
-         · in (c < 0), a HIGH power narrows the notch — it stays near nothing
-           except right at the bottom, so the slot is a slot.
-       ⚠ AND `APEX` IS THE ONE DEPARTURE FROM FIVEFOLD SYMMETRY. A pure
-       5-lobed rosette has an equal lobe in every direction including straight
-       down, and a leaf does not: its apex is the biggest lobe and its basal
-       pair are the smallest. Ten per cent of bias, which is enough to give the
-       shape a top and a bottom without making it a different outline. */
-    const LOBE_OUT = 0.30, POW_OUT = 0.55;
-    const LOBE_IN  = 0.34, POW_IN  = 1.90;
-    const APEX = 0.10, SINUS = 0.40, SINUS_D = 0.72;
-    /* One statement of the outline, so the veins cannot leave it (below). */
-    const leafR = th => {
-      const c = Math.cos(5 * th);
-      let r = c >= 0 ? 1 + LOBE_OUT * c ** POW_OUT
-                     : 1 - LOBE_IN * (-c) ** POW_IN;
-      r *= 1 + APEX * Math.cos(th);
-      const fromFoot = Math.abs(Math.PI - th);
-      if (fromFoot < SINUS) {
-        const k = 1 - fromFoot / SINUS;
-        r *= 1 - (1 - SINUS_D) * k * k * (3 - 2 * k);
-      }
-      return r;
+      let d = `M${P(pts[0])}`;
+      for (let i = 1; i < pts.length - 1; i++)
+        d += `Q${P(pts[i])} ${P(mid(pts[i], pts[i + 1]))}`;
+      return `${d}L${P(pts[pts.length - 1])}`;
     };
-    const leafPath = (cx, cy, span, rot) => {
-      const R = span / 2;
-      const N = 64;                     // sub-pixel at pane scale and at A4
+
+    /* The leaf is emitted ONCE and placed with use, because it is the same
+       stamp every time — the two leaves traced whole came back the same shape,
+       which is what a printed film does. Only translate and rotate: a scale
+       would scale the STROKE with it and the film has one weight.
+       ⚠ The id goes through uid, which carries this pane's own key. A fixed id
+       is §5.13, and the gallery puts thirty doors in one document. */
+    const lid = uid('vleaf');
+    /* ⚠ AND IT IS MIRRORED ON HALF OF THEM. One stamp at three rotations read
+       as wallpaper — the eye finds the repeat immediately, which the
+       photograph does not do. A mirror is free here (a reflection of a printed
+       film is a leaf seen from its other face) and it doubles the apparent
+       vocabulary at no byte cost. scale(-1,1) has |determinant| 1, so the
+       stroke keeps its single measured weight. */
+    const leafAt = (cx, cy, rot, flip) => `<use href="#${lid}"
+      transform="translate(${n2(cx)} ${n2(cy)}) rotate(${rot.toFixed(1)})${
+        flip ? ' scale(-1 1)' : ''}"/>`;
+
+    /* ⚠ THE MARKS INSIDE A LEAF ARE NOT VEINS, AND LOOKING IS WHAT SETTLED IT.
+       The first pass here went looking for veins radiating from the petiole,
+       traced two broken runs and would have drawn the wrong thing — what it
+       had actually found was the STEM passing behind that particular leaf.
+       Magnified on a leaf clear of the stem, every notch between two lobes
+       carries one short tapered DART pointing inward, and there is nothing at
+       the base at all.
+       So they are derived from the outline rather than traced run by run: a
+       local minimum of the outline's radius IS a sinus, and the outline is the
+       photograph's. Five of them on this leaf, at depths of 0.12 to 0.21 of
+       its width, each with the inward bisector of its own notch. The dart
+       starts a hair OUTSIDE the vertex so it meets the drawn curve — a
+       quadratic B-spline cuts a concave corner, so the curve passes on the far
+       side of the notch's own point. */
+    const DART = [[0.366, -0.110, -0.926, -0.379], [0.103, 0.260, -0.873, -0.487],
+                  [-0.338, 0.204, 0.393, -0.919], [-0.310, -0.094, 0.766, 0.643],
+                  [-0.118, -0.263, -0.465, 0.885]];
+    const DART_LEN = 0.155;                // of the leaf's width, measured at 2.2x
+
+    /* where a stalk meets a leaf: the traced OUTLINE crossed by the line in
+       from the stem, so the branch stops on the leaf's own margin rather than
+       at a guessed radius. The drawn curve is the B-spline, which lies inside
+       this polygon, so the stalk runs a hair under the outline — which is what
+       the photograph shows, the petiole entering the leaf a little. */
+    const leafHit = (cx, cy, rot, flip, fx, fy) => {
+      const a = rot * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+      const f = flip ? -1 : 1;
+      const abs = LEAF.map(p => [cx + (p[0] * LW * f) * ca - (p[1] * LW) * sa,
+                                 cy + (p[0] * LW * f) * sa + (p[1] * LW) * ca]);
+      let best = null;
+      for (let i = 0; i < abs.length; i++) {
+        const p = abs[i], q = abs[(i + 1) % abs.length];
+        const r1 = [cx - fx, cy - fy], r2 = [q[0] - p[0], q[1] - p[1]];
+        const den = r1[0] * r2[1] - r1[1] * r2[0];
+        if (!den) continue;
+        const t = ((p[0] - fx) * r2[1] - (p[1] - fy) * r2[0]) / den;
+        const u = ((p[0] - fx) * r1[1] - (p[1] - fy) * r1[0]) / den;
+        if (t < 0 || t > 1 || u < 0 || u > 1) continue;
+        if (!best || t < best) best = t;
+      }
+      const t = best === null ? 0.7 : best;
+      return [fx + (cx - fx) * t, fy + (cy - fy) * t];
+    };
+
+    /* 3, 3, 2, 1, counted off the photograph; the top row is the smaller one
+       and one berry in the second row is the biggest, which is also what it
+       shows. Rings, not discs: the film cuts an outline. */
+    const BUNCH = [[0.86, 0.86, 0.86], [0.96, 1.14, 0.9], [1, 1], [1]];
+    const bunchPath = (cx, cy) => {
       let d = '';
-      const ca = Math.cos(rot), sa = Math.sin(rot);
-      /* 0.95 on the y axis: the photograph's leaves are a touch wider than
-         they are tall, which is what a grape leaf is. */
-      const put = (u, v) => [cx + u * ca - v * sa, cy + u * sa + v * ca];
-      const ring = (th, f) => {
-        const rr = R * leafR(th) * f;
-        return put(rr * Math.sin(th), -rr * Math.cos(th) * 0.95);
-      };
-      for (let i = 0; i < N; i++) {
-        /* θ from the apex, clockwise: θ=0 is the top. */
-        const [px, py] = ring((i / N) * Math.PI * 2, 1);
-        d += `${i ? ' L' : 'M'} ${n2(px)} ${n2(py)}`;
-      }
-      /* ⚠ THREE VEINS FROM THE PETIOLE, AND THEY ARE LONG. The first redraw
-         made them short stubs from the leaf's CENTRE and they came out as an
-         asterisk lying on a blob. On the magnified crop the midrib runs from
-         the sinus nearly to the apex and the two side veins reach well into
-         the side lobes — they are most of what makes the shape read as a leaf
-         rather than as a cut-out. Each ends in a small blob, which the film
-         has and which also stops a stroke ending in mid-air.
-         ⚠ AND THEY START AND END ON THE SAME CURVE THE OUTLINE IS DRAWN FROM,
-         which is why `leafR` is a function rather than eight lines repeated.
-         The version before this put the root at a flat 0.52 R and drew to a
-         radius that ignored the sinus — so on every leaf the root sat OUTSIDE
-         the outline at the bottom and three strokes crossed the edge, which is
-         the X that was showing through the shape. The root is now the sinus's
-         own point pulled a little inside it, and each vein ends at a fraction
-         of the radius at its own angle. Re-measure `LOBE` and both follow. */
-      /* ⚠ ROOT → CENTRE → TIP, AND A STRAIGHT ROOT-TO-TIP CROSSES THE OUTLINE.
-         This is the third try at the veins and the second real defect in them.
-         A leaf with notches this deep is NOT convex, so a chord from the sinus
-         at the foot to a lobe tip at 72° leaves the shape through the notch
-         between them — drawn large, three strokes ran out past the edge and
-         the leaf read as a splat with a star scribbled over it. Every segment
-         is RADIAL now: the root runs in to the centre along 180°, and each
-         vein runs out from the centre along its own angle, so a vein is inside
-         the outline by construction whatever `LOBE` is re-measured to. */
-      /* ⚠ THREE STROKES, NOT FOUR. The midrib is ONE line from the sinus
-         through the centre to the apex — drawn as two, the leaf's interior
-         came out as an X with a stroke crossing it, because four lines meeting
-         at a point is a star whatever the outline round it does. The
-         photograph has a midrib and two side veins, and the midrib is the
-         petiole carrying on. */
-      const root = ring(Math.PI, 0.88), apex = ring(0, 0.80), mid = put(0, 0);
-      let veins = str(`M ${n2(root[0])} ${n2(root[1])} L ${n2(mid[0])} ${n2(mid[1])}`
-                    + ` L ${n2(apex[0])} ${n2(apex[1])}`)
-        + `<circle cx="${n2(apex[0])}" cy="${n2(apex[1])}" r="${n2(INK * 0.62)}" fill="${ink}"/>`;
-      for (const th of [Math.PI * 0.4, -Math.PI * 0.4]) {
-        const b = ring(th, 0.66);
-        veins += str(`M ${n2(mid[0])} ${n2(mid[1])} L ${n2(b[0])} ${n2(b[1])}`)
-               + `<circle cx="${n2(b[0])}" cy="${n2(b[1])}" r="${n2(INK * 0.62)}" fill="${ink}"/>`;
-      }
-      return str(d + ' Z') + veins;
-    };
-
-    /* ── the bunch ─────────────────────────────────────────────────────
-       Rings, never discs, at a pitch just under their own diameter so they
-       touch the way the photograph's do. Rows of 3-3-2-1 with the odd rows
-       offset by half a pitch, and the radii varied a little: three identical
-       bunches at identical spacing is not what a drawn film looks like. */
-    /* ⚠ THE BERRIES VARY BY MORE THAN TWO TO ONE, AND OURS VARIED BY SIX PER
-       CENT. Cropped at 4x with a 0.10 W bar beside it, one bunch on d109 holds
-       berries of 0.061, 0.094 and 0.139 W across — a factor of 2.3 inside a
-       single bunch, packed so they touch and nest rather than sitting on a
-       grid. A tidy pyramid of identical rings is what a PATTERN looks like;
-       this is what fruit looks like, and the difference is most of why ours
-       read as a diagram.
-       Mean diameter 0.105 W, so the ring's centreline radius is 0.039 W with
-       the 0.0265 W stroke on it. */
-    const BR = [1.00, 0.72, 1.28, 0.86, 1.15, 0.64, 1.32, 0.94, 1.08, 0.78, 1.20];
-    /* ⚠ AND THE ROWS ARE LAID OUT BY ACCUMULATING DIAMETERS, NOT ON A PITCH.
-       With sizes varying two to one a fixed centre-to-centre spacing leaves
-       gaps under the small berries and drives the large ones through each
-       other. Each berry is placed against the edge of the one before it, less
-       a little, so they touch whatever size they are — which is also what
-       makes a row of three come out a different width each time. */
-    const bunchPath = (cx, cy, seed) => {
-      const R = w * 0.048;
-      let s = '', k = seed, y0 = 0;
-      /* ⚠ THEY TOUCH, THEY DO NOT OVERLAP, and the first version of this drew
-         them through each other. With radii varying two to one, an overlap of
-         a fixed 0.22 R put a big berry's ring inside a small one's and a bunch
-         came out as a tangle of arcs rather than as fruit. On the magnified
-         crop the rings meet and stop — you can follow every berry all the way
-         round. A hair of air rather than none, so two strokes never merge into
-         one thick line at pane scale. */
-      const rows = [3, 3, 2, 1];
-      rows.forEach((per, row) => {
-        const rs = [...Array(per)].map(() => R * BR[k++ % BR.length]);
-        const span = rs.reduce((a, b) => a + b * 2, 0) + (per - 1) * INK * 0.5;
-        let bx = cx - span / 2;
-        const mean = rs.reduce((a, b) => a + b, 0) / per;
-        for (let c = 0; c < per; c++) {
-          bx += rs[c];
-          s += `<circle cx="${n2(bx)}" cy="${n2(cy + y0)}" r="${n2(rs[c])}" fill="none"
-                        stroke="${ink}" stroke-width="${INK.toFixed(2)}"/>`;
-          bx += rs[c] + INK * 0.5;
-        }
-        y0 += mean * 1.86;                // rows sit under each other, nested a little
+      BUNCH.forEach((row, ri) => {
+        const yy = cy + (ri - 1.5) * ROW;
+        row.forEach((s, i) => {
+          const xx = cx + (i - (row.length - 1) / 2) * BP, r = BR * s;
+          d += `M${n2(xx - r)} ${n2(yy)}a${n2(r)} ${n2(r)} 0 1 0 ${n2(2 * r)} 0`
+             + `a${n2(r)} ${n2(r)} 0 1 0 ${n2(-2 * r)} 0`;
+        });
       });
-      return s;
+      return d;
     };
 
-    /* ── the tendril ───────────────────────────────────────────────────
-       An open spiral that never closes into a ring — a closed loop reads as a
-       stray berry. 0.19 W across and 1.3 turns, which is what the photograph
-       shows; ours were 0.14 W at a hairline weight and disappeared. */
-    const tendril = (sx, sy, dir) => {
-      let d = `M ${n2(sx)} ${n2(sy)}`;
-      /* ⚠ 1.15 TURNS, AND IT TOOK THREE GOES. At 2.6 turns it closed into a
-         paisley blob with a hook; at 1.6, drawn large, it still came round far
-         enough to read as a capital G — a shape with a bar across it, which is
-         the one thing a tendril is not. d109's curl comes round about once and
-         a sixth and stops, so the eye follows it out and off rather than round
-         and back. It is drawn from the stem OUTWARD, with the first point on
-         the stem, so it reads as growing off the branch rather than as a mark
-         laid beside it. */
-      for (let k = 1; k <= 24; k++) {
-        const a = (k / 24) * Math.PI * 1.15 * dir - Math.PI * 0.5 * dir;
-        const r = w * (0.100 - 0.028 * (k / 24));
-        d += ` L ${n2(sx + dir * w * 0.088 + Math.cos(a) * r)} ${n2(sy + Math.sin(a) * r * dir)}`;
+    /* ⚠ A TENDRIL IS A LONG RUN THAT ENDS IN ONE LOOP, NOT A RING ON THE STEM.
+       The first version put the loop straight onto the stem and it read as a
+       stray berry. On the pane the tendril leaves the stem, bows away across a
+       quarter of the pane's width and only then curls, just over a single turn
+       and easing inward so the free end tucks inside — measured at 2.6x, where
+       it is plainly one loop and not a coil. The run-out is what fills the
+       ground between the motifs, and it is most of the tendril's length. */
+    const curl = (sx, sy, rot, reach) => {
+      const a0 = rot * Math.PI / 180, R = U * reach;
+      const cxL = sx + Math.cos(a0) * (R + TR), cyL = sy + Math.sin(a0) * (R + TR);
+      const pts = [[sx, sy],
+        [sx + Math.cos(a0) * R * 0.55 - Math.sin(a0) * R * 0.26,
+         sy + Math.sin(a0) * R * 0.55 + Math.cos(a0) * R * 0.26]];
+      const N = 20, TURNS = 1.18;
+      for (let i = 0; i <= N; i++) {
+        const t = i / N, th = a0 + Math.PI + t * TURNS * 2 * Math.PI;
+        const r = TR * (1 - 0.26 * t);
+        pts.push([cxL + Math.cos(th) * r, cyL + Math.sin(th) * r]);
       }
-      return str(d);
+      return spline(pts, false);
     };
 
-    /* ── laying them out ───────────────────────────────────────────────
-       One motif per PITCH down the stem, alternating side, and alternating
-       kind on a four-cycle so each side gets leaf, bunch, leaf, bunch rather
-       than the same thing every time. The two sides are offset by half a pitch
-       so nothing lines up across the pane, which is what stopped it reading as
-       a ladder. Both ends run past the opening, so the film is cut rather than
-       arranged inside it. */
-    /* ⚠ THE PITCH IS SET BY A MEASUREMENT AND MY EYE HAD IT BACKWARDS.
-       Looking at the first redraw beside the photograph I called it too sparse
-       and halved the pitch. Measured, it was too DENSE: **41.3% ink against
-       d109's 25.6%**, and I had been reading a comparison sheet that squashed
-       our pane to two thirds of its aspect. §6 in one line, and it is the
-       second time in this one round — the leaf's lobe depth was the first.
+    /* The composition is the photograph's own, read off d109's rectified pane
+       as the centres of every enclosed shape in it: a leaf low on the left, a
+       bunch high on the right, a leaf near the middle, a leaf on the right, a
+       bunch on the left — repeating every 1.34 W, which is the distance
+       between the two bunches that sit on the same side of the stem.
+       ⚠ IT IS NOT A LATTICE AND MUST NOT BECOME ONE. Autocorrelating the pane
+       returns its best peak at r = 0.011, which is noise: this is a drawn film
+       and its repeat is loose, and the odd offsets below are what it measures
+       rather than a rhythm anybody chose.
+       ⚠ AND THE TENDRILS ARE THE ONE THING HERE THAT IS PLACED RATHER THAN
+       MEASURED. The leaves' and bunches' offsets are the centres of the
+       enclosed shapes in the rectified pane; the tendrils on that door are
+       woven through the motifs at no spacing an instrument could call a
+       position, so their three rows are chosen to fill the ground the way the
+       photograph fills it. Said out loud because everything around them is a
+       measurement and a reader is entitled to know which is which. */
+    const CYCLE = [
+      { u: 0.00, cx: 0.20, leaf: -28, flip: true },
+      { u: 0.08, cx: 0.81, bunch: true },
+      { u: 0.24, cx: 0.31, curl: 202, reach: 0.20 },
+      { u: 0.45, cx: 0.49, leaf: 38 },
+      { u: 0.56, cx: 0.87, curl: 18, reach: 0.24 },
+      { u: 0.70, cx: 0.17, curl: 168, reach: 0.17 },
+      { u: 0.82, cx: 0.79, leaf: 8, flip: true },
+      { u: 0.95, cx: 0.21, bunch: true },
+    ];
 
-       ⚠ AND THE INSTRUMENT THAT SAID 41.3% WAS ALSO WRONG, WHICH IS WHY THE
-       NUMBER BELOW IS TRUSTWORTHY AND THAT ONE WAS NOT. Three versions:
-         · recolour every shape in the pane and count — 0.8% on a pane plainly
-           a third covered, because the glass is a gradient and it missed it;
-         · diff against the same door with `grille: 'none'` — 58.9%, of which
-           most was the two panes carrying different sky;
-         · departure from the crop's own median — 41.3%, and it would NOT MOVE:
-           pitching the motifs 45% apart changed it by three points. That is
-           the tell. Our pane's own head-to-foot fall is a bigger departure
-           from its median than the ornament is, so the test was measuring the
-           glass; d109's pane is flat frosted glass, so the same test measured
-           the film there. One function, two subjects it cannot both be right
-           about.
-       What works is the same function HIGH-PASSED — subtract a box blur at a
-       quarter of the pane's width, which is far wider than any stroke and far
-       narrower than any gradient, and threshold what is left. It responds:
-       0.34 / 0.40 / 0.46 / 0.52 read 26.6 / 24.1 / 23.7 / 21.4 per cent.
+    /* ⚠ TWO TERMS, NOT ONE. A single sine at the cycle's own wavelength makes
+       the stem agree with the motifs on every bow, and the pair reads as a
+       repeating stripe. The pane's stem wanders between 0.47 and 0.53 W in the
+       rows where nothing crosses it; a second, faster term of a third the
+       amplitude keeps that envelope and breaks the agreement. */
+    const stemX = yy => X0 + U * 0.5
+      + U * 0.055 * Math.sin(2 * Math.PI * (yy - y) / CY + 0.6)
+      + U * 0.018 * Math.sin(2 * Math.PI * (yy - y) / (CY * 0.37) + 2.1);
+    const stem = [];
+    for (let yy = y - U * 0.2; yy <= y + h + U * 0.2; yy += U * 0.05) stem.push([stemX(yy), yy]);
 
-       **0.34 W puts us at 26.6% on the square window and 28.5% on the vertical
-       slot, against the photograph's 27.6%.** The reach follows from the leaf:
-       a 0.42 W leaf centred 0.33 W from a stem at 0.50 reaches past the edge,
-       so it is cut, which is what every motif in the photograph is. */
-    const PITCH = w * 0.34;                          // a motif each 0.34 W down the stem
-    const REACH = w * 0.33;                          // stem to motif centre
-    const ROT = [-0.42, 0.24, -0.20, 0.50, -0.34, 0.15];
-    const SZ  = [1.00, 0.88, 1.10, 0.94, 1.04, 0.91];
-    const first = Math.floor((yTop - y) / PITCH) - 1;
-    const last  = Math.ceil((yBot - y) / PITCH) + 1;
-    let i = 0;
-    for (let m = first; m <= last; m++, i++) {
-      const my = y + m * PITCH + (i % 2 ? PITCH * 0.5 : 0);
-      if (my < y - PITCH || my > y + h + PITCH) continue;
-      const side = i % 2 ? 1 : -1;
-      const sx = stemAt(my), ax = sx + side * REACH;
-      /* the branch, the same weight as the stem — this is the thing that was
-         a hairline stalk before, and it is a third of the ink on the pane */
-      out += str(`M ${n2(sx)} ${n2(my + w * 0.06)}`
-        + ` Q ${n2(sx + side * REACH * 0.55)} ${n2(my + w * 0.04)}`
-        + ` ${n2(ax)} ${n2(my - w * 0.02)}`);
-      if (i % 4 === 1 || i % 4 === 2) {
-        out += bunchPath(ax, my, i * 3);
-      } else {
-        out += leafPath(ax, my, w * 0.42 * SZ[i % SZ.length], ROT[i % ROT.length] * side);
+    let d = spline(stem, false);
+    let uses = '';
+    const k0 = -2, k1 = Math.ceil((h + U * 0.6) / CY) + 1;
+    for (let k = k0; k <= k1; k++) {
+      for (const m of CYCLE) {
+        const my = y + (k + m.u) * CY;
+        if (my < y - U * 0.7 || my > y + h + U * 0.7) continue;
+        const mx = X0 + m.cx * U;
+        const sx = stemX(my), sy = my;
+        /* ⚠ THE BRANCH IS A SWEEP, NOT A SPOKE. On the pane a motif sits at the
+           end of a long curving branch that crosses a good part of the width,
+           and the first version hung everything off 20 mm stubs — which is
+           what made ours read as a chain and the photograph as a mat. The
+           control point is thrown well off the chord, alternating side with
+           the motif's own side so the branches do not all bow the same way. */
+        const bow = (tx, ty2, lift) => {
+          const s2 = mx > sx ? 1 : -1;
+          return `M${n2(sx)} ${n2(sy)}Q${n2(sx + (tx - sx) * 0.45 - (ty2 - sy) * 0.30 * s2)} `
+               + `${n2(sy + (ty2 - sy) * 0.45 + (tx - sx) * 0.30 * s2 - lift)} `
+               + `${n2(tx)} ${n2(ty2)}`;
+        };
+        if (m.bunch !== undefined) {
+          /* the stalk meets the bunch at the top of its middle berry */
+          d += bow(mx, my - 1.5 * ROW - BR * 0.86, ROW * 0.2);
+          d += bunchPath(mx, my);
+        } else if (m.curl !== undefined) {
+          d += curl(sx, sy, m.curl, m.reach);
+        } else {
+          const [hx, hy] = leafHit(mx, my, m.leaf, m.flip, sx, sy);
+          d += bow(hx, hy, ROW * 0.2);
+          uses += leafAt(mx, my, m.leaf, m.flip);
+        }
       }
-      /* a tendril off every other branch, on the same side, below the motif */
-      if (i % 2 === 0) out += tendril(sx, my + PITCH * 0.42, -side);
     }
+
+    /* the outline and its five darts are ONE definition, so a dart cannot come
+       adrift from the leaf it belongs to when the leaf is rotated */
+    const leafD = spline(LEAF.map(p => [p[0] * LW, p[1] * LW]), true)
+      + DART.map(v => {
+        const ax = (v[0] - v[2] * 0.03) * LW, ay = (v[1] - v[3] * 0.03) * LW;
+        return `M${n2(ax)} ${n2(ay)}L${n2(ax + v[2] * DART_LEN * LW)} `
+             + `${n2(ay + v[3] * DART_LEN * LW)}`;
+      }).join('');
+    /* ⚠ THE UNIT IS PUBLISHED, so the claim above is a check and not a
+       sentence. npm test reads it back for every size x window and requires it
+       to equal the pane's own width — the day the catalogue gains a squat
+       opening, the vine stops being drawn at the pane's width and that row
+       goes red instead of the pattern quietly halving. */
+    const out = `<defs><path id="${lid}" d="${leafD}"/></defs>`
+      + `<g data-vine-unit="${n2(U)}" fill="none" stroke="${ink}"
+           stroke-width="${INK.toFixed(2)}"
+           stroke-linecap="round" stroke-linejoin="round">`
+      + `<path d="${d}"/>${uses}</g>`;
     return { veil: out, over: '' };
   }
 

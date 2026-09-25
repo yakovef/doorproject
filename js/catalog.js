@@ -1194,7 +1194,23 @@ export const GRILLES = [
      was drawn pale when the real one is a black silhouette, and it forks).
      So the sheets are the instrument that is blunt here, not the drawing, and
      the honest fix is a better photograph rather than a better guess.
-     ASK-PERETZ asks for one. */
+     ASK-PERETZ asks for one.
+
+     ⚠ AND FOR THE VINE THAT STOPPED BEING TRUE ON 25.9.2026, WHICH IS WORTH
+     MORE THAN THE REDRAW IT CAME WITH. The pane is not cut from the leaf box
+     any more: `tools/pane.mjs` fits the four corners of the GLASS directly,
+     off the dark rebate line around it, to an rms of 0.3 to 1.4 px over a
+     couple of hundred rows — so nothing in that measurement passes through
+     `research/works/auto` at all. Both doors turned out to be KEYSTONES, 13%
+     wider at the foot than at the head, which no axis-aligned crop of either
+     could ever have been; `tools/rectify.mjs -H` takes that out projectively
+     and the berries, which are circles on the real door, come back round at
+     both ends of both panes. Two doors, two independent de-skews, pane aspect
+     0.443 and 0.431.
+     The photograph is still wanted for the TREE and for the comparison sheets,
+     which still crop the guessed rectangle. It is no longer what stands
+     between us and measuring the vine — that was true for a fortnight and
+     nobody had tried putting a ruler on the rebate. */
   { id: 'vine',    he: 'גפן',            en: 'Grape and vine', ru: 'Виноградная лоза',  glass: true,
     doors: ['d109', 'd111'] },
   { id: 'tree',    he: 'עץ',             en: 'Tree', ru: 'Дерево',            glass: true,

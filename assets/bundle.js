@@ -1841,33 +1841,49 @@
       doors: ["d106"]
     },
     /* ⚠ THESE THREE DOORS HAVE NO HAND-MEASURED LEAF BOX AND CANNOT BE GIVEN
-       ONE — examined 14.9.2026, when the patterns were re-opened to be redrawn
-       from the photographs and it turned out they already had been.
-       `research/works/auto/leaf.json` carries d109, d111 and d114 at the corpus
-       MEDIAN — the identical rectangle 241,193,424,1183 on all three, `src:
-       "fallback"` — which `tools/leaf.mjs` is explicit about: its width is
-       median 14% out and "no confidence signal predicts which doors it gets
-       wrong". Everything measured in millimetres has to come from a hand box.
-       Why they have none, per door:
-         d111  the photograph DOES NOT CONTAIN THE FOOT OF THE DOOR. The leaf
-               runs off the bottom edge of the frame, so its height cannot be
-               read at any accuracy from this file;
-         d109  shot from below and well off-axis — the light above it is a
-               pointed arch in the picture and a rectangle on the wall — so a
-               fraction of the image is not a fraction of the leaf. That is the
-               same trap CLASSIC_ROWS fell into twice;
-         d114  square-on and the best of the three, but its foot is behind a
-               doormat and the bottom rail is not visible.
-       What that costs, precisely: `npm run against` frames its crops from the
-       leaf box, so the `vine` and `tree` comparison sheets crop a GUESSED
-       rectangle. The patterns themselves are drawn in fractions of the PANE and
-       do not depend on it, which is why they could be measured at all — see the
-       long notes in `grillePaths`, both of which record what the photograph
-       corrected (the vine had no leaves and berries at twice life size; the tree
-       was drawn pale when the real one is a black silhouette, and it forks).
-       So the sheets are the instrument that is blunt here, not the drawing, and
-       the honest fix is a better photograph rather than a better guess.
-       ASK-PERETZ asks for one. */
+         ONE — examined 14.9.2026, when the patterns were re-opened to be redrawn
+         from the photographs and it turned out they already had been.
+         `research/works/auto/leaf.json` carries d109, d111 and d114 at the corpus
+         MEDIAN — the identical rectangle 241,193,424,1183 on all three, `src:
+         "fallback"` — which `tools/leaf.mjs` is explicit about: its width is
+         median 14% out and "no confidence signal predicts which doors it gets
+         wrong". Everything measured in millimetres has to come from a hand box.
+         Why they have none, per door:
+           d111  the photograph DOES NOT CONTAIN THE FOOT OF THE DOOR. The leaf
+                 runs off the bottom edge of the frame, so its height cannot be
+                 read at any accuracy from this file;
+           d109  shot from below and well off-axis — the light above it is a
+                 pointed arch in the picture and a rectangle on the wall — so a
+                 fraction of the image is not a fraction of the leaf. That is the
+                 same trap CLASSIC_ROWS fell into twice;
+           d114  square-on and the best of the three, but its foot is behind a
+                 doormat and the bottom rail is not visible.
+         What that costs, precisely: `npm run against` frames its crops from the
+         leaf box, so the `vine` and `tree` comparison sheets crop a GUESSED
+         rectangle. The patterns themselves are drawn in fractions of the PANE and
+         do not depend on it, which is why they could be measured at all — see the
+         long notes in `grillePaths`, both of which record what the photograph
+         corrected (the vine had no leaves and berries at twice life size; the tree
+         was drawn pale when the real one is a black silhouette, and it forks).
+         So the sheets are the instrument that is blunt here, not the drawing, and
+         the honest fix is a better photograph rather than a better guess.
+         ASK-PERETZ asks for one.
+    
+         ⚠ AND FOR THE VINE THAT STOPPED BEING TRUE ON 25.9.2026, WHICH IS WORTH
+         MORE THAN THE REDRAW IT CAME WITH. The pane is not cut from the leaf box
+         any more: `tools/pane.mjs` fits the four corners of the GLASS directly,
+         off the dark rebate line around it, to an rms of 0.3 to 1.4 px over a
+         couple of hundred rows — so nothing in that measurement passes through
+         `research/works/auto` at all. Both doors turned out to be KEYSTONES, 13%
+         wider at the foot than at the head, which no axis-aligned crop of either
+         could ever have been; `tools/rectify.mjs -H` takes that out projectively
+         and the berries, which are circles on the real door, come back round at
+         both ends of both panes. Two doors, two independent de-skews, pane aspect
+         0.443 and 0.431.
+         The photograph is still wanted for the TREE and for the comparison sheets,
+         which still crop the guessed rectangle. It is no longer what stands
+         between us and measuring the vine — that was true for a fortnight and
+         nobody had tried putting a ruler on the rebate. */
     {
       id: "vine",
       he: "גפן",
@@ -5698,109 +5714,206 @@ ${body}
     }
     if (kind === "vine") {
       const ink = scaleTone(paint2, 1.06);
-      const INK = w * 0.0265;
-      const str = (d) => `<path d="${d}" fill="none" stroke="${ink}"
-      stroke-width="${INK.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
-      let out = "";
-      const MID = 0.5, AMP = 0.045, WAVE = 1.05;
-      const half = w * WAVE / 2;
-      const yTop = y - half, yBot = y + h + half;
-      const stemX = (t) => x + w * (MID + AMP * Math.sin(t * Math.PI));
-      const nHalf = Math.ceil((yBot - yTop) / half);
-      {
-        let d = `M ${n2(x + w * MID)} ${n2(yTop)}`;
-        for (let i2 = 0; i2 < nHalf; i2++) {
-          const dir = i2 % 2 ? -1 : 1;
-          d += ` Q ${n2(x + w * (MID + dir * AMP * 2))} ${n2(yTop + half * (i2 + 0.5))} ${n2(x + w * MID)} ${n2(yTop + half * (i2 + 1))}`;
+      const U = Math.min(w, h / 1.7);
+      const X0 = x + (w - U) / 2;
+      const INK = U * 0.021;
+      const LW = U * 0.417;
+      const BR = U * 0.064;
+      const BP = U * 0.132;
+      const ROW = U * 0.124;
+      const CY = U * 1.34;
+      const TR = U * 0.05;
+      const LEAF = [
+        [0.131, -0.399],
+        [0.153, -0.4],
+        [0.205, -0.394],
+        [0.269, -0.366],
+        [0.343, -0.312],
+        [0.403, -0.246],
+        [0.429, -0.212],
+        [0.439, -0.186],
+        [0.439, -0.169],
+        [0.432, -0.154],
+        [0.417, -0.139],
+        [0.374, -0.118],
+        [0.366, -0.11],
+        [0.439, -0.071],
+        [0.469, -0.043],
+        [0.488, -0.016],
+        [0.507, 0.036],
+        [0.515, 0.09],
+        [0.515, 0.155],
+        [0.508, 0.19],
+        [0.497, 0.206],
+        [0.478, 0.221],
+        [0.332, 0.271],
+        [0.271, 0.285],
+        [0.191, 0.288],
+        [0.148, 0.278],
+        [0.103, 0.26],
+        [0.099, 0.265],
+        [0.117, 0.312],
+        [0.117, 0.348],
+        [0.105, 0.378],
+        [0.078, 0.397],
+        [-0.121, 0.42],
+        [-0.192, 0.417],
+        [-0.252, 0.398],
+        [-0.275, 0.385],
+        [-0.296, 0.366],
+        [-0.32, 0.328],
+        [-0.333, 0.279],
+        [-0.338, 0.204],
+        [-0.351, 0.201],
+        [-0.423, 0.217],
+        [-0.452, 0.215],
+        [-0.475, 0.197],
+        [-0.485, 0.163],
+        [-0.485, 0.125],
+        [-0.476, 0.073],
+        [-0.464, 0.042],
+        [-0.442, 7e-3],
+        [-0.404, -0.034],
+        [-0.371, -0.062],
+        [-0.349, -0.077],
+        [-0.31, -0.094],
+        [-0.332, -0.13],
+        [-0.341, -0.177],
+        [-0.335, -0.246],
+        [-0.312, -0.309],
+        [-0.281, -0.354],
+        [-0.259, -0.374],
+        [-0.233, -0.384],
+        [-0.211, -0.383],
+        [-0.192, -0.373],
+        [-0.174, -0.356],
+        [-0.118, -0.263],
+        [-0.07, -0.31],
+        [0.01, -0.364],
+        [0.081, -0.392]
+      ];
+      const spline = (pts, close) => {
+        const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+        const P = (p) => `${n2(p[0])} ${n2(p[1])}`;
+        if (pts.length < 3) return `M${pts.map(P).join("L")}`;
+        if (close) {
+          let d3 = `M${P(mid(pts[pts.length - 1], pts[0]))}`;
+          for (let i = 0; i < pts.length; i++)
+            d3 += `Q${P(pts[i])} ${P(mid(pts[i], pts[(i + 1) % pts.length]))}`;
+          return `${d3}Z`;
         }
-        out += str(d);
-      }
-      const stemAt = (yy) => x + w * (MID + AMP * Math.sin((yy - yTop) / half * Math.PI));
-      const LOBE_OUT = 0.3, POW_OUT = 0.55;
-      const LOBE_IN = 0.34, POW_IN = 1.9;
-      const APEX = 0.1, SINUS = 0.4, SINUS_D = 0.72;
-      const leafR = (th) => {
-        const c = Math.cos(5 * th);
-        let r = c >= 0 ? 1 + LOBE_OUT * c ** POW_OUT : 1 - LOBE_IN * (-c) ** POW_IN;
-        r *= 1 + APEX * Math.cos(th);
-        const fromFoot = Math.abs(Math.PI - th);
-        if (fromFoot < SINUS) {
-          const k = 1 - fromFoot / SINUS;
-          r *= 1 - (1 - SINUS_D) * k * k * (3 - 2 * k);
-        }
-        return r;
+        let d2 = `M${P(pts[0])}`;
+        for (let i = 1; i < pts.length - 1; i++)
+          d2 += `Q${P(pts[i])} ${P(mid(pts[i], pts[i + 1]))}`;
+        return `${d2}L${P(pts[pts.length - 1])}`;
       };
-      const leafPath = (cx, cy, span, rot) => {
-        const R = span / 2;
-        const N = 64;
-        let d = "";
-        const ca = Math.cos(rot), sa = Math.sin(rot);
-        const put = (u, v) => [cx + u * ca - v * sa, cy + u * sa + v * ca];
-        const ring = (th, f) => {
-          const rr = R * leafR(th) * f;
-          return put(rr * Math.sin(th), -rr * Math.cos(th) * 0.95);
-        };
-        for (let i2 = 0; i2 < N; i2++) {
-          const [px, py] = ring(i2 / N * Math.PI * 2, 1);
-          d += `${i2 ? " L" : "M"} ${n2(px)} ${n2(py)}`;
+      const lid = uid("vleaf");
+      const leafAt = (cx, cy, rot, flip) => `<use href="#${lid}"
+      transform="translate(${n2(cx)} ${n2(cy)}) rotate(${rot.toFixed(1)})${flip ? " scale(-1 1)" : ""}"/>`;
+      const DART = [
+        [0.366, -0.11, -0.926, -0.379],
+        [0.103, 0.26, -0.873, -0.487],
+        [-0.338, 0.204, 0.393, -0.919],
+        [-0.31, -0.094, 0.766, 0.643],
+        [-0.118, -0.263, -0.465, 0.885]
+      ];
+      const DART_LEN = 0.155;
+      const leafHit = (cx, cy, rot, flip, fx, fy) => {
+        const a = rot * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+        const f = flip ? -1 : 1;
+        const abs = LEAF.map((p) => [
+          cx + p[0] * LW * f * ca - p[1] * LW * sa,
+          cy + p[0] * LW * f * sa + p[1] * LW * ca
+        ]);
+        let best = null;
+        for (let i = 0; i < abs.length; i++) {
+          const p = abs[i], q = abs[(i + 1) % abs.length];
+          const r1 = [cx - fx, cy - fy], r2 = [q[0] - p[0], q[1] - p[1]];
+          const den = r1[0] * r2[1] - r1[1] * r2[0];
+          if (!den) continue;
+          const t2 = ((p[0] - fx) * r2[1] - (p[1] - fy) * r2[0]) / den;
+          const u = ((p[0] - fx) * r1[1] - (p[1] - fy) * r1[0]) / den;
+          if (t2 < 0 || t2 > 1 || u < 0 || u > 1) continue;
+          if (!best || t2 < best) best = t2;
         }
-        const root = ring(Math.PI, 0.88), apex = ring(0, 0.8), mid = put(0, 0);
-        let veins = str(`M ${n2(root[0])} ${n2(root[1])} L ${n2(mid[0])} ${n2(mid[1])} L ${n2(apex[0])} ${n2(apex[1])}`) + `<circle cx="${n2(apex[0])}" cy="${n2(apex[1])}" r="${n2(INK * 0.62)}" fill="${ink}"/>`;
-        for (const th of [Math.PI * 0.4, -Math.PI * 0.4]) {
-          const b = ring(th, 0.66);
-          veins += str(`M ${n2(mid[0])} ${n2(mid[1])} L ${n2(b[0])} ${n2(b[1])}`) + `<circle cx="${n2(b[0])}" cy="${n2(b[1])}" r="${n2(INK * 0.62)}" fill="${ink}"/>`;
-        }
-        return str(d + " Z") + veins;
+        const t = best === null ? 0.7 : best;
+        return [fx + (cx - fx) * t, fy + (cy - fy) * t];
       };
-      const BR = [1, 0.72, 1.28, 0.86, 1.15, 0.64, 1.32, 0.94, 1.08, 0.78, 1.2];
-      const bunchPath = (cx, cy, seed) => {
-        const R = w * 0.048;
-        let s = "", k = seed, y0 = 0;
-        const rows = [3, 3, 2, 1];
-        rows.forEach((per, row) => {
-          const rs = [...Array(per)].map(() => R * BR[k++ % BR.length]);
-          const span = rs.reduce((a, b) => a + b * 2, 0) + (per - 1) * INK * 0.5;
-          let bx = cx - span / 2;
-          const mean = rs.reduce((a, b) => a + b, 0) / per;
-          for (let c = 0; c < per; c++) {
-            bx += rs[c];
-            s += `<circle cx="${n2(bx)}" cy="${n2(cy + y0)}" r="${n2(rs[c])}" fill="none"
-                        stroke="${ink}" stroke-width="${INK.toFixed(2)}"/>`;
-            bx += rs[c] + INK * 0.5;
-          }
-          y0 += mean * 1.86;
+      const BUNCH = [[0.86, 0.86, 0.86], [0.96, 1.14, 0.9], [1, 1], [1]];
+      const bunchPath = (cx, cy) => {
+        let d2 = "";
+        BUNCH.forEach((row, ri) => {
+          const yy = cy + (ri - 1.5) * ROW;
+          row.forEach((s, i) => {
+            const xx = cx + (i - (row.length - 1) / 2) * BP, r = BR * s;
+            d2 += `M${n2(xx - r)} ${n2(yy)}a${n2(r)} ${n2(r)} 0 1 0 ${n2(2 * r)} 0a${n2(r)} ${n2(r)} 0 1 0 ${n2(-2 * r)} 0`;
+          });
         });
-        return s;
+        return d2;
       };
-      const tendril = (sx, sy, dir) => {
-        let d = `M ${n2(sx)} ${n2(sy)}`;
-        for (let k = 1; k <= 24; k++) {
-          const a = k / 24 * Math.PI * 1.15 * dir - Math.PI * 0.5 * dir;
-          const r = w * (0.1 - 0.028 * (k / 24));
-          d += ` L ${n2(sx + dir * w * 0.088 + Math.cos(a) * r)} ${n2(sy + Math.sin(a) * r * dir)}`;
+      const curl = (sx, sy, rot, reach) => {
+        const a0 = rot * Math.PI / 180, R = U * reach;
+        const cxL = sx + Math.cos(a0) * (R + TR), cyL = sy + Math.sin(a0) * (R + TR);
+        const pts = [
+          [sx, sy],
+          [
+            sx + Math.cos(a0) * R * 0.55 - Math.sin(a0) * R * 0.26,
+            sy + Math.sin(a0) * R * 0.55 + Math.cos(a0) * R * 0.26
+          ]
+        ];
+        const N = 20, TURNS = 1.18;
+        for (let i = 0; i <= N; i++) {
+          const t = i / N, th = a0 + Math.PI + t * TURNS * 2 * Math.PI;
+          const r = TR * (1 - 0.26 * t);
+          pts.push([cxL + Math.cos(th) * r, cyL + Math.sin(th) * r]);
         }
-        return str(d);
+        return spline(pts, false);
       };
-      const PITCH = w * 0.34;
-      const REACH = w * 0.33;
-      const ROT = [-0.42, 0.24, -0.2, 0.5, -0.34, 0.15];
-      const SZ = [1, 0.88, 1.1, 0.94, 1.04, 0.91];
-      const first = Math.floor((yTop - y) / PITCH) - 1;
-      const last = Math.ceil((yBot - y) / PITCH) + 1;
-      let i = 0;
-      for (let m = first; m <= last; m++, i++) {
-        const my = y + m * PITCH + (i % 2 ? PITCH * 0.5 : 0);
-        if (my < y - PITCH || my > y + h + PITCH) continue;
-        const side = i % 2 ? 1 : -1;
-        const sx = stemAt(my), ax = sx + side * REACH;
-        out += str(`M ${n2(sx)} ${n2(my + w * 0.06)} Q ${n2(sx + side * REACH * 0.55)} ${n2(my + w * 0.04)} ${n2(ax)} ${n2(my - w * 0.02)}`);
-        if (i % 4 === 1 || i % 4 === 2) {
-          out += bunchPath(ax, my, i * 3);
-        } else {
-          out += leafPath(ax, my, w * 0.42 * SZ[i % SZ.length], ROT[i % ROT.length] * side);
+      const CYCLE = [
+        { u: 0, cx: 0.2, leaf: -28, flip: true },
+        { u: 0.08, cx: 0.81, bunch: true },
+        { u: 0.24, cx: 0.31, curl: 202, reach: 0.2 },
+        { u: 0.45, cx: 0.49, leaf: 38 },
+        { u: 0.56, cx: 0.87, curl: 18, reach: 0.24 },
+        { u: 0.7, cx: 0.17, curl: 168, reach: 0.17 },
+        { u: 0.82, cx: 0.79, leaf: 8, flip: true },
+        { u: 0.95, cx: 0.21, bunch: true }
+      ];
+      const stemX = (yy) => X0 + U * 0.5 + U * 0.055 * Math.sin(2 * Math.PI * (yy - y) / CY + 0.6) + U * 0.018 * Math.sin(2 * Math.PI * (yy - y) / (CY * 0.37) + 2.1);
+      const stem = [];
+      for (let yy = y - U * 0.2; yy <= y + h + U * 0.2; yy += U * 0.05) stem.push([stemX(yy), yy]);
+      let d = spline(stem, false);
+      let uses = "";
+      const k0 = -2, k1 = Math.ceil((h + U * 0.6) / CY) + 1;
+      for (let k = k0; k <= k1; k++) {
+        for (const m of CYCLE) {
+          const my = y + (k + m.u) * CY;
+          if (my < y - U * 0.7 || my > y + h + U * 0.7) continue;
+          const mx = X0 + m.cx * U;
+          const sx = stemX(my), sy = my;
+          const bow = (tx, ty2, lift) => {
+            const s2 = mx > sx ? 1 : -1;
+            return `M${n2(sx)} ${n2(sy)}Q${n2(sx + (tx - sx) * 0.45 - (ty2 - sy) * 0.3 * s2)} ${n2(sy + (ty2 - sy) * 0.45 + (tx - sx) * 0.3 * s2 - lift)} ${n2(tx)} ${n2(ty2)}`;
+          };
+          if (m.bunch !== void 0) {
+            d += bow(mx, my - 1.5 * ROW - BR * 0.86, ROW * 0.2);
+            d += bunchPath(mx, my);
+          } else if (m.curl !== void 0) {
+            d += curl(sx, sy, m.curl, m.reach);
+          } else {
+            const [hx, hy] = leafHit(mx, my, m.leaf, m.flip, sx, sy);
+            d += bow(hx, hy, ROW * 0.2);
+            uses += leafAt(mx, my, m.leaf, m.flip);
+          }
         }
-        if (i % 2 === 0) out += tendril(sx, my + PITCH * 0.42, -side);
       }
+      const leafD = spline(LEAF.map((p) => [p[0] * LW, p[1] * LW]), true) + DART.map((v) => {
+        const ax = (v[0] - v[2] * 0.03) * LW, ay = (v[1] - v[3] * 0.03) * LW;
+        return `M${n2(ax)} ${n2(ay)}L${n2(ax + v[2] * DART_LEN * LW)} ${n2(ay + v[3] * DART_LEN * LW)}`;
+      }).join("");
+      const out = `<defs><path id="${lid}" d="${leafD}"/></defs><g data-vine-unit="${n2(U)}" fill="none" stroke="${ink}"
+           stroke-width="${INK.toFixed(2)}"
+           stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/>${uses}</g>`;
       return { veil: out, over: "" };
     }
     if (kind === "tree") {

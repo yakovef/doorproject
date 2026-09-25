@@ -26,6 +26,34 @@
  * narrow AND 1% short, and the two errors cancelled in the ratio. A ratio
  * catches one error, never two. See CLAUDE.md §7.
  *
+ * ── TWO MAPS, AND THIS FILE SHIPPED ONLY THE WRONG ONE FOR A YEAR ────
+ * ⚠ THE DEFAULT MAP HERE IS BILINEAR, WHICH IS RIGHT FOR A SHEAR AND WRONG
+ * FOR A KEYSTONE. It interpolates linearly along the two long edges, so equal
+ * steps in the output are equal steps along the photograph's edges. Under
+ * PERSPECTIVE they are not: a receding surface crowds equal real steps toward
+ * its far end, and a quadrilateral whose two ends differ in width is a
+ * perspective view by definition.
+ * Found 25.9.2026 on the vine's evidence doors, whose panes are 13% wider at
+ * the foot than at the head. Rectified bilinearly, d111's grape berries — which
+ * are CIRCLES on the real door — came back 1.23 times wider than tall at the
+ * head of the pane and 1.03 at its foot. That GRADIENT is the missing
+ * projective term. Pass `-H` and it goes: head and foot then agree to 0.015 at
+ * every output height.
+ * ⚠ `newdoor` KEEPS THE BILINEAR MAP, and that is not an endorsement of it.
+ * Every table of the classical set is a fraction of the 1600 x 3730 picture
+ * this file produced bilinearly, and an instrument that quietly starts
+ * producing a different picture from the one the numbers came off is the trap
+ * the pinned height above already guards against. That door wants re-measuring
+ * under `-H`, with every fraction re-read in the same pass — which is work,
+ * not a flag.
+ * ⚠ AND UNDER `-H` THE ASPECT IS A FREE PARAMETER. A quadrilateral alone does
+ * not fix a rectangle's proportions, so pass the height you want and CHECK it
+ * against something in the picture that is known to be round or square. On the
+ * vine the berries did it: sweep the height, take the one where they come back
+ * at aspect 1.000. That is a far better instrument than the aspect check above,
+ * because a circle constrains both axes at once and two errors cannot cancel
+ * in it.
+ *
  * ── how to get the corners ───────────────────────────────────────────
  * Not by eye on the whole frame. Crop the two ENDS of the door separately and
  * put a 0.05 grid down each — an edge two degrees off level is invisible at
@@ -62,11 +90,14 @@ const NEWDOOR = {
   height: 3730,
 };
 
-const a = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const PROJ = argv.includes('-H');
+const a = argv.filter(t => t !== '-H');
 const job = a.length
   ? { src: a[0], out: a[1],
       corners: a.slice(2, 6).map(s => s.split(',').map(Number)),
-      width: +(a[6] || 1600) }
+      width: +(a[6] || 1600),
+      height: a[7] ? +a[7] : null }
   : NEWDOOR;
 
 const s = jpeg.decode(fs.readFileSync(job.src), { useTArray: true });
@@ -95,7 +126,44 @@ const at = (x, y) => {                               // bilinear sample
   return out;
 };
 
+/** The 8-parameter DLT taking the OUTPUT rectangle's corners to the source
+    quadrilateral's. Gaussian elimination on the 8x8; no library. */
+const homography = (dst, src) => {
+  const M = [];
+  for (let i = 0; i < 4; i++) {
+    const [px, py] = dst[i], [u, v] = src[i];
+    M.push([px, py, 1, 0, 0, 0, -px * u, -py * u, u]);
+    M.push([0, 0, 0, px, py, 1, -px * v, -py * v, v]);
+  }
+  for (let c = 0; c < 8; c++) {
+    let p = c;
+    for (let r = c + 1; r < 8; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]];
+    for (let r = 0; r < 8; r++) {
+      if (r === c || !M[r][c]) continue;
+      const f = M[r][c] / M[c][c];
+      for (let k = c; k <= 8; k++) M[r][k] -= f * M[c][k];
+    }
+  }
+  const hh = M.map((r, i) => r[8] / r[i]);
+  return [hh[0], hh[1], hh[2], hh[3], hh[4], hh[5], hh[6], hh[7], 1];
+};
+/* corner order is A B C D = head-top, foot-top, foot-bottom, head-bottom, and
+   the output puts A at its top-RIGHT because ox runs from the D side to the A
+   side — the same convention the bilinear branch below implements by hand. */
+const H = PROJ ? homography([[LW - 1, 0], [LW - 1, LH - 1], [0, LH - 1], [0, 0]],
+                            [A, B, C, D]) : null;
+
 const o = new PNG({ width: LW, height: LH });
+if (PROJ) {
+  for (let oy = 0; oy < LH; oy++) for (let ox = 0; ox < LW; ox++) {
+    const den = H[6] * ox + H[7] * oy + H[8];
+    const [r, g, b] = at((H[0] * ox + H[1] * oy + H[2]) / den,
+                         (H[3] * ox + H[4] * oy + H[5]) / den);
+    const t = (LW * oy + ox) << 2;
+    o.data[t] = r; o.data[t + 1] = g; o.data[t + 2] = b; o.data[t + 3] = 255;
+  }
+} else
 for (let oy = 0; oy < LH; oy++) {
   const u = oy / (LH - 1);
   /* the two long edges at this height */
@@ -112,4 +180,5 @@ fs.writeFileSync(job.out, PNG.sync.write(o));
 /* The aspect is printed, not asserted — see the note above about what a ratio
    can and cannot catch. It is worth a glance and it is not a check. */
 console.log(`${job.out}  ${LW} x ${LH}   aspect ${(LW / LH).toFixed(3)}`
+          + `   ${PROJ ? 'homography' : 'bilinear'}`
           + `   (a standard leaf is 0.415)`);

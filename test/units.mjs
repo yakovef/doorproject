@@ -1779,6 +1779,64 @@ group('no dangling gradient or filter references');
   console.log(`  (${checked} renders swept)`);
 }
 
+// ── 5b. The vine is drawn at the pane's own width ──────────────────
+/* The גפן was retraced off the photograph on 25.9.2026 and everything in it
+   is a fraction of the PANE'S WIDTH, which is the only unit `glazingArt` lays
+   ornament out in. One surface cannot obey that and it is not a door: the
+   option TILE is a 300 x 300 square, where a cycle is 1.34 W tall and three
+   quarters of it fits — rendered at the size it ships, that tile showed a
+   single leaf and two fragments while every other grille tile read as a
+   pattern. So the branch takes `min(w, h / 1.7)`, and the comment beside it
+   claims that is exactly `w` on every pane the catalogue can build.
+
+   ⚠ THIS IS THAT CLAIM, ASKED OF THE DRAWING. A sentence in a comment has no
+   reader; the renderer publishes the unit it used and this reads it back. The
+   shortest opening in the range is the square window on a standard leaf, at
+   357 x 902 — h/w 2.53 against a gate of 1.7 — so the day somebody adds a
+   squat opening this row goes red instead of the pattern quietly halving on
+   one door. Paired with its opposite, that the tile DOES take the other
+   branch, because a check that only ever sees the no-op cannot tell a working
+   `min` from a `const`. */
+group('the vine is drawn at the pane\'s own width');
+{
+  let panes = 0;
+  for (const sz of sizeKeys) {
+    for (const win of WINDOWS.filter(w => w.id !== 'none')) {
+      const svg = render({ ...base, size: sz, window: win.id, grille: 'vine',
+                           detail: 'plain' });
+      const widths = [...svg.matchAll(
+        /<rect x="[-\d.]+" y="[-\d.]+" width="([\d.]+)" height="([\d.]+)" fill="url\(#glass\)"/g)]
+        .map(m => [+m[1], +m[2]]);
+      const units = [...svg.matchAll(/data-vine-unit="([\d.]+)"/g)].map(m => +m[1]);
+      ok(widths.length > 0 && units.length === widths.length,
+        `${sz}/${win.id}: ${widths.length} panes but ${units.length} vine units — `
+        + 'the check cannot pair them, so it is not measuring anything');
+      widths.forEach(([w, h], i) => {
+        panes++;
+        /* ⚠ THE ORNAMENT WIDTH, WHICH ON THE NARROW LEAF OF A דו כנפי IS NOT
+           THE PANE'S. `aperture` passes `ornW` so the fixed leaf draws the film
+           at the MAIN leaf's scale — that is the 14.9 fix for Peretz's "the
+           half door window designs look like crops" — so the expected unit is
+           the widest pane on this door, not this pane's own width. */
+        const orn = Math.max(...widths.map(v => v[0]));
+        ok(Math.abs(units[i] - orn) < 0.15,
+          `${sz}/${win.id} pane ${i}: vine drawn at unit ${units[i]} on an ornament `
+          + `width of ${orn} (pane ${w} x ${h}, h/w ${(h / w).toFixed(2)}) — `
+          + 'the short-pane branch has started biting a real door');
+      });
+    }
+  }
+  ok(panes >= 12, `only ${panes} glazed panes swept — the sweep found no subject`);
+  /* the clause that must stay true beside it: the tile takes the other branch */
+  const tile = grilleGlyph(byId(GRILLES, 'vine'));
+  const tu = /data-vine-unit="([\d.]+)"/.exec(tile);
+  ok(tu, 'the vine tile emits no unit at all — this check has no subject');
+  ok(tu && +tu[1] < 299 && +tu[1] > 150,
+    `the vine tile drew at unit ${tu && tu[1]} of a 300 px square: the short-pane `
+    + 'branch is not firing, so the tile is back to three quarters of one cycle');
+  console.log(`  (${panes} glazed panes, and the tile)`);
+}
+
 // ── 6a. A grille the customer pays for must actually appear ────────
 /* Missed once and shipped: adding `grid-light` gave it an id that matched no
    branch in grillePaths, so it returned an empty string. The option was

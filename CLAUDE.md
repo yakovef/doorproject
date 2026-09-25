@@ -342,7 +342,8 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **11,809,901 / 0** (re-read 25.9.2026). ⚠ A CHANGE IN THIS
+- `npm test` — **11,809,935 / 0** (re-read 25.9.2026, after the vine was
+  retraced). ⚠ A CHANGE IN THIS
   NUMBER IS NOT EVIDENCE OF ANYTHING; it is the product of the catalogue's list
   lengths. Read the failure count. (This line said **5,403,239** for two rounds
   after the stripe rework cut fourteen `DETAILS` entries, and then **4,349,768**
@@ -365,9 +366,9 @@ walk, and walking it means grepping for each one, not remembering it.
 - `npm run collide` — clean on `all` (1,110 designs, re-read 25.9) and `boxes`,
   whose deepest bolted lock furniture reads **111 mm against `MOUNT_REACH`'s
   121**.
-- `npm run latency` — **238 ms** against a 600 ms gate (115 on the default
+- `npm run latency` — **217 ms** against a 600 ms gate (108 on the default
   door; the worst is a half door with a strip light and quatrefoil, 658
-  elements). Re-read 25.9.
+  elements). Re-read 25.9, after the vine was retraced.
   ⚠ **THAT IS 1.7× THE 138 ms READ ON 23.9 AND IT IS THE CONTAINER, WHICH IS
   CHECKED RATHER THAN ASSUMED**: the heaviest door is **658 elements on both
   readings**, the same door with the same drawing, and every row moved by about
@@ -1612,7 +1613,8 @@ something was tuned by eye against nothing and landed on "slightly better".
 | `npm run audit` | the real page at eight viewports plus the failure routes — **the whole question order asserted off the rendered navigator** (nothing was asking, and the order is a product decision Peretz made), every option clicked, the keyboard walked, tap targets measured, the gallery and the order sheet driven, **a visible send and a readable price asserted on every step**, every `[data-wa]` checked for the identical href, a `prefers-reduced-motion` route that asserts nothing is left running (delays included), a **`no-photo`** route that must come up NORMAL with the drawn room still painting, **the photographed floor line measured in PIXELS against the drawn one**, and **the room's sconces and the price card measured in pixels too** — the check the wide-screen fault got past — and **a real repair driven at every viewport, its every sentence required on screen AND its box required to cover no option tile that is on screen** (the second half found `cusp` and `narrow-d` red on a rule nobody had touched), and **the price's own FIGURE measured against the send and the way on, in three languages, at five widths of its own** — because "a readable price" above means *intersects the viewport*, and it read green while ₪3,195 was painted 23 px under the green pill. ⚠ That last sweep does NOT use `VIEWS`: the two widths it is worst at, 360 and 375, are not in the list, and it visits them without costing a whole audit pass each. Plus **the summary's own order — its spec card before its explainer, in the markup AND in the drawn geometry** (11.9), which is asserted as an ORDER rather than as a row count on purpose: the count passes at 1280 by exactly one row, and a gate with no margin is worse than none. Plus **which FORM the summary states the door in** (11.9) — exactly one of `#spec` and `#summary` drawn at every viewport, never both and never neither, and the table above 700 px and the line below it. ⚠ It reads the drawn WIDTH and not `display`, because the hidden one is `sr-only` and `checkVisibility` calls a clipped element visible — a `display` test would report both as shown at every width and could never fail. Plus **a code typed wrong says the code was not recognised** (12.9) — the arrival block drives every good code and this drives a bad one, requiring the strip to show and to carry `notice.code` rather than the generic "some of the options are unavailable", which is a false statement about a door that is not near anything. Plus **a phone held sideways can see what it is being asked** (12.9) — five landscape phones, its own viewports again, walked FORWARD with the button, the step's own question required whole above the fold, with arrival and 568×320 as named exemptions that the check asserts are STILL needed so they cannot outlive the fault. Plus **a customer can compare Peretz's doors** (12.9) — its own five widths again, because the gallery block above drives ONE viewport and the fault lived only at 320: the grid must never be a single column, **and** no tile may fall under the 132 px the stylesheet declares, because the obvious way to buy a column is to shrink the door and that was measured and refused (0.48% of pixels between the closest pair at a 105 px art box, against the 0.45% §0b calls "the same picture"). Plus **the order sheet prints on ONE sheet of paper** (12.9) — the only check here that puts the document on A4, and until that day there was none: it prints real PDFs at **703 px, which is the paper** (186 mm inside the stylesheet's own 12 mm `@page` margin, so the phone rules are the rules on paper) and counts `/Type /Page`. ⚠ The gate is the PAGE COUNT and not a height, because a `scrollHeight` against a printable height is §5.14 — a check anchored in the model of the page that was itself wrong, twice. Two doors at the ends of the range in three languages, the tallest sheet the catalogue can build among them, each asserted to survive `repair` first; the headroom is PRINTED rather than gated, because a threshold under it would be a constant fitted to nothing, and Hebrew is asserted SHORTER than the other two so a sweep that has stopped switching language cannot pass Plus **a customer with no mouse can see the option they just focused** (12.9) — its own four widths, walked forward with the button and driven with REAL key presses, because the fault IS the browser's scroll-into-view on a focus change and a scripted `focus()` would reproduce it while `focus({preventScroll})` would hide it. `keyboardGrid` scrolls each newly focused option into view and "into view" means flush against the scrollport's edge, which on this page has a bar on it at both ends of both scrollports: measured before the fix, **62 of 64 step × viewport cases hid the option the customer had just focused**, usually entirely. ⚠ It measures against the FIXED AND STICKY furniture read off the live page rather than `innerHeight`, and §5.15 requires every landing to still be a `[role="radio"]` — the day the arrows stop landing on options this sweep is measuring the way-on button and can no longer fail ⚠ EIGHT viewports now, not seven: `wide-short` 1920×918 is here because that fault was invisible to the other seven and the widest of them clipped the same sconce by two pixels and passed. Plus **the price breakdown can be read to its last line** (13.9) — its own eight shapes again, including a 1280×600 windowed browser that is in no list here, on two doors that are asserted to survive `repair` first: the column must never leave the screen, its TOTAL must be readable without scrolling, and — the clause that must stay true beside it — every component row must still be reachable when it is scrolled, so the cheap way to pass the first half (shrink the column until only the total shows) fails the second. Plus **an undo says what came back** (13.9) — its own four shapes in Hebrew AND Russian, walked FORWARD with the button because a rail click builds a different history: whenever an undo moves the price it must name a spec row, and — the clause that must stay true — its toast must cover no option tile, no price and no send, because the cheap way to pass the first half is a longer toast and a longer toast is what the 10.9 entry measured. Russian is carried because it is the longest copy and the box grows with it, 99 characters against Hebrew's 71. Plus **the saved-designs drawer fits the card it hangs in** (13.9) — its own five shapes in Hebrew and Russian, and the first check here that ever puts a design IN that drawer: opening it must not make the document scroll sideways and must not move the summary card or its `#spec` by a pixel, and — the clause that must stay true — every row must still name its PRICE and every delete button must be whole on screen and return itself from `elementFromPoint`, because the cheap way to fit a drawer is to shrink its rows until they say nothing, which is what the fix itself does (three doors of one colour read as ONE distinct row before the price went on). Plus a sixth page that saves a design the catalogue no longer builds and requires the drawer to SAY so on opening it, the promise `saveCurrent`'s own docstring makes and the handler was dropping. Plus **the wall chrome keeps its ink off the door** (14.9) — its own five phone widths (320, 360, 390, 430, 1100; 360 is where the worst reading is and `VIEWS` has neither it nor 430) plus the four wide ones, every size read off `SIZES` rather than listed, in Hebrew and Russian, measuring the GLYPHS (Range rects for the labels, the `<svg>` for the undo circles, disabled controls skipped) and not the padded button — because §0b's 28.8 fix deliberately allowed the BOX to overlap and measured the words stopping clear, on the one door in six where they do. It gates the two halves that are sound (the standard ₪3,195 leaf AND `extra1` at every width, and every door at 1152 px and up) and NAMES the four that overlap as an exemption it fails if they stop needing, so §9's entry cannot outlive the fault — which it did on 25.9.2026, when `extra1`'s one 7 px² reading went to zero because the phone's door got smaller and the wall got wider. Plus **the price card stays inside the picture it is pinned to** (14.9) — its own nine desktop widths (1200 and 1366 are in no other list here) × three languages × all six sizes, because the card is 22–44 px wider on any size but `standard` and again in Russian, so the standard door in Hebrew is the least bad of the eighteen. ⚠ Its first clause is gated on arithmetic and its second deliberately is NOT: *where the wall can hold the card* the card must be whole, and NOWHERE may it be pulled onto `#frame`. Gated the same way the second clause could not fire at all — the card is only pulled onto the leaf where the wall cannot hold it, which is what the gate excludes, and falsified it reported 0 faults about 76 px × 122 of opaque paper on the widest double. Four readings already overlap and are NAMED and asserted to still overlap. Plus a third clause, that the price BREAKDOWN is centred on the card it hangs off, in three languages: the box that moves with the card is not the card, and in Hebrew that popover had never been centred on it. Where the wall is narrower than the card there is no good position and the sweep PRINTS those readings instead of gating them (§9). Plus **no two of the page's own marks are the same picture** (15.9) — the nine navigator circles and the thirteen spec-row marks RASTERISED at the size each ships at and compared pair by pair, which is the only instrument here that can see a fault the markup does not carry: `fit` and `sum` differed in every character and were the same rectangle. ⚠ The px size and the stroke weight are read off the STYLESHEET through a real element of each class, so it cannot go on measuring 21 px after the CSS moves, and the table is checked against what the RAIL renders before anything is compared, so it cannot pass on nine marks nobody sees. The floor is 0.50 differing-over-inked and it is a SCREEN, not a judgement — a paint drop against a four-pane window scores 0.51 and nobody confuses them — set above every pair a reader actually confused (0.42-0.48) and below every pair that survived the redraw (0.55). Plus **a tap does not scroll the panel it is in** (23.9) — four desktop shapes and two phones of its own, REAL mouse clicks with the choices panel scrolled to its middle and to its bottom first, because every harness that tapped from the panel's top came back clean on a page that scrolled up on every press; a tap that changes what the panel holds is counted and not judged, and — the clause that must stay true — the live navigator circle is whole in its row after every step change, which is the one reason that row scrolls at all. Plus **the stripe pills carry three pictures** (23.9), rasterised at the size the pill draws them and compared pairwise with the plain face tile beside them, and fitting a 320 px screen in Russian. Plus **no step's explainer contradicts the price on it** (23.9) — a "same price" phrase list per language, tested against the sentence it was written for before it is trusted, run over every step that shows a surcharge; and the colour-at-the-measure sentence required on the colour step and in the summary in all three languages |
 | `npm run latency` | how long a tap takes at 6× CPU throttle, against a 600 ms gate |
 | `npm run collide` | real `getBBox()` from a browser over 1,410 designs. No declared number anywhere in the loop — and it asserts the SIZES it sweeps still exist before it starts, because a withdrawn id renders as `standard` and turns a sweep into the same door three times. ⚠ Since 18.9.2026 it is also what keeps `SPECIAL_BOX` honest: the kodan's and kasefet's sizes are declared once and read by the drawing AND by `faceObstacles`, and this compares the declared box against the drawn one on every swept design |
-| `node tools/rectify.mjs` | cuts a leaf out of a photograph and DE-SKEWS it, bilinearly, from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3 |
+| `node tools/pane.mjs` | **where is the glass in this photograph** (25.9.2026) — the four corners of a glazed pane, fitted by least squares to the frame-to-glass edge over a couple of hundred rows. ⚠ TWO SIGNS: on a door with dark glass the boundary is a near-black rebate and the rule is *walk in until dark*; on a frosted one the glass is BRIGHTER than the frame and a negative threshold asks for the other rule — a detector that knew only the first read d109's pane as 57 px wide and negative. It prints the corners in the order `rectify.mjs` wants, so the two compose. ⚠ Read the rms before believing the corners: a pane edge is straight, so a good fit is well under a pixel |
+| `node tools/rectify.mjs` | cuts a quadrilateral out of a photograph and DE-SKEWS it from four measured corners. Every classical-set measurement is a fraction of its output; a rectangular crop of that door shears it — see §3. ⚠ **Its default map is BILINEAR, which is right for a shear and wrong for a KEYSTONE** — under perspective equal real steps crowd toward the far end, and `-H` does it projectively instead. Found by the vine's berries, which are circles on the real door and came back 1.23 times wider than tall at the head of a bilinearly-rectified pane and 1.03 at its foot; that gradient IS the missing term. `newdoor` keeps the bilinear map because every classical table is a fraction of the picture it produced, and that door wants re-measuring rather than a flag. ⚠ Under `-H` the output ASPECT is a free parameter: pass it and check it against something in the picture known to be round |
 | `npm run fuzz` | random combinations, then click-walks in a real browser |
 | `npm run profile` | the leaf's VERTICAL fall, against the medians `FALLOFF` was fitted to |
 | `npm run mottle` | slow horizontal unevenness of the PAINT. ⚠ It strips `[data-room="lamp-wash"]` first — the sconces' wash is horizontal too, and it moved this figure 46% without a drop of paint changing |
@@ -2256,17 +2258,36 @@ shortage**, which is the fault §9's iPad entry already names one band over:
 middle term runs past the cap, so the door is pinned near its MAXIMUM on a
 screen whose band is smaller than a 390 px phone's.
 
-### ⚠ THE VINE'S MOTIFS LOOK TWICE THE PHOTOGRAPH'S SIZE AND THREE INSTRUMENTS CANNOT SAY
+### ✅ THE VINE'S MOTIFS LOOK TWICE THE PHOTOGRAPH'S SIZE AND THREE INSTRUMENTS CANNOT SAY — CLOSED 25.9.2026
 
-Left open 25.9.2026 at the end of the redraw (§0b), and it is recorded rather
-than tuned because this is the exact shape §7 says to stop at.
+⚠ **CLOSED BY CHANGING THE METHOD, NOT BY MEASURING A FOURTH TIME**, and the
+entry is kept whole because that is the lesson. The owner's son read the redraw
+this describes and said *"i dont like the grape design still, find a new way to
+copy it right this time"* — and he was right that a fourth scalar was not going
+to do it. The motifs are TRACED out of the film's own ink now (§0b), and a
+traced outline carries its own scale, so the question this entry could not
+answer stops being askable. **When three detectors come back blind on one
+quantity, the move is to stop needing that quantity.**
 
-**What IS settled, and both readings are sound.** The stroke weight is one
+⚠ **AND ONE OF THE TWO "SETTLED" READINGS BELOW WAS WRONG, WHICH ONLY THE NEW
+METHOD EXPOSED.** The stroke is 0.021 W, not 0.0265: this was read off d109
+UNRECTIFIED and as the mode of ink RUNS ALONG ROWS, which counts a run through
+a stroke at a shallow angle as a wide stroke. Measured on the medial axis of
+two de-skewed panes it is 0.0226 W on d111 and 0.0194 on d109. A number this
+entry called settled, in bold, was 26% out.
+
+The record of what could not be measured, and why:
+
+~~**What IS settled, and both readings are sound.** The stroke weight is one
 weight at **0.0265 W**, taken as the mode of every ink run along every row of
 d109's pane and the same on the stem, the leaf outlines, the berry rings and
-the tendrils. And the ink coverage matches: **26.6% ours against 27.6%
-measured**, from a high-passed mask that demonstrably RESPONDS — pitching the
-motifs 45% apart moves it from 26.6 to 21.4.
+the tendrils.~~ — **superseded, see the correction above: 0.021 W.** The other
+half stands as a description of the film and no longer of our drawing: the ink
+coverage matched, **26.6% ours against 27.6% measured**, from a high-passed
+mask that demonstrably RESPONDS — pitching the motifs 45% apart moves it from
+26.6 to 21.4. ⚠ **And that is precisely the trap**: it was a true number about
+a drawing whose motifs were the wrong size, which is what the paragraph below
+is about.
 
 **What is not.** Beside the photograph ours reads as a few large motifs where
 d109 has many small ones, and ⚠ **coverage is exactly the ratio that cannot
@@ -2291,11 +2312,60 @@ axis, and `npm run against` therefore frames its crop from a guessed rectangle.
 One square-on photograph of either pane — or any one dimension of the film in
 centimetres — turns the motif's size from an argument into arithmetic.
 `ASK-PERETZ.md` asks for it beside the other two glazing photographs.
+⚠ **AND THE FALLBACK LEAF BOX TURNED OUT NOT TO MATTER, WHICH IS WORTH AS MUCH
+AS THE FIX.** Both panes were located by MEASURING the frame-to-glass edge
+instead — least squares through the dark rebate line, rms 0.3 to 1.4 px over
+about 250 rows — so `research/works/auto/leaf.json` is never consulted. The
+question that was blocked on Peretz was blocked on nothing: the photographs
+already contained the answer and nobody had put a ruler on them. ⚠ The
+centimetre question STAYS open in `ASK-PERETZ.md` because it settles a
+different thing — whether the film is the same absolute size on every door, or
+only the same fraction of these two panes.
 
 ⚠ **AND MY EYE IS NOT THE TIE-BREAK HERE, BECAUSE IT WAS WRONG TWICE IN THE
 SAME ROUND ON THE SAME PATTERN** — it called the pattern too sparse when it
 measured 41.3% against 25.6%, and it read a lobe depth of 1.37 that measured
 2.3. That is the whole reason this is a §9 entry and not a fifth redraw.
+
+### ⚠ AN ETCHED FILM TAKES THE DOOR'S COLOUR, AND ON A MID-TONE DOOR IT NEARLY VANISHES
+
+Measured 25.9.2026 while retracing the vine, and it is recorded rather than
+fixed because it belongs to four designs and not to one.
+
+Every etched design draws its ornament as `scaleTone(paint, 1.06)` — the LEAF's
+paint, lightened six per cent — and the pane behind it is a fixed gradient
+running 173 down to 91 in luminance. So the ornament's contrast against the
+glass is decided by a colour that has nothing to do with either of them:
+
+| door | ink | against the pane's four stops |
+|---|---|---|
+| לבן | 254 | 1.44 / 1.90 / 2.56 / 2.33 |
+| חום-אפור כהה (the door the site opens with) | 68 | 2.29 / 1.73 / **1.28** / 1.41 |
+| ירוק מרווה | 135 | 1.26 / **1.05** / 1.42 / 1.29 |
+
+⚠ **AND THE POLARITY FLIPS WITH THE PAINT.** A white door draws the film
+brighter than the glass and a dark door draws it DARKER — and both are real:
+d111's film is white on dark glass and d109's is grey on frosted, because a
+film is a constant pale material and what changes is what is behind the pane.
+So the flip is not the fault. The fault is the middle: at 1.05 the ornament and
+the glass are the same tone and a ₪700 option is a smudge.
+
+⚠ **THE RENDERER'S OWN COMMENT ALREADY CLAIMS THE THING IT DOES NOT DO** —
+*"the ornament is drawn LIGHTER than the paint and reads against the glass
+rather than into it"*. It is lighter than the paint on every door, and that is
+not the same as reading against the GLASS, which is the surface it is on.
+§5.19, in a sentence written two rounds ago.
+
+**Not fixed, and the reason is scope rather than difficulty.** The rule is
+shared by `circles`, `rings` and the vine, and `tree` derives its silhouette
+from the same `paint` by darkening. Deriving the ink from the GLASS instead is
+a few characters and would be physically right — a frosted film is pale
+whatever colour the door is — but it moves four designs at once on a colour
+axis nobody asked about, and it would make the four inconsistent if only one
+moved. The same edit would fix the four etched TILES, which are faint for
+exactly this reason: the tile passes the PANE's colour as `paint` where a door
+passes the LEAF's, so the ornament is drawn six per cent off its own
+background.
 
 ### ⚠ THE DESKTOP PRICE BREAKDOWN IS A SHORT WINDOW ON A LONG COLUMN
 
@@ -2826,6 +2896,173 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE GRAPE AND VINE, TRACED INSTEAD OF DRAWN — AND THE DE-SKEW WAS THE
+  WHOLE OF IT — 25.9.2026.** He read the redraw of the entry below and sent one
+  line: *"i dont like the grape design still, find a new way to copy it right
+  this time."* Not another iteration — a different METHOD, and he was right.
+
+  **A · WHY THE OLD METHOD COULD NOT GET THERE.** Every attempt so far AUTHORED
+  the motifs from measured scalars — a stroke weight, an ink coverage, a lobe
+  depth, a repeat pitch — and §9 recorded where that stalled: coverage is
+  invariant to trading motif SIZE against motif COUNT, so the one number the
+  pitch was fitted against is structurally blind to what an eye complains about.
+  Three instruments were then built to measure the motif's scale and all three
+  came back blind. **A fourth scalar was never going to close it**, and the
+  right move when three detectors fail on one quantity is to stop needing that
+  quantity. Nothing in the drawing is authored now: the shapes are TRACED out of
+  the film's own ink, and a traced outline carries its own scale.
+
+  **B · AND THE EVIDENCE HAD TO BE DE-SKEWED FIRST, WHICH IS THE REAL FINDING.**
+  ⚠ **BOTH PANES ARE KEYSTONES AND NOBODY HAD NOTICED.** d111 measures 292 px
+  across at its head and 330 at its foot, d109 209 and 237 — 13% on both, so
+  every fraction ever read off either photograph carried a shear that grew down
+  the pane. The four edges are fitted by least squares to the dark rebate line
+  (rms **0.3 to 1.4 px** over about 250 rows), so `research/works/auto`'s
+  fallback leaf box — which §9 named as the thing blocking this work — is never
+  consulted at all.
+  ⚠ **AND `tools/rectify.mjs` IS BILINEAR, WHICH IS THE WRONG MAP FOR A
+  KEYSTONE.** It interpolates along the two long edges, which is right for a
+  shear; a keystone is projective, and under perspective equal steps on the real
+  door do not map to equal steps in the image, they crowd toward the far end.
+  Rectified bilinearly, d111's berries — which are **circles on the real door**
+  — came back **1.23 times wider than tall at the head of the pane and 1.03 at
+  its foot**. That gradient IS the missing projective term, and a homography
+  removes it: head and foot agree to 0.015 at every output height.
+  ⚠ **THE OUTPUT ASPECT IS MEASURED, NOT ASSUMED.** A quadrilateral alone does
+  not fix a rectangle's proportions, so the one free parameter is set by ground
+  truth — sweep the output height, take the one where the berries come back
+  round. **d111 lands at 0.443 and d109 at 0.431: two doors, two independent
+  de-skews, agreeing to 3%.** The bilinear rectifier said 0.486, which is 10%
+  out.
+  ⚠ **AND THAT IS A CHECK THIS PROJECT DID NOT HAVE.** Every de-skew before
+  this one was accepted on the aspect of the thing it produced, and §7 records
+  that ratio failing on `newdoor` because two errors cancelled in it. A circle
+  in the photograph is a far better instrument than a ratio: it constrains BOTH
+  axes at once and it cannot cancel.
+
+  **C · WHAT THE FILM MEASURES, ON THOSE TWO VIEWS.** Every figure is a fraction
+  of the pane's width, which is the only unit `glazingArt` lays ornament out in.
+  · **ONE stroke weight**, the mode of the distance transform sampled on the
+    SKELETON: **14.0 px of 620 on d111 (0.0226 W)** and 12.0 on d109 (0.0194).
+    ⚠ The shipped figure was **0.0265 W** and §9 called it settled in bold: it
+    was read off an UNRECTIFIED pane as the mode of ink RUNS ALONG ROWS, and a
+    run through a stroke at a shallow angle is wider than the stroke. 26% out.
+    ⚠ And the first version of the new reading sampled "ridge" pixels and
+    returned **4.0 px on a stroke that is plainly 10** — a local maximum along
+    x or y is satisfied one step in from the stroke's own edge, so the histogram
+    filled with edge pixels and its mode was the smallest bin. The medial axis
+    is what means "the middle of a stroke".
+  · **A BERRY is a hole 0.053 W in radius** (d111 0.0513 and 0.0529 on its two
+    bunches, d109 0.0575), so its centreline radius is that plus half a stroke.
+    Adjacent holes sit 18.6 px apart against a 14 px stroke, so the rings very
+    nearly touch. Roundness 0.97–1.03.
+  · **A BUNCH is 3, 3, 2, 1** top to bottom, counted at 2.6x on a bunch whole in
+    the frame, the top row a little smaller.
+  · **A LEAF is 0.417 W across** — five traced leaves at 0.389, 0.394, 0.417,
+    0.422, 0.429 — and 0.395 W tall on the two not cut by their crop.
+  · **A TENDRIL is ONE open loop** just over a turn, not a coil.
+  · **THE STEM** wanders between 0.47 and 0.53 W in the rows where nothing
+    crosses it, and measures 13–16 px: the SAME single weight as the outlines,
+    which the old comment had claimed and never checked.
+
+  **D · HOW THE LEAF IS TRACED.** Its interior is a hole in the ink, so the
+  hole's boundary is the outline's inner edge; offset that outward by half the
+  measured stroke and you have the curve the film was cut along. Moore-
+  neighbourhood contour, box smooth at a quarter of a stroke, Ramer-Douglas-
+  Peucker at 0.7 px of a 262 px leaf, 67 points.
+  ⚠ **EMITTED AS A QUADRATIC B-SPLINE, NOT AS A SPLINE THROUGH THE POINTS.**
+  Every anchor is an edge MIDPOINT and every traced vertex a control point, so
+  the curve is guaranteed to lie inside the convex hull of the traced polygon.
+  The entry below records the previous redraw failing exactly there — a spline
+  THROUGH ten measured points overshot at every reversal and turned the lobes
+  into thorns. A B-spline cannot do that at any point density.
+  ⚠ **AND THE FIRST TRACE STACKED THREE ROUNDINGS AND CAME OUT A BLOB** — a
+  morphological close at 0.75 of a stroke, a box smooth at 0.6, and then the
+  spline. Each is defensible and together they ate the sinuses. 0.55 / 0.25 /
+  0.7 keeps them.
+
+  **E · THE MARKS INSIDE A LEAF ARE NOT VEINS, AND LOOKING IS WHAT SETTLED IT.**
+  The trace went looking for veins radiating from the petiole, found two broken
+  runs and would have drawn them. ⚠ **What it had actually found was the STEM
+  passing behind that particular leaf.** Magnified on a leaf clear of the stem,
+  every notch between two lobes carries one short tapered DART pointing inward
+  and there is nothing at the base at all — and the dart's blunt inner end is a
+  round line cap, which is what the drawing already does. They are derived from
+  the outline rather than traced one by one, because a local minimum of the
+  outline's radius IS a sinus and the outline is the photograph's: five of them,
+  at depths of 0.12 to 0.16 of the leaf's width.
+  ⚠ **AND THE FIRST SPECIMEN WAS THE WRONG LEAF FOR THE SAME REASON** — the
+  stem ran through it, which is where its odd flat right-hand side came from.
+  The traced leaf is one the stem misses.
+
+  **F · THE TILE WAS THE WORST OF THE TWELVE AND NOTHING SAID SO.** Everything
+  here is a fraction of the pane's WIDTH, and the option tile is a 300 x 300
+  SQUARE where a cycle is 1.34 W tall — so three quarters of one cycle fitted
+  and the tile showed a single leaf and two fragments. Rendered beside its
+  eleven neighbours at the size it ships, every other grille tile reads as a
+  pattern and this one did not. §5.5 is nine handle tiles that each drew a
+  picture and none of which said which product it was; `npm test`'s
+  tile-distinctness check compares MARKUP and cannot see it.
+  The unit is `min(w, h / 1.7)` now, centred in whatever width there is.
+  ⚠ **AND THE CLAIM THAT THIS IS A NO-OP ON EVERY DOOR IS A CHECK, NOT A
+  SENTENCE.** The renderer publishes `data-vine-unit` and `npm test` reads it
+  back for every size x window, against the ORNAMENT width rather than the
+  pane's — on the narrow leaf of a דו כנפי those differ, and that difference is
+  the 14.9 fix for *"the half door window designs look like crops"*. The
+  shortest opening in the range is the square window on a standard leaf at
+  357 x 902, h/w **2.53** against a gate of 1.7. Paired with its opposite, that
+  the TILE does take the other branch — a check that only ever sees the no-op
+  cannot tell a working `min` from a constant.
+
+  **G · AND ONE STAMP AT THREE ROTATIONS READ AS WALLPAPER.** Half the leaves
+  are mirrored now. A reflection of a printed film is a leaf seen from its other
+  face, it costs no bytes, and `scale(-1 1)` has determinant magnitude 1 so the
+  stroke keeps its single measured weight. The composition itself is the
+  photograph's own, read off d109's rectified pane as the centres of every
+  enclosed shape in it — a leaf low on the left, a bunch high on the right, a
+  leaf near the middle, a leaf on the right, a bunch on the left, repeating
+  every 1.34 W, which is the distance between the two bunches on the same side
+  of the stem. ⚠ **It is not a lattice and must not become one**: autocorrelating
+  the pane returns its best peak at **r = 0.011**, which is noise.
+
+  **H · WHAT IS NOT DONE, STATED RATHER THAN HIDDEN.** The tall slot draws the
+  film smaller than the square window does, because everything in `glazingArt`
+  is a fraction of the pane's width and the slot is narrower — a real film cut
+  to a narrower opening would show the same motifs, fewer of them. That is the
+  house rule and it is identical for `circles`, `rings` and `tree`, so it is not
+  this design's to change alone. And the four etched tiles are all faint against
+  their own background, because the tile passes the PANE's colour where a door
+  passes the LEAF's; the vine now reads at 70 px, which is the width it ships at
+  on a phone, and fixing the relationship properly moves three other tiles.
+
+  **Gates.** `npm test` **11,809,935 / 0** once the sheets were regenerated (its
+  first pass failed exactly the stale bundle and the five staleness rows, which
+  is those checks doing their one job) · `npm run audit` **no faults** at eight
+  viewports · `npm run fuzz` 30,000 designs and 1,800 clicks clean ·
+  `npm run collide -- all` **1,110** designs, `-- boxes` every fitting inside
+  its declaration with `MOUNT_REACH` covering 111 of 121 · `npm run latency`
+  worst **217 ms** against 600 · `npm run mottle` **0.0190 / 0.1070**, unmoved
+  to the digit, which it must be — the sampled leaf is unglazed.
+  ⚠ **AND THE LATENCY GATE NEVER MEASURES THIS DESIGN**, so it was measured
+  separately: the vine adds **12 elements** to a pane over drawing no grille at
+  all, because the leaf is one definition and a `<use>` each, and a vined door
+  is **68 KB against `rings`' 106**. The heaviest door in the range carries
+  neither.
+
+  **Sheets.** **1 of 48 bare sheets moved and it is `against-vine`**, the
+  redraw. The other 47 and all six `lockset` sheets came back byte-identical,
+  which is the check that a change to one glazing design reached exactly one
+  glazing design. A second regeneration after a comment-and-alias tidy moved
+  the same one and no other, which is the check that the tidy moved no pixel.
+  The `shot` sheets moved and prove nothing on their own (§7).
+
+  **Falsified in both directions, and each arm catches what the other cannot.**
+  With `U = w` — the short-pane branch never firing — the pane clause stays
+  green on all 18 and the TILE clause fails alone, naming unit 300.0 of a 300
+  px square. With `U = h / 1.7` unconditionally, the tile clause goes green and
+  **18 pane faults** fire, each naming the pane it measured and its h/w. Either
+  arm on its own would have passed one of the two mistakes.
 
 - **⚠ A DUMP OF EIGHT NOTES FROM THE OWNER'S SON — THE פרזול MOVES UP, THE
   PHONE LOSES A BAR IT DID NOT NEED, THE BALL FOLLOWS THE FINISH, AND THE
