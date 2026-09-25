@@ -1031,8 +1031,15 @@ for (const v of VIEWS) {
     let picked = 0;
     for (let i = 0; i < 9; i++) {
       if (await p.evaluate(() => !!document.querySelector('.sect:not([hidden]) [data-id="rect"]'))) break;
-      if (await tap('idan')) picked++;
-      if (await tap('panel2')) picked++;
+      /* ⚠ RE-AIMED 25.9.2026. It tapped the Idan and the two-panel face, and
+         the square window then said two sentences: the face went, and the
+         lever went. Since the lever yields the moment a bar is chosen, that
+         second sentence is said at the HANDLE tap, and the window's repair
+         came down to one — the §5.15 clause below fired on all eight
+         viewports. The window still takes two things off a door that carries
+         a פעמון and an עינית, both on its centre line, so the walk puts them
+         there. Asserted by the clause below, not assumed. */
+      for (const id of ['idan', 'bell', 'peep']) if (await tap(id)) picked++;
       if (!(await fwd())) break;
       await p.waitForTimeout(260);
     }
@@ -1065,7 +1072,7 @@ for (const v of VIEWS) {
       fault(v.name, 'the toast-placement check never reached the window step '
         + `(picked ${picked} options, on the glass step: ${onGlass}) — it is dead`);
     } else if (m.noToast) {
-      fault(v.name, 'choosing the square window on a panelled door with a bar '
+      fault(v.name, 'choosing the square window on a door with a bar, a bell and a peephole '
         + 'raised no toast at all — this check has lost its subject');
     } else if (m.sentences < 2) {
       fault(v.name, `the repair this check is built on now says ${m.sentences} sentence — `

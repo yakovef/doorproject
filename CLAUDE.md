@@ -2706,7 +2706,18 @@ how it got there. Detail lives in the section it belongs to.
   **Gates.** `npm test` 0 failed after the sheets · `collide -- all` 1,110
   designs clean, `-- boxes` clean · **0 of 48 bare sheets moved** — no gallery
   door and no comparison fixture carries `panel3` — and 7 `shot` sheets moved,
-  which proves nothing either way (§7) · `npm run audit` — see the commit.
+  which proves nothing either way (§7) · `npm run audit` no faults on this
+  change alone.
+  ⚠ **AND REBASED ONTO THE PULL-BAR FIX ABOVE IT, THE AUDIT WENT RED ON ALL
+  EIGHT VIEWPORTS — about neither change's drawing.** The toast-placement
+  check of 10.9 walks Idan → two-panel face → square window and needs the
+  window's repair to say two sentences; since the lever yields at the HANDLE
+  tap, the window said one, and the check's own §5.15 clause fired: *"it no
+  longer produces the tall toast it exists to place, and must be re-aimed."*
+  Reproduced in node on the pull-bar commit alone, so it was that commit's,
+  not this one's. Re-aimed at Idan + פעמון + עינית → square window, which
+  takes both centre-line fittings and swaps the lever: three sentences, a
+  taller toast than the check was written for. The clause is untouched.
 - **⚠ A PULL BAR NEVER STANDS ACROSS A WINDOW OR A PANEL, AND THE LEVER
   YIELDS FIRST — 24.9.2026.** A quick fix, off a screenshot of the live page:
   the three-panel face with a gold Idan drawn straight down through all three
