@@ -31,7 +31,7 @@ import {
   BELLS, byId, colourCode, COLOURS, DETAIL_SUBS, DETAILS,
   GRILLES, handleLength, handleLensFor, HANDINGS, HANDLES, HANDLE_FINISHES, LOCKSETS, MASHKOFS,
   mashkofFor, MASHKOF_PARTS, MASHKOF_WIDER_A, BUILD_A,
-  PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_MAX, WINDOWS,
+  PEEPHOLES, PIRZUL, PLACEHOLDER, SIZES, SPECIAL_LOCKS, STRIPE_A, STRIPE_MAX, WINDOWS,
 } from './catalog.js';
 import { breakdownRows, deltaLabel, formatAgorot, priceAgorot, priceLabel, priceParts, tileAgorot }
   from './price.js';
@@ -333,8 +333,17 @@ const GROUPS = [
    already sent goes stale and no VERSION moves. The `01`-`08` digits are a CSS
    counter over position, which is exactly why they are a counter — this
    reorder is the event a stored digit would have gone stale on. */
+/* ⚠ WHY FOUR OF THESE NINE CARRY `expArgs` — 25.9.2026. An explainer that
+   types a price or the name of an option is a second copy of something the
+   catalogue already states, and §5 is about what two copies of one fact do.
+   One of them had already gone stale in silence: `exp.lock.a` promised ₪700
+   and ₪900 for five days after Peretz corrected the two figures to 690 and
+   880 and `prices.js` took the correction. Every figure and every option name
+   in an explainer now comes through an argument, out of the same table the
+   tile beside it reads. `test/units.mjs` asserts there are none left. */
 const SECTIONS = [
-  { key: 'fit',    title: 'step.fit.t',    sub: 'step.fit.s',    lede: 'step.fit.l', exp: 'exp.fit' },
+  { key: 'fit',    title: 'step.fit.t',    sub: 'step.fit.s',    lede: 'step.fit.l', exp: 'exp.fit',
+    expArgs: () => [L(SIZES.half)] },
   { key: 'colour', title: 'step.colour.t', sub: 'step.colour.s', lede: 'step.colour.l', exp: 'exp.colour',
     expArgs: () => [T('colour.measured')] },
   /* ⚠ THE LOCK COMES BEFORE THE GRIP, 14.9.2026 — Peretz: *"the lockset
@@ -351,11 +360,15 @@ const SECTIONS = [
      `tools/audit.mjs`, which asserts the WHOLE sequence off the rendered
      navigator rather than a pair-wise rule — so a half-finished reorder fails
      there rather than shipping. */
-  { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock' },
+  { key: 'lock',   title: 'step.lock.t',   sub: 'step.lock.s',   lede: 'step.lock.l', exp: 'exp.lock',
+    expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
+                    formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
   { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip' },
   { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz' },
-  { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face' },
-  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass' },
+  { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
+    expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v)] },
+  { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass',
+    expArgs: () => [L(SIZES.half)] },
   { key: 'mk',     title: 'step.mk.t',     sub: 'step.mk.s',     lede: 'step.mk.l', exp: 'exp.mk',
     expArgs: () => [formatAgorot(MASHKOF_WIDER_A), formatAgorot(BUILD_A.mashkof)] },
 ];

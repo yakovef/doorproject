@@ -5155,9 +5155,22 @@ for (const v of VIEWS) {
             a: (live.querySelector('.sect__a')?.textContent || '').replace(/\s+/g, ' '),
             priced: metas.some(t => /₪\s*[1-9]|[1-9][\d,.]*\s*₪/.test(t)),
             fine: (document.querySelector('.sect.is-live .send__fine')?.textContent || '').replace(/\s+/g, ' '),
+            /* ⚠ AND NOTHING ON THE STEP STILL SAYS `{0}` — 25.9.2026. Four
+               explainers stopped typing their prices and their double door's
+               name that day and take them as arguments instead, which moves
+               the failure: a `{n}` whose argument is not passed renders as
+               the two characters themselves. `units.mjs` asserts the three
+               languages carry the SAME slots, so a dropped `expArgs` is
+               uniform across all three and invisible there — it is visible
+               here, on the page, where the customer would have read it. */
+            slot: (live.textContent || '').match(/\{\d\}/)?.[0] || '',
           };
         });
         if (!r) { fault(where, `step "${k}" did not come up`); continue; }
+        if (r.slot) {
+          fault(where, `step "${r.key}" prints "${r.slot}" to the customer — a copy `
+            + 'placeholder reached the page with nothing passed for it');
+        }
         if (r.priced) {
           priced++;
           const hit = SAME[lang].find(ph => r.a.includes(ph));

@@ -174,7 +174,10 @@ export function specRows(state) {
   rows.push({ key: 'lockset', label: T('row.lockset'), id: lk.id, value: L(lk) });
   /* ⚠ NAMED ONLY WHEN THERE IS ONE, and named at all because an axis that does
      not reach this file is an axis Peretz never hears about. A customer can
-     now add a כספת or a קודן — ₪700 and ₪900 — and every reader of a door
+     now add a כספת or a קודן — both priced in `prices.js`, and their figures
+     deliberately not repeated here: this note used to carry them, and so did
+     `exp.lock.a`, where they sat five days out of date after Peretz moved
+     them (§0b, 25.9) — and every reader of a door
      (the message, the spec table, the summary line, the drawing's accessible
      name and the A4 sheet) goes through here. A priced choice missing from
      this list is a clarifying question with money on it, which is exactly

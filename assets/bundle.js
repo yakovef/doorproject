@@ -133,10 +133,15 @@
        Peretz includes three in the price and charges ₪200 for the rest, so the
        old sentence sat directly above a chart that contradicted it. The two
        headings under it now carry the money; this line stops making a promise
-       about it and says the thing that IS still true of every shade. */
+       about it and says the thing that IS still true of every shade.
+       ⚠ AND THE ENGLISH SAID A DIFFERENT THING FROM THE OTHER TWO — 25.9.2026.
+       Hebrew and Russian say the DURABILITY is the same in every shade; English
+       said "the same finish in every shade", which a reader can take as the
+       sheen being identical — and the explainer two lines below warns that the
+       sheen is exactly what may differ. Three languages, one claim. */
     "step.colour.l": [
       "צבע בתנור, מלוח הגוונים של היצרן — באותה עמידות בכל גוון.",
-      "Oven-baked, from the manufacturer’s chart — the same finish in every shade.",
+      "Oven-baked, from the manufacturer’s chart — the same durability in every shade.",
       "Порошковая окраска по палитре производителя — стойкость одинакова во всех оттенках."
     ],
     "step.face.t": ["עיצוב החזית", "The face", "Полотно"],
@@ -288,10 +293,17 @@
       "Размер — это проём в стене, а не само полотно."
     ],
     "g.mashkof": ["משקוף", "Frame", "Коробка"],
+    /* ⚠ "THE DRAWING" WAS AMBIGUOUS AND THIS STEP NOW HAS TWO — 25.9.2026. The
+       hint sat directly under a diagram that LABELS the inner kant, and said
+       the inner kant does not show in the drawing. `exp.mk.a` had it right all
+       along — *בציור הדלת* — and this line is the same sentence now: the door
+       drawing shows two of the three parts because the third is behind the
+       wall; the section drawing beside these rows shows all three, because a
+       section is what it is for. */
     "g.mashkof.h": [
-      "המסגרת שהדלת נסגרת עליה. הסטנדרטי כלול; כל חלק שמרחיבים — {0}. הקאנט הפנימי נמצא בצד הפנימי של הקיר ולא נראה בציור. נמדוד את הקיר אצלכם.",
-      "The frame the door closes against. Standard is included; each part you widen is {0}. The inner kant is on the room side of the wall and does not show in the drawing. We measure your wall on site.",
-      "Рама, к которой прилегает дверь. Стандартная входит в цену; каждая расширенная часть — {0}. Внутренний кант находится со стороны комнаты и на рисунке не виден. Толщину стены замерим на месте."
+      "המסגרת שהדלת נסגרת עליה. הסטנדרטי כלול; כל חלק שמרחיבים — {0}. הקאנט הפנימי נמצא בצד הפנימי של הקיר ולא נראה בציור הדלת. נמדוד את הקיר אצלכם.",
+      "The frame the door closes against. Standard is included; each part you widen is {0}. The inner kant is on the room side of the wall and does not show in the drawing of the door. We measure your wall on site.",
+      "Рама, к которой прилегает дверь. Стандартная входит в цену; каждая расширенная часть — {0}. Внутренний кант находится со стороны комнаты и на рисунке двери не виден. Толщину стены замерим на месте."
     ],
     "mk.std": ["סטנדרטי", "Standard", "Стандартный"],
     "mk.wide": ["רחב", "Wide", "Расширенный"],
@@ -358,10 +370,22 @@
        want to add a sentence here and cannot point at the file it comes from,
        it belongs in `ASK-PERETZ.md` instead. */
     "exp.fit.q": ["מה המידה שלי?", "Which size is mine?", "Какой размер мой?"],
+    /* ⚠ THE DOUBLE DOOR IS NAMED BY ITS OWN TILE, `{0}` — 25.9.2026. This
+       sentence said דלת וחצי / "a leaf and a half" / "Полуторная дверь", and no
+       tile on the page has said that since the size was renamed: a customer
+       reading the explainer went looking for a size called one thing among six
+       called another. The label comes out of `SIZES.half` now, so the two
+       cannot come apart again.
+       ⚠ AND THE DISAGREEMENT UNDERNEATH IT IS NOT SETTLED BY THIS. `catalog.js`
+       says in as many words that the NAME is דו כנפי and the DRAWING is a
+       דלת וחצי — a main leaf with a 400 mm fixed one beside it — and
+       `ASK-PERETZ.md` §0g asks him which he sells. That is a question about the
+       product; this was a question about whether the page contradicts itself,
+       and only the second one is ours to fix. */
     "exp.fit.a": [
-      "המידה נקבעת לפי הפתח שבקיר, ואנחנו מודדים אותו אצלכם בחינם. עד 98 × 203 ס״מ זה המחיר הבסיסי; דלת רחבה או גבוהה יותר מוסיפה 25%, ומעל 120 × 240 ס״מ — 50%. דלת וחצי היא שתי כנפיים ומחירה כפול. כיוון הפתיחה נמדד תמיד במבט מבחוץ — הצד שבו נמצאים הצירים.",
-      "The size follows the opening in your wall, and we measure it on site, free. Up to 98 × 203 cm is the base price; wider or taller adds 25%, and over 120 × 240 cm adds 50%. A leaf and a half is two leaves and costs double. Handing is always read from OUTSIDE — the side the hinges are on.",
-      "Размер определяется проёмом в стене, и мы замеряем его у вас бесплатно. До 98 × 203 см — базовая цена; шире или выше — плюс 25%, свыше 120 × 240 см — плюс 50%. Полуторная дверь — это две створки, и стоит вдвое. Сторона открывания всегда считается СНАРУЖИ — по стороне петель."
+      "המידה נקבעת לפי הפתח שבקיר, ואנחנו מודדים אותו אצלכם בחינם. עד 98 × 203 ס״מ זה המחיר הבסיסי; דלת רחבה או גבוהה יותר מוסיפה 25%, ומעל 120 × 240 ס״מ — 50%. {0} — שתי כנפיים, והמחיר כפול. כיוון הפתיחה נמדד תמיד במבט מבחוץ — הצד שבו נמצאים הצירים.",
+      "The size follows the opening in your wall, and we measure it on site, free. Up to 98 × 203 cm is the base price; wider or taller adds 25%, and over 120 × 240 cm adds 50%. {0} — two leaves, and twice the price. Handing is always read from OUTSIDE — the side the hinges are on.",
+      "Размер определяется проёмом в стене, и мы замеряем его у вас бесплатно. До 98 × 203 см — базовая цена; шире или выше — плюс 25%, свыше 120 × 240 см — плюс 50%. {0} — две створки, и цена вдвое. Сторона открывания всегда считается СНАРУЖИ — по стороне петель."
     ],
     "exp.mk.q": ["מה זה משקוף?", "What is the frame?", "Что такое коробка?"],
     /* ⚠ THREE PARTS SINCE 20.9.2026 — Peretz named the section's pieces and
@@ -398,16 +422,27 @@
       "Цвет наносится порошком и запекается, по палитре производителя; код рядом с названием — его. Изображение здесь — визуализация: готовый оттенок может немного отличаться, прежде всего по блеску. {0}"
     ],
     "exp.face.q": ["פאנלים או פסים — מה ההבדל?", "Panels or strips — what is the difference?", "Панели или полосы — в чём разница?"],
+    /* The two stripe figures are `{0}` and `{1}` out of `STRIPE_A`, for the
+       reason written over `exp.lock.a`: these two were still right on the day
+       the safe lock's two were not, and being right is not a property a typed
+       number keeps. */
     "exp.face.a": [
-      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — 150 ₪ לפס אופקי ו‑300 ₪ לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון — חלון מרובע מגיע עם הפאנל שלו בתחתית, ואין צורך לבחור אותו כאן. כל עיצוב חזית מתאים לכל ידית משיכה.",
-      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — ₪150 a horizontal strip and ₪300 a vertical one. Panels and strips do not go on the same door, and neither goes with a window — a square window brings its own panel below it, and there is nothing to choose here for that. Every face goes with every pull handle.",
-      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: ₪150 за горизонтальную и ₪300 за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном: у квадратного окна своя нижняя панель, и выбирать её здесь не нужно. Любое оформление полотна сочетается с любой ручкой-скобой."
+      "פאנלים הם מסגרות מוגבהות שמולבשות על פני הדלת. פסי מתכת הם קווים דקים, לרוחב או לאורך, ומחירם לפי מספרם — {0} לפס אופקי ו‑{1} לפס אנכי. לא משלבים פאנלים עם פסים על אותה דלת, וגם לא עם חלון — חלון מרובע מגיע עם הפאנל שלו בתחתית, ואין צורך לבחור אותו כאן. כל עיצוב חזית מתאים לכל ידית משיכה.",
+      "Panels are raised frames laid on the face of the door. Metal strips are thin lines, across or upright, priced by the count — {0} a horizontal strip and {1} a vertical one. Panels and strips do not go on the same door, and neither goes with a window — a square window brings its own panel below it, and there is nothing to choose here for that. Every face goes with every pull handle.",
+      "Панели — это накладные рамки на лицевой стороне двери. Металлические полосы — тонкие линии, поперёк или вдоль, цена по количеству: {0} за горизонтальную и {1} за вертикальную. Панели и полосы не совмещаются на одной двери, как и с окном: у квадратного окна своя нижняя панель, и выбирать её здесь не нужно. Любое оформление полотна сочетается с любой ручкой-скобой."
     ],
     "exp.glass.q": ["מה נכנס לתוך החלון?", "What goes inside the window?", "Что ставится в окно?"],
+    /* ⚠ THE SIDELIGHT IS NOT A PRODUCT AND THIS SENTENCE WAS STILL SELLING IT —
+       25.9.2026. "a door with a sidelight" / "דלת עם חלון צד" / "дверь с боковым
+       окном" was withdrawn on 27.8 and `SIZES` has held six entries with no such
+       door ever since; `side: 400` is a PROPERTY of the דו כנפי, not a size of
+       its own. A customer who read this and went looking for it found nothing
+       to click. Gone, and the double door is named by its own tile through
+       `{0}` — see the note over `exp.fit.a`. */
     "exp.glass.a": [
-      "יש שני חלונות: צוהר אנכי צר לאורך הדלת, וחלון מלבני. חלון מלבני מגיע תמיד עם פאנל בתחתית. מה שנמצא בתוך הזכוכית — סורג מברזל או זכוכית מעוצבת — נבחר בנפרד. בדלת וחצי ובדלת עם חלון צד יש שני פתחים מזוגגים, והסורג מותקן בשניהם ומתומחר לפי מספרם.",
-      "There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. What fills the glass — wrought iron, or worked glass — is chosen separately. A leaf and a half, and a door with a sidelight, have TWO glazed openings; the ironwork goes in both and is priced per opening.",
-      "Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Наполнение стекла — кованая решётка или художественное стекло — выбирается отдельно. У полуторной двери и двери с боковым окном ДВА остеклённых проёма: решётка ставится в оба и считается по их числу."
+      "יש שני חלונות: צוהר אנכי צר לאורך הדלת, וחלון מלבני. חלון מלבני מגיע תמיד עם פאנל בתחתית. מה שנמצא בתוך הזכוכית — סורג מברזל או זכוכית מעוצבת — נבחר בנפרד. בדלת {0} יש שני פתחים מזוגגים, והסורג מותקן בשניהם ומתומחר לפי מספרם.",
+      "There are two windows: a narrow upright slot, and a rectangle. A rectangle always comes with a panel below it. What fills the glass — wrought iron, or worked glass — is chosen separately. A {0} door has TWO glazed openings; the ironwork goes in both and is priced per opening.",
+      "Окон два: узкое вертикальное и прямоугольное. Прямоугольное всегда идёт с нижней панелью. Наполнение стекла — кованая решётка или художественное стекло — выбирается отдельно. У двери «{0}» ДВА остеклённых проёма: решётка ставится в оба и считается по их числу."
     ],
     "exp.grip.q": ["איזה אורך לבחור?", "What length should I choose?", "Какую длину выбрать?"],
     /* ⚠ TWO PRICES PER BAR SINCE 20.9.2026, NOT A RATE. Peretz: *"cylinder
@@ -421,10 +456,20 @@
       "Ручка-скоба — это то, за что тянут дверь. Есть круглая и прямоугольная, и у каждой две цены: до метра и свыше метра. Длина ограничена высотой створки, так что на низкую дверь слишком длинная скоба не встанет. Отделку можно выбрать чёрную или золотую — доплата за ручку и за звонок, за каждый отдельно. Можно обойтись и без ручки. Горизонтальная скоба и врезная ручка ставятся поперёк двери, и длина у них не выбирается."
     ],
     "exp.lock.q": ["כספת וקודן — במקום המנעול או בנוסף?", "Safe lock and keypad — instead of the lock, or as well?", "Сейфовый и кодовый замок — вместо основного или вдобавок?"],
+    /* ⚠ THE TWO FIGURES WERE TYPED HERE AND THEY WENT STALE — 25.9.2026. This
+       paragraph said ₪700 and ₪900 in all three languages for five days after
+       Peretz corrected himself on 20.9 — *"kasefet - 690 · kodan 880"* — and
+       `js/prices.js` took the correction the same day. So the tile beside this
+       sentence charged ₪690 while the sentence promised ₪700: the page quoting
+       a price the page does not charge, which is §0's worst fault in its
+       cheapest form. Nothing failed, because nothing was asking.
+       They come through `{0}` and `{1}` now, out of `SPECIAL_LOCKS[].delta`,
+       which is the same place the tiles read. A figure that cannot be typed
+       cannot drift. */
     "exp.lock.a": [
-      "בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת (700 ₪) וקודן (900 ₪) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
-      "As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock (₪700) and a keypad (₪900) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.",
-      "Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый (₪700) и кодовый (₪900) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек."
+      "בנוסף. בכל דלת יש ידית שמסובבים וצילינדר, והם כלולים במחיר — זה המנעול הרגיל. כספת ({0}) וקודן ({1}) מותקנים לצדו ולא במקומו, ולכן אפשר לבחור גם וגם. מנעול חכם הוא מוצר אחר ונמצא ברשימת הידיות.",
+      "As well. Every door has a lever and a cylinder, included in the price — that is the ordinary lock. A safe lock ({0}) and a keypad ({1}) are fitted BESIDE it rather than instead of it, so you can have both. A smart lock is a different product and is in the lever list.",
+      "Вдобавок. В каждой двери есть нажимная ручка и цилиндр, они входят в цену — это обычный замок. Сейфовый ({0}) и кодовый ({1}) ставятся РЯДОМ с ним, а не вместо, поэтому можно выбрать оба. Умный замок — отдельный продукт, он в списке ручек."
     ],
     "exp.pz.q": ["מה הפרזול משנה?", "What does the hardware finish change?", "На что влияет отделка фурнитуры?"],
     /* ⚠ THE LONGEST OF THE THREE, AND IT CARRIED A CLAIM THAT WENT FALSE ON
@@ -1154,7 +1199,7 @@
        this table draws is a main leaf with a 400 mm FIXED leaf beside it — a
        דלת וחצי. If his דו כנפי is two EQUAL leaves then the drawing is wrong,
        not just the label, and that is a bigger fix than a string.
-       `ASK-PERETZ.md` §0h asks him. */
+       `ASK-PERETZ.md` §0g asks him — §0h is the size RANGES, a different question. */
     half: {
       id: "half",
       he: "דו כנפי",
@@ -9281,7 +9326,14 @@ ${body}
     }
   ];
   var SECTIONS = [
-    { key: "fit", title: "step.fit.t", sub: "step.fit.s", lede: "step.fit.l", exp: "exp.fit" },
+    {
+      key: "fit",
+      title: "step.fit.t",
+      sub: "step.fit.s",
+      lede: "step.fit.l",
+      exp: "exp.fit",
+      expArgs: () => [L(SIZES.half)]
+    },
     {
       key: "colour",
       title: "step.colour.t",
@@ -9304,11 +9356,35 @@ ${body}
        `tools/audit.mjs`, which asserts the WHOLE sequence off the rendered
        navigator rather than a pair-wise rule — so a half-finished reorder fails
        there rather than shipping. */
-    { key: "lock", title: "step.lock.t", sub: "step.lock.s", lede: "step.lock.l", exp: "exp.lock" },
+    {
+      key: "lock",
+      title: "step.lock.t",
+      sub: "step.lock.s",
+      lede: "step.lock.l",
+      exp: "exp.lock",
+      expArgs: () => [
+        formatAgorot(byId(SPECIAL_LOCKS, "kasefet").delta),
+        formatAgorot(byId(SPECIAL_LOCKS, "kodan").delta)
+      ]
+    },
     { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
     { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l", exp: "exp.pz" },
-    { key: "face", title: "step.face.t", sub: "step.face.s", lede: "step.face.l", exp: "exp.face" },
-    { key: "glass", title: "step.glass.t", sub: "step.glass.s", lede: "step.glass.l", exp: "exp.glass" },
+    {
+      key: "face",
+      title: "step.face.t",
+      sub: "step.face.s",
+      lede: "step.face.l",
+      exp: "exp.face",
+      expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v)]
+    },
+    {
+      key: "glass",
+      title: "step.glass.t",
+      sub: "step.glass.s",
+      lede: "step.glass.l",
+      exp: "exp.glass",
+      expArgs: () => [L(SIZES.half)]
+    },
     {
       key: "mk",
       title: "step.mk.t",

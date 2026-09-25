@@ -4951,6 +4951,37 @@ async function checkLanguages() {
     }
   }
 
+  /* ── NO SENTENCE TYPES A PRICE ────────────────────────────────────
+     ⚠ WRITTEN BECAUSE ONE DID, AND IT WAS WRONG FOR FIVE DAYS — 25.9.2026.
+     `exp.lock.a` said the safe lock was ₪700 and the keypad ₪900 in all three
+     languages. Peretz corrected both on 20.9 — *"kasefet - 690 · kodan 880"* —
+     `js/prices.js` took the correction the same day, and the paragraph did
+     not: the tile beside it charged ₪690 while the sentence above it promised
+     ₪700. §0's worst fault, in its cheapest form, and nothing in 9 million
+     assertions was looking, because every one of them reads the copy for
+     SHAPE — that it exists, that it is translated, that its `{n}` slots
+     match — and none for what it CLAIMS.
+
+     This is the shape-level check that catches it: a price reaches the copy
+     through an argument or it does not reach it at all. `js/prices.js` is the
+     only file allowed to hold money (§1), and a figure typed into a sentence
+     is a second copy of one — it cannot be re-read when the first moves, and
+     the page then quotes a price the page does not charge.
+
+     ⚠ THE SHEKEL SIGN IS THE WHOLE TEST, and that is deliberate rather than
+     lazy: every price this page has ever printed is `formatAgorot`'s output
+     and carries it. A figure written "700 שקל" would pass — so would one
+     spelled out in words — and neither has ever appeared here. What this
+     refuses is the thing that DID happen, in the form it happened in. */
+  for (const [key, row] of Object.entries(UI)) {
+    IDS.forEach((id, i) => {
+      const hit = (row[i] || '').match(/₪\s*[\d][\d,.]*|[\d][\d,.]*\s*₪/);
+      ok(!hit, `UI['${key}'] ${id} types the price "${hit && hit[0]}" into a sentence `
+            + '— money lives in js/prices.js and reaches the copy through a {n} '
+            + 'argument, or the day the price moves the page starts lying');
+    });
+  }
+
   /* ── every catalogue name exists in all three ─────────────────── */
   const lists = { COLOURS, WINDOWS, HANDLES, LOCKSETS, PIRZUL, MASHKOFS,
                   SPECIAL_LOCKS, GRILLES, HANDINGS, DETAILS, FINISHES,

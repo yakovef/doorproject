@@ -1260,7 +1260,7 @@ sheet. A right-hinged door is a physical fact.
 
 ## 5. The failure mode that keeps recurring
 
-**Things that vanish rather than break.** Twenty-four so far. None of them
+**Things that vanish rather than break.** Twenty-five so far. None of them
 threw. All of them looked like a working page.
 
 1. A grille id matched no branch in `grillePaths` — a priced ₪300 option drew
@@ -1541,6 +1541,25 @@ it is **present and distinct**, not only that it is correct:
     DETAILS entry the question an entry can answer; the channel is greyed on
     432 worked-face doors in the sweep where it had been greyed on 162, all
     glazed.
+
+25. **A PRICE WRITTEN TWICE, AND THE SECOND COPY WAS NOT READ AGAIN FOR FIVE
+    DAYS.** Peretz corrected two figures on 20.9 — *"kasefet - 690 · kodan
+    880"* — and `js/prices.js` took the correction that day. `exp.lock.a` had
+    them typed into its prose, in all three languages, and did not: the safe
+    lock's tile charged ₪690 under a paragraph promising ₪700. Nothing threw,
+    nothing looked wrong, and the page quoted a price the page does not
+    charge. **The same round had already built the cure and not carried it
+    across** — `g.mashkof.h` and `exp.mk.a` were moved onto `hintArgs` /
+    `expArgs` on 20.9 with the note *"the mechanism is general and costs the
+    other groups nothing"*, and four sentences that were still typing their
+    own numbers were left where they were.
+    ⚠ **NINE MILLION ASSERTIONS READ THAT SENTENCE AND NONE OF THEM READ IT.**
+    Every copy check in `units.mjs` is about SHAPE — the key exists, all three
+    languages are present, the `{n}` slots match, the paragraph is longer than
+    a stub — and shape is exactly what a stale price has. The check added
+    25.9 is shape too, which is the only kind that scales: **a price reaches
+    the copy through an argument or it does not reach it at all**, so there is
+    no second copy left to go stale. What cannot be typed cannot drift.
 
 ⚠ **And one assertion was counting PROSE.** The ironwork group asked
 `render(st).match(/data-pane/g)` — nine characters, anywhere in the emitted
@@ -2691,6 +2710,68 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE STEP EXPLAINERS, READ IN THREE LANGUAGES — AND ONE OF THEM WAS
+  QUOTING A PRICE THE PAGE DOES NOT CHARGE — 25.9.2026.** Part E of the
+  owner's review round: all eight steps and the summary walked on the live
+  page in he, en and ru, every `sect__lede`, `.sect__q`, `.sect__a` and
+  `.field__hint` dumped and read side by side. Five things were wrong and one
+  of them was money.
+
+  **1 · `exp.lock.a` said ₪700 and ₪900.** Peretz corrected both on 20.9 —
+  *"kasefet - 690 · kodan 880"* — `js/prices.js` took it the same day, and the
+  paragraph did not, in all three languages. For five days the safe lock's
+  tile charged ₪690 under a sentence promising ₪700. It is §5's subject
+  exactly, and it is now §5 item **25**, because the cure had already been
+  built that same round and not carried across: the 20.9 entry below moved
+  `g.mashkof.h` and `exp.mk.a` onto `hintArgs`/`expArgs` and says *"the
+  mechanism is general and costs the other groups nothing"*.
+
+  **2 · So every figure and every option name left the copy.** Four sections
+  carry `expArgs` now — `lock` (the two `SPECIAL_LOCKS[].delta`), `face`
+  (`STRIPE_A.h` and `.v`), `fit` and `glass` (the `SIZES.half` label) — all
+  through `formatAgorot` and `L`, the same tables the tiles beside them read.
+
+  **3 · The sidelight is not a product and `exp.glass.a` was still selling
+  it.** *"a door with a sidelight"* / *"דלת עם חלון צד"* went out on 27.8;
+  `SIZES` has held six entries with no such door since, and `side: 400` is a
+  property of the דו כנפי. A customer who read that sentence and went looking
+  found nothing to click.
+
+  **4 · And the same two sentences called the דו כנפי a דלת וחצי**, which is
+  not what any tile has said since the size was renamed. The label is
+  interpolated now, so they cannot come apart again. The disagreement
+  underneath — the name is דו כנפי, the DRAWING is a leaf and a half — is
+  `ASK-PERETZ.md` **§0g**, and two comments pointed at §0h (the size ranges)
+  instead; both fixed.
+
+  **5 · `g.mashkof.h` said the inner kant "does not show in the drawing"**,
+  sitting under a diagram that labels it. `exp.mk.a` had it right — *בציור
+  הדלת* — and the hint says the same now: the door drawing shows two of three
+  parts because the third is behind the wall; the section beside the rows
+  shows all three, because that is what a section is for.
+
+  **6 · The colour lede said a different thing in English.** Hebrew and
+  Russian: the DURABILITY is the same in every shade. English: *"the same
+  finish in every shade"* — which reads as the sheen being identical, two
+  lines above an explainer warning that the sheen is what may differ.
+
+  ⚠ **TWO NEW ASSERTIONS, BOTH ABOUT SHAPE, WHICH IS THE ONLY KIND THAT
+  SCALES.** `units.mjs`: no string in `UI` may contain a shekel figure, in any
+  language — money lives in `js/prices.js` and reaches the copy through an
+  argument or not at all. `audit.mjs`: nothing on a live step may print
+  `{0}` — the failure a `{n}` moves you to, and one `units.mjs` structurally
+  cannot see, because it asserts the three languages carry the SAME slots and
+  a dropped `expArgs` is uniform across all three. Falsified both ways: typing
+  `700 ₪` back into `exp.lock.a` fires the first on exactly that key and
+  language and turns the suite red; deleting `fit`'s `expArgs` makes the live
+  page print `{0}` to the customer and fires the second.
+
+  Re-checked while here and found TRUE: the colour explainer's *"כל הגוונים
+  באותו מחיר"* really is gone (20.9), so the claim three entries down is no
+  longer the false one it was on 30.8. `exp.mk.a`'s ₪250 and ₪500, and
+  `exp.face.a`'s ₪150 and ₪300, were all correct — being right is not a
+  property a typed number keeps, which is why they moved too.
 
 - **⚠ THE AUDIT'S "NOTHING TO ANSWER THE QUESTION WITH" CHECK WAS FAILING AT
   RANDOM, AND IT WAS THE CHECK, NOT THE PAGE — 25.9.2026.** A run reported

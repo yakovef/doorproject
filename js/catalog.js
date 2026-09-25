@@ -248,7 +248,7 @@ export const SIZES = {
      this table draws is a main leaf with a 400 mm FIXED leaf beside it — a
      דלת וחצי. If his דו כנפי is two EQUAL leaves then the drawing is wrong,
      not just the label, and that is a bigger fix than a string.
-     `ASK-PERETZ.md` §0h asks him. */
+     `ASK-PERETZ.md` §0g asks him — §0h is the size RANGES, a different question. */
   half:       { id: 'half', he: 'דו כנפי', en: 'Double', ru: 'Двустворчатая',
                 w: 950, h: 2100, side: 400, mult: 2,
                 band: { he: 'שתי כנפיים', en: 'Two leaves', ru: 'Две створки' } },
