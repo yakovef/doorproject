@@ -636,7 +636,19 @@ export const UI = {
   'send.callToo':     ['אפשר גם להתקשר —', 'Or call us —', 'Или позвоните —'],
   'send.seeReal':     ['רוצים לראות דלתות אמיתיות שהתקנו?', 'Want to see doors we have actually fitted?',
                        'Хотите посмотреть двери, которые мы уже установили?'],
-  'send.ourWorks':    ['העבודות שלנו →', 'Our work →', 'Наши работы →'],
+  /* ⚠ THE HEBREW ARROW POINTS THE OTHER WAY, AND IT HAS TO BE A DIFFERENT
+     CHARACTER RATHER THAN THE SAME ONE MIRRORED. `→` is U+2192, whose Unicode
+     `Bidi_Mirrored` property is **No** — so unlike the `‹ ›` on the way-on and
+     way-back buttons (U+2039/U+203A, which ARE mirrored and do flip correctly
+     in Hebrew, checked at 3x before this was touched) the renderer will never
+     turn it round. At the logical end of an RTL line it lands at the visual
+     LEFT still pointing right, i.e. back into its own sentence.
+     So Hebrew carries `←` (U+2190): end of the line is the visual left, and a
+     left-pointing glyph there reads onward. English and Russian are LTR and
+     keep `→` unchanged. Anything added here later that is a direction glyph
+     wants the same treatment — mirrored punctuation flips itself, arrows do
+     not. */
+  'send.ourWorks':    ['העבודות שלנו ←', 'Our work →', 'Наши работы →'],
   'copy.ok':          ['הפרטים הועתקו — הדביקו בהודעה לפרץ', 'Copied — paste it into a message to Peretz',
                        'Скопировано — вставьте в сообщение Перецу'],
   'copy.fail':        ['ההעתקה נכשלה, נסו לשלוח בוואטסאפ', 'Copying failed — try WhatsApp instead',

@@ -765,8 +765,25 @@ export const LOCKSETS = [
   /* `photo: null` — it is the drawing the Coral used to be, asked for by the
      owner from the screen rather than from a product. If a cut-out turns out
      to match it, that is A0's question and not an assumption to make here. */
-  { id: 'lever-taper', he: 'ידית מתעקלת (שם זמני)', en: 'Curved lever (provisional)',
-    ru: 'Изогнутая ручка (временное название)',
+  /* ⚠ AND THE LABEL NO LONGER SAYS "(שם זמני)" — OUR UNCERTAINTY WAS BEING
+     PRINTED ON THE SHOP FLOOR AND, WORSE, IN THE ORDER. It read
+     `ידית מתעקלת (שם זמני)` / `Curved lever (provisional)` /
+     `Изогнутая ручка (временное название)`, so a customer choosing a ₪200
+     handle was told the catalogue is unfinished — and `js/spec.js` prints the
+     label, so the WhatsApp message reached Peretz as
+     `מנעול וידית: ידית מתעקלת (שם זמני)`. An order line carrying the word
+     "provisional" is an order he cannot act on without ringing back to ask
+     which handle it is, which is the one failure `PLAN.md` §0 exists to
+     forbid. Verified before the change: `/שם זמני/.test(message(state))` was
+     true on every door carrying this lockset.
+     What the name says now is what the drawing shows and what separates it
+     from the Coral — the blade curves. That is a description, not a claim
+     about his catalogue. The open question is what PERETZ calls it, and that
+     is not a thing to print at a customer: it stays in `ASK-PERETZ.md` §1b and
+     in the note above, where the people who can answer it will find it. The
+     id is untouched and still permanent, for the reason given above. */
+  { id: 'lever-taper', he: 'ידית מתעקלת', en: 'Curved lever',
+    ru: 'Изогнутая ручка',
     style: 'levertaper', lever: true, photo: null },
 ];
 

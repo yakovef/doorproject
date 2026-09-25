@@ -69,7 +69,23 @@
      "chosen" ring nobody with poor sight can find. The tan stays where it is
      decoration; this is where it means something. */
   --accent-ink: #7E6134;
-  --wa:         #1EA95A;
+  /* ⚠ DARKENED FROM #1EA95A ON 25.9.2026, AND IT IS THE ONE TOKEN THAT MOVES
+     A COLOUR THE OWNER CHOSE — revert this line alone if he says no.
+     White on the old green measured **3.05:1** by real pixels on BOTH sends
+     (the quiet one in the wall and the green one on the summary), against the
+     4.5 that normal-size text wants. The round that found it shrank the label
+     from 16 px to 14 px instead, which does not help — smaller text needs the
+     same 4.5 — and left the note saying the real fix is "fixing `--wa` ITSELF,
+     once, for both buttons, never darkening one of them into a second green".
+     This is that fix, and there is still exactly one green.
+     Chosen by solving for the ratio rather than by eye: scaled in LINEAR light
+     until white cleared 4.5 with margin rather than landing on it, because a
+     gate met exactly is a coincidence. #148545 measures **4.70:1**.
+     ⚠ It is still a WhatsApp-recognisable green and deliberately not WhatsApp's
+     own #25D366, which carries white at about 2.2:1 — matching the brand
+     exactly would mean failing this outright. Peretz's customers are not
+     twenty, which is the half of the argument that decides it. */
+  --wa:         #148545;
   --warn:       #A4442E;
 
   --sp: 4px;
@@ -435,8 +451,26 @@ svg { direction: ltr; }
      LIE about which value is in force: it reads as "prefer x" and behaves as
      "whatever x becomes, one day, in another file". Named outright now.
      Found by grepping every `--ink-3` the moment the token was added, which is
-     the habit rather than the luck. */
-  font: 500 .8rem var(--sans); color: var(--ink-2);
+     the habit rather than the luck.
+     ⚠ AND THE 4.75:1 ABOVE WENT STALE ON 29.8.2026 AND DEFENDED THIS COLOUR
+     FOR A MONTH AFTER IT STOPPED BEING TRUE. That figure is `--ink-2` against
+     the PAPER. This control has not stood on paper since the room became a
+     photograph: it is absolutely positioned in `.stage__hud`, over the wall in
+     `assets/room*.webp`. Re-measured 25.9 by sampling the real wall pixel
+     immediately outside each button, both rooms, two door sizes:
+         chosen (`--ink`)      8.70:1  desktop and phone
+         unchosen (`--ink-2`)  2.95 / 3.00  desktop
+         unchosen (`--ink-2`)  2.37 / 2.69  PHONE, where nearly everyone is
+     Against the 4.5 that 12.8 px text wants. So the language a customer is
+     ALREADY READING was the legible one and the two they might need were the
+     ghosts — backwards, on the control this same comment twice calls "the one
+     a customer who cannot read the rest of the page needs to find".
+     ⚠ The state does not need the colour and never did: `.lang.is-on` below
+     carries it TWICE over, with 600 weight and a 2 px underline. So all three
+     take `--ink` and the chosen one stays obvious without spending the only
+     channel that was keeping the other two readable. Third stale contrast
+     figure on this one control; §6 is about exactly this. */
+  font: 500 .8rem var(--sans); color: var(--ink);
   cursor: pointer; border-radius: var(--r-pill);
   border-block-end: 2px solid transparent;
 }
@@ -643,6 +677,21 @@ svg { direction: ltr; }
   font-size: .78rem; color: var(--ink-2);
 }
 .trust__i { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ⚠ FOUR CLAIMS WRAP 3 + 1 ON A PHONE AND THE FOURTH IS LEFT CENTRED ALONE.
+   Measured at 390: the three shorter claims take the first line and
+   `שירות אישי וליווי` is orphaned under the middle of them, which reads as a
+   claim that did not fit rather than as one of a set. Two by two is the same
+   four items with no orphan, and it fits — the widest pair comes to about
+   320 px of a 390 px screen at this gap. The flex row is kept above 560,
+   where all four sit on one line and there is nothing to balance. */
+@media (max-width: 560px) {
+  .trust {
+    display: grid; grid-template-columns: repeat(2, auto);
+    justify-content: center; gap: 8px 22px;
+  }
+  .trust__i { justify-content: flex-start; }
+}
 .trust__ico {
   inline-size: 18px; block-size: 18px;
   stroke-linecap: round; stroke-linejoin: round;
@@ -2889,7 +2938,18 @@ button.spec__row:focus-visible {
   cursor: pointer;
   border: 1px solid var(--rule);
   border-radius: var(--r-tile);
-  display: grid; gap: 3px; justify-items: center;
+  /* ⚠ A COLUMN, NOT A GRID, SO THE PRICE CAN BE PINNED TO THE FOOT OF EVERY
+     TILE. As a grid of auto rows the price simply followed the name, and a
+     name that wraps to two lines pushed it down — so in a grid of options a
+     customer is comparing BY PRICE, the prices sat at different heights.
+     Measured on the size step before this change, the six tiles' price tops:
+     822 822 822 / 963 963 991 in Hebrew and 822 822 822 / 963 976 991 in
+     English — three different baselines in one row, up to 28 px apart, and
+     the two rows 131 px against 159 px tall.
+     `margin-block-start: auto` on the price is what does it, and it only
+     works in a FLEX column: in a grid each child sits in its own auto row and
+     an auto margin has no free space of its own to absorb. */
+  display: flex; flex-direction: column; gap: 3px; align-items: center;
   min-block-size: 44px;
   /* the check badge is drawn against this box */
   position: relative;
@@ -2943,7 +3003,29 @@ button.spec__row:focus-visible {
 .glyph__dim { font-family: var(--mono); }
 
 .tile__name { font-size: .78rem; line-height: 1.2; }
-.tile__meta { font-family: var(--mono); font-size: .62rem; color: var(--ink-2); }
+/* ⚠ THE SANS WITH TABULAR FIGURES, NOT `--mono`, AND THE PRICE IS PINNED TO
+   THE FOOT OF THE TILE. Three things were wrong with one declaration.
+   · `--mono` is `ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas,
+     monospace` and NOT ONE of those faces carries Hebrew, so `כלול` was drawn
+     by whatever last-resort face the machine had while the `+₪200` beside it
+     came from the monospace one — one line, two typefaces. This is one of the
+     four slots §9 names, and the argument it makes for leaving them alone
+     ("their Latin content is figures, and tabular figures are what the token
+     is spent on") does not survive contact with the tile: `.tile__band` sits
+     DIRECTLY ABOVE this line in the same tile and is already the sans with
+     `font-variant-numeric: tabular-nums`. So the token was buying nothing here
+     that its neighbour was not already getting without it, and was costing the
+     Hebrew. Tabular figures are kept, by the same declaration the band uses.
+   · .62rem is 9.92 px. That is the price a customer is choosing on, at under
+     ten pixels, on a phone. .72rem is 11.5 px and matches the band's optical
+     size instead of undercutting it.
+   · `margin-block-start: auto` is what pins it to the bottom of the flex
+     column — see the note on `.tile`. */
+.tile__meta {
+  font-size: .72rem; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  margin-block-start: auto;
+}
 /* ⚠ ONE LINE, AND NOT RED. `דורש חלון` was `--warn` at three wrapped lines,
    which did two things to a grid of tiles: it made the reason the LOUDEST
    colour on a page whose accent is tan, and it doubled the height of the tiles
@@ -3380,6 +3462,35 @@ html.is-live.is-untouched .wa__ask { display: inline; }
    of three. Written here rather than up with the rest of `.quote__next` for
    exactly the reason the display rule is here: after, not before. */
 .quote__next { flex: 0 0 auto; }
+
+/* ⚠ AND BELOW 1100 THE FOOT'S WAY ON IS A SECOND COPY OF THE BAR'S, WHICH IS
+   WHAT THE RULE ABOVE HAS BEEN ARRANGING SINCE 29.8 WITHOUT ANYBODY HIDING THE
+   FIRST ONE. `.quote__next` is `display: none` above 1100 and shown below it,
+   because down there the foot is below the fold and the way on has to be in
+   the bar under the thumb. The foot's own `.sect__next` was never taken away,
+   so both render — and the moment a customer scrolls to the end of a step,
+   which is exactly what choosing an option leads to, they are looking at TWO
+   identical black pills with the identical label.
+   Measured before this line, scrolled to the foot, on the fit, pz and mk
+   steps: 320x568 two, 390x844 two, 430x932 two, 834x1112 two — 138 to 164 px
+   apart. Above 1100 there was correctly only ever one.
+   ⚠ It is `display: none` rather than `visibility: hidden` for two reasons:
+   the foot is a flex row and a hidden-but-present button would hold its gap
+   open beside the way back, and every instrument here finds the live control
+   with `.filter(x => x.offsetParent !== null)`, which only `display` answers.
+   The bar's copy comes FIRST in document order, so those filters keep finding
+   a way on and keep finding the right one. */
+@media (max-width: 1099px) {
+  .sect__foot .sect__next { display: none; }
+  /* ⚠ AND THE WAY BACK THEN TAKES THE ROW, or the foot reads as a row whose
+     main control is missing. With the duplicate gone the foot holds exactly
+     one button below 1100 — the skip is desktop-only and the summary's send
+     sits in the bar down here — so a `flex: 0 0 auto` pill left a lone ghost
+     against one edge under a full-width rule, which looks like a layout that
+     failed rather than like the way back. Filling the row is the same button
+     saying the same thing and reading as a decision. */
+  .sect__foot .sect__back { flex: 1 1 auto; }
+}
 
 /* ⚠ AND ON A DESKTOP THE FOOT IS PINNED TO THE BOTTOM OF THE CARD, because it
    was falling off the bottom of the screen. Measured at 1440x900 on the
