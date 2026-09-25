@@ -339,7 +339,7 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **9,085,342 / 0** (25.9.2026; 11,809,879 on 23.9 — the drop is
+- `npm test` — **9,085,344 / 0** (25.9.2026; 11,809,879 on 23.9 — the drop is
   the buildable sweeps shrinking, see §0b 24.9). ⚠ A CHANGE IN THIS
   NUMBER IS NOT EVIDENCE OF ANYTHING; it is the product of the catalogue's list
   lengths. Read the failure count. (This line said **5,403,239** for two rounds
@@ -2710,6 +2710,68 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE CURVED LEVER IS TURNED 8° UP ABOUT ITS SPINDLE, AND ITS SHAPE DID
+  NOT MOVE — 25.9.2026.** The owner's son on the version below: *"Now the
+  shape is right, but you need to rotate it a little bit up so it will be more
+  Horizontal looking."*
+  · **What changed:** one new constant, `TAPER_TILT = 8`, and one helper,
+    `taperAt`, in `js/renderer.js`. The helper rotates every point of the
+    blade about the spindle, and both readers use it: `leverTaper` on the door
+    and `FITTING_GLYPH.levertaper` on the tile.
+  · **What did not:** the four shape constants (drop 30, neck 16, point 4,
+    reach 0.85). The rose is drawn unturned at the spindle, so it stays where
+    it was.
+  · **The numbers:** the line from neck to tip fell **15.4°** and now falls
+    **7.4°**. The tip hung 30 mm below the spindle and now hangs about 14.5.
+    The neck leaves the rose rising a little, and the curl at the tip does the
+    falling. 8° is about half the old fall, which is "a little bit" read as a
+    number.
+  · **Why not an SVG `transform`:** the rotation is applied to the path's
+    points. §7 records that `getBBox` rounds a rotated group up, and the
+    footprint sweep measures this fitting with it.
+  · **The comment it overturns:** the note inside `leverTaper` said *"the
+    sweep is in the CENTRELINE rather than in a rotation: rotating the whole
+    fitting would lift the rosette off the spindle"*. That is true only of a
+    rotation about any point other than the spindle, which is what the
+    Coral's old droop was. The note now says so.
+
+  **Footprint:** drawn at 30/116/30 against a declared 40/118/51, still
+  inside (`npm run collide -- boxes`). The tip reaches 4 mm further inboard
+  than before.
+
+  **Asserted.** The scythe clause in `npm test` is restated so the SHAPE is
+  measured in a frame no rotation can move, and the TURN is measured
+  separately:
+  · `depth` is the true thickness (`hypot`), not the vertical height;
+  · `bend` is how far the blade's middle stands off the neck-to-tip line. It
+    must be positive (the blade curls down) and more than 0.055 of that line's
+    length. Today it is 0.064; a 22 mm drop would give 0.048;
+  · the neck rises, and the neck-to-tip line falls less than 10°.
+
+  Two clauses measured the curve and the turn as one number: *"the tip sweeps
+  more than half the neck's depth"* and *"the drop is more than 0.25 of the
+  reach"*. The `bend` clauses replace them; nothing else was deleted.
+
+  **Falsified** on a scratch copy of the test's own expressions:
+  · last night's lever, unturned, fails *neck rises* and *under 10°*;
+  · flattening the curve instead (drop 15) fails *more curved*;
+  · the morning's climbing sign fails *bends down*;
+  · a straight slope fails the bend and curl clauses.
+
+  **The rule the pair enforces:** a chord that flattens while the bend holds
+  is a rotation. A chord that flattens because the bend went is the shape he
+  called right, taken away.
+
+  ⚠ **Still no photograph of this product**, and `ASK-PERETZ` §1b still asks
+  for its name.
+
+  **Gates:** `npm test` **9,085,344 / 0** after the sheets; `npm run audit`
+  found **no faults** at eight viewports.
+
+  **Sheets:** **0 of 48 bare and 0 lockset sheets moved**, as predicted,
+  because no comparison fixture carries the curved lever. 9 of the 12 `shot`
+  sheets moved, which proves nothing (§7).
 
 - **⚠ THE STEP EXPLAINERS, READ IN THREE LANGUAGES — AND ONE OF THEM WAS
   QUOTING A PRICE THE PAGE DOES NOT CHARGE — 25.9.2026.** Part E of the

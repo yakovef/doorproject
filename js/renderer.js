@@ -911,15 +911,38 @@ const LEVER_BLADE  = Math.round(LEVER_ROSETTE * 2 * 0.377);
    of the reach → 0.28), and the neck 28 → 32 deep (1.22 → 1.39 of the
    Coral's blade). The 25.9 morning version climbed 22 on a 28 neck. Still his
    words, still no photograph. */
+/* ⚠ AND IT IS TURNED UP 8 DEGREES, SINCE LATER STILL — *"Now the shape is
+   right, but you need to rotate it a little bit up so it will be more
+   Horizontal looking."* So the four constants above do not move; the whole
+   blade is ROTATED about the spindle, which is the one point a rotation can
+   turn about without taking the rose off it. Hanging as drawn, the line from
+   the neck to the tip fell 15.4 degrees (30 over 109) and read as a drooping
+   lever; turned up 8 it falls about 7.4 and the tip hangs about 14.5 below
+   the spindle, where it hung 30 — the neck now leaves the rose rising a
+   little and the curl at the tip does the falling. 8 is about half the old
+   fall, which is "a little bit" read as a number, and it is this one
+   constant. The rotation is applied to the POINTS by taperAt, never as an
+   SVG transform, because a browser's getBBox rounds a rotated group up
+   (CLAUDE.md §7) and the footprint sweep measures this fitting with it. */
 const TAPER_REACH_F  = 0.85;  // a bit shorter than the Coral
 const TAPER_DROP     = 30;    // how far the tip hangs below the spindle, as the square of the reach
 const TAPER_HALF_NECK = 16;   // half-depth where it leaves the rose (the Coral's is 11.5) …
 const TAPER_HALF_CAP  = 4;    // … and at the point
+const TAPER_TILT     = 8;     // degrees the whole blade is turned UP about the spindle
 const taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
 /* Positive is DOWN in the drawing's y. */
 const taperMid   = (t, L) => TAPER_DROP * (t / L) ** 2;
 const taperHalf  = (t, L) =>
   TAPER_HALF_CAP + (TAPER_HALF_NECK - TAPER_HALF_CAP) * (1 - Math.min(1, t / L)) ** 2;
+/* A point `t` along the reach and `s` half-depths off the centreline, turned
+   UP by TAPER_TILT about the spindle: [how far along, how far down]. A true
+   rotation, not a shear, so the shape the owner's son called right is the
+   shape that is drawn, only turned. */
+const taperAt = (t, s, L) => {
+  const u = t, v = taperMid(t, L) + s * taperHalf(t, L);
+  const a = TAPER_TILT * Math.PI / 180, c = Math.cos(a), n = Math.sin(a);
+  return [u * c + v * n, v * c - u * n];
+};
 /* One outline, two readers — the door and the tile — so the blade on the tile
    cannot drift from the blade on the door. `pt(t, s)` places a point `t` along
    the reach at `s` half-depths off the centreline; the band between `s0` and
@@ -9325,8 +9348,9 @@ function lever(cx, cy, dir) {
 }
 
 /**
- * The curved lever — a SCYTHE since 25.9.2026, and one that HANGS DOWN since
- * later that day (see TAPER_DROP for both sets of words and the constants).
+ * The curved lever — a SCYTHE since 25.9.2026, one that HANGS DOWN since
+ * later that day, and TURNED UP 8 degrees about its spindle later still (see
+ * TAPER_DROP and TAPER_TILT for all three sets of words and the constants).
  * It began as the shape the Coral was drawn as until
  * 14.9.2026, kept because Peretz recognised it as a product of its own:
  * *"the one thats there right now with the curve, add it as a different
@@ -9342,11 +9366,16 @@ function lever(cx, cy, dir) {
  */
 function leverTaper(cx, cy, dir) {
   const L = taperReach();
-  const at = t => cx + dir * t;
-  /* The sweep is in the CENTRELINE rather than in a rotation: rotating the
-     whole fitting would lift the rosette off the spindle it turns, which is
-     the mistake the droop on the Coral was. */
-  const pt = (t, s) => `${at(t).toFixed(1)} ${(cy + taperMid(t, L) + s * taperHalf(t, L)).toFixed(1)}`;
+  /* The sweep is in the CENTRELINE, and the tilt is a rotation about the
+     SPINDLE itself, so the rosette — drawn unturned at (cx, cy) — cannot
+     leave the spindle it turns. What this note used to warn against is a
+     rotation about any other point, which is the mistake the droop on the
+     Coral was. `dir` mirrors the along-reach coordinate, and a mirrored turn
+     upward is still a turn upward. */
+  const pt = (t, s) => {
+    const [u, v] = taperAt(t, s, L);
+    return `${(cx + dir * u).toFixed(1)} ${(cy + v).toFixed(1)}`;
+  };
   const body = taperBand(pt, L);
   return `
     <g data-kind="lever">
@@ -9884,9 +9913,14 @@ const FITTING_GLYPH = {
      tapers" cannot become true of one of them and not the other. */
   levertaper: () => {
     const L = taperReach();
-    const pt = (t, s) => `${(-t).toFixed(1)} ${(taperMid(t, L) + s * taperHalf(t, L)).toFixed(1)}`;
+    const pt = (t, s) => {
+      const [u, v] = taperAt(t, s, L);
+      return `${(-u).toFixed(1)} ${v.toFixed(1)}`;
+    };
+    /* The box's foot is the turned tip's lowest edge or the rose, whichever
+       hangs further — asked of taperAt, so it follows the tilt. */
     return { box: [-(L + 16), -(LEVER_ROSETTE + 12), LEVER_ROSETTE + 12,
-                   Math.max(LEVER_ROSETTE, TAPER_DROP + TAPER_HALF_CAP) + 12], art: `
+                   Math.max(LEVER_ROSETTE, taperAt(L, 1, L)[1]) + 12], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
     <path d="${taperBand(pt, L)}"/>` };
   },

@@ -3191,8 +3191,13 @@ group('the second review\'s night round — 25.9.2026');
     const top = P.slice(0, n), bot = P.slice(n + 2).reverse();
     ok(Number.isInteger(n) && n > 4 && top.length === bot.length,
        `the curved lever's outline is not the sampled band it should be (${P.length} points)`);
-    const depth = i => bot[i][1] - top[i][1];
+    /* The TRUE thickness across the blade rather than its vertical height:
+       since the blade is turned up about its spindle, top and bottom points
+       of one station no longer share an x, and a vertical reading would
+       measure the turn as well as the shape. */
+    const depth = i => Math.hypot(bot[i][0] - top[i][0], bot[i][1] - top[i][1]);
     const mid = i => (bot[i][1] + top[i][1]) / 2;
+    const C = i => [(bot[i][0] + top[i][0]) / 2, (bot[i][1] + top[i][1]) / 2];
     const last = n - 1, half = Math.floor(last / 2);
     const reach = Math.abs(top[last][0]);
     const coralReach = Number(/width="([\d.]+)"\s+height="[\d.]+" rx/.exec(coral)[1]);
@@ -3209,9 +3214,28 @@ group('the second review\'s night round — 25.9.2026');
        the Coral's blade. */
     const sweep = mid(last) - mid(0), early = mid(half) - mid(0);
     ok(sweep > 0, `the curved lever's tip is ${(-sweep).toFixed(1)} ABOVE its neck — it curves downwards, not up`);
-    ok(sweep > depth(0) * 0.5, `the curved lever's tip sweeps ${sweep.toFixed(1)} — it is not curved`);
-    ok(sweep > reach * 0.25, `the curved lever drops ${sweep.toFixed(1)} over a ${reach} reach — it should be a little more curved than 0.20 of it`);
     ok(early < sweep * 0.4, 'the curved lever bends in a straight line — the curl belongs at the tip');
+    /* And later still: "Now the shape is right, but you need to rotate it a
+       little bit up so it will be more Horizontal looking." So the SHAPE is
+       asked in a frame no turn can move — how far the middle of the blade
+       stands off the straight line from its neck to its tip, positive when it
+       stands ABOVE that line, which is what a blade that curls down at the
+       tip does — and the TURN is asked separately. A bend held while the
+       chord flattens is a rotation; a chord that flattens because the bend
+       went is the shape the owner's son said was right, taken away.
+       (These replace "the tip sweeps more than half the neck's depth" and
+       "the drop is more than 0.25 of the reach", which measured the curve
+       and the turn as one number; hung square, the shape reads 0.064 of its
+       chord, and a 22 drop — the morning's sweep — reads 0.048.) */
+    const [x0, y0] = C(0), [xm, ym] = C(half), [x1, y1] = C(last);
+    const chord = Math.hypot(x1 - x0, y1 - y0);
+    const bend = (y0 + (y1 - y0) * (xm - x0) / (x1 - x0) - ym) * Math.abs(x1 - x0) / chord;
+    ok(bend > 0, `the middle of the curved lever stands ${(-bend).toFixed(1)} BELOW the line from its neck to its tip — it curves up, not down`);
+    ok(bend > chord * 0.055,
+       `the curved lever bends ${(bend / chord).toFixed(3)} of its chord — it should be a little more curved than 0.048`);
+    const fall = Math.atan2(y1 - y0, Math.abs(x1 - x0)) * 180 / Math.PI;
+    ok(C(1)[1] < C(0)[1], 'the curved lever leaves its rose falling — it should be turned up a little, so the neck rises');
+    ok(fall < 10, `the line from the curved lever's neck to its tip falls ${fall.toFixed(1)} degrees — it should be turned up to read more horizontal (it fell 15.4)`);
     const coralBlade = Number(/height="([\d.]+)" rx/.exec(coral)[1]);
     ok(depth(0) >= coralBlade * 1.35,
        `the curved lever is ${depth(0).toFixed(1)} deep at the neck against the Coral's ${coralBlade} — it should start a little wider`);
