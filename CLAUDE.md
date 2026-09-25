@@ -2663,15 +2663,29 @@ complete and its findings live here:
 
 ### Wanted next, and named so it is not forgotten
 
-- **⚠ THREE MORE SLOTS STILL SET HEBREW IN `--mono`, WHICH HAS NO HEBREW IN
-  IT.** `.swatch__meta`, `.tile__why` and `.sheet__dims`. ⚠ **This said FOUR
-  and `.tile__meta` came out on 25.9.2026**, and the reason is the one the
-  paragraph below could not have: `.tile__band` sits DIRECTLY above it in the
-  same tile and is already the sans with `tabular-nums`, so the token was
-  buying that slot nothing its own neighbour was not already getting, while
-  costing it the Hebrew — `כלול` from a last-resort face beside a `+₪200` from
-  the monospace one, at 9.92 px. The three below are not in that position and
-  the trade there is still the one argued for. The
+- **⚠ TWO MORE SLOTS STILL SET HEBREW IN `--mono`, WHICH HAS NO HEBREW IN
+  IT.** `.swatch__meta` and `.sheet__dims`. ⚠ **This said FOUR, and two came
+  out on 25.9.2026 for two DIFFERENT reasons** — which is what makes the
+  argument below sound for the two that are left rather than merely inherited.
+  `.tile__meta` went because the tile already had the figures without it: the
+  element emitted directly above it is `.tile__band` on a size tile and
+  `.tile__name` on every other, both the sans, and `.tile__band` already
+  carries `tabular-nums` at the same `--ink-2` — so the token bought that slot
+  nothing its own neighbour was not already getting, while costing it the
+  Hebrew (`כלול` from a last-resort face beside a `+₪200` from the monospace
+  one, at 9.92 px). **`.tile__why` went because it has no figures at all**: it
+  receives only `blocked[id]`, which is only ever a `why.*` string, and **78 of
+  78 of those — 26 reasons in three languages — contain no digit.** It was
+  paying the Hebrew for figures that do not exist, and measured at its own
+  9.6 px all 78 come out NARROWER in the sans and none wider, mean −44 px,
+  worst case `why.setOwnWindow` in English 323.5 → 220.5 — which is the
+  cheapest thing that has ever been aimed at the `Needs a w…` clipping this
+  section records below. The two that remain really do hold figures — a RAL
+  code and a dimension in millimetres — so the trade there is the one argued
+  for, and it is now argued about the right two. (`.swatch__code`,
+  `.glyph__dim`, `.send__code b` and `.sheet__code` also take the token and
+  never appear on this list: they are Latin and numerals with no Hebrew in
+  them, which is what `--mono` is for.) The
   fault is the one §0b records for the eyebrow on 5.9: the token is
   `ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, monospace`, none of
   those faces carries the script, and Chromium resolves a face per glyph — so
@@ -2869,14 +2883,14 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
-- **⚠ THE CRUELTY SWEEP — TWELVE DETAILS, AND SIX OF MY OWN FINDINGS KILLED BY
-  MEASURING THEM — 25.9.2026.** Asked for from outside in those words: *"i want
+- **⚠ THE CRUELTY SWEEP — THIRTEEN DETAILS, AND SIX OF MY OWN FINDINGS KILLED
+  BY MEASURING THEM — 25.9.2026.** Asked for from outside in those words: *"i want
   you to critisize the app, everything that you see that you think is bad or can
   be made better… and the sweep is not only for bad things, it can be things
   that are just out of place, or if you think some icon is not good enough. i
   want you to be cruel to the app. the devil is in the details."* Run as
-  measure → fix → re-measure → sweep again. Two rounds, two commits. **No price,
-  no id, no list order, no bit, no `VERSION`** in either.
+  measure → fix → re-measure → sweep again, three times. **No price, no id, no
+  list order, no bit, no `VERSION`** in any of them.
 
   **⚠ THE HEADLINE IS ONE CHARACTER, AND IT IS THE THIRD TIME.** `.sect__q::after`
   was `content: "⌄"` — U+2304 DOWN ARROWHEAD, the one affordance saying a step's
@@ -3018,6 +3032,21 @@ how it got there. Detail lives in the section it belongs to.
   glyphs in it, and a probe compositing `background-color` over a
   `background-image`. Four wrong claims before the right one, on one control,
   and the right one was still a real fault.
+
+  **⚠ AND THE FOURTH `--mono` SLOT CAME OUT TOO, FOR A DIFFERENT REASON FROM
+  THE THIRD.** `.tile__meta` went because the tile already had its figures
+  without the token. `.tile__why` went because **it has no figures at all**:
+  it receives only `blocked[id]`, which is only ever a `why.*` string, and 78
+  of 78 of those — 26 reasons in three languages — contain no digit. §9 keeps
+  the remaining slots on the ground that their Latin content is figures and
+  tabular figures are what the token is spent on; that argument simply never
+  covered this one, which was paying the Hebrew for figures that do not exist.
+  ⚠ And it pays back on the axis §9 has been complaining about: measured at
+  the rule's own 9.6 px, **all 78 come out NARROWER in the sans and none
+  wider, mean −44 px**, worst case `why.setOwnWindow` in English 323.5 →
+  220.5 — against a §9 entry that records twelve English grille tiles clipping
+  `Needs a window` to `Needs a w…` for want of 20 px. Two slots left, both
+  genuinely holding figures.
 
   ⚠ **AND WHAT I MEASURED AND DID NOT FIX IS IN §9**, because in each case the
   number is the contribution and a redraw by eye is what §6 is about: the

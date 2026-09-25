@@ -3067,8 +3067,25 @@ button.spec__row:focus-visible {
    is still clickable: tapping it repairs the conflict rather than refusing.
    So the reason is stated the way a caption is — one line, ellipsised, in the
    secondary ink — and the ROW keeps its shape. */
+/* ⚠ NOT `--mono`, AND THIS SLOT IS THE ONE §9's ARGUMENT NEVER COVERED.
+   That section keeps three captions in the monospace token — which carries no
+   Hebrew, so Chromium draws the Hebrew from a last-resort face and the Latin
+   from the mono one, two typefaces on one line — on the ground that their
+   Latin content is FIGURES, and tabular figures are what the token is spent
+   on. True of `.swatch__meta` (a RAL code) and `.sheet__dims` (millimetres).
+   Not true here: this slot receives `blocked[id]`, which is only ever a
+   `why.*` string, and **78 of 78 of those — 26 reasons in three languages —
+   contain no digit at all.** It was paying the Hebrew for figures that do not
+   exist.
+   ⚠ And it pays back on the other axis too, which is why it is worth doing
+   rather than merely correct: measured at this rule's own 9.6px, ALL 78 get
+   narrower in the sans and NONE wider, mean −44 px, worst case
+   `why.setOwnWindow` in English 323.5 → 220.5. §9 records twelve English
+   grille tiles clipping `Needs a window` to `Needs a w…` because this element
+   wants 20 px more than it gets; a third off every reason is the cheapest
+   thing that has ever been aimed at it. */
 .tile__why {
-  font-family: var(--mono); font-size: .6rem; color: var(--ink-2);
+  font-size: .6rem; color: var(--ink-2);
   inline-size: 100%;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
