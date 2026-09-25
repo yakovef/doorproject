@@ -339,8 +339,8 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **9,769,450 / 0** (24.9.2026; 11,809,879 on 23.9 — the drop is
-  the buildable sweeps shrinking, see §0b). ⚠ A CHANGE IN THIS
+- `npm test` — **9,085,339 / 0** (25.9.2026; 11,809,879 on 23.9 — the drop is
+  the buildable sweeps shrinking, see §0b 24.9). ⚠ A CHANGE IN THIS
   NUMBER IS NOT EVIDENCE OF ANYTHING; it is the product of the catalogue's list
   lengths. Read the failure count. (This line said **5,403,239** for two rounds
   after the stripe rework cut fourteen `DETAILS` entries, and then **4,349,768**
@@ -361,7 +361,8 @@ walk, and walking it means grepping for each one, not remembering it.
   hit-tests its two ends, in three languages, at five widths of its own
   including the 360 and 375 that `VIEWS` has never visited.
 - `npm run collide` — clean on `all` (1,110 designs, 20.9) and `boxes`.
-- `npm run latency` — **138 ms** against a 600 ms gate (70 on the default
+- `npm run latency` — **215 ms** against a 600 ms gate (25.9: a door-and-a-half
+  now draws the Greek set twice; it read 138 on 23.9) (70 on the default
   door; the worst is a half door with a strip light and quatrefoil, 658
   elements). Re-read 23.9; it said 226 through the rounds that halved it.
 - `npm run profile` — **all four rows green.** See below; this is not
@@ -495,7 +496,7 @@ copied here. `git show origin/claude/app-design-mockup-review-qt00n6:<file>`.
   nearest real one.
 - **The short code stores INDICES**, which no alias can rescue. Any change to
   the option ORDER or the bit layout requires a `VERSION` bump in
-  `js/url-state.js` (**23** as of 20.9), so an old code is *refused with a
+  `js/url-state.js` (**24** as of 25.9), so an old code is *refused with a
   notice* rather than decoded into a different door. **Appending to the end of
   a list costs no bump. Changing a property — not the id, not the order —
   costs no bump.**
@@ -2398,7 +2399,7 @@ the same list in Hebrew, shorter, for him to answer.
 | A1 | ~~`sidelight` is priced ×2~~ — **settled 27.8**: the size is withdrawn | — |
 | A2 | `98 × 203` is the OPENING, not the leaf | every size's drawn dimensions |
 | A3 | The size multiplier applies to the mashkof's total *including* its width extras | one expression in `priceParts` |
-| A4 | `rings` survives — he named three grilles to remove and this was not one | one alias |
+| A4 | ~~`rings` survives~~ — **closed 25.9**: *"remove the 'scrolled ring lattice' pattern on windows"*. It resolves to `circles` | — |
 | A5 | `knobplate` is a "circle" at +₪200 | one number |
 | A6 | The widened mashkof is 60 mm outside / 300 mm inside | two numbers in `MASHKOF_PARTS` |
 | A7 | The peephole and security latch are standard on every door — **the עינית is now a CHOICE priced at ₪0 on the strength of this**, so it is louder than it was | one number in `prices.js`, and whether the tile says כלול |
@@ -2559,7 +2560,7 @@ complete and its findings live here:
 - **The classical set's two remaining differences, recorded rather than
   guessed at.** Photo beside ours at 4x, after five rounds: (a) our cornice's
   UNDERSIDE is a flat plank shadow where his has a stepped bed mould, and
-  (b) the `rings` grille reads coarser than the photograph's — fewer, bigger
+  (b) ~~the `rings` grille~~ — withdrawn 25.9.2026, so this half is moot; it read coarser than the photograph's — fewer, bigger
   rings. Neither has been measured properly. Everything else on that door now
   matches within the instrument's error.
 
@@ -2675,6 +2676,114 @@ This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
+- **⚠ THE NIGHT ROUND — THE IDAN FITS BESIDE THE GREEK SET, THE RING LATTICE
+  IS GONE, A DOOR-AND-A-HALF CARRIES THE SET ON BOTH LEAVES, AND THE CURVED
+  LEVER IS A SCYTHE — 25.9.2026.** Four notes from the owner's son, left
+  overnight to be done without questions. `VERSION` 23 → 24.
+
+  **1 · *"even with the greek set there should be still enough space at least
+  for idan handle. either just fit it, or change the greek set or the pull
+  handle. in the end it need to fit."*** He was right that it was close.
+  Measured on 24.9: the only piece of the set at hand height that reaches
+  into the lock stile is the SHELF'S CAP. It spans 0.176–0.824 of the leaf,
+  overhanging its brackets by 0.034, which is 150 mm from the lock edge on a
+  standard leaf. The Idan beside the cylinder stands to 167.
+  · **Changed:** the Greek set. The cap now overhangs its brackets by
+    `CLASSIC_CORBEL.gap` (0.006, the same gap the brackets stand off the
+    band), so it spans 0.204–0.796, 174 mm from the lock edge on a standard
+    leaf. Every other piece is untouched, and the measured 0.648 is written
+    beside it.
+  · ⚠ **A Nitzan then missed by 0.4 mm**, which is a coincidence rather than
+    a limit. So `spawnSpots` gained one last upright rung,
+    `floorRung`: the bar at hand height at `standoffFloor`, the tightest gap
+    anyone installs (`BAR_GAP_MIN`, measured). It is the same arithmetic as
+    `gripStandoff`'s floor, now one function with two readers. At the floor
+    the Nitzan clears the cap by 4.6 mm. `spawnIndexOf` numbers the new rung
+    after the flat ones, so no existing index moves.
+  · **Result:** every Idan and Nitzan at every length, and the bow, fits
+    beside the Greek set on all six sizes, glazed or solid. The Idan stands
+    exactly where it did (x 149 solid, 145 glazed, standard leaf).
+    `npm test` asserts all of it. The 24.9 clause *"some bar is refused for
+    the panels"* is restated, not deleted: its job, proving the whole-grip
+    check still has a subject, now falls on a count of rungs on worked faces
+    turned away for crossing a frame.
+
+  **2 · *"remove the 'scrolled ring lattice' pattern on windows."*** `rings`
+  (טבעות ותלתלים) leaves `GRILLES`.
+  · Its id and the three it had inherited (`mesh`, `lattice`, `reeded`) alias
+    onto `circles`, the etched cousin.
+  · ⚠ An old link's price moves ₪0 → ₪700 through that alias. Nothing is
+    deployed, so no customer holds one.
+  · Its drawing is deleted and its measurement stays as prose over
+    `grillePaths`.
+  · The removal is mid-list, so `arch-light` and `deco-light` moved:
+    `VERSION` 24.
+
+  **3 · *"on the door and a half part, the half door has its own greek set if
+  a person chooses the greek set. its just shrinked down. and always the
+  windows are at the same height and are the same height."*** The fixed leaf
+  used to take the plain square window and its lower panel at the catalogue
+  rectangle's height, beside a main leaf whose light the set places at its
+  own rows: two windows at two heights.
+  · **What it draws now:** `classicSet` on the fixed leaf too, after its own
+    pane. Columns are fractions of width, so the set is narrowed; rows are
+    fractions of height, which both leaves share, so the two lights line up
+    top and bottom by construction.
+  · **The pane's rectangle:** `classicFixedLight`, which takes `winFrac`
+    straight. `apertureLayout`'s clamp protects a lock stile, and a fixed leaf
+    has no lock; on 350 mm the clamp would squeeze the light to nothing.
+  · **Ids:** every key in the set takes a `side` suffix, so the second copy
+    duplicates no id (§5.13).
+  · **Price and ironwork:** unchanged. The second pane was already one of
+    `glazedPanels`, and the ironwork is drawn at the main pane's width.
+  · **Other windows:** measured and already consistent. All 27 glazed
+    door-and-a-half states share top and height across the two leaves.
+    Asserted, beside no-duplicate-ids and a set on both leaves.
+
+  **4 · *"i would like you to fix the curved lever. it looks more like a
+  scythe, just shorter and becomes narrower faster, it is a bit shorter than
+  the coral lever."*** `leverTaper` was a straight wedge on a straight slope:
+  40 deep closing linearly to 26, rising 13 in a line, and thicker than the
+  Coral everywhere.
+  · **Sweep:** the centreline now climbs as the square of the distance, 22 at
+    the tip, so the curl is at the tip.
+  · **Depth:** it falls as the square of what is left, from 28 at the neck to
+    8 at a rounded point. It is past half its narrowing by the middle.
+  · **Reach:** 0.85 of the Coral's, as before.
+  · **One outline:** `taperBand` is read by the door and by the tile.
+  · **Asserted off the tile's outline:** shorter than the Coral but not a
+    stub; a point under 0.4 of the neck; past half its narrowing at the
+    middle; a real sweep, with the curl at the tip.
+  · ⚠ **Still no photograph of this product**, so these are his words turned
+    into geometry; `ASK-PERETZ` §1b still asks for its name.
+
+  **Falsified, each by putting its old behaviour back:**
+  · the cap at 0.176 fails the Idan beside the set;
+  · no floor rung fails the Nitzan on the standard leaf;
+  · the fixed leaf without the set fails both-leaves and the window heights
+    (`half/classic/rect` printed 789/902 against 920/763);
+  · the old wedge fails the scythe's point.
+
+  **Gates:**
+  · `npm test` **9,085,339 / 0** after the sheets;
+  · `npm run collide -- all` clean over 1,094 designs;
+  · `-- boxes`: every fitting inside its declaration, with the scythe drawn
+    at 30/112/30 against a declared 40/118/51;
+  · `npm run fuzz`: 30,000 designs and 1,800 clicks clean;
+  · `npm run latency`: worst 215 ms against 600. It read 138 on 23.9: a
+    door-and-a-half now draws the set twice.
+
+  **Sheets:** **not one bare sheet moved**, and that is right. No comparison
+  fixture carries the Greek set, the ring pattern or the curved lever;
+  `corpus-links.md` moved because its links now say `v=24`.
+  ⚠ **`npm run audit` found its own toast check dead**, eight times, once
+  per viewport, through its §5.15 clause: since 24.9 the window's repair says
+  one sentence. I re-aimed it, then found on rebasing that the recurring agent
+  had re-aimed the same check hours earlier (`13a5485`, the entry below), at
+  a bar plus bell plus peephole, then the square window. Theirs is kept, being
+  already verified, and mine was dropped. Before the rebase, with mine,
+  `npm run audit` reported **no faults** at all eight viewports.
+
 - **⚠ THE THREE-PANEL FACE RE-MEASURED OFF AN INSTALLED DOOR, AND THE BOW
   NOW HANGS BELOW THE LEVER — 24.9.2026.** Sent in beside a screenshot of
   ours: *"our panel proportions are not so great, please fix them, you can see
@@ -2756,8 +2865,9 @@ how it got there. Detail lives in the section it belongs to.
   · 976 lever swaps;
   · 720 refused for the face.
 
-  ⚠ **The Greek set cannot take a stock-length bar beside it on four of six
-  sizes, even with the cylinder:** its shelf's cap reaches within 150 mm of
+  ⚠ **SUPERSEDED 25.9.2026 — the Greek set now takes every bar on every size;
+  see the entry above.** As it stood on 24.9: **The Greek set cannot take a
+  stock-length bar beside it on four of six sizes, even with the cylinder:** its shelf's cap reaches within 150 mm of
   the lock edge, and on the standard leaf the Idan misses by 8 mm. The tile
   greys with *"the panels are in the way, and they stay"*. Shorter bars fit,
   placed higher. The face tile does NOT yet warn in advance when choosing the

@@ -213,11 +213,10 @@ export const GRILLE = {
   /* Worked GLASS rather than ironwork — etched into the pane, bought from a
      different supplier. Priced together here only because they are the same
      row on the customer's screen. */
-  /* `mesh` (זכוכית מעוצבת) is WITHDRAWN, 27.8.2026, at the owner's request.
-     Its key goes with it — `catalog.js` asserts every priced key names a
-     live entry — and its ids resolve to `rings`, the surviving worked
-     glass at the same money. */
-  rings:        0,   // טבעות ותלתלים — see the note above about why it stays
+  /* `mesh` (זכוכית מעוצבת) is WITHDRAWN, 27.8.2026, and `rings` (טבעות
+     ותלתלים) on 25.9.2026, both at the owner's request. Their keys go with
+     them — `catalog.js` asserts every priced key names a live entry — and
+     their ids resolve to `circles`. */
 };
 
 /* ── the face ─────────────────────────────────────────────────────────

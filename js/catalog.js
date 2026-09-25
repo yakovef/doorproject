@@ -1166,6 +1166,9 @@ export const GRILLES = [
   { id: 'deco',    he: 'קווים גיאומטריים', en: 'Art-deco lines', ru: 'Геометрические линии', doors: ['d123'] },
   /* Worked GLASS. In the pane, not on it. */
   { id: 'circles', he: 'עיגולים שזורים', en: 'Interlocking rings', ru: 'Переплетённые кольца', glass: true,
+    /* `rings` and the three ids it had inherited land here since 25.9.2026 —
+       see the withdrawal note where it stood, below. */
+    aliases: ['rings', 'mesh', 'lattice', 'reeded'],
     doors: ['d106'] },
   /* ⚠ THESE THREE DOORS HAVE NO HAND-MEASURED LEAF BOX AND CANNOT BE GIVEN
      ONE — examined 14.9.2026, when the patterns were re-opened to be redrawn
@@ -1222,9 +1225,16 @@ export const GRILLES = [
      three retired names now land on this one: it is the surviving worked-glass
      field at the same price, and a link naming any of them opens a door with
      worked glass in it rather than a bare pane. */
-  { id: 'rings',   he: 'טבעות ותלתלים', en: 'Scrolled ring lattice', ru: 'Кольца и завитки',
-    glass: true, aliases: ['mesh', 'lattice', 'reeded'],
-    doors: ['newdoor'] },
+  /* ⚠ `rings` IS WITHDRAWN — 25.9.2026. The owner's son: *"remove the
+     'scrolled ring lattice' pattern on windows."* It was the field on the door
+     in `research/newdoor/`, measured by autocorrelation and a Hough vote (the
+     numbers are in the note over `grillePaths`). The id and the three it had
+     inherited (`mesh`, `lattice`, `reeded`) resolve to `circles`, the nearest
+     survivor and the same family of geometry. ⚠ THE PRICE MOVES ON AN OLD
+     LINK: `rings` was ₪0 and `circles` is ₪700. Nothing is deployed, so no
+     customer holds such a link; if one ever does, the alias opens a real door
+     rather than a bare pane. Removing it mid-list moves the two entries after
+     it, which is VERSION 24. */
   /* The three missing `-light` twins, appended so the ids already in the wild
      keep their indices. `light` is the same one switch it has always been: the
      same ironwork, painted the door's colour instead of black. */

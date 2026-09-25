@@ -3094,10 +3094,115 @@ group('a pull bar never stands across a window or a panel — 24.9.2026');
   /* §5.15: each arm must have a subject, or the sweep passes by finding nothing. */
   ok(panelPlaced > 500, `only ${panelPlaced} grips placed on a worked face — the across-a-frame check has no subject`);
   ok(swaps > 50, `only ${swaps} doors where the lever yields to a bar on a worked face — the priority is not being exercised`);
-  ok(refusedFace > 0, 'no bar is ever refused for the panels — the Greek set leaves no room on four sizes, so the check has gone blind');
+  /* ⚠ RESTATED 25.9.2026. This clause read "some bar is refused for the
+     panels", because on 24.9 the Greek set left no room on four sizes and
+     that refusal was the only thing proving the arm had a subject. The owner's
+     son then ruled that it must fit — *"in the end it need to fit"* — so the
+     set's shelf cap was narrowed and a floor rung added, and the clause that
+     must now be true is the opposite one, below. What still needs a subject
+     is the whole-grip check itself: some rung on a worked face must be turned
+     away for crossing a frame, or the check has gone blind. */
+  let turnedAway = 0;
+  for (const size of Object.keys(SIZES)) for (const detail of ['panel2', 'panel3', 'classic']) {
+    const st = { ...DEFAULTS, size, detail, handle: 'idan', lockset: 'cylinder', grip: null };
+    for (const c of spawnSpots(st)) {
+      const why = gripPlacement(st, c).why;
+      if (why === T('why.feetOnPanel') || why === T('why.feetOnFace')) turnedAway++;
+    }
+  }
+  ok(turnedAway > 0, 'no rung on a worked face was ever refused for crossing a frame — the whole-grip check has gone blind');
+  /* The owner's son, 25.9.2026: *"even with the greek set there should be
+     still enough space at least for idan handle … in the end it need to
+     fit."* Every stock bar, every length, every size, glazed or solid, beside
+     the cylinder — which is what the lever yields to. */
+  let greekMiss = 0, greekN = 0;
+  for (const size of Object.keys(SIZES)) for (const window of ['none', 'rect'])
+  for (const handle of ['idan', 'nitzan', 'grab']) for (const hl of (handle === 'grab' ? [0] : [0, ...handleLensFor({ ...DEFAULTS, size })])) {
+    const st = { ...DEFAULTS, size, detail: 'classic', window, handle, handleLen: hl, lockset: 'cylinder', grip: null };
+    greekN++;
+    const o = gripObstacle(st, handle);
+    if (o !== null && greekMiss++ < 5) ok(false, `${handle} ${hl || ''} does not fit beside the Greek set on ${size}/${window}: ${o}`);
+  }
+  ok(greekN > 50 && greekMiss === 0, `${greekMiss} of ${greekN} bars do not fit beside the Greek set`);
   /* The clause that must stay true: a plain solid leaf with the cylinder takes every grip. */
   ok(plainMiss === 0, `${plainMiss} grips no longer fit a plain solid leaf with the cylinder`);
   console.log(`  ${placed} placed (${panelPlaced} on a worked face), ${swaps} lever swaps, ${refusedFace} refused for the face`);
+}
+
+group('the second review\'s night round — 25.9.2026');
+{
+  /* "remove the 'scrolled ring lattice' pattern on windows." Gone from the
+     list, and every id that used to reach it opens a real worked glass — the
+     alias, not a notice, because withdrawing it is our change. */
+  ok(!GRILLES.some(g => g.id === 'rings'), '`rings` is still offered');
+  for (const id of ['rings', 'mesh', 'lattice', 'reeded']) {
+    const r = fromQuery(`?g=${id}&w=rect`);
+    ok(r.state.grille === 'circles' && r.notice !== 'option-unknown',
+       `a link carrying g=${id} opened ${r.state.grille} with notice ${r.notice}`);
+  }
+
+  /* "the half door has its own greek set if a person chooses the greek set.
+     its just shrinked down. and always the windows are at the same height and
+     are the same height." Read off the markup: both leaves carry the set, the
+     two lights share their top and their height, and the second copy did not
+     duplicate an id (§5.13 — a duplicate paints with the first copy's
+     gradient). */
+  const glassOf = svg => [...svg.matchAll(/<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)" fill="url\(#glass\)"/g)]
+    .map(m => m.slice(1).map(Number));
+  const twoLeaf = Object.keys(SIZES).filter(k => SIZES[k].side);
+  ok(twoLeaf.length === 3, `expected three door-and-a-half sizes, found ${twoLeaf.length}`);
+  let checkedPairs = 0;
+  for (const size of twoLeaf) {
+    for (const window of ['rect', 'none']) {
+      const svg = render({ ...base, size, detail: 'classic', window, handle: 'none' });
+      ok((svg.match(/data-set="classic"/g) || []).length === 2,
+         `${size}/${window}: the Greek set is not drawn on both leaves`);
+      const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+      const dup = ids.filter((x, i) => ids.indexOf(x) !== i);
+      ok(dup.length === 0, `${size}/${window}: the second Greek set duplicates ids ${[...new Set(dup)].slice(0, 5)}`);
+    }
+    for (const d of DETAILS) for (const w of WINDOWS) {
+      if (!w.rects.length) continue;
+      const st = { ...base, size, detail: d.id, window: w.id, handle: 'none' };
+      if (!buildable(st)) continue;
+      const g = glassOf(render(st));
+      checkedPairs++;
+      ok(g.length === 2 && Math.abs(g[0][1] - g[1][1]) < 0.05 && Math.abs(g[0][3] - g[1][3]) < 0.05,
+         `${size}/${d.id}/${w.id}: the two leaves' windows are at different heights — ${JSON.stringify(g.map(r => r.map(Math.round)))}`);
+    }
+  }
+  ok(checkedPairs >= 6, `only ${checkedPairs} glazed door-and-a-half doors checked — the window clause has no subject`);
+
+  /* "it looks more like a scythe, just shorter and becomes narrower faster,
+     it is a bit shorter than the coral lever." Read off the tile, which draws
+     from the same outline as the door: shorter than the Coral's, a point at
+     the tip, and the narrowing mostly done by the middle. */
+  const tile = locksetGlyph(LOCKSETS.find(k => k.id === 'lever-taper'));
+  const coral = locksetGlyph(LOCKSETS.find(k => k.id === 'coral'));
+  const blade = /<path d="(M [^"]+)"\/>/.exec(tile);
+  ok(blade, 'the curved lever tile has no blade path — the scythe check is dead');
+  if (blade) {
+    /* The outline is the top edge from the neck to the tip, one control
+       point and the tip, then the bottom edge back: N+1 pairs, 2, N+1. */
+    const P = [...blade[1].matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])]);
+    const n = (P.length - 2) / 2;
+    const top = P.slice(0, n), bot = P.slice(n + 2).reverse();
+    ok(Number.isInteger(n) && n > 4 && top.length === bot.length,
+       `the curved lever's outline is not the sampled band it should be (${P.length} points)`);
+    const depth = i => bot[i][1] - top[i][1];
+    const mid = i => (bot[i][1] + top[i][1]) / 2;
+    const last = n - 1, half = Math.floor(last / 2);
+    const reach = Math.abs(top[last][0]);
+    const coralReach = Number(/width="([\d.]+)"\s+height="[\d.]+" rx/.exec(coral)[1]);
+    ok(reach < coralReach, `the curved lever reaches ${reach} against the Coral's ${coralReach} — it is a bit shorter`);
+    ok(reach > coralReach * 0.75, `the curved lever reaches ${reach} — "a bit shorter" than ${coralReach}, not a stub`);
+    ok(depth(last) < depth(0) * 0.4, `the scythe's point is ${depth(last).toFixed(1)} deep against ${depth(0).toFixed(1)} at the neck`);
+    ok(depth(half) - depth(last) < (depth(0) - depth(last)) * 0.5,
+       'the curved lever narrows evenly — it should be past half its narrowing by the middle');
+    const sweep = mid(0) - mid(last), early = mid(0) - mid(half);
+    ok(sweep > depth(0) * 0.5, `the curved lever's tip sweeps ${sweep.toFixed(1)} — it is not curved`);
+    ok(early < sweep * 0.4, 'the curved lever climbs in a straight line — the curl belongs at the tip');
+  }
 }
 
 group('`gp` is a retired parameter, and a link still carrying it is not an error');

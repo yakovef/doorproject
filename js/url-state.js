@@ -266,7 +266,12 @@ import { repair } from './rules.js';
    `aliases`, and two of them — `ella` and `barblack` — through `HANDLE_LEGACY`
    as well, because what made them products was a finish and the finish is a
    field now: `n=ella` opens the round bar in gold, silently. */
-export const VERSION = 23;
+/* ⚠ 24: 25.9.2026. `GRILLES` lost `rings` MID-LIST — *"remove the 'scrolled
+   ring lattice' pattern on windows"* — so `arch-light` and `deco-light`, the
+   two entries after it, moved down one. Nothing else in the layout moved.
+   A link naming `rings` (or `mesh`, `lattice`, `reeded`, which it had
+   inherited) opens `circles` through `aliases`. */
+export const VERSION = 24;
 
 /**
  * THE DOOR YOU ARRIVE ON, and it is a BARE ONE.

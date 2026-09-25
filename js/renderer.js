@@ -883,14 +883,45 @@ const LEVER_BLADE  = Math.round(LEVER_ROSETTE * 2 * 0.377);
    millimetres, so a tile cannot drift from its door", and for the two levers
    it was not true — the tile carried a 39 rose and a 152 reach against the
    door's 30 and 145, which is §5.10 sitting under a comment denying it. */
-const TAPER_REACH_F  = 0.85;  // shorter than the Coral, which is half of what
-                              // makes it a different product
-const TAPER_RISE     = 13;    // the centreline's climb across the whole reach
-const TAPER_HALF_NECK = 20;   // half-depth at the neck …
-const TAPER_HALF_CAP  = 13;   // … and at the cap
+/* ⚠ A SCYTHE, SINCE 25.9.2026 — the owner's son: *"i would like you to fix
+   the curved lever. it looks more like a scythe, just shorter and becomes
+   narrower faster, it is a bit shorter than the coral lever."* It was a
+   straight wedge on a straight slope: 40 deep at the neck closing LINEARLY to
+   26 at the tip, the centreline climbing 13 in a straight line — a paddle,
+   thicker than the Coral along its whole length. A scythe is three things the
+   wedge was not, and each is one constant:
+     · the SWEEP is a curve, not a slope: the centreline leaves the rose flat
+       and climbs as the square of the distance, so the curl is at the tip;
+     · it NARROWS FAST: the half-depth falls as the square of what is left,
+       so it is past half its narrowing by a third of the way out, and ends
+       in a point barely a third of the Coral's blade;
+     · and it is a little shorter than the Coral, which it already was.
+   ⚠ STILL NO PHOTOGRAPH of this product anywhere — the corpus files no door
+   under it and RB has no cut-out (§7) — so these are the words turned into
+   geometry, not a measurement, and they are held as ratios to nothing but
+   each other. */
+const TAPER_REACH_F  = 0.85;  // a bit shorter than the Coral
+const TAPER_RISE     = 22;    // the sweep's climb at the tip, as the square of the reach
+const TAPER_HALF_NECK = 14;   // half-depth where it leaves the rose (the Coral's is 11.5) …
+const TAPER_HALF_CAP  = 4;    // … and at the point
 const taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
+const taperMid   = (t, L) => -TAPER_RISE * (t / L) ** 2;
 const taperHalf  = (t, L) =>
-  TAPER_HALF_NECK - (TAPER_HALF_NECK - TAPER_HALF_CAP) * (t / L);
+  TAPER_HALF_CAP + (TAPER_HALF_NECK - TAPER_HALF_CAP) * (1 - Math.min(1, t / L)) ** 2;
+/* One outline, two readers — the door and the tile — so the blade on the tile
+   cannot drift from the blade on the door. `pt(t, s)` places a point `t` along
+   the reach at `s` half-depths off the centreline; the band between `s0` and
+   `s1` is sampled so the curve reads as a curve, and it ends in a round point
+   when it runs to the tip. */
+const TAPER_STEPS = 14;
+const taperBand = (pt, L, s0 = -1, s1 = 1, t0 = 0, t1 = L) => {
+  const ts = Array.from({ length: TAPER_STEPS + 1 }, (_, i) => t0 + (t1 - t0) * i / TAPER_STEPS);
+  const tip = t1 >= L
+    ? ` Q ${pt(L + TAPER_HALF_CAP * 1.6 * (s1 - s0) / 2, (s0 + s1) / 2)} ${pt(L, s1)}`
+    : ` L ${pt(t1, s1)}`;
+  return `M ${ts.map(t => pt(t, s0)).join(' L ')}${tip} L `
+       + `${ts.slice().reverse().map(t => pt(t, s1)).join(' L ')} Z`;
+};
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
 const PANEL_GAP    = 25;    // flat stile left between a pull bar and a moulded panel
 /* ONE MOULDING PER DOOR. This is the width of the applied moulding, each side,
@@ -3043,7 +3074,35 @@ export function render(state) {
          attributes of inside-out rectangle. `glazedPanels` counted and CHARGED
          for that pane, because it pushed the sidelight panel before the test
          its sibling has to pass. How many panels exist now has one answer. */
-      size.sideGlazed && sideW > 320
+      /* ⚠ THE GREEK SET ON A DOOR-AND-A-HALF — 25.9.2026. The owner's son:
+         *"on the door and a half part, the half door has its own greek set if
+         a person chooses the greek set. its just shrinked down. and always the
+         windows are at the same height and are the same height."* The fixed
+         leaf used to take the plain square window and its lower panel here,
+         at the catalogue rectangle's height, beside a main leaf whose light
+         the set places at its own rows — two windows at two heights. It now
+         draws the SAME composition: every column of the set is a fraction of
+         the leaf's width, so on 350 mm it is the set narrowed, and every row
+         is a fraction of the height, which both leaves share — so the two
+         lights line up top and bottom by construction, not by being told to.
+         The glass first and the set over it, the order the main leaf uses.
+         The ironwork is drawn at the MAIN pane's width and clipped to this
+         one, as on every fixed leaf (see `grillePaths`). Priced as it was: the
+         set is one face and its second pane was already one of
+         `glazedPanels`. */
+      detail.classic && sideW > 320
+        ? (() => {
+            const glazedSet = openings.length > 0;
+            const o = classicFixedLight(sideW, leafH);
+            return (glazedSet
+              ? aperture({ band: CLASSIC_BAND, x: sideX + o.x, y: y0 + o.top, w: o.w, h: o.h,
+                           ornW: openings[0].w, paint, edge, grille, key: 's',
+                           profile: mouldOf(detail),
+                           leaf: { x: sideX, y: y0, w: sideW, h: leafH } })
+              : '')
+              + classicSet(sideX, y0, sideW, leafH, paint, pale, tone, glazedSet, 's');
+          })()
+      : size.sideGlazed && sideW > 320
         ? (() => {
             const top = y0 + (win.rects.length ? win.rects[0].top : leafH * 0.09);
             const tall = win.rects.length ? win.rects[0].h : leafH * 0.79;
@@ -5323,7 +5382,34 @@ export function spawnSpots(state) {
     if (Math.abs(cand.y - handY(leafH)) > HOME_REACH) continue;
     out.push(cand);
   }
+  const floor = floorRung(state);
+  if (floor && !out.some(c => Math.abs(c.x - floor.x) < 0.5 && Math.abs(c.y - floor.y) < 0.5)) {
+    out.push(floor);
+  }
   return out;
+}
+
+/**
+ * THE LAST UPRIGHT RUNG: a pull bar at hand height, as close to its lock
+ * furniture as it may legally stand — `standoffFloor`, the tightest gap anyone
+ * installs.
+ *
+ * ⚠ ADDED 25.9.2026 FOR THE GREEK SET, and it is a measured limit rather than
+ * a rung fitted to a door. The set leaves the lock stile 174 mm wide on a
+ * standard leaf (see CLASSIC_COLS.shelf); the ladder's own outboard rung is
+ * the ideal less 20, which puts a Nitzan's edge 0.4 mm into the shelf's cap —
+ * a coincidence either way, and it was coming out refused. At the floor the
+ * same bar clears the cap by 4.6 mm. Bars only: the bow is centred on the leaf
+ * and the channel's place is its own `inset`.
+ */
+function floorRung(state) {
+  const handle = gripOf(state);
+  if (handle.style !== 'bar') return null;
+  const size = SIZES[state.size] || SIZES.standard;
+  const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
+  const lockset = byId(LOCKSETS, state.lockset);
+  return { x: lockBackset(handle, lockset) + standoffFloor(handle, lockset, leafW, leafH),
+           y: handY(leafH), rot: 0 };
 }
 
 /** The same, laid across the leaf and centred on it. */
@@ -5355,8 +5441,14 @@ export function spawnIndexOf(state, place) {
     return i < 0 ? -1 : SPAWN.length + i;
   }
   const ideal = gripIdeal(state);
-  return SPAWN.findIndex(([dx, dy]) =>
+  const i = SPAWN.findIndex(([dx, dy]) =>
     Math.abs(ideal.x + dx - place.x) < 0.5 && Math.abs(ideal.y + dy - place.y) < 0.5);
+  if (i >= 0) return i;
+  /* The floor rung sits after the flat ones in the numbering, so no existing
+     index moves. */
+  const f = floorRung(state);
+  return f && Math.abs(f.x - place.x) < 0.5 && Math.abs(f.y - place.y) < 0.5
+    ? SPAWN.length + SPAWN_FLAT.length : -1;
 }
 
 
@@ -6597,72 +6689,10 @@ function grillePaths(kind, x, y, w, h, tint, ornW = null) {
      photograph shows is black bar standing in front of the glass, with a
      shadow on one side and a lit edge on the other. Same geometry family,
      different object. */
-  if (kind === 'rings') {
-    /* ⚠ THE LATTICE IS SQUARE AND THE RINGS ARE TANGENT, and the elaborate
-       thing that stood here before — a rectangular cell 0.955 of the pitch
-       across and 1.10 along, with a rosette in the diagonal gaps AND a smaller
-       pair at every crossing — was built on a pane measurement taken off a
-       crop that was not the pane. Re-measured against `tools/_upright.mjs`'s
-       leaf crop, at matched scale beside our own render:
-
-         ring pitch      240 px of a 676 px pane  =  0.355 of the light
-         ring diameter   240 px                   =  THE SAME, so tangent
-         across          676 / 240                =  2.8 rings
-         down            1516 / 240                =  6.3 rows
-
-       Square, tangent, 2.8 across. The overlap I thought I could see was the
-       COMMAS bridging the tangency points, which is what they are for.
-       ⚠ And there is no separate ornament at the crossings. Four commas per
-       diagonal gap and nothing else; the extra pairs put a chain of ornament
-       down every column of the pane and turned an airy grille into a mesh. */
-    const ACROSS = 2.8;
-    const PX = w / ACROSS, R = PX / 2;
-    const sw = Math.max(1.1, PX * 0.038);   // 9 px of a 240 px pitch
-    const nx = Math.ceil(ACROSS), ny = Math.ceil(h / PX);
-    const ox = x + (w - nx * PX) / 2, oy = y + (h - ny * PX) / 2;
-    const cxOf = i => ox + (i + 0.5) * PX, cyOf = j => oy + (j + 0.5) * PX;
-
-    let d = '';
-    for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
-      const cx = cxOf(i), cy = cyOf(j);
-      d += `M ${n2(cx - R)} ${n2(cy)} a ${n2(R)} ${n2(R)} 0 1 0 ${n2(R * 2)} 0
-            a ${n2(R)} ${n2(R)} 0 1 0 ${n2(-R * 2)} 0 `;
-    }
-
-    /* THE MOUSTACHES, AND THEY SIT AT THE TANGENCIES — not in the diagonal
-       gaps, which is where two rebuilds of this branch put them and is why
-       both came out as a mesh. Beside the photograph at matched scale the
-       structure is plain: every point where two rings touch carries a PAIR of
-       commas, one belonging to each ring, tails meeting at a cusp on the
-       tangency and eyes swung out to either side. Four tangencies to a ring,
-       each shared with a neighbour, so two commas per ring per axis and
-       nothing at all in the concave squares between four rings — those stay
-       open, and that openness is half of what the pane looks like.
-       `curl` takes the EYE first and the free end second, so each comma is
-       written from its eye back to the cusp it grows out of. */
-    const EYE_P = 0.190, EYE_A = 0.090, CUSP = 0.050, TURNS = 0.68;
-    let cur = '';
-    const pair = (mx, my, ax, ay) => {
-      const px = -ay, py = ax;
-      /* ⚠ TWO COMMAS, NOT FOUR. Drawn on both sides of the tangency they
-         closed into a four-lobed clover at every crossing and the pane came
-         out as a field of flowers. The photograph has one moustache per
-         tangency: two commas, mirrored about the ring-to-ring axis, tails
-         meeting at a cusp on the tangency point and eyes swung out. */
-      for (const k of [-1, 1]) {
-        cur += poly(curl(mx + (px * k * EYE_P - ax * EYE_A) * PX,
-                         my + (py * k * EYE_P - ay * EYE_A) * PX,
-                         mx + ax * CUSP * PX, my + ay * CUSP * PX,
-                         TURNS, k > 0 ? 1 : -1)) + ' ';
-      }
-    };
-    for (let i = -1; i <= nx; i++) for (let j = -1; j <= ny; j++) {
-      pair(cxOf(i) + PX / 2, cyOf(j), 1, 0);      // between side neighbours
-      pair(cxOf(i), cyOf(j) + PX / 2, 0, 1);      // and stacked ones
-    }
-    return ink(d, sw) + ink(cur, sw * 1.30);
-  }
-
+  /* ⚠ `rings` IS WITHDRAWN — 25.9.2026, the owner's son: *"remove the
+     'scrolled ring lattice' pattern on windows."* Its drawing went with it;
+     the measurement above stays as the record of what it was, and the id
+     resolves to `circles`, the etched cousin. */
   if (kind === 'grid') {
     /* ⚠ 0.38, not 0.40, and the two hundredths matter. d091 and d122 are the
        two doors that carry three columns and four rows, and both are
@@ -7089,7 +7119,20 @@ const CLASSIC_ROWS = {
 const CLASSIC_COLS = {
   cornice: [0.145, 0.855],   // width 0.710 — the widest thing on the door
   frieze:  [0.206, 0.794],   // width 0.588
-  shelf:   [0.176, 0.824],   // width 0.648
+  /* ⚠ THE SHELF'S CAP IS NARROWED BY INSTRUCTION, NOT BY MEASUREMENT —
+     25.9.2026. Ruled off the rectified photograph it spans 0.176 to 0.824
+     (0.648), overhanging its brackets by 0.034 of the leaf, and that overhang
+     is the only piece of the set at hand height that reaches into the lock
+     stile: 150 mm from the lock edge on a standard leaf, where an Idan beside
+     the cylinder stands to 167. With the whole-grip rule of 24.9 every stock
+     Idan was refused on the Greek set on four sizes of six. The owner's son:
+     *"even with the greek set there should be still enough space at least for
+     idan handle. either just fit it, or change the greek set or the pull
+     handle. in the end it need to fit."* So the cap now overhangs its brackets
+     by CLASSIC_CORBEL.gap, the same 0.006 the brackets stand off the band —
+     0.204, 174 mm on a standard leaf — and every other piece is untouched.
+     The measured 0.648 is kept here as what the photograph says. */
+  shelf:   [0.204, 0.796],   // width 0.592 — measured 0.648, narrowed 25.9.2026
   band:    [0.286, 0.714],   // width 0.428 — the face BETWEEN the two brackets
   panel:   [0.230, 0.770],   // width 0.540
   plinth:  [0.206, 0.794],   // width 0.588 — the frieze, upside down
@@ -7178,15 +7221,28 @@ export const CLASSIC_BAND = 59;
  * so the architrave does not eat the stile the ironmongery is bolted to. One
  * function answers where the hole is; this only adds the casing round it.
  */
-function classicLight(leafW, leafH) {
-  const [o] = apertureLayout(byId(WINDOWS, 'rect'), leafW,
-                             byId(DETAILS, 'classic'), leafH);
+function classicLight(leafW, leafH, fixed = false) {
+  /* ⚠ THE FIXED LEAF OF A DOOR-AND-A-HALF CARRIES NO IRONMONGERY, so the clamp
+     `apertureLayout` applies — keep the architrave off the stile the lock is
+     bolted to — has nothing to protect there, and on a 350 mm leaf it would
+     squeeze the light to nothing. That leaf takes the set's own fractions. */
+  const [o] = fixed ? [classicFixedLight(leafW, leafH)]
+    : apertureLayout(byId(WINDOWS, 'rect'), leafW, byId(DETAILS, 'classic'), leafH);
   return { x: o.x - CLASSIC_BAND, y: o.top - CLASSIC_BAND,
            w: o.w + CLASSIC_BAND * 2,
            h: o.h + CLASSIC_BAND * 2 };
 }
 
-export function classicPieces(leafW, leafH, glazed = true) {
+/* The set's glass on a leaf that carries no ironmongery: `winFrac` straight,
+   the same rows as the main leaf's, so the two lights of a door-and-a-half are
+   at the same height and the same height tall by construction. */
+function classicFixedLight(leafW, leafH) {
+  const F = byId(DETAILS, 'classic').winFrac;
+  return { x: leafW * F.x0, w: leafW * (F.x1 - F.x0), top: leafH * F.top,
+           h: leafH * (F.bot - F.top) };
+}
+
+export function classicPieces(leafW, leafH, glazed = true, fixed = false) {
   const R = CLASSIC_ROWS, C = CLASSIC_COLS;
   const of = (row, x0, x1) => ({
     x: leafW * x0, y: leafH * R[row][0],
@@ -7246,7 +7302,7 @@ export function classicPieces(leafW, leafH, glazed = true) {
        function the glazed variant asks, so the narrow leaf's clamp applies to
        both or to neither. */
     ...(glazed ? [] : [{ piece: 'light', kind: 'moulding',
-                        ...classicLight(leafW, leafH) }]),
+                        ...classicLight(leafW, leafH, fixed) }]),
   ];
 }
 
@@ -7615,7 +7671,12 @@ function classicBand(x, y, w, h, paint, pale, leaf, key, ends, middle) {
    place itself around whatever glazing it finds — it OWNS the opening, through
    `detail.winRect`, so the rows below already know where the glass is. It was
    taking one and never reading it. */
-function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
+function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true, side = '') {
+  /* `side` is '' on the main leaf and a key suffix on the FIXED leaf of a
+     door-and-a-half, which carries its own copy of the set since 25.9.2026.
+     Every id this composition emits is built from a key, and two copies of
+     one id in a document paint the second copy with the first one's gradient
+     (CLAUDE.md §5.13) — so the suffix goes on every key below. */
   const n = v => Number(v.toFixed(1));
   const R = CLASSIC_ROWS, C = CLASSIC_COLS;
   const Y = f => ly + lh * f;
@@ -7630,7 +7691,7 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
      the block's own face, the cap's corona and hollow — so the drift reader
      measures ink rather than a claim, and the shadows and the brackets stay
      inside the group where the sweep can still see them. */
-  const P = Object.fromEntries(classicPieces(lw, lh, glazed).map(q => [q.piece, q]));
+  const P = Object.fromEntries(classicPieces(lw, lh, glazed, !!side).map(q => [q.piece, q]));
   const piece = (name, art) =>
     out.push(`<g data-detail="moulding" data-piece="${name}">${art}</g>`);
 
@@ -7669,7 +7730,7 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
      moulded return there and nothing else; the brackets belong to the shelf
      alone, which is what makes the shelf read as a shelf. */
   const at = q => [lx + q.x, ly + q.y, q.w, q.h];
-  piece('frieze', block(...at(P.frieze)) + inBand(...at(P.frieze), 'cfb', 'flute', 'oval'));
+  piece('frieze', block(...at(P.frieze)) + inBand(...at(P.frieze), 'cfb' + side, 'flute', 'oval'));
   /* ⚠ AND WHERE THE LIGHT WOULD BE, A PANEL — when the customer has not asked
      for glass. The set is the same composition either way; only the material
      in that rectangle changes. Drawn before the cornice so the head's shadow
@@ -7677,7 +7738,7 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
   /* CLASSIC_BAND, not MOULD_BAND — the set's own casing stock. `P.light` is
      the casing's OUTER rectangle, so at 59 the moulding's inner edge lands
      exactly on the glass line the glazed variant cuts. */
-  if (!glazed) piece('light', moulding(...at(P.light), CLASSIC_BAND, paint, pale, leaf, 'clt',
+  if (!glazed) piece('light', moulding(...at(P.light), CLASSIC_BAND, paint, pale, leaf, 'clt' + side,
                                        'ogee'));
   piece('cornice',
     /* ⚠ THE DENTILS SPAN THE FRIEZE, NOT THE CORNICE. They were the cornice's
@@ -7691,7 +7752,7 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
     /* 0.77, not the default 0.68. Ruled on the rectified leaf: the corona is
        0.0215 of the leaf's height and the cavetto under it 0.007, so the slab
        takes rather more than three quarters of the cap and not two. */
-    + classicCap(...at(P.cornice), paint, 'cn', false, 0.77));
+    + classicCap(...at(P.cornice), paint, 'cn' + side, false, 0.77));
 
   /* ── THE SHELF: its own corona, two brackets, and the band they carry ──
      ⚠ THE BAND'S FACE IS NARROWER THAN THE SHELF, and it was drawn the same
@@ -7709,8 +7770,8 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
   piece('band',
     block(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh)
     + inBand(faceX, Y(R.band[0]), faceW, (R.band[1] - R.band[0]) * lh,
-             'cbt', 'tablet', 'plain'));
-  piece('shelf', classicCap(...at(P.shelf), paint, 'sh', false, 0.51));
+             'cbt' + side, 'tablet', 'plain'));
+  piece('shelf', classicCap(...at(P.shelf), paint, 'sh' + side, false, 0.51));
   /* ⚠ AFTER THE SHELF, and that is the whole reason the brackets are pieces of
      their own. Drawn inside the band's group they went down first, so the
      shelf's cast shadow — 0.80 of its own height, blurred — lay across them
@@ -7767,7 +7828,7 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
      under ogee for exactly that reason and stays correct. */
   const pn = at(P.panel);
   out.push(`<g data-detail="panel" data-panels="1" data-top="${pn[1].toFixed(1)}">`
-    + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn',
+    + moulding(pn[0], pn[1], pn[2], pn[3], MOULD_BAND, paint, pale, leaf, 'cpn' + side,
                MOULD_DEFAULT)
     + `</g>`);
 
@@ -7776,10 +7837,10 @@ function classicSet(lx, ly, lw, lh, paint, pale, tone, glazed = true) {
      The first version had the beads on top and no block at all: a string of
      dots above a bare rectangle, which is neither piece. */
   piece('plinth',
-    block(...at(P.plinth)) + inBand(...at(P.plinth), 'cpb', 'flute', 'oval')
+    block(...at(P.plinth)) + inBand(...at(P.plinth), 'cpb' + side, 'flute', 'oval')
     + beadRun(X(C.plinth[0]) - lw * 0.006, Y((R.pbeads[0] + R.pbeads[1]) / 2),
               (C.plinth[1] - C.plinth[0]) * lw + lw * 0.012, beadR, paint));
-  piece('foot', classicCap(...at(P.foot), paint, 'ft', true));
+  piece('foot', classicCap(...at(P.foot), paint, 'ft' + side, true));
 
   /* ⚠ `data-set`, NOT `data-detail`, on the wrapper. Both of `collide.mjs`'s
      readers select on `[data-detail]`, and a group carrying the whole
@@ -7934,6 +7995,15 @@ function handleFootprint(handle, leafH, panelled = false) {
  * vertical bands happen to meet. The measured inset is the target and the
  * clearance is the floor — on a narrow leaf the floor is what binds.
  */
+/* The TIGHTEST a grip may stand to its lock furniture: the two drawn boxes
+   LOCK_CLEAR apart, and never closer than the closest gap anyone installs
+   (BAR_GAP_MIN, measured on the ten doors carrying both). One statement, two
+   readers — `gripStandoff`'s floor and the last rung of `spawnSpots`. */
+function standoffFloor(handle, lockset, leafW, leafH) {
+  const grip = handleFootprint(handle, leafH), lock = handleFootprint(lockset, leafH);
+  return Math.max(lock.in + grip.out + LOCK_CLEAR, leafW * BAR_GAP_MIN);
+}
+
 export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) {
   const grip = handleFootprint(handle, leafH);
   if (!grip.vy && !grip.out) return 0;                // nothing to place
@@ -7959,10 +8029,10 @@ export function gripStandoff(handle, lockset, leafW, leafH, toGlass = Infinity) 
      blade and the bar are both drawn, and the complaint that put this line
      here was three screenshots of a blade crossing a bar. `npm run collide`
      said so immediately — 22 drawn overlaps and one handle through another. */
+  const floor = standoffFloor(handle, lockset, leafW, leafH);
   const body = lock.in + grip.out + LOCK_CLEAR;
   /* The floor is the tightest gap anyone actually installs, not the point at
      which the two drawings stop overlapping. */
-  const floor = Math.max(body, leafW * BAR_GAP_MIN);
   const want = handle.inset ? leafW * handle.inset - lockBackset(handle, lockset)
              : grip.vy > 200 ? Math.max(leafW * BAR_GAP, body) : 0;
   /* And it must not run across the glass. `toGlass` is the distance from the
@@ -9243,26 +9313,16 @@ function lever(cx, cy, dir) {
 }
 
 /**
- * The tapered, upward-curving lever — the shape the Coral was drawn as until
+ * The curved lever — a SCYTHE since 25.9.2026 (see TAPER_RISE for the words
+ * and the three constants). It began as the shape the Coral was drawn as until
  * 14.9.2026, kept because Peretz recognised it as a product of its own:
  * *"the one thats there right now with the curve, add it as a different
  * handle."*
  *
- * ⚠ WHAT IT IS, AND WHERE THE NUMBERS COME FROM. Every figure here is the one
- * `lever()` carried before it was straightened, with two deliberate changes
- * that are what make it a different handle rather than a copy of the old bug:
- *
- *   depth    40 units at the neck closing to 26 at the tip — the taper, and it
- *            is a real taper now rather than a side effect of a capped tip
- *   rise     the centreline lifts across the reach instead of drifting a
- *            single unit. `RISE` below, and it is the "curve" he named
- *   reach    0.85 of `LEVER_REACH`. Shorter, which is the other half of what
- *            distinguishes it on the door at a glance
- *
  * ⚠ IT IS NOT THE ALMOG. That handle is also a swan neck and is a different
  * object: bronze rather than nickel, 2.8 rosette diameters rather than 2.4,
  * and its taper runs BACKWARDS — thin at the root, thick at the tip. This one
- * is nickel, short, and thick at the root.
+ * is nickel, short, full at the root and a point at the tip.
  *
  * ⚠ AND ITS NAME IS NOT KNOWN. `lever-taper` is a placeholder id; see the
  * catalogue entry for why an id cannot be renamed later and a label can.
@@ -9270,67 +9330,39 @@ function lever(cx, cy, dir) {
 function leverTaper(cx, cy, dir) {
   const L = taperReach();
   const at = t => cx + dir * t;
-  /* The rise across the reach, and the curve is in the CENTRELINE rather than
-     in a rotation: rotating the whole fitting would lift the rosette off the
-     spindle it turns, which is the mistake the droop on the Coral was. */
-  const mid = t => cy - TAPER_RISE * (t / L);
-  /* Half-depth at `t`: TAPER_HALF_NECK at the neck, TAPER_HALF_CAP at the cap. */
-  const half = t => taperHalf(t, L);
-  const pt = (t, s) => `${at(t)} ${(mid(t) + s * half(t)).toFixed(1)}`;
+  /* The sweep is in the CENTRELINE rather than in a rotation: rotating the
+     whole fitting would lift the rosette off the spindle it turns, which is
+     the mistake the droop on the Coral was. */
+  const pt = (t, s) => `${at(t).toFixed(1)} ${(cy + taperMid(t, L) + s * taperHalf(t, L)).toFixed(1)}`;
+  const body = taperBand(pt, L);
   return `
     <g data-kind="lever">
-      <path d="M ${pt(12, -0.7)} L ${pt(L - 16, -0.7)}
-               Q ${pt(L + 4, 0)} ${pt(L - 16, 1.5)} L ${pt(12, 1.5)} Z"
+      <path d="${taperBand(pt, L, -0.7, 1.5, 12, L)}"
             transform="translate(0 8)" fill="#000" opacity="0.30"
             filter="url(#hwShadow)"/>
 
-      <!-- Body: broad at the neck, tapering, rising, capped at the tip. -->
-      <path d="M ${pt(0, -1)} L ${pt(L - 20, -1)}
-               Q ${pt(L, -0.95)} ${pt(L, 0)}
-               Q ${pt(L, 0.95)} ${pt(L - 20, 1)}
-               L ${pt(0, 1)} Z"
-            fill="url(#nickel)"/>
+      <!-- Body: full where it leaves the rose, narrowing fast, sweeping up to
+           a point. -->
+      <path d="${body}" fill="url(#nickel)"/>
       <!-- ⚠ AND THE SAME BLACK WASH AS THE CORAL, FOR THE SAME REASON AND OFF
            THE SAME MEASUREMENT. The seven photographed levers put the blade's
            darkest point at 0.22 to 0.68 of the paint beside it, median 0.35,
            and that is a fact about a lever seen against a painted door rather
-           than about the Coral in particular. Leaving this one out would have
-           given the range two nickel levers made of visibly different metal,
-           which is the defect the five-owners rule exists to prevent, arriving
-           through the shape axis instead of the finish axis.
-           Its SHAPE is untouched: the taper, the rise and the short reach are
-           what Peretz recognised as a second product, and there is no
-           photograph of this one anywhere to move them against. -->
-      <path d="M ${pt(0, -1)} L ${pt(L - 20, -1)}
-               Q ${pt(L, -0.95)} ${pt(L, 0)}
-               Q ${pt(L, 0.95)} ${pt(L - 20, 1)}
-               L ${pt(0, 1)} Z"
-            fill="#000" opacity="0.14"/>
+           than about the Coral in particular. Leaving this one out would give
+           the range two nickel levers made of visibly different metal. -->
+      <path d="${body}" fill="#000" opacity="0.14"/>
 
-      <!-- the same banding as the Coral: clipped arris, mid band, dark roll -->
-      <path d="M ${pt(14, -0.85)} L ${pt(L - 20, -0.85)}
-               Q ${pt(L - 6, -0.8)} ${pt(L - 6, -0.62)} L ${pt(14, -0.66)} Z"
-            fill="#fff" opacity="0.92"/>
-      <path d="M ${pt(16, -0.60)} L ${pt(L - 14, -0.58)}
-               L ${pt(L - 14, -0.20)} L ${pt(16, -0.30)} Z"
-            fill="#fff" opacity="0.18"/>
-      <path d="M ${pt(16, 0.18)} L ${pt(L - 16, 0.16)}
-               L ${pt(L - 16, 0.84)} L ${pt(16, 0.80)} Z"
-            fill="#000" opacity="0.56"/>
-      <path d="M ${pt(L - 26, -0.55)} L ${pt(L - 4, -0.52)}
-               Q ${pt(L, -0.45)} ${pt(L, 0)}
-               Q ${pt(L, 0.7)} ${pt(L - 14, 0.7)} L ${pt(L - 26, 0.62)} Z"
-            fill="#000" opacity="0.16"/>
+      <!-- the same banding as the Coral, bent to the sweep: clipped arris,
+           mid band, dark roll -->
+      <path d="${taperBand(pt, L, -0.85, -0.62, 14, L - 6)}" fill="#fff" opacity="0.92"/>
+      <path d="${taperBand(pt, L, -0.55, -0.22, 16, L - 10)}" fill="#fff" opacity="0.18"/>
+      <path d="${taperBand(pt, L, 0.18, 0.84, 16, L - 8)}" fill="#000" opacity="0.56"/>
 
       ${disc(cx, cy, LEVER_ROSETTE)}
 
       <!-- the neck over the rose, as on the Coral -->
-      <path d="M ${pt(2, -0.95)} Q ${pt(28, -0.92)} ${pt(33, -0.78)}
-               L ${pt(33, 0.72)} Q ${pt(28, 0.92)} ${pt(2, 0.95)} Z"
-            fill="url(#nickel)"/>
-      <path d="M ${pt(9, -0.70)} Q ${pt(26, -0.68)} ${pt(30, -0.58)}
-               L ${pt(30, -0.30)} L ${pt(9, -0.35)} Z"
-            fill="#fff" opacity="0.42"/>
+      <path d="${taperBand(pt, L, -0.95, 0.95, 2, 33)}" fill="url(#nickel)"/>
+      <path d="${taperBand(pt, L, -0.70, -0.32, 9, 30)}" fill="#fff" opacity="0.42"/>
     </g>`;
 }
 
@@ -9839,16 +9871,11 @@ const FITTING_GLYPH = {
      tapers" cannot become true of one of them and not the other. */
   levertaper: () => {
     const L = taperReach();
-    const mid = t => -TAPER_RISE * (t / L);
-    const half = t => taperHalf(t, L);
-    const pt = (t, s) => `${-t} ${(mid(t) + s * half(t)).toFixed(1)}`;
+    const pt = (t, s) => `${(-t).toFixed(1)} ${(taperMid(t, L) + s * taperHalf(t, L)).toFixed(1)}`;
     return { box: [-(L + 16), -(LEVER_ROSETTE + TAPER_RISE + 12),
                    LEVER_ROSETTE + 12, LEVER_ROSETTE + 12], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
-    <path d="M ${pt(0, -1)} L ${pt(L - 20, -1)}
-             Q ${pt(L, -0.95)} ${pt(L, 0)}
-             Q ${pt(L, 0.95)} ${pt(L - 20, 1)}
-             L ${pt(0, 1)} Z"/>` };
+    <path d="${taperBand(pt, L)}"/>` };
   },
 
   /* Cylinder only: an escutcheon with a euro keyway and nothing else. It had
