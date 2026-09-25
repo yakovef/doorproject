@@ -1891,6 +1891,36 @@ the sort of fact that ends this in one sentence. `ASK-PERETZ.md` asks for it.
 Until then the blade is held as `LEVER_ROSETTE * 2 * 0.377` rather than as an
 absolute, so the whole fitting stays in proportion whichever way this goes.
 
+### ⚠ `Needs a window` IS 0.61 px TOO WIDE FOR ITS TILE, AND ENGLISH IS THE OUTLIER
+
+The tablet entry below records twelve English grille tiles clipping
+`Needs a window` to `Needs a w…`, *"and the clipped word is the one carrying
+the meaning"*. Taking `.tile__why` off `--mono` on 25.9.2026 recovered
+**18.27 px of the 18.88 it needed** — a monospace face is wide by
+construction — and left **0.61**. Measured on the tile, ink against box:
+
+| | ink | box | |
+|---|---|---|---|
+| `Needs a window` in `--mono` | 80.88 | 62 | −18.88 |
+| `Needs a window` in the sans | **62.61** | 62 | **−0.61** |
+| `דורש חלון` | 39 | 62 | +23 |
+| `Нужно окно` | 46 | 62 | +16 |
+
+Screenshotted rather than inferred: it now reads `Needs a wind…`. Four more
+characters and still cut on the word that matters.
+
+⚠ **THE COPY WAS MEASURED AS THE FIX AND IS REFUSED ON THIS FILE'S OWN RULE.**
+`Window needed` leads with the subject, which is the rule §0b's 20.9 entry
+already established for exactly these strings (*"what is in the way leads"*,
+after `אין מקום למנעול הז…`), and it comes to **61.19 px — a fit by 0.81**.
+`Window required` 64.02, `Requires a window` 72.09, `Needs a window first`
+78.72. So the best available English wording clears the box by less than a
+pixel, and a number that lands at 0 or 1 is a coincidence rather than a
+measurement. **What that says is that the BOX is too small for English at
+`.6rem`, not that the sentence is wrong** — Hebrew has 23 px of room and
+Russian 16 — and shaving the font size or the tracking to buy the last
+six-tenths is fitting the copy to the grid, which is §6's subject.
+
 ### ⚠ THE NAVIGATOR'S NINE MARKS RUN 3.27× APART IN INK, AND NOBODY HAS SET A CRITERION
 
 Measured 25.9.2026, rasterised at the 21 px each ships at, ink over the
@@ -2527,7 +2557,7 @@ is wide and short, and that moves the door on a whole band.
 no 768 portrait. Two smaller faults live in the same band and are verified:
 **`Needs a window` is clipped to `Needs a w…` on twelve English grille tiles**
 (the `.tile__why` wants 20 px more than it gets, and the clipped word is the
-one carrying the meaning), and **seven Russian tile labels are drawn 12–13 px
+one carrying the meaning) — ⚠ **now 0.61 px, not 20: see below**, and **seven Russian tile labels are drawn 12–13 px
 OUTSIDE their own tile**, past the rounded border toward the neighbour.
 
 ### ⚠ THE SUMMARY CANNOT SHOW ITS WHOLE SPEC AT 1280×720
@@ -3045,7 +3075,13 @@ how it got there. Detail lives in the section it belongs to.
   the rule's own 9.6 px, **all 78 come out NARROWER in the sans and none
   wider, mean −44 px**, worst case `why.setOwnWindow` in English 323.5 →
   220.5 — against a §9 entry that records twelve English grille tiles clipping
-  `Needs a window` to `Needs a w…` for want of 20 px. Two slots left, both
+  `Needs a window` to `Needs a w…` for want of 20 px.
+  ⚠ **AND IT DOES NOT CLOSE THAT ONE, WHICH WAS CHECKED RATHER THAN ASSUMED.**
+  Measured on the tile after the change: `Needs a window` is **62.61 px of ink
+  in a 62 px box**, so it recovers **18.27 px of the 18.88 it needed** and is
+  still over by **0.61**. Screenshotted: `Needs a w…` has become
+  `Needs a wind…` — four more characters, and still cut on the word carrying
+  the meaning. §9 has the residual and the arithmetic. Two slots left, both
   genuinely holding figures.
 
   ⚠ **AND WHAT I MEASURED AND DID NOT FIX IS IN §9**, because in each case the
