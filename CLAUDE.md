@@ -1676,7 +1676,7 @@ under test. `--disable-gpu` made it *worse*.
   photographs, and halving their resolution to suit a sick container is fitting
   the instrument to the room.
 
-### Five rules about instruments, each learned the hard way
+### Rules about instruments, each learned the hard way
 
 **Tools must ask the page, not assume.** Four of them have held constants that
 silently stopped being true: a `0.735` leaf-height ratio, a viewBox origin
@@ -1768,6 +1768,22 @@ nothing to fix — a browser is entitled to rasterise a gradient differently
 twice. What has to change is what the sheets are allowed to prove, which is
 now written beside them in §7's table and in §0c. **Before reading a diff as a
 finding, run the instrument twice on the same input.**
+
+**⚠ AND AN INSTRUMENT THAT MEASURES DURING AN ANIMATION MEASURES THE
+ANIMATION.** Measured 25.9.2026. The audit's step sweep clicked a rail circle,
+waited a flat 90 ms and asked `checkVisibility({ checkOpacity: true })` whether
+the step's options were on screen. `.sect.is-live` carries
+`animation: stepIn .22s var(--ease) both`, and the `both` fill is the whole of
+the trap: before the first frame the element sits at the keyframe's `from`, so
+its opacity is not *low*, it is **exactly 0** — the same reading a genuinely
+hidden step gives. Under load that frame does not always land inside 90 ms, and
+the sweep then printed the most alarming sentence it owns, *"N options and NONE
+on screen"*, about a step with its options in place. 3 of 25 walks on one tree,
+2 of 25 on another; eight walks to a run puts it on roughly half of all audits,
+on a different step each time. **A fixed wait is a guess about a machine, not a
+question about a page**: wait for the animations to stop and the opacity to
+reach 1, and make a step that never gets there its own fault — which is a
+finding the fixed wait was too short to make either.
 
 A contact sheet triages; it does not measure. When a number matters, put a
 scale on the picture. Scratch harnesses go in `tools/_*.mjs`, gitignored.
@@ -2675,6 +2691,36 @@ that matters and who asked for it.
 This section is long and is not meant to be read end to end. The top ten or so
 entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
+
+- **⚠ THE AUDIT'S "NOTHING TO ANSWER THE QUESTION WITH" CHECK WAS FAILING AT
+  RANDOM, AND IT WAS THE CHECK, NOT THE PAGE — 25.9.2026.** A run reported
+  *[wide-short] step "face": 7 options and NONE on screen*. The face step was
+  fine. `.sect.is-live` carries `animation: stepIn .22s var(--ease) both`, and
+  `both` fills BACKWARDS: before the animation's first frame the element sits
+  at the keyframe's `from`, computed opacity **exactly 0**. The sweep clicked a
+  circle, waited 90 ms and measured; under load the first frame does not always
+  land inside 90 ms, so `checkVisibility({ checkOpacity: true })` read a whole
+  step of tiles as invisible.
+
+  Measured rather than argued: the walk was repeated 25 times at 1920×918 on
+  this branch and 25 times on a tree without the day's changes — **3 and 2** —
+  landing on `lock`, `mk` and `glass`, never twice the same step. Eight walks
+  to an audit puts a red gate on roughly **half of all runs**, which is the
+  worst thing a gate can be: a fault sentence nobody believes.
+
+  ⚠ **THE FIX ADDS AN ASSERTION RATHER THAN SOFTENING ONE.** The sweep now
+  waits for the entering step's animations to stop and its opacity to reach 1,
+  up to two seconds, and a step that never gets there is a NEW fault — the
+  customer is looking at a panel that is not there, a thing nothing in this
+  file could see before, because the same 90 ms too short to let a fast
+  entrance finish was also too short to notice one that never did. Falsified
+  both ways: with the wait, 0 of 25 walks flake; with
+  `animation-play-state: paused` forced onto `.sect.is-live`, the new fault
+  fires on the first step.
+
+  §7 carries the lesson — *an instrument that measures during an animation
+  measures the animation* — and its rules heading no longer counts itself: it
+  said five and the list already held eight.
 
 - **⚠ THE CURVED LEVER HANGS DOWN, STARTS WIDER AND CURVES MORE —
   25.9.2026.** The owner's son on the morning's scythe: *"The curved lever is

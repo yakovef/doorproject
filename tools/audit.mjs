@@ -1223,6 +1223,44 @@ for (const v of VIEWS) {
         (document.querySelector('.sect:not([hidden])') || {}).dataset?.section);
       if (now !== k) fault(v.name, `the navigator's "${k}" circle opened "${now}"`);
 
+      /* ── AND THE STEP HAS FINISHED ARRIVING, WHICH IS NOT 90 MS ───────
+         ⚠ `.sect.is-live` carries `animation: stepIn .22s var(--ease) both`
+         (css/app.css, M8), and `both` fills BACKWARDS: before the animation's
+         first frame the element sits at the keyframe's `from`, so its computed
+         opacity is exactly 0 — not part-way through a fade, not yet started.
+         Under load that first frame does not always land inside 90 ms, and
+         every measurement below that asks `checkVisibility` reads the whole
+         step as invisible. The "options on screen" check is the one that does,
+         and what it then reports is the worst sentence in this file: a step
+         with its options in place, called a step a customer cannot answer.
+
+         Measured 25.9.2026 by repeating this walk at 1920x918: it fired on 3
+         of 25 walks here and 2 of 25 on a tree without the day's changes, on a
+         different step each time — lock, mk, glass. A gate that names a
+         different step at random is a gate people learn to re-run.
+
+         ⚠ THE WAIT ADDS AN ASSERTION, IT DOES NOT SOFTEN ONE. A step whose
+         entrance never finishes is a real fault of exactly the kind this sweep
+         is for — the customer is looking at a panel that is not there — and
+         nothing in this file could see it, because the same 90 ms that was too
+         short to let a fast animation finish was also too short to notice one
+         that never did. Two seconds is nine times the .22s the stylesheet asks
+         for, so a timeout is a stuck page and not a slow machine. */
+      let settled = true;
+      try {
+        await p.waitForFunction(() => {
+          const live = document.querySelector('.sect.is-live');
+          return !!live
+            && live.getAnimations().every(a => a.playState !== 'running')
+            && Number(getComputedStyle(live).opacity) > 0.99;
+        }, null, { timeout: 2000 });
+      } catch { settled = false; }
+      if (!settled) {
+        fault(v.name, `step "${k}" never finished arriving — two seconds after `
+          + 'its circle was clicked the panel is still part-way through a .22s '
+          + 'entrance, so the customer is looking at a step that is not there');
+      }
+
       /* ── SEND AND PRICE EXIST ON THIS STEP, AND ON THIS SCREEN ────────
          `PLAN.md` §0: the product is an order Peretz can act on. A guided flow
          may sequence the questions; it may not put the answer out of reach.
