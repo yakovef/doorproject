@@ -2828,6 +2828,46 @@ how it got there. Detail lives in the section it belongs to.
   already verified, and mine was dropped. Before the rebase, with mine,
   `npm run audit` reported **no faults** at all eight viewports.
 
+- **⚠ THE משקוף SECTION IS A SQUARE C, WHICH IS WHAT HE ASKED FOR TWICE —
+  24.9.2026.** Part B read his sentence — *"a sort of a square C shape that
+  represents how the mashkof looks from above if it is cut half way"* — and
+  drew an **I**: a wall band, a plate on it, a stem through it and the leaf at
+  the back. Five pieces, of which the three he names and prices were not
+  obviously any of them, the "62" printed across the leaf, and the inner
+  kant's figure marooned at the foot of the box with a 60 px gap over it. The
+  owner's son sent the drawing: a vertical with two arms off the same end,
+  the arms `inside kant` and `outside kant`, the vertical `falce`. Three
+  strokes. That is the profile and it is the whole of the profile.
+
+  So the frame is one C now and **nothing else is drawn**. No wall — the C IS
+  the piece that wraps the wall's edge, and a grey band behind it was carrying
+  none of the meaning. No leaf — the section is of the משקוף, and the leaf is
+  what the falc's figure was being printed across. The falc faces the opening
+  and the two kants lap the two faces of the wall, so the wall lies between the
+  arms, which is why they point the way they do.
+
+  ⚠ **THE UNITS ARE NOW MILLIMETRES, `sc = 1`.** Each mark runs the length of
+  one PIECE end to end — the arm, the arm, the falc — so "one scale across
+  eight frames" is a fact about the figure rather than an arithmetic
+  coincidence, and the assertion that was already there needed only its reason
+  rewritten. Until now the face mark spanned one WING of a plate drawn two
+  wings wide: true, and it took a paragraph to defend.
+
+  ⚠ **ONE LENGTH IN THE FIGURE IS NOT MEASURED AND IS LABELLED AS SUCH.** A cut
+  profile needs a thickness to read as cut rather than as a line, and frame
+  stock is thinner than any mark at this scale could show. It is 6 units
+  against the smallest real number on the drawing, 46, so it cannot be mistaken
+  for one of them, and it is not dimensioned. It is not priced.
+
+  Measured after: the glyph is 300×197 at 1280 and 260×170 at 390, against
+  300×222 before — **shorter**, which is the direction that matters, since the
+  reason the section sits after the rows below 1100 px is that it was taking
+  the fold. Every `<text>` checked inside the viewBox at 320, 390 and 1280 in
+  all three languages with all three parts widened — the case Part B's own note
+  warns about, where "Наружный кант" printed as "аружный кант" on a phone. The
+  two kant names sit in a fixed column past the widest arm they can have, so
+  they do not walk 36 units left and right as the choices are ticked.
+
 - **⚠ THE THREE-PANEL FACE RE-MEASURED OFF AN INSTALLED DOOR, AND THE BOW
   NOW HANGS BELOW THE LEVER — 24.9.2026.** Sent in beside a screenshot of
   ours: *"our panel proportions are not so great, please fix them, you can see

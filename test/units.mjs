@@ -1999,13 +1999,15 @@ group('the stripe pictures are the door\'s own lines');
    15.9.2026, while Peretz orders them as 46 and 82 across the face and 62 and
    112 into the wall. The numbers are now on the section.
 
-   ⚠ ASSERTED AS ONE SCALE SHARED BY BOTH AXES AND ALL FOUR TILES, because
+   ⚠ ASSERTED AS ONE SCALE SHARED BY BOTH AXES AND ALL EIGHT FRAMES, because
    that is what makes a dimensioned diagram honest: every mark is exactly as
-   long as the number written on it, so a customer comparing two tiles is
-   comparing two measurements and not two drawings. The face dimension spans
-   ONE WING of the casing, which is what `mk.out` is — dimensioning the whole
-   plate would print 46 against a mark 92 long, and the drawing would be
-   lying in the customer's favour on a frame he pays ₪250 a side for.
+   long as the number written on it, so a customer comparing two frames is
+   comparing two measurements and not two drawings. Since the section became a
+   square C on 24.9.2026 each mark runs the length of one PIECE — the arm, the
+   arm, the falc — end to end, and the glyph's units are millimetres, so the
+   scale is one by construction. It still has to be asserted: the failure this
+   catches is a second constant creeping onto one axis, and a diagram that is
+   lying in the customer's favour about a part he pays ₪250 for.
 
    The numbers are read out of `MASHKOFS`, never typed, so the test feeds a
    frame that is not in the catalogue and demands the glyph follow it: a

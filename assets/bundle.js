@@ -7983,53 +7983,49 @@ ${body}
   </svg>`;
   }
   function mashkofGlyph(mk) {
-    const W = 232, H = 172;
-    const sc = 0.62;
-    const out = mk.out * sc, dep = mk.in * sc;
-    const inner = (mk.inner == null ? mk.out : mk.inner) * sc;
-    const cx = 100;
-    const wallY = 46, frameY = wallY;
-    const dimY = 30, dimX = cx + 22;
-    const foot = frameY + dep;
+    const W = 290, H = 190;
+    const sc = 1, T2 = 6;
+    const O = mk.out * sc;
+    const F = mk.in * sc;
+    const I = (mk.inner == null ? mk.out : mk.inner) * sc;
+    const x0 = 74, cy = H / 2;
+    const yTop = cy - F / 2, yBot = cy + F / 2;
+    const dimX = x0 - 20, numX = dimX - 8, lblX = x0 + 92;
     const f = (n) => n.toFixed(1);
     const part = (k) => MASHKOF_PARTS.find((p) => p.key === k);
     return `<svg viewBox="0 0 ${W} ${H}" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">
-      <!-- the wall, cut -->
-      <rect x="0" y="${wallY}" width="${W}" height="26" opacity=".16"/>
-      <!-- the frame's face on the wall, and its return into the opening -->
-      <rect x="${f(cx - out)}" y="${frameY - 9}" width="${f(out * 2)}" height="9"/>
-      <rect x="${cx - 7}" y="${frameY}" width="14" height="${f(dep)}"/>
-      <!-- the inner kant: the same wing on the room side of the wall -->
-      <rect x="${f(cx - inner)}" y="${wallY + 26}" width="${f(inner * 2)}" height="9"/>
-      <!-- the leaf, at the back of the return -->
-      <rect x="${cx - 46}" y="${f(foot)}" width="92" height="11" opacity=".72"/>
+      <!-- the falc: the face that stands in the opening, and the leaf shuts on -->
+      <rect x="${x0}" y="${f(yTop)}" width="${T2}" height="${f(F)}"/>
+      <!-- the inner kant, lapping the room side of the wall -->
+      <rect x="${x0}" y="${f(yTop)}" width="${f(I)}" height="${T2}"/>
+      <!-- the outer kant, lapping the street side -->
+      <rect x="${x0}" y="${f(yBot - T2)}" width="${f(O)}" height="${T2}"/>
     </g>
-    <g fill="none" stroke="currentColor" stroke-width="2.6" opacity=".6">
-      <!-- the face, over one wing -->
-      <path d="M${f(cx - out)} ${dimY}H${cx}"/>
-      <path d="M${f(cx - out)} ${dimY - 5}v10"/>
-      <path d="M${cx} ${dimY - 5}v10"/>
-      <!-- the return, wall face to leaf -->
-      <path d="M${dimX} ${frameY}V${f(foot)}"/>
-      <path d="M${dimX - 5} ${frameY}h10"/>
-      <path d="M${dimX - 5} ${f(foot)}h10"/>
-      <!-- the inner kant, over one wing, at the foot of the glyph: the band
-           between the wing and the leaf is too short to hold a mark on the
-           deep frame, so the mark sits under everything -->
-      <path d="M${f(cx - inner)} ${H - 7}H${cx}"/>
-      <path d="M${f(cx - inner)} ${H - 12}v10"/>
-      <path d="M${cx} ${H - 12}v10"/>
+    <g fill="none" stroke="currentColor" stroke-width="2.4" opacity=".55">
+      <!-- the outer kant, under its arm. FIRST of the two horizontal runs,
+           and the inner kant is last: that order is what the test reads. -->
+      <path d="M${x0} ${f(yBot + 12)}H${f(x0 + O)}"/>
+      <path d="M${x0} ${f(yBot + 7)}v10"/>
+      <path d="M${f(x0 + O)} ${f(yBot + 7)}v10"/>
+      <!-- the falc, beside the profile: the only vertical run -->
+      <path d="M${dimX} ${f(yTop)}V${f(yBot)}"/>
+      <path d="M${dimX - 5} ${f(yTop)}h10"/>
+      <path d="M${dimX - 5} ${f(yBot)}h10"/>
+      <!-- the inner kant, over its arm -->
+      <path d="M${x0} ${f(yTop - 12)}H${f(x0 + I)}"/>
+      <path d="M${x0} ${f(yTop - 17)}v10"/>
+      <path d="M${f(x0 + I)} ${f(yTop - 17)}v10"/>
     </g>
-    <g class="glyph__dim" fill="currentColor" font-size="23" opacity=".8">
-      <text x="${f(cx - out / 2)}" y="${dimY - 8}" text-anchor="middle">${mk.out}</text>
-      <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 8)}">${mk.in}</text>
-      <text x="${f(cx - inner / 2)}" y="${H - 13}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
+    <g class="glyph__dim" fill="currentColor" font-size="17" opacity=".85">
+      <text x="${f(x0 + O / 2)}" y="${f(yBot + 32)}" text-anchor="middle">${mk.out}</text>
+      <text x="${numX}" y="${f(cy - 2)}" text-anchor="end">${mk.in}</text>
+      <text x="${f(x0 + I / 2)}" y="${f(yTop - 21)}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
     </g>
-    <g class="glyph__lbl" fill="currentColor" font-size="11" opacity=".72">
-      <text x="${cx + 9}" y="${dimY + 4}">${L(part("out"))}</text>
-      <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 24)}">${L(part("in"))}</text>
-      <text x="${cx + 9}" y="${H - 9}">${L(part("inner"))}</text>
+    <g class="glyph__lbl" fill="currentColor" font-size="12" opacity=".7">
+      <text x="${lblX}" y="${f(yBot + 16)}">${L(part("out"))}</text>
+      <text x="${numX}" y="${f(cy + 15)}" text-anchor="end">${L(part("in"))}</text>
+      <text x="${lblX}" y="${f(yTop - 8)}">${L(part("inner"))}</text>
     </g>
   </svg>`;
   }

@@ -10158,14 +10158,15 @@ export function handleFinishGlyph(hf) {
  * tile said only "wide face".
  *
  * ⚠ THE NUMBERS ARE `MASHKOFS`' OWN, NEVER TYPED HERE, and the marks are
- * exactly as long as the numbers claim: `sc` scales both, the face dimension
- * spans ONE WING of the casing (`cx - out … cx`, which is `mk.out * sc`) and
- * the return spans the stem (`mk.in * sc`). Dimensioning the whole plate would
- * have put "46" against a mark twice that long — the plate is one wing each
- * side of the frame, which is what `casX0 = revX0 - mk.out` says in `render`.
- * No unit is printed: מ״מ beside a numeral inside an eleven-pixel line is a
+ * exactly as long as the numbers claim. Since the C replaced the I on 24.9 the
+ * three marks are the three PIECES, end to end: each kant's mark runs the
+ * length of its own arm and the falc's runs the height of the falc, with the
+ * units millimetres so that "one scale" is a fact about the figure and not an
+ * arithmetic coincidence. Until then the face mark spanned one WING of a plate
+ * drawn two wings wide, which was true but needed a paragraph to defend.
+ * No unit is printed: מ״מ beside a numeral inside a seventeen-pixel line is a
  * bidi reordering risk for a word the section drawing already implies, and the
- * four tiles are read against each other, not off a ruler.
+ * frames are read against each other, not off a ruler.
  */
 /* ⚠ THREE PARTS SINCE 20.9.2026, AND THE THIRD IS THE ONE THE DOOR CANNOT
    SHOW. The inner kant — the wing on the room side of the wall — is drawn here
@@ -10188,70 +10189,87 @@ export function handleFinishGlyph(hf) {
    exactly three of them. `render()` never calls this: the door carries no
    type (§4), and the language it is drawn in is the panel's affair. */
 export function mashkofGlyph(mk) {
-  /* ⚠ 172 TALL SINCE PART B, NOT 150: at tile size the foot mark sat on the
-     leaf and nobody could see it; drawn 300 px wide as the control's own
-     section the "46" was printed ACROSS the leaf slab. The deepest return
-     ends at 126 and the figure's top is about H − 31, so 172 keeps it clear
-     of the leaf on every frame; the stylesheet takes the aspect off the
-     viewBox rather than restating it. */
-  /* ⚠ AND 232 WIDE WITH THE SECTION AT x=100, NOT CENTRED: the part names
-     are the customer's language and "Внутренний кант" is 95 units at this
-     size. Anchored to the RIGHT of each mark they need 130 units of room on
-     that side; right-anchored to the left of the face mark, as the first
-     version drew it, "Наружный кант" ran off the viewBox at x<0 and printed
-     "аружный кант" on a 320 px phone. Seen in a screenshot, not by any
-     instrument — a clipped glyph is not a fault the markup carries. */
-  const W = 232, H = 172;
-  const sc = 0.62;                        // mm to glyph units
-  const out = mk.out * sc, dep = mk.in * sc;
-  const inner = (mk.inner == null ? mk.out : mk.inner) * sc;
-  const cx = 100;
-  /* The section sits 16 units lower than it did: that band is where the face
-     dimension and its number now live, and moving the drawing down was
-     cheaper than shrinking it — at 74 px tall the difference between a 62 and
-     a 112 return is 19 px against 34 px, and `sc` is what carries it. */
-  const wallY = 46, frameY = wallY;
-  const dimY = 30, dimX = cx + 22;
-  const foot = frameY + dep;
+  /* ⚠ A SQUARE C, WHICH IS WHAT HE ASKED FOR TWICE — redrawn 24.9.2026 from
+     the owner's son's own sketch after Part B drew something else. Part B read
+     *"a sort of a square C shape that represents how the mashkof looks from
+     above if it is cut half way"* and produced an I: a wall band, a plate on
+     it, a stem through it and the leaf at the back — five pieces, of which the
+     three he names were not obviously any of them. His drawing is three
+     strokes: a vertical with two arms off the same end, the arms labelled
+     `inside kant` and `outside kant` and the vertical `falce`. That is the
+     profile, and it is the whole of the profile.
+
+     So the frame is one C now and nothing else is drawn. No wall: the C IS the
+     piece that wraps the wall's edge and a grey band behind it was carrying
+     none of the meaning. No leaf: the section is of the משקוף, and the leaf in
+     the old drawing is what the "62" was being printed across.
+
+     Which way round: the falc faces the opening, the two kants lap the two
+     faces of the wall, so the wall lies between the arms — to the RIGHT of the
+     C as it is drawn, exactly as he drew it, with the inner kant on top. */
+  /* ⚠ THE UNITS ARE MILLIMETRES, `sc = 1`. Every part of this figure is drawn
+     at the length the catalogue gives it and every dimension mark is that same
+     length, so there is one scale by construction rather than by arithmetic —
+     which is what the assertion in `test/units.mjs` asks of it.
+     ⚠ `T` IS THE ONE LENGTH HERE THAT IS NOT MEASURED. A cut profile has to
+     have a thickness to read as cut rather than as a line, and steel frame
+     stock is thinner than any mark drawn at this scale could show. It is a
+     drawing weight, deliberately a fraction of the smallest real number on the
+     figure (6 against 46) so it cannot be read as one of them, and it is not
+     dimensioned. Do not price it. */
+  const W = 290, H = 190;
+  const sc = 1, T = 6;
+  const O = mk.out * sc;
+  const F = mk.in * sc;
+  const I = (mk.inner == null ? mk.out : mk.inner) * sc;
+  /* The falc's outer face, and the vertical middle of the figure. The C grows
+     from its centre in both directions, so a deeper falc is visibly a taller
+     piece with the drawing staying where it is on the page. */
+  const x0 = 74, cy = H / 2;
+  const yTop = cy - F / 2, yBot = cy + F / 2;
+  /* The falc's mark sits in the clear to the left with its figure and its
+     name; the two kants are named down a fixed column to the right of the
+     widest arm they can have. Part B's note about this still holds and is why
+     the column is fixed rather than following each arm's tip: the names are
+     the customer's language, "Внутренний кант" is about 104 units at this
+     size, and a name that starts where the arm ends walks 36 units left and
+     right as the choices are ticked. */
+  const dimX = x0 - 20, numX = dimX - 8, lblX = x0 + 92;
   const f = n => n.toFixed(1);
   const part = k => MASHKOF_PARTS.find(p => p.key === k);
   return `<svg viewBox="0 0 ${W} ${H}" class="glyph glyph--hw" aria-hidden="true">
     <g fill="currentColor">
-      <!-- the wall, cut -->
-      <rect x="0" y="${wallY}" width="${W}" height="26" opacity=".16"/>
-      <!-- the frame's face on the wall, and its return into the opening -->
-      <rect x="${f(cx - out)}" y="${frameY - 9}" width="${f(out * 2)}" height="9"/>
-      <rect x="${cx - 7}" y="${frameY}" width="14" height="${f(dep)}"/>
-      <!-- the inner kant: the same wing on the room side of the wall -->
-      <rect x="${f(cx - inner)}" y="${wallY + 26}" width="${f(inner * 2)}" height="9"/>
-      <!-- the leaf, at the back of the return -->
-      <rect x="${cx - 46}" y="${f(foot)}" width="92" height="11" opacity=".72"/>
+      <!-- the falc: the face that stands in the opening, and the leaf shuts on -->
+      <rect x="${x0}" y="${f(yTop)}" width="${T}" height="${f(F)}"/>
+      <!-- the inner kant, lapping the room side of the wall -->
+      <rect x="${x0}" y="${f(yTop)}" width="${f(I)}" height="${T}"/>
+      <!-- the outer kant, lapping the street side -->
+      <rect x="${x0}" y="${f(yBot - T)}" width="${f(O)}" height="${T}"/>
     </g>
-    <g fill="none" stroke="currentColor" stroke-width="2.6" opacity=".6">
-      <!-- the face, over one wing -->
-      <path d="M${f(cx - out)} ${dimY}H${cx}"/>
-      <path d="M${f(cx - out)} ${dimY - 5}v10"/>
-      <path d="M${cx} ${dimY - 5}v10"/>
-      <!-- the return, wall face to leaf -->
-      <path d="M${dimX} ${frameY}V${f(foot)}"/>
-      <path d="M${dimX - 5} ${frameY}h10"/>
-      <path d="M${dimX - 5} ${f(foot)}h10"/>
-      <!-- the inner kant, over one wing, at the foot of the glyph: the band
-           between the wing and the leaf is too short to hold a mark on the
-           deep frame, so the mark sits under everything -->
-      <path d="M${f(cx - inner)} ${H - 7}H${cx}"/>
-      <path d="M${f(cx - inner)} ${H - 12}v10"/>
-      <path d="M${cx} ${H - 12}v10"/>
+    <g fill="none" stroke="currentColor" stroke-width="2.4" opacity=".55">
+      <!-- the outer kant, under its arm. FIRST of the two horizontal runs,
+           and the inner kant is last: that order is what the test reads. -->
+      <path d="M${x0} ${f(yBot + 12)}H${f(x0 + O)}"/>
+      <path d="M${x0} ${f(yBot + 7)}v10"/>
+      <path d="M${f(x0 + O)} ${f(yBot + 7)}v10"/>
+      <!-- the falc, beside the profile: the only vertical run -->
+      <path d="M${dimX} ${f(yTop)}V${f(yBot)}"/>
+      <path d="M${dimX - 5} ${f(yTop)}h10"/>
+      <path d="M${dimX - 5} ${f(yBot)}h10"/>
+      <!-- the inner kant, over its arm -->
+      <path d="M${x0} ${f(yTop - 12)}H${f(x0 + I)}"/>
+      <path d="M${x0} ${f(yTop - 17)}v10"/>
+      <path d="M${f(x0 + I)} ${f(yTop - 17)}v10"/>
     </g>
-    <g class="glyph__dim" fill="currentColor" font-size="23" opacity=".8">
-      <text x="${f(cx - out / 2)}" y="${dimY - 8}" text-anchor="middle">${mk.out}</text>
-      <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 8)}">${mk.in}</text>
-      <text x="${f(cx - inner / 2)}" y="${H - 13}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
+    <g class="glyph__dim" fill="currentColor" font-size="17" opacity=".85">
+      <text x="${f(x0 + O / 2)}" y="${f(yBot + 32)}" text-anchor="middle">${mk.out}</text>
+      <text x="${numX}" y="${f(cy - 2)}" text-anchor="end">${mk.in}</text>
+      <text x="${f(x0 + I / 2)}" y="${f(yTop - 21)}" text-anchor="middle">${mk.inner == null ? mk.out : mk.inner}</text>
     </g>
-    <g class="glyph__lbl" fill="currentColor" font-size="11" opacity=".72">
-      <text x="${cx + 9}" y="${dimY + 4}">${L(part('out'))}</text>
-      <text x="${dimX + 9}" y="${f(frameY + dep / 2 + 24)}">${L(part('in'))}</text>
-      <text x="${cx + 9}" y="${H - 9}">${L(part('inner'))}</text>
+    <g class="glyph__lbl" fill="currentColor" font-size="12" opacity=".7">
+      <text x="${lblX}" y="${f(yBot + 16)}">${L(part('out'))}</text>
+      <text x="${numX}" y="${f(cy + 15)}" text-anchor="end">${L(part('in'))}</text>
+      <text x="${lblX}" y="${f(yTop - 8)}">${L(part('inner'))}</text>
     </g>
   </svg>`;
 }
