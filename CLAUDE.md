@@ -339,7 +339,7 @@ walk, and walking it means grepping for each one, not remembering it.
 
 ### Green
 
-- `npm test` — **9,085,344 / 0** (25.9.2026; 11,809,879 on 23.9 — the drop is
+- `npm test` — **9,086,139 / 0** (25.9.2026; 11,809,879 on 23.9 — the drop is
   the buildable sweeps shrinking, see §0b 24.9). ⚠ A CHANGE IN THIS
   NUMBER IS NOT EVIDENCE OF ANYTHING; it is the product of the catalogue's list
   lengths. Read the failure count. (This line said **5,403,239** for two rounds
@@ -2712,7 +2712,8 @@ entries describe the code as it stands; below that it becomes the history of
 how it got there. Detail lives in the section it belongs to.
 
 - **⚠ THE CURVED LEVER IS TURNED 8° UP ABOUT ITS SPINDLE, AND ITS SHAPE DID
-  NOT MOVE — 25.9.2026.** The owner's son on the version below: *"Now the
+  NOT MOVE — 25.9.2026.** The owner's son on the version that hangs down
+  (three entries below): *"Now the
   shape is right, but you need to rotate it a little bit up so it will be more
   Horizontal looking."*
   · **What changed:** one new constant, `TAPER_TILT = 8`, and one helper,
@@ -2766,12 +2767,15 @@ how it got there. Detail lives in the section it belongs to.
   ⚠ **Still no photograph of this product**, and `ASK-PERETZ` §1b still asks
   for its name.
 
-  **Gates:** `npm test` **9,085,344 / 0** after the sheets; `npm run audit`
-  found **no faults** at eight viewports.
+  **Gates:** `npm test` **9,086,139 / 0** after the sheets, on the tree
+  rebased onto the recurring agent's three commits of the same afternoon
+  (9,085,344 before them); `npm run audit` found **no faults** at eight
+  viewports, before the rebase and after it.
 
   **Sheets:** **0 of 48 bare and 0 lockset sheets moved**, as predicted,
-  because no comparison fixture carries the curved lever. 9 of the 12 `shot`
-  sheets moved, which proves nothing (§7).
+  because no comparison fixture carries the curved lever — before the rebase
+  and again after it. 7 of the 12 `shot` sheets moved, which proves nothing
+  (§7).
 
 - **⚠ THE STEP EXPLAINERS, READ IN THREE LANGUAGES — AND ONE OF THEM WAS
   QUOTING A PRICE THE PAGE DOES NOT CHARGE — 25.9.2026.** Part E of the

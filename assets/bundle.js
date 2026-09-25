@@ -3074,9 +3074,15 @@ ${stops}
   var TAPER_DROP = 30;
   var TAPER_HALF_NECK = 16;
   var TAPER_HALF_CAP = 4;
+  var TAPER_TILT = 8;
   var taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
   var taperMid = (t, L2) => TAPER_DROP * (t / L2) ** 2;
   var taperHalf = (t, L2) => TAPER_HALF_CAP + (TAPER_HALF_NECK - TAPER_HALF_CAP) * (1 - Math.min(1, t / L2)) ** 2;
+  var taperAt = (t, s, L2) => {
+    const u = t, v = taperMid(t, L2) + s * taperHalf(t, L2);
+    const a = TAPER_TILT * Math.PI / 180, c = Math.cos(a), n = Math.sin(a);
+    return [u * c + v * n, v * c - u * n];
+  };
   var TAPER_STEPS = 14;
   var taperBand = (pt, L2, s0 = -1, s1 = 1, t0 = 0, t1 = L2) => {
     const ts = Array.from({ length: TAPER_STEPS + 1 }, (_, i) => t0 + (t1 - t0) * i / TAPER_STEPS);
@@ -7529,8 +7535,10 @@ ${body}
   }
   function leverTaper(cx, cy, dir) {
     const L2 = taperReach();
-    const at = (t) => cx + dir * t;
-    const pt = (t, s) => `${at(t).toFixed(1)} ${(cy + taperMid(t, L2) + s * taperHalf(t, L2)).toFixed(1)}`;
+    const pt = (t, s) => {
+      const [u, v] = taperAt(t, s, L2);
+      return `${(cx + dir * u).toFixed(1)} ${(cy + v).toFixed(1)}`;
+    };
     const body = taperBand(pt, L2);
     return `
     <g data-kind="lever">
@@ -7825,12 +7833,15 @@ ${body}
        tapers" cannot become true of one of them and not the other. */
     levertaper: () => {
       const L2 = taperReach();
-      const pt = (t, s) => `${(-t).toFixed(1)} ${(taperMid(t, L2) + s * taperHalf(t, L2)).toFixed(1)}`;
+      const pt = (t, s) => {
+        const [u, v] = taperAt(t, s, L2);
+        return `${(-u).toFixed(1)} ${v.toFixed(1)}`;
+      };
       return { box: [
         -(L2 + 16),
         -(LEVER_ROSETTE + 12),
         LEVER_ROSETTE + 12,
-        Math.max(LEVER_ROSETTE, TAPER_DROP + TAPER_HALF_CAP) + 12
+        Math.max(LEVER_ROSETTE, taperAt(L2, 1, L2)[1]) + 12
       ], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
     <path d="${taperBand(pt, L2)}"/>` };
