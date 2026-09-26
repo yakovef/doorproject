@@ -127,6 +127,9 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **26.9** Curved lever's tip level with its spindle (*"the end of the handle
+  needs to be the same height as the start"*): `TAPER_TILT` derived, 15.39°;
+  lock-tile raster coral~curved 0.300 → 0.277, no audit floor exists for it.
 - **26.9** `CLAUDE.md` rewritten to what is true now; the log and the old §0–§10
   moved verbatim to `HISTORY.md`. Fixed: code is 60 bits not 40 (§8), the
   flow not the cabinet (§3), five August plans are in the tree (§2).
@@ -685,9 +688,12 @@ is idempotent and always LANDS somewhere buildable. Glazing repairs run
 - **`LOCKSETS` — the lock furniture**, always: what you turn and the keyway.
   ⚠ **`lever-taper` (the curved lever) has a placeholder id that can never be
   renamed** — Peretz's name for it becomes the label, never the id (1b in
-  `ASK-PERETZ.md`). It is drawn by `leverTaper`, turned `TAPER_TILT = 8`° up
-  about the spindle by `taperAt`, which the tile uses too — point rotation, not
-  an SVG transform, because `getBBox` rounds rotated groups up (§7).
+  `ASK-PERETZ.md`). It is drawn by `leverTaper`, turned up about the spindle
+  by `taperAt` until its tip's centre is level with the spindle — `TAPER_TILT`
+  is **derived**, `atan2(TAPER_DROP, taperReach())`, never typed (26.9). The
+  tile uses the same function and sizes its box off `taperExtent`. Point
+  rotation, not an SVG transform, because `getBBox` rounds rotated groups up
+  (§7).
 - **`SPECIAL_LOCKS`** — a second lock beside the first, at eye level
   (`SPECIAL_AFF` 1430). Bought-in units.
 - **`BELLS` and `PEEPHOLES`** — fittings on the face (`bl=`, `ey=`). The bell is

@@ -3074,8 +3074,8 @@ ${stops}
   var TAPER_DROP = 30;
   var TAPER_HALF_NECK = 16;
   var TAPER_HALF_CAP = 4;
-  var TAPER_TILT = 8;
   var taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
+  var TAPER_TILT = Math.atan2(TAPER_DROP, taperReach()) * 180 / Math.PI;
   var taperMid = (t, L2) => TAPER_DROP * (t / L2) ** 2;
   var taperHalf = (t, L2) => TAPER_HALF_CAP + (TAPER_HALF_NECK - TAPER_HALF_CAP) * (1 - Math.min(1, t / L2)) ** 2;
   var taperAt = (t, s, L2) => {
@@ -3088,6 +3088,13 @@ ${stops}
     const ts = Array.from({ length: TAPER_STEPS + 1 }, (_, i) => t0 + (t1 - t0) * i / TAPER_STEPS);
     const tip = t1 >= L2 ? ` Q ${pt(L2 + TAPER_HALF_CAP * 1.6 * (s1 - s0) / 2, (s0 + s1) / 2)} ${pt(L2, s1)}` : ` L ${pt(t1, s1)}`;
     return `M ${ts.map((t) => pt(t, s0)).join(" L ")}${tip} L ${ts.slice().reverse().map((t) => pt(t, s1)).join(" L ")} Z`;
+  };
+  var taperExtent = (L2) => {
+    const P = [];
+    for (let i = 0; i <= TAPER_STEPS; i++) P.push(taperAt(L2 * i / TAPER_STEPS, -1, L2), taperAt(L2 * i / TAPER_STEPS, 1, L2));
+    const a = taperAt(L2, -1, L2), b = taperAt(L2, 1, L2), c = taperAt(L2 + TAPER_HALF_CAP * 1.6, 0, L2);
+    P.push([(a[0] + b[0]) / 4 + c[0] / 2, (a[1] + b[1]) / 4 + c[1] / 2]);
+    return [Math.max(...P.map((p) => p[0])), Math.min(...P.map((p) => p[1])), Math.max(...P.map((p) => p[1]))];
   };
   var LOCK_CLEAR = 15;
   var MOULD_BAND = 70;
@@ -7837,11 +7844,12 @@ ${body}
         const [u, v] = taperAt(t, s, L2);
         return `${(-u).toFixed(1)} ${v.toFixed(1)}`;
       };
+      const [along, high, low] = taperExtent(L2);
       return { box: [
-        -(L2 + 16),
-        -(LEVER_ROSETTE + 12),
+        -(Math.max(L2, along) + 16),
+        Math.min(-LEVER_ROSETTE, high) - 12,
         LEVER_ROSETTE + 12,
-        Math.max(LEVER_ROSETTE, taperAt(L2, 1, L2)[1]) + 12
+        Math.max(LEVER_ROSETTE, low) + 12
       ], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
     <path d="${taperBand(pt, L2)}"/>` };

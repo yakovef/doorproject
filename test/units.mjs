@@ -3212,8 +3212,22 @@ group('the second review\'s night round — 25.9.2026');
        has the larger mid. Each number below is one the morning's scythe
        fails: it climbed, it swept 0.20 of its reach, and its neck was 1.22 of
        the Coral's blade. */
-    const sweep = mid(last) - mid(0), early = mid(half) - mid(0);
-    ok(sweep > 0, `the curved lever's tip is ${(-sweep).toFixed(1)} ABOVE its neck — it curves downwards, not up`);
+    /* ⚠ RESTATED 26.9.2026, SAME SUBJECT. These two read the curl straight
+       off the drawing's y — "the tip hangs below the neck", "the middle has
+       done less than 0.4 of that" — which was the blade's own frame while it
+       hung square. The owner's son has since put the tip at the neck's height
+       (below), so the drawing's y now measures the turn, and `sweep > 0` would
+       fail by being asked the wrong frame, not because the blade stopped
+       curling down. Both are asked now against the line the blade LEAVES THE
+       ROSE along (C(0) to C(1), which no turn can bend): the tip must stand
+       below that line, and the middle must have done less than 0.4 of the
+       tip's fall from it. On the 25.9 morning scythe — which climbed — the
+       first is negative, exactly as the old form was; hung square or turned
+       any amount, the second reads the same 0.23. */
+    const [nx, ny] = [C(1)[0] - C(0)[0], C(1)[1] - C(0)[1]], nl = Math.hypot(nx, ny);
+    const offNeck = i => ((C(i)[1] - C(0)[1]) * Math.abs(nx) - (C(i)[0] - C(0)[0]) * Math.sign(nx) * ny) / nl;
+    const sweep = offNeck(last), early = offNeck(half);
+    ok(sweep > 0, `the curved lever's tip stands ${(-sweep).toFixed(1)} ABOVE the line it leaves its rose along — it curves downwards, not up`);
     ok(early < sweep * 0.4, 'the curved lever bends in a straight line — the curl belongs at the tip');
     /* And later still: "Now the shape is right, but you need to rotate it a
        little bit up so it will be more Horizontal looking." So the SHAPE is
@@ -3233,13 +3247,45 @@ group('the second review\'s night round — 25.9.2026');
     ok(bend > 0, `the middle of the curved lever stands ${(-bend).toFixed(1)} BELOW the line from its neck to its tip — it curves up, not down`);
     ok(bend > chord * 0.055,
        `the curved lever bends ${(bend / chord).toFixed(3)} of its chord — it should be a little more curved than 0.048`);
-    const fall = Math.atan2(y1 - y0, Math.abs(x1 - x0)) * 180 / Math.PI;
     ok(C(1)[1] < C(0)[1], 'the curved lever leaves its rose falling — it should be turned up a little, so the neck rises');
-    ok(fall < 10, `the line from the curved lever's neck to its tip falls ${fall.toFixed(1)} degrees — it should be turned up to read more horizontal (it fell 15.4)`);
+    /* ⚠ RESTATED 26.9.2026, STRONGER. This was `fall < 10` degrees — "turned
+       up a little" read as a ceiling, which the 8-degree turn met at 7.4.
+       Then: *"make it face a little bit more upward … the end of the handle
+       needs to be the same height as the start."* That is not a ceiling, it
+       is a point: the tip's centre on the spindle's height, to a millimetre,
+       and it implies the old clause (level is 0 degrees). 8 typed back leaves
+       the tip 14.5 below and fails it. */
+    ok(Math.abs(y1 - y0) < 1,
+       `the curved lever's tip is ${(y1 - y0).toFixed(1)} mm ${y1 > y0 ? 'below' : 'above'} its spindle — the end of the handle is the same height as the start`);
     const coralBlade = Number(/height="([\d.]+)" rx/.exec(coral)[1]);
     ok(depth(0) >= coralBlade * 1.35,
        `the curved lever is ${depth(0).toFixed(1)} deep at the neck against the Coral's ${coralBlade} — it should start a little wider`);
   }
+
+  /* And the same "same height as the start" asked of the DOOR, every size and
+     both handings, because the tile and the door share taperAt and a check on
+     one of them is a check on a shared function only while nobody forks it.
+     The neck's centre must be the rose's centre (the rose stays on the
+     spindle) and the tip's centre must be within a millimetre of its height. */
+  let doorLevers = 0;
+  for (const size of Object.keys(SIZES)) for (const handing of HANDINGS.map(h => h.id)) {
+    const svg = render({ ...DEFAULTS, size, handing, lockset: 'lever-taper' });
+    const g = /<g data-kind="lever">([\s\S]*?)<g data-mount="rose">([\s\S]*?)<\/g>/.exec(svg);
+    const body = g && /<path d="(M [^"]+)" fill="url\(#nickel\)"\/>/.exec(g[1]);
+    const rose = g && /<circle cx="(-?[\d.]+)" cy="(-?[\d.]+)" r="[\d.]+" fill="url\(#roseFace\)"/.exec(g[2]);
+    ok(body && rose, `${size}/${handing}: the curved lever's body or rose was not found on the door — the level check is dead`);
+    if (!body || !rose) continue;
+    const Q = [...body[1].matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])]);
+    const k = (Q.length - 2) / 2, up = Q.slice(0, k), dn = Q.slice(k + 2).reverse();
+    const mid = i => [(up[i][0] + dn[i][0]) / 2, (up[i][1] + dn[i][1]) / 2];
+    const [rx, ry] = [Number(rose[1]), Number(rose[2])];
+    ok(Math.hypot(mid(0)[0] - rx, mid(0)[1] - ry) < 0.2,
+       `${size}/${handing}: the curved lever's neck is centred at ${mid(0).map(v => v.toFixed(1))} and its rose at ${rx},${ry} — the rose has left the spindle`);
+    ok(Math.abs(mid(k - 1)[1] - ry) < 1,
+       `${size}/${handing}: the curved lever's tip is ${(mid(k - 1)[1] - ry).toFixed(1)} mm off its spindle's height on the door — the end is the same height as the start`);
+    doorLevers++;
+  }
+  ok(doorLevers >= 12, `only ${doorLevers} curved levers were read off the door — the level clause has no subject`);
 }
 
 group('`gp` is a retired parameter, and a link still carrying it is not an error');

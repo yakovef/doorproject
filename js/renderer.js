@@ -924,12 +924,28 @@ const LEVER_BLADE  = Math.round(LEVER_ROSETTE * 2 * 0.377);
    constant. The rotation is applied to the POINTS by taperAt, never as an
    SVG transform, because a browser's getBBox rounds a rotated group up
    (CLAUDE.md §7) and the footprint sweep measures this fitting with it. */
+/* ⚠ AND ITS TIP IS LEVEL WITH ITS SPINDLE, SINCE 26.9.2026 — the owner's son:
+   *"Keep the shape of the curved lever but make it face a little bit more
+   upward … the end of the handle needs to be the same height as the start."*
+   The start is the neck, whose centre IS the spindle, so the sentence names
+   one angle and it is not a number to type: turn the blade up until the
+   centre of its tip — (reach, TAPER_DROP) before the turn — lands on the
+   spindle's height, and that is atan2(TAPER_DROP, reach), 15.39 degrees on
+   today's 109 reach. It is DERIVED, below taperReach, so the day the drop or
+   the reach is re-measured the tip stays level without anybody remembering
+   this line; the 8 it replaces left the tip 14.5 below. Still a rotation of
+   the points about the spindle, so the four constants above do not move and
+   the rose does not leave its spindle — the shape he called right is the
+   shape drawn, turned further. */
 const TAPER_REACH_F  = 0.85;  // a bit shorter than the Coral
 const TAPER_DROP     = 30;    // how far the tip hangs below the spindle, as the square of the reach
 const TAPER_HALF_NECK = 16;   // half-depth where it leaves the rose (the Coral's is 11.5) …
 const TAPER_HALF_CAP  = 4;    // … and at the point
-const TAPER_TILT     = 8;     // degrees the whole blade is turned UP about the spindle
 const taperReach = () => Math.round(LEVER_REACH * TAPER_REACH_F);
+/* Degrees the whole blade is turned UP about the spindle: exactly enough to put
+   the tip's centre at the spindle's height (the note above). Read after
+   taperReach — a const arrow read before its own line throws. */
+const TAPER_TILT = Math.atan2(TAPER_DROP, taperReach()) * 180 / Math.PI;
 /* Positive is DOWN in the drawing's y. */
 const taperMid   = (t, L) => TAPER_DROP * (t / L) ** 2;
 const taperHalf  = (t, L) =>
@@ -956,6 +972,18 @@ const taperBand = (pt, L, s0 = -1, s1 = 1, t0 = 0, t1 = L) => {
     : ` L ${pt(t1, s1)}`;
   return `M ${ts.map(t => pt(t, s0)).join(' L ')}${tip} L `
        + `${ts.slice().reverse().map(t => pt(t, s1)).join(' L ')} Z`;
+};
+/* How far the whole blade reaches, rises and hangs, read off the same points
+   taperBand draws — both edges at every station, and the round point's apex
+   (a quadratic's midpoint is a quarter of each end and half its control) — so
+   a box that has to hold the blade grows with the outline, never with a typed
+   margin guessed for one tilt. [along, highest, lowest], `v` positive down. */
+const taperExtent = L => {
+  const P = [];
+  for (let i = 0; i <= TAPER_STEPS; i++) P.push(taperAt(L * i / TAPER_STEPS, -1, L), taperAt(L * i / TAPER_STEPS, 1, L));
+  const a = taperAt(L, -1, L), b = taperAt(L, 1, L), c = taperAt(L + TAPER_HALF_CAP * 1.6, 0, L);
+  P.push([(a[0] + b[0]) / 4 + c[0] / 2, (a[1] + b[1]) / 4 + c[1] / 2]);
+  return [Math.max(...P.map(p => p[0])), Math.min(...P.map(p => p[1])), Math.max(...P.map(p => p[1]))];
 };
 const LOCK_CLEAR   = 15;    // air the handle must leave around the escutcheon
 const PANEL_GAP    = 25;    // flat stile left between a pull bar and a moulded panel
@@ -9349,8 +9377,9 @@ function lever(cx, cy, dir) {
 
 /**
  * The curved lever — a SCYTHE since 25.9.2026, one that HANGS DOWN since
- * later that day, and TURNED UP 8 degrees about its spindle later still (see
- * TAPER_DROP and TAPER_TILT for all three sets of words and the constants).
+ * later that day, TURNED UP about its spindle later still, and turned until
+ * its tip is LEVEL with the spindle on 26.9 (see TAPER_DROP and TAPER_TILT for
+ * all four sets of words and the constants).
  * It began as the shape the Coral was drawn as until
  * 14.9.2026, kept because Peretz recognised it as a product of its own:
  * *"the one thats there right now with the curve, add it as a different
@@ -9917,10 +9946,14 @@ const FITTING_GLYPH = {
       const [u, v] = taperAt(t, s, L);
       return `${(-u).toFixed(1)} ${v.toFixed(1)}`;
     };
-    /* The box's foot is the turned tip's lowest edge or the rose, whichever
-       hangs further — asked of taperAt, so it follows the tilt. */
-    return { box: [-(L + 16), -(LEVER_ROSETTE + 12), LEVER_ROSETTE + 12,
-                   Math.max(LEVER_ROSETTE, taperAt(L, 1, L)[1]) + 12], art: `
+    /* The box holds the rose and the whole turned blade, each read off its
+       own outline (taperExtent) with the Coral's margins. Its foot used to ask
+       only the tip's lower edge, which was the blade's lowest point while it
+       hung; turned level, the lowest point is the neck, and the tip reaches
+       further along than the reach it was typed as. */
+    const [along, high, low] = taperExtent(L);
+    return { box: [-(Math.max(L, along) + 16), Math.min(-LEVER_ROSETTE, high) - 12,
+                   LEVER_ROSETTE + 12, Math.max(LEVER_ROSETTE, low) + 12], art: `
     <circle cx="0" cy="0" r="${LEVER_ROSETTE}"/>
     <path d="${taperBand(pt, L)}"/>` };
   },
