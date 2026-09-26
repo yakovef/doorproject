@@ -12,8 +12,9 @@ has already been tried and reverted for a reason that is written down.
 
 If you read only part of it, read **§0, §0a and §0c** — what this is, who you
 are working for, and where it stands today — and then **§5**, the failure mode
-that keeps recurring. §0b at the bottom is the change log; it is an archive and
-not a briefing, but its top few entries are the code as it stands.
+that keeps recurring. §0b is the change log, one line per change; the
+long-form archive to 26.9.2026 is `HISTORY.md`, which is a record and not a
+briefing.
 
 ⚠ **And add to it.** Every change you make gets a line in `CLAUDE.md` §0b the
 same day, and anything in §0–§10 your change makes false gets corrected in the
@@ -132,7 +133,7 @@ street behind the glass hit its measurement and was reverted. The two-row rail,
 the 30 px navigator circles, the incremental colour repaint, the alcove — all
 built, all measured, all deliberately undone, every reason written down. Others
 that read as defects are open questions for Peretz. So grep `CLAUDE.md` §0b,
-§5 and §9 and `ASK-PERETZ.md` before acting on anything, and say in your log
+§5 and §9, `HISTORY.md` and `ASK-PERETZ.md` before acting on anything, and say in your log
 that you did. *"This is already decided, and here is where"* is a good run's
 work. Undoing a considered decision is worse than another run of nothing.
 
@@ -510,8 +511,11 @@ Two things follow for you:
 `CLAUDE.md` §0b is a newest-first list of every change, one line each. **Add
 your line when you change something**, so that file alone carries what a fresh
 context needs — the owner compacts this conversation regularly and anything
-only in chat is gone. Detail goes in the section it belongs to; §0b is the
-index.
+only in chat is gone. Detail goes in the section it belongs to and in the
+commit message; §0b is the index. **One line per change, three at most** — it
+grew to 9,000 lines of essays once and was moved to `HISTORY.md` on 26.9.2026.
+When §0b passes about forty lines, move its oldest lines to the top of
+`HISTORY.md`.
 
 ## Write down what you did
 
