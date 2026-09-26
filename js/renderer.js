@@ -395,6 +395,41 @@ export function cylinderRamp(tone) {
  */
 export const bellRamp = tone => tone;
 
+/**
+ * The כדור's ball — the פרזול's, since 26.9.2026.
+ *
+ * ⚠ THIS OVERRULES THE 31.8 INSTRUCTION, WHICH IS KEPT HERE RATHER THAN
+ * DELETED. Owner, 31.8.2026: *"the pirzul doesnt change the color of the ספיר
+ * and כדור handles."* The owner's son, 26.9, reporting from the page: *"The
+ * 'cadoor' handle isnt affected by the hardware finish."* Asked whether that
+ * was the 31.8 rule or a bug, he said a bug: **the כדור follows the פרזול; the
+ * ספיר stays constant.** So the Sapir's mirror knob and its plate keep their
+ * constant gradients (`mirrorKnob`, `lockUnitFace`, `lockUnitSoft`) and the
+ * cadoor's shank moves onto `nickelSoft`; this is the ball.
+ *
+ * ⚠ ON A NICKEL DOOR NOTHING MOVES, BYTE FOR BYTE. The dome was measured off
+ * the product photograph and it is WARM (R above B at every stop) where the
+ * steel ramp is cool, so running the derivation on steel would NOT reproduce
+ * it — it would give the dome's brightness in the ramp's hue. The measured
+ * five are therefore emitted as literals for nickel, as `cylinderRamp` emits
+ * its measured chrome and black, and the other three finishes are DERIVED:
+ * each measured stop is paired with the steel entry nearest it in brightness
+ * (the one playing the same part — highlight, body, core), the multiplier is
+ * the one between them, and `scaleTone` applies it to the chosen finish's own
+ * entry, which moves brightness and leaves hue alone. Pairing and multipliers
+ * are both computed, so a refitted steel ramp carries them with it.
+ * The two overlays on the ball (the white terminator and the black belly) are
+ * white and black at alpha and stay so on every finish — never tinted (§4).
+ */
+const DOME = ['#F2EEEA', '#E3DFDB', '#5D5249', '#988E86', '#6B625B'];
+const DOME_REF = DOME.map(c => FINISH_TONES.steel
+  .map((s, i) => [Math.abs(rawLum(s) - rawLum(c)), i]).sort((a, b) => a[0] - b[0])[0][1]);
+const DOME_LIFT = DOME.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[DOME_REF[i]]));
+export function domeRamp(tone) {
+  if (tone === FINISH_TONES.steel) return DOME;
+  return DOME_LIFT.map((m, i) => scaleTone(tone[DOME_REF[i]], m));
+}
+
 /* ── The light. Everything shades from this. ────────────────────────
    Key is high and ~30° left of camera. The camera is square on to the door,
    so the two jamb returns are the same width (see RETURN) and the light,
@@ -1595,6 +1630,7 @@ export function render(state) {
      shares one answer with the ones already here. See `cylinderRamp` for
      which of the four cylinders are measured. */
   const cyl      = cylinderRamp(hwTone);
+  const dome     = domeRamp(hwTone);
   const bellTone = bellRamp(tone);
 
   /* ⚠ THE STRIPES FOLLOW THE FINISH, AND WHICH FINISH TOOK DECIDING.
@@ -2152,7 +2188,12 @@ export function render(state) {
       <stop offset="0.80" stop-color="${FINISH_TONES.steel[4]}"/>
       <stop offset="1"    stop-color="${FINISH_TONES.steel[5]}"/>
     </linearGradient>
-    <!-- ⚠ AND TWO MORE CONSTANTS FOR THE SAME REASON, ONE STEP OVER.
+    <!-- ⚠ AND TWO MORE CONSTANTS FOR THE SAME REASON, ONE STEP OVER —
+         ⚠ NOW ONE, SINCE 26.9.2026: the owner's son called the constant
+         cadoor a bug ("The 'cadoor' handle isnt affected by the hardware
+         finish"), so its ball follows the פרזול through domeRamp and its
+         shank paints from nickelSoft. The ספיר keeps everything below. The
+         31.8 sentence stays here because it is the instruction overruled.
          Owner, 31.8.2026: "the pirzul doesnt change the color of the ספיר and
          כדור handles."
 
@@ -2411,13 +2452,15 @@ export function render(state) {
       <stop offset="0.78" stop-color="#5A4B40"/>
       <stop offset="1"   stop-color="#8C8179"/>
     </linearGradient>
-    <!-- Cadoor's dome: a hard terminator, not a smooth falloff. -->
+    <!-- Cadoor's dome: a hard terminator, not a smooth falloff. The פרזול's
+         metal since 26.9.2026, through domeRamp — the measured stops on
+         nickel, the same brightness relation in the other three. -->
     <radialGradient id="domeKnob" cx="0.34" cy="0.26" r="0.86">
-      <stop offset="0"    stop-color="#F2EEEA"/>
-      <stop offset="0.28" stop-color="#E3DFDB"/>
-      <stop offset="0.42" stop-color="#5D5249"/>
-      <stop offset="0.72" stop-color="#988E86"/>
-      <stop offset="1"    stop-color="#6B625B"/>
+      <stop offset="0"    stop-color="${dome[0]}"/>
+      <stop offset="0.28" stop-color="${dome[1]}"/>
+      <stop offset="0.42" stop-color="${dome[2]}"/>
+      <stop offset="0.72" stop-color="${dome[3]}"/>
+      <stop offset="1"    stop-color="${dome[4]}"/>
     </radialGradient>
     <!-- Sapir: mirror chrome is bright at both edges with a dark reflected
          core — the opposite of the satin gradient everything else uses. -->
@@ -9002,10 +9045,14 @@ function cadoorKnob(cx, cy, dir) {
            the door. Invisible until the footprints were measured off the art
            instead of asserted. It points inboard now, which is also where the
            spindle goes. -->
-      <rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
-            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#lockUnitSoft)"
+      <!-- Shank and ball are the פרזול's metal since 26.9.2026 (see
+           domeRamp): the shank was the bought-in unit's constant soft ring,
+           and it is the furniture's soft ramp now. data-part names each so a
+           check can ask about the BALL, not about the group. -->
+      <rect data-part="shank" x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
+            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"
             transform="${dir < 0 ? `translate(${-rx * 1.2} 0)` : ''}"/>
-      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
+      <ellipse data-part="ball" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
                transform="rotate(${tilt} ${cx} ${cy})"/>
       <!-- the terminator: a hard bright band over a dark one, not a gradient -->
       <ellipse cx="${cx - dir * rx * 0.22}" cy="${cy - ry * 0.30}"

@@ -127,6 +127,9 @@ says *they* (older text says "the owner's son"; leave it, do not add more).
 Older and long-form: **`HISTORY.md`** (verbatim to 26.9.2026). Dates are the
 day of the change.
 
+- **26.9** The כדור follows the פרזול (*"a bug"*, overruling 31.8): ball via
+  `domeRamp` (measured literal on nickel, `scaleTone` elsewhere), shank on
+  `nickelSoft`; the ספיר stays constant. `exp.pz.a` names both via `expArgs`.
 - **26.9** Curved lever's tip level with its spindle (*"the end of the handle
   needs to be the same height as the start"*): `TAPER_TILT` derived, 15.39°;
   lock-tile raster coral~curved 0.300 → 0.277, no audit floor exists for it.
@@ -709,8 +712,8 @@ before it picks a fill.**
 | gradients | owner |
 |---|---|
 | `gripHard` `gripSoft` | the pull bar, in its own finish (`hf=`) |
-| `nickel` `nickelSoft` `plateFace` | the פרזול |
-| `lockUnit` | the bought-in extra locks — a constant steel |
+| `nickel` `nickelSoft` `plateFace` `domeKnob` | the פרזול — `domeKnob` (the כדור's ball) through `domeRamp` since 26.9, the measured dome on nickel |
+| `lockUnit` `lockUnitFace` `lockUnitSoft` `mirrorKnob` | the bought-in extra locks and the ספיר — a constant steel |
 | `euroSteel` `euroRim` | the cylinder, following the פרזול at its own stand-off (`cylinderRamp`) |
 | `bellMetal` | the פעמון, following the pull handle's finish (`bellRamp` keeps Peretz's older *"nickel and gold only"* beside the instruction that overruled it) |
 
@@ -721,8 +724,8 @@ at least once, always silently.
 
 | | |
 |---|---|
-| follows it | the lever and its furniture, the keyhole, the hinges, the peephole (both kinds), the security latch, the metal strips |
-| never | the pull handle and the פעמון (their own `hf=`) · the extra lock (`#lockUnit`) · the ספיר and כדור knobs (the maker's finish, 31.8). The כדור על אורך (`knobplate`) **does** follow it — it is a different product, and d092 is bronze |
+| follows it | the lever and its furniture, the כדור's ball and shank (26.9 — the owner's son called the constant ball a bug, overruling 31.8), the keyhole, the hinges, the peephole (both kinds), the security latch, the metal strips. The כדור על אורך (`knobplate`) too — d092 is bronze |
+| never | the pull handle and the פעמון (their own `hf=`) · the extra lock (`#lockUnit`) · the ספיר (the maker's finish, 31.8) |
 
 ### The lock furniture's measurements (`npm run lockset`, 19.9)
 

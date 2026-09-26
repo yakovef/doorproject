@@ -481,16 +481,22 @@
          project calls its worst (§0): not a crash, a promise the picture did not
          keep. The list here is now the whole of it, in both directions:
     
-           follows it   the lever, the keyhole, the hinges, the viewer, the
-                        security latch, and the metal strips
-           does not     the pull handle (its own product, its own finish), the
-                        safe lock and the keypad, and the ספיר and כדור handles —
-                        all bought-in in one finish, on the owner's word 31.8
-           two only     the doorbell — nickel or gold, on the owner's word */
+           follows it   the lever, the כדור's ball and shank (26.9), the
+                        keyhole, the hinges, the viewer, the security latch, and
+                        the metal strips
+           does not     the pull handle and the doorbell (their own finish, hf=),
+                        the safe lock and the keypad, and the ספיר — bought-in in
+                        one finish, on the owner's word 31.8
+         ⚠ 26.9.2026: the כדור left the second row. The owner's son called its
+         constant ball a bug (see domeRamp in renderer.js), so the sentence that
+         named it beside the ספיר would have told a customer holding a gold door
+         the opposite of the picture — this comment's own first paragraph, again.
+         The two names come through {0} (the כדור) and {1} (the ספיר), out of
+         LOCKSETS, so a renamed knob cannot leave this paragraph behind. */
     "exp.pz.a": [
-      "את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
-      "The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
-      "Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
+      "את הגוון של הידית שמסובבים (וגם של ידית ה{0}), חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את ידית ה{1}: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.",
+      "The tone of the lever you turn (and of the {0} knob), the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the {1} handle: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.",
+      "Оттенок нажимной ручки (и ручки «{0}»), замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручку «{1}»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет."
     ],
     "exp.sum.q": [
       "מה קורה אחרי שאני שולח?",
@@ -3010,6 +3016,13 @@ ${stops}
     };
   }
   var bellRamp = (tone) => tone;
+  var DOME = ["#F2EEEA", "#E3DFDB", "#5D5249", "#988E86", "#6B625B"];
+  var DOME_REF = DOME.map((c) => FINISH_TONES.steel.map((s, i) => [Math.abs(rawLum(s) - rawLum(c)), i]).sort((a, b) => a[0] - b[0])[0][1]);
+  var DOME_LIFT = DOME.map((c, i) => rawLum(c) / rawLum(FINISH_TONES.steel[DOME_REF[i]]));
+  function domeRamp(tone) {
+    if (tone === FINISH_TONES.steel) return DOME;
+    return DOME_LIFT.map((m, i) => scaleTone(tone[DOME_REF[i]], m));
+  }
   var LIGHT = {
     key: 0.24,
     // face wash amplitude
@@ -3284,6 +3297,7 @@ ${stops}
     const tone = FINISH_TONES[finish.id] || FINISH_TONES.steel;
     const hwTone = FINISH_TONES[byId(PIRZUL2, state2.pirzul).tone] || FINISH_TONES.steel;
     const cyl = cylinderRamp(hwTone);
+    const dome = domeRamp(hwTone);
     const bellTone = bellRamp(tone);
     const stripeTone = byId(PIRZUL2, state2.pirzul).tone === "steel" ? tone : hwTone;
     const leafW = size.w - REBATE * 2, leafH = size.h - REBATE;
@@ -3672,7 +3686,12 @@ ${stops}
       <stop offset="0.80" stop-color="${FINISH_TONES.steel[4]}"/>
       <stop offset="1"    stop-color="${FINISH_TONES.steel[5]}"/>
     </linearGradient>
-    <!-- ⚠ AND TWO MORE CONSTANTS FOR THE SAME REASON, ONE STEP OVER.
+    <!-- ⚠ AND TWO MORE CONSTANTS FOR THE SAME REASON, ONE STEP OVER —
+         ⚠ NOW ONE, SINCE 26.9.2026: the owner's son called the constant
+         cadoor a bug ("The 'cadoor' handle isnt affected by the hardware
+         finish"), so its ball follows the פרזול through domeRamp and its
+         shank paints from nickelSoft. The ספיר keeps everything below. The
+         31.8 sentence stays here because it is the instruction overruled.
          Owner, 31.8.2026: "the pirzul doesnt change the color of the ספיר and
          כדור handles."
 
@@ -3931,13 +3950,15 @@ ${stops}
       <stop offset="0.78" stop-color="#5A4B40"/>
       <stop offset="1"   stop-color="#8C8179"/>
     </linearGradient>
-    <!-- Cadoor's dome: a hard terminator, not a smooth falloff. -->
+    <!-- Cadoor's dome: a hard terminator, not a smooth falloff. The פרזול's
+         metal since 26.9.2026, through domeRamp — the measured stops on
+         nickel, the same brightness relation in the other three. -->
     <radialGradient id="domeKnob" cx="0.34" cy="0.26" r="0.86">
-      <stop offset="0"    stop-color="#F2EEEA"/>
-      <stop offset="0.28" stop-color="#E3DFDB"/>
-      <stop offset="0.42" stop-color="#5D5249"/>
-      <stop offset="0.72" stop-color="#988E86"/>
-      <stop offset="1"    stop-color="#6B625B"/>
+      <stop offset="0"    stop-color="${dome[0]}"/>
+      <stop offset="0.28" stop-color="${dome[1]}"/>
+      <stop offset="0.42" stop-color="${dome[2]}"/>
+      <stop offset="0.72" stop-color="${dome[3]}"/>
+      <stop offset="1"    stop-color="${dome[4]}"/>
     </radialGradient>
     <!-- Sapir: mirror chrome is bright at both edges with a dark reflected
          core — the opposite of the satin gradient everything else uses. -->
@@ -7328,10 +7349,14 @@ ${body}
            the door. Invisible until the footprints were measured off the art
            instead of asserted. It points inboard now, which is also where the
            spindle goes. -->
-      <rect x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
-            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#lockUnitSoft)"
+      <!-- Shank and ball are the פרזול's metal since 26.9.2026 (see
+           domeRamp): the shank was the bought-in unit's constant soft ring,
+           and it is the furniture's soft ramp now. data-part names each so a
+           check can ask about the BALL, not about the group. -->
+      <rect data-part="shank" x="${cx - (dir < 0 ? 0 : rx * 1.1)}" y="${cy - ry * 0.26}" width="${rx * 1.2}"
+            height="${ry * 0.52}" rx="${ry * 0.26}" fill="url(#nickelSoft)"
             transform="${dir < 0 ? `translate(${-rx * 1.2} 0)` : ""}"/>
-      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
+      <ellipse data-part="ball" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#domeKnob)"
                transform="rotate(${tilt} ${cx} ${cy})"/>
       <!-- the terminator: a hard bright band over a dark one, not a gradient -->
       <ellipse cx="${cx - dir * rx * 0.22}" cy="${cy - ry * 0.3}"
@@ -9387,7 +9412,14 @@ ${body}
       ]
     },
     { key: "grip", title: "step.grip.t", sub: "step.grip.s", lede: "step.grip.l", exp: "exp.grip" },
-    { key: "pz", title: "step.pz.t", sub: "step.pz.s", lede: "step.pz.l", exp: "exp.pz" },
+    {
+      key: "pz",
+      title: "step.pz.t",
+      sub: "step.pz.s",
+      lede: "step.pz.l",
+      exp: "exp.pz",
+      expArgs: () => [L(byId(LOCKSETS, "cadoor")), L(byId(LOCKSETS, "sapir"))]
+    },
     {
       key: "face",
       title: "step.face.t",

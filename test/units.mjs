@@ -3703,7 +3703,19 @@ group('the finish reaches every piece of metal');
        `knobplate`, `digital` and `square` beside them have carried
        `data-style` all along. A fourth attribute meaning the same thing is
        how a selector comes to match three fittings out of five. */
-    for (const kind of ['sapir', 'cadoor']) {
+    /* ⚠ RESTATED 26.9.2026 — THE PAIR IS NOW THE ספיר AGAINST THE כדור.
+       The owner's son, from the page: *"The 'cadoor' handle isnt affected by
+       the hardware finish."* Asked whether that was the 31.8 rule above or a
+       bug: a bug — the כדור follows the פרזול, the ספיר stays constant. So
+       the Sapir keeps every clause it had (the loop below, unchanged), and
+       the cadoor's clause is turned round rather than deleted: it must now
+       CHANGE under each of the three finishes, and it is asked of the BALL
+       and the SHANK by name (`data-part`), because the group changing proves
+       nothing about the ball — the shank alone moving would pass it (§5.8,
+       "an assertion names the object, not the document"). `looks` resolves
+       each gradient to its stops (§5.22): a part painted url(#domeKnob) is
+       the same markup in every finish. */
+    for (const kind of ['sapir']) {
       const st = { ...base, lockset: kind };
       const sel = `data-style="${kind}"`;
       ok(grabDeep(render(st), sel),
@@ -3715,6 +3727,34 @@ group('the finish reaches every piece of metal');
       }
       ok(!refs(grabDeep(render(st), sel)).some(id => /^(nickel|nickelSoft|plateFace)$/.test(id)),
          `the ${kind} still paints with one of the פרזול's own gradients`);
+    }
+    {
+      const st = { ...base, lockset: 'cadoor' };
+      for (const part of ['ball', 'shank']) {
+        const sel = `data-part="${part}"`;
+        const partLooks = svg => {
+          const el = new RegExp(`<[a-z]+ ${sel}[^>]*>`).exec(grabDeep(svg, 'data-style="cadoor"') || '');
+          const id = el && (/fill="url\(#([A-Za-z0-9_-]+)\)"/.exec(el[0]) || [])[1];
+          const g = id && new RegExp(`<(linear|radial)Gradient id="${id}"[^>]*>([\\s\\S]*?)</\\1Gradient>`).exec(svg);
+          return g ? (g[2].match(/stop-color="[^"]+"/g) || []).join(',') : null;
+        };
+        ok(partLooks(render(st)), `the cadoor's ${part} or its gradient was not found — this check is dead`);
+        for (const pz of ['pz-black', 'pz-bronze', 'pz-gold']) {
+          ok(partLooks(render({ ...st, pirzul: pz })) !== partLooks(render(st)),
+             `the פרזול "${pz}" does not reach the cadoor's ${part} — the owner's son, `
+             + '26.9: it follows the פרזול');
+        }
+      }
+      ok(refs(grabDeep(render(st), 'data-style="cadoor"')).includes('nickelSoft'),
+         'the cadoor\'s shank is not painted from the פרזול\'s soft ramp');
+      /* And on nickel the ball is still the MEASUREMENT, stop for stop — the
+         five hexes read off the product photograph — so following the
+         פרזול cost the default door nothing. */
+      const nickelBall = (/<radialGradient id="domeKnob"[^>]*>([\s\S]*?)<\/radialGradient>/
+        .exec(render({ ...st, pirzul: 'pz-nickel' })) || [])[1] || '';
+      ok((nickelBall.match(/stop-color="([^"]+)"/g) || []).join(',')
+         === ['#F2EEEA', '#E3DFDB', '#5D5249', '#988E86', '#6B625B'].map(c => `stop-color="${c}"`).join(','),
+         'on a nickel פרזול the cadoor\'s ball is no longer the measured dome');
     }
     ok(grabDeep(render({ ...base, lockset: 'knobplate' }), 'data-style="knobplate"'),
        'the knob-on-backplate group is not in the markup — the pair check is dead');

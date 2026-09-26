@@ -575,15 +575,21 @@ export const UI = {
      project calls its worst (§0): not a crash, a promise the picture did not
      keep. The list here is now the whole of it, in both directions:
 
-       follows it   the lever, the keyhole, the hinges, the viewer, the
-                    security latch, and the metal strips
-       does not     the pull handle (its own product, its own finish), the
-                    safe lock and the keypad, and the ספיר and כדור handles —
-                    all bought-in in one finish, on the owner's word 31.8
-       two only     the doorbell — nickel or gold, on the owner's word */
-  'exp.pz.a':             ['את הגוון של הידית שמסובבים, חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את הידיות ספיר וכדור: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.',
-                       'The tone of the lever you turn, the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the Sapir and Cadoor handles: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.',
-                       'Оттенок нажимной ручки, замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручки «Сапир» и «Шаровая»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет.'],
+       follows it   the lever, the כדור's ball and shank (26.9), the
+                    keyhole, the hinges, the viewer, the security latch, and
+                    the metal strips
+       does not     the pull handle and the doorbell (their own finish, hf=),
+                    the safe lock and the keypad, and the ספיר — bought-in in
+                    one finish, on the owner's word 31.8
+     ⚠ 26.9.2026: the כדור left the second row. The owner's son called its
+     constant ball a bug (see domeRamp in renderer.js), so the sentence that
+     named it beside the ספיר would have told a customer holding a gold door
+     the opposite of the picture — this comment's own first paragraph, again.
+     The two names come through {0} (the כדור) and {1} (the ספיר), out of
+     LOCKSETS, so a renamed knob cannot leave this paragraph behind. */
+  'exp.pz.a':             ['את הגוון של הידית שמסובבים (וגם של ידית ה{0}), חור המנעול, הצירים, העינית וסגר הביטחון — וגם של פסי המתכת, אם בחרתם גוון שאיננו ניקל. הוא לא משנה את ידית המשיכה ואת הפעמון — לשניהם גימור משלהם, שנבחר בשלב ידית המשיכה — ולא את הכספת והקודן, ולא את ידית ה{1}: כל אלה מגיעים בגימור של היצרן. הצירים אינם נראים מבחוץ בדלת שנפתחת פנימה, ולכן השורה הזו בהזמנה היא המקום היחיד שאומר באיזה גוון הם.',
+                       'The tone of the lever you turn (and of the {0} knob), the keyhole, the hinges, the peephole and the security latch — and the metal strips too, if you pick anything other than nickel. It does NOT change the pull handle or the doorbell — those two have a finish of their own, chosen on the pull-handle step — nor the safe lock, the keypad, or the {1} handle: all of those arrive in the manufacturer’s own finish. On a door that opens inwards the hinges are hidden from the street, so this row on the order is the only place that says what colour they are.',
+                       'Оттенок нажимной ручки (и ручки «{0}»), замочной скважины, петель, глазка и предохранительной защёлки — а также металлических полос, если выбран не никель. Он НЕ меняет ручку-скобу и звонок — у них своя отделка, выбираемая на шаге ручки-скобы — и не меняет сейфовый и кодовый замки и ручку «{1}»: всё это приходит в отделке производителя. У двери, открывающейся внутрь, петли снаружи не видны, поэтому эта строка в заказе — единственное место, где указан их цвет.'],
 
   'exp.sum.q':        ['מה קורה אחרי שאני שולח?', 'What happens after I send it?',
                        'Что будет после отправки?'],

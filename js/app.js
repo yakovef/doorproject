@@ -333,7 +333,9 @@ const GROUPS = [
    already sent goes stale and no VERSION moves. The `01`-`08` digits are a CSS
    counter over position, which is exactly why they are a counter — this
    reorder is the event a stored digit would have gone stale on. */
-/* ⚠ WHY FOUR OF THESE NINE CARRY `expArgs` — 25.9.2026. An explainer that
+/* ⚠ WHY MOST OF THESE CARRY `expArgs` — 25.9.2026 (and `pz` since 26.9,
+   when its paragraph moved the כדור from "never" to "follows" and its two
+   typed knob names came out with it). An explainer that
    types a price or the name of an option is a second copy of something the
    catalogue already states, and §5 is about what two copies of one fact do.
    One of them had already gone stale in silence: `exp.lock.a` promised ₪700
@@ -364,7 +366,8 @@ const SECTIONS = [
     expArgs: () => [formatAgorot(byId(SPECIAL_LOCKS, 'kasefet').delta),
                     formatAgorot(byId(SPECIAL_LOCKS, 'kodan').delta)] },
   { key: 'grip',   title: 'step.grip.t',   sub: 'step.grip.s',   lede: 'step.grip.l', exp: 'exp.grip' },
-  { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz' },
+  { key: 'pz',     title: 'step.pz.t',     sub: 'step.pz.s',     lede: 'step.pz.l', exp: 'exp.pz',
+    expArgs: () => [L(byId(LOCKSETS, 'cadoor')), L(byId(LOCKSETS, 'sapir'))] },
   { key: 'face',   title: 'step.face.t',   sub: 'step.face.s',   lede: 'step.face.l', exp: 'exp.face',
     expArgs: () => [formatAgorot(STRIPE_A.h), formatAgorot(STRIPE_A.v)] },
   { key: 'glass',  title: 'step.glass.t',  sub: 'step.glass.s',  lede: 'step.glass.l', exp: 'exp.glass',
